@@ -255,6 +255,28 @@ InternalPoly::invert()
 }
 
 InternalCF*
+InternalPoly::tryInvert ( const CanonicalForm& M, bool& fail)
+{
+  if ( inExtension() && !getReduce ( var ) )
+  {
+    CanonicalForm b, inverse;
+    CanonicalForm F ( this ->copyObject() );
+    Variable a = M.mvar();
+    Variable x = Variable(1);
+    F= mod (F, M); //reduce mod M
+    CanonicalForm g= extgcd (replacevar( F, a, x ), replacevar( M, a, x ), inverse, b );
+    if(!g.isOne())
+      fail = true;
+    else
+      inverse = replacevar( inverse, x, a ); // change back to alg var
+    CanonicalForm test= mod (inverse*F, M);
+    return inverse.getval();
+  }
+  else
+    return CFFactory::basic( 0 );
+}
+
+InternalCF*
 InternalPoly::addsame( InternalCF* aCoeff )
 {
     InternalPoly * aPoly = (InternalPoly*)aCoeff;
@@ -397,6 +419,69 @@ InternalPoly::mulsame( InternalCF* aCoeff )
 }
 
 InternalCF*
+InternalPoly::tryMulsame( InternalCF* aCoeff, const CanonicalForm& M)
+{
+    if (is_imm(aCoeff))
+       return mulcoeff(aCoeff);
+    InternalPoly *aPoly = (InternalPoly*)aCoeff;
+    termList resultFirst = 0, resultLast = 0;
+    termList theCursor = firstTerm;
+
+    while ( theCursor )
+    {
+        resultFirst = mulAddTermList( resultFirst, aPoly->firstTerm,
+                          theCursor->coeff, theCursor->exp, resultLast, false );
+        theCursor = theCursor->next;
+    }
+    if ( inExtension() && !getReduce( var ) )
+    {
+        resultFirst= reduceTermList (resultFirst, ((InternalPoly*) M.getval())->firstTerm, resultLast);
+        if ( resultFirst == 0 )
+        {
+            if ( getRefCount() <= 1 )
+            {
+                delete this;
+                return CFFactory::basic(0);
+            }
+            else
+            {
+                decRefCount();
+                return CFFactory::basic(0);
+            }
+        }
+        else  if ( resultFirst->exp == 0 )
+        {
+            if ( getRefCount() <= 1 )
+            {
+                InternalCF * res = resultFirst->coeff.getval();
+                delete resultFirst;
+                delete this;
+                return res;
+            }
+            else
+            {
+                decRefCount();
+                InternalCF * res = resultFirst->coeff.getval();
+                delete resultFirst;
+                return res;
+            }
+        }
+    }
+    if ( getRefCount() <= 1 )
+    {
+        freeTermList( firstTerm );
+        firstTerm = resultFirst;
+        lastTerm = resultLast;
+        return this;
+    }
+    else
+    {
+        decRefCount();
+        return new InternalPoly( resultFirst, resultLast, var );
+    }
+}
+
+InternalCF*
 InternalPoly::dividesame( InternalCF* aCoeff )
 {
     return divsame( aCoeff );
@@ -447,6 +532,109 @@ InternalPoly::divsame( InternalCF* aCoeff )
         first = mulAddTermList( first->next, aPoly->firstTerm->next, newcoeff, newexp, last, true );
         delete dummy;
         appendTermList( resultfirst, resultlast, newcoeff, newexp );
+    }
+    freeTermList( first );
+    if ( singleObject )
+    {
+        if ( resultfirst && resultfirst->exp != 0 )
+        {
+            firstTerm = resultfirst;
+            lastTerm = resultlast;
+            return this;
+        }
+        else  if ( resultfirst )
+        {
+            InternalCF * res = resultfirst->coeff.getval();
+            delete resultfirst;
+            firstTerm = 0;
+            delete this;
+            return res;
+        }
+        else
+        {
+            // this should not happen (evtl use assertion)
+            ASSERT( 0, "FATAL ERROR, PLEASE INFORM THE AUTHOR" );
+            firstTerm = 0;
+            delete this;
+            return CFFactory::basic( 0 );
+        }
+    }
+    else
+    {
+        if ( resultfirst && resultfirst->exp != 0 )
+            return new InternalPoly( resultfirst, resultlast, var );
+        else  if ( resultfirst )
+        {
+            InternalCF * res = resultfirst->coeff.getval();
+            delete resultfirst;
+            return res;
+        }
+        else
+            return CFFactory::basic( 0 );
+    }
+}
+
+InternalCF*
+InternalPoly::tryDivsame( InternalCF* aCoeff, const CanonicalForm& M, bool& fail )
+{
+    if ( inExtension() && !getReduce( var ) )
+    {
+        InternalCF * dummy = aCoeff->tryInvert(M, fail);
+        if (fail)
+          return CFFactory::basic( 0 );
+        if (is_imm(dummy)) dummy=this->tryMulsame(dummy, M);
+        else dummy = dummy->tryMulsame( this, M);
+        if (fail)
+        {
+          if (getRefCount() <= 1)
+            delete this;
+          else
+            decRefCount();
+          return dummy;
+        }
+        if ( getRefCount() <= 1 )
+        {
+             delete this;
+             return dummy;
+        }
+        else
+        {
+            decRefCount();
+            return dummy;
+        }
+    }
+    InternalPoly *aPoly = (InternalPoly*)aCoeff;
+    termList dummy, first, last, resultfirst = 0, resultlast = 0;
+    CanonicalForm coeff, newcoeff;
+    int exp, newexp;
+    bool singleObject;
+
+    if ( getRefCount() <= 1 )
+    {
+        first = firstTerm; last = lastTerm; singleObject = true;
+    }
+    else
+    {
+        first = copyTermList( firstTerm, last ); singleObject = false;
+        decRefCount();
+    }
+    coeff = aPoly->firstTerm->coeff;
+    exp = aPoly->firstTerm->exp;
+    while (first && ( first->exp >= exp ) )
+    {
+        newcoeff= first->coeff.tryDiv (coeff, M, fail);
+        if (fail)
+        {
+          freeTermList (first);
+          return CFFactory::basic (0);
+        }
+        newcoeff= reduce (newcoeff, M);
+        newexp = first->exp - exp;
+        dummy = first;
+        first = mulAddTermList( first->next, aPoly->firstTerm->next, newcoeff, newexp, last, true );
+        delete dummy;
+        if (!newcoeff.isZero())
+          appendTermList( resultfirst, resultlast, newcoeff, newexp );
     }
     freeTermList( first );
     if ( singleObject )
@@ -619,7 +807,6 @@ InternalPoly::divremsame( InternalCF* acoeff, InternalCF*& quot, InternalCF*& re
     }
 }
 
-
 bool
 InternalPoly::divremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& rem )
 {
@@ -675,6 +862,89 @@ InternalPoly::divremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& r
             }
             else
                 rem = new InternalPoly( first, last, var );
+        else
+            rem = CFFactory::basic( 0 );
+    }
+    else
+    {
+        freeTermList( resultfirst );
+        freeTermList( first );
+    }
+    return divideok;
+}
+
+bool
+InternalPoly::tryDivremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& rem, const CanonicalForm& M, bool& fail)
+{
+    if (inExtension() && !getReduce (var))
+    {
+       InternalCF * dummy = acoeff->tryInvert(M, fail);
+       if (fail)
+         return false;
+       quot = dummy->tryMulsame( this, M);
+       rem = CFFactory::basic( 0 );
+       if (fail)
+         return false;
+       return true;
+    }
+    InternalPoly *aPoly = (InternalPoly*)acoeff;
+    termList dummy, first, last, resultfirst = 0, resultlast = 0;
+    CanonicalForm coeff, newcoeff, dummycoeff;
+    int exp, newexp;
+    bool divideok = true;
+
+    first = copyTermList( firstTerm, last );
+
+    coeff = aPoly->firstTerm->coeff;
+    exp = aPoly->firstTerm->exp;
+    while (first && ( first->exp >= exp ) && divideok )
+    {
+        divideok = tryDivremt( first->coeff, coeff, newcoeff, dummycoeff, M, fail );
+        if (fail)
+        {
+          freeTermList (first);
+          return false;
+        }
+        if ( divideok && dummycoeff.isZero() )
+        {
+            newexp = first->exp - exp;
+            dummy = first;
+            first = mulAddTermList( first->next, aPoly->firstTerm->next, newcoeff, newexp, last, true );
+            delete dummy;
+            if (!newcoeff.isZero())
+              appendTermList( resultfirst, resultlast, newcoeff, newexp );
+        }
+        else
+            divideok = false;
+    }
+    if ( divideok )
+    {
+        if ( resultfirst )
+            if ( resultfirst->exp == 0 )
+            {
+                quot = resultfirst->coeff.getval();
+                delete resultfirst;
+            }
+            else
+                quot = new InternalPoly( resultfirst, resultlast, var );
+        else
+            quot = CFFactory::basic( 0 );
+        if ( first )
+            if ( first->exp == 0 )
+            {
+                rem = first->coeff.getval();
+                delete first;
+            }
+            else
+            {
+                if (first->coeff.isZero())
+                {
+                  rem= CFFactory::basic (0);
+                  delete first;
+                }
+                else
+                  rem = new InternalPoly( first, last, var );
+            }
         else
             rem = CFFactory::basic( 0 );
     }
@@ -1026,6 +1296,102 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
 }
 
 InternalCF*
+InternalPoly::tryDividecoeff( InternalCF* cc, bool invert, const CanonicalForm& M, bool& fail )
+{
+    CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
+    if ( inExtension() && !getReduce( var ) && invert )
+    {
+        InternalCF * dummy;
+        dummy = this->tryInvert(M, fail);
+        if (fail)
+        {
+          if (getRefCount() <= 1)
+            delete this;
+          else
+            decRefCount(); 
+          return dummy; //is equal to CFFactory::basic (0) in this case
+        }
+        if (is_imm(dummy))
+        {
+          if (is_imm(cc))
+          {
+            InternalInteger *d=new InternalInteger(imm2int(dummy)*imm2int(cc));
+            dummy=d;
+          }
+          else
+            dummy=cc->mulcoeff(dummy);
+        }
+        else dummy = dummy->mulcoeff( cc );
+        if ( getRefCount() <= 1 )
+        {
+            delete this;
+            return dummy;
+        }
+        else
+        {
+            decRefCount();
+            return dummy;
+        }
+    }
+    if ( invert )
+    {
+        if ( getRefCount() <= 1 )
+        {
+            delete this;
+            return CFFactory::basic( 0 );
+        }
+        else
+        {
+            decRefCount();
+            return CFFactory::basic( 0 );
+        }
+    }
+    if ( c.isOne() )
+        return this;
+    //one should never get here
+    else
+    {
+        if ( getRefCount() <= 1 )
+        {
+            firstTerm = divideTermList( firstTerm, c, lastTerm );
+            if ( firstTerm && firstTerm->exp != 0 )
+                return this;
+            else  if ( firstTerm )
+            {
+                InternalCF * res = firstTerm->coeff.getval();
+                delete this;
+                return res;
+            }
+            else
+            {
+                delete this;
+                return CFFactory::basic( 0 );
+            }
+        }
+        else
+        {
+            decRefCount();
+            termList last, first = copyTermList( firstTerm, last );
+            first = divideTermList( first, c, last );
+            if ( first && first->exp != 0 )
+                return new InternalPoly( first, last, var );
+            else  if ( first )
+            {
+                InternalCF * res = first->coeff.getval();
+                delete first;
+                return res;
+            }
+            else
+            {
+                delete first;
+                return CFFactory::basic( 0 );
+            }
+        }
+    }
+}
+
+
+InternalCF*
 InternalPoly::divcoeff( InternalCF* cc, bool invert )
 {
     CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
@@ -1084,6 +1450,105 @@ InternalPoly::divcoeff( InternalCF* cc, bool invert )
             decRefCount();
             termList last, first = copyTermList( firstTerm, last );
             first = divTermList( first, c, last );
+            if ( first && first->exp != 0 )
+                return new InternalPoly( first, last, var );
+            else  if ( first )
+            {
+                InternalCF * res = first->coeff.getval();
+                delete first;
+                return res;
+            }
+            else
+            {
+                delete first;
+                return CFFactory::basic( 0 );
+            }
+        }
+    }
+}
+
+InternalCF*
+InternalPoly::tryDivcoeff( InternalCF* cc, bool invert, const CanonicalForm& M, bool& fail )
+{
+    CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
+    if ( inExtension() && !getReduce( var ) && invert )
+    {
+        InternalCF * dummy;
+        dummy = this->tryInvert(M, fail);
+        if (fail)
+        {
+          if (getRefCount() <= 1)
+            delete this;
+          else
+            decRefCount();
+          return dummy;
+        }
+        dummy = dummy->mulcoeff( cc );
+        if ( getRefCount() <= 1 )
+        {
+            delete this;
+            return dummy;
+        }
+        else
+        {
+            decRefCount();
+            return dummy;
+        }
+    }
+    if ( invert )
+    {
+        if ( getRefCount() <= 1 )
+        {
+            delete this;
+            return CFFactory::basic( 0 );
+        }
+        else
+        {
+            decRefCount();
+            return CFFactory::basic( 0 );
+        }
+    }
+    if ( c.isOne() )
+        return this;
+    else
+    {
+        if ( getRefCount() <= 1 )
+        {
+            firstTerm = tryDivTermList( firstTerm, c, lastTerm, M, fail );
+            if (fail)
+            {
+              delete this;
+              return CFFactory::basic (0);
+            }
+            if ( firstTerm && firstTerm->exp != 0 )
+                return this;
+            else  if ( firstTerm )
+            {
+                InternalCF * res = firstTerm->coeff.getval();
+                delete this;
+                return res;
+            }
+            else
+            {
+                delete this;
+                return CFFactory::basic( 0 );
+            }
+        }
+        else
+        {
+            decRefCount();
+            termList last, first = copyTermList( firstTerm, last );
+            first = tryDivTermList( first, c, last, M, fail );
+            if (fail)
+            {
+              delete this;
+              return CFFactory::basic (0);
+            }
+            if (fail)
+            {
+              delete first;
+              return CFFactory::basic (0);
+            }
             if ( first && first->exp != 0 )
                 return new InternalPoly( first, last, var );
             else  if ( first )
@@ -1248,6 +1713,79 @@ InternalPoly::divremcoefft( InternalCF* cc, InternalCF*& quot, InternalCF*& rem,
     while ( cursor && divideok )
     {
         divideok = divremt( cursor->coeff, c, cquot, crem );
+        divideok = divideok && crem.isZero();
+        if ( divideok )
+        {
+            if ( ! cquot.isZero() )
+            {
+                quotcursor->next = new term( 0, cquot, cursor->exp );
+                quotcursor = quotcursor->next;
+            }
+            cursor = cursor->next;
+        }
+    }
+    quotcursor->next = 0;
+    if ( divideok )
+    {
+        cursor = quotfirst; quotfirst = quotfirst->next; delete cursor;
+        if ( quotfirst )
+            if ( quotfirst->exp == 0 )
+            {
+                quot = quotfirst->coeff.getval();
+                delete quotfirst;
+            }
+            else
+                quot = new InternalPoly( quotfirst, quotcursor, var );
+        else
+            quot = CFFactory::basic( 0 );
+        rem = CFFactory::basic( 0 );
+    }
+    else
+    {
+        freeTermList( quotfirst );
+    }
+    return divideok;
+}
+
+bool
+InternalPoly::tryDivremcoefft( InternalCF* cc, InternalCF*& quot, InternalCF*& rem, bool invert, const CanonicalForm& M, bool& fail )
+{
+    if ( inExtension() && !getReduce( var ) )
+    {
+        quot = copyObject();
+        quot = quot->tryDividecoeff( cc, invert, M, fail );
+        if (fail)
+          return false;
+        rem = CFFactory::basic( 0 );
+        return true;
+    }
+    else  if ( invert )
+    {
+        if ( is_imm( cc ) )
+            rem = cc;
+        else
+            rem = cc->copyObject();
+        quot = CFFactory::basic( 0 );
+        return true;
+    }
+    CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
+    ASSERT( ! c.isZero(), "divide by zero!" );
+    termList quotfirst, quotcursor;
+    termList cursor;
+    CanonicalForm cquot, crem;
+    bool divideok = true;
+
+    cursor = firstTerm;
+    quotcursor = quotfirst = new term;
+
+    while ( cursor && divideok )
+    {
+        divideok = tryDivremt( cursor->coeff, c, cquot, crem, M, fail );
+        if (fail)
+        {
+          freeTermList (quotfirst);
+          return false;
+        }
         divideok = divideok && crem.isZero();
         if ( divideok )
         {
@@ -1528,6 +2066,37 @@ InternalPoly::divTermList ( termList firstTerm, const CanonicalForm& coeff, term
 }
 
 termList
+InternalPoly::tryDivTermList ( termList firstTerm, const CanonicalForm& coeff, termList& lastTerm, const CanonicalForm& M, bool& fail )
+{
+    termList theCursor = firstTerm;
+    lastTerm = 0;
+    termList dummy;
+
+    while ( theCursor )
+    {
+        theCursor->coeff.tryDiv( coeff, M, fail );
+        if (fail)
+          return 0;
+        if ( theCursor->coeff.isZero() )
+        {
+            if ( theCursor == firstTerm )
+                firstTerm = theCursor->next;
+            else
+                lastTerm->next = theCursor->next;
+            dummy = theCursor;
+            theCursor = theCursor->next;
+            delete dummy;
+        }
+        else
+        {
+            lastTerm = theCursor;
+            theCursor = theCursor->next;
+        }
+    }
+    return firstTerm;
+}
+
+termList
 InternalPoly::modTermList ( termList firstTerm, const CanonicalForm& coeff, termList& lastTerm )
 {
     termList theCursor = firstTerm;
@@ -1673,3 +2242,4 @@ InternalPoly::reduceTermList ( termList first, termList redterms, termList & las
     }
     return first;
 }
+

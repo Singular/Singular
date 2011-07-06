@@ -70,6 +70,7 @@ private:
     static void mulTermList ( termList, const CanonicalForm& , const int );
     static termList divideTermList ( termList, const CanonicalForm&, termList& );
     static termList divTermList ( termList, const CanonicalForm&, termList& );
+    static termList tryDivTermList ( termList, const CanonicalForm&, termList&, const CanonicalForm&, bool& );
     static termList modTermList ( termList, const CanonicalForm&, termList& );
     static void appendTermList ( termList&, termList&, const CanonicalForm&, const int );
     static termList mulAddTermList ( termList theList, termList aList, const CanonicalForm & c, const int exp, termList & lastTerm, bool negate );
@@ -105,18 +106,21 @@ public:
 
     InternalCF* neg();
     InternalCF* invert();
-
+    InternalCF* tryInvert( const CanonicalForm&, bool& );
     int comparesame ( InternalCF* );
 
     InternalCF* addsame( InternalCF* );
     InternalCF* subsame( InternalCF* );
     InternalCF* mulsame( InternalCF* );
+    InternalCF* tryMulsame ( InternalCF*, const CanonicalForm&);
     InternalCF* dividesame( InternalCF* );
     InternalCF* modulosame( InternalCF* );
     InternalCF* divsame( InternalCF* );
+    InternalCF* tryDivsame ( InternalCF*, const CanonicalForm&, bool& );
     InternalCF* modsame( InternalCF* );
     void divremsame( InternalCF*, InternalCF*&, InternalCF*& );
     bool divremsamet( InternalCF*, InternalCF*&, InternalCF*& );
+    bool tryDivremsamet( InternalCF*, InternalCF*&, InternalCF*&, const CanonicalForm&, bool& );
 
     int comparecoeff ( InternalCF* );
 
@@ -124,11 +128,14 @@ public:
     InternalCF* subcoeff( InternalCF*, bool );
     InternalCF* mulcoeff( InternalCF* );
     InternalCF* dividecoeff( InternalCF*, bool );
+    InternalCF* tryDividecoeff ( InternalCF*, bool, const CanonicalForm&, bool& );
     InternalCF* modulocoeff( InternalCF*, bool );
     InternalCF* divcoeff( InternalCF*, bool );
+    InternalCF* tryDivcoeff ( InternalCF*, bool, const CanonicalForm&, bool& );
     InternalCF* modcoeff( InternalCF*, bool );
     void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool );
     bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool );
+    bool tryDivremcoefft ( InternalCF*, InternalCF*&, InternalCF*&, bool, const CanonicalForm&, bool& );
 
     int sign() const;
 
