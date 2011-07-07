@@ -458,18 +458,14 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   tryEuclid(cf,cg,M,c,fail);
   if(fail)
     return;
-  bool divides = true;
-  CanonicalForm tmp;
   // f /= cf
-  tryDivide(f,cf,M,tmp,divides,fail); // 'divides' is not checked
+  f.tryDiv (cf, M, fail);
   if(fail)
     return;
-  f = tmp;
   // g /= cg
-  tryDivide(g,cg,M,tmp,divides,fail); // 'divides' is not checked
+  g.tryDiv (cg, M, fail);
   if(fail)
     return;
-  g = tmp;
   if(f.inCoeffDomain())
   {
     tryInvert(f,M,result,fail);
@@ -508,6 +504,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   CanonicalForm g_image, alpha, gnew;
   FFGenerator gen = FFGenerator();
   Variable x= Variable (1);
+  bool divides= true;
   for(FFGenerator gen = FFGenerator(); gen.hasItems(); gen.next())
   {
     alpha = gen.item();
@@ -551,18 +548,19 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
         if(fail)
           return;
         divides = true;
-        tryDivide(gm,cf,M,g_image,divides,fail); // 'divides' is ignored
+        g_image= gm;
+        g_image.tryDiv (cf, M, fail);
         if(fail)
           return;
-        tryDivide(f,g_image,M,tmp,divides,fail); // trial division (f)
+        divides= tryFdivides (g_image,f, M, fail); // trial division (f)
         if(fail)
           return;
         if(divides)
         {
-          tryDivide(g,g_image,M,tmp,divides,fail); // trial division (g)
+          bool divides2= tryFdivides (g_image,g, M, fail); // trial division (g)
           if(fail)
             return;
-          if(divides)
+          if(divides2)
           {
             result = NN(reduce (c*g_image, M));
             return;
