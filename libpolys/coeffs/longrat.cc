@@ -220,7 +220,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
            extensions over Q will throw a lot of assume violations although
            everything is computed correctly and no seg fault appears.
            Maybe the test is not appropriate in this case. */
-  //omCheckIf(omCheckAddrSize(a,sizeof(*a)), return FALSE);
+  omCheckIf(omCheckAddrSize(a,sizeof(*a)), return FALSE);
   if (a->debug!=123456)
   {
     Print("!!longrat:debug:%d in %s:%d\n",a->debug,f,l);
