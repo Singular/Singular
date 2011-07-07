@@ -316,7 +316,7 @@ static inline number n_Init(int i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
 /// conversion to int; 0 if not possible
-static inline int n_Int(number n,        const coeffs r)
+static inline int n_Int(number &n,       const coeffs r)
 { assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
 
 /// changes argument  inline: a:= -a

@@ -590,6 +590,8 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
   
   if (!p_IsConstant(DEN(f), ntRing))
   { /* step (1); see documentation of this procedure above */
+    p_Normalize(NUM(f), ntRing);
+    p_Normalize(DEN(f), ntRing);
     number lcmOfDenominators = n_Init(1, ntCoeffs);
     number c; number tmp;
     poly p = NUM(f);
@@ -615,7 +617,9 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
     if (!n_IsOne(lcmOfDenominators, ntCoeffs))
     { /* multiply NUM(f) and DEN(f) with lcmOfDenominators */
       NUM(f) = p_Mult_nn(NUM(f), lcmOfDenominators, ntRing);
+      p_Normalize(NUM(f), ntRing);
       DEN(f) = p_Mult_nn(DEN(f), lcmOfDenominators, ntRing);
+      p_Normalize(DEN(f), ntRing);
     }
     n_Delete(&lcmOfDenominators, ntCoeffs);
     if (!p_IsConstant(DEN(f), ntRing))
@@ -645,7 +649,9 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
         number inverseOfGcdOfCoefficients = n_Invers(gcdOfCoefficients,
                                                      ntCoeffs);
         NUM(f) = p_Mult_nn(NUM(f), inverseOfGcdOfCoefficients, ntRing);
+        p_Normalize(NUM(f), ntRing);
         DEN(f) = p_Mult_nn(DEN(f), inverseOfGcdOfCoefficients, ntRing);
+        p_Normalize(DEN(f), ntRing);
         n_Delete(&inverseOfGcdOfCoefficients, ntCoeffs);
       }
       n_Delete(&gcdOfCoefficients, ntCoeffs);
