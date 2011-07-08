@@ -207,7 +207,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
             ZZ NTLc= convertFacCF2NTLZZ (c);
             bool lessZero= (sign (NTLc) == -1);
             if (lessZero)
-              negate (NTLc, NTLc);
+              NTL::negate (NTLc, NTLc);
             ZZ NTLq= convertFacCF2NTLZZ (q);
             ZZ bound;
             SqrRoot (bound, NTLq/2);
@@ -215,7 +215,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
             if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
             {
               if (lessZero)
-                negate (NTLnum, NTLnum);
+                NTL::negate (NTLnum, NTLnum);
               CanonicalForm num= convertNTLZZX2CF (to_ZZX (NTLnum), Variable (1));
               CanonicalForm den= convertNTLZZX2CF (to_ZZX (NTLden), Variable (1));
               On (SW_RATIONAL);

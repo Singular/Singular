@@ -463,9 +463,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
               #endif
             }
           }
-        #ifndef NTL_ZZ
-        if (fac_NTL_char >NTL_SP_BOUND)
-        {
+          #ifndef NTL_ZZ
+          if (fac_NTL_char >NTL_SP_BOUND)
+          {
             // convert to NTL
             ZZ_pX f1=convertFacCF2NTLZZpX(f);
             ZZ_p leadcoeff = LeadCoeff(f1);
@@ -506,7 +506,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           }
           //test_cff(F,f);
         }
-        else
+        else /*getCharacteristic()==2*/
         {
           // Specialcase characteristic==2
           if (fac_NTL_char!=2)
