@@ -308,20 +308,6 @@ static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
 #endif
 
-/// Test whether a can be divided by b?
-static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
-{
-  assume(r != NULL);
-#ifdef HAVE_RINGS
-  if( nCoeff_is_Ring(r) )
-  {
-    assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r);
-  }
-#endif
-  return !n_IsZero(b, r);
-}
-
-
 /// init with an integer
 static inline number n_Init(int i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
@@ -443,6 +429,19 @@ static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 #else
   return TRUE;
 #endif
+}
+
+/// Test whether a can be divided by b?
+static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
+{
+  assume(r != NULL);
+#ifdef HAVE_RINGS
+  if( nCoeff_is_Ring(r) )
+  {
+    assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r);
+  }
+#endif
+  return !n_IsZero(b, r);
 }
 
 /// returns TRUE, if r is not a field and r has non-trivial units
