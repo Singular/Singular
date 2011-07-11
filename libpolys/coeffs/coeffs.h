@@ -559,6 +559,7 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 // HAVE_RINGS: cfDivComp, cfExtGcd... 
 
 
+
 // Deprecated:
 static inline int n_GetChar(const coeffs r)
 { assume(r != NULL); return nInternalChar(r); }
