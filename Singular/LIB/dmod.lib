@@ -2449,9 +2449,10 @@ NOTE:    activate the output ring with the @code{setring} command. In this ring,
 @*       - the list or ideal BS is a Bernstein-Sato ideal of a polynomial f = F[1]*..*F[P].
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If met <>0, the B-Sigma ideal (cf. Castro and Ucha, 
-@*       'On the computation of Bernstein-Sato ideals', 2005). Otherwise, and by 
-@*       default, the ideal B (cf. the paper) is computed.
+@*       If met <0, the B-Sigma ideal (cf. Castro and Ucha, 
+@*       'On the computation of Bernstein-Sato ideals', 2005) is computed. 
+@*       If 0 < met < P, then the ideal B_P (cf. the paper) is computed. 
+@*       Otherwise, and by default, the ideal B (cf. the paper) is computed.
 @*       If the output ideal happens to be principal, the list of factors
 @*       with their multiplicities is returned instead of the ideal.
 @*       If printlevel=1, progress debug messages will be printed,
@@ -2480,7 +2481,17 @@ EXAMPLE: example annfsBMI; shows examples
   //  printf("plevel :%s, voice: %s",printlevel,voice);
   def save = basering;
   int N = nvars(basering);
-  int P = size(F);  //if F has some generators which are zero, int P = ncols(I);
+  //if F has some generators which are zero, int P = ncols(I);
+  int P = size(F);  
+  if (P < ncols(F)) 
+  {
+    F = simplify(F,2);
+  }
+  P = size(F);
+  if (P == 0)
+  {
+    ERROR("zero ideal in the input");
+  }
   int Nnew = 2*N+2*P;
   int i,j;
   string s;
@@ -2660,8 +2671,25 @@ EXAMPLE: example annfsBMI; shows examples
 //  ideal K = R01(K);
   ideal F = imap(save,F);  // maybe ideal F = R01(I); ?
   ideal K = imap(@R,K);    // maybe ideal K = R01(I); ?
-  if (met)
+
+  if (met <0)
   {
+  //K = K,F;     // to compute Bsigma (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
+    K = K,F;
+    dbprint(ppl,"// -2-1-1 computing the ideal B-Sigma from Castro-Ucha");
+  }
+  if ( (met>0) && (met<=ncols(F) ) )
+  {
+	/* compute the ideal B_met */
+  //j=2;         // for example
+  //K = K,F[j];  // to compute Bj (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
+    dbprint(ppl,"// -2-1-1 computing the ideal B_i from Castro-Ucha");
+    K = K, F[met];
+  }
+  if ( ( met == 0) || (met > ncols(F) ) )
+  {
+    // that is met ==0 or met> ncols(F)    
+    /* compute the ideal B */
     poly f=1;
     for (j=1; j<=P; j++)
     {
@@ -2670,14 +2698,6 @@ EXAMPLE: example annfsBMI; shows examples
     K = K,f;       // to compute B (Bernstein-Sato ideal)
     dbprint(ppl,"// -2-1-1 computing the ideal B from Castro-Ucha");
   }
-  else 
-  {
-  //K = K,F;     // to compute Bsigma (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
-    K = K,F;
-    dbprint(ppl,"// -2-1-1 computing the ideal B-Sigma from Castro-Ucha");
-  }
-  //j=2;         // for example
-  //K = K,F[j];  // to compute Bj (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
   dbprint(ppl,"// -2-2- starting the elimination of _x,_Dx in @R2");
   dbprint(ppl-1, K);
   ideal M = engine(K,eng);
@@ -2785,14 +2805,25 @@ example
   ring r = 0,(x,y),Dp;
   ideal F = x,y,x+y;
   printlevel = 0;
+  // *1* let us compute the B ideal
   def A = annfsBMI(F);    setring A;
   LD; // annihilator
   BS; // Bernstein-Sato ideal
-  // now, let us compute B-Sigma ideal
+  // *2* now, let us compute B-Sigma ideal
   setring r;
-  def Sigma = annfsBMI(F,0,1); setring Sigma;
-  LD; // annihilator
-  BS; // Bernstein-Sato B-Sigma ideal
+  def Sigma = annfsBMI(F,0,-1); setring Sigma;
+  print(matrix(lead(LD))); // compact form of leading
+  //  monomials from the annihilator
+  BS; // Bernstein-Sato B-Sigma ideal: it is principal, 
+  // so factors and multiplicities are returned
+  // *3* and now, let us compute B-i ideal 
+  setring r; 
+  def Bi = annfsBMI(F,0,3); // that is F[3]=x+y is taken
+  setring Bi;
+  print(matrix(lead(LD)));   // compact form of leading
+  //  monomials from the annihilator
+  BS; // the B_3 ideal: it is principal, so factors
+  // and multiplicities are returned
 }
 
 proc annfsOT(poly F, list #)
