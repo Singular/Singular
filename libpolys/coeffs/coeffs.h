@@ -308,11 +308,15 @@ static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
 #endif
 
+/// Test whether a can be divided by b?
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 {
   assume(r != NULL);
 #ifdef HAVE_RINGS
-  assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r);
+  if( nCoeff_is_Ring(r) )
+  {
+    assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r);
+  }
 #endif
   return !n_IsZero(b, r);
 }
