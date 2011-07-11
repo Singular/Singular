@@ -2440,26 +2440,39 @@ example
 
 
 proc annfsBMI(ideal F, list #)
-"USAGE:  annfsBMI(F [,eng]);  F an ideal, eng an optional int
+"USAGE:  annfsBMI(F [,eng,met]);  F an ideal, eng, met optional ints
 RETURN:  ring
-PURPOSE: compute the D-module structure of basering[1/f]*f^s where
-@* f = F[1]*..*F[P], according to the algorithm by Briancon and Maisonobe.
+PURPOSE: compute two kinds of Bernstein-Sato ideals, associated to
+@* f = F[1]*..*F[P], with the multivariate algorithm by Briancon and Maisonobe.
 NOTE:    activate the output ring with the @code{setring} command. In this ring,
-@*       - the ideal LD is the needed D-mod structure,
-@*       - the list BS is the Bernstein ideal of a polynomial f = F[1]*..*F[P].
+@*       - the ideal LD is the annihilator of F[1]^s_1*..*F[P]^s_p,
+@*       - the list or ideal BS is a Bernstein-Sato ideal of a polynomial f = F[1]*..*F[P].
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
+@*       If met <>0, the B-Sigma ideal (cf. Castro and Ucha, 
+@*       'On the computation of Bernstein-Sato ideals', 2005). Otherwise, and by 
+@*       default, the ideal B (cf. the paper) is computed.
+@*       If the output ideal happens to be principal, the list of factors
+@*       with their multiplicities is returned instead of the ideal.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBMI; shows examples
 "
 {
   int eng = 0;
+  int met = 0;
   if ( size(#)>0 )
   {
     if ( typeof(#[1]) == "int" )
     {
       eng = int(#[1]);
+    }
+    if ( size(#)>1 )
+    {
+      if ( typeof(#[2]) == "int" )
+      {
+	met = int(#[2]);
+      }
     }
   }
   // returns a list with a ring and an ideal LD in it
@@ -2647,15 +2660,24 @@ EXAMPLE: example annfsBMI; shows examples
 //  ideal K = R01(K);
   ideal F = imap(save,F);  // maybe ideal F = R01(I); ?
   ideal K = imap(@R,K);    // maybe ideal K = R01(I); ?
-  poly f=1;
-  for (j=1; j<=P; j++)
+  if (met)
   {
-    f = f*F[j];
+    poly f=1;
+    for (j=1; j<=P; j++)
+    {
+      f = f*F[j];
+    }
+    K = K,f;       // to compute B (Bernstein-Sato ideal)
+    dbprint(ppl,"// -2-1-1 computing the ideal B from Castro-Ucha");
   }
-  K = K,f;       // to compute B (Bernstein-Sato ideal)
+  else 
+  {
+  //K = K,F;     // to compute Bsigma (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
+    K = K,F;
+    dbprint(ppl,"// -2-1-1 computing the ideal B-Sigma from Castro-Ucha");
+  }
   //j=2;         // for example
   //K = K,F[j];  // to compute Bj (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
-  //K = K,F;     // to compute Bsigma (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
   dbprint(ppl,"// -2-2- starting the elimination of _x,_Dx in @R2");
   dbprint(ppl-1, K);
   ideal M = engine(K,eng);
@@ -2667,10 +2689,11 @@ EXAMPLE: example annfsBMI; shows examples
   ring @R3 = 0,s(1..P),dp;
   dbprint(ppl,"// -3-1- the ring @R3(_s) is ready");
   ideal K3 = imap(@R2,K2);
-  if (size(K3)==1)
+  if (ncols(K3)==1)
   {
     poly p = K3[1];
-    dbprint(ppl,"// -3-2- factorization");
+    dbprint(ppl,"// -3-2- the Bernstein ideal is principal");
+    dbprint(ppl,"// -3-2-1- factorization");
     // Warning: now P is an integer
     list Q = factorize(p);         //with constants and multiplicities
     ideal bs; intvec m;
@@ -2684,7 +2707,7 @@ EXAMPLE: example annfsBMI; shows examples
   }
   else
   {
-    // conjecture: the Bernstein ideal is principal
+    // conjecture for some ideals: the Bernstein ideal is principal
     dbprint(ppl,"// -3-2- the Bernstein ideal is not principal");
     ideal BS = K3;
   }
@@ -2762,10 +2785,14 @@ example
   ring r = 0,(x,y),Dp;
   ideal F = x,y,x+y;
   printlevel = 0;
-  def A = annfsBMI(F);
-  setring A;
-  LD;
-  BS;
+  def A = annfsBMI(F);    setring A;
+  LD; // annihilator
+  BS; // Bernstein-Sato ideal
+  // now, let us compute B-Sigma ideal
+  setring r;
+  def Sigma = annfsBMI(F,0,1); setring Sigma;
+  LD; // annihilator
+  BS; // Bernstein-Sato B-Sigma ideal
 }
 
 proc annfsOT(poly F, list #)
@@ -5349,7 +5376,7 @@ RETURN:  int, 1 if M is holonomic over the base ring, and 0 otherwise
 ASSUME: basering is a Weyl algebra in characteristic 0
 PURPOSE: check whether M is holonomic over the base ring
 NOTE:    M is holonomic if 2*dim(M) = dim(R), where R is the
-base ring; dim stays for Gelfand-Kirillov dimension
+base ring; dim stands for Gelfand-Kirillov dimension
 EXAMPLE: example isHolonomic; shows examples
 "
 {
