@@ -346,6 +346,10 @@ static inline void   n_Normalize(number& n, const coeffs r)
 static inline void   n_Write(number& n,  const coeffs r)
 { assume(r != NULL); assume(r->cfWrite!=NULL); r->cfWrite(n,r); }
 
+/// @todo: Describe me!!!
+static inline const char *n_Read(const char * s, number * a, const coeffs r)
+{ assume(r != NULL); assume(r->cfRead!=NULL); return r->cfRead(s, a, r); }
+
 /// Normalize and get denomerator
 static inline number n_GetDenom(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetDenom!=NULL); return r->cfGetDenom(n, r); }
