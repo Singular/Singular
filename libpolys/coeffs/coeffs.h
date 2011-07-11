@@ -306,10 +306,17 @@ static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 
 static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
+#endif
 
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
-{ assume(r != NULL); assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r); }
+{
+  assume(r != NULL);
+#ifdef HAVE_RINGS
+  assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r);
 #endif
+  return !n_IsZero(b, r);
+}
+
 
 /// init with an integer
 static inline number n_Init(int i,       const coeffs r)
@@ -543,9 +550,9 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
-// Missing wrappers for:
+// Missing wrappers for: (TODO: review this?)
 // cfIntMod, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
-// HAVE_RINGS: cfDivComp, cfExtGcd... cfDivBy
+// HAVE_RINGS: cfDivComp, cfExtGcd... 
 
 
 // Deprecated:
