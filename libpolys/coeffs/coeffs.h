@@ -108,8 +108,6 @@ struct n_Procs_s
    numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
    /// init with an integer
    number  (*cfInit)(int i,const coeffs r);
-   number  (*cfPar)(int i, const coeffs r);
-   int     (*cfParDeg)(number n, const coeffs r);
    /// how complicated, (0) => 0, or positive
    int     (*cfSize)(number n, const coeffs r);
    /// convertion, 0 if impossible
@@ -381,12 +379,6 @@ static inline number n_Lcm(number a, number b, const coeffs r)
 
 static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
 { assume(src != NULL && dst != NULL); assume(dst->cfSetMap!=NULL); return dst->cfSetMap(src,dst); }
-
-static inline number n_Par(int n, const coeffs r)
-{ assume(r != NULL); assume(r->cfPar!=NULL); return r->cfPar(n,r); }
-
-static inline int n_ParDeg(number n, const coeffs r)
-{ assume(r != NULL); assume(r->cfParDeg!=NULL); return r->cfParDeg(n,r); }
 
 /// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)

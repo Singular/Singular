@@ -721,6 +721,10 @@ ring rCompose(const lists  L);
 // Auxillary functions
 //
 
+/* return the varIndex-th ring variable as a poly;
+   varIndex starts at index 1 */
+poly rGetVar(const int varIndex, const ring r);
+
 BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL);
 
 BOOLEAN rCheckIV(intvec *iv);

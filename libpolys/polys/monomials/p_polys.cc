@@ -2272,11 +2272,12 @@ static number p_InitContent(poly ph, const ring r)
 #endif
 
 number p_InitContent_a(poly ph, const ring r)
-// only for coefficients in K(a) anf K(a,...)
+// only for coefficients in K(a)/<minpoly(a)> and K(t_1, t_2, ..., t_n)
 {
   number d=pGetCoeff(ph);
-  int s=n_ParDeg(d,r->cf);
-  if (s /* n_ParDeg(d)*/ <=1) return n_Copy(d,r->cf);
+  /* old: int s=n_ParDeg(d,r->cf);   new: */
+  int s = p_Totaldegree((poly)d, r->cf->extRing);
+  if (s <=1) return n_Copy(d,r->cf);
   int s2=-1;
   number d2;
   int ss;
@@ -2288,7 +2289,8 @@ number p_InitContent_a(poly ph, const ring r)
       if (s2==-1) return n_Copy(d,r->cf);
       break;
     }
-    if ((ss=n_ParDeg(pGetCoeff(ph),r->cf))<s)
+    /* old: if ((ss=n_ParDeg(pGetCoeff(ph),r->cf))<s)   new: */
+    if ((ss = p_Totaldegree((poly)pGetCoeff(ph), r->cf->extRing)) < s)
     {
       s2=s;
       d2=d;
@@ -3436,7 +3438,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             if (rField_is_GF(dst))
             {
               number c=pGetCoeff(qq);
-              number ee=n_Par(1,dst->cf);
+              number ee=(number)rGetVar(1, dst->cf->extRing);
               number eee;n_Power(ee,e,&eee,dst->cf); //nfDelete(ee,dst);
               ee=n_Mult(c,eee,dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);

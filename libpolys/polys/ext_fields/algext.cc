@@ -60,7 +60,6 @@ number   naInit(int i, const coeffs cf);
 int      naInt(number &a, const coeffs cf);
 number   naNeg(number a, const coeffs cf);
 number   naInvers(number a, const coeffs cf);
-number   naPar(int i, const coeffs cf);
 number   naAdd(number a, number b, const coeffs cf);
 number   naSub(number a, number b, const coeffs cf);
 number   naMult(number a, number b, const coeffs cf);
@@ -242,15 +241,6 @@ void naCoeffWrite(const coeffs cf)
   Print("//   with the minimal polynomial f(%s) = %s\n", x,
         p_String(naMinpoly, naRing));
   PrintS("//   and K: "); n_CoeffWrite(cf->extRing->cf);
-}
-
-number naPar(int i, const coeffs cf)
-{
-  assume(i == 1);   // there is only one parameter in this extension field
-  poly p = p_ISet(1, naRing);   // p = 1
-  p_SetExp(p, 1, 1, naRing);    // p = the sole extension variable
-  p_Setm(p, naRing);
-  return (number)p;
 }
 
 number naAdd(number a, number b, const coeffs cf)
@@ -641,7 +631,6 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfInit         = naInit;
   cf->cfInt          = naInt;
   cf->cfNeg          = naNeg;
-  cf->cfPar          = naPar;
   cf->cfAdd          = naAdd;
   cf->cfSub          = naSub;
   cf->cfMult         = naMult;

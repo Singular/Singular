@@ -37,7 +37,7 @@ BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
 }
 #endif
 
-
+/*
 number   ngcPar(int i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
@@ -46,6 +46,7 @@ number   ngcPar(int i, const coeffs r)
   gmp_complex* n= new gmp_complex( (long)0, (long)1 );
   return (number)n;
 }
+*/
 
 /*2
 * n := i
@@ -401,7 +402,6 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
   n->cfRead    = ngcRead;
   n->cfPower   = ngcPower;
   n->cfSetMap = ngcSetMap;
-  n->cfPar     = ngcPar;
   n->cfRePart  = ngcRePart;
   n->cfImPart  = ngcImPart;
   n->cfCoeffWrite = ngcCoeffWrite;
@@ -428,8 +428,6 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
-  r->cfPar = ndPar;
-  r->cfParDeg = ndParDeg;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
 #ifdef HAVE_RINGS

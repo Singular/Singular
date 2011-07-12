@@ -5380,3 +5380,11 @@ BOOLEAN rMinpolyIsNULL(const ring r)
   return TRUE;
 }
 
+poly rGetVar(const int varIndex, const ring r)
+{
+    poly p = p_ISet(1, r);
+    p_SetExp(p, varIndex, 1, r);
+    p_Setm(p, r);
+    return p;
+}
+

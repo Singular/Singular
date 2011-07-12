@@ -59,7 +59,6 @@ number   naInit(int i, const coeffs cf);
 int      naInt(number &a, const coeffs cf);
 number   naNeg(number a, const coeffs cf);
 number   naInvers(number a, const coeffs cf);
-number   naPar(int i, const coeffs cf);
 number   naAdd(number a, number b, const coeffs cf);
 number   naSub(number a, number b, const coeffs cf);
 number   naMult(number a, number b, const coeffs cf);

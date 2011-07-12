@@ -39,8 +39,6 @@ static inline number n_IntDiv(number a, number b, const ring r){ return n_IntDiv
 static inline number n_ExactDiv(number a, number b, const ring r){ return n_ExactDiv(a,b, r->cf);}
 static inline number n_Gcd(number a, number b, const ring r){ return n_Gcd(a,b, r->cf);}
 static inline number n_Lcm(number a, number b, const ring r){ return n_Lcm(a,b, r->cf);}
-static inline number n_Par(int n, const ring r){ return n_Par(n, r->cf);}
-static inline int n_ParDeg(number n, const ring r){ return n_ParDeg(n, r->cf);}
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const ring r){ return n_IsUnit(n, r->cf);}
