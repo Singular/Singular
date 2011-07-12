@@ -277,10 +277,9 @@ BOOLEAN nr2mGreater(number a, number b, const coeffs r)
   return nr2mDivBy(a, b,r);
 }
 
-/* Is a divisible by b? There are two cases:
+/* Is 'a' divisible by 'b'? There are two cases:
    1) a = 0 mod 2^m; then TRUE iff b = 0 or b is a power of 2
-   2) a, b <> 0; then TRUE iff b/gcd(a, b) is a unit mod 2^m
-   TRUE iff b(gcd(a, b) is a unit */
+   2) a, b <> 0; then TRUE iff b/gcd(a, b) is a unit mod 2^m */
 BOOLEAN nr2mDivBy (number a, number b, const coeffs r)
 {
   if (a == NULL)

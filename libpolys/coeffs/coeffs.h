@@ -274,113 +274,206 @@ void           nNew(number * a);
 
 // the access methods (part 2):
 
-/// return a copy of a
+/// return a copy of 'n'
 static inline number n_Copy(number n,    const coeffs r)
 {   assume(r != NULL); assume(r->cfCopy!=NULL); return r->cfCopy(n, r); }
 
+/// delete 'p'
 static inline void   n_Delete(number* p, const coeffs r)
 {   assume(r != NULL); assume(r->cfDelete!= NULL); r->cfDelete(p, r); }
 
+/// TRUE iff 'a' and 'b' represent the same number;
+/// they may have different representations
 static inline BOOLEAN n_Equal(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfEqual!=NULL); return r->cfEqual(a, b, r); }
 
+/// TRUE iff 'n' represents the zero element
 static inline BOOLEAN n_IsZero(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfIsZero!=NULL); return r->cfIsZero(n,r); }
 
+/// TRUE iff 'n' represents the one element
 static inline BOOLEAN n_IsOne(number n,  const coeffs r)
 { assume(r != NULL); assume(r->cfIsOne!=NULL); return r->cfIsOne(n,r); }
 
+/// TRUE iff 'n' represents the additive inverse of the one element, i.e. -1
 static inline BOOLEAN n_IsMOne(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfIsMOne!=NULL); return r->cfIsMOne(n,r); }
 
+/// ordered fields: TRUE iff 'n' is positive;
+/// in Z/pZ: TRUE iff 0 < m <= roundedBelow(p/2), where m is the long
+///          representing n
+/// in C:    TRUE iff (Im(n) != 0 and Im(n) >= 0) or
+///                   (Im(n) == 0 and Re(n) >= 0)
+/// in K(a)/<p(a)>: TRUE iff (n != 0 and (LC(n) > 0 or deg(n) > 0))
+/// in K(t_1, ..., t_n): TRUE iff (LC(numerator(n) is a constant and > 0)
+///                            or (LC(numerator(n) is not a constant)
+/// in Z/2^kZ: TRUE iff 0 < n <= 2^(k-1)
+/// in Z/mZ: TRUE iff the internal mpz is greater than zero
+/// in Z: TRUE iff n > 0
+///
+/// !!! Recommendation: remove implementations for unordered fields
+/// !!!                 and raise errors instead, in these cases
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
-{ assume(r != NULL); assume(r->cfGreaterZero!=NULL); return r->cfGreaterZero(n,r); }
+{
+  assume(r != NULL); assume(r->cfGreaterZero!=NULL);
+  return r->cfGreaterZero(n,r);
+}
+
+/// ordered fields: TRUE iff 'a' is larger than 'b';
+/// in Z/pZ: TRUE iff la > lb, where la and lb are the long's representing
+//                             a and b, respectively
+/// in C:    TRUE iff (Im(a) > Im(b))
+/// in K(a)/<p(a)>: TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b))
+/// in K(t_1, ..., t_n): TRUE only if one or both numerator polynomials are
+///                      zero or if their degrees are equal. In this case,
+///                      TRUE if LC(numerator(a)) > LC(numerator(b))
+/// in Z/2^kZ: TRUE if n_DivBy(a, b)
+/// in Z/mZ: TRUE iff the internal mpz's fulfill the relation '>'
+/// in Z: TRUE iff a > b
+///
+/// !!! Recommendation: remove implementations for unordered fields
+/// !!!                 and raise errors instead, in these cases
 static inline BOOLEAN n_Greater(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfGreater!=NULL); return r->cfGreater(a,b,r); }
 
 #ifdef HAVE_RINGS
+/// TRUE iff n has a multiplicative inverse in the given coeff field/ring r
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfIsUnit!=NULL); return r->cfIsUnit(n,r); }
 
+/// in Z: 1
+/// in Z/kZ (where k is not a prime): largest divisor of n (taken in Z) that
+///                                   is co-prime with k
+/// in Z/2^kZ: largest odd divisor of n (taken in Z)
+/// other cases: not implemented
 static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
 #endif
 
-/// init with an integer
+/// a number representing i in the given coeff field/ring r
 static inline number n_Init(int i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
-/// conversion to int; 0 if not possible
+/// conversion of n to an int; 0 if not possible
+/// in Z/pZ: the representing int lying in (-p/2 .. p/2]
 static inline int n_Int(number &n,       const coeffs r)
 { assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
 
-/// changes argument  inline: a:= -a
+/// in-place negation of n
 static inline number n_Neg(number n,     const coeffs r)
 { assume(r != NULL); assume(r->cfNeg!=NULL); return r->cfNeg(n,r); }
 
-/// return 1/a
+/// return the multiplicative inverse of 'a';
+/// raise an error if 'a' is not invertible
+///
+/// !!! Recommendation: rename to 'n_Inverse'
 static inline number n_Invers(number a,  const coeffs r)
 { assume(r != NULL); assume(r->cfInvers!=NULL); return r->cfInvers(a,r); }
 
-/// use for pivot strategies, (0) => 0, otherwise positive
+/// return a non-negative measure for the complexity of n;
+/// return 0 only when n represents zero;
+/// (used for pivot strategies in matrix computations with entries from r)
 static inline int    n_Size(number n,    const coeffs r)
 { assume(r != NULL); assume(r->cfSize!=NULL); return r->cfSize(n,r); }
 
-/// normalize the number. i.e. go to some canonnical representation (inplace)
+/// inplace-normalization of n;
+/// produces some canonical representation of n;
+///
+/// !!! Recommendation: remove this method from the user-interface, i.e.,
+/// !!!                 this should be hidden
 static inline void   n_Normalize(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfNormalize!=NULL); r->cfNormalize(n,r); }
 
-/// Normalize and Write to the output buffer of reporter
+/// write to the output buffer of the currently used reporter
 static inline void   n_Write(number& n,  const coeffs r)
 { assume(r != NULL); assume(r->cfWrite!=NULL); r->cfWrite(n,r); }
 
-/// @todo: Describe me!!!
+/// @todo: Describe me!!! --> Hans
+///
+/// !!! Recommendation: This method is to cryptic to be part of the user-
+/// !!!                 interface. As defined here, it is merely a helper
+/// !!!                 method for parsing number input strings.
 static inline const char *n_Read(const char * s, number * a, const coeffs r)
 { assume(r != NULL); assume(r->cfRead!=NULL); return r->cfRead(s, a, r); }
 
-/// Normalize and get denomerator
+/// return the denominator of n
+/// (if elements of r are by nature not fractional, result is 1)
 static inline number n_GetDenom(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetDenom!=NULL); return r->cfGetDenom(n, r); }
 
-/// Normalize and get numerator
+/// return the numerator of n
+/// (if elements of r are by nature not fractional, result is n)
 static inline number n_GetNumerator(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetNumerator!=NULL); return r->cfGetNumerator(n, r); }
 
+/// fill res with the power a^b
 static inline void   n_Power(number a, int b, number *res, const coeffs r)
 { assume(r != NULL); assume(r->cfPower!=NULL); r->cfPower(a,b,res,r); }
 
+/// return the product of 'a' and 'b', i.e., a*b
 static inline number n_Mult(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfMult!=NULL); return r->cfMult(a, b, r); }
 
-/// Inplace multiplication: a := a * b
+/// multiplication of 'a' and 'b';
+/// replacement of 'a' by the product a*b
 static inline void n_InpMult(number &a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfInpMult!=NULL); r->cfInpMult(a,b,r); }
 
+/// return the difference of 'a' and 'b', i.e., a-b
 static inline number n_Sub(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfSub!=NULL); return r->cfSub(a, b, r); }
 
+/// return the sum of 'a' and 'b', i.e., a+b
 static inline number n_Add(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfAdd!=NULL); return r->cfAdd(a, b, r); }
 
+/// return the quotient of 'a' and 'b', i.e., a/b;
+/// raise an error if 'b' is not invertible in r
 static inline number n_Div(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
+/// in Z: largest c such that c*b <= a
+/// in Z/nZ, Z/2^kZ: computed as in the case Z (from integers representing
+///                  'a' and 'b')
+/// in Z/pZ: return a/b
+/// in K(a)/<p(a)>: return a/b
+/// in K(t_1, ..., t_n): return a/b
+/// other fields: not implemented
 static inline number n_IntDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
 
+/// @todo: Describe me!!!
+///
+/// What is the purpose of this method, especially in comparison with
+/// n_Div?
+/// !!! Recommendation: remove this method from the user-interface.
 static inline number n_ExactDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfExactDiv!=NULL); return r->cfExactDiv(a,b,r); }
 
+/// in Z: return the gcd of 'a' and 'b'
+/// in Z/nZ, Z/2^kZ: computed as in the case Z
+/// in Z/pZ, C, R: not implemented
+/// in Q: return the gcd of the numerators of 'a' and 'b'
+/// in K(a)/<p(a)>: not implemented
+/// in K(t_1, ..., t_n): not implemented
 static inline number n_Gcd(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfGcd!=NULL); return r->cfGcd(a,b,r); }
 
+/// in Z: return the lcm of 'a' and 'b'
+/// in Z/nZ, Z/2^kZ: computed as in the case Z
+/// in Z/pZ, C, R: not implemented
+/// in Q: return the lcm of the numerators of 'a' and the denominator of 'b'
+/// in K(a)/<p(a)>: not implemented
+/// in K(t_1, ..., t_n): not implemented
 static inline number n_Lcm(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfLcm!=NULL); return r->cfLcm(a,b,r); }
 
+/// set the mapping function pointers for translating numbers from src to dst
 static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
 { assume(src != NULL && dst != NULL); assume(dst->cfSetMap!=NULL); return dst->cfSetMap(src,dst); }
 
-/// Tests whether n is a correct number: only used if LDEBUG is defined
+/// test whether n is a correct number;
+/// only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
   assume(r != NULL); 
@@ -423,7 +516,14 @@ static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 #endif
 }
 
-/// Test whether a can be divided by b?
+/// test whether 'a' is divisible 'b';
+/// for r encoding a field: TRUE iff 'b' does not represent zero
+/// in Z: TRUE iff 'b' divides 'a' (with remainder = zero)
+/// in Z/nZ: TRUE iff (a = 0 and b divides n in Z) or
+///                   (a != 0 and b/gcd(a, b) is co-prime with n, i.e.
+///                                              a unit in Z/nZ)
+/// in Z/2^kZ: TRUE iff ((a = 0 mod 2^k) and (b = 0 or b is a power of 2))
+///                  or ((a, b <> 0) and (b/gcd(a, b) is odd))
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 {
   assume(r != NULL);
@@ -516,33 +616,20 @@ static inline BOOLEAN nCoeff_is_long_C(const coeffs r)
 static inline BOOLEAN nCoeff_is_CF(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_CF; }
 
-/// TRUE, if the computation of the inverse is fast (i.e. prefer leading coeff. 1 over content)
+/// TRUE, if the computation of the inverse is fast,
+/// i.e. prefer leading coeff. 1 over content
 static inline BOOLEAN nCoeff_has_simple_inverse(const coeffs r)
 { assume(r != NULL); return r->has_simple_Inverse; }
-/* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
-// /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
-// #ifdef HAVE_RINGS
-// { return (r->ringtype > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
-// #else
-// { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
-// #endif
 
 /// TRUE if n_Delete/n_New are empty operations
 static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 { assume(r != NULL); return r->has_simple_Alloc; }
-/* Z/p, GF(p,n), R, Ring_2toM: nCopy, nNew, nDelete are dummies*/
-// return (rField_is_Zp(r)
-//         || rField_is_GF(r)
-// #ifdef HAVE_RINGS
-//             || rField_is_Ring_2toM(r)
-// #endif
-//             || rField_is_R(r)); }
 
-/* TRUE iff r represents an algebraic extension field */
+/// TRUE iff r represents an algebraic extension field
 static inline BOOLEAN nCoeff_is_algExt(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_algExt); }
 
-/* TRUE iff r represents a transcendental extension field */
+/// TRUE iff r represents a transcendental extension field
 static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_transExt); }
 
@@ -552,8 +639,6 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 // Missing wrappers for: (TODO: review this?)
 // cfIntMod, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... 
-
-
 
 // Deprecated:
 static inline int n_GetChar(const coeffs r)

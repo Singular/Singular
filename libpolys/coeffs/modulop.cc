@@ -59,7 +59,7 @@ number npInit (int i, const coeffs r)
 }
 
 /*2
-* convert a number to int (-p/2 .. p/2)
+* convert a number to an int in (-p/2 .. p/2]
 */
 int npInt(number &n, const coeffs r)
 {
