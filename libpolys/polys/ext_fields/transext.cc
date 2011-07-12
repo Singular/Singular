@@ -69,7 +69,6 @@ number   ntInit(int i, const coeffs cf);
 int      ntInt(number &a, const coeffs cf);
 number   ntNeg(number a, const coeffs cf);
 number   ntInvers(number a, const coeffs cf);
-number   ntPar(int i, const coeffs cf);
 number   ntAdd(number a, number b, const coeffs cf);
 number   ntSub(number a, number b, const coeffs cf);
 number   ntMult(number a, number b, const coeffs cf);
@@ -342,20 +341,6 @@ void ntCoeffWrite(const coeffs cf)
   }
   PrintS(") with\n");
   PrintS("//   K: "); n_CoeffWrite(cf->extRing->cf);
-}
-
-/* the i-th parameter */
-number ntPar(int i, const coeffs cf)
-{
-  assume((1 <= i) && (i <= rVar(ntRing)));
-  poly p = p_ISet(1, ntRing);
-  p_SetExp(p, i, 1, ntRing);
-  p_Setm(p, ntRing);
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(result) = p;
-  DEN(result) = NULL;
-  COM(result) = 0;
-  return (number)result;
 }
 
 number ntAdd(number a, number b, const coeffs cf)
@@ -1071,7 +1056,6 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfInit         = ntInit;
   cf->cfInt          = ntInt;
   cf->cfNeg          = ntNeg;
-  cf->cfPar          = ntPar;
   cf->cfAdd          = ntAdd;
   cf->cfSub          = ntSub;
   cf->cfMult         = ntMult;

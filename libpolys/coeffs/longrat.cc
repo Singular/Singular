@@ -2562,8 +2562,6 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
-  //r->cfPar = ndPar;
-  //r->cfParDeg = ndParDeg;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
   #ifdef HAVE_RINGS

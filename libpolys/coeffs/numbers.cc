@@ -93,11 +93,7 @@ void   ndNormalize(number&, const coeffs) { }
 
 char * ndName(number, const coeffs) { return NULL; }
 
-number ndPar(int, const coeffs r) { return n_Init(0,r); }
-
 number ndReturn0(number, const coeffs r) { return n_Init(0,r); }
-
-int    ndParDeg(number, const coeffs) { return 0; }
 
 number ndGcd(number, number, const coeffs r) { return n_Init(1,r); }
 
@@ -204,8 +200,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->type=t;
 
     // default entries (different from NULL) for some routines:
-    n->cfPar  = ndPar;
-    n->cfParDeg=ndParDeg;
     n->cfSize = ndSize;
     n->cfGetDenom= ndGetDenom;
     n->cfGetNumerator= ndGetNumerator;
@@ -267,8 +261,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfIntMod!=NULL);
     assume(n->cfExactDiv!=NULL);
     assume(n->cfInit!=NULL);
-    assume(n->cfPar!=NULL);
-    assume(n->cfParDeg!=NULL);
     assume(n->cfSize!=NULL);
     assume(n->cfInt!=NULL);
     //assume(n->n->cfDivComp!=NULL);

@@ -352,8 +352,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfIntMod= ndIntMod;
   r->cfExactDiv= npDiv;
   r->cfInit = npInit;
-  //r->cfPar = ndPar;
-  //r->cfParDeg = ndParDeg;
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;
   #ifdef HAVE_RINGS

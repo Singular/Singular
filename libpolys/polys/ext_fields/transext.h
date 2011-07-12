@@ -107,7 +107,6 @@ number   ntInit(int i, const coeffs cf);
 int      ntInt(number &a, const coeffs cf);
 number   ntNeg(number a, const coeffs cf);
 number   ntInvers(number a, const coeffs cf);
-number   ntPar(int i, const coeffs cf);
 number   ntAdd(number a, number b, const coeffs cf);
 number   ntSub(number a, number b, const coeffs cf);
 number   ntMult(number a, number b, const coeffs cf);
