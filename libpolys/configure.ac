@@ -70,6 +70,15 @@ SING_CHECK_ARITH_RINGS
 SING_CHECK_FACTORY
 SING_CHECK_PLURAL
 
+if test "x$prefix" != xNONE; then
+  PREFIX="$prefix"
+else
+  PREFIX="$ac_default_prefix"
+fi
+
+# AC_SUBST(PREFIX)
+AC_DEFINE_UNQUOTED(INSTALL_PREFIX,"$PREFIX",Prefix)
+
 AC_SUBST(LIBPREFIX)
 
 AC_CONFIG_FILES([Makefile])
