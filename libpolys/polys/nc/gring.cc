@@ -2371,8 +2371,8 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
   int rN=r->N;
   int *M1=(int *)omAlloc0((rN+1)*sizeof(int));
   int *M2=(int *)omAlloc0((rN+1)*sizeof(int));
-  int *PREFIX=(int *)omAlloc0((rN+1)*sizeof(int));
-  int *SUFFIX=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *aPREFIX=(int *)omAlloc0((rN+1)*sizeof(int));
+  int *aSUFFIX=(int *)omAlloc0((rN+1)*sizeof(int));
   p_GetExpV(m1,M1, r);
   p_GetExpV(m2,M2, r);
   poly res=NULL;
@@ -2418,23 +2418,23 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
           if (bres!=NULL)
           {
             /* now mult (prefix, bres, suffix) */
-            memcpy(SUFFIX, M1,(rN+1)*sizeof(int));
-            memcpy(PREFIX, M1,(rN+1)*sizeof(int));
-            for (k=1;k<=j;k++) SUFFIX[k]=0;
-            for (k=j;k<=rN;k++) PREFIX[k]=0;
-            SUFFIX[0]=0;
-            PREFIX[0]=0;
+            memcpy(aSUFFIX, M1,(rN+1)*sizeof(int));
+            memcpy(aPREFIX, M1,(rN+1)*sizeof(int));
+            for (k=1;k<=j;k++) aSUFFIX[k]=0;
+            for (k=j;k<=rN;k++) aPREFIX[k]=0;
+            aSUFFIX[0]=0;
+            aPREFIX[0]=0;
             prefix=p_One(r);
             suffix=p_One(r);
-            p_SetExpV(prefix,PREFIX, r);
+            p_SetExpV(prefix,aPREFIX, r);
             p_Setm(prefix, r);
-            p_SetExpV(suffix,SUFFIX, r);
+            p_SetExpV(suffix,aSUFFIX, r);
             p_Setm(suffix, r);
             if (!p_LmIsConstant(prefix, r)) bres = gnc_mm_Mult_p(prefix, bres, r);
             if (!p_LmIsConstant(suffix, r)) bres = gnc_p_Mult_mm(bres, suffix, r);
             ares=p_Add_q(ares, bres, r);
             /* What to give free? */
-        /* Do we have to free PREFIX/SUFFIX? it seems so */
+        /* Do we have to free aPREFIX/aSUFFIX? it seems so */
             p_Delete(&prefix, r);
             p_Delete(&suffix, r);
           }
@@ -2443,17 +2443,17 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
       if (ares!=NULL)
       {
         /* now mult (prefix, bres, suffix) */
-        memcpy(SUFFIX, M2,(rN+1)*sizeof(int));
-        memcpy(PREFIX, M2,(rN+1)*sizeof(int));
-        for (k=1;k<=i;k++) SUFFIX[k]=0;
-        for (k=i;k<=rN;k++) PREFIX[k]=0;
-        SUFFIX[0]=0;
-        PREFIX[0]=0;
+        memcpy(aSUFFIX, M2,(rN+1)*sizeof(int));
+        memcpy(aPREFIX, M2,(rN+1)*sizeof(int));
+        for (k=1;k<=i;k++) aSUFFIX[k]=0;
+        for (k=i;k<=rN;k++) aPREFIX[k]=0;
+        aSUFFIX[0]=0;
+        aPREFIX[0]=0;
         prefix=p_One(r);
         suffix=p_One(r);
-        p_SetExpV(prefix,PREFIX, r);
+        p_SetExpV(prefix,aPREFIX, r);
         p_Setm(prefix, r);
-        p_SetExpV(suffix,SUFFIX, r);
+        p_SetExpV(suffix,aSUFFIX, r);
         p_Setm(suffix, r);
         bres=ares;
         if (!p_LmIsConstant(prefix, r)) bres = gnc_mm_Mult_p(prefix, bres, r);
@@ -2466,8 +2466,8 @@ poly nc_mm_Bracket_nn(poly m1, poly m2, const ring r)
   }
   freeT(M1, rN);
   freeT(M2, rN);
-  freeT(PREFIX, rN);
-  freeT(SUFFIX, rN);
+  freeT(aPREFIX, rN);
+  freeT(aSUFFIX, rN);
 #ifdef PDEBUG
   p_Test(res, r);
 #endif

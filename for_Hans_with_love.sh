@@ -49,6 +49,7 @@ for d in libpolys; do
   cd $d;
   libtoolize --force
   aclocal -I $TOP_DIR/m4
+  autoheader
   autotools
   cd $TOP_DIR
   echo
