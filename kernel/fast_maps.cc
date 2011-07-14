@@ -12,11 +12,11 @@
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
 #include <polys/monomials/p_polys.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>
-#include <kernel/sbuckets.h>
+#include <polys/sbuckets.h>
 #include <kernel/fast_maps.h>
 
 // define if you want to use special dest_ring

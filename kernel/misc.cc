@@ -21,9 +21,9 @@
 //#include "cntrlc.h"
 #include "kstd1.h"
 #include "timer.h"
-#include "intvec.h"
-#include "ring.h"
-#include "p_Procs.h"
+#include <misc/intvec.h>
+#include <polys/monomials/ring.h>
+#include <polys/templates/p_Procs.h>
 #include "kversion.h"
 
 //#ifdef HAVE_LIBPARSER

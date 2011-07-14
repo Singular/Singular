@@ -24,7 +24,7 @@
 #include <misc/intvec.h>
 #include <polys/monomials/ring.h>
 #include <polys/kbuckets.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 
 //#define SHOW_PROT
 //#define SHOW_RED

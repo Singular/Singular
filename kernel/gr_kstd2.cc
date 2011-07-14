@@ -12,7 +12,7 @@
 
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
@@ -23,10 +23,10 @@
 #include <kernel/kutil.h>
 //#include "spolys.h"
 //#include "cntrlc.h"
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #include <polys/nc/nc.h>
-#include <kernel/sca.h>
+#include <polys/nc/sca.h>
 #include <kernel/ratgring.h>
 
 #if 0

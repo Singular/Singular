@@ -26,7 +26,7 @@
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <misc/intvec.h>
@@ -35,7 +35,7 @@
 #include <kernel/fglmgauss.h>
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h.
-#include <templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_list.h>
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define PROT2(msg,arg)

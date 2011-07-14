@@ -37,7 +37,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <kernel/stairc.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 //#include "cntrlc.h"
 #include <misc/intvec.h>
 #include <kernel/ideals.h>
@@ -47,7 +47,7 @@
 //#include "ipprint.h"
 
 #ifdef HAVE_PLURAL
-#include <kernel/sca.h>
+#include <polys/nc/sca.h>
 #endif
 
 

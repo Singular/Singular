@@ -11,7 +11,7 @@
 
 #include <kernel/kutil.h>
 #include <kernel/structs.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <polys/polys.h>
 #include <polys/monomials/p_polys.h>
 #include <kernel/ideals.h>
@@ -19,7 +19,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <polys/kbuckets.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/pInline1.h>
 #include <kernel/lpolynomial.h>

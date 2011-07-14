@@ -6,9 +6,9 @@
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/walkSupport.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 #include <kernel/kstd1.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <math.h>
 
 extern BOOLEAN overflow_error;

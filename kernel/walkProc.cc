@@ -10,14 +10,14 @@
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/fglm.h>
 #include <kernel/walkMain.h>
 #include <kernel/walkSupport.h>
 #include <kernel/walkProc.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 
 ///////////////////////////////////////////////////////////////////
 //Frame procedures for Groebner Walk and Fractal Walk

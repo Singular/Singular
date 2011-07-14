@@ -14,26 +14,26 @@
 #include <polys/polys.h>
 #include <coeffs/numbers.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <polys/kbuckets.h>
 #include <kernel/kstd1.h>
-#include <kernel/sbuckets.h>
-#include <kernel/p_Mult_q.h>
+#include <polys/sbuckets.h>
+#include <polys/operations/p_Mult_q.h>
 #include <kernel/kutil.h>
 #include <kernel/structs.h>
 #include <omalloc/omalloc.h>
 #include <kernel/khstd.h>
 #include <polys/kbuckets.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/structs.h>
 #include <kernel/kInline.cc>
 #include <kernel/stairc.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/timer.h>
 #include <kernel/shiftgb.h>
-#include <kernel/sca.h>
+#include <polys/nc/sca.h>
 
 
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))

@@ -13,7 +13,7 @@
 #include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <misc/intvec.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <kernel/kstd1.h>
 #include <kernel/units.h>
 

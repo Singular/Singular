@@ -22,8 +22,8 @@
 
 #include <kernel/digitech.h>
 #include <polys/nc/nc.h>
-#include <kernel/sca.h>
-#include <kernel/prCopy.h>
+#include <polys/nc/sca.h>
+#include <polys/prCopy.h>
 #include <kernel/longrat.h>
 #include <kernel/modulop.h>
 #include <stdlib.h>

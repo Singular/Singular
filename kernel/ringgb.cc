@@ -19,7 +19,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <polys/kbuckets.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/pInline1.h>
 #ifdef HAVE_PLURAL

@@ -24,9 +24,9 @@
 #include <polys/monomials/ring.h>
 #include <kernel/syz.h>
 #include <polys/kbuckets.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 #include <kernel/timer.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
  
 //#define SHOW_PROT
 //#define SHOW_RED

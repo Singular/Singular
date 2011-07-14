@@ -17,13 +17,13 @@
 #include <polys/polys.h>
 #include <coeffs/numbers.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <polys/kbuckets.h>
 #include <kernel/kstd1.h>
-#include <kernel/sbuckets.h>
-#include <kernel/prCopy.h>
-#include <kernel/p_Mult_q.h>
-#include <kernel/clapsing.h>
+#include <polys/sbuckets.h>
+#include <polys/prCopy.h>
+#include <polys/operations/p_Mult_q.h>
+#include <polys/clapsing.h>
 #include <misc/options.h>
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift)

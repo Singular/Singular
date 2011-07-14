@@ -22,9 +22,9 @@
 #include <misc/intvec.h>
 #include <polys/monomials/ring.h>
 #include <kernel/syz.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 
-#include <kernel/sca.h>
+#include <polys/nc/sca.h>
 
 static intvec * syPrepareModComp(ideal arg,intvec ** w)
 {

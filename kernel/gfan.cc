@@ -17,9 +17,9 @@ $Id$
 #include <kernel/kmatrix.h>
 #include <kernel/GMPrat.h>
 
-#include "ring.h"	//apparently not needed
-#include <Singular/lists.h>
-#include <kernel/prCopy.h>
+#include <polys/monomials/ring.h>	//apparently not needed
+#include lists.h
+#include <polys/prCopy.h>
 #include <kernel/stairc.h>
 #include <fstream>	//read-write cones to files
 #include <string>
@@ -292,7 +292,7 @@ static bool areEqual(facet *f, facet *s)
 	const int64vec* sNormal;
 	fNormal = f->getRef2FacetNormal();
 	sNormal = s->getRef2FacetNormal();
-#include "intvec.h"
+#include <misc/intvec.h>
 	//Do not need parallelity. Too time consuming
 //  	if(!isParallel(*fNormal,*sNormal))
 // 	if(fNormal->compare(ivNeg(sNormal))!=0)//This results in a Mandelbug

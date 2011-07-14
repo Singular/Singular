@@ -16,9 +16,9 @@
 #include <polys/monomials/ring.h>
 #include <kernel/walkMain.h>
 #include <kernel/walkSupport.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 #include <kernel/kstd1.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 
 

@@ -16,11 +16,11 @@
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 //#include "cntrlc.h"
-#include <kernel/weight.h>
+#include <polys/weight.h>
 //#include "ipshell.h"
 #include <misc/intvec.h>
 #ifdef HAVE_FACTORY
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 #endif
 #include <kernel/ideals.h>
 #include <kernel/timer.h>
