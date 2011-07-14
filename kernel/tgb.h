@@ -12,7 +12,7 @@
 //#define OM_CHECK 3
 //#define OM_TRACK 5
 
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 #include <kernel/structs.h>
 

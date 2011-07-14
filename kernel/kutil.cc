@@ -22,7 +22,7 @@
 
 #include <omalloc/mylimits.h>
 #include <misc/options.h>
-#include <kernel/gring.h>
+#include <polys/nc/nc.h>
 #include <kernel/sca.h>
 #ifdef KDEBUG
 #undef KDEBUG
@@ -44,18 +44,18 @@
 // #define ENTER_USE_MYMEMMOVE
 
 #include <kernel/kutil.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
 #include <kernel/timer.h>
 //#include "cntrlc.h"
 #include <kernel/stairc.h>
 #include <kernel/kstd1.h>
-#include <kernel/pShallowCopyDelete.h>
+#include <polys/operations/pShallowCopyDelete.h>
 
 /* shiftgb stuff */
 #include <kernel/shiftgb.h>

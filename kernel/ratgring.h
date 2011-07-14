@@ -11,7 +11,7 @@
 
 #ifdef HAVE_RATGRING
 #include <kernel/structs.h>
-#include <kernel/gring.h>
+#include <polys/nc/nc.h>
 
 /* MACROS */
 

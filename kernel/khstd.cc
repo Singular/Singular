@@ -9,8 +9,8 @@
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
 #include <misc/options.h>
-#include <kernel/polys.h>
-#include <kernel/intvec.h>
+#include <polys/polys.h>
+#include <misc/intvec.h>
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
 #include <kernel/kstd1.h>

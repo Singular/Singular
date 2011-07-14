@@ -32,14 +32,14 @@
 #include <misc/options.h>
 #include <kernel/kutil.h>
 #include <kernel/kInline.cc>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <kernel/stairc.h>
 #include <kernel/weight.h>
 //#include "cntrlc.h"
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
 #include <kernel/timer.h>

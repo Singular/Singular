@@ -12,9 +12,9 @@
 
 #ifdef HAVE_FACTORY
 #include <misc/options.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/febase.h>
 #include <kernel/maps.h>
 #include <omalloc/omalloc.h>

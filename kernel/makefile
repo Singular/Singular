@@ -233,6 +233,8 @@ libkernel_g.a: ${OBJG} ${OBJSG2}
 	-rm -f libkernel_g.a
 	ar cr $@ ${OBJG}
 
+
+
 ##
 ## .op files for profiling
 ##
@@ -254,6 +256,9 @@ CXXP		= ${CXX}
 CFLAGSP		= -g -pg -O ${PIPE}
 CXXFLAGSP	= -g -pg -O ${PIPE}
 DEFSP		= 
+
+
+
 
 ##
 ## Profiling Targets
@@ -289,3 +294,8 @@ include depend
 endif
 
 
+# My headers test
+# test: test.o
+
+test.o: test.cc mod2.h
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@

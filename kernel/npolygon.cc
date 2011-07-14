@@ -18,7 +18,7 @@
 #endif
 #endif
 
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/GMPrat.h>
 #include <kernel/kmatrix.h>
 #include <kernel/npolygon.h>

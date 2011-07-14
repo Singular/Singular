@@ -11,7 +11,7 @@
 #include <kernel/structs.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 
 class int64vec
 {

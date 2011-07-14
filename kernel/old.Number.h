@@ -2,9 +2,9 @@
 #define NUMBERCPP_HEADER
 #include <boost/intrusive_ptr.hpp>
 #include <kernel/mod2.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/febase.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 using namespace boost;
 inline void intrusive_ptr_add_ref(ring r){
     r->ref++;

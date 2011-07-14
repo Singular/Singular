@@ -21,12 +21,12 @@
 #include <omalloc/mylimits.h>
 
 #include <coeffs/numbers.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>
 #include <kernel/stairc.h>
-#include <kernel/intvec.h>
-#include <kernel/ring.h>
+#include <misc/intvec.h>
+#include <polys/monomials/ring.h>
 
 #include <kernel/multicnt.h>
 #include <kernel/GMPrat.h>

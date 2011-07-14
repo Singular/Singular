@@ -9,13 +9,13 @@
  * ABSTRACT: tgb internal .h file
 */
 #include <omalloc/omalloc.h>
-#include <kernel/p_polys.h>
+#include <polys/monomials/p_polys.h>
 
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/febase.h>
 #include <misc/options.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <stdlib.h>
 #include <kernel/modulop.h>
 #define USE_NORO 1
@@ -49,7 +49,7 @@ using std::vector;
 #include <kernel/kutil.h>
 #include <kernel/kInline.cc>
 #include <kernel/kstd1.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 
 
 

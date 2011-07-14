@@ -3,9 +3,9 @@
 ****************************************/
 /* $Id$ */
 #include <kernel/mod2.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/fast_mult.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/febase.h>
 
 typedef poly fastmultrec(poly f, poly g, ring r);
