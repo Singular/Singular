@@ -76,7 +76,6 @@ static feResourceConfig_s feResourceConfigs[] =
 {
   {"SearchPath",    's', feResPath,  NULL,
    "$SINGULARPATH;"
-   "" INSTALL_PREFIX ";"
    "%b/LIB;"
    "%b/MOD;"
    "%b/../lib/libpolys/MOD;"
