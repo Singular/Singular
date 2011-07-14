@@ -17,7 +17,7 @@
 #ifdef HAVE_FACTORY
 #include <omalloc/omalloc.h>
 #include <kernel/structs.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 

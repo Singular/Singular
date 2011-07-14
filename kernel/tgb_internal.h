@@ -14,7 +14,7 @@
 #include <kernel/ideals.h>
 #include <kernel/ring.h>
 #include <kernel/febase.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/polys.h>
 #include <stdlib.h>
 #include <kernel/modulop.h>

@@ -14,7 +14,7 @@
 #include <kernel/structs.h>
 //#include "ipid.h"
 #include <kernel/intvec.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 //#include "lists.h"

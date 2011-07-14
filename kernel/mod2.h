@@ -53,9 +53,6 @@
 /* letterplace gb:*/
 #define HAVE_SHIFTBBA 1
 
-/* rings as coefficients */
-#define HAVE_RINGS
-
 /* procedures to compute with units */
 #define HAVE_UNITS
 

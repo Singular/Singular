@@ -34,7 +34,7 @@
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
 #include <kernel/kutil.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

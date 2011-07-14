@@ -16,7 +16,7 @@
 #include <omalloc/mylimits.h>
 #include <omalloc/omalloc.h>
 #include <kernel/structs.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/febase.h>
 //#include "cntrlc.h"
 #include "kstd1.h"
