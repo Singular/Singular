@@ -19,7 +19,7 @@
 #endif
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 
 #include <Singular/static.h>
 

@@ -8,9 +8,9 @@
 
 // #define PDEBUG 2
 #include <kernel/mod2.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/kutil.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/p_polys.h>
 #include <kernel/p_Procs.h>
 #include <kernel/gring.h>

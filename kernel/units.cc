@@ -9,7 +9,7 @@
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>

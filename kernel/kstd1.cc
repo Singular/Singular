@@ -29,7 +29,7 @@
 #endif /* ifdef HAVE_TAIL_RING */
 #endif /* if MYTEST */
 
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/kutil.h>
 #include <kernel/kInline.cc>
 #include <kernel/polys.h>

@@ -20,7 +20,7 @@
 
 #include <kernel/structs.h>
 #include <kernel/GMPrat.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/npolygon.h>
 #include <kernel/splist.h>

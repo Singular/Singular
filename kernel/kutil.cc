@@ -21,7 +21,7 @@
 
 
 #include <omalloc/mylimits.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/gring.h>
 #include <kernel/sca.h>
 #ifdef KDEBUG
@@ -47,7 +47,7 @@
 #include <kernel/kbuckets.h>
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ring.h>
 #include <kernel/ideals.h>

@@ -12,7 +12,7 @@
 #include <kernel/febase.h>
 #include <kernel/ring.h>
 #include <kernel/polys.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/ideals.h>
 #include <kernel/matpol.h>
 #include <kernel/kbuckets.h>

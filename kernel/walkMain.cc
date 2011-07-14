@@ -8,7 +8,7 @@
 */
 #include <string.h>
 #include <kernel/mod2.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/intvec.h>
 #include <kernel/int64vec.h>
 #include <kernel/polys.h>

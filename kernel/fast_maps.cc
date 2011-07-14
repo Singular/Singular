@@ -10,7 +10,7 @@
  *******************************************************************/
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/p_polys.h>
 #include <kernel/prCopy.h>
 #include <kernel/ideals.h>

@@ -20,7 +20,7 @@
 
 #include <omalloc/mylimits.h>
 
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>

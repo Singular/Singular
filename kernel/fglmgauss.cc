@@ -13,7 +13,7 @@
 
 #ifdef  HAVE_FACTORY
 #include <kernel/structs.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/ring.h>
 #include <omalloc/omalloc.h>
 

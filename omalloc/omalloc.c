@@ -13,7 +13,7 @@
 #ifndef OMALLOC_C
 #define OMALLOC_C
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 #ifdef OM_MALLOC_MARK_AS_STATIC
 #define OM_MARK_AS_STATIC(addr) omMarkAsStaticAddr(addr)

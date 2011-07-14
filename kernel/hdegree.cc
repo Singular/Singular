@@ -15,7 +15,7 @@
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
 #include <kernel/intvec.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/hutil.h>
 #include <kernel/stairc.h>
 

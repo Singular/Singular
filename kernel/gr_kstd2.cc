@@ -16,7 +16,7 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/kutil.h>
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>

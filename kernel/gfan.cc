@@ -9,7 +9,7 @@ $Id$
 #include <kernel/mod2.h>
 
 #ifdef HAVE_FANS
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
 #include <kernel/polys.h>

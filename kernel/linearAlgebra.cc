@@ -20,7 +20,7 @@
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/matpol.h>
 #include <Singular/lists.h>
 #include <kernel/mpr_complex.h>

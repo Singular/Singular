@@ -6,7 +6,7 @@
 * ABSTRACT: gauss implementation for F4
 */
 #include <kernel/mod2.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/tgbgauss.h>
 #include <omalloc/omalloc.h>
 #include <stdlib.h>

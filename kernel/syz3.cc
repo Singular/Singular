@@ -8,7 +8,7 @@
  
 #include <kernel/mod2.h>
 #include <omalloc/mylimits.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
@@ -17,7 +17,7 @@
 #include <kernel/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/intvec.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>

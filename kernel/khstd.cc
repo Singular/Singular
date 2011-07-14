@@ -8,7 +8,7 @@
 
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/polys.h>
 #include <kernel/intvec.h>
 #include <kernel/kutil.h>
