@@ -666,7 +666,8 @@ mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   MulTrunc (F1, F1, G1, (long) k);
 
   mul (F2, F2, G2);
-  F2 >>= k;
+  if (deg (F2) > k)
+    F2 >>= (k - d1);
 
   return reverseSubst (F1, F2, d1, d2);
 }
@@ -686,7 +687,7 @@ mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
   int d1= degAx + 1 + degBx;
   int d2= tmax (degree (A, 2), degree (B, 2));
 
-  if (d1 > 128 && d2 > 160 && (degAy == degBy))
+  if (d1 > 128 && d2 > 160 && (degAy == degBy) && (2*degAy > degree (M)))
     return mulMod2NTLFpReci (A, B, M);
 
   zz_pX NTLA= kronSubFp (A, d1);
@@ -713,12 +714,12 @@ mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
   zz_pEX G1, G2;
   kronSubRecipro (G1, G2, G, d1, alpha);
 
-  int k1= d1*degree (M);
-  MulTrunc (F1, F1, G1, (long) k1);
+  int k= d1*degree (M);
+  MulTrunc (F1, F1, G1, (long) k);
 
   mul (F2, F2, G2);
-
-  F2 >>= k1;
+  if (deg (F2) > k)
+    F2 >>= (k-d1);
 
   CanonicalForm result= reverseSubst (F1, F2, d1, d2, alpha);
 
@@ -746,7 +747,8 @@ mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
     zz_pE::init (NTLMipo);
 
     int degMipo= degree (getMipo (alpha));
-    if ((d1 > 128/degMipo) && (d2 > 160/degMipo) && (degAy == degBy))
+    if ((d1 > 128/degMipo) && (d2 > 160/degMipo) && (degAy == degBy) &&
+        (2*degAy > degree (M)))
       return mulMod2NTLFqReci (A, B, M, alpha);
 
     zz_pEX NTLA= kronSub (A, d1, alpha);
