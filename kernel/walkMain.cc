@@ -9,17 +9,17 @@
 #include <string.h>
 #include <kernel/mod2.h>
 #include <misc/options.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/int64vec.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/walkMain.h>
 #include <kernel/walkSupport.h>
 #include <kernel/prCopy.h>
 #include <kernel/kstd1.h>
 #include <kernel/matpol.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 
 ///////////////////////////////////////////////////////////////////

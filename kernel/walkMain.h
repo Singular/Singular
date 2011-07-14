@@ -1,7 +1,7 @@
 #ifndef WALKMAIN_H
 #define WALKMAIN_H
 
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/int64vec.h>
 
 enum WalkState{

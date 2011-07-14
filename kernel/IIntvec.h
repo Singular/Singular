@@ -1,7 +1,7 @@
 #ifndef ITERATABLE_INTVEC_H
 #define ITERATABLE_INTVEC_H
 #include <vector>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 class Intvec: public std::vector<int>{
 public:
   Intvec(iterator first, 

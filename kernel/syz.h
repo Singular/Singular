@@ -8,7 +8,7 @@
 * ABSTRACT: Resolutions
 */
 #include <kernel/structs.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
 
 // Logarithm of estimate of maximal number of new components

@@ -19,9 +19,9 @@
 #include <Singular/tok.h>
 #include <kernel/structs.h>
 #include <kernel/subexpr.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ipid.h>
 #include <kernel/ipshell.h>
 #include <kernel/febase.h>
@@ -30,7 +30,7 @@
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/kstd1.h>
 #include <kernel/stairc.h>
 #include <templates/ftmpl_list.h>

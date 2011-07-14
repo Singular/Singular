@@ -18,7 +18,7 @@
 // include header files
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
 #include <kernel/matpol.h>

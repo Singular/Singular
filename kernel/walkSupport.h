@@ -1,7 +1,7 @@
 #ifndef WALKSUPPORT_H
 #define WALKSUPPORT_H
 
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/int64vec.h>
 
 int tdeg(poly p);

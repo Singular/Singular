@@ -16,7 +16,7 @@
 #ifdef HAVE_FACTORY
 #include <factory/factory.h>
 
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/fglmvec.h>
 
 #define PROT(msg)

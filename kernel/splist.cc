@@ -21,10 +21,10 @@
 #include <kernel/structs.h>
 #include <kernel/GMPrat.h>
 #include <coeffs/numbers.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/npolygon.h>
 #include <kernel/splist.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 
 // ------------------------
 //  class spectrumPolyNode

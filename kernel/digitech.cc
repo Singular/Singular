@@ -3,10 +3,10 @@
 ****************************************/
 /* $Id$ */
 #include <kernel/mod2.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 #include <kernel/digitech.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/ideals.h>
 static ideal zero_ideal;
 

@@ -11,14 +11,14 @@
 #include <misc/options.h>
 #include <kernel/kutil.h>
 #include <coeffs/numbers.h>
-#include <kernel/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <kernel/p_Procs.h>
-#include <kernel/gring.h>
+#include <polys/nc/nc.h>
 #ifdef KDEBUG
 #include <kernel/febase.h>
 #endif
 #ifdef HAVE_RINGS
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #endif
 
 #ifdef KDEBUG

@@ -22,14 +22,14 @@
 
 #ifdef HAVE_FACTORY
 #include <misc/options.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/febase.h>
 #include <kernel/maps.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>

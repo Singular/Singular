@@ -9,7 +9,7 @@
 #include <kernel/structs.h>
 #include <kernel/febase.h>
 #include <kernel/int64vec.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 
 /*0 implementation*/

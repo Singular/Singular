@@ -9,7 +9,7 @@
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
 #include <kernel/kutil.h>
@@ -18,7 +18,7 @@
 //#include "cntrlc.h"
 #include <kernel/weight.h>
 //#include "ipshell.h"
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #ifdef HAVE_FACTORY
 #include <kernel/clapsing.h>
 #endif

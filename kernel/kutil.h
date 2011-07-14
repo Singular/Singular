@@ -14,9 +14,9 @@
 
 #include <kernel/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/structs.h>
-#include <kernel/pShallowCopyDelete.h>
+#include <polys/operations/pShallowCopyDelete.h>
 
 #if 1
 #define setmax 16

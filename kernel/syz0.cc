@@ -10,19 +10,19 @@
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
 //#include "cntrlc.h"
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <kernel/ideals.h>
-#include <kernel/intvec.h>
-#include <kernel/ring.h>
+#include <misc/intvec.h>
+#include <polys/monomials/ring.h>
 #include <kernel/syz.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/prCopy.h>
 
 static kBucket_pt sy0buck;

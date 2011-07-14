@@ -11,10 +11,10 @@
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <kernel/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <kernel/prCopy.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/febase.h>
 #include <kernel/sbuckets.h>
 #include <kernel/fast_maps.h>

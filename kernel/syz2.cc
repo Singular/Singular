@@ -11,19 +11,19 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/syz.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
 //#include "cntrlc.h"
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/ideals.h>
-#include <kernel/intvec.h>
-#include <kernel/ring.h>
-#include <kernel/kbuckets.h>
+#include <misc/intvec.h>
+#include <polys/monomials/ring.h>
+#include <polys/kbuckets.h>
 #include <kernel/prCopy.h>
 
 //#define SHOW_PROT

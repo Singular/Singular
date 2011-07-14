@@ -13,10 +13,10 @@
 
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
 
-#include <kernel/p_polys.h>
-#include <kernel/polys.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/polys.h>
 #include <kernel/p_Procs.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
 

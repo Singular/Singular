@@ -8,7 +8,7 @@
 * ABSTRACT
 */
 #include <kernel/structs.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 

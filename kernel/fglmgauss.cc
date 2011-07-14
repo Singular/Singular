@@ -14,7 +14,7 @@
 #ifdef  HAVE_FACTORY
 #include <kernel/structs.h>
 #include <coeffs/numbers.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>
 
 #include <kernel/fglmvec.h>

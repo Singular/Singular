@@ -21,7 +21,7 @@
 #include <kernel/tgbgauss.h>
 
 #include <kernel/digitech.h>
-#include <kernel/gring.h>
+#include <polys/nc/nc.h>
 #include <kernel/sca.h>
 #include <kernel/prCopy.h>
 #include <kernel/longrat.h>

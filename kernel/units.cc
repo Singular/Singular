@@ -10,9 +10,9 @@
 #include <kernel/structs.h>
 #include <kernel/febase.h>
 #include <coeffs/numbers.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/matpol.h>
 #include <kernel/kstd1.h>
 #include <kernel/units.h>

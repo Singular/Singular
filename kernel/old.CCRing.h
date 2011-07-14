@@ -1,6 +1,6 @@
 #ifndef CCRING_WRAP_HEADER
 #define CCRING_WRAP_HEADER
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/grammar.h>
 #include <kernel/subexpr.h>
 #include <kernel/ipid.h>

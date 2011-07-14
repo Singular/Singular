@@ -10,12 +10,12 @@
 
 #ifdef HAVE_SHIFTBBA
 #include <kernel/febase.h>
-#include <kernel/ring.h>
-#include <kernel/polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/polys.h>
 #include <coeffs/numbers.h>
 #include <kernel/ideals.h>
 #include <kernel/matpol.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/kstd1.h>
 #include <kernel/sbuckets.h>
 #include <kernel/p_Mult_q.h>
@@ -23,14 +23,14 @@
 #include <kernel/structs.h>
 #include <omalloc/omalloc.h>
 #include <kernel/khstd.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/weight.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/structs.h>
 #include <kernel/kInline.cc>
 #include <kernel/stairc.h>
 #include <kernel/weight.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/timer.h>
 #include <kernel/shiftgb.h>
 #include <kernel/sca.h>

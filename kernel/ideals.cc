@@ -21,17 +21,17 @@
 #include <coefss/coeffs.h>
 #include <coefss/numbers.h>
 #include <kernel/longrat.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
 #include <kernel/kstd1.h>
 #include <kernel/matpol.h>
 #include <kernel/weight.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/syz.h>
-#include <kernel/sparsmat.h>
+#include <polys/sparsmat.h>
 #include <kernel/ideals.h>
 #include <kernel/prCopy.h>
-#include <kernel/gring.h>
+#include <polys/nc/nc.h>
 
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));

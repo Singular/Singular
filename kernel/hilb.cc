@@ -10,8 +10,8 @@
 #include <kernel/structs.h>
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/intvec.h>
+#include <polys/polys.h>
+#include <misc/intvec.h>
 #include <kernel/hutil.h>
 #include <kernel/stairc.h>
 

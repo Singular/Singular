@@ -6,11 +6,11 @@
 #define POLYCPP_HEADER
 #include <kernel/mod2.h>
 #include <kernel/IIntvec.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/Number.h>
 #include <kernel/febase.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
 
 
 #include <boost/shared_ptr.hpp>

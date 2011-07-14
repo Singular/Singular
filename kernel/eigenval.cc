@@ -13,9 +13,9 @@
 #include <kernel/febase.h>
 #include <kernel/structs.h>
 //#include "ipid.h"
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <coeffs/numbers.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 //#include "lists.h"
 #include <kernel/matpol.h>
