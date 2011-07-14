@@ -24,7 +24,7 @@
 //#include<values.h>
 #endif
 
-#include"intvec.h"
+#include<misc/intvec.h>
 #include"GMPrat.h"
 #include"semic.h"
 

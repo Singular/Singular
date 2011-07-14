@@ -12,7 +12,7 @@
 #include <kernel/kutil.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/p_polys.h>
-#include <kernel/p_Procs.h>
+#include <polys/templates/p_Procs.h>
 #include <polys/nc/nc.h>
 #ifdef KDEBUG
 #include <kernel/febase.h>

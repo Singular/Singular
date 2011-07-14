@@ -23,7 +23,7 @@
 #include <omalloc/mylimits.h>
 #include <misc/options.h>
 #include <polys/nc/nc.h>
-#include <kernel/sca.h>
+#include <polys/nc/sca.h>
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
@@ -59,7 +59,7 @@
 
 /* shiftgb stuff */
 #include <kernel/shiftgb.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 
 #ifdef HAVE_RATGRING
 #include <kernel/ratgring.h>

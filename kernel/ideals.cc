@@ -18,19 +18,19 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <coefss/coeffs.h>
-#include <coefss/numbers.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
 #include <kernel/longrat.h>
 #include <polys/polys.h>
 #include <polys/monomials/ring.h>
 #include <kernel/kstd1.h>
-#include <kernel/matpol.h>
-#include <kernel/weight.h>
+#include <polys/matpol.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/syz.h>
 #include <polys/sparsmat.h>
 #include <kernel/ideals.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 #include <polys/nc/nc.h>
 
 
@@ -2532,7 +2532,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   return res;
 }
 
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 
 #ifdef HAVE_FACTORY
 poly id_GCD(poly f, poly g, const ring r)

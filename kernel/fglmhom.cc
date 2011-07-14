@@ -25,15 +25,15 @@
 #include <kernel/ipid.h>
 #include <kernel/ipshell.h>
 #include <kernel/febase.h>
-#include <kernel/maps.h>
-#include <omalloc.h>
+#include <polys/monomials/maps.h>
+#include <omalloc/omalloc.h>
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
 #include <misc/intvec.h>
 #include <kernel/kstd1.h>
 #include <kernel/stairc.h>
-#include <templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_list.h>
 
 // obachman: Got rid off those "redefiende messages by includeing fglm.h
 #include <kernel/fglm.h>

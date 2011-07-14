@@ -221,7 +221,7 @@
      #define OM_TRACK 5
      #define OM_KEEP  1
      #include "mod2.h"
-     #include "omalloc.h"
+     #include <omalloc/omalloc.h>
    ensures that all memory allocs/free in this file are done with 
    OM_CHECK==3 and OM_TRACK==5, and that all addresses allocated/freed 
    in this file are only marked as free and never really freed.
@@ -249,7 +249,7 @@
        #define OM_TRACK 5
        #define OM_KEEP  1
        #include "mod2.h"
-       #include "omalloc.h"
+       #include <omalloc/omalloc.h>
      Under dynamic scope, do (e.g., from within the debugger):
        om_Opts.MinCheck = 3; om_Opts.MinTrack = 5; omOpts.Keep = LONG_MAX;
    + to find out where "memory corruption" occured, increase value of 

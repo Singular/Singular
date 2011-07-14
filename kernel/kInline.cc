@@ -15,7 +15,7 @@
 
 #include <polys/monomials/p_polys.h>
 #include <polys/polys.h>
-#include <kernel/p_Procs.h>
+#include <polys/templates/p_Procs.h>
 #include <polys/kbuckets.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>

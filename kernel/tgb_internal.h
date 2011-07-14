@@ -37,7 +37,7 @@
 //#define HAVE_BOOST 1
 //#define USE_STDVECBOOL 1
 #ifdef HAVE_BOOST
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <vector>
 using boost::dynamic_bitset;
 using std::vector;

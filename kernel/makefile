@@ -65,10 +65,9 @@ CXXSOURCES=\
     ideals.cc int64vec.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
-    maps.cc matpol.cc misc.cc \
-    sparsmat.cc fast_maps.cc \
+    misc.cc \
+    fast_maps.cc \
     fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
-    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
     kspoly.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc \
@@ -80,6 +79,8 @@ CXXSOURCES=\
     f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc \
     linearAlgebra.cc
 CXXSOURCES2	= SingularBuilder.cpp
+
+#    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
 
 # normal C source files
 CSOURCES=fegetopt.c mmstd.c

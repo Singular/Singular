@@ -43,7 +43,7 @@
 #include <kernel/khstd.h>
 #include <polys/kbuckets.h>
 //#include "cntrlc.h"
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <misc/intvec.h>
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>

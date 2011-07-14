@@ -18,8 +18,8 @@
 #include <polys/polys.h>
 #include <kernel/ideals.h>
 //#include "lists.h"
-#include <kernel/matpol.h>
-#include <kernel/clapsing.h>
+#include <polys/matpol.h>
+#include <polys/clapsing.h>
 #include <kernel/eigenval.h>
 
 

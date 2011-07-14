@@ -21,9 +21,9 @@
 #include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
-#include <kernel/matpol.h>
-#include <Singular/lists.h>
-#include <kernel/mpr_complex.h>
+#include <polys/matpol.h>
+#include lists.h
+#include <coeffs/mpr_complex.h>
 #include <kernel/linearAlgebra.h>
 
 /**

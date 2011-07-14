@@ -23,7 +23,7 @@
 #include <polys/monomials/ring.h>
 #include <kernel/syz.h>
 #include <polys/kbuckets.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 
 static kBucket_pt sy0buck;
 
