@@ -19,7 +19,7 @@ $Id$
 #include <kernel/../../cddlib/include/cdd.h>
 #include <kernel/../../cddlib/include/cddmp.h>
 #endif
-#include <Singular/bbfan.h>
+#include <kernel/bbfan.h>
 #include <Singular/bbcone.h>
 extern int gfanHeuristic;
 
