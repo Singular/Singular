@@ -33,10 +33,12 @@
 #include <Singular/ssiLink.h>
 #include <Singular/bigintm.h>
 #include <Singular/bbcone.h>
-#include <Singular/bbfan.h>
 #include <Singular/pyobject_setup.h>
 #include <omalloc/omalloc.h>
 
+#ifdef HAVE_FANS
+#include <kernel/bbfan.h>
+#endif
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS

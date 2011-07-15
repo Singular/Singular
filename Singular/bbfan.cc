@@ -7,7 +7,7 @@
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
-#include <Singular/bbfan.h>
+#include <kernel/bbfan.h>
 #include <Singular/bbcone.h>
 #include <ipshell.h>
 #include <kernel/intvec.h>
