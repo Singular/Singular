@@ -20,7 +20,7 @@ $Id$
 #include <kernel/../../cddlib/include/cddmp.h>
 #endif
 #include <kernel/bbfan.h>
-#include <Singular/bbcone.h>
+#include <kernel/bbcone.h>
 extern int gfanHeuristic;
 
 #ifndef USE_ZFAN
