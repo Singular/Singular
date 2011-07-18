@@ -8,8 +8,6 @@
 * ABSTRACT
 */
 
-/* for memset: */
-#include <string.h>
 /* for omBin */
 #include <omalloc/omalloc.h>
 #ifdef HAVE_RINGS
@@ -46,11 +44,9 @@ typedef long int64;
 /* C++-part */
 #ifdef __cplusplus
 class sleftv;
-class slists;
-class sattr;
+class procinfo;
 class skStrategy;
 class ssyStrategy;
-class procinfo;
 class CPolynomialSummator;
 class CGlobalMultiplier;
 class CFormulaPowerMultiplier;
@@ -59,7 +55,6 @@ class CFormulaPowerMultiplier;
 struct sip_package;
 typedef struct sip_package ip_package;
 typedef ip_package *       package;
-
 
 typedef struct  n_Procs_s  n_Procs_s;
 
@@ -75,10 +70,10 @@ typedef char *             char_ptr;
 typedef int  *             int_ptr;
 
 #ifdef __cplusplus
-typedef ip_link *          si_link;
+//typedef ip_link *          si_link;
 typedef sleftv *           leftv;
-typedef slists *           lists;
-typedef sattr *            attr;
+//typedef slists *           lists;
+//typedef sattr *            attr;
 typedef skStrategy *       kStrategy;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
@@ -123,7 +118,6 @@ int siRand();
 #endif
 
 extern omBin char_ptr_bin;
-extern omBin sleftv_bin;
 
 #endif
 
