@@ -9,7 +9,7 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <gfanlib/gfanlib.h>
-#include <Singular/bbcone.h>
+#include <kernel/bbcone.h>
 #include <ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
