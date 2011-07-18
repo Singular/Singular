@@ -22,7 +22,6 @@
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
 #include <polys/matpol.h>
-#include lists.h
 #include <coeffs/mpr_complex.h>
 #include <kernel/linearAlgebra.h>
 
