@@ -14,9 +14,6 @@
 #define SINGULAR_MAJOR_VERSION 0
 #define SINGULAR_MINOR_VERSION 0
 #define SINGULAR_SUB_VERSION 0
-#define S_VERSION1 ""
-#define S_VERSION2 ""
-#define S_UNAME ""
 #define S_ROOT_DIR ""
 
 /*******************************************************************
@@ -85,8 +82,6 @@
 #ifndef CHAR_BIT
 #define CHAR_BIT 8
 #endif
-
-#define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
 #define SINGULAR_PATCHLEVEL 0
 #define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+SINGULAR_PATCHLEVEL)
