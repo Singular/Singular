@@ -83,7 +83,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-  if( (strncmp(buf, &mach_o_module[0], 4)==0)) /* Mach-O bundle */
+  if( (strncmp(buf, (const char *)mach_O, 4)==0)) /* Mach-O bundle */
   {
     LT = LT_MACH_O;
     //omFree(newlib);
