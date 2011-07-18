@@ -32,11 +32,11 @@
 #include <Singular/slInit.h>
 #include <Singular/ssiLink.h>
 #include <Singular/bigintm.h>
-#include <Singular/bbcone.h>
 #include <Singular/pyobject_setup.h>
 #include <omalloc/omalloc.h>
 
 #ifdef HAVE_FANS
+#include <kernel/bbcone.h>
 #include <kernel/bbfan.h>
 #endif
 
