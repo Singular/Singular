@@ -3774,16 +3774,3 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
 
 #include <polys/templates/p_Delete__T.cc>
 
-#ifdef HAVE_RINGS
-/* TRUE iff LT(f) | LT(g) */
-BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r)
-{
-  int exponent;
-  for(int i = (int)r->N; i; i--)
-  {
-    exponent = p_GetExp(g, i, r) - p_GetExp(f, i, r);
-    if (exponent < 0) return FALSE;
-  }
-  return n_DivBy(p_GetCoeff(g,r), p_GetCoeff(f,r),r->cf);
-}
-#endif

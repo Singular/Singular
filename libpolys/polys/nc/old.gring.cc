@@ -1590,7 +1590,7 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
     C1=n_Copy(C1, r);
     C2=n_Copy(C2, r);
   }
-  nDelete(&C);
+  n_Delete(&C,r);
   M1=p_Mult_nn(M1,C2,r);
   p_SetCoeff(m1,C2,r);
   if (n_IsMOne(C1,r))
