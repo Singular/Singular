@@ -8,6 +8,7 @@
  * File Stuff
  *
  *****************************************************************/
+#ifdef __cplusplus
 FILE*feFopen(const char *path, const char *mode, char *where=NULL, BOOLEAN useWerror=FALSE, BOOLEAN path_only=FALSE);
 
 /*
@@ -23,4 +24,5 @@ FILE *myfopen(const char *path, const char *mode);
 
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
+#endif
 #endif

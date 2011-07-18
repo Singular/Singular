@@ -15,6 +15,7 @@ libfactory_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFL
 
 # factory source files
 SOURCES = \
+		algext.cc \
 		canonicalform.cc \
 		cf_algorithm.cc \
 		cf_binom.cc \
@@ -38,6 +39,8 @@ SOURCES = \
 		cf_linsys.cc \
 		cf_map.cc \
 		cf_map_ext.cc \
+		cfNewtonPolygon.cc \
+		cfModResultant.cc \
 		cf_ops.cc \
 		cf_primes.cc \
 		cf_random.cc \
@@ -49,10 +52,12 @@ SOURCES = \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
 		facAlgExt.cc \
+		facBivar.cc \
 		fac_berlekamp.cc \
 		fac_cantzass.cc \
 		fac_distrib.cc \
 		fac_ezgcd.cc \
+		facFactorize.cc \
 		fac_iterfor.cc \
 		fac_multihensel.cc \
 		fac_multivar.cc \
@@ -112,6 +117,8 @@ factory_headers = \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
+		cfNewtonPolygon.h \
+                cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
@@ -122,9 +129,11 @@ factory_headers = \
 		DegreePattern.h \
 		ExtensionInfo.h \
 		facAlgExt.h \
+		facBivar.h \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_distrib.h \
+		facFactorize.h \
 		fac_iterfor.h \
 		fac_multivar.h \
 		fac_sqrfree.h \
