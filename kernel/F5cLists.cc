@@ -13,7 +13,7 @@
 #include <polys/kbuckets.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
-#include <kernel/pInline1.h>
+#include <libpolys/polys/polys.h>
 #include <kernel/f5c.h>
 #include <kernel/F5cData.h>
 #include <kernel/F5cLists.h>

@@ -21,7 +21,7 @@
 #include <polys/kbuckets.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
-#include <kernel/pInline1.h>
+#include <libpolys/polys/polys.h>
 #include <kernel/lpolynomial.h>
 #include <kernel/lplist.h>
 
