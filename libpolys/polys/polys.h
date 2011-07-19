@@ -5,12 +5,12 @@
 ****************************************/
 /* $Id$ */
 /*
-* ABSTRACT - all basic methods to manipulate polynomials of the
-             currRing
+* ABSTRACT - compatiblity layer for all operations with polys
 */
 
 #include <polys/monomials/p_polys.h>
 
+extern ring currRing;
 /***************************************************************
  *
  * Primitives for accessing and setting fields of a poly
