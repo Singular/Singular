@@ -16,13 +16,20 @@
 /*****************************************************************************/
 
 // include header files
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <polys/polys.h>
-#include <kernel/ideals.h>
+#include "mod2.h"
+
+#include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
-#include <polys/matpol.h>
+
 #include <coeffs/mpr_complex.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/simpleideals.h>
+#include <polys/matpol.h>
+
+// #include <polys/polys.h>
+
+#include <kernel/structs.h>
+#include <kernel/ideals.h>
 #include <kernel/linearAlgebra.h>
 
 /**
@@ -38,12 +45,12 @@
  * for larger values of |n|. Therefore, in R, long R, and long C,
  * the negative of nSize will be returned.
  **/
-int pivotScore(number n)
+int pivotScore(number n, const ring r)
 {
-  int s = nSize(n);
-  if (rField_is_long_C(currRing) ||
-      rField_is_long_R(currRing) ||
-      rField_is_R(currRing))
+  int s = n_Size(n, r->cf);
+  if (rField_is_long_C(r) ||
+      rField_is_long_R(r) ||
+      rField_is_R(r))
     return -s;
   else
     return s;
@@ -57,7 +64,7 @@ int pivotScore(number n)
  * matrix entry are stored in bestR and bestC.
  **/
 bool pivot(const matrix aMat, const int r1, const int r2, const int c1,
-           const int c2, int* bestR, int* bestC)
+           const int c2, int* bestR, int* bestC, const ring R)
 {
   int bestScore; int score; bool foundBestScore = false; poly matEntry;
 
@@ -68,7 +75,7 @@ bool pivot(const matrix aMat, const int r1, const int r2, const int c1,
       matEntry = MATELEM(aMat, r, c);
       if (matEntry != NULL)
       {
-        score = pivotScore(pGetCoeff(matEntry));
+        score = pivotScore(pGetCoeff(matEntry), R);
         if ((!foundBestScore) || (score < bestScore))
         {
           bestScore = score;
@@ -83,15 +90,16 @@ bool pivot(const matrix aMat, const int r1, const int r2, const int c1,
   return foundBestScore;
 }
 
-bool unitMatrix(const int n, matrix &unitMat)
+bool unitMatrix(const int n, matrix &unitMat, const ring R)
 {
   if (n < 1) return false;
   unitMat = mpNew(n, n);
-  for (int r = 1; r <= n; r++) MATELEM(unitMat, r, r) = pOne();
+  for (int r = 1; r <= n; r++) MATELEM(unitMat, r, r) = p_One(R);
   return true;
 }
 
-void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
+void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat,
+              const ring R)
 {
   int rr = aMat->rows();
   int cc = aMat->cols();
@@ -100,7 +108,7 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
   /* copy aMat into uMat: */
   for (int r = 1; r <= rr; r++)
     for (int c = 1; c <= cc; c++)
-      MATELEM(uMat, r, c) = pCopy(aMat->m[c - 1 + (r - 1) * cc]);
+      MATELEM(uMat, r, c) = p_Copy(aMat->m[c - 1 + (r - 1) * cc], R);
 
   /* we use an int array to store all row permutations;
      note that we only make use of the entries [1..rr] */
@@ -108,14 +116,14 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
   for (int i = 1; i <= rr; i++) permut[i] = i;
 
   /* fill lMat with the (rr x rr) unit matrix */
-  unitMatrix(rr, lMat);
+  unitMatrix(rr, lMat,R);
 
   int bestR; int bestC; int intSwap; poly pSwap; int cOffset = 0;
   for (int r = 1; r < rr; r++)
   {
     if (r > cc) break;
     while ((r + cOffset <= cc) &&
-           (!pivot(uMat, r, rr, r + cOffset, r + cOffset, &bestR, &bestC)))
+           (!pivot(uMat, r, rr, r + cOffset, r + cOffset, &bestR, &bestC, R)))
       cOffset++;
     if (r + cOffset <= cc)
     {
@@ -154,25 +162,25 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
         p = MATELEM(uMat, rGauss, r + cOffset);
         if (p != NULL)
         {
-          n = nDiv(pGetCoeff(p), pivotElement);
-          nNormalize(n);
+          n = n_Div(pGetCoeff(p), pivotElement, R->cf);
+          n_Normalize(n,R->cf);
 
           /* filling lMat;
              old entry was zero, so no need to call pDelete(.) */
-          MATELEM(lMat, rGauss, r) = pNSet(nCopy(n));
+          MATELEM(lMat, rGauss, r) = p_NSet(n_Copy(n,R->cf),R);
 
           /* adjusting uMat: */
-          MATELEM(uMat, rGauss, r + cOffset) = NULL; pDelete(&p);
-          n = nNeg(n);
+          MATELEM(uMat, rGauss, r + cOffset) = NULL; p_Delete(&p,R);
+          n = n_Neg(n,R->cf);
           for (int cGauss = r + cOffset + 1; cGauss <= cc; cGauss++)
           {
             MATELEM(uMat, rGauss, cGauss)
-              = pAdd(MATELEM(uMat, rGauss, cGauss),
-                     ppMult_nn(MATELEM(uMat, r, cGauss), n));
-            pNormalize(MATELEM(uMat, rGauss, cGauss));
+              = p_Add_q(MATELEM(uMat, rGauss, cGauss),
+                     pp_Mult_nn(MATELEM(uMat, r, cGauss), n, R), R);
+            p_Normalize(MATELEM(uMat, rGauss, cGauss),R);
           }
 
-          nDelete(&n); /* clean up n */
+          n_Delete(&n,R->cf); /* clean up n */
         }
       }
     }
@@ -180,7 +188,7 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
 
   /* building the permutation matrix from 'permut' */
   for (int r = 1; r <= rr; r++)
-    MATELEM(pMat, r, permut[r]) = pOne();
+    MATELEM(pMat, r, permut[r]) = p_One(R);
   delete[] permut;
 
   return;
@@ -191,18 +199,18 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
  * and then calls the method for inverting a matrix which
  * is given by its LU-decomposition.
  **/
-bool luInverse(const matrix aMat, matrix &iMat)
+bool luInverse(const matrix aMat, matrix &iMat, const ring R)
 { /* aMat is guaranteed to be an (n x n)-matrix */
   matrix pMat;
   matrix lMat;
   matrix uMat;
-  luDecomp(aMat, pMat, lMat, uMat);
-  bool result = luInverseFromLUDecomp(pMat, lMat, uMat, iMat);
+  luDecomp(aMat, pMat, lMat, uMat, R);
+  bool result = luInverseFromLUDecomp(pMat, lMat, uMat, iMat, R);
 
   /* clean-up */
-  idDelete((ideal*)&pMat);
-  idDelete((ideal*)&lMat);
-  idDelete((ideal*)&uMat);
+  id_Delete((ideal*)&pMat,R);
+  id_Delete((ideal*)&lMat,R);
+  id_Delete((ideal*)&uMat,R);
 
   return result;
 }
@@ -221,7 +229,7 @@ int rankFromRowEchelonForm(const matrix aMat)
   return rank;
 }
 
-int luRank(const matrix aMat, const bool isRowEchelon)
+int luRank(const matrix aMat, const bool isRowEchelon, const ring R)
 {
   if (isRowEchelon) return rankFromRowEchelonForm(aMat);
   else
@@ -230,20 +238,20 @@ int luRank(const matrix aMat, const bool isRowEchelon)
     matrix pMat;
     matrix lMat;
     matrix uMat;
-    luDecomp(aMat, pMat, lMat, uMat);
+    luDecomp(aMat, pMat, lMat, uMat,R);
     int result = rankFromRowEchelonForm(uMat);
 
     /* clean-up */
-    idDelete((ideal*)&pMat);
-    idDelete((ideal*)&lMat);
-    idDelete((ideal*)&uMat);
+    id_Delete((ideal*)&pMat,R);
+    id_Delete((ideal*)&lMat,R);
+    id_Delete((ideal*)&uMat,R);
 
     return result;
   }
 }
 
 bool upperRightTriangleInverse(const matrix uMat, matrix &iMat,
-                               bool diagonalIsOne)
+                               bool diagonalIsOne, const ring R)
 {
   int d = uMat->rows();
   poly p; poly q;
@@ -269,20 +277,20 @@ bool upperRightTriangleInverse(const matrix uMat, matrix &iMat,
     for (int r = d; r >= 1; r--)
     {
       if (diagonalIsOne)
-        MATELEM(iMat, r, r) = pOne();
+        MATELEM(iMat, r, r) = p_One(R);
       else
-        MATELEM(iMat, r, r) = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, r))));
+        MATELEM(iMat, r, r) = p_NSet(n_Invers(p_GetCoeff(MATELEM(uMat, r, r),R),R->cf),R);
       for (int c = r + 1; c <= d; c++)
       {
         p = NULL;
         for (int k = r + 1; k <= c; k++)
         {
-          q = ppMult_qq(MATELEM(uMat, r, k), MATELEM(iMat, k, c));
-          p = pAdd(p, q);
+          q = pp_Mult_qq(MATELEM(uMat, r, k), MATELEM(iMat, k, c),R);
+          p = p_Add_q(p, q,R);
         }
-        p = pNeg(p);
-        p = pMult(p, pCopy(MATELEM(iMat, r, r)));
-        pNormalize(p);
+        p = p_Neg(p,R);
+        p = p_Mult_q(p, p_Copy(MATELEM(iMat, r, r),R),R);
+        p_Normalize(p,R);
         MATELEM(iMat, r, c) = p;
       }
     }
@@ -344,7 +352,7 @@ bool lowerLeftTriangleInverse(const matrix lMat, matrix &iMat,
  * then performing two matrix multiplications.
  **/
 bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
-                           const matrix uMat, matrix &iMat)
+                           const matrix uMat, matrix &iMat, const ring R)
 { /* uMat is guaranteed to be quadratic */
   //int d = uMat->rows();
 
@@ -358,7 +366,7 @@ bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
     /* next will always work, since lMat is known to have all diagonal
        entries equal to 1 */
     lowerLeftTriangleInverse(lMat, lMatInverse, true);
-    iMat = mpMult(mpMult(uMatInverse, lMatInverse), pMat);
+    iMat = mp_Mult(mp_Mult(uMatInverse, lMatInverse,R), pMat,R);
 
     /* clean-up */
     idDelete((ideal*)&lMatInverse);
@@ -891,7 +899,7 @@ number hessenbergStep(
 }
 
 void hessenberg(const matrix aMat, matrix &pMat, matrix &hessenbergMat,
-                const number tolerance)
+                const number tolerance, const ring R)
 {
   int n = MATROWS(aMat);
   unitMatrix(n, pMat);
@@ -933,13 +941,13 @@ void hessenberg(const matrix aMat, matrix &pMat, matrix &hessenbergMat,
         matrix pTmpFull; matrixBlock(u, pTmp, pTmpFull);
         idDelete((ideal*)&u); idDelete((ideal*)&pTmp);
         /* now include pTmpFull in pMat (by letting it act from the left) */
-        pTmp = mpMult(pTmpFull, pMat); idDelete((ideal*)&pMat);
+        pTmp = mp_Mult(pTmpFull, pMat,R); idDelete((ideal*)&pMat);
         pMat = pTmp;
         /* now let pTmpFull act on hessenbergMat from the left and from the
            right (note that pTmpFull is self-inverse) */
-        pTmp = mpMult(pTmpFull, hessenbergMat);
+        pTmp = mp_Mult(pTmpFull, hessenbergMat,R);
         idDelete((ideal*)&hessenbergMat);
-        hessenbergMat = mpMult(pTmp, pTmpFull);
+        hessenbergMat = mp_Mult(pTmp, pTmpFull, R);
         idDelete((ideal*)&pTmp); idDelete((ideal*)&pTmpFull);
         /* as there may be inaccuracy, we erase those entries of hessenbergMat
            which must have become zero by the last transformation */
@@ -963,7 +971,8 @@ void hessenberg(const matrix aMat, matrix &pMat, matrix &hessenbergMat,
 void mpTrafo(
       matrix &H,             /**< [in/out]  the matrix to be transformed */
       int it,                /**< [in]      iteration index */
-      const number tolerance /**< [in]      accuracy for square roots */
+      const number tolerance,/**< [in]      accuracy for square roots */
+      const ring R
             )
 {
   int n = MATROWS(H);
@@ -1047,11 +1056,11 @@ void mpTrafo(
     matrix uVec; matrix hMat;
     tmp1 = hessenbergStep(c, uVec, hMat, tolerance); nDelete(&tmp1);
     /* now replace H by hMat * H * hMat: */
-    matrix wMat = mpMult(hMat, H); idDelete((ideal*)&H);
-    matrix H1 = mpMult(wMat, hMat);
+    matrix wMat = mp_Mult(hMat, H,R); idDelete((ideal*)&H);
+    matrix H1 = mp_Mult(wMat, hMat,R);
     idDelete((ideal*)&wMat); idDelete((ideal*)&hMat);
     /* now need to re-establish Hessenberg form of H1 and put it in H */
-    hessenberg(H1, wMat, H, tolerance);
+    hessenberg(H1, wMat, H, tolerance,R);
     idDelete((ideal*)&wMat); idDelete((ideal*)&H1);
   }
   else if ((MATELEM(c,1,1) == NULL) && (MATELEM(c,2,1) != NULL))
@@ -1077,7 +1086,8 @@ bool qrDS(
        number* eigenValues,
        int& eigenValuesL,
        const number tol1,
-       const number tol2
+       const number tol2,
+       const ring R
          )
 {
   bool deflationFound = true;
@@ -1113,7 +1123,7 @@ bool qrDS(
     {
       /* bring currentMat into Hessenberg form to fasten computations: */
       matrix mm1; matrix mm2;
-      hessenberg(currentMat, mm1, mm2, tol2);
+      hessenberg(currentMat, mm1, mm2, tol2,R);
       idDelete((ideal*)&currentMat); idDelete((ideal*)&mm1);
       currentMat = mm2;
       int it = 1; bool doLoop = true;
@@ -1142,7 +1152,7 @@ bool qrDS(
         }
         else   /* no deflation found yet */
         {
-          mpTrafo(currentMat, it, tol2);
+          mpTrafo(currentMat, it, tol2,R);
           it++;   /* try again */
         }
       }
@@ -1193,71 +1203,6 @@ int similar(
     if (result != -1) break;
   }
   nDelete(&tt); nDelete(&nr); nDelete(&ni);
-  return result;
-}
-
-lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
-                    const number tol3)
-{
-  int n = MATROWS(A);
-  matrix* queue = new matrix[n];
-  queue[0] = mpCopy(A); int queueL = 1;
-  number* eigenVs = new number[n]; int eigenL = 0;
-  /* here comes the main call: */
-  bool worked = qrDS(n, queue, queueL, eigenVs, eigenL, tol1, tol2);
-  lists result = (lists)omAlloc(sizeof(slists));
-  if (!worked)
-  {
-    for (int i = 0; i < eigenL; i++)
-      nDelete(&eigenVs[i]);
-    delete [] eigenVs;
-    for (int i = 0; i < queueL; i++)
-      idDelete((ideal*)&queue[i]);
-    delete [] queue;
-    result->Init(1);
-    result->m[0].rtyp = INT_CMD;
-    result->m[0].data = (void*)0;   /* a list with a single entry
-                                             which is the int zero */
-  }
-  else
-  {
-    /* now eigenVs[0..eigenL-1] contain all eigenvalues; among them, there
-       may be equal entries */
-    number* distinctEVs = new number[n]; int distinctC = 0;
-    int* mults = new int[n];
-    for (int i = 0; i < eigenL; i++)
-    {
-      int index = similar(distinctEVs, distinctC, eigenVs[i], tol3);
-      if (index == -1) /* a new eigenvalue */
-      {
-        distinctEVs[distinctC] = nCopy(eigenVs[i]);
-        mults[distinctC++] = 1;
-      }
-      else mults[index]++;
-      nDelete(&eigenVs[i]);
-    }
-    delete [] eigenVs;
-
-    lists eigenvalues = (lists)omAlloc(sizeof(slists));
-    eigenvalues->Init(distinctC);
-    lists multiplicities = (lists)omAlloc(sizeof(slists));
-    multiplicities->Init(distinctC);
-    for (int i = 0; i < distinctC; i++)
-    {
-      eigenvalues->m[i].rtyp = NUMBER_CMD;
-      eigenvalues->m[i].data = (void*)nCopy(distinctEVs[i]);
-      multiplicities->m[i].rtyp = INT_CMD;
-      multiplicities->m[i].data = (void*)mults[i];
-      nDelete(&distinctEVs[i]);
-    }
-    delete [] distinctEVs; delete [] mults;
-
-    result->Init(2);
-    result->m[0].rtyp = LIST_CMD;
-    result->m[0].data = (char*)eigenvalues;
-    result->m[1].rtyp = LIST_CMD;
-    result->m[1].data = (char*)multiplicities;
-  }
   return result;
 }
 
@@ -1439,7 +1384,7 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
         if (MATELEM(uMat, r, col) != NULL)
         {
           t = gg;
-          gg = nGcd(t, pGetCoeff(MATELEM(uMat, r, col)), currRing);
+          gg = nGcd(t, pGetCoeff(MATELEM(uMat, r, col)));
           nDelete(&t);
         }
       }
@@ -1459,7 +1404,7 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
         if (MATELEM(uMat, r, col) != NULL)
         {
           number g = nGcd(pGetCoeff(MATELEM(uMat, row, col)),
-                          pGetCoeff(MATELEM(uMat, r, col)), currRing);
+                          pGetCoeff(MATELEM(uMat, r, col)));
           number f1 = nDiv(pGetCoeff(MATELEM(uMat, r, col)), g);
           nNormalize(f1);   /* this division works without remainder */
           number f2 = nDiv(pGetCoeff(MATELEM(uMat, row, col)), g);

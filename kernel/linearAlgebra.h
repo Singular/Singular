@@ -49,7 +49,8 @@ void luDecomp(
        const matrix aMat, /**< [in]  the initial matrix A,          */
        matrix &pMat,      /**< [out] the row permutation matrix P   */
        matrix &lMat,      /**< [out] the lower triangular matrix L  */
-       matrix &uMat       /**< [out] the upper row echelon matrix U */
+       matrix &uMat,      /**< [out] the upper row echelon matrix U */
+       const ring r= currRing       /**< [in] current ring */
              );
 
 /**
@@ -61,7 +62,8 @@ void luDecomp(
  * @return the pivot score of n
  **/
 int pivotScore(
-               number n  /**< [in] a non-zero matrix entry */
+               number n,    /**< [in] a non-zero matrix entry */
+               const ring r= currRing /**< [in] current ring */
               );
 
 /**
@@ -86,8 +88,9 @@ bool pivot(
            const int c2,      /**< [in]  upper column index             */
            int* bestR,        /**< [out] address of row index of best
                                          pivot element                  */
-           int* bestC         /**< [out] address of column index of
+           int* bestC,        /**< [out] address of column index of
                                          best pivot element             */
+           const ring r= currRing       /**< [in] current ring */
           );
 
 /**
@@ -107,8 +110,9 @@ bool pivot(
  **/
 bool luInverse(
                const matrix aMat, /**< [in]  matrix to be inverted */
-               matrix &iMat       /**< [out] inverse of aMat if
+               matrix &iMat,      /**< [out] inverse of aMat if
                                              invertible            */
+               const ring r=currRing /**< [in] current ring */
               );
 
 /**
@@ -135,8 +139,9 @@ bool upperRightTriangleInverse(
        const matrix uMat, /**< [in]  (n x n)-matrix in upper right
                                      triangular form               */
        matrix &iMat,      /**< [out] inverse of uMat if invertible */
-       bool diagonalIsOne /**< [in]  if true, then all diagonal
+       bool diagonalIsOne,/**< [in]  if true, then all diagonal
                                      entries of uMat are 1         */
+       const ring r= currRing /**< [in] current ring */
                               );
 
 /**
@@ -196,7 +201,8 @@ bool luInverseFromLUDecomp(
                                      decomposition                */
        const matrix uMat, /**< [in]  upper right matrix of an LU-
                                      decomposition                */
-       matrix &iMat       /**< [out] inverse of A if invertible   */
+       matrix &iMat,      /**< [out] inverse of A if invertible   */
+       const ring r= currRing
                           );
 
 /**
@@ -214,8 +220,9 @@ bool luInverseFromLUDecomp(
  **/
 int luRank(
        const matrix aMat,      /**< [in]  input matrix */
-       const bool isRowEchelon /**< [in]  if true then aMat is assumed to be
+       const bool isRowEchelon,/**< [in]  if true then aMat is assumed to be
                                           already in row echelon form */
+       const ring r= currRing
           );
 
 /**
@@ -336,7 +343,8 @@ bool luSolveViaLDUDecomp(
  **/
 bool unitMatrix(
        const int n,     /**< [in]  size of the matrix */
-       matrix &unitMat  /**< [out] the new (nxn) unit matrix */
+       matrix &unitMat,  /**< [out] the new (nxn) unit matrix */
+       const ring r= currRing /** [in] current ring */
                );
 
 /**
@@ -456,7 +464,8 @@ void hessenberg(
        const matrix aMat,      /**< [in]  the square input matrix */
        matrix &pMat,           /**< [out] the transformation matrix */
        matrix &hessenbergMat,  /**< [out] the Hessenberg form of aMat */
-       const number tolerance  /**< [in]  accuracy */
+       const number tolerance, /**< [in]  accuracy */
+       const ring r
                );
 
 /**
@@ -483,37 +492,6 @@ int quadraticSolve(
        const number tolerance  /**< [in] accuracy               */
                   );
 
-/**
- * Computes all eigenvalues of a given real quadratic matrix with
- * multiplicites.
- *
- * The method assumes that the current ground field is the complex numbers.
- * Computations are based on the QR double shift algorithm involving
- * Hessenberg form and householder transformations.
- * If the algorithm works, then it returns a list with two entries which
- * are again lists of the same size:
- * _[1][i] is the i-th mutually distinct eigenvalue that was found,
- * _[2][i] is the (int) multiplicity of _[1][i].
- * If the algorithm does not work (due to an ill-posed matrix), a list with
- * the single entry (int)0 is returned.
- * 'tol1' is used for detection of deflation in the actual qr double shift
- * algorithm.
- * 'tol2' is used for ending Heron's iteration whenever square roots
- * are being computed.
- * 'tol3' is used to distinguish between distinct eigenvalues: When
- * the Euclidean distance between two computed eigenvalues is less then
- * tol3, then they will be regarded equal, resulting in a higher
- * multiplicity of the corresponding eigenvalue.
- *
- * @return a list with one entry (int)0, or two entries which are again lists
- **/
-lists qrDoubleShift(
-       const matrix A,     /**< [in]  the quadratic matrix         */
-       const number tol1,  /**< [in]  tolerance for deflation      */
-       const number tol2,  /**< [in]  tolerance for square roots   */
-       const number tol3   /**< [in]  tolerance for distinguishing
-                                      eigenvalues                  */
-                   );
 
 /**
  * Computes a factorization of a polynomial h(x, y) in K[[x]][y] up to a
