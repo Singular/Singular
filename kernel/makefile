@@ -92,7 +92,7 @@ CSOURCES=fegetopt.c mmstd.c
 ESOURCES=mmalloc.cc
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
-	kInline.cc
+	kInline.h
 
 HEADERS=hutil.h idrec.h stairc.h ideals.h \
 	structs.h int64vec.h \
@@ -149,7 +149,7 @@ install-nolns: install
 install-libsingular: install
 	-${MKINSTALLDIRS} ${includedir}
 	-${MKINSTALLDIRS} ${includedir}/singular
-	-for file in *.h kInline.cc; do sed -e "s:<kernel/:<singular/:"< $$file | sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" > ${includedir}/singular/$$file; done
+	-for file in *.h kInline.h; do sed -e "s:<kernel/:<singular/:"< $$file | sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" > ${includedir}/singular/$$file; done
 
 install: all installbin
 

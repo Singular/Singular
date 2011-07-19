@@ -243,9 +243,10 @@ extern BOOLEAN  pVectorOut;
  * Degree stuff -- see p_polys.cc for explainations
  *
  ***************************************************************/
-inline int pWeight(int i, const ring R = currRing){ return p_Weight(i,R); }
+inline int pWeight(int i, const ring R = currRing){ return p_Weight(i, R); }
+inline long pDeg(poly p, const ring R = currRing) { return p_Deg(p, R); }
+ 
 
-#define pDeg(p)    p_Deg(p,currRing)
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 #define pWTotaldegree(p) p_WTotaldegree(p,currRing)
 #define pWDegree(p) p_WDegree(p,currRing)

@@ -10,13 +10,15 @@
 
 
 #include <string.h>
-#include <omalloc/mylimits.h>
+
+#include <omalloc/omalloc.h>
+#include <misc/mylimits.h>
+
+
+#include <polys/polys.h>
+#include <polys/operations/pShallowCopyDelete.h>
 
 #include <kernel/structs.h>
-#include <omalloc/omalloc.h>
-#include <polys/monomials/ring.h>
-#include <kernel/structs.h>
-#include <polys/operations/pShallowCopyDelete.h>
 
 #if 1
 #define setmax 16
@@ -640,7 +642,7 @@ void kDebugPrint(kStrategy strat);
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
 
-//// #include <kernel/kInline.cc> // This is really ugly!!!
+#include <kernel/kInline.h>
 
 /* shiftgb stuff */
 #include <kernel/shiftgb.h>

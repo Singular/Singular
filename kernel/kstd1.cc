@@ -14,14 +14,18 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-
 #ifndef NDEBUG
 # define MYTEST 0
 #else /* ifndef NDEBUG */
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
+
+
+#include "mod2.h"
+
+#include <omalloc/omalloc.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
 
 #if MYTEST
 #ifdef HAVE_TAIL_RING
@@ -29,17 +33,15 @@
 #endif /* ifdef HAVE_TAIL_RING */
 #endif /* if MYTEST */
 
-#include <misc/options.h>
-#include <kernel/kutil.h>
-#include <kernel/kInline.cc>
+#include <polys/weight.h>
 #include <polys/polys.h>
+
+#include <kernel/kutil.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <kernel/stairc.h>
-#include <polys/weight.h>
 //#include "cntrlc.h"
-#include <misc/intvec.h>
 #include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
 #include <kernel/timer.h>
@@ -47,8 +49,11 @@
 //#include "ipprint.h"
 
 #ifdef HAVE_PLURAL
+#include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 #endif
+
+#include <kernel/kInline.h>
 
 
 /* the list of all options which give a warning by test */
@@ -1689,7 +1694,7 @@ intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
 {
-  long o=pWDegree(p, r);
+  long o=p_WDegree(p, r);
   long i=p_GetComp(p, r);
   if (i==0) return o;
   //assume((i>0) && (i<=kModW->length()));

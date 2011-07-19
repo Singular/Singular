@@ -260,7 +260,7 @@ extern ring currRing;
 #include "ideals.cc"
 #include "int64vec.cc"
 #include "khstd.cc"
-#include "kInline.cc"
+#include "kInline.h"
 #include "kpolys.cc"
 #include "kspoly.cc"
 #include "kstd1.cc"
