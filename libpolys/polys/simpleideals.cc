@@ -1680,7 +1680,7 @@ poly id_GCD(poly f, poly g, const ring r)
 
   if (w!=NULL) delete w;
   poly gg=pTakeOutComp(&(S->m[0]),2);
-  idDelete(&S);
+  id_Delete(&S, r);
   poly gcd_p=singclap_pdivide(f,gg);
   pDelete(&gg);
   rChangeCurrRing(save_r);
