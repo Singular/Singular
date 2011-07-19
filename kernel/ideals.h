@@ -7,6 +7,8 @@
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
+#include <polys/simpleideals.h>
+#include <polys/polys.h>
 // #include <kernel/structs.h>
 
 //typedef struct sip_sideal *        ideal;

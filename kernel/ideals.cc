@@ -7,31 +7,38 @@
 */
 
 /* includes */
-#include <kernel/mod2.h>
+#include "mod2.h"
+
 
 #ifndef NDEBUG
 # define MYTEST 0
 #else /* ifndef NDEBUG */
-# define MYTEST 1
+# define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+
+#include <misc/options.h>
+#include <misc/intvec.h>
+
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
-#include <kernel/longrat.h>
+
 #include <polys/polys.h>
 #include <polys/monomials/ring.h>
-#include <kernel/kstd1.h>
 #include <polys/matpol.h>
 #include <polys/weight.h>
-#include <misc/intvec.h>
-#include <kernel/syz.h>
 #include <polys/sparsmat.h>
-#include <kernel/ideals.h>
 #include <polys/prCopy.h>
 #include <polys/nc/nc.h>
+
+#include <kernel/ideals.h>
+
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/syz.h>
+
+#include <kernel/longrat.h>
 
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
