@@ -9,7 +9,7 @@
 #ifndef  GMPRAT_H
 #define  GMPRAT_H
 
-#include <kernel/si_gmp.h>
+#include <coeffs/si_gmp.h>
 
 class Rational
 {

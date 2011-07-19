@@ -12,7 +12,7 @@
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
 #ifdef HAVE_RINGS
-#include <kernel/si_gmp.h>
+#include <coeffs/si_gmp.h>
 #endif
 
 extern int dummy;

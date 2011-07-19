@@ -38,7 +38,8 @@
   extern const char * libfac_date;
 #endif
 
-#include <si_gmp.h>
+#include <coeffs/si_gmp.h>
+
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
 #endif
