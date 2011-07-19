@@ -19,12 +19,11 @@ typedef ideal *            resolvente;
 extern omBin sip_sideal_bin;
 
 /*- creates an ideal -*/
-ideal idInit (int size, int rank=1);
+// ideal idInit (int size, int rank=1); // in simple...
 ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
-// #define idDelete(h) id_Delete(h, currRing)
-void id_Delete (ideal* h, ring r);
+inline void idDelete (ideal* h, ring r = currRing) { id_Delete(h, r); } ;
 void id_ShallowDelete (ideal* h, ring r);
 /*- initialise an ideal -*/ // ?
 
@@ -63,13 +62,21 @@ void idDBTest(ideal h1, int level, const char *f,const int l);
 #define idPrint(A) ((void)0)
 #endif
 
-ideal id_Copy (ideal h1,const ring r);
+ideal id_Copy (ideal h1, const ring r);
+
 #ifdef PDEBUG
 ideal idDBCopy(ideal h1,const char *f,int l,const ring r);
 #define id_DBCopy(A,r) idDBCopy(A,__FILE__,__LINE__,r)
-#define idCopy(A,r) id_DBCopy(A,r)
+
+inline ideal idCopy(ideal A, const ring R = currRing)
+{
+  return id_DBCopy(A,R); // well, just for now... ok? Macros can't  have default args values :(
+}
 #else
-#define idCopy(A,r) id_Copy(A,r)
+inline ideal idCopy(ideal A, const ring R = currRing)
+{
+  return id_Copy(A, R);
+}
 #endif
 
 
