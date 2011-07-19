@@ -16,18 +16,18 @@ BOOLEAN    spaddProc    ( leftv,leftv,leftv );
 BOOLEAN    spmulProc    ( leftv,leftv,leftv );
 BOOLEAN    semicProc   ( leftv,leftv,leftv );
 BOOLEAN    semicProc3   ( leftv,leftv,leftv,leftv );
-BOOLEAN    hasTermOfDegree( poly h, int d );
-int        hasOne( ideal J );
-BOOLEAN    hasAxis( ideal J,int k );
-poly       computeWC( const newtonPolygon &np,Rational max_weight );
-void       computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF );
+BOOLEAN    hasTermOfDegree( poly h, int d, const ring r );
+int        hasOne( ideal J, const ring r );
+BOOLEAN    hasAxis( ideal J,int k, const ring r );
+poly       computeWC( const newtonPolygon &np,Rational max_weight, const ring r );
+void       computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r );
 void       spectrumPrintError(spectrumState state);
-BOOLEAN    ringIsLocal( void );
+BOOLEAN    ringIsLocal( const ring r);
 
-BOOLEAN inline hasConstTerm( poly h )
-{ return  hasTermOfDegree(h,0); }
-BOOLEAN inline hasLinearTerm( poly h )
-{ return  hasTermOfDegree(h,1); }
+BOOLEAN inline hasConstTerm( poly h, const ring r )
+{ return  hasTermOfDegree(h,0,r); }
+BOOLEAN inline hasLinearTerm( poly h, const ring r )
+{ return  hasTermOfDegree(h,1,r); }
 
 
 #endif

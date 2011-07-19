@@ -21,13 +21,14 @@
 #include <omalloc/mylimits.h>
 
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/stairc.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/simpleideals.h>
 #include <misc/intvec.h>
 #include <polys/monomials/ring.h>
+//extern ring currRing;
 
+#include <kernel/kstd1.h>
+#include <kernel/stairc.h>
 #include <kernel/multicnt.h>
 #include <kernel/GMPrat.h>
 #include <kernel/kmatrix.h>
@@ -39,11 +40,11 @@
 //  test if the polynomial  h  has a term of total degree d
 // ----------------------------------------------------------------------------
 
-BOOLEAN hasTermOfDegree( poly h, int d )
+BOOLEAN hasTermOfDegree( poly h, int d, const ring r )
 {
   do
   {
-    if( pTotaldegree( h )== d )
+    if( p_Totaldegree( h,r )== d )
       return  TRUE;
     pIter(h);
   }
@@ -56,31 +57,31 @@ BOOLEAN hasTermOfDegree( poly h, int d )
 //  test if the polynomial  h  has a constant term
 // ----------------------------------------------------------------------------
 
-static BOOLEAN inline hasConstTerm( poly h )
+static BOOLEAN inline hasConstTerm( poly h, const ring r )
 {
-  return  hasTermOfDegree(h,0);
+  return  hasTermOfDegree(h,0,r);
 }
 
 // ----------------------------------------------------------------------------
 //  test if the polynomial  h  has a linear term
 // ----------------------------------------------------------------------------
 
-static BOOLEAN inline hasLinearTerm( poly h )
+static BOOLEAN inline hasLinearTerm( poly h, const ring r )
 {
-  return  hasTermOfDegree(h,1);
+  return  hasTermOfDegree(h,1,r);
 }
 
 // ----------------------------------------------------------------------------
 //  test if the ideal  J  has a lead monomial on the axis number  k
 // ----------------------------------------------------------------------------
 
-BOOLEAN hasAxis( ideal J,int k )
+BOOLEAN hasAxis( ideal J,int k, const ring r )
 {
   int i;
 
   for( i=0; i<IDELEMS(J); i++ )
   {
-    if (pIsPurePower( J->m[i] ) == k) return TRUE;
+    if (p_IsPurePower( J->m[i],r ) == k) return TRUE;
   }
   return  FALSE;
 }
@@ -89,13 +90,13 @@ BOOLEAN hasAxis( ideal J,int k )
 //  test if the ideal  J  has  1  as a lead monomial
 // ----------------------------------------------------------------------------
 
-int     hasOne( ideal J )
+int     hasOne( ideal J, const ring r )
 {
   int i;
 
   for( i=0; i<IDELEMS(J); i++ )
   {
-    if (pIsConstant(J->m[i])) return TRUE;
+    if (p_IsConstant(J->m[i],r)) return TRUE;
   }
   return  FALSE;
 }
@@ -103,7 +104,7 @@ int     hasOne( ideal J )
 //  test if  m  is a multiple of one of the monomials of  f
 // ----------------------------------------------------------------------------
 
-int     isMultiple( poly f,poly m )
+int     isMultiple( poly f,poly m, const ring r )
 {
   while( f!=NULL )
   {
@@ -111,9 +112,9 @@ int     isMultiple( poly f,poly m )
     //  for a local order  f|m  is only possible if  f>=m
     // ---------------------------------------------------
 
-    if( pLmCmp( f,m )>=0 )
+    if( p_LmCmp( f,m,r )>=0 )
     {
-      if( pLmDivisibleByNoComp( f,m ) )
+      if( p_LmDivisibleByNoComp( f,m,r ) )
       {
         return  TRUE;
       }
@@ -135,38 +136,38 @@ int     isMultiple( poly f,poly m )
 //  compute the minimal monomial of minimmal  weight>=max_weight
 // ----------------------------------------------------------------------------
 
-poly    computeWC( const newtonPolygon &np,Rational max_weight )
+poly    computeWC( const newtonPolygon &np,Rational max_weight, const ring r )
 {
-  poly m  = pOne();
+  poly m  = p_One(r);
   poly wc = NULL;
   int  mdegree;
 
-  for( int i=1; i<=pVariables; i++ )
+  for( int i=1; i<=r->N; i++ )
   {
     mdegree = 1;
-    pSetExp( m,i,mdegree );
+    p_SetExp( m,i,mdegree,r );
     // pSetm( m );
     // np.weight_shift does not need pSetm( m ), postpone it
 
-    while(  np.weight_shift( m )<max_weight )
+    while(  np.weight_shift( m,r )<max_weight )
     {
       mdegree++;
-      pSetExp( m,i,mdegree );
+      p_SetExp( m,i,mdegree,r );
       // pSetm( m );
       // np.weight_shift does not need pSetm( m ), postpone it
     }
-    pSetm( m );
+    p_Setm( m,r );
 
-    if( i==1 || pCmp( m,wc )<0 )
+    if( i==1 || p_Cmp( m,wc,r )<0 )
     {
-      pDelete( &wc );
-      wc = pHead( m );
+      p_Delete( &wc,r );
+      wc = p_Head( m,r );
     }
 
-    pSetExp( m,i,0 );
+    p_SetExp( m,i,0,r );
   }
 
-  pDelete( &m );
+  p_Delete( &m,r );
 
   return  wc;
 }
@@ -175,19 +176,19 @@ poly    computeWC( const newtonPolygon &np,Rational max_weight )
 //  deletes all monomials of  f  which are less than  hc
 // ----------------------------------------------------------------------------
 
-static inline  poly    normalFormHC( poly f,poly hc )
+static inline  poly    normalFormHC( poly f,poly hc, const ring r )
 {
   poly    *ptr = &f;
 
   while( (*ptr)!=NULL )
   {
-    if( pLmCmp( *ptr,hc )>=0 )
+    if( p_LmCmp( *ptr,hc,r )>=0 )
     {
       ptr = &(pNext( *ptr ));
     }
     else
     {
-      pDelete( ptr );
+      p_Delete( ptr,r );
       return  f;
     }
   }
@@ -199,19 +200,19 @@ static inline  poly    normalFormHC( poly f,poly hc )
 //  deletes all monomials of  f  which are multiples of monomials of  Z
 // ----------------------------------------------------------------------------
 
-static inline  poly    normalFormZ( poly f,poly Z )
+static inline  poly    normalFormZ( poly f,poly Z, const ring r )
 {
   poly    *ptr = &f;
 
   while( (*ptr)!=NULL )
   {
-    if( !isMultiple( Z,*ptr ) )
+    if( !isMultiple( Z,*ptr,r ) )
     {
       ptr = &(pNext( *ptr ));
     }
     else
     {
-      pLmDelete(ptr);
+      p_LmDelete(ptr,r);
     }
   }
 
@@ -227,14 +228,14 @@ static inline  poly    normalFormZ( poly f,poly Z )
 //  which are smaller than the highest corner hc
 // ----------------------------------------------------------------------------
 
-static inline  int     isLeadMonomial( poly m,ideal stdJ )
+static inline  int     isLeadMonomial( poly m,ideal stdJ, const ring r )
 {
   int     length = INT_MAX;
   int     result = -1;
 
   for( int i=0; i<IDELEMS(stdJ); i++ )
   {
-    if( pCmp( stdJ->m[i],m )>=0 && pDivisibleBy( stdJ->m[i],m ) )
+    if( p_Cmp( stdJ->m[i],m,r )>=0 && p_DivisibleBy( stdJ->m[i],m,r ) )
     {
       int     tmp = pLength( stdJ->m[i] );
 
@@ -253,13 +254,13 @@ static inline  int     isLeadMonomial( poly m,ideal stdJ )
 //  set the exponent of a monomial t an integer array
 // ----------------------------------------------------------------------------
 
-static void    setExp( poly m,int *r )
+static void    setExp( poly m,int *r, const ring s )
 {
-  for( int i=pVariables; i>0; i-- )
+  for( int i=s->N; i>0; i-- )
   {
-    pSetExp( m,i,r[i-1] );
+    p_SetExp( m,i,r[i-1],s );
   }
-  pSetm( m );
+  p_Setm( m,s );
 }
 
 // ----------------------------------------------------------------------------
@@ -267,27 +268,27 @@ static void    setExp( poly m,int *r )
 //  is smaller than only finitely monomials
 // ----------------------------------------------------------------------------
 
-static BOOLEAN isWell( void )
+static BOOLEAN isWell( const ring r )
 {
-  int b = rBlocks( currRing );
+  int b = rBlocks( r );
 
   if( b==3 &&
-      ( currRing->order[0] == ringorder_ds ||
-        currRing->order[0] == ringorder_Ds ||
-        currRing->order[0] == ringorder_ws ||
-        currRing->order[0] == ringorder_Ws ) )
+      ( r->order[0] == ringorder_ds ||
+        r->order[0] == ringorder_Ds ||
+        r->order[0] == ringorder_ws ||
+        r->order[0] == ringorder_Ws ) )
   {
     return  TRUE;
   }
   else if( b>=3
-  && (( currRing->order[0] ==ringorder_a
-        && currRing->block1[0]==pVariables  )
-    || (currRing->order[0]==ringorder_M
-        && currRing->block1[0]==pVariables*pVariables )))
+  && (( r->order[0] ==ringorder_a
+        && r->block1[0]==r->N )
+    || (r->order[0]==ringorder_M
+        && r->block1[0]==r->N*r->N )))
   {
-    for( int i=pVariables-1; i>=0; i-- )
+    for( int i=r->N-1; i>=0; i-- )
     {
-      if( currRing->wvhdl[0][i]>=0 )
+      if( r->wvhdl[0][i]>=0 )
       {
         return  FALSE;
       }
@@ -302,22 +303,22 @@ static BOOLEAN isWell( void )
 //  compute all monomials not in  stdJ  and their normal forms
 // ----------------------------------------------------------------------------
 
-void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
+void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r )
 {
   int         carry,k;
-  multiCnt    C( pVariables,0 );
+  multiCnt    C( r->N,0 );
   poly        Z = NULL;
 
-  int         well = isWell( );
+  int         well = isWell(r);
 
   do
   {
-    poly    m = pOne();
-    setExp( m,C.cnt );
+    poly    m = p_One(r);
+    setExp( m,C.cnt,r );
 
     carry = FALSE;
 
-    k = isLeadMonomial( m,stdJ );
+    k = isLeadMonomial( m,stdJ,r );
 
     if( k < 0 )
     {
@@ -327,22 +328,22 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
 
       NF->insert_node( m,NULL );
     }
-    else if( isMultiple( Z,m ) )
+    else if( isMultiple( Z,m,r ) )
     {
       // ------------------------------------
       //  m  is trivially in the ideal  stdJ
       // ------------------------------------
 
-      pDelete( &m );
+      p_Delete( &m,r );
       carry = TRUE;
     }
-    else if( pCmp( m,hc ) < 0 || pCmp( m,wc ) < 0 )
+    else if( p_Cmp( m,hc,r ) < 0 || p_Cmp( m,wc,r ) < 0 )
     {
       // -------------------
       //  we do not need  m
       // -------------------
 
-      pDelete( &m );
+      p_Delete( &m,r );
       carry = TRUE;
     }
     else
@@ -351,14 +352,14 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
       //  compute lazy normal form
       // --------------------------
 
-      poly    multiplicant = pDivide( m,stdJ->m[k] );
-      pGetCoeff( multiplicant ) = nInit(1);
+      poly    multiplicant = p_Divide( m,stdJ->m[k],r );
+      pGetCoeff( multiplicant ) = n_Init(1,r->cf);
 
-      poly    nf = pMult_mm( pCopy( stdJ->m[k] ), multiplicant );
+      poly    nf = p_Mult_mm( p_Copy( stdJ->m[k],r ), multiplicant,r );
 
-      pDelete( &multiplicant );
+      p_Delete( &multiplicant,r );
 
-      nf = normalFormHC( nf,hc );
+      nf = normalFormHC( nf,hc,r );
 
       if( pNext( nf )==NULL )
       {
@@ -366,14 +367,14 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
         //  normal form of  m  is  m  itself
         // ----------------------------------
 
-        pDelete( &nf );
+        p_Delete( &nf,r );
         NF->delete_monomial( m );
-        Z = pAdd( Z,m );
+        Z = p_Add_q( Z,m,r );
         carry = TRUE;
       }
       else
       {
-        nf = normalFormZ( nf,Z );
+        nf = normalFormZ( nf,Z,r );
 
         if( pNext( nf )==NULL )
         {
@@ -381,9 +382,9 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
           //  normal form of  m  is  m  itself
           // ----------------------------------
 
-          pDelete( &nf );
+          p_Delete( &nf,r );
           NF->delete_monomial( m );
-          Z = pAdd( Z,m );
+          Z = p_Add_q( Z,m,r );
           carry = TRUE;
         }
         else
@@ -392,7 +393,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
           //  normal form of  m  is a polynomial
           // ------------------------------------
 
-          pNorm( nf );
+          p_Norm( nf,r );
           if( well==TRUE )
           {
             NF->insert_node( m,nf );
@@ -400,18 +401,18 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
           else
           {
             poly    nfhard = kNF( stdJ,(ideal)NULL,pNext( nf ),0,0 );
-            nfhard = normalFormHC( nfhard,hc );
-            nfhard = normalFormZ ( nfhard,Z );
+            nfhard = normalFormHC( nfhard,hc,r );
+            nfhard = normalFormZ ( nfhard,Z,r );
 
             if( nfhard==NULL )
             {
               NF->delete_monomial( m );
-              Z = pAdd( Z,m );
+              Z = p_Add_q( Z,m,r );
               carry = TRUE;
             }
             else
             {
-              pDelete( &pNext( nf ) );
+              p_Delete( &pNext( nf ),r );
               pNext( nf ) = nfhard;
               NF->insert_node( m,nf );
             }
@@ -447,34 +448,34 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
     }
   } while( not_finished );
 
-  pDelete( &Z );
+  p_Delete( &Z,r );
 }
 
 // ----------------------------------------------------------------------------
 //  check if  currRing is local
 // ----------------------------------------------------------------------------
 
-BOOLEAN ringIsLocal( void )
+BOOLEAN ringIsLocal( const ring r )
 {
-  poly    m   = pOne();
-  poly    one = pOne();
+  poly    m   = p_One(r);
+  poly    one = p_One(r);
   BOOLEAN res=TRUE;
 
-  for( int i=pVariables; i>0; i-- )
+  for( int i=r->N; i>0; i-- )
   {
-    pSetExp( m,i,1 );
-    pSetm( m );
+    p_SetExp( m,i,1,r );
+    p_Setm( m,r );
 
-    if( pCmp( m,one )>0 )
+    if( p_Cmp( m,one,r )>0 )
     {
       res=FALSE;
       break;
     }
-    pSetExp( m,i,0 );
+    p_SetExp( m,i,0,r );
   }
 
-  pDelete( &m );
-  pDelete( &one );
+  p_Delete( &m,r );
+  p_Delete( &one,r );
 
   return  res;
 }
