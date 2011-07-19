@@ -5,7 +5,7 @@
 
 
 #include<cmath>
-#include<Singular/mod2.h>
+#include<kernel/mod2.h>
 //#include<iomanip>
 
 #include "minpoly.h"

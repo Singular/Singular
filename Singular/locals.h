@@ -3,7 +3,7 @@
  * part of modgen
  */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 //#include <mmemory.h>

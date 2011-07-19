@@ -16,7 +16,7 @@
 
 
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
