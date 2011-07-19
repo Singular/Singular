@@ -1,5 +1,10 @@
 #include "config.h"
 #include <misc/auxiliary.h>
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
+
 #include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
