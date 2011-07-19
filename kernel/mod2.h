@@ -122,7 +122,7 @@
 
 /* the maximal ascii length of an int number + 1 = 11 for 32 bit int */
 #define MAX_INT_LEN 11
-#define MAX_INT_VAL 0x7fffffff
+// #define MAX_INT_VAL 0x7fffffff
 
 #ifdef DO_PROFILE
 /* define to enable explicit profiling of some crucial inline
