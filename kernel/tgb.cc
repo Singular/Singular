@@ -15,17 +15,17 @@
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 ///@TODO: no tail reductions in syz comp
 #include <kernel/mod2.h>
-#include <misc/options.h>
 #include <kernel/tgb.h>
 #include <kernel/tgb_internal.h>
 #include <kernel/tgbgauss.h>
 
+#include <misc/options.h>
 #include <kernel/digitech.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 #include <polys/prCopy.h>
 #include <kernel/longrat.h>
-#include <kernel/modulop.h>
+#include <coeffs/modulop.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <queue>
