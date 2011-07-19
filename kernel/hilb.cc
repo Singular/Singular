@@ -198,7 +198,7 @@ static void hWDegree(intvec *wdegree)
   int i, k;
   int x;
 
-  for (i=pVariables; i; i--)
+  for (i=(currRing->N); i; i--)
   {
     x = (*wdegree)[i-1];
     if (x != 1)
@@ -238,12 +238,12 @@ static intvec * hSeries(ideal S, intvec *modulweight,
 
   p0 = 1;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
-  hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
-  stcmem = hCreate(pVariables - 1);
-  Qpol = (int **)omAlloc((pVariables + 1) * sizeof(int *));
-  Ql = (int *)omAlloc0((pVariables + 1) * sizeof(int));
-  Q0 = (int *)omAlloc((pVariables + 1) * sizeof(int));
+  hvar = (varset)omAlloc(((currRing->N) + 1) * sizeof(int));
+  hpure = (scmon)omAlloc((1 + ((currRing->N) * (currRing->N))) * sizeof(int));
+  stcmem = hCreate((currRing->N) - 1);
+  Qpol = (int **)omAlloc(((currRing->N) + 1) * sizeof(int *));
+  Ql = (int *)omAlloc0(((currRing->N) + 1) * sizeof(int));
+  Q0 = (int *)omAlloc(((currRing->N) + 1) * sizeof(int));
   *Qpol = NULL;
   hLength = k = j = 0;
   mc = hisModule;
@@ -268,7 +268,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     }
     if (hNstc!=0)
     {
-      hNvar = pVariables;
+      hNvar = (currRing->N);
       for (i = hNvar; i>=0; i--)
         hvar[i] = i;
       //if (notstc) // TODO: no mon divides another
@@ -279,7 +279,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         if ((hNvar > 2) && (hNstc > 10))
           hOrdSupp(hstc, hNstc, hvar, hNvar);
         hHilbEst(hstc, hNstc, hvar, hNvar);
-        memset(hpure, 0, (pVariables + 1) * sizeof(int));
+        memset(hpure, 0, ((currRing->N) + 1) * sizeof(int));
         hPure(hstc, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
         hLexS(hstc, hNstc, hvar, hNvar);
         Q0[hNvar] = 0;
@@ -346,17 +346,17 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     }
     (*hseries1)[l-1] = mw;
   }
-  for (i = 0; i <= pVariables; i++)
+  for (i = 0; i <= (currRing->N); i++)
   {
     if (Ql[i]!=0)
       omFreeSize((ADDRESS)Qpol[i], Ql[i] * sizeof(int));
   }
-  omFreeSize((ADDRESS)Q0, (pVariables + 1) * sizeof(int));
-  omFreeSize((ADDRESS)Ql, (pVariables + 1) * sizeof(int));
-  omFreeSize((ADDRESS)Qpol, (pVariables + 1) * sizeof(int *));
-  hKill(stcmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(int));
-  omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
+  omFreeSize((ADDRESS)Q0, ((currRing->N) + 1) * sizeof(int));
+  omFreeSize((ADDRESS)Ql, ((currRing->N) + 1) * sizeof(int));
+  omFreeSize((ADDRESS)Qpol, ((currRing->N) + 1) * sizeof(int *));
+  hKill(stcmem, (currRing->N) - 1);
+  omFreeSize((ADDRESS)hpure, (1 + ((currRing->N) * (currRing->N))) * sizeof(int));
+  omFreeSize((ADDRESS)hvar, ((currRing->N) + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
   if (hisModule!=0)
@@ -461,7 +461,7 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q)
   PrintLn();
   hPrintHilb(hseries2);
   if ((l == 1) &&(mu == 0))
-    scPrintDegree(pVariables+1, 0);
+    scPrintDegree((currRing->N)+1, 0);
   else
     scPrintDegree(co, mu);
   if (l>1)

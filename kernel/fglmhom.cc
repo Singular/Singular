@@ -138,7 +138,7 @@ hfglmNextdegree( intvec * source, ideal current, int & deg )
 void
 generateMonoms( poly m, int var, int deg, homogData * dat )
 {
-    if ( var == pVariables ) {
+    if ( var == (currRing->N) ) {
         BOOLEAN inSource = FALSE;
         BOOLEAN inDest = FALSE;
         poly mon = pCopy( m );

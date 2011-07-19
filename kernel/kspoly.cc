@@ -394,7 +394,7 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
     {
       m2=p_Init(currRing);
 x2:
-      for (i = pVariables; i; i--)
+      for (i = (currRing->N); i; i--)
       {
         c = p_GetExpDiff(p1, p2,i, currRing);
         if (c>0)
@@ -446,7 +446,7 @@ x2:
   {
     m1=p_Init(currRing);
 x1:
-    for (i = pVariables; i; i--)
+    for (i = (currRing->N); i; i--)
     {
       c = p_GetExpDiff(p2, p1,i,currRing);
       if (c>0)
@@ -484,7 +484,7 @@ x1:
   m2 = p_Init(currRing);
   loop
   {
-    for (i = pVariables; i; i--)
+    for (i = (currRing->N); i; i--)
     {
       c = p_GetExpDiff(p1, p2,i,currRing);
       if (c > 0)

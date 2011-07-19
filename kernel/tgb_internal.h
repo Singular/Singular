@@ -728,7 +728,7 @@ protected:
   {
     int i;
     nReducibleMonomials++;
-    int nvars=pVariables;
+    int nvars=(currRing->N);
     NoroCacheNode* parent=&root;
     for(i=1;i<nvars;i++)
     {
@@ -741,7 +741,7 @@ protected:
   {
     int i;
     nReducibleMonomials++;
-    int nvars=pVariables;
+    int nvars=(currRing->N);
     NoroCacheNode* parent=&root;
     for(i=1;i<nvars;i++)
     {
@@ -753,7 +753,7 @@ protected:
   DataNoroCacheNode<number_type>* treeInsertBackLink(poly term)
   {
     int i;
-    int nvars=pVariables;
+    int nvars=(currRing->N);
     NoroCacheNode* parent=&root;
     for(i=1;i<nvars;i++)
     {
@@ -1885,7 +1885,7 @@ template <class number_type> void NoroCache<number_type>::collectIrreducibleMono
 template <class number_type> void NoroCache<number_type>::collectIrreducibleMonomials(int level, NoroCacheNode* node, std::vector<DataNoroCacheNode<number_type>*>& res){
   assume(level>=0);
   if (node==NULL) return;
-  if (level<pVariables)
+  if (level<(currRing->N))
   {
     int i;
     for(i=0;i<node->branches_len;i++)
@@ -1906,7 +1906,7 @@ template <class number_type> void NoroCache<number_type>::collectIrreducibleMono
 template<class number_type> DataNoroCacheNode<number_type>* NoroCache<number_type>::getCacheReference(poly term){
   int i;
   NoroCacheNode* parent=&root;
-  for(i=1;i<pVariables;i++){
+  for(i=1;i<(currRing->N);i++){
     parent=parent->getBranch(p_GetExp(term,i,currRing));
     if (!(parent)){
       return NULL;
@@ -1918,7 +1918,7 @@ template<class number_type> DataNoroCacheNode<number_type>* NoroCache<number_typ
 template<class number_type> poly NoroCache<number_type>::lookup(poly term, BOOLEAN& succ, int & len){
   int i;
   NoroCacheNode* parent=&root;
-  for(i=1;i<pVariables;i++){
+  for(i=1;i<(currRing->N);i++){
     parent=parent->getBranch(p_GetExp(term,i,currRing));
     if (!(parent)){
       succ=FALSE;

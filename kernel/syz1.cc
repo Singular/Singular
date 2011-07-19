@@ -206,10 +206,10 @@ static int syzcomp2dpc_test(poly p1, poly p2)
 
   //if (o1>0)
   {
-    int i = pVariables;
+    int i = (currRing->N);
     while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
       i--;
-    //(*orderingdepth)[pVariables-i]++;
+    //(*orderingdepth)[(currRing->N)-i]++;
     if (i>1)
     {
       if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
@@ -1706,7 +1706,7 @@ resolvente syReorder(resolvente res,int length,
             }
 //            pWrite(tq);
             pTest(tq);
-            for (l=pVariables;l>0;l--)
+            for (l=(currRing->N);l>0;l--)
             {
               if (origR!=NULL)
                 pSubExp(tq,l, p_GetExp(ri1[pGetComp(tq)-1],l,origR));
@@ -2131,7 +2131,7 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
         if (pGetComp(p)==tc)
         {
           tq = pInit();
-          for(j=pVariables; j>0; j--)
+          for(j=(currRing->N); j>0; j--)
             pSetExp(tq,j, pGetExp(p,j)-pGetExp(pisN,j));
           pSetComp(tq, 0);
           pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
@@ -2459,7 +2459,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   //crit = 0;
   //euler = -1;
   redpol = pInit();
-  syzstr->length = *length = pVariables+2;
+  syzstr->length = *length = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
   syzstr->syRing = rCurrRingAssure_dp_S();
@@ -2597,9 +2597,9 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   redpol = pInit();
 
   if( maxlength > 0 )
-    syzstr->length = maxlength; //  = pVariables+2;
+    syzstr->length = maxlength; //  = (currRing->N)+2;
   else
-    syzstr->length = maxlength = pVariables+2;
+    syzstr->length = maxlength = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
   syzstr->syRing = rCurrRingAssure_dp_S();

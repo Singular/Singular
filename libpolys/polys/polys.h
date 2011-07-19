@@ -11,6 +11,8 @@
 #include <polys/monomials/p_polys.h>
 
 extern ring currRing;
+extern void rChangeCurrRing(ring r);
+
 /***************************************************************
  *
  * Primitives for accessing and setting fields of a poly
@@ -25,7 +27,7 @@ extern ring currRing;
 #define pGetOrder(p)        p_GetOrder(p, currRing)
 
 // Component
-#define pGetComp(p)         _p_GetComp(p, currRing)
+#define pGetComp(p)         __p_GetComp(p, currRing)
 #define pSetComp(p,v)       p_SetComp(p,v, currRing)
 
 // Exponent
@@ -241,7 +243,8 @@ extern BOOLEAN  pVectorOut;
  * Degree stuff -- see p_polys.cc for explainations
  *
  ***************************************************************/
-#define pWeight(c) p_Weight(c,currRing)
+inline int pWeight(int i, const ring R = currRing){ return p_Weight(i,R); }
+
 #define pDeg(p)    p_Deg(p,currRing)
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 #define pWTotaldegree(p) p_WTotaldegree(p,currRing)

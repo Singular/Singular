@@ -378,7 +378,7 @@ static BOOLEAN elength_is_normal_length (poly p, slimgb_alg * c)
   ring r = c->r;
   if(p_GetComp (p, r) != 0)
     return FALSE;
-  if(c->lastDpBlockStart <= pVariables)
+  if(c->lastDpBlockStart <= (currRing->N))
   {
     int i;
     for(i = 1; i < c->lastDpBlockStart; i++)
@@ -406,7 +406,7 @@ static BOOLEAN lies_in_last_dp_block (poly p, slimgb_alg * c)
   ring r = c->r;
   if(p_GetComp (p, r) != 0)
     return FALSE;
-  if(c->lastDpBlockStart <= pVariables)
+  if(c->lastDpBlockStart <= (currRing->N))
   {
     int i;
     for(i = 1; i < c->lastDpBlockStart; i++)
@@ -445,7 +445,7 @@ static int get_last_dp_block_start (ring r)
   assume (last_block >= 0);
   if(r->order[last_block] == ringorder_dp)
     return r->block0[last_block];
-  return pVariables + 1;
+  return (currRing->N) + 1;
 }
 
 static wlen_type do_pELength (poly p, slimgb_alg * c, int dlm = -1)
@@ -826,7 +826,7 @@ trivial_syzygie (int pos1, int pos2, poly bound, slimgb_alg * c)
     {
       if(pGetExp (p1, i) + pGetExp (p2, i) > pGetExp (bound, i))
         return FALSE;
-      if(i == pVariables)
+      if(i == (currRing->N))
       {
         //PrintS("trivial");
         return TRUE;
@@ -844,7 +844,7 @@ trivial_syzygie (int pos1, int pos2, poly bound, slimgb_alg * c)
         pDelete (&m);
         return FALSE;
       }
-      if(i == pVariables)
+      if(i == (currRing->N))
       {
         pDelete (&m);
         //PrintS("trivial");
@@ -1551,7 +1551,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
               p_LmShortDivisibleBy (c->S->m[i], c->short_Exps[i], c->S->m[j],
                                     ~(c->short_Exps[j]), c->r));
 
-      if(_p_GetComp (c->S->m[i], c->r) != _p_GetComp (c->S->m[j], c->r))
+      if(__p_GetComp (c->S->m[i], c->r) != __p_GetComp (c->S->m[j], c->r))
       {
         //c->states[i][j]=UNCALCULATED;
         //WARNUNG: be careful
@@ -1734,8 +1734,8 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
     {
       p_Test (nodes[lower]->lcm_of_lm, c->r);
       nodes[lower]->lcm_of_lm = pCopy (nodes[lower]->lcm_of_lm);
-      assume (_p_GetComp (c->S->m[nodes[lower]->i], c->r) ==
-              _p_GetComp (c->S->m[nodes[lower]->j], c->r));
+      assume (__p_GetComp (c->S->m[nodes[lower]->i], c->r) ==
+              __p_GetComp (c->S->m[nodes[lower]->j], c->r));
       nodes_final[spc_final] =
         (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
 
@@ -2245,7 +2245,7 @@ void NoroCache::evaluateRows (int level, NoroCacheNode * node)
   assume (level >= 0);
   if(node == NULL)
     return;
-  if(level < pVariables)
+  if(level < (currRing->N))
   {
     int i, sum;
     for(i = 0; i < node->branches_len; i++)
@@ -3354,7 +3354,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   use_noro = ((!(nc)) && (S->rank <= 1) && (rField_is_Zp (r))
               && (!(eliminationProblem)) && (npPrimeM <= 32003));
   use_noro_last_block = false;
-  if((!(use_noro)) && (lastDpBlockStart <= pVariables))
+  if((!(use_noro)) && (lastDpBlockStart <= (currRing->N)))
   {
     use_noro_last_block = ((!(nc)) && (S->rank <= 1) && (rField_is_Zp (r))
                            && (npPrimeM <= 32003));
@@ -3711,7 +3711,7 @@ static int pLcmDeg (poly a, poly b)
 {
   int i;
   int n = 0;
-  for(i = pVariables; i; i--)
+  for(i = (currRing->N); i; i--)
   {
     n += si_max (pGetExp (a, i), pGetExp (b, i));
   }
@@ -4033,7 +4033,7 @@ static poly gcd_of_terms (poly p, ring r)
   int i;
   poly m = pOne ();
   poly t;
-  for(i = pVariables; i; i--)
+  for(i = (currRing->N); i; i--)
   {
     pSetExp (m, i, pGetExp (p, i));
     if(max_g_0 == 0)
@@ -4077,7 +4077,7 @@ static inline BOOLEAN pHasNotCFExtended (poly p1, poly p2, poly m)
     if((pGetExp (p1, i) - pGetExp (m, i) > 0)
        && (pGetExp (p2, i) - pGetExp (m, i) > 0))
       return FALSE;
-    if(i == pVariables)
+    if(i == (currRing->N))
       return TRUE;
     i++;
   }
@@ -4986,7 +4986,7 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
     poly m = c->tmp_lm;
     pSetCoeff (m, nInit (1));
     pSetComp (m, 0);
-    for(int i = 1; i <= pVariables; i++)
+    for(int i = 1; i <= (currRing->N); i++)
       pSetExp (m, i, (pGetExp (r[erg.to_reduce_l].p, i) - pGetExp (red, i)));
     pSetm (m);
     poly red_cp;

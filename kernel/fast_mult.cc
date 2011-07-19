@@ -440,7 +440,7 @@ static void p_MonMultMB(poly p, poly q,ring r)
   x = n_Mult(y,pGetCoeff(q),r);
   n_Delete(&y,r);
   p_SetCoeff0(p,x,r);
-  //for (i=pVariables; i!=0; i--)
+  //for (i=(currRing->N); i!=0; i--)
   //{
   //  pAddExp(p,i, pGetExp(q,i));
   //}

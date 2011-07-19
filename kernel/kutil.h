@@ -639,7 +639,8 @@ void kDebugPrint(kStrategy strat);
 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
-#include <kernel/kInline.cc>
+
+//// #include <kernel/kInline.cc> // This is really ugly!!!
 
 /* shiftgb stuff */
 #include <kernel/shiftgb.h>

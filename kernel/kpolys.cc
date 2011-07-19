@@ -13,16 +13,16 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
 
   if (lcm==NULL) return FALSE;
 
-  for (j=pVariables; j; j--)
+  for (j=(currRing->N); j; j--)
     if ( pGetExp(p,j) >  pGetExp(lcm,j)) return FALSE;
   if ( pGetComp(p) !=  pGetComp(lcm)) return FALSE;
-  for (j=pVariables; j; j--)
+  for (j=(currRing->N); j; j--)
   {
     if (pGetExp(p1,j)!=pGetExp(lcm,j))
     {
       if (pGetExp(p,j)!=pGetExp(lcm,j))
       {
-        for (k=pVariables; k>j; k--)
+        for (k=(currRing->N); k>j; k--)
         {
           if ((pGetExp(p,k)!=pGetExp(lcm,k))
           && (pGetExp(p2,k)!=pGetExp(lcm,k)))
@@ -41,7 +41,7 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
     {
       if (pGetExp(p,j)!=pGetExp(lcm,j))
       {
-        for (k=pVariables; k>j; k--)
+        for (k=(currRing->N); k>j; k--)
         {
           if ((pGetExp(p,k)!=pGetExp(lcm,k))
           && (pGetExp(p1,k)!=pGetExp(lcm,k)))
@@ -75,7 +75,7 @@ BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm)
     {
       if (pGetExp(p,j)!=pGetExp(lcm,j))
       {
-        for (k=pVariables; k>j; k--)
+        for (k=(currRing->N); k>j; k--)
         for (k=currRing->real_var_end; k>j; k--)
         {
           if ((pGetExp(p,k)!=pGetExp(lcm,k))

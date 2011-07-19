@@ -406,7 +406,7 @@ void HEckeTest (poly pp,kStrategy strat)
   p=pIsPurePower(pp);
   if (p!=0) strat->NotUsedAxis[p] = FALSE;
   /*- the leading term of pp is a power of the p-th variable -*/
-  for (j=pVariables;j>0; j--)
+  for (j=(currRing->N);j>0; j--)
   {
     if (strat->NotUsedAxis[j])
     {
@@ -6209,7 +6209,7 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
   j = pFDeg(newNoether,currRing);
-  for (i=1; i<=pVariables; i++)
+  for (i=1; i<=(currRing->N); i++)
   {
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
   }

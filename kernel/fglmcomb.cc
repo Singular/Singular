@@ -98,7 +98,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         int i, diff;
 
         poly m = pOne();
-        for ( i= pVariables; i > 0; i-- )
+        for ( i= (currRing->N); i > 0; i-- )
 	{
             diff= pGetExp( *pptr, i ) - pGetExp( p2, i );
             pSetExp( m, i, diff );

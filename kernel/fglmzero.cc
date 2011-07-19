@@ -309,7 +309,7 @@ public:
 
 fglmSelem::fglmSelem( poly p, int var ) : monom( p ), numVars( 0 )
 {
-    for ( int k = pVariables; k > 0; k-- )
+    for ( int k = (currRing->N); k > 0; k-- )
         if ( pGetExp( monom, k ) > 0 )
             numVars++;
     divisors= (int *)omAlloc( (numVars+1)*sizeof( int ) );
@@ -366,12 +366,12 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
     // werden, jenachdem wie das Ideal aussieht.
     theIdeal= thisIdeal;
     idelems= IDELEMS( theIdeal );
-    varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
+    varpermutation = (int*)omAlloc( ((currRing->N)+1)*sizeof(int) );
     // Sort ring variables by increasing values (because of weighted orderings)
     ideal perm = idMaxIdeal(1);
     intvec *iv = idSort(perm,TRUE);
     idDelete(&perm);
-    for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    for(int i = (currRing->N); i > 0; i--) varpermutation[(currRing->N)+1-i] = (*iv)[i-1];
     delete iv;
 
     basisBS= 100;
@@ -393,7 +393,7 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
 
 fglmSdata::~fglmSdata()
 {
-    omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
+    omFreeSize( (ADDRESS)varpermutation, ((currRing->N)+1)*sizeof(int) );
     for ( int k = basisSize; k > 0; k-- )
         pLmDelete( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
     omFreeSize( (ADDRESS)basis, basisMax*sizeof( poly ) );
@@ -473,7 +473,7 @@ fglmSdata::updateCandidates()
     fglmASSERT( basisSize > 0 && basisSize < basisMax, "Error(1) in fglmSdata::updateCandidates - wrong bassSize" );
     poly m = basis[basisSize];
     poly newmonom = NULL;
-    int k = pVariables;
+    int k = (currRing->N);
     BOOLEAN done = FALSE;
     int state = 0;
     while ( k >= 1 )
@@ -584,7 +584,7 @@ fglmSdata::getBorderDiv( const poly m, int & var ) const
     while ( num > 0 ) {
         poly temp = border[num].monom;
         if ( pDivisibleBy( temp, m ) ) {
-            var = pVariables;
+            var = (currRing->N);
             while ( var > 0 ) {
                 if ( (pGetExp( m, var ) - pGetExp( temp, var )) == 1 )
                     return border[num].nf;
@@ -691,7 +691,7 @@ fglmDelem::fglmDelem( poly & m, fglmVector mv, int v ) : v( mv ), insertions( 0 
 {
     monom= m;
     m= NULL;
-    for ( int k = pVariables; k > 0; k-- )
+    for ( int k = (currRing->N); k > 0; k-- )
         if ( pGetExp( monom, k ) > 0 )
             insertions++;
     // Wir gehen davon aus, dass ein fglmDelem direkt bei der Erzeugung
@@ -796,12 +796,12 @@ fglmDdata::fglmDdata( int dimension )
     for ( k= dimen; k > 0; k-- ) isPivot[k]= FALSE;
     perm= (int *)omAlloc( (dimen+1)*sizeof( int ) );
     basis= (polyset)omAlloc( (dimen+1)*sizeof( poly ) );
-    varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
+    varpermutation = (int*)omAlloc( ((currRing->N)+1)*sizeof(int) );
     // Sort ring variables by increasing values (because of weighted orderings)
     ideal perm_id = idMaxIdeal(1);
     intvec *iv = idSort(perm_id,TRUE);
     idDelete(&perm_id);
-    for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    for(int i = (currRing->N); i > 0; i--) varpermutation[(currRing->N)+1-i] = (*iv)[i-1];
     delete iv;
 
     groebnerBS= 16;
@@ -830,7 +830,7 @@ fglmDdata::~fglmDdata()
     for ( k= basisSize; k > 0; k-- )
         pLmDelete( basis[k]);
     omFreeSize( (ADDRESS)basis, (dimen+1)*sizeof( poly ) );
-    omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
+    omFreeSize( (ADDRESS)varpermutation, ((currRing->N)+1)*sizeof(int) );
 }
 
 fglmDelem
@@ -883,7 +883,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
 {
     ListIterator<fglmDelem> list = nlist;
     poly newmonom = NULL;
-    int k = pVariables;
+    int k = (currRing->N);
     BOOLEAN done = FALSE;
     int state = 0;
     while ( k >= 1 )
@@ -1108,18 +1108,18 @@ FindUnivariatePolys( const idealFunctionals & l )
 {
     fglmVector v;
     fglmVector p;
-    ideal destIdeal = idInit( pVariables, 1 );
+    ideal destIdeal = idInit( (currRing->N), 1 );
 
     int i;
     BOOLEAN isZero;
-    int *varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
+    int *varpermutation = (int*)omAlloc( ((currRing->N)+1)*sizeof(int) );
     ideal perm = idMaxIdeal(1);
     intvec *iv = idSort(perm,TRUE);
     idDelete(&perm);
-    for(i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    for(i = (currRing->N); i > 0; i--) varpermutation[(currRing->N)+1-i] = (*iv)[i-1];
     delete iv;
 
-    for (i= 1; i <= pVariables; i++ )
+    for (i= 1; i <= (currRing->N); i++ )
     {
         // main loop
         STICKYPROT2( "(%i)", i /*varpermutation[i]*/);
@@ -1168,7 +1168,7 @@ FindUnivariatePolys( const idealFunctionals & l )
         }
     }
     STICKYPROT( "\n" );
-    omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
+    omFreeSize( (ADDRESS)varpermutation, ((currRing->N)+1)*sizeof(int) );
     return destIdeal;
 }
 
@@ -1184,7 +1184,7 @@ fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & destI
         rChangeCurrRing( sourceRing );
         currRingHdl=NULL;
     }
-    idealFunctionals L( 100, pVariables );
+    idealFunctionals L( 100, (currRing->N) );
     fglmok = CalculateFunctionals( sourceIdeal, L );
     if ( deleteIdeal == TRUE )
         idDelete( & sourceIdeal );
@@ -1205,7 +1205,7 @@ fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal)
     BOOLEAN fglmok;
     fglmVector v;
 
-    idealFunctionals L( 100, pVariables );
+    idealFunctionals L( 100, (currRing->N) );
     // STICKYPROT("calculating normal form\n");
     // poly p = kNF( sourceIdeal, currRing->qideal, quot );
     // STICKYPROT("calculating functionals\n");
@@ -1222,7 +1222,7 @@ FindUnivariateWrapper( ideal source, ideal & destIdeal )
 {
     BOOLEAN fglmok;
 
-    idealFunctionals L( 100, pVariables );
+    idealFunctionals L( 100, (currRing->N) );
     fglmok = CalculateFunctionals( source, L );
     if ( fglmok == TRUE ) {
         destIdeal= FindUnivariatePolys( L );

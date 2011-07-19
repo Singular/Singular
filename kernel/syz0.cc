@@ -89,14 +89,14 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
       q = pHead(F[j]);
       if (mW!=NULL)
       {
-        for(jj=1;jj<=pVariables;jj++)
+        for(jj=1;jj<=(currRing->N);jj++)
           pSetExp(q,jj,pGetExp(q,jj) -pGetExp(mW->m[pGetComp(q)-1],jj));
         pSetm(q);
       }
       pLcm(q,currQuotient->m[ii],p);
       if (mW!=NULL)
       {
-        for(jj=1;jj<=pVariables;jj++)
+        for(jj=1;jj<=(currRing->N);jj++)
           pSetExp(p,jj,pGetExp(p,jj) +pGetExp(mW->m[pGetComp(p)-1],jj));
         pSetm(p);
       }
@@ -469,7 +469,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
   p = pHead(toNorm);
   if (mW!=NULL)
   {
-    for(j=1;j<=pVariables;j++)
+    for(j=1;j<=(currRing->N);j++)
       pSetExp(p,j,pGetExp(p,j) -pGetExp(mW->m[pGetComp(p)-1],j));
   }
   while ((p!=NULL) && (i<IDELEMS(currQuotient)))
@@ -483,7 +483,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
       p = pHead(toNorm);
       if (mW!=NULL)
       {
-        for(j=1;j<=pVariables;j++)
+        for(j=1;j<=(currRing->N);j++)
           pSetExp(p,j,pGetExp(p,j) -pGetExp(mW->m[pGetComp(p)-1],j));
       }
       i = 0;
@@ -748,7 +748,7 @@ void syReOrderResolventFB(resolvente res,int length, int initial)
       {
         if (res[syzIndex-1]->m[pGetComp(p)-1]!=NULL)
         {
-          for(j=1;j<=pVariables;j++)
+          for(j=1;j<=(currRing->N);j++)
           {
             pSetExp(p,j,pGetExp(p,j)
                         -pGetExp(res[syzIndex-1]->m[pGetComp(p)-1],j));
@@ -781,7 +781,7 @@ static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
         for (;;)
         {
           qq = p;
-          for(j=1;j<=pVariables;j++)
+          for(j=1;j<=(currRing->N);j++)
           {
             pSetExp(p,j,pGetExp(p,j)
                         -pGetExp(res[syzIndex-1]->m[pGetComp(p)-1],j));
@@ -795,7 +795,7 @@ static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
               break;
             }
             pp = pNext(p);
-            for(j=1;j<=pVariables;j++)
+            for(j=1;j<=(currRing->N);j++)
             {
               pSetExp(pp,j,pGetExp(pp,j)
                           -pGetExp(res[syzIndex-1]->m[pGetComp(pp)-1],j));

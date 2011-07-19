@@ -886,7 +886,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
     pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
