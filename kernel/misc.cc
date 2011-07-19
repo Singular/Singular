@@ -5,30 +5,7 @@
 * ABSTRACT:
 */
 
-#include <string.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
-
 #include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <omalloc/omalloc.h>
-#include <kernel/structs.h>
-#include <misc/options.h>
-#include <kernel/febase.h>
-//#include "cntrlc.h"
-#include "kstd1.h"
-#include "timer.h"
-#include <misc/intvec.h>
-#include <polys/monomials/ring.h>
-#include <polys/templates/p_Procs.h>
-#include "kversion.h"
-
-//#ifdef HAVE_LIBPARSER
-//#  include "libparse.h"
-//#endif /* HAVE_LIBPARSER */
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -39,14 +16,15 @@
 #endif
 
 #include <coeffs/si_gmp.h>
+#include <omalloc/omalloc.h>
 
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
 #endif
 
-/* init bins from structs.h */
+/* init bins */
 
-omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
+omBin char_ptr_bin = omGetSpecBin(sizeof(char*));
 
 /*0 implementation*/
 

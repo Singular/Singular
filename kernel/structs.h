@@ -15,8 +15,6 @@
 #include <coeffs/si_gmp.h>
 #endif
 
-extern int dummy;
-
 /* standard types */
 #ifdef HAVE_RINGS
 typedef unsigned long NATNUMBER;
