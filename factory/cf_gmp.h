@@ -2,7 +2,7 @@
 #define CF_GMP_H
 
 
-#ifdef _cplusplus
+#ifdef __cplusplus
   #define __cplusplus_backup __cplusplus
   #undef __cplusplus
   extern "C" {

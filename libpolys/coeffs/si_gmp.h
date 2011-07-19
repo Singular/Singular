@@ -1,16 +1,17 @@
 /* $Id$ */
 
-#ifndef INCL_CF_GMP_H
-#define INCL_CF_GMP_H
+#ifndef SI_GMP_H
+#define SI_GMP_H
 
 #if defined(__cplusplus) && defined(__GNUC__)
-extern "C" {
-#undef __cplusplus
-#include <gmp.h>
-}
-#define __cplusplus 1
+  #define __cplusplus_backup __cplusplus
+  #undef __cplusplus
+  extern "C" {
+  #include <gmp.h>
+  }
+  #define __cplusplus __cplusplus_backup
 #else
-#include <gmp.h>
+  #include <gmp.h>
 #endif
 
-#endif /* ! INCL_CF_GMP_H */
+#endif /* ! SI_GMP_H */
