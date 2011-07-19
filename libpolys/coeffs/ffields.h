@@ -9,7 +9,6 @@
 */
 #include <coeffs/coeffs.h>
 
-// #define MAX_INT_VAL 0x7fffffff
 typedef struct 
 {
   int GFChar;

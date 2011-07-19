@@ -378,7 +378,6 @@ lists primeFactorisation(const number n, const number pBound)
 #endif
 
 /* version strings */
-#include <kernel/si_gmp.h>
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
 #endif

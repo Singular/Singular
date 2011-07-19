@@ -17,7 +17,11 @@
 
 #include "config.h"
 #include <misc/auxiliary.h>
-// #include <polys/structs.h>
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
+
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>

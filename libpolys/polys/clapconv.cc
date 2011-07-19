@@ -8,10 +8,13 @@
 */
 
 
+#include "config.h"
 #include <misc/auxiliary.h>
 #ifdef HAVE_FACTORY
-#include <omalloc/omalloc.h>
 #define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+
+#include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/sbuckets.h>

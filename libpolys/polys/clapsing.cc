@@ -11,7 +11,11 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
+#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+#endif
+
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
@@ -24,9 +28,7 @@
 
 
 TODO(Martin, Please adapt the following code for the use in SW)
-#ifdef HAVE_FACTORY
 
-#include <factory/factory.h>
 
 #include "clapsing.h"
 #include "clapconv.h"
@@ -1355,7 +1357,6 @@ lists singclap_chineseRemainder(lists x, lists q)
   res->m[1].data=(char *)convFactoryNSingN( prod );
   return res;
 }
-#endif
 #endif
 
 number   nChineseRemainder(number *x, number *q,int rl, const coeffs r)

@@ -24,7 +24,7 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include <kernel/si_gmp.h>
+#include <coeffs/si_gmp.h>
 #include <kernel/structs.h>
 
 // include basic SINGULAR structures

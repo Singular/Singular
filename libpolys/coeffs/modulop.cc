@@ -6,8 +6,14 @@
 * ABSTRACT: numbers modulo p (<=32003)
 */
 
-#include <string.h>
 #include "config.h"
+#include <misc/auxiliary.h>
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
+
+#include <string.h>
 #include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
@@ -16,9 +22,6 @@
 #include <coeffs/mpr_complex.h>
 #include <misc/mylimits.h>
 #include <coeffs/modulop.h>
-#ifdef HAVE_FACTORY
-#include <factory/factory.h>
-#endif
 
 // int npGen=0;
 
