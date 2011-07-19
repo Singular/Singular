@@ -24,18 +24,15 @@ ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
 inline void idDelete (ideal* h, ring r = currRing) { id_Delete(h, r); } ;
-void id_ShallowDelete (ideal* h, ring r);
-/*- initialise an ideal -*/ // ?
 
 /// initialise the maximal ideal (at 0)
-ideal idMaxIdeal (int deg);
-
-/// gives an ideal the minimal possible size
-void idSkipZeroes (ideal ide);
+//ideal id_MaxIdeal(int deg, const ring r); 
+#define idMaxIdeal(D) id_MaxIdeal(D,currRing)
 
 /// index of generator with leading term in ground ring (if any); otherwise -1
-int idPosConstant (ideal id);
-
+//int id_PosConstant(ideal id, const ring r)
+#define idPosConstant(I) id_PosConstant(I,currRing)
+//
 /// Count the effective size of an ideal
 /// (without the trailing allocated zero-elements)
 static inline int idSize(const ideal id)
@@ -46,12 +43,23 @@ static inline int idSize(const ideal id)
   return (j + 1); 
 }
 
-void idNorm(ideal id);
-void idDelMultiples(ideal id);
-void idDelEquals(ideal id);
-void idDelLmEquals(ideal id);
-void idDelDiv(ideal id);
-BOOLEAN idIsConstant(ideal id);
+//void id_Norm(ideal id, const ring r);
+#define idNorm(I) id_Norm(I,currRing)
+
+//void id_DelMultiples(ideal id, const ring r);
+#define idDelMultiples(I) id_DelMultiples(I,currRing)
+
+//void id_DelEquals(ideal id, const ring r);
+#define idDelEquals(I) id_DelEquals(I,currRing)
+
+//void id_DelLmEquals(ideal id, const ring r);
+#define idDelLmEquals(I) id_DelLmEquals(I,currRing)
+
+//void id_DelDiv(ideal id, const ring r);
+#define idDelDiv(I) id_DelDiv(I,currRing)
+
+//BOOLEAN id_IsConstant(ideal id, const ring r);
+#define idIsConstant(I) id_IsConstant(I,currRing)
 
 #ifdef PDEBUG
 void idDBTest(ideal h1, int level, const char *f,const int l);
