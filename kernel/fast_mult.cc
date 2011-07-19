@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include <kernel/mod2.h>
+#include "mod2.h"
 #include <polys/monomials/ring.h>
 #include <kernel/fast_mult.h>
 #include <polys/kbuckets.h>
@@ -437,8 +437,8 @@ static void p_MonMultMB(poly p, poly q,ring r)
   // int i;
 
   y = p_GetCoeff(p,r);
-  x = n_Mult(y,pGetCoeff(q),r);
-  n_Delete(&y,r);
+  x = n_Mult(y,pGetCoeff(q),r->cf);
+  n_Delete(&y,r->cf);
   p_SetCoeff0(p,x,r);
   //for (i=(currRing->N); i!=0; i--)
   //{
@@ -457,7 +457,7 @@ static poly p_MonMultCMB(poly p, poly q, ring r)
   number x;
   poly res = p_Init(r,lm_bin);
 
-  x = n_Mult(p_GetCoeff(p,r),p_GetCoeff(q,r),r);
+  x = n_Mult(p_GetCoeff(p,r),p_GetCoeff(q,r),r->cf);
   p_SetCoeff0(res,x,r);
   p_ExpVectorSum(res,p, q,r);
   return res;
@@ -466,12 +466,12 @@ static poly p_MonPowerMB(poly p, int exp, ring r)
 {
   int i;
 
-  if(!n_IsOne(p_GetCoeff(p,r),r))
+  if(!n_IsOne(p_GetCoeff(p,r),r->cf))
   {
     number x, y;
     y = p_GetCoeff(p,r);
-    n_Power(y,exp,&x,r);
-    n_Delete(&y,r);
+    n_Power(y,exp,&x,r->cf);
+    n_Delete(&y,r->cf);
     p_SetCoeff0(p,x,r);
   }
   for (i=rVar(r); i!=0; i--)
@@ -534,20 +534,20 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
       exp[pos]=i;
       if(i==0)
       {
-        new_coef=n_Copy(coef,r);
+        new_coef=n_Copy(coef,r->cf);
       }
       else
       {
         number old=new_coef;
-        number old_rest=n_Init(n-sum-(i-1),r);
-        new_coef=n_Mult(new_coef,old_rest,r);
-        n_Delete(&old_rest,r);
-        n_Delete(&old,r);
-        number i_number=n_Init(i,r);
+        number old_rest=n_Init(n-sum-(i-1),r->cf);
+        new_coef=n_Mult(new_coef,old_rest,r->cf);
+        n_Delete(&old_rest,r->cf);
+        n_Delete(&old,r->cf);
+        number i_number=n_Init(i,r->cf);
         old=new_coef;
-        new_coef=n_IntDiv(new_coef,i_number,r);
-        n_Delete(&old,r);
-        n_Delete(&i_number,r);
+        new_coef=n_IntDiv(new_coef,i_number,r->cf);
+        n_Delete(&old,r->cf);
+        n_Delete(&i_number,r->cf);
       }
       //new_coef is
       //(n                          )
@@ -561,9 +561,9 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
         zw_real->next=zw_l;
         zw_l=zw_real;
       }
-      //n_Delete(& new_coef,r);
+      //n_Delete(& new_coef,r->cf);
     }
-    n_Delete(&new_coef,r);
+    n_Delete(&new_coef,r->cf);
     if (pos==f_len-2)
     {
       int len=n-sum+1;
@@ -575,7 +575,7 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
   {
     i=n-sum;
     exp[pos]=i;
-    number new_coef=nCopy(coef);//n_IntDiv(coef,facult[i],r); //really consumed???????
+    number new_coef=n_Copy(coef,r->cf);//n_IntDiv(coef,facult[i],r); //really consumed???????
     buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef,zw, tmp,term_pot);
     // n_Delete(& new_coef,r);
   }
@@ -593,13 +593,13 @@ poly pFastPowerMC(poly f, int n, ring r)
     Werror("not implemented for so small lenght of f, recursion fails");
   //  number null_number=n_Init(0,r);
   number* facult=(number*) omAlloc((n+1)*sizeof(number));
-  facult[0]=n_Init(1,r);
+  facult[0]=n_Init(1,r->cf);
   int i;
   for(i=1;i<=n;i++)
   {
-    number this_n=n_Init(i,r);
-    facult[i]=n_Mult(this_n,facult[i-1],r);
-    n_Delete(&this_n,r);
+    number this_n=n_Init(i,r->cf);
+    facult[i]=n_Mult(this_n,facult[i-1],r->cf);
+    n_Delete(&this_n,r->cf);
   }
 
   lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
@@ -630,11 +630,11 @@ poly pFastPowerMC(poly f, int n, ring r)
   assume(f_iter==NULL);
   poly zw=NULL;
   poly tmp=p_Init(r);
-  number one=n_Init(1,r);
+  number one=n_Init(1,r->cf);
   MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,one/*facult[n]*/,zw,tmp, term_potences);
 
 
-  n_Delete(&one,r);
+  n_Delete(&one,r->cf);
 
 
 
@@ -643,7 +643,7 @@ poly pFastPowerMC(poly f, int n, ring r)
   //free facult
   for(i=0;i<=n;i++)
   {
-    n_Delete(&facult[i],r);
+    n_Delete(&facult[i],r->cf);
   }
   int i2;
   for (i=0;i<f_len;i++)
