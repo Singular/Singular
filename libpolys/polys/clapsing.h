@@ -16,7 +16,7 @@
 #include <polys/simpleideals.h>
 #include <misc/intvec.h>
 #include <polys/matpol.h>
-#include <polys/clapconv.h>
+//#include <polys/clapconv.h>
 //#include <kernel/longtrans.h>
 
 /* destroys f and g */

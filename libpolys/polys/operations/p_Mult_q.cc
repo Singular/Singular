@@ -9,6 +9,11 @@
  *  Version: $Id$
  *******************************************************************/
 #include "config.h"
+#include <misc/auxiliary.h>
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
 
 /***************************************************************
  *

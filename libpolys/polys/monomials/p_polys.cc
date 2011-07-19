@@ -9,11 +9,13 @@
  *  Version: $Id$
  *******************************************************************/
 
-#include <ctype.h>
 
 
-#include <omalloc/omalloc.h>
+#include "config.h"
 #include <misc/auxiliary.h>
+
+#include <ctype.h>
+#include <omalloc/omalloc.h>
 #include <misc/options.h>
 #include <misc/intvec.h>
 

@@ -5,6 +5,12 @@
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
+#include "config.h"
+#include <misc/auxiliary.h>
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
 
 #include <coeffs/longrat.h>
 
@@ -44,7 +50,6 @@ static inline number nlShort3(number x) // assume x->s==3
 #include <string.h>
 #include <float.h>
 
-#include "config.h"
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
@@ -53,10 +58,6 @@ static inline number nlShort3(number x) // assume x->s==3
 #include <coeffs/modulop.h>
 #include <coeffs/shortfl.h>
 #include <coeffs/mpr_complex.h>
-
-#ifdef HAVE_FACTORY
-#include <factory/factory.h>
-#endif
 
 #ifndef BYTES_PER_MP_LIMB
 #define BYTES_PER_MP_LIMB sizeof(mp_limb_t)

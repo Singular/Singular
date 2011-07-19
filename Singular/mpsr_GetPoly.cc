@@ -19,7 +19,7 @@
 
 #include <Singular/mpsr_Get.h>
 
-#include <kernel/si_gmp.h>
+#include <coeffs/si_gmp.h>
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

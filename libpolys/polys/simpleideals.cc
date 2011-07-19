@@ -1731,7 +1731,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
           xx[j]->m[i]=hh;
         }
         else
-          x[j]=nlInit(0, R->cf); // is R->cf really n_Q???
+          x[j]=n_Init(0, R->cf); // is R->cf really n_Q???, yes!
       }
        
       number n=nChineseRemainder(x,q,rl, R->cf);

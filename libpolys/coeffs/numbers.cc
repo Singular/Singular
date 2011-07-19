@@ -7,8 +7,15 @@
 * ABSTRACT: interface to coefficient aritmetics
 */
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "config.h"
 #include <misc/auxiliary.h>
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
 
 
 #include "coeffs.h"
@@ -32,13 +39,6 @@
 #ifdef HAVE_POLYEXTENSIONS
 #include <polys/ext_fields/algext.h>
 #endif
-
-#ifdef HAVE_FACTORY
-#include <factory/factory.h>
-#endif
-
-#include <string.h>
-#include <stdlib.h>
 
 
 

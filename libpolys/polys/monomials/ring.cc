@@ -40,10 +40,6 @@
 #endif
 // #include <???/maps.h>
 // #include <???/matpol.h>
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-#  include <factory/factory.h>
-#endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
@@ -130,11 +126,6 @@ void rChangeCurrRing(ring r)
     //------------ global variables related to polys -------------------
     p_SetGlobals(r);
     //------------ global variables related to factory -----------------
-#ifdef HAVE_FACTORY
-    //int c=ABS(n_GetChar());
-    //if (c==1) c=0;
-    //setCharacteristic( c );
-#endif
   }
 }
 */
