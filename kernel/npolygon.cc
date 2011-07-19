@@ -18,10 +18,14 @@
 #endif
 #endif
 
-#include <polys/polys.h>
+//#include <polys/polys.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+
 #include <kernel/GMPrat.h>
 #include <kernel/kmatrix.h>
 #include <kernel/npolygon.h>
+#include <kernel/structs.h>
 
 // ----------------------------------------------------------------------------
 //  Allocate memory for a linear form of  k  terms
@@ -180,13 +184,13 @@ int     operator == ( const linearForm &l1,const linearForm &l2 )
 //  Newton weight of a monomial
 // ----------------------------------------------------------------------------
 
-Rational linearForm::weight( poly m ) const
+Rational linearForm::weight( poly m, const ring r ) const
 {
   Rational ret=(Rational)0;
 
   for( int i=0,j=1; i<N; i++,j++ )
   {
-    ret += c[i]*(Rational)pGetExp( m,j );
+    ret += c[i]*(Rational)p_GetExp( m,j,r );
   }
 
   return ret;
@@ -196,17 +200,17 @@ Rational linearForm::weight( poly m ) const
 //  Newton weight of a polynomial
 // ----------------------------------------------------------------------------
 
-Rational linearForm::pweight( poly m ) const
+Rational linearForm::pweight( poly m, const ring r ) const
 {
   if( m==(poly)NULL )
     return  (Rational)0;
 
-  Rational    ret = weight( m );
+  Rational    ret = weight( m, r );
   Rational    tmp;
 
   for( m=pNext(m); m!=(poly)NULL; pIter(m) )
   {
-    tmp = weight( m );
+    tmp = weight( m, r );
     if( tmp<ret )
     {
       ret = tmp;
@@ -220,13 +224,13 @@ Rational linearForm::pweight( poly m ) const
 //  Newton weight of a monomial shifted by the product of the variables
 // ----------------------------------------------------------------------------
 
-Rational linearForm::weight_shift( poly m ) const
+Rational linearForm::weight_shift( poly m, const ring r ) const
 {
   Rational ret=(Rational)0;
 
   for( int i=0,j=1; i<N; i++,j++ )
   {
-    ret += c[i]*(Rational)( pGetExp( m,j ) + 1 );
+    ret += c[i]*(Rational)( p_GetExp( m,j,r ) + 1 );
   }
 
   return ret;
@@ -236,13 +240,13 @@ Rational linearForm::weight_shift( poly m ) const
 //  Newton weight of a monomial (forgetting the first variable)
 // ----------------------------------------------------------------------------
 
-Rational linearForm::weight1( poly m ) const
+Rational linearForm::weight1( poly m, const ring r ) const
 {
   Rational ret=(Rational)0;
 
   for( int i=0,j=2; i<N; i++,j++ )
   {
-    ret += c[i]*(Rational)pGetExp( m,j );
+    ret += c[i]*(Rational)p_GetExp( m,j,r );
   }
 
   return ret;
@@ -253,13 +257,13 @@ Rational linearForm::weight1( poly m ) const
 //  (forgetting the first variable)
 // ----------------------------------------------------------------------------
 
-Rational linearForm::weight_shift1( poly m ) const
+Rational linearForm::weight_shift1( poly m, const ring r ) const
 {
   Rational ret=(Rational)0;
 
   for( int i=0,j=2; i<N; i++,j++ )
   {
-    ret += c[i]*(Rational)( pGetExp( m,j ) + 1 );
+    ret += c[i]*(Rational)( p_GetExp( m,j,r ) + 1 );
   }
 
   return ret;
@@ -388,15 +392,15 @@ newtonPolygon & newtonPolygon::operator = ( const newtonPolygon &np )
 //  Initialize a Newton polygon from a polynomial
 // ----------------------------------------------------------------------------
 
-newtonPolygon::newtonPolygon( poly f )
+newtonPolygon::newtonPolygon( poly f, const ring s )
 {
   copy_zero( );
 
-  int *r=new int[pVariables];
-  poly *m=new poly[pVariables];
+  int *r=new int[s->N];
+  poly *m=new poly[s->N];
 
 
-  KMatrix<Rational> mat( pVariables,pVariables+1 );
+  KMatrix<Rational> mat(s->N,s->N+1 );
 
   int i,j,stop=FALSE;
   linearForm sol;
@@ -405,14 +409,14 @@ newtonPolygon::newtonPolygon( poly f )
   //  init counters
   // ---------------
 
-  for( i=0; i<pVariables; i++ )
+  for( i=0; i<s->N; i++ )
   {
     r[i] = i;
   }
 
   m[0] = f;
 
-  for( i=1; i<pVariables; i++ )
+  for( i=1; i<s->N; i++ )
   {
     m[i] = pNext(m[i-1]);
   }
@@ -428,24 +432,24 @@ newtonPolygon::newtonPolygon( poly f )
     //  are linearely independent
     // ---------------------------------------------------
 
-    for( i=0; i<pVariables; i++ )
+    for( i=0; i<s->N; i++ )
     {
-      for( j=0; j<pVariables; j++ )
+      for( j=0; j<s->N; j++ )
       {
         //    mat.set( i,j,pGetExp( m[r[i]],j+1 ) );
-        mat.set( i,j,pGetExp( m[i],j+1 ) );
+        mat.set( i,j,p_GetExp( m[i],j+1,s ) );
       }
       mat.set( i,j,1 );
     }
 
-    if( mat.solve( &(sol.c),&(sol.N) ) == pVariables )
+    if( mat.solve( &(sol.c),&(sol.N) ) == s->N )
     {
       // ---------------------------------
       //  check if linearForm is positive
       //  check if linearForm is extremal
       // ---------------------------------
 
-      if( sol.positive( ) && sol.pweight( f ) >= (Rational)1 )
+      if( sol.positive( ) && sol.pweight( f,s ) >= (Rational)1 )
       {
         // ----------------------------------
         //  this is a face or the polyhedron
@@ -461,7 +465,7 @@ newtonPolygon::newtonPolygon( poly f )
     //  increment counters
     // --------------------
 
-    for( i=1; r[i-1] + 1 == r[i] && i < pVariables; i++ );
+    for( i=1; r[i-1] + 1 == r[i] && i < s->N; i++ );
 
     for( j=0; j<i-1; j++ )
     {
@@ -479,7 +483,7 @@ newtonPolygon::newtonPolygon( poly f )
     r[i-1]++;
     m[i-1]=pNext(m[i-1]);
 
-    if( m[pVariables-1] == (poly)NULL )
+    if( m[s->N-1] == (poly)NULL )
     {
       stop = TRUE;
     }
@@ -555,14 +559,14 @@ void    newtonPolygon::add_linearForm( const linearForm &l0 )
 //  Newton weight of a monomial
 // ----------------------------------------------------------------------------
 
-Rational  newtonPolygon::weight( poly m ) const
+Rational  newtonPolygon::weight( poly m, const ring r ) const
 {
-  Rational ret = l[0].weight( m );
+  Rational ret = l[0].weight( m,r );
   Rational tmp;
 
   for( int i=1; i<N; i++ )
   {
-    tmp = l[i].weight( m );
+    tmp = l[i].weight( m,r );
 
     if( tmp < ret )
     {
@@ -576,14 +580,14 @@ Rational  newtonPolygon::weight( poly m ) const
 //  Newton weight of a monomial shifted by the product of the variables
 // ----------------------------------------------------------------------------
 
-Rational  newtonPolygon::weight_shift( poly m ) const
+Rational  newtonPolygon::weight_shift( poly m, const ring r ) const
 {
-  Rational ret = l[0].weight_shift( m );
+  Rational ret = l[0].weight_shift( m, r );
   Rational tmp;
 
   for( int i=1; i<N; i++ )
   {
-    tmp = l[i].weight_shift( m );
+    tmp = l[i].weight_shift( m, r );
 
     if( tmp < ret )
     {
@@ -597,14 +601,14 @@ Rational  newtonPolygon::weight_shift( poly m ) const
 //  Newton weight of a monomial (forgetting the first variable)
 // ----------------------------------------------------------------------------
 
-Rational  newtonPolygon::weight1( poly m ) const
+Rational  newtonPolygon::weight1( poly m, const ring r ) const
 {
-  Rational ret = l[0].weight1( m );
+  Rational ret = l[0].weight1( m, r );
   Rational tmp;
 
   for( int i=1; i<N; i++ )
   {
-    tmp = l[i].weight1( m );
+    tmp = l[i].weight1( m, r );
 
     if( tmp < ret )
     {
@@ -619,14 +623,14 @@ Rational  newtonPolygon::weight1( poly m ) const
 //  (forgetting the first variable)
 // ----------------------------------------------------------------------------
 
-Rational  newtonPolygon::weight_shift1( poly m ) const
+Rational  newtonPolygon::weight_shift1( poly m, const ring r ) const
 {
-  Rational ret = l[0].weight_shift1( m );
+  Rational ret = l[0].weight_shift1( m, r );
   Rational tmp;
 
   for( int i=1; i<N; i++ )
   {
-    tmp = l[i].weight_shift1( m );
+    tmp = l[i].weight_shift1( m, r );
 
     if( tmp < ret )
     {

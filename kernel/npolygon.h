@@ -38,12 +38,12 @@ public:
     void        copy_shallow ( linearForm& );
     void        copy_deep    ( const linearForm& );
 
-    Rational    weight       ( poly ) const;
-    Rational    weight_shift ( poly ) const;
-    Rational    weight1      ( poly ) const;
-    Rational    weight_shift1( poly ) const;
+    Rational    weight       ( poly, const ring r ) const;
+    Rational    weight_shift ( poly, const ring r ) const;
+    Rational    weight1      ( poly, const ring r ) const;
+    Rational    weight_shift1( poly, const ring r ) const;
 
-    Rational    pweight      ( poly ) const;
+    Rational    pweight      ( poly, const ring r ) const;
 
     int         positive     ( void );
 
@@ -70,7 +70,7 @@ public:
 
     newtonPolygon( );
     newtonPolygon( const newtonPolygon& );
-    newtonPolygon( poly );
+    newtonPolygon( poly, const ring r );
     ~newtonPolygon( );
 
     newtonPolygon & operator = ( const newtonPolygon& );
@@ -84,10 +84,10 @@ public:
 
     void        add_linearForm( const linearForm& );
 
-    Rational    weight       ( poly ) const;
-    Rational    weight_shift ( poly ) const;
-    Rational    weight1      ( poly ) const;
-    Rational    weight_shift1( poly ) const;
+    Rational    weight       ( poly, const ring r ) const;
+    Rational    weight_shift ( poly, const ring r ) const;
+    Rational    weight1      ( poly, const ring r ) const;
+    Rational    weight_shift1( poly, const ring r ) const;
 
     //int         is_sqh     ( void ) const;
     //Rational*   sqh_weights( void ) const;
