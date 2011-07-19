@@ -15,7 +15,7 @@
 #define MAXPATHLEN 1024
 #endif
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 /*****************************************************************
  *
  * Resource management (feResources.cc)
@@ -44,7 +44,7 @@ void feReInitResources();
 void feStringAppendResources(int warn = -1);
 
 #endif
-/* end ifdef _cplusplus */
+/* end ifdef __cplusplus */
 
 
 const char fePathSep =
