@@ -15,7 +15,7 @@
 #define MAXPATHLEN 1024
 #endif
 
-
+#ifdef _cplusplus
 /*****************************************************************
  *
  * Resource management (feResources.cc)
@@ -43,11 +43,12 @@ void feReInitResources();
 // Prints resources into string with StringAppend, etc
 void feStringAppendResources(int warn = -1);
 
-
+#endif
+/* end ifdef _cplusplus */
 
 
 const char fePathSep =
-// not really cygwin, applies to all windows systems:
+/* not really cygwin, applies to all windows systems:*/
 #if (defined(CYGWIN) || defined(ix86_Win))
                 ';'
 #else

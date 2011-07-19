@@ -174,7 +174,6 @@ extern "C"
   char * fe_fgets_dummy(const char *pr,char *s, int size);
 
 }
-#endif
 const  char * VoiceName();
 void    VoiceBackTrack();
 BOOLEAN contBuffer(feBufferTypes typ);
@@ -187,5 +186,6 @@ void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_li
 void *  myynewbuffer();
 void    myyoldbuffer(void * oldb);
 
+#endif
 #endif
   

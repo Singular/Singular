@@ -10,26 +10,19 @@
 
 /* for omBin */
 #include <omalloc/omalloc.h>
+#include <misc/auxiliary.h>
 #ifdef HAVE_RINGS
 #include <kernel/si_gmp.h>
 #endif
 
+extern int dummy;
 
 /* standard types */
 #ifdef HAVE_RINGS
 typedef unsigned long NATNUMBER;
 typedef mpz_ptr int_number;
 #endif
-#if (SIZEOF_LONG == 8)
-typedef int BOOLEAN;
-/* testet on x86_64, gcc 3.4.6: 2 % */
-/* testet on IA64, gcc 3.4.6: 1 % */
-#else
-/* testet on athlon, gcc 2.95.4: 1 % */
-typedef short BOOLEAN;
-#endif
 
-typedef void * ADDRESS;
 #define BITSET  unsigned int
 
 #if SIZEOF_LONG == 4
