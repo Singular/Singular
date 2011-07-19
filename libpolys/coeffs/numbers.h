@@ -30,7 +30,6 @@
 #define nWrite(n)         n_Write(n,currRing->cf)
 #define nNormalize(n)     n_Normalize(n,currRing->cf)
 
-inline number nGcd(number a, number b, const ring r = currRing) { return n_Gcd(a, b, r->cf); }
 inline number nGcd(number a, number b, const coeffs cf) { return n_Gcd(a, b, cf); }
 
 #define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
