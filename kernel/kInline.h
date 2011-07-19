@@ -12,6 +12,11 @@
 #define KINLINE_H
 
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
+/* this file is a header file with inline routines, 
+ *     if NO_KINLINE is not defined (AND ONLY THEN!)
+ * otherwise it is an part of kutil.cc and a source file!
+ * (remark: NO_KINLINE is defined by KDEBUG, i.e. in the debug version)
+ */
 
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
