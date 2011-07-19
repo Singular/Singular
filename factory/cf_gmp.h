@@ -1,5 +1,5 @@
-#ifndef CF_GMP_H
-#define CF_GMP_H
+#ifndef SI_GMP_H
+#define SI_GMP_H
 
 
 #ifdef __cplusplus
@@ -14,4 +14,4 @@
 #endif
 
 
-#endif /* CF_GMP_H */
+#endif /* SI_GMP_H */

@@ -8,19 +8,24 @@
 /*
  * ABSTRACT: tgb internal .h file
 */
-#include <omalloc/omalloc.h>
-#include <polys/monomials/p_polys.h>
-
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <kernel/febase.h>
-#include <misc/options.h>
-#include <polys/polys.h>
-#include <stdlib.h>
-#include <kernel/modulop.h>
 #define USE_NORO 1
 
 
+//#define TGB_DEBUG
+#define FULLREDUCTIONS
+#define HANS_IDEA
+//#define HALFREDUCTIONS
+//#define HEAD_BIN
+//#define HOMOGENEOUS_EXAMPLE
+#define REDTAIL_S
+#define PAR_N 100
+#define PAR_N_F4 5000
+#define AC_NEW_MIN 2
+#define AC_FLATTEN 1
+
+//#define FIND_DETERMINISTIC
+//#define REDTAIL_PROT
+//#define QUICK_SPOLY_TEST
 #ifdef USE_NORO
 #define NORO_CACHE 1
 #define NORO_SPARSE_ROWS_PRE 1
@@ -46,30 +51,24 @@ using std::vector;
 #include <vector>
 using std::vector;
 #endif
+
+#include <omalloc/omalloc.h>
+#include <polys/monomials/p_polys.h>
+
+#include <kernel/ideals.h>
+#include <polys/monomials/ring.h>
+#include <kernel/febase.h>
+#include <misc/options.h>
+#include <polys/polys.h>
+#include <stdlib.h>
+#include <kernel/modulop.h>
 #include <kernel/kutil.h>
 #include <kernel/kInline.cc>
 #include <kernel/kstd1.h>
 #include <polys/kbuckets.h>
 
-
-
-
-//#define TGB_DEBUG
-#define FULLREDUCTIONS
-#define HANS_IDEA
-//#define HALFREDUCTIONS
-//#define HEAD_BIN
-//#define HOMOGENEOUS_EXAMPLE
-#define REDTAIL_S
-#define PAR_N 100
-#define PAR_N_F4 5000
-#define AC_NEW_MIN 2
-#define AC_FLATTEN 1
-
-//#define FIND_DETERMINISTIC
-//#define REDTAIL_PROT
-//#define QUICK_SPOLY_TEST
-class PolySimple{
+class PolySimple
+{
 public:
   PolySimple(poly p)
   {
