@@ -13,12 +13,15 @@
 
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
 
-#include <polys/monomials/p_polys.h>
-#include <polys/polys.h>
-#include <polys/templates/p_Procs.h>
-#include <polys/kbuckets.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
+
+#include <polys/monomials/p_polys.h>
+#include <polys/templates/p_Procs.h>
+#include <polys/kbuckets.h>
+
+#include <polys/polys.h>
+
 
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
@@ -418,7 +421,8 @@ KINLINE long sTObject::SetDegStuffReturnLDeg()
 }
 
 //extern void pCleardenom(poly p);
-extern void pNorm(poly p);
+// extern void pNorm(poly p);
+
 // manipulations
 KINLINE void  sTObject::pCleardenom()
 {
@@ -466,12 +470,12 @@ KINLINE void  sTObject::pCleardenom()
     }
 }
 
-KINLINE void  sTObject::pNorm()
+KINLINE void sTObject::pNorm() // pNorm seems to be a _bad_ method name...
 {
   assume(p != NULL);
   if (! is_normalized)
   {
-    ::pNorm(p);
+    p_Norm(p, currRing);
     if (t_p != NULL)
       pSetCoeff0(t_p, pGetCoeff(p));
     is_normalized = TRUE;

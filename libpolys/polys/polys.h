@@ -13,6 +13,9 @@
 extern ring currRing;
 extern void rChangeCurrRing(ring r);
 
+#include <coeffs/numbers.h>
+inline number nGcd(number a, number b, const ring r = currRing) { return n_Gcd(a, b, r->cf); }
+
 /***************************************************************
  *
  * Primitives for accessing and setting fields of a poly
@@ -318,7 +321,10 @@ poly      pTakeOutComp(poly * p, int k);
 */
 void      pSetPolyComp(poly p, int comp);
 #define   pDeleteComp(p,k) p_DeleteComp(p,k,currRing)
-#define   pNorm(p) p_Norm(p,currRing)
+
+inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
+
+
 #define   pSubst(p,n,e) p_Subst(p,n.e,currRing)
 #define   ppJet(p,m) pp_Jet(p,m,currRing)
 #define   pJet(p,m)  p_Jet(p,m,currRing)
