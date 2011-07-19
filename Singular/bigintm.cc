@@ -3,7 +3,7 @@
 //
 #if 0
 //
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <omalloc/omalloc.h>

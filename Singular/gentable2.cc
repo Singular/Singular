@@ -14,7 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/grammar.h>
 

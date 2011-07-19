@@ -1,4 +1,4 @@
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
