@@ -1,3 +1,7 @@
+#include <kernel/mod2.h>
+#include <Singular/lists.h>
+#include <kernel/liniearAlgebra.h>
+
 /**
  * Computes all eigenvalues of a given real quadratic matrix with
  * multiplicites.
