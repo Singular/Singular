@@ -63,7 +63,7 @@ using std::vector;
 #include <stdlib.h>
 #include <kernel/modulop.h>
 #include <kernel/kutil.h>
-#include <kernel/kInline.cc>
+#include <kernel/kInline.h>
 #include <kernel/kstd1.h>
 #include <polys/kbuckets.h>
 
