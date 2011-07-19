@@ -34,11 +34,13 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
+LIBPOLYS_CFLAGS = `sh ../libpolys/libpolys-config --cflags`
+
 PIPE		= -pipe
-CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} 
-CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} 
+CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
+CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I..  -I${includedir} 
+CPPFLAGS	= -I${srcdir} -I..  -I${includedir}   ${LIBPOLYS_CFLAGS}
 DEFS		= -DNDEBUG -DOM_NDEBUG
 LDFLAGS		= -L${srcdir}/lib 
 LD_DYN_FLAGS	= -ldl -rdynamic
@@ -216,8 +218,8 @@ CXXG		= ${CXX} -Wall
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
-CFLAGSG		= -g ${PIPE}
-CXXFLAGSG	= -g ${PIPE}
+CFLAGSG		= -g ${PIPE} ${LIBPOLYS_CFLAGS}
+CXXFLAGSG	= -g ${PIPE} ${LIBPOLYS_CFLAGS}
 DEFSG		= 
 
 ##
@@ -254,8 +256,8 @@ OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
 CCP		= ${CC}
 CXXP		= ${CXX}
 
-CFLAGSP		= -g -pg -O ${PIPE}
-CXXFLAGSP	= -g -pg -O ${PIPE}
+CFLAGSP		= -g -pg -O ${PIPE} ${LIBPOLYS_CFLAGS}
+CXXFLAGSP	= -g -pg -O ${PIPE} ${LIBPOLYS_CFLAGS}
 DEFSP		= 
 
 

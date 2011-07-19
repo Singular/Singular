@@ -12,7 +12,7 @@
 
 #include <coeffs/coeffs.h>
 
-// #include <coeffs/si_gmp.h>
+#include <coeffs/si_gmp.h>
 
 #include <polys/clapconv.h>
 #include <polys/clapsing.h>
@@ -143,7 +143,7 @@ extern ring currRing;
 #include "run.h"
 #include "semic.h"
 #include "shiftgb.h"
-#include "si_gmp.h"
+// #include "si_gmp.h" // remove it...
 #include "spectrum.h"
 #include "splist.h"
 #include "stairc.h"
