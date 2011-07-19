@@ -326,7 +326,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
       //  m  is not a lead monomial
       // ---------------------------
 
-      NF->insert_node( m,NULL );
+      NF->insert_node( m,NULL,r );
     }
     else if( isMultiple( Z,m,r ) )
     {
@@ -368,7 +368,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
         // ----------------------------------
 
         p_Delete( &nf,r );
-        NF->delete_monomial( m );
+        NF->delete_monomial( m,r );
         Z = p_Add_q( Z,m,r );
         carry = TRUE;
       }
@@ -383,7 +383,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
           // ----------------------------------
 
           p_Delete( &nf,r );
-          NF->delete_monomial( m );
+          NF->delete_monomial( m,r );
           Z = p_Add_q( Z,m,r );
           carry = TRUE;
         }
@@ -396,7 +396,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
           p_Norm( nf,r );
           if( well==TRUE )
           {
-            NF->insert_node( m,nf );
+            NF->insert_node( m,nf,r );
           }
           else
           {
@@ -406,7 +406,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
 
             if( nfhard==NULL )
             {
-              NF->delete_monomial( m );
+              NF->delete_monomial( m,r );
               Z = p_Add_q( Z,m,r );
               carry = TRUE;
             }
@@ -414,7 +414,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
             {
               p_Delete( &pNext( nf ),r );
               pNext( nf ) = nfhard;
-              NF->insert_node( m,nf );
+              NF->insert_node( m,nf,r );
             }
           }
         }
@@ -437,7 +437,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r
     {
       if( node->nf!=NULL && pNext( node->nf )==NULL )
       {
-        NF->delete_monomial( node->nf );
+        NF->delete_monomial( node->nf,r );
         not_finished = TRUE;
         node = (spectrumPolyNode*)NULL;
       }
