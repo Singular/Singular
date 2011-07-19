@@ -29,8 +29,8 @@ typedef struct ip_sring *         ring;
 class intvec;
 struct p_Procs_s;
 typedef struct p_Procs_s p_Procs_s;
-class slists;
-typedef slists *           lists;
+//class slists;
+//typedef slists *           lists;
 class kBucket;
 typedef kBucket*           kBucket_pt;
 
@@ -715,8 +715,8 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
 int64 * rGetWeightVec(ring r);
 void rSetWeightVec(ring r, int64 *wv);
 
-lists rDecompose(const ring r);
-ring rCompose(const lists  L);
+//lists rDecompose(const ring r);
+//ring rCompose(const lists  L);
 /////////////////////////////
 // Auxillary functions
 //
