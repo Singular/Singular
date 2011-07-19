@@ -43,7 +43,7 @@
 // 6) parameters in one ring have the same names
 //    and order as parameters of the other
 // 7) none of the rings are qrings
-// vperm must be a vector of length pVariables+1, initialized by 0.
+// vperm must be a vector of length (currRing->N)+1, initialized by 0.
 // If both rings are compatible, it stores the permutation of the
 // variables if mapped from sringHdl to dringHdl.
 // if the rings are compatible, it returns WalkOk.
@@ -199,7 +199,7 @@ walkConsistency( ring sring, ring dring, int * vperm )
 // 6) parameters in one ring have the same names
 //    and order as parameters of the other
 // 7) none of the rings are qrings
-// vperm must be a vector of length pVariables+1, initialized by 0.
+// vperm must be a vector of length (currRing->N)+1, initialized by 0.
 // If both rings are compatible, it stores the permutation of the
 // variables if mapped from sringHdl to dringHdl.
 // if the rings are compatible, it returns WalkOk.

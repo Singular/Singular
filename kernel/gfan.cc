@@ -253,7 +253,7 @@ static bool areEqual2(facet* f, facet *g)
 	bool res = TRUE;
 	const int64vec *fIntP = f->getRef2InteriorPoint();
 	const int64vec *gIntP = g->getRef2InteriorPoint();
-	for(int ii=0;ii<pVariables;ii++)
+	for(int ii=0;ii<(currRing->N);ii++)
 	{
 		if( (*fIntP)[ii] != (*gIntP)[ii] )
 		{
@@ -1558,7 +1558,7 @@ void gcone::getExtremalRays(const gcone &gc)
 				}
 				n--;			
 			}while(exchanged==TRUE && n>=0);
-		}*///if pVariables>2
+		}*///if (currRing->N)>2
 // 		delete fNormal;		
 		fAct = fAct->next;
 	}//end of facet checking
@@ -2384,7 +2384,7 @@ static int64vec* ivNeg(/*const*/int64vec *iv)
 static int dotProduct(const int64vec &iva, const int64vec &ivb)				
 {			
 	int res=0;	
-	for (int i=0;i<pVariables;i++)
+	for (int i=0;i<(currRing->N);i++)
 	{
 // #ifndef NDEBUG
 // 	(const_cast<int64vec*>(&iva))->show(1,0); (const_cast<int64vec*>(&ivb))->show(1,0);
@@ -2782,7 +2782,7 @@ ring gcone::rCopyAndAddWeight2(const ring &r,const int64vec *ivw, const int64vec
 static bool ivAreEqual(const int64vec &a, const int64vec &b)
 {
 	bool res=TRUE;
-	for(int ii=0;ii<pVariables;ii++)
+	for(int ii=0;ii<(currRing->N);ii++)
 	{
 		if(a[ii]!=b[ii])
 		{
@@ -4238,9 +4238,9 @@ intvec *gcRays2Intmat(gcone *gc)
   for(int ii=0;ii<gc->numRays;ii++)
   {
     int64vec *ivTmp=iv64Copy(gc->gcRays[ii]);
-    for(int jj=0;jj<pVariables;jj++)
+    for(int jj=0;jj<(currRing->N);jj++)
       (*res)[offset+jj]=(int)(*ivTmp)[jj];
-    offset += pVariables;
+    offset += (currRing->N);
     delete ivTmp;
   }
   return res;
@@ -4357,11 +4357,11 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
 #endif
 {
 	lists lResList; //this is the object we return	
-	gfan::ZFan *zResFan = new gfan::ZFan(pVariables);
+	gfan::ZFan *zResFan = new gfan::ZFan((currRing->N));
 	
 	if(rHasGlobalOrdering(currRing))
 	{	
-// 		int numvar = pVariables; 
+// 		int numvar = (currRing->N); 
 		gfanHeuristic = h;
 		
 		enum searchMethod {
@@ -4381,8 +4381,8 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
 			gcone *gcRoot = new gcone(currRing,inputIdeal);
 			gcone *gcAct;
 			gcAct = gcRoot;
-			gcone::numVars=pVariables;
-			//gcAct->numVars=pVariables;//NOTE is now static
+			gcone::numVars=(currRing->N);
+			//gcAct->numVars=(currRing->N);//NOTE is now static
 			gcAct->getGB(inputIdeal);
 			/*Check whether input is homogeneous
 			if TRUE each facet intersects the positive orthant, so we don't need the
@@ -4395,8 +4395,8 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
 			}
 			else
 			{
-				gcone::ivZeroVector = new int64vec(pVariables);
-				for(int ii=0;ii<pVariables;ii++)
+				gcone::ivZeroVector = new int64vec((currRing->N));
+				for(int ii=0;ii<(currRing->N);ii++)
 					(*gcone::ivZeroVector)[ii]=0;
 			}
 
@@ -4449,7 +4449,7 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
 // 			facet *fPtr=gcPtr->facetPtr=new facet();
 // 			for(int jj=0;jj<5;jj++)
 // 			{
-// 				int64vec *iv=new int64vec(pVariables);
+// 				int64vec *iv=new int64vec((currRing->N));
 // 				fPtr->setFacetNormal(iv);				
 // 				delete(iv);
 // 				fPtr->next=new facet();

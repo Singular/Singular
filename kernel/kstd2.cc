@@ -1283,7 +1283,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1795,7 +1795,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
     pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1998,14 +1998,14 @@ void initBbaShift(ideal F,kStrategy strat)
     //}
     //else
     {
-      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
+      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
     pRestoreDegProcs(totaldegreeWecart, maxdegreeWecart);
     if (TEST_OPT_PROT)
     {
-      for(i=1; i<=pVariables; i++)
+      for(i=1; i<=(currRing->N); i++)
         Print(" %d",ecartWeights[i]);
       PrintLn();
       mflush();

@@ -5,29 +5,33 @@
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
+#define PLURAL_INTERNAL_DECLARATIONS
 
-#include <kernel/mod2.h>
+#include "mod2.h"
 
 #ifdef HAVE_PLURAL
 
-#define PLURAL_INTERNAL_DECLARATIONS
 
 #include <omalloc/omalloc.h>
-#include <polys/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <misc/options.h>
-#include <kernel/kutil.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
-#include <kernel/kutil.h>
-//#include "spolys.h"
-//#include "cntrlc.h"
-#include <polys/weight.h>
 #include <misc/intvec.h>
+
+#include <polys/weight.h>
+#include <polys/polys.h>
+
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
+
+
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+//#include "spolys.h"
+//#include "cntrlc.h"
 #include <kernel/ratgring.h>
+
+#include <kernel/kutil.h>
 
 #if 0
 /*3
@@ -1025,13 +1029,13 @@ void nc_gr_initBba(ideal F, kStrategy strat)
   //   }
   //   else
     {
-      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
+      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
     pFDeg=totaldegreeWecart;
     pLDeg=maxdegreeWecart;
-    for(i=1; i<=pVariables; i++)
+    for(i=1; i<=(currRing->N); i++)
       Print(" %d",ecartWeights[i]);
     PrintLn();
     mflush();
@@ -1282,7 +1286,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }

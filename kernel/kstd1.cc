@@ -641,7 +641,7 @@ void reorderT(kStrategy strat)
 }
 
 /*2
-*looks whether exactly pVariables-1 axis are used
+*looks whether exactly (currRing->N)-1 axis are used
 *returns last != 0 in this case
 *last is the (first) unused axis
 */
@@ -656,7 +656,7 @@ void missingAxis (int* last,kStrategy strat)
     loop
     {
       i++;
-      if (i > pVariables) break;
+      if (i > (currRing->N)) break;
       if (strat->NotUsedAxis[i])
       {
         *last = i;
@@ -941,7 +941,7 @@ void firstUpdate(kStrategy strat)
       }
       if (ecartWeights)
       {
-        omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+        omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
         ecartWeights=NULL;
       }
     }
@@ -1087,14 +1087,14 @@ void initBba(ideal F,kStrategy strat)
     //}
     //else
     {
-      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
+      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
     pRestoreDegProcs(totaldegreeWecart, maxdegreeWecart);
     if (TEST_OPT_PROT)
     {
-      for(i=1; i<=pVariables; i++)
+      for(i=1; i<=(currRing->N); i++)
         Print(" %d",ecartWeights[i]);
       PrintLn();
       mflush();
@@ -1107,8 +1107,8 @@ void initMora(ideal F,kStrategy strat)
   int i,j;
   idhdl h;
 
-  strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
-  for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
+  strat->NotUsedAxis = (BOOLEAN *)omAlloc(((currRing->N)+1)*sizeof(BOOLEAN));
+  for (j=(currRing->N); j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS = enterSMora;
   strat->initEcartPair = initEcartPairMora; /*- ecart approximation -*/
   strat->posInLOld = strat->posInL;
@@ -1145,7 +1145,7 @@ void initMora(ideal F,kStrategy strat)
     //}
     //else
     {
-      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
+      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
@@ -1153,7 +1153,7 @@ void initMora(ideal F,kStrategy strat)
     pSetDegProcs(totaldegreeWecart, maxdegreeWecart);
     if (TEST_OPT_PROT)
     {
-      for(i=1; i<=pVariables; i++)
+      for(i=1; i<=(currRing->N); i++)
         Print(" %d",ecartWeights[i]);
       PrintLn();
       mflush();
@@ -1399,14 +1399,14 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
-  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (TEST_OPT_WEIGHTM)
   {
     pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1516,7 +1516,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
-  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   omfree(strat->sevT);
   omfree(strat->S_2_R);
   omfree(strat->R);
@@ -1534,7 +1534,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS *)&ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1655,7 +1655,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
-  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   omfree(strat->sevT);
   omfree(strat->S_2_R);
   omfree(strat->R);
@@ -1673,7 +1673,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS *)&ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -2204,8 +2204,8 @@ ideal kInterRedOld (ideal F, ideal Q)
   strat->kNoether=pCopy(ppNoether);
   strat->ak = idRankFreeModule(tempF);
   initBuchMoraCrit(strat);
-  strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
-  for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
+  strat->NotUsedAxis = (BOOLEAN *)omAlloc(((currRing->N)+1)*sizeof(BOOLEAN));
+  for (j=(currRing->N); j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS      = enterSBba;
   strat->posInT      = posInT17;
   strat->initEcart   = initEcartNormal;
@@ -2227,7 +2227,7 @@ ideal kInterRedOld (ideal F, ideal Q)
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
-  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
   omfree(strat->sevT);
   omfree(strat->S_2_R);
   omfree(strat->R);
@@ -2506,7 +2506,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }

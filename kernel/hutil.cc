@@ -88,7 +88,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   {
     if (*si!=NULL)
     {
-      *ek = (scmon) omAlloc((pVariables+1)*sizeof(int));
+      *ek = (scmon) omAlloc(((currRing->N)+1)*sizeof(int));
       pGetExpV(*si, *ek);
       ek++;
     }
@@ -98,7 +98,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   {
     if (*qi!=NULL)
     {
-      *ek = (scmon) omAlloc((pVariables+1)*sizeof(int));
+      *ek = (scmon) omAlloc(((currRing->N)+1)*sizeof(int));
       pGetExpV(*qi, *ek);
       ek++;
     }
@@ -114,14 +114,14 @@ void hWeight()
   int i, k;
   int x;
 
-  i = pVariables;
+  i = (currRing->N);
   loop
   {
     if (pWeight(i) != 1) break;
     i--;
     if (i == 0) return;
   }
-  for (i=pVariables; i>0; i--)
+  for (i=(currRing->N); i>0; i--)
   {
     x = pWeight(i);
     if (x != 1)
@@ -142,7 +142,7 @@ void hDelete(scfmon ev, int ev_length)
   if (ev_length>0)
   {
     for (i=ev_length-1;i>=0;i--)
-      omFreeSize(hsecure[i],(pVariables+1)*sizeof(int));
+      omFreeSize(hsecure[i],((currRing->N)+1)*sizeof(int));
     omFreeSize(hsecure, ev_length*sizeof(scmon));
     omFreeSize(ev,  ev_length*sizeof(scmon));
   }
@@ -1038,8 +1038,8 @@ scfmon hGetmem(int lm, scfmon old, monp monmem)
 *{
 *  scmon p1, pn;
 *  p1 = p + 1;
-*  pn = p1 + pVariables;
-*  memcpy(pn, p1, pVariables * sizeof(int));
+*  pn = p1 + (currRing->N);
+*  memcpy(pn, p1, (currRing->N) * sizeof(int));
 *  return pn - 1;
 *}
 */
@@ -1049,8 +1049,8 @@ scmon hGetpure(scmon p)
   scmon pn;
   p1++;
   pn = p1;
-  pn += pVariables;
-  memcpy(pn, p1, pVariables * sizeof(int));
+  pn += (currRing->N);
+  memcpy(pn, p1, (currRing->N) * sizeof(int));
   return pn - 1;
 }
 

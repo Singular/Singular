@@ -16,7 +16,9 @@ void scComputeHCw(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing)
 #endif
 
 intvec * scIndIntvec(ideal S, ideal Q=NULL);
-lists scIndIndset(ideal S, BOOLEAN all, ideal Q=NULL);
+
+// lists scIndIndset(ideal S, BOOLEAN all, ideal Q=NULL); // TODO: move to Singular/
+
 int scDimInt(ideal  s,ideal Q=NULL);
 int scMultInt(ideal  s,ideal Q=NULL);
 int scMult0Int(ideal  s,ideal Q=NULL);

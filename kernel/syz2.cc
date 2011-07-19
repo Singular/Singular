@@ -6,25 +6,37 @@
 * ABSTRACT: resolutions
 */
 
-#include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <misc/options.h>
+#include "mod2.h"
+
 #include <omalloc/omalloc.h>
-#include <kernel/syz.h>
+
+#include <misc/mylimits.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+//#include "cntrlc.h"
+
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/kbuckets.h>
+#include <polys/prCopy.h>
+
 #include <polys/polys.h>
+
+// #include <kernel/modulop.h>
+
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
-//#include "cntrlc.h"
-#include <misc/intvec.h>
-#include <coeffs/numbers.h>
-#include <kernel/modulop.h>
+
+#include <kernel/syz.h>
 #include <kernel/ideals.h>
-#include <misc/intvec.h>
-#include <polys/monomials/ring.h>
-#include <polys/kbuckets.h>
-#include <polys/prCopy.h>
+
+
+
+
 
 //#define SHOW_PROT
 //#define SHOW_RED
@@ -141,7 +153,7 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
                 else
                 {
                   poly p1,p2;
-                  int ip=pVariables;
+                  int ip= currRing->N;
                   p1 = pDivide(p,(syzstr->resPairs[index])[i].p);
                   p2 = pDivide(nP->m[j],(syzstr->resPairs[index])[j].p);
                   while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
@@ -982,7 +994,7 @@ syStrategy syHilb(ideal arg,int * length)
   cons_pairs = 0;
   crit_fails = 0;
 #endif
-  syzstr->length = *length = pVariables+2;
+  syzstr->length = *length = currRing->N+2;
   syzstr->Tl = new intvec(*length+1);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)

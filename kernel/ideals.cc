@@ -32,6 +32,7 @@
 #include <polys/prCopy.h>
 #include <polys/nc/nc.h>
 
+
 #include <kernel/ideals.h>
 
 #include <kernel/febase.h>
@@ -148,7 +149,7 @@ int pLowVar (poly p)
   {
     l = 1;
     lex = pGetExp(p,l);
-    while ((l < pVariables) && (lex == 0))
+    while ((l < (currRing->N)) && (lex == 0))
     {
       l++;
       lex = pGetExp(p,l);
@@ -192,7 +193,7 @@ static poly pMultWithT (poly p,BOOLEAN cas)
       qresult->next = pInit();
       pIter(qresult);
     }
-    for (j=pVariables-1; j>0; j--)
+    for (j=(currRing->N)-1; j>0; j--)
     {
       lex = pGetExp(qp,j);
       pSetExp(qresult,j+1,lex);/*copy all variables*/
@@ -1614,18 +1615,18 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   else
   {
     block0[1] = 1;
-    block1[1] = pVariables;
+    block1[1] = (currRing->N);
     if (origR->OrdSgn==1) ord[1] = ringorder_wp;
     else                  ord[1] = ringorder_ws;
-    wv[1]=(int*)omAlloc0(pVariables*sizeof(int));
-    double wNsqr = (double)2.0 / (double)pVariables;
+    wv[1]=(int*)omAlloc0((currRing->N)*sizeof(int));
+    double wNsqr = (double)2.0 / (double)(currRing->N);
     wFunctional = wFunctionalBuch;
-    int  *x= (int * )omAlloc(2 * (pVariables + 1) * sizeof(int));
+    int  *x= (int * )omAlloc(2 * ((currRing->N) + 1) * sizeof(int));
     int sl=IDELEMS(h1) - 1;
     wCall(h1->m, sl, x, wNsqr);
-    for (sl = pVariables; sl!=0; sl--)
-      wv[1][sl-1] = x[sl + pVariables + 1];
-    omFreeSize((ADDRESS)x, 2 * (pVariables + 1) * sizeof(int));
+    for (sl = (currRing->N); sl!=0; sl--)
+      wv[1][sl-1] = x[sl + (currRing->N) + 1];
+    omFreeSize((ADDRESS)x, 2 * ((currRing->N) + 1) * sizeof(int));
 
     ord[2]=ringorder_C;
     ord[3]=0;
@@ -1734,7 +1735,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
 #endif
   // change into the new ring
-  //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
+  //pChangeRing((currRing->N),currRing->OrdSgn,ord,block0,block1,wv);
   rChangeCurrRing(tmpR);
 
   //h = idInit(IDELEMS(h1),h1->rank);
@@ -1773,7 +1774,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   // fetch data from temp ring
   for (k=0; k<=i; k++)
   {
-    l=pVariables;
+    l=(currRing->N);
     while ((l>0) && (p_GetExp( hh->m[k],l,tmpR)*pGetExp(delVar,l)==0)) l--;
     if (l==0)
     {
@@ -2373,7 +2374,7 @@ int idIndexOfKBase(poly monom, ideal kbase)
 
   while ((j>0) && (kbase->m[j-1]==NULL)) j--;
   if (j==0) return -1;
-  int i=pVariables;
+  int i=(currRing->N);
   while (i>0)
   {
     loop
@@ -2408,7 +2409,7 @@ poly idDecompose(poly monom, poly how, ideal kbase, int * pos)
   int i;
   poly coeff=pOne(), base=pOne();
 
-  for (i=1;i<=pVariables;i++)
+  for (i=1;i<=(currRing->N);i++)
   {
     if (pGetExp(how,i)>0)
     {

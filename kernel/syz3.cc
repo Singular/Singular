@@ -280,7 +280,7 @@ void syReorder_Kosz(syStrategy syzstr)
       {
         if (res[syzIndex-1]->m[pGetComp(p)-1]!=NULL)
         {
-          for(j=1;j<=pVariables;j++)
+          for(j=1;j<=(currRing->N);j++)
           {
             pSetExp(p,j,pGetExp(p,j)
                         -pGetExp(res[syzIndex-1]->m[pGetComp(p)-1],j));
@@ -385,7 +385,7 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
             else
             {
               poly p1,p2;
-              int ip=pVariables;
+              int ip=(currRing->N);
               p1 = pDivide(p,old_generators->m[jj]);
               p2 = pDivide(prs[j1],old_generators->m[j1]);
               while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
@@ -1084,7 +1084,7 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
             else
             {
               poly p1,p2;
-              int ip=pVariables;
+              int ip=(currRing->N);
               p1 = pDivide(p,add_generators->m[j]);
               p2 = pDivide(prs[j1],add_generators->m[j1]);
               while ((ip>0) && (pGetExp(p1,ip)*pGetExp(p2,ip)==0)) ip--;
@@ -1210,7 +1210,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       loop
       {
         assume(pp1!=NULL);
-        for(i=(int)pVariables; i; i--)
+        for(i=(int)(currRing->N); i; i--)
           pSetExp(pp1,i, pGetExp(pp1,i)- pGetExp(deg_soc,i));
         pSetComp(pp1, 0);
         pSetm(pp1);
@@ -1220,7 +1220,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       loop
       {
         assume(pp2!=NULL);
-        for(i=(int)pVariables; i; i--)
+        for(i=(int)(currRing->N); i; i--)
           pSetExp(pp2,i, pGetExp(pp2,i)- pGetExp(deg_soc,i));
         pSetComp(pp2, 0);
         pSetm(pp2);
@@ -1767,7 +1767,7 @@ syStrategy syKosz(ideal arg,int * length)
 /*--- changes to a Cdp-ring ----------------------------*/
   syzstr->syRing = rCurrRingAssure_C_dp();
 /*--- initializes the data structures---------------*/
-  syzstr->length = *length = pVariables+2;
+  syzstr->length = *length = (currRing->N)+2;
   syzstr->regularity = -1;
   if (origR!=syzstr->syRing)
     temp = idrCopyR(arg,origR);

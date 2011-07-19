@@ -30,7 +30,7 @@ void pLcmRat(poly a, poly b, poly m, int rat_shift)
 {
   /* rat_shift is the last exp one should count with */
   int i;
-  for (i=pVariables; i>=rat_shift; i--)
+  for (i=(currRing->N); i>=rat_shift; i--)
   {
     pSetExp(m,i, si_max( pGetExp(a,i), pGetExp(b,i)));
   }
@@ -47,9 +47,9 @@ poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
   poly m = // p_One( r);
           p_Init(r);
 
-  const int pVariables = r->N;
+  const int (currRing->N) = r->N;
 
-  //  for (int i = pVariables; i>=r->real_var_start; i--)
+  //  for (int i = (currRing->N); i>=r->real_var_start; i--)
   for (int i = r->real_var_end; i>=r->real_var_start; i--)
   {
     const int lExpA = p_GetExp (a, i, r);
@@ -69,7 +69,7 @@ poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
 // {
 //   /* shift is the exp of rational elements */
 //   int i;
-//   for (i=pVariables; i; i--)
+//   for (i=(currRing->N); i; i--)
 //   {
 //     if (!pGetExp(pshift,i))
 //     {
