@@ -27,7 +27,7 @@
 #include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/structs.h>
-#include <kernel/kInline.cc>
+#include <kernel/kInline.h>
 #include <kernel/stairc.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
