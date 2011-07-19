@@ -21,7 +21,7 @@
 #include <kernel/structs.h>
 #include <kernel/GMPrat.h>
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
+#include <polys/monomials/p_polys.h>
 #include <kernel/npolygon.h>
 #include <kernel/splist.h>
 #include <misc/intvec.h>
@@ -40,6 +40,7 @@ void    spectrumPolyNode::copy_zero( void )
     mon    = NULL;
     weight = (Rational)0;
     nf     = NULL;
+    r      = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -47,12 +48,13 @@ void    spectrumPolyNode::copy_zero( void )
 // ----------------------------------------------------------------------------
 
 void    spectrumPolyNode::copy_shallow(
-                spectrumPolyNode *pnode,poly m,const Rational &w,poly f )
+         spectrumPolyNode *pnode,poly m,const Rational &w,poly f, const ring R )
 {
     next   = pnode;
     mon    = m;
     weight = w;
     nf     = f;
+    r      = R;
 }
 
 // ----------------------------------------------------------------------------
@@ -65,6 +67,7 @@ void    spectrumPolyNode::copy_shallow( spectrumPolyNode &node )
     mon    = node.mon;
     weight = node.weight;
     nf     = node.nf;
+    r      = node.r;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,19 +84,19 @@ spectrumPolyNode::spectrumPolyNode( )
 // ----------------------------------------------------------------------------
 
 spectrumPolyNode::spectrumPolyNode(
-        spectrumPolyNode *pnode,poly m,const Rational &w,poly f )
+        spectrumPolyNode *pnode,poly m,const Rational &w,poly f, const ring R )
 {
-    copy_shallow( pnode,m,w,f );
+    copy_shallow( pnode,m,w,f,R );
 }
 
 // ----------------------------------------------------------------------------
 //  Destructor is empty since we construct our objects shallow
 // ----------------------------------------------------------------------------
 
-spectrumPolyNode::~spectrumPolyNode( )
+spectrumPolyNode::~spectrumPolyNode()
 {
-    if( mon!=NULL ) pDelete( &mon );
-    if( nf !=NULL ) pDelete( &nf );
+    if( mon!=NULL ) p_Delete( &mon, r );
+    if( nf !=NULL ) p_Delete( &nf,r );
     copy_zero( );
 }
 
@@ -175,7 +178,7 @@ spectrumPolyList::~spectrumPolyList( )
 //      the new node ist inserted such that the list remains sorted.
 // ----------------------------------------------------------------------------
 
-void    spectrumPolyList::insert_node( poly m,poly f )
+void    spectrumPolyList::insert_node( poly m,poly f, const ring R )
 {
     #ifdef SPLIST_DEBUG
         if( np==(newtonPolygon*)NULL )
@@ -197,12 +200,12 @@ void    spectrumPolyList::insert_node( poly m,poly f )
     #endif
 
     spectrumPolyNode    *newnode = new spectrumPolyNode(
-        (spectrumPolyNode*)NULL,m,np->weight_shift( m ),f );
+        (spectrumPolyNode*)NULL,m,np->weight_shift( m,R ),f, R );
 
     if( N==0 ||
               root->weight>newnode->weight ||
             ( root->weight==newnode->weight &&
-              pCmp( root->mon,newnode->mon )<0 ) )
+              p_Cmp( root->mon,newnode->mon,R )<0 ) )
     {
         // ----------------------
         //  insert at position 0
@@ -231,7 +234,7 @@ void    spectrumPolyList::insert_node( poly m,poly f )
         while( next!=(spectrumPolyNode*)NULL &&
                ( newnode->weight>next->weight ||
                ( newnode->weight==next->weight &&
-                 pCmp( newnode->mon,next->mon )<0 ) ) )
+                 p_Cmp( newnode->mon,next->mon, R )<0 ) ) )
         {
             actual = next;
             next   = next->next;
@@ -260,16 +263,16 @@ void    spectrumPolyList::delete_node( spectrumPolyNode **node )
 //  In every node delete all instances of  m  in  node->nf
 // ----------------------------------------------------------------------------
 
-void    spectrumPolyList::delete_monomial( poly m )
+void    spectrumPolyList::delete_monomial( poly m, const ring R )
 {
     spectrumPolyNode **node = &root;
     poly              *f;
 
-    m = pCopy( m );
+    m = p_Copy( m,R );
 
     while( *node!=(spectrumPolyNode*)NULL )
     {
-        if( pCmp( m,(*node)->mon )>=0 && pLmDivisibleByNoComp( m,(*node)->mon ) )
+        if( p_Cmp( m,(*node)->mon,R )>=0 && p_LmDivisibleByNoComp( m,(*node)->mon, R ))
         {
             delete_node( node );
         }
@@ -279,9 +282,9 @@ void    spectrumPolyList::delete_monomial( poly m )
 
             while( *f!=NULL )
             {
-                if( pCmp( m,*f )>=0 && pLmDivisibleByNoComp( m,*f ) )
+                if( p_Cmp( m,*f,R )>=0 && p_LmDivisibleByNoComp( m,*f,R ) )
                 {
-                    pLmDelete(f);
+                    p_LmDelete(f,R);
                 }
                 else
                 {
@@ -303,7 +306,7 @@ void    spectrumPolyList::delete_monomial( poly m )
             node = &((*node)->next);
         }
     }
-    pDelete( &m );
+    p_Delete( &m,R );
 }
 
 // ----------------------------------------------------------------------------
