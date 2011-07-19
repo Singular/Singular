@@ -8,8 +8,8 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#ifndef KINLINE_CC
-#define KINLINE_CC
+#ifndef KINLINE_H
+#define KINLINE_H
 
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
 
@@ -688,7 +688,7 @@ KINLINE poly sLObject::GetP(omBin lmBin)
   }
   else if (lmBin != NULL && lmBin != currRing->PolyBin)
   {
-    p = p_LmShallowCopyDelete(p, currRing, lmBin);
+    p = p_LmShallowCopyDelete(p, currRing);
     FDeg = pFDeg();
   }
 
@@ -1167,4 +1167,4 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 }
 
 #endif // defined(KINLINE) || defined(KUTIL_CC)
-#endif // KINLINE_CC
+#endif // KINLINE_H
