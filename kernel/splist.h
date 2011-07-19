@@ -40,13 +40,14 @@ public:
     poly                mon;
     Rational            weight;
     poly                nf;
+    ring                r;
 
     spectrumPolyNode( );
-    spectrumPolyNode( spectrumPolyNode*,poly,const Rational&,poly );
+    spectrumPolyNode( spectrumPolyNode*,poly,const Rational&,poly, const ring);
     ~spectrumPolyNode( );
 
     void    copy_zero   ( void );
-    void    copy_shallow( spectrumPolyNode*,poly,const Rational&,poly );
+    void    copy_shallow( spectrumPolyNode*,poly,const Rational&,poly, const ring);
     void    copy_shallow( spectrumPolyNode& );
 };
 
@@ -68,10 +69,10 @@ public:
     void    copy_shallow( spectrumPolyNode*,int,newtonPolygon* );
     void    copy_shallow( spectrumPolyList& );
 
-    void    insert_node( poly,poly );
+    void    insert_node( poly,poly, const ring );
     void    delete_node( spectrumPolyNode** );
 
-    void    delete_monomial( poly );
+    void    delete_monomial( poly, const ring );
 
     spectrumState  spectrum( lists*,int );
 
