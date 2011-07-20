@@ -197,10 +197,6 @@
 /* still testing */
 #undef HAVE_F5 
 
-/* procedures to compute groebner bases with the f5c implementation */
-/* still testing */
-#undef HAVE_F5C
-
 /* letterplace gb:*/
 #define HAVE_SHIFTBBA 1
 
