@@ -32,52 +32,6 @@
 // This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN
 
-/*2
-* returns the length of a (numbers of monomials)
-* respect syzComp
-*/
-poly p_Last(poly a, int &l, const ring r)
-{
-  if (a == NULL)
-  {
-    l = 0;
-    return NULL;
-  }
-  l = 1;
-  if (! rIsSyzIndexRing(r))
-  {
-    while (pNext(a)!=NULL)
-    {
-      pIter(a);
-      l++;
-    }
-  }
-  else
-  {
-    int curr_limit = rGetCurrSyzLimit(r);
-    poly pp = a;
-    while ((a=pNext(a))!=NULL)
-    {
-      if (p_GetComp(a,r)<=curr_limit/*syzComp*/)
-        l++;
-      else break;
-      pp = a;
-    }
-    a=pp;
-  }
-  return a;
-}
-
-/***************************************************************
- *
- * poly things which are independent of ring
- *
- ***************************************************************/
-
-// returns the length of a polynomial (numbers of monomials)
-// respect syzComp
-static inline poly pLast(poly a, int &length) { return p_Last (a, length, currRing); }
-static inline poly pLast(poly a) { int l; return pLast(a, l); }
 
 
 KINLINE TObject* skStrategy::S_2_T(int i)

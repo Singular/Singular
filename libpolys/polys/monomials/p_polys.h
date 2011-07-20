@@ -1921,6 +1921,9 @@ poly p_Invers(int n,poly u,intvec *w, const ring R);
 /*----------------------------------------------------*/
 int   p_Var(poly mi,const ring r);
 
-
+/*----------------------------------------------------*/
+// returns the length of a polynomial (numbers of monomials) and the last mon.
+// respect syzComp
+poly p_Last(poly a, int &l, const ring r);
 #endif // P_POLYS_H
 
