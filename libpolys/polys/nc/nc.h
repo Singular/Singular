@@ -258,6 +258,13 @@ static inline poly nc_CreateSpoly(const poly p1, const poly p2, const ring r)
   return r->GetNC()->p_Procs.SPoly(p1, p2, r);
 }
 
+// ?
+poly nc_CreateShortSpoly(poly p1, poly p2, const ring r);
+
+/* brackets: p will be destroyed... */
+poly nc_p_Bracket_qq(poly p, const poly q);
+
+
 static inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
 {
   assume(rIsPluralRing(r));

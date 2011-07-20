@@ -1716,7 +1716,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
-    Lp.p = nc_CreateShortSpoly(strat->S[i],p); // ??? strat->tailRing?
+    Lp.p = nc_CreateShortSpoly(strat->S[i],p, currRing); // ??? strat->tailRing?
   }
   else
   #endif

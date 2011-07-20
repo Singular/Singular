@@ -45,11 +45,6 @@ void nc_PolyPolyRed(poly &b, poly p, number *c);
 
 
 
-poly nc_CreateShortSpoly(poly p1, poly p2, const ring r=currRing);
-
-
-/* brackets: p will be destroyed... */
-poly nc_p_Bracket_qq(poly p, const poly q);
 
 /* twostd: */
 ideal twostd(ideal I);

@@ -11,6 +11,9 @@
 /* for omBin */
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
+#include <polys/polys.h>
+#include <polys/coeffrings.h>
+
 #ifdef HAVE_RINGS
 #include <coeffs/si_gmp.h>
 #endif
