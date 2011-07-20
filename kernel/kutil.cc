@@ -11,7 +11,7 @@
 #define KUTIL_CC
 #include <stdlib.h>
 #include <string.h>
-#include <kernel/mod2.h>
+#include "mod2.h"
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -321,7 +321,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   int  i;
   poly h;
 
-  if(rHasGlobalOrdering_currRing()) return;
+  if(rHasGlobalOrdering (currRing)) return;
   if(TEST_OPT_CANCELUNIT) return;
 
   ring r = L->tailRing;
@@ -1057,7 +1057,7 @@ void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
 {
   Lp->FDeg = Lp->pFDeg();
   (*Lp).ecart = si_max(ecartF,ecartG);
-  (*Lp).ecart = (*Lp).ecart- (Lp->FDeg -pFDeg((*Lp).lcm,currRing));
+  (*Lp).ecart = (*Lp).ecart- (Lp->FDeg -p_FDeg((*Lp).lcm,currRing));
   (*Lp).length = 0;
 }
 
@@ -1085,7 +1085,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 #endif
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
-  pSetCoeff0(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
+  pSetCoeff0(Lp.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
   // Lp.lcm == 0
   if (nIsZero(pGetCoeff(Lp.lcm)))
   {
@@ -1108,7 +1108,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
   assume(!strat->sugarCrit);
-  if (pHasNotCF(p,strat->S[i]) && nIsUnit(pGetCoeff(p)) && nIsUnit(pGetCoeff(strat->S[i])))
+  if (pHasNotCF(p,strat->S[i]) && n_IsUnit(pGetCoeff(p),currRing->cf)
+      && n_IsUnit(pGetCoeff(strat->S[i]),currRing->cf))
   {
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -1135,7 +1136,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
-    compareCoeff = nDivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
+    compareCoeff = n_DivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm), currRing->cf);
     if (compareCoeff == pDivComp_EQUAL || compare == compareCoeff)
     {
       if (compare == 1)
@@ -1300,7 +1301,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   assume(atR >= 0);
   poly m1, m2, gcd;
 
-  d = nExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t);
+  d = n_ExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t, currRing->cf);
 
   if (nIsZero(s) || nIsZero(t))  // evtl. durch divBy tests ersetzen
   {
@@ -2392,7 +2393,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
   assume(!(strat->Gebauer || strat->fromT));
   for (j=strat->Ll; j>=0; j--)
   {
-    if (strat->L[j].lcm != NULL && nDivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
+    if (strat->L[j].lcm != NULL && n_DivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p), currRing->cf))
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
@@ -2445,7 +2446,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
       {
         if (i < 0)  break;
         // Element is from B and has the same lcm as L[j]
-        if ((strat->L[i].p2 == p) && nDivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm))
+        if ((strat->L[i].p2 == p) && n_DivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm), currRing->cf)
              && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
         {
           /*L[i] could be canceled but we search for a better one to cancel*/
@@ -2951,7 +2952,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
   if (nIsOne(pGetCoeff(h))) return;
   number gcd;
   bool go = false;
-  if (nDivBy((number) 0, pGetCoeff(h)))
+  if (n_DivBy((number) 0, pGetCoeff(h), currRing->cf))
   {
     gcd = nIntDiv((number) 0, pGetCoeff(h));
     go = true;
@@ -3273,7 +3274,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
           cmp = pLmCmp(set[an],p);
           if (cmp == cmp_int)  return an;
           if (cmp == -cmp_int) return en;
-          if (nDivBy(pGetCoeff(p), pGetCoeff(set[an]))) return en;
+          if (n_DivBy(pGetCoeff(p), pGetCoeff(set[an]), currRing->cf)) return en;
           return an;
         }
         i = (an+en) / 2;
@@ -3282,7 +3283,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
         else if (cmp == -cmp_int)   an = i;
         else
         {
-          if (nDivBy(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
+          if (n_DivBy(pGetCoeff(p), pGetCoeff(set[i]), currRing->cf)) an = i;
           else en = i;
         }
       }
@@ -4655,7 +4656,7 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
       // test divisibility of coefs:
       poly p_Ln=Ln.GetLmCurrRing();
       poly p_With=With->GetLmCurrRing();
-      number z=nIntMod(pGetCoeff(p_Ln),pGetCoeff(p_With));
+      number z=n_IntMod(pGetCoeff(p_Ln),pGetCoeff(p_With), currRing->cf);
       if (!nIsZero(z))
       {
         // subtract z*Ln, add z.Ln to L
@@ -4916,7 +4917,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
   /*- test, if a unit is in F -*/
   if ((strat->sl>=0)
 #ifdef HAVE_RINGS
-       && nIsUnit(pGetCoeff(strat->S[0]))
+       && n_IsUnit(pGetCoeff(strat->S[0]),currRing->cf)
 #endif
        && pIsConstant(strat->S[0]))
   {
@@ -5015,7 +5016,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 
   if ((strat->Ll>=0)
 #ifdef HAVE_RINGS
-       && nIsUnit(pGetCoeff(strat->L[strat->Ll].p))
+       && n_IsUnit(pGetCoeff(strat->L[strat->Ll].p), currRing->cf)
 #endif
        && pIsConstant(strat->L[strat->Ll].p))
   {
@@ -5308,7 +5309,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 
   if (maxIndex >= 0)
   {
-    e = pLDeg(h,&l,currRing)-pFDeg(h,currRing);
+    e = pLDeg(h,&l,currRing)-p_FDeg(h,currRing);
     do
     {
       if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
@@ -5325,7 +5326,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 #endif
         // pDelete(&h);
         if (h == NULL) return NULL;
-        e = pLDeg(h,&l,currRing)-pFDeg(h,currRing);
+        e = pLDeg(h,&l,currRing)-p_FDeg(h,currRing);
         j = 0;
         not_sev = ~ pGetShortExpVector(h);
       }
@@ -6240,7 +6241,7 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
-  j = pFDeg(newNoether,currRing);
+  j = p_FDeg(newNoether,currRing);
   for (i=1; i<=(currRing->N); i++)
   {
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
@@ -6349,7 +6350,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
 #ifdef HAVE_RINGS
-                                  (strat->homog && pFDeg == pDeg && !(rField_is_Ring(currRing))), // TODO Oliver
+                                  (strat->homog && currRing->pFDeg == pDeg && !(rField_is_Ring(currRing))), // TODO Oliver
 #else
                                   (strat->homog && pFDeg == pDeg), // omit_degree
 #endif
@@ -6485,7 +6486,7 @@ skStrategy::skStrategy()
 #ifdef HAVE_TAIL_BIN
   tailBin = omGetStickyBinOfBin(currRing->PolyBin);
 #endif
-  pOrigFDeg = pFDeg;
+  pOrigFDeg = currRing->pFDeg;
   pOrigLDeg = pLDeg;
 }
 
@@ -6505,7 +6506,7 @@ skStrategy::~skStrategy()
 
   if (currRing != tailRing)
     rKillModifiedRing(tailRing);
-  pRestoreDegProcs(pOrigFDeg, pOrigLDeg);
+  pRestoreDegProcs(currRing,pOrigFDeg, pOrigLDeg);
 }
 
 #if 0
@@ -6754,7 +6755,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->tailRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
     else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
     else Print("? (%lx)", (long)strat->tailRing->pLDeg);
-    Print(" syzring:%d, syzComp(strat):%d syzComb(ring)\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
+    Print(" syzring:%d, syzComp(strat):%d syzComb(ring)\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
 
