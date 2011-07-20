@@ -349,17 +349,6 @@ static inline   long p_MinComp(poly p, ring lmRing, ring tailRing)
 
 static inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRing);}
 
-/***************************************************************
- *
- * poly things which are independent of ring
- *
- ***************************************************************/
-
-// returns the length of a polynomial (numbers of monomials)
-// respect syzComp
-// static inline poly pLast(poly a, int &length);
-// static inline poly pLast(poly a) { int l; return pLast(a, l); }
-
 
 static inline poly pReverse(poly p)
 {
