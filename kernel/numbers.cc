@@ -257,7 +257,6 @@ void nSetChar(ring r)
 void nInitChar(ring r)
 {
   int c=rInternalChar(r);
-  n_coeffType t=rFieldType(r);
 
   if (rField_is_Extension(r))
   {
@@ -270,6 +269,10 @@ void nInitChar(ring r)
       // includes: nInitChar(r->algring);
     }
   }
+
+  n_coeffType t=rFieldType(r);
+  if ((r->cf!=NULL) && (r->cf->nChar==c) && (r->cf->type==t))
+  { r->cf->ref++; return; }
 
   n_Procs_s *n=cf_root;
   while((n!=NULL)
@@ -762,6 +765,7 @@ void nKillChar(ring r)
           WarnS("cf_root list destroyed");
         }
       }
+      r->cf=NULL;
     }
     if (r->algring!=NULL)
     {
