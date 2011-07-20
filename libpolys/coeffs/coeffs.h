@@ -341,6 +341,12 @@ static inline BOOLEAN n_Greater(number a, number b, const coeffs r)
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfIsUnit!=NULL); return r->cfIsUnit(n,r); }
 
+static inline number n_ExtGcd(number a, number b, number *s, number *t, const coeffs r)
+{ assume(r != NULL); assume(r->cfExtGcd!=NULL); return r->cfExtGcd (a,b,s,t,r); }
+
+static inline int n_DivComp(number a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfDivComp!=NULL); return r->cfDivComp (a,b,r); }
+
 /// in Z: 1
 /// in Z/kZ (where k is not a prime): largest divisor of n (taken in Z) that
 ///                                   is co-prime with k
@@ -442,6 +448,8 @@ static inline number n_Div(number a, number b, const coeffs r)
 static inline number n_IntDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
 
+static inline number n_IntMod(number a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfIntMod!=NULL); return r->cfIntMod(a,b,r); }
 /// @todo: Describe me!!!
 ///
 /// What is the purpose of this method, especially in comparison with
