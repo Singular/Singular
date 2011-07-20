@@ -347,6 +347,10 @@ BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm);
 #define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
 
 
+// returns the length of a polynomial (numbers of monomials)
+// respect syzComp
+static inline poly pLast(poly a, int &length) { return p_Last (a, length, currRing); }
+static inline poly pLast(poly a) { int l; return pLast(a, l); }
 
 /***************************************************************
  *
