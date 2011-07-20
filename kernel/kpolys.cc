@@ -114,38 +114,4 @@ BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm)
   return FALSE;
 }
 #endif
-/*2
-* returns the length of a (numbers of monomials)
-* respect syzComp
-*/
-poly p_Last(poly a, int &l, const ring r)
-{
-  if (a == NULL)
-  {
-    l = 0;
-    return NULL;
-  }
-  l = 1;
-  if (! rIsSyzIndexRing(r))
-  {
-    while (pNext(a)!=NULL)
-    {
-      pIter(a);
-      l++;
-    }
-  }
-  else
-  {
-    int curr_limit = rGetCurrSyzLimit(r);
-    poly pp = a;
-    while ((a=pNext(a))!=NULL)
-    {
-      if (p_GetComp(a,r)<=curr_limit/*syzComp*/)
-        l++;
-      else break;
-      pp = a;
-    }
-    a=pp;
-  }
-  return a;
-}
+
