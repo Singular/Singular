@@ -71,10 +71,6 @@
 #include <Singular/f5gb.h>
 #endif
 
-#ifdef HAVE_F5C
-#include <Singular/f5c.h>
-#endif
-
 #ifdef HAVE_WALK
 #include <Singular/walk.h>
 #endif
@@ -3074,24 +3070,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
         res->rtyp=IDEAL_CMD;
         res->data=(ideal) F5main(G,r,opt,plus,termination);
-        return FALSE;
-      }
-      else
-  #endif
-  /*==================== F5C Implementation =================*/
-  #ifdef HAVE_F5C
-      if (strcmp(sys_cmd, "f5c")==0)
-      {
-        if (h->Typ()!=IDEAL_CMD)
-        {
-          WerrorS("ideal expected");
-          return TRUE;
-        }
-
-        ring r = currRing;
-        ideal G = (ideal) h->Data();
-        res->rtyp=IDEAL_CMD;
-        res->data=(ideal) f5cMain(G,r);
         return FALSE;
       }
       else
