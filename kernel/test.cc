@@ -285,7 +285,6 @@ extern ring currRing;
 #include "syz.cc"
 #include "tgb.cc"
 #include "tgbgauss.cc"
-#include "tgb_obsolete.cc"
 #include "timer.cc"
 #include "units.cc"
 #include "walkMain.cc"
