@@ -175,18 +175,6 @@ PINLINE1 poly p_GetExp_k_n(poly p, int l, int k, const ring r)
   return np;
 }
 
-PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
-{
-  p_LmCheckPolyRing1(p, r);
-  pAssume1(bin->sizeW == r->PolyBin->sizeW);
-  poly new_p = p_New(r);
-  p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpL_Size);
-  pSetCoeff0(new_p, pGetCoeff(p));
-  pNext(new_p) = pNext(p);
-  omFreeBinAddr(p);
-  return new_p;
-}
-
 /***************************************************************
  *
  * Operation on ExpVectors
