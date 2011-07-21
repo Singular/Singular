@@ -121,6 +121,8 @@ struct n_Procs_s
 #endif
 
    /// changes argument  inline: a:= -a
+   /// return -a! (no copy is returned)
+   /// the result should be assigned to the original argument: e.g. a = n_Neg(a,r)
    number  (*cfNeg)(number a, const coeffs r);
    /// return 1/a
    number  (*cfInvers)(number a, const coeffs r);
@@ -366,6 +368,7 @@ static inline int n_Int(number &n,       const coeffs r)
 { assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
 
 /// in-place negation of n
+/// MUST BE USED: n = n_Neg(n) (no copy is returned)
 static inline number n_Neg(number n,     const coeffs r)
 { assume(r != NULL); assume(r->cfNeg!=NULL); return r->cfNeg(n,r); }
 

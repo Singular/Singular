@@ -30,6 +30,8 @@ static const n_coeffType ID = n_Zp;
 
 BOOLEAN npGreaterZero (number k, const coeffs r)
 {
+  assume( n_Test(k, r) );
+  
   int h = (int)((long) k);
   return ((int)h !=0) && (h <= (r->npPrimeM>>1));
 }
@@ -44,10 +46,14 @@ BOOLEAN npGreaterZero (number k, const coeffs r)
 
 number npMult (number a,number b, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  assume( n_Test(b, r) );
+
   if (((long)a == 0) || ((long)b == 0))
     return (number)0;
-  else
-    return npMultM(a,b, r);
+  number c = npMultM(a,b, r);
+  assume( n_Test(c, r) );
+  return c;  
 }
 
 /*2
@@ -58,40 +64,80 @@ number npInit (int i, const coeffs r)
   long ii=i;
   while (ii <  0L)                         ii += (long)r->ch;
   while ((ii>1L) && (ii >= ((long)r->ch))) ii -= (long)r->ch;
-  return (number)ii;
+  
+  number c = (number)ii;
+  assume( n_Test(c, r) );
+  return c;
+  
 }
 
+
+#if 0
 /*2
-* convert a number to an int in (-p/2 .. p/2]
-*/
+ * convert a number to an int in (-p/2 .. p/2]
+ * BUG: InConsistent: nInit(nInt(a)) != a, for a in (p/2, p)
+ */
 int npInt(number &n, const coeffs r)
 {
+  assume( n_Test(n, r) );
+  
   if ((long)n > (((long)r->ch) >>1)) return (int)((long)n -((long)r->ch));
   else                               return (int)((long)n);
 }
+#else
+/*2
+ * convert a number to an int in [0 .. p)
+ */
+int npInt(number &n, const coeffs r)
+{
+  assume( n_Test(n, r) );
+  
+  return (int)(long)n;
+}
+#endif
 
 number npAdd (number a, number b, const coeffs r)
 {
-  return npAddM(a,b, r);
+  assume( n_Test(a, r) );
+  assume( n_Test(b, r) );
+  
+  number c = npAddM(a,b, r);
+
+  assume( n_Test(c, r) );
+  
+  return c;
 }
 
 number npSub (number a, number b, const coeffs r)
 {
-  return npSubM(a,b,r);
+  assume( n_Test(a, r) );
+  assume( n_Test(b, r) );
+  
+  number c = npSubM(a,b,r);
+
+  assume( n_Test(c, r) );
+
+  return c;
 }
 
-BOOLEAN npIsZero (number  a, const coeffs)
+BOOLEAN npIsZero (number  a, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  
   return 0 == (long)a;
 }
 
-BOOLEAN npIsOne (number a, const coeffs)
+BOOLEAN npIsOne (number a, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  
   return 1 == (long)a;
 }
 
 BOOLEAN npIsMOne (number a, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  
   return ((r->npPminus1M == (long)a)&&((long)1!=(long)a));
 }
 
@@ -142,8 +188,9 @@ long InvMod(long a, const coeffs R)
 
 inline number npInversM (number c, const coeffs r)
 {
+  assume( n_Test(c, r) );
 #ifndef HAVE_DIV_MOD
-  return (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
+  number d = (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
 #else
   long inv=(long)r->npInvTable[(long)c];
   if (inv==0)
@@ -151,72 +198,110 @@ inline number npInversM (number c, const coeffs r)
     inv=InvMod((long)c,r);
     r->npInvTable[(long)c]=inv;
   }
-  return (number)inv;
+  number d = (number)inv;
 #endif
+  assume( n_Test(d, r) );
+  return d;
+
 }
 
 number npDiv (number a,number b, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  assume( n_Test(b, r) );
+
 //#ifdef NV_OPS
 //  if (npPrimeM>NV_MAX_PRIME)
 //    return nvDiv(a,b);
 //#endif
   if ((long)a==0)
     return (number)0;
+  number d;
+  
 #ifndef HAVE_DIV_MOD
   if ((long)b==0)
   {
     WerrorS(nDivBy0);
     return (number)0;
   }
-  else
-  {
-    int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
-    if (s < 0)
-      s += r->npPminus1M;
-    return (number)(long)r->npExpTable[s];
-  }
+  
+  int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
+  if (s < 0)
+    s += r->npPminus1M;
+  d = (number)(long)r->npExpTable[s];
 #else
   number inv=npInversM(b,r);
-  return npMultM(a,inv,r);
+  d = npMultM(a,inv,r);
 #endif
+
+  assume( n_Test(d, r) );
+  return d;
+  
 }
 number  npInvers (number c, const coeffs r)
 {
+  assume( n_Test(c, r) );
+  
   if ((long)c==0)
   {
     WerrorS("1/0");
     return (number)0;
   }
-  return npInversM(c,r);
+  number d = npInversM(c,r);
+  
+  assume( n_Test(d, r) );
+  return d;
+  
 }
 
 number npNeg (number c, const coeffs r)
 {
+  assume( n_Test(c, r) );
+  
   if ((long)c==0) return c;
-  return npNegM(c,r);
+
+#if 0  
+  number d = npNegM(c,r);  
+  assume( n_Test(d, r) );
+  return d;
+#else
+  c = npNegM(c,r);  
+  assume( n_Test(c, r) );
+  return c;
+#endif  
 }
 
-BOOLEAN npGreater (number a,number b, const coeffs)
+BOOLEAN npGreater (number a,number b, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  assume( n_Test(b, r) );
+
   //return (long)a != (long)b;
   return (long)a > (long)b;
 }
 
 BOOLEAN npEqual (number a,number b, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  assume( n_Test(b, r) );
+  
 //  return (long)a == (long)b;
+  
   return npEqualM(a,b,r);
 }
 
 void npWrite (number &a, const coeffs r)
 {
+  assume( n_Test(a, r) );
+  
   if ((long)a>(((long)r->ch) >>1)) StringAppend("-%d",(int)(((long)r->ch)-((long)a)));
   else                             StringAppend("%d",(int)((long)a));
 }
 
 void npPower (number a, int i, number * result, const coeffs r)
 {
+  assume( n_Test(a, r) );
+
   if (i==0)
   {
     //npInit(1,result);
@@ -278,6 +363,7 @@ const char * npRead (const char *s, number *a, const coeffs r)
         *a = npDiv((number)z,(number)n,r);
     }
   }
+  assume( n_Test(*a, r) );
   return s;
 }
 
