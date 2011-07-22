@@ -72,10 +72,8 @@ number npInit (int i, const coeffs r)
 }
 
 
-#if 0
 /*2
  * convert a number to an int in (-p/2 .. p/2]
- * BUG: InConsistent: nInit(nInt(a)) != a, for a in (p/2, p)
  */
 int npInt(number &n, const coeffs r)
 {
@@ -84,17 +82,6 @@ int npInt(number &n, const coeffs r)
   if ((long)n > (((long)r->ch) >>1)) return (int)((long)n -((long)r->ch));
   else                               return (int)((long)n);
 }
-#else
-/*2
- * convert a number to an int in [0 .. p)
- */
-int npInt(number &n, const coeffs r)
-{
-  assume( n_Test(n, r) );
-  
-  return (int)(long)n;
-}
-#endif
 
 number npAdd (number a, number b, const coeffs r)
 {
