@@ -489,7 +489,7 @@ void quo (unsigned long *a, unsigned long *q, unsigned long p, int &dega,
 {
   unsigned degres = dega - degq;
   unsigned long *result = new unsigned long[degres + 1];
-  unsigned i;
+  int i;
 
   while(degq <= dega)
   {
