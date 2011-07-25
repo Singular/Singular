@@ -288,7 +288,6 @@ public:
   BOOLEAN * NotUsedAxis;
   BOOLEAN * pairtest;/*used for enterOnePair*/
   poly tail;
-  leftv kIdeal;
   intvec * kModW;
   intvec * kHomW;
   // procedure for ShalloCopy from tailRing  to currRing

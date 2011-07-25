@@ -72,11 +72,6 @@
 #if SIZEOF_VOIDP == 8
 /* SIZEOF_LONG == SIZEOF_VOIDP is guaranteed by configure */
 #define ALIGN_8
-#define LOG_SIZEOF_LONG  3
-#define LOG_SIZEOF_VOIDP 3
-#else
-#define LOG_SIZEOF_LONG  2
-#define LOG_SIZEOF_VOIDP 2
 #endif
 
 #ifndef CHAR_BIT

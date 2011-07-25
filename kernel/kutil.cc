@@ -5965,7 +5965,6 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
     // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
   }
-  strat->kIdeal = NULL;
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)
@@ -5992,11 +5991,6 @@ void exitBuchMora (kStrategy strat)
   omFreeSize(strat->B,(strat->Bmax)*sizeof(LObject));
   pLmDelete(&strat->tail);
   strat->syzComp=0;
-  if (strat->kIdeal!=NULL)
-  {
-    omFreeBin(strat->kIdeal, sleftv_bin);
-    strat->kIdeal=NULL;
-  }
 }
 
 /*2
@@ -6939,7 +6933,6 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
     // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
   }
-  strat->kIdeal = NULL;
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)

@@ -204,7 +204,6 @@ kStrategy kStratCopy(kStrategy o)
     s->NotUsedAxis=(BOOLEAN *)omAlloc(currRing->N*sizeof(BOOLEAN));
     memcpy(s->NotUsedAxis,o->NotUsedAxis,currRing->N*sizeof(BOOLEAN));
   }
-  s->kIdeal=NULL;
   //s->P=s->L[s->Ll+1];
   s->P.Init(o->tailRing);
   s->update=o->update;
@@ -326,7 +325,6 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
   }
   for (si=strat->sl; si>0; si--)
   {
-    //if (strat->interpt) test_int_std(strat->kIdeal);
     strat->S[si] = redtailBba(strat->S[si],si-1,strat);
     if (TEST_OPT_INTSTRATEGY)
     {
@@ -563,7 +561,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     if (TEST_OPT_DEBUG) messageSets(strat);
-    //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey

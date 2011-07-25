@@ -515,7 +515,6 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
     }
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing))
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- remember the found T-poly -*/
       poly pi = strat->T[j].p;
       int ei = strat->T[j].ecart;
@@ -1076,10 +1075,6 @@ void initBba(ideal F,kStrategy strat)
     strat->initEcartPair = initEcartPairMora;
   else
     strat->initEcartPair = initEcartPairBba;
-  strat->kIdeal = NULL;
-  //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
-  //else              strat->kIdeal->rtyp=MODUL_CMD;
-  //strat->kIdeal->data=(void *)strat->Shdl;
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    //interred  machen   Aenderung
@@ -1245,7 +1240,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     mora_loop_count++;
 #endif
     if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
-    //test_int_std(strat->kIdeal);
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
     #endif

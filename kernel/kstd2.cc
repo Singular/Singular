@@ -1982,10 +1982,6 @@ void initBbaShift(ideal F,kStrategy strat)
     strat->initEcartPair = initEcartPairMora;
   else
     strat->initEcartPair = initEcartPairBba;
-  strat->kIdeal = NULL;
-  //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
-  //else              strat->kIdeal->rtyp=MODUL_CMD;
-  //strat->kIdeal->data=(void *)strat->Shdl;
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    //interred  machen   Aenderung
