@@ -3651,7 +3651,10 @@ static BOOLEAN jjDEGREE(leftv res, leftv v)
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currQuotient);
-  res->data=(void*)SPrintEnd();
+  char *s=SPrintEnd();
+  int l=strlen(s)-1;
+  s[l]='\0';
+  res->data=(void*)s;
   return FALSE;
 }
 static BOOLEAN jjDEFINED(leftv res, leftv v)
