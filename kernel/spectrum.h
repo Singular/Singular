@@ -10,18 +10,19 @@
 #include <kernel/npolygon.h>
 #include <kernel/splist.h>
 
-BOOLEAN    spectrumProc ( leftv,leftv );
+/*BOOLEAN    spectrumProc ( leftv,leftv );
 BOOLEAN    spectrumfProc( leftv,leftv );
 BOOLEAN    spaddProc    ( leftv,leftv,leftv );
 BOOLEAN    spmulProc    ( leftv,leftv,leftv );
 BOOLEAN    semicProc   ( leftv,leftv,leftv );
-BOOLEAN    semicProc3   ( leftv,leftv,leftv,leftv );
+BOOLEAN    semicProc3   ( leftv,leftv,leftv,leftv );*/ //TODO move to kernel
+
 BOOLEAN    hasTermOfDegree( poly h, int d, const ring r );
 int        hasOne( ideal J, const ring r );
 BOOLEAN    hasAxis( ideal J,int k, const ring r );
 poly       computeWC( const newtonPolygon &np,Rational max_weight, const ring r );
 void       computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF, const ring r );
-void       spectrumPrintError(spectrumState state);
+//void       spectrumPrintError(spectrumState state);
 BOOLEAN    ringIsLocal( const ring r);
 
 BOOLEAN inline hasConstTerm( poly h, const ring r )

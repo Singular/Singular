@@ -483,7 +483,7 @@ BOOLEAN ringIsLocal( const ring r )
 // ----------------------------------------------------------------------------
 // print error message corresponding to spectrumState state:
 // ----------------------------------------------------------------------------
-void spectrumPrintError(spectrumState state)
+/*void spectrumPrintError(spectrumState state)
 {
   switch( state )
   {
@@ -512,7 +512,7 @@ void spectrumPrintError(spectrumState state)
       WerrorS( "unknown error occurred" );
       break;
   }
-}
+}*/
 #endif /* HAVE_SPECTRUM */
 // ----------------------------------------------------------------------------
 //  spectrum.cc
