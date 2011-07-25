@@ -35,9 +35,9 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   polyset si, qi, ss;
   scfmon ex, ek;
   if (tailRing != currRing)
-    hisModule = idRankFreeModule(S, currRing, tailRing);
+    hisModule = id_RankFreeModule(S, currRing, tailRing);
   else
-    hisModule = idRankFreeModule(S);
+    hisModule = id_RankFreeModule(S,currRing);
   if (hisModule < 0)
     hisModule = 0;
   if (S!=NULL)

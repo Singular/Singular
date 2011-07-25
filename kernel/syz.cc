@@ -398,7 +398,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   tHomog hom=isNotHomog;
   ideal temp=NULL;
   intvec *w = NULL,**tempW;
-  int i,k,syzIndex = 0,j,rk_arg=si_max(1,(int)idRankFreeModule(arg));
+  int i,k,syzIndex = 0,j,rk_arg=si_max(1,(int)id_RankFreeModule(arg,currRing));
   int Kstd1_OldDeg=Kstd1_deg;
   BOOLEAN completeMinim;
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
@@ -512,7 +512,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 /*--- interreducing first -----------------------------------*/
     if (syzIndex>0)
     {
-      int rkI=idRankFreeModule(res[syzIndex]);
+      int rkI=id_RankFreeModule(res[syzIndex],currRing);
       rSetSyzComp(rkI);
     }
     if(! TEST_OPT_NO_SYZ_MINIM )
@@ -554,7 +554,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 //Print("die %d Modulegewichte sind:\n",w1->length());
 //w1->show();
 //PrintLn();
-      int max_comp = idRankFreeModule(res[syzIndex]);
+      int max_comp = id_RankFreeModule(res[syzIndex],currRing);
       k = max_comp - rGetCurrSyzLimit();
       assume(w != NULL);
       if (w != NULL)
@@ -843,7 +843,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   #ifdef SHOW_W
   PrintS("weights:");if (weights!=NULL) weights->show(); else Print("NULL"); PrintLn();
   #endif
-  int rkl=l = si_max(idRankFreeModule(res[0]),res[0]->rank);
+  int rkl=l = si_max(id_RankFreeModule(res[0],currRing),res[0]->rank);
   i = 0;
   while ((i<length) && (res[i]!=NULL))
   {

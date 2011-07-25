@@ -299,7 +299,7 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
   intvec * iv=NULL;
   int i,j;
 
-  if (idRankFreeModule(arg)==0)
+  if (id_RankFreeModule(arg,currRing)==0)
   {
     iv = idSort(arg);
     for (i=0;i<IDELEMS(arg);i++)
@@ -1988,7 +1988,7 @@ void syPrint(syStrategy syzstr)
       else
         rr = syzstr->fullres;
       (*resolution)[0]
-        = si_max(1,(int)idRankFreeModule(rr[0],
+        = si_max(1,(int)id_RankFreeModule(rr[0],
                                  (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       int k=0;
       while ((k<syzstr->length) && (rr[k]!=NULL))
@@ -2448,7 +2448,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   ring origR = currRing;
 
   if ((idIs0(arg)) ||
-      ((idRankFreeModule(arg)>0) && (!idHomModule(arg,NULL,&(syzstr->cw)))))
+      ((id_RankFreeModule(arg,currRing)>0) && (!idHomModule(arg,NULL,&(syzstr->cw)))))
   {
     syzstr->minres = (resolvente)omAlloc0Bin(char_ptr_bin);
     syzstr->length = 1;
@@ -2502,7 +2502,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->Firstelem = (int**)omAlloc0((*length+1)*sizeof(int*));
   syzstr->sev = (unsigned long **) omAlloc0((*length+1)*sizeof(unsigned long *));
   syzstr->bucket = kBucketCreate();
-  int len0=idRankFreeModule(temp)+1;
+  int len0=id_RankFreeModule(temp,currRing)+1;
 
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
@@ -2583,7 +2583,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
     syzstr->cw = NULL;
 
   if ((idIs0(arg)) ||
-      ((idRankFreeModule(arg)>0) && (!idTestHomModule(arg, NULL, syzstr->cw))))
+      ((id_RankFreeModule(arg,currRing)>0) && (!idTestHomModule(arg, NULL, syzstr->cw))))
   {
     syzstr->minres = (resolvente)omAlloc0Bin(char_ptr_bin);
     syzstr->length = 1;
@@ -2650,7 +2650,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   assume( syzstr->length == maxlength );
 
   syzstr->bucket = kBucketCreate();
-  int len0=idRankFreeModule(temp)+1;
+  int len0=id_RankFreeModule(temp,currRing)+1;
 
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);

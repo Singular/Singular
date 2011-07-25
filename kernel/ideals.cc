@@ -284,8 +284,8 @@ ideal idSectWithElim (ideal h1,ideal h2)
   assume(!idIs0(h1));
   assume(!idIs0(h2));
   assume(IDELEMS(h1)<=IDELEMS(h2));
-  assume(idRankFreeModule(h1)==0);
-  assume(idRankFreeModule(h2)==0);
+  assume(id_RankFreeModule(h1,currRing)==0);
+  assume(id_RankFreeModule(h2,currRing)==0);
   // add a new variable:
   int j;
   ring origRing=currRing;
@@ -350,8 +350,8 @@ ideal idSectWithElim (ideal h1,ideal h2)
 ideal idSect (ideal h1,ideal h2)
 {
   int i,j,k,length;
-  int flength = idRankFreeModule(h1);
-  int slength = idRankFreeModule(h2);
+  int flength = id_RankFreeModule(h1,currRing);
+  int slength = id_RankFreeModule(h2,currRing);
   int rank=si_min(flength,slength);
   if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
 
@@ -499,7 +499,7 @@ ideal idMultSect(resolvente arg, int length)
   {
     if (!idIs0(arg[i]))
     {
-      realrki=idRankFreeModule(arg[i]);
+      realrki=id_RankFreeModule(arg[i],currRing);
       k++;
       j += IDELEMS(arg[i]);
       if (realrki>maxrk) maxrk = realrki;
@@ -609,7 +609,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
   poly    p,q;
 
   if (idIs0(h1)) return NULL;
-  k = idRankFreeModule(h1);
+  k = id_RankFreeModule(h1,currRing);
   h2=idCopy(h1);
   i = IDELEMS(h2)-1;
   if (k == 0)
@@ -723,8 +723,8 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     }
     return result;
   }
-  int slength=(int)idRankFreeModule(h1);
-  k=si_max(1,slength /*idRankFreeModule(h1)*/);
+  int slength=(int)id_RankFreeModule(h1,currRing);
+  k=si_max(1,slength /*id_RankFreeModule(h1)*/);
 
   assume(currRing != NULL);
   ring orig_ring=currRing;
@@ -892,7 +892,7 @@ ideal idXXX (ideal  h1, int k)
 */
 ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 {
-  int   i, j, k, t, inputIsIdeal=idRankFreeModule(h1);
+  int   i, j, k, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
   poly  p=NULL, q, qq;
   intvec *w=NULL;
 
@@ -918,7 +918,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 
   BITSET save_verbose=verbose;
 
-  k=si_max(1,(int)idRankFreeModule(h1));
+  k=si_max(1,(int)id_RankFreeModule(h1,currRing));
 
   if ((k==1) && (!lift3)) verbose |=Sy_bit(V_IDLIFT);
 
@@ -1046,7 +1046,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 
 static void idPrepareStd(ideal s_temp, int k)
 {
-  int j,rk=idRankFreeModule(s_temp);
+  int j,rk=id_RankFreeModule(s_temp,currRing);
   poly p,q;
 
   if (rk == 0)
@@ -1080,7 +1080,7 @@ static void idPrepareStd(ideal s_temp, int k)
 ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
              BOOLEAN isSB, BOOLEAN divide, matrix *unit)
 {
-  int lsmod =idRankFreeModule(submod), i, j, k;
+  int lsmod =id_RankFreeModule(submod,currRing), i, j, k;
   int comps_to_add=0;
   poly p;
 
@@ -1124,7 +1124,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL))
       comps_to_add--;
   }
-  k=si_max(idRankFreeModule(mod),idRankFreeModule(submod));
+  k=si_max(id_RankFreeModule(mod,currRing),id_RankFreeModule(submod,currRing));
   if  ((k!=0) && (lsmod==0)) lsmod=1;
   k=si_max(k,(int)mod->rank);
   if (k<submod->rank) { WarnS("rk(submod) > rk(mod) ?");k=submod->rank; }
@@ -1363,8 +1363,8 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
   poly     p,q = NULL;
   int i,l,ll,k,kkk,kmax;
   int j = 0;
-  int k1 = idRankFreeModule(h1);
-  int k2 = idRankFreeModule(h2);
+  int k1 = id_RankFreeModule(h1,currRing);
+  int k2 = id_RankFreeModule(h2,currRing);
   tHomog   hom=isNotHomog;
 
   k=si_max(k1,k2);
@@ -2197,8 +2197,8 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   if (idIs0(h2))
     return idFreeModule(si_max(1,h2->ncols));
   if (!idIs0(h1))
-    flength = idRankFreeModule(h1);
-  slength = idRankFreeModule(h2);
+    flength = id_RankFreeModule(h1,currRing);
+  slength = id_RankFreeModule(h2,currRing);
   length  = si_max(flength,slength);
   if (length==0)
   {
@@ -2508,7 +2508,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   int i,next_gen,next_comp;
   ideal res=arg;
   if (!inPlace) res = idCopy(arg);
-  res->rank=si_max(res->rank,idRankFreeModule(res));
+  res->rank=si_max(res->rank,id_RankFreeModule(res,currRing));
   int *red_comp=(int*)omAlloc((res->rank+1)*sizeof(int));
   for (i=res->rank;i>=0;i--) red_comp[i]=i;
 
