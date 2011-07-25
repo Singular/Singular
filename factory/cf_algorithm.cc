@@ -385,6 +385,72 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
 }
 //}}}
 
+/// same as fdivides if true returns quotient quot of g by f otherwise quot == 0
+bool
+fdivides ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm& quot )
+{
+    quot= 0;
+    // trivial cases
+    if ( g.isZero() )
+        return true;
+    else if ( f.isZero() )
+        return false;
+
+    if ( (f.inCoeffDomain() || g.inCoeffDomain())
+         && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
+             || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
+    {
+        // if we are in a field all elements not equal to zero are units
+        if ( f.inCoeffDomain() )
+        {
+            quot= g/f;
+            return true;
+        }
+        else
+            // g.inCoeffDomain()
+            return false;
+    }
+
+    // we may assume now that both levels either equal LEVELBASE
+    // or are greater zero
+    int fLevel = f.level();
+    int gLevel = g.level();
+    if ( (gLevel > 0) && (fLevel == gLevel) )
+        // f and g are polynomials in the same main variable
+        if ( degree( f ) <= degree( g )
+             && fdivides( f.tailcoeff(), g.tailcoeff() )
+             && fdivides( f.LC(), g.LC() ) )
+        {
+            CanonicalForm q, r;
+            if (divremt( g, f, q, r ) && r.isZero())
+            {
+              quot= q;
+              return true;
+            }
+            else
+              return false;
+        }
+        else
+            return false;
+    else if ( gLevel < fLevel )
+        // g is a coefficient w.r.t. f
+        return false;
+    else
+    {
+        // either f is a coefficient w.r.t. polynomial g or both
+        // f and g are from a base domain (should be Z or Z/p^n,
+        // then)
+        CanonicalForm q, r;
+        if (divremt( g, f, q, r ) && r.isZero())
+        {
+          quot= q;
+          return true;
+        }
+        else
+          return false;
+    }
+}
+
 /// same as fdivides but handles zero divisors in Z_p[t]/(f)[x1,...,xn] for reducible f
 bool
 tryFdivides ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm& M, bool& fail )

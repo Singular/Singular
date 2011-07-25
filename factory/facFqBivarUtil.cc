@@ -414,12 +414,13 @@ CFFList multiplicity (CanonicalForm& F, const CFList& factors)
     return CFFList (CFFactor (F, 1));
   CFFList result;
   int multi= 0;
+  CanonicalForm quot;
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
-    while (fdivides (i.getItem(), F))
+    while (fdivides (i.getItem(), F, quot))
     {
       multi++;
-      F /= i.getItem();
+      F= quot;
     }
     if (multi > 0)
       result.append (CFFactor (i.getItem(), multi));

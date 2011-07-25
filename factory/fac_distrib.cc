@@ -65,7 +65,7 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
 {
     DEBINCLEVEL( cerr, "distributeLeadingCoeffs" );
     CanonicalForm ut, gt, d, ft;
-    CanonicalForm dd;
+    CanonicalForm dd, quot;
     CFFListIterator I;
     int m, j, i;
     lcG = CFArray( 1, r );
@@ -84,10 +84,10 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
         {
             ut = lc( G[j] );
             DEBOUTLN( cerr, "checking with " << ut );
-            while ( m > 0 && fdivides( D[i], ut ) )
+            while ( m > 0 && fdivides( D[i], ut, quot ) )
             {
                 DEBOUTLN( cerr, "match found" );
-                m--; ut /= D[i];
+                m--; ut= quot;
                 lcG[j] *= ft;
             }
             j++;
@@ -135,7 +135,7 @@ gfbAdjoin ( const CanonicalForm & F, CFList & L )
         L.append( F );
         return;
     }
-    CanonicalForm h, f = F;
+    CanonicalForm h, quot, f = F;
     CFListIterator i, j;
     for ( i = L; i.hasItem() && ! f.isOne(); )
     {
@@ -145,8 +145,8 @@ gfbAdjoin ( const CanonicalForm & F, CFList & L )
             i++;
             continue;
         }
-        while ( fdivides( h, f ) )
-            f /= h;
+        while ( fdivides( h, f, quot ) )
+            f= quot;
         CFList D( h );
         gfbAdjoin( i.getItem() / h, D );
         for ( j = D; j.hasItem(); j++ )

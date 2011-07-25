@@ -155,16 +155,16 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
 
   bool save_rat=!isOn (SW_RATIONAL);
   On (SW_RATIONAL);
-  CanonicalForm buf= F/Lc (F);
+  CanonicalForm quot, buf= F/Lc (F);
   CFFList factors;
   int multi;
   for (CFListIterator i= sqrfFactors; i.hasItem(); i++)
   {
     multi= 0;
     i.getItem() /= Lc (i.getItem()); //make factors monic
-    while (fdivides (i.getItem(), buf))
+    while (fdivides (i.getItem(), buf, quot))
     {
-      buf /= i.getItem();
+      buf= quot;
       multi++;
     }
     factors.append (CFFactor (i.getItem(), multi));

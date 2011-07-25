@@ -1773,12 +1773,12 @@ biDiophantine (const CanonicalForm& F, const CFList& factors, const int d)
     {
       bufFactors [k]= i.getItem();
     }
-    CanonicalForm b;
+    CanonicalForm b, quot;
     for (k= 0; k < factors.length(); k++) //TODO compute b's faster
     {
       b= 1;
-      if (fdivides (bufFactors[k], F))
-        b= F/bufFactors[k];
+      if (fdivides (bufFactors[k], F, quot))
+        b= quot;
       else
       {
         for (int l= 0; l < factors.length(); l++)
@@ -1862,15 +1862,15 @@ multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
   int k= 0;
   for (CFListIterator i= factors; i.hasItem(); i++, k++)
     bufFactors [k]= i.getItem();
-  CanonicalForm b;
+  CanonicalForm b, quot;
   CFList buf= M;
   buf.removeLast();
   buf.append (yToD);
   for (k= 0; k < factors.length(); k++) //TODO compute b's faster
   {
     b= 1;
-    if (fdivides (bufFactors[k], F))
-      b= F/bufFactors[k];
+    if (fdivides (bufFactors[k], F, quot))
+      b= quot;
     else
     {
       for (int l= 0; l < factors.length(); l++)
@@ -2908,25 +2908,26 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
     Pi [0] += mulMod (bufFactors [0], bufFactors[1] [1], MOD)*y;
 
   CFList products;
+  CanonicalForm quot;
   for (int i= 0; i < bufFactors.size(); i++)
   {
     if (degree (bufFactors[i], y) > 0)
     {
-      if (!fdivides (bufFactors[i] [0], F.getFirst()))
+      if (!fdivides (bufFactors[i] [0], F.getFirst(), quot))
       {
         bad= true;
         return CFList();
       }
-      products.append (F.getFirst()/bufFactors[i] [0]);
+      products.append (quot);
     }
     else
     {
-      if (!fdivides (bufFactors[i], F.getFirst()))
+      if (!fdivides (bufFactors[i], F.getFirst(), quot))
       {
         bad= true;
         return CFList();
       }
-      products.append (F.getFirst()/bufFactors[i]);
+      products.append (quot);
     }
   }
 
@@ -3135,27 +3136,27 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
   }
 
   CFList products;
-  CanonicalForm bufF= F.getFirst();
+  CanonicalForm quot, bufF= F.getFirst();
 
   for (int i= 0; i < bufFactors.size(); i++)
   {
     if (degree (bufFactors[i], y) > 0)
     {
-      if (!fdivides (bufFactors[i] [0], bufF))
+      if (!fdivides (bufFactors[i] [0], bufF, quot))
       {
         noOneToOne= true;
         return factors;
       }
-      products.append (bufF/bufFactors[i] [0]);
+      products.append (quot);
     }
     else
     {
-      if (!fdivides (bufFactors[i], bufF))
+      if (!fdivides (bufFactors[i], bufF, quot))
       {
         noOneToOne= true;
         return factors;
       }
-      products.append (bufF/bufFactors[i]);
+      products.append (quot);
     }
   }
 

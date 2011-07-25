@@ -213,7 +213,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
   buf= F;
 
   CanonicalForm g, LCBuf= LC (buf, Variable (1));
-  CanonicalForm buf2;
+  CanonicalForm buf2, quot;
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
@@ -254,7 +254,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
       g= prodMod (S, M);
       S.removeFirst();
       g /= myContent (g);
-      if (fdivides (g, buf))
+      if (fdivides (g, buf, quot))
       {
         buf2= reverseShift (g, evaluation);
         buf2 /= Lc (buf2);
@@ -263,7 +263,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
           if (degree (buf2, alpha) < degMipoBeta)
           {
             appendTestMapDown (result, buf2, info, source, dest);
-            buf /= g;
+            buf= quot;
             LCBuf= LC (buf, Variable (1));
             recombination= true;
             trueFactor= true;
@@ -347,7 +347,7 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
   TT= copy (factors);
   Variable y= F.level() - 1;
   bool recombination= false;
-  CanonicalForm h;
+  CanonicalForm h, quot;
   while (T.length() >= 2*s)
   {
     while (noSubset == false)
@@ -371,11 +371,11 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
       g= prodMod (S, M);
       S.removeFirst();
       g /= myContent (g);
-      if (fdivides (g, buf))
+      if (fdivides (g, buf, quot))
       {
         recombination= true;
         result.append (g);
-        buf /= g;
+        buf= quot;
         LCBuf= LC (buf, Variable(1));
         T= Difference (T, S);
         if (T.length() < 2*s || T.length() == s)
@@ -415,7 +415,7 @@ liftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   CanonicalForm buf= F;
   Variable y= F.mvar();
   CanonicalForm LCBuf= LC (buf, Variable (1));
-  CanonicalForm g;
+  CanonicalForm g, quot;
   CFList M= MOD;
   M.append (power (y, deg));
   int d= bound;
@@ -425,12 +425,12 @@ liftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   {
     g= mulMod (i.getItem(), LCBuf, M);
     g /= myContent (g);
-    if (fdivides (g, buf))
+    if (fdivides (g, buf, quot))
     {
       nBuf= degree (g, y) + degree (LC (g, 1), y);
       d -= nBuf;
       e= tmax (e, nBuf);
-      buf /= g;
+      buf= quot;
       LCBuf= LC (buf, Variable (1));
     }
   }
@@ -484,7 +484,7 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   CanonicalForm buf= F;
   Variable y= F.mvar();
   CanonicalForm LCBuf= LC (buf, Variable (1));
-  CanonicalForm g, gg;
+  CanonicalForm g, gg, quot;
   CFList M= MOD;
   M.append (power (y, deg));
   adaptedLiftBound= 0;
@@ -500,7 +500,7 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   {
     g= mulMod (i.getItem(), LCBuf, M);
     g /= myContent (g);
-    if (fdivides (g, buf))
+    if (fdivides (g, buf, quot))
     {
       gg= reverseShift (g, eval);
       gg /= Lc (gg);
@@ -508,7 +508,7 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
       {
         if (degree (gg, alpha) < degMipoBeta)
         {
-          buf /= g;
+          buf= quot;
           nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
           d -= nBuf;
           e= tmax (e, nBuf);
@@ -519,7 +519,7 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
       {
         if (!isInExtension (gg, gamma, k, delta, source, dest))
         {
-          buf /= g;
+          buf= quot;
           nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
           d -= nBuf;
           e= tmax (e, nBuf);
@@ -575,7 +575,7 @@ earlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   CanonicalForm buf= F;
   Variable y= F.mvar();
   CanonicalForm LCBuf= LC (buf, Variable (1));
-  CanonicalForm g;
+  CanonicalForm g, quot;
   CFList M= MOD;
   M.append (power (y, deg));
   adaptedLiftBound= 0;
@@ -586,13 +586,13 @@ earlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   {
     g= mulMod (i.getItem(), LCBuf, M);
     g /= myContent (g);
-    if (fdivides (g, buf))
+    if (fdivides (g, buf, quot))
     {
       result.append (g);
       nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
       d -= nBuf;
       e= tmax (e, nBuf);
-      buf /= g;
+      buf= quot;
       LCBuf= LC (buf, Variable (1));
       T= Difference (T, CFList (i.getItem()));
     }
@@ -630,7 +630,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   CanonicalForm buf= F;
   Variable y= F.mvar();
   CanonicalForm LCBuf= LC (buf, Variable (1));
-  CanonicalForm g, gg;
+  CanonicalForm g, gg, quot;
   CFList M= MOD;
   M.append (power (y, deg));
   adaptedLiftBound= 0;
@@ -647,7 +647,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   {
     g= mulMod (i.getItem(), LCBuf, M);
     g /= myContent (g);
-    if (fdivides (g, buf))
+    if (fdivides (g, buf, quot))
     {
       gg= reverseShift (g, eval);
       gg /= Lc (gg);
@@ -656,7 +656,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
         if (degree (gg, alpha) < degMipoBeta)
         {
           appendTestMapDown (result, gg, info, source, dest);
-          buf /= g;
+          buf= quot;
           nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
           d -= nBuf;
           e= tmax (e, nBuf);
@@ -669,7 +669,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
         if (!isInExtension (gg, gamma, k, delta, source, dest))
         {
           appendTestMapDown (result, gg, info, source, dest);
-          buf /= g;
+          buf= quot;
           nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
           d -= nBuf;
           e= tmax (e, nBuf);
@@ -1165,7 +1165,7 @@ CFList
 leadingCoeffReconstruction (const CanonicalForm& F, const CFList& factors,
                             const CFList& M)
 {
-  CanonicalForm buf= F;
+  CanonicalForm quot, buf= F;
   CanonicalForm LCBuf= LC (buf, 1);
 
   CFList result;
@@ -1175,9 +1175,9 @@ leadingCoeffReconstruction (const CanonicalForm& F, const CFList& factors,
     CanonicalForm tmp= i.getItem();
     tmp= mulMod (tmp, LCBuf, M);
     tmp= tmp/content (tmp, 1);
-    if (fdivides (tmp, buf))
+    if (fdivides (tmp, buf, quot))
     {
-      buf /= tmp;
+      buf= quot;
       result.append (tmp);
       LCBuf= LC (buf, 1);
     }
@@ -1934,7 +1934,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
   T= factors;
   int s= 1;
   CFList result;
-  CanonicalForm buf= F;
+  CanonicalForm quot, buf= F;
 
   CanonicalForm g;
   CanonicalForm buf2;
@@ -1975,7 +1975,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
 
       g= prod (S);
       g /= myContent (g);
-      if (fdivides (g, buf))
+      if (fdivides (g, buf, quot))
       {
         buf2= reverseShift (g, evaluation);
         buf2 /= Lc (buf2);
@@ -1984,7 +1984,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           if (degree (buf2, alpha) < degMipoBeta)
           {
             appendTestMapDown (result, buf2, info, source, dest);
-            buf /= g;
+            buf= quot;
             recombination= true;
             trueFactor= true;
           }
@@ -1994,7 +1994,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           if (!isInExtension (buf2, gamma, k, delta, source, dest))
           {
             appendTestMapDown (result, buf2, info, source, dest);
-            buf /= g;
+            buf= quot;
             recombination= true;
             trueFactor= true;
           }

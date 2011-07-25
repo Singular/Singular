@@ -273,7 +273,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   T= factors;
 
   CFList result;
-  CanonicalForm buf, buf2;
+  CanonicalForm buf, buf2, quot;
 
   buf= F;
 
@@ -333,7 +333,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
           g= prodMod (S, M);
           S.removeFirst();
           g /= content (g, Variable (1));
-          if (fdivides (g, buf))
+          if (fdivides (g, buf, quot))
           {
             buf2= g (y - eval, y);
             buf2 /= Lc (buf2);
@@ -342,7 +342,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
             {
               if (degree (buf2, alpha) < degMipoBeta)
               {
-                buf /= g;
+                buf= quot;
                 LCBuf= LC (buf, Variable (1));
                 recombination= true;
                 appendTestMapDown (result, buf2, info, source, dest);
@@ -353,7 +353,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
             {
               if (!isInExtension (buf2, gamma, k, delta, source, dest))
               {
-                buf /= g;
+                buf= quot;
                 LCBuf= LC (buf, Variable (1));
                 recombination= true;
                 appendTestMapDown (result, buf2, info, source, dest);
@@ -460,7 +460,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   T= factors;
   CFList result;
   CanonicalForm LCBuf= LC (F, Variable (1));
-  CanonicalForm g, buf= F;
+  CanonicalForm g, quot, buf= F;
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
@@ -511,11 +511,12 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           g= prodMod (S, M);
           S.removeFirst();
           g /= content (g, Variable (1));
-          if (fdivides (g, buf))
+
+          if (fdivides (g, buf, quot))
           {
             recombination= true;
             result.append (g);
-            buf /= g;
+            buf= quot;
             LCBuf= LC (buf, Variable(1));
             T= Difference (T, S);
 
@@ -627,7 +628,7 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
   CFList T= factors;
   CanonicalForm buf= F;
   CanonicalForm LCBuf= LC (buf, Variable (1));
-  CanonicalForm g;
+  CanonicalForm g, quot;
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
   int d= degree (F) + degree (LCBuf);
@@ -644,10 +645,10 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
       {
         g= mulMod2 (i.getItem(), LCBuf, M);
         g /= content (g, Variable (1));
-        if (fdivides (g, buf))
+        if (fdivides (g, buf, quot))
         {
           result.append (g);
-          buf /= g;
+          buf= quot;
           d -= degree (g) + degree (LC (g, Variable (1)));
           LCBuf= LC (buf, Variable (1));
           T= Difference (T, CFList (i.getItem()));
@@ -702,6 +703,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   int degMipoBeta= 1;
   if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
+  CanonicalForm quot;
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
     if (!bufDegs1.find (degree (i.getItem(), 1)))
@@ -715,7 +717,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
       {
         g= mulMod2 (i.getItem(), LCBuf, M);
         g /= content (g, Variable (1));
-        if (fdivides (g, buf))
+        if (fdivides (g, buf, quot))
         {
           buf2= g (y - eval, y);
           buf2 /= Lc (buf2);
@@ -725,7 +727,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
             if (degree (buf2, alpha) < degMipoBeta)
             {
               appendTestMapDown (result, buf2, info, source, dest);
-              buf /= g;
+              buf= quot;
               d -= degree (g) + degree (LC (g, Variable (1)));
               LCBuf= LC (buf, Variable (1));
               trueFactor= true;
@@ -736,7 +738,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
             if (!isInExtension (buf2, gamma, k, delta, source, dest))
             {
               appendTestMapDown (result, buf2, info, source, dest);
-              buf /= g;
+              buf= quot;
               d -= degree (g) + degree (LC (g, Variable (1)));
               LCBuf= LC (buf, Variable (1));
               trueFactor= true;
@@ -958,6 +960,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
   Variable y= Variable (2);
   Variable x= Variable (1);
   CanonicalForm yToL= power (y, liftBound);
+  CanonicalForm quot;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (factorsFoundIndex [i - 1] == 1)
@@ -986,11 +989,11 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     buf *= LC (F, x);
     buf= mod (buf, yToL);
     buf /= content (buf, x);
-    if (fdivides (buf, F))
+    if (fdivides (buf, F, quot))
     {
       factorsFoundIndex[i - 1]= 1;
       factorsFound++;
-      F /= buf;
+      F= quot;
       F /= Lc (F);
       reconstructedFactors.append (buf);
     }
@@ -1012,6 +1015,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
 {
   Variable y= Variable (2);
   Variable x= Variable (1);
+  CanonicalForm quot;
   CanonicalForm yToL= power (y, liftBound);
   for (long i= 1; i <= N.NumCols(); i++)
   {
@@ -1041,11 +1045,11 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     buf *= LC (F, x);
     buf= mod (buf, yToL);
     buf /= content (buf, x);
-    if (fdivides (buf, F))
+    if (fdivides (buf, F, quot))
     {
       factorsFoundIndex[i - 1]= 1;
       factorsFound++;
-      F /= buf;
+      F= quot;
       F /= Lc (F);
       reconstructedFactors.append (buf);
     }
@@ -1068,6 +1072,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
   Variable x= Variable (1);
   CanonicalForm F= G;
   CanonicalForm yToL= power (y, precision);
+  CanonicalForm quot;
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
@@ -1089,9 +1094,9 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     buf *= LC (F, x);
     buf= mod (buf, yToL);
     buf /= content (buf, x);
-    if (fdivides (buf, F))
+    if (fdivides (buf, F, quot))
     {
-      F /= buf;
+      F= quot;
       F /= Lc (F);
       result.append (buf);
       bufFactors= Difference (bufFactors, factorsConsidered);
@@ -1117,6 +1122,7 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   Variable x= Variable (1);
   CanonicalForm F= G;
   CanonicalForm yToL= power (y, precision);
+  CanonicalForm quot;
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
@@ -1139,9 +1145,9 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
     buf *= LC (F, x);
     buf= mod (buf, yToL);
     buf /= content (buf, x);
-    if (fdivides (buf, F))
+    if (fdivides (buf, F, quot))
     {
-      F /= buf;
+      F= quot;
       F /= Lc (F);
       result.append (buf2);
       bufFactors= Difference (bufFactors, factorsConsidered);
@@ -1176,7 +1182,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
-  CanonicalForm buf2;
+  CanonicalForm buf2, quot;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (zeroOneVecs [i - 1] == 0)
@@ -1200,9 +1206,9 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     {
       if (degree (buf2, alpha) < 1)
       {
-        if (fdivides (buf, F))
+        if (fdivides (buf, F, quot))
         {
-          F /= buf;
+          F= quot;
           F /= Lc (F);
           result.append (buf2);
           bufFactors= Difference (bufFactors, factorsConsidered);
@@ -1215,9 +1221,9 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
 
       if (!isInExtension (buf2, gamma, k, delta, source, dest))
       {
-        if (fdivides (buf, F))
+        if (fdivides (buf, F, quot))
         {
-          F /= buf;
+          F= quot;
           F /= Lc (F);
           result.append (buf2);
           bufFactors= Difference (bufFactors, factorsConsidered);
@@ -1244,6 +1250,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   Variable x= Variable (1);
   CanonicalForm F= G;
   CanonicalForm yToL= power (y, precision);
+  CanonicalForm quot;
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
@@ -1265,9 +1272,9 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
     buf *= LC (F, x);
     buf= mod (buf, yToL);
     buf /= content (buf, x);
-    if (fdivides (buf, F))
+    if (fdivides (buf, F, quot))
     {
-      F /= buf;
+      F= quot;
       F /= Lc (F);
       result.append (buf);
       bufFactors= Difference (bufFactors, factorsConsidered);
@@ -1299,6 +1306,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
   CanonicalForm gamma= info.getGamma();
   CanonicalForm delta= info.getDelta();
   CanonicalForm yToL= power (y, liftBound);
+  CanonicalForm quot;
   CFList source, dest;
   for (long i= 1; i <= N.NumCols(); i++)
   {
@@ -1334,11 +1342,11 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     {
       if (degree (buf2, alpha) < 1)
       {
-        if (fdivides (buf, F))
+        if (fdivides (buf, F, quot))
         {
           factorsFoundIndex[i - 1]= 1;
           factorsFound++;
-          F /= buf;
+          F= quot;
           F /= Lc (F);
           buf2= mapDown (buf2, info, source, dest);
           reconstructedFactors.append (buf2);
@@ -1350,11 +1358,11 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
       CFList source, dest;
       if (!isInExtension (buf2, gamma, k, delta, source, dest))
       {
-        if (fdivides (buf, F))
+        if (fdivides (buf, F, quot))
         {
           factorsFoundIndex[i - 1]= 1;
           factorsFound++;
-          F /= buf;
+          F= quot;
           F /= Lc (F);
           buf2= mapDown (buf2, info, source, dest);
           reconstructedFactors.append (buf2);
