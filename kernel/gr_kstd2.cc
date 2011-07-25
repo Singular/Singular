@@ -1013,33 +1013,29 @@ void nc_gr_initBba(ideal F, kStrategy strat)
     strat->initEcartPair = initEcartPairMora;
   else
     strat->initEcartPair = initEcartPairBba;
-  strat->kIdeal = NULL;
-  //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
-  //else              strat->kIdeal->rtyp=MODUL_CMD;
-  //strat->kIdeal->data=(void *)strat->Shdl;
-  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
-  {
-     //interred  machen   Aenderung
-     pFDegOld=pFDeg;
-     pLDegOld=pLDeg;
-  //   h=ggetid("ecart");
-  //   if ((h!=NULL) && (IDTYP(h)==INTVEC_CMD))
-  //   {
-  //     ecartWeights=iv2array(IDINTVEC(h));
-  //   }
-  //   else
-    {
-      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
-      /*uses automatic computation of the ecartWeights to set them*/
-      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
-    }
-    pFDeg=totaldegreeWecart;
-    pLDeg=maxdegreeWecart;
-    for(i=1; i<=(currRing->N); i++)
-      Print(" %d",ecartWeights[i]);
-    PrintLn();
-    mflush();
-  }
+//  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
+//  {
+//     //interred  machen   Aenderung
+//     pFDegOld=pFDeg;
+//     pLDegOld=pLDeg;
+//  //   h=ggetid("ecart");
+//  //   if ((h!=NULL) && (IDTYP(h)==INTVEC_CMD))
+//  //   {
+//  //     ecartWeights=iv2array(IDINTVEC(h));
+//  //   }
+//  //   else
+//    {
+//      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
+//      /*uses automatic computation of the ecartWeights to set them*/
+//      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
+//    }
+//    pFDeg=totaldegreeWecart;
+//    pLDeg=maxdegreeWecart;
+//    for(i=1; i<=(currRing->N); i++)
+//      Print(" %d",ecartWeights[i]);
+//    PrintLn();
+//    mflush();
+//  }
 }
 
 #define MYTEST 0
