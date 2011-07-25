@@ -5309,7 +5309,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 
   if (maxIndex >= 0)
   {
-    e = pLDeg(h,&l,currRing)-p_FDeg(h,currRing);
+    e = currRing->pLDeg(h,&l,currRing)-p_FDeg(h,currRing);
     do
     {
       if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
@@ -5326,7 +5326,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 #endif
         // pDelete(&h);
         if (h == NULL) return NULL;
-        e = pLDeg(h,&l,currRing)-p_FDeg(h,currRing);
+        e = currRing->pLDeg(h,&l,currRing)-p_FDeg(h,currRing);
         j = 0;
         not_sev = ~ pGetShortExpVector(h);
       }
@@ -6487,7 +6487,7 @@ skStrategy::skStrategy()
   tailBin = omGetStickyBinOfBin(currRing->PolyBin);
 #endif
   pOrigFDeg = currRing->pFDeg;
-  pOrigLDeg = pLDeg;
+  pOrigLDeg = currRing->pLDeg;
 }
 
 

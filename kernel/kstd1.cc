@@ -498,7 +498,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   int j = 0;
   int z = 10;
   int o = H.SetpFDeg();
-  H.ecart = pLDeg(H.p,&H.length,currRing)-o;
+  H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
   if ((flag & 2) == 0) cancelunit(&H,TRUE);
   H.sev = pGetShortExpVector(H.p);
   unsigned long not_sev = ~ H.sev;
@@ -577,7 +577,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
       if ((flag &2 ) == 0) cancelunit(&H,TRUE);
-      H.ecart = pLDeg(H.p,&(H.length),currRing)-o;
+      H.ecart = currRing->pLDeg(H.p,&(H.length),currRing)-o;
       j = 0;
       H.sev = pGetShortExpVector(H.p);
       not_sev = ~ H.sev;
@@ -1164,7 +1164,7 @@ void initMora(ideal F,kStrategy strat)
 //      mflush();
 //    }
 //  }
-  kOptimizeLDeg(pLDeg, strat);
+  kOptimizeLDeg(currRing->pLDeg, strat);
 }
 
 #ifdef HAVE_ASSUME
@@ -1745,7 +1745,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
     pFDegOld = currRing->pFDeg;
-    pLDegOld = pLDeg;
+    pLDegOld = currRing->pLDeg;
     pSetDegProcs(currRing,kHomModDeg);
     toReset = TRUE;
   }
@@ -1770,7 +1770,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       if (vw == NULL)
       {
         pFDegOld = currRing->pFDeg;
-        pLDegOld = pLDeg;
+        pLDegOld = currRing->pLDeg;
         pSetDegProcs(currRing,kModDeg);
         toReset = TRUE;
       }
@@ -1867,7 +1867,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
     pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
     pFDegOld = currRing->pFDeg;
-    pLDegOld = pLDeg;
+    pLDegOld = currRing->pLDeg;
     pSetDegProcs(currRing,kHomModDeg);
     toReset = TRUE;
   }
@@ -1892,7 +1892,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
       if (vw == NULL)
       {
         pFDegOld = currRing->pFDeg;
-        pLDegOld = pLDeg;
+        pLDegOld = currRing->pLDeg;
         pSetDegProcs(currRing,kModDeg);
         toReset = TRUE;
       }
@@ -1991,9 +1991,9 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     {
       kModW = *w;
       strat->kModW = *w;
-      assume(pFDeg != NULL && pLDeg != NULL);
+      assume(currRing->pFDeg != NULL && currRing->pLDeg != NULL);
       pFDegOld = currRing->pFDeg;
-      pLDegOld = pLDeg;
+      pLDegOld = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
 
       toReset = TRUE;
@@ -2302,7 +2302,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     {
       strat->kModW = kModW = w;
       pFDegOld = currRing->pFDeg;
-      pLDegOld = pLDeg;
+      pLDegOld = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
       toReset = TRUE;
     }
