@@ -3623,6 +3623,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 }
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
+  SPrintStart();
 #ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
@@ -3645,12 +3646,12 @@ static BOOLEAN jjDEGREE(leftv res, leftv v)
     idDelete(&vv);
     rChangeCurrRing(origR);
     rDelete(tempR);
-    return FALSE;
   }
 #endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currQuotient);
+  res->data=(void*)SPrintEnd();
   return FALSE;
 }
 static BOOLEAN jjDEFINED(leftv res, leftv v)
