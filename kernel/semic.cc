@@ -25,6 +25,7 @@
 #endif
 
 #include<misc/intvec.h>
+#include<misc/mylimits.h>
 #include"GMPrat.h"
 #include"semic.h"
 
