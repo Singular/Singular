@@ -194,9 +194,9 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   number tmp1;
   poly tmp2, tmp3;
   poly lead_mult = p_ISet(1, tailRing);
-  if (leadRing->ch <= k_ind2 + a_ind2)
+  if (n_GetChar(leadRing->cf) <= k_ind2 + a_ind2)
   {
-    int too_much = k_ind2 + a_ind2 - leadRing->ch;
+    int too_much = k_ind2 + a_ind2 - n_GetChar(leadRing->cf);
     int s_exp;
     zeroPoly = p_ISet(a, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
@@ -1019,7 +1019,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif /* KDEBUG */
 
 #ifdef HAVE_TAIL_RING
-  if(!idIs0(F) &&(!rField_is_Ring()))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
+  if(!idIs0(F) &&(!rField_is_Ring(currRing)))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
     kStratInitChangeTailRing(strat);
 #endif
   if (BVERBOSE(23))
@@ -1043,8 +1043,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
        *stops computation if
@@ -1053,8 +1053,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
        */
       while ((strat->Ll >= 0)
         && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
         )
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       if (strat->Ll<0) break;
@@ -1278,15 +1278,15 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
-  if (TEST_OPT_WEIGHTM)
-  {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+//    if (ecartWeights)
+//    {
+//      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
+//      ecartWeights=NULL;
+//    }
+//  }
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
@@ -1344,7 +1344,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
     #ifdef HAVE_RINGS
-    if (rField_is_Ring())
+    if (rField_is_Ring(currRing))
     {
       p = redtailBba_Z(p,max_ind,strat);
     }
@@ -1419,7 +1419,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
         #ifdef HAVE_RINGS
-        if (rField_is_Ring())
+        if (rField_is_Ring(currRing))
         {
           p = redtailBba_Z(p,max_ind,strat);
         }
@@ -1506,8 +1506,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
        *stops computation if
@@ -1516,8 +1516,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
        */
       while ((strat->Ll >= 0)
         && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
         )
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       if (strat->Ll<0) break;
@@ -1790,15 +1790,15 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
-  if (TEST_OPT_WEIGHTM)
-  {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+//    if (ecartWeights)
+//    {
+//      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
+//      ecartWeights=NULL;
+//    }
+//  }
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
@@ -1986,30 +1986,30 @@ void initBbaShift(ideal F,kStrategy strat)
   //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
   //else              strat->kIdeal->rtyp=MODUL_CMD;
   //strat->kIdeal->data=(void *)strat->Shdl;
-  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
-  {
-    //interred  machen   Aenderung
-    pFDegOld=pFDeg;
-    pLDegOld=pLDeg;
-    //h=ggetid("ecart");
-    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
-    //{
-    //  ecartWeights=iv2array(IDINTVEC(h));
-    //}
-    //else
-    {
-      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
-      /*uses automatic computation of the ecartWeights to set them*/
-      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
-    }
-    pRestoreDegProcs(totaldegreeWecart, maxdegreeWecart);
-    if (TEST_OPT_PROT)
-    {
-      for(i=1; i<=(currRing->N); i++)
-        Print(" %d",ecartWeights[i]);
-      PrintLn();
-      mflush();
-    }
-  }
+//  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
+//  {
+//    //interred  machen   Aenderung
+//    pFDegOld=currRing->pFDeg;
+//    pLDegOld=pLDeg;
+//    //h=ggetid("ecart");
+//    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
+//    //{
+//    //  ecartWeights=iv2array(IDINTVEC(h));
+//    //}
+//    //else
+//    {
+//      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
+//      /*uses automatic computation of the ecartWeights to set them*/
+//      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights,currRing);
+//    }
+//    pRestoreDegProcs(currRing,totaldegreeWecart, maxdegreeWecart);
+//    if (TEST_OPT_PROT)
+//    {
+//      for(i=1; i<=(currRing->N); i++)
+//        Print(" %d",ecartWeights[i]);
+//      PrintLn();
+//      mflush();
+//    }
+//  }
 }
 #endif
