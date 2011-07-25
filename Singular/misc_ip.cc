@@ -425,6 +425,7 @@ void singular_example(char *str)
         if (strlen(s)>5)
         {
           iiEStart(s,IDPROC(h));
+          omFree((ADDRESS)s);
           return;
         }
         else omFree((ADDRESS)s);
@@ -457,7 +458,6 @@ void singular_example(char *str)
       if (got != length)
       {
         Werror("Error while reading file %s", sing_file);
-        omFree(s);
       }
       else
       {
@@ -467,6 +467,7 @@ void singular_example(char *str)
         iiEStart(s, NULL);
         si_echo = old_echo;
       }
+      omFree(s);
     }
     else
     {

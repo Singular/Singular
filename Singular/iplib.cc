@@ -293,6 +293,17 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   return NULL;
 }
 
+BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
+{
+  newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
+               pi, l );
+  BOOLEAN err=yyparse();
+  if (sLastPrinted.rtyp!=0)
+  {
+    sLastPrinted.CleanUp();
+  }
+  return err;
+}
 /*2
 * start a proc
 * parameters are built as exprlist
@@ -322,10 +333,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
 //      omUpdateInfo();
 //      int m=om_Info.UsedBytes;
 //      Print("proc %s, mem=%d\n",IDID(pn),m);
-      newBuffer( omStrDup(pi->data.s.body), BT_proc,
-                 pi, pi->data.s.body_lineno-(v!=NULL) );
     }
   }
+  else return TRUE;
   /* generate argument list ======================================*/
   if (v!=NULL)
   {
@@ -347,14 +357,8 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   }
   else
   {
-    err=yyparse();
-#ifndef NDEBUG
-    checkall();
-#endif
-    if (sLastPrinted.rtyp!=0)
-    {
-      sLastPrinted.CleanUp();
-    }
+    err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(v!=NULL));
+
     //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
     killlocals(myynest);
 #ifndef NDEBUG
@@ -614,9 +618,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   BOOLEAN err;
   int old_echo=si_echo;
 
-  newBuffer( example, BT_example, pi,
-             (pi != NULL ? pi->data.s.example_lineno: 0));
-
   iiCheckNest();
   procstack->push(example);
 #ifdef USE_IILOCALRING
@@ -629,12 +630,9 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   }
   myynest++;
   iiRETURNEXPR[myynest].Init();
-  err=yyparse();
-  if (sLastPrinted.rtyp!=0)
-  {
-    sLastPrinted.CleanUp();
-    //memset(&sLastPrinted,0,sizeof(sleftv)); //done by CleanUp
-  }
+
+  err=iiAllStart(pi,example,BT_example,(pi != NULL ? pi->data.s.example_lineno: 0));
+
   killlocals(myynest);
   myynest--;
   si_echo=old_echo;
@@ -1078,8 +1076,8 @@ void* binary_module_function(const char* newlib, const char* funcname)
 #else
   const char* bin_dir = feGetResource('b');
   if (!bin_dir)  { return NULL; }
-  
-  char path_name[MAXPATHLEN]; 
+
+  char path_name[MAXPATHLEN];
   sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, newlib, MODULE_SUFFIX_STRING);
 
   void* openlib = dynl_open(path_name);
