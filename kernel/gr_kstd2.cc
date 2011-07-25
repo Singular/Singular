@@ -55,7 +55,7 @@ int redGrFirst (LObject* h,kStrategy strat)
   int pass = 0;
   int j = 0;
 
-  d = pFDeg((*h).p,currRing)+(*h).ecart;
+  d = currRing->pFDeg((*h).p,currRing)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
   loop
   {
@@ -105,12 +105,12 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-        if (rField_is_Zp_a()) p_Content(h->p,currRing);
+        if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
         else h->pCleardenom();// also does a p_Content
       }
       /*computes the ecart*/
-      d = pLDeg((*h).p,&((*h).length),currRing);
-      (*h).FDeg=pFDeg((*h).p,currRing);
+      d = currRing->pLDeg((*h).p,&((*h).length),currRing);
+      (*h).FDeg=currRing->pFDeg((*h).p,currRing);
       (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
       if ((strat->syzComp!=0) && !strat->honey)
       {
@@ -231,11 +231,11 @@ int redGrRatGB (LObject* h,kStrategy strat)
   assume(strat->tailRing==currRing);
 
   ratGB_divide_out((*h).p);
-  d = pFDeg((*h).p,currRing)+(*h).ecart;
+  d = currRing->pFDeg((*h).p,currRing)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
   if (!TEST_OPT_INTSTRATEGY)
   {
-    if (rField_is_Zp_a()) p_Content(h->p,currRing);
+    if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
     else h->pCleardenom();// also does a pContentRat
   }
   loop
@@ -272,7 +272,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
           else h->pCleardenom();// also does a p_Content
         }
 
@@ -290,8 +290,8 @@ int redGrRatGB (LObject* h,kStrategy strat)
           return 0;
         }
         ratGB_divide_out((*h).p);
-        d = pLDeg((*h).p,&((*h).length),currRing);
-        (*h).FDeg=pFDeg((*h).p,currRing);
+        d = currRing->pLDeg((*h).p,&((*h).length),currRing);
+        (*h).FDeg=currRing->pFDeg((*h).p,currRing);
         (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
         /*- try to reduce the s-polynomial again -*/
         pass++;
@@ -322,7 +322,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
     if (p_LmDivisibleByPart(strat->S[j],(*h).p,currRing,
         currRing->real_var_start,currRing->real_var_end))
     {
-      int a_e=(p_Totaldegree(strat->S[j],currRing)-pFDeg(strat->S[j],currRing));
+      int a_e=(p_Totaldegree(strat->S[j],currRing)-currRing->pFDeg(strat->S[j],currRing));
 #ifdef KDEBUG
       if(TEST_OPT_DEBUG)
       {
@@ -471,7 +471,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
           else h->pCleardenom();// also does a pContent
         }
         if (strat->syzComp!=0)
@@ -495,7 +495,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
           else h->pCleardenom();// also does a p_Content
         }
 /*
@@ -524,7 +524,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
   int at,d,i;
   int j = 0;
   int pass = 0;
-  int reddeg = pFDeg((*h).p,currRing);
+  int reddeg = currRing->pFDeg((*h).p,currRing);
 
   if (TEST_OPT_DEBUG)
   {
@@ -577,7 +577,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
       }
       /*- try to reduce the s-polynomial -*/
       pass++;
-      d = pFDeg((*h).p,currRing);
+      d = currRing->pFDeg((*h).p,currRing);
       if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
       {
         at = posInL11(strat->L,strat->Ll,h,strat);
@@ -615,7 +615,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG) PrintLn();
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          if (rField_is_Zp_a(currRing)) p_Content(h->p,currRing);
           else h->pCleardenom();// also does a p_Content
         }
         enterT((*h),strat);
@@ -643,7 +643,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
   int i,j,at,reddeg,d,pass,ei;
 
   pass = j = 0;
-  d = reddeg = pFDeg((*h).p,currRing)+(*h).ecart;
+  d = reddeg = currRing->pFDeg((*h).p,currRing)+(*h).ecart;
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
@@ -736,9 +736,9 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       }
       /* compute the ecart */
       if (ei <= (*h).ecart)
-        (*h).ecart = d-pFDeg((*h).p,currRing);
+        (*h).ecart = d-currRing->pFDeg((*h).p,currRing);
       else
-        (*h).ecart = d-pFDeg((*h).p,currRing)+ei-(*h).ecart;
+        (*h).ecart = d-currRing->pFDeg((*h).p,currRing)+ei-(*h).ecart;
 //      if (strat->syzComp)
 //      {
 //        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
@@ -758,7 +758,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       *-if the number of pre-defined reductions jumps
       */
       pass++;
-      d = pFDeg((*h).p,currRing)+(*h).ecart;
+      d = currRing->pFDeg((*h).p,currRing)+(*h).ecart;
       if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
       {
         at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -824,9 +824,9 @@ static int nc_redBest (LObject*  h,kStrategy strat)
   pass = j = 0;
 
   if (strat->honey)
-    reddeg = pFDeg((*h).p,currRing)+(*h).ecart;
+    reddeg = currRing->pFDeg((*h).p,currRing)+(*h).ecart;
   else
-    reddeg = pFDeg((*h).p,currRing);
+    reddeg = currRing->pFDeg((*h).p,currRing);
   loop
   {
     if (pDivisibleBy(strat->T[j].p,(*h).p))
@@ -923,7 +923,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
       if (strat->honey || pLexOrder)
       {
         pass++;
-        d = pFDeg((*h).p,currRing);
+        d = currRing->pFDeg((*h).p,currRing);
         if (strat->honey)
           d += (*h).ecart;
         if ((strat->Ll >= 0) && ((pass > strat->LazyPass) || (d > reddeg)))
@@ -1016,8 +1016,8 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //     //interred  machen   Aenderung
-//     pFDegOld=pFDeg;
-//     pLDegOld=pLDeg;
+//     pFDegOld=currRing->pFDeg;
+//     pLDegOld=currRing->pLDeg;
 //  //   h=ggetid("ecart");
 //  //   if ((h!=NULL) && (IDTYP(h)==INTVEC_CMD))
 //  //   {
@@ -1029,8 +1029,8 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 //      /*uses automatic computation of the ecartWeights to set them*/
 //      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
 //    }
-//    pFDeg=totaldegreeWecart;
-//    pLDeg=maxdegreeWecart;
+//    currRing->pFDeg=totaldegreeWecart;
+//    currRing->pLDeg=maxdegreeWecart;
 //    for(i=1; i<=(currRing->N); i++)
 //      Print(" %d",ecartWeights[i]);
 //    PrintLn();
@@ -1095,8 +1095,8 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
-    && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+    && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+       || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
       *stops computation if
@@ -1276,16 +1276,16 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
      completeReduce(strat);
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
-  if (TEST_OPT_WEIGHTM)
-  {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    currRing->pFDeg=pFDegOld;
+//    currRing->pLDeg=pLDegOld;
+//    if (ecartWeights)
+//    {
+//      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
+//      ecartWeights=NULL;
+//    }
+//  }
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
