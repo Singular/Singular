@@ -1019,15 +1019,10 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             {
                 CanonicalForm d;
 #if 1
-                do{ d = gcd_poly( f, g ); }
-                while ((!fdivides(d,f)) || (!fdivides(d,g)));
+                d = gcd_poly( f, g );
 #else
-                while(1)
-                {
-                  d = gcd_poly( f, g );
-                  if ((fdivides(d,f)) && (fdivides(d,g))) break;
-                  printf("g"); fflush(stdout);
-                }
+                d = gcd_poly( f, g );
+                printf("g"); fflush(stdout);
 #endif
                 return abs( d );
             }
@@ -1040,8 +1035,7 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
                 On( SW_RATIONAL );
                 CanonicalForm F = f * l, G = g * l;
                 Off( SW_RATIONAL );
-                do { l = gcd_poly( F, G ); }
-                while ((!fdivides(l,F)) || (!fdivides(l,G)));
+                l = gcd_poly( F, G );
                 On( SW_RATIONAL );
                 return abs( l );
             }
