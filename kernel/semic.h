@@ -23,7 +23,7 @@ typedef enum
 
 } interval_status;
 
-typedef enum
+/*typedef enum
 {
     semicOK,
     semicMulNegative,
@@ -55,7 +55,7 @@ typedef enum
     semicListMilnorWrong,
     semicListPGWrong
 
-} semicState;
+} semicState; */ //TODO move to Singular
 
 class spectrum
 {

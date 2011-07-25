@@ -17,7 +17,7 @@
 
 #include <kernel/npolygon.h>
 
-enum    spectrumState
+/*enum    spectrumState
 {
     spectrumOK,
     spectrumZero,
@@ -28,7 +28,7 @@ enum    spectrumState
     spectrumWrongRing,
     spectrumNoHC,
     spectrumUnspecErr
-};
+};*/ //TODO move to Singular
 
 // ----------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ public:
 
     void    delete_monomial( poly, const ring );
 
-    spectrumState  spectrum( lists*,int );
+    //spectrumState  spectrum( lists*,int );
 
     #ifdef SPLIST_PRINT
         friend ostream & operator << ( ostream&,const spectrumPolyList& );
