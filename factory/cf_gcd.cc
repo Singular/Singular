@@ -1018,12 +1018,7 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             if ( !( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) )
             {
                 CanonicalForm d;
-#if 1
                 d = gcd_poly( f, g );
-#else
-                d = gcd_poly( f, g );
-                printf("g"); fflush(stdout);
-#endif
                 return abs( d );
             }
             else
