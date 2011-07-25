@@ -1678,7 +1678,7 @@ static ideal syAppendSyz(ideal new_generators, syStrategy syzstr,int index,int c
   intvec * w;
   poly p;
   ideal result;
-  int rk_new_gens = idRankFreeModule(new_generators);
+  int rk_new_gens = id_RankFreeModule(new_generators,currRing);
   if (syzstr->res[index]==NULL)
   {
     syzstr->res[index] = idInit(1,si_max(rk_new_gens,1));
@@ -1762,7 +1762,7 @@ syStrategy syKosz(ideal arg,int * length)
   discard_pairs = 0;
   short_pairs = 0;
   if (idIs0(arg)) return NULL;
-  rk_arg = idRankFreeModule(arg);
+  rk_arg = id_RankFreeModule(arg,currRing);
   syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 /*--- changes to a Cdp-ring ----------------------------*/
   syzstr->syRing = rCurrRingAssure_C_dp();

@@ -971,7 +971,7 @@ syStrategy syHilb(ideal arg,int * length)
   ring origR = currRing;
   syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
-  if ((idIs0(arg)) || (idRankFreeModule(arg)>0))
+  if ((idIs0(arg)) || (id_RankFreeModule(arg,currRing)>0))
   {
     syzstr->minres = (resolvente)omAllocBin(sip_sideal_bin);
     syzstr->length = 1;
@@ -1037,7 +1037,7 @@ Print("compute %d Paare im Module %d im Grad %d \n",howmuch,index,actdeg+index);
     if (TEST_OPT_PROT) Print("%d",actdeg);
     if (TEST_OPT_PROT) Print("(m%d)",index);
     if (index==0)
-      i = syInitSyzMod(syzstr,index,idRankFreeModule(arg, origR)+1);
+      i = syInitSyzMod(syzstr,index,id_RankFreeModule(arg, origR)+1);
     else
       i = syInitSyzMod(syzstr,index);
     j = syInitSyzMod(syzstr,index+1);

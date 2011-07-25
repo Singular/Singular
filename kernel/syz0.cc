@@ -33,7 +33,7 @@ static void syInitSort(ideal arg,intvec **modcomp)
   idSkipZeroes(arg);
   polyset F,oldF=arg->m;
   int Fl=IDELEMS(arg);
-  int rkF=idRankFreeModule(arg);
+  int rkF=id_RankFreeModule(arg,currRing);
   int syComponentOrder=currRing->ComponentOrder;
 
   while ((Fl!=0) && (oldF[Fl-1]==NULL)) Fl--;
@@ -206,7 +206,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
       assume (pGetComp(arg->m[j-1])-pGetComp(arg->m[j])<=0);
     }
   }
-  rkF=idRankFreeModule(arg);
+  rkF=id_RankFreeModule(arg,currRing);
 /*----------------construction of the new ordering----------*/
   if (rkF>0)
     rSetSyzComp(rkF);
@@ -534,7 +534,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
     gencQ = IDELEMS(currQuotient);
     pairs=(polyset)omAlloc0((Fl+gencQ)*sizeof(poly));
   }
-  rkF=idRankFreeModule(arg);
+  rkF=id_RankFreeModule(arg,currRing);
   Flength = (int*)omAlloc0(Fl*sizeof(int));
   for(j=0;j<Fl;j++)
   {
@@ -821,7 +821,7 @@ static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
 
 BOOLEAN syTestOrder(ideal M)
 {
-  int i=idRankFreeModule(M);
+  int i=id_RankFreeModule(M,currRing);
   if (i == 0) return FALSE;
   int j=0;
 
