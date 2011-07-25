@@ -252,8 +252,8 @@ kStrategy kStratCopy(kStrategy o)
 
 BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
 {
-  int facdeg=pFDeg(p,currRing);
-  ideal fac=singclap_factorize(pCopy(p),NULL,1);
+  int facdeg=currRing->pFDeg(p,currRing);
+  ideal fac=singclap_factorize(pCopy(p),NULL,1,currRing);
   int fac_elems;
 #ifndef HAVE_FACTORY
   if (fac==NULL)
@@ -268,7 +268,7 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
   rfac=fac;
   fac_copy=idInit(fac_elems,1);
 
-  if ((fac_elems!=1)||(facdeg!=pFDeg(fac->m[0],currRing)))
+  if ((fac_elems!=1)||(facdeg!=currRing->pFDeg(fac->m[0],currRing)))
   {
     if (TEST_OPT_DEBUG)
     {
@@ -567,8 +567,8 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
-        && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-      || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+      || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
       *stops computation if
@@ -593,12 +593,12 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
     if (strat->honey)
     {
       if (TEST_OPT_PROT)
-        message(strat->P.ecart+pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
+        message(strat->P.ecart+currRing->pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
     }
     else
     {
       if (TEST_OPT_PROT)
-        message(pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
+        message(currRing->pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
     }
     /* reduction of the element choosen from L */
     kTest_TS(strat);
@@ -883,7 +883,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
   {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
     if (ecartWeights)
     {
       omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
@@ -906,12 +906,12 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   kStrategy orgstrat=strat;
   ideal_list L=NULL;
 
-  if (rField_has_simple_inverse())
+  if (rField_has_simple_inverse(currRing))
     strat->LazyPass=20;
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
-  strat->ak = idRankFreeModule(F);
+  strat->ak = id_RankFreeModule(F,currRing);
   if ((h==testHomog))
   {
     if (strat->ak==0)
@@ -928,9 +928,9 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     {
       kModW = *w;
       strat->kModW = *w;
-      pFDegOld = pFDeg;
+      pFDegOld = currRing->pFDeg;
       pLDegOld = pLDeg;
-      pSetDegProcs(kModDeg);
+      pSetDegProcs(currRing,kModDeg);
       toReset = TRUE;
     }
     pLexOrder = TRUE;
@@ -1031,7 +1031,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 // Ende: aufraeumen
   if (toReset)
   {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
     kModW = NULL;
   }
   pLexOrder = b;
