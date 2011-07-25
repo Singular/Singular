@@ -15,6 +15,8 @@
 //typedef struct sip_smap *          map;
 typedef ideal *            resolvente;
 
+extern ideal currQuotient;
+
 
 extern omBin sip_sideal_bin;
 
