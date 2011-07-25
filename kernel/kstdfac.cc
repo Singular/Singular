@@ -929,7 +929,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
       kModW = *w;
       strat->kModW = *w;
       pFDegOld = currRing->pFDeg;
-      pLDegOld = pLDeg;
+      pLDegOld = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
       toReset = TRUE;
     }
