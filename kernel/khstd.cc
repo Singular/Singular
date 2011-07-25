@@ -66,7 +66,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
       }
       omFree((ADDRESS)used_comp);
     }
-    degp=pFDeg;
+    degp=currRing->pFDeg;
     // if weights for variables were given to std computations,
     // then pFDeg == degp == kHomModDeg (see kStd)
     if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=p_Totaldegree;
