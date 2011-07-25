@@ -69,12 +69,12 @@ public:
 
     spectrum( );
     spectrum( const spectrum& );
-    spectrum( lists );
+//    spectrum( lists );
 
     ~spectrum( );
 
     spectrum operator = ( const spectrum& );
-    spectrum operator = ( lists );
+//    spectrum operator = ( lists );
 
     friend spectrum   operator + ( const spectrum&,const spectrum& );
     friend spectrum   operator * ( int,const spectrum& );
@@ -89,9 +89,9 @@ public:
 
     void    copy_shallow( spectrum& );
     void    copy_deep   ( const spectrum& );
-    void    copy_deep   ( lists );
+//    void    copy_deep   ( lists );
 
-    lists   thelist     ( void );
+//    lists   thelist     ( void );
 
     int     add_subspectrum    ( spectrum&,int );
     int     next_number        ( Rational* );

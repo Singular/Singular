@@ -71,6 +71,7 @@ CXXSOURCES=\
     fast_maps.cc \
     fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     kspoly.cc \
+    semic.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
@@ -111,6 +112,7 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
 	fegetopt.h \
 	ratgring.h shiftgb.h \
         mmalloc.h \
+	semic.h \
 	gfan.h
 
 DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
