@@ -6406,7 +6406,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   if(v1->Typ()==POLY_CMD||v1->Typ()==VECTOR_CMD)
   {
     if(v1->Typ()==POLY_CMD)
-      pShift(&R->m[0],-1);
+      p_Shift(&R->m[0],-1,currRing);
     L->m[1].data=(void *)R->m[0];
     R->m[0]=NULL;
     idDelete(&R);

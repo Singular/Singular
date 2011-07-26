@@ -597,7 +597,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
       for (j=0; j<IDELEMS(res[i]); j++)
       {
-        pShift(&res[i]->m[j], -rGetMaxSyzComp(i));
+        p_Shift(&res[i]->m[j], -rGetMaxSyzComp(i),currRing);
       }
     }
   }
