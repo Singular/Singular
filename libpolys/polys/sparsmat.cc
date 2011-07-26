@@ -64,14 +64,14 @@ static void sm_ExactPolyDiv(poly, poly, const ring);
 static BOOLEAN sm_IsNegQuot(poly, const poly, const poly, const ring);
 static void sm_ExpMultDiv(poly, const poly, const poly, const ring);
 static void sm_PolyDivN(poly, const number, const ring);
-static BOOLEAN sm_Smaller(poly, poly, const ring);
+static BOOLEAN smSmaller(poly, poly);
 static void sm_CombineChain(poly *, poly, const ring);
 static void sm_FindRef(poly *, poly *, poly, const ring);
 
 static void sm_ElemDelete(smpoly *, const ring);
-static smpoly smElemCopy(smpoly, const ring);
+static smpoly smElemCopy(smpoly);
 static float sm_PolyWeight(smpoly, const ring);
-static smpoly smPoly2Smpoly(poly, const ring);
+static smpoly sm_Poly2Smpoly(poly, const ring);
 static poly sm_Smpoly2Poly(smpoly, const ring);
 static BOOLEAN sm_HaveDenom(poly, const ring);
 static number sm_Cleardenom(ideal, const ring);
@@ -145,7 +145,7 @@ private:
   smpoly red;          // row to reduce
   smpoly piv, oldpiv;  // pivot and previous pivot
   smpoly dumm;         // allocated dummy
-  const ring _R;
+  ring _R;
   
   void smColToRow();
   void smRowToCol();
@@ -259,10 +259,10 @@ static void smMinSelect(long *c, int t, int d)
 }
 
 /* ----------------- ops with rings ------------------ */
-ring sm_RingChange(const ring currRing, long bound)
+ring sm_RingChange(const ring origR, long bound)
 {
 //  *origR =currRing;
-  ring tmpR=rCopy0(currRing,FALSE,FALSE);
+  ring tmpR=rCopy0(origR,FALSE,FALSE);
   int *ord=(int*)omAlloc0(3*sizeof(int));
   int *block0=(int*)omAlloc(3*sizeof(int));
   int *block1=(int*)omAlloc(3*sizeof(int));
@@ -281,11 +281,10 @@ ring sm_RingChange(const ring currRing, long bound)
 //  if (tmpR->bitmask > currRing->bitmask) tmpR->bitmask = currRing->bitmask;
 
   rComplete(tmpR,1);
-  if ((*origR)->qideal!=NULL)
+  if (origR->qideal!=NULL)
   {
-    tmpR->qideal= idrCopyR_NoSort((*origR)->qideal, currRing, tmpR);
+    tmpR->qideal= idrCopyR_NoSort(origR->qideal, origR, tmpR);
   }
-//  rChangeCurrRing(tmpR);
   if (TEST_OPT_PROT)
     Print("[%ld:%d]", (long) tmpR->bitmask, tmpR->ExpL_Size);
   return tmpR;
@@ -305,14 +304,14 @@ void sm_KillModifiedRing(ring r)
 * return True  -> change Type
 *        FALSE -> same Type
 */
-BOOLEAN smCheckDet(ideal I, int d, BOOLEAN sw)
+BOOLEAN sm_CheckDet(ideal I, int d, BOOLEAN sw, const ring r)
 {
   int s,t,i;
   poly p;
 
-  if ((d>100) || (currRing->parameter!=NULL))
+  if ((d>100) || (rIsExtension(r)))
     return sw;
-  if (rField_is_Q(currRing)==FALSE)
+  if (!rField_is_Q(r))
     return sw;
   s = t = 0;
   if (sw)
@@ -322,10 +321,10 @@ BOOLEAN smCheckDet(ideal I, int d, BOOLEAN sw)
       p=I->m[i];
       if (p!=NULL)
       {
-        if(!pIsConstant(p))
+        if(!p_IsConstant(p,r))
           return sw;
         s++;
-        t+=nSize(pGetCoeff(p));
+        t+=n_Size(pGetCoeff(p),r->cf);
       }
     }
   }
@@ -334,12 +333,12 @@ BOOLEAN smCheckDet(ideal I, int d, BOOLEAN sw)
     for(i=IDELEMS(I)-1;i>=0;i--)
     {
       p=I->m[i];
-      if (!pIsConstantPoly(p))
+      if (!p_IsConstantPoly(p,r))
         return sw;
       while (p!=NULL)
       {
         s++;
-        t+=nSize(pGetCoeff(p));
+        t+=n_Size(pGetCoeff(p),r->cf);
         pIter(p);
       }
     }
@@ -356,60 +355,56 @@ BOOLEAN smCheckDet(ideal I, int d, BOOLEAN sw)
 *returns the determinant of the module I;
 *uses Bareiss algorithm
 */
-poly smCallDet(ideal I)
+poly sm_CallDet(ideal I,const ring R)
 {
   if (I->ncols != I->rank)
   {
     Werror("det of %ld x %d module (matrix)",I->rank,I->ncols);
     return NULL;
   }
-  int r=idRankFreeModule(I);
+  int r=id_RankFreeModule(I,R);
   if (I->ncols != r) // some 0-lines at the end
   {
     return NULL;
   }
-  long bound=smExpBound(I,r,r,r);
-  number diag,h=nInit(1);
+  long bound=sm_ExpBound(I,r,r,r,R);
+  number diag,h=n_Init(1,R->cf);
   poly res;
-  ring origR;
   ring tmpR;
   sparse_mat *det;
   ideal II;
 
-  tmpR=smRingChange(&origR,bound);
-  II = idrCopyR(I, origR);
-  diag = smCleardenom(II);
-  det = new sparse_mat(II);
-  idDelete(&II);
+  tmpR=sm_RingChange(R,bound);
+  II = idrCopyR(I, R, tmpR);
+  diag = sm_Cleardenom(II,tmpR);
+  det = new sparse_mat(II,tmpR);
+  id_Delete(&II,tmpR);
   if (det->smGetAct() == NULL)
   {
     delete det;
-    rChangeCurrRing(origR);
-    smKillModifiedRing(tmpR);
+    sm_KillModifiedRing(tmpR);
     return NULL;
   }
   res=det->smDet();
-  if(det->smGetSign()<0) res=pNeg(res);
+  if(det->smGetSign()<0) res=p_Neg(res,tmpR);
   delete det;
-  rChangeCurrRing(origR);
-  res = prMoveR(res, tmpR);
-  smKillModifiedRing(tmpR);
-  if (nEqual(diag,h) == FALSE)
+  res = prMoveR(res, tmpR, R);
+  sm_KillModifiedRing(tmpR);
+  if (!n_Equal(diag,h,R->cf))
   {
-    pMult_nn(res,diag);
-    pNormalize(res);
+    p_Mult_nn(res,diag,R);
+    p_Normalize(res,R);
   }
-  nDelete(&diag);
-  nDelete(&h);
+  n_Delete(&diag,R->cf);
+  n_Delete(&h,R->cf);
   return res;
 }
 
-void smCallBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
+void sm_CallBareiss(ideal I, int x, int y, ideal & M, intvec **iv, const ring R)
 {
-  int r=idRankFreeModule(I),t=r;
+  int r=id_RankFreeModule(I,R),t=r;
   int c=IDELEMS(I),s=c;
   long bound;
-  ring origR;
   ring tmpR;
   sparse_mat *bareiss;
 
@@ -418,41 +413,40 @@ void smCallBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
   if ((y>1) && (y<s))
     s-=y;
   if (t>s) t=s;
-  bound=smExpBound(I,c,r,t);
-  tmpR=smRingChange(&origR,bound);
-  ideal II = idrCopyR(I, origR);
-  bareiss = new sparse_mat(II);
+  bound=sm_ExpBound(I,c,r,t,R);
+  tmpR=sm_RingChange(R,bound);
+  ideal II = idrCopyR(I, R, tmpR);
+  bareiss = new sparse_mat(II,tmpR);
   if (bareiss->smGetAct() == NULL)
   {
     delete bareiss;
-    *iv=new intvec(1,pVariables);
-    rChangeCurrRing(origR);
+    *iv=new intvec(1,rVar(tmpR));
   }
   else
   {
-    idDelete(&II);
+    id_Delete(&II,tmpR);
     bareiss->smNewBareiss(x, y);
     II = bareiss->smRes2Mod();
     *iv = new intvec(bareiss->smGetRed());
     bareiss->smToIntvec(*iv);
     delete bareiss;
-    rChangeCurrRing(origR);
-    II = idrMoveR(II,tmpR);
+    II = idrMoveR(II,tmpR,R);
   }
-  smKillModifiedRing(tmpR);
+  sm_KillModifiedRing(tmpR);
   M=II;
 }
 
 /*
 * constructor
 */
-sparse_mat::sparse_mat(ideal smat)
+sparse_mat::sparse_mat(ideal smat, const ring RR)
 {
   int i;
-  polyset pmat;
+  poly* pmat;
+  _R=RR;
 
   ncols = smat->ncols;
-  nrows = idRankFreeModule(smat);
+  nrows = id_RankFreeModule(smat,RR);
   if (nrows <= 0)
   {
     m_act = NULL;
@@ -477,7 +471,7 @@ sparse_mat::sparse_mat(ideal smat)
   pmat = smat->m;
   for(i=ncols; i; i--)
   {
-    m_act[i] = smPoly2Smpoly(pmat[i-1]);
+    m_act[i] = sm_Poly2Smpoly(pmat[i-1], RR);
     pmat[i-1] = NULL;
   }
   this->smZeroElim();
@@ -506,13 +500,14 @@ sparse_mat::~sparse_mat()
 /*
 * transform the result to a module
 */
+
 ideal sparse_mat::smRes2Mod()
 {
   ideal res = idInit(crd, crd);
   int i;
 
-  for (i=crd; i; i--) res->m[i-1] = smSmpoly2Poly(m_res[i]);
-  res->rank = idRankFreeModule(res);
+  for (i=crd; i; i--) res->m[i-1] = sm_Smpoly2Poly(m_res[i],_R);
+  res->rank = id_RankFreeModule(res,_R);
   return res;
 }
 
@@ -682,7 +677,7 @@ void sparse_mat::smWeights()
     {
       if (a->pos > tored)
         break;
-      w = a->f = smPolyWeight(a);
+      w = a->f = sm_PolyWeight(a,_R);
       wc += w;
       wrw[a->pos] += w;
       a = a->n;
@@ -865,7 +860,7 @@ void sparse_mat::sm1Elim()
 
   if ((c == NULL) || (r == NULL))
   {
-    while (r!=NULL) smElemDelete(&r);
+    while (r!=NULL) sm_ElemDelete(&r,_R);
     return;
   }
   do
@@ -882,9 +877,9 @@ void sparse_mat::sm1Elim()
         do
         {
           res = res->n = smElemCopy(b);
-          res->m = ppMult_qq(b->m, w);
+          res->m = pp_Mult_qq(b->m, w,_R);
           res->e = 1;
-          res->f = smPolyWeight(res);
+          res->f = sm_PolyWeight(res,_R);
           b = b->n;
         } while (b != NULL);
         break;
@@ -897,28 +892,28 @@ void sparse_mat::sm1Elim()
       else if (a->pos > b->pos)
       {
         res = res->n = smElemCopy(b);
-        res->m = ppMult_qq(b->m, w);
+        res->m = pp_Mult_qq(b->m, w,_R);
         res->e = 1;
-        res->f = smPolyWeight(res);
+        res->f = sm_PolyWeight(res,_R);
         b = b->n;
       }
       else
       {
-        ha = ppMult_qq(a->m, p);
-        pDelete(&a->m);
-        hb = ppMult_qq(b->m, w);
-        ha = pAdd(ha, hb);
+        ha = pp_Mult_qq(a->m, p,_R);
+        p_Delete(&a->m,_R);
+        hb = pp_Mult_qq(b->m, w,_R);
+        ha = p_Add_q(ha, hb,_R);
         if (ha != NULL)
         {
           a->m = ha;
           a->e = 1;
-          a->f = smPolyWeight(a);
+          a->f = sm_PolyWeight(a,_R);
           res = res->n = a;
           a = a->n;
         }
         else
         {
-          smElemDelete(&a);
+          sm_ElemDelete(&a,_R);
         }
         b = b->n;
       }
@@ -929,7 +924,7 @@ void sparse_mat::sm1Elim()
       }
     }
     m_act[r->pos] = dumm->n;
-    smElemDelete(&r);
+    sm_ElemDelete(&r,_R);
   } while (r != NULL);
 }
 
@@ -946,8 +941,8 @@ void sparse_mat::smHElim()
 
   if ((c == NULL) || (r == NULL))
   {
-    while(r!=NULL) smElemDelete(&r);
-    pDelete(&hp);
+    while(r!=NULL) sm_ElemDelete(&r,_R);
+    p_Delete(&hp,_R);
     return;
   }
   e = crd+1;
@@ -967,12 +962,12 @@ void sparse_mat::smHElim()
         do
         {
           res = res->n = smElemCopy(b);
-          x = SM_MULT(b->m, hr, m_res[ir]->m);
+          x = SM_MULT(b->m, hr, m_res[ir]->m,_R);
           b = b->n;
-          if(ir) SM_DIV(x, m_res[ir]->m);
+          if(ir) SM_DIV(x, m_res[ir]->m,_R);
           res->m = x;
           res->e = e;
-          res->f = smPolyWeight(res);
+          res->f = sm_PolyWeight(res,_R);
         } while (b != NULL);
         break;
       }
@@ -984,12 +979,12 @@ void sparse_mat::smHElim()
       else if (a->pos > b->pos)
       {
         res = res->n = smElemCopy(b);
-        x = SM_MULT(b->m, hr, m_res[ir]->m);
+        x = SM_MULT(b->m, hr, m_res[ir]->m,_R);
         b = b->n;
-        if(ir) SM_DIV(x, m_res[ir]->m);
+        if(ir) SM_DIV(x, m_res[ir]->m,_R);
         res->m = x;
         res->e = e;
-        res->f = smPolyWeight(res);
+        res->f = sm_PolyWeight(res,_R);
       }
       else
       {
@@ -999,60 +994,60 @@ void sparse_mat::smHElim()
         {
           if (ir > ia)
           {
-            x = SM_MULT(ha, m_res[ir]->m, m_res[ia]->m);
-            pDelete(&ha);
+            x = SM_MULT(ha, m_res[ir]->m, m_res[ia]->m,_R);
+            p_Delete(&ha,_R);
             ha = x;
-            if (ia) SM_DIV(ha, m_res[ia]->m);
+            if (ia) SM_DIV(ha, m_res[ia]->m,_R);
             ia = ir;
           }
-          x = SM_MULT(ha, gp, m_res[ia]->m);
-          pDelete(&ha);
-          y = SM_MULT(b->m, hr, m_res[ia]->m);
+          x = SM_MULT(ha, gp, m_res[ia]->m,_R);
+          p_Delete(&ha,_R);
+          y = SM_MULT(b->m, hr, m_res[ia]->m,_R);
         }
         else if (ir >= ip)
         {
           if (ia < crd)
           {
-            x = SM_MULT(ha, m_res[crd]->m, m_res[ia]->m);
-            pDelete(&ha);
+            x = SM_MULT(ha, m_res[crd]->m, m_res[ia]->m,_R);
+            p_Delete(&ha,_R);
             ha = x;
-            SM_DIV(ha, m_res[ia]->m);
+            SM_DIV(ha, m_res[ia]->m,_R);
           }
           y = hp;
           if(ir > ip)
           {
-            y = SM_MULT(y, m_res[ir]->m, m_res[ip]->m);
-            if (ip) SM_DIV(y, m_res[ip]->m);
+            y = SM_MULT(y, m_res[ir]->m, m_res[ip]->m,_R);
+            if (ip) SM_DIV(y, m_res[ip]->m,_R);
           }
           ia = ir;
-          x = SM_MULT(ha, y, m_res[ia]->m);
-          if (y != hp) pDelete(&y);
-          pDelete(&ha);
-          y = SM_MULT(b->m, hr, m_res[ia]->m);
+          x = SM_MULT(ha, y, m_res[ia]->m,_R);
+          if (y != hp) p_Delete(&y,_R);
+          p_Delete(&ha,_R);
+          y = SM_MULT(b->m, hr, m_res[ia]->m,_R);
         }
         else
         {
-          x = SM_MULT(hr, m_res[ia]->m, m_res[ir]->m);
-          if (ir) SM_DIV(x, m_res[ir]->m);
-          y = SM_MULT(b->m, x, m_res[ia]->m);
-          pDelete(&x);
-          x = SM_MULT(ha, gp, m_res[ia]->m);
-          pDelete(&ha);
+          x = SM_MULT(hr, m_res[ia]->m, m_res[ir]->m,_R);
+          if (ir) SM_DIV(x, m_res[ir]->m,_R);
+          y = SM_MULT(b->m, x, m_res[ia]->m,_R);
+          p_Delete(&x,_R);
+          x = SM_MULT(ha, gp, m_res[ia]->m,_R);
+          p_Delete(&ha,_R);
         }
-        ha = pAdd(x, y);
+        ha = p_Add_q(x, y,_R);
         if (ha != NULL)
         {
-          if (ia) SM_DIV(ha, m_res[ia]->m);
+          if (ia) SM_DIV(ha, m_res[ia]->m,_R);
           a->m = ha;
           a->e = e;
-          a->f = smPolyWeight(a);
+          a->f = sm_PolyWeight(a,_R);
           res = res->n = a;
           a = a->n;
         }
         else
         {
           a->m = NULL;
-          smElemDelete(&a);
+          sm_ElemDelete(&a,_R);
         }
         b = b->n;
       }
@@ -1063,9 +1058,9 @@ void sparse_mat::smHElim()
       }
     }
     m_act[r->pos] = dumm->n;
-    smElemDelete(&r);
+    sm_ElemDelete(&r,_R);
   } while (r != NULL);
-  pDelete(&hp);
+  p_Delete(&hp,_R);
 }
 
 /* ----------------- transfer ------------------ */
@@ -1114,7 +1109,7 @@ void sparse_mat::smSelectPR()
         if (a->pos == rpiv)
         {
           ap->n = a->n;
-          a->m = pNeg(a->m);
+          a->m = p_Neg(a->m,_R);
           b = b->n = a;
           b->pos = i;
           break;
@@ -1124,7 +1119,7 @@ void sparse_mat::smSelectPR()
     else if (a->pos == rpiv)
     {
       m_act[i] = a->n;
-      a->m = pNeg(a->m);
+      a->m = p_Neg(a->m,_R);
       b = b->n = a;
       b->pos = i;
     }
@@ -1427,11 +1422,11 @@ void sparse_mat::smMultCol()
     f = a->e;
     if (f < e)
     {
-      ha = SM_MULT(a->m, m_res[e]->m, m_res[f]->m);
-      pDelete(&a->m);
-      if (f) SM_DIV(ha, m_res[f]->m);
+      ha = SM_MULT(a->m, m_res[e]->m, m_res[f]->m,_R);
+      p_Delete(&a->m,_R);
+      if (f) SM_DIV(ha, m_res[f]->m,_R);
       a->m = ha;
-      if (normalize) pNormalize(a->m);
+      if (normalize) p_Normalize(a->m,_R);
     }
     a = a->n;
   }
@@ -1455,12 +1450,12 @@ void sparse_mat::smFinalMult()
       f = a->e;
       if (f < e)
       {
-        ha = SM_MULT(a->m, m_res[e]->m, m_res[f]->m);
-        pDelete(&a->m);
-        if (f) SM_DIV(ha, m_res[f]->m);
+        ha = SM_MULT(a->m, m_res[e]->m, m_res[f]->m, _R);
+        p_Delete(&a->m,_R);
+        if (f) SM_DIV(ha, m_res[f]->m, _R);
         a->m = ha;
       }
-      if (normalize) pNormalize(a->m);
+      if (normalize) p_Normalize(a->m, _R);
       a = a->n;
     } while (a != NULL);
   }
@@ -1479,7 +1474,7 @@ int sparse_mat::smCheckNormalize()
     a = m_act[i];
     do
     {
-      if(smHaveDenom(a->m)) return 1;
+      if(sm_HaveDenom(a->m,_R)) return 1;
       a = a->n;
     } while (a != NULL);
   }
@@ -1500,7 +1495,7 @@ void sparse_mat::smNormalize()
     a = m_act[i];
     do
     {
-      if (e == a->e) pNormalize(a->m);
+      if (e == a->e) p_Normalize(a->m,_R);
       a = a->n;
     } while (a != NULL);
   }
@@ -1517,11 +1512,11 @@ poly sparse_mat::smMultPoly(smpoly a)
   if (f < crd)
   {
     h = r = a->m;
-    h = SM_MULT(h, m_res[crd]->m, m_res[f]->m);
-    if (f) SM_DIV(h, m_res[f]->m);
+    h = SM_MULT(h, m_res[crd]->m, m_res[f]->m, _R);
+    if (f) SM_DIV(h, m_res[f]->m, _R);
     a->m = h;
-    if (normalize) pNormalize(a->m);
-    a->f = smPolyWeight(a);
+    if (normalize) p_Normalize(a->m,_R);
+    a->f = sm_PolyWeight(a,_R);
     return r;
   }
   else
@@ -1541,7 +1536,7 @@ void sparse_mat::smActDel()
     a = m_act[i];
     do
     {
-      smElemDelete(&a);
+      sm_ElemDelete(&a,_R);
     } while (a != NULL);
   }
 }
@@ -1555,7 +1550,7 @@ void sparse_mat::smColDel()
 
   while (a != NULL)
   {
-    smElemDelete(&a);
+    sm_ElemDelete(&a,_R);
   }
 }
 
@@ -1568,7 +1563,7 @@ void sparse_mat::smPivDel()
 
   while (i != 0)
   {
-    smElemDelete(&m_res[i]);
+    sm_ElemDelete(&m_res[i],_R);
     i--;
   }
 }
@@ -1615,7 +1610,7 @@ void sparse_mat::smInitPerm()
 * exact division a/b
 * a destroyed, b NOT destroyed
 */
-void smPolyDiv(poly a, poly b)
+void sm_PolyDiv(poly a, poly b, const ring R)
 {
   const number x = pGetCoeff(b);
   number y, yn;
@@ -1626,46 +1621,46 @@ void smPolyDiv(poly a, poly b)
   {
     do
     {
-      if (!pLmIsConstantComp(b))
+      if (!p_LmIsConstantComp(b,R))
       {
-        for (i=pVariables; i; i--)
-          pSubExp(a,i,pGetExp(b,i));
-        pSetm(a);
+        for (i=rVar(R); i; i--)
+          p_SubExp(a,i,p_GetExp(b,i,R),R);
+        p_Setm(a,R);
       }
-      y = nDiv(pGetCoeff(a),x);
-      nNormalize(y);
-      pSetCoeff(a,y);
+      y = n_Div(pGetCoeff(a),x,R->cf);
+      n_Normalize(y,R->cf);
+      p_SetCoeff(a,y,R);
       pIter(a);
     } while (a != NULL);
     return;
   }
-  dummy = pInit();
+  dummy = p_Init(R);
   do
   {
-    for (i=pVariables; i; i--)
-      pSubExp(a,i,pGetExp(b,i));
-    pSetm(a);
-    y = nDiv(pGetCoeff(a),x);
-    nNormalize(y);
-    pSetCoeff(a,y);
-    yn = nNeg(nCopy(y));
+    for (i=rVar(R); i; i--)
+      p_SubExp(a,i,p_GetExp(b,i,R),R);
+    p_Setm(a,R);
+    y = n_Div(pGetCoeff(a),x,R->cf);
+    n_Normalize(y,R->cf);
+    p_SetCoeff(a,y,R);
+    yn = n_Neg(n_Copy(y,R->cf),R->cf);
     t = pNext(b);
     h = dummy;
     do
     {
-      h = pNext(h) = pInit();
+      h = pNext(h) = p_Init(R);
       //pSetComp(h,0);
-      for (i=pVariables; i; i--)
-        pSetExp(h,i,pGetExp(a,i)+pGetExp(t,i));
-      pSetm(h);
-      pSetCoeff0(h,nMult(yn, pGetCoeff(t)));
+      for (i=rVar(R); i; i--)
+        p_SetExp(h,i,p_GetExp(a,i,R)+p_GetExp(t,i,R),R);
+      p_Setm(h,R);
+      pSetCoeff0(h,n_Mult(yn, pGetCoeff(t),R->cf));
       pIter(t);
     } while (t != NULL);
-    nDelete(&yn);
+    n_Delete(&yn,R->cf);
     pNext(h) = NULL;
-    a = pNext(a) = pAdd(pNext(a), pNext(dummy));
+    a = pNext(a) = p_Add_q(pNext(a), pNext(dummy),R);
   } while (a!=NULL);
-  pLmFree(dummy);
+  p_LmFree(dummy, R);
 }
 
 
@@ -1684,7 +1679,7 @@ poly smMultDiv(poly a, poly b, const poly c)
 
   if ((c == NULL) || pLmIsConstantComp(c))
   {
-    return ppMult_qq(a, b);
+    return pp_Mult_qq(a, b);
   }
 
   pqLength(a, b, la, lb, SM_MIN_LENGTH_BUCKET);
@@ -1701,7 +1696,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     lb = lr;
   }
   res = NULL;
-  e = pInit();
+  e = p_Init();
   lead = FALSE;
   while (!lead)
   {
@@ -1714,7 +1709,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     else
     {
       lead = TRUE;
-      r = ppMult_mm(a, e);
+      r = pp_Mult__mm(a, e);
     }
     if (lead)
     {
@@ -1730,7 +1725,7 @@ poly smMultDiv(poly a, poly b, const poly c)
       }
     }
     else
-      res = pAdd(res, r);
+      res = p_Add_q(res, r);
     pIter(b);
     if (b == NULL)
     {
@@ -1775,7 +1770,7 @@ poly smMultDiv(poly a, poly b, const poly c)
       }
       else
       {
-        r = ppMult_mm(a, e);
+        r = pp_Mult__mm(a, e);
         append = kBucket_ExtractLarger_Add_q(bucket, append, r, &la);
       }
       pIter(b);
@@ -1796,11 +1791,11 @@ poly smMultDiv(poly a, poly b, const poly c)
         if (pLmDivisibleByNoComp(e, a))
           smCombineChain(&pa, r);
         else
-          pa = pAdd(pa,r);
+          pa = p_Add_q(pa,r);
       }
       else
       {
-        r = ppMult_mm(a, e);
+        r = pp_Mult__mm(a, e);
         smCombineChain(&pa, r);
       }
       pIter(b);
@@ -1815,14 +1810,14 @@ poly smMultDiv(poly a, poly b, const poly c)
 /*
 *  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
 */
-poly smMultDiv(poly a, poly b, const poly c)
+poly sm_MultDiv(poly a, poly b, const poly c, const ring R)
 {
   poly pa, e, res, r;
   BOOLEAN lead;
 
-  if ((c == NULL) || pLmIsConstantComp(c))
+  if ((c == NULL) || p_LmIsConstantComp(c,R))
   {
-    return ppMult_qq(a, b);
+    return pp_Mult_qq(a, b, R);
   }
   if (smSmaller(a, b))
   {
@@ -1831,26 +1826,26 @@ poly smMultDiv(poly a, poly b, const poly c)
     b = r;
   }
   res = NULL;
-  e = pInit();
+  e = p_Init(R);
   lead = FALSE;
   while (!lead)
   {
     pSetCoeff0(e,pGetCoeff(b));
-    if (smIsNegQuot(e, b, c))
+    if (sm_IsNegQuot(e, b, c, R))
     {
-      lead = pLmDivisibleByNoComp(e, a);
-      r = smSelectCopy_ExpMultDiv(a, e, b, c);
+      lead = p_LmDivisibleByNoComp(e, a, R);
+      r = sm_SelectCopy_ExpMultDiv(a, e, b, c, R);
     }
     else
     {
       lead = TRUE;
-      r = ppMult_mm(a, e);
+      r = pp_Mult_mm(a, e,R);
     }
     if (lead)
     {
       if (res != NULL)
       {
-        smFindRef(&pa, &res, r);
+        sm_FindRef(&pa, &res, r, R);
         if (pa == NULL)
           lead = FALSE;
       }
@@ -1860,33 +1855,33 @@ poly smMultDiv(poly a, poly b, const poly c)
       }
     }
     else
-      res = pAdd(res, r);
+      res = p_Add_q(res, r, R);
     pIter(b);
     if (b == NULL)
     {
-      pLmFree(e);
+      p_LmFree(e, R);
       return res;
     }
   }
   do
   {
     pSetCoeff0(e,pGetCoeff(b));
-    if (smIsNegQuot(e, b, c))
+    if (sm_IsNegQuot(e, b, c, R))
     {
-      r = smSelectCopy_ExpMultDiv(a, e, b, c);
-      if (pLmDivisibleByNoComp(e, a))
-        smCombineChain(&pa, r);
+      r = sm_SelectCopy_ExpMultDiv(a, e, b, c, R);
+      if (p_LmDivisibleByNoComp(e, a,R))
+        sm_CombineChain(&pa, r, R);
       else
-        pa = pAdd(pa,r);
+        pa = p_Add_q(pa,r,R);
     }
     else
     {
-      r = ppMult_mm(a, e);
-      smCombineChain(&pa, r);
+      r = pp_Mult_mm(a, e, R);
+      sm_CombineChain(&pa, r, R);
     }
     pIter(b);
   } while (b != NULL);
-  pLmFree(e);
+  p_LmFree(e, R);
   return res;
 }
 #endif
@@ -1895,46 +1890,46 @@ poly smMultDiv(poly a, poly b, const poly c)
 * a is a result of smMultDiv
 * a destroyed, b NOT destroyed
 */
-void smSpecialPolyDiv(poly a, poly b)
+void sm_SpecialPolyDiv(poly a, poly b, const ring R)
 {
   if (pNext(b) == NULL)
   {
-    smPolyDivN(a, pGetCoeff(b));
+    sm_PolyDivN(a, pGetCoeff(b),R);
     return;
   }
-  smExactPolyDiv(a, b);
+  sm_ExactPolyDiv(a, b, R);
 }
 
 
 /* ------------ internals arithmetic ------------- */
-static void smExactPolyDiv(poly a, poly b)
+static void sm_ExactPolyDiv(poly a, poly b, const ring R)
 {
   const number x = pGetCoeff(b);
-  poly tail = pNext(b), e = pInit();
+  poly tail = pNext(b), e = p_Init(R);
   poly h;
   number y, yn;
   int lt = pLength(tail);
 
   if (lt + 1 >= SM_MIN_LENGTH_BUCKET &&  !TEST_OPT_NOT_BUCKETS)
   {
-    kBucket_pt bucket = kBucketCreate(currRing);
+    kBucket_pt bucket = kBucketCreate(R);
     kBucketInit(bucket, pNext(a), 0);
     int lh = 0;
     do
     {
-      y = nDiv(pGetCoeff(a), x);
-      nNormalize(y);
-      pSetCoeff(a,y);
-      yn = nNeg(nCopy(y));
+      y = n_Div(pGetCoeff(a), x, R->cf);
+      n_Normalize(y, R->cf);
+      p_SetCoeff(a,y, R);
+      yn = n_Neg(n_Copy(y, R->cf), R->cf);
       pSetCoeff0(e,yn);
       lh = lt;
-      if (smIsNegQuot(e, a, b))
+      if (sm_IsNegQuot(e, a, b, R))
       {
-        h = pp_Mult_Coeff_mm_DivSelect_MultDiv(tail, lh, e, a, b);
+        h = pp_Mult_Coeff_mm_DivSelect_MultDiv(tail, lh, e, a, b, R);
       }
       else
-        h = ppMult_mm(tail, e);
-      nDelete(&yn);
+        h = pp_Mult_mm(tail, e, R);
+      n_Delete(&yn, R->cf);
       kBucket_Add_q(bucket, h, &lh);
 
       a = pNext(a) = kBucketExtractLm(bucket);
@@ -1945,76 +1940,76 @@ static void smExactPolyDiv(poly a, poly b)
   {
     do
     {
-      y = nDiv(pGetCoeff(a), x);
-      nNormalize(y);
-      pSetCoeff(a,y);
-      yn = nNeg(nCopy(y));
+      y = n_Div(pGetCoeff(a), x, R->cf);
+      n_Normalize(y, R->cf);
+      p_SetCoeff(a,y, R);
+      yn = n_Neg(n_Copy(y, R->cf), R->cf);
       pSetCoeff0(e,yn);
-      if (smIsNegQuot(e, a, b))
-        h = smSelectCopy_ExpMultDiv(tail, e, a, b);
+      if (sm_IsNegQuot(e, a, b, R))
+        h = sm_SelectCopy_ExpMultDiv(tail, e, a, b, R);
       else
-        h = ppMult_mm(tail, e);
-      nDelete(&yn);
-      a = pNext(a) = pAdd(pNext(a), h);
+        h = pp_Mult_mm(tail, e, R);
+      n_Delete(&yn, R->cf);
+      a = pNext(a) = p_Add_q(pNext(a), h, R);
     } while (a!=NULL);
   }
-  pLmFree(e);
+  p_LmFree(e, R);
 }
 
 // obachman --> Wilfried: check the following
-static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
+static BOOLEAN sm_IsNegQuot(poly a, const poly b, const poly c, const ring R)
 {
-  if (pLmDivisibleByNoComp(c, b))
+  if (p_LmDivisibleByNoComp(c, b,R))
   {
-    pExpVectorDiff(a, b, c);
-    // Hmm: here used to be a pSetm(a): but it is unnecessary,
+    p_ExpVectorDiff(a, b, c,R);
+    // Hmm: here used to be a p_Setm(a): but it is unnecessary,
     // if b and c are correct
     return FALSE;
   }
   else
   {
     int i;
-    for (i=pVariables; i>0; i--)
+    for (i=rVar(R); i>0; i--)
     {
-      if(pGetExp(c,i) > pGetExp(b,i))
-        pSetExp(a,i,pGetExp(c,i)-pGetExp(b,i));
+      if(p_GetExp(c,i,R) > p_GetExp(b,i,R))
+        p_SetExp(a,i,p_GetExp(c,i,R)-p_GetExp(b,i,R),R);
       else
-        pSetExp(a,i,0);
+        p_SetExp(a,i,0,R);
     }
-    // here we actually might need a pSetm, if a is to be used in
+    // here we actually might need a p_Setm, if a is to be used in
     // comparisons
     return TRUE;
   }
 }
 
-static void smExpMultDiv(poly t, const poly b, const poly c)
+static void sm_ExpMultDiv(poly t, const poly b, const poly c, const ring R)
 {
   int i;
-  pTest(t);
-  pLmTest(b);
-  pLmTest(c);
-  poly bc = p_New(currRing);
+  p_Test(t,R);
+  p_LmTest(b,R);
+  p_LmTest(c,R);
+  poly bc = p_New(R);
 
-  p_ExpVectorDiff(bc, b, c, currRing);
+  p_ExpVectorDiff(bc, b, c, R);
 
   while(t!=NULL)
   {
-    pExpVectorAdd(t, bc);
+    p_ExpVectorAdd(t, bc, R);
     pIter(t);
   }
-  p_LmFree(bc, currRing);
+  p_LmFree(bc, R);
 }
 
 
-static void smPolyDivN(poly a, const number x)
+static void sm_PolyDivN(poly a, const number x, const ring R)
 {
   number y;
 
   do
   {
-    y = nDiv(pGetCoeff(a),x);
-    nNormalize(y);
-    pSetCoeff(a,y);
+    y = n_Div(pGetCoeff(a),x, R->cf);
+    n_Normalize(y, R->cf);
+    p_SetCoeff(a,y, R);
     pIter(a);
   } while (a != NULL);
 }
@@ -2030,7 +2025,7 @@ static BOOLEAN smSmaller(poly a, poly b)
   }
 }
 
-static void smCombineChain(poly *px, poly r)
+static void sm_CombineChain(poly *px, poly r, const ring R)
 {
   poly pa = *px, pb;
   number x;
@@ -2044,31 +2039,31 @@ static void smCombineChain(poly *px, poly r)
       pa = pNext(pa) = r;
       break;
     }
-    i = pLmCmp(pb, r);
+    i = p_LmCmp(pb, r,R);
     if (i > 0)
       pa = pb;
     else
     {
       if (i == 0)
       {
-        x = nAdd(pGetCoeff(pb), pGetCoeff(r));
-        pLmDelete(&r);
-        if (nIsZero(x))
+        x = n_Add(pGetCoeff(pb), pGetCoeff(r),R->cf);
+        p_LmDelete(&r,R);
+        if (n_IsZero(x,R->cf))
         {
-          pLmDelete(&pb);
-          pNext(pa) = pAdd(pb,r);
+          p_LmDelete(&pb,R);
+          pNext(pa) = p_Add_q(pb,r,R);
         }
         else
         {
           pa = pb;
-          pSetCoeff(pa,x);
-          pNext(pa) = pAdd(pNext(pa), r);
+          p_SetCoeff(pa,x,R);
+          pNext(pa) = p_Add_q(pNext(pa), r, R);
         }
       }
       else
       {
         pa = pNext(pa) = r;
-        pNext(pa) = pAdd(pb, pNext(pa));
+        pNext(pa) = p_Add_q(pb, pNext(pa),R);
       }
       break;
     }
@@ -2077,7 +2072,7 @@ static void smCombineChain(poly *px, poly r)
 }
 
 
-static void smFindRef(poly *ref, poly *px, poly r)
+static void sm_FindRef(poly *ref, poly *px, poly r, const ring R)
 {
   number x;
   int i;
@@ -2085,7 +2080,7 @@ static void smFindRef(poly *ref, poly *px, poly r)
 
   loop
   {
-    i = pLmCmp(pa, r);
+    i = p_LmCmp(pa, r,R);
     if (i > 0)
     {
       pp = pa;
@@ -2100,21 +2095,21 @@ static void smFindRef(poly *ref, poly *px, poly r)
     {
       if (i == 0)
       {
-        x = nAdd(pGetCoeff(pa), pGetCoeff(r));
-        pLmDelete(&r);
-        if (nIsZero(x))
+        x = n_Add(pGetCoeff(pa), pGetCoeff(r),R->cf);
+        p_LmDelete(&r,R);
+        if (n_IsZero(x,R->cf))
         {
-          pLmDelete(&pa);
+          p_LmDelete(&pa,R);
           if (pp!=NULL)
-            pNext(pp) = pAdd(pa,r);
+            pNext(pp) = p_Add_q(pa,r,R);
           else
-            *px = pAdd(pa,r);
+            *px = p_Add_q(pa,r,R);
         }
         else
         {
           pp = pa;
-          pSetCoeff(pp,x);
-          pNext(pp) = pAdd(pNext(pp), r);
+          p_SetCoeff(pp,x,R);
+          pNext(pp) = p_Add_q(pNext(pp), r, R);
         }
       }
       else
@@ -2123,7 +2118,7 @@ static void smFindRef(poly *ref, poly *px, poly r)
           pp = pNext(pp) = r;
         else
           *px = pp = r;
-        pNext(pp) = pAdd(pa, pNext(r));
+        pNext(pp) = p_Add_q(pa, pNext(r),R);
       }
       break;
     }
@@ -2133,11 +2128,11 @@ static void smFindRef(poly *ref, poly *px, poly r)
 
 /* ----------------- internal 'C' stuff ------------------ */
 
-static void smElemDelete(smpoly *r)
+static void sm_ElemDelete(smpoly *r, const ring R)
 {
   smpoly a = *r, b = a->n;
 
-  pDelete(&a->m);
+  p_Delete(&a->m, R);
   omFreeBin((void *)a,  smprec_bin);
   *r = b;
 }
@@ -2154,7 +2149,7 @@ static smpoly smElemCopy(smpoly a)
 * from poly to smpoly
 * do not destroy p
 */
-static smpoly smPoly2Smpoly(poly q)
+static smpoly sm_Poly2Smpoly(poly q, const ring R)
 {
   poly pp;
   smpoly res, a;
@@ -2163,12 +2158,12 @@ static smpoly smPoly2Smpoly(poly q)
   if (q == NULL)
     return NULL;
   a = res = (smpoly)omAllocBin(smprec_bin);
-  a->pos = x = pGetComp(q);
+  a->pos = x = p_GetComp(q,R);
   a->m = q;
   a->e = 0;
   loop
   {
-    pSetComp(q,0);
+    p_SetComp(q,0,R);
     pp = q;
     pIter(q);
     if (q == NULL)
@@ -2176,11 +2171,11 @@ static smpoly smPoly2Smpoly(poly q)
       a->n = NULL;
       return res;
     }
-    if (pGetComp(q) != x)
+    if (p_GetComp(q,R) != x)
     {
       a = a->n = (smpoly)omAllocBin(smprec_bin);
       pNext(pp) = NULL;
-      a->pos = x = pGetComp(q);
+      a->pos = x = p_GetComp(q,R);
       a->m = q;
       a->e = 0;
     }
@@ -2191,7 +2186,7 @@ static smpoly smPoly2Smpoly(poly q)
 * from smpoly to poly
 * destroy a
 */
-static poly smSmpoly2Poly(smpoly a)
+static poly sm_Smpoly2Poly(smpoly a, const ring R)
 {
   smpoly b;
   poly res, pp, q;
@@ -2203,7 +2198,7 @@ static poly smSmpoly2Poly(smpoly a)
   q = res = a->m;
   loop
   {
-    pSetComp(q,x);
+    p_SetComp(q,x,R);
     pp = q;
     pIter(q);
     if (q == NULL)
@@ -2220,7 +2215,7 @@ static poly smSmpoly2Poly(smpoly a)
     q = pNext(pp) = a->m;
     loop
     {
-      pSetComp(q,x);
+      p_SetComp(q,x,R);
       pp = q;
       pIter(q);
       if (q == NULL)
@@ -2232,17 +2227,17 @@ static poly smSmpoly2Poly(smpoly a)
 /*
 * weigth of a polynomial, for pivot strategy
 */
-static float smPolyWeight(smpoly a)
+static float sm_PolyWeight(smpoly a, const ring R)
 {
   poly p = a->m;
   int i;
-  float res = (float)nSize(pGetCoeff(p));
+  float res = (float)n_Size(pGetCoeff(p),R->cf);
 
   if (pNext(p) == NULL)
   {
-    for(i=pVariables; i>0; i--)
+    for(i=rVar(R); i>0; i--)
     {
-      if (pGetExp(p,i) != 0) return res+1.0;
+      if (p_GetExp(p,i,R) != 0) return res+1.0;
     }
     return res;
   }
@@ -2253,7 +2248,7 @@ static float smPolyWeight(smpoly a)
     do
     {
       i++;
-      res += (float)nSize(pGetCoeff(p));
+      res += (float)n_Size(pGetCoeff(p),R->cf);
       pIter(p);
     }
     while (p);
@@ -2261,16 +2256,16 @@ static float smPolyWeight(smpoly a)
   }
 }
 
-static BOOLEAN smHaveDenom(poly a)
+static BOOLEAN sm_HaveDenom(poly a, const ring R)
 {
   BOOLEAN sw;
   number x;
 
   while (a != NULL)
   {
-    x = nGetDenom(pGetCoeff(a));
-    sw = nIsOne(x);
-    nDelete(&x);
+    x = n_GetDenom(pGetCoeff(a),R->cf);
+    sw = n_IsOne(x,R->cf);
+    n_Delete(&x,R->cf);
     if (!sw)
     {
       return TRUE;
@@ -2280,16 +2275,16 @@ static BOOLEAN smHaveDenom(poly a)
   return FALSE;
 }
 
-static number smCleardenom(ideal id)
+static number sm_Cleardenom(ideal id, const ring R)
 {
   poly a;
-  number x,y,res=nInit(1);
+  number x,y,res=n_Init(1,R->cf);
   BOOLEAN sw=FALSE;
 
   for (int i=0; i<IDELEMS(id); i++)
   {
     a = id->m[i];
-    sw = smHaveDenom(a);
+    sw = sm_HaveDenom(a,R);
     if (sw) break;
   }
   if (!sw) return res;
@@ -2298,13 +2293,13 @@ static number smCleardenom(ideal id)
     a = id->m[i];
     if (a!=NULL)
     {
-      x = nCopy(pGetCoeff(a));
-      p_Cleardenom(a, currRing);
-      y = nDiv(x,pGetCoeff(a));
-      nDelete(&x);
-      x = nMult(res,y);
-      nNormalize(x);
-      nDelete(&res);
+      x = n_Copy(pGetCoeff(a),R->cf);
+      p_Cleardenom(a, R);
+      y = n_Div(x,pGetCoeff(a),R->cf);
+      n_Delete(&x,R->cf);
+      x = n_Mult(res,y,R->cf);
+      n_Normalize(x,R->cf);
+      n_Delete(&res,R->cf);
       res = x;
     }
   }
@@ -2324,10 +2319,10 @@ struct smnrec{
 static omBin smnrec_bin = omGetSpecBin(sizeof(smnrec));
 
 /* declare internal 'C' stuff */
-static void smNumberDelete(smnumber *);
+static void sm_NumberDelete(smnumber *, const ring R);
 static smnumber smNumberCopy(smnumber);
-static smnumber smPoly2Smnumber(poly);
-static poly smSmnumber2Poly(number);
+static smnumber sm_Poly2Smnumber(poly, const ring);
+static poly sm_Smnumber2Poly(number,const ring);
 static BOOLEAN smCheckSolv(ideal);
 
 /* class for sparse number matrix:
@@ -2349,6 +2344,7 @@ private:
   smnumber red;        // row to reduce
   smnumber piv;        // pivot
   smnumber dumm;       // allocated dummy
+  ring _R;
   void smColToRow();
   void smRowToCol();
   void smSelectPR();
@@ -2357,7 +2353,7 @@ private:
   void smGElim();
   void smAllDel();
 public:
-  sparse_number_mat(ideal);
+  sparse_number_mat(ideal, const ring);
   ~sparse_number_mat();
   int smIsSing() { return sing; }
   void smTriangular();
@@ -2372,23 +2368,23 @@ public:
 *   I = module(transprose(M)) + r*gen(n+1)
 * uses  Gauss-elimination
 */
-ideal smCallSolv(ideal I)
+ideal sm_CallSolv(ideal I, const ring R)
 {
   sparse_number_mat *linsolv;
   ring origR;
   ring tmpR;
   ideal rr;
 
-  if (idIsConstant(I)==FALSE)
+  if (id_IsConstant(I,R)==FALSE)
   {
     WerrorS("symbol in equation");
     return NULL;
   }
-  I->rank = idRankFreeModule(I);
+  I->rank = id_RankFreeModule(I,R);
   if (smCheckSolv(I)) return NULL;
-  tmpR=smRingChange(&origR,1);
-  rr=idrCopyR(I,origR);
-  linsolv = new sparse_number_mat(rr);
+  tmpR=sm_RingChange(R,1);
+  rr=idrCopyR(I,R, tmpR);
+  linsolv = new sparse_number_mat(rr,tmpR);
   rr=NULL;
   linsolv->smTriangular();
   if (linsolv->smIsSing() == 0)
@@ -2399,20 +2395,20 @@ ideal smCallSolv(ideal I)
   else
     WerrorS("singular problem for linsolv");
   delete linsolv;
-  rChangeCurrRing(origR);
   if (rr!=NULL)
-    rr = idrMoveR(rr,tmpR);
-  smKillModifiedRing(tmpR);
+    rr = idrMoveR(rr,tmpR,R);
+  sm_KillModifiedRing(tmpR);
   return rr;
 }
 
 /*
 * constructor, destroy smat
 */
-sparse_number_mat::sparse_number_mat(ideal smat)
+sparse_number_mat::sparse_number_mat(ideal smat, const ring R)
 {
   int i;
-  polyset pmat;
+  poly* pmat;
+  _R=R;
 
   crd = sing = 0;
   act = ncols = smat->ncols;
@@ -2429,7 +2425,7 @@ sparse_number_mat::sparse_number_mat(ideal smat)
   pmat = smat->m;
   for(i=ncols; i; i--)
   {
-    m_act[i] = smPoly2Smnumber(pmat[i-1]);
+    m_act[i] = sm_Poly2Smnumber(pmat[i-1],_R);
   }
   omFreeSize((ADDRESS)pmat,smat->ncols*sizeof(poly));
   omFreeBin((ADDRESS)smat, sip_sideal_bin);
@@ -2505,8 +2501,8 @@ void sparse_number_mat::smSolv()
   if (sol[i] != NULL)
   {
     x = sol[i];
-    sol[i] = nDiv(x, m_res[i]->m);
-    nDelete(&x);
+    sol[i] = n_Div(x, m_res[i]->m,_R->cf);
+    n_Delete(&x,_R->cf);
   }
   i--;
   while (i > 0)
@@ -2519,16 +2515,16 @@ void sparse_number_mat::smSolv()
       j = s->pos;
       if (sol[j] != NULL)
       {
-        z = nMult(sol[j], s->m);
+        z = n_Mult(sol[j], s->m,_R->cf);
         if (x != NULL)
         {
           y = x;
-          x = nSub(y, z);
-          nDelete(&y);
-          nDelete(&z);
+          x = n_Sub(y, z,_R->cf);
+          n_Delete(&y,_R->cf);
+          n_Delete(&z,_R->cf);
         }
         else
-          x = nNeg(z);
+          x = n_Neg(z,_R->cf);
       }
       s = s->n;
     }
@@ -2536,11 +2532,11 @@ void sparse_number_mat::smSolv()
     {
       if (x != NULL)
       {
-        y = nAdd(x, sol[i]);
-        nDelete(&x);
-        if (nIsZero(y))
+        y = n_Add(x, sol[i],_R->cf);
+        n_Delete(&x,_R->cf);
+        if (n_IsZero(y,_R->cf))
         {
-          nDelete(&sol[i]);
+          n_Delete(&sol[i],_R->cf);
           sol[i] = NULL;
         }
         else
@@ -2552,8 +2548,8 @@ void sparse_number_mat::smSolv()
     if (sol[i] != NULL)
     {
       x = sol[i];
-      sol[i] = nDiv(x, d->m);
-      nDelete(&x);
+      sol[i] = n_Div(x, d->m,_R->cf);
+      n_Delete(&x,_R->cf);
     }
     i--;
   }
@@ -2571,7 +2567,7 @@ ideal sparse_number_mat::smRes2Ideal()
   for (i=crd; i; i--)
   {
     j = perm[i]-1;
-    res->m[j] = smSmnumber2Poly(sol[i]);
+    res->m[j] = sm_Smnumber2Poly(sol[i],_R);
   }
   omFreeSize((ADDRESS)sol, sizeof(number)*(crd+1));
   return res;
@@ -2588,34 +2584,34 @@ void sparse_number_mat::smRealPivot()
   number x, xo;
   int i, copt, ropt;
 
-  xo=nInit(0);
+  xo=n_Init(0,_R->cf);
   for (i=act; i; i--)
   {
     a = m_act[i];
     while ((a!=NULL) && (a->pos<=tored))
     {
       x = a->m;
-      if (nGreaterZero(x))
+      if (n_GreaterZero(x,_R->cf))
       {
-        if (nGreater(x,xo))
+        if (n_Greater(x,xo,_R->cf))
         {
-          nDelete(&xo);
-          xo = nCopy(x);
+          n_Delete(&xo,_R->cf);
+          xo = n_Copy(x,_R->cf);
           copt = i;
           ropt = a->pos;
         }
       }
       else
       {
-        xo = nNeg(xo);
-        if (nGreater(xo,x))
+        xo = n_Neg(xo,_R->cf);
+        if (n_Greater(xo,x,_R->cf))
         {
-          nDelete(&xo);
-          xo = nCopy(x);
+          n_Delete(&xo,_R->cf);
+          xo = n_Copy(x,_R->cf);
           copt = i;
           ropt = a->pos;
         }
-        xo = nNeg(xo);
+        xo = n_Neg(xo,_R->cf);
       }
       a = a->n;
     }
@@ -2627,7 +2623,7 @@ void sparse_number_mat::smRealPivot()
     m_act[act] = m_act[copt];
     m_act[copt] = a;
   }
-  nDelete(&xo);
+  n_Delete(&xo,_R->cf);
 }
 
 /* ----------------- elimination ------------------ */
@@ -2635,7 +2631,7 @@ void sparse_number_mat::smRealPivot()
 /* one step of Gauss-elimination */
 void sparse_number_mat::smGElim()
 {
-  number p = nInvers(piv->m);  // pivotelement
+  number p = n_Invers(piv->m,_R->cf);  // pivotelement
   smnumber c = m_act[act];      // pivotcolumn
   smnumber r = red;             // row to reduce
   smnumber res, a, b;
@@ -2643,7 +2639,7 @@ void sparse_number_mat::smGElim()
 
   if ((c == NULL) || (r == NULL))
   {
-    while (r!=NULL) smNumberDelete(&r);
+    while (r!=NULL) sm_NumberDelete(&r,_R);
     return;
   }
   do
@@ -2652,8 +2648,8 @@ void sparse_number_mat::smGElim()
     res = dumm;
     res->n = NULL;
     b = c;
-    w = nMult(r->m, p);
-    nDelete(&r->m);
+    w = n_Mult(r->m, p,_R->cf);
+    n_Delete(&r->m,_R->cf);
     r->m = w;
     loop   // combine the chains a and b: a + w*b
     {
@@ -2662,7 +2658,7 @@ void sparse_number_mat::smGElim()
         do
         {
           res = res->n = smNumberCopy(b);
-          res->m = nMult(b->m, w);
+          res->m = n_Mult(b->m, w,_R->cf);
           b = b->n;
         } while (b != NULL);
         break;
@@ -2675,18 +2671,18 @@ void sparse_number_mat::smGElim()
       else if (a->pos > b->pos)
       {
         res = res->n = smNumberCopy(b);
-        res->m = nMult(b->m, w);
+        res->m = n_Mult(b->m, w,_R->cf);
         b = b->n;
       }
       else
       {
-        hb = nMult(b->m, w);
-        ha = nAdd(a->m, hb);
-        nDelete(&hb);
-        nDelete(&a->m);
-        if (nIsZero(ha))
+        hb = n_Mult(b->m, w,_R->cf);
+        ha = n_Add(a->m, hb,_R->cf);
+        n_Delete(&hb,_R->cf);
+        n_Delete(&a->m,_R->cf);
+        if (n_IsZero(ha,_R->cf))
         {
-          smNumberDelete(&a);
+          sm_NumberDelete(&a,_R);
         }
         else
         {
@@ -2703,9 +2699,9 @@ void sparse_number_mat::smGElim()
       }
     }
     m_act[r->pos] = dumm->n;
-    smNumberDelete(&r);
+    sm_NumberDelete(&r,_R);
   } while (r != NULL);
-  nDelete(&p);
+  n_Delete(&p,_R->cf);
 }
 
 /* ----------------- transfer ------------------ */
@@ -2754,7 +2750,7 @@ void sparse_number_mat::smSelectPR()
         if (a->pos == rpiv)
         {
           ap->n = a->n;
-          a->m = nNeg(a->m);
+          a->m = n_Neg(a->m,_R);
           b = b->n = a;
           b->pos = i;
           break;
@@ -2764,7 +2760,7 @@ void sparse_number_mat::smSelectPR()
     else if (a->pos == rpiv)
     {
       m_act[i] = a->n;
-      a->m = nNeg(a->m);
+      a->m = n_Neg(a->m,_R);
       b = b->n = a;
       b->pos = i;
     }
@@ -2861,13 +2857,13 @@ void sparse_number_mat::smAllDel()
   {
     a = m_act[i];
     while (a != NULL)
-      smNumberDelete(&a);
+      sm_NumberDelete(&a,_R);
   }
   for (i=crd; i; i--)
   {
     a = m_res[i];
     while (a != NULL)
-      smNumberDelete(&a);
+      sm_NumberDelete(&a,_R);
   }
   if (act)
   {
@@ -2875,18 +2871,18 @@ void sparse_number_mat::smAllDel()
     {
       a = m_row[i];
       while (a != NULL)
-        smNumberDelete(&a);
+        sm_NumberDelete(&a,_R);
     }
   }
 }
 
 /* ----------------- internal 'C' stuff ------------------ */
 
-static void smNumberDelete(smnumber *r)
+static void sm_NumberDelete(smnumber *r, const ring R)
 {
   smnumber a = *r, b = a->n;
 
-  nDelete(&a->m);
+  n_Delete(&a->m,R->cf);
   omFreeBin((ADDRESS)a,  smnrec_bin);
   *r = b;
 }
@@ -2902,7 +2898,7 @@ static smnumber smNumberCopy(smnumber a)
 * from poly to smnumber
 * do not destroy p
 */
-static smnumber smPoly2Smnumber(poly q)
+static smnumber sm_Poly2Smnumber(poly q, const ring R)
 {
   smnumber a, res;
   poly p = q;
@@ -2910,22 +2906,22 @@ static smnumber smPoly2Smnumber(poly q)
   if (p == NULL)
     return NULL;
   a = res = (smnumber)omAllocBin(smnrec_bin);
-  a->pos = pGetComp(p);
+  a->pos = p_GetComp(p,R);
   a->m = pGetCoeff(p);
-  nNew(&pGetCoeff(p));
+  n_New(&pGetCoeff(p),R->cf);
   loop
   {
     pIter(p);
     if (p == NULL)
     {
-      pDelete(&q);
+      p_Delete(&q,R);
       a->n = NULL;
       return res;
     }
     a = a->n = (smnumber)omAllocBin(smnrec_bin);
-    a->pos = pGetComp(p);
+    a->pos = p_GetComp(p,R);
     a->m = pGetCoeff(p);
-    nNew(&pGetCoeff(p));
+    n_New(&pGetCoeff(p),R->cf);
   }
 }
 
@@ -2933,12 +2929,12 @@ static smnumber smPoly2Smnumber(poly q)
 * from smnumber to poly
 * destroy a
 */
-static poly smSmnumber2Poly(number a)
+static poly sm_Smnumber2Poly(number a, const ring R)
 {
   poly res;
 
   if (a == NULL) return NULL;
-  res = pInit();
+  res = p_Init(R);
   pSetCoeff0(res, a);
   return res;
 }

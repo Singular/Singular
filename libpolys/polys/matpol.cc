@@ -812,6 +812,22 @@ class row_col_weight
   ~row_col_weight();
 };
 
+row_col_weight::row_col_weight(int i, int j)
+{
+  ym = i;
+  yn = j;
+  wrow = (float *)omAlloc(i*sizeof(float));
+  wcol = (float *)omAlloc(j*sizeof(float));
+}
+row_col_weight::~row_col_weight()
+{
+  if (ym!=0)
+  {
+    omFreeSize((ADDRESS)wcol, yn*sizeof(float));
+    omFreeSize((ADDRESS)wrow, ym*sizeof(float));
+  }
+}
+
 /*2
 *  a submatrix M of a matrix X[m,n]:
 *    0 <= i < s_m <= a_m
@@ -828,25 +844,28 @@ class mp_permmatrix
   int       a_m, a_n, s_m, s_n, sign, piv_s;
   int       *qrow, *qcol;
   poly      *Xarray;
+  ring _R;
   void mpInitMat();
-  poly * mpRowAdr(int);
-  poly * mpColAdr(int);
+  poly * mpRowAdr(int r)
+  { return &(Xarray[a_n*qrow[r]]); }
+  poly * mpColAdr(int c)
+  { return &(Xarray[qcol[c]]); }
   void mpRowWeight(float *);
   void mpColWeight(float *);
   void mpRowSwap(int, int);
   void mpColSwap(int, int);
   public:
   mp_permmatrix() : a_m(0) {}
-  mp_permmatrix(matrix);
+  mp_permmatrix(matrix, ring);
   mp_permmatrix(mp_permmatrix *);
   ~mp_permmatrix();
   int mpGetRow();
   int mpGetCol();
-  int mpGetRdim();
-  int mpGetCdim();
-  int mpGetSign();
+  int mpGetRdim() { return s_m; }
+  int mpGetCdim() { return s_n; }
+  int mpGetSign() { return sign; }
   void mpSetSearch(int s);
-  void mpSaveArray();
+  void mpSaveArray() { Xarray = NULL; }
   poly mpGetElem(int, int);
   void mpSetElem(poly, int, int);
   void mpDelElem(int, int);
@@ -857,7 +876,342 @@ class mp_permmatrix
   void mpRowReorder();
   void mpColReorder();
 };
+mp_permmatrix::mp_permmatrix(matrix A, ring R) : sign(1)
+{
+  a_m = A->nrows;
+  a_n = A->ncols;
+  this->mpInitMat();
+  Xarray = A->m;
+  _R=R;
+}
 
+mp_permmatrix::mp_permmatrix(mp_permmatrix *M)
+{
+  poly p, *athis, *aM;
+  int i, j;
+
+  _R=M->_R;
+  a_m = M->s_m;
+  a_n = M->s_n;
+  sign = M->sign;
+  this->mpInitMat();
+  Xarray = (poly *)omAlloc0(a_m*a_n*sizeof(poly));
+  for (i=a_m-1; i>=0; i--)
+  {
+    athis = this->mpRowAdr(i);
+    aM = M->mpRowAdr(i);
+    for (j=a_n-1; j>=0; j--)
+    {
+      p = aM[M->qcol[j]];
+      if (p)
+      {
+        athis[j] = p_Copy(p,_R);
+      }
+    }
+  }
+}
+
+mp_permmatrix::~mp_permmatrix()
+{
+  int k;
+
+  if (a_m != 0)
+  {
+    omFreeSize((ADDRESS)qrow,a_m*sizeof(int));
+    omFreeSize((ADDRESS)qcol,a_n*sizeof(int));
+    if (Xarray != NULL)
+    {
+      for (k=a_m*a_n-1; k>=0; k--)
+        p_Delete(&Xarray[k],_R);
+      omFreeSize((ADDRESS)Xarray,a_m*a_n*sizeof(poly));
+    }
+  }
+}
+
+
+static float mp_PolyWeight(poly p, const ring r);
+void mp_permmatrix::mpColWeight(float *wcol)
+{
+  poly p, *a;
+  int i, j;
+  float count;
+
+  for (j=s_n; j>=0; j--)
+  {
+    a = this->mpColAdr(j);
+    count = 0.0;
+    for(i=s_m; i>=0; i--)
+    {
+      p = a[a_n*qrow[i]];
+      if (p)
+        count += mp_PolyWeight(p,_R);
+    }
+    wcol[j] = count;
+  }
+}
+void mp_permmatrix::mpRowWeight(float *wrow)
+{
+  poly p, *a;
+  int i, j;
+  float count;
+
+  for (i=s_m; i>=0; i--)
+  {
+    a = this->mpRowAdr(i);
+    count = 0.0;
+    for(j=s_n; j>=0; j--)
+    {
+      p = a[qcol[j]];
+      if (p)
+        count += mp_PolyWeight(p,_R);
+    }
+    wrow[i] = count;
+  }
+}
+
+void mp_permmatrix::mpRowSwap(int i1, int i2)
+{
+   poly p, *a1, *a2;
+   int j;
+
+   a1 = &(Xarray[a_n*i1]);
+   a2 = &(Xarray[a_n*i2]);
+   for (j=a_n-1; j>= 0; j--)
+   {
+     p = a1[j];
+     a1[j] = a2[j];
+     a2[j] = p;
+   }
+}
+
+void mp_permmatrix::mpColSwap(int j1, int j2)
+{
+   poly p, *a1, *a2;
+   int i, k = a_n*a_m;
+
+   a1 = &(Xarray[j1]);
+   a2 = &(Xarray[j2]);
+   for (i=0; i< k; i+=a_n)
+   {
+     p = a1[i];
+     a1[i] = a2[i];
+     a2[i] = p;
+   }
+}
+void mp_permmatrix::mpInitMat()
+{
+  int k;
+
+  s_m = a_m;
+  s_n = a_n;
+  piv_s = 0;
+  qrow = (int *)omAlloc(a_m*sizeof(int));
+  qcol = (int *)omAlloc(a_n*sizeof(int));
+  for (k=a_m-1; k>=0; k--) qrow[k] = k;
+  for (k=a_n-1; k>=0; k--) qcol[k] = k;
+}
+
+void mp_permmatrix::mpColReorder()
+{
+  int k, j, j1, j2;
+
+  if (a_n > a_m)
+    k = a_n - a_m;
+  else
+    k = 0;
+  for (j=a_n-1; j>=k; j--)
+  {
+    j1 = qcol[j];
+    if (j1 != j)
+    {
+      this->mpColSwap(j1, j);
+      j2 = 0;
+      while (qcol[j2] != j) j2++;
+      qcol[j2] = j1;
+    }
+  }
+}
+
+void mp_permmatrix::mpRowReorder()
+{
+  int k, i, i1, i2;
+
+  if (a_m > a_n)
+    k = a_m - a_n;
+  else
+    k = 0;
+  for (i=a_m-1; i>=k; i--)
+  {
+    i1 = qrow[i];
+    if (i1 != i)
+    {
+      this->mpRowSwap(i1, i);
+      i2 = 0;
+      while (qrow[i2] != i) i2++;
+      qrow[i2] = i1;
+    }
+  }
+}
+
+/*
+* perform replacement for pivot strategy in Bareiss algorithm
+* change sign of determinant
+*/
+static void mpReplace(int j, int n, int &sign, int *perm)
+{
+  int k;
+
+  if (j != n)
+  {
+    k = perm[n];
+    perm[n] = perm[j];
+    perm[j] = k;
+    sign = -sign;
+  }
+}
+/*2
+* pivot strategy for Bareiss algorithm
+*/
+int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
+{
+  poly p, *a;
+  int i, j, iopt, jopt;
+  float sum, f1, f2, fo, r, ro, lp;
+  float *dr = C->wrow, *dc = C->wcol;
+
+  fo = 1.0e20;
+  ro = 0.0;
+  iopt = jopt = -1;
+
+  s_n--;
+  s_m--;
+  if (s_m == 0)
+    return 0;
+  if (s_n == 0)
+  {
+    for(i=s_m; i>=0; i--)
+    {
+      p = this->mpRowAdr(i)[qcol[0]];
+      if (p)
+      {
+        f1 = mp_PolyWeight(p,_R);
+        if (f1 < fo)
+        {
+          fo = f1;
+          if (iopt >= 0)
+            p_Delete(&(this->mpRowAdr(iopt)[qcol[0]]),_R);
+          iopt = i;
+        }
+        else
+          p_Delete(&(this->mpRowAdr(i)[qcol[0]]),_R);
+      }
+    }
+    if (iopt >= 0)
+      mpReplace(iopt, s_m, sign, qrow);
+    return 0;
+  }
+  this->mpRowWeight(dr);
+  this->mpColWeight(dc);
+  sum = 0.0;
+  for(i=s_m; i>=0; i--)
+    sum += dr[i];
+  for(i=s_m; i>=0; i--)
+  {
+    r = dr[i];
+    a = this->mpRowAdr(i);
+    for(j=s_n; j>=0; j--)
+    {
+      p = a[qcol[j]];
+      if (p)
+      {
+        lp = mp_PolyWeight(p,_R);
+        ro = r - lp;
+        f1 = ro * (dc[j]-lp);
+        if (f1 != 0.0)
+        {
+          f2 = lp * (sum - ro - dc[j]);
+          f2 += f1;
+        }
+        else
+          f2 = lp-r-dc[j];
+        if (f2 < fo)
+        {
+          fo = f2;
+          iopt = i;
+          jopt = j;
+        }
+      }
+    }
+  }
+  if (iopt < 0)
+    return 0;
+  mpReplace(iopt, s_m, sign, qrow);
+  mpReplace(jopt, s_n, sign, qcol);
+  return 1;
+}
+poly mp_permmatrix::mpGetElem(int r, int c)
+{
+  return Xarray[a_n*qrow[r]+qcol[c]];
+}
+
+/*
+* the Bareiss-type elimination with division by div (div != NULL)
+*/
+void mp_permmatrix::mpElimBareiss(poly div)
+{
+  poly piv, elim, q1, q2, *ap, *a;
+  int i, j, jj;
+
+  ap = this->mpRowAdr(s_m);
+  piv = ap[qcol[s_n]];
+  for(i=s_m-1; i>=0; i--)
+  {
+    a = this->mpRowAdr(i);
+    elim = a[qcol[s_n]];
+    if (elim != NULL)
+    {
+      elim = p_Neg(elim,_R);
+      for (j=s_n-1; j>=0; j--)
+      {
+        q2 = NULL;
+        jj = qcol[j];
+        if (ap[jj] != NULL)
+        {
+          q2 = SM_MULT(ap[jj], elim, div,_R);
+          if (a[jj] != NULL)
+          {
+            q1 = SM_MULT(a[jj], piv, div,_R);
+            p_Delete(&a[jj],_R);
+            q2 = p_Add_q(q2, q1, _R);
+          }
+        }
+        else if (a[jj] != NULL)
+        {
+          q2 = SM_MULT(a[jj], piv, div, _R);
+        }
+        if ((q2!=NULL) && div)
+          SM_DIV(q2, div, _R);
+        a[jj] = q2;
+      }
+      p_Delete(&a[qcol[s_n]], _R);
+    }
+    else
+    {
+      for (j=s_n-1; j>=0; j--)
+      {
+        jj = qcol[j];
+        if (a[jj] != NULL)
+        {
+          q2 = SM_MULT(a[jj], piv, div, _R);
+          p_Delete(&a[jj], _R);
+          if (div)
+            SM_DIV(q2, div, _R);
+          a[jj] = q2;
+        }
+      }
+    }
+  }
+}
 /*
 * weigth of a polynomial, for pivot strategy
 */
@@ -1199,7 +1553,7 @@ poly mp_DetBareiss (matrix a, const ring r)
     return NULL;
   }
   matrix c = mp_Copy(a,r);
-  mp_permmatrix *Bareiss = new mp_permmatrix(c);
+  mp_permmatrix *Bareiss = new mp_permmatrix(c,r);
   row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
 
   /* Bareiss */
