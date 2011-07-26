@@ -542,7 +542,7 @@ ideal idMultSect(resolvente arg, int length)
       if (syz_ring==orig_ring)
         p = pCopy(tempstd->m[j]);
       else
-        p = prCopyR(tempstd->m[j], syz_ring);
+        p = prCopyR(tempstd->m[j], syz_ring,currRing);
       p_Shift(&p,-syzComp-isIdeal,currRing);
       result->m[k] = p;
       k++;
@@ -693,7 +693,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   assume(currRing != NULL);
   ring orig_ring=currRing;
-  ring syz_ring=rAssure_SyzComp(orig_ring.TRUE);
+  ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
   rChangeCurrRing(syz_ring);
 
   if (setSyzComp)
@@ -701,7 +701,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   if (orig_ring != syz_ring)
   {
-    s_h1=idrCopyR_NoSort(h1,orig_ring);
+    s_h1=idrCopyR_NoSort(h1,orig_ring,syz_ring);
   }
   else
   {
@@ -773,9 +773,12 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   && (!rIsPluralRing(currRing))
   )
   {
-    ring dp_C_ring = rCurrRingAssure_dp_C();
+    ring dp_C_ring = rAssure_dp_C(syz_ring);
     if (dp_C_ring != syz_ring)
+    {
+      rChangeCurrRing(dp_C_ring);
       e = idrMoveR_NoSort(e, syz_ring, dp_C_ring);
+    }
     resolvente res = sySchreyerResolvente(e,-1,&length,TRUE, TRUE);
     intvec * dummy = syBetti(res,length,&reg, *w);
     *deg = reg+2;
@@ -823,7 +826,7 @@ ideal idXXX (ideal  h1, int k)
 
   if (orig_ring != syz_ring)
   {
-    s_h1=idrCopyR_NoSort(h1,orig_ring);
+    s_h1=idrCopyR_NoSort(h1,orig_ring, syz_ring);
   }
   else
   {
@@ -897,7 +900,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
   ideal s_h1=h1;
 
   if (orig_ring != syz_ring)
-    s_h1 = idrCopyR_NoSort(h1,orig_ring);
+    s_h1 = idrCopyR_NoSort(h1,orig_ring,syz_ring);
   else
     s_h1 = h1;
 
@@ -1105,8 +1108,8 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   ideal s_mod, s_temp;
   if (orig_ring != syz_ring)
   {
-    s_mod = idrCopyR_NoSort(mod,orig_ring);
-    s_temp = idrCopyR_NoSort(submod,orig_ring);
+    s_mod = idrCopyR_NoSort(mod,orig_ring,syz_ring);
+    s_temp = idrCopyR_NoSort(submod,orig_ring,syz_ring);
   }
   else
   {
@@ -1287,7 +1290,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
     {
       if(pDivisibleBy(Q->m[j],p))
       {
-        poly p0=pDivideM(pHead(p),pHead(Q->m[j]));
+        poly p0=p_DivideM(pHead(p),pHead(Q->m[j]),currRing);
         if(w==NULL)
           p=pJet(pSub(p,ppMult_mm(Q->m[j],p0)),N);
         else
@@ -1459,7 +1462,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
 
   ring orig_ring=currRing;
-  ring syz_ring=rAssure_SyzComp(orig_ring.TRUE);
+  ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);
   rChangeCurrRing(syz_ring);
   rSetSyzComp(kmax-1,syz_ring);
   if (orig_ring!=syz_ring)
@@ -1805,7 +1808,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
             MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
           }
         }
-        p = mpDetBareiss(tmp);
+        p = mp_DetBareiss(tmp,currRing);
         if (p!=NULL)
         {
           if (R!=NULL)
@@ -1869,7 +1872,7 @@ ideal idMinors(matrix a, int ar, ideal R)
           MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
         }
       }
-      p = mpDetBareiss(tmp);
+      p = mp_DetBareiss(tmp,vcurrRing);
       if (p!=NULL)
       {
         if (R!=NULL)
@@ -1932,19 +1935,19 @@ ideal idMinors(matrix a, int ar, ideal R)
     Werror("%d-th minor, matrix is %dx%d",ar,r,c);
     return NULL;
   }
-  h = idMatrix2Module(mpCopy(a));
-  bound = smExpBound(h,c,r,ar);
+  h = idMatrix2Module(mp_Copy(a,currRing));
+  bound = sm_ExpBound(h,c,r,ar,currRing);
   idDelete(&h);
-  tmpR=smRingChange(&origR,bound);
+  tmpR=sm_RingChange(origR,bound);
   b = mpNew(r,c);
   for (i=r*c-1;i>=0;i--)
   {
     if (a->m[i])
-      b->m[i] = prCopyR(a->m[i],origR);
+      b->m[i] = prCopyR(a->m[i],origR,currRing);
   }
   if (R!=NULL)
   {
-    R = idrCopyR(R,origR);
+    R = idrCopyR(R,origR,currRing);
     //if (ar>1) // otherwise done in mpMinorToResult
     //{
     //  matrix bb=(matrix)kNF(R,currQuotient,(ideal)b);
@@ -1959,7 +1962,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   if (R!=NULL) idDelete(&R);
   idSkipZeroes(result);
   rChangeCurrRing(origR);
-  result = idrMoveR(result,tmpR);
+  result = idrMoveR(result,tmpR,origR);
   smKillModifiedRing(tmpR);
   idTest(result);
   return result;

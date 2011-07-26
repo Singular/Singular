@@ -60,7 +60,7 @@ matrix mp_Wedge(matrix a, int ar, const ring r);
 
 // BOOLEAN mpJacobi(leftv res,leftv a);
 // BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
-// poly mp_DetBareiss (matrix a, const ring r);
+poly mp_DetBareiss (matrix a, const ring r);
 
 //matrix mp_Homogen(matrix a, int v, const ring r);
 
@@ -80,7 +80,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring r);
 void mp_Coef2(poly v, poly vars, matrix *c, matrix *m, const ring r);
 
 /// for minors with Bareiss
-// void mp_RecMin(int, ideal, int &, matrix, int, int, poly, ideal, const ring r);
+void mp_RecMin(int, ideal, int &, matrix, int, int, poly, ideal, const ring r);
 // void mp_MinorToResult(ideal, int &, matrix, int, int, ideal, const ring r);
 
 BOOLEAN mp_IsDiagUnit(matrix U, const ring r);

@@ -5022,7 +5022,7 @@ static BOOLEAN jjidElem(leftv res, leftv v)
 }
 static BOOLEAN jjmpDetBareiss(leftv res, leftv v)
 {
-  res->data = (char *)mpDetBareiss((matrix)v->Data());
+  res->data = (char *)mp_DetBareiss((matrix)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjidFreeModule(leftv res, leftv v)
