@@ -129,6 +129,7 @@ static feResourceConfig_s feResourceConfigs[] =
  *
  *****************************************************************/
 char* feArgv0=NULL;
+
 #define MAXRESOURCELEN 5*MAXPATHLEN
 
 static feResourceConfig feGetResourceConfig(const char id);
@@ -178,7 +179,7 @@ char* feResourceDefault(const char* key)
   return feResourceDefault(feGetResourceConfig(key));
 }
 
-void feInitResources(char* argv0)
+void feInitResources(const char* argv0)
 {
 #if defined(ix86_Win) && defined(__GNUC__)
   if (cygwin32_posix_path_list_p (getenv("PATH")))
@@ -187,7 +188,7 @@ void feInitResources(char* argv0)
   if (argv0==NULL)
   {
     feArgv0 = (char*)omAlloc0(MAXPATHLEN+strlen("/Singular"));
-    getcwd(feArgv0,MAXPATHLEN);
+    getcwd(feArgv0, MAXPATHLEN);
     strcpy(feArgv0+strlen(feArgv0),"/Singular");
   }
   else

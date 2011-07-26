@@ -37,7 +37,7 @@ char* feGetResource(const char id);
 
 // This needs to be called before the first call to feResource
 // Initializes Resources, SearchPath, and extends PATH
-void feInitResources(char* argv0 = NULL);
+void feInitResources(const char* argv0 = NULL);
 // Re-inits resources, should be called after changing env. variables
 void feReInitResources();
 // Prints resources into string with StringAppend, etc
