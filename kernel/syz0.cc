@@ -422,7 +422,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
             pEnlargeSet(Shdl,IDELEMS(result),16);
             IDELEMS(result) += 16;
           }
-          //pShift(&toRed,-rkF);
+          //p_Shift(&toRed,-rkF,currRing);
           pNorm(toRed);
           (*Shdl)[Sl] = toRed;
           Sl++;
@@ -838,7 +838,7 @@ static void idShift(ideal arg,int index)
   for (i=0;i<IDELEMS(arg);i++)
   {
     if (arg->m[i]!=NULL)
-      pShift(&arg->m[i],-j);
+      p_Shift(&arg->m[i],-j,currRing);
   }
 }
 

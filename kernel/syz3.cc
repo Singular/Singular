@@ -122,8 +122,8 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
   neg_gen = pNeg(neg_gen);
   if (pGetComp(gen)>0)
   {
-    pShift(&gen,-1);
-    pShift(&neg_gen,-1);
+    p_Shift(&gen,-1,currRing);
+    p_Shift(&neg_gen,-1,currRing);
   }
   while (index>0) 
   {
@@ -193,14 +193,14 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
         {
           syzstr->res[index]->m[i+start] = pCopy(current_ideal->m[i]);
           syzstr->res[index]->m[i+start] = pMult_mm(syzstr->res[index]->m[i+start],w_gen);
-          pShift(&syzstr->res[index]->m[i+start],current_tl);
+          p_Shift(&syzstr->res[index]->m[i+start],current_tl,currRing);
           syzstr->res[index]->m[i+start] = pAdd(syzstr->res[index]->m[i+start],
             ppMult_qq(current_repr->m[i],p));
           syzstr->orderedRes[index]->m[i+start] = pCopy(current_repr->m[i]);
           syzstr->orderedRes[index]->m[i+start] = 
             pMult_mm(syzstr->orderedRes[index]->m[i+start],w_gen);
           if ((*syzstr->Tl)[index]!=0)
-            pShift(&syzstr->orderedRes[index]->m[i+start],(*syzstr->Tl)[index]);
+            p_Shift(&syzstr->orderedRes[index]->m[i+start],(*syzstr->Tl)[index],currRing);
         }
       }
       for (i=0;i<IDELEMS(totake[index-1]);i++)
@@ -211,10 +211,10 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
                (totake[index-1]->m[i+1]==NULL)))) break;
           totake[index]->m[i+start_ttk] = 
             pMult_mm(pCopy(totake[index-1]->m[i]),w_gen);
-          pShift(&totake[index]->m[i+start_ttk],current_tl);
+          p_Shift(&totake[index]->m[i+start_ttk],current_tl,currRing);
 #ifdef FULL_TOTAKE
           poly pp=pCopy(p);
-          pShift(&pp,i+1);
+          p_Shift(&pp,i+1,currRing);
           totake[index]->m[i+start_ttk] = pAdd(totake[index]->m[i+start_ttk],pp);
 #endif
         }
@@ -689,7 +689,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
     {
       tso.p = NULL;
       p = pCopy(tso.p1);
-      pShift(&p,-1);
+      p_Shift(&p,-1,currRing);
 #ifdef WITH_BUCKET
       poly pp;
       pp = pMult_mm(pCopy(old_repr->m[tso.ind2]),p);
@@ -705,7 +705,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       }
       pDelete(&pp);
       p = pCopy(tso.p2);
-      pShift(&p,-1);
+      p_Shift(&p,-1,currRing);
       pp = pCopy(old_repr->m[tso.ind1]);
       il=-1;
       while (p!=NULL)
@@ -718,7 +718,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
 #else
       tso.syz = pMult(p,pCopy(old_repr->m[tso.ind2]));
       p = pCopy(tso.p2);
-      pShift(&p,-1);
+      p_Shift(&p,-1,currRing);
       tso.syz = pSub(tso.syz,pMult(p,pCopy(old_repr->m[tso.ind1])));
 #endif
     }
@@ -1231,8 +1231,8 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       tp2 = pNext(pp2);
       pNext(pp1) = NULL;
       pNext(pp2) = NULL;
-      //pShift(&p1,-ac);
-      //pShift(&p2,-ac);
+      //p_Shift(&p1,-ac,currRing);
+      //p_Shift(&p2,-ac,currRing);
       tp1 = pMult(tp1,pCopy(p2));
       tp2 = pMult(tp2,pCopy(p1));
       sp1 = pMult(p2,sp1);
@@ -1778,7 +1778,7 @@ syStrategy syKosz(ideal arg,int * length)
     for (j=0;j<IDELEMS(temp);j++)
     {
       if (temp->m[j]!=NULL)
-        pShift(&temp->m[j],1);
+        p_Shift(&temp->m[j],1,currRing);
     }
   }
   idSkipZeroes(temp);
