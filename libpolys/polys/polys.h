@@ -331,7 +331,7 @@ inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
 #define   ppJetW(p,m,iv) pp_JetW(p,m,iv,currRing)
 #define   pJetW(p,m,iv) p_JetW(p,m,iv,currRing)
 #define   pMinDeg(p,w) p_MinDeg(p,w,currRing)
-#define   pSeries(n,p,u,w) p_series(n,p,u,w,currRing)
+#define   pSeries(n,p,u,w) p_Series(n,p,u,w,currRing)
 #define   pInvers(n,p,w) p_Invers(n,p,w,currRing)
 // maximum weigthed degree of all monomials of p, w is indexed from
 // 1..pVariables

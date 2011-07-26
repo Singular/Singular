@@ -1924,5 +1924,8 @@ int   p_Var(poly mi,const ring r);
 // returns the length of a polynomial (numbers of monomials) and the last mon.
 // respect syzComp
 poly p_Last(poly a, int &l, const ring r);
+
+/// shifts components of the vector p by i
+void p_Shift (poly * p,int i, const ring r);
 #endif // P_POLYS_H
 
