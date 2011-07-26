@@ -23,6 +23,7 @@
 
 @set singularmanual 1
 @set withplural 1
+@c @set withpython 1
 @set PSUFFIX  (plural)
 @set namespaces 1
 @include version.texi

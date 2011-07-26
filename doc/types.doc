@@ -4522,4 +4522,15 @@ operator @code{.} to access the elements
 @end smallexample
 
 @c ------------------------------
+@ifset withpython
 @include pyobject.tex
+@end ifset
+
+@ifclear withpython
+@node  pyobject,,User defined types, Data types
+@section pyobject
+@cindex pyobject
+@cindex blackbox
+
+This version of Singular does not support pyobject.
+@end ifclear

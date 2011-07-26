@@ -12,6 +12,10 @@ SHELL=/bin/sh
 SINGUNAME       = @SINGUNAME@
 S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 
+PYOBECT_TEX =
+#PYOBECT_TEX = pyobject.tex
+
+
 ## directory where info files are installed
 prefix          = @prefix@
 infodir	        = ${prefix}/info
@@ -99,7 +103,7 @@ STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 DOC2TEX_FILES	= decodegb.tex \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex \
-		plural.tex letterplace.tex plulibs.tex sca.tex pyobject.tex
+		plural.tex letterplace.tex plulibs.tex sca.tex ${PYOBJECT_TEX}
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
