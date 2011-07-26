@@ -919,7 +919,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
               server->h_length);
         serv_addr.sin_port = htons(portno);
         if (connect(sockfd,(sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
-        { WerrorS("ERROR connecting"); return TRUE; }
+        { Werror("ERROR connecting(errno=%d)",errno); return TRUE; }
         //PrintS("connected\n");mflush();
         d->f_read=fdopen(sockfd,"r");
         d->fd_read=sockfd;
