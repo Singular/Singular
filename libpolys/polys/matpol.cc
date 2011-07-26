@@ -35,7 +35,7 @@
 #include "matpol.h"
 #include "prCopy.h"
 
-// #include "sparsmat.h"
+#include "sparsmat.h"
    
 //omBin ip_smatrix_bin = omGetSpecBin(sizeof(ip_smatrix));
 #define ip_smatrix_bin sip_sideal_bin
@@ -796,4 +796,430 @@ char * iiStringMatrix(matrix im, int dim, const ring r, char ch)
 void   mp_Delete(matrix* a, const ring r)
 {
   id_Delete((ideal *) a, r);
+}
+
+/*
+* C++ classes for Bareiss algorithm
+*/
+class row_col_weight
+{
+  private:
+  int ym, yn;
+  public:
+  float *wrow, *wcol;
+  row_col_weight() : ym(0) {}
+  row_col_weight(int, int);
+  ~row_col_weight();
+};
+
+/*2
+*  a submatrix M of a matrix X[m,n]:
+*    0 <= i < s_m <= a_m
+*    0 <= j < s_n <= a_n
+*    M = ( Xarray[qrow[i],qcol[j]] )
+*    if a_m = a_n and s_m = s_n
+*      det(X) = sign*div^(s_m-1)*det(M)
+*    resticted pivot for elimination
+*      0 <= j < piv_s
+*/
+class mp_permmatrix
+{
+  private:
+  int       a_m, a_n, s_m, s_n, sign, piv_s;
+  int       *qrow, *qcol;
+  poly      *Xarray;
+  void mpInitMat();
+  poly * mpRowAdr(int);
+  poly * mpColAdr(int);
+  void mpRowWeight(float *);
+  void mpColWeight(float *);
+  void mpRowSwap(int, int);
+  void mpColSwap(int, int);
+  public:
+  mp_permmatrix() : a_m(0) {}
+  mp_permmatrix(matrix);
+  mp_permmatrix(mp_permmatrix *);
+  ~mp_permmatrix();
+  int mpGetRow();
+  int mpGetCol();
+  int mpGetRdim();
+  int mpGetCdim();
+  int mpGetSign();
+  void mpSetSearch(int s);
+  void mpSaveArray();
+  poly mpGetElem(int, int);
+  void mpSetElem(poly, int, int);
+  void mpDelElem(int, int);
+  void mpElimBareiss(poly);
+  int mpPivotBareiss(row_col_weight *);
+  int mpPivotRow(row_col_weight *, int);
+  void mpToIntvec(intvec *);
+  void mpRowReorder();
+  void mpColReorder();
+};
+
+/*
+* weigth of a polynomial, for pivot strategy
+*/
+static float mp_PolyWeight(poly p, const ring r)
+{
+  int i;
+  float res;
+
+  if (pNext(p) == NULL)
+  {
+    res = (float)n_Size(pGetCoeff(p),r->cf);
+    for (i=rVar(r);i>0;i--)
+    {
+      if(p_GetExp(p,i,r)!=0)
+      {
+        res += 2.0;
+        break;
+      }
+    }
+  }
+  else
+  {
+    res = 0.0;
+    do
+    {
+      res += (float)n_Size(pGetCoeff(p),r->cf)+2.0;
+      pIter(p);
+    }
+    while (p);
+  }
+  return res;
+}
+/*
+* find best row
+*/
+static int mp_PivBar(matrix a, int lr, int lc, const ring r)
+{
+  float f1, f2;
+  poly *q1;
+  int i,j,io;
+
+  io = -1;
+  f1 = 1.0e30;
+  for (i=lr-1;i>=0;i--)
+  {
+    q1 = &(a->m)[i*a->ncols];
+    f2 = 0.0;
+    for (j=lc-1;j>=0;j--)
+    {
+      if (q1[j]!=NULL)
+        f2 += mp_PolyWeight(q1[j],r);
+    }
+    if ((f2!=0.0) && (f2<f1))
+    {
+      f1 = f2;
+      io = i;
+    }
+  }
+  if (io<0) return 0;
+  else return io+1;
+}
+
+static void mpSwapRow(matrix a, int pos, int lr, int lc)
+{
+  poly sw;
+  int j;
+  poly* a2 = a->m;
+  poly* a1 = &a2[a->ncols*(pos-1)];
+
+  a2 = &a2[a->ncols*(lr-1)];
+  for (j=lc-1; j>=0; j--)
+  {
+    sw = a1[j];
+    a1[j] = a2[j];
+    a2[j] = sw;
+  }
+}
+
+/*2
+*  prepare one step of 'Bareiss' algorithm
+*  for application in minor
+*/
+static int mp_PrepareRow (matrix a, int lr, int lc, const ring R)
+{
+  int r;
+
+  r = mp_PivBar(a,lr,lc,R);
+  if(r==0) return 0;
+  if(r<lr) mpSwapRow(a, r, lr, lc);
+  return 1;
+}
+
+/*
+* find pivot in the last row
+*/
+static int mp_PivRow(matrix a, int lr, int lc, const ring r)
+{
+  float f1, f2;
+  poly *q1;
+  int j,jo;
+
+  jo = -1;
+  f1 = 1.0e30;
+  q1 = &(a->m)[(lr-1)*a->ncols];
+  for (j=lc-1;j>=0;j--)
+  {
+    if (q1[j]!=NULL)
+    {
+      f2 = mp_PolyWeight(q1[j],r);
+      if (f2<f1)
+      {
+        f1 = f2;
+        jo = j;
+      }
+    }
+  }
+  if (jo<0) return 0;
+  else return jo+1;
+}
+
+static void mpSwapCol(matrix a, int pos, int lr, int lc)
+{
+  poly sw;
+  int j;
+  poly* a2 = a->m;
+  poly* a1 = &a2[pos-1];
+
+  a2 = &a2[lc-1];
+  for (j=a->ncols*(lr-1); j>=0; j-=a->ncols)
+  {
+    sw = a1[j];
+    a1[j] = a2[j];
+    a2[j] = sw;
+  }
+}
+
+/*2
+*  prepare one step of 'Bareiss' algorithm
+*  for application in minor
+*/
+static int mp_PreparePiv (matrix a, int lr, int lc,const ring r)
+{
+  int c;
+
+  c = mp_PivRow(a, lr, lc,r);
+  if(c==0) return 0;
+  if(c<lc) mpSwapCol(a, c, lr, lc);
+  return 1;
+}
+
+static inline BOOLEAN smSmaller(poly a, poly b)
+{
+  loop
+  {
+    pIter(b);
+    if (b == NULL) return TRUE;
+    pIter(a);
+    if (a == NULL) return FALSE;
+  }
+}
+
+static BOOLEAN sm_IsNegQuot(poly a, const poly b, const poly c, const ring R)
+{
+  if (p_LmDivisibleByNoComp(c, b, R))
+  {
+    p_ExpVectorDiff(a, b, c, R);
+    // Hmm: here used to be a pSetm(a): but it is unnecessary,
+    // if b and c are correct
+    return FALSE;
+  }
+  else
+  {
+    int i;
+    for (i=rVar(R); i>0; i--)
+    {
+      if(p_GetExp(c,i,R) > p_GetExp(b,i,R))
+        p_SetExp(a,i,p_GetExp(c,i,R)-p_GetExp(b,i,R),R);
+      else
+        p_SetExp(a,i,0,R);
+    }
+    // here we actually might need a pSetm, if a is to be used in
+    // comparisons
+    return TRUE;
+  }
+}
+
+static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const ring R)
+{
+  int r=lr-1, c=lc-1;
+  poly *b = a0->m, *x = re->m;
+  poly piv, elim, q1, q2, *ap, *a, *q;
+  int i, j;
+
+  ap = &b[r*a0->ncols];
+  piv = ap[c];
+  for(j=c-1; j>=0; j--)
+    if (ap[j] != NULL) ap[j] = p_Neg(ap[j],R);
+  for(i=r-1; i>=0; i--)
+  {
+    a = &b[i*a0->ncols];
+    q = &x[i*re->ncols];
+    if (a[c] != NULL)
+    {
+      elim = a[c];
+      for (j=c-1; j>=0; j--)
+      {
+        q1 = NULL;
+        if (a[j] != NULL)
+        {
+          q1 = sm_MultDiv(a[j], piv, div,R);
+          if (ap[j] != NULL)
+          {
+            q2 = sm_MultDiv(ap[j], elim, div, R);
+            q1 = p_Add_q(q1,q2,R);
+          }
+        }
+        else if (ap[j] != NULL)
+          q1 = sm_MultDiv(ap[j], elim, div, R);
+        if (q1 != NULL)
+        {
+          if (div)
+            sm_SpecialPolyDiv(q1, div,R);
+          q[j] = q1;
+        }
+      }
+    }
+    else
+    {
+      for (j=c-1; j>=0; j--)
+      {
+        if (a[j] != NULL)
+        {
+          q1 = sm_MultDiv(a[j], piv, div, R);
+          if (div)
+            sm_SpecialPolyDiv(q1, div, R);
+          q[j] = q1;
+        }
+      }
+    }
+  }
+}
+
+/*2
+* entries of a are minors and go to result (only if not in R)
+*/
+void mp_MinorToResult(ideal result, int &elems, matrix a, int r, int c,
+                     ideal R, const ring ri)
+{
+  poly *q1;
+  int e=IDELEMS(result);
+  int i,j;
+
+  if (R != NULL)
+  {
+    for (i=r-1;i>=0;i--)
+    {
+      q1 = &(a->m)[i*a->ncols];
+      //for (j=c-1;j>=0;j--)
+      //{
+      //  if (q1[j]!=NULL) q1[j] = kNF(R,currQuotient,q1[j]);
+      //}
+    }
+  }
+  for (i=r-1;i>=0;i--)
+  {
+    q1 = &(a->m)[i*a->ncols];
+    for (j=c-1;j>=0;j--)
+    {
+      if (q1[j]!=NULL)
+      {
+        if (elems>=e)
+        {
+          pEnlargeSet(&(result->m),e,e);
+          e += e;
+          IDELEMS(result) =e;
+        }
+        result->m[elems] = q1[j];
+        q1[j] = NULL;
+        elems++;
+      }
+    }
+  }
+}
+
+static void mpFinalClean(matrix a)
+{
+  omFreeSize((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
+  omFreeBin((ADDRESS)a, ip_smatrix_bin);
+}
+
+/*2
+* produces recursively the ideal of all arxar-minors of a
+*/
+void mp_RecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
+              poly barDiv, ideal R, const ring r)
+{
+  int k;
+  int kr=lr-1,kc=lc-1;
+  matrix nextLevel=mpNew(kr,kc);
+
+  loop
+  {
+/*--- look for an optimal row and bring it to last position ------------*/
+    if(mp_PrepareRow(a,lr,lc,r)==0) break;
+/*--- now take all pivots from the last row ------------*/
+    k = lc;
+    loop
+    {
+      if(mp_PreparePiv(a,lr,k,r)==0) break;
+      mp_ElimBar(a,nextLevel,barDiv,lr,k,r);
+      k--;
+      if (ar>1)
+      {
+        mp_RecMin(ar-1,result,elems,nextLevel,kr,k,a->m[kr*a->ncols+k],R,r);
+        mp_PartClean(nextLevel,kr,k, r);
+      }
+      else mp_MinorToResult(result,elems,nextLevel,kr,k,R,r);
+      if (ar>k-1) break;
+    }
+    if (ar>=kr) break;
+/*--- now we have to take out the last row...------------*/
+    lr = kr;
+    kr--;
+  }
+  mpFinalClean(nextLevel);
+}
+
+/*2
+*returns the determinant of the matrix m;
+*uses Bareiss algorithm
+*/
+poly mp_DetBareiss (matrix a, const ring r)
+{
+  int s;
+  poly div, res;
+  if (MATROWS(a) != MATCOLS(a))
+  {
+    Werror("det of %d x %d matrix",MATROWS(a),MATCOLS(a));
+    return NULL;
+  }
+  matrix c = mp_Copy(a,r);
+  mp_permmatrix *Bareiss = new mp_permmatrix(c);
+  row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+
+  /* Bareiss */
+  div = NULL;
+  while(Bareiss->mpPivotBareiss(&w))
+  {
+    Bareiss->mpElimBareiss(div);
+    div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+  }
+  Bareiss->mpRowReorder();
+  Bareiss->mpColReorder();
+  Bareiss->mpSaveArray();
+  s = Bareiss->mpGetSign();
+  delete Bareiss;
+
+  /* result */
+  res = MATELEM(c,1,1);
+  MATELEM(c,1,1) = NULL;
+  id_Delete((ideal *)&c,r);
+  if (s < 0)
+    res = p_Neg(res,r);
+  return res;
 }

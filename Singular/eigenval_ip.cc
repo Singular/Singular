@@ -179,7 +179,7 @@ lists evEigenvals(matrix M)
         MATELEM(M0,i,i)=pSub(MATELEM(M0,i,i),pCopy(t));
 
       intvec *m0;
-      ideal e0=singclap_factorize(mpDetBareiss(M0),&m0,2);
+      ideal e0=singclap_factorize(mp_DetBareiss(M,currRing)),&m0,2);
       if (e0==NULL)
       {
         l->Init(0);
