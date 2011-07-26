@@ -9,14 +9,6 @@
 */
 #include <coeffs/coeffs.h>
 
-typedef struct 
-{
-  int GFChar;
-  int GFDegree;
-  char* GFPar_name;
-} GFInfo;
-
-
 BOOLEAN nfInitChar(coeffs r, void*);
 
 //static BOOLEAN nfCoeffsEqual(const coeffs r, n_coeffType n, void* parameter);

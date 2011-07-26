@@ -61,6 +61,15 @@ typedef number (*numberfunc)(number a, number b, const coeffs r);
 /// maps "a", which lives in src, into dst
 typedef number (*nMapFunc)(number a, const coeffs src, const coeffs dst);
 
+/// Creation data needed for finite fields
+typedef struct 
+{
+  int GFChar;
+  int GFDegree;
+  const char* GFPar_name;
+} GFInfo;
+
+
 struct n_Procs_s
 {
    coeffs next;
