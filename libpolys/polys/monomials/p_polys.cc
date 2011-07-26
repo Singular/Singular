@@ -3797,6 +3797,42 @@ poly p_Last(poly a, int &l, const ring r)
   return a;
 }
 
+/*2
+* verschiebt die Indizees der Modulerzeugenden um i
+*/
+void p_Shift (poly * p,int i, const ring r)
+{
+  poly qp1 = *p,qp2 = *p;/*working pointers*/
+  int     j = p_MaxComp(*p,r),k = p_MinComp(*p,r);
+
+  if (j+i < 0) return ;
+  while (qp1 != NULL)
+  {
+    if ((p_GetComp(qp1,r)+i > 0) || ((j == -i) && (j == k)))
+    {
+      p_AddComp(qp1,i,r);
+      p_SetmComp(qp1,r);
+      qp2 = qp1;
+      pIter(qp1);
+    }
+    else
+    {
+      if (qp2 == *p)
+      {
+        pIter(*p);
+        p_LmDelete(&qp2,r);
+        qp2 = *p;
+        qp1 = *p;
+      }
+      else
+      {
+        qp2->next = qp1->next;
+        if (qp1!=NULL) p_LmDelete(&qp1,r);
+        qp1 = qp2->next;
+      }
+    }
+  }
+}
 /***************************************************************
  *
  * p_ShallowDelete
