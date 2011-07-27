@@ -190,44 +190,46 @@ const char* slStatus(si_link l, const char *request)
 //--------------------------------------------------------------------------
 BOOLEAN slOpen(si_link l, short flag, leftv h)
 {
-  BOOLEAN res;
-
-  if (l->m == NULL) slInit(l, ((char*)""));
-
-  if (SI_LINK_OPEN_P(l))
+  BOOLEAN res = TRUE;
+  if (l!=NULL)
   {
-    Warn("open: link of type: %s, mode: %s, name: %s is already open",
+
+    if (l->m == NULL) slInit(l, ((char*)""));
+
+    const char *c="_";;
+    if (h!=NULL) c=h->Name();
+
+    if (SI_LINK_OPEN_P(l))
+    {
+      Warn("open: link of type: %s, mode: %s, name: %s is already open",
          l->m->type, l->mode, l->name);
-    return FALSE;
+      return FALSE;
+    }
+    else if (l->m->Open != NULL)
+    {
+      res = l->m->Open(l, flag, h);
+      if (res)
+        Werror("open: Error for link %s of type: %s, mode: %s, name: %s",
+             c, l->m->type, l->mode, l->name);
+    }
   }
-  else if (l->m->Open != NULL)
-    res = l->m->Open(l, flag, h);
-  else
-    res = TRUE;
-
-  const char *c="_";;
-  if (h!=NULL) c=h->Name();
-
-  if (res)
-    Werror("open: Error for link %s of type: %s, mode: %s, name: %s",
-           c, l->m->type, l->mode, l->name);
   return res;
 }
 
 BOOLEAN slClose(si_link l)
 {
-  BOOLEAN res;
 
   if(! SI_LINK_OPEN_P(l))
     return FALSE;
-  else if (l->m->Close != NULL)
-    res = l->m->Close(l);
-  else
-    res = TRUE;
 
-  if (res)
-    Werror("close: Error for link of type: %s, mode: %s, name: %s",
+  BOOLEAN res = TRUE;
+  if (l->m->Close != NULL)
+  {
+    res = l->m->Close(l);
+    if (res)
+      Werror("close: Error for link of type: %s, mode: %s, name: %s",
            l->m->type, l->mode, l->name);
+  }
   return res;
 }
 
