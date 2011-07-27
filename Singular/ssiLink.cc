@@ -980,51 +980,54 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 //**************************************************************************/
 BOOLEAN ssiClose(si_link l)
 {
-  ssiInfo *d = (ssiInfo *)l->data;
-  if (d!=NULL)
+  if (l!=NULL)
   {
-    if (d->r!=NULL) rKill(d->r);
-    if (d->f_read!=NULL) fclose(d->f_read);
-    if ((strcmp(l->mode,"tcp")==0)
-    || (strcmp(l->mode,"fork")==0))
+    ssiInfo *d = (ssiInfo *)l->data;
+    if (d!=NULL)
     {
-      link_list hh=ssiToBeClosed;
-      if (hh!=NULL)
+      if (d->r!=NULL) rKill(d->r);
+      if (d->f_read!=NULL) fclose(d->f_read);
+      if ((strcmp(l->mode,"tcp")==0)
+      || (strcmp(l->mode,"fork")==0))
       {
-        if (hh->l==l)
+        link_list hh=ssiToBeClosed;
+        if (hh!=NULL)
         {
-           ssiToBeClosed=(link_list)hh->next;
-           omFreeSize(hh,sizeof(link_struct));
-        }
-        else while(hh!=NULL)
-        {
-          link_list hhh=(link_list)hh->next;
-          if (hhh->l==l)
+          if (hh->l==l)
           {
-            hh->next=hhh->next;
-            omFreeSize(hhh,sizeof(link_struct));
-            break;
+             ssiToBeClosed=(link_list)hh->next;
+             omFreeSize(hh,sizeof(link_struct));
           }
-          hh=(link_list)hh->next;
+          else while(hh!=NULL)
+          {
+            link_list hhh=(link_list)hh->next;
+            if (hhh->l==l)
+            {
+              hh->next=hhh->next;
+              omFreeSize(hhh,sizeof(link_struct));
+              break;
+            }
+            hh=(link_list)hh->next;
+          }
+        }
+        if (d->send_quit_at_exit)
+        {  
+          fputs("99\n",d->f_write);fflush(d->f_write);
         }
       }
-      if (d->send_quit_at_exit)
+      if (d->f_write!=NULL) fclose(d->f_write);
+      if (d->pid!=0)
       {
-        fputs("99\n",d->f_write);fflush(d->f_write);
+        kill(d->pid,15);
+        waitpid(d->pid,NULL,WNOHANG);
+        kill(d->pid,9); // just to be sure
+        waitpid(d->pid,NULL,0);
       }
+      omFreeSize((ADDRESS)d,(sizeof *d));
     }
-    if (d->f_write!=NULL) fclose(d->f_write);
-    if (d->pid!=0)
-    {
-      kill(d->pid,15);
-      waitpid(d->pid,NULL,WNOHANG);
-      kill(d->pid,9); // just to be sure
-      waitpid(d->pid,NULL,0);
-    }
-    omFreeSize((ADDRESS)d,(sizeof *d));
+    l->data=NULL;
+    SI_LINK_SET_CLOSE_P(l);
   }
-  l->data=NULL;
-  SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
 
