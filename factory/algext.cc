@@ -824,8 +824,11 @@ void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const Canonica
     if( rem.isZero() )
     {
       s*=inv;
+      s= reduce (s, M);
       t*=inv;
+      t= reduce (t, M);
       result *= inv; // monify result
+      result= reduce (result, M);
       return;
     }
     sum += q;
@@ -945,6 +948,60 @@ static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const C
   }
   result = reduce(result, M);
   divides = true;
+}
+
+void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
+{
+  // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
+  // F and G must have the same level AND level > 0
+  // we try to calculate gcd(f,g) = s*F + t*G
+  // if a zero divisor is encontered, 'fail' is set to one
+  Variable a, b;
+  if( !hasFirstAlgVar(F,a) && !hasFirstAlgVar(G,b) ) // note lazy evaluation
+  {
+    result = extgcd( F, G, s, t ); // no zero divisors possible
+    return;
+  }
+  if( b.level() > a.level() )
+    a = b;
+  // here: a is the biggest alg. var in F and G
+  CanonicalForm M = getMipo(a);
+  CanonicalForm P;
+  if( degree(F) > degree(G) )
+  {
+    P=F; result=G; s=0; t=1;
+  }
+  else
+  {
+    P=G; result=F; s=1; t=0;
+  }
+  CanonicalForm inv, rem, q, u, v;
+  // here: degree(P) >= degree(result)
+  while(true)
+  {
+    tryInvert( Lc(result), M, inv, fail );
+    if(fail)
+      return;
+    // here: Lc(result) is invertible modulo M
+    q = Lc(P)*inv * power( P.mvar(), degree(P)-degree(result) );
+    rem = P - q*result;
+    // here: s*F + t*G = result
+    if( rem.isZero() )
+    {
+      s*=inv;
+      t*=inv;
+      result *= inv; // monify result
+      return;
+    }
+    P=result;
+    result=rem;
+    rem=u-q*s;
+    u=s;
+    s=rem;
+    rem=v-q*t;
+    v=t;
+    t=rem;
+  }
 }
 
 void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, bool & fail )
@@ -1067,57 +1124,3 @@ void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const Canonical
   }
 }
 
-
-void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
-{
-  // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
-  // F and G must have the same level AND level > 0
-  // we try to calculate gcd(f,g) = s*F + t*G
-  // if a zero divisor is encontered, 'fail' is set to one
-  Variable a, b;
-  if( !hasFirstAlgVar(F,a) && !hasFirstAlgVar(G,b) ) // note lazy evaluation
-  {
-    result = extgcd( F, G, s, t ); // no zero divisors possible
-    return;
-  }
-  if( b.level() > a.level() )
-    a = b;
-  // here: a is the biggest alg. var in F and G
-  CanonicalForm M = getMipo(a);
-  CanonicalForm P;
-  if( degree(F) > degree(G) )
-  {
-    P=F; result=G; s=0; t=1;
-  }
-  else
-  {
-    P=G; result=F; s=1; t=0;
-  }
-  CanonicalForm inv, rem, q, u, v;
-  // here: degree(P) >= degree(result)
-  while(true)
-  {
-    tryInvert( Lc(result), M, inv, fail );
-    if(fail)
-      return;
-    // here: Lc(result) is invertible modulo M
-    q = Lc(P)*inv * power( P.mvar(), degree(P)-degree(result) );
-    rem = P - q*result;
-    // here: s*F + t*G = result
-    if( rem.isZero() )
-    {
-      s*=inv;
-      t*=inv;
-      result *= inv; // monify result
-      return;
-    }
-    P=result;
-    result=rem;
-    rem=u-q*s;
-    u=s;
-    s=rem;
-    rem=v-q*t;
-    v=t;
-    t=rem;
-  }
-}

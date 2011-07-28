@@ -27,10 +27,305 @@
 #include "cf_util.h"
 #include "fac_util.h"
 #include "cf_algorithm.h"
+#include "cf_primes.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
 #include "NTLconvert.h"
+
+static
+CFList productsNTL (const CFList& factors, const CanonicalForm& M)
+{
+  zz_p::init (getCharacteristic());
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
+  zz_pE::init (NTLMipo);
+  zz_pEX prod;
+  vec_zz_pEX v;
+  v.SetLength (factors.length());
+  int j= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, j++)
+  {
+    if (i.getItem().inCoeffDomain())
+      v[j]= to_zz_pEX (to_zz_pE (convertFacCF2NTLzzpX (i.getItem())));
+    else
+      v[j]= convertFacCF2NTLzz_pEX (i.getItem(), NTLMipo);
+  }
+  CFList result;
+  Variable x= Variable (1);
+  for (int j= 0; j < factors.length(); j++)
+  {
+    int k= 0;
+    set(prod);
+    for (int i= 0; i < factors.length(); i++, k++)
+    {
+      if (k == j)
+        continue;
+      prod *= v[i];
+    }
+    result.append (convertNTLzz_pEX2CF (prod, x, M.mvar()));
+  }
+  return result;
+}
+
+static
+void tryDiophantine (CFList& result, const CanonicalForm& F,
+                     const CFList& factors, const CanonicalForm& M, bool& fail)
+{
+  ASSERT (M.isUnivariate(), "expected univariate poly");
+
+  CFList bufFactors= factors;
+  bufFactors.removeFirst();
+  bufFactors.insert (factors.getFirst () (0,2));
+  CanonicalForm inv, leadingCoeff= Lc (F);
+  CFListIterator i= bufFactors;
+  if (bufFactors.getFirst().inCoeffDomain())
+  {
+    if (i.hasItem())
+      i++;
+  }
+  for (; i.hasItem(); i++)
+  {
+    tryInvert (Lc (i.getItem()), M, inv ,fail);
+    if (fail)
+      return;
+    i.getItem()= reduce (i.getItem()*inv, M);
+  }
+  bufFactors= productsNTL (bufFactors, M);
+
+  CanonicalForm buf1, buf2, buf3, S, T;
+  i= bufFactors;
+  if (i.hasItem())
+    i++;
+  buf1= bufFactors.getFirst();
+  buf2= i.getItem();
+  tryExtgcd (buf1, buf2, M, buf3, S, T, fail);
+  if (fail)
+    return;
+  result.append (S);
+  result.append (T);
+  if (i.hasItem())
+    i++;
+  for (; i.hasItem(); i++)
+  {
+    buf1= i.getItem();
+    CanonicalForm bb= buf3;
+    tryExtgcd (buf3, buf1, M, buf3, S, T, fail);
+    if (fail)
+      return;
+    CFListIterator k= factors;
+    for (CFListIterator j= result; j.hasItem(); j++, k++)
+    {
+      j.getItem() *= S;
+      CanonicalForm q;
+      j.getItem()= mod (j.getItem(), k.getItem());
+      j.getItem()= reduce (j.getItem(), M);
+    }
+    result.append (T);
+  }
+}
+
+static inline
+CFList mapinto (const CFList& L)
+{
+  CFList result;
+  for (CFListIterator i= L; i.hasItem(); i++)
+    result.append (mapinto (i.getItem()));
+  return result;
+}
+
+static inline
+int mod (const CFList& L, const CanonicalForm& p)
+{
+  for (CFListIterator i= L; i.hasItem(); i++)
+  {
+    if (mod (i.getItem(), p) == 0)
+      return 0;
+  }
+  return 1;
+}
+
+
+static inline void
+chineseRemainder (const CFList & x1, const CanonicalForm & q1,
+                  const CFList & x2, const CanonicalForm & q2,
+                  CFList & xnew, CanonicalForm & qnew)
+{
+  ASSERT (x1.length() == x2.length(), "expected lists of equal length");
+  CanonicalForm tmp1, tmp2;
+  CFListIterator j= x2;
+  for (CFListIterator i= x1; i.hasItem() && j.hasItem(); i++, j++)
+  {
+    chineseRemainder (i.getItem(), q1, j.getItem(), q2, tmp1, tmp2);
+    xnew.append (tmp1);
+  }
+  qnew= tmp2;
+}
+
+static inline
+CFList Farey (const CFList& L, const CanonicalForm& q)
+{
+  CFList result;
+  for (CFListIterator i= L; i.hasItem(); i++)
+    result.append (Farey (i.getItem(), q));
+  return result;
+}
+
+static inline
+CFList replacevar (const CFList& L, const Variable& a, const Variable& b)
+{
+  CFList result;
+  for (CFListIterator i= L; i.hasItem(); i++)
+    result.append (replacevar (i.getItem(), a, b));
+  return result;
+}
+
+CFList
+modularDiophant (const CanonicalForm& f, const CFList& factors,
+                 const CanonicalForm& M)
+{
+  bool save_rat=!isOn (SW_RATIONAL);
+  On (SW_RATIONAL);
+  CanonicalForm F= f*bCommonDen (f);
+  CFList products= factors;
+  for (CFListIterator i= products; i.hasItem(); i++)
+    i.getItem() *= bCommonDen (i.getItem());
+  if (products.getFirst().level() == 1)
+    products.insert (Lc (F));
+  CanonicalForm bound= maxNorm (F);
+  CFList leadingCoeffs;
+  leadingCoeffs.append (lc (F));
+  CanonicalForm dummy;
+  for (CFListIterator i= products; i.hasItem(); i++)
+  {
+    leadingCoeffs.append (lc (i.getItem()));
+    dummy= maxNorm (i.getItem());
+    bound= (dummy > bound) ? dummy : bound;
+  }
+  bound *= maxNorm (Lc (F))*maxNorm (Lc(F))*bound;
+  bound *= bound*bound;
+  bound= power (bound, degree (M));
+  bound *= power (CanonicalForm (2),degree (f));
+  CanonicalForm bufBound= bound;
+  int i = cf_getNumBigPrimes() - 1;
+  int p;
+  CFList resultModP, result, newResult;
+  CanonicalForm q (0), newQ;
+  bool fail= false;
+  Variable a= M.mvar();
+  Variable b= Variable (2);
+  setReduce (M.mvar(), false);
+  CanonicalForm mipo= bCommonDen (M)*M;
+  Off (SW_RATIONAL);
+  CanonicalForm modMipo;
+  leadingCoeffs.append (lc (mipo));
+  CFList tmp1, tmp2;
+  bool equal= false;
+  int count= 0;
+  do
+  {
+    p = cf_getBigPrime( i );
+    i--;
+    while ( i >= 0 && mod( leadingCoeffs, p ) == 0)
+    {
+      p = cf_getBigPrime( i );
+      i--;
+    }
+
+    ASSERT (i >= 0, "ran out of primes"); //sic
+
+    setCharacteristic (p);
+    modMipo= mapinto (mipo);
+    modMipo /= lc (modMipo);
+    resultModP= CFList();
+    tryDiophantine (resultModP, mapinto (F), mapinto (products), modMipo, fail);
+    setCharacteristic (0);
+    if (fail)
+    {
+      fail= false;
+      continue;
+    }
+
+    if ( q.isZero() )
+    {
+      result= replacevar (mapinto(resultModP), a, b);
+      q= p;
+    }
+    else
+    {
+      result= replacevar (result, a, b);
+      newResult= CFList();
+      chineseRemainder( result, q, replacevar (mapinto (resultModP), a, b),
+                        p, newResult, newQ );
+      q= newQ;
+      result= newResult;
+      if (newQ > bound)
+      {
+        count++;
+        tmp1= replacevar (Farey (result, q), b, a);
+        if (tmp2.isEmpty())
+          tmp2= tmp1;
+        else
+        {
+          equal= true;
+          CFListIterator k= tmp1;
+          for (CFListIterator j= tmp2; j.hasItem(); j++, k++)
+          {
+            if (j.getItem() != k.getItem())
+              equal= false;
+          }
+          if (!equal)
+            tmp2= tmp1;
+        }
+        if (count > 2)
+        {
+          bound *= bufBound;
+          equal= false;
+          count= 0;
+        }
+      }
+      if (newQ > bound && equal)
+      {
+        On( SW_RATIONAL );
+        result= tmp2;
+        CFList bufResult= result;
+        setReduce (M.mvar(), true);
+        if (factors.getFirst().level() == 1)
+        {
+          result.removeFirst();
+          CFListIterator j= factors;
+          CanonicalForm denf= bCommonDen (f);
+          for (CFListIterator i= result; i.hasItem(); i++, j++)
+            i.getItem() *= Lc (j.getItem())*denf;
+        }
+        if (factors.getFirst().level() != 1 && 
+            !bCommonDen (factors.getFirst()).isOne())
+        {
+          CanonicalForm denFirst= bCommonDen (factors.getFirst());
+          for (CFListIterator i= result; i.hasItem(); i++)
+            i.getItem() *= denFirst;
+        }
+
+        CanonicalForm test= 0;
+        CFListIterator jj= factors;
+        for (CFListIterator ii= result; ii.hasItem(); ii++, jj++)
+          test += ii.getItem()*(f/jj.getItem());
+        if (!test.isOne())
+        {
+          bound *= bufBound;
+          equal= false;
+          count= 0;
+          setReduce (M.mvar(), false);
+          result= bufResult;
+          Off (SW_RATIONAL);
+        }
+        else
+          break;
+      }
+    }
+  } while (1);
+  if (save_rat) Off(SW_RATIONAL);
+  return result;
+}
 
 CanonicalForm
 mulNTL (const CanonicalForm& F, const CanonicalForm& G)
@@ -1451,6 +1746,19 @@ void sortList (CFList& list, const Variable& x)
 static inline
 CFList diophantine (const CanonicalForm& F, const CFList& factors)
 {
+  if (getCharacteristic() == 0)
+  {
+    Variable v;
+    bool hasAlgVar= hasFirstAlgVar (F, v);
+    for (CFListIterator i= factors; i.hasItem() && !hasAlgVar; i++)
+      hasAlgVar= hasFirstAlgVar (i.getItem(), v);
+    if (hasAlgVar)
+    {
+      CFList result= modularDiophant (F, factors, getMipo (v));
+      return result;
+    }
+  }
+
   CanonicalForm buf1, buf2, buf3, S, T;
   CFListIterator i= factors;
   CFList result;
@@ -2453,8 +2761,6 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   Pi= CFArray (factors.length() - 2);
   CFList bufFactors2= factors;
   bufFactors2.removeFirst();
-  diophant.removeFirst();
-  CFListIterator iter= diophant;
   CanonicalForm s,t;
   extgcd (bufFactors2.getFirst(), bufFactors2.getLast(), s, t);
   diophant= CFList();
