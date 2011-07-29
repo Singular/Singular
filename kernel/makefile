@@ -79,7 +79,7 @@ CXXSOURCES=\
     eigenval.cc units.cc \
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
-    f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc \
+    f5c.cc ratgring.cc shiftgb.cc gfan.cc \
     linearAlgebra.cc
 CXXSOURCES2	= SingularBuilder.cpp
 
