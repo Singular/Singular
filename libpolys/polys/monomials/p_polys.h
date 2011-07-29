@@ -26,6 +26,7 @@
 #include <polys/monomials/monomials.h>
 
 #include <polys/templates/p_MemAdd.h>
+#include <polys/templates/p_MemCmp.h>
 #include <polys/templates/p_Procs.h>
 
 #include <polys/sbuckets.h>
