@@ -167,7 +167,6 @@ ideal   idSubst(ideal i, int n, poly e);
 
 ideal   idJet(ideal i,int d);
 ideal   idJetW(ideal i,int d, intvec * iv);
-int idMinDegW(ideal M,intvec *w);
 ideal   idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL);
 
 BOOLEAN idIsZeroDim(ideal i);

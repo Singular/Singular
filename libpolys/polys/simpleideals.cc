@@ -1677,6 +1677,21 @@ void id_Normalize(ideal I,const ring r)
   }
 }
 
+int id_MinDegW(ideal M,intvec *w, const ring r)
+{
+  int d=-1;
+  for(int i=0;i<IDELEMS(M);i++)
+  {
+    if (M->m[i]!=NULL)
+    {
+      int d0=p_MinDeg(M->m[i],w,r);
+      if(-1<d0&&((d0<d)||(d==-1)))
+        d=d0;
+    }
+  }
+  return d;
+}
+
 // #include <kernel/clapsing.h>
 
 #ifdef HAVE_FACTORY
