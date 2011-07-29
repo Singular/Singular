@@ -36,9 +36,8 @@
 #include "prCopy.h"
 
 #include "sparsmat.h"
-   
-//omBin ip_smatrix_bin = omGetSpecBin(sizeof(ip_smatrix));
-#define ip_smatrix_bin sip_sideal_bin
+
+//omBin sip_sideal_bin = omGetSpecBin(sizeof(ip_smatrix));
 /*0 implementation*/
 
 static poly mp_Exdiv ( poly m, poly d, poly vars, const ring);
@@ -53,7 +52,7 @@ matrix mpNew(int r, int c)
     Werror("internal error: creating matrix[%d][%d]",r,c);
     return NULL;
   }
-  matrix rc = (matrix)omAllocBin(ip_smatrix_bin);
+  matrix rc = (matrix)omAllocBin(sip_sideal_bin);
   rc->nrows = r;
   rc->ncols = c;
   rc->rank = r;
@@ -428,7 +427,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
   sel = mp_Select(f, vars, R);
   l = pLength(sel);
   co = mpNew(2, l);
-  
+
   if (rHasLocalOrMixedOrdering(R))
   {
     for (i=l; i>=1; i--)
@@ -731,7 +730,7 @@ static void mp_PartClean(matrix a, int lr, int lc, const ring R)
 static void mp_FinalClean(matrix a, const ring R)
 {
   omFreeSize((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
-  omFreeBin((ADDRESS)a, ip_smatrix_bin);
+  omFreeBin((ADDRESS)a, sip_sideal_bin);
 }
 
 BOOLEAN mp_IsDiagUnit(matrix U, const ring R)
@@ -1499,7 +1498,7 @@ void mp_MinorToResult(ideal result, int &elems, matrix a, int r, int c,
 static void mpFinalClean(matrix a)
 {
   omFreeSize((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
-  omFreeBin((ADDRESS)a, ip_smatrix_bin);
+  omFreeBin((ADDRESS)a, sip_sideal_bin);
 }
 
 /*2
