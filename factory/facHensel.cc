@@ -108,7 +108,6 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
   for (; i.hasItem(); i++)
   {
     buf1= i.getItem();
-    CanonicalForm bb= buf3;
     tryExtgcd (buf3, buf1, M, buf3, S, T, fail);
     if (fail)
       return;
@@ -116,7 +115,6 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
     for (CFListIterator j= result; j.hasItem(); j++, k++)
     {
       j.getItem() *= S;
-      CanonicalForm q;
       j.getItem()= mod (j.getItem(), k.getItem());
       j.getItem()= reduce (j.getItem(), M);
     }
@@ -188,7 +186,11 @@ modularDiophant (const CanonicalForm& f, const CFList& factors,
   CanonicalForm F= f*bCommonDen (f);
   CFList products= factors;
   for (CFListIterator i= products; i.hasItem(); i++)
+  {
+    if (products.getFirst().level() == 1)
+      i.getItem() /= Lc (i.getItem());
     i.getItem() *= bCommonDen (i.getItem());
+  }
   if (products.getFirst().level() == 1)
     products.insert (Lc (F));
   CanonicalForm bound= maxNorm (F);
@@ -286,8 +288,8 @@ modularDiophant (const CanonicalForm& f, const CFList& factors,
       if (newQ > bound && equal)
       {
         On( SW_RATIONAL );
-        result= tmp2;
         CFList bufResult= result;
+        result= tmp2;
         setReduce (M.mvar(), true);
         if (factors.getFirst().level() == 1)
         {
