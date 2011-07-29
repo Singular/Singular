@@ -2019,18 +2019,6 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
   return TRUE;
 }
 
-int idMinDegW(ideal M,intvec *w)
-{
-  int d=-1;
-  for(int i=0;i<IDELEMS(M);i++)
-  {
-    int d0=pMinDeg(M->m[i],w);
-    if(-1<d0&&(d0<d||d==-1))
-      d=d0;
-  }
-  return d;
-}
-
 ideal idSeries(int n,ideal M,matrix U,intvec *w)
 {
   for(int i=IDELEMS(M)-1;i>=0;i--)
