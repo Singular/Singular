@@ -1125,11 +1125,11 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       maFindPerm(R1->names,  rVar(R1),  rParameter(R1),  rPar(R1),
                  sum->names, rVar(sum), rParameter(sum), rPar(sum),
-                 perm1, par_perm1, sum->cf->ch);
+                 perm1, par_perm1, sum->cf->type);
 
       maFindPerm(R2->names,  rVar(R2),  rParameter(R2),  rPar(R2),
                  sum->names, rVar(sum), rParameter(sum), rPar(sum),
-                 perm2, par_perm2, sum->cf->ch);
+                 perm2, par_perm2, sum->cf->type);
 
 
       matrix C1 = R1->GetNC()->C, C2 = R2->GetNC()->C;
@@ -1230,7 +1230,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     if (rPar(r1)!=0) par_perm1=(int *)omAlloc0((rPar(r1)+1)*sizeof(int));
     maFindPerm(r1->names,  rVar(r1),  rParameter(r1),  rPar(r1),
                sum->names, rVar(sum), rParameter(sum), rPar(sum),
-               perm1, par_perm1, sum->cf->ch);
+               perm1, par_perm1, sum->cf->type);
     nMapFunc nMap1 = n_SetMap(r1->cf,sum->cf);
     Q1 = idInit(IDELEMS(r1->qideal),1);
 
@@ -1253,7 +1253,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     if (rPar(r2)!=0) par_perm2=(int *)omAlloc0((rPar(r2)+1)*sizeof(int));
     maFindPerm(r2->names,  rVar(r2),  rParameter(r2),  rPar(r2),
                sum->names, rVar(sum), rParameter(sum), rPar(sum),
-               perm2, par_perm2, sum->cf->ch);
+               perm2, par_perm2, sum->cf->type);
     nMapFunc nMap2 = n_SetMap(r2->cf,sum->cf);
     Q2 = idInit(IDELEMS(r2->qideal),1);
 

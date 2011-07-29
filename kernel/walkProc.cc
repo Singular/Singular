@@ -252,8 +252,8 @@ fractalWalkConsistency( ring sring, ring dring, int * vperm )
     else
         pperm= NULL;
 
-    maFindPerm( sring->names, nvar, sring->parameter, npar,
-                dring->names, nvar, dring->parameter, npar, vperm, pperm,
+    maFindPerm( sring->names, nvar, sring->extring->names, npar,
+                dring->names, nvar, dring->extring->names, npar, vperm, pperm,
                 dring->ch);
 
     for ( k= nvar; (k > 0) && (state == WalkOk); k-- )

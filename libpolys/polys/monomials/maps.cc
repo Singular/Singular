@@ -194,7 +194,7 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar, const r
 
 void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
                 char **names,       int n,       char **par,       int nop,
-                int * perm, int *par_perm, int ch)
+                int * perm, int *par_perm, n_coeffType ch)
 {
   int i,j;
   /* find correspondig vars */
@@ -213,7 +213,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
     }
     if ((perm[i+1]==0)&&(par!=NULL)
         // do not consider par of Fq
-         && (ch < 2))
+         && (ch!=n_GF))
     {
       for(j=0; j<nop; j++)
       {
@@ -271,7 +271,7 @@ poly maIMap(ring r, poly p, const ring dst_r)
   //int *par_perm=(int *)omAlloc0(rPar(r)*sizeof(int));
   maFindPerm(r->names, rVar(r), rParameter(r), rPar(r),
              dst_r->names, rVar(dst_r),rParameter(dst_r), rPar(dst_r),
-             perm,NULL, dst_r->cf->ch);
+             perm,NULL, dst_r->cf->type);
   poly res=p_PermPoly(p,perm,r,dst_r, nMap /*,par_perm,rPar(r)*/);
   omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
   //omFreeSize((ADDRESS)par_perm,rPar(r)*sizeof(int));

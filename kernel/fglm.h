@@ -14,7 +14,7 @@
 #define FGLM_H
 
 #ifdef HAVE_FACTORY
-#include <factory/factory.h>
+#include <factory/factoryconf.h>
 
 #include <polys/polys.h>
 #include <kernel/fglmvec.h>
@@ -38,13 +38,13 @@ public:
     void cleanup();
     BOOLEAN isBasisOrEdge() const { return ( (divisors[0] == numVars) ? TRUE : FALSE ); }
     void newDivisor( int var ) { divisors[ ++divisors[0] ]= var; }
-#ifndef NOSTREAMIO
-friend OSTREAM & operator <<(OSTREAM &, fglmSelem);
-#endif
+//#ifndef NOSTREAMIO
+//friend OSTREAM & operator <<(OSTREAM &, fglmSelem);
+//#endif
 };
-#ifndef NOSTREAMIO
-inline OSTREAM & operator <<(OSTREAM & os, fglmSelem) { return os;};
-#endif
+//#ifndef NOSTREAMIO
+//inline OSTREAM & operator <<(OSTREAM & os, fglmSelem) { return os;};
+//#endif
 
 class fglmDelem
 {
@@ -58,13 +58,13 @@ public:
     void cleanup();
     BOOLEAN isBasisOrEdge() const { return ( (insertions == 0) ? TRUE : FALSE ); }
     void newDivisor() { insertions--; }
-#ifndef NOSTREAMIO
-friend OSTREAM & operator <<(OSTREAM &, fglmDelem);
-#endif
+//#ifndef NOSTREAMIO
+//friend OSTREAM & operator <<(OSTREAM &, fglmDelem);
+//#endif
 };
-#ifndef NOSTREAMIO
-inline OSTREAM & operator <<(OSTREAM & os, fglmDelem) { return os;};
-#endif
+//#ifndef NOSTREAMIO
+//inline OSTREAM & operator <<(OSTREAM & os, fglmDelem) { return os;};
+//#endif
 
 // fglmzero(...):
 // The fglm algorithm for 0-dimensional ideals. ( fglmzero is defined in fglmzero.cc )
