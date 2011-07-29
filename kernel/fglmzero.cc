@@ -19,8 +19,12 @@
  */
 
 #include <kernel/mod2.h>
-
 #ifdef HAVE_FACTORY
+// assumes, that NOSTREAMIO is set in factoryconf.h, which is included
+// by templates/list.h.
+#include <factory/factory.h>
+#include <factory/templates/ftmpl_list.h>
+
 #include <misc/options.h>
 #include <polys/polys.h>
 #include <kernel/ideals.h>
@@ -33,9 +37,6 @@
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
-// assumes, that NOSTREAMIO is set in factoryconf.h, which is included
-// by templates/list.h.
-#include <factory/templates/ftmpl_list.h>
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define PROT2(msg,arg)
@@ -141,8 +142,8 @@ idealFunctionals::map( ring source )
 
     int * perm = (int *)omAlloc0( (_nfunc+1)*sizeof( int ) );
     maFindPerm( source->names, source->N, NULL, 0, currRing->names,
-                currRing->N, NULL, 0, perm, NULL , currRing->ch);
-    nMapFunc nMap=nSetMap( source);
+                currRing->N, NULL, 0, perm, NULL , currRing->cf->type);
+    nMapFunc nMap=n_SetMap( source, currRing);
 
     matHeader ** temp = (matHeader **)omAlloc( _nfunc*sizeof( matHeader * ));
     for ( var= 0; var < _nfunc; var ++ ) {
@@ -151,7 +152,7 @@ idealFunctionals::map( ring source )
                 for ( row= colp->size-1, elemp= colp->elems; row >= 0;
                   row--, elemp++ )
                 {
-                    newelem= nMap( elemp->elem );
+                    newelem= nMap( elemp->elem, source->cf, currRing->cf );
                     nDelete( & elemp->elem );
                     elemp->elem= newelem;
                 }
@@ -1176,26 +1177,26 @@ FindUnivariatePolys( const idealFunctionals & l )
 BOOLEAN
 fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
 {
-    idhdl initialRingHdl = currRingHdl;
+    //idhdl initialRingHdl = currRingHdl;
     BOOLEAN fglmok;
 
     if ( currRing != sourceRing )
     {
         rChangeCurrRing( sourceRing );
-        currRingHdl=NULL;
+        //currRingHdl=NULL;
     }
-    idealFunctionals L( 100, (currRing->N) );
+    idealFunctionals L( 100, rVar(currRing) );
     fglmok = CalculateFunctionals( sourceIdeal, L );
     if ( deleteIdeal == TRUE )
         idDelete( & sourceIdeal );
-    rSetHdl( destRingHdl );
+    //rSetHdl( destRingHdl );
     if ( fglmok == TRUE )
     {
         L.map( sourceRing );
         destIdeal= GroebnerViaFunctionals( L );
     }
-    if ( (switchBack == TRUE) && (currRingHdl != initialRingHdl) )
-        rSetHdl( initialRingHdl );
+    //if ( (switchBack) && (currRingHdl != initialRingHdl) )
+    //    rSetHdl( initialRingHdl );
     return fglmok;
 }
 
