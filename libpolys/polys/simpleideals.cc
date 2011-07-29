@@ -190,6 +190,18 @@ void idSkipZeroes (ideal ide)
   }
 }
 
+int idElem(const ideal F)
+{
+  int i=0,j=IDELEMS(F)-1;
+
+  while(j>=0)
+  {
+    if ((F->m)[j]!=NULL) i++;
+    j--;
+  }
+  return i;
+}
+
 /*2
 * copies the first k (>= 1) entries of the given ideal
 * and returns these as a new ideal

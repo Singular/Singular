@@ -176,7 +176,6 @@ matrix  idDiffOp(ideal I, ideal J,BOOLEAN multiply=TRUE);
 
 intvec *idSort(ideal id,BOOLEAN nolex=TRUE);
 ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
-int     idElem(const ideal F);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 // transpose a module
 ideal   idTransp(ideal a);
@@ -184,8 +183,6 @@ ideal   idTransp(ideal a);
 ideal id_Transp(ideal a, const ring rRing);
 
 intvec *idQHomWeight(ideal id);
-
-void    idNormalize(ideal id);
 
 ideal idXXX (ideal  h1, int k);
 
