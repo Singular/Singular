@@ -55,6 +55,11 @@ void id_ShallowDelete (ideal* h, ring r);
 void idSkipZeroes (ideal ide);
   /*gives an ideal the minimal possible size*/
 
+/// number of non-zero polys in F
+int     idElem(const ideal F);
+/// normialize all polys in id
+void    id_Normalize(ideal id, const ring r);
+
 #ifdef PDEBUG
 void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r);
 #define id_Test(A, r) id_DBTest(A, PDEBUG, __FILE__,__LINE__, r)
