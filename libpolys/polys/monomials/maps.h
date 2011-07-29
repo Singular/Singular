@@ -27,7 +27,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
 */
 void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
                 char **names,       int n,       char **par,       int nop,
-                int * perm, int *par_perm, int ch);
+                int * perm, int *par_perm, n_coeffType ch);
 poly pSubstPoly(poly p, int var, poly image);
 ideal  idSubstPoly(ideal id, int n, poly e);
 
