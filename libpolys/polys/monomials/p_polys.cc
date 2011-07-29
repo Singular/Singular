@@ -3797,6 +3797,53 @@ poly p_Last(poly a, int &l, const ring r)
   return a;
 }
 
+int p_Var(poly m,const ring r)
+{
+  if (m==NULL) return 0;
+  if (pNext(m)!=NULL) return 0;
+  int i,e=0;
+  for (i=rVar(r); i>0; i--)
+  {
+    int exp=p_GetExp(m,i,r);
+    if (exp==1)
+    {
+      if (e==0) e=i;
+      else return 0;
+    }
+    else if (exp!=0)
+    {
+      return 0;
+    }
+  }
+  return e;
+}
+
+/*2
+*the minimal index of used variables - 1
+*/
+int p_LowVar (poly p, const ring r)
+{
+  int k,l,lex;
+
+  if (p == NULL) return -1;
+
+  k = 32000;/*a very large dummy value*/
+  while (p != NULL)
+  {
+    l = 1;
+    lex = p_GetExp(p,l,r);
+    while ((l < (rVar(r))) && (lex == 0))
+    {
+      l++;
+      lex = p_GetExp(p,l,r);
+    }
+    l--;
+    if (l < k) k = l;
+    pIter(p);
+  }
+  return k;
+}
+
 /*2
 * verschiebt die Indizees der Modulerzeugenden um i
 */

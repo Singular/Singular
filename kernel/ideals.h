@@ -18,10 +18,6 @@ typedef ideal *            resolvente;
 extern ideal currQuotient;
 
 
-extern omBin sip_sideal_bin;
-
-/*- creates an ideal -*/
-// ideal idInit (int size, int rank=1); // in simple...
 ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
@@ -113,8 +109,6 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w);
 
 ideal idMinBase (ideal h1);
   /*returns a minimized set of generators of h1*/
-int pLowVar (poly p);
-  /*-the minimal index of used variables - 1-*/
 void    idInitChoise (int r,int beg,int end,BOOLEAN *endch,int * choise);
 void    idGetNextChoise (int r,int end,BOOLEAN *endch,int * choise);
 int     idGetNumberOfChoise(int t, int d, int begin, int end, int * choise);

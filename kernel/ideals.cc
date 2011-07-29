@@ -42,8 +42,6 @@
 #include <kernel/longrat.h>
 
 
-omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
-
 /* #define WITH_OLD_MINOR */
 #define pCopy_noCheck(p) pCopy(p)
 
@@ -135,31 +133,6 @@ ideal idMinBase (ideal h1)
   return e;
 }
 
-/*2
-*the minimal index of used variables - 1
-*/
-int pLowVar (poly p)
-{
-  int k,l,lex;
-
-  if (p == NULL) return -1;
-
-  k = 32000;/*a very large dummy value*/
-  while (p != NULL)
-  {
-    l = 1;
-    lex = pGetExp(p,l);
-    while ((l < (currRing->N)) && (lex == 0))
-    {
-      l++;
-      lex = pGetExp(p,l);
-    }
-    l--;
-    if (l < k) k = l;
-    pIter(p);
-  }
-  return k;
-}
 
 /*3
 *multiplies p with t (!cas) or  (t-1)
