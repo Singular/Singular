@@ -96,7 +96,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <kernel/sca.h>
 #ifdef HAVE_PLURAL
 #include <polys/monomials/ring.h>
-#include <kernel/ncSAMult.h> // for CMultiplier etc classes
+#include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
 #include <Singular/ipconv.h>
 #include <polys/monomials/ring.h>
 #ifdef HAVE_RATGRING

@@ -202,7 +202,7 @@ template    static  void    print_rational( OSTREAM&,int,const Rational& );
 
 #ifdef HAVE_PLURAL
 
-#include <kernel/ncSAMult.h> // for CMultiplier etc classes
+#include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
 
 template class CMultiplier<int>;
 template class CMultiplier<poly>;
