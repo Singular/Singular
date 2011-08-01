@@ -340,7 +340,7 @@ lists primeFactorisation(const number n, const number pBound)
 
 #include <omalloc/mylimits.h>
 #include <omalloc/omalloc.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>
 #include <kernel/page.h>
@@ -349,12 +349,12 @@ lists primeFactorisation(const number n, const number pBound)
 #include <kernel/kstd1.h>
 #include <Singular/subexpr.h>
 #include <kernel/timer.h>
-#include <kernel/intvec.h>
-#include <kernel/ring.h>
+#include <misc/intvec.h>
+#include <polys/monomials/ring.h>
 #include <kernel/p_Procs.h>
 /* Needed for debug Version of p_SetRingOfLeftv, Oliver */
 #ifdef PDEBUG
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #endif
 #include <Singular/version.h>
 

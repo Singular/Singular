@@ -15,13 +15,13 @@
 
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
-#include <kernel/intvec.h>
-#include <kernel/polys.h>
+#include <misc/intvec.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <Singular/ipshell.h>
 #include <Singular/attrib.h>
 

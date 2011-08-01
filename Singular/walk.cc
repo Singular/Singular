@@ -47,9 +47,9 @@
 
 
 #include <kernel/mod2.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <Singular/cntrlc.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/ipshell.h>
@@ -59,7 +59,7 @@
 #include <Singular/subexpr.h>
 #include <kernel/p_Procs.h>
 
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 
 /* include Hilbert-function */
 #include <kernel/stairc.h>
@@ -69,22 +69,22 @@
 #include <kernel/khstd.h>
 
 #include <Singular/walk.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/ipid.h>
 #include <Singular/tok.h>
 #include <kernel/febase.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <Singular/ipid.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/kstd1.h>
-#include <kernel/matpol.h>
-#include <kernel/weight.h>
-#include <kernel/intvec.h>
+#include <polys/matpol.h>
+#include <polys/weight.h>
+#include <misc/intvec.h>
 #include <kernel/syz.h>
 #include <Singular/lists.h>
-#include <kernel/prCopy.h>
-#include <kernel/ring.h>
+#include <polys/prCopy.h>
+#include <polys/monomials/ring.h>
 #include <kernel/longalg.h>
 #ifdef HAVE_FACTORY
 #include <kernel/clapsing.h>

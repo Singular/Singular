@@ -15,19 +15,19 @@
 
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipid.h>
 #include <Singular/silink.h>
 #include <Singular/ipshell.h>
-#include <kernel/matpol.h>
-#include <kernel/ring.h>
+#include <polys/matpol.h>
+#include <polys/monomials/ring.h>
 #include <Singular/lists.h>
 #include <kernel/ideals.h>
-#include <kernel/numbers.h>
-#include <kernel/intvec.h>
+#include <coeffs/numbers.h>
+#include <misc/intvec.h>
 #include <Singular/ssiLink.h>
 #include <Singular/pipeLink.h>
 

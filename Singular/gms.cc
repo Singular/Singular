@@ -12,11 +12,11 @@
 
 #include <kernel/febase.h>
 #include <kernel/structs.h>
-#include <kernel/numbers.h>
-#include <kernel/polys.h>
+#include <coeffs/numbers.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <Singular/gms.h>
 
 

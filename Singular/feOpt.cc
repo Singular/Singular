@@ -11,7 +11,7 @@
 #include <kernel/mod2.h>
 #include <Singular/feOpt.h>
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <kernel/options.h>
+#include <misc/options.h>
 #endif
 
 // Define here which cmd-line options are recognized

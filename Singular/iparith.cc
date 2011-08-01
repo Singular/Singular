@@ -16,21 +16,21 @@
 
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/ipid.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
 #include <kernel/longalg.h>
 #include <kernel/longtrans.h>
 #include <kernel/ideals.h>
-#include <kernel/prCopy.h>
-#include <kernel/matpol.h>
+#include <polys/prCopy.h>
+#include <polys/matpol.h>
 #include <kernel/kstd1.h>
 #include <kernel/timer.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
 #include <kernel/modulop.h>
@@ -39,12 +39,12 @@
 #include <kernel/rmodulo2m.h>
 #include <kernel/rintegers.h>
 #endif
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/stairc.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <Singular/maps_ip.h>
 #include <kernel/syz.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <Singular/ipconv.h>
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
@@ -55,7 +55,7 @@
 #include <kernel/GMPrat.h>
 #include <kernel/tgb.h>
 #include <kernel/walkProc.h>
-#include <kernel/mod_raw.h>
+#include <polys/mod_raw.h>
 #include <Singular/MinorInterface.h>
 #include <kernel/linearAlgebra.h>
 #include <Singular/misc_ip.h>

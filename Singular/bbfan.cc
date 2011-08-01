@@ -10,7 +10,7 @@
 #include <kernel/bbfan.h>
 #include <Singular/bbcone.h>
 #include <ipshell.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
 

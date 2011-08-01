@@ -23,9 +23,9 @@
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include "kernel/longalg.h"
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <kernel/ideals.h>
 #include <Singular/grammar.h>
 #include <kernel/febase.h>

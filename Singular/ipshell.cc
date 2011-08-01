@@ -14,21 +14,21 @@
 
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/ipid.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <kernel/polys.h>
-#include <kernel/prCopy.h>
+#include <polys/polys.h>
+#include <polys/prCopy.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <kernel/kstd1.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <kernel/syz.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/longalg.h>
 #include <Singular/lists.h>
@@ -36,7 +36,7 @@
 #include <Singular/ipconv.h>
 #include <Singular/silink.h>
 #include <kernel/stairc.h>
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <kernel/semic.h>
 #include <kernel/splist.h>
 #include <kernel/spectrum.h>
@@ -45,7 +45,7 @@
 #include <kernel/ffields.h>
 #include <kernel/clapsing.h>
 #include <kernel/hutil.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS

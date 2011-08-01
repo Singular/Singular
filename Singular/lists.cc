@@ -12,11 +12,11 @@
 #include <Singular/tok.h>
 #include <kernel/febase.h>
 //#include "ipid.h"
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/attrib.h>
 #include <Singular/ipshell.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <Singular/lists.h>
 
 omBin slists_bin = omGetSpecBin(sizeof(slists));

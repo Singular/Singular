@@ -35,9 +35,9 @@
 #include <unistd.h>
 
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/ipid.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <Singular/lists.h>
 #include <kernel/kutil.h>
 #include <Singular/cntrlc.h>
@@ -45,7 +45,7 @@
 #include <Singular/ipshell.h>
 #include <kernel/modulop.h>
 #include <kernel/febase.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <kernel/longalg.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>
@@ -53,7 +53,7 @@
 #include <Singular/sdb.h>
 #include <Singular/feOpt.h>
 #include <Singular/distrib.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 #include <kernel/mpr_complex.h>
 #include <kernel/ffields.h>
 #include <Singular/minpoly.h>
@@ -75,7 +75,7 @@
 #include <Singular/walk.h>
 #endif
 
-#include <kernel/weight.h>
+#include <polys/weight.h>
 #include <kernel/fast_mult.h>
 #include <kernel/digitech.h>
 
@@ -95,10 +95,10 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #include <kernel/sca.h>
 #ifdef HAVE_PLURAL
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ncSAMult.h> // for CMultiplier etc classes
 #include <Singular/ipconv.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #ifdef HAVE_RATGRING
 #include <kernel/ratgring.h>
 #endif
@@ -131,7 +131,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <Singular/silink.h>
 #include <Singular/walk.h>
 
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 
 #include <kernel/shiftgb.h>
 #include <kernel/linearAlgebra.h>
@@ -2206,8 +2206,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #    include <hc_newton.h>
 #  endif
 #  include <mpsr.h>
-#  include <kernel/mod_raw.h>
-#  include <kernel/ring.h>
+#  include <polys/mod_raw.h>
+#  include <polys/monomials/ring.h>
 #  include <kernel/shiftgb.h>
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)

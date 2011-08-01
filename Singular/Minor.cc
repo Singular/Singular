@@ -1,6 +1,6 @@
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <Minor.h>
 #include <kernel/febase.h>
 

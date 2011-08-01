@@ -5,12 +5,12 @@
 
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <coeffs/numbers.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>
-#include <kernel/kbuckets.h>
+#include <polys/kbuckets.h>
 #include <kernel/longrat.h>
 
 #if (defined(__CYGWIN__))
