@@ -11,6 +11,8 @@
 #include <kernel/mod2.h>
 
 #ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
 #include <misc/options.h>
 #include <polys/polys.h>
 #include <kernel/ideals.h>
@@ -21,8 +23,6 @@
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
 #include <kernel/kstd1.h>
-#define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory/factory.h>
 
 #include <kernel/fglm.h>
 
