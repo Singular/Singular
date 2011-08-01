@@ -10,7 +10,7 @@
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <misc/intvec.h>
-#include <kernel/int64vec.h>
+#include <misc/int64vec.h>
 #include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
