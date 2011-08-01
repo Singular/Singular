@@ -27,6 +27,7 @@ typedef polyrec *          poly;
 struct ip_sring;
 typedef struct ip_sring *         ring;
 class intvec;
+class int64vec;
 struct p_Procs_s;
 typedef struct p_Procs_s p_Procs_s;
 //class slists;
@@ -345,6 +346,8 @@ void   rWrite(ring r);
 void   rKill(ring r);
 ring   rCopy(ring r);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
+ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal = TRUE,
+                   BOOLEAN copy_ordering = TRUE);
 ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
 

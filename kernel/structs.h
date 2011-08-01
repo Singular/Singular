@@ -26,14 +26,6 @@ typedef mpz_ptr int_number;
 
 #define BITSET  unsigned int
 
-#if SIZEOF_LONG == 4
-typedef long long int64;
-#elif SIZEOF_LONG == 8
-typedef long int64;
-#else
-#error int64 undefined
-#endif
-
 
 /* C++-part */
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <kernel/mod2.h>
 #include <misc/intvec.h>
-#include <kernel/int64vec.h>
+#include <misc/int64vec.h>
 #include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
@@ -252,6 +252,37 @@ void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64)
   i64=inveps64;
 }
 
+///////////////////////////////////////////////////////////////////
+//scalarProduct64
+///////////////////////////////////////////////////////////////////
+//Description: returns the scalar product of int64vecs a and b
+///////////////////////////////////////////////////////////////////
+//Assume: Overflow tests assumes input has nonnegative entries
+///////////////////////////////////////////////////////////////////
+//Uses: none
+///////////////////////////////////////////////////////////////////
+
+static inline int64  scalarProduct64(int64vec* a, int64vec* b)
+{
+  assume( a->length() ==  b->length());
+  int i, n = a->length();
+  int64 result = 0;
+  int64 temp1,temp2;
+  for(i=n-1; i>=0; i--)
+  {
+    temp1=(*a)[i] * (*b)[i];
+    if((*a)[i]!=0 && (temp1/(*a)[i])!=(*b)[i]) overflow_error=1;
+
+    temp2=result;
+    result += temp1;
+
+    //since both vectors always have nonnegative entries in init64
+    //result should be >=temp2
+    if(temp2>result) overflow_error=2;
+  }
+
+  return result;
+}
 ///////////////////////////////////////////////////////////////////
 
 
@@ -789,37 +820,6 @@ static inline long  scalarProduct(intvec* a, intvec* b)
 ///////////////////////////////////////////////////////////////////
 
 
-///////////////////////////////////////////////////////////////////
-//scalarProduct64
-///////////////////////////////////////////////////////////////////
-//Description: returns the scalar product of int64vecs a and b
-///////////////////////////////////////////////////////////////////
-//Assume: Overflow tests assumes input has nonnegative entries
-///////////////////////////////////////////////////////////////////
-//Uses: none
-///////////////////////////////////////////////////////////////////
-
-static inline int64  scalarProduct64(int64vec* a, int64vec* b)
-{
-  assume( a->length() ==  b->length());
-  int i, n = a->length();
-  int64 result = 0;
-  int64 temp1,temp2;
-  for(i=n-1; i>=0; i--)
-  {
-    temp1=(*a)[i] * (*b)[i];
-    if((*a)[i]!=0 && (temp1/(*a)[i])!=(*b)[i]) overflow_error=1;
-
-    temp2=result;
-    result += temp1;
-
-    //since both vectors always have nonnegative entries in init64
-    //result should be >=temp2
-    if(temp2>result) overflow_error=2;
-  }
-
-  return result;
-}
 
 ///////////////////////////////////////////////////////////////////
 
@@ -1003,96 +1003,6 @@ void rCopyAndChangeA(int64vec* w)
   rSetWeightVec(rnew,w->iv64GetVec());
   rChangeCurrRing(rnew);
 }
-
-///////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////
-//rCopy0AndAddA
-///////////////////////////////////////////////////////////////////
-//Description: returns a copy of currRing with the
-//int64vec wv64 added in front of the current order
-//i.e. if old order was O, then the new one will be (A(w),O)
-///////////////////////////////////////////////////////////////////
-//Uses: omAllocBin,memcpy,sizeof,nCopy,omStrDup,omMemDup,
-//idrCopyR_NoSort
-///////////////////////////////////////////////////////////////////
-
-ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
-                   BOOLEAN copy_ordering)
-{
-
-  if (r == NULL) return NULL;
-  int i,j;
-  ring res=(ring)omAllocBin(sip_sring_bin);
-
-  memcpy(res,r,sizeof(ip_sring));
-  res->VarOffset = NULL;
-  res->ref=0;
-  if (r->extRing!=NULL)
-    r->extRing->ref++;
-  if (r->parameter!=NULL)
-  {
-    res->minpoly=nCopy(r->minpoly);
-    int l=rPar(r);
-    res->parameter=(char **)omAlloc(l*sizeof(char_ptr));
-    int i;
-    for(i=0;i<rPar(r);i++)
-    {
-      res->parameter[i]=omStrDup(r->parameter[i]);
-    }
-  }
-
-  i=rBlocks(r);
-  res->wvhdl   = (int **)omAlloc((i+1) * sizeof(int_ptr));
-  res->order   = (int *) omAlloc((i+1) * sizeof(int));
-  res->block0  = (int *) omAlloc((i+1) * sizeof(int));
-  res->block1  = (int *) omAlloc((i+1) * sizeof(int));
-  for (j=0; j<i; j++)
-  {
-    if (r->wvhdl[j]!=NULL)
-    {
-      res->wvhdl[j+1] = (int*) omMemDup(r->wvhdl[j]);
-    }
-    else
-      res->wvhdl[j+1]=NULL;
-  }
-  for (j=0;j<i;j++)
-  {
-    res->order[j+1]=r->order[j];
-    res->block0[j+1]=r->block0[j];
-    res->block1[j+1]=r->block1[j];
-  }
-
- //the added A
-  res->order[0]=ringorder_a64;
-  int length=wv64->rows();
-  int64 *A=(int64 *)omAlloc(length*sizeof(int64));
-  for(j=length-1;j>=0;j--)
-  {
-    A[j]=(*wv64)[j];
-  }
-  res->wvhdl[0]=(int *)A;
-  res->block0[0]=1;
-  res->block1[0]=length;
-
-  res->names   = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
-  for (i=rVar(res)-1;i>=0; i--)
-  {
-    res->names[i] = omStrDup(r->names[i]);
-  }
-  res->idroot = NULL;
-  if (r->qideal!=NULL)
-  {
-    if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r);
-    else res->qideal = NULL;
-  }
-
-  return res;
-}
-
-///////////////////////////////////////////////////////////////////
-
 
 ///////////////////////////////////////////////////////////////////
 //rGetGlobalOrderMatrix

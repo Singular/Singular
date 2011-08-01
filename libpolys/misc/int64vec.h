@@ -8,9 +8,8 @@
 * ABSTRACT: class intvec: lists/vectors of int64
 */
 #include <string.h>
-#include <kernel/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+#include <misc/auxiliary.h>
 #include <misc/intvec.h>
 
 class int64vec
@@ -78,7 +77,7 @@ inline int64vec * iv64Copy(int64vec * o)
 {
   int64vec * iv=new int64vec(o);
   return iv;
-};
+}
 
 int64vec * iv64Add(int64vec * a, int64vec * b);
 int64vec * iv64Sub(int64vec * a, int64vec * b);
