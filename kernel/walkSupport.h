@@ -44,8 +44,8 @@ poly getNthPolyOfId(ideal I,int n);
 int gcd(int a, int b);
 int64 gcd64(int64 a, int64 b);
 inline int64 abs64(int64 i) { return ABS(i); }
-static inline long  scalarProduct(intvec* a, intvec* b);
-static inline int64  scalarProduct64(int64vec* a, int64vec* b);
+//static inline long  scalarProduct(intvec* a, intvec* b);
+//static inline int64  scalarProduct64(int64vec* a, int64vec* b);
 ideal sortRedSB(ideal G);
 intvec* int64VecToIntVec(int64vec* source);
 int64vec* rGetGlobalOrderWeightVec(ring r);
