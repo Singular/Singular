@@ -75,11 +75,21 @@
 #endif
 #endif
 
+
+
 #define SIZEOF_LONG (LONG_BIT/CHAR_BIT)
 // another option for SIZEOF_LONG: use omConfig included in <omalloc/omalloc.h>...
 
 #endif
 
+#include <sys/types.h>
+#if SIZEOF_LONG == 4
+typedef long long int64;
+#elif SIZEOF_LONG == 8
+typedef long int64;
+#else
+#error "Unexpected SIZEOF_LONG"
+#endif
 
 
 
