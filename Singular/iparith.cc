@@ -3785,31 +3785,43 @@ static BOOLEAN jjEXECUTE(leftv res, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
-  ideal_list p,h;
-  h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
   lists L=(lists)omAllocBin(slists_bin);
-  if (h==NULL)
+  if (rField_is_Zp()
+  || rField_is_Q()
+  || rField_is_Zp_a()
+  || rField_is_Q_a())
   {
-    L->Init(1);
-    L->m[0].data=(char *)idInit(0,1);
-    L->m[0].rtyp=IDEAL_CMD;
+    ideal_list p,h;
+    h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
+    if (h==NULL)
+    {
+      L->Init(1);
+      L->m[0].data=(char *)idInit(0,1);
+      L->m[0].rtyp=IDEAL_CMD;
+    }
+    else
+    {
+      p=h;
+      int l=0;
+      while (p!=NULL) { p=p->next;l++; }
+      L->Init(l);
+      l=0;
+      while(h!=NULL)
+      {
+        L->m[l].data=(char *)h->d;
+        L->m[l].rtyp=IDEAL_CMD;
+        p=h->next;
+        omFreeSize(h,sizeof(*h));
+        h=p;
+        l++;
+      }
+    }
   }
   else
   {
-    p=h;
-    int l=0;
-    while (p!=NULL) { p=p->next;l++; }
-    L->Init(l);
-    l=0;
-    while(h!=NULL)
-    {
-      L->m[l].data=(char *)h->d;
-      L->m[l].rtyp=IDEAL_CMD;
-      p=h->next;
-      omFreeSize(h,sizeof(*h));
-      h=p;
-      l++;
-    }
+    WarnS("no factorization implemented");
+    L->Init(1);
+    iiExprArith1(&(L->m[0]),v,STD_CMD);
   }
   res->data=(void *)L;
   return FALSE;
