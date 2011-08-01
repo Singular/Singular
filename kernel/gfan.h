@@ -11,7 +11,7 @@ $Id$
 #ifndef GFAN_H
 #define GFAN_H
 
-#include <kernel/int64vec.h>
+#include <misc/int64vec.h>
 
 #define p800
 #ifdef p800
