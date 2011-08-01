@@ -17,7 +17,7 @@
 #include <sys/socket.h>
 
 
-#include "mod2.h"
+#include "kernel/mod2.h"
 
 #include "tok.h"
 #include "ipid.h"
