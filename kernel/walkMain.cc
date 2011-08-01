@@ -80,7 +80,7 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
     rComplete(rnew);
     rChangeCurrRing(rnew);
 
-    ideal newGw=idrMoveR(Gw, oldRing);
+    ideal newGw=idrMoveR(Gw, oldRing, rnew);
 
 
  //HIER GEANDERT
@@ -102,11 +102,11 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
 
     idDelete(&newGw);
 
-    nextG=idrMoveR(G,oldRing); idTest(nextG);
+    nextG=idrMoveR(G,oldRing, rnew); idTest(nextG);
 
     matrix nextGmat=(matrix)nextG;
 
-    matrix resMat=mpMult(nextGmat,L);
+    matrix resMat=mp_Mult(nextGmat,L,rnew);
     idDelete((ideal *)&nextGmat);
     idDelete((ideal *)&L);
 
@@ -123,7 +123,7 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
     ring rnew=rCopy0AndAddA(destRing,currw64);
     rComplete(rnew);
     rChangeCurrRing(rnew);
-    nextG=idrMoveR(G,oldRing);
+    nextG=idrMoveR(G,oldRing, rnew);
   }
 
   G=nextG;
@@ -156,7 +156,7 @@ WalkState walkStep64(ideal & G,int64vec* currw64, int step){
 /* NEWRING ****************************************************** */
   rCopyAndChangeA(currw64);
 
-  ideal newGw=idrMoveR(Gw, oldRing);
+  ideal newGw=idrMoveR(Gw, oldRing,currRing);
 
   //HIER GEANDERT
   matrix L=mpNew(1,1);
@@ -183,12 +183,12 @@ WalkState walkStep64(ideal & G,int64vec* currw64, int step){
   idDelete(&newGw);
     //PrintS("  lift for initial forms done\n");
 
-  ideal nextG=idrMoveR(G,oldRing);
+  ideal nextG=idrMoveR(G,oldRing,currRing);
   rKill(oldRing);
 
   matrix nextGmat=(matrix)nextG;
 
-  matrix resMat=mpMult(nextGmat,L);
+  matrix resMat=mp_Mult(nextGmat,L,currRing);
   idDelete((ideal *)&nextGmat);
   idDelete((ideal *)&L);
     //PrintS("  lift done\n");
@@ -328,7 +328,7 @@ BOOLEAN unperturbedStartVectorStrategy){
       ring newRing=rCopy0AndAddA(destRing,currw64);
       rComplete(newRing);
       rChangeCurrRing(newRing);
-      G=idrMoveR(G,oldRing);
+      G=idrMoveR(G,oldRing,newRing);
     }
 
   return(WalkOk);
@@ -367,7 +367,7 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing){
     rComplete(rnew);
     rChangeCurrRing(rnew);
 
-    ideal newGw=idrMoveR(Gw, oldRing);
+    ideal newGw=idrMoveR(Gw, oldRing,rnew);
 
       //turn off bucket representation of polynomials and on redSB
     optionState=test;
@@ -383,11 +383,11 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing){
     idDelete(&newStdGw);
     idDelete(&newGw);
 
-    nextG=idrMoveR(G,oldRing); idTest(nextG);
+    nextG=idrMoveR(G,oldRing,rnew); idTest(nextG);
 
     matrix nextGmat=(matrix)nextG;
 
-    matrix resMat=mpMult(nextGmat,L);
+    matrix resMat=mp_Mult(nextGmat,L,rnew);
     idDelete((ideal *)&nextGmat);
     idDelete((ideal *)&L);
 
@@ -404,7 +404,7 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing){
     ring rnew=rCopy0AndAddA(destRing,currw64);
     rComplete(rnew);
     rChangeCurrRing(rnew);
-    nextG=idrMoveR(G,oldRing);
+    nextG=idrMoveR(G,oldRing,rnew);
   }
 
   G=nextG;
@@ -527,7 +527,7 @@ while(1){
       //rSetWeightVec(newring,w->iv64GetVec());
       //rComplete(newring,1);
 
-      newGw=idrMoveR(GwCp,oldRing);
+      newGw=idrMoveR(GwCp,oldRing,newring);
 
       test|=Sy_bit(OPT_REDSB);
       newStdGw=idStd(newGw); //computes new reduced GB of Gw
@@ -556,9 +556,9 @@ while(1){
       rSetWeightVec(currRing,w->iv64GetVec());
       rComplete(newring,1);
 
-      newGw=idrMoveR(GwCp,oldRing);
+      newGw=idrMoveR(GwCp,oldRing,newring);
 
-      newStdGw=idrMoveR(recG,temp);
+      newStdGw=idrMoveR(recG,temp,newring);
     }
 
 //8
@@ -570,10 +570,10 @@ while(1){
     matrix L=matIdLift(newGw,newStdGw);
     test=optionState;
 
-    newG=idrMoveR(GCp,oldRing);
+    newG=idrMoveR(GCp,oldRing,currRing);
     matrix MG=(matrix)newG;
 
-    matrix resMat=mpMult(MG,L);
+    matrix resMat=mp_Mult(MG,L,currRing);
     idDelete((ideal *)&MG);
     idDelete((ideal *)&L);
     G=(ideal)resMat;
