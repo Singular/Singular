@@ -13,7 +13,7 @@
 #include <Singular/tok.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 struct _ssubexpr
 {

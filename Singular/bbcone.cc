@@ -11,7 +11,7 @@
 #include <gfanlib/gfanlib.h>
 #include <Singular/bbcone.h>
 #include <ipshell.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <sstream>
 
 

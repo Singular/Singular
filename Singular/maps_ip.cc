@@ -9,24 +9,24 @@
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/febase.h>
-#include <kernel/polys.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <coeffs/numbers.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/longalg.h>
 #include <Singular/lists.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <Singular/maps_ip.h>
-#include <kernel/prCopy.h>
+#include <polys/prCopy.h>
 
 // define this if you want to use the fast_map routine for mapping ideals
 //#define FAST_MAP
 
 #ifdef FAST_MAP
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #endif
 
 

@@ -21,10 +21,10 @@
 #include <kernel/structs.h>
 #include <Singular/mpsr_Put.h>
 #include <Singular/mpsr_Tok.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <Singular/lists.h>
-#include <kernel/numbers.h>
-#include <kernel/polys.h>
+#include <coeffs/numbers.h>
+#include <polys/polys.h>
 
 /***************************************************************
  *

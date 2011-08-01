@@ -23,9 +23,9 @@
 #include <kernel/structs.h>
 #include "subexpr.h"
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <coeffs/numbers.h>
+#include <polys/monomials/ring.h>
 
 /***************************************************************
  *

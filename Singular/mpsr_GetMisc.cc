@@ -20,7 +20,7 @@
 #include <Singular/mpsr_Get.h>
 #include "kernel/longalg.h"
 #include <Singular/tok.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <Singular/lists.h>
 
 BOOLEAN currComplete = FALSE;

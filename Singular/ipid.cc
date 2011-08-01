@@ -13,16 +13,16 @@
 #include <Singular/static.h>
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/ipshell.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/febase.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/longrat.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/silink.h>
@@ -31,7 +31,7 @@
 #include <Singular/blackbox.h>
 
 #ifdef HAVE_DYNAMIC_LOADING
-#include <kernel/mod_raw.h>
+#include <polys/mod_raw.h>
 #endif /* HAVE_DYNAMIC_LOADING */
 
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));

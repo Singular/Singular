@@ -1,9 +1,9 @@
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <MinorInterface.h>
 #include <MinorProcessor.h>
 

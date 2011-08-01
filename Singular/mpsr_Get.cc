@@ -23,9 +23,9 @@
 
 #include <Singular/tok.h>
 #include <kernel/longrat.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <kernel/ideals.h>
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <Singular/lists.h>
 
 #include <mylimits.h>

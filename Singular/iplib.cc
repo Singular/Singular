@@ -15,11 +15,11 @@
 #include <kernel/mod2.h>
 #include <Singular/static.h>
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
@@ -58,7 +58,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
 
-#include <kernel/mod_raw.h>
+#include <polys/mod_raw.h>
 
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );

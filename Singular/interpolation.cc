@@ -4,15 +4,15 @@
 /* $Id$ */
 
 #include <kernel/mod2.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/intvec.h>
-#include <kernel/polys.h>
+#include <misc/intvec.h>
+#include <polys/polys.h>
 #include <Singular/lists.h>
 #include <kernel/longrat.h>
 #include <Singular/ipid.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #  include <factory/factory.h>

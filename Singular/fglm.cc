@@ -20,14 +20,14 @@
 
 #ifdef HAVE_FACTORY
 #include <Singular/tok.h>
-#include <kernel/options.h>
-#include <kernel/polys.h>
+#include <misc/options.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
-#include <kernel/maps.h>
+#include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/fglm.h>

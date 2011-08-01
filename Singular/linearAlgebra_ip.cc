@@ -1,6 +1,6 @@
 #include <kernel/mod2.h>
 #include <Singular/lists.h>
-#include <kernel/liniearAlgebra.h>
+#include <kernel/linearAlgebra.h>
 
 /**
  * Computes all eigenvalues of a given real quadratic matrix with

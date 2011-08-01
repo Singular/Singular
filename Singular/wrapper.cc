@@ -1,11 +1,11 @@
 #include <string.h>
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/kstd1.h>
 #include <Singular/subexpr.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/janet.h>
 
 //extern int (*ListGreatMove)(jList *,jList *,poly);

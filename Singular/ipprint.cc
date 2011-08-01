@@ -11,10 +11,10 @@
 #include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <kernel/polys.h>
-#include <kernel/matpol.h>
+#include <polys/polys.h>
+#include <polys/matpol.h>
 #include <Singular/subexpr.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipprint.h>
 #include <kernel/ideals.h>

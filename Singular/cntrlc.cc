@@ -23,7 +23,7 @@
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <Singular/feOpt.h>
 #include <Singular/version.h>
 #include <Singular/silink.h>

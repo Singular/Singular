@@ -23,8 +23,8 @@
 #include <Singular/mpsr_Tok.h>
 #include "kernel/longalg.h"
 #include <omalloc/omalloc.h>
-#include <kernel/ring.h>
-#include <kernel/polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/polys.h>
 //#include "ipid.h"
 
 #ifdef PARI_BIGINT_TEST

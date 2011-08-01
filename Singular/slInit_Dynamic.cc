@@ -17,7 +17,7 @@
 #include <kernel/mod2.h>
 #include <Singular/silink.h>
 #include <Singular/slInit.h>
-#include <kernel/mod_raw.h>
+#include <polys/mod_raw.h>
 
 #ifdef HAVE_DL
 #ifdef HAVE_MPSR

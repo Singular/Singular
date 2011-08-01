@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
-#include <kernel/options.h>
+#include <misc/options.h>
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>

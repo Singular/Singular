@@ -9,14 +9,14 @@
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
-#include <kernel/intvec.h>
-#include <kernel/options.h>
+#include <misc/intvec.h>
+#include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <kernel/polys.h>
+#include <polys/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>
-#include <kernel/numbers.h>
+#include <coeffs/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/longrat.h>
 #include <kernel/longalg.h>
@@ -25,11 +25,11 @@
 #include <kernel/rmodulo2m.h>
 #include <kernel/rintegers.h>
 #endif
-#include <kernel/matpol.h>
+#include <polys/matpol.h>
 #include <Singular/silink.h>
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
 
