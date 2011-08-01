@@ -14,7 +14,7 @@ libmisc_g_a_CPPFLAGS = -DHAVE_CONFIG_H
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
-SOURCES  = intvec.cc options.c
+SOURCES  = intvec.cc int64vec.cc options.c
 libmisc_a_SOURCES   = $(SOURCES)
 libmisc_g_a_SOURCES = $(SOURCES)
 
@@ -25,7 +25,7 @@ libmisc_g_a_includedir=$(includedir)/libpolys/misc
 #libmisc_a_libdir  =${libdir}/libpolys
 #libmisc_g_a_libdir=${libdir}/libpolys
 
-MISCHEADERS  = auxiliary.h mylimits.h options.h intvec.h
+MISCHEADERS  = auxiliary.h mylimits.h options.h intvec.h int64vec.h
 libmisc_a_include_HEADERS   = $(MISCHEADERS)
 libmisc_g_a_include_HEADERS = $(MISCHEADERS)
 

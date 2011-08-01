@@ -5,10 +5,7 @@
 /*
 * ABSTRACT: class int64vec: lists/vectors of int64
 */
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <kernel/int64vec.h>
+#include <misc/int64vec.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 

@@ -2,7 +2,7 @@
 #define WALKSUPPORT_H
 
 #include <misc/intvec.h>
-#include <kernel/int64vec.h>
+#include <misc/int64vec.h>
 
 int tdeg(poly p);
 int getMaxTdeg(ideal I);
@@ -29,8 +29,6 @@ ideal idStd(ideal G);
 ideal idInterRed(ideal G);
 matrix matIdLift(ideal Gomega, ideal M);
 void rCopyAndChangeA(int64vec* w);
-ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal = TRUE,
-                   BOOLEAN copy_ordering = TRUE);
 int64vec* rGetGlobalOrderMatrix(ring r);
 int64vec* rGetGlobalOrderWeightVec(ring r);
 BOOLEAN noPolysWithMoreThanTwoTerms(ideal Gw);

@@ -64,7 +64,7 @@ CXXSOURCES=\
     febase.cc feread.cc \
     hdegree.cc hilb.cc hutil.cc \
     gr_kstd2.cc \
-    ideals.cc int64vec.cc \
+    ideals.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
     misc.cc \
@@ -96,7 +96,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 	kInline.h
 
 HEADERS=hutil.h idrec.h stairc.h ideals.h \
-	structs.h int64vec.h \
+	structs.h \
 	syz.h \
 	fast_maps.h \
 	febase.h \

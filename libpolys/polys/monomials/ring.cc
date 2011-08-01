@@ -12,7 +12,7 @@
 
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <misc/intvec.h>
+#include <misc/int64vec.h>
 
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
@@ -1296,10 +1296,8 @@ int rSum(ring r1, ring r2, ring &sum)
 }
 
 /*2
- * create a copy of the ring r, which must be equivalent to currRing
+ * create a copy of the ring r
  * used for qring definition,..
- * (i.e.: normal rings: same nCopy as currRing;
- *        qring:        same nCopy, same idCopy as currRing)
  * DOES NOT CALL rComplete
  */
 ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
@@ -1413,6 +1411,166 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset:   res->block0 = NULL;
   //memset:   res->block1 = NULL;
   //memset: }
+
+  res->names   = (char **)omAlloc0(rVar(r) * sizeof(char *));
+  for (i=0; i<rVar(res); i++)
+  {
+    res->names[i] = omStrDup(r->names[i]);
+  }
+  if (r->qideal!=NULL)
+  {
+    if (copy_qideal)
+    {
+      #ifndef NDEBUG
+      if (!copy_ordering)
+        WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
+      else
+      #endif
+      {
+      #ifndef NDEBUG
+        WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
+      #endif
+        rComplete(res);
+        res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+        rUnComplete(res);
+      }
+    }
+    //memset: else res->qideal = NULL;
+  }
+  //memset: else res->qideal = NULL;
+  //memset: res->GetNC() = NULL; // copy is purely commutative!!!
+  return res;
+}
+
+/*2
+ * create a copy of the ring r
+ * used for qring definition,..
+ * DOES NOT CALL rComplete
+ */
+ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
+{
+  if (r == NULL) return NULL;
+  int i,j;
+  ring res=(ring)omAllocBin(sip_sring_bin);
+  memset(res,0,sizeof(ip_sring));
+  //memcpy(res,r,sizeof(ip_sring));
+  //memset: res->idroot=NULL; /* local objects */
+  //ideal      minideal;
+  res->options=r->options; /* ring dependent options */
+
+  //memset: res->ordsgn=NULL;
+  //memset: res->typ=NULL;
+  //memset: res->VarOffset=NULL;
+  //memset: res->firstwv=NULL;
+
+  //struct omBin   PolyBin; /* Bin from where monoms are allocated */
+  //memset: res->PolyBin=NULL; // rComplete
+  res->cf=r->cf;     /* coeffs */
+  res->cf->ref++;
+
+  //memset: res->ref=0; /* reference counter to the ring */
+
+  res->float_len=r->float_len; /* additional char-flags */
+  res->float_len2=r->float_len2; /* additional char-flags */
+
+  res->N=rVar(r);      /* number of vars */
+  res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+
+  res->firstBlockEnds=r->firstBlockEnds;
+#ifdef HAVE_PLURAL
+  res->real_var_start=r->real_var_start;
+  res->real_var_end=r->real_var_end;
+#endif
+
+#ifdef HAVE_SHIFTBBA
+  res->isLPring=r->isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+#endif
+
+  res->VectorOut=r->VectorOut;
+  res->ShortOut=r->ShortOut;
+  res->CanShortOut=r->CanShortOut;
+  res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
+  res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
+  res->ComponentOrder=r->ComponentOrder;
+
+  //memset: res->ExpL_Size=0;
+  //memset: res->CmpL_Size=0;
+  //memset: res->VarL_Size=0;
+  //memset: res->pCompIndex=0;
+  //memset: res->pOrdIndex=0;
+  //memset: res->OrdSize=0;
+  //memset: res->VarL_LowIndex=0;
+  //memset: res->MinExpPerLong=0;
+  //memset: res->NegWeightL_Size=0;
+  //memset: res->NegWeightL_Offset=NULL;
+  //memset: res->VarL_Offset=NULL;
+
+  // the following are set by rComplete unless predefined
+  // therefore, we copy these values: maybe they are non-standard
+  /* mask for getting single exponents */
+  res->bitmask=r->bitmask;
+  res->divmask=r->divmask;
+  res->BitsPerExp = r->BitsPerExp;
+  res->ExpPerLong =  r->ExpPerLong;
+
+  //memset: res->p_Procs=NULL;
+  //memset: res->pFDeg=NULL;
+  //memset: res->pLDeg=NULL;
+  //memset: res->pFDegOrig=NULL;
+  //memset: res->pLDegOrig=NULL;
+  //memset: res->p_Setm=NULL;
+  //memset: res->cf=NULL;
+  res->options=r->options;
+
+/*
+  if (r->extRing!=NULL)
+    r->extRing->ref++;
+  
+  res->extRing=r->extRing;  
+  //memset: res->minideal=NULL;
+*/
+  
+  
+  if (copy_ordering == TRUE)
+  {
+    i=rBlocks(r)+1; // DIFF to rCopy0
+    res->wvhdl   = (int **)omAlloc(i * sizeof(int *));
+    res->order   = (int *) omAlloc(i * sizeof(int));
+    res->block0  = (int *) omAlloc(i * sizeof(int));
+    res->block1  = (int *) omAlloc(i * sizeof(int));
+    for (j=0; j<i-1; j++)
+    {
+      if (r->wvhdl[j]!=NULL)
+      {
+        res->wvhdl[j+1] = (int*) omMemDup(r->wvhdl[j]); //DIFF
+      }
+      else
+        res->wvhdl[j+1]=NULL; //DIFF
+    }
+    memcpy(&(res->order[1]),r->order,(i-1) * sizeof(int)); //DIFF
+    memcpy(&(res->block0[1]),r->block0,(i-1) * sizeof(int)); //DIFF
+    memcpy(&(res->block1[1]),r->block1,(i-1) * sizeof(int)); //DIFF
+  }
+  //memset: else
+  //memset: {
+  //memset:   res->wvhdl = NULL;
+  //memset:   res->order = NULL;
+  //memset:   res->block0 = NULL;
+  //memset:   res->block1 = NULL;
+  //memset: }
+
+  //the added A
+  res->order[0]=ringorder_a64;
+  int length=wv64->rows();
+  int64 *A=(int64 *)omAlloc(length*sizeof(int64));
+  for(j=length-1;j>=0;j--)
+  {
+     A[j]=(*wv64)[j];
+  }
+  res->wvhdl[0]=(int *)A;
+  res->block0[0]=1;
+  res->block1[0]=length;
+  //
 
   res->names   = (char **)omAlloc0(rVar(r) * sizeof(char *));
   for (i=0; i<rVar(res); i++)
