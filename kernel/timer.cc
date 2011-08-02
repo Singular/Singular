@@ -7,6 +7,8 @@
 *  ABSTRACT - get the computing time
 */
 #include <sys/resource.h>
+#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include <kernel/mod2.h>
@@ -144,6 +146,12 @@ int rtimerv = 0;
 static struct timeval  startRl;
 static struct timeval  siStartRTime;
 static struct timezone tzp;
+
+void startRTimer()
+{
+  gettimeofday(&siStartRTime, &tzp);
+}
+
 void initRTimer()
 {
 #ifdef HAVE_GETTIMEOFDAY
@@ -151,13 +159,8 @@ void initRTimer()
   gettimeofday(&siStartRTime, &tzp);
 #else
   memset(&startRl,0,sizeof(startRl));
-  memset(&startRTime,0,sizeof(startRTime));
+  memset(&siStartRTime,0,sizeof(siStartRTime));
 #endif
-}
-
-void startRTimer()
-{
-  gettimeofday(&siStartRTime, &tzp);
 }
 
 /*2
