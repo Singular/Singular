@@ -37,10 +37,10 @@
 #include <kernel/semic.h>
 #include <kernel/splist.h>
 #include <kernel/spectrum.h>
-#include <kernel/gnumpfl.h>
-#include <kernel/mpr_base.h>
-#include <kernel/ffields.h>
-#include <kernel/clapsing.h>
+//#include <kernel/gnumpfl.h>
+//#include <kernel/mpr_base.h>
+//#include <kernel/ffields.h>
+#include <polys/clapsing.h>
 #include <kernel/hutil.h>
 #include <Singular/ipshell.h>
 #include <kernel/walkMain.h>

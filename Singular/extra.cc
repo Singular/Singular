@@ -126,7 +126,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <kernel/kstdfac.h>
 #include <libfac/factor.h>
 #endif
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 
 #include <Singular/silink.h>
 #include <Singular/walk.h>

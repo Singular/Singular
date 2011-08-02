@@ -19,7 +19,7 @@
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
 #include <polys/matpol.h>
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 #include <kernel/eigenval.h>
 #include <Singular/eigenval_ip.h>
 

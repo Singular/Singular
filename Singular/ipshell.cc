@@ -43,7 +43,7 @@
 #include <kernel/gnumpfl.h>
 #include <kernel/mpr_base.h>
 #include <kernel/ffields.h>
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 #include <kernel/hutil.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
