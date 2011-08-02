@@ -87,7 +87,7 @@
 #include <polys/monomials/ring.h>
 #include <kernel/longalg.h>
 #ifdef HAVE_FACTORY
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 #endif
 
 #include <kernel/mpr_complex.h>

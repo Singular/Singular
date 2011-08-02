@@ -60,7 +60,7 @@
 #include <kernel/linearAlgebra.h>
 #include <Singular/misc_ip.h>
 #ifdef HAVE_FACTORY
-#  include <kernel/clapsing.h>
+#  include <polys/clapsing.h>
 #  include <kernel/kstdfac.h>
 #endif /* HAVE_FACTORY */
 #ifdef HAVE_FACTORY
