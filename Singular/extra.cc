@@ -46,7 +46,7 @@
 #include <kernel/modulop.h>
 #include <kernel/febase.h>
 #include <polys/matpol.h>
-#include <kernel/longalg.h>
+//#include <kernel/longalg.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>
 #include <kernel/syz.h>

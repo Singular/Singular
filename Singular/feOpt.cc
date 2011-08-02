@@ -9,6 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <kernel/mod2.h>
+#ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+#endif
 #include <Singular/feOpt.h>
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
@@ -293,10 +297,6 @@ static void feOptHelp(const char* name);
 #include <Singular/cntrlc.h>
 #include <kernel/timer.h>
 
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory/factory.h>
-#endif
 #include <errno.h>
 
 static const char* feOptAction(feOptIndex opt);
