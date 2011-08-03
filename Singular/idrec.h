@@ -8,7 +8,9 @@
 * ABSTRACT
 */
 
-#include <kernel/structs.h>
+#include <Singular/lists.h>
+#include <Singular/attrib.h>
+#include <Singular/silink.h>
 
 typedef union uutypes      utypes;
 union uutypes
