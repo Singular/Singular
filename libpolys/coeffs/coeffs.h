@@ -158,6 +158,8 @@ struct n_Procs_s
    number  (*cfGetNumerator)(number &n, const coeffs r);
    number  (*cfGcd)(number a, number b, const coeffs r);
    number  (*cfLcm)(number a, number b, const coeffs r);
+   number  (*cfChineseRemainder)(number *a, number *b, int rl, const coeffs r);
+   number  (*cfFarey)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
 
@@ -554,6 +556,20 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
   }
 #endif
   return !n_IsZero(b, r);
+}
+
+static inline number n_ChineseRemainder(number *a, number *b, int rl, const coeffs r)
+{
+  assume(r != NULL);
+  assume(getCoeffType(r)==n_Q);
+  return r->cfChineseRemainder(a,b,rl,r);
+}
+
+static inline number n_farey(number a, number b, const coeffs r)
+{
+  assume(r != NULL);
+  assume(getCoeffType(r)==n_Q);
+  return r->cfFarey(a,b,r);
 }
 
 /// returns TRUE, if r is not a field and r has non-trivial units

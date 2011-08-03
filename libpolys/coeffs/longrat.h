@@ -87,6 +87,8 @@ int      nlSize(number n, const coeffs r);
 number   nlGetDenom(number &n, const coeffs r);
 number   nlGetNumerator(number &n, const coeffs r);
 void     nlCoeffWrite(const coeffs r);
+number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C);
+number   nlFarey(number nN, number nP, const coeffs CF);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif
@@ -107,8 +109,6 @@ void nlInpIntDiv(number &a, number b, const coeffs r);
 
 LINLINE void nlInpAdd(number &a, number b, const coeffs r);
 LINLINE void nlInpMult(number &a, number b, const coeffs r);
-
-number nlFarey(number nP, number nN);
 
 #ifdef LDEBUG
 #define nlTest(a, r) nlDBTest(a,__FILE__,__LINE__, r)
