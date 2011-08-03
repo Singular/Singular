@@ -420,12 +420,12 @@ void syResetShiftedComponents(syStrategy syzstr, int index,int hilb)
     long * prev_s;
     int* prev_c;
     int p_length;
-    rGetSComps(&prev_c, &prev_s, &p_length);
+    rGetSComps(&prev_c, &prev_s, &p_length, currRing);
     currcomponents = syzstr->truecomponents[index-1];
     currShiftedComponents = syzstr->ShiftedComponents[index-1];
     rChangeSComps(currcomponents,
                   currShiftedComponents,
-                  IDELEMS(syzstr->res[index-1]));
+                  IDELEMS(syzstr->res[index-1]), currRing);
     if (hilb==0)
     {
       ideal id = syzstr->res[index];
@@ -455,7 +455,7 @@ void syResetShiftedComponents(syStrategy syzstr, int index,int hilb)
     }
     currcomponents  = prev_c;
     currShiftedComponents = prev_s;
-    rChangeSComps(prev_c, prev_s, p_length);
+    rChangeSComps(prev_c, prev_s, p_length, currRing);
   }
 }
 
@@ -1644,7 +1644,7 @@ void syKillComputation(syStrategy syzstr, ring r)
     if ((syzstr->syRing != NULL) && (syzstr->syRing != r))
     {
       if(syzstr->syRing->typ[1].ord_typ == ro_syzcomp)
-        rNChangeSComps(NULL, NULL, syzstr->syRing);
+        rChangeSComps(NULL, NULL, 0, syzstr->syRing);
 
       rKill(syzstr->syRing);
     }
@@ -2356,7 +2356,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
       currcomponents = syzstr->truecomponents[index];
       currShiftedComponents = syzstr->ShiftedComponents[index];
       rChangeSComps(currcomponents, currShiftedComponents,
-                    IDELEMS(syzstr->res[index]));
+                    IDELEMS(syzstr->res[index]), currRing);
       sPairs = syzstr->resPairs[index];
       Strip = syToStrip(syzstr,index);
       tres[index+1] = idInit(IDELEMS(syzstr->res[index+1]),syzstr->res[index+1]->rank);
@@ -2381,7 +2381,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   currcomponents = syzstr->truecomponents[0];
   currShiftedComponents = syzstr->ShiftedComponents[0];
   rChangeSComps( currcomponents, currShiftedComponents,
-                 IDELEMS(syzstr->res[0]));
+                 IDELEMS(syzstr->res[0]), currRing);
   tres[1] = idInit(IDELEMS(syzstr->res[1]),syzstr->res[1]->rank);
   sPairs = syzstr->resPairs[0];
   for (i=(*syzstr->Tl)[0]-1;i>=0;i--)
@@ -2478,7 +2478,7 @@ syStrategy syLaScala3(ideal arg,int * length)
     currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
     currcomponents[i] = i;
   }
-  rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
+  rChangeSComps(currcomponents, currShiftedComponents, arg->rank, syzstr->syRing);
 /*--- initializes the data structures---------------*/
   syzstr->Tl = new intvec(*length);
   temp = idInit(IDELEMS(arg),arg->rank);
@@ -2524,7 +2524,7 @@ syStrategy syLaScala3(ideal arg,int * length)
     currcomponents = syzstr->truecomponents[si_max(index-1,0)];
     currShiftedComponents = syzstr->ShiftedComponents[si_max(index-1,0)];
     rChangeSComps(currcomponents, currShiftedComponents,
-                  IDELEMS(syzstr->res[si_max(index-1,0)]));
+                  IDELEMS(syzstr->res[si_max(index-1,0)]), currRing);
     j = syInitSyzMod(syzstr,index+1);
     if (index>0)
     {
@@ -2620,7 +2620,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
     currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
     currcomponents[i] = i;
   }
-  rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
+  rChangeSComps(currcomponents, currShiftedComponents, arg->rank, currRing);
 /*--- initializes the data structures---------------*/
   syzstr->Tl = new intvec(maxlength);
   temp = idInit(IDELEMS(arg),arg->rank);
@@ -2672,7 +2672,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
     currcomponents = syzstr->truecomponents[si_max(index-1,0)];
     currShiftedComponents = syzstr->ShiftedComponents[si_max(index-1,0)];
     rChangeSComps(currcomponents, currShiftedComponents,
-                  IDELEMS(syzstr->res[si_max(index-1,0)]));
+                  IDELEMS(syzstr->res[si_max(index-1,0)]), currRing);
     j = syInitSyzMod(syzstr,index+1);
     if (index>0)
     {

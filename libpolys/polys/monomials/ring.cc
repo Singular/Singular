@@ -4203,9 +4203,23 @@ void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ri
 * assume that the first block ist ringorder_S
 * change the block to reflect the sequence given by appending v
 */
+static inline void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r)
+{
+  assume(r->typ[1].ord_typ == ro_syzcomp);
 
+  r->typ[1].data.syzcomp.ShiftedComponents = currShiftedComponents;
+  r->typ[1].data.syzcomp.Components = currComponents;
+}
+
+static inline void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
+{
+  assume(r->typ[1].ord_typ == ro_syzcomp);
+
+  *currShiftedComponents = r->typ[1].data.syzcomp.ShiftedComponents;
+  *currComponents =   r->typ[1].data.syzcomp.Components;
+}
 #ifdef PDEBUG
-void rDBChangeSComps(int* currComponents,
+static inline void rDBChangeSComps(int* currComponents,
                      long* currShiftedComponents,
                      int length,
                      ring r)
@@ -4215,7 +4229,7 @@ void rDBChangeSComps(int* currComponents,
   r->typ[1].data.syzcomp.length = length;
   rNChangeSComps( currComponents, currShiftedComponents, r);
 }
-void rDBGetSComps(int** currComponents,
+static inline void rDBGetSComps(int** currComponents,
                  long** currShiftedComponents,
                  int *length,
                  ring r)
@@ -4227,21 +4241,24 @@ void rDBGetSComps(int** currComponents,
 }
 #endif
 
-void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r)
+void rChangeSComps(int* currComponents, long* currShiftedComponents, int length, ring r)
 {
-  assume(r->typ[1].ord_typ == ro_syzcomp);
-
-  r->typ[1].data.syzcomp.ShiftedComponents = currShiftedComponents;
-  r->typ[1].data.syzcomp.Components = currComponents;
+#ifdef PDEBUG
+   rDBChangeSComps(currComponents, currShiftedComponents, length, r);
+#else
+   rNChangeSComps(currComponents, currShiftedComponents, r);
+#endif
 }
 
-void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
+void rGetSComps(int** currComponents, long** currShiftedComponents, int *length, ring r)
 {
-  assume(r->typ[1].ord_typ == ro_syzcomp);
-
-  *currShiftedComponents = r->typ[1].data.syzcomp.ShiftedComponents;
-  *currComponents =   r->typ[1].data.syzcomp.Components;
+#ifdef PDEBUG
+   rDBGetSComps(currComponents, currShiftedComponents, length, r);
+#else
+   rNGetSComps(currComponents, currShiftedComponents, r);
+#endif
 }
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
