@@ -929,7 +929,7 @@ int temp_size,SparseRow<number_type>* row, number coef)
   tgb_uint32 buffer[256];
   const tgb_uint32 prime=n_GetChar(currRing->cf);
   const tgb_uint32 c=F4mat_to_number_type(coef);
-  assume(!(npIsZero(coef)));
+  assume(!(n_IsZero(coef,currRing->cf)));
   for(j=0;j<len;j=j+256)
   {
     const int bound=std::min(j+256,len);
@@ -953,7 +953,7 @@ int temp_size,SparseRow<number_type>* row, number coef)
     {
       int idx=idx_array[i];
       assume(bpos<256);
-      assume(!(npIsZero((number)(long) buffer[bpos])));
+      assume(!(n_IsZero((number)(long) buffer[bpos],currRing->cf)));
       temp_array[idx]=F4mat_to_number_type(n_Add((number)(long) temp_array[idx], (number)(long) buffer[bpos++],currRing->cf));
       assume(idx<temp_size);
     }
@@ -970,7 +970,7 @@ int temp_size,const number_type* row, int len,number coef)
   tgb_uint32 buffer[256];
   const tgb_uint32 prime=n_GetChar(currRing->cf);
   const tgb_uint32 c=F4mat_to_number_type(coef);
-  assume(!(npIsZero(coef)));
+  assume(!(n_IsZero(coef,currRing->cf)));
   for(j=0;j<len;j=j+256)
   {
     const int bound=std::min(j+256,len);
@@ -1540,7 +1540,7 @@ public:
     number_type coef=row_array[start];
     assume(start<ncols);
     int other_row;
-    assume(!(npIsZero((number)(long) row_array[start])));
+    assume(!(n_IsZero((number)(long) row_array[start],currRing->cf)));
     if (!(n_IsOne((number)(long) coef,currRing->cf)))
       multiplyRow(r,F4mat_to_number_type(n_Invers((number)(long) coef,currRing->cf)));
     assume(n_IsOne((number)(long) row_array[start],currRing->cf));
@@ -1572,14 +1572,14 @@ public:
           }
         }
         updateStartIndex(other_row,start);
-        assume(npIsZero((number)(long) other_row_array[start]));
+        assume(n_IsZero((number)(long) other_row_array[start],currRing->cf));
       }
     }
   }
   void updateStartIndex(int row,int lower_bound)
   {
     number_type* row_array=rows[row];
-    assume((lower_bound<0)||(npIsZero((number)(long) row_array[lower_bound])));
+    assume((lower_bound<0)||(n_IsZero((number)(long) row_array[lower_bound],currRing->cf)));
     int i;
     //number_type zero=npInit(0);
     for(i=lower_bound+1;i<ncols;i++)
@@ -1662,7 +1662,7 @@ public:
     for(i=0;i<=nonZeroUntil;i++)
     {
       assume(startIndices[i]<ncols);
-      assume(!(npIsZero((number)(long) rows[i][startIndices[i]])));
+      assume(!(n_IsZero((number)(long) rows[i][startIndices[i]],currRing->cf)));
       assume(startIndices[i]>=i);
       updateLastReducibleIndex(i,nonZeroUntil+1);
     }
@@ -1691,7 +1691,7 @@ public:
     assume(start<ncols);
     number_type zero=0;//npInit(0);
     number_type* row_array=rows[r];
-    assume((!(npIsZero((number)(long) row_array[start]))));
+    assume((!(n_IsZero((number)(long) row_array[start],currRing->cf))));
     assume(start<ncols);
     int other_row;
     if (!(n_IsOne((number)(long) row_array[r],currRing->cf)))
@@ -1709,7 +1709,7 @@ public:
       {
         number_type* other_row_array=rows[other_row];
         number coef=n_Neg((number)(long) other_row_array[start],currRing->cf);
-        assume(!(npIsZero(coef)));
+        assume(!(n_IsZero(coef,currRing->cf)));
         int i;
         assume(start>startIndices[other_row]);
         for(i=start;i<=lastIndex;i++)
