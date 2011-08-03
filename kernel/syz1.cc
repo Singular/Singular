@@ -7,25 +7,29 @@
 */
 
 #include <kernel/mod2.h>
+
 #include <omalloc/mylimits.h>
-#include <misc/options.h>
 #include <omalloc/omalloc.h>
+
+#include <misc/options.h>
+#include <misc/intvec.h>
+#include <coeffs/numbers.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/kbuckets.h>
+#include <polys/prCopy.h>
+
 #include <polys/polys.h>
+
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
 //#include "cntrlc.h"
-#include <misc/intvec.h>
-#include <coeffs/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/ideals.h>
-#include <misc/intvec.h>
-#include <polys/monomials/ring.h>
 #include <kernel/syz.h>
-#include <polys/kbuckets.h>
-#include <polys/prCopy.h>
-#include <kernel/idrec.h>
+// #include <kernel/idrec.h>
 
 extern void p_Setm_Syz(poly p, ring r,
                        int* Components, long* ShiftedComponents);
