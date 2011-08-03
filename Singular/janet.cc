@@ -11,7 +11,8 @@
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>
 #include <polys/kbuckets.h>
-#include <kernel/longrat.h>
+#include <coeffs/longrat.h>
+#include <polys/monomials/p_polys.h>
 
 #if (defined(__CYGWIN__))
 #include <ctype.h>
@@ -260,7 +261,7 @@ void NFL(Poly *p, TreeM *F)
       if (count>500)
       {
         kBucketClear(p->root_b,&p->root,&p->root_l);
-        pSimpleContent(p->root,2);
+        p_SimpleContent(p->root,2,currRing);
         kBucketInit(p->root_b,p->root,p->root_l);
         count=0;
         //PrintS(".");
