@@ -2466,9 +2466,10 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->length = *length = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
-  syzstr->syRing = rCurrRingAssure_dp_S();
-  assume(syzstr->syRing != origR);
-
+  syzstr->syRing = rAssure_dp_S(origR, TRUE);
+  assume(syzstr->syRing != origR); // why?
+  rChangeCurrRing(syzstr->syRing);
+   
   // set initial ShiftedComps
   currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));
   currShiftedComponents = (long*)omAlloc0((arg->rank+1)*sizeof(long));
@@ -2606,10 +2607,10 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
     syzstr->length = maxlength = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
-  syzstr->syRing = rCurrRingAssure_dp_S();
+  syzstr->syRing = rAssure_dp_S(origR, TRUE);
   assume(syzstr->syRing != origR);
   assume(syzstr->syRing->typ[1].ord_typ == ro_syzcomp);
-
+  rChangeCurrRing(syzstr->syRing);
 
   // set initial ShiftedComps
   currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));

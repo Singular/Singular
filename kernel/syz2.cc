@@ -980,7 +980,8 @@ syStrategy syHilb(ideal arg,int * length)
   }
   
   // Creare dp,S ring and change to it
-  syzstr->syRing = rCurrRingAssure_dp_C();
+  syzstr->syRing = rAssure_dp_C(origR, TRUE);
+  rChangeCurrRing(syzstr->syRing);
 
   // set initial ShiftedComps
   currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));

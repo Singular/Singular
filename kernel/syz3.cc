@@ -1765,7 +1765,7 @@ syStrategy syKosz(ideal arg,int * length)
   rk_arg = id_RankFreeModule(arg,currRing);
   syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 /*--- changes to a Cdp-ring ----------------------------*/
-  syzstr->syRing = rCurrRingAssure_C_dp();
+  syzstr->syRing = rAssure_C_dp(origR, TRUE); rChangeCurrRing(syzstr->syRing);
 /*--- initializes the data structures---------------*/
   syzstr->length = *length = (currRing->N)+2;
   syzstr->regularity = -1;
@@ -1877,8 +1877,8 @@ syStrategy syKosz(ideal arg,int * length)
           ideal initial=idHead(syzstr->res[0]);
           int len=0,reg=0;
           intvec *w=NULL;
-          ring dp_C_ring = rCurrRingAssure_dp_C();
-          initial = idrMoveR_NoSort(initial, syzstr->syRing);
+          ring dp_C_ring = rAssure_dp_C(currRing, TRUE); rChangeCurrRing(dp_C_ring);	   
+          initial = idrMoveR_NoSort(initial, syzstr->syRing, dp_C_ring);
           resolvente res = sySchreyerResolvente(initial,-1,&len,TRUE, TRUE);
           intvec * dummy = syBetti(res,len,&reg, w);
           syzstr->regularity = reg+2;
