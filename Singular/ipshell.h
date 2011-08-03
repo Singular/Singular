@@ -83,6 +83,14 @@ char *  iiConvName(const char *libname);
 BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
                          idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
 
+// converts a resolution into a list of modules
+lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE,int add_row_shift=0);
+// converts a list of modules into a minimal resolution
+syStrategy syForceMin(lists li);
+// converts a list of modules into a resolution
+syStrategy syConvList(lists li,BOOLEAN toDel);
+
+
 
 /* ================================================================== */
 /* Expressions : */

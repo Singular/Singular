@@ -14,6 +14,7 @@
 extern char*  feErrors;
 extern int    feErrorsLen;
 extern FILE*  feProtFile;
+extern int    si_echo, printlevel;
 extern int    pagelength, colmax;
 extern int    yy_blocklineno;
 extern int    yy_noeof;

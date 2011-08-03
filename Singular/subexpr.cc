@@ -27,9 +27,9 @@
 #include <kernel/kstd1.h>
 #include <kernel/timer.h>
 #include <polys/monomials/ring.h>
-#include <kernel/ffields.h>
+#include <coeffs/ffields.h>
 #include <coeffs/numbers.h>
-#include <kernel/longrat.h>
+#include <coeffs/longrat.h>
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
@@ -119,7 +119,7 @@ void sleftv::Print(leftv store, int spaces)
           rWrite((ring)d);
           break;
         case MATRIX_CMD:
-          iiWriteMatrix((matrix)d,n,2,spaces);
+          iiWriteMatrix((matrix)d,n,2, currRing, spaces);
           break;
         case MODUL_CMD:
         case IDEAL_CMD:
@@ -130,7 +130,7 @@ void sleftv::Print(leftv store, int spaces)
           }
           // no break:
         case MAP_CMD:
-          iiWriteMatrix((matrix)d,n,1,spaces);
+          iiWriteMatrix((matrix)d,n,1, currRing, spaces);
           break;
         case POLY_CMD:
         case VECTOR_CMD:
@@ -369,7 +369,7 @@ static inline void * s_internalCopy(const int t,  void *d)
     case INTMAT_CMD:
       return (void *)ivCopy((intvec *)d);
     case MATRIX_CMD:
-      return (void *)mpCopy((matrix)d);
+      return (void *)mp_Copy((matrix)d, currRing);
     case IDEAL_CMD:
     case MODUL_CMD:
       return  (void *)idCopy((ideal)d);
@@ -389,9 +389,9 @@ static inline void * s_internalCopy(const int t,  void *d)
     case NUMBER_CMD:
       return  (void *)nCopy((number)d);
     case BIGINT_CMD:
-      return  (void *)nlCopy((number)d);
+      return  (void *)nlCopy((number)d, currRing->cf);
     case MAP_CMD:
-      return  (void *)maCopy((map)d);
+      return  (void *)maCopy((map)d, currRing);
     case LIST_CMD:
       return  (void *)lCopy((lists)d);
     case LINK_CMD:
@@ -613,8 +613,11 @@ void * sleftv::CopyD(int t)
     if (iiCheckRing(t)) return NULL;
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
-    else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(!rField_is_GF()))
-      x=(void *)nCopy(currRing->minpoly);
+    else if ((rtyp==VMINPOLY)&& \
+		    nCoeff_is_Extension(currRing->cf) && \
+		    (!nCoeff_is_GF(currRing->cf)))
+      x=(void *)p_Copy(currRing->cf->extRing->minideal->m[0],
+		      currRing->cf->extRing );
     data=NULL;
     return x;
   }
@@ -723,9 +726,9 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             nWrite(n);
             data=(char *)n;
           }
-          else if((rtyp==VMINPOLY)&&(rField_is_GF()))
+          else if((rtyp==VMINPOLY)&&(rField_is_GF(currRing)))
           {
-            nfShowMipo();
+            nfShowMipo(currRing->cf);
           }
           else
           {
@@ -746,7 +749,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
 
         case MATRIX_CMD:
-          s= iiStringMatrix((matrix)d,dim);
+          s= iiStringMatrix((matrix)d,dim, currRing);
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 40);
@@ -763,7 +766,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case MODUL_CMD:
         case IDEAL_CMD:
         case MAP_CMD:
-          s= iiStringMatrix((matrix)d,dim);
+          s= iiStringMatrix((matrix)d,dim, currRing);
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
@@ -808,7 +811,8 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ns;
             if (t/*Typ()*/ == QRING_CMD)
             {
-              char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim);
+              char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim,
+			      currRing);
               ns = (char*) omAlloc(strlen(s) + strlen(id) + 20);
               sprintf(ns, "\"%s\";%sideal(%s)", s,(dim == 2 ? "\n" : " "), id);
             }
@@ -1019,11 +1023,12 @@ void * sleftv::Data()
       case TRACE:      return (void *)traceit;
       case VSHORTOUT:  return (void *)(currRing != NULL ? currRing->ShortOut : 0);
       case VMINPOLY:   if (currRing != NULL &&
-                           (currRing->minpoly!=NULL)&&(!rField_is_GF()))
+                           nCoeff_is_Extension(currRing->cf)&&
+			   !nCoeff_is_GF(currRing->cf))
                        /* Q(a), Fp(a), but not GF(q) */
-                         return (void *)currRing->minpoly;
+                         return (void *)currRing->cf->extRing->minideal->m[0];
                        else
-                         return (void *)nNULL;
+                         return (void *)currRing->cf->nNULL;
       case VNOETHER:   return (void *) ppNoether;
       case IDHDL:
         return IDDATA((idhdl)data);
@@ -1379,7 +1384,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /*&& (!yyInRingConstruction)*/)
     {
       int vnr;
-      if ((vnr=rIsRingVar(id))>=0)
+      if ((vnr=r_IsRingVar(id, currRing))>=0)
       {
         poly p=pOne();
         pSetExp(p,vnr+1,1);

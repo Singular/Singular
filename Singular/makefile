@@ -361,12 +361,12 @@ feOpt.inc: feOpt.cc mod2.h
 	/bin/rm -f feOpt feOpt.exe
 
 feOptES.inc: feOpt.cc mod2.h
-	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DESINGULAR -I../kernel feOpt.cc -o feOptES
 	./feOptES
 	rm -f feOptES feOptES.exe
 
 feOptTS.inc: feOpt.cc mod2.h
-	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
 
