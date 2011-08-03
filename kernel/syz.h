@@ -105,11 +105,7 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w);
 int sySize(syStrategy syzstr);
 int syDim(syStrategy syzstr);
 syStrategy syCopy(syStrategy syzstr);
-void syPrint(syStrategy syzstr);
-
-// lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE,int add_row_shift=0); // TODO: move to Singular/
-// syStrategy syConvList(lists li,BOOLEAN toDel=FALSE); // TODO: move to Singular/
-// syStrategy syForceMin(lists li); // TODO: move to Singular/
+void syPrint(syStrategy syzstr,   const char *currRingName /* = currRingHdl->id */);
 
 syStrategy syMinimize(syStrategy syzstr);
 void syKillEmptyEntres(resolvente res,int length);
