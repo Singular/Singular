@@ -54,8 +54,8 @@
 #include <Singular/feOpt.h>
 #include <Singular/distrib.h>
 #include <polys/prCopy.h>
-#include <kernel/mpr_complex.h>
-#include <kernel/ffields.h>
+#include <coeffs/mpr_complex.h>
+#include <coeffs/ffields.h>
 #include <Singular/minpoly.h>
 
 #ifdef HAVE_RINGS
@@ -93,7 +93,7 @@
 extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
-#include <kernel/sca.h>
+#include <polys/nc//sca.h>
 #ifdef HAVE_PLURAL
 #include <polys/monomials/ring.h>
 #include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
@@ -122,7 +122,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <kernel/clapconv.h>
+#include <polys/clapconv.h>
 #include <kernel/kstdfac.h>
 #include <libfac/factor.h>
 #endif

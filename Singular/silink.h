@@ -10,6 +10,8 @@
 
 #include <kernel/structs.h>
 #include <Singular/sing_dbm.h>
+#include <Singular/lists.h>
+#include <Singular/attrib.h>
 
 typedef struct sip_link    ip_link;
 typedef ip_link *          si_link;

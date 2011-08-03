@@ -351,7 +351,7 @@ lists primeFactorisation(const number n, const number pBound)
 #include <kernel/timer.h>
 #include <misc/intvec.h>
 #include <polys/monomials/ring.h>
-#include <kernel/p_Procs.h>
+#include <polys/templates/p_Procs.h>
 /* Needed for debug Version of p_SetRingOfLeftv, Oliver */
 #ifdef PDEBUG
 #include <polys/polys.h>

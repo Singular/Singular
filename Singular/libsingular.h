@@ -10,7 +10,7 @@
 #include <singular/numbers.h>
 #include <singular/febase.h>
 #include <singular/ring.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <singular/clapsing.h>
 #include <singular/maps.h>
 #include <singular/fast_maps.h>

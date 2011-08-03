@@ -23,8 +23,8 @@
 #include <polys/polys.h>
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
-#include <kernel/longalg.h>
-#include <kernel/longtrans.h>
+#include <polys/ext_fields/longalg.h>
+#include <polys/ext_fields/longtrans.h>
 #include <kernel/ideals.h>
 #include <polys/prCopy.h>
 #include <polys/matpol.h>
@@ -35,9 +35,9 @@
 #include <Singular/lists.h>
 #include <kernel/modulop.h>
 #ifdef HAVE_RINGS
-#include <kernel/rmodulon.h>
-#include <kernel/rmodulo2m.h>
-#include <kernel/rintegers.h>
+#include <coeffs/rmodulon.h>
+#include <coeffs/rmodulo2m.h>
+#include <coeffs/rintegers.h>
 #endif
 #include <coeffs/numbers.h>
 #include <kernel/stairc.h>
@@ -49,7 +49,7 @@
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
 #include <Singular/silink.h>
-#include <kernel/sparsmat.h>
+#include <polys/sparsmat.h>
 #include <kernel/units.h>
 #include <Singular/janet.h>
 #include <kernel/GMPrat.h>
@@ -71,14 +71,14 @@
 #include <Singular/blackbox.h>
 #include <Singular/newstruct.h>
 #include <Singular/ipshell.h>
-#include <kernel/mpr_inout.h>
+//#include <kernel/mpr_inout.h>
 
 #include <kernel/timer.h>
 
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
-  #include <kernel/gring.h>
+  #include <kernel/ratgring.h>
   #include <kernel/sca.h>
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
