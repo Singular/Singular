@@ -14,6 +14,9 @@
 ///@TODO: delay nur auf Sugarvergr?erung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 ///@TODO: no tail reductions in syz comp
+#include <stdlib.h>
+#include <stdio.h>
+#include <queue>
 #include <kernel/mod2.h>
 #include <kernel/tgb.h>
 #include <kernel/tgb_internal.h>
@@ -26,9 +29,6 @@
 #include <polys/prCopy.h>
 #include <kernel/longrat.h>
 #include <coeffs/modulop.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <queue>
 #define BUCKETS_FOR_NORO_RED 1
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size = 100;
@@ -175,15 +175,25 @@ int kSBucketLength (kBucket * b, poly lm)
   return s;
 }
 #endif
+struct snumber_dummy
+{
+  mpz_t z;
+  mpz_t n;
+  #if defined(LDEBUG)
+  int debug;
+  #endif
+  BOOLEAN s;
+};
+typedef struct snumber_dummy  *number_dummy;
+
 
 int QlogSize (number n)
 {
-  if(SR_HDL (n) & SR_INT)
+  long nl=n_Size(n,currRing->cf);
+  if (nl==0L) return 0;
+  if (nl==1L)
   {
-    long i = SR_TO_INT (n);
-    if(i == 0)
-      return 0;
-
+    long i = n_Int(n,currRing->cf);
     unsigned long v;
     v = (i >= 0) ? i : -i;
     int r = 0;
@@ -195,7 +205,8 @@ int QlogSize (number n)
     return r + 1;
   }
   //assume denominator is 0
-  return mpz_sizeinbase (n->z, 2);
+  number_dummy nn=(number_dummy)n;
+  return mpz_sizeinbase (nn->z, 2);
 }
 
 #ifdef LEN_VAR3
@@ -984,7 +995,7 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
   P.tailRing = c->r;
   P.p = h;                      /*p_Copy(h,c->r); */
   P.ecart = ecart;
-  P.FDeg = pFDeg (P.p, c->r);
+  P.FDeg = c->r->pFDeg (P.p, c->r);
   if(!(simplified))
   {
     if(!rField_is_Zp (c->r))
@@ -2588,13 +2599,13 @@ poly noro_red_non_unique (poly p, int &len, NoroCache * cache, slimgb_alg * c)
 
 /*template <class number_type> SparseRow<number_type>* noro_red_to_non_poly(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c)
  * {
-  if (npPrimeM<255)
+  if (n_GetChar(currRing->cf)<255)
   {
     return noro_red_to_non_poly_t<tgb_uint8>(p,len,cache,c);
   }
   else
   {
-    if (npPrimeM<65000)
+    if (n_GetChar(currRing->cf)<65000)
     {
       return noro_red_to_non_poly_t<tgb_uint16>(p,len,cache,c);
     }
@@ -2834,13 +2845,13 @@ static void go_on (slimgb_alg * c)
       return;
     }
     {
-      if(npPrimeM < 255)
+      if(n_GetChar(currRing->cf) < 255)
       {
         noro_step < tgb_uint8 > (p, pn, c);
       }
       else
       {
-        if(npPrimeM < 65000)
+        if(n_GetChar(currRing->cf) < 65000)
         {
           noro_step < tgb_uint16 > (p, pn, c);
         }
@@ -3352,12 +3363,12 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   add_later = idInit (ADD_LATER_SIZE, S->rank);
 #ifdef USE_NORO
   use_noro = ((!(nc)) && (S->rank <= 1) && (rField_is_Zp (r))
-              && (!(eliminationProblem)) && (npPrimeM <= 32003));
+              && (!(eliminationProblem)) && (n_GetChar(currRing->cf) <= 32003));
   use_noro_last_block = false;
   if((!(use_noro)) && (lastDpBlockStart <= (currRing->N)))
   {
     use_noro_last_block = ((!(nc)) && (S->rank <= 1) && (rField_is_Zp (r))
-                           && (npPrimeM <= 32003));
+                           && (n_GetChar(currRing->cf) <= 32003));
   }
 #else
   use_noro = false;
@@ -3572,7 +3583,7 @@ ideal t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
   if(orig_ring != new_ring)
   {
     rChangeCurrRing (new_ring);
-    s_h = idrCopyR_NoSort (arg_I, orig_ring);
+    s_h = idrCopyR_NoSort (arg_I, orig_ring, new_ring);
     idTest (s_h);
     /*int i;
        for(i=0;i<IDELEMS(s_h);i++)
@@ -3596,7 +3607,7 @@ ideal t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
   {
     idTest (s_result);
     rChangeCurrRing (orig_ring);
-    result = idrMoveR_NoSort (s_result, new_ring);
+    result = idrMoveR_NoSort (s_result, new_ring, orig_ring);
 
     idTest (result);
     //rChangeCurrRing(new_ring);
@@ -4716,13 +4727,13 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
         kBucketClear (los[i].bucket, &p, &dummy_len);
         p_noro[i] = p;
       }
-      if(npPrimeM < 255)
+      if(n_GetChar(currRing->cf) < 255)
       {
         noro_step < tgb_uint8 > (p_noro, pn_noro, c);
       }
       else
       {
-        if(npPrimeM < 65000)
+        if(n_GetChar(currRing->cf) < 65000)
         {
           noro_step < tgb_uint16 > (p_noro, pn_noro, c);
         }

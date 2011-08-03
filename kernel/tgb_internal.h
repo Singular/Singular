@@ -10,6 +10,7 @@
 */
 #define USE_NORO 1
 
+#include <omalloc/omalloc.h>
 
 //#define TGB_DEBUG
 #define FULLREDUCTIONS
@@ -42,7 +43,6 @@
 //#define HAVE_BOOST 1
 //#define USE_STDVECBOOL 1
 #ifdef HAVE_BOOST
-#include <omalloc/omalloc.h>
 #include <vector>
 using boost::dynamic_bitset;
 using std::vector;
@@ -51,8 +51,8 @@ using std::vector;
 #include <vector>
 using std::vector;
 #endif
+#include <stdlib.h>
 
-#include <omalloc/omalloc.h>
 #include <polys/monomials/p_polys.h>
 
 #include <kernel/ideals.h>
@@ -60,7 +60,6 @@ using std::vector;
 #include <kernel/febase.h>
 #include <misc/options.h>
 #include <polys/polys.h>
-#include <stdlib.h>
 #include <kernel/modulop.h>
 #include <kernel/kutil.h>
 #include <kernel/kInline.h>
@@ -623,7 +622,7 @@ public:
   {
     //assume(impl.find(p_Copy(term,currRing))==impl.end());
     //assume(len==pLength(nf));
-    assume(npIsOne(p_GetCoeff(term,currRing)));
+    assume(n_IsOne(p_GetCoeff(term,currRing),currRing->cf));
     if (term==nf)
     {
       term=p_Copy(term,currRing);
@@ -791,14 +790,14 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
   {
     number coef_bak=p_GetCoeff(t,c->r);
 
-    p_SetCoeff(t,npInit(1,c->r),c->r);
-    assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
+    p_SetCoeff(t,n_Init(1,c->r->cf),c->r);
+    assume(n_IsOne(p_GetCoeff(c->strat->S[i],c->r),c->r->cf));
     number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
 
 
     poly exp_diff=cache->temp_term;
     p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
-    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
+    p_SetCoeff(exp_diff,n_Neg(n_Invers(coefstrat,c->r->cf),c->r->cf),c->r);
     p_Setm(exp_diff,c->r);
     assume(c->strat->S[i]!=NULL);
 
@@ -818,7 +817,7 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
 
   } else {
     number coef_bak=p_GetCoeff(t,c->r);
-    number one=npInit(1, currRing);
+    number one=n_Init(1, c->r->cf);
     p_SetCoeff(t,one,c->r);
 
     res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
@@ -928,7 +927,7 @@ int temp_size,SparseRow<number_type>* row, number coef)
   int* const idx_array=row->idx_array;
   const int len=row->len;
   tgb_uint32 buffer[256];
-  const tgb_uint32 prime=npPrimeM;
+  const tgb_uint32 prime=n_GetChar(currRing->cf);
   const tgb_uint32 c=F4mat_to_number_type(coef);
   assume(!(npIsZero(coef)));
   for(j=0;j<len;j=j+256)
@@ -955,7 +954,7 @@ int temp_size,SparseRow<number_type>* row, number coef)
       int idx=idx_array[i];
       assume(bpos<256);
       assume(!(npIsZero((number) buffer[bpos])));
-      temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx], (number) buffer[bpos++]));
+      temp_array[idx]=F4mat_to_number_type(n_Add((number) temp_array[idx], (number) buffer[bpos++],currRing->cf));
       assume(idx<temp_size);
     }
 
@@ -969,7 +968,7 @@ int temp_size,const number_type* row, int len,number coef)
   //int* const idx_array=row->idx_array;
   //const int len=temp_size;
   tgb_uint32 buffer[256];
-  const tgb_uint32 prime=npPrimeM;
+  const tgb_uint32 prime=n_GetChar(currRing->cf);
   const tgb_uint32 c=F4mat_to_number_type(coef);
   assume(!(npIsZero(coef)));
   for(j=0;j<len;j=j+256)
@@ -996,7 +995,7 @@ int temp_size,const number_type* row, int len,number coef)
       //int idx=idx_array[i];
       assume(bpos<256);
       //assume(!(npIsZero((number) buffer[bpos])));
-      temp_array[i]=F4mat_to_number_type(npAddM((number) temp_array[i], (number) buffer[bpos++]));
+      temp_array[i]=F4mat_to_number_type(n_Add((number) temp_array[i], (number) buffer[bpos++],currRing->cf));
       assume(i<temp_size);
     }
 
@@ -1016,7 +1015,7 @@ int temp_size,const number_type* row, int len)
   int i;
   for(i=0;i<len;i++)
   {
-      temp_array[i]=F4mat_to_number_type(npAddM((number)(long) temp_array[i], (number)(long) row[i]));
+      temp_array[i]=F4mat_to_number_type(n_Add((number)(long) temp_array[i], (number)(long) row[i],currRing->cf));
       assume(i<temp_size);
   }
 
@@ -1036,7 +1035,7 @@ int temp_size,const number_type* row, int len)
   for(i=0;i<len;i++)
   {
 
-      temp_array[i]=F4mat_to_number_type(npSubM((number) temp_array[i], (number) row[i]));
+      temp_array[i]=F4mat_to_number_type(n_Sub((number) temp_array[i], (number) row[i],currRing->cf));
       assume(i<temp_size);
   }
 
@@ -1052,7 +1051,7 @@ template <class number_type> void add_sparse(number_type* const temp_array,int t
         for(j=0;j<len;j++)
         {
           int idx=idx_array[j];
-          temp_array[idx]=F4mat_to_number_type(   (number_type)(long)npAddM((number) temp_array[idx],(number) coef_array[j]));
+          temp_array[idx]=F4mat_to_number_type(   (number_type)(long)n_Add((number) temp_array[idx],(number) coef_array[j],currRing->cf));
           assume(idx<temp_size);
         }
 }
@@ -1066,7 +1065,7 @@ template <class number_type> void sub_sparse(number_type* const temp_array,int t
         for(j=0;j<len;j++)
         {
           int idx=idx_array[j];
-          temp_array[idx]=F4mat_to_number_type(  (number_type)(long) npSubM((number) temp_array[idx],(number) coef_array[j]));
+          temp_array[idx]=F4mat_to_number_type(  (number_type)(long) n_Sub((number) temp_array[idx],(number) coef_array[j],currRing->cf));
           assume(idx<temp_size);
         }
 }
@@ -1078,7 +1077,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
    number_type* temp_array=(number_type*) cache->tempBuffer;//omalloc(cache->nIrreducibleMonomials*sizeof(number_type));
    int temp_size=cache->nIrreducibleMonomials;
    memset(temp_array,0,temp_size_bytes);
-   number minus_one=npInit(-1,currRing);
+   number minus_one=n_Init(-1,currRing->cf);
    int i;
    for(i=0;i<len;i++)
    {
@@ -1129,7 +1128,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
        {
          if (red.ref->value_len==NoroCache<number_type>::backLinkCode)
          {
-           temp_array[red.ref->term_index]=F4mat_to_number_type( npAddM((number) temp_array[red.ref->term_index],red.coef));
+           temp_array[red.ref->term_index]=F4mat_to_number_type( n_Add((number) temp_array[red.ref->term_index],red.coef,currRing->cf));
          }
          else
          {
@@ -1177,7 +1176,7 @@ template<class number_type> void write_coef_times_xx_idx_to_buffer(CoefIdx<numbe
   {
     assume(coef_array[j]!=0);
     CoefIdx<number_type> ci;
-    ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
+    ci.coef=F4mat_to_number_type(n_Mult((number) coef,(number) coef_array[j],currRing->cf));
     ci.idx=idx_array[j];
     pairs[pos++]=ci;
   }
@@ -1192,7 +1191,7 @@ template<class number_type> void write_coef_times_xx_idx_to_buffer_dense(CoefIdx
     {
       assume(coef_array[j]!=0);
       CoefIdx<number_type> ci;
-      ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
+      ci.coef=F4mat_to_number_type(n_Mult((number) coef,(number) coef_array[j],currRing->cf));
       assume(ci.coef!=0);
       ci.idx=j;
       pairs[pos++]=ci;
@@ -1227,7 +1226,7 @@ template<class number_type> void write_minus_coef_idx_to_buffer_dense(CoefIdx<nu
     {
       assume(coef_array[j]!=0);
       CoefIdx<number_type> ci;
-      ci.coef=F4mat_to_number_type(npNegM((number) coef_array[j]));
+      ci.coef=F4mat_to_number_type(n_Neg((number) coef_array[j],currRing->cf));
       assume(ci.coef!=0);
       ci.idx=j;
       pairs[pos++]=ci;
@@ -1254,7 +1253,7 @@ template<class number_type> void write_minus_coef_idx_to_buffer(CoefIdx<number_t
   {
     assume(coef_array[j]!=0);
     CoefIdx<number_type> ci;
-    ci.coef=F4mat_to_number_type(npNegM(coef_array[j]));
+    ci.coef=F4mat_to_number_type(n_Neg((number)coef_array[j],currRing->cf));
     ci.idx=idx_array[j];
     pairs[pos++]=ci;
   }
@@ -1282,8 +1281,8 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
   cache->ensureTempBufferSize(together*sizeof(CoefIdx<number_type>));
   CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
   int pos=0;
-  const number one=npInit(1, currRing);
-  const number minus_one=npInit(-1, currRing);
+  const number one=n_Init(1, currRing->cf);
+  const number minus_one=n_Init(-1, currRing->cf);
   for(i=0;i<len;i++)
   {
     MonRedResNP<number_type> red=mon[i];
@@ -1362,7 +1361,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
     }
     else
     {
-      pairs[act].coef=F4mat_to_number_type(npAddM((number)pairs[act].coef,(number)pairs[i].coef));
+      pairs[act].coef=F4mat_to_number_type(n_Add((number)pairs[act].coef,(number)pairs[i].coef,currRing->cf));
     }
   }
 
@@ -1529,24 +1528,24 @@ public:
     number_type* row_array=rows[row];
     for(i=startIndices[row];i<ncols;i++)
     {
-      row_array[i]=F4mat_to_number_type(npMult((number) row_array[i],(number) coef));
+      row_array[i]=F4mat_to_number_type(n_Mult((number) row_array[i],(number) coef,currRing->cf));
     }
   }
   void reduceOtherRowsForward(int r)
   {
     //assume rows "under r" have bigger or equal start index
     number_type* row_array=rows[r];
-    number_type zero=F4mat_to_number_type(npInit(0, currRing));
+    number_type zero=F4mat_to_number_type((number)0 /*npInit(0, currRing)*/);
     int start=startIndices[r];
     number_type coef=row_array[start];
     assume(start<ncols);
     int other_row;
     assume(!(npIsZero((number) row_array[start])));
-    if (!(npIsOne((number) coef)))
-      multiplyRow(r,F4mat_to_number_type(npInvers((number) coef)));
-    assume(npIsOne((number) row_array[start]));
+    if (!(n_IsOne((number) coef,currRing->cf)))
+      multiplyRow(r,F4mat_to_number_type(n_Invers((number) coef,currRing->cf)));
+    assume(n_IsOne((number) row_array[start],currRing->cf));
     int lastIndex=modP_lastIndexRow(row_array, ncols);
-    number minus_one=npInit(-1, currRing);
+    number minus_one=n_Init(-1, currRing->cf);
     for (other_row=r+1;other_row<nrows;other_row++)
     {
       assume(startIndices[other_row]>=start);
@@ -1554,13 +1553,13 @@ public:
       {
         int i;
         number_type* other_row_array=rows[other_row];
-        number coef2=npNeg((number) other_row_array[start]);
+        number coef2=n_Neg((number) other_row_array[start],currRing->cf);
         if (coef2==minus_one)
         {
           for(i=start;i<=lastIndex;i++)
           {
             if (row_array[i]!=zero)
-              other_row_array[i]=F4mat_to_number_type(npSubM((number) other_row_array[i], (number) row_array[i]));
+              other_row_array[i]=F4mat_to_number_type(n_Sub((number) other_row_array[i], (number) row_array[i],currRing->cf));
           }
       }
       else
@@ -1569,7 +1568,7 @@ public:
           for(i=start;i<=lastIndex;i++)
           {
             if (row_array[i]!=zero)
-            other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef2,(number) row_array[i]),(number) other_row_array[i]));
+            other_row_array[i]=F4mat_to_number_type(n_Add(n_Mult(coef2,(number) row_array[i],currRing->cf),(number) other_row_array[i],currRing->cf));
           }
         }
         updateStartIndex(other_row,start);
@@ -1635,7 +1634,7 @@ public:
     number_type* row_array=rows[row];
     for(i=startIndices[row];i<ncols;i++)
     {
-      row_array[i]=F4mat_to_number_type(npMult((number) row_array[i],(number) coef));
+      row_array[i]=F4mat_to_number_type(n_Mult((number) row_array[i],(number) coef,currRing->cf));
     }
   }
   ModPMatrixBackSubstProxyOnArray<number_type> (ModPMatrixProxyOnArray<number_type> & p)
@@ -1695,10 +1694,10 @@ public:
     assume((!(npIsZero((number) row_array[start]))));
     assume(start<ncols);
     int other_row;
-    if (!(npIsOne((number) row_array[r])))
+    if (!(n_IsOne((number) row_array[r],currRing->cf)))
     {
       //it should be one, but this safety is not expensive
-      multiplyRow(r, F4mat_to_number_type(npInvers((number) row_array[start])));
+      multiplyRow(r, F4mat_to_number_type(n_Invers((number) row_array[start],currRing->cf)));
     }
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     assume(lastIndex<ncols);
@@ -1709,14 +1708,14 @@ public:
       if (lastReducibleIndices[other_row]==start)
       {
         number_type* other_row_array=rows[other_row];
-        number coef=npNeg((number) other_row_array[start]);
+        number coef=n_Neg((number) other_row_array[start],currRing->cf);
         assume(!(npIsZero(coef)));
         int i;
         assume(start>startIndices[other_row]);
         for(i=start;i<=lastIndex;i++)
         {
           if (row_array[i]!=zero)
-            other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef,(number)row_array[i]),(number)other_row_array[i]));
+            other_row_array[i]=F4mat_to_number_type(n_Add(n_Mult(coef,(number)row_array[i],currRing->cf),(number)other_row_array[i],currRing->cf));
         }
         updateLastReducibleIndex(other_row,r);
       }
