@@ -187,9 +187,9 @@ ideal idXXX (ideal  h1, int k);
 
 poly id_GCD(poly f, poly g, const ring r);
 
-ideal idChineseRemainder(ideal *x, number *q, int rl);
+ideal id_ChineseRemainder(ideal *x, number *q, int rl, const ring R);
 //ideal idChineseRemainder(ideal *x, intvec *iv); /* currently unused */
-ideal idFarey(ideal x, number N);
+ideal id_Farey(ideal x, number N, const ring r);
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
 

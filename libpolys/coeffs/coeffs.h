@@ -565,7 +565,7 @@ static inline number n_ChineseRemainder(number *a, number *b, int rl, const coef
   return r->cfChineseRemainder(a,b,rl,r);
 }
 
-static inline number n_farey(number a, number b, const coeffs r)
+static inline number n_Farey(number a, number b, const coeffs r)
 {
   assume(r != NULL);
   assume(getCoeffType(r)==n_Q);
