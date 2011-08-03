@@ -40,8 +40,8 @@
 #include <kernel/semic.h>
 #include <kernel/splist.h>
 #include <kernel/spectrum.h>
-#include <kernel/gnumpfl.h>
-#include <kernel/mpr_base.h>
+#include <coeffs/gnumpfl.h>
+//#include <kernel/mpr_base.h>
 #include <kernel/ffields.h>
 #include <polys/clapsing.h>
 #include <kernel/hutil.h>

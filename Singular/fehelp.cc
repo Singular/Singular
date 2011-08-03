@@ -22,7 +22,7 @@
 #include <Singular/ipshell.h>
 #include <Singular/libparse.h>
 #include <Singular/feOpt.h>
-#include <kernel/dError.h>
+#include <reporter/reporter.h>
 
 /*****************************************************************
  *

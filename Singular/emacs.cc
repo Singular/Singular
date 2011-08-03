@@ -86,7 +86,7 @@ void fePrintReportBug(char* msg, char* file, int line)
 
 }
 
-#include <Singular/../kernel/feResource.cc>
+#include <resources/feResource.cc>
 #include <Singular/feOpt.cc>
 
 void mainUsage()

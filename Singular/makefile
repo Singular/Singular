@@ -352,5 +352,26 @@ endif
 # My headers test
 # test: test.o
 
-test.o: test.cc mod2.h
+test.o: test.cc mod2.h feOpt.inc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+feOpt.inc: feOpt.cc mod2.h
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} feOpt.cc -o feOpt
+	./feOpt
+	/bin/rm -f feOpt feOpt.exe
+
+feOptES.inc: feOpt.cc mod2.h
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
+	./feOptES
+	rm -f feOptES feOptES.exe
+
+feOptTS.inc: feOpt.cc mod2.h
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
+	./feOptTS
+	rm -f feOptTS feOptTS.exe
+
+iparith.inc: gentable.cc grammar.h tok.h table.h mod2.h
+	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
+	     -o gentable1
+	./gentable1
+	/bin/rm -f gentable1 gentable1.exe
