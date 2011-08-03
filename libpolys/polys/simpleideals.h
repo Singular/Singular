@@ -116,6 +116,7 @@ matrix id_Module2formatedMatrix(ideal mod,int rows, int cols, const ring R);
 ideal id_Matrix2Module(matrix mat, const ring R);
 ideal id_Vec2Ideal(poly vec, const ring R);
 
+int id_ReadOutPivot(ideal arg, int* comp, const ring r);
 
 int     binom (int n,int r);
 

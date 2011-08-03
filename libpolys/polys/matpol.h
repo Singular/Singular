@@ -80,8 +80,8 @@ matrix mp_CoeffProc (poly f, poly vars, const ring r);
 void mp_Coef2(poly v, poly vars, matrix *c, matrix *m, const ring r);
 
 /// for minors with Bareiss
-void mp_RecMin(int, ideal, int &, matrix, int, int, poly, ideal, const ring r);
-// void mp_MinorToResult(ideal, int &, matrix, int, int, ideal, const ring r);
+void mp_RecMin(int, ideal, int &, matrix, int, int, poly, ideal, const ring);
+void mp_MinorToResult(ideal, int &, matrix, int, int, ideal, const ring);
 
 BOOLEAN mp_IsDiagUnit(matrix U, const ring r);
 

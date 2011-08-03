@@ -1922,14 +1922,14 @@ ideal idMinors(matrix a, int ar, ideal R)
     //}
   }
   result=idInit(32,1);
-  if(ar>1) mpRecMin(ar-1,result,elems,b,r,c,NULL,R);
-  else mpMinorToResult(result,elems,b,r,c,R);
+  if(ar>1) mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,currRing);
+  else mp_MinorToResult(result,elems,b,r,c,R,currRing);
   idDelete((ideal *)&b);
   if (R!=NULL) idDelete(&R);
   idSkipZeroes(result);
   rChangeCurrRing(origR);
   result = idrMoveR(result,tmpR,origR);
-  smKillModifiedRing(tmpR);
+  sm_KillModifiedRing(tmpR);
   idTest(result);
   return result;
 }
@@ -2430,7 +2430,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   int del=0;
   loop
   {
-    next_gen = idReadOutPivot(res,&next_comp);
+    next_gen = id_ReadOutPivot(res, &next_comp, currRing);
     if (next_gen<0) break;
     del++;
     syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));

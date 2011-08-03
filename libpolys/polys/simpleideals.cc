@@ -1519,7 +1519,7 @@ ideal id_JetW(ideal i,int d, intvec * iv, const ring R)
 * searches for the next unit in the components of the module arg and
 * returns the first one;
 */
-static int id_ReadOutPivot(ideal arg,int* comp, const ring r)
+int id_ReadOutPivot(ideal arg,int* comp, const ring r)
 {
   if (idIs0(arg)) return -1;
   int i=0,j, generator=-1;
