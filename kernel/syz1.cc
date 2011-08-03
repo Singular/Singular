@@ -1948,7 +1948,7 @@ static int syLengthInt(int i)
 /*3
 * prints the resolution as sequence of free modules
 */
-void syPrint(syStrategy syzstr)
+void syPrint(syStrategy syzstr, const char *sn)
 {
   if ( (syzstr->resPairs==NULL) &&
        (syzstr->fullres==NULL)  &&
@@ -2002,7 +2002,7 @@ void syPrint(syStrategy syzstr)
       }
     }
   }
-  const char *sn=currRingHdl->id;
+   
   int sl=strlen(sn);
   syPrintEmptySpaces1(sl);
   int k = 0;
