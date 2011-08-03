@@ -2794,44 +2794,25 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
 #ifdef HAVE_SPECTRUM
 
 // ----------------------------------------------------------------------------
-//  Initialize a  spectrum  deep from another  spectrum
-// ----------------------------------------------------------------------------
-
-void spectrum::copy_deep( const spectrum &spec )
-{
-    mu = spec.mu;
-    pg = spec.pg;
-    n  = spec.n;
-
-    copy_new( n );
-
-    for( int i=0; i<n; i++ )
-    {
-        s[i] = spec.s[i];
-        w[i] = spec.w[i];
-    }
-}
-
-// ----------------------------------------------------------------------------
 //  Initialize a  spectrum  deep from a  singular  lists
 // ----------------------------------------------------------------------------
 
-void spectrum::copy_deep( lists l )
+void copy_deep( spectrum& spec, lists l )
 {
-    mu = (int)(long)(l->m[0].Data( ));
-    pg = (int)(long)(l->m[1].Data( ));
-    n  = (int)(long)(l->m[2].Data( ));
+    spec.mu = (int)(long)(l->m[0].Data( ));
+    spec.pg = (int)(long)(l->m[1].Data( ));
+    spec.n  = (int)(long)(l->m[2].Data( ));
 
-    copy_new( n );
+    spec.copy_new( spec.n );
 
     intvec  *num = (intvec*)l->m[3].Data( );
     intvec  *den = (intvec*)l->m[4].Data( );
     intvec  *mul = (intvec*)l->m[5].Data( );
 
-    for( int i=0; i<n; i++ )
+    for( int i=0; i<spec.n; i++ )
     {
-        s[i] = (Rational)((*num)[i])/(Rational)((*den)[i]);
-        w[i] = (*mul)[i];
+        spec.s[i] = (Rational)((*num)[i])/(Rational)((*den)[i]);
+        spec.w[i] = (*mul)[i];
     }
 }
 
@@ -2839,30 +2820,34 @@ void spectrum::copy_deep( lists l )
 //  singular lists  constructor for  spectrum
 // ----------------------------------------------------------------------------
 
-spectrum::spectrum( lists l )
+spectrum /*former spectrum::spectrum ( lists l )*/
+spectrumFromList( lists l )
 {
-    copy_deep( l );
+    spectrum result;
+    copy_deep( result, l );
+    return result;
 }
 
 // ----------------------------------------------------------------------------
 //  generate a Singular  lists  from a spectrum
 // ----------------------------------------------------------------------------
 
-lists   spectrum::thelist( void )
+/* former spectrum::thelist ( void )*/
+lists   getList( spectrum& spec )
 {
     lists   L  = (lists)omAllocBin( slists_bin);
 
     L->Init( 6 );
 
-    intvec            *num  = new intvec( n );
-    intvec            *den  = new intvec( n );
-    intvec            *mult = new intvec( n );
+    intvec            *num  = new intvec( spec.n );
+    intvec            *den  = new intvec( spec.n );
+    intvec            *mult = new intvec( spec.n );
 
-    for( int i=0; i<n; i++ )
+    for( int i=0; i<spec.n; i++ )
     {
-        (*num) [i] = s[i].get_num_si( );
-        (*den) [i] = s[i].get_den_si( );
-        (*mult)[i] = w[i];
+        (*num) [i] = spec.s[i].get_num_si( );
+        (*den) [i] = spec.s[i].get_den_si( );
+        (*mult)[i] = spec.w[i];
     }
 
     L->m[0].rtyp = INT_CMD;    //  milnor number
@@ -2872,9 +2857,9 @@ lists   spectrum::thelist( void )
     L->m[4].rtyp = INTVEC_CMD; //  denomiantors
     L->m[5].rtyp = INTVEC_CMD; //  multiplicities
 
-    L->m[0].data = (void*)mu;
-    L->m[1].data = (void*)pg;
-    L->m[2].data = (void*)n;
+    L->m[0].data = (void*)spec.mu;
+    L->m[1].data = (void*)spec.pg;
+    L->m[2].data = (void*)spec.n;
     L->m[3].data = (void*)num;
     L->m[4].data = (void*)den;
     L->m[5].data = (void*)mult;
@@ -2885,6 +2870,40 @@ lists   spectrum::thelist( void )
 // ----------------------------------------------------------------------------
 //  print out an error message for a spectrum list
 // ----------------------------------------------------------------------------
+
+typedef enum
+{
+    semicOK,
+    semicMulNegative,
+
+    semicListTooShort,
+    semicListTooLong,
+
+    semicListFirstElementWrongType,
+    semicListSecondElementWrongType,
+    semicListThirdElementWrongType,
+    semicListFourthElementWrongType,
+    semicListFifthElementWrongType,
+    semicListSixthElementWrongType,
+
+    semicListNNegative,
+    semicListWrongNumberOfNumerators,
+    semicListWrongNumberOfDenominators,
+    semicListWrongNumberOfMultiplicities,
+
+    semicListMuNegative,
+    semicListPgNegative,
+    semicListNumNegative,
+    semicListDenNegative,
+    semicListMulNegative,
+
+    semicListNotSymmetric,
+    semicListNotMonotonous,
+
+    semicListMilnorWrong,
+    semicListPGWrong
+
+} semicState;
 
 void    list_error( semicState state )
 {
@@ -2967,6 +2986,19 @@ void    list_error( semicState state )
 // ----------------------------------------------------------------------------
 //  this is the main spectrum computation function
 // ----------------------------------------------------------------------------
+
+enum    spectrumState
+{
+    spectrumOK,
+    spectrumZero,
+    spectrumBadPoly,
+    spectrumNoSingularity,
+    spectrumNotIsolated,
+    spectrumDegenerate,
+    spectrumWrongRing,
+    spectrumNoHC,
+    spectrumUnspecErr
+};
 
 spectrumState   spectrumCompute( poly h,lists *L,int fast )
 {
@@ -3178,7 +3210,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #endif
   #endif
 
-  newtonPolygon nph( h );
+  newtonPolygon nph( h, currRing );
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -3257,6 +3289,37 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
 //  first  = polynomial
 //  result = list of spectrum numbers
 // ----------------------------------------------------------------------------
+
+void spectrumPrintError(spectrumState state)
+{
+  switch( state )
+  {
+    case spectrumZero:
+      WerrorS( "polynomial is zero" );
+      break;
+    case spectrumBadPoly:
+      WerrorS( "polynomial has constant term" );
+      break;
+    case spectrumNoSingularity:
+      WerrorS( "not a singularity" );
+      break;
+    case spectrumNotIsolated:
+      WerrorS( "the singularity is not isolated" );
+      break;
+    case spectrumNoHC:
+      WerrorS( "highest corner cannot be computed" );
+      break;
+    case spectrumDegenerate:
+      WerrorS( "principal part is degenerate" );
+      break;
+    case spectrumOK:
+      break;
+
+    default:
+      WerrorS( "unknown error occurred" );
+      break;
+  }
+}
 
 BOOLEAN spectrumProc( leftv result,leftv first )
 {
@@ -3576,12 +3639,12 @@ BOOLEAN spaddProc( leftv result,leftv first,leftv second )
     }
     else
     {
-        spectrum s1( l1 );
-        spectrum s2( l2 );
+        spectrum s1= spectrumFromList ( l1 );
+        spectrum s2= spectrumFromList ( l2 );
         spectrum sum( s1+s2 );
 
         result->rtyp = LIST_CMD;
-        result->data = (char*)(sum.thelist( ));
+        result->data = (char*)(getList(sum));
     }
 
     return  (state!=semicOK);
@@ -3618,11 +3681,11 @@ BOOLEAN spmulProc( leftv result,leftv first,leftv second )
     }
     else
     {
-        spectrum s( l );
+        spectrum s= spectrumFromList( l );
         spectrum product( k*s );
 
         result->rtyp = LIST_CMD;
-        result->data = (char*)product.thelist( );
+        result->data = (char*)getList(product);
     }
 
     return  (state!=semicOK);
@@ -3660,8 +3723,8 @@ BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
   }
   else
   {
-    spectrum s1( l1 );
-    spectrum s2( l2 );
+    spectrum s1= spectrumFromList( l1 );
+    spectrum s2= spectrumFromList( l2 );
 
     res->rtyp = INT_CMD;
     if (qh)
@@ -3690,9 +3753,10 @@ BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
 //  Compute the spectrum of a  spectrumPolyList
 // ----------------------------------------------------------------------------
 
-spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
+/* former spectrumPolyList::spectrum ( lists*, int) */
+spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int fast )
 {
-    spectrumPolyNode  **node = &root;
+    spectrumPolyNode  **node = &speclist.root;
     spectrumPolyNode  *search;
 
     poly              f,tmp;
@@ -3817,7 +3881,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
                 }
                 search = search->next;
             }
-            delete_node( node );
+            speclist.delete_node( node );
         }
 
     }
@@ -3843,7 +3907,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
     int count         = 0;
     int multiplicity  = 1;
 
-    for( search=root; search!=(spectrumPolyNode*)NULL &&
+    for( search=speclist.root; search!=(spectrumPolyNode*)NULL &&
                      ( fast==0 || search->weight<=smax );
                      search=search->next )
     {
