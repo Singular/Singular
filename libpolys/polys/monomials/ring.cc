@@ -4496,7 +4496,7 @@ ring rAssure_HasComp(const ring r)
   return new_r;
 }
 
-static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
+ring rAssure_CompLastBlock(ring r, BOOLEAN complete)
 {
   int last_block = rBlocks(r) - 2;
   if (r->order[last_block] != ringorder_c &&
@@ -4551,56 +4551,59 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
 }
 
 // Moves _c or _C ordering to the last place AND adds _s on the 1st place
-ring rAssure_SyzComp_CompLastBlock(const ring r)
+ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
 {
+  rTest(r);
+   
   ring new_r_1 = rAssure_CompLastBlock(r, FALSE); // due to this FALSE - no completion!
   ring new_r = rAssure_SyzComp(new_r_1, FALSE); // new_r_1 is used only here!!!
 
-  if (new_r != r)
-  {
-    ring old_r = r;
-    if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
-    rComplete(new_r, 1);
+  if (new_r == r)
+     return r;
+     
+  ring old_r = r;
+  if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
+     
+   rComplete(new_r, 1);
 #ifdef HAVE_PLURAL
-    if (rIsPluralRing(old_r))
-    {
-      if ( nc_rComplete(old_r, new_r, false) ) // no qideal!
-      {
-#ifndef NDEBUG
-        WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
+   if (rIsPluralRing(old_r))
+   {
+       if ( nc_rComplete(old_r, new_r, false) ) // no qideal!
+       {
+# ifndef NDEBUG
+	  WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
+# endif
+       }
+   }
 #endif
-        }
-    }
-    assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
-#endif
+     
 ///?    rChangeCurrRing(new_r);
-    if (old_r->qideal != NULL)
-    {
+   if (old_r->qideal != NULL)
+   {
       new_r->qideal = idrCopyR(old_r->qideal, old_r, new_r);
       //currQuotient = new_r->qideal;
+   }
 
 #ifdef HAVE_PLURAL
-      if( rIsPluralRing(old_r) )
-        if( nc_SetupQuotient(new_r, old_r, true) )
-        {
+   if( rIsPluralRing(old_r) )
+     if( nc_SetupQuotient(new_r, old_r, true) )
+       {
 #ifndef NDEBUG
-          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+	  WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
 #endif
-        }
+       }
 #endif
-    }
 
 #ifdef HAVE_PLURAL
-    assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
-    assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
-    assume(rIsSCA(new_r) == rIsSCA(old_r));
-    assume(ncRingType(new_r) == ncRingType(old_r));
+   assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
+   assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
+   assume(rIsSCA(new_r) == rIsSCA(old_r));
+   assume(ncRingType(new_r) == ncRingType(old_r));
 #endif
-
-    rTest(new_r);
-    rTest(old_r);
-  }
-  return new_r;
+   
+   rTest(new_r);
+   rTest(old_r);
+   return new_r;
 }
 
 // use this for global orderings consisting of two blocks
