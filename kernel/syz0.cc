@@ -911,9 +911,10 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     {
       if ((hom==isHomog)|| (rHasGlobalOrdering(origR)))
       {
-        syRing = rCurrRingAssure_CompLastBlock();
+        syRing = rAssure_CompLastBlock(origR, TRUE);
         if (syRing != origR)
         {
+	  rChangeCurrRing(syRing);
           for (i=0; i<IDELEMS(res[1]); i++)
           {
             res[1]->m[i] = prMoveR( res[1]->m[i], origR);
@@ -923,9 +924,10 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       }
       else
       {
-        syRing = rCurrRingAssure_SyzComp_CompLastBlock();
+        syRing = rAssure_SyzComp_CompLastBlock(origR, TRUE);
         if (syRing != origR)
         {
+	  rChangeCurrRing(syRing);
           for (i=0; i<IDELEMS(res[0]); i++)
           {
             res[0]->m[i] = prMoveR( res[0]->m[i], origR);

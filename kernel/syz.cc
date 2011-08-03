@@ -418,7 +418,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
 /*--- initialize the syzygy-ring -----------------------------*/
   ring origR = currRing;
-  ring syz_ring = rCurrRingAssure_SyzComp();
+  ring syz_ring = rAssure_SyzComp(origR, TRUE); // will do rChangeCurrRing if needed
   rSetSyzComp(rk_arg, syz_ring);
 
   if (syz_ring != origR)
