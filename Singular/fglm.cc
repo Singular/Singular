@@ -153,9 +153,9 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         pperm= (int *)omAlloc0( (npar+1)*sizeof( int ) );
     else
         pperm= NULL;
-    maFindPerm( sring->names, nvar, sring->parameter, npar,
-                dring->names, nvar, dring->parameter, npar, vperm, pperm,
-                dring->ch);
+    maFindPerm( sring->names, nvar, rParameter(sring), npar,
+                dring->names, nvar, rParameter(dring), npar, vperm, pperm,
+                dring->cf->type);
     for ( k= nvar; (k > 0) && (state == FglmOk); k-- )
         if ( vperm[k] <= 0 )
         {
@@ -182,10 +182,11 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         // both rings are qrings, now check if both quotients define the same ideal.
         // check if sring->qideal is contained in dring->qideal:
         rSetHdl( dringHdl );
-        nMapFunc nMap=nSetMap( sring );
+        nMapFunc nMap=n_SetMap(currRing->cf, sring->cf );
         ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
-          (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring, nMap);
+          (sqind->m)[k]= p_PermPoly( (sring->qideal->m)[k], vperm, sring,
+			  currRing, nMap);
         ideal sqindred = kNF( dring->qideal, NULL, sqind );
         if ( ! idIs0( sqindred ) )
         {
@@ -199,11 +200,12 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         // check if dring->qideal is contained in sring->qideal:
         int * dsvperm = (int *)omAlloc0( (nvar+1)*sizeof( int ) );
         maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0,
-                    dsvperm, NULL, sring->ch);
-        nMap=nSetMap(dring);
+                    dsvperm, NULL, sring->cf->type);
+        nMap=n_SetMap(currRing->cf, dring->cf);
         ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
-          (dqins->m)[k]=pPermPoly( (dring->qideal->m)[k], dsvperm, sring, nMap);
+          (dqins->m)[k]=p_PermPoly( (dring->qideal->m)[k], dsvperm, sring,
+			 currRing, nMap);
         ideal dqinsred = kNF( sring->qideal, NULL, dqins );
         if ( ! idIs0( dqinsred ) )
         {
@@ -240,7 +242,7 @@ fglmIdealcheck( const ideal theIdeal )
     FglmState state = FglmOk;
     int power;
     int k;
-    BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( pVariables*sizeof( BOOLEAN ) );
+    BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( currRing->N*sizeof( BOOLEAN ) );
 
     for ( k= IDELEMS( theIdeal ) - 1; (state == FglmOk) && (k >= 0); k-- )
     {
@@ -250,7 +252,7 @@ fglmIdealcheck( const ideal theIdeal )
           if( pIsConstant( p ) ) state= FglmHasOne;
           else if ( (power= pIsPurePower( p )) > 0 )
           {
-            fglmASSERT( 0 < power && power <= pVariables, "illegal power" );
+            fglmASSERT( 0 < power && power <= currRing->N, "illegal power" );
             if ( purePowers[power-1] == TRUE  ) state= FglmNotReduced;
             else purePowers[power-1]= TRUE;
           }
@@ -261,10 +263,10 @@ fglmIdealcheck( const ideal theIdeal )
     }
     if ( state == FglmOk )
     {
-        for ( k= pVariables-1 ; (state == FglmOk) && (k >= 0); k-- )
+        for ( k= currRing->N-1 ; (state == FglmOk) && (k >= 0); k-- )
             if ( purePowers[k] == FALSE ) state= FglmNotZeroDim;
     }
-    omFreeSize( (ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
+    omFreeSize( (ADDRESS)purePowers, currRing->N*sizeof( BOOLEAN ) );
     return state;
 }
 
@@ -283,9 +285,9 @@ fglmProc( leftv result, leftv first, leftv second )
     rSetHdl( sourceRingHdl );
     ring sourceRing = currRing;
 
-    int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
+    int * vperm = (int *)omAlloc0( (currRing->N+1)*sizeof( int ) );
     state= fglmConsistency( sourceRingHdl, destRingHdl, vperm );
-    omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
+    omFreeSize( (ADDRESS)vperm, (currRing->N+1)*sizeof(int) );
 
     if ( state == FglmOk )
     {
@@ -433,7 +435,7 @@ findUniProc( leftv result, leftv first )
       // univariate polys, try to reduce the problem
       int i,k;
       int count=0;
-      BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( pVariables*sizeof( BOOLEAN ) );
+      BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( currRing->N*sizeof( BOOLEAN ) );
       for ( k= IDELEMS( sourceIdeal ) - 1; k >= 0; k-- )
       {
         if((i=pIsUnivariate(sourceIdeal->m[k]))>0)
@@ -442,16 +444,16 @@ findUniProc( leftv result, leftv first )
           {
             purePowers[i-1]=k;
             count++;
-            if (count==pVariables) break;
+            if (count==currRing->N) break;
           }
         }
       }
-      if (count==pVariables)
+      if (count==currRing->N)
       {
-        destIdeal=idInit(pVariables,1);
-        for(k=pVariables-1; k>=0; k--) destIdeal->m[k]=pCopy(sourceIdeal->m[purePowers[k]]);
+        destIdeal=idInit(currRing->N,1);
+        for(k=currRing->N-1; k>=0; k--) destIdeal->m[k]=pCopy(sourceIdeal->m[purePowers[k]]);
       }
-      omFreeSize((ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
+      omFreeSize((ADDRESS)purePowers, currRing->N*sizeof( BOOLEAN ) );
       if (destIdeal!=NULL)
             state = FglmOk;
       else if ( FindUnivariateWrapper( sourceIdeal, destIdeal ) == FALSE )
