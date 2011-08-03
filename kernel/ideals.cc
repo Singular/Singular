@@ -1989,7 +1989,7 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
   }
 
   if(w!=NULL)
-    pSetModDeg(w);
+    p_SetModDeg(w, currRing);
 
   for (i=length-1;i>=0;i--)
   {
@@ -2006,7 +2006,7 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
         {
           //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing));
           if(w!=NULL)
-            pSetModDeg(NULL);
+            p_SetModDeg(NULL, currRing);
           return FALSE;
         }
       }
@@ -2014,7 +2014,7 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
   }
 
   if(w!=NULL)
-    pSetModDeg(NULL);
+    p_SetModDeg(NULL, currRing);
 
   return TRUE;
 }
