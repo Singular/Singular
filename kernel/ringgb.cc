@@ -171,7 +171,7 @@ int findRingSolver(poly rside, ideal G, ring r)
 poly plain_spoly(poly f, poly g)
 {
   number cf = nCopy(pGetCoeff(f)), cg = nCopy(pGetCoeff(g));
-  (void)ksCheckCoeff(&cf, &cg); // gcd and zero divisors
+  (void)ksCheckCoeff(&cf, &cg, currRing->cf); // gcd and zero divisors
   poly fm, gm;
   k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
   pSetCoeff0(fm, cg);
@@ -269,7 +269,7 @@ int testGB(ideal I, ideal GI) {
       PrintS("-");
     }
   }
-  if (!(rField_is_Domain()))
+  if (!(rField_is_Domain(currRing)))
   {
     PrintS(" Yes!\nzero-spoly --> 0?");
     for (i = 0; i < IDELEMS(GI); i++)
