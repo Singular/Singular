@@ -56,6 +56,10 @@
 #define S_ROOT_DIR ""
 #endif
 
+/* Singular\'s own uname\ */
+#ifndef S_UNAME
+#undef S_UNAME ""
+#endif
 // ----------------- end of configure stuff
 
 // ---------------- Singular standard types etc.

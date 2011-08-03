@@ -24,6 +24,8 @@
 #include <Singular/feOpt.h>
 #include <reporter/reporter.h>
 
+#include "fehelp.h"
+
 /*****************************************************************
  *
  * Declarations: Data  structures
