@@ -62,7 +62,7 @@ static inline int idSize(const ideal id)
 #ifdef PDEBUG
 void idDBTest(ideal h1, int level, const char *f,const int l);
 #define idTest(A) idDBTest(A, PDEBUG, __FILE__,__LINE__)
-#define idPrint(id) idShow(id)
+#define idPrint(id) idShow(id, currRing, currRing)
 #else
 #define idTest(A)  (TRUE)
 #define idPrint(A) ((void)0)
@@ -192,11 +192,4 @@ ideal id_ChineseRemainder(ideal *x, number *q, int rl, const ring R);
 ideal id_Farey(ideal x, number N, const ring r);
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
-
-#ifdef PDEBUG
-/* Shows an ideal -- only for debugging */
-void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint = 0);
-#else
-#define idShow(id, lmRing, tailRing, debugPrint) ((void)0)
-#endif
 #endif

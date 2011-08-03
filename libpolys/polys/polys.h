@@ -262,6 +262,7 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 // ----------------- define to enable new p_procs -----*/
 
 #define pDivide(a,b) p_Divide(a,b,currRing)
+#define pDivideM(a,b) p_DivideM(a,b,currRing)
 #define pLcm(a,b,m) p_Lcm(a,b,m,currRing)
 #define pDiff(a,b)  p_Diff(a,b,currRing)
 #define pDiffOp(a,b,m) p_DiffOp(a,b,m,currRing)

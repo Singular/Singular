@@ -124,4 +124,9 @@ void    idInitChoise (int r,int beg,int end,BOOLEAN *endch,int * choise);
 void    idGetNextChoise (int r,int end,BOOLEAN *endch,int * choise);
 int     idGetNumberOfChoise(int t, int d, int begin, int end, int * choise);
 
+#ifdef PDEBUG
+void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint = 0);
+#endif
+
+
 #endif
