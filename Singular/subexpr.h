@@ -11,7 +11,8 @@
 #include <string.h>
 #include <Singular/grammar.h>
 #include <Singular/tok.h>
-#include <kernel/structs.h>
+//#include <kernel/structs.h>
+#include <Singular/attrib.h>
 #include <kernel/febase.h>
 #include <polys/monomials/ring.h>
 
