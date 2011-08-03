@@ -25,8 +25,6 @@
 #include <polys/kbuckets.h>
 #include <polys/prCopy.h>
 
-static kBucket_pt sy0buck;
-
 static void syInitSort(ideal arg,intvec **modcomp)
 {
   int i,j,k,kk,kkk,jj;
@@ -505,6 +503,8 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
 */
 static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN redTail=TRUE)
 {
+  kBucket_pt sy0buck = kBucketCreate(currRing);
+
   int Fl=IDELEMS(arg);
   while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
   ideal result=idInit(16,Fl);
@@ -665,6 +665,8 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
               omFreeSize((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
               for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
+	       
+	      kBucketDestroy(&(sy0buck));
               return result;
             }
           }
@@ -730,6 +732,8 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   omFreeSize((ADDRESS)Flength,Fl*sizeof(int));
   delete *modcomp;
   *modcomp = newmodcomp;
+   
+  kBucketDestroy(&(sy0buck));
   return result;
 }
 
@@ -875,11 +879,11 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   *length = 4;
   resolvente res = (resolvente)omAlloc0(4*sizeof(ideal)),newres;
   res[0] = idCopy(arg);
+
   while ((!idIs0(res[syzIndex])) && ((maxlength==-1) || (syzIndex<maxlength)))
   {
     i = IDELEMS(res[syzIndex]);
     //while ((i!=0) && (!res[syzIndex]->m[i-1])) i--;
-    sy0buck = kBucketCreate();
     if (syzIndex+1==*length)
     {
       newres = (resolvente)omAlloc0((*length+4)*sizeof(ideal));
@@ -937,7 +941,6 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     }
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
-    kBucketDestroy(&(sy0buck));
   }
   //syPrintResolution(res,1,*length);
   if ((hom!=isHomog) && (rHasLocalOrMixedOrdering(origR)))

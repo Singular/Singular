@@ -1024,8 +1024,8 @@ syStrategy syHilb(ideal arg,int * length)
   syzstr->Firstelem = (int**)omAlloc0((*length+1)*sizeof(int*));
   syzstr->hilb_coeffs = (intvec**)omAlloc0((*length+1)*sizeof(intvec*));
   syzstr->sev = (unsigned long **)omAlloc0((*length+1)*sizeof(unsigned long*));
-  syzstr->bucket = kBucketCreate();
-  syzstr->syz_bucket = kBucketCreate();
+  syzstr->bucket = kBucketCreate(currRing);
+  syzstr->syz_bucket = kBucketCreate(currRing);
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
 /*--- computes the resolution ----------------------*/

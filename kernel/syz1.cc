@@ -2347,7 +2347,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   assume(syzstr->syRing != NULL);
   rChangeCurrRing(syzstr->syRing);
 //Print("laeufts ");
-  syzstr->bucket = kBucketCreate();
+  syzstr->bucket = kBucketCreate(syzstr->syRing);
   for (index=syzstr->length-1;index>0;index--)
   {
     if (syzstr->resPairs[index]!=NULL)
@@ -2505,7 +2505,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->Howmuch = (int**)omAlloc0((*length+1)*sizeof(int*));
   syzstr->Firstelem = (int**)omAlloc0((*length+1)*sizeof(int*));
   syzstr->sev = (unsigned long **) omAlloc0((*length+1)*sizeof(unsigned long *));
-  syzstr->bucket = kBucketCreate();
+  syzstr->bucket = kBucketCreate(currRing);
   int len0=id_RankFreeModule(temp,currRing)+1;
 
   startdeg = actdeg;
@@ -2653,7 +2653,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
 
   assume( syzstr->length == maxlength );
 
-  syzstr->bucket = kBucketCreate();
+  syzstr->bucket = kBucketCreate(currRing);
   int len0=id_RankFreeModule(temp,currRing)+1;
 
   startdeg = actdeg;

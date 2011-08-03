@@ -1828,8 +1828,8 @@ syStrategy syKosz(ideal arg,int * length)
   syzstr->orderedRes = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
   resolvente totake=(resolvente)omAlloc0((*length+1)*sizeof(ideal));
   syzstr->Tl = new intvec(*length+1);
-  syzstr->bucket = kBucketCreate();
-  syzstr->syz_bucket = kBucketCreate();
+  syzstr->bucket = kBucketCreate(currRing);
+  syzstr->syz_bucket = kBucketCreate(currRing);
   ideal new_generators=idInit(1,si_max(rk_arg,1));
   ideal temp_gens,old_std;
   syzstr->res[0] = idInit(1,1);
