@@ -54,10 +54,10 @@
 #include <kernel/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
-#include <kernel/longalg.h>
-#include <kernel/ffields.h>
+#include <polys/ext_fields/longalg.h>
+#include <coeffs/ffields.h>
 #include <Singular/subexpr.h>
-#include <kernel/p_Procs.h>
+#include <polys/templates/p_Procs.h>
 
 #include <polys/monomials/maps.h>
 
@@ -85,12 +85,12 @@
 #include <Singular/lists.h>
 #include <polys/prCopy.h>
 #include <polys/monomials/ring.h>
-#include <kernel/longalg.h>
+//#include <polys/ext_fields/longalg.h>
 #ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
 #endif
 
-#include <kernel/mpr_complex.h>
+#include <coeffs/mpr_complex.h>
 
 int nstep;
 
