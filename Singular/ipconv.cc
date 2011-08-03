@@ -17,13 +17,12 @@
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>
 #include <coeffs/numbers.h>
-#include <kernel/modulop.h>
-#include <kernel/longrat.h>
-#include <kernel/longalg.h>
+#include <coeffs/coeffs.h>
+#include <polys/ext_fields/longalg.h>
 #ifdef HAVE_RINGS
-#include <kernel/rmodulon.h>
-#include <kernel/rmodulo2m.h>
-#include <kernel/rintegers.h>
+#include <coeffs/rmodulon.h>
+#include <coeffs/rmodulo2m.h>
+#include <coeffs/rintegers.h>
 #endif
 #include <polys/matpol.h>
 #include <Singular/silink.h>
@@ -53,8 +52,8 @@ static void * iiI2P(void *data)
 
 static void * iiBI2P(void *data)
 {
-  number n=nInit_bigint((number)data);
-  nlDelete((number *)&data,NULL);
+  number n=n_Init_bigint((number)data, currRing->cf, currRing->cf);
+  n_Delete((number *)&data,currRing);
   poly p=pNSet(n);
   return (void *)p;
 }
@@ -68,7 +67,7 @@ static void * iiI2V(void *data)
 
 static void * iiBI2V(void *data)
 {
-  number n=nInit_bigint((number)data);
+  number n=n_Init_bigint((number)data, currRing->cf, currRing->cf);
   nlDelete((number *)&data,NULL);
   poly p=pNSet(n);
   if (p!=NULL) pSetComp(p,1);
@@ -85,7 +84,7 @@ static void * iiI2Id(void *data)
 static void * iiBI2Id(void *data)
 {
   ideal I=idInit(1,1);
-  number n=nInit_bigint((number)data);
+  number n=n_Init_bigint((number)data, currRing->cf, currRing->cf);
   nlDelete((number *)&data,NULL);
   poly p=pNSet(n);
   I->m[0]=p;
@@ -164,7 +163,7 @@ static void * iiBI2N(void *data)
 {
   if (currRing==NULL) return NULL;
   // a bigint is really a number from char 0, with diffrent operations...
-  return (void*)nInit_bigint((number)data);
+  return (void*)n_Init_bigint((number)data, currRing->cf, currRing->cf);
 }
 
 static void * iiIm2Ma(void *data)
@@ -301,7 +300,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
           }
           else if(pIsConstant((poly)input->data))
           {
-            output->name=nName(pGetCoeff((poly)input->data));
+            output->name=ndName(pGetCoeff((poly)input->data), currRing->cf);
           }
 #ifdef TEST
           else
@@ -314,7 +313,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       }
       else if ((input->rtyp==NUMBER_CMD) && (input->name==NULL))
       {
-        output->name=nName((number)input->data);
+        output->name=ndName((number)input->data, currRing->cf);
       }
       else
       {

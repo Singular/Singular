@@ -572,6 +572,13 @@ static inline number n_Farey(number a, number b, const coeffs r)
   return r->cfFarey(a,b,r);
 }
 
+static inline number  n_Init_bigint(number i, const coeffs dummy,
+		const coeffs dst)
+{
+  assume(dummy != NULL && dst != NULL); assume(dst->cfInit_bigint!=NULL); 
+  return dst->cfInit_bigint(i, dummy, dst);
+}
+
 /// returns TRUE, if r is not a field and r has non-trivial units
 static inline BOOLEAN nCoeff_has_Units(const coeffs r)
 { assume(r != NULL); return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
