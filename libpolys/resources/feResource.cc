@@ -17,6 +17,8 @@
 
 #include "feResource.h"
 
+char* feArgv0 = NULL; 
+
 #ifdef AIX_4
 #define HAVE_PUTENV 1
 #endif

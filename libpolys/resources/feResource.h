@@ -42,11 +42,9 @@ void feInitResources(const char* argv0 = NULL);
 void feReInitResources();
 // Prints resources into string with StringAppend, etc
 void feStringAppendResources(int warn = -1);
+#endif /* end ifdef __cplusplus */
 
-#endif
-/* end ifdef __cplusplus */
-
-char* feArgv0=NULL;
+extern char* feArgv0; 
 
 const char fePathSep =
 /* not really cygwin, applies to all windows systems:*/
