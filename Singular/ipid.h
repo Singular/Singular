@@ -9,7 +9,7 @@
 */
 #include <string.h>
 //#include <kernel/structs.h>
-#include <kernel/idrec.h>
+#include <Singular/idrec.h>
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
 
