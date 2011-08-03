@@ -655,15 +655,18 @@ BOOLEAN rHasSimpleOrder(const ring r);
 /// returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(const ring r);
 
-// return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
-//inline BOOLEAN rHasGlobalOrdering(const ring r)
-//{ return (r->OrdSgn==1); }
-#define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
-// #define rHasGlobalOrdering_currRing() (pOrdSgn==1)
-//inline BOOLEAN rHasLocalOrMixedOrdering(const ring r)
-//{ return (r->OrdSgn==-1); }
-#define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
-// #define rHasLocalOrMixedOrdering_currRing() (pOrdSgn==-1)
+//???? return TRUE if p->exp[r->pOrdIndex] holds total degree of p ???
+
+
+inline BOOLEAN rHasGlobalOrdering(const ring r){ return (r->OrdSgn==1); }
+inline BOOLEAN rHasLocalOrMixedOrdering(const ring r){ return (r->OrdSgn==-1); }
+
+// #define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
+// #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
+
+#define rHasGlobalOrdering_currRing() rHasGlobalOrdering(currRing)
+#define rHasLocalOrMixedOrdering_currRing() rHasLocalOrMixedOrdering(currRing)
+
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r );
 
 /// return TRUE if p_SetComp requires p_Setm
