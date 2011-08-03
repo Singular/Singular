@@ -857,7 +857,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   cols++;
   for (i=0;i<cols-1;i++)
   {
-    if ((i==0) && (weights!=NULL)) pSetModDeg(weights);
+    if ((i==0) && (weights!=NULL)) p_SetModDeg(weights, currRing);
     memset(temp2,0,(l+1)*sizeof(int));
     for (j=0;j<IDELEMS(res[i]);j++)
     {
@@ -876,7 +876,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
         if (temp2[j+1]-i<mr) mr = temp2[j+1]-i;
       }
     }
-    if ((i==0) && (weights!=NULL)) pSetModDeg(NULL);
+    if ((i==0) && (weights!=NULL)) p_SetModDeg(NULL, currRing);
     temp3 = temp1;
     temp1 = temp2;
     temp2 = temp3;
@@ -911,12 +911,12 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   if (weights!=NULL)
   {
     memset(temp2,0,l*sizeof(int));
-    pSetModDeg(weights);
+    p_SetModDeg(weights, currRing);
   }
   else
     memset(temp2,0,l*sizeof(int));
   int dummy = syDetect(res[0],0,TRUE,temp2,tocancel);
-  if (weights!=NULL) pSetModDeg(NULL);
+  if (weights!=NULL) p_SetModDeg(NULL, currRing);
   if (tomin)
   {
     //(*result)[(-mr)*cols] -= dummy;
@@ -928,7 +928,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   }
   for (i=0;i<cols-1;i++)
   {
-    if ((i==0) && (weights!=NULL)) pSetModDeg(weights);
+    if ((i==0) && (weights!=NULL)) p_SetModDeg(weights, currRing);
     memset(temp2,0,l*sizeof(int));
     for (j=0;j<IDELEMS(res[i]);j++)
     {
@@ -971,7 +971,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     //  if (((*result)[i+1+j*cols]!=0) && (j>*regularity)) *regularity = j;
       if ((IMATELEM((*result),j+1,i+2)!=0) && (j>*regularity)) *regularity = j;
     }
-    if ((i==0) && (weights!=NULL)) pSetModDeg(NULL);
+    if ((i==0) && (weights!=NULL)) p_SetModDeg(NULL, currRing);
   }
   // Print("nach minim:\n"); result->show(); PrintLn();
   /*------ clean up --------------*/
