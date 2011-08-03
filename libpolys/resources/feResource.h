@@ -46,6 +46,7 @@ void feStringAppendResources(int warn = -1);
 #endif
 /* end ifdef __cplusplus */
 
+char* feArgv0=NULL;
 
 const char fePathSep =
 /* not really cygwin, applies to all windows systems:*/
