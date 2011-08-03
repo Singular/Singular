@@ -128,7 +128,6 @@ static feResourceConfig_s feResourceConfigs[] =
  * Declarations: Local variables / functions
  *
  *****************************************************************/
-char* feArgv0=NULL;
 
 #define MAXRESOURCELEN 5*MAXPATHLEN
 

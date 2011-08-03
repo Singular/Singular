@@ -18,6 +18,8 @@
 #include <misc/options.h>
 #endif
 
+#include "fehelp.h"
+
 // Define here which cmd-line options are recognized
 struct fe_option feOptSpec[] =
 {
