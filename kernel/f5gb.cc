@@ -1212,7 +1212,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList*
     //tempMon->setPoly(tempPoly);
     //while(NULL != tempMon) {
         // iteration over all monomials in tempMon
-        kBucket* bucket  =   kBucketCreate();
+        kBucket* bucket  =   kBucketCreate(currRing);
         kBucketInit(bucket,tempPoly,0);
         tempPoly    =   kBucketGetLm(bucket);
         //Print("\n\n\nTO BE REDUCED:  ");
