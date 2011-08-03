@@ -10,7 +10,7 @@
 #include <misc/intvec.h>
 #include <polys/polys.h>
 #include <Singular/lists.h>
-#include <kernel/longrat.h>
+#include <coeffs/longrat.h>
 #include <Singular/ipid.h>
 #include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY
@@ -1495,7 +1495,7 @@ ideal interpolation(lists L, intvec *v)
   bool data_ok=true;
 
   // reading the ring data ***************************************************
-  if ((currRing==NULL) || ((!rField_is_Zp ())&&(!rField_is_Q ())))
+  if ((currRing==NULL) || ((!rField_is_Zp (currRing))&&(!rField_is_Q (currRing))))
   {
      WerrorS("coefficient field should be Zp or Q!");
      return NULL;
@@ -1517,8 +1517,8 @@ ideal interpolation(lists L, intvec *v)
      return NULL;
   }
   variables=currRing->N;
-  only_modp=rField_is_Zp();
-  if (only_modp) myp=rChar();
+  only_modp=rField_is_Zp(currRing);
+  if (only_modp) myp=rChar(currRing);
   // ring data read **********************************************************
 
 
@@ -1759,7 +1759,7 @@ ideal interpolation(lists L, intvec *v)
 #endif
              mpz_init_set(n->z,temp->polycoef[a]);
              n->s=3;
-             nlNormalize(n);
+             nlNormalize(n, currRing->cf);
              p=pNSet(n); //a monomial
              for (j=0;j<variables;j++) pSetExp(p,j+1,temp->polyexp[a][j]);
              pSetm(p); // after all pSetExp
