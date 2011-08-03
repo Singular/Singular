@@ -518,15 +518,16 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
 
 //#define WRITE_BUCKETS
 #ifdef WRITE_BUCKETS
-PrintS("Input: \n");
-ideal twr=idHead(arg);
-idPrint(arg);
-idDelete(&twr);
-if (modcomp!=NULL) (*modcomp)->show(0,0);
+  PrintS("Input: \n");
+  ideal twr=idHead(arg);
+  idPrint(arg);
+  idDelete(&twr);
+  if (modcomp!=NULL) (*modcomp)->show(0,0);
 #endif
+   
   newmodcomp = new intvec(Fl+2);
-//for (j=0;j<Fl;j++) pWrite(F[j]);
-//PrintLn();
+  //for (j=0;j<Fl;j++) pWrite(F[j]);
+  //PrintLn();
   if (currQuotient==NULL)
     pairs=(polyset)omAlloc0(Fl*sizeof(poly));
   else
@@ -864,7 +865,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   int ** wv=NULL;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
   ring origR = currRing;
-  ring syRing=NULL;
+  ring syRing = NULL;
 
   if ((!isMonomial) && syTestOrder(arg))
   {
@@ -888,13 +889,16 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       *length += 4;
       res=newres;
     }
+     
     if ((hom==isHomog)|| (rHasGlobalOrdering(origR)))
     {
       if (syzIndex==0) syInitSort(res[0],&modcomp);
+       
       if ((syzIndex==0) && !rRing_has_CompLastBlock(currRing))
         res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW,FALSE);
       else
         res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW);
+       
       mW = res[syzIndex];
     }
 //idPrint(res[syzIndex+1]);
@@ -965,8 +969,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       }
       syzIndex++;
     }
-    j = 0;
-    while (currRing->order[j]!=0) j++;
+//    j = 0; while (currRing->order[j]!=0) j++; // What was this for???!
     rKill(syRing);
   }
   else

@@ -425,8 +425,7 @@ fglmhomog( ring sourceRing, ideal sourceIdeal, ring destRing, ideal & destIdeal 
     return TRUE;
 }
 
-ideal
-fglmhomProc(leftv first, leftv second)
+/* ideal fglmhomProc(leftv first, leftv second) // TODO: Move to Singular/
 {
     idhdl dest= currRingHdl;
     ideal result;
@@ -440,7 +439,7 @@ fglmhomProc(leftv first, leftv second)
     fglmhomog( IDRING((idhdl)first->data), i, IDRING(dest), result );
 
     return( result );
-}
+} */
 
 #endif
 
