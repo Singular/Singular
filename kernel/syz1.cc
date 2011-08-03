@@ -1686,7 +1686,7 @@ resolvente syReorder(resolvente res,int length,
             if (toCopy)
             {
               if (origR!=NULL)
-                tq = prHeadR(p,origR);
+                tq = prHeadR(p,origR, currRing);
               else
                 tq = pHead(p);
               pIter(p);
@@ -1699,7 +1699,7 @@ resolvente syReorder(resolvente res,int length,
                 poly pp=p;
                 pIter(p);
                 pNext(pp)=NULL;
-                tq = prMoveR(pp, origR);
+                tq = prMoveR(pp, origR, currRing);
               }
               else
               {
@@ -1733,10 +1733,10 @@ resolvente syReorder(resolvente res,int length,
           for (j=IDELEMS(res[i])-1;j>=0;j--)
           {
             if (toCopy)
-              fullres[i-1]->m[j] = prCopyR(res[i]->m[j], origR);
+              fullres[i-1]->m[j] = prCopyR(res[i]->m[j], origR, currRing);
             else
             {
-              fullres[i-1]->m[j] = prMoveR(res[i]->m[j], origR);
+              fullres[i-1]->m[j] = prMoveR(res[i]->m[j], origR, currRing);
               res[i]->m[j] = NULL;
             }
           }
@@ -2484,7 +2484,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = prCopyR( arg->m[i], origR);
+    temp->m[i] = prCopyR( arg->m[i], origR, syzstr->syRing);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);
@@ -2626,7 +2626,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = prCopyR( arg->m[i], origR);
+    temp->m[i] = prCopyR( arg->m[i], origR, currRing);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);

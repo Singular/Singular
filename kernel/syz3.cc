@@ -1770,7 +1770,7 @@ syStrategy syKosz(ideal arg,int * length)
   syzstr->length = *length = (currRing->N)+2;
   syzstr->regularity = -1;
   if (origR!=syzstr->syRing)
-    temp = idrCopyR(arg,origR);
+    temp = idrCopyR(arg, origR, syzstr->syRing);
   else
     temp = idCopy(arg);
   if (rk_arg==0)
@@ -2015,7 +2015,7 @@ syStrategy syKosz(ideal arg,int * length)
     index = 0;
     while ((index<=*length) && (syzstr->fullres[index]!=NULL))
     {
-      syzstr->fullres[index] = idrMoveR(syzstr->fullres[index],syzstr->syRing);
+      syzstr->fullres[index] = idrMoveR(syzstr->fullres[index],syzstr->syRing, origR);
       index++;
     }
   }
