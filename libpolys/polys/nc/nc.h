@@ -43,6 +43,8 @@ enum nc_type
 void nc_rKill(ring r);
 
 
+BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
+
 // NC pProcs:
 typedef poly (*mm_Mult_p_Proc_Ptr)(const poly m, poly p, const ring r);
 typedef poly (*mm_Mult_pp_Proc_Ptr)(const poly m, const poly p, const ring r);
