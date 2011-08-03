@@ -207,9 +207,9 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   rkF=id_RankFreeModule(arg,currRing);
 /*----------------construction of the new ordering----------*/
   if (rkF>0)
-    rSetSyzComp(rkF);
+    rSetSyzComp(rkF, currRing);
   else
-    rSetSyzComp(1);
+    rSetSyzComp(1, currRing);
 /*----------------creating S--------------------------------*/
   for(j=0;j<Fl;j++)
   {
@@ -839,7 +839,7 @@ BOOLEAN syTestOrder(ideal M)
 
 static void idShift(ideal arg,int index)
 {
-  int i,j=rGetMaxSyzComp(index);
+  int i,j=rGetMaxSyzComp(index, currRing);
   for (i=0;i<IDELEMS(arg);i++)
   {
     if (arg->m[i]!=NULL)

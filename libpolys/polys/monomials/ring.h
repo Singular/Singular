@@ -379,24 +379,10 @@ static inline bool rIsRatGRing(const ring r)
 
 
 // The following are for LaScala3 only!
-#ifdef PDEBUG
-#define rChangeSComps(c,s,l) rDBChangeSComps(c,s,l)
-#define rGetSComps(c,s,l) rDBGetSComps(c,s,l)
-void rDBChangeSComps(int* currComponents,
-                     long* currShiftedComponents,
-                     int length,
-                     ring r);
-void rDBGetSComps(int** currComponents,
-                  long** currShiftedComponents,
-                  int *length,
-                  ring r);
-#else
-#define rChangeSComps(c,s,l) rNChangeSComps(c,s)
-#define rGetSComps(c,s,l) rNGetSComps(c,s)
-#endif
+void rChangeSComps(int* currComponents, long* currShiftedComponents, int length, ring r);
+void rGetSComps(int** currComponents, long** currShiftedComponents, int *length, ring r);
 
-void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r);
-void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r);
+
 
 //idhdl  rFindHdl(ring r, idhdl n, idhdl w);
 //idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n);
