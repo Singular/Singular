@@ -90,6 +90,25 @@ void spectrum::copy_new( int k )
 }
 
 // ----------------------------------------------------------------------------
+//  Initialize a  spectrum  deep from another  spectrum
+// ----------------------------------------------------------------------------
+
+void spectrum::copy_deep( const spectrum &spec )
+{
+    mu = spec.mu;
+    pg = spec.pg;
+    n  = spec.n;
+
+    copy_new( n );
+
+    for( int i=0; i<n; i++ )
+    {
+        s[i] = spec.s[i];
+        w[i] = spec.w[i];
+    }
+}
+
+// ----------------------------------------------------------------------------
 //  Copy constructor for  spectrum
 // ----------------------------------------------------------------------------
 
