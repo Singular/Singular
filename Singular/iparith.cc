@@ -79,7 +79,7 @@
 
 #ifdef HAVE_PLURAL
   #include <kernel/ratgring.h>
-  #include <kernel/sca.h>
+  #include <polys/nc/sca.h>
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
   #define COMM_PLURAL      2
@@ -1696,7 +1696,7 @@ static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
 {
   poly p = pInit();
   int i;
-  for (i=1; i<=pVariables; i++)
+  for (i=1; i<=currRing->N; i++)
   {
     pSetExp(p, i, 1);
   }
@@ -1718,7 +1718,7 @@ static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
   int d=-1;
   int i;
   for(i=IDELEMS(I);i>=0;i--) d=si_max(d,(int)pDegW(I->m[i],iv));
-  omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
+  omFreeSize((ADDRESS)iv,(currRing->N+1)*sizeof(short));
   res->data = (char *)((long)d);
   return FALSE;
 }
@@ -1729,7 +1729,7 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
   {
     short *iv=iv2array((intvec *)v->Data());
     int d=(int)pDegW(p,iv);
-    omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
+    omFreeSize((ADDRESS)iv,(currRing->N+1)*sizeof(short));
     res->data = (char *)(long(d));
   }
   else
@@ -2059,7 +2059,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         goto err_fetch;
       }
     }
-    if ((iiOp!=FETCH_CMD) || (r->N!=pVariables) || (rPar(r)!=rPar(currRing)))
+    if ((iiOp!=FETCH_CMD) || (r->N!=currRing->N) || (rPar(r)!=rPar(currRing)))
     {
       perm=(int *)omAlloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
@@ -2067,8 +2067,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       op=IMAP_CMD;
       if (iiOp==IMAP_CMD)
       {
-        maFindPerm(r->names,       r->N,       r->parameter,        r->P,
-                   currRing->names,currRing->N,currRing->parameter, currRing->P,
+        maFindPerm(r->names,       r->N,       rParameter(r),        r->P,
+                   currRing->names,currRing->N,rParameter(currRing), currRing->P,
                    perm,par_perm, currRing->ch);
       }
       else
@@ -2076,20 +2076,20 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         int i;
         if (par_perm_size!=0)
           for(i=si_min(rPar(r),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
-        for(i=si_min(r->N,pVariables);i>0;i--) perm[i]=i;
+        for(i=si_min(r->N,currRing->N);i>0;i--) perm[i]=i;
       }
     }
     if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
     {
       int i;
-      for(i=0;i<si_min(r->N,pVariables);i++)
+      for(i=0;i<si_min(r->N,currRing->N);i++)
       {
         Print("// var nr %d: %s -> %s\n",i,r->names[i],currRing->names[i]);
       }
       for(i=0;i<si_min(rPar(r),rPar(currRing));i++) // possibly empty loop
       {
         Print("// par nr %d: %s -> %s\n",
-              i,r->parameter[i],currRing->parameter[i]);
+              i,rParameter(r)[i],rParameter(currRing)[i]);
       }
     }
     sleftv tmpW;
@@ -2524,16 +2524,16 @@ static BOOLEAN jjMONOM(leftv res, leftv v)
   poly p=pOne();
   int i,e;
   BOOLEAN err=FALSE;
-  for(i=si_min(pVariables,iv->length()); i>0; i--)
+  for(i=si_min(currRing->N,iv->length()); i>0; i--)
   {
     e=(*iv)[i-1];
     if (e>=0) pSetExp(p,i,e);
     else err=TRUE;
   }
-  if (iv->length()==(pVariables+1))
+  if (iv->length()==(currRing->N+1))
   {
     res->rtyp=VECTOR_CMD;
-    e=(*iv)[pVariables];
+    e=(*iv)[currRing->N];
     if (e>=0) pSetComp(p,e);
     else err=TRUE;
   }
@@ -2556,9 +2556,9 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
   int i=(int)(long)v->Data();
   int p=0;
   if ((0<i)
-  && (IDRING(h)->parameter!=NULL)
+  && (rParameter(IDRING(h))!=NULL)
   && (i<=(p=rPar(IDRING(h)))))
-    res->data=omStrDup(IDRING(h)->parameter[i-1]);
+    res->data=omStrDup(rParameter(IDRING(h))[i-1]);
   else
   {
     Werror("par number %d out of range 1..%d",i,p);
@@ -2817,7 +2817,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   maxl--;
   if ((maxl==-1) /*&& (iiOp!=MRES_CMD)*/)
   {
-    maxl = pVariables-1+2*(iiOp==MRES_CMD);
+    maxl = currRing->N-1+2*(iiOp==MRES_CMD);
     if (currQuotient!=NULL)
     {
       Warn(
@@ -2934,7 +2934,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   maxl--;
   if ((maxl==-1) /*&& (iiOp!=MRES_CMD)*/)
   {
-    maxl = pVariables-1+2*(iiOp==MRES_CMD);
+    maxl = currRing->N-1+2*(iiOp==MRES_CMD);
     if (currQuotient!=NULL)
     {
       Warn(
@@ -4067,10 +4067,10 @@ static BOOLEAN jjIS_RINGVAR0(leftv res, leftv v)
 }
 static BOOLEAN jjJACOB_P(leftv res, leftv v)
 {
-  ideal i=idInit(pVariables,1);
+  ideal i=idInit(currRing->N,1);
   int k;
   poly p=(poly)(v->Data());
-  for (k=pVariables;k>0;k--)
+  for (k=currRing->N;k>0;k--)
   {
     i->m[k-1]=pDiff(p,k);
   }
@@ -4079,7 +4079,7 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
 }
 /*2
  * compute Jacobi matrix of a module/matrix
- * Jacobi(M) := ( diff(Mt,var(1))|, ... ,| diff(Mt,var(pVariables))  ),
+ * Jacobi(M) := ( diff(Mt,var(1))|, ... ,| diff(Mt,var(currRing->N))  ),
  * where Mt := transpose(M)
  * Note that this is consistent with the current conventions for jacob in Singular,
  * whereas M2 computes its transposed.
@@ -4090,10 +4090,10 @@ static BOOLEAN jjJACOB_M(leftv res, leftv a)
   id = idTransp(id);
   int W = IDELEMS(id);
 
-  ideal result = idInit(W * pVariables, id->rank);
+  ideal result = idInit(W * currRing->N, id->rank);
   poly *p = result->m;
 
-  for( int v = 1; v <= pVariables; v++ )
+  for( int v = 1; v <= currRing->N; v++ )
   {
     poly* q = id->m;
     for( int i = 0; i < W; i++, p++, q++ )
@@ -4143,17 +4143,17 @@ static BOOLEAN jjLEADCOEF(leftv res, leftv v)
 static BOOLEAN jjLEADEXP(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  int s=pVariables;
+  int s=currRing->N;
   if (v->Typ()==VECTOR_CMD) s++;
   intvec *iv=new intvec(s);
   if (p!=NULL)
   {
-    for(int i = pVariables;i;i--)
+    for(int i = currRing->N;i;i--)
     {
       (*iv)[i-1]=pGetExp(p,i);
     }
-    if (s!=pVariables)
-      (*iv)[pVariables]=pGetComp(p);
+    if (s!=currRing->N)
+      (*iv)[currRing->N]=pGetComp(p);
   }
   res->data=(char *)iv;
   return FALSE;
@@ -4388,8 +4388,8 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
   }
   int i=(int)(long)v->Data();
   int p=0;
-  if ((0<i) && (currRing->parameter!=NULL) && (i<=(p=rPar(currRing))))
-    res->data=omStrDup(currRing->parameter[i-1]);
+  if ((0<i) && (rParameter(currRing)!=NULL) && (i<=(p=rPar(currRing))))
+    res->data=omStrDup(rParameter(currRing)[i-1]);
   else
   {
     Werror("par number %d out of range 1..%d",i,p);
@@ -5489,10 +5489,10 @@ static BOOLEAN jjFWALK3(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 {
   intvec *wdegree=(intvec*)w->Data();
-  if (wdegree->length()!=pVariables)
+  if (wdegree->length()!=currRing->N)
   {
     Werror("weight vector must have size %d, not %d",
-           pVariables,wdegree->length());
+           currRing->N,wdegree->length());
     return TRUE;
   }
 #ifdef HAVE_RINGS
@@ -5607,7 +5607,7 @@ static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
   short *iw=iv2array((intvec *)w->Data());
   res->data = (char *)ppJetW((poly)u->Data(),(int)(long)v->Data(),iw);
-  omFreeSize((ADDRESS)iw,(pVariables+1)*sizeof(short));
+  omFreeSize((ADDRESS)iw,(currRing->N+1)*sizeof(short));
   return FALSE;
 }
 static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
@@ -6161,7 +6161,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   int wmaxl=maxl;
   maxl--;
   if ((maxl==-1) && (iiOp!=MRES_CMD))
-    maxl = pVariables-1;
+    maxl = currRing->N-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
     intvec * iv=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
@@ -6341,7 +6341,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   {
     w=iv2array((intvec *)v4->Data());
     short *w0=w+1;
-    int i=pVariables;
+    int i=currRing->N;
     while(i>0&&*w0>0)
     {
       w0++;
