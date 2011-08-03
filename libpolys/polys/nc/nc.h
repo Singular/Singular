@@ -275,6 +275,8 @@ static inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
   return r->GetNC()->p_Procs.ReduceSPoly(p1, p2, r);
 }
 
+void nc_PolyPolyRed(poly &b, poly p, number *c, const ring r);
+
 /*
 static inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r) // nc_PolyPolyRed
 {
