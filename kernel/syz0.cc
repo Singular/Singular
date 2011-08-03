@@ -576,7 +576,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
         if (k<Fl)
         {
           number an=nCopy(pGetCoeff(F[k])),bn=nCopy(pGetCoeff(F[j]));
-          int ct = ksCheckCoeff(&an, &bn);
+          int ct = ksCheckCoeff(&an, &bn, currRing->cf);
           syz = pCopy(pairs[k]);
           //syz->coef = nCopy(F[k]->coef);
           syz->coef = an;

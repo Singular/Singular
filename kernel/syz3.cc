@@ -1767,7 +1767,7 @@ syStrategy syKosz(ideal arg,int * length)
 /*--- changes to a Cdp-ring ----------------------------*/
   syzstr->syRing = rAssure_C_dp(origR, TRUE); rChangeCurrRing(syzstr->syRing);
 /*--- initializes the data structures---------------*/
-  syzstr->length = *length = (currRing->N)+2;
+  syzstr->length = *length = (syzstr->syRing->N)+2;
   syzstr->regularity = -1;
   if (origR!=syzstr->syRing)
     temp = idrCopyR(arg, origR, syzstr->syRing);
