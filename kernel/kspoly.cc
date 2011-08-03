@@ -80,9 +80,9 @@ int ksReducePoly(LObject* PR,
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
       assume(_p != NULL);
-      nc_PolyPolyRed(_p, p2,coef);
+      nc_PolyPolyRed(_p, p2,coef, currRing);
       if (PR->t_p!=NULL) PR->t_p=_p; else PR->p=_p;
-      PR->pLength=0; // usaully not used, GetpLength re-comoutes it if needed
+      PR->pLength=0; // usually not used, GetpLength re-computes it if needed
     }
     return 0;
   }
@@ -121,7 +121,7 @@ int ksReducePoly(LObject* PR,
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
-    int ct = ksCheckCoeff(&an, &bn);    // Calculate special LC
+    int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
     p_SetCoeff(lm, bn, tailRing);
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
@@ -187,7 +187,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   poly a1 = pNext(p1), a2 = pNext(p2);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
-  int co=0, ct = ksCheckCoeff(&lc1, &lc2); // gcd and zero divisors
+  int co=0, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
 
   int l1=0, l2=0;
 
@@ -370,7 +370,7 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   if (is_Ring)
   {
-    ksCheckCoeff(&lc1, &lc2); // gcd and zero divisors
+    ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
     if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
     if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
     while (a1 != NULL && nIsZero(t2))
