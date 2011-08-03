@@ -214,8 +214,8 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   for(j=0;j<Fl;j++)
   {
     S[j] = pCopy(F[j]);
-    totalS[j] = pLDeg(S[j],&k,currRing);
-    ecartS[j] = totalS[j]-pFDeg(S[j],currRing);
+    totalS[j] = p_LDeg(S[j],&k,currRing);
+    ecartS[j] = totalS[j]-p_FDeg(S[j],currRing);
 //Print("%d", pGetComp(S[j]));PrintS("  ");
     p = S[j];
     if (rkF==0) pSetCompP(p,1);
@@ -324,8 +324,8 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 *         if ((bestEcart) || (ecartToRed!=0))
 *         {
 */
-            totalToRed = pLDeg(toRed,&kk,currRing);
-            ecartToRed = totalToRed-pFDeg(toRed,currRing);
+            totalToRed = p_LDeg(toRed,&kk,currRing);
+            ecartToRed = totalToRed-p_FDeg(toRed,currRing);
 /*
 *         }
 */
