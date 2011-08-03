@@ -917,7 +917,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 	  rChangeCurrRing(syRing);
           for (i=0; i<IDELEMS(res[1]); i++)
           {
-            res[1]->m[i] = prMoveR( res[1]->m[i], origR);
+            res[1]->m[i] = prMoveR( res[1]->m[i], origR, syRing);
           }
         }
         idTest(res[1]);
@@ -930,7 +930,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 	  rChangeCurrRing(syRing);
           for (i=0; i<IDELEMS(res[0]); i++)
           {
-            res[0]->m[i] = prMoveR( res[0]->m[i], origR);
+            res[0]->m[i] = prMoveR( res[0]->m[i], origR, syRing);
           }
         }
         idTest(res[0]);
@@ -969,7 +969,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       {
         if (res[syzIndex]->m[i])
         {
-          res[syzIndex]->m[i] = prMoveR( res[syzIndex]->m[i], syRing);
+          res[syzIndex]->m[i] = prMoveR( res[syzIndex]->m[i], syRing, origR);
         }
       }
       syzIndex++;

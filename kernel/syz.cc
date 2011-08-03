@@ -423,7 +423,8 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
   if (syz_ring != origR)
   {
-    res[0] = idrCopyR_NoSort(arg, origR);
+    rChangeCurrRing(syz_ring);
+    res[0] = idrCopyR_NoSort(arg, origR, syz_ring);
   }
   else
   {
@@ -604,10 +605,10 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 /*--- going back to the original ring -------------------------*/
   if (origR != syz_ring)
   {
-    rChangeCurrRing(origR);
+    rChangeCurrRing(origR); // should not be needed now?
     for (i=0; i<=syzIndex; i++)
     {
-      res[i] = idrMoveR_NoSort(res[i], syz_ring);
+      res[i] = idrMoveR_NoSort(res[i], syz_ring, origR);
     }
     rKill(syz_ring);
   }

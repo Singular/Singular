@@ -1001,7 +1001,7 @@ syStrategy syHilb(ideal arg,int * length)
   for (i=0;i<IDELEMS(arg);i++)
   {
     if (origR != syzstr->syRing)
-      temp->m[i] = prCopyR( arg->m[i], origR);
+      temp->m[i] = prCopyR( arg->m[i], origR, syzstr->syRing);
     else
       temp->m[i] = pCopy( arg->m[i]);
     if (temp->m[i]!=NULL)
