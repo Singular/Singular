@@ -34,7 +34,8 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_CFLAGS = `sh ../libpolys/libpolys-config --cflags`
+LIBPOLYS_CFLAGS = -I.. -I../libpolys
+LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
 
 PIPE		= -pipe
 CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
@@ -299,8 +300,10 @@ include depend
 endif
 
 
-# My headers test
-# test: test.o
+test.o: test.cc mod2.h libkernel_g.a  
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@ 
 
-test.o: test.cc mod2.h
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+# My headers test
+check: test.o
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o test -L. -lkernel_g ${LIBPOLYS_LIBS} -lntl -ldl -lgmp

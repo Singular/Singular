@@ -1,7 +1,8 @@
 #include <omalloc/omalloc.h>
-
 #include <misc/auxiliary.h>
+
 #include <misc/intvec.h>
+#include <misc/int64vec.h>
 #include <misc/mylimits.h>
 #include <misc/options.h>
 
@@ -14,8 +15,7 @@
 
 #include <coeffs/si_gmp.h>
 
-#include <polys/clapconv.h>
-#include <polys/clapsing.h>
+/*
 #include <polys/kbuckets.h>
 #include <polys/matpol.h>
 #include <polys/mod_raw.h>
@@ -36,17 +36,22 @@
 #include <polys/nc/sca.h>
 #include <polys/nc/summator.h>
 
-#include <polys/operations/pShallowCopyDelete.h>
+//WRONG???/// #include <polys/operations/pShallowCopyDelete.h> // TODO!
 
 #include <polys/templates/p_MemAdd.h>
 #include <polys/templates/p_Procs.h>
 
+// #include <polys/clapconv.h> // factory?
+// #include <polys/clapsing.h>
+*/
+
+
+#ifdef HAVE_FACTORY
+int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
+#endif
+
+/*
 extern ring currRing;
-
-//#ifdef HAVE_FACTORY
-//int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
-//#endif
-
 
 #include <coeffs/numbers.h>
 #include <polys/polys.h>
@@ -57,11 +62,10 @@ extern ring currRing;
 // HEADERS:
 
 #include "hutil.h"
-#include "idrec.h"
+//#include "idrec.h" // moved to Singular
 #include "stairc.h"
 #include "ideals.h"
 #include "structs.h"
-#include "int64vec.h"
 #include "syz.h"
 #include "fast_maps.h"
 #include "febase.h"
@@ -92,19 +96,17 @@ extern ring currRing;
 #include "mmalloc.h"
 #include "gfan.h"
 
-// #include "kutil.h" // ???
+#include "kutil.h"
 
-
-/* ALL: */
 
 // #include "CCRing.h" // Too old!
 #include "dbm_sl.h"
 #include "digitech.h"
 #include "eigenval.h"
-// #include "F4.h" // uses tgb_internal
-#include "F5cData.h"
+#include "F4.h" // uses tgb_internal
+//#include "F5cData.h"
 #include "f5c.h"
-#include "F5cLists.h"
+//#include "F5cLists.h"
 #include "f5data.h"
 #include "f5gb.h"
 #include "f5lists.h"
@@ -121,9 +123,7 @@ extern ring currRing;
 #include "hutil.h"
 // #include "Ideal.h" // Too old?
 #include "ideals.h"
-#include "idrec.h"
 #include "IIntvec.h"
-#include "int64vec.h"
 #include "khstd.h"
 #include "kmatrix.h"
 #include "kstd1.h"
@@ -153,20 +153,18 @@ extern ring currRing;
 
 #include "tgbgauss.h"
 #include "tgb.h"
-// #include "tgb_internal.h" // uses kutil :(
+#include "tgb_internal.h" // uses kutil :(
 #include "timer.h"
 #include "units.h"
 #include "walkMain.h"
 #include "walkProc.h"
 #include "walkSupport.h"
 
-/* */
-
-
+*/
 
 
 // Sources:
-
+/*
 #include "febase.cc"
 #include "feread.cc"
 #include "hdegree.cc"
@@ -290,3 +288,17 @@ extern ring currRing;
 #include "walkMain.cc"
 #include "walkProc.cc"
 #include "walkSupport.cc"
+*/
+
+
+
+int main( int, char *argv[] ) 
+{
+  feInitResources(argv[0]);
+
+  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  feStringAppendResources(0);
+  PrintS(StringAppendS("\n"));
+   
+  return 0;
+}

@@ -165,4 +165,5 @@ int main( int, char *argv[] )
     PrintS("GF: Test: Failed!");
   PrintLn();
  
+  return 0;
 }

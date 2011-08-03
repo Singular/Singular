@@ -7,8 +7,8 @@ else
   USE_FACTORY =
 endif
  
-PACKAGES=$(ALLOC) $(USE_FACTORY) libpolys
+PACKAGES=$(ALLOC) $(USE_FACTORY) libpolys kernel
 
 SUBDIRS=$(PACKAGES)
 
-TESTDIRS=libpolys
+TESTDIRS=libpolys kernel
