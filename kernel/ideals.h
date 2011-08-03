@@ -141,9 +141,8 @@ ideal   idPower(ideal gid,int deg);
 //ideal   idElimination (ideal h1,poly delVar);
 ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL);
 
-poly idMinor(matrix a, int ar, unsigned long which, ideal R=NULL);
-
-ideal   idMinors(matrix a, int ar, ideal R=NULL);
+poly idMinor(matrix a, int ar, unsigned long which, ideal R = NULL);
+ideal   idMinors(matrix a, int ar, ideal R = NULL);
 
 void   idCompactify(ideal id);
 
