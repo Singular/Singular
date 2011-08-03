@@ -75,9 +75,9 @@ walkProc(leftv first, leftv second)
 
     if(state==WalkOk)
     {
-      int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
+      int * vperm = (int *)omAlloc0( (currRing->N+1)*sizeof( int ) );
       state= walkConsistency( IDRING(sourceRingHdl), IDRING(destRingHdl), vperm );
-      omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
+      omFreeSize( (ADDRESS)vperm, (currRing->N+1)*sizeof(int) );
     }
 
     int64vec* currw64=rGetGlobalOrderWeightVec(sourceRing);
@@ -115,7 +115,7 @@ walkProc(leftv first, leftv second)
 
     switch (state) {
         case WalkOk:
-          destIdeal=idrMoveR(destIdeal,almostDestRing);
+          destIdeal=idrMoveR(destIdeal,currRing,almostDestRing);
           break;
 
         case WalkIncompatibleRings:
@@ -187,9 +187,9 @@ fractalWalkProc(leftv first, leftv second)
     rSetHdl( sourceRingHdl );
     ring sourceRing = currRing;
 
-    int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
+    int * vperm = (int *)omAlloc0( (currRing->N+1)*sizeof( int ) );
     state= fractalWalkConsistency( IDRING(sourceRingHdl), IDRING(destRingHdl), vperm );
-    omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
+    omFreeSize( (ADDRESS)vperm, (currRing->N+1)*sizeof(int) );
 
     ideal sourceIdeal;
     BOOLEAN sourcIdealIsSB=FALSE;
@@ -219,7 +219,7 @@ fractalWalkProc(leftv first, leftv second)
      {
        ring almostDestRing=currRing;
        rSetHdl(destRingHdl);
-       destIdeal=idrMoveR(destIdeal,almostDestRing);
+       destIdeal=idrMoveR(destIdeal,currRing,almostDestRing);
      }
 
 
