@@ -566,5 +566,18 @@ void lduDecomp(
        poly &lTimesU      /**< [out] the product of l and u         */
              );
 
+/* helper for qrDoubleShift */
+bool qrDS( const int n, matrix* queue, int& queueL, number* eigenValues,
+       int& eigenValuesL, const number tol1, const number tol2, const ring R);
+
+/**
+ * Tries to find the number n in the array nn[0..nnLength-1].
+ **/
+int similar(
+       const number* nn,       /**< [in] array of numbers to look-up */
+       const int nnLength,     /**< [in] length of nn                */
+       const number n,         /**< [in] number to loop-up in nn     */
+       const number tolerance  /**< [in] tolerance for comparison    */
+           );
 #endif
 /* LINEAR_ALGEBRA_H */
