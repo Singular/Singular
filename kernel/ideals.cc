@@ -695,9 +695,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
       if (s_h3->m[j] != NULL)
       {
         if (p_MinComp(s_h3->m[j],syz_ring) > k)
-          p_Shift(&s_h3->m[j], -k,currRing);
+          p_Shift(&s_h3->m[j], -k,syz_ring);
         else
-          pDelete(&s_h3->m[j]);
+          p_Delete(&s_h3->m[j],syz_ring);
       }
     }
     idSkipZeroes(s_h3);
@@ -726,7 +726,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
       {
         e->m[j] = s_h3->m[j];
         isMonomial=isMonomial && (pNext(s_h3->m[j])==NULL);
-        pDelete(&pNext(s_h3->m[j]));
+        p_Delete(&pNext(s_h3->m[j]),syz_ring);
         s_h3->m[j] = NULL;
       }
     }
@@ -917,7 +917,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
           s_h3->m[j]=NULL;
         }
         else
-          pDelete(&(s_h3->m[j]));
+          p_Delete(&(s_h3->m[j]),currRing);
       }
     }
   }
@@ -1098,7 +1098,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     for (j=0;j<IDELEMS(s_h3);j++)
     {
       if ((s_h3->m[j] != NULL) && (pMinComp(s_h3->m[j]) > k))
-        pDelete(&(s_h3->m[j]));
+        p_Delete(&(s_h3->m[j]),currRing);
     }
   }
   idSkipZeroes(s_h3);
@@ -1264,7 +1264,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
           p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
         pNormalize(p);
         if((w==NULL)&&(pDeg(p0)>n)||(w!=NULL)&&(pDegW(p0,w)>n))
-          pDelete(&p0);
+          p_Delete(&p0,currRing);
         else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
         j=IDELEMS(Q)-1;
@@ -1278,7 +1278,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
           pNext(p0)=NULL;
           if(((w==NULL)&&(pDeg(p0)>n))
           ||((w!=NULL)&&(pDegW(p0,w)>n)))
-            pDelete(&p0);
+            p_Delete(&p0,currRing);
           else
             R->m[i]=pAdd(R->m[i],p0);
           j=IDELEMS(Q)-1;
@@ -1475,7 +1475,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
         p_Shift(&s_h3->m[i],-kmax+1,currRing);
     }
     else
-      pDelete(&s_h3->m[i]);
+      p_Delete(&s_h3->m[i],currRing);
   }
   if (resultIsIdeal)
     s_h3->rank = 1;
@@ -1781,7 +1781,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
           {
             q = p;
             p = kNF(R,currQuotient,q);
-            pDelete(&q);
+            p_Delete(&q,currRing);
           }
           /*delete the matrix tmp*/
           for (i=1; i<=ar; i++)
@@ -1845,7 +1845,7 @@ ideal idMinors(matrix a, int ar, ideal R)
         {
           q = p;
           p = kNF(R,currQuotient,q);
-          pDelete(&q);
+          p_Delete(&q,currRing);
         }
         if (p!=NULL)
         {
@@ -1951,7 +1951,7 @@ BOOLEAN idIsSubModule(ideal id1,ideal id2)
       p = kNF(id2,currQuotient,id1->m[i]);
       if (p != NULL)
       {
-        pDelete(&p);
+        p_Delete(&p,currRing);
         return FALSE;
       }
     }
@@ -2218,7 +2218,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
     if ((s_temp1->m[i]!=NULL)
     && (pGetComp(s_temp1->m[i])<=length))
     {
-      pDelete(&(s_temp1->m[i]));
+      p_Delete(&(s_temp1->m[i]),currRing);
     }
     else
     {
@@ -2341,8 +2341,8 @@ poly idDecompose(poly monom, poly how, ideal kbase, int * pos)
   pSetm(coeff);
   *pos = idIndexOfKBase(base,kbase);
   if (*pos<0)
-    pDelete(&coeff);
-  pDelete(&base);
+    p_Delete(&coeff,currRing);
+  p_Delete(&base,currRing);
   return coeff;
 }
 
@@ -2382,7 +2382,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
             pAdd(MATELEM(result,(*convert)[pos],k+1),q);
       }
       else
-        pDelete(&q);
+        p_Delete(&q,currRing);
       pIter(p);
     }
   }
@@ -2469,7 +2469,7 @@ poly id_GCD(poly f, poly g, const ring r)
   poly gg=pTakeOutComp(&(S->m[0]),2);
   idDelete(&S);
   poly gcd_p=singclap_pdivide(f,gg,r);
-  pDelete(&gg);
+  p_Delete(&gg,r);
   rChangeCurrRing(save_r);
   return gcd_p;
 }
@@ -2483,7 +2483,7 @@ poly id_GCD(poly f, poly g, const ring r)
 * destroys xx
 */
 #ifdef HAVE_FACTORY
-ideal idChineseRemainder(ideal *xx, number *q, int rl)
+ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
   ideal result=idInit(cnt,xx[0]->rank);
@@ -2502,40 +2502,40 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
       {
         h=xx[j]->m[i];
         if ((h!=NULL)
-        &&((r==NULL)||(pLmCmp(r,h)==-1)))
+        &&((r==NULL)||(p_LmCmp(r,h,R)==-1)))
           r=h;
       }
       if (r==NULL) break;
-      h=pHead(r);
+      h=p_Head(r,R);
       for(j=rl-1;j>=0;j--)
       {
         hh=xx[j]->m[i];
-        if ((hh!=NULL) && (pLmCmp(r,hh)==0))
+        if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
         {
           x[j]=pGetCoeff(hh);
-          hh=pLmFreeAndNext(hh);
+          hh=p_LmFreeAndNext(hh,R);
           xx[j]->m[i]=hh;
         }
         else
-          x[j]=nlInit(0, currRing);
+          x[j]=n_Init(0, R->cf);
       }
-      number n=nlChineseRemainder(x,q,rl);
+      number n=n_ChineseRemainder(x,q,rl,R->cf);
       for(j=rl-1;j>=0;j--)
       {
         x[j]=NULL; // nlInit(0...) takes no memory
       }
-      if (nlIsZero(n)) pDelete(&h);
+      if (n_IsZero(n,R->cf)) p_Delete(&h,R);
       else
       {
-        pSetCoeff(h,n);
+        p_SetCoeff(h,n,R);
         //Print("new mon:");pWrite(h);
-        res_p=pAdd(res_p,h);
+        res_p=p_Add_q(res_p,h,R);
       }
     }
     result->m[i]=res_p;
   }
   omFree(x);
-  for(i=rl-1;i>=0;i--) idDelete(&(xx[i]));
+  for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]),R);
   omFree(xx);
   return result;
 }
@@ -2556,7 +2556,7 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey
  */
-ideal idFarey(ideal x, number N)
+ideal id_Farey(ideal x, number N, const ring r)
 {
   int cnt=IDELEMS(x)*x->nrows;
   ideal result=idInit(cnt,x->rank);
@@ -2566,25 +2566,25 @@ ideal idFarey(ideal x, number N)
   int i;
   for(i=cnt-1;i>=0;i--)
   {
-    poly h=pCopy(x->m[i]);
+    poly h=p_Copy(x->m[i],r);
     result->m[i]=h;
     while(h!=NULL)
     {
       number c=pGetCoeff(h);
-      pSetCoeff0(h,nlFarey(c,N));
-      nDelete(&c);
+      pSetCoeff0(h,n_Farey(c,N,r->cf));
+      n_Delete(&c,r->cf);
       pIter(h);
     }
-    while((result->m[i]!=NULL)&&(nIsZero(pGetCoeff(result->m[i]))))
+    while((result->m[i]!=NULL)&&(n_IsZero(pGetCoeff(result->m[i]),r->cf)))
     {
-      pLmDelete(&(result->m[i]));
+      p_LmDelete(&(result->m[i]),r);
     }
     h=result->m[i];
     while((h!=NULL) && (pNext(h)!=NULL))
     {
-      if(nIsZero(pGetCoeff(pNext(h))))
+      if(n_IsZero(pGetCoeff(pNext(h)),r->cf))
       {
-        pLmDelete(&pNext(h));
+        p_LmDelete(&pNext(h),r);
       }
       else pIter(h);
     }
