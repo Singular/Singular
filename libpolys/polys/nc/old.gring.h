@@ -18,8 +18,6 @@
 // BOOLEAN nc_CheckOrdCondition(matrix D, ring r);
 // BOOLEAN nc_CheckOrdCondition(ring r); // with D == r->GetNC()->D
 
-BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
-
 // BOOLEAN nc_InitMultiplication(ring r); // should call nc_p_ProcsSet!
 // NOTE: instead of constructing nc_struct and calling nc_InitMultiplication yourself - just create C, D and call nc_CallPlural!!!
 
