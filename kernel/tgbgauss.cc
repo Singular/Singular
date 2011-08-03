@@ -271,7 +271,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c)
         number n1=c1;
         number n2=c2;
 
-        ksCheckCoeff(&n1,&n2);
+        ksCheckCoeff(&n1,&n2,currRing->cf);
         //nDelete(&c1);
         n1=nNeg(n1);
         mat->mult_row(i,n2);
@@ -431,7 +431,7 @@ void simple_gauss2(tgb_matrix* mat)
           number n1=c1;
           number n2=c2;
 
-          ksCheckCoeff(&n1,&n2);
+          ksCheckCoeff(&n1,&n2,currRing->cf);
           nDelete(&c1);
           mat->mult_row(i,n2);
           mat->add_lambda_times_row(i,row,n1);
@@ -886,7 +886,7 @@ void tgb_sparse_matrix::row_content(int row)
     {
       while (p!=NULL)
       {
-        d = nIntDiv(pGetCoeff(p),h);
+        d = nIntDiv(p->coef,h);
         nDelete(&p->coef);
         p->coef=d;
         p=p->next;

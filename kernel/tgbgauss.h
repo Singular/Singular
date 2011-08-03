@@ -9,6 +9,7 @@
 */
 #include <kernel/mod2.h>
 #include <coeffs/numbers.h>
+#include <polys/monomials/p_polys.h>
 //#include "tgb_internal.h"
 
 struct slimgb_alg;
