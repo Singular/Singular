@@ -40,7 +40,7 @@ BOOLEAN evSwap(leftv res,leftv h)
         {
           int j=(int)(long)h->Data();
           res->rtyp=MATRIX_CMD;
-          res->data=(void *)evSwap(mpCopy(M),i,j);
+          res->data=(void *)evSwap(mp_Copy(M, currRing),i,j);
           return FALSE;
         }
       }
@@ -72,7 +72,7 @@ BOOLEAN evRowElim(leftv res,leftv h)
           {
             int k=(int)(long)h->Data();
             res->rtyp=MATRIX_CMD;
-            res->data=(void *)evRowElim(mpCopy(M),i,j,k);
+            res->data=(void *)evRowElim(mp_Copy(M, currRing),i,j,k);
             return FALSE;
 	  }
         }
@@ -105,7 +105,7 @@ BOOLEAN evColElim(leftv res,leftv h)
           {
             int k=(int)(long)h->Data();
             res->rtyp=MATRIX_CMD;
-            res->data=(void *)evColElim(mpCopy(M),i,j,k);
+            res->data=(void *)evColElim(mp_Copy(M, currRing),i,j,k);
             return FALSE;
 	  }
         }
@@ -126,7 +126,7 @@ BOOLEAN evHessenberg(leftv res,leftv h)
     {
       matrix M=(matrix)h->Data();
       res->rtyp=MATRIX_CMD;
-      res->data=(void *)evHessenberg(mpCopy(M));
+      res->data=(void *)evHessenberg(mp_Copy(M, currRing));
       return FALSE;
     }
     WerrorS("<matrix> expected");
@@ -179,7 +179,7 @@ lists evEigenvals(matrix M)
         MATELEM(M0,i,i)=pSub(MATELEM(M0,i,i),pCopy(t));
 
       intvec *m0;
-      ideal e0=singclap_factorize(mp_DetBareiss(M,currRing)),&m0,2);
+      ideal e0=singclap_factorize(mp_DetBareiss(M,currRing),&m0,2, currRing);
       if (e0==NULL)
       {
         l->Init(0);
@@ -293,7 +293,7 @@ BOOLEAN evEigenvals(leftv res,leftv h)
     {
       matrix M=(matrix)h->Data();
       res->rtyp=LIST_CMD;
-      res->data=(void *)evEigenvals(mpCopy(M));
+      res->data=(void *)evEigenvals(mp_Copy(M, currRing));
       return FALSE;
     }
     WerrorS("<matrix> expected");
