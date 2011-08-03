@@ -116,6 +116,7 @@ void ndKillChar(coeffs) {}
 
 number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
 
+number ndChineseRemainder(number *,number *,int,const coeffs r){ return n_Init(0,r); }
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
 int ndDivComp(number, number, const coeffs) { return 2; }
@@ -215,6 +216,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfInit_bigint = ndInit_bigint;
     //n->cfKillChar = ndKillChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
+
+    n->cfChineseRemainder = ndChineseRemainder;
+    n->cfFarey = ndGcd;
 
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;

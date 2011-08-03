@@ -2545,6 +2545,38 @@ void    nlCoeffWrite  (const coeffs)
   PrintS("//   characteristic : 0\n");
 }
 
+number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
+// elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
+{
+#ifdef HAVE_FACTORY
+  setCharacteristic( 0 ); // only in char 0
+  CFArray X(rl), Q(rl);
+  int i;
+  for(i=rl-1;i>=0;i--)
+  {
+    X[i]=C->convSingNFactoryN(x[i],FALSE,C); // may be larger MAX_INT
+    Q[i]=C->convSingNFactoryN(q[i],FALSE,C); // may be larger MAX_INT
+  }
+  CanonicalForm xnew,qnew;
+  chineseRemainder(X,Q,xnew,qnew);
+  number n=C->convFactoryNSingN(xnew,C);
+  number p=C->convFactoryNSingN(qnew,C);
+  number p2=nlIntDiv(p,nlInit(2, C),C);
+  if (nlGreater(n,p2,C))
+  {
+     number n2=nlSub(n,p,C);
+     nlDelete(&n,C);
+     n=n2;
+  }
+  nlDelete(&p,C);
+  nlDelete(&p2,C);
+  return n;
+#else
+  WerrorS("not implemented");
+  return nlInit(0);
+#endif
+}
+
 BOOLEAN nlInitChar(coeffs r, void*)
 {
   assume( getCoeffType(r) == ID );
@@ -2565,6 +2597,8 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
+  r->cfChineseRemainder=nlChineseRemainder;
+  r->cfFarey=nlFarey;
   #ifdef HAVE_RINGS
   //r->cfDivComp = NULL; // only for ring stuff
   //r->cfIsUnit = NULL; // only for ring stuff
