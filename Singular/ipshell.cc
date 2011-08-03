@@ -30,7 +30,7 @@
 #include <kernel/syz.h>
 #include <coeffs/numbers.h>
 #include <kernel/modulop.h>
-#include <kernel/longalg.h>
+#include <polys/ext_fields/longalg.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
@@ -42,7 +42,7 @@
 #include <kernel/spectrum.h>
 #include <coeffs/gnumpfl.h>
 //#include <kernel/mpr_base.h>
-#include <kernel/ffields.h>
+#include <coeffs/ffields.h>
 #include <polys/clapsing.h>
 #include <kernel/hutil.h>
 #include <polys/monomials/ring.h>
