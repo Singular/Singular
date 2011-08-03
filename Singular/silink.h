@@ -11,6 +11,10 @@
 #include <kernel/structs.h>
 #include <Singular/sing_dbm.h>
 
+typedef struct sip_link    ip_link;
+typedef ip_link *          si_link;
+
+
 // extension links:
 typedef BOOLEAN    (*slOpenProc)(si_link l, short flag, leftv h);
 typedef BOOLEAN    (*slWriteProc)(si_link l, leftv lv);
