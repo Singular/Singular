@@ -419,7 +419,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 /*--- initialize the syzygy-ring -----------------------------*/
   ring origR = currRing;
   ring syz_ring = rCurrRingAssure_SyzComp();
-  rSetSyzComp(rk_arg);
+  rSetSyzComp(rk_arg, syz_ring);
 
   if (syz_ring != origR)
   {
@@ -513,7 +513,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     if (syzIndex>0)
     {
       int rkI=id_RankFreeModule(res[syzIndex],currRing);
-      rSetSyzComp(rkI);
+      rSetSyzComp(rkI, currRing);
     }
     if(! TEST_OPT_NO_SYZ_MINIM )
     if (minim || (syzIndex!=0))
@@ -597,7 +597,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
       for (j=0; j<IDELEMS(res[i]); j++)
       {
-        p_Shift(&res[i]->m[j], -rGetMaxSyzComp(i),currRing);
+        p_Shift(&res[i]->m[j], -rGetMaxSyzComp(i, currRing),currRing);
       }
     }
   }
