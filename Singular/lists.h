@@ -47,6 +47,8 @@ class slists
     sleftv  *m;  /* field of sleftv */
 };
 
+typedef slists *           lists;
+
 lists lCopy(lists L);
 lists lInsert0(lists ul, leftv v, int pos);
 BOOLEAN lInsert(leftv res, leftv u, leftv v);

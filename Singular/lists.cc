@@ -217,7 +217,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
   {
     int oldlength=length;
     while (r[length-1]==NULL) length--;
-    if (reallen<=0) reallen=pVariables;
+    if (reallen<=0) reallen=currRing->N;
     reallen=si_max(reallen,length);
     L->Init(reallen);
     int i=0;
@@ -249,7 +249,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           }
           else
           {
-            r[i]->rank=si_max(rank,(int)idRankFreeModule(r[i]));
+            r[i]->rank=si_max(rank,(int)id_RankFreeModule(r[i], currRing));
           }
           idSkipZeroes(r[i]);
         }
