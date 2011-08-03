@@ -8,9 +8,9 @@
 * ABSTRACT
 */
 #include <stdio.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
+//#include <kernel/structs.h>
 #include <kernel/ideals.h>
+#include <Singular/lists.h>
 
 struct _ssubexpr;
 typedef struct _ssubexpr *Subexpr;
