@@ -34,7 +34,9 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_CFLAGS = `sh ../libpolys/libpolys-config --cflags`
+LIBPOLYS_CFLAGS = -I.. -I../libpolys
+LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc
+LIBPOLYS_LIBSG   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
 
 PIPE		= -pipe
 CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
