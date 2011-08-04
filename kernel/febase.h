@@ -45,6 +45,8 @@ enum noeof_t
 extern int myynest;
 extern int yylineno;
 extern char     my_yylinebuf[80];
+extern char    prompt_char; /*1 either '>' or '.'*/
+extern int    si_echo;
 
 #ifdef __cplusplus
 
