@@ -66,17 +66,16 @@ walkProc(leftv first, leftv second)
     BITSET saveTest=test;
     test &= (~Sy_bit(OPT_REDSB)); //make sure option noredSB is set
 
-    idhdl destRingHdl = currRingHdl;
     ring destRing = currRing;
     ideal destIdeal = NULL;
     idhdl sourceRingHdl = (idhdl)first->data;
-    rSetHdl( sourceRingHdl );
-    ring sourceRing = currRing;
+    ring sourceRing = IDRING(sourceRingHdl);
+    rChangeCurrRing( sourceRing );
 
     if(state==WalkOk)
     {
       int * vperm = (int *)omAlloc0( (currRing->N+1)*sizeof( int ) );
-      state= walkConsistency( IDRING(sourceRingHdl), IDRING(destRingHdl), vperm );
+      state= walkConsistency( sourceRing, destRing, vperm );
       omFreeSize( (ADDRESS)vperm, (currRing->N+1)*sizeof(int) );
     }
 
@@ -111,7 +110,7 @@ walkProc(leftv first, leftv second)
     test=saveTest;//making sure options are as before function call
 
     ring almostDestRing=currRing;
-    rSetHdl(destRingHdl);
+    rChangeCurrRing(destRing);
 
     switch (state) {
         case WalkOk:
@@ -131,7 +130,7 @@ walkProc(leftv first, leftv second)
 
         case WalkIncompatibleSourceRing:
           Werror( "Order of %s not allowed,\n must be a combination of a,A,lp,dp,Dp,wp,Wp,M and C.\n",first->Name());
-          rSetHdl(destRingHdl);
+          rChangeCurrRing(destRing);
           destIdeal= idInit(0,0);
           break;
 
@@ -171,7 +170,7 @@ fractalWalkProc(leftv first, leftv second)
 
   //unperturbedStartVectorStrategy SHOULD BE SET BY THE USER THROUGH
   //A THIRD ARGUMENT. TRUE MEANS THAT THE UNPERTURBED START
-  //VECTOR STRATEGY IS USED AND FALSE THAT THE START VECTOR IS 
+  //VECTOR STRATEGY IS USED AND FALSE THAT THE START VECTOR IS
   //MAXIMALLY PERTURBED
 
     BOOLEAN unperturbedStartVectorStrategy=TRUE;
@@ -180,7 +179,6 @@ fractalWalkProc(leftv first, leftv second)
     BITSET saveTest=test;
     test &= (~Sy_bit(OPT_REDSB)); //make sure option noredSB is set
 
-    idhdl destRingHdl = currRingHdl;
     ring destRing = currRing;
     ideal destIdeal = NULL;
     idhdl sourceRingHdl = (idhdl)first->data;
@@ -188,7 +186,7 @@ fractalWalkProc(leftv first, leftv second)
     ring sourceRing = currRing;
 
     int * vperm = (int *)omAlloc0( (currRing->N+1)*sizeof( int ) );
-    state= fractalWalkConsistency( IDRING(sourceRingHdl), IDRING(destRingHdl), vperm );
+    state= fractalWalkConsistency( sourceRing, destRing, vperm );
     omFreeSize( (ADDRESS)vperm, (currRing->N+1)*sizeof(int) );
 
     ideal sourceIdeal;
@@ -218,8 +216,8 @@ fractalWalkProc(leftv first, leftv second)
      if ( state == WalkOk )
      {
        ring almostDestRing=currRing;
-       rSetHdl(destRingHdl);
-       destIdeal=idrMoveR(destIdeal,currRing,almostDestRing);
+       rChangeCurrRing(destRing);
+       destIdeal=idrMoveR(destIdeal,destRing,almostDestRing);
      }
 
 
@@ -233,14 +231,14 @@ fractalWalkProc(leftv first, leftv second)
         case WalkIncompatibleRings:
             Werror( "ring %s and current ring are incompatible\n",
                      first->Name() );
-            rSetHdl(destRingHdl);
+            rChangeCurrRing(destRing);
             destIdeal= idInit(0,0);
             return destIdeal;
             break;
 
         case WalkIncompatibleDestRing:
             Werror( "Order of basering not allowed,\n must be a combination of lp,dp,Dp,wp,Wp and C or just M.\n");
-            rSetHdl(destRingHdl);
+            rChangeCurrRing(destRing);
             destIdeal= idInit(0,0);
             return destIdeal;
             break;
@@ -248,7 +246,7 @@ fractalWalkProc(leftv first, leftv second)
         case WalkIncompatibleSourceRing:
             Werror( "Order of %s not allowed,\n must be a combination of lp,dp,Dp,wp,Wp and C or just M.\n",
                      first->Name());
-            rSetHdl(destRingHdl);
+            rChangeCurrRing(destRing);
             destIdeal= idInit(0,0);
             return destIdeal;
             break;
@@ -256,20 +254,20 @@ fractalWalkProc(leftv first, leftv second)
         case WalkNoIdeal:
             Werror( "Can't find ideal %s in ring %s.\n",
                      second->Name(), first->Name() );
-            rSetHdl(destRingHdl);
+            rChangeCurrRing(destRing);
             destIdeal= idInit(0,0);
             return destIdeal;
             break;
 
         case WalkOverFlowError:
             Werror( "Overflow occured in ring %s.\n", first->Name() );
-            rSetHdl(destRingHdl);
+            rChangeCurrRing(destRing);
             destIdeal= idInit(0,0);
             return destIdeal;
             break;
 
         default:
-            rSetHdl(destRingHdl);
+            rChangeCurrRing(destRing);
             destIdeal= idInit(1,1);
             return destIdeal;
     }
