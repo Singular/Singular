@@ -108,7 +108,6 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
 	fglmgauss.h fglmvec.h \
 	kstdfac.h kmatrix.h\
 	kutil.h \
-	dbm_sl.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	eigenval.h units.h \
 	fegetopt.h \

@@ -94,7 +94,7 @@ int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
 
 #include "kutil.h"
 
-////// #include "dbm_sl.h" // TODO: needs si_link?!
+// #include "dbm_sl.h" // TODO: needs si_link// already moved to Singular/!
 
 // #include "CCRing.h" // Too old!
 #include "digitech.h"
