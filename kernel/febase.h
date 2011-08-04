@@ -47,6 +47,7 @@ extern int yylineno;
 extern char     my_yylinebuf[80];
 extern char    prompt_char; /*1 either '>' or '.'*/
 extern int    si_echo;
+extern int    printlevel;
 
 #ifdef __cplusplus
 
