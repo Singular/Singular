@@ -32,6 +32,17 @@
 /*0 implementation */
 
 
+char fe_promptstr[] ="  ";
+
+// output/print buffer:
+#define INITIAL_PRINT_BUFFER 24*1024L
+// line buffer for reading:
+// minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
+// this is an upper limit for the size of monomials/numbers read via the interpreter
+#define MAX_FILE_BUFFER 4*4096
+static long feBufferLength=INITIAL_PRINT_BUFFER;
+static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
+
 /**************************************************************************
 * handling of 'voices'
 **************************************************************************/
