@@ -35,7 +35,8 @@ LN_S		= ln -s
 ## compiler and linker options
 ##
 LIBPOLYS_CFLAGS = -I.. -I../libpolys
-LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
+LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc
+LIBPOLYS_LIBSG   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
 
 PIPE		= -pipe
 CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
@@ -300,10 +301,18 @@ include depend
 endif
 
 
-test.o: test.cc mod2.h libkernel_g.a  
+test.og: test.cc mod2.h libkernel_g.a  
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@ 
 
+test.o: test.cc mod2.h libkernel_g.a  
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $< -o $@ 
+
+
+test-g: test.og
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@ -L. -lkernel_g ${LIBPOLYS_LIBSG} -lntl -ldl -lgmp
+
+test: test.o
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS} -lntl -ldl -lgmp
 
 # My headers test
-check: test.o
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o test -L. -lkernel_g ${LIBPOLYS_LIBS} -lntl -ldl -lgmp
+check: test test-g
