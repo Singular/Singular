@@ -57,6 +57,11 @@ typedef long     (*pFDegProc)(poly p, ring r);
 typedef void     (*p_SetmProc)(poly p, const ring r);
 
 
+/// returns a poly from dest_r which is a ShallowCopy of s_p from source_r
+/// assumes that source_r->N == dest_r->N and that orderings are the same
+typedef poly (*pShallowCopyDeleteProc)(poly s_p, ring source_r, ring dest_r, 
+                                       omBin dest_bin);
+
 
 typedef enum
 {

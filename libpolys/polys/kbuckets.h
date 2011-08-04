@@ -4,7 +4,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include <polys/operations/pShallowCopyDelete.h>
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
 

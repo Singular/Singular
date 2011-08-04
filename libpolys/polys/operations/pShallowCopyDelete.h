@@ -8,10 +8,12 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
+#ifndef PSHALLOWCOPYDELETE_H
+#define PSHALLOWCOPYDELETE_H
 
-// returns a poly from dest_r which is a ShallowCopy of s_p from source_r
-// assumes that source_r->N == dest_r->N and that orderings are the same
-typedef poly (*pShallowCopyDeleteProc)(poly s_p, ring source_r, ring dest_r, 
-                                       omBin dest_bin);
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+
 pShallowCopyDeleteProc pGetShallowCopyDeleteProc(ring source_r, ring dest_r);
 
+#endif // PSHALLOWCOPYDELETE_H

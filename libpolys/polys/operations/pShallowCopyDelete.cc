@@ -9,9 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 #include "config.h"
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/operations/pShallowCopyDelete.h>
+#include "pShallowCopyDelete.h"
 
 // a simple implementations
 poly pShallowCopyDelete_General(poly s_p, ring s_r, ring d_r, omBin d_bin)
