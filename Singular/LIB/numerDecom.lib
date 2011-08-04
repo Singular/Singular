@@ -1,0 +1,2223 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Algebraic Geometry";
+info="
+LIBRARY:  NumDecom.lib    Numerical Decomposition of Ideals
+OVERVIEW:
+     The library contains procedures to compute
+      numerical irreducible decomposition, and
+      numerical primary decomposition of an algebraic variety defined by a
+      polynomial system. The use of the library requires to install Bertini
+           (www.nd.edu~sommese/bertini/thedownload).
+AUTHOR: Shawki AlRashed, rashed@mathematik.uni-kl.de; sh.shawki@yahoo.de
+
+PROCEDURES:
+
+ re2squ(ideal I);               reduction to square system
+
+ UseBertini(ideal H,string sv); use Bertini to compute the solutions of the homotopy function
+
+ Singular2betini1(list L); adopt the list to be a read file in Bertini as a start solution set
+
+ bertini2Singular(string snp, int q); adopt the file of solutions of the homotopy function to be a list in SINGULAR
+
+ ReJunkUseHomo(ideal I, ideal L, list W, list w); remove junk points using the homotopy function
+
+ JuReTopDim(ideal J,list w,int tt, int d); remove junk points that are on top-dimensional component
+
+ JuReZeroDim(ideal J,list w, int d); remove junk points from 0-dimensional component
+
+ WitSupSet(ideal I);                 witness point super set
+
+ WitSet(ideal I);                    witness point set
+
+ NumIrrDecom(ideal I);               numerical irreducible decomposition
+
+ defl(ideal I, int d);               deflation of ideal I
+
+ NumPrimDecom(ideal I, int d);       numerical primary decomposition
+";
+
+
+LIB "solve.lib";
+LIB "matrix.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+proc re2squ(ideal I)
+"USAGE:   re2squ(ideal I);I ideal
+RETURN:   ideal J defined by the polynomial system of the same number of polynomials and unknowns
+EXAMPLE: example re2squ;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ ideal J;
+ poly p;
+ int N=size(I);
+ int i,j;
+ if(n==N)
+ {
+  J=I;
+ }
+ else
+ {
+  if(N<n)
+  {
+   for(i=1;i<=n;i++)
+   {
+    if(i<=N)
+    {
+     J[i]=I[i];
+    }
+    else
+    {
+     J[i]=0;
+    }
+   }
+  }
+  else
+  {
+   for(i=1;i<=n;i++)
+   {
+    p=0;
+    for(j=N-n;j<=N;j++)
+    {
+     p=p+random(1,101)*I[j];
+    }
+    J[i]=I[i]+p;
+   }
+  }
+ }
+ export(J);
+ setring S;
+ return(S);
+ }
+example
+{ "EXAMPLE:";echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal I= x3+y4,z4+yx,xz+3x,x2y+z;
+   def D=re2squ(I);
+   setring D;
+   J;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc Singular2betini1(list L)
+"USAGE:   Singular2betini1(list L);L a list
+RETURN:  text file called start
+NOTE:    adopting the list L to be as a start solution of the homptopy function in Bertini
+EXAMPLE: Singular2betini1;shows an example
+"
+{
+ write("start",string(size(L)));
+ int i,j;
+ number a,b;
+ string s;
+ list LLL;
+ for(i=1;i<=size(L);i++)
+ {
+  LLL=L[i];
+  for(j=1;j<=size(LLL);j++)
+  {
+   a=repart(LLL[j]);
+   b=impart(LLL[j]);
+   s=string(a)+" "+string(b)+";";
+  write("start",s);
+  }
+ }
+ return(0);
+}
+example
+{ "EXAMPLE:";echo = 2;
+   ring r=(complex,16,I),(x,y,z),dp;
+   list L=list(1,2,3),list(4,5,6+I*2);
+   def D=Singular2betini1(L);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc UseBertini(ideal H,string sv)
+"USAGE:   UseBertini(ideal H,string sv);
+          H ideal, sv string of the variable of ring
+RETURN:   text file called input used in Bertini to compute the solution of
+          the homotopy function H that existed in file input.text
+NOTE:     Need to define a start solution of H
+EXAMPLE:  example Use;shows an example
+"
+{
+ int ii,j,k, ph;
+ ph=size(H);
+ string sff,sf;
+ link l=":w ./input";
+ write(l,"");
+ write(l,"CONFIG");
+ write(l,"");
+ write(l,"USERHOMOTOPY: 1;");
+ write(l,"");
+ write(l,"END;");
+ write(l,"");
+ write(l,"INPUT");
+ write(l,"");
+ for( ii=1;ii<=size(sv);ii++)
+ {
+  if((sv[ii]=="(")||(sv[ii]==")"))
+  {
+   sv=sv[1,ii-1]+sv[ii+1,size(sv)];
+  }
+ }
+ write(l,"variable "+sv+";");
+  sff="function";
+ if(ph!=1)
+ { 
+  for( ii=1;ii<=ph-1;ii++)
+  {
+   sff=sff+" f"+string(ii)+",";
+  }
+  sff=sff+"f"+string(ph)+";";
+ }
+ else
+ {
+  sff=sff+" f"+string(1)+",";
+ } 
+ write(l,sff);
+ write(l,"pathvariable t;");
+ write(l,"parameter s;");
+ write(l,"constant gamma;");
+ write(l,"");
+ write(l,"gamma = 0.8 + 1.1*I;");
+ write(l,"");
+ write(l,"s=t;");
+ write(l,"");
+ short=0;
+ for( ii=1;ii<=ph;ii++)
+ {
+   sf=string(H[ii]);
+   k=find(sf,newline);
+  for( j=1;j<=size(sf);j++)
+  {
+   if(sf[j]=="(")
+   {
+    if(sf[j+2]==")")
+    {
+     sf[j]=" ";
+     sf=sf[1,j-1]+sf[j+1,size(sf)];
+     sf[j+1]=" ";
+     sf=sf[1,j]+sf[j+2,size(sf)];
+    }
+   }
+  }
+  write(l,"f"+string(ii)+"="+sf+";");
+ }
+ write(l,"END;");
+ system(("sh","bertini<./input"));
+ return(0);
+}
+example
+{ "EXAMPLE:";echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal I= x3+y4,z4+yx,xz+3x,x2y+z;
+   string sv=varstr(basering);
+   def A=UseBertini(I,sv);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc bertini2Singular(string snp, int q)
+"USAGE:   bertini2Singular(string snp, int q);
+         snp string, q=nvars(basering) integer
+RETURN:  re list of the solutions of the homotopy function computed by Bertini
+EXAMPLE: example bertini2Singular;shows an example
+"
+{
+ def S=basering;
+ int nn=nvars(basering);
+ int n=q;
+ execute("ring R=(complex,18,I),("+varstr(S)+"),dp;");
+ number r1,r2;
+ list re,ru;
+ string sss=read(snp);
+ sss=sss+"";
+ int i,j,k,m,p;
+ string ss;
+ ss=sss[1];
+ i=2;
+ while(sss[i]!=" ")
+ {
+  ss=ss+sss[i];
+  i++;
+ }
+ execute("m="+ss+";");
+ for(i=1;i<=size(sss);i++)
+ {
+  if(sss[i]=="e")
+  {
+   if(!((sss[i+1]=="+")||(sss[i+1]=="-")))
+   {
+    ss=sss[i+1,size(sss)];
+    sss=sss[1,i];
+    sss=sss+"+"+ss;
+   }
+  }
+ }
+ j=1;
+ j=find(sss,newline,j)+1;
+ while(sss[j]==newline){j++;}
+ for(q=1;q<=m;q++)
+ {
+  for(p=1;p<=n;p++)
+  {
+   k=find(sss,newline,j);
+   ss=sss[j,k-j];
+   i=find (ss," ");
+   execute("r1="+ss[1,i-1]+";");
+   execute("r2="+ss[i+1,size(ss)-i+1]+";");
+   ru[p]=r1+I*r2;
+   j=k+1;
+  }
+  j=j+1;
+  re[size(re)+1]=ru;
+ }
+ export(re);
+ setring S;
+ return(R);
+}
+example
+{ "EXAMPLE:";echo = 2;
+   ring r = 0,(a,b,c),ds;
+   int q=nvars(basering);
+   def T=bertini2Singular("nonsingular_solutions",q);
+   re;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc   WitSupSet(ideal I)
+"USAGE:  WitSupSet(ideal I);I ideal
+RETURN:  list of Witness point Super Sets W(i) for i=1,...,dim(V(I)),
+          L list of generic linear polynomials and N(0) list of a polynomial system of the same number of
+          polynomials and unknowns. // if W(i) = x, then V(I) has no component of dimension i 
+EXAMPLE: example WitSupSet;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ ideal II=I;
+ int dd=dim(std(I));
+ if(n==1)
+ {
+   ERROR("n=1");
+ }
+ else
+ {
+  if(dd==0)
+  {
+   execute("ring R=0,("+varstr(S)+"),dp;");
+   int i,j;
+   ideal I=imap(S,I);
+   list V(dd),W(dd);
+   def T(dd+1)=solve(I,"nodisplay");
+   setring T(dd+1);
+   W(dd)=SOL;
+   ideal N(dd)=imap(S,I);
+   export(N(dd));
+   ideal LL;
+   export(LL);
+   int c(0);
+   c(0)=0;
+   export(c(0));
+   export(dd);
+   list w(1..size(W(dd)));
+   for(i=1;i<=size(W(dd));i++)
+   {
+    w(i)=W(dd)[i];
+    export(w(i));
+   }
+  "===========================================";
+  "===========================================";
+   "Dimension";
+    dd;
+   "Number of Components";
+   size(W(dd));
+   setring S;
+   return(T(dd+1));
+  }
+  else
+  {
+   matrix MJJ=jacob(I);
+   int rn=rank(MJJ);
+   I=imap(S,II);
+   def rs=re2squ(I);
+   setring rs;
+   I=J;
+   if((n-rn)!=dd)
+   {
+    execute("ring R=0,("+varstr(S)+",z(1..dd)),dp;");
+    ideal I=imap(rs,I);
+    ideal H(0..n),L,LL,L(1..dd),LL(1..dd),h(1..dd),N(0..dd);
+    poly p,p(0..n),e;
+   int i,j,k,kk,q,qq,t,m,d,jj,rii,c(0),ii;
+   for(i=1;i<=dd;i++)
+   {
+    p=0;
+    for(j=1;j<=n;j++)
+    {
+     p=p+random(1,2*n+7)*var(j);
+    }
+    if(i<dd)
+    {
+     LL[i]=random(2*n+7,4*n+1)+p;
+    }
+    else
+    {
+     c(0)=random(4*n+1,5*n+13);
+     LL[i]=c(0)+p;
+    }
+   }
+   export(c(0));
+   p(0)=0;
+   for(t=1;t<=n;t++)
+   {
+    for(j=1;j<=dd;j++)
+    {
+     p(j)=p(j-1)+random(1,2*n+10)*var(n+j);
+     h(j)[t]=I[t]+p(j);
+    }
+   }
+   for(q=1;q<=dd;q++)
+   {
+    for(i=1;i<=q;i++)
+    {
+     L(q)[i]=LL[i]+var(n+i);
+    }
+   }
+   for(i=1;i<=dd;i++)
+   {
+    N(i)=h(i),L(i);
+   }
+   for(i=1;i<=n;i++)
+   {
+    N(0)[i]=I[i];
+   }
+   ideal JJ=N(0);
+   if(dim(std(N(dd)))!=0)
+   {
+    "Try Again";
+   }
+   else
+   {
+    def T=solve(N(dd),100,"nodisplay");
+    setring T;
+    execute("ring T(dd+1)=(complex,16,I),("+varstr(S)+"),dp;");
+    list M,Y;
+    list W(dd),V(dd);
+    list SOL=imap(T,SOL);
+    Y=SOL;
+    number rp,ip,rip;
+    for( i=1;i<=size(SOL);i++)
+    {
+     M=Y[i];
+     for(j=dd;j>=1;j--)
+     {
+      rp=repart(M[n+j]);
+      ip=impart(M[n+j]);
+      rip=rp^2 + ip^2;
+      if(rip<0.0000000000000001)
+      {
+       M=delete(M,n+j);
+       Y[i]=M;
+      }
+     }
+    }
+    k=1;
+    kk=1;
+    for( i=1;i<=size(Y);i++)
+    {
+     if(size(Y[i])==n)
+     {
+      W(dd)[k]=Y[i];
+      k=k+1;
+     }
+     else
+     {
+      V(dd)[kk]=Y[i];
+      kk=kk+1;
+     }
+    }
+    ideal JJ=imap(S,II);
+    k=1;
+    number al,ar,ai,ri;
+    for(j=1;j<=size(W(dd));j++)
+    {
+     ri=0;
+     al=0;
+     ai=0;
+     ar=0;
+     for(ii=1;ii<=size(JJ);ii++)
+     {
+      for(i=1;i<=n;i++)
+      {
+       JJ[ii]=subst(JJ[ii],var(i),W(dd)[j][i]);
+      }
+      al=leadcoef(JJ[ii]);
+      ar=repart(al);
+      ai=impart(al);
+      ri=ar^2+ai^2+ri;
+     }
+     if(ri<=0.000000000000000001)
+     {
+      W(dd)[k]=W(dd)[j];
+      k=k+1;
+     }
+    }
+    ideal L(dd)=imap(R,L(dd));
+    export(L(dd));
+    export(W(dd));
+    export(V(dd));
+    string sff,sf,sv;
+    int nv(dd)=size(V(dd));
+    int nv(0..dd-1);
+    if(size(W(dd))<size(Y))
+    {
+     def SB(dd)=Singular2betini1(V(dd));
+    }
+    for( q=dd;q>=n-rn+1;q--)
+    {
+     if(nv(q)!=0)
+     {
+      int w(q-1)=0;
+      execute("ring D(q)=(0,s,gamma),("+varstr(S)+",z(1..q)),dp;");
+      string nonsin(q),stnonsin(q);
+      ideal H(1..q);
+      ideal N(q)=imap(R,N(q));
+      ideal N(q-1)=imap(R,N(q-1));
+      for(j=1;j<=n+q-1;j++)
+      {
+       H(q)[j]=s*gamma*N(q)[j]+(1-s)*N(q-1)[j];
+      }
+      H(q)[n+q]=s*gamma*N(q)[n+q]+(1-s)*var(n+q);
+      ideal H=H(q);
+      export(H(q));
+      string sv(q)=varstr(basering);
+      sv=sv(q);
+      def Q(q)=UseBertini(H,sv);
+      system("sh","rm start");
+      nonsin(q)=read("nonsingular_solutions");
+      if(size(nonsin(q))>=52)
+      {
+       def T(q)=bertini2Singular("nonsingular_solutions",nvars(basering));
+       setring T(q);
+       list C=re;
+       list B,X,A,G;
+       for(i=1;i<=size(C);i++)
+       {
+        B=re[i];
+        B=delete(B,n+q);
+        C[i]=B;
+       }
+       X=C;
+       if(q>=2)
+       {
+        for(j=q-1;j>=1;j--)
+        {
+         for(i=1;i<=size(X);i++)
+         {
+          A[i]=X[i];
+          G=A[i];
+          G=delete(G,n+j);
+          A[i]=G;
+         }
+         X=A;
+        }
+       }
+       else
+       {
+        X=C;
+       }
+       list W(q-1),V(q-1);
+       ideal JJ=imap(S,II);
+       k=1;
+       poly tj;
+       number al,ar,ai,ri;
+       for(j=1;j<=size(C);j++)
+       {
+        ri=0;
+        al=0;
+        ai=0;
+        ar=0;
+        for(i=1;i<=size(JJ);i++)
+        {
+         tj=JJ[i];
+         for(i=1;i<=n;i++)
+         {
+          tj=subst(tj,var(i),X[j][i]);
+         }
+         al=leadcoef(tj);
+         ar=repart(al);
+         ai=impart(al);
+         ri=ar^2+ai^2+ri;
+        }
+        if(ri<=0.000000000000000001)
+        {
+          W(q-1)[k]=X[j];
+          k=k+1;
+        }
+        else
+        {
+         nv(q-1)=nv(q-1)+1;
+         V(q-1)[nv(q-1)]=C[j];
+        }
+       }
+       if(nv(q-1)==size(C))
+       {
+        list W(q-1)=var(1);
+       }
+       if(q>=2)
+       {
+        if(nv(q-1)!=0)
+        {
+         def SB(qq-1)=Singular2betini1(V(q-1));
+        }
+        else
+        {
+         for(qq=q-1;qq>=1;qq--)
+         {
+          execute("ring T(qq)=(complex,16,I),("+varstr(S)+",z(1..qq)),dp;");
+          list W(qq-1)=var(1);
+         }
+         q=1;
+        }
+       }
+      }
+      else
+      {
+       for(qq=q;qq>=1;qq--)
+       {
+        int w(qq-1);
+        execute("ring T(qq)=(complex,16,I),("+varstr(S)+",z(1..qq)),dp;");
+        list W(qq-1)=var(1);
+       }
+      }
+     }
+     else
+     {
+      for(qq=q;qq>=1;qq--)
+      {
+       execute("ring T(qq)=(complex,16,I),("+varstr(S)+",z(1..qq)),dp;");
+       list W(qq-1)=var(1);
+      }
+     }
+    }
+    execute("ring D=(complex,16,I),("+varstr(S)+"),dp;");
+    for(i=0;i<=dd;i++)
+    {
+     list W(i)=imap(T(i+1),W(i));
+     export(W(i));
+    }
+     ideal L=imap(R,LL);
+     export(L);
+     ideal N(0)=imap(R,N(0));
+     export(N(0));
+     setring S;
+     return(D);
+    }
+   }
+   else
+   {
+    execute("ring R=0,("+varstr(S)+"),dp;");
+    int i,j,c(0);
+    poly p;
+    ideal LL;
+    for(i=1;i<=dd;i++)
+    {
+     p=0;
+     for(j=1;j<=n;j++)
+     {
+      p=p+random(1,100)*var(j);
+     }
+     if(i<dd)
+     {
+      LL[i]=random(101,200)+p;
+     }
+     else
+     {
+      c(0)=random(201,300);
+      LL[i]=c(0)+p;
+     }
+    }
+    ideal I=imap(S,I);
+    ideal N(dd)=I,LL;
+    def T=solve(N(dd),100,"nodisplay");
+    setring T;
+    list W(0..dd);
+    W(dd)=SOL;
+    export(W(dd));
+    for(i=0;i<=dd-1;i++)
+    {
+     W(i)=var(1);
+     export(W(i));
+    }
+    ideal L=imap(R,LL);
+    export(L);
+    ideal N(0)=imap(S,I);
+    export(N(0));
+    setring S;
+    return(T);
+   }
+  }
+ }
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=0,(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal I=f1,f2,f3;
+    def W=WitSupSet(I);
+    setring W;
+    W(2);
+        // witness point super set of a pure 2-dimensional component of V(I)
+    W(1);
+        // witness point super set of a pure 1-dimensional component of V(I)
+    W(0);
+        // witness point super set of a pure 0-dimensional component of V(I)
+    L;
+        // list of generic linear polynomials
+}
+///////////////////////////////////////////////////////////////////////////////
+proc ReJunkUseHomo(ideal I, ideal L, list W, list w)
+"USAGE:   ReJunkUseHomo(ideal I, ideal L, list W, list w);
+          I ideal, L list of generic linear polynomials {l_1,...,l_i},
+          W list of a subset of the solution set of the generic slicing V(L) with V(J),
+          w list of a point in V(J)
+RETURN:  t=1 if w on an i-dimensional component of V(I),
+         otherwise t=0. Where i=size(L)
+EXAMPLE: example ReJunkUseHomo;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int ii,i,in,j,jjj,jj,k,zi,a,kk,kkk;
+ string sf,sff,sv;
+ i=size(W);
+ in=size(w);
+ ideal LL;
+ jjj=size(L);
+ poly pp;
+ for(jj=1;jj<=jjj;jj++)
+ {
+  for(ii=1;ii<=in;ii++)
+  {
+   pp=random(1,3*n+1)*(var(ii)-w[ii])+pp;
+  }
+  LL[jj]=pp;
+ }
+ export(LL);
+ execute("ring R=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
+ ideal L=imap(S,L);
+ ideal LL=imap(S,LL);
+ ideal I=imap(S,I);
+ list w=imap(S,w);
+ zi=size(I);
+ ideal H;
+ for(a=1;a<=zi;a++)
+ {
+  H[a]=s*gamma*I[a]+(1-s)*I[a];
+ }
+ for(kk=1;kk<=jjj;kk++)
+ {
+  H[kk+zi]=s*gamma*L[kk]+(1-s)*LL[kk];
+ }
+ list W=imap(S,W);
+ def SB1=Singular2betini1(W);
+ sv=varstr(S);
+ def Q=UseBertini(H,sv);
+ system("sh","rm start");
+ string nonsin=read("nonsingular_solutions");
+ if(size(nonsin)>=52)
+ {
+  def TT=bertini2Singular("nonsingular_solutions",nvars(basering)-2);
+  setring TT;
+  list w=imap(S,w);
+  list C=re;
+  list ww,v;
+  number rp,ip,rp(1..size(w)),ip(1..size(w)),irp,t;
+  for(k=1;k<=size(C);k++)
+  {
+   ww=re[k];
+   for(jj=1;jj<=size(w);jj++)
+   {
+    rp(jj)=(repart(ww[jj])-repart(w[jj]))^2;
+    ip(jj)=(impart(ww[jj])-impart(w[jj]))^2;
+    rp=rp+rp(jj);
+    ip=ip+ip(jj);
+   }
+   irp=ip+rp;
+   if(irp<=0.000000000000000000000001)
+   {
+    t=1.0;
+   }
+   else
+   {
+    t=0.0;
+   }
+  }
+ }
+ else
+ {
+ execute("ring TT=(complex,16,I),("+varstr(S)+"),dp;");
+ list w=imap(S,w);
+ number t=1.0;
+ }
+ export(t);
+ setring S;
+ return(TT);
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=(complex,16,I),(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal J=f1,f2,f3;
+    poly l1=15x+16y+6z+17;
+    poly l2=2x+14y+4z+18;
+    ideal L=l1,l2;
+    list W1=list(0.5372775295412116,-0.7105339291010922,-2.2817700129167831+I*0),list(0.09201175741935605,-1.7791717821935455,1.6810953589677311);
+    list w=list(2,2,-131666666/10000000);
+    def D=ReJunkUseHomo(J,L,W1,w);
+    setring D;
+    t;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc JuReTopDim(ideal J,list w,int tt, int d);
+"USAGE:  JuReTopDim(ideal J,list w,int tt, int d);J ideal, w list of a point in V(J),
+         tt the degree of d-dimensional component of V(J), d dimension of V(J)
+RETURN:  t=1 if w on a d-dimensional component of V(I), otherwise t=0.
+EXAMPLE: example JuReTopDim;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int i,j,k;
+ list iw,rw;
+ for(k=1;k<=n;k++)
+ {
+  rw[k]=repart(w[k]);
+  iw[k]=impart(w[k]);
+ }
+ execute("ring R=real,("+varstr(S)+",I),dp;");
+ list iw=imap(S,iw);
+ list rw=imap(S,rw);
+ ideal J=imap(S,J);
+ execute("ring RR=0,("+varstr(S)+",I),dp;");
+ ideal J=imap(R,J);
+ list iw=imap(R,iw);
+ list rw=imap(R,rw);
+ ideal L;
+ poly p;
+ for(i=1;i<=d;i++)
+ {
+  p=0;
+  for(j=1;j<=n;j++)
+  {
+   p=p+random(1,100)*(var(j)-rw[j]-I*iw[j]);
+  }
+  L[i]=p;
+ }
+ ideal JJ;
+ for(i=1;i<=size(J);i++)
+ {
+  p=J[i];
+  for(j=1;j<=n;j++)
+  {
+   p=subst(p,var(j),rw[j]+I*iw[j]);
+  }
+  JJ[i]=p;
+ }
+ poly pp;
+ pp=I^2 +1;
+ ideal T=L,J,pp;
+ int di=dim(std(T));
+ if(di==0)
+ {
+  def T(d)=solve(T,10,"nodisplay");
+  setring T(d);
+  number t,ie,re,rt;
+  int zi=size(SOL);
+  list iw=imap(S,iw);
+  list rw=imap(S,rw);
+  if(zi==2*tt)
+  {
+   t=1.0/1;
+  }
+  else
+  {
+   t=0.0/1;
+  }
+ }
+ else
+ {
+  execute("ring T(d)=(complex,16,I),("+varstr(S)+"),dp;");
+  "Try Again";
+   -----
+ }
+ export(t);
+ setring S;
+ return(T(d));
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=(complex,16,I),(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal J=f1,f2,f3;
+    list w=list(0.5372775295412116,-0.7105339291010922,-2.2817700129167831);
+    def D=JuReTopDim(J,w,2,2);
+    setring D;
+    t;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc JuReZeroDim(ideal J,list w, int d);
+"USAGE:  JuReZeroDim(ideal J,list w, int d);J ideal, 
+         w list of a point in V(J), d dimension of V(J)
+RETURN:  t=1 if w on a positive-dimensional component of V(I),
+         i.e w is not isolated point in V(J)
+EXAMPLE: example JuReZeroDim;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int i,j,k;
+ list iw,rw;
+ for(k=1;k<=n;k++)
+ {
+  rw[k]=repart(w[k]);
+  iw[k]=impart(w[k]);
+ }
+ execute("ring R=real,("+varstr(S)+",I),dp;");
+ list iw=imap(S,iw);
+ ideal J=imap(S,J);
+ list rw=imap(S,rw);
+ execute("ring RR=0,("+varstr(S)+",I),dp;");
+ list iw=imap(R,iw);
+ ideal J=imap(R,J);
+ list rw=imap(R,rw);
+ ideal LL;
+ poly p;
+ for(i=1;i<=d;i++)
+ {
+  p=0;
+  for(j=1;j<=n;j++)
+  {
+   p=p+random(1,100)*(var(j)-rw[j]-I*iw[j]);
+  }
+  LL[i]=p;
+ }
+ poly pp;
+ pp=I^2 +1;
+ ideal TT=LL,J,pp;
+ def TT(d)=solve(TT,16,"nodisplay");
+ setring TT(d);
+ int zii=size(SOL);
+ execute("ring RR1=0,("+varstr(S)+",I),dp;");
+ list iw=imap(R,iw);
+ ideal J=imap(R,J);
+ list rw=imap(R,rw);
+ ideal L;
+ poly p;
+ for(i=1;i<=d;i++)
+ {
+  p=0;
+  for(j=1;j<=n;j++)
+  {
+   p=p+random(1,100)*(var(j)-rw[j]-I*iw[j]-1/100000000000000);
+  }
+  L[i]=p;
+ }
+ poly pp;
+ pp=I^2 +1;
+ ideal T=L,J,pp;
+ int di=dim(std(T));
+ if(di==0)
+ {
+  def T(d)=solve(T,16,"nodisplay");
+  setring T(d);
+  number t;
+  int zi=size(SOL);
+  list iw=imap(S,iw);
+  list rw=imap(S,rw);
+  if(zi==zii)
+  {
+   t=1.0/1;
+  }
+  else
+  {
+   t=0.0/1;
+  }
+ }
+ else
+ {
+  execute("ring T(d)=(complex,16,I),("+varstr(S)+"),dp;");
+  "Try Again";
+   -----
+ }
+ export(t);
+ setring S;
+ return(T(d));
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=(complex,16,I),(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal J=f1,f2,f3;
+    list w1=list(0.5372775295412116,-0.7105339291010922,-2.2817700129167831);
+    def D1=JuReZeroDim(J,w1,2);
+    setring D1;
+    t;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc    WitSet(ideal I)
+"USAGE:   WitSet(ideal I); I ideal
+RETURN:  lists W(0..d) of witness point sets of i-dimensional components
+          of V(J) for i=0,...d respectively, where d the dimension of V(J),
+          L list of generic linear polynomials
+NOTE:    if W(i)=x, then V(J) has no component of dimension i
+EXAMPLE: example WitSet;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int ii,i,j,b,bb,k,kk,dt;
+ def TJ(0)=WitSupSet(I);
+ setring TJ(0);
+ ideal LL=L;
+ int d=size(LL);
+ if(d==0)
+ {
+  setring S;
+  return(TJ(0));
+ }
+ else
+ {
+  for( i=0;i<=d;i++)
+  {
+   list Ww(i)=W(i);
+   int z(i)=size(W(i));
+   export(Ww(i));
+  }
+  for(i=d-1;i>=0;i--)
+  {
+   list W(i)=imap(TJ(0),Ww(i));
+   if(size(W(i)[1])>1)
+   {
+    for(j=1;j<=z(i);j++)
+    {
+     execute("ring Rr(j+i)=(complex,106,I),("+varstr(S)+"),ds;");
+     list W(i)=imap(TJ(0),Ww(i));
+     list w=W(i)[j];
+     ideal J=imap(TJ(0),N(0));
+     ideal J(j),K(j);
+     for(k=1;k<=size(J);k++)
+     {
+      J(j)[k]=J[k];
+      for(kk=1;kk<=n;kk++)
+      {
+       J(j)[k]=subst(J(j)[k],var(kk),w[kk]);
+      }
+      K(j)[k]=J[k]-J(j)[k];
+     }
+     poly p(1..n);
+     for(k=1;k<=n;k++)
+     {
+      p(k)=var(k)+w[k];
+     }
+     map f(j)=Rr(j+i),p(1..n);
+     ideal JJ=f(j)(K(j));
+     if(dim(std(JJ))>i)
+     {
+      execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+      list W(i)=imap(TJ(0),Ww(i));
+      list w(j)=var(1);
+     }
+     else
+     {
+      if(i==0)
+      {
+       execute("ring RR(j)=(complex,16,I),("+varstr(S)+"),dp;");
+       list W(i)=imap(TJ(0),Ww(i));
+       list w=W(i)[j];
+       ideal J=imap(TJ(0),N(0));
+       def AA(j)=JuReZeroDim( J,w,d);
+       setring AA(j);
+       list W(i)=imap(TJ(0),Ww(i));
+       if(t<1)
+       {
+        execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+        list W(i)=imap(TJ(0),Ww(i));
+        list w(j)=W(i)[j];
+       }
+       else
+       {
+        execute("ring RRR(j)=(complex,106,I),("+varstr(S)+"),dp;");
+        list W(i)=imap(TJ(0),Ww(i));
+        list w=W(i)[j];
+        ideal J=imap(TJ(0),N(0));
+        def AAA(j)=JuReTopDim( J,w, z(d),d);
+        setring AAA(j);
+        number ts=t;
+        list W(i)=imap(TJ(0),Ww(i));
+        if(ts<1)
+        {
+         dt=d-1;
+        }
+        else
+        {
+         dt=d;
+        }
+        if(dt>i)
+        {
+         for(ii=i+1;ii<=dt;ii++)
+         {
+          execute("ring RRRR(ii+j)=(complex,106,I),("+varstr(S)+"),ds;");
+          list Ww(ii)=imap(TJ(0),Ww(ii));
+          if(size(Ww(ii)[1])>1)
+          {
+           execute("ring RRRRR(ii+j)=(complex,16,I),("+varstr(S)+"),dp;");
+           list W(i)=imap(TJ(0),Ww(i));
+           list w=W(i)[j];
+           list Ww(ii)=imap(TJ(0),Ww(ii));
+           ideal J=imap(TJ(0),N(0));
+           ideal L=imap(TJ(0),LL);
+           ideal L(ii);
+           for(k=1;k<=ii;k++)
+           {
+           L(ii)[k]=L[k];
+           }
+           def AAA(ii+j)=ReJunkUseHomo(J,L(ii),Ww(ii),w);
+           setring AAA(ii+j);
+           number ts=t;
+           list W(i)=imap(TJ(0),Ww(i));
+           if(ts>0)
+           {
+           execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+           list W(i)=imap(TJ(0),Ww(i));
+           list w(j)=var(1);
+           ii=d+1;
+           }
+           else
+           {
+            if(ii==dt)
+            {
+             execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+             list W(i)=imap(TJ(0),Ww(i));
+            }
+            list w(j)=W(i)[j];
+           }
+          }
+         }
+        }
+        else
+        {
+         execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+         list W(i)=imap(TJ(0),Ww(i));
+         list w(j)=W(i)[j];
+        }
+       }
+      }
+      else
+      {
+       execute("ring RRRRRRR(j)=(complex,106,I),("+varstr(S)+"),dp;");
+       list W(i)=imap(TJ(0),Ww(i));
+       list w=W(i)[j];
+       ideal J=imap(TJ(0),N(0));
+       def Aaa(j)=JuReTopDim( J,w,z(d),d);
+       setring Aaa(j);
+       list W(i)=imap(TJ(0),Ww(i));
+       number ts =t;
+       if(ts<1)
+       {
+        dt=d-1;
+       }
+       else
+       {
+        dt=d;
+       }
+       if(dt>i)
+       {
+        for(ii=i+1;ii<=dt;ii++)
+        {
+         execute("ring RRRRRRRR(ii+j)=(complex,106,I),("+varstr(S)+"),ds;");
+         list Ww(ii)=imap(TJ(0),Ww(ii));
+         if(size(Ww(ii)[1])>1)
+         {
+          execute("ring R1(ii+j)=(complex,16,I),("+varstr(S)+"),dp;");
+          list W(i)=imap(TJ(0),Ww(i));
+          list w=W(i)[j];
+          list Ww(ii)=imap(TJ(0),Ww(ii));
+          ideal J=imap(TJ(0),N(0));
+          ideal L=imap(TJ(0),LL);
+          ideal L(ii);
+          for(k=1;k<=ii;k++)
+          {
+           L(ii)[k]=L[k];
+          }
+          def AA(ii+j)=ReJunkUseHomo(J,L(ii),Ww(ii),w);
+          setring AA(ii+j);
+          number ts=t;
+          list W(i)=imap(TJ(0),Ww(i));
+          if(ts>0)
+          {
+           execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+           list W(i)=imap(TJ(0),Ww(i));
+           list w(j)=var(1);
+           ii=d+1;
+          }
+          else
+          {
+           if(ii==dt)
+           {
+           execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+           list W(i)=imap(TJ(0),Ww(i));
+           }
+           list w(j)=W(i)[j];
+          }
+         }
+        }
+       }
+       else
+       {
+        execute("ring A(j)=(complex,16,I),("+varstr(S)+"),dp;");
+        list W(i)=imap(TJ(0),Ww(i));
+        list w(j)=W(i)[j];
+       }
+      }
+     }
+     if(j==z(i))
+     {
+      execute("ring R(i)=(complex,16,I),("+varstr(S)+"),dp;");
+      list W(i),w;
+      int k(i)=0;
+      for(k=1;k<=z(i);k++)
+      {
+       w=imap(A(k),w(k));
+       if(size(w)>1)
+       {
+        k(i)=k(i)+1;
+        W(i)[k(i)]=w;
+       }
+      }
+      if(k(i)==0)
+      {
+       W(i)=var(1);
+      }
+     }
+    }
+   }
+  }
+  execute("ring T=(complex,16,I),("+varstr(S)+"),dp;");
+  int bt=0;
+  for(i=0;i<=d-1;i++)
+  {
+   list Ww(i)=imap(TJ(0),W(i));
+   if(size(Ww(i)[1])>1)
+   {
+    list W(i)=imap(R(i),W(i));
+   }
+   else
+   {
+    list W(i)=Ww(i);
+   }
+   export(W(i));
+  }
+  list W(d)=imap(TJ(0),W(d));
+  export(W(d));
+  ideal L=imap(TJ(0),LL);
+  export(L);
+  ideal N(0)=imap(TJ(0),N(0));
+  export(N(0));
+  setring S;
+  return(T);
+ }
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=0,(x,y,z),dp;
+    poly f1=(x3+z)*(x2-y);
+    poly f2=(x3+y)*(x2-z);
+    poly f3=(x3+y)*(x3+z)*(z2-y);
+    ideal I=f1,f2,f3;
+    def W=WitSet(I);
+    setring W;
+    W(1);
+         // witness point  set of a pure 1-dimensional component of V(I)
+    W(0);
+         // witness point  set of a pure 0-dimensional component of V(I)
+    L;
+         // list of generic linear polynomials
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc ZSR1(ideal I, ideal L, list W )
+"USAGE:  ZSR1(ideal I, ideal L, list W );I ideal,
+         L ideal defined by generic linear polynomials,
+         W list of a point in the generic slicing of V(I) and V(L)
+RETURN:  ts number;zero sum relation of W
+EXAMPLE: example ZSR1;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int c(1)=5*n;
+ int c(2)=23*n;
+ int iii=size(L);
+ execute("ring R=(complex,16,I),("+varstr(S)+"),ds;");
+ number c(0);
+ ideal LL=imap(S,L);
+ c(0)=leadcoef(LL[iii]);
+ string sv=varstr(S);
+ int j,ii,jj,k,a,b,te,zi,si;
+ string sf,sff;
+ list VV;
+ list W=imap(S,W);
+ VV[1]=W;
+ def SB1=Singular2betini1(VV);
+ execute("ring R=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
+ ideal I=imap(S,I);
+ zi=size(I);
+ ideal LL=imap(S,L);
+ ideal H, ll;
+ for(a=1;a<=zi;a++)
+ {
+  H[a]=s*gamma*I[a]+(1-s)*I[a];
+ }
+ if(iii>1)
+ {
+  for(k=1;k<=iii-1;k++)
+  {
+   ll[k]=LL[k];
+   H[k+zi]=s*gamma*LL[k]+(1-s)*ll[k];
+  }
+  ll[iii]=LL[iii]+c(1)-c(0);
+  H[iii+zi]=s*gamma*LL[iii]+(1-s)*ll[iii];
+ }
+ else
+ {
+  ll[iii]=LL[iii]+c(1)-c(0);
+   H[iii+zi]=s*gamma*LL[iii]+(1-s)*ll[iii];
+ }
+ def Q(1)=UseBertini(H,sv);
+ string siaa=read("singular_solutions");
+ string saa=read("nonsingular_solutions");
+ def TT(1)=bertini2Singular("nonsingular_solutions",nvars(basering)-2);
+ setring TT(1);
+ list wr=re;
+ if(size(wr)==0)
+ {
+  execute("ring TT(2)=(complex,16,I),("+varstr(S)+"),dp;");
+  number tte, ts;
+  tte=11;
+  ts=0;
+  export(ts);
+  export(tte);
+ }
+ else
+ {
+  execute("ring R1=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
+  ideal I=imap(S,I);
+  si=size(I);
+  ideal LL=imap(S,L);
+  ideal H, ll;
+  for(a=1;a<=si;a++)
+  {
+   H[a]=s*gamma*I[a]+(1-s)*I[a];
+  }
+  if(iii>1)
+  {
+   for(k=1;k<=iii-1;k++)
+   {
+    ll[k]=LL[k];
+    H[k+si]=s*gamma*LL[k]+(1-s)*ll[k];
+   }
+   ll[iii]=LL[iii]+c(2)-c(0);
+   H[iii+si]=s*gamma*LL[iii]+(1-s)*ll[iii];
+  }
+  else
+  {
+   ll[iii]=LL[iii]+c(2)-c(0);
+   H[iii+si]=s*gamma*LL[iii]+(1-s)*ll[iii];
+  }
+  def Q(2)=UseBertini(H,sv);
+  string saaa=read("nonsingular_solutions");
+  string siaaa=read("singular_solutions");
+  if(size(saaa)<52)
+  {
+   if(size(siaaa)<52)
+   {
+    "ERROR( Try again try);";
+   }
+  }
+  if(size(saaa)>=52)
+  {
+   def TT(2)=bertini2Singular("nonsingular_solutions",nvars(basering)-2);
+   setring TT(2);
+   list wwr=re;
+   list wr=imap(TT(1),wr);
+   list W=imap(S,W);
+   list w,ww,www;
+   number s(0),s(1),s(2),ts;
+   zi=size(W)/n;
+   for(jj=1;jj<=zi;jj++)
+   {
+    s(0)=0;
+    s(1)=0;
+    s(2)=0;
+    w=W;
+    ww=wr[jj];
+    www=wwr[jj];
+    for(j=1;j<=n;j++)
+    {
+     s(0)=s(0)+j*w[j];
+    }
+    for(j=1;j<=n;j++)
+    {
+     s(1)=s(1)+j*ww[j];
+    }
+    for(j=1;j<=n;j++)
+    {
+     s(2)=s(2)+j*www[j];
+    }
+   }
+   ts=s(0)*(c(1)-c(2))+s(1)*(c(2)-c(0))+s(2)*(c(0)-c(1));
+  }
+  else
+  {
+   def TT(2)=bertini2Singular("singular_solutions",nvars(basering)-2);
+   setring TT(2);
+   list wwr=re;
+   list wr=imap(TT(1),wr);
+   list W=imap(S,W);
+   list w,ww,www;
+   number s(0),s(1),s(2),ts;
+   zi=size(W)/n;
+   for(jj=1;jj<=zi;jj++)
+   {
+    s(0)=0;
+    s(1)=0;
+    s(2)=0;
+    w=W;
+    ww=wr[jj];
+    www=wwr[jj];
+    for(j=1;j<=n;j++)
+    {
+     s(0)=s(0)+j*w[j];
+    }
+    for(j=1;j<=n;j++)
+    {
+     s(1)=s(1)+j*ww[j];
+    }
+    for(j=1;j<=n;j++)
+    {
+     s(2)=s(2)+j*www[j];
+    }
+   }
+   ts=s(0)*(c(1)-c(2))+s(1)*(c(2)-c(0))+s(2)*(c(0)-c(1));
+  }
+ }
+ execute("ring e=(complex,16,I),("+varstr(S)+"),dp;");
+ number ts=imap(TT(2),ts);
+ export(ts);
+ number tte;
+ tte=11;
+ export(tte);
+ system("sh","rm start");
+ setring S;
+ return (e);
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=(complex,16,I),(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal J=f1,f2,f3;
+    ideal L=2*x+7*y+3*z+29;
+    list W=2,1.999999999999999,-15.6666666666664;
+    def D=ZSR1(J,L,W );
+    setring D;
+    ts;
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc perSumZ(list A)
+"USAGE:  perSumZ(list A);A list of different complex numbers
+RETURN:  all subsets of A, whose sum of their elements is zero
+EXAMPLE: example perSumZ;shows an example
+"
+{
+ list B, C;
+ int i, j;
+ number t,tr;
+ if(size(A)==0)
+ {
+  B[1]=A;
+ }
+ if(size(A)==1)
+ {
+  if(((repart(A[1]))^2+(impart(A[1]))^2)<=0.000000000000001)
+  {
+   B[1]=A;
+  }
+ }
+ for(i=1;i<=size(A);i++)
+ {
+  t=t+A[i];
+ }
+ if(((repart(t))^2+(impart(t))^2)<=0.000000000000001)
+ {
+  B[1]=A;
+ }
+ for(i=1;i<=size(A);i++)
+ {
+  C=delete(A,i);
+  C=perSumZ(C);
+  for(j=1;j<=size(C);j++)
+  {
+   if(size(C[j])>0)
+   {
+    B[size(B)+1]=C[j];
+   }
+  }
+ }
+ return(B);
+}
+example
+{ "EXAMPLE:";echo = 2;
+   ring r=(complex,16,I),x,lp;
+   list A=1,-1,2-I,I,-2;
+   def D=perSumZ(A);
+   D;
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc  ZSROFWitSet(ideal I)
+"USAGE:  ZSROFWitSet(ideal I);I ideal
+RETURN:  ZSR(i) lists of the zero sum relation of witness point
+          sets W(i) for i=1,...dim(V(I))
+EXAMPLE: example ZSROFWitSet;shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ def T(0)=WitSet(I);
+ setring T(0);
+ ideal LL=L;
+ int dd=size(LL);
+ int a=c(0);
+ if(a==0)
+ {
+  return(T(0));
+ }
+ else
+ {
+  int i,j,ii,jj,k,sv(0..dd),j(0..dd),kk;
+  string sv;
+  for(i=1;i<=dd;i++)
+  {
+   jj=0;
+   list V(i)=imap(T(0),W(i));
+   if(size(V(i)[1])>1)
+   {
+    if(size(V(i))==1)
+    {
+     execute("ring L(i)(1)=(complex,16,I),("+varstr(S)+"),dp;");
+     list W(i),ZSR(i);
+     list V(i)=imap(T(0),W(i));
+     W(i)=V(i);
+     ZSR(i)[1]=0.000;
+    }
+    else
+    {
+     if(i>1)
+     {
+      execute("ring ee(i)=(complex,16,I),("+varstr(S)+"),dp;");
+      list V(i)=imap(T(0),W(i));
+     }
+     sv(i)=size(V(i));
+     for(j=1;j<=sv(i);j++)
+     {
+      ideal N=imap(T(0),N(0));
+      ideal LLL=imap(T(0),LL);
+      ideal L;
+      for(kk=1;kk<=i;kk++)
+      {
+       L[kk]=LLL[kk];
+      }
+      def L(i)(j)=ZSR1(N,L,V(i)[j]);
+      setring L(i)(j);
+      if(j==1)
+      {
+       list W(i),ZSR(i);
+      }
+      else
+      {
+       list W(i)=imap(L(i)(j-1),W(i));
+       list ZSR(i)=imap(L(i)(j-1),ZSR(i));
+       export(ZSR(i));
+      }
+      list V(i)=imap(T(0),W(i));
+      jj=jj+1;
+      ZSR(i)[jj]=ts;
+      W(i)[jj]=V(i)[j];
+     }
+    }
+   }
+  }
+  execute("ring Q=(complex,12,I),("+varstr(S)+"),dp;");
+  list W(0)=imap(T(0),W(0));
+  export(W(0));
+  for(jj=1;jj<=dd;jj++)
+  {
+   number pt(jj);
+   list V(jj)=imap(T(0),W(jj));
+   if(size(V(jj)[1])>1)
+   {
+    sv(jj)=size(V(jj));
+    if(jj>0)
+    {
+     list ZSR(jj)=imap(L(jj)(sv(jj)),ZSR(jj));
+     export(ZSR(jj));
+     list W(jj)=imap(L(jj)(sv(jj)),W(jj));
+     export(W(jj));
+    }
+   }
+   else
+   {
+    list ZSR(jj)=var(1);
+    export(ZSR(jj));
+    list W(jj)=var(1);
+    export(W(jj));
+    }
+   }
+   ideal L=imap(T(0),LL);
+   export(L);
+   export(dd);
+   system("sh","rm singular_solutions");
+   system("sh","rm nonsingular_solutions");
+   system("sh","rm real_solutions");
+   system("sh","rm raw_solutions");
+   system("sh","rm raw_data");
+   system("sh","rm output");
+   system("sh","rm midpath_data");
+   system("sh","rm main_data");
+   system("sh","rm input");
+   system("sh","rm failed_paths");
+   setring S;
+   return(Q);
+  }
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring  r = 0,(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal J=f1,f2,f3;
+    def D=ZSROFWitSet(J);
+    setring D;
+    ZSR(1);
+    W(1);
+    ZSR(2);
+    W(2);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc ReWitZSR(list A, list W, int di)
+"USAGE:  ReWitZSR(list A, list W, int di);A ideal of complex numbers,
+          W list of points on di-dimensional component,
+         di integer
+RETURN:  tw(di) integer, list Z(size(Z));
+        if tw(di)>0, else Z(0), list Z1(tw1(di))
+EXAMPLE: example ReWitZSR;shows an example
+"
+{
+ def S=basering;
+ execute("ring e=(complex,16,I),("+varstr(S)+"),dp;");
+ list A=imap(S,A);
+ list W=imap(S,W);
+ list  D, B(1..size(A)),C(1..size(A)),D(1..size(A)),Z1(1..size(A)),Z(1..size(A)),Z,Y,ZY,ZZ;
+ int i,j,k,tw(di),tw1(di),tw2(di),tw3(di),tr,tc;
+ list AA;
+ list WW;
+ for(i=1;i<=size(A);i++)
+ {
+  if(((repart(A[i]))^2+(impart(A[i]))^2)<=0.0000000000000001)
+  {
+   tc=tc+1;
+   tw1(di)=tw1(di)+1;
+   ZY[i]=A[i];
+   Z1(tw1(di))=W[i];
+   export(Z1(tw1(di)));
+  }
+  else
+  {
+   tr=tr+1;
+   tw2(di)=tw2(di)+1;
+   AA[tr]=A[i];
+   WW[tr]=W[i];
+  }
+ }
+ A=AA;
+ W=WW;
+ if(size(A)>0)
+ {
+  def B=perSumZ(A);
+  for(i=1;i<=size(A);i++)
+  {
+   tc=0;
+   B(i)=A[i];
+   for(j=1;j<=size(B);j++)
+   {
+    tr=0;
+    for(k=1;k<=size(B[j]);k++)
+    {
+     if(B(i)[1]==B[j][k])
+     {
+      tr=tr+1;
+     }
+    }
+    if(tr>0)
+    {
+     tc=tc+1;
+     C(i)[tc]=B[j];
+    }
+   }
+   for(j=1;j<=size(C(i));j++)
+   {
+    D(i)=C(i)[j];
+    for(k=1;k<=size(C(i));k++)
+    {
+     if(size(D(i))<size(C(i)[k]))
+     {
+      D(i)=D(i);
+     }
+     else
+     {
+      D(i)=C(i)[k];
+     }
+    }
+   }
+  }
+  for(i=1;i<=size(A);i++)
+  {
+   Z[i]=D(i);
+  }
+  for(i=1;i<=size(Z);i++)
+  {
+   if(size(Z[i])>0)
+   {
+    D=Z[i];
+    for(k=size(Z);k>0;k--)
+    {
+     if(size(Z[k])>0)
+     {
+      B=Z[k];
+      if(i!=k)
+      {
+       if(D[1]==B[1])
+       {
+        Z=delete(Z,k);
+       }
+      }
+     }
+    }
+   }
+  }
+  for(j=1;j<=size(Z);j++)
+  {
+    tr=0;
+    D=Z[j];
+    for(i=1;i<=size(A);i++)
+    {
+     for(k=1;k<=size(D);k++)
+     {
+      if(A[i]==D[k])
+      {
+       tr=tr+1;
+       tw(di)=tw(di)+1;
+       Z(j)[tr]=W[i];
+      }
+     }
+    }
+    export(Z(j));
+  }
+ export(Z);
+ }
+ if(tw1(di)==0)
+ {
+  list Z1(0);
+  Z1(0)="Empty set";
+  export(Z1(0));
+ }
+ if(tw(di)==0)
+ {
+  list Z(0);
+  Z(0)="Empty set";
+  export(Z(0));
+ }
+ export(tw1(di));
+ export(tw(di));
+  setring S;
+  return (e);
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=(complex,16,I),(x,y,z),dp;
+    list A= 3.7794571034732007+I*21.1724850800421247,
+           -3.7794571034752664-I*21.1724850800419908;
+    list W=list(-2.0738016397747976,1.29520655909919,-0.1476032795495952),
+           list(-1.354769788796631,-1.5809208448134761,1.2904604224067381);
+    int di=1;
+    def D=ReWitZSR(A,W,di);
+    setring D;
+    tw(di);
+    Z(size(Z));// if tw(di)>0, else Z(0);
+    Z1(tw1(di));
+}
+///////////////////////////////////////////////////////////////////////////////
+proc NumIrrDecom(ideal I) Numerical Irreducible Decomposition
+"USAGE:  NumIrrDecom(ideal I);I ideal
+RETURN:  w(1),..., w(t) lists of irreducible witness point sets of
+         irreducible components of V(J)
+EXAMPLE: example NumIrrDecom;shows an example
+"
+{
+ def S=basering;
+ int i,ii;
+ def WW=ZSROFWitSet(I);
+ setring WW;
+ if(c(0)==0)
+ {
+  setring S;
+  return(WW);
+ }
+ else
+ {
+  int d=size(L);
+  for(i=0;i<=d;i++)
+  {
+   int co(i)=0;
+   if(i==0)
+   {
+    execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+    list V(i)=imap(WW,W(i));
+    list W(0..size(V(i)));
+    if(size(V(i)[1])>1)
+    {
+     co(i)=size(V(i));
+     for(ii=1;ii<=size(V(i));ii++)
+     {
+      list w(ii)=V(i)[ii];
+      export(w(ii));
+     }
+    }
+    else
+    {
+     W(1)[1]="Empty Set";
+    }
+   }
+   else
+   {
+    list WW(i);
+    list V(i)=imap(WW,W(i));
+    list a(i)=imap(WW,ZSR(i));
+    if(size(V(i)[1])>1)
+    {
+     def q(i)=ReWitZSR(a(i),V(i),i);
+     setring q(i);
+     if(tw1(i)>0)
+     {
+      for(ii=1;ii<=tw1(i);ii++)
+      {
+       WW(i)[ii]=Z1(ii);
+      }
+      co(i)=tw1(i);
+     }
+     if(tw(i)>0)
+     {
+      for(ii=1;ii<=size(Z);ii++)
+      {
+       if(size(Z[ii])>1)
+       {
+        co(i)=co(i)+1;
+        WW(i)[ii+tw1(i)]=Z(ii);
+       }
+      }
+     }
+     for(ii=1;ii<=size(WW(i));ii++)
+     {
+      list w(ii);
+      w(ii)=WW(i)[ii];
+     }
+    }
+    else
+    {
+     execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+     WW(i)[1]="Empty Set";
+    }
+   }
+  }
+  for(i=0;i<=d;i++)
+  {
+   execute("ring qq(i)=(complex,16,I),("+varstr(S)+"),dp;");
+   for(ii=1;ii<=co(i);ii++)
+   {
+    list w(ii)=imap(q(i),w(ii));
+    export w(ii);
+   }
+  "===========================================";
+  "===========================================";
+   "Dimension";
+    i;
+   "Number of Components";
+    co(i);
+   number cco(i)=co(i)/1;
+   export(cco(i));
+  }
+  ideal L=imap(WW,L);
+  export(L);
+  "The generic Linear Space L";
+  L;
+  return(qq(0..d));
+ }
+}
+example
+{ "EXAMPLE:";echo = 2;
+    ring r=0,(x,y,z),dp;
+    poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+    poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+    poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+    ideal I=f1,f2,f3;
+    list W=NumIrrDecom(I);
+      ==>
+         Dimension
+         0
+         Number of Components
+         1
+         Dimension
+         1
+         Number of Components
+         3
+         Dimension
+         2
+         Number of Components
+         1
+    def A(0)=W[1];
+       // corresponding 0-dimensional components
+    setring A(0);
+    w(1);
+        // corresponding 0-dimensional irreducible component
+         ==> 0-Witness point set (one point)
+    def A(1)=W[2];
+           // corresponding 1-dimensional components
+    setring A(1);
+    w(1);
+         // corresponding 1-dimensional irreducible component
+         ==> 1-Witness point set (one point)
+    w(2);
+       // corresponding 1-dimensional irreducible component
+         ==> 1-Witness point set (one point)
+    w(3);
+      // corresponding 1-dimensional irreducible component
+        ==> 1-Witness point set (one point)
+    def A(2)=W[3];
+    // corresponding 2-dimensional components
+    setring A(2);
+    w(1);
+      // corresponding 2-dimensional irreducible component
+        ==> 1-Witness point set (two points)
+}
+///////////////////////////////////////////////////////////////////////////////
+proc defl(ideal I, int d)
+"USAGE:   defl(ideal I, int d);  I ideal, int d order of the deflation
+RETURN:   deflation ideal DI of I
+EXAMPLE:  example defl; shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int i,j;
+ for(i=1;i<=d;i++)
+ {
+  def R(i)=symmetricBasis(n,i,"x");
+  setring R(i);
+  ideal J(i)=symBasis;
+  export(J(i));
+ }
+ execute("ring RR=0,(x(1..n),"+varstr(S)+"),dp;");
+ for(i=1;i<=d;i++)
+ {
+  ideal J(i)=imap(R(i),J(i));
+  for(j=1;j<=n;j++)
+  {
+   J(i)=subst(J(i),x(j),var(n+j));
+  }
+ }
+ execute("ring R=0,("+varstr(S)+"),dp;");
+ ideal I=imap(S,I);
+ if(d>1)
+ {
+  for(i=1;i<=d-1;i++)
+  {
+   ideal J(i)=imap(RR,J(i));
+   for(j=1;j<=size(I);j++)
+   {
+    ideal I(j);
+    for(k=1;k<=size(J(i));k++)
+    {
+     I(j)[k]=J(i)[k]*I[j];
+    }
+     export(I(j));
+   }
+  }
+  ideal J(d)=imap(RR,J(d));
+  ideal D(d)=J(1..d);
+  ideal II(d)=I,I(1..size(I));
+  matrix T(d)=diff(D(d),II(d));
+  matrix TT(d)=transpose(T(d));
+  export(TT(d));
+ }
+ else
+ {
+  ideal J(d)=imap(RR,J(d));
+  ideal D(d)=J(d);
+  ideal II(d)=I;
+  matrix T(d)=diff(D(d),II(d));
+  matrix TT(d)=transpose(T(d));
+  export(TT(d));
+ }
+ int zc=size(D(d));
+ export(zc);
+ execute("ring DR=0,("+varstr(S)+",x(1..zc)),dp;");
+ matrix TT(d)=imap(R,TT(d));
+ ideal I=imap(S,I);
+ vector v=[x(1..zc)];
+ ideal DI=I,TT(d)*v;
+ export(DI); 
+ export(I);
+ setring S;
+ return(DR);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f1=z^2;
+   poly f2=z*(x^2+y);
+   ideal I=f1,f2;
+   def D=defl(I,1);
+   setring D;
+   DI;
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc     NIDofDI(ideal I)
+"USAGE:  NIDofDI(ideal I);  I ideal 
+RETURN:  numerical irreducible decomposition of I 
+EXAMPLE: NIDofDI; shows an example
+"
+{
+ def S=basering;
+ int i,ii;
+ def WW=ZSROFWitSet(I);
+ setring WW;
+ if(c(0)==0)
+ {
+  setring S;
+  return(WW);
+ }
+ else
+ {
+  int d=size(L);
+  for(i=0;i<=d;i++)
+  {
+   int co(i)=0;
+   if(i==0)
+   {
+    execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+    list V(i)=imap(WW,W(i));
+    list W(0..size(V(i)));
+    if(size(V(i)[1])>1)
+    {
+     co(i)=size(V(i));
+     for(ii=1;ii<=size(V(i));ii++)
+     {
+      list w(ii)=V(i)[ii];
+      export(w(ii));
+     }
+    }
+    else
+    {
+     W(1)[1]="Empty Set";
+    }
+   }
+   else
+   {
+    list WW(i);
+    list V(i)=imap(WW,W(i));
+    list a(i)=imap(WW,ZSR(i));
+    if(size(V(i)[1])>1)
+    {
+     def q(i)=ReWitZSR(a(i),V(i),i);
+     setring q(i);
+     if(tw1(i)>0)
+     {
+      for(ii=1;ii<=tw1(i);ii++)
+      {
+       WW(i)[ii]=Z1(ii);
+      }
+      co(i)=tw1(i);
+     }
+     if(tw(i)>0)
+     {
+      for(ii=1;ii<=size(Z);ii++)
+      {
+       if(size(Z[ii])>1)
+       {
+        co(i)=co(i)+1;
+        WW(i)[ii+tw1(i)]=Z(ii);
+       }
+      }
+     }
+     for(ii=1;ii<=size(WW(i));ii++)
+     {
+      list w(ii);
+      w(ii)=WW(i)[ii];
+     }
+    }
+    else
+    {
+     execute("ring q(i)=(complex,16,I),("+varstr(S)+"),dp;");
+     WW(i)[1]="Empty Set";
+    }
+   }
+  }
+  for(i=0;i<=d;i++)
+  {
+   execute("ring qq(i)=(complex,16,I),("+varstr(S)+"),dp;");
+   list ww(i);
+   if(co(i)>0)
+   {
+    for(ii=1;ii<=co(i);ii++)
+    {
+     list v(ii)=imap(q(i),w(ii));
+     ww(i)=v(ii)[1];
+     if(size(ww(i))==1)
+     {
+      list w(ii);
+      w(ii)[1]=v(ii);
+     }
+     else
+     {
+      list w(ii)=v(ii);
+     }
+     export(w(ii));
+    }
+   }
+   else
+   {
+    list w(1);
+    w(1)[1]=var(1);
+    export(w(1));
+   }
+   number cco(i)=co(i)/1;
+   export(cco(i));
+  }
+  ideal L=imap(WW,L);
+  export(L);
+  return(qq(0..d));
+ }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f1=z^2;
+   poly f2=z*(x^2+y);
+   ideal I=f1,f2;
+   list DD=NIDofDI(I);
+   def D(0)=DD[1];
+   setring D(0);
+   w(1);          // w(1)= x, i.e. no components 
+   def D(1)=DD[2];
+   setring D(1);
+   w(1);
+   def D(2)=DD[3];
+   setring D(2);
+   w(1);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc NumPrimDecom(ideal I,int d)
+"USAGE:   NumPrimDecom(ideal I,int d);  I ideal, d order of the deflation
+RETURN:   lists of the numerical primary decomposition
+EXAMPLE:  example NumPrimDecom; shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int i,Dd,j,k,jj;
+ def D=defl(I,d);
+ setring D;
+ ideal J=DI;
+ Dd=dim(std(DI));
+ list W=NIDofDI(J);
+ for(i=0;i<=Dd;i++)
+ {
+  def A(i+1)=W[i+1];
+  setring A(i+1);
+  if(cco(i)>0)
+  {
+   for(j=1;j<=cco(i);j++)
+   {
+    list W(j)=w(j);
+    for(k=1;k<=size(w(j));k++)
+    {
+     for(jj=size(W(j)[k]);jj>=n+1;jj--)
+     {
+      W(j)[k]=delete(W(j)[k],jj);
+     }
+     W(j)[k]=W(j)[k];
+    }
+   }
+  }
+  else
+  {
+   list W(1)=var(1);
+  }
+ }
+ execute("ring R=(complex,16,I),("+varstr(S)+"),dp;");
+ jj=0;
+ for(i=0;i<=Dd;i++)
+ {
+  number cco(i)=imap(A(i+1),cco(i));
+  if(cco(i)>0)
+  {
+   for(j=1;j<=cco(i);j++)
+   {
+    jj=jj+1;
+    list w(jj)=imap(A(i+1),W(j));
+    export(w(jj));
+  "===========================================";
+  "===========================================";
+    "Numerical Primary Component";
+     w(jj);
+   }
+  }
+ }
+ return(R);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y),dp;
+   poly f1=yx;
+   poly f2=x2;
+   ideal I=f1,f2;
+   def W=NumPrimDecom(I,1);
+   setring W;
+   w(1);
+      ==> 1-Witness point set (one point)
+   w(2);
+      ==> 1-Witness point set (one point)
+}
+///////////////////////////////////////////////////////////////////////////////

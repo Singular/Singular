@@ -1,0 +1,559 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Algebraic Geometry";
+info="
+LIBRARY:  NumerAlg.lib    Numerical Algebraic Algorithm
+OVERVIEW:
+        The library contains procedures to 
+        test the inclusion, the equality of two ideals defined by polynomial systems,
+        compute the degree of a pure i-dimensional component of an algebraic variety
+         defined by a polynomial system,
+        compute the local dimension of an algebraic variety defined by a polynomial
+         system at a point computed as an approximate value. The use of the library
+         requires to install Bertini (www.nd.edu~sommese/bertini/thedownload).
+
+AUTHOR: Shawki AlRashed, rashed@mathematik.uni-kl.de; sh.shawki@yahoo.de
+PROCEDURES:
+
+ Incl(ideal I, ideal J);   test if I containes J
+
+ Equal(ideal I, ideal J);  test if I equals to J
+
+ Degree(ideal I, int i);   computes the degree of a pure i-dimensional
+
+ NumLocalDim(ideal I, p);  numerical local dimension at a point computed as
+                                  an approximate value
+";
+
+LIB "numerDecom.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+proc Degree(ideal I,int i)
+"USAGE:  Degree(ideal I,int i); I ideal,  i positive integer
+RETURN:  the degree of the pure i-dimensional component of the algebraic 
+          variety defined by I
+EXAMPLE: example Degree; shows an example
+"
+{
+ def S=basering;
+ def W=WitSet(I);
+ setring W;
+ int j;
+ if(size(W(i)[1])>1)
+ {
+  j=size(W(i));
+ }
+ else
+ {
+  j=-1; // no component of dimension i
+ }
+ "The Degree of Component";
+ j;
+ setring S;
+ return (W);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+   poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+   poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+   ideal I=f1,f2,f3;
+   def W=Degree(I,1);
+        ==>
+           The Degree of Component
+           3
+   def W=Degree(I,2);
+        ==>
+           The Degree of Component
+           2
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc Incl(ideal I, ideal J)
+"USAGE:  Incl(ideal I, ideal J); I, J ideals
+RETURN:  t=1 if the algebraic variety defined by I contains the algebraic
+           variety defined by J, otherwise t=0
+EXAMPLE: example Incl; shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int i,j,ii,k,z,zi,dd;
+ if(dim(std(I))==0)
+ {
+  def W=solve(I,"nodisplay");
+  setring W;
+  ideal J=imap(S,J);
+  ideal I=imap(S,I);
+  list w;
+  poly tj;
+  number al,ar,ai,ri,jj;
+  zi=size(SOL);
+  for(j=1;j<=zi;j++)
+  {
+   w=SOL[j];
+   for(k=1;k<=size(J);k++)
+   {
+    tj=J[k];
+    for(ii=1;ii<=n;ii++)
+    {
+     tj=subst(tj,var(ii),w[ii]);
+    }
+    al=leadcoef(tj);
+    ar=repart(al);
+    ai=impart(al);
+    ri=ar^2+ai^2;
+    if(ri>0.000000000000001)
+    {
+     jj=0;
+     k=size(I)+1;
+     j=zi+1;
+    }
+    else
+    {
+     jj=1;
+     ri=0;
+    }
+   }
+  }
+ }
+ else
+ {
+  def W=WitSupSet(I);
+  setring W;
+  ideal J=imap(S,J);
+  ideal I=imap(S,I);
+  list w;
+  number al,ar,ai,ri,jj;
+  poly tj;
+  dd=size(L);
+  for(i=0;i<=dd;i++)
+  {
+   z=size(W(i)[1]);
+   zi=size(W(i));
+   if(z>1)
+   {
+    for(j=1;j<=zi;j++)
+    {
+     w=W(i)[j];
+     for(k=1;k<=size(J);k++)
+     {
+      tj=J[k];
+      for(ii=1;ii<=n;ii++)
+      {
+       tj=subst(tj,var(ii),w[ii]);
+      }
+      al=leadcoef(tj);
+      ar=repart(al);
+      ai=impart(al);
+      ri=ar^2+ai^2;
+      if(ri>0.000000000000001)
+      {
+       jj=-1;
+       k=size(J)+1;
+       j=zi+1;
+       z=0;
+       i=dd+1;
+      }
+      else
+      {
+       jj=1;
+       ri=0;
+      }
+     }
+    }
+   }
+  }
+ }
+ if(ri>0.000000000000001)
+ {
+  jj=0;
+ }
+ else
+ {
+  jj=1;
+ }
+"================================================";
+ "Inclusion:";
+ jj;
+"================================================";
+ export(jj);
+ export(J);
+ export(I);
+   system("sh","rm singular_solutions");
+   system("sh","rm nonsingular_solutions");
+   system("sh","rm real_solutions");
+   system("sh","rm raw_solutions");
+   system("sh","rm raw_data");
+   system("sh","rm output");
+   system("sh","rm midpath_data");
+   system("sh","rm main_data");
+   system("sh","rm input");
+   system("sh","rm failed_paths");
+ setring S;
+ return (W);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+   poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+   poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+   ideal I=f1,f2,f3;
+   poly g1=(x2+y2+z2-6)*(x-1);
+   poly g2=(x2+y2+z2-6)*(y-2);
+   poly g3=(x2+y2+z2-6)*(z-3);
+   ideal J=g1,g2,g3;
+   def W=Incl(I,J);
+      ==>
+         Inclusion:
+         0
+ def W=Incl(J,I);
+      ==>
+         Inclusion:
+         1
+}
+///////////////////////////////////////////////////////////////////////////////
+proc Equal(ideal I, ideal J)
+"USAGE:  Equal(ideal I, ideal J); I, J ideals
+RETURN:  t=1 if the algebraic variety defined by I equals to the algebraic
+           variety defined by J, otherwise t=0
+EXAMPLE: example Equal; shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ def W1=Incl(J,I);
+ setring W1;
+ number j1=jj;
+ execute("ring q=(real,0),("+varstr(S)+"),dp;");
+ ideal I=imap(W1,I);
+ ideal J=imap(W1,J);
+ execute("ring qq=0,("+varstr(S)+"),dp;");
+ ideal I=imap(S,I);
+ ideal J=imap(S,J);
+ def W2=Incl(I,J);
+ setring W2;
+ number j2=jj;
+ number j;
+ number j1=imap(W1,j1);
+ if(j2==1)
+ {
+  if(j1==1)
+  {
+   j=1/1;
+  }
+  else
+  {
+   j=0/1;
+  }
+ }
+ else
+ {
+  j=0/1;
+ }
+"================================================";
+ "Equality:";
+ j;
+"================================================";
+ setring S;
+ return (W2);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+   poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+   poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+   ideal I=f1,f2,f3;
+   poly g1=(x2+y2+z2-6)*(x-1);
+   poly g2=(x2+y2+z2-6)*(y-2);
+   poly g3=(x2+y2+z2-6)*(z-3);
+   ideal J=g1,g2,g3;
+   def W=Equal(I,J);
+        ==>
+           Equality:
+           0
+
+
+  def W=Equal(J,J);
+        ==>
+           Equality:
+           1
+}
+///////////////////////////////////////////////////////////////////////////////
+proc NumLocalDim(ideal J, list w, int e)
+"USAGE:  NumLocalDim(ideal J, list w, int e); J ideal,
+           w list of an approximate value of a point v in the algebraic variety defined by J,
+               e integer
+RETURN: the local dimension of the algebraic variety defined by J at v 
+EXAMPLE: example NumLocalDim; shows an example
+"
+{
+ def S=basering;
+ int n=nvars(basering);
+ int sI=size(J);
+ int i,j,jj,t,tt,sz1,sz2,ii,ph,ci,k;
+ poly p,pp;
+ list rw,iw;
+ for(i=1;i<=sI;i++)
+ {
+  p=J[i];
+  for(j=1;j<=n;j++)
+  {
+   w[j]=w[j]+I*0;
+   rw[j]=repart(w[j]);
+   iw[j]=impart(w[j]);
+   p=subst(p,var(j),w[j]);
+  }
+  pp=pp+p;
+ }
+ number u=leadcoef(pp);
+ if((u^2)==0)
+ {
+  execute("ring A=(real,e-1),("+varstr(S)+",I),ds;");
+  ideal II=imap(S,J);
+  list rw=imap(S,rw);
+  list iw=imap(S,iw);
+  poly p(1..n);
+  for(j=1;j<=n;j++)
+  {
+   p(j)=var(j)+rw[j]+I*iw[j];
+  }
+  map f=A,p(1..n);
+  ideal T=f(II);
+  tt=dim(std(T));
+  t=tt-1;
+ }
+ else
+ {
+  int d=dim(std(J));
+  execute("ring R=(complex,e-1,I),("+varstr(S)+"),ds;");
+  list w=imap(S,w);
+  ideal II=imap(S,J);
+  ideal JJ;
+  poly p, p(1..n);
+  for(i=1;i<=sI;i++)
+  {
+   p=II[i];
+   for(j=1;j<=n;j++)
+   {
+    p=subst(p,var(j),w[j]);
+   } 
+   JJ[i]=II[i]-p;
+  }
+  for(j=1;j<=n;j++)
+  {
+   p(j)=var(j)+w[j];
+  }
+  map f=R,p(1..n);
+  ideal T=f(JJ);
+  tt=dim(std(T));
+  if(tt==d)
+  {
+   execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+   t=tt;
+  }
+  else
+  {
+   execute("ring RR=(real,e-2),("+varstr(S)+",I),dp;");
+   ideal II=imap(S,J);
+   list rw=imap(S,rw);
+   list iw=imap(S,iw);
+   ideal L,LL,H,HH;
+   poly l(1..d),ll(1..d);
+   int c;
+   for(i=1;i<=d;i++)
+   {
+    for(j=1;j<=n;j++)
+    {
+     c=random(1,100);
+     l(i)=l(i)+c*(var(j));
+     ll(i)=ll(i)+c*(var(j)-rw[j]-I*iw[j]);
+    }
+    l(i)=l(i)+random(101,200);
+    L[i]=l(i);
+    LL[i]=ll(i);
+   }
+   poly pi=I^2+1;
+   H=L,II,pi;
+   ideal JJ;
+   poly p, p(1..n);
+   for(i=1;i<=sI;i++)
+   {
+    p=II[i];
+    for(j=1;j<=n;j++)
+    {
+     p=subst(p,var(j),rw[j]+I*iw[j]);
+    } 
+    JJ[i]=II[i]-p;
+   }
+   HH=LL,JJ,pi;
+   if(dim(std(H))==0)
+   {
+    def M=solve(H,100,"nodisplay");
+    setring M;
+    sz1=size(SOL);
+    execute("ring RRRQ=(real,e-1),("+varstr(S)+",I),dp;");
+    ideal HH=imap(RR,HH);
+    if(dim(std(HH))==0)
+    {
+     def MM=solve(HH,100,"nodisplay");
+     setring MM;
+     sz2=size(SOL);
+    }
+   }
+   else
+   {
+    sz1=1;
+   }
+   if(sz1==sz2)
+   {
+    execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+    t=d;
+   }
+   else
+   {
+    execute("ring RQ=(real,e-1),("+varstr(S)+"),dp;");
+    ideal II=imap(S,J);
+    def RW=WitSet(II);
+    setring RW;
+    list v;
+    list w=imap(S,w);
+    number nr,ni;
+    if(tt<0)
+    {
+     tt=0;
+    }
+    for(ii=tt;ii<=d;ii++)
+    {
+     list W(ii)=imap(RW,W(ii));
+     if(size(W(ii)[1])>1)
+     {
+      if(ii==0)
+      {
+       for(i=1;i<=size(W(0));i++)
+       {
+        v=W(ii)[i];
+        nr=0;
+        ni=0;
+        for(j=1;j<=n;j++)
+        {
+         nr=nr+(repart(v[j])-repart(w[j]))^2;
+         ni=ni+(impart(v[j])-impart(w[j]))^2;
+        }
+        if((ni+nr)<1/10^(2*e-3))
+        {
+         execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+         list W(ii)=imap(RW,W(ii));
+         t=0;
+         i=size(W(ii))+1;
+         ii=d+1;
+        }
+       }
+      }
+      else
+      {
+       def SS=Singular2betini1(W(ii));
+       execute("ring D=(complex,e,I),("+varstr(S)+",s,gamma),dp;");
+       string nonsin;
+       ideal H,L;
+       ideal J=imap(RW,N(0));
+       ideal LL=imap(RW,L);
+       list w=imap(S,w);
+       poly p;
+       for(j=1;j<=ii;j++)
+       {
+        p=0;
+        for(jj=1;jj<=n;jj++)
+        {
+         p=p+random(1,100)*(var(jj)-w[jj]);
+        }
+        L[j]=p;
+       }
+       for(jj=1;jj<=size(J);jj++)
+       {
+        H[jj]=s*gamma*J[jj]+(1-s)*J[jj];
+       }
+       for(jj=1;jj<=ii;jj++)
+       {
+        H[size(J)+jj]=s*gamma*LL[jj]+(1-s)*L[jj];
+       }
+       string sv=varstr(S);
+       def Q(ii)=UseBertini(H,sv);
+       system("sh","rm start");
+       nonsin=read("nonsingular_solutions");
+       if(size(nonsin)>=52)
+       {
+        def T(ii)=bertini2Singular("nonsingular_solutions",nvars(basering)-2);
+        setring T(ii);
+        list C=re;
+        ci=size(C);
+        number tr;
+        list w=imap(S,w);
+        for(jj=1;jj<=ci;jj++)
+        {
+         tr=0;
+         for(k=1;k<=n;k++)
+         {
+          tr=tr+(repart(w[k])-repart(C[jj][k]))^2+(impart(w[k])-impart(C[jj][k]))^2;
+         }
+         if(tr<=1/10^(2*e-3))
+         {
+          execute("ring A=(complex,e,I),("+varstr(S)+"),dp;");
+          t=ii;
+          ii=d+1;
+          jj=ci+1;
+         }
+        }
+       }
+      }
+     }
+    }
+    system("sh","rm singular_solutions");
+    system("sh","rm nonsingular_solutions");
+    system("sh","rm real_solutions");
+    system("sh","rm raw_solutions");
+    system("sh","rm raw_data");
+    system("sh","rm output");
+    system("sh","rm midpath_data");
+    system("sh","rm main_data");
+    system("sh","rm input");
+    system("sh","rm failed_paths");
+   }
+  }
+ }
+ "=============================================";
+ "The Local Dimension:";
+ t;
+ setring S;
+ return(A);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   int e=14;
+   ring r=(complex,e,I),(x,y,z),dp;
+   poly f1=(x2+y2+z2-6)*(x-y)*(x-1);
+   poly f2=(x2+y2+z2-6)*(x-z)*(y-2);
+   poly f3=(x2+y2+z2-6)*(x-y)*(x-z)*(z-3);
+   ideal J=f1,f2,f3;
+   list p0=0.99999999999999+I*0.00000000000001,2,3+I*0.00000000000001;
+   list p2=1,0.99999999999998,2;
+   list p1=5+I,4.999999999999998+I,5+I;
+   def D=NumLocalDim(J,p0,e);
+             ==>
+               The Local Dimension:
+                0
+   def D=NumLocalDim(J,p1,e);
+             ==>
+               The Local Dimension:
+                1
+   def D=NumLocalDim(J,p2,e);
+             ==>
+               The Local Dimension:
+                2
+}
+
+///////////////////////////////////////////////////////////////////////////////
