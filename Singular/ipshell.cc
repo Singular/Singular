@@ -61,10 +61,7 @@
 
 leftv iiCurrArgs=NULL;
 idhdl iiCurrProc=NULL;
-int  traceit = 0;
 const char *lastreserved=NULL;
-
-int  myynest = -1;
 
 static BOOLEAN iiNoKeepRing=TRUE;
 

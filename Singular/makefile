@@ -77,6 +77,7 @@ CXXSOURCES=\
    extra.cc\
    feOpt.cc\
    fehelp.cc\
+   fevoices.cc \
    fglm.cc\
    gentable.cc\
    gentable2.cc\

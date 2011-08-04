@@ -48,6 +48,17 @@
 #include <Singular/mpsr.h>
 #endif
 
+struct snumber_dummy
+{
+  mpz_t z;
+  mpz_t n;
+  #if defined(LDEBUG)
+  int debug;
+  #endif
+  BOOLEAN s;
+};
+typedef struct snumber_dummy  *number_dummy;
+
 //#if (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
 //#define HAVE_PSELECT
 //#endif
@@ -73,6 +84,10 @@ sigset_t ssi_sigmask;
 sigset_t ssi_oldmask;
 #define SSI_BLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_sigmask, &ssi_oldmask)
 #define SSI_UNBLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_oldmask, NULL)
+
+#define SR_INT 1L
+#define SR_HDL(A) ((long)(A))
+#define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 // the helper functions:
 void ssiSetCurrRing(const ring r)
@@ -114,15 +129,15 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   // case 2 Q:     3 4 <int>
   //        or     3 3 <mpz_t nominator>
   SSI_BLOCK_CHLD;
-  if(SR_HDL(n) & SR_INT)
+  if((long)(n) & SR_INT)
   {
     fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
     //if (d->f_debug!=NULL) fprintf(d->f_debug,"bigint: short \"%ld\" ",SR_TO_INT(n));
   }
-  else if (n->s==3)
+  else if (((number_dummy)n)->s==3)
   {
     fputs("3 ",d->f_write);
-    mpz_out_str(d->f_write,10,n->z);
+    mpz_out_str(d->f_write,10,((number_dummy)n)->z);
     fputc(' ',d->f_write);
     //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"bigint: gmp \"%Zd\" ",n->z);
@@ -155,13 +170,13 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
       //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
     }
-    else if (n->s<2)
+    else if (((number_dummy)n)->s<2)
     {
       //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
-      fprintf(d->f_write,"%d ",n->s+5);
-      mpz_out_str (d->f_write,32, n->z);
+      fprintf(d->f_write,"%d ",((number_dummy)n)->s+5);
+      mpz_out_str (d->f_write,32, ((number_dummy)n)->z);
       fputc(' ',d->f_write);
-      mpz_out_str (d->f_write,32, n->n);
+      mpz_out_str (d->f_write,32, ((number_dummy)n)->n);
       fputc(' ',d->f_write);
 
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
@@ -170,7 +185,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
     {
       //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
       fputs("8 ",d->f_write);
-      mpz_out_str (d->f_write,32, n->z);
+      mpz_out_str (d->f_write,32, ((number_dummy)n)->z);
       fputc(' ',d->f_write);
 
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
@@ -333,9 +348,9 @@ number ssiReadBigInt(ssiInfo *d)
      {// read int or mpz_t or mpz_t, mpz_t
        number n=nlRInit(0);
        SSI_BLOCK_CHLD;
-       mpz_inp_str(n->z,d->f_read,0);
+       mpz_inp_str(((number_dummy)n)->z,d->f_read,0);
        SSI_UNBLOCK_CHLD;
-       n->s=sub_type;
+       ((number_dummy)n)->s=sub_type;
        return n;
      }
    case 4:
@@ -366,11 +381,11 @@ number ssiReadNumber(ssiInfo *d)
      case 1:
        {// read mpz_t, mpz_t
          number n=nlRInit(0);
-         mpz_init(n->n);
+         mpz_init(((number_dummy)n)->n);
          SSI_BLOCK_CHLD;
-         gmp_fscanf(d->f_read,"%Zd %Zd",n->z,n->n);
+         gmp_fscanf(d->f_read,"%Zd %Zd",((number_dummy)n)->z,((number_dummy)n)->n);
          SSI_UNBLOCK_CHLD;
-         n->s=sub_type;
+         ((number_dummy)n)->s=sub_type;
          return n;
        }
 
@@ -378,9 +393,9 @@ number ssiReadNumber(ssiInfo *d)
        {// read mpz_t
          number n=nlRInit(0);
          SSI_BLOCK_CHLD;
-         gmp_fscanf(d->f_read,"%Zd",n->z);
+         gmp_fscanf(d->f_read,"%Zd",((number_dummy)n)->z);
          SSI_UNBLOCK_CHLD;
-         n->s=3; /*sub_type*/
+         ((number_dummy)n)->s=3; /*sub_type*/
          return n;
        }
      case 4:
@@ -395,21 +410,21 @@ number ssiReadNumber(ssiInfo *d)
      case 6:
        {// read raw mpz_t, mpz_t
          number n=nlRInit(0);
-         mpz_init(n->n);
+         mpz_init(((number_dummy)n)->n);
          SSI_BLOCK_CHLD;
-         mpz_inp_str (n->z, d->f_read, 32);
-         mpz_inp_str (n->n, d->f_read, 32);
+         mpz_inp_str (((number_dummy)n)->z, d->f_read, 32);
+         mpz_inp_str (((number_dummy)n)->n, d->f_read, 32);
          SSI_UNBLOCK_CHLD;
-         n->s=sub_type-5;
+         ((number_dummy)n)->s=sub_type-5;
          return n;
        }
      case 8:
        {// read raw mpz_t
          number n=nlRInit(0);
          SSI_BLOCK_CHLD;
-         mpz_inp_str (n->z, d->f_read, 32);
+         mpz_inp_str (((number_dummy)n)->z, d->f_read, 32);
          SSI_UNBLOCK_CHLD;
-         n->s=sub_type=3; /*subtype-5*/
+         ((number_dummy)n)->s=sub_type=3; /*subtype-5*/
          return n;
        }
 

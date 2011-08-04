@@ -18,7 +18,6 @@
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))
 #ifndef NEW_FLEX
-int yylineno  = 0;
 #endif /* NEW_LEX */
 int blocknest = 0;
 extern char * yytext;
