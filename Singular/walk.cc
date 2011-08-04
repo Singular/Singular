@@ -1801,8 +1801,6 @@ intvec* MkInterRedNextWeight(intvec* iva, intvec* ivb, ideal G)
 /* define and execute a new ring which order is (a(va),lp,C) */
 static void VMrDefault(intvec* va)
 {
-  idhdl tmp = enterid(IDID(currRingHdl),IDLEV(currRingHdl)+1,RING_CMD,&IDROOT,TRUE);
-  //3.11.01
 
   if (ppNoether!=NULL)
     pDelete(&ppNoether);
@@ -1814,7 +1812,7 @@ static void VMrDefault(intvec* va)
     sLastPrinted.CleanUp();
   }
 
-  ring r = IDRING(tmp);
+  ring r = (ring) omAlloc0Bin(sip_sring_bin);
   int i, nv = currRing->N;
 
   r->cf->ch  = rChar (currRing);
@@ -1868,15 +1866,12 @@ static void VMrDefault(intvec* va)
   rComplete(r);
 
   rChangeCurrRing(r);
-  currRingHdl = tmp;
 }
 
 /* 03.11.01 */
 /* define and execute a new ring which order is  a lexicographic order */
 static void VMrDefaultlp(void)
 {
-  idhdl tmp = enterid(IDID(currRingHdl),IDLEV(currRingHdl)+1,RING_CMD,&IDROOT,TRUE);
-
 
   if (ppNoether!=NULL)
     pDelete(&ppNoether);
@@ -1888,7 +1883,7 @@ static void VMrDefaultlp(void)
     sLastPrinted.CleanUp();
   }
 
-  ring r = IDRING(tmp);
+  ring r = (ring) omAlloc0Bin(sip_sring_bin);
   int i, nv = currRing->N;
 
   r->cf->ch  = rChar (currRing);
@@ -1930,10 +1925,7 @@ static void VMrDefaultlp(void)
   /* complete ring intializations */
   rComplete(r);
 
-  //rSetHdl(tmp);
-
   rChangeCurrRing(r);
-  currRingHdl = tmp;
 }
 
 
