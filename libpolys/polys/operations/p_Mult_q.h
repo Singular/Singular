@@ -9,12 +9,20 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include "config.h"
+
+#ifndef P_MULT_Q_H
+#define P_MULT_Q_H
+
+#include <misc/auxiliary.h>
+
+// #include "config.h"
 // #include <polys/structs.h>
 
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET
 // Not thoroughly tested what is best
+#ifndef MIN_LENGTH_BUCKET
 #define MIN_LENGTH_BUCKET 10
+#endif 
 
 //  return TRUE and lp == pLength(p), lq == pLength(q),
 //              if min(pLength(p), pLength(q)) >= min
@@ -23,3 +31,4 @@
 //                  lp < lq  if pLength(p) < pLength(q)
 BOOLEAN pqLength(poly p, poly q, int &lp, int &lq, const int min);
 
+#endif // P_MULT_Q_H

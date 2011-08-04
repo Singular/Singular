@@ -15,13 +15,8 @@
 #include <factory/factory.h>
 #endif
 
-/***************************************************************
- *
- * Returns:  p * q,
- * Destroys: if !copy then p, q
- * Assumes: pLength(p) >= 2 pLength(q) >=2
- ***************************************************************/
 #include <misc/options.h>
+
 #include <polys/monomials/p_polys.h>
 #include <polys/templates/p_Procs.h>
 #include <polys/templates/p_MemCmp.h>
@@ -30,7 +25,8 @@
 #include <polys/templates/p_Numbers.h>
 #include <polys/kbuckets.h>
 
-#include <polys/operations/p_Mult_q.h>
+#include "p_Mult_q.h"
+
 
 BOOLEAN pqLength(poly p, poly q, int &lp, int &lq, const int min)
 {
@@ -275,6 +271,9 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 }
 
 
+/// Returns:  p * q,
+/// Destroys: if !copy then p, q
+/// Assumes: pLength(p) >= 2 pLength(q) >=2
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
   assume(r != NULL);
