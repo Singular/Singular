@@ -102,7 +102,6 @@ to save space for ordinary inputs that do not need much stack.
 extern int   yylineno;
 extern FILE* yyin;
 
-char       my_yylinebuf[80];
 const  char *  currid;
 BOOLEAN    yyInRingConstruction=FALSE;
 BOOLEAN    expected_parms;

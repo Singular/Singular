@@ -205,5 +205,7 @@ void iiCheckPack(package &p);
 #ifndef NDEBUG
 void checkall();
 #endif
+void rSetHdl(idhdl h);
+
 #endif
 

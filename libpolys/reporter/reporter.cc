@@ -41,6 +41,7 @@ char *  feErrors=NULL;
 int     feErrorsLen=0;
 BOOLEAN feWarn = TRUE;
 BOOLEAN feOut = TRUE;
+void (*WerrorS_callback)(const char *s) = NULL;
 
 const char feNotImplemented[]="not implemented";
 
@@ -179,10 +180,17 @@ void WerrorS(const char *s)
     else
 #endif
     {
-      fwrite("   ? ",1,5,stderr);
-      fwrite((char *)s,1,strlen((char *)s),stderr);
-      fwrite("\n",1,1,stderr);
-      fflush(stderr);
+      if (WerrorS_callback == NULL)
+      {
+        fwrite("   ? ",1,5,stderr);
+        fwrite((char *)s,1,strlen((char *)s),stderr);
+        fwrite("\n",1,1,stderr);
+        fflush(stderr);
+      }
+      else
+      {
+        WerrorS_callback(s);
+      }
       if (feProt&PROT_O)
       {
         fwrite("   ? ",1,5,feProtFile);

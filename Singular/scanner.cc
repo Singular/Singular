@@ -570,7 +570,6 @@ char *yytext;
 
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))
-int yylineno  = 0;
 int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
