@@ -75,7 +75,6 @@ CXXSOURCES=\
    cntrlc.cc\
    denom_list.cc\
    eigenval_ip.cc\
-   emacs.cc\
    extra.cc\
    feOpt.cc\
    fehelp.cc\
