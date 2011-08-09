@@ -17,7 +17,7 @@ AM_CXXFLAGS = $(AM_CFLAGS) ${CXXTEMPLFLAGS}
 
 AM_CPPFLAGS = -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS} ${FACTORY_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS} 
 
 
 TESTS = simple_test coeffs_test rings_test polys_test
@@ -33,7 +33,7 @@ rings_test_SOURCES = rings_test_runner.cpp gftables MOD
 polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_LDFLAGS = $(polys_test_LDFLAGS)
 
-coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc_g
+coeffs_test_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
 polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
