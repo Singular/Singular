@@ -64,7 +64,7 @@ main()
   currentVoice=feInitStdin(NULL);
   // hook for error handling:
   // WerrorS_callback=......; of type p(const char *)
-  int err=iiEStart(omStrDup("int ver=system(\"version\");export ver;return();\n"),NULL);
+  int err=iiAllStart(NULL,"int ver=system(\"version\");\n",BT_proc,0);
   if (err) errorreported = 0; // reset error handling
   printf("interpreter returns %d\n",err);
   idhdl h=ggetid("ver");
@@ -95,7 +95,7 @@ main()
    IDRING(newRingHdl)=R;
    // make R the default ring (include rChangeCurrRing):
    rSetHdl(newRingHdl);
-   err=iiEStart(omStrDup("poly p=x;listvar();return();\n"),NULL);
+   err=iiAllStart(NULL,"poly p=x;listvar();return();\n"),BT_Proc,0);
 
   // calling a kernel function via the interpreter interface
   sleftv r1; memset(&r1,0,sizeof(r1));
