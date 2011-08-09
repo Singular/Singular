@@ -314,4 +314,4 @@ test: test.o
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS} -lntl -ldl -lgmp
 
 # My headers test
-check: test test-g
+check: all test test-g
