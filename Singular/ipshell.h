@@ -9,6 +9,7 @@
 */
 #include <stdio.h>
 #include <kernel/structs.h>
+#include <kernel/febase.h>
 #include <kernel/ideals.h>
 
 struct _ssubexpr;
