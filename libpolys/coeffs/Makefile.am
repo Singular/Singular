@@ -52,8 +52,8 @@ check_PROGRAMS = $(TESTS)
 tt_r_SOURCES = test.cc
 tt_g_SOURCES = test.cc
 
-tt_r_LDADD = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc
-tt_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc_g
+tt_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
+tt_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
 
 tt_r: gftables
 tt_g: gftables
