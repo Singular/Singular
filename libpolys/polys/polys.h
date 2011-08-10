@@ -326,7 +326,7 @@ void      pSetPolyComp(poly p, int comp);
 inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
 
 
-#define   pSubst(p,n,e) p_Subst(p,n.e,currRing)
+#define   pSubst(p,n,e) p_Subst(p,n,e,currRing)
 #define   ppJet(p,m) pp_Jet(p,m,currRing)
 #define   pJet(p,m)  p_Jet(p,m,currRing)
 #define   ppJetW(p,m,iv) pp_JetW(p,m,iv,currRing)

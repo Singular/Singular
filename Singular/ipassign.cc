@@ -16,7 +16,7 @@
 #include <Singular/tok.h>
 #include <misc/options.h>
 #include <Singular/ipid.h>
-#include <kernel/idrec.h>
+#include <Singular/idrec.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
@@ -29,7 +29,7 @@
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
 #include <coeffs/numbers.h>
-#include <kernel/longalg.h>
+#include <polys/ext_fields/longalg.h>
 #include <kernel/stairc.h>
 #include <polys/monomials/maps.h>
 #include <kernel/syz.h>
@@ -38,7 +38,7 @@
 #include <Singular/attrib.h>
 #include <Singular/silink.h>
 #include <Singular/ipshell.h>
-#include <kernel/sca.h>
+#include <polys/nc/sca.h>
 #include <Singular/blackbox.h>
 
 /*=================== proc =================*/
@@ -130,7 +130,7 @@ static void jjMINPOLY_red(idhdl h)
     case POLY_CMD:
     {
       poly p=(poly)IDDATA(h);
-      IDDATA(h)=(char*)pMinPolyNormalize(p);
+      IDDATA(h)=(char*)p_MinPolyNormalize(p, currRing);
       break;
     }
     case IDEAL_CMD:
@@ -140,7 +140,8 @@ static void jjMINPOLY_red(idhdl h)
     {
       int i;
       ideal I=(ideal)IDDATA(h);
-      for(i=IDELEMS(I)-1;i>=0;i--) I->m[i]=pMinPolyNormalize(I->m[i]);
+      for(i=IDELEMS(I)-1;i>=0;i--)
+	      I->m[i]=p_MinPolyNormalize(I->m[i], currRing);
       break;
     }
     case LIST_CMD:
@@ -168,7 +169,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
   else
   {
     if ((rPar(currRing)!=1)
-      || (rField_is_GF()))
+      || (rField_is_GF(currRing)))
     {
       WerrorS("no minpoly allowed");
       return TRUE;
@@ -485,8 +486,8 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   res->data=(void *)a->CopyD(MATRIX_CMD);
-  if (a->rtyp==IDHDL) idNormalize((ideal)a->Data());
-  else                idNormalize((ideal)res->data);
+  if (a->rtyp==IDHDL) id_Normalize((ideal)a->Data(), currRing);
+  else                id_Normalize((ideal)res->data, currRing);
   jiAssignAttr(res,a);
   if (((res->rtyp==IDEAL_CMD)||(res->rtyp==MODUL_CMD))
   && (IDELEMS((ideal)(res->data))==1)
@@ -528,7 +529,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
   IDELEMS((ideal)m)=MATROWS(m)*MATCOLS(m);
   ((ideal)m)->rank=1;
   MATROWS(m)=1;
-  idNormalize((ideal)m);
+  id_Normalize((ideal)m, currRing);
   res->data=(void *)m;
   if (TEST_V_QRING && (currQuotient!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
@@ -578,7 +579,7 @@ static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
   idDelete((ideal *)&f);
   res->data=(void *)a->CopyD(IDEAL_CMD);
   f=(map)res->data;
-  idNormalize((ideal)f);
+  id_Normalize((ideal)f, currRing);
   f->preimage = rn;
   return FALSE;
 }
