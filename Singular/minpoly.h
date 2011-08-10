@@ -54,10 +54,6 @@
  * rows are regarded as zero rows). Furthermore, the array pivots stores the       *
  * pivot entries of the rows, i.e., pivots[i] indicates the position of the        *
  * first non-zero entry in the i-th row, which is normalized to 1.                 *
- *                                                                                 *
- *                                                                                 *
- * To use:                                                                         *
- * Call the method computeMinimalPolynomial(...)                                   *
  ***********************************************************************************/
 
 
@@ -101,7 +97,7 @@ public:
 
     bool findLinearDependency(unsigned long* newRow, unsigned long* dep);
 
-   //friend std::ostream& operator<<(std::ostream& out, const LinearDependencyMatrix& mat);
+    //friend std::ostream& operator<<(std::ostream& out, const LinearDependencyMatrix& mat);
 };
 
 
@@ -124,6 +120,9 @@ public:
     // right hand sides).
     // If the first n entries are all zero, return -1 (so this gives a check if row is the zero vector)
     int firstNonzeroEntry(unsigned long *row);
+
+//    // let piv be the pivot position of row i. then this method eliminates entry piv of row
+//    void subtractIthRow(unsigned long *row, unsigned i);
 
     void normalizeRow(unsigned long *row, unsigned i);
 
@@ -154,9 +153,12 @@ unsigned long* computeMinimalPolynomial(unsigned long** matrix, unsigned n, unsi
 
 // compute x^(-1) mod p
 //
-// NOTE: this uses long instead of unsigned long, for the XEA to work.
+// NOTE: this uses long long instead of unsigned long, for the XEA to work.
 // This shouldn't be a problem, since p has to be < 2^31 for the multiplication to work anyway.
-long modularInverse(long x, long p);
+//
+// There is no need to distinguish between 32bit and 64bit architectures: On 64bit, long long
+// is the same as long, and on 32bit, we need long long so that the variables can hold negative values.
+unsigned long modularInverse(long long x, long long p);
 
 void vectorMatrixMult(unsigned long* vec, unsigned long **mat, unsigned long* result, unsigned n, unsigned long p);
 
@@ -191,5 +193,18 @@ int gcd(unsigned long* g, unsigned long* a, unsigned long* b, unsigned long p, i
 //
 // NOTE: since we don't know the size of l, every entry has to be preinitialized to zero!
 int lcm(unsigned long* l, unsigned long* a, unsigned long* b, unsigned long p, int dega, int degb);
+
+
+// method suggested by Hans Schoenemann to multiply elements in finite fields
+// on 32bit and 64bit machines
+static inline unsigned long multMod(unsigned long a, unsigned long b, unsigned long p)
+{
+#if SIZEOF_LONG == 4
+#define ULONG64 (unsigned long long)
+#else
+#define ULONG64 (unsigned long)
+#endif
+  return (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 p));
+}
 
 #endif // MINPOLY_H
