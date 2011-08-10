@@ -1,6 +1,9 @@
 #ifndef CACHE_IMPLEMENTATION_H
 #define CACHE_IMPLEMENTATION_H
 
+#include <cstdio> // for sprintf
+#include <iostream>
+
 template<class KeyClass, class ValueClass>
 Cache<KeyClass, ValueClass>::Cache (const int maxEntries, const int maxWeight)
 {

@@ -2,8 +2,9 @@
 #define MINOR_H
 
 #include <assert.h>
-#include <iostream>
 #include <string>
+
+#include <polys/polys.h>
 
 using namespace std;
 

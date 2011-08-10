@@ -1,7 +1,8 @@
+#include <MinorProcessor.h>
+
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <polys/polys.h>
-#include <MinorProcessor.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <polys/kbuckets.h>
@@ -429,7 +430,7 @@ int getReduction (const int i, const ideal& iSB)
   poly f = pISet(i);
   poly g = kNF(iSB, currRing->qideal, f);
   int result = 0;
-  if (g != NULL) result = n_Int(pGetCoeff(g), currRing);
+  if (g != NULL) result = n_Int(pGetCoeff(g), currRing->cf);
   pDelete(&f);
   pDelete(&g);
   return result;
@@ -1292,7 +1293,7 @@ void elimOperationBucketNoDiv(poly &p1, poly &p2, poly &p3, poly &p4)
       (pLength(p3) != 0) && (pLength(p4) != 0))
     addsPoly++;
 #endif
-  kBucket_pt myBucket = kBucketCreate();
+  kBucket_pt myBucket = kBucketCreate(currRing);
   addOperationBucket(p1, p2, myBucket);
   poly p3Neg = pNeg(pCopy(p3));
   addOperationBucket(p3Neg, p4, myBucket);
@@ -1328,7 +1329,7 @@ void elimOperationBucket(poly &p1, poly &p2, poly &p3, poly &p4, poly &p5,
       (pLength(p3) != 0) && (pLength(p4) != 0))
     addsPoly++;
 #endif
-  kBucket_pt myBucket = kBucketCreate();
+  kBucket_pt myBucket = kBucketCreate(currRing);
   addOperationBucket(p1, p2, myBucket);
   poly p3Neg = pNeg(pCopy(p3));
   addOperationBucket(p3Neg, p4, myBucket);

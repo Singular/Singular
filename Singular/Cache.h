@@ -1,7 +1,6 @@
 #ifndef CACHE_H
 #define CACHE_H
 
-#include <iostream>
 #include <string>
 #include <list>
 #include <assert.h>
