@@ -16,6 +16,7 @@
 #include <kernel/ideals.h>
 
 #include <Singular/lists.h>
+
 lists gmsNF(ideal p, ideal g, matrix B, int D, int K);
 BOOLEAN gmsNF(leftv res, leftv h);
 

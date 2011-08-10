@@ -8,7 +8,9 @@
 * ABSTRACT: general interface to links
 */
 
+#include <misc/auxiliary.h>
 #include <kernel/structs.h>
+
 #include <Singular/sing_dbm.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
@@ -91,6 +93,7 @@ inline si_link slCopy(si_link l)
 }
 
 #include <omalloc/omalloc.h>
+
 inline char* slString(si_link l)
 {
   if (l->name != NULL)

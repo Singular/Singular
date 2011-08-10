@@ -1,8 +1,11 @@
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <Singular/subexpr.h>
-#include <Singular/ipshell.h>
-#include <Singular/blackbox.h>
+#include <misc/auxiliary.h>
+
+#include "tok.h"
+#include "subexpr.h"
+#include "ipshell.h"
+
+#include "blackbox.h"
 
 #define MAX_BB_TYPES 256
 // #define BLACKBOX_DEVEL 1

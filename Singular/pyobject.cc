@@ -12,24 +12,22 @@
 **/
 //*****************************************************************************
 
-
-
-
-
 #include <kernel/mod2.h>
+#include <misc/auxiliary.h>
 
-#include <Singular/ipid.h>
-#include <Singular/blackbox.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/longrat.h>
-#include <Singular/subexpr.h>
 
-#include <Singular/lists.h>
+#include <kernel/febase.h>
+// #include <kernel/longrat.h>
+
+#include "subexpr.h"
+#include "lists.h"
+#include "ipid.h"
+#include "blackbox.h"
 
 #include <Python.h>
-#include <iterator>             // std::distance
-#include <stdio.h>
+// #include <iterator>             // std::distance
+// #include <stdio.h>
 
 void sync_contexts();
 
@@ -347,7 +345,7 @@ inline PythonObject::ptr_type
 PythonCastStatic<CastType>::get(lists value)
 {
   ptr_type pylist(PyList_New(0));
-  for (std::size_t i = 0; i <= value->nr; ++i)
+  for (size_t i = 0; i <= value->nr; ++i)
     PyList_Append(pylist, PythonCastDynamic((value->m) + i));
 
   return pylist;
@@ -365,7 +363,7 @@ public:
 
   
 private:
-  std::size_t size(leftv iter, std::size_t distance = 0) const 
+  size_t size(leftv iter, size_t distance = 0) const 
   {
     if (iter) { do { ++distance; } while(iter = iter->next); }; 
     return distance;
@@ -373,7 +371,7 @@ private:
   
   void append_to(leftv iter) const
   {
-    for(std::size_t idx = 0; iter != NULL; iter = iter->next)
+    for(size_t idx = 0; iter != NULL; iter = iter->next)
       PyTuple_SetItem(*this, idx++, PythonCastDynamic(iter));
   }
 };
