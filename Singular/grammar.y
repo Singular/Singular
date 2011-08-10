@@ -1287,7 +1287,7 @@ ringcmd:
             if (b!=NULL)
             {
                 newRingHdl=enterid(ring_name, myynest, RING_CMD,
-                                   &($2.req_packhdl->idroot,FALSE));
+                                   &($2.req_packhdl->idroot),FALSE);
               $2.CleanUp();
               if (newRingHdl!=NULL)
               {
