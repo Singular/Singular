@@ -541,6 +541,17 @@ int nlSize(number a, const coeffs)
   return s;
 }
 
+void nlMPZ(mpz_t m, number &n, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+   
+  nlTest(n, r);
+  nlNormalize(n, r);
+  if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
+  else             mpz_init_set(m, (mpz_ptr)n->z);
+}
+
+
 /*2
 * convert number to int
 */
@@ -2090,7 +2101,6 @@ LINLINE BOOLEAN nlEqual (number a, number b, const coeffs r)
   return _nlEqual_aNoImm_OR_bNoImm(a, b);
 }
 
-
 LINLINE number nlInit (int i, const coeffs r)
 {
   number n;
@@ -2101,6 +2111,15 @@ LINLINE number nlInit (int i, const coeffs r)
   return n;
 }
 
+
+number nlInitMPZ(mpz_t m, const coeffs r)
+{
+  number z = ALLOC_RNUMBER();
+  mpz_init_set(z->z, m);
+  mpz_init_set_ui(z->n, 1);
+  z->s = 3;
+  return z;   
+}
 
 /*2
 * a == 1 ?
@@ -2595,8 +2614,11 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
+  r->cfInitMPZ = nlInitMPZ;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
+  r->cfMPZ = nlMPZ;
+  
   r->cfChineseRemainder=nlChineseRemainder;
   r->cfFarey=nlFarey;
   #ifdef HAVE_RINGS
