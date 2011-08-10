@@ -5,10 +5,7 @@
  *
  * This file provides miscellaneous functionality.
  *
- * For more general information, see the documentation in
- * misc_ip.h.
- *
- * @author Frank Seelisch
+ * For more general information, see the documentation in misc_ip.h.
  *
  * @internal @version \$Id$
  *
@@ -17,26 +14,27 @@
 
 // include header files
 #include <kernel/mod2.h>
-#include <Singular/lists.h>
-#include <kernel/longrat.h>
-#include <Singular/misc_ip.h>
-#include <Singular/feOpt.h>
-#include <Singular/silink.h>
+#include <misc/auxiliary.h>
+
+#include "misc_ip.h"
+#include "ipid.h"
+
+#include <coeffs/coeffs.h>
+// #include <coeffs/longrat.h>
+
+#include "feOpt.h"
+#include "silink.h"
 
 void number2mpz(number n, mpz_t m)
 {
-  if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
-  else             mpz_init_set(m, (mpz_ptr)n->z);
+  n_MPZ(m, n, coeffs_BIGINT);
 }
 
 number mpz2number(mpz_t m)
 {
-  number z = ALLOC_RNUMBER();
-  mpz_init_set(z->z, m);
-  mpz_init_set_ui(z->n, 1);
-  z->s = 3;
-  return z;
+  return n_Init(m, coeffs_BIGINT);
 }
+
 
 void divTimes(mpz_t n, mpz_t d, int* times)
 {
@@ -110,8 +108,7 @@ void setListEntry_ui(lists L, int index, unsigned long ui)
   }
   else
   {
-    number nn = nlRInit(ui);
-    mpz_set_ui(nn->z,ui);
+    number nn = n_Init(ui, coeffs_BIGINT);
     L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
   }
 }
@@ -175,6 +172,8 @@ void nextPrime(mpz_t p, mpz_t bound)
 }
 */
 
+
+
 /* n and pBound are assumed to be bigint numbers */
 lists primeFactorisation(const number n, const number pBound)
 {
@@ -187,9 +186,9 @@ lists primeFactorisation(const number n, const number pBound)
   int* multiplicities = new int[1000];
   int positive=1; int probTest = 0;
 
-  if (!nlIsZero(n))
+  if (!n_IsZero(n, coeffs_BIGINT))
   {
-    if (!nlGreaterZero(n))
+    if (!n_GreaterZero(n, coeffs_BIGINT))
     {
       positive=-1;
       mpz_neg(nn,nn);
@@ -331,34 +330,29 @@ lists primeFactorisation(const number n, const number pBound)
   return L;
 }
 
-#include <string.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
-
-#include <omalloc/mylimits.h>
 #include <omalloc/omalloc.h>
+#include <omalloc/mylimits.h>
+
 #include <misc/options.h>
-#include <kernel/febase.h>
-#include <Singular/cntrlc.h>
-#include <kernel/page.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <kernel/kstd1.h>
-#include <Singular/subexpr.h>
-#include <kernel/timer.h>
 #include <misc/intvec.h>
+
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
-/* Needed for debug Version of p_SetRingOfLeftv, Oliver */
-#ifdef PDEBUG
-#include <polys/polys.h>
-#endif
-#include <Singular/version.h>
 
-#include <Singular/static.h>
+#include <kernel/febase.h>
+#include <kernel/page.h>
+#include <kernel/kstd1.h>
+#include <kernel/timer.h>
+
+
+#include "subexpr.h"
+#include "cntrlc.h"
+#include "ipid.h"
+#include "ipshell.h"
+
+#include "version.h"
+#include "static.h"
+
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
 #endif
@@ -371,7 +365,7 @@ lists primeFactorisation(const number n, const number pBound)
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory/factory.h>
+//#include <factory/factory.h>
 // libfac:
   extern const char * libfac_version;
   extern const char * libfac_date;
@@ -398,6 +392,14 @@ lists primeFactorisation(const number n, const number pBound)
 *  sleep(10);
 *}
 */
+
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <time.h>
+
 
 void singular_example(char *str)
 {

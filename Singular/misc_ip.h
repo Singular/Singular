@@ -14,7 +14,7 @@
  *           coded in SINGULAR in some library. Due to performance reasons
  *           these algorithms have been moved to the C/C++ kernel.
  *
- * @author Frank Seelisch
+ * @author Frank Seelisch, Oleksandr Motsak
  *
  * @internal @version \$Id$
  *
@@ -24,27 +24,13 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include <coeffs/si_gmp.h>
+#include <misc/auxiliary.h>
+#include <coeffs/coeffs.h>
+
 #include <kernel/structs.h>
+#include <coeffs/si_gmp.h>
 
-// include basic SINGULAR structures
-/* So far nothing is required. */
-
-/**
- * Converts a non-negative bigint number into a GMP number.
- *
- **/
-void number2mpz(number n,   /**< [in]  a bigint number >= 0  */
-                mpz_t m     /**< [out] the GMP equivalent    */
-               );
-               
-/**
- * Converts a non-negative GMP number into a bigint number.
- *
- * @return the bigint number representing the given GMP number
- **/
-number mpz2number(mpz_t m   /**< [in]  a GMP number >= 0  */
-                 );
+#include <Singular/lists.h>
 
 /**
  * Divides 'n' as many times as possible by 'd' and returns the number
