@@ -88,5 +88,15 @@ lists primeFactorisation(
                                       seeked                            */
                         );
 
+
+
+#ifdef PDEBUG
+#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
+// #include <polys/polys.h>
+/* Needed for debug Version of p_SetRingOfLeftv, Oliver */
+void p_SetRingOfLeftv(leftv l, ring r);
+#endif
+#endif
+
 #endif
 /* MISC_H */

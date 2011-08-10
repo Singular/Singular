@@ -5,23 +5,30 @@
 
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-#include <polys/polys.h>
+
 #include <coeffs/numbers.h>
+
+#include <polys/polys.h>
 #include <polys/monomials/ring.h>
-#include <kernel/ideals.h>
-#include <Singular/subexpr.h>
-#include <polys/kbuckets.h>
-#include <coeffs/longrat.h>
 #include <polys/monomials/p_polys.h>
+#include <polys/kbuckets.h>
+
+#include <kernel/ideals.h>
+#include <kernel/longrat.h>
+#include <kernel/febase.h>
+#include <kernel/kutil.h>
+
+#include "subexpr.h"
+
+
+#include "janet.h"
 
 #if (defined(__CYGWIN__))
 #include <ctype.h>
 #endif
+
 #include <stdarg.h>
 
-#include <kernel/febase.h>
-#include <Singular/janet.h>
-#include <kernel/kutil.h>
 
 //------GLOBALS-------
 static int m_s,v_s,vectorized,VarN1,offset;
