@@ -1,5 +1,8 @@
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
+#ifdef HAVE_FACTORY
+#include <factory/factory.h> // :(
+#endif
 
 #include <misc/intvec.h>
 #include <misc/int64vec.h>
@@ -170,10 +173,6 @@ int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
 #include "walkSupport.h"
 
 
-// NOTE: including any of the following will lead to including factory.h with a bunch of C++ errors...
-#ifdef HAVE_FACTORY
-#include <factory/factory.h> // :(
-#endif
 // #include <polys/clapconv.h> // due to factory? :(
 // #include "tgb_internal.h" // :(
 // #include "F4.h" // uses tgb_internal // :(
