@@ -229,7 +229,7 @@ clean: mostlyclean
 
 distclean: clean
 	-rm -f *~ .\#* 
-	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
+	-rm -f Makefile TAGS* tags config.status config.cache config.log
 
 srcclean:
 	@echo "This command is intended for maintainers to use;"
@@ -240,6 +240,10 @@ maintainer-clean: distclean srcclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "Rebuilding the deleted files requires flex"
 	@echo "bison, perl and autoconf"
+
+#dep.
+feOpt.h: feOpt.inc
+misc_ip.cc: feOpt.h
 
 ##
 ## miscellanous targets
@@ -335,15 +339,15 @@ libkernel_p.a: ${OBJP} ${OBJSP2}
 ## dependencies
 ##
 
-%.dd: %.cc mod2.h 
+%.dd: %.cc
 	echo $(@:.dd=.og) $(@:.dd=.op) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
-%.d: %.c mod2.h 
+%.d: %.c
 	echo $(@:.d=.og) $(@:.d=.op) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
+depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d)
 	cat *.d *.dd >depend
 
 ifeq (depend,$(wildcard depend))
@@ -354,25 +358,25 @@ endif
 # My headers test
 # test: test.o
 
-test.o: test.cc mod2.h feOpt.inc
+test.o: test.cc feOpt.inc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-feOpt.inc: feOpt.cc mod2.h
+feOpt.inc: feOpt.cc
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} feOpt.cc -o feOpt
 	./feOpt
 	/bin/rm -f feOpt feOpt.exe
 
-feOptES.inc: feOpt.cc mod2.h
+feOptES.inc: feOpt.cc
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DESINGULAR -I../kernel feOpt.cc -o feOptES
 	./feOptES
 	rm -f feOptES feOptES.exe
 
-feOptTS.inc: feOpt.cc mod2.h
+feOptTS.inc: feOpt.cc
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
 
-iparith.inc: gentable.cc grammar.h tok.h table.h mod2.h
+iparith.inc: gentable.cc grammar.h tok.h table.h
 	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
 	     -o gentable1
 	./gentable1
