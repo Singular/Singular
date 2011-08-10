@@ -18,7 +18,7 @@
 #include <Singular/subexpr.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
-#include <polys/ext_fields/longalg.h>
+//#include <polys/ext_fields/longalg.h>
 #ifdef HAVE_RINGS
 #include <coeffs/rmodulon.h>
 #include <coeffs/rmodulo2m.h>

@@ -21,7 +21,7 @@
 
 #include <Singular/mpsr_Put.h>
 #include <Singular/mpsr_Tok.h>
-#include "kernel/longalg.h"
+//#include "kernel/longalg.h"
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
 #include <polys/polys.h>

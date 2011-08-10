@@ -54,7 +54,6 @@
 #include <kernel/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
-#include <polys/ext_fields/longalg.h>
 #include <coeffs/ffields.h>
 #include <coeffs/coeffs.h>
 #include <Singular/subexpr.h>

@@ -24,7 +24,7 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <polys/monomials/ring.h>
-#include "kernel/longalg.h"
+//#include "kernel/longalg.h"
 #include <polys/monomials/maps.h>
 #include <kernel/ideals.h>
 #include <Singular/grammar.h>

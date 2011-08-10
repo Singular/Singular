@@ -6,7 +6,6 @@
 #include <singular/structs.h>
 #include <singular/polys.h>
 #include <singular/longrat.h>
-#include <singular/longalg.h>
 #include <singular/numbers.h>
 #include <singular/febase.h>
 #include <singular/ring.h>

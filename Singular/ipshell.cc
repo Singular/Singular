@@ -30,7 +30,7 @@
 #include <kernel/syz.h>
 #include <coeffs/numbers.h>
 #include <kernel/modulop.h>
-#include <polys/ext_fields/longalg.h>
+//#include <polys/ext_fields/longalg.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>

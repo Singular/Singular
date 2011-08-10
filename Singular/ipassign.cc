@@ -29,7 +29,7 @@
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
 #include <coeffs/numbers.h>
-#include <polys/ext_fields/longalg.h>
+//#include <polys/ext_fields/longalg.h>
 #include <kernel/stairc.h>
 #include <polys/monomials/maps.h>
 #include <kernel/syz.h>
