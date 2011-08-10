@@ -7,16 +7,22 @@
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
+#include <misc/options.h>
+#include <misc/auxiliary.h>
+#ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+#endif
+
+#include <kernel/mod2.h>
+#include <Singular/tok.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
+
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>
@@ -34,16 +40,13 @@
 #include <Singular/bigintm.h>
 #include <Singular/pyobject_setup.h>
 #include <omalloc/omalloc.h>
+#include <kernel/mmalloc.h>
 
 #ifdef HAVE_FANS
 #include <kernel/bbcone.h>
 #include <kernel/bbfan.h>
 #endif
 
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory/factory.h>
-#endif
 
 extern int siInit(char *);
 
