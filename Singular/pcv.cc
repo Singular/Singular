@@ -106,7 +106,7 @@ BOOLEAN pcvPMulL(leftv res,leftv h)
 int pcvDeg(poly p)
 {
   int d=0;
-  for(int i=pVariables;i>=1;i--) d+=pGetExp(p,i);
+  for(int i=currRing->N;i>=1;i--) d+=pGetExp(p,i);
   return d;
 }
 
@@ -165,16 +165,16 @@ void pcvInit(int d)
 {
   if(d<0) d=1;
   pcvMaxDegree=d+1;
-  pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
+  pcvTableSize=currRing->N*pcvMaxDegree*sizeof(unsigned);
   pcvTable=(unsigned*)omAlloc0(pcvTableSize);
-  pcvIndexSize=pVariables*sizeof(unsigned*);
+  pcvIndexSize=currRing->N*sizeof(unsigned*);
   pcvIndex=(unsigned**)omAlloc(pcvIndexSize);
-  for(int i=0;i<pVariables;i++)
+  for(int i=0;i<currRing->N;i++)
     pcvIndex[i]=pcvTable+i*pcvMaxDegree;
   for(int i=0;i<pcvMaxDegree;i++)
     pcvIndex[0][i]=i;
   unsigned k,l;
-  for(int i=1;i<pVariables;i++)
+  for(int i=1;i<currRing->N;i++)
   {
     k=0;
     for(int j=0;j<pcvMaxDegree;j++)
@@ -183,7 +183,7 @@ void pcvInit(int d)
       if(l>unsigned(~0)-k)
       {
         j=pcvMaxDegree;
-        i=pVariables;
+        i=currRing->N;
         WerrorS("unsigned overflow");
       }
       else pcvIndex[i][j]=k+=l;
@@ -208,13 +208,13 @@ void pcvClean()
 int pcvM2N(poly m)
 {
   unsigned n=0,dn,d=0;
-  for(int i=0;i<pVariables;i++)
+  for(int i=0;i<currRing->N;i++)
   {
     d+=pGetExp(m,i+1);
     dn=pcvIndex[i][d];
     if(dn>INT_MAX-n)
     {
-      i=pVariables;
+      i=currRing->N;
       WerrorS("component overflow");
     }
     else n+=dn;
@@ -227,13 +227,13 @@ poly pcvN2M(int n)
   n--;
   poly m=pOne();
   int i,j=0,k;
-  for(i=pVariables-1;i>=0;i--)
+  for(i=currRing->N-1;i>=0;i--)
   {
     k=j;
     for(j=0; (j<pcvMaxDegree) && (pcvIndex[i][j]<=(unsigned)n); j++);
     j--;
     n-=pcvIndex[i][j];
-    if(i<pVariables-1) pSetExp(m,i+2,k-j);
+    if(i<currRing->N-1) pSetExp(m,i+2,k-j);
   }
   if(n==0)
   {
@@ -380,7 +380,7 @@ int pcvDim(int d0,int d1)
   if(d0<0) d0=0;
   if(d1<0) d1=0;
   pcvInit(d1);
-  int d=pcvIndex[pVariables-1][d1]-pcvIndex[pVariables-1][d0];
+  int d=pcvIndex[currRing->N-1][d1]-pcvIndex[currRing->N-1][d0];
   pcvClean();
   return d;
 }
@@ -410,7 +410,7 @@ BOOLEAN pcvDim(leftv res,leftv h)
 
 int pcvBasis(lists b,int i,poly m,int d,int n)
 {
-  if(n<pVariables)
+  if(n<currRing->N)
   {
     for(int k=0,l=d;k<=l;k++,d--)
     {
