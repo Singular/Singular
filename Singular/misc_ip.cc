@@ -356,6 +356,7 @@ lists primeFactorisation(const number n, const number pBound)
 #ifdef PDEBUG
 #include <polys/polys.h>
 #endif
+#include <Singular/version.h>
 
 #include <Singular/static.h>
 #ifdef HAVE_STATIC
@@ -834,11 +835,11 @@ char * versionString()
               StringAppendS("ratGB,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-//              StringAppend("\tCC=%s,\n\tCXX=%s"
+              StringAppend("\tCC=%s,\n\tCXX=%s"
 #ifdef __GNUC__
-//              "(" __VERSION__ ")"
+              "(" __VERSION__ ")"
 #endif
-//              "\n",CC,CXX);
+              "\n",CC,CXX);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");
