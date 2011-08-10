@@ -10,15 +10,13 @@
 
 #ifdef HAVE_GMS
 
-#include <kernel/febase.h>
-#include <kernel/structs.h>
+#include "gms.h"
+
 #include <coeffs/numbers.h>
 #include <polys/polys.h>
-#include <kernel/ideals.h>
-#include <Singular/lists.h>
-#include <polys/matpol.h>
-#include <Singular/gms.h>
+#include <kernel/febase.h>
 
+#include "ipid.h"
 
 lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
 {
@@ -27,7 +25,7 @@ lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
 
   matrix B0=mpNew(MATROWS(B),MATCOLS(B));
   for(int i=1;i<=MATROWS(B0);i++)
-    for(int j=1;j<=MATCOLS(B0);j++)
+     for(int j=1;j<=MATCOLS(B0);j++)
       if(MATELEM(B,i,j)!=NULL)
         MATELEM(B0,i,j)=pDiff(MATELEM(B,i,j),i+1);
 
@@ -85,8 +83,8 @@ lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
   idDelete(&p);
   idDelete((ideal *)&B0);
 
-  idNormalize(r);
-  idNormalize(q);
+  id_Normalize(r, currRing);
+  id_Normalize(q, currRing);
 
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
