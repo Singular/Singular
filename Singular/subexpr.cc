@@ -13,31 +13,41 @@
 #include <unistd.h>
 
 #include <kernel/mod2.h>
-#include <misc/intvec.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
-#include <Singular/ipid.h>
-#include <misc/intvec.h>
+
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <polys/polys.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/maps.h>
-#include <polys/matpol.h>
-#include <kernel/kstd1.h>
-#include <kernel/timer.h>
-#include <polys/monomials/ring.h>
+
+#include <misc/intvec.h>
+#include <misc/options.h>
+
+
 #include <coeffs/ffields.h>
 #include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
+
+#include <polys/monomials/maps.h>
+#include <polys/matpol.h>
+#include <polys/monomials/ring.h>
+#include <polys/polys.h>
+
+#include <kernel/longrat.h>
+// #include <coeffs/longrat.h>
+
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/timer.h>
+#include <kernel/syz.h>
+
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/silink.h>
-#include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
 #include <Singular/blackbox.h>
+
+
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));

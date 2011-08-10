@@ -9,14 +9,20 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #  include <factory/factory.h>
 #endif /* HAVE_FACTORY */
+
+#include <misc/intvec.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/polys.h>
+
+#include <coeffs/longrat.h>
+
+#include <kernel/longrat.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <misc/intvec.h>
-#include <polys/polys.h>
-#include <Singular/lists.h>
-#include <coeffs/longrat.h>
-#include <Singular/ipid.h>
-#include <polys/monomials/ring.h>
+
+#include "lists.h"
+#include "ipid.h"
 
 // parameters to debug
 //#define shmat
