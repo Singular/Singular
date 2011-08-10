@@ -21,8 +21,8 @@
 #include <polys/simpleideals.h>
 // #include <???/febase.h>
 // #include <???/intvec.h>
-#include <polys/ext_fields/longalg.h>
-#include <polys/ext_fields/longtrans.h>
+//#include <polys/ext_fields/longalg.h>
+//#include <polys/ext_fields/longtrans.h>
 // #include <coeffs/ffields.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/maps.h>
