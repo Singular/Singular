@@ -207,6 +207,8 @@ void iiCheckPack(package &p);
 void checkall();
 #endif
 void rSetHdl(idhdl h);
+ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
+idhdl rFindHdl(ring r, idhdl n, idhdl w);
 
 #endif
 

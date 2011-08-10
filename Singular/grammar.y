@@ -19,6 +19,7 @@
 #include <Singular/tok.h>
 #include <misc/options.h>
 #include <Singular/stype.h>
+#include <Singular/fehelp.h>
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <kernel/febase.h>
@@ -568,7 +569,7 @@ elemexpr:
               sprintf(tmp,"%d",i);
               if (strcmp(tmp,$1)!=0)
               {
-                nlRead($1,&n);
+                n_Read($1,&n,coeffs_BIGINT);
                 $$.rtyp=BIGINT_CMD;
                 $$.data = n;
               }
