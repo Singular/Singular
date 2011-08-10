@@ -48,7 +48,8 @@ REFERENCES:
 
 PROCEDURES:
  signatureBrieskorn(a1,a2,a3);  signature of singularity x^a1+y^a2+z^a3
- signatureNemethi(N,f);         signature of singularity z^N+f(x,y)=0, f irred.
+ signaturePuiseux(N,f);         signature of singularity z^N+f(x,y)=0, f irred.
+ signatureNemethi(N,f);         signature of singularity z^N+f(x,y)=0
 ";
 
 LIB "hnoether.lib";
@@ -96,7 +97,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc signatureBrieskorn(a1,a2,a3)
+proc signatureBrieskorn(int a1, int a2, int a3)
 "USAGE:  signatureBrieskorn(a1,a2,a3); a1,a2,a3 = integers
 RETURN:  signature of Brieskorn singularity x^a1+y^a2+z^a3
 EXAMPLE: example signatureBrieskorn; shows an example
@@ -147,10 +148,10 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc signatureP(int N,poly f)
-"USAGE:  signatureP(N,f); N = integer, f = irreducible poly in 2 variables
+proc signaturePuiseux(int N, poly f)
+"USAGE:  signaturePuiseux(N,f); N = int, f = irreducible poly in 2 variables
 RETURN:  signature of surface singularity defined by z^N + f(x,y) = 0
-EXAMPLE: example signatureP; shows an example
+EXAMPLE: example signaturePuiseux; shows an example
 "
 {
    int i, d, prod, sigma;
@@ -179,7 +180,7 @@ example
    int N  = 3;
    poly f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
             +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
-   signatureP(N,f);
+   signaturePuiseux(N,f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,7 +296,7 @@ static proc etaRes(list L, int K)
    for(i=1;i<=n;i++)
    {
       v=N[i,1..n];
-      if(isRupture(v))    // the divisor intersects more then two others
+      if(isRupture(v))      // the divisor intersects more then two others
       {
          for(j=1;j<=n;j++)
          {
@@ -312,6 +313,16 @@ static proc etaRes(list L, int K)
       return(4*e);
    }
    return(a-1+4*e+sumEdges(N,M,K,n)-sumExcepDiv(N,M,K,n));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc signatureRes(int N, poly f)
+//=== computes signature of surface singularity defined by z^N + f(x,y) = 0
+//=== in terms of the imbedded resolution graph of f
+{
+   list L = totalmultiplicities(f);
+   return(etaRes(L,N) - N*etaRes(L,1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -384,15 +395,31 @@ static proc etaSpec(list L, int N)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//---------------- Consolidation of the three former variants -----------------
+
+static proc signatureSpec(int N, poly f)
+//=== computes signature of surface singularity defined by z^N + f(x,y) = 0
+//=== in terms of the spectral pairs of f
+{
+   def R = basering;
+   def Rds = changeord("ds");
+   setring Rds;
+   poly f = imap(R,f);
+   list L = sppairs(f);
+   setring R;
+   list L = imap(Rds,L);
+   return(etaSpec(L,N) - N*etaSpec(L,1));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//----------------- Consolidation of the two recent variants ------------------
 
 proc signatureNemethi(int N, poly f, list #)
 "USAGE:  signatureNemethi(N,f); N = integer, f = reduced poly in 2 variables,
                                 # empty or 1,2,3
-@*       - if # is empty or #[1] = 2 then resolution of singularities is used
-@*       - if #[1] = 1 then f has to be analytically irreducible and Puiseux
-                       expansions are used
-@*       - if #[1] = 3 then spectral pairs are used
+@*       - if #[1] = 1 then resolution of singularity is used
+@*       - if #[1] = 2 then spectral pairs are used
+@*       - if # is empty then both upper variants are used in parallel and the
+@*                 fastest returns the result
 RETURN:  signature of surface singularity defined by z^N + f(x,y) = 0
 REMARK:  computes the signature of some special surface singularities
 EXAMPLE: example signatureNemethi; shows an example
@@ -400,31 +427,31 @@ EXAMPLE: example signatureNemethi; shows an example
 {
    if(size(#) == 0)
    {
-      list L = totalmultiplicities(f);
-      return(etaRes(L,N) - N*etaRes(L,1));
+      link l(1) = "ssi:fork"; open(l(1));
+      link l(2) = "ssi:fork"; open(l(2));
+      list l = list(l(1),l(2));
+      write(l(1), quote(signatureRes(N,f)));
+      write(l(2), quote(signatureSpec(N,f)));
+      int winner = waitfirst(l);
+      number sigma = read(l(winner));
+      close(l(1));
+      close(l(2));
+      if(printlevel >= 1)
+      {
+         if(winner == 1) { "Resolution of singularity has been used."; }
+         if(winner == 2) { "Spectral pairs have been used."; }
+      }
+      return(sigma);
    }
 
    if(#[1] == 1)
    {
-      return(signatureP(N,f));
+      return(signatureRes(N,f));
    }
 
    if(#[1] == 2)
    {
-      list L = totalmultiplicities(f);
-      return(etaRes(L,N) - N*etaRes(L,1));
-   }
-
-   if(#[1] == 3)
-   {
-      def R = basering;
-      def Rds = changeord("ds");
-      setring Rds;
-      poly f = imap(R,f);
-      list L = sppairs(f);
-      setring R;
-      list L = imap(Rds,L);
-      return(etaSpec(L,N) - N*etaSpec(L,1));
+      return(signatureSpec(N,f));
    }
 }
 example
@@ -434,7 +461,8 @@ example
    poly f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
             +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
    signatureNemethi(N,f,1);
-   signatureNemethi(N,f,2);
+   printlevel = 1;
+   signatureNemethi(N,f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
