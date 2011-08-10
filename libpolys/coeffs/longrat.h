@@ -89,6 +89,7 @@ number   nlGetNumerator(number &n, const coeffs r);
 void     nlCoeffWrite(const coeffs r);
 number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C);
 number   nlFarey(number nN, number nP, const coeffs CF);
+
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif

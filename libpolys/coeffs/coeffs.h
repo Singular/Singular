@@ -115,13 +115,22 @@ struct n_Procs_s
                                 // or NULL
    // general stuff
    numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
+   
    /// init with an integer
    number  (*cfInit)(int i,const coeffs r);
+
+   /// init with a GMP integer
+   number  (*cfInitMPZ)(mpz_t i, const coeffs r);
+   
    /// how complicated, (0) => 0, or positive
    int     (*cfSize)(number n, const coeffs r);
-   /// convertion, 0 if impossible
+   
+   /// convertion to int, 0 if impossible
    int     (*cfInt)(number &n, const coeffs r);
 
+   /// Converts a non-negative number n into a GMP number, 0 if impossible
+   void     (*cfMPZ)(mpz_t result, number &n, const coeffs r);
+   
 #ifdef HAVE_RINGS
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
@@ -373,10 +382,19 @@ static inline number n_GetUnit(number n, const coeffs r)
 static inline number n_Init(int i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
+/// conversion of a GMP integer to number
+static inline number n_Init(mpz_t n,     const coeffs r)
+{ assume(r != NULL); assume(r->cfInitMPZ != NULL); return r->cfInitMPZ(n,r); }
+
 /// conversion of n to an int; 0 if not possible
 /// in Z/pZ: the representing int lying in (-p/2 .. p/2]
 static inline int n_Int(number &n,       const coeffs r)
 { assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
+
+/// conversion of n to a GMP integer; 0 if not possible
+static inline void n_MPZ(mpz_t result, number &n,       const coeffs r)
+{ assume(r != NULL); assume(r->cfMPZ!=NULL); r->cfMPZ(result, n, r); }
+
 
 /// in-place negation of n
 /// MUST BE USED: n = n_Neg(n) (no copy is returned)

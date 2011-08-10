@@ -145,6 +145,19 @@ number  ndInit_bigint(number, const coeffs, const coeffs)
   return NULL;
 }
 
+/**< [in, out] a bigint number >= 0  */
+/**< [out] the GMP equivalent    */
+/// Converts a non-negative bigint number into a GMP number.
+void ndMPZ(mpz_t result, number &n, const coeffs r)
+{
+  mpz_init_set_si( result, n_Int(n, r) );
+}
+
+number ndInitMPZ(mpz_t m, const coeffs r)
+{ 
+  return n_Init( mpz_get_si(m), r);
+}
+
 
 BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
 {
@@ -214,6 +227,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfGcd  = ndGcd;
     n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
     n->cfInit_bigint = ndInit_bigint;
+    n->cfInitMPZ = ndInitMPZ;
+    n->cfMPZ = ndMPZ;
+
     //n->cfKillChar = ndKillChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
 
@@ -265,8 +281,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfIntMod!=NULL);
     assume(n->cfExactDiv!=NULL);
     assume(n->cfInit!=NULL);
+    assume(n->cfInitMPZ!=NULL);
     assume(n->cfSize!=NULL);
     assume(n->cfInt!=NULL);
+    assume(n->cfMPZ!=NULL);
     //assume(n->n->cfDivComp!=NULL);
     //assume(n->cfIsUnit!=NULL);
     //assume(n->cfGetUnit!=NULL);
@@ -294,7 +312,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfSetMap!=NULL);
     assume(n->cfName!=NULL);
     assume(n->cfInpMult!=NULL);
-    //assume(n->cfInit_bigint!=NULL);
+//    assume(n->cfInit_bigint!=NULL);
     assume(n->cfCoeffWrite != NULL);
 #ifdef LDEBUG
     assume(n->cfDBTest!=NULL);
