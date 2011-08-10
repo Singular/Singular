@@ -78,7 +78,7 @@ typedef struct
 } SModulFunctions;
 
 
-/*extern idhdl      currRingHdl; in ring.h */
+extern idhdl      currRingHdl;
 /*extern ring     currRing;  in ring.h */
 /*extern ideal      currQuotient; in structs.h */
 
