@@ -1114,6 +1114,7 @@ void siInit(char *name)
   IDPACKAGE(h)=basePack;
   currPackHdl=h;
   basePackHdl=h;
+  coeffs_BIGINT=nInitChar(n_Q,NULL);
 
 // random generator: -----------------------------------------------
   int t=initTimer();

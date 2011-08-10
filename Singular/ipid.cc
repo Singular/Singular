@@ -39,6 +39,10 @@ omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
 //omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
 omBin idrec_bin = omGetSpecBin(sizeof(idrec));
 
+coeffs coeffs_BIGINT;
+
+FILE   *feFilePending; /*temp. storage for grammar.y */
+
 proclevel *procstack=NULL;
 #define TEST
 //idhdl idroot = NULL;

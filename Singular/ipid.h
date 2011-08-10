@@ -131,6 +131,11 @@ void ipListFlag(idhdl h);
 extern omBin sip_command_bin;
 extern omBin sip_package_bin;
 extern omBin idrec_bin;
+extern omBin sleftv_bin;
+
+extern coeffs coeffs_BIGINT;
+
+extern FILE   *feFilePending; /*temp. storage for grammar.y */
 #endif
 
 
