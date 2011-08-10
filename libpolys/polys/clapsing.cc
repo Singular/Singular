@@ -24,6 +24,7 @@
 
 #include "monomials/ring.h"
 #include "simpleideals.h"
+#include "ext_fields/transext.h"
 //#include "polys.h"
 
 
@@ -282,15 +283,15 @@ void singclap_divide_content ( poly f, const ring r )
       }
       pIter(p);
     }
-    g = convSingPFactoryP( ((lnumber)g1)->z, r->cf->extRing );
-    g = gcd( g, convSingPFactoryP( ((lnumber)g2)->z , r->cf->extRing));
+    g = convSingPFactoryP( NUM(((fraction)g1)), r->cf->extRing );
+    g = gcd( g, convSingPFactoryP( NUM(((fraction)g2)) , r->cf->extRing));
 
     // second run: gcd's
 
     p = f;
     while ( (p != NULL) && (g != 1)  && ( g != 0))
     {
-      h = convSingPFactoryP( ((lnumber)pGetCoeff(p))->z, r->cf->extRing );
+      h = convSingPFactoryP( NUM(((fraction)pGetCoeff(p))), r->cf->extRing );
       pIter( p );
 
       g = gcd( g, h );
@@ -307,9 +308,9 @@ void singclap_divide_content ( poly f, const ring r )
       CFListIterator i;
       for ( i = L, p = f; i.hasItem(); i++, p=pNext(p) )
       {
-        lnumber c=(lnumber)pGetCoeff(p);
-        p_Delete(&c->z,r->cf->extRing); // 2nd arg used to be nacRing
-        c->z=convFactoryPSingP( i.getItem() / g, r->cf->extRing );
+        fraction c=(fraction)pGetCoeff(p);
+        p_Delete(&(NUM(c)),r->cf->extRing); // 2nd arg used to be nacRing
+        NUM(c)=convFactoryPSingP( i.getItem() / g, r->cf->extRing );
         //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;

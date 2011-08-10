@@ -14,7 +14,7 @@
 #ifdef HAVE_FACTORY
 
 #include <polys/monomials/ring.h>
-#include <polys/ext_fields/longtrans.h>
+//#include <polys/ext_fields/longtrans.h>
 #include <factory/factory.h>
 
 

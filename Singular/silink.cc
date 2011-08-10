@@ -699,7 +699,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
   if (fprintf(fd, "%s temp_ring = %s;\n", Tok2Cmdname(RING_CMD), ring_str)
               == EOF) return TRUE;
   if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD),
-              iiStringMatrix((matrix) IDRING(h)->qideal, 1))
+              iiStringMatrix((matrix) IDRING(h)->qideal, 1, currRing, n_GetChar(currRing->cf)))
       == EOF) return TRUE;
   if (fprintf(fd, "attrib(temp_ideal, \"isSB\", 1);\n") == EOF) return TRUE;
   if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
@@ -774,10 +774,10 @@ static int DumpRhs(FILE *fd, idhdl h)
     omFree(rhs);
 
     if ((type_id == RING_CMD || type_id == QRING_CMD) &&
-        IDRING(h)->minpoly != NULL)
+        IDRING(h)->cf->type==n_algExt)
     {
       StringSetS("");
-      nWrite(IDRING(h)->minpoly);
+      nWrite(IDRING(h)->cf->minpoly);
       rhs = StringAppendS("");
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
     }
