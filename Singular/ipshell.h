@@ -208,6 +208,8 @@ void checkall();
 void rSetHdl(idhdl h);
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl rFindHdl(ring r, idhdl n, idhdl w);
+void   rKill(idhdl h);
+void   rKill(ring r);
 
 #endif
 

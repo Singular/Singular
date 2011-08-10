@@ -131,7 +131,7 @@ void *idrecDataInit(int t)
     case NUMBER_CMD:
       return (void *) nInit(0);
     case BIGINT_CMD:
-      return (void *) nlInit(0, NULL /* dummy for nlInit*/);
+      return (void *) n_Init(0, coeffs_BIGINT);
     case IDEAL_CMD:
     case MODUL_CMD:
     case MATRIX_CMD:
