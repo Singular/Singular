@@ -18,7 +18,7 @@
 #ifdef HAVE_MPSR
 
 #include <Singular/mpsr_Get.h>
-#include "kernel/longalg.h"
+//#include "kernel/longalg.h"
 #include <Singular/tok.h>
 #include <polys/monomials/maps.h>
 #include <Singular/lists.h>
