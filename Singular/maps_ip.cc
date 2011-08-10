@@ -7,20 +7,24 @@
 */
 
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <kernel/febase.h>
-#include <polys/polys.h>
+
+#include "maps_ip.h"
+
+#include <omalloc/omalloc.h>
+
 #include <coeffs/numbers.h>
 #include <polys/monomials/ring.h>
-#include <kernel/ideals.h>
+// #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
-#include <omalloc/omalloc.h>
-#include <kernel/kstd1.h>
-#include <kernel/longalg.h>
-#include <Singular/lists.h>
-#include <polys/monomials/maps.h>
-#include <Singular/maps_ip.h>
 #include <polys/prCopy.h>
+
+// #include <kernel/longalg.h>
+
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+
+#include "lists.h"
+#include "tok.h"
 
 // define this if you want to use the fast_map routine for mapping ideals
 //#define FAST_MAP
