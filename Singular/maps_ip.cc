@@ -18,7 +18,7 @@
 // #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
 #include <polys/prCopy.h>
-#include <libpolys/polys/ext_fields/longtrans.h>
+//#include <libpolys/polys/ext_fields/longtrans.h>
 #include <libpolys/polys/monomials/maps.h>
 #include <libpolys/coeffs/coeffs.h>
 

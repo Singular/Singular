@@ -24,7 +24,7 @@
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
 //#include <polys/ext_fields/longalg.h>
-#include <polys/ext_fields/longtrans.h>
+//#include <polys/ext_fields/longtrans.h>
 #include <kernel/ideals.h>
 #include <polys/prCopy.h>
 #include <polys/matpol.h>
