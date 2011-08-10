@@ -693,6 +693,7 @@ srcdist:
 	touch  grammar.cc;\
 	touch  scanner.cc;\
 	cd ../..;\
+	chmod -R a+rX .;\
 	tar cf - Singular-${S_VERSION}| ${MYGZIP} > Singular-${S_VERSION}.tar.gz
 	mv ${SI_TMPDIR}/Singular-${S_VERSION}.tar.gz .
 	rm -rf ${SI_TMPDIR}
