@@ -34,15 +34,21 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_CFLAGS = -I.. -I../libpolys
+LIBPOLYS_INCLUDES = -I.. -I../libpolys
+LIBPOLYS_CFLAGS = ${LIBPOLYS_INCLUDES}
 LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc
 LIBPOLYS_LIBSG   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
 
+
+PYTHON_INCLUDES = `python-config --includes`
+PYTHON_CFLAGS = `python-config --cflags`
+PYTHON_LIBS   = `python-config --libs`
+
 PIPE		= -pipe
-CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
-CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS}
+CFLAGS		= -O3 -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
+CXXFLAGS	= -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I..  -I${includedir}   ${LIBPOLYS_CFLAGS}
+CPPFLAGS	= -I${srcdir} -I..  -I${includedir} ${LIBPOLYS_INCLUDES}  ${PYTHON_INCLUDES}
 DEFS		= -DNDEBUG -DOM_NDEBUG
 LDFLAGS		= -L${srcdir}/lib 
 LD_DYN_FLAGS	= -ldl -rdynamic
@@ -51,7 +57,7 @@ SLDFLAGS	= -shared
 
 LD_LIBC	        = -lc
 STATIC_LDFLAGS	= -static
-LIBS		= -lm -lsingfac -lsingcf -lntl -lgmp -lreadline -lncurses -lm  -lnsl  -lomalloc_ndebug 
+LIBS		= -lm -lsingfac -lsingcf -lntl -lgmp -lreadline -lncurses -lm  -lnsl  -lomalloc_ndebug ${PYTHON_LIBS}
 MP_LIBS		= -lMPT -lMP -lnsl 
 
 ## End configuration dependend stuff
