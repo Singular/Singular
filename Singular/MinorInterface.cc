@@ -1,26 +1,30 @@
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <polys/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <polys/matpol.h>
+// include before anything to avoid clashes with stdio.h included elsewhere
+#include <cstdio>
+
 #include <MinorInterface.h>
 #include <MinorProcessor.h>
 
+#include <polys/polys.h>
+#include <kernel/structs.h>
+
+#include <kernel/mod2.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+
 bool currRingIsOverIntegralDomain ()
 {
-  if (rField_is_Ring_PtoM()) return false;
-  if (rField_is_Ring_2toM()) return false;
-  if (rField_is_Ring_ModN()) return false;
+  if (rField_is_Ring_PtoM(currRing)) return false;
+  if (rField_is_Ring_2toM(currRing)) return false;
+  if (rField_is_Ring_ModN(currRing)) return false;
   return true;
 }
 
 bool currRingIsOverField ()
 {
-  if (rField_is_Ring_PtoM()) return false;
-  if (rField_is_Ring_2toM()) return false;
-  if (rField_is_Ring_ModN()) return false;
-  if (rField_is_Ring_Z())    return false;
+  if (rField_is_Ring_PtoM(currRing)) return false;
+  if (rField_is_Ring_2toM(currRing)) return false;
+  if (rField_is_Ring_ModN(currRing)) return false;
+  if (rField_is_Ring_Z(currRing))    return false;
   return true;
 }
 
@@ -58,7 +62,7 @@ bool arrayIsNumberArray (const poly* polyArray, const ideal iSB,
       if (!isConstant) result = false;
       else
       {
-        intArray[i] = n_Int(pGetCoeff(nfPolyArray[i]), currRing);
+        intArray[i] = n_Int(pGetCoeff(nfPolyArray[i]), currRing->cf);
         if (characteristic != 0) intArray[i] = intArray[i] % characteristic;
         if (intArray[i] == 0) zeroCounter++;
       }
@@ -210,7 +214,7 @@ ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
   else
   {
     if ((k == 0) && (strcmp(algorithm, "Bareiss") == 0)
-        && (!rField_is_Ring_Z()) && (!allDifferent))
+        && (!rField_is_Ring_Z(currRing)) && (!allDifferent))
     {
       /* In this case, we call an optimized procedure, dating back to
          Wilfried Pohl. It may be used whenever
@@ -266,7 +270,7 @@ ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
   }
 
   if ((k == 0) && (strcmp(algorithm, "Bareiss") == 0)
-      && (!rField_is_Ring_Z()) && (!allDifferent))
+      && (!rField_is_Ring_Z(currRing)) && (!allDifferent))
   {
     /* In this case, we call an optimized procedure, dating back to
        Wilfried Pohl. It may be used whenever
@@ -524,7 +528,8 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
     if      (minorSize <= 2)                                     b = true;
     else if (vars <= 2)                                          b = true;
     else if (currRingIsOverField() && (vars == 3)
-             && (currRing->ch >= 2) && (currRing->ch <= 32003))  b = true;
+             && (currRing->cf->ch >= 2) && (currRing->cf->ch <= 32003))
+	    b = true;
   }
   if (!b)
   { /* the non-Bareiss cases */

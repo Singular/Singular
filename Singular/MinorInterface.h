@@ -1,6 +1,10 @@
 #ifndef MINOR_INTERFACE_H
 #define MINOR_INTERFACE_H
 
+
+#include <polys/simpleideals.h>
+#include <polys/polys.h>
+
 /* all computations are module char, if char <> 0;
    if additionally, an ideal i != NULL is given, then computations are
    modulo i (in this case, i is assumed to be a standard basis);
