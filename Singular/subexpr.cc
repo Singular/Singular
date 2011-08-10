@@ -145,7 +145,7 @@ void sleftv::Print(leftv store, int spaces)
         case RESOLUTION_CMD:
         {
           syStrategy tmp=(syStrategy)d;
-          syPrint(tmp);
+          syPrint(tmp,IDID(currRingHdl));
           break;
         }
         case STRING_CMD:
