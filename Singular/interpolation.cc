@@ -5,6 +5,10 @@
 
 #include <kernel/mod2.h>
 #include <misc/options.h>
+#ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#  include <factory/factory.h>
+#endif /* HAVE_FACTORY */
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
 #include <misc/intvec.h>
@@ -13,10 +17,6 @@
 #include <coeffs/longrat.h>
 #include <Singular/ipid.h>
 #include <polys/monomials/ring.h>
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-#  include <factory/factory.h>
-#endif /* HAVE_FACTORY */
 
 // parameters to debug
 //#define shmat
