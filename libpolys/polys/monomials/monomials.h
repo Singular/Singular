@@ -102,10 +102,10 @@ while (0)
 #define pFalseReturn(cond)  do {if (! (cond)) return FALSE;} while (0)
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
 #define p_SetRingOfLm(p, r) omSetCustomOfAddr(p, r)
-void p_SetRingOfLeftv(leftv l, ring r);
+//void p_SetRingOfLeftv(leftv l, ring r);
 #else
 #define p_SetRingOfLm(p, r) ((void)0)
-#define p_SetRingOfLeftv(l, r) ((void)0)
+//#define p_SetRingOfLeftv(l, r) ((void)0)
 #endif
 
 #else // ! defined(PDEBUG)
@@ -117,7 +117,7 @@ void p_SetRingOfLeftv(leftv l, ring r);
 #define pPolyAssumeReturn(cond)      ((void)0)
 #define _pPolyAssumeReturn(cond,p,r) ((void)0)
 #define p_SetRingOfLm(p, r)          ((void)0)
-#define p_SetRingOfLeftv(l, r)       ((void)0)
+//#define p_SetRingOfLeftv(l, r)       ((void)0)
 #endif // defined(PDEBUG)
 
 #if PDEBUG >= 1
