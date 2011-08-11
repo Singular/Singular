@@ -753,14 +753,11 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     {
       Variable a;
       if (hasFirstAlgVar (fc, a) || hasFirstAlgVar (gc, a))
-      {
         fc=GCD_Fp_extension (fc, gc, a);
-      }
-      if (CFFactory::gettype() == GaloisFieldDomain)
-      {
+      else if (CFFactory::gettype() == GaloisFieldDomain)
         fc=GCD_GF (fc, gc);
-      }
-      fc=GCD_small_p (fc, gc);
+      else
+        fc=GCD_small_p (fc, gc);
     }
     #endif
     else if ( p1 == fc.level() )

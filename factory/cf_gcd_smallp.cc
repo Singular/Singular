@@ -4074,10 +4074,11 @@ bool findeval_P (const CanonicalForm & F, const CanonicalForm & G,
     if( count++ > maxeval )
       return false;
   }
-  CanonicalForm evalPoint;
   if (count > 0)
   {
     b.nextpoint(k);
+    if (k == 0)
+      k++;
     l++;
     if (l > bound)
     {
