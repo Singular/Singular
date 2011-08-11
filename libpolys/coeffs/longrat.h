@@ -9,6 +9,7 @@
 */
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
+
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
@@ -20,8 +21,6 @@
 
 #define MP_SMALL 1
 
-#define mpz_size1(A) (ABS((A)->_mp_size))
-//#define mpz_size1(A) mpz_size(A)
 
 struct snumber;
 typedef struct snumber  *number;
