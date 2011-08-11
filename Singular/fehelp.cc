@@ -14,16 +14,19 @@
 #include <time.h>
 
 #include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <Singular/tok.h>
+
 #include <omalloc/omalloc.h>
+#include <omalloc/mylimits.h>
+
 #include <kernel/febase.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/libparse.h>
-#include <Singular/feOpt.h>
 #include <reporter/reporter.h>
 
+#include "ipid.h"
+#include "ipshell.h"
+#include "libparse.h"
+#include "feOpt.h"
+
+#include "tok.h"
 #include "fehelp.h"
 
 /*****************************************************************
@@ -77,7 +80,7 @@ static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,in
 static void heHtmlHelp(heEntry hentry,int);
 static void heWinHelp(heEntry hentry,int);
 static void heWinHtmlHelp(heEntry hentry,int);
-#include <Singular/sing_win.h>
+#include "sing_win.h"
 #endif
 
 static heBrowser heCurrentHelpBrowser = NULL;

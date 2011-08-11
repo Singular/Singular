@@ -353,6 +353,8 @@ lists primeFactorisation(const number n, const number pBound)
 #include "version.h"
 #include "static.h"
 
+#include "fehelp.h"
+
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
 #endif
