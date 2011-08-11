@@ -14,7 +14,7 @@
  *           coded in SINGULAR in some library. Due to performance reasons
  *           these algorithms have been moved to the C/C++ kernel.
  *
- * @author Frank Seelisch, Oleksandr Motsak
+ * @author Frank Seelisch
  *
  * @internal @version \$Id$
  *
@@ -25,10 +25,9 @@
 #define MISC_H
 
 #include <misc/auxiliary.h>
-#include <coeffs/coeffs.h>
 
-#include <kernel/structs.h>
 #include <coeffs/si_gmp.h>
+#include <coeffs/coeffs.h>
 
 #include <Singular/lists.h>
 
@@ -80,6 +79,7 @@ lists primeFactorisation(
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
 // #include <polys/polys.h>
 /* Needed for debug Version of p_SetRingOfLeftv, Oliver */
+#include <kernel/structs.h>
 void p_SetRingOfLeftv(leftv l, ring r);
 #endif
 #endif
