@@ -26,6 +26,7 @@
 // #include "mod2.h"
 
 #include <Singular/tok.h>
+#include <Singular/ipshell.h>
 #include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
@@ -202,7 +203,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   d->r=r;
   d->r->ref++;
   SSI_BLOCK_CHLD;
-  fprintf(d->f_write,"%d %d ",r->ch,r->N);
+  fprintf(d->f_write,"%d %d ",n_GetChar(r->cf),r->N);
 
   int i;
   for(i=0;i<r->N;i++)
@@ -346,7 +347,7 @@ number ssiReadBigInt(ssiInfo *d)
   {
    case 3:
      {// read int or mpz_t or mpz_t, mpz_t
-       number n=nlRInit(0);
+       number n=(number)omAlloc0(sizeof(snumber_dummy));
        SSI_BLOCK_CHLD;
        mpz_inp_str(((number_dummy)n)->z,d->f_read,0);
        SSI_UNBLOCK_CHLD;
@@ -359,7 +360,7 @@ number ssiReadBigInt(ssiInfo *d)
        SSI_BLOCK_CHLD;
        fscanf(d->f_read,"%d",&dd);
        SSI_UNBLOCK_CHLD;
-       return INT_TO_SR(dd);
+       return n_Init(dd,d->r->cf);
      }
    default:
        Werror("error in reading bigint: invalid subtype %d",sub_type);
@@ -380,7 +381,7 @@ number ssiReadNumber(ssiInfo *d)
      case 0:
      case 1:
        {// read mpz_t, mpz_t
-         number n=nlRInit(0);
+         number n=(number)omAlloc0(sizeof(snumber_dummy));
          mpz_init(((number_dummy)n)->n);
          SSI_BLOCK_CHLD;
          gmp_fscanf(d->f_read,"%Zd %Zd",((number_dummy)n)->z,((number_dummy)n)->n);
@@ -391,7 +392,7 @@ number ssiReadNumber(ssiInfo *d)
 
      case 3:
        {// read mpz_t
-         number n=nlRInit(0);
+         number n=(number)omAlloc0(sizeof(snumber_dummy));
          SSI_BLOCK_CHLD;
          gmp_fscanf(d->f_read,"%Zd",((number_dummy)n)->z);
          SSI_UNBLOCK_CHLD;
@@ -404,12 +405,12 @@ number ssiReadNumber(ssiInfo *d)
          SSI_BLOCK_CHLD;
          fscanf(d->f_read,"%d",&dd);
          SSI_UNBLOCK_CHLD;
-         return INT_TO_SR(dd);
+         return n_Init(dd,d->r->cf);
        }
      case 5:
      case 6:
        {// read raw mpz_t, mpz_t
-         number n=nlRInit(0);
+         number n=(number)omAlloc0(sizeof(snumber_dummy));
          mpz_init(((number_dummy)n)->n);
          SSI_BLOCK_CHLD;
          mpz_inp_str (((number_dummy)n)->z, d->f_read, 32);
@@ -420,7 +421,7 @@ number ssiReadNumber(ssiInfo *d)
        }
      case 8:
        {// read raw mpz_t
-         number n=nlRInit(0);
+         number n=(number)omAlloc0(sizeof(snumber_dummy));
          SSI_BLOCK_CHLD;
          mpz_inp_str (((number_dummy)n)->z, d->f_read, 32);
          SSI_UNBLOCK_CHLD;
