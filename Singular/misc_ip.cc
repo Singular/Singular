@@ -16,11 +16,19 @@
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
+#ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+// libfac:
+extern const char * libfac_version;
+extern const char * libfac_date;
+#endif
+
 #include "misc_ip.h"
 #include "ipid.h"
 
+#include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
-// #include <coeffs/longrat.h>
 
 #include "feOpt.h"
 #include "silink.h"
@@ -365,13 +373,6 @@ lists primeFactorisation(const number n, const number pBound)
 //#  include "libparse.h"
 //#endif /* HAVE_LIBPARSER */
 
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-//#include <factory/factory.h>
-// libfac:
-  extern const char * libfac_version;
-  extern const char * libfac_date;
-#endif
 
 /* version strings */
 #ifdef HAVE_MPSR
