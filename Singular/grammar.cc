@@ -3247,6 +3247,7 @@ yyreduce:
 
             if (b!=NULL)
             {
+	      if (yyvsp[-6].lv.rtyp==IDHDL) 
                 newRingHdl=enterid(ring_name, myynest, RING_CMD,
                                    &(yyvsp[-6].lv.req_packhdl->idroot),FALSE);
               yyvsp[-6].lv.CleanUp();
