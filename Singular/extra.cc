@@ -8,13 +8,20 @@
 
 #define HAVE_WALK 1
 
+#include <kernel/mod2.h>
+#include <misc/auxiliary.h>
+
+#ifdef HAVE_FACTORY
+// #define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+#endif
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <signal.h>
-#include <kernel/mod2.h>
-#include <misc_ip.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -34,29 +41,59 @@
 
 #include <unistd.h>
 
-#include <Singular/tok.h>
 #include <misc/options.h>
-#include <Singular/ipid.h>
+
+// #include <coeffs/ffields.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/mpr_complex.h>
+
+#include <polys/monomials/ring.h>
 #include <polys/polys.h>
-#include <Singular/lists.h>
-#include <kernel/kutil.h>
-#include <Singular/cntrlc.h>
+
+#include <polys/monomials/maps.h>
+#include <polys/matpol.h>
+
+// #include <kernel/longalg.h>
+#include <polys/prCopy.h>
+#include <polys/weight.h>
+
+
+#include <kernel/fast_mult.h>
+#include <kernel/digitech.h>
 #include <kernel/stairc.h>
-#include <Singular/ipshell.h>
 #include <kernel/modulop.h>
 #include <kernel/febase.h>
-#include <polys/matpol.h>
-//#include <kernel/longalg.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>
 #include <kernel/syz.h>
-#include <Singular/sdb.h>
-#include <Singular/feOpt.h>
-#include <Singular/distrib.h>
-#include <polys/prCopy.h>
-#include <coeffs/mpr_complex.h>
-#include <coeffs/ffields.h>
-#include <Singular/minpoly.h>
+#include <kernel/kutil.h>
+
+#include <kernel/shiftgb.h>
+#include <kernel/linearAlgebra.h>
+
+// for tests of t-rep-GB
+#include <kernel/tgb.h>
+
+
+#include "tok.h"
+#include "ipid.h"
+#include "lists.h"
+#include "cntrlc.h"
+#include "ipshell.h"
+#include "sdb.h"
+#include "feOpt.h"
+#include "fehelp.h"
+#include "distrib.h"
+
+#include "minpoly.h"
+#include "misc_ip.h"
+
+#include "attrib.h"
+
+#include "silink.h"
+#include "walk.h"
+
+
 
 #ifdef HAVE_RINGS
 #include <kernel/ringgb.h>
@@ -68,16 +105,13 @@
 #endif
 
 #ifdef HAVE_F5
-#include <Singular/f5gb.h>
+#include <kernel/f5gb.h>
 #endif
 
 #ifdef HAVE_WALK
-#include <Singular/walk.h>
+#include "walk.h"
 #endif
 
-#include <polys/weight.h>
-#include <kernel/fast_mult.h>
-#include <kernel/digitech.h>
 
 #ifdef HAVE_SPECTRUM
 #include <kernel/spectrum.h>
@@ -87,18 +121,17 @@
 #include <bifac.h>
 #endif
 
-#include <Singular/attrib.h>
-
 #if defined(HPUX_10) || defined(HPUX_9)
 extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
-#include <polys/nc//sca.h>
+
 #ifdef HAVE_PLURAL
-#include <polys/monomials/ring.h>
+#include <polys/nc/nc.h>
 #include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
-#include <Singular/ipconv.h>
-#include <polys/monomials/ring.h>
+#include <polys/nc/sca.h>
+#include <kernel/nc.h>
+#include "ipconv.h"
 #ifdef HAVE_RATGRING
 #include <kernel/ratgring.h>
 #endif
@@ -107,12 +140,10 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #ifdef ix86_Win /* only for the DLLTest */
 /* #include "WinDllTest.h" */
 #ifdef HAVE_DL
-#include <Singular/mod_raw.h>
+#include <polys/mod_raw.h>
 #endif
 #endif
 
-// for tests of t-rep-GB
-#include <kernel/tgb.h>
 
 // Define to enable many more system commands
 #undef MAKE_DISTRIBUTION
@@ -122,26 +153,21 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
+
+////// #include <libfac/factor.h> //////?????
+
 #include <polys/clapconv.h>
 #include <kernel/kstdfac.h>
-#include <libfac/factor.h>
 #endif
+
 #include <polys/clapsing.h>
 
-#include <Singular/silink.h>
-#include <Singular/walk.h>
-
-#include <polys/monomials/maps.h>
-
-#include <kernel/shiftgb.h>
-#include <kernel/linearAlgebra.h>
-
 #ifdef HAVE_EIGENVAL
-#include <Singular/eigenval_ip.h>
+#include "eigenval_ip.h"
 #endif
 
 #ifdef HAVE_GMS
-#include <Singular/gms.h>
+#include "gms.h"
 #endif
 
 /*
@@ -153,7 +179,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 //#ifndef HAVE_DYNAMIC_LOADING
 
 #ifdef HAVE_PCV
-#include <Singular/pcv.h>
+#include "pcv.h"
 #endif
 
 //#endif /* not HAVE_DYNAMIC_LOADING */
@@ -195,8 +221,8 @@ unsigned long** singularMatrixToLongMatrix(matrix singularMatrix)
       if (p!=NULL)
       {
         entry = p_GetCoeff(p, currRing);
-        entryAsInt = n_Int(entry, currRing);
-        if (entryAsInt < 0) entryAsInt += currRing->ch;
+        entryAsInt = n_Int(entry, currRing->cf);
+        if (entryAsInt < 0) entryAsInt += n_GetChar(currRing->cf);
       }
       else
         entryAsInt=0;
@@ -298,13 +324,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 
 /*==================== gen ==================================*/
-    if(strcmp(sys_cmd,"gen")==0)
-    {
-      res->rtyp=INT_CMD;
-      res->data=(void *)(long)npGen;
-      return FALSE;
-    }
-    else
+// // This seems to be obsolette...?!
+// // TODO: cleanup doc/reference.doc:6998 to system("gen")
+//     if(strcmp(sys_cmd,"gen")==0)
+//     {
+//       res->rtyp=INT_CMD;
+//       res->data=(void *)(long)npGen;
+//       return FALSE;
+//     }
+//     else
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
@@ -626,7 +654,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         {
           if ( h->next!=NULL && h->next->Typ()==INT_CMD )
           {
-            if ( !rField_is_long_C() )
+            if ( !rField_is_long_C(currRing) )
               {
                 Werror( "unsupported ground field!");
                 return TRUE;
@@ -654,7 +682,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== getPrecDigits ======================*/
       if(strcmp(sys_cmd,"getPrecDigits")==0)
       {
-        if ( !rField_is_long_C() && !rField_is_long_R() )
+        if ( !rField_is_long_C(currRing) && !rField_is_long_R(currRing) )
         {
           Werror( "unsupported ground field!");
           return TRUE;
@@ -678,7 +706,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           mpz_t m; mpz_init(m);
           mpz_inp_str(m, f, 10);
           fclose(f);
-          number n = mpz2number(m);
+          number n = n_Init(m, coeffs_BIGINT);
           res->rtyp = BIGINT_CMD;
           res->data = (void*)n;
           return FALSE;
@@ -955,7 +983,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
         {
           res->rtyp=STRING_CMD;
-          res->data=(void *)singclap_neworder((ideal)h->Data());
+          res->data=(void *)singclap_neworder((ideal)h->Data(), currRing);
           return FALSE;
         }
         else
@@ -1335,7 +1363,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
           {
             poly p = (poly)IDDATA(w);
-            res->data = pOppose(Rop,p);
+            res->data = pOppose(Rop, p, currRing); // into CurrRing?
             res->rtyp = POLY_CMD;
             return FALSE;
           }
@@ -2294,12 +2322,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 
                 /* == now the work starts == */
 
-                short * iv=iv2array(v);
+                short * iv=iv2array(v, currRing);
                 poly r=0;
                 poly hp=ppJetW(f,n,iv);
                 int s=MATCOLS(m);
                 int j=0;
-                matrix T=mpInitI(s,1,0);
+                matrix T=mp_InitI(s,1,0, currRing);
 
                 while (hp != NULL)
                 {
@@ -2331,7 +2359,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                   }
                 }
 
-                matrix Temp=mpTransp((matrix) idVec2Ideal(r));
+                matrix Temp=mp_Transp((matrix) idVec2Ideal(r), currRing);
                 matrix R=mpNew(MATCOLS((matrix) idVec2Ideal(f)),1);
                 for (int k=1;k<=MATROWS(Temp);k++)
                 {
@@ -2536,17 +2564,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
 #endif
   /*==================== naIdeal ==================================*/
-      if(strcmp(sys_cmd,"naIdeal")==0)
-      {
-        if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
-        {
-          naSetIdeal((ideal)h->Data());
-          return FALSE;
-        }
-        else
-           WerrorS("ideal expected");
-      }
-      else
+//       // This seems to be obsolette with the new Frank's alg.ext field...
+//       if(strcmp(sys_cmd,"naIdeal")==0)
+//       {
+//         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
+//         {
+//           naSetIdeal((ideal)h->Data());
+//           return FALSE;
+//         }
+//         else
+//            WerrorS("ideal expected");
+//       }
+//       else
   /*==================== isSqrFree =============================*/
   #ifdef HAVE_FACTORY
       if(strcmp(sys_cmd,"isSqrFree")==0)
@@ -2554,7 +2583,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if ((h!=NULL) &&(h->Typ()==POLY_CMD))
         {
           res->rtyp=INT_CMD;
-          res->data=(void *)(long) singclap_isSqrFree((poly)h->Data());
+          res->data=(void *)(long) singclap_isSqrFree((poly)h->Data(), currRing);
           return FALSE;
         }
         else
@@ -2790,7 +2819,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         {
           matrix m = (matrix)h->Data();
           int n = m->rows();
-          unsigned long p = (unsigned long)currRing->ch;
+          unsigned long p = (unsigned long)n_GetChar(currRing->cf);
           if (n != m->cols())
           {
             Werror("expected exactly one argument: %s",
@@ -2852,9 +2881,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         {
           int c=rChar(currRing);
           setCharacteristic( c,nfMinPoly[0], currRing->parameter[0][0] );
-          CanonicalForm F( convSingGFFactoryGF( (poly)h->Data() ) );
+          CanonicalForm F( convSingGFFactoryGF( (poly)h->Data(), currRing ) );
           res->rtyp=POLY_CMD;
-          res->data=convFactoryGFSingGF( F );
+          res->data=convFactoryGFSingGF( F, currRing );
           return FALSE;
         }
         else { Werror("wrong typ"); return TRUE;}
@@ -3449,7 +3478,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           WerrorS("`system(\"bifac\",<poly>) expected");
           return TRUE;
         }
-        if (!rField_is_Q())
+        if (!rField_is_Q(currRing))
         {
           WerrorS("coeff field must be Q");
           return TRUE;
@@ -3458,7 +3487,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         CFFList C;
         int sw_rat=isOn(SW_RATIONAL);
         On(SW_RATIONAL);
-        CanonicalForm F( convSingPClapP((poly)(h->Data())));
+        CanonicalForm F( convSingPClapP((poly)(h->Data()), currRing));
         B.bifac(F, 1);
         CFFList L=B.getFactors();
         // construct the ring ==============================================
@@ -3475,7 +3504,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         new_ring->P=lev;
         new_ring->parameter=names;
         new_ring->extRing=alg_ring;
-        new_ring->ch=1;
+        new_ring->ch=1; // WTF!!??? :(
         rComplete(new_ring,TRUE);
         // set the mipo ===============================================
         ring save_currRing=currRing; idhdl save_currRingHdl=currRingHdl;
@@ -3593,12 +3622,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           res->rtyp=h->Typ();
           if (h->Typ()==MATRIX_CMD)
           {
-            res->data=(char *)singntl_HNF((matrix)h->Data());
+            res->data=(char *)singntl_HNF((matrix)h->Data(), currRing);
             return FALSE;
           }
           else if (h->Typ()==INTMAT_CMD)
           {
-            res->data=(char *)singntl_HNF((intvec*)h->Data());
+            res->data=(char *)singntl_HNF((intvec*)h->Data(), currRing);
             return FALSE;
           }
           else return TRUE;
@@ -3613,12 +3642,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           res->rtyp=h->Typ();
           if (h->Typ()==MATRIX_CMD)
           {
-            res->data=(char *)singntl_LLL((matrix)h->Data());
+            res->data=(char *)singntl_LLL((matrix)h->Data(), currRing);
             return FALSE;
           }
           else if (h->Typ()==INTMAT_CMD)
           {
-            res->data=(char *)singntl_LLL((intvec*)h->Data());
+            res->data=(char *)singntl_LLL((intvec*)h->Data(), currRing);
             return FALSE;
           }
           else return TRUE;
@@ -3632,7 +3661,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         if (h!=NULL && (h->Typ()== POLY_CMD) && ((h->next != NULL) && h->next->Typ() == STRING_CMD))
         {
-          CanonicalForm F= convSingPFactoryP((poly)(h->Data()));
+          CanonicalForm F= convSingPFactoryP((poly)(h->Data()), currRing);
           char *s=(char *)h->next->Data();
           double error= atof (s);
           int irred= probIrredTest (F, error);
