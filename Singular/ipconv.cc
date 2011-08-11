@@ -68,7 +68,7 @@ static void * iiI2V(void *data)
 static void * iiBI2V(void *data)
 {
   number n=n_Init_bigint((number)data, currRing->cf, currRing->cf);
-  nlDelete((number *)&data,NULL);
+  n_Delete((number *)&data,coeffs_BIGINT);
   poly p=pNSet(n);
   if (p!=NULL) pSetComp(p,1);
   return (void *)p;
@@ -85,7 +85,7 @@ static void * iiBI2Id(void *data)
 {
   ideal I=idInit(1,1);
   number n=n_Init_bigint((number)data, currRing->cf, currRing->cf);
-  nlDelete((number *)&data,NULL);
+  n_Delete((number *)&data,coeffs_BIGINT);
   poly p=pNSet(n);
   I->m[0]=p;
   return (void *)I;
@@ -155,7 +155,7 @@ static void * iiI2N(void *data)
 
 static void * iiI2BI(void *data)
 {
-  number n=nlInit((int)(long)data, NULL /*dummy for nlInit*/);
+  number n=n_Init((int)(long)data, coeffs_BIGINT);
   return (void *)n;
 }
 
