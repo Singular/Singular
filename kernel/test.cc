@@ -149,6 +149,8 @@ int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
 // #include "PowerSeries.h" // Too old?
 
 
+#include "nc.h"
+
 #include "ratgring.h"
 #include "ringgb.h"
 #include "run.h"

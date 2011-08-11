@@ -20,6 +20,8 @@ class skStrategy;
 typedef skStrategy * kStrategy;
 
 
+matrix nc_PrintMat(int a, int b, ring r, int metric);
+
 
 enum nc_type
 {

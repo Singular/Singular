@@ -8,12 +8,12 @@
 * ABSTRACT additional defines etc for --with-plural
 */
 
+//////////// NOTE: These are left-overs from the original gring.h /////////////////////
+
 #ifdef HAVE_PLURAL
 
 
-#include <kernel/structs.h>
-#include <kernel/ring.h>
-#include <kernel/matpol.h>
+// #include <kernel/structs.h>
 
 // BOOLEAN nc_CheckOrdCondition(matrix D, ring r);
 // BOOLEAN nc_CheckOrdCondition(ring r); // with D == r->GetNC()->D
@@ -24,12 +24,12 @@
 
 
 
-
-
 // used by "rSum" from ring.cc only! 
 // purpose init nc structure for initially commutative ring:
 // "creates a commutative nc extension; "converts" comm.ring to a Plural ring"
 ring nc_rCreateNCcomm(ring r); 
+
+
 
 
 // poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r);
@@ -44,14 +44,6 @@ void nc_PolyPolyRed(poly &b, poly p, number *c);
 
 
 
-/* twostd: */
-ideal twostd(ideal I);
-/* Ann: */
-ideal Approx_Step(ideal L);
-
-/* complete reduction routines */
-
-matrix nc_PrintMat(int a, int b, ring r, int metric);
 
 poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift);
 
@@ -151,11 +143,4 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 
 
 
-#ifdef PLURAL_INTERNAL_DECLARATIONS
-
-// we need nc_gr_initBba for sca_gr_bba and gr_bba.
-void nc_gr_initBba(ideal F,kStrategy strat); 
-#endif // PLURAL_INTERNAL_DECLARATIONS
-
-#endif // HAVE_PLURAL :(
 #endif // 
