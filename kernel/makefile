@@ -39,8 +39,8 @@ LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/rep
 LIBPOLYS_LIBSG   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
 
 PIPE		= -pipe
-CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
-CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS}
+CFLAGS		= -O3 -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
+CXXFLAGS	= -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I..  -I${includedir}   ${LIBPOLYS_CFLAGS}
 DEFS		= -DNDEBUG -DOM_NDEBUG
@@ -82,7 +82,7 @@ CXXSOURCES=\
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
     f5c.cc ratgring.cc shiftgb.cc gfan.cc \
-    linearAlgebra.cc
+    linearAlgebra.cc nc.cc
 CXXSOURCES2	= SingularBuilder.cpp
 
 #    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
@@ -111,7 +111,7 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	eigenval.h units.h \
 	fegetopt.h \
-	ratgring.h shiftgb.h \
+	ratgring.h shiftgb.h nc.h \
         mmalloc.h \
 	semic.h \
 	gfan.h
