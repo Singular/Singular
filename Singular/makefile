@@ -86,8 +86,6 @@ CXXSOURCES=\
    fehelp.cc\
    fevoices.cc \
    fglm.cc\
-   gentable.cc\
-   gentable2.cc\
    gms.cc\
    grammar.cc\
    interpolation.cc\
@@ -250,6 +248,14 @@ maintainer-clean: distclean srcclean
 #dep.
 feOpt.h: feOpt.inc
 misc_ip.cc: feOpt.h
+
+mpsr_Tok.inc: gentable2.cc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable2.cc -o gentable2
+	./gentable2
+	/bin/rm -f gentable2 gentable2.exe
+
+
+iparith.o :iparith.inc
 
 ##
 ## miscellanous targets
