@@ -21,7 +21,7 @@
 #define NV_OPS
 #define NV_MAX_PRIME 32003
 
-extern int npGen;
+// extern int npGen; // obsolete
 
 BOOLEAN npInitChar(coeffs r, void* p);
 

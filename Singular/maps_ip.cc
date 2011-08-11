@@ -212,12 +212,12 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 */
 poly pSubstPar(poly p, int par, poly image)
 {
-  ideal theMapI=idInit(rPar(currRing),1);
-  nMapFunc nMap=n_SetMap(currRing->cf->extRing->cf, currRing->cf->extRing->cf);
+  ideal theMapI = idInit(rPar(currRing),1);
+  nMapFunc nMap = n_SetMap(currRing->cf->extRing->cf, currRing->cf->extRing->cf);
 
   int i;
   poly pp;
-  for(i=rPar(currRing);i>0;i--)
+  for(i = rPar(currRing);i>0;i--)
   {
     if (i!=par)
     {
