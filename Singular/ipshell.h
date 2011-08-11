@@ -97,9 +97,6 @@ syStrategy syForceMin(lists li);
 // converts a list of modules into a resolution
 syStrategy syConvList(lists li,BOOLEAN toDel);
 
-void rSetHdl(idhdl h);
-
-
 /* ================================================================== */
 /* Expressions : */
 BOOLEAN iiExprArith1(leftv res, sleftv* a, int op);
