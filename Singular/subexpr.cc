@@ -399,7 +399,7 @@ static inline void * s_internalCopy(const int t,  void *d)
     case NUMBER_CMD:
       return  (void *)nCopy((number)d);
     case BIGINT_CMD:
-      return  (void *)nlCopy((number)d, currRing->cf);
+      return  (void *)n_Copy((number)d, coeffs_BIGINT);
     case MAP_CMD:
       return  (void *)maCopy((map)d, currRing);
     case LIST_CMD:
@@ -489,7 +489,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case BIGINT_CMD:
     {
       number n=(number)d;
-      nlDelete(&n,NULL);
+      n_Delete(&n,coeffs_BIGINT);
       break;
     }
     case LIST_CMD:
@@ -753,7 +753,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
           StringSetS((char*) (typed ? "bigint(" : ""));
           number nl=(number)d;
-          nlWrite(nl,NULL);
+          n_Write(nl,coeffs_BIGINT);
           s = StringAppendS((char*) (typed ? ")" : ""));
           return omStrDup(s);
           }
@@ -1669,7 +1669,7 @@ int sleftv::Eval()
       break;
     case BIGINT_CMD:
 #ifdef LDEBUG
-      nlTest((number)Data());
+      n_Test((number)Data(),coeffs_BIGINT);
 #endif
       break;
     case POLY_CMD:
