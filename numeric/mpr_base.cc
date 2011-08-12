@@ -1838,7 +1838,7 @@ const number resMatrixSparse::getDetAt( const number* evpoint )
 
   mprSTICKYPROT(ST__DET); // 1
 
-  poly pres= smCallDet( rmat );
+  poly pres= sm_CallDet( rmat, currRing );
   number numres= nCopy( pGetCoeff( pres ) );
   pDelete( &pres );
 
@@ -1908,7 +1908,7 @@ const poly resMatrixSparse::getUDet( const number* evpoint )
 
   mprSTICKYPROT(ST__DET); // 1
 
-  poly pres= smCallDet( rmat );
+  poly pres= sm_CallDet( rmat, currRing );
 
   mprSTICKYPROT(ST__DET); // 2
 

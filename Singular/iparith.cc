@@ -3456,7 +3456,7 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
   //lists l=mpBareiss(m,FALSE);
   intvec *iv;
   ideal m;
-  smCallBareiss((ideal)v->Data(),0,0,m,&iv);
+  sm_CallBareiss((ideal)v->Data(),0,0,m,&iv, currRing);
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   l->m[0].rtyp=MODUL_CMD;
@@ -3640,10 +3640,10 @@ static BOOLEAN jjDET(leftv res, leftv v)
 {
   matrix m=(matrix)v->Data();
   poly p;
-  if (smCheckDet((ideal)m,m->cols(),TRUE))
+  if (sm_CheckDet((ideal)m,m->cols(),TRUE, currRing))
   {
     ideal I=idMatrix2Module(mp_Copy(m,currRing));
-    p=smCallDet(I);
+    p=sm_CallDet(I, currRing);
     idDelete(&I);
   }
   else
@@ -3670,14 +3670,14 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
   ideal I=(ideal)v->Data();
   poly p;
   if (IDELEMS(I)<1) return TRUE;
-  if (smCheckDet(I,IDELEMS(I),FALSE))
+  if (sm_CheckDet(I,IDELEMS(I),FALSE, currRing))
   {
     matrix m=idModule2Matrix(idCopy(I));
     p=singclap_det(m);
     idDelete((ideal *)&m);
   }
   else
-    p=smCallDet(I);
+    p=sm_CallDet(I, currRing);
   res->data = (char *)p;
   return FALSE;
 }
@@ -5347,7 +5347,7 @@ static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
   int k=(int)(long)w->Data();
   if (k>=0)
   {
-    smCallBareiss((ideal)u->Data(),(int)(long)v->Data(),(int)(long)w->Data(),m,&iv);
+    sm_CallBareiss((ideal)u->Data(),(int)(long)v->Data(),(int)(long)w->Data(),m,&iv, currRing);
     l->Init(2);
     l->m[0].rtyp=MODUL_CMD;
     l->m[1].rtyp=INTVEC_CMD;
@@ -5356,7 +5356,7 @@ static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
   }
   else
   {
-    m=smCallSolv((ideal)u->Data());
+    m=sm_CallSolv((ideal)u->Data(), currRing);
     l->Init(1);
     l->m[0].rtyp=IDEAL_CMD;
     l->m[0].data=(void *)m;
