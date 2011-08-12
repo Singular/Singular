@@ -59,6 +59,7 @@
 #include <Singular/MinorInterface.h>
 #include <kernel/linearAlgebra.h>
 #include <Singular/misc_ip.h>
+#include <Singular/linearAlgebra_ip.h>
 #ifdef HAVE_FACTORY
 #  include <polys/clapsing.h>
 #  include <kernel/kstdfac.h>
@@ -84,6 +85,8 @@ ring rCompose(const lists  L);
 
 #ifdef HAVE_PLURAL
   #include <kernel/ratgring.h>
+  #include <kernel/nc.h>
+  #include <polys/nc/nc.h>
   #include <polys/nc/sca.h>
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
@@ -215,6 +218,12 @@ extern BOOLEAN expected_parms;
 #define ii_div_by_0 "div. by 0"
 
 int iiOp; /* the current operation*/
+
+/*=================== simple helpers =================*/
+poly pHeadProc(poly p)
+{
+  return pHead(p);
+} 
 
 /*=================== operations with 2 args.: static proc =================*/
 /* must be ordered: first operations for chars (infix ops),
@@ -5046,12 +5055,12 @@ static BOOLEAN jjpMaxComp(leftv res, leftv v)
 }
 static BOOLEAN jjmpTrace(leftv res, leftv v)
 {
-  res->data = (char *)mpTrace((matrix)v->Data());
+  res->data = (char *)mp_Trace((matrix)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjmpTransp(leftv res, leftv v)
 {
-  res->data = (char *)mpTransp((matrix)v->Data());
+  res->data = (char *)mp_Transp((matrix)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjrOrdStr(leftv res, leftv v)
@@ -5100,8 +5109,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjidMinBase    (proc1)idMinBase
 #define jjsyMinBase    (proc1)syMinBase
 #define jjpMaxComp     (proc1)pMaxCompProc
-#define jjmpTrace      (proc1)mpTrace
-#define jjmpTransp     (proc1)mpTransp
 #define jjrOrdStr      (proc1)rOrdStr
 #define jjrVarStr      (proc1)rVarStr
 #define jjrParStr      (proc1)rParStr
@@ -5398,7 +5405,7 @@ static BOOLEAN jjCOEFFS3_Id(leftv res, leftv u, leftv v, leftv w)
   int rank=(int)i->rank;
   BOOLEAN r=jjCOEFFS_Id(res,u,v);
   if (r) return TRUE;
-  mpMonomials((matrix)res->data, rank, pVar((poly)v->Data()),(matrix)w->Data());
+  mp_Monomials((matrix)res->data, rank, pVar((poly)v->Data()),(matrix)w->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjCOEFFS3_KB(leftv res, leftv u, leftv v, leftv w)
@@ -5431,7 +5438,7 @@ static BOOLEAN jjCOEFFS3_P(leftv res, leftv u, leftv v, leftv w)
   BOOLEAN r=jjCOEFFS_Id(res,&t,v);
   t.CleanUp();
   if (r) return TRUE;
-  mpMonomials((matrix)res->data, rank, pVar((poly)v->Data()),(matrix)w->Data());
+  mp_Monomials((matrix)res->data, rank, pVar((poly)v->Data()),(matrix)w->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjELIMIN_HILB(leftv res, leftv u, leftv v, leftv w)

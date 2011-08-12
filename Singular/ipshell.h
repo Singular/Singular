@@ -211,6 +211,13 @@ void   rKill(idhdl h);
 void   rKill(ring r);
 lists scIndIndset(ideal S, BOOLEAN all, ideal Q);
 BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id);
+BOOLEAN mpJacobi(leftv res,leftv a);
+BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
+BOOLEAN kQHWeight(leftv res,leftv v);
+BOOLEAN kWeight(leftv res,leftv id);
+BOOLEAN loSimplex( leftv res, leftv args );
+BOOLEAN loNewtonP( leftv res, leftv arg1 );
+
 
 #endif
 

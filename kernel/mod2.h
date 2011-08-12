@@ -27,6 +27,7 @@
 #define HAVE_GETTIMEOFDAY 1
 #define TIME_WITH_SYS_TIME 1
 #define HAVE_SYS_TIME_H 1
+#define PROC_BUG 1
 /* Default value for timer resolution in ticks per second */
 /* set to 10 for resolution of tenth of a second, etc */
 #define TIMER_RESOLUTION 1
