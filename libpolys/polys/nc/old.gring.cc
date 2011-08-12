@@ -3391,9 +3391,6 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift, ring dstRing)
   return(q);
 }
 
-  /* checks whether rings rBase and rCandidate */
-  /* could be opposite to each other */
-  /* returns TRUE if it is so */
 BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 {
   /* the same basefield */

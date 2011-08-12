@@ -38,6 +38,14 @@ enum nc_type
 
 // //////////////////////////////////////////////////////
 
+
+/// checks whether rings rBase and rCandidate
+/// could be opposite to each other
+/// returns TRUE if it is so
+BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
+
+
+
 // Macros used to access upper triangle matrices C,D... (which are actually ideals) // afaik
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 
