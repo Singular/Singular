@@ -82,7 +82,8 @@ CXXSOURCES=\
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
     f5c.cc ratgring.cc shiftgb.cc gfan.cc \
-    linearAlgebra.cc nc.cc
+    linearAlgebra.cc nc.cc preimage.cc
+    
 CXXSOURCES2	= SingularBuilder.cpp
 
 #    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
@@ -114,7 +115,7 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
 	ratgring.h shiftgb.h nc.h \
         mmalloc.h \
 	semic.h \
-	gfan.h
+	gfan.h preimage.h
 
 DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
         Makefile.in \

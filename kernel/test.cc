@@ -148,6 +148,7 @@ int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
 // #include "Poly.h" // Too old?
 // #include "PowerSeries.h" // Too old?
 
+#include "preimage.h"
 
 #include "nc.h"
 
