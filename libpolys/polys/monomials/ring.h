@@ -6,7 +6,6 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id$ */
 
 /* includes */
 #include <omalloc/omalloc.h>

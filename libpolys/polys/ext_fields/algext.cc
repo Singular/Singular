@@ -1,33 +1,32 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-/*
-* ABSTRACT: numbers in an algebraic extension field K[a] / < f(a) >
-*           Assuming that we have a coeffs object cf, then these numbers
-*           are polynomials in the polynomial ring K[a] represented by
-*           cf->extRing.
-*           IMPORTANT ASSUMPTIONS:
-*           1.) So far we assume that cf->extRing is a valid polynomial
-*               ring in exactly one variable, i.e., K[a], where K is allowed
-*               to be any field (representable in SINGULAR and which may
-*               itself be some extension field, thus allowing for extension
-*               towers).
-*           2.) Moreover, this implementation assumes that
-*               cf->extRing->minideal is not NULL but an ideal with at
-*               least one non-zero generator which may be accessed by
-*               cf->extRing->minideal->m[0] and which represents the minimal
-*               polynomial f(a) of the extension variable 'a' in K[a].
-*           3.) As soon as an std method for polynomial rings becomes
-*               availabe, all reduction steps modulo f(a) should be replaced
-*               by a call to std. Moreover, in this situation one can finally
-*               move from K[a] / < f(a) > to
-*                  K[a_1, ..., a_s] / I, with I some zero-dimensional ideal
-*                                        in K[a_1, ..., a_s] given by a lex
-*                                        Gröbner basis.
-*               The code in algext.h and algext.cc is then capable of
-*               computing in K[a_1, ..., a_s] / I.
-*/
+/**
+  * ABSTRACT: numbers in an algebraic extension field K[a] / < f(a) >
+  *           Assuming that we have a coeffs object cf, then these numbers
+  *           are polynomials in the polynomial ring K[a] represented by
+  *           cf->extRing.
+  *           IMPORTANT ASSUMPTIONS:
+  *           1.) So far we assume that cf->extRing is a valid polynomial
+  *               ring in exactly one variable, i.e., K[a], where K is allowed
+  *               to be any field (representable in SINGULAR and which may
+  *               itself be some extension field, thus allowing for extension
+  *               towers).
+  *           2.) Moreover, this implementation assumes that
+  *               cf->extRing->minideal is not NULL but an ideal with at
+  *               least one non-zero generator which may be accessed by
+  *               cf->extRing->minideal->m[0] and which represents the minimal
+  *               polynomial f(a) of the extension variable 'a' in K[a].
+  *           3.) As soon as an std method for polynomial rings becomes
+  *               availabe, all reduction steps modulo f(a) should be replaced
+  *               by a call to std. Moreover, in this situation one can finally
+  *               move from K[a] / < f(a) > to
+  *                  K[a_1, ..., a_s] / I, with I some zero-dimensional ideal
+  *                                        in K[a_1, ..., a_s] given by a lex
+  *                                        Gröbner basis.
+  *               The code in algext.h and algext.cc is then capable of
+  *               computing in K[a_1, ..., a_s] / I.
+  **/
 
 #include "config.h"
 #include <misc/auxiliary.h>
@@ -44,10 +43,30 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
-#include <polys/ext_fields/algext.h>
+#include "ext_fields/algext.h"
 
-/// our type has been defined as a macro in algext.h
-/// and is accessible by 'naID'
+#ifdef LDEBUG
+#define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
+BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
+#else
+#define naTest(a)
+#endif
+
+/// Our own type!
+static const n_coeffType ID = n_algExt;
+
+/* polynomial ring in which our numbers live */
+#define naRing cf->extRing
+
+/* coeffs object in which the coefficients of our numbers live;
+ * methods attached to naCoeffs may be used to compute with the
+ * coefficients of our numbers, e.g., use naCoeffs->nAdd to add
+ * coefficients of our numbers */
+#define naCoeffs cf->extRing->cf
+
+/* minimal polynomial */
+#define naMinpoly naRing->minideal->m[0]
+
 
 /// forward declarations
 BOOLEAN  naGreaterZero(number a, const coeffs cf); 
@@ -83,7 +102,7 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 #ifdef LDEBUG
 BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 {
-  assume(getCoeffType(cf) == naID);
+  assume(getCoeffType(cf) == ID);
   if (a == NULL) return TRUE;
   p_Test((poly)a, naRing);
   assume(p_Totaldegree((poly)a, naRing) <= p_Totaldegree(naMinpoly, naRing));
@@ -414,7 +433,7 @@ number naLcm(number a, number b, const coeffs cf)
 /* expects *param to be castable to AlgExtInfo */
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 {
-  if (naID != n) return FALSE;
+  if (ID != n) return FALSE;
   AlgExtInfo *e = (AlgExtInfo *)param;
   /* for extension coefficient fields we expect the underlying
      polynomial rings to be IDENTICAL, i.e. the SAME OBJECT;
@@ -550,7 +569,7 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
 nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be an algebraic field extension */
-  assume(getCoeffType(dst) == naID);
+  assume(getCoeffType(dst) == ID);
   
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
@@ -612,7 +631,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
          (IDELEMS(cf->extRing->minideal) != 0)    &&    // non-zero generator
          (cf->extRing->minideal->m[0]    != NULL)    ); // at m[0];
   assume(cf->extRing->cf                 != NULL);      // extRing->cf;
-  assume(getCoeffType(cf) == naID);                     // coeff type;
+  assume(getCoeffType(cf) == ID);                     // coeff type;
   
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
