@@ -81,5 +81,9 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 /// return the specified parameter as a number in the given alg. field
 number naParam(short iParameter, const coeffs cf);
 
+
+/// if m == var(i)/1 => return i, 
+int naIsParam(number, const coeffs);
+
 #endif
 /* ALGEXT_H */

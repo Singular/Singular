@@ -123,5 +123,8 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 /// return the specified parameter as a number in the given trans.ext.
 number ntParam(short iParameter, const coeffs cf);
 
+/// if m == var(i)/1 => return i, 
+int ntIsParam(number, const coeffs);
+
 #endif
 /* TRANSEXT_H */
