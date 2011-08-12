@@ -141,7 +141,7 @@ static void jjMINPOLY_red(idhdl h)
       int i;
       ideal I=(ideal)IDDATA(h);
       for(i=IDELEMS(I)-1;i>=0;i--)
-	      I->m[i]=p_MinPolyNormalize(I->m[i], currRing);
+             I->m[i]=p_MinPolyNormalize(I->m[i], currRing);
       break;
     }
     case LIST_CMD:
@@ -160,44 +160,52 @@ static void jjMINPOLY_red(idhdl h)
 }
 static BOOLEAN jjMINPOLY(leftv res, leftv a)
 {
+  if (getCoeffType(currRing->cf)!=n_transExt)
+  {
+      WerrorS("no minpoly allowed");
+      return TRUE;
+  }
   number p=(number)a->CopyD(NUMBER_CMD);
   if (nIsZero(p))
   {
-    currRing->minpoly=NULL;
-    naMinimalPoly=NULL;
+    WerrorS("cannot set minpoly to 0");
+    return TRUE;
   }
   else
   {
-    if ((rPar(currRing)!=1)
-      || (rField_is_GF(currRing)))
+    // remove all object currently in the ring
+    while(currRing->idroot!=NULL)
     {
-      WerrorS("no minpoly allowed");
-      return TRUE;
-    }
-    if (currRing->minpoly!=NULL)
-    {
-      WerrorS("minpoly already set");
-      return TRUE;
+      killhdl2(currRing->idroot,&(currRing->idroot),currRing);
     }
     nNormalize(p);
-    currRing->minpoly=p;
-    naMinimalPoly=((lnumber)currRing->minpoly)->z;
-    if (p_GetExp(((lnumber)currRing->minpoly)->z,1,currRing->extRing)==0)
+    typedef struct { ring r; ideal i; } AlgExtInfo;
+    struct fractionObject
     {
-      Werror("minpoly must not be constant");
-      currRing->minpoly=NULL;
-      naMinimalPoly=NULL;
-      nDelete(&p);
+      poly numerator;
+      poly denominator;
+      int complexity;
+    };
+    typedef struct fractionObject * fraction;
+
+    AlgExtInfo A;
+    A.r=currRing->cf->extRing;
+    A.r->ref++;
+    A.i=idInit(1,1);
+    A.i->m[0]=((fraction)p)->numerator;
+    ((fraction)p)->numerator=NULL;
+    n_Delete(&p,currRing->cf);
+    coeffs new_cf=nInitChar(n_algExt,&A);
+    if (new_cf==NULL)
+    {
+      Werror("llegal minpoly");
+      // cleanup A: TODO
+      return TRUE;
     }
-    /* redefine function pointers due to switch from
-       transcendental to algebraic field extension */
-    redefineFunctionPointers();
-    // and now, normalize all already defined objects in this ring
-    idhdl h=currRing->idroot;
-    while(h!=NULL)
+    else
     {
-      jjMINPOLY_red(h);
-      h=IDNEXT(h);
+      nKillChar(currRing->cf);
+      currRing->cf=new_cf;
     }
   }
   return FALSE;
@@ -299,7 +307,7 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 {
   number p=(number)a->CopyD(BIGINT_CMD);
-  if (res->data!=NULL) nlDelete((number *)&res->data,NULL);
+  if (res->data!=NULL) n_Delete((number *)&res->data,coeffs_BIGINT);
   res->data=(void *)p;
   jiAssignAttr(res,a);
   return FALSE;
@@ -1048,7 +1056,7 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
       if (TEST_V_ALLWARN)
       {
         Warn("expression list length(%d) does not match intmat size(%d)",
-	      iv->length()+exprlist_length(hh),iv->length());
+             iv->length()+exprlist_length(hh),iv->length());
       }
       break;
     }

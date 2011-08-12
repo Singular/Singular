@@ -335,6 +335,9 @@ static inline BOOLEAN n_IsMOne(number n, const coeffs r)
 ///
 /// !!! Recommendation: remove implementations for unordered fields
 /// !!!                 and raise errors instead, in these cases
+/// !!! Do not follow this recommendation: while writing polys,
+/// !!! between 2 monomials will be an additional + iff !n_GreaterZero(next coeff)
+///
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
 {
   assume(r != NULL); assume(r->cfGreaterZero!=NULL);
