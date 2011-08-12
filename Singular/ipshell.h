@@ -202,8 +202,11 @@ void iiCheckPack(package &p);
 #ifndef NDEBUG
 void checkall();
 #endif
+
 void rSetHdl(idhdl h);
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
+idhdl  rDefault(const char *s);
+
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL);
 idhdl rFindHdl(ring r, idhdl n, idhdl w);
 void   rKill(idhdl h);
