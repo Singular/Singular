@@ -812,19 +812,20 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->nNULL = (number)0;
   assume( getCoeffType(r) == n_GF );
 
-  GFInfo* p = (GFInfo *)(parameter); 
+  GFInfo* p = (GFInfo *)(parameter);
+  assume (p->GFChar > 0);
+  assume (p->GFDegree > 0);
+
   const char * name = p->GFPar_name;
+  
   r->m_nfCharQ = 0;
   r->m_nfCharP = p->GFChar;
   r->m_nfCharQ1 = 0;
-  r->m_nfParameter= strdup(name); //TODO use omAlloc for allocating memory and use strcpy?
+  r->m_nfParameter= omStrDup(name); //TODO use omAlloc for allocating memory and use strcpy?
   r->m_nfPlus1Table= NULL;
 
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
-
-  assume (p->GFChar > 0);
-  assume (p->GFDegree > 0);
 
   if(p->GFChar > (2<<15))
   {
