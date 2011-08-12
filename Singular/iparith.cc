@@ -2726,7 +2726,7 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
         ring save = currRing;
         rChangeCurrRing(r);
         matrix  m = (matrix)IDDATA(w);
-        ideal   Q = idMatrix2Module(mp_Copy(m,currRing));
+        ideal   Q = idMatrix2Module(mp_Copy(m, currRing));
         rChangeCurrRing(save);
         ideal   S = idOppose(r,Q,currRing);
         id_Delete(&Q, r);
@@ -3642,7 +3642,7 @@ static BOOLEAN jjDET(leftv res, leftv v)
   poly p;
   if (sm_CheckDet((ideal)m,m->cols(),TRUE, currRing))
   {
-    ideal I=idMatrix2Module(mp_Copy(m,currRing));
+    ideal I=idMatrix2Module(mp_Copy(m, currRing));
     p=sm_CallDet(I, currRing);
     idDelete(&I);
   }
@@ -6750,8 +6750,12 @@ static BOOLEAN jjJET4(leftv res, leftv u)
       return TRUE;
     }
     res->rtyp=u1->Typ();
-    res->data=(char*)idSeries((int)(long)u3->Data(),idCopy((ideal)u1->Data()),
-                              mp_Copy((matrix)u2->Data()),(intvec*)u4->Data(),currRing);
+    res->data=(char*)idSeries(
+                              (int)(long)u3->Data(),
+                              idCopy((ideal)u1->Data()),
+                              mp_Copy((matrix)u2->Data(), currRing),
+                              (intvec*)u4->Data()
+                             );
     return FALSE;
   }
   else
@@ -6880,8 +6884,12 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
       return TRUE;
     }
     res->rtyp=IDEAL_CMD;
-    res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
-                           mp_Copy((matrix)u2->Data()),(int)(long)u4->Data(),currRing);
+    res->data=(char*)redNF(
+                           idCopy((ideal)u3->Data()),
+                           idCopy((ideal)u1->Data()),
+                           mp_Copy((matrix)u2->Data(), currRing),
+                           (int)(long)u4->Data()
+                          );
     return FALSE;
   }
   else
@@ -6922,9 +6930,13 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
       return TRUE;
     }
     res->rtyp=IDEAL_CMD;
-    res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
-                           mp_Copy((matrix)u2->Data()),
-                           (int)(long)u4->Data(),(intvec*)u5->Data(),currRing);
+    res->data=(char*)redNF(
+                           idCopy((ideal)u3->Data()),
+                           idCopy((ideal)u1->Data()),
+                           mp_Copy((matrix)u2->Data(),currRing),
+                           (int)(long)u4->Data(),
+                           (intvec*)u5->Data()
+                          );
     return FALSE;
   }
   else
