@@ -5618,7 +5618,7 @@ static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
 {
-  if (!mpIsDiagUnit((matrix)v->Data()))
+  if (!mp_IsDiagUnit((matrix)v->Data(), currRing))
   {
     WerrorS("2nd argument must be a diagonal matrix of units");
     return TRUE;
@@ -6784,7 +6784,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
   if((u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD)
   &&((u1->Typ()==IDEAL_CMD)||(u1->Typ()==MODUL_CMD)))
   {
-    if(!mpIsDiagUnit((matrix)u2->Data()))
+    if(!mp_IsDiagUnit((matrix)u2->Data(), currRing))
     {
       WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
@@ -6914,7 +6914,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
      (u4->Typ()==INT_CMD))
   {
     assumeStdFlag(u3);
-    if(!mpIsDiagUnit((matrix)u2->Data()))
+    if(!mp_IsDiagUnit((matrix)u2->Data(), currRing))
     {
       WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
@@ -6956,7 +6956,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
      (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
   {
     assumeStdFlag(u3);
-    if(!mpIsDiagUnit((matrix)u2->Data()))
+    if(!mp_IsDiagUnit((matrix)u2->Data(), currRing))
     {
       WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
