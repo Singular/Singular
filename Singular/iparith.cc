@@ -471,7 +471,7 @@ static BOOLEAN jjPOWER_BI(leftv res, leftv u, leftv v)
   number n=(number)u->Data();
   if (e>=0)
   {
-    nlPower(n,e,(number*)&res->data);
+    n_Power(n,e,(number*)&res->data,coeffs_BIGINT);
   }
   else
   {
@@ -640,7 +640,7 @@ static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPLUS_BI(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)(nlAdd((number)u->Data(), (number)v->Data()));
+  res->data = (char *)(n_Add((number)u->Data(), (number)v->Data(),coeffs_BIGINT));
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjPLUS_N(leftv res, leftv u, leftv v)
@@ -667,7 +667,7 @@ static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 {
   matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
-  res->data = (char *)(mpAdd(A , B));
+  res->data = (char *)(mp_Add(A , B, currRing));
   if (res->data==NULL)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
@@ -679,11 +679,11 @@ static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 static BOOLEAN jjPLUS_MA_P(leftv res, leftv u, leftv v)
 {
   matrix m=(matrix)u->Data();
-  matrix p= mpInitP(m->nrows,m->ncols,(poly)(v->CopyD(POLY_CMD)));
+  matrix p= mp_InitP(m->nrows,m->ncols,(poly)(v->CopyD(POLY_CMD)),currRing);
   if (iiOp=='+')
-    res->data = (char *)mpAdd(m , p);
+    res->data = (char *)mp_Add(m , p,currRing);
   else
-    res->data = (char *)mpSub(m , p);
+    res->data = (char *)mp_Sub(m , p,currRing);
   idDelete((ideal *)&p);
   return jjPLUSMINUS_Gen(res,u,v);
 }
@@ -724,7 +724,7 @@ static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMINUS_BI(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)(nlSub((number)u->Data(), (number)v->Data()));
+  res->data = (char *)(n_Sub((number)u->Data(), (number)v->Data(),coeffs_BIGINT));
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjMINUS_N(leftv res, leftv u, leftv v)
@@ -750,7 +750,7 @@ static BOOLEAN jjMINUS_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
 {
   matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
-  res->data = (char *)(mpSub(A , B));
+  res->data = (char *)(mp_Sub(A , B, currRing));
   if (res->data==NULL)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
@@ -774,7 +774,7 @@ static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_BI(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)(nlMult( (number)u->Data(), (number)v->Data()));
+  res->data = (char *)(n_Mult( (number)u->Data(), (number)v->Data(),coeffs_BIGINT));
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -846,7 +846,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_ID(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idMult((ideal)u->Data(),(ideal)v->Data());
-  idNormalize((ideal)res->data);
+  id_Normalize((ideal)res->data,currRing);
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -865,9 +865,9 @@ static BOOLEAN jjTIMES_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_BI1(leftv res, leftv u, leftv v)
 {
-  number n=nInit_bigint((number)v->Data());
+  number n=n_Init_bigint((number)v->Data(),coeffs_BIGINT,currRing->cf);
   poly p=pNSet(n);
-  ideal I= (ideal)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
+  ideal I= (ideal)mp_MultP((matrix)u->CopyD(MATRIX_CMD),p,currRing);
   res->data = (char *)I;
   return FALSE;
 }
@@ -879,9 +879,9 @@ static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->CopyD(POLY_CMD);
   int r=pMaxComp(p);/* recompute the rank for the case ideal*vector*/
-  ideal I= (ideal)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
+  ideal I= (ideal)mp_MultP((matrix)u->CopyD(MATRIX_CMD),p,currRing);
   if (r>0) I->rank=r;
-  idNormalize(I);
+  id_Normalize(I,currRing);
   res->data = (char *)I;
   return FALSE;
 }
@@ -889,9 +889,9 @@ static BOOLEAN jjTIMES_MA_P2(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->CopyD(POLY_CMD);
   int r=pMaxComp(p);/* recompute the rank for the case ideal*vector*/
-  ideal I= (ideal)pMultMp(p,(matrix)v->CopyD(MATRIX_CMD));
+  ideal I= (ideal)pMultMp(p,(matrix)v->CopyD(MATRIX_CMD),currRing);
   if (r>0) I->rank=r;
-  idNormalize(I);
+  id_Normalize(I,currRing);
   res->data = (char *)I;
   return FALSE;
 }
@@ -899,8 +899,8 @@ static BOOLEAN jjTIMES_MA_N1(leftv res, leftv u, leftv v)
 {
   number n=(number)v->CopyD(NUMBER_CMD);
   poly p=pNSet(n);
-  res->data = (char *)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
-  idNormalize((ideal)res->data);
+  res->data = (char *)mp_MultP((matrix)u->CopyD(MATRIX_CMD),p,currRing);
+  id_Normalize((ideal)res->data,currRing);
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_N2(leftv res, leftv u, leftv v)
@@ -909,8 +909,8 @@ static BOOLEAN jjTIMES_MA_N2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_I1(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mpMultI((matrix)u->CopyD(MATRIX_CMD),(int)(long)v->Data());
-  idNormalize((ideal)res->data);
+  res->data = (char *)mp_MultI((matrix)u->CopyD(MATRIX_CMD),(int)(long)v->Data(),currRing);
+  id_Normalize((ideal)res->data,currRing);
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_I2(leftv res, leftv u, leftv v)
@@ -920,23 +920,23 @@ static BOOLEAN jjTIMES_MA_I2(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
 {
   matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
-  res->data = (char *)mpMult(A,B);
+  res->data = (char *)mp_Mult(A,B,currRing);
   if (res->data==NULL)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
              MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
-  idNormalize((ideal)res->data);
+  id_Normalize((ideal)res->data,currRing);
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjGE_BI(leftv res, leftv u, leftv v)
 {
-  number h=nlSub((number)u->Data(),(number)v->Data());
-  res->data = (char *) (nlGreaterZero(h)||(nlIsZero(h)));
-  nlDelete(&h,NULL);
+  number h=n_Sub((number)u->Data(),(number)v->Data(),coeffs_BIGINT);
+  res->data = (char *) (n_GreaterZero(h,coeffs_BIGINT)||(n_IsZero(h,coeffs_BIGINT)));
+  n_Delete(&h,coeffs_BIGINT);
   return FALSE;
 }
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
@@ -952,9 +952,9 @@ static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGT_BI(leftv res, leftv u, leftv v)
 {
-  number h=nlSub((number)u->Data(),(number)v->Data());
-  res->data = (char *) (nlGreaterZero(h)&&(!nlIsZero(h)));
-  nlDelete(&h,NULL);
+  number h=n_Sub((number)u->Data(),(number)v->Data(),coeffs_BIGINT);
+  res->data = (char *) (n_GreaterZero(h,coeffs_BIGINT)&&(!n_IsZero(h,coeffs_BIGINT)));
+  n_Delete(&h,coeffs_BIGINT);
   return FALSE;
 }
 static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
@@ -1024,13 +1024,13 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
 static BOOLEAN jjDIV_BI(leftv res, leftv u, leftv v)
 {
   number q=(number)v->Data();
-  if (nlIsZero(q))
+  if (n_IsZero(q,coeffs_BIGINT))
   {
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  q = nlIntDiv((number)u->Data(),q);
-  nlNormalize(q);
+  q = n_IntDiv((number)u->Data(),q,coeffs_BIGINT);
+  n_Normalize(q,coeffs_BIGINT);
   res->data = (char *)q;
   return FALSE;
 }
@@ -1061,14 +1061,14 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
     res->data=NULL;
     return FALSE;
   }
-  if ((pNext(q)!=NULL) && (!rField_is_Ring()))
+  if ((pNext(q)!=NULL) && (!rField_is_Ring(currRing)))
   { /* This means that q != 0 consists of at least two terms.
        Moreover, currRing is over a field. */
 #ifdef HAVE_FACTORY
     if(pGetComp(p)==0)
     {
       res->data=(void*)(singclap_pdivide(p /*(poly)(u->Data())*/ ,
-                                         q /*(poly)(v->Data())*/ ));
+                                         q /*(poly)(v->Data())*/ ,currRing));
     }
     else
     {
@@ -1094,7 +1094,7 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
       {
         if (I->m[i]!=NULL)
         {
-          h=singclap_pdivide(I->m[i],q);
+          h=singclap_pdivide(I->m[i],q,currRing);
           pSetCompP(h,i+1);
           p=pAdd(p,h);
         }
@@ -1111,7 +1111,7 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   { /* This means that q != 0 consists of just one term,
        or that currRing is over a coefficient ring. */
 #ifdef HAVE_RINGS
-    if (!rField_is_Domain())
+    if (!rField_is_Domain(currRing))
     {
       WerrorS("division only defined over coefficient domains");
       return TRUE;
@@ -1148,7 +1148,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
       {
       #ifdef HAVE_FACTORY
         MATELEM(mm,i,j) = singclap_pdivide( MATELEM(m,i,j) ,
-                                           q /*(poly)(v->Data())*/ );
+                                           q /*(poly)(v->Data())*/, currRing );
 #else /* HAVE_FACTORY */
         WerrorS("division only by a monomial");
         return TRUE;
@@ -1158,13 +1158,13 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
         MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
     }
   }
-  idNormalize((ideal)mm);
+  id_Normalize((ideal)mm,currRing);
   res->data=(char *)mm;
   return FALSE;
 }
 static BOOLEAN jjEQUAL_BI(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((long)nlEqual((number)u->Data(),(number)v->Data()));
+  res->data = (char *)((long)n_Equal((number)u->Data(),(number)v->Data(),coeffs_BIGINT));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -1176,7 +1176,7 @@ static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((long)mpEqual((matrix)u->Data(),(matrix)v->Data()));
+  res->data = (char *)((long)mp_Equal((matrix)u->Data(),(matrix)v->Data(),currRing));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -1517,14 +1517,14 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
   int i;
   for(i=rl-1;i>=0;i--)
   {
-    q[i]=nlInit((*p)[i], NULL);
-    x[i]=nlInit((*c)[i], NULL);
+    q[i]=n_Init((*p)[i], coeffs_BIGINT);
+    x[i]=n_Init((*c)[i], coeffs_BIGINT);
   }
-  number n=nlChineseRemainder(x,q,rl);
+  number n=n_ChineseRemainder(x,q,rl,coeffs_BIGINT);
   for(i=rl-1;i>=0;i--)
   {
-    nlDelete(&(q[i]),NULL);
-    nlDelete(&(x[i]),NULL);
+    n_Delete(&(q[i]),coeffs_BIGINT);
+    n_Delete(&(x[i]),coeffs_BIGINT);
   }
   omFree(x); omFree(q);
   res->data=(char *)n;
@@ -1597,7 +1597,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  if ((currRing==NULL) || rField_is_Q())
+  if ((currRing==NULL) || rField_is_Q(currRing))
   {
     lists c=(lists)u->CopyD(); // list of ideal
     lists pl=NULL;
@@ -1633,7 +1633,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       for(i=rl-1;i>=0;i--)
       {
-        q[i]=nlInit((*p)[i], currRing);
+        q[i]=n_Init((*p)[i], currRing->cf);
       }
     }
     else
@@ -1642,18 +1642,18 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
       {
         if (pl->m[i].Typ()==INT_CMD)
         {
-          q[i]=nlInit((int)(long)pl->m[i].Data(),currRing);
+          q[i]=n_Init((int)(long)pl->m[i].Data(),currRing->cf);
         }
         else if (pl->m[i].Typ()==BIGINT_CMD)
         {
-          q[i]=nlCopy((number)(pl->m[i].Data()));
+          q[i]=n_Copy((number)(pl->m[i].Data()),coeffs_BIGINT);
         }
         else
         {
           Werror("bigint expected at pos %d",i+1);
           for(i++;i<rl;i++)
           {
-            nlDelete(&(q[i]),currRing);
+            n_Delete(&(q[i]),currRing->cf);
           }
           omFree(x); // delete c
           omFree(q); // delete pl
@@ -1661,10 +1661,10 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
         }
       }
     }
-    result=idChineseRemainder(x,q,rl);
+    result=id_ChineseRemainder(x,q,rl,currRing);
     for(i=rl-1;i>=0;i--)
     {
-      nlDelete(&(q[i]),currRing);
+      n_Delete(&(q[i]),coeffs_BIGINT);
     }
     omFree(q);
     res->data=(char *)result;
@@ -1678,7 +1678,7 @@ static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
   if ((p==NULL)||(pNext(p)!=NULL)) return TRUE;
-  res->data=(char *)mpCoeffProc((poly)u->Data(),p /*(poly)v->Data()*/);
+  res->data=(char *)mp_CoeffProc((poly)u->Data(),p /*(poly)v->Data()*/,currRing);
   return FALSE;
 }
 static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
@@ -1689,7 +1689,7 @@ static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
     WerrorS("ringvar expected");
     return TRUE;
   }
-  res->data=(char *)mpCoeffs((ideal)u->CopyD(),i);
+  res->data=(char *)mp_Coeffs((ideal)u->CopyD(),i,currRing);
   return FALSE;
 }
 static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
@@ -1713,7 +1713,7 @@ static BOOLEAN jjCONTRACT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
 {
-  short *iv=iv2array((intvec *)v->Data());
+  short *iv=iv2array((intvec *)v->Data(),currRing);
   ideal I=(ideal)u->Data();
   int d=-1;
   int i;
@@ -1727,7 +1727,7 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
   poly p=(poly)u->Data();
   if (p!=NULL)
   {
-    short *iv=iv2array((intvec *)v->Data());
+    short *iv=iv2array((intvec *)v->Data(),currRing);
     int d=(int)pDegW(p,iv);
     omFreeSize((ADDRESS)iv,(currRing->N+1)*sizeof(short));
     res->data = (char *)(long(d));
@@ -1771,11 +1771,13 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
   {
     ring origR = currRing;
     ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
+    coeffs new_cf=nInitChar(n_Q,NULL);
+    nKillChar(tempR->cf);
+    tempR->cf=new_cf;
     rComplete(tempR);
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
-    if ((i != -1) && (nIsUnit(pGetCoeff(vid->m[i]))))
+    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
     { /* ideal v contains unit; dim = -1 */
       res->data = (char *)-1;
       return FALSE;
@@ -1909,7 +1911,7 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 static BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v)
 {
   poly r,pa,pb;
-  BOOLEAN ret=singclap_extgcd((poly)u->Data(),(poly)v->Data(),r,pa,pb);
+  BOOLEAN ret=singclap_extgcd((poly)u->Data(),(poly)v->Data(),r,pa,pb,currRing);
   if (ret) return TRUE;
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
@@ -1930,7 +1932,7 @@ static BOOLEAN jjFAC_P2(leftv res, leftv u,leftv dummy)
   int fac_sw=sw;
   if ((sw<0)||(sw>2)) fac_sw=1;
   singclap_factorize_retry=0;
-  ideal f=singclap_factorize((poly)(u->CopyD()), &v, fac_sw);
+  ideal f=singclap_factorize((poly)(u->CopyD()), &v, fac_sw,currRing);
   if (f==NULL)
     return TRUE;
   switch(sw)
@@ -1995,22 +1997,22 @@ static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 #endif /* HAVE_FACTORY */
 static BOOLEAN jjFAREY_BI(leftv res, leftv u, leftv v)
 {
-  if (rField_is_Q())
+  if (rField_is_Q(currRing))
   {
     number uu=(number)u->Data();
     number vv=(number)v->Data();
-    res->data=(char *)nlFarey(uu,vv);
+    res->data=(char *)n_Farey(uu,vv,currRing->cf);
     return FALSE;
   }
   else return TRUE;
 }
 static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
 {
-  if (rField_is_Q())
+  if (rField_is_Q(currRing))
   {
     ideal uu=(ideal)u->Data();
     number vv=(number)v->Data();
-    res->data=(void*)idFarey(uu,vv);
+    res->data=(void*)id_Farey(uu,vv,currRing);
     res->rtyp=u->Typ();
     return FALSE;
   }
@@ -2030,29 +2032,18 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int par_perm_size=0;
     BOOLEAN bo;
     //if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
-    if ((nMap=nSetMap(r))==NULL)
+    if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
-      if (rEqual(r,currRing))
-      {
-        nMap=nCopy;
-      }
-      else
       // Allow imap/fetch to be make an exception only for:
       if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-            (rField_is_Q() || rField_is_Q_a() ||
-             (rField_is_Zp() || rField_is_Zp_a())))
+            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
+             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
            ||
            (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-            (rField_is_Zp(currRing, rInternalChar(r)) ||
-             rField_is_Zp_a(currRing, rInternalChar(r)))) )
+            (rField_is_Zp(currRing, r->cf->ch) ||
+             rField_is_Zp_a(currRing, r->cf->ch))) )
       {
         par_perm_size=rPar(r);
-        BITSET save_test=test;
-        if ((r->minpoly != NULL) || (r->minideal != NULL))
-          naSetChar(rInternalChar(r),r);
-        else ntSetChar(rInternalChar(r),r);
-        nSetChar(currRing);
-        test=save_test;
       }
       else
       {
@@ -2067,9 +2058,23 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       op=IMAP_CMD;
       if (iiOp==IMAP_CMD)
       {
-        maFindPerm(r->names,       r->N,       rParameter(r),        r->P,
-                   currRing->names,currRing->N,rParameter(currRing), currRing->P,
-                   perm,par_perm, currRing->ch);
+        int r_par=0;
+        char ** r_par_names=NULL;
+        if (r->cf->extRing!=NULL) 
+        {
+          r_par=r->cf->extRing->N;
+          r_par_names=r->cf->extRing->names;
+        }
+        int c_par=0;
+        char ** c_par_names=NULL;
+        if (currRing->cf->extRing!=NULL) 
+        {
+          c_par=currRing->cf->extRing->N;
+          c_par_names=currRing->cf->extRing->names;
+        }
+        maFindPerm(r->names,       r->N,       r_par_names, r_par,
+                   currRing->names,currRing->N,c_par_names, c_par,
+                   perm,par_perm, currRing->cf->type);
       }
       else
       {
@@ -2157,15 +2162,15 @@ static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
 {
   number a=(number) u->Data();
   number b=(number) v->Data();
-  if (nlIsZero(a))
+  if (n_IsZero(a,coeffs_BIGINT))
   {
-    if (nlIsZero(b)) res->data=(char *)nlInit(1, NULL);
-    else             res->data=(char *)nlCopy(b);
+    if (n_IsZero(b,coeffs_BIGINT)) res->data=(char *)n_Init(1,coeffs_BIGINT);
+    else                           res->data=(char *)n_Copy(b,coeffs_BIGINT);
   }
   else
   {
-    if (nlIsZero(b))  res->data=(char *)nlCopy(a);
-    else res->data=(char *)nlGcd(a, b, NULL);
+    if (n_IsZero(b,coeffs_BIGINT))  res->data=(char *)n_Copy(a,coeffs_BIGINT);
+    else res->data=(char *)n_Gcd(a, b, coeffs_BIGINT);
   }
   return FALSE;
 }
@@ -2189,7 +2194,7 @@ static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
 static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
   res->data=(void *)singclap_gcd((poly)(u->CopyD(POLY_CMD)),
-                                 (poly)(v->CopyD(POLY_CMD)));
+                                 (poly)(v->CopyD(POLY_CMD)),currRing);
   return FALSE;
 }
 #endif /* HAVE_FACTORY */
@@ -2200,7 +2205,9 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
   {
     ring origR = currRing;
     ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
+    coeffs new_cf=nInitChar(n_Q,NULL);
+    nKillChar(tempR->cf);
+    tempR->cf=new_cf;
     rComplete(tempR);
     ideal uid = (ideal)u->Data();
     rChangeCurrRing(tempR);
@@ -2282,7 +2289,7 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
     deg=p_Totaldegree;
    else
-    deg=pFDeg;
+    deg=currRing->pFDeg;
   poly p=pOne(); pSetExp(p,i,1); pSetm(p);
   int d=deg(p,currRing);
   pLmDelete(p);
@@ -2297,18 +2304,18 @@ static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
   intvec *w=new intvec(rVar(currRing));
   intvec *vw=(intvec*)u->Data();
   ideal v_id=(ideal)v->Data();
-  pFDegProc save_FDeg=pFDeg;
-  pLDegProc save_LDeg=pLDeg;
+  pFDegProc save_FDeg=currRing->pFDeg;
+  pLDegProc save_LDeg=currRing->pLDeg;
   BOOLEAN save_pLexOrder=pLexOrder;
   pLexOrder=FALSE;
   kHomW=vw;
   kModW=w;
-  pSetDegProcs(kHomModDeg);
+  pSetDegProcs(currRing,kHomModDeg);
   res->data=(void *)(long)idHomModule(v_id,currQuotient,&w);
   pLexOrder=save_pLexOrder;
   kHomW=NULL;
   kModW=NULL;
-  pRestoreDegProcs(save_FDeg,save_LDeg);
+  pRestoreDegProcs(currRing,save_FDeg,save_LDeg);
   if (w!=NULL) delete w;
   return FALSE;
 }
@@ -2358,7 +2365,7 @@ static BOOLEAN jjKERNEL(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjKoszul(leftv res, leftv u, leftv v)
 {
-  return mpKoszul(res, u,v);
+  return mpKoszul(res, u,v,NULL);
 }
 static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
 {
@@ -2453,12 +2460,12 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
 static BOOLEAN jjMOD_BI(leftv res, leftv u, leftv v)
 {
   number q=(number)v->Data();
-  if (nlIsZero(q))
+  if (n_IsZero(q,coeffs_BIGINT))
   {
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  res->data =(char *) nlIntMod((number)u->Data(),q);
+  res->data =(char *) n_IntMod((number)u->Data(),q,coeffs_BIGINT);
   return FALSE;
 }
 static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
@@ -2469,7 +2476,7 @@ static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  res->data =(char *) nIntMod((number)u->Data(),q);
+  res->data =(char *) n_IntMod((number)u->Data(),q,currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v);
@@ -2577,12 +2584,12 @@ static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 
   if (iiOp==NCALGEBRA_CMD)
   {
-    return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
+    return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing,false,true,false,currRing);
   }
   else
   {
     ring r=rCopy(currRing);
-    BOOLEAN result=nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),r);
+    BOOLEAN result=nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),r,false,true,false,currRing);
     res->data=r;
     if (r->qideal!=NULL) res->rtyp=QRING_CMD;
     return result;
@@ -2598,12 +2605,12 @@ static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
 
   if (iiOp==NCALGEBRA_CMD)
   {
-    return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing);
+    return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing,false,true,false,currRing);
   }
   else
   {
     ring r=rCopy(currRing);
-    BOOLEAN result=nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,r);
+    BOOLEAN result=nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,r,false,true,false,currRing);
     res->data=r;
     if (r->qideal!=NULL) res->rtyp=QRING_CMD;
     return result;
@@ -2619,12 +2626,12 @@ static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
 
   if (iiOp==NCALGEBRA_CMD)
   {
-    return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
+    return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing,false,true,false,currRing);
   }
   else
   {
     ring r=rCopy(currRing);
-    BOOLEAN result=nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),r);
+    BOOLEAN result=nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),r,false,true,false,currRing);
     res->data=r;
     if (r->qideal!=NULL) res->rtyp=QRING_CMD;
     return result;
@@ -2640,12 +2647,12 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 
   if (iiOp==NCALGEBRA_CMD)
   {
-    return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
+    return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing,false,true,false,currRing);
   }
   else
   {
     ring r=rCopy(currRing);
-    BOOLEAN result=nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,r);
+    BOOLEAN result=nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,r,false,true,false,currRing);
     res->data=r;
     if (r->qideal!=NULL) res->rtyp=QRING_CMD;
     return result;
@@ -2702,7 +2709,7 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
     case VECTOR_CMD:
       {
         poly    q = (poly)IDDATA(w);
-        res->data = pOppose(r,q);
+        res->data = pOppose(r,q,currRing);
         res->rtyp = argtype;
         break;
       }
@@ -2710,7 +2717,7 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
     case MODUL_CMD:
       {
         ideal   Q = (ideal)IDDATA(w);
-        res->data = idOppose(r,Q);
+        res->data = idOppose(r,Q,currRing);
         res->rtyp = argtype;
         break;
       }
@@ -2719,9 +2726,9 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
         ring save = currRing;
         rChangeCurrRing(r);
         matrix  m = (matrix)IDDATA(w);
-        ideal   Q = idMatrix2Module(mpCopy(m));
+        ideal   Q = idMatrix2Module(mp_Copy(m,currRing));
         rChangeCurrRing(save);
-        ideal   S = idOppose(r,Q);
+        ideal   S = idOppose(r,Q,currRing);
         id_Delete(&Q, r);
         res->data = idModule2Matrix(S);
         res->rtyp = argtype;
@@ -3043,15 +3050,15 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   number n1; number n2; number temp; int i;
 
   if ((u->Typ() == BIGINT_CMD) ||
-     ((u->Typ() == NUMBER_CMD) && rField_is_Q()))
+     ((u->Typ() == NUMBER_CMD) && rField_is_Q(currRing)))
   {
     temp = (number)u->Data();
-    n1 = nlCopy(temp);
+    n1 = n_Copy(temp,coeffs_BIGINT);
   }
   else if (u->Typ() == INT_CMD)
   {
     i = (int)(long)u->Data();
-    n1 = nlInit(i, NULL);
+    n1 = n_Init(i, coeffs_BIGINT);
   }
   else
   {
@@ -3060,15 +3067,15 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   }
 
   if ((v->Typ() == BIGINT_CMD) ||
-     ((v->Typ() == NUMBER_CMD) && rField_is_Q()))
+     ((v->Typ() == NUMBER_CMD) && rField_is_Q(currRing)))
   {
     temp = (number)v->Data();
-    n2 = nlCopy(temp);
+    n2 = n_Copy(temp,coeffs_BIGINT);
   }
   else if (v->Typ() == INT_CMD)
   {
     i = (int)(long)v->Data();
-    n2 = nlInit(i, NULL);
+    n2 = n_Init(i, coeffs_BIGINT);
   }
   else
   {
@@ -3077,7 +3084,7 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   }
 
   lists l = primeFactorisation(n1, n2);
-  nlDelete(&n1, NULL); nlDelete(&n2, NULL);
+  n_Delete(&n1, coeffs_BIGINT); n_Delete(&n2, coeffs_BIGINT);
   res->data = (char*)l;
   return FALSE;
 }
@@ -3357,7 +3364,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjWEDGE(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mpWedge((matrix)u->Data(),(int)(long)v->Data());
+  res->data = (char *)mp_Wedge((matrix)u->Data(),(int)(long)v->Data(),currRing);
   return FALSE;
 }
 #define jjWRONG2 (proc2)jjWRONG
@@ -3405,7 +3412,7 @@ static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
 static BOOLEAN jjUMINUS_BI(leftv res, leftv u)
 {
   number n=(number)u->CopyD(BIGINT_CMD);
-  n=nlNeg(n);
+  n=n_Neg(n,coeffs_BIGINT);
   res->data = (char *)n;
   return FALSE;
 }
@@ -3429,7 +3436,7 @@ static BOOLEAN jjUMINUS_P(leftv res, leftv u)
 static BOOLEAN jjUMINUS_MA(leftv res, leftv u)
 {
   poly m1=pISet(-1);
-  res->data = (char *)mpMultP((matrix)u->CopyD(MATRIX_CMD),m1);
+  res->data = (char *)mp_MultP((matrix)u->CopyD(MATRIX_CMD),m1,currRing);
   return FALSE;
 }
 static BOOLEAN jjUMINUS_IV(leftv res, leftv u)
@@ -3468,53 +3475,18 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 //}
 static BOOLEAN jjBI2N(leftv res, leftv u)
 {
-  if (rField_is_Q())
-  {
-    res->data=u->CopyD();
-    return FALSE;
-  }
+  BOOLEAN bo=FALSE;
+  number n=(number)u->CopyD();
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+  if (nMap!=NULL)
+    res->data=nMap(n,coeffs_BIGINT,currRing->cf);
   else
   {
-    BOOLEAN bo=FALSE;
-    number n=(number)u->CopyD();
-    if (rField_is_Zp())
-    {
-      res->data=(void *)npMap0(n);
-    }
-    else if (rField_is_Q_a())
-    {
-      res->data=(void *)naMap00(n);
-    }
-    else if (rField_is_Zp_a())
-    {
-      res->data=(void *)naMap0P(n);
-    }
-#ifdef HAVE_RINGS
-    else if (rField_is_Ring_Z())
-    {
-      res->data=(void *)nrzMapQ(n);
-    }
-    else if (rField_is_Ring_ModN())
-    {
-      res->data=(void *)nrnMapQ(n);
-    }
-    else if (rField_is_Ring_PtoM())
-    {
-      res->data=(void *)nrnMapQ(n);
-    }
-    else if (rField_is_Ring_2toM())
-    {
-      res->data=(void *)nr2mMapQ(n);
-    }
-#endif
-    else
-    {
-      WerrorS("cannot convert bigint to this field");
-      bo=TRUE;
-    }
-    nlDelete(&n,NULL);
-    return bo;
+    WerrorS("cannot convert bigint to this field");
+    bo=TRUE;
   }
+  n_Delete(&n,coeffs_BIGINT);
+  return bo;
 }
 static BOOLEAN jjBI2P(leftv res, leftv u)
 {
@@ -3560,7 +3532,7 @@ static BOOLEAN jjCONTENT(leftv res, leftv v)
 }
 static BOOLEAN jjCOUNT_BI(leftv res, leftv v)
 {
-  res->data = (char *)(long)nlSize((number)v->Data());
+  res->data = (char *)(long)n_Size((number)v->Data(),coeffs_BIGINT);
   return FALSE;
 }
 static BOOLEAN jjCOUNT_N(leftv res, leftv v)
@@ -3589,14 +3561,14 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
 {
   ring r=(ring)v->Data();
   int elems=-1;
-  if (rField_is_Zp(r)||rField_is_GF(r)) elems=rInternalChar(r);
+  if (rField_is_Zp(r)||rField_is_GF(r)) elems=r->cf->ch;
   else if (rField_is_Zp_a(r) && (r->minpoly!=NULL))
   {
 #ifdef HAVE_FACTORY
     extern int ipower ( int b, int n ); /* factory/cf_util */
-    elems=ipower(ABS(rInternalChar(r)),naParDeg(r->minpoly));
+    elems=ipower(r->cf->ch,naParDeg(r->minpoly));
 #else
-    elems=(int)pow(ABS((double) rInternalChar(r)),(double)naParDeg(r->minpoly));
+    elems=(int)pow((double) r->cf->ch,(double)naParDeg(r->minpoly));
 #endif
   }
   res->data = (char *)(long)elems;
@@ -3670,7 +3642,7 @@ static BOOLEAN jjDET(leftv res, leftv v)
   poly p;
   if (smCheckDet((ideal)m,m->cols(),TRUE))
   {
-    ideal I=idMatrix2Module(mpCopy(m));
+    ideal I=idMatrix2Module(mp_Copy(m,currRing));
     p=smCallDet(I);
     idDelete(&I);
   }
@@ -4191,7 +4163,7 @@ static number jjLONG2N(long d)
   int i=(int)d;
   if ((long)i == d)
   {
-    return nlInit(i, NULL);
+    return n_Init(i, coeffs_BIGINT);
   }
   else
   {
@@ -4208,7 +4180,7 @@ static number jjLONG2N(long d)
   }
 }
 #else
-#define jjLONG2N(D) nlInit((int)D, NULL)
+#define jjLONG2N(D) n_Init((int)D, coeffs_BIGINT)
 #endif
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
@@ -4314,14 +4286,14 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 static BOOLEAN jjN2BI(leftv res, leftv v)
 {
   number n,i; i=(number)v->Data();
-  if (rField_is_Zp())
+  if (rField_is_Zp(currRing))
   {
-    n=nlInit(npInt(i,currRing),NULL);
+    n=n_Init(n_Int(i,currRing->cf),coeffs_BIGINT);
   }
-  else if (rField_is_Q()) n=nlBigInt(i);
+  else if (rField_is_Q(currRing)) n=nlBigInt(i);
 #ifdef HAVE_RINGS
-  else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM()) n=nlMapGMP(i);
-  else if (rField_is_Ring_2toM()) n=nlInit((unsigned long) i,NULL);
+  else if (rField_is_Ring_Z(currRing) || rField_is_Ring_ModN(currRing) || rField_is_Ring_PtoM(currRing)) n=nlMapGMP(i);
+  else if (rField_is_Ring_2toM(currRing)) n=n_Init((unsigned long) i,coeffs_BIGINT);
 #endif
   else goto err;
   res->data=(void *)n;
@@ -4400,7 +4372,7 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
 static BOOLEAN jjP2BI(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  if (p==NULL) { res->data=(char *)nlInit(0,NULL); return FALSE; }
+  if (p==NULL) { res->data=(char *)n_Init(0,coeffs_BIGINT); return FALSE; }
   if ((pNext(p)!=NULL)|| (!pIsConstant(p)))
   {
     WerrorS("poly must be constant");
@@ -4410,14 +4382,14 @@ static BOOLEAN jjP2BI(leftv res, leftv v)
   number n;
   if (rField_is_Zp())
   {
-    n=nlInit(npInt(i,currRing), NULL);
+    n=n_Init(npInt(i,currRing), coeffs_BIGINT);
   }
-  else if (rField_is_Q()) n=nlBigInt(i);
+  else if (rField_is_Q(currRing)) n=nlBigInt(i);
 #ifdef HAVE_RINGS
   else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM())
     n=nlMapGMP(i);
   else if (rField_is_Ring_2toM())
-    n=nlInit((unsigned long) i, NULL);
+    n=n_Init((unsigned long) i, coeffs_BIGINT);
 #endif
   else goto err;
   res->data=(void *)n;
@@ -5124,7 +5096,7 @@ static BOOLEAN jjnInt(leftv res, leftv u)
 static BOOLEAN jjnlInt(leftv res, leftv u)
 {
   number n=(number)u->Data();
-  res->data=(char *)(long)nlInt(n,NULL /*dummy for nlInt*/);
+  res->data=(char *)(long)n_Int(n,coeffs_BIGINT );
   return FALSE;
 }
 /*=================== operations with 3 args.: static proc =================*/
@@ -5617,7 +5589,7 @@ static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
     WerrorS("2nd argument must be a unit");
     return TRUE;
   }
-  res->data = (char *)pSeries((int)(long)w->Data(),(poly)u->CopyD(),(poly)v->CopyD());
+  res->data = (char *)p_Series((int)(long)w->Data(),(poly)u->CopyD(),(poly)v->CopyD(),NULL,currRing);
   return FALSE;
 }
 static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
@@ -6440,7 +6412,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       case BIGINT_CMD:
       {
         number b=(number)h->Data();
-        number n=nInit_bigint(b);
+        number n=n_Init_bigint(b,coeffs_BIGINT,currRing->cf);
         if (!nIsZero(n))
         {
           p=pNSet(n);
@@ -6779,7 +6751,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
     }
     res->rtyp=u1->Typ();
     res->data=(char*)idSeries((int)(long)u3->Data(),idCopy((ideal)u1->Data()),
-                              mpCopy((matrix)u2->Data()),(intvec*)u4->Data());
+                              mp_Copy((matrix)u2->Data()),(intvec*)u4->Data(),currRing);
     return FALSE;
   }
   else
@@ -6909,7 +6881,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     }
     res->rtyp=IDEAL_CMD;
     res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
-                           mpCopy((matrix)u2->Data()),(int)(long)u4->Data());
+                           mp_Copy((matrix)u2->Data()),(int)(long)u4->Data(),currRing);
     return FALSE;
   }
   else
@@ -6951,8 +6923,8 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
     }
     res->rtyp=IDEAL_CMD;
     res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
-                           mpCopy((matrix)u2->Data()),
-                           (int)(long)u4->Data(),(intvec*)u5->Data());
+                           mp_Copy((matrix)u2->Data()),
+                           (int)(long)u4->Data(),(intvec*)u5->Data(),currRing);
     return FALSE;
   }
   else
