@@ -61,6 +61,9 @@
 
 #include <math.h>
 
+#include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
+
 // define this if you want to use the fast_map routine for mapping ideals
 #define FAST_MAP
 
@@ -2077,110 +2080,93 @@ ring rCompose(const lists  L)
   // possibly:
   // 4: C
   // 5: D
-  ring R = (ring) omAlloc0Bin(sip_sring_bin);
+  
+  ring R = (ring) omAlloc0Bin(sip_sring_bin); // why 
    
    
-  assume( R->cf == NULL );   
-  int ch;
-  int is_gf_char = 0;
-   
+  assume( R->cf == NULL );
+  
   // ------------------------------------------------------------------
   // 0: char:
   if (L->m[0].Typ()==INT_CMD)
   {
-    ch = (int)(long)L->m[0].Data();
+    int ch = (int)(long)L->m[0].Data();
     assume( ch >= 0 );
-     
-     
-    if (ch != -1) // WTF?
+
+    if (ch == 0) // Q?
+      R->cf = nInitChar(n_Q, NULL);
+    else
     {
-      int l=0;
-       
-      if (
-          ((ch!=0) && (ch<2) && (is_gf_char=-1)) // TODO for Hans!: negative characteristic?
-      #ifndef NV_OPS
-      || (ch > 32003)
-      #endif
-      || ((l=IsPrime(ch))!=ch)
-      )
+      int l = IsPrime(ch); // Zp?
+      if( l != ch )
       {
-        Warn("%d is invalid characteristic of ground field. %d is used.", ch,l);
+        Warn("%d is invalid characteristic of ground field. %d is used.", ch, l);
         ch = l;
-      }
+      }      
+      R->cf = nInitChar(n_Zp, (void*)ch);       
     }
   }
-  else if (L->m[0].Typ()==LIST_CMD)
+  else if (L->m[0].Typ()==LIST_CMD) // something complicated...
   {
     lists LL=(lists)L->m[0].Data();
+    
 #ifdef HAVE_RINGS
-    if (LL->m[0].Typ() == STRING_CMD)
+    if (LL->m[0].Typ() == STRING_CMD) // 1st comes a string?
     {
-      rComposeRing(LL,R); /* Ring */
+      rComposeRing(LL, R); // Ring!?
     }
     else
 #endif
-    if (LL->nr<3)
-      rComposeC(LL,R); /* R, long_R, long_C */
+    if (LL->nr < 3)
+      rComposeC(LL,R); // R, long_R, long_C
     else
-    {
+    {      
       if (LL->m[0].Typ()==INT_CMD)
-      {
+      {        
         ch = (int)(long)LL->m[0].Data();
-         
-        // TODO: check that ch is a supported (by our GF impl.) power of a prime
-        while ((ch != fftable[is_gf_char]) && (fftable[is_gf_char])) is_gf_char++;
-         
-        if (fftable[is_gf_char]==0) is_gf_char=-1;
+
+        if( ch != 0 ) // TODO: GF-Test ch!
+        {
+          GFInfo param;
+        
+          param.GFChar = ch; 
+          param.GFDegree = 1;
+          param.GFPar_name = (const char*)(((lists)(LL->m[1].Data()))->m[0].Data());
+
+          // nfInitChar should be able to handle the case when ch is in fftables!
+          R->cf = nInitChar(n_GF, (void*)&param);
+        }
       }
-       
-      if (is_gf_char==-1)
+
+      if( R->cf == NULL )
       {
         ring extRing = rCompose((lists)L->m[0].Data());
         
         if (extRing==NULL)
         {
-          WerrorS("could not create rational function coefficient field");
+          WerrorS("could not create the specified coefficient field");
           goto rCompose_err;
         }
-        if (extRing->cf->ch > 0)
-          ch = - extRing->cf->ch; // TODO: this is obsolete!
-        else
-          ch = 1; // WTF?
-         
-//        extRing->names = (char**)omAlloc0(rPar(R)*sizeof(char_ptr)); // obsolete?
-         
-        int i;
-         
-//        for( i = rPar(R) - 1; i >= 0; i--) extRing->names[i] = omStrDup(extRing->names[i]);
-/*        
-        // Obsolete?
-        if (extRing->qideal!=NULL)
+
+        if( extRing->qideal != NULL ) // Algebraic extension
         {
-          if (IDELEMS(extRing->qideal) == 1)
-          {
-            extRing->qideal->m[0] = naInit(1,R);
-            lnumber n=(lnumber)R->minpoly;
-            n->z = extRing->qideal->m[0];
-//            naMinimalPoly = n->z;
-            R->cf->extRing->qideal->m[0]=NULL;
-            idDelete(&(R->cf->extRing->qideal));
-             
-            redefineFunctionPointers();
-          }
-          else
-          {
-            WerrorS("not implemented yet.");
-          }
+          AlgExtInfo extParam;
+          
+          extParam.i = extRing->qideal;
+          extParam.r = extRing;
+
+          extRing->qideal = NULL; // ???
+
+          R->cf = nInitChar(type, (void*)&extParam); 
+        } else // Transcendental extension
+        {
+          TransExtInfo extParam;
+          extParam.r = r;
+
+          R->cf = nInitChar(n_transExt, &extParam);
         }
-*/
-      }
-      else
-      { // gf-char
-//        ch = fftable[is_gf_char];
-        extRing->N=1;
-        extRing->names=(char**)omAlloc0(1*sizeof(char_ptr));
-        extRing->names[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
-      }
+        
+      }     
     }
   }
   else
@@ -2188,28 +2174,13 @@ ring rCompose(const lists  L)
     WerrorS("coefficient field must be described by `int` or `list`");
     goto rCompose_err;
   }
-  rRenameVars(R);
-  rComplete(R);
-   
-#ifdef HAVE_RINGS 
-  // This was a BUG IN SINGULAR: There is no HABE_RINGS!!!
-   
-// currently, coefficients which are ring elements require a global ordering:
-  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+
+  if( R->cf == NULL )
   {
-    WerrorS("global ordering required for these coefficients");
+    WerrorS("could not create coefficient field described by the input!");
     goto rCompose_err;
   }
-#endif
-   
-   
-   
-   
-   
-   
-   
-   
-   
+
   // ------------------------- VARS ---------------------------
   if (L->m[1].Typ()==LIST_CMD)
   {
@@ -2406,6 +2377,24 @@ ring rCompose(const lists  L)
     WerrorS("ordering must be given as `list`");
     goto rCompose_err;
   }
+
+  // ------------------------ ??????? --------------------
+
+  rRenameVars(R);
+  rComplete(R);
+
+#ifdef HAVE_RINGS 
+  // This was a BUG IN SINGULAR: There is no HABE_RINGS!!!
+
+// currently, coefficients which are ring elements require a global ordering:
+  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+  {
+    WerrorS("global ordering required for these coefficients");
+    goto rCompose_err;
+  }
+#endif
+
+
   // ------------------------ Q-IDEAL ------------------------
 
   if (L->m[3].Typ()==IDEAL_CMD)
