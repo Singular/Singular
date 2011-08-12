@@ -120,25 +120,8 @@ const char * ntRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 */
 
-#ifdef LDEBUG
-#define ntTest(a) ntDBTest(a,__FILE__,__LINE__,cf)
-BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
-#else
-#define ntTest(a)
-#endif
-
-/* our own type */
-#define ntID n_transExt
-
-/* polynomial ring in which the numerators and denominators of our
-   numbers live */
-#define ntRing cf->extRing
-
-/* coeffs object in which the coefficients of our numbers live;
- * methods attached to ntCoeffs may be used to compute with the
- * coefficients of our numbers, e.g., use ntCoeffs->nAdd to add
- * coefficients of our numbers */
-#define ntCoeffs cf->extRing->cf
+/// return the specified parameter as a number in the given trans.ext.
+number ntParam(short iParameter, const coeffs cf);
 
 #endif
 /* TRANSEXT_H */
