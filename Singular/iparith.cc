@@ -3581,13 +3581,13 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
   ring r=(ring)v->Data();
   int elems=-1;
   if (rField_is_Zp(r)||rField_is_GF(r)) elems=r->cf->ch;
-  else if (rField_is_Zp_a(r) && (r->minpoly!=NULL))
+  else if (rField_is_Zp_a(r) && (r->cf->type==n_algExt))
   {
 #ifdef HAVE_FACTORY
     extern int ipower ( int b, int n ); /* factory/cf_util */
-    elems=ipower(r->cf->ch,naParDeg(r->minpoly));
+    elems=ipower(r->cf->ch,r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
 #else
-    elems=(int)pow((double) r->cf->ch,(double)naParDeg(r->minpoly));
+    elems=(int)pow((double) r->cf->ch,(double)r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
 #endif
   }
   res->data = (char *)(long)elems;
@@ -4380,7 +4380,7 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
   p=rPar(currRing);
   if ((0<i) && (i<=p))
   {
-    res->data=(char *)nPar(i);
+    res->data=(char *)n_Param(i,currRing);
   }
   else
   {
@@ -4391,7 +4391,14 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
 }
 static BOOLEAN jjPARDEG(leftv res, leftv v)
 {
-  res->data = (char *)(long)nParDeg((number)v->Data());
+  if (rField_is_Extension(currRing))
+  {
+    res->data = (char *)(long)currRing->cf->extRing->pFDeg(
+        currRing->cf->extRing->qideal->m[0],
+	currRing->cf->extRing);
+  }
+  else
+    res->data = (char *)0L;
   return FALSE;
 }
 static BOOLEAN jjPARSTR1(leftv res, leftv v)
@@ -5927,7 +5934,7 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
   {
     WarnS("preimage in local qring may be wrong: use Ring::preimageLoc instead");
   }
-  res->data=(char *)maGetPreimage(rr,mapping,image);
+  res->data=(char *)maGetPreimage(rr,mapping,image,currRing);
   if (kernel_cmd) idDelete(&image);
   return (res->data==NULL/* is of type ideal, should not be NULL*/);
 }
@@ -6334,8 +6341,8 @@ static BOOLEAN jjCOEF_M(leftv res, leftv v)
   idhdl m=(idhdl)v->next->next->next->data;
   idDelete((ideal *)&(c->data.uideal));
   idDelete((ideal *)&(m->data.uideal));
-  mpCoef2((poly)v->Data(),(poly)v->next->Data(),
-    (matrix *)&(c->data.umatrix),(matrix *)&(m->data.umatrix));
+  mp_Coef2((poly)v->Data(),(poly)v->next->Data(),
+    (matrix *)&(c->data.umatrix),(matrix *)&(m->data.umatrix),currRing);
   return FALSE;
 }
 
