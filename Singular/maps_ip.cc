@@ -64,11 +64,15 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case NUMBER_CMD:
       if (P!=0)
       {
+        WerrorS("Sorry 'napPermNumber' was lost in the refactoring process (due to Frank): needs to be fixed");
+        return TRUE;
+#if 0        
         res->data=(void *)napPermNumber((number)data,par_perm,P, preimage_r);
+#endif
         res->rtyp=POLY_CMD;
         if (nCoeff_is_Extension(currRing->cf))
           res->data=(void *)p_MinPolyNormalize((poly)res->data, currRing);
-        pTest((poly) res->data);
+        pTest((poly) res->data);        
       }
       else
       {
@@ -216,19 +220,14 @@ poly pSubstPar(poly p, int par, poly image)
   nMapFunc nMap = n_SetMap(currRing->cf->extRing->cf, currRing->cf->extRing->cf);
 
   int i;
-  poly pp;
   for(i = rPar(currRing);i>0;i--)
   {
-    if (i!=par)
-    {
-      pp=theMapI->m[i-1]=pOne();
-      lnumber n=(lnumber)pGetCoeff(pp);
-      p_SetExp(n->z,i,1,currRing->cf->extRing);
-      p_Setm(n->z,currRing->cf->extRing);
-    }
+    if (i != par)
+      theMapI->m[i-1]= p_NSet(n_Param(i, currRing), currRing);
     else
-      theMapI->m[i-1]=pCopy(image);
+      theMapI->m[i-1] = p_Copy(image, currRing);
   }
+  
 
   map theMap=(map)theMapI;
   theMap->preimage=NULL;
@@ -236,24 +235,33 @@ poly pSubstPar(poly p, int par, poly image)
   leftv v=(leftv)omAllocBin(sleftv_bin);
   sleftv tmpW;
   poly res=NULL;
+
   while (p!=NULL)
   {
     memset(&tmpW,0,sizeof(sleftv));
     memset(v,0,sizeof(sleftv));
     tmpW.rtyp=POLY_CMD;
-    lnumber n=(lnumber)pGetCoeff(p);
-    tmpW.data=n->z;
-    if (n->n!=NULL) WarnS("ignoring denominators of coefficients...");
+    
+    number n = pGetCoeff(p);
+    tmpW.data = n_GetNumerator(n, currRing); 
+    
+    if(1)
+    {
+      number d = n_GetDenom(n, currRing);
+      if ( d != NULL ) WarnS("ignoring denominators of coefficients...");
+      n_Delete(&d, currRing);
+    }
+      
     if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->cf->extRing,NULL,NULL,0,nMap))
     {
       WerrorS("map failed");
       v->data=NULL;
     }
-    pp=pHead(p);
+    poly pp = pHead(p);
     //PrintS("map:");pWrite(pp);
-    pSetCoeff(pp,nInit(1));
+    pSetCoeff(pp, nInit(1));
     //PrintS("->");pWrite((poly)(v->data));
-    poly ppp=pMult((poly)(v->data),pp);
+    poly ppp = pMult((poly)(v->data),pp);
     //PrintS("->");pWrite(ppp);
     res=pAdd(res,ppp);
     pIter(p);
