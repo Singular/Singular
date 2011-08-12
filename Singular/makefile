@@ -116,8 +116,6 @@ CXXSOURCES=\
    newstruct.cc\
    pcv.cc\
    pipeLink.cc\
-   pyobject.cc\
-   pyobject_setup.cc\
    scanner.cc\
    sdb.cc\
    silink.cc\
@@ -132,6 +130,8 @@ CXXSOURCES=\
    walk.cc\
    walk_ip.cc\
    wrapper.cc
+
+#   pyobject.cc  pyobject_setup.cc
 
 CXXSOURCES2	= SingularBuilder.cpp
 
@@ -220,7 +220,9 @@ OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
 
 all:	Singular
 
-Singular:  ${OBJS}
+Singular: ${OBJS}
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${OBJS} -o $@ -L. -L../kernel -lkernel ${LIBPOLYS_LIBS} -lntl -ldl -lgmp
+
 
 ##
 ## clean targest
@@ -302,11 +304,6 @@ DEFSG		=
 $(OBJG2) : %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-libkernel_g.a: ${OBJG} ${OBJSG2}
-	-rm -f libkernel_g.a
-	ar cr $@ ${OBJG}
-
-
 
 ##
 ## .op files for profiling
@@ -343,10 +340,6 @@ DEFSP		=
 $(OBJP2) : %.op: %.c
 	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
-libkernel_p.a: ${OBJP} ${OBJSP2}
-	-rm -f libkernel_p.a
-	ar cr $@ ${OBJP}
-
 ##
 ## dependencies
 ##
@@ -369,9 +362,6 @@ endif
 
 # My headers test
 # test: test.o
-
-test.o: test.cc feOpt.inc
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 feOpt.inc: feOpt.cc
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} feOpt.cc -o feOpt
