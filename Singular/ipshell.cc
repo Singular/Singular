@@ -55,7 +55,7 @@
 #include <Singular/ipshell.h>
 #include <polys/ext_fields/algext.h>
 #include <coeffs/mpr_complex.h>
-////// #include <coeffs/longrat.h>
+#include <coeffs/longrat.h>
 #include <numeric/mpr_base.h>
 #include <numeric/mpr_numeric.h>
 
@@ -705,27 +705,27 @@ leftv iiMap(map theMap, const char * what)
         IDMAP(w)->preimage=0;
       }
       tmpW.data=IDDATA(w);
-      #if 0
+#if 0
       if (((tmpW.rtyp==IDEAL_CMD)||(tmpW.rtyp==MODUL_CMD)) && idIs0(IDIDEAL(w)))
       {
         v->rtyp=tmpW.rtyp;
         v->data=idInit(IDELEMS(IDIDEAL(w)),IDIDEAL(w)->rank);
       }
       else
-      #endif
+#endif
       {
-        #ifdef FAST_MAP
-        if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy)
-        #ifdef HAVE_PLURAL
+#ifdef FAST_MAP
+        if ((tmpW.rtyp==IDEAL_CMD) && (nMap == ndCopyMap)
+#ifdef HAVE_PLURAL
         && (!rIsPluralRing(currRing))
-        #endif
+#endif
         )
         {
           v->rtyp=IDEAL_CMD;
           v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
         }
         else
-        #endif
+#endif
         if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0,nMap))
         {
           Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
@@ -1651,13 +1651,14 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
   // 3: qideal
   L->m[3].rtyp=IDEAL_CMD;
-  if (R->minpoly==NULL)
+  if (rMinpolyIsNULL(R))
     L->m[3].data=(void *)idInit(1,1);
   else
   {
-    ideal I=idInit(1,1);
-    L->m[3].data=(void *)I;
-    I->m[0]=pNSet(R->minpoly);
+    const ring RR = R->cf->extRing;
+    
+    L->m[3].data=(void *) idCopy(RR->minideal, RR);
+//    I->m[0] = pNSet(R->minpoly);
   }
   // ----------------------------------------
 }
@@ -1729,8 +1730,7 @@ void rDecomposeRing(leftv h,const ring R)
 lists rDecompose(const ring r)
 {
   // sanity check: require currRing==r for rings with polynomial data
-  if ((r!=currRing)
-  && ((r->minpoly!=NULL) || (r->qideal!=NULL) || (r->minideal!=NULL)
+  if ( (r!=currRing) && (!rMinpolyIsNULL(r)
 #ifdef HAVE_PLURAL
   || (rIsPluralRing(r))
 #endif
@@ -2123,7 +2123,7 @@ ring rCompose(const lists  L)
     {      
       if (LL->m[0].Typ()==INT_CMD)
       {        
-        ch = (int)(long)LL->m[0].Data();
+        int ch = (int)(long)LL->m[0].Data();
 
         if( ch != 0 ) // TODO: GF-Test ch!
         {
@@ -2157,11 +2157,11 @@ ring rCompose(const lists  L)
 
           extRing->qideal = NULL; // ???
 
-          R->cf = nInitChar(type, (void*)&extParam); 
+          R->cf = nInitChar(n_algExt, (void*)&extParam); 
         } else // Transcendental extension
         {
           TransExtInfo extParam;
-          extParam.r = r;
+          extParam.r = extRing;
 
           R->cf = nInitChar(n_transExt, &extParam);
         }
@@ -2387,7 +2387,7 @@ ring rCompose(const lists  L)
   // This was a BUG IN SINGULAR: There is no HABE_RINGS!!!
 
 // currently, coefficients which are ring elements require a global ordering:
-  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+  if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
     WerrorS("global ordering required for these coefficients");
     goto rCompose_err;
@@ -2434,9 +2434,11 @@ ring rCompose(const lists  L)
           {
             par_perm_size=rPar(orig_ring);
             BITSET save_test=test;
-            if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
-              naSetChar(rInternalChar(orig_ring),orig_ring);
-            else ntSetChar(rInternalChar(orig_ring),orig_ring);
+            
+//            if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
+//              naSetChar(rInternalChar(orig_ring),orig_ring);
+//            else ntSetChar(rInternalChar(orig_ring),orig_ring);
+            
             nSetChar(currRing->cf);
             test=save_test;
           }
@@ -3029,6 +3031,255 @@ enum    spectrumState
     spectrumUnspecErr
 };
 
+// from splist.cc
+// ----------------------------------------------------------------------------
+//  Compute the spectrum of a  spectrumPolyList
+// ----------------------------------------------------------------------------
+
+/* former spectrumPolyList::spectrum ( lists*, int) */
+spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int fast )
+{
+  spectrumPolyNode  **node = &speclist.root;
+  spectrumPolyNode  *search;
+
+  poly              f,tmp;
+  int               found,cmp;
+
+  Rational smax( ( fast==0 ? 0 : rVar(currRing) ),
+                 ( fast==2 ? 2 : 1 ) );
+
+  Rational weight_prev( 0,1 );
+
+  int     mu = 0;          // the milnor number
+  int     pg = 0;          // the geometrical genus
+  int     n  = 0;          // number of different spectral numbers
+  int     z  = 0;          // number of spectral number equal to smax
+
+  int     k = 0;
+
+  while( (*node)!=(spectrumPolyNode*)NULL &&
+         ( fast==0 || (*node)->weight<=smax ) )
+  {
+        // ---------------------------------------
+        //  determine the first normal form which
+        //  contains the monomial  node->mon
+        // ---------------------------------------
+
+    found  = FALSE;
+    search = *node;
+
+    while( search!=(spectrumPolyNode*)NULL && found==FALSE )
+    {
+      if( search->nf!=(poly)NULL )
+      {
+        f = search->nf;
+
+        do
+        {
+                    // --------------------------------
+                    //  look for  (*node)->mon  in   f
+                    // --------------------------------
+
+          cmp = pCmp( (*node)->mon,f );
+
+          if( cmp<0 )
+          {
+            f = pNext( f );
+          }
+          else if( cmp==0 )
+          {
+                        // -----------------------------
+                        //  we have found a normal form
+                        // -----------------------------
+
+            found = TRUE;
+
+                        //  normalize coefficient
+
+            number inv = nInvers( pGetCoeff( f ) );
+            pMult_nn( search->nf,inv );
+            nDelete( &inv );
+
+                        //  exchange  normal forms
+
+            tmp         = (*node)->nf;
+            (*node)->nf = search->nf;
+            search->nf  = tmp;
+          }
+        }
+        while( cmp<0 && f!=(poly)NULL );
+      }
+      search = search->next;
+    }
+
+    if( found==FALSE )
+    {
+            // ------------------------------------------------
+            //  the weight of  node->mon  is a spectrum number
+            // ------------------------------------------------
+
+      mu++;
+
+      if( (*node)->weight<=(Rational)1 )              pg++;
+      if( (*node)->weight==smax )           z++;
+      if( (*node)->weight>weight_prev )     n++;
+
+      weight_prev = (*node)->weight;
+      node = &((*node)->next);
+    }
+    else
+    {
+            // -----------------------------------------------
+            //  determine all other normal form which contain
+            //  the monomial  node->mon
+            //  replace for  node->mon  its normal form
+            // -----------------------------------------------
+
+      while( search!=(spectrumPolyNode*)NULL )
+      {
+        if( search->nf!=(poly)NULL )
+        {
+          f = search->nf;
+
+          do
+          {
+                        // --------------------------------
+                        //  look for  (*node)->mon  in   f
+                        // --------------------------------
+
+            cmp = pCmp( (*node)->mon,f );
+
+            if( cmp<0 )
+            {
+              f = pNext( f );
+            }
+            else if( cmp==0 )
+            {
+              search->nf = pSub( search->nf,
+                                 ppMult_nn( (*node)->nf,pGetCoeff( f ) ) );
+              pNorm( search->nf );
+            }
+          }
+          while( cmp<0 && f!=(poly)NULL );
+        }
+        search = search->next;
+      }
+      speclist.delete_node( node );
+    }
+
+  }
+
+    // --------------------------------------------------------
+    //  fast computation exploits the symmetry of the spectrum
+    // --------------------------------------------------------
+
+  if( fast==2 )
+  {
+    mu = 2*mu - z;
+    n  = ( z > 0 ? 2*n - 1 : 2*n );
+  }
+
+    // --------------------------------------------------------
+    //  compute the spectrum numbers with their multiplicities
+    // --------------------------------------------------------
+
+  intvec            *nom  = new intvec( n );
+  intvec            *den  = new intvec( n );
+  intvec            *mult = new intvec( n );
+
+  int count         = 0;
+  int multiplicity  = 1;
+
+  for( search=speclist.root; search!=(spectrumPolyNode*)NULL &&
+              ( fast==0 || search->weight<=smax );
+       search=search->next )
+  {
+    if( search->next==(spectrumPolyNode*)NULL ||
+        search->weight<search->next->weight )
+    {
+      (*nom) [count] = search->weight.get_num_si( );
+      (*den) [count] = search->weight.get_den_si( );
+      (*mult)[count] = multiplicity;
+
+      multiplicity=1;
+      count++;
+    }
+    else
+    {
+      multiplicity++;
+    }
+  }
+
+    // --------------------------------------------------------
+    //  fast computation exploits the symmetry of the spectrum
+    // --------------------------------------------------------
+
+  if( fast==2 )
+  {
+    int n1,n2;
+    for( n1=0, n2=n-1; n1<n2; n1++, n2-- )
+    {
+      (*nom) [n2] = rVar(currRing)*(*den)[n1]-(*nom)[n1];
+      (*den) [n2] = (*den)[n1];
+      (*mult)[n2] = (*mult)[n1];
+    }
+  }
+
+    // -----------------------------------
+    //  test if the spectrum is symmetric
+    // -----------------------------------
+
+  if( fast==0 || fast==1 )
+  {
+    int symmetric=TRUE;
+
+    for( int n1=0, n2=n-1 ; n1<n2 && symmetric==TRUE; n1++, n2-- )
+    {
+      if( (*mult)[n1]!=(*mult)[n2] ||
+          (*den) [n1]!= (*den)[n2] ||
+          (*nom)[n1]+(*nom)[n2]!=rVar(currRing)*(*den) [n1] )
+      {
+        symmetric = FALSE;
+      }
+    }
+
+    if( symmetric==FALSE )
+    {
+            // ---------------------------------------------
+            //  the spectrum is not symmetric => degenerate
+            //  principal part
+            // ---------------------------------------------
+
+      *L = (lists)omAllocBin( slists_bin);
+      (*L)->Init( 1 );
+      (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+      (*L)->m[0].data = (void*)mu;
+
+      return spectrumDegenerate;
+    }
+  }
+
+  *L = (lists)omAllocBin( slists_bin);
+
+  (*L)->Init( 6 );
+
+  (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+  (*L)->m[1].rtyp = INT_CMD;    //  geometrical genus
+  (*L)->m[2].rtyp = INT_CMD;    //  number of spectrum values
+  (*L)->m[3].rtyp = INTVEC_CMD; //  nominators
+  (*L)->m[4].rtyp = INTVEC_CMD; //  denomiantors
+  (*L)->m[5].rtyp = INTVEC_CMD; //  multiplicities
+
+  (*L)->m[0].data = (void*)mu;
+  (*L)->m[1].data = (void*)pg;
+  (*L)->m[2].data = (void*)n;
+  (*L)->m[3].data = (void*)nom;
+  (*L)->m[4].data = (void*)den;
+  (*L)->m[5].data = (void*)mult;
+
+  return  spectrumOK;
+}
+
 spectrumState   spectrumCompute( poly h,lists *L,int fast )
 {
   int i,j;
@@ -3309,8 +3560,9 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   // ----------------------------
   //  compute the spectrum of  h
   // ----------------------------
+//  spectrumState spectrumStateFromList( spectrumPolyList& speclist, lists *L, int fast );
 
-  return  NF.spectrum( L,fast );
+  return spectrumStateFromList(NF, L, fast );
 }
 
 // ----------------------------------------------------------------------------
@@ -3777,254 +4029,6 @@ BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
   /* tmp.data = (void *)0;  -- done by memset */
 
   return  semicProc3(res,u,v,&tmp);
-}
-// from splist.cc
-// ----------------------------------------------------------------------------
-//  Compute the spectrum of a  spectrumPolyList
-// ----------------------------------------------------------------------------
-
-/* former spectrumPolyList::spectrum ( lists*, int) */
-spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int fast )
-{
-    spectrumPolyNode  **node = &speclist.root;
-    spectrumPolyNode  *search;
-
-    poly              f,tmp;
-    int               found,cmp;
-
-    Rational smax( ( fast==0 ? 0 : rVar(currRing) ),
-                   ( fast==2 ? 2 : 1 ) );
-
-    Rational weight_prev( 0,1 );
-
-    int     mu = 0;          // the milnor number
-    int     pg = 0;          // the geometrical genus
-    int     n  = 0;          // number of different spectral numbers
-    int     z  = 0;          // number of spectral number equal to smax
-
-    int     k = 0;
-
-    while( (*node)!=(spectrumPolyNode*)NULL &&
-           ( fast==0 || (*node)->weight<=smax ) )
-    {
-        // ---------------------------------------
-        //  determine the first normal form which
-        //  contains the monomial  node->mon
-        // ---------------------------------------
-
-        found  = FALSE;
-        search = *node;
-
-        while( search!=(spectrumPolyNode*)NULL && found==FALSE )
-        {
-            if( search->nf!=(poly)NULL )
-            {
-                f = search->nf;
-
-                do
-                {
-                    // --------------------------------
-                    //  look for  (*node)->mon  in   f
-                    // --------------------------------
-
-                    cmp = pCmp( (*node)->mon,f );
-
-                    if( cmp<0 )
-                    {
-                        f = pNext( f );
-                    }
-                    else if( cmp==0 )
-                    {
-                        // -----------------------------
-                        //  we have found a normal form
-                        // -----------------------------
-
-                        found = TRUE;
-
-                        //  normalize coefficient
-
-                        number inv = nInvers( pGetCoeff( f ) );
-                        pMult_nn( search->nf,inv );
-                        nDelete( &inv );
-
-                        //  exchange  normal forms
-
-                        tmp         = (*node)->nf;
-                        (*node)->nf = search->nf;
-                        search->nf  = tmp;
-                    }
-                }
-                while( cmp<0 && f!=(poly)NULL );
-            }
-            search = search->next;
-        }
-
-        if( found==FALSE )
-        {
-            // ------------------------------------------------
-            //  the weight of  node->mon  is a spectrum number
-            // ------------------------------------------------
-
-            mu++;
-
-            if( (*node)->weight<=(Rational)1 )              pg++;
-            if( (*node)->weight==smax )           z++;
-            if( (*node)->weight>weight_prev )     n++;
-
-            weight_prev = (*node)->weight;
-            node = &((*node)->next);
-        }
-        else
-        {
-            // -----------------------------------------------
-            //  determine all other normal form which contain
-            //  the monomial  node->mon
-            //  replace for  node->mon  its normal form
-            // -----------------------------------------------
-
-            while( search!=(spectrumPolyNode*)NULL )
-            {
-                    if( search->nf!=(poly)NULL )
-                {
-                    f = search->nf;
-
-                    do
-                    {
-                        // --------------------------------
-                        //  look for  (*node)->mon  in   f
-                        // --------------------------------
-
-                        cmp = pCmp( (*node)->mon,f );
-
-                        if( cmp<0 )
-                        {
-                            f = pNext( f );
-                        }
-                        else if( cmp==0 )
-                        {
-                            search->nf = pSub( search->nf,
-                                ppMult_nn( (*node)->nf,pGetCoeff( f ) ) );
-                            pNorm( search->nf );
-                        }
-                    }
-                    while( cmp<0 && f!=(poly)NULL );
-                }
-                search = search->next;
-            }
-            speclist.delete_node( node );
-        }
-
-    }
-
-    // --------------------------------------------------------
-    //  fast computation exploits the symmetry of the spectrum
-    // --------------------------------------------------------
-
-    if( fast==2 )
-    {
-        mu = 2*mu - z;
-        n  = ( z > 0 ? 2*n - 1 : 2*n );
-    }
-
-    // --------------------------------------------------------
-    //  compute the spectrum numbers with their multiplicities
-    // --------------------------------------------------------
-
-    intvec            *nom  = new intvec( n );
-    intvec            *den  = new intvec( n );
-    intvec            *mult = new intvec( n );
-
-    int count         = 0;
-    int multiplicity  = 1;
-
-    for( search=speclist.root; search!=(spectrumPolyNode*)NULL &&
-                     ( fast==0 || search->weight<=smax );
-                     search=search->next )
-    {
-        if( search->next==(spectrumPolyNode*)NULL ||
-            search->weight<search->next->weight )
-        {
-            (*nom) [count] = search->weight.get_num_si( );
-            (*den) [count] = search->weight.get_den_si( );
-            (*mult)[count] = multiplicity;
-
-            multiplicity=1;
-            count++;
-        }
-        else
-        {
-            multiplicity++;
-        }
-    }
-
-    // --------------------------------------------------------
-    //  fast computation exploits the symmetry of the spectrum
-    // --------------------------------------------------------
-
-    if( fast==2 )
-    {
-        int n1,n2;
-        for( n1=0, n2=n-1; n1<n2; n1++, n2-- )
-        {
-            (*nom) [n2] = rVar(currRing)*(*den)[n1]-(*nom)[n1];
-            (*den) [n2] = (*den)[n1];
-            (*mult)[n2] = (*mult)[n1];
-        }
-    }
-
-    // -----------------------------------
-    //  test if the spectrum is symmetric
-    // -----------------------------------
-
-    if( fast==0 || fast==1 )
-    {
-        int symmetric=TRUE;
-
-        for( int n1=0, n2=n-1 ; n1<n2 && symmetric==TRUE; n1++, n2-- )
-        {
-            if( (*mult)[n1]!=(*mult)[n2] ||
-                (*den) [n1]!= (*den)[n2] ||
-                (*nom)[n1]+(*nom)[n2]!=rVar(currRing)*(*den) [n1] )
-            {
-                symmetric = FALSE;
-            }
-        }
-
-        if( symmetric==FALSE )
-        {
-            // ---------------------------------------------
-            //  the spectrum is not symmetric => degenerate
-            //  principal part
-            // ---------------------------------------------
-
-            *L = (lists)omAllocBin( slists_bin);
-            (*L)->Init( 1 );
-            (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-            (*L)->m[0].data = (void*)mu;
-
-            return spectrumDegenerate;
-        }
-    }
-
-    *L = (lists)omAllocBin( slists_bin);
-
-    (*L)->Init( 6 );
-
-    (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-    (*L)->m[1].rtyp = INT_CMD;    //  geometrical genus
-    (*L)->m[2].rtyp = INT_CMD;    //  number of spectrum values
-    (*L)->m[3].rtyp = INTVEC_CMD; //  nominators
-    (*L)->m[4].rtyp = INTVEC_CMD; //  denomiantors
-    (*L)->m[5].rtyp = INTVEC_CMD; //  multiplicities
-
-    (*L)->m[0].data = (void*)mu;
-    (*L)->m[1].data = (void*)pg;
-    (*L)->m[2].data = (void*)n;
-    (*L)->m[3].data = (void*)nom;
-    (*L)->m[4].data = (void*)den;
-    (*L)->m[5].data = (void*)mult;
-
-    return  spectrumOK;
 }
 
 #endif
@@ -5145,7 +5149,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
 #ifdef HABE_RINGS
 // currently, coefficients which are ring elements require a global ordering:
-  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+  if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
     WerrorS("global ordering required for these coefficients");
     goto rInitError;
