@@ -208,6 +208,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl rFindHdl(ring r, idhdl n, idhdl w);
 void   rKill(idhdl h);
 void   rKill(ring r);
+lists scIndIndset(ideal S, BOOLEAN all, ideal Q);
+BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id);
 
 #endif
 
