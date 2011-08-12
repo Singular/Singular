@@ -5952,21 +5952,21 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
 {
   monomexpr=(poly)w->Data();
   poly p=(poly)v->Data();
-  #if 0
+#if 0
   if (pLength(monomexpr)>1)
   {
     Werror("`%s` substitutes a ringvar only by a term",
       Tok2Cmdname(SUBST_CMD));
     return TRUE;
   }
-  #endif
+#endif
   if (!(ringvar=pVar(p)))
   {
     if (rField_is_Extension(currRing))
     {
       assume(currRing->extRing!=NULL);
-      lnumber n=(lnumber)pGetCoeff(p);
-      ringvar=-p_Var(n->z,currRing->cf->extRing);
+      number n = pGetCoeff(p);
+      ringvar=- n_IsParam(n, currRing);
     }
     if(ringvar==0)
     {
