@@ -33,11 +33,9 @@
 
 #include <coeffs/coeffs.h>
 
-struct ip_sring;
-typedef struct ip_sring * ring;
-
-struct sip_sideal;
-typedef struct sip_sideal * ideal;
+// Forward declarations
+struct ip_sring; typedef struct ip_sring * ring;
+struct sip_sideal; typedef struct sip_sideal * ideal;
 
 /// struct for passing initialization parameters to naInitChar
 typedef struct { ring r; ideal i; } AlgExtInfo;
@@ -80,27 +78,6 @@ const char * naRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 */
 
-#ifdef LDEBUG
-#define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
-BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
-#else
-#define naTest(a)
-#endif
-
-/* our own type */
-#define naID n_algExt
-
-/* polynomial ring in which our numbers live */
-#define naRing cf->extRing
-
-/* coeffs object in which the coefficients of our numbers live;
- * methods attached to naCoeffs may be used to compute with the
- * coefficients of our numbers, e.g., use naCoeffs->nAdd to add
- * coefficients of our numbers */
-#define naCoeffs cf->extRing->cf
-
-/* minimal polynomial */
-#define naMinpoly naRing->minideal->m[0]
 
 #endif
 /* ALGEXT_H */

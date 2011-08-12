@@ -14,8 +14,7 @@ using namespace std;
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rintegers.h>
 
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
+
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 
@@ -25,6 +24,13 @@ using namespace std;
 #include <polys/clapsing.h>
 #include <factory/factory.h>
 #endif
+
+
+#define TRANSEXT_PRIVATES
+
+#include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
+
 
 class MyGlobalPrintingFixture : public GlobalPrintingFixture
 {

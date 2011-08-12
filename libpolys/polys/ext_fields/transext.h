@@ -39,17 +39,13 @@
 struct ip_sring;
 typedef struct ip_sring * ring;
 
-struct sip_sideal;
-typedef struct sip_sideal * ideal;
 
-struct spolyrec;
-typedef struct spolyrec polyrec;
-typedef polyrec * poly;
+// the following is only needed _here_ due to its use in clapsing.cc!
+#ifdef TRANSEXT_PRIVATES
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec * poly;
 
-/// struct for passing initialization parameters to naInitChar
-typedef struct { ring r; } TransExtInfo;
 
-/* a number in K(t_1, .., t_s) is represented by either NULL
+/** a number in K(t_1, .., t_s) is represented by either NULL
    (representing the zero number), or a pointer to a fraction which contains
    the numerator polynomial and the denominator polynomial in K[t_1, .., t_s];
    if the denominator is 1, the member 'denominator' is NULL;
@@ -65,30 +61,26 @@ typedef struct { ring r; } TransExtInfo;
    to time. (This heuristic may be set up such that cancellation can be
    enforced after each arithmetic operation, or such that it will never take
    place.) Moreover, the 'complexity' of n is zero iff the gcd in n (that is,
-   the gcd of its numerator and denominator) is trivial. */
+     the gcd of its numerator and denominator) is trivial.
+ */
 struct fractionObject
 {
   poly numerator;
   poly denominator;
   int complexity;
 };
+
 typedef struct fractionObject * fraction;
 
-/* constants for controlling the complexity of numbers */
-#define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
-#define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
-#define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
 
-/* some useful accessors for fractions: */
-#define IS0(f) (f == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
 #define NUM(f) f->numerator
 #define DEN(f) f->denominator
-#define DENIS1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
-#define NUMIS1(f) (p_IsConstant(f->numerator, cf->extRing) && \
-                   n_IsOne(p_GetCoeff(f->numerator, cf->extRing), \
-                           cf->extRing->cf))
-                   /**< TRUE iff num. represents 1 */
-#define COM(f) f->complexity
+
+#endif
+
+
+/// struct for passing initialization parameters to naInitChar
+typedef struct { ring r; } TransExtInfo;
 
 /// Get a mapping function from src into the domain of this type (n_transExt)
 nMapFunc ntSetMap(const coeffs src, const coeffs dst);

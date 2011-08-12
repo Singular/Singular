@@ -2063,7 +2063,7 @@ void p_Content(poly ph, const ring r)
       h = nlInit(1, r->cf);
       p=ph;
       Werror("longalg missing 1");
-      #if 0
+#if 0
       while (p!=NULL)
       { // each monom: coeff in Q_a
         lnumber c_n_n=(lnumber)pGetCoeff(p);
@@ -2127,7 +2127,7 @@ void p_Content(poly ph, const ring r)
         }
       }
       nlDelete(&h,r->extRing->cf);
-      #endif
+#endif
     }
   }
 }
@@ -3403,17 +3403,17 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
     {
       qq=p_One(dst);
       WerrorS("longalg missing 2");
-      #if 0
+#if 0
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
       if ((!rMinpolyIsNULL(dst))
       && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
       {
-	p_Normalize(aq,dst);
+        p_Normalize(aq,dst);
         if (aq==NULL)
-	  p_SetCoeff(qq,n_Init(0,dst->cf),dst);
+          p_SetCoeff(qq,n_Init(0,dst->cf),dst);
       }
       p_Test(aq,dst);
-      #endif
+#endif
     }
     if (rRing_has_Comp(dst)) p_SetComp(qq, p_GetComp(p,oldRing),dst);
     if (n_IsZero(pGetCoeff(qq),dst->cf))
@@ -3449,7 +3449,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             else
             {
               WerrorS("longalg missing 3");
-              #if 0
+#if 0
               lnumber c=(lnumber)pGetCoeff(qq);
               if (c->z->next==NULL)
                 p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
@@ -3463,7 +3463,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
                 n_Delete((number *)&mmc,dst->cf);
               }
               mapped_to_par=1;
-              #endif
+#endif
             }
           }
           else

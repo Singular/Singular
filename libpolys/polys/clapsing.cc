@@ -24,11 +24,13 @@
 
 #include "monomials/ring.h"
 #include "simpleideals.h"
-#include "ext_fields/transext.h"
+
+
 //#include "polys.h"
+#define TRANSEXT_PRIVATES
+#include "ext_fields/transext.h"
 
-
-TODO(Martin, Please adapt the following code for the use in SW)
+// TODO(Martin, Please adapt the following code for the use in SW)
 
 
 #include "clapsing.h"

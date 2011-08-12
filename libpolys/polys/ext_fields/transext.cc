@@ -31,6 +31,7 @@
 *           is being replaced by a quotient of two polynomials over Z, or
 *           - if the denominator is a constant - by a polynomial over Q.
 */
+#define TRANSEXT_PRIVATES
 
 #include "config.h"
 #include <misc/auxiliary.h>
@@ -51,10 +52,50 @@
 #include <polys/clapsing.h>
 #endif
 
-#include <polys/ext_fields/transext.h>
+#include "ext_fields/transext.h"
 
-/// our type has been defined as a macro in transext.h
-/// and is accessible by 'ntID'
+
+
+
+
+
+/* constants for controlling the complexity of numbers */
+#define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
+#define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
+#define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
+
+/* some useful accessors for fractions: */
+#define IS0(f) (f == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
+
+#define DENIS1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
+#define NUMIS1(f) (p_IsConstant(f->numerator, cf->extRing) && \
+                   n_IsOne(p_GetCoeff(f->numerator, cf->extRing), \
+                           cf->extRing->cf))
+                   /**< TRUE iff num. represents 1 */
+#define COM(f) f->complexity
+
+
+#ifdef LDEBUG
+#define ntTest(a) ntDBTest(a,__FILE__,__LINE__,cf)
+BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
+#else
+#define ntTest(a)
+#endif
+
+/// Our own type!
+static const n_coeffType ID = n_transExt;
+
+/* polynomial ring in which the numerators and denominators of our
+   numbers live */
+#define ntRing cf->extRing
+
+/* coeffs object in which the coefficients of our numbers live;
+ * methods attached to ntCoeffs may be used to compute with the
+ * coefficients of our numbers, e.g., use ntCoeffs->nAdd to add
+ * coefficients of our numbers */
+#define ntCoeffs cf->extRing->cf
+
+
 
 extern omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
 
@@ -97,7 +138,7 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf);
 #ifdef LDEBUG
 BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 {
-  assume(getCoeffType(cf) == ntID);
+  assume(getCoeffType(cf) == ID);
   fraction t = (fraction)a;
   if (IS0(t)) return TRUE;
   assume(NUM(t) != NULL);   /**< t != 0 ==> numerator(t) != 0 */
@@ -802,7 +843,7 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
 /* expects *param to be castable to TransExtInfo */
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 {
-  if (ntID != n) return FALSE;
+  if (ID != n) return FALSE;
   TransExtInfo *e = (TransExtInfo *)param;
   /* for rational function fields we expect the underlying
      polynomial rings to be IDENTICAL, i.e. the SAME OBJECT;
@@ -977,7 +1018,7 @@ number ntMapUP(number a, const coeffs src, const coeffs dst)
 nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be a rational function field */
-  assume(getCoeffType(dst) == ntID);
+  assume(getCoeffType(dst) == ID);
   
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
@@ -1041,7 +1082,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   assume(cf->extRing                != NULL);      // extRing;
   assume(cf->extRing->cf            != NULL);      // extRing->cf;
-  assume(getCoeffType(cf) == ntID);                // coeff type;
+  assume(getCoeffType(cf) == ID);                // coeff type;
   
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
