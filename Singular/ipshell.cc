@@ -5,18 +5,19 @@
 /*
 * ABSTRACT:
 */
+#include <kernel/mod2.h>
+#include <misc/auxiliary.h>
 
-#include <math.h>
 
 #include <misc/options.h>
-#include <misc/auxiliary.h>
+#include <misc/mylimits.h>
+
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #endif
 
 #include <Singular/maps_ip.h>
-#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>
 #include <Singular/ipid.h>
@@ -45,18 +46,20 @@
 #include <kernel/semic.h>
 #include <kernel/splist.h>
 #include <kernel/spectrum.h>
-#include <coeffs/gnumpfl.h>
+////// #include <coeffs/gnumpfl.h>
 //#include <kernel/mpr_base.h>
-#include <coeffs/ffields.h>
+////// #include <coeffs/ffields.h>
 #include <polys/clapsing.h>
 #include <kernel/hutil.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
 #include <polys/ext_fields/algext.h>
 #include <coeffs/mpr_complex.h>
-#include <coeffs/longrat.h>
+////// #include <coeffs/longrat.h>
 #include <numeric/mpr_base.h>
 #include <numeric/mpr_numeric.h>
+
+#include <math.h>
 
 // define this if you want to use the fast_map routine for mapping ideals
 #define FAST_MAP
@@ -658,18 +661,19 @@ leftv iiMap(map theMap, const char * what)
     //             IDRING(r)->parameter,
     //             rPar(IDRING(r)),
     //             IDRING(r)->minpoly)))
-    if ((nMap=nSetMap(IDRING(r)->cf))==NULL)
+    if ((nMap=n_SetMap(IDRING(r)->cf, currRing->cf))==NULL)
     {
-      if (rEqual(IDRING(r),currRing))
-      {
-        nMap=n_SetMap(currRing->cf, currRing->cf);
-      }
-      else
-      {
+////////// WTF?
+//      if (rEqual(IDRING(r),currRing))
+//      {
+//        nMap = n_SetMap(currRing->cf, currRing->cf);
+//      }
+//      else
+//      {
         Werror("can not map from ground field of %s to current ground field",
           theMap->preimage);
         return NULL;
-      }
+//      }
     }
     if (IDELEMS(theMap)<IDRING(r)->N)
     {
@@ -4880,6 +4884,8 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
   return FALSE;
 }
 
+const short MAX_SHORT = SHRT_MAX; // (1 << (sizeof(short)*8)) - 1;
+
 ////////////////////
 //
 // rInit itself:
@@ -5102,9 +5108,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   /* names and number of variables-------------------------------------*/
   {
     int l=rv->listLength();
-#if SIZEOF_SHORT == 2
-#define MAX_SHORT 0x7fff
-#endif
+
     if (l>MAX_SHORT)
     {
       Werror("too many ring variables(%d), max is %d",l,MAX_SHORT);

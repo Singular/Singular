@@ -114,11 +114,11 @@ BOOLEAN Test(const n_coeffType type, void* param)
 }
 
 
-BOOLEAN simple(const n_coeffType _type, cfInitCharProc p, void* param = NULLp)
+BOOLEAN simple(const n_coeffType _type, void* param = NULLp)
 {
-  n_coeffType type = nRegister( _type, p);
-  assume( type == _type ); // ?
-  return ( Test(type, param) );
+//  n_coeffType type = nRegister( _type, p);
+//  assume( type == _type ); // ?
+  return ( Test(_type, param) );
 }
 
 
@@ -131,23 +131,20 @@ int main( int, char *argv[] )
   feStringAppendResources(0);
   PrintS(StringAppendS("\n"));
   // longrat
-  extern BOOLEAN nlInitChar(coeffs, void*); // Q
-  if( simple(n_Q, nlInitChar) )
+  if( simple(n_Q) )
     PrintS("Q: Test Passed!");
   else 
     PrintS("Q: Test: Failed!");
   PrintLn();
 
   // modulop
-  extern BOOLEAN npInitChar(coeffs, void*); // Zp
-  if( simple(n_Zp, npInitChar, (void*)7) )
+  if( simple(n_Zp, (void*)7) )
     PrintS("Zp: Test Passed!");
   else 
     PrintS("Zp: Test: Failed!");
   PrintLn();
   
   // due to coeffs/ffields.h
-  extern BOOLEAN nfInitChar(coeffs, void*); // GF
   struct 
   {
     int GFChar;
@@ -159,7 +156,7 @@ int main( int, char *argv[] )
   param.GFDegree= 2;
   param.GFPar_name= (const char*)"Q";
 
-  if( simple(n_GF, nfInitChar, (void*)&param) )
+  if( simple(n_GF, (void*)&param) )
     PrintS("GF: Test Passed!");
   else 
     PrintS("GF: Test: Failed!");

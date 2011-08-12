@@ -5542,13 +5542,16 @@ BOOLEAN rMinpolyIsNULL(const ring r)
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) )
+  const BOOLEAN ret = nCoeff_is_algExt(C);
+  
+  if( ret )
   {
     const ring R = C->extRing;
     assume( R != NULL );
-    return idIs0(R->minideal);
+    assume( !idIs0(R->minideal) );
   }
-  return TRUE;
+  
+  return ret;
 }
 
 poly rGetVar(const int varIndex, const ring r)
