@@ -2097,7 +2097,7 @@ ring rCompose(const lists  L)
       int l=0;
        
       if (
-	  ((ch!=0) && (ch<2) && (is_gf_char=-1)) // TODO for Hans!: negative characteristic?
+          ((ch!=0) && (ch<2) && (is_gf_char=-1)) // TODO for Hans!: negative characteristic?
       #ifndef NV_OPS
       || (ch > 32003)
       #endif
@@ -2126,17 +2126,17 @@ ring rCompose(const lists  L)
       if (LL->m[0].Typ()==INT_CMD)
       {
         ch = (int)(long)LL->m[0].Data();
-	 
-	// TODO: check that ch is a supported (by our GF impl.) power of a prime
+         
+        // TODO: check that ch is a supported (by our GF impl.) power of a prime
         while ((ch != fftable[is_gf_char]) && (fftable[is_gf_char])) is_gf_char++;
-	 
+         
         if (fftable[is_gf_char]==0) is_gf_char=-1;
       }
        
       if (is_gf_char==-1)
       {
         ring extRing = rCompose((lists)L->m[0].Data());
-	
+        
         if (extRing==NULL)
         {
           WerrorS("could not create rational function coefficient field");
@@ -2146,13 +2146,13 @@ ring rCompose(const lists  L)
           ch = - extRing->cf->ch; // TODO: this is obsolete!
         else
           ch = 1; // WTF?
-	 
+         
 //        extRing->names = (char**)omAlloc0(rPar(R)*sizeof(char_ptr)); // obsolete?
-	 
+         
         int i;
-	 
+         
 //        for( i = rPar(R) - 1; i >= 0; i--) extRing->names[i] = omStrDup(extRing->names[i]);
-/*	
+/*        
         // Obsolete?
         if (extRing->qideal!=NULL)
         {
@@ -2164,7 +2164,7 @@ ring rCompose(const lists  L)
 //            naMinimalPoly = n->z;
             R->cf->extRing->qideal->m[0]=NULL;
             idDelete(&(R->cf->extRing->qideal));
-	     
+             
             redefineFunctionPointers();
           }
           else
@@ -2307,8 +2307,8 @@ ring rCompose(const lists  L)
       R->block1[j]=si_max(R->block0[j],R->block0[j]+iv_len-1);
       if (R->block1[j]>R->N)
       {
-	R->block1[j]=R->N;
-	iv_len=R->block1[j]-R->block0[j]+1;
+        R->block1[j]=R->N;
+        iv_len=R->block1[j]-R->block0[j]+1;
       }
       //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
       int i;
@@ -2332,10 +2332,10 @@ ring rCompose(const lists  L)
            for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
            R->block1[j]=si_max(R->block0[j],R->block0[j]+(int)sqrt((double)(iv->length()-1)));
            if (R->block1[j]>R->N)
-	   {
-	     WerrorS("ordering matrix too big");
-	     goto rCompose_err;
-	   }
+           {
+             WerrorS("ordering matrix too big");
+             goto rCompose_err;
+           }
            break;
          case ringorder_ls:
          case ringorder_ds:
@@ -2820,7 +2820,7 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
   res->data=singclap_resultant((poly)u->CopyD(),(poly)v->CopyD(),
-		  (poly)w->CopyD(), currRing);
+                  (poly)w->CopyD(), currRing);
   return errorreported;
 }
 BOOLEAN jjCHARSERIES(leftv res, leftv u)
@@ -3275,7 +3275,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   poly    wc = ( fast==0 ? pCopy( hc ) :
                ( fast==1 ? computeWC( nph,(Rational)rVar(currRing), currRing ) :
               /* fast==2 */computeWC( nph,
-		      ((Rational)rVar(currRing))/(Rational)2, currRing ) ) );
+                      ((Rational)rVar(currRing))/(Rational)2, currRing ) ) );
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -4175,7 +4175,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   if ( !(rField_is_R(currRing) || rField_is_long_R(currRing) || \
-			  rField_is_long_C(currRing)) )
+                          rField_is_long_C(currRing)) )
   {
     unsigned long int ii = (unsigned long int)arg2->Data();
     setGMPFloatDigits( ii, ii );
@@ -4188,7 +4188,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   int ldummy;
-  int deg= pLDeg( gls, &ldummy, currRing );
+  int deg= currRing->pLDeg( gls, &ldummy, currRing );
   //  int deg= pDeg( gls );
   int len= pLength( gls );
   int i,vpos=0;
@@ -4436,7 +4436,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   if ( v->Typ() != INT_CMD )
     return TRUE;
   else if ( !(rField_is_R(currRing) || rField_is_long_R(currRing) || \
-			  rField_is_long_C(currRing)) )
+                          rField_is_long_C(currRing)) )
   {
     unsigned long int ii=(unsigned long int)v->Data();
     setGMPFloatDigits( ii, ii );
@@ -4572,7 +4572,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
         {
           onepoint->m[j].rtyp=STRING_CMD;
           onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec,
-			  currRing->cf);
+                          currRing->cf);
         }
         else
         {
@@ -4948,24 +4948,59 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   /* ch -------------------------------------------------------*/
   // get ch of ground field
   int numberOfAllocatedBlocks;
+  
+  coeffs cf=NULL;
 
   if (pn->Typ()==INT_CMD)
   {
     ch=(int)(long)pn->Data();
+    if (pn->next==NULL)
+      cf=nInitChar(ch==0 ? n_Q : n_Zp, (void*)(long)ch);
+    else
+    {
+      if ((ch!=0) && (ch!=IsPrime(ch)))
+      {
+        cf=nInitChar(n_GF,(void*)(long)ch);
+        if (cf==NULL) goto rInitError;
+        else ffChar=TRUE;
+      }
+      /* parameter -------------------------------------------------------*/
+      pn=pn->next;
+      if (cf==NULL) cf=nInitChar(n_transExt,NULL);
+      R->cf=cf;
+      if (pn!=NULL)
+      {
+        int pars=pn->listLength();
+        if (!ffChar) R->cf->extRing->N=pars;
+        if ((pars > 1) && (ffChar))
+        {
+          WerrorS("too many parameters");
+          goto rInitError;
+        }
+        if (!ffChar) R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
+        if (rSleftvList2StringArray(pn, R->cf->extRing->names))
+        {
+          WerrorS("parameter expected");
+          goto rInitError;
+        }
+      }
+    }
   }
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
-    ch=-1;
+    ch=0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
+      WarnS("not implemented: size for real/complex");
       float_len=(int)(long)pn->next->Data();
       float_len2=float_len;
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
         float_len2=(int)(long)pn->next->Data();
+        WarnS("not implemented: size for real/complex");
         pn=pn->next;
       }
     }
@@ -4974,6 +5009,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       pn->next=(leftv)omAlloc0Bin(sleftv_bin);
       pn->next->name=omStrDup("i");
     }
+    else
+      WarnS("not implemented: name for i (complex)");
+    cf=nInitChar(complex_flag ? n_long_C: n_long_R,NULL);
   }
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
@@ -4995,6 +5033,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         pn=pn->next;
       }
     }
+    else
+      cf=nInitChar(n_Z,NULL);
     if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
     {
       Werror("Wrong ground ring specification (module is 1)");
@@ -5005,14 +5045,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       Werror("Wrong ground ring specification (exponent smaller than 1");
       goto rInitError;
     }
-    // module is 0 ---> integers
-    if (mpz_cmp_ui(modBase, 0) == 0)
-    {
-      ch = 0;
-      ringtype = 4;
-    }
+    // module is 0 ---> integers ringtype = 4;
     // we have an exponent
-    else if (modExponent > 1)
+    if (modExponent > 1)
     {
       ch = modExponent;
       if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
@@ -5020,10 +5055,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
         ringtype = 1;       // Use Z/2^ch
+        cf=nInitChar(n_Z2m,(void*)(long)modExponent);
       }
       else
       {
         ringtype = 3;
+        cf=nInitChar(n_Zn,(void*)(long)modBase);
       }
     }
     // just a module m > 1
@@ -5031,6 +5068,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       ringtype = 2;
       ch = mpz_get_ui(modBase);
+      cf=nInitChar(n_Zn,(void*)(long)modBase);
     }
   }
 #endif
@@ -5055,88 +5093,22 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
   */
-  if ((ch!=-1)
-#ifdef HAVE_RINGS
-       && (ringtype == 0)
-#endif
-     )
-  {
-    int l = 0;
+  l = 0;
 
-    if (((ch!=0) && (ch<2))
-    #ifndef NV_OPS
-    || (ch > 32003)
-    #endif
-    )
-    {
-      Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
-      ch=32003;
-    }
-    // load fftable, if necessary
-    if (pn!=NULL)
-    {
-      while ((ch!=fftable[l]) && (fftable[l])) l++;
-      if (fftable[l]==0) ch = IsPrime(ch);
-      else
-      {
-        char *m[1]={(char *)sNoName};
-        nfSetChar(ch,m);
-        if (errorreported) goto rInitError;
-        else ffChar=TRUE;
-      }
-    }
-    else
-    {
-      ch = IsPrime(ch);
-    }
+  if (cf==NULL)
+  {
+    Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
+    ch=32003;
+    cf=nInitChar(n_Zp, (void*)(long)ch);
   }
   // allocated ring and set ch
   R = (ring) omAlloc0Bin(sip_sring_bin);
-  R->cf->ch = ch;
+  R->cf=cf;
 #ifdef HAVE_RINGS
   R->cf->ringtype = ringtype;
   R->cf->modBase = modBase;
   R->cf->modExponent = modExponent;
 #endif
-  if (ch == -1)
-  {
-    R->float_len= si_min(float_len,32767);
-    R->float_len2= si_min(float_len2,32767);
-  }
-
-  /* parameter -------------------------------------------------------*/
-  if (pn!=NULL)
-  {
-    R->cf->extRing->N=pn->listLength();
-    //if ((ffChar|| (ch == 1)) && (rPar(R) > 1))
-    if ((rPar(R) > 1) && (ffChar || (ch == -1)))
-    {
-      WerrorS("too many parameters");
-      goto rInitError;
-    }
-    R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
-    if (rSleftvList2StringArray(pn, R->cf->extRing->names))
-    {
-      WerrorS("parameter expected");
-      goto rInitError;
-    }
-    if (ch>1 && !ffChar) R->cf->ch=-ch;
-    else if (ch==0) R->cf->ch=1;
-  }
-  else if (ffChar)
-  {
-    WerrorS("need one parameter");
-    goto rInitError;
-  }
-  /* post-processing of field description */
-  // we have short reals, but no short complex
-  if ((R->cf->ch == - 1)
-  && (rParameter(R) !=NULL)
-  && (R->float_len < SHORT_REAL_LENGTH))
-  {
-    R->float_len = SHORT_REAL_LENGTH;
-    R->float_len2 = SHORT_REAL_LENGTH;
-  }
 
   /* names and number of variables-------------------------------------*/
   {
