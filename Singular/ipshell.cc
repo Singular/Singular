@@ -2070,7 +2070,6 @@ ring rCompose(const lists  L)
 #endif
   )
     return NULL;
-  int is_gf_char=0;
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
@@ -2078,7 +2077,139 @@ ring rCompose(const lists  L)
   // possibly:
   // 4: C
   // 5: D
-  ring R=(ring) omAlloc0Bin(sip_sring_bin);
+  ring R = (ring) omAlloc0Bin(sip_sring_bin);
+   
+   
+  assume( R->cf == NULL );   
+  int ch;
+  int is_gf_char = 0;
+   
+  // ------------------------------------------------------------------
+  // 0: char:
+  if (L->m[0].Typ()==INT_CMD)
+  {
+    ch = (int)(long)L->m[0].Data();
+    assume( ch >= 0 );
+     
+     
+    if (ch != -1) // WTF?
+    {
+      int l=0;
+       
+      if (
+	  ((ch!=0) && (ch<2) && (is_gf_char=-1)) // TODO for Hans!: negative characteristic?
+      #ifndef NV_OPS
+      || (ch > 32003)
+      #endif
+      || ((l=IsPrime(ch))!=ch)
+      )
+      {
+        Warn("%d is invalid characteristic of ground field. %d is used.", ch,l);
+        ch = l;
+      }
+    }
+  }
+  else if (L->m[0].Typ()==LIST_CMD)
+  {
+    lists LL=(lists)L->m[0].Data();
+#ifdef HAVE_RINGS
+    if (LL->m[0].Typ() == STRING_CMD)
+    {
+      rComposeRing(LL,R); /* Ring */
+    }
+    else
+#endif
+    if (LL->nr<3)
+      rComposeC(LL,R); /* R, long_R, long_C */
+    else
+    {
+      if (LL->m[0].Typ()==INT_CMD)
+      {
+        ch = (int)(long)LL->m[0].Data();
+	 
+	// TODO: check that ch is a supported (by our GF impl.) power of a prime
+        while ((ch != fftable[is_gf_char]) && (fftable[is_gf_char])) is_gf_char++;
+	 
+        if (fftable[is_gf_char]==0) is_gf_char=-1;
+      }
+       
+      if (is_gf_char==-1)
+      {
+        ring extRing = rCompose((lists)L->m[0].Data());
+	
+        if (extRing==NULL)
+        {
+          WerrorS("could not create rational function coefficient field");
+          goto rCompose_err;
+        }
+        if (extRing->cf->ch > 0)
+          ch = - extRing->cf->ch; // TODO: this is obsolete!
+        else
+          ch = 1; // WTF?
+	 
+//        extRing->names = (char**)omAlloc0(rPar(R)*sizeof(char_ptr)); // obsolete?
+	 
+        int i;
+	 
+//        for( i = rPar(R) - 1; i >= 0; i--) extRing->names[i] = omStrDup(extRing->names[i]);
+/*	
+        // Obsolete?
+        if (extRing->qideal!=NULL)
+        {
+          if (IDELEMS(extRing->qideal) == 1)
+          {
+            extRing->qideal->m[0] = naInit(1,R);
+            lnumber n=(lnumber)R->minpoly;
+            n->z = extRing->qideal->m[0];
+//            naMinimalPoly = n->z;
+            R->cf->extRing->qideal->m[0]=NULL;
+            idDelete(&(R->cf->extRing->qideal));
+	     
+            redefineFunctionPointers();
+          }
+          else
+          {
+            WerrorS("not implemented yet.");
+          }
+        }
+*/
+      }
+      else
+      { // gf-char
+//        ch = fftable[is_gf_char];
+        extRing->N=1;
+        extRing->names=(char**)omAlloc0(1*sizeof(char_ptr));
+        extRing->names[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
+      }
+    }
+  }
+  else
+  {
+    WerrorS("coefficient field must be described by `int` or `list`");
+    goto rCompose_err;
+  }
+  rRenameVars(R);
+  rComplete(R);
+   
+#ifdef HAVE_RINGS 
+  // This was a BUG IN SINGULAR: There is no HABE_RINGS!!!
+   
+// currently, coefficients which are ring elements require a global ordering:
+  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+  {
+    WerrorS("global ordering required for these coefficients");
+    goto rCompose_err;
+  }
+#endif
+   
+   
+   
+   
+   
+   
+   
+   
+   
   // ------------------------- VARS ---------------------------
   if (L->m[1].Typ()==LIST_CMD)
   {
@@ -2275,104 +2406,7 @@ ring rCompose(const lists  L)
     WerrorS("ordering must be given as `list`");
     goto rCompose_err;
   }
-  // ------------------------------------------------------------------
-  // 0: char:
-  if (L->m[0].Typ()==INT_CMD)
-  {
-    R->cf->ch=(int)(long)L->m[0].Data();
-    if (R->cf->ch!=-1)
-    {
-      int l=0;
-      if (((R->cf->ch!=0) && (R->cf->ch<2) && (is_gf_char=-1))
-      #ifndef NV_OPS
-      || (R->cf->ch > 32003)
-      #endif
-      || ((l=IsPrime(R->cf->ch))!=R->cf->ch)
-      )
-      {
-        Warn("%d is invalid characteristic of ground field. %d is used.", R->cf->ch,l);
-        R->cf->ch=l;
-      }
-    }
-  }
-  else if (L->m[0].Typ()==LIST_CMD)
-  {
-    lists LL=(lists)L->m[0].Data();
-#ifdef HAVE_RINGS
-    if (LL->m[0].Typ() == STRING_CMD)
-    {
-      rComposeRing(LL,R); /* Ring */
-    }
-    else
-#endif
-    if (LL->nr<3)
-      rComposeC(LL,R); /* R, long_R, long_C */
-    else
-    {
-      if (LL->m[0].Typ()==INT_CMD)
-      {
-        int ch=(int)(long)LL->m[0].Data();
-        while ((ch!=fftable[is_gf_char]) && (fftable[is_gf_char])) is_gf_char++;
-        if (fftable[is_gf_char]==0) is_gf_char=-1;
-      }
-      if (is_gf_char==-1)
-      {
-        R->cf->extRing=rCompose((lists)L->m[0].Data());
-        if (R->cf->extRing==NULL)
-        {
-          WerrorS("could not create rational function coefficient field");
-          goto rCompose_err;
-        }
-        if (R->cf->extRing->cf->ch>0)
-          R->cf->ch= -R->cf->extRing->cf->ch;
-        else
-          R->cf->ch=1;
-        R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
-        int i;
-        for(i=rPar(R)-1;i>=0;i--)
-          R->cf->extRing->names[i]=omStrDup(R->cf->extRing->names[i]);
-        if (R->cf->extRing->qideal!=NULL)
-        {
-          if (IDELEMS(R->cf->extRing->qideal)==1)
-          {
-            R->cf->extRing->qideal->m[0]=naInit(1,R);
-            lnumber n=(lnumber)R->minpoly;
-            n->z=R->cf->extRing->qideal->m[0];
-            naMinimalPoly=n->z;
-            R->cf->extRing->qideal->m[0]=NULL;
-            idDelete(&(R->cf->extRing->qideal));
-            redefineFunctionPointers();
-          }
-          else
-          {
-            WerrorS("not implemented yet.");
-          }
-        }
-      }
-      else
-      { // gf-char
-        R->cf->ch=fftable[is_gf_char];
-        R->cf->extRing->N=1;
-        R->cf->extRing->names=(char**)omAlloc0(1*sizeof(char_ptr));
-        R->cf->extRing->names[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
-      }
-    }
-  }
-  else
-  {
-    WerrorS("coefficient field must be described by `int` or `list`");
-    goto rCompose_err;
-  }
-  rRenameVars(R);
-  rComplete(R);
-#ifdef HABE_RINGS
-// currently, coefficients which are ring elements require a global ordering:
-  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
-  {
-    WerrorS("global ordering required for these coefficients");
-    goto rCompose_err;
-  }
-#endif
+   
   // ------------------------ Q-IDEAL ------------------------
 
   if (L->m[3].Typ()==IDEAL_CMD)
