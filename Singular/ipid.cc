@@ -232,6 +232,7 @@ char * idrec::String()
 
 idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN search)
 {
+  if (s==NULL) return NULL;
   idhdl h;
   s=omStrDup(s);
   // is it already defined in root ?
