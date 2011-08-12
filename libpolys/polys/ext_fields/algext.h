@@ -78,6 +78,8 @@ const char * naRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 */
 
+/// return the specified parameter as a number in the given alg. field
+number naParam(short iParameter, const coeffs cf);
 
 #endif
 /* ALGEXT_H */

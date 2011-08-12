@@ -559,6 +559,11 @@ static inline char** rParameter(const ring r)
   }
   return NULL;
 }
+
+/// return the specified parameter as a (new!) number in the given
+/// polynomial ring, or NULL if invalid 
+number n_Param(const short iParameter, const ring r);
+
    
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)

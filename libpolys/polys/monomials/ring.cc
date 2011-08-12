@@ -5557,3 +5557,32 @@ poly rGetVar(const int varIndex, const ring r)
     return p;
 }
 
+
+
+number n_Param(const short iParameter, const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  const n_coeffType _filed_type = getCoeffType(C);
+
+  if ( iParameter < 0 || iParameter >= rPar(r) )
+    // Wrong parameter
+    return NULL;
+
+  if( _filed_type == n_algExt )
+  {
+    extern number naParam(short iParameter, const coeffs cf);
+    return naParam(iParameter, C);
+  }
+  
+  if( _filed_type == n_transExt )
+  {
+    extern number ntParam(short iParameter, const coeffs cf);
+    return ntParam(iParameter, C);
+  }
+    
+  return NULL;
+}
+

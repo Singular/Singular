@@ -1129,3 +1129,24 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   
   return FALSE;
 }
+
+
+number ntParam(short iParameter, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );  
+  assume( 0 <= iParameter && iParameter < rVar(R) );
+
+  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
+
+//  return (number) p; 
+
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(f) = p;
+  DEN(f) = NULL;
+  COM(f) = 0;
+
+  return (number)f;
+}
