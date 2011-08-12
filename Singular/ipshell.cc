@@ -4954,9 +4954,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       if ((ch!=0) && (ch!=IsPrime(ch)))
       {
         GFInfo param;
-        param.GFDegree = ch;
-        param.GFChar   = 1;
-        
+	 
+        param.GFChar = ch; 
+        param.GFDegree = 1;
+	 
         param.GFPar_name=pn->name;
         cf=nInitChar(n_GF,&param);
         
