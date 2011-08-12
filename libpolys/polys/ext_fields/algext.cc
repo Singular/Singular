@@ -678,15 +678,27 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 }
 
 
-number naParam(short iParameter, const coeffs cf)
+number naParam(const short iParameter, const coeffs cf)
 {
   assume(getCoeffType(cf) == ID);
   
   const ring R = cf->extRing;
   assume( R != NULL );  
-  assume( 0 <= iParameter && iParameter < rVar(R) );
+  assume( 0 < iParameter && iParameter <= rVar(R) );
   
   poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
   
   return (number) p; 
+}
+
+
+/// if m == var(i)/1 => return i, 
+int naIsParam(number m, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );  
+
+  return p_Var( (poly)m, R ); 
 }

@@ -55,10 +55,6 @@
 #include "ext_fields/transext.h"
 
 
-
-
-
-
 /* constants for controlling the complexity of numbers */
 #define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
 #define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
@@ -1131,13 +1127,13 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 }
 
 
-number ntParam(short iParameter, const coeffs cf)
+number ntParam(const short iParameter, const coeffs cf)
 {
   assume(getCoeffType(cf) == ID);
 
   const ring R = cf->extRing;
   assume( R != NULL );  
-  assume( 0 <= iParameter && iParameter < rVar(R) );
+  assume( 0 < iParameter && iParameter <= rVar(R) );
 
   poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
 
@@ -1149,4 +1145,21 @@ number ntParam(short iParameter, const coeffs cf)
   COM(f) = 0;
 
   return (number)f;
+}
+
+
+/// if m == var(i)/1 => return i, 
+int ntIsParam(number m, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+
+  fraction f = (fraction)m;
+
+  if( DEN(f) != NULL )
+    return 0;
+
+  return p_Var( NUM(f), R ); 
 }

@@ -21,8 +21,6 @@
 #include <polys/simpleideals.h>
 // #include <???/febase.h>
 // #include <???/intvec.h>
-//#include <polys/ext_fields/longalg.h>
-//#include <polys/ext_fields/longtrans.h>
 // #include <coeffs/ffields.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/maps.h>
@@ -40,6 +38,11 @@
 #endif
 // #include <???/maps.h>
 // #include <???/matpol.h>
+
+
+#include "ext_fields/algext.h"
+#include "ext_fields/transext.h"
+
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
@@ -5567,22 +5570,35 @@ number n_Param(const short iParameter, const ring r)
 
   const n_coeffType _filed_type = getCoeffType(C);
 
-  if ( iParameter < 0 || iParameter >= rPar(r) )
+  if ( iParameter <= 0 || iParameter > rPar(r) )
     // Wrong parameter
     return NULL;
 
   if( _filed_type == n_algExt )
-  {
-    extern number naParam(short iParameter, const coeffs cf);
     return naParam(iParameter, C);
-  }
   
   if( _filed_type == n_transExt )
-  {
-    extern number ntParam(short iParameter, const coeffs cf);
     return ntParam(iParameter, C);
-  }
     
   return NULL;
+}
+
+
+
+int n_IsParam(number m, const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  const n_coeffType _filed_type = getCoeffType(C);
+
+  if( _filed_type == n_algExt )
+    return naIsParam(m, C);
+
+  if( _filed_type == n_transExt )
+    return ntIsParam(m, C);
+
+  return 0;
 }
 
