@@ -600,6 +600,17 @@ static inline number  n_Init_bigint(number i, const coeffs dummy,
   return dst->cfInit_bigint(i, dummy, dst);
 }
 
+static inline number  n_RePart(number i, const coeffs cf)
+{
+  assume(cf != NULL); assume(cf->cfRePart!=NULL); 
+  return cf->cfRePart(i,cf);
+}
+static inline number  n_ImPart(number i, const coeffs cf)
+{
+  assume(cf != NULL); assume(cf->cfImPart!=NULL); 
+  return cf->cfImpart(i,cf);
+}
+
 /// returns TRUE, if r is not a field and r has non-trivial units
 static inline BOOLEAN nCoeff_has_Units(const coeffs r)
 { assume(r != NULL); return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
@@ -701,7 +712,7 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 // Missing wrappers for: (TODO: review this?)
-// cfIntMod, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
+// cfIntMod, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... 
 
 // Deprecated:
