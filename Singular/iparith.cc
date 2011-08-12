@@ -4123,7 +4123,7 @@ static BOOLEAN jjpHead(leftv res, leftv v)
 #endif
 static BOOLEAN jjL2R(leftv res, leftv v)
 {
-  res->data=(char *)syConvList((lists)v->Data());
+  res->data=(char *)syConvList((lists)v->Data(),FALSE);
   if (res->data != NULL)
     return FALSE;
   else
@@ -4208,7 +4208,7 @@ static number jjLONG2N(long d)
     };
     typedef struct snumber_dummy  *number_dummy;
  
-    number_dummy z=(number)omAlloc(sizeof(snumber_dummy));
+    number_dummy z=(number_dummy)omAlloc(sizeof(snumber_dummy));
     #if defined(LDEBUG)
     z->debug=123456;
     #endif
@@ -4430,7 +4430,7 @@ static BOOLEAN jjP2I(leftv res, leftv v)
     WerrorS("poly must be constant");
     return TRUE;
   }
-  res->data = (char *)(long)n_Int(pGetCoeff(p),currRing);
+  res->data = (char *)(long)n_Int(pGetCoeff(p),currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
@@ -6358,7 +6358,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   short *w=NULL;
   if(v4!=NULL)
   {
-    w=iv2array((intvec *)v4->Data());
+    w=iv2array((intvec *)v4->Data(),currRing);
     short *w0=w+1;
     int i=currRing->N;
     while(i>0&&*w0>0)
@@ -7188,7 +7188,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
 #ifdef HAVE_FACTORY
     poly h0 = pSubst(pCopy(h), xIndex, NULL);
     intvec* v = NULL;
-    ideal i = singclap_factorize(h0, &v, 0);
+    ideal i = singclap_factorize(h0, &v, 0,currRing);
 
     ivTest(v);
 
