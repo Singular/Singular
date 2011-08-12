@@ -567,6 +567,16 @@ number n_Param(const short iParameter, const ring r);
 
 /// if m == var(i)/1 => return i, 
 int n_IsParam(number m, const ring r);
+
+//#define  rInternalChar(r) ((r)->cf->ch)
+static inline int rInternalChar(const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+  return C->ch;
+}
+
    
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)

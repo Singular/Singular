@@ -68,6 +68,7 @@ int      nlInt(number &n, const coeffs r);
 number   nlBigInt(number &n);
 
 #ifdef HAVE_RINGS
+number nlMapGMP(number from, const coeffs src, const coeffs dst);
 void     nlGMP(number &i, number n, const coeffs r);
 #endif
 
