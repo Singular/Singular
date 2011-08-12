@@ -4953,25 +4953,16 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       if ((ch!=0) && (ch!=IsPrime(ch)))
       {
-        int cc=ch;
-        // finding the prime
-	int p=2;
-	int i=0;
-	if ((ch%p!=0)  p=3;
-        else p=5;
-	loop
-	{
-	  if (cc%p==0) break;
-          p+=2;
-	}
-	while(cc>=1) { cc/=p; i++)
         GFInfo param;
-	param.GFDegree=i;
-	param.GFChar=p;
-	param.GFPar_name=pn->name;
+        param.GFDegree = ch;
+        param.GFChar   = 1;
+        
+        param.GFPar_name=pn->name;
         cf=nInitChar(n_GF,&param);
+        
         if (cf==NULL) goto rInitError;
         else ffChar=TRUE;
+        
       }
       /* parameter -------------------------------------------------------*/
       pn=pn->next;
