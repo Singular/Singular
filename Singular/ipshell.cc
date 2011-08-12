@@ -6,12 +6,16 @@
 * ABSTRACT:
 */
 
-//#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 #include <math.h>
 
+#include <misc/options.h>
+#include <misc/auxiliary.h>
+#ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory/factory.h>
+#endif
+
+#include <Singular/maps_ip.h>
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>
@@ -20,6 +24,7 @@
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <polys/polys.h>
+#include <coeffs/numbers.h>
 #include <polys/prCopy.h>
 #include <kernel/ideals.h>
 #include <polys/matpol.h>
@@ -47,10 +52,11 @@
 #include <kernel/hutil.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory/factory.h>
-#endif
+#include <polys/ext_fields/algext.h>
+#include <coeffs/mpr_complex.h>
+#include <coeffs/longrat.h>
+#include <numeric/mpr_base.h>
+#include <numeric/mpr_numeric.h>
 
 // define this if you want to use the fast_map routine for mapping ideals
 #define FAST_MAP
@@ -652,11 +658,11 @@ leftv iiMap(map theMap, const char * what)
     //             IDRING(r)->parameter,
     //             rPar(IDRING(r)),
     //             IDRING(r)->minpoly)))
-    if ((nMap=nSetMap(IDRING(r)))==NULL)
+    if ((nMap=nSetMap(IDRING(r)->cf))==NULL)
     {
       if (rEqual(IDRING(r),currRing))
       {
-        nMap=nCopy;
+        nMap=n_SetMap(currRing->cf, currRing->cf);
       }
       else
       {
@@ -1196,7 +1202,7 @@ BOOLEAN iiAlias(leftv p)
          nDelete(&IDNUMBER(pp));
          break;
       case BIGINT_CMD:
-         nlDelete(&IDNUMBER(pp),currRing);
+         n_Delete(&IDNUMBER(pp),currRing->cf);
          break;
       case MAP_CMD:
          {
@@ -1505,8 +1511,8 @@ idhdl rDefault(const char *s)
 
   ring r = IDRING(tmp);
 
-  r->ch    = 32003;
-  r->N     = 3;
+  r->cf->ch = 32003;
+  r->N      = 3;
   /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
   /*names*/
   r->names = (char **) omAlloc0(3 * sizeof(char_ptr));
@@ -1575,7 +1581,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
   // 0: char/ cf - ring
   L->m[0].rtyp=INT_CMD;
-  L->m[0].data=(void *)r->ch;
+  L->m[0].data=(void *)r->cf->ch;
   // ----------------------------------------
   // 1: list (var)
   lists LL=(lists)omAlloc0Bin(slists_bin);
@@ -1678,7 +1684,7 @@ void rDecomposeC(leftv h,const ring R)
   if (rField_is_long_C(R))
   {
     L->m[2].rtyp=STRING_CMD;
-    L->m[2].data=(void *)omStrDup(R->parameter[0]);
+    L->m[2].data=(void *)omStrDup(rParameter(R)[0]);
   }
   // ----------------------------------------
 }
@@ -1704,9 +1710,9 @@ void rDecomposeRing(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=nlMapGMP((number) R->ringflaga);
+  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf);
   LL->m[1].rtyp=INT_CMD;
-  LL->m[1].data=(void *) R->ringflagb;
+  LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
 }
@@ -1753,20 +1759,20 @@ lists rDecompose(const ring r)
 #endif
   else if (rIsExtension(r))
   {
-    if (r->extRing!=NULL)
-      rDecomposeCF(&(L->m[0]),r->extRing,r);
+    if (nCoeff_is_algExt(r->cf))
+      rDecomposeCF(&(L->m[0]),r->cf->extRing,r);
     else
     {
       lists Lc=(lists)omAlloc0Bin(slists_bin);
       Lc->Init(4);
       // char:
       Lc->m[0].rtyp=INT_CMD;
-      Lc->m[0].data=(void*)r->ch;
+      Lc->m[0].data=(void*)r->cf->ch;
       // var:
       lists Lv=(lists)omAlloc0Bin(slists_bin);
       Lv->Init(1);
       Lv->m[0].rtyp=STRING_CMD;
-      Lv->m[0].data=(void *)omStrDup(r->parameter[0]);
+      Lv->m[0].data=(void *)omStrDup(rParameter(r)[0]);
       Lc->m[1].rtyp=LIST_CMD;
       Lc->m[1].data=(void*)Lv;
       // ord:
@@ -1801,7 +1807,7 @@ lists rDecompose(const ring r)
   #endif
   {
     L->m[0].rtyp=INT_CMD;
-    L->m[0].data=(void *)r->ch;
+    L->m[0].data=(void *)r->cf->ch;
   }
   // ----------------------------------------
   // 1: list (var)
@@ -1884,9 +1890,9 @@ lists rDecompose(const ring r)
   if (rIsPluralRing(r))
   {
     L->m[4].rtyp=MATRIX_CMD;
-    L->m[4].data=(void *)mpCopy(r->GetNC()->C);
+    L->m[4].data=(void *)mp_Copy(r->GetNC()->C, r, r);
     L->m[5].rtyp=MATRIX_CMD;
-    L->m[5].data=(void *)mpCopy(r->GetNC()->D);
+    L->m[5].data=(void *)mp_Copy(r->GetNC()->D, r, r);
   }
   #endif
   return L;
@@ -1902,7 +1908,7 @@ void rComposeC(lists L, ring R)
     Werror("invald coeff. field description, expecting 0");
     return;
   }
-  R->ch=-1;
+  R->cf->ch=-1;
   // ----------------------------------------
   // 1:
   if (L->m[1].rtyp!=LIST_CMD)
@@ -1925,14 +1931,14 @@ void rComposeC(lists L, ring R)
   // 2: list (par)
   if (L->nr==2)
   {
-    R->P=1;
+    R->cf->extRing->N=1;
     if (L->m[2].rtyp!=STRING_CMD)
     {
       Werror("invald coeff. field description, expecting parameter name");
       return;
     }
-    R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
-    R->parameter[0]=omStrDup((char *)L->m[2].data);
+    R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
+    R->cf->extRing->names[0]=omStrDup((char *)L->m[2].data);
   }
   // ----------------------------------------
 }
@@ -1944,11 +1950,11 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   // 0: string: integer
   // no further entries --> Z
-  R->ringflaga = (int_number) omAlloc(sizeof(mpz_t));
+  R->cf->modBase = (int_number) omAlloc(sizeof(mpz_t));
   if (L->nr == 0)
   {
-    mpz_init_set_ui(R->ringflaga,0);
-    R->ringflagb = 1;
+    mpz_init_set_ui(R->cf->modBase,0);
+    R->cf->modExponent = 1;
   }
   // ----------------------------------------
   // 1:
@@ -1956,67 +1962,67 @@ void rComposeRing(lists L, ring R)
   {
     if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of numbers");
     lists LL=(lists)L->m[1].data;
-    mpz_init(R->ringflaga);
+    mpz_init(R->cf->modBase);
     if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
-      number ringflaga = (number) LL->m[0].data;
-      nlGMP(ringflaga, (number) R->ringflaga);
-      LL->m[0].data = (void *)ringflaga;
+      number modBase = (number) LL->m[0].data;
+      nlGMP(modBase, (number) R->cf->modBase, R->cf);
+      LL->m[0].data = (void *)modBase;
     }
     else if ((LL->nr >= 0) && LL->m[0].rtyp == INT_CMD)
     {
-      mpz_set_ui(R->ringflaga,(unsigned long) LL->m[0].data);
+      mpz_set_ui(R->cf->modBase,(unsigned long) LL->m[0].data);
     }
     else
     {
-      mpz_set_ui(R->ringflaga,0);
+      mpz_set_ui(R->cf->modBase,0);
     }
     if (LL->nr >= 1)
     {
-      R->ringflagb = (unsigned long) LL->m[1].data;
+      R->cf->modExponent = (unsigned long) LL->m[1].data;
     }
     else
     {
-      R->ringflagb = 1;
+      R->cf->modExponent = 1;
     }
   }
   // ----------------------------------------
-  if ((mpz_cmp_ui(R->ringflaga, 1) == 0) && (mpz_cmp_ui(R->ringflaga, 0) < 0))
+  if ((mpz_cmp_ui(R->cf->modBase, 1) == 0) && (mpz_cmp_ui(R->cf->modBase, 0) < 0))
   {
     Werror("Wrong ground ring specification (module is 1)");
     return;
   }
-  if (R->ringflagb < 1)
+  if (R->cf->modExponent < 1)
   {
     Werror("Wrong ground ring specification (exponent smaller than 1");
     return;
   }
   // module is 0 ---> integers
-  if (mpz_cmp_ui(R->ringflaga, 0) == 0)
+  if (mpz_cmp_ui(R->cf->modBase, 0) == 0)
   {
-    R->ch = 0;
-    R->ringtype = 4;
+    R->cf->ch = 0;
+    R->cf->ringtype = 4;
   }
   // we have an exponent
-  else if (R->ringflagb > 1)
+  else if (R->cf->modExponent > 1)
   {
-    R->ch = R->ringflagb;
-    if ((mpz_cmp_ui(R->ringflaga, 2) == 0) && (R->ringflagb <= 8*sizeof(NATNUMBER)))
+    R->cf->ch = R->cf->modExponent;
+    if ((mpz_cmp_ui(R->cf->modBase, 2) == 0) && (R->cf->modExponent <= 8*sizeof(NATNUMBER)))
     {
-      /* this branch should be active for ringflagb = 2..32 resp. 2..64,
+      /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
-      R->ringtype = 1;       // Use Z/2^ch
+      R->cf->ringtype = 1;       // Use Z/2^ch
     }
     else
     {
-      R->ringtype = 3;
+      R->cf->ringtype = 3;
     }
   }
   // just a module m > 1
   else
   {
-    R->ringtype = 2;
-    R->ch = mpz_get_ui(R->ringflaga);
+    R->cf->ringtype = 2;
+    R->cf->ch = mpz_get_ui(R->cf->modBase);
   }
 }
 #endif
@@ -2037,16 +2043,16 @@ static void rRenameVars(ring R)
       }
     }
   }
-  for(i=0;i<R->P; i++)
+  for(i=0;i<rPar(R); i++)
   {
     for(j=0;j<R->N;j++)
     {
-      if (strcmp(R->parameter[i],R->names[j])==0)
+      if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
         Warn("name conflict par(%d) and var(%d): `%s`, rename to `@@(%d)`",i+1,j+1,R->names[j],i+1);
-        omFree(R->parameter[i]);
-        R->parameter[i]=(char *)omAlloc(10);
-        sprintf(R->parameter[i],"@@(%d)",i+1);
+        omFree(rParameter(R)[i]);
+        rParameter(R)[i]=(char *)omAlloc(10);
+        sprintf(rParameter(R)[i],"@@(%d)",i+1);
       }
     }
   }
@@ -2269,19 +2275,19 @@ ring rCompose(const lists  L)
   // 0: char:
   if (L->m[0].Typ()==INT_CMD)
   {
-    R->ch=(int)(long)L->m[0].Data();
-    if (R->ch!=-1)
+    R->cf->ch=(int)(long)L->m[0].Data();
+    if (R->cf->ch!=-1)
     {
       int l=0;
-      if (((R->ch!=0) && (R->ch<2) && (is_gf_char=-1))
+      if (((R->cf->ch!=0) && (R->cf->ch<2) && (is_gf_char=-1))
       #ifndef NV_OPS
-      || (R->ch > 32003)
+      || (R->cf->ch > 32003)
       #endif
-      || ((l=IsPrime(R->ch))!=R->ch)
+      || ((l=IsPrime(R->cf->ch))!=R->cf->ch)
       )
       {
-        Warn("%d is invalid characteristic of ground field. %d is used.", R->ch,l);
-        R->ch=l;
+        Warn("%d is invalid characteristic of ground field. %d is used.", R->cf->ch,l);
+        R->cf->ch=l;
       }
     }
   }
@@ -2307,31 +2313,30 @@ ring rCompose(const lists  L)
       }
       if (is_gf_char==-1)
       {
-        R->extRing=rCompose((lists)L->m[0].Data());
-        if (R->extRing==NULL)
+        R->cf->extRing=rCompose((lists)L->m[0].Data());
+        if (R->cf->extRing==NULL)
         {
           WerrorS("could not create rational function coefficient field");
           goto rCompose_err;
         }
-        if (R->extRing->ch>0)
-          R->ch= -R->extRing->ch;
+        if (R->cf->extRing->cf->ch>0)
+          R->cf->ch= -R->cf->extRing->cf->ch;
         else
-          R->ch=1;
-        R->P=R->extRing->N;
-        R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
+          R->cf->ch=1;
+        R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
         int i;
-        for(i=R->P-1;i>=0;i--)
-          R->parameter[i]=omStrDup(R->extRing->names[i]);
-        if (R->extRing->qideal!=NULL)
+        for(i=rPar(R)-1;i>=0;i--)
+          R->cf->extRing->names[i]=omStrDup(R->cf->extRing->names[i]);
+        if (R->cf->extRing->qideal!=NULL)
         {
-          if (IDELEMS(R->extRing->qideal)==1)
+          if (IDELEMS(R->cf->extRing->qideal)==1)
           {
-            R->minpoly=naInit(1,R);
+            R->cf->extRing->qideal->m[0]=naInit(1,R);
             lnumber n=(lnumber)R->minpoly;
-            n->z=R->extRing->qideal->m[0];
+            n->z=R->cf->extRing->qideal->m[0];
             naMinimalPoly=n->z;
-            R->extRing->qideal->m[0]=NULL;
-            idDelete(&(R->extRing->qideal));
+            R->cf->extRing->qideal->m[0]=NULL;
+            idDelete(&(R->cf->extRing->qideal));
             redefineFunctionPointers();
           }
           else
@@ -2342,10 +2347,10 @@ ring rCompose(const lists  L)
       }
       else
       { // gf-char
-        R->ch=fftable[is_gf_char];
-        R->P=1;
-        R->parameter=(char**)omAlloc0(1*sizeof(char_ptr));
-        R->parameter[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
+        R->cf->ch=fftable[is_gf_char];
+        R->cf->extRing->N=1;
+        R->cf->extRing->names=(char**)omAlloc0(1*sizeof(char_ptr));
+        R->cf->extRing->names[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
       }
     }
   }
@@ -2371,7 +2376,7 @@ ring rCompose(const lists  L)
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
     {
-      if (R->ch!=currRing->ch)
+      if (R->cf->ch!=currRing->cf->ch)
       {
       #if 0
             WerrorS("coefficient fields must be equal if q-ideal !=0");
@@ -2385,17 +2390,17 @@ ring rCompose(const lists  L)
         nMapFunc nMap;
         BOOLEAN bo;
 
-        if ((nMap=nSetMap(orig_ring))==NULL)
+        if ((nMap=nSetMap(orig_ring->cf))==NULL)
         {
           if (rEqual(orig_ring,currRing))
           {
-            nMap=nCopy;
+            nMap=n_SetMap(currRing->cf, currRing->cf);
           }
           else
           // Allow imap/fetch to be make an exception only for:
           if ( (rField_is_Q_a(orig_ring) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-            (rField_is_Q() || rField_is_Q_a() ||
-             (rField_is_Zp() || rField_is_Zp_a())))
+            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
+             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
            ||
            (rField_is_Zp_a(orig_ring) &&  // Zp(a..) -> Zp(a..) || Zp
             (rField_is_Zp(currRing, rInternalChar(orig_ring)) ||
@@ -2406,7 +2411,7 @@ ring rCompose(const lists  L)
             if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
               naSetChar(rInternalChar(orig_ring),orig_ring);
             else ntSetChar(rInternalChar(orig_ring),orig_ring);
-            nSetChar(currRing);
+            nSetChar(currRing->cf);
             test=save_test;
           }
           else
@@ -2437,7 +2442,7 @@ ring rCompose(const lists  L)
         ideal dest_id=idInit(IDELEMS(q),1);
         for(i=IDELEMS(q)-1; i>=0; i--)
         {
-          dest_id->m[i]=pPermPoly(q->m[i],perm,orig_ring,nMap,
+          dest_id->m[i]=p_PermPoly(q->m[i],perm,orig_ring, currRing,nMap,
                                   par_perm,par_perm_size);
           //  PrintS("map:");pWrite(dest_id->m[i]);PrintLn();
           pTest(dest_id->m[i]);
@@ -2653,7 +2658,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
         trueres[i] = idCopy(tr[i]);
       }
     }
-    if (idRankFreeModule(trueres[0]) > 0)
+    if (/* idRankFreeModule(trueres[0]) */ trueres[0] > 0)
       typ0 = MODUL_CMD;
     if (syzstr->weights!=NULL)
     {
@@ -2750,7 +2755,7 @@ BOOLEAN kWeight(leftv res,leftv id)
   double wNsqr = (double)2.0 / (double)n;
   wFunctional = wFunctionalBuch;
   x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
-  wCall(s, sl, x, wNsqr);
+  wCall(s, sl, x, wNsqr, currRing);
   for (i = n; i!=0; i--)
     (*iv)[i-1] = x[i + n + 1];
   omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
@@ -2777,12 +2782,13 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 #ifdef HAVE_FACTORY
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
-  res->data=singclap_resultant((poly)u->CopyD(),(poly)v->CopyD(), (poly)w->CopyD());
+  res->data=singclap_resultant((poly)u->CopyD(),(poly)v->CopyD(),
+		  (poly)w->CopyD(), currRing);
   return errorreported;
 }
 BOOLEAN jjCHARSERIES(leftv res, leftv u)
 {
-  res->data=singclap_irrCharSeries((ideal)u->Data());
+  res->data=singclap_irrCharSeries((ideal)u->Data(), currRing);
   return (res->data==NULL);
 }
 #endif
@@ -3030,7 +3036,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   //  check if  h  has a constant term
   // ----------------------------------
 
-  if( hasConstTerm( h ) )
+  if( hasConstTerm( h, currRing ) )
   {
     return  spectrumBadPoly;
   }
@@ -3039,7 +3045,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   //  check if  h  has a linear term
   // --------------------------------
 
-  if( hasLinearTerm( h ) )
+  if( hasLinearTerm( h, currRing ) )
   {
     *L = (lists)omAllocBin( slists_bin);
     (*L)->Init( 1 );
@@ -3122,7 +3128,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   //  check if the  h  has a singularity
   // ------------------------------------------
 
-  if( hasOne( stdJ ) )
+  if( hasOne( stdJ, currRing ) )
   {
     // -------------------------------
     //  h is smooth in the origin
@@ -3143,7 +3149,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   for( i=rVar(currRing); i>0; i-- )
   {
-    if( hasAxis( stdJ,i )==FALSE )
+    if( hasAxis( stdJ,i, currRing )==FALSE )
     {
       return  spectrumNotIsolated;
     }
@@ -3230,8 +3236,9 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #endif
 
   poly    wc = ( fast==0 ? pCopy( hc ) :
-               ( fast==1 ? computeWC( nph,(Rational)rVar(currRing) ) :
-              /* fast==2 */computeWC( nph,((Rational)rVar(currRing))/(Rational)2 ) ) );
+               ( fast==1 ? computeWC( nph,(Rational)rVar(currRing), currRing ) :
+              /* fast==2 */computeWC( nph,
+		      ((Rational)rVar(currRing))/(Rational)2, currRing ) ) );
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -3260,7 +3267,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   spectrumPolyList NF( &nph );
 
-  computeNF( stdJ,hc,wc,&NF );
+  computeNF( stdJ,hc,wc,&NF, currRing );
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -3328,7 +3335,7 @@ BOOLEAN spectrumProc( leftv result,leftv first )
 
   //  check for a local ring
 
-  if( !ringIsLocal( ) )
+  if( !ringIsLocal(currRing ) )
   {
     WerrorS( "only works for local orderings" );
     state = spectrumWrongRing;
@@ -4007,7 +4014,7 @@ BOOLEAN loNewtonP( leftv res, leftv arg1 )
 
 BOOLEAN loSimplex( leftv res, leftv args )
 {
-  if ( !(rField_is_long_R()) )
+  if ( !(rField_is_long_R(currRing)) )
   {
     WerrorS("Ground field not implemented!");
     return TRUE;
@@ -4121,16 +4128,17 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   gls= (poly)(arg1->Data());
   int howclean= (int)(long)arg3->Data();
 
-  if ( !(rField_is_R() ||
-         rField_is_Q() ||
-         rField_is_long_R() ||
-         rField_is_long_C()) )
+  if ( !(rField_is_R(currRing) ||
+         rField_is_Q(currRing) ||
+         rField_is_long_R(currRing) ||
+         rField_is_long_C(currRing)) )
   {
     WerrorS("Ground field not implemented!");
     return TRUE;
   }
 
-  if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
+  if ( !(rField_is_R(currRing) || rField_is_long_R(currRing) || \
+			  rField_is_long_C(currRing)) )
   {
     unsigned long int ii = (unsigned long int)arg2->Data();
     setGMPFloatDigits( ii, ii );
@@ -4212,7 +4220,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   rlist= (lists)omAlloc( sizeof(slists) );
   rlist->Init( elem );
 
-  if (rField_is_long_C())
+  if (rField_is_long_C(currRing))
   {
     for ( j= 0; j < elem; j++ )
     {
@@ -4225,7 +4233,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   {
     for ( j= 0; j < elem; j++ )
     {
-      dummy = complexToStr( (*roots)[j], gmp_output_digits );
+      dummy = complexToStr( (*roots)[j], gmp_output_digits, currRing->cf );
       rlist->m[j].rtyp=STRING_CMD;
       rlist->m[j].data=(void *)dummy;
     }
@@ -4283,7 +4291,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
       (int)pow((double)tdg+1,(double)n));
     return TRUE;
   }
-  if ( !(rField_is_Q() /* ||
+  if ( !(rField_is_Q(currRing) /* ||
          rField_is_R() || rField_is_long_R() ||
          rField_is_long_C()*/ ) )
          {
@@ -4390,7 +4398,8 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   // get and set precision in digits ( > 0 )
   if ( v->Typ() != INT_CMD )
     return TRUE;
-  else if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
+  else if ( !(rField_is_R(currRing) || rField_is_long_R(currRing) || \
+			  rField_is_long_C(currRing)) )
   {
     unsigned long int ii=(unsigned long int)v->Data();
     setGMPFloatDigits( ii, ii );
@@ -4522,10 +4531,11 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
       onepoint->Init(elem);
       for ( j= 0; j < elem; j++ )
       {
-        if ( !rField_is_long_C() )
+        if ( !rField_is_long_C(currRing) )
         {
           onepoint->m[j].rtyp=STRING_CMD;
-          onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec);
+          onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec,
+			  currRing->cf);
         }
         else
         {
@@ -4886,8 +4896,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int ch;
 #ifdef HAVE_RINGS
   unsigned int ringtype = 0;
-  int_number ringflaga = NULL;
-  unsigned int ringflagb = 1;
+  int_number modBase = NULL;
+  unsigned int modExponent = 1;
 #endif
   int float_len=0;
   int float_len2=0;
@@ -4929,46 +4939,46 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
-    ringflaga = (int_number) omAlloc(sizeof(mpz_t));
-    mpz_init_set_si(ringflaga, 0);
+    modBase = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init_set_si(modBase, 0);
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      mpz_set_ui(ringflaga, (int)(long) pn->next->Data());
+      mpz_set_ui(modBase, (int)(long) pn->next->Data());
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        ringflagb = (long) pn->next->Data();
+        modExponent = (long) pn->next->Data();
         pn=pn->next;
       }
       while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        mpz_mul_ui(ringflaga, ringflaga, (int)(long) pn->next->Data());
+        mpz_mul_ui(modBase, modBase, (int)(long) pn->next->Data());
         pn=pn->next;
       }
     }
-    if ((mpz_cmp_ui(ringflaga, 1) == 0) && (mpz_cmp_ui(ringflaga, 0) < 0))
+    if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
     {
       Werror("Wrong ground ring specification (module is 1)");
       goto rInitError;
     }
-    if (ringflagb < 1)
+    if (modExponent < 1)
     {
       Werror("Wrong ground ring specification (exponent smaller than 1");
       goto rInitError;
     }
     // module is 0 ---> integers
-    if (mpz_cmp_ui(ringflaga, 0) == 0)
+    if (mpz_cmp_ui(modBase, 0) == 0)
     {
       ch = 0;
       ringtype = 4;
     }
     // we have an exponent
-    else if (ringflagb > 1)
+    else if (modExponent > 1)
     {
-      ch = ringflagb;
-      if ((mpz_cmp_ui(ringflaga, 2) == 0) && (ringflagb <= 8*sizeof(NATNUMBER)))
+      ch = modExponent;
+      if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
       {
-        /* this branch should be active for ringflagb = 2..32 resp. 2..64,
+        /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
         ringtype = 1;       // Use Z/2^ch
       }
@@ -4981,7 +4991,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     else
     {
       ringtype = 2;
-      ch = mpz_get_ui(ringflaga);
+      ch = mpz_get_ui(modBase);
     }
   }
 #endif
@@ -5043,11 +5053,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
   // allocated ring and set ch
   R = (ring) omAlloc0Bin(sip_sring_bin);
-  R->ch = ch;
+  R->cf->ch = ch;
 #ifdef HAVE_RINGS
-  R->ringtype = ringtype;
-  R->ringflaga = ringflaga;
-  R->ringflagb = ringflagb;
+  R->cf->ringtype = ringtype;
+  R->cf->modBase = modBase;
+  R->cf->modExponent = modExponent;
 #endif
   if (ch == -1)
   {
@@ -5058,21 +5068,21 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   /* parameter -------------------------------------------------------*/
   if (pn!=NULL)
   {
-    R->P=pn->listLength();
-    //if ((ffChar|| (ch == 1)) && (R->P > 1))
-    if ((R->P > 1) && (ffChar || (ch == -1)))
+    R->cf->extRing->N=pn->listLength();
+    //if ((ffChar|| (ch == 1)) && (rPar(R) > 1))
+    if ((rPar(R) > 1) && (ffChar || (ch == -1)))
     {
       WerrorS("too many parameters");
       goto rInitError;
     }
-    R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
-    if (rSleftvList2StringArray(pn, R->parameter))
+    R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
+    if (rSleftvList2StringArray(pn, R->cf->extRing->names))
     {
       WerrorS("parameter expected");
       goto rInitError;
     }
-    if (ch>1 && !ffChar) R->ch=-ch;
-    else if (ch==0) R->ch=1;
+    if (ch>1 && !ffChar) R->cf->ch=-ch;
+    else if (ch==0) R->cf->ch=1;
   }
   else if (ffChar)
   {
@@ -5081,8 +5091,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
   /* post-processing of field description */
   // we have short reals, but no short complex
-  if ((R->ch == - 1)
-  && (R->parameter !=NULL)
+  if ((R->cf->ch == - 1)
+  && (rParameter(R) !=NULL)
   && (R->float_len < SHORT_REAL_LENGTH))
   {
     R->float_len = SHORT_REAL_LENGTH;
@@ -5410,7 +5420,7 @@ void rKill(idhdl h)
   }
 }
 
-idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL)
+idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n)
 {
   //idhdl next_best=NULL;
   idhdl h=root;
