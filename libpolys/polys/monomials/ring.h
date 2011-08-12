@@ -717,8 +717,6 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
 int64 * rGetWeightVec(ring r);
 void rSetWeightVec(ring r, int64 *wv);
 
-//lists rDecompose(const ring r);
-//ring rCompose(const lists  L);
 /////////////////////////////
 // Auxillary functions
 //
