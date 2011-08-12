@@ -995,8 +995,8 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   hexist = hInit(S, Q, &hNexist);
   if (hNexist == 0)
   {
-    intvec *iv=new intvec(pVariables);
-    for(i=0; i<pVariables; i++) (*iv)[i]=1;
+    intvec *iv=new intvec(rVar(currRing));
+    for(i=0; i<rVar(currRing); i++) (*iv)[i]=1;
     res->Init(1);
     res->m[0].rtyp=INTVEC_CMD;
     res->m[0].data=(intvec*)iv;
@@ -1010,24 +1010,24 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   save = ISet = (indset)omAlloc0Bin(indlist_bin);
   hMu = 0;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
-  hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(long));
+  hvar = (varset)omAlloc((rVar(currRing) + 1) * sizeof(int));
+  hpure = (scmon)omAlloc((1 + (rVar(currRing) * rVar(currRing))) * sizeof(long));
   hrad = hexist;
   hNrad = hNexist;
-  radmem = hCreate(pVariables - 1);
-  hCo = pVariables + 1;
-  hNvar = pVariables;
+  radmem = hCreate(rVar(currRing) - 1);
+  hCo = rVar(currRing) + 1;
+  hNvar = rVar(currRing);
   hRadical(hrad, &hNrad, hNvar);
   hSupp(hrad, hNrad, hvar, &hNvar);
   if (hNvar)
   {
     hCo = hNvar;
-    memset(hpure, 0, (pVariables + 1) * sizeof(long));
+    memset(hpure, 0, (rVar(currRing) + 1) * sizeof(long));
     hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
     hLexR(hrad, hNrad, hvar, hNvar);
     hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
   }
-  if (hCo && (hCo < pVariables))
+  if (hCo && (hCo < rVar(currRing)))
   {
     hIndMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
   }
@@ -1035,7 +1035,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   {
     ISet = save;
     hMu2 = 0;
-    if (all && (hCo+1 < pVariables))
+    if (all && (hCo+1 < rVar(currRing)))
     {
       JSet = (indset)omAlloc0Bin(indlist_bin);
       hIndAllMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -1078,9 +1078,9 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     res->Init(0);
     omFreeBin((ADDRESS)ISet,  indlist_bin);
   }
-  hKill(radmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(long));
-  omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
+  hKill(radmem, rVar(currRing) - 1);
+  omFreeSize((ADDRESS)hpure, (1 + (rVar(currRing) * rVar(currRing))) * sizeof(long));
+  omFreeSize((ADDRESS)hvar, (rVar(currRing) + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
   return res;
@@ -1460,7 +1460,7 @@ poly    iiHighCorner(ideal I, int ak)
     if (po!=NULL)
     {
       pGetCoeff(po)=nInit(1);
-      for (i=pVariables; i>0; i--)
+      for (i=rVar(currRing); i>0; i--)
       {
         if (pGetExp(po, i) > 0) pDecrExp(po,i);
       }
@@ -2432,7 +2432,7 @@ ring rCompose(const lists  L)
         }
         else if (par_perm_size!=0)
           for(i=si_min(rPar(orig_ring),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
-        for(i=si_min(orig_ring->N,pVariables);i>0;i--) perm[i]=i;
+        for(i=si_min(orig_ring->N,rVar(currRing));i>0;i--) perm[i]=i;
         #endif
         ideal dest_id=idInit(IDELEMS(q),1);
         for(i=IDELEMS(q)-1; i>=0; i--)
@@ -2507,10 +2507,10 @@ BOOLEAN mpJacobi(leftv res,leftv a)
   matrix result;
   ideal id=(ideal)a->Data();
 
-  result =mpNew(IDELEMS(id),pVariables);
+  result =mpNew(IDELEMS(id),rVar(currRing));
   for (i=1; i<=IDELEMS(id); i++)
   {
-    for (j=1; j<=pVariables; j++)
+    for (j=1; j<=rVar(currRing); j++)
     {
       MATELEM(result,i,j) = pDiff(id->m[i-1],j);
     }
@@ -2738,7 +2738,7 @@ syStrategy syForceMin(lists li)
 BOOLEAN kWeight(leftv res,leftv id)
 {
   ideal F=(ideal)id->Data();
-  intvec * iv = new intvec(pVariables);
+  intvec * iv = new intvec(rVar(currRing));
   polyset s;
   int  sl, n, i;
   int  *x;
@@ -2746,7 +2746,7 @@ BOOLEAN kWeight(leftv res,leftv id)
   res->data=(char *)iv;
   s = F->m;
   sl = IDELEMS(F) - 1;
-  n = pVariables;
+  n = rVar(currRing);
   double wNsqr = (double)2.0 / (double)n;
   wFunctional = wFunctionalBuch;
   x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
@@ -2761,7 +2761,7 @@ BOOLEAN kQHWeight(leftv res,leftv v)
 {
   res->data=(char *)idQHomWeight((ideal)v->Data());
   if (res->data==NULL)
-    res->data=(char *)new intvec(pVariables);
+    res->data=(char *)new intvec(rVar(currRing));
   return FALSE;
 }
 /*==============================================================*/
@@ -3054,7 +3054,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   // ----------------------------------
 
   ideal J = NULL;
-  J = idInit( pVariables,1 );
+  J = idInit( rVar(currRing),1 );
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -3066,7 +3066,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #endif
   #endif
 
-  for( i=0; i<pVariables; i++ )
+  for( i=0; i<rVar(currRing); i++ )
   {
     J->m[i] = pDiff( h,i+1); //j );
 
@@ -3141,7 +3141,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   //  check if the singularity  h  is isolated
   // ------------------------------------------
 
-  for( i=pVariables; i>0; i-- )
+  for( i=rVar(currRing); i>0; i-- )
   {
     if( hasAxis( stdJ,i )==FALSE )
     {
@@ -3171,7 +3171,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   {
     pGetCoeff(hc) = nInit(1);
 
-    for( i=pVariables; i>0; i-- )
+    for( i=rVar(currRing); i>0; i-- )
     {
       if( pGetExp( hc,i )>0 ) pDecrExp( hc,i );
     }
@@ -3230,8 +3230,8 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #endif
 
   poly    wc = ( fast==0 ? pCopy( hc ) :
-               ( fast==1 ? computeWC( nph,(Rational)pVariables ) :
-              /* fast==2 */computeWC( nph,((Rational)pVariables)/(Rational)2 ) ) );
+               ( fast==1 ? computeWC( nph,(Rational)rVar(currRing) ) :
+              /* fast==2 */computeWC( nph,((Rational)rVar(currRing))/(Rational)2 ) ) );
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -3551,7 +3551,7 @@ semicState  list_is_spectrum( lists l )
 
     for( i=0, j=n-1; i<=j; i++,j-- )
     {
-        if( (*num)[i] != pVariables*((*den)[i]) - (*num)[j] ||
+        if( (*num)[i] != rVar(currRing)*((*den)[i]) - (*num)[j] ||
             (*den)[i] != (*den)[j] ||
             (*mul)[i] != (*mul)[j] )
         {
@@ -3759,7 +3759,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
     poly              f,tmp;
     int               found,cmp;
 
-    Rational smax( ( fast==0 ? 0 : pVariables ),
+    Rational smax( ( fast==0 ? 0 : rVar(currRing) ),
                    ( fast==2 ? 2 : 1 ) );
 
     Rational weight_prev( 0,1 );
@@ -3933,7 +3933,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
         int n1,n2;
         for( n1=0, n2=n-1; n1<n2; n1++, n2-- )
         {
-            (*nom) [n2] = pVariables*(*den)[n1]-(*nom)[n1];
+            (*nom) [n2] = rVar(currRing)*(*den)[n1]-(*nom)[n1];
             (*den) [n2] = (*den)[n1];
             (*mult)[n2] = (*mult)[n1];
         }
@@ -3951,7 +3951,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
         {
             if( (*mult)[n1]!=(*mult)[n2] ||
                 (*den) [n1]!= (*den)[n2] ||
-                (*nom)[n1]+(*nom)[n2]!=pVariables*(*den) [n1] )
+                (*nom)[n1]+(*nom)[n2]!=rVar(currRing)*(*den) [n1] )
             {
                 symmetric = FALSE;
             }
@@ -4154,10 +4154,10 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   elist= (lists)omAlloc( sizeof(slists) );
   elist->Init( 0 );
 
-  if ( pVariables > 1 )
+  if ( rVar(currRing) > 1 )
   {
     piter= gls;
-    for ( i= 1; i <= pVariables; i++ )
+    for ( i= 1; i <= rVar(currRing); i++ )
       if ( pGetExp( piter, i ) )
       {
         vpos= i;
@@ -4165,7 +4165,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
       }
     while ( piter )
     {
-      for ( i= 1; i <= pVariables; i++ )
+      for ( i= 1; i <= rVar(currRing); i++ )
         if ( (vpos != i) && (pGetExp( piter, i ) != 0) )
         {
           WerrorS("The input polynomial must be univariate!");
@@ -4272,9 +4272,9 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
     WerrorS("Last input parameter must be > 0!");
     return TRUE;
   }
-  if ( n != pVariables )
+  if ( n != rVar(currRing) )
   {
-    Werror("Size of first input ideal must be equal to %d!",pVariables);
+    Werror("Size of first input ideal must be equal to %d!",rVar(currRing));
     return TRUE;
   }
   if ( m != (int)pow((double)tdg+1,(double)n) )
@@ -5487,7 +5487,7 @@ static void jjINT_S_TO_ID(int n,int *e, leftv res)
   ideal l=idInit(n,1);
   int i;
   poly p;
-  for(i=pVariables;i>0;i--)
+  for(i=rVar(currRing);i>0;i--)
   {
     if (e[i]>0)
     {
@@ -5501,11 +5501,11 @@ static void jjINT_S_TO_ID(int n,int *e, leftv res)
   }
   res->data=(char*)l;
   setFlag(res,FLAG_STD);
-  omFreeSize((ADDRESS)e,(pVariables+1)*sizeof(int));
+  omFreeSize((ADDRESS)e,(rVar(currRing)+1)*sizeof(int));
 }
 BOOLEAN jjVARIABLES_P(leftv res, leftv u)
 {
-  int *e=(int *)omAlloc0((pVariables+1)*sizeof(int));
+  int *e=(int *)omAlloc0((rVar(currRing)+1)*sizeof(int));
   int n=pGetVariables((poly)u->Data(),e);
   jjINT_S_TO_ID(n,e,res);
   return FALSE;
@@ -5513,7 +5513,7 @@ BOOLEAN jjVARIABLES_P(leftv res, leftv u)
 
 BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
 {
-  int *e=(int *)omAlloc0((pVariables+1)*sizeof(int));
+  int *e=(int *)omAlloc0((rVar(currRing)+1)*sizeof(int));
   ideal I=(ideal)u->Data();
   int i;
   int n=0;
