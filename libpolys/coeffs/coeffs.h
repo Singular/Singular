@@ -608,7 +608,7 @@ static inline number  n_RePart(number i, const coeffs cf)
 static inline number  n_ImPart(number i, const coeffs cf)
 {
   assume(cf != NULL); assume(cf->cfImPart!=NULL); 
-  return cf->cfImpart(i,cf);
+  return cf->cfImPart(i,cf);
 }
 
 /// returns TRUE, if r is not a field and r has non-trivial units
