@@ -1,4 +1,59 @@
-// ideal maGetPreimage(ring theImageRing, map theMap,ideal id);
+#include "mod2.h"
+
+#include <omalloc/omalloc.h>
+#include <misc/auxiliary.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
+
+
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+
+#include <kernel/kutil.h>
+
+
+#ifdef HAVE_PLURAL
+#include <polys/nc/nc.h>
+#endif
+
+/*2
+*shifts the variables between minvar and maxvar of p  \in p_ring to the
+*first maxvar-minvar+1 variables in the actual ring
+*be carefull: there is no range check for the variables of p
+*/
+static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar, const ring dst_r)
+{
+  int i;
+  poly result = NULL,resultWorkP;
+  number n;
+
+  if (p==NULL) return result;
+  else result = p_Init(dst_r);
+  resultWorkP = result;
+  while (p!=NULL)
+  {
+    for (i=minvar;i<=maxvar;i++)
+      p_SetExp(resultWorkP,i-minvar+1,p_GetExp(p,i,p_ring),dst_r);
+    p_SetComp(resultWorkP,p_GetComp(p,p_ring),dst_r);
+    n=n_Copy(pGetCoeff(p),dst_r->cf);
+    p_SetCoeff(resultWorkP,n,dst_r);
+    p_Setm(resultWorkP,dst_r);
+    pIter(p);
+    if (p!=NULL)
+    {
+      pNext(resultWorkP) = p_Init(dst_r);
+      pIter(resultWorkP);
+    }
+  }
+  return result;
+}
+
+
 
 /*2
 *returns the preimage of id under theMap,
@@ -56,8 +111,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
     if ((i<IDELEMS(theMap)) && (theMap->m[i]!=NULL))
     {
       p = p_SortMerge(
-        pChangeSizeOfPoly(theImageRing,theMap->m[i],1,imagepvariables,tmpR),
-	tmpR);
+		      pChangeSizeOfPoly(theImageRing, theMap->m[i], 1, imagepvariables, tmpR),
+		      tmpR);
       p=p_Add_q(p,q,tmpR);
     }
     else
@@ -69,21 +124,22 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   idTest(temp1);
   for (i=sourcering->N;i<sourcering->N+j0;i++)
   {
-    temp1->m[i] = p_SortMerge(pChangeSizeOfPoly(theImageRing,
-                         id->m[i-sourcering->N],1,imagepvariables,tmpR),tmpR);
+    temp1->m[i] = p_SortMerge(
+			      pChangeSizeOfPoly(theImageRing, id->m[i-sourcering->N], 1, imagepvariables, tmpR),
+			      tmpR);
   }
   for (i=sourcering->N+j0;i<sourcering->N+j;i++)
   {
-    temp1->m[i] = p_SortMerge(pChangeSizeOfPoly(theImageRing,
-                              theImageRing->qideal->m[i-sourcering->N-j0],
-                              1,imagepvariables,tmpR),tmpR);
+    temp1->m[i] = p_SortMerge(
+			      pChangeSizeOfPoly(theImageRing, theImageRing->qideal->m[i-sourcering->N-j0], 1, imagepvariables, tmpR),
+			      tmpR);
   }
   // we ignore here homogenity - may be changed later:
   temp2 = kStd(temp1,NULL,isNotHomog,NULL);
   id_Delete(&temp1,tmpR);
   for (i=0;i<IDELEMS(temp2);i++)
   {
-    if (pLowVar(temp2->m[i])<imagepvariables) p_Delete(&(temp2->m[i]),tmpR);
+    if (p_LowVar(temp2->m[i], currRing)<imagepvariables) p_Delete(&(temp2->m[i]),tmpR);
   }
 
   // let's get back to the original ring
@@ -95,7 +151,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
     p = temp2->m[i];
     if (p!=NULL)
     {
-      q = p_SortMerge(pChangeSizeOfPoly(tmpR, p,imagepvariables+1,N),sourcering);
+      q = p_SortMerge(
+		      pChangeSizeOfPoly(tmpR, p, imagepvariables+1, N, sourcering),
+		      sourcering);
       if (j>=IDELEMS(temp1))
       {
         pEnlargeSet(&(temp1->m),IDELEMS(temp1),5);

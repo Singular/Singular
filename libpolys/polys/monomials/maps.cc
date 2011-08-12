@@ -159,39 +159,6 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const rin
   return result;
 }
 
-/*2
-*shifts the variables between minvar and maxvar of p  \in p_ring to the
-*first maxvar-minvar+1 variables in the actual ring
-*be carefull: there is no range check for the variables of p
-*/
-static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar, const ring dst_r)
-{
-  int i;
-  poly result = NULL,resultWorkP;
-  number n;
-
-  if (p==NULL) return result;
-  else result = p_Init(dst_r);
-  resultWorkP = result;
-  while (p!=NULL)
-  {
-    for (i=minvar;i<=maxvar;i++)
-      p_SetExp(resultWorkP,i-minvar+1,p_GetExp(p,i,p_ring),dst_r);
-    p_SetComp(resultWorkP,p_GetComp(p,p_ring),dst_r);
-    n=n_Copy(pGetCoeff(p),dst_r->cf);
-    p_SetCoeff(resultWorkP,n,dst_r);
-    p_Setm(resultWorkP,dst_r);
-    pIter(p);
-    if (p!=NULL)
-    {
-      pNext(resultWorkP) = p_Init(dst_r);
-      pIter(resultWorkP);
-    }
-  }
-  return result;
-}
-
-
 void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
                 char **names,       int n,       char **par,       int nop,
                 int * perm, int *par_perm, n_coeffType ch)

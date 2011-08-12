@@ -1919,9 +1919,9 @@ poly p_Invers(int n,poly u,intvec *w, const ring R);
 
 
 /*----------------------------------------------------*/
-int   p_Var(poly mi,const ring r);
+int   p_Var(poly mi, const ring r);
 /// the minimal index of used variables - 1
-int   p_LowVar (poly p);
+int   p_LowVar (poly p, const ring r);
 
 /*----------------------------------------------------*/
 // returns the length of a polynomial (numbers of monomials) and the last mon.

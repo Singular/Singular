@@ -30,6 +30,9 @@
 #include <polys/matpol.h>
 #include <kernel/kstd1.h>
 #include <kernel/timer.h>
+
+#include <kernel/preimage.h>
+
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
