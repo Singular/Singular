@@ -3586,7 +3586,7 @@ static BOOLEAN jjDEG(leftv res, leftv v)
 {
   int dummy;
   poly p=(poly)v->Data();
-  if (p!=NULL) res->data = (char *)pLDeg(p,&dummy,currRing);
+  if (p!=NULL) res->data = (char *)currRing->pLDeg(p,&dummy,currRing);
   else res->data=(char *)-1;
   return FALSE;
 }
@@ -3597,7 +3597,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
   int dummy;
   int i;
   for(i=IDELEMS(I)-1;i>=0;i--)
-    if (I->m[i]!=NULL) d=si_max(d,(int)pLDeg(I->m[i],&dummy,currRing));
+    if (I->m[i]!=NULL) d=si_max(d,(int)currRing->pLDeg(I->m[i],&dummy,currRing));
   res->data = (char *)(long)d;
   return FALSE;
 }
@@ -3609,7 +3609,9 @@ static BOOLEAN jjDEGREE(leftv res, leftv v)
   {
     ring origR = currRing;
     ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
+    coeffs new_cf=nInitChar(n_Q,NULL);
+    nKillChar(tempR->cf);
+    tempR->cf=new_cf;
     rComplete(tempR);
     ideal vid = (ideal)v->Data();
     rChangeCurrRing(tempR);
@@ -3659,7 +3661,7 @@ static BOOLEAN jjDET(leftv res, leftv v)
     idDelete(&I);
   }
   else
-    p=singclap_det(m);
+    p=singclap_det(m,currRing);
   res ->data = (char *)p;
   return FALSE;
 }
@@ -3669,7 +3671,7 @@ static BOOLEAN jjDET_I(leftv res, leftv v)
   int i,j;
   i=m->rows();j=m->cols();
   if(i==j)
-    res->data = (char *)(long)singclap_det_i(m);
+    res->data = (char *)(long)singclap_det_i(m,currRing);
   else
   {
     Werror("det of %d x %d intmat",i,j);
@@ -3685,7 +3687,7 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
   if (sm_CheckDet(I,IDELEMS(I),FALSE, currRing))
   {
     matrix m=idModule2Matrix(idCopy(I));
-    p=singclap_det(m);
+    p=singclap_det(m,currRing);
     idDelete((ideal *)&m);
   }
   else
@@ -3702,11 +3704,13 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   {
     ring origR = currRing;
     ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
+    coeffs new_cf=nInitChar(n_Q,NULL);
+    nKillChar(tempR->cf);
+    tempR->cf=new_cf;
     rComplete(tempR);
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
-    if ((i != -1) && (nIsUnit(pGetCoeff(vid->m[i]))))
+    if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
     { /* ideal v contains unit; dim = -1 */
       res->data = (char *)-1;
       return FALSE;
@@ -3810,7 +3814,7 @@ static BOOLEAN jjFAC_P(leftv res, leftv u)
 {
   intvec *v=NULL;
   singclap_factorize_retry=0;
-  ideal f=singclap_factorize((poly)(u->CopyD()), &v, 0);
+  ideal f=singclap_factorize((poly)(u->CopyD()), &v, 0,currRing);
   if (f==NULL) return TRUE;
   ivTest(v);
   lists l=(lists)omAllocBin(slists_bin);
@@ -3852,7 +3856,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
   ideal I=(ideal)v->Data();
   int i;
   poly p=NULL,po=NULL;
-  int rk=idRankFreeModule(I);
+  int rk=id_RankFreeModule(I,currRing);
   if (w==NULL)
   {
     w = new intvec(rk);
@@ -3874,7 +3878,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
     else
     {
       // now po!=NULL, p!=NULL
-      int d=(pFDeg(po,currRing)-(*w)[pGetComp(po)-1] - pFDeg(p,currRing)+(*w)[i-1]);
+      int d=(currRing->pFDeg(po,currRing)-(*w)[pGetComp(po)-1] - currRing->pFDeg(p,currRing)+(*w)[i-1]);
       if (d==0)
         d=pLmCmp(po,p);
       if (d > 0)
@@ -3898,7 +3902,9 @@ static BOOLEAN jjHILBERT(leftv res, leftv v)
   {
     ring origR = currRing;
     ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
+    coeffs new_cf=nInitChar(n_Q,NULL);
+    nKillChar(tempR->cf);
+    tempR->cf=new_cf;
     rComplete(tempR);
     ideal vid = (ideal)v->Data();
     rChangeCurrRing(tempR);
@@ -4030,7 +4036,7 @@ static BOOLEAN jjIm2Iv(leftv res, leftv v)
 }
 static BOOLEAN jjIMPART(leftv res, leftv v)
 {
-  res->data = (char *)nImPart((number)v->Data());
+  res->data = (char *)n_ImPart((number)v->Data(),currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjINDEPSET(leftv res, leftv v)
@@ -4191,16 +4197,24 @@ static number jjLONG2N(long d)
   }
   else
   {
-#if !defined(OM_NDEBUG) && !defined(NDEBUG)
-    omCheckBin(rnumber_bin);
-#endif
-    number z=(number)omAllocBin(rnumber_bin);
+     struct snumber_dummy
+     {
+      mpz_t z;
+      mpz_t n;
+      #if defined(LDEBUG)
+      int debug;
+      #endif
+      BOOLEAN s;
+    };
+    typedef struct snumber_dummy  *number_dummy;
+ 
+    number_dummy z=(number)omAlloc(sizeof(snumber_dummy));
     #if defined(LDEBUG)
     z->debug=123456;
     #endif
     z->s=3;
     mpz_init_set_si(z->z,d);
-    return z;
+    return (number)z;
   }
 }
 #else
@@ -4310,15 +4324,9 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 static BOOLEAN jjN2BI(leftv res, leftv v)
 {
   number n,i; i=(number)v->Data();
-  if (rField_is_Zp(currRing))
-  {
-    n=n_Init(n_Int(i,currRing->cf),coeffs_BIGINT);
-  }
-  else if (rField_is_Q(currRing)) n=nlBigInt(i);
-#ifdef HAVE_RINGS
-  else if (rField_is_Ring_Z(currRing) || rField_is_Ring_ModN(currRing) || rField_is_Ring_PtoM(currRing)) n=nlMapGMP(i);
-  else if (rField_is_Ring_2toM(currRing)) n=n_Init((unsigned long) i,coeffs_BIGINT);
-#endif
+  nMapFunc nMap=n_SetMap(currRing->cf,coeffs_BIGINT);
+  if (nMap!=NULL)
+    n=nMap(i,currRing->cf,coeffs_BIGINT);
   else goto err;
   res->data=(void *)n;
   return FALSE;
@@ -4351,7 +4359,7 @@ static BOOLEAN jjOpenClose(leftv res, leftv v)
 static BOOLEAN jjORD(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  res->data=(char *)( p==NULL ? -1 : pFDeg(p,currRing) );
+  res->data=(char *)( p==NULL ? -1 : currRing->pFDeg(p,currRing) );
   return FALSE;
 }
 static BOOLEAN jjPAR1(leftv res, leftv v)
@@ -4404,17 +4412,9 @@ static BOOLEAN jjP2BI(leftv res, leftv v)
   }
   number i=pGetCoeff(p);
   number n;
-  if (rField_is_Zp())
-  {
-    n=n_Init(npInt(i,currRing), coeffs_BIGINT);
-  }
-  else if (rField_is_Q(currRing)) n=nlBigInt(i);
-#ifdef HAVE_RINGS
-  else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM())
-    n=nlMapGMP(i);
-  else if (rField_is_Ring_2toM())
-    n=n_Init((unsigned long) i, coeffs_BIGINT);
-#endif
+  nMapFunc nMap=n_SetMap(currRing->cf,coeffs_BIGINT);
+  if (nMap!=NULL)
+    n=nMap(i,currRing->cf,coeffs_BIGINT);
   else goto err;
   res->data=(void *)n;
   return FALSE;
@@ -4520,7 +4520,7 @@ static BOOLEAN jjREGULARITY(leftv res, leftv v)
 }
 static BOOLEAN jjREPART(leftv res, leftv v)
 {
-  res->data = (char *)nRePart((number)v->Data());
+  res->data = (char *)n_RePart((number)v->Data(),currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjRINGLIST(leftv res, leftv v)
@@ -4627,7 +4627,7 @@ static BOOLEAN jjSQR_FREE(leftv res, leftv u)
 {
   intvec *v=NULL;
   singclap_factorize_retry=0;
-  ideal f=singclap_sqrfree((poly)(u->CopyD()));
+  ideal f=singclap_sqrfree((poly)(u->CopyD()),currRing);
   if (f==NULL)
     return TRUE;
   res->data=(void *)f;
@@ -5113,7 +5113,7 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 static BOOLEAN jjnInt(leftv res, leftv u)
 {
   number n=(number)u->Data();
-  res->data=(char *)(long)n_Int(n,currRing);
+  res->data=(char *)(long)n_Int(n,currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjnlInt(leftv res, leftv u)
@@ -5495,7 +5495,9 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   {
     ring origR = currRing;
     ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
+    coeffs new_cf=nInitChar(n_Q,NULL);
+    nKillChar(tempR->cf);
+    tempR->cf=new_cf;
     rComplete(tempR);
     ideal uid = (ideal)u->Data();
     rChangeCurrRing(tempR);
@@ -5600,7 +5602,7 @@ static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
-  short *iw=iv2array((intvec *)w->Data());
+  short *iw=iv2array((intvec *)w->Data(),currRing);
   res->data = (char *)ppJetW((poly)u->Data(),(int)(long)v->Data(),iw);
   omFreeSize((ADDRESS)iw,(currRing->N+1)*sizeof(short));
   return FALSE;
@@ -5635,9 +5637,9 @@ static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN currRingIsOverIntegralDomain ()
 {
   /* true for fields and Z, false otherwise */
-  if (rField_is_Ring_PtoM()) return FALSE;
-  if (rField_is_Ring_2toM()) return FALSE;
-  if (rField_is_Ring_ModN()) return FALSE;
+  if (rField_is_Ring_PtoM(currRing)) return FALSE;
+  if (rField_is_Ring_2toM(currRing)) return FALSE;
+  if (rField_is_Ring_ModN(currRing)) return FALSE;
   return TRUE;
 }
 static BOOLEAN jjMINOR_M(leftv res, leftv v)
@@ -5964,7 +5966,7 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
     {
       assume(currRing->extRing!=NULL);
       lnumber n=(lnumber)pGetCoeff(p);
-      ringvar=-p_Var(n->z,currRing->extRing);
+      ringvar=-p_Var(n->z,currRing->cf->extRing);
     }
     if(ringvar==0)
     {
