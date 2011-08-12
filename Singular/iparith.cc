@@ -75,6 +75,11 @@
 
 #include <kernel/timer.h>
 
+
+lists rDecompose(const ring r);
+ring rCompose(const lists  L);
+
+
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
