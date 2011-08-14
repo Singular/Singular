@@ -34,9 +34,9 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_CFLAGS = -I.. -I../libpolys -DHAVE_SINGULAR
-LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc
-LIBPOLYS_LIBSG   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
+LIBPOLYS_CFLAGS = -I.. -I../libpolys -DHAVE_SINGULAR -I/opt/local/include
+LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc -L/opt/local/lib -lntl -lgmp -ldl
+LIBPOLYS_LIBSG  = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g -L/opt/local/lib  -lntl -lgmp -ldl
 
 PIPE		= -pipe
 CFLAGS		= -O3 -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS}
@@ -309,10 +309,10 @@ test.o: test.cc mod2.h libkernel_g.a
 
 
 test-g: test.og
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@ -L. -lkernel_g ${LIBPOLYS_LIBSG} -lntl -ldl -lgmp
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@ -L. -lkernel_g ${LIBPOLYS_LIBSG}
 
 test: test.o
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS} -lntl -ldl -lgmp
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS}
 
 # My headers test
 check: all test test-g
