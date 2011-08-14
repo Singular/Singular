@@ -34,10 +34,10 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_INCLUDES = -I.. -I../libpolys
-LIBPOLYS_CFLAGS = ${LIBPOLYS_INCLUDES}
-LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc
-LIBPOLYS_LIBSG   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g
+LIBPOLYS_INCLUDES = -I.. -I../libpolys -I/opt/local/include
+LIBPOLYS_CFLAGS   = ${LIBPOLYS_INCLUDES}
+LIBPOLYS_LIBS     = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc -L/opt/local/lib -lntl -lgmp -ldl
+LIBPOLYS_LIBSG    = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g  -L/opt/local/lib  -lntl -lgmp -ldl
 
 
 PYTHON_INCLUDES = `python-config --includes`
@@ -221,7 +221,7 @@ OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
 all:	Singular
 
 Singular: ${OBJS}
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${OBJS} -o $@ -L. -L../kernel -lkernel ${LIBPOLYS_LIBS} -lntl -ldl -lgmp
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${OBJS} -o $@ -L. -L../kernel -lkernel ${LIBPOLYS_LIBS}
 
 
 ##
