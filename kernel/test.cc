@@ -1,3 +1,5 @@
+#include "mod2.h"
+
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
 #ifdef HAVE_FACTORY
