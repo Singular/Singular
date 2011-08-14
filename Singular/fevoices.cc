@@ -52,7 +52,7 @@ extern int blocknest; /* scaner.l internal */
 int    yy_noeof=0;     // the scanner "state"
 int    yy_blocklineno; // to get the lineno of the block start from scanner
 Voice  *currentVoice = NULL;
-FILE   *feFilePending; /*temp. storage for grammar.y */
+// FILE   *feFilePending; /*temp. storage for grammar.y */
 
 //static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
 //                               "BT_file","BT_execute","BT_if","BT_else"};
