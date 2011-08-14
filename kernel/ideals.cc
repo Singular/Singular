@@ -9,6 +9,9 @@
 /* includes */
 #include "mod2.h"
 
+#include <omalloc/omalloc.h>
+#include <misc/auxiliary.h>
+
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -2539,6 +2542,76 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
   omFree(xx);
   return result;
 }
+#endif
+
+#if 0
+/*2
+* xx,q: arrays of length 0..rl-1
+* xx[i]: SB mod q[i]
+* assume: char=0
+* assume: q[i]!=0
+* destroys xx
+*/
+#ifdef HAVE_FACTORY
+ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
+{
+  int cnt=IDELEMS(xx[0])*xx[0]->nrows;
+  ideal result=idInit(cnt,xx[0]->rank);
+  result->nrows=xx[0]->nrows; // for lifting matrices
+  result->ncols=xx[0]->ncols; // for lifting matrices
+  int i,j;
+  poly r,h,hh,res_p;
+  number *x=(number *)omAlloc(rl*sizeof(number));
+  for(i=cnt-1;i>=0;i--)
+  {
+    res_p=NULL;
+    loop
+    {
+      r=NULL;
+      for(j=rl-1;j>=0;j--)
+      {
+        h=xx[j]->m[i];
+        if ((h!=NULL)
+        &&((r==NULL)||(p_LmCmp(r,h,R)==-1)))
+          r=h;
+      }
+      if (r==NULL) break;
+      h=p_Head(r, R);
+      for(j=rl-1;j>=0;j--)
+      {
+        hh=xx[j]->m[i];
+        if ((hh!=NULL) && (p_LmCmp(r,hh, R)==0))
+        {
+          x[j]=p_GetCoeff(hh, R);
+          hh=p_LmFreeAndNext(hh, R);
+          xx[j]->m[i]=hh;
+        }
+        else
+          x[j]=n_Init(0, R->cf); // is R->cf really n_Q???, yes!
+      }
+       
+      number n=nChineseRemainder(x,q,rl, R->cf);
+
+      for(j=rl-1;j>=0;j--)
+      {
+        x[j]=NULL; // nlInit(0...) takes no memory
+      }
+      if (n_IsZero(n, R->cf)) p_Delete(&h, R);
+      else
+      {
+        p_SetCoeff(h,n, R);
+        //Print("new mon:");pWrite(h);
+        res_p=p_Add_q(res_p, h, R);
+      }
+    }
+    result->m[i]=res_p;
+  }
+  omFree(x);
+  for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]), R);
+  omFree(xx);
+  return result;
+}
+#endif
 #endif
 /* currently unsed:
 ideal idChineseRemainder(ideal *xx, intvec *iv)
