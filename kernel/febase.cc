@@ -31,7 +31,7 @@
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
 /*0 implementation */
 
-char fe_promptstr[] ="  ";
+// char fe_promptstr[] ="  ";
 
 // output/print buffer:
 // line buffer for reading:

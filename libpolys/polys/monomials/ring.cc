@@ -732,8 +732,8 @@ static int binaryPower (const int a, const int b)
    towards the SINGULAR svn trunk */
 int rChar(ring r) { return r->cf->ch; }
 
-typedef char *             char_ptr;
-omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr)); // deallocation?
+// typedef char *             char_ptr;
+// omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr)); // deallocation?
 
 
 // creates a commutative nc extension; "converts" comm.ring to a Plural ring
