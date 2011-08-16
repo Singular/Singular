@@ -35,8 +35,11 @@ LN_S		= ln -s
 ## compiler and linker options
 ##
 LIBPOLYS_INCLUDES = -I.. -I../libpolys -I/opt/local/include
+
 LIBPOLYS_CFLAGS   = ${LIBPOLYS_INCLUDES}
+
 LIBPOLYS_LIBS     = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc -L/opt/local/lib -lntl -lgmp -ldl
+
 LIBPOLYS_LIBSG    = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g  -L/opt/local/lib  -lntl -lgmp -ldl
 
 
@@ -125,11 +128,12 @@ CXXSOURCES=\
    slInit_Static.cc\
    ssiLink.cc\
    subexpr.cc\
-   tesths.cc\
    utils.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc
+
+#   tesths.cc
 
 #   pyobject.cc  pyobject_setup.cc
 
@@ -213,15 +217,18 @@ OBJSP2 := $(ESOURCES:.cc=.op)
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
-OBJG= $(CXXSOURCES:.cc=.og) $(CSOURCES:.c=.og)
+OBJG= $(OBJS:.o=.og)
 
 OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
 OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op) 
 
-all:	Singular
+all: libSingular_g.a libSingular.a Singularg Singular
 
-Singular: ${OBJS}
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${OBJS} -o $@ -L. -L../kernel -lkernel ${LIBPOLYS_LIBS}
+Singularg: tesths.og libSingular_g.a
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g ${LIBPOLYS_LIBSG}
+
+Singular: tesths.o libSingular.a
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel ${LIBPOLYS_LIBS}
 
 
 ##
@@ -383,3 +390,25 @@ iparith.inc: gentable.cc grammar.h tok.h table.h
 	     -o gentable1
 	./gentable1
 	/bin/rm -f gentable1 gentable1.exe
+
+
+
+libSingular.a: ${OBJS}
+	-rm -f $@
+	ar cr $@ $^
+
+
+libSingular_g.a: ${OBJG}
+	-rm -f $@
+	ar cr $@ $^
+
+test: test.o libSingular.a
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel ${LIBPOLYS_LIBS}
+
+# My headers test
+check: test testg
+	./test
+	./testg
+
+testg: test.og libSingular_g.a
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@  -L. -lSingular_g -L../kernel -lkernel_g ${LIBPOLYS_LIBSG}
