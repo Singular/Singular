@@ -12,9 +12,13 @@
  * Change History (most recent first):
  *
  ***************************************************************/
+
+#ifdef HAVE_MPSR
+
 #ifndef __MPSR_TOK_H__
 #define __MPSR_TOK_H__
-#include"mpsr.h"
+
+#include <Singular/mpsr.h>
 
 extern mpsr_Status_t mpsr_tok2mp(short tok, MP_DictTag_t *dict,
                                MP_Common_t *cop);
@@ -29,3 +33,6 @@ extern short mpsr_mp2ord(MP_Common_t mp_ord);
 #define MP_AnnotSingularPackageType     2
 
 #endif  // __MPSR_TOK_H__
+
+
+#endif // #ifdef HAVE_MPSR

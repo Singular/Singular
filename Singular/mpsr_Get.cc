@@ -628,7 +628,7 @@ static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
     if (IsUnOrdered) id->m[i] = pSort(id->m[i]);
   }
   if (rank == 1)
-    id->rank = idRankFreeModule(id);
+    id->rank = id_RankFreeModule(id, currRing);
   idTest(id);
   mlv->lv = mpsr_InitLeftv(MODUL_CMD, (void *) id);
   return mpsr_Success;

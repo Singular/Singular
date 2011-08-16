@@ -8,6 +8,13 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
+
+#ifndef _SINGULAR_MPSR_SL_H_
+#define _SINGULAR_MPSR_SL_H_
+
+#ifdef HAVE_MPSR
+
+
 LINKAGE BOOLEAN slOpenMPFile(si_link l, short flag, leftv u);
 LINKAGE MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv);
 LINKAGE MP_Link_pt slOpenMPListen(int n_argc, char **n_argv);
@@ -23,3 +30,6 @@ LINKAGE BOOLEAN slGetDumpMP(si_link l);
 LINKAGE const char* slStatusMP(si_link l, const char* request);
 LINKAGE int Batch_do(const char* port, const char* host);
 
+#endif // #ifdef HAVE_MPSR
+
+#endif // _SINGULAR_MPSR_SL_H_
