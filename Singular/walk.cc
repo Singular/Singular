@@ -591,7 +591,7 @@ static inline int MLmWeightedDegree(const poly p, intvec* weight)
  ********************************************************************/
 static inline int MwalkWeightDegree(poly p, intvec* weight_vector)
 {
-  assume(weight_vector->length() >= pVariables);
+  assume(weight_vector->length() >= currRing->N);
   int max = 0, maxtemp;
 
   while(p != NULL)
