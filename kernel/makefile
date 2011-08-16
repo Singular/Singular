@@ -175,7 +175,7 @@ mostlyclean:
 	-rm -f *.o *.og core *.op
 
 clean: mostlyclean
-	-rm -f *.bak *.d *.dd depend *.a *.so*
+	-rm -f *.bak *.d *.dd depend *.a *.so* test testg test-g
 
 distclean: clean
 	-rm -f *~ .\#* 
@@ -301,18 +301,13 @@ include depend
 endif
 
 
-test.og: test.cc mod2.h libkernel_g.a  
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@ 
-
-test.o: test.cc mod2.h libkernel_g.a  
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $< -o $@ 
-
-
-test-g: test.og
+testg: test.og libkernel_g.a
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@ -L. -lkernel_g ${LIBPOLYS_LIBSG}
 
-test: test.o
+test: test.o libkernel.a
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS}
 
 # My headers test
-check: all test test-g
+check: all test testg
+	./test
+	./test
