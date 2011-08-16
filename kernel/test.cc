@@ -156,7 +156,7 @@ int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
 
 #include "ratgring.h"
 #include "ringgb.h"
-#include "run.h"
+// #include "run.h" // moved to Singular
 #include "semic.h"
 #include "shiftgb.h"
 // #include "si_gmp.h" // remove it...
