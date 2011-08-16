@@ -11,21 +11,26 @@
  * Change History (most recent first):
  *
  ***************************************************************/
-#ifdef HAVE_MPSR
-
 #ifndef __MPSR__
 #define __MPSR__
 
+#ifdef HAVE_MPSR
+
+
+#include <omalloc/omalloc.h>
+
+#include <coeffs/numbers.h>
+
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
+
+#include <kernel/structs.h>
+
+#include <Singular/subexpr.h>
+
 // now the MP include stuff (is surrounded by ifndef there)
 #include <MP.h>
-
 #include <MPT.h>
-#include <kernel/structs.h>
-#include "subexpr.h"
-#include <omalloc/omalloc.h>
-#include <polys/polys.h>
-#include <coeffs/numbers.h>
-#include <polys/monomials/ring.h>
 
 /***************************************************************
  *
@@ -266,5 +271,6 @@ union nf
 #define Number_2_Real32(n) nf(n).F()
 
 
-#endif
+#endif // #ifdef HAVE_MPSR
+
 #endif

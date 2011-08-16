@@ -17,12 +17,15 @@
 #ifndef __MPSR_PUT__
 #define __MPSR_PUT__
 
-#include"mpsr.h"
+
+#ifdef HAVE_MPSR
 
 #include <kernel/structs.h>
-#include"kernel/febase.h"
-#include"tok.h"
-#include"ipid.h"
+#include <kernel/febase.h>
+
+#include <Singular/mpsr.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
 
 /***************************************************************
  * 1.) Some handy macros
@@ -227,5 +230,9 @@ inline mpsr_Status_t mpsr_PutPackageLeftv(MP_Link_pt link, leftv v)
  *
  ***************************************************************/
 extern mpsr_Status_t mpsr_PutMsg(MP_Link_pt l, leftv v);
+
+
+#endif // #ifdef HAVE_MPSR
+
 
 #endif
