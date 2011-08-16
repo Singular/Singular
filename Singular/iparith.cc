@@ -4580,7 +4580,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     }
   }
 
-  assume(u_id->rank>=idRankFreeModule(u_id));
+  assume(u_id->rank>=id_RankFreeModule(u_id, currRing));
   res->data=(char *)t_rep_gb(currRing,
     u_id,u_id->rank);
   //res->data=(char *)t_rep_gb(currRing, u_id);
@@ -5961,7 +5961,7 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
   {
     if (rField_is_Extension(currRing))
     {
-      assume(currRing->extRing!=NULL);
+      assume(currRing->cf->extRing!=NULL);
       number n = pGetCoeff(p);
       ringvar=- n_IsParam(n, currRing);
     }
