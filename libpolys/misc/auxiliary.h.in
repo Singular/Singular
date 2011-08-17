@@ -200,7 +200,7 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 #endif
 
 /* define MDEBUG to enable memory checks */
-#define MDEBUG 0
+//////////////////////////////////////////// #define MDEBUG 0
 
 #ifdef MDEBUG
 /* If ! defined(OM_NDEBUG) and (defined(OM_TRACK) or defined(OM_CHECK)
