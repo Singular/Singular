@@ -59,6 +59,8 @@ static inline int idSize(const ideal id)
 //BOOLEAN id_IsConstant(ideal id, const ring r);
 #define idIsConstant(I) id_IsConstant(I,currRing)
 
+#define idSimpleAdd(A,B) id_SimpleAdd(A,B,currRing)
+
 #ifdef PDEBUG
 #define idTest(A) id_DBTest(A, PDEBUG, __FILE__,__LINE__,currRing)
 #define idPrint(id) idShow(id, currRing, currRing)
@@ -85,9 +87,6 @@ inline ideal idCopy(ideal A, const ring R = currRing)
 #endif
 
 
-  /*adds two ideals without simplifying the result*/
-ideal idSimpleAdd (ideal h1,ideal h2);
-  /*adds the quotient ideal*/
 ideal idAdd (ideal h1,ideal h2);
   /* h1 + h2 */
 BOOLEAN idInsertPoly (ideal h1,poly h2);
