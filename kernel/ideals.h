@@ -60,8 +60,7 @@ static inline int idSize(const ideal id)
 #define idIsConstant(I) id_IsConstant(I,currRing)
 
 #ifdef PDEBUG
-void idDBTest(ideal h1, int level, const char *f,const int l);
-#define idTest(A) idDBTest(A, PDEBUG, __FILE__,__LINE__)
+#define idTest(A) id_DBTest(A, PDEBUG, __FILE__,__LINE__,currRing)
 #define idPrint(id) idShow(id, currRing, currRing)
 #else
 #define idTest(A)  (TRUE)
