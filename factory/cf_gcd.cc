@@ -682,19 +682,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   bool fc_isUnivariate=f.isUnivariate();
   bool gc_isUnivariate=g.isUnivariate();
   bool fc_and_gc_Univariate=fc_isUnivariate && gc_isUnivariate;
-#if 1
-  if (( getCharacteristic() == 0 )
-  && (f.level() >4)
-  && (g.level() >4)
-  && isOn( SW_USE_CHINREM_GCD)
-  && (!fc_and_gc_Univariate)
-  && (isPurePoly_m(f))
-  && (isPurePoly_m(g))
-  )
-  {
-      return chinrem_gcd( f, g );
-  }
-#endif
   cf_prepgcd( f, g, cc, p1, pe);
   if ( cc != 0 )
   {
@@ -713,8 +700,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
 // now each appearing variable is in f and g
   fc = f;
   gc = g;
-  if( gcd_avoid_mtaildegree ( fc, gc, d1 ) )
-      return d1;
   if ( getCharacteristic() != 0 )
   {
     if ((!fc_and_gc_Univariate)
@@ -726,21 +711,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #ifdef HAVE_NTL
     else if ((!fc_and_gc_Univariate) && (isOn( SW_USE_EZGCD_P )))
     {
-      /*if ( pe == 1 )
-        fc = fin_ezgcd( fc, gc );
-      else if ( pe > 0 )// no variable at position 1
-      {
-        fc = replacevar( fc, Variable(pe), Variable(1) );
-        gc = replacevar( gc, Variable(pe), Variable(1) );
-        fc = replacevar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
-      else
-      {
-        pe = -pe;
-        fc = swapvar( fc, Variable(pe), Variable(1) );
-        gc = swapvar( gc, Variable(pe), Variable(1) );
-        fc = swapvar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }*/
       fc= EZGCD_P (fc, gc);
     }
     #endif
@@ -773,8 +743,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   {
     if (
     isOn(SW_USE_CHINREM_GCD)
-    && (gc.level() >5)
-    && (fc.level() >5)
     && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
     )
     {
@@ -808,24 +776,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
         gc = swapvar( gc, Variable(pe), Variable(1) );
         fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
       }
-    }
-    else if (
-    isOn(SW_USE_CHINREM_GCD)
-    && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
-    )
-    {
-    #if 0
-      if ( p1 == fc.level() )
-        fc = chinrem_gcd( fc, gc );
-      else
-      {
-        fc = replacevar( fc, Variable(p1), Variable(mp) );
-        gc = replacevar( gc, Variable(p1), Variable(mp) );
-        fc = replacevar( chinrem_gcd( fc, gc ), Variable(mp), Variable(p1) );
-      }
-    #else
-      fc = chinrem_gcd( fc, gc);
-    #endif
     }
     else
     {
@@ -1020,6 +970,7 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
             else
             {
+                //printf ("here\n");
                 CanonicalForm cdF = bCommonDen( f );
                 CanonicalForm cdG = bCommonDen( g );
                 Off( SW_RATIONAL );
@@ -1287,6 +1238,9 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
 
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
+  bool saveRat= isOn (SW_RATIONAL);
+  if (!saveRat)
+    On (SW_RATIONAL);
   CanonicalForm f, g, cg, cl, q(0), Dp, newD, D, newq;
   int p, i, dp_deg, d_deg=-1;
 
@@ -1305,6 +1259,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   i = cf_getNumBigPrimes() - 1;
   cl =  f.lc()* g.lc();
 
+  Off (SW_RATIONAL);
   while ( true )
   {
     p = cf_getBigPrime( i );
@@ -1323,6 +1278,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     if ( dp_deg == 0 )
     {
       //printf(" -> 1\n");
+      if (saveRat)
+        On (SW_RATIONAL);
       return CanonicalForm(1);
     }
     if ( q.isZero() )
@@ -1355,23 +1312,26 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     if ( i >= 0 )
     {
+      On (SW_RATIONAL);
       CanonicalForm Dn= Farey(D,q);
-      int is_rat=isOn(SW_RATIONAL);
-      On(SW_RATIONAL);
       CanonicalForm cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
-      if (!is_rat) Off(SW_RATIONAL);
       Dn *=cd;
       //Dn /=vcontent(Dn,Variable(1));
       if ( fdivides( Dn, f ) && fdivides( Dn, g ) )
       {
+        if (!saveRat)
+          Off (SW_RATIONAL);
         //printf(" -> success\n");
         return Dn;
       }
+      Off (SW_RATIONAL);
       //else: try more primes
     }
     else
     { // try other method
       //printf("try other gcd\n");
+      if (saveRat)
+        On (SW_RATIONAL);
       Off(SW_USE_CHINREM_GCD);
       D=gcd_poly( f, g );
       On(SW_USE_CHINREM_GCD);
