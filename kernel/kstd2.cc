@@ -117,7 +117,7 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
 #if 1
   int ende;
-  if ((strat->ak>0) || pLexOrder) ende=strat->sl;
+  if ((strat->ak>0) || currRing->pLexOrder) ende=strat->sl;
   else ende=posInS(strat,*max_ind,p,0)+1;
   if (ende>(*max_ind)) ende=(*max_ind);
 #else
@@ -1974,7 +1974,7 @@ void initBbaShift(ideal F,kStrategy strat)
 
   strat->red = redFirstShift; /* no redHomog ! */
 
-  if (pLexOrder && strat->honey)
+  if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
     strat->initEcart = initEcartBBA;

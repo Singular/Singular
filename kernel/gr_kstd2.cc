@@ -905,7 +905,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
         (*h).p = NULL;
         return 0;
       }
-      if (strat->honey && pLexOrder)
+      if (strat->honey && currRing->pLexOrder)
         strat->initEcart(h);
       /* h.length:=l; */
       /* try to reduce the s-polynomial */
@@ -921,7 +921,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
 //          return;
 //        }
 //      }
-      if (strat->honey || pLexOrder)
+      if (strat->honey || currRing->pLexOrder)
       {
         pass++;
         d = currRing->pFDeg((*h).p,currRing);
@@ -978,7 +978,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
     strat->red = nc_redBest;
   else if (strat->honey)
     strat->red = nc_redHoney;
-  else if (pLexOrder && !strat->homog)
+  else if (currRing->pLexOrder && !strat->homog)
     strat->red = nc_redLazy;
   else if (TEST_OPT_INTSTRATEGY && strat->homog)
     strat->red = nc_redHomog0;
@@ -1006,7 +1006,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
   }
 #endif
 
-  if (pLexOrder && strat->honey)
+  if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
     strat->initEcart = initEcartBBA;

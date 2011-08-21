@@ -2302,7 +2302,7 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
     return TRUE;
   }
   pFDegProc deg;
-  if (pLexOrder && (currRing->order[0]==ringorder_lp))
+  if (currRing->pLexOrder && (currRing->order[0]==ringorder_lp))
     deg=p_Totaldegree;
    else
     deg=currRing->pFDeg;
@@ -2322,13 +2322,13 @@ static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
   ideal v_id=(ideal)v->Data();
   pFDegProc save_FDeg=currRing->pFDeg;
   pLDegProc save_LDeg=currRing->pLDeg;
-  BOOLEAN save_pLexOrder=pLexOrder;
-  pLexOrder=FALSE;
+  BOOLEAN save_pLexOrder=currRing->pLexOrder;
+  currRing->pLexOrder=FALSE;
   kHomW=vw;
   kModW=w;
   pSetDegProcs(currRing,kHomModDeg);
   res->data=(void *)(long)idHomModule(v_id,currQuotient,&w);
-  pLexOrder=save_pLexOrder;
+  currRing->pLexOrder=save_pLexOrder;
   kHomW=NULL;
   kModW=NULL;
   pRestoreDegProcs(currRing,save_FDeg,save_LDeg);

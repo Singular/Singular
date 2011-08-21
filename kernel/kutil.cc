@@ -390,7 +390,7 @@ void HEckeTest (poly pp,kStrategy strat)
   int   j,k,p;
 
   strat->kHEdgeFound=FALSE;
-  if (pLexOrder || currRing->MixedOrder)
+  if (currRing->pLexOrder || currRing->MixedOrder)
   {
     return;
   }
@@ -5834,7 +5834,7 @@ void initBuchMoraPos (kStrategy strat)
       else
         strat->posInT = posInT_EcartpLength;
     }
-    else if (pLexOrder && !TEST_OPT_INTSTRATEGY)
+    else if (currRing->pLexOrder && !TEST_OPT_INTSTRATEGY)
     {
       strat->posInL = posInL11;
       strat->posInT = posInT11;

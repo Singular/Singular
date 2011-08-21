@@ -1054,7 +1054,7 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redHoney;
   if (strat->honey)
     strat->red = redHoney;
-  else if (pLexOrder && !strat->homog)
+  else if (currRing->pLexOrder && !strat->homog)
     strat->red = redLazy;
   else
   {
@@ -1067,7 +1067,7 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redRing;
   }
 #endif
-  if (pLexOrder && strat->honey)
+  if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
     strat->initEcart = initEcartBBA;
@@ -1716,7 +1716,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     return idInit(1,F->rank);
 
   ideal r;
-  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
 
@@ -1736,7 +1736,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->kHomW=kHomW=NULL;
   if (vw != NULL)
   {
-    pLexOrder=FALSE;
+    currRing->pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
     pFDegOld = currRing->pFDeg;
     pLDegOld = currRing->pLDeg;
@@ -1755,7 +1755,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       h = (tHomog)idHomModule(F,Q,w);
     }
   }
-  pLexOrder=b;
+  currRing->pLexOrder=b;
   if (h==isHomog)
   {
     if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
@@ -1769,7 +1769,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
         toReset = TRUE;
       }
     }
-    pLexOrder = TRUE;
+    currRing->pLexOrder = TRUE;
     if (hilb==NULL) strat->LazyPass*=2;
   }
   strat->homog=h;
@@ -1827,7 +1827,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     kModW = NULL;
     pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
   }
-  pLexOrder = b;
+  currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
   HCord=strat->HCord;
   delete(strat);
@@ -1840,7 +1840,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
                 int newIdeal, intvec *vw, int uptodeg, int lV)
 {
   ideal r;
-  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
 
@@ -1858,7 +1858,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   strat->kHomW=kHomW=NULL;
   if (vw != NULL)
   {
-    pLexOrder=FALSE;
+    currRing->pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
     pFDegOld = currRing->pFDeg;
     pLDegOld = currRing->pLDeg;
@@ -1877,7 +1877,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
       h = (tHomog)idHomModule(F,Q,w);
     }
   }
-  pLexOrder=b;
+  currRing->pLexOrder=b;
   if (h==isHomog)
   {
     if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
@@ -1891,7 +1891,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
         toReset = TRUE;
       }
     }
-    pLexOrder = TRUE;
+    currRing->pLexOrder = TRUE;
     if (hilb==NULL) strat->LazyPass*=2;
   }
   strat->homog=h;
@@ -1920,7 +1920,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
     kModW = NULL;
     pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
   }
-  pLexOrder = b;
+  currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
   HCord=strat->HCord;
   delete(strat);
@@ -1947,7 +1947,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   ideal r=NULL;
   int Kstd1_OldDeg = Kstd1_deg,i;
   intvec* temp_w=NULL;
-  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
   kStrategy strat=new skStrategy;
@@ -2002,7 +2002,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
         }
       }
     }
-    pLexOrder = TRUE;
+    currRing->pLexOrder = TRUE;
     strat->LazyPass*=2;
   }
   strat->homog=h;
@@ -2032,7 +2032,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
     kModW = NULL;
   }
-  pLexOrder = b;
+  currRing->pLexOrder = b;
   HCord=strat->HCord;
   if ((delete_w)&&(temp_w!=NULL)) delete temp_w;
   if ((IDELEMS(r)==1) && (r->m[0]!=NULL) && pIsConstant(r->m[0]) && (strat->ak==0))
