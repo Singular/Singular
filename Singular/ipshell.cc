@@ -5544,3 +5544,8 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
   jjINT_S_TO_ID(n,e,res);
   return FALSE;
 }
+
+void rChangeCurrRing(ring r)
+{
+  currRing=r;
+}
