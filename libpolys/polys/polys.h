@@ -224,7 +224,6 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 
 typedef poly*   polyset;
 extern int      pOrdSgn;
-extern BOOLEAN  pLexOrder;
 extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 

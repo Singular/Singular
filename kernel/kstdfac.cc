@@ -897,7 +897,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 {
 #ifdef HAVE_FACTORY
   ideal r;
-  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
   kStrategy orgstrat=strat;
@@ -930,7 +930,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
       pSetDegProcs(currRing,kModDeg);
       toReset = TRUE;
     }
-    pLexOrder = TRUE;
+    currRing->pLexOrder = TRUE;
     strat->LazyPass*=2;
   }
   strat->homog=h;
@@ -1031,7 +1031,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
     kModW = NULL;
   }
-  pLexOrder = b;
+  currRing->pLexOrder = b;
   delete(strat);
   strat=orgstrat;
   while (strat!=NULL)

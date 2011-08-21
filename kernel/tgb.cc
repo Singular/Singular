@@ -3221,7 +3221,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
         break;
     }
   }
-  eliminationProblem = ((!(is_homog)) && ((pLexOrder) || (I->rank > 1)));
+  eliminationProblem = ((!(is_homog)) && ((currRing->pLexOrder) || (I->rank > 1)));
   tailReductions = ((is_homog) || ((TEST_OPT_REDTAIL) && (!(I->rank > 1))));
   //  Print("is homog:%d",c->is_homog);
   void *h;
