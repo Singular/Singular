@@ -3633,7 +3633,7 @@ do_t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode, int deg_pos)
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I = arg_I;
-  idCompactify (I);
+  id_Compactify (I,currRing);
   if(idIs0 (I))
     return I;
   int i;
