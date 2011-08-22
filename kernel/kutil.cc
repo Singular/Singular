@@ -976,10 +976,10 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
     else
     {
       // search p in T, if it is there, do not delete it
-      if (pOrdSgn != -1 || kFindInT(set[j].p, strat) < 0)
+      if (currRing->OrdSgn != -1 || kFindInT(set[j].p, strat) < 0)
       {
         // assure that for global orderings kFindInT fails
-        assume(pOrdSgn == -1 || kFindInT(set[j].p, strat) < 0);
+        assume(currRing->OrdSgn == -1 || kFindInT(set[j].p, strat) < 0);
         set[j].Delete();
       }
     }
@@ -1824,7 +1824,7 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
       for (j=strat->Ll; j>=0; j--)
       {
         if (sugarDivisibleBy(ecart,strat->L[j].ecart)
-        && ((pNext(strat->L[j].p) == strat->tail) || (pOrdSgn==1))
+        && ((pNext(strat->L[j].p) == strat->tail) || (currRing->OrdSgn==1))
         && pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
         {
           if (strat->L[j].p == strat->tail)
@@ -1877,7 +1877,7 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
       {
         if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
         {
-          if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+          if ((pNext(strat->L[j].p) == strat->tail)||(currRing->OrdSgn==1))
           {
             deleteInL(strat->L,&strat->Ll,j,strat);
             strat->c3++;
@@ -1916,7 +1916,7 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
-        if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+        if ((pNext(strat->L[j].p) == strat->tail)||(currRing->OrdSgn==1))
         {
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
@@ -2046,7 +2046,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
       for (j=strat->Ll; j>=0; j--)
       {
         if (sugarDivisibleBy(ecart,strat->L[j].ecart)
-        && ((pNext(strat->L[j].p) == strat->tail) || (pOrdSgn==1))
+        && ((pNext(strat->L[j].p) == strat->tail) || (currRing->OrdSgn==1))
         && pCompareChainPart(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
         {
           if (strat->L[j].p == strat->tail)
@@ -2123,7 +2123,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
       {
         if (pCompareChainPart(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
         {
-          if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+          if ((pNext(strat->L[j].p) == strat->tail)||(currRing->OrdSgn==1))
           {
               if(TEST_OPT_DEBUG)
               {
@@ -2176,7 +2176,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
     {
       if (pCompareChainPart(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
-        if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+        if ((pNext(strat->L[j].p) == strat->tail)||(currRing->OrdSgn==1))
         {
               if(TEST_OPT_DEBUG)
               {
@@ -2397,7 +2397,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
-        if ((pNext(strat->L[j].p) == strat->tail) || (pOrdSgn==1))
+        if ((pNext(strat->L[j].p) == strat->tail) || (currRing->OrdSgn==1))
         {
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
@@ -3226,7 +3226,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int i;
   int an = 0;
   int en = length;
-  int cmp_int = pOrdSgn;
+  int cmp_int = currRing->OrdSgn;
   int pc=pGetComp(p);
   if ((currRing->MixedOrder)
 #ifdef HAVE_PLURAL
@@ -3339,7 +3339,7 @@ int posInT1 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
-  if (pLmCmp(set[length].p,p.p)!= pOrdSgn) return length+1;
+  if (pLmCmp(set[length].p,p.p)!= currRing->OrdSgn) return length+1;
 
   int i;
   int an = 0;
@@ -3349,11 +3349,11 @@ int posInT1 (const TSet set,const int length,LObject &p)
   {
     if (an >= en-1)
     {
-      if (pLmCmp(set[an].p,p.p) == pOrdSgn) return an;
+      if (pLmCmp(set[an].p,p.p) == currRing->OrdSgn) return an;
       return en;
     }
     i=(an+en) / 2;
-    if (pLmCmp(set[i].p,p.p) == pOrdSgn) en=i;
+    if (pLmCmp(set[i].p,p.p) == currRing->OrdSgn) en=i;
     else                                 an=i;
   }
 }
@@ -3402,7 +3402,7 @@ int posInT11 (const TSet set,const int length,LObject &p)
  * loop
  * {
  *   if ((pFDeg(set[j].p) > o)
- *   || ((pFDeg(set[j].p) == o) && (pLmCmp(set[j].p,p.p) == pOrdSgn)))
+ *   || ((pFDeg(set[j].p) == o) && (pLmCmp(set[j].p,p.p) == currRing->OrdSgn)))
  *   {
  *     return j;
  *   }
@@ -3418,7 +3418,7 @@ int posInT11 (const TSet set,const int length,LObject &p)
   int op = set[length].GetpFDeg();
 
   if ((op < o)
-  || ((op == o) && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
     return length+1;
 
   int i;
@@ -3431,14 +3431,14 @@ int posInT11 (const TSet set,const int length,LObject &p)
     {
       op= set[an].GetpFDeg();
       if ((op > o)
-      || (( op == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+      || (( op == o) && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
     op = set[i].GetpFDeg();
     if (( op > o)
-    || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+    || (( op == o) && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
       en=i;
     else
       an=i;
@@ -3458,7 +3458,7 @@ int posInTrg0 (const TSet set,const int length,LObject &p)
   int i;
   int an = 0;
   int en = length;
-  int cmp_int = pOrdSgn;
+  int cmp_int = currRing->OrdSgn;
   if ((op < o) || (pLmCmp(set[length].p,p.p)== -cmp_int))
     return length+1;
   int cmp;
@@ -3494,7 +3494,7 @@ int posInTrg0 (const TSet set,const int length,LObject &p)
   int op = set[length].GetpFDeg();
 
   if ((op < o)
-  || ((op == o) && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
     return length+1;
 
   int i;
@@ -3507,14 +3507,14 @@ int posInTrg0 (const TSet set,const int length,LObject &p)
     {
       op= set[an].GetpFDeg();
       if ((op > o)
-      || (( op == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+      || (( op == o) && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
     op = set[i].GetpFDeg();
     if (( op > o)
-    || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+    || (( op == o) && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
       en=i;
     else
       an=i;
@@ -3537,7 +3537,7 @@ int posInT110 (const TSet set,const int length,LObject &p)
   if (( op < o)
   || (( op == o) && (set[length].length<p.length))
   || (( op == o) && (set[length].length == p.length)
-     && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
     return length+1;
 
   int i;
@@ -3551,7 +3551,7 @@ int posInT110 (const TSet set,const int length,LObject &p)
       if (( op > o)
       || (( op == o) && (set[an].length > p.length))
       || (( op == o) && (set[an].length == p.length)
-         && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
         return an;
       return en;
     }
@@ -3560,7 +3560,7 @@ int posInT110 (const TSet set,const int length,LObject &p)
     if (( op > o)
     || (( op == o) && (set[i].length > p.length))
     || (( op == o) && (set[i].length == p.length)
-       && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
       en=i;
     else
       an=i;
@@ -3650,7 +3650,7 @@ int posInT15 (const TSet set,const int length,LObject &p)
  * {
  *   if ((set[j].GetpFDeg()+set[j].ecart > o)
  *   || ((set[j].GetpFDeg()+set[j].ecart == o)
- *     && (pLmCmp(set[j].p,p.p) == pOrdSgn)))
+ *     && (pLmCmp(set[j].p,p.p) == currRing->OrdSgn)))
  *   {
  *     return j;
  *   }
@@ -3667,7 +3667,7 @@ int posInT15 (const TSet set,const int length,LObject &p)
 
   if ((op < o)
   || ((op == o)
-     && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
     return length+1;
 
   int i;
@@ -3679,14 +3679,14 @@ int posInT15 (const TSet set,const int length,LObject &p)
     {
       op = set[an].GetpFDeg()+set[an].ecart;
       if (( op > o)
-      || (( op  == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+      || (( op  == o) && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
     op = set[i].GetpFDeg()+set[i].ecart;
     if (( op > o)
-    || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+    || (( op == o) && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
       en=i;
     else
       an=i;
@@ -3712,7 +3712,7 @@ int posInT17 (const TSet set,const int length,LObject &p)
 *      && (set[j].ecart < p.ecart)))
 *    || ((pFDeg(set[j].p)+set[j].ecart == o)
 *      && (set[j].ecart==p.ecart)
-*      && (pLmCmp(set[j].p,p.p)==pOrdSgn)))
+*      && (pLmCmp(set[j].p,p.p)==currRing->OrdSgn)))
 *      return j;
 *    j++;
 *    if (j > length) return j;
@@ -3728,7 +3728,7 @@ int posInT17 (const TSet set,const int length,LObject &p)
   if ((op < o)
   || (( op == o) && (set[length].ecart > p.ecart))
   || (( op == o) && (set[length].ecart==p.ecart)
-     && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+     && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
     return length+1;
 
   int i;
@@ -3742,7 +3742,7 @@ int posInT17 (const TSet set,const int length,LObject &p)
       if (( op > o)
       || (( op == o) && (set[an].ecart < p.ecart))
       || (( op  == o) && (set[an].ecart==p.ecart)
-         && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+         && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
         return an;
       return en;
     }
@@ -3751,7 +3751,7 @@ int posInT17 (const TSet set,const int length,LObject &p)
     if ((op > o)
     || (( op == o) && (set[i].ecart < p.ecart))
     || (( op == o) && (set[i].ecart == p.ecart)
-       && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+       && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
       en=i;
     else
       an=i;
@@ -3779,7 +3779,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
     if ((op < o)
     || ((op == o) && (set[length].ecart > p.ecart))
     || ((op == o) && (set[length].ecart==p.ecart)
-       && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+       && (pLmCmp(set[length].p,p.p) != currRing->OrdSgn)))
       return length+1;
   }
 
@@ -3798,7 +3798,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
         if ((op > o)
         || ((op == o) && (set[an].ecart < p.ecart))
         || ((op == o) && (set[an].ecart==p.ecart)
-           && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+           && (pLmCmp(set[an].p,p.p) == currRing->OrdSgn)))
           return an;
       }
       return en;
@@ -3812,7 +3812,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
       if ((op > o)
       || ((op == o) && (set[i].ecart < p.ecart))
       || ((op == o) && (set[i].ecart == p.ecart)
-         && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+         && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
         en=i;
       else
         an=i;
@@ -3894,7 +3894,7 @@ int posInLSpecial (const LSet set, const int length,
 
   if ((op > d)
   || ((op == d) && (p->p1!=NULL)&&(set[length].p1==NULL))
-  || (pLmCmp(set[length].p,p->p)== pOrdSgn))
+  || (pLmCmp(set[length].p,p->p)== currRing->OrdSgn))
      return length+1;
 
   int i;
@@ -3907,7 +3907,7 @@ int posInLSpecial (const LSet set, const int length,
       op=set[an].GetpFDeg();
       if ((op > d)
       || ((op == d) && (p->p1!=NULL) && (set[an].p1==NULL))
-      || (pLmCmp(set[an].p,p->p)== pOrdSgn))
+      || (pLmCmp(set[an].p,p->p)== currRing->OrdSgn))
          return en;
       return an;
     }
@@ -3915,7 +3915,7 @@ int posInLSpecial (const LSet set, const int length,
     op=set[i].GetpFDeg();
     if ((op>d)
     || ((op==d) && (p->p1!=NULL) && (set[i].p1==NULL))
-    || (pLmCmp(set[i].p,p->p) == pOrdSgn))
+    || (pLmCmp(set[i].p,p->p) == currRing->OrdSgn))
       an=i;
     else
       en=i;
@@ -3932,7 +3932,7 @@ int posInL0 (const LSet set, const int length,
 {
   if (length<0) return 0;
 
-  if (pLmCmp(set[length].p,p->p)== pOrdSgn)
+  if (pLmCmp(set[length].p,p->p)== currRing->OrdSgn)
     return length+1;
 
   int i;
@@ -3942,11 +3942,11 @@ int posInL0 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      if (pLmCmp(set[an].p,p->p) == pOrdSgn) return en;
+      if (pLmCmp(set[an].p,p->p) == currRing->OrdSgn) return en;
       return an;
     }
     i=(an+en) / 2;
-    if (pLmCmp(set[i].p,p->p) == pOrdSgn) an=i;
+    if (pLmCmp(set[i].p,p->p) == currRing->OrdSgn) an=i;
     else                                 en=i;
     /*aend. fuer lazy == in !=- machen */
   }
@@ -3969,7 +3969,7 @@ int posInL11 (const LSet set, const int length,
  * {
  *   if (j > length)            return j;
  *   if ((set[j].GetpFDeg() < o)) return j;
- *   if ((set[j].GetpFDeg() == o) && (pLmCmp(set[j].p,p->p) == -pOrdSgn))
+ *   if ((set[j].GetpFDeg() == o) && (pLmCmp(set[j].p,p->p) == -currRing->OrdSgn))
  *   {
  *     return j;
  *   }
@@ -3984,7 +3984,7 @@ int posInL11 (const LSet set, const int length,
   int op = set[length].GetpFDeg();
 
   if ((op > o)
-  || ((op == o) && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -3995,14 +3995,14 @@ int posInL11 (const LSet set, const int length,
     {
       op = set[an].GetpFDeg();
       if ((op > o)
-      || ((op == o) && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+      || ((op == o) && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
     op = set[i].GetpFDeg();
     if ((op > o)
-    || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+    || ((op == o) && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
       an=i;
     else
       en=i;
@@ -4044,7 +4044,7 @@ int posInLrg0 (const LSet set, const int length,
   int o = p->GetpFDeg();
   int op = set[length].GetpFDeg();
 
-  if ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+  if ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
     return length + 1;
   int i;
   int an = 0;
@@ -4054,13 +4054,13 @@ int posInLrg0 (const LSet set, const int length,
     if (an >= en - 1)
     {
       op = set[an].GetpFDeg();
-      if ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+      if ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
         return en;
       return an;
     }
     i = (an+en) / 2;
     op = set[i].GetpFDeg();
-    if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+    if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
       an = i;
     else
       en = i;
@@ -4078,7 +4078,7 @@ int posInLrg0 (const LSet set, const int length,
   int inda;
   int indi;
 
-  if ((inda > indp) || ((inda == inde) && ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))))
+  if ((inda > indp) || ((inda == inde) && ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))))
     return length + 1;
   int i;
   int an = 0;
@@ -4089,15 +4089,15 @@ int posInLrg0 (const LSet set, const int length,
     if (an >= en-1)
     {
       op = set[an].GetpFDeg();
-      if ((indp > inda) || ((indp == inda) && ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))))
+      if ((indp > inda) || ((indp == inda) && ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))))
         return en;
       return an;
     }
     i = (an + en) / 2;
     indi = getIndexRng((unsigned long) pGetCoeff(set[i].p));
     op = set[i].GetpFDeg();
-    if ((indi > indp) || ((indi == indp) && ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))))
-    // if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+    if ((indi > indp) || ((indi == indp) && ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))))
+    // if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
     {
       an = i;
       inda = getIndexRng((unsigned long) pGetCoeff(set[an].p));
@@ -4123,7 +4123,7 @@ int posInL110 (const LSet set, const int length,
   if ((op > o)
   || ((op == o) && (set[length].length >p->length))
   || ((op == o) && (set[length].length <= p->length)
-     && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+     && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -4136,7 +4136,7 @@ int posInL110 (const LSet set, const int length,
       if ((op > o)
       || ((op == o) && (set[an].length >p->length))
       || ((op == o) && (set[an].length <=p->length)
-         && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+         && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
         return en;
       return an;
     }
@@ -4145,7 +4145,7 @@ int posInL110 (const LSet set, const int length,
     if ((op > o)
     || ((op == o) && (set[i].length > p->length))
     || ((op == o) && (set[i].length <= p->length)
-       && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+       && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
       an=i;
     else
       en=i;
@@ -4205,7 +4205,7 @@ int posInL15 (const LSet set, const int length,
  *   if (j > length)                       return j;
  *   if (set[j].GetpFDeg()+set[j].ecart < o) return j;
  *   if ((set[j].GetpFDeg()+set[j].ecart == o)
- *   && (pLmCmp(set[j].p,p->p) == -pOrdSgn))
+ *   && (pLmCmp(set[j].p,p->p) == -currRing->OrdSgn))
  *   {
  *     return j;
  *   }
@@ -4220,7 +4220,7 @@ int posInL15 (const LSet set, const int length,
   int op = set[length].GetpFDeg() + set[length].ecart;
 
   if ((op > o)
-  || ((op == o) && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+  || ((op == o) && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -4231,14 +4231,14 @@ int posInL15 (const LSet set, const int length,
     {
       op = set[an].GetpFDeg() + set[an].ecart;
       if ((op > o)
-      || ((op == o) && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+      || ((op == o) && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
     op = set[i].GetpFDeg() + set[i].ecart;
     if ((op > o)
-    || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+    || ((op == o) && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
       an=i;
     else
       en=i;
@@ -4263,7 +4263,7 @@ int posInL17 (const LSet set, const int length,
      && (set[length].ecart > p->ecart))
   || ((set[length].GetpFDeg() + set[length].ecart == o)
      && (set[length].ecart == p->ecart)
-     && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+     && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
     return length+1;
   int i;
   int an = 0;
@@ -4277,7 +4277,7 @@ int posInL17 (const LSet set, const int length,
          && (set[an].ecart > p->ecart))
       || ((set[an].GetpFDeg() + set[an].ecart == o)
          && (set[an].ecart == p->ecart)
-         && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+         && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
         return en;
       return an;
     }
@@ -4287,7 +4287,7 @@ int posInL17 (const LSet set, const int length,
        && (set[i].ecart > p->ecart))
     || ((set[i].GetpFDeg() +set[i].ecart == o)
        && (set[i].ecart == p->ecart)
-       && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+       && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
       an=i;
     else
       en=i;
@@ -4318,7 +4318,7 @@ int posInL17_c (const LSet set, const int length,
        && (set[length].ecart > p->ecart))
     || ((set[length].GetpFDeg() + set[length].ecart == o)
        && (set[length].ecart == p->ecart)
-       && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+       && (pLmCmp(set[length].p,p->p) != -currRing->OrdSgn)))
       return length+1;
   }
   int i;
@@ -4337,7 +4337,7 @@ int posInL17_c (const LSet set, const int length,
            && (set[an].ecart > p->ecart))
         || ((set[an].GetpFDeg() + set[an].ecart == o)
            && (set[an].ecart == p->ecart)
-           && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+           && (pLmCmp(set[an].p,p->p) != -currRing->OrdSgn)))
           return en;
       }
       return an;
@@ -4352,7 +4352,7 @@ int posInL17_c (const LSet set, const int length,
          && (set[i].ecart > p->ecart))
       || ((set[i].GetpFDeg() +set[i].ecart == o)
          && (set[i].ecart == p->ecart)
-         && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+         && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
         an=i;
       else
         en=i;
@@ -4861,7 +4861,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
         {
           h.pNorm();
         }
-        if (pOrdSgn==-1)
+        if (currRing->OrdSgn==-1)
         {
           deleteHC(&h, strat);
         }
@@ -4887,7 +4887,7 @@ void initS (ideal F, ideal Q, kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
-      if (pOrdSgn==-1)
+      if (currRing->OrdSgn==-1)
       {
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
@@ -4948,7 +4948,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
       {
         LObject h;
         h.p = pCopy(Q->m[i]);
-        if (pOrdSgn==-1)
+        if (currRing->OrdSgn==-1)
         {
           deleteHC(&h,strat);
         }
@@ -4985,7 +4985,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
       h.p = pCopy(F->m[i]);
       if (h.p!=NULL)
       {
-        if (pOrdSgn==-1)
+        if (currRing->OrdSgn==-1)
         {
           cancelunit(&h);  /*- tries to cancel a unit -*/
           deleteHC(&h, strat);
@@ -5062,7 +5062,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         //{
         //  h.pNorm();
         //}
-        if (pOrdSgn==-1)
+        if (currRing->OrdSgn==-1)
         {
           deleteHC(&h,strat);
         }
@@ -5090,7 +5090,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
-      if (pOrdSgn==-1)
+      if (currRing->OrdSgn==-1)
       {
         deleteHC(&h,strat);
       }
@@ -5127,7 +5127,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       }
       if(strat->sl>=0)
       {
-        if (pOrdSgn==1)
+        if (currRing->OrdSgn==1)
         {
           h.p=redBba(h.p,strat->sl,strat);
           if (h.p!=NULL)
@@ -5355,9 +5355,9 @@ void updateS(BOOLEAN toT,kStrategy strat)
 //    if (strat->fromQ!=NULL) Print("(Q:%d) ",strat->fromQ[i]);
 //    pWrite(strat->S[i]);
 //  }
-//  Print("pOrdSgn=%d\n", pOrdSgn);
+//  Print("currRing->OrdSgn=%d\n", currRing->OrdSgn);
   any_change=FALSE;
-  if (pOrdSgn==1)
+  if (currRing->OrdSgn==1)
   {
     while (suc != -1)
     {
@@ -5820,7 +5820,7 @@ BOOLEAN kPosInLDependsOnLength(int (*pos_in_l)
 
 void initBuchMoraPos (kStrategy strat)
 {
-  if (pOrdSgn==1)
+  if (currRing->OrdSgn==1)
   {
     if (strat->honey)
     {
@@ -5914,7 +5914,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
   strat->kHEdge=NULL;
-  if (pOrdSgn==1) strat->kHEdgeFound=FALSE;
+  if (currRing->OrdSgn==1) strat->kHEdgeFound=FALSE;
   /*- creating temp data structures------------------- -*/
   strat->cp = 0;
   strat->c3 = 0;
@@ -5938,7 +5938,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- init local data struct.---------------------------------------- -*/
   strat->P.ecart=0;
   strat->P.length=0;
-  if (pOrdSgn==-1)
+  if (currRing->OrdSgn==-1)
   {
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
@@ -6097,7 +6097,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
 void completeReduce (kStrategy strat, BOOLEAN withT)
 {
   int i;
-  int low = (((pOrdSgn==1) && (strat->ak==0)) ? 1 : 0);
+  int low = (((currRing->OrdSgn==1) && (strat->ak==0)) ? 1 : 0);
   LObject L;
 
 #ifdef KDEBUG
@@ -6126,7 +6126,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
     {
       L = *T_j;
       poly p;
-      if (pOrdSgn == 1)
+      if (currRing->OrdSgn == 1)
         strat->S[i] = redtailBba(&L, end_pos, strat, withT);
       else
         strat->S[i] = redtail(&L, strat->sl, strat);
@@ -6145,7 +6145,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
     else
     {
       assume(currRing == strat->tailRing);
-      if (pOrdSgn == 1)
+      if (currRing->OrdSgn == 1)
         strat->S[i] = redtailBba(strat->S[i], end_pos, strat, withT);
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
@@ -6881,7 +6881,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
   strat->kHEdge=NULL;
-  if (pOrdSgn==1) strat->kHEdgeFound=FALSE;
+  if (currRing->OrdSgn==1) strat->kHEdgeFound=FALSE;
   /*- creating temp data structures------------------- -*/
   strat->cp = 0;
   strat->c3 = 0;
@@ -6906,7 +6906,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   /*- init local data struct.---------------------------------------- -*/
   strat->P.ecart=0;
   strat->P.length=0;
-  if (pOrdSgn==-1)
+  if (currRing->OrdSgn==-1)
   {
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);

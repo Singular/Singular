@@ -1062,7 +1062,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 #endif
 #endif
 
-  assume(pOrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
+  assume(currRing->OrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
 
   intvec *w=NULL;
   intvec *hilb=NULL;
