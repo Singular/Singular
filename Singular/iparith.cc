@@ -4926,7 +4926,6 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #ifndef MDEBUG
 #define jjpHead        (proc1)8
 #endif
-#define jjidHead       (proc1)9
 #define jjidMinBase    (proc1)11
 #define jjsyMinBase    (proc1)12
 #define jjpMaxComp     (proc1)13
@@ -4961,7 +4960,6 @@ void jjInitTab1()
 #ifndef MDEBUG
         case (int)jjpHead:        dArith1[i].p=(proc1)pHeadProc; break;
 #endif
-        case (int)jjidHead:       dArith1[i].p=(proc1)idHead; break;
         case (int)jjidMinBase:    dArith1[i].p=(proc1)idMinBase; break;
         case (int)jjsyMinBase:    dArith1[i].p=(proc1)syMinBase; break;
         case (int)jjpMaxComp:     dArith1[i].p=(proc1)pMaxCompProc; break;
@@ -5025,7 +5023,7 @@ static BOOLEAN jjpHead(leftv res, leftv v)
 #endif
 static BOOLEAN jjidHead(leftv res, leftv v)
 {
-  res->data = (char *)idHead((ideal)v->Data());
+  res->data = (char *)id_Head((ideal)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjidMinBase(leftv res, leftv v)

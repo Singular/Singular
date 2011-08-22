@@ -4986,7 +4986,7 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
         G = idrMoveR(G, newRing,currRing);
         goto FINISH;
       }
-      H0 = idHead(G);
+      H0 = id_Head(G,currRing);
 
       if(MivSame(target_tmp, iv_lp) == 1)
         if (rParameter(currRing) != NULL)
