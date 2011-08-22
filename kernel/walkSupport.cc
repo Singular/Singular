@@ -979,7 +979,7 @@ matrix matIdLift(ideal Gomega, ideal M)
   ideal Mtmp = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);
   int rows=IDELEMS(Gomega);
   int cols=IDELEMS(Mtmp);
-  matrix res=idModule2formatedMatrix(Mtmp,rows,cols);
+  matrix res=id_Module2formatedMatrix(Mtmp,rows,cols,currRing);
   return res;
 }
 ///////////////////////////////////////////////////////////////////
