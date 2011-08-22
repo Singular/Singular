@@ -383,7 +383,7 @@ ideal Approx_Step(ideal L)
     else
       SI = idMultSect(S, syzcnt);
     //idShow(SI);
-    MI = idModule2Matrix(SI);
+    MI = id_Module2Matrix(SI,currRing);
     res= idInit(MATCOLS(MI),1);
     for (i=1; i<= MATCOLS(MI); i++)
     {

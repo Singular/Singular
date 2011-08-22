@@ -1857,7 +1857,7 @@ syStrategy syKosz(ideal arg,int * length)
           old_ideal = idCopy(syzstr->res[0]);
           old_repr = idCopy(syzstr->orderedRes[0]);
           old_tl = (*syzstr->Tl)[0];
-          old_std = idHead(syzstr->res[0]);
+          old_std = id_Head(syzstr->res[0],currRing);
         }
         t_comp = (*syzstr->Tl)[index];
         if (index==0) crit_comp = t_comp;
@@ -1874,7 +1874,7 @@ syStrategy syKosz(ideal arg,int * length)
         if ((index==0) && (!isRegular) && (i==last_generator))
         {
 /*----------- we are computing the regularity -----------------------*/
-          ideal initial=idHead(syzstr->res[0]);
+          ideal initial=id_Head(syzstr->res[0],currRing);
           int len=0,reg=0;
           intvec *w=NULL;
           ring dp_C_ring = rAssure_dp_C(currRing, TRUE); rChangeCurrRing(dp_C_ring);	   
@@ -1947,7 +1947,7 @@ syStrategy syKosz(ideal arg,int * length)
   {
 #ifdef SHOW_RESULT
     Print("The %d-th syzygy-module is now:\n",index);
-    ideal ttt=idHead(syzstr->fullres[index]);
+    ideal ttt=id_Head(syzstr->fullres[index],currRing);
     idShow(ttt);
     idDelete(&ttt);
     //if (index>0)
