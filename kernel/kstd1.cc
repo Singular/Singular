@@ -1804,7 +1804,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
 #endif
   {
-    if (pOrdSgn==-1)
+    if (currRing->OrdSgn==-1)
     {
       if (w!=NULL)
         r=mora(F,Q,*w,hilb,strat);
@@ -1898,7 +1898,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 #ifdef KDEBUG
   idTest(F);
 #endif
-  if (pOrdSgn==-1)
+  if (currRing->OrdSgn==-1)
   {
     /* error: no local ord yet with shifts */
     Print("No local ordering possible for shifts");
@@ -2006,7 +2006,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     strat->LazyPass*=2;
   }
   strat->homog=h;
-  if (pOrdSgn==-1)
+  if (currRing->OrdSgn==-1)
   {
     if (w!=NULL)
       r=mora(F,Q,*w,hilb,strat);
@@ -2099,7 +2099,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
   strat->ak = si_max(id_RankFreeModule(F,currRing),pMaxComp(p));
   poly res;
 
-  if (pOrdSgn==-1)
+  if (currRing->OrdSgn==-1)
     res=kNF1(F,Q,pp,strat,lazyReduce);
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
@@ -2152,7 +2152,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     strat->ak = si_max(strat->ak,(int)F->rank);
   }
 
-  if (pOrdSgn==-1)
+  if (currRing->OrdSgn==-1)
     res=kNF1(F,Q,pp,strat,lazyReduce);
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
@@ -2214,7 +2214,7 @@ ideal kInterRedOld (ideal F, ideal Q)
   strat->T           = initT();
   strat->R           = initR();
   strat->sevT        = initsevT();
-  if (pOrdSgn == -1)   strat->honey = TRUE;
+  if (currRing->OrdSgn == -1)   strat->honey = TRUE;
   initS(tempF, tempQ, strat);
   if (TEST_OPT_REDSB)
     strat->noTailReduction=FALSE;
@@ -2522,7 +2522,7 @@ ideal kInterRed (ideal F, ideal Q)
 #ifdef HAVE_PLURAL
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
 #endif
-  if ((pOrdSgn==-1)
+  if ((currRing->OrdSgn==-1)
   || (rField_is_numeric(currRing)))
     return kInterRedOld(F,Q);
 

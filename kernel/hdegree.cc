@@ -796,7 +796,7 @@ int  scMultInt(ideal S, ideal Q)
 void scPrintDegree(int co, int mu)
 {
   int di = (currRing->N)-co;
-  if (pOrdSgn == 1)
+  if (currRing->OrdSgn == 1)
   {
     if (di>0)
       Print("// dimension (proj.)  = %d\n// degree (proj.)   = %d\n", di-1, mu);
@@ -909,7 +909,7 @@ static poly pWork;
 static void hHedge(poly hEdge)
 {
   pSetm(pWork);
-  if (pLmCmp(pWork, hEdge) == pOrdSgn)
+  if (pLmCmp(pWork, hEdge) == currRing->OrdSgn)
   {
     for (int i = hNvar; i>0; i--)
       pSetExp(hEdge,i, pGetExp(pWork,i));
