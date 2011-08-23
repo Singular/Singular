@@ -2,26 +2,32 @@
 /* $Id$ */
 
 %{
-#ifndef NOSTREAMIO
+
+#include "config.h"
+#include "factoryconf.h"
+
+#if (!defined(NOSTREAMIO)) && (!defined(SINGULAR))
+
 
 #if defined(WINNT) && ! defined(__GNUC__)
-#include <malloc.h>
-#include <memory.h>
-#define alloca _alloca
+# include <malloc.h>
+# include <memory.h>
+# define alloca _alloca
 #endif
 
 #include <cstring> // we need this for gcc 4.3
 #include <config.h>
 
 #include <ctype.h>
+
 #ifdef HAVE_IOSTREAM
-#include <iostream>
-#define ISTREAM std::istream
-#define CERR std::cerr
+# include <iostream>
+# define ISTREAM std::istream
+# define CERR std::cerr
 #elif defined(HAVE_IOSTREAM_H)
-#include <iostream.h>
-#define ISTREAM istream
-#define CERR cerr
+# include <iostream.h>
+# define ISTREAM istream
+# define CERR cerr
 #endif
 
 
@@ -34,10 +40,10 @@
 #include "variable.h"
 
 #ifndef BISONPP
-#define YYSTYPE ParseUtil
+# define YYSTYPE ParseUtil
 #else
-#define YY_parse_USE_GOTO 1
-#define YY_parse_STYPE ParseUtil
+# define YY_parse_USE_GOTO 1
+# define YY_parse_STYPE ParseUtil
 #endif
 
 static char* readString( ISTREAM& );
@@ -212,5 +218,5 @@ char* readString( ISTREAM& s )
 }
 
 
-#endif
-// #ifndef NOSTREAMIO
+#endif 
+/* #ifndef SINGULAR && ifndef NOSTREAMIO */
