@@ -4,7 +4,7 @@
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

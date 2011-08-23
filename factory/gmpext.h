@@ -4,9 +4,8 @@
 #ifndef INCL_GMPEXT_H
 #define INCL_GMPEXT_H
 
-#include <config.h>
-
-#include "cf_gmp.h"
+// #include "config.h"
+// #include "cf_gmp.h"
 
 #include "cf_defs.h"
 #include "imm.h"

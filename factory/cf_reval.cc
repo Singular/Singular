@@ -3,7 +3,7 @@
 
 #define MORE_ZEROES
 
-#include <config.h>
+#include "config.h"
 
 #include "cf_assert.h"
 

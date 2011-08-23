@@ -4,18 +4,18 @@
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
-#ifdef HAVE_IOSTREAM
-#include <iostream>
-#define OSTREAM std::ostream
-#define ISTREAM std::istream
-#elif defined(HAVE_IOSTREAM_H)
-#include <iostream.h>
-#define OSTREAM ostream
-#define ISTREAM istream
-#endif
+# ifdef HAVE_IOSTREAM
+#  include <iostream>
+#  define OSTREAM std::ostream
+#  define ISTREAM std::istream
+# elif defined(HAVE_IOSTREAM_H)
+#  include <iostream.h>
+#  define OSTREAM ostream
+#  define ISTREAM istream
+# endif
 #endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
@@ -164,10 +164,10 @@ public:
 
     // input/output
 #ifndef NOSTREAMIO
-    void print( OSTREAM&, char * ) const;
-    void print( OSTREAM& ) const;
-    friend OSTREAM& operator << ( OSTREAM&, const CanonicalForm& );
-    friend ISTREAM& operator >> ( ISTREAM&, CanonicalForm& );
+   void print( OSTREAM&, char * ) const;
+   void print( OSTREAM& ) const;
+   friend OSTREAM& operator << ( OSTREAM&, const CanonicalForm& );
+   friend ISTREAM& operator >> ( ISTREAM&, CanonicalForm& );
 #endif /* NOSTREAMIO */
 
     // obsolete methods

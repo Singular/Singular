@@ -19,6 +19,7 @@
 
 #ifdef HAVE_FACTORY
 int initializeGMP(){ return 1; }
+int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #endif
 
 // #pragma GCC diagnostic ignored "-Wwrite-strings"

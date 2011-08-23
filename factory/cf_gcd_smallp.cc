@@ -18,7 +18,7 @@
 **/
 //*****************************************************************************
 
-#include <config.h>
+#include "config.h"
 
 #include "cf_assert.h"
 #include "debug.h"

@@ -16,7 +16,7 @@
 #ifndef FAC_FQ_BIVAR_H
 #define FAC_FQ_BIVAR_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "cf_assert.h"
 

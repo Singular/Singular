@@ -4,7 +4,7 @@
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
 
-#include <factory/factoryconf.h>
+// #include <factory/factoryconf.h>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

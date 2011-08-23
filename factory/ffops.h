@@ -4,7 +4,7 @@
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "cf_globals.h"
 #ifdef HAVE_NTL

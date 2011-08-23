@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <config.h>
+#include "config.h"
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>

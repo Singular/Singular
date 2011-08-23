@@ -4,7 +4,7 @@
 #ifndef INCL_FAC_MULTIVAR_H
 #define INCL_FAC_MULTIVAR_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 

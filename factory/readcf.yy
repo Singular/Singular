@@ -2,6 +2,7 @@
 /* $Id$ */
 
 %{
+#ifndef NOSTREAMIO
 
 #if defined(WINNT) && ! defined(__GNUC__)
 #include <malloc.h>
@@ -209,3 +210,7 @@ char* readString( ISTREAM& s )
     }
     return buffer;
 }
+
+
+#endif
+// #ifndef NOSTREAMIO

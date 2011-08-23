@@ -28,7 +28,6 @@ SOURCES = \
 		cf_gcd.cc \
 		cf_gcd_smallp.cc \
 		cf_generator.cc \
-		cfGEval.cc \
 		cf_globals.cc \
 		cf_hnf.cc \
 		cf_inline.cc \
@@ -72,7 +71,6 @@ SOURCES = \
 		facIrredTest.cc \
 		fieldGCD.cc \
 		ffops.cc \
-		ffreval.cc \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
@@ -91,10 +89,10 @@ SOURCES = \
 		lgs.cc \
 		singext.cc \
 		parseutil.cc \
-		readcf.yy \
-		factory.h \
-		factoryconf.h \
-		ftmpl_inst.cc
+		ftmpl_inst.cc \
+		factory.h factoryconf.h cplusplus.h \
+		readcf.yy
+
 
 libfactory_a_SOURCES = $(SOURCES)
 libfactory_g_a_SOURCES = $(SOURCES)
@@ -109,7 +107,6 @@ factory_headers = \
 		cf_eval.h \
 		cf_factory.h \
 		cf_generator.h \
-		cfGEval.h \
 		cf_globals.h \
 		cf_gcd_smallp.h \
 		cf_hnf.h \
@@ -117,7 +114,7 @@ factory_headers = \
 		cf_iter.h \
 		cf_map.h \
 		cfNewtonPolygon.h \
-                cfModResultant.h \
+		cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
@@ -147,7 +144,6 @@ factory_headers = \
 		facIrredTest.h \
 		fieldGCD.h \
 		ffops.h \
-		ffreval.h \
 		templates/ftmpl_list.h \
 		templates/ftmpl_matrix.h \
 		gf_tabutil.h \
@@ -249,7 +245,8 @@ gftables: gengftables
 .template.h:
 	${srcdir}/bin/makeheader $< $@
 
-BUILT_SOURCES = factory.h factoryconf.h
+BUILT_SOURCES = cplusplus.h factory.h factoryconf.h
+
 
 libfactory_a_include_HEADERS=$(BUILT_SOURCES)
 libfactory_g_a_include_HEADERS=$(BUILT_SOURCES)
@@ -311,4 +308,15 @@ EXTRA_DIST =	test_install.cc \
 		bin/folding.el bin/fold-docu.el \
 		bin/makeheader bin/gen-readcf readcf.cc $(gftables_DATA)
 
-CLEANFILES = factory.h factoryconf.h
+CLEANFILES = factory.h factoryconf.h cplusplus.h
+
+
+
+EXTRA_PROGRAMS = cplusplus
+
+cplusplus_SOURCES = cplusplus.cc
+
+cplusplus.h: cplusplus
+	${builddir}/cplusplus > ${builddir}/cplusplus.h
+
+cf_gmp.h: cplusplus.h

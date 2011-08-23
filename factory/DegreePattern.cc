@@ -12,7 +12,7 @@
  **/
 /*****************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 #include "DegreePattern.h"
 #include "cf_iter.h"

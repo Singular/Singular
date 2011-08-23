@@ -12,7 +12,7 @@
  **/
 /*****************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 #include "cf_map.h"
 #include "cf_map_ext.h"

@@ -4,7 +4,7 @@
 #ifndef INCL_FAC_DISTRIB_H
 #define INCL_FAC_DISTRIB_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 

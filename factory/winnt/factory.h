@@ -22,7 +22,7 @@
 //
 //}}}
 
-#include <factoryconf.h>
+// #include <factoryconf.h>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
@@ -36,11 +36,12 @@
 #endif
 #endif /* ! NOSTREAMIO */
 
-#ifdef SINGULAR
-#include "cf_gmp.h"
-#else
-#include <gmp.h>
-#endif /* SINGULAR */
+
+// #ifdef SINGULAR
+// #include "cf_gmp.h"
+// #else
+// #include <gmp.h>
+// #endif /* SINGULAR */
 
 #include <templates/ftmpl_array.h>
 #include <templates/ftmpl_factor.h>

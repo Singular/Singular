@@ -4,7 +4,7 @@
 #ifndef INCL_CF_ITER_H
 #define INCL_CF_ITER_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 

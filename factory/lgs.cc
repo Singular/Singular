@@ -1,6 +1,7 @@
 /* ===================================================================
     Dateiname:          lgs.cc
    =================================================================== */
+#include "config.h"
 
 #include "lgs.h"
 #include "bifacConfig.h"
@@ -306,4 +307,5 @@ CFMatrix LGS::GetSolutionVector(void)
   }
   return erg;
 }
-#endif
+#endif /* #ifdef HAVE_BIFAC */
+

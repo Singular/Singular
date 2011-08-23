@@ -1,10 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 /* $Id$ */
 
-#include <config.h>
+#include "config.h"
 
 #include "cf_assert.h"
-
 #include "cf_factory.h"
 
 #include "cf_defs.h"
@@ -16,9 +15,13 @@
 #include "imm.h"
 #include "gfops.h"
 #include "cf_binom.h"
+
 #if defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)
 #include "memman.h"
 #endif
+
+#include "cf_gmp.h"
+
 
 #ifndef NOSTREAMIO
 CanonicalForm readCF( ISTREAM& );
@@ -27,6 +30,7 @@ CanonicalForm readCF( ISTREAM& );
 //{{{ initialization
 int initializeGMP();
 int initializeCharacteristic();
+
 #ifdef SINGULAR
 extern int mmInit(void);
 #endif

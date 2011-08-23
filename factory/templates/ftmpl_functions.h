@@ -26,7 +26,7 @@
 //
 //}}}
 
-#include <factory/factoryconf.h>
+// #include <factory/factoryconf.h>
 
 //{{{ template <class T> inline T tmax ( const T & a, const T & b )
 //{{{ docu

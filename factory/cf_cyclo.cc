@@ -16,11 +16,12 @@
 **/
 //*****************************************************************************
 
-#include <config.h>
+#include "config.h"
 
 #include "canonicalform.h"
 #include "cf_primes.h"
 #include "cf_util.h"
+#include "cf_assert.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ.h>

@@ -11,7 +11,11 @@
 //
 //}}}
 
-#include <config.h>
+#include "config.h"
+
+#ifdef HAVE_NTL
+#include "NTLconvert.h"
+#endif
 
 #include "cf_assert.h"
 #include "debug.h"
@@ -19,9 +23,6 @@
 #include "canonicalform.h"
 #include "cf_iter.h"
 
-#ifdef HAVE_NTL
-#include "NTLconvert.h"
-#endif
 
 //{{{ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 //{{{ docu

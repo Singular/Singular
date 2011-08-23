@@ -1,7 +1,7 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 /* $Id$ */
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_CSTDIO
 #include <cstdio>

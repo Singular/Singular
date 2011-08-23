@@ -4,7 +4,7 @@
 #ifndef INCL_INT_RAT_H
 #define INCL_INT_RAT_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
@@ -21,7 +21,7 @@
 #include "canonicalform.h"
 #include "int_cf.h"
 #include "imm.h"
-#include "cf_gmp.h"
+// #include "cf_gmp.h"
 
 class InternalRational : public InternalCF
 {

@@ -14,7 +14,7 @@
 #ifndef DEGREE_PATTERN_H
 #define DEGREE_PATTERN_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "cf_assert.h"
 

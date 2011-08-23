@@ -17,7 +17,7 @@
 #ifndef CF_NEWTON_POLYGON_H
 #define CF_NEWTON_POLYGON_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

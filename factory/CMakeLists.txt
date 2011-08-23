@@ -164,7 +164,6 @@ set(basefactory_srcs
   facHensel.cc
   fieldGCD.cc 
   ffops.cc 
-  ffreval.cc 
   gf_tabutil.cc 
   gfops.cc 
   imm.cc 

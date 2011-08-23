@@ -4,7 +4,7 @@
 #ifndef INCL_CF_PRIMETAB_H
 #define INCL_CF_PRIMETAB_H
 
-#include <config.h>
+// #include "config.h"
 
 #define NUMSMALLPRIMES 3511
 #define NUMBIGPRIMES 28427

@@ -19,6 +19,8 @@
  **/
 /*****************************************************************************/
 
+#include "config.h"
+
 #include "cf_assert.h"
 #include "debug.h"
 #include "timing.h"

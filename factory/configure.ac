@@ -15,7 +15,6 @@ dnl #
 AC_INIT([factory], [3.1.2.sw])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
-AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR([.])
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
@@ -36,6 +35,13 @@ factory_configuration="'$ac_configure_args' in `pwd`"
 # - check withs and enables.
 #
 AC_ARG_WITH(
+  Singular,
+  [AS_HELP_STRING([--without-Singular],[build NOT for the use with CAS Singular.])],
+  ,
+  [with_Singular=yes])
+
+
+AC_ARG_WITH(
   memman,
   [  --with-memman(=<memman>) specify Factory memory manager.
                           <memman> is either \`old' (default), \`new', or \`no'.],
@@ -50,30 +56,20 @@ AC_ARG_WITH(
 
 AC_ARG_WITH(
   omalloc,
-  [  --with-omalloc           build for use with omalloc])
+  [AS_HELP_STRING([--with-omalloc],[build for use with omalloc])])
 
-AC_ARG_WITH(
-  Singular,
-  [  --with-Singular         build for use with computer algebra system Singular.],
-  ,
-  with_Singular=no)
 
 AC_ARG_ENABLE(
   cf-inline,
-  [  --enable-cf-inline      build Factory with \"configurable inline methods\"
-                          enabled.],
-  ,
-  enable_cf_inline=no)
+  [AS_HELP_STRING([--enable-cf-inline],[build Factory with \"configurable inline methods\" enabled.])],
+  [enable_cf_inline=$enableval],
+  [enable_cf_inline=no])
 
 AC_ARG_ENABLE(
   streamio,
-  [  --disable-streamio      build Factory without stream IO],
+  [AS_HELP_STRING([--enable-streamio],[build Factory with stream IO])],
   ,
-  [ if test "x$with_Singular" = xyes; then
-      enable_streamio=no
-    else
-      enable_streamio=yes
-    fi ])
+  [enable_streamio=no])
 
 AC_ARG_ENABLE(
   memdebug,
@@ -85,19 +81,19 @@ AC_ARG_ENABLE(
 
 AC_ARG_ENABLE(
   assertions,
-  [  --enable-assertions     build Factory with assertions activated],
+  [AS_HELP_STRING([--enable-assertions],[build Factory with assertions activated])],
   ,
   enable_assertions=no)
 
 AC_ARG_ENABLE(
   timing,
-  [  --enable-timing         build Factory so it will print timing information],
+  [AS_HELP_STRING([--enable-timing],[build Factory so it will print timing information])],
   ,
   enable_timing=no)
 
 AC_ARG_ENABLE(
   debugoutput,
-  [  --enable-debugoutput    build Factory so it will print debugging information],
+  [AS_HELP_STRING([--enable-debugoutput],[build Factory so it will print debugging information])],
   ,
   enable_debugoutput=no)
 
@@ -469,4 +465,5 @@ AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version", [FACTORYVERSION])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration", [FACTORYCONFIGURATION])
 AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir", [GFTABLEDIR])
 
+AC_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile ftest/GNUmakefile)

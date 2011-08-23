@@ -4,7 +4,7 @@
 #ifndef INCL_FAC_UNIVAR_H
 #define INCL_FAC_UNIVAR_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "fac_util.h"
