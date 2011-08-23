@@ -28,8 +28,11 @@ LIB "ring.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc mixedTest()
-// decides whether the ordering of the basering is mixed
+proc mixedTest()
+"USAGE:  mixedTest();
+RETURN:  1 if ordering of basering is mixed, 0 else
+EXAMPLE: example mixedTest(); shows an example
+"
 {
    int i,p,m;
    for(i = 1; i <= nvars(basering); i++)
@@ -46,6 +49,15 @@ static proc mixedTest()
    if((p > 0) && (m > 0)) { return(1); }
    return(0);
 }
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R1 = 0,(x,y,z),dp;
+   mixedTest();
+   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
+   mixedTest();
+   ring R3 = 181,x(1..9),(dp(5),lp(4));
+   mixedTest();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -60,7 +72,7 @@ static proc redFork(ideal I, ideal J, int n)
 proc isIncluded(ideal I, ideal J, list #)
 "USAGE:  isIncluded(I,J); I,J ideals
 RETURN:  1 if J includes I,
-         0 if there is an element f in I which does not reduce to 0 w.r.t. J.
+@*       0 if there is an element f in I which does not reduce to 0 w.r.t. J.
 EXAMPLE: example isIncluded; shows an example
 "
 {
@@ -254,7 +266,7 @@ proc deleteUnluckyPrimes(list T, list L, int ho, list #)
 RETURN:  lists T,L(,M),lT with T/L(/M) list of polys/primes(/type of #),
          lT ideal
 NOTE:    - if ho = 1, the polynomials in T are homogeneous, else ho = 0,
-         - lT is prevalent, i.e. the most appearing leading ideal in T
+@*       - lT is prevalent, i.e. the most appearing leading ideal in T
 EXAMPLE: example deleteUnluckyPrimes; shows an example
 "
 {
