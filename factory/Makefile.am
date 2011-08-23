@@ -245,7 +245,7 @@ gftables: gengftables
 .template.h:
 	${srcdir}/bin/makeheader $< $@
 
-BUILT_SOURCES = cplusplus.h factory.h factoryconf.h
+BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc
 
 
 libfactory_a_include_HEADERS=$(BUILT_SOURCES)
@@ -306,9 +306,9 @@ EXTRA_DIST =	test_install.cc \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
-		bin/makeheader bin/gen-readcf readcf.cc $(gftables_DATA)
+		bin/makeheader bin/gen-readcf $(gftables_DATA)
 
-CLEANFILES = factory.h factoryconf.h cplusplus.h
+CLEANFILES = factory.h factoryconf.h cplusplus.h readcf.cc
 
 
 
