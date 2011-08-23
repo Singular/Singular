@@ -60,6 +60,7 @@
 #include <numeric/mpr_numeric.h>
 
 #include <math.h>
+#include <ctype.h>
 
 #include <polys/ext_fields/algext.h>
 #include <polys/ext_fields/transext.h>
