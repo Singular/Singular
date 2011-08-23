@@ -48,11 +48,11 @@ PYTHON_CFLAGS = `python-config --cflags`
 PYTHON_LIBS   = `python-config --libs`
 
 PIPE		= -pipe
-CFLAGS		= -O3 -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
-CXXFLAGS	= -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
+CFLAGS		= -O3 -Wall -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
+CXXFLAGS	= -O3 -Wall -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I..  -I${includedir} ${LIBPOLYS_INCLUDES}  ${PYTHON_INCLUDES}
-DEFS		= -DNDEBUG -DOM_NDEBUG
+DEFS		= -DNDEBUG -DOM_NDEBUG  -DHAVE_SINGULAR
 LDFLAGS		= -L${srcdir}/lib 
 LD_DYN_FLAGS	= -ldl -rdynamic
 SFLAGS		= -fpic -DPIC
@@ -222,13 +222,13 @@ OBJG= $(OBJS:.o=.og)
 OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
 OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op) 
 
-all: libSingular_g.a libSingular.a Singularg Singular
-
-Singularg: tesths.og libSingular_g.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g ${LIBPOLYS_LIBSG}
+all: libSingular_g.a libSingular.a Singular Singularg 
 
 Singular: tesths.o libSingular.a
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel ${LIBPOLYS_LIBS}
+
+Singularg: tesths.og libSingular_g.a
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGSG} ${DEFSG} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g ${LIBPOLYS_LIBSG}
 
 
 ##
@@ -292,14 +292,15 @@ OBJG2 := $(CSOURCES:.c=.og)
 ## compiler and linker options for debug version
 ##
 
-CCG		= ${CC}
-CXXG		= ${CXX} -Wall
+CCG		= ${CC} -g
+CXXG		= ${CXX} -g
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
-CFLAGSG		= -g ${PIPE} ${LIBPOLYS_CFLAGS}
-CXXFLAGSG	= -g ${PIPE} ${LIBPOLYS_CFLAGS}
-DEFSG		= 
+DEFSG		=  -DHAVE_SINGULAR
+
+CFLAGSG		= -Wall ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
+CXXFLAGSG	= -Wall ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 
 ##
 ## Debug Targets
@@ -327,11 +328,11 @@ OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
 ## compiler and linker options for profiling version
 ##
 
-CCP		= ${CC}
-CXXP		= ${CXX}
+CCP		= ${CC} -g -pg 
+CXXP		= ${CXX} -g -pg 
 
-CFLAGSP		= -g -pg -O ${PIPE} ${LIBPOLYS_CFLAGS}
-CXXFLAGSP	= -g -pg -O ${PIPE} ${LIBPOLYS_CFLAGS}
+CFLAGSP		= -O ${PIPE} ${LIBPOLYS_CFLAGS}
+CXXFLAGSP	= -O ${PIPE} ${LIBPOLYS_CFLAGS}
 DEFSP		= 
 
 
