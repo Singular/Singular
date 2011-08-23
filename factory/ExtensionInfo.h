@@ -17,7 +17,7 @@
 #ifndef EXTENSION_INFO_H
 #define EXTENSION_INFO_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 

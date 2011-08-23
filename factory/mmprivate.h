@@ -4,7 +4,7 @@
 #ifndef INCL_MMPRIVATE_H
 #define INCL_MMPRIVATE_H
 
-#include <config.h>
+// #include "config.h"
 
 #define MAXDATA 4000
 #ifdef __alpha__

@@ -9,7 +9,7 @@
 //
 //}}}
 
-#include <config.h>
+#include "config.h"
 
 #include "cf_switches.h"
 #include "cf_defs.h"

@@ -4,7 +4,7 @@
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
@@ -19,7 +19,7 @@
 #include "cf_assert.h"
 
 #include "int_cf.h"
-#include "cf_gmp.h"
+// #include "cf_gmp.h"
 #include "gmpext.h"
 
 #ifdef HAVE_OMALLOC

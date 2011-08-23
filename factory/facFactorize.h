@@ -15,7 +15,7 @@
 #ifndef FAC_FACTORIZE_H
 #define FAC_FACTORIZE_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "facBivar.h"
 #include "facFqBivarUtil.h"

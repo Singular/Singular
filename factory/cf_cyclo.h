@@ -18,7 +18,7 @@
 **/
 //*****************************************************************************
 
-#include <config.h>
+// #include "config.h"
 
 int* integerFactorizer (const long integer, int& length, bool& fail);
 CanonicalForm cyclotomicPoly (int n, bool& fail);

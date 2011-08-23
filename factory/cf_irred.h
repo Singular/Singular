@@ -4,7 +4,7 @@
 #ifndef INCL_CF_IRRED_H
 #define INCL_CF_IRRED_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "cf_random.h"

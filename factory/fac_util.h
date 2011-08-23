@@ -4,7 +4,7 @@
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "cf_eval.h"

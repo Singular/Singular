@@ -1,7 +1,7 @@
 #ifndef FFREVAL_H
 #define FFREVAL_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "cf_reval.h"

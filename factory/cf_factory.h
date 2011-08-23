@@ -4,11 +4,12 @@
 #ifndef INCL_CF_FACTORY_H
 #define INCL_CF_FACTORY_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "cf_defs.h"
 #include "variable.h"
-#include "cf_gmp.h"
+
+#include <factory/cf_gmp.h>
 
 class InternalCF;
 class CanonicalForm;
@@ -32,6 +33,7 @@ public:
     static InternalCF * poly ( const Variable & v, int exp, const CanonicalForm & c );
     static InternalCF * poly ( const Variable & v, int exp = 1 );
 };
+
 
 MP_INT getmpi ( InternalCF * value, bool symmetric = true );
 

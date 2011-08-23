@@ -92,10 +92,10 @@ SOURCES = \
 		lgs.cc \
 		singext.cc \
 		parseutil.cc \
-		readcf.yy \
-		factory.h \
-		factoryconf.h \
-		ftmpl_inst.cc
+		ftmpl_inst.cc \
+		factory.h factoryconf.h cplusplus.h \
+		readcf.yy
+
 
 libfactory_a_SOURCES = $(SOURCES)
 libfactory_g_a_SOURCES = $(SOURCES)
@@ -118,7 +118,7 @@ factory_headers = \
 		cf_iter.h \
 		cf_map.h \
 		cfNewtonPolygon.h \
-                cfModResultant.h \
+		cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
@@ -250,7 +250,8 @@ gftables: gengftables
 .template.h:
 	${srcdir}/bin/makeheader $< $@
 
-BUILT_SOURCES = factory.h factoryconf.h
+BUILT_SOURCES = cplusplus.h factory.h factoryconf.h
+
 
 libfactory_a_include_HEADERS=$(BUILT_SOURCES)
 libfactory_g_a_include_HEADERS=$(BUILT_SOURCES)
@@ -312,4 +313,15 @@ EXTRA_DIST =	test_install.cc \
 		bin/folding.el bin/fold-docu.el \
 		bin/makeheader bin/gen-readcf readcf.cc $(gftables_DATA)
 
-CLEANFILES = factory.h factoryconf.h
+CLEANFILES = factory.h factoryconf.h cplusplus.h
+
+
+
+EXTRA_PROGRAMS = cplusplus
+
+cplusplus_SOURCES = cplusplus.cc
+
+cplusplus.h: cplusplus
+	${builddir}/cplusplus > ${builddir}/cplusplus.h
+
+cf_gmp.h: cplusplus.h

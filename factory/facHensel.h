@@ -18,7 +18,7 @@
 #ifndef FAC_HENSEL_H
 #define FAC_HENSEL_H
 
-#include <config.h>
+// #include "config.h"
 #include "cf_assert.h"
 #include "debug.h"
 #include "timing.h"

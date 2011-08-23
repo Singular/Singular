@@ -12,7 +12,9 @@
 
 
 #include <time.h>
-#include <factoryconf.h>
+
+// #include <factoryconf.h>
+
 #ifdef HAVE_BIFAC
 
 #include "lgs.h"

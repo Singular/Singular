@@ -4,9 +4,9 @@
 #ifndef INCL_INT_PP_H
 #define INCL_INT_PP_H
 
-#include <config.h>
+// #include "config.h"
 
-#include "cf_gmp.h"
+#include <factory/cf_gmp.h>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

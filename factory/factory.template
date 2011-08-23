@@ -21,7 +21,7 @@
 //
 //}}}
 
-#include <factory/factoryconf.h>
+// #include <factory/factoryconf.h>
 
 #ifndef NOSTREAMIO
 #  ifdef HAVE_IOSTREAM
@@ -35,7 +35,7 @@
 #  endif
 #endif /* ! NOSTREAMIO */
 
-#  include <factory/cf_gmp.h>
+#include <factory/cf_gmp.h>
 
 #include <factory/templates/ftmpl_array.h>
 #include <factory/templates/ftmpl_factor.h>

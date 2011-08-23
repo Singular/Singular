@@ -18,7 +18,7 @@
 **/
 //*****************************************************************************
 
-#include <config.h>
+// #include "config.h"
 
 int findItem (const CFList& list, const CanonicalForm& item);
 

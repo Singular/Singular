@@ -23,7 +23,7 @@
 //
 //}}}
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "variable.h"

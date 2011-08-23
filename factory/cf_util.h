@@ -10,7 +10,7 @@
 //
 //}}}
 
-#include <config.h>
+// #include "config.h"
 
 int ipower ( int b, int n );
 int ilog2 (int a);

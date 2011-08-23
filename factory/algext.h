@@ -1,7 +1,7 @@
 #ifndef ALGEXT_H
 #define ALGEXT_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "variable.h"

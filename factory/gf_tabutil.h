@@ -4,7 +4,7 @@
 #ifndef INCL_GF_TABUTIL_H
 #define INCL_GF_TABUTIL_H
 
-#include <config.h>
+// #include "config.h"
 
 int gf_tab_numdigits62 ( int q );
 

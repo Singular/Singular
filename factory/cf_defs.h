@@ -4,7 +4,7 @@
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H
 
-#include <config.h>
+// #include "config.h"
 
 /*BEGINPUBLIC*/
 

@@ -1,7 +1,8 @@
-#include <config.h>
+#include "config.h"
 
 #include "cfGEval.h"
 #include "cf_generator.h"
+#include "cf_assert.h"
 
 GEvaluation::GEvaluation( const GEvaluation & e )
 {

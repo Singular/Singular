@@ -4,7 +4,7 @@
 #ifndef INCL_PARSEUTIL_H
 #define INCL_PARSEUTIL_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"

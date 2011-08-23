@@ -21,7 +21,7 @@
 #define INCL_CF_ITER_INLINE_CC
 #endif
 
-#include <config.h>
+#include "config.h"
 
 #include "cf_assert.h"
 

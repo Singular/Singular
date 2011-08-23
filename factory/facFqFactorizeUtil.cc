@@ -12,7 +12,7 @@
  **/
 /*****************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 #include "canonicalform.h"
 #include "cf_map.h"

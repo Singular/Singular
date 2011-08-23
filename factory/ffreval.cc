@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"
@@ -46,12 +46,12 @@ FFREvaluation& FFREvaluation::operator= ( const FFREvaluation & e )
 {
   if( this != &e )
   {
-    if( gen != NULL )
+    if( gen != 0 )
       delete gen;
     values = e.values;
     start = e.start;
-    if( e.gen == NULL )
-      gen = NULL;
+    if( e.gen == 0 )
+      gen = 0;
     else
       gen = e.gen->clone();
   }

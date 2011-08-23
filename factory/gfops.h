@@ -4,7 +4,7 @@
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

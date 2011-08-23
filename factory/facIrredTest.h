@@ -19,7 +19,7 @@
 #ifndef FAC_IRRED_TEST_H
 #define FAC_IRRED_TEST_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 

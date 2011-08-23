@@ -4,16 +4,16 @@
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
-#ifdef HAVE_IOSTREAM
-#include <iostream>
-#define OSTREAM std::ostream
-#elif defined(HAVE_IOSTREAM_H)
-#include <iostream.h>
-#define OSTREAM ostream
-#endif
+# ifdef HAVE_IOSTREAM
+#  include <iostream>
+#  define OSTREAM std::ostream
+# elif defined(HAVE_IOSTREAM_H)
+#  include <iostream.h>
+#  define OSTREAM ostream
+# endif
 #endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
@@ -68,7 +68,7 @@ public:
 	return lhs._level <= rhs._level;
     }
 #ifndef NOSTREAMIO
-    friend OSTREAM & operator << ( OSTREAM & os, const Variable & v );
+   friend OSTREAM & operator << ( OSTREAM & os, const Variable & v );
 #endif /* NOSTREAMIO */
     friend void swap_levels();
     friend Variable rootOf( const CanonicalForm &, char name );

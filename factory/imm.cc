@@ -10,7 +10,7 @@
 //
 //}}}
 
-#include <config.h>
+#include "config.h"
 
 #include "imm.h"
 

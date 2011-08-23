@@ -4,7 +4,7 @@
 #ifndef INCL_CF_EVAL_H
 #define INCL_CF_EVAL_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

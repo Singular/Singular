@@ -4,7 +4,7 @@
 #ifndef INCL_FAC_ITERFOR_H
 #define INCL_FAC_ITERFOR_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

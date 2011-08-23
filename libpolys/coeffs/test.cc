@@ -25,7 +25,8 @@
 
 
 #ifdef HAVE_FACTORY
-int initializeGMP(){ return 1; }
+int initializeGMP(void){ return 1; }
+int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #endif
 
 #include <iostream>

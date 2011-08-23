@@ -15,7 +15,7 @@
 #ifndef FAC_FQ_BIVAR_UTIL_H
 #define FAC_FQ_BIVAR_UTIL_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "cf_map.h"
 #include "ExtensionInfo.h"

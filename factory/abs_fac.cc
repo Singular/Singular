@@ -1,10 +1,13 @@
-
+#include "config.h"
 #include "canonicalform.h"
+
 #ifdef HAVE_BIFAC
-#ifndef NOSTREAMIO
-#include<fstream>
-#endif
-#include <sys/timeb.h>
+
+# ifndef NOSTREAMIO
+#  include<fstream>
+# endif
+
+# include <sys/timeb.h>
 
 
 
@@ -1070,4 +1073,4 @@ CFFList Mysqrfree( const CanonicalForm& F )
   return L;
 
 }
-#endif
+#endif /* HAVE_BIFAC */

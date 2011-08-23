@@ -15,7 +15,7 @@
 #ifndef FAC_FQ_FACTORIZE_UTIL_H
 #define FAC_FQ_FACTORIZE_UTIL_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 #include "cf_map.h"

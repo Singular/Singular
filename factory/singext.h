@@ -4,10 +4,10 @@
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
-#include "cf_gmp.h"
+#include <factory/cf_gmp.h>
 
 /*BEGINPUBLIC*/
 

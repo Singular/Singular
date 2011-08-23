@@ -16,7 +16,7 @@
 #ifndef FAC_FQ_FACTORIZE_H
 #define FAC_FQ_FACTORIZE_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "facFqBivar.h"
 #include "DegreePattern.h"

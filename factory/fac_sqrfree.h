@@ -4,7 +4,7 @@
 #ifndef INCL_FAC_SQRFREE_H
 #define INCL_FAC_SQRFREE_H
 
-#include <config.h>
+// #include "config.h"
 
 #include "canonicalform.h"
 

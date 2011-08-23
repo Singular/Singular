@@ -7,7 +7,7 @@
 //
 //}}}
 
-#include <config.h>
+#include "config.h"
 
 #include "canonicalform.h"
 #include "imm.h"

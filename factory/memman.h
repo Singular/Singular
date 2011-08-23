@@ -4,7 +4,7 @@
 #ifndef INCL_MEMMAN_H
 #define INCL_MEMMAN_H
 
-#include <config.h>
+// #include "config.h"
 
 #include <stdlib.h>
 

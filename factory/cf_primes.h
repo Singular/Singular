@@ -4,7 +4,7 @@
 #ifndef INCL_CF_PRIMES_H
 #define INCL_CF_PRIMES_H
 
-#include <config.h>
+// #include "config.h"
 
 /*BEGINPUBLIC*/
 

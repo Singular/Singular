@@ -1,9 +1,14 @@
+#include "config.h"
+
 #include "canonicalform.h"
+
 #ifdef HAVE_BIFAC
-#include "lgs.h"
+
+# include "lgs.h"
 #include "bifacConfig.h"
 
 #define BIFAC_BASIS_OF_G_CHECK        1
+
 void Reduce( bool );
 CanonicalForm Bigcd( const CanonicalForm& f, const CanonicalForm& g);
 
@@ -1291,4 +1296,4 @@ void BIFAC::bifac(CanonicalForm f, bool abs)
 }
 
 // ==============  end of 'bifac.cc'  ==================
-#endif
+#endif /* #ifdef HAVE_BIFAC */

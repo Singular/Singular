@@ -2,11 +2,9 @@
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 
-#include <config.h>
-
 #ifdef HAVE_NTL
 
-#include "cf_gmp.h"
+// #include "cf_gmp.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"
@@ -18,8 +16,8 @@
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
 
-
 #include <NTL/config.h>
+
 #ifdef NTL_STD_CXX
 #ifdef NOSTREAMIO
 #  ifdef HAVE_IOSTREAM
@@ -34,11 +32,11 @@
 #endif /* ! NOSTREAMIO */
 #endif
 
+
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/lzz_pXFactoring.h>
 #include <NTL/GF2XFactoring.h>
-#include "int_int.h"
 #include <NTL/ZZ_pEXFactoring.h>
 #include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
@@ -46,11 +44,16 @@
 #include <NTL/mat_lzz_p.h>
 #include <NTL/mat_lzz_pE.h>
 
-#include "cf_assert.h"
-
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
 #endif
+
+
+
+
+#include "int_int.h"
+#include "cf_assert.h"
+
 
 ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f);
 zz_pX convertFacCF2NTLzzpX(CanonicalForm f);
