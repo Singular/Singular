@@ -963,8 +963,8 @@ mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   MulTrunc (F1, F1, G1, (long) k);
 
   mul (F2, F2, G2);
-  if (deg (F2) > k)
-    F2 >>= (k - d1);
+  if (deg (F2) > k - 2)
+    F2 >>= (deg (F2) - k + 2);
 
   return reverseSubst (F1, F2, d1, d2);
 }
@@ -1015,8 +1015,8 @@ mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
   MulTrunc (F1, F1, G1, (long) k);
 
   mul (F2, F2, G2);
-  if (deg (F2) > k)
-    F2 >>= (k-d1);
+  if (deg (F2) > k - 2)
+    F2 >>= (deg (F2) - k + 2);
 
   CanonicalForm result= reverseSubst (F1, F2, d1, d2, alpha);
 
