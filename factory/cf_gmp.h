@@ -4,12 +4,17 @@
 
 #ifdef __cplusplus
 //  #define __cplusplus_backup __cplusplus
-  #undef __cplusplus
-  extern "C" 
-  {
-    #include <gmp.h>
-  }
+
+# ifdef DISABLE_GMP_CPP
+#  undef __cplusplus
+extern "C" 
+{
+#  include <gmp.h>
+}
   #include <factory/cplusplus.h>
+#else
+  #include <gmp.h>
+#endif
 //  #define __cplusplus __cplusplus_backup
 #else
   #include <gmp.h>

@@ -16,6 +16,7 @@ AC_INIT([factory], [3.1.2.sw])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
@@ -348,6 +349,8 @@ test "${M4FLAGS+set}" = set || M4FLAGS=
 # Singular
 if test "x$with_Singular" = xyes; then
   AC_DEFINE([SINGULAR],[1],[SINGULAR])
+  AC_DEFINE([DISABLE_GMP_CPP],[1],[DISABLE_GMP_CPP])
+  AC_DEFINE([NOSTREAMIO],[1],[DISABLE_GMP_CPP])
 fi
 
 # arithmetic shift
@@ -465,5 +468,4 @@ AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version", [FACTORYVERSION])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration", [FACTORYCONFIGURATION])
 AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir", [GFTABLEDIR])
 
-AC_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile ftest/GNUmakefile)

@@ -41,6 +41,24 @@
 #ifndef HAVE_POLYEXTENSIONS
 #undef HAVE_POLYEXTENSIONS
 #endif
+
+#ifndef DISABLE_GMP_CPP
+#undef DISABLE_GMP_CPP
+#endif
+
+#ifdef HAVE_FACTORY
+
+#ifndef SINGULAR
+#undef SINGULAR
+#endif
+
+#ifndef NOSTREAMIO
+#undef NOSTREAMIO
+#endif
+
+#endif 
+// #ifdef HAVE_FACTORY
+
 // ----------------  end of parts/extensions
 // -----------------  configure stuff
 
