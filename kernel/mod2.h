@@ -11,6 +11,7 @@
 #define MOD2_H
 
 #include <misc/auxiliary.h>
+
 #define SINGULAR_MAJOR_VERSION 0
 #define SINGULAR_MINOR_VERSION 0
 #define SINGULAR_SUB_VERSION 0
