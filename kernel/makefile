@@ -309,5 +309,5 @@ test: test.o libkernel.a
 
 # My headers test
 check: all test testg
-	./test
-	./test
+	SINGULAR_ROOT_DIR=`pwd/../` SINGULARPATH="$SINGULAR_ROOT_DIR/libpolys/polys/.libs" ./test
+	SINGULAR_ROOT_DIR=`pwd/../` SINGULARPATH="$SINGULAR_ROOT_DIR/libpolys/polys/.libs" ./testg
