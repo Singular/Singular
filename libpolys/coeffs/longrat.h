@@ -60,6 +60,10 @@ BOOLEAN nlInitChar(coeffs r, void*);
 
 number   nlInit2 (int i, int j, const coeffs r);
 number   nlInit2gmp (mpz_t i, mpz_t j);
+
+// number nlInitMPZ(mpz_t m, const coeffs r);
+// void nlMPZ(mpz_t m, number &n, const coeffs r);
+
 number   nlGcd(number a, number b, const coeffs r);
 number   nlLcm(number a, number b, const coeffs r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b, const coeffs r);
@@ -98,7 +102,6 @@ extern number nlOne;
 nMapFunc nlSetMap(const coeffs src, const coeffs dst);
 
 extern omBin rnumber_bin;
-
 
 #define FREE_RNUMBER(x) omFreeBin((void *)x, rnumber_bin)
 #define ALLOC_RNUMBER() (number)omAllocBin(rnumber_bin)

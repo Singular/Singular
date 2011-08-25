@@ -630,7 +630,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
   mpz_clear(dest);
   if(res->s==0)
     iz=(long)npDiv((number)iz,(number)in,dst_r);
-  omFreeBin((void *)res, rnumber_bin);
+  FREE_RNUMBER(res); // Q!?
   return (number)iz;
 }
 

@@ -75,7 +75,8 @@ static inline void n_InpAdd_FieldZp(number &n1, number n2, const ring r)
 { assume(rField_is_Zp(r)); n1=npAddM(n1, n2, r->cf); }
 
 #define DO_LINLINE
-#include <coeffs/longrat.cc>
+#include <coeffs/longrat.cc> // TODO: fix this Uglyness?!!!
+
 #define n_Copy_FieldQ(n, r)        nlCopy(n, r->cf)
 #define n_Delete_FieldQ(n, r)      nlDelete(n,r->cf)
 #define n_Mult_FieldQ(n1, n2, r)   nlMult(n1,n2, r->cf)

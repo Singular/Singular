@@ -9,12 +9,25 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #include "config.h"
-#include <reporter/reporter.h>
-#include <coeffs/coeffs.h>
+#include <misc/auxiliary.h>
+
 #include <omalloc/omalloc.h>
-#include <coeffs/longrat.h>
-#include <coeffs/numbers.h>
+#include <reporter/reporter.h>
+
+#include "coeffs.h"
+#include "numbers.h"
+
+#include "longrat.h"
+
+/// Our Type!
+static const n_coeffType ID = n_Q;
+
+//#ifndef SI_THREADS
+omBin rnumber_bin = omGetSpecBin(sizeof(snumber)); // TODO: move this into coeffs-struct (for Q)?! 
+//#endif
+
 
 #define SR_HDL(A) ((long)(A))
 //#define SR_INT    1 // already in longrat.h
@@ -141,4 +154,5 @@ void nlWrite (number &a, const coeffs r)
     omFreeSize((void *)s,l);
   }
 }
+
 

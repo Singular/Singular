@@ -5,6 +5,7 @@
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
+
 #include "config.h"
 #include <misc/auxiliary.h>
 
@@ -128,9 +129,6 @@ number nlShort3_noinline(number x) // assume x->s==3
   return nlShort3(x);
 }
 
-//#ifndef SI_THREADS
-omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
-//#endif
 
 number nlOne=INT_TO_SR(1);
 
@@ -159,6 +157,7 @@ static number nlMapP(number from, const coeffs src, const coeffs dst)
 
 static number nlMapLongR(number from, const coeffs src, const coeffs dst);
 static number nlMapR(number from, const coeffs src, const coeffs dst);
+
 
 #ifdef HAVE_RINGS
 /*2
@@ -322,7 +321,7 @@ number nlConvFactoryNSingN( const CanonicalForm n, const coeffs r)
   }
   else
   {
-    number z=(number)omAllocBin(rnumber_bin);
+    number z = ALLOC_RNUMBER(); //Q!? // (number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
@@ -541,17 +540,6 @@ int nlSize(number a, const coeffs)
   return s;
 }
 
-void nlMPZ(mpz_t m, number &n, const coeffs r)
-{
-  assume( getCoeffType(r) == ID );
-   
-  nlTest(n, r);
-  nlNormalize(n, r);
-  if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
-  else             mpz_init_set(m, (mpz_ptr)n->z);
-}
-
-
 /*2
 * convert number to int
 */
@@ -722,7 +710,7 @@ number   nlExactDiv(number a, number b, const coeffs r)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    omFreeBin((void *)bb, rnumber_bin);
+    FREE_RNUMBER(bb); // omFreeBin((void *)bb, rnumber_bin);
   }
   u=nlShort3(u);
   nlTest(u, r);
@@ -788,7 +776,7 @@ number nlIntDiv (number a, number b, const coeffs r)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    omFreeBin((void *)bb, rnumber_bin);
+    FREE_RNUMBER(bb); // omFreeBin((void *)bb, rnumber_bin);
   }
   u=nlShort3(u);
   nlTest(u, r);
@@ -865,7 +853,7 @@ number nlIntMod (number a, number b, const coeffs r)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    omFreeBin((void *)bb, rnumber_bin);
+    FREE_RNUMBER(bb); // omFreeBin((void *)bb, rnumber_bin);
   }
   if (mpz_isNeg(u->z))
   {
@@ -908,7 +896,7 @@ number nlDiv (number a, number b, const coeffs r)
     long r=i%j;
     if (r==0)
     {
-      omFreeBin((void *)u, rnumber_bin);
+      FREE_RNUMBER(u); // omFreeBin((void *)u, rnumber_bin);
       return INT_TO_SR(i/j);
     }
     mpz_init_set_si(u->z,(long)i);
@@ -1455,7 +1443,7 @@ void _nlDelete_NoImm(number *a)
         (*a)->s=2;
 #endif
     }
-    omFreeBin((void *) *a, rnumber_bin);
+    FREE_RNUMBER(*a); // omFreeBin((void *) *a, rnumber_bin);
   }
 }
 
@@ -2111,16 +2099,6 @@ LINLINE number nlInit (int i, const coeffs r)
   return n;
 }
 
-
-number nlInitMPZ(mpz_t m, const coeffs r)
-{
-  number z = ALLOC_RNUMBER();
-  mpz_init_set(z->z, m);
-  mpz_init_set_ui(z->n, 1);
-  z->s = 3;
-  return z;   
-}
-
 /*2
 * a == 1 ?
 */
@@ -2447,6 +2425,27 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r)
 
 #ifndef P_NUMBERS_H
 
+static void nlMPZ(mpz_t m, number &n, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+   
+  nlTest(n, r);
+  nlNormalize(n, r);
+  if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
+  else             mpz_init_set(m, (mpz_ptr)n->z);
+}
+
+
+static number nlInitMPZ(mpz_t m, const coeffs r)
+{
+  number z = ALLOC_RNUMBER();
+  mpz_init_set(z->z, m);
+  mpz_init_set_ui(z->n, 1);
+  z->s = 3;
+  return z;   
+}
+
+
 void nlInpGcd(number &a, number b, const coeffs r)
 {
   if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
@@ -2606,6 +2605,9 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->nCoeffIsEqual=ndCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
 
+  r->cfInitMPZ = nlInitMPZ;
+  r->cfMPZ  = nlMPZ;
+   
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
@@ -2614,11 +2616,9 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
-  r->cfInitMPZ = nlInitMPZ;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
-  r->cfMPZ = nlMPZ;
-  
+   
   r->cfChineseRemainder=nlChineseRemainder;
   r->cfFarey=nlFarey;
   #ifdef HAVE_RINGS
@@ -2706,7 +2706,7 @@ number nlMod(number a, number b)
     && (mpz_cmp_si(x->z,(long)ui)==0))
     {
       mpz_clear(&r->z);
-      omFreeBin((void *)r, rnumber_bin);
+      FREE_RNUMBER(r); //  omFreeBin((void *)r, rnumber_bin);
       r=INT_TO_SR(ui);
     }
   }
