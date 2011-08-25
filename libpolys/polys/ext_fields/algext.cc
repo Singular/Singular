@@ -49,7 +49,7 @@
 #define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
 BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
 #else
-#define naTest(a)
+#define naTest(a) (TRUE)
 #endif
 
 /// Our own type!
@@ -666,7 +666,9 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfRePart       = naCopy;
   cf->cfImPart       = naImPart;
   cf->cfCoeffWrite   = naCoeffWrite;
+#ifdef LDEBUG
   cf->cfDBTest       = naDBTest;
+#endif
   cf->cfGcd          = naGcd;
   cf->cfLcm          = naLcm;
   cf->cfSize         = naSize;

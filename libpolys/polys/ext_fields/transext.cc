@@ -75,7 +75,7 @@
 #define ntTest(a) ntDBTest(a,__FILE__,__LINE__,cf)
 BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
 #else
-#define ntTest(a)
+#define ntTest(a) (TRUE)
 #endif
 
 /// Our own type!
@@ -1109,7 +1109,9 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfRePart       = ntCopy;
   cf->cfImPart       = ntImPart;
   cf->cfCoeffWrite   = ntCoeffWrite;
+#ifdef LDEBUG
   cf->cfDBTest       = ntDBTest;
+#endif
   cf->cfGcd          = ntGcd;
   cf->cfLcm          = ntLcm;
   cf->cfSize         = ntSize;
