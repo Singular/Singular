@@ -13,7 +13,7 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #endif
-#include <Singular/feOpt.h>
+#include "feOpt.h"
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
 #endif

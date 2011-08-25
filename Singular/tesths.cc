@@ -32,7 +32,7 @@
 #include <kernel/timer.h>
 #include <Singular/sdb.h>
 #include <kernel/fegetopt.h>
-#include <Singular/feOpt.h>
+#include "feOpt.h"
 #include <Singular/distrib.h>
 #include <Singular/version.h>
 #include <Singular/slInit.h>

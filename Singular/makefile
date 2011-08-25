@@ -239,6 +239,7 @@ mostlyclean:
 
 clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend *.a *.so*
+	-rm feOpt.inc iparith.inc plural_cmd.inc
 
 distclean: clean
 	-rm -f *~ .\#* 
@@ -256,6 +257,7 @@ maintainer-clean: distclean srcclean
 
 #dep.
 feOpt.h: feOpt.inc
+
 misc_ip.cc: feOpt.h
 
 mpsr_Tok.inc: gentable2.cc
@@ -385,6 +387,12 @@ feOptTS.inc: feOpt.cc
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
+
+plural_cmd.inc: gentable.cc grammar.h tok.h table.h
+	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
+	     -o gentable1
+	./gentable1
+	/bin/rm -f gentable1 gentable1.exe
 
 iparith.inc: gentable.cc grammar.h tok.h table.h
 	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \

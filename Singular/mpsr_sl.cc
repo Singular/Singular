@@ -28,7 +28,7 @@
 #include <Singular/ipid.h>
 #include <Singular/silink.h>
 #include <Singular/cntrlc.h>
-#include <Singular/feOpt.h>
+#include "feOpt.h"
 
 
 static int Batch_ReadEval(si_link silink);
