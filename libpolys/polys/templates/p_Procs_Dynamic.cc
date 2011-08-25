@@ -15,16 +15,21 @@
 #include <factory/factory.h>
 #endif
 
+#include <reporter/reporter.h>
+
 // #include <polys/structs.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
-#include <polys/templates/p_Procs.h>
+
+#include <polys/kbuckets.h>
+
 #include <polys/templates/p_Numbers.h>
+
+#include <polys/templates/p_Procs.h>
 #include <polys/templates/p_MemCmp.h>
 #include <polys/templates/p_MemAdd.h>
 #include <polys/templates/p_MemCopy.h>
-#include <polys/kbuckets.h>
-#include <reporter/reporter.h>
+
 
 #ifdef HAVE_DL
 const BOOLEAN p_procs_dynamic = TRUE;

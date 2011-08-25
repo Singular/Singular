@@ -55,9 +55,9 @@ namespace
   void PrintRing(const ring r)
   {
     rWrite(r); PrintLn();
-  #ifdef  RDEBUG
+#ifdef RDEBUG
     rDebugPrint(r); PrintLn();
-  #endif
+#endif
   }
 static inline void Test(const ring)
 {

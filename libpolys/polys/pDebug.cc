@@ -11,23 +11,26 @@
 
 #ifndef PDEBUG_CC
 #define PDEBUG_CC
+
 #include <stdarg.h>
 #include <stdio.h>
 
 
 #include "config.h"
 #include <misc/auxiliary.h>
+
+
 #ifdef PDEBUG
 
 // do the following to always enforce checking of pSetm
 // #undef PDEBUG
 // #define PDEBUG 2
 
-//#include <polys/monomials/p_polys.h>
-//#include <output.h>
 #include <omalloc/omalloc.h>
+
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
+
 #include <coeffs/coeffs.h>
 
 /***************************************************************
