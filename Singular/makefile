@@ -52,7 +52,7 @@ CFLAGS		= -O3 -Wall -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFL
 CXXFLAGS	= -O3 -Wall -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I..  -I${includedir} ${LIBPOLYS_INCLUDES}  ${PYTHON_INCLUDES}
-DEFS		= -DNDEBUG -DOM_NDEBUG  -DHAVE_SINGULAR
+DEFS		= -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
 LDFLAGS		= -L${srcdir}/lib 
 LD_DYN_FLAGS	= -ldl -rdynamic
 SFLAGS		= -fpic -DPIC
@@ -299,7 +299,7 @@ CXXG		= ${CXX} -g
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
-DEFSG		=  -DHAVE_SINGULAR
+DEFSG		=   -DLIBSINGULAR
 
 CFLAGSG		= -Wall ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXFLAGSG	= -Wall ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}

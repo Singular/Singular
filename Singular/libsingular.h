@@ -1,7 +1,9 @@
-#ifndef SINGULAR__H
-#define SINGULAR__H
+#ifndef LIBSINGULAR__H
+#define LIBSINGULAR__H
 
-#include <math.h>
+#include <math.h> // Why this?
+/*
+// TODO: correct these includes!!!
 #include <singular/mod2.h>
 #include <singular/structs.h>
 #include <singular/polys.h>
@@ -28,11 +30,13 @@
 #include <singular/ipshell.h>
 #include <singular/attrib.h>
 #include <singular/options.h>
+*/
 
 void siInit(char *);
 
 /* we need this function in Sage*/
-number nr2mMapZp(number from);
+number nr2mMapZp(number from); // TODO: replace with something else...
 
-#endif //SINGULAR__H
+
+#endif // #ifndef LIBSINGULAR__H
 
