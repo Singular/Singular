@@ -8,8 +8,10 @@
 #include <cxxtest/TestSuite.h>
 #include <cxxtest/GlobalFixture.h>
 
-#include <omalloc/omalloc.h>
+#include "config.h"
+
 #include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
