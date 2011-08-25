@@ -23,14 +23,14 @@
 #include <omalloc/omalloc.h>
 
 #include <kernel/polys.h>
-
-#include <Singular/tok.h>
-#include <Singular/ipshell.h>
 #include <kernel/febase.h>
-#include <Singular/cntrlc.h>
-#include <Singular/feOpt.h>
-#include <Singular/version.h>
-#include <Singular/silink.h>
+
+#include "tok.h"
+#include "ipshell.h"
+#include "cntrlc.h"
+#include "feOpt.h"
+#include "version.h"
+#include "silink.h"
 
 /* undef, if you don't want GDB to come up on error */
 

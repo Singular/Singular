@@ -34,7 +34,7 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_CFLAGS = -I.. -I../libpolys -DHAVE_SINGULAR -I/opt/local/include
+LIBPOLYS_CFLAGS = -I.. -I../libpolys -I/opt/local/include
 LIBPOLYS_LIBS   = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc -L/opt/local/lib -lntl -lgmp -ldl
 LIBPOLYS_LIBSG  = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g -L/opt/local/lib  -lntl -lgmp -ldl
 
