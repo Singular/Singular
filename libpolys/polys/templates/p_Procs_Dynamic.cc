@@ -201,7 +201,9 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
   if (get_name)
   {
     char* name = omStrDup(proc_name);
+#if (!defined(NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
     omMarkAsStaticAddr(name);
+#endif
     return (void*) name;
   }
 #endif
