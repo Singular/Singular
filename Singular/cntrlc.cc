@@ -10,6 +10,7 @@
 #ifdef DecAlpha_OSF1
 #define _XOPEN_SOURCE_EXTENDED
 #endif /* MP3-Y2 0.022UF */
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
