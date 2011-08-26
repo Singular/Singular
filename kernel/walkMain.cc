@@ -184,7 +184,7 @@ WalkState walkStep64(ideal & G,int64vec* currw64, int step){
     //PrintS("  lift for initial forms done\n");
 
   ideal nextG=idrMoveR(G,oldRing,currRing);
-  rKill(oldRing);
+  rDelete(oldRing);
 
   matrix nextGmat=(matrix)nextG;
 

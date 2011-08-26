@@ -165,7 +165,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   }
   id_Delete(&temp2, tmpR);
   idSkipZeroes(temp1);
-  rKill(tmpR);
+  rDelete(tmpR);
   return temp1;
 }
 

@@ -344,8 +344,8 @@ ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bl
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
 void   rWrite(ring r);
-//void   rKill(idhdl h);
-void   rKill(ring r);
+// void   rKill(idhdl h);
+// void   rKill(ring r);
 ring   rCopy(ring r);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
 ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal = TRUE,
@@ -740,7 +740,8 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int 
 
 BOOLEAN rCheckIV(intvec *iv);
 int rTypeOfMatrixOrder(intvec * order);
-void rDelete(ring r);
+
+void rDelete(ring r); // To be used instead of rKill!
 
 extern omBin sip_sring_bin;
 #endif
