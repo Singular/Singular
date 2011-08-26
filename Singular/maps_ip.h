@@ -13,7 +13,7 @@
 
 #include <kernel/structs.h>
 #include <kernel/ideals.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 poly pSubstPoly(poly p, int var, poly image);
 poly pSubstPar(poly p, int par, poly image);

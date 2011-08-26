@@ -4,7 +4,7 @@
 #include <misc/options.h>
 
 #include <polys/simpleideals.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 #include <polys/prCopy.h>
 

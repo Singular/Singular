@@ -12,7 +12,7 @@
 #include <Singular/tok.h>
 #include <kernel/febase.h>
 //#include "ipid.h"
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/attrib.h>
 #include <Singular/ipshell.h>

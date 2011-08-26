@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string>
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 using namespace std;
 

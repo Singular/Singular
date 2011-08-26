@@ -6,7 +6,7 @@
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/structs.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>

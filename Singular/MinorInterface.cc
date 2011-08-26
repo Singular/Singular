@@ -4,7 +4,7 @@
 #include <MinorInterface.h>
 #include <MinorProcessor.h>
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/structs.h>
 
 #include <kernel/mod2.h>

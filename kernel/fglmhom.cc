@@ -19,7 +19,7 @@
 #include <Singular/tok.h>
 #include <kernel/structs.h>
 #include <kernel/subexpr.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/ipid.h>

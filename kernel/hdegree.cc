@@ -13,7 +13,7 @@
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <kernel/ideals.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <kernel/hutil.h>

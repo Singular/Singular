@@ -13,7 +13,7 @@
 #include <misc/intvec.h>
 
 #include <polys/monomials/ring.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 #include <coeffs/longrat.h>
 

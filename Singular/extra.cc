@@ -48,7 +48,7 @@
 #include <coeffs/mpr_complex.h>
 
 #include <polys/monomials/ring.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 #include <polys/monomials/maps.h>
 #include <polys/matpol.h>

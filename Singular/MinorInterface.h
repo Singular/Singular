@@ -3,7 +3,7 @@
 
 
 #include <polys/simpleideals.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 /* all computations are module char, if char <> 0;
    if additionally, an ideal i != NULL is given, then computations are

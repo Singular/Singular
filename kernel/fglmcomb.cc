@@ -14,7 +14,7 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #include <misc/options.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>

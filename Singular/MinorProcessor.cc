@@ -2,7 +2,7 @@
 
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <polys/kbuckets.h>

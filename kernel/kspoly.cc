@@ -18,7 +18,7 @@
 #include <kernel/febase.h>
 #endif
 #ifdef HAVE_RINGS
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #endif
 
 #ifdef KDEBUG

@@ -12,7 +12,7 @@ $Id$
 #include <misc/options.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/kmatrix.h>
 #include <kernel/GMPrat.h>

@@ -22,7 +22,7 @@
 #include <polys/kbuckets.h>
 #include <polys/prCopy.h>
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 // #include <kernel/modulop.h>
 

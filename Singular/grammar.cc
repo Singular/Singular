@@ -336,7 +336,7 @@
 #include <Singular/sdb.h>
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/stairc.h>
 #include <kernel/timer.h>
 #include <Singular/cntrlc.h>

@@ -9,7 +9,7 @@
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
 #include <kernel/kutil.h>

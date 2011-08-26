@@ -59,7 +59,7 @@ using std::vector;
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>
 #include <misc/options.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/modulop.h>
 #include <kernel/kutil.h>
 #include <kernel/kInline.h>

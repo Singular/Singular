@@ -69,7 +69,7 @@
 #include <kernel/khstd.h>
 
 #include <Singular/walk.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/ipid.h>
 #include <Singular/tok.h>

@@ -14,7 +14,7 @@
 #include <polys/nc/nc.h>
 #include <kernel/febase.h>
 #include <polys/monomials/ring.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <coeffs/numbers.h>
 #include <kernel/ideals.h>
 #include <polys/matpol.h>

@@ -26,7 +26,7 @@
 #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 #include <kernel/longrat.h>
 // #include <coeffs/longrat.h>

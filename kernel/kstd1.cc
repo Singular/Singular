@@ -34,7 +34,7 @@
 #endif /* if MYTEST */
 
 #include <polys/weight.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 #include <kernel/kutil.h>
 #include <kernel/febase.h>

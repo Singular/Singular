@@ -27,7 +27,7 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/matpol.h>
 #include <polys/weight.h>

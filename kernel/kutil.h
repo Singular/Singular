@@ -15,7 +15,7 @@
 #include <misc/mylimits.h>
 
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <polys/operations/pShallowCopyDelete.h>
 
 #include <kernel/structs.h>

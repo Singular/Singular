@@ -11,7 +11,7 @@
 #include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <polys/matpol.h>
 #include <Singular/subexpr.h>
 #include <misc/intvec.h>
