@@ -2,7 +2,7 @@
 
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <Minor.h>
 #include <kernel/febase.h>
 

@@ -14,7 +14,7 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
 #include <polys/matpol.h>

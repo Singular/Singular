@@ -19,11 +19,13 @@
 #include <sys/wait.h>
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
+
+#include <kernel/polys.h>
+
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>
-#include <polys/polys.h>
 #include <Singular/feOpt.h>
 #include <Singular/version.h>
 #include <Singular/silink.h>

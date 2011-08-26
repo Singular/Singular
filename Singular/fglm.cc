@@ -21,7 +21,7 @@
 #ifdef HAVE_FACTORY
 #include <Singular/tok.h>
 #include <misc/options.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipid.h>

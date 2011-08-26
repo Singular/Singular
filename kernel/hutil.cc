@@ -11,7 +11,7 @@
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <kernel/ideals.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/hutil.h>
 
 scfmon hexist, hstc, hrad, hwork;

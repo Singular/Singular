@@ -24,7 +24,7 @@
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <coeffs/numbers.h>
 #include <polys/prCopy.h>
 #include <kernel/ideals.h>
@@ -5544,9 +5544,4 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
   }
   jjINT_S_TO_ID(n,e,res);
   return FALSE;
-}
-
-void rChangeCurrRing(ring r)
-{
-  currRing=r;
 }

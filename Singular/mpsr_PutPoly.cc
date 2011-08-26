@@ -24,7 +24,7 @@
 //#include "kernel/longalg.h"
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 //#include "ipid.h"
 
 #ifdef PARI_BIGINT_TEST

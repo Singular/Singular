@@ -5,7 +5,7 @@
 
 #include <Singular/svd_si.h>
 #include <kernel/structs.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <polys/matpol.h>
 #include <Singular/lists.h>
 #include <kernel/febase.h>

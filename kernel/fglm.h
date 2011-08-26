@@ -15,7 +15,7 @@
 
 #ifdef HAVE_FACTORY
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/fglmvec.h>
 
 #define PROT(msg)

@@ -24,7 +24,7 @@
 #include <misc/intvec.h>
 #include <Singular/lists.h>
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 /***************************************************************
  *

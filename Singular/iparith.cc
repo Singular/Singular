@@ -20,7 +20,7 @@
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
 //#include <polys/ext_fields/longalg.h>

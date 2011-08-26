@@ -13,7 +13,7 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>
 #include <coeffs/numbers.h>

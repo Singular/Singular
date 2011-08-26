@@ -63,7 +63,7 @@ MP_LIBS		= -lMPT -lMP -lnsl
 
 # normal C++ source files
 CXXSOURCES=\
-    febase.cc feread.cc \
+    polys.cc febase.cc feread.cc \
     hdegree.cc hilb.cc hutil.cc \
     gr_kstd2.cc \
     ideals.cc \
@@ -98,7 +98,7 @@ ESOURCES=mmalloc.cc
 SOURCES=${CSOURCES} ${CXXSOURCES} \
 	kInline.h
 
-HEADERS=hutil.h idrec.h stairc.h ideals.h \
+HEADERS= polys.h hutil.h idrec.h stairc.h ideals.h \
 	structs.h \
 	syz.h \
 	fast_maps.h \

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <kernel/kstd1.h>
 #include <Singular/subexpr.h>
 #include <kernel/ideals.h>

@@ -25,7 +25,7 @@
 #include <polys/templates/p_Procs.h>
 #include <polys/kbuckets.h>
 
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 
 #define HAVE_TAIL_BIN

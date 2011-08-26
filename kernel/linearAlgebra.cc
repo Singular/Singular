@@ -26,7 +26,7 @@
 #include <polys/simpleideals.h>
 #include <polys/matpol.h>
 
-// #include <polys/polys.h>
+// #include <kernel/polys.h>
 
 #include <kernel/structs.h>
 #include <kernel/ideals.h>

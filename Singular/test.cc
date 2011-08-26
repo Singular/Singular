@@ -56,7 +56,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 
 
 #include <kernel/mod2.h>

@@ -9,7 +9,7 @@
 #include <coeffs/numbers.h>
 #include <kernel/Number.h>
 #include <kernel/febase.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 
 

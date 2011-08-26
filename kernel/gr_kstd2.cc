@@ -17,7 +17,7 @@
 #include <misc/intvec.h>
 
 #include <polys/weight.h>
-#include <polys/polys.h>
+#include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 
 #include <polys/nc/nc.h>

@@ -18,7 +18,7 @@
 #endif
 #endif
 
-//#include <polys/polys.h>
+//#include <kernel/polys.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 
