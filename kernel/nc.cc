@@ -358,7 +358,7 @@ ideal Approx_Step(ideal L)
         rChangeCurrRing(orig_ring);
         //  s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
         s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
-        rKill(syz_ring);
+        rDelete(syz_ring);
       }
       idTest(s_h3);
       S[syzcnt]=kStd(s_h3,currQuotient,(tHomog)FALSE,NULL,NULL);

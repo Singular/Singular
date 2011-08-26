@@ -975,7 +975,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       syzIndex++;
     }
 //    j = 0; while (currRing->order[j]!=0) j++; // What was this for???!
-    rKill(syRing);
+    rDelete(syRing);
   }
   else
   {

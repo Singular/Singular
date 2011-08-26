@@ -1891,7 +1891,7 @@ syStrategy syKosz(ideal arg,int * length)
           omFreeSize((ADDRESS)res,len*sizeof(ideal));
           idDelete(&initial);
           rChangeCurrRing(syzstr->syRing);
-          rKill(dp_C_ring);
+          rDelete(dp_C_ring);
         }
 #endif
 #endif
@@ -2021,7 +2021,7 @@ syStrategy syKosz(ideal arg,int * length)
   }
   delete syzstr->Tl;
   syzstr->Tl = NULL;
-  rKill(syzstr->syRing);
+  rDelete(syzstr->syRing);
   syzstr->syRing = NULL;
   omFreeSize((ADDRESS)totake,(*length+1)*sizeof(ideal));
   omFreeSize((ADDRESS)syzstr->orderedRes,(*length+1)*sizeof(ideal));

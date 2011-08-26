@@ -610,7 +610,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
       res[i] = idrMoveR_NoSort(res[i], syz_ring, origR);
     }
-    rKill(syz_ring);
+    rDelete(syz_ring);
   }
   return res;
 }

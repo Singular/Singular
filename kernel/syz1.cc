@@ -1646,7 +1646,7 @@ void syKillComputation(syStrategy syzstr, ring r)
       if(syzstr->syRing->typ[1].ord_typ == ro_syzcomp)
         rChangeSComps(NULL, NULL, 0, syzstr->syRing);
 
-      rKill(syzstr->syRing);
+      rDelete(syzstr->syRing);
     }
     omFreeSize((ADDRESS)syzstr, sizeof(ssyStrategy));
   }

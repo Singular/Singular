@@ -3611,7 +3611,7 @@ ideal t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
 
     idTest (result);
     //rChangeCurrRing(new_ring);
-    rKill (new_ring);
+    rDelete(new_ring);
     //rChangeCurrRing(orig_ring);
   }
   else
