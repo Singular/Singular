@@ -1,3 +1,5 @@
+AM_LDFLAGS = -L${top_builddir}/omalloc -L${top_builddir}/../omalloc
+
 lib_LIBRARIES=libomalloc.a libomalloc_g.a
 
 libomalloc_a_includedir=$(includedir)/omalloc
@@ -44,4 +46,31 @@ omTables.h: omTables
 noinst_PROGRAMS = omTables
 omTables_SOURCES = omAllocPrivate.h omConfig.h omTables.c omlimits.h mylimits.h
 omTables_CPPFLAGS = -DOM_GENERATE_INC
+
+####################################################
+## Test program
+##
+TESTS = omtTest-g omtTest-m omtTest-r
+check_PROGRAMS = $(TESTS)
+
+OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtTest.c 
+
+omtTest_g: libomalloc_g.a
+
+omtTest_g_SOURCES = $(OMTTESTSSOURCES)
+omtTest_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+omtTest_g_LDADD = -lomalloc_g
+
+omtTest_m: libomalloc_g.a
+
+omtTest_m_CPPFLAGS = -DOM_TEST_MALLOC
+omtTest_m_SOURCES  = $(OMTTESTSSOURCES)
+omtTest_m_LDADD = -lomalloc_g
+
+omtTest_r: libomalloc.a
+
+omtTest_r_SOURCES = $(OMTTESTSSOURCES)
+omtTest_r_CPPFLAGS = -DOM_NDEBUG
+omtTest_r_CFLAGS = -O3
+omtTest_r_LDADD = -lomalloc
 
