@@ -5,7 +5,8 @@
 
 #include "polys.h"
 
-ring currRing;
+ring  currRing = NULL;
+ideal currQuotient = NULL;
 
 void rChangeCurrRing(ring r)
 {
