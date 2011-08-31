@@ -52,7 +52,8 @@ CFLAGS		= -O3 -Wall -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFL
 CXXFLAGS	= -O3 -Wall -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I..  -I${includedir} ${LIBPOLYS_INCLUDES}  ${PYTHON_INCLUDES}
-DEFS		= -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
+DEFSNL		= -DNDEBUG -DOM_NDEBUG
+DEFS		= ${DEFSNL} -DLIBSINGULAR
 LDFLAGS		= -L${srcdir}/lib 
 LD_DYN_FLAGS	= -ldl -rdynamic
 SFLAGS		= -fpic -DPIC
@@ -224,6 +225,12 @@ OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
 
 all: libSingular_g.a libSingular.a Singular Singularg 
 
+tesths.og: %.og: %.cc
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSGNL} -c $< -o $@
+	
+tesths.o: %.o: %.cc
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSNL} -c $< -o $@
+
 Singular: tesths.o libSingular.a
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel ${LIBPOLYS_LIBS}
 
@@ -255,9 +262,10 @@ maintainer-clean: distclean srcclean
 	@echo "Rebuilding the deleted files requires flex"
 	@echo "bison, perl and autoconf"
 
-#dep.
+#dep. ( manually?!! :((( )
 feOpt.h: feOpt.inc
-
+cntrlc.cc: feOpt.inc
+iparith.cc: iparith.inc
 misc_ip.cc: feOpt.h
 
 mpsr_Tok.inc: gentable2.cc
@@ -265,8 +273,6 @@ mpsr_Tok.inc: gentable2.cc
 	./gentable2
 	/bin/rm -f gentable2 gentable2.exe
 
-
-iparith.o :iparith.inc
 
 ##
 ## miscellanous targets
@@ -299,7 +305,8 @@ CXXG		= ${CXX} -g
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
-DEFSG		=   -DLIBSINGULAR
+DEFSGNL		= 
+DEFSG		= ${DEFSGNL} -DLIBSINGULAR
 
 CFLAGSG		= -Wall ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXFLAGSG	= -Wall ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
