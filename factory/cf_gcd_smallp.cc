@@ -29,7 +29,7 @@
 #include "cf_util.h"
 #include "templates/ftmpl_functions.h"
 #include "cf_random.h"
-#include "ffreval.h"
+#include "cf_reval.h"
 #include "facHensel.h"
 
 // iinline helper functions:
@@ -3995,7 +3995,7 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
 
 static inline
 int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
-                const Variable & x, const CFArray& LeadCoeffs )
+              const CFArray& LeadCoeffs )
 {
   CFList factors;
   factors.append (G[1]);
@@ -4509,7 +4509,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*GCD_small_p (F,G));
       }
 
-      gcdfound= Hensel_P (B*lcD, DD, b, x, lcDD);
+      gcdfound= Hensel_P (B*lcD, DD, b, lcDD);
 
       if (gcdfound == -1)
       {

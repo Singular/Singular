@@ -174,49 +174,49 @@ InternalCF::invert()
 }
 
 InternalCF*
-InternalCF::tryMulsame( InternalCF* F, const CanonicalForm& M)
+InternalCF::tryMulsame( InternalCF*, const CanonicalForm&)
 {
     ASSERT1( 0, "tryMulsame() not implemented for class %s", this->classname() );
     return 0;
 }
 
 InternalCF*
-InternalCF::tryInvert ( const CanonicalForm& M, bool& fail)
+InternalCF::tryInvert ( const CanonicalForm&, bool&)
 {
     ASSERT1( 0, "tryInvert() not implemented for class %s", this->classname() );
     return 0;
 }
 
 bool
-InternalCF::tryDivremsamet ( InternalCF* F, InternalCF*& S, InternalCF*& T, const CanonicalForm& M, bool& fail)
+InternalCF::tryDivremsamet ( InternalCF*, InternalCF*&, InternalCF*&, const CanonicalForm&, bool&)
 {
     ASSERT1( 0, "tryDivremsamet() not implemented for class %s", this->classname() );
     return 0;
 }
 
 bool
-InternalCF::tryDivremcoefft ( InternalCF* F, InternalCF*& S, InternalCF*& T, bool invert, const CanonicalForm& M, bool& fail)
+InternalCF::tryDivremcoefft ( InternalCF*, InternalCF*&, InternalCF*&, bool, const CanonicalForm&, bool&)
 {
     ASSERT1( 0, "tryDivremcoefft() not implemented for class %s", this->classname() );
     return 0;
 }
 
 InternalCF*
-InternalCF::tryDivsame ( InternalCF* F, const CanonicalForm& M, bool& fail)
+InternalCF::tryDivsame ( InternalCF*, const CanonicalForm&, bool&)
 {
     ASSERT1( 0, "tryDivsame() not implemented for class %s", this->classname() );
     return 0;
 }
 
 InternalCF*
-InternalCF::tryDivcoeff ( InternalCF* F, bool invert, const CanonicalForm& M, bool& fail)
+InternalCF::tryDivcoeff ( InternalCF*, bool, const CanonicalForm&, bool&)
 {
     ASSERT1( 0, "tryDivcoeff() not implemented for class %s", this->classname() );
     return 0;
 }
 
 InternalCF*
-InternalCF::tryDividecoeff ( InternalCF* F, bool invert, const CanonicalForm& M, bool& fail)
+InternalCF::tryDividecoeff ( InternalCF*, bool, const CanonicalForm&, bool&)
 {
     ASSERT1( 0, "tryDividecoeff() not implemented for class %s", this->classname() );
     return 0;

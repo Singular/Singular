@@ -71,10 +71,9 @@ maxpthRoot (const CanonicalForm & F, const int & q, int& l)
 
 static inline
 CFFList
-sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
-            const Variable & alpha, CanonicalForm & c)
+sqrfPosDer (const CanonicalForm & F, const Variable & x,
+            CanonicalForm & c)
 {
-  Variable buf= alpha;
   CanonicalForm b= deriv (F, x);
   c= gcd (F, b);
   CanonicalForm w= F/c;
@@ -130,12 +129,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     buf= Variable (i);
     if (degree (deriv (A, buf)) >= 0)
     {
-      if (GF)
-        tmp1= sqrfPosDer (A, buf, k, alpha, tmp);
-      else if (GF == false && alpha.level() != 1)
-        tmp1= sqrfPosDer (A, buf, k, alpha, tmp);
-      else
-        tmp1= sqrfPosDer (A, buf, 1, alpha, tmp);
+      tmp1= sqrfPosDer (A, buf, tmp);
       A= tmp;
       for (CFFListIterator j= tmp1; j.hasItem(); j++)
       {

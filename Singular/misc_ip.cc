@@ -1075,7 +1075,6 @@ void siInit(char *name)
 #ifdef HAVE_FACTORY
 // factory default settings: -----------------------------------------------
   On(SW_USE_NTL);
-  Off(SW_USE_GCD_P);
   On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
   On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
   On(SW_USE_EZGCD);

@@ -236,8 +236,8 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
         // In this case F is squarefree and we came here by bad chance
         // (means: bad evaluation point).  Try again with another
         // evaluation point.  Bug fix (?) by JS.  The bad example was
-        // gcd.debug -ocr /+USE_EZGCD/@12/CB \
-        //     '(16*B^8-208*B^6*C+927*B^4*C^2-1512*B^2*C^3+432*C^4)' \
+        // gcd.debug -ocr /+USE_EZGCD/@12/CB
+        //     '(16*B^8-208*B^6*C+927*B^4*C^2-1512*B^2*C^3+432*C^4)'
         //     '(4*B^7*C^2-50*B^5*C^3+208*B^3*C^4-288*B*C^5)'
         b.nextpoint();
         return ezgcd( F, G, b, true );

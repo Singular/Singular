@@ -45,13 +45,13 @@ private:
 #endif
 public:
 #ifdef HAVE_OMALLOC
-  void* operator new(size_t size)
+  void* operator new(size_t)
     {
       void* addr;
       omTypeAllocBin(void*, addr, InternalInteger_bin);
       return addr;
     }
-  void operator delete(void* addr, size_t size)
+  void operator delete(void* addr, size_t)
     {
       omFreeBin(addr, InternalInteger_bin);
     }

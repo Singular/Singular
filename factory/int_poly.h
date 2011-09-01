@@ -40,13 +40,13 @@ public:
     friend class InternalPoly;
     friend class CFIterator;
 #ifdef HAVE_OMALLOC
-  void* operator new(size_t size)
+  void* operator new(size_t)
     {
       void* addr;
       omTypeAllocBin(void*, addr, term_bin);
       return addr;
     }
-  void operator delete(void* addr, size_t size)
+  void operator delete(void* addr, size_t)
     {
       omFreeBin(addr, term_bin);
     }
@@ -141,13 +141,13 @@ public:
 
 #ifdef HAVE_OMALLOC
   static const omBin InternalPoly_bin;
-  void* operator new(size_t size)
+  void* operator new(size_t)
     {
       void* addr;
       omTypeAllocBin(void*, addr, InternalPoly_bin);
       return addr;
     }
-  void operator delete(void* addr, size_t size)
+  void operator delete(void* addr, size_t)
     {
       omFreeBin(addr, InternalPoly_bin);
     }

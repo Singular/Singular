@@ -15,7 +15,6 @@
 #include "cf_factory.h"
 #include "fac_util.h"
 #include "templates/ftmpl_functions.h"
-#include "ffreval.h"
 #include "algext.h"
 #include "fieldGCD.h"
 #include "cf_gcd_smallp.h"
@@ -31,13 +30,11 @@ static CanonicalForm gcd_univar_ntlp( const CanonicalForm &, const CanonicalForm
 #endif
 
 static CanonicalForm cf_content ( const CanonicalForm &, const CanonicalForm & );
-static bool gcd_avoid_mtaildegree ( CanonicalForm &, CanonicalForm &, CanonicalForm & );
 static void cf_prepgcd( const CanonicalForm &, const CanonicalForm &, int &, int &, int & );
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 CanonicalForm chinrem_gcd(const CanonicalForm & FF,const CanonicalForm & GG);
-CanonicalForm newGCD(CanonicalForm A, CanonicalForm B);
 
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
@@ -533,13 +530,6 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     C = gcd( Ci, Ci1 );
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
     {
-        //out_cf("F:",f,"\n");
-        //out_cf("G:",g,"\n");
-        //out_cf("newGCD:",newGCD(f,g),"\n");
-        if (isOn(SW_USE_GCD_P) && (getCharacteristic()>0))
-        {
-          return newGCD(f,g);
-        }
         if ( gcd_test_one( pi1, pi, true ) )
         {
           C=abs(C);
@@ -713,12 +703,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     {
       fc= EZGCD_P (fc, gc);
     }
-    #endif
-    else if (isOn(SW_USE_GCD_P))
-    {
-      fc=newGCD(fc,gc);
-    }
-    #ifdef HAVE_NTL
     else if (isOn(SW_USE_FF_MOD_GCD) && !fc_and_gc_Univariate)
     {
       Variable a;
@@ -1055,73 +1039,6 @@ gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
 }
 
 #endif
-
-static bool
-gcd_avoid_mtaildegree ( CanonicalForm & f1, CanonicalForm & g1, CanonicalForm & d1 )
-{
-    bool rdy = true;
-    int df = f1.taildegree();
-    int dg = g1.taildegree();
-
-    d1 = d1.genOne();
-    if ( dg == 0 )
-    {
-        if ( df == 0 )
-            return false;
-        else
-        {
-            if ( f1.degree() == df )
-                d1 = cf_content( g1, LC( f1 ) );
-            else
-            {
-                f1 /= power( f1.mvar(), df );
-                rdy = false;
-            }
-        }
-    }
-    else
-    {
-        if ( df == 0)
-        {
-            if ( g1.degree() == dg )
-                d1 = cf_content( f1, LC( g1 ) );
-            else
-            {
-                g1 /= power( g1.mvar(), dg );
-                rdy = false;
-            }
-        }
-        else
-        {
-            if ( df > dg )
-                d1 = power( f1.mvar(), dg );
-            else
-                d1 = power( f1.mvar(), df );
-            if ( f1.degree() == df )
-            {
-                if (g1.degree() == dg)
-                    d1 *= gcd( LC( f1 ), LC( g1 ) );
-                else
-                {
-                    g1 /= power( g1.mvar(), dg);
-                    d1 *= cf_content( g1, LC( f1 ) );
-                }
-            }
-            else
-            {
-                f1 /= power( f1.mvar(), df );
-                if ( g1.degree() == dg )
-                    d1 *= cf_content( f1, LC( g1 ) );
-                else
-                {
-                    g1 /= power( g1.mvar(), dg );
-                    rdy = false;
-                }
-            }
-        }
-    }
-    return rdy;
-}
 
 /*
 *  compute positions p1 and pe of optimal variables:

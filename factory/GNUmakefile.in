@@ -138,10 +138,8 @@ basefactorysrc := \
 		cf_factor.cc \
 		cf_factory.cc \
 		cf_gcd.cc \
-		cf_gcd_charp.cc \
 		cf_gcd_smallp.cc \
 		cf_generator.cc \
-		cfGEval.cc \
 		cf_globals.cc \
 		cf_hnf.cc \
 		cf_inline.cc \
@@ -185,7 +183,6 @@ basefactorysrc := \
 		facIrredTest.cc \
 		fieldGCD.cc \
 		ffops.cc \
-		ffreval.cc \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
@@ -234,7 +231,6 @@ basefactoryincl := \
 		cf_eval.h \
 		cf_factory.h \
 		cf_generator.h \
-		cfGEval.h \
 		cf_globals.h \
 		cf_gcd_smallp.h \
 		cf_hnf.h \
@@ -272,7 +268,6 @@ basefactoryincl := \
 		facIrredTest.h \
 		fieldGCD.h \
 		ffops.h \
-		ffreval.h \
 		ftmpl_list.h \
 		ftmpl_matrix.h \
 		gf_tabutil.h \
