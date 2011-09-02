@@ -35,6 +35,7 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
 
   bool found= false;
   CanonicalForm deriv_x, gcd_deriv;
+  CFListIterator iter;
   do
   {
     eval.insert (F);
@@ -75,9 +76,9 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
       E.nextpoint();
       continue;
     }
-    CFListIterator i= eval;
-    i++;
-    CanonicalForm contentx= content (i.getItem(), x);
+    iter= eval;
+    iter++;
+    CanonicalForm contentx= content (iter.getItem(), x);
     if (degree (contentx) > 0)
     {
       result= CFList();
@@ -102,13 +103,15 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
   Variable x= Variable (1);
   minFactorsLength= 0;
   irred= false;
+  Variable v;
+  CFList factors;
   for (int j= 0; j < A.level() - 2; j++)
   {
     if (!Aeval[j].isEmpty())
     {
-      Variable v= Variable (Aeval[j].getFirst().level());
+      v= Variable (Aeval[j].getFirst().level());
 
-      CFList factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
+      factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
 
       if (factors.getFirst().inCoeffDomain())
         factors.removeFirst();
@@ -134,14 +137,16 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
              CanonicalForm& sqrfPartF, CFList& factors,
              CFFList*& bufSqrfFactors, CFList& evalSqrfPartF)
 {
+  CanonicalForm tmp;
+  CFListIterator j;
   for (CFListIterator i= uniFactors; i.hasItem(); i++)
   {
-    CanonicalForm tmp= i.getItem();
+    tmp= i.getItem();
     if (i.hasItem())
       i++;
     else
       break;
-    for (CFListIterator j= i; j.hasItem(); j++)
+    for (j= i; j.hasItem(); j++)
     {
       if (tmp == j.getItem())
         return 0;
@@ -166,15 +171,16 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
   CFList tmp2;
   int k= 0;
   factors= uniFactors;
+  CFFListIterator iter;
   for (CFListIterator i= factors; i.hasItem(); i++, k++)
   {
-    CanonicalForm tmp= 1;
+    tmp= 1;
     sqrfFactors= sqrFree (i.getItem());
 
-    for (CFFListIterator j= sqrfFactors; j.hasItem(); j++)
+    for (iter= sqrfFactors; iter.hasItem(); iter++)
     {
-      tmp2.append (j.getItem().factor());
-      tmp *= j.getItem().factor();
+      tmp2.append (iter.getItem().factor());
+      tmp *= iter.getItem().factor();
     }
     i.getItem()= tmp/Lc(tmp);
     bufSqrfFactors [k]= sqrfFactors;
@@ -193,27 +199,29 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
   {
     if (i == 0)
     {
-      for (CFFListIterator k= bufSqrfFactors [i]; k.hasItem(); k++)
+      for (iter= bufSqrfFactors [i]; iter.hasItem(); iter++)
       {
-        k.getItem()= CFFactor (k.getItem().factor()/Lc (k.getItem().factor()),
-                               k.getItem().exp());
-        factors.append (k.getItem().factor());
+        iter.getItem()= CFFactor (iter.getItem().factor()/
+                                  Lc (iter.getItem().factor()),
+                                  iter.getItem().exp());
+        factors.append (iter.getItem().factor());
       }
     }
     else
     {
-      for (CFFListIterator k= bufSqrfFactors [i]; k.hasItem(); k++)
+      for (iter= bufSqrfFactors [i]; iter.hasItem(); iter++)
       {
-        k.getItem()= CFFactor (k.getItem().factor()/Lc (k.getItem().factor()),
-                               k.getItem().exp());
-        if (!find (factors, k.getItem().factor()))
-          factors.append (k.getItem().factor());
+        iter.getItem()= CFFactor (iter.getItem().factor()/
+                               Lc (iter.getItem().factor()),
+                               iter.getItem().exp());
+        if (!find (factors, iter.getItem().factor()))
+          factors.append (iter.getItem().factor());
       }
     }
   }
 
   test= prod (factors);
-  CanonicalForm tmp= evalSqrfPartF.getFirst() (0,2);
+  tmp= evalSqrfPartF.getFirst() (0,2);
   if (test/Lc (test) != tmp/Lc (tmp))
     return 0;
   else
@@ -257,9 +265,10 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     }
     else
     {
+      CFListIterator j;
       for (int i= 0; i < length; i++)
       {
-        for (CFListIterator j= differentSecondVarLCs[i]; j.hasItem(); j++)
+        for (j= differentSecondVarLCs[i]; j.hasItem(); j++)
         {
           if (j.getItem().level() == LCFLevel)
           {
@@ -295,7 +304,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   CanonicalForm sqrfPartF;
   CFFList * bufSqrfFactors= new CFFList [factors.length()];
   CFList evalSqrfPartF;
-  CanonicalForm bufContent;
   CFList bufFactors;
   //TODO sqrfPartF einmal berechnen nicht ständig
   int pass= testFactors (F, factors, sqrfPartF,
@@ -318,11 +326,13 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     }
     for (int i= 0; i < length; i++)
     {
+      CanonicalForm bufF;
+      CFListIterator iter;
+      CFList bufBufFactors;
       if (!differentSecondVarLCs [i].isEmpty())
       {
         bool allConstant= true;
-        for (CFListIterator iter= differentSecondVarLCs[i]; iter.hasItem();
-             iter++)
+        for (iter= differentSecondVarLCs[i]; iter.hasItem(); iter++)
         {
           if (!iter.getItem().inCoeffDomain())
           {
@@ -334,12 +344,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           continue;
 
         bufFactors= differentSecondVarLCs [i];
-        for (CFListIterator iter= bufFactors; iter.hasItem(); iter++)
+        for (iter= bufFactors; iter.hasItem(); iter++)
           iter.getItem()= swapvar (iter.getItem(), x, y);
-        CanonicalForm bufF= F;
+        bufF= F;
         z= Variable (y.level() - lev);
         bufF= swapvar (bufF, x, z);
-        CFList bufBufFactors= bufFactors;
+        bufBufFactors= bufFactors;
         pass= testFactors (bufF, bufBufFactors, sqrfPartF, bufFactors,
                            bufSqrfFactors, evalSqrfPartF);
         if (pass)
@@ -347,7 +357,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           foundDifferent= true;
           F= bufF;
           CFList l= factors;
-          for (CFListIterator iter= l; iter.hasItem(); iter++)
+          for (iter= l; iter.hasItem(); iter++)
             iter.getItem()= swapvar (iter.getItem(), x, y);
           differentSecondVarLCs [i]= l;
           j= i;
@@ -401,10 +411,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
                                                      factors, MOD);
 
   CFList result;
+  CFFListIterator k;
+  CanonicalForm tmp;
   for (int i= 0; i < LCFFactors.length(); i++)
   {
-    CanonicalForm tmp= 1;
-    for (CFFListIterator k= bufSqrfFactors[i]; k.hasItem(); k++)
+    tmp= 1;
+    for (k= bufSqrfFactors[i]; k.hasItem(); k++)
     {
       int pos= findItem (bufFactors, k.getItem().factor());
       if (pos)

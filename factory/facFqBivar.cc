@@ -960,13 +960,13 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
   Variable y= Variable (2);
   Variable x= Variable (1);
   CanonicalForm yToL= power (y, liftBound);
-  CanonicalForm quot;
+  CanonicalForm quot, buf;
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (factorsFoundIndex [i - 1] == 1)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf;
+    iter= factors;
     if (beenInThres)
     {
       int count= 1;
@@ -1015,14 +1015,14 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
 {
   Variable y= Variable (2);
   Variable x= Variable (1);
-  CanonicalForm quot;
+  CanonicalForm quot, buf;
   CanonicalForm yToL= power (y, liftBound);
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (factorsFoundIndex [i - 1] == 1)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf;
+    iter= factors;
     if (beenInThres)
     {
       int count= 1;
@@ -1072,16 +1072,16 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
   Variable x= Variable (1);
   CanonicalForm F= G;
   CanonicalForm yToL= power (y, precision);
-  CanonicalForm quot;
-  CFList result;
+  CanonicalForm quot, buf;
+  CFList result, factorsConsidered;
   CFList bufFactors= factors;
-  CFList factorsConsidered;
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (zeroOneVecs [i - 1] == 0)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf= 1;
+    iter= factors;
+    buf= 1;
     factorsConsidered= CFList();
     for (long j= 1; j <= N.NumRows(); j++, iter++)
     {
@@ -1122,16 +1122,17 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   Variable x= Variable (1);
   CanonicalForm F= G;
   CanonicalForm yToL= power (y, precision);
-  CanonicalForm quot;
+  CanonicalForm quot, buf, buf2;
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (zeroOneVecs [i - 1] == 0)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf= 1;
+    iter= factors;
+    buf= 1;
     factorsConsidered= CFList();
     for (long j= 1; j <= N.NumRows(); j++, iter++)
     {
@@ -1141,7 +1142,7 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
         buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    CanonicalForm buf2= buf;
+    buf2= buf;
     buf *= LC (F, x);
     buf= mod (buf, yToL);
     buf /= content (buf, x);
@@ -1182,13 +1183,14 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
-  CanonicalForm buf2, quot;
+  CanonicalForm buf2, quot, buf;
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (zeroOneVecs [i - 1] == 0)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf= 1;
+    iter= factors;
+    buf= 1;
     factorsConsidered= CFList();
     for (long j= 1; j <= N.NumRows(); j++, iter++)
     {
@@ -1250,16 +1252,17 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   Variable x= Variable (1);
   CanonicalForm F= G;
   CanonicalForm yToL= power (y, precision);
-  CanonicalForm quot;
+  CanonicalForm quot, buf;
   CFList result;
   CFList bufFactors= factors;
   CFList factorsConsidered;
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (zeroOneVecs [i - 1] == 0)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf= 1;
+    iter= factors;
+    buf= 1;
     factorsConsidered= CFList();
     for (long j= 1; j <= N.NumRows(); j++, iter++)
     {
@@ -1306,15 +1309,14 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
   CanonicalForm gamma= info.getGamma();
   CanonicalForm delta= info.getDelta();
   CanonicalForm yToL= power (y, liftBound);
-  CanonicalForm quot;
+  CanonicalForm quot, buf, buf2;
   CFList source, dest;
+  CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
     if (factorsFoundIndex [i - 1] == 1)
       continue;
-    CFListIterator iter= factors;
-    CanonicalForm buf;
-    CanonicalForm buf2;
+    iter= factors;
     if (beenInThres)
     {
       int count= 1;
@@ -1355,7 +1357,6 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     }
     else
     {
-      CFList source, dest;
       if (!isInExtension (buf2, gamma, k, delta, source, dest))
       {
         if (fdivides (buf, F, quot))
@@ -1397,9 +1398,12 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   int stepSize= 2;
   int oldL= l/2;
   bool reduced= false;
+  mat_zz_p NTLK, *NTLC;
+  CFMatrix C;
+  CFArray buf;
+  CFListIterator j;
   while (l <= liftBound)
   {
-
     if (start)
     {
       henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
@@ -1414,15 +1418,13 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
     }
 
     factors.insert (LCF);
-    CFListIterator j= factors;
+    j= factors;
     j++;
 
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
-      {
         A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
-      }
       else
         A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
     }
@@ -1433,16 +1435,15 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
       {
         wasInBounds= true;
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l - k, factors.length() - 1);
+        C= CFMatrix (l - k, factors.length() - 1);
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -1514,6 +1515,14 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     l= start;
   int oldL= l/2;
   bool reduced= false;
+  Variable y= F.mvar();
+  Variable x= Variable (1);
+  CanonicalForm powX, imBasis;
+  CFMatrix Mat, C;
+  CFArray buf;
+  CFIterator iter;
+  mat_zz_p* NTLMat, *NTLC, NTLK;
+  CFListIterator j;
   while (l <= liftBound)
   {
     if (start)
@@ -1529,34 +1538,30 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         henselLift12 (F, factors, l, Pi, diophant, M);
     }
 
-    Variable y= F.mvar();
-    Variable x= Variable (1);
-
     factors.insert (LCF);
 
     if (GF)
       setCharacteristic (getCharacteristic());
 
-    CanonicalForm powX= power (y-gamma, l);
-    CFMatrix Mat= CFMatrix (l*degMipo, l*degMipo);
+    powX= power (y-gamma, l);
+    Mat= CFMatrix (l*degMipo, l*degMipo);
     for (int i= 0; i < l*degMipo; i++)
     {
-
-      CanonicalForm imBasis= mod (power (y, i), powX);
+      imBasis= mod (power (y, i), powX);
       imBasis= imBasis (power (y, degMipo), y);
       imBasis= imBasis (y, gamma);
-      CFIterator iter= imBasis;
+      iter= imBasis;
       for (; iter.hasTerms(); iter++)
         Mat (iter.exp()+ 1, i+1)= iter.coeff();
     }
 
-    mat_zz_p* NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
+    NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
     *NTLMat= inv (*NTLMat);
 
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
-    CFListIterator j= factors;
+    j= factors;
     j++;
 
     for (int i= 0; i < factors.length() - 1; i++, j++)
@@ -1573,11 +1578,10 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
       {
         wasInBounds= true;
         int k= tmin (bounds [i] + 1, (l/2)*degMipo);
-        CFMatrix C= CFMatrix (l*degMipo - k, factors.length() - 1);
+        C= CFMatrix (l*degMipo - k, factors.length() - 1);
 
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
           {
             if (GF)
@@ -1609,8 +1613,8 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         if (GF)
           setCharacteristic(getCharacteristic());
 
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -1673,6 +1677,10 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   int stepSize= 2;
   int oldL= l/2;
   bool reduced= false;
+  CFListIterator j;
+  mat_zz_pE* NTLC, NTLK;
+  CFArray buf;
+  CFMatrix C;
   while (l <= liftBound)
   {
     if (start)
@@ -1689,7 +1697,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     }
 
     factors.insert (LCF);
-    CFListIterator j= factors;
+    j= factors;
     j++;
 
     for (int i= 0; i < factors.length() - 1; i++, j++)
@@ -1712,17 +1720,17 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
       {
         wasInBounds= true;
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l - k, factors.length() - 1);
+        C= CFMatrix (l - k, factors.length() - 1);
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
-          CFArray buf;
+
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
 
-        mat_zz_pE* NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
-        mat_zz_pE NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -1783,6 +1791,10 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
   bool hitBound= false;
   int extensionDeg= degree (getMipo (alpha));
   bool reduced= false;
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_p* NTLC, NTLK;
   while (l <= liftBound)
   {
     if (start)
@@ -1799,7 +1811,7 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
     }
 
     factors.insert (LCF);
-    CFListIterator j= factors;
+    j= factors;
     j++;
 
     for (int i= 0; i < factors.length() - 1; i++, j++)
@@ -1822,17 +1834,16 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
       {
         wasInBounds= true;
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix ((l - k)*extensionDeg, factors.length() - 1);
+        C= CFMatrix ((l - k)*extensionDeg, factors.length() - 1);
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k, alpha);
           writeInMatrix (C, buf, ii + 1, 0);
         }
 
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -1899,9 +1910,13 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   int stepSize= 2;
   bool useOldQs= false;
   bool hitBound= false;
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_p* NTLC, NTLK;
   while (l <= precision)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -1920,16 +1935,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l - k, factors.length());
+        C= CFMatrix (l - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -1959,8 +1973,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         reconstructionTry (result, bufF, factors, degree (F) + 1, factorsFound2,
                            factorsFoundIndex, NTLN, false
                           );
-        F= bufF;
-        if (result.length() > 0)
+        if (result.length() == NTLN.NumCols())
         {
           delete [] factorsFoundIndex;
           delete [] A;
@@ -2024,9 +2037,13 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   int stepSize= 2;
   bool useOldQs= false;
   bool hitBound= false;
+  CFListIterator j;
+  CFMatrix C;
+  mat_zz_pE* NTLC, NTLK;
+  CFArray buf;
   while (l <= precision)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -2045,16 +2062,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l - k, factors.length());
+        C= CFMatrix (l - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_pE* NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
-        mat_zz_pE NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2155,26 +2171,31 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   Variable gamma= info.getBeta();
   CanonicalForm primElemAlpha= info.getGamma();
   CanonicalForm imPrimElemAlpha= info.getDelta();
+  CFListIterator j;
+  Variable y= F.mvar();
+  CanonicalForm powX, imBasis;
+  CFMatrix Mat, C;
+  CFIterator iter;
+  mat_zz_p* NTLMat,*NTLC, NTLK;
+  CFArray buf;
   while (l <= precision)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (GF)
       setCharacteristic (getCharacteristic());
-    Variable y= F.mvar();
-    CanonicalForm powX= power (y-gamma, l);
-    CFMatrix Mat= CFMatrix (l*degMipo, l*degMipo);
+    powX= power (y-gamma, l);
+    Mat= CFMatrix (l*degMipo, l*degMipo);
     for (int i= 0; i < l*degMipo; i++)
     {
-
-      CanonicalForm imBasis= mod (power (y, i), powX);
+      imBasis= mod (power (y, i), powX);
       imBasis= imBasis (power (y, degMipo), y);
       imBasis= imBasis (y, gamma);
-      CFIterator iter= imBasis;
+      iter= imBasis;
       for (; iter.hasTerms(); iter++)
           Mat (iter.exp()+ 1, i+1)= iter.coeff();
     }
 
-    mat_zz_p* NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
+    NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
     *NTLMat= inv (*NTLMat);
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
@@ -2197,10 +2218,9 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
       if (bounds [i] + 1 <= (l/2)*degMipo)
       {
         int k= tmin (bounds [i] + 1, (l/2)*degMipo);
-        CFMatrix C= CFMatrix (l*degMipo - k, factors.length());
+        C= CFMatrix (l*degMipo - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
           {
             if (GF)
@@ -2232,8 +2252,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         if (GF)
           setCharacteristic(getCharacteristic());
 
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2260,23 +2280,23 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
     {
       if (isReduced (NTLN))
       {
-      int * factorsFoundIndex= new int [NTLN.NumCols()];
-      for (long i= 0; i < NTLN.NumCols(); i++)
-        factorsFoundIndex[i]= 0;
-      int factorsFound2= 0;
-      CFList result;
-      CanonicalForm bufF= F;
-      extReconstructionTry (result, bufF, factors, degree (F)+1, factorsFound2,
-                            factorsFoundIndex, NTLN, false, info, evaluation
-                           );
-      if (result.length() == NTLN.NumCols())
-      {
+        int * factorsFoundIndex= new int [NTLN.NumCols()];
+        for (long i= 0; i < NTLN.NumCols(); i++)
+          factorsFoundIndex[i]= 0;
+        int factorsFound2= 0;
+        CFList result;
+        CanonicalForm bufF= F;
+        extReconstructionTry (result, bufF, factors,degree (F)+1, factorsFound2,
+                              factorsFoundIndex, NTLN, false, info, evaluation
+                             );
+        if (result.length() == NTLN.NumCols())
+        {
+          delete [] factorsFoundIndex;
+          delete [] A;
+          delete [] bounds;
+          return result;
+        }
         delete [] factorsFoundIndex;
-        delete [] A;
-        delete [] bounds;
-        return result;
-      }
-      delete [] factorsFoundIndex;
       }
       else if (l == precision)
       {
@@ -2337,9 +2357,13 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
   bool useOldQs= false;
   bool hitBound= false;
   Variable y= Variable (2);
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_pE* NTLC, NTLK;
   while (l <= precision)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -2348,9 +2372,7 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-      {
         A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
-      }
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2358,16 +2380,15 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l - k, factors.length());
+        C= CFMatrix (l - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_pE* NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
-        mat_zz_pE NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2426,7 +2447,6 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
   return CFList();
 }
 
-
 CFList
 increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
                         int oldNumCols, int oldL, const Variable& alpha,
@@ -2452,9 +2472,13 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
   int stepSize= 2;
   bool useOldQs= false;
   bool hitBound= false;
+  CFListIterator j;
+  CFMatrix C;
+  mat_zz_p* NTLC, NTLK;
+  CFArray buf;
   while (l <= precision)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -2473,16 +2497,15 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix ((l - k)*extensionDeg, factors.length());
+        C= CFMatrix ((l - k)*extensionDeg, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k, alpha);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2566,9 +2589,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     bufQ= CFArray (factors.length());
   }
   bool useOldQs= false;
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_p* NTLC, NTLK;
+  CanonicalForm bufF;
+  CFList bufUniFactors;
   while (oldL <= l)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -2588,16 +2617,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
       if (bounds [i] + 1 <= oldL/2)
       {
         int k= tmin (bounds [i] + 1, oldL/2);
-        CFMatrix C= CFMatrix (oldL - k, factors.length());
+        C= CFMatrix (oldL - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2618,8 +2646,8 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     int * zeroOneVecs;
     zeroOneVecs= extractZeroOneVecs (NTLN);
-    CanonicalForm bufF= F;
-    CFList bufUniFactors= factors;
+    bufF= F;
+    bufUniFactors= factors;
     result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, NTLN);
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < oldL && result.length() > 0)
@@ -2661,9 +2689,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
   bool useOldQs= false;
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_pE* NTLC, NTLK;
+  CanonicalForm bufF;
+  CFList bufUniFactors;
   while (oldL <= l)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -2683,16 +2717,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
       if (bounds [i] + 1 <= oldL/2)
       {
         int k= tmin (bounds [i] + 1, oldL/2);
-        CFMatrix C= CFMatrix (oldL - k, factors.length());
+        C= CFMatrix (oldL - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_pE* NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
-        mat_zz_pE NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2714,8 +2747,8 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
 
     int * zeroOneVecs;
     zeroOneVecs= extractZeroOneVecs (NTLN);
-    CanonicalForm bufF= F;
-    CFList bufUniFactors= factors;
+    bufF= F;
+    bufUniFactors= factors;
     result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, NTLN);
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < l && result.length() > 0)
@@ -2767,26 +2800,34 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
   CanonicalForm imPrimElemAlpha= info.getDelta();
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+  Variable y= F.mvar();
+  CFListIterator j;
+  CanonicalForm powX, imBasis, bufF;
+  CFMatrix Mat, C;
+  CFIterator iter;
+  mat_zz_p* NTLMat;
+  CFArray buf;
+  mat_zz_p* NTLC, NTLK;
+  CFList bufUniFactors;
   while (oldL <= l)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (GF)
       setCharacteristic (getCharacteristic());
-    Variable y= F.mvar();
-    CanonicalForm powX= power (y-gamma, oldL);
-    CFMatrix Mat= CFMatrix (oldL*degMipo, oldL*degMipo);
+
+    powX= power (y-gamma, oldL);
+    Mat= CFMatrix (oldL*degMipo, oldL*degMipo);
     for (int i= 0; i < oldL*degMipo; i++)
     {
-
-      CanonicalForm imBasis= mod (power (y, i), powX);
+      imBasis= mod (power (y, i), powX);
       imBasis= imBasis (power (y, degMipo), y);
       imBasis= imBasis (y, gamma);
-      CFIterator iter= imBasis;
+      iter= imBasis;
       for (; iter.hasTerms(); iter++)
         Mat (iter.exp()+ 1, i+1)= iter.coeff();
     }
 
-    mat_zz_p* NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
+    NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
     *NTLMat= inv (*NTLMat);
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
@@ -2809,10 +2850,9 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
       if (bounds [i] + 1 <= oldL/2)
       {
         int k= tmin (bounds [i] + 1, oldL/2);
-        CFMatrix C= CFMatrix (oldL*degMipo - k, factors.length());
+        C= CFMatrix (oldL*degMipo - k, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
           {
             if (GF)
@@ -2844,8 +2884,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
         if (GF)
           setCharacteristic(getCharacteristic());
 
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -2879,8 +2919,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
 
     int * zeroOneVecs;
     zeroOneVecs= extractZeroOneVecs (NTLN);
-    CanonicalForm bufF= F;
-    CFList bufUniFactors= factors;
+    bufF= F;
+    bufUniFactors= factors;
     result= extReconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, NTLN,
                                info, evaluation
                               );
@@ -2892,23 +2932,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
       return result;
     }
 
-    if (isReduced (NTLN))
-    {
-      int factorsFound= 0;
-      CanonicalForm bufF= F;
-      int* factorsFoundIndex= new int [NTLN.NumCols()];
-      for (long i= 0; i < NTLN.NumCols(); i++)
-        factorsFoundIndex[i]= 0;
-      extReconstructionTry (result, bufF, factors, l, factorsFound,
-                            factorsFoundIndex, NTLN, false, info, evaluation
-                           );
-      if (NTLN.NumCols() == result.length())
-      {
-        delete [] A;
-        delete [] factorsFoundIndex;
-        return result;
-      }
-    }
     result= CFList();
     oldL2= oldL;
     oldL *= 2;
@@ -2941,20 +2964,16 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
   bool hitBound= false;
   bool useOldQs= false;
   if (NTLN.NumRows() != factors.length()) //refined factors
-  {
-    int minBound= bounds [0];
-    for (int i= 1; i < d; i++)
-    {
-      if (bounds [i] != 0)
-        minBound= tmin (minBound, bounds [i]);
-    }
-    oldL= 2*(minBound+1);
-    oldL2= minBound + 1;
     ident (NTLN, factors.length());
-  }
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_p* NTLC, NTLK;
+  CanonicalForm bufF;
+  CFList bufUniFactors;
   while (oldL <= l)
   {
-    CFListIterator j= factors;
+    j= factors;
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
@@ -2974,16 +2993,15 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
       if (bounds [i] + 1 <= oldL/2)
       {
         int k= tmin (bounds [i] + 1, oldL/2);
-        CFMatrix C= CFMatrix ((oldL - k)*extensionDeg, factors.length());
+        C= CFMatrix ((oldL - k)*extensionDeg, factors.length());
         for (int ii= 0; ii < factors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k, alpha);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -3000,8 +3018,8 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
     int * zeroOneVecs;
     zeroOneVecs= extractZeroOneVecs (NTLN);
 
-    CanonicalForm bufF= F;
-    CFList bufUniFactors= factors;
+    bufF= F;
+    bufUniFactors= factors;
     result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, NTLN);
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < l && result.length() > 0)
@@ -3049,13 +3067,18 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l), 2);
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+  CFListIterator j;
+  CFMatrix C;
+  CFArray buf;
+  mat_zz_p* NTLC, NTLK;
+  CanonicalForm bufF;
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
     bufFactors.insert (LCF);
     bufFactors.removeFirst();
-    CFListIterator j= bufFactors;
+    j= bufFactors;
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
@@ -3071,16 +3094,15 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l - k, bufFactors.length());
+        C= CFMatrix (l - k, bufFactors.length());
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -3100,7 +3122,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
     }
 
     int * zeroOneVecs= extractZeroOneVecs (NTLN);
-    CanonicalForm bufF= F;
+    bufF= F;
     result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
     delete [] zeroOneVecs;
     if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
@@ -3114,7 +3136,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
     if (isReduced (NTLN))
     {
       int factorsFound= 0;
-      CanonicalForm bufF= F;
+      bufF= F;
       int* factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
@@ -3181,11 +3203,15 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l), 2);
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+  CFListIterator j;
+  CFArray buf;
+  mat_zz_pE* NTLC, NTLK;
+  CanonicalForm bufF;
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
-    CFListIterator j= bufFactors;
+    j= bufFactors;
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
@@ -3204,13 +3230,12 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         CFMatrix C= CFMatrix (l - k, bufFactors.length());
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
             buf= getCoeffs (A[ii] [i], k);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_pE* NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
-        mat_zz_pE NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -3228,22 +3253,22 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
       break;
     }
 
-      int * zeroOneVecs= extractZeroOneVecs (NTLN);
-      CanonicalForm bufF= F;
-      result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
-      delete [] zeroOneVecs;
-      if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
-      {
-        F= bufF;
-        factors= bufFactors;
-        delete [] A;
-        return result;
-      }
+    int * zeroOneVecs= extractZeroOneVecs (NTLN);
+    bufF= F;
+    result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
+    delete [] zeroOneVecs;
+    if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
+    {
+      F= bufF;
+      factors= bufFactors;
+      delete [] A;
+      return result;
+    }
 
     if (isReduced (NTLN))
     {
       int factorsFound= 0;
-      CanonicalForm bufF= F;
+      bufF= F;
       int* factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
@@ -3318,6 +3343,13 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
   CanonicalForm imPrimElemAlpha= info.getDelta();
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+  Variable y= F.mvar();
+  CanonicalForm powX, imBasis, bufF;
+  CFMatrix Mat, C;
+  CFIterator iter;
+  mat_zz_p* NTLMat,*NTLC, NTLK;
+  CFListIterator j;
+  CFArray buf;
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
@@ -3326,27 +3358,26 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
     if (GF)
       setCharacteristic (getCharacteristic());
 
-    Variable y= F.mvar();
-    CanonicalForm powX= power (y-gamma, l);
-    CFMatrix Mat= CFMatrix (l*degMipo, l*degMipo);
+    powX= power (y-gamma, l);
+    Mat= CFMatrix (l*degMipo, l*degMipo);
     for (int i= 0; i < l*degMipo; i++)
     {
 
-      CanonicalForm imBasis= mod (power (y, i), powX);
+      imBasis= mod (power (y, i), powX);
       imBasis= imBasis (power (y, degMipo), y);
       imBasis= imBasis (y, gamma);
-      CFIterator iter= imBasis;
+      iter= imBasis;
       for (; iter.hasTerms(); iter++)
         Mat (iter.exp()+ 1, i+1)= iter.coeff();
     }
 
-    mat_zz_p* NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
+    NTLMat= convertFacCFMatrix2NTLmat_zz_p (Mat);
     *NTLMat= inv (*NTLMat);
 
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
-    CFListIterator j= bufFactors;
+    j= bufFactors;
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
@@ -3362,10 +3393,9 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix (l*degMipo - k, bufFactors.length());
+        C= CFMatrix (l*degMipo - k, bufFactors.length());
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
-          CFArray buf;
           if (A[ii].size() - 1 >= i)
           {
             if (GF)
@@ -3396,8 +3426,8 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
 
         if (GF)
           setCharacteristic(getCharacteristic());
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -3418,24 +3448,24 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
       break;
     }
 
-      int * zeroOneVecs= extractZeroOneVecs (NTLN);
-      CanonicalForm bufF= F;
-      result= extReconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN, info,
-                                 evaluation
-                                );
-      delete [] zeroOneVecs;
-      if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
-      {
-        F= bufF;
-        factors= bufFactors;
-        delete [] A;
-        return result;
-      }
+    int * zeroOneVecs= extractZeroOneVecs (NTLN);
+    bufF= F;
+    result= extReconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN, info,
+                               evaluation
+                              );
+    delete [] zeroOneVecs;
+    if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
+    {
+      F= bufF;
+      factors= bufFactors;
+      delete [] A;
+      return result;
+    }
 
     if (isReduced (NTLN))
     {
       int factorsFound= 0;
-      CanonicalForm bufF= F;
+      bufF= F;
       int* factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
@@ -3506,11 +3536,15 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l), 2);
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+  CFListIterator j;
+  CFMatrix C;
+  mat_zz_p* NTLC, NTLK;
+  CanonicalForm bufF;
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
-    CFListIterator j= bufFactors;
+    j= bufFactors;
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
@@ -3526,7 +3560,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
       if (bounds [i] + 1 <= l/2)
       {
         int k= tmin (bounds [i] + 1, l/2);
-        CFMatrix C= CFMatrix ((l - k)*extensionDeg, bufFactors.length());
+        C= CFMatrix ((l - k)*extensionDeg, bufFactors.length());
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
           CFArray buf;
@@ -3534,8 +3568,8 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
             buf= getCoeffs (A[ii] [i], k, alpha);
           writeInMatrix (C, buf, ii + 1, 0);
         }
-        mat_zz_p* NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
-        mat_zz_p NTLK= (*NTLC)*NTLN;
+        NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
+        NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
@@ -3553,22 +3587,22 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
       break;
     }
 
-      int * zeroOneVecs= extractZeroOneVecs (NTLN);
-      CanonicalForm bufF= F;
-      result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
-      delete [] zeroOneVecs;
-      if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
-      {
-        F= bufF;
-        factors= bufFactors;
-        delete [] A;
-        return result;
-      }
+    int * zeroOneVecs= extractZeroOneVecs (NTLN);
+    CanonicalForm bufF= F;
+    result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
+    delete [] zeroOneVecs;
+    if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
+    {
+      F= bufF;
+      factors= bufFactors;
+      delete [] A;
+      return result;
+    }
 
     if (isReduced (NTLN))
     {
       int factorsFound= 0;
-      CanonicalForm bufF= F;
+      bufF= F;
       int* factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
@@ -3623,10 +3657,12 @@ refineAndRestartLift (const CanonicalForm& F, const mat_zz_p& NTLN, int
   CFList bufFactors;
   Variable y= Variable (2);
   CanonicalForm LCF= LC (F, 1);
+  CFListIterator iter;
+  CanonicalForm buf;
   for (long i= 1; i <= NTLN.NumCols(); i++)
   {
-    CFListIterator iter= factors;
-    CanonicalForm buf= 1;
+    iter= factors;
+    buf= 1;
     for (long j= 1; j <= NTLN.NumRows(); j++, iter++)
     {
       if (!IsZero (NTLN (j,i)))
@@ -3651,10 +3687,12 @@ refineAndRestartLift (const CanonicalForm& F, const mat_zz_pE& NTLN, int
   CFList bufFactors;
   Variable y= Variable (2);
   CanonicalForm LCF= LC (F, 1);
+  CFListIterator iter;
+  CanonicalForm buf;
   for (long i= 1; i <= NTLN.NumCols(); i++)
   {
-    CFListIterator iter= factors;
-    CanonicalForm buf= 1;
+    iter= factors;
+    buf= 1;
     for (long j= 1; j <= NTLN.NumRows(); j++, iter++)
     {
       if (!IsZero (NTLN (j,i)))
@@ -4035,10 +4073,10 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   }
 
   int index;
+  CanonicalForm tmp1, tmp2;
   for (CFListIterator i= smallFactors; i.hasItem(); i++)
   {
     index= 1;
-    CanonicalForm tmp1, tmp2;
     tmp1= mod (i.getItem(),y);
     tmp1 /= Lc (tmp1);
     for (CFListIterator j= bufUniFactors; j.hasItem(); j++, index++)
@@ -4332,59 +4370,62 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   {
     if (beenInThres)
     {
-    int index;
-    for (CFListIterator i= result; i.hasItem(); i++)
-    {
-      index= 1;
-      CanonicalForm tmp1, tmp2;
-      tmp1= mod (i.getItem(), y);
-      tmp1 /= Lc (tmp1);
-      for (CFListIterator j= bufUniFactors; j.hasItem(); j++, index++)
+      int index;
+      for (CFListIterator i= result; i.hasItem(); i++)
       {
-        tmp2= mod (j.getItem(), y);
-        tmp2 /= Lc (tmp2);
-        if (tmp1 == tmp2)
+        index= 1;
+        tmp1= mod (i.getItem(), y);
+        tmp1 /= Lc (tmp1);
+        for (CFListIterator j= bufUniFactors; j.hasItem(); j++, index++)
         {
-          index++;
-          j.remove(index);
-          break;
+          tmp2= mod (j.getItem(), y);
+          tmp2 /= Lc (tmp2);
+          if (tmp1 == tmp2)
+          {
+            index++;
+            j.remove(index);
+            break;
+          }
         }
       }
-    }
     }
     else
     {
-    int * zeroOne= extractZeroOneVecs (NTLN);
-    CFList bufBufUniFactors= bufUniFactors;
-    for (int i= 0; i < NTLN.NumCols(); i++)
-    {
-      if (zeroOne [i] == 0)
-        continue;
-      CFListIterator iter= bufUniFactors;
-      CanonicalForm buf= 1;
+      int * zeroOne= extractZeroOneVecs (NTLN);
+      CFList bufBufUniFactors= bufUniFactors;
+      CFListIterator iter, iter2;
+      CanonicalForm buf;
       CFList factorsConsidered;
-      for (int j= 0; j < NTLN.NumRows(); j++, iter++)
+      CanonicalForm tmp;
+      for (int i= 0; i < NTLN.NumCols(); i++)
       {
-        if (!IsZero (NTLN (j + 1,i + 1)))
+        if (zeroOne [i] == 0)
+          continue;
+        iter= bufUniFactors;
+        buf= 1;
+        factorsConsidered= CFList();
+        for (int j= 0; j < NTLN.NumRows(); j++, iter++)
         {
-          factorsConsidered.append (iter.getItem());
-          buf *= mod (iter.getItem(), y);
+          if (!IsZero (NTLN (j + 1,i + 1)))
+          {
+            factorsConsidered.append (iter.getItem());
+            buf *= mod (iter.getItem(), y);
+          }
+        }
+        buf /= Lc (buf);
+        for (iter2= result; iter2.hasItem(); iter2++)
+        {
+          tmp= mod (iter2.getItem(), y);
+          tmp /= Lc (tmp);
+          if (tmp == buf)
+          {
+            bufBufUniFactors= Difference (bufBufUniFactors, factorsConsidered);
+            break;
+          }
         }
       }
-      buf /= Lc (buf);
-      for (CFListIterator iter2= result; iter2.hasItem(); iter2++)
-      {
-        CanonicalForm tmp= mod (iter2.getItem(), y);
-        tmp /= Lc (tmp);
-        if (tmp == buf)
-        {
-          bufBufUniFactors= Difference (bufBufUniFactors, factorsConsidered);
-          break;
-        }
-      }
-    }
-    bufUniFactors= bufBufUniFactors;
-    delete [] zeroOne;
+      bufUniFactors= bufBufUniFactors;
+      delete [] zeroOne;
     }
 
     int oldNumCols;
@@ -4688,10 +4729,10 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   }
 
   int index;
+  CanonicalForm tmp1, tmp2;
   for (CFListIterator i= smallFactors; i.hasItem(); i++)
   {
     index= 1;
-    CanonicalForm tmp1, tmp2;
     tmp1= mod (i.getItem(), y - evaluation);
     tmp1 /= Lc (tmp1);
     for (CFListIterator j= bufUniFactors; j.hasItem(); j++, index++)
@@ -4827,9 +4868,9 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   if (l >= liftBound)
   {
     int * factorsFoundIndex;
-      factorsFoundIndex= new int [NTLN.NumCols()];
-      for (long i= 0; i < NTLN.NumCols(); i++)
-        factorsFoundIndex[i]= 0;
+    factorsFoundIndex= new int [NTLN.NumCols()];
+    for (long i= 0; i < NTLN.NumCols(); i++)
+      factorsFoundIndex[i]= 0;
     CanonicalForm bufF= F;
     int factorsFound= 0;
 
@@ -4881,7 +4922,6 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
       for (CFListIterator i= result; i.hasItem(); i++)
       {
         index= 1;
-        CanonicalForm tmp1, tmp2;
         tmp1= mod (i.getItem(), y-evaluation);
         tmp1 /= Lc (tmp1);
         for (CFListIterator j= bufUniFactors; j.hasItem(); j++, index++)
@@ -4901,13 +4941,16 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
     {
       int * zeroOne= extractZeroOneVecs (NTLN);
       CFList bufBufUniFactors= bufUniFactors;
+      CFListIterator iter, iter2;
+      CanonicalForm buf;
+      CFList factorsConsidered;
       for (int i= 0; i < NTLN.NumCols(); i++)
       {
         if (zeroOne [i] == 0)
           continue;
-        CFListIterator iter= bufUniFactors;
-        CanonicalForm buf= 1;
-        CFList factorsConsidered;
+        iter= bufUniFactors;
+        buf= 1;
+        factorsConsidered= CFList();
         for (int j= 0; j < NTLN.NumRows(); j++, iter++)
         {
           if (!IsZero (NTLN (j + 1,i + 1)))
@@ -4917,7 +4960,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
           }
         }
         buf /= Lc (buf);
-        for (CFListIterator iter2= result; iter2.hasItem(); iter2++)
+        for (iter2= result; iter2.hasItem(); iter2++)
         {
           CanonicalForm tmp= mod (iter2.getItem(), y - evaluation);
           tmp /= Lc (tmp);
