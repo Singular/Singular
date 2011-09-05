@@ -314,10 +314,14 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "walk_ip.cc"
 #include "wrapper.cc"
 */
+void siInit(char *);
 
 int main( int, char *argv[] ) 
 {
-  feInitResources(argv[0]);
+  // init path names etc.
+  feInitResources(argv[0]); //???
+  siInit(argv[0]); // ?
+
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
@@ -359,6 +363,58 @@ int main( int, char *argv[] )
    
   rDelete(R);
    
+
+   
+   
+  currentVoice=feInitStdin(NULL);
+   
+   
+  // hook for error handling:
+  // WerrorS_callback=......; of type p(const char *)
+  int err=iiEStart(omStrDup("int ver=system(\"version\");export ver;return();\n"),NULL);
+  if (err) errorreported = 0; // reset error handling
+  printf("interpreter returns %d\n",err);
+  idhdl h=ggetid("ver");
+  if (h!=NULL)
+    printf("singular variable ver of type %d contains %d\n",h->typ,(int)(long)IDDATA(h));
+  else
+    printf("variable ver does not exist\n");
+
+  // calling a singular-library function
+  idhdl datetime=ggetid("datetime");
+  if (datetime==NULL)
+    printf("datetime not found\n");
+  else
+  {
+    leftv res=iiMake_proc(datetime,NULL,NULL);
+    if (res==NULL) { printf("datetime return an error\n"); errorreported = 0; }
+    else           printf("datetime returned type %d, >>%s<<\n",res->Typ(),(char *)res->Data());
+  }
+
+  // changing a ring for the interpreter
+  // re-using n and R from above
+  R=rDefault(32003,3,n);
+  idhdl newRingHdl=enterid("R" /* ring name*/,
+                           0, /*nesting level, 0=global*/
+                           RING_CMD,
+                           &IDROOT,
+                           FALSE);
+   IDRING(newRingHdl)=R;
+   // make R the default ring (include rChangeCurrRing):
+   rSetHdl(newRingHdl);
+   err=iiEStart(omStrDup("poly p=x;listvar();return();\n"),NULL);
+
+  // calling a kernel function via the interpreter interface
+  sleftv r1; memset(&r1,0,sizeof(r1));
+  sleftv arg; memset(&arg,0,sizeof(r1));
+  arg.rtyp=STRING_CMD;
+  arg.data=omStrDup("huhu");
+  err=iiExprArith1(&r1,&arg,TYPEOF_CMD);
+  printf("interpreter returns %d\n",err);
+  if (err) errorreported = 0; // reset error handling
+  else printf("typeof returned type %d, >>%s<<\n",r1.Typ(),r1.Data());
+  // clean up r1:
+  r1.CleanUp();
    
   return 0;
 }
