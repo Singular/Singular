@@ -572,8 +572,8 @@ kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
                 const Variable& alpha)
 {
   int degAy= degree (A);
-  subA1.rep.SetLength ((long) d*(degAy + 1));
-  subA2.rep.SetLength ((long) d*(degAy + 1));
+  subA1.rep.SetLength ((long) d*(degAy + 2));
+  subA2.rep.SetLength ((long) d*(degAy + 2));
 
   Variable v;
   zz_pE *subA1p;
@@ -601,8 +601,8 @@ kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
     int bufRepLength= (int) buf.rep.length();
     for (int j= 0; j < bufRepLength; j++)
     {
-      subA1p [j + k]= bufp [j];
-      subA2p [j + kk]= bufp [j];
+      subA1p [j + k] += bufp [j];
+      subA2p [j + kk] += bufp [j];
     }
   }
   subA1.normalize();
@@ -613,10 +613,9 @@ void
 kronSubRecipro (zz_pX& subA1, zz_pX& subA2,const CanonicalForm& A, int d)
 {
   int degAy= degree (A);
-  subA1.rep.SetLength ((long) d*(degAy + 1));
-  subA2.rep.SetLength ((long) d*(degAy + 1));
+  subA1.rep.SetLength ((long) d*(degAy + 2));
+  subA2.rep.SetLength ((long) d*(degAy + 2));
 
-  Variable v;
   zz_p *subA1p;
   zz_p *subA2p;
   subA1p= subA1.rep.elts();
@@ -634,8 +633,8 @@ kronSubRecipro (zz_pX& subA1, zz_pX& subA2,const CanonicalForm& A, int d)
     int bufRepLength= (int) buf.rep.length();
     for (int j= 0; j < bufRepLength; j++)
     {
-      subA1p [j + k]= bufp [j];
-      subA2p [j + kk]= bufp [j];
+      subA1p [j + k] += bufp [j];
+      subA2p [j + kk] += bufp [j];
     }
   }
   subA1.normalize();
@@ -738,7 +737,7 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
     {
       if (repLengthBuf2 > degfSubLf + 1)
         degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg);
+      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
       for (int ind= 0; ind < tmp; ind++)
         gp [ind + lg] -= buf1p [ind];
     }
@@ -852,7 +851,7 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
     {
       if (repLengthBuf2 > degfSubLf + 1)
         degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg);
+      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
       for (int ind= 0; ind < tmp; ind++)
         gp [ind + lg] -= buf1p [ind];
     }
@@ -951,8 +950,9 @@ CanonicalForm
 mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
                   CanonicalForm& M)
 {
-  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
-  int d2= tmax (degree (F, 2), degree (G, 2));
+  int d1= degree (F, 1) + degree (G, 1) + 1;
+  d1 /= 2;
+  d1 += 1;
 
   zz_pX F1, F2;
   kronSubRecipro (F1, F2, F, d1);
@@ -962,10 +962,18 @@ mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   int k= d1*degree (M);
   MulTrunc (F1, F1, G1, (long) k);
 
-  mul (F2, F2, G2);
-  if (deg (F2) > k - 2)
-    F2 >>= (deg (F2) - k + 2);
+  int degtailF= degree (tailcoeff (F), 1);
+  int degtailG= degree (tailcoeff (G), 1);
+  int taildegF= taildegree (F);
+  int taildegG= taildegree (G);
+  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
 
+  reverse (F2, F2);
+  reverse (G2, G2);
+  MulTrunc (F2, F2, G2, b + 1);
+  reverse (F2, F2, b);
+
+  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
   return reverseSubst (F1, F2, d1, d2);
 }
 
@@ -982,7 +990,7 @@ mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
   int degBx= degree (B, 1);
   int degBy= degree (B, 2);
   int d1= degAx + 1 + degBx;
-  int d2= tmax (degree (A, 2), degree (B, 2));
+  int d2= tmax (degAy, degBy);
 
   if (d1 > 128 && d2 > 160 && (degAy == degBy) && (2*degAy > degree (M)))
     return mulMod2NTLFpReci (A, B, M);
@@ -1003,8 +1011,9 @@ CanonicalForm
 mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
                   CanonicalForm& M, const Variable& alpha)
 {
-  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
-  int d2= tmax (degree (F, 2), degree (G, 2));
+  int d1= degree (F, 1) + degree (G, 1) + 1;
+  d1 /= 2;
+  d1 += 1;
 
   zz_pEX F1, F2;
   kronSubRecipro (F1, F2, F, d1, alpha);
@@ -1014,13 +1023,19 @@ mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
   int k= d1*degree (M);
   MulTrunc (F1, F1, G1, (long) k);
 
-  mul (F2, F2, G2);
-  if (deg (F2) > k - 2)
-    F2 >>= (deg (F2) - k + 2);
+  int degtailF= degree (tailcoeff (F), 1);
+  int degtailG= degree (tailcoeff (G), 1);
+  int taildegF= taildegree (F);
+  int taildegG= taildegree (G);
+  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
 
-  CanonicalForm result= reverseSubst (F1, F2, d1, d2, alpha);
+  reverse (F2, F2);
+  reverse (G2, G2);
+  MulTrunc (F2, F2, G2, b + 1);
+  reverse (F2, F2, b);
 
-  return result;
+  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
+  return reverseSubst (F1, F2, d1, d2, alpha);
 }
 
 CanonicalForm
@@ -1038,7 +1053,7 @@ mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
     int degBx= degree (B, 1);
     int degBy= degree (B, 2);
     int d1= degAx + degBx + 1;
-    int d2= tmax (degree (A, 2), degree (B, 2));
+    int d2= tmax (degAy, degBy);
     zz_p::init (getCharacteristic());
     zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
     zz_pE::init (NTLMipo);
