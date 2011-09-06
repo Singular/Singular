@@ -1379,6 +1379,7 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
   if (m < 0)
     return 0;
 
+  Variable v;
   CanonicalForm Q;
   if (degB <= 1 || CFFactory::gettype() == GaloisFieldDomain)
   {
@@ -1387,12 +1388,25 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
   }
   else
   {
-    CanonicalForm R= reverse (A, degA);
-    CanonicalForm revB= reverse (B, degB);
-    revB= newtonInverse (revB, m + 1, M);
-    Q= mulMod2 (R, revB, M);
-    Q= mod (Q, power (x, m + 1));
-    Q= reverse (Q, m);
+    if (hasFirstAlgVar (A, v) || hasFirstAlgVar (B, v))
+    {
+      CanonicalForm R= reverse (A, degA);
+      CanonicalForm revB= reverse (B, degB);
+      revB= newtonInverse (revB, m + 1, M);
+      Q= mulMod2 (R, revB, M);
+      Q= mod (Q, power (x, m + 1));
+      Q= reverse (Q, m);
+    }
+    else
+    {
+      zz_pX mipo= convertFacCF2NTLzzpX (M);
+      Variable y= Variable (2);
+      zz_pEX NTLA, NTLB;
+      NTLA= convertFacCF2NTLzz_pEX (swapvar (A, x, y), mipo);
+      NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
+      div (NTLA, NTLA, NTLB);
+      Q= convertNTLzz_pEX2CF (NTLA, x, y);
+    }
   }
 
   return Q;
@@ -1416,22 +1430,38 @@ newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     return;
   }
 
+  Variable v;
   if (degB <= 1 || CFFactory::gettype() == GaloisFieldDomain)
   {
      divrem2 (A, B, Q, R, M);
   }
   else
   {
-    R= reverse (A, degA);
+    if (hasFirstAlgVar (A, v) || hasFirstAlgVar (B, v))
+    {
+      R= reverse (A, degA);
 
-    CanonicalForm revB= reverse (B, degB);
-    revB= newtonInverse (revB, m + 1, M);
-    Q= mulMod2 (R, revB, M);
+      CanonicalForm revB= reverse (B, degB);
+      revB= newtonInverse (revB, m + 1, M);
+      Q= mulMod2 (R, revB, M);
 
-    Q= mod (Q, power (x, m + 1));
-    Q= reverse (Q, m);
+      Q= mod (Q, power (x, m + 1));
+      Q= reverse (Q, m);
 
-    R= A - mulMod2 (Q, B, M);
+      R= A - mulMod2 (Q, B, M);
+    }
+    else
+    {
+      zz_pX mipo= convertFacCF2NTLzzpX (M);
+      Variable y= Variable (2);
+      zz_pEX NTLA, NTLB;
+      NTLA= convertFacCF2NTLzz_pEX (swapvar (A, x, y), mipo);
+      NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
+      zz_pEX NTLQ, NTLR;
+      DivRem (NTLQ, NTLR, NTLA, NTLB);
+      Q= convertNTLzz_pEX2CF (NTLQ, x, y);
+      R= convertNTLzz_pEX2CF (NTLR, x, y);
+    }
   }
 }
 
