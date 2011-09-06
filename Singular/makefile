@@ -232,10 +232,10 @@ tesths.o: %.o: %.cc
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSNL} -c $< -o $@
 
 Singular: tesths.o libSingular.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel ${LIBPOLYS_LIBS}
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS}
 
 Singularg: tesths.og libSingular_g.a
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGSG} ${DEFSG} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g ${LIBPOLYS_LIBSG}
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGSG} ${DEFSG} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG}
 
 
 ##
@@ -419,7 +419,7 @@ libSingular_g.a: ${OBJG}
 	ar cr $@ $^
 
 test: test.o libSingular.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel ${LIBPOLYS_LIBS}
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS}
 
 # My headers test
 check: test testg
@@ -427,4 +427,4 @@ check: test testg
 	./testg
 
 testg: test.og libSingular_g.a
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@  -L. -lSingular_g -L../kernel -lkernel_g ${LIBPOLYS_LIBSG}
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@  -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG}
