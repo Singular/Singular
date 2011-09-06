@@ -56,6 +56,7 @@
 #include <polys/ext_fields/algext.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/longrat.h>
+
 #include <numeric/mpr_base.h>
 #include <numeric/mpr_numeric.h>
 
@@ -4515,7 +4516,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   if ( arranger->success() )
   {
     arranger->arrange();
-    listofroots= arranger->listOfRoots( gmp_output_digits );
+    listofroots= listOfRoots(arranger, gmp_output_digits );
   }
   else
   {
@@ -4544,15 +4545,15 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
 }
 
 // from mpr_numeric.cc
-lists rootArranger::listOfRoots( const unsigned int oprec )
+lists listOfRoots( rootArranger* self, const unsigned int oprec )
 {
   int i,j,tr;
-  int count= roots[0]->getAnzRoots(); // number of roots
-  int elem= roots[0]->getAnzElems();  // number of koordinates per root
+  int count= self->roots[0]->getAnzRoots(); // number of roots
+  int elem= self->roots[0]->getAnzElems();  // number of koordinates per root
 
   lists listofroots= (lists)omAlloc( sizeof(slists) ); // must be done this way!
 
-  if ( found_roots )
+  if ( self->found_roots )
   {
     listofroots->Init( count );
 
@@ -4565,13 +4566,12 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
         if ( !rField_is_long_C(currRing) )
         {
           onepoint->m[j].rtyp=STRING_CMD;
-          onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec,
-                          currRing->cf);
+          onepoint->m[j].data=(void *)complexToStr((*self->roots[j])[i],oprec, currRing->cf);
         }
         else
         {
           onepoint->m[j].rtyp=NUMBER_CMD;
-          onepoint->m[j].data=(void *)nCopy((number)(roots[j]->getRoot(i)));
+          onepoint->m[j].data=(void *)n_Copy((number)(self->roots[j]->getRoot(i)), currRing->cf);
         }
         onepoint->m[j].next= NULL;
         onepoint->m[j].name= NULL;

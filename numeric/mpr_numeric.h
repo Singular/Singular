@@ -144,10 +144,14 @@ private:
 };
 //<-
 
+class slists; typedef slists * lists;
+
 //-> class rootArranger
 class rootArranger
 {
 public:
+  friend lists listOfRoots( rootArranger*, const unsigned int oprec );
+   
   rootArranger( rootContainer ** _roots,
 		rootContainer ** _mu,
 		const int _howclean = PM_CORRUPT );
@@ -155,8 +159,6 @@ public:
 
   void solve_all();
   void arrange();
-
-  lists listOfRoots( const unsigned int oprec );
 
   const bool success() { return found_roots; }
 
