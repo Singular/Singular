@@ -17,7 +17,7 @@
 #define MPR_SPARSE 2
 
 /** solve a multipolynomial system using the u-resultant
- * Input ideal must be 0-dimensional and pVariables == IDELEMS(ideal).
+ * Input ideal must be 0-dimensional and (currRing->N) == IDELEMS(ideal).
  * Resultant method can be MPR_DENSE, which uses Macaulay Resultant (good for
  * dense homogeneous polynoms) or MPR_SPARSE, which uses Sparse Resultant
  * (Gelfand, Kapranov, Zelevinsky).

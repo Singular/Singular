@@ -9,25 +9,40 @@
 *            ( root finder, vandermonde system solver, simplex )
 */
 
+#include <math.h>
+
 #include <kernel/mod2.h>
+
+#include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
+
 //#ifdef HAVE_MPR
 
 //#define mprDEBUG_ALL
 
 //-> includes
-#include <kernel/options.h>
+#include <misc/mylimits.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <coeffs/numbers.h>
+#include <coeffs/mpr_global.h>
+
+#include <polys/matpol.h>
+
 #include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/intvec.h>
-#include <kernel/matpol.h>
-#include <kernel/ring.h>
+
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+
 //#include "longrat.h"
 
+#include "mpr_numeric.h"
+
 #include <math.h>
-#include <kernel/mpr_numeric.h>
 
 extern size_t gmp_output_digits;
 //<-
@@ -403,7 +418,7 @@ gmp_complex & rootContainer::evPointCoord( const int i )
     if ( ievpoint[i] != NULL )
     {
       gmp_complex *tmp= new gmp_complex();
-      *tmp= numberToComplex(ievpoint[i]);
+      *tmp= numberToComplex(ievpoint[i], currRing->cf);
       return *tmp;
     }
     else
@@ -453,7 +468,7 @@ bool rootContainer::solver( const int polishmode )
   for ( i=0; i <= tdg; i++ )
   {
     ad[i]= new gmp_complex();
-    if ( coeffs[i] ) *ad[i] = numberToComplex( coeffs[i] );
+    if ( coeffs[i] ) *ad[i] = numberToComplex( coeffs[i], currRing->cf );
   }
 
   // now solve
@@ -1371,3 +1386,4 @@ void simplex::simp3( mprfloat **a, int i1, int k1, int ip, int kp )
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
 // End: ***
+
