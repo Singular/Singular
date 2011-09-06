@@ -205,7 +205,8 @@ templateincl =	\
 # somehow the current deps. seem to be broken... 
 # moreover factory.h needs a lot more generated headers, which wouldn't be installed yet
 
-EXTRA_PROGRAMS = gengftables
+EXTRA_PROGRAMS = gengftables cplusplus
+
 
 gengftables_SOURCES = gengftables-conway.cc
 
@@ -316,8 +317,6 @@ EXTRA_DIST =	test_install.cc \
 CLEANFILES = factory.h factoryconf.h cplusplus.h readcf.cc
 
 
-
-EXTRA_PROGRAMS = cplusplus
 
 cplusplus_SOURCES = cplusplus.cc
 
