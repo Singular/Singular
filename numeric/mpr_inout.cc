@@ -9,24 +9,34 @@
 */
 
 #include <kernel/mod2.h>
+
 //#ifdef HAVE_MPR
 
 //-> includes
+#include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
+
+#include <misc/mylimits.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <coeffs/numbers.h>
+#include <coeffs/mpr_global.h>
+
+#include <polys/matpol.h>
+
+
+#include <kernel/febase.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/ring.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/matpol.h>
+
 
 #include <math.h>
 
-#include <kernel/mpr_global.h>
-#include <kernel/mpr_inout.h>
-#include <kernel/mpr_base.h>
-#include <kernel/mpr_numeric.h>
+#include "mpr_base.h"
+#include "mpr_numeric.h"
+#include "mpr_inout.h"
 
 // to get detailed timigs, define MPR_TIMING
 #ifdef MPR_TIMING
@@ -71,7 +81,7 @@ void mprPrintError( mprState state, const char * name )
     break;
   case mprInfNumOfVars:
     Werror("Wrong number of elements in given ideal %s, should be %d resp. %d!",
-           name,pVariables+1,pVariables);
+           name,(currRing->N)+1,(currRing->N));
     break;
   case mprNotZeroDim:
     Werror("The given ideal %s must be 0-dimensional!",name);
@@ -102,7 +112,7 @@ mprState mprIdealCheck( const ideal theIdeal,
   int power;
   int k;
 
-  int numOfVars= mtype == uResultant::denseResMat?pVariables-1:pVariables;
+  int numOfVars= mtype == uResultant::denseResMat?(currRing->N)-1:(currRing->N);
   if ( rmatrix ) numOfVars++;
 
   if ( mtype == uResultant::none )
@@ -120,11 +130,11 @@ mprState mprIdealCheck( const ideal theIdeal,
       state=mprNotHomog;
   }
 
-  if ( !(rField_is_R()||
-         rField_is_Q()||
-         rField_is_long_R()||
-         rField_is_long_C()||
-         (rmatrix && rField_is_Q_a())) )
+  if ( !(rField_is_R(currRing)||
+         rField_is_Q(currRing)||
+         rField_is_long_R(currRing)||
+         rField_is_long_C(currRing)||
+         (rmatrix && rField_is_Q_a(currRing))) )
     state= mprUnSupField;
 
   if ( state != mprOk ) mprPrintError( state, "" /* name */ );

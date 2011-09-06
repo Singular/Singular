@@ -8,29 +8,34 @@
  *            ( sparse, dense, u-resultant solver )
  */
 
-#include <math.h>
-
+//-> includes
 #include <kernel/mod2.h>
 
-#include <misc/mylimits.h>
+#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
-//-> includes
-#include <kernel/options.h>
+#include <misc/mylimits.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <coeffs/numbers.h>
+#include <coeffs/mpr_global.h>
+
+#include <polys/matpol.h>
+#include <polys/sparsmat.h>
+
+#ifdef HAVE_FACTORY
+#include <polys/clapsing.h>
+#endif
+
+#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
-#include <kernel/intvec.h>
-#include <kernel/matpol.h>
-#include <kernel/numbers.h>
-#ifdef HAVE_FACTORY
-#include <kernel/clapsing.h>
-#endif
-#include <kernel/sparsmat.h>
 
-#include <kernel/mpr_global.h>
-#include <kernel/mpr_base.h>
-#include <kernel/mpr_numeric.h>
+#include "mpr_base.h"
+#include "mpr_numeric.h"
+
+#include <math.h>
 //<-
 
 extern void nPrint(number n);  // for debugging output
@@ -277,7 +282,7 @@ private:
 class mayanPyramidAlg
 {
 public:
-  mayanPyramidAlg( simplex * _pLP ) : n(pVariables), pLP(_pLP) {}
+  mayanPyramidAlg( simplex * _pLP ) : n((currRing->N)), pLP(_pLP) {}
   ~mayanPyramidAlg() {}
 
   /** Drive Mayan Pyramid Algorithm.
@@ -379,7 +384,7 @@ void print_matrix( matrix omat )
       if ( (MATELEM( omat, i, j)!=NULL)
       && (!nIsZero(pGetCoeff( MATELEM( omat, i, j)))))
       {
-        val= n_Int(pGetCoeff( MATELEM( omat, i, j) ), currRing);
+        val= n_Int(pGetCoeff( MATELEM( omat, i, j) ), currRing->cf);
         if ( i==MATROWS(omat) && j==MATCOLS(omat) )
         {
           Print("%d ",val);
@@ -780,12 +785,12 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
   int idelem= IDELEMS(gls);
   int * vert;
 
-  n= pVariables;
+  n= (currRing->N);
   vert= (int *)omAlloc( (idelem+1) * sizeof(int) );
 
   Q = (pointSet **)omAlloc( idelem * sizeof(pointSet*) );        // support hulls
   for ( i= 0; i < idelem; i++ )
-    Q[i] = new pointSet( pVariables, i+1, pLength((gls->m)[i])+1 );
+    Q[i] = new pointSet( (currRing->N), i+1, pLength((gls->m)[i])+1 );
 
   for( i= 0; i < idelem; i++ )
   {
@@ -819,7 +824,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     Print(" \\Conv(Qi[%d]): #%d\n", i,Q[i]->num );
     for ( j=1; j <= Q[i]->num; j++ )
     {
-      Print("%d: <",j);print_exp( (*Q[i])[j] , pVariables );PrintS(">\n");
+      Print("%d: <",j);print_exp( (*Q[i])[j] , (currRing->N) );PrintS(">\n");
     }
     PrintLn();
   }
@@ -840,7 +845,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
   poly p,pid;
   int * vert;
 
-  n= pVariables;
+  n= (currRing->N);
   vert= (int *)omAlloc( (idelem+1) * sizeof(int) );
   id= idInit( idelem, 1 );
 
@@ -1217,7 +1222,7 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
 //-> resMatrixSparse::*
 bool resMatrixSparse::remapXiToPoint( const int indx, pointSet **pQ, int *set, int *pnt )
 {
-  int i,nn= pVariables;
+  int i,nn= (currRing->N);
   int loffset= 0;
   for ( i= 0; i <= nn; i++ )
   {
@@ -1420,7 +1425,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
   int *epp_mon, *eexp;
 
   epp_mon= (int *)omAlloc( (n+2) * sizeof(int) );
-  eexp= (int *)omAlloc0((pVariables+1)*sizeof(int));
+  eexp= (int *)omAlloc0(((currRing->N)+1)*sizeof(int));
 
   totDeg= numSet0;
 
@@ -1479,7 +1484,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
 
   pDelete( &epp );
   omFreeSize( (void *) epp_mon, (n+2) * sizeof(int) );
-  omFreeSize( (void *) eexp, (pVariables+1)*sizeof(int));
+  omFreeSize( (void *) eexp, ((currRing->N)+1)*sizeof(int));
 
 #ifdef mprDEBUG_ALL
   if ( E->num <= 40 )
@@ -1524,7 +1529,7 @@ pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
   onePoint vert;
   int j,k,l;
 
-  vert.point=(Coord_t*)omAlloc( (pVariables+2) * sizeof(Coord_t) );
+  vert.point=(Coord_t*)omAlloc( ((currRing->N)+2) * sizeof(Coord_t) );
 
   vs= new pointSet( dim );
 
@@ -1541,7 +1546,7 @@ pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
     }
   }
 
-  omFreeSize( (void *) vert.point, (pVariables+2) * sizeof(Coord_t) );
+  omFreeSize( (void *) vert.point, ((currRing->N)+2) * sizeof(Coord_t) );
 
   return vs;
 }
@@ -1578,7 +1583,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   int totverts;                // total number of exponent vectors in ideal gls
   mprfloat shift[MAXVARS+2];   // shiftvector delta, index [1..dim]
 
-  if ( pVariables > MAXVARS )
+  if ( (currRing->N) > MAXVARS )
   {
     WerrorS("resMatrixSparse::resMatrixSparse: Too many variables!");
     return;
@@ -1592,7 +1597,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
   istate= resMatrixBase::ready;
 
-  n= pVariables;
+  n= (currRing->N);
   idelem= IDELEMS(gls);  // should be n+1
 
   // prepare matrix LP->LiPM for Linear Programming
@@ -1973,7 +1978,7 @@ private:
   void generateMonomData( int deg, intvec* polyDegs , intvec* iVO );
 
   /** Recursively generate all homogeneous monoms of
-   * pVariables variables of degree deg.
+   * (currRing->N) variables of degree deg.
    */
   void generateMonoms( poly m, int var, int deg );
 
@@ -2028,7 +2033,7 @@ public:
   int elementOfS;
 
   /** holds the index of u0, u1, ..., un, if (elementOfS == linPolyS)
-   *  the size is given by pVariables
+   *  the size is given by (currRing->N)
    */
   int *numColParNr;
 
@@ -2099,7 +2104,7 @@ resMatrixDense::~resMatrixDense()
     omfreeSize( (void *)resVectorList[i].numColVector,
                 numVectors * sizeof( number ) );
     omfreeSize( (void *)resVectorList[i].numColParNr,
-                (pVariables+1) * sizeof(int) );
+                ((currRing->N)+1) * sizeof(int) );
   }
 
   omFreeSize( (void *)resVectorList, veclistmax*sizeof( resVector ) );
@@ -2134,7 +2139,7 @@ void resMatrixDense::createMatrix()
     if ( linPolyS == getMVector(k)->elementOfS )
     {
       mprSTICKYPROT(ST_DENSE_FR);
-      for ( i= 0; i < pVariables; i++ )
+      for ( i= 0; i < (currRing->N); i++ )
       {
         MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i])= pInit();
       }
@@ -2160,7 +2165,7 @@ void resMatrixDense::createMatrix()
   {
     if ( linPolyS == getMVector(k)->elementOfS )
     {
-      for ( i=0; i < pVariables; i++ )
+      for ( i=0; i < (currRing->N); i++ )
       {
         Print(" %d ",(getMVector(k)->numColParNr)[i]);
       }
@@ -2206,7 +2211,7 @@ void resMatrixDense::generateMonoms( poly mm, int var, int deg )
   }
   else
   {
-    if ( var == pVariables+1 ) return;
+    if ( var == (currRing->N)+1 ) return;
     poly newm = pCopy( mm );
     while ( deg >= 0 )
     {
@@ -2351,12 +2356,12 @@ void resMatrixDense::generateBaseData()
 
   // the internal Variable Ordering
   // make sure that the homogenization variable goes last!
-  intvec iVO( pVariables );
+  intvec iVO( (currRing->N) );
   if ( linPolyS != SNONE )
   {
-    iVO[pVariables - 1]= linPolyS;
+    iVO[(currRing->N) - 1]= linPolyS;
     int p=0;
-    for ( k= pVariables - 1; k >= 0; k-- )
+    for ( k= (currRing->N) - 1; k >= 0; k-- )
     {
       if ( k != linPolyS )
       {
@@ -2368,8 +2373,8 @@ void resMatrixDense::generateBaseData()
   else
   {
     linPolyS= 0;
-    for ( k= 0; k < pVariables; k++ )
-      iVO[k]= pVariables - k - 1;
+    for ( k= 0; k < (currRing->N); k++ )
+      iVO[k]= (currRing->N) - k - 1;
   }
 
   // the critical degree d= sum( deg(Fi) ) - n
@@ -2424,7 +2429,7 @@ void resMatrixDense::generateBaseData()
       //mprPROTInl(" setup of numColParNr ",k);
       resVectorList[k].numColVectorSize= 0;
       resVectorList[k].numColVector= NULL;
-      resVectorList[k].numColParNr= (int *)omAlloc0( (pVariables+1) * sizeof(int) );
+      resVectorList[k].numColParNr= (int *)omAlloc0( ((currRing->N)+1) * sizeof(int) );
 
       pi= (gls->m)[ resVectorList[k].elementOfS ];
       factor= pDivideM( pCopy( resVectorList[k].mon ), pCopy( resVectorList[k].dividedBy ) );
@@ -2488,7 +2493,7 @@ const ideal resMatrixDense::getMatrix()
   {
     if ( resVectorList[i].elementOfS == linPolyS )
     {
-      for (j=1; j <= pVariables; j++ )
+      for (j=1; j <= (currRing->N); j++ )
       {
         if ( MATELEM(resmat,numVectors-i,
                      numVectors-resVectorList[i].numColParNr[j-1])!=NULL )
@@ -2497,7 +2502,7 @@ const ideal resMatrixDense::getMatrix()
         // FIX ME
         if ( FALSE )
         {
-          pSetCoeff( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), nPar(j) );
+          pSetCoeff( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), n_Param(j,currRing) );
         }
         else
         {
@@ -2554,7 +2559,7 @@ const number resMatrixDense::getDetAt( const number* evpoint )
   {
     if ( linPolyS == getMVector(k)->elementOfS )
     {
-      for ( i= 0; i < pVariables; i++ )
+      for ( i= 0; i < (currRing->N); i++ )
       {
         pSetCoeff( MATELEM(m,numVectors-k,numVectors-(getMVector(k)->numColParNr)[i]),
                    nCopy(evpoint[i]) );
@@ -2566,7 +2571,7 @@ const number resMatrixDense::getDetAt( const number* evpoint )
 
   // evaluate determinant of matrix m using factory singclap_det
 #ifdef HAVE_FACTORY
-  poly res= singclap_det( m );
+  poly res= singclap_det( m, currRing );
 #else
   poly res= NULL;
 #endif
@@ -2630,7 +2635,7 @@ const number resMatrixDense::getSubDet()
   }
 
 #ifdef HAVE_FACTORY
-  poly res= singclap_det( mat );
+  poly res= singclap_det( mat, currRing );
 #else
   poly res= NULL;
 #endif
@@ -2752,7 +2757,7 @@ poly uResultant::linearPoly( const resMatType rrmt )
   poly newlp= pOne();
   poly actlp, rootlp= newlp;
 
-  for ( i= 1; i <= pVariables; i++ )
+  for ( i= 1; i <= (currRing->N); i++ )
   {
     actlp= newlp;
     pSetExp( actlp, i, 1 );
@@ -3200,7 +3205,7 @@ ideal loNewtonPolytope( const ideal id )
   int n,totverts,idelem;
   ideal idr;
 
-  n= pVariables;
+  n= (currRing->N);
   idelem= IDELEMS(id);  // should be n+1
 
   totverts = 0;

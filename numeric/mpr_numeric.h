@@ -170,6 +170,9 @@ private:
   int rc,mc;
   bool found_roots;
 };
+
+
+
 //<-
 
 //-> simplex computation
