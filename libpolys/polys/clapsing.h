@@ -23,6 +23,7 @@
 poly singclap_gcd ( poly f, poly g, const ring r );
 
 /*
+// commented out!
 napoly singclap_alglcm ( napoly f, napoly g );
 void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
 */
@@ -39,8 +40,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r);
 
 ideal singclap_sqrfree ( poly f, const ring r );
 
-matrix singclap_irrCharSeries ( ideal I, const ring r);
-
 #ifdef HAVE_NTL
 #if 1
 matrix singntl_HNF(matrix A, const ring r);
@@ -52,7 +51,11 @@ intvec* singntl_LLL(intvec* A, const ring r);
 
 BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
-char* singclap_neworder ( ideal I, const ring r);
+/* 
+ // need libfac??? commented out!
+ matrix singclap_irrCharSeries ( ideal I, const ring r);
+ char* singclap_neworder ( ideal I, const ring r); 
+*/ 
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );

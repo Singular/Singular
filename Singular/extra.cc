@@ -980,7 +980,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_FACTORY
       if(strcmp(sys_cmd,"neworder")==0)
       {
-        if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
+#if 1
+  Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
+  return FALSE;
+#else	 
+	if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
         {
           res->rtyp=STRING_CMD;
           res->data=(void *)singclap_neworder((ideal)h->Data(), currRing);
@@ -988,6 +992,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else
           WerrorS("ideal expected");
+#endif	
       }
       else
   #endif

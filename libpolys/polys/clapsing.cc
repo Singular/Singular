@@ -961,7 +961,8 @@ TODO(somebody, add libfac)
   return res;
 }*/
 
-/*char* singclap_neworder ( ideal I, const ring r)
+/*
+char* singclap_neworder ( ideal I, const ring r)
 {
   int i;
   Off(SW_RATIONAL);
