@@ -1099,7 +1099,7 @@ int singclap_det_i( intvec * m)
 }
 
 #ifdef HAVE_NTL
-#if 0
+#if 1
 matrix singntl_HNF(matrix  m, const ring s )
 {
   int r=m->rows();
@@ -1108,7 +1108,9 @@ matrix singntl_HNF(matrix  m, const ring s )
     Werror("HNF of %d x %d matrix",r,m->cols());
     return NULL;
   }
-  matrix res=mpNew(r,r);
+   
+  matrix res=mp_New(r,r);
+   
   if (rField_is_Q(s))
   {
 
@@ -1133,7 +1135,8 @@ matrix singntl_HNF(matrix  m, const ring s )
   }
   return res;
 }
-intvec* singntl_HNF(intvec*  m)
+
+intvec* singntl_HNF(intvec*  m, const ring)
 {
   int r=m->rows();
   if (r!=m->cols())
@@ -1163,11 +1166,12 @@ intvec* singntl_HNF(intvec*  m)
   delete MM;
   return mm;
 }
+
 matrix singntl_LLL(matrix  m, const ring s )
 {
   int r=m->rows();
   int c=m->cols();
-  matrix res=mpNew(r,c);
+  matrix res=mp_New(r,c);
   if (rField_is_Q(s))
   {
     CFMatrix M(r,c);
@@ -1191,7 +1195,8 @@ matrix singntl_LLL(matrix  m, const ring s )
   }
   return res;
 }
-intvec* singntl_LLL(intvec*  m)
+
+intvec* singntl_LLL(intvec*  m, const ring)
 {
   int r=m->rows();
   int c=m->cols();

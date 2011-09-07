@@ -12,7 +12,7 @@
 #include "config.h"
 
 #ifdef HAVE_NTL
-#if 0
+#if 1
 #include "NTLconvert.h"
 #include "canonicalform.h"
 #include "cf_defs.h"
