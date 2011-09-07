@@ -5001,12 +5001,12 @@ static BOOLEAN jjmpDetBareiss(leftv res, leftv v)
 }
 static BOOLEAN jjidFreeModule(leftv res, leftv v)
 {
-  res->data = (char *)idFreeModule((int)(long)v->Data());
+  res->data = (char *)id_FreeModule((int)(long)v->Data(), currRing);
   return FALSE;
 }
 static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
 {
-  res->data = (char *)idVec2Ideal((poly)v->Data());
+  res->data = (char *)id_Vec2Ideal((poly)v->Data(), currRing);
   return FALSE;
 }
 static BOOLEAN jjrCharStr(leftv res, leftv v)

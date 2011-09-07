@@ -36,7 +36,7 @@ inline void idDelete (ideal* h, ring r = currRing)
 //
 /// Count the effective size of an ideal
 /// (without the trailing allocated zero-elements)
-static inline int idSize(const ideal id)
+static inline int idSize(const ideal id, const ring r = currRing)
 {
   int j = IDELEMS(id) - 1;
   poly* mm = id->m;
@@ -72,9 +72,11 @@ static inline int idSize(const ideal id)
 #define idPrint(A) ((void)0)
 #endif
 
-ideal id_Copy (ideal h1, const ring r);
+ideal id_Copy (ideal h1, const ring r = currRing);
 
-#ifdef PDEBUG
+#if 0
+
+// ifdef PDEBUG // Sorry: the following was lost........ :((((((((
 ideal idDBCopy(ideal h1,const char *f,int l,const ring r);
 #define id_DBCopy(A,r) idDBCopy(A,__FILE__,__LINE__,r)
 
@@ -116,7 +118,13 @@ int     idGetNumberOfChoise(int t, int d, int begin, int end, int * choise);
 
 int     binom (int n,int r);
 
-ideal   idFreeModule (int i);
+inline ideal idFreeModule (int i, const ring R = currRing)
+{
+  return id_FreeModule (i, R);
+}
+
+
+
 
 ideal   idSect (ideal h1,ideal h2);
 ideal   idMultSect(resolvente arg, int length);
@@ -153,7 +161,10 @@ ideal   idHomogen(ideal h, int varnum);
 
 BOOLEAN idIsSubModule(ideal id1,ideal id2);
 
-ideal   idVec2Ideal(poly vec);
+inline ideal idVec2Ideal(poly vec, const ring R = currRing)
+{
+  return id_Vec2Ideal(vec, R);
+}
 
 ideal   idMatrix2Module(matrix mat);
 

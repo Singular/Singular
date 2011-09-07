@@ -2364,8 +2364,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                   }
                 }
 
-                matrix Temp=mp_Transp((matrix) idVec2Ideal(r), currRing);
-                matrix R=mpNew(MATCOLS((matrix) idVec2Ideal(f)),1);
+                matrix Temp=mp_Transp((matrix) id_Vec2Ideal(r, currRing), currRing);
+                matrix R=mpNew(MATCOLS((matrix) id_Vec2Ideal(f, currRing)),1);
                 for (int k=1;k<=MATROWS(Temp);k++)
                 {
                   MATELEM(R,k,1)=MATELEM(Temp,k,1);
