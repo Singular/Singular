@@ -1558,7 +1558,7 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
          {
              // generalized prod-crit for lie-type
              strat->cp++;
-             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i], currRing);
          }
          else
         if( ALLOW_PROD_CRIT(strat) )
@@ -7303,7 +7303,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 //         {
 //             // generalized prod-crit for lie-type
 //             strat->cp++;
-//             Lp.p = nc_p_Bracket_qq(pCopy(p),q);
+//             Lp.p = nc_p_Bracket_qq(pCopy(p),q, currRing);
 //         }
 //         else
 //         if( ALLOW_PROD_CRIT(strat) )

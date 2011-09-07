@@ -1234,7 +1234,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else return TRUE;
         res->rtyp=POLY_CMD;
-        if (rIsPluralRing(currRing))  res->data=nc_p_Bracket_qq(p,q);
+        if (rIsPluralRing(currRing))  res->data=nc_p_Bracket_qq(p,q, currRing);
         else res->data=NULL;
         return FALSE;
       }
