@@ -274,8 +274,7 @@ static inline poly nc_CreateSpoly(const poly p1, const poly p2, const ring r)
 poly nc_CreateShortSpoly(poly p1, poly p2, const ring r);
 
 /* brackets: p will be destroyed... */
-poly nc_p_Bracket_qq(poly p, const poly q);
-
+poly nc_p_Bracket_qq(poly p, const poly q, const ring r);
 
 static inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
 {

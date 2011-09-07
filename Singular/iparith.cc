@@ -2690,7 +2690,7 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
       if( (poly)a->Data() != NULL )
       {
         poly p = (poly)a->CopyD(POLY_CMD); // p = copy!
-        res->data = nc_p_Bracket_qq(p,q); // p will be destroyed!
+        res->data = nc_p_Bracket_qq(p,q, currRing); // p will be destroyed!
       }
     }
   }
