@@ -2818,8 +2818,13 @@ BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 }
 BOOLEAN jjCHARSERIES(leftv res, leftv u)
 {
+#if 1
+  Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
+  return FALSE;
+#else   
   res->data=singclap_irrCharSeries((ideal)u->Data(), currRing);
   return (res->data==NULL);
+#endif
 }
 #endif
 
