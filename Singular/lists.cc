@@ -245,7 +245,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           if (idIs0(r[i-1]))
           {
             idDelete(&(r[i]));
-            r[i]=idFreeModule(rank);
+            r[i]=id_FreeModule(rank, currRing);
           }
           else
           {
