@@ -21,7 +21,10 @@ extern ideal currQuotient;
 ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
-inline void idDelete (ideal* h, ring r = currRing) { id_Delete(h, r); } ;
+inline void idDelete (ideal* h, ring r = currRing)
+{ 
+  id_Delete(h, r); 
+}
 
 /// initialise the maximal ideal (at 0)
 //ideal id_MaxIdeal(int deg, const ring r); 
