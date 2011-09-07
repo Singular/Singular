@@ -287,8 +287,8 @@ static ideal kInterRedCC(ideal F, ideal Q)
 //    mflush();
 //  }
   //strat->syzComp     = 0;
-  strat->kHEdgeFound = ppNoether != NULL;
-  strat->kNoether=pCopy(ppNoether);
+  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kNoether=pCopy((currRing->ppNoether));
   strat->ak = id_RankFreeModule(F, currRing);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)omAlloc((currRing->N+1)*sizeof(BOOLEAN));
@@ -1801,8 +1801,8 @@ intvec* MkInterRedNextWeight(intvec* iva, intvec* ivb, ideal G)
 static void VMrDefault(intvec* va)
 {
 
-  if (ppNoether!=NULL)
-    pDelete(&ppNoether);
+  if ((currRing->ppNoether)!=NULL)
+    pDelete(&(currRing->ppNoether));
 
   if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
       ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
@@ -1872,8 +1872,8 @@ static void VMrDefault(intvec* va)
 static void VMrDefaultlp(void)
 {
 
-  if (ppNoether!=NULL)
-    pDelete(&ppNoether);
+  if ((currRing->ppNoether)!=NULL)
+    pDelete(&(currRing->ppNoether));
 
   if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
       ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))

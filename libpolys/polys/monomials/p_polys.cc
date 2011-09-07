@@ -3031,7 +3031,7 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
 
 void p_SetGlobals(const ring r, BOOLEAN complete)
 {
-  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r);
+// // //  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r); // ???
 
   if (complete)
   {
