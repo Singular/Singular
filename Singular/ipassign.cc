@@ -213,8 +213,8 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 static BOOLEAN jjNOETHER(leftv res, leftv a)
 {
   poly p=(poly)a->CopyD(POLY_CMD);
-  pDelete(&ppNoether);
-  ppNoether=p;
+  pDelete(&(currRing->ppNoether));
+  (currRing->ppNoether)=p;
   return FALSE;
 }
 /*=================== proc =================*/

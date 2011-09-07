@@ -1114,16 +1114,16 @@ void initMora(ideal F,kStrategy strat)
   strat->posInLOld = strat->posInL;
   strat->posInLOldFlag = TRUE;
   strat->initEcart = initEcartNormal;
-  strat->kHEdgeFound = ppNoether != NULL;
+  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
   if ( strat->kHEdgeFound )
-     strat->kNoether = pCopy(ppNoether);
+     strat->kNoether = pCopy((currRing->ppNoether));
   else if (strat->kHEdgeFound || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (strat->kHEdgeFound)
   {
-    strat->HCord = currRing->pFDeg(ppNoether,currRing)+1;
+    strat->HCord = currRing->pFDeg((currRing->ppNoether),currRing)+1;
     strat->posInT = posInT2;
   }
   else
@@ -1201,7 +1201,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
   /*updateS in initBuchMora has Hecketest
   * and could have put strat->kHEdgdeFound FALSE*/
-  if (ppNoether!=NULL)
+  if ((currRing->ppNoether)!=NULL)
   {
     strat->kHEdgeFound = TRUE;
   }
@@ -1436,8 +1436,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   //  return pCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
-  strat->kHEdgeFound = ppNoether != NULL;
-  strat->kNoether    = pCopy(ppNoether);
+  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kNoether    = pCopy((currRing->ppNoether));
   test|=Sy_bit(OPT_REDTAIL);
   test&=~Sy_bit(OPT_INTSTRATEGY);
   if (TEST_OPT_STAIRCASEBOUND
@@ -1566,8 +1566,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   //  return idCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
-  strat->kHEdgeFound = ppNoether != NULL;
-  strat->kNoether=pCopy(ppNoether);
+  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kNoether=pCopy((currRing->ppNoether));
   test|=Sy_bit(OPT_REDTAIL);
   if (TEST_OPT_STAIRCASEBOUND
   && (0<Kstd1_deg)
@@ -2199,8 +2199,8 @@ ideal kInterRedOld (ideal F, ideal Q)
 //    mflush();
 //  }
   //strat->syzComp     = 0;
-  strat->kHEdgeFound = ppNoether != NULL;
-  strat->kNoether=pCopy(ppNoether);
+  strat->kHEdgeFound = (currRing->ppNoether) != NULL;
+  strat->kNoether=pCopy((currRing->ppNoether));
   strat->ak = id_RankFreeModule(tempF,currRing);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)omAlloc(((currRing->N)+1)*sizeof(BOOLEAN));

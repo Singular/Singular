@@ -1511,7 +1511,7 @@ idhdl rDefault(const char *s)
   if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &IDROOT);
   if (tmp==NULL) return NULL;
 
-  if (ppNoether!=NULL) pDelete(&ppNoether);
+  if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
@@ -5396,7 +5396,7 @@ void rKill(ring r)
       {
         currQuotient=NULL;
       }
-      if (ppNoether!=NULL) pDelete(&ppNoether);
+      if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
       if (sLastPrinted.RingDependend())
       {
         sLastPrinted.CleanUp();

@@ -624,7 +624,7 @@ void * sleftv::CopyD(int t)
   {
     if (iiCheckRing(t)) return NULL;
     void *x=data;
-    if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
+    if (rtyp==VNOETHER) x=(void *)pCopy((currRing->ppNoether));
     else if ((rtyp==VMINPOLY)&& \
 		    nCoeff_is_Extension(currRing->cf) && \
 		    (!nCoeff_is_GF(currRing->cf)))
@@ -1041,7 +1041,7 @@ void * sleftv::Data()
                          return (void *)currRing->cf->extRing->minideal->m[0];
                        else
                          return (void *)currRing->cf->nNULL;
-      case VNOETHER:   return (void *) ppNoether;
+      case VNOETHER:   return (void *) (currRing->ppNoether);
       case IDHDL:
         return IDDATA((idhdl)data);
       case POINTER_CMD:
