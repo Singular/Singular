@@ -84,31 +84,5 @@ fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & desti
 
 BOOLEAN fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
 
-// fglmproc(...):
-// The procedure which has to be called from the interpreter for fglm.
-// first is the sourceRing, second is the given ideal in sourceRing.
-// Returns the groebnerbasis of the sourceIdeal in the currentRing.
-// Checks, if the ideal is really a reduced groebner basis of a
-// 0-dimensional Ideal. Returns TRUE if an error occoured.
-BOOLEAN fglmProc( leftv result, leftv first, leftv second );
-
-// fglmquotproc(...):
-// The procedure which has to be called from the interpreter for fglmquot.
-// first is the ideal I, second is the polynomial q. The polynomial must
-// be reduced with respect to I.
-// Returns the groebnerbasis of I:q in the currentRing.
-// Checks, if the ideal is really a reduced groebner basis of a
-// 0-dimensional Ideal and if q is really reduced.
-//  Returns TRUE if an error occoured.
-BOOLEAN fglmQuotProc( leftv result, leftv first, leftv second );
-
-// FindUnivariatePolys (test)
-BOOLEAN FindUnivariateWrapper( ideal source, ideal & dest );
-
-// wrapper for FindUnivariatePolys (test)
-BOOLEAN findUniProc( leftv result, leftv first);
-
-// homogeneous FGLM
-ideal fglmhomProc(leftv first, leftv second);
 #endif
 #endif

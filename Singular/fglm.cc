@@ -19,18 +19,26 @@
 #include <kernel/mod2.h>
 
 #ifdef HAVE_FACTORY
-#include <Singular/tok.h>
+
+
+#include <omalloc/omalloc.h>
 #include <misc/options.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/monomials/maps.h>
+
+#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <kernel/febase.h>
-#include <polys/monomials/maps.h>
-#include <omalloc/omalloc.h>
+
 #include <kernel/kstd1.h>
 #include <kernel/fglm.h>
+
+#include <Singular/fglm.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/tok.h>
+
 
 // internal Version: 1.18.1.6
 //     enumeration to handle the various errors to occour.
