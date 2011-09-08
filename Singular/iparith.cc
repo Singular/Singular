@@ -69,6 +69,7 @@
 #endif /* HAVE_FACTORY */
 #ifdef HAVE_FACTORY
 #  include <kernel/fglm.h>
+#  include <Singular/fglm.h>
 #endif /* HAVE_FACTORY */
 #include <Singular/interpolation.h>
 

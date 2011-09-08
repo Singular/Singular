@@ -19,24 +19,34 @@
  */
 
 #include <kernel/mod2.h>
+
+
 #ifdef HAVE_FACTORY
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h.
+
 #include <factory/factory.h>
+
 #include <factory/templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_list.cc>
+
+#include <omalloc/omalloc.h>
 
 #include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <polys/monomials/maps.h>
+#include <polys/monomials/ring.h>
+
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
 #include <kernel/febase.h>
-#include <polys/monomials/maps.h>
-#include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
-#include <misc/intvec.h>
+
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
+
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define PROT2(msg,arg)

@@ -163,6 +163,7 @@ HEADERS=\
    distrib.h \
    eigenval_ip.h \
    feOpt.h \
+   fglm.h \
    gms.h \
    grammar.h \
    interpolation.h \
