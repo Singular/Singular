@@ -2461,6 +2461,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 #include <polys/clapsing.h>
 
 #ifdef HAVE_FACTORY
+#if 0
 poly id_GCD(poly f, poly g, const ring r)
 {
   ring save_r=currRing;
@@ -2476,6 +2477,23 @@ poly id_GCD(poly f, poly g, const ring r)
   rChangeCurrRing(save_r);
   return gcd_p;
 }
+#else
+poly id_GCD(poly f, poly g, const ring r)
+{
+  ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
+  intvec *w = NULL;
+
+  ring save_r = currRing; rChangeCurrRing(r); ideal S=idSyzygies(I,testHomog,&w); rChangeCurrRing(save_r);   
+   
+  if (w!=NULL) delete w;
+  poly gg=p_TakeOutComp(&(S->m[0]), 2, r);
+  id_Delete(&S, r);
+  poly gcd_p=singclap_pdivide(f,gg, r);
+  p_Delete(&gg, r);
+   
+  return gcd_p;
+}
+#endif
 #endif
 
 /*2

@@ -1694,29 +1694,6 @@ int id_MinDegW(ideal M,intvec *w, const ring r)
 
 // #include <kernel/clapsing.h>
 
-#ifdef HAVE_FACTORY
-#if 0
-poly id_GCD(poly f, poly g, const ring r)
-{
-  ring save_r=r;
-  rChangeCurrRing(r);
-  ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
-  intvec *w = NULL;
-
-  ideal S=idSyzygies(I,testHomog,&w);
-
-  if (w!=NULL) delete w;
-  poly gg=pTakeOutComp(&(S->m[0]),2);
-  id_Delete(&S, r);
-  poly gcd_p=singclap_pdivide(f,gg);
-  pDelete(&gg);
-  rChangeCurrRing(save_r);
-  return gcd_p;
-}
-#endif
-#endif
-
-
 /*2
 * transpose a module
 */
