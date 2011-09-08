@@ -50,7 +50,7 @@ PYTHON_LIBS   = `python-config --libs`
 PIPE		= -pipe
 CFLAGS		= -O3 -Wall -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
 CXXFLAGS	= -O3 -Wall -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
-CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS	=  --no-exceptions ## -fno-implicit-templates
 CPPFLAGS	= -I${srcdir} -I..  -I${includedir} ${LIBPOLYS_INCLUDES}  ${PYTHON_INCLUDES}
 DEFSNL		= -DNDEBUG -DOM_NDEBUG
 DEFS		= ${DEFSNL} -DLIBSINGULAR
@@ -70,6 +70,10 @@ MP_LIBS		= -lMPT -lMP -lnsl
 ###
 ### file sets
 ###
+
+# special C++ source files (need extra compiling and/or linking), for which
+# dependencies should be generated
+ESOURCES=claptmpl.cc
 
 # normal C++ source files
 CXXSOURCES=\
@@ -132,7 +136,7 @@ CXXSOURCES=\
    utils.cc\
    walk.cc\
    walk_ip.cc\
-   wrapper.cc
+   wrapper.cc ${ESOURCES} 
 
 #   tesths.cc
 
@@ -140,9 +144,6 @@ CXXSOURCES=\
 
 CXXSOURCES2	= SingularBuilder.cpp
 
-# special C++ source files (need extra compiling and/or linking), for which
-# dependencies should be generated
-ESOURCES=claptmpl.cc
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
 	kInline.h

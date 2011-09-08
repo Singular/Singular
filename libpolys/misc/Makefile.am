@@ -1,6 +1,6 @@
 lib_LIBRARIES=libmisc.a libmisc_g.a
 
-CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
 libmisc_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libmisc_g_a_CFLAGS = ${PIPE}
