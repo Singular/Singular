@@ -1,3 +1,11 @@
+#include "mod2.h"
+
+#include <omalloc/omalloc.h>
+#include <misc/auxiliary.h>
+
+#include "polys.h"
+
+
 /* Returns TRUE if
      * LM(p) | LM(lcm)
      * LC(p) | LC(lcm) only if ring
@@ -7,7 +15,7 @@
          * LE(p, j)  != LE(lcm, j)
          * LE(p2, j) != LE(lcm, j)   ==> LCM(p2, p) != lcm
 */
-BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm, const ring R = currRing)
+BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm, const ring R)
 {
   int k, j;
 
@@ -60,8 +68,7 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm, const ring R = currRing)
   return FALSE;
 }
 #ifdef HAVE_RATGRING
-BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm,
-		const ring R = currRing)
+BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm, const ring R)
 {
   int k, j;
 
