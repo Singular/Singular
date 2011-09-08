@@ -130,4 +130,17 @@ void idShow(const ideal id, const ring lmRing, const ring tailRing, const int de
 #endif
 
 
+/// insert h2 into h1 depending on the two boolean parameters:
+/// - if zeroOk is true, then h2 will also be inserted when it is zero
+/// - if duplicateOk is true, then h2 will also be inserted when it is
+///   already present in h1
+/// return TRUE iff h2 was indeed inserted
+BOOLEAN id_InsertPolyWithTests (ideal h1, const int validEntries,
+                                const poly h2, const bool zeroOk,
+                                const bool duplicateOk, const ring r);
+
+
+intvec * id_QHomWeight(ideal id, const ring r);
+
+
 #endif

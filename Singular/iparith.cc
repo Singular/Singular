@@ -538,7 +538,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPOWER_ID(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idPower((ideal)(u->Data()),(int)(long)(v->Data()));
+  res->data = (char *)id_Power((ideal)(u->Data()),(int)(long)(v->Data()), currRing);
   if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
@@ -2311,7 +2311,7 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
   int d=deg(p,currRing);
   pLmDelete(p);
   if (d==1)
-    res->data = (char *)idHomogen((ideal)u->Data(),i);
+    res->data = (char *)id_Homogen((ideal)u->Data(), i, currRing);
   else
     WerrorS("variable must have weight 1");
   return (d!=1);
@@ -5559,7 +5559,7 @@ static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv w)
   int d=pWTotaldegree(p);
   pLmDelete(p);
   if (d==1)
-    res->data = (char *)idHomogen((ideal)u->Data(),i);
+    res->data = (char *)id_Homogen((ideal)u->Data(), i, currRing);
   else
     WerrorS("variable must have weight 1");
   return (d!=1);
