@@ -1881,7 +1881,7 @@ poly      p_TakeOutComp1(poly * p, int k, const ring r);
 void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
 
 // This is something weird -- Don't use it, unless you know what you are doing
-poly      p_TakeOutComp(poly * p, int k);
+poly      p_TakeOutComp(poly * p, int k, const ring r);
 
 void      p_DeleteComp(poly * p,int k, const ring r);
 
