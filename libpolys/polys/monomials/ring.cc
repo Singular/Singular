@@ -4769,17 +4769,17 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
 
 ring rAssure_dp_S(const ring r)
 {
-  return rAssure_Global(ringorder_dp, ringorder_S,r);
+  return rAssure_Global(ringorder_dp, ringorder_S, r);
 }
 
 ring rAssure_dp_C(const ring r)
 {
-  return rAssure_Global(ringorder_dp, ringorder_C,r);
+  return rAssure_Global(ringorder_dp, ringorder_C, r);
 }
 
 ring rAssure_C_dp(const ring r)
 {
-  return rAssure_Global(ringorder_C, ringorder_dp,r);
+  return rAssure_Global(ringorder_C, ringorder_dp, r);
 }
 
 

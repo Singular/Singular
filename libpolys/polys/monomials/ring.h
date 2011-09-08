@@ -641,11 +641,13 @@ static inline int rGetCurrSyzLimit(const ring r)
 void   rSetSyzComp(int k, const ring r);
 
 // Ring Manipulations
-ring   rAssure_HasComp(const ring r, BOOLEAN complete = TRUE);
+ring   rAssure_HasComp(const ring r);
 ring   rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
-ring   rAssure_dp_S(const ring r, BOOLEAN complete = TRUE);
-ring   rAssure_dp_C(const ring r, BOOLEAN complete = TRUE);
-ring   rAssure_C_dp(const ring r, BOOLEAN complete = TRUE);
+
+ring   rAssure_dp_S(const ring r);
+ring   rAssure_dp_C(const ring r);
+ring   rAssure_C_dp(const ring r);
+
 /// makes sure that c/C ordering is last ordering
 ring   rAssure_CompLastBlock(const ring r, BOOLEAN complete = TRUE);
 

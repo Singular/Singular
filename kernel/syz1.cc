@@ -2466,7 +2466,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->length = *length = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
-  syzstr->syRing = rAssure_dp_S(origR, TRUE);
+  syzstr->syRing = rAssure_dp_S(origR);
   assume(syzstr->syRing != origR); // why?
   rChangeCurrRing(syzstr->syRing);
    
@@ -2607,7 +2607,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
     syzstr->length = maxlength = (currRing->N)+2;
 
   // Creare dp,S ring and change to it
-  syzstr->syRing = rAssure_dp_S(origR, TRUE);
+  syzstr->syRing = rAssure_dp_S(origR);
   assume(syzstr->syRing != origR);
   assume(syzstr->syRing->typ[1].ord_typ == ro_syzcomp);
   rChangeCurrRing(syzstr->syRing);
