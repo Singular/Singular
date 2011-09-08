@@ -306,10 +306,18 @@ BOOLEAN   pIsHomogeneous (poly p);
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
 // On return all components pf *q == 0
-void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
+inline void pTakeOutComp(poly *p, long comp, poly *q, int *lq, const ring R = currRing)
+{ 
+  return p_TakeOutComp(p, comp, q, lq, R);
+}
+
 
 // This is something weird -- Don't use it, unless you know what you are doing
-poly      pTakeOutComp(poly * p, int k);
+inline poly      pTakeOutComp(poly * p, int k, const ring R = currRing)
+{
+  return p_TakeOutComp(p, k, R);
+}
+
 /* old spielwiese
 #define   pTakeOutComp(p,k,q,lq)    p_TakeOutComp(p,k,q,lq,currRing)
 
