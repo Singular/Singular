@@ -120,5 +120,7 @@ BOOLEAN p_LmIsConstantRat(const poly p, const ring r);
 
 BOOLEAN p_LmIsConstantCompRat(const poly p, const ring r);
 
+BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm);
+
 #endif /* HAVE_PLURAL */
 #endif

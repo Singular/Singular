@@ -350,9 +350,19 @@ void  pVec2Polys(poly v, polyset *p, int *len);
 #define   pVar(m) p_Var(m,currRing)
 
 /*-----------specials for spoly-computations--------------*/
-BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
-BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm);
+
+/// Returns TRUE if
+///      * LM(p) | LM(lcm)
+///      * LC(p) | LC(lcm) only if ring
+///      * Exists i, j:
+///          * LE(p, i)  != LE(lcm, i)
+///          * LE(p1, i) != LE(lcm, i)   ==> LCM(p1, p) != lcm
+///          * LE(p, j)  != LE(lcm, j)
+///          * LE(p2, j) != LE(lcm, j)   ==> LCM(p2, p) != lcm
+BOOLEAN pCompareChain (poly p, poly p1, poly p2, poly lcm, const ring R = currRing);
+
 #define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
+
 
 
 // returns the length of a polynomial (numbers of monomials)
