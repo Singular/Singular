@@ -2289,7 +2289,7 @@ static BOOLEAN jjHOMOG_P(leftv res, leftv u, leftv v)
   int d=pWTotaldegree(p);
   pLmDelete(p);
   if (d==1)
-    res->data = (char *)pHomogen((poly)u->Data(),i);
+    res->data = (char *)p_Homogen((poly)u->Data(), i, currRing);
   else
     WerrorS("variable must have weight 1");
   return (d!=1);
@@ -5577,7 +5577,7 @@ static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv w)
   int d=pWTotaldegree(p);
   pLmDelete(p);
   if (d==1)
-    res->data = (char *)pHomogen((poly)u->Data(),i);
+    res->data = (char *)p_Homogen((poly)u->Data(), i, currRing);
   else
     WerrorS("variable must have weight 1");
   return (d!=1);

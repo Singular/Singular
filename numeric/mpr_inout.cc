@@ -126,7 +126,7 @@ mprState mprIdealCheck( const ideal theIdeal,
     poly p = (theIdeal->m)[k];
     if ( pIsConstant(p) ) state= mprHasOne;
     else
-    if ( (mtype == uResultant::denseResMat) && !pIsHomogeneous(p) )
+    if ( (mtype == uResultant::denseResMat) && !p_IsHomogeneous(p, currRing) )
       state=mprNotHomog;
   }
 
