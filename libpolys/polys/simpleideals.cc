@@ -1427,60 +1427,6 @@ BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
   return TRUE;
 }
 
-// uses glabl vars via pSetModDeg
-//BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
-//{
-//  if ((Q!=NULL) && (!idHomIdeal(Q,NULL)))  { PrintS(" Q not hom\n"); return FALSE;}
-//  if (idIs0(m)) return TRUE;
-//
-//  int cmax=-1;
-//  int i;
-//  poly p=NULL;
-//  int length=IDELEMS(m);
-//  poly* P=m->m;
-//  for (i=length-1;i>=0;i--)
-//  {
-//    p=P[i];
-//    if (p!=NULL) cmax=si_max(cmax,(int)pMaxComp(p)+1);
-//  }
-//  if (w != NULL)
-//  if (w->length()+1 < cmax)
-//  {
-//    // Print("length: %d - %d \n", w->length(),cmax);
-//    return FALSE;
-//  }
-//
-//  if(w!=NULL)
-//    pSetModDeg(w);
-//
-//  for (i=length-1;i>=0;i--)
-//  {
-//    p=P[i];
-//    poly q=p;
-//    if (p!=NULL)
-//    {
-//      int d=pFDeg(p,currRing);
-//      loop
-//      {
-//        pIter(p);
-//        if (p==NULL) break;
-//        if (d!=pFDeg(p,currRing))
-//        {
-//          //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing));
-//          if(w!=NULL)
-//            pSetModDeg(NULL);
-//          return FALSE;
-//        }
-//      }
-//    }
-//  }
-//
-//  if(w!=NULL)
-//    pSetModDeg(NULL);
-//
-//  return TRUE;
-//}
-
 ideal id_Jet(ideal i,int d, const ring R)
 {
   ideal r=idInit((i->nrows)*(i->ncols),i->rank);
