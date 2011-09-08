@@ -18,7 +18,10 @@ typedef ideal *            resolvente;
 extern ideal currQuotient;
 
 
-ideal idCopyFirstK (const ideal ide, const int k);
+inline ideal idCopyFirstK (const ideal ide, const int k, ring R = currRing)
+{
+  return id_CopyFirstK(ide, k, R);
+}
 
 /// delete an ideal
 inline void idDelete (ideal* h, ring r = currRing)
@@ -33,10 +36,10 @@ inline void idDelete (ideal* h, ring r = currRing)
 /// index of generator with leading term in ground ring (if any); otherwise -1
 //int id_PosConstant(ideal id, const ring r)
 #define idPosConstant(I) id_PosConstant(I,currRing)
-//
+
 /// Count the effective size of an ideal
 /// (without the trailing allocated zero-elements)
-static inline int idSize(const ideal id, const ring r = currRing)
+static inline int idSize(const ideal id)
 {
   int j = IDELEMS(id) - 1;
   poly* mm = id->m;
@@ -92,22 +95,42 @@ inline ideal idCopy(ideal A, const ring R = currRing)
 #endif
 
 
-ideal idAdd (ideal h1,ideal h2);
-  /* h1 + h2 */
-BOOLEAN idInsertPoly (ideal h1,poly h2);
-  /* h1 + h2 */
-BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries,
-  const poly h2, const bool zeroOk, const bool duplicateOk);
-  /* h1 + h2 */
-ideal idMult (ideal h1,ideal h2);
-  /*hh := h1 * h2*/
+/// h1 + h2
+inline ideal idAdd (ideal h1, ideal h2, const ring R = currRing)
+{
+  return id_Add(h1, h2, R);
+}
+
+BOOLEAN idInsertPoly (ideal h1,poly h2);  /* h1 + h2 */
+inline BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries, const poly h2, const bool zeroOk, const bool duplicateOk, const ring R = currRing)
+{
+  return id_InsertPolyWithTests (h1, validEntries, h2, zeroOk, duplicateOk, R);
+}
+
+
+/* h1 + h2 */
+
+/// hh := h1 * h2
+inline ideal idMult (ideal h1, ideal h2, const ring R = currRing)
+{
+  return id_Mult(h1, h2, R);
+}
 
 BOOLEAN idIs0 (ideal h);
 
 // returns TRUE, if idRankFreeModule(m) > 0
 BOOLEAN idIsModule(ideal m, const ring r);
-BOOLEAN idHomIdeal (ideal id, ideal Q=NULL);
-BOOLEAN idHomModule(ideal m, ideal Q,intvec **w);
+
+inline BOOLEAN idHomIdeal (ideal id, ideal Q=NULL, const ring R = currRing)
+{
+  return id_HomIdeal(id, Q, R);
+}
+
+inline BOOLEAN idHomModule(ideal m, ideal Q,intvec **w, const ring R = currRing)
+{
+   return id_HomModule(m, Q, w, R);
+}
+
 BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w);
 
 ideal idMinBase (ideal h1);
@@ -145,7 +168,7 @@ intvec * idMWLift(ideal mod,intvec * weights);
 ideal   idQuot (ideal h1,ideal h2,
                 BOOLEAN h1IsStb=FALSE, BOOLEAN resultIsIdeal=FALSE);
 
-ideal   idPower(ideal gid,int deg);
+// ideal   idPower(ideal gid,int deg);
 
 //ideal   idElimination (ideal h1,poly delVar);
 ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL);
@@ -157,7 +180,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE, intvec **w=NULL);
 
 ideal   idHead(ideal h);
 
-ideal   idHomogen(ideal h, int varnum);
+// ideal   idHomogen(ideal h, int varnum);
 
 BOOLEAN idIsSubModule(ideal id1,ideal id2);
 
@@ -166,31 +189,56 @@ inline ideal idVec2Ideal(poly vec, const ring R = currRing)
   return id_Vec2Ideal(vec, R);
 }
 
-ideal   idMatrix2Module(matrix mat);
+inline ideal   idMatrix2Module(matrix mat, const ring R = currRing)
+{
+  return idMatrix2Module(mat, R);
+}
 
-matrix  idModule2Matrix(ideal mod);
-
-matrix  idModule2formatedMatrix(ideal mod,int rows, int cols);
+inline matrix  idModule2Matrix(ideal mod, const ring R = currRing)
+{
+  return id_Module2Matrix(mod, R);
+}
+inline matrix  idModule2formatedMatrix(ideal mod, int rows, int cols, const ring R = currRing)
+{
+  return id_Module2formatedMatrix(mod, rows, cols, R);
+}
 
 ideal   idSubst(ideal i, int n, poly e);
 
-ideal   idJet(ideal i,int d);
-ideal   idJetW(ideal i,int d, intvec * iv);
+inline ideal   idJet(ideal i, int d, const ring R = currRing)
+{
+  return id_Jet(i, d, R);
+}
+
+inline ideal   idJetW(ideal i,int d, intvec * iv, const ring R = currRing)
+{
+  return id_JetW(i, d, iv, R);
+}
 ideal   idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL);
 
-BOOLEAN idIsZeroDim(ideal i);
+inline BOOLEAN idIsZeroDim(ideal i, const ring R = currRing)
+{
+  return idIsZeroDim(i, R);
+}
+
 matrix  idDiff(matrix i, int k);
 matrix  idDiffOp(ideal I, ideal J,BOOLEAN multiply=TRUE);
 
-intvec *idSort(ideal id,BOOLEAN nolex=TRUE);
+inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE, const ring R = currRing)
+{
+  return id_Sort(id, nolex, R);
+}
+
 ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
-// transpose a module
-ideal   idTransp(ideal a);
-// version of "ideal idTransp(ideal)" which works within a given ring.
-ideal id_Transp(ideal a, const ring rRing);
 
-intvec *idQHomWeight(ideal id);
+/// transpose a module
+inline ideal   idTransp(ideal a, const ring R = currRing)
+{
+  return id_Transp(a, R);
+}
+
+// intvec *idQHomWeight(ideal id);
 
 ideal idXXX (ideal  h1, int k);
 
@@ -201,4 +249,6 @@ ideal id_ChineseRemainder(ideal *x, number *q, int rl, const ring R);
 ideal id_Farey(ideal x, number N, const ring r);
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
+
+
 #endif

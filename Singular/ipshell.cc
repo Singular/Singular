@@ -2794,7 +2794,7 @@ BOOLEAN kWeight(leftv res,leftv id)
 
 BOOLEAN kQHWeight(leftv res,leftv v)
 {
-  res->data=(char *)idQHomWeight((ideal)v->Data());
+  res->data=(char *)id_QHomWeight((ideal)v->Data(), currRing);
   if (res->data==NULL)
     res->data=(char *)new intvec(rVar(currRing));
   return FALSE;
@@ -4421,7 +4421,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
       if (gls->m[j]!=NULL)
       {
         test_id->m[0]=gls->m[j];
-        intvec *dummy_w=idQHomWeight(test_id);
+        intvec *dummy_w=id_QHomWeight(test_id, currRing);
         if (dummy_w!=NULL)
         {
           WerrorS("Newton polytope not of expected dimension");
