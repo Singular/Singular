@@ -1,4 +1,4 @@
-CXXTEMPLFLAGS = -O0 --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS = -O0 --no-exceptions ##  ## -fno-implicit-templates
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory

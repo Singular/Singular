@@ -1,6 +1,6 @@
 lib_LIBRARIES=libreporter.a libreporter_g.a
 
-CXXTEMPLFLAGS = -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
 
 libreporter_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libreporter_g_a_CFLAGS = ${PIPE}

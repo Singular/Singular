@@ -1,6 +1,6 @@
 lib_LIBRARIES=libresources.a libresources_g.a
 
-CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
 libresources_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libresources_g_a_CFLAGS = ${PIPE}

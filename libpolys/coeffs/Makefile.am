@@ -1,5 +1,5 @@
 lib_LIBRARIES=libcoeffs.a libcoeffs_g.a
-CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
 libcoeffs_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libcoeffs_g_a_CFLAGS = ${PIPE}

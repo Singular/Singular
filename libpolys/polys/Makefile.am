@@ -1,4 +1,4 @@
-CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS	=  --no-exceptions ## -fno-implicit-templates
 
 
 DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long

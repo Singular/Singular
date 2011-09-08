@@ -1,6 +1,6 @@
 lib_LIBRARIES=libnumeric.a libnumeric_g.a
 
-CXXTEMPLFLAGS = -fno-implicit-templates --no-exceptions
+CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
 
 libnumeric_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libnumeric_g_a_CFLAGS = ${PIPE}
