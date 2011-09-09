@@ -26,9 +26,6 @@
 // This is a very dirty way to "normalize" numbers w.r.t. a
 // MinPoly
 
-/* debug output: Tok2Cmdname in maApplyFetch*/
-//#include "ipshell.h"
-
 #define MAX_MAP_DEG 128
 
 /*2

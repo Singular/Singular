@@ -15,16 +15,13 @@ typedef number (*nMapFunc)(number a, coeffs src, coeffs dst);
 struct sip_smap;
 typedef struct sip_smap *         map;
 
-poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap, ideal s=NULL);
+// poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap, ideal s=NULL);
+poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const ring dst_r);
+
 map maCopy(map theMap, const ring dst_ring);
 
 poly maIMap(ring src_ring, ring dst_ring, poly p);
 
-/*
-BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
-                     ring preimage_r, int *perm,
-                     int *par_perm,int P, nMapFunc nMap);
-*/
 void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
                 char **names,       int n,       char **par,       int nop,
                 int * perm, int *par_perm, n_coeffType ch);
