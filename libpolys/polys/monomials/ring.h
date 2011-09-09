@@ -717,7 +717,7 @@ void rKillModifiedRing_Simple(ring r);
 
 #ifdef RDEBUG
 void rDebugPrint(ring r);
-void pDebugPrint(poly p);
+// void pDebugPrint(poly p);
 void p_DebugPrint(poly p, const ring r);
 #endif
 

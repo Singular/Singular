@@ -2406,7 +2406,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   #ifdef RDEBUG
         if(strcmp(sys_cmd,"p")==0)
         {
-          pDebugPrint((poly)h->Data());
+          p_DebugPrint((poly)h->Data(), currRing);
           return FALSE;
         }
         else

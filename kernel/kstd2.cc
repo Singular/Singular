@@ -1138,7 +1138,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
 #if MYTEST
-      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
+      PrintS("New S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
@@ -1164,7 +1164,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #if MYTEST
-      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
+      PrintS("New (reduced) S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
