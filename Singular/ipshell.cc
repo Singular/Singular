@@ -1511,7 +1511,7 @@ idhdl rDefault(const char *s)
   if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &IDROOT);
   if (tmp==NULL) return NULL;
 
-  if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
+// if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
@@ -1520,7 +1520,7 @@ idhdl rDefault(const char *s)
 
   ring r = IDRING(tmp);
 
-  r->cf->ch = 32003;
+  r->cf = nInitChar(n_Zp, (void*)32003); //   r->cf->ch = 32003;
   r->N      = 3;
   /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
   /*names*/

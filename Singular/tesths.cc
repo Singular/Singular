@@ -7,15 +7,44 @@
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
+#include <kernel/mod2.h>
+
+#include <omalloc/omalloc.h>
+
 #include <misc/options.h>
 #include <misc/auxiliary.h>
+
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #endif
 
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
+#include <kernel/febase.h>
+#include <kernel/timer.h>
+#include <kernel/fegetopt.h>
+
+#ifdef HAVE_FANS
+#include <kernel/bbcone.h>
+#include <kernel/bbfan.h>
+#endif
+
+#include "ipshell.h"
+#include "cntrlc.h"
+#include "silink.h"
+#include "ipid.h"
+#include "sdb.h"
+#include "feOpt.h"
+#include "distrib.h"
+#include "version.h"
+#include "slInit.h"
+#include "ssiLink.h"
+#include "bigintm.h"
+#include "bbcone.h"
+#include "mmalloc.h"
+#include "tok.h"
+
+// #include "pyobject_setup.h"
+
 #include <unistd.h>
 #include <string.h>
 #include <stddef.h>
@@ -23,34 +52,16 @@
 #include <time.h>
 #include <errno.h>
 
-#include <Singular/ipshell.h>
-#include <kernel/febase.h>
-#include <Singular/cntrlc.h>
-#include <omalloc/omalloc.h>
-#include <Singular/silink.h>
-#include <Singular/ipid.h>
-#include <kernel/timer.h>
-#include <Singular/sdb.h>
-#include <kernel/fegetopt.h>
-#include "feOpt.h"
-#include <Singular/distrib.h>
-#include <Singular/version.h>
-#include <Singular/slInit.h>
-#include <Singular/ssiLink.h>
-#include <Singular/bigintm.h>
-#include <Singular/pyobject_setup.h>
-#include <omalloc/omalloc.h>
-#include <kernel/mmalloc.h>
-
-#ifdef HAVE_FANS
-#include <kernel/bbcone.h>
-#include <kernel/bbfan.h>
-#endif
 
 
 extern int siInit(char *);
 
 #if ! defined(LIBSINGULAR)
+
+#ifdef HAVE_FACTORY
+int initializeGMP(){ return 1; }
+#endif
+
 int mmInit2( void )
 {
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
