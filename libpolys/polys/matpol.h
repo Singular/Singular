@@ -55,11 +55,12 @@ BOOLEAN mp_Equal(matrix a, matrix b, const ring r);
 poly mp_Trace ( matrix a, const ring r);
 poly TraceOfProd ( matrix a, matrix b, int n, const ring r);
 
-poly mp_Det (matrix m, const ring r);
+// poly mp_Det (matrix m, const ring r);
 matrix mp_Wedge(matrix a, int ar, const ring r);
 
 // BOOLEAN mpJacobi(leftv res,leftv a);
 // BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
+
 poly mp_DetBareiss (matrix a, const ring r);
 
 //matrix mp_Homogen(matrix a, int v, const ring r);
