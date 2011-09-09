@@ -342,7 +342,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
   {
 #ifdef FACTORIZE2_DEBUG
     printf("start count_Factors(%d), Fdeg=%d, factor deg=%d\n",j,pTotaldegree(f),pTotaldegree(fac));
-    p_wrp(fac,currRing);PrintLn();
+    p_wrp(fac,r);PrintLn();
 #endif
     On(SW_RATIONAL);
     CanonicalForm F, FAC,Q,R;
