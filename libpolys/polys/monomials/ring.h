@@ -356,7 +356,7 @@ ring   rEnvelope(ring r);
 /// we must always have this test!
 static inline bool rIsPluralRing(const ring r)
 {
-  assume(r != NULL);   
+  assume(r != NULL); assume(r->cf != NULL);   
 #ifdef HAVE_PLURAL
   nc_struct *n;
   return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
@@ -410,25 +410,25 @@ BOOLEAN rRing_has_CompLastBlock(ring r);
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN rField_is_Ring_2toM(const ring r)
-{ assume(r != NULL); return ( getCoeffType(r->cf) == n_Z2m && nCoeff_is_Ring_2toM(r->cf) ); }
+{ assume(r != NULL); assume(r->cf != NULL); return ( getCoeffType(r->cf) == n_Z2m && nCoeff_is_Ring_2toM(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring_ModN(const ring r)
-{ assume(r != NULL); return ( getCoeffType(r->cf) == n_Zn && nCoeff_is_Ring_ModN(r->cf) ); }
+{ assume(r != NULL); assume(r->cf != NULL); return ( getCoeffType(r->cf) == n_Zn && nCoeff_is_Ring_ModN(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring_PtoM(const ring r)
-{ assume(r != NULL); return (getCoeffType(r->cf) == n_Zpn && nCoeff_is_Ring_PtoM(r->cf) ); }
+{ assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Zpn && nCoeff_is_Ring_PtoM(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring_Z(const ring r)
-{ assume(r != NULL); return (getCoeffType(r->cf) == n_Z && nCoeff_is_Ring_Z(r->cf) ); }
+{ assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Z && nCoeff_is_Ring_Z(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring(const ring r)
-{ assume(r != NULL); return nCoeff_is_Ring(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Ring(r->cf); }
 
 static inline BOOLEAN rField_is_Domain(const ring r)
-{ assume(r != NULL); return nCoeff_is_Domain(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Domain(r->cf); }
 
 static inline BOOLEAN rField_has_Units(const ring r)
-{ assume(r != NULL); return nCoeff_has_Units(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_Units(r->cf); }
 #else
 #define rField_is_Ring(A) (0)
 #define rField_is_Ring_2toM(A) (0)
@@ -440,56 +440,56 @@ static inline BOOLEAN rField_has_Units(const ring r)
 #endif
 
 static inline BOOLEAN rField_is_Zp(const ring r)
-{ assume(r != NULL); return (getCoeffType(r->cf) == n_Zp); }
+{ assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Zp); }
 
 static inline BOOLEAN rField_is_Zp(const ring r, int p)
-{ assume(r != NULL); return (getCoeffType(r->cf) == n_Zp) && (r->cf->ch == p); }
+{ assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Zp) && (r->cf->ch == p); }
 
 static inline BOOLEAN rField_is_Q(const ring r)
-{ assume(r != NULL); return nCoeff_is_Q(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Q(r->cf); }
 
 static inline BOOLEAN rField_is_numeric(const ring r) /* R, long R, long C */
-{ assume(r != NULL); return nCoeff_is_numeric(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_numeric(r->cf); }
 
 static inline BOOLEAN rField_is_R(const ring r)
-{ assume(r != NULL); return nCoeff_is_R(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_R(r->cf); }
 
 static inline BOOLEAN rField_is_GF(const ring r)
-{ assume(r != NULL); return nCoeff_is_GF(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_GF(r->cf); }
 
 static inline BOOLEAN rField_is_GF(const ring r, int q)
-{ assume(r != NULL); return nCoeff_is_GF(r->cf, q); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_GF(r->cf, q); }
 
 /* DO NOT USE; just here for compatibility reasons towards
    the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Zp_a(const ring r)
-{ assume(r != NULL); return nCoeff_is_Zp_a(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Zp_a(r->cf); }
 
 /* DO NOT USE; just here for compatibility reasons towards
    the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Zp_a(const ring r, int p)
-{ assume(r != NULL); return nCoeff_is_Zp_a(r->cf, p); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Zp_a(r->cf, p); }
 
 /* DO NOT USE; just here for compatibility reasons towards
    the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Q_a(const ring r)
-{ assume(r != NULL); return nCoeff_is_Q_a(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Q_a(r->cf); }
    
 static inline BOOLEAN rField_is_long_R(const ring r)
-{ assume(r != NULL); return nCoeff_is_long_R(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_long_R(r->cf); }
 
 static inline BOOLEAN rField_is_long_C(const ring r)
-{ assume(r != NULL); return nCoeff_is_long_C(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_long_C(r->cf); }
 
 static inline BOOLEAN rField_has_simple_inverse(const ring r)
-{ assume(r != NULL); return nCoeff_has_simple_inverse(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_inverse(r->cf); }
 
 static inline BOOLEAN rField_has_simple_Alloc(const ring r)
-{ assume(r != NULL); return nCoeff_has_simple_Alloc(r->cf); }
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_Alloc(r->cf); }
 
 /* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
 static inline BOOLEAN rField_is_Extension(const ring r)
-{ assume(r != NULL); return nCoeff_is_Extension(r->cf); } /* Z/p(a) and Q(a)*/
+{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Extension(r->cf); } /* Z/p(a) and Q(a)*/
 
 n_coeffType rFieldType(const ring r);
 
@@ -511,11 +511,11 @@ static inline int rBlocks(ring r)
 // misc things
 static inline char* rRingVar(short i, const ring r)
 {
-  assume(r != NULL); return r->names[i];
+  assume(r != NULL); assume(r->cf != NULL); return r->names[i];
 }
 static inline BOOLEAN rShortOut(const ring r)
 {
-  assume(r != NULL); return (r->ShortOut);
+  assume(r != NULL); assume(r->cf != NULL); return (r->ShortOut);
 }
 
 /// #define rVar(r) (r->N)
@@ -633,10 +633,10 @@ typedef enum rOrderType_t
 } rOrderType_t;
 
 static inline BOOLEAN rIsSyzIndexRing(const ring r)
-{ assume(r != NULL); return r->order[0] == ringorder_s;}
+{ assume(r != NULL); assume(r->cf != NULL); return r->order[0] == ringorder_s;}
 
 static inline int rGetCurrSyzLimit(const ring r)
-{ assume(r != NULL); return (rIsSyzIndexRing(r)? r->typ[0].data.syz.limit : 0);}
+{ assume(r != NULL); assume(r->cf != NULL); return (rIsSyzIndexRing(r)? r->typ[0].data.syz.limit : 0);}
 
 void   rSetSyzComp(int k, const ring r);
 
@@ -688,6 +688,7 @@ BOOLEAN rIsPolyVar(int i, ring r);
 static inline BOOLEAN rOrd_is_Comp_dp(ring r)
 {
   assume(r != NULL);
+  assume(r->cf != NULL);
   return ((r->order[0] == ringorder_c || r->order[0] == ringorder_C) &&
           r->order[1] == ringorder_dp &&
           r->order[2] == 0);
