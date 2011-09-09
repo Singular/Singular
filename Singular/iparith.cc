@@ -6026,7 +6026,7 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   if (ringvar>0)
   {
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
-      res->data = idSubst((ideal)u->CopyD(res->rtyp),ringvar,monomexpr);
+      res->data = id_Subst((ideal)u->CopyD(res->rtyp), ringvar, monomexpr, currRing);
     else
       res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
   }
