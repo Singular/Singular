@@ -7,28 +7,31 @@
 */
 
 #include <kernel/mod2.h>
-
-#include "maps_ip.h"
-#include "ipid.h"
-
 #include <omalloc/omalloc.h>
 
 #include <coeffs/numbers.h>
+#include <coeffs/coeffs.h>
+
 #include <polys/monomials/ring.h>
-// #include <polys/monomials/maps.h>
+#include <polys/monomials/maps.h>
 #include <polys/matpol.h>
 #include <polys/prCopy.h>
-//#include <libpolys/polys/ext_fields/longtrans.h>
-#include <libpolys/polys/monomials/maps.h>
-#include <libpolys/coeffs/coeffs.h>
 
+//#include <libpolys/polys/ext_fields/longtrans.h>
 // #include <kernel/longalg.h>
 
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 
+#include "maps_ip.h"
+#include "ipid.h"
+
+
 #include "lists.h"
 #include "tok.h"
+
+/* debug output: Tok2Cmdname in maApplyFetch*/
+//#include "ipshell.h"
 
 // define this if you want to use the fast_map routine for mapping ideals
 //#define FAST_MAP
@@ -102,7 +105,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       else /*if (what==MAP_CMD)*/
       {
         matrix s=mpNew(N,maMaxDeg_P((poly)data, preimage_r));
-        res->data=(void *)maEval(theMap,(poly)data,preimage_r,nMap,(ideal)s);
+        res->data=(void *)maEval(theMap, (poly)data, preimage_r, nMap, (ideal)s, currRing);
         idDelete((ideal *)&s);
       }
       if (nCoeff_is_Extension(currRing->cf))
@@ -148,7 +151,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,preimage_r));
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=maEval(theMap,((ideal)data)->m[i],preimage_r,nMap,(ideal)s);
+          m->m[i]=maEval(theMap, ((ideal)data)->m[i], preimage_r, nMap, (ideal)s, currRing);
           pTest(m->m[i]);
         }
         idDelete((ideal *)&s);
