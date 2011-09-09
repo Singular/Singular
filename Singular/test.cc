@@ -300,10 +300,19 @@ int main( int, char *argv[] )
    
   currentVoice=feInitStdin(NULL);
    
+  int err=iiEStart(omStrDup("ring R; R; kill R; return();\n"),NULL);
+  
+  printf("interpreter returns %d\n",err);
+  if (err) 
+     errorreported = 0; // reset error handling
+   
+  assume( err == 0 );
+   
+   
    
   // hook for error handling:
   // WerrorS_callback=......; of type p(const char *)
-  int err=iiEStart(omStrDup("int ver=system(\"version\");export ver;return();\n"),NULL);
+  err=iiEStart(omStrDup("int ver=system(\"version\");export ver;return();\n"),NULL);
   
   printf("interpreter returns %d\n",err);
   if (err) 
