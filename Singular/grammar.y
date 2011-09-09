@@ -167,11 +167,13 @@ void yyerror(const char * fmt)
   {
     Werror("leaving %s",VoiceName());
   }
-  #ifdef HAVE_FACTORY
+#ifdef HAVE_FACTORY
   // libfac:
+#ifdef HAVE_LIBFAC
   extern int libfac_interruptflag;
   libfac_interruptflag=0;
-  #endif
+#endif // #ifdef HAVE_LIBFAC
+#endif
 }
 
 %}
