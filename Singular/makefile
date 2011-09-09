@@ -425,13 +425,13 @@ libSingular_g.a: ${OBJG}
 	-rm -f $@
 	ar cr $@ $^
 
-test: test.o libSingular.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS}
-
 # My headers test
-check: test testg
-	./test
+check: testr testg
+	./testr
 	./testg
+
+testr: test.o libSingular.a
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS}
 
 testg: test.og libSingular_g.a
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@  -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG}
