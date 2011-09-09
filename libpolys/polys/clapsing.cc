@@ -1082,9 +1082,11 @@ poly singclap_det( const matrix m, const ring s )
   return res;
 }
 
-int singclap_det_i( intvec * m)
+int singclap_det_i( intvec * m, const ring r)
 {
-  setCharacteristic( 0 );
+//  assume( r == currRing ); // Anything else is not guaranted to work!
+   
+  setCharacteristic( 0 ); // ?
   CFMatrix M(m->rows(),m->cols());
   int i,j;
   for(i=m->rows();i>0;i--)
@@ -1095,7 +1097,7 @@ int singclap_det_i( intvec * m)
     }
   }
   int res= convFactoryISingI( determinant(M,m->rows()) ) ;
-  Off(SW_RATIONAL);
+  Off(SW_RATIONAL); // ?
   return res;
 }
 
