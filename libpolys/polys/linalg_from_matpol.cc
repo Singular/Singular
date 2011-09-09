@@ -167,94 +167,6 @@ static void mpSwapCol(matrix a, int pos, int lr, int lc)
   }
 }
 
-
-/*
-/// entries of a are minors and go to result (only if not in R)
-void mp_MinorToResult(ideal result, int &elems, matrix a, int r, int c,
-                     ideal R, const ring R)
-{
-  poly *q1;
-  int e=IDELEMS(result);
-  int i,j;
-
-  if (R != NULL)
-  {
-    for (i=r-1;i>=0;i--)
-    {
-      q1 = &(a->m)[i*a->ncols];
-      for (j=c-1;j>=0;j--)
-      {
-        if (q1[j]!=NULL) q1[j] = kNF(R,currQuotient,q1[j]);
-      }
-    }
-  }
-  for (i=r-1;i>=0;i--)
-  {
-    q1 = &(a->m)[i*a->ncols];
-    for (j=c-1;j>=0;j--)
-    {
-      if (q1[j]!=NULL)
-      {
-        if (elems>=e)
-        {
-          if(e<SIZE_OF_SYSTEM_PAGE)
-          {
-            pEnlargeSet(&(result->m),e,e);
-            e += e;
-          }
-          else
-          {
-            pEnlargeSet(&(result->m),e,SIZE_OF_SYSTEM_PAGE);
-            e += SIZE_OF_SYSTEM_PAGE;
-          }
-          IDELEMS(result) =e;
-        }
-        result->m[elems] = q1[j];
-        q1[j] = NULL;
-        elems++;
-      }
-    }
-  }
-}
-
-/// produces recursively the ideal of all arxar-minors of a
-void mp_RecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
-              poly barDiv, ideal R, const ring R)
-{
-  int k;
-  int kr=lr-1,kc=lc-1;
-  matrix nextLevel=mpNew(kr,kc);
-
-  loop
-  {
-// --- look for an optimal row and bring it to last position ------------
-    if(mpPrepareRow(a,lr,lc)==0) break;
-// --- now take all pivots from the last row ------------
-    k = lc;
-    loop
-    {
-      if(mpPreparePiv(a,lr,k)==0) break;
-      mpElimBar(a,nextLevel,barDiv,lr,k);
-      k--;
-      if (ar>1)
-      {
-        mpRecMin(ar-1,result,elems,nextLevel,kr,k,a->m[kr*a->ncols+k],R);
-        mpPartClean(nextLevel,kr,k);
-      }
-      else mpMinorToResult(result,elems,nextLevel,kr,k,R);
-      if (ar>k-1) break;
-    }
-    if (ar>=kr) break;
-// --- now we have to take out the last row...------------
-    lr = kr;
-    kr--;
-  }
-  mpFinalClean(nextLevel);
-}
-*/
-
-
-
 /*
 * C++ classes for Bareiss algorithm
 */
@@ -316,47 +228,6 @@ class mp_permmatrix
     void mpRowReorder();
     void mpColReorder();
 };
-
-
-
-/*2
-*returns the determinant of the matrix m;
-*uses Bareiss algorithm
-*/
-poly mp_DetBareiss (matrix a, const ring R)
-{
-  int s;
-  poly div, res;
-  if (MATROWS(a) != MATCOLS(a))
-  {
-    Werror("det of %d x %d matrix",MATROWS(a),MATCOLS(a));
-    return NULL;
-  }
-  matrix c = mp_Copy(a, R);
-  mp_permmatrix *Bareiss = new mp_permmatrix(c, R);
-  row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
-
-  /* Bareiss */
-  div = NULL;
-  while(Bareiss->mpPivotBareiss(&w))
-  {
-    Bareiss->mpElimBareiss(div);
-    div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
-  }
-  Bareiss->mpRowReorder();
-  Bareiss->mpColReorder();
-  Bareiss->mpSaveArray();
-  s = Bareiss->mpGetSign();
-  delete Bareiss;
-
-  /* result */
-  res = MATELEM(c,1,1);
-  MATELEM(c,1,1) = NULL;
-  id_Delete((ideal *)&c, R);
-  if (s < 0)
-    res = p_Neg(res, R);
-  return res;
-}
 
 
 
@@ -446,58 +317,6 @@ poly mp_Det (matrix m, const ring R)
   return result;
 }
 
-/*2
-* compute all ar-minors of the matrix a
-*/
-matrix mp_Wedge(matrix a, int ar, const ring R)
-{
-  int     i,j,k,l;
-  int *rowchoise,*colchoise;
-  BOOLEAN rowch,colch;
-  matrix result;
-  matrix tmp;
-  poly p;
-
-  i = binom(a->nrows,ar);
-  j = binom(a->ncols,ar);
-
-  rowchoise=(int *)omAlloc(ar*sizeof(int));
-  colchoise=(int *)omAlloc(ar*sizeof(int));
-  result =mpNew(i,j);
-  tmp=mpNew(ar,ar);
-  l = 1; /* k,l:the index in result*/
-  idInitChoise(ar,1,a->nrows,&rowch,rowchoise);
-  while (!rowch)
-  {
-    k=1;
-    idInitChoise(ar,1,a->ncols,&colch,colchoise);
-    while (!colch)
-    {
-      for (i=1; i<=ar; i++)
-      {
-        for (j=1; j<=ar; j++)
-        {
-          MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
-        }
-      }
-      p = mp_DetBareiss(tmp, R);
-      if ((k+l) & 1) p=p_Neg(p, R);
-      MATELEM(result,l,k) = p;
-      k++;
-      idGetNextChoise(ar,a->ncols,&colch,colchoise);
-    }
-    idGetNextChoise(ar,a->nrows,&rowch,rowchoise);
-    l++;
-  }
-
-  /*delete the matrix tmp*/
-  for (i=1; i<=ar; i++)
-  {
-    for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
-  }
-  id_Delete((ideal *) &tmp, R);
-  return (result);
-}
 
 ///*2
 //*homogenize all elements of matrix (not the matrix itself)
