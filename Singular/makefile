@@ -144,6 +144,7 @@ CXXSOURCES=\
 
 CXXSOURCES2	= SingularBuilder.cpp
 
+CSOURCES = fereadl.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
 	kInline.h
