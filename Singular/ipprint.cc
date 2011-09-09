@@ -193,7 +193,7 @@ static BOOLEAN ipPrint_V(leftv u)
   polyset m=NULL;
   int l,j;
   /*convert into an array of the components*/
-  pVec2Polys((poly)u->Data(), &m, &l);
+  p_Vec2Polys((poly)u->Data(), &m, &l, currRing);
   /*output*/
   PrintS("[");
   j=0;

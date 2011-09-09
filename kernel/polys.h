@@ -346,7 +346,7 @@ inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
 #define    pDegW(p,w) p_DegW(p,w,currRing)
 
 /*-----------type conversions ----------------------------*/
-void  pVec2Polys(poly v, polyset *p, int *len);
+// void  pVec2Polys(poly v, polyset *p, int *len);
 #define   pVar(m) p_Var(m,currRing)
 
 /*-----------specials for spoly-computations--------------*/
