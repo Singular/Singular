@@ -2131,14 +2131,16 @@ void p_Content(poly ph, const ring r)
     }
   }
 }
-#if 0 // currently not used
-void p_SimpleContent(poly ph,int smax, const ring r)
+
+// Not yet?
+#if 1 // currently only used by Singular/janet
+void p_SimpleContent(poly ph, int smax, const ring r)
 {
   if(TEST_OPT_CONTENTSB) return;
   if (ph==NULL) return;
   if (pNext(ph)==NULL)
   {
-    p_SetCoeff(ph,n_Init(1,r_cf),r);
+    p_SetCoeff(ph,n_Init(1,r->cf),r);
     return;
   }
   if ((pNext(pNext(ph))==NULL)||(!rField_is_Q(r)))
@@ -2146,11 +2148,13 @@ void p_SimpleContent(poly ph,int smax, const ring r)
     return;
   }
   number d=p_InitContent(ph,r);
-  if (nlSize(d,r->cf)<=smax)
+  if (n_Size(d,r->cf)<=smax)
   {
     //if (TEST_OPT_PROT) PrintS("G");
     return;
   }
+
+   
   poly p=ph;
   number h=d;
   if (smax==1) smax=2;
