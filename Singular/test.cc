@@ -244,76 +244,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "walk.h"
 
 
-// Source files in Singular/
-/*
-#include "attrib.cc"
-#include "bbcone.cc"
-#include "bbfan.cc"
-#include "bigintm.cc"
-#include "blackbox.cc"
-#include "calcSVD.cc"
-#include "claptmpl.cc"
-#include "cntrlc.cc"
-#include "denom_list.cc"
-#include "eigenval_ip.cc"
-#include "emacs.cc"
-#include "extra.cc"
-#include "fehelp.cc"
-#include "feOpt.cc"
-#include "fglm.cc"
-#include "gentable2.cc"
-#include "gentable.cc"
-#include "gms.cc"
-#include "grammar.cc"
-#include "interpolation.cc"
-#include "iparith.cc"
-#include "ipassign.cc"
-#include "ipconv.cc"
-#include "ipid.cc"
-#include "iplib.cc"
-#include "ipprint.cc"
-#include "ipshell.cc"
-#include "janet.cc"
-#include "libparse.cc"
-#include "linearAlgebra_ip.cc"
-#include "lists.cc"
-#include "maps_ip.cc"
-#include "Minor.cc"
-#include "MinorInterface.cc"
-#include "MinorProcessor.cc"
-#include "minpoly.cc"
-#include "misc_ip.cc"
-#include "mpsr_Error.cc"
-#include "mpsr_Get.cc"
-#include "mpsr_GetMisc.cc"
-#include "mpsr_GetPoly.cc"
-#include "mpsr_Put.cc"
-#include "mpsr_PutPoly.cc"
-#include "mpsr_sl.cc"
-#include "mpsr_Timer.cc"
-#include "mpsr_Tok.cc"
-#include "ndbm.cc"
-#include "newstruct.cc"
-#include "pcv.cc"
-#include "pipeLink.cc"
-#include "pyobject.cc"
-#include "pyobject_setup.cc"
-#include "scanner.cc"
-#include "sdb.cc"
-#include "silink.cc"
-#include "sing_dbm.cc"
-#include "sing_win.cc"
-#include "slInit_Dynamic.cc"
-#include "slInit_Static.cc"
-#include "ssiLink.cc"
-#include "subexpr.cc"
-#include "test.cc"
-#include "tesths.cc"
-#include "utils.cc"
-#include "walk.cc"
-#include "walk_ip.cc"
-#include "wrapper.cc"
-*/
 void siInit(char *);
 
 int main( int, char *argv[] ) 
@@ -362,6 +292,7 @@ int main( int, char *argv[] )
   pDelete(&p1);
    
   rDelete(R);
+  rChangeCurrRing(NULL);
    
 
    

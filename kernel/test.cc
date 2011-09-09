@@ -50,8 +50,9 @@
 
 
 #ifdef HAVE_FACTORY
-int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
+// The following are needed due to FACTORY (e.g. initCanonicalForm)
+int initializeGMP(){ return 1; } 
+int mmInit(void) {return 1; }
 #endif
 
 
@@ -185,132 +186,9 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 
 
-// Sources:
-/*
-#include "febase.cc"
-#include "feread.cc"
-#include "hdegree.cc"
-#include "hilb.cc"
-#include "hutil.cc"
-#include "gr_kstd2.cc"
-#include "ideals.cc"
-#include "int64vec.cc"
-#include "khstd.cc"
-#include "kstdfac.cc"
-#include "kstd1.cc"
-#include "kstd2.cc"
-#include "kutil.cc"
-// #include "maps.cc" // moved to polys
-// #include "matpol.cc" // same!
-#include "misc.cc"
-// #include "sparsmat.cc" // same!
-#include "fast_maps.cc"
-#include "fglmzero.cc" // looks like <factory/templates/ftmpl_list.h> must be installed!
-#include "fglmvec.cc"
-#include "fglmgauss.cc"
-#include "fglmhom.cc"
-#include "fglmcomb.cc"
-// #include "numbers.cc" // moved
-// #include "polys.cc" // same
-// #include "p_polys.cc" // same
-// #include "polys0.cc" // same
-// #include "polys1.cc" // same
-// #include "polys-impl.cc" // same
-#include "kspoly.cc"
-#include "syz.cc"
-#include "syz0.cc"
-#include "syz1.cc"
-#include "syz2.cc"
-#include "syz3.cc"
-#include "timer.cc"
-#include "GMPrat.cc"
-#include "multicnt.cc"
-#include "npolygon.cc"
-#include "semic.cc"
-#include "spectrum.cc"
-#include "splist.cc"
-#include "walkProc.cc"
-#include "walkMain.cc"
-#include "walkSupport.cc"
-#include "eigenval.cc"
-#include "units.cc"
-#include "fast_mult.cc"
-#include "digitech.cc"
-#include "tgb.cc"
-#include "tgbgauss.cc"
-#include "ringgb.cc"
-#include "f5data.cc"
-#include "f5lists.cc"
-#include "f5gb.cc"
-#include "f5c.cc"
-#include "F5cLists.cc"
-#include "ratgring.cc"
-#include "shiftgb.cc"
-#include "gfan.cc"
-#include "linearAlgebra.cc"
-
-  
+// #include "fglmzero.cc" // looks like <factory/templates/ftmpl_list.h> must be installed!
 // TODO: looks like <coeffs/mpr_complex.h> must be installed!
 
-// Now ALL the sources from here...
-#include "digitech.cc"
-#include "eigenval.cc"
-#include "F4.cc"
-#include "f5c.cc"
-#include "F5cData.cc"
-#include "F5cLists.cc"
-#include "f5data.cc"
-#include "f5gb.cc"
-#include "f5lists.cc"
-#include "fast_maps.cc"
-#include "fast_mult.cc"
-#include "febase.cc"
-#include "feread.cc"
-#include "fglmcomb.cc"
-#include "fglmgauss.cc"
-#include "fglmhom.cc"
-#include "fglmvec.cc"
-#include "fglmzero.cc"
-#include "gfan.cc"
-#include "GMPrat.cc"
-#include "gr_kstd2.cc"
-#include "hdegree.cc"
-#include "hilb.cc"
-#include "hutil.cc"
-#include "ideals.cc"
-#include "int64vec.cc"
-#include "khstd.cc"
-#include "kInline.h"
-#include "kpolys.cc"
-#include "kspoly.cc"
-#include "kstd1.cc"
-#include "kstd2.cc"
-#include "kstdfac.cc"
-#include "kutil.cc"
-#include "linearAlgebra.cc"
-#include "misc.cc"
-#include "mmalloc.cc"
-#include "multicnt.cc"
-#include "npolygon.cc"
-#include "ratgring.cc"
-#include "ringgb.cc"
-#include "semic.cc"
-#include "shiftgb.cc"
-#include "spectrum.cc"
-#include "splist.cc"
-#include "syz0.cc"
-#include "syz1.cc"
-#include "syz2.cc"
-#include "syz3.cc"
-#include "syz.cc"
-#include "tgb.cc"
-#include "tgbgauss.cc"
-#include "timer.cc"
-#include "units.cc"
-#include "walkMain.cc"
-#include "walkProc.cc"
-#include "walkSupport.cc"
-*/
 
 
 #include "polys.h"
