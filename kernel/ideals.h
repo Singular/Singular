@@ -203,7 +203,7 @@ inline matrix  idModule2formatedMatrix(ideal mod, int rows, int cols, const ring
   return id_Module2formatedMatrix(mod, rows, cols, R);
 }
 
-ideal   idSubst(ideal i, int n, poly e);
+// ideal   idSubst(ideal i, int n, poly e);
 
 inline ideal   idJet(ideal i, int d, const ring R = currRing)
 {
