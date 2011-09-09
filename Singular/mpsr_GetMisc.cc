@@ -435,7 +435,7 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
 #undef free
 #undef freeSize
 
-#include "kernel/mmalloc.h"
+#include "mmalloc.h"
 
 static int mpsr_is_initialized = 0;
 

@@ -573,6 +573,9 @@ AC_DEFINE(Void_t,char,"Type of void"),
 AC_MSG_RESULT(Void_t)
 
 
+AC_DEFINE(OM_PROVIDE_MALLOC,0,[Provide NO standard routines!])
+
+
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up

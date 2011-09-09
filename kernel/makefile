@@ -89,7 +89,7 @@ CXXSOURCES2	= SingularBuilder.cpp
 #    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
 
 # normal C source files
-CSOURCES=fegetopt.c mmstd.c
+CSOURCES = fegetopt.c
 
 # special C++ source files (need extra compiling and/or linking), for which
 # dependencies should be generated
@@ -113,7 +113,6 @@ HEADERS= polys.h hutil.h idrec.h stairc.h ideals.h \
 	eigenval.h units.h \
 	fegetopt.h \
 	ratgring.h shiftgb.h nc.h \
-        mmalloc.h \
 	semic.h \
 	gfan.h preimage.h
 

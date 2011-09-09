@@ -94,7 +94,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "fegetopt.h"
 #include "ratgring.h"
 #include "shiftgb.h"
-#include "mmalloc.h"
+// #include "mmalloc.h" // move to Singular!?
 #include "gfan.h"
 
 #include "kutil.h"
@@ -142,7 +142,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 
 // #include "lplist.h" // Too old!
-#include "mmalloc.h"
 #include "multicnt.h"
 #include "npolygon.h"
 // #include "Number.h" // Too old?

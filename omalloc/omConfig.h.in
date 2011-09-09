@@ -95,6 +95,11 @@
 #undef OM_MALLOC_PROVIDES_SIZEOF_ADDR
 #endif
 
+/* Provide NO standard routines! */
+#ifndef OM_PROVIDE_MALLOC
+#undef OM_PROVIDE_MALLOC
+#endif
+
 /* "Disable debug" */
 #ifndef OM_NDEBUG
 #undef OM_NDEBUG

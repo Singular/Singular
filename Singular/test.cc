@@ -97,7 +97,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <kernel/fegetopt.h>
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
-#include <kernel/mmalloc.h>
+#include "mmalloc.h"
 #include <kernel/gfan.h>
 
 #include <kernel/kutil.h>
@@ -145,7 +145,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 
 // #include "lplist.h" // Too old!
-#include <kernel/mmalloc.h>
+#include "mmalloc.h"
 #include <kernel/multicnt.h>
 #include <kernel/npolygon.h>
 // #include <kernel/Number.h> // Too old?

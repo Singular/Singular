@@ -144,7 +144,7 @@ CXXSOURCES=\
 
 CXXSOURCES2	= SingularBuilder.cpp
 
-CSOURCES = fereadl.c
+CSOURCES = fereadl.c mmstd.c 
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
 	kInline.h
@@ -180,6 +180,8 @@ HEADERS=\
    maps_ip.h \
    minpoly.h \
    misc_ip.h \
+   mmalloc.h \
+   omSingularConfig.h \
    mpsr.h \
    mpsr_Get.h \
    mpsr_Put.h \
@@ -188,7 +190,6 @@ HEADERS=\
    mpsr_sl.h \
    ndbm.h \
    newstruct.h \
-   omSingularConfig.h \
    pcv.h \
    pipeLink.h \
    pyobject_setup.h \
