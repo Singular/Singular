@@ -248,16 +248,9 @@ void siInit(char *);
 int main( int, char *argv[] ) 
 {
   // init path names etc.
-  feInitResources(argv[0]); //???
+//  feInitResources(argv[0]); //???
   siInit(argv[0]); // ?
 
-
-  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
-  feStringAppendResources(0);
-  PrintS(StringAppendS("\n"));
-
-   
-   
   // Libpolys tests:
    
   // construct the ring Z/32003[x,y,z]
@@ -267,6 +260,14 @@ int main( int, char *argv[] )
   n[1]=omStrDup("y");
   n[2]=omStrDup("z2");
 
+   
+/*
+  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  feStringAppendResources(0);
+  PrintS(StringAppendS("\n"));
+
+   
+   
   ring R=rDefault(32003,3,n);
   // make R the default ring:
   rChangeCurrRing(R);
@@ -293,7 +294,8 @@ int main( int, char *argv[] )
   rDelete(R);
   rChangeCurrRing(NULL);
    
-
+*/
+   
    
    
   currentVoice=feInitStdin(NULL);
@@ -302,14 +304,33 @@ int main( int, char *argv[] )
   // hook for error handling:
   // WerrorS_callback=......; of type p(const char *)
   int err=iiEStart(omStrDup("int ver=system(\"version\");export ver;return();\n"),NULL);
-  if (err) errorreported = 0; // reset error handling
+  
   printf("interpreter returns %d\n",err);
+  if (err) 
+     errorreported = 0; // reset error handling
+   
+  assume( err == 0 );
+
   idhdl h=ggetid("ver");
-  if (h!=NULL)
+   
+  if (h != NULL)
     printf("singular variable ver of type %d contains %d\n",h->typ,(int)(long)IDDATA(h));
   else
     printf("variable ver does not exist\n");
+   
+  assume( h != NULL );
 
+   
+  err = iiEStart(
+		 omStrDup("system(\"--version\");return();\n"),
+		 NULL);
+   
+  printf("interpreter returns %d\n",err);
+  if (err) 
+     errorreported = 0; // reset error handling   
+   
+  assume( err == 0 );
+   
   // calling a singular-library function
   idhdl datetime=ggetid("datetime");
   if (datetime==NULL)
@@ -323,16 +344,17 @@ int main( int, char *argv[] )
 
   // changing a ring for the interpreter
   // re-using n and R from above
-  R=rDefault(32003,3,n);
+  ring R = rDefault(32003, 3, n);
   idhdl newRingHdl=enterid("R" /* ring name*/,
                            0, /*nesting level, 0=global*/
                            RING_CMD,
                            &IDROOT,
                            FALSE);
-   IDRING(newRingHdl)=R;
-   // make R the default ring (include rChangeCurrRing):
-   rSetHdl(newRingHdl);
-   err=iiEStart(omStrDup("poly p=x;listvar();return();\n"),NULL);
+  
+  IDRING(newRingHdl)=R;
+  // make R the default ring (include rChangeCurrRing):
+  rSetHdl(newRingHdl);
+  err=iiEStart(omStrDup("poly p=x;listvar();return();\n"),NULL);
 
   // calling a kernel function via the interpreter interface
   sleftv r1; memset(&r1,0,sizeof(r1));
@@ -340,9 +362,13 @@ int main( int, char *argv[] )
   arg.rtyp=STRING_CMD;
   arg.data=omStrDup("huhu");
   err=iiExprArith1(&r1,&arg,TYPEOF_CMD);
+  
   printf("interpreter returns %d\n",err);
-  if (err) errorreported = 0; // reset error handling
-  else printf("typeof returned type %d, >>%s<<\n",r1.Typ(),r1.Data());
+  if (err) 
+     errorreported = 0; // reset error handling   
+  else 
+     printf("typeof returned type %d, >>%s<<\n",r1.Typ(),r1.Data());
+   
   // clean up r1:
   r1.CleanUp();
    
