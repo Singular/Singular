@@ -19,9 +19,6 @@
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-// libfac:
-extern const char * libfac_version;
-extern const char * libfac_date;
 #endif
 
 #include "misc_ip.h"
@@ -738,9 +735,15 @@ char * versionString()
                feVersionId,singular_date);
   StringAppendS("\t");
 #ifdef HAVE_FACTORY
-              StringAppend("factory(%s),", factoryVersion);
-              StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);
+  StringAppend("factory(%s),", factoryVersion);
+#ifdef HAVE_LIBFAC
+  // libfac:
+  extern const char * libfac_version;
+  extern const char * libfac_date;
+  StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);
+#endif // #ifdef HAVE_LIBFAC
 #endif
+
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
               StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
 #else
