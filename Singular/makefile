@@ -43,9 +43,12 @@ LIBPOLYS_LIBS     = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/r
 LIBPOLYS_LIBSG    = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g  -L/opt/local/lib  -lntl -lgmp -ldl
 
 
-PYTHON_INCLUDES = `python-config --includes`
-PYTHON_CFLAGS = `python-config --cflags`
-PYTHON_LIBS   = `python-config --libs`
+PYTHON_INCLUDES = 
+# `python2-config --includes`
+PYTHON_CFLAGS = 
+# `python2-config --cflags`
+PYTHON_LIBS   = 
+# `python2-config --libs`
 
 PIPE		= -pipe
 CFLAGS		= -O3 -Wall -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
