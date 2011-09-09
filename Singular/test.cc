@@ -227,7 +227,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "omSingularConfig.h"
 #include "pcv.h"
 #include "pipeLink.h"
-#include "pyobject_setup.h"
 #include "run.h"
 #include "sdb.h"
 #include "silink.h"

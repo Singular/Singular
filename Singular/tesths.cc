@@ -155,7 +155,11 @@ int main(          /* main entry to Singular */
     *    memcpy(stderr,stdout,sizeof(FILE));
     */
   }
-  pyobject_setup();
+
+#ifdef SINGULAR_PYOBJECT_SETUP_H
+   pyobject_setup();
+#endif
+
 #ifdef HAVE_FANS
   bbcone_setup();
   bbfan_setup();
