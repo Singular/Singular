@@ -30,10 +30,13 @@ digraph singular {
 	ntl -> coeffs;
 	polys [ fontcolor=blue ];
 	ext_fields -> coeffs;
+
         kernel [ fontcolor=blue ];
 
         libpolys -> kernel;
         numeric [ fontcolor=blue ];
+	kernel -> numeric;
+	kernel -> SingularInterpreter;
         SingularInterpreter [ fontcolor=red ];
         numeric -> SingularInterpreter;
         libpolys -> SingularInterpreter;
