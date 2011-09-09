@@ -9,8 +9,10 @@
  * */
 
 #include <reporter/reporter.h>
+
 #include <resources/feFopen.h>
 #include <resources/feResource.h>
+
 #include <kernel/structs.h>
 
 enum   feBufferTypes

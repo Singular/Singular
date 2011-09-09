@@ -8,10 +8,11 @@
 
 
 #include <kernel/mod2.h>
-#include <kernel/febase.h>
 #include <omalloc/omalloc.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
+
+// #include <kernel/febase.h>
+// #include <kernel/structs.h>
+
 
 #ifdef HAVE_FEREAD
   #include <unistd.h>
