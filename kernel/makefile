@@ -174,7 +174,7 @@ mostlyclean:
 	-rm -f *.o *.og core *.op
 
 clean: mostlyclean
-	-rm -f *.bak *.d *.dd depend *.a *.so* test testg test-g
+	-rm -f *.bak *.d *.dd depend *.a *.so* testr testg
 
 distclean: clean
 	-rm -f *~ .\#* 
@@ -301,12 +301,12 @@ endif
 
 
 testg: test.og libkernel_g.a
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@ -L. -lkernel_g ${LIBPOLYS_LIBSG}
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@ -L. -lkernel_g ${LIBPOLYS_LIBSG} ${LD_DYN_FLAGS}
 
-test: test.o libkernel.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS}
+testr: test.o libkernel.a
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@ -L. -lkernel ${LIBPOLYS_LIBS} ${LD_DYN_FLAGS}
 
 # My headers test
-check: all test testg
-	SINGULAR_ROOT_DIR=`pwd/../` SINGULARPATH="$SINGULAR_ROOT_DIR/libpolys/polys/.libs" ./test
-	SINGULAR_ROOT_DIR=`pwd/../` SINGULARPATH="$SINGULAR_ROOT_DIR/libpolys/polys/.libs" ./testg
+check: all testg testr
+	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testg
+	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testr
