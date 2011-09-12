@@ -16,10 +16,6 @@
 #include "gfops.h"
 #include "cf_binom.h"
 
-#if defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)
-#include "memman.h"
-#endif
-
 #include "cf_gmp.h"
 
 
@@ -40,7 +36,7 @@ initCanonicalForm( void )
 {
     static bool initialized = false;
     if ( ! initialized ) {
-#if (defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)) || defined (SINGULAR)
+#if defined (SINGULAR)
         (void)mmInit();
 #endif
 

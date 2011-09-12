@@ -6,12 +6,6 @@
 
 #include "cf_assert.h"
 
-#ifdef USE_OLD_MEMMAN
-#include "memutil.h"
-#else
-#include "memman.h"
-#endif
-
 // The C++ standard has ratified a change to the new operator.
 //
 //  T *p = new T;
@@ -30,39 +24,6 @@
 // do you expect to have enough to be able to deal with it?
 // Most operating systems will have slowed to be unusable
 // long before the exception gets thrown.
-
-#ifdef USE_OLD_MEMMAN
-
-void * operator new ( size_t size )
-{
-    return getBlock( size );
-}
-
-void operator delete ( void * block )
-{
-    freeBlock( block, 0 );
-}
-
-void * operator new[] ( size_t size )
-{
-    return getBlock( size );
-}
-
-void operator delete[] ( void * block )
-{
-    freeBlock( block, 0 );
-}
-
-void * operator new(size_t size, std::nothrow_t) throw()
-{
-    return getBlock( size );
-}
-void * operator new[](size_t size, std::nothrow_t) throw()
-{
-    return getBlock( size );
-}
-
-#else
 
 void * operator new ( size_t size )
 {
@@ -93,4 +54,3 @@ void * operator new[](size_t size, const std::nothrow_t&) throw()
     return mmAlloc( size );
 }
 
-#endif /* USE_OLD_MEMMAN */

@@ -40,10 +40,6 @@
 #ifdef HAVE_OMALLOC
 #define Alloc(L) omAlloc(L)
 #define Free(A,L) omFreeSize(A,L)
-#elif defined(USE_MEMUTIL)
-#include "memutil.h"
-#define Alloc(L) getBlock(L)
-#define Free(A,L) freeBlock(A,L)
 #else
 #define Alloc(L) malloc(L)
 #define Free(A,L) free(A)

@@ -42,17 +42,6 @@ AC_ARG_WITH(
   [with_Singular=yes])
 
 
-AC_ARG_WITH(
-  memman,
-  [  --with-memman(=<memman>) specify Factory memory manager.
-                          <memman> is either \`old' (default), \`new', or \`no'.],
-  ,
-  [ if test "x$with_Singular" = xyes; then
-      with_memman=no
-    else
-      with_memman=old
-    fi ])
-
 # font-lock-trick: '
 
 AC_ARG_WITH(
@@ -71,14 +60,6 @@ AC_ARG_ENABLE(
   [AS_HELP_STRING([--enable-streamio],[build Factory with stream IO])],
   ,
   [enable_streamio=no])
-
-AC_ARG_ENABLE(
-  memdebug,
-  [  --enable-memdebug=<level> switch on memory management debugging.  Meaningful
-                          with \`--with-memman=new' only.  <level> may be either
-                          \`no' (default), \`normal', or \`full'.],
-  ,
-  enable_memdebug=no)
 
 AC_ARG_ENABLE(
   assertions,
@@ -278,8 +259,6 @@ if test "x$with_Singular" = xyes; then
 
   factorysrc='$(basefactorysrc) $(singfactorysrc)'
   factoryincl='$(basefactoryincl) $(singfactoryincl)'
-  memmansrc=
-  memmanincl=
 
   alltargets=cf
   installtargets=installcf
@@ -289,8 +268,6 @@ else
 
   factorysrc='$(basefactorysrc)'
   factoryincl='$(basefactoryincl)'
-  memmansrc='$(basememmansrc)'
-  memmanincl=
 
   alltargets=cf
   installtargets=installcf
@@ -382,36 +359,12 @@ else
 fi
 if test "$with_omalloc" = yes; then
   AC_DEFINE([HAVE_OMALLOC],[1],[HAVE_OMALLOC])
-  with_memman=no 
 fi
 AC_MSG_RESULT($with_omalloc)
 if test "$warn_omalloc" = yes; then
   AC_MSG_WARN(did not find omalloc.h -- install before compiling)
 fi
 
-    
-# memory manager
-if test "x$with_memman" = xyes; then
-  alltargets="$alltargets mem"
-  installtargets="$installtargets installmem"
-  uninstalltargets="$uninstalltargets uninstallmem"
-  AC_DEFINE([USE_MEMUTIL],[1],[USE_MEMUTIL])
-
-  if test "x$with_memman" != xnew; then
-    memmansrc="$memmansrc \$(oldmemmansrc)"
-    memmanincl='$(oldmemmanincl)'
-    AC_DEFINE([USE_OLD_MEMMAN],[1],[USE_OLD_MEMMAN])
-  else
-    memmansrc="$memmansrc \$(newmemmansrc)"
-    memmanincl='$(newmemmanincl)'
-
-    if test "x$enable_memdebug" = xfull; then
-      AC_DEFINE([MDEBUG], [1], [MDEBUG])
-    elif test "x$enable_memdebug" != xno; then
-      AC_DEFINE([MDEBUG], [0], [MDEBUG])
-    fi
-  fi
-fi
 
 # "configurable inline methods"
 if test "x$enable_cf_inline" != xno; then
@@ -457,8 +410,6 @@ AC_SUBST(MAKEHEADERFLAGS)
 
 AC_SUBST(factorysrc)
 AC_SUBST(factoryincl)
-AC_SUBST(memmansrc)
-AC_SUBST(memmanincl)
 
 AC_SUBST(alltargets)
 AC_SUBST(installtargets)
