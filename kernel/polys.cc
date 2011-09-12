@@ -10,5 +10,6 @@ ideal currQuotient = NULL;
 
 void rChangeCurrRing(ring r)
 {
-  currRing = r;
+   currRing = r;
+   currQuotient = r->qideal;
 }
