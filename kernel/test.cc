@@ -211,10 +211,36 @@ int main( int, char *argv[] )
   n[1]=omStrDup("y");
   n[2]=omStrDup("z2");
 
-  ring R=rDefault(32003,3,n);
+  ring R = rDefault(32003,3,n); //  ring R = rDefault(0,3,n);
+
+  rWrite(R); PrintLn();
+
+#ifdef RDEBUG
+  rDebugPrint(R);
+#endif
+
+  
+  poly p = p_ISet(1,R); p_SetExp(p,1,1, R); p_Setm(p, R);
+
+  assume( p_GetExp(p,1, R) == 1 );
+  
+  poly pp = pp_Mult_qq( p, p, R);
+
+  Print("p: "); p_Write0(p, R);
+  Print("; p*p : "); p_Write(pp, R); 
+
+  p_Delete(&p, R);
+  
+  assume( p_GetExp(pp,1, R) == 2 );
+  
+  p_Delete(&pp, R);
+  
+  
+//  rDelete(R);
+   
   // make R the default ring:
   rChangeCurrRing(R);
-
+  
   // create the polynomial 1
   poly p1=pISet(1);
 
@@ -225,16 +251,18 @@ int main( int, char *argv[] )
   pSetm(p2);
 
   // print p1 + p2
-  pWrite(p1); printf(" + \n"); pWrite(p2); printf("\n");
+  Print("p1: "); pWrite0(p1); 
+  Print(" + p2: "); pWrite0(p2); 
+  Print("  ---- >>>> ");
 
   // compute p1+p2
   p1=p_Add_q(p1,p2,R); p2=NULL;
   pWrite(p1); 
 
   // clean up:
-  pDelete(&p1);
+//  pDelete(&p1);
    
-  rDelete(R);
+  rDelete(R); // should cleanup every belonging polynomial, right!?
    
    
   return 0;
