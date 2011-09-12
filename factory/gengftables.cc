@@ -28,8 +28,6 @@ using namespace std;
 #include "cf_algorithm.h"
 #include "cf_iter.h"
 
-int initializeGMP(){ return 1; }
-
 //{{{ constants
 //{{{ docu
 //

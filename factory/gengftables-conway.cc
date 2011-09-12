@@ -34,12 +34,6 @@
 
 using namespace std;
 
-int initializeGMP()
-{
-  return 1;
-}
-
-
 //{{{ constants
 //{{{ docu
 //

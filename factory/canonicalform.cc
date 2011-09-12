@@ -24,7 +24,6 @@ CanonicalForm readCF( ISTREAM& );
 #endif /* NOSTREAMIO */
 
 //{{{ initialization
-int initializeGMP();
 int initializeCharacteristic();
 
 #ifdef SINGULAR
@@ -41,7 +40,6 @@ initCanonicalForm( void )
 #endif
 
         (void)initializeCharacteristic();
-        (void)initializeGMP();
         initPT();
         initialized = true;
     }
