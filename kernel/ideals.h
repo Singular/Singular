@@ -47,20 +47,6 @@ static inline int idSize(const ideal id)
   return (j + 1); 
 }
 
-//void id_Norm(ideal id, const ring r);
-#define idNorm(I) id_Norm(I,currRing)
-
-//void id_DelMultiples(ideal id, const ring r);
-#define idDelMultiples(I) id_DelMultiples(I,currRing)
-
-//void id_DelEquals(ideal id, const ring r);
-#define idDelEquals(I) id_DelEquals(I,currRing)
-
-//void id_DelLmEquals(ideal id, const ring r);
-#define idDelLmEquals(I) id_DelLmEquals(I,currRing)
-
-//void id_DelDiv(ideal id, const ring r);
-#define idDelDiv(I) id_DelDiv(I,currRing)
 
 //BOOLEAN id_IsConstant(ideal id, const ring r);
 #define idIsConstant(I) id_IsConstant(I,currRing)
@@ -75,7 +61,7 @@ static inline int idSize(const ideal id)
 #define idPrint(A) ((void)0)
 #endif
 
-ideal id_Copy (ideal h1, const ring r = currRing);
+ideal id_Copy (ideal h1, const ring r);
 
 #if 0
 

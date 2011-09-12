@@ -2774,7 +2774,7 @@ static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idQuot((ideal)u->Data(),(ideal)v->Data(),
     hasFlag(u,FLAG_STD),u->Typ()==v->Typ());
-  idDelMultiples((ideal)(res->data));
+  id_DelMultiples((ideal)(res->data),currRing);
   return FALSE;
 }
 static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
@@ -3128,19 +3128,19 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   ideal id = (ideal)u->CopyD(IDEAL_CMD);
   if (sw & SIMPL_LMDIV)
   {
-    idDelDiv(id);
+    id_DelDiv(id,currRing);
   }
   if (sw & SIMPL_LMEQ)
   {
-    idDelLmEquals(id);
+    id_DelLmEquals(id,currRing);
   }
   if (sw & SIMPL_MULT)
   {
-    idDelMultiples(id);
+    id_DelMultiples(id,currRing);
   }
   else if(sw & SIMPL_EQU)
   {
-    idDelEquals(id);
+    id_DelEquals(id,currRing);
   }
   if (sw & SIMPL_NULL)
   {
@@ -3148,7 +3148,7 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   }
   if (sw & SIMPL_NORM)
   {
-    idNorm(id);
+    id_Norm(id,currRing);
   }
   res->data = (char * )id;
   return FALSE;
