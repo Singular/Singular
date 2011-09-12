@@ -15,18 +15,10 @@ LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 
-#if test x$ac_configure_args != x; then
-#  old_ac_configure_args="$ac_configure_args"
-#  ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
-#else
-#  old_ac_configure_args=""
-#fi
-
-ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
+### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
+#ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
 
 AC_CONFIG_SUBDIRS(omalloc)
-
-# ac_configure_args="$old_ac_configure_args"
 
 if test x$ENABLE_FACTORY = xyes; then
   AC_CONFIG_SUBDIRS(factory)
