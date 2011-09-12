@@ -239,10 +239,10 @@ tesths.o: %.o: %.cc
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSNL} -c $< -o $@
 
 Singular: tesths.o libSingular.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS}
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS} ${LD_DYN_FLAGS}
 
 Singularg: tesths.og libSingular_g.a
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGSG} ${DEFSG} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG}
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGSG} ${DEFSG} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG} ${LD_DYN_FLAGS}
 
 
 ##
@@ -426,12 +426,13 @@ libSingular_g.a: ${OBJG}
 	ar cr $@ $^
 
 # My headers test
-check: testr testg
-	./testr
-	./testg
-
-testr: test.o libSingular.a
-	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS}
+check: testg testr 
+	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testg
+	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testr
 
 testg: test.og libSingular_g.a
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@  -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG}
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} $< -o $@  -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG} ${LD_DYN_FLAGS}
+
+testr: test.o libSingular.a
+	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@  -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS} ${LD_DYN_FLAGS}
+
