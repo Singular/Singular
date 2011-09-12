@@ -709,9 +709,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring, orig_ring);
     rDelete(syz_ring);
     #ifdef HAVE_PLURAL
-    if (rIsPluralRing(currRing))
+    if (rIsPluralRing(orig_ring))
     {
-      idDelMultiples(s_h3);
+      id_DelMultiples(s_h3,orig_ring);
       idSkipZeroes(s_h3);
     }
     #endif
