@@ -230,7 +230,7 @@ OBJG= $(OBJS:.o=.og)
 OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
 OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op) 
 
-all: libSingular_g.a libSingular.a Singular Singularg 
+all: feOpt.inc libSingular_g.a libSingular.a Singular Singularg 
 
 tesths.og: %.og: %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSGNL} -c $< -o $@
@@ -270,10 +270,12 @@ maintainer-clean: distclean srcclean
 	@echo "bison, perl and autoconf"
 
 #dep. ( manually?!! :((( )
+
 feOpt.h: feOpt.inc
 cntrlc.cc: feOpt.inc
 iparith.cc: iparith.inc
-misc_ip.cc: feOpt.h
+misc_ip.cc: feOpt.inc
+test.cc: iparith.inc
 
 mpsr_Tok.inc: gentable2.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable2.cc -o gentable2
@@ -426,7 +428,7 @@ libSingular_g.a: ${OBJG}
 	ar cr $@ $^
 
 # My headers test
-check: testg testr 
+check: feOpt.inc testg testr 
 	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testg
 	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testr
 
