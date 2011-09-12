@@ -676,10 +676,12 @@ BOOLEAN setOption(leftv res, leftv v)
     v=v->next;
   } while (v!=NULL);
    
-  // set global variable to show memory usage
+#ifdef OM_SINGULAR_CONFIG_H
+   // set global variable to show memory usage
   extern int om_sing_opt_show_mem;
   if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
   else om_sing_opt_show_mem = 0;
+#endif
    
   return FALSE;
 }
