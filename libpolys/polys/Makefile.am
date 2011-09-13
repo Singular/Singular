@@ -32,7 +32,7 @@ endif
 prCopy.inc: prCopy.pl
 	perl ${srcdir}/prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
 
-prCopy.o: prCopy.inc
+prCopy.cc: prCopy.inc
 
 
 lib_LIBRARIES=libpolys.a libpolys_g.a
