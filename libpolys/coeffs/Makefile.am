@@ -1,5 +1,6 @@
-lib_LIBRARIES=libcoeffs.a libcoeffs_g.a
-CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
+lib_LIBRARIES = libcoeffs.a libcoeffs_g.a
+CXXTEMPLFLAGS =  --no-exceptions 
+## -fno-implicit-templates
 
 libcoeffs_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libcoeffs_g_a_CFLAGS = ${PIPE}
@@ -46,27 +47,36 @@ endif
 ## for testing...
 AM_LDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc
 
-TESTS = tt-g tt-r
+
+TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
+
+
+TESTS = testg testr
 check_PROGRAMS = $(TESTS)
 
-tt_r_SOURCES = test.cc
-tt_g_SOURCES = test.cc
+testr_SOURCES = test.cc
+testg_SOURCES = test.cc
 
-tt_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
-tt_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
+testr_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
+testg_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
 
-tt_r: gftables
-tt_g: gftables
 
-tt_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-tt_g_CFLAGS = ${PIPE}
+# testr: libcoeffs.a
+# testg: libcoeffs_g.a
+# gftables 
 
-tt_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
-tt_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
+testr_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+testg_CFLAGS = ${PIPE}
+
+testr_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
+# -fimplicit-templates
+testg_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+# -fimplicit-templates
 # -fdiagnostics-show-option 
 
-tt_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-tt_g_CPPFLAGS = -DHAVE_CONFIG_H
+testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+testg_CPPFLAGS = -DHAVE_CONFIG_H
 
-gftables: ${top_srcdir}/../factory/gftables
-	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
+#gftables: ${top_srcdir}/../factory/gftables
+#	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
