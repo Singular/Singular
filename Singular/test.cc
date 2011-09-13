@@ -300,7 +300,7 @@ int main( int, char *argv[] )
    
   currentVoice=feInitStdin(NULL);
    
-  int err=iiEStart(omStrDup("ring R; R; kill R; return();\n"),NULL);
+  int err=iiEStart(omStrDup("ring R; R; system(\"r\", R); kill R; return();\n"),NULL);
   
   printf("interpreter returns %d\n",err);
   if (err) 
@@ -363,7 +363,7 @@ int main( int, char *argv[] )
   IDRING(newRingHdl)=R;
   // make R the default ring (include rChangeCurrRing):
   rSetHdl(newRingHdl);
-  err=iiEStart(omStrDup("poly p=x; p; poly pp = p * p; pp; listvar(); return();\n"),NULL);
+  err=iiEStart(omStrDup("R; system(\"r\", R); poly p=x; p; system(\"p\", p); \"\"; poly pp = p * p; pp; listvar(); return();\n"),NULL);
 
   // calling a kernel function via the interpreter interface
   sleftv r1; memset(&r1,0,sizeof(r1));
