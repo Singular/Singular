@@ -1,5 +1,6 @@
-ALLOC=omalloc
+ACLOCAL_AMFLAGS = -I m4
 
+ALLOC=omalloc
 
 if ENABLE_FACTORY
   USE_FACTORY = factory 

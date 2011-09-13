@@ -6,6 +6,7 @@
 #LD_LIBC	        = -lc
 #STATIC_LDFLAGS	= -static
 
+ACLOCAL_AMFLAGS = -I ${top_srcdir}/m4
 
 
 CXXTEMPLFLAGS = --no-exceptions ## -fno-implicit-templates
