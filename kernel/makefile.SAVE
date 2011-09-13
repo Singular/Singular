@@ -84,7 +84,7 @@ CXXSOURCES=\
     f5c.cc ratgring.cc shiftgb.cc gfan.cc \
     linearAlgebra.cc nc.cc preimage.cc
     
-CXXSOURCES2	= SingularBuilder.cpp
+# CXXSOURCES2	= SingularBuilder.cpp
 
 #    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
 
