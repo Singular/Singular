@@ -30,6 +30,7 @@
 #include <coeffs/gnumpc.h>
 #include <coeffs/ffields.h>
 #include <coeffs/shortfl.h>
+
 #ifdef HAVE_RINGS
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rmodulon.h>
@@ -38,6 +39,7 @@
 
 #ifdef HAVE_POLYEXTENSIONS
 #include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
 #endif
 
 
@@ -176,10 +178,11 @@ cfInitCharProc nInitCharTableDefault[]=
  ngfInitChar,  /* n_long_R */
  #ifdef HAVE_POLYEXTENSIONS
  naInitChar,  /* n_algExt */
+ ntInitChar,  /* n_transExt */
  #else
  NULL,        /* n_algExt */
- #endif
- NULL, /* n_transExt */
+ NULL,        /* n_transExt */
+ #endif   
  ngcInitChar,  /* n_long_C */
  #ifdef HAVE_RINGS
  nrzInitChar,  /* n_Z */
@@ -254,7 +257,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if ((t<=nLastCoeffs) && (nInitCharTable[t]!=NULL))
       nOK = (nInitCharTable[t])(n,parameter);
     else
-       Werror("nInitCharTable[%d] missing",(int)t);
+       Werror("Sorry: the coeff type [%d] was not registered: it is missing in nInitCharTable", (int)t);
     if (nOK)
     {
       omFreeSize(n,sizeof(*n));

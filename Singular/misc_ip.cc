@@ -13,20 +13,22 @@
 /*****************************************************************************/
 
 // include header files
-#include <kernel/mod2.h>
 #include <misc/auxiliary.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #endif
 
-#include "misc_ip.h"
-#include "ipid.h"
-
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
+#include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
+
+#include "misc_ip.h"
+#include "ipid.h"
 #include "feOpt.h"
 #include "silink.h"
 
@@ -1110,8 +1112,9 @@ void siInit(char *name)
 #endif
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
-  extern int iiInitArithmetic();
-  iiInitArithmetic();
+  
+  extern int iiInitArithmetic(); iiInitArithmetic(); // iparith.cc
+
   basePack=(package)omAlloc0(sizeof(*basePack));
   currPack=basePack;
   idhdl h;
@@ -1120,7 +1123,20 @@ void siInit(char *name)
   IDPACKAGE(h)=basePack;
   currPackHdl=h;
   basePackHdl=h;
-  coeffs_BIGINT=nInitChar(n_Q,NULL);
+
+  coeffs_BIGINT = nInitChar(n_Q,NULL);
+  
+#if 1 
+   // def HAVE_POLYEXTENSIONS
+  if(TRUE)
+  {
+    n_coeffType type = nRegister(n_algExt, naInitChar);
+    assume(type == n_algExt);
+     
+    type = nRegister(n_transExt, ntInitChar);
+    assume(type == n_transExt);
+  }
+#endif
 
 // random generator: -----------------------------------------------
   int t=initTimer();
