@@ -2796,6 +2796,92 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
   }
 
   Pi [0] += tmp[0]*xToJ*F.mvar();
+
+  int degPi, degBuf;
+  for (int l= 1; l < factors.length() - 1; l++)
+  {
+    degPi= degree (Pi [l - 1], x);
+    degBuf= degree (bufFactors[l + 1], x);
+    if (degPi > 0 && degBuf > 0)
+    {
+      M (j + 1, l + 1)= mulNTL (Pi [l - 1] [j], bufFactors[l + 1] [j]);
+      if (j + 2 <= M.rows())
+        M (j + 2, l + 1)= mulNTL (Pi [l - 1][j + 1], bufFactors[l + 1] [j + 1]);
+    }
+
+    if (degPi > 0 && degBuf > 0)
+      uIZeroJ= mulNTL (Pi[l -1] [0], buf[l + 1]) +
+               mulNTL (uIZeroJ, bufFactors[l+1] [0]);
+    else if (degPi > 0)
+      uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1]);
+    else if (degBuf > 0)
+      uIZeroJ= mulNTL (Pi[l - 1], buf[1]);
+    else
+      uIZeroJ= 0;
+
+    Pi [l] += xToJ*uIZeroJ;
+
+    one= bufFactors [l + 1];
+    two= Pi [l - 1];
+    if (degBuf > 0 && degPi > 0)
+    {
+      while (one.hasTerms() && one.exp() > j) one++;
+      while (two.hasTerms() && two.exp() > j) two++;
+      for (k= 1; k <= (int) ceil (j/2.0); k++)
+      {
+        if (k != j - k + 1)
+        {
+          if ((one.hasTerms() && one.exp() == j - k + 1) &&
+              (two.hasTerms() && two.exp() == j - k + 1))
+          {
+            tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()),
+                      (Pi[l - 1] [k] + two.coeff())) - M (k + 1, l + 1) -
+                      M (j - k + 2, l + 1);
+            one++;
+            two++;
+          }
+          else if (one.hasTerms() && one.exp() == j - k + 1)
+          {
+            tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()),
+                               Pi[l - 1] [k]) - M (k + 1, l + 1);
+            one++;
+          }
+          else if (two.hasTerms() && two.exp() == j - k + 1)
+          {
+            tmp[l] += mulNTL (bufFactors[l + 1] [k],
+                      (Pi[l - 1] [k] + two.coeff())) - M (k + 1, l + 1);
+            two++;
+           }
+        }
+        else
+          tmp[l] += M (k + 1, l + 1);
+      }
+    }
+
+    if (degPi >= j + 1 && degBuf >= j + 1)
+    {
+      if (j + 2 <= M.rows())
+        tmp [l] += mulNTL ((Pi [l - 1] [j + 1]+ Pi [l - 1] [0]),
+                           (bufFactors [l + 1] [j + 1] + bufFactors [l + 1] [0])
+                          ) - M(1,l+1) - M (j + 2,l+1);
+    }
+    else if (degPi >= j + 1)
+    {
+      if (degBuf > 0)
+        tmp[l] += mulNTL (Pi [l - 1] [j+1], bufFactors [l + 1] [0]);
+      else
+        tmp[l] += mulNTL (Pi [l - 1] [j+1], bufFactors [l + 1]);
+    }
+    else if (degBuf >= j + 1)
+    {
+      if (degPi > 0)
+        tmp[l] += mulNTL (Pi [l - 1] [0], bufFactors [l + 1] [j + 1]);
+      else
+        tmp[l] += mulNTL (Pi [l - 1], bufFactors [l + 1] [j + 1]);
+    }
+
+    Pi[l] += tmp[l]*xToJ*F.mvar();
+  }
   return;
 }
 
@@ -2808,11 +2894,7 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   Pi= CFArray (factors.length() - 2);
   CFList bufFactors2= factors;
   bufFactors2.removeFirst();
-  CanonicalForm s,t;
-  extgcd (bufFactors2.getFirst(), bufFactors2.getLast(), s, t);
-  diophant= CFList();
-  diophant.append (t);
-  diophant.append (s);
+  diophant= diophantine (F[0], bufFactors2);
   DEBOUTLN (cerr, "diophant= " << diophant);
 
   CFArray bufFactors= CFArray (bufFactors2.length());
@@ -2845,6 +2927,31 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
     Pi [0]= M (1, 1);
   }
 
+  for (i= 1; i < Pi.size(); i++)
+  {
+    if (degree (Pi[i-1], x) > 0 && degree (bufFactors [i+1], x) > 0)
+    {
+      M (1,i+1)= mulNTL (Pi[i-1] [0], bufFactors[i+1] [0]);
+      Pi [i]= M (1,i+1) + (mulNTL (Pi[i-1] [1], bufFactors[i+1] [0]) +
+                       mulNTL (Pi[i-1] [0], bufFactors [i+1] [1]))*x;
+    }
+    else if (degree (Pi[i-1], x) > 0)
+    {
+      M (1,i+1)= mulNTL (Pi[i-1] [0], bufFactors [i+1]);
+      Pi [i]=  M(1,i+1) + mulNTL (Pi[i-1] [1], bufFactors[i+1])*x;
+    }
+    else if (degree (bufFactors[i+1], x) > 0)
+    {
+      M (1,i+1)= mulNTL (Pi[i-1], bufFactors [i+1] [0]);
+      Pi [i]= M (1,i+1) + mulNTL (Pi[i-1], bufFactors[i+1] [1])*x;
+    }
+    else
+    {
+      M (1,i+1)= mulNTL (Pi [i-1], bufFactors [i+1]);
+      Pi [i]= M (1,i+1);
+    }
+  }
+
   for (i= 1; i < l; i++)
     henselStep122 (F, bufFactors2, bufFactors, diophant, M, Pi, i, LCs);
 
@@ -2853,6 +2960,7 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
     factors.append (bufFactors[i]);
   return;
 }
+
 
 /// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
 /// mod M, products contains \f$ prod_{j=1, j\neq i}^{r}{f_{i}}} \f$
