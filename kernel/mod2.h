@@ -56,9 +56,6 @@
 /* still testing */
 #undef HAVE_F5C
 
-/* letterplace gb:*/
-#define HAVE_SHIFTBBA 1
-
 /* procedures to compute with units */
 #define HAVE_UNITS
 

@@ -38,6 +38,11 @@
 #undef HAVE_NTL
 #endif
 
+/* letterplace gb:*/
+#ifndef HAVE_SHIFTBBA
+#undef HAVE_SHIFTBBA
+#endif
+
 #ifndef HAVE_POLYEXTENSIONS
 #undef HAVE_POLYEXTENSIONS
 #endif
