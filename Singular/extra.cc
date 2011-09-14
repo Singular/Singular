@@ -2403,23 +2403,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   /*==================== poly debug ==================================*/
-  #ifdef RDEBUG
         if(strcmp(sys_cmd,"p")==0)
         {
+#  ifdef RDEBUG
           p_DebugPrint((poly)h->Data(), currRing);
+#  else
+	  Warn("Sorry: not available for release build!");
+#  endif
           return FALSE;
         }
         else
-  #endif
   /*==================== ring debug ==================================*/
-  #ifdef RDEBUG
         if(strcmp(sys_cmd,"r")==0)
         {
+#  ifdef RDEBUG
           rDebugPrint((ring)h->Data());
+#  else
+	  Warn("Sorry: not available for release build!");
+#  endif
           return FALSE;
         }
         else
-  #endif
   /*==================== changeRing ========================*/
         /* The following code changes the names of the variables in the
            current ring to "x1", "x2", ..., "xN", where N is the number
