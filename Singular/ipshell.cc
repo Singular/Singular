@@ -4949,6 +4949,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int numberOfAllocatedBlocks;
   
   coeffs cf=NULL;
+  // allocated ring
+  R = (ring) omAlloc0Bin(sip_sring_bin);
 
   if (pn->Typ()==INT_CMD)
   {
@@ -4974,6 +4976,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       /* parameter -------------------------------------------------------*/
       pn=pn->next;
       if (cf==NULL) cf=nInitChar(n_transExt,NULL);
+      if (cf==NULL) goto rInitError;
       R->cf=cf;
       if (pn!=NULL)
       {
@@ -5108,8 +5111,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     ch=32003;
     cf=nInitChar(n_Zp, (void*)(long)ch);
   }
-  // allocated ring and set ch
-  R = (ring) omAlloc0Bin(sip_sring_bin);
   R->cf=cf;
 #ifdef HAVE_RINGS
   R->cf->ringtype = ringtype;
@@ -5174,7 +5175,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   // error case:
   rInitError:
-  if  (R != NULL) rDelete(R);
+  if  ((R != NULL)&&(R->cf!=NULL)) rDelete(R);
   if (pn != NULL) pn->CleanUp();
   if (rv != NULL) rv->CleanUp();
   if (ord != NULL) ord->CleanUp();
