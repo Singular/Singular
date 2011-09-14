@@ -226,8 +226,10 @@ int main( int, char *argv[] )
   
   poly pp = pp_Mult_qq( p, p, R);
 
-  Print("p: "); p_Write0(p, R);
-  Print("; p*p : "); p_Write(pp, R); 
+  Print("p: "); p_Write0(p, R); Print(", deg(p): %d", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
+
+  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %d\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
+
 
   p_Delete(&p, R);
   
