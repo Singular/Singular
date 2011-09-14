@@ -255,11 +255,40 @@ BOOLEAN naGreaterZero(number a, const coeffs cf)
 
 void naCoeffWrite(const coeffs cf)
 {
-  char *x = rRingVar(0, naRing);
+  assume( cf != NULL );
+  
+  const ring A = cf->extRing;
+  
+  assume( A != NULL );
+  assume( A->cf != NULL );
+   
+  n_CoeffWrite(A->cf);
+ 
+//  rWrite(A);
+  
+  const int P = rVar(A);
+  assume( P > 0 );
+  
+  Print("//   %d parameter    : ", P);
+  
+  for (int nop=0; nop < P; nop ++)
+    Print("%s ", rRingVar(nop, A));
+  
+  const ideal I = A->minideal;
+
+  assume( I != NULL );
+  assume( IDELEMS(I) == 1 );
+  
+  PrintS("\n//   minpoly        : ("); p_Write0( I->m[0], A); PrintS(")\n");
+  
+/*
+  char *x = rRingVar(0, A);
+
   Print("//   Coefficients live in the extension field K[%s]/<f(%s)>\n", x, x);
   Print("//   with the minimal polynomial f(%s) = %s\n", x,
-        p_String(naMinpoly, naRing));
-  PrintS("//   and K: "); n_CoeffWrite(cf->extRing->cf);
+        p_String(A->minideal->m[0], A));
+  PrintS("//   and K: ");
+*/
 }
 
 number naAdd(number a, number b, const coeffs cf)
@@ -621,6 +650,9 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {  
+  assume( cf != NULL );
+  assume( infoStruct != NULL );
+
   AlgExtInfo *e = (AlgExtInfo *)infoStruct;
   /// first check whether cf->extRing != NULL and delete old ring???
   cf->extRing           = e->r;

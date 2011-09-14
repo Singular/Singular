@@ -369,15 +369,41 @@ BOOLEAN ntGreaterZero(number a, const coeffs cf)
 
 void ntCoeffWrite(const coeffs cf)
 {
+  assume( cf != NULL );
+
+  const ring A = cf->extRing;
+
+  assume( A != NULL );
+  assume( A->cf != NULL );
+
+  n_CoeffWrite(A->cf);
+
+//  rWrite(A);
+
+  const int P = rVar(A);
+  assume( P > 0 );
+  
+  Print("//   %d parameter    : ", P);
+  
+  for (int nop=0; nop < P; nop ++)
+    Print("%s ", rRingVar(nop, A));
+
+  assume( A->minideal == NULL );
+  
+  PrintS("\n//   minpoly        : 0\n");
+
+
+/*
   PrintS("//   Coefficients live in the rational function field\n");
   Print("//   K(");
   for (int i = 0; i < rVar(ntRing); i++)
   {
-    if (i > 0) PrintS(", ");
+    if (i > 0) PrintS(" ");
     Print("%s", rRingVar(i, ntRing));
   }
   PrintS(") with\n");
   PrintS("//   K: "); n_CoeffWrite(cf->extRing->cf);
+*/
 }
 
 number ntAdd(number a, number b, const coeffs cf)
@@ -1070,7 +1096,11 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 }
 
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
-{  
+{
+
+  assume( cf != NULL );
+  assume( infoStruct != NULL );
+  
   TransExtInfo *e = (TransExtInfo *)infoStruct;
   /// first check whether cf->extRing != NULL and delete old ring???
   cf->extRing           = e->r;
