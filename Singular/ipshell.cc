@@ -4931,7 +4931,6 @@ const short MAX_SHORT = SHRT_MAX; // (1 << (sizeof(short)*8)) - 1;
 //idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
-  int ch;
 #ifdef HAVE_RINGS
   unsigned int ringtype = 0;
   int_number modBase = NULL;
@@ -4948,59 +4947,74 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // get ch of ground field
   int numberOfAllocatedBlocks;
   
-  coeffs cf=NULL;
   // allocated ring
   R = (ring) omAlloc0Bin(sip_sring_bin);
 
+  coeffs cf = NULL;
+
+  assume( pn != NULL );
+  const int P = pn->listLength();
+  
   if (pn->Typ()==INT_CMD)
   {
-    ch=(int)(long)pn->Data();
-    if (pn->next==NULL)
-      cf=nInitChar(ch==0 ? n_Q : n_Zp, (void*)(long)ch);
+    const int ch = (int)(long)pn->Data();
+    
+    /* parameter? -------------------------------------------------------*/
+    pn = pn->next;
+    
+    if (pn == NULL) // no params!?
+      cf = nInitChar(ch==0 ? n_Q : n_Zp, (void*)(long)ch);
     else
     {
-      if ((ch!=0) && (ch!=IsPrime(ch)))
+      const int pars = pn->listLength();
+
+      assume( pars > 0 );
+
+      // predefined finite field: (p^k, a)
+      if ((ch!=0) && (ch!=IsPrime(ch)) && (pars == 1))
       {
         GFInfo param;
 	 
         param.GFChar = ch; 
-        param.GFDegree = 1;
-	 
-        param.GFPar_name=pn->name;
-        cf=nInitChar(n_GF,&param);
+        param.GFDegree = 1;	 
+        param.GFPar_name = pn->name;
         
-        if (cf==NULL) goto rInitError;
-        else ffChar=TRUE;
-        
+        cf = nInitChar(n_GF, &param);        
       }
-      /* parameter -------------------------------------------------------*/
-      pn=pn->next;
-      if (cf==NULL) cf=nInitChar(n_transExt,NULL);
-      if (cf==NULL) goto rInitError;
-      R->cf=cf;
-      if (pn!=NULL)
+      else // (0/p, a, b, ..., z)
       {
-        int pars=pn->listLength();
-        if (!ffChar) R->cf->extRing->N=pars;
-        if ((pars > 1) && (ffChar))
-        {
-          WerrorS("too many parameters");
-          goto rInitError;
-        }
-        if (!ffChar) R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
-        if (rSleftvList2StringArray(pn, R->cf->extRing->names))
+        assume( (ch == 0) || (ch==IsPrime(ch)) );
+
+//         if ((pars > 1) && (ffChar))
+//         {
+//           WerrorS("too many parameters");
+//           goto rInitError;
+//         }
+        
+        char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
+
+        if (rSleftvList2StringArray(pn, names))
         {
           WerrorS("parameter expected");
           goto rInitError;
         }
+
+        TransExtInfo extParam;
+        
+        extParam.r = rDefault( ch, pars, names); // Q/Zp [ p_1, ... p_pars ]
+        
+        cf = nInitChar(n_transExt, &extParam);
       }
     }
+    
+//    if (cf==NULL) goto rInitError;
+    assume( cf != NULL );
   }
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
-    ch=0;
+    const int ch=0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
       WarnS("not implemented: size for real/complex");
@@ -5022,6 +5036,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     else
       WarnS("not implemented: name for i (complex)");
     cf=nInitChar(complex_flag ? n_long_C: n_long_R,NULL);
+
+    assume( cf != NULL );
   }
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
@@ -5045,6 +5061,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else
       cf=nInitChar(n_Z,NULL);
+    
     if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
     {
       Werror("Wrong ground ring specification (module is 1)");
@@ -5059,7 +5076,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     // we have an exponent
     if (modExponent > 1)
     {
-      ch = modExponent;
+      const int ch = modExponent;
       if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
       {
         /* this branch should be active for modExponent = 2..32 resp. 2..64,
@@ -5077,17 +5094,42 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     else
     {
       ringtype = 2;
-      ch = mpz_get_ui(modBase);
-      cf=nInitChar(n_Zn,(void*)(long)modBase);
+      const int ch = mpz_get_ui(modBase);
+      cf=nInitChar(n_Zn,(void*)(long)ch);
     }
+    assume( cf != NULL );
   }
 #endif
+  // ring NEW = OLD, (), (); where OLD is a polynomial ring...
+  else if ((pn->Typ()==RING_CMD) && (P == 1))
+  {
+    TransExtInfo extParam;
+    extParam.r = (ring)pn->Data();
+    cf = nInitChar(n_transExt, &extParam);
+  }
+  else if ((pn->Typ()==QRING_CMD) && (P == 1)) // same for qrings - which should be fields!?
+  {
+    AlgExtInfo extParam;
+    extParam.r = (ring)pn->Data();
+    extParam.i = (extParam.r->qideal);
+    
+    cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
+  }
   else
   {
-    Werror("Wrong ground field specification");
+    sleftv* p = pn;
+    Werror("Wrong or unknown ground field specification");
+#ifndef NDEBUG
+    while (p != NULL)
+    {
+      Print( "pn[%p]: type: %d [%s]: %p, name: %s", p, p->Typ(), Tok2Cmdname(p->Typ()), p->Data(), (p->name == NULL? "NULL" : p->name) );
+      PrintLn();
+      p = p->next;
+    }
+#endif    
     goto rInitError;
   }
-  pn=pn->next;
+//  pn=pn->next;
 
   int l, last;
   sleftv * sl;
@@ -5107,15 +5149,20 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   if (cf==NULL)
   {
-    Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
-    ch=32003;
+    const int ch=32003;
+    Warn("Invalid ground field specification: using the default field: Z_{%d}", ch);
     cf=nInitChar(n_Zp, (void*)(long)ch);
   }
-  R->cf=cf;
+
+  assume( R != NULL );
+  
+  R->cf = cf;
+  
 #ifdef HAVE_RINGS
-  R->cf->ringtype = ringtype;
-  R->cf->modBase = modBase;
-  R->cf->modExponent = modExponent;
+  // the following should have beed set already into cf, right?!
+//  R->cf->ringtype = ringtype;
+//  R->cf->modBase = modBase;
+//  R->cf->modExponent = modExponent;
 #endif
 
   /* names and number of variables-------------------------------------*/
