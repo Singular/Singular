@@ -2538,7 +2538,8 @@ else
 fi
 
 	  if test "$ac_cv_lib_dld_shl_load" = yes; then
-         	LD_DYN_FLAGS="-ldld -Xlinker -E"
+         	LD_DYN_FLAGS1="-Xlinker -E"
+         	LD_DYN_FLAGS2="-ldld"
 	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS="-fPIC -DPIC -shared"
                 if test "${LD+set}" != set; then
@@ -2596,7 +2597,8 @@ else
 fi
 
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -rdynamic"
+	  	LD_DYN_FLAGS1="-rdynamic"
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
@@ -2606,7 +2608,8 @@ fi
 	  fi
 	;;
         IRIX-6)
-          LD_DYN_FLAGS="-lc"
+          LD_DYN_FLAGS1="-lc"
+          LD_DYN_FLAGS2=""
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
           if test "${LD+set}" != set; then
@@ -2663,7 +2666,8 @@ else
 fi
 
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl"
+	  	LD_DYN_FLAGS1=""
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
@@ -2722,7 +2726,8 @@ else
 fi
 
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	LD_DYN_FLAGS1="-dynamic"
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
                 if test "${LD+set}" != set; then
@@ -2780,7 +2785,8 @@ else
 fi
 
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	LD_DYN_FLAGS1="-dynamic"
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
                 if test "${LD+set}" != set; then
@@ -2838,7 +2844,8 @@ else
 fi
 
           if test "$ac_cv_lib_c_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-Xlinker -E"
+	  	LD_DYN_FLAGS1="-Xlinker -E"
+	  	LD_DYN_FLAGS2=""
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
@@ -2852,7 +2859,8 @@ esac
 
 if test $ac_cv_c_cpp = unknown;
 then
-  LD_DYN_FLAGS=
+  LD_DYN_FLAGS1=
+  LD_DYN_FLAGS2=
   SFLAGS=
   SLDFLAGS=
 fi
@@ -6066,7 +6074,8 @@ s%@PYTHON_STATIC_LIBS@%$PYTHON_STATIC_LIBS%g
 s%@PYTHON_MODULE_FLAGS@%$PYTHON_MODULE_FLAGS%g
 s%@PYTHON_EMBED_LIBS@%$PYTHON_EMBED_LIBS%g
 s%@EMBED_PYTHON_VALUE@%$EMBED_PYTHON_VALUE%g
-s%@LD_DYN_FLAGS@%$LD_DYN_FLAGS%g
+s%@LD_DYN_FLAGS1@%$LD_DYN_FLAGS1%g
+s%@LD_DYN_FLAGS2@%$LD_DYN_FLAGS2%g
 s%@SFLAGS@%$SFLAGS%g
 s%@SLDFLAGS@%$SLDFLAGS%g
 s%@LD@%$LD%g

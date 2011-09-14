@@ -714,7 +714,8 @@ case "$ac_cv_singuname" in
 	HPUX*)
 	  AC_CHECK_LIB(dld, shl_load)
 	  if test "$ac_cv_lib_dld_shl_load" = yes; then
-         	LD_DYN_FLAGS="-ldld -Xlinker -E"
+         	LD_DYN_FLAGS1="-Xlinker -E"
+         	LD_DYN_FLAGS2="-ldld"
 	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS="-fPIC -DPIC -shared"
                 if test "${LD+set}" != set; then
@@ -726,7 +727,8 @@ case "$ac_cv_singuname" in
 	*Linux*)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -rdynamic"
+	  	LD_DYN_FLAGS1="-rdynamic"
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
@@ -736,7 +738,8 @@ case "$ac_cv_singuname" in
 	  fi
 	;;
         IRIX-6)
-          LD_DYN_FLAGS="-lc"
+          LD_DYN_FLAGS1=""
+          LD_DYN_FLAGS2="-lc"
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
           if test "${LD+set}" != set; then
@@ -747,7 +750,8 @@ case "$ac_cv_singuname" in
 	SunOS-5)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl"
+	  	LD_DYN_FLAGS1=""
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
@@ -760,7 +764,8 @@ case "$ac_cv_singuname" in
 	ppcMac-darwin)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	LD_DYN_FLAGS1="-dynamic"
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
                 if test "${LD+set}" != set; then
@@ -772,7 +777,8 @@ case "$ac_cv_singuname" in
 	ix86Mac-darwin)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	LD_DYN_FLAGS1="-dynamic"
+	  	LD_DYN_FLAGS2="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
                 if test "${LD+set}" != set; then
@@ -784,7 +790,8 @@ case "$ac_cv_singuname" in
 	*-freebsd)
 	  AC_CHECK_LIB(c, dlopen)
           if test "$ac_cv_lib_c_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-Xlinker -E"
+	  	LD_DYN_FLAGS1="-Xlinker -E"
+	  	LD_DYN_FLAGS2=""
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
@@ -796,11 +803,13 @@ case "$ac_cv_singuname" in
 esac
 if test $ac_cv_c_cpp = unknown;
 then
-  LD_DYN_FLAGS=
+  LD_DYN_FLAGS1=
+  LD_DYN_FLAGS2=
   SFLAGS=
   SLDFLAGS=
 fi
-AC_SUBST(LD_DYN_FLAGS)
+AC_SUBST(LD_DYN_FLAGS1)
+AC_SUBST(LD_DYN_FLAGS2)
 AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
 AC_SUBST(LD)

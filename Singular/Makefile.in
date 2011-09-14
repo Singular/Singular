@@ -86,15 +86,16 @@ DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LDFLAGS		= -L@prefix@/kernel -L../kernel -lkernel @LDFLAGS@ 
-LDFLAGSG	= -L@prefix@/kernel -L../kernel -lkernel_g @LDFLAGS@ 
-LDFLAGSP	= -L@prefix@/kernel -L../kernel -lkernel_p @LDFLAGS@ 
+LDFLAGSG	= -L@prefix@/kernel -L../kernel -lkernel_g @LD_DYN_FLAGS1@ @LDFLAGS@ 
+LDFLAGSP	= -L@prefix@/kernel -L../kernel -lkernel_p @LD_DYN_FLAGS1@ @LDFLAGS@ 
 else
 ## -L/usr/local/lib -L@prefix@/modules/python --> PySingular
 LDFLAGS		= -L@prefix@/kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python 
 LDFLAGSG	= -L@prefix@/kernel -L/bin -lkernel_g @LDFLAGS@ 
 LDFLAGSP	= -L@prefix@/kernel -L/bin -lkernel_p @LDFLAGS@ 
 endif
-LD_DYN_FLAGS	= @LD_DYN_FLAGS@
+LD_DYN_FLAGS1	= @LD_DYN_FLAGS1@
+LD_DYN_FLAGS2	= @LD_DYN_FLAGS2@
 SFLAGS		= @SFLAGS@
 SLDFLAGS	= @SLDFLAGS@
 
@@ -180,7 +181,7 @@ LIBSG := ${MP_LIBS} ${LIBSG} ${PYTHON_LIBS}
 DL_KERNEL =
 GLIBC_DYN_FIX=
 else
-LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS}
+LDFLAGS  := ${LD_DYN_FLAGS1} ${LDFLAGS} ${LD_DYN_FLAGS2}
 SING_EXEC = Singular
 LIBS := ${LIBS} ${PYTHON_LIBS}
 LIBSG := ${LIBSG} ${PYTHON_LIBS}
@@ -751,7 +752,7 @@ Singularg${S_EXT}: scanner.cc  $(OBJG)  $(DL_LIBSG)\
            iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg${S_EXT} \
 	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGSG} ${LIBSG} -lomalloc ../kernel/mmalloc.og \
-	${LD_DYN_FLAGS} ${LD_LIBC}
+	${LD_DYN_FLAGS2} ${LD_LIBC}
 
 iparith.og: iparith.inc iparith.cc
 	$(CXXG)  ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
@@ -831,7 +832,7 @@ Singularp${S_EXT}: scanner.cc  $(OBJP)  $(DL_LIBSP)\
 	(cd ../kernel;make libkernel_p.a;make install;cd ../Singular)
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp${S_EXT} \
 	tesths.cc iparith.op mpsr_Tok.op claptmpl.op $(OBJP) ${LDFLAGSP} ${LIBSP} -lomalloc ../kernel/mmalloc.op \
-	${LD_DYN_FLAGS}
+	${LD_DYN_FLAGS2}
 
 iparith.op: iparith.inc iparith.cc
 	$(CXXP)  ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c iparith.cc -o iparith.op
