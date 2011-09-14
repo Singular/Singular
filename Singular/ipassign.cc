@@ -12,34 +12,50 @@
 #include <string.h>
 #include <ctype.h>
 
+#define TRANSEXT_PRIVATES
+
+#include <polys/ext_fields/transext.h>
+
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
-#include <Singular/ipid.h>
-#include <Singular/idrec.h>
-#include <misc/intvec.h>
 #include <omalloc/omalloc.h>
+
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
+
+
+#include <polys/ext_fields/algext.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/matpol.h>
+#include <polys/monomials/maps.h>
+#include <polys/nc/nc.h>
+#include <polys/nc/sca.h>
+
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <polys/matpol.h>
 #include <kernel/kstd1.h>
 #include <kernel/timer.h>
-#include <polys/monomials/ring.h>
-#include <Singular/subexpr.h>
-#include <Singular/lists.h>
-#include <coeffs/numbers.h>
-//#include <polys/ext_fields/longalg.h>
 #include <kernel/stairc.h>
-#include <polys/monomials/maps.h>
 #include <kernel/syz.h>
+
 //#include "weight.h"
-#include <Singular/ipconv.h>
-#include <Singular/attrib.h>
-#include <Singular/silink.h>
-#include <Singular/ipshell.h>
-#include <polys/nc/sca.h>
-#include <Singular/blackbox.h>
+#include "tok.h"
+#include "ipid.h"
+#include "idrec.h"
+#include "subexpr.h"
+#include "lists.h"
+#include "ipconv.h"
+#include "attrib.h"
+#include "silink.h"
+#include "ipshell.h"
+#include "blackbox.h"
+
+
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
@@ -160,54 +176,68 @@ static void jjMINPOLY_red(idhdl h)
 }
 static BOOLEAN jjMINPOLY(leftv res, leftv a)
 {
-  if (getCoeffType(currRing->cf)!=n_transExt)
+  if ( !nCoeff_is_transExt(currRing->cf) )
   {
-      WerrorS("no minpoly allowed");
-      return TRUE;
+    WerrorS("no minpoly allowed over non-transcendental ground field");
+    return TRUE;
   }
-  number p=(number)a->CopyD(NUMBER_CMD);
-  if (nIsZero(p))
+
+  if ( currRing->idroot != NULL )
+  {
+    WerrorS("no minpoly allowed if there are local objects belonging to the basering");
+    return TRUE;
+  }
+  
+  number p = (number)a->CopyD(NUMBER_CMD);
+
+  if (n_IsZero(p, currRing->cf))
   {
     WerrorS("cannot set minpoly to 0");
     return TRUE;
   }
+
+  assume (currRing->idroot==NULL);
+  
+  // remove all object currently in the ring
+  while(currRing->idroot!=NULL)
+  {
+    killhdl2(currRing->idroot,&(currRing->idroot),currRing);
+  }
+  
+  n_Normalize(p, currRing->cf);
+
+  AlgExtInfo A;
+  
+  A.r = currRing->cf->extRing; // Use the same ground field!
+  A.i = idInit(1,1);
+
+  assume( DEN((fractionObject *)(p)) == NULL ); // minpoly must be a poly...!?
+  
+  A.i->m[0] = NUM((fractionObject *)p);
+
+#ifndef NDEBUG
+  PrintS("\nTrying to conver the currRing into an algebraic field: ");
+  PrintS("Ground poly. ring: \n");
+  rWrite( A.r );
+  PrintS("\nGiven MinPOLY: ");
+  p_Write( A.i->m[0], A.r );
+#endif
+
+  NUM((fractionObject *)p) = NULL; n_Delete(&p, currRing->cf);
+  
+  coeffs new_cf = nInitChar(n_algExt, &A);
+  
+  if (new_cf==NULL)
+  {
+    Werror("Could not construct the alg. extension: llegal minpoly?");
+    // cleanup A: TODO
+    return TRUE;
+  }
   else
   {
-    // remove all object currently in the ring
-    while(currRing->idroot!=NULL)
-    {
-      killhdl2(currRing->idroot,&(currRing->idroot),currRing);
-    }
-    nNormalize(p);
-    typedef struct { ring r; ideal i; } AlgExtInfo;
-    struct fractionObject
-    {
-      poly numerator;
-      poly denominator;
-      int complexity;
-    };
-    typedef struct fractionObject * fraction;
-
-    AlgExtInfo A;
-    A.r=currRing->cf->extRing;
-    A.r->ref++;
-    A.i=idInit(1,1);
-    A.i->m[0]=((fraction)p)->numerator;
-    ((fraction)p)->numerator=NULL;
-    n_Delete(&p,currRing->cf);
-    coeffs new_cf=nInitChar(n_algExt,&A);
-    if (new_cf==NULL)
-    {
-      Werror("llegal minpoly");
-      // cleanup A: TODO
-      return TRUE;
-    }
-    else
-    {
-      nKillChar(currRing->cf);
-      currRing->cf=new_cf;
-    }
+    nKillChar(currRing->cf); currRing->cf=new_cf;
   }
+
   return FALSE;
 }
 static BOOLEAN jjNOETHER(leftv res, leftv a)
@@ -690,7 +720,7 @@ static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr e)
 /*=================== table =================*/
 #define IPASSIGN
 #define D(A) A
-#include <Singular/table.h>
+#include "table.h"
 /*=================== operations ============================*/
 /*2
 * assign a = b
