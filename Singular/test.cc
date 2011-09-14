@@ -300,7 +300,7 @@ int main( int, char *argv[] )
    
   currentVoice=feInitStdin(NULL);
    
-  int err=iiEStart(omStrDup("ring R; R; system(\"r\", R); kill R; return();\n"),NULL);
+  int err=iiEStart(omStrDup("ring R = (0, a), x, dp; R; system(\"r\", R); minpoly=a*a+1; R; system(\"r\", R); kill R; return();\n"),NULL);
   
   printf("interpreter returns %d\n",err);
   if (err) 
