@@ -1098,18 +1098,20 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
-  assume( cf != NULL );
   assume( infoStruct != NULL );
   
   TransExtInfo *e = (TransExtInfo *)infoStruct;
-  /// first check whether cf->extRing != NULL and delete old ring???
-  cf->extRing           = e->r;
-  cf->extRing->minideal = NULL;
-
-  assume(cf->extRing                != NULL);      // extRing;
-  assume(cf->extRing->cf            != NULL);      // extRing->cf;
-  assume(getCoeffType(cf) == ID);                // coeff type;
   
+  assume( e->r                != NULL);      // extRing;
+  assume( e->r->cf            != NULL);      // extRing->cf;
+  assume( e->r->minideal == NULL ); 
+
+  assume( cf != NULL );
+  assume(getCoeffType(cf) == ID);                // coeff type;
+
+  cf->extRing           = e->r;
+  cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!  
+
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
   cf->ch = cf->extRing->cf->ch;

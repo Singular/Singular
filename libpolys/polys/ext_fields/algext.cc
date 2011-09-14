@@ -650,21 +650,27 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {  
-  assume( cf != NULL );
   assume( infoStruct != NULL );
 
   AlgExtInfo *e = (AlgExtInfo *)infoStruct;
   /// first check whether cf->extRing != NULL and delete old ring???
-  cf->extRing           = e->r;
-  cf->extRing->minideal = e->i;
 
-  assume(cf->extRing                     != NULL);      // extRing;
-  assume((cf->extRing->minideal          != NULL) &&    // minideal has one
-         (IDELEMS(cf->extRing->minideal) != 0)    &&    // non-zero generator
-         (cf->extRing->minideal->m[0]    != NULL)    ); // at m[0];
-  assume(cf->extRing->cf                 != NULL);      // extRing->cf;
+  assume(e->r                     != NULL);      // extRing;
+  assume(e->r->cf                 != NULL);      // extRing->cf;
+  assume((e->i          != NULL) &&    // minideal has one
+         (IDELEMS(e->i) != 0)    &&    // non-zero generator
+         (e->i->m[0]    != NULL)    ); // at m[0];
+
+  assume( e->r->minideal == NULL );
+
+  assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                     // coeff type;
   
+  cf->extRing           = e->r;
+  cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!
+
+  cf->extRing->minideal = e->i; // make a copy? 
+
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
   cf->ch = cf->extRing->cf->ch;
