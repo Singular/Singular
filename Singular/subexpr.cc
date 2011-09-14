@@ -621,13 +621,17 @@ void * sleftv::CopyD(int t)
   if ((rtyp!=IDHDL)&&(e==NULL))
   {
     if (iiCheckRing(t)) return NULL;
-    void *x=data;
-    if (rtyp==VNOETHER) x=(void *)pCopy((currRing->ppNoether));
-    else if ((rtyp==VMINPOLY)&& \
-		    nCoeff_is_Extension(currRing->cf) && \
-		    (!nCoeff_is_GF(currRing->cf)))
-      x=(void *)p_Copy(currRing->cf->extRing->minideal->m[0],
-		      currRing->cf->extRing );
+    void *x = data;
+    if (rtyp==VNOETHER) x = (void *)pCopy((currRing->ppNoether));
+    else if ((rtyp==VMINPOLY) && nCoeff_is_algExt(currRing->cf) && (!nCoeff_is_GF(currRing->cf)))
+    {
+      const ring A = currRing->cf->extRing;
+      
+      assume( A != NULL );
+      assume( A->minideal != NULL );
+    
+      x=(void *)p_Copy(A->minideal->m[0], A);
+    }
     data=NULL;
     return x;
   }
@@ -1032,13 +1036,20 @@ void * sleftv::Data()
       case VMAXMULT:   return (void *)Kstd1_mu;
       case TRACE:      return (void *)traceit;
       case VSHORTOUT:  return (void *)(currRing != NULL ? currRing->ShortOut : 0);
-      case VMINPOLY:   if (currRing != NULL &&
-                           nCoeff_is_Extension(currRing->cf)&&
-			   !nCoeff_is_GF(currRing->cf))
-                       /* Q(a), Fp(a), but not GF(q) */
-                         return (void *)currRing->cf->extRing->minideal->m[0];
-                       else
-                         return (void *)currRing->cf->nNULL;
+      case VMINPOLY:
+        if ( (currRing != NULL)  && nCoeff_is_algExt(currRing->cf) && !nCoeff_is_GF(currRing->cf))
+        {
+          /* Q(a), Fp(a), but not GF(q) */
+          const ring A = currRing->cf->extRing;
+          
+          assume( A != NULL );
+          assume( A->minideal != NULL );
+          
+          return (void *)A->minideal->m[0];
+        }
+        else
+          return (void *)currRing->cf->nNULL;
+        
       case VNOETHER:   return (void *) (currRing->ppNoether);
       case IDHDL:
         return IDDATA((idhdl)data);
