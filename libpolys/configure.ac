@@ -82,6 +82,8 @@ AC_DEFINE([SINGULAR],[1],[SINGULAR])
 AC_DEFINE([DISABLE_GMP_CPP],[1],[DISABLE_GMP_CPP])
 AC_DEFINE([NOSTREAMIO],[1],[DISABLE_GMP_CPP])
 
+## AC_DEFINE([HAVE_POLYEXTENSIONS], [1], [Enable the algebraic & transcendental extensions])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([misc/Makefile])
 AC_CONFIG_FILES([reporter/Makefile])
