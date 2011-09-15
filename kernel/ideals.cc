@@ -1904,7 +1904,7 @@ ideal idMinors(matrix a, int ar, ideal R)
     Werror("%d-th minor, matrix is %dx%d",ar,r,c);
     return NULL;
   }
-  h = idMatrix2Module(mp_Copy(a,currRing));
+  h = id_Matrix2Module(mp_Copy(a,currRing),currRing);
   bound = sm_ExpBound(h,c,r,ar,currRing);
   idDelete(&h);
   tmpR=sm_RingChange(origR,bound);

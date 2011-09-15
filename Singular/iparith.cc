@@ -2746,11 +2746,11 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
         ring save = currRing;
         rChangeCurrRing(r);
         matrix  m = (matrix)IDDATA(w);
-        ideal   Q = idMatrix2Module(mp_Copy(m, currRing));
+        ideal   Q = id_Matrix2Module(mp_Copy(m, currRing),currRing);
         rChangeCurrRing(save);
         ideal   S = idOppose(r,Q,currRing);
         id_Delete(&Q, r);
-        res->data = idModule2Matrix(S);
+        res->data = id_Module2Matrix(S,currRing);
         res->rtyp = argtype;
         break;
       }
@@ -3668,7 +3668,7 @@ static BOOLEAN jjDET(leftv res, leftv v)
   poly p;
   if (sm_CheckDet((ideal)m,m->cols(),TRUE, currRing))
   {
-    ideal I=idMatrix2Module(mp_Copy(m, currRing));
+    ideal I=id_Matrix2Module(mp_Copy(m, currRing),currRing);
     p=sm_CallDet(I, currRing);
     idDelete(&I);
   }
@@ -3698,7 +3698,7 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
   if (IDELEMS(I)<1) return TRUE;
   if (sm_CheckDet(I,IDELEMS(I),FALSE, currRing))
   {
-    matrix m=idModule2Matrix(idCopy(I));
+    matrix m=id_Module2Matrix(id_Copy(I,currRing),currRing);
     p=singclap_det(m,currRing);
     idDelete((ideal *)&m);
   }
@@ -6406,7 +6406,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
     idDelete(&R);
   }
   else if(v1->Typ()==IDEAL_CMD||v1->Typ()==MATRIX_CMD)
-    L->m[1].data=(void *)idModule2Matrix(R);
+    L->m[1].data=(void *)id_Module2Matrix(R,currRing);
   else
   {
     L->m[1].rtyp=MODUL_CMD;

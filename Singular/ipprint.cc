@@ -243,9 +243,9 @@ BOOLEAN jjPRINT(leftv res, leftv u)
 
       case MODUL_CMD:
       {
-        matrix m = idModule2Matrix(idCopy((ideal) u->Data()));
+        matrix m = id_Module2Matrix(id_Copy((ideal) u->Data(),currRing),currRing);
         ipPrint_MA0(m, u->Name());
-        idDelete((ideal *) &m);
+        id_Delete((ideal *) &m,currRing);
         break;
       }
 
