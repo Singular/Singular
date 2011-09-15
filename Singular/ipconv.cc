@@ -130,13 +130,13 @@ static void * iiDummy(void *data)
 
 static void * iiMo2Ma(void *data)
 {
-  void *res=idModule2Matrix((ideal)data);
+  void *res=id_Module2Matrix((ideal)data,currRing);
   return res;
 }
 
 static void * iiMa2Mo(void *data)
 {
-  void *res=idMatrix2Module((matrix)data);
+  void *res=id_Matrix2Module((matrix)data,currRing);
   return res;
 }
 

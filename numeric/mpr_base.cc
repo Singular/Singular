@@ -2514,7 +2514,7 @@ const ideal resMatrixDense::getMatrix()
   }
 
   // obachman: idMatrix2Module frees resmat !!
-  ideal resmod= idMatrix2Module(resmat);
+  ideal resmod= id_Matrix2Module(resmat,currRing);
   return resmod;
 }
 
@@ -2545,7 +2545,7 @@ const ideal resMatrixDense::getSubMatrix()
   }
 
   // obachman: idMatrix2Module frees resmat !!
-  ideal resmod= idMatrix2Module(resmat);
+  ideal resmod= id_Matrix2Module(resmat,currRing);
   return resmod;
 }
 

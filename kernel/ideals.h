@@ -175,15 +175,6 @@ inline ideal idVec2Ideal(poly vec, const ring R = currRing)
   return id_Vec2Ideal(vec, R);
 }
 
-inline ideal   idMatrix2Module(matrix mat, const ring R = currRing)
-{
-  return idMatrix2Module(mat, R);
-}
-
-inline matrix  idModule2Matrix(ideal mod, const ring R = currRing)
-{
-  return id_Module2Matrix(mod, R);
-}
 inline matrix  idModule2formatedMatrix(ideal mod, int rows, int cols, const ring R = currRing)
 {
   return id_Module2formatedMatrix(mod, rows, cols, R);
