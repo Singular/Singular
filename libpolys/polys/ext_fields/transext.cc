@@ -545,9 +545,9 @@ void ntPower(number a, int exp, number *b, const coeffs cf)
     if (exp >= 0) *b = NULL;
     else          WerrorS(nDivBy0);
   }
-  else if (exp ==  0) *b = ntInit(1, cf);
-  else if (exp ==  1) *b = ntCopy(a, cf);
-  else if (exp == -1) *b = ntInvers(a, cf);
+  else if (exp ==  0) { *b = ntInit(1, cf); return;}
+  else if (exp ==  1) { *b = ntCopy(a, cf); return;}
+  else if (exp == -1) { *b = ntInvers(a, cf); return;}
   
   int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
   
