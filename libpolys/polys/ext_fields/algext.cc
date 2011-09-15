@@ -353,9 +353,9 @@ void naPower(number a, int exp, number *b, const coeffs cf)
     if (exp >= 0) *b = NULL;
     else          WerrorS(nDivBy0);
   }
-  else if (exp ==  0) *b = naInit(1, cf);
-  else if (exp ==  1) *b = naCopy(a, cf);
-  else if (exp == -1) *b = naInvers(a, cf);
+  else if (exp ==  0) { *b = naInit(1, cf); return; }
+  else if (exp ==  1) { *b = naCopy(a, cf); return; }
+  else if (exp == -1) { *b = naInvers(a, cf); return; }
   
   int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
   
