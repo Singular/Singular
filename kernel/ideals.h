@@ -175,22 +175,6 @@ inline ideal idVec2Ideal(poly vec, const ring R = currRing)
   return id_Vec2Ideal(vec, R);
 }
 
-inline matrix  idModule2formatedMatrix(ideal mod, int rows, int cols, const ring R = currRing)
-{
-  return id_Module2formatedMatrix(mod, rows, cols, R);
-}
-
-// ideal   idSubst(ideal i, int n, poly e);
-
-inline ideal   idJet(ideal i, int d, const ring R = currRing)
-{
-  return id_Jet(i, d, R);
-}
-
-inline ideal   idJetW(ideal i,int d, intvec * iv, const ring R = currRing)
-{
-  return id_JetW(i, d, iv, R);
-}
 ideal   idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL);
 
 inline BOOLEAN idIsZeroDim(ideal i, const ring R = currRing)
