@@ -34,13 +34,13 @@ LN_S		= ln -s
 ##
 ## compiler and linker options
 ##
-LIBPOLYS_INCLUDES = -I.. -I../libpolys -I/opt/local/include
+LIBPOLYS_INCLUDES = -I.. -I../libpolys -I/opt/local/include -I/sw/include 
 
 LIBPOLYS_CFLAGS   = ${LIBPOLYS_INCLUDES}
 
-LIBPOLYS_LIBS     = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc -L/opt/local/lib -lntl -lgmp -ldl
+LIBPOLYS_LIBS     = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys -lcoeffs -lresources -lreporter -lmisc -lfactory -lomalloc -L/sw/lib -L/opt/local/lib -lntl -lgmp -ldl
 
-LIBPOLYS_LIBSG    = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g  -L/opt/local/lib  -lntl -lgmp -ldl
+LIBPOLYS_LIBSG    = -L../factory -L../omalloc -L../libpolys/misc -L../libpolys/reporter -L../libpolys/resources -L../libpolys/coeffs -L../libpolys/polys -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lfactory -lomalloc_g -L/sw/lib -L/opt/local/lib  -lntl -lgmp -ldl
 
 
 PYTHON_INCLUDES = 
