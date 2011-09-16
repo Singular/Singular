@@ -2127,7 +2127,7 @@ ring rCompose(const lists  L)
       {        
         int ch = (int)(long)LL->m[0].Data();
 
-        if( ch != 0 ) // TODO: GF-Test ch!
+        if(( ch != 0 ) && (ch!=IsPrime(ch))) // TODO: GF-Test ch!
         {
           GFInfo param;
         
