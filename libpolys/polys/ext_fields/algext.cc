@@ -164,7 +164,7 @@ BOOLEAN naEqual(number a, number b, const coeffs cf)
   /// subtraction test
   number c = naSub(a, b, cf);
   BOOLEAN result = naIsZero(c, cf);
-  naDelete(&c, naCoeffs);
+  naDelete(&c, cf);
   return result;
 }
 
