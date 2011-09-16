@@ -1832,7 +1832,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   // now make sure that all matices have the corect size:
-  matrix T = idModule2formatedMatrix(m,vl,ul);
+  matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
   if (MATCOLS(U) != ul)
   {
@@ -2360,7 +2360,7 @@ static BOOLEAN jjJET_P(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjJET_ID(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idJet((ideal)u->Data(),(int)(long)v->Data());
+  res->data = (char *)id_Jet((ideal)u->Data(),(int)(long)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjKBASE2(leftv res, leftv u, leftv v)
@@ -2399,7 +2399,7 @@ static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD));
-  res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+  res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
   test=save_test;
   return FALSE;
 }
@@ -5615,8 +5615,8 @@ static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
 {
-  res->data = (char *)idJetW((ideal)u->Data(),(int)(long)v->Data(),
-                             (intvec *)w->Data());
+  res->data = (char *)id_JetW((ideal)u->Data(),(int)(long)v->Data(),
+                             (intvec *)w->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
@@ -6056,8 +6056,8 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
-  res->data = (char *)idModule2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
-           (int)(long)v->Data(),(int)(long)w->Data());
+  res->data = (char *)id_Module2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
+           (int)(long)v->Data(),(int)(long)w->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
@@ -6088,7 +6088,7 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   ideal m
     = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
-  res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+  res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
   test=save_test;
   return FALSE;
 }

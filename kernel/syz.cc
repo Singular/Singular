@@ -95,7 +95,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
   if ((final) && (h==isHomog))
   /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
   {
-    deg0=idJet(syz,0);
+    deg0=id_Jet(syz,0,currRing);
     idSkipZeroes(deg0);
     syz=deg0;
   }
@@ -302,7 +302,7 @@ static void syMinStep1(resolvente res, int length)
 /*---we take out dependend elements from syz---------------------*/
     if (res[index+1]!=NULL)
     {
-      deg0 = idJet(res[index+1],0);
+      deg0 = id_Jet(res[index+1],0,currRing);
       reddeg0 = kInterRedOld(deg0);
       idDelete(&deg0);
       have_del = new intvec(IDELEMS(res[index]));

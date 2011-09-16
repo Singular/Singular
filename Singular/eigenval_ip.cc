@@ -146,7 +146,7 @@ lists evEigenvals(matrix M)
     return(l);
   }
 
-  M=evHessenberg((matrix)idJet((ideal)M,0));
+  M=evHessenberg((matrix)id_Jet((ideal)M,0,currRing));
 
   int n=MATROWS(M);
   ideal e=idInit(n,1);
