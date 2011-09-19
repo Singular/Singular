@@ -324,3 +324,28 @@ cplusplus.h: cplusplus
 	${builddir}/cplusplus > ${builddir}/cplusplus.h
 
 cf_gmp.h: cplusplus.h
+
+#ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
+#		$(addprefix templates/,$(templatesrc)) \
+#		$(addprefix templates/,$(templateincl))
+#		$(CXX) -c $< $(libfactory_a_CXXFLAGS)  $(INCLUDES) -o $@
+
+####################################################
+## Test program
+##
+TESTS = test-g test-r
+check_PROGRAMS = $(TESTS)
+
+TESTSSOURCES = test.cc 
+
+test_g: libfactory_g.a
+
+test_g_SOURCES = $(TESTSSOURCES)
+test_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti #ftmpl_inst.o
+test_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
+
+test_r: libfactory.a
+
+test_r_SOURCES = $(TESTSSOURCES)
+test_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti #ftmpl_inst.o
+test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
