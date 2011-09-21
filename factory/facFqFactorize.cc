@@ -1971,12 +1971,16 @@ void prepareLeadingCoeffs (CFList*& LCs, int n, const CFList& leadingCoeffs,
 CFList recoverFactors (const CanonicalForm& F, const CFList& factors)
 {
   CFList result;
-  CanonicalForm tmp;
+  CanonicalForm tmp, tmp2;
+  CanonicalForm G= F;
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
-    tmp= i.getItem() / content (i.getItem(), 1);
-    if (fdivides (tmp, F))
+    tmp= i.getItem()/content (i.getItem(), 1);
+    if (fdivides (tmp, G, tmp2))
+    {
+      G= tmp2;
       result.append (tmp);
+    }
   }
   return result;
 }
