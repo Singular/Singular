@@ -1,0 +1,16 @@
+; > 10.00!
+bfctAnn.tst
+genus.tst
+Atkin.tst
+PollardRho.tst
+PocklingtonLehmer.tst
+; > 20.00
+ECPP.tst
+
+; TOOO LONG
+; > 85.00
+; zetaDL.tst
+; > 128.00
+; ask.tst
+; > 222.00
+; sheafCohBGG2.tst
