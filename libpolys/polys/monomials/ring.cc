@@ -425,11 +425,11 @@ void rWrite(ring r)
 #endif
   }
 #endif
-  //if (r->qideal!=NULL)
-  //{
-  //  PrintS("\n// quotient ring from ideal\n");
-  //  iiWriteMatrix((matrix)r->qideal,"_",1);
-  //}
+  if (r->qideal!=NULL)
+  {
+    PrintS("\n// quotient ring from ideal\n");
+    iiWriteMatrix((matrix)r->qideal,"_",1,r);
+  }
 }
 
 void rDelete(ring r)
