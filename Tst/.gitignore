@@ -2,8 +2,6 @@
 */*.diff
 */*.new.res
 */*.new.stat
-*/*.res
-*/*.stat
 Singular
 Singularg
 
