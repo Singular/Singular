@@ -1,0 +1,20 @@
+LIB "tst.lib"; tst_init();
+LIB "homolog.lib";
+ring s=0,(x,y),dp;
+ideal i = x,y;
+canonMap(i);
+ring R = 0,(x,y,z,w),dp;
+ideal I1 = x,y;
+ideal I2 = z,w;
+ideal I = intersect(I1,I2);
+canonMap(I);
+module M = syz(I);
+canonMap(M);
+ring S = 0,(x,y,z,t),Wp(3,4,5,1);
+ideal I = x-t3,y-t4,z-t5;
+ideal J = eliminate(I,t);
+ring T = 0,(x,y,z),Wp(3,4,5);
+ideal p = imap(S,J);
+ideal p2 = p^2;
+canonMap(p2);
+tst_status(1);$
