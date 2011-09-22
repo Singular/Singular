@@ -27,6 +27,7 @@ regress.cmd    -- regress test of Singular
   [-a [crit]]       -- add status results [of crit] to result file
   [-m]              -- add status result for current version to result file
   [-t]              -- compute and call system("mtrack", 1) at the end, no diffs
+  [-A num]          -- set timeout [in sec.] for executed Singular
   [-tt max]         -- compute and call system("mtrack", max) at the end
   [-T]              -- simply compute and determine timmings, no diffs
   [file.lst]        -- read tst files from file.lst
@@ -114,6 +115,8 @@ if ( (! (-e $singular)) || (! (-x $singular)))
 {
   $singular = $curr_dir."/../Singular$ext";
 }
+# timeout for Singular execution (in seconds!)
+$timeout  = 0;
 # sed scripts which are applied to res files before they are diff'ed
 $sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id[:\$]/d' -e '/error occurred in/d' -e '/tst_status/d' -e'/init >>/d' -e 's/\\[[0-9]*:[0-9]*\\]//g'";
 # default value (in %) above which differences are reported on -r
@@ -588,6 +591,10 @@ while ($ARGV[0] =~ /^-/)
   {
     $mtrack = shift;
   }
+  elsif (/^-A/)
+  {
+    $timeout = shift;
+  }
   elsif(/^-t$/)
   {
     $mtrack = 1;
@@ -717,6 +724,12 @@ if (-d $singular)
 }
 
 
+if ($timeout > 0)
+{
+  $singular = "perl -e 'alarm $timeout; exec \@ARGV' $singular";
+  print ("Set exec timeout to $timeout sec.\n") if ($verbosity > 1);
+  # die;
+}
 # now do the work
 foreach (@ARGV)
 {
