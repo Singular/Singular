@@ -78,7 +78,7 @@ triagmatrix.tst
 univariate.tst
 univarpoly.tst
 vdim_BR_PLURAL_BR.tst
-waitall.tst
+;; waitall.tst
 bigint_expressions.tst
 boolean_operations.tst
 breakpoint.tst
@@ -388,7 +388,7 @@ triangL_solve.tst
 triangM_solve.tst
 truncate.tst
 varNum.tst
-waitfirst.tst
+;; waitfirst.tst
 absFactorize.tst
 absValue.tst
 Ann.tst
