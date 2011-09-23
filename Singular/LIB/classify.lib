@@ -9,6 +9,8 @@ OVERVIEW:
    A library for classifying isolated hypersurface singularities w.r.t. right
    equivalence, based on the determinator of singularities by V.I. Arnold.
 
+SEE ALSO:  realclassify_lib
+
 PROCEDURES:
  basicinvariants(f); computes Milnor number, determinacy-bound and corank of
  classify(f);        normal form of polynomial f determined with Arnold's method
@@ -24,6 +26,11 @@ PROCEDURES:
  normalform(s);      normal form of singularity given by its name s
  debug_log(lev,[]);  print trace and debugging information w.r.t level>@DeBug
  swap(a,b);          swaps the arguments
+ modality(f);        modality of the singularity
+ complexSingType(f); complex type of the singularity as a string
+ prepRealclassify(f);
+                     the modality and the complex type of the singularity at
+                     once
            (parameters in square brackets [] are optional)
 ";
 
@@ -39,7 +46,7 @@ proc classify_init
   link l="DBM:r NFlist";
   s = read(l,"VERSION");
   if (s == "" ) {
-    if (printlevel)
+    if (printlevel > 0)
     {
       "(classify.lib): Need to create database...";
     }
@@ -1434,6 +1441,14 @@ static proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
 ///////////////////////////////////////////////////////////////////////////////
 static proc printresult (int step, poly f, string typ, list cstn, int m)
 {
+  if(defined(onlyreturninvariants))
+  {
+    if(onlyreturninvariants == 1)
+    {
+      Modality = m;
+      Type = typ;
+    }
+  }
 //---------------------------- initialisation ---------------------------------
   int corank, Mu, K;
   list v;
@@ -2934,6 +2949,89 @@ example
 {
   "EXAMPLE"; echo=2;
   internalfunctions();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc prepRealclassify(poly f)
+"
+USAGE:    prepRealclassify(f); f poly
+RETURN:   a list, containing the modality of the singularity and the type of
+          the singularity as a string
+          @* This procedure is needed in realclassify.lib in order to avoid
+          classify() being called more than once.
+EXAMPLE:  example prepRealclassify; shows an example"
+{
+  exportinvariants(f);
+  return(list(Modality, Type));
+}
+example
+{
+  "EXAMPLE"; echo = 2;
+  ring r = 0, (x,y,z), ds;
+  poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
+  prepRealclassify(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc modality(poly f)
+"
+USAGE:    modality(f); f poly
+RETURN:   the modality of the singularity
+EXAMPLE:  example modality; shows an example"
+{
+  exportinvariants(f);
+  return(Modality);
+}
+example
+{
+  "EXAMPLE"; echo = 2;
+  ring r = 0, (x,y,z), ds;
+  poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
+  modality(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc complexSingType(poly f)
+"
+USAGE:    complexSingType(f); f poly
+RETURN:   the type of the singularity as a string
+EXAMPLE:  example complexSingType; shows an example"
+{
+  exportinvariants(f);
+  return(Type);
+}
+example
+{
+  "EXAMPLE"; echo = 2;
+  ring r = 0, (x,y,z), ds;
+  poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
+  complexSingType(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/* some of the invariants will be exported during the computation of
+ * classify(f) such that they are accessible at for all procs in the library
+ */
+static proc exportinvariants(poly f)
+{
+  init_debug(-1);
+  if(!defined(onlyreturninvariants))
+  {
+    int onlyreturninvariants;
+    export(onlyreturninvariants);
+  }
+  onlyreturninvariants = 1;
+  if(!defined(Modality))
+  {
+    int Modality;
+    export(Modality);
+  }
+  if(!defined(Type))
+  {
+    string Type;
+    export(Type);
+  }
+  f = classify(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

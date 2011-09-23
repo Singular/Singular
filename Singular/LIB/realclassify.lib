@@ -1,0 +1,1151 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Singularities";
+info="
+LIBRARY:  realclassify.lib   Classification of real singularities
+AUTHOR:   Magdaleen Marais,  magdaleen@aims.ac.za
+          Andreas Steenpass, steenpass@mathematik.uni-kl.de
+
+OVERVIEW:
+   A library for classifying isolated hypersurface singularities over the reals
+   w.r.t. right
+   equivalence, based on the determinator of singularities by V.I. Arnold.
+   This library is based on classify.lib by Kai Krueger, but handles the real
+   case, while classify.lib does the complex classification.
+
+PROCEDURES:
+ realclassify(f);    real classification of singularities of modality 0 and 1
+ realmorsesplit(f);  splitting lemma in the real case
+ milnornumber(f);    Milnor number
+ determinacy(f);     an upper bound for the determinacy
+";
+
+LIB "classify.lib";
+LIB "rootsur.lib";
+LIB "atkins.lib";
+LIB "solve.lib";
+///////////////////////////////////////////////////////////////////////////////
+proc realclassify(poly f, list #)
+"
+USAGE:    realclassify(f[, printcomments]); f poly, printcomments int
+RETURN:   A list containing (in this order)
+          @* - the type of the singularity as a string,
+          @* - the normal form as well as
+          @* - the corank, the Milnor number, the inertia index and
+               a bound for the determinacy as integers.
+          @* The normal form involves parameters for singularities of modality
+             greater than 0. The actual value of the parameters is not computed
+             in most of the cases. If the value of the parameter is unknown,
+             the normal form is given as a string with an \"a\" as the
+             parameter. Otherwise, it is given as a polynomial.
+          @* An optional integer printcomments can be provided. If its value
+             is non-zero, a string will be added at the end of the returned
+             list, containing the result in more readable form and in some
+             cases also more comments on how to interpret the result. The
+             default is zero.
+NOTE:     The classification is done over the real numbers, so in contrast to
+          classify.lib, the signs of coefficients of monomials where even
+          exponents occur matter.
+          @* The ground field must be Q (the rational numbers). No field
+             extensions of any kind nor floating point numbers are allowed.
+          @* The monomial order must be local.
+          @* The input polynomial must be contained in maxideal(2) and must be
+             an isolated singularity of modality 0 or 1. The Milnor number is
+             checked for being finite.
+SEE ALSO: classify
+KEYWORDS: Classification of singularities
+EXAMPLE:  example realclassify; shows an example"
+{
+  /* auxiliary variables */
+  int i, j;
+
+  /* name for the basering */
+  def br = basering;
+
+  /* read optional parameters */
+  int printcomments;
+  if(size(#) > 0)
+  {
+    if(size(#) > 1 || typeof(#[1]) != "int")
+    {
+      ERROR("Wrong optional parameters.");
+    }
+    printcomments = #[1];
+  }
+
+  /* error check */
+  if(charstr(br) != "0")
+  {
+    ERROR("The ground field must be Q (the rational numbers).");
+  }
+  int n = nvars(br);
+  for(i = 1; i <= n; i++)
+  {
+    if(var(i) > 1)
+    {
+      ERROR("The monomial order must be local.");
+    }
+  }
+  if(jet(f, 1) != 0)
+  {
+    ERROR("The input polynomial must be contained in maxideal(2).");
+  }
+
+  /* compute Milnor number before continuing the error check */
+  int mu = milnornumber(f);
+
+  /* continue error check */
+  if(mu < 1)
+  {
+    ERROR("The Milnor number of the input polynomial must be"+newline
+      +"positive and finite.");
+  }
+
+  /* call classify before continuing the error check */
+  list dataFromClassify = prepRealclassify(f);
+  int m = dataFromClassify[1];                // the modality of f
+  string complextype = dataFromClassify[2];   // the complex type of f
+
+  /* continue error check */
+  if(m > 1)
+  {
+    ERROR("The input polynomial must be a singularity of modality 0 or 1.");
+  }
+
+  /* apply splitting lemma */
+  list morse = realmorsesplit(f, mu);
+  int cr = morse[1];
+  int lambda = morse[2];
+  int d = morse[3];
+  poly rf = morse[4];
+
+  /* determine the type */
+  string typeofsing, typeofsing_alternative;
+  poly nf, nf_alternative;
+  poly monparam;   // the monomial whose coefficient is the parameter
+                   // in the modality 1 cases, 0 otherwise
+  string morecomments = newline;
+  map phi;
+  if(cr == 0)   // case A[1]
+  {
+    if(lambda < n)
+    {
+      typeofsing = "A[1]+";
+      typeofsing_alternative = "A[1]-";
+    }
+    else
+    {
+      typeofsing = "A[1]-";
+      typeofsing_alternative = "A[1]+";
+    }
+  }
+  if(cr == 1)   // case A[k], k > 1
+  {
+    int k = deg(lead(rf), 1:n)-1;
+    if(k%2 == 0)
+    {
+      nf = var(1)^(k+1);
+      nf_alternative = nf;
+      typeofsing = "A["+string(k)+"]";
+      typeofsing_alternative = typeofsing;
+    }
+    else
+    {
+      if(leadcoef(rf) > 0)
+      {
+        nf = var(1)^(k+1);
+        typeofsing = "A["+string(k)+"]+";
+        typeofsing_alternative = "A["+string(k)+"]-";
+      }
+      else
+      {
+        nf = -var(1)^(k+1);
+        typeofsing = "A["+string(k)+"]-";
+        typeofsing_alternative = "A["+string(k)+"]+";
+      }
+      nf_alternative = -nf;
+    }
+  }
+  if(cr == 2)
+  {
+    if(complextype[1,2] == "D[")   // case D[k]
+    {
+      if(mu == 4)   // case D[4]
+      {
+        rf = jet(rf, 3);
+        number s1 = number(rf/(var(1)^3));
+        number s2 = number(rf/(var(2)^3));
+        if(s2 == 0 && s1 != 0)
+        {
+          phi = br, var(2), var(1);
+          rf = phi(rf);
+        }
+        if(s1 == 0 && s2 == 0)
+        {
+          number t1 = number(rf/(var(1)^2*var(2)));
+          number t2 = number(rf/(var(2)^2*var(1)));
+          if(t1+t2 == 0)
+          {
+            phi = br, var(1), 2*var(2);
+            rf = phi(rf);
+          }
+          phi = br, var(1)+var(2), var(2);
+          rf = phi(rf);
+        }
+        ring R = 0, y, dp;
+        map phi = br, 1, y;
+        poly rf = phi(rf);
+        int k = nrroots(rf);
+        setring(br);
+        if(k == 3)
+        {
+          nf = var(1)^2*var(2)-var(2)^3;
+          typeofsing = "D[4]-";
+        }
+        else
+        {
+          nf = var(1)^2*var(2)+var(2)^3;
+          typeofsing = "D[4]+";
+        }
+        typeofsing_alternative = typeofsing;
+        nf_alternative = nf;
+      }
+      else   // case D[k], k > 4
+      {
+        rf = jet(rf, d);
+        list factorization = factorize(jet(rf, 3));
+        list factors = factorization[1][2];
+        if(factorization[2][2] == 2)
+        {
+          factors = insert(factors, factorization[1][3], 1);
+        }
+        else
+        {
+          factors = insert(factors, factorization[1][3]);
+        }
+        factors[2] = factorization[1][1]*factors[2];
+        matrix T[2][2] = factors[1]/var(1), factors[1]/var(2),
+                         factors[2]/var(1), factors[2]/var(2);
+        phi = br, luinverse(T)[2]*matrix(ideal(var(1), var(2)), 2, 1);
+        rf = phi(rf);
+        rf = jet(rf, d);
+        poly g;
+        for(i = 4; i < mu; i++)
+        {
+          g = jet(rf, i) - var(1)^2*var(2);
+          if(g != 0)
+          {
+            phi = br, var(1)-(g/(var(1)*var(2)))/2,
+                      var(2)-(g/var(1)^i)*var(1)^(i-2);
+            rf = phi(rf);
+            rf = jet(rf, d);
+          }
+        }
+        number a = number(rf/var(2)^(mu-1));
+        if(a > 0)
+        {
+          typeofsing = "D["+string(mu)+"]+";
+          nf = var(1)^2*var(2)+var(2)^(mu-1);
+          if(mu%2 == 0)
+          {
+            nf_alternative = nf;
+            typeofsing_alternative = typeofsing;
+          }
+          else
+          {
+            nf_alternative = var(1)^2*var(2)-var(2)^(mu-1);
+            typeofsing_alternative = "D["+string(mu)+"]-";
+          }
+        }
+        else
+        {
+          typeofsing = "D["+string(mu)+"]-";
+          nf = var(1)^2*var(2)-var(2)^(mu-1);
+          if(mu%2 == 0)
+          {
+            nf_alternative = nf;
+            typeofsing_alternative = typeofsing;
+          }
+          else
+          {
+            nf_alternative = var(1)^2*var(2)+var(2)^(mu-1);
+            typeofsing_alternative = "D["+string(mu)+"]+";
+          }
+        }
+      }
+    }
+    if(complextype == "E[6]")  // case E[6] ;
+    {
+      poly g = jet(rf,3);
+      number s = number(g/(var(1)^3));
+      if(s == 0)
+      {
+        phi = br, var(2), var(1);
+        rf = phi(rf);
+        g = jet(rf,3);
+      }
+      list Factors = factorize(g);
+      poly g1 = Factors[1][2];
+      phi = br, (var(1)-(g1/var(2))*var(2))/(g1/var(1)), var(2);
+      rf = phi(rf);
+      rf = jet(rf,4);
+      number w = number(rf/(var(2)^4));
+      if(w > 0)
+      {
+        typeofsing = "E[6]+";
+        nf = var(1)^3+var(2)^4;
+        typeofsing_alternative = "E[6]-";
+        nf_alternative = var(1)^3-var(2)^4;
+      }
+      else
+      {
+        typeofsing = "E[6]-";
+        nf = var(1)^3-var(2)^4;
+        typeofsing_alternative = "E[6]+";
+        nf_alternative = var(1)^3+var(2)^4;
+      }
+    }
+    if(complextype == "E[7]")   // case E[7]
+    {
+      typeofsing = "E[7]";
+      nf = var(1)^3+var(1)*var(2)^3;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype == "E[8]")   // case E[8]
+    {
+      typeofsing = "E[8]";
+      nf = var(1)^3+var(2)^5;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype == "J[2,0]")  // case J[10]
+    {
+      int signforJ10;
+      poly g = jet(rf,3);
+      number s = number(g/(var(1)^3));
+      if (s == 0)
+      {
+        phi = br, var(2), var(1);
+        rf = phi(rf);
+        g = jet(rf,3);
+      }
+      list Factors = factorize(g);
+      poly g1 = Factors[1][2];
+      phi = br, (var(1)-(g1/var(2))*var(2))/(g1/var(1)), var(2);
+      rf = phi(rf);
+      poly rf3 = jet(rf,3);
+      number w0 = number(rf3/(var(1)^3));
+      if(w0 < 0)
+      {
+        phi = br, -var(1), var(2);
+        rf = phi(rf);
+      }
+      rf3 = jet(rf,3);
+      poly rf4 = jet(rf,4);
+      poly rf5 = jet(rf,5);
+      poly rf6 = jet(rf,6);
+      poly b1 = 3*(rf3/(var(1)^3))*var(1)^2+2*(rf4/(var(1)^2*var(2)^2))
+                *var(1)+(rf5/(var(1)*var(2)^4));
+      ring R = 0,x,dp;
+      map phi = br, x, 1;
+      poly b11 = phi(b1);
+      int r = nrroots(b11);
+      if( r == 0 || r == 1)
+      {
+        setring(br);
+        signforJ10 = 1;
+      }
+      else
+      {
+        setring(br);
+        poly c1 = (rf3/(var(1)^3))*var(1)^3+(rf4/(var(1)^2*var(2)^2))*
+                  var(1)^2+(rf5/(var(1)*var(2)^4))*
+                  var(1)+rf6/(var(2)^6);
+        list Factors = factorize(c1);
+        if( size(Factors[1])>2)
+        {
+          if( deg(Factors[1][2]) == 1)
+          {
+            poly g1 = Factors[1][2];
+          }
+          else
+          {
+            poly g1 = Factors[1][3];
+          }
+          phi = br, ((g1/var(1))*var(1)-g1)/(g1/var(1)),
+                  var(2);
+          number b = number(phi(b1));
+          if(b > 0)
+          {
+            signforJ10 = 1;
+          }
+          else
+          {
+            signforJ10 = -1;
+          }
+        }
+        else
+        {
+          ring R = (complex,40,40),x,lp;
+          phi = br, x, 1;
+          poly c1 = phi(c1);
+          poly b1 = phi(b1);
+          list L = laguerre_solve(c1,30);
+          list LL;
+          for(i = 1; i <= size(L); i++)
+          {
+            if(impart(L[i]) == 0)
+            {
+              LL = insert(LL,L[i]);
+            }
+          }
+          number r1 = LL[1];
+          for(j = 1; j <= size(LL); j++)
+          {
+            r1 = round(r1*10000000000)/10000000000;
+            number c1min = number(subst(c1,x,r1-0.0000000001));
+            number c1plus = number(subst(c1,x,r1+0.0000000001));
+            number b1min = number(subst(b1,x,r1-0.00000000001));
+            number b1plus = number(subst(b1,x,r1+0.00000000001));
+            if(c1min*c1plus<0)
+            {
+              int c = -1;
+            }
+            if(c1min*c1plus>0)
+            {
+              int c = 1;
+            }
+            if(b1min>0 && b1plus>0)
+            {
+              int b = 1;
+            }
+            if(b1min<0 && b1plus<0)
+            {
+              int b = -1;
+            }
+            if(b1min*b1plus<=0)
+            {
+              int b = 0;
+            }
+            if( c < 0 && b != 0)
+            {
+              r1 = LL[j];
+              break;
+            }
+          }
+          setring(br);
+          if (c == -1 && b == 1)
+          {
+            signforJ10 = 1;
+          }
+          if (c == -1 && b == -1)
+          {
+            signforJ10 = -1;
+          }
+          if (c == 1 || b == 0)
+          {
+            ERROR("Ask Arnold the normal form.)");
+          }
+        }
+      }
+      if(signforJ10 == 1)
+      {
+        typeofsing = "J[10]+";
+      }
+      else
+      {
+        typeofsing = "J[10]-";
+      }
+      nf = var(1)^3+var(1)^2*var(2)^2+signforJ10*var(1)*var(2)^4;
+      monparam = var(1)^2*var(2)^2;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype[1,3] == "X[1") //case X[1,k]
+    {
+      if(mu > 9)
+      {
+        rf = jet(rf,4);
+
+        number s1 = number(rf/(var(1)^4));
+        number s2 = number(rf/(var(2)^4));
+        if(s2 != 0 && s1 == 0)
+        {
+          phi = br, var(2), var(1);
+          rf = phi(rf);
+        }
+        if(s2 == 0 && s1 == 0)
+        {
+          number t1 = number(rf/(var(1)^3*var(2)));
+          number t2 = number(rf/(var(1)^2*var(2)^2));
+          number t3 = number(rf/(var(1)*var(2)^3));
+          if(t1+t2+t3 == 0)
+          {
+            if(2*t1+4*t2+8*t3 != 0)
+            {
+              phi = br, var(1), 2*var(2);
+              rf = phi(rf);
+            }
+            else
+            {
+              phi = br, var(1), 3*var(2);
+              rf = phi(rf);
+            }
+          }
+          phi = br, var(1), var(1)+var(2);
+          rf = phi(rf);
+        }
+        ring R = 0, x, dp;
+        map phi = br, var(1), 1;
+        int k = nrroots(phi(rf));
+        setring(br);
+        if(k == 1)
+        {
+          number w = number(rf/(var(1)^4));
+          if(w > 0)
+          {
+            typeofsing = "X["+string(mu)+"]++";
+            nf = var(1)^4+var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+            typeofsing_alternative = "X["+string(mu)+"]--";
+            nf_alternative = -var(1)^4-var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+          }
+          else
+          {
+            typeofsing = "X["+string(mu)+"]--";
+            nf = -var(1)^4-var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+            typeofsing_alternative = "X["+string(mu)+"]++";
+            nf_alternative = var(1)^4+var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+          }
+        }
+        if(k == 3)
+        {
+          list Factors = factorize(rf);
+          for(i = 2; i <= size(Factors[1]); i++)
+          {
+            if(Factors[2][i] == 2)
+            {
+              poly g1 = Factors[1][i];
+              break;
+            }
+          }
+          map phi = br, (var(1)-(g1/(var(2))*var(2)))/(g1/var(1)), var(2);
+          rf = phi(rf);
+          number w = number(rf/(var(1)^2*var(2)^2));
+          if(w > 0)
+          {
+            typeofsing = "X["+string(mu)+"]-+";
+            nf = -var(1)^4+var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+            typeofsing_alternative = "X["+string(mu)+"]+-";
+            nf_alternative = var(1)^4-var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+          }
+          else
+          {
+            typeofsing = "X["+string(mu)+"]+-";
+            nf = var(1)^4-var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+            typeofsing_alternative = "X["+string(mu)+"]-+";
+            nf_alternative = -var(1)^4+var(1)^2*var(2)^2+var(2)^(4+(mu-9));
+          }
+        }
+        monparam = var(2)^(4+(mu-9));
+      }
+    }
+    if(complextype == "E[12]")   // case E[12]
+    {
+      typeofsing = "E[12]";
+      nf = var(1)^3+var(2)^7+var(1)*var(2)^5;
+      monparam = var(1)*var(2)^5;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype == "E[13]")   // case E[13]
+    {
+      typeofsing = "E[13]";
+      nf = var(1)^3+var(1)*var(2)^5+var(2)^8;
+      monparam = var(2)^8;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype == "E[14]") //case E[14]
+    {
+      poly g = jet(rf,3);
+      number s = number(g/(var(1)^3));
+      if(s == 0)
+      {
+        phi = br, var(2), var(1);
+        rf = phi(rf);
+        g = jet(rf,3);
+        s = number(g/(var(1)^3));
+      }
+      rf = rf/s;
+      list Factors = factorize(g);
+      poly g1 = Factors[1][2];
+      phi = br, (var(1)-(g1/var(2))*var(2))/(g1/var(1)), var(2);
+      rf = phi(rf);
+      g = jet(rf,3);
+      number w0 = number(g/(var(1)^3));
+      phi = br, var(1)-((jet(rf,4)-(w0*var(1)^3))/(3*var(1)^2)), var(2);
+      rf = phi(rf);
+      phi = br, var(1)-((jet(rf,5)-(w0*var(1)^3))/(3*var(1)^2)), var(2);
+      rf = phi(rf);
+      rf = s*rf;
+      rf = jet(rf,8);
+      number w = number(rf/(var(2)^8));
+      if(w > 0)
+      {
+        typeofsing = "E[14]+";
+        nf = var(1)^3+var(2)^8+var(1)*var(2)^6;
+        typeofsing_alternative = "E[14]-";
+        nf_alternative = var(1)^3-var(2)^8+var(1)*var(2)^6;
+      }
+      if(w < 0)
+      {
+        typeofsing = "E[14]-";
+        nf = var(1)^3-var(2)^8+var(1)*var(2)^6;
+        typeofsing_alternative = "E[14]+";
+        nf_alternative = var(1)^3+var(2)^8+var(1)*var(2)^6;
+      }
+      monparam = var(1)*var(2)^6;
+    }
+    if(complextype == "Z[11]")   // case Z[11]
+    {
+      typeofsing = "Z[11]";
+      nf = var(1)^3*var(2)+var(2)^5+var(1)*var(2)^4;
+      monparam = var(1)*var(2)^4;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype == "Z[12]")   // case Z[12]
+    {
+      typeofsing = "Z[12]";
+      nf = var(1)^3*var(2)+var(1)*var(2)^4+var(1)^2*var(2)^3;
+      monparam = var(1)^2*var(2)^3;
+      typeofsing_alternative = typeofsing;
+      nf_alternative = nf;
+    }
+    if(complextype == "Z[13]")
+    {
+      poly g = jet(rf,4);
+      number s = number(g/var(1)^3*var(2));
+      if(s == 0)
+      {
+        phi = br, var(2), var(1);
+        rf = phi(rf);
+        g = jet(rf,4);
+      }
+      list Factors = factorize(g);
+      if(Factors[2][2] == 3)
+      {
+        poly g1 = Factors[1][2];
+      }
+      else
+      {
+        poly g1 = Factors[1][3];
+      }
+      phi = br, var(1)-(g1/var(2))*var(2), var(2);
+      rf = phi(rf);
+      rf = jet(rf,6);
+      number w = number(rf/var(2)^6);
+      if(w > 0)
+      {
+        typeofsing = "Z[13]+";
+        nf = var(1)^3*var(2)+var(2)^6+var(1)*var(2)^5;
+        typeofsing_alternative = "Z[13]-";
+        nf_alternative = var(1)^3*var(2)-var(2)^6+var(1)*var(2)^5;
+      }
+      else
+      {
+        typeofsing = "Z[13]-";
+        nf = var(1)^3*var(2)-var(2)^6+var(1)*var(2)^5;
+        typeofsing_alternative = "Z[13]+";
+        nf_alternative = var(1)^3*var(2)+var(2)^6+var(1)*var(2)^5;
+      }
+      monparam = var(1)*var(2)^5;
+    }
+    if(complextype == "W[12]") //case W[12]
+    {
+      poly g = jet(rf, 4);
+      number s = number(g/(var(1)^4));
+      if(s == 0)
+      {
+        s = number(g/(var(2)^4));
+        phi = br, var(2), var(1);   // maybe we'll need this transformation
+        rf = phi(rf);               // later
+      }
+      if(s > 0)
+      {
+        typeofsing = "W[12]+";
+        nf = var(1)^4+var(2)^5+var(1)^2*var(2)^3;
+        typeofsing_alternative = "W[12]-";
+        nf_alternative = -var(1)^4+var(2)^5+var(1)^2*var(2)^3;
+      }
+      else
+      {
+        typeofsing = "W[12]-";
+        nf = -var(1)^4+var(2)^5+var(1)^2*var(2)^3;
+        typeofsing_alternative = "W[12]+";
+        nf_alternative = var(1)^4+var(2)^5+var(1)^2*var(2)^3;
+      }
+      monparam = var(1)^2*var(2)^3;
+    }
+    if(complextype == "W[13]")   //case W[13]
+    {
+      poly g = jet(rf, 4);
+      number s = number(g/(var(1)^4));
+      if(s == 0)
+      {
+        s = number(g/(var(2)^4));
+        phi = br, var(2), var(1);   // maybe we'll need this transformation
+        rf = phi(rf);               // later
+      }
+      if(s > 0)
+      {
+        typeofsing = "W[13]+";
+        nf = var(1)^4+var(1)*var(2)^4+var(2)^6;
+        typeofsing_alternative = "W[13]-";
+        nf_alternative = -var(1)^4+var(1)*var(2)^4+var(2)^6;
+      }
+      else
+      {
+        typeofsing = "W[13]-";
+        nf = -var(1)^4+var(1)*var(2)^4+var(2)^6;
+        typeofsing_alternative = "W[13]+";
+        nf_alternative = var(1)^4+var(1)*var(2)^4+var(2)^6;
+      }
+      monparam = var(2)^6;
+    }
+    if(typeofsing == "")
+    {
+      ERROR("This case is not yet implemented.");
+    }
+  }
+  if(cr > 2)
+  {
+    ERROR("This case is not yet implemented.");
+  }
+
+  /* add the non-corank variables to the normal forms */
+  nf = addnondegeneratevariables(nf, lambda, cr);
+  nf_alternative = addnondegeneratevariables(nf_alternative, n-cr-lambda, cr);
+
+  /* write normal form as a string in the cases with modality greater than 0 */
+  if(monparam != 0)
+  {
+    poly nf_tmp = nf;
+    poly nf_alternative_tmp = nf_alternative;
+    def nf = modality1NF(nf_tmp, monparam);
+    def nf_alternative = modality1NF(nf_alternative_tmp, monparam);
+  }
+
+  /* write comments */
+  if(printcomments)
+  {
+    string comments = newline;
+    comments = comments+"Type of singularity: "   +typeofsing    +newline
+                       +"Normal form:         "   +string(nf)    +newline
+                       +"Corank:              "   +string(cr)    +newline
+                       +"Milnor number:       "   +string(mu)    +newline
+                       +"Inertia index:       "   +string(lambda)+newline
+                       +"Determinacy:         <= "+string(d)     +newline;
+    if(typeofsing != typeofsing_alternative || nf != nf_alternative
+       || lambda != n-cr-lambda)
+    {
+      comments = comments+newline
+        +"Note: By multiplying the input polynomial with -1,"+newline
+        +"      it can also be regarded as of the following case:"+newline
+        +"Type of singularity: "+typeofsing_alternative+newline
+        +"Normal form:         "+string(nf_alternative)+newline
+        +"Inertia index:       "+string(n-cr-lambda)   +newline;
+    }
+    if(morecomments != newline)
+    {
+      comments = comments+morecomments;
+    }
+  }
+
+  /* return results */
+  if(printcomments)
+  {
+    return(list(typeofsing, nf, cr, mu, lambda, d, comments));
+  }
+  else
+  {
+    return(list(typeofsing, nf, cr, mu, lambda, d));
+  }
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  LIB "realclassify.lib";
+  ring r = 0, (x,y,z), ds;
+  poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
+  realclassify(f, 1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+  print the normal form as a string for the modality 1 cases.
+  The first argument is the normalform with parameter = 1,
+  the second argument is the monomial whose coefficient is the parameter.
+*/
+static proc modality1NF(poly nf, poly monparam)
+{
+  def br = basering;
+  list lbr = ringlist(br);
+  ring r = (0,a), x, dp;
+  list lr = ringlist(r);
+  setring(br);
+  list lr = fetch(r, lr);
+  lbr[1] = lr[1];
+  def s = ring(lbr);
+  setring(s);
+  poly nf = fetch(br, nf);
+  poly monparam = fetch(br, monparam);
+  nf = nf+(a-1)*monparam;
+  string result = string(nf);
+  setring(br);
+  return(result);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+  add squares of the non-degenerate variables (i.e. var(cr+1), ...,
+  var(nvars(basering)) for corank cr) to the normalform nf,
+  with signs according to the inertia index lambda
+*/
+static proc addnondegeneratevariables(poly nf, int lambda, int cr)
+{
+  int n = nvars(basering);
+  int i;
+  for(i = cr+1; i <= n-lambda; i++)
+  {
+    nf = nf+var(i)^2;
+  }
+  for(i = n-lambda+1; i <= n ; i++)
+  {
+    nf = nf-var(i)^2;
+  }
+  return(nf);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc realmorsesplit(poly f, list #)
+"
+USAGE:    realmorsesplit(f[, mu]); f poly, mu int
+RETURN:   a list consisting of the corank of f, the inertia index, an upper
+          bound for the determinacy, the residual form of f and
+          the transformation
+NOTE:     The characteristic of the basering must be zero, the monomial order
+          must be local, f must be contained in maxideal(2) and the Milnor
+          number of f must be finite.
+          @* The Milnor number of f can be provided as an optional parameter in
+             order to avoid that it is computed again.
+SEE ALSO: morsesplit
+KEYWORDS: Morse lemma; Splitting lemma
+EXAMPLE:  example morsesplit; shows an example"
+{
+  /* auxiliary variables */
+  int i, j;
+
+  /* error check */
+  if(char(basering) != 0)
+  {
+    ERROR("The characteristic must be zero.");
+  }
+  int n = nvars(basering);
+  for(i = 1; i <= n; i++)
+  {
+    if(var(i) > 1)
+    {
+      ERROR("The monomial order must be local.");
+    }
+  }
+  if(jet(f, 1) != 0)
+  {
+    ERROR("The input polynomial must be contained in maxideal(2).");
+  }
+
+  /* get Milnor number before continuing error check */
+  int mu;
+  if(size(#) > 0)   // read optional parameter
+  {
+    if(size(#) > 1 || typeof(#[1]) != "int")
+    {
+      ERROR("Wrong optional parameters.");
+    }
+    else
+    {
+      mu = #[1];
+    }
+  }
+  else              // compute Milnor number
+  {
+    mu = milnornumber(f);
+  }
+
+  /* continue error check */
+  if(mu < 0)
+  {
+    ERROR("The Milnor number of the input polynomial must be"+newline
+      +"non-negative and finite.");
+  }
+
+  /* preliminary stuff */
+  list S;
+  int k = determinacy(f, mu);
+  f = jet(f, k);
+  def br = basering;
+  map Phi = br, maxideal(1);
+  map phi;
+  poly a, p, r;
+
+  /* treat the variables one by one */
+  for(i = 1; i <= n; i++)
+  {
+    if(jet(f, 2)/var(i) == 0)
+    {
+      S = insert(S, i);
+    }
+    else
+    {
+      f, a, p, r = rewriteformorsesplit(f, k, i);
+      if(jet(a, 0) == 0)
+      {
+        for(j = i+1; j <= n; j++)
+        {
+          if(jet(f, 2)/(var(i)*var(j)) != 0)
+          {
+            break;
+          }
+        }
+        phi = br, maxideal(1);
+        phi[j] = var(j)+var(i);
+        Phi = phi(Phi);
+        f = phi(f);
+      }
+      f, a, p, r = rewriteformorsesplit(f, k, i);
+      while(p != 0)
+      {
+        phi = br, maxideal(1);
+        phi[i] = var(i)-p/(2*jet(a, 0));
+        Phi = phi(Phi);
+        f = phi(f);
+        f, a, p, r = rewriteformorsesplit(f, k, i);
+      }
+    }
+  }
+
+  /* sort variables according to corank */
+  int cr = size(S);
+  phi = br, 0:n;
+  j = 1;
+  for(i = size(S); i > 0; i--)
+  {
+    phi[S[i]] = var(j);
+    j++;
+  }
+  for(i = 1; i <= n; i++)
+  {
+    if(phi[i] == 0)
+    {
+      phi[i] = var(j);
+      j++;
+    }
+  }
+  Phi = phi(Phi);
+  f = phi(f);
+
+  /* compute the inertia index lambda */
+  int lambda;
+  list negCoeff, posCoeff;
+  number ai;
+  poly f2 = jet(f, 2);
+  for(i = 1; i <= n; i++)
+  {
+    ai = number(f2/var(i)^2);
+    if(ai < 0)
+    {
+      lambda++;
+      negCoeff = insert(negCoeff, i);
+    }
+    if(ai > 0)
+    {
+      posCoeff = insert(posCoeff, i);
+    }
+  }
+
+  /* sort variables according to lambda */
+  phi = br, maxideal(1);
+  j = cr+1;
+  for(i = size(negCoeff); i > 0; i--)
+  {
+    phi[negCoeff[i]] = var(j);
+    j++;
+  }
+  for(i = size(posCoeff); i > 0; i--)
+  {
+    phi[posCoeff[i]] = var(j);
+    j++;
+  }
+  Phi = phi(Phi);
+  f = phi(f);
+
+  /* compute residual form */
+  phi = br, maxideal(1);
+  for(i = size(S)+1; i <= n; i++)
+  {
+    phi[i] = 0;
+  }
+  f = phi(f);
+
+  return(list(cr, lambda, k, f, Phi));
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  LIB "realclassify.lib";
+  ring r = 0, (x,y,z), ds;
+  poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
+  realmorsesplit(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+   - apply jet(f, k)
+   - rewrite f as f = a*var(i)^2+p*var(i)+r with
+     var(i)-free p and r
+*/
+static proc rewriteformorsesplit(poly f, int k, int i)
+{
+  f = jet(f, k);
+  matrix C = coeffs(f, var(i));
+  poly r = C[1,1];
+  poly p = C[2,1];
+  poly a = (f-r-p*var(i))/var(i)^2;
+  return(f, a, p, r);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc milnornumber(poly f)
+"
+USAGE:    milnornumber(f); f poly
+RETURN:   Milnor number of f, or -1 if the Milnor number is not finite
+KEYWORDS: Milnor number
+NOTE:     The monomial order must be local.
+EXAMPLE:  example milnornumber; shows an example"
+{
+  /* error check */
+  int i;
+  for(i = nvars(basering); i > 0; i--)
+  {
+    if(var(i) > 1)
+    {
+      ERROR("The monomial order must be local.");
+    }
+  }
+
+  return(vdim(std(jacob(f))));
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  LIB "realclassify.lib";
+  ring r = 0, (x,y), ds;
+  poly f = x3+y4;
+  milnornumber(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc determinacy(poly f, list #)
+"
+USAGE:    determinacy(f[, mu]); f poly, mu int
+RETURN:   an upper bound for the determinacy of f
+NOTE:     The characteristic of the basering must be zero, the monomial order
+          must be local, f must be contained in maxideal(1) and the Milnor
+          number of f must be finite.
+          @* The Milnor number of f can be provided as an optional parameter in
+             order to avoid that it is computed again.
+SEE ALSO: milnornumber, highcorner
+KEYWORDS: Determinacy
+EXAMPLE:  example determinacy; shows an example"
+{
+  /* auxiliary variables */
+  int i;
+
+  /* error check */
+  if(char(basering) != 0)
+  {
+    ERROR("The characteristic must be zero.");
+  }
+  int n = nvars(basering);
+  for(i = 1; i <= n; i++)
+  {
+    if(var(i) > 1)
+    {
+      ERROR("The monomial order must be local.");
+    }
+  }
+  if(jet(f, 0) != 0)
+  {
+    ERROR("The input polynomial must be contained in maxideal(1).");
+  }
+
+  /* get Milnor number before continuing error check */
+  int mu;
+  if(size(#) > 0)   // read optional parameter
+  {
+    if(size(#) > 1 || typeof(#[1]) != "int")
+    {
+      ERROR("Wrong optional parameters.");
+    }
+    else
+    {
+      mu = #[1];
+    }
+  }
+  else              // compute Milnor number
+  {
+    mu = milnornumber(f);
+  }
+
+  /* continue error check */
+  if(mu < 0)
+  {
+    ERROR("The Milnor number of the input polynomial must be"+newline
+      +"non-negative and finite.");
+  }
+
+  int k;   // an upper bound for the determinacy,
+           // we use several methods:
+
+  /* Milnor number */
+  k = mu+1;
+  f = jet(f, k);
+
+  /* highest corner */
+  int hc;
+  for(i = 0; i < 3; i++)
+  {
+    f = jet(f, k);
+    hc = deg(highcorner(std(maxideal(i)*jacob(f))));
+    hc = hc+2-i;
+    if(hc < k)
+    {
+      k = hc;
+    }
+  }
+
+  return(k);
+}
+example
+{
+  "EXAMPLE:";
+  echo = 2;
+  LIB "realclassify.lib";
+  ring r = 0, (x,y), ds;
+  poly f = x3+xy3;
+  determinacy(f);
+}
