@@ -230,7 +230,9 @@ OBJG= $(OBJS:.o=.og)
 OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
 OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op) 
 
-all: feOpt.inc libSingular_g.a libSingular.a Singular Singularg 
+all: feOpt.inc all1
+
+all1: feOpt.inc libSingular_g.a libSingular.a Singular Singularg 
 
 tesths.og: %.og: %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSGNL} -c $< -o $@
@@ -238,10 +240,10 @@ tesths.og: %.og: %.cc
 tesths.o: %.o: %.cc
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSNL} -c $< -o $@
 
-Singular: tesths.o libSingular.a
+Singular: feOpt.inc tesths.o libSingular.a
 	$(CXX) ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} tesths.o -o $@ -L. -lSingular -L../kernel -lkernel -L../numeric -lnumeric ${LIBPOLYS_LIBS} ${LD_DYN_FLAGS}
 
-Singularg: tesths.og libSingular_g.a
+Singularg: feOpt.inc tesths.og libSingular_g.a
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGSG} ${DEFSG} tesths.og -o $@ -L. -lSingular_g -L../kernel -lkernel_g -L../numeric -lnumeric_g ${LIBPOLYS_LIBSG} ${LD_DYN_FLAGS}
 
 
@@ -271,11 +273,12 @@ maintainer-clean: distclean srcclean
 
 #dep. ( manually?!! :((( )
 
+feOpt.cc: feOpt.inc
 feOpt.h: feOpt.inc
 cntrlc.cc: feOpt.inc
-iparith.cc: iparith.inc
 misc_ip.cc: feOpt.inc
 test.cc: iparith.inc
+iparith.cc: iparith.inc
 
 mpsr_Tok.inc: gentable2.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable2.cc -o gentable2
@@ -389,28 +392,28 @@ endif
 # My headers test
 # test: test.o
 
-feOpt.inc: feOpt.cc
+feOpt.inc:
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} feOpt.cc -o feOpt
 	./feOpt
 	/bin/rm -f feOpt feOpt.exe
 
-feOptES.inc: feOpt.cc
+feOptES.inc:
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DESINGULAR -I../kernel feOpt.cc -o feOptES
 	./feOptES
 	rm -f feOptES feOptES.exe
 
-feOptTS.inc: feOpt.cc
+feOptTS.inc:
 	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
 
-plural_cmd.inc: gentable.cc grammar.h tok.h table.h
+plural_cmd.inc: feOpt.inc gentable.cc grammar.h tok.h table.h
 	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
 	     -o gentable1
 	./gentable1
 	/bin/rm -f gentable1 gentable1.exe
 
-iparith.inc: gentable.cc grammar.h tok.h table.h
+iparith.inc: feOpt.inc gentable.cc grammar.h tok.h table.h
 	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
 	     -o gentable1
 	./gentable1
@@ -428,7 +431,7 @@ libSingular_g.a: ${OBJG}
 	ar cr $@ $^
 
 # My headers test
-check: feOpt.inc testg testr 
+check: feOpt.inc libSingular.a libSingular_g.a testg testr 
 	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testg
 	SINGULAR_ROOT_DIR="${PWD}/../" SINGULARPATH="${PWD}/../libpolys/polys/.libs" ./testr
 
