@@ -728,7 +728,7 @@ sub tst_check
   }
   $total_checks_pass++ unless $exit_status;
 
-  mysystem("mv gmon.out \"gmon.$root.out\"") if (-e "gmon.out");
+  &mysystem("mv gmon.out \"gmon.$root.out\"") if (-e "gmon.out");
 
   testFinished($test_file, $cuser_t + $csystem_t);
   
@@ -905,17 +905,42 @@ if (-d $singular)
   print (STDERR "$singular is a directory\n") && &Usage && die;
 }
 
+sub ViewFile
+{
+  local($f) = $_[0];
+  
+  local($ff) = myGetTCprop($f);
+  local($b) = "$f: " . $ff;
+    
+  blockOpened ($b);
+  &mysystem("cat " . $ff);
+  blockClosed ($b);
+}
+
 
 if( length($teamcity) > 0 )
 {
   #  tcLog("|Hi|\r I\'m [Alex]|\nHow are You?|");
 
   blockOpened ("init");
+      
   
 #  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
   
   tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
-  
+
+  if ( length("$ENV{TEAMCITY_BUILD_PROPERTIES_FILE}") > 0 )
+  {
+    print( "teamcity.tests.runRiskGroupTestsFirst: " . myGetTCprop("teamcity.tests.runRiskGroupTestsFirst") . "\n" );
+
+    ViewFile("teamcity.tests.recentlyFailedTests.file");
+    ViewFile("teamcity.build.changedFiles.file");
+    ViewFile("teamcity.build.properties.file");
+    ViewFile("teamcity.configuration.properties.file");
+    ViewFile("teamcity.runner.properties.file");
+  }
+    
+    
   blockClosed ("init");
 }
 
@@ -1058,23 +1083,11 @@ if( length($teamcity) > 0 )
 {
   testSuiteFinished($teamcity);
 
-  blockOpened ("init");
+#  blockOpened ("init");
   
 #  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
-  
-  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
-  
-  if ( length("$ENV{TEAMCITY_BUILD_PROPERTIES_FILE}") > 0 )
-  {
-    print( "teamcity.tests.runRiskGroupTestsFirst: " . myGetTCprop("teamcity.tests.runRiskGroupTestsFirst") . "\n" );
-    print( "teamcity.tests.recentlyFailedTests.file: " . myGetTCprop("teamcity.tests.recentlyFailedTests.file") . "\n" );
-    print( "teamcity.build.changedFiles.file: " . myGetTCprop("teamcity.build.changedFiles.file") . "\n" );
-    print( "teamcity.build.properties.file: " . myGetTCprop("teamcity.build.properties.file") . "\n" );
-    print( "teamcity.configuration.properties.file: " . myGetTCprop("teamcity.configuration.properties.file") . "\n" );
-    print( "teamcity.runner.properties.file  : " . myGetTCprop("teamcity.runner.properties.file  ") . "\n" );
-  }
 
-  blockClosed ("init");
+#  blockClosed ("init");
     
     
     
