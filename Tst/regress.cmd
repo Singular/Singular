@@ -912,19 +912,10 @@ if( length($teamcity) > 0 )
 
   blockOpened ("init");
   
-  local($TEAMCITY_BUILD_PROPERTIES_FILE) = $ENV{TEAMCITY_BUILD_PROPERTIES_FILE};
+#  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
   
-  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $TEAMCITY_BUILD_PROPERTIES_FILE");
+  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
   
-  if ( length($TEAMCITY_BUILD_PROPERTIES_FILE) > 0 )
-  {
-    print( "teamcity.tests.runRiskGroupTestsFirst: " . myGetTCprop("teamcity.tests.runRiskGroupTestsFirst") . "\n" );
-    print( "teamcity.tests.recentlyFailedTests.file: " . myGetTCprop("teamcity.tests.recentlyFailedTests.file") . "\n" );
-    print( "teamcity.build.changedFiles.file: " . myGetTCprop("teamcity.build.changedFiles.file") . "\n" );
-    print( "teamcity.build.properties.file: " . myGetTCprop("teamcity.build.properties.file") . "\n" );
-    print( "teamcity.configuration.properties.file: " . myGetTCprop("teamcity.configuration.properties.file") . "\n" );
-    print( "teamcity.runner.properties.file  : " . myGetTCprop("teamcity.runner.properties.file  ") . "\n" );
-  }
   blockClosed ("init");
 }
 
@@ -1066,6 +1057,27 @@ unless ($verbosity < 2 || $lst_checks == $total_checks)
 if( length($teamcity) > 0 )
 {
   testSuiteFinished($teamcity);
+
+  blockOpened ("init");
+  
+#  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
+  
+  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
+  
+  if ( length("$ENV{TEAMCITY_BUILD_PROPERTIES_FILE}") > 0 )
+  {
+    print( "teamcity.tests.runRiskGroupTestsFirst: " . myGetTCprop("teamcity.tests.runRiskGroupTestsFirst") . "\n" );
+    print( "teamcity.tests.recentlyFailedTests.file: " . myGetTCprop("teamcity.tests.recentlyFailedTests.file") . "\n" );
+    print( "teamcity.build.changedFiles.file: " . myGetTCprop("teamcity.build.changedFiles.file") . "\n" );
+    print( "teamcity.build.properties.file: " . myGetTCprop("teamcity.build.properties.file") . "\n" );
+    print( "teamcity.configuration.properties.file: " . myGetTCprop("teamcity.configuration.properties.file") . "\n" );
+    print( "teamcity.runner.properties.file  : " . myGetTCprop("teamcity.runner.properties.file  ") . "\n" );
+  }
+
+  blockClosed ("init");
+    
+    
+    
 }  
 
 
