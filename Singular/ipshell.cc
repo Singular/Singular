@@ -4957,13 +4957,21 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   
   if (pn->Typ()==INT_CMD)
   {
-    const int ch = (int)(long)pn->Data();
+    int ch = (int)(long)pn->Data();
     
     /* parameter? -------------------------------------------------------*/
     pn = pn->next;
     
     if (pn == NULL) // no params!?
-      cf = nInitChar(ch==0 ? n_Q : n_Zp, (void*)(long)ch);
+    {
+      if (ch!=0)
+      {
+        ch=IsPrime(ch);
+        cf = nInitChar(n_Zp, (void*)(long)ch);
+      }
+      else
+        cf = nInitChar(n_Q, (void*)(long)ch);
+    }
     else
     {
       const int pars = pn->listLength();
