@@ -1895,7 +1895,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   int i;
   matrix b;
   ideal result,h;
-  ring origR;
+  ring origR=currRing;
   ring tmpR;
   long bound;
 
@@ -1904,19 +1904,19 @@ ideal idMinors(matrix a, int ar, ideal R)
     Werror("%d-th minor, matrix is %dx%d",ar,r,c);
     return NULL;
   }
-  h = id_Matrix2Module(mp_Copy(a,currRing),currRing);
-  bound = sm_ExpBound(h,c,r,ar,currRing);
+  h = id_Matrix2Module(mp_Copy(a,origR),origR);
+  bound = sm_ExpBound(h,c,r,ar,origR);
   idDelete(&h);
   tmpR=sm_RingChange(origR,bound);
   b = mpNew(r,c);
   for (i=r*c-1;i>=0;i--)
   {
     if (a->m[i])
-      b->m[i] = prCopyR(a->m[i],origR,currRing);
+      b->m[i] = prCopyR(a->m[i],origR,tmpR);
   }
   if (R!=NULL)
   {
-    R = idrCopyR(R,origR,currRing);
+    R = idrCopyR(R,origR,tmpR);
     //if (ar>1) // otherwise done in mpMinorToResult
     //{
     //  matrix bb=(matrix)kNF(R,currQuotient,(ideal)b);
@@ -1925,8 +1925,8 @@ ideal idMinors(matrix a, int ar, ideal R)
     //}
   }
   result=idInit(32,1);
-  if(ar>1) mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,currRing);
-  else mp_MinorToResult(result,elems,b,r,c,R,currRing);
+  if(ar>1) mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,tmpR);
+  else mp_MinorToResult(result,elems,b,r,c,R,tmpR);
   idDelete((ideal *)&b);
   if (R!=NULL) idDelete(&R);
   idSkipZeroes(result);
