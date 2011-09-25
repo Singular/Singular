@@ -9,7 +9,10 @@ AM_INIT_AUTOMAKE
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
-LT_INIT(dlopen disable-static)
+# Turn off shared libraries during beta-testing, since they
+# make the build process take too long.
+LT_INIT([disable-shared])
+# LT_INIT(dlopen disable-static) # doesn't work on PowerPc!
 
 # Checks for programs.
 AC_PROG_CXX
