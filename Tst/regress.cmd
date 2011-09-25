@@ -72,7 +72,7 @@ sub mysystem_catch
   local($output) = "";
 
   $call = "$call > catch_$$";
-  & mysystem($call);
+  mysystem($call);
 
   open(CATCH_FILE, "<catch_$$");
   while (<CATCH_FILE>)
@@ -80,11 +80,11 @@ sub mysystem_catch
     $output = $output.$_;
   }
   close(CATCH_FILE);
-  & mysystem("$rm -f catch_$$");
+  mysystem("$rm -f catch_$$");
   return $output;
 }
 
-$WINNT = 1 if (&mysystem("uname -a | $grep CYGWIN > /dev/null 2>&1") == 0);
+$WINNT = 1 if (mysystem("uname -a | $grep CYGWIN > /dev/null 2>&1") == 0);
 $uuencode = "uuencode";
 $uudecode = "uudecode";
 
@@ -128,7 +128,7 @@ $report_val = 5;
 $error_val = 5;
 # default value in 1/100 seconds, above which time differences are reported
 $mintime_val = 100;
-$hostname = &mysystem_catch("hostname");
+$hostname = mysystem_catch("hostname");
 chop $hostname;
 
 # flag indicating whether to produce TeamCity output ("" - no):
@@ -136,7 +136,8 @@ $teamcity = "";
 # current argument: test file name?
 $test_file = ""; 
 
-
+# all previous test_file's:
+%test_files = ();
 
 
 #################################################################
@@ -146,7 +147,7 @@ $test_file = "";
 sub myGetTCprop
 {
   local($prop) = $_[0];
-  return( &mysystem_catch("cat \"\$TEAMCITY_BUILD_PROPERTIES_FILE\"|grep \"$prop=\"|sed \"s/$prop=//\"") );
+  return( mysystem_catch("cat \"\$TEAMCITY_BUILD_PROPERTIES_FILE\"|grep \"$prop=\"|sed \"s/$prop=//\"") );
 }
 
 sub tc_filter
@@ -221,6 +222,11 @@ sub tcLog
 { 
   local($text) = $_[0];
   putTCmsgNV2( "message", "text", $text, "status", "NORMAL"); 
+}
+sub tcWarn
+{ 
+  local($text) = $_[0];
+  putTCmsgNV2( "message", "text", $text, "status", "WARNING"); 
 }
 sub tcError
 { 
@@ -298,7 +304,7 @@ sub testIgnored
 
 sub GetSingularVersionDate
 {
-  &mysystem("$singular -t -v --execute=\"exit;\"> SingularVersionDate");
+  mysystem("$singular -t -v --execute=\"exit;\"> SingularVersionDate");
   open(FD, "<SingularVersionDate");
   while (<FD>)
   {
@@ -309,11 +315,11 @@ sub GetSingularVersionDate
     last;
   }
   close(FD);
-  &mysystem("if [ -e /proc/cpuinfo ]; then cat /proc/cpuinfo >> SingularVersionDate; fi ");
-  &mysystem("sysctl -a  >> SingularVersionDate");
-  &mysystem("uname -a >> SingularVersionDate");
-  &mysystem("if [ -e /proc/meminfo ]; then cat /proc/meminfo >> SingularVersionDate; fi ");
-  &mysystem("free -h >> SingularVersionDate");
+  mysystem("if [ -e /proc/cpuinfo ]; then cat /proc/cpuinfo >> SingularVersionDate; fi ");
+  mysystem("sysctl -a  >> SingularVersionDate");
+  mysystem("uname -a >> SingularVersionDate");
+  mysystem("if [ -e /proc/meminfo ]; then cat /proc/meminfo >> SingularVersionDate; fi ");
+  mysystem("free -h >> SingularVersionDate");
 }
 
 sub Set_withMP
@@ -324,14 +330,14 @@ sub Set_withMP
     open(MP_TEST, ">MPTest");
     print(MP_TEST "system(\"with\", \"MP\"); \$");
     close(MP_TEST);
-    &mysystem("$singular -qt MPTest > withMPtest");
+    mysystem("$singular -qt MPTest > withMPtest");
     if (open(MP_TEST, "<withMPtest"))
     {
       $_ = <MP_TEST>;
       $withMP = "yes" if (/^1/);
       close(MP_TEST);
     }
-    &mysystem("$rm -f withMPtest MPTest");
+    mysystem("$rm -f withMPtest MPTest");
   }
 }
 
@@ -362,14 +368,14 @@ sub Diff
   local($exit_status);
 
   # prepare the result files:
-  &mysystem("$cat \"$root.res\" | $tr -d '\\013' | $sed $sed_scripts > \"$root.res.cleaned\"");
-  &mysystem("$cat \"$root.new.res\" | $tr -d '\\013' | $sed $sed_scripts > \"$root.new.res.cleaned\"");
+  mysystem("$cat \"$root.res\" | $tr -d '\\013' | $sed $sed_scripts > \"$root.res.cleaned\"");
+  mysystem("$cat \"$root.new.res\" | $tr -d '\\013' | $sed $sed_scripts > \"$root.new.res.cleaned\"");
 
   # doo the diff call
-  $exit_status = &mysystem("$diff -w -b \"$root.res.cleaned\" \"$root.new.res.cleaned\" > \"$root.diff\" 2>&1");
+  $exit_status = mysystem("$diff -w -b \"$root.res.cleaned\" \"$root.new.res.cleaned\" > \"$root.diff\" 2>&1");
 
   # clean up time
-  &mysystem("$rm -f \"$root.res.cleaned\" \"$root.new.res.cleaned\"");
+  mysystem("$rm -f \"$root.res.cleaned\" \"$root.new.res.cleaned\"");
 
   # there seems to be a bug here somewhere: even if diff reported
   # differenceses and exited with status != 0, then system still
@@ -504,7 +510,7 @@ sub tst_status_merge
       close(RES_FILE);
       close(NEW_RES_FILE);
       close(TEMP_FILE);
-      &mysystem("$rm \"$root.tmp.stat\"");
+      mysystem("$rm \"$root.tmp.stat\"");
       return (1, "Can not find '$prefix >> $crit' in $root.stat\n");
     }
     if ($merge_version)
@@ -524,8 +530,8 @@ sub tst_status_merge
   close(RES_FILE);
   close(NEW_RES_FILE);
   close(TEMP_FILE);
-  &mysystem("$mv -f \"$root.tmp.stat\" \"$root.stat\"");
-  &mysystem("$rm -f \"$root.new.stat\" \"$root.stat.sdiff\"") unless $keep eq "yes";
+  mysystem("$mv -f \"$root.tmp.stat\" \"$root.stat\"");
+  mysystem("$rm -f \"$root.new.stat\" \"$root.stat.sdiff\"") unless $keep eq "yes";
   return ;
 }
 
@@ -534,23 +540,31 @@ sub tst_check
   local($root) = $_[0];
   local($system_call, $exit_status, $ignore_pattern, $error_cause);
 
-  $total_checks++;
+  if( exists($test_files{$test_file}) && (length($teamcity) > 0) )
+  {
+     tcWarn("The test '$test_file' have been alreeady tests (with result: $test_files{$test_file})... skipping!");
+     return ($test_files{$test_file})
+  }
   
+  $total_checks++;
+    
   # check for existence/readablity of tst and res file
   if (! (-r "$root.tst"))
   {
     print "--- $root " unless ($verbosity == 0);
     print (STDERR "Can not read $root.tst\n");
     testIgnored($test_file, "Can not read $root.tst");
+    $test_files{$test_file} = 1;
     return (1);
   }
 
   # ignore MP stuff, if this singular does not have MP
-  if (! &MPok($root))
+  if (! MPok($root))
   {
     print "--- $root " unless ($verbosity == 0);
     print "Warning: $root not tested: needs MP\n";
     testIgnored($test_file, "Warning: $root not tested: needs MP");
+    $test_files{$test_file} = 0;
     return (0);
   }
 
@@ -559,12 +573,13 @@ sub tst_check
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
-      $exit_status = &mysystem("$uudecode \"$root.res.gz.uu\" > /dev/null 2>&1; $gunzip -f \"$root.res.gz\"");
+      $exit_status = mysystem("$uudecode \"$root.res.gz.uu\" > /dev/null 2>&1; $gunzip -f \"$root.res.gz\"");
       if ($exit_status)
       {
         print "--- $root " unless ($verbosity == 0);
         print (STDERR "Can not decode $root.res.gz.uu\n");
         testIgnored($test_file, "Can not decode $root.res.gz.uu");
+        $test_files{$test_file} = $exit_status;
         return ($exit_status);
       }
     }
@@ -573,6 +588,7 @@ sub tst_check
       print "--- $root " unless ($verbosity == 0);
       print (STDERR "Can not read $root.res[.gz.uu]\n");
       testIgnored($test_file, "Can not read $root.res[.gz.uu]");
+      $test_files{$test_file} = 1;
       return (1);
     }
   }
@@ -583,7 +599,7 @@ sub tst_check
   my $resfile = "\"$root.new.res\"";
   $resfile = "\"$root.mtrack.res\"" if (defined($mtrack));
   my $statfile = "$root.new.stat";
-  &mysystem("$rm -f \"$statfile\"");
+  mysystem("$rm -f \"$statfile\"");
   
   if (defined($mtrack))
   {
@@ -608,7 +624,7 @@ sub tst_check
   # Go Singular, Go!
   
   my ($user_t,$system_t,$cuser_t,$csystem_t) = times;
-  $exit_status = &mysystem($system_call);
+  $exit_status = mysystem($system_call);
   my ($user_t,$system_t,$cuser_t2,$csystem_t2) = times;
   $cuser_t = $cuser_t2 - $cuser_t;
   $csystem_t = $csystem_t2 - $csystem_t;
@@ -620,7 +636,7 @@ sub tst_check
   else
   {
     # check for Segment fault in res file
-    $exit_status = ! (&mysystem("$grep \"Segment fault\" $resfile > /dev/null 2>&1"));
+    $exit_status = ! (mysystem("$grep \"Segment fault\" $resfile > /dev/null 2>&1"));
 
     if ($exit_status)
     {
@@ -628,15 +644,15 @@ sub tst_check
     }
     elsif (! defined($mtrack) && !defined($timings_only))
     {
-      &mysystem("$rm -f \"$root.diff\"");
+      mysystem("$rm -f \"$root.diff\"");
       if ($generate eq "yes")
       {
-        &mysystem("$cp $resfile \"$root.res\"");
+        mysystem("$cp $resfile \"$root.res\"");
       }
       else
       {
         # call Diff
-        $exit_status = &Diff($root);
+        $exit_status = Diff($root);
         if ($exit_status)
         {
 	  unless ($verbosity == 0)
@@ -648,7 +664,7 @@ sub tst_check
         }
         else
         {
-          &mysystem("$rm -f \"$root.diff\"");
+          mysystem("$rm -f \"$root.diff\"");
         }
       }
     }
@@ -664,11 +680,12 @@ sub tst_check
     if (-e "$statfile")
     {
       # do status checks
-      ($exit_status, $error_cause) = & tst_status_check($root);
+      ($exit_status, $error_cause) = tst_status_check($root);
     }
     else
     {
       print "Warning: no file $statfile\n";
+      tcWarn("Warning: no file $statfile");
     }
   }
 
@@ -696,7 +713,7 @@ sub tst_check
 	($exit_status, $error_cause) = tst_status_merge($root);
 	if (! $WINNT)
 	{
-	  &mysystem("$gzip -cf \"$root.res\" | $uuencode \"$root.res.gz\" > \"$root.res.gz.uu\"");
+	  mysystem("$gzip -cf \"$root.res\" | $uuencode \"$root.res.gz\" > \"$root.res.gz.uu\"");
 	}
 	else
 	{
@@ -706,7 +723,7 @@ sub tst_check
       }
       elsif (%merge)
       {
-	($exit_status, $error_cause) = & tst_status_merge($root);
+	($exit_status, $error_cause) = tst_status_merge($root);
 	  
 	print (STDERR "Warning: Merge Problems: $error_cause\n")
 	  if ($verbosity > 0 && $exit_status);
@@ -714,7 +731,7 @@ sub tst_check
     }
     if ($keep ne "yes")
     {
-      &mysystem("$rm -f tst_status.out $resfile \"$root.res\" \"$root.diff\" \"$root.new.stat\"");
+      mysystem("$rm -f tst_status.out $resfile \"$root.res\" \"$root.diff\" \"$root.new.stat\"");
     }
   }
   # und tschuess
@@ -732,10 +749,11 @@ sub tst_check
   }
   $total_checks_pass++ unless $exit_status;
 
-  &mysystem("mv gmon.out \"gmon.$root.out\"") if (-e "gmon.out");
+  mysystem("mv gmon.out \"gmon.$root.out\"") if (-e "gmon.out");
 
   testFinished($test_file, $cuser_t + $csystem_t);
   
+  $test_files{$test_file} = $exit_status;
   return ($exit_status);
 }
 
@@ -917,7 +935,7 @@ sub ViewFile
   local($b) = "$f: " . $ff;
     
   blockOpened ($b);
-  &mysystem("cat " . $ff);
+  mysystem("cat " . $ff);
   blockClosed ($b);
 }
 
@@ -990,7 +1008,7 @@ foreach (@ARGV)
 
   if ($extension eq "tst")
   {
-    $exit_code = &tst_check($base) || $exit_code;
+    $exit_code = tst_check($base) || $exit_code;
   }
   elsif ($extension eq "lst")
   {
@@ -1048,9 +1066,8 @@ foreach (@ARGV)
       $lst_checks++;
 
       tcLog("tst_path: $tst_path, tst_base: $tst_base");
-
       
-      my $this_exit_code = &tst_check($tst_base);
+      my $this_exit_code = tst_check($tst_base);
 
       $lst_checks_pass++ unless $this_exit_code;
       $exit_code = $this_exit_code || $exit_code;
@@ -1062,8 +1079,11 @@ foreach (@ARGV)
       }
     }
     close (LST_FILE);
-    printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time) 
+      
+    printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time)
       unless ($verbosity < 2);
+      
+    tcLog( sprintf("list '$base' Summary: Checks:$lst_checks Failed:%d Time:%.2f", $lst_checks - $lst_checks_pass, $lst_used_time) );
     blockClosed ($b);
   }
   else
@@ -1082,6 +1102,8 @@ unless ($verbosity < 2 || $lst_checks == $total_checks)
 {
   printf("Summary: Checks:$total_checks Failed:%d Time:%.2f\n", $total_checks - $total_checks_pass, $total_used_time);
 }
+
+tcLog( sprintf("Global Summary: Checks:$total_checks Failed:%d Time:%.2f", $total_checks - $total_checks_pass, $total_used_time)) ;
 
 if( length($teamcity) > 0 )
 {
