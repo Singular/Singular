@@ -218,6 +218,28 @@ sub blockClosed
   local($v) = $_[0];
   putTCmsgNV( "blockClosed", "name", $v);
 }
+sub tcError
+{ 
+  local($text) = tc_filter($_[0]);
+  local($details) = tc_filter($_[1]);
+  local($status) = tc_filter($_[2]);
+  # The status attribute may take following values:
+  # NORMAL, WARNING, FAILURE, ERROR.
+  # The default value is NORMAL.
+  # The errorDetails attribute is used only if status is ERROR, in other cases it is ignored.
+  # This message fails the build in case its status is ERROR and "Fail build if an error message is logged by build runner" checkbox is checked on build configuration general settings page.
+  
+  ##teamcity[message text='<message text>' errorDetails='<error details>' status='<status value>']
+  putTCmsg( "message", "text=\'$text\' errorDetails=\'$details\' status=\'$status\'");
+}
+
+sub tcFailure
+{
+  local($text) = tc_filter($_[0]);
+  local($details) = tc_filter($_[1]);
+  tcError( $text, $details, "FAILURE" );
+}
+
 sub tcLog
 { 
   local($text) = $_[0];
@@ -227,20 +249,6 @@ sub tcWarn
 { 
   local($text) = $_[0];
   putTCmsgNV2( "message", "text", $text, "status", "WARNING"); 
-}
-sub tcError
-{ 
-  local($n) = tc_filter($_[0]);
-  local($m) = tc_filter($_[1]);
-  local($t) = tc_filter($_[2]);
-  # The status attribute may take following values:
-  # NORMAL, WARNING, FAILURE, ERROR.
-  # The default value is NORMAL.
-  # The errorDetails attribute is used only if status is ERROR, in other cases it is ignored.
-  # This message fails the build in case its status is ERROR and "Fail build if an error message is logged by build runner" checkbox is checked on build configuration general settings page.
-  
-  ##teamcity[message text='<message text>' errorDetails='<error details>' status='<status value>']
-  putTCmsg( "message", "text=\'$n\' errorDetails=\'$m\' status=\'$t\'"); 
 }
 
 sub testSuiteStarted
@@ -253,41 +261,71 @@ sub testSuiteFinished
   local($v) = $_[0];
   putTCmsgNV( "testSuiteFinished", "name", $v);
 }
+
+$failed = 0;
+
 sub testStarted
 {
   local($v) = $_[0];        
   putTCmsgNV2( "testStarted", "name", $v, "captureStandardOutput", "true");
+  $failed = 0;    
 }
 sub testFinished
 { 
   local($v) = $_[0];
   local($d) = $_[1];
-  putTCmsgNV2( "testFinished", "name", $v, "duration", $d); 
+  putTCmsgNV2( "testFinished", "name", $v, "duration", $d);
+  $failed = 0;   
 }
+
 sub testFailed
 {
   local($n) = $_[0];
   local($m) = $_[1];
-  putTCmsgNV2( "testFailed", "name", $n, "message", $m);
+    
+  if( !$failed )
+  {
+    putTCmsgNV2( "testFailed", "name", $n, "message", $m);
+    $failed = 1;
+  } else
+  {
+    tcFailure("Test: $n => $m", "");
+  }
 }
 sub testFailed2
 {
   local($n) = tc_filter($_[0]);
   local($m) = tc_filter($_[1]);
   local($t) = tc_filter($_[2]);
-  putTCmsg( "testFailed", "name=\'$n\' message=\'$m\' details=\'$t\'"); 
+  if( !$failed )
+  {
+    putTCmsg( "testFailed", "name=\'$n\' message=\'$m\' details=\'$t\'"); 
+    $failed = 1;
+  } else
+  {
+    tcFailure("Test: $n => $m", $t);
+  }
+
 }
 sub testFailedCMP
 {
-  local($n) = tc_filter($_[0]);
-  local($m) = tc_filter($_[1]);
-  local($d) = tc_filter($_[2]);
-  local($e) = tc_filter($_[3]);
-  local($a) = tc_filter($_[4]);
-  putTCmsg( "testFailed", "type=\'comparisonFailure\' name=\'$n\' message=\'$m\' details=\'$d\' expected=\'$e\' actual=\'$a\'"); 
+  local($name) = tc_filter($_[0]);
+  local($msg) = tc_filter($_[1]);
+  local($details) = tc_filter($_[2]);
+  local($expected) = tc_filter($_[3]);
+  local($actual) = tc_filter($_[4]);
+  if( !$failed )
+  {
+    putTCmsg( "testFailed", "type=\'comparisonFailure\' name=\'$name\' message=\'$msg\' details=\'$details\' expected=\'$expected\' actual=\'$actual\'");
+    $failed = 1;
+  } else
+  {
+    tcFailure("Test: $name => $msg", "$detail\nExpected: $expected\nActual: $actual");
+  }
+
 }
 
-##teamcity[testFailed type='comparisonFailure' name='test2' message='failure message' details='message and stack trace' expected='expected value' actual='actual value']
+##teamcity[testFailed type='comparisonFailure' name='test_file' message='failure_message' details='message and stack trace' expected='expected value' actual='actual value']
 sub testIgnored
 { 
   local($n) = $_[0];
@@ -374,6 +412,7 @@ sub Diff
   # doo the diff call
   $exit_status = mysystem("$diff -w -b \"$root.res.cleaned\" \"$root.new.res.cleaned\" > \"$root.diff\" 2>&1");
 
+  
   # clean up time
   mysystem("$rm -f \"$root.res.cleaned\" \"$root.new.res.cleaned\"");
 
@@ -384,6 +423,14 @@ sub Diff
   # iff diff-file exists and has non-zero size
   $exit_status = $exit_status || (-e "$root.diff" && -s "$root.diff");
 
+  if( $exit_status && (length($teamcity) > 0) )
+  {
+    local($details) = mysystem_catch("$cat \"$root.diff\"");
+    local($expected) = mysystem_catch("$cat \"$root.res\"");
+    local($actual) = mysystem_catch("$cat \"$root.new.res\"");
+    testFailedCMP($test_file, "Differences in res files", $details, $expected, $actual )
+  }
+    
   return($exit_status);
 }
 
@@ -628,10 +675,22 @@ sub tst_check
   my ($user_t,$system_t,$cuser_t2,$csystem_t2) = times;
   $cuser_t = $cuser_t2 - $cuser_t;
   $csystem_t = $csystem_t2 - $csystem_t;
-  
+
+  tcLog("Test: $test_file, user time: $cuser_t, system time: $csystem_t" );
+    
   if ($exit_status != 0)
   {
-    $error_cause = "Singular call exited with status != 0";    
+    $error_cause = "Singular call exited with status ($exit_status) != 0";
+    
+    if( length($teamcity) > 0 )
+    {   
+      ### TODO: add a way to detect timeout!!!
+      if( $exit_status == 142 ) # perl sig alarm exit code? NOPE :(((
+      { 
+        local($details) = mysystem_catch("$cat \"$resfile\"");      
+	testFailed2($test_file, "Exit on timeout ($timeout sec)!", $details);    
+      }
+    }
   }
   else
   {
@@ -641,6 +700,8 @@ sub tst_check
     if ($exit_status)
     {
       $error_cause = "Segment fault";
+      local($details) = mysystem_catch("$cat \"$resfile\"");
+      testFailed2($test_file, $error_cause, $details);      
     }
     elsif (! defined($mtrack) && !defined($timings_only))
     {
@@ -700,7 +761,12 @@ sub tst_check
       print "\n";
     }
     print STDERR "!!! $root : $error_cause\n";
-    testFailed($test_file, $error_cause);
+
+    if( length($teamcity) > 0 )
+    {
+      local($details) = mysystem_catch("$cat \"$resfile\"");      
+      testFailed2($test_file, $error_cause, $details);    
+    }
   }
   else
   {
@@ -750,7 +816,7 @@ sub tst_check
   $total_checks_pass++ unless $exit_status;
 
   mysystem("mv gmon.out \"gmon.$root.out\"") if (-e "gmon.out");
-
+ 
   testFinished($test_file, $cuser_t + $csystem_t);
   
   $test_files{$test_file} = $exit_status;
@@ -968,7 +1034,7 @@ if( length($teamcity) > 0 )
 
 if ($timeout > 0)
 {
-  $singular = "PERL_SIGNALS=unsafe perl -e 'alarm($timeout); exec(\@ARGV); ' $singular";
+  $singular = "PERL_SIGNALS=unsafe perl -e 'alarm($timeout);exec(\@ARGV);' $singular";
   tcLog ("Set exec timeout to $timeout sec.\n");
   # die;
 }
