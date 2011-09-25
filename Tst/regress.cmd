@@ -1044,15 +1044,39 @@ testSuiteStarted($teamcity);
 # now do the work
 foreach (@ARGV)
 {
+  if( /^([^:]*): *(.*)$/ )
+  {
+    $_=$2;
+  }
+
+  if ( /^\s*([^ ].*)$/ )
+  {
+    $_ = $1;
+  }  
+  
+  if ( /^\.\/(.*)$/ )
+  {
+    $_ = $1;
+  }
+
   $test_file = $_;
 
   tcLog("test_file: $test_file");
-  
+
   if ( /^(.*)\.([^\.\/]*)$/ )
   {
     $_ = $1;
     $extension = $2;
+  } else
+  {
+    print ("Wrong input: [$_] has no extension!");
+    tcWarn("Wrong input: [$_] has no extension!");
+    next;
   }
+    
+  
+    
+    
 
   if ( /^(.*)\/([^\/]*)$/ )
   {
@@ -1099,6 +1123,21 @@ foreach (@ARGV)
         print unless ($verbosity == 0);
         next;
       }
+  if( /^([^:]*): *(.*)$/ )
+  {
+    $_=$2;
+  }
+
+  if ( /^\s*([^\s].*)$/ )
+  {
+    $_ = $1;
+  }  
+  
+  if ( /^\.\/(.*)$/ )
+  {
+    $_ = $1;
+  }
+	
       next if (/^\s*$/); #ignore whitespaced lines
       chop if (/\n$/);   #chop of \n
  
@@ -1112,6 +1151,8 @@ foreach (@ARGV)
       {
         $test_file = $_;
       }
+
+      $test_file =~ s/^[ ]*\.\///;
                       
       
       $_ = $1 if (/^(.*)\.([^\.\/]*)$/ ); # chop of extension (.tst!!!?)
