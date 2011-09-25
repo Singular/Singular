@@ -14,7 +14,7 @@ AM_INIT_AUTOMAKE
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
-LT_INIT(dlopen disable-static)
+LT_INIT([enable-shared])
 
 AC_PROG_CC
 AC_PROG_CXX

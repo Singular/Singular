@@ -11,7 +11,7 @@ AM_SANITY_CHECK
 
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
-LT_INIT([disable-shared])
+LT_INIT([enable-shared])
 # LT_INIT(dlopen disable-static) # doesn't work on PowerPc!
 
 # Checks for programs.
