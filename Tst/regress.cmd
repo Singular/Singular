@@ -534,12 +534,12 @@ sub tst_check
   local($root) = $_[0];
   local($system_call, $exit_status, $ignore_pattern, $error_cause);
 
-  print "--- $root " unless ($verbosity == 0);
   $total_checks++;
   
   # check for existence/readablity of tst and res file
   if (! (-r "$root.tst"))
   {
+    print "--- $root " unless ($verbosity == 0);
     print (STDERR "Can not read $root.tst\n");
     testIgnored($test_file, "Can not read $root.tst");
     return (1);
@@ -548,6 +548,7 @@ sub tst_check
   # ignore MP stuff, if this singular does not have MP
   if (! &MPok($root))
   {
+    print "--- $root " unless ($verbosity == 0);
     print "Warning: $root not tested: needs MP\n";
     testIgnored($test_file, "Warning: $root not tested: needs MP");
     return (0);
@@ -561,6 +562,7 @@ sub tst_check
       $exit_status = &mysystem("$uudecode \"$root.res.gz.uu\" > /dev/null 2>&1; $gunzip -f \"$root.res.gz\"");
       if ($exit_status)
       {
+        print "--- $root " unless ($verbosity == 0);
         print (STDERR "Can not decode $root.res.gz.uu\n");
         testIgnored($test_file, "Can not decode $root.res.gz.uu");
         return ($exit_status);
@@ -568,6 +570,7 @@ sub tst_check
     }
     elsif (! (-r "$root.res") || ( -z "$root.res"))
     {
+      print "--- $root " unless ($verbosity == 0);
       print (STDERR "Can not read $root.res[.gz.uu]\n");
       testIgnored($test_file, "Can not read $root.res[.gz.uu]");
       return (1);
@@ -575,6 +578,7 @@ sub tst_check
   }
 
   testStarted($test_file);
+  print "--- $root " unless ($verbosity == 0);
   
   my $resfile = "\"$root.new.res\"";
   $resfile = "\"$root.mtrack.res\"" if (defined($mtrack));
