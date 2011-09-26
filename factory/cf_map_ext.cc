@@ -23,6 +23,8 @@
 
 #include "canonicalform.h"
 #include "cf_util.h"
+#include "imm.h"
+#include "cf_iter.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEXFactoring.h>
@@ -33,8 +35,6 @@
 #include "cf_cyclo.h"
 
 #include "cf_map_ext.h"
-
-#ifdef HAVE_NTL
 
 /// helper function
 int findItem (const CFList& list, const CanonicalForm& item)
@@ -63,7 +63,7 @@ CanonicalForm getItem (const CFList& list, const int& pos)
   return 0;
 }
 
-
+#ifdef HAVE_NTL
 /// \f$ F_{p} (\alpha ) \subset F_{p}(\beta ) \f$ and \f$ \alpha \f$ is a
 /// primitive element, returns the image of \f$ \alpha \f$
 static inline
@@ -77,6 +77,8 @@ CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
   zz_pE root= FindRoot (NTL_alpha_mipo);
   return convertNTLzzpE2CF (root, beta);
 }
+
+#endif
 
 /// the CanonicalForm G is the output of map_up, returns F considered as an
 /// element over \f$ F_{p}(\alpha ) \f$, WARNING: make sure coefficients of F
@@ -306,6 +308,7 @@ CanonicalForm mapUp (const CanonicalForm& F, const CanonicalForm& G,
   }
 }
 
+#ifdef HAVE_NTL
 /// determine a primitive element of \f$ F_{p} (\alpha ) \f$,
 /// \f$ \beta \f$ is a primitive element of a field which is isomorphic to
 /// \f$ F_{p}(\alpha ) \f$
@@ -347,6 +350,7 @@ primitiveElement (const Variable& alpha, Variable& beta, bool fail)
   zz_pE root= FindRoot (NTL_beta_mipo);
   return convertNTLzzpE2CF (root, alpha);
 }
+#endif
 
 CanonicalForm
 mapDown (const CanonicalForm& F, const CanonicalForm& prim_elem, const
@@ -366,6 +370,7 @@ mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& beta,
   return mapUp (F, prim_elem, alpha, im_prim_elem, source, dest);
 }
 
+#ifdef HAVE_NTL
 CanonicalForm
 mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
              const Variable& beta)

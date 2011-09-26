@@ -32,6 +32,7 @@ multiFactorize (const CanonicalForm& F,     ///< [in] poly to be factored
 ///
 /// @return @a ratSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
+#ifdef HAVE_NTL
 inline
 CFList ratSqrfFactorize (const CanonicalForm & G, ///< [in] a multivariate poly
                          const Variable& v
@@ -88,6 +89,7 @@ CFFList ratFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
   }
   return result;
 }
+#endif
 
 #endif
 

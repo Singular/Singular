@@ -804,7 +804,11 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   }
   else //Q(a)[x1,...,xn]
   {
+#ifdef HAVE_NTL
     F= ratFactorize (f, alpha);
+#else
+    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+#endif
   }
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;

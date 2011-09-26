@@ -39,6 +39,7 @@ multiFactorize (const CanonicalForm& F,    ///< [in] poly to be factored
 /// @return @a FpSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
 /// @sa FqSqrfFactorize(), GFSqrfFactorize()
+#ifdef HAVE_NTL
 inline
 CFList FpSqrfFactorize (const CanonicalForm & F ///< [in] a multivariate poly
                        )
@@ -229,6 +230,8 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   result.insert (CFFactor (LcF, 1));
   return result;
 }
+
+#endif
 
 /// Naive factor recombination for multivariate factorization over an extension
 /// of the initial field. No precomputed is used to exclude combinations.
