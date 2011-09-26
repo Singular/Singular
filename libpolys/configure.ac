@@ -9,17 +9,34 @@ AM_INIT_AUTOMAKE
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
+#
+# - Check for CC and CXX but be careful about CFLAGS.
+#
+test "${CFLAGS+set}" = set || cflags_expl_set=no
+AC_PROG_CC
+test "${CXXFLAGS+set}" = set || cxxflags_expl_set=no
+AC_PROG_CXX
+if test "x$GCC" != xyes && test "x$GXX" != xyes; then
+  AC_MSG_WARN(you better use gcc to compile Factory)
+else
+  if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
+    AC_MSG_WARN([we use \`' as default for \`CXXFLAGS'
+                    (instead of the configure default \`-g -O')])
+  fi
+  if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
+    AC_MSG_WARN([we use \`' as default for \`CFLAGS'
+                    (instead of the configure default \`-g -O')])
+  fi
+fi
+
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
 LT_INIT([shared])
 # LT_INIT(dlopen disable-static) # doesn't work on PowerPc!
 
-# Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_LN_S
 AC_PROG_INSTALL
-AM_PROG_CC_C_O
 
 # Checks for libraries.
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
@@ -71,6 +88,16 @@ SING_CHECK_P_PROCS
 SING_CHECK_ARITH_RINGS
 SING_CHECK_FACTORY
 SING_CHECK_PLURAL
+
+# CFLAGS
+if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
+  CFLAGS=""
+fi
+  
+# CXXFLAGS
+if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
+  CXXFLAGS=""
+fi
 
 if test "x$prefix" != xNONE; then
   PREFIX="$prefix"
