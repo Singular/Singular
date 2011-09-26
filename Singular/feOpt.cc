@@ -16,8 +16,8 @@
 #include <factory/factory.h>
 #endif
 
+#define FE_OPT_STRUCTURE
 #include "feOpt.h"
-#include "feOptTab.h"
 
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>

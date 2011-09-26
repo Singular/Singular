@@ -9,10 +9,10 @@
 */
 
 #include <kernel/fegetopt.h>
+
 #include <Singular/feOptTab.h>
 
 extern const char SHORT_OPTS_STRING[];
-#define LONG_OPTION_RETURN 13
 
 /* specifies format of options */
 extern struct fe_option feOptSpec[];

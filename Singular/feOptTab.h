@@ -1,6 +1,12 @@
 #ifndef FE_OPT_TAB_H
 #define FE_OPT_TAB_H
+
+#define LONG_OPTION_RETURN 13
+
 // Define here which cmd-line options are recognized
+#ifndef FE_OPT_STRUCTURE
+extern struct fe_option feOptSpec[];
+#else
 struct fe_option feOptSpec[] =
 {
 //
@@ -154,4 +160,5 @@ struct fe_option feOptSpec[] =
   { 0, 0, 0, 0, 0, feOptInt, 0, 0}
 };
 
+#endif
 #endif
