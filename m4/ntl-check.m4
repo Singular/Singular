@@ -116,6 +116,7 @@ AC_LANG_POP
 
 AM_CONDITIONAL(SING_HAVE_NTL, test "x$HAVE_NTL" = "xyes")
 
+# TODO: The following seems to set CXXFLAGS even if it was not defined previously!!!!
 CXXFLAGS=${BACKUP_CXXFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH

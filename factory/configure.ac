@@ -90,11 +90,11 @@ if test "x$GCC" != xyes && test "x$GXX" != xyes; then
   AC_MSG_WARN(you better use gcc to compile Factory)
 else
   if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`-O2 -fomit-frame-pointer' as default for \`CXXFLAGS'
+    AC_MSG_WARN([we use \`' as default for \`CXXFLAGS'
                     (instead of the configure default \`-g -O')])
   fi
   if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`-O2 -fomit-frame-pointer' as default for \`CFLAGS'
+    AC_MSG_WARN([we use \`' as default for \`CFLAGS'
                     (instead of the configure default \`-g -O')])
   fi
 fi
@@ -280,26 +280,26 @@ fi
 
 # CFLAGS
 if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-  CFLAGS="-O2 -fomit-frame-pointer"
+  CFLAGS=""
 fi
 
 # CXXFLAGS
 if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-  CXXFLAGS="-O2 -fomit-frame-pointer"
+  CXXFLAGS=""
 
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 # check whether CXX accepts -fno-rtti
 AC_MSG_CHECKING(whether gcc accepts -fno-rtti)
 tmp_flags=${CXXFLAGS}
-CXXFLAGS="${CXXFLAGS} -fno-rtti"
+CXXFLAGS="${CXXFLAGS}"
 AC_CACHE_VAL(ac_cv_cxx_have_rtti,
 AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
 )
 AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
 CXXFLAGS=$tmp_flags
 if test "${ac_cv_cxx_have_rtti}" = yes; then
-CXXFLAGS="$CXXFLAGS -fno-rtti"
+CXXFLAGS="$CXXFLAGS"
 fi
 
 AC_MSG_CHECKING(whether gcc accepts -fno-exceptions)
