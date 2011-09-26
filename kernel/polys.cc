@@ -2,6 +2,7 @@
 
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
+#include <misc/options.h>
 
 #include "polys.h"
 
@@ -12,4 +13,6 @@ void rChangeCurrRing(ring r)
 {
    currRing = r;
    currQuotient = r->qideal;
+   test &= ~ TEST_RINGDEP_OPTS;
+   test |= r->options;
 }
