@@ -40,9 +40,8 @@ AC_ARG_WITH(
   [AS_HELP_STRING([--without-Singular],[build NOT for the use with CAS Singular.])],
   ,
   [with_Singular=yes])
+AM_CONDITIONAL([WITHOUT_SINGULAR], [test x$with_Singular != xyes])
 
-
-# font-lock-trick: '
 
 AC_ARG_WITH(
   omalloc,

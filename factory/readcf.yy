@@ -6,9 +6,6 @@
 #include "config.h"
 #include "factoryconf.h"
 
-#if (!defined(NOSTREAMIO)) && (!defined(SINGULAR))
-
-
 #if defined(WINNT) && ! defined(__GNUC__)
 # include <malloc.h>
 # include <memory.h>
@@ -217,6 +214,3 @@ char* readString( ISTREAM& s )
     return buffer;
 }
 
-
-#endif 
-/* #ifndef SINGULAR && ifndef NOSTREAMIO */

@@ -93,8 +93,11 @@ SOURCES = \
 		singext.cc \
 		parseutil.cc \
 		ftmpl_inst.cc \
-		factory.h factoryconf.h cplusplus.h \
-		readcf.yy
+		factory.h factoryconf.h cplusplus.h
+
+if WITHOUT_SINGULAR
+    SOURCES +=  readcf.yy
+endif
 
 
 libfactory_a_SOURCES = $(SOURCES)
