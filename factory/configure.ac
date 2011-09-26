@@ -40,7 +40,6 @@ AC_ARG_WITH(
   [AS_HELP_STRING([--without-Singular],[build NOT for the use with CAS Singular.])],
   ,
   [with_Singular=yes])
-AM_CONDITIONAL([WITHOUT_SINGULAR], [test x$with_Singular != xyes])
 
 
 AC_ARG_WITH(
@@ -418,4 +417,9 @@ AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version", [FACTORYVERSION])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration", [FACTORYCONFIGURATION])
 AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir", [GFTABLEDIR])
 
+AM_CONDITIONAL(
+    [WITH_PARSER_FOR_CANONICAL_FORM], 
+    [test x$with_Singular != xyes && test x$enable_streamio != xno])
+
 AC_OUTPUT(Makefile ftest/GNUmakefile)
+

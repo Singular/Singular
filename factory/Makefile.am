@@ -95,7 +95,7 @@ SOURCES = \
 		ftmpl_inst.cc \
 		factory.h factoryconf.h cplusplus.h
 
-if WITHOUT_SINGULAR
+if WITH_PARSER_FOR_CANONICAL_FORM
     SOURCES +=  readcf.yy
 endif
 
