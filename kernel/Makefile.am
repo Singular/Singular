@@ -1,3 +1,5 @@
+# ACLOCAL_AMFLAGS = -I ${top_srcdir}/m4
+
 # PIPE = -pipe
 # ???
 #LD_DYN_FLAGS	= -ldl -rdynamic
@@ -6,7 +8,6 @@
 #LD_LIBC	        = -lc
 #STATIC_LDFLAGS	= -static
 
-ACLOCAL_AMFLAGS = -I ${top_srcdir}/m4
 
 
 CXXTEMPLFLAGS = --no-exceptions ## -fno-implicit-templates
