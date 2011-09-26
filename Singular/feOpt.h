@@ -9,6 +9,7 @@
 */
 
 #include <kernel/fegetopt.h>
+#include <Singular/feOptTab.h>
 
 extern const char SHORT_OPTS_STRING[];
 #define LONG_OPTION_RETURN 13
@@ -17,7 +18,7 @@ extern const char SHORT_OPTS_STRING[];
 extern struct fe_option feOptSpec[];
 
 /* provides feOptIndex enum type for fast accesses to feOptSpec */
-#if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
+#if ! defined(GENERATE_DEPEND)
 
 # ifdef ESINGULAR
 #  include <Singular/feOptES.inc>

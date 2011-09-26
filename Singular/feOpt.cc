@@ -17,7 +17,7 @@
 #endif
 
 #include "feOpt.h"
-#include "feOptGen.h"
+#include "feOptTab.h"
 
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
