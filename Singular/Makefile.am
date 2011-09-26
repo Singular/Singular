@@ -194,14 +194,7 @@ BUILT_SOURCES=feOpt.inc mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
 
 AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/resources -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc
 
-EXTRA_PROGRAMS=feOpt gentable2 gentable1 feOptES feOptTS
-
-#mpsr_Tok.cc: mpsr_Tok.inc
-#iparith.cc: iparith.inc
-#cntrlc.cc: feOpt.inc
-#misc_ip.cc: feOpt.inc
-## test.cc: iparith.inc
-
+EXTRA_PROGRAMS=gentable2 gentable1 feOpt feOptES feOptTS
 
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
 # gentable2_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
@@ -218,36 +211,24 @@ gentable1_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 
 # plural_cmd.inc: iparith.inc			       
 			         
-feOpt_SOURCES = feOpt.cc
-# feOpt_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-feOpt_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+feOpt_SOURCES = feOptGen.cc feOptGen.h
 feOpt_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOpt_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DGENERATE_OPTION_INDEX
+feOpt_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 
-
-feOptES_SOURCES = feOpt.cc
-# feOptES_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-feOptES_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+feOptES_SOURCES = feOptGen.cc feOptGen.h
 feOptES_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptES_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DGENERATE_OPTION_INDEX -DESINGULAR 
+feOptES_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DESINGULAR 
 
-
-feOptTS_SOURCES = feOpt.cc
-# feOptES_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-feOptTS_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+feOptTS_SOURCES = feOptGen.cc feOptGen.h
 feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptTS_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DGENERATE_OPTION_INDEX -DTSINGULAR
-
+feOptTS_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DTSINGULAR
 
 ########################### Singular* #########################
 
 bin_PROGRAMS = Singular Singularg
 
-## Singular: libSingular.a
-## Singularg: libSingular_g.a
-
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-Singularg_CFLAGS = ${PIPE}
+Singularg_CFLAGS = -g ${PIPE}
 
 Singular_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 Singularg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
@@ -278,9 +259,6 @@ testg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLA
 testr_SOURCES = test.cc
 testg_SOURCES = test.cc
 
-## testr: libSingular.a
-## testg: libSingular_g.a
-
 testr_LDADD = libSingular.a -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 testg_LDADD = libSingular_g.a -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
@@ -294,6 +272,10 @@ CLEANFILES = $(TESTS) $(EXTRA_PROGRAMS)
 
 #########################################################
 
+#mpsr_Tok.cc: mpsr_Tok.inc
+#iparith.cc: iparith.inc
+#cntrlc.cc: feOpt.inc
+#misc_ip.cc: feOpt.inc
 
 feOpt.inc: feOpt
 	./feOpt
