@@ -12,4 +12,4 @@ PACKAGES=$(ALLOC) $(USE_FACTORY) libpolys kernel numeric Singular
 
 SUBDIRS=$(PACKAGES)
 
-TESTDIRS=$(ALLOC) libpolys kernel Singular
+TESTDIRS=$(ALLOC) $(USE_FACTORY) libpolys kernel Singular
