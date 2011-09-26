@@ -1658,7 +1658,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   else
   {
     const ring RR = R->cf->extRing;
-    
+
     L->m[3].data=(void *) idCopy(RR->minideal, RR);
 //    I->m[0] = pNSet(R->minpoly);
   }
@@ -2075,6 +2075,7 @@ ring rCompose(const lists  L)
 #endif
   )
     return NULL;
+  int is_gf_char=0;
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
@@ -2082,12 +2083,12 @@ ring rCompose(const lists  L)
   // possibly:
   // 4: C
   // 5: D
-  
-  ring R = (ring) omAlloc0Bin(sip_sring_bin); // why 
-   
-   
-  assume( R->cf == NULL );
-  
+
+  ring R = (ring) omAlloc0Bin(sip_sring_bin); // why
+
+
+  //assume( R->cf == NULL );
+
   // ------------------------------------------------------------------
   // 0: char:
   if (L->m[0].Typ()==INT_CMD)
@@ -2104,14 +2105,14 @@ ring rCompose(const lists  L)
       {
         Warn("%d is invalid characteristic of ground field. %d is used.", ch, l);
         ch = l;
-      }      
-      R->cf = nInitChar(n_Zp, (void*)ch);       
+      }
+      R->cf = nInitChar(n_Zp, (void*)ch);
     }
   }
   else if (L->m[0].Typ()==LIST_CMD) // something complicated...
   {
     lists LL=(lists)L->m[0].Data();
-    
+
 #ifdef HAVE_RINGS
     if (LL->m[0].Typ() == STRING_CMD) // 1st comes a string?
     {
@@ -2122,16 +2123,18 @@ ring rCompose(const lists  L)
     if (LL->nr < 3)
       rComposeC(LL,R); // R, long_R, long_C
     else
-    {      
+    {
       if (LL->m[0].Typ()==INT_CMD)
-      {        
+      {
         int ch = (int)(long)LL->m[0].Data();
+        while ((ch!=fftable[is_gf_char]) && (fftable[is_gf_char])) is_gf_char++;
+        if (fftable[is_gf_char]==0) is_gf_char=-1;
 
-        if(( ch != 0 ) && (ch!=IsPrime(ch))) // TODO: GF-Test ch!
+        if(is_gf_char!= -1)
         {
           GFInfo param;
-        
-          param.GFChar = ch; 
+
+          param.GFChar = ch;
           param.GFDegree = 1;
           param.GFPar_name = (const char*)(((lists)(LL->m[1].Data()))->m[0].Data());
 
@@ -2143,7 +2146,7 @@ ring rCompose(const lists  L)
       if( R->cf == NULL )
       {
         ring extRing = rCompose((lists)L->m[0].Data());
-        
+
         if (extRing==NULL)
         {
           WerrorS("could not create the specified coefficient field");
@@ -2153,22 +2156,22 @@ ring rCompose(const lists  L)
         if( extRing->qideal != NULL ) // Algebraic extension
         {
           AlgExtInfo extParam;
-          
+
           extParam.i = extRing->qideal;
           extParam.r = extRing;
 
           extRing->qideal = NULL; // ???
 
-          R->cf = nInitChar(n_algExt, (void*)&extParam); 
-        } else // Transcendental extension
+          R->cf = nInitChar(n_algExt, (void*)&extParam);
+        }
+        else // Transcendental extension
         {
           TransExtInfo extParam;
           extParam.r = extRing;
 
           R->cf = nInitChar(n_transExt, &extParam);
         }
-        
-      }     
+      }
     }
   }
   else
@@ -2385,7 +2388,7 @@ ring rCompose(const lists  L)
   rRenameVars(R);
   rComplete(R);
 
-#ifdef HAVE_RINGS 
+#ifdef HAVE_RINGS
   // This was a BUG IN SINGULAR: There is no HABE_RINGS!!!
 
 // currently, coefficients which are ring elements require a global ordering:
@@ -2436,11 +2439,11 @@ ring rCompose(const lists  L)
           {
             par_perm_size=rPar(orig_ring);
             BITSET save_test=test;
-            
+
 //            if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
 //              naSetChar(rInternalChar(orig_ring),orig_ring);
 //            else ntSetChar(rInternalChar(orig_ring),orig_ring);
-            
+
             nSetChar(currRing->cf);
             test=save_test;
           }
@@ -2821,7 +2824,7 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
 #if 1
   Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
   return FALSE;
-#else   
+#else
   res->data=singclap_irrCharSeries((ideal)u->Data(), currRing);
   return (res->data==NULL);
 #endif
@@ -4946,7 +4949,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   /* ch -------------------------------------------------------*/
   // get ch of ground field
   int numberOfAllocatedBlocks;
-  
+
   // allocated ring
   R = (ring) omAlloc0Bin(sip_sring_bin);
 
@@ -4954,14 +4957,14 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   assume( pn != NULL );
   const int P = pn->listLength();
-  
+
   if (pn->Typ()==INT_CMD)
   {
     int ch = (int)(long)pn->Data();
-    
+
     /* parameter? -------------------------------------------------------*/
     pn = pn->next;
-    
+
     if (pn == NULL) // no params!?
     {
       if (ch!=0)
@@ -4982,12 +4985,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       if ((ch!=0) && (ch!=IsPrime(ch)) && (pars == 1))
       {
         GFInfo param;
-	 
-        param.GFChar = ch; 
-        param.GFDegree = 1;	 
+
+        param.GFChar = ch;
+        param.GFDegree = 1;
         param.GFPar_name = pn->name;
-        
-        cf = nInitChar(n_GF, &param);        
+
+        cf = nInitChar(n_GF, &param);
       }
       else // (0/p, a, b, ..., z)
       {
@@ -4998,7 +5001,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 //           WerrorS("too many parameters");
 //           goto rInitError;
 //         }
-        
+
         char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
 
         if (rSleftvList2StringArray(pn, names))
@@ -5008,13 +5011,13 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         }
 
         TransExtInfo extParam;
-        
+
         extParam.r = rDefault( ch, pars, names); // Q/Zp [ p_1, ... p_pars ]
-        
+
         cf = nInitChar(n_transExt, &extParam);
       }
     }
-    
+
 //    if (cf==NULL) goto rInitError;
     assume( cf != NULL );
   }
@@ -5069,7 +5072,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else
       cf=nInitChar(n_Z,NULL);
-    
+
     if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
     {
       Werror("Wrong ground ring specification (module is 1)");
@@ -5120,7 +5123,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     AlgExtInfo extParam;
     extParam.r = (ring)pn->Data();
     extParam.i = (extParam.r->qideal);
-    
+
     cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
   }
   else
@@ -5134,7 +5137,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       PrintLn();
       p = p->next;
     }
-#endif    
+#endif
     goto rInitError;
   }
 //  pn=pn->next;
@@ -5163,9 +5166,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
 
   assume( R != NULL );
-  
+
   R->cf = cf;
-  
+
 #ifdef HAVE_RINGS
   // the following should have beed set already into cf, right?!
 //  R->cf->ringtype = ringtype;
