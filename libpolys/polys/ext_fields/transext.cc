@@ -1092,6 +1092,11 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
   return NULL;                                           /// default
 }
 
+void ntKillChar(coeffs cf) {
+  if ((--cf->extRing->ref) == 0)
+    rDelete(cf->extRing);
+}
+
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
@@ -1147,6 +1152,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->nCoeffIsEqual  = ntCoeffIsEqual;
   cf->cfInvers       = ntInvers;
   cf->cfIntDiv       = ntDiv;
+  cf->cfKillChar     = ntKillChar;
   
 #ifndef HAVE_FACTORY
   PrintS("// Warning: The 'factory' module is not available.\n");
