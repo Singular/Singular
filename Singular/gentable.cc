@@ -15,8 +15,8 @@
 #include <unistd.h>
 
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <Singular/grammar.h>
+#include "tok.h"
+#include "grammar.h"
 
 // to produce convert_table.texi for doc:
 //#define CONVERT_TABLE 1

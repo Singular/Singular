@@ -20,13 +20,15 @@ extern struct fe_option feOptSpec[];
 
 /* provides feOptIndex enum type for fast accesses to feOptSpec */
 #if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
-#ifdef ESINGULAR
-#include <Singular/feOptES.inc>
-#elif defined(TSINGULAR)
-#include <Singular/feOptTS.inc>
-#else
-#include <Singular/feOpt.inc>
-#endif
+
+# ifdef ESINGULAR
+#  include <Singular/feOptES.inc>
+# elif defined(TSINGULAR)
+#  include <Singular/feOptTS.inc>
+# else
+#  include <Singular/feOpt.inc>
+# endif
+
 #else
 typedef enum {FE_OPT_UNDEF}  feOptIndex;
 #endif
