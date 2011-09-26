@@ -176,6 +176,13 @@ static void jjMINPOLY_red(idhdl h)
 }
 static BOOLEAN jjMINPOLY(leftv res, leftv a)
 {
+  if( !nCoeff_is_transExt(currRing->cf) && (currRing->idroot == NULL) && n_IsZero((number)a->Data(), currRing->cf) )
+  {
+    WarnS("Set minpoly over non-transcendental ground field to 0?!");
+    return FALSE;    
+  }
+   
+   
   if ( !nCoeff_is_transExt(currRing->cf) )
   {
     WerrorS("no minpoly allowed over non-transcendental ground field");
