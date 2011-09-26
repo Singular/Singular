@@ -8,12 +8,16 @@
 
 #include <string.h>
 #include <stdlib.h>
+
 #include <kernel/mod2.h>
+
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #endif
+
 #include "feOpt.h"
+
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
 #endif
@@ -293,11 +297,12 @@ static void feOptHelp(const char* name);
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <Singular/ipshell.h>
-#include <Singular/tok.h>
-#include <Singular/sdb.h>
-#include <Singular/cntrlc.h>
 #include <kernel/timer.h>
+
+#include "ipshell.h"
+#include "tok.h"
+#include "sdb.h"
+#include "cntrlc.h"
 
 #include <errno.h>
 

@@ -7408,7 +7408,7 @@ static Subexpr jjMakeSub(leftv e)
 #define IPARITH
 #include "table.h"
 
-#include <iparith.inc>
+#include "iparith.inc"
 
 /*=================== operations with 2 args. ============================*/
 /* must be ordered: first operations for chars (infix ops),

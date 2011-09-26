@@ -15,8 +15,9 @@
 #include <unistd.h>
 
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <Singular/grammar.h>
+
+#include "tok.h"
+#include "grammar.h"
 
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
@@ -203,9 +204,13 @@ short IsCmdToken(short tok)
   return 0;
 }
 
+char *touch_mpsr_Tok_inc = "touch mpsr_Tok.xxxxxxxx\0";
+char *mpsr_Tok_inc = touch_mpsr_Tok_inc + 6; // mpsr_Tok.xxxxxxxx!
+
 #ifdef HAVE_MPSR
-#include <Singular/mpsr.h>
-#include <Singular/mpsr_Tok.h>
+
+#include "mpsr.h"
+#include "mpsr_Tok.h"
 #define MAX_COP 256 // there may be at most 256 cops
 
 // this is the main data struct for storing the relation
@@ -498,7 +503,6 @@ static short GetMPDictTok(short tok, MP_DictTag_t *dict, MP_Common_t *cop)
 
 
 // This actually generates the tables of mpsr_tok.inc
-char *mpsr_Tok_inc;
 void mpsr_ttGen()
 {
   mpsr_cmd mpsrcmds[MAX_TOK];
@@ -543,7 +547,6 @@ void mpsr_ttGen()
   }
 
   // Generate the template file
-  mpsr_Tok_inc=strdup("mpsr_Tok.xxxxxxxx");
   int pid=getpid();
   mpsr_Tok_inc[8]=(pid %10)+'0'; pid/=10;
   mpsr_Tok_inc[9]=(pid %10)+'0'; pid/=10;
@@ -555,7 +558,7 @@ void mpsr_ttGen()
   outfile = fopen(mpsr_Tok_inc, "w");
   if (outfile == NULL)
   {
-    fprintf(stderr, "Error: mpsr_ttGen: Cannot open file mpsr_Tok.inc\n");
+    fprintf(stderr, "Error: mpsr_ttGen: Cannot open file [%s]\n", mpsr_Tok_inc);
     exit(1);
   }
 
@@ -623,15 +626,13 @@ void mpsr_ttGen()
 #else
 void mpsr_ttGen()
 {
-  system("touch mpsr_Tok.xx");
+  system(touch_mpsr_Tok_inc);
 }
 #endif
 
 int main()
 {
   mpsr_ttGen();
-  #ifdef HAVE_MPSR
   rename(mpsr_Tok_inc,"mpsr_Tok.inc");
-  #endif
   return 0;
 }

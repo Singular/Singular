@@ -967,7 +967,7 @@ void Initialization(char *Ord)
   }
 
   Define(&G);
-};
+}
 
 static Poly *h,*f;
 
