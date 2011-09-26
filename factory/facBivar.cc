@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "timing.h"
 
+#include "cf_algorithm.h"
 #include "facFqBivar.h"
 #include "facBivar.h"
 

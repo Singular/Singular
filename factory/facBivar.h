@@ -15,7 +15,7 @@
 #ifndef FAC_BIVAR_H
 #define FAC_BIVAR_H
 
-// #include "config.h"
+#include <config.h>
 
 #include "assert.h"
 
@@ -38,6 +38,7 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
 ///
 /// @ return @a ratBiSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
+#ifdef HAVE_NTL
 inline
 CFList ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                            const Variable& v
@@ -141,6 +142,8 @@ CFFList ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   }
   return result;
 }
+
+#endif
 
 /// convert a CFFList to a CFList by dropping the multiplicity
 CFList conv (const CFFList& L ///< [in] a CFFList

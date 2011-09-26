@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "timing.h"
 
+#include "cf_algorithm.h"
 #include "facFqFactorizeUtil.h"
 #include "facFactorize.h"
 #include "facFqFactorize.h"
@@ -28,6 +29,7 @@
 #include "algext.h"
 #include "cf_reval.h"
 
+#ifdef HAVE_NTL
 CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
 {
   CFList result;
@@ -822,3 +824,5 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   return factors;
 }
+
+#endif

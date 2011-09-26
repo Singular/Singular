@@ -21,6 +21,7 @@
 #include "cf_gcd_smallp.h"
 #include "cf_map_ext.h"
 #include "cf_util.h"
+#include "gfops.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -102,6 +103,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
     else if (p > 0 && p < TEST_ONE_MAX && algExtension)
     {
       bool extOfExt= false;
+#ifdef HAVE_NTL
       int d= degree (getMipo (v));
       CFList source, dest;
       Variable v2;
@@ -152,6 +154,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
         lcg= mapUp (lcg, v, v2, primElem, imPrimElem, source, dest);
         v= v2;
       }
+#endif
     }
 
     CFRandom * sample;
