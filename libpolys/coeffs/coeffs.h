@@ -41,6 +41,8 @@ enum n_coeffType
   n_CF
 };
 
+extern unsigned short fftable[];
+
 struct snumber;
 typedef struct snumber *   number;
 

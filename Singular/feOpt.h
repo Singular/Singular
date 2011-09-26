@@ -16,8 +16,6 @@ extern const char SHORT_OPTS_STRING[];
 /* specifies format of options */
 extern struct fe_option feOptSpec[];
 
-#ifndef GENERATE_OPTION_INDEX
-
 /* provides feOptIndex enum type for fast accesses to feOptSpec */
 #if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
 
@@ -85,7 +83,5 @@ const char* feSetOptValue(feOptIndex opt, char* optarg);
 void fePrintOptValues();
 
 #endif /* __cplusplus */
-
-#endif /* ! GENERATE_OPTION_INDEX */
 
 #endif /*  FEOPTS_H */
