@@ -24,9 +24,9 @@ SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
 	gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc ffields.cc \
 	modulop.cc mpr_complex.cc
+
 libcoeffs_a_SOURCES   = $(SOURCES)
 libcoeffs_g_a_SOURCES = $(SOURCES)
-
 
 ## include_HEADERS = coeffs.h numbers.h
 
@@ -75,8 +75,8 @@ testg_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLA
 # -fimplicit-templates
 # -fdiagnostics-show-option 
 
-testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-testg_CPPFLAGS = -DHAVE_CONFIG_H
+testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+testg_CPPFLAGS =
 
 #gftables: ${top_srcdir}/../factory/gftables
 #	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
