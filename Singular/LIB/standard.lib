@@ -891,7 +891,7 @@ EXAMPLE: example groebner;  shows an example"
 // check for integer etc coefficients
   if (charstr(basering)[1]=="i") // either integer or integer,q
   {
-    if (find(option(),"prot"))  { "calling std for ideals in ring with ring coefficients"; }
+    if (find(s_opt, option()))  { "calling std for ideals in ring with ring coefficients"; }
     return (std(i));
   }
 

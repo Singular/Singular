@@ -111,10 +111,12 @@ number nrzCopy(number a, const coeffs)
   return (number) erg;
 }
 
+#if 0
 number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 {
   return nrzCopy(a,dst);
 }
+#endif
 
 int nrzSize(number a, const coeffs)
 {
@@ -282,7 +284,7 @@ nMapFunc nrzSetMap(const coeffs src, const coeffs dst)
   /* dst = currRing */
   if (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src))
   {
-    return nrzCopyMap;
+    return ndCopyMap; //nrzCopyMap;
   }
   if (nCoeff_is_Ring_2toM(src))
   {

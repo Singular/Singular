@@ -1985,7 +1985,7 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 
   if (nCoeff_is_Q(src))
   {
-    return nlCopyMap;
+    return ndCopyMap;
   }
   if (nCoeff_is_Zp(src))
   {
