@@ -15,8 +15,6 @@ AM_CFLAGS = -g -Wextra -Wall -Wno-long-long ${PIPE}
 
 AM_CXXFLAGS = $(AM_CFLAGS) ${CXXTEMPLFLAGS}
 
-AM_CPPFLAGS = -DHAVE_CONFIG_H
-
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS} 
 
 
@@ -37,14 +35,14 @@ coeffs_test_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIB
 polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
+
+BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
+
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
 
 MOD: ${top_builddir}/polys/.libs
 	ln -snf ${top_builddir}/polys/.libs/ ${builddir}/MOD
-
-BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
-
 
 # How to generate *_runner.cpp 
 simple_test_runner.cpp: simple_test.h
@@ -59,4 +57,4 @@ polys_test_runner.cpp: polys_test.h
 rings_test_runner.cpp: rings_test.h
 	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/rings_test.h
 
-CLEANFILES = simple_test_runner.cpp coeffs_test_runner.cpp polys_test_runner.cpp rings_test_runner.cpp MOD gftables
+CLEANFILES = $(BUILT_SOURCES)

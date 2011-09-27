@@ -24,8 +24,8 @@ libkernel_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-l
 libkernel_g_a_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
-libkernel_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-libkernel_g_a_CPPFLAGS = -DHAVE_CONFIG_H
+libkernel_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
+#libkernel_g_a_CPPFLAGS =
 
 INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) $(FACTORY_CFLAGS) $(NTL_CFLAGS)
 
@@ -67,11 +67,10 @@ KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	kutil.h \
 	khstd.h kstd1.h \
 	fglm.h fglmgauss.h fglmvec.h \
-  GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
+	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	fegetopt.h \
 	ratgring.h shiftgb.h nc.h \
-	semic.h \
 	gfan.h preimage.h
 
 libkernel_a_include_HEADERS   = $(KERNELHEADERS)
@@ -102,14 +101,11 @@ testg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLA
 testr_SOURCES = test.cc
 testg_SOURCES = test.cc
 
-# testr: libkernel.a
-# testg: libkernel_g.a
-
 testr_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 testg_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-testg_CPPFLAGS = -DHAVE_CONFIG_H
+testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+#testg_CPPFLAGS = 
 
 CLEANFILES = $(TESTS)
 
