@@ -22,16 +22,16 @@ static inline BOOLEAN n_IsOne(number n,  const ring r){ return n_IsOne(n,r->cf);
 static inline BOOLEAN n_IsMOne(number n, const ring r){ return n_IsMOne(n,r->cf); }
 static inline BOOLEAN n_GreaterZero(number n, const ring r){ return n_GreaterZero(n,r->cf); }
 static inline number n_Init(int i,       const ring r){ return n_Init(i,r->cf); }
-static inline number n_Neg(number n,     const ring r){ return n_Neg(n,r); }
-static inline number n_Invers(number a,  const ring r){ return n_Invers(a,r); }
-static inline int    n_Size(number n,    const ring r){ return n_Size(n,r); }
-static inline void   n_Normalize(number& n, const ring r){ return n_Normalize(n,r); }
-static inline void   n_Write(number& n,  const ring r){ return n_Write(n,r); }
+static inline number n_Neg(number n,     const ring r){ return n_Neg(n,r->cf); }
+static inline number n_Invers(number a,  const ring r){ return n_Invers(a,r->cf); }
+static inline int    n_Size(number n,    const ring r){ return n_Size(n,r->cf); }
+static inline void   n_Normalize(number& n, const ring r){ return n_Normalize(n,r->cf); }
+static inline void   n_Write(number& n,  const ring r){ return n_Write(n,r->cf); }
 static inline number n_GetDenom(number& n, const ring r){ return n_GetDenom(n, r->cf);}
 static inline number n_GetNumerator(number& n, const ring r){ return n_GetNumerator(n, r->cf);}
-static inline void   n_Power(number a, int b, number *res, const ring r){ n_Power(a,b,res,r); }
+static inline void   n_Power(number a, int b, number *res, const ring r){ n_Power(a,b,res,r->cf); }
 static inline number n_Mult(number a, number b, const ring r){ return n_Mult(a, b, r->cf);}
-static inline void n_InpMult(number &a, number b, const ring r){ n_InpMult(a,b,r); }
+static inline void n_InpMult(number &a, number b, const ring r){ n_InpMult(a,b,r->cf); }
 static inline number n_Sub(number a, number b, const ring r){ return n_Sub(a, b, r->cf);}
 static inline number n_Add(number a, number b, const ring r){ return n_Add(a, b, r->cf);}
 static inline number n_Div(number a, number b, const ring r){ return n_Div(a,b, r->cf);}
