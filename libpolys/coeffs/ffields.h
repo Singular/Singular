@@ -45,3 +45,4 @@ void    nfCoeffWrite(const coeffs r);
 void    nfShowMipo(const coeffs r);
 #endif
 
+BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter);
