@@ -51,6 +51,7 @@
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
+#include <kernel/nc.h>
 #endif
 
 #include <kernel/kInline.h>

@@ -16,9 +16,6 @@
 class ip_smatrix;
 typedef ip_smatrix *       matrix;
 
-class skStrategy;
-typedef skStrategy * kStrategy;
-
 
 matrix nc_PrintMat(int a, int b, ring r, int metric);
 
@@ -61,8 +58,6 @@ typedef poly (*mm_Mult_pp_Proc_Ptr)(const poly m, const poly p, const ring r);
 
 
 
-typedef ideal (*GB_Proc_Ptr)(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat, const ring r);
-
 typedef poly (*SPoly_Proc_Ptr)(const poly p1, const poly p2, const ring r);
 typedef poly (*SPolyReduce_Proc_Ptr)(const poly p1, poly p2, const ring r);
 
@@ -79,10 +74,6 @@ public:
 
   SPoly_Proc_Ptr                        SPoly;
   SPolyReduce_Proc_Ptr                  ReduceSPoly;
-
-  GB_Proc_Ptr                           GB;
-//                                         GlobalGB, // BBA
-//                                         LocalGB;  // MORA
 };
 
 class CGlobalMultiplier;
@@ -319,15 +310,6 @@ static inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
   return r->GetNC()->p_Procs.BucketPolyRed_Z(b, p, c);
 
 }
-
-static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat, const ring r)
-{
-  assume(rIsPluralRing(r));
-
-  assume(r->GetNC()->p_Procs.GB!=NULL);
-  return r->GetNC()->p_Procs.GB(F, Q, w, hilb, strat, r);
-}
-
 
 
 /* subst: */

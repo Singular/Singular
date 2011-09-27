@@ -216,6 +216,7 @@ void ratGB_divide_out(poly p)
   }
   pDelete(&f);
 }
+
 #ifdef HAVE_RATGRING
 /*2
 *reduces h with elements from T choosing  the first possible
