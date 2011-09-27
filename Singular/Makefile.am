@@ -1,9 +1,4 @@
-lib_LIBRARIES = libSingular.a libSingular_g.a
-
-all: libSingular.a libSingular_g.a Singular Singularg
-
 # ACLOCAL_AMFLAGS = -I m4
-
 # PIPE = -pipe
 # ???
 #LD_DYN_FLAGS	= -ldl -rdynamic
@@ -17,21 +12,16 @@ NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
 NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer --no-rtti 
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
-
-
-
 CXXTEMPLFLAGS = --no-exceptions ## -fno-implicit-templates
 
-
-
 INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) $(FACTORY_CFLAGS) $(NTL_CFLAGS)
-AM_CPPFLAGS	= -DHAVE_CONFIG_H
 
-########################### liSingular* #########################
+########################### libSingular* #########################
+
+lib_LIBRARIES = libSingular.a libSingular_g.a
 
 libSingular_a_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
 libSingular_g_a_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
-## -pedantic
 
 libSingular_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 libSingular_g_a_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
@@ -100,9 +90,7 @@ SOURCES =    Minor.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
-   fereadl.c mmstd.c claptmpl.cc feOpt.h
-   
-#   tesths.cc
+   fereadl.c mmstd.c claptmpl.cc
 
 
 libSingular_a_SOURCES   = $(SOURCES)
@@ -168,7 +156,8 @@ SingularHEADERS =    Cache.h \
    tok.h \
    utils.h \
    walk.h \
-   feOpt.inc mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
+   feOpt.h feOpt.inc \
+   mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
 
 
 libSingular_a_include_HEADERS   = $(SingularHEADERS)
@@ -181,20 +170,15 @@ else
 endif
 
 # noinst_HEADERS = feOpt.h
-## TODO: install all the *.inc?!
-
-#EXTRA_libSingular_a_SOURCES = feOpt.h
-#EXTRA_libSingular_g_a_SOURCES = feOpt.h
-
-BUILT_SOURCES=feOpt.inc mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
-# plural_cmd.inc
+## TODO: install all the *.inc?!  
+## If not, move feOpt.h to SOURCES and remove *inc from HEADERS
 
 #########################################################
 # handle all the generated *.inc
 
 AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/resources -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc
 
-EXTRA_PROGRAMS=gentable2 gentable1 feOpt feOptES feOptTS
+EXTRA_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
 
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
 # gentable2_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
@@ -210,7 +194,7 @@ gentable1_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-
 gentable1_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 
 # plural_cmd.inc: iparith.inc			       
-			         
+
 feOpt_SOURCES = feOptGen.cc feOptGen.h
 feOpt_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 feOpt_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
@@ -267,15 +251,10 @@ testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 
 #########################################################
 
-CLEANFILES = $(TESTS) $(EXTRA_PROGRAMS)
+BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc  # files are built first
+# plural_cmd.inc
 
-
-#########################################################
-
-#mpsr_Tok.cc: mpsr_Tok.inc
-#iparith.cc: iparith.inc
-#cntrlc.cc: feOpt.inc
-#misc_ip.cc: feOpt.inc
+CLEANFILES = $(TESTS) $(EXTRA_PROGRAMS) $(BUILT_SOURCES)
 
 feOpt.inc: feOpt
 	./feOpt
