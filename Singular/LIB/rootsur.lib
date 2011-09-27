@@ -178,8 +178,10 @@ EXAMPLE:   example varsigns; shows an example"
 
   lastsign = sign(l[1]);
 
-  for (int i = 1; i <= size(l); i = i + 1) {
-    if (sign(l[i]) != lastsign && sign(l[i]) != 0) {
+  for (int i = 1; i <= size(l); i++)
+  {
+    if (sign(l[i]) != lastsign && sign(l[i]) != 0)
+    {
       numberofchanges++;
       lastsign = sign(l[i]);
     }
@@ -436,7 +438,8 @@ EXAMPLE:   example maxabs; shows an example"
 
   maximum = 0;
 
-  for (i = 1; i <= size(monic); i = i + 1) {
+  for (i = 1; i <= size(monic); i++)
+  {
     maximum = max(abs(leadcoef(p[i])),maximum);
   }
 
@@ -623,19 +626,16 @@ EXAMPLE:   example sturmha; shows an example"
   //number result;
   int result;
 
-  if (isparam(P) || isparam(a) || isparam(b)) {
-    ERROR("This procedure cannot operate with parametric arguments");
-  }
+  if (isparam(P) || isparam(a) || isparam(b))
+  { ERROR("This procedure cannot operate with parametric arguments"); }
+  if (!attrib(basering,"global"))
+  { ERROR("This procedure requires a global ordering"); }
 
   variable = isuni(P);
 
-  if (variable == 0) {
-    ERROR ("P must be a univariate polynomial");
-  }
+  if (variable == 0) { ERROR ("P must be a univariate polynomial"); }
 
-  if (a >= b) {
-    ERROR("a must be lower than b");
-  }
+  if (a >= b) { ERROR("a must be lower than b"); }
 
   if (subst(P,variable,a) == 0 || subst(P,variable,b) == 0) {
     ERROR ("Neither a nor b can be roots of P");
@@ -645,13 +645,9 @@ EXAMPLE:   example sturmha; shows an example"
 
   bound = maxabs(P);
 
-  if (a < -bound) {
-    a = -bound;
-  }
+  if (a < -bound) { a = -bound; }
 
-  if (b > bound) {
-    b = bound;
-  }
+  if (b > bound) { b = bound; }
 
 //  if (a == -bound && b == bound) {
 //    for (i = size(seq);i >= 1;i--) {
@@ -785,9 +781,8 @@ RETURN:    int: the number of real roots of p
 SEE ALSO:  boundposDes, sturm, sturmha
 EXAMPLE:   example nrroots; shows an example"
 {
-  if (isparam(p)) {
-    ERROR("This procedure cannot operate with parametric arguments");
-  }
+  if (isparam(p))
+  { ERROR("This procedure cannot operate with parametric arguments"); }
 
   number a = maxabs(p);
 
@@ -915,10 +910,9 @@ static proc search(list l,int from,int dir,number element)
 
   result = 0;
 
-  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result) {
-    if (l[i] == element) {
-      result = i;
-    }
+  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result)
+  {
+    if (l[i] == element) { result = i; }
     i = i + dir;
   }
 
@@ -933,10 +927,9 @@ static proc searchnot(list l,int from,int dir,number element)
 
   result = 0;
 
-  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result) {
-    if (l[i] != element) {
-      result = i;
-    }
+  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result)
+  {
+    if (l[i] != element) { result = i; }
     i = i + dir;
   }
 
