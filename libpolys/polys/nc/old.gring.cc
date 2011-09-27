@@ -68,7 +68,7 @@ poly nc_p_CopyPut(poly a, const ring r);
 
 poly nc_p_Bracket_qq(poly p, const poly q, const ring r);
 
-int  iNCExtensions = 0x00001; // only SCA can be used by default
+int  iNCExtensions = 0; // SCAMASK; // only SCA can be used by default
 
 
 int& getNCExtensions()
@@ -144,10 +144,6 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
 // void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
 
 // void nc_kBucketPolyRed(kBucket_pt b, poly p);
-
-// ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring r); // Not yet!
-// ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring r);
-
 
 void nc_CleanUp(nc_struct* p); // just free memory!
 void nc_rCleanUp(ring r); // smaller than kill: just free mem
@@ -3212,12 +3208,6 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   rGR->GetNC()->p_Procs.mm_Mult_p   = gnc_mm_Mult_p;
   rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
 
-///////////  rGR->GetNC()->p_Procs.GB          = gnc_gr_bba; // bba even for local case!
-
-//   rGR->GetNC()->p_Procs.GlobalGB    = gnc_gr_bba;
-//   rGR->GetNC()->p_Procs.LocalGB     = gnc_gr_mora;
-
-
 #if 0
   // Previous Plural's implementation...
   rGR->GetNC()->p_Procs.SPoly       = gnc_CreateSpolyOld;
@@ -3250,8 +3240,6 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
     r->GetNC()->mmMultP()       = gnc_mm_Mult_p;
     r->GetNC()->mmMultPP()      = gnc_mm_Mult_pp;
-
-//////////////    r->GetNC()->GB()            = gnc_gr_bba;
 
     r->GetNC()->SPoly()         = gnc_CreateSpoly;
     r->GetNC()->ReduceSPoly()   = gnc_ReduceSpoly;
