@@ -125,7 +125,10 @@ EXAMPLE:  example inverse; shows an example
    matrix invA;
    int db = printlevel-voice+3;      //used for comments
    def R=basering;
-   string mp = string(minpoly);
+   string mp = "";
+   if (minpoly != 0) {
+     string(minpoly);
+   }
    int n = nrows(A);
    module M = A;
    intvec v = option(get);           //get options to reset it later
@@ -158,8 +161,10 @@ EXAMPLE:  example inverse; shows an example
      u=1;
      def @R=changeord("C,dp",R);
      setring @R;
+     if (mp != "") {
+       execute(mp);
+     }
      module M = fetch(R,M);
-     execute("minpoly="+mp+";");
    }
 //----------------------------- opt=3: use lift ------------------------------
    if( opt==3 )
