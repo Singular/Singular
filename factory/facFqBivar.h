@@ -111,8 +111,8 @@ CFList FqBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
-  contentXFactors= factorize (contentX);
-  contentYFactors= factorize (contentY);
+  contentXFactors= factorize (contentX, alpha);
+  contentYFactors= factorize (contentY, alpha);
   if (contentXFactors.getFirst().factor().inCoeffDomain())
     contentXFactors.removeFirst();
   if (contentYFactors.getFirst().factor().inCoeffDomain())
@@ -291,8 +291,8 @@ CFFList FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
-  contentXFactors= factorize (contentX);
-  contentYFactors= factorize (contentY);
+  contentXFactors= factorize (contentX, alpha);
+  contentYFactors= factorize (contentY, alpha);
   if (contentXFactors.getFirst().factor().inCoeffDomain())
     contentXFactors.removeFirst();
   if (contentYFactors.getFirst().factor().inCoeffDomain())
