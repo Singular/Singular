@@ -556,12 +556,14 @@ number naMapP0(number a, const coeffs src, const coeffs dst)
   return (number)result;
 }
 
+#if 0
 /* assumes that either src = Q(a), dst = Q(a), or
                        src = Z/p(a), dst = Z/p(a)     */
 number naCopyMap(number a, const coeffs src, const coeffs dst)
 {
   return naCopy(a, dst);
 }
+#endif
 
 number naCopyExt(number a, const coeffs src, const coeffs dst)
 {
@@ -638,7 +640,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
                rRingVar(0, dst->extRing)) == 0)
     {
       if (src->type==n_algExt)
-         return naCopyMap;                       /// Q(a)   --> Q(a)
+         return ndCopyMap; // naCopyMap;         /// Q(a)   --> Q(a)
       else
          return naCopyExt;
     }
@@ -651,7 +653,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
     if (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0)
     {
       if (src->type==n_algExt)
-        return naCopyMap;                        /// Z/p(a) --> Z/p(a)
+        return ndCopyMap; // naCopyMap;          /// Z/p(a) --> Z/p(a)
       else
          return naCopyExt;
     }
