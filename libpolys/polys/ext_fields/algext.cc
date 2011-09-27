@@ -648,8 +648,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
-    if (strcmp(rParameter(src->extRing)[0],
-               rParameter(dst->extRing)[0]) == 0)
+    if (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0)
     {
       if (src->type==n_algExt)
         return naCopyMap;                        /// Z/p(a) --> Z/p(a)
