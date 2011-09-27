@@ -1357,6 +1357,7 @@ number ntMult(number la, number lb)
     p_Delete(&x,nacRing);
   lo->n = x;
   lo->s = 0;
+  number luu=(number)lo;
   if(lo->z==NULL)
   {
     FREE_LNUMBER(lo);
@@ -1364,12 +1365,16 @@ number ntMult(number la, number lb)
   }
   else if (lo->n!=NULL)
   {
-    number luu=(number)lo;
     // if (p_IsConstant(lo->n,nacRing)) ntCoefNormalize(luu);
     // else
                       ntNormalize(luu);
     lo=(lnumber)luu;
   }
+  luu=(number)lo;
+  if ((lo!=NULL) 
+  && (naMinimalPoly!=NULL)
+  &&(p_GetExp(lo->z,1,nacRing)>=p_GetExp(naMinimalPoly,1,nacRing)))
+    lo->z=napRemainder(lo->z,naMinimalPoly);
   //if (naMinimalPoly==NULL) lo->s=2;
   ntTest((number)lo);
   return (number)lo;
