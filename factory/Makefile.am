@@ -90,7 +90,7 @@ SOURCES = \
 		singext.cc \
 		parseutil.cc \
 		ftmpl_inst.cc \
-		factory.h factoryconf.h cplusplus.h
+		factory.h factoryconf.h
 
 if WITH_PARSER_FOR_CANONICAL_FORM
     SOURCES +=  readcf.yy
@@ -320,8 +320,6 @@ cplusplus_SOURCES = cplusplus.cc
 
 cplusplus.h: cplusplus
 	${builddir}/cplusplus > ${builddir}/cplusplus.h
-
-cf_gmp.h: cplusplus.h
 
 #ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 #		$(addprefix templates/,$(templatesrc)) \

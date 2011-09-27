@@ -7,8 +7,6 @@ NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
 NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer --no-rtti 
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
-AM_CPPFLAGS	= -DHAVE_CONFIG_H
-
 AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
@@ -30,10 +28,7 @@ else
 endif
 
 prCopy.inc: prCopy.pl
-	perl ${srcdir}/prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
-
-prCopy.cc: prCopy.inc
-
+	perl ${srcdir}/prCopy.pl >  prCopy.inc
 
 lib_LIBRARIES=libpolys.a libpolys_g.a
 
@@ -57,7 +52,7 @@ SOURCES = \
 
 #	OLD?: 
 
-BUILT_SOURCES = templates/p_Procs.inc
+BUILT_SOURCES = prCopy.inc templates/p_Procs.inc
 
 noinst_HEADERS =
 
@@ -74,7 +69,7 @@ LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 
 
 
-P_PROCS_CPPFLAGS_COMMON = -DHAVE_CONFIG_H -DDYNAMIC_VERSION 
+P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
 
 p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
 p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}

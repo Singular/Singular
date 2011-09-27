@@ -9,8 +9,8 @@ libnumeric_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLF
 libnumeric_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libnumeric_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-libnumeric_g_a_CPPFLAGS = -DHAVE_CONFIG_H
+libnumeric_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
+#libnumeric_g_a_CPPFLAGS =
 
 INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys ${GMP_CFLAGS} ${FACTORY_CFLAGS} ${NTL_CFLAGS}
 
