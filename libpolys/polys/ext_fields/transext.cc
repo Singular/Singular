@@ -829,16 +829,17 @@ void ntWrite(number &a, const coeffs cf)
   {
     fraction f = (fraction)a;
     // stole logic from napWrite from kernel/longtrans.cc of legacy singular
-    BOOLEAN omitBrackets = p_IsConstant(NUM(f), ntRing) && DENIS1(f);
+    BOOLEAN omitBrackets = p_IsConstant(NUM(f), ntRing);
     if (!omitBrackets) StringAppendS("(");
     p_String0(NUM(f), ntRing, ntRing);
     if (!omitBrackets) StringAppendS(")");
     if (!DENIS1(f))
     {
       StringAppendS("/");
-      StringAppendS("(");
+      omitBrackets = p_IsConstant(DEN(f), ntRing);
+      if (!omitBrackets) StringAppendS("(");
       p_String0(DEN(f), ntRing, ntRing);
-      StringAppendS(")");
+      if (!omitBrackets) StringAppendS(")");
     }
   }
 }
