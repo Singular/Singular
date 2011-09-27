@@ -1155,28 +1155,32 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
 
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
-  bool saveRat= isOn (SW_RATIONAL);
-  if (!saveRat)
-    On (SW_RATIONAL);
-  CanonicalForm f, g, cg, cl, q(0), Dp, newD, D, newq;
+  CanonicalForm f, g, cl, q(0), Dp, newD, D, newq;
   int p, i, dp_deg, d_deg=-1;
 
   CanonicalForm cd ( bCommonDen( FF ));
   f=cd*FF;
-  f /=vcontent(f,Variable(1));
+  Variable x= Variable (1);
+  CanonicalForm cf, cg;
+  cf= icontent (f);
+  f /= cf;
   //cd = bCommonDen( f ); f *=cd;
   //f /=vcontent(f,Variable(1));
 
   cd = bCommonDen( GG );
   g=cd*GG;
-  g /=vcontent(g,Variable(1));
+  cg= icontent (g);
+  g /= cg;
   //cd = bCommonDen( g ); g *=cd;
   //g /=vcontent(g,Variable(1));
 
+  CanonicalForm Dn, test= 0;
+  bool equal= false;
   i = cf_getNumBigPrimes() - 1;
-  cl =  f.lc()* g.lc();
+  cl =  gcd (f.lc(),g.lc());
 
-  Off (SW_RATIONAL);
+  CanonicalForm gcdcfcg= gcd (cf, cg);
+  //Off (SW_RATIONAL);
   while ( true )
   {
     p = cf_getBigPrime( i );
@@ -1195,9 +1199,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     if ( dp_deg == 0 )
     {
       //printf(" -> 1\n");
-      if (saveRat)
-        On (SW_RATIONAL);
-      return CanonicalForm(1);
+      return CanonicalForm(gcdcfcg);
     }
     if ( q.isZero() )
     {
@@ -1220,6 +1222,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         q = p;
         D = mapinto( Dp );
         d_deg=dp_deg;
+        test= 0;
+        equal= false;
       }
       else
       {
@@ -1229,30 +1233,33 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     if ( i >= 0 )
     {
+      Dn= Farey(D,q);
+      int is_rat= isOn (SW_RATIONAL);
       On (SW_RATIONAL);
-      CanonicalForm Dn= Farey(D,q);
-      CanonicalForm cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
+      cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
+      if (!is_rat)
+        Off (SW_RATIONAL);
       Dn *=cd;
+      if (test != Dn)
+        test= Dn;
+      else
+        equal= true;
       //Dn /=vcontent(Dn,Variable(1));
-      if ( fdivides( Dn, f ) && fdivides( Dn, g ) )
+      if (equal && fdivides( Dn, f ) && fdivides( Dn, g ) )
       {
-        if (!saveRat)
-          Off (SW_RATIONAL);
         //printf(" -> success\n");
-        return Dn;
+        return Dn*gcdcfcg;
       }
-      Off (SW_RATIONAL);
+      equal= false;
       //else: try more primes
     }
     else
     { // try other method
       //printf("try other gcd\n");
-      if (saveRat)
-        On (SW_RATIONAL);
       Off(SW_USE_CHINREM_GCD);
       D=gcd_poly( f, g );
       On(SW_USE_CHINREM_GCD);
-      return D;
+      return D*gcdcfcg;
     }
   }
 }
