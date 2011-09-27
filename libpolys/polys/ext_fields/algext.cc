@@ -44,6 +44,8 @@
 #include <polys/simpleideals.h>
 
 #include "ext_fields/algext.h"
+#define TRANSEXT_PRIVATES 1
+#include "ext_fields/transext.h"
 
 #ifdef LDEBUG
 #define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
@@ -561,6 +563,12 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
   return naCopy(a, dst);
 }
 
+number naCopyExt(number a, const coeffs src, const coeffs dst)
+{
+  fraction fa=(fraction)a;
+  return (number)p_Copy(NUM(fa),src->extRing);
+}
+
 /* assumes that src = Q, dst = Z/p(a) */
 number naMap0P(number a, const coeffs src, const coeffs dst)
 {
@@ -602,47 +610,54 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
+  coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
   
   /* for the time being, we only provide maps if h = 1 and if b is Q or
      some field Z/pZ: */
+  if (h==0)
+  {
+    if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
+      return naMap00;                            /// Q     -->  Q(a)
+    if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
+      return naMapP0;                            /// Z/p   -->  Q(a)
+    if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
+      return naMap0P;                            /// Q      --> Z/p(a)
+    if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
+    {
+      if (src->ch == dst->ch) return naMapPP;    /// Z/p    --> Z/p(a)
+      else return naMapUP;                       /// Z/u    --> Z/p(a)
+    }
+  }
   if (h != 1) return NULL;
   if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
-  
-  if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
-    return naMap00;                                      /// Q     -->  Q(a)
-  
-  if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
-    return naMapP0;                                      /// Z/p   -->  Q(a)
-  
-  if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
-    return naMap0P;                                      /// Q      --> Z/p(a)
-  
-  if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
-  {
-    if (src->ch == dst->ch) return naMapPP;              /// Z/p    --> Z/p(a)
-    else return naMapUP;                                 /// Z/u    --> Z/p(a)
-  }
-  
-  coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
-  if (h != 1) return NULL;
   if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
   
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
     if (strcmp(rRingVar(0, src->extRing),
                rRingVar(0, dst->extRing)) == 0)
-      return naCopyMap;                                  /// Q(a)   --> Q(a)
+    {
+      if (src->type==n_algExt)
+         return naCopyMap;                       /// Q(a)   --> Q(a)
+      else
+         return naCopyExt;
+    }
     else
-      return NULL;                                       /// Q(b)   --> Q(a)
+      return NULL;                               /// Q(b)   --> Q(a)
   }
   
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
     if (strcmp(rParameter(src->extRing)[0],
                rParameter(dst->extRing)[0]) == 0)
-      return naCopyMap;                                  /// Z/p(a) --> Z/p(a)
+    {
+      if (src->type==n_algExt)
+        return naCopyMap;                        /// Z/p(a) --> Z/p(a)
+      else
+         return naCopyExt;
+    }
     else
-      return NULL;                                       /// Z/p(b) --> Z/p(a)
+      return NULL;                               /// Z/p(b) --> Z/p(a)
   }
   
   return NULL;                                           /// default

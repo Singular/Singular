@@ -898,8 +898,8 @@ number ntLcm(number a, number b, const coeffs cf)
   }
   else
   { /* return pa*pb/gcd */
-    p_Delete(&pGcd,ntRing);
     poly newNum = singclap_pdivide(NUM(fa), pGcd, ntRing);
+    p_Delete(&pGcd,ntRing);
     fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
     NUM(result) = p_Mult_q(p_Copy(DEN(fb),ntRing),newNum,ntRing);
     return (number)result;
@@ -1096,6 +1096,7 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
   
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
+  coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
   
   /* for the time being, we only provide maps if h = 1 and if b is Q or
      some field Z/pZ: */
@@ -1121,8 +1122,6 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
      Let moreover, for any such sequence T, T' denote any subsequence of T
      of the form t_1, ..., t_w with w <= s. */
   
-  coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
-  if (h != 1) return NULL;
   if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
   
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
