@@ -269,7 +269,7 @@ BOOLEAN ntIsOne(number a, const coeffs cf)
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  return DENIS1(f) && NUMIS1(f);
+  return (f!=NULL) && DENIS1(f) && NUMIS1(f);
 }
 
 BOOLEAN ntIsMOne(number a, const coeffs cf)
@@ -277,7 +277,7 @@ BOOLEAN ntIsMOne(number a, const coeffs cf)
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  if (!DENIS1(f)) return FALSE;
+  if ((f==NULL) || (!DENIS1(f))) return FALSE;
   poly g = NUM(f);
   if (!p_IsConstant(g, ntRing)) return FALSE;
   return n_IsMOne(p_GetCoeff(g, ntRing), ntCoeffs);
@@ -982,6 +982,14 @@ number ntCopyMap(number a, const coeffs src, const coeffs dst)
   return ntCopy(a, dst);
 }
 
+number ntCopyAlg(number a, const coeffs src, const coeffs dst)
+{
+  if (n_IsZero(a, src)) return NULL;
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(f) = p_Copy((poly)a,src->extRing);// DEN(f) = NULL; COM(f) = 0;
+  return (number)f;
+}
+
 /* assumes that src = Q, dst = Z/p(t_1, ..., t_s) */
 number ntMap0P(number a, const coeffs src, const coeffs dst)
 {
@@ -998,7 +1006,7 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
   g = p_One(dst->extRing);
   p_SetCoeff(g, q, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(f) = g; DEN(f) = NULL; COM(f) = 0;
+  NUM(f) = g; // DEN(f) = NULL; COM(f) = 0;
   return (number)f;
 }
 
@@ -1044,6 +1052,20 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
   
   /* for the time being, we only provide maps if h = 1 and if b is Q or
      some field Z/pZ: */
+  if (h==0)
+  {
+    if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
+      return ntMap00;                                 /// Q       -->  Q(T)
+    if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
+      return ntMapP0;                                 /// Z/p     -->  Q(T)
+    if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
+      return ntMap0P;                                 /// Q       --> Z/p(T)
+    if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
+    {
+      if (src->ch == dst->ch) return ntMapPP;         /// Z/p     --> Z/p(T)
+      else return ntMapUP;                            /// Z/u     --> Z/p(T)
+    }
+  }
   if (h != 1) return NULL;
   if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
   
@@ -1051,21 +1073,6 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
      K[t_1, ..., t_s] =: K[T];
      Let moreover, for any such sequence T, T' denote any subsequence of T
      of the form t_1, ..., t_w with w <= s. */
-  
-  if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
-    return ntMap00;                                      /// Q       -->  Q(T)
-  
-  if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
-    return ntMapP0;                                      /// Z/p     -->  Q(T)
-  
-  if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
-    return ntMap0P;                                      /// Q       --> Z/p(T)
-  
-  if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
-  {
-    if (src->ch == dst->ch) return ntMapPP;              /// Z/p     --> Z/p(T)
-    else return ntMapUP;                                 /// Z/u     --> Z/p(T)
-  }
   
   coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
   if (h != 1) return NULL;
@@ -1077,7 +1084,10 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
     for (int i = 0; i < rVar(src->extRing); i++)
       if (strcmp(rRingVar(i, src->extRing),
                  rRingVar(i, dst->extRing)) != 0) return NULL;
-      return ntCopyMap;                                  /// Q(T')   --> Q(T)
+      if (src->type==n_transExt)
+        return ntCopyMap;                              /// Q(T')   --> Q(T)
+      else
+        return ntCopyAlg;
   }
   
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
@@ -1086,13 +1096,17 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
     for (int i = 0; i < rVar(src->extRing); i++)
       if (strcmp(rRingVar(i, src->extRing),
                  rRingVar(i, dst->extRing)) != 0) return NULL;
-      return ntCopyMap;                                  /// Z/p(T') --> Z/p(T)
+      if (src->type==n_transExt)
+        return ntCopyMap;                              /// Z/p(T') --> Z/p(T)
+      else
+        return ntCopyAlg;
   }
   
   return NULL;                                           /// default
 }
 
-void ntKillChar(coeffs cf) {
+void ntKillChar(coeffs cf)
+{
   if ((--cf->extRing->ref) == 0)
     rDelete(cf->extRing);
 }
