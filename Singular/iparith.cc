@@ -508,7 +508,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   poly u_p=(poly)u->CopyD(POLY_CMD);
   int dummy;
   if ((u_p!=NULL)
-  && ((v_i==0) ||
+  && ((v_i!=0) &&
        (pTotaldegree(u_p) > (signed long)currRing->bitmask)/(signed long)v_i))
   {
     Werror("OVERFLOW in power(d=%ld, e=%d, max=%ld)",
