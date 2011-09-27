@@ -875,19 +875,66 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 number ntLcm(number a, number b, const coeffs cf)
 {
   ntTest(a); ntTest(b);
-  /* TO BE IMPLEMENTED!
-     for the time, we simply return NULL, representing the number zero */
-  Print("// TO BE IMPLEMENTED: transext.cc:ntLcm\n");
+  fraction fb = (fraction)b;
+  if ((b==NULL)||(DEN(fb)==NULL)) return ntCopy(a,cf);
+#ifdef HAVE_FACTORY  
+  fraction fa = (fraction)a;
+  /* singclap_gcd destroys its arguments; we hence need copies: */
+  poly pa = p_Copy(NUM(fa), ntRing);
+  poly pb = p_Copy(DEN(fb), ntRing);
+  
+  /* Note that, over Q, singclap_gcd will remove the denominators in all
+     rational coefficients of pa and pb, before starting to compute
+     the gcd. Thus, we do not need to ensure that the coefficients of
+     pa and pb live in Z; they may well be elements of Q\Z. */
+  poly pGcd = singclap_gcd(pa, pb, cf->extRing);
+  if (p_IsConstant(pGcd, ntRing) &&
+      n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs))
+  { /* gcd = 1; return pa*pb*/
+    p_Delete(&pGcd,ntRing);
+    fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+    NUM(result) = pp_Mult_qq(NUM(fa),DEN(fb),ntRing);
+    return (number)result;
+  }
+  else
+  { /* return pa*pb/gcd */
+    p_Delete(&pGcd,ntRing);
+    poly newNum = singclap_pdivide(NUM(fa), pGcd, ntRing);
+    fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+    NUM(result) = p_Mult_q(p_Copy(DEN(fb),ntRing),newNum,ntRing);
+    return (number)result;
+  }
+#else
+  Print("// factory needed: transext.cc:ntLcm\n");
+  return NULL;
+#endif /* HAVE_FACTORY */
   return NULL;
 }
 
 number ntGcd(number a, number b, const coeffs cf)
 {
   ntTest(a); ntTest(b);
-  /* TO BE IMPLEMENTED!
-     for the time, we simply return NULL, representing the number zero */
-  Print("// TO BE IMPLEMENTED: transext.cc:ntGcd\n");
+  if (a==NULL) return ntCopy(b,cf);
+  if (b==NULL) return ntCopy(a,cf);
+#ifdef HAVE_FACTORY  
+  fraction fa = (fraction)a;
+  fraction fb = (fraction)b;
+  /* singclap_gcd destroys its arguments; we hence need copies: */
+  poly pa = p_Copy(NUM(fa), ntRing);
+  poly pb = p_Copy(NUM(fb), ntRing);
+  
+  /* Note that, over Q, singclap_gcd will remove the denominators in all
+     rational coefficients of pa and pb, before starting to compute
+     the gcd. Thus, we do not need to ensure that the coefficients of
+     pa and pb live in Z; they may well be elements of Q\Z. */
+  poly pGcd = singclap_gcd(pa, pb, cf->extRing);
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(result) = pGcd;
+  return (number)result;
+#else
+  Print("// factory needed: transext.cc:ntGcd\n");
   return NULL;
+#endif /* HAVE_FACTORY */
 }
 
 int ntSize(number a, const coeffs cf)
