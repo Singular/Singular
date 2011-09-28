@@ -5024,29 +5024,31 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
+    LongComplexInfo param;
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
     const int ch=0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      WarnS("not implemented: size for real/complex");
       float_len=(int)(long)pn->next->Data();
       float_len2=float_len;
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
         float_len2=(int)(long)pn->next->Data();
-        WarnS("not implemented: size for real/complex");
         pn=pn->next;
       }
     }
-    if ((pn->next==NULL) && complex_flag)
-    {
-      pn->next=(leftv)omAlloc0Bin(sleftv_bin);
-      pn->next->name=omStrDup("i");
+    // set the parameter name
+    if (complex_flag) {
+      if (pn->next == NULL)
+        param.par_name=(const char*)"i"; //default to i
+      else
+        param.par_name = (const char*)pn->next->name;
     }
-    else
-      WarnS("not implemented: name for i (complex)");
-    cf=nInitChar(complex_flag ? n_long_C: n_long_R,NULL);
+
+    param.float_len = float_len;
+    param.float_len2 = float_len2;
+    cf=nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
 
     assume( cf != NULL );
   }
