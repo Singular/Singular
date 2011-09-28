@@ -1,4 +1,5 @@
-lib_LIBRARIES=libmisc.a libmisc_g.a
+libmisc_LIBRARIES = libmisc.a libmisc_g.a
+libmiscdir = $(libdir)/singular
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
@@ -18,16 +19,9 @@ SOURCES  = intvec.cc int64vec.cc options.c
 libmisc_a_SOURCES   = $(SOURCES)
 libmisc_g_a_SOURCES = $(SOURCES)
 
-libmisc_a_includedir  =$(includedir)/libpolys/misc
-libmisc_g_a_includedir=$(includedir)/libpolys/misc
+libmisc_includedir = $(includedir)/singular/misc
+libmisc_include_HEADERS = auxiliary.h mylimits.h options.h intvec.h int64vec.h
 
-###????
-#libmisc_a_libdir  =${libdir}/libpolys
-#libmisc_g_a_libdir=${libdir}/libpolys
-
-MISCHEADERS  = auxiliary.h mylimits.h options.h intvec.h int64vec.h
-libmisc_a_include_HEADERS   = $(MISCHEADERS)
-libmisc_g_a_include_HEADERS = $(MISCHEADERS)
 
 
 
