@@ -403,8 +403,6 @@ void ngfSetChar(const coeffs r)
 BOOLEAN ngfInitChar(coeffs n, void *parameter)
 {
   assume( getCoeffType(n) == ID );
-  assume( parameter != NULL);
-  LongComplexInfo *p = (LongComplexInfo*)parameter;
 
   n->cfKillChar = ndKillChar; /* dummy */
 
@@ -440,8 +438,21 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
 
   n->nCoeffIsEqual = ngfCoeffIsEqual;
 
-  n->float_len = p->float_len;
-  n->float_len2 = p->float_len2;
+  if( parameter != NULL)
+  {
+    LongComplexInfo* p = (LongComplexInfo*)parameter;
+     
+    n->float_len = p->float_len;
+    n->float_len2 = p->float_len2;
+  } else // default values, just for testing!
+  {
+    n->float_len = SHORT_REAL_LENGTH;
+    n->float_len2 = SHORT_REAL_LENGTH;
+  }
+   
+  assume( n->float_len <= n->float_len2 );
+  assume( n->float_len2 >= SHORT_REAL_LENGTH );
+  assume( n->complex_parameter == NULL );
 
   return FALSE;
 }

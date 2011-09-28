@@ -388,7 +388,6 @@ BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 BOOLEAN ngcInitChar(coeffs n, void* parameter)
 {
   assume( getCoeffType(n) == ID );
-  assume( parameter != NULL);
 
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
@@ -487,11 +486,24 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
 */
-
-  LongComplexInfo* p = (LongComplexInfo*)parameter;
-  n->complex_parameter = omStrDup(p->par_name);
-  n->float_len = p->float_len;
-  n->float_len2 = p->float_len2;
+   
+  if( parameter != NULL)
+  {
+    LongComplexInfo* p = (LongComplexInfo*)parameter;
+    n->complex_parameter = omStrDup(p->par_name);
+    n->float_len = p->float_len;
+    n->float_len2 = p->float_len2;
+    
+  } else // default values, just for testing!
+  {
+    n->complex_parameter = omStrDup("i");
+    n->float_len = SHORT_REAL_LENGTH;
+    n->float_len2 = SHORT_REAL_LENGTH;     
+  }
+   
+  assume( n->float_len <= n->float_len2 );
+  assume( n->float_len2 >= SHORT_REAL_LENGTH );
+  assume( n->complex_parameter != NULL );
 
   return FALSE;
 }
