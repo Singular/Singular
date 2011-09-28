@@ -541,9 +541,12 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
   return NULL;
 }
 
-BOOLEAN nrInitChar(coeffs n, void*)
+BOOLEAN nrInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == ID );
+   
+  assume( p == NULL ); p;
+   
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
 
@@ -577,6 +580,9 @@ BOOLEAN nrInitChar(coeffs n, void*)
   
   n->nCoeffIsEqual = ndCoeffIsEqual;
 
+  n->float_len = SHORT_REAL_LENGTH;
+  n->float_len2 = SHORT_REAL_LENGTH;
+   
   // TODO: Any variables?
   return FALSE;
 }
