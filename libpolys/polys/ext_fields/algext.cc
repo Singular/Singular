@@ -540,7 +540,7 @@ number naMap00(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly result = p_One(dst->extRing);
-  p_SetCoeff(result, naCopy(a, src), dst->extRing);
+  p_SetCoeff(result, n_Copy(a, src), dst->extRing);
   return (number)result;
 }
 
@@ -589,7 +589,7 @@ number naMapPP(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly result = p_One(dst->extRing);
-  p_SetCoeff(result, naCopy(a, src), dst->extRing);
+  p_SetCoeff(result, n_Copy(a, src), dst->extRing);
   return (number)result;
 }
 
