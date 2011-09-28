@@ -1064,7 +1064,7 @@ number ntMapPP(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly p = p_One(dst->extRing);
-  p_SetCoeff(p, ntCopy(a, src), dst->extRing);
+  p_SetCoeff(p, n_Copy(a, src), dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
