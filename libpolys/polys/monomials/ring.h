@@ -14,9 +14,6 @@
 //#include <polys/monomials/polys-impl.h>
 //
 
-/* constants */
-#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
-
 /* forward declaration of types */
 class idrec;
 typedef idrec *   idhdl;
