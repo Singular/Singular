@@ -20,6 +20,12 @@
 #include <misc/intvec.h>
 
 #include <coeffs/longrat.h> // ???
+#include <coeffs/ffields.h>
+
+#define TRANSEXT_PRIVATES
+
+#include "ext_fields/transext.h"
+#include "ext_fields/algext.h"
 
 #include "weight.h"
 #include "simpleideals.h"
@@ -3298,7 +3304,7 @@ poly p_Subst(poly p, int n, poly e, const ring r)
 poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
        nMapFunc nMap, int *par_perm, int OldPar)
 {
-  int OldpVariables = oldRing->N;
+  const int OldpVariables = rVar(oldRing);
   poly result = NULL;
   poly result_last = NULL;
   poly aq=NULL; /* the map coefficient */
@@ -3306,81 +3312,118 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
 
   while (p != NULL)
   {
-    if ((OldPar==0)||(rField_is_GF(oldRing)))
+    // map the coefficient
+    if ((OldPar==0) || (rField_is_GF(oldRing)))
     {
       qq = p_Init(dst);
-      number n=nMap(pGetCoeff(p),oldRing->cf,dst->cf);
-      if ((!rMinpolyIsNULL(dst))
-      && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
-      {
-        n_Normalize(n,dst->cf);
-      }
-      pGetCoeff(qq)=n;
-    // coef may be zero:  pTest(qq);
+      number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
+       
+      if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
+        n_Normalize(n, dst->cf);
+       
+      p_GetCoeff(qq, dst) = n;
+      // coef may be zero:  
+      p_Test(qq, dst);
     }
     else
     {
       qq=p_One(dst);
-      WerrorS("longalg missing 2");
+       
+      assume( FALSE ); WerrorS("longalg missing 2");
+       
 #if 0
-      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
-      if ((!rMinpolyIsNULL(dst))
-      && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
+      aq = naPermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing); // no dst???
+#endif
+       
+      if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
       {
         p_Normalize(aq,dst);
+	 
         if (aq==NULL)
-          p_SetCoeff(qq,n_Init(0,dst->cf),dst);
+          p_SetCoeff(qq, n_Init(0,dst->cf),dst);
       }
-      p_Test(aq,dst);
-#endif
+      p_Test(aq, dst);
     }
-    if (rRing_has_Comp(dst)) p_SetComp(qq, p_GetComp(p,oldRing),dst);
-    if (n_IsZero(pGetCoeff(qq),dst->cf))
+     
+    if (rRing_has_Comp(dst)) 
+       p_SetComp(qq, p_GetComp(p, oldRing), dst);
+
+    if ( n_IsZero(pGetCoeff(qq), dst->cf) )
     {
       p_LmDelete(&qq,dst);
-    }
+      qq = NULL;
+    }     
     else
     {
-      int i;
-      int mapped_to_par=0;
-      for(i=1; i<=OldpVariables; i++)
+      // map pars:
+      int mapped_to_par = 0;
+      for(int i = 1; i <= OldpVariables; i++)
       {
-        int e=p_GetExp(p,i,oldRing);
-        if (e!=0)
+        int e = p_GetExp(p, i, oldRing);
+        if (e != 0)
         {
           if (perm==NULL)
-          {
-            p_SetExp(qq,i, e, dst);
-          }
+            p_SetExp(qq, i, e, dst);
           else if (perm[i]>0)
             p_AddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/, dst);
           else if (perm[i]<0)
           {
+            number c = p_GetCoeff(qq, dst);
             if (rField_is_GF(dst))
             {
-              number c=pGetCoeff(qq);
-              number ee=(number)rGetVar(1, dst->cf->extRing);
-              number eee;n_Power(ee,e,&eee,dst->cf); //nfDelete(ee,dst);
-              ee=n_Mult(c,eee,dst->cf);
+ 	      assume( dst->cf->extRing == NULL );
+              number ee = nfPar(1, dst->cf); // NOTE: using nfPar is a BAD thing to do...
+
+	      number eee;
+	      n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);
+	       
+              ee = n_Mult(c, eee, dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
             }
-            else
+            else if (nCoeff_is_Extension(dst->cf))
             {
-              WerrorS("longalg missing 3");
-#if 0
-              lnumber c=(lnumber)pGetCoeff(qq);
-              if (c->z->next==NULL)
-                p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
+	      const int par = -perm[i];
+	      assume( par > 0 );
+//              WarnS("longalg missing 3");
+#if 1
+	      const coeffs C = dst->cf;
+	      assume( C != NULL );
+	      
+	      const ring R = C->extRing;
+	      assume( R != NULL );
+	       
+	      assume( par <= rVar(R) );
+	       
+	      poly pcn; // = (number)c
+	      
+	      assume( !n_IsZero(c, C) );
+	       
+	      if( nCoeff_is_algExt(C) )
+		 pcn = (poly) c;
+	       else //            nCoeff_is_transExt(C)
+		 pcn = NUM(c);
+	      
+              if (pNext(pcn) == NULL) // c->z
+                p_AddExp(pcn, -perm[i], e, R);
               else /* more difficult: we have really to multiply: */
               {
-                lnumber mmc=(lnumber)naInit(1,dst);
-                p_SetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
-                p_Setm(mmc->z,dst->extRing->cf);
-                pGetCoeff(qq)=n_Mult((number)c,(number)mmc,dst->cf);
-                n_Delete((number *)&c,dst->cf);
-                n_Delete((number *)&mmc,dst->cf);
+                poly mmc = p_ISet(1, R);
+                p_SetExp(mmc, -perm[i], e, R);
+                p_Setm(mmc, R);
+		 
+		number nnc;
+		// convert back to a number: number nnc = mmc; 
+		if( nCoeff_is_algExt(C) ) 
+		   nnc = (number) mmc;
+	        else //            nCoeff_is_transExt(C)
+	          nnc = ntInit(mmc, C);
+		
+                p_GetCoeff(qq, dst) = n_Mult((number)c, nnc, C);
+                n_Delete((number *)&c, C);
+                n_Delete((number *)&nnc, C);
               }
+	       
               mapped_to_par=1;
 #endif
             }
@@ -3388,20 +3431,20 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
           else
           {
             /* this variable maps to 0 !*/
-            p_LmDelete(&qq,dst);
+            p_LmDelete(&qq, dst);
             break;
           }
         }
       }
-      if (mapped_to_par
-      && (!rMinpolyIsNULL(dst)))
+      if ( mapped_to_par && (!rMinpolyIsNULL(dst)) )
       {
-        number n=pGetCoeff(qq);
+        number n = p_GetCoeff(qq, dst);
         n_Normalize(n,dst->cf);
-        pGetCoeff(qq)=n;
+        p_GetCoeff(qq, dst) = n;
       }
     }
     pIter(p);
+
 #if 1
     if (qq!=NULL)
     {

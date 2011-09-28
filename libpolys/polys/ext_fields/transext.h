@@ -73,8 +73,10 @@ struct fractionObject
 typedef struct fractionObject * fraction;
 
 
-#define NUM(f) ((f)->numerator)
-#define DEN(f) ((f)->denominator)
+#define NUM(f) (((fraction)f)->numerator)
+#define DEN(f) (((fraction)f)->denominator)
+
+number ntInit(poly p, const coeffs cf);
 
 #endif
 
