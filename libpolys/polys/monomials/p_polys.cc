@@ -1238,7 +1238,8 @@ const char * p_Read(const char *st, poly &rc, const ring r)
     else
     {
       // 1st char of is not a varname
-      p_LmDelete(&rc,r);
+      // We return the parsed polynomial nevertheless. This is needed when
+      // we are parsing coefficients in a rational function field.
       s--;
       return s;
     }
