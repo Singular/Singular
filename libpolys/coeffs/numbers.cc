@@ -110,9 +110,10 @@ number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == getCoeffType(aRing) );
-  assume( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) );
-  
-  return a;
+  if ( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) )
+    return a;
+	else
+    return n_Copy(a, r);
 }
 void ndKillChar(coeffs) {}
 void ndSetChar(const coeffs) {}
