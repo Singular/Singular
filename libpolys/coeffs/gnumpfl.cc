@@ -97,6 +97,7 @@ number ngfCopy(number a, const coeffs r)
   return (number)b;
 }
 
+#if 0
 static number ngfCopyMap(number a, const coeffs r1, const coeffs r2)
 {
   assume( getCoeffType(r1) == ID );
@@ -109,6 +110,7 @@ static number ngfCopyMap(number a, const coeffs r1, const coeffs r2)
   }
   return (number)b;
 }
+#endif
 
 /*2
 * za:= - za
@@ -462,7 +464,7 @@ nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
   }
   if (nCoeff_is_long_R(src))
   {
-    return ngfCopyMap;
+    return ndCopyMap; //ngfCopyMap;
   }
   if (nCoeff_is_R(src))
   {

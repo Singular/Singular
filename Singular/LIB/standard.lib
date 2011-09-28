@@ -888,6 +888,12 @@ EXAMPLE: example groebner;  shows an example"
   if ((typeof(i_par)=="vector")||(typeof(i_par)=="module")||(typeof(i_par)=="matrix")) {module i=i_par;}
   else {ideal i=i_par; } // int, poly, number, ideal
   kill i_par;
+// check for integer etc coefficients
+  if (charstr(basering)[1]=="i") // either integer or integer,q
+  {
+    if (find(s_opt, option()))  { "calling std for ideals in ring with ring coefficients"; }
+    return (std(i));
+  }
 
 //----------------------- save the given method ---------------------------
   string method;                //all given methods as a coma separated string

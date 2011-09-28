@@ -9,8 +9,8 @@ libmisc_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAG
 libmisc_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libmisc_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-libmisc_g_a_CPPFLAGS = -DHAVE_CONFIG_H
+libmisc_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
+#libmisc_g_a_CPPFLAGS =
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
