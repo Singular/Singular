@@ -22,11 +22,9 @@ TESTS = simple_test coeffs_test rings_test polys_test
 check_PROGRAMS = $(TESTS)
 
 simple_test_SOURCES = simple_test_runner.cpp
-coeffs_test_SOURCES = coeffs_test_runner.cpp gftables
-polys_test_SOURCES = polys_test_runner.cpp gftables MOD
-rings_test_SOURCES = rings_test_runner.cpp gftables MOD
-
-
+coeffs_test_SOURCES = coeffs_test_runner.cpp
+polys_test_SOURCES = polys_test_runner.cpp
+rings_test_SOURCES = rings_test_runner.cpp
 
 polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_LDFLAGS = $(polys_test_LDFLAGS)
@@ -36,7 +34,8 @@ polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
 
-BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
+BUILT_SOURCES = gftables MOD \
+	$(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
 
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
@@ -58,3 +57,17 @@ rings_test_runner.cpp: rings_test.h
 	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/rings_test.h
 
 CLEANFILES = $(BUILT_SOURCES)
+
+EXTRA_DIST = simple_test.h coeffs_test.h polys_test.h rings_test.h common.h 		\
+    cxxtest/Descriptions.h       cxxtest/ParenPrinter.h      cxxtest/TestListener.h	\
+    cxxtest/DummyDescriptions.h  cxxtest/QtGui.h             cxxtest/TestRunner.h	\
+    cxxtest/ErrorFormatter.h     cxxtest/RealDescriptions.h  cxxtest/TestSuite.h	\
+    cxxtest/ErrorPrinter.h       cxxtest/SelfTest.h          cxxtest/TestTracker.h	\
+    cxxtest/Flags.h              cxxtest/StdHeaders.h        cxxtest/ValueTraits.h	\
+    cxxtest/GlobalFixture.h      cxxtest/StdioFilePrinter.h  cxxtest/Win32Gui.h		\
+    cxxtest/Gui.h                cxxtest/StdioPrinter.h      cxxtest/X11Gui.h		\
+    cxxtest/LinkedList.h         cxxtest/StdValueTraits.h    cxxtest/YesNoRunner.h	\
+    cxxtest/Mock.h               cxxtest/TeeListener.h					\
+    cxxtest/Descriptions.cpp     cxxtest/LinkedList.cpp      cxxtest/TestSuite.cpp	\
+    cxxtest/DummyDescriptions.cpp cxxtest/RealDescriptions.cpp  cxxtest/TestTracker.cpp \
+    cxxtest/GlobalFixture.cpp    cxxtest/Root.cpp            cxxtest/ValueTraits.cpp

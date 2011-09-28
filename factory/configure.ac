@@ -421,5 +421,6 @@ AM_CONDITIONAL(
     [WITH_PARSER_FOR_CANONICAL_FORM], 
     [test x$with_Singular != xyes && test x$enable_streamio != xno])
 
-AC_OUTPUT(Makefile ftest/GNUmakefile)
+AC_CONFIG_FILES([Makefile ftest/GNUmakefile])
+AC_OUTPUT
 
