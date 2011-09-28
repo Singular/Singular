@@ -71,6 +71,12 @@ typedef struct
   const char* GFPar_name;
 } GFInfo;
 
+typedef struct
+{
+  short      float_len; /**< additional char-flags, rInit */
+  short      float_len2; /**< additional char-flags, rInit */
+  const char* par_name; /**< parameter name */
+} LongComplexInfo;
 
 struct n_Procs_s
 {
@@ -289,7 +295,8 @@ void nKillChar(coeffs r);
 static inline void nSetChar(const coeffs r)
 {
   assume(r!=NULL); // r==NULL is an error
-  if (r->cfSetChar!=NULL) r->cfSetChar(r);
+  assume(r->cfSetChar != NULL);
+  r->cfSetChar(r);
 }
 
 void           nNew(number * a);

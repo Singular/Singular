@@ -761,7 +761,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   //r->cfInitChar=npInitChar;
   //r->cfKillChar=nfKillChar;
-  r->cfSetChar= NULL;
   r->nCoeffIsEqual=nfCoeffIsEqual;
 
   r->cfMult  = nfMult;
