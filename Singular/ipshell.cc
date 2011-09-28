@@ -5024,7 +5024,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
-    LongComplexInfo param;
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
     const int ch=0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
@@ -5038,18 +5037,27 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         pn=pn->next;
       }
     }
-    // set the parameter name
-    if (complex_flag) {
-      if (pn->next == NULL)
-        param.par_name=(const char*)"i"; //default to i
-      else
-        param.par_name = (const char*)pn->next->name;
-    }
+    assume( float_len <= float_len2 );
+     
+    if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH) )
+       cf=nInitChar(n_R, NULL);
+    else // longR or longC?
+    { 
+       LongComplexInfo param;
+       
+       param.float_len = float_len;
+       param.float_len2 = float_len2;
+       
+       // set the parameter name
+       if (complex_flag) {
+	  if (pn->next == NULL)
+	    param.par_name=(const char*)"i"; //default to i
+	  else
+	    param.par_name = (const char*)pn->next->name;
+       }
 
-    param.float_len = float_len;
-    param.float_len2 = float_len2;
-    cf=nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
-
+       cf = nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
+    }   
     assume( cf != NULL );
   }
 #ifdef HAVE_RINGS
