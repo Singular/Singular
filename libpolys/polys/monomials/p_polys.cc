@@ -1957,7 +1957,6 @@ poly p_Power(poly p, int i, const ring r)
 /* content suff                                                                   */
 
 static number p_InitContent(poly ph, const ring r);
-static number p_InitContent_a(poly ph, const ring r);
 
 void p_Content(poly ph, const ring r)
 {
@@ -2002,16 +2001,6 @@ void p_Content(poly ph, const ring r)
       h=p_InitContent(ph,r);
       p=ph;
     }
-    else if (rField_is_Extension(r)
-             &&
-             (
-              (rPar(r)>1) || rMinpolyIsNULL(r)
-             )
-            )
-    {
-      h=p_InitContent_a(ph,r);
-      p=ph;
-    }
     else
     {
       h=n_Copy(pGetCoeff(ph),r->cf);
@@ -2051,83 +2040,55 @@ void p_Content(poly ph, const ring r)
     }
     n_Delete(&h,r->cf);
 #ifdef HAVE_FACTORY
-    if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
-    {
-      singclap_divide_content(ph, r);
-      if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
-    }
+//    if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+//    {
+//      singclap_divide_content(ph, r);
+//      if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+//    }
 #endif
     if (rField_is_Q_a(r))
     {
-      //number hzz = nlInit(1, r->cf);
-      h = nlInit(1, r->cf);
-      p=ph;
-      Werror("longalg missing 1");
-#if 0
-      while (p!=NULL)
-      { // each monom: coeff in Q_a
-        lnumber c_n_n=(lnumber)pGetCoeff(p);
-        poly c_n=c_n_n->z;
-        while (c_n!=NULL)
-        { // each monom: coeff in Q
-          d=nlLcm(hzz,pGetCoeff(c_n),r->extRing->cf);
-          n_Delete(&hzz,r->extRing->cf);
-          hzz=d;
-          pIter(c_n);
-        }
-        c_n=c_n_n->n;
-        while (c_n!=NULL)
-        { // each monom: coeff in Q
-          d=nlLcm(h,pGetCoeff(c_n),r->extRing->cf);
-          n_Delete(&h,r->extRing->cf);
-          h=d;
-          pIter(c_n);
-        }
-        pIter(p);
-      }
-      /* hzz contains the 1/lcm of all denominators in c_n_n->z*/
-      /* h contains the 1/lcm of all denominators in c_n_n->n*/
-      number htmp=nlInvers(h,r->extRing->cf);
-      number hzztmp=nlInvers(hzz,r->extRing->cf);
-      number hh=nlMult(hzz,h,r->extRing->cf);
-      nlDelete(&hzz,r->extRing->cf);
-      nlDelete(&h,r->extRing->cf);
-      number hg=nlGcd(hzztmp,htmp,r->extRing->cf);
-      nlDelete(&hzztmp,r->extRing->cf);
-      nlDelete(&htmp,r->extRing->cf);
-      h=nlMult(hh,hg,r->extRing->cf);
-      nlDelete(&hg,r->extRing->cf);
-      nlDelete(&hh,r->extRing->cf);
-      nlNormalize(h,r->extRing->cf);
-      if(!nlIsOne(h,r->extRing->cf))
+      // we only need special handling for alg. ext.
+      if (getCoeffType(r->cf)==n_algExt)
       {
+        number hzz = n_Init(1, r->cf->extRing->cf);
         p=ph;
         while (p!=NULL)
         { // each monom: coeff in Q_a
-          lnumber c_n_n=(lnumber)pGetCoeff(p);
-          poly c_n=c_n_n->z;
+          poly c_n_n=(poly)pGetCoeff(p);
+          poly c_n=c_n_n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=nlMult(h,pGetCoeff(c_n),r->extRing->cf);
-            nlNormalize(d,r->extRing->cf);
-            nlDelete(&pGetCoeff(c_n),r->extRing->cf);
-            pGetCoeff(c_n)=d;
+            d=n_Lcm(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
+            n_Delete(&hzz,r->cf->extRing->cf);
+            hzz=d;
             pIter(c_n);
           }
-          c_n=c_n_n->n;
-          while (c_n!=NULL)
-          { // each monom: coeff in Q
-            d=nlMult(h,pGetCoeff(c_n),r->extRing->cf);
-            nlNormalize(d,r->extRing->cf);
-            nlDelete(&pGetCoeff(c_n),r->extRing->cf);
-            pGetCoeff(c_n)=d;
-            pIter(c_n);
-          }
-          pIter(p);
         }
+        pIter(p);
+        /* hzz contains the 1/lcm of all denominators in c_n_n*/
+        h=n_Invers(hzz,r->cf->extRing->cf);
+        n_Delete(&hzz,r->cf->extRing->cf);
+        n_Normalize(h,r->cf->extRing->cf);
+        if(!n_IsOne(h,r->cf->extRing->cf))
+        {
+          p=ph;
+          while (p!=NULL)
+          { // each monom: coeff in Q_a
+            poly c_n=(poly)pGetCoeff(p);
+            while (c_n!=NULL)
+            { // each monom: coeff in Q
+              d=n_Mult(h,pGetCoeff(c_n),r->cf->extRing->cf);
+              n_Normalize(d,r->cf->extRing->cf);
+              n_Delete(&pGetCoeff(c_n),r->cf->extRing->cf);
+              pGetCoeff(c_n)=d;
+              pIter(c_n);
+            }
+            pIter(p);
+          }
+        }
+        n_Delete(&h,r->cf->extRing->cf);
       }
-      nlDelete(&h,r->extRing->cf);
-#endif
     }
   }
 }
@@ -2276,38 +2237,6 @@ static number p_InitContent(poly ph, const ring r)
   return nlGcd(d,d2,r->cf);
 }
 #endif
-
-number p_InitContent_a(poly ph, const ring r)
-// only for coefficients in K(a)/<minpoly(a)> and K(t_1, t_2, ..., t_n)
-{
-  number d=pGetCoeff(ph);
-  /* old: int s=n_ParDeg(d,r->cf);   new: */
-  int s = p_Totaldegree((poly)d, r->cf->extRing);
-  if (s <=1) return n_Copy(d,r->cf);
-  int s2=-1;
-  number d2;
-  int ss;
-  loop
-  {
-    pIter(ph);
-    if(ph==NULL)
-    {
-      if (s2==-1) return n_Copy(d,r->cf);
-      break;
-    }
-    /* old: if ((ss=n_ParDeg(pGetCoeff(ph),r->cf))<s)   new: */
-    if ((ss = p_Totaldegree((poly)pGetCoeff(ph), r->cf->extRing)) < s)
-    {
-      s2=s;
-      d2=d;
-      s=ss;
-      d=pGetCoeff(ph);
-      if (s2<=1) break;
-    }
-  }
-  return n_Gcd(d,d2,r->cf);
-}
-
 
 //void pContent(poly ph)
 //{
