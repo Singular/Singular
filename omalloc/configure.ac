@@ -1,5 +1,5 @@
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl File: configure.in
+dnl File: configure.ac
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
@@ -515,7 +515,7 @@ int main(int argc, char** argv)
 AC_MSG_RESULT($ac_cv_prog_addr2line_works)
 
 AC_MSG_CHECKING(whether to track return addresses)
-if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
+if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works "!= yes; then
   with_track_return=no
 else
   AC_DEFINE(OM_TRACK_RETURN,1,"Whether to track return")
@@ -581,8 +581,6 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
 AC_CONFIG_HEADER(config.h omConfig.h omlimits.h)
-
-AC_OUTPUT(Makefile, \
- if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
-
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
 

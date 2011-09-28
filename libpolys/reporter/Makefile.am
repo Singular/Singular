@@ -1,4 +1,5 @@
-lib_LIBRARIES=libreporter.a libreporter_g.a
+libreporter_LIBRARIES=libreporter.a libreporter_g.a
+libreporterdir = $(libdir)/singular
 
 CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
 
@@ -18,12 +19,9 @@ SOURCES  = dError.c reporter.cc
 libreporter_a_SOURCES   = $(SOURCES)
 libreporter_g_a_SOURCES = $(SOURCES)
 
-libreporter_a_includedir  =$(includedir)/libpolys/reporter
-libreporter_g_a_includedir=$(includedir)/libpolys/reporter
+libreporter_includedir  =$(includedir)/singular/reporter
 
-REPORTERHEADERS = reporter.h 
-libreporter_a_include_HEADERS   = $(REPORTERHEADERS)
-libreporter_g_a_include_HEADERS = $(REPORTERHEADERS)
+libreporter_include_HEADERS   = reporter.h 
 
 
 

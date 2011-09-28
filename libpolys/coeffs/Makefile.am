@@ -1,4 +1,6 @@
-lib_LIBRARIES = libcoeffs.a libcoeffs_g.a
+libcoeffs_LIBRARIES = libcoeffs.a libcoeffs_g.a
+libcoeffsdir = $(libdir)/singular
+
 CXXTEMPLFLAGS =  --no-exceptions 
 ## -fno-implicit-templates
 
@@ -28,15 +30,8 @@ SOURCES = \
 libcoeffs_a_SOURCES   = $(SOURCES)
 libcoeffs_g_a_SOURCES = $(SOURCES)
 
-## include_HEADERS = coeffs.h numbers.h
-
-libcoeffs_a_includedir  =$(includedir)/libpolys/coeffs
-libcoeffs_g_a_includedir=$(includedir)/libpolys/coeffs
-
-COEFFSHEADERS  = coeffs.h numbers.h si_gmp.h
-libcoeffs_a_include_HEADERS   = $(COEFFSHEADERS)
-libcoeffs_g_a_include_HEADERS = $(COEFFSHEADERS)
-
+libcoeffs_includedir  =$(includedir)/singular/coeffs
+libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory

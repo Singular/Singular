@@ -9,12 +9,10 @@
 #STATIC_LDFLAGS	= -static
 
 
-
 CXXTEMPLFLAGS = --no-exceptions ## -fno-implicit-templates
 
-
-lib_LIBRARIES = libkernel.a libkernel_g.a
-
+libkernel_LIBRARIES = libkernel.a libkernel_g.a
+libkerneldir = $(libdir)/singular
 
 libkernel_a_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
 libkernel_g_a_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
@@ -49,13 +47,10 @@ SOURCES = polys.cc febase.cc feread.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
     f5c.cc ratgring.cc shiftgb.cc gfan.cc \
     linearAlgebra.cc nc.cc preimage.cc \
-    fegetopt.c kInline.h
+    fegetopt.c
 
 libkernel_a_SOURCES   = $(SOURCES)
 libkernel_g_a_SOURCES = $(SOURCES)
-
-libkernel_a_includedir  =${includedir}/kernel/
-libkernel_g_a_includedir=${includedir}/kernel/
 
 KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	structs.h \
@@ -71,11 +66,12 @@ KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	eigenval.h units.h \
 	fegetopt.h \
 	ratgring.h shiftgb.h nc.h \
-	gfan.h preimage.h
+	gfan.h preimage.h mod2.h longrat.h timer.h kInline.h modulop.h fast_mult.h \
+	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
+	linearAlgebra.h page.h
 
-libkernel_a_include_HEADERS   = $(KERNELHEADERS)
-libkernel_g_a_include_HEADERS = $(KERNELHEADERS)
-
+libkernel_includedir  =${includedir}/singular/kernel/
+libkernel_include_HEADERS   = $(KERNELHEADERS)
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/factory
@@ -98,8 +94,9 @@ testg_CFLAGS = ${PIPE}
 testr_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 testg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
-testr_SOURCES = test.cc
-testg_SOURCES = test.cc
+testsources = test.cc f5c.h f5data.h f5gb.h f5lists.h
+testr_SOURCES = $(testsources)
+testg_SOURCES = $(testsources)
 
 testr_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 testg_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
@@ -110,6 +107,4 @@ testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 CLEANFILES = $(TESTS)
 
 
-
-# noinst_HEADERS =
 
