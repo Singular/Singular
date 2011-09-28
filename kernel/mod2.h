@@ -10,6 +10,8 @@
 #ifndef MOD2_H
 #define MOD2_H
 
+#include "config.h"
+
 #include <misc/auxiliary.h>
 
 #define SINGULAR_MAJOR_VERSION 0
