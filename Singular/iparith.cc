@@ -5118,7 +5118,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjpHead        (proc1)pHeadProc
 #endif
 #define jjidHead       (proc1)idHead
-#define jjidMaxIdeal   (proc1)idMaxIdeal
 #define jjidMinBase    (proc1)idMinBase
 #define jjsyMinBase    (proc1)syMinBase
 #define jjpMaxComp     (proc1)pMaxCompProc

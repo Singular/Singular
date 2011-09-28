@@ -172,7 +172,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjCALL1MANY),  LIST_CMD,        LIST_CMD,       DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{  jjWRONG ,      MAP_CMD,         0,              ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjidMaxIdeal), MAXID_CMD,       XS(IDEAL_CMD),  INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjidMaxIdeal), MAXID_CMD,       IDEAL_CMD,      INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjMEMORY),     MEMORY_CMD,      BIGINT_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjidMinBase),  MINBASE_CMD,     XS(IDEAL_CMD),  IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
 ,{D(jjidMinBase),  MINBASE_CMD,     XS(MODUL_CMD),  MODUL_CMD     , NO_PLURAL |ALLOW_RING}
