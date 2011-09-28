@@ -248,8 +248,8 @@ variable name. If the attribute is not defined for this variable,
   ring r=0,(x,y,z),dp;
   ideal I=std(maxideal(2));
   attrib(I,"isSB");
-  // although maxideal(2) is a standard basis,
-  // SINGULAR does not know it:
+  // maxideal(2) is a standard basis,
+  // SINGULAR does know it for maxideal:
   attrib(maxideal(2), "isSB");
 @c example
 @end smallexample
@@ -266,7 +266,7 @@ to the value expression.
   ring r=0,(x,y,z),dp;
   ideal I=maxideal(2); // the attribute "isSB" is not set
   vdim(I);
-  attrib(I,"isSB",1);  // the standard basis attribute is set here
+  attrib(I,"isSB",0);  // the standard basis attribute is reset here
   vdim(I);
 @c example
 @end smallexample
