@@ -53,7 +53,7 @@
 #endif
 
 #include "ext_fields/transext.h"
-
+#include "prCopy.h"
 
 /* constants for controlling the complexity of numbers */
 #define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
@@ -308,6 +308,19 @@ number ntInit(int i, const coeffs cf)
   {
     fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
     NUM(result) = p_ISet(i, ntRing);
+    DEN(result) = NULL;
+    COM(result) = 0;
+    return (number)result;
+  }
+}
+
+number ntInit(poly p, const coeffs cf)
+{
+  if (p == 0) return NULL;
+  else
+  {
+    fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+    NUM(result) = p;
     DEN(result) = NULL;
     COM(result) = 0;
     return (number)result;
@@ -1025,16 +1038,43 @@ number ntMapP0(number a, const coeffs src, const coeffs dst)
 
 /* assumes that either src = Q(t_1, ..., t_s), dst = Q(t_1, ..., t_s), or
                        src = Z/p(t_1, ..., t_s), dst = Z/p(t_1, ..., t_s) */
-number ntCopyMap(number a, const coeffs src, const coeffs dst)
+number ntCopyMap(number a, const coeffs cf, const coeffs dst)
 {
-  return ntCopy(a, dst);
+//  if (n_IsZero(a, cf)) return NULL;
+   
+  ntTest(a);
+
+  if (IS0(a)) return NULL;
+   
+  const ring rSrc = cf->extRing;
+  const ring rDst = dst->extRing;
+  
+  if( rSrc == rDst )
+    return ntCopy(a, dst); // USUALLY WRONG!
+  
+  fraction f = (fraction)a;
+  poly g = prCopyR(NUM(f), rSrc, rDst);
+   
+  poly h = NULL;
+  
+  if (!DENIS1(f))
+     h = prCopyR(DEN(f), rSrc, rDst);
+   
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+   
+  NUM(result) = g;
+  DEN(result) = h;
+  COM(result) = COM(f);
+  return (number)result;  
 }
 
-number ntCopyAlg(number a, const coeffs src, const coeffs dst)
+number ntCopyAlg(number a, const coeffs cf, const coeffs dst)
 {
-  if (n_IsZero(a, src)) return NULL;
-  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(f) = p_Copy((poly)a,src->extRing);// DEN(f) = NULL; COM(f) = 0;
+  if (n_IsZero(a, cf)) return NULL;
+   
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin); 
+  // DEN(f) = NULL; COM(f) = 0;
+  NUM(f) = prCopyR((poly)a, cf->extRing, dst->extRing);
   return (number)f;
 }
 
@@ -1127,26 +1167,32 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
-    if (rVar(src->extRing) > rVar(dst->extRing)) return NULL;
+    if (rVar(src->extRing) > rVar(dst->extRing)) 
+       return NULL;
+     
     for (int i = 0; i < rVar(src->extRing); i++)
-      if (strcmp(rRingVar(i, src->extRing),
-                 rRingVar(i, dst->extRing)) != 0) return NULL;
-      if (src->type==n_transExt)
-        return ndCopyMap; //ntCopyMap;          /// Q(T')   --> Q(T)
-      else
-        return ntCopyAlg;
+      if (strcmp(rRingVar(i, src->extRing), rRingVar(i, dst->extRing)) != 0) 
+	 return NULL;
+     
+    if (src->type==n_transExt)
+       return ntCopyMap;          /// Q(T')   --> Q(T)
+    else
+       return ntCopyAlg;
   }
 
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
-    if (rVar(src->extRing) > rVar(dst->extRing)) return NULL;
+    if (rVar(src->extRing) > rVar(dst->extRing)) 
+       return NULL;
+     
     for (int i = 0; i < rVar(src->extRing); i++)
-      if (strcmp(rRingVar(i, src->extRing),
-                 rRingVar(i, dst->extRing)) != 0) return NULL;
-      if (src->type==n_transExt)
-        return ndCopyMap; //ntCopyMap;         /// Z/p(T') --> Z/p(T)
-      else
-        return ntCopyAlg;
+      if (strcmp(rRingVar(i, src->extRing), rRingVar(i, dst->extRing)) != 0) 
+	 return NULL;
+     
+    if (src->type==n_transExt)
+       return ntCopyMap;         /// Z/p(T') --> Z/p(T)
+    else
+       return ntCopyAlg;
   }
 
   return NULL;                                 /// default
