@@ -15,6 +15,7 @@ nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
 /// Initialize r
 BOOLEAN ngcInitChar(coeffs r, void*);
 
+void ngcSetChar(const coeffs r);
 
 // Private interface should be hidden!!!
      

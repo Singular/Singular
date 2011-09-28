@@ -41,7 +41,6 @@ void     ngfCoeffWrite(const coeffs r);
 
 void     ngfDelete(number *a, const coeffs r);
 
-void setGMPFloatDigits( size_t digits, size_t rest );
 number ngfMapQ(number from, const coeffs r);
 
 #endif
