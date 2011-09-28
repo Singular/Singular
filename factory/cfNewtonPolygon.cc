@@ -253,7 +253,7 @@ int ** newtonPolygon (const CanonicalForm& F, int& sizeOfNewtonPoly)
   }
 
   sizeOfNewtonPoly= n;
-  for (int i= n; i < sizeF; i++)
+  for (int i= 0; i < sizeF; i++)
     delete [] points[i];
   delete [] points;
 
