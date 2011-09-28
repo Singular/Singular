@@ -102,36 +102,6 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-/*
-
-/// internally changes the gloabl ring and resets the relevant
-/// global variables:
-/// SHOULD BE DEPRECATED NOW...?
-void rChangeCurrRing(ring r)
-{
- // if (!rMinpolyIsNULL(currRing))
- // {
- //   omCheckAddr(currRing->cf->minpoly);
- // }
-  //------------ set global ring vars --------------------------------
-  //currRing = r;
-  //currQuotient=NULL;
-  if (r != NULL)
-  {
-    rTest(r);
-    //------------ set global ring vars --------------------------------
-    //currQuotient=r->qideal;
-
-    //------------ global variables related to coefficients ------------
-    nSetChar(r->cf);
-
-    //------------ global variables related to polys -------------------
-    p_SetGlobals(r);
-    //------------ global variables related to factory -----------------
-  }
-}
-*/
-
 ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
   assume( cf != NULL);
