@@ -76,6 +76,14 @@ typedef struct fractionObject * fraction;
 #define NUM(f) (((fraction)f)->numerator)
 #define DEN(f) (((fraction)f)->denominator)
 
+/* some useful accessors for fractions: */
+#define IS0(f) (f == NULL) 
+/**< TRUE iff n represents 0 in K(t_1, .., t_s) */
+
+#define DENIS1(f) (DEN(f) == NULL) 
+/**< TRUE iff den. represents 1 */
+
+
 number ntInit(poly p, const coeffs cf);
 
 #endif

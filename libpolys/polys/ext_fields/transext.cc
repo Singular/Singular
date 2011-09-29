@@ -60,12 +60,8 @@
 #define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
 #define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
 
-/* some useful accessors for fractions: */
-#define IS0(f) (f == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
-
-#define DENIS1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
-#define NUMIS1(f) (p_IsConstant(f->numerator, cf->extRing) && \
-                   n_IsOne(p_GetCoeff(f->numerator, cf->extRing), \
+#define NUMIS1(f) (p_IsConstant(NUM(f), cf->extRing) && \
+                   n_IsOne(p_GetCoeff(NUM(f), cf->extRing), \
                            cf->extRing->cf))
                    /**< TRUE iff num. represents 1 */
 #define COM(f) f->complexity
