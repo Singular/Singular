@@ -251,7 +251,7 @@ static const char* npEati(const char *s, int *i)
     {
       ii *= 10;
       ii += *s++ - '0';
-      if (ii >= (MAX_INT_VAL / 100)) ii = ii % npPrimeM;
+      if (ii >= (MAX_INT_VAL / 10)) ii = ii % npPrimeM;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
     if (ii >= npPrimeM) ii = ii % npPrimeM;
