@@ -160,7 +160,7 @@ SingularHEADERS =    Cache.h \
    mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
 
 libSingular_includedir = ${includedir}/singular/Singular/
-libSingular_include_HEADERS = $(SingularHEADERS)
+nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/factory

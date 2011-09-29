@@ -108,7 +108,6 @@ factory_headers = \
 		cf_generator.h \
 		cf_globals.h \
 		cf_gcd_smallp.h \
-		cf_gmp.h \
 		cf_hnf.h \
 		cf_irred.h \
 		cf_iter.h \
@@ -145,8 +144,6 @@ factory_headers = \
 		facIrredTest.h \
 		fieldGCD.h \
 		ffops.h \
-		templates/ftmpl_list.h \
-		templates/ftmpl_matrix.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
@@ -171,8 +168,9 @@ factory_headers = \
 noinst_HEADERS = $(factory_headers)
 
 libfactory_includedir=$(includedir)/factory
-libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
-
+nobase_libfactory_include_HEADERS = \
+		cplusplus.h factory.h factoryconf.h \
+		cf_gmp.h $(templateincl)
 
 # Documentation
 include $(top_srcdir)/aminclude.am
@@ -275,7 +273,7 @@ ftestdistfiles = \
 		ftest/ftest_util.m4
 
 EXTRA_DIST =	test_install.cc \
-		$(templatesrc) $(templateincl) $(hdrtemplsrc) \
+		$(templatesrc) $(hdrtemplsrc) \
 		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
 		doxygen.cfg factory.cfg \
 		examples/application.cc \
