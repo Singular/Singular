@@ -209,9 +209,9 @@ InternalCF* InternalRational::addsame( InternalCF * c )
         MP_INT tmp1;
         MP_INT tmp2;
         mpz_init( &tmp1 );
-        mpz_fdiv_q( &tmp1, &_den, &g );
+        mpz_divexact( &tmp1, &_den, &g );
         mpz_init( &tmp2 );
-        mpz_fdiv_q( &tmp2, &MPQDEN( c ), &g );
+        mpz_divexact( &tmp2, &MPQDEN( c ), &g );
         mpz_mul( &d, &tmp2, &_den );
         mpz_mul( &tmp2, &tmp2, &_num );
         mpz_mul( &tmp1, &tmp1, &MPQNUM( c ) );
@@ -219,8 +219,8 @@ InternalCF* InternalRational::addsame( InternalCF * c )
         mpz_gcd( &g, &n, &d );
         if ( mpz_cmp_si( &g, 1 ) != 0 )
         {
-            mpz_fdiv_q( &n, &n, &g );
-            mpz_fdiv_q( &d, &d, &g );
+            mpz_divexact( &n, &n, &g );
+            mpz_divexact( &d, &d, &g );
         }
         mpz_clear( &tmp1 );
         mpz_clear( &tmp2 );
@@ -265,9 +265,9 @@ InternalCF* InternalRational::subsame( InternalCF * c )
         MP_INT tmp1;
         MP_INT tmp2;
         mpz_init( &tmp1 );
-        mpz_fdiv_q( &tmp1, &_den, &g );
+        mpz_divexact( &tmp1, &_den, &g );
         mpz_init( &tmp2 );
-        mpz_fdiv_q( &tmp2, &MPQDEN( c ), &g );
+        mpz_divexact( &tmp2, &MPQDEN( c ), &g );
         mpz_mul( &d, &tmp2, &_den );
         mpz_mul( &tmp2, &tmp2, &_num );
         mpz_mul( &tmp1, &tmp1, &MPQNUM( c ) );
@@ -275,8 +275,8 @@ InternalCF* InternalRational::subsame( InternalCF * c )
         mpz_gcd( &g, &n, &d );
         if ( mpz_cmp_si( &g, 1 ) != 0 )
         {
-            mpz_fdiv_q( &n, &n, &g );
-            mpz_fdiv_q( &d, &d, &g );
+            mpz_divexact( &n, &n, &g );
+            mpz_divexact( &d, &d, &g );
         }
         mpz_clear( &tmp1 );
         mpz_clear( &tmp2 );
@@ -323,20 +323,20 @@ InternalCF* InternalRational::mulsame( InternalCF * c )
         bool g2is1 = mpz_cmp_si( &g2, 1 ) == 0;
         mpz_init( &tmp1 ); mpz_init( &tmp2 );
         if ( ! g1is1 )
-            mpz_fdiv_q( &tmp1, &_num, &g1 );
+            mpz_divexact( &tmp1, &_num, &g1 );
         else
             mpz_set( &tmp1, &_num );
         if ( ! g2is1 )
-            mpz_fdiv_q( &tmp2, &MPQNUM( c ), &g2 );
+            mpz_divexact( &tmp2, &MPQNUM( c ), &g2 );
         else
             mpz_set( &tmp2, &MPQNUM( c ) );
         mpz_mul( &n, &tmp1, &tmp2 );
         if ( ! g1is1 )
-            mpz_fdiv_q( &tmp1, &MPQDEN( c ), &g1 );
+            mpz_divexact( &tmp1, &MPQDEN( c ), &g1 );
         else
             mpz_set( &tmp1, &MPQDEN( c ) );
         if ( ! g2is1 )
-            mpz_fdiv_q( &tmp2, &_den, &g2 );
+            mpz_divexact( &tmp2, &_den, &g2 );
         else
             mpz_set( &tmp2, &_den );
         mpz_mul( &d, &tmp1, &tmp2 );
@@ -383,20 +383,20 @@ InternalCF* InternalRational::dividesame( InternalCF * c )
         bool g2is1 = mpz_cmp_si( &g2, 1 ) == 0;
         mpz_init( &tmp1 ); mpz_init( &tmp2 );
         if ( ! g1is1 )
-            mpz_fdiv_q( &tmp1, &_num, &g1 );
+            mpz_divexact( &tmp1, &_num, &g1 );
         else
             mpz_set( &tmp1, &_num );
         if ( ! g2is1 )
-            mpz_fdiv_q( &tmp2, &MPQDEN( c ), &g2 );
+            mpz_divexact( &tmp2, &MPQDEN( c ), &g2 );
         else
             mpz_set( &tmp2, &MPQDEN( c ) );
         mpz_mul( &n, &tmp1, &tmp2 );
         if ( ! g1is1 )
-            mpz_fdiv_q( &tmp1, &MPQNUM( c ), &g1 );
+            mpz_divexact( &tmp1, &MPQNUM( c ), &g1 );
         else
             mpz_set( &tmp1, &MPQNUM( c ) );
         if ( ! g2is1 )
-            mpz_fdiv_q( &tmp2, &_den, &g2 );
+            mpz_divexact( &tmp2, &_den, &g2 );
         else
             mpz_set( &tmp2, &_den );
         mpz_mul( &d, &tmp1, &tmp2 );
@@ -633,10 +633,10 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
     }
     else
     {
-        mpz_fdiv_q( &n, &n, &g );
+        mpz_divexact( &n, &n, &g );
         mpz_mul( &n, &n, &_num );
         mpz_init( &d );
-        mpz_fdiv_q( &d, &_den, &g );
+        mpz_divexact( &d, &_den, &g );
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
@@ -710,8 +710,8 @@ InternalCF* InternalRational::dividecoeff( InternalCF* c, bool invert )
     mpz_gcd( &g, &n, &d );
     if ( mpz_cmp_si( &g, 1 ) != 0 )
     {
-        mpz_fdiv_q( &d, &d, &g );
-        mpz_fdiv_q( &n, &n, &g );
+        mpz_divexact( &d, &d, &g );
+        mpz_divexact( &n, &n, &g );
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
@@ -809,8 +809,8 @@ InternalCF * InternalRational::normalize_myself()
     mpz_gcd( &g, &_num, &_den );
     if ( mpz_cmp_si( &g, 1 ) != 0 )
     {
-        mpz_fdiv_q( &_num, &_num, &g );
-        mpz_fdiv_q( &_den, &_den, &g );
+        mpz_divexact( &_num, &_num, &g );
+        mpz_divexact( &_den, &_den, &g );
     }
     // Hier brauchen wir ein mpz_clear, J.M.
     mpz_clear( &g );

@@ -374,6 +374,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           for (int j= 1; j <= factors.length(); j++)
             result.append (LCF);
           y= Variable (1);
+          delete [] bufSqrfFactors;
           return result;
         }
       }
@@ -386,6 +387,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     for (int j= 1; j <= factors.length(); j++)
       result.append (LCF);
     y= Variable (1);
+    delete [] bufSqrfFactors;
     return result;
   }
   else
@@ -507,6 +509,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   }
   else
     y= Variable (1);
+
+  delete [] bufSqrfFactors;
 
   return result;
 }
@@ -871,6 +875,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   if (isOn (SW_RATIONAL))
     normalize (factors);
 
+  delete [] leadingCoeffs2;
+  delete [] oldAeval;
+  delete [] Aeval2;
   delete[] liftBounds;
 
   return factors;

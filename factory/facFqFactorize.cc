@@ -1548,6 +1548,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           for (int k= 1; k <= factors.length(); k++)
             result.append (LCF);
           y= Variable (1);
+          delete [] bufSqrfFactors;
           return result;
         }
       }
@@ -1560,6 +1561,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     for (int k= 1; k <= factors.length(); k++)
       result.append (LCF);
     y= Variable (1);
+    delete [] bufSqrfFactors;
     return result;
   }
   else
@@ -1679,6 +1681,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   }
   else
     y= Variable (1);
+
+  delete [] bufSqrfFactors;
 
   return result;
 }
