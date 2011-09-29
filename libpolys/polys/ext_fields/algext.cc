@@ -93,7 +93,7 @@ number   naImPart(number a, const coeffs cf);
 number   naGetDenom(number &a, const coeffs cf);
 number   naGetNumerator(number &a, const coeffs cf);
 number   naGcd(number a, number b, const coeffs cf);
-number   naLcm(number a, number b, const coeffs cf);
+//number   naLcm(number a, number b, const coeffs cf);
 int      naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf);
@@ -447,6 +447,7 @@ const char * naRead(const char *s, number *a, const coeffs cf)
   return result;
 }
 
+#if 0
 /* implemented by the rule lcm(a, b) = a * b / gcd(a, b) */
 number naLcm(number a, number b, const coeffs cf)
 {
@@ -460,6 +461,7 @@ number naLcm(number a, number b, const coeffs cf)
   number theGcd = naGcd(a, b, cf);
   return naDiv(theProduct, theGcd, cf);
 }
+#endif
 
 /* expects *param to be castable to AlgExtInfo */
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
@@ -724,7 +726,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfDBTest       = naDBTest;
 #endif
   cf->cfGcd          = naGcd;
-  cf->cfLcm          = naLcm;
+  //cf->cfLcm          = naLcm;
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
