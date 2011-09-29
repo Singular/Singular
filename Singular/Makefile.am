@@ -223,6 +223,20 @@ Singularg_LDADD = libSingular_g.a -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -l
 Singular_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 # Singularg_CPPFLAGS =
 
+
+#########################################################
+# the Singular library (*.lib files)
+
+include ${srcdir}/singular-libs
+
+singularlibrarydir = ${datadir}/singular
+nobase_dist_singularlibrary_DATA = LIB/all.lib $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
+EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs
+
+LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${nobase_dist_singularlibrary_DATA}
+	$(MKDIR_P) LIB
+	${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
+
 ########################### TEST #########################
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/libpolys/tests'
@@ -249,7 +263,7 @@ testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc plural_cmd.inc feOptTS.inc feOptES.inc
+BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc plural_cmd.inc feOptTS.inc feOptES.inc LIB/all.lib
 
 CLEANFILES = $(BUILT_SOURCES)
 
