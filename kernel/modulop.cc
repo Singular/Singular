@@ -246,15 +246,16 @@ static const char* npEati(const char *s, int *i)
 
   if (((*s) >= '0') && ((*s) <= '9'))
   {
-    (*i) = 0;
+    unsigned long ii=0L;
     do
     {
-      (*i) *= 10;
-      (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % npPrimeM;
+      ii *= 10;
+      ii += *s++ - '0';
+      if (ii >= (MAX_INT_VAL / 100)) ii = ii % npPrimeM;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if ((*i) >= npPrimeM) (*i) = (*i) % npPrimeM;
+    if (ii >= npPrimeM) ii = ii % npPrimeM;
+    *i=(int)ii;
   }
   else (*i) = 1;
   return s;
