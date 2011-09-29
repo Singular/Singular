@@ -125,6 +125,12 @@ static BOOLEAN jjSHORTOUT(leftv res, leftv a)
     }
 #else
     currRing->ShortOut = shortOut;
+    coeffs cf = currRing->cf;
+    while (nCoeff_is_Extension(cf)) {
+      cf->extRing->ShortOut = shortOut;
+      assume(cf->extRing != NULL);
+      cf = cf->extRing->cf;
+    }
 #endif
   }
   return FALSE;
