@@ -2100,6 +2100,7 @@ void p_Content(poly ph, const ring r)
       }
     }
   }
+  if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
 }
 
 // Not yet?
