@@ -2,34 +2,29 @@
 #define LIBSINGULAR__H
 
 #include <math.h> // Why this?
-/*
-// TODO: correct these includes!!!
-#include <singular/mod2.h>
-#include <singular/structs.h>
-#include <singular/polys.h>
-#include <singular/longrat.h>
-#include <singular/numbers.h>
-#include <singular/febase.h>
-#include <singular/ring.h>
-#include <omalloc/omalloc.h>
-#include <singular/clapsing.h>
-#include <singular/maps.h>
-#include <singular/kutil.h>
-#include <singular/kstd1.h>
-#include <singular/tgb.h>
-#include <singular/sparsmat.h>
-#include <singular/rintegers.h>
-#include <singular/rmodulo2m.h>
-#include <singular/rmodulon.h>
 
-#include <singular/subexpr.h>
-#include <singular/tok.h>
-#include <singular/grammar.h>
-#include <singular/ipid.h>
-#include <singular/ipshell.h>
-#include <singular/attrib.h>
-#include <singular/options.h>
-*/
+#include <misc/auxiliary.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/longrat.h>
+#include <coeffs/numbers.h>
+#include <kernel/febase.h>
+#include <polys/monomials/ring.h>
+#include <omalloc/omalloc.h>
+#include <polys/clapsing.h>
+#include <polys/monomials/maps.h>
+#include <kernel/kutil.h>
+#include <kernel/kstd1.h>
+#include <kernel/tgb.h>
+#include <polys/sparsmat.h>
+
+#include <Singular/subexpr.h>
+#include <Singular/tok.h>
+#include <Singular/grammar.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/attrib.h>
+#include <misc/options.h>
 
 void siInit(char *);
 

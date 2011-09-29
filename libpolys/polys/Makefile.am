@@ -43,23 +43,23 @@ SOURCES = \
 
 LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h \
-	operations/pShallowCopyDelete.h operations/p_Mult_q.h \
-	templates/p_Procs.h mod_raw.h \
+	operations/pShallowCopyDelete.h \
+	templates/p_Procs.h templates/p_MemAdd.h templates/p_MemCmp.h \
 	monomials/p_polys.h monomials/maps.h prCopy.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
 	sparsmat.h clapsing.h clapconv.h coeffrings.h \
-	ext_fields/algext.h ext_fields/transext.h 
+	ext_fields/algext.h ext_fields/transext.h mod_raw.h  
 
 EXTRA_DIST = \
 	prCopy.pl prCopyTemplate.cc \
-	templates/p_Procs_Lib.cc templates/p_MemCmp.h templates/p_MemCopy.h templates/p_Numbers.h \
+	templates/p_Procs_Lib.cc templates/p_MemCopy.h templates/p_Numbers.h \
 	templates/p_Procs_Set.h templates/p_Procs_Static.h templates/p_Procs_Dynamic.h \
 	templates/p_Procs_Impl.h templates/p_Delete__T.cc templates/p_Copy__T.cc \
-	templates/p_ShallowCopyDelete__T.cc templates/p_MemAdd.h templates/p_Mult_nn__T.cc \
+	templates/p_ShallowCopyDelete__T.cc templates/p_Mult_nn__T.cc \
 	templates/pp_Mult_nn__T.cc templates/pp_Mult_mm__T.cc templates/p_Mult_mm__T.cc \
 	templates/pp_Mult_Coeff_mm_DivSelect__T.cc templates/pp_Mult_nn__T.cc \
 	templates/pp_Mult_Coeff_mm_DivSelectMult__T.cc \
-	templates/pp_Mult_mm_Noether__T.cc \
+	templates/pp_Mult_mm_Noether__T.cc operations/p_Mult_q.h \
 	templates/p_kBucketSetLm__T.cc templates/p_Minus_mm_Mult_qq__T.cc \
 	templates/p_Merge_q__T.cc templates/p_Add_q__T.cc templates/p_Neg__T.cc
 
@@ -123,7 +123,7 @@ endif
 
 libpolys_includedir=$(includedir)/singular/polys
 
-libpolys_include_HEADERS = $(LIBPOLYSHEADERS)
+nobase_libpolys_include_HEADERS = $(LIBPOLYSHEADERS)
 
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
