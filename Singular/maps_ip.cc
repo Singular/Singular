@@ -31,7 +31,7 @@
 #include "tok.h"
 
 /* debug output: Tok2Cmdname in maApplyFetch*/
-//#include "ipshell.h"
+#include "ipshell.h"
 
 // define this if you want to use the fast_map routine for mapping ideals
 //#define FAST_MAP
@@ -54,12 +54,15 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 {
   int i;
   int N = preimage_r->N;
-  //Print("N=%d what=%s ",N,Tok2Cmdname(what));
-  //if (perm!=NULL) for(i=1;i<=N;i++) Print("%d -> %d ",i,perm[i]);
-  //PrintS("\n");
-  //Print("P=%d ",P);
-  //if (par_perm!=NULL) for(i=0;i<P;i++) Print("%d -> %d ",i,par_perm[i]);
-  //PrintS("\n");
+#if 0
+  Print("N=%d what=%s ",N,Tok2Cmdname(what));
+  if (perm!=NULL) for(i=1;i<=N;i++) Print("%d -> %d ",i,perm[i]);
+  PrintS("\n");
+  Print("P=%d ",P);
+  if (par_perm!=NULL) for(i=0;i<P;i++) Print("%d -> %d ",i,par_perm[i]);
+  PrintS("\n");
+#endif
+
   void *data=w->Data();
   res->rtyp = w->rtyp;
   switch (w->rtyp)
@@ -67,10 +70,11 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case NUMBER_CMD:
       if (P!=0)
       {
-        WerrorS("Sorry 'napPermNumber' was lost in the refactoring process (due to Frank): needs to be fixed");
-        return TRUE;
-#if 0        
-        res->data=(void *)napPermNumber((number)data,par_perm,P, preimage_r);
+//        WerrorS("Sorry 'napPermNumber' was lost in the refactoring process (due to Frank): needs to be fixed");
+//        return TRUE;
+#if 1
+// poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst);
+        res->data= (void *) n_PermNumber((number)data, par_perm, P, preimage_r, currRing);
 #endif
         res->rtyp=POLY_CMD;
         if (nCoeff_is_Extension(currRing->cf))
@@ -79,19 +83,28 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       }
       else
       {
-        res->data=(void *)nMap((number)data, preimage_r->cf, currRing->cf);
+	assume( nMap != NULL );
+	 
+	number a = nMap((number)data, preimage_r->cf, currRing->cf);
+	
+ 
         if (nCoeff_is_Extension(currRing->cf))
         {
-          number a=(number)res->data;
-	  number one=nInit(1);
-          number product = nMult(a,one );
+          n_Normalize(a, currRing->cf); // ???
+/*
+          number a = (number)res->data;
+	  number one = nInit(1);
+          number product = nMult(a, one );
 	  nDelete(&one);
 	  nDelete(&a);
           res->data=(void *)product;
+ */
         }
         #ifdef LDEBUG
-        nTest((number) res->data);
+        n_Test(a, currRing->cf);
         #endif
+        res->data=(void *)a;
+
       }
       break;
     case POLY_CMD:
@@ -100,8 +113,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->data=(void *)prCopyR( (poly)data, preimage_r, currRing);
       else
       if ((what==IMAP_CMD) || ((what==FETCH_CMD) /* && (nMap!=nCopy)*/))
-        res->data=(void *)p_PermPoly((poly)data,perm,preimage_r,currRing,
-			nMap,par_perm,P);
+        res->data=(void *)p_PermPoly((poly)data,perm,preimage_r,currRing, nMap,par_perm,P);
       else /*if (what==MAP_CMD)*/
       {
         matrix s=mpNew(N,maMaxDeg_P((poly)data, preimage_r));

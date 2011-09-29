@@ -1909,9 +1909,10 @@ poly p_Jet(poly p, int m,const ring R);
 poly pp_JetW(poly p, int m, short *w, const ring R);
 poly p_JetW(poly p, int m, short *w, const ring R);
 
+poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst);
 
-poly      p_PermPoly (poly p, int * perm,const ring OldRing, const ring dst,
-                     nMapFunc nMap, int *par_perm=NULL, int OldPar=0);
+poly p_PermPoly (poly p, const int * perm,const ring OldRing, const ring dst,
+                     nMapFunc nMap, const int *par_perm=NULL, int OldPar=0);
 
 /*----------------------------------------------------*/
 poly p_Series(int n,poly p,poly u, intvec *w, const ring R);
