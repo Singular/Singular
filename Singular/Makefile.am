@@ -230,10 +230,12 @@ Singular_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 include ${srcdir}/singular-libs
 
 singularlibrarydir = ${datadir}/singular
-nobase_dist_singularlibrary_DATA = LIB/all.lib $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
+singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
+nobase_dist_singularlibrary_DATA = LIB/all.lib ${singularlibrary}
 EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs
 
-LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${nobase_dist_singularlibrary_DATA}
+# ${nobase_dist_singularlibrary_DATA}
+LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
 	$(MKDIR_P) LIB
 	${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
 
