@@ -36,7 +36,7 @@
 @sc{Singular} has the following limitations:
 @itemize @bullet
 @item
-the characteristic of a prime field must be less than or equal to 2147483629 (2^31)
+the characteristic of a prime field must be less than or equal to 2147483647 (2^31)
 @* (the characteristic of a prime field in the factory routines must be less than 536870912 (2^29))
 @* (the characteristic of a prime field in the NTL routines must be less than NTL_SP_BOUND (2^30) on 32bit
 machines - This is always the case since currently, only factory uses NTL.)

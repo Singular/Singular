@@ -3829,7 +3829,7 @@ declares a ring and sets it as the actual basering.
 The coefficients are given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less or equal 2147483629.
+a non-negative int_expression less or equal 2147483647.
 @item
 an expression_list of an int_expression and one or more names.
 @item

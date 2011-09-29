@@ -1388,10 +1388,10 @@ The coefficient field of the rings may be
 the field of rational numbers @math{Q},
 @item
 @tex
-finite fields $Z/p$, $p$ a prime $\le 2147483629$,
+finite fields $Z/p$, $p$ a prime $\le 2147483647$,
 @end tex
 @ifinfo
-finite fields Z/p, p a prime <= 2147483629,
+finite fields Z/p, p a prime <= 2147483647,
 @end ifinfo
 @item
 @tex
@@ -1682,7 +1682,7 @@ declares a ring and sets it as the current basering.
 The coefficients are given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less than or equal to 2147483629.
+a non-negative int_expression less than 2147483648 (2^31).
 @* The int_expression should either be 0, specifying the field of
 rational numbers Q, or a prime number p, specifying the finite field
 with p elements.  If it is not a prime number, int_expression is
