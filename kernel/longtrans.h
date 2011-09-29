@@ -9,6 +9,8 @@
               i.e., in rational function fields
 */
 #include <kernel/structs.h>
+#include <kernel/longalg.h>
+#if 0
 #include <kernel/longrat.h>
 #include <kernel/polys-impl.h>
 
@@ -166,5 +168,6 @@ const char* napHandleMons(const char *s, int i, napoly ex);
 const char* napHandlePars(const char *s, int i, napoly ex);
 const char* napRead(const char *s, napoly *b);
 
+#endif
 #endif
 

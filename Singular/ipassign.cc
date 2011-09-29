@@ -190,7 +190,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
     }
     /* redefine function pointers due to switch from
        transcendental to algebraic field extension */
-    redefineFunctionPointers();
+    //redefineFunctionPointers();
     // and now, normalize all already defined objects in this ring
     idhdl h=currRing->idroot;
     while(h!=NULL)

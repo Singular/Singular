@@ -2335,7 +2335,7 @@ ring rCompose(const lists  L)
             naMinimalPoly=n->z;
             R->algring->qideal->m[0]=NULL;
             idDelete(&(R->algring->qideal));
-            redefineFunctionPointers();
+            //redefineFunctionPointers();
           }
           else
           {
@@ -2408,7 +2408,7 @@ ring rCompose(const lists  L)
             BITSET save_test=test;
             if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
               naSetChar(rInternalChar(orig_ring),orig_ring);
-            else ntSetChar(rInternalChar(orig_ring),orig_ring);
+            else naSetChar(rInternalChar(orig_ring),orig_ring);
             nSetChar(currRing);
             test=save_test;
           }

@@ -2051,7 +2051,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         BITSET save_test=test;
         if ((r->minpoly != NULL) || (r->minideal != NULL))
           naSetChar(rInternalChar(r),r);
-        else ntSetChar(rInternalChar(r),r);
+        else naSetChar(rInternalChar(r),r);
         nSetChar(currRing);
         test=save_test;
       }

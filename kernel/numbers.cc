@@ -139,18 +139,9 @@ void nSetChar(ring r)
   /*--------------------- Q_a/ Zp_a -----------------*/
   else if (rField_is_Extension(r))
   {
-    if (r->minpoly != NULL)
-    {
       naSetChar(c,r);
       if (rField_is_Q_a()) nInit_bigint=naMap00;
       if (rField_is_Zp_a()) nInit_bigint=naMap0P;
-    }
-    else
-    {
-      ntSetChar(c,r);
-      if (rField_is_Q_a()) nInit_bigint=ntMap00;
-      if (rField_is_Zp_a()) nInit_bigint=ntMap0P;
-    }
   }
 #ifdef HAVE_RINGS
   /*----------------------ring Z / 2^m----------------*/
@@ -323,41 +314,41 @@ void nInitChar(ring r)
 #endif
   if (rField_is_Extension(r))
   {
-    //ntInitChar(c,TRUE,r);
-    n->cfDelete       = ntDelete;
-    n->nNormalize     = ntNormalize;
-    n->cfInit         = ntInit;
-    n->nPar           = ntPar;
-    n->nParDeg        = ntParDeg;
-    n->n_Int          = ntInt;
-    n->nAdd           = ntAdd;
-    n->nSub           = ntSub;
-    n->nMult          = ntMult;
-    n->nDiv           = ntDiv;
-    n->nExactDiv      = ntDiv;
-    n->nIntDiv        = ntIntDiv;
-    n->nNeg           = ntNeg;
-    n->nInvers        = ntInvers;
-    n->nCopy          = ntCopy;
-    n->cfCopy         = nt_Copy;
-    n->nGreater       = ntGreater;
-    n->nEqual         = ntEqual;
-    n->nIsZero        = ntIsZero;
-    n->nIsOne         = ntIsOne;
-    n->nIsMOne        = ntIsMOne;
-    n->nGreaterZero   = ntGreaterZero;
-    n->cfWrite        = ntWrite;
-    n->nRead          = ntRead;
-    n->nPower         = ntPower;
-    n->nGcd           = ntGcd;
-    n->nLcm           = ntLcm;
-    n->cfSetMap       = ntSetMap;
-    n->nName          = ntName;
-    n->nSize          = ntSize;
+    //naInitChar(c,TRUE,r);
+    n->cfDelete       = naDelete;
+    n->nNormalize     = naNormalize;
+    n->cfInit         = naInit;
+    n->nPar           = naPar;
+    n->nParDeg        = naParDeg;
+    n->n_Int          = naInt;
+    n->nAdd           = naAdd;
+    n->nSub           = naSub;
+    n->nMult          = naMult;
+    n->nDiv           = naDiv;
+    n->nExactDiv      = naDiv;
+    n->nIntDiv        = naIntDiv;
+    n->nNeg           = naNeg;
+    n->nInvers        = naInvers;
+    n->nCopy          = naCopy;
+    n->cfCopy         = na_Copy;
+    n->nGreater       = naGreater;
+    n->nEqual         = naEqual;
+    n->nIsZero        = naIsZero;
+    n->nIsOne         = naIsOne;
+    n->nIsMOne        = naIsMOne;
+    n->nGreaterZero   = naGreaterZero;
+    n->cfWrite        = naWrite;
+    n->nRead          = naRead;
+    n->nPower         = naPower;
+    n->nGcd           = naGcd;
+    n->nLcm           = naLcm;
+    n->cfSetMap       = naSetMap;
+    n->nName          = naName;
+    n->nSize          = naSize;
     n->cfGetDenom     = napGetDenom;
     n->cfGetNumerator = napGetNumerator;
 #ifdef LDEBUG
-    n->nDBTest        = ntDBTest;
+    n->nDBTest        = naDBTest;
 #endif
   }
 #ifdef HAVE_RINGS

@@ -7,6 +7,7 @@
               in rational function fields
 */
 
+#if 0
 #include <stdio.h>
 #include <string.h>
 #include <kernel/mod2.h>
@@ -2524,4 +2525,5 @@ BOOLEAN ntDBTest(number a, const char *f,const int l)
   }
   return TRUE;
 }
+#endif
 #endif
