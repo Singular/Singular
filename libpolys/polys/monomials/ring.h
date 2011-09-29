@@ -481,10 +481,11 @@ static inline BOOLEAN rField_is_long_C(const ring r)
 static inline BOOLEAN rField_has_simple_inverse(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_inverse(r->cf); }
 
+/// Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies
 static inline BOOLEAN rField_has_simple_Alloc(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_Alloc(r->cf); }
 
-/* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
+/// Alg. or trans. ext. 
 static inline BOOLEAN rField_is_Extension(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Extension(r->cf); } /* Z/p(a) and Q(a)*/
 
@@ -546,7 +547,7 @@ static inline char** rParameter(const ring r)
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) )
+  if( rField_is_Extension(r) ) // only alg / trans. exts...
   {
     const ring R = C->extRing;
     assume( R != NULL );
@@ -576,8 +577,8 @@ static inline int rInternalChar(const ring r)
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)
 {
-  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
-  return rField_is_Extension(r);
+//  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
+  return rField_is_Extension(r) || nCoeff_is_GF(r->cf) ;
 }
 
 /// Tests whether '(r->cf->minpoly) == NULL'
