@@ -1481,19 +1481,21 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
    this assumes that we are over a ground field so that division
    is well-defined;
    modifies p */
-void p_Monic(poly &p, ring r)
+void p_Monic(poly p, const ring r)
 {
   if (p == NULL) return;
+  number n = n_Init(1, r->cf);
+  if (p->next==NULL) { p_SetCoeff(p,n,r); return; }
   poly pp = p;
   number lc = p_GetCoeff(p, r);
   if (n_IsOne(lc, r->cf)) return;
   number lcInverse = n_Invers(lc, r->cf);
-  number n = n_Init(1, r->cf);
   p_SetCoeff(p, n, r);   // destroys old leading coefficient!
-  p = pIter(p);
+  pIter(p);
   while (p != NULL)
   {
     number n = n_Mult(p_GetCoeff(p, r), lcInverse, r->cf);
+    n_Normalize(n,r->cf);
     p_SetCoeff(p, n, r);   // destroys old leading coefficient!
     p = pIter(p);
   }
@@ -2071,8 +2073,8 @@ void p_Content(poly ph, const ring r)
             hzz=d;
             pIter(c_n);
           }
+          pIter(p);
         }
-        pIter(p);
         /* hzz contains the 1/lcm of all denominators in c_n_n*/
         h=n_Invers(hzz,r->cf->extRing->cf);
         n_Delete(&hzz,r->cf->extRing->cf);

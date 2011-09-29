@@ -1854,7 +1854,7 @@ poly      p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r);
    this assumes that we are over a ground field so that division
    is well-defined;
    modifies p */
-void      p_Monic(poly &p, ring r);
+void      p_Monic(poly p, const ring r);
 
 /* assumes that p and q are univariate polynomials in r,
    mentioning the same variable;
