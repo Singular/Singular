@@ -917,7 +917,7 @@ BOOLEAN containsRelatively(leftv res, leftv args)
 
 BOOLEAN hasFace(leftv res, leftv args)
 {
-  leftv u=args;                             
+  leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
     leftv v=u->next;
@@ -934,6 +934,69 @@ BOOLEAN hasFace(leftv res, leftv args)
   }
   WerrorS("hasFace: unexpected parameters");
   return TRUE;  
+}
+
+// BOOLEAN faceContaining(leftv res, leftv args)
+// {
+//   leftv u = args;
+//   if ((u != NULL) && (u->Typ() == coneID))
+//   {
+//     leftv v = u->next;
+//     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
+//     {
+//       const intvec* iv = (intvec*) v->Data();
+//       gfan::ZVector zv = intvec2ZVector(iv);
+//       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+//       gfan::ZCone* zf = &zc->faceContaining(zv);
+//       res->rtyp = coneID;
+//       res->data = (char*) zf;
+//       return FALSE;
+//     } 
+//     else
+//     {
+//       WerrorS("setprop: unexpected parameters");
+//       return TRUE;
+//     }
+//   }
+//   else
+//   {
+//     WerrorS("setprop: unexpected parameters");
+//     return TRUE;
+//   }
+// }
+
+BOOLEAN hasFace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zf = (gfan::ZCone*)v->Data();
+      int retInt;
+      gfan::ZVector point = zf->getRelativeInteriorPoint();
+      gfan::ZMatrix ineq = zc->getInequalities();
+      if(zc->hasFace(*zf))
+        {retInt = 1;}
+      else
+        {retInt = 0;}
+      res->rtyp = INT_CMD;
+      res->data = (char*) retInt;
+      return FALSE;
+    } 
+    else
+    {
+      WerrorS("hasFace: unexpected parameters");
+      return TRUE;
+    }
+  }
+  else
+  {
+    WerrorS("hasFace: unexpected parameters");
+    return TRUE;
+  }
 }
 
 void bbcone_setup()
