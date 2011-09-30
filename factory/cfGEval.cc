@@ -4,7 +4,7 @@
 #include "cf_generator.h"
 #include "cf_assert.h"
 
-GEvaluation::GEvaluation( const GEvaluation & e )
+GEvaluation::GEvaluation( const GEvaluation & e ):Evaluation()
 {
     if ( e.gen == 0 )
       gen = 0;

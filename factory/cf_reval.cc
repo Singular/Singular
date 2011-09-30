@@ -11,7 +11,7 @@
 #include "cf_reval.h"
 
 
-REvaluation::REvaluation( const REvaluation & e )
+REvaluation::REvaluation( const REvaluation & e ):Evaluation()
 {
     if ( e.gen == 0 )
         gen = 0;
