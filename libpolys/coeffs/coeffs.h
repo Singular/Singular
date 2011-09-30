@@ -256,7 +256,9 @@ struct n_Procs_s
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
 
-  BOOLEAN   ShortOut; /// ffields need this.
+  BOOLEAN   CanShortOut; //< if the elements can be printed in short format
+		       // this is set to FALSE if a parameter name has >2 chars
+  BOOLEAN   ShortOut; //< if the elements should print in short format
 
 // ---------------------------------------------------
   // for n_GF

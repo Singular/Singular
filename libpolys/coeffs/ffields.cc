@@ -823,6 +823,13 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->m_nfParameter= omStrDup(name); //TODO use omAlloc for allocating memory and use strcpy?
   r->m_nfPlus1Table= NULL;
 
+  if (strlen(name) > 1) {
+    r->ShortOut = 0;
+    r->CanShortOut = FALSE;
+  } else {
+    r->ShortOut = 1;
+  }
+
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
 
