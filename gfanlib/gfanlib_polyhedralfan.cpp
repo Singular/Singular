@@ -424,9 +424,7 @@ void addFacesToSymmetricComplex(SymmetricComplex &c, std::set<int> const &indice
 
       if(!c.contains(theCone))
         {
-
           c.insert(theCone);
-          //      log0 fprintf(Stderr,"ADDING\n");
           list<SymmetricComplex::Cone> facets=computeFacets(theCone,rays,facetCandidates,c/*,linealityDim*/);
           clist.splice(clist.end(),facets);
         }
@@ -493,12 +491,6 @@ SymmetricComplex PolyhedralFan::toSymmetricComplex()const
 
           for(PolyhedralConeList::const_iterator i=cones.begin();i!=cones.end();i++)
             {
-              {
-                static int t;
-//                log1 fprintf(Stderr,"Adding faces of cone %i\n",t++);
-              }
-  //            log2 fprintf(Stderr,"Dim: %i\n",i->dimension());
-
               addFacesToSymmetricComplex(symCom,*i,i->getFacets(),generatorsOfLinealitySpace);
             }
 

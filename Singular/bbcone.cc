@@ -584,6 +584,7 @@ BOOLEAN cone_intersect(leftv res, leftv args)
         Werror("expected ambient dims of both cones to coincide\n"
                "but got %d and %d", d1, d2);
       gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+      zc3.canonicalize();
       res->rtyp = coneID;
       res->data = (void *)new gfan::ZCone(zc3);
       return FALSE;
@@ -715,7 +716,6 @@ static BOOLEAN jjSETPROPC3B(leftv res, leftv u, leftv v, leftv w)
 
 BOOLEAN setprop(leftv res, leftv args)
 {
-
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
@@ -729,6 +729,69 @@ BOOLEAN setprop(leftv res, leftv args)
   }
   WerrorS("setprop: unexpected parameters");
   return TRUE;
+}
+
+// BOOLEAN faceContaining(leftv res, leftv args)
+// {
+//   leftv u = args;
+//   if ((u != NULL) && (u->Typ() == coneID))
+//   {
+//     leftv v = u->next;
+//     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
+//     {
+//       const intvec* iv = (intvec*) v->Data();
+//       gfan::ZVector zv = intvec2ZVector(iv);
+//       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+//       gfan::ZCone* zf = &zc->faceContaining(zv);
+//       res->rtyp = coneID;
+//       res->data = (char*) zf;
+//       return FALSE;
+//     } 
+//     else
+//     {
+//       WerrorS("setprop: unexpected parameters");
+//       return TRUE;
+//     }
+//   }
+//   else
+//   {
+//     WerrorS("setprop: unexpected parameters");
+//     return TRUE;
+//   }
+// }
+
+BOOLEAN hasFace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zf = (gfan::ZCone*)v->Data();
+      int retInt;
+      gfan::ZVector point = zf->getRelativeInteriorPoint();
+      gfan::ZMatrix ineq = zc->getInequalities();
+      if(zc->hasFace(*zf))
+        {retInt = 1;}
+      else
+        {retInt = 0;}
+      res->rtyp = INT_CMD;
+      res->data = (char*) retInt;
+      return FALSE;
+    } 
+    else
+    {
+      WerrorS("hasFace: unexpected parameters");
+      return TRUE;
+    }
+  }
+  else
+  {
+    WerrorS("hasFace: unexpected parameters");
+    return TRUE;
+  }
 }
 
 void bbcone_setup()
@@ -750,6 +813,8 @@ void bbcone_setup()
   iiAddCproc("","cone_link",FALSE,cone_link);
   iiAddCproc("","contains",FALSE,contains);
   iiAddCproc("","setprop",FALSE,setprop);
+  // iiAddCproc("","faceContaining",FALSE,faceContaining);
+  iiAddCproc("","hasFace",FALSE,hasFace);
   coneID=setBlackboxStuff(b,"cone");
   Print("created type %d (cone)\n",coneID); 
 }

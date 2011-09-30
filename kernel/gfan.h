@@ -4,7 +4,7 @@ gfan.h Interface to gfan.cc
 $Author: monerjan $
 $Date: 2009/11/03 06:57:32 $
 $Header: /usr/local/Singular/cvsroot/kernel/gfan.h,v 1.13 2009/11/03 06:57:32 monerjan Exp $
-$Id$
+$Id: gfan.h 14338 2011-07-18 12:05:21Z hannes $
 */
 #ifdef HAVE_FANS
 
@@ -15,9 +15,9 @@ $Id$
 
 #define p800
 #ifdef p800
-#include <kernel/../../cddlib/include/setoper.h>
-#include <kernel/../../cddlib/include/cdd.h>
-#include <kernel/../../cddlib/include/cddmp.h>
+#include <../cddlib-094f/lib-src-gmp/setoper.h>
+#include <../cddlib-094f/lib-src-gmp/cdd.h>
+#include <../cddlib-094f/lib-src-gmp/cddmp.h>
 #endif
 #include <kernel/bbfan.h>
 #include <kernel/bbcone.h>
