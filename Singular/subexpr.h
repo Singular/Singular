@@ -9,12 +9,15 @@
 */
 
 #include <string.h>
+
+#include <polys/monomials/ring.h>
+
+#include <kernel/febase.h>
+//#include <kernel/structs.h>
+
 #include <Singular/grammar.h>
 #include <Singular/tok.h>
-//#include <kernel/structs.h>
 #include <Singular/attrib.h>
-#include <kernel/febase.h>
-#include <polys/monomials/ring.h>
 
 struct _ssubexpr
 {
@@ -30,6 +33,8 @@ extern const char *iiSleftv2name(leftv v);
 
 class sleftv;
 typedef sleftv * leftv;
+
+/// Class used for (list of) interpreter objects
 class sleftv
 {
   public:
@@ -56,9 +61,14 @@ class sleftv
     Subexpr e;    /* holds the indices for indexed values */
     package     req_packhdl;
     inline void Init() { memset(this,0,sizeof(*this)); }
-    void Print(leftv store=NULL,int spaces=0);
     void CleanUp(ring r=currRing);
+   
+    /// Called by type_cmd (e.g. "r;") or as default in jPRINT
+    void Print(leftv store=NULL,int spaces=0);
+   
+    /// Called for conversion to string (used by string(..), write(..),..)
     char * String(void *d=NULL, BOOLEAN typed = FALSE, int dim = 1);
+   
     void Copy(leftv e);
     attr CopyA();
     void * CopyD(int t);
