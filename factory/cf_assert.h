@@ -117,10 +117,10 @@ extern "C" {
 #define PVIRT_CHARCC(msg) \
 { fprintf( stderr, "pure method( " msg " ) called\n" ); abort(); return 0; }
 #else /* NOASSERT */
-#define ASSERT(expression, message)
-#define ASSERT1(expression, message, parameter1)
+#define ASSERT(expression, message) ((void) 0)
+#define ASSERT1(expression, message, parameter1) ((void) 0)
 
-#define WARN(expression, message)
+#define WARN(expression, message) ((void) 0)
 
 #define PVIRT_VOID(msg) = 0
 #define PVIRT_INTCF(msg) = 0

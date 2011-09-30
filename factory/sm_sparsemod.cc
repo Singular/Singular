@@ -408,8 +408,8 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   primif = MM(C[1]);
   primig = MM(C[2]);
 
-  if ( level( primif) != level( primig ) )
-    ASSERT( 0, "this should n e v e r happen !!!!" );
+  ASSERT((level(primif) != level(primig)),
+         "this should n e v e r happen !!!!");
 
   //cout << " primif = " << primif << endl;
   //cout << " primig = " << primig << endl;

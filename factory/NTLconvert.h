@@ -88,6 +88,6 @@ CFMatrix* convertNTLmat_zz_p2FacCFMatrix(mat_zz_p &m);
 mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(CFMatrix &m);
 CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(mat_zz_pE &m, Variable alpha);
 
-extern int fac_NTL_char;
+extern long fac_NTL_char;
 #endif
 #endif

@@ -84,7 +84,7 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
   }
   if (j >= 31397)
     fail= true;
-  ASSERT (j < 31397, "integer factorizer ran out of primes") //sic
+  ASSERT (j < 31397, "integer factorizer ran out of primes"); //sic
   return result;
 }
 
