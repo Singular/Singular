@@ -340,7 +340,7 @@ ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bl
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
-void   rWrite(ring r);
+void   rWrite(ring r, BOOLEAN details = FALSE);
 // void   rKill(idhdl h);
 // void   rKill(ring r);
 ring   rCopy(ring r);
