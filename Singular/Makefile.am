@@ -82,7 +82,6 @@ SOURCES =    Minor.cc\
    silink.cc\
    sing_dbm.cc\
    sing_win.cc\
-   slInit_Dynamic.cc\
    slInit_Static.cc\
    ssiLink.cc\
    subexpr.cc\
@@ -92,6 +91,7 @@ SOURCES =    Minor.cc\
    wrapper.cc\
    fereadl.c mmstd.c claptmpl.cc
 
+#   slInit_Dynamic.cc
 
 libSingular_a_SOURCES   = $(SOURCES)
 libSingular_g_a_SOURCES = $(SOURCES)
