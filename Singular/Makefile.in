@@ -147,6 +147,13 @@ LIBSINGULAR_FLAGS = -single_module
 LIBSINGULAR_LD = $(LD)
 endif
 
+ifeq ($(SINGUNAME),x86_64Mac-darwin)
+SO_SUFFIX        = dylib
+MODULE_SUFFIX    = bundle
+LIBSINGULAR_FLAGS = -single_module
+LIBSINGULAR_LD = $(LD)
+endif
+
 ifeq ($(SINGUNAME),ppcMac-darwin)
 MACOSX_DEPLOYMENT_TARGET=10.4
 SO_SUFFIX        = dylib
