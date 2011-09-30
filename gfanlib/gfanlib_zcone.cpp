@@ -1227,13 +1227,12 @@ bool ZCone::hasFace(ZCone const &f)const
   if(!contains(f.getRelativeInteriorPoint()))return false;
   ZCone temp=faceContaining(f.getRelativeInteriorPoint());
   temp.canonicalize();
-//  ZCone temp2=*this;
   ZCone temp2=f;
   temp2.canonicalize();
-//  std::cout << temp << std::endl;
-//  std::cout << temp2 << std::endl;
-
-  return !(temp2!=temp);
+  if(temp.dimension()==temp2.dimension())
+    return !(temp2!=temp);
+  else
+    return false;
 }
 
 ZCone ZCone::faceContaining(ZVector const &v)const
