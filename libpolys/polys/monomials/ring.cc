@@ -608,22 +608,36 @@ char * rCharStr(ring r)
     return s;
   }
 #endif
-  if (rParameter(r)==NULL)
+  if (rField_is_long_R(r))
   {
-    i=r->cf->ch;
-    if(i==-1)
-      s=omStrDup("real");                    /* R */
-    else
-    {
-      s=(char *)omAlloc(MAX_INT_LEN+1);
-      sprintf(s,"%d",i);                   /* Q, Z/p */
-    }
+    i = MAX_INT_LEN*2+7; // 2 integers and real,,
+    s=(char *)omAlloc(i);
+    snprintf(s,i,"real,%d,%d",r->cf->float_len,r->cf->float_len2); /* long_R */
+    return s;
+  }
+  if (rField_is_R(r))
+  {
+    return omStrDup("real"); /* short real */
+  }
+  char **params = rParameter(r);
+  if (params==NULL)
+  {
+    s=(char *)omAlloc(MAX_INT_LEN+1);
+    snprintf(s,MAX_INT_LEN+1,"%d",n_GetChar(r->cf));         /* Q, Z/p */
     return s;
   }
   if (rField_is_long_C(r))
   {
-    s=(char *)omAlloc(21+strlen(rParameter(r)[0]));
-    sprintf(s,"complex,%d,%s",r->float_len,rParameter(r)[0]);   /* C */
+    i=strlen(params[0])+21;
+    s=(char *)omAlloc(i);
+    snprintf(s,i,"complex,%d,%s",r->cf->float_len,params[0]);   /* C */
+    return s;
+  }
+  if (nCoeff_is_GF(r->cf))
+  {
+    i=strlen(params[0])+21;
+    s=(char *)omAlloc(i);
+    snprintf(s,i,"%d,%s",r->cf->m_nfCharQ,params[0]); /* GF(q)  */
     return s;
   }
   int l=0;
@@ -633,13 +647,7 @@ char * rCharStr(ring r)
   }
   s=(char *)omAlloc((long)(l+MAX_INT_LEN+1));
   s[0]='\0';
-  if (r->cf->ch<0)       sprintf(s,"%d",-r->cf->ch); /* Fp(a) */
-  else if (r->cf->ch==1) sprintf(s,"0");         /* Q(a)  */
-  else
-  {
-    sprintf(s,"%d,%s",r->cf->ch,rParameter(r)[0]); /* GF(q)  */
-    return s;
-  }
+  snprintf(s,MAX_INT_LEN+1,"%d",r->cf->ch); /* Fp(a) or Q(a) */
   char tt[2];
   tt[0]=',';
   tt[1]='\0';
@@ -1303,9 +1311,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   //memset: res->ref=0; /* reference counter to the ring */
 
-  res->float_len=r->float_len; /* additional char-flags */
-  res->float_len2=r->float_len2; /* additional char-flags */
-
   res->N=rVar(r);      /* number of vars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
@@ -1449,9 +1454,6 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   res->cf->ref++;
 
   //memset: res->ref=0; /* reference counter to the ring */
-
-  res->float_len=r->float_len; /* additional char-flags */
-  res->float_len2=r->float_len2; /* additional char-flags */
 
   res->N=rVar(r);      /* number of vars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
@@ -1615,8 +1617,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1 == NULL || r2 == NULL) return FALSE;
 
   if ((r1->cf->type != r2->cf->type)
-  || (r1->float_len != r2->float_len)
-  || (r1->float_len2 != r2->float_len2)
   || (rVar(r1) != rVar(r2))
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
@@ -1707,8 +1707,6 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   if (r1 == NULL || r2 == NULL) return FALSE;
 
   if ((r1->cf->type != r2->cf->type)
-  || (r1->float_len != r2->float_len)
-  || (r1->float_len2 != r2->float_len2)
   || (rVar(r1) != rVar(r2))
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
