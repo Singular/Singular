@@ -1782,7 +1782,7 @@ lists rDecompose(const ring r)
       Lc->Init(4);
       // char:
       Lc->m[0].rtyp=INT_CMD;
-      Lc->m[0].data=(void*)r->cf->ch;
+      Lc->m[0].data=(void*)r->cf->m_nfCharQ;
       // var:      
       lists Lv=(lists)omAlloc0Bin(slists_bin);
       Lv->Init(1);
