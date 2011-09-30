@@ -125,9 +125,12 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case RING_CMD:
         case QRING_CMD:
+        {	      
           PrintNSpaces(spaces);
-          rWrite((ring)d);
+	  const ring r = (const ring)d;
+          rWrite(r, currRing == r);
           break;
+	}	 
         case MATRIX_CMD:
           iiWriteMatrix((matrix)d,n,2, currRing, spaces);
           break;

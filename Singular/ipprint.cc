@@ -7,18 +7,22 @@
 */
 
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
+
+#include <misc/intvec.h>
+
+#include <polys/matpol.h>
+
 #include <kernel/febase.h>
 #include <kernel/polys.h>
-#include <polys/matpol.h>
-#include <Singular/subexpr.h>
-#include <misc/intvec.h>
-#include <Singular/ipshell.h>
-#include <Singular/ipprint.h>
 #include <kernel/ideals.h>
-#include <Singular/attrib.h>
+
+#include "tok.h"
+#include "ipid.h"
+#include "subexpr.h"
+#include "ipshell.h"
+#include "ipprint.h"
+#include "attrib.h"
 
 /*2
 * print for: int, string, poly, vector, ideal
@@ -186,6 +190,16 @@ static BOOLEAN ipPrint_MA(leftv u)
 }
 
 /*2
+* print for: ring
+*/
+static BOOLEAN ipPrint_RING(leftv u)
+{
+  ring r=(ring)u->Data();
+  rWrite(r, TRUE);
+  return FALSE;
+}
+
+/*2
 * print for: vector
 */
 static BOOLEAN ipPrint_V(leftv u)
@@ -251,6 +265,11 @@ BOOLEAN jjPRINT(leftv res, leftv u)
 
       case VECTOR_CMD:
         bo=ipPrint_V(u);
+	break;
+
+      case RING_CMD:
+      case QRING_CMD:
+        bo=ipPrint_RING(u);
 	break;
 
       default:
