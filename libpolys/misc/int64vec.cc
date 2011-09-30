@@ -49,7 +49,7 @@ int64vec::int64vec(int r, int c, int64 init)
   }
 }
 
-char * int64vec::iv64String(int not_mat,int mat,int spaces, int dim)
+char * int64vec::iv64String(int not_mat, int /*mat*/, int spaces, int dim)
 {
   StringSetS("");
   if ((col == 1)&&(not_mat))
