@@ -553,6 +553,10 @@ static inline char** rParameter(const ring r)
     assume( R != NULL );
     return R->names;
   }
+  else if (nCoeff_is_GF(C))
+  {
+    return &(C->m_nfParameter);
+  }
   return NULL;
 }
 
