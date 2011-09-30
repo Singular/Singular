@@ -1308,9 +1308,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   //memset: res->ref=0; /* reference counter to the ring */
 
-  res->float_len=r->float_len; /* additional char-flags */
-  res->float_len2=r->float_len2; /* additional char-flags */
-
   res->N=rVar(r);      /* number of vars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
@@ -1454,9 +1451,6 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   res->cf->ref++;
 
   //memset: res->ref=0; /* reference counter to the ring */
-
-  res->float_len=r->float_len; /* additional char-flags */
-  res->float_len2=r->float_len2; /* additional char-flags */
 
   res->N=rVar(r);      /* number of vars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
@@ -1620,8 +1614,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1 == NULL || r2 == NULL) return FALSE;
 
   if ((r1->cf->type != r2->cf->type)
-  || (r1->float_len != r2->float_len)
-  || (r1->float_len2 != r2->float_len2)
   || (rVar(r1) != rVar(r2))
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
@@ -1712,8 +1704,6 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   if (r1 == NULL || r2 == NULL) return FALSE;
 
   if ((r1->cf->type != r2->cf->type)
-  || (r1->float_len != r2->float_len)
-  || (r1->float_len2 != r2->float_len2)
   || (rVar(r1) != rVar(r2))
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
