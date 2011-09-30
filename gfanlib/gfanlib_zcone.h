@@ -337,7 +337,7 @@ public:
     /**
        Tests if f is a face of the cone.
      */
-  //  bool hasFace(ZCone const &f)const; TODO: make implementation of this
+    bool hasFace(ZCone const &f)const;
   /**
    Computes the face of the cone containing v in its relative interior.
    The vector MUST be contained in the cone.

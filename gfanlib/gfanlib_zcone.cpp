@@ -1220,6 +1220,19 @@ ZCone ZCone::link(ZVector const &w)const
   return C;
 }
 
+bool ZCone::hasFace(ZCone const &f)const
+{
+  if(!contains(f.getRelativeInteriorPoint()))return false;
+  ZCone temp=faceContaining(f.getRelativeInteriorPoint());
+  temp.canonicalize();
+  ZCone temp2=f;
+  temp2.canonicalize();
+  if(temp.dimension()==temp2.dimension())
+    return !(temp2!=temp);
+  else
+    return false;
+}
+
 ZCone ZCone::faceContaining(ZVector const &v)const
 {
   assert(n==v.size());

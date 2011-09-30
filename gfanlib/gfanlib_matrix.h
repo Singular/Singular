@@ -103,14 +103,14 @@ public:
       for(int i=0;i<q.height;i++)p[i]=s*(q[i]);
       return p;
     }
-/*  friend Matrix operator*(const Matrix& a, const Matrix& b)
+  friend Matrix operator*(const Matrix& a, const Matrix& b)
     {
       assert(a.width==b.height);
       Matrix ret(b.width,a.height);
       for(int i=0;i<b.width;i++)
         ret[i]=a.vectormultiply(b.column(i));
       return ret.transposed();
-    }*/
+    }
   /*  template<class T>
     Matrix<T>(const Matrix<T>& c):v(c.size()){
     for(int i=0;i<size();i++)v[i]=typ(c[i]);}
