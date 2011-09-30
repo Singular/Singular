@@ -71,7 +71,7 @@ maxpthRoot (const CanonicalForm & F, const int & q, int& l)
 
 static inline
 CFFList
-sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
+sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & /*k*/,
             const Variable & alpha, CanonicalForm & c)
 {
   Variable buf= alpha;

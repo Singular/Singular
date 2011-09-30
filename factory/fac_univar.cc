@@ -243,7 +243,7 @@ static int choosePrimes ( int * p, const CanonicalForm & f )
 
 
 static int
-UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, const CanonicalForm &H, const modpk & pk, const CanonicalForm & Gamma, CanonicalForm & gk, CanonicalForm & hk )
+UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, const CanonicalForm &H, const modpk & pk, const CanonicalForm & /*Gamma*/, CanonicalForm & gk, CanonicalForm & hk )
 {
     CanonicalForm lf, f, gamma;
     CanonicalForm a, b, aa, bb, c, g, h, g1, h1, e, modulus, tmp, q, r;
@@ -318,7 +318,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
 }
 
 static int
-UnivariateLinearLift ( const CanonicalForm &F, const  CanonicalForm & G, const CanonicalForm &H, const modpk & pk, const CanonicalForm & Gamma, CanonicalForm & gk, CanonicalForm & hk )
+UnivariateLinearLift ( const CanonicalForm &F, const  CanonicalForm & G, const CanonicalForm &H, const modpk & pk, const CanonicalForm & /*Gamma*/, CanonicalForm & gk, CanonicalForm & hk )
 {
     CanonicalForm lf, f, gamma;
     CanonicalForm a, b, c, g, h, g1, h1, e, modulus, tmp, q, r;
