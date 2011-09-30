@@ -227,7 +227,7 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
   }
   else if (k == 1)
   {
-    if (!isInExtension (g, gamma, k, delta, source, dest));
+    if (!isInExtension (g, gamma, k, delta, source, dest))
       factors.append (g);
   }
   else if (!k && beta == Variable (1))
