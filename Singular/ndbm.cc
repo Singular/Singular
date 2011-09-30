@@ -189,7 +189,8 @@ int dbm_store(register DBM *db, datum key, datum dat, int replace)
     errno = EPERM;
     return (-1);
   }
-loop:
+   
+_loop:
   dbm_access(db, dcalchash(key));
   if ((i = finddatum(db->dbm_pagbuf, key)) >= 0)
   {
@@ -256,7 +257,7 @@ split:
     return (-1);
   }
   setbit(db);
-  goto loop;
+  goto _loop;
 }
 
 datum dbm_firstkey(DBM *db)

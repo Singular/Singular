@@ -15,6 +15,7 @@
  *
  ***************************************************************/
 #include <kernel/mod2.h>
+
 #include <Singular/silink.h>
 #include <Singular/slInit.h>
 
@@ -63,11 +64,13 @@ BatchDoProc slInitMPBatchDo()
 #endif
 
 #ifdef HAVE_DBM
-#ifndef USE_GDBM
-#include <Singular/dbm_sl.h>
-#else
-#include <Singular/sing_dbm.h>
+
+# ifndef USE_GDBM
+#   include <Singular/dbm_sl.h>
+# else
+#   include <Singular/sing_dbm.h>
 #endif
+
 si_link_extension slInitDBMExtension(si_link_extension s)
 {
   s->Open=dbOpen;
@@ -80,4 +83,4 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   s->type="DBM";
   return s;
 }
-#endif
+#endif /* #ifdef HAVE_DBM */

@@ -102,7 +102,7 @@ BatchDoProc slInitMPBatchDo()
 #endif
 
 #ifdef HAVE_DBM
-#include <Singular/dbm_sl.h>
+#include "dbm_sl.h"
 
 static void* dbm_so_handle = NULL;
 static void* slInitDBMHandle()

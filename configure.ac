@@ -70,6 +70,7 @@ esac
 SING_CHECK_P_PROCS
 SING_CHECK_FACTORY
 SING_CHECK_READLINE
+SING_CHECK_DBM
 
 # CFLAGS
 if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
