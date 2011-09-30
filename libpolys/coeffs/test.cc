@@ -343,18 +343,12 @@ int main( int, char *argv[] )
 
 
 #ifdef HAVE_RINGS
-//  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?); // ????
-
   type = n_Zn;
 
   if( Test(type, (void*) 3) )
     c ++;
 
 #endif
-
-  TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Please fix it!);
-  setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
-
 
   type = n_long_C;
   if( Test(type) )

@@ -374,9 +374,21 @@ void ngcWrite (number &a, const coeffs r)
   }
 }
 
-BOOLEAN ngcInitChar(coeffs n, void* p)
+BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
+{
+  if (n==ID) {
+    LongComplexInfo* p = (LongComplexInfo *)(parameter);
+    if (p->float_len == r->float_len && p->float_len2 == r->float_len2 &&
+                    strcmp(p->par_name, r->complex_parameter))
+      return TRUE;
+  }
+  return FALSE;
+}
+
+BOOLEAN ngcInitChar(coeffs n, void* parameter)
 {
   assume( getCoeffType(n) == ID );
+
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
 
@@ -410,15 +422,14 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
   n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
 #endif
 
-  n->nCoeffIsEqual = ndCoeffIsEqual;
+  n->nCoeffIsEqual = ngcCoeffIsEqual;
 
+  n->cfSetChar=ngcSetChar;
 
 
 /*
   //r->cfInitChar=nlInitChar;
   r->cfKillChar=NULL;
-  r->cfSetChar=NULL;
-  r->nCoeffIsEqual=nlCoeffsEqual;
 
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
@@ -475,17 +486,32 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
 */
-
-/// TODO: Any variables?
-  if( p == NULL )
-    n->complex_parameter = omStrDup((char*)"i");
-  else
-    n->complex_parameter = omStrDup( (char*) p );
+   
+  if( parameter != NULL)
+  {
+    LongComplexInfo* p = (LongComplexInfo*)parameter;
+    n->complex_parameter = omStrDup(p->par_name);
+    n->float_len = p->float_len;
+    n->float_len2 = p->float_len2;
+    
+  } else // default values, just for testing!
+  {
+    n->complex_parameter = omStrDup("i");
+    n->float_len = SHORT_REAL_LENGTH;
+    n->float_len2 = SHORT_REAL_LENGTH;     
+  }
+   
+  assume( n->float_len <= n->float_len2 );
+  assume( n->float_len2 >= SHORT_REAL_LENGTH );
+  assume( n->complex_parameter != NULL );
 
   return FALSE;
 }
 
-
+void ngcSetChar(const coeffs r)
+{
+  setGMPFloatDigits(r->float_len, r->float_len2);
+}
 
 
 

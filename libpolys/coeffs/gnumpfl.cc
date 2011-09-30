@@ -303,10 +303,13 @@ static char * ngfEatFloatNExp(char * s )
 
 /*2
 * extracts the number a from s, returns the rest
+*
+* This is also called to print components of complex coefficients.
+* Handle with care!
 */
 const char * ngfRead (const char * start, number * a, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(r) == ID or getCoeffType(r) == n_long_C);
   
   char *s= (char *)start;
 
@@ -382,10 +385,28 @@ void ngfWrite (number &a, const coeffs r)
   }
 }
 
-BOOLEAN ngfInitChar(coeffs n, void *)
+BOOLEAN ngfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
+{
+  if (n==ID) {
+    LongComplexInfo* p = (LongComplexInfo *)(parameter);
+    if (p->float_len == r->float_len && p->float_len2 == r->float_len2)
+      return TRUE;
+  }
+  return FALSE;
+}
+
+void ngfSetChar(const coeffs r)
+{
+  setGMPFloatDigits(r->float_len, r->float_len2);
+}
+
+BOOLEAN ngfInitChar(coeffs n, void *parameter)
 {
   assume( getCoeffType(n) == ID );
+
   n->cfKillChar = ndKillChar; /* dummy */
+
+  n->cfSetChar = ngfSetChar;
   n->ch = 0;
   
   n->cfDelete  = ngfDelete;
@@ -415,7 +436,24 @@ BOOLEAN ngfInitChar(coeffs n, void *)
   n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
 
-  n->nCoeffIsEqual = ndCoeffIsEqual;
+  n->nCoeffIsEqual = ngfCoeffIsEqual;
+
+  if( parameter != NULL)
+  {
+    LongComplexInfo* p = (LongComplexInfo*)parameter;
+     
+    n->float_len = p->float_len;
+    n->float_len2 = p->float_len2;
+  } else // default values, just for testing!
+  {
+    n->float_len = SHORT_REAL_LENGTH;
+    n->float_len2 = SHORT_REAL_LENGTH;
+  }
+   
+  assume( n->float_len <= n->float_len2 );
+  assume( n->float_len2 >= SHORT_REAL_LENGTH );
+  assume( n->complex_parameter == NULL );
+
   return FALSE;
 }
 

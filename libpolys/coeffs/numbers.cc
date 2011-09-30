@@ -110,11 +110,13 @@ number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == getCoeffType(aRing) );
-  assume( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) );
-  
-  return a;
+  if ( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) )
+    return a;
+	else
+    return n_Copy(a, r);
 }
 void ndKillChar(coeffs) {}
+void ndSetChar(const coeffs) {}
 
 number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
 
@@ -234,6 +236,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfMPZ = ndMPZ;
 
     //n->cfKillChar = ndKillChar; /* dummy */
+    n->cfSetChar = ndSetChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
 
     n->cfChineseRemainder = ndChineseRemainder;
@@ -275,7 +278,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #ifndef NDEBUG
     assume(n->nCoeffIsEqual!=NULL);
     if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
-    if(n->cfSetChar!=NULL) Warn("cfSetChar is NOT NULL for coeff %d",t);
+		assume(n->cfSetChar!=NULL);
     assume(n->cfMult!=NULL);
     assume(n->cfSub!=NULL);
     assume(n->cfAdd!=NULL);

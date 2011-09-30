@@ -1,4 +1,5 @@
-lib_LIBRARIES=libresources.a libresources_g.a
+libresources_LIBRARIES=libresources.a libresources_g.a
+libresourcesdir = $(libdir)/singular
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
@@ -18,12 +19,9 @@ SOURCES = feFopen.cc feResource.cc
 libresources_a_SOURCES   = $(SOURCES)
 libresources_g_a_SOURCES = $(SOURCES)
 
-libresources_a_includedir  =$(includedir)/libpolys/resources
-libresources_g_a_includedir=$(includedir)/libpolys/resources
+libresources_includedir  =$(includedir)/singular/resources
 
-RESOURCESHEADERS  = feFopen.h feResource.h
-libresources_a_include_HEADERS   = $(RESOURCESHEADERS)
-libresources_g_a_include_HEADERS = $(RESOURCESHEADERS)
+libresources_include_HEADERS   = feFopen.h feResource.h
 
 
 

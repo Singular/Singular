@@ -9,8 +9,11 @@
 */
 #include <kernel/structs.h>
 
+class sleftv; typedef sleftv * leftv;
+
 BOOLEAN jjPRINT(leftv res, leftv u);
 BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v);
 BOOLEAN jjDBPRINT(leftv res, leftv u);
+
 #endif
 

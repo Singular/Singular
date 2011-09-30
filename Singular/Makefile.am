@@ -1,4 +1,3 @@
-# ACLOCAL_AMFLAGS = -I m4
 # PIPE = -pipe
 # ???
 #LD_DYN_FLAGS	= -ldl -rdynamic
@@ -18,7 +17,8 @@ INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_bui
 
 ########################### libSingular* #########################
 
-lib_LIBRARIES = libSingular.a libSingular_g.a
+libSingular_LIBRARIES = libSingular.a libSingular_g.a
+libSingulardir = $(libdir)/singular
 
 libSingular_a_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
 libSingular_g_a_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
@@ -96,9 +96,6 @@ SOURCES =    Minor.cc\
 libSingular_a_SOURCES   = $(SOURCES)
 libSingular_g_a_SOURCES = $(SOURCES)
 
-libSingular_a_includedir  =${includedir}/Singular/
-libSingular_g_a_includedir=${includedir}/Singular/
-
 SingularHEADERS =    Cache.h \
    CacheImplementation.h \
    Minor.h \
@@ -112,11 +109,12 @@ SingularHEADERS =    Cache.h \
    dbm_sl.h \
    distrib.h \
    eigenval_ip.h \
-   feOpt.h \
+   feOpt.h feOptTab.h fehelp.h \
    fglm.h \
    gms.h \
    grammar.h \
    interpolation.h \
+   idrec.h \
    ipconv.h \
    ipid.h \
    ipprint.h \
@@ -124,6 +122,7 @@ SingularHEADERS =    Cache.h \
    janet.h \
    libparse.h \
    libsingular.h \
+   linearAlgebra_ip.h\
    lists.h \
    locals.h \
    maps_ip.h \
@@ -155,13 +154,13 @@ SingularHEADERS =    Cache.h \
    table.h \
    tok.h \
    utils.h \
+   version.h \
    walk.h \
    feOpt.h feOpt.inc \
    mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
 
-
-libSingular_a_include_HEADERS   = $(SingularHEADERS)
-libSingular_g_a_include_HEADERS = $(SingularHEADERS)
+libSingular_includedir = ${includedir}/singular/Singular/
+nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/factory
@@ -178,7 +177,7 @@ endif
 
 AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/resources -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc
 
-EXTRA_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
+noinst_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
 
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
 # gentable2_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
@@ -192,8 +191,6 @@ gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
 gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable1_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 gentable1_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-
-# plural_cmd.inc: iparith.inc			       
 
 feOpt_SOURCES = feOptGen.cc feOptGen.h
 feOpt_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
@@ -226,6 +223,22 @@ Singularg_LDADD = libSingular_g.a -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -l
 Singular_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 # Singularg_CPPFLAGS =
 
+
+#########################################################
+# the Singular library (*.lib files)
+
+include ${srcdir}/singular-libs
+
+singularlibrarydir = ${datadir}/singular
+singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
+nobase_dist_singularlibrary_DATA = LIB/all.lib ${singularlibrary}
+EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs
+
+# ${nobase_dist_singularlibrary_DATA}
+LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
+	$(MKDIR_P) LIB
+	${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
+
 ########################### TEST #########################
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/libpolys/tests'
@@ -251,10 +264,10 @@ testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 
 #########################################################
 
-BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc  # files are built first
-# plural_cmd.inc
+# These files are built first
+BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc plural_cmd.inc feOptTS.inc feOptES.inc LIB/all.lib
 
-CLEANFILES = $(TESTS) $(EXTRA_PROGRAMS) $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES)
 
 feOpt.inc: feOpt
 	./feOpt
@@ -265,8 +278,11 @@ feOptES.inc: feOptES
 feOptTS.inc: feOptTS
 	./feOptTS
 
-iparith.inc: gentable1
+plural_cmd.inc iparith.inc: gentable1
 	./gentable1
+
+# fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
+plural_cmd.inc: iparith.inc
 
 mpsr_Tok.inc: gentable2
 	./gentable2

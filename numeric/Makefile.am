@@ -1,4 +1,5 @@
-lib_LIBRARIES=libnumeric.a libnumeric_g.a
+libnumeric_LIBRARIES = libnumeric.a libnumeric_g.a
+libnumericdir = $(libdir)/singular
 
 CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
 
@@ -18,13 +19,9 @@ SOURCES  = mpr_base.cc mpr_inout.cc mpr_numeric.cc
 libnumeric_a_SOURCES   = $(SOURCES)
 libnumeric_g_a_SOURCES = $(SOURCES)
 
-libnumeric_a_includedir  =$(includedir)/numeric/
-libnumeric_g_a_includedir=$(includedir)/numeric/
+libnumeric_includedir  =$(includedir)/singular/numeric/
 
-NUMERICHEADERS = mpr_base.h mpr_inout.h mpr_numeric.h
-
-libnumeric_a_include_HEADERS   = $(NUMERICHEADERS)
-libnumeric_g_a_include_HEADERS = $(NUMERICHEADERS)
+libnumeric_include_HEADERS = mpr_base.h mpr_inout.h mpr_numeric.h
 
 
 

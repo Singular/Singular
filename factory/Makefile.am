@@ -4,11 +4,8 @@ INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir
 
 lib_LIBRARIES = libfactory.a libfactory_g.a
 
-libfactory_a_includedir=$(includedir)/factory
-libfactory_g_a_includedir=$(includedir)/factory
-
-libfactory_a_libdir=$(libdir)/factory
-libfactory_g_a_libdir=$(libdir)/factory
+libfactory_a_libdir = $(libdir)
+libfactory_g_a_libdir = $(libdir)
 
 libfactory_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
 libfactory_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
@@ -92,13 +89,11 @@ SOURCES = \
 		lgs.cc \
 		singext.cc \
 		parseutil.cc \
-		ftmpl_inst.cc \
-		factory.h factoryconf.h
+		ftmpl_inst.cc
 
 if WITH_PARSER_FOR_CANONICAL_FORM
     SOURCES +=  readcf.yy
 endif
-
 
 libfactory_a_SOURCES = $(SOURCES)
 libfactory_g_a_SOURCES = $(SOURCES)
@@ -108,6 +103,7 @@ factory_headers = \
 		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
+		cf_cyclo.h \
 		cf_binom.h \
 		cf_defs.h \
 		cf_eval.h \
@@ -120,6 +116,7 @@ factory_headers = \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
+		cf_map_ext.h \
 		cfNewtonPolygon.h \
 		cfModResultant.h \
 		cf_primes.h \
@@ -152,8 +149,6 @@ factory_headers = \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \
-		templates/ftmpl_list.h \
-		templates/ftmpl_matrix.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
@@ -172,9 +167,15 @@ factory_headers = \
 		bifacConfig.h \
 		lgs.h \
 		algext.h \
-		singext.h
+		singext.h \
+		parseutil.h
 
 noinst_HEADERS = $(factory_headers)
+
+libfactory_includedir=$(includedir)/factory
+nobase_libfactory_include_HEADERS = \
+		cplusplus.h factory.h factoryconf.h \
+		cf_gmp.h $(templateincl)
 
 # Documentation
 include $(top_srcdir)/aminclude.am
@@ -189,34 +190,10 @@ doxy:		factory.cfg $(doxysrc) $(doxyincl)
 doxyclean:
 		rm -rf doxygen
 
-# Support for building GF(q)-tables
-
-templatesrc =	\
-		ftmpl_array.cc \
-		ftmpl_factor.cc \
-		ftmpl_functions.h \
-		ftmpl_list.cc \
-		ftmpl_matrix.cc
-templateincl =	\
-		ftmpl_array.h \
-		ftmpl_factor.h \
-		ftmpl_list.h \
-		ftmpl_matrix.h
-
-# TODO:
-# gengftables needs libfactory.a and factory.h AND is needed for generating gftable...
-# somehow the current deps. seem to be broken... 
-# moreover factory.h needs a lot more generated headers, which wouldn't be installed yet
-
-EXTRA_PROGRAMS = gengftables cplusplus
-
-
-gengftables_SOURCES = gengftables-conway.cc
-
-gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
+# the precomputed GF(q)-tables
 
 gftablesdir=$(datadir)/gftables
-gftables_DATA = gftables/10201 gftables/1024 gftables/10609 gftables/11449 \
+dist_gftables_DATA = gftables/10201 gftables/1024 gftables/10609 gftables/11449 \
 gftables/11881 gftables/121 gftables/12167 gftables/125 gftables/12769 \
 gftables/128 gftables/1331 gftables/1369 gftables/14641 \
 gftables/15625 gftables/16 gftables/16129 gftables/16384 \
@@ -239,97 +216,99 @@ gftables/7921 gftables/8 gftables/81 gftables/8192 gftables/841 \
 gftables/9 gftables/9409 gftables/961 
 
 
-gftables: gengftables
-		@if test -x ${srcdir}/gftables; then \
-			if test ! -x ${builddir}/gftables; then \
-			  ln -snf ${srcdir}/gftables ${builddir}; \
-			fi; \
-		else \
-			echo "This command will take quite a long time to execute;"; \
-			echo "maybe you want to get the tables directly via ftp (see"; \
-			echo "the INSTALL file)."; \
-			${builddir}/gengftables; \
-		fi
+# Support for building GF(q)-tables
+#
+# gengftables needs libfactory.a and factory.h AND is needed for
+# generating gftable but the tables are not necessarily needed to
+# compile and use libfactory (though it will be a lot slower).
 
-.template.h:
-	${srcdir}/bin/makeheader $< $@
+EXTRA_PROGRAMS = gengftables 
+gengftables_SOURCES = gengftables-conway.cc
+gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
-BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc
-
-
-libfactory_a_include_HEADERS=$(BUILT_SOURCES)
-libfactory_g_a_include_HEADERS=$(BUILT_SOURCES)
 
 # These files listed below are not used anywhere but are included in
 # the distribution. So they will be tacked on to EXTRA_DIST.
 
+templatesrc =	templates/ftmpl_array.cc \
+		templates/ftmpl_factor.cc \
+		templates/ftmpl_functions.h \
+		templates/ftmpl_list.cc \
+		templates/ftmpl_matrix.cc
+
+templateincl =	templates/ftmpl_array.h \
+		templates/ftmpl_factor.h \
+		templates/ftmpl_list.h \
+		templates/ftmpl_matrix.h
+
 # header templates
-hdrtemplsrc = \
-		factoryconf.template \
+hdrtemplsrc = 	factoryconf.template \
 		factory.template
 
 # FTE source files
-ftestsrc =	\
-		ftest_io.cc \
-		ftest_util.cc \
-		ntl_util.cc
+ftestsrc =	ftest/ftest_io.cc \
+		ftest/ftest_util.cc \
+		ftest/ntl_util.cc
 
 # FTE header files
-ftestincl =	\
-		ftest_io.h \
-		ftest_util.h \
-		ntl_util.h
+ftestincl =	ftest/ftest_io.h \
+		ftest/ftest_util.h \
+		ftest/ntl_util.h
 
-# FTE m4 source files (exported for `GNUmakefile' in `ftest/').
-# The variable `$(ftestm4develsrc)' may be already initialized
-# from the development `GNUmakefile'.
-ftestm4src =	$(ftestm4develsrc) \
-		commonden.m4 \
-		degree.m4 \
-		deriv.m4 \
-		divides.m4 \
-		divrem.m4 \
-		extgcd.m4 \
-		factorize.m4 \
-		fbinops.m4 \
-		feval.m4 \
-		gcd.m4 \
-		gcd.ntl.m4 \
-		insert.m4 \
-		norm.m4 \
-		resultant.m4 \
-		revert.m4 \
-		sqrfree.m4 \
-		size.m4 \
-		totaldegree.m4
+ftestm4src =	ftest/commonden.m4 \
+		ftest/degree.m4 \
+		ftest/deriv.m4 \
+		ftest/divides.m4 \
+		ftest/divrem.m4 \
+		ftest/extgcd.m4 \
+		ftest/factorize.m4 \
+		ftest/fbinops.m4 \
+		ftest/feval.m4 \
+		ftest/gcd.m4 \
+		ftest/gcd.ntl.m4 \
+		ftest/insert.m4 \
+		ftest/norm.m4 \
+		ftest/resultant.m4 \
+		ftest/revert.m4 \
+		ftest/sqrfree.m4 \
+		ftest/size.m4 \
+		ftest/totaldegree.m4
 
-# other files from the FTE
 ftestdistfiles = \
-		ftest_util.m4
+		ftest/ftest_util.m4
 
-# gengftables.cc gengftables-conway.cc 
 EXTRA_DIST =	test_install.cc \
-		$(templatesrc) $(templateincl) $(hdrtemplsrc) \
+		$(templatesrc) $(hdrtemplsrc) \
 		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
-		doxygen.cfg factory.cfg gen_cf_gmp.template \
+		doxygen.cfg factory.cfg \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
-		bin/makeheader bin/gen-readcf $(gftables_DATA)
+		bin/makeheader bin/gen-readcf 
 
-CLEANFILES = factory.h factoryconf.h cplusplus.h readcf.cc
+##################################################
+# autogenerated sources
 
+noinst_PROGRAMS = cplusplus
 
+BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc 
+
+CLEANFILES = $(BUILT_SOURCES)
 
 cplusplus_SOURCES = cplusplus.cc
 
 cplusplus.h: cplusplus
 	${builddir}/cplusplus > ${builddir}/cplusplus.h
 
-#ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
-#		$(addprefix templates/,$(templatesrc)) \
-#		$(addprefix templates/,$(templateincl))
-#		$(CXX) -c $< $(libfactory_a_CXXFLAGS)  $(INCLUDES) -o $@
+.template.h:
+	${srcdir}/bin/makeheader $< $@
+
+# factory/gfops.cc has the gftables path hardcoded in, so we create a
+# symlink. Remove this rule once gfopts.cc has been fixed. Note that
+# check-local would run in parallel with check, so we can't use it
+# here!
+all-local:
+	[ -d ${builddir}/gftables ] || ln -s ${srcdir}/gftables ${builddir}
 
 ####################################################
 ## Test program
@@ -339,14 +318,11 @@ check_PROGRAMS = $(TESTS)
 
 TESTSSOURCES = test.cc 
 
-test_g: libfactory_g.a
-
 test_g_SOURCES = $(TESTSSOURCES)
 test_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti #ftmpl_inst.o
 test_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
 
-test_r: libfactory.a
-
 test_r_SOURCES = $(TESTSSOURCES)
 test_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti #ftmpl_inst.o
 test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
+

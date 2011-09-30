@@ -1854,7 +1854,7 @@ poly      p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r);
    this assumes that we are over a ground field so that division
    is well-defined;
    modifies p */
-void      p_Monic(poly &p, ring r);
+void      p_Monic(poly p, const ring r);
 
 /* assumes that p and q are univariate polynomials in r,
    mentioning the same variable;
@@ -1889,7 +1889,6 @@ poly      p_TakeOutComp(poly * p, int k, const ring r);
 void      p_DeleteComp(poly * p,int k, const ring r);
 
 /*-------------ring management:----------------------*/
-void p_SetGlobals(const ring r, BOOLEAN complete = TRUE);
 
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
@@ -1910,9 +1909,10 @@ poly p_Jet(poly p, int m,const ring R);
 poly pp_JetW(poly p, int m, short *w, const ring R);
 poly p_JetW(poly p, int m, short *w, const ring R);
 
+poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst);
 
-poly      p_PermPoly (poly p, int * perm,const ring OldRing, const ring dst,
-                     nMapFunc nMap, int *par_perm=NULL, int OldPar=0);
+poly p_PermPoly (poly p, const int * perm,const ring OldRing, const ring dst,
+                     nMapFunc nMap, const int *par_perm=NULL, int OldPar=0);
 
 /*----------------------------------------------------*/
 poly p_Series(int n,poly p,poly u, intvec *w, const ring R);

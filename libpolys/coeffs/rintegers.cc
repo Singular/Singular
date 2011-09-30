@@ -385,7 +385,6 @@ void    nrzCoeffWrite  (const coeffs)
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == ID );
-  r->cfSetChar= NULL;
   r->nCoeffIsEqual = ndCoeffIsEqual;
   r->cfKillChar = ndKillChar;
   r->cfMult  = nrzMult;

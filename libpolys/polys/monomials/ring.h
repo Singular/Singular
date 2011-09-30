@@ -14,9 +14,6 @@
 //#include <polys/monomials/polys-impl.h>
 //
 
-/* constants */
-#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
-
 /* forward declaration of types */
 class idrec;
 typedef idrec *   idhdl;
@@ -343,7 +340,7 @@ ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bl
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
-void   rWrite(ring r);
+void   rWrite(ring r, BOOLEAN details = FALSE);
 // void   rKill(idhdl h);
 // void   rKill(ring r);
 ring   rCopy(ring r);
@@ -484,10 +481,11 @@ static inline BOOLEAN rField_is_long_C(const ring r)
 static inline BOOLEAN rField_has_simple_inverse(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_inverse(r->cf); }
 
+/// Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies
 static inline BOOLEAN rField_has_simple_Alloc(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_Alloc(r->cf); }
 
-/* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
+/// Alg. or trans. ext. 
 static inline BOOLEAN rField_is_Extension(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Extension(r->cf); } /* Z/p(a) and Q(a)*/
 
@@ -549,11 +547,15 @@ static inline char** rParameter(const ring r)
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) )
+  if( rField_is_Extension(r) ) // only alg / trans. exts...
   {
     const ring R = C->extRing;
     assume( R != NULL );
     return R->names;
+  }
+  else if (nCoeff_is_GF(C))
+  {
+    return &(C->m_nfParameter);
   }
   return NULL;
 }
@@ -579,8 +581,8 @@ static inline int rInternalChar(const ring r)
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)
 {
-  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
-  return rField_is_Extension(r);
+//  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
+  return rField_is_Extension(r) || nCoeff_is_GF(r->cf) ;
 }
 
 /// Tests whether '(r->cf->minpoly) == NULL'

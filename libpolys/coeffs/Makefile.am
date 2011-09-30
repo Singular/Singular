@@ -1,4 +1,6 @@
-lib_LIBRARIES = libcoeffs.a libcoeffs_g.a
+libcoeffs_LIBRARIES = libcoeffs.a libcoeffs_g.a
+libcoeffsdir = $(libdir)/singular
+
 CXXTEMPLFLAGS =  --no-exceptions 
 ## -fno-implicit-templates
 
@@ -9,8 +11,8 @@ libcoeffs_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFL
 libcoeffs_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libcoeffs_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-libcoeffs_g_a_CPPFLAGS = -DHAVE_CONFIG_H
+libcoeffs_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
+libcoeffs_g_a_CPPFLAGS =
 
 
 noinst_HEADERS= \
@@ -28,15 +30,8 @@ SOURCES = \
 libcoeffs_a_SOURCES   = $(SOURCES)
 libcoeffs_g_a_SOURCES = $(SOURCES)
 
-## include_HEADERS = coeffs.h numbers.h
-
-libcoeffs_a_includedir  =$(includedir)/libpolys/coeffs
-libcoeffs_g_a_includedir=$(includedir)/libpolys/coeffs
-
-COEFFSHEADERS  = coeffs.h numbers.h si_gmp.h
-libcoeffs_a_include_HEADERS   = $(COEFFSHEADERS)
-libcoeffs_g_a_include_HEADERS = $(COEFFSHEADERS)
-
+libcoeffs_includedir  =$(includedir)/singular/coeffs
+libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory
@@ -62,10 +57,6 @@ testr_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc $
 testg_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
 
 
-# testr: libcoeffs.a
-# testg: libcoeffs_g.a
-# gftables 
-
 testr_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 testg_CFLAGS = ${PIPE}
 
@@ -78,5 +69,4 @@ testg_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLA
 testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 testg_CPPFLAGS =
 
-#gftables: ${top_srcdir}/../factory/gftables
-#	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
+

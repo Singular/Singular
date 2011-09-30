@@ -20,6 +20,12 @@
 #include <misc/intvec.h>
 
 #include <coeffs/longrat.h> // ???
+#include <coeffs/ffields.h>
+
+#define TRANSEXT_PRIVATES
+
+#include "ext_fields/transext.h"
+#include "ext_fields/algext.h"
 
 #include "weight.h"
 #include "simpleideals.h"
@@ -1238,7 +1244,8 @@ const char * p_Read(const char *st, poly &rc, const ring r)
     else
     {
       // 1st char of is not a varname
-      p_LmDelete(&rc,r);
+      // We return the parsed polynomial nevertheless. This is needed when
+      // we are parsing coefficients in a rational function field.
       s--;
       return s;
     }
@@ -1474,19 +1481,21 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
    this assumes that we are over a ground field so that division
    is well-defined;
    modifies p */
-void p_Monic(poly &p, ring r)
+void p_Monic(poly p, const ring r)
 {
   if (p == NULL) return;
+  number n = n_Init(1, r->cf);
+  if (p->next==NULL) { p_SetCoeff(p,n,r); return; }
   poly pp = p;
   number lc = p_GetCoeff(p, r);
   if (n_IsOne(lc, r->cf)) return;
   number lcInverse = n_Invers(lc, r->cf);
-  number n = n_Init(1, r->cf);
   p_SetCoeff(p, n, r);   // destroys old leading coefficient!
-  p = pIter(p);
+  pIter(p);
   while (p != NULL)
   {
     number n = n_Mult(p_GetCoeff(p, r), lcInverse, r->cf);
+    n_Normalize(n,r->cf);
     p_SetCoeff(p, n, r);   // destroys old leading coefficient!
     p = pIter(p);
   }
@@ -2064,8 +2073,8 @@ void p_Content(poly ph, const ring r)
             hzz=d;
             pIter(c_n);
           }
+          pIter(p);
         }
-        pIter(p);
         /* hzz contains the 1/lcm of all denominators in c_n_n*/
         h=n_Invers(hzz,r->cf->extRing->cf);
         n_Delete(&hzz,r->cf->extRing->cf);
@@ -2091,6 +2100,7 @@ void p_Content(poly ph, const ring r)
       }
     }
   }
+  if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
 }
 
 // Not yet?
@@ -2957,21 +2967,6 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
   }
 }
 
-/* -------------------------------------------------------- */
-/*2
-* change all global variables to fit the description of the new ring
-*/
-
-void p_SetGlobals(const ring r, BOOLEAN complete)
-{
-// // //  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r); // ???
-
-  if (complete)
-  {
-    test &= ~ TEST_RINGDEP_OPTS;
-    test |= r->options;
-  }
-}
 //
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
@@ -3305,95 +3300,228 @@ poly p_Subst(poly p, int n, poly e, const ring r)
   omFreeSize((ADDRESS)ee,(rVar(r)+1)*sizeof(int));
   return res;
 }
+
+/*2
+ * returns a re-ordered convertion of a number as a polynomial, 
+ * with permutation of parameters
+ * NOTE: this only works for Frank's alg. & trans. fields
+ */
+poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst)
+{
+#if 0
+  PrintS("\nSource Ring: \n");
+  rWrite(src);
+
+  if(0)
+  {
+    number zz = n_Copy(z, src->cf);
+    PrintS("z: "); n_Write(zz, src->cf);
+    n_Delete(&zz, src->cf);
+  }
+   
+  PrintS("\nDestination Ring: \n");
+  rWrite(dst);
+   
+  Print("\nOldPar: %d\n", OldPar);
+  for( int i = 1; i <= OldPar; i++ )
+  {
+    Print("par(%d) -> par/var (%d)\n", i, par_perm[i-1]);
+  }
+#endif
+  if( z == NULL )
+     return NULL;
+   
+  const coeffs srcCf = src->cf;
+  assume( srcCf != NULL );
+
+  assume( !nCoeff_is_GF(srcCf) );
+  assume( rField_is_Extension(src) );
+   
+  poly zz = NULL;
+   
+  const ring srcExtRing = srcCf->extRing;
+  assume( srcExtRing != NULL );
+   
+  const coeffs dstCf = dst->cf;
+  assume( dstCf != NULL );
+
+  if( nCoeff_is_algExt(srcCf) ) // nCoeff_is_GF(srcCf)?
+  {
+    zz = (poly) z;
+
+    if( zz == NULL )
+       return NULL;
+     
+  } else if (nCoeff_is_transExt(srcCf)) 
+  {   
+    assume( !IS0(z) );
+     
+    zz = NUM(z);
+    p_Test (zz, srcExtRing);
+     
+    if( zz == NULL )
+       return NULL;
+     
+    if( !DENIS1(z) )
+      WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
+  } else
+     {
+	assume (FALSE);
+	Werror("Number permutation is not implemented for this data yet!");
+	return NULL;
+     }
+   
+  assume( zz != NULL );
+  p_Test (zz, srcExtRing);
+
+  
+  nMapFunc nMap = n_SetMap(srcExtRing->cf, dstCf);
+     
+  assume( nMap != NULL );
+     
+  poly qq = p_PermPoly(zz, par_perm - 1, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
+//       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
+   
+//  assume( FALSE );  WarnS("longalg missing 2");
+     
+  return qq;
+}
+
+
 /*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
 */
-poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
-       nMapFunc nMap, int *par_perm, int OldPar)
+poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
+       nMapFunc nMap, const int *par_perm, int OldPar)
 {
-  int OldpVariables = oldRing->N;
+#if 0
+    p_Test(p, oldRing);
+    PrintS("\np_PermPoly::p: "); p_Write(p, oldRing, oldRing); PrintLn();
+#endif
+  
+  const int OldpVariables = rVar(oldRing);
   poly result = NULL;
   poly result_last = NULL;
-  poly aq=NULL; /* the map coefficient */
+  poly aq = NULL; /* the map coefficient */
   poly qq; /* the mapped monomial */
 
   while (p != NULL)
   {
-    if ((OldPar==0)||(rField_is_GF(oldRing)))
+    // map the coefficient
+    if ( ((OldPar == 0) || (par_perm == NULL) || rField_is_GF(oldRing)) && (nMap != NULL) )
     {
       qq = p_Init(dst);
-      number n=nMap(pGetCoeff(p),oldRing->cf,dst->cf);
-      if ((!rMinpolyIsNULL(dst))
-      && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
-      {
-        n_Normalize(n,dst->cf);
-      }
-      pGetCoeff(qq)=n;
-    // coef may be zero:  pTest(qq);
+      assume( nMap != NULL );
+      number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
+       
+      if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
+        n_Normalize(n, dst->cf);
+       
+      p_GetCoeff(qq, dst) = n;
+      // coef may be zero:  
+      p_Test(qq, dst);
     }
     else
     {
-      qq=p_One(dst);
-      WerrorS("longalg missing 2");
-#if 0
-      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
-      if ((!rMinpolyIsNULL(dst))
-      && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
+      qq = p_One(dst);       
+
+//      aq = naPermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing); // no dst???
+//      poly    n_PermNumber(const number z, const int *par_perm, const int P, const ring src, const ring dst)
+      aq = n_PermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing, dst);
+
+      p_Test(aq, dst);
+       
+      if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
       {
         p_Normalize(aq,dst);
-        if (aq==NULL)
-          p_SetCoeff(qq,n_Init(0,dst->cf),dst);
+	 
       }
-      p_Test(aq,dst);
-#endif
+      if (aq == NULL)
+	p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
+	 
+      p_Test(aq, dst);
     }
-    if (rRing_has_Comp(dst)) p_SetComp(qq, p_GetComp(p,oldRing),dst);
-    if (n_IsZero(pGetCoeff(qq),dst->cf))
+     
+    if (rRing_has_Comp(dst)) 
+       p_SetComp(qq, p_GetComp(p, oldRing), dst);
+
+    if ( n_IsZero(pGetCoeff(qq), dst->cf) )
     {
       p_LmDelete(&qq,dst);
-    }
+      qq = NULL;
+    }     
     else
     {
-      int i;
-      int mapped_to_par=0;
-      for(i=1; i<=OldpVariables; i++)
+      // map pars:
+      int mapped_to_par = 0;
+      for(int i = 1; i <= OldpVariables; i++)
       {
-        int e=p_GetExp(p,i,oldRing);
-        if (e!=0)
+        int e = p_GetExp(p, i, oldRing);
+        if (e != 0)
         {
           if (perm==NULL)
-          {
-            p_SetExp(qq,i, e, dst);
-          }
+            p_SetExp(qq, i, e, dst);
           else if (perm[i]>0)
             p_AddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/, dst);
           else if (perm[i]<0)
           {
+            number c = p_GetCoeff(qq, dst);
             if (rField_is_GF(dst))
             {
-              number c=pGetCoeff(qq);
-              number ee=(number)rGetVar(1, dst->cf->extRing);
-              number eee;n_Power(ee,e,&eee,dst->cf); //nfDelete(ee,dst);
-              ee=n_Mult(c,eee,dst->cf);
+ 	      assume( dst->cf->extRing == NULL );
+              number ee = nfPar(1, dst->cf); // NOTE: using nfPar is a BAD thing to do...
+
+	      number eee;
+	      n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);
+	       
+              ee = n_Mult(c, eee, dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
             }
-            else
+            else if (nCoeff_is_Extension(dst->cf))
             {
-              WerrorS("longalg missing 3");
-#if 0
-              lnumber c=(lnumber)pGetCoeff(qq);
-              if (c->z->next==NULL)
-                p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
+	      const int par = -perm[i];
+	      assume( par > 0 );
+
+//              WarnS("longalg missing 3");
+#if 1
+	      const coeffs C = dst->cf;
+	      assume( C != NULL );
+	      
+	      const ring R = C->extRing;
+	      assume( R != NULL );
+	       
+	      assume( par <= rVar(R) );
+	       
+	      poly pcn; // = (number)c
+	      
+	      assume( !n_IsZero(c, C) );
+	       
+	      if( nCoeff_is_algExt(C) )
+		 pcn = (poly) c;
+	       else //            nCoeff_is_transExt(C)
+		 pcn = NUM(c);
+	      
+              if (pNext(pcn) == NULL) // c->z
+                p_AddExp(pcn, -perm[i], e, R);
               else /* more difficult: we have really to multiply: */
               {
-                lnumber mmc=(lnumber)naInit(1,dst);
-                p_SetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
-                p_Setm(mmc->z,dst->extRing->cf);
-                pGetCoeff(qq)=n_Mult((number)c,(number)mmc,dst->cf);
-                n_Delete((number *)&c,dst->cf);
-                n_Delete((number *)&mmc,dst->cf);
+                poly mmc = p_ISet(1, R);
+                p_SetExp(mmc, -perm[i], e, R);
+                p_Setm(mmc, R);
+		 
+		number nnc;
+		// convert back to a number: number nnc = mmc; 
+		if( nCoeff_is_algExt(C) ) 
+		   nnc = (number) mmc;
+	        else //            nCoeff_is_transExt(C)
+	          nnc = ntInit(mmc, C);
+		
+                p_GetCoeff(qq, dst) = n_Mult((number)c, nnc, C);
+                n_Delete((number *)&c, C);
+                n_Delete((number *)&nnc, C);
               }
+	       
               mapped_to_par=1;
 #endif
             }
@@ -3401,29 +3529,46 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
           else
           {
             /* this variable maps to 0 !*/
-            p_LmDelete(&qq,dst);
+            p_LmDelete(&qq, dst);
             break;
           }
         }
       }
-      if (mapped_to_par
-      && (!rMinpolyIsNULL(dst)))
+      if ( mapped_to_par && (!rMinpolyIsNULL(dst)) )
       {
-        number n=pGetCoeff(qq);
+        number n = p_GetCoeff(qq, dst);
         n_Normalize(n,dst->cf);
-        pGetCoeff(qq)=n;
+        p_GetCoeff(qq, dst) = n;
       }
     }
     pIter(p);
+     
+#if 0
+    p_Test(aq,dst);
+    PrintS("\naq: "); p_Write(aq, dst, dst); PrintLn();
+#endif
+     
+
 #if 1
     if (qq!=NULL)
     {
       p_Setm(qq,dst);
+       
       p_Test(aq,dst);
       p_Test(qq,dst);
-      if (aq!=NULL) qq=p_Mult_q(aq,qq,dst);
+       
+#if 0
+    p_Test(qq,dst);
+    PrintS("\nqq: "); p_Write(qq, dst, dst); PrintLn();
+#endif
+       
+      if (aq!=NULL) 
+	 qq=p_Mult_q(aq,qq,dst);
+       
       aq = qq;
+       
       while (pNext(aq) != NULL) pIter(aq);
+       
       if (result_last==NULL)
       {
         result=qq;
@@ -3440,6 +3585,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
       p_Delete(&aq,dst);
     }
   }
+   
   result=p_SortAdd(result,dst);
 #else
   //  if (qq!=NULL)
@@ -3470,6 +3616,11 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
   //}
 #endif
   p_Test(result,dst);
+   
+#if 0
+  p_Test(result,dst);
+  PrintS("\nresult: "); p_Write(result,dst,dst); PrintLn();
+#endif
   return result;
 }
 /**************************************************************

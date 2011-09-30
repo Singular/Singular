@@ -1768,20 +1768,26 @@ lists rDecompose(const ring r)
 #endif
   else if (rIsExtension(r))
   {
-    if (nCoeff_is_algExt(r->cf))
-      rDecomposeCF(&(L->m[0]),r->cf->extRing,r);
-    else
+    if ( rField_is_Extension(r) )// nCoeff_is_algExt(r->cf))
     {
+      assume( r->cf != NULL );	  
+      assume( r->cf->extRing != NULL );
+      
+      rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
+    }else
+    {
+      assume( nCoeff_is_GF(r->cf) );
+       
       lists Lc=(lists)omAlloc0Bin(slists_bin);
       Lc->Init(4);
       // char:
       Lc->m[0].rtyp=INT_CMD;
-      Lc->m[0].data=(void*)r->cf->ch;
-      // var:
+      Lc->m[0].data=(void*)r->cf->m_nfCharQ;
+      // var:      
       lists Lv=(lists)omAlloc0Bin(slists_bin);
       Lv->Init(1);
       Lv->m[0].rtyp=STRING_CMD;
-      Lv->m[0].data=(void *)omStrDup(rParameter(r)[0]);
+      Lv->m[0].data=(void *)omStrDup(rParameter(r)[0]);     
       Lc->m[1].rtyp=LIST_CMD;
       Lc->m[1].data=(void*)Lv;
       // ord:
@@ -1791,9 +1797,11 @@ lists rDecompose(const ring r)
       Loo->Init(2);
       Loo->m[0].rtyp=STRING_CMD;
       Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
+       
       intvec *iv=new intvec(1); (*iv)[0]=1;
       Loo->m[1].rtyp=INTVEC_CMD;
       Loo->m[1].data=(void *)iv;
+       
       Lo->m[0].rtyp=LIST_CMD;
       Lo->m[0].data=(void*)Loo;
 
@@ -5028,26 +5036,36 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     const int ch=0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      WarnS("not implemented: size for real/complex");
       float_len=(int)(long)pn->next->Data();
       float_len2=float_len;
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
         float_len2=(int)(long)pn->next->Data();
-        WarnS("not implemented: size for real/complex");
         pn=pn->next;
       }
     }
-    if ((pn->next==NULL) && complex_flag)
-    {
-      pn->next=(leftv)omAlloc0Bin(sleftv_bin);
-      pn->next->name=omStrDup("i");
-    }
-    else
-      WarnS("not implemented: name for i (complex)");
-    cf=nInitChar(complex_flag ? n_long_C: n_long_R,NULL);
+    assume( float_len <= float_len2 );
+     
+    if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH) )
+       cf=nInitChar(n_R, NULL);
+    else // longR or longC?
+    { 
+       LongComplexInfo param;
+       
+       param.float_len = float_len;
+       param.float_len2 = float_len2;
+       
+       // set the parameter name
+       if (complex_flag) {
+	  if (pn->next == NULL)
+	    param.par_name=(const char*)"i"; //default to i
+	  else
+	    param.par_name = (const char*)pn->next->name;
+       }
 
+       cf = nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
+    }   
     assume( cf != NULL );
   }
 #ifdef HAVE_RINGS

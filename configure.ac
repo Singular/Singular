@@ -1,4 +1,4 @@
-AC_INIT([singular], [3.1.2.sw])
+AC_INIT([singular], [3.1.3.sw])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([.])
@@ -69,7 +69,7 @@ esac
 
 SING_CHECK_P_PROCS
 SING_CHECK_FACTORY
-
+SING_CHECK_READLINE
 
 # CFLAGS
 if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then

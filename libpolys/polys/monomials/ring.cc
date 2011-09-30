@@ -102,36 +102,6 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-/*
-
-/// internally changes the gloabl ring and resets the relevant
-/// global variables:
-/// SHOULD BE DEPRECATED NOW...?
-void rChangeCurrRing(ring r)
-{
- // if (!rMinpolyIsNULL(currRing))
- // {
- //   omCheckAddr(currRing->cf->minpoly);
- // }
-  //------------ set global ring vars --------------------------------
-  //currRing = r;
-  //currQuotient=NULL;
-  if (r != NULL)
-  {
-    rTest(r);
-    //------------ set global ring vars --------------------------------
-    //currQuotient=r->qideal;
-
-    //------------ global variables related to coefficients ------------
-    nSetChar(r->cf);
-
-    //------------ global variables related to polys -------------------
-    p_SetGlobals(r);
-    //------------ global variables related to factory -----------------
-  }
-}
-*/
-
 ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
   assume( cf != NULL);
@@ -258,7 +228,7 @@ int r_IsRingVar(const char *n, ring r)
 }
 
 
-void rWrite(ring r)
+void   rWrite(ring r, BOOLEAN details)
 {
   if ((r==NULL)||(r->order==NULL))
     return; /*to avoid printing after errors....*/
@@ -384,22 +354,27 @@ void rWrite(ring r)
   if(rIsPluralRing(r))
   {
     PrintS("\n//   noncommutative relations:");
-    poly pl=NULL;
-    int nl;
-    int i,j;
-    for (i = 1; i<r->N; i++)
+    if( details )
     {
-      for (j = i+1; j<=r->N; j++)
+      poly pl=NULL;
+      int nl;
+      int i,j;
+      for (i = 1; i<r->N; i++)
       {
-        nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r), r->cf);
-        if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
-        {
-          Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
-          pl = MATELEM(r->GetNC()->MT[UPMATELEM(i,j,r->N)],1,1);
-          p_Write0(pl, r, r);
+	for (j = i+1; j<=r->N; j++)
+	{
+	  nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r), r->cf);
+	  if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
+	  {
+            Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
+            pl = MATELEM(r->GetNC()->MT[UPMATELEM(i,j,r->N)],1,1);
+            p_Write0(pl, r, r);
+          }
         }
       }
-    }
+    } else
+      PrintS(" ...");
+     
 #if 0  /*Singularg should not differ from Singular except in error case*/
     Print("\n//   noncommutative type:%d", (int)ncRingType(r));
     Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);

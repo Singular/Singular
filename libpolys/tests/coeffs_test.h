@@ -452,7 +452,6 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    void test_Zn3()
    {
 #ifdef HAVE_RINGS
-     //  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?); // ????
      n_coeffType type = n_Zn;
 
      TS_ASSERT( Test(type, (void*) 3) );
@@ -468,17 +467,13 @@ class CoeffsTestSuite : public CxxTest::TestSuite
 #endif
    }
 
-   TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Please fix it!);
-
    void test_LR()
    {
-     setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
      simple(n_long_R);
    }
    
    void test_LC()
    {
-     setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
      simple(n_long_C);
    }
    
