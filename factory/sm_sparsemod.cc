@@ -31,7 +31,7 @@
 #include "templates/ftmpl_functions.h"
 
 static CanonicalForm
-smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm & lcggt, const REvaluation & alpha, CFRandom & gen, int CHAR, const Variable & /*extension*/ )
+smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm & lcggt, const REvaluation & alpha, CFRandom & gen, int CHAR, const Variable & extension )
 {
   DEBOUTLN( cerr, " ALPHA = " << alpha );
 

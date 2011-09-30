@@ -469,16 +469,10 @@ number nr2mMod(number a, number b, const coeffs r)
     compute the gcd of |b| and 2^m "by hand": We just extract the highest
     power of 2 (<= 2^m) that is contained in b.
   */
-  assume((NATNUMBER) b != 0);
+  assume((NATNUMBER)b != 0);
   NATNUMBER g = 1;
-  NATNUMBER b_div = (NATNUMBER) b;
-  
-  /*
-   * b_div is unsigned, so that (b_div < 0) evaluates false at compile-time
-   *
+  NATNUMBER b_div = (NATNUMBER)b;
   if (b_div < 0) b_div = -b_div; // b_div now represents |b|, BUT b_div is unsigned!
-  */
-
   NATNUMBER rr = 0;
   while ((g < r->mod2mMask ) && (b_div > 0) && (b_div % 2 == 0))
   {
