@@ -243,9 +243,6 @@ struct ip_sring
 //  int        ch;  /* characteristic, rInit */
   int        ref; /* reference counter to the ring, interpreter */
 
-  short      float_len; /* additional char-flags, rInit */
-  short      float_len2; /* additional char-flags, rInit */
-
   short      N;      /* number of vars, rInit */
 
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise, rInit */

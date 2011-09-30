@@ -1684,9 +1684,9 @@ void rDecomposeC(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
-    LL->m[0].data=(void *)si_max(R->float_len,SHORT_REAL_LENGTH/2);
+    LL->m[0].data=(void *)si_max(R->cf->float_len,SHORT_REAL_LENGTH/2);
     LL->m[1].rtyp=INT_CMD;
-    LL->m[1].data=(void *)si_max(R->float_len2,SHORT_REAL_LENGTH);
+    LL->m[1].data=(void *)si_max(R->cf->float_len2,SHORT_REAL_LENGTH);
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
   // ----------------------------------------
@@ -1936,13 +1936,13 @@ void rComposeC(lists L, ring R)
   if ((r1<=SHORT_REAL_LENGTH)
   && (r2=SHORT_REAL_LENGTH))
   {
-    R->float_len=SHORT_REAL_LENGTH/2;
-    R->float_len2=SHORT_REAL_LENGTH;
+    R->cf->float_len=SHORT_REAL_LENGTH/2;
+    R->cf->float_len2=SHORT_REAL_LENGTH;
   }
   else
   {
-    R->float_len=si_min(r1,32767);
-    R->float_len2=si_min(r2,32767);
+    R->cf->float_len=si_min(r1,32767);
+    R->cf->float_len2=si_min(r2,32767);
   }
   // ----------------------------------------
   // 2: list (par)
