@@ -1006,31 +1006,29 @@ sub ViewFile
 }
 
 
-if( length($teamcity) > 0 )
-{
-  #  tcLog("|Hi|\r I\'m [Alex]|\nHow are You?|");
-
-  blockOpened ("init");
-      
-  
-#  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
-  
-  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
-
-  if ( length("$ENV{TEAMCITY_BUILD_PROPERTIES_FILE}") > 0 )
-  {
-    print( "teamcity.tests.runRiskGroupTestsFirst: " . myGetTCprop("teamcity.tests.runRiskGroupTestsFirst") . "\n" );
-
-    ViewFile("teamcity.tests.recentlyFailedTests.file");
-    ViewFile("teamcity.build.changedFiles.file");
-    ViewFile("teamcity.build.properties.file");
-    ViewFile("teamcity.configuration.properties.file");
-    ViewFile("teamcity.runner.properties.file");
-  }
-    
-    
-  blockClosed ("init");
-}
+# if( length($teamcity) > 0 )
+# {
+#  #  tcLog("|Hi|\r I\'m [Alex]|\nHow are You?|");
+#
+#  blockOpened ("init");
+#  
+# #  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
+#  
+#  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
+#
+#  if ( length("$ENV{TEAMCITY_BUILD_PROPERTIES_FILE}") > 0 )
+#  {
+#    print( "teamcity.tests.runRiskGroupTestsFirst: " . myGetTCprop("teamcity.tests.runRiskGroupTestsFirst") . "\n" );
+#
+#    ViewFile("teamcity.tests.recentlyFailedTests.file");
+#    ViewFile("teamcity.build.changedFiles.file");
+#    ViewFile("teamcity.build.properties.file");
+#    ViewFile("teamcity.configuration.properties.file");
+#    ViewFile("teamcity.runner.properties.file");
+#  }
+#    
+#  blockClosed ("init");
+# }
 
 if ($timeout > 0)
 {
