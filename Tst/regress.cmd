@@ -1037,7 +1037,7 @@ if ($timeout > 0)
   # die;
 }
 
-testSuiteStarted($teamcity);
+# testSuiteStarted($teamcity);
 
 # now do the work
 foreach (@ARGV)
@@ -1212,7 +1212,7 @@ tcLog( sprintf("Global Summary: Checks:$total_checks Failed:%d Time:%.2f", $tota
 
 if( length($teamcity) > 0 )
 {
-  testSuiteFinished($teamcity);
+#  testSuiteFinished($teamcity);
 
 #  blockOpened ("init");
   
