@@ -385,186 +385,417 @@ BOOLEAN cone_via_normals(leftv res, leftv args)
   return TRUE;
 }
 
-static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
+BOOLEAN getInequalities(leftv res, leftv args)
 {
-  /* method for retrieving cone properties;
-     valid parametrizations: (cone, string),
-     Errors will be invoked in the following cases:
-     - invalid property string (see below for valid ones) */
-  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-  char* prop = (char*)v->Data();
-  gfan::ZMatrix retMat;
-  gfan::ZCone retCone;
-  int retInt;
-  gfan::ZVector retVec;
-  int typeInfo;
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->getInequalities();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
+  }
+  WerrorS("getInequalities: unexpected parameters");
+  return TRUE;
+}
 
-  /* ################ properties with return type intmat: ################## */
-  if      (strcmp(prop, "INEQUALITIES") == 0)
+BOOLEAN getEquations(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->getInequalities();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->getEquations();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "EQUATIONS") == 0)
+  WerrorS("getEquations: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getFacets(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->getEquations();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->getFacets();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "FACETS") == 0)
+  WerrorS("getFacets: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getImpliedEquations(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->getFacets();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->getImpliedEquations();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "IMPLIED_EQUATIONS") == 0)
+  WerrorS("getImpliedEquations: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getGeneratorsOfSpan(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->getImpliedEquations();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->generatorsOfSpan();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "GENERATORS_OF_SPAN") == 0)
+  WerrorS("getGeneratorsOfSpan: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getGeneratorsOfLinealitySpace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->generatorsOfSpan();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->generatorsOfLinealitySpace();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "GENERATORS_OF_LINEALITY_SPACE") == 0)
+  WerrorS("getGeneratorsOfLinealitySpace: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getRays(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->generatorsOfLinealitySpace();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->extremeRays();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "RAYS") == 0)
+  WerrorS("getRays: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getQuotientLatticeBasis(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->extremeRays();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->quotientLatticeBasis();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "QUOTIENT_LATTICE_BASIS") == 0)
+  WerrorS("getQuotientLatticeBasis: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getLinearForms(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->quotientLatticeBasis();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix zmat = zc->getLinearForms();
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
   }
-  else if (strcmp(prop, "LINEAR_FORMS") == 0)
+  WerrorS("getLinearForms: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getAmbientDimension(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retMat = zc->getLinearForms();
-    typeInfo = INTMAT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->ambientDimension();
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  /* ################ properties with return type int: ################## */
-  else if (strcmp(prop, "AMBIENT_DIM") == 0)
+  WerrorS("getLinearForms: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getDimension(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->ambientDimension();
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->dimension();
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "DIM") == 0)
+  WerrorS("getDimension: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getCodimension(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->dimension();
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->codimension();
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "LINEALITY_DIM") == 0)
+  WerrorS("getCodimension: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getLinealityDimension(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->dimensionOfLinealitySpace();
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->dimensionOfLinealitySpace();
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "MULTIPLICITY") == 0)
+  WerrorS("getLinealityDimension: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getMultiplicity(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     bool ok = true;
-    retInt = integerToInt(zc->getMultiplicity(), ok);
+    int i = integerToInt(zc->getMultiplicity(), ok);
     if (!ok)
       WerrorS("overflow while converting a gfan::Integer to an int");
-    typeInfo = INT_CMD;
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "IS_ORIGIN") == 0)
+  WerrorS("getMultiplicity: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN isOrigin(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->isOrigin() ? 1 : 0;
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->isOrigin() ? 1 : 0;
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "IS_FULL_SPACE") == 0)
+  WerrorS("isOrigin: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN isFullSpace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->isFullSpace() ? 1 : 0;
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->isFullSpace() ? 1 : 0;
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "SIMPLICIAL") == 0)
+  WerrorS("isFullSpace: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN isSimplicial(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->isSimplicial() ? 1 : 0;
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->isSimplicial() ? 1 : 0;
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  else if (strcmp(prop, "CONTAINS_POSITIVE_VECTOR") == 0)
+  WerrorS("isSimplicial: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN containsPositiveVector(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retInt = zc->containsPositiveVector() ? 1 : 0;
-    typeInfo = INT_CMD;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    int i = zc->containsPositiveVector() ? 1 : 0;
+    res->rtyp = INT_CMD;
+    res->data = (void*) i;
+    return FALSE;
   }
-  /* ################ properties with return type ZCone: ################## */
-  else if (strcmp(prop, "LINEALITY_SPACE") == 0)
+  WerrorS("containsPositiveVector: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getLinealitySpace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retCone = zc->linealitySpace();
-    typeInfo = coneID;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZCone* zd = &zc->linealitySpace();
+    res->rtyp = coneID;
+    res->data = (void*) zd;
+    return FALSE;
   }
-  else if (strcmp(prop, "DUAL_CONE") == 0)
+  WerrorS("getLinealitySpace: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getDualCone(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retCone = zc->dualCone();
-    typeInfo = coneID;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZCone* zd = &zc->dualCone();
+    res->rtyp = coneID;
+    res->data = (void*) zd;
+    return FALSE;
   }
-  else if (strcmp(prop, "NEGATED") == 0)
+  WerrorS("getDualCone: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getNegated(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    retCone = zc->negated();
-    typeInfo = coneID;
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZCone* zd = &zc->negated();
+    res->rtyp = coneID;
+    res->data = (void*) zd;
+    return FALSE;
   }
-  /* ################ properties with return type intvec: ################## */
-  else if (strcmp(prop, "SEMI_GROUP_GENERATOR") == 0)
+  WerrorS("getNegated: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getSemigroupGenerator(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
   {
-    /* test whether the cone's dim = dim of lin space + 1: */
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     int d = zc->dimension();
     int dLS = zc->dimensionOfLinealitySpace();
     if (d == dLS + 1)
-      retVec = zc->semiGroupGeneratorOfRay();
+    {
+      gfan::ZVector zv = zc->semiGroupGeneratorOfRay();
+      res->rtyp = INTVEC_CMD;
+      res->data = (void*) zVector2Intvec(zv);
+      return FALSE;
+    }
     else
     {
       Werror("expected dim of cone one larger than dim of lin space\n"
              "but got dimensions %d and %d", d, dLS);
     }
-    typeInfo = INTVEC_CMD;
   }
-  else if (strcmp(prop, "RELATIVE_INTERIOR_POINT") == 0)
-  {
-    retVec = zc->getRelativeInteriorPoint();
-    typeInfo = INTVEC_CMD;
-  }
-  else if (strcmp(prop, "UNIQUE_POINT") == 0)
-  {
-    retVec = zc->getUniquePoint();
-    typeInfo = INTVEC_CMD;
-  }
-  else
-  {
-    Werror("unexpected cone property '%s'", prop);
-    return TRUE;
-  }
-
-  res->rtyp = typeInfo;
-  if (typeInfo == INT_CMD)
-    res->data = (void*)retInt;
-  else if (typeInfo == INTMAT_CMD)
-    res->data = (void*)zMatrix2Intvec(retMat);
-  else if (typeInfo == coneID)
-    res->data = (void*)new gfan::ZCone(retCone);
-  else if (typeInfo == INTVEC_CMD)
-    res->data = (void*)zVector2Intvec(retVec);
-  else
-  {
-    WerrorS("implementation error in bbcone.cc::jjGETPROPC");
-    return TRUE;
-  }
-  return FALSE;
+  WerrorS("getSemigroupGenerator: unexpected parameters");
+  return TRUE;
 }
 
-BOOLEAN getprop(leftv res, leftv args)
+BOOLEAN getRelativeInteriorPoint(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZVector zv = zc->getRelativeInteriorPoint();
+    res->rtyp = INTVEC_CMD;
+    res->data = (void*) zVector2Intvec(zv);
+    return FALSE;
+  }
+  WerrorS("getRelativeInteriorPoint: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN getUniquePoint(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZVector zv = zc->getUniquePoint();
+    res->rtyp = INTVEC_CMD;
+    res->data = (void*) zVector2Intvec(zv);
+    return FALSE;
+  }
+  WerrorS("getUniquePoint: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN setMultiplicity(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == STRING_CMD))
+    if ((v != NULL) && (v->Typ() == INT_CMD))
     {
-      if (v->next == NULL) return jjGETPROPC(res, u, v);
+      int val = (int)(long)v->Data();
+      zc->setMultiplicity(gfan::Integer(val));
+      res->rtyp = NONE;
+      res->data = NULL;
+      return FALSE;
     }
   }
-  WerrorS("getprop: unexpected parameters");
+  WerrorS("setMultiplicity: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN setLinearForms(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
+    {
+      intvec* mat = (intvec*)v->Data();
+      gfan::ZMatrix zm = intmat2ZMatrix(mat);
+      zc->setLinearForms(zm);
+      res->rtyp = NONE;
+      res->data = NULL;
+      return FALSE;
+    }
+  }
+  WerrorS("setLinearForms: unexpected parameters");
   return TRUE;
 }
 
@@ -623,142 +854,72 @@ BOOLEAN cone_link(leftv res, leftv args)
   return TRUE;
 }
 
-static BOOLEAN jjCONTAINS2(leftv res, leftv u, leftv v)
-{
-  gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-  gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-  int d1 = zc1->ambientDimension();
-  int d2 = zc2->ambientDimension();
-  if (d1 != d2)
-    Werror("expected cones with same ambient dimensions\n but got"
-           " dimensions %d and %d", d1, d2);
-  res->rtyp = INT_CMD;
-  res->data = (void *)(zc1->contains(*zc2) ? 1 : 0);
-  return FALSE;
-}
-
-static BOOLEAN jjCONTAINS3(leftv res, leftv u, leftv v, leftv w)
-{
-  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-  intvec* vec = (intvec*)v->Data();
-  int flag = (int)(long)w->Data();
-  gfan::ZVector zv = intvec2ZVector(vec);
-  int d1 = zc->ambientDimension();
-  int d2 = zv.size();
-  if (d1 != d2)
-    Werror("expected ambient dim of cone and size of vector\n"
-           "to be equal but got %d and %d", d1, d2);
-  res->rtyp = INT_CMD;
-  if (flag)
-    res->data = (void *)(zc->containsRelatively(zv) ? 1 : 0);
-  else
-    res->data = (void *)(zc->contains(zv) ? 1 : 0);;
-  return FALSE;
-}
-
 BOOLEAN contains(leftv res, leftv args)
 {
-
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
     leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == coneID)) return jjCONTAINS2(res, u, v); 
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
+      int d1 = zc->ambientDimension();
+      int d2 = zd->ambientDimension();
+      if (d1 == d2)
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void *)(zc->contains(*zd) ? 1 : 0);
+        return FALSE;
+      }
+      Werror("expected cones with same ambient dimensions\n but got"
+             " dimensions %d and %d", d1, d2);
+    }
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
-      leftv w = v->next;
-      if ((w != NULL) && (w->Typ() == INT_CMD)) return jjCONTAINS3(res, u, v, w);
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      intvec* vec = (intvec*)v->Data();
+      gfan::ZVector zv = intvec2ZVector(vec);
+      int d1 = zc->ambientDimension();
+      int d2 = zv.size();
+      if (d1 == d2)
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void *)(zc->contains(zv) ? 1 : 0);
+      }
+      Werror("expected ambient dim of cone and size of vector\n"
+             "to be equal but got %d and %d", d1, d2);
     }
   }
-  WerrorS("contains: unexpected parameters");
+  WerrorS("containsCone: unexpected parameters");
   return TRUE;
 }
 
-static BOOLEAN jjSETPROPC3A(leftv res, leftv u, leftv v, leftv w)
-{
-  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-  char* prop = (char*)v->Data();
-  int val = (int)(long)w->Data();
-
-  if (strcmp(prop, "MULTIPLICITY") == 0)
-  {
-    zc->setMultiplicity(gfan::Integer(val));
-  }
-  else
-  {
-    Werror("unexpected cone property '%s'", prop);
-    return TRUE;
-  }
-  res->rtyp = NONE;
-  res->data = NULL;
-  return FALSE;
-}
-static BOOLEAN jjSETPROPC3B(leftv res, leftv u, leftv v, leftv w)
-{
-  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-  char* prop = (char*)v->Data();
-  intvec* mat = (intvec*)w->Data();
-  gfan::ZMatrix zm = intmat2ZMatrix(mat);
-
-  if (strcmp(prop, "LINEAR_FORMS") == 0)
-  {
-    zc->setLinearForms(zm);
-  }
-  else
-  {
-    Werror("unexpected cone property '%s'", prop);
-    return TRUE;
-  }
-  res->rtyp = NONE;
-  res->data = NULL;
-  return FALSE;
-}
-
-BOOLEAN setprop(leftv res, leftv args)
+BOOLEAN containsRelatively(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
     leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == STRING_CMD))
+    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
-      leftv w = v->next;
-      if ((w != NULL) && (w->Typ() == INT_CMD)) return jjSETPROPC3A(res, u, v, w);
-      if ((w != NULL) && (w->Typ() == INTMAT_CMD)) return jjSETPROPC3B(res, u, v, w);
-    } 
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      intvec* vec = (intvec*)v->Data();
+      gfan::ZVector zv = intvec2ZVector(vec);
+      int d1 = zc->ambientDimension();
+      int d2 = zv.size();
+      if (d1 == d2)
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void *)(zc->containsRelatively(zv) ? 1 : 0);
+      }
+      Werror("expected ambient dim of cone and size of vector\n"
+             "to be equal but got %d and %d", d1, d2);     
+    }
   }
-  WerrorS("setprop: unexpected parameters");
+  WerrorS("containsCone: unexpected parameters");
   return TRUE;
 }
-
-// BOOLEAN faceContaining(leftv res, leftv args)
-// {
-//   leftv u = args;
-//   if ((u != NULL) && (u->Typ() == coneID))
-//   {
-//     leftv v = u->next;
-//     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
-//     {
-//       const intvec* iv = (intvec*) v->Data();
-//       gfan::ZVector zv = intvec2ZVector(iv);
-//       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-//       gfan::ZCone* zf = &zc->faceContaining(zv);
-//       res->rtyp = coneID;
-//       res->data = (char*) zf;
-//       return FALSE;
-//     } 
-//     else
-//     {
-//       WerrorS("setprop: unexpected parameters");
-//       return TRUE;
-//     }
-//   }
-//   else
-//   {
-//     WerrorS("setprop: unexpected parameters");
-//     return TRUE;
-//   }
-// }
 
 BOOLEAN hasFace(leftv res, leftv args)
 {
@@ -808,11 +969,35 @@ void bbcone_setup()
   b->blackbox_Assign=bbcone_Assign;
   iiAddCproc("","cone_via_rays",FALSE,cone_via_rays);
   iiAddCproc("","cone_via_normals",FALSE,cone_via_normals);
-  iiAddCproc("","getprop",FALSE,getprop);
   iiAddCproc("","cone_intersect",FALSE,cone_intersect);
   iiAddCproc("","cone_link",FALSE,cone_link);
   iiAddCproc("","contains",FALSE,contains);
-  iiAddCproc("","setprop",FALSE,setprop);
+  iiAddCproc("","getRays",FALSE,getRays);
+  iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
+  iiAddCproc("","setMultiplicty",FALSE,setMultiplicity);
+  iiAddCproc("","getLinearForms",FALSE,getLinearForms);
+  iiAddCproc("","setLinearForms",FALSE,setLinearForms);
+  iiAddCproc("","getInequalities",FALSE,getInequalities);
+  iiAddCproc("","getEquations",FALSE,getEquations);
+  iiAddCproc("","getGeneratorsOfSpan",FALSE,getGeneratorsOfSpan);
+  iiAddCproc("","getGeneratorsOfLinealitySpace",FALSE,getGeneratorsOfLinealitySpace);
+  iiAddCproc("","getFacets",FALSE,getFacets);
+  iiAddCproc("","getImpliedEquations",FALSE,getImpliedEquations);
+  iiAddCproc("","getRelativeInteriorPoint",FALSE,getRelativeInteriorPoint);
+  iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
+  iiAddCproc("","getDimension",FALSE,getDimension);
+  iiAddCproc("","getCodimension",FALSE,getCodimension);
+  iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
+  iiAddCproc("","isOrigin",FALSE,isOrigin);
+  iiAddCproc("","isFullSpace",FALSE,isFullSpace);
+  iiAddCproc("","isSimplicial",FALSE,isSimplicial);
+  iiAddCproc("","containsPositiveVector",FALSE,containsPositiveVector);
+  iiAddCproc("","getLinealitySpace",FALSE,getLinealitySpace);
+  iiAddCproc("","getDualCone",FALSE,getDualCone);
+  iiAddCproc("","getNegated",FALSE,getNegated);
+  iiAddCproc("","getQuotientLatticeBasis",FALSE,getQuotientLatticeBasis);
+  iiAddCproc("","getSemigroupGenerator",FALSE,getSemigroupGenerator);
+  iiAddCproc("","getUniquePoint",FALSE,getUniquePoint);
   // iiAddCproc("","faceContaining",FALSE,faceContaining);
   iiAddCproc("","hasFace",FALSE,hasFace);
   coneID=setBlackboxStuff(b,"cone");
