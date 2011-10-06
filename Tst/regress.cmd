@@ -354,10 +354,10 @@ sub GetSingularVersionDate
   }
   close(FD);
   mysystem("if [ -e /proc/cpuinfo ]; then cat /proc/cpuinfo >> SingularVersionDate; fi ");
-  mysystem("sysctl -a  >> SingularVersionDate");
+  # mysystem("sysctl -a  >> SingularVersionDate"); # sysctl is not a user cmd.
   mysystem("uname -a >> SingularVersionDate");
   mysystem("if [ -e /proc/meminfo ]; then cat /proc/meminfo >> SingularVersionDate; fi ");
-  mysystem("free -h >> SingularVersionDate");
+  # mysystem("free -h >> SingularVersionDate"); # nobody supports free -h
 }
 
 sub Set_withMP
