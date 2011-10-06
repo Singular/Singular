@@ -7,3 +7,5 @@ New/short_print.tst
 New/std_criteria.tst
 New/trans_ext_poly_read.tst
 New/trans_ext_std.tst
+New/print_nc_relations.tst
+New/print_qring.tst
