@@ -172,6 +172,10 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
+#if defined(ppcMac_darwin)
+#define HAVE_ELF_SYSTEM
+#endif
+
 #if defined(ix86Mac_darwin)
 #define HAVE_ELF_SYSTEM
 #endif
