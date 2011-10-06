@@ -402,8 +402,12 @@ void   rWrite(ring r, BOOLEAN details)
 #endif
   if (r->qideal!=NULL)
   {
-    PrintS("\n// quotient ring from ideal\n");
-    iiWriteMatrix((matrix)r->qideal,"_",1,r);
+    PrintS("\n// quotient ring from ideal");
+    if( details )
+    {
+      PrintLn();       
+      iiWriteMatrix((matrix)r->qideal,"_",1,r);
+    } else PrintS(" ...");
   }
 }
 
