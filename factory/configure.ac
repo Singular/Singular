@@ -104,11 +104,16 @@ AC_PROG_CPP
 AC_PROG_CXXCPP
 AC_PROG_LN_S
 AC_PROG_INSTALL
-AC_PROG_RANLIB
+AC_DISABLE_STATIC
+LT_INIT
 AC_PROG_MAKE_SET
 AC_CHECK_PROG(AR, ar, ar, where-is-your-ar)
 AC_CHECK_PROG(M4, m4, m4, where-is-your-m4)
 AC_CHECK_PROG(BISON, bison, bison, where-is-your-bison)
+AC_C_CONST
+AC_C_INLINE
+AH_TEMPLATE([INT64], [])
+AC_DEFINE([INT64], [long long int])
 DX_INIT_DOXYGEN($PACKAGE_NAME, MYDOXYGENCONFIG)
 
 # do not use `MKINSTALLDIRS' and `MAKEHEADER' since there may be
@@ -323,6 +328,7 @@ test "${M4FLAGS+set}" = set || M4FLAGS=
 
 # Singular
 if test "x$with_Singular" = xyes; then
+  AH_TEMPLATE([SINGULAR], [define if linked to Singular])
   AC_DEFINE([SINGULAR],[1],[SINGULAR])
   AC_DEFINE([DISABLE_GMP_CPP],[1],[DISABLE_GMP_CPP])
   AC_DEFINE([NOSTREAMIO],[1],[DISABLE_GMP_CPP])
@@ -356,6 +362,7 @@ else
   fi
 fi
 if test "$with_omalloc" = yes; then
+  AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
   AC_DEFINE([HAVE_OMALLOC],[1],[HAVE_OMALLOC])
 fi
 AC_MSG_RESULT($with_omalloc)
@@ -366,11 +373,13 @@ fi
 
 # "configurable inline methods"
 if test "x$enable_cf_inline" != xno; then
+  AH_TEMPLATE([CF_USE_INLINE], [define to use "configurable inline methods" (see cf_inline.cc)])
   AC_DEFINE([CF_USE_INLINE],[1],[CF_USE_INLINE])
 fi
 
 # iostream
 if test "x$enable_streamio" = xno; then
+  AH_TEMPLATE([NOSTREAMIO], [define to build factory without stream IO])
   AC_DEFINE([NOSTREAMIO],[1],[NOSTREAMIO])
 else
   factorysrc="$factorysrc \$(useiofactorysrc)"
@@ -379,16 +388,19 @@ fi
 
 # assertions
 if test "x$enable_assertions" = xno; then
+  AH_TEMPLATE([NOASSERT], [define if you do not want to activate assertions])
   AC_DEFINE([NOASSERT],[1],[NOASSERT])
 fi
 
 # timing
 if test "x$enable_timing" != xno; then
+  AH_TEMPLATE([TIMING], [define if you want to activate the timing stuff])
   AC_DEFINE([TIMING],[1],[TIMING])
 fi
 
 # debugoutput
 if test "x$enable_debugoutput" != xno; then
+  AH_TEMPLATE([DEBUGOUTPUT], [define if you want to have debugging output])
   AC_DEFINE([DEBUGOUTPUT],[1],[DEBUGOUTPUT])
 fi
 
@@ -413,8 +425,11 @@ AC_SUBST(alltargets)
 AC_SUBST(installtargets)
 AC_SUBST(uninstalltargets)
 
+AH_TEMPLATE([FACTORYVERSION], [factory version])
 AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version", [FACTORYVERSION])
+AH_TEMPLATE([FACTORYCONFIGURATION], [factory configuration])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration", [FACTORYCONFIGURATION])
+AH_TEMPLATE([GFTABLEDIR], [where the gftables live])
 AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir", [GFTABLEDIR])
 
 AM_CONDITIONAL(

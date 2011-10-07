@@ -8,7 +8,7 @@ automake -a
 
 TOP_DIR=$PWD
 
-for d in . libpolys; do
+for d in . libpolys factory; do
   echo "==============="
   echo "run libtoolize --force, aclocal -I $TOP_DIR/m4, autoconf, automake -a in $d"
   echo "---------------"
@@ -20,7 +20,7 @@ for d in . libpolys; do
   echo
 done
 
-for d in omalloc factory; do
+for d in omalloc; do
   echo "==============="
   echo "run aclocal -I $TOP_DIR/m4, autotools in $d"
   echo "---------------"

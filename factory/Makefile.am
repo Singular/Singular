@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I ../m4
+
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
