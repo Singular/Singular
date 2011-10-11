@@ -244,7 +244,7 @@ void   rWrite(ring r, BOOLEAN details)
 
   nblocks--;
 
-  n_CoeffWrite(r->cf);
+  n_CoeffWrite(r->cf, details);
 #if 0
   {
     PrintS("//   characteristic : ");

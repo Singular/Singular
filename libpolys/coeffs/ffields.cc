@@ -867,13 +867,18 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   
 }
 
-void    nfCoeffWrite  (const coeffs r)
+void    nfCoeffWrite  (const coeffs r, BOOLEAN details)
 {
   // m_nfCharQ = p^k where p is the characteristic (r->CharP) and k is GFDegree
   Print("//   # ground field : %d\n",r->m_nfCharQ);
   Print("//   primitive element : %s\n", r->m_nfParameter);
-  StringSetS("//   minpoly        : ");
-  nfShowMipo(r);PrintS(StringAppendS("\n"));
+  if ( details )
+  {
+    StringSetS("//   minpoly        : ");
+    nfShowMipo(r);
+    PrintS(StringAppendS("\n"));
+  }
+  else PrintS("//   minpoly        : ...\n"); 
 }
 
 BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)

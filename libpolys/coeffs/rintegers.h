@@ -45,7 +45,7 @@ nMapFunc nrzSetMap     (const coeffs src, const coeffs dst);
 void    nrzWrite       (number &a, const coeffs r);
 const char *  nrzRead  (const char *s, number *a, const coeffs r);
 char *  nrzName        (number n, const coeffs r);
-void    nrzCoeffWrite  (const coeffs r);
+void    nrzCoeffWrite  (const coeffs r, BOOLEAN details);
 #ifdef LDEBUG
 BOOLEAN nrzDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif

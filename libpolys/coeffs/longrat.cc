@@ -2558,7 +2558,7 @@ number nlFarey(number nN, number nP, const coeffs r)
   return z;
 }
 
-void    nlCoeffWrite  (const coeffs)
+void    nlCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
   PrintS("//   characteristic : 0\n");
 }

@@ -99,7 +99,7 @@ struct n_Procs_s
    BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, void * parameter);
 
    /// output of coeff description via Print
-   void (*cfCoeffWrite)(const coeffs r);
+   void (*cfCoeffWrite)(const coeffs r, BOOLEAN details);
 
    // the union stuff
 
@@ -540,8 +540,8 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 }
 
 /// output the coeff description
-static inline void   n_CoeffWrite(const coeffs r)
-{ assume(r != NULL); assume(r->cfCoeffWrite != NULL); r->cfCoeffWrite(r); }
+static inline void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)
+{ assume(r != NULL); assume(r->cfCoeffWrite != NULL); r->cfCoeffWrite(r, details); }
 
 // Tests:
 static inline BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)

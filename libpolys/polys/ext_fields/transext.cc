@@ -117,7 +117,7 @@ number   ntGcd(number a, number b, const coeffs cf);
 number   ntLcm(number a, number b, const coeffs cf);
 int      ntSize(number a, const coeffs cf);
 void     ntDelete(number * a, const coeffs cf);
-void     ntCoeffWrite(const coeffs cf);
+void     ntCoeffWrite(const coeffs cf, BOOLEAN details);
 number   ntIntDiv(number a, number b, const coeffs cf);
 const char * ntRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
@@ -376,7 +376,7 @@ BOOLEAN ntGreaterZero(number a, const coeffs cf)
           (!p_LmIsConstant(g, ntRing)));
 }
 
-void ntCoeffWrite(const coeffs cf)
+void ntCoeffWrite(const coeffs cf, BOOLEAN details)
 {
   assume( cf != NULL );
 
@@ -385,7 +385,7 @@ void ntCoeffWrite(const coeffs cf)
   assume( A != NULL );
   assume( A->cf != NULL );
 
-  n_CoeffWrite(A->cf);
+  n_CoeffWrite(A->cf, details);
 
 //  rWrite(A);
 
@@ -400,7 +400,6 @@ void ntCoeffWrite(const coeffs cf)
   assume( A->minideal == NULL );
 
   PrintS("\n//   minpoly        : 0\n");
-
 
 /*
   PrintS("//   Coefficients live in the rational function field\n");

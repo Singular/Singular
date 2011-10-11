@@ -46,7 +46,7 @@ number  nrnExtGcd      (number a, number b, number *s, number *t, const coeffs r
 nMapFunc nrnSetMap     (const coeffs src, const coeffs dst);
 #define  nrnWrite      nrzWrite
 const char *  nrnRead  (const char *s, number *a, const coeffs r);
-void     nrnCoeffWrite (const coeffs r);
+void     nrnCoeffWrite (const coeffs r, BOOLEAN details);
 #ifdef LDEBUG
 BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif

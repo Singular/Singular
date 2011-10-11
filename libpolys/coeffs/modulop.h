@@ -41,7 +41,7 @@ number  npInvers      (number c,const coeffs r);
 BOOLEAN npGreater     (number a, number b,const coeffs r);
 BOOLEAN npEqual       (number a, number b,const coeffs r);
 void    npWrite       (number &a, const coeffs r);
-void    npCoeffWrite  (const coeffs r);
+void    npCoeffWrite  (const coeffs r, BOOLEAN details);
 const char *  npRead  (const char *s, number *a,const coeffs r);
 #ifdef LDEBUG
 BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
