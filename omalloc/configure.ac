@@ -6,13 +6,13 @@ dnl Created: 11/99
 dnl Version: $Id$
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
-AC_INIT(omalloc,0.9.6)
+AC_INIT([omalloc],[0.9.6])
 AC_CONFIG_SRCDIR(om_Alloc.c)
 
 AC_CONFIG_AUX_DIR([.])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([omalloc],[0.9.6])
 
 AC_SUBST(VERSION)
 
