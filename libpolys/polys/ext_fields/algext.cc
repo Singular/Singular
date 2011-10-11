@@ -387,7 +387,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
       expAbs = expAbs / 2;
       if (expAbs != 0)
       {
-        factor = p_Mult_q(factor, factor, naRing);
+        factor = p_Mult_q(factor, p_Copy(factor, naRing), naRing);
         heuristicReduce(factor, naMinpoly, cf);
       }
     }
