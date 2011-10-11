@@ -8,8 +8,7 @@ AC_CONFIG_SRCDIR([Singular/tesths.cc])
 AC_CONFIG_HEADER([config.h])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE
-
+AM_INIT_AUTOMAKE([singular], [3.1.3.sw])
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
