@@ -896,6 +896,7 @@ static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 // returns p+q, destroys p and q
 static inline poly p_Add_q(poly p, poly q, const ring r)
 {
+  assume( (p != q) || (p == NULL && q == NULL) );
   int shorter;
   return r->p_Procs->p_Add_q(p, q, shorter, r);
 }
@@ -903,6 +904,7 @@ static inline poly p_Add_q(poly p, poly q, const ring r)
 /// like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq) then lp == pLength(p+q)
 static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
 {
+  assume( (p != q) || (p == NULL && q == NULL) );
   int shorter;
   poly res = r->p_Procs->p_Add_q(p, q, shorter, r);
   lp = (lp + lq) - shorter;
@@ -1052,6 +1054,8 @@ extern poly  _p_Mult_q(poly p, poly q, const int copy, const ring r);
 // returns p*q, destroys p and q
 static inline poly p_Mult_q(poly p, poly q, const ring r)
 {
+  assume( (p != q) || (p == NULL && q == NULL) );
+  
   if (p == NULL)
   {
     r->p_Procs->p_Delete(&q, r);
@@ -1166,6 +1170,7 @@ static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 // returns merged p and q, assumes p and q have no monomials which are equal
 static inline poly p_Merge_q(poly p, poly q, const ring r)
 {
+  assume( (p != q) || (p == NULL && q == NULL) );
   return r->p_Procs->p_Merge_q(p, q, r);
 }
 
