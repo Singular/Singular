@@ -53,16 +53,9 @@ InternalRational::InternalRational( const int n, const int d )
     else
     {
         int g = intgcd( n, d );
-        if ( d < 0 )
-        {
-            mpz_init_set_si( &_num, -n / g );
-            mpz_init_set_si( &_den, -d / g );
-        }
-        else
-        {
-            mpz_init_set_si( &_num, n / g );
-            mpz_init_set_si( &_den, d / g );
-        }
+        if ( d < 0 ) g= -g;
+        mpz_init_set_si( &_num, n / g );
+        mpz_init_set_si( &_den, d / g );
     }
 }
 
@@ -199,50 +192,52 @@ InternalCF* InternalRational::addsame( InternalCF * c )
 
     if ( mpz_cmp_si( &g, 1 ) == 0 )
     {
-        mpz_mul( &n, &_den, &MPQNUM( c ) );
-        mpz_mul( &g, &_num, &MPQDEN( c ) );
-        mpz_add( &n, &n, &g );
-        mpz_mul( &d, &_den, &MPQDEN( c ) );
+      mpz_mul( &n, &_den, &MPQNUM( c ) );
+      mpz_mul( &g, &_num, &MPQDEN( c ) );
+      mpz_add( &n, &n, &g );
+      mpz_mul( &d, &_den, &MPQDEN( c ) );
     }
     else
     {
-        MP_INT tmp1;
-        MP_INT tmp2;
-        mpz_init( &tmp1 );
-        mpz_divexact( &tmp1, &_den, &g );
-        mpz_init( &tmp2 );
-        mpz_divexact( &tmp2, &MPQDEN( c ), &g );
-        mpz_mul( &d, &tmp2, &_den );
-        mpz_mul( &tmp2, &tmp2, &_num );
-        mpz_mul( &tmp1, &tmp1, &MPQNUM( c ) );
-        mpz_add( &n, &tmp1, &tmp2 );
-        mpz_gcd( &g, &n, &d );
-        if ( mpz_cmp_si( &g, 1 ) != 0 )
-        {
-            mpz_divexact( &n, &n, &g );
-            mpz_divexact( &d, &d, &g );
-        }
-        mpz_clear( &tmp1 );
-        mpz_clear( &tmp2 );
+      MP_INT tmp1;
+      MP_INT tmp2;
+      mpz_init( &tmp1 );
+      mpz_divexact( &tmp1, &_den, &g );
+      mpz_init( &tmp2 );
+      mpz_divexact( &tmp2, &MPQDEN( c ), &g );
+      mpz_mul( &d, &tmp2, &_den );
+      mpz_mul( &tmp2, &tmp2, &_num );
+      mpz_mul( &tmp1, &tmp1, &MPQNUM( c ) );
+      mpz_add( &n, &tmp1, &tmp2 );
+      mpz_gcd( &g, &n, &d );
+      if ( mpz_cmp_si( &g, 1 ) != 0 )
+      {
+          mpz_divexact( &n, &n, &g );
+          mpz_divexact( &d, &d, &g );
+      }
+      mpz_clear( &tmp1 );
+      mpz_clear( &tmp2 );
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
     if ( mpz_cmp_si( &d, 1 ) == 0 )
     {
-        mpz_clear( &d );
-        if ( mpz_is_imm( &n ) )
-        {
-            InternalCF * res = int2imm( mpz_get_si( &n ) );
-            mpz_clear( &n );
-            return res;
-        }
-        else
-        {
-            return new InternalInteger( n );
-        }
+      mpz_clear( &d );
+      if ( mpz_is_imm( &n ) )
+      {
+          InternalCF * res = int2imm( mpz_get_si( &n ) );
+          mpz_clear( &n );
+          return res;
+      }
+      else
+      {
+          return new InternalInteger( n );
+      }
     }
     else
-        return new InternalRational( n, d );
+    {
+      return new InternalRational( n, d );
+    }
 }
 
 InternalCF* InternalRational::subsame( InternalCF * c )
@@ -305,10 +300,10 @@ InternalCF* InternalRational::mulsame( InternalCF * c )
 {
     ASSERT( ! ::is_imm( c ) && c->levelcoeff() == RationalDomain, "illegal domain" );
     MP_INT n, d;
+    mpz_init( &n ); mpz_init( &d );
 
     if ( this == c )
     {
-        mpz_init( &n ); mpz_init( &d );
         mpz_mul( &n, &_num, &_num );
         mpz_mul( &d, &_den, &_den );
     }
@@ -316,7 +311,6 @@ InternalCF* InternalRational::mulsame( InternalCF * c )
     {
         MP_INT g1, g2, tmp1, tmp2;
         mpz_init( &g1 ); mpz_init( &g2 );
-        mpz_init( &n ); mpz_init( &d );
         mpz_gcd( &g1, &_num, &MPQDEN( c ) );
         mpz_gcd( &g2, &_den, &MPQNUM( c ) );
         bool g1is1 = mpz_cmp_si( &g1, 1 ) == 0;
@@ -522,18 +516,20 @@ InternalCF* InternalRational::addcoeff( InternalCF* c )
         int cc = imm2int( c );
         if ( cc == 0 )
             return this;
-        else  if ( cc < 0 )
-        {
-            mpz_init( &n );
+        else
+	{
+          mpz_init( &n );
+	  if ( cc < 0 )
+          {
             mpz_mul_ui( &n, &_den, -cc );
             mpz_sub( &n, &_num, &n );
-        }
-        else
-        {
-            mpz_init( &n );
+          }
+          else
+          {
             mpz_mul_ui( &n, &_den, cc );
             mpz_add( &n, &_num, &n );
-        }
+          }
+	}
     }
     else
     {
