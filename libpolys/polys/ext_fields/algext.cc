@@ -69,7 +69,6 @@ static const n_coeffType ID = n_algExt;
 /* minimal polynomial */
 #define naMinpoly naRing->minideal->m[0]
 
-
 /// forward declarations
 BOOLEAN  naGreaterZero(number a, const coeffs cf); 
 BOOLEAN  naGreater(number a, number b, const coeffs cf);
@@ -96,9 +95,10 @@ number   naGcd(number a, number b, const coeffs cf);
 //number   naLcm(number a, number b, const coeffs cf);
 int      naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
-void     naCoeffWrite(const coeffs cf);
+void     naCoeffWrite(const coeffs cf, BOOLEAN details);
 number   naIntDiv(number a, number b, const coeffs cf);
 const char * naRead(const char *s, number *a, const coeffs cf);
+
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
 #ifdef LDEBUG
@@ -255,7 +255,7 @@ BOOLEAN naGreaterZero(number a, const coeffs cf)
   return FALSE;
 }
 
-void naCoeffWrite(const coeffs cf)
+void naCoeffWrite(const coeffs cf, BOOLEAN details)
 {
   assume( cf != NULL );
   
@@ -264,7 +264,7 @@ void naCoeffWrite(const coeffs cf)
   assume( A != NULL );
   assume( A->cf != NULL );
    
-  n_CoeffWrite(A->cf);
+  n_CoeffWrite(A->cf, details);
  
 //  rWrite(A);
   
@@ -276,12 +276,24 @@ void naCoeffWrite(const coeffs cf)
   for (int nop=0; nop < P; nop ++)
     Print("%s ", rRingVar(nop, A));
   
+  PrintLn();
+  
   const ideal I = A->minideal;
 
   assume( I != NULL );
   assume( IDELEMS(I) == 1 );
   
-  PrintS("\n//   minpoly        : ("); p_Write0( I->m[0], A); PrintS(")\n");
+
+  if ( details )
+  {
+    PrintS("//   minpoly        : (");
+    p_Write0( I->m[0], A);
+    PrintS(")");
+  }
+  else
+    PrintS("//   minpoly        : ...");
+  
+  PrintLn();
   
 /*
   char *x = rRingVar(0, A);

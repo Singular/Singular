@@ -28,7 +28,7 @@ static const n_coeffType ID = n_Zn;
 
 extern omBin gmp_nrz_bin;
 
-void    nrnCoeffWrite  (const coeffs r)
+void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   long l = (long)mpz_sizeinbase(r->modBase, 10) + 2;
   char* s = (char*) omAlloc(l);

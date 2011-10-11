@@ -90,7 +90,7 @@ int      nlModP(number n, int p, const coeffs r);
 int      nlSize(number n, const coeffs r);
 number   nlGetDenom(number &n, const coeffs r);
 number   nlGetNumerator(number &n, const coeffs r);
-void     nlCoeffWrite(const coeffs r);
+void     nlCoeffWrite(const coeffs r, BOOLEAN details);
 number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C);
 number   nlFarey(number nN, number nP, const coeffs CF);
 

@@ -28,7 +28,7 @@ static const n_coeffType ID = n_Z2m;
 
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
-void    nr2mCoeffWrite  (const coeffs r)
+void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   Print("//   Z/2^%lu\n", r->modExponent);
 }

@@ -124,7 +124,7 @@ number   ntGcd(number a, number b, const coeffs cf);
 number   ntLcm(number a, number b, const coeffs cf);
 int      ntSize(number a, const coeffs cf);
 void     ntDelete(number * a, const coeffs cf);
-void     ntCoeffWrite(const coeffs cf);
+void     ntCoeffWrite(const coeffs cf, BOOLEAN details);
 number   ntIntDiv(number a, number b, const coeffs cf);
 const char * ntRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
