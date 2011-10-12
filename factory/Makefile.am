@@ -293,7 +293,7 @@ EXTRA_DIST =	test_install.cc \
 
 noinst_PROGRAMS = cplusplus
 
-BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc  factory_config.h
+BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -334,4 +334,4 @@ test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 ## The following is due to AX_PREFIX_CONFIG_H
 ##
 
-DISTCLEANFILES=_configs.sed
+DISTCLEANFILES=_configs.sed factory_config.h
