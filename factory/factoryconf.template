@@ -20,6 +20,7 @@
 
 /*MAKEHEADER*/
 #include "config.h"
+/* #include "factory_config.h" */
 
 /*MAKEHEADER*/
 #include "cf_assert.h"
