@@ -331,6 +331,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     if (res->data!=NULL) pDelete((poly*)&res->data);
     res->data=(void*)p;
     jiAssignAttr(res,a);
+    if (TEST_V_QRING && (currQuotient!=NULL) && (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingP(res);
   }
   else
   {
@@ -364,8 +365,8 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     {
       m->rank=si_max(m->rank,pMaxComp(p));
     }
+    if (TEST_V_QRING) jjNormalizeQRingP(res);
   }
-  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingP(res);
   return FALSE;
 }
 static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
@@ -495,7 +496,7 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
   {
     setFlag(res,FLAG_STD);
   }
-  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currQuotient!=NULL)&& (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr e)
@@ -513,7 +514,11 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
   if (I->m[0]!=NULL) pSetCompP(I->m[0],1);
   pNormalize(I->m[0]);
   res->data=(void *)I;
-  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currQuotient!=NULL))
+  {
+    if (hasFlag(a,FLAG_QRING)) setFlag(res,FLAG_QRING);
+    else                       jjNormalizeQRingId(res);
+  }
   return FALSE;
 }
 static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
@@ -525,7 +530,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
   MATROWS(m)=1;
   idNormalize((ideal)m);
   res->data=(void *)m;
-  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currQuotient!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
@@ -967,7 +972,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   idDelete(&I);
   l1->CleanUp();
   r->CleanUp();
-  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingP(l);
+  //if (TEST_V_QRING && (currQuotient!=NULL)) jjNormalizeQRingP(l);
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
@@ -1047,7 +1052,7 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
       if (TEST_V_ALLWARN)
       {
         Warn("expression list length(%d) does not match intmat size(%d)",
-	      iv->length()+exprlist_length(hh),iv->length());
+              iv->length()+exprlist_length(hh),iv->length());
       }
       break;
     }
@@ -1656,27 +1661,30 @@ void jjNormalizeQRingId(leftv I)
   {
     if (I->e==NULL)
     {
-      ideal F=idInit(1,1);
       ideal I0=(ideal)I->Data();
-      ideal II=kNF(F,currQuotient,I0);
-      idDelete(&F);
-      if ((I->rtyp==IDEAL_CMD)
-      || (I->rtyp==MODUL_CMD)
-      )
+      switch (I->Typ())
       {
-        idDelete((ideal*)&(I0));
-        I->data=II;
-      }
-      else if (I->rtyp==IDHDL)
-      {
-        idhdl h=(idhdl)I->data;
-        idDelete((ideal*)&IDIDEAL(h));
-        IDIDEAL(h)=II;
-        setFlag(h,FLAG_QRING);
-      }
-      else
-      {
-        idDelete(&II);
+        case IDEAL_CMD:
+	case MODUL_CMD:
+        {
+          ideal F=idInit(1,1);
+          ideal II=kNF(F,currQuotient,I0);
+          idDelete(&F);
+          if (I->rtyp!=IDHDL)
+          {
+            idDelete((ideal*)&(I0));
+            I->data=II;
+          }
+          else
+          {
+            idhdl h=(idhdl)I->data;
+            idDelete((ideal*)&IDIDEAL(h));
+            IDIDEAL(h)=II;
+            setFlag(h,FLAG_QRING);
+          }
+          break;
+        }
+        default: break;
       }
       setFlag(I,FLAG_QRING);
     }
@@ -1686,21 +1694,22 @@ void jjNormalizeQRingP(leftv I)
 {
   if ((currQuotient!=NULL) && (!hasFlag(I,FLAG_QRING)))
   {
-    if (I->e==NULL)
+    poly p=(poly)I->Data();
+    if ((I->e==NULL) && (p!=NULL))
     {
       ideal F=idInit(1,1);
-      poly II=kNF(F,currQuotient,(poly)I->Data());
+      poly II=kNF(F,currQuotient,p);
       idDelete(&F);
       if ((I->rtyp==POLY_CMD)
       || (I->rtyp==VECTOR_CMD))
       {
-        pDelete((poly*)&(I->data));
+        pDelete(&p);
         I->data=II;
       }
       else if (I->rtyp==IDHDL)
       {
+        pDelete(&p);
         idhdl h=(idhdl)I->data;
-        pDelete((poly*)&IDPOLY(h));
         IDPOLY(h)=II;
         setFlag(h,FLAG_QRING);
       }
@@ -1708,8 +1717,8 @@ void jjNormalizeQRingP(leftv I)
       {
         pDelete(&II);
       }
-      setFlag(I,FLAG_QRING);
     }
+    setFlag(I,FLAG_QRING);
   }
 }
 BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
