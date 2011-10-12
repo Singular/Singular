@@ -21,6 +21,9 @@ AC_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([factory], [3.1.2.sw])
 
+# Add pre'prefixed config
+AX_PREFIX_CONFIG_H([factory_config.h], [__FACTORY], [config.h])
+
 AC_PROG_YACC
 
 #

@@ -293,9 +293,10 @@ EXTRA_DIST =	test_install.cc \
 
 noinst_PROGRAMS = cplusplus
 
-BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc 
+BUILT_SOURCES = cplusplus.h factory.h factoryconf.h readcf.cc  factory_config.h
 
 CLEANFILES = $(BUILT_SOURCES)
+
 
 cplusplus_SOURCES = cplusplus.cc
 
@@ -328,3 +329,9 @@ test_r_SOURCES = $(TESTSSOURCES)
 test_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti #ftmpl_inst.o
 test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
+
+####################################################
+## The following is due to AX_PREFIX_CONFIG_H
+##
+
+DISTCLEANFILES=_configs.sed
