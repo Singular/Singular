@@ -125,13 +125,16 @@ CFFList ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   mat_ZZ M;
   vec_ZZ S;
   F= compress (F, M, S);
-  CanonicalForm sqrfP= sqrfPart (F);
-  CFList buf;
-  buf= biFactorize (sqrfP, v);
-  result= multiplicity (F, buf);
-  for (CFFListIterator i= result; i.hasItem(); i++)
-    i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
-                             i.getItem().exp());
+  CFFList sqrfFactors= sqrFree (F);
+  for (CFFListIterator i= sqrfFactors; i.hasItem(); i++)
+  {
+    CFList tmp= ratBiSqrfFactorize (i.getItem().factor(), v);
+    for (CFListIterator j= tmp; j.hasItem(); j++)
+    {
+      if (j.getItem().inCoeffDomain()) continue;
+      result.append (CFFactor (N (decompress (j.getItem(), M, S)), i.getItem().exp()));
+    }
+  }
   result= Union (result, contentXFactors);
   result= Union (result, contentYFactors);
   if (isOn (SW_RATIONAL))
