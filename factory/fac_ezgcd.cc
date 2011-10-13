@@ -206,7 +206,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 }
 
 static CanonicalForm
-ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluation & b, const modpk & bound )
+ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluation & /*b*/, const modpk & /*bound*/ )
 {
     CanonicalForm d;
 #if 1

@@ -65,7 +65,7 @@ fmonome( const CanonicalForm & f  )
 //
 //}}}
 static CanonicalForm
-interpol( const CFArray & values, const CanonicalForm & point, const CFArray & points, const Variable & x, int d, int CHAR )
+interpol( const CFArray & values, const CanonicalForm & point, const CFArray & points, const Variable & x, int d, int /*CHAR*/ )
 {
   CFArray alpha( 1, d+1 );
   int i;

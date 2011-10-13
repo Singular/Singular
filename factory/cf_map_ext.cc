@@ -361,7 +361,7 @@ mapDown (const CanonicalForm& F, const CanonicalForm& prim_elem, const
 }
 
 CanonicalForm
-mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& beta,
+mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& /*beta*/,
         const CanonicalForm& prim_elem, const CanonicalForm& im_prim_elem,
         CFList& source, CFList& dest)
 {
