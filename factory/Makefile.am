@@ -334,4 +334,4 @@ test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 ## The following is due to AX_PREFIX_CONFIG_H
 ##
 
-DISTCLEANFILES=_configs.sed factory_config.h
+# DISTCLEANFILES=_configs.sed factory_config.h
