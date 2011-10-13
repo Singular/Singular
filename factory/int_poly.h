@@ -81,7 +81,7 @@ public:
     InternalPoly( const InternalPoly& );
     ~InternalPoly();
     InternalCF* deepCopyObject() const;
-    const char * const classname() const { return "InternalPoly"; }
+    const char * classname() const { return "InternalPoly"; }
     int level() const { return var.level(); }
     Variable variable() const { return var; }
     int degree();

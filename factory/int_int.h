@@ -67,7 +67,7 @@ public:
     InternalInteger( const MP_INT & );
     ~InternalInteger();
     InternalCF* deepCopyObject() const;
-    const char * const classname() const { return "InternalInteger"; }
+    const char * classname() const { return "InternalInteger"; }
 #ifndef NOSTREAMIO
     void print( OSTREAM&, char* );
 #endif /* NOSTREAMIO */
