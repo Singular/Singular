@@ -483,7 +483,7 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_GF2X_long2FacCFFList
-                               (vec_pair_GF2X_long e,GF2 multi,Variable x)
+    (vec_pair_GF2X_long e, GF2 /*multi*/, Variable x)
 {
   //printf("convertNTLvec_pair_GF2X_long2FacCFFList\n");
   CFFList result;
@@ -928,7 +928,8 @@ CanonicalForm convertNTLGF2E2CF(GF2E coefficient,Variable x)
 //         have x as their main variable                                      //
 ////////////////////////////////////////////////////////////////////////////////
 
-CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E multi,Variable x,Variable alpha)
+CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
+    (vec_pair_GF2EX_long e, GF2E /*multi*/, Variable x, Variable alpha)
 {
   CFFList result;
   GF2EX polynom;
