@@ -221,6 +221,10 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
     On(SW_USE_EZGCD);
     return d;
 #else
+    /*
+     * I am not sure, if these lines are much of use.
+     * Remove?
+     */
     DEBOUTLN( cerr, "ezgcd: special case" );
     CanonicalForm Ft, Gt, L, LL, Fb, Gb, Db, Lb, D, Ds, Dt;
     CFArray DD( 1, 2 ), lcDD( 1, 2 );
