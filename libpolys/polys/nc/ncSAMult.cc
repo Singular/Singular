@@ -988,8 +988,6 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
 
     CSpecialPairMultiplier* pSpecialMultiplier = GetPair(i, j);
 
-    poly product = NULL;
-
     // Special case?
     if( pSpecialMultiplier != NULL )
     {
@@ -1006,7 +1004,7 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
       WerrorS("Sorry the general case is not implemented this way yet!!!");
       assume(0);
 
-//      product = NULL;
+      // poly product = NULL;
     }
   }
   
