@@ -33,10 +33,10 @@ extern char * deb_level_msg;
 #define DEBOUTLN(stream, objects) \
 (stream << deb_level_msg << objects << endl)
 #else /* DEBUGOUTPUT */
-#define DEBINCLEVEL(stream, msg)
-#define DEBDECLEVEL(stream, msg)
-#define DEBOUTSL(stream)
-#define DEBOUT(stream, objects)
-#define DEBOUTENDL(stream)
-#define DEBOUTLN(stream, objects)
+#define DEBINCLEVEL(stream, msg) ((void) 0)
+#define DEBDECLEVEL(stream, msg) ((void) 0)
+#define DEBOUTSL(stream) ((void) 0)
+#define DEBOUT(stream, objects) ((void) 0)
+#define DEBOUTENDL(stream) ((void) 0)
+#define DEBOUTLN(stream, objects) ((void) 0)
 #endif /* DEBUGOUTPUT */

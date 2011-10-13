@@ -196,9 +196,9 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 #define p_CheckRing(r)          ((void)0)
 #define P_CheckIf(cond, check)  ((void)0)
 
-#define p_Test(p,r)     (1)
-#define p_LmTest(p,r)   (1)
-#define pp_Test(p, lmRing, tailRing) (1)
+#define p_Test(p,r)     ((void) 1)
+#define p_LmTest(p,r)   ((void) 1)
+#define pp_Test(p, lmRing, tailRing) ((void) 1)
 
 #endif
 
