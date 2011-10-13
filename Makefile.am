@@ -15,4 +15,4 @@ SUBDIRS=$(PACKAGES)
 TESTDIRS=$(ALLOC) $(USE_FACTORY) libpolys kernel Singular
 
 # libfac doesn't use automake, just include it all in tarball
-EXTRA_DIST = libfac
+EXTRA_DIST = libfac autogen.sh
