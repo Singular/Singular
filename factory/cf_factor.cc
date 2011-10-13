@@ -433,11 +433,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         // USE NTL
         if (getCharacteristic()!=2)
         {
-          if (fac_NTL_char!=getCharacteristic())
+          if (fac_NTL_char != getCharacteristic())
           {
-            fac_NTL_char=getCharacteristic();
+            fac_NTL_char = getCharacteristic();
             #ifndef NTL_ZZ
-            if (fac_NTL_char >NTL_SP_BOUND)
+            if (fac_NTL_char > NTL_SP_BOUND)
             {
               ZZ r;
               r=getCharacteristic();
@@ -464,7 +464,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
             }
           }
           #ifndef NTL_ZZ
-          if (fac_NTL_char >NTL_SP_BOUND)
+          if (fac_NTL_char > NTL_SP_BOUND)
           {
             // convert to NTL
             ZZ_pX f1=convertFacCF2NTLZZpX(f);
@@ -509,9 +509,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         else /*getCharacteristic()==2*/
         {
           // Specialcase characteristic==2
-          if (fac_NTL_char!=2)
+          if (fac_NTL_char != 2)
           {
-            fac_NTL_char=2;
+            fac_NTL_char = 2;
             zz_p::init(2);
           }
           // convert to NTL using the faster conversion routine for characteristic 2
@@ -684,9 +684,9 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       {
         // First all cases with characteristic !=2
         // set remainder
-        if (fac_NTL_char!=getCharacteristic())
+        if (fac_NTL_char != getCharacteristic())
         {
-          fac_NTL_char=getCharacteristic();
+          fac_NTL_char = getCharacteristic();
           #ifdef NTL_ZZ
           ZZ r;
           r=getCharacteristic();
