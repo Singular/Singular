@@ -52,7 +52,7 @@ InternalPoly::InternalPoly( const Variable & v, const int e, const CanonicalForm
     lastTerm = firstTerm;
 }
 
-InternalPoly::InternalPoly( const InternalPoly& )
+InternalPoly::InternalPoly( const InternalPoly& ):InternalCF()
 {
     ASSERT( 0, "ups there is something wrong in your code" );
 }

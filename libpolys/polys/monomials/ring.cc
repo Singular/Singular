@@ -699,10 +699,12 @@ char * rString(ring r)
 }
 
 
+/*
+// The fowolling function seems to be never used. Remove?
 static int binaryPower (const int a, const int b)
 {
-  /* computes a^b according to the binary representation of b,
-     i.e., a^7 = a^4 * a^2 * a^1. This saves some multiplications. */
+  // computes a^b according to the binary representation of b,
+  //   i.e., a^7 = a^4 * a^2 * a^1. This saves some multiplications.
   int result = 1;
   int factor = a;
   int bb = b;
@@ -714,6 +716,7 @@ static int binaryPower (const int a, const int b)
   }
   return result;
 }
+*/
 
 /* we keep this otherwise superfluous method for compatibility reasons
    towards the SINGULAR svn trunk */

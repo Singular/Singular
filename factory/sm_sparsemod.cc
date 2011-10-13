@@ -31,7 +31,7 @@
 #include "templates/ftmpl_functions.h"
 
 static CanonicalForm
-smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm & lcggt, const REvaluation & alpha, CFRandom & gen, int CHAR, const Variable & extension )
+smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm & lcggt, const REvaluation & alpha, CFRandom & gen, int CHAR, const Variable & /*extension*/ )
 {
   DEBOUTLN( cerr, " ALPHA = " << alpha );
 
@@ -408,8 +408,8 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   primif = MM(C[1]);
   primig = MM(C[2]);
 
-  if ( level( primif) != level( primig ) )
-    ASSERT( 0, "this should n e v e r happen !!!!" );
+  ASSERT((level(primif) != level(primig)),
+         "this should n e v e r happen !!!!");
 
   //cout << " primif = " << primif << endl;
   //cout << " primig = " << primig << endl;

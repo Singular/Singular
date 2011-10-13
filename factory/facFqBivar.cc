@@ -1994,7 +1994,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
 
 CFList
 increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
-                   int oldNumCols, int oldL, const Variable& alpha,
+                   int oldNumCols, int oldL, const Variable& /*alpha*/,
                    int precision
                   )
 {

@@ -40,7 +40,7 @@ public:
     int deleteObject() { return decRefCount() == 0; }
     InternalCF* copyObject() { incRefCount(); return this; }
     virtual InternalCF* deepCopyObject() const PVIRT_INTCF("deepCopyObject");
-    virtual const char * const classname() const PVIRT_CHARCC("classname");
+    virtual const char * classname() const PVIRT_CHARCC("classname");
     virtual InternalCF* genZero() PVIRT_INTCF("genZero");
     virtual InternalCF* genOne() PVIRT_INTCF("genOne");
     virtual int level() const { return LEVELBASE; }

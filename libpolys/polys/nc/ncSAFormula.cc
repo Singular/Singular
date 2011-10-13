@@ -116,8 +116,6 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
     {
       if( pNext(d) == NULL ) // Our Main Special Case! 
       {
-        const number g = p_GetCoeff(d, r);
-
         if( p_LmIsConstantComp(d, r) ) // Weyl
           return _ncSA_1xy0x0yG;
 

@@ -2324,7 +2324,7 @@ henselLift (const CFList& eval, const CFList& factors, const int* l, const int
 void
 henselStep122 (const CanonicalForm& F, const CFList& factors,
               CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
-              CFArray& Pi, int j, const CFArray& LCs)
+              CFArray& Pi, int j, const CFArray& /*LCs*/)
 {
   Variable x= F.mvar();
   CanonicalForm xToJ= power (x, j);

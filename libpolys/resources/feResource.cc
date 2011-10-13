@@ -505,7 +505,7 @@ static char* feCleanResourceValue(feResourceType type, char* value)
 
 static char* feCleanUpFile(char* fname)
 {
-  char* fn, *s;
+  char* fn;
 
 #ifdef RESOURCE_DEBUG
   printf("feCleanUpFile: entering with =%s=\n", fname);

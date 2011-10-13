@@ -3995,7 +3995,7 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
 
 static inline
 int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
-                const Variable & x, const CFArray& LeadCoeffs )
+                const Variable & /*x*/, const CFArray& LeadCoeffs )
 {
   CFList factors;
   factors.append (G[1]);
