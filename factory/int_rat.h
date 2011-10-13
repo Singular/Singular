@@ -45,7 +45,7 @@ public:
     InternalRational( const MP_INT &, const MP_INT & );
     ~InternalRational();
     InternalCF* deepCopyObject() const;
-    const char * const classname() const { return "InternalRational"; }
+    const char * classname() const { return "InternalRational"; }
 #ifndef NOSTREAMIO
     void print( OSTREAM&, char* );
 #endif /* NOSTREAMIO */
