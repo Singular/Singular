@@ -302,8 +302,9 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
 //        g = replaceLc( g, lf ); h = replaceLc( h, lf );
         e = f - g * h;
         modulus = power( CanonicalForm(p), kvals[j] );
-        if ( mod( f - g * h, modulus ) != 0 )
+        if ( mod( f - g * h, modulus ) != 0 ) {
             DEBOUTLN( cerr, "error at lift stage " << i );
+        }
         i++;
     }
     if ( e.isZero() ) {
