@@ -4,6 +4,7 @@ New/longalg_missing_2.tst
 New/longalg_missing_3.tst
 New/minpoly_locals.tst
 New/modulo_homalg.tst
+New/modulo_homalg_full.tst
 New/print_minpoly.tst
 New/print_nc_relations.tst
 New/print_qring.tst
