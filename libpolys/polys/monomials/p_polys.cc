@@ -2996,7 +2996,6 @@ void pRestoreDegProcs(ring r, pFDegProc old_FDeg, pLDegProc old_lDeg)
 */
 static pFDegProc pOldFDeg;
 static pLDegProc pOldLDeg;
-static intvec * pModW;
 static BOOLEAN pOldLexOrder;
 
 static long pModDeg(poly p, ring r)
