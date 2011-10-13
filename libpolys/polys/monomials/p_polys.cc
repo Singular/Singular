@@ -3659,8 +3659,6 @@ poly pp_Jet(poly p, int m, const ring R)
 
 poly p_Jet(poly p, int m,const ring R)
 {
-  poly t=NULL;
-
   while((p!=NULL) && (p_Totaldegree(p,R)>m)) p_LmDelete(&p,R);
   if (p==NULL) return NULL;
   poly r=p;
