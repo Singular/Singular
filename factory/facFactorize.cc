@@ -800,7 +800,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   if (!noOneToOne)
   {
     int check= factors.length();
-    factors= recoverFactors (A, factors);
+    factors= recoverFactors (reverseShift (oldA, evaluation), factors,
+                             evaluation);
     if (check != factors.length())
       noOneToOne= true;
   }
@@ -850,16 +851,16 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
     if (earlySuccess)
       factors= Union (factors, earlyFactors);
-  }
 
-  for (CFListIterator i= factors; i.hasItem(); i++)
-  {
-    int kk= Aeval.getLast().level();
-    for (CFListIterator j= evaluation; j.hasItem(); j++, kk--)
+    for (CFListIterator i= factors; i.hasItem(); i++)
     {
-      if (i.getItem().level() < kk)
-        continue;
-      i.getItem()= i.getItem() (Variable (kk) - j.getItem(), kk);
+      int kk= Aeval.getLast().level();
+      for (CFListIterator j= evaluation; j.hasItem(); j++, kk--)
+      {
+        if (i.getItem().level() < kk)
+          continue;
+       i.getItem()= i.getItem() (Variable (kk) - j.getItem(), kk);
+      }
     }
   }
 

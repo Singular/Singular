@@ -455,6 +455,16 @@ CFList recoverFactors (const CanonicalForm& F, ///< [in] some poly F
                                                ///< factor candidates
                       );
 
+/// divides factors shifted by evaluation by their content wrt. Variable(1) and 
+/// checks if these polys divide F
+///
+/// @return returns factors of F
+CFList recoverFactors (const CanonicalForm& F,  ///< [in] some poly F
+                       const CFList& factors,   ///< [in] some list of
+                                                ///< factor candidates
+                       const CFList& evaluation
+                      );
+
 /// refine a bivariate factorization of A with l factors to one with
 /// minFactorsLength
 void

@@ -111,11 +111,8 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   int k;
   bool GF= false;
   if (CFFactory::gettype() == GaloisFieldDomain)
-  {
     k= getGFDegree();
-    GF= true;
-  }
-  if (alpha.level() != 1)
+  else if (alpha.level() != 1)
     k= degree (getMipo (alpha));
   else
     k= 1;

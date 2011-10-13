@@ -1989,10 +1989,28 @@ CFList recoverFactors (const CanonicalForm& F, const CFList& factors)
   return result;
 }
 
+CFList recoverFactors (const CanonicalForm& F, const CFList& factors,
+                       const CFList& evaluation)
+{
+  CFList result;
+  CanonicalForm tmp, tmp2;
+  CanonicalForm G= F;
+  for (CFListIterator i= factors; i.hasItem(); i++)
+  {
+    tmp= reverseShift (i.getItem(), evaluation);
+    tmp /= content (tmp, 1);
+    if (fdivides (tmp, G, tmp2))
+    {
+      G= tmp2;
+      result.append (tmp);
+    }
+  }
+  return result;
+}
+
 CFList
 extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
-                                const ExtensionInfo& info,
-                                const CFList& evaluation)
+                                const ExtensionInfo& info)
 {
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();
@@ -2033,16 +2051,12 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           g= prod (T);
           T.removeFirst();
           result.append (g/myContent (g));
-          g= reverseShift (g, evaluation);
           g /= Lc (g);
           appendTestMapDown (result, g, info, source, dest);
           return result;
         }
         else
-        {
-          buf= reverseShift (buf, evaluation);
           return CFList (buf);
-        }
       }
 
       S= subset (v, s, TT, noSubset);
@@ -2052,7 +2066,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
       g /= myContent (g);
       if (fdivides (g, buf, quot))
       {
-        buf2= reverseShift (g, evaluation);
+        buf2= g;
         buf2 /= Lc (buf2);
         if (!k && beta == Variable (1))
         {
@@ -2081,7 +2095,6 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           if (T.length() < 2*s || T.length() == s)
           {
             delete [] v;
-            buf= reverseShift (buf, evaluation);
             buf /= Lc (buf);
             appendTestMapDown (result, buf, info, source, dest);
             return result;
@@ -2097,7 +2110,6 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     if (T.length() < 2*s || T.length() == s)
     {
       delete [] v;
-      buf= reverseShift (buf, evaluation);
       appendTestMapDown (result, buf, info, source, dest);
       return result;
     }
@@ -2106,10 +2118,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     noSubset= false;
   }
   if (T.length() < 2*s)
-  {
-    buf= reverseShift (F, evaluation);
-    appendMapDown (result, buf, info, source, dest);
-  }
+    appendMapDown (result, F, info, source, dest);
 
   delete [] v;
   return result;
@@ -2316,7 +2325,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
 
-    for (int j= 0; j < A.level() - 1; j++)
+    for (int j= 0; j < A.level() - 2; j++)
     {
       if (!bufAeval2[j].isEmpty())
         counter++;
@@ -2514,15 +2523,17 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   factors= nonMonicHenselLift (Aeval, biFactors, leadingCoeffs2, diophant,
                                Pi, liftBounds, liftBoundsLength, noOneToOne);
 
+
   if (!noOneToOne)
   {
     int check= factors.length();
-    factors= recoverFactors (A, factors);
+    A= reverseShift (oldA, evaluation);
+    factors= recoverFactors (A, factors, evaluation);
     if (check != factors.length())
       noOneToOne= true;
 
     if (extension && !noOneToOne)
-      factors= extNonMonicFactorRecombination (factors, oldA, info, evaluation);
+      factors= extNonMonicFactorRecombination (factors, A, info);
   }
   if (noOneToOne)
   {
@@ -2579,21 +2590,22 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     if (earlySuccess)
       factors= Union (factors, earlyFactors);
-  }
-
-  if (!extension)
-  {
-    for (CFListIterator i= factors; i.hasItem(); i++)
+    if (!extension)
     {
-      int kk= Aeval.getLast().level();
-      for (CFListIterator j= evaluation; j.hasItem(); j++, kk--)
+      for (CFListIterator i= factors; i.hasItem(); i++)
       {
-        if (i.getItem().level() < kk)
-          continue;
-        i.getItem()= i.getItem() (Variable (kk) - j.getItem(), kk);
+        int kk= Aeval.getLast().level();
+        for (CFListIterator j= evaluation; j.hasItem(); j++, kk--)
+        {
+          if (i.getItem().level() < kk)
+            continue;
+          i.getItem()= i.getItem() (Variable (kk) - j.getItem(), kk);
+        }
       }
     }
   }
+
+
 
   if (v.level() != 1)
   {
