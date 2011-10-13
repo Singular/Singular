@@ -230,7 +230,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
   
   A.i->m[0] = NUM((fractionObject *)p);
 
-#ifndef NDEBUG
+#if 0
   PrintS("\nTrying to conver the currRing into an algebraic field: ");
   PrintS("Ground poly. ring: \n");
   rWrite( A.r );
