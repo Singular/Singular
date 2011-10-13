@@ -114,7 +114,7 @@ p_Procs_FieldQ_g_la_SOURCES = ${P_PROCS}
 p_Procs_FieldZp_g_la_SOURCES = ${P_PROCS}
 
 
-moduledir = $(libdir)/singular/MOD/
+moduledir = $(libexecdir)/singular/MOD/
 
 if ENABLE_P_PROCS_DYNAMIC
   module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la \
