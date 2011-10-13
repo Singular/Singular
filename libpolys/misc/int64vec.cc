@@ -221,10 +221,17 @@ int64vec * iv64Sub(int64vec * a, int64vec * b)
   return iv;
 }
 
-/* def. internals */
+
+/*
+ * The following two functions are never used.
+ * Remove?
+
+// def. internals
 static int64 iv64Gcd(int, int);
 static int64 iv64L1Norm(intvec *);
 
+
+// The following two functions seem to be never used. Remove?
 static int64 iv64Gcd(int64 a,int64 b)
 {
   int64 x;
@@ -261,4 +268,4 @@ static int64 iv64L1Norm(int64vec *w)
   }
   return s;
 }
-
+*/
