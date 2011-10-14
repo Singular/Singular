@@ -6076,7 +6076,7 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
   //}
   memcpy(m->m,I->m,i*sizeof(poly));
   memset(I->m,0,i*sizeof(poly));
-  idDelete(&I);
+  id_Delete(&I,currRing);
   res->data = (char *)m;
   return FALSE;
 }
@@ -6090,7 +6090,7 @@ static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
     return TRUE;
   }
   res->data = (char *)id_Module2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
-           (int)(long)v->Data(),(int)(long)w->Data(),currRing);
+           mi,ni,currRing);
   return FALSE;
 }
 static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
@@ -6115,7 +6115,7 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
       MATELEM(I,i,j)=NULL;
     }
   }
-  idDelete((ideal *)&I);
+  id_Delete((ideal *)&I,currRing);
   res->data = (char *)m;
   return FALSE;
 }
