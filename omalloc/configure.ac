@@ -14,7 +14,7 @@ AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER(omConfig.h)
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([omalloc],[0.9.6])
+AM_INIT_AUTOMAKE([-Wall foreign])
 
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([omConfig.h],[],[omConfig.h])
