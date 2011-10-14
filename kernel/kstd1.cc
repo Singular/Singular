@@ -2418,7 +2418,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       if (strat->sl>srmax) srmax = strat->sl;
       if (pos<strat->sl)
       {
-	need_retry++;
+        need_retry++;
         // move all "larger" elements fromS to L
         // remove them from T
         int ii=pos+1;
@@ -2426,7 +2426,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
         {
           LObject h;
           memset(&h,0,sizeof(h));
-	  h.tailRing=strat->tailRing;
+          h.tailRing=strat->tailRing;
           h.p=strat->S[ii]; strat->S[ii]=NULL;
           strat->initEcart(&h);
           h.sev=strat->sevS[ii];
@@ -2450,12 +2450,25 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
           }
           int lpos=strat->posInL(strat->L,strat->Ll,&h,strat);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,lpos);
+          #ifdef KDEBUG
+          if (TEST_OPT_DEBUG)
+          {
+            Print("move S[%d] -> L[%d]: ",ii,pos);
+            p_wrp(h.p,currRing, strat->tailRing);
+            PrintLn();
+          }
+          #endif
+        }
+        if (strat->fromQ!=NULL)
+        {
+          for(ii=pos+1;ii<=strat->sl;ii++) strat->fromQ[ii]=0;
         }
         strat->sl=pos;
       }
     }
 
 #ifdef KDEBUG
+    messageSets(strat);
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif
     //kTest_TS(strat);: i_r out of sync in kInterRedBba, but not used!
@@ -2465,7 +2478,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #endif
   /* complete reduction of the standard basis--------- */
 
-  if((need_retry==0) && (TEST_OPT_REDSB))
+  if((need_retry<=0) && (TEST_OPT_REDSB))
   {
     completeReduce(strat);
 #ifdef HAVE_TAIL_RING
@@ -2527,6 +2540,9 @@ ideal kInterRed (ideal F, ideal Q)
   ideal res=kInterRedBba(F,Q,need_retry);
   while (need_retry && (counter>0))
   {
+    #ifdef KDEBUG
+    if (TEST_OPT_DEBUG) { Print("retry counter %d\n",counter); }
+    #endif
     ideal res1=kInterRedBba(res,Q,need_retry);
     int new_elems=idElem(res1);
     counter -= (new_elems >= elems);

@@ -5400,24 +5400,24 @@ void updateS(BOOLEAN toT,kStrategy strat)
           {
             if (TEST_OPT_INTSTRATEGY)
             {
-	      if (TEST_OPT_CONTENTSB)
-		{
-		  number n;
-		  p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
-		  if (!nIsOne(n))
-		    {
-		      denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
-		      denom->n=nInvers(n);
-		      denom->next=DENOMINATOR_LIST;
-		      DENOMINATOR_LIST=denom;
-		    }
-		  nDelete(&n);
-		}
-	      else
-		{
-		  //pContent(strat->S[i]);
-		  strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
-		}
+              if (TEST_OPT_CONTENTSB)
+                {
+                  number n;
+                  p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
+                  if (!nIsOne(n))
+                    {
+                      denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
+                      denom->n=nInvers(n);
+                      denom->next=DENOMINATOR_LIST;
+                      DENOMINATOR_LIST=denom;
+                    }
+                  nDelete(&n);
+                }
+              else
+                {
+                  //pContent(strat->S[i]);
+                  strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
+                }
             }
             else
             {
@@ -5487,24 +5487,24 @@ void updateS(BOOLEAN toT,kStrategy strat)
             strat->ecartS[i] = h.ecart;
             if (TEST_OPT_INTSTRATEGY)
             {
-	      if (TEST_OPT_CONTENTSB)
-		{
-		  number n;
-		  p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
-		  if (!nIsOne(n))
-		    {
-		      denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
-		      denom->n=nInvers(n);
-		      denom->next=DENOMINATOR_LIST;
-		      DENOMINATOR_LIST=denom;
-		    }
-		  nDelete(&n);
-		}
-	      else
-		{
-		  //pContent(strat->S[i]);
-		  strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
-		}
+              if (TEST_OPT_CONTENTSB)
+                {
+                  number n;
+                  p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
+                  if (!nIsOne(n))
+                    {
+                      denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
+                      denom->n=nInvers(n);
+                      denom->next=DENOMINATOR_LIST;
+                      DENOMINATOR_LIST=denom;
+                    }
+                  nDelete(&n);
+                }
+              else
+                {
+                  //pContent(strat->S[i]);
+                  strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
+                }
             }
             else
             {
@@ -6127,14 +6127,30 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
     if ((strat->fromQ!=NULL) && (strat->fromQ[i])) continue; // do not reduce Q_i
     if (strat->ak==0) end_pos=i-1;
     TObject* T_j = strat->s_2_t(i);
-    if (T_j != NULL)
+    if ((T_j != NULL)&&(T_j->p==strat->S[i]))
     {
       L = *T_j;
+      #ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        Print("test S[%d]:",i);
+        p_wrp(L.p,currRing,strat->tailRing);
+        PrintLn();
+      }
+      #endif
       poly p;
       if (pOrdSgn == 1)
         strat->S[i] = redtailBba(&L, end_pos, strat, withT);
       else
         strat->S[i] = redtail(&L, strat->sl, strat);
+      #ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        Print("to (tailR) S[%d]:",i);
+        p_wrp(strat->S[i],currRing,strat->tailRing);
+        PrintLn();
+      }
+      #endif
 
       if (strat->redTailChange && strat->tailRing != currRing)
       {
@@ -6150,31 +6166,47 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
     else
     {
       assume(currRing == strat->tailRing);
+      #ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        Print("test S[%d]:",i);
+        p_wrp(strat->S[i],currRing,strat->tailRing);
+        PrintLn();
+      }
+      #endif
       if (pOrdSgn == 1)
         strat->S[i] = redtailBba(strat->S[i], end_pos, strat, withT);
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
       if (TEST_OPT_INTSTRATEGY)
-	{
-	  if (TEST_OPT_CONTENTSB)
-	    {
-	      number n;
-	      p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
-	      if (!nIsOne(n))
-		{
-		  denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
-		  denom->n=nInvers(n);
-		  denom->next=DENOMINATOR_LIST;
-		  DENOMINATOR_LIST=denom;
-		}
-	      nDelete(&n);
-	    }
-	  else
-	    {
-	      //pContent(strat->S[i]);
-	      strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
-	    }
-	}
+      {
+        if (TEST_OPT_CONTENTSB)
+        {
+          number n;
+          p_Cleardenom_n(strat->S[i], currRing, n);// also does a pContent
+          if (!nIsOne(n))
+          {
+            denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
+            denom->n=nInvers(n);
+            denom->next=DENOMINATOR_LIST;
+            DENOMINATOR_LIST=denom;
+          }
+          nDelete(&n);
+        }
+        else
+        {
+          //pContent(strat->S[i]);
+          strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
+        }
+      }
+      #ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        Print("to (-tailR) S[%d]:",i);
+        p_wrp(strat->S[i],currRing,strat->tailRing);
+        PrintLn();
+      }
+      #endif
     }
     if (TEST_OPT_PROT)
       PrintS("-");

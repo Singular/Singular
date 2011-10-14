@@ -39,10 +39,10 @@ KINLINE TObject* skStrategy::s_2_t(int i)
   if (i >= 0 && i <= sl)
   {
     int sri= S_2_R[i];
-    if (sri >= 0 && sri <= tl)
+    if ((sri >= 0) && (sri <= tl))
     {
       TObject* t = R[sri];
-      if (t != NULL && t->p == S[i])
+      if ((t != NULL) && (t->p == S[i]))
         return t;
     }
     // last but not least, try kFindInT
