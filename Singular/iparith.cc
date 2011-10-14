@@ -6063,9 +6063,16 @@ static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
 }
 static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 {
-  matrix m=mpNew((int)(long)v->Data(),(int)(long)w->Data());
+  int mi=(int)(long)v->Data();
+  int ni=(int)(long)w->Data();
+  if ((mi<1)||(ni<1))
+  {
+    WerrorS("matrix dimensions must be positive");
+    return TRUE;
+  }
+  matrix m=mpNew(mi,ni);
   ideal I=(ideal)u->CopyD(IDEAL_CMD);
-  int i=si_min(IDELEMS(I),(int)(long)v->Data()*(int)(long)w->Data());
+  int i=si_min(IDELEMS(I),mi*ni);
   //for(i=i-1;i>=0;i--)
   //{
   //  m->m[i]=I->m[i];
@@ -6079,16 +6086,30 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
+  int mi=(int)(long)v->Data();
+  int ni=(int)(long)w->Data();
+  if ((mi<1)||(ni<1))
+  {
+    WerrorS("matrix dimensions must be positive");
+    return TRUE;
+  }
   res->data = (char *)idModule2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
-           (int)(long)v->Data(),(int)(long)w->Data());
+           mi,ni);
   return FALSE;
 }
 static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 {
-  matrix m=mpNew((int)(long)v->Data(),(int)(long)w->Data());
+  int mi=(int)(long)v->Data();
+  int ni=(int)(long)w->Data();
+  if ((mi<1)||(ni<1))
+  {
+    WerrorS("matrix dimensions must be positive");
+    return TRUE;
+  }
+  matrix m=mpNew(mi,ni);
   matrix I=(matrix)u->CopyD(MATRIX_CMD);
-  int r=si_min(MATROWS(I),(int)(long)v->Data());
-  int c=si_min(MATCOLS(I),(int)(long)w->Data());
+  int r=si_min(MATROWS(I),mi);
+  int c=si_min(MATCOLS(I),ni);
   int i,j;
   for(i=r;i>0;i--)
   {
