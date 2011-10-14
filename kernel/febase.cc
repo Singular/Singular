@@ -707,6 +707,11 @@ FILE * feFopen(const char *path, const char *mode, char *where,
       struct passwd *pw_entry;
       strcpy (longpath, path);
       dir_sep = strchr(longpath, DIR_SEP);
+      if (dir_sep==NULL) 
+      {
+        Werror(" illegal ~ in filename >>%s<<",longpath);
+        return NULL;
+      }
       *dir_sep = '\0';
       pw_entry = getpwnam(&longpath[1]);
       if (pw_entry != NULL)
