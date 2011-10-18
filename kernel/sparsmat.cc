@@ -45,24 +45,25 @@ struct smprec
 };
 
 
-/* declare internal 'C' stuff */
-static void smExactPolyDiv(poly, poly);
-static BOOLEAN smIsNegQuot(poly, const poly, const poly);
-static void smExpMultDiv(poly, const poly, const poly);
-static void smPolyDivN(poly, const number);
-static BOOLEAN smSmaller(poly, poly);
-static void smCombineChain(poly *, poly);
-static void smFindRef(poly *, poly *, poly);
-
-static void smElemDelete(smpoly *);
-static smpoly smElemCopy(smpoly);
-static float smPolyWeight(smpoly);
-static smpoly smPoly2Smpoly(poly);
-static poly smSmpoly2Poly(smpoly);
-static BOOLEAN smHaveDenom(poly);
-static number smCleardenom(ideal);
-
 omBin smprec_bin = omGetSpecBin(sizeof(smprec));
+
+static void smExpMultDiv(poly t, const poly b, const poly c)
+{
+  int i;
+  pTest(t);
+  pLmTest(b);
+  pLmTest(c);
+  poly bc = p_New(currRing);
+
+  p_ExpVectorDiff(bc, b, c, currRing);
+
+  while(t!=NULL)
+  {
+    pExpVectorAdd(t, bc);
+    pIter(t);
+  }
+  p_LmFree(bc, currRing);
+}
 
 static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m,
                                                poly a, poly b)
@@ -335,6 +336,56 @@ BOOLEAN smCheckDet(ideal I, int d, BOOLEAN sw)
 }
 
 /* ----------------- basics (used from 'C') ------------------ */
+static BOOLEAN smHaveDenom(poly a)
+{
+  BOOLEAN sw;
+  number x;
+
+  while (a != NULL)
+  {
+    x = nGetDenom(pGetCoeff(a));
+    sw = nIsOne(x);
+    nDelete(&x);
+    if (!sw)
+    {
+      return TRUE;
+    }
+    pIter(a);
+  }
+  return FALSE;
+}
+
+static number smCleardenom(ideal id)
+{
+  poly a;
+  number x,y,res=nInit(1);
+  BOOLEAN sw=FALSE;
+
+  for (int i=0; i<IDELEMS(id); i++)
+  {
+    a = id->m[i];
+    sw = smHaveDenom(a);
+    if (sw) break;
+  }
+  if (!sw) return res;
+  for (int i=0; i<IDELEMS(id); i++)
+  {
+    a = id->m[i];
+    if (a!=NULL)
+    {
+      x = nCopy(pGetCoeff(a));
+      p_Cleardenom(a, currRing);
+      y = nDiv(x,pGetCoeff(a));
+      nDelete(&x);
+      x = nMult(res,y);
+      nNormalize(x);
+      nDelete(&res);
+      res = x;
+    }
+  }
+  return res;
+}
+
 /*2
 *returns the determinant of the module I;
 *uses Bareiss algorithm
@@ -427,6 +478,43 @@ void smCallBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
 }
 
 /*
+* from poly to smpoly
+* do not destroy p
+*/
+static smpoly smPoly2Smpoly(poly q)
+{
+  poly pp;
+  smpoly res, a;
+  long x;
+
+  if (q == NULL)
+    return NULL;
+  a = res = (smpoly)omAllocBin(smprec_bin);
+  a->pos = x = pGetComp(q);
+  a->m = q;
+  a->e = 0;
+  loop
+  {
+    pSetComp(q,0);
+    pp = q;
+    pIter(q);
+    if (q == NULL)
+    {
+      a->n = NULL;
+      return res;
+    }
+    if (pGetComp(q) != x)
+    {
+      a = a->n = (smpoly)omAllocBin(smprec_bin);
+      pNext(pp) = NULL;
+      a->pos = x = pGetComp(q);
+      a->m = q;
+      a->e = 0;
+    }
+  }
+}
+
+/*
 * constructor
 */
 sparse_mat::sparse_mat(ideal smat)
@@ -484,6 +572,48 @@ sparse_mat::~sparse_mat()
   omFreeSize((ADDRESS)wrw, sizeof(float)*i);
   omFreeSize((ADDRESS)m_row, sizeof(smpoly)*i);
   omFreeSize((ADDRESS)perm, sizeof(int)*(i+1));
+}
+
+/*
+* from smpoly to poly
+* destroy a
+*/
+static poly smSmpoly2Poly(smpoly a)
+{
+  smpoly b;
+  poly res, pp, q;
+  long x;
+
+  if (a == NULL)
+    return NULL;
+  x = a->pos;
+  q = res = a->m;
+  loop
+  {
+    pSetComp(q,x);
+    pp = q;
+    pIter(q);
+    if (q == NULL)
+      break;
+  }
+  loop
+  {
+    b = a;
+    a = a->n;
+    omFreeBin((void *)b,  smprec_bin);
+    if (a == NULL)
+      return res;
+    x = a->pos;
+    q = pNext(pp) = a->m;
+    loop
+    {
+      pSetComp(q,x);
+      pp = q;
+      pIter(q);
+      if (q == NULL)
+        break;
+    }
+  }
 }
 
 /*
@@ -644,6 +774,38 @@ void sparse_mat::smNewBareiss(int x, int y)
 }
 
 /* ----------------- pivot method ------------------ */
+
+/*
+* weigth of a polynomial, for pivot strategy
+*/
+static float smPolyWeight(smpoly a)
+{
+  poly p = a->m;
+  int i;
+  float res = (float)nSize(pGetCoeff(p));
+
+  if (pNext(p) == NULL)
+  {
+    for(i=pVariables; i>0; i--)
+    {
+      if (pGetExp(p,i) != 0) return res+1.0;
+    }
+    return res;
+  }
+  else
+  {
+    i = 0;
+    res = 0.0;
+    do
+    {
+      i++;
+      res += (float)nSize(pGetCoeff(p));
+      pIter(p);
+    }
+    while (p);
+    return res+(float)i;
+  }
+}
 
 /*
 * prepare smPivot, compute weights for rows and columns
@@ -836,6 +998,22 @@ void sparse_mat::smNewPivot()
 }
 
 /* ----------------- elimination ------------------ */
+static void smElemDelete(smpoly *r)
+{
+  smpoly a = *r, b = a->n;
+
+  pDelete(&a->m);
+  omFreeBin((void *)a,  smprec_bin);
+  *r = b;
+}
+
+static smpoly smElemCopy(smpoly a)
+{
+  smpoly r = (smpoly)omAllocBin(smprec_bin);
+  memcpy(r, a, sizeof(smprec));
+/*  r->m = pCopy(r->m); */
+  return r;
+}
 
 /* first step of elimination */
 void sparse_mat::sm1Elim()
@@ -1652,6 +1830,142 @@ void smPolyDiv(poly a, poly b)
 }
 
 
+static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
+{
+  if (pLmDivisibleByNoComp(c, b))
+  {
+    pExpVectorDiff(a, b, c);
+    // Hmm: here used to be a pSetm(a): but it is unnecessary,
+    // if b and c are correct
+    return FALSE;
+  }
+  else
+  {
+    int i;
+    for (i=pVariables; i>0; i--)
+    {
+      if(pGetExp(c,i) > pGetExp(b,i))
+        pSetExp(a,i,pGetExp(c,i)-pGetExp(b,i));
+      else
+        pSetExp(a,i,0);
+    }
+    // here we actually might need a pSetm, if a is to be used in
+    // comparisons
+    return TRUE;
+  }
+}
+
+static BOOLEAN smSmaller(poly a, poly b)
+{
+  loop
+  {
+    pIter(b);
+    if (b == NULL) return TRUE;
+    pIter(a);
+    if (a == NULL) return FALSE;
+  }
+}
+
+static void smCombineChain(poly *px, poly r)
+{
+  poly pa = *px, pb;
+  number x;
+  int i;
+
+  loop
+  {
+    pb = pNext(pa);
+    if (pb == NULL)
+    {
+      pa = pNext(pa) = r;
+      break;
+    }
+    i = pLmCmp(pb, r);
+    if (i > 0)
+      pa = pb;
+    else
+    {
+      if (i == 0)
+      {
+        x = nAdd(pGetCoeff(pb), pGetCoeff(r));
+        pLmDelete(&r);
+        if (nIsZero(x))
+        {
+          pLmDelete(&pb);
+          pNext(pa) = pAdd(pb,r);
+        }
+        else
+        {
+          pa = pb;
+          pSetCoeff(pa,x);
+          pNext(pa) = pAdd(pNext(pa), r);
+        }
+      }
+      else
+      {
+        pa = pNext(pa) = r;
+        pNext(pa) = pAdd(pb, pNext(pa));
+      }
+      break;
+    }
+  }
+  *px = pa;
+}
+
+static void smFindRef(poly *ref, poly *px, poly r)
+{
+  number x;
+  int i;
+  poly pa = *px, pp = NULL;
+
+  loop
+  {
+    i = pLmCmp(pa, r);
+    if (i > 0)
+    {
+      pp = pa;
+      pIter(pa);
+      if (pa==NULL)
+      {
+        pNext(pp) = r;
+        break;
+      }
+    }
+    else
+    {
+      if (i == 0)
+      {
+        x = nAdd(pGetCoeff(pa), pGetCoeff(r));
+        pLmDelete(&r);
+        if (nIsZero(x))
+        {
+          pLmDelete(&pa);
+          if (pp!=NULL)
+            pNext(pp) = pAdd(pa,r);
+          else
+            *px = pAdd(pa,r);
+        }
+        else
+        {
+          pp = pa;
+          pSetCoeff(pp,x);
+          pNext(pp) = pAdd(pNext(pp), r);
+        }
+      }
+      else
+      {
+        if (pp!=NULL)
+          pp = pNext(pp) = r;
+        else
+          *px = pp = r;
+        pNext(pp) = pAdd(pa, pNext(r));
+      }
+      break;
+    }
+  }
+  *ref = pp;
+}
+
 //disable that, as it fails with coef buckets
 //#define X_MAS
 #ifdef X_MAS
@@ -1873,22 +2187,6 @@ poly smMultDiv(poly a, poly b, const poly c)
   return res;
 }
 #endif
-/*n
-* exact division a/b
-* a is a result of smMultDiv
-* a destroyed, b NOT destroyed
-*/
-void smSpecialPolyDiv(poly a, poly b)
-{
-  if (pNext(b) == NULL)
-  {
-    smPolyDivN(a, pGetCoeff(b));
-    return;
-  }
-  smExactPolyDiv(a, b);
-}
-
-
 /* ------------ internals arithmetic ------------- */
 static void smExactPolyDiv(poly a, poly b)
 {
@@ -1944,51 +2242,6 @@ static void smExactPolyDiv(poly a, poly b)
   pLmFree(e);
 }
 
-// obachman --> Wilfried: check the following
-static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
-{
-  if (pLmDivisibleByNoComp(c, b))
-  {
-    pExpVectorDiff(a, b, c);
-    // Hmm: here used to be a pSetm(a): but it is unnecessary,
-    // if b and c are correct
-    return FALSE;
-  }
-  else
-  {
-    int i;
-    for (i=pVariables; i>0; i--)
-    {
-      if(pGetExp(c,i) > pGetExp(b,i))
-        pSetExp(a,i,pGetExp(c,i)-pGetExp(b,i));
-      else
-        pSetExp(a,i,0);
-    }
-    // here we actually might need a pSetm, if a is to be used in
-    // comparisons
-    return TRUE;
-  }
-}
-
-static void smExpMultDiv(poly t, const poly b, const poly c)
-{
-  int i;
-  pTest(t);
-  pLmTest(b);
-  pLmTest(c);
-  poly bc = p_New(currRing);
-
-  p_ExpVectorDiff(bc, b, c, currRing);
-
-  while(t!=NULL)
-  {
-    pExpVectorAdd(t, bc);
-    pIter(t);
-  }
-  p_LmFree(bc, currRing);
-}
-
-
 static void smPolyDivN(poly a, const number x)
 {
   number y;
@@ -2002,296 +2255,19 @@ static void smPolyDivN(poly a, const number x)
   } while (a != NULL);
 }
 
-static BOOLEAN smSmaller(poly a, poly b)
-{
-  loop
-  {
-    pIter(b);
-    if (b == NULL) return TRUE;
-    pIter(a);
-    if (a == NULL) return FALSE;
-  }
-}
-
-static void smCombineChain(poly *px, poly r)
-{
-  poly pa = *px, pb;
-  number x;
-  int i;
-
-  loop
-  {
-    pb = pNext(pa);
-    if (pb == NULL)
-    {
-      pa = pNext(pa) = r;
-      break;
-    }
-    i = pLmCmp(pb, r);
-    if (i > 0)
-      pa = pb;
-    else
-    {
-      if (i == 0)
-      {
-        x = nAdd(pGetCoeff(pb), pGetCoeff(r));
-        pLmDelete(&r);
-        if (nIsZero(x))
-        {
-          pLmDelete(&pb);
-          pNext(pa) = pAdd(pb,r);
-        }
-        else
-        {
-          pa = pb;
-          pSetCoeff(pa,x);
-          pNext(pa) = pAdd(pNext(pa), r);
-        }
-      }
-      else
-      {
-        pa = pNext(pa) = r;
-        pNext(pa) = pAdd(pb, pNext(pa));
-      }
-      break;
-    }
-  }
-  *px = pa;
-}
-
-
-static void smFindRef(poly *ref, poly *px, poly r)
-{
-  number x;
-  int i;
-  poly pa = *px, pp = NULL;
-
-  loop
-  {
-    i = pLmCmp(pa, r);
-    if (i > 0)
-    {
-      pp = pa;
-      pIter(pa);
-      if (pa==NULL)
-      {
-        pNext(pp) = r;
-        break;
-      }
-    }
-    else
-    {
-      if (i == 0)
-      {
-        x = nAdd(pGetCoeff(pa), pGetCoeff(r));
-        pLmDelete(&r);
-        if (nIsZero(x))
-        {
-          pLmDelete(&pa);
-          if (pp!=NULL)
-            pNext(pp) = pAdd(pa,r);
-          else
-            *px = pAdd(pa,r);
-        }
-        else
-        {
-          pp = pa;
-          pSetCoeff(pp,x);
-          pNext(pp) = pAdd(pNext(pp), r);
-        }
-      }
-      else
-      {
-        if (pp!=NULL)
-          pp = pNext(pp) = r;
-        else
-          *px = pp = r;
-        pNext(pp) = pAdd(pa, pNext(r));
-      }
-      break;
-    }
-  }
-  *ref = pp;
-}
-
-/* ----------------- internal 'C' stuff ------------------ */
-
-static void smElemDelete(smpoly *r)
-{
-  smpoly a = *r, b = a->n;
-
-  pDelete(&a->m);
-  omFreeBin((void *)a,  smprec_bin);
-  *r = b;
-}
-
-static smpoly smElemCopy(smpoly a)
-{
-  smpoly r = (smpoly)omAllocBin(smprec_bin);
-  memcpy(r, a, sizeof(smprec));
-/*  r->m = pCopy(r->m); */
-  return r;
-}
-
-/*
-* from poly to smpoly
-* do not destroy p
+/*n
+* exact division a/b
+* a is a result of smMultDiv
+* a destroyed, b NOT destroyed
 */
-static smpoly smPoly2Smpoly(poly q)
+void smSpecialPolyDiv(poly a, poly b)
 {
-  poly pp;
-  smpoly res, a;
-  long x;
-
-  if (q == NULL)
-    return NULL;
-  a = res = (smpoly)omAllocBin(smprec_bin);
-  a->pos = x = pGetComp(q);
-  a->m = q;
-  a->e = 0;
-  loop
+  if (pNext(b) == NULL)
   {
-    pSetComp(q,0);
-    pp = q;
-    pIter(q);
-    if (q == NULL)
-    {
-      a->n = NULL;
-      return res;
-    }
-    if (pGetComp(q) != x)
-    {
-      a = a->n = (smpoly)omAllocBin(smprec_bin);
-      pNext(pp) = NULL;
-      a->pos = x = pGetComp(q);
-      a->m = q;
-      a->e = 0;
-    }
+    smPolyDivN(a, pGetCoeff(b));
+    return;
   }
-}
-
-/*
-* from smpoly to poly
-* destroy a
-*/
-static poly smSmpoly2Poly(smpoly a)
-{
-  smpoly b;
-  poly res, pp, q;
-  long x;
-
-  if (a == NULL)
-    return NULL;
-  x = a->pos;
-  q = res = a->m;
-  loop
-  {
-    pSetComp(q,x);
-    pp = q;
-    pIter(q);
-    if (q == NULL)
-      break;
-  }
-  loop
-  {
-    b = a;
-    a = a->n;
-    omFreeBin((void *)b,  smprec_bin);
-    if (a == NULL)
-      return res;
-    x = a->pos;
-    q = pNext(pp) = a->m;
-    loop
-    {
-      pSetComp(q,x);
-      pp = q;
-      pIter(q);
-      if (q == NULL)
-        break;
-    }
-  }
-}
-
-/*
-* weigth of a polynomial, for pivot strategy
-*/
-static float smPolyWeight(smpoly a)
-{
-  poly p = a->m;
-  int i;
-  float res = (float)nSize(pGetCoeff(p));
-
-  if (pNext(p) == NULL)
-  {
-    for(i=pVariables; i>0; i--)
-    {
-      if (pGetExp(p,i) != 0) return res+1.0;
-    }
-    return res;
-  }
-  else
-  {
-    i = 0;
-    res = 0.0;
-    do
-    {
-      i++;
-      res += (float)nSize(pGetCoeff(p));
-      pIter(p);
-    }
-    while (p);
-    return res+(float)i;
-  }
-}
-
-static BOOLEAN smHaveDenom(poly a)
-{
-  BOOLEAN sw;
-  number x;
-
-  while (a != NULL)
-  {
-    x = nGetDenom(pGetCoeff(a));
-    sw = nIsOne(x);
-    nDelete(&x);
-    if (!sw)
-    {
-      return TRUE;
-    }
-    pIter(a);
-  }
-  return FALSE;
-}
-
-static number smCleardenom(ideal id)
-{
-  poly a;
-  number x,y,res=nInit(1);
-  BOOLEAN sw=FALSE;
-
-  for (int i=0; i<IDELEMS(id); i++)
-  {
-    a = id->m[i];
-    sw = smHaveDenom(a);
-    if (sw) break;
-  }
-  if (!sw) return res;
-  for (int i=0; i<IDELEMS(id); i++)
-  {
-    a = id->m[i];
-    if (a!=NULL)
-    {
-      x = nCopy(pGetCoeff(a));
-      p_Cleardenom(a, currRing);
-      y = nDiv(x,pGetCoeff(a));
-      nDelete(&x);
-      x = nMult(res,y);
-      nNormalize(x);
-      nDelete(&res);
-      res = x;
-    }
-  }
-  return res;
+  smExactPolyDiv(a, b);
 }
 
 /* ----------------- gauss elimination ------------------ */
