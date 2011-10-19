@@ -1,5 +1,6 @@
 New/algext_numbers.tst
 New/gf_coeff_short.tst
+New/gf_fetch.tst
 New/longalg_missing_2.tst
 New/longalg_missing_3.tst
 New/minpoly_locals.tst
