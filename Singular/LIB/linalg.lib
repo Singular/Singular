@@ -124,11 +124,7 @@ EXAMPLE:  example inverse; shows an example
    int ii,u,notInvertible,opt;
    matrix invA;
    int db = printlevel-voice+3;      //used for comments
-   def R=basering;
-   string mp = "";
-   if (minpoly != 0) {
-     string(minpoly);
-   }
+   def R = basering;
    int n = nrows(A);
    module M = A;
    intvec v = option(get);           //get options to reset it later
@@ -156,13 +152,14 @@ EXAMPLE:  example inverse; shows an example
       else {opt = 1;}
    }
 //------------------------- change ring if necessary -------------------------
-   if( ordstr(R) != "C,dp(nvars(R))" )
+   if( ordstr(R) != "C,dp(" + string(nvars(R)) + ")" )
    {
      u=1;
-     def @R=changeord("C,dp",R);
-     setring @R;
-     if (mp != "") {
-       execute(mp);
+     string mp = string(minpoly);
+     def @R=changeord("C,dp", R); setring @R;
+     if (mp != string(minpoly)) 
+     {
+       execute("minpoly = " + mp + ";");
      }
      module M = fetch(R,M);
    }
