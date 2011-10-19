@@ -2314,7 +2314,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   strat->posInL=posInL0; /* ord according pComp */
 
-  /*Shdl=*/initBuchMora(F, Q,strat);
+  /*Shdl=*/initBuchMora(F, Q, strat);
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
 
@@ -2468,7 +2468,10 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     }
 
 #ifdef KDEBUG
-    messageSets(strat);
+    if (TEST_OPT_DEBUG)
+    {
+      messageSets(strat);
+    }
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif
     //kTest_TS(strat);: i_r out of sync in kInterRedBba, but not used!
@@ -2536,25 +2539,47 @@ ideal kInterRed (ideal F, ideal Q)
 
   int need_retry;
   int counter=3;
-  int elems=idElem(F);
-  ideal res=kInterRedBba(F,Q,need_retry);
+  ideal res, res1;
+  int elems;
+  ideal null=NULL;
+  if ((Q==NULL) || (!TEST_OPT_REDSB))
+  {
+    elems=idElem(F);
+    res=kInterRedBba(F,Q,need_retry);
+  }
+  else
+  {
+    ideal FF=idSimpleAdd(F,Q);
+    res=kInterRedBba(FF,NULL,need_retry);
+    idDelete(&FF);
+    null=idInit(1,1);
+    res1=kNF(null,Q,res);
+    idDelete(&res);
+    res=res1;
+  }
   while (need_retry && (counter>0))
   {
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) { Print("retry counter %d\n",counter); }
     #endif
-    ideal res1=kInterRedBba(res,Q,need_retry);
+    res1=kInterRedBba(res,Q,need_retry);
     int new_elems=idElem(res1);
     counter -= (new_elems >= elems);
     elems = new_elems;
     idDelete(&res);
-    res = res1;
+    if ((Q!=NULL) && (TEST_OPT_REDSB))
+    {
+      res=kNF(null,Q,res1);
+      idDelete(&res1);
+    }
+    else
+      res = res1;
   }
+  if (null!=NULL) idDelete(&null);
   test=save;
   idSkipZeroes(res);
   return res;
 }
-
 
 // returns TRUE if mora should use buckets, false otherwise
 static BOOLEAN kMoraUseBucket(kStrategy strat)

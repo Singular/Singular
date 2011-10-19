@@ -19,4 +19,12 @@ NF(_,std(ideal(y+u2+uv3,z+uv3)));
 interred(std(i));
 interred(NF(std(i),std(ideal(y+u2+uv3,z+uv3))));
 
+ring r = 2,(a, b),dp;
+option(redSB);
+interred(ideal(a^2,a*b+a^2));
+qring qq = std(ideal(b^2+a*b+a^2,a^3));
+qq;
+option(redSB);
+interred(ideal(a^2,a*b+a^2));
+
 tst_status(1);$
