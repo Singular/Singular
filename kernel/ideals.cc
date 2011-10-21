@@ -262,7 +262,7 @@ void idDelMultiples(ideal id)
           }
 #else
           if (pComparePolys(id->m[i], id->m[j])) pDelete(&id->m[j]);
-#endif          
+#endif
         }
       }
     }
@@ -364,7 +364,7 @@ void idDelDiv(ideal id)
           }
 #ifdef HAVE_RINGS
           }
-#endif          
+#endif
         }
       }
     }
@@ -442,7 +442,7 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
   if (b==NULL) return 1;
   if (a==NULL) return -1;
 
-  if (nolex) 
+  if (nolex)
   {
     int r=pLmCmp(a,b);
     if (r!=0) return r;
@@ -1189,9 +1189,9 @@ ideal idSectWithElim (ideal h1,ideal h2)
   // eliminate t:
 
   ideal res=idElimination(h,t);
-  // cleanup 
+  // cleanup
   idDelete(&h);
-  res=idrMoveR(res,r,origRing);
+  if (res!=NULL) res=idrMoveR(res,r,origRing);
   rChangeCurrRing(origRing);
   rKill(r);
   return res;
@@ -1952,23 +1952,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   if (idIs0(mod)) /* and not idIs0(submod) */
   {
     WerrorS("2nd module does not lie in the first");
-    #if 0
-    if (unit!=NULL)
-    {
-      i=IDELEMS(submod);
-      *unit=mpNew(i,i);
-      for (j=i;j>0;j--)
-      {
-        MATELEM(*unit,j,j)=pOne();
-      }
-    }
-    if (rest!=NULL)
-    {
-      *rest=idCopy(submod);
-    }
-    return idInit(1,mod->rank);
-    #endif
-    return idInit(IDELEMS(submod),submod->rank);
+    return NULL;
   }
   if (unit!=NULL)
   {
@@ -2625,7 +2609,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   if ((currQuotient!=NULL) && rIsPluralRing(origR))
   {
     WerrorS("cannot eliminate in a qring");
-    return idCopy(h1);
+    return NULL;
   }
   if (idIs0(h1)) return idInit(1,h1->rank);
 #ifdef HAVE_PLURAL
@@ -2638,7 +2622,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       if (nc_CheckSubalgebra(delVar,origR))
       {
         WerrorS("no elimination is possible: subalgebra is not admissible");
-        return idCopy(h1);
+        return NULL;
       }
     }
   }
@@ -2780,7 +2764,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       rDelete(tmpR);
       if (w!=NULL)
         delete w;
-      return idCopy(h1);
+      return NULL;
     }
   }
 #endif
