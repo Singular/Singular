@@ -1832,6 +1832,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   int ul= IDELEMS(ui);
   ideal R; matrix U;
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
+  if (m==NULL) return TRUE;
   // now make sure that all matices have the corect size:
   matrix T = id_Module2formatedMatrix(m,vl,ul,currRing);
   int i;
@@ -2395,11 +2396,12 @@ static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
-  ideal m;
   BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
-  m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD));
+  ideal m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,
+                       hasFlag(u,FLAG_STD));
+  if (m==NULL) return TRUE;
   res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
   test=save_test;
   return FALSE;
@@ -6110,6 +6112,7 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   ideal m
     = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
+  if (m==NULL) return TRUE;
   res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
   test=save_test;
   return FALSE;
