@@ -133,7 +133,6 @@ static void kOptimizeLDeg(pLDegProc ldeg, kStrategy strat)
 
 static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 {
-  poly hp;
   int ret;
 #if KDEBUG > 0
   kTest_L(h);
@@ -181,7 +180,6 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 
 int redEcart (LObject* h,kStrategy strat)
 {
-  poly pi;
   int i,at,ei,li,ii;
   int j = 0;
   int pass = 0;
@@ -929,7 +927,7 @@ void firstUpdate(kStrategy strat)
     strat->update = (strat->tl == -1);
     //if (TEST_OPT_WEIGHTM)
     //{
-    //  pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+    //  pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
     //  if (strat->tailRing != currRing)
     //  {
     //    strat->tailRing->pFDeg = strat->pOrigFDeg_TailRing;
@@ -982,7 +980,6 @@ void firstUpdate(kStrategy strat)
 */
 void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
 {
-  int i;
   enterSBba(p, atS, strat, atR);
   #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
@@ -1036,8 +1033,6 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
 */
 void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
 {
-  int i;
-
   enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
@@ -1048,8 +1043,6 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
 
 void initBba(ideal F,kStrategy strat)
 {
-  int i;
-  idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
     strat->red = redHoney;
@@ -1079,8 +1072,8 @@ void initBba(ideal F,kStrategy strat)
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
 //    //interred  machen   Aenderung
-//    pFDegOld=pFDeg;
-//    pLDegOld=pLDeg;
+//    strat->pOrigFDeg=pFDeg;
+//    strat->pOrigLDeg=pLDeg;
 //    //h=ggetid("ecart");
 //    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
 //    //{
@@ -1106,7 +1099,6 @@ void initBba(ideal F,kStrategy strat)
 void initMora(ideal F,kStrategy strat)
 {
   int i,j;
-  idhdl h;
 
   strat->NotUsedAxis = (BOOLEAN *)omAlloc(((currRing->N)+1)*sizeof(BOOLEAN));
   for (j=(currRing->N); j>0; j--) strat->NotUsedAxis[j] = TRUE;
@@ -1134,32 +1126,24 @@ void initMora(ideal F,kStrategy strat)
   /*reads the ecartWeights used for Graebes method from the
    *intvec ecart and set ecartWeights
    */
-//  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
-//  {
-//    //interred  machen   Aenderung
-//    pFDegOld=pFDeg;
-//    pLDegOld=pLDeg;
-//    //h=ggetid("ecart");
-//    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
-//    //{
-//    //  ecartWeights=iv2array(IDINTVEC(h));
-//    //}
-//    //else
-//    {
-//      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
-//      /*uses automatic computation of the ecartWeights to set them*/
-//      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
-//    }
-//
-//    pSetDegProcs(currRing,totaldegreeWecart, maxdegreeWecart);
-//    if (TEST_OPT_PROT)
-//    {
-//      for(i=1; i<=(currRing->N); i++)
-//        Print(" %d",ecartWeights[i]);
-//      PrintLn();
-//      mflush();
-//    }
-//  }
+  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
+  {
+    //interred  machen   Aenderung
+    strat->pOrigFDeg=currRing->pFDeg;
+    strat->pOrigLDeg=currRing->pLDeg;
+    ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
+    /*uses automatic computation of the ecartWeights to set them*/
+    kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights,currRing);
+
+    pSetDegProcs(currRing,totaldegreeWecart, maxdegreeWecart);
+    if (TEST_OPT_PROT)
+    {
+      for(i=1; i<=(currRing->N); i++)
+        Print(" %d",ecartWeights[i]);
+      PrintLn();
+      mflush();
+    }
+  }
   kOptimizeLDeg(currRing->pLDeg, strat);
 }
 
@@ -1403,7 +1387,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {
-//    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+//    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
 //    if (ecartWeights)
 //    {
 //      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
@@ -1531,7 +1515,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   pDelete(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
-//    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+//    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
 //    if (ecartWeights)
 //    {
 //      omFreeSize((ADDRESS *)&ecartWeights,((currRing->N)+1)*sizeof(short));
@@ -1669,8 +1653,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   pDelete(&strat->kNoether);
 //  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
 //  {
-//    pFDeg=pFDegOld;
-//    pLDeg=pLDegOld;
+//    pFDeg=strat->pOrigFDeg;
+//    pLDeg=strat->pOrigLDeg;
 //    if (ecartWeights)
 //    {
 //      omFreeSize((ADDRESS *)&ecartWeights,((currRing->N)+1)*sizeof(short));
@@ -1683,8 +1667,6 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   return res;
 }
 
-pFDegProc pFDegOld;
-pLDegProc pLDegOld;
 intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
@@ -1739,8 +1721,8 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     currRing->pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
-    pFDegOld = currRing->pFDeg;
-    pLDegOld = currRing->pLDeg;
+    strat->pOrigFDeg = currRing->pFDeg;
+    strat->pOrigLDeg = currRing->pLDeg;
     pSetDegProcs(currRing,kHomModDeg);
     toReset = TRUE;
   }
@@ -1764,8 +1746,8 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       strat->kModW = kModW = *w;
       if (vw == NULL)
       {
-        pFDegOld = currRing->pFDeg;
-        pLDegOld = currRing->pLDeg;
+        strat->pOrigFDeg = currRing->pFDeg;
+        strat->pOrigLDeg = currRing->pLDeg;
         pSetDegProcs(currRing,kModDeg);
         toReset = TRUE;
       }
@@ -1826,7 +1808,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if (toReset)
   {
     kModW = NULL;
-    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
   }
   currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
@@ -1861,8 +1843,8 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   {
     currRing->pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
-    pFDegOld = currRing->pFDeg;
-    pLDegOld = currRing->pLDeg;
+    strat->pOrigFDeg = currRing->pFDeg;
+    strat->pOrigLDeg = currRing->pLDeg;
     pSetDegProcs(currRing,kHomModDeg);
     toReset = TRUE;
   }
@@ -1886,8 +1868,8 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
       strat->kModW = kModW = *w;
       if (vw == NULL)
       {
-        pFDegOld = currRing->pFDeg;
-        pLDegOld = currRing->pLDeg;
+        strat->pOrigFDeg = currRing->pFDeg;
+        strat->pOrigLDeg = currRing->pLDeg;
         pSetDegProcs(currRing,kModDeg);
         toReset = TRUE;
       }
@@ -1919,7 +1901,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   if (toReset)
   {
     kModW = NULL;
-    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
   }
   currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
@@ -1987,8 +1969,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
       kModW = *w;
       strat->kModW = *w;
       assume(currRing->pFDeg != NULL && currRing->pLDeg != NULL);
-      pFDegOld = currRing->pFDeg;
-      pLDegOld = currRing->pLDeg;
+      strat->pOrigFDeg = currRing->pFDeg;
+      strat->pOrigLDeg = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
 
       toReset = TRUE;
@@ -2030,7 +2012,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   idSkipZeroes(r);
   if (toReset)
   {
-    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
     kModW = NULL;
   }
   currRing->pLexOrder = b;
@@ -2296,8 +2278,8 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     if (strat->ak > 0 && (w!=NULL) && (w!=NULL))
     {
       strat->kModW = kModW = w;
-      pFDegOld = currRing->pFDeg;
-      pLDegOld = currRing->pLDeg;
+      strat->pOrigFDeg = currRing->pFDeg;
+      strat->pOrigLDeg = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
       toReset = TRUE;
     }
@@ -2358,7 +2340,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     }
     else
     {
-      int deg_before=olddeg;
       if (TEST_OPT_PROT)
         message(strat->P.pFDeg(),
                 &olddeg,&reduc,strat, red_result);
@@ -2487,7 +2468,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {
-//    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+//    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
 //    if (ecartWeights)
 //    {
 //      omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));

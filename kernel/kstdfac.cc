@@ -877,16 +877,16 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
   if (TEST_OPT_DEBUG) messageSets(strat);
   /* complete reduction of the standard basis--------- */
   /* release temp data-------------------------------- */
-  exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
   {
-    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
     if (ecartWeights)
     {
       omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
+  exitBuchMora(strat);
   if (TEST_OPT_PROT) { PrintLn(); messageStat(srmax,lrmax,0,strat); }
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
@@ -925,8 +925,8 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     {
       kModW = *w;
       strat->kModW = *w;
-      pFDegOld = currRing->pFDeg;
-      pLDegOld = currRing->pLDeg;
+      strat->pOrigFDeg = currRing->pFDeg;
+      strat->pOrigLDeg = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
       toReset = TRUE;
     }
@@ -1028,7 +1028,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 // Ende: aufraeumen
   if (toReset)
   {
-    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
     kModW = NULL;
   }
   currRing->pLexOrder = b;
