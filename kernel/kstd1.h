@@ -54,8 +54,6 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
               intvec *hilb=NULL, int syzComp=0,int reduced=0);
 
 
-extern pFDegProc pFDegOld;
-extern pLDegProc pLDegOld;
 extern intvec * kModW;
 extern intvec * kHomW;
 
