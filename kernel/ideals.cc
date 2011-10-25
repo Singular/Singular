@@ -276,9 +276,9 @@ ideal idSectWithElim (ideal h1,ideal h2)
   // eliminate t:
 
   ideal res=idElimination(h,t);
-  // cleanup 
+  // cleanup
   idDelete(&h);
-  res=idrMoveR(res,r,origRing);
+  if (res!=NULL) res=idrMoveR(res,r,origRing);
   rChangeCurrRing(origRing);
   rDelete(r);
   return res;
@@ -1042,23 +1042,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   if (idIs0(mod)) /* and not idIs0(submod) */
   {
     WerrorS("2nd module does not lie in the first");
-    #if 0
-    if (unit!=NULL)
-    {
-      i=IDELEMS(submod);
-      *unit=mpNew(i,i);
-      for (j=i;j>0;j--)
-      {
-        MATELEM(*unit,j,j)=pOne();
-      }
-    }
-    if (rest!=NULL)
-    {
-      *rest=idCopy(submod);
-    }
-    return idInit(1,mod->rank);
-    #endif
-    return idInit(IDELEMS(submod),submod->rank);
+    return NULL;
   }
   if (unit!=NULL)
   {
@@ -1517,7 +1501,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   if ((currQuotient!=NULL) && rIsPluralRing(origR))
   {
     WerrorS("cannot eliminate in a qring");
-    return idCopy(h1);
+    return NULL;
   }
   if (idIs0(h1)) return idInit(1,h1->rank);
 #ifdef HAVE_PLURAL
@@ -1530,7 +1514,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       if (nc_CheckSubalgebra(delVar,origR))
       {
         WerrorS("no elimination is possible: subalgebra is not admissible");
-        return idCopy(h1);
+        return NULL;
       }
     }
   }
@@ -1672,7 +1656,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       rDelete(tmpR);
       if (w!=NULL)
         delete w;
-      return idCopy(h1);
+      return NULL;
     }
   }
 #endif
@@ -2483,14 +2467,14 @@ poly id_GCD(poly f, poly g, const ring r)
   ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
   intvec *w = NULL;
 
-  ring save_r = currRing; rChangeCurrRing(r); ideal S=idSyzygies(I,testHomog,&w); rChangeCurrRing(save_r);   
-   
+  ring save_r = currRing; rChangeCurrRing(r); ideal S=idSyzygies(I,testHomog,&w); rChangeCurrRing(save_r);
+
   if (w!=NULL) delete w;
   poly gg=p_TakeOutComp(&(S->m[0]), 2, r);
   id_Delete(&S, r);
   poly gcd_p=singclap_pdivide(f,gg, r);
   p_Delete(&gg, r);
-   
+
   return gcd_p;
 }
 #endif
@@ -2607,7 +2591,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
         else
           x[j]=n_Init(0, R->cf); // is R->cf really n_Q???, yes!
       }
-       
+
       number n=nChineseRemainder(x,q,rl, R->cf);
 
       for(j=rl-1;j>=0;j--)
