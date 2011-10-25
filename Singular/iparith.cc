@@ -959,30 +959,30 @@ static BOOLEAN jjGE_BI(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)((long)u->Data()) >= (int)((long)v->Data()));
+  res->data = (char *)(long)((int)((long)u->Data()) >= (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
 {
-  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data())
+  res->data = (char *)(long) (nGreater((number)u->Data(),(number)v->Data())
                        || nEqual((number)u->Data(),(number)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjGT_BI(leftv res, leftv u, leftv v)
 {
   number h=n_Sub((number)u->Data(),(number)v->Data(),coeffs_BIGINT);
-  res->data = (char *) (n_GreaterZero(h,coeffs_BIGINT)&&(!n_IsZero(h,coeffs_BIGINT)));
+  res->data = (char *)(long) (n_GreaterZero(h,coeffs_BIGINT)&&(!n_IsZero(h,coeffs_BIGINT)));
   n_Delete(&h,coeffs_BIGINT);
   return FALSE;
 }
 static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)((long)u->Data()) > (int)((long)v->Data()));
+  res->data = (char *)(long)((int)((long)u->Data()) > (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
 {
-  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data()));
+  res->data = (char *)(long)(nGreater((number)u->Data(),(number)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLE_BI(leftv res, leftv u, leftv v)
@@ -991,7 +991,7 @@ static BOOLEAN jjLE_BI(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLE_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)((long)u->Data()) <= (int)((long)v->Data()));
+  res->data = (char *)(long)((int)((long)u->Data()) <= (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
@@ -1004,7 +1004,7 @@ static BOOLEAN jjLT_BI(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLT_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)((long)u->Data()) < (int)((long)v->Data()));
+  res->data = (char *)(long)((int)((long)u->Data()) < (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
