@@ -204,7 +204,7 @@ short * iv2array(intvec * iv, const ring R)
   short *s=(short *)omAlloc0((rVar(R)+1)*sizeof(short));
   int len=0;
   if(iv!=NULL)
-    len=si_min(iv->length(),pVariables); // usually: pVariables==length()
+    len=si_min(iv->length(),rVar(R)); // usually: rVar(R)==length()
   int i;
   //for(i=pVariables;i>len;i--) s[i]=1;
   for(i=len;i>0;i--)               s[i]=(*iv)[i-1];
