@@ -299,6 +299,35 @@ number ntImPart(number a, const coeffs cf)
   return NULL;
 }
 
+number ntInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs cf)
+{
+  assume( cf != NULL );
+
+  const ring A = cf->extRing;
+
+  assume( A != NULL );
+
+  const coeffs C = A->cf;
+
+  assume( C != NULL );
+
+  number n = n_Init_bigint(longratBigIntNumber, src, C);
+
+  if ( n_IsZero(n, C) )
+  {
+    n_Delete(&n, C);
+    return NULL;
+  }    
+
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+
+  NUM(result) = p_NSet(n, A);
+  DEN(result) = NULL;
+  COM(result) = 0;
+  return (number)result;
+}
+
+   
 number ntInit(int i, const coeffs cf)
 {
   if (i == 0) return NULL;
@@ -1250,6 +1279,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = ntIsOne;
   cf->cfIsMOne       = ntIsMOne;
   cf->cfInit         = ntInit;
+  cf->cfInit_bigint  = ntInit_bigint;
   cf->cfInt          = ntInt;
   cf->cfNeg          = ntNeg;
   cf->cfAdd          = ntAdd;

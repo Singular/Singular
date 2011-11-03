@@ -223,6 +223,31 @@ number naImPart(number a, const coeffs cf)
   return NULL;
 }
 
+number naInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs cf)
+{
+  assume( cf != NULL );
+
+  const ring A = cf->extRing;
+
+  assume( A != NULL );
+
+  const coeffs C = A->cf;
+
+  assume( C != NULL );
+
+  number n = n_Init_bigint(longratBigIntNumber, src, C);
+
+  if ( n_IsZero(n, C) )
+  {
+    n_Delete(&n, C);
+    return NULL;
+  }
+  
+  return (number)p_NSet(n, A);
+}
+
+
+
 number naInit(int i, const coeffs cf)
 {
   if (i == 0) return NULL;
@@ -745,6 +770,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = naIsOne;
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
+  cf->cfInit_bigint  = naInit_bigint;  
   cf->cfInt          = naInt;
   cf->cfNeg          = naNeg;
   cf->cfAdd          = naAdd;

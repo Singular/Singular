@@ -185,7 +185,10 @@ struct n_Procs_s
 
    /// Inplace: a *= b
    void    (*cfInpMult)(number &a, number b, const coeffs r);
-   /// maps the bigint i (from dummy) into the coeffs dst
+
+   /// maps the bigint i (from dummy == coeffs_BINGINT!!!) into the
+   /// coeffs dst
+   /// TODO: to be exchanged with a map!!!
    number  (*cfInit_bigint)(number i, const coeffs dummy, const coeffs dst);
 
 #ifdef HAVE_FACTORY
