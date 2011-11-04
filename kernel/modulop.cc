@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: modulop.cc 14402 2011-09-29 17:16:19Z hannes $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -64,8 +64,9 @@ number npMult (number a,number b)
 number npInit (int i, const ring r)
 {
   long ii=i;
-  while (ii <  0L)                         ii += (long)r->ch;
-  while ((ii>1L) && (ii >= ((long)r->ch))) ii -= (long)r->ch;
+  long p=(long)ABS(r->ch);
+  while (ii <  0L)             ii += p;
+  while ((ii>1L) && (ii >= p)) ii -= p;
   return (number)ii;
 }
 
