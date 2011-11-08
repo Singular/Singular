@@ -50,6 +50,8 @@
 
 #ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
+#include <polys/clapconv.h>
+#include <factory/factory.h>
 #endif
 
 #include "ext_fields/transext.h"
@@ -89,7 +91,7 @@ static const n_coeffType ID = n_transExt;
 
 
 
-extern omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
+omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
 
 /// forward declarations
 BOOLEAN  ntGreaterZero(number a, const coeffs cf);
@@ -304,8 +306,8 @@ number ntInit(int i, const coeffs cf)
   {
     fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
     NUM(result) = p_ISet(i, ntRing);
-    DEN(result) = NULL;
-    COM(result) = 0;
+    //DEN(result) = NULL; // done by omAlloc0Bin
+    //COM(result) = 0; // done by omAlloc0Bin
     return (number)result;
   }
 }
@@ -1198,6 +1200,26 @@ void ntKillChar(coeffs cf)
   if ((--cf->extRing->ref) == 0)
     rDelete(cf->extRing);
 }
+#ifdef HAVE_FACTORY
+number ntConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
+{
+  if (n.isZero()) return NULL;
+  poly p=convFactoryPSingP(n,ntRing);
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(result) = p;
+  //DEN(result) = NULL; // done by omAlloc0Bin
+  //COM(result) = 0; // done by omAlloc0Bin
+  return (number)result;
+}
+CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
+{
+  ntTest(n);
+  if (IS0(n)) return CanonicalForm(0);
+
+  fraction f = (fraction)n;
+  return convSingPFactoryP(NUM(f),ntRing);
+}
+#endif
 
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
@@ -1215,6 +1237,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   cf->extRing           = e->r;
   cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!
+  cf->factoryVarOffset = cf->extRing->cf->factoryVarOffset+rVar(cf->extRing);
 
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
@@ -1260,6 +1283,9 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   PrintS("// Warning: The 'factory' module is not available.\n");
   PrintS("//          Hence gcd's cannot be cancelled in any\n");
   PrintS("//          computed fraction!\n");
+#else
+  cf->convFactoryNSingN =ntConvFactoryNSingN;
+  cf->convSingNFactoryN =ntConvSingNFactoryN;
 #endif
 
   return FALSE;

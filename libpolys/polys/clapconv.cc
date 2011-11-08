@@ -63,8 +63,9 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
   {
     poly term = p_Init(r);
     pNext( term ) = NULL;
+    int varoffset=r->cf->factoryVarOffset;
     for ( int i = 1; i <= r->N; i++ )
-      p_SetExp( term, i, exp[i], r);
+      p_SetExp( term, i-varoffset, exp[i], r);
     pGetCoeff( term )=r->cf->convFactoryNSingN(f, r->cf);
     p_Setm( term, r );
     if ( n_IsZero(pGetCoeff(term), r->cf) )
@@ -91,10 +92,11 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar, r->cf);
     if (errorreported) break;
     setChar=FALSE;
+    int varoffset=r->cf->factoryVarOffset;
     for ( int i = n; i >0; i-- )
     {
       if ( (e = p_GetExp( p, i, r)) != 0 )
-        term *= power( Variable( i ), e );
+        term *= power( Variable( i+varoffset ), e );
     }
     result += term;
     pIter( p );
