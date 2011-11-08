@@ -41,7 +41,6 @@ Manual/short.tst
 Manual/showNmzOptions.tst
 Manual/slimgb.tst
 Manual/sortvec.tst
-Manual/startNmz.tst
 Manual/variables.tst
 Manual/Access_to_elements_of_a_user_defined_type.tst
 Manual/cantorred.tst
@@ -58,7 +57,6 @@ Manual/kbase_BR_PLURAL_BR.tst
 Manual/kernel.tst
 Manual/Kernel_of_module_homomorphisms.tst
 Manual/LIB.tst
-Manual/memory.tst
 Manual/Miscellaneous_oddities_3.tst
 Manual/ordstr.tst
 Manual/PBW_maxDeg.tst
@@ -106,7 +104,6 @@ Manual/ishyper.tst
 Manual/jordanbasis.tst
 Manual/kohom.tst
 Manual/kontrahom.tst
-Manual/LLL.tst
 Manual/matrix_operations.tst
 Manual/Module_orderings_1.tst
 Manual/Module_orderings_2.tst
@@ -126,7 +123,6 @@ Manual/showrecursive.tst
 Manual/sort.tst
 Manual/sprintf.tst
 Manual/std.tst
-Manual/system.tst
 Manual/texproc.tst
 Manual/timeFactorize.tst
 Manual/tolessvars.tst
@@ -190,7 +186,6 @@ Manual/resultant.tst
 Manual/rvar.tst
 Manual/setring.tst
 Manual/solutionsMod2.tst
-Manual/solve_IP.tst
 Manual/sortier.tst
 Manual/sparsepoly.tst
 Manual/split.tst
@@ -212,7 +207,6 @@ Manual/char.tst
 Manual/charexp2multseq.tst
 Manual/codim.tst
 Manual/contract.tst
-Manual/datetime.tst
 Manual/debug_log.tst
 Manual/det.tst
 Manual/dsum.tst
@@ -314,7 +308,6 @@ Manual/diag.tst
 Manual/diagInvariants.tst
 Manual/dimMon.tst
 Manual/divisor.tst
-Manual/dump.tst
 Manual/elimlinearpart.tst
 Manual/elimRing.tst
 Manual/equalJinI.tst
@@ -347,7 +340,6 @@ Manual/Long_coefficients.tst
 Manual/matrix_type_cast.tst
 Manual/Max.tst
 Manual/maxabs.tst
-Manual/minMult.tst
 Manual/Miscellaneous_oddities_4.tst
 Manual/nameof.tst
 Manual/names.tst
@@ -412,7 +404,6 @@ Manual/ERROR.tst
 Manual/exteriorBasis.tst
 Manual/gcdN.tst
 Manual/genericmat.tst
-Manual/getdump.tst
 Manual/GKdim.tst
 Manual/hessenberg.tst
 Manual/Identifier_resolution_1.tst
@@ -535,7 +526,6 @@ Manual/isMonomial.tst
 Manual/isprimaryMon.tst
 Manual/isTame.tst
 Manual/jordan.tst
-Manual/kmemory.tst
 Manual/KSker.tst
 Manual/KSlinear.tst
 Manual/lastvarGeneral.tst
@@ -681,7 +671,6 @@ Manual/texfactorize.tst
 Manual/Tor.tst
 Manual/U_D_O.tst
 Manual/view.tst
-Manual/watchdog.tst
 Manual/weierstrDiv.tst
 Manual/writeNmzPaths.tst
 Manual/ademRelations.tst
@@ -1233,7 +1222,6 @@ Manual/linReduce.tst
 Manual/makeQso3.tst
 Manual/makeUso10.tst
 Manual/makeUso12.tst
-Manual/markov4ti2.tst
 Manual/minIntRoot.tst
 Manual/number_e.tst
 Manual/operatorModulo.tst
@@ -1295,7 +1283,6 @@ Manual/Blowupcenter.tst
 Manual/changeDenominator.tst
 Manual/hnexpansion.tst
 Manual/sysCRHTMindist.tst
-Manual/tex.tst
 Manual/bfctIdeal.tst
 Manual/computemcm.tst
 Manual/cupproduct.tst
@@ -1307,7 +1294,6 @@ Manual/pIntersectSyz.tst
 Manual/primeClosure.tst
 Manual/resolutiongraph.tst
 Manual/testNCfac.tst
-Manual/timer.tst
 Manual/tmatrix.tst
 Manual/vfilt.tst
 Manual/integralBasis.tst
@@ -1323,9 +1309,7 @@ Manual/tau_es2.tst
 Manual/Classification_of_hypersurface_singularities.tst
 Manual/constructblwup.tst
 Manual/nrRootsDeterm.tst
-Manual/rmx.tst
 Manual/slim_Groebner_bases.tst
-Manual/xdvi.tst
 Manual/endvfilt.tst
 Manual/genoutput.tst
 Manual/lpNF.tst
@@ -1374,7 +1358,6 @@ Manual/buildtreetoMaple.tst
 Manual/cgsdr.tst
 Manual/decode.tst
 Manual/Eresol.tst
-Manual/multiDegBasis.tst
 Manual/norTest.tst
 Manual/Weierstrass.tst
 Manual/ellipticAllPoints.tst
@@ -1431,9 +1414,32 @@ Manual/facSubWeyl.tst
 Manual/AG_codes.tst
 Manual/Resolution_of_singularities.tst
 Manual/quadraticSieve.tst
-Manual/timeStd.tst
 Manual/assPrimes.tst
 Manual/facFirstShift.tst
 Manual/spectralNeg.tst
-Manual/grobcovold.tst
 Manual/SannfsBFCT.tst
+
+
+; Manual/startNmz.tst ; needs normaliz!
+; Manual/memory.tst ; HW-dependent: contains memory output!
+; Manual/LLL.tst
+; Manual/system.tst ;; outputs build-dependent info!
+; Manual/solve_IP.tst ; needs solve_IP!
+; Manual/datetime.tst
+;;;; Manual/dump.tst ; missing!!??
+;;; Manual/minMult.tst ; missing?!?
+;;; Manual/getdump.tst ; missing!??!
+; Manual/kmemory.tst ; HW-dependent: output is system-dependent!
+; Manual/watchdog.tst ; needs MP!
+; the following contains timings
+Manual/markov4ti2.tst
+; Manual/tex.tst ; Latex!
+; Manual/timer.tst ; HW-dependent!
+; Manual/rmx.tst ; depends on LaTeX
+; Manual/xdvi.tst ; Latex!
+; following contains a 4ti2 timings!
+Manual/multiDegBasis.tst
+; output is system HW -dependent!
+;;; Manual/timeStd.tst ; doesn't seem to work :(((((((
+; the following example outputs timings :(((
+Manual/grobcovold.tst

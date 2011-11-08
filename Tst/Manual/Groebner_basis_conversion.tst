@@ -5,15 +5,15 @@ LIB "tst.lib"; tst_init();
   int t=timer;
   option(prot);
   ideal j1=stdfglm(i);
-  timer-t;
+//  timer-t;
   size(j1);   // size (no. of polys) in computed GB
   t=timer;
   ideal j2=stdhilb(i);
-  timer-t;
+//  timer-t;
   size(j2);   // size (no. of polys) in computed GB
   // usual Groebner basis computation for lex ordering
   t=timer;
   ideal j0 =std(i);
   option(noprot);
-  timer-t;
+//  timer-t;
 tst_status(1);$

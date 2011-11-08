@@ -9,5 +9,5 @@ s1;
 def s2=errormap(s1);
 s2;
 def s3=ComplexValue(s2);s3;
-qepcad(s3);
+// qepcad(s3); // needs qepcad!
 tst_status(1);$

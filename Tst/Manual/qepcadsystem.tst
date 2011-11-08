@@ -10,5 +10,5 @@ list Appr=forward(Ut,U,t),forward(Ux,U,x);
 //matrixsystem(Mat,Appr);
 //timestep(_);
 fouriersystem(Mat,Appr);
-qepcadsystem(_[2]);
+// qepcadsystem(_[2]); // needs qepcad!
 tst_status(1);$

@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init();
-  link l="|: date";
+  link l="|: date --date='@0'";
   open(l); l;
   read(l);
   l;

@@ -22,7 +22,7 @@ LIB "tst.lib"; tst_init();
   int time = timer;
   module sD = std(D);
   list Dres = sres(sD,0);                // the full resolution
-  timer-time;                            // time used for std + sres
+//  timer-time;                            // time used for std + sres
   intmat B = betti(Dres);
   print(B,"betti");
   N-ncols(B)+1;                          // the desired depth

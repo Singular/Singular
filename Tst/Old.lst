@@ -2,7 +2,6 @@ Old/aa.tst
 Old/agnes.tst
 Old/alex1.tst
 Old/alex2.tst
-Old/algmap.tst
 Old/algnorm.tst
 Old/barei.tst
 Old/betti.tst
@@ -155,7 +154,6 @@ Old/m21si.tst
 Old/m22si.tst
 Old/m23si.tst
 Old/m24si.tst
-Old/m25si.tst
 Old/m27si.tst
 Old/m28si.tst
 Old/m29si.tst
@@ -331,3 +329,5 @@ Old/wedg.tst
 Old/weight2.tst
 Old/weight.tst
 Old/zahlen0.tst
+; Old/algmap.tst
+; Old/m25si.tst ; needs MP!
