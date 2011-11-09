@@ -3782,10 +3782,10 @@ static BOOLEAN jjEXECUTE(leftv res, leftv v)
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
-  if (rField_is_Zp()
-  || rField_is_Q()
-  || rField_is_Zp_a()
-  || rField_is_Q_a())
+  if (rField_is_Zp(currRing)
+  || rField_is_Q(currRing)
+  || rField_is_Zp_a(currRing)
+  || rField_is_Q_a(currRing))
   {
     ideal_list p,h;
     h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);

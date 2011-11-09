@@ -357,7 +357,6 @@ void nKillChar(coeffs r)
       {
         WarnS("cf_root list destroyed");
       }
-      r->cf=NULL;
     }
   }
 }

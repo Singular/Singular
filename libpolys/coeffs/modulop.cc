@@ -315,10 +315,10 @@ static const char* npEati(const char *s, int *i, const coeffs r)
     {
       ii *= 10;
       ii += *s++ - '0';
-      if (ii >= (MAX_INT / 10)) ii = ii % r->npPrimeM;
+      if (ii >= (MAX_INT_VAL / 10)) ii = ii % r->npPrimeM;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if (ii >= npPrimeM) ii = ii % r->npPrimeM;
+    if (ii >= r->npPrimeM) ii = ii % r->npPrimeM;
     *i=(int)ii;
   }
   else (*i) = 1;
