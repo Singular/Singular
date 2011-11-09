@@ -6,6 +6,6 @@ module N = gen(1);
 
 ring D = (4,a),x,dp;print(D);
 
-fetch(S, N); // BUG!
+fetch(S, N);
 
 tst_status(1);$
