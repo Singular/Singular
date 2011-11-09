@@ -102,7 +102,6 @@ SingularHEADERS =    Cache.h \
    MinorInterface.h \
    MinorProcessor.h \
    attrib.h \
-   bbcone.h \
    bigintm.h \
    blackbox.h \
    cntrlc.h \

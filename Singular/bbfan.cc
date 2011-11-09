@@ -8,7 +8,7 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <kernel/bbfan.h>
-#include <Singular/bbcone.h>
+#include <kernel/bbcone.h>
 #include <ipshell.h>
 #include <misc/intvec.h>
 #include <sstream>

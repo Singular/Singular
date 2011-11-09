@@ -66,7 +66,8 @@ KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	eigenval.h units.h \
 	fegetopt.h \
 	ratgring.h shiftgb.h nc.h \
-	gfan.h preimage.h longrat.h timer.h kInline.h modulop.h fast_mult.h \
+	gfan.h bbcone.h bbfan.h \
+	preimage.h longrat.h timer.h kInline.h modulop.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
 	linearAlgebra.h page.h
 
