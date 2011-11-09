@@ -29,6 +29,7 @@
 #include "facFqBivarUtil.h"
 #include "facAlgExt.h"
 #include "cfModResultant.h"
+#include "fac_sqrfree.h"
 
 // squarefree part of F
 CanonicalForm
