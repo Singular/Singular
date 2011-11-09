@@ -43,6 +43,11 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
+#ifdef HAVE_FACTORY
+#include <polys/clapconv.h>
+#include <factory/factory.h>
+#endif
+
 #include "ext_fields/algext.h"
 #define TRANSEXT_PRIVATES 1
 #include "ext_fields/transext.h"
@@ -521,6 +526,30 @@ void definiteReduce(poly &p, poly reducer, const coeffs cf)
   p_PolyDiv(p, reducer, FALSE, naRing);
 }
 
+void  naNormalize(number &a, const coeffs cf)
+{
+  poly aa=(poly)a;
+  definiteReduce(aa,naMinpoly,cf); 
+  a=(number)aa;
+}
+
+#ifdef HAVE_FACTORY
+number naConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
+{
+  if (n.isZero()) return NULL;
+  poly p=convFactoryPSingP(n,naRing);
+  return (number)p;
+}
+CanonicalForm naConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
+{
+  naTest(n);
+  if (n==NULL) return CanonicalForm(0);
+
+  return convSingPFactoryP((poly)n,naRing);
+}
+#endif
+
+
 /* IMPORTANT NOTE: Since an algebraic field extension is again a field,
                    the gcd of two elements is not very interesting. (It
                    is actually any unit in the field, i.e., any non-
@@ -734,6 +763,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfRePart       = naCopy;
   cf->cfImPart       = naImPart;
   cf->cfCoeffWrite   = naCoeffWrite;
+  cf->cfNormalize    = naNormalize;
 #ifdef LDEBUG
   cf->cfDBTest       = naDBTest;
 #endif
@@ -743,6 +773,10 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
   cf->cfIntDiv       = naDiv;
+#ifdef HAVE_FACTORY
+  cf->convFactoryNSingN=naConvFactoryNSingN;
+  cf->convSingNFactoryN=naConvSingNFactoryN;
+#endif
   
   return FALSE;
 }
