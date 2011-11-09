@@ -26,10 +26,6 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r );
 
-static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs, const ring r );
-
-static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
-
 static number convFactoryNSingAN( const CanonicalForm &f, const ring r);
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r )
@@ -104,361 +100,55 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   return result;
 }
 
-int convFactoryISingI( const CanonicalForm & f)
-{
-  if (!f.isImm()) WerrorS("int overflow in det");
-  return f.intval();
-}
-#if 0
-CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r)
+CanonicalForm convSingAFactoryA( number pp, Variable a, const coeffs cf )
 {
   CanonicalForm result = 0;
-  int e, n = pVariables;
-  int off=rPar(currRing);
+  int e;
+  poly p=(poly)pp;
+  BOOLEAN setChar=TRUE;
 
-  On(SW_RATIONAL);
-  while ( p!=NULL)
+  while ( p!=NULL )
   {
-    CanonicalForm term=convSingAFactoryA(((lnumber)pGetCoeff(p))->z,a, r);
-    for ( int i = 1; i <= n; i++ )
-    {
-      if ( (e = pGetExp( p, i )) != 0 )
-        term *= power( Variable( i + off), e );
-    }
+    CanonicalForm term;
+    term=cf->extRing->cf->convSingNFactoryN(pGetCoeff( p ),setChar, cf->extRing->cf);
+    if (errorreported) break;
+    setChar=FALSE;
+    if ( (e = p_GetExp( p, 1, cf->extRing)) != 0 )
+        term *= power( a, e );
     result += term;
     pIter( p );
   }
   return result;
 }
 
-static void
-convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start, const ring r) ;
-
-poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start, const ring r )
-{
-  int n = rVar(r)+rPar(r)+1;
-  int * exp = (int *)omAlloc0(n*sizeof(int));
-  poly result = NULL;
-  convRecAP_R( f, exp, result,par_start, var_start, r );
-  omFreeSize((ADDRESS)exp,n*sizeof(int));
-  return result;
-}
-
-poly convFactoryAPSingAP ( const CanonicalForm & f, const ring r )
-{
-  return convFactoryAPSingAP_R(f,0,rPar(r),r);
-}
-
-static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start, const ring r )
-{
-  if (f.isZero())
-    return;
-  if ( ! f.inCoeffDomain() )
-  {
-    int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
-    {
-      exp[l] = i.exp();
-      convRecAP_R( i.coeff(), exp, result, par_start, var_start, r);
-    }
-    exp[l] = 0;
-  }
-  else
-  {
-    poly z=(poly)convFactoryASingA( f,r );
-    if (z!=NULL)
-    {
-      poly term = p_Init(r);
-      pNext( term ) = NULL;
-      int i;
-      for ( i = rVar(r); i>0 ; i-- )
-        p_SetExp( term, i , exp[i+var_start],r);
-      //if (rRing_has_Comp(currRing->extRing)) p_SetComp(term, 0, currRing->extRing); // done by pInit
-      if (par_start==0)
-      {
-        for ( i = 1; i <= var_start; i++ )
-        //z->e[i-1]+=exp[i];
-          p_AddExp(z,i,exp[i],r->extRing);
-      }
-      else
-      {
-        for ( i = par_start+1; i <= var_start+rPar(currRing); i++ )
-        //z->e[i-1]+=exp[i];
-          p_AddExp(z,i,exp[i-par_start],r->extRing);
-      }
-      pGetCoeff(term)=(number)ALLOC0_LNUMBER();
-      ((lnumber)pGetCoeff(term))->z=z;
-      p_Setm( term,r );
-      result = p_Add_q( result, term, r );
-    }
-  }
-}
-
-CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
-{
-  CanonicalForm result = 0;
-  int e;
-
-  while ( p!=NULL )
-  {
-    CanonicalForm term;
-    /* does only work for finite fields:Z/p */
-    if ( rField_is_Zp_a() )
-    {
-      term = npInt( napGetCoeff( p ),r );
-    }
-    else
-    {
-      if ( SR_HDL(napGetCoeff( p )) & SR_INT )
-        term = SR_TO_INT(napGetCoeff( p )) ;
-      else
-      {
-        if ( napGetCoeff( p )->s == 3 )
-        {
-          lint dummy;
-          mpz_init_set( &dummy, (napGetCoeff( p )->z) );
-          term = make_cf( dummy );
-        }
-        else
-        {
-          // assume s==0 or s==1
-          lint num, den;
-          On(SW_RATIONAL);
-          mpz_init_set( &num, (napGetCoeff( p )->z) );
-          mpz_init_set( &den, (napGetCoeff( p )->n) );
-          term = make_cf( num, den, ( napGetCoeff( p )->s != 1 ));
-        }
-      }
-    }
-    if ( (e = p_GetExp( p, 1, r->extRing )) != 0 )
-      term *= power( a , e );
-    result += term;
-    p = pNext( p );
-  }
-  return result;
-}
-
-static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
-{
-  if ( f.isImm() )
-    return n_Init( f.intval(), r->extRing );
-  else
-  {
-    number z=ALLOC_RNUMBER();
-#if defined(LDEBUG)
-    z->debug=123456;
-#endif
-    gmp_numerator( f, z->z );
-    if ( f.den().isOne() )
-    {
-      z->s = 3;
-    }
-    else
-    {
-      gmp_denominator( f, z->n );
-      z->s = 0;
-      nlNormalize(z);
-    }
-    #ifdef LDEBUG
-    nlDBTest(z,__FILE__,__LINE__);
-    #endif
-    return z;
-  }
-}
-
-poly convFactoryASingA ( const CanonicalForm & f, const ring r )
+number convFactoryASingA ( const CanonicalForm & f, const coeffs cf )
 {
   poly a=NULL;
   poly t;
   for( CFIterator i=f; i.hasTerms(); i++)
   {
-    t=napNew();
+    t=p_New(cf->extRing);
     // pNext( t ) = NULL; //already done by napNew
-    pGetCoeff(t)=convFactoryNSingAN( i.coeff(), r );
-    if (n_IsZero(napGetCoeff(t),r->extRing))
+    pGetCoeff(t)=cf->extRing->cf->convFactoryNSingN( i.coeff(), cf->extRing->cf );
+    if (n_IsZero(p_GetCoeff(t,cf->extRing),cf->extRing->cf))
     {
-      p_Delete(&t,r->extRing);
+      p_Delete(&t,cf->extRing);
     }
     else
     {
-      p_SetExp(t,1,i.exp(),r->extRing);
-      a=p_Add_q(a,t,r->extRing);
+      p_SetExp(t,1,i.exp(),cf->extRing);
+      a=p_Add_q(a,t,cf->extRing);
     }
   }
-  if (a!=NULL)
-  {
-    if (r->minpoly!=NULL)
-    {
-      lnumber l=(lnumber)r->minpoly;
-      if (p_GetExp(a,1,r->extRing) >= p_GetExp(l->z,1,r->extRing))
-        a = napRemainder( a, l->z);
-    }
-  }
-  return a;
+  number aa=(number)a;
+  n_Normalize(aa,cf);
+  return aa;
 }
 
-CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
+
+int convFactoryISingI( const CanonicalForm & f)
 {
-  CanonicalForm result = 0;
-  int e, n = rVar(r);
-  int offs = rPar(r);
-
-  while ( p!=NULL )
-  {
-    n_Normalize(pGetCoeff(p),r);
-    CanonicalForm term=convSingPFactoryP(((lnumber)pGetCoeff(p))->z,r->extRing);
-
-    if ((((lnumber)pGetCoeff(p))->n!=NULL)
-    && (!errorreported))
-    {
-      WerrorS("conversion error: denominator!= 1");
-    }
-
-    for ( int i = n; i > 0; i-- )
-    {
-      if ( (e = p_GetExp( p, i,r )) != 0 )
-        term = term * power( Variable( i + offs ), e );
-    }
-    result += term;
-    p = pNext( p );
-  }
-  return result;
+  if (!f.isImm()) WerrorS("int overflow in det");
+  return f.intval();
 }
-
-poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r )
-{
-  int n = rVar(r)+1;
-  int * exp = (int*)omAlloc0(n*sizeof(int));
-  poly result = NULL;
-  convRecTrP( f, exp, result , rPar(r), r );
-  omFreeSize((ADDRESS)exp,n*sizeof(int));
-  return result;
-}
-
-static void
-convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const ring r)
-{
-  if (f.isZero())
-    return;
-  if ( f.level() > offs )
-  {
-    int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
-    {
-      exp[l-offs] = i.exp();
-      convRecTrP( i.coeff(), exp, result, offs, r );
-    }
-    exp[l-offs] = 0;
-  }
-  else
-  {
-    poly term = p_Init(r);
-    pNext( term ) = NULL;
-    for ( int i = rVar(r); i>0; i-- )
-      p_SetExp( term, i ,exp[i], r);
-    //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
-    pGetCoeff(term) = ALLOC0_RNUMBER(); // Q!?
-    ((lnumber)pGetCoeff(term))->z=convFactoryPSingP( f, r->extRing );
-    p_Setm( term,r );
-    result = p_Add_q( result, term,r );
-  }
-}
-
-number   nlChineseRemainder(number *x, number *q,int rl)
-// elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
-{
-#ifdef HAVE_FACTORY
-  setCharacteristic( 0 ); // only in char 0
-  CFArray X(rl), Q(rl);
-  int i;
-  for(i=rl-1;i>=0;i--)
-  {
-    X[i]=convSingNFactoryN(x[i],NULL); // may be larger MAX_INT
-    Q[i]=convSingNFactoryN(q[i],NULL); // may be larger MAX_INT
-  }
-  CanonicalForm xnew,qnew;
-  chineseRemainder(X,Q,xnew,qnew);
-  number n=convFactoryNSingN(xnew,NULL);
-  number p=convFactoryNSingN(qnew,NULL);
-  number p2=nlIntDiv(p,nlInit(2, NULL));
-  if (nlGreater(n,p2))
-  {
-     number n2=nlSub(n,p);
-     nlDelete(&n,NULL);
-     n=n2;
-  }
-  nlDelete(&p,NULL);
-  nlDelete(&p2,NULL);
-  return n;
-#else
-  WerrorS("not implemented");
-  return nlInit(0);
-#endif
-}
-
-CanonicalForm
-convSingGFFactoryGF( poly p )
-{
-  CanonicalForm result=CanonicalForm(0);
-  int e, n = pVariables;
-
-  while ( p != NULL )
-  {
-    CanonicalForm term;
-    term = make_cf_from_gf( (int)(long)pGetCoeff( p ) );
-    //int * A=(int *)&term;
-    //Print("term=%x, == 0 ?: %d\n",*A, term.isZero());
-    for ( int i = 1; i <= n; i++ )
-    {
-      if ( (e = pGetExp( p, i )) != 0 )
-         term *= power( Variable( i ), e );
-    }
-    result += term;
-    p = pNext( p );
-  }
-  return result;
-}
-
-poly
-convFactoryGFSingGF ( const CanonicalForm & f )
-{
-//    cerr << " f = " << f << endl;
-  int n = pVariables+1;
-  /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
-  int * exp = (int*)omAlloc0(n*sizeof(int));
-  poly result = NULL;
-  convRecGFGF( f, exp, result );
-  omFreeSize((ADDRESS)exp,n*sizeof(int));
-  return result;
-}
-
-static void
-convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
-{
-  if (f.isZero())
-    return;
-  if ( ! f.inCoeffDomain() )
-  {
-    int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
-    {
-      exp[l] = i.exp();
-      convRecGFGF( i.coeff(), exp, result );
-    }
-    exp[l] = 0;
-  }
-  else
-  {
-    poly term = pInit();
-    pNext( term ) = NULL;
-    for ( int i = 1; i <= pVariables; i++ )
-      pSetExp( term, i, exp[i]);
-    //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
-    pGetCoeff( term ) = (number) gf_value (f);
-    pSetm( term );
-    result = pAdd( result, term );
-  }
-}
-
-#endif
 #endif

@@ -1267,11 +1267,32 @@ int nlModP(number n, int p, const coeffs r)
   if (n->s!=3)
   {
     int in=mpz_fdiv_ui(n->n,(unsigned long)p);
-    #ifdef NV_OPS
-    if (p>NV_MAX_PRIME)
-    return (int)((long)nvDiv((number)iz,(number)in,(const coeffs)r));
-    #endif
-    return (int)((long)npDiv((number)iz,(number)in,(const coeffs)r));
+    long  s, t;
+
+    long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+
+     u1=1; v1=0;
+     u2=0; v2=1;
+     u = in; v = p;
+
+     while (v != 0)
+     {
+        q = u / v;
+        r = u % v;
+        u = v;
+        v = r;
+        u0 = u2;
+        v0 = v2;
+        u2 =  u1 - q*u2;
+        v2 = v1- q*v2;
+        u1 = u0;
+        v1 = v0;
+     }
+
+     s = u1;
+     if (s < 0) s+=p;
+     u=(s*((long)iz)) % ((long)p);
+     return (int)u;
   }
   return iz;
 }
