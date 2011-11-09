@@ -728,15 +728,15 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
       int n2=1;
       qq=r->m_nfCharP;
       while(qq!=src->m_nfCharQ) { qq *= r->m_nfCharP; n2++; }
-      Print("map %d^%d -> %d^%d\n",r->m_nfCharP,n1,r->m_nfCharP,n2);
+      //Print("map %d^%d -> %d^%d\n",r->m_nfCharP,n1,r->m_nfCharP,n2);
       if ((n2 % n1)==0)
       {
-        int save_ch=r->ch;
-        nfReadTable(src->ch, r);
+        int save_ch=r->m_nfCharQ;
+        nfReadTable(src->m_nfCharQ, r);
         int nn=r->m_nfPlus1Table[0];
         nfReadTable(save_ch, r);
         nfMapGG_factor= r->m_nfPlus1Table[0] / nn;
-        Print("nfMapGG_factor=%d (%d / %d)\n",nfMapGG_factor, r->m_nfPlus1Table[0], nn);
+        //Print("nfMapGG_factor=%d (%d / %d)\n",nfMapGG_factor, r->m_nfPlus1Table[0], nn);
         return nfMapGG;
       }
       else if ((n1 % n2)==0)
