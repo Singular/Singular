@@ -21,8 +21,18 @@ poly convFactoryPSingP ( const CanonicalForm & f, const ring r );
 CanonicalForm convSingPFactoryP( poly p, const ring r );
 int convFactoryISingI( const CanonicalForm & f);
 
-CanonicalForm convSingAFactoryA( number pp, Variable a, const coeffs cf );
-number convFactoryASingA ( const CanonicalForm & f, const coeffs cf );
+CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r );
+poly convFactoryAPSingAP ( const CanonicalForm & f, const ring r );
+poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start );
+
+//CanonicalForm convSingGFFactoryGF ( poly p, const ring r );
+//poly convFactoryGFSingGF ( const CanonicalForm & f, const ring r );
+
+CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r );
+poly convFactoryASingA ( const CanonicalForm & f, const ring r );
+
+CanonicalForm convSingTrPFactoryP ( poly p, const ring r );
+poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r );
 
 // HAVE_FACTORY
 #endif 
