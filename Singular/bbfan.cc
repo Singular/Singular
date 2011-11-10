@@ -231,6 +231,133 @@ BOOLEAN fullFan(leftv res, leftv args)
   return TRUE;
 }
 
+BOOLEAN getAmbientDimension(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == fanID))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      int d = zf->getAmbientDimension();
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      int d = getAmbientDimension(zc);
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  WerrorS("getAmbientDimension: unexpected parameters");
+  return TRUE;  
+}
+
+BOOLEAN getDimension(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == fanID))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      int d = 0; // zf->dimension();
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      int d = getDimension(zc);
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  WerrorS("getDimension: unexpected parameters");
+  return TRUE;  
+}
+
+BOOLEAN getCodimension(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == fanID))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      int d = 0; // zf->getAmbientDimension() - zf->dimension();
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      int d = getCodimension(zc);
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  WerrorS("getCodimension: unexpected parameters");
+  return TRUE;  
+}
+
+BOOLEAN getLinealityDimension(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == fanID))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      int d = 0; // zf->dimensionOfLinealitySpace();
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      int d = getLinealityDimension(zc);
+      res->rtyp = INT_CMD;
+      res->data = (char*) d;
+      return FALSE;
+    }
+  WerrorS("getLinealityDimension: unexpected parameters");
+  return TRUE;  
+}
+
+BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == fanID))
+    {
+      leftv v=u->next;
+      if ((v != NULL) && (v->Typ() == INT_CMD))
+        {
+	  leftv w=v->next;
+	  if ((w != NULL) && (w->Typ() == INT_CMD))
+	    {
+	      leftv x=w->next;
+	      if ((x != NULL) && (x->Typ() == INT_CMD))
+		{
+		  gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+		  int d = (int)(long)v->Data(); 
+		  int o = (int)(long)w->Data();
+		  int m = (int)(long)x->Data();
+                  if ((d <= zf->getAmbientDimension()) && ((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+		    {
+		      bool oo = (bool) o;
+		      bool mm = (bool) m;
+		      int n = zf->numberOfConesOfDimension(d,oo,mm);
+		      res->rtyp = INT_CMD;
+		      res->data = (char*) n;
+		      return FALSE;
+		    }
+		}
+	    }
+	}
+    }
+  WerrorS("getAmbientDimension: unexpected parameters");
+  return TRUE;  
+}
+
 BOOLEAN ncones(leftv res, leftv args)
 {  
   leftv u=args;                             
@@ -276,26 +403,26 @@ BOOLEAN nmaxcones(leftv res, leftv args)
     }
 }
 
-BOOLEAN hasFace(leftv res, leftv args)
-{
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-      bool b = zc->hasFace(*zd);
-      int bb = (int) b;
-      res->rtyp = INT_CMD;
-      res->data = (char*) bb;
-      return FALSE;
-    }
-  }
-  WerrorS("hasFace: unexpected parameters");
-  return TRUE;  
-}
+// BOOLEAN hasFace(leftv res, leftv args)
+// {
+//   leftv u=args;                             
+//   if ((u != NULL) && (u->Typ() == coneID))
+//   {
+//     leftv v=u->next;
+//     if ((v != NULL) && (v->Typ() == coneID))
+//     {
+//       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+//       gfan::ZCone* zd = (gfan::ZCone*)v->Data();
+//       bool b = zc->hasFace(*zd);
+//       int bb = (int) b;
+//       res->rtyp = INT_CMD;
+//       res->data = (char*) bb;
+//       return FALSE;
+//     }
+//   }
+//   WerrorS("hasFace: unexpected parameters");
+//   return TRUE;  
+// }
 
 bool iscompatible(gfan::ZFan* zf, gfan::ZCone* zc)
 {
