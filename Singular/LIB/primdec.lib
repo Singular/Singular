@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: primdec.lib 14192 2011-05-04 14:45:40Z hannes $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -3000,6 +3000,7 @@ EXAMPLE: example decomp; shows an example
       setring @P;
       primary=imap(gnir,primary);
     }
+    option(set,op);
     return(primary);
   }
 
@@ -4111,15 +4112,19 @@ static proc min_ass_prim_charsets (ideal PS, int cho)
   {
     ERROR("<int> must be 0 or 1");
   }
+  intvec saveopt=option(get);
   option(notWarnSB);
+  list L;
   if(cho==0)
   {
-    return(min_ass_prim_charsets0(PS));
+    L=min_ass_prim_charsets0(PS);
   }
   else
   {
-     return(min_ass_prim_charsets1(PS));
+    L=min_ass_prim_charsets1(PS);
   }
+  option(set,saveopt);
+  return(L);
 }
 ///////////////////////////////////////////////////////
 // min_ass_prim_charsets0
@@ -4356,7 +4361,6 @@ static proc prim_dec(ideal I, int choose)
   {
     ERROR("ERROR: <int> must be 0 or 1 or 2 or 3");
   }
-  option(notWarnSB);
   ideal H=1; // The intersection of the primary components
   list U;    // the leaves of the decomposition tree, i.e.,
              // pairs consisting of a primary component of I
@@ -4388,6 +4392,8 @@ static proc prim_dec(ideal I, int choose)
   {
     return(list());
   }
+  intvec save=option(get);
+  option(notWarnSB);
   int ncolsSI=ncols(SI);
   int ncolsH=1;
   W[1]=list(I,1,0,poly(1),ideal(0),list()); // The root of the tree
@@ -4464,6 +4470,7 @@ static proc prim_dec(ideal I, int choose)
         }
         if(check==0) // H==I => U is a primary decomposition
         {
+	  option(set,save);
           return(U);
         }
       }
@@ -4506,7 +4513,6 @@ static proc prim_dec(ideal I, int choose)
                          // the "minimal divisor" of the seperator
                          // as computed by the procedure minsat,
                          // SRest=standard basis of remaining component
-
       }
       //check
       for(i=size(QQ);i>=1;i--)
@@ -4548,6 +4554,7 @@ static proc prim_dec(ideal I, int choose)
       }
     }
   }
+  option(set,save);
 }
 
 //////////////////////////////////////////////////////////////////////////

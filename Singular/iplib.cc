@@ -297,10 +297,57 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
 {
   newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
                pi, l );
+  int save1=(test & ~TEST_RINGDEP_OPTS);
+  int save2=verbose;
   BOOLEAN err=yyparse();
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
+  }
+  int save11= ( test & ~TEST_RINGDEP_OPTS);
+  if ((TEST_V_ALLWARN) &&
+  (t==BT_proc) &&
+  ((save1!=save11)||(save2!=verbose)) &&
+  (pi->libname!=NULL) && (pi->libname[0]!='\0'))
+  {
+    struct soptionStruct
+    {
+      const char * name;
+      unsigned   setval;
+      unsigned   resetval;
+    };
+    extern struct soptionStruct optionStruct[];
+    extern struct soptionStruct verboseStruct[];
+    Warn("option changed in proc %s from %s",pi->procname,pi->libname);
+    int i;
+    for (i=0; optionStruct[i].setval!=0; i++)
+    {
+      if ((optionStruct[i].setval & save11)
+      && (!(optionStruct[i].setval & save1)))
+      {
+          Print(" +%s",optionStruct[i].name);
+      }
+      if (!(optionStruct[i].setval & save11)
+      && ((optionStruct[i].setval & save1)))
+      {
+          Print(" -%s",optionStruct[i].name);
+      }
+    }
+    for (i=0; verboseStruct[i].setval!=0; i++)
+    {
+      if ((verboseStruct[i].setval & verbose)
+      && (!(verboseStruct[i].setval & save2)))
+      {
+          Print(" +%s",verboseStruct[i].name);
+      }
+      if (!(verboseStruct[i].setval & verbose)
+      && ((verboseStruct[i].setval & save2)))
+      {
+          Print(" -%s",verboseStruct[i].name);
+      }
+    }
+    PrintLn();
+  //  PrintS(p);
   }
   return err;
 }

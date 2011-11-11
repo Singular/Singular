@@ -4591,6 +4591,7 @@ EXAMPLE:  example secondary_char0; shows an example
 
   int dgb=degBound;
   degBound = 0;
+  intvec saveopt=option(get);
   option(redSB);
   ideal sP = groebner(ideal(P));
                            // This is the only explicit Groebner basis computation!
@@ -4878,6 +4879,7 @@ EXAMPLE:  example secondary_char0; shows an example
      }
     }
   }
+  option(set,saveopt);
   return(S,matrix(compress(IS)));
 }
 
@@ -5774,6 +5776,7 @@ EXAMPLE:  example secondary_charp; shows an example
 
   int dgb=degBound;
   degBound = 0;
+  intvec saveopt=option(get);
   option(redSB);
   ideal sP = groebner(ideal(P));
                            // This is the only explicit Groebner basis computation!
@@ -6075,6 +6078,7 @@ EXAMPLE:  example secondary_charp; shows an example
   if (ring_name=="aksldfalkdsflkj")
   { kill `ring_name`;
   }
+  option(set,saveopt);
   return(matrix(S),matrix(compress(IS)));
 }
 example

@@ -532,6 +532,7 @@ EXAMPLE: example findInvo; shows examples
   J = simplify(J,2); // without extra zeros
   list mL = minAssGTZ(J); // components not in GB
   int sL  = size(mL);
+  intvec saveopt=option(get);
   option(redSB);       // important for reduced GBs
   option(redTail);
   matrix IM = @@D;     // involution map
@@ -551,6 +552,7 @@ EXAMPLE: example findInvo; shows examples
   matrix matD = @@D;
   export(idJ);
   export(matD);
+  option(set,saveopt);
   return(@@KK);
 }
 example
@@ -671,6 +673,7 @@ EXAMPLE: example findInvoDiag; shows examples
 
   list mL = minAssGTZ(J); // components not in GB
   int sL  = size(mL);
+  intvec saveopt=option(get);
   option(redSB); // important for reduced GBs
   option(redTail);
   matrix IM = @@D; // involution map
@@ -690,6 +693,7 @@ EXAMPLE: example findInvoDiag; shows examples
   matrix matD = @@D;
   export(idJ);
   export(matD);
+  option(set,saveopt);
   return(@@KK);
 }
 example
@@ -833,6 +837,7 @@ EXAMPLE: example findAuto; shows examples
   J       = simplify(J,2); // without extra zeros
   list mL = minAssGTZ(J); // components not in GB
   int sL  = size(mL);
+  intvec saveopt=option(get);
   option(redSB); // important for reduced GBs
   option(redTail);
   matrix IM = @@D; //  map
@@ -852,6 +857,7 @@ EXAMPLE: example findAuto; shows examples
   matrix matD = @@D;
   export(idJ);
   export(matD);
+  option(set,saveopt);
   return(@@KK);
 }
 example

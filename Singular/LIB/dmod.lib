@@ -1365,6 +1365,7 @@ EXAMPLE: example annfsBM; shows examples
   dbprint(ppl,"// -4-1- the ring @R4(_x,_Dx) is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R,K2);
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -4-2- the final cosmetic std");
   K4 = engine(K4,eng);  //std does the job too
@@ -1376,6 +1377,7 @@ EXAMPLE: example annfsBM; shows examples
   kill @R3;
   ideal LD = K4;
   export LD;
+  option(set,saveopt);
   return(@R4);
 }
 example
@@ -2030,11 +2032,13 @@ EXAMPLE: example operatorBM; shows examples
   poly PS = T[1,1];
   dbprint(ppl,"// -4-3- an operator PS found, PS*f^(s+1) = b(s)*f^s");
   dbprint(ppl-1,PS);
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -4-4- the final cosmetic std");
   LD0 = engine(LD0,eng);  //std does the job too
   LD  = engine(LD,eng);
   export F,LD,LD0,bs,BS,PS;
+  option(set,saveopt);
   return(@R4);
 }
 example
@@ -2398,6 +2402,7 @@ EXAMPLE: example annfsParamBM; shows examples
   dbprint(ppl-1, @R2);
   ideal K = imap(@R,K);
   kill @R;
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -3-2- the final cosmetic std");
   K = engine(K,eng);  //std does the job too
@@ -2411,6 +2416,7 @@ EXAMPLE: example annfsParamBM; shows examples
   execute("ideal Param ="+sParam+";");
   export Param;
   kill sParam;
+  option(set,saveopt);
   return(@R2);
 }
 example
@@ -2786,6 +2792,7 @@ EXAMPLE: example annfsBMI; shows examples
   dbprint(ppl,"// -4-1- the ring @R4i(_x,_Dx,_s) is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R,K);
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -4-2- the final cosmetic std");
   K4 = engine(K4,eng);  //std does the job too
@@ -2797,6 +2804,7 @@ EXAMPLE: example annfsBMI; shows examples
   kill @R3;
   ideal LD = K4;
   export LD;
+  option(set,saveopt);
   return(@R4);
 }
 example
@@ -3180,6 +3188,7 @@ EXAMPLE: example annfsOT; shows examples
   dbprint(ppl,"// -5-1- the ring @R5 is ready");
   dbprint(ppl-1, @R5);
   ideal K5 = imap(@R2,K3);
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -5-2- the final cosmetic std");
   K5 = engine(K5,eng); // std does the job too
@@ -3193,6 +3202,7 @@ EXAMPLE: example annfsOT; shows examples
   ideal LD = K5;
   kill @R4;
   export LD;
+  option(set,saveopt);
   return(@R5);
 }
 example
@@ -4859,6 +4869,7 @@ EXAMPLE: example annfs0; shows examples
   dbprint(ppl,"// -3-1- the ring @R4 is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R2,K2);
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -3-2- the final cosmetic std");
   K4 = engine(K4,eng);  // std does the job too
@@ -4869,6 +4880,7 @@ EXAMPLE: example annfs0; shows examples
   export BS;
   ideal LD = K4;
   export LD;
+  option(set,saveopt);
   return(@R4);
 }
 example
