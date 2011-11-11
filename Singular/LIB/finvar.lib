@@ -6461,6 +6461,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
 
   int dgb=degBound;
   degBound = 0;
+  intvec saveopt=option(get);
   option(redSB);
   ideal sP = groebner(ideal(P));
                            // This is the only explicit Groebner basis computation!
