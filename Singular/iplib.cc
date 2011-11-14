@@ -297,13 +297,19 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
 {
   newBuffer( omStrDup(p /*pi->data.s.body*/), t /*BT_proc*/,
                pi, l );
+  #ifndef LIBSINGULAR
+  // see below:
   int save1=(si_opt_1 & ~TEST_RINGDEP_OPTS);
   int save2=si_opt_2;
+  #endif
   BOOLEAN err=yyparse();
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
   }
+  #ifndef LIBSINGULAR
+  // the access to optionStruct and verboseStruct do not work 
+  // on x86_64-Linux for pic-code
   int save11= ( si_opt_1 & ~TEST_RINGDEP_OPTS);
   if ((TEST_V_ALLWARN) &&
   (t==BT_proc) &&
@@ -349,6 +355,7 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
     PrintLn();
   //  PrintS(p);
   }
+  #endif
   return err;
 }
 /*2
