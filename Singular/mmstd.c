@@ -10,7 +10,6 @@
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
-#include <omalloc/config.h>
 #include <omalloc/omConfig.h>
 
 #include "static.h"

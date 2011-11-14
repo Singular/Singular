@@ -13,7 +13,7 @@ omList.h		omFindExec.h		omGetBackTrace.h	\
 omRet2Info.h		omStats.h		omOpts.h		\
 omBinPage.h		omAllocSystem.h		omTables.h		\
 omAllocPrivate.h	omDebug.h		omInline.h		\
-omAllocFunc.h 		omlimits.h 		mylimits.h
+omAllocFunc.h 		mylimits.h
 
 noinst_HEADERS= omPage.h omDefaultConfig.h omReturn.h omGetPageSize.h \
   omMalloc.h omMallocSystem.h
@@ -32,10 +32,11 @@ INCLUDES=-I${top_srcdir}/.. -I${top_builddir}/..
 libomalloc_a_SOURCES=$(SOURCES) $(noinst_HEADERS)
 libomalloc_g_a_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
-nodist_libomalloc_a_SOURCES = omConfig.h omlimits.h mylimits.h omalloc.h omTables.inc
-nodist_libomalloc_g_a_SOURCES = omConfig.h omlimits.h omalloc.h omTables.inc
+nodist_libomalloc_a_SOURCES = omConfig.h mylimits.h omalloc.h omTables.inc
+nodist_libomalloc_g_a_SOURCES = omConfig.h omalloc.h omTables.inc
 
-libomalloc_a_CPPFLAGS= -DOM_NDEBUG
+libomalloc_a_CPPFLAGS= -DHAVE_CONFIG_H -DOM_NDEBUG
+libomalloc_g_a_CPPFLAGS= -DHAVE_CONFIG_H
 
 BUILT_SOURCES = omTables.inc omTables.h
 
@@ -46,8 +47,8 @@ omTables.h: omTables
 	./omTables 1 >omTables.yy && mv omTables.yy $@
 
 noinst_PROGRAMS = omTables
-omTables_SOURCES = omAllocPrivate.h omConfig.h omTables.c omlimits.h mylimits.h
-omTables_CPPFLAGS = -DOM_GENERATE_INC
+omTables_SOURCES = omAllocPrivate.h omConfig.h omTables.c mylimits.h
+omTables_CPPFLAGS = -DOM_GENERATE_INC  -DHAVE_CONFIG_H
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -62,12 +63,13 @@ OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtT
 omtTest_g: libomalloc_g.a
 
 omtTest_g_SOURCES = $(OMTTESTSSOURCES)
+omtTest_g_CPPFLAGS = -DHAVE_CONFIG_H
 omtTest_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 omtTest_g_LDADD = -lomalloc_g
 
 omtTest_m: libomalloc_g.a
 
-omtTest_m_CPPFLAGS = -DOM_TEST_MALLOC
+omtTest_m_CPPFLAGS = -DOM_TEST_MALLOC  -DHAVE_CONFIG_H
 omtTest_m_SOURCES  = $(OMTTESTSSOURCES)
 omtTest_m_LDADD = -lomalloc_g
 

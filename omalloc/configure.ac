@@ -11,8 +11,13 @@ AC_CONFIG_SRCDIR(om_Alloc.c)
 
 AC_CONFIG_AUX_DIR([.])
 
+AC_CONFIG_HEADER(omConfig.h)
+
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([omalloc],[0.9.6])
+
+# Add pre'prefixed config
+AX_PREFIX_CONFIG_H([omConfig.h],[],[omConfig.h])
 
 AC_SUBST(VERSION)
 
@@ -580,7 +585,6 @@ AC_DEFINE(OM_PROVIDE_MALLOC,0,[Provide NO standard routines!])
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
-AC_CONFIG_HEADER(config.h omConfig.h omlimits.h)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
