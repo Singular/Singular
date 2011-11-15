@@ -126,7 +126,8 @@ size_t omSizeWOfAddr(void* addr)
  *******************************************************************/
 #ifdef OM_HAVE_VALLOC_MMAP
 
-#include <omalloc/omMmap.c>
+#include "omMmap.c"
+
 #define OM_VALLOC_FROM_SYSTEM   omVallocMmap
 #define OM_VFREE_TO_SYSTEM      omVfreeMmap
 

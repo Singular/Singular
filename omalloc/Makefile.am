@@ -25,7 +25,7 @@ omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omFindExec.c     omDebugTrack.c   		     \
 omalloc_provide.c omAllocFunc.c
 
-EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h
+EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 
 INCLUDES=-I${top_srcdir}/.. -I${top_builddir}/..
 
