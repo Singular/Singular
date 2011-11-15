@@ -87,7 +87,7 @@ int nrInt(number &n, const coeffs r)
 
   int i;
   float f = nf(n).F();
-  if (((float)INT_MIN <= f) || ((float)INT_MAX >= f))
+  if (((float)(-MAX_INT_VAL-1) <= f) || ((float)MAX_INT_VAL >= f))
     i = (int)f;
   else
     i = 0;

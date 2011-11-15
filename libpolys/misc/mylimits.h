@@ -9,8 +9,14 @@
 #ifndef _MYLIMITS_H
 #define _MYLIMITS_H
 
-#include <limits.h>
+static const int MAX_INT_VAL = 2147483647;
 
-static const int MAX_INT_VAL = INT_MAX;
+#define ULONG_MAX (~0L)
+
+#if ~0UL == 4294967295UL
+#define LONG_MAX 9223372036854775807L
+#else
+#define LONG_MAX 2147483647L
+#endif
 
 #endif /* _MYLIMITS_H */

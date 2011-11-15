@@ -47,7 +47,7 @@ static poly mp_Select (poly fro, poly what, const ring);
 matrix mpNew(int r, int c)
 {
   if (r<=0) r=1;
-  if ( (((int)(INT_MAX/sizeof(poly))) / r) <= c)
+  if ( (((int)(MAX_INT_VAL/sizeof(poly))) / r) <= c)
   {
     Werror("internal error: creating matrix[%d][%d]",r,c);
     return NULL;

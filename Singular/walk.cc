@@ -42,7 +42,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <float.h>
-#include <limits.h>
+#include <misc/mylimits.h>
 #include <sys/types.h>
 
 

@@ -463,7 +463,7 @@ static const char* nfEati(const char *s, int *i, const coeffs r)
     {
       *i *= 10;
       *i += *s++ - '0';
-      if (*i > (INT_MAX / 10)) *i = *i % r->m_nfCharP;
+      if (*i > (MAX_INT_VAL / 10)) *i = *i % r->m_nfCharP;
     }
     while (*s >= '0' && *s <= '9');
     if (*i >= r->m_nfCharP) *i = *i % r->m_nfCharP;

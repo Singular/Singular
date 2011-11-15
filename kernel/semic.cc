@@ -412,7 +412,7 @@ int     spectrum::mult_spectrum( spectrum &t )
     Rational alpha1 = -2;
     Rational alpha2 = -1;
 
-    int      mult=INT_MAX,nthis,nt;
+    int      mult=MAX_INT_VAL,nthis,nt;
 
     while( u.next_interval( &alpha1,&alpha2 ) )
     {
@@ -441,7 +441,7 @@ int     spectrum::mult_spectrumh( spectrum &t )
     Rational alpha1 = -2;
     Rational alpha2 = -1;
 
-    int      mult=INT_MAX,nthis,nt;
+    int      mult=MAX_INT_VAL,nthis,nt;
 
     while( u.next_interval( &alpha1,&alpha2 ) )
     {
