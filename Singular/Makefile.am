@@ -240,7 +240,7 @@ LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibra
 
 ########################### TEST #########################
 
-TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/libpolys/tests'
+TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/libpolys/tests/MOD:${top_builddir}/libpolys/tests/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${top_builddir}' 
 
 TESTS=testg testr
