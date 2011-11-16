@@ -41,6 +41,7 @@ char *  feErrors=NULL;
 int     feErrorsLen=0;
 BOOLEAN feWarn = TRUE;
 BOOLEAN feOut = TRUE;
+
 void (*WerrorS_callback)(const char *s) = NULL;
 
 const char feNotImplemented[]="not implemented";

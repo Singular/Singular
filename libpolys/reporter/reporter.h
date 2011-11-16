@@ -79,6 +79,7 @@ char* SPrintEnd();
 extern "C"
 {
 #endif
+extern void (*WerrorS_callback)(const char *s);
 extern int dReportError(const char* fmt, ...);
 #define dReportBug(s) \
   dReportError("Bug reported: %s\n occured at %s,%d\n", s, __FILE__, __LINE__)

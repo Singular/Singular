@@ -15,10 +15,10 @@ libcoeffs_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
 libcoeffs_g_la_CPPFLAGS =
 
 
-noinst_HEADERS= \
-	gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
-	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
-	mpr_complex.h mpr_global.h
+# noinst_HEADERS= \
+#	gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
+#	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
+#	mpr_complex.h mpr_global.h
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
@@ -31,7 +31,8 @@ libcoeffs_la_SOURCES   = $(SOURCES)
 libcoeffs_g_la_SOURCES = $(SOURCES)
 
 libcoeffs_includedir  =$(includedir)/singular/coeffs
-libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h
+libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h shortfl.h mpr_complex.h mpr_global.h
+
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory
