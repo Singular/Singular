@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: ipid.h 13833 2011-02-09 13:45:48Z hannes $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -88,6 +88,7 @@ void  killid(const char * a, idhdl * i);
 void killhdl(idhdl h, package prooti=currPack);
 void  killhdl2(idhdl h, idhdl * ih, ring r);
 lists ipNameList(idhdl root);
+lists ipNameListLev(idhdl root, int lev);
 void  ipMoveId(idhdl h);
 BOOLEAN checkPackage(package pack);
 idhdl packFindHdl(package r);

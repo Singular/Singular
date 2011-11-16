@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: ipid.cc 14372 2011-08-12 08:20:39Z hannes $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -499,6 +499,32 @@ lists ipNameList(idhdl root)
     L->m[l].rtyp=STRING_CMD;
     L->m[l].data=omStrDup(IDID(h));
     l++;
+    h=IDNEXT(h);
+  }
+  return L;
+}
+
+lists ipNameListLev(idhdl root, int lev)
+{
+  idhdl h=root;
+  /* compute the length */
+  int l=0;
+  while (h!=NULL) { if (IDLEV(h)==lev) l++; h=IDNEXT(h); }
+  /* allocate list */
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(l);
+  /* copy names */
+  h=root;
+  l=0;
+  while (h!=NULL)
+  {
+    if (IDLEV(h)==lev)
+    {
+      /* list is initialized with 0 => no need to clear anything */
+      L->m[l].rtyp=STRING_CMD;
+      L->m[l].data=omStrDup(IDID(h));
+      l++;
+    }
     h=IDNEXT(h);
   }
   return L;

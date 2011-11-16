@@ -4592,12 +4592,14 @@ See
 @code{names ( )}
 @*@code{names (} ring_name @code{)}
 @*@code{names (} package_name @code{)}
+@*@code{names (} level @code{)}
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
 returns the names of all user-defined variables which are ring independent
 (this includes the names of  procedures) or, in the second case, which
 belong to the given ring.
+The third case restricts the variables to the given level.
 
 package_name can be @code{Current}, @code{Top} or any other
 identifier of type package.
@@ -4615,6 +4617,7 @@ identifier of type package.
   l[1..3];
   names(r);
   names(p);
+  names(0);
 @c example
 @end smallexample
 @end table

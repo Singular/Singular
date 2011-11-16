@@ -186,6 +186,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjMSTD),       MSTD_CMD,        LIST_CMD,       IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
 ,{D(jjMSTD),       MSTD_CMD,        LIST_CMD,       MODUL_CMD     , NO_PLURAL |ALLOW_RING}
 ,{D(jjNAMEOF),     NAMEOF_CMD,      STRING_CMD,     ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNAMES_I),    NAMES_CMD,       LIST_CMD,       INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       PACKAGE_CMD   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjNAMES),      NAMES_CMD,       LIST_CMD,       QRING_CMD     , ALLOW_PLURAL |ALLOW_RING}

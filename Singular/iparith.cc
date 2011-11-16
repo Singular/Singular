@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: iparith.cc 14421 2011-10-21 12:37:32Z hannes $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4358,6 +4358,11 @@ static BOOLEAN jjNAMEOF(leftv res, leftv v)
 static BOOLEAN jjNAMES(leftv res, leftv v)
 {
   res->data=ipNameList(((ring)v->Data())->idroot);
+  return FALSE;
+}
+static BOOLEAN jjNAMES_I(leftv res, leftv v)
+{
+  res->data=ipNameListLev((IDROOT),(int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjNVARS(leftv res, leftv v)
