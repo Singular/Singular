@@ -4,7 +4,7 @@
 
 #ifdef HAVE_NTL
 
-// #include "cf_gmp.h"
+// #include <factory/cf_gmp.h>
 
 #include "cf_defs.h"
 #include "canonicalform.h"

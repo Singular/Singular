@@ -20,10 +20,10 @@
 
 #include "cf_defs.h"
 #include "variable.h"
-#include "templates/ftmpl_list.h"
-#include "templates/ftmpl_array.h"
-#include "templates/ftmpl_factor.h"
-#include "templates/ftmpl_matrix.h"
+#include <factory/templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_array.h>
+#include <factory/templates/ftmpl_factor.h>
+#include <factory/templates/ftmpl_matrix.h>
 
 /*BEGINPUBLIC*/
 

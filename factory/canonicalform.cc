@@ -16,7 +16,7 @@
 #include "gfops.h"
 #include "cf_binom.h"
 
-#include "cf_gmp.h"
+#include <factory/cf_gmp.h>
 
 
 #ifndef NOSTREAMIO

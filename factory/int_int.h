@@ -19,7 +19,7 @@
 #include "cf_assert.h"
 
 #include "int_cf.h"
-// #include "cf_gmp.h"
+// #include <factory/cf_gmp.h>
 #include "gmpext.h"
 
 #ifdef HAVE_OMALLOC

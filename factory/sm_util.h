@@ -16,7 +16,7 @@
 
 #include "canonicalform.h"
 #include "cf_reval.h"
-#include "templates/ftmpl_array.h"
+#include <factory/templates/ftmpl_array.h>
 
 typedef Array<REvaluation> REArray;
 

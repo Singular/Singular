@@ -13,7 +13,7 @@
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
 
-#include "cf_gmp.h"
+#include <factory/cf_gmp.h>
 
 #ifdef HAVE_NTL
 #ifndef NOSTREAMIO

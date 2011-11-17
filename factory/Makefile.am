@@ -1,8 +1,10 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
+SUBDIRS = include/factory
+
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
+AM_CPPFLAGS = -Iinclude -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
@@ -107,7 +109,6 @@ libfactory_g_la_CPPFLAGS= ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 nodist_libfactory_la_SOURCES = cplusplus.h factory.h factoryconf.h
 nodist_libfactory_g_la_SOURCES = cplusplus.h factory.h factoryconf.h
 
-
 # factory header files
 factory_headers = \
 		cf_assert.h \
@@ -181,10 +182,7 @@ factory_headers = \
 
 noinst_HEADERS = $(factory_headers)
 
-libfactory_includedir=$(includedir)/factory
-
-nobase_libfactory_include_HEADERS = \
-    cf_gmp.h $(templateincl)
+libfactory_includedir = ${includedir}/factory
 
 nodist_libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
 
@@ -252,11 +250,6 @@ templatesrc =	templates/ftmpl_array.cc \
 		templates/ftmpl_list.cc \
 		templates/ftmpl_matrix.cc
 
-templateincl =	templates/ftmpl_array.h \
-		templates/ftmpl_factor.h \
-		templates/ftmpl_list.h \
-		templates/ftmpl_matrix.h
-
 # header templates
 hdrtemplsrc = 	factoryconf.template \
 		factory.template
@@ -315,10 +308,12 @@ CLEANFILES = $(BUILT_SOURCES)
 cplusplus_SOURCES = cplusplus.cc
 
 cplusplus.h: cplusplus
-	${abs_builddir}/cplusplus > ${abs_builddir}/cplusplus.h
+	./cplusplus >$@
+	cp $@ include/factory/
 
 .template.h:
 	${srcdir}/bin/makeheader $< $@
+	cp $@ include/factory/
 
 # factory/gfops.cc has the gftables path hardcoded in, so we create a
 # symlink. Remove this rule once gfopts.cc has been fixed. Note that

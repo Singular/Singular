@@ -27,7 +27,7 @@
 #include "cf_algorithm.h"
 #include "sm_util.h"
 #include "sm_sparsemod.h"
-#include "templates/ftmpl_array.h"
+#include <factory/templates/ftmpl_array.h>
 #include "templates/ftmpl_functions.h"
 
 static CanonicalForm

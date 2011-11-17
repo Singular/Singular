@@ -5,7 +5,7 @@
 #define INCL_GMPEXT_H
 
 // #include "config.h"
-// #include "cf_gmp.h"
+// #include <factory/cf_gmp.h>
 
 #include "cf_defs.h"
 #include "imm.h"

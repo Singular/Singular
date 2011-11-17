@@ -38,7 +38,7 @@
 #include "NTLconvert.h"
 #endif
 
-#include "cf_gmp.h"
+#include <factory/cf_gmp.h>
 
 int getExp(); /* cf_char.cc */
 

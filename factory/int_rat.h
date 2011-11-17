@@ -21,7 +21,7 @@
 #include "canonicalform.h"
 #include "int_cf.h"
 #include "imm.h"
-// #include "cf_gmp.h"
+// #include <factory/cf_gmp.h>
 
 class InternalRational : public InternalCF
 {

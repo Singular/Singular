@@ -12,7 +12,7 @@
 #include "fac_sqrfree.h"
 #include "gmpext.h"
 
-#include "cf_gmp.h"
+#include <factory/cf_gmp.h>
 
 static CanonicalForm randomPoly( int n, const Variable & x, const CFRandom & gen );
 

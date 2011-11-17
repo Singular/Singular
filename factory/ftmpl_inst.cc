@@ -13,7 +13,7 @@
 
 #include "config.h"
 
-#include "factoryconf.h"
+#include <factory/factoryconf.h>
 
 #include "factory.h"
 
