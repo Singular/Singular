@@ -5,12 +5,12 @@ lib_LTLIBRARIES=libomalloc.la libomalloc_g.la
 libomalloc_includedir=$(includedir)/omalloc
 
 libomalloc_include_HEADERS = \
-omalloc.h		omConfig.h		omDerivedConfig.h	\
+omalloc.h		omDerivedConfig.h	\
 omError.h		omStructs.h		omAllocDecl.h		\
 omInlineDecl.h		omBin.h			omMemOps.h		\
 omList.h		omFindExec.h		omGetBackTrace.h	\
 omRet2Info.h		omStats.h		omOpts.h		\
-omBinPage.h		omAllocSystem.h		omTables.h		\
+omBinPage.h		omAllocSystem.h		\
 omAllocPrivate.h	omDebug.h		omInline.h		\
 omAllocFunc.h 		mylimits.h
 
@@ -31,8 +31,8 @@ INCLUDES=-I${abs_top_srcdir}/.. -I${abs_top_builddir}/..
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 libomalloc_g_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
-nodist_libomalloc_la_SOURCES = omConfig.h mylimits.h omalloc.h omTables.inc
-nodist_libomalloc_g_la_SOURCES = omConfig.h omalloc.h omTables.inc
+nodist_libomalloc_la_SOURCES = omConfig.h mylimits.h omalloc.h omTables.inc omTables.h
+nodist_libomalloc_g_la_SOURCES = omConfig.h omalloc.h omTables.inc omTables.h
 
 libomalloc_la_CPPFLAGS= -DHAVE_CONFIG_H -DOM_NDEBUG
 libomalloc_g_la_CPPFLAGS= -DHAVE_CONFIG_H
@@ -46,7 +46,8 @@ omTables.h: omTables
 	./omTables 1 >omTables.yy && mv omTables.yy $@
 
 noinst_PROGRAMS = omTables
-omTables_SOURCES = omAllocPrivate.h omConfig.h omTables.c mylimits.h
+omTables_SOURCES = omAllocPrivate.h omTables.c mylimits.h
+nodist_omTables_SOURCES = omConfig.h
 omTables_CPPFLAGS = -DOM_GENERATE_INC  -DHAVE_CONFIG_H
 
 CLEANFILES = $(BUILT_SOURCES)
