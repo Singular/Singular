@@ -21,6 +21,7 @@
 #include <singular/rintegers.h>
 #include <singular/rmodulo2m.h>
 #include <singular/rmodulon.h>
+#include <singular/lists.h>
 
 #include <singular/subexpr.h>
 #include <singular/tok.h>
