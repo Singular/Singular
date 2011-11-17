@@ -93,8 +93,8 @@ SOURCES =    Minor.cc\
 
 #   slInit_Dynamic.cc
 
-libSingular_la_SOURCES   = $(SOURCES)
-libSingular_g_la_SOURCES = $(SOURCES)
+libSingular_la_SOURCES   = $(SOURCES) feOpt.inc feOptTS.inc feOptES.inc 
+libSingular_g_la_SOURCES = $(SOURCES) feOpt.inc feOptTS.inc feOptES.inc 
 
 SingularHEADERS =    Cache.h \
    CacheImplementation.h \
@@ -155,8 +155,10 @@ SingularHEADERS =    Cache.h \
    utils.h \
    version.h \
    walk.h \
-   feOpt.h feOpt.inc \
-   mpsr_Tok.inc iparith.inc feOptTS.inc feOptES.inc
+   feOpt.h 
+
+nodist_libSingular_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
+nodist_libSingular_g_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
 
 libSingular_includedir = ${includedir}/singular/Singular/
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
@@ -265,7 +267,7 @@ testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc plural_cmd.inc feOptTS.inc feOptES.inc LIB/all.lib
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib
 
 CLEANFILES = $(BUILT_SOURCES)
 
