@@ -1,5 +1,5 @@
-libcoeffs_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
-libcoeffsdir = $(libdir)/singular
+noinst_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
+# libcoeffsdir = $(libdir)/singular
 
 CXXTEMPLFLAGS =  --no-exceptions 
 ## -fno-implicit-templates

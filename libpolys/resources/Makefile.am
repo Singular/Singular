@@ -1,5 +1,5 @@
-libresources_LTLIBRARIES=libresources.la libresources_g.la
-libresourcesdir = $(libdir)/singular
+noinst_LTLIBRARIES=libresources.la libresources_g.la
+# libresourcesdir = $(libdir)/singular
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 

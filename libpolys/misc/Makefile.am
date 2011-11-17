@@ -1,5 +1,5 @@
-libmisc_LTLIBRARIES = libmisc.la libmisc_g.la
-libmiscdir = $(libdir)/singular
+noinst_LTLIBRARIES = libmisc.la libmisc_g.la
+# libmiscdir = $(libdir)/singular
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 

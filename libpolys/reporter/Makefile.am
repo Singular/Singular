@@ -1,5 +1,5 @@
-libreporter_LTLIBRARIES=libreporter.la libreporter_g.la
-libreporterdir = $(libdir)/singular
+noinst_LTLIBRARIES=libreporter.la libreporter_g.la
+# libreporterdir = $(libdir)/singular
 
 CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
 
