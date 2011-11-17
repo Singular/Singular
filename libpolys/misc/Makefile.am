@@ -19,8 +19,12 @@ SOURCES  = intvec.cc int64vec.cc options.c
 libmisc_la_SOURCES   = $(SOURCES)
 libmisc_g_la_SOURCES = $(SOURCES)
 
+
 libmisc_includedir = $(includedir)/singular/misc
-libmisc_include_HEADERS = auxiliary.h mylimits.h options.h intvec.h int64vec.h
+libmisc_include_HEADERS = mylimits.h options.h intvec.h int64vec.h
+
+nodist_libmisc_la_SOURCES   = auxiliary.h 
+nodist_libmisc_g_la_SOURCES = auxiliary.h 
 
 
 

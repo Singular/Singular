@@ -21,10 +21,10 @@ INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir
 TESTS = simple_test coeffs_test rings_test polys_test
 check_PROGRAMS = $(TESTS)
 
-simple_test_SOURCES = simple_test_runner.cpp
-coeffs_test_SOURCES = coeffs_test_runner.cpp
-polys_test_SOURCES = polys_test_runner.cpp
-rings_test_SOURCES = rings_test_runner.cpp
+nodist_simple_test_SOURCES = simple_test_runner.cpp
+nodist_coeffs_test_SOURCES = coeffs_test_runner.cpp
+nodist_polys_test_SOURCES = polys_test_runner.cpp
+nodist_rings_test_SOURCES = rings_test_runner.cpp
 
 polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_LDFLAGS = $(polys_test_LDFLAGS)
@@ -35,7 +35,7 @@ rings_test_LDADD = $(polys_test_LDADD)
 
 
 BUILT_SOURCES = gftables MOD \
-	$(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
+	$(nodist_simple_test_SOURCES) $(nodist_coeffs_test_SOURCES) $(nodist_rings_test_SOURCES) $(nodist_polys_test_SOURCES)
 
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
@@ -58,7 +58,7 @@ rings_test_runner.cpp: rings_test.h
 
 CLEANFILES = $(BUILT_SOURCES)
 
-EXTRA_DIST = simple_test.h coeffs_test.h polys_test.h rings_test.h common.h 		\
+EXTRA_DIST = cxxtestgen.pl simple_test.h coeffs_test.h polys_test.h rings_test.h common.h \
     cxxtest/Descriptions.h       cxxtest/ParenPrinter.h      cxxtest/TestListener.h	\
     cxxtest/DummyDescriptions.h  cxxtest/QtGui.h             cxxtest/TestRunner.h	\
     cxxtest/ErrorFormatter.h     cxxtest/RealDescriptions.h  cxxtest/TestSuite.h	\
