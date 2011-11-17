@@ -97,6 +97,10 @@ endif
 libfactory_la_SOURCES = $(SOURCES)
 libfactory_g_la_SOURCES = $(SOURCES)
 
+nodist_libfactory_la_SOURCES = cplusplus.h factory.h factoryconf.h
+nodist_libfactory_g_la_SOURCES = cplusplus.h factory.h factoryconf.h
+
+
 # factory header files
 factory_headers = \
 		cf_assert.h \
@@ -172,8 +176,9 @@ noinst_HEADERS = $(factory_headers)
 libfactory_includedir=$(includedir)/factory
 
 nobase_libfactory_include_HEADERS = \
-		cplusplus.h factory.h factoryconf.h \
-		cf_gmp.h $(templateincl)
+    cf_gmp.h $(templateincl)
+
+nodist_libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
 
 
 ####################################################
@@ -302,7 +307,7 @@ CLEANFILES = $(BUILT_SOURCES)
 cplusplus_SOURCES = cplusplus.cc
 
 cplusplus.h: cplusplus
-	${builddir}/cplusplus > ${builddir}/cplusplus.h
+	${abs_builddir}/cplusplus > ${abs_builddir}/cplusplus.h
 
 .template.h:
 	${srcdir}/bin/makeheader $< $@
