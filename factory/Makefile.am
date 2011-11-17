@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
@@ -97,8 +97,8 @@ endif
 libfactory_la_SOURCES = $(SOURCES)
 libfactory_g_la_SOURCES = $(SOURCES)
 
-libfactory_la_CPPFLAGS  = -DHAVE_CONFIG_H -DOM_NDEBUG -DNDEBUG
-libfactory_g_la_CPPFLAGS= -DHAVE_CONFIG_H 
+libfactory_la_CPPFLAGS  = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DOM_NDEBUG -DNDEBUG
+libfactory_g_la_CPPFLAGS= ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 nodist_libfactory_la_SOURCES = cplusplus.h factory.h factoryconf.h
 nodist_libfactory_g_la_SOURCES = cplusplus.h factory.h factoryconf.h
