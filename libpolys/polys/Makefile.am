@@ -85,9 +85,9 @@ p_Procs_FieldIndep_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 p_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 p_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-P_PROCS_MODULE_LDFLAGS = -module 
+P_PROCS_MODULE_LDFLAGS = -shared -module
 # -L${top_builddir}/coeffs -lcoeffs 
-P_PROCS_MODULE_LDFLAGSG = -module 
+P_PROCS_MODULE_LDFLAGSG = -shared -module
 # -L${top_builddir}/coeffs -lcoeffs_g
 
 p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
