@@ -321,7 +321,7 @@ lists pcvCV2P(lists cvl,int d0,int d1)
 
 BOOLEAN pcvP2CV(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==LIST_CMD)
     {
@@ -349,7 +349,7 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
 
 BOOLEAN pcvCV2P(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==LIST_CMD)
     {
@@ -387,7 +387,7 @@ int pcvDim(int d0,int d1)
 
 BOOLEAN pcvDim(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==INT_CMD)
     {
@@ -443,7 +443,7 @@ lists pcvBasis(int d0,int d1)
 
 BOOLEAN pcvBasis(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==INT_CMD)
     {

@@ -26,7 +26,7 @@
 
 BOOLEAN evSwap(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==MATRIX_CMD)
     {
@@ -54,7 +54,7 @@ BOOLEAN evSwap(leftv res,leftv h)
 
 BOOLEAN evRowElim(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==MATRIX_CMD)
     {
@@ -87,7 +87,7 @@ BOOLEAN evRowElim(leftv res,leftv h)
 
 BOOLEAN evColElim(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==MATRIX_CMD)
     {
@@ -120,7 +120,7 @@ BOOLEAN evColElim(leftv res,leftv h)
 
 BOOLEAN evHessenberg(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==MATRIX_CMD)
     {
@@ -287,7 +287,7 @@ lists evEigenvals(matrix M)
 
 BOOLEAN evEigenvals(leftv res,leftv h)
 {
-  if(currRingHdl)
+  if(currRing)
   {
     if(h&&h->Typ()==MATRIX_CMD)
     {
