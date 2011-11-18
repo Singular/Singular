@@ -547,6 +547,24 @@ gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
                                  ///< factors
              );
 
+/// heuristic algorithm for lifting sparse polynomials
+///
+/// @return a list of factors of A, possibly incomplete
+CFList
+sparseHeuristic (const CanonicalForm& A,  ///<[in] polynomial to be factored
+                 const CFList& biFactors, ///<[in] list of bivariate factors wrt
+                                          ///< Variable 1 and 2
+                 CFList*& moreBiFactors,  ///<[in,out] more bivariate factors
+                                          ///< wrt different second variables.
+                                          ///< May be recombined s.t. there are
+                                          ///< only minFactorsLength factors and
+                                          ///< resorted s.t. the sequence of
+                                          ///< univariate factors in biFactors
+                                          ///< and moreBiFactors coincides 
+                 const CFList& evaluation,///<[in] evaluation point
+                 int minFactorsLength     ///<[in] minimal number of factors
+                );
+
 #endif
 /* FAC_FQ_FACTORIZE_H */
 
