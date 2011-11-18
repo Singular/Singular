@@ -9,9 +9,12 @@
 
 NAME="test"
 
-LIBPOLYSCFLAGS="`sh libpolys-config --cflags` -g -Wextra -Wall -Wno-long-long  -O0 --no-exceptions"
-LIBPOLYSLIBS=`sh libpolys-config --libs`
-LIBPOLYSPREFIX=`sh libpolys-config --prefix`
+P="." 
+# /mnt/DATA/GITHUB/w/GAP/libsing/spielwiese/TARGET/bin"
+
+LIBPOLYSCFLAGS="`sh $P/libsingular-config --cflagsg` -g -Wextra -Wall -Wno-long-long  -O0 --no-exceptions"
+LIBPOLYSLIBS=`sh $P/libsingular-config --libsg`
+LIBPOLYSPREFIX="`sh $P/libsingular-config --prefix`"
 
 echo "Using libpolys from: '$LIBPOLYSPREFIX'"
 echo "Using        CFLAGS: '$LIBPOLYSCFLAGS'"

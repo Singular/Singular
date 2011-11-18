@@ -93,5 +93,6 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])
+AC_CONFIG_FILES([libsingular-config])
 
 AC_OUTPUT
