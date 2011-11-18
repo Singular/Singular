@@ -694,6 +694,33 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   else if (biFactors.length() > minFactorsLength)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
 
+  if (differentSecondVar == A.level() - 2)
+  {
+    bool zeroOccured= false;
+    for (CFListIterator iter= evaluation; iter.hasItem(); iter++)
+    {
+      if (iter.getItem().isZero())
+      {
+        zeroOccured= true;
+        break;
+      }
+    }
+    if (!zeroOccured)
+    {
+      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation, minFactorsLength);
+      if (factors.length() == biFactors.length())
+      {
+        appendSwapDecompress (factors, contentAFactors, N, 0, 0, x);
+        normalize (factors);
+        delete [] Aeval2;
+        return factors;
+      }
+      else
+        factors= CFList();
+      //TODO case where factors.length() > 0
+    }
+  }
+
   CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
 
   CFList * oldAeval= new CFList [A.level() - 2];
