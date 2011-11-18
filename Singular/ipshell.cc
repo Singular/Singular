@@ -1446,7 +1446,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 
 BOOLEAN iiCheckRing(int i)
 {
-  if (currRingHdl==NULL)
+  if (currRing==NULL)
   {
     #ifdef SIQ
     if (siq<=0)
