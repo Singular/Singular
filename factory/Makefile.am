@@ -4,7 +4,7 @@ SUBDIRS = include/factory
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
-AM_CPPFLAGS = -Iinclude -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS}
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
@@ -302,7 +302,7 @@ noinst_PROGRAMS = cplusplus
 
 BUILT_SOURCES = cplusplus.h factory.h factoryconf.h
 
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES) include/factory/factory.h include/factory/factoryconf.h include/factory/cplusplus.h
 
 
 cplusplus_SOURCES = cplusplus.cc

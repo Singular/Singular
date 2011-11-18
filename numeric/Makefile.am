@@ -13,7 +13,7 @@ libnumeric_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${C
 libnumeric_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 libnumeric_g_la_CPPFLAGS = -DHAVE_CONFIG_H 
 
-INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys ${GMP_CFLAGS} ${FACTORY_CFLAGS} ${NTL_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys ${GMP_CFLAGS} -I${top_srcdir}/factory/include -I${top_builddir}/factory/include ${FACTORY_CFLAGS} ${NTL_CFLAGS}
 
 SOURCES  = mpr_base.cc mpr_inout.cc mpr_numeric.cc
 libnumeric_la_SOURCES   = $(SOURCES)

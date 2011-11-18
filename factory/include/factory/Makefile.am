@@ -8,4 +8,4 @@ templateincl =	templates/ftmpl_array.h \
 libfactory_includedir = ${includedir}/factory
 
 nobase_libfactory_include_HEADERS = \
-    cf_gmp.h $(templateincl)
+              cf_gmp.h ${templateincl}

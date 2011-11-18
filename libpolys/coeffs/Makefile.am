@@ -20,7 +20,8 @@ libcoeffs_g_la_CPPFLAGS = -DHAVE_CONFIG_H
 #	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
 #	mpr_complex.h mpr_global.h
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
+
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
