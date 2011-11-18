@@ -82,8 +82,8 @@ endif
 AM_LDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/resources -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc
 
 
-TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/libpolys/tests/MOD:${top_builddir}/libpolys/tests/gftables'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${top_builddir}' 
+TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/tests/MOD:${abs_top_builddir}/libpolys/tests/gftables'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 
 TESTS = testg testr 
 check_PROGRAMS = $(TESTS)

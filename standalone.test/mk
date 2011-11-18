@@ -21,7 +21,8 @@ CMD="g++ $LIBPOLYSCFLAGS -c $NAME.cc "
 echo "executing '$CMD':"
 $CMD
 
-
 CMD="g++ -g -Wextra -Wall -Wno-long-long -O0 --no-exceptions -rdynamic $NAME.o -o $NAME $LIBPOLYSLIBS" 
 echo "executing '$CMD':"
 $CMD
+
+SINGULARPATH="$LIBPOLYSPREFIX/share/gftables:$LIBPOLYSPREFIX/libexec/singular/MOD" SINGULAR_ROOT_DIR="$LIBPOLYSPREFIX" ./$NAME
