@@ -30,6 +30,7 @@
 
 static const double log2exp= 1.442695041;
 
+#ifdef HAVE_NTL
 /// Factorization of a squarefree bivariate polynomials over an arbitrary finite
 /// field, information on the current field we work over is in @a info. @a info
 /// may also contain information about the initial field if initial and current
@@ -50,7 +51,6 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
 /// @return @a FpBiSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
 /// @sa FqBiSqrfFactorize(), GFBiSqrfFactorize()
-#ifdef HAVE_NTL
 inline
 CFList FpBiSqrfFactorize (const CanonicalForm & G ///< [in] a bivariate poly
                          )
@@ -439,8 +439,6 @@ CFFList GFBiFactorize (const CanonicalForm & G ///< [in] a bivariate poly
   return result;
 }
 
-#endif
-
 /// \f$ \prod_{f\in L} {f (0, x)} \ mod\ M \f$ via divide-and-conquer
 ///
 /// @return @a prodMod0 computes the above defined product
@@ -609,7 +607,7 @@ extBiFactorize (const CanonicalForm& F,    ///< [in] poly to be factored
                 const ExtensionInfo& info  ///< [in] info about extension
                );
 
-
+#endif
 #endif
 /* FAC_FQ_BIVAR_H */
 

@@ -28,6 +28,7 @@
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
 
+#ifdef HAVE_NTL
 /// multiplication of univariate polys over a finite field using NTL, if we are
 /// in GF factory's default multiplication is used.
 ///
@@ -357,6 +358,7 @@ nonMonicHenselLift (const CFList& eval,    ///< [in] a list of polys the last
                     bool& noOneToOne       ///< [in, out] check for one to one
                                            ///< correspondence
                    );
+#endif /* HAVE_NTL */
 #endif
 /* FAC_HENSEL_H */
 
