@@ -11,19 +11,19 @@
 
 CXXTEMPLFLAGS = --no-exceptions ## -fno-implicit-templates
 
-libkernel_LIBRARIES = libkernel.a libkernel_g.a
+libkernel_LTLIBRARIES = libkernel.la libkernel_g.la
 libkerneldir = $(libdir)/singular
 
-libkernel_a_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
-libkernel_g_a_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
+libkernel_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
+libkernel_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
 ## -pedantic
 
-libkernel_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-libkernel_g_a_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+libkernel_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+libkernel_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
-libkernel_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
-#libkernel_g_a_CPPFLAGS =
+libkernel_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
+#libkernel_g_la_CPPFLAGS =
 
 INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) $(FACTORY_CFLAGS) $(NTL_CFLAGS)
 
@@ -48,8 +48,8 @@ SOURCES = polys.cc febase.cc feread.cc \
     linearAlgebra.cc nc.cc preimage.cc \
     fegetopt.c mod2.h 
 
-libkernel_a_SOURCES   = $(SOURCES)
-libkernel_g_a_SOURCES = $(SOURCES)
+libkernel_la_SOURCES   = $(SOURCES)
+libkernel_g_la_SOURCES = $(SOURCES)
 
 KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	structs.h \

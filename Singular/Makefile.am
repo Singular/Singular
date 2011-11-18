@@ -17,18 +17,18 @@ INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_bui
 
 ########################### libSingular* #########################
 
-libSingular_LIBRARIES = libSingular.a libSingular_g.a
+libSingular_LTLIBRARIES = libSingular.la libSingular_g.la
 libSingulardir = $(libdir)/singular
 
-libSingular_a_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
-libSingular_g_a_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
+libSingular_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
+libSingular_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
 
-libSingular_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-libSingular_g_a_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+libSingular_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+libSingular_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
-libSingular_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
-libSingular_g_a_CPPFLAGS = -DLIBSINGULAR
+libSingular_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
+libSingular_g_la_CPPFLAGS = -DLIBSINGULAR
 
 SOURCES =    Minor.cc\
    MinorInterface.cc\
@@ -93,8 +93,8 @@ SOURCES =    Minor.cc\
 
 #   slInit_Dynamic.cc
 
-libSingular_a_SOURCES   = $(SOURCES)
-libSingular_g_a_SOURCES = $(SOURCES)
+libSingular_la_SOURCES   = $(SOURCES)
+libSingular_g_la_SOURCES = $(SOURCES)
 
 SingularHEADERS =    Cache.h \
    CacheImplementation.h \

@@ -1,18 +1,18 @@
-libcoeffs_LIBRARIES = libcoeffs.a libcoeffs_g.a
+libcoeffs_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
 libcoeffsdir = $(libdir)/singular
 
 CXXTEMPLFLAGS =  --no-exceptions 
 ## -fno-implicit-templates
 
-libcoeffs_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
-libcoeffs_g_a_CFLAGS = ${PIPE}
+libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
+libcoeffs_g_la_CFLAGS = ${PIPE}
 
-libcoeffs_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
-libcoeffs_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libcoeffs_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libcoeffs_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
-libcoeffs_g_a_CPPFLAGS =
+libcoeffs_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
+libcoeffs_g_la_CPPFLAGS =
 
 
 noinst_HEADERS= \
@@ -27,8 +27,8 @@ SOURCES = \
 	gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc ffields.cc \
 	modulop.cc mpr_complex.cc
 
-libcoeffs_a_SOURCES   = $(SOURCES)
-libcoeffs_g_a_SOURCES = $(SOURCES)
+libcoeffs_la_SOURCES   = $(SOURCES)
+libcoeffs_g_la_SOURCES = $(SOURCES)
 
 libcoeffs_includedir  =$(includedir)/singular/coeffs
 libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h

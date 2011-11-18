@@ -26,7 +26,7 @@ else
   USE_P_PROCS_DYNAMIC_CC =
 endif
 
-libpolys_LIBRARIES = libpolys.a libpolys_g.a
+libpolys_LTLIBRARIES = libpolys.la libpolys_g.la
 libpolysdir = $(libdir)/singular
 
 SOURCES = \
@@ -125,13 +125,13 @@ libpolys_includedir=$(includedir)/singular/polys
 
 nobase_libpolys_include_HEADERS = $(LIBPOLYSHEADERS)
 
-libpolys_a_SOURCES = ${SOURCES}
-libpolys_g_a_SOURCES = ${SOURCES}
+libpolys_la_SOURCES = ${SOURCES}
+libpolys_g_la_SOURCES = ${SOURCES}
 
-EXTRA_libpolys_a_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
+EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
-libpolys_g_a_CXXFLAGS = ${DEBUGCXXFLAGS}
-libpolys_a_CPPFLAGS = ${NODEBUGDEFS}
+libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+libpolys_la_CPPFLAGS = ${NODEBUGDEFS}
 
 
 #################################################

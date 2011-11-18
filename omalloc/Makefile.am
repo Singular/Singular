@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 AM_LDFLAGS = -L${top_builddir}/omalloc -L${top_builddir}/../omalloc
 
-lib_LIBRARIES=libomalloc.a libomalloc_g.a
+lib_LTLIBRARIES=libomalloc.la libomalloc_g.la
 
 libomalloc_includedir=$(includedir)/omalloc
 
@@ -29,14 +29,14 @@ EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 
 INCLUDES=-I${top_srcdir}/.. -I${top_builddir}/..
 
-libomalloc_a_SOURCES=$(SOURCES) $(noinst_HEADERS)
-libomalloc_g_a_SOURCES=$(SOURCES) $(noinst_HEADERS)
+libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
+libomalloc_g_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
-nodist_libomalloc_a_SOURCES = omConfig.h mylimits.h omalloc.h omTables.inc
-nodist_libomalloc_g_a_SOURCES = omConfig.h omalloc.h omTables.inc
+nodist_libomalloc_la_SOURCES = omConfig.h mylimits.h omalloc.h omTables.inc
+nodist_libomalloc_g_la_SOURCES = omConfig.h omalloc.h omTables.inc
 
-libomalloc_a_CPPFLAGS= -DHAVE_CONFIG_H -DOM_NDEBUG
-libomalloc_g_a_CPPFLAGS= -DHAVE_CONFIG_H
+libomalloc_la_CPPFLAGS= -DHAVE_CONFIG_H -DOM_NDEBUG
+libomalloc_g_la_CPPFLAGS= -DHAVE_CONFIG_H
 
 BUILT_SOURCES = omTables.inc omTables.h
 

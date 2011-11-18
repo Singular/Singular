@@ -4,13 +4,13 @@ CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
-lib_LIBRARIES = libfactory.a libfactory_g.a
+lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
-libfactory_a_libdir = $(libdir)
-libfactory_g_a_libdir = $(libdir)
+libfactory_la_libdir = $(libdir)
+libfactory_g_la_libdir = $(libdir)
 
-libfactory_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
-libfactory_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
+libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
+libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
 
 # factory source files
 SOURCES = \
@@ -94,8 +94,8 @@ if WITH_PARSER_FOR_CANONICAL_FORM
     SOURCES +=  readcf.yy
 endif
 
-libfactory_a_SOURCES = $(SOURCES)
-libfactory_g_a_SOURCES = $(SOURCES)
+libfactory_la_SOURCES = $(SOURCES)
+libfactory_g_la_SOURCES = $(SOURCES)
 
 # factory header files
 factory_headers = \
@@ -215,7 +215,7 @@ gftables/9 gftables/9409 gftables/961
 
 # Support for building GF(q)-tables
 #
-# gengftables needs libfactory.a and factory.h AND is needed for
+# gengftables needs libfactory.la and factory.h AND is needed for
 # generating gftable but the tables are not necessarily needed to
 # compile and use libfactory (though it will be a lot slower).
 
