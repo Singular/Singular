@@ -523,7 +523,7 @@ int main(int argc, char** argv)
 AC_MSG_RESULT($ac_cv_prog_addr2line_works)
 
 AC_MSG_CHECKING(whether to track return addresses)
-if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works "!= yes; then
+if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
   with_track_return=no
 else
   AC_DEFINE(OM_TRACK_RETURN,1,"Whether to track return")

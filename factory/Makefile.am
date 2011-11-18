@@ -170,10 +170,13 @@ factory_headers = \
 noinst_HEADERS = $(factory_headers)
 
 libfactory_includedir=$(includedir)/factory
+
 nobase_libfactory_include_HEADERS = \
 		cplusplus.h factory.h factoryconf.h \
 		cf_gmp.h $(templateincl)
 
+
+####################################################
 # Documentation
 include $(top_srcdir)/aminclude.am
 
@@ -187,6 +190,7 @@ doxy:		factory.cfg $(doxysrc) $(doxyincl)
 doxyclean:
 		rm -rf doxygen
 
+####################################################
 # the precomputed GF(q)-tables
 
 gftablesdir=$(datadir)/gftables
@@ -213,6 +217,7 @@ gftables/7921 gftables/8 gftables/81 gftables/8192 gftables/841 \
 gftables/9 gftables/9409 gftables/961 
 
 
+####################################################
 # Support for building GF(q)-tables
 #
 # gengftables needs libfactory.la and factory.h AND is needed for
@@ -224,6 +229,7 @@ gengftables_SOURCES = gengftables-conway.cc
 gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
 
+####################################################
 # These files listed below are not used anywhere but are included in
 # the distribution. So they will be tacked on to EXTRA_DIST.
 
@@ -323,10 +329,3 @@ test_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
 test_r_SOURCES = $(TESTSSOURCES)
 test_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti #ftmpl_inst.o
 test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
-
-
-####################################################
-## The following is due to AX_PREFIX_CONFIG_H
-##
-
-# DISTCLEANFILES=_configs.sed factory_config.h

@@ -179,14 +179,12 @@ AM_LDFLAGS = -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${ab
 noinst_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
 
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
-# gentable2_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 gentable2_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable2_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 gentable2_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
 
 
 gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
-# gentable1_LDADD = -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable1_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 gentable1_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
@@ -234,7 +232,7 @@ include ${srcdir}/singular-libs
 singularlibrarydir = ${datadir}/singular
 singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
 nobase_dist_singularlibrary_DATA = LIB/all.lib LIB/tst.lib LIB/help.cnf ${singularlibrary}
-EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs LIB/help.cnf LIB/tst.lib
+EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs LIB/help.cnf
 
 # ${nobase_dist_singularlibrary_DATA}
 LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
