@@ -60,20 +60,20 @@ check_PROGRAMS = $(TESTS)
 
 OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtTest.c
 
-omtTest_g: libomalloc_g.a
+# omtTest_g: libomalloc_g.la
 
 omtTest_g_SOURCES = $(OMTTESTSSOURCES)
 omtTest_g_CPPFLAGS = -DHAVE_CONFIG_H
 omtTest_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 omtTest_g_LDADD = -lomalloc_g
 
-omtTest_m: libomalloc_g.a
+# omtTest_m: libomalloc_g.la
 
 omtTest_m_CPPFLAGS = -DOM_TEST_MALLOC  -DHAVE_CONFIG_H
 omtTest_m_SOURCES  = $(OMTTESTSSOURCES)
 omtTest_m_LDADD = -lomalloc_g
 
-omtTest_r: libomalloc.a
+# omtTest_r: libomalloc.la
 
 omtTest_r_SOURCES = $(OMTTESTSSOURCES)
 omtTest_r_CPPFLAGS = -DOM_NDEBUG
