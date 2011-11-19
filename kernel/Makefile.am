@@ -37,7 +37,6 @@ SOURCES = polys.cc febase.cc feread.cc \
     fast_maps.cc \
     fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     kspoly.cc kpolys.cc \
-    semic.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc \
     timer.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \

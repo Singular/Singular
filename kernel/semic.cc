@@ -7,37 +7,45 @@
 
 #define SEMIC_CC
 
-#include"mod2.h"
+#include "mod2.h"
 
 #ifdef HAVE_SPECTRUM
 
 #ifdef  SEMIC_PRINT
 #ifndef SEMIC_IOSTREAM
-#include<stdio.h>
+#include <stdio.h>
 #else
-#include<iostream.h>
+#include <iostream.h>
 #endif
 #endif
 
-#include<string.h>
+#include <string.h>
+
 #ifndef ix86_Win
 //#include<values.h>
 #endif
 
-#include<misc/intvec.h>
-#include<misc/mylimits.h>
-#include"GMPrat.h"
-#include"semic.h"
+#include <misc/intvec.h>
+#include <misc/mylimits.h>
+#include "GMPrat.h"
+#include "semic.h"
 
 // ----------------------------------------------------------------------------
-//  Delete the memory of a spectrum
+//  Copy constructor for  spectrum
 // ----------------------------------------------------------------------------
 
-inline void spectrum::copy_delete( void )
+spectrum::spectrum( const spectrum &spec )
 {
-    if( s != (Rational*)NULL && n > 0 ) delete [] s;
-    if( w != (int*)NULL      && n > 0 ) delete [] w;
-    copy_zero( );
+    copy_deep( spec );
+}
+
+// ----------------------------------------------------------------------------
+//  Destructor for  spectrum
+// ----------------------------------------------------------------------------
+
+spectrum::~spectrum( )
+{
+    copy_delete( );
 }
 
 // ----------------------------------------------------------------------------
@@ -107,25 +115,6 @@ void spectrum::copy_deep( const spectrum &spec )
         w[i] = spec.w[i];
     }
 }
-
-// ----------------------------------------------------------------------------
-//  Copy constructor for  spectrum
-// ----------------------------------------------------------------------------
-
-spectrum::spectrum( const spectrum &spec )
-{
-    copy_deep( spec );
-}
-
-// ----------------------------------------------------------------------------
-//  Destructor for  spectrum
-// ----------------------------------------------------------------------------
-
-spectrum::~spectrum( )
-{
-    copy_delete( );
-}
-
 
 // ----------------------------------------------------------------------------
 //  operator  =  for  spectrum

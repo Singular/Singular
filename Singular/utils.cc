@@ -11,7 +11,9 @@ extern char *optarg;
 extern int optind, opterr, optopt;
 extern int lpverbose, check;
 extern int texinfo_out;
-extern int category_out;
+
+int category_out;
+
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
 int warning_info = 0, warning_version = 0;
 

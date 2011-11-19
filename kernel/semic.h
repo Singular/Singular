@@ -12,6 +12,9 @@
 #ifndef SEMIC_H
 #define SEMIC_H
 
+#ifdef HAVE_SPECTRUM
+
+
 #include <kernel/GMPrat.h>
 
 typedef enum
@@ -67,10 +70,17 @@ public:
     Rational    *s;      // spectrum numbers
     int         *w;      // multiplicities
 
-    spectrum( );
-    spectrum( const spectrum& );
+//    spectrum( );
 //    spectrum( lists );
 
+    ///  Zero constructor
+    spectrum( )
+    {
+       copy_zero( );
+    }
+
+    spectrum( const spectrum& );
+   
     ~spectrum( );
 
     spectrum operator = ( const spectrum& );
@@ -84,10 +94,36 @@ public:
     #endif /*SEMIC_PRINT*/
 
     void    copy_new    ( int );
-    void    copy_delete ( void );
-    void    copy_zero   ( void );
+//    void    copy_delete ( void );
 
-    void    copy_shallow( spectrum& );
+///  Delete the memory of a spectrum
+inline void copy_delete( void )
+{
+    if( s != (Rational*)NULL && n > 0 ) delete [] s;
+    if( w != (int*)NULL      && n > 0 ) delete [] w;
+    copy_zero( );
+}
+
+///  Initialize with zero
+inline void copy_zero( void )
+{
+    mu = 0;
+    pg = 0;
+    n  = 0;
+    s  = (Rational*)NULL;
+    w  = (int*)NULL;
+}
+
+///  Initialize shallow from another spectrum
+inline void copy_shallow( spectrum &spec )
+{
+    mu = spec.mu;
+    pg = spec.pg;
+    n  = spec.n;
+    s  = spec.s;
+    w  = spec.w;
+}
+
     void    copy_deep   ( const spectrum& );
 //    void    copy_deep   ( lists );
 
@@ -104,42 +140,7 @@ public:
     //   int     set_geometric_genus( void );
 };
 
-
-// ----------------------------------------------------------------------------
-//  Initialize with zero
-// ----------------------------------------------------------------------------
-
-inline void spectrum::copy_zero( void )
-{
-    mu = 0;
-    pg = 0;
-    n  = 0;
-    s  = (Rational*)NULL;
-    w  = (int*)NULL;
-}
-
-// ----------------------------------------------------------------------------
-//  Initialize shallow from another spectrum
-// ----------------------------------------------------------------------------
-
-inline void spectrum::copy_shallow( spectrum &spec )
-{
-    mu = spec.mu;
-    pg = spec.pg;
-    n  = spec.n;
-    s  = spec.s;
-    w  = spec.w;
-}
-
-// ----------------------------------------------------------------------------
-//  Zero constructor
-// ----------------------------------------------------------------------------
-
-inline spectrum::spectrum( )
-{
-    copy_zero( );
-}
-
+#endif /*HAVE_SPECTRUM*/
 // ----------------------------------------------------------------------------
 //  semic.h
 //  end of file

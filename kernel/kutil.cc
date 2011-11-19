@@ -6661,7 +6661,7 @@ int redEcart (LObject* h,kStrategy strat);
 void enterSMora (LObject p,int atS,kStrategy strat, int atR=-1);
 void enterSMoraNF (LObject p,int atS,kStrategy strat, int atR=-1);
 // ../Singular/misc.cc:
-char *  showOption();
+extern char *  showOption();
 
 void kDebugPrint(kStrategy strat)
 {

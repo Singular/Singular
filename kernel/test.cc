@@ -55,6 +55,15 @@ int initializeGMP(){ return 1; }
 int mmInit(void) {return 1; }
 #endif
 
+// // TODO: DUE to the use of HALT in npolygon.cc :(((
+extern "C" {void m2_end(int i){exit(i);}}
+
+// // TODO: DUE to its use in kutil.cc :(((
+char * showOption(){return NULL;}
+
+// // TODO: DUE to its use in feread.cc :(((
+char *iiArithGetCmd(int nPos){return NULL; }
+
 
 #include <coeffs/numbers.h>
 
