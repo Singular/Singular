@@ -144,7 +144,7 @@ templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
 templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
 templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC}
-templates_p_Procs_Generate_LDADD    = -lreporter
+templates_p_Procs_Generate_LDADD    = -lreporter -lomalloc
 
 
 templates/p_Procs.inc: templates/p_Procs_Generate
