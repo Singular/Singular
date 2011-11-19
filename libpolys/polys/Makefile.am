@@ -9,8 +9,8 @@ NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
-INCLUDES	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${includedir} ${GMP_CFLAGS}
-AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/../omalloc -L${builddir}
+INCLUDES	= -I${abs_top_srcdir} -I${abs_top_srcdir}/.. -I${abs_top_builddir} -I${abs_top_builddir}/.. -I${srcdir} -I${includedir} ${GMP_CFLAGS}
+AM_LDFLAGS	= -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${abs_top_builddir}/resources -L${abs_top_builddir}/../omalloc -L${abs_builddir}
 
 if ENABLE_P_PROCS_STATIC
   USE_P_PROCS_STATIC_CC = templates/p_Procs_Static.cc

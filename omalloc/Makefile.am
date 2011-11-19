@@ -1,5 +1,4 @@
 ACLOCAL_AMFLAGS = -I ../m4
-AM_LDFLAGS = -L${top_builddir}/omalloc -L${top_builddir}/../omalloc
 
 lib_LTLIBRARIES=libomalloc.la libomalloc_g.la
 
@@ -27,7 +26,7 @@ omalloc_provide.c omAllocFunc.c
 
 EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 
-INCLUDES=-I${top_srcdir}/.. -I${top_builddir}/..
+INCLUDES=-I${abs_top_srcdir}/.. -I${abs_top_builddir}/..
 
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 libomalloc_g_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
@@ -55,6 +54,9 @@ CLEANFILES = $(BUILT_SOURCES)
 ####################################################
 ## Test program
 ##
+# AM_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../omalloc
+
+
 TESTS = omtTest-g omtTest-m omtTest-r
 check_PROGRAMS = $(TESTS)
 
@@ -66,12 +68,15 @@ omtTest_g_SOURCES = $(OMTTESTSSOURCES)
 omtTest_g_CPPFLAGS = -DHAVE_CONFIG_H
 omtTest_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 omtTest_g_LDADD = -lomalloc_g
+omtTest_g_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../omalloc
+
 
 # omtTest_m: libomalloc_g.la
 
 omtTest_m_CPPFLAGS = -DOM_TEST_MALLOC  -DHAVE_CONFIG_H
 omtTest_m_SOURCES  = $(OMTTESTSSOURCES)
 omtTest_m_LDADD = -lomalloc_g
+omtTest_m_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../omalloc
 
 # omtTest_r: libomalloc.la
 
@@ -79,4 +84,5 @@ omtTest_r_SOURCES = $(OMTTESTSSOURCES)
 omtTest_r_CPPFLAGS = -DOM_NDEBUG
 omtTest_r_CFLAGS = -O3
 omtTest_r_LDADD = -lomalloc
+omtTest_r_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../omalloc
 

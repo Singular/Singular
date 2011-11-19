@@ -174,7 +174,7 @@ endif
 #########################################################
 # handle all the generated *.inc
 
-AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/resources -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc
+AM_LDFLAGS = -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel -L${abs_top_builddir}/libpolys/polys -L${abs_top_builddir}/libpolys/coeffs -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/resources -L${abs_top_builddir}/libpolys/misc $(USE_FACTORY) -L${abs_top_builddir}/omalloc
 
 noinst_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
 
@@ -269,20 +269,20 @@ BUILT_SOURCES = feOpt.inc mpsr_Tok.inc iparith.inc plural_cmd.inc feOptTS.inc fe
 CLEANFILES = $(BUILT_SOURCES)
 
 feOpt.inc: feOpt
-	./feOpt
+	${abs_builddir}/feOpt
 
 feOptES.inc: feOptES
-	./feOptES
+	${abs_builddir}/feOptES
 
 feOptTS.inc: feOptTS
-	./feOptTS
+	${abs_builddir}/feOptTS
 
 plural_cmd.inc iparith.inc: gentable1
-	./gentable1
+	${abs_builddir}/gentable1
 
 # fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
 plural_cmd.inc: iparith.inc
 
 mpsr_Tok.inc: gentable2
-	./gentable2
+	${abs_builddir}/gentable2
 
