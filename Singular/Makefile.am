@@ -213,6 +213,9 @@ Singularg_CFLAGS = -g ${PIPE}
 Singular_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 Singularg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
+nodist_Singular_SOURCES = libSingular.la
+nodist_Singularg_SOURCES =  libSingular_g.la
+
 Singular_SOURCES = tesths.cc
 Singularg_SOURCES = tesths.cc
 
