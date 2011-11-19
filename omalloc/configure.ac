@@ -94,12 +94,15 @@ CPPFLAGS="-I.. -I."
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_RANLIB
+
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
 AC_C_CONST
 AC_C_INLINE
+
+LT_INIT
+
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for programs

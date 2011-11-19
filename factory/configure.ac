@@ -26,6 +26,8 @@ AX_PREFIX_CONFIG_H([config.h],[],[config.h])
 
 AC_PROG_YACC
 
+LT_INIT
+
 #
 # Do not change version here!!!
 #

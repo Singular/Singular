@@ -33,8 +33,9 @@ fi
 
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
-LT_INIT([shared])
-# LT_INIT(dlopen disable-static) # doesn't work on PowerPc!
+LT_INIT
+# ([shared])
+# LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
 
 AM_PROG_CC_C_O
 AC_PROG_LN_S
