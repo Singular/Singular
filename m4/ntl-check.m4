@@ -37,6 +37,7 @@ min_ntl_version=ifelse([$1], ,1.0,$1)
 
 dnl Check for existence
 BACKUP_CXXFLAGS=${CXXFLAGS}
+BACKUP_CFLAGS=${CFLAGS}
 BACKUP_LIBS=${LIBS}
 
 AC_LANG_PUSH(C++)
@@ -56,7 +57,8 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 		NTL_CFLAGS=
 		NTL_LIBS="-lntl"		
 	fi	
-	CXXFLAGS="${BACKUP_CXXFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}" 
+###	CFLAGS="${BACKUP_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}" 
+	CXXFLAGS="${BACKUP_CFLAGS} ${BACKUP_CXXFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${NTL_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(
