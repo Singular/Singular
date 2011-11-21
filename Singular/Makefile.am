@@ -268,46 +268,46 @@ LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibra
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_builddir}/libpolys/tests/MOD:${abs_top_builddir}/libpolys/tests/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 
-TESTS=testg testr testdg testdr
+TESTS=test-s-g test-s-r test-d-g test-d-r
 check_PROGRAMS=$(TESTS)
 
 # Static versions
 
-testr_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-testg_CFLAGS = ${PIPE}
+test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+test_s_g_CFLAGS = ${PIPE}
 
-testr_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-testg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_s_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
-testr_SOURCES = test.cc
-testg_SOURCES = test.cc
+test_s_r_SOURCES = test.cc
+test_s_g_SOURCES = test.cc
 
-testr_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-testg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-# testg_CPPFLAGS =
+test_s_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+# test_s_g_CPPFLAGS =
 
-testr_LDFLAGS = -static
-testg_LDFLAGS = -static
+test_s_r_LDFLAGS = -static
+test_s_g_LDFLAGS = -static
 
 
 # Dynamic versions
 
-testdr_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-testdg_CFLAGS = ${PIPE}
+test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+test_d_g_CFLAGS = ${PIPE}
 
-testdr_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-testdg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
-testdr_SOURCES = test.cc
-testdg_SOURCES = test.cc
+test_d_r_SOURCES = test.cc
+test_d_g_SOURCES = test.cc
 
-testdr_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-testdg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-testdr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-# testdg_CPPFLAGS =
+test_d_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+# test_d_g_CPPFLAGS =
 
 #########################################################
 
