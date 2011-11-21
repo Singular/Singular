@@ -48,26 +48,45 @@ TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../fa
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
 
 
-TESTS = testg testr
+TESTS = test_s_g test_s_r test_d_g test_d_r
 check_PROGRAMS = $(TESTS)
 
-testr_SOURCES = test.cc
-testg_SOURCES = test.cc
+test_s_r_SOURCES = test.cc
+test_s_g_SOURCES = test.cc
 
-testr_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
-testg_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
+test_d_r_SOURCES = test.cc
+test_d_g_SOURCES = test.cc
 
 
-testr_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-testg_CFLAGS = ${PIPE}
+test_s_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
+test_s_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
 
-testr_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
+test_d_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
+test_d_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
+
+
+test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+test_s_g_CFLAGS = ${PIPE}
+
+test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+test_d_g_CFLAGS = ${PIPE}
+
+test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
 # -fimplicit-templates
-testg_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+test_s_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fimplicit-templates
 # -fdiagnostics-show-option 
 
-testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-testg_CPPFLAGS =
+
+test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
+test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+
+test_s_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+test_s_g_CPPFLAGS =
+
+test_d_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+test_d_g_CPPFLAGS =
 
 
+test_s_r_LDFLAGS = -static
+test_s_g_LDFLAGS = -static
