@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #include "modgen.h"
-#include <mod2.h>
+#include <kernel/mod2.h>
 #include <febase.h>
 #include <grammar.h>
 #include <ipid.h>

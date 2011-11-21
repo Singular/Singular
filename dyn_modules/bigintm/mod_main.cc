@@ -2,7 +2,7 @@
  * Developer's BB tests
  */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #include <Singular/blackbox.h>
 

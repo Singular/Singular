@@ -4,7 +4,7 @@
 #include <Python.h>
 #include <boost/python.hpp>
 #include <sstream>
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 
 #include "structs.h"

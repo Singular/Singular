@@ -545,7 +545,7 @@ void  mod_write_header(FILE *fp, char *module, char what)
     fprintf(fp, "#include <unistd.h>\n");
     fprintf(fp, "#include <sys/stat.h>");
     fprintf(fp, "\n");
-    fprintf(fp, "#include <Singular/mod2.h>\n");
+    fprintf(fp, "#include <kernel/mod2.h>\n");
     fprintf(fp, "#include <Singular/tok.h>\n");
     fprintf(fp, "#include <kernel/structs.h>\n");
     fprintf(fp, "#include <Singular/ipid.h>\n\n");

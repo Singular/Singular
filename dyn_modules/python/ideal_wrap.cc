@@ -1,6 +1,6 @@
 //$Id$
 #include <boost/python.hpp>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include "Poly.h"
 #include "Ideal.h"
 #include "ring_wrap.h"

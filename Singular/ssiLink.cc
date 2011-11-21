@@ -23,7 +23,6 @@
 
 
 #include <kernel/mod2.h>
-// #include "mod2.h"
 
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>

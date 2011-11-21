@@ -69,7 +69,6 @@ omalloc/omalloc.h
 omalloc/omTables.dSYM/*
 MP/MP/MP_Config.h
 MP/MP/h/values.h
-Singular/mod2.h
 Singular/confdefs.h
 Singular/Singular.rc
 config.cache

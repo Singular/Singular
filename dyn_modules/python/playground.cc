@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include "Poly.h"
 #include "boost/python/numeric.hpp"
 using boost::python::numeric::array;

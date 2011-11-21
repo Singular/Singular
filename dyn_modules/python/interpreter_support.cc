@@ -3,7 +3,7 @@
 #include <sstream>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include "subexpr.h"
 #include "Poly.h"
 #include "Ideal.h"

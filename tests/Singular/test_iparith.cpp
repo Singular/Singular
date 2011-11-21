@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "test_iparith.hpp"
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/grammar.h>
 #include <Singular/ipid.h>
 

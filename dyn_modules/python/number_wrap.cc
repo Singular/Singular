@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include "Number.h"
 #include "number_wrap.h"
 #include "ring_wrap.h"

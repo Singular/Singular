@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <boost/python.hpp>
 #include <Python.h>
-#include <mod2.h>
+#include <kernel/mod2.h>
 #include <tok.h>
 #include <structs.h>
 #include <ipid.h>

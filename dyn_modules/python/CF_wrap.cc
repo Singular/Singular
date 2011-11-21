@@ -1,6 +1,6 @@
 #include <sstream>
 #include <boost/python.hpp>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include "factory.h"
 
 using boost::python::self;
