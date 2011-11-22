@@ -332,7 +332,7 @@ lists primeFactorisation(const number n, const number pBound)
 }
 
 #include <omalloc/omalloc.h>
-#include <omalloc/mylimits.h>
+#include <misc/mylimits.h>
 
 #include <misc/options.h>
 #include <misc/intvec.h>

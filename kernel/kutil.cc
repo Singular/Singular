@@ -20,7 +20,7 @@
 #endif /* ifndef NDEBUG */
 
 
-#include <omalloc/mylimits.h>
+#include <misc/mylimits.h>
 #include <misc/options.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>

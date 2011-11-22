@@ -15,7 +15,7 @@
 #include <kernel/mod2.h>
 
 #ifdef HAVE_MPSR
-#include "mylimits.h"
+#include <misc/mylimits.h>
 
 #include <Singular/mpsr_Get.h>
 

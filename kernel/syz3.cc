@@ -7,7 +7,7 @@
 */
  
 #include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
+#include <misc/mylimits.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>

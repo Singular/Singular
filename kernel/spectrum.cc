@@ -18,7 +18,7 @@
 #endif
 #endif
 
-#include <omalloc/mylimits.h>
+#include <misc/mylimits.h>
 
 #include <coeffs/numbers.h>
 #include <polys/monomials/p_polys.h>

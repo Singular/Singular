@@ -28,7 +28,7 @@
 #include <polys/matpol.h>
 #include <Singular/lists.h>
 
-#include <mylimits.h>
+#include <misc/mylimits.h>
 
 omBin mpsr_sleftv_bin = omGetSpecBin(sizeof(mpsr_sleftv));
 

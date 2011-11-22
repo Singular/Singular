@@ -16,7 +16,7 @@
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
-#include <omalloc/mylimits.h>
+#include <misc/mylimits.h>
 
 #include <kernel/febase.h>
 #include <reporter/reporter.h>
