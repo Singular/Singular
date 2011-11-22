@@ -97,6 +97,9 @@ endif
 libfactory_la_SOURCES = $(SOURCES)
 libfactory_g_la_SOURCES = $(SOURCES)
 
+libfactory_la_CPPFLAGS  = -DHAVE_CONFIG_H -DOM_NDEBUG -DNDEBUG
+libfactory_g_la_CPPFLAGS= -DHAVE_CONFIG_H 
+
 nodist_libfactory_la_SOURCES = cplusplus.h factory.h factoryconf.h
 nodist_libfactory_g_la_SOURCES = cplusplus.h factory.h factoryconf.h
 

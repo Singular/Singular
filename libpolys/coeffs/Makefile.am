@@ -11,8 +11,8 @@ libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLF
 libcoeffs_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libcoeffs_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
-libcoeffs_g_la_CPPFLAGS =
+libcoeffs_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+libcoeffs_g_la_CPPFLAGS = -DHAVE_CONFIG_H
 
 
 # noinst_HEADERS= \
@@ -81,11 +81,13 @@ test_s_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPL
 test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
 test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 
-test_s_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-test_s_g_CPPFLAGS =
 
-test_d_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-test_d_g_CPPFLAGS =
+
+test_s_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_s_g_CPPFLAGS = -DHAVE_CONFIG_H
+
+test_d_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_d_g_CPPFLAGS = -DHAVE_CONFIG_H
 
 
 test_s_r_LDFLAGS = -static

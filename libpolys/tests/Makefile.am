@@ -40,7 +40,7 @@ nodist_rings_test_d_g_SOURCES = rings_test_runner.cpp
 
 RELEASECFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 RELEASECXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE}
-RELEASECPPFLAGS = -DNDEBUG -DOM_NDEBUG
+RELEASECPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 coeffs_test_s_r_CFLAGS =${RELEASECFLAGS} 
 polys_test_s_r_CFLAGS = ${RELEASECFLAGS}
@@ -72,7 +72,7 @@ rings_test_d_r_CPPFLAGS = ${RELEASECPPFLAGS}
 ###  -pedantic
 DEBUGCFLAGS = $(AM_CFLAGS) -g -Wextra -Wall -Wno-long-long ${PIPE}
 DEBUGCXXFLAGS = $(AM_CXXFLAGS) ${DEBUGCFLAGS} ${CXXTEMPLFLAGS}
-
+DEBUGCPPFLAGS = -DHAVE_CONFIG_H
 
 coeffs_test_s_g_CFLAGS =${DEBUGCFLAGS} 
 polys_test_s_g_CFLAGS = ${DEBUGCFLAGS}
@@ -90,7 +90,13 @@ coeffs_test_d_g_CXXFLAGS =${DEBUGCXXFLAGS}
 polys_test_d_g_CXXFLAGS = ${DEBUGCXXFLAGS}
 rings_test_d_g_CXXFLAGS = ${DEBUGCXXFLAGS}
 
+coeffs_test_d_g_CPPFLAGS =${DEBUGCPPFLAGS} 
+polys_test_d_g_CPPFLAGS = ${DEBUGCPPFLAGS}
+rings_test_d_g_CPPFLAGS = ${DEBUGCPPFLAGS}
 
+coeffs_test_s_g_CPPFLAGS =${DEBUGCPPFLAGS} 
+polys_test_s_g_CPPFLAGS = ${DEBUGCPPFLAGS}
+rings_test_s_g_CPPFLAGS = ${DEBUGCPPFLAGS}
 
 AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc 
 

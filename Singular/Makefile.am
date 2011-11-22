@@ -27,8 +27,9 @@ libSingular_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wn
 libSingular_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
-libSingular_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
-libSingular_g_la_CPPFLAGS = -DLIBSINGULAR
+
+libSingular_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
+libSingular_g_la_CPPFLAGS = -DHAVE_CONFIG_H -DLIBSINGULAR
 
 SOURCES =    Minor.cc\
    MinorInterface.cc\
@@ -183,25 +184,25 @@ noinst_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
 gentable2_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable2_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-gentable2_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+gentable2_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 
 gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
 gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable1_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-gentable1_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+gentable1_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 feOpt_SOURCES = feOptGen.cc feOptGen.h
 feOpt_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOpt_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+feOpt_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 feOptES_SOURCES = feOptGen.cc feOptGen.h
 feOptES_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptES_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DESINGULAR 
+feOptES_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR 
 
 feOptTS_SOURCES = feOptGen.cc feOptGen.h
 feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptTS_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DTSINGULAR
+feOptTS_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR
 
 ########################### Singular* #########################
 
@@ -222,8 +223,8 @@ Singularg_SOURCES = tesths.cc
 Singular_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 Singularg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-Singular_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-# Singularg_CPPFLAGS =
+Singular_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+Singularg_CPPFLAGS = -DHAVE_CONFIG_H 
 
 Singular_LDFLAGS = -static
 Singularg_LDFLAGS = -static
@@ -244,8 +245,8 @@ nodist_Singulardg_SOURCES =  libSingular_g.la
 Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-Singulard_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-# Singulardg_CPPFLAGS =
+Singulard_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+Singulardg_CPPFLAGS = -DHAVE_CONFIG_H 
 
 
 #########################################################
@@ -285,8 +286,8 @@ test_s_g_SOURCES = test.cc
 test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-test_s_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-# test_s_g_CPPFLAGS =
+test_s_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_s_g_CPPFLAGS = -DHAVE_CONFIG_H 
 
 test_s_r_LDFLAGS = -static
 test_s_g_LDFLAGS = -static
@@ -306,8 +307,8 @@ test_d_g_SOURCES = test.cc
 test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-test_d_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-# test_d_g_CPPFLAGS =
+test_d_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_d_g_CPPFLAGS = -DHAVE_CONFIG_H 
 
 #########################################################
 

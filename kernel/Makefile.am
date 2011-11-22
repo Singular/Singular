@@ -22,8 +22,8 @@ libkernel_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-
 libkernel_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
-libkernel_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG
-#libkernel_g_la_CPPFLAGS =
+libkernel_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+libkernel_g_la_CPPFLAGS = -DHAVE_CONFIG_H 
 
 INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) $(FACTORY_CFLAGS) $(NTL_CFLAGS)
 
@@ -102,8 +102,8 @@ test_s_g_SOURCES = $(testsources)
 test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-test_s_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-#test_s_g_CPPFLAGS = 
+test_s_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_s_g_CPPFLAGS = -DHAVE_CONFIG_H 
 
 test_s_r_LDFLAGS = -static
 test_s_g_LDFLAGS = -static
@@ -121,8 +121,8 @@ test_d_g_SOURCES = $(testsources)
 test_d_r_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 test_d_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-test_d_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-#test_d_g_CPPFLAGS = 
+test_d_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_d_g_CPPFLAGS = -DHAVE_CONFIG_H 
 
 
 CLEANFILES = $(TESTS)
