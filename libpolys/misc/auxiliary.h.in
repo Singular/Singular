@@ -87,7 +87,6 @@
 
 // ---------------- Singular standard types etc.
 // BOOLEAN
-
 #ifndef SIZEOF_LONG
 
 #include <misc/mylimits.h>
@@ -117,6 +116,16 @@ typedef long int64;
 #else
 #error "Unexpected SIZEOF_LONG"
 #endif
+
+
+#ifndef CHAR_BIT
+#define CHAR_BIT (8)
+#endif /*ifndef CHAR_BIT*/
+
+
+#ifndef BIT_SIZEOF_LONG
+#define BIT_SIZEOF_LONG ((CHAR_BIT)*(SIZEOF_LONG))
+#endif /*ifndef BIT_SIZEOF_LONG*/
 
 
 
