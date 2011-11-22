@@ -6,19 +6,18 @@
  *  Version: $Id$
  *******************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <omalloc/omConfig.h>
-#endif
+#include "config.h"
 
 #if defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h> /* always defiend */
 #endif
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <omalloc/omFindExec.h>
+#include "omFindExec.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024

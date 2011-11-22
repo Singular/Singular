@@ -15,6 +15,8 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
+#include <findexec/omFindExec.h>
+
 #include "feResource.h"
 
 char* feArgv0 = NULL; 

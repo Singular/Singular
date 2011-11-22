@@ -21,6 +21,8 @@
 #include <kernel/febase.h>
 #include <reporter/reporter.h>
 
+#include <findexec/omFindExec.h>
+
 #include "ipid.h"
 #include "ipshell.h"
 #include "libparse.h"

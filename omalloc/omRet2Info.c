@@ -17,7 +17,6 @@
 #include <omalloc/omDerivedConfig.h>
 #include <omalloc/omStructs.h>
 #include <omalloc/omRet2Info.h>
-#include <omalloc/omFindExec.h>
 #include <omalloc/omGetBackTrace.h>
 
 #ifndef MAXPATHLEN
@@ -35,11 +34,12 @@ static char om_this_prog[MAXPATHLEN] = "";
 
 void omInitRet_2_Info(const char* argv0)
 {
-  char buf[MAXPATHLEN];
+//  char buf[MAXPATHLEN];
 
-  if (argv0 != NULL && omFindExec(argv0, buf))
+  if (argv0 != NULL) // // && omFindExec(argv0, buf))
   {
-    strcpy(om_this_prog, buf);
+    strncpy(om_this_prog, argv0, MAXPATHLEN); // // buf);
+    om_this_prog[MAXPATHLEN - 1]= '\0';    
   }
 }
 

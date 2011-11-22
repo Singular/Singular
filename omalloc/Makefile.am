@@ -8,7 +8,7 @@ libomalloc_include_HEADERS = \
 omalloc.h		omDerivedConfig.h	\
 omError.h		omStructs.h		omAllocDecl.h		\
 omInlineDecl.h		omBin.h			omMemOps.h		\
-omList.h		omFindExec.h		omGetBackTrace.h	\
+omList.h		omGetBackTrace.h	\
 omRet2Info.h		omStats.h		omOpts.h		\
 omBinPage.h		omAllocSystem.h		\
 omAllocPrivate.h	omDebug.h		omInline.h		\
@@ -21,7 +21,7 @@ SOURCES=\
 omBinPage.c       omList.c         omAllocEmulate.c omDebug.c        \
 om_Alloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c \
 omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
-omBin.c           omFindExec.c     omDebugTrack.c   		     \
+omBin.c           omDebugTrack.c   		     \
 omalloc_provide.c omAllocFunc.c
 
 EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c

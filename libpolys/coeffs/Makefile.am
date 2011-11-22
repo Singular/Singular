@@ -41,7 +41,7 @@ else
 endif
 
 ## for testing...
-AM_LDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc
+AM_LDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../findexec
 
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
@@ -58,11 +58,12 @@ test_d_r_SOURCES = test.cc
 test_d_g_SOURCES = test.cc
 
 
-test_s_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
-test_s_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
+test_s_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS} 
+test_s_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS} 
 
-test_d_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc ${NTL_LIBS} ${GMP_LIBS} 
-test_d_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g ${NTL_LIBS} ${GMP_LIBS} 
+test_d_r_LDADD = -lcoeffs -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS} 
+test_d_g_LDADD = -lcoeffs_g -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS} 
+
 
 
 test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}

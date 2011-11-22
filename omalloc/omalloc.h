@@ -25,7 +25,6 @@ extern "C" {
 #include <omalloc/omBin.h>
 #include <omalloc/omMemOps.h>
 #include <omalloc/omList.h>
-#include <omalloc/omFindExec.h>
 #include <omalloc/omGetBackTrace.h>
 #include <omalloc/omRet2Info.h>
 #include <omalloc/omStats.h>

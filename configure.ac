@@ -34,6 +34,13 @@ else
   fi
 fi
 
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h)
+
+AC_CHECK_FUNCS(readlink getcwd getwd)
+
+
 AC_PROG_CPP
 AC_PROG_CXXCPP
 AM_PROG_CC_C_O
@@ -88,8 +95,8 @@ if test x$ENABLE_FACTORY = xyes; then
 fi
 
 AC_CONFIG_SUBDIRS(libpolys)
-
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([findexec/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])

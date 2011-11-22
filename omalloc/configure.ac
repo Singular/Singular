@@ -127,9 +127,10 @@ dnl
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
+
 AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
 
-AC_CHECK_FUNCS(popen readlink getcwd getwd mmap sbrk random)
+AC_CHECK_FUNCS(popen mmap sbrk random)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
@@ -495,8 +496,6 @@ AC_TRY_RUN([
 #include "omStructs.h"
 #include "omGetBackTrace.h"
 #include "omRet2Info.c"
-#include "omFindExec.c"
-
 
 int test_Ret_2_Info()
 {
