@@ -1,6 +1,6 @@
 #!/bin/sh
 
-autoreconf -vifs
+autoreconf -vifs `dirname "$0"`
 
 # TOP_DIR=$PWD
 # 
