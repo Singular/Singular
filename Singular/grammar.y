@@ -98,7 +98,7 @@ to save space for ordinary inputs that do not need much stack.
 
    The default value of `YYMAXDEPTH', if you do not define it, is 10000.
 */
-#define YYMAXDEPTH INT_MAX
+#define YYMAXDEPTH MAX_INT_VAL
 
 extern int   yylineno;
 extern FILE* yyin;

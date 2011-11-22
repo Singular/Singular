@@ -212,7 +212,7 @@ int pcvM2N(poly m)
   {
     d+=pGetExp(m,i+1);
     dn=pcvIndex[i][d];
-    if(dn>INT_MAX-n)
+    if(dn>MAX_INT_VAL-n)
     {
       i=currRing->N;
       WerrorS("component overflow");

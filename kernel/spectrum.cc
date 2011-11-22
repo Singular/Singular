@@ -230,7 +230,7 @@ static inline  poly    normalFormZ( poly f,poly Z, const ring r )
 
 static inline  int     isLeadMonomial( poly m,ideal stdJ, const ring r )
 {
-  int     length = INT_MAX;
+  int     length = MAX_INT_VAL;
   int     result = -1;
 
   for( int i=0; i<IDELEMS(stdJ); i++ )

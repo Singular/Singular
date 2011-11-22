@@ -44,7 +44,7 @@
 // min-length of polys is >= SM_MIN_LENGTH_BUCKET
 #define SM_MIN_LENGTH_BUCKET MIN_LENGTH_BUCKET - 5
 #else
-#define SM_MIN_LENGTH_BUCKET    INT_MAX
+#define SM_MIN_LENGTH_BUCKET    MAX_INT_VAL
 #endif
 
 typedef struct smprec sm_prec;

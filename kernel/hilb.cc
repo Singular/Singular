@@ -51,7 +51,7 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
     j = i - 1;
     if (z > Ql[j])
     {
-      if (z>(INT_MAX)/2)
+      if (z>(MAX_INT_VAL)/2)
       {
        Werror("interal arrays too big");
        return;

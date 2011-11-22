@@ -270,7 +270,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     MP_Uint32_t ui;
     mp_failr(IMP_GetUint32(link, &ui));
     // check whether u_int can be casted safely to int
-    if (ui < INT_MAX)
+    if (ui < MAX_INT_VAL)
       *x = nlInit(ui, currRing);
     else
     {

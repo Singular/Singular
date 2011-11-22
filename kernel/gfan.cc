@@ -1386,8 +1386,8 @@ void gcone::getExtremalRays(const gcone &gc)
 	int64 ggT=(*ivIntPointOfCone)[0];
 	for (int ii=0;ii<(this->numVars);ii++)
 	{
-		if( (*ivIntPointOfCone)[ii]>INT_MAX ) 
-			WarnS("Interior point exceeds INT_MAX!\n");
+		if( (*ivIntPointOfCone)[ii]>MAX_INT_VAL ) 
+			WarnS("Interior point exceeds MAX_INT_VAL!\n");
 		//Compute intgcd
 		ggT=int64gcd(ggT,(*ivIntPointOfCone)[ii]);
 	}
@@ -1398,7 +1398,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		for(int ii=0;ii<this->numVars;ii++)
 		{
 			(*ivIntPointOfCone)[ii] /= ggT;
-			if( (*ivIntPointOfCone)[ii]>INT_MAX ) WarnS("Interior point still exceeds INT_MAX after GCD!\n");
+			if( (*ivIntPointOfCone)[ii]>MAX_INT_VAL ) WarnS("Interior point still exceeds MAX_INT_VAL after GCD!\n");
 		}
 	}
 
@@ -2705,7 +2705,7 @@ ring gcone::rCopyAndAddWeight(const ring &r, int64vec *ivw)
 	for (jj=0;jj<length;jj++)
 	{				
 		A[jj]=(*ivw)[jj];
-		if((*ivw)[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::rCopyAndAddWeight!\n");
+		if((*ivw)[jj]>=MAX_INT_VAL) WarnS("A[jj] exceeds MAX_INT_VAL in gcone::rCopyAndAddWeight!\n");
 	}			
 	res->wvhdl[0]=(int *)A;
 	res->block1[0]=length;
@@ -2747,7 +2747,7 @@ ring gcone::rCopyAndAddWeight2(const ring &r,const int64vec *ivw, const int64vec
 	{				
 		A1[jj]=(*ivw)[jj];
 		A2[jj]=-(*fNormal)[jj];
-		if((*ivw)[jj]>=INT_MAX || (*fNormal)[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::rCopyAndAddWeight2!\n");
+		if((*ivw)[jj]>=MAX_INT_VAL || (*fNormal)[jj]>=MAX_INT_VAL) WarnS("A[jj] exceeds MAX_INT_VAL in gcone::rCopyAndAddWeight2!\n");
 	}			
 	res->wvhdl[0]=(int *)A1;
 	res->block1[0]=length;
@@ -3725,7 +3725,7 @@ void gcone::replaceDouble_ringorder_a_ByASingleOne()
 	for (int jj=0;jj<length;jj++)
 	{
 		A[jj]=(*ivw)[jj];
-		if((*ivw)[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::replaceDouble_ringorder_a_ByASingleOne!\n");
+		if((*ivw)[jj]>=MAX_INT_VAL) WarnS("A[jj] exceeds MAX_INT_VAL in gcone::replaceDouble_ringorder_a_ByASingleOne!\n");
 	}	
 	//delete ivw; //Not needed if this->getIntPoint(TRUE)
 	replacementRing->wvhdl[0]=(int *)A;

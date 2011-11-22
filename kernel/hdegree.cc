@@ -1059,7 +1059,7 @@ static int scRestrict( int &Nstc, scfmon stc, int Nvar)
   int x, y;
   int i, j, Istc = Nstc;
 
-  y = INT_MAX;
+  y = MAX_INT_VAL;
   for (i=Nstc-1; i>=0; i--)
   {
     j = Nvar-1;

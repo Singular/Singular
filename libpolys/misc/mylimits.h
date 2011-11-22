@@ -9,7 +9,16 @@
 #ifndef _MYLIMITS_H
 #define _MYLIMITS_H
 
-static const int MAX_INT_VAL = 2147483647;
+/* Maximum/minimum value an `signed int' can hold. */
+// #define MAX_INT_VAL        2147483647
+#ifndef MAX_INT_VAL
+#define MAX_INT_VAL     (2147483647)
+#endif
+
+#ifndef MIN_INT_VAL
+#define MIN_INT_VAL     (-MAX_INT_VAL-1)
+#endif
+
 
 #define ULONG_MAX (~0L)
 
