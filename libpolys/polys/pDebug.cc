@@ -79,7 +79,7 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
                            // be more sloppy for qrings
                            (r->qideal != NULL &&
                             omIsBinPageAddr(p) &&
-                            omSizeWOfAddr(p)==r->PolyBin->sizeW) ||
+                            omSizeWOfAddr(p)==omSizeWOfBin(r->PolyBin)) ||
                            rSamePolyRep((ring) custom, r),
                            "monomial not from specified ring",p,r);
       return TRUE;
@@ -87,7 +87,7 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     else
     #endif
     {
-      _pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==r->PolyBin->sizeW,p,r);
+      _pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==omSizeWOfBin(r->PolyBin),p,r);
       return TRUE;
     }
     return FALSE;
@@ -210,7 +210,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
 
   #ifndef OM_NDEBUG
   // check addr with level+1 so as to check bin/page of addr
-  _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, level+1)
+  _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (omSizeWOfBin(r->PolyBin))*SIZEOF_LONG, level+1)
                         == omError_NoError, "memory error",p,r);
   #endif
 
@@ -230,7 +230,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pFalseReturn(p_LmCheckIsFromRing(p, r));
     #ifndef OM_NDEBUG
     // omAddr check
-    _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1)
+    _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (omSizeWOfBin(r->PolyBin))*SIZEOF_LONG, 1)
                      == omError_NoError, "memory error",p,r);
     #endif
     // number/coef check

@@ -95,7 +95,7 @@ PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, const ring r)
 PINLINE1 poly p_Init(const ring r, omBin bin)
 {
   p_CheckRing1(r);
-  pAssume1(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
+  pAssume1(bin != NULL && omSizeWOfBin(r->PolyBin) == omSizeWOfBin(bin));
   poly p;
   omTypeAlloc0Bin(poly, p, bin);
   p_MemAdd_NegWeightAdjust(p, r);

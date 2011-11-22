@@ -680,7 +680,7 @@ static inline poly p_New(const ring, omBin bin)
 #endif
 {
   p_CheckRing2(r);
-  pAssume2(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
+  pAssume2(bin != NULL && omSizeWOfBin(r->PolyBin) == omSizeWOfBin(bin));
   poly p;
   omTypeAllocBin(poly, p, bin);
   p_SetRingOfLm(p, r);
@@ -889,7 +889,7 @@ static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
 static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 {
   p_LmCheckPolyRing2(p, r);
-  pAssume2(r->PolyBin->sizeW == bin->sizeW);
+  pAssume2(omSizeWOfBin(r->PolyBin) == omSizeWOfBin(bin));
   return r->p_Procs->p_ShallowCopyDelete(p, r, bin);
 }
 
@@ -1279,7 +1279,7 @@ static inline void p_ExpVectorCopy(poly d_p, poly s_p, const ring r)
 static inline poly p_Init(const ring r, omBin bin)
 {
   p_CheckRing1(r);
-  pAssume1(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
+  pAssume1(bin != NULL && omSizeWOfBin(r->PolyBin) == omSizeWOfBin(bin));
   poly p;
   omTypeAlloc0Bin(poly, p, bin);
   p_MemAdd_NegWeightAdjust(p, r);
@@ -1352,7 +1352,7 @@ static inline poly p_GetExp_k_n(poly p, int l, int k, const ring r)
 static inline poly p_LmShallowCopyDelete(poly p, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
-  pAssume1(bin->sizeW == r->PolyBin->sizeW);
+  pAssume1(omSizeWOfBin(bin) == omSizeWOfBin(r->PolyBin));
   poly new_p = p_New(r);
   memcpy(new_p->exp, p->exp, r->ExpL_Size*sizeof(long));
   pSetCoeff0(new_p, pGetCoeff(p));

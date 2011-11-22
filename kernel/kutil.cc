@@ -666,7 +666,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
           return dReportError("pNext(%c[%d].max) != NULL", TN, i);
 
         pFalseReturn(p_CheckPolyRing(T->max, tailRing));
-        omCheckBinAddrSize(T->max, (tailRing->PolyBin->sizeW)*SIZEOF_LONG);
+        omCheckBinAddrSize(T->max, (omSizeWOfBin(tailRing->PolyBin))*SIZEOF_LONG);
 #if KDEBUG > 0
         if (! sloppy_max)
         {

@@ -97,6 +97,8 @@ size_t omSizeOfBinAddr(void* addr);
 #define omSizeOfBinAddr(addr) _omSizeOfBinAddr(addr)
 #endif
 
+#define omSizeWOfBin(bin_ptr) ((bin_ptr)->sizeW)
+
 #define _omSizeOfBinAddr(addr)  ((omSizeWOfBinAddr(addr)) << LOG_SIZEOF_LONG)
 #define omSizeWOfBinAddr(addr) ((omGetTopBinOfAddr(addr))->sizeW)
 
