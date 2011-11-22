@@ -71,13 +71,13 @@ test_s_g_CFLAGS = ${PIPE}
 test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 test_d_g_CFLAGS = ${PIPE}
 
+
+
 test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
 # -fimplicit-templates
 test_s_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fimplicit-templates
 # -fdiagnostics-show-option 
-
-
 test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
 test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 
