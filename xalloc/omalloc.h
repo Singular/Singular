@@ -122,7 +122,46 @@ static inline void * omMemDup(void * s)
   return n;
 }
 
+/* #define omSizeWOfBin(bin_ptr) ((bin_ptr)->sizeW) */
+#define omSizeWOfBin(bin_ptr) (((bin_ptr)+sizeof(long)-1)/sizeof(long))
+
+/*******************************************************************
+ *
+ *  error codes
+ *
+ *******************************************************************/
+enum omError_e
+{
+  omError_NoError = 0,
+  omError_Unknown,
+  omError_InternalBug,
+  omError_MemoryCorrupted,
+  omError_NullAddr,
+  omError_InvalidRangeAddr,
+  omError_FalseAddr,
+  omError_FalseAddrOrMemoryCorrupted,
+  omError_WrongSize,
+  omError_FreedAddr,
+  omError_FreedAddrOrMemoryCorrupted,
+  omError_WrongBin,
+  omError_UnknownBin,
+  omError_NotBinAddr,
+  omError_UnalignedAddr,
+  omError_NullSizeAlloc,
+  omError_ListCycleError,
+  omError_SortedListError,
+  omError_KeptAddrListCorrupted,
+  omError_FreePattern,
+  omError_BackPattern,
+  omError_FrontPattern,
+  omError_NotString,
+  omError_StickyBin,
+  omError_MaxError
+};
+// typedef enum omError_e omError_t;
+   
 #define omSizeWOfAddr(P)         (omSizeOfAddr(P)/sizeof(long))
+   
 #define omTypeAllocBin(T,P,B)    P=(T)omAlloc(B)
 #define omTypeAlloc(T,P,S)       P=(T)omAlloc(S)
 #define omTypeAlloc0Bin(T,P,B)   P=(T)omAlloc0(B)
@@ -175,16 +214,17 @@ static inline void * omMemDup(void * s)
 #define omCheckBin(bin)                          ((void) 0)
 #define omCheckMemory()                          ((void) 0)
 #define omPrintCurrentBackTraceMax(A,B)          ((void) 0)
+#define omPrintUsedTrackAddrs(F,max)             ((void) 0)
+#define omPrintCurrentBackTrace(F)               ((void) 0)
+#define omPrintUsedAddrs(F,max)                  ((void) 0)
 #define omdebugAddrSize(A,B)                     ((void) 0)
 #define omPrintAddrInfo(A,B,C)                   ((void) 0)
-#define omIsBinPageAddr(A)                       ((void) 0)
-#define omTestBinAddrSize(A,B,C)                 ((void) 0)
+#define omIsBinPageAddr(A)                       (1)
+#define omTestBinAddrSize(A,B,C)                 (omError_NoError)
+#define omTestList(ptr, level)                   (omError_NoError)
 #define omInitRet_2_Info(argv0)                  ((void) 0)
 #define omMergeStickyBinIntoBin(A,B)             ((void) 0)
 
-
-
-char * omFindExec (const char *name, char* executable);
 
 #ifdef __cplusplus
 }
@@ -197,4 +237,5 @@ char * omFindExec (const char *name, char* executable);
 #define omFreeSizeFunc omFreeSize
 /* #define OM_NDEBUG */
 #undef OM_SING_KEEP
+
 #endif
