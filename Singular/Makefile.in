@@ -115,9 +115,9 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 ## for cones & fans if not under Win OS:
 ## put "-lgfan -lcddgmp " behind "-lncurses" in next three lines
-LIBS		= -lm @NEED_LIBS@
-LIBSG		= -lm @NEED_LIBSG@
-LIBSP		= -lm @NEED_LIBSG@
+LIBS		= -lpthread -lm @NEED_LIBS@
+LIBSG		= -lpthread -lm @NEED_LIBSG@
+LIBSP		= -lpthread -lm @NEED_LIBSG@
 else
 ## for cones & fans if under Win OS:
 ## put "-lgfan -lcddgmp " before "-Xlinker" in definition of LIBS and LIBSG
@@ -240,7 +240,7 @@ MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
 DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
 
 # normal C source files
-CSOURCES=
+CSOURCES=semaphore.c
 
 # C++ sources which are used if part of the kernel are dynamically linked
 DL_KERNEL_SOURCES=slInit_Dynamic.cc 

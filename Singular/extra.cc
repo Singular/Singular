@@ -148,6 +148,10 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <Singular/gms.h>
 #endif
 
+#define HAVE_SIMPLEIPC
+#ifdef HAVE_SIMPLEIPC
+#include "simpleipc.h"
+#endif
 /*
  *   New function/system-calls that will be included as dynamic module
  * should be inserted here.
@@ -3749,7 +3753,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       #else
         extern int fanID;
         res->rtyp=fanID;
-	res->data=(void*)(grfan(I,heuristic,FALSE));
+        res->data=(void*)(grfan(I,heuristic,FALSE));
       #endif
       return FALSE;
     }
@@ -3772,13 +3776,36 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //   }
   else
 #endif
-    if (strcmp(sys_cmd,"denom_list")==0)
+/*==================== semaphore =================*/
+#ifdef HAVE_SIMPLEIPC
+    if (strcmp(sys_cmd,"semaphore")==0)
+    {
+      if((h!=NULL) && (h->Typ()==STRING_CMD) && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
       {
-	res->rtyp=LIST_CMD;
-	extern lists get_denom_list();
-	res->data=(lists)get_denom_list();
-	return FALSE;
+        int v=1;
+	if ((h->next->next!=NULL)&& (h->next->next->Typ()==INT_CMD))
+	  v=(int)(long)h->next->next->Data();
+        res->data=(char *)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
+        res->rtyp=INT_CMD;
+        return FALSE;
       }
+      else
+      {
+        WerrorS("Usage: system(\"semaphore\",<cmd>,int)");
+        return TRUE;
+      }
+    }
+    else
+#endif
+/*==================== demon_list =================*/
+  if (strcmp(sys_cmd,"denom_list")==0)
+  {
+    res->rtyp=LIST_CMD;
+    extern lists get_denom_list();
+    res->data=(lists)get_denom_list();
+    return FALSE;
+  }
+  else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
