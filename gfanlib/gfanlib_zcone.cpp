@@ -10,9 +10,10 @@
 #include <vector>
 #include <set>
 
-#include "setoper.h"
-#include "cdd.h"
-#include <sstream>
+extern "C" {
+#include "cdd/setoper.h"
+#include "cdd/cdd.h"
+}
 
 namespace gfan{
 
@@ -708,7 +709,7 @@ void ZCone::ensureStateAsMinimum(int s)const
   if((state<3) && (s>=3))
     {
       QMatrix equations2=ZToQMatrix(equations);
-      equations2.reduce();
+      equations2.reduce(false,false,true);
 
       for(int i=0;i<inequalities.getHeight();i++)
         {
@@ -1221,63 +1222,18 @@ ZCone ZCone::link(ZVector const &w)const
   return C;
 }
 
-std::string toString(gfan::ZMatrix const &m, char *tab=0)
-{
-  std::stringstream s;
-
-  for(int i=0;i<m.getHeight();i++)
-    {
-      if(tab)s<<tab;
-      for(int j=0;j<m.getWidth();j++)
-	{
-	  s<<m[i][j];
-	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
-	    {
-	      s<<",";
-	    }
-	}
-      s<<std::endl;
-    }
-  return s.str();
-}
-
-std::string toString(ZCone const &c)
-{
-  std::stringstream s;
-  ZMatrix i=c.getInequalities();
-  ZMatrix e=c.getEquations();
-  s<<"AMBIENT_DIM"<<std::endl;
-  s<<c.ambientDimension()<<std::endl;
-  s<<"INEQUALITIES"<<std::endl;
-  s<<toString(i);
-  s<<"EQUATIONS"<<std::endl;
-  s<<toString(e);
-  return s.str();
-}
-
 bool ZCone::hasFace(ZCone const &f)const
 {
   if(!contains(f.getRelativeInteriorPoint()))return false;
   ZCone temp=faceContaining(f.getRelativeInteriorPoint());
   temp.canonicalize();
+//  ZCone temp2=*this;
   ZCone temp2=f;
   temp2.canonicalize();
-  std::string s1 = toString(temp);
-  std::cout << "temp.str() => " << s1 << std::endl;
-  std::string s2 = toString(temp);
-  std::cout << "temp2.str() => " << s2 << std::endl;
-  // int i = (int) temp.dimension()==temp2.dimension();
-  // std::cout << "temp.dimension()==temp2.dimension() => " << i << std::endl;
-  if(temp.dimension()==temp2.dimension())
-    {
-      // int j = (int) !(temp2!=temp);
-      // std::cout << "!(temp2!=temp) => " << j << std::endl;
-      // int k = (int) (temp2!=temp);
-      // std::cout << "temp2!=temp => " << k << std::endl;
-      return !(temp2!=temp);
-    }
-  else
-    return false;
+//  std::cout << temp << std::endl;
+//  std::cout << temp2 << std::endl;
+
+  return !(temp2!=temp);
 }
 
 ZCone ZCone::faceContaining(ZVector const &v)const
