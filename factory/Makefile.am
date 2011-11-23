@@ -322,15 +322,32 @@ all-local:
 ####################################################
 ## Test program
 ##
-TESTS = test-g test-r
+TESTS = test-s-g test-s-r test-d-g test-d-r
 check_PROGRAMS = $(TESTS)
 
 TESTSSOURCES = test.cc 
 
-test_g_SOURCES = $(TESTSSOURCES)
-test_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti #ftmpl_inst.o
-test_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
+test_s_g_SOURCES = $(TESTSSOURCES)
+test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti 
+#ftmpl_inst.o
+test_s_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
 
-test_r_SOURCES = $(TESTSSOURCES)
-test_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti #ftmpl_inst.o
-test_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
+test_s_r_SOURCES = $(TESTSSOURCES)
+test_s_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti 
+#ftmpl_inst.o
+test_s_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
+
+test_s_r_LDFLAGS = -static
+test_s_g_LDFLAGS = -static
+
+
+
+test_d_g_SOURCES = $(TESTSSOURCES)
+test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti 
+#ftmpl_inst.o
+test_d_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
+
+test_d_r_SOURCES = $(TESTSSOURCES)
+test_d_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti 
+#ftmpl_inst.o
+test_d_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
