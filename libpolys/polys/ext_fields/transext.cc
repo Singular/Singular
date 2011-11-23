@@ -137,7 +137,15 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
   if (IS0(t)) return TRUE;
   assume(NUM(t) != NULL);   /**< t != 0 ==> numerator(t) != 0 */
   p_Test(NUM(t), ntRing);
-  if (!DENIS1(t)) p_Test(DEN(t), ntRing);
+  if (!DENIS1(t)) 
+  {
+    p_Test(DEN(t), ntRing);
+    if(p_IsConstant(DEN(t),ntRing) && (n_IsOne(pGetCoeff(DEN(t)),ntRing->cf)))
+    {
+      Print("?/1 in %s:%d\n",f,l);
+       return FALSE;
+    }
+  }
   return TRUE;
 }
 #endif
@@ -560,7 +568,8 @@ number ntDiv(number a, number b, const coeffs cf)
 
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(result) = g;
-  DEN(result) = f;
+  if (!p_IsConstant(f,ntRing) || !n_IsOne(pGetCoeff(f),ntRing->cf))
+    DEN(result) = f;
   COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
   return (number)result;
