@@ -30,7 +30,7 @@
 //                          tau doesn't stay in the correct cone
 
 //#define TIME_TEST // print the used time of each subroutine
-//#define ENDWALKS //print the size of the last omega-homogenoues Gröbner basis
+//#define ENDWALKS //print the size of the last omega-homogenoues Grï¿½bner basis
 
 /* includes */
 
@@ -1814,7 +1814,7 @@ static void VMrDefault(intvec* va)
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
   int i, nv = currRing->N;
 
-  r->cf->ch  = rChar (currRing);
+  r->cf  = currRing->cf;
   r->N   = currRing->N;
   int nb = rBlocks(currRing) + 1;//31.10.01 (+1)
 
@@ -3271,8 +3271,8 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
 /* The implementation of the fractal walk algorithmus */
 
 /* The main procedur Mfwalk calls the recursive Subroutine
-   rec_fractal_call to compute the wanted Gröbner basis.
-   At the main procedur we compute the reduced Gröbner basis w.r.t. a "fast"
+   rec_fractal_call to compute the wanted Grï¿½bner basis.
+   At the main procedur we compute the reduced Grï¿½bner basis w.r.t. a "fast"
    order, e.g. "dp" and a sequence of weight vectors which are row vectors
    of a matrix. This matrix defines the given monomial order, e.g. "lp"
 */
@@ -3560,8 +3560,8 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
 
 
 /* 08.09.02 */
-/******** THE NEW GRÖBNER WALK ALGORITHM **********/
-/* Gröbnerwalk with a recursive "second" alternative GW, REC_GB_Mwalk
+/******** THE NEW GRï¿½BNER WALK ALGORITHM **********/
+/* Grï¿½bnerwalk with a recursive "second" alternative GW, REC_GB_Mwalk
    that only computes the last reduced GB */
 ideal Mwalk(ideal Go, intvec* curr_weight, intvec* target_weight)
 {
@@ -3619,7 +3619,7 @@ ideal Mwalk(ideal Go, intvec* curr_weight, intvec* target_weight)
          the recursive changed perturbation walk alg. */
       tim = clock();
       /*
-        Print("\n// **** Gröbnerwalk took %d steps and ", nwalk);
+        Print("\n// **** Grï¿½bnerwalk took %d steps and ", nwalk);
         PrintS("\n// **** call the rec. Pert. Walk to compute a red GB of:");
         idElements(Gomega, "G_omega");
       */
@@ -5129,7 +5129,7 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
 }
 
 
-/* compute the reduced Gröbner basis of an ideal <Go> w.r.t. lp */
+/* compute the reduced Grï¿½bner basis of an ideal <Go> w.r.t. lp */
 static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
 {
   Overflow_Error = FALSE;
