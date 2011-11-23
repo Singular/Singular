@@ -305,7 +305,7 @@ public:
      make the routine terminate before completion if it discovers that
      the determinant is zero.
   */
-  int reduce(bool returnIfZeroDeterminant=false, bool integral=false)
+  int reduce(bool returnIfZeroDeterminant=false, bool integral=false, bool makePivotsOne=false)
   {
     assert(integral || typ::isField());
     int retSwaps=0;
@@ -321,6 +321,17 @@ public:
               {
                 swapRows(currentRow,s);
                 retSwaps++;
+              }
+            if(makePivotsOne)
+              {//THE PIVOT SHOULD BE SET TO ONE IF INTEGRAL IS FALSE
+                if(!rows[currentRow][i].sign()<0)retSwaps++;
+                typ inverse=typ(1)/rows[currentRow][i];
+                //                if(!rows[currentRow][i].isOne())
+                  {
+                    for(int k=0;k<width;k++)
+                      if(!rows[currentRow][k].isZero())
+                        rows[currentRow][k]*=inverse;
+                  }
               }
             for(int j=currentRow+1;j<height;j++)
               if(integral)

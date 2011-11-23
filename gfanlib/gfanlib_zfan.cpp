@@ -30,7 +30,7 @@ namespace gfan
   }
   int ZFan::numberOfConesOfDimension(int d, bool orbit, bool maximal)const
   {
-    this->ensureComplex();
+    ensureComplex();
     return numberOf(table(orbit,maximal),d);
   }
   ZCone ZFan::getCone(int dimension, int index, bool orbit, bool maximal)const
