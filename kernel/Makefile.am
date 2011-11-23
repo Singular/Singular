@@ -43,8 +43,8 @@ SOURCES = polys.cc febase.cc feread.cc \
     walkProc.cc walkMain.cc walkSupport.cc \
     eigenval.cc units.cc \
     fast_mult.cc digitech.cc \
-    tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
-    f5c.cc ratgring.cc shiftgb.cc gfan.cc \
+    tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
+    ratgring.cc shiftgb.cc gfan.cc \
     linearAlgebra.cc nc.cc preimage.cc \
     fegetopt.c mod2.h 
 
@@ -68,7 +68,8 @@ KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	gfan.h bbcone.h bbfan.h \
 	preimage.h longrat.h timer.h kInline.h modulop.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
-	linearAlgebra.h page.h
+	linearAlgebra.h page.h \
+	f5c.h f5data.h f5gb.h f5lists.h
 
 libkernel_includedir  =${includedir}/singular/kernel/
 libkernel_include_HEADERS   = $(KERNELHEADERS)
@@ -85,24 +86,44 @@ AM_LDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_b
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/tests/MOD:${abs_top_builddir}/libpolys/tests/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 
-TESTS = testg testr 
+TESTS = test-s-g test-s-r test-d-g test-d-r 
 check_PROGRAMS = $(TESTS)
 
-testr_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-testg_CFLAGS = ${PIPE}
+test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+test_s_g_CFLAGS = ${PIPE}
 
-testr_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-testg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_s_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
-testsources = test.cc f5c.h f5data.h f5gb.h f5lists.h
-testr_SOURCES = $(testsources)
-testg_SOURCES = $(testsources)
+testsources = test.cc
+test_s_r_SOURCES = $(testsources)
+test_s_g_SOURCES = $(testsources)
 
-testr_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-testg_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-testr_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
-#testg_CPPFLAGS = 
+test_s_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+#test_s_g_CPPFLAGS = 
+
+test_s_r_LDFLAGS = -static
+test_s_g_LDFLAGS = -static
+
+
+test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+test_d_g_CFLAGS = ${PIPE}
+
+test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+
+test_d_r_SOURCES = $(testsources)
+test_d_g_SOURCES = $(testsources)
+
+test_d_r_LDADD = -lkernel -lpolys -lcoeffs -lresources -lreporter -lmisc $(FACTORY_LIBS) -lomalloc $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_d_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+
+test_d_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG
+#test_d_g_CPPFLAGS = 
+
 
 CLEANFILES = $(TESTS)
 
