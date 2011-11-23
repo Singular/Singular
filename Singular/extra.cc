@@ -983,8 +983,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #if 1
   Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
   return FALSE;
-#else	 
-	if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
+#else
+        if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
         {
           res->rtyp=STRING_CMD;
           res->data=(void *)singclap_neworder((ideal)h->Data(), currRing);
@@ -992,7 +992,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else
           WerrorS("ideal expected");
-#endif	
+#endif
       }
       else
   #endif
@@ -2408,7 +2408,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #  ifdef RDEBUG
           p_DebugPrint((poly)h->Data(), currRing);
 #  else
-	  Warn("Sorry: not available for release build!");
+          Warn("Sorry: not available for release build!");
 #  endif
           return FALSE;
         }
@@ -2419,7 +2419,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #  ifdef RDEBUG
           rDebugPrint((ring)h->Data());
 #  else
-	  Warn("Sorry: not available for release build!");
+          Warn("Sorry: not available for release build!");
 #  endif
           return FALSE;
         }
@@ -3765,7 +3765,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       #else
         extern int fanID;
         res->rtyp=fanID;
-	res->data=(void*)(grfan(I,heuristic,FALSE));
+        res->data=(void*)(grfan(I,heuristic,FALSE));
       #endif
       return FALSE;
     }
@@ -3788,13 +3788,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //   }
   else
 #endif
-    if (strcmp(sys_cmd,"denom_list")==0)
-      {
-	res->rtyp=LIST_CMD;
-	extern lists get_denom_list();
-	res->data=(lists)get_denom_list();
-	return FALSE;
-      }
+  if (strcmp(sys_cmd,"denom_list")==0)
+  {
+    res->rtyp=LIST_CMD;
+    extern lists get_denom_list();
+    res->data=(lists)get_denom_list();
+    return FALSE;
+  }
+  else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
