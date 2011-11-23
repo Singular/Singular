@@ -87,11 +87,11 @@ struct fe_option
   int has_arg;
   int val;
   /* Stuff added for Singular  */
-  const char*   arg_name;// name of argument, for display in help
-  const char*   help;    // (short) help string
-  feOptType     type;    // type of argument, if has_arg > 0
-  void*         value;   // (default) value of option
-  int           set;     // only relevant for strings: 0 if not set, 1 if set
+  const char*   arg_name;/* name of argument, for display in help */
+  const char*   help;    /* (short) help string */
+  feOptType     type;    /* type of argument, if has_arg > 0 */
+  void*         value;   /* (default) value of option */
+  int           set;     /* only relevant for strings: 0 if not set, 1 if set */
 };
 
 /* Names for the values of the `has_arg' field of `struct option'.  */
