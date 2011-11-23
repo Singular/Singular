@@ -313,9 +313,12 @@ test_d_g_CPPFLAGS = -DHAVE_CONFIG_H
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib MOD 
 
 CLEANFILES = $(BUILT_SOURCES)
+
+MOD: ${top_builddir}/libpolys/tests/MOD
+	ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
 
 feOpt.inc: feOpt
 	${abs_builddir}/feOpt

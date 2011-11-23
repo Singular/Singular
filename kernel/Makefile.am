@@ -125,7 +125,16 @@ test_d_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_d_g_CPPFLAGS = -DHAVE_CONFIG_H 
 
 
-CLEANFILES = $(TESTS)
+
+# These files are built first
+BUILT_SOURCES = MOD 
+
+MOD: ${top_builddir}/libpolys/tests/MOD
+	ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
+
+
+CLEANFILES = $(TESTS) $(BUILT_SOURCES)
+
 
 
 
