@@ -112,7 +112,11 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
   assume(getCoeffType(cf) == ID);
   if (a == NULL) return TRUE;
   p_Test((poly)a, naRing);
-  assume(p_Totaldegree((poly)a, naRing) <= p_Totaldegree(naMinpoly, naRing));
+  if(p_Totaldegree((poly)a, naRing) >= p_Totaldegree(naMinpoly, naRing))
+  {
+    Print("deg >= deg(minpoly) in %s:%d\n",f,l);
+    return FALSE;
+  }
   return TRUE;
 }
 #endif
@@ -485,6 +489,7 @@ const char * naRead(const char *s, number *a, const coeffs cf)
 {
   poly aAsPoly;
   const char * result = p_Read(s, aAsPoly, naRing);
+  definiteReduce(aAsPoly, naMinpoly, cf);
   *a = (number)aAsPoly;
   return result;
 }
