@@ -26,14 +26,14 @@
 class InternalPrimePower : public InternalCF
 {
 private:
-    MP_INT thempi;
+    mpz_t thempi;
     static int initialized;
     static int prime;
     static int exp;
-    static MP_INT primepow;
-    static MP_INT primepowhalf;
+    static mpz_t primepow;
+    static mpz_t primepowhalf;
     static int initialize();
-    static MP_INT & MPI( const InternalCF * const c );
+    static mpz_ptr MPI( const InternalCF * const c );
 public:
     InternalPrimePower();
     InternalPrimePower( const InternalCF& )
@@ -42,7 +42,7 @@ public:
     }
     InternalPrimePower( const int i );
     InternalPrimePower( const char * str, const int base=10 );
-    InternalPrimePower( const MP_INT & );
+    InternalPrimePower( const mpz_ptr );
     ~InternalPrimePower();
     InternalCF* deepCopyObject() const;
     const char * const classname() const { return "InternalPrimePower"; }
@@ -93,10 +93,10 @@ public:
     int intmod( int p ) const;
 
     int sign() const;
-    friend MP_INT getmpi ( InternalCF * value, bool symmetric );
+    friend mpz_ptr getmpi ( InternalCF * value, bool symmetric );
 };
 
-inline MP_INT & InternalPrimePower::MPI( const InternalCF * const c )
+inline mpz_ptr InternalPrimePower::MPI( const InternalCF * const c )
 {
     return (((InternalPrimePower*)c)->thempi);
 }

@@ -220,7 +220,7 @@ CFFactory::basic ( int type, int value, bool nonimm )
 }
 
 InternalCF *
-CFFactory::basic ( const MP_INT & num )
+CFFactory::basic ( const mpz_ptr num )
 {
     if ( currenttype != IntegerDomain ) {
         InternalPrimePower * dummy = new InternalPrimePower( num );
@@ -238,7 +238,7 @@ CFFactory::rational ( int num, int den )
 }
 
 InternalCF *
-CFFactory::rational ( const MP_INT & num, const MP_INT & den, bool normalize )
+CFFactory::rational ( const mpz_ptr num, const mpz_ptr den, bool normalize )
 {
     if ( normalize ) {
         InternalRational * result = new InternalRational( num, den );
@@ -266,20 +266,20 @@ CFFactory::poly ( const Variable & v, int exp )
         return new InternalPoly( v, exp, 1 );
 }
 
-MP_INT getmpi ( InternalCF * value, bool symmetric )
+mpz_ptr getmpi ( InternalCF * value, bool symmetric )
 {
     ASSERT( ! is_imm( value ) && ( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain ), "illegal operation" );
-    MP_INT dummy;
+    mpz_ptr dummy= new mpz_t;
     if ( value->levelcoeff() == IntegerDomain )
-        mpz_init_set( &dummy, &InternalInteger::MPI( value ) );
+        mpz_init_set( dummy, InternalInteger::MPI( value ) );
     else  if ( symmetric ) {
-        mpz_init( &dummy );
-        if ( mpz_cmp( &InternalPrimePower::primepowhalf, &InternalPrimePower::MPI( value ) ) < 0 )
-            mpz_sub( &dummy, &InternalPrimePower::MPI( value ), &InternalPrimePower::primepow );
+        mpz_init( dummy );
+        if ( mpz_cmp( InternalPrimePower::primepowhalf, InternalPrimePower::MPI( value ) ) < 0 )
+            mpz_sub( dummy, InternalPrimePower::MPI( value ), InternalPrimePower::primepow );
         else
-            mpz_set( &dummy, &InternalPrimePower::MPI( value ) );
+            mpz_set( dummy, InternalPrimePower::MPI( value ) );
     }
     else
-        mpz_init_set( &dummy, &InternalPrimePower::MPI( value ) );
+        mpz_init_set( dummy, InternalPrimePower::MPI( value ) );
     return dummy;
 }

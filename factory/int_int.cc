@@ -16,43 +16,43 @@ const omBin InternalInteger::InternalInteger_bin = omGetSpecBin(sizeof(InternalI
 
 InternalInteger::InternalInteger()
 {
-    mpz_init( &thempi );
+    mpz_init( thempi );
 }
 
 InternalInteger::InternalInteger( const int i )
 {
-    mpz_init_set_si( &thempi, i );
+    mpz_init_set_si( thempi, i );
 }
 
-InternalInteger::InternalInteger( const MP_INT & mpi) : thempi( mpi ) {}
+InternalInteger::InternalInteger( const mpz_ptr mpi) { thempi[0]=*mpi;}
 
 InternalInteger::InternalInteger( const char * str, const int base )
 {
-    mpz_init_set_str( &thempi, str, base );
+    mpz_init_set_str( thempi, str, base );
 }
 
 InternalInteger::~InternalInteger()
 {
-    mpz_clear( &thempi );
+    mpz_clear( thempi );
 }
 
 InternalCF* InternalInteger::deepCopyObject() const
 {
     mpz_t dummy;
-    mpz_init_set( dummy, &thempi );
-    return new InternalInteger( dummy[0] );
+    mpz_init_set( dummy, thempi );
+    return new InternalInteger( dummy );
 }
 
 #ifndef NOSTREAMIO
 void InternalInteger::print( OSTREAM & os, char * c )
 {
-    if ( *c == '*' && mpz_cmp_si( &thempi, 1 ) == 0 )
+    if ( *c == '*' && mpz_cmp_si( thempi, 1 ) == 0 )
         os << c+1;
-    else if ( *c == '*' && mpz_cmp_si( &thempi, -1 ) == 0 )
+    else if ( *c == '*' && mpz_cmp_si( thempi, -1 ) == 0 )
         os << '-' << c+1;
     else {
-        char * str = new char[mpz_sizeinbase( &thempi, 10 ) + 2];
-        str = mpz_get_str( str, 10, &thempi );
+        char * str = new char[mpz_sizeinbase( thempi, 10 ) + 2];
+        str = mpz_get_str( str, 10, thempi );
         os << str << c;
         delete [] str;
     }
@@ -61,7 +61,7 @@ void InternalInteger::print( OSTREAM & os, char * c )
 
 bool InternalInteger::is_imm() const
 {
-    return mpz_is_imm( &thempi );
+    return mpz_is_imm( thempi );
 }
 
 InternalCF* InternalInteger::genZero()
@@ -89,13 +89,13 @@ InternalInteger::neg ()
     {
         decRefCount();
         mpz_t dummy;
-        mpz_init_set( dummy, &thempi );
+        mpz_init_set( dummy, thempi );
         mpz_neg( dummy, dummy );
-        return new InternalInteger( dummy[0] );
+        return new InternalInteger( dummy );
     }
     else
     {
-        mpz_neg( &thempi, &thempi );
+        mpz_neg( thempi, thempi );
         return this;
     }
 }
@@ -109,7 +109,7 @@ InternalCF* InternalInteger::addsame( InternalCF * c )
         decRefCount();
         mpz_t dummy;
         mpz_init( dummy );
-        mpz_add( dummy, &thempi, &MPI( c ) );
+        mpz_add( dummy, thempi, MPI( c ) );
         if ( mpz_is_imm( dummy ) )
         {
             InternalCF * res = int2imm( mpz_get_si( dummy ) );
@@ -117,14 +117,14 @@ InternalCF* InternalInteger::addsame( InternalCF * c )
             return res;
         }
         else
-            return new InternalInteger( dummy[0] );
+            return new InternalInteger( dummy );
     }
     else
     {
-        mpz_add( &thempi, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &thempi ) )
+        mpz_add( thempi, thempi, MPI( c ) );
+        if ( mpz_is_imm( thempi ) )
         {
-            InternalCF * res = int2imm( mpz_get_si( &thempi ) );
+            InternalCF * res = int2imm( mpz_get_si( thempi ) );
             delete this;
             return res;
         }
@@ -140,7 +140,7 @@ InternalCF* InternalInteger::subsame( InternalCF * c )
         decRefCount();
         mpz_t dummy;
         mpz_init( dummy );
-        mpz_sub( dummy, &thempi, &MPI( c ) );
+        mpz_sub( dummy, thempi, MPI( c ) );
         if ( mpz_is_imm( dummy ) )
         {
             InternalCF * res = int2imm( mpz_get_si( dummy ) );
@@ -148,14 +148,14 @@ InternalCF* InternalInteger::subsame( InternalCF * c )
             return res;
         }
         else
-            return new InternalInteger( dummy[0] );
+            return new InternalInteger( dummy );
     }
     else
     {
-        mpz_sub( &thempi, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &thempi ) )
+        mpz_sub( thempi, thempi, MPI( c ) );
+        if ( mpz_is_imm( thempi ) )
         {
-            InternalCF * res = int2imm( mpz_get_si( &thempi ) );
+            InternalCF * res = int2imm( mpz_get_si( thempi ) );
             delete this;
             return res;
         }
@@ -171,7 +171,7 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
         decRefCount();
         mpz_t dummy;
         mpz_init( dummy );
-        mpz_mul( dummy, &thempi, &MPI( c ) );
+        mpz_mul( dummy, thempi, MPI( c ) );
         #if 0
         if ( mpz_is_imm( dummy ) )
         {
@@ -182,11 +182,11 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
         }
         else
         #endif
-            return new InternalInteger( dummy[0] );
+            return new InternalInteger( dummy );
     }
     else
     {
-        mpz_mul( &thempi, &thempi, &MPI( c ) );
+        mpz_mul( thempi, thempi, MPI( c ) );
         #if 0
         if ( mpz_is_imm( &thempi ) )
         {
@@ -207,14 +207,14 @@ int
 InternalInteger::comparesame ( InternalCF * c )
 {
     ASSERT( ! ::is_imm( c ) && c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
-    return mpz_cmp( &thempi, &MPI( c ) );
+    return mpz_cmp( thempi, MPI( c ) );
 }
 
 int
 InternalInteger::comparecoeff ( InternalCF * c )
 {
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
-    return mpz_cmp_si( &thempi, imm2int( c ) );
+    return mpz_cmp_si( thempi, imm2int( c ) );
 }
 //}}}
 
@@ -228,9 +228,9 @@ InternalCF* InternalInteger::addcoeff( InternalCF* c )
         mpz_t dummy;
         mpz_init( dummy );
         if ( cc < 0 )
-            mpz_sub_ui( dummy, &thempi, -cc );
+            mpz_sub_ui( dummy, thempi, -cc );
         else
-            mpz_add_ui( dummy, &thempi, cc );
+            mpz_add_ui( dummy, thempi, cc );
         if ( mpz_is_imm( dummy ) )
         {
             InternalCF * res = int2imm( mpz_get_si( dummy ) );
@@ -238,17 +238,17 @@ InternalCF* InternalInteger::addcoeff( InternalCF* c )
             return res;
         }
         else
-            return new InternalInteger( dummy[0] );
+            return new InternalInteger( dummy );
     }
     else
     {
         if ( cc < 0 )
-            mpz_sub_ui( &thempi, &thempi, -cc );
+            mpz_sub_ui( thempi, thempi, -cc );
         else
-            mpz_add_ui( &thempi, &thempi, cc );
-        if ( mpz_is_imm( &thempi ) )
+            mpz_add_ui( thempi, thempi, cc );
+        if ( mpz_is_imm( thempi ) )
         {
-            InternalCF * res = int2imm( mpz_get_si( &thempi ) );
+            InternalCF * res = int2imm( mpz_get_si( thempi ) );
             delete this;
             return res;
         }
@@ -268,15 +268,15 @@ InternalCF* InternalInteger::subcoeff( InternalCF* c, bool negate )
         if ( negate )
         {
             mpz_init_set_si( dummy, cc );
-            mpz_sub( dummy, dummy, &thempi );
+            mpz_sub( dummy, dummy, thempi );
         }
         else
         {
             mpz_init( dummy );
             if ( cc < 0 )
-                mpz_add_ui( dummy, &thempi, -cc );
+                mpz_add_ui( dummy, thempi, -cc );
             else
-                mpz_sub_ui( dummy, &thempi, cc );
+                mpz_sub_ui( dummy, thempi, cc );
         }
         if ( mpz_is_imm( dummy ) )
         {
@@ -285,7 +285,7 @@ InternalCF* InternalInteger::subcoeff( InternalCF* c, bool negate )
             return res;
         }
         else
-            return new InternalInteger( dummy[0] );
+            return new InternalInteger( dummy );
     }
     else
     {
@@ -293,17 +293,17 @@ InternalCF* InternalInteger::subcoeff( InternalCF* c, bool negate )
         {
             mpz_t dummy;
             mpz_init_set_si( dummy, cc );
-            mpz_sub( &thempi, dummy, &thempi );
+            mpz_sub( thempi, dummy, thempi );
             mpz_clear( dummy );
         }
         else
             if ( cc < 0 )
-                mpz_add_ui( &thempi, &thempi, -cc );
+                mpz_add_ui( thempi, thempi, -cc );
             else
-                mpz_sub_ui( &thempi, &thempi, cc );
-        if ( mpz_is_imm( &thempi ) )
+                mpz_sub_ui( thempi, thempi, cc );
+        if ( mpz_is_imm( thempi ) )
         {
-            InternalCF * res = int2imm( mpz_get_si( &thempi ) );
+            InternalCF * res = int2imm( mpz_get_si( thempi ) );
             delete this;
             return res;
         }
@@ -323,11 +323,11 @@ InternalCF* InternalInteger::mulcoeff( InternalCF* c )
         mpz_init( dummy );
         if ( cc < 0 )
         {
-            mpz_mul_ui( dummy, &thempi, -cc );
+            mpz_mul_ui( dummy, thempi, -cc );
             mpz_neg( dummy, dummy );
         }
         else
-            mpz_mul_ui( dummy, &thempi, cc );
+            mpz_mul_ui( dummy, thempi, cc );
         if ( mpz_is_imm( dummy ) )
         {
             InternalCF * res = int2imm( mpz_get_si( dummy ) );
@@ -335,20 +335,20 @@ InternalCF* InternalInteger::mulcoeff( InternalCF* c )
             return res;
         }
         else
-            return new InternalInteger( dummy[0] );
+            return new InternalInteger( dummy );
     }
     else
     {
         if ( cc < 0 )
         {
-            mpz_mul_ui( &thempi, &thempi, -cc );
-            mpz_neg( &thempi, &thempi );
+            mpz_mul_ui( thempi, thempi, -cc );
+            mpz_neg( thempi, thempi );
         }
         else
-            mpz_mul_ui( &thempi, &thempi, cc );
-        if ( mpz_is_imm( &thempi ) )
+            mpz_mul_ui( thempi, thempi, cc );
+        if ( mpz_is_imm( thempi ) )
         {
-            InternalCF * res = int2imm( mpz_get_si( &thempi ) );
+            InternalCF * res = int2imm( mpz_get_si( thempi ) );
             delete this;
             return res;
         }
@@ -371,7 +371,7 @@ InternalInteger::bgcdsame ( const InternalCF * const c ) const
     // calculate gcd
     mpz_t result;
     mpz_init( result );
-    mpz_gcd( result, &thempi, &MPI( c ) );
+    mpz_gcd( result, thempi, MPI( c ) );
     mpz_abs( result, result );
 
     // check for immediate result
@@ -382,7 +382,7 @@ InternalInteger::bgcdsame ( const InternalCF * const c ) const
         return res;
     }
     else
-        return new InternalInteger( result[0] );
+        return new InternalInteger( result );
 }
 
 InternalCF *
@@ -408,7 +408,7 @@ InternalInteger::bgcdcoeff ( const InternalCF * const c )
     mpz_t dummy;
     mpz_init( dummy );
     // we do not need dummy since we know that cInt != 0
-    cInt = mpz_gcd_ui( dummy, &thempi, cInt );
+    cInt = mpz_gcd_ui( dummy, thempi, cInt );
     mpz_clear( dummy );
     if ( cInt < 0 ) cInt = -cInt;
     return int2imm( cInt );
@@ -433,7 +433,7 @@ InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm &
     mpz_init( result );
     mpz_init( aMPI );
     mpz_init( bMPI );
-    mpz_gcdext( result, aMPI, bMPI, &thempi, &MPI( c ) );
+    mpz_gcdext( result, aMPI, bMPI, thempi, MPI( c ) );
 
     // check and modify signs
     if ( mpz_sgn( result ) < 0 )
@@ -450,14 +450,14 @@ InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm &
         mpz_clear( aMPI );
     }
     else
-        a = CanonicalForm( new InternalInteger( aMPI[0] ) );
+        a = CanonicalForm( new InternalInteger( aMPI ) );
     if ( mpz_is_imm( bMPI ) )
     {
         b = CanonicalForm( int2imm( mpz_get_si( bMPI ) ) );
         mpz_clear( bMPI );
     }
     else
-        b = CanonicalForm( new InternalInteger( bMPI[0] ) );
+        b = CanonicalForm( new InternalInteger( bMPI ) );
     if ( mpz_is_imm( result ) )
     {
         InternalCF * res = int2imm( mpz_get_si( result ) );
@@ -465,7 +465,7 @@ InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm &
         return res;
     }
     else
-        return new InternalInteger( result[0] );
+        return new InternalInteger( result );
 }
 
 InternalCF *
@@ -514,12 +514,12 @@ InternalInteger::bextgcdcoeff( InternalCF * c, CanonicalForm & a, CanonicalForm 
 
 int InternalInteger::intval() const
 {
-  return (int)mpz_get_si( &thempi );
+  return (int)mpz_get_si( thempi );
 }
 
 int InternalInteger::intmod( int p ) const
 {
-  return (int)mpz_fdiv_ui( &thempi, (unsigned long)p );
+  return (int)mpz_fdiv_ui( thempi, (unsigned long)p );
 }
 
 //{{{ int InternalInteger::sign () const
@@ -527,7 +527,7 @@ int InternalInteger::intmod( int p ) const
 int
 InternalInteger::sign () const
 {
-    return mpz_sgn( &thempi );
+    return mpz_sgn( thempi );
 }
 //}}}
 
@@ -536,10 +536,10 @@ InternalInteger::sign () const
 InternalCF *
 InternalInteger::sqrt ()
 {
-    ASSERT( mpz_cmp_si( &thempi, 0 ) >= 0, "sqrt() argument < 0" );
+    ASSERT( mpz_cmp_si( thempi, 0 ) >= 0, "sqrt() argument < 0" );
     mpz_t result;
     mpz_init( result );
-    mpz_sqrt( result, &thempi );
+    mpz_sqrt( result, thempi );
     if ( mpz_is_imm( result ) )
     {
         InternalCF * res = int2imm( mpz_get_si( result ) );
@@ -547,7 +547,7 @@ InternalInteger::sqrt ()
         return res;
     }
     else
-        return new InternalInteger( result[0] );
+        return new InternalInteger( result );
 }
 //}}}
 
@@ -556,7 +556,7 @@ InternalInteger::sqrt ()
 int
 InternalInteger::ilog2 ()
 {
-    ASSERT( mpz_cmp_si( &thempi, 0 ) > 0, "log() argument <= 0" );
-    return mpz_sizeinbase( &thempi, 2 ) - 1;
+    ASSERT( mpz_cmp_si( thempi, 0 ) > 0, "log() argument <= 0" );
+    return mpz_sizeinbase( thempi, 2 ) - 1;
 }
 //}}}
