@@ -30,6 +30,7 @@
 #include "facAlgExt.h"
 #include "facFactorize.h"
 #include "singext.h"
+#include "cf_util.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -562,6 +563,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       #else
       ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+      factoryError ("multivariate factorization not implemented");
+      return CFFList (CFFactor (f, 1));
       #endif
     }
   }
@@ -614,16 +617,23 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         //F=ZFactorizeUnivariate( fz, issqrfree );
         //printf("fac.:\n");out_cff(F);
       }
-      else
-      #endif
+      #else
       {
         //Use Factory without NTL
-        F = ZFactorizeUnivariate( fz, issqrfree );
+        //F = ZFactorizeUnivariate( fz, issqrfree );
+	factoryError ("univariate factorization over Z not implemented"); 
+	return CFFList (CFFactor (f, 1));
       }
+      #endif
     }
     else
     {
+      #ifdef HAVE_NTL
       F = ZFactorizeMultivariate( fz, issqrfree );
+      #else
+      factoryError ("multivariate factorization not implemented");
+      return CFFList (CFFactor (f, 1));
+      #endif
     }
 
     if ( on_rational )
@@ -795,6 +805,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     F= FqFactorize (f, alpha);
     #else
     ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    factoryError ("multivariate factorization not implemented");
+    return CFFList (CFFactor (f, 1));
     #endif
 
   }
@@ -808,6 +820,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     F= ratFactorize (f, alpha);
 #else
     ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    factoryError ("multivariate factorization not implemented");
+    return CFFList (CFFactor (f, 1));
 #endif
   }
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
