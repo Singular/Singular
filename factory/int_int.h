@@ -30,16 +30,16 @@
 class InternalInteger : public InternalCF
 {
 private:
-    MP_INT thempi;
+    mpz_t thempi;
 
     // auxilliary methods
     inline InternalCF * normalizeMyself ();
     inline InternalCF * uiNormalizeMyself ();
 
-    static inline InternalCF * normalizeMPI ( MP_INT & );
-    static inline InternalCF * uiNormalizeMPI ( MP_INT & );
+    static inline InternalCF * normalizeMPI ( mpz_ptr );
+    static inline InternalCF * uiNormalizeMPI ( mpz_ptr );
 
-    static inline MP_INT & MPI ( const InternalCF * const c );
+    static inline mpz_ptr MPI ( const InternalCF * const c );
 #ifdef HAVE_OMALLOC
   static const omBin InternalInteger_bin;
 #endif
@@ -64,7 +64,7 @@ public:
     }
     InternalInteger( const int i );
     InternalInteger( const char * str, const int base=10 );
-    InternalInteger( const MP_INT & );
+    InternalInteger( const mpz_ptr );
     ~InternalInteger();
     InternalCF* deepCopyObject() const;
     const char * classname() const { return "InternalInteger"; }
@@ -122,7 +122,7 @@ public:
     friend class InternalRational;
     friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result);
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
-    friend MP_INT getmpi ( InternalCF * value, bool symmetric );
+    friend mpz_ptr getmpi ( InternalCF * value, bool symmetric );
 };
 
 //{{{ inline InternalCF * InternalInteger::normalizeMyself, uiNormalizeMyself ()
@@ -147,8 +147,8 @@ InternalInteger::normalizeMyself ()
 {
     ASSERT( getRefCount() == 1, "internal error: must not delete CO" );
 
-    if ( mpz_is_imm( &thempi ) ) {
-        InternalCF * result = int2imm( mpz_get_si( &thempi ) );
+    if ( mpz_is_imm( thempi ) ) {
+        InternalCF * result = int2imm( mpz_get_si( thempi ) );
         delete this;
         return result;
     } else
@@ -160,8 +160,8 @@ InternalInteger::uiNormalizeMyself ()
 {
     ASSERT( getRefCount() == 1, "internal error: must not delete CO" );
 
-    if ( mpz_is_imm( &thempi ) ) {
-        InternalCF * result = int2imm( mpz_get_ui( &thempi ) );
+    if ( mpz_is_imm( thempi ) ) {
+        InternalCF * result = int2imm( mpz_get_ui( thempi ) );
         delete this;
         return result;
     } else
@@ -169,7 +169,7 @@ InternalInteger::uiNormalizeMyself ()
 }
 //}}}
 
-//{{{ static inline InternalCF * InternalInteger::normalizeMPI, uiNormalizeMPI ( MP_INT & aMpi )
+//{{{ static inline InternalCF * InternalInteger::normalizeMPI, uiNormalizeMPI ( mpz_ptr aMpi )
 //{{{ docu
 //
 // normalizeMPI(), uiNormalizeMPI() - normalize a mpi.
@@ -185,29 +185,29 @@ InternalInteger::uiNormalizeMyself ()
 //
 //}}}
 inline InternalCF *
-InternalInteger::normalizeMPI ( MP_INT & aMpi )
+InternalInteger::normalizeMPI ( mpz_ptr aMpi )
 {
-    if ( mpz_is_imm( &aMpi ) ) {
-        InternalCF * result = int2imm( mpz_get_si( &aMpi ) );
-        mpz_clear( &aMpi );
+    if ( mpz_is_imm( aMpi ) ) {
+        InternalCF * result = int2imm( mpz_get_si( aMpi ) );
+        mpz_clear( aMpi );
         return result;
     } else
         return new InternalInteger( aMpi );
 }
 
 inline InternalCF *
-InternalInteger::uiNormalizeMPI ( MP_INT & aMpi )
+InternalInteger::uiNormalizeMPI ( mpz_ptr aMpi )
 {
-    if ( mpz_is_imm( &aMpi ) ) {
-        InternalCF * result = int2imm( mpz_get_ui( &aMpi ) );
-        mpz_clear( &aMpi );
+    if ( mpz_is_imm( aMpi ) ) {
+        InternalCF * result = int2imm( mpz_get_ui( aMpi ) );
+        mpz_clear( aMpi );
         return result;
     } else
         return new InternalInteger( aMpi );
 }
 //}}}
 
-//{{{ inline MP_INT & InternalInteger::MPI ( const InternalCF * const c )
+//{{{ inline mpz_ptr InternalInteger::MPI ( const InternalCF * const c )
 //{{{ docu
 //
 // MPI() - return underlying mpi of `c'.
@@ -216,7 +216,7 @@ InternalInteger::uiNormalizeMPI ( MP_INT & aMpi )
 // mpi is returned.
 //
 //}}}
-inline MP_INT &
+inline mpz_ptr
 InternalInteger::MPI ( const InternalCF * const c )
 {
     return (((InternalInteger*)c)->thempi);

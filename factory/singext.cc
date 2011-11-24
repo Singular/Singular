@@ -22,12 +22,12 @@ void gmp_numerator ( const CanonicalForm & f, mpz_ptr result )
     ASSERT( ! is_imm( ff ), "illegal type" );
     if ( ff->levelcoeff() == IntegerDomain )
     {
-        mpz_init_set( result, &(InternalInteger::MPI( ff )) );
+        mpz_init_set( result, (InternalInteger::MPI( ff )) );
         ff->deleteObject();
     }
     else  if ( ff->levelcoeff() == RationalDomain )
     {
-        mpz_init_set( result, &(InternalRational::MPQNUM( ff )) );
+        mpz_init_set( result, (InternalRational::MPQNUM( ff )) );
         ff->deleteObject();
     }
     else
@@ -47,7 +47,7 @@ void gmp_denominator ( const CanonicalForm & f, mpz_ptr result )
     }
     else  if ( ff->levelcoeff() == RationalDomain )
     {
-        mpz_init_set( result, &(InternalRational::MPQDEN( ff )) );
+        mpz_init_set( result, (InternalRational::MPQDEN( ff )) );
         ff->deleteObject();
     }
     else
@@ -63,13 +63,13 @@ int gf_value (const CanonicalForm & f )
 }
 
 CanonicalForm
-make_cf ( const MP_INT & n )
+make_cf ( const mpz_ptr n )
 {
     return CanonicalForm( CFFactory::basic( n ) );
 }
 
 CanonicalForm
-make_cf ( const MP_INT & n, const MP_INT & d, bool normalize )
+make_cf ( const mpz_ptr n, const mpz_ptr d, bool normalize )
 {
     return CanonicalForm( CFFactory::rational( n, d, normalize ) );
 }

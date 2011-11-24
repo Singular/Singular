@@ -970,15 +970,15 @@ bool gf_isff ( int a );
 /* stuff included from ./singext.h */
 
 
-MP_INT gmp_numerator ( const CanonicalForm & f );
+mpz_ptr gmp_numerator ( const CanonicalForm & f );
 
-MP_INT gmp_denominator ( const CanonicalForm & f );
+mpz_ptr gmp_denominator ( const CanonicalForm & f );
 
 int gf_value (const CanonicalForm & f );
 
-CanonicalForm make_cf ( const MP_INT & n );
+CanonicalForm make_cf ( const mpz_ptr n );
 
-CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d, bool normalize );
+CanonicalForm make_cf ( const mpz_ptr n, const mpz_ptr d, bool normalize );
 
 CanonicalForm make_cf_from_gf ( const int z );
 

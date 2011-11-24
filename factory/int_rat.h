@@ -26,12 +26,12 @@
 class InternalRational : public InternalCF
 {
 private:
-    MP_INT _num;
-    MP_INT _den;
+    mpz_t _num;
+    mpz_t _den;
     static int initialized;
-    static MP_INT & MPQNUM( const InternalCF * const c );
-    static MP_INT & MPQDEN( const InternalCF * const c );
-    static void normalize( const MP_INT &, const MP_INT &, MP_INT &, MP_INT & );
+    static mpz_ptr MPQNUM( const InternalCF * const c );
+    static mpz_ptr MPQDEN( const InternalCF * const c );
+    static void normalize( const mpz_ptr, const mpz_ptr, mpz_ptr, mpz_ptr );
 public:
     InternalRational();
     InternalRational( const InternalCF& )
@@ -41,8 +41,8 @@ public:
     InternalRational( const int i );
     InternalRational( const int n, const int d );
     InternalRational( const char * str );
-    InternalRational( const MP_INT & );
-    InternalRational( const MP_INT &, const MP_INT & );
+    InternalRational( const mpz_ptr );
+    InternalRational( const mpz_ptr , const mpz_ptr );
     ~InternalRational();
     InternalCF* deepCopyObject() const;
     const char * classname() const { return "InternalRational"; }
@@ -99,15 +99,15 @@ public:
     friend class InternalInteger;
     friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
-    friend CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d );
+    friend CanonicalForm make_cf ( const mpz_ptr n, const mpz_ptr d );
 };
 
-inline MP_INT & InternalRational::MPQNUM( const InternalCF * const c )
+inline mpz_ptr InternalRational::MPQNUM( const InternalCF * const c )
 {
     return (((InternalRational*)c)->_num);
 }
 
-inline MP_INT & InternalRational::MPQDEN( const InternalCF * const c )
+inline mpz_ptr InternalRational::MPQDEN( const InternalCF * const c )
 {
     return (((InternalRational*)c)->_den);
 }

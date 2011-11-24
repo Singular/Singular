@@ -27,14 +27,13 @@ public:
     static InternalCF * basic ( const char * str, int base );
     static InternalCF * basic ( int type, const char * const str );
     static InternalCF * basic ( int type, int value, bool nonimm );
-    static InternalCF * basic ( const MP_INT & num );
+    static InternalCF * basic ( const mpz_ptr num );
     static InternalCF * rational ( int num, int den );
-    static InternalCF * rational ( const MP_INT & num, const MP_INT & den, bool normalize );
+    static InternalCF * rational ( const mpz_ptr num, const mpz_ptr den, bool normalize );
     static InternalCF * poly ( const Variable & v, int exp, const CanonicalForm & c );
     static InternalCF * poly ( const Variable & v, int exp = 1 );
 };
 
-
-MP_INT getmpi ( InternalCF * value, bool symmetric = true );
+mpz_ptr getmpi ( InternalCF * value, bool symmetric = true );
 
 #endif /* ! INCL_CF_FACTORY_H */

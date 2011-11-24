@@ -32,9 +32,9 @@ InternalInteger::dividesame ( InternalCF * c )
     }
 
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
-        MP_INT n, d;
-        mpz_init_set( &n, &thempi );
-        mpz_init_set( &d, &MPI( c ) );
+        mpz_t n, d;
+        mpz_init_set( n, thempi );
+        mpz_init_set( d, MPI( c ) );
         if ( deleteObject() ) delete this;
         InternalRational * result = new InternalRational( n, d );
         return result->normalize_myself();
@@ -42,18 +42,18 @@ InternalInteger::dividesame ( InternalCF * c )
 
     if ( getRefCount() > 1 ) {
         decRefCount();
-        MP_INT mpiResult;
-        mpz_init( &mpiResult );
-        if ( mpz_sgn( &MPI( c ) ) > 0 )
-            mpz_fdiv_q( &mpiResult, &thempi, &MPI( c ) );
+        mpz_t mpiResult;
+        mpz_init( mpiResult );
+        if ( mpz_sgn( MPI( c ) ) > 0 )
+            mpz_fdiv_q( mpiResult, thempi, MPI( c ) );
         else
-            mpz_cdiv_q( &mpiResult, &thempi, &MPI( c ) );
+            mpz_cdiv_q( mpiResult, thempi, MPI( c ) );
         return normalizeMPI( mpiResult );
     } else {
-        if ( mpz_sgn( &MPI( c ) ) > 0 )
-            mpz_fdiv_q( &thempi, &thempi, &MPI( c ) );
+        if ( mpz_sgn( MPI( c ) ) > 0 )
+            mpz_fdiv_q( thempi, thempi, MPI( c ) );
         else
-            mpz_cdiv_q( &thempi, &thempi, &MPI( c ) );
+            mpz_cdiv_q( thempi, thempi, MPI( c ) );
         return normalizeMyself();
     }
 }
@@ -69,13 +69,13 @@ InternalInteger::dividecoeff ( InternalCF * c, bool invert )
     int intC = imm2int( c );
 
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
-        MP_INT n, d;
+        mpz_t n, d;
         if ( invert ) {
-            mpz_init_set_si( &n, intC );
-            mpz_init_set( &d, &thempi );
+            mpz_init_set_si( n, intC );
+            mpz_init_set( d, thempi );
         } else {
-            mpz_init_set( &n, &thempi );
-            mpz_init_set_si( &d, intC );
+            mpz_init_set( n, thempi );
+            mpz_init_set_si( d, intC );
         }
         if ( deleteObject() ) delete this;
         InternalRational * result = new InternalRational( n, d );
@@ -83,7 +83,7 @@ InternalInteger::dividecoeff ( InternalCF * c, bool invert )
     }
 
     if ( invert ) {
-        int mpiSign = mpz_sgn( &thempi );
+        int mpiSign = mpz_sgn( thempi );
         if ( deleteObject() ) delete this;
         if ( intC >= 0 )
             return int2imm( 0 );
@@ -91,21 +91,21 @@ InternalInteger::dividecoeff ( InternalCF * c, bool invert )
             return int2imm( -mpiSign );
     } else if ( getRefCount() > 1 ) {
         decRefCount();
-        MP_INT mpiResult;
-        mpz_init( &mpiResult );
+        mpz_t mpiResult;
+        mpz_init( mpiResult );
         if ( intC > 0 )
-            mpz_fdiv_q_ui( &mpiResult, &thempi, intC );
+            mpz_fdiv_q_ui( mpiResult, thempi, intC );
         else {
-            mpz_fdiv_q_ui( &mpiResult, &thempi, -intC );
-            mpz_neg( &mpiResult, &mpiResult );
+            mpz_fdiv_q_ui( mpiResult, thempi, -intC );
+            mpz_neg( mpiResult, mpiResult );
         }
         return normalizeMPI( mpiResult );
     } else {
         if ( intC > 0 )
-            mpz_fdiv_q_ui( &thempi, &thempi, intC );
+            mpz_fdiv_q_ui( thempi, thempi, intC );
         else {
-            mpz_fdiv_q_ui( &thempi, &thempi, -intC );
-            mpz_neg( &thempi, &thempi );
+            mpz_fdiv_q_ui( thempi, thempi, -intC );
+            mpz_neg( thempi, thempi );
         }
         return normalizeMyself();
     }
@@ -127,12 +127,12 @@ InternalInteger::divsame ( InternalCF * c )
 
     if ( getRefCount() > 1 ) {
         deleteObject();
-        MP_INT mpiResult;
-        mpz_init( &mpiResult );
-        mpz_divexact( &mpiResult, &thempi, &MPI( c ) );
+        mpz_t mpiResult;
+        mpz_init( mpiResult );
+        mpz_divexact( mpiResult, thempi, MPI( c ) );
         return normalizeMPI( mpiResult );
     } else {
-        mpz_divexact( &thempi, &thempi, &MPI( c ) );
+        mpz_divexact( thempi, thempi, MPI( c ) );
         return normalizeMyself();
     }
 }
@@ -153,18 +153,18 @@ InternalInteger::divcoeff ( InternalCF * c, bool invert )
         return int2imm( 0 );
     } else if ( getRefCount() > 1 ) {
         deleteObject();
-        MP_INT mpiC;
-        MP_INT mpiResult;
-        mpz_init_set_si( &mpiC, imm2int( c ) );
-        mpz_init( &mpiResult );
-        mpz_divexact( &mpiResult, &thempi, &mpiC );
-        mpz_clear( &mpiC );
+        mpz_t mpiC;
+        mpz_t mpiResult;
+        mpz_init_set_si( mpiC, imm2int( c ) );
+        mpz_init( mpiResult );
+        mpz_divexact( mpiResult, thempi, mpiC );
+        mpz_clear( mpiC );
         return normalizeMPI( mpiResult );
     } else {
-        MP_INT mpiC;
-        mpz_init_set_si( &mpiC, imm2int( c ) );
-        mpz_divexact( &thempi, &thempi, &mpiC );
-        mpz_clear( &mpiC );
+        mpz_t mpiC;
+        mpz_init_set_si( mpiC, imm2int( c ) );
+        mpz_divexact( thempi, thempi, mpiC );
+        mpz_clear( mpiC );
         return normalizeMyself();
     }
 }
@@ -185,12 +185,12 @@ InternalInteger::modulosame ( InternalCF * c )
 
     if ( getRefCount() > 1 ) {
         decRefCount();
-        MP_INT mpiResult;
-        mpz_init( &mpiResult );
-        mpz_mod( &mpiResult, &thempi, &MPI( c ) );
+        mpz_t mpiResult;
+        mpz_init( mpiResult );
+        mpz_mod( mpiResult, thempi, MPI( c ) );
         return uiNormalizeMPI( mpiResult );
     } else {
-        mpz_mod( &thempi, &thempi, &MPI( c ) );
+        mpz_mod( thempi, thempi, MPI( c ) );
         return uiNormalizeMyself();
     }
 }
@@ -216,18 +216,18 @@ InternalInteger::modulocoeff ( InternalCF * c, bool invert )
             return c;
         } else {
             // no checks for refCount == 1 are done.  It is not worth ...
-            MP_INT mpiResult;
-            mpz_init_set( &mpiResult, &thempi );
-            mpz_abs( &mpiResult, &mpiResult );
-            mpz_sub_ui( &mpiResult, &mpiResult, -intC );
+            mpz_t mpiResult;
+            mpz_init_set( mpiResult, thempi );
+            mpz_abs( mpiResult, mpiResult );
+            mpz_sub_ui( mpiResult, mpiResult, -intC );
             if ( deleteObject() ) delete this;
             return uiNormalizeMPI( mpiResult );
         }
     } else {
-        MP_INT dummy;
-        mpz_init( &dummy );
-        InternalCF * result = int2imm( mpz_mod_ui( &dummy, &thempi, tabs( intC ) ) );
-        mpz_clear( &dummy );
+        mpz_t dummy;
+        mpz_init( dummy );
+        InternalCF * result = int2imm( mpz_mod_ui( dummy, thempi, tabs( intC ) ) );
+        mpz_clear( dummy );
         if ( deleteObject() ) delete this;
         return result;
     }
@@ -264,22 +264,22 @@ InternalInteger::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF * 
     }
 
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
-        MP_INT n, d;
-        mpz_init_set( &n, &thempi );
-        mpz_init_set( &d, &MPI( c ) );
+        mpz_t n, d;
+        mpz_init_set( n, thempi );
+        mpz_init_set( d, MPI( c ) );
         InternalRational * result = new InternalRational( n, d );
         quot = result->normalize_myself();
         rem = int2imm( 0 );
         return;
     }
 
-    MP_INT q;
-    MP_INT r;
-    mpz_init( &q ); mpz_init( &r );
-    if ( mpz_sgn( &MPI( c ) ) > 0 )
-        mpz_fdiv_qr( &q, &r, &thempi, &MPI( c ) );
+    mpz_t q;
+    mpz_t r;
+    mpz_init( q ); mpz_init( r );
+    if ( mpz_sgn( MPI( c ) ) > 0 )
+        mpz_fdiv_qr( q, r, thempi, MPI( c ) );
     else
-        mpz_cdiv_qr( &q, &r, &thempi, &MPI( c ) );
+        mpz_cdiv_qr( q, r, thempi, MPI( c ) );
 
     quot = normalizeMPI( q );
     rem = uiNormalizeMPI( r );
@@ -296,13 +296,13 @@ InternalInteger::divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF *
     int intC = imm2int( c );
 
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
-        MP_INT n, d;
+        mpz_t n, d;
         if ( invert ) {
-            mpz_init_set_si( &n, intC );
-            mpz_init_set( &d, &thempi );
+            mpz_init_set_si( n, intC );
+            mpz_init_set( d, thempi );
         } else {
-            mpz_init_set( &n, &thempi );
-            mpz_init_set_si( &d, intC );
+            mpz_init_set( n, thempi );
+            mpz_init_set_si( d, intC );
         }
         InternalRational * result = new InternalRational( n, d );
         quot = result->normalize_myself();
@@ -315,26 +315,26 @@ InternalInteger::divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF *
             rem = c;
             quot = int2imm( 0 );
         } else {
-            MP_INT mpiResult;
-            mpz_init_set( &mpiResult, &thempi );
-            mpz_abs( &mpiResult, &mpiResult );
-            mpz_sub_ui( &mpiResult, &mpiResult, -intC );
+            mpz_t mpiResult;
+            mpz_init_set( mpiResult, thempi );
+            mpz_abs( mpiResult, mpiResult );
+            mpz_sub_ui( mpiResult, mpiResult, -intC );
             rem = uiNormalizeMPI( mpiResult );
-            quot = int2imm( -mpz_sgn( &thempi ) );
+            quot = int2imm( -mpz_sgn( thempi ) );
         }
     } else {
-        MP_INT q;
-        MP_INT dummy;
-        mpz_init( &q ); mpz_init( &dummy );
+        mpz_t q;
+        mpz_t dummy;
+        mpz_init( q ); mpz_init( dummy );
         if ( intC > 0 ) {
-            rem = int2imm( mpz_fdiv_qr_ui( &q, &dummy, &thempi, intC ) );
+            rem = int2imm( mpz_fdiv_qr_ui( q, dummy, thempi, intC ) );
             quot = normalizeMPI( q );
         } else {
-            rem = int2imm( mpz_fdiv_qr_ui( &q, &dummy, &thempi, -intC ) );
-            mpz_neg( &q, &q );
+            rem = int2imm( mpz_fdiv_qr_ui( q, dummy, thempi, -intC ) );
+            mpz_neg( q, q );
             quot = normalizeMPI( q );
         }
-        mpz_clear( &dummy );
+        mpz_clear( dummy );
     }
 }
 //}}}

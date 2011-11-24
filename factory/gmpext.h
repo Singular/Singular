@@ -12,7 +12,7 @@
 
 
 inline bool
-mpz_is_imm( const MP_INT * mpi )
+mpz_is_imm( const mpz_t mpi )
 {
     return ( mpz_cmp_si( mpi, MINIMMEDIATE ) >= 0 ) &&
 	( mpz_cmp_si( mpi, MAXIMMEDIATE ) <= 0 );
