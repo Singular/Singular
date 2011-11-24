@@ -475,7 +475,6 @@ void naWrite(number &a, const coeffs cf)
   else
   {
     poly aAsPoly = (poly)a;
-    definiteReduce(aAsPoly, naMinpoly, cf);
     /* basically, just write aAsPoly using p_Write,
        but use brackets around the output, if a is not
        a constant living in naCoeffs = cf->extRing->cf */
