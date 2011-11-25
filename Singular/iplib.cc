@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -292,6 +291,17 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   }
   return NULL;
 }
+#ifndef LIBSINGULAR
+// see below:
+struct soptionStruct
+{
+  const char * name;
+  unsigned   setval;
+  unsigned   resetval;
+};
+extern struct soptionStruct optionStruct[];
+extern struct soptionStruct verboseStruct[];
+#endif
 
 BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
 {
@@ -308,7 +318,7 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
     sLastPrinted.CleanUp();
   }
   #ifndef LIBSINGULAR
-  // the access to optionStruct and verboseStruct do not work 
+  // the access to optionStruct and verboseStruct do not work
   // on x86_64-Linux for pic-code
   int save11= ( test & ~TEST_RINGDEP_OPTS);
   if ((TEST_V_ALLWARN) &&
@@ -316,14 +326,6 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
   ((save1!=save11)||(save2!=verbose)) &&
   (pi->libname!=NULL) && (pi->libname[0]!='\0'))
   {
-    struct soptionStruct
-    {
-      const char * name;
-      unsigned   setval;
-      unsigned   resetval;
-    };
-    extern struct soptionStruct optionStruct[];
-    extern struct soptionStruct verboseStruct[];
     Warn("option changed in proc %s from %s",pi->procname,pi->libname);
     int i;
     for (i=0; optionStruct[i].setval!=0; i++)
