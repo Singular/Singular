@@ -367,7 +367,7 @@ EXAMPLE:  @code{example parallelWaitN;} shows an example."
       write(mempatrol, list(server, pid, i, maxmems[k]));
     }
     write(l(i), quote(execute("result = "+eval(commands[k])
-                                    +"(currentargs[1..size(currentargs)]);")));
+      +"("+argsToString("currentargs", size(currentargs))+");")));
     assignment[i] = k;
     k++;
   }
@@ -454,7 +454,7 @@ EXAMPLE:  @code{example parallelWaitN;} shows an example."
         write(mempatrol, list(server, pid, wait, maxmems[k]));
       }
       write(l(wait), quote(execute("def result = "+eval(commands[k])
-                                     +"(currentargs[1..size(currentargs)]);")));
+        +"("+argsToString("currentargs", size(currentargs))+");")));
       assignment[wait] = k;
       k++;
     }
@@ -715,4 +715,17 @@ static proc getusedmemory(string server, int pid)
   execute("b = "+s+";");
   int i = int(b/1000);
   return(i);
+}
+
+static proc argsToString(string name, int length)
+{
+  string arglist;
+  if(length > 0) {
+    arglist = name+"[1]";
+  }
+  int i;
+  for(i = 2; i <= length; i++) {
+    arglist = arglist+", "+name+"["+string(i)+"]";
+  }
+  return(arglist);
 }
