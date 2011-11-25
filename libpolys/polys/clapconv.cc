@@ -27,8 +27,6 @@
 #define TRANSEXT_PRIVATES
 #include <polys/ext_fields/transext.h>
 
-typedef __mpz_struct lint;
-
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r );
@@ -219,17 +217,17 @@ CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
       {
         if ( p_GetCoeff( p, r->cf->extRing )->s == 3 )
         {
-          lint dummy;
-          mpz_init_set( &dummy, (p_GetCoeff( p,r->cf->extRing )->z) );
+          mpz_t dummy;
+          mpz_init_set( dummy, (p_GetCoeff( p,r->cf->extRing )->z) );
           term = make_cf( dummy );
         }
         else
         {
           // assume s==0 or s==1
-          lint num, den;
+          mpz_t num, den;
           On(SW_RATIONAL);
-          mpz_init_set( &num, (p_GetCoeff( p, r->cf->extRing )->z) );
-          mpz_init_set( &den, (p_GetCoeff( p, r->cf->extRing )->n) );
+          mpz_init_set( num, (p_GetCoeff( p, r->cf->extRing )->z) );
+          mpz_init_set( den, (p_GetCoeff( p, r->cf->extRing )->n) );
           term = make_cf( num, den, ( p_GetCoeff( p, r->cf->extRing )->s != 1 ));
         }
       }

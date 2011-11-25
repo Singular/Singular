@@ -296,17 +296,17 @@ CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/
   {
     if ( n->s == 3 )
     {
-      MP_INT dummy;
-      mpz_init_set( &dummy,n->z );
+      mpz_t dummy;
+      mpz_init_set( dummy,n->z );
       term = make_cf( dummy );
     }
     else
     {
       // assume s==0 or s==1
-      MP_INT num, den;
+      mpz_t num, den;
       On(SW_RATIONAL);
-      mpz_init_set( &num, n->z );
-      mpz_init_set( &den, n->n );
+      mpz_init_set( num, n->z );
+      mpz_init_set( den, n->n );
       term = make_cf( num, den, ( n->s != 1 ));
     }
   }
