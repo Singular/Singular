@@ -1131,12 +1131,20 @@ ideal singclap_sqrfree ( poly f)
   if(rField_is_Q()) prime_number=0;
   #endif
   CFFList L;
+  number N=NULL;
+  number NN=NULL;
 
   if (!rField_is_Zp() && !rField_is_Zp_a()) /* Q, Q(a) */
   {
     //if (f!=NULL) // already tested at start of routine
     {
+      number n0= nCopy(pGetCoeff(f));
+      N=nCopy (n0);
       p_Cleardenom(f, currRing);
+      NN= nDiv(n0,pGetCoeff(f));
+      nDelete(&n0);
+      nDelete (&N);
+      N=nCopy(NN);
     }
   }
   else if (rField_is_Zp_a())
@@ -1144,15 +1152,20 @@ ideal singclap_sqrfree ( poly f)
     //if (f!=NULL) // already tested at start of routine
     if (singclap_factorize_retry==0)
     {
+      number n0= nCopy(pGetCoeff(f));
       pNorm(f);
       p_Cleardenom(f, currRing);
+      NN=nDiv(n0,pGetCoeff(f));
+      nDelete(&n0);
+      nDelete (&N);
+      N=nCopy(NN);
     }
   }
   if (rField_is_Q() || rField_is_Zp())
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) );
-    L = sqrFree( F );
+    L = sqrFree( F, true );
   }
   #if 0
   else if (rField_is_GF())
@@ -1178,19 +1191,17 @@ ideal singclap_sqrfree ( poly f)
     if (currRing->minpoly!=NULL)
     {
       CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
-                    currRing->algring);
+                   currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) );
-      CFFList SqrFreeMV( const CanonicalForm & f , const CanonicalForm & mipo=0) ;
-
-      L = SqrFreeMV( F,mipo );
+      L= sqrFree ( F, true);
       //WarnS("L = sqrFree( F,mipo );");
       //L = sqrFree( F );
     }
     else
     {
       CanonicalForm F( convSingTrPFactoryP( f ) );
-      L = sqrFree( F );
+      L = sqrFree( F, true );
     }
   }
   else
@@ -1225,6 +1236,20 @@ ideal singclap_sqrfree ( poly f)
     {
       res->m[0]=pOne();
     }
+    if (N!=NULL)
+    {
+      pMult_nn(res->m[0],N);
+      nDelete(&N);
+      N= NULL;
+    }
+  }
+  if (NN!=NULL)
+  {
+    nDelete(&NN);
+  }
+  if (N!=NULL)
+  {
+    nDelete(&N);
   }
   pDelete(&f);
   errorreported=save_errorreported;
