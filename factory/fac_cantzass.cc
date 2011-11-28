@@ -22,7 +22,7 @@ static CanonicalForm randomPoly( int n, const Variable & x, const CFRandom & gen
 
 static CFFList CantorZassenhausFactorFFGF( const CanonicalForm & f, int d, int q, const CFRandom & );
 
-static CFFList CantorZassenhausFactorExt( const CanonicalForm & g, int s, MP_INT * q, const CFRandom & gen );
+static CFFList CantorZassenhausFactorExt( const CanonicalForm & g, int s, mpz_t q, const CFRandom & gen );
 
 static CFFList distinctDegreeFactorFFGF ( const CanonicalForm & f, int q );
 
@@ -40,7 +40,7 @@ static CanonicalForm powerMod( const CanonicalForm & f, int p, int s, const Cano
 
 static CanonicalForm powerMod2( const CanonicalForm & f, int p, int s, const CanonicalForm & d );
 
-static CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const CanonicalForm & d );
+static CanonicalForm powerMod2( const CanonicalForm & f, mpz_t q, int s, const CanonicalForm & d );
 
 CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int numext, const Variable alpha, const Variable beta )
 {
@@ -49,7 +49,7 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
     ListIterator<CFFactor> i, j, k;
     int d, q, n = 0;
     bool galoisfield = getGFDegree() > 1;
-    MP_INT qq;
+    mpz_t qq;
 
     if ( galoisfield )
         q = ipower( getCharacteristic(), getGFDegree() );
@@ -60,8 +60,8 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
             n = getMipo( alpha ).degree();
         else
             n = getMipo( alpha ).degree() * getMipo( beta ).degree();
-        mpz_init( &qq );
-        mpz_ui_pow_ui ( &qq, q, n );
+        mpz_init( qq );
+        mpz_ui_pow_ui ( qq, q, n );
     }
     if ( LC( f ).isOne() )
         if ( issqrfree )
@@ -85,11 +85,11 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
             if ( numext > 0 ) {
              if ( numext == 1 ) {
                    AlgExtRandomF tmpalpha( alpha );
-                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), &qq, tmpalpha );
+                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), qq, tmpalpha );
              }
              else {
                    AlgExtRandomF tmpalphabeta( alpha, beta );
-                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), &qq, tmpalphabeta );
+                    HH = CantorZassenhausFactorExt( j.getItem().factor(), j.getItem().exp(), qq, tmpalphabeta );
              }
             }
             else  if ( galoisfield )
@@ -103,7 +103,7 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
         }
     }
     if ( numext > 0 )
-        mpz_clear( &qq );
+        mpz_clear( qq );
     return H;
 }
 
@@ -174,7 +174,7 @@ CFFList CantorZassenhausFactorFFGF( const CanonicalForm & g, int s, int q, const
     }
 }
 
-CFFList CantorZassenhausFactorExt( const CanonicalForm & g, int s, MP_INT * q, const CFRandom & gen )
+CFFList CantorZassenhausFactorExt( const CanonicalForm & g, int s, mpz_t q, const CFRandom & gen )
 {
     CanonicalForm f = g;
     CanonicalForm b, f1;
@@ -231,19 +231,19 @@ CanonicalForm powerMod( const CanonicalForm & f, int p, int s, const CanonicalFo
     CanonicalForm b = f % d;
     int odd;
 
-    MP_INT m;
+    mpz_t m;
 
-    mpz_init( &m );
-    mpz_ui_pow_ui ( &m, p, s );
-    while ( mpz_cmp_si( &m, 0 ) != 0 )
+    mpz_init( m );
+    mpz_ui_pow_ui ( m, p, s );
+    while ( mpz_cmp_si( m, 0 ) != 0 )
     {
-        odd = mpz_fdiv_q_ui( &m, &m, 2 );
+        odd = mpz_fdiv_q_ui( m, m, 2 );
         if ( odd != 0 )
             prod = (prod * b) % d;
-        if ( mpz_cmp_si( &m, 0 ) != 0 )
+        if ( mpz_cmp_si( m, 0 ) != 0 )
             b = (b*b) % d;
     }
-    mpz_clear( &m );
+    mpz_clear( m );
     return prod;
 }
 
@@ -253,44 +253,44 @@ CanonicalForm powerMod2( const CanonicalForm & f, int p, int s, const CanonicalF
     CanonicalForm b = f % d;
     int odd;
 
-    MP_INT m;
+    mpz_t m;
 
-    mpz_init( &m );
-    mpz_ui_pow_ui ( &m, p, s );
-    mpz_sub_ui( &m, &m, 1 );
-    mpz_fdiv_q_ui( &m, &m, 2 );
-    while ( mpz_cmp_si( &m, 0 ) != 0 )
+    mpz_init( m );
+    mpz_ui_pow_ui ( m, p, s );
+    mpz_sub_ui( m, m, 1 );
+    mpz_fdiv_q_ui( m, m, 2 );
+    while ( mpz_cmp_si( m, 0 ) != 0 )
     {
-        odd = mpz_fdiv_q_ui( &m, &m, 2 );
+        odd = mpz_fdiv_q_ui( m, m, 2 );
         if ( odd != 0 )
             prod = (prod * b) % d;
-        if ( mpz_cmp_si( &m, 0 ) != 0 )
+        if ( mpz_cmp_si( m, 0 ) != 0 )
             b = (b*b) % d;
     }
-    mpz_clear( &m );
+    mpz_clear( m );
     return prod;
 }
 
-CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const CanonicalForm & d )
+CanonicalForm powerMod2( const CanonicalForm & f, mpz_t q, int s, const CanonicalForm & d )
 {
     CanonicalForm prod = 1;
     CanonicalForm b = f % d;
     int odd;
 
-    MP_INT m;
+    mpz_t m;
 
-    mpz_init( &m );
-    mpz_pow_ui( &m, q, s );
-    mpz_sub_ui( &m, &m, 1 );
-    mpz_fdiv_q_ui( &m, &m, 2 );
-    while ( mpz_cmp_si( &m, 0 ) != 0 )
+    mpz_init( m );
+    mpz_pow_ui( m, q, s );
+    mpz_sub_ui( m, m, 1 );
+    mpz_fdiv_q_ui( m, m, 2 );
+    while ( mpz_cmp_si( m, 0 ) != 0 )
     {
-        odd = mpz_fdiv_q_ui( &m, &m, 2 );
+        odd = mpz_fdiv_q_ui( m, m, 2 );
         if ( odd != 0 )
             prod = (prod * b) % d;
-        if ( mpz_cmp_si( &m, 0 ) != 0 )
+        if ( mpz_cmp_si( m, 0 ) != 0 )
             b = (b*b) % d;
     }
-    mpz_clear( &m );
+    mpz_clear( m );
     return prod;
 }
