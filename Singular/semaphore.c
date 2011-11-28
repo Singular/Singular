@@ -66,7 +66,7 @@ void sipc_semaphore_release(int id) {
 
 int sipc_semaphore_get_value(int id) {
   int val;
-  sem_post(semaphore[id], &val);
+  sem_getvalue(semaphore[id], &val);
   return val;
 }
 
