@@ -64,6 +64,12 @@ void sipc_semaphore_release(int id) {
   sem_post(semaphore[id]);
 }
 
+int sipc_semaphore_get_value(int id) {
+  int val;
+  sem_post(semaphore[id], &val);
+  return val;
+}
+
 int simpleipc_cmd(char *cmd, int id, int v)
 {
   if (strcmp(cmd,"init")==0)
@@ -71,11 +77,13 @@ int simpleipc_cmd(char *cmd, int id, int v)
   else if (strcmp(cmd,"exists")==0)
     return sipc_semaphore_exists(id);
   else if (strcmp(cmd,"acquire")==0)
-    {  sipc_semaphore_acquire(id); return;}
+    {  sipc_semaphore_acquire(id); return -2;}
   else if (strcmp(cmd,"try_acquire")==0)
     return sipc_semaphore_try_acquire(id);
   else if (strcmp(cmd,"release")==0)
-    { sipc_semaphore_release(id); return;}
+    { sipc_semaphore_release(id); return -2;}
+  else if (strcmp(cmd,"get_value")==0)
+    { return sipc_semaphore_get_value(id); }
   else printf("unknown\n");
-    return 0;
+    return  -2;
 }
