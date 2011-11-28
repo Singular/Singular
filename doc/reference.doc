@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4592,12 +4591,14 @@ See
 @code{names ( )}
 @*@code{names (} ring_name @code{)}
 @*@code{names (} package_name @code{)}
+@*@code{names (} level @code{)}
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
 returns the names of all user-defined variables which are ring independent
 (this includes the names of  procedures) or, in the second case, which
 belong to the given ring.
+The third case restricts the variables to the given level.
 
 package_name can be @code{Current}, @code{Top} or any other
 identifier of type package.
@@ -4615,6 +4616,7 @@ identifier of type package.
   l[1..3];
   names(r);
   names(p);
+  names(0);
 @c example
 @end smallexample
 @end table
@@ -8719,7 +8721,7 @@ of the Windows95/98 operating system). Use @ref{rtimer}, instead.
   t;  // yields the time in ticks-per-sec (default 1)
       // since t was initialized by timer
   int tps=system("--ticks-per-sec");
-  t/tps; // yields the time in seconds truncated to int
+  t div tps; // yields the time in seconds truncated to int
   timer=0;
   system("--ticks-per-sec",1000); // set timer resolution to ms
   t=timer; // initialize t by timer
