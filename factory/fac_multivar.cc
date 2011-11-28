@@ -360,10 +360,7 @@ CFFList ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
     for ( i = F; i.hasItem(); i++ )
     {
         if ( i.getItem().factor().inCoeffDomain() )
-        {
-            if ( ! i.getItem().factor().isOne() )
-                R.append( CFFactor( i.getItem().factor(), i.getItem().exp() ) );
-        }
+            R.append( CFFactor( i.getItem().factor(), i.getItem().exp() ) );
         else
         {
             TIMING_START(fac_content);

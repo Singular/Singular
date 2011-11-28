@@ -8,6 +8,7 @@
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_map.h"
+#include "cf_algorithm.h"
 
 static int divexp = 1;
 
@@ -139,8 +140,19 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 {
     if ( a.inCoeffDomain() )
         return CFFactor( a, 1 );
-    CanonicalForm LcA= Lc (a);
-    CanonicalForm aa= a/LcA;
+    CanonicalForm aa, LcA;
+    if (isOn (SW_RATIONAL))
+    {
+      LcA= bCommonDen (a);
+      aa= a*LcA;
+    }
+    else
+    {
+      LcA= icontent (a);
+      if (lc (a).sign() < 0)
+        LcA= -LcA;
+      aa= a/LcA;
+    }
     CanonicalForm cont = content( aa );
     aa /= cont;
     CanonicalForm b = aa.deriv(), c = gcd( aa, b );
@@ -152,12 +164,30 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     {
         y = gcd( w, c ); z = w / y;
         if ( degree( z, v ) > 0 )
+        {
+          if (isOn (SW_RATIONAL))
+          {
+            z /= Lc (z);
+            z *= bCommonDen (z);
+          }
+          if (lc (z).sign() < 0)
+            z= -z;
           F.append( CFFactor( z, i ) );
+        }
         i++;
         w = y; c = c / y;
     }
     if ( degree( w,v ) > 0 )
+    {
+      if (isOn (SW_RATIONAL))
+      {
+        w /= Lc (w);
+        w *= bCommonDen (w);
+      }
+      if (lc (w).sign() < 0)
+        w= -w;
       F.append( CFFactor( w, i ) );
+    }
     if ( ! cont.isOne() )
     {
         CFFList buf= sqrFreeZ (cont);
