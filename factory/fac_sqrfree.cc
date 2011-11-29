@@ -139,8 +139,10 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 {
     if ( a.inCoeffDomain() )
         return CFFactor( a, 1 );
-    CanonicalForm cont = content( a );
-    CanonicalForm aa = a / cont;
+    CanonicalForm LcA= Lc (a);
+    CanonicalForm aa= a/LcA;
+    CanonicalForm cont = content( aa );
+    aa /= cont;
     CanonicalForm b = aa.deriv(), c = gcd( aa, b );
     CanonicalForm y, z, w = aa / c;
     int i = 1;
@@ -150,34 +152,19 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     {
         y = gcd( w, c ); z = w / y;
         if ( degree( z, v ) > 0 )
-        {
-            if ( lc( z ).sign() < 0 )
-                F.append( CFFactor( -z, i ) );
-            else
-                F.append( CFFactor( z, i ) );
-        }
+          F.append( CFFactor( z, i ) );
         i++;
         w = y; c = c / y;
     }
     if ( degree( w,v ) > 0 )
-    {
-        if ( lc( w ).sign() < 0 )
-            F.append( CFFactor( -w, i ) );
-        else
-            F.append( CFFactor( w, i ) );
-    }
+      F.append( CFFactor( w, i ) );
     if ( ! cont.isOne() )
-        F = Union( F, sqrFreeZ( cont ) );
-    if ( lc( a ).sign() < 0 )
     {
-        if ( F.getFirst().exp() == 1 )
-        {
-            CanonicalForm f = F.getFirst().factor();
-            CFFListIterator(F).getItem() = CFFactor( -f, 1 );
-        }
-        else
-            F.insert( CFFactor( -1, 1 ) );
+        CFFList buf= sqrFreeZ (cont);
+        buf.removeFirst();
+        F = Union( F, buf );
     }
+    F.insert (CFFactor (LcA, 1));
     return F;
 }
 
