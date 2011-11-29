@@ -12,7 +12,6 @@
  **/
 /*****************************************************************************/
 
-#include <config.h>
 
 #include "canonicalform.h"
 #include "cf_map.h"
@@ -127,10 +126,10 @@ int* liftingBounds (const CanonicalForm& A, const int& bivarLiftBound)
   return liftBounds;
 }
 
-CanonicalForm shift2Zero (const CanonicalForm& F, CFList& Feval, const CFList& evaluation)
+CanonicalForm shift2Zero (const CanonicalForm& F, CFList& Feval, const CFList& evaluation, int l)
 {
   CanonicalForm A= F;
-  int k= A.level();
+  int k= evaluation.length() + l - 1;
   for (CFListIterator i= evaluation; i.hasItem(); i++, k--)
     A= A (Variable (k) + i.getItem(), k);
   CanonicalForm buf= A;
@@ -144,12 +143,12 @@ CanonicalForm shift2Zero (const CanonicalForm& F, CFList& Feval, const CFList& e
   return A;
 }
 
-CanonicalForm reverseShift (const CanonicalForm& F, const CFList& evaluation)
+CanonicalForm reverseShift (const CanonicalForm& F, const CFList& evaluation, int l)
 {
-  int l= evaluation.length() + 1;
+  int k= evaluation.length() + l - 1;
   CanonicalForm result= F;
   CFListIterator j= evaluation;
-  for (int i= l; i > 1; i--, j++)
+  for (int i= k; j.hasItem() && (i > l - 1); i--, j++)
   {
     if (F.level() < i)
       continue;
