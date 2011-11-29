@@ -96,4 +96,7 @@ EZGCD_P (const CanonicalForm& A, const CanonicalForm& B);
 
 CanonicalForm
 randomIrredpoly (int i, const Variable & x) ;
+
+CFArray
+getMonoms (const CanonicalForm& F);
 #endif

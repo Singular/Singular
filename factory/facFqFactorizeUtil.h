@@ -16,7 +16,6 @@
 #define FAC_FQ_FACTORIZE_UTIL_H
 
 // #include "config.h"
-
 #include "canonicalform.h"
 #include "cf_map.h"
 
@@ -107,7 +106,9 @@ shift2Zero (const CanonicalForm& F,  ///< [in] a compressed poly
             CFList& Feval,           ///< [in,out] an empty list, returns
                                      ///< @a F successively evaluated
                                      ///< at 0
-            const CFList& evaluation ///< [in] a valid evaluation point
+            const CFList& evaluation,///< [in] a valid evaluation point
+            int l= 2                 ///< [in] level at which the evaluation
+                                     ///< starts
            );
 
 /// reverse shifting the evaluation point to zero
@@ -115,8 +116,10 @@ shift2Zero (const CanonicalForm& F,  ///< [in] a compressed poly
 /// @return @a reverseShift returns a poly whose shift to zero is reversed
 /// @sa shift2Zero(), evalPoints()
 CanonicalForm reverseShift (const CanonicalForm& F,  ///< [in] a compressed poly
-                            const CFList& evaluation ///< [in] a valid
+                            const CFList& evaluation,///< [in] a valid
                                                      ///< evaluation point
+                            int l= 2                 ///< [in] level at which
+                                                     ///< the evaluation starts
                            );
 
 #endif
