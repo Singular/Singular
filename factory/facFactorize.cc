@@ -27,6 +27,7 @@
 #include "cf_map_ext.h"
 #include "algext.h"
 #include "cf_reval.h"
+#include "facSparseHensel.h"
 
 CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
 {

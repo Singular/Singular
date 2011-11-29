@@ -260,6 +260,20 @@ factorRecombination (const CanonicalForm& F,///< [in] poly to be factored
                                             ///< Variables
                     );
 
+/// recombination of bivariate factors @a factors1 s. t. the result evaluated
+/// at @a evalPoint coincides with @a factors2
+CFList
+recombination (const CFList& factors1,        ///<[in] list of bivariate factors
+               const CFList& factors2,        ///<[in] list univariate factors
+               int s,                         ///<[in] algorithm starts checking
+                                              ///<  subsets of size s
+               int thres,                     ///<[in] threshold for the size of
+                                              ///<  subsets which are checked
+               const CanonicalForm& evalPoint,///<[in] evaluation point
+               const Variable& x              ///<[in] second variable of
+                                              ///< bivariate factors
+              );
+
 /// Lift bound adaption. Essentially an early factor detection but only the lift
 /// bound is adapted.
 ///
