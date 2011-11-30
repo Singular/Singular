@@ -1630,6 +1630,8 @@ KEYWORDS: delta invariant; Tjurina number
         gdummy = gdummy + lead(fdummy);
       }
    ideal SQRpart = sqrfree(gdummy);
+   int iii;
+   for(iii=2;iii<=ncols(SQRpart);iii++) { SQRpart[1]=SQRpart[1]*SQRpart[iii]; }
    int IntForRet;
    if(deg(SQRpart[1])==intMult)
      {
