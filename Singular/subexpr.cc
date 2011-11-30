@@ -1642,32 +1642,62 @@ int sleftv::Eval()
       }
       else nok=TRUE;
     }
-    else if (d->argc==1)
+    else
     {
-      nok=d->arg1.Eval();
-      nok=nok||iiExprArith1(this,&d->arg1,d->op);
-    }
-    else if(d->argc==2)
-    {
-      nok=d->arg1.Eval();
-      nok=nok||d->arg2.Eval();
-      nok=nok||iiExprArith2(this,&d->arg1,d->op,&d->arg2);
-    }
-    else if(d->argc==3)
-    {
-      nok=d->arg1.Eval();
-      nok=nok||d->arg2.Eval();
-      nok=nok||d->arg3.Eval();
-      nok=nok||iiExprArith3(this,d->op,&d->arg1,&d->arg2,&d->arg3);
-    }
-    else if(d->argc!=0)
-    {
-      nok=d->arg1.Eval();
-      nok=nok||iiExprArithM(this,&d->arg1,d->op);
-    }
-    else // d->argc == 0
-    {
-      nok = iiExprArithM(this, NULL, d->op);
+      int toktype=iiTokType(d->op);
+      if ((toktype==CMD_M)
+      ||( toktype==ROOT_DECL_LIST)
+      ||( toktype==IDEAL_CMD)
+      ||( toktype==MODUL_CMD))
+      {
+        if (d->argc <=3)
+        {
+          if (d->argc>=1) nok=d->arg1.Eval();
+          if ((!nok) && (d->argc>=2))
+          { nok=d->arg2.Eval(); d->arg1.next=&d->arg2; }
+          if ((!nok) && (d->argc==3))
+          { nok=d->arg3.Eval(); d->arg2.next=&d->arg3; }
+          if (d->argc==0)
+            nok=nok||iiExprArithM(this,NULL,d->op);
+          else
+            nok=nok||iiExprArithM(this,&d->arg1,d->op);
+          d->arg1.next=NULL;
+          d->arg2.next=NULL;
+          d->arg3.next=NULL;
+        }
+        else
+        {
+          nok=d->arg1.Eval();
+          nok=nok||iiExprArithM(this,&d->arg1,d->op);
+        }
+      }
+      else if (d->argc==1)
+      {
+        nok=d->arg1.Eval();
+        nok=nok||iiExprArith1(this,&d->arg1,d->op);
+      }
+      else if(d->argc==2)
+      {
+        nok=d->arg1.Eval();
+        nok=nok||d->arg2.Eval();
+        nok=nok||iiExprArith2(this,&d->arg1,d->op,&d->arg2);
+      }
+      else if(d->argc==3)
+      {
+        nok=d->arg1.Eval();
+        nok=nok||d->arg2.Eval();
+        nok=nok||d->arg3.Eval();
+        nok=nok||iiExprArith3(this,d->op,&d->arg1,&d->arg2,&d->arg3);
+      }
+      else if(d->argc!=0)
+      {
+        nok=d->arg1.Eval();
+        nok=nok||iiExprArithM(this,&d->arg1,d->op);
+      }
+      else // d->argc == 0
+      {
+        nok = iiExprArithM(this, NULL, d->op);
+      }
     }
   }
   else if (((rtyp==0)||(rtyp==DEF_CMD))

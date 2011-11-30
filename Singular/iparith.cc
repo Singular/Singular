@@ -228,6 +228,16 @@ poly pHeadProc(poly p)
   return pHead(p);
 } 
 
+int iiTokType(int op)
+{
+  for (int i=0;i<sArithBase.nCmdUsed;i++)
+  {
+    if (sArithBase.sCmds[i].tokval==op)
+      return sArithBase.sCmds[i].toktype;
+  }
+  return 0;
+}
+
 /*=================== operations with 2 args.: static proc =================*/
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
