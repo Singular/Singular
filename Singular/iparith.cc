@@ -1515,15 +1515,6 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   omFreeBin((ADDRESS)sl, sleftv_bin);
   return FALSE;
 }
-static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
-{
-  u->next=(leftv)omAllocBin(sleftv_bin);
-  memcpy(u->next,v,sizeof(sleftv));
-  BOOLEAN r=iiExprArithM(res,u,iiOp);
-  v->Init();
-  // iiExprArithM did the CleanUp
-  return r;
-}
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
@@ -5363,19 +5354,6 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
   memcpy(v->next,w,sizeof(sleftv));
   memset(w,0,sizeof(sleftv));
   return jjPROC(res,u,v);
-}
-static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
-{
-  u->next=(leftv)omAllocBin(sleftv_bin);
-  memcpy(u->next,v,sizeof(sleftv));
-  u->next->next=(leftv)omAllocBin(sleftv_bin);
-  memcpy(u->next->next,w,sizeof(sleftv));
-  BOOLEAN r=iiExprArithM(res,u,iiOp);
-  v->Init();
-  w->Init();
-  //w->rtyp=0; w->data=NULL;
-  // iiExprArithM did the CleanUp
-  return r;
 }
 static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
 {
