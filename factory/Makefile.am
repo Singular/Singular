@@ -6,11 +6,12 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_build
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
-libfactory_la_libdir = $(libdir)
-libfactory_g_la_libdir = $(libdir)
-
 libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
+libfactory_la_LIBADD     = ${GMP_LIBS} ${NTL_LIBS}
+libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
+libfactory_g_la_LIBADD   = ${GMP_LIBS} ${NTL_LIBS}
+libfactory_g_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
 # factory source files
 SOURCES = \
