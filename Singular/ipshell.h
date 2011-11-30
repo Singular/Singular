@@ -84,6 +84,7 @@ char *  iiConvName(const char *libname);
 BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
                          idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
 
+int iiTokType(int op);
 
 /* ================================================================== */
 /* Expressions : */
