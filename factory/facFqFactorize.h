@@ -514,15 +514,16 @@ getLeadingCoeffs (const CanonicalForm& A,  ///< [in] some poly
                  );
 
 /// normalize precomputed leading coefficients such that leading coefficients
-/// evaluated at 0 in K^(n-2) equal the leading coeffs wrt Variable(1) of 
-/// bivariate factors
+/// evaluated at @a evaluation in K^(n-2) equal the leading coeffs wrt 
+/// Variable(1) of bivariate factors
 void
 prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out] 
                       int n,                      ///<[in] level of poly to be
                                                   ///< factored
                       const CFList& leadingCoeffs,///<[in] precomputed leading
                                                   ///< coeffs
-                      const CFList& biFactors     ///<[in] bivariate factors
+                      const CFList& biFactors,    ///<[in] bivariate factors
+                      const CFList& evaluation    ///<[in] evaluation point
                      );
 
 /// obtain factors of F by reconstructing their leading coeffs
@@ -578,6 +579,25 @@ sparseHeuristic (const CanonicalForm& A,  ///<[in] polynomial to be factored
                  const CFList& evaluation,///<[in] evaluation point
                  int minFactorsLength     ///<[in] minimal number of factors
                 );
+
+/// evaluate @a F at @a evaluation
+///
+/// @return @a evaluateAtEval returns a list containing the successive 
+/// evaluations of @a F, last entry is @a F again
+CFList
+evaluateAtEval (const CanonicalForm& F,   ///<[in] some poly
+                const CFArray& evaluation ///<[in] some evaluation point
+               );
+
+/// evaluate @a F at @a evaluation
+///
+/// @return @a evaluateAtEval returns a list containing the successive
+/// evaluations of @a F starting at level @a l, last entry is @a F again
+CFList
+evaluateAtEval (const CanonicalForm& F,  ///<[in] some poly
+                const CFList& evaluation,///<[in] some evaluation point
+                int l                    ///<[in] level to start at
+               );
 
 #endif
 /* FAC_FQ_FACTORIZE_H */
