@@ -2570,6 +2570,28 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   A /= hh;
 
+  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+      factors))
+  {
+    int check= factors.length();
+    factors= recoverFactors (A, factors);
+
+    if (check == factors.length())
+    {
+      if (extension)
+        factors= extNonMonicFactorRecombination (factors, A, info);
+
+      appendSwapDecompress (factors, contentAFactors, N, swapLevel,
+                            swapLevel2, x);
+      normalize (factors);
+      delete [] Aeval2;
+      return factors;
+    }
+    else
+      factors= CFList();
+    //TODO handle this case
+  }
+
   A= shift2Zero (A, Aeval, evaluation);
 
   for (iter= biFactors; iter.hasItem(); iter++)

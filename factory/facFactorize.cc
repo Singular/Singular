@@ -843,6 +843,24 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A /= hh;
 
+  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+      factors))
+  {
+    int check= factors.length();
+    factors= recoverFactors (A, factors);
+
+    if (check == factors.length())
+    {
+      appendSwapDecompress (factors, contentAFactors, N, 0, 0, x);
+      normalize (factors);
+      delete [] Aeval2;
+      return factors;
+    }
+    else
+      factors= CFList();
+  }
+
+
   //shifting to zero
   A= shift2Zero (A, Aeval, evaluation);
 
