@@ -126,33 +126,34 @@
      ROOT_DECL = 352,
      ROOT_DECL_LIST = 353,
      RING_DECL = 354,
-     EXAMPLE_CMD = 355,
-     EXPORT_CMD = 356,
-     HELP_CMD = 357,
-     KILL_CMD = 358,
-     LIB_CMD = 359,
-     LISTVAR_CMD = 360,
-     SETRING_CMD = 361,
-     TYPE_CMD = 362,
-     STRINGTOK = 363,
-     BLOCKTOK = 364,
-     INT_CONST = 365,
-     UNKNOWN_IDENT = 366,
-     RINGVAR = 367,
-     PROC_DEF = 368,
-     BREAK_CMD = 369,
-     CONTINUE_CMD = 370,
-     ELSE_CMD = 371,
-     EVAL = 372,
-     QUOTE = 373,
-     FOR_CMD = 374,
-     IF_CMD = 375,
-     SYS_BREAK = 376,
-     WHILE_CMD = 377,
-     RETURN = 378,
-     PARAMETER = 379,
-     SYSVAR = 380,
-     UMINUS = 381
+     RING_DECL_LIST = 355,
+     EXAMPLE_CMD = 356,
+     EXPORT_CMD = 357,
+     HELP_CMD = 358,
+     KILL_CMD = 359,
+     LIB_CMD = 360,
+     LISTVAR_CMD = 361,
+     SETRING_CMD = 362,
+     TYPE_CMD = 363,
+     STRINGTOK = 364,
+     BLOCKTOK = 365,
+     INT_CONST = 366,
+     UNKNOWN_IDENT = 367,
+     RINGVAR = 368,
+     PROC_DEF = 369,
+     BREAK_CMD = 370,
+     CONTINUE_CMD = 371,
+     ELSE_CMD = 372,
+     EVAL = 373,
+     QUOTE = 374,
+     FOR_CMD = 375,
+     IF_CMD = 376,
+     SYS_BREAK = 377,
+     WHILE_CMD = 378,
+     RETURN = 379,
+     PARAMETER = 380,
+     SYSVAR = 381,
+     UMINUS = 382
    };
 #endif
 #define DOTDOT 258
@@ -252,33 +253,34 @@
 #define ROOT_DECL 352
 #define ROOT_DECL_LIST 353
 #define RING_DECL 354
-#define EXAMPLE_CMD 355
-#define EXPORT_CMD 356
-#define HELP_CMD 357
-#define KILL_CMD 358
-#define LIB_CMD 359
-#define LISTVAR_CMD 360
-#define SETRING_CMD 361
-#define TYPE_CMD 362
-#define STRINGTOK 363
-#define BLOCKTOK 364
-#define INT_CONST 365
-#define UNKNOWN_IDENT 366
-#define RINGVAR 367
-#define PROC_DEF 368
-#define BREAK_CMD 369
-#define CONTINUE_CMD 370
-#define ELSE_CMD 371
-#define EVAL 372
-#define QUOTE 373
-#define FOR_CMD 374
-#define IF_CMD 375
-#define SYS_BREAK 376
-#define WHILE_CMD 377
-#define RETURN 378
-#define PARAMETER 379
-#define SYSVAR 380
-#define UMINUS 381
+#define RING_DECL_LIST 355
+#define EXAMPLE_CMD 356
+#define EXPORT_CMD 357
+#define HELP_CMD 358
+#define KILL_CMD 359
+#define LIB_CMD 360
+#define LISTVAR_CMD 361
+#define SETRING_CMD 362
+#define TYPE_CMD 363
+#define STRINGTOK 364
+#define BLOCKTOK 365
+#define INT_CONST 366
+#define UNKNOWN_IDENT 367
+#define RINGVAR 368
+#define PROC_DEF 369
+#define BREAK_CMD 370
+#define CONTINUE_CMD 371
+#define ELSE_CMD 372
+#define EVAL 373
+#define QUOTE 374
+#define FOR_CMD 375
+#define IF_CMD 376
+#define SYS_BREAK 377
+#define WHILE_CMD 378
+#define RETURN 379
+#define PARAMETER 380
+#define SYSVAR 381
+#define UMINUS 382
 
 
 
