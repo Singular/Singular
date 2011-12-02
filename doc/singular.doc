@@ -1,5 +1,4 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id$
 @comment this file contains the main structure of the manual
 
 
@@ -915,6 +914,7 @@ Comments should be send to the author of the library directly.
 * finitediff_lib:: finite difference schemes for linear differential equations
 * lll_lib:: Integral LLL-Algorithm
 * multigrading_lib:: Multigradings and related computations
+* realclassify_lib:: Classification of real singularities
 @end menu
 @c ----------------------------------------------------------
 @node findifs_lib, finitediff_lib, , Experimental libraries
@@ -943,7 +943,7 @@ Issues:
 @subsection lll_lib
 @c lib lll.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,,lll_lib, Experimental libraries
+@node multigrading_lib,realclassify_lib,lll_lib, Experimental libraries
 @subsection multigrading_lib
 
 Todos/Issues:
@@ -952,6 +952,10 @@ Todos/Issues:
 @end itemize
 
 @c lib multigrading.lib
+@c ----------------------------------------------------------
+@node realclassify_lib,, multigrading_lib, Experimental libraries
+@subsection realclassify_lib
+@c lib realclassify.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
