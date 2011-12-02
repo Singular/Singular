@@ -1,4 +1,12 @@
-iChanes since 3-1-3-2:
+Chanes since 3-1-3-3:
+- new library: realclassify.lib
+- new library: parallel.lib
+- test code for threads/semaphores
+- libray grobcov.lib updated
+- library modstd.lib updated
+- fix sqrfree
+
+Chanes since 3-1-3-2:
 - blackbox types, newstruct etc.
 - factory fixes: implemnts factorize/gcd for more kinds of polynomials
 - Do 29. Sep 17:34:08 CEST 2011: 3-1-3-3
