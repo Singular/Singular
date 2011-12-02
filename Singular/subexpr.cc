@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id$ */
+/* $Id: subexpr.cc 14447 2011-11-30 20:00:05Z motsak $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -289,7 +289,7 @@ void sleftv::CleanUp(ring r)
   if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL) && (rtyp!=ALIAS_CMD))
   {
     //::Print("free %x (%s)\n",name,name);
-    omFree((ADDRESS)name);
+    omFreeBinAddr((ADDRESS)name);
   }
   //name=NULL;
   //flag=0;
@@ -443,7 +443,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case MAP_CMD:
     {
       map m=(map)d;
-      omFree((ADDRESS)m->preimage);
+      omFreeBinAddr((ADDRESS)m->preimage);
       m->preimage=NULL;
       /* no break: continue as IDEAL*/
     }
@@ -855,7 +855,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
             sprintf(ns, "link(\"%s\")", s);
-            omFree(s);
+            omFreeBinAddr(s);
             omCheckAddr(ns);
             return ns;
           }
@@ -1335,7 +1335,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       {
         if (currRingHdl!=NULL)
         {
-          if (id!=IDID(currRingHdl)) omFree((ADDRESS)id);
+          if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
           h=currRingHdl;
           goto id_found;
         }
@@ -1349,7 +1349,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       {
         if (currPackHdl!=NULL)
         {
-          omFree((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id);
           h=currPackHdl;
           goto id_found;
         }
@@ -1368,7 +1368,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        if (id!=IDID(h)) omFree((ADDRESS)id);
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);
         goto id_found;
       }
     }
@@ -1395,7 +1395,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /* 5. existing identifier, global */
     if (h!=NULL)
     {
-      if (id!=IDID(h)) omFree((ADDRESS)id);
+      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);
       goto id_found;
     }
     /* 6. local ring: number/poly */
@@ -1414,7 +1414,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           // in this case we may have monomials equal to 0 in p_Read
           v->name = id;
           #else
-          omFree((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id);
           #endif
         }
         else if (pIsConstant(p))
@@ -1452,7 +1452,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           // in this case we may have monomials equal to 0 in p_Read
           v->name = id;
           #else
-          omFree((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id);
           #endif
         }
         else
@@ -1478,7 +1478,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) omFree((ADDRESS)id);
+        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id);
         h=currRingHdl;
         goto id_found;
       }
@@ -1488,7 +1488,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       h=basePack->idroot->get(id,myynest);
       if (h!=NULL)
       {
-        if (id!=IDID(h)) omFree((ADDRESS)id);
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);
         v->req_packhdl=basePack;
         goto id_found;
       }
@@ -1501,7 +1501,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   /* 9: _ */
   if (strcmp(id,"_")==0)
   {
-    omFree((ADDRESS)id);
+    omFreeBinAddr((ADDRESS)id);
     v->Copy(&sLastPrinted);
   }
   else
@@ -1618,8 +1618,7 @@ int sleftv::Eval()
       int toktype=iiTokType(d->op);
       if ((toktype==CMD_M)
       ||( toktype==ROOT_DECL_LIST)
-      ||( toktype==IDEAL_CMD)
-      ||( toktype==MODUL_CMD))
+      ||( toktype==RING_DECL_LIST))
       {
         if (d->argc <=3)
         {
