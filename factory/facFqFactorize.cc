@@ -1604,71 +1604,97 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     }
   }
 
+  CFList interMedResult;
+  CanonicalForm oldSqrfPartF= sqrfPartF;
   sqrfPartF= shift2Zero (sqrfPartF, evalSqrfPartF, evaluation2, 1);
   if (factors.length() > 1)
   {
-    CanonicalForm LC1= LC (evalSqrfPartF.getFirst(), 1);
-
-    CFArray leadingCoeffs= CFArray (factors.length());
+    CanonicalForm LC1= LC (oldSqrfPartF, 1);
+    CFList leadingCoeffs;
     for (int i= 0; i < factors.length(); i++)
-      leadingCoeffs[i]= LC1;
+      leadingCoeffs.append (LC1);
 
-    for (CFListIterator i= factors; i.hasItem(); i++)
+    CFList LC1eval= evaluateAtEval (LC1, evaluation2, 1);
+    CFList oldFactors= factors;
+    for (CFListIterator i= oldFactors; i.hasItem(); i++)
+      i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
+
+    bool success= false;
+    if (LucksWangSparseHeuristic (oldSqrfPartF*power (LC1, factors.length()-1),
+                                  oldFactors, 1, leadingCoeffs, factors))
     {
-      i.getItem()= i.getItem() (x + evaluation2.getLast(), x);
-      i.getItem() *= LC1 (0,2)/Lc (i.getItem());
+      interMedResult= recoverFactors (oldSqrfPartF, factors);
+      if (oldFactors.length() == interMedResult.length())
+        success= true;
     }
-    factors.insert (1);
-
-    CanonicalForm
-    newSqrfPartF= evalSqrfPartF.getFirst()*power (LC1, factors.length() - 2);
-
-    int liftBound= degree (newSqrfPartF,2) + 1;
-
-    CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
-    CFArray Pi;
-    CFList diophant;
-    henselLift122 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
-                   leadingCoeffs, false);
-
-    if (sqrfPartF.level() > 2)
+    if (!success)
     {
-      int* liftBounds= new int [sqrfPartF.level() - 1];
-      liftBounds [0]= liftBound;
-      bool noOneToOne= false;
-      CFList *leadingCoeffs2= new CFList [sqrfPartF.level()-2];
-      LC1= LC (evalSqrfPartF.getLast(), 1);
-      CFList LCs;
-      for (int i= 0; i < factors.length(); i++)
-        LCs.append (LC1);
-      leadingCoeffs2 [sqrfPartF.level() - 3]= LCs;
-      for (int i= sqrfPartF.level() - 1; i > 2; i--)
-      {
-        for (CFListIterator j= LCs; j.hasItem(); j++)
-          j.getItem()= j.getItem() (0, i + 1);
-        leadingCoeffs2 [i - 3]= LCs;
-      }
-      sqrfPartF= sqrfPartF*power (LC1, factors.length()-1);
+      LC1= LC (evalSqrfPartF.getFirst(), 1);
 
-      int liftBoundsLength= sqrfPartF.level() - 1;
-      for (int i= 1; i < liftBoundsLength; i++)
-        liftBounds [i]= degree (sqrfPartF, i + 2) + 1;
-      evalSqrfPartF= evaluateAtZero (sqrfPartF);
-      evalSqrfPartF.removeFirst();
-      factors= nonMonicHenselLift (evalSqrfPartF, factors, leadingCoeffs2,
-               diophant, Pi, liftBounds, sqrfPartF.level() - 1, noOneToOne);
-      delete [] leadingCoeffs2;
-      delete [] liftBounds;
+      CFArray leadingCoeffs= CFArray (factors.length());
+      for (int i= 0; i < factors.length(); i++)
+        leadingCoeffs[i]= LC1;
+
+      for (CFListIterator i= factors; i.hasItem(); i++)
+      {
+        i.getItem()= i.getItem() (x + evaluation2.getLast(), x);
+        i.getItem() *= LC1 (0,2)/Lc (i.getItem());
+      }
+      factors.insert (1);
+
+      CanonicalForm
+      newSqrfPartF= evalSqrfPartF.getFirst()*power (LC1, factors.length() - 2);
+
+      int liftBound= degree (newSqrfPartF,2) + 1;
+
+      CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
+      CFArray Pi;
+      CFList diophant;
+      henselLift122 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
+                     leadingCoeffs, false);
+
+      if (sqrfPartF.level() > 2)
+      {
+        int* liftBounds= new int [sqrfPartF.level() - 1];
+        liftBounds [0]= liftBound;
+        bool noOneToOne= false;
+        CFList *leadingCoeffs2= new CFList [sqrfPartF.level()-2];
+        LC1= LC (evalSqrfPartF.getLast(), 1);
+        CFList LCs;
+        for (int i= 0; i < factors.length(); i++)
+          LCs.append (LC1);
+        leadingCoeffs2 [sqrfPartF.level() - 3]= LCs;
+        for (int i= sqrfPartF.level() - 1; i > 2; i--)
+        {
+          for (CFListIterator j= LCs; j.hasItem(); j++)
+            j.getItem()= j.getItem() (0, i + 1);
+          leadingCoeffs2 [i - 3]= LCs;
+        }
+        sqrfPartF *= power (LC1, factors.length()-1);
+
+        int liftBoundsLength= sqrfPartF.level() - 1;
+        for (int i= 1; i < liftBoundsLength; i++)
+          liftBounds [i]= degree (sqrfPartF, i + 2) + 1;
+        evalSqrfPartF= evaluateAtZero (sqrfPartF);
+        evalSqrfPartF.removeFirst();
+        factors= nonMonicHenselLift (evalSqrfPartF, factors, leadingCoeffs2,
+                 diophant, Pi, liftBounds, sqrfPartF.level() - 1, noOneToOne);
+        delete [] leadingCoeffs2;
+        delete [] liftBounds;
+      }
+      for (CFListIterator iter= factors; iter.hasItem(); iter++)
+        iter.getItem()= reverseShift (iter.getItem(), evaluation2, 1);
+
+      interMedResult=
+      recoverFactors (reverseShift(evalSqrfPartF.getLast(),evaluation2,1),
+                      factors);
     }
   }
   else
-    factors= evalSqrfPartF.getLast();
-
-  for (CFListIterator iter= factors; iter.hasItem(); iter++)
-    iter.getItem()= reverseShift (iter.getItem(), evaluation2, 1);
-
-  CFList interMedResult=
-  recoverFactors (reverseShift(evalSqrfPartF.getLast(),evaluation2,1), factors);
+  {
+    factors= CFList (oldSqrfPartF);
+    interMedResult= recoverFactors (oldSqrfPartF, factors);
+  }
 
   CFList result;
   CFFListIterator k;
