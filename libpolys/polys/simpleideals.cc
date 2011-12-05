@@ -1229,7 +1229,7 @@ matrix id_Module2Matrix(ideal mod, const ring R)
 #ifdef TEST
       if (cp>mod->rank)
       {
-        Print("## inv. rank %ld -> %d\n",mod->rank,cp);
+        Print("## inv. rank %ld -> %ld\n",mod->rank,cp);
         int k,l,o=mod->rank;
         mod->rank=cp;
         matrix d=mpNew(mod->rank,IDELEMS(mod));

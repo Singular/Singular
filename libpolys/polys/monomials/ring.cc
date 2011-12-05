@@ -1603,7 +1603,7 @@ ring rCopy(ring r)
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
-    if( nc_rCopy(res, r, true) );
+    if( nc_rCopy(res, r, true) ) {}
 #endif
 
   return res;

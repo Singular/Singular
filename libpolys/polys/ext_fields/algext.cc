@@ -570,7 +570,7 @@ number naConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
   poly p=convFactoryPSingP(n,naRing);
   return (number)p;
 }
-CanonicalForm naConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
+CanonicalForm naConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs cf )
 {
   naTest(n);
   if (n==NULL) return CanonicalForm(0);
@@ -638,7 +638,7 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
 }
 #endif
 
-number naCopyExt(number a, const coeffs src, const coeffs dst)
+number naCopyExt(number a, const coeffs src, const coeffs)
 {
   fraction fa=(fraction)a;
   return (number)p_Copy(NUM(fa),src->extRing);

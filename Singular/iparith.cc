@@ -207,12 +207,7 @@ extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
 /*============= proc =======================*/
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport = FALSE);
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
-#ifdef MDEBUG
-#define jjMakeSub(A) jjDBMakeSub(A,__FILE__,__LINE__)
-static Subexpr jjDBMakeSub(leftv e,const char *f,const  int l);
-#else
 static Subexpr jjMakeSub(leftv e);
-#endif
 
 /*============= vars ======================*/
 extern int cmdtok;
@@ -533,7 +528,6 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
     return TRUE;
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
-  int dummy;
   if ((u_p!=NULL)
   && ((v_i!=0) && 
       ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i)))
@@ -821,7 +815,6 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
 {
   poly a;
   poly b;
-  int dummy;
   if (v->next==NULL)
   {
     a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
@@ -1624,7 +1617,6 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
     else                    p=(intvec*)v->Data();
     int rl=c->nr+1;
-    poly r=NULL,h;
     ideal result;
     ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
     int i;
@@ -1886,12 +1878,12 @@ static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
   //setFlag(res,FLAG_STD);
   return FALSE;
 }
-static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
+static BOOLEAN jjEXPORTTO(leftv, leftv u, leftv v)
 {
   //Print("exportto %s -> %s\n",v->Name(),u->Name() );
   return iiExport(v,0,(idhdl)u->data);
 }
-static BOOLEAN jjERROR(leftv res, leftv u)
+static BOOLEAN jjERROR(leftv, leftv u)
 {
   WerrorS((char *)u->Data());
   extern int inerror;
@@ -2417,7 +2409,7 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
-static BOOLEAN jjLOAD2(leftv res, leftv u,leftv v)
+static BOOLEAN jjLOAD2(leftv res, leftv, leftv v)
 {
   return jjLOAD(res, v,TRUE);
 }
@@ -2505,7 +2497,7 @@ static BOOLEAN jjMONITOR1(leftv res, leftv v)
 {
   return jjMONITOR2(res,v,NULL);
 }
-static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
+static BOOLEAN jjMONITOR2(leftv, leftv u,leftv v)
 {
 #if 0
   char *opt=(char *)v->Data();
@@ -2570,7 +2562,7 @@ static BOOLEAN jjMONOM(leftv res, leftv v)
   if(err) { pDelete(&p); WerrorS("no negative exponent allowed"); }
   return err;
 }
-static BOOLEAN jjNEWSTRUCT2(leftv res, leftv u, leftv v)
+static BOOLEAN jjNEWSTRUCT2(leftv, leftv u, leftv v)
 {
   // u: the name of the new type
   // v: the elements
@@ -2952,8 +2944,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     WerrorS("length for res must not be negative");
     return TRUE;
   }
-  int l=0;
-  //resolvente r;
   syStrategy r;
   intvec *weights=NULL;
   int wmaxl=maxl;
@@ -3390,7 +3380,7 @@ static BOOLEAN jjWEDGE(leftv res, leftv u, leftv v)
 }
 #define jjWRONG2 (proc2)jjWRONG
 #define jjWRONG3 (proc3)jjWRONG
-static BOOLEAN jjWRONG(leftv res, leftv u)
+static BOOLEAN jjWRONG(leftv, leftv)
 {
   return TRUE;
 }
@@ -3404,7 +3394,7 @@ static BOOLEAN jjDUMMY(leftv res, leftv u)
   res->data = (char *)u->CopyD();
   return FALSE;
 }
-static BOOLEAN jjNULL(leftv res, leftv u)
+static BOOLEAN jjNULL(leftv, leftv)
 {
   return FALSE;
 }
@@ -3418,7 +3408,7 @@ static BOOLEAN jjNULL(leftv res, leftv u)
 //  res->data = (char *)((int)(long)u->Data()-1);
 //  return FALSE;
 //}
-static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
+static BOOLEAN jjPLUSPLUS(leftv, leftv u)
 {
   if (IDTYP((idhdl)u->data)==INT_CMD)
   {
@@ -3744,7 +3734,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   res->data = (char *)(long)scDimInt((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
-static BOOLEAN jjDUMP(leftv res, leftv v)
+static BOOLEAN jjDUMP(leftv, leftv v)
 {
   si_link l = (si_link)v->Data();
   if (slDump(l))
@@ -3770,7 +3760,7 @@ static BOOLEAN jjE(leftv res, leftv v)
   else WerrorS("argument of gen must be positive");
   return (co<=0);
 }
-static BOOLEAN jjEXECUTE(leftv res, leftv v)
+static BOOLEAN jjEXECUTE(leftv, leftv v)
 {
   char * d = (char *)v->Data();
   char * s = (char *)omAlloc(strlen(d) + 13);
@@ -3840,7 +3830,7 @@ static BOOLEAN jjFAC_P(leftv res, leftv u)
   return FALSE;
 }
 #endif
-static BOOLEAN jjGETDUMP(leftv res, leftv v)
+static BOOLEAN jjGETDUMP(leftv, leftv v)
 {
   si_link l = (si_link)v->Data();
   if (slGetDump(l))
@@ -3908,7 +3898,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
   res->data=(void *)po;
   return FALSE;
 }
-static BOOLEAN jjHILBERT(leftv res, leftv v)
+static BOOLEAN jjHILBERT(leftv, leftv v)
 {
 #ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
@@ -4075,7 +4065,7 @@ static BOOLEAN jjIS_RINGVAR_S(leftv res, leftv v)
   res->data = (char *)(long)(r_IsRingVar((char *)v->Data(), currRing)+1);
   return FALSE;
 }
-static BOOLEAN jjIS_RINGVAR0(leftv res, leftv v)
+static BOOLEAN jjIS_RINGVAR0(leftv res, leftv)
 {
   res->data = (char *)0;
   return FALSE;
@@ -4252,8 +4242,6 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
      Then, we also have P * M = L * U.
      A list [P, L, U] is returned. */
   matrix mat = (const matrix)v->Data();
-  int rr = mat->rows();
-  int cc = mat->cols();
   matrix pMat;
   matrix lMat;
   matrix uMat;
@@ -4272,7 +4260,6 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
-  long d;
   switch(((int)(long)v->Data()))
   {
   case 0:
@@ -4363,7 +4350,7 @@ static BOOLEAN jjNVARS(leftv res, leftv v)
   res->data = (char *)(long)(((ring)(v->Data()))->N);
   return FALSE;
 }
-static BOOLEAN jjOpenClose(leftv res, leftv v)
+static BOOLEAN jjOpenClose(leftv, leftv v)
 {
   si_link l=(si_link)v->Data();
   if (iiOp==OPEN_CMD) return slOpen(l, SI_LINK_OPEN,v);
@@ -4391,7 +4378,7 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
   }
   return FALSE;
 }
-static BOOLEAN jjPARDEG(leftv res, leftv v)
+static BOOLEAN jjPARDEG(leftv res, leftv)
 {
   if (rField_is_Extension(currRing))
   {
@@ -4509,7 +4496,6 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
 {
   char *s= (char *)v->Data();
   int i = 1;
-  int l = strlen(s);
   for(i=0; i<sArithBase.nCmdUsed; i++)
   {
     //Print("test %d, >>%s<<, tab:>>%s<<\n",i,s,sArithBase.sCmds[i].name);
@@ -4645,7 +4631,6 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
 extern int singclap_factorize_retry;
 static BOOLEAN jjSQR_FREE(leftv res, leftv u)
 {
-  intvec *v=NULL;
   singclap_factorize_retry=0;
   ideal f=singclap_sqrfree((poly)(u->CopyD()),currRing);
   if (f==NULL)
@@ -4878,7 +4863,7 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
   Lforks->Clean();
   return FALSE;
 }
-static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
+static BOOLEAN jjLOAD(leftv, leftv v, BOOLEAN autoexport)
 {
   char * s=(char *)v->CopyD();
   char libnamebuf[256];
@@ -5841,7 +5826,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   res->rtyp = IDEAL_CMD;
   return FALSE;
 }
-static BOOLEAN jjNEWSTRUCT3(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN jjNEWSTRUCT3(leftv, leftv u, leftv v, leftv w)
 {
   // u: the name of the new type
   // v: the parent type
@@ -5849,7 +5834,7 @@ static BOOLEAN jjNEWSTRUCT3(leftv res, leftv u, leftv v, leftv w)
   newstruct_desc d=newstructChildFromString((const char *)v->Data(),
                                             (const char *)w->Data());
   if (d!=NULL) newstruct_setup((const char *)u->Data(),d);
-  return d==NULL;
+  return (d==NULL);
 }
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 {
@@ -6267,14 +6252,14 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
 /*=================== operations with many arg.: static proc =================*/
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
-static BOOLEAN jjBREAK0(leftv res, leftv v)
+static BOOLEAN jjBREAK0(leftv, leftv)
 {
 #ifdef HAVE_SDB
   sdb_show_bp();
 #endif
   return FALSE;
 }
-static BOOLEAN jjBREAK1(leftv res, leftv v)
+static BOOLEAN jjBREAK1(leftv, leftv v)
 {
 #ifdef HAVE_SDB
   if(v->Typ()==PROC_CMD)
@@ -6315,7 +6300,7 @@ static BOOLEAN jjCALL3ARG(leftv res, leftv u)
   return b;
 }
 
-static BOOLEAN jjCOEF_M(leftv res, leftv v)
+static BOOLEAN jjCOEF_M(leftv, leftv v)
 {
   if((v->Typ() != VECTOR_CMD)
   || (v->next->Typ() != POLY_CMD)
@@ -6887,7 +6872,7 @@ BOOLEAN jjLIST_PL(leftv res, leftv v)
   res->data=(char *)L;
   return FALSE;
 }
-static BOOLEAN jjNAMES0(leftv res, leftv v)
+static BOOLEAN jjNAMES0(leftv res, leftv)
 {
   res->data=(void *)ipNameList(IDROOT);
   return FALSE;
@@ -7012,7 +6997,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
     return TRUE;
   }
 }
-static BOOLEAN jjRESERVED0(leftv res, leftv v)
+static BOOLEAN jjRESERVED0(leftv, leftv)
 {
   int i=1;
   int nCount = (sArithBase.nCmdUsed-1)/3;
@@ -7067,7 +7052,7 @@ static BOOLEAN jjSTRING_PL(leftv res, leftv v)
   res->data = s;
   return FALSE;
 }
-static BOOLEAN jjTEST(leftv res, leftv v)
+static BOOLEAN jjTEST(leftv, leftv v)
 {
   do
   {
@@ -7381,11 +7366,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
 }
 
 
-#ifdef MDEBUG
-static Subexpr jjDBMakeSub(leftv e,const char *f,const int l)
-#else
 static Subexpr jjMakeSub(leftv e)
-#endif
 {
   assume( e->Typ()==INT_CMD );
   Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
@@ -8234,7 +8215,6 @@ static int _gentable_sort_cmds( const void *a, const void *b )
 /*---------------------------------------------------------------------*/
 int iiInitArithmetic()
 {
-  int i;
   //printf("iiInitArithmetic()\n");
   memset(&sArithBase, 0, sizeof(sArithBase));
   iiInitCmdName();
@@ -8265,50 +8245,6 @@ int iiInitArithmetic()
   //iiArithAddCmd("mygcd", 2, GCD_CMD, CMD_2);
   //iiArithRemoveCmd("mygcd");
   //iiArithAddCmd("kkk", 1, 1234, CMD_1);
-  return 0;
-}
-
-/*---------------------------------------------------------------------*/
-/**
- * @brief append newitem of size sizeofitem to the list named list.
-
- @param[in,out] list
- @param[in,out] item_count
- @param[in] sizeofitem
- @param[in] newitem
-
- @retval  0 success
- @retval -1 failure
-**/
-/*---------------------------------------------------------------------*/
-int iiArithAddItem2list(
-  void **list,
-  long  *item_count,
-  long sizeofitem,
-  void *newitem
-  )
-{
-  int count = *item_count;
-
-  //TRACE(0, "add_item_to_list(%p, %p, %ld, %p)\n", list, item_count,
-  //       sizeofitem, newitem);
-
-  if(count==0)
-  {
-    *list = (void *)omAlloc(sizeofitem);
-  }
-  else
-  {
-    *list = (void *)omRealloc(*list, (count+1) * sizeofitem);
-  }
-  if((*list)==NULL) return -1;
-
-  //memset((*list)+count*sizeofitem, 0, sizeofitem);
-  //memcpy((*list)+count*sizeofitem, newitem, sizeofitem);
-
-  /* erhoehe counter um 1 */
-  (count)++;
-  *item_count = count;
   return 0;
 }
 

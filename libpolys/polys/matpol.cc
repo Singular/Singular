@@ -727,7 +727,7 @@ static void mp_PartClean(matrix a, int lr, int lc, const ring R)
   }
 }
 
-static void mp_FinalClean(matrix a, const ring R)
+static void mp_FinalClean(matrix a, const ring)
 {
   omFreeSize((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
   omFreeBin((ADDRESS)a, sip_sideal_bin);
@@ -1456,7 +1456,7 @@ static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const rin
 /*2*/
 /// entries of a are minors and go to result (only if not in R)
 void mp_MinorToResult(ideal result, int &elems, matrix a, int r, int c,
-                     ideal R, const ring ri)
+                     ideal R, const ring)
 {
   poly *q1;
   int e=IDELEMS(result);

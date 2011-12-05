@@ -1267,7 +1267,7 @@ int nlModP(number n, int p, const coeffs r)
   if (n->s!=3)
   {
     int in=mpz_fdiv_ui(n->n,(unsigned long)p);
-    long  s, t;
+    long  s;
 
     long  u, v, u0, v0, u1, v1, u2, v2, q, r;
 
@@ -2457,7 +2457,7 @@ static void nlMPZ(mpz_t m, number &n, const coeffs r)
 }
 
 
-static number nlInitMPZ(mpz_t m, const coeffs r)
+static number nlInitMPZ(mpz_t m, const coeffs)
 {
   number z = ALLOC_RNUMBER();
   mpz_init_set(z->z, m);

@@ -527,7 +527,6 @@ void sparse_mat::smToIntvec(intvec *v)
 */
 poly sparse_mat::smDet()
 {
-  int y;
   poly res = NULL;
 
   if (sign == 0)
@@ -937,7 +936,7 @@ void sparse_mat::smHElim()
   smpoly r = red;         // row to reduce
   smpoly res, a, b;
   poly ha, hr, x, y;
-  int e, ip, ir, ia, lev;
+  int e, ip, ir, ia;
 
   if ((c == NULL) || (r == NULL))
   {
@@ -1984,7 +1983,6 @@ static BOOLEAN sm_IsNegQuot(poly a, const poly b, const poly c, const ring R)
 
 static void sm_ExpMultDiv(poly t, const poly b, const poly c, const ring R)
 {
-  int i;
   p_Test(t,R);
   p_LmTest(b,R);
   p_LmTest(c,R);
@@ -2371,7 +2369,6 @@ public:
 ideal sm_CallSolv(ideal I, const ring R)
 {
   sparse_number_mat *linsolv;
-  ring origR;
   ring tmpR;
   ideal rr;
 

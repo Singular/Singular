@@ -204,7 +204,7 @@ int nfParDeg(number n, const coeffs r)
 /*2
 * number -> int
 */
-int nfInt (number &n, const coeffs r)
+int nfInt (number &, const coeffs )
 {
   return 0;
 }

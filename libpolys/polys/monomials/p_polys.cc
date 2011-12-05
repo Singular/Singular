@@ -3306,7 +3306,7 @@ poly p_Subst(poly p, int n, poly e, const ring r)
  * with permutation of parameters
  * NOTE: this only works for Frank's alg. & trans. fields
  */
-poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst)
+poly n_PermNumber(const number z, const int *par_perm, const int , const ring src, const ring dst)
 {
 #if 0
   PrintS("\nSource Ring: \n");
