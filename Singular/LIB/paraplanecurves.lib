@@ -1629,9 +1629,9 @@ KEYWORDS: delta invariant; Tjurina number
         if((fdummy ==0) || (deg(lead(fdummy))>intMult)){break;}
         gdummy = gdummy + lead(fdummy);
       }
-   ideal SQRpart = sqrfree(gdummy);
+   poly SQRpart = sqrfree(gdummy, 3);
    int IntForRet;
-   if(deg(SQRpart[1])==intMult)
+   if(deg(SQRpart)==intMult)
      {
         IntForRet = intMult;
      }

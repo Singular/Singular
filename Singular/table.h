@@ -240,9 +240,9 @@ struct sValCmd1 dArith1[]=
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FACTORY
-,{D(jjSQR_FREE),   SQR_FREE_CMD,    IDEAL_CMD,      POLY_CMD      , NO_PLURAL |ALLOW_RING}
+,{D(jjSQR_FREE),   SQR_FREE_CMD,    LIST_CMD,      POLY_CMD      , NO_PLURAL |NO_RING}
 #else
-,{  jjWRONG ,      SQR_FREE_CMD,    IDEAL_CMD,      POLY_CMD      , NO_PLURAL |ALLOW_RING}
+,{  jjWRONG ,      SQR_FREE_CMD,    LIST_CMD,      POLY_CMD      , NO_PLURAL |NO_RING}
 #endif
 ,{D(jjSTD),        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD),        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
@@ -627,6 +627,11 @@ struct sValCmd2 dArith2[]=
 //,{D(jjRES),       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
 ,{D(jjRES),       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES),       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+#ifdef HAVE_FACTORY
+,{D(jjSQR_FREE2), SQR_FREE_CMD,   IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_PLURAL |ALLOW_RING}
+#else
+,{  jjWRONG2 ,    SQR_FREE_CMD,   IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_PLURAL |ALLOW_RING}
+#endif
 ,{D(jjSTATUS2),   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTATUS2L),  STATUS_CMD,     INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSIMPL_P),   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -1004,7 +1009,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "slimgb",      0, SLIM_GB_CMD ,       CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
-  { "sqrfree",     0, SQR_FREE_CMD ,      CMD_1},
+  { "sqrfree",     0, SQR_FREE_CMD ,      CMD_12},
 #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
 #else /* OLD_RES */
