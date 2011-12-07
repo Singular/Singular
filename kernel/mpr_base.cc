@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: mpr_base.cc 14278 2011-06-14 13:49:47Z hannes $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -2096,9 +2096,11 @@ resMatrixDense::~resMatrixDense()
         nDelete( resVectorList[i].numColVector+j );
     }
     // OB: ????? (solve_s.tst)
-    omfreeSize( (ADDRESS)resVectorList[i].numColVector,
+    if (resVectorList[i].numColVector!=NULL)
+      omfreeSize( (ADDRESS)resVectorList[i].numColVector,
                 numVectors * sizeof( number ) );
-    omfreeSize( (ADDRESS)resVectorList[i].numColParNr,
+    if (resVectorList[i].numColParNr!=NULL)
+      omfreeSize( (ADDRESS)resVectorList[i].numColParNr,
                 (pVariables+1) * sizeof(int) );
   }
 
