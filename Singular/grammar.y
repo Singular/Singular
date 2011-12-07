@@ -295,6 +295,8 @@ void yyerror(const char * fmt)
         /* put variables of this type into the idroot list */
 %token <i> RING_DECL
         /* put variables of this type into the currRing list */
+%token <i> RING_DECL_LIST
+        /* put variables of this type into the currRing list */
 %token <i> EXAMPLE_CMD
 %token <i> EXPORT_CMD
 %token <i> HELP_CMD
@@ -330,7 +332,6 @@ void yyerror(const char * fmt)
 %type <lv>   declare_ip_variable left_value
 %type <i>    ordername
 %type <i>    cmdeq
-%type <i>    currring_lists
 %type <i>    setrings
 %type <i>    ringcmd1
 
@@ -644,11 +645,11 @@ expr:   expr_arithmetic
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
-        | currring_lists '(' exprlist ')'
+        | RING_DECL_LIST '(' exprlist ')'
           {
             if(iiExprArithM(&$$,&$3,$1)) YYERROR;
           }
-        | currring_lists '(' ')'
+        | RING_DECL_LIST '(' ')'
           {
             if(iiExprArithM(&$$,NULL,$1)) YYERROR;
           }
@@ -882,11 +883,6 @@ extendedid:
           }
         ;
 
-currring_lists:
-        IDEAL_CMD | MODUL_CMD
-        /* put variables into the current ring */
-        ;
-
 declare_ip_variable:
         ROOT_DECL elemexpr
           {
@@ -902,7 +898,7 @@ declare_ip_variable:
           {
             if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
-        | currring_lists elemexpr
+        | RING_DECL_LIST elemexpr
           {
             if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
@@ -1183,7 +1179,7 @@ listcmd:
             if ($3==QRING_CMD) $3=RING_CMD;
             list_cmd($3,NULL,"// ",TRUE);
           }
-        | LISTVAR_CMD '(' currring_lists ')'
+        | LISTVAR_CMD '(' RING_DECL_LIST ')'
           {
             list_cmd($3,NULL,"// ",TRUE);
           }
@@ -1226,7 +1222,7 @@ listcmd:
               list_cmd($5,NULL,"// ",TRUE);
             $3.CleanUp();
           }
-        | LISTVAR_CMD '(' elemexpr ',' currring_lists ')'
+        | LISTVAR_CMD '(' elemexpr ',' RING_DECL_LIST ')'
           {
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);

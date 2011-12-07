@@ -1647,8 +1647,7 @@ int sleftv::Eval()
       int toktype=iiTokType(d->op);
       if ((toktype==CMD_M)
       ||( toktype==ROOT_DECL_LIST)
-      ||( toktype==IDEAL_CMD)
-      ||( toktype==MODUL_CMD))
+      ||( toktype==RING_DECL_LIST))
       {
         if (d->argc <=3)
         {

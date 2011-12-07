@@ -2101,9 +2101,11 @@ resMatrixDense::~resMatrixDense()
         nDelete( resVectorList[i].numColVector+j );
     }
     // OB: ????? (solve_s.tst)
-    omfreeSize( (void *)resVectorList[i].numColVector,
+    if (resVectorList[i].numColVector!=NULL)
+      omfreeSize( (void *)resVectorList[i].numColVector,
                 numVectors * sizeof( number ) );
-    omfreeSize( (void *)resVectorList[i].numColParNr,
+    if (resVectorList[i].numColParNr!=NULL)
+      omfreeSize( (void *)resVectorList[i].numColParNr,
                 ((currRing->N)+1) * sizeof(int) );
   }
 
