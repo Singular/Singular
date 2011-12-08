@@ -220,7 +220,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc(((currRing->N) + 1) * sizeof(int));
   hpure = (scmon)omAlloc((1 + ((currRing->N) * (currRing->N))) * sizeof(int));
-  hInd = (scmon)omAlloc((1 + (currRing->N)) * sizeof(int));
+  hInd = (scmon)omAlloc0((1 + (currRing->N)) * sizeof(int));
   mc = hisModule;
   if (mc==0)
   {
