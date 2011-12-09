@@ -3153,7 +3153,7 @@ static BOOLEAN jjSQR_FREE2(leftv res, leftv u, leftv dummy)
   int fac_sw=sw;
   if ((sw<0)||(sw>2)) fac_sw=1;
   singclap_factorize_retry=0;
-  ideal f=singclap_sqrfree((poly)(u->CopyD()), &v, fac_sw);
+  ideal f=singclap_sqrfree((poly)(u->CopyD()), &v, fac_sw, currRing);
   if (f==NULL)
     return TRUE;
   switch(sw)
@@ -4681,6 +4681,7 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
 static BOOLEAN jjSQR_FREE(leftv res, leftv u)
 {
   singclap_factorize_retry=0;
+  intvec *v=NULL;
   ideal f=singclap_sqrfree((poly)(u->CopyD()), &v, 0, currRing);
   if (f==NULL) return TRUE;
   ivTest(v);

@@ -951,7 +951,7 @@ notImpl:
   //PrintS("......S\n");
   return res;
 }
-ideal singclap_sqrfree ( poly f, const ring r)
+ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
 {
   p_Test(f,r);
 #ifdef FACTORIZE2_DEBUG
@@ -968,6 +968,11 @@ ideal singclap_sqrfree ( poly f, const ring r)
   if (f==NULL)
   {
     res=idInit(1,1);
+    if (with_exps!=1)
+    {
+      (*v)=new intvec(1);
+      (**v)[0]=1;
+    }
     return res;
   }
   // handle factorize(mon) =========================================
@@ -977,27 +982,45 @@ ideal singclap_sqrfree ( poly f, const ring r)
     int n=0;
     int e;
     for(i=rVar(r);i>0;i--) if(p_GetExp(f,i,r)!=0) n++;
-    n++; // with coeff
+    if (with_exps==0) n++; // with coeff
     res=idInit(si_max(n,1),1);
+    switch(with_exps)
+    {
+      case 0: // with coef & exp.
+        res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
+        // no break
+      case 2: // with exp.
+        (*v)=new intvec(si_max(1,n));
+        (**v)[0]=1;
+        // no break
+      case 1: ;
+      #ifdef TEST
+      default: ;
+      #endif
+    }
     res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
     if (n==0)
     {
       res->m[0]=p_One(r);
       // (**v)[0]=1; is already done
-      return res;
     }
-    for(i=rVar(r);i>0;i--)
+    else
     {
-      e=p_GetExp(f,i,r);
-      if(e!=0)
+      for(i=rVar(r);i>0;i--)
       {
-        n--;
-        poly p=p_One(r);
-        p_SetExp(p,i,1,r);
-        p_Setm(p,r);
-        res->m[n]=p;
+        e=p_GetExp(f,i,r);
+        if(e!=0)
+        {
+          n--;
+          poly p=p_One(r);
+          p_SetExp(p,i,1,r);
+          p_Setm(p,r);
+          res->m[n]=p;
+          if (with_exps!=1) (**v)[n]=e;
+        }
       }
     }
+    p_Delete(&f,r);
     return res;
   }
   //PrintS("S:");pWrite(f);PrintLn();
@@ -1009,12 +1032,24 @@ ideal singclap_sqrfree ( poly f, const ring r)
   if(rField_is_Q(r)) prime_number=0;
   #endif
   CFFList L;
+  number N=NULL;
+  number NN=NULL;
 
   if (!rField_is_Zp(r) && !rField_is_Zp_a(r)) /* Q, Q(a) */
   {
     //if (f!=NULL) // already tested at start of routine
+    number n0=n_Copy(pGetCoeff(f),r->cf);
+    if (with_exps==0)
+      N=n_Copy(n0,r->cf);
+    p_Cleardenom(f, r);
+    //after here f should not have a denominator!!
+    //PrintS("S:");p_Write(f,r);PrintLn();
+    NN=n_Div(n0,pGetCoeff(f),r->cf);
+    n_Delete(&n0,r->cf);
+    if (with_exps==0)
     {
-      p_Cleardenom(f, r);
+      n_Delete(&N,r->cf);
+      N=n_Copy(NN,r->cf);
     }
   }
   else if (rField_is_Zp_a(r))
@@ -1022,8 +1057,18 @@ ideal singclap_sqrfree ( poly f, const ring r)
     //if (f!=NULL) // already tested at start of routine
     if (singclap_factorize_retry==0)
     {
+      number n0=n_Copy(pGetCoeff(f),r->cf);
+      if (with_exps==0)
+        N=n_Copy(n0,r->cf);
       p_Norm(f,r);
       p_Cleardenom(f, r);
+      NN=n_Div(n0,pGetCoeff(f),r->cf);
+      n_Delete(&n0,r->cf);
+      if (with_exps==0)
+      {
+        n_Delete(&N,r->cf);
+        N=n_Copy(NN,r->cf);
+      }
     }
   }
   if (rField_is_Q(r) || rField_is_Zp(r))
@@ -1031,6 +1076,24 @@ ideal singclap_sqrfree ( poly f, const ring r)
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) );
     L = sqrFree( F );
+  }
+  else if (rField_is_Extension(r))
+  {
+    if (rField_is_Q_a (r)) setCharacteristic (0);
+    else                   setCharacteristic( rChar(r) );
+    if (r->cf->extRing->minideal!=NULL)
+    {
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+                                           r->cf->extRing);
+      Variable a=rootOf(mipo);
+      CanonicalForm F( convSingAPFactoryAP( f, a, r ) );
+      L= sqrFree (F);
+    }
+    else
+    {
+      CanonicalForm F( convSingTrPFactoryP( f,r ) );
+      L = sqrFree( F );
+    }
   }
   #if 0
   else if (rField_is_GF())
@@ -1058,10 +1121,33 @@ ideal singclap_sqrfree ( poly f, const ring r)
     if (n==0) n=1;
     CFFListIterator J=L;
     int j=0;
+    if (with_exps!=1)
+    {
+      if ((with_exps==2)&&(n>1))
+      {
+        n--;
+        J++;
+      }
+      *v = new intvec( n );
+    }
+    else if (L.getFirst().factor().inCoeffDomain())
+    {
+      n--;
+      J++;
+    }
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
     {
-      res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
+      if (with_exps!=1) (**v)[j] = J.getItem().exp();
+      if (rField_is_Zp(r) || rField_is_Q(r))
+        res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
+      else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
+      {
+        if (r->cf->extRing->minideal==NULL)
+          res->m[j]=convFactoryPSingTrP( J.getItem().factor(),r );
+        else
+          res->m[j]=convFactoryAPSingAP( J.getItem().factor(),r );
+      }
     }
     if (res->m[0]==NULL)
     {

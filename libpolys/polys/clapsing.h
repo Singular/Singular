@@ -38,7 +38,7 @@ void singclap_divide_content ( poly f, const ring r);
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r);
 
-ideal singclap_sqrfree ( poly f, const ring r );
+ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r );
 
 #ifdef HAVE_NTL
 #if 1
