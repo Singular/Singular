@@ -6764,7 +6764,7 @@ the multiplicities (as an intvec) depending on the second argument:
        May also be written with only one argument.
     1: returns non-constant factors (no multiplicities).
     2: returns non-constant factors and multiplicities.
-    3: returns the product of factors (including constant), i.e. squarefree part
+    3: returns the product of non-constant factors, i.e. squarefree part
 @end format
 @item @strong{Note:}
 Not implemented for the coefficient fields real and finite fields of
