@@ -320,13 +320,6 @@ struct ip_sring
   operator coeffs() const { return cf; }
 };
 
-enum tHomog
-{
-   isNotHomog = FALSE,
-   isHomog    = TRUE,
-   testHomog
-};
-
 ////////// DEPRECATED
 /////// void   rChangeCurrRing(ring r);
 

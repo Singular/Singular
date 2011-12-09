@@ -9,7 +9,8 @@
 */
 #include <polys/simpleideals.h>
 #include <kernel/polys.h>
-// #include <kernel/structs.h>
+
+#include <kernel/structs.h> // for tHomog
 
 //typedef struct sip_sideal *        ideal;
 //typedef struct sip_smap *          map;
@@ -131,8 +132,6 @@ inline ideal idFreeModule (int i, const ring R = currRing)
 {
   return id_FreeModule (i, R);
 }
-
-
 
 
 ideal   idSect (ideal h1,ideal h2);

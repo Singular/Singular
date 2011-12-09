@@ -38,6 +38,15 @@ class CGlobalMultiplier;
 class CFormulaPowerMultiplier;
 #endif
 
+
+enum tHomog
+{
+  isNotHomog = FALSE,
+  isHomog    = TRUE,
+  testHomog
+};
+
+
 struct sip_package;
 typedef struct sip_package ip_package;
 typedef ip_package *       package;
