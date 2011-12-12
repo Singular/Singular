@@ -89,7 +89,7 @@
    but the more unused memory the application might have allocated from the operating system
 */
 #ifndef OM_DEFAULT_PAGES_PER_REGION
-#define OM_DEFAULT_PAGES_PER_REGION 128
+#define OM_DEFAULT_PAGES_PER_REGION 512
 #endif
 
 /* This is called if nothing goes any more, i.e., if
