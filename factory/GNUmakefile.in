@@ -181,6 +181,7 @@ basefactorysrc := \
 		facFqSquarefree.cc \
 		facHensel.cc \
 		facIrredTest.cc \
+		facSparseHensel.cc \
 		fieldGCD.cc \
 		ffops.cc \
 		gf_tabutil.cc \
@@ -266,6 +267,7 @@ basefactoryincl := \
 		facFqSquarefree.h \
 		facHensel.h \
 		facIrredTest.h \
+		facSparseHensel.h \
 		fieldGCD.h \
 		ffops.h \
 		ftmpl_list.h \
