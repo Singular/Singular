@@ -395,32 +395,149 @@ void TestGBEngine()
   // make R the default ring:
   rChangeCurrRing(R);
 
-  ideal G = kStd(I, currQuotient, testHomog, NULL);
+  {
+    ideal G = kStd(I, currQuotient, testHomog, NULL);
 
 #ifdef PDEBUG
-  PrintS("GB: ");
-  idShow(G, R, R, 0);
+    PrintS("GB: ");
+    idShow(G, R, R, 0);
 #endif
 
-  idDelete( &G, R);
-
-  ideal SYZ;
+    idDelete( &G, R);
+  }
 
   {
-    intvec *ww=NULL;
-    SYZ = idSyzygies(I, testHomog, &ww);
-    if (ww!=NULL) delete ww;
+    intvec *weights = NULL;
+    ideal SYZ = idSyzygies(I, testHomog, &weights);
+    
+#ifdef PDEBUG
+    PrintS("SYZ: ");
+    idShow(SYZ, R, R, 0);
+#endif
+
+    idDelete(&SYZ, R);
+    if (weights!=NULL) { PrintS("weights: "); weights->show(); delete weights; }
   }
 
 
-#ifdef PDEBUG
-  PrintS("SYZ: ");
-  idShow(SYZ, R, R, 0);
-#endif
-  
-  idDelete( &SYZ, R);
-  idDelete( &I, R);
+  {
+    PrintS("\n**********************************\n");
+    PrintS("lres: \n");
+    int dummy;
+    syStrategy r = syLaScala3(I,&dummy);
 
+    intvec *b = syBettiOfComputation(r, FALSE);
+    PrintS("non-min. betti: \n");    b->show();    PrintLn();
+    delete b;
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    r =  syMinimize(r); // syzstr->references ++ ==> memory leak :(((
+
+    b = syBettiOfComputation(r, TRUE);
+    PrintS("min. betti: \n");    b->show();    PrintLn();
+    delete b;    
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+    
+    syKillComputation(r, R);
+  }
+
+  {
+    PrintS("\n**********************************\n");
+    PrintS("sres: \n");
+    const int maxl = rVar(R)-1; // +2*(1);
+
+    syStrategy r = sySchreyer(I, rVar(R));
+
+    intvec *b = syBettiOfComputation(r, FALSE);
+    PrintS("non-min. betti: \n");    b->show();    PrintLn();
+    delete b;
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    r =  syMinimize(r); // syzstr->references ++ ==> memory leak :(((
+
+    b = syBettiOfComputation(r, TRUE);
+    PrintS("min. betti: \n");    b->show();    PrintLn();
+    delete b;    
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    syKillComputation(r, R);
+  }
+
+    
+
+  {
+    PrintS("\n**********************************\n");
+    PrintS("nres: \n");
+    intvec *weights=NULL;
+//    const int maxl = rVar(R)-1 + 2*(1);
+    syStrategy r = syResolution(I, rVar(R)-1, weights, FALSE/*iiOp==MRES_CMD*/);
+
+    intvec *b = syBettiOfComputation(r, FALSE);
+    PrintS("non-min. betti: \n");    b->show();    PrintLn();
+    delete b;
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    r =  syMinimize(r); // syzstr->references ++ ==> memory leak :(((
+
+    b = syBettiOfComputation(r, TRUE);
+    PrintS("min. betti: \n");    b->show();    PrintLn();
+    delete b;    
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    syKillComputation(r, R);
+  }
+  
+
+  {
+    PrintS("\n**********************************\n");
+    PrintS("mres: \n");
+    intvec *weights=NULL;
+//    const int maxl = rVar(R)-1 + 2*(1);
+    syStrategy r = syResolution(I, rVar(R)+1, weights, TRUE/*iiOp==MRES_CMD*/);
+
+    intvec *b = syBettiOfComputation(r, FALSE);
+    PrintS("non-min. betti: \n");    b->show();    PrintLn();
+    delete b;
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    r =  syMinimize(r); // syzstr->references ++ ==> memory leak :(((
+
+    b = syBettiOfComputation(r, TRUE);
+    PrintS("min. betti: \n");    b->show();    PrintLn();
+    delete b;    
+
+    Print("length: %d\n", sySize(r));
+
+    syPrint(r, "R");
+
+    syKillComputation(r, R);
+  }
+  
+
+
+  
+  idDelete( &I, R);  
   rDelete(R); // should cleanup every belonging polynomial, right!?
    
 }
