@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc 14421 2011-10-21 12:37:32Z hannes $ */
+/* $Id: iparith.cc 14447 2011-11-30 20:00:05Z motsak $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -7501,7 +7501,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           if (check_valid(dArith2[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
-          Print("call %s(%s,%s)\n",Tok2Cmdname(iiOp),Tok2Cmdname(at),Tok2Cmdname(bt));
+          Print("call %s(%s,%s)\n",iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt));
         if ((call_failed=dArith2[i].p(res,a,b)))
         {
           break;// leave loop, goto error handling
@@ -7535,7 +7535,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
               if (check_valid(dArith2[i].valid_for,op)) break;
             }
             if (TEST_V_ALLWARN)
-              Print("call %s(%s,%s)\n",Tok2Cmdname(iiOp),
+              Print("call %s(%s,%s)\n",iiTwoOps(op),
               Tok2Cmdname(an->rtyp),Tok2Cmdname(bn->rtyp));
             failed= ((iiConvert(at,dArith2[i].arg1,ai,a,an))
             || (iiConvert(bt,dArith2[i].arg2,bi,b,bn))
@@ -7668,7 +7668,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           if (check_valid(dArith1[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
-          Print("call %s(%s)\n",Tok2Cmdname(iiOp),Tok2Cmdname(at));
+          Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
         if (r<0)
         {
           res->rtyp=-r;
@@ -7736,7 +7736,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           else
           {
             if (TEST_V_ALLWARN)
-              Print("call %s(%s)\n",Tok2Cmdname(iiOp),Tok2Cmdname(an->rtyp));
+              Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(an->rtyp));
             if (an->Next() != NULL)
             {
               res->next = (leftv)omAllocBin(sleftv_bin);
@@ -7841,7 +7841,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         }
         if (TEST_V_ALLWARN)
           Print("call %s(%s,%s,%s)\n",
-            Tok2Cmdname(iiOp),Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
+            iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
         if ((call_failed=dArith3[i].p(res,a,b,c)))
         {
           break;// leave loop, goto error handling
@@ -7878,7 +7878,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               }
               if (TEST_V_ALLWARN)
                 Print("call %s(%s,%s,%s)\n",
-                  Tok2Cmdname(iiOp),Tok2Cmdname(an->rtyp),
+                  iiTwoOps(op),Tok2Cmdname(an->rtyp),
                   Tok2Cmdname(bn->rtyp),Tok2Cmdname(cn->rtyp));
               failed= ((iiConvert(at,dArith3[i].arg1,ai,a,an))
                 || (iiConvert(bt,dArith3[i].arg2,bi,b,bn))
@@ -8060,7 +8060,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
           if (check_valid(dArithM[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
-          Print("call %s(... (%d args))\n", Tok2Cmdname(iiOp),args);
+          Print("call %s(... (%d args))\n", iiTwoOps(op),args);
         if (dArithM[i].p(res,a))
         {
           break;// leave loop, goto error handling
