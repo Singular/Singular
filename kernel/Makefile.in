@@ -243,7 +243,7 @@ p_Procs_Lib.o: p_Procs_Lib.inc
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
-prCopy.o: prCopy.inc
+prCopy.o prCopy.og prCopy.op: prCopy.inc
 
 prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
 	$(PERL) prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc

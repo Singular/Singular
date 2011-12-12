@@ -146,19 +146,19 @@ local-maintainer-clean: local-distclean
 	rm -rf configure
 
 clean mostlyclean: local-clean
-	$(recurse)
+	+$(recurse)
 
 distclean: local-distclean
-	$(recurse)
+	+$(recurse)
 	rm -rf build
 
 maintainer-clean: uninstall local-maintainer-clean
-	$(recurse)
+	+$(recurse)
 
 ##############################################################
 # some extra targets for the specific packages
-.PHONY: factory libfac MP gmp smallgmp
-Singular factory libfac MP gmp smallgmp:
+.PHONY: factory libfac MP
+Singular factory libfac MP:
 	cd $@; ${MAKE} all
 
 ##############################################################
