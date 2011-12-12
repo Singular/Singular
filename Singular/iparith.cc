@@ -3129,6 +3129,56 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   res->data = (char * )id;
   return FALSE;
 }
+#ifdef HAVE_FACTORY
+extern int singclap_factorize_retry;
+static BOOLEAN jjSQR_FREE2(leftv res, leftv u, leftv dummy)
+{
+  intvec *v=NULL;
+  int sw=(int)(long)dummy->Data();
+  int fac_sw=sw;
+  if ((sw<0)||(sw>2)) fac_sw=1;
+  singclap_factorize_retry=0;
+  ideal f=singclap_sqrfree((poly)(u->CopyD()), &v, fac_sw);
+  if (f==NULL)
+    return TRUE;
+  switch(sw)
+  {
+    case 0:
+    case 2:
+    {
+      lists l=(lists)omAllocBin(slists_bin);
+      l->Init(2);
+      l->m[0].rtyp=IDEAL_CMD;
+      l->m[0].data=(void *)f;
+      l->m[1].rtyp=INTVEC_CMD;
+      l->m[1].data=(void *)v;
+      res->data=(void *)l;
+      res->rtyp=LIST_CMD;
+      return FALSE;
+    }
+    case 1:
+      res->data=(void *)f;
+      return FALSE;
+    case 3:
+      {
+        poly p=f->m[0];
+        int i=IDELEMS(f);
+        f->m[0]=NULL;
+        while(i>1)
+        {
+          i--;
+          p=pMult(p,f->m[i]);
+          f->m[i]=NULL;
+        }
+        res->data=(void *)p;
+        res->rtyp=POLY_CMD;
+      }
+      return FALSE;
+  }
+  WerrorS("invalid switch");
+  return FALSE;
+}
+#endif
 static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 {
   res->data = omStrDup(slStatus((si_link) u->Data(), (char *) v->Data()));
@@ -4650,15 +4700,20 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
   return FALSE;
 }
 #ifdef HAVE_FACTORY
-extern int singclap_factorize_retry;
 static BOOLEAN jjSQR_FREE(leftv res, leftv u)
 {
   intvec *v=NULL;
   singclap_factorize_retry=0;
-  ideal f=singclap_sqrfree((poly)(u->CopyD()));
-  if (f==NULL)
-    return TRUE;
-  res->data=(void *)f;
+  ideal f=singclap_sqrfree((poly)(u->CopyD()), &v, 0);
+  if (f==NULL) return TRUE;
+  ivTest(v);
+  lists l=(lists)omAllocBin(slists_bin);
+  l->Init(2);
+  l->m[0].rtyp=IDEAL_CMD;
+  l->m[0].data=(void *)f;
+  l->m[1].rtyp=INTVEC_CMD;
+  l->m[1].data=(void *)v;
+  res->data=(void *)l;
   return FALSE;
 }
 #endif

@@ -6614,16 +6614,43 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{sqrfree (} poly_expression @code{)}
+@*@code{sqrfree (} poly_expression@code{, 0 )}
+@*@code{sqrfree (} poly_expression@code{, 2 )}
+@item @strong{Type:}
+list of ideal and intvec
+@*
+@item @strong{Syntax:}
+@code{sqrfree (} poly_expression@code{, 1 )}
 @item @strong{Type:}
 ideal
+@*
+@item @strong{Syntax:}
+@code{sqrfree (} poly_expression@code{, 3 )}
+@item @strong{Type:}
+poly
 @item @strong{Purpose:}
-computes a squarefree decomposition of the given polynomial.
+computes the squarefree factors (as an ideal) of the polynomial
+together with or without
+the multiplicities (as an intvec) depending on the second argument:
+@format
+    0: returns factors and multiplicities, first factor is a constant.
+       May also be written with only one argument.
+    1: returns non-constant factors (no multiplicities).
+    2: returns non-constant factors and multiplicities.
+    3: returns the product of non-constant factors, i.e. squarefree part
+@end format
+@item @strong{Note:}
+Not implemented for the coefficient fields real and finite fields of
+type @code{(p^n,a)}.
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=3,(x,y,z),dp;
   poly f=(x-y)^3*(x+z)*(y-z);
   sqrfree(f);
+  sqrfree(f,1);
+  sqrfree(f,2);
+  sqrfree(f,3);
 @c example
 @end smallexample
 @end table
