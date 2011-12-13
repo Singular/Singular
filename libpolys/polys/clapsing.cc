@@ -1034,6 +1034,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   CFFList L;
   number N=NULL;
   number NN=NULL;
+  number old_lead_coeff=n_Copy(pGetCoeff(f), r->cf);
 
   if (!rField_is_Zp(r) && !rField_is_Zp_a(r)) /* Q, Q(a) */
   {
@@ -1153,12 +1154,40 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     {
       res->m[0]=p_One(r);
     }
+    if (N!=NULL)
+    {
+      p_Mult_nn(res->m[0],N,r);
+      n_Delete(&N,r->cf);
+      N=NULL;
+    }
   }
+  if (rField_is_Q_a(r) && (r->cf->extRing->minideal!=NULL))
+  {
+    int i=IDELEMS(res)-1;
+    int stop=1;
+    if (with_exps!=0) stop=0;
+    for(;i>=stop;i--)
+    {
+      p_Norm(res->m[i],r);
+    }
+    if (with_exps==0) p_SetCoeff(res->m[0],old_lead_coeff,r);
+    else n_Delete(&old_lead_coeff,r->cf);
+  }
+  else
+    n_Delete(&old_lead_coeff,r->cf);
   p_Delete(&f,r);
   errorreported=save_errorreported;
 notImpl:
   if (res==NULL)
     WerrorS( feNotImplemented );
+  if (NN!=NULL)
+  {
+    n_Delete(&NN,r->cf);
+  }
+  if (N!=NULL)
+  {
+    n_Delete(&N,r->cf);
+  }
   return res;
 }
 

@@ -25,6 +25,7 @@
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
 #include "facFqFactorize.h"
+#include "facFqSquarefree.h"
 #include "cf_map.h"
 #include "algext.h"
 #include "facAlgExt.h"
@@ -828,7 +829,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   return F;
 }
 
-CFFList sqrFree ( const CanonicalForm & f )
+CFFList sqrFree ( const CanonicalForm & f, bool sort )
 {
 //    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
     CFFList result;
@@ -836,9 +837,20 @@ CFFList sqrFree ( const CanonicalForm & f )
     if ( getCharacteristic() == 0 )
         result = sqrFreeZ( f );
     else
-        result = sqrFreeFp( f );
-
-    //return ( sort ? sortCFFList( result ) : result );
+    {
+        Variable alpha;
+        if (hasFirstAlgVar (f, alpha))
+          result = FqSqrf( f, alpha );
+        else
+          result= FpSqrf (f);
+    }
+    if (sort)
+    {
+      CFFactor buf= result.getFirst();
+      result.removeFirst();
+      result= sortCFFList (result);
+      result.insert (buf);
+    }
     return result;
 }
 
