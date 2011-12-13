@@ -69,7 +69,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree = false );
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
 
-CFFList sqrFree ( const CanonicalForm & f );
+CFFList sqrFree ( const CanonicalForm & f, bool sort= false );
 
 bool isSqrFree ( const CanonicalForm & f );
 
