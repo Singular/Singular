@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6724,7 +6723,7 @@ void kDebugPrint(kStrategy strat)
     else  Print("%p\n",(void*)strat->initEcartPair);
   Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
          strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
-  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d\n",
+  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
          strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
   Print("posInLDependsOnLength=%d, use_buckets=%d\n",
          strat->posInLDependsOnLength,strat->use_buckets);
@@ -6755,6 +6754,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->tailRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
     else if (strat->tailRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
     else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
+    else if (strat->tailRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
     else Print("? (%lx)", (long)strat->tailRing->pLDeg);
     Print(" syzring:%d, syzComp(strat):%d syzComb(ring)\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
     if(TEST_OPT_DEGBOUND)
