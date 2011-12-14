@@ -15,7 +15,7 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #ifdef HAVE_LIBFAC
-#include <libfac/factor.h>
+#include <factory/libfac/factor.h>
 #endif
 #endif
 

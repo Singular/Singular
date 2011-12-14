@@ -12,8 +12,8 @@
 #  include <factory/factory.h>
 /* libfac version strings */
 #ifdef HAVE_LIBFAC
-  extern const char * libfac_version;
-  extern const char * libfac_date;
+//  extern const char * libfac_version;
+//  extern const char * libfac_date;
 #endif // #ifdef HAVE_LIBFAC
 #endif
 

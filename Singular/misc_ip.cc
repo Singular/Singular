@@ -742,13 +742,14 @@ char * versionString()
                feVersionId,singular_date);
   StringAppendS("\t");
 #ifdef HAVE_FACTORY
-  StringAppend("factory(%s),", factoryVersion);
+  StringAppend("factory(%s)", factoryVersion);
 #ifdef HAVE_LIBFAC
   // libfac:
-  extern const char * libfac_version;
-  extern const char * libfac_date;
-  StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);
+//  extern const char * libfac_version;
+//  extern const char * libfac_date;
+  StringAppend("+libfac");
 #endif // #ifdef HAVE_LIBFAC
+  StringAppend(",");
 #endif
 
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)

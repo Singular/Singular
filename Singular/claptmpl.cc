@@ -63,7 +63,9 @@
 
 // place here your own template stuff, not instantiated by factory
   // libfac:
-#include <libfac/factor.h>
+#ifdef HAVE_LIBFAC
+# include <factory/libfac/factor.h>
+#endif
 
 // class.h:
 template <class T>
@@ -134,8 +136,10 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
     template class List<int>;
     template class ListIterator<int>;
 
+#ifdef HAVE_LIBFAC
     template class List<IntList>;
     template class ListIterator<IntList>;
+#endif
 
     template class Substitution<CanonicalForm>;
     template class Array<Variable>;
