@@ -35,7 +35,7 @@ void singclap_divide_content ( poly f );
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps);
 
-ideal singclap_sqrfree ( poly f );
+ideal singclap_sqrfree ( poly f, intvec ** v, int with_exps);
 
 matrix singclap_irrCharSeries ( ideal I);
 
