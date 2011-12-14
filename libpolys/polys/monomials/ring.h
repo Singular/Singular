@@ -488,6 +488,9 @@ n_coeffType rFieldType(const ring r);
 BOOLEAN rComplete(ring r, int force = 0);
 // use this to free fields created by rComplete //?
 
+/// set all properties of a new ring - also called by rComplete
+void p_SetGlobals(const ring r, BOOLEAN complete = TRUE);
+
 static inline int rBlocks(ring r)
 {
   assume(r != NULL);

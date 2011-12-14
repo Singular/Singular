@@ -9,22 +9,6 @@
 ring  currRing = NULL;
 ideal currQuotient = NULL;
 
-/* -------------------------------------------------------- */
-/*2
-* change all global variables to fit the description of the new ring
-*/
-
-void p_SetGlobals(const ring r, BOOLEAN complete)
-{
-// // //  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r); // ???
-
-  if (complete)
-  {
-    test &= ~ TEST_RINGDEP_OPTS;
-    test |= r->options;
-  }
-}
-
 void rChangeCurrRing(ring r)
 {
    currRing = r;
@@ -32,7 +16,6 @@ void rChangeCurrRing(ring r)
    //------------ global variables related to coefficients ------------
    nSetChar(r->cf);
    //------------ global variables related to polys -------------------
-   p_SetGlobals(r);
 }
 /*
 

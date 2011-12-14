@@ -3317,6 +3317,22 @@ static void rSetOption(ring r)
 
 static void rCheckOrdSgn(ring r,int i/*current block*/);
 
+/* -------------------------------------------------------- */
+/*2
+* change all global variables to fit the description of the new ring
+*/
+
+void p_SetGlobals(const ring r, BOOLEAN complete)
+{
+// // //  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r); // ???
+
+  if (complete)
+  {
+    test &= ~ TEST_RINGDEP_OPTS;
+    test |= r->options;
+  }
+}
+
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
@@ -3710,6 +3726,7 @@ BOOLEAN rComplete(ring r, int force)
   // p_Procs: call AFTER NegWeightL
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_ProcsSet(r, r->p_Procs);
+  p_SetGlobals(r);
   return FALSE;
 }
 
