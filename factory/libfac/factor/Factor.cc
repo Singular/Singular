@@ -37,7 +37,7 @@ void out_cff(CFFList &L);
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "timing.h"
 TIMING_DEFINE_PRINT(factorize_time);
 TIMING_DEFINE_PRINT(sqrfree_time);

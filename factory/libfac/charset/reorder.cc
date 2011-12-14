@@ -28,7 +28,7 @@
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "timing.h"
 TIMING_DEFINE_PRINT(neworder_time);
 

@@ -10,28 +10,34 @@
 // Set this to a nonzero value to interrupt the computation
 extern int libfac_interruptflag;
 
+/*
 // some values you can ask for:
 extern const char * libfac_name;
 extern const char * libfac_version;
 extern const char * libfac_date;
 extern const char * libfac_author;
+*/
 
+/*
 CFFList Factorize( const CanonicalForm & F, const CanonicalForm & mipo, int is_SqrFree=0 ) ;
 CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
 CFFList newcfactor( const CanonicalForm & f, const CFList & as, int &success);
+*/
+
 
 //// Note: InternalSqrFree does only the work needed for factorization.
 // CFFList SqrFree( const CanonicalForm & f ) ;
 
 typedef List<CFList> ListCFList;
 typedef List<int> IntList ;
-typedef ListIterator<int> IntListIterator ;
-typedef List<Variable> Varlist;
-typedef ListIterator<Variable> VarlistIterator;
+
+// typedef ListIterator<int> IntListIterator ;
+// typedef List<Variable> Varlist;
+// typedef ListIterator<Variable> VarlistIterator;
 
 ////////////////////////////////////////
 /// from charsets:
-
+/*
 class PremForm {
 public:
   CFList FS1;
@@ -45,12 +51,18 @@ public:
   }
 };
 
+
 CanonicalForm  Prem( const CanonicalForm &f, const CanonicalForm &g );
 CanonicalForm  Prem( const CanonicalForm &f, const CFList &L );
 CFList         Prem( const CFList &AS, const CFList &L );
 CFList     MCharSetN( const CFList &PS, PremForm & Remembern );
+*/
+
+
+/// Char. set
 ListCFList IrrCharSeries( const CFList &PS, int opt=0 );
 
+/*
 // the next three give you a heuristically optimal reorderd list of the
 // variables. For internal and external (e.g. Singular/Macaulay2) library use.
 // This is really experimental!
@@ -62,9 +74,12 @@ Varlist  neworder( const CFList & PolyList );
 // the same as neworder(...) only returning a list of CanonicalForm 's
 // (i.e. the variables as CanonicalForms)
 CFList   newordercf(const CFList & PolyList );
-// the same as neworder(...) only returning a list of int 's (i.e. the levels)
+*/
+
+/// the same as neworder(...) only returning a list of int 's (i.e. the levels)
 IntList  neworderint(const CFList & PolyList );
 
+/*
 // for library internal use only:
 // next function reorders the variables in PS:
 // a code segment to use:
@@ -80,6 +95,6 @@ IntList  neworderint(const CFList & PolyList );
 CFList reorder( const Varlist & betterorder, const CFList & PS);
 CFFList reorder( const Varlist & betterorder, const CFFList & PS);
 ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
-
+*/
 
 #endif /* FACTOR_H */

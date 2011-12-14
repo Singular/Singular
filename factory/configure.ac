@@ -441,6 +441,9 @@ AC_SUBST(uninstalltargets)
 AH_TEMPLATE([FACTORYVERSION], [factory version])
 AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version")
 
+AH_TEMPLATE([HAVE_LIBFAC], [have libfac])
+AC_DEFINE_UNQUOTED([HAVE_LIBFAC], 1)
+
 AH_TEMPLATE([FACTORYCONFIGURATION], [factory configuration])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")
 
@@ -451,6 +454,6 @@ AM_CONDITIONAL(
     [WITH_PARSER_FOR_CANONICAL_FORM], 
     [test x$with_Singular != xyes && test x$enable_streamio != xno])
 
-AC_CONFIG_FILES([Makefile ftest/GNUmakefile])
+AC_CONFIG_FILES([Makefile libfac/Makefile]) #  ftest/GNUmakefile
 AC_OUTPUT
 

@@ -31,7 +31,7 @@
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "timing.h"
 
 int hasAlgVar(const CanonicalForm &f, const Variable &v)

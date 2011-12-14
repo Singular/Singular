@@ -37,7 +37,7 @@ extern int libfac_interruptflag;
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "interrupt.h"
 #include "timing.h"
 

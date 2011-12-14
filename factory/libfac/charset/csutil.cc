@@ -620,7 +620,7 @@ initalset2(const CFList & Cset, const CanonicalForm & reducible)
 #else
 #  undef DEBUGOUTPUT
 #endif
-#include "debug.h"
+#include <libfac/factor/debug.h>
 // examine the irreducibility of as for IrrCharSeries
 int
 irreducible( const CFList & AS)

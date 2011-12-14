@@ -26,7 +26,7 @@
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "timing.h"
 TIMING_DEFINE_PRINT(subfactorize_time);
 
@@ -39,7 +39,7 @@ static CFList     irras(CFList & AS, int &ja, CanonicalForm & reducible);
 #else
 #  undef DEBUGOUTPUT
 #endif
-#include "debug.h"
+#include <libfac/factor/debug.h>
 
 // the next computes a characteristic set (a basic set in Wang's sense)
 CFList
@@ -95,7 +95,7 @@ checkok( const CFList & PS, CFList & FS2){
 #else
 #  undef DEBUGOUTPUT
 #endif
-#include "debug.h"
+#include <libfac/factor/debug.h>
 
 // The modified CharSet (an extended characteristic set with certain factors
 // canceled; this is a characteristic set in Wang's sense)
@@ -327,7 +327,7 @@ sort( const ListCFList & list_to_sort ){
 #else
 #  undef DEBUGOUTPUT
 #endif
-#include "debug.h"
+#include <libfac/factor/debug.h>
 
 ListCFList
 IrrCharSeries( const CFList &PS, int opt ){
@@ -473,7 +473,7 @@ IrrCharSeries( const CFList &PS, int opt ){
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 
 static CFList
 irras( CFList & AS, int & ja, CanonicalForm & reducible)

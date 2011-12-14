@@ -23,7 +23,7 @@
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "timing.h"
 TIMING_DEFINE_PRINT(newfactoras_time);
 
@@ -72,7 +72,7 @@ return 1;
 #else
 #  undef DEBUGOUTPUT
 #endif
-#include "debug.h"
+#include <libfac/factor/debug.h>
 static CFList
 charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Variable & vf ){
   CFList QS = PS, RS = PS, Cset;
@@ -122,7 +122,7 @@ charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Varia
 #else
 #  undef DEBUGOUTPUT
 #endif
-#include "debug.h"
+#include <libfac/factor/debug.h>
 // compute the GCD of f and g over the algebraic field having
 // adjoing ascending set as
 CanonicalForm

@@ -4,7 +4,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef TMPL_INST_H
 #define TMPL_INST_H
-#include "class.h"
+
+#include <libfac/factor/class.h>
 //typedef CanonicalForm CF;
 //typedef List<CanonicalForm> CFList;
 //typedef ListIterator<CanonicalForm> CFListIterator;

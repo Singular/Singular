@@ -3,14 +3,17 @@
 // $Id$
 ////////////////////////////////////////////////////////////
 
+// #include <factory/templates/ftmpl_array.cc>
 
-#include <templates/ftmpl_array.cc>
-#include <templates/ftmpl_factor.cc>
-#include <templates/ftmpl_list.cc>
-#include <templates/ftmpl_functions.h>
-#include <templates/ftmpl_matrix.cc>
+#include <factory/factory.h>
 
-#include <factory.h>
+
+
+#include <factory/templates/ftmpl_array.cc>
+#include <factory/templates/ftmpl_factor.cc>
+#include <factory/templates/ftmpl_list.cc>
+#include <factory/templates/ftmpl_functions.h>
+#include <factory/templates/ftmpl_matrix.cc>
 
 template class Factor<CanonicalForm>;
 template class List<CFFactor>;
@@ -46,8 +49,8 @@ template int tmax ( const int&, const int& );
 template int tmin ( const int&, const int& );
 
 // place here your own template stuff, not instantiated by factory
-#include "tmpl_inst.h"
-#include "class.cc"
+#include <libfac/factor/tmpl_inst.h>
+#include <libfac/factor/class.cc>
 
 template class List<int>;
 template class ListIterator<int>;

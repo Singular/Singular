@@ -26,7 +26,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 #  undef DEBUGOUTPUT
 #endif
 
-#include "debug.h"
+#include <libfac/factor/debug.h>
 #include "timing.h"
 TIMING_DEFINE_PRINT(newfactoras_time);
 
