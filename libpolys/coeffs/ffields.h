@@ -11,8 +11,6 @@
 
 BOOLEAN nfInitChar(coeffs r, void*);
 
-//static BOOLEAN nfCoeffsEqual(const coeffs r, n_coeffType n, void* parameter);
-
 BOOLEAN nfGreaterZero (number k, const coeffs r);
 number  nfMult        (number a, number b, const coeffs r);
 number  nfInit        (int i, const coeffs r);
@@ -44,5 +42,3 @@ void    nfReadTable   (const int c, const coeffs r);
 void    nfCoeffWrite(const coeffs r, BOOLEAN details);
 void    nfShowMipo(const coeffs r);
 #endif
-
-BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter);

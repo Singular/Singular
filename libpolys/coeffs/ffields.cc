@@ -755,10 +755,10 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
   return NULL;     /* default */
 }
 
+static BOOLEAN nfCoeffIsEqual(const coeffs, n_coeffType, void*);
+
 BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
-
-
   //r->cfInitChar=npInitChar;
   //r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;
@@ -881,13 +881,12 @@ void    nfCoeffWrite  (const coeffs r, BOOLEAN details)
   else PrintS("//   minpoly        : ...\n"); 
 }
 
-BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
+static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
-
   if (n==n_GF) {
     GFInfo* p = (GFInfo *)(parameter);
     int c = pow (p->GFChar, p->GFDegree);
-    if (c == r->m_nfCharQ)
+    if ((c == r->m_nfCharQ) && (strcmp(r->m_nfParameter,p->GFPar_name) == 0))
       return TRUE;
   }
   return FALSE;
