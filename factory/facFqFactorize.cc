@@ -1798,6 +1798,8 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
   }
 }
 
+#endif
+
 static inline
 CanonicalForm prodEval (const CFList& l, const CanonicalForm& evalPoint,
                         const Variable& v)
@@ -1870,6 +1872,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
   return result;
 }
 
+#ifdef HAVE_NTL
 void
 factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
                                      const ExtensionInfo& info,
