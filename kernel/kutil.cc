@@ -6670,6 +6670,7 @@ char *  showOption();
 
 void kDebugPrint(kStrategy strat)
 {
+  extern long maxdegreeWecart(poly p,int *l, ring r = currRing); /*weight.h*/
   PrintS("red: ");
     if (strat->red==redFirst) PrintS("redFirst\n");
     else if (strat->red==redHoney) PrintS("redHoney\n");
@@ -6740,6 +6741,7 @@ void kDebugPrint(kStrategy strat)
     else if (currRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
     else if (currRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
     else if (currRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
+    else if (currRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
     else Print("? (%lx)", (long)currRing->pLDeg);
     PrintS(" / ");
     if (strat->tailRing->pLDeg==pLDeg0) PrintS("pLDeg0");
