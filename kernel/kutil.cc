@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -24,6 +23,7 @@
 #include <misc/options.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
+#include <polys/weight.h> /* for kDebugPrint: maxdegreeWecart*/
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
@@ -6718,7 +6718,7 @@ void kDebugPrint(kStrategy strat)
     else  Print("%p\n",(void*)strat->initEcartPair);
   Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
          strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
-  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d\n",
+  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets: %d\n",
          strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
   Print("posInLDependsOnLength=%d, use_buckets=%d\n",
          strat->posInLDependsOnLength,strat->use_buckets);
@@ -6735,6 +6735,7 @@ void kDebugPrint(kStrategy strat)
     else if (currRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
     else if (currRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
     else if (currRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
+    else if (currRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
     else Print("? (%lx)", (long)currRing->pLDeg);
     PrintS(" / ");
     if (strat->tailRing->pLDeg==pLDeg0) PrintS("pLDeg0");
@@ -6748,6 +6749,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->tailRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
     else if (strat->tailRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
     else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
+    else if (strat->tailRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
     else Print("? (%lx)", (long)strat->tailRing->pLDeg);
     Print(" syzring:%d, syzComp(strat):%d syzComb(ring)\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
