@@ -14,6 +14,9 @@
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
+#ifdef HAVE_LIBFAC
+#include <libfac/factor.h>
+#endif
 #endif
 
 #include <omalloc/omalloc.h>
@@ -34,7 +37,7 @@
 #include "clapsing.h"
 #include "clapconv.h"
 // #include <kernel/clapconv.h>
-// #include <libfac/factor.h>
+
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
@@ -1194,9 +1197,8 @@ notImpl:
   return res;
 }
 
-
-TODO(somebody, add libfac)
-/*matrix singclap_irrCharSeries ( ideal I, const ring r)
+#ifdef HAVE_LIBFAC
+matrix singclap_irrCharSeries ( ideal I, const ring r)
 {
   if (idIs0(I)) return mpNew(1,1);
 
@@ -1286,9 +1288,8 @@ TODO(somebody, add libfac)
   }
   Off(SW_RATIONAL);
   return res;
-}*/
+}
 
-/*
 char* singclap_neworder ( ideal I, const ring r)
 {
   int i;
@@ -1370,7 +1371,8 @@ char* singclap_neworder ( ideal I, const ring r)
   char * s=omStrDup(StringAppendS(""));
   if (s[strlen(s)-1]==',') s[strlen(s)-1]='\0';
   return s;
-}*/
+}
+#endif /*HAVE_LIBFAC*/
 
 BOOLEAN singclap_isSqrFree(poly f, const ring r)
 {

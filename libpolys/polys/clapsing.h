@@ -51,11 +51,10 @@ intvec* singntl_LLL(intvec* A, const ring r);
 
 BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
-/* 
- // need libfac??? commented out!
+#ifdef HAVE_LIBFAC
  matrix singclap_irrCharSeries ( ideal I, const ring r);
- char* singclap_neworder ( ideal I, const ring r); 
-*/ 
+ char* singclap_neworder ( ideal I, const ring r);
+#endif 
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );
