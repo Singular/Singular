@@ -3326,6 +3326,7 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
 {
 // // //  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r); // ???
 
+  r->pLexOrder=r->LexOrder;
   if (complete)
   {
     test &= ~ TEST_RINGDEP_OPTS;
