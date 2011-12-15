@@ -230,6 +230,14 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 );
 BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3);
 BOOLEAN nuUResSolve( leftv res, leftv args );
 
+BOOLEAN jjCHARSERIES(leftv res, leftv u);
+/*
+BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
+#if 0
+BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
+#endif
+*/
+
 
 #endif
 

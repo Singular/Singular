@@ -2820,24 +2820,28 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 }
 #endif
 
-#ifdef HAVE_FACTORY
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
+#ifdef HAVE_FACTORY
   res->data=singclap_resultant((poly)u->CopyD(),(poly)v->CopyD(),
                   (poly)w->CopyD(), currRing);
   return errorreported;
-}
-BOOLEAN jjCHARSERIES(leftv res, leftv u)
-{
-#if 1
+#else
   Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
   return FALSE;
-#else
-  res->data=singclap_irrCharSeries((ideal)u->Data(), currRing);
-  return (res->data==NULL);
 #endif
 }
+
+BOOLEAN jjCHARSERIES(leftv res, leftv u)
+{
+#if defined(HAVE_FACTORY) && defined(HAVE_LIBFAC)
+  res->data=singclap_irrCharSeries((ideal)u->Data(), currRing);
+  return (res->data==NULL);
+#else
+  Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
+  return FALSE;
 #endif
+}
 
 // from semic.cc
 #ifdef HAVE_SPECTRUM

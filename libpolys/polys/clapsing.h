@@ -58,13 +58,6 @@ BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );
-/*
-BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
-BOOLEAN jjCHARSERIES(leftv res, leftv u);
-#if 0
-BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
-#endif
-*/
 
 number   nChineseRemainder(number *x, number *q,int rl, const coeffs r);
 
