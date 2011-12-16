@@ -1700,6 +1700,7 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   delete N;
   return A;
 }
+#endif
 
 CFArray
 getMonoms (const CanonicalForm& F)
@@ -1735,6 +1736,7 @@ getMonoms (const CanonicalForm& F)
   return result;
 }
 
+#ifdef HAVE_NTL
 CFArray
 evaluateMonom (const CanonicalForm& F, const CFList& evalPoints)
 {
