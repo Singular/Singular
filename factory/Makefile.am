@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-SUBDIRS = include/factory
+SUBDIRS=include/factory libfac
 
 CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
 
@@ -355,6 +355,3 @@ test_d_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti
 #ftmpl_inst.o
 test_d_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
-
-PACKAGES=libfac
-SUBDIRS=$(PACKAGES)
