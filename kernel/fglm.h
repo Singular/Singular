@@ -81,7 +81,7 @@ public:
 // procedure fails)
 // if deleteIdeal==FALSE, then nothing happens to sourceIdeal
 BOOLEAN
-fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & destideal, BOOLEAN switchBack = TRUE, BOOLEAN deleteIdeal = FALSE );
+fglmzero( ring sourceRing, ideal & sourceIdeal, ring destRing, ideal & destideal, BOOLEAN switchBack = TRUE, BOOLEAN deleteIdeal = FALSE );
 
 BOOLEAN fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
 
