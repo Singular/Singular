@@ -1,12 +1,12 @@
 libnumeric_LTLIBRARIES = libnumeric.la libnumeric_g.la
 libnumericdir = $(libdir)/singular
 
-CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS =  ## -fno-implicit-templates
 
 libnumeric_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libnumeric_g_la_CFLAGS = ${PIPE}
 
-libnumeric_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libnumeric_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libnumeric_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

@@ -1,11 +1,11 @@
 noinst_LTLIBRARIES=libfac.la libfac_g.la
 
-CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS =  ## -fno-implicit-templates
 
 libfac_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libfac_g_la_CFLAGS = ${PIPE}
 
-libfac_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libfac_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libfac_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

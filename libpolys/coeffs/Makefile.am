@@ -1,13 +1,13 @@
 noinst_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
 # libcoeffsdir = $(libdir)/singular
 
-CXXTEMPLFLAGS =  --no-exceptions 
+CXXTEMPLFLAGS =  
 ## -fno-implicit-templates
 
 libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libcoeffs_g_la_CFLAGS = ${PIPE}
 
-libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libcoeffs_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
@@ -75,12 +75,12 @@ test_d_g_CFLAGS = ${PIPE}
 
 
 
-test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
+test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} 
 # -fimplicit-templates
 test_s_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fimplicit-templates
 # -fdiagnostics-show-option 
-test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} 
+test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} 
 test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 
 

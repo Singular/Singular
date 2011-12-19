@@ -1,12 +1,12 @@
 noinst_LTLIBRARIES = libmisc.la libmisc_g.la
 # libmiscdir = $(libdir)/singular
 
-CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS      =  ## -fno-implicit-templates
 
 libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libmisc_g_la_CFLAGS = ${PIPE}
 
-libmisc_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libmisc_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libmisc_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

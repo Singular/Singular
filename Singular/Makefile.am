@@ -8,10 +8,10 @@
 
 
 NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
-NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer --no-rtti 
+NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer 
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
-CXXTEMPLFLAGS = --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS = ## -fno-implicit-templates
 
 INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)
 
@@ -23,7 +23,7 @@ libSingulardir = $(libdir)/singular
 libSingular_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
 libSingular_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
 
-libSingular_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+libSingular_la_CXXFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 libSingular_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
@@ -183,25 +183,25 @@ noinst_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
 
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
 gentable2_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-gentable2_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+gentable2_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 gentable2_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 
 gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
 gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-gentable1_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+gentable1_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 gentable1_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 feOpt_SOURCES = feOptGen.cc feOptGen.h
-feOpt_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOpt_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 feOpt_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 feOptES_SOURCES = feOptGen.cc feOptGen.h
-feOptES_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOptES_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 feOptES_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR 
 
 feOptTS_SOURCES = feOptGen.cc feOptGen.h
-feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 feOptTS_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR
 
 ########################### Singular* #########################
@@ -211,7 +211,7 @@ bin_PROGRAMS = Singular Singularg Singulard Singulardg
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 Singularg_CFLAGS = -g ${PIPE}
 
-Singular_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+Singular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 Singularg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
 nodist_Singular_SOURCES = libSingular.la
@@ -233,7 +233,7 @@ Singularg_LDFLAGS = -static
 Singulard_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 Singulardg_CFLAGS = -g ${PIPE}
 
-Singulard_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+Singulard_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 Singulardg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
 Singulard_SOURCES = tesths.cc
@@ -277,7 +277,7 @@ check_PROGRAMS=$(TESTS)
 test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 test_s_g_CFLAGS = ${PIPE}
 
-test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 test_s_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
 test_s_r_SOURCES = test.cc
@@ -298,7 +298,7 @@ test_s_g_LDFLAGS = -static
 test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 test_d_g_CFLAGS = ${PIPE}
 
-test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
 test_d_r_SOURCES = test.cc

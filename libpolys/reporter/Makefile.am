@@ -1,12 +1,12 @@
 noinst_LTLIBRARIES=libreporter.la libreporter_g.la
 # libreporterdir = $(libdir)/singular
 
-CXXTEMPLFLAGS =  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS =  ## -fno-implicit-templates
 
 libreporter_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libreporter_g_la_CFLAGS = ${PIPE}
 
-libreporter_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libreporter_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libreporter_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

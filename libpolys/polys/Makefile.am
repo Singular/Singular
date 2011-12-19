@@ -1,9 +1,9 @@
-CXXTEMPLFLAGS	=  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS	=  ## -fno-implicit-templates
 
 DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 
 NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
-NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer --no-rtti 
+NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer 
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
 AM_CFLAGS	= ${PIPE}

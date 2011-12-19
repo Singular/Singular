@@ -1,12 +1,12 @@
 noinst_LTLIBRARIES=libresources.la libresources_g.la
 # libresourcesdir = $(libdir)/singular
 
-CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS      =  ## -fno-implicit-templates
 
 libresources_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libresources_g_la_CFLAGS = ${PIPE}
 
-libresources_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libresources_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libresources_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

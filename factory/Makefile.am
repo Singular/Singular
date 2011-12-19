@@ -2,13 +2,13 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 SUBDIRS=include/factory libfac
 
-CXXTEMPLFLAGS      =  --no-exceptions ## -fno-implicit-templates
+CXXTEMPLFLAGS      =  ## -fno-implicit-templates
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
-libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
+libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
 libfactory_la_LIBADD     = ${abs_top_builddir}/libfac/libfac.la ${GMP_LIBS} ${NTL_LIBS}
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
@@ -331,12 +331,12 @@ check_PROGRAMS = $(TESTS)
 TESTSSOURCES = test.cc
 
 test_s_g_SOURCES = $(TESTSSOURCES)
-test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti 
+test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
 #ftmpl_inst.o
 test_s_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
 
 test_s_r_SOURCES = $(TESTSSOURCES)
-test_s_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti 
+test_s_r_CFLAGS = -O3 -fomit-frame-pointer 
 #ftmpl_inst.o
 test_s_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
@@ -346,12 +346,12 @@ test_s_g_LDFLAGS = -static
 
 
 test_d_g_SOURCES = $(TESTSSOURCES)
-test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer --no-rtti 
+test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
 #ftmpl_inst.o
 test_d_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS)
 
 test_d_r_SOURCES = $(TESTSSOURCES)
-test_d_r_CFLAGS = -O3 -fomit-frame-pointer --no-rtti 
+test_d_r_CFLAGS = -O3 -fomit-frame-pointer 
 #ftmpl_inst.o
 test_d_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 

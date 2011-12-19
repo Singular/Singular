@@ -1,4 +1,4 @@
-CXXTEMPLFLAGS = -O0 --no-exceptions ##  ## -fno-implicit-templates
+CXXTEMPLFLAGS = -O0 ##  ## -fno-implicit-templates
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory
@@ -39,7 +39,7 @@ nodist_rings_test_d_g_SOURCES = rings_test_runner.cpp
 
 
 RELEASECFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-RELEASECXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE}
+RELEASECXXFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 RELEASECPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 coeffs_test_s_r_CFLAGS =${RELEASECFLAGS} 

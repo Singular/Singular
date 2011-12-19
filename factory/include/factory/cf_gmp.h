@@ -1,7 +1,7 @@
 #ifndef SI_GMP_H
 #define SI_GMP_H
 
-
+/*
 #ifdef __cplusplus
 //  #define __cplusplus_backup __cplusplus
 
@@ -9,7 +9,10 @@
 #  undef __cplusplus
 extern "C" 
 {
-#  include <gmp.h>
+*/
+
+# include <gmp.h>
+/*
 }
   #include <factory/cplusplus.h>
 #else
@@ -19,6 +22,7 @@ extern "C"
 #else
   #include <gmp.h>
 #endif
+*/
 
 
 #endif /* SI_GMP_H */
