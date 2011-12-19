@@ -16,7 +16,7 @@
 
 /* forward declaration of types */
 class idrec;
-typedef idrec *   idhdl;
+typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
 struct  spolyrec;
 typedef struct spolyrec    polyrec;
 typedef polyrec *          poly;
@@ -331,8 +331,6 @@ ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bl
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
 void   rWrite(ring r, BOOLEAN details = FALSE);
-// void   rKill(idhdl h);
-// void   rKill(ring r);
 ring   rCopy(ring r);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
 ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal = TRUE,
@@ -373,8 +371,6 @@ void rGetSComps(int** currComponents, long** currShiftedComponents, int *length,
 
 
 
-//idhdl  rFindHdl(ring r, idhdl n, idhdl w);
-//idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n);
 const char * rSimpleOrdStr(int ord);
 int rOrderName(char * ordername);
 char * rOrdStr(ring r);

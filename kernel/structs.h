@@ -75,9 +75,6 @@ typedef procinfo *         procinfov;
 
 /* the function pointer types */
 
-class idrec;
-typedef idrec *   idhdl;
-
 #endif /* __cplusplus */
 
 

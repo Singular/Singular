@@ -970,7 +970,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
   assume(rIsPluralRing(currRing));
 
   int i;
-  idhdl h;
+//  idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
 

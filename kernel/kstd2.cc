@@ -1968,7 +1968,7 @@ int redFirstShift (LObject* h,kStrategy strat)
 void initBbaShift(ideal F,kStrategy strat)
 {
   int i;
-  idhdl h;
+//  idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba; /* remains as is, we change enterT! */
 
