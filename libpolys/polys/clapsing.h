@@ -11,6 +11,9 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
+
+#ifdef HAVE_FACTORY
+
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/simpleideals.h>
@@ -60,6 +63,10 @@ poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );
 
 number   nChineseRemainder(number *x, number *q,int rl, const coeffs r);
+
+
+#endif /* HAVE_FACTORY */
+
 
 #endif /* INCL_FACTORYSING_H */
 

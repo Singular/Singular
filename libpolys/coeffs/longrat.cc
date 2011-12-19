@@ -2616,7 +2616,7 @@ number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
   return n;
 #else
   WerrorS("not implemented");
-  return nlInit(0);
+  return nlInit(0, C);
 #endif
 }
 

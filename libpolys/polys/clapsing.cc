@@ -13,11 +13,13 @@
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
+
 #include <factory/factory.h>
+
 #ifdef HAVE_LIBFAC
 #include <factory/libfac/factor.h>
 #endif
-#endif
+
 
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
@@ -1557,3 +1559,5 @@ intvec* singntl_LLL(intvec*  m, const ring)
 #endif
 #endif
 
+
+#endif /* HAVE_FACTORY */

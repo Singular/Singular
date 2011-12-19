@@ -34,7 +34,6 @@ poly convFactoryASingA ( const CanonicalForm & f, const ring r );
 CanonicalForm convSingTrPFactoryP ( poly p, const ring r );
 poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r );
 
-// HAVE_FACTORY
-#endif 
+#endif /* HAVE_FACTORY */
 
 #endif /* INCL_SINGCONV_H */
