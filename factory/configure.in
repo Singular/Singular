@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id$
+dnl # $Id: configure.in 14157 2011-04-14 08:21:34Z hannes $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,11 +12,11 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id$)
+AC_REVISION($Id: configure.in 14157 2011-04-14 08:21:34Z hannes $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
-
+AC_CONFIG_MACRO_DIR([.])
 #
 # Do not change version here!!!
 #
@@ -277,6 +277,8 @@ if test "x$gmp_in_installation" != xyes; then
       unset ac_cv_header_gmp_h
     ])
 fi
+
+LB_CHECK_FLINT(2.2,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h, ,
   [ AC_MSG_ERROR(C header files not found) ])
