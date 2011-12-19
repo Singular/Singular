@@ -78,6 +78,7 @@ SOURCES = \
 		facSparseHensel.cc \
 		fieldGCD.cc \
 		ffops.cc \
+		FLINTconvert.cc \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
@@ -161,6 +162,7 @@ factory_headers = \
 		facSparseHensel.h \
 		fieldGCD.h \
 		ffops.h \
+		FLINTconvert.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
