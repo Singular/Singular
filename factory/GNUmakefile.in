@@ -184,6 +184,7 @@ basefactorysrc := \
 		fieldGCD.cc \
 		ffops.cc \
 		ftmpl_inst.cc \
+		FLINTconvert.cc \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
@@ -270,6 +271,7 @@ basefactoryincl := \
 		facSparseHensel.h \
 		fieldGCD.h \
 		ffops.h \
+		FLINTconvert.h \
 		ftmpl_list.h \
 		ftmpl_matrix.h \
 		gf_tabutil.h \
