@@ -29,6 +29,14 @@ CHARSETSRC = 	$(CHARSETSRC1)
 
 
 SOURCES  = $(FACTORSRC) $(CHARSETSRC)
+
+noinst_HEADERS = factor/SqrFree.h factor/Factor.h \
+    factor/MVMultiHensel.h factor/Truefactor.h \
+    factor/helpstuff.h factor/homogfactor.h \
+    factor/class.h factor/debug.h factor/interrupt.h factor/timing.h \
+    factor/tmpl_inst.h \
+    charset/csutil.h charset/charset.h charset/reorder.h charset/alg_factor.h charset/algfactor.h 
+
 libfac_la_SOURCES   = $(SOURCES)
 libfac_g_la_SOURCES = $(SOURCES)
 
@@ -36,6 +44,11 @@ libfac_g_la_SOURCES = $(SOURCES)
 libfac_includedir=$(includedir)/factory/libfac
 
 libfac_include_HEADERS   = factor.h 
+
+EXTRA_DIST = factor/class.cc \
+      factor/test.cc test.cc testcs.cc header.tpl \
+      tests charset/tests bin \
+      ChangeLog 00README 
 
 
 
