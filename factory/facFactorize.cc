@@ -873,7 +873,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A /= hh;
 
-  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+  /*if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
       factors))
   {
     int check= factors.length();
@@ -888,7 +888,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     }
     else
       factors= CFList();
-  }
+  }*/
 
 
   //shifting to zero

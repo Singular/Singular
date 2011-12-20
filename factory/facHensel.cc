@@ -31,6 +31,228 @@
 #include <NTL/lzz_pEX.h>
 #include "NTLconvert.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
+#ifdef HAVE_FLINT
+void kronSub (fmpz_poly_t result, const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  fmpz_poly_init2 (result, d*(degAy + 1));
+  _fmpz_poly_set_length (result, d*(degAy + 1));
+  CFIterator j;
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inBaseDomain())
+      convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d), i.coeff());
+    else
+      for (j=i.coeff(); j.hasTerms(); j++)
+        convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result,i.exp()*d+j.exp()), j.coeff());
+  }
+  _fmpz_poly_normalise(result);
+
+
+  /*fmpz_t coeff;
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inBaseDomain())
+    {
+      convertCF2Fmpz (coeff, i.coeff());
+      fmpz_poly_set_coeff_fmpz (result, i.exp()*d, coeff);
+    }
+    else
+    {
+      for (CFIterator j= i.coeff();j.hasTerms(); j++)
+      {
+        convertCF2Fmpz (coeff, j.coeff());
+        fmpz_poly_set_coeff_fmpz (result, i.exp()*d+j.exp(), coeff);
+      }
+    }
+  }
+  fmpz_clear (coeff);
+  _fmpz_poly_normalise (result);*/
+}
+
+
+CanonicalForm reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha, const CanonicalForm& den)
+{
+  Variable x= Variable (1);
+
+  CanonicalForm result= 0;
+  int i= 0;
+  int degf= fmpz_poly_degree (F);
+  int k= 0;
+  int degfSubK;
+  int repLength;
+  CanonicalForm coeff;
+  fmpz* tmp;
+  while (degf >= k)
+  {
+    coeff= 0;
+    degfSubK= degf - k;
+    if (degfSubK >= d)
+      repLength= d;
+    else
+      repLength= degfSubK + 1;
+
+    for (int j= 0; j < repLength; j++)
+    {
+      tmp= fmpz_poly_get_coeff_ptr (F, j+k);
+      if (!fmpz_is_zero (tmp))
+      {
+        CanonicalForm ff= convertFmpz2CF (tmp)/den;
+        coeff += ff*power (alpha, j);
+      }
+    }
+    result += coeff*power (x, i);
+    i++;
+    k= d*i;
+  }
+  return result;
+}
+
+CanonicalForm mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G, const Variable& alpha)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  CanonicalForm denA= bCommonDen (A);
+  CanonicalForm denB= bCommonDen (B);
+
+  A *= denA;
+  B *= denB;
+  int degAa= degree (A, alpha);
+  int degBa= degree (B, alpha);
+  int d= degAa + 1 + degBa;
+
+  fmpz_poly_t FLINTA,FLINTB;
+  fmpz_poly_init (FLINTA);
+  fmpz_poly_init (FLINTB);
+  kronSub (FLINTA, A, d);
+  kronSub (FLINTB, B, d);
+
+  fmpz_poly_mul (FLINTA, FLINTA, FLINTB);
+
+  denA *= denB;
+  A= reverseSubst (FLINTA, d, alpha, denA);
+
+  fmpz_poly_clear (FLINTA);
+  fmpz_poly_clear (FLINTB);
+  return A;
+}
+
+CanonicalForm
+mulFLINTQ (const CanonicalForm& F, const CanonicalForm& G)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  CanonicalForm denA= bCommonDen (A);
+  CanonicalForm denB= bCommonDen (B);
+
+  A *= denA;
+  B *= denB;
+  fmpz_poly_t FLINTA,FLINTB;
+  convertFacCF2Fmpz_poly_t (FLINTA, A);
+  convertFacCF2Fmpz_poly_t (FLINTB, B);
+  fmpz_poly_mul (FLINTA, FLINTA, FLINTB);
+  denA *= denB;
+  A= convertFmpz_poly_t2FacCF (FLINTA, F.mvar());
+  A /= denA;
+  fmpz_poly_clear (FLINTA);
+  fmpz_poly_clear (FLINTB);
+
+  return A;
+}
+
+CanonicalForm
+mulFLINTQ2 (const CanonicalForm& F, const CanonicalForm& G)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  fmpq_poly_t FLINTA,FLINTB;
+  convertFacCF2Fmpq_poly_t (FLINTA, A);
+  convertFacCF2Fmpq_poly_t (FLINTB, B);
+
+  fmpq_poly_mul (FLINTA, FLINTA, FLINTB);
+  A= convertFmpq_poly_t2FacCF (FLINTA, F.mvar());
+  fmpq_poly_clear (FLINTA);
+  fmpq_poly_clear (FLINTB);
+  return A;
+}
+
+CanonicalForm
+divFLINTQ (const CanonicalForm& F, const CanonicalForm& G)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  fmpq_poly_t FLINTA,FLINTB;
+  convertFacCF2Fmpq_poly_t (FLINTA, A);
+  convertFacCF2Fmpq_poly_t (FLINTB, B);
+
+  fmpq_poly_div (FLINTA, FLINTA, FLINTB);
+  A= convertFmpq_poly_t2FacCF (FLINTA, F.mvar());
+
+  fmpq_poly_clear (FLINTA);
+  fmpq_poly_clear (FLINTB);
+  return A;
+}
+
+CanonicalForm
+modFLINTQ (const CanonicalForm& F, const CanonicalForm& G)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  fmpq_poly_t FLINTA,FLINTB;
+  convertFacCF2Fmpq_poly_t (FLINTA, A);
+  convertFacCF2Fmpq_poly_t (FLINTB, B);
+
+  fmpq_poly_rem (FLINTA, FLINTA, FLINTB);
+  A= convertFmpq_poly_t2FacCF (FLINTA, F.mvar());
+
+  fmpq_poly_clear (FLINTA);
+  fmpq_poly_clear (FLINTB);
+  return A;
+}
+
+CanonicalForm
+mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G, const Variable& alpha, int m)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  CanonicalForm denA= bCommonDen (A);
+  CanonicalForm denB= bCommonDen (B);
+
+  A *= denA;
+  B *= denB;
+
+  int degAa= degree (A, alpha);
+  int degBa= degree (B, alpha);
+  int d= degAa + 1 + degBa;
+
+  fmpz_poly_t FLINTA,FLINTB;
+  fmpz_poly_init (FLINTA);
+  fmpz_poly_init (FLINTB);
+  kronSub (FLINTA, A, d);
+  kronSub (FLINTB, B, d);
+
+  int k= d*m;
+  fmpz_poly_mullow (FLINTA, FLINTA, FLINTB, k);
+
+  denA *= denB;
+  A= reverseSubst (FLINTA, d, alpha, denA);
+  fmpz_poly_clear (FLINTA);
+  fmpz_poly_clear (FLINTB);
+  return A;
+}
+
+#endif
+
 static
 CFList productsNTL (const CFList& factors, const CanonicalForm& M)
 {
@@ -331,7 +553,19 @@ CanonicalForm
 mulNTL (const CanonicalForm& F, const CanonicalForm& G)
 {
   if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
+  {
+    Variable alpha;
+#ifdef HAVE_FLINT
+    if ((!F.inCoeffDomain() && !G.inCoeffDomain()) && (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha)))
+    {
+      CanonicalForm result= mulFLINTQa (F, G, alpha);
+      return result;
+    }
+    else if (!F.inCoeffDomain() && !G.inCoeffDomain())
+      return mulFLINTQ (F, G);
+#endif
     return F*G;
+  }
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
   if (CFFactory::gettype() == GaloisFieldDomain)
@@ -350,10 +584,20 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G)
   }
   else
   {
+#ifdef HAVE_FLINT
+    nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2nmod_poly_t (FLINTF, F);
+    convertFacCF2nmod_poly_t (FLINTG, G);
+    nmod_poly_mul (FLINTF, FLINTF, FLINTG);
+    result= convertnmod_poly_t2FacCF (FLINTF, F.mvar());
+    nmod_poly_clear (FLINTF);
+    nmod_poly_clear (FLINTG);
+#else
     zz_pX NTLF= convertFacCF2NTLzzpX (F);
     zz_pX NTLG= convertFacCF2NTLzzpX (G);
     mul (NTLF, NTLF, NTLG);
     result= convertNTLzzpX2CF(NTLF, F.mvar());
+#endif
   }
   return result;
 }
@@ -369,7 +613,13 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
     return mod (F,G);
 
   if (getCharacteristic() == 0)
+  {
+#ifdef HAVE_FLINT
+    return modFLINTQ (F, G);
+#else
     return mod (F, G);
+#endif
+  }
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
@@ -389,10 +639,20 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
   }
   else
   {
+#ifdef HAVE_FLINT
+    nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2nmod_poly_t (FLINTF, F);
+    convertFacCF2nmod_poly_t (FLINTG, G);
+    nmod_poly_divrem (FLINTG, FLINTF, FLINTF, FLINTG);
+    result= convertnmod_poly_t2FacCF (FLINTF, F.mvar());
+    nmod_poly_clear (FLINTF);
+    nmod_poly_clear (FLINTG);
+#else
     zz_pX NTLF= convertFacCF2NTLzzpX (F);
     zz_pX NTLG= convertFacCF2NTLzzpX (G);
     rem (NTLF, NTLF, NTLG);
     result= convertNTLzzpX2CF(NTLF, F.mvar());
+#endif
   }
   return result;
 }
@@ -408,7 +668,13 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
     return div (F,G);
 
   if (getCharacteristic() == 0)
+  {
+#ifdef HAVE_FLINT
+    return divFLINTQ (F,G);
+#else
     return div (F, G);
+#endif
+  }
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
@@ -428,10 +694,20 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
   }
   else
   {
+#ifdef HAVE_FLINT
+    nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2nmod_poly_t (FLINTF, F);
+    convertFacCF2nmod_poly_t (FLINTG, G);
+    nmod_poly_div (FLINTF, FLINTF, FLINTG);
+    result= convertnmod_poly_t2FacCF (FLINTF, F.mvar());
+    nmod_poly_clear (FLINTF);
+    nmod_poly_clear (FLINTG);
+#else
     zz_pX NTLF= convertFacCF2NTLzzpX (F);
     zz_pX NTLG= convertFacCF2NTLzzpX (G);
     div (NTLF, NTLF, NTLG);
     result= convertNTLzzpX2CF(NTLF, F.mvar());
+#endif
   }
   return result;
 }
@@ -500,6 +776,101 @@ CanonicalForm mod (const CanonicalForm& F, const CFList& M)
     A= mod (A, i.getItem());
   return A;
 }
+
+#ifdef HAVE_FLINT
+void kronSubFp (nmod_poly_t result, const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  nmod_poly_init2 (result, getCharacteristic(), d*(degAy + 1));
+
+  nmod_poly_t buf;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    convertFacCF2nmod_poly_t (buf, i.coeff());
+
+    int k= i.exp()*d;
+    int bufRepLength= (int) nmod_poly_length (buf);
+    for (int j= 0; j < bufRepLength; j++)
+      nmod_poly_set_coeff_ui (result, j + k, nmod_poly_get_coeff_ui (buf, j));
+    nmod_poly_clear (buf);
+  }
+  _nmod_poly_normalise (result);
+}
+
+/*void kronSubQ (fmpz_poly_t result, const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  fmpz_poly_init2 (result, d*(degAy + 1));
+  _fmpz_poly_set_length (result, d*(degAy+1));
+
+  CFIterator j;
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inBas
+    convertFacCF2Fmpz_poly_t (buf, i.coeff());
+
+    int k= i.exp()*d;
+    int bufRepLength= (int) fmpz_poly_length (buf);
+    for (int j= 0; j < bufRepLength; j++)
+    {
+      fmpz_poly_get_coeff_fmpz (coeff, buf, j);
+      fmpz_poly_set_coeff_fmpz (result, j + k, coeff);
+    }
+    fmpz_poly_clear (buf);
+  }
+  fmpz_clear (coeff);
+  _fmpz_poly_normalise (result);
+}*/
+
+// A is a bivariate poly over Qa!!!!
+// d2= 2*deg_alpha + 1
+// d1= 2*deg_x*d2+1
+void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
+{
+  int degAy= degree (A);
+  fmpq_poly_init2 (result, d1*(degAy + 1));
+
+  fmpq_poly_t buf;
+  fmpq_t coeff;
+
+  int k, l, bufRepLength;
+  CFIterator j;
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      k= d1*i.exp();
+      convertFacCF2Fmpq_poly_t (buf, i.coeff());
+      bufRepLength= (int) fmpq_poly_length(buf);
+      for (l= 0; l < bufRepLength; l++)
+      {
+        fmpq_poly_get_coeff_fmpq (coeff, buf, l);
+        fmpq_poly_set_coeff_fmpq (result, l + k, coeff);
+      }
+      fmpq_poly_clear (buf);
+    }
+    else
+    {
+      for (j= i.coeff(); j.hasTerms(); j++)
+      {
+        k= d1*i.exp();
+        k += d2*j.exp();
+        convertFacCF2Fmpq_poly_t (buf, j.coeff());
+        bufRepLength= (int) fmpq_poly_length(buf);
+        for (l= 0; l < bufRepLength; l++)
+        {
+          fmpq_poly_get_coeff_fmpq (coeff, buf, l);
+          fmpq_poly_set_coeff_fmpq (result, k + l, coeff);
+        }
+        fmpq_poly_clear (buf);
+      }
+    }
+  }
+  fmpq_clear (coeff);
+  _fmpq_poly_normalise (result);
+}
+#endif
 
 zz_pX kronSubFp (const CanonicalForm& A, int d)
 {
