@@ -64,7 +64,7 @@ static  long hashinc(register DBM *db, long hash);
 static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
-extern  int errno;
+// extern  int errno;
 extern "C" int singular_fstat(int fd, struct stat *buf);
 
 DBM * dbm_open(char *file, int flags, int mode)
