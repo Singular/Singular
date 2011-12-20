@@ -38,6 +38,10 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 int getExp(); /* cf_char.cc */
 
 //static bool isUnivariateBaseDomain( const CanonicalForm & f )
@@ -427,7 +431,15 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   {
     if (f.isUnivariate())
     {
-      #ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+      nmod_poly_t f1;
+      convertFacCF2nmod_poly_t (f1, f);
+      nmod_poly_factor_t result;
+      nmod_poly_factor_init (result);
+      mp_limb_t leadingCoeff= nmod_poly_factor (result, f1);
+      F= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, f.mvar());
+      nmod_poly_factor_clear (result);
+#else ifdef HAVE_NTL
       if (isOn(SW_USE_NTL) && (isPurePoly(f)))
       {
         // USE NTL
