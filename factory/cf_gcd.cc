@@ -29,6 +29,12 @@ static CanonicalForm gcd_univar_ntl0( const CanonicalForm &, const CanonicalForm
 static CanonicalForm gcd_univar_ntlp( const CanonicalForm &, const CanonicalForm & );
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+static CanonicalForm gcd_univar_flint0 (const CanonicalForm &, const CanonicalForm &);
+static CanonicalForm gcd_univar_flintp (const CanonicalForm &, const CanonicalForm &);
+#endif
+
 static CanonicalForm cf_content ( const CanonicalForm &, const CanonicalForm & );
 static void cf_prepgcd( const CanonicalForm &, const CanonicalForm &, int &, int &, int & );
 
@@ -543,7 +549,10 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     else
     {
         bpure = isPurePoly(pi) && isPurePoly(pi1);
-#ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+        if (bpure && (CFFactory::gettype() != GaloisFieldDomain))
+          return gcd_univar_flintp(pi,pi1)*C;
+#else ifdef HAVE_NTL
         if ( isOn(SW_USE_NTL_GCD_P) && bpure && (CFFactory::gettype() != GaloisFieldDomain))
             return gcd_univar_ntlp(pi, pi1 ) * C;
 #endif
@@ -616,7 +625,10 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
     C = gcd( Ci, Ci1 );
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
-#ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+        if (isPurePoly(pi) && isPurePoly(pi1) )
+            return gcd_univar_flint0(pi, pi1 ) * C;
+#else ifdef HAVE_NTL
         if ( isOn(SW_USE_NTL_GCD_0) && isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_ntl0(pi, pi1 ) * C;
 #endif
@@ -1041,6 +1053,35 @@ gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
 }
 
 #endif
+
+#ifdef HAVE_FLINT
+static CanonicalForm
+gcd_univar_flintp (const CanonicalForm& F, const CanonicalForm& G)
+{
+  nmod_poly_t F1, G1;
+  convertFacCF2nmod_poly_t (F1, F);
+  convertFacCF2nmod_poly_t (G1, G);
+  nmod_poly_gcd (F1, F1, G1);
+  CanonicalForm result= convertnmod_poly_t2FacCF (F1, F.mvar());
+  nmod_poly_clear (F1);
+  nmod_poly_clear (G1);
+  return result;
+}
+
+static CanonicalForm
+gcd_univar_flint0( const CanonicalForm & F, const CanonicalForm & G )
+{
+  fmpz_poly_t F1, G1;
+  convertFacCF2Fmpz_poly_t(F1, F);
+  convertFacCF2Fmpz_poly_t(G1, G);
+  fmpz_poly_gcd (F1, F1, G1);
+  CanonicalForm result= convertFmpz_poly_t2FacCF (F1, F.mvar());
+  fmpz_poly_clear (F1);
+  fmpz_poly_clear (G1);
+  return result;
+}
+#endif
+
 
 /*
 *  compute positions p1 and pe of optimal variables:
