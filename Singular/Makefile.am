@@ -206,7 +206,19 @@ feOptTS_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR
 
 ########################### Singular* #########################
 
-bin_PROGRAMS = Singular Singularg Singulard Singulardg
+bin_PROGRAMS = Singular Singularg Singulard Singulardg 
+# libparse
+# libparse_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DSTANDALONE_PARSER
+# libparse_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+# libparse_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+  
+# libparse_SOURCES = libparse.cc
+# nodist_libparse_SOURCES = libSingular.la
+ 
+# # libSingular.la -lnumeric 
+# libparse_LDADD = -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+# libparse_LDFLAGS = -static ${AM_LDFLAGS}
+
 
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 Singularg_CFLAGS = -g ${PIPE}

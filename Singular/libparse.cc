@@ -1058,7 +1058,13 @@ char *yytext;
 #include <ctype.h>
 #include <kernel/mod2.h>
 #ifdef STANDALONE_PARSER
-  #include "utils.h"
+#include <Singular/utils.h>
+
+# ifdef HAVE_FACTORY
+int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
+int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
+# endif
+
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
   #define myfread fread
