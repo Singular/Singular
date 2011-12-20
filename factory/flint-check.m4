@@ -32,7 +32,7 @@ AC_ARG_WITH(flint,
 	     fi],
 	     [FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
 
-min_flint_version=ifelse([$1], ,2.2,$1)
+min_flint_version=ifelse([$1], ,2.3,$1)
 
 
 dnl Check for existence
@@ -65,7 +65,7 @@ if test -r "$FLINT_HOME/include/fmpz.h"; then
 	[
 	AC_TRY_RUN(
 	[#include <flint.h>
-	int main () { if (FLINT_MAJOR_VERSION < 2) return -1; else return 0; }	
+	int main () { if ((int) version[0] < 2) return -1; else return 0; }	
 	],[
 	flint_found="yes"	
 	break
