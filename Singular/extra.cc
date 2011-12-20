@@ -154,7 +154,9 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 
-////// #include <libfac/factor.h> //////?????
+#ifdef HAVE_LIBFAC
+//#include <factory/libfac/factor.h>
+#endif
 
 #include <polys/clapconv.h>
 #include <kernel/kstdfac.h>
