@@ -637,7 +637,17 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else
     {
-      F = ZFactorizeMultivariate( fz, issqrfree );
+      On (SW_RATIONAL);
+      if (issqrfree)
+      {
+        CFList factors;
+        factors= ratSqrfFactorize (fz, Variable (1));
+        for (CFListIterator i= factors; i.hasItem(); i++)
+          F.append (CFFactor (i.getItem(), 1));
+      }
+      else
+        F = ratFactorize (fz, Variable (1));
+      Off (SW_RATIONAL);
     }
 
     if ( on_rational )
