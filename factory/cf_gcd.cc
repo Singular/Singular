@@ -553,9 +553,11 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
 #ifdef HAVE_FLINT
         if (bpure && (CFFactory::gettype() != GaloisFieldDomain))
           return gcd_univar_flintp(pi,pi1)*C;
-#else ifdef HAVE_NTL
+#else
+#ifdef HAVE_NTL
         if ( isOn(SW_USE_NTL_GCD_P) && bpure && (CFFactory::gettype() != GaloisFieldDomain))
             return gcd_univar_ntlp(pi, pi1 ) * C;
+#endif
 #endif
     }
     Variable v = f.mvar();
@@ -629,9 +631,11 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
 #ifdef HAVE_FLINT
         if (isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_flint0(pi, pi1 ) * C;
-#else ifdef HAVE_NTL
+#else
+#ifdef HAVE_NTL
         if ( isOn(SW_USE_NTL_GCD_0) && isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_ntl0(pi, pi1 ) * C;
+#endif
 #endif
         return gcd_poly_univar0( pi, pi1, true ) * C;
     }

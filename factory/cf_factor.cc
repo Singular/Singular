@@ -440,7 +440,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       mp_limb_t leadingCoeff= nmod_poly_factor (result, f1);
       F= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, f.mvar());
       nmod_poly_factor_clear (result);
-#else ifdef HAVE_NTL
+#else
+#ifdef HAVE_NTL
       if (isOn(SW_USE_NTL) && (isPurePoly(f)))
       {
         // USE NTL
@@ -539,7 +540,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         }
       }
       else
-      #endif
+#endif //HAVE_NTL
+#endif //HAVE_FLINT
       {  // Use Factory without NTL
         if ( isOn( SW_BERLEKAMP ) )
           F=FpFactorizeUnivariateB( f, issqrfree );
