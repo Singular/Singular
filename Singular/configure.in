@@ -1260,7 +1260,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
-LB_CHECK_FLINT(2.2,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 if test "x$flint_found" = "xyes"; then
   includedir= "${FLINT_HOME}/include ${includedir}"
