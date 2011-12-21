@@ -308,6 +308,8 @@ BUILT_SOURCES = cplusplus.h factory.h factoryconf.h
 
 CLEANFILES = $(BUILT_SOURCES) include/factory/factory.h include/factory/factoryconf.h include/factory/cplusplus.h
 
+distclean-local:
+	-rm -f readcf.cc
 
 cplusplus_SOURCES = cplusplus.cc
 
