@@ -708,11 +708,13 @@ example
    ring r = 0, x(1..4), dp;
    ideal I = cyclic(4);
    int p = 181;
-   list P = modpStd(I,p,5);
+   list P = modpStd(I,p,2);
    P;
 
+   ring r2 = 0, x(1..5), lp;
+   ideal I = cyclic(5);
    int q = 32003;
-   list Q = modpStd(I,q,2);
+   list Q = modpStd(I,q,4);
    Q;
 }
 
@@ -729,7 +731,7 @@ ASSUME:  If size(#) > 0, then # contains either 1, 2 or 4 integers such that
            the computation stops.
 RETURN:  a standard basis of I if no warning appears;
 NOTE:    The procedure computes a standard basis of I (over the rational
-         numbers) by using  modular methods.
+         numbers) by using modular methods.
          By default the procedure computes a standard basis of I for sure, but
          if the optional parameter #[2] = 0, it computes a standard basis of I
          with high probability.
@@ -917,7 +919,7 @@ EXAMPLE: example modStd; shows an example
                {
                   variant = 3;
                   if(printlevel >= 10) { "variant = 3"; }
-                  
+               
                   int nvar@r = nvars(@r);
                   intvec w;
                   for(i = 1; i <= nvar@r; i++)
