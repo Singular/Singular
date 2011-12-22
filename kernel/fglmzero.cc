@@ -986,14 +986,14 @@ fglmDdata::gaussreduce( fglmVector & v, fglmVector & p, number & pdenom )
     fglmASSERT( pdenom == NULL, "pdenom in gaussreduce should be NULL" );
     pdenom= nInit( 1 );
     number vdenom = v.clearDenom();
-    if ( ! nIsOne( vdenom ) && ! nIsZero( vdenom ) ) {
+    if ( ! nIsZero( vdenom ) && ! nIsOne( vdenom ) ) {
         p.setelem( p.size(), vdenom );
     }
     else {
         nDelete( &vdenom );
     }
     number gcd = v.gcd();
-    if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) ) {
+    if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {
         v /= gcd;
         number temp= nMult( pdenom, gcd );
         nDelete( &pdenom );
@@ -1019,7 +1019,7 @@ fglmDdata::gaussreduce( fglmVector & v, fglmVector & p, number & pdenom )
             nDelete( & fac1 );
             nDelete( & fac2 );
             number gcd = v.gcd();
-            if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) ) {
+            if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {
                 v /= gcd;
                 number temp= nMult( pdenom, gcd );
                 nDelete( &pdenom );
@@ -1185,28 +1185,27 @@ FindUnivariatePolys( const idealFunctionals & l )
 
 // for a descritption of the parameters see fglm.h
 BOOLEAN
-fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
+fglmzero( ring sourceRing, ideal & sourceIdeal, ring destRing, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
 {
-    //idhdl initialRingHdl = currRingHdl;
+    ring initialRing = currRing;
     BOOLEAN fglmok;
 
     if ( currRing != sourceRing )
     {
         rChangeCurrRing( sourceRing );
-        //currRingHdl=NULL;
     }
     idealFunctionals L( 100, rVar(currRing) );
     fglmok = CalculateFunctionals( sourceIdeal, L );
     if ( deleteIdeal == TRUE )
         idDelete( & sourceIdeal );
-    //rSetHdl( destRingHdl );
+    rChangeCurrRing( destRing );
     if ( fglmok == TRUE )
     {
         L.map( sourceRing );
         destIdeal= GroebnerViaFunctionals( L );
     }
-    //if ( (switchBack) && (currRingHdl != initialRingHdl) )
-    //    rSetHdl( initialRingHdl );
+    if ( (switchBack) && (currRing != initialRing) )
+      rChangeCurrRing( initialRing );
     return fglmok;
 }
 
