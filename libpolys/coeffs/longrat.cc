@@ -1291,7 +1291,7 @@ int nlModP(number n, int p, const coeffs r)
 
      s = u1;
      if (s < 0) s+=p;
-     u=(s*((long)iz)) % ((long)p);
+     u=(s*((long)iz)) % ((long)p); // BUG: integer overflow!!!
      return (int)u;
   }
   return iz;
