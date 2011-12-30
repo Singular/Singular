@@ -212,9 +212,6 @@ endif
 p_Procs_Lib_%.dl_o : p_Procs_Lib.cc p_Procs_Dynamic.o 
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
-%.dl_o : %.cc
-	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -c $< -o $@
-
 DL_TAILG=\"sog\"
 DL_TAILP=\"sop\"
 
@@ -382,9 +379,6 @@ p_Procs_%.sog: p_Procs_Lib_%.dl_og
 p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
-%.dl_og: %.cc
-	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
-
 %.og: %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
@@ -430,9 +424,6 @@ p_Procs_%.sop: p_Procs_Lib_%.dl_op
 
 p_Procs_Lib_%.dl_op : p_Procs_Lib.cc  p_Procs_Dynamic.op
 	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
-
-%.dl_op: %.cc
-	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -c $< -o $@
 
 %.op: %.cc
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} -c $< -o $@
