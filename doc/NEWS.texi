@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id$
+@comment $Id: NEWS.texi 14111 2011-04-07 14:21:37Z hannes $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -22,6 +22,18 @@
 
 @heading News for version @value{VERSION}
 
+@heading Changed @sc{Singular} commands
+@itemize @bullet
+@item sqrfree: (@nref{sqrfree}): changed implementation, arguments, return type
+@end itemize
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
+@item new kibrary: symodstd.lib (@nref{symodstd_lib})
+@end itemize
+@heading --------------------------------------------------------------------
+@heading Older versions:
+@heading News for version 3-1-3
 @heading User defined types
 New types can be defined, see @nref{User defined types}.
 
@@ -55,7 +67,6 @@ renamed @code{resbin.lib} to @code{resbinomial.lib}, see @nref{resbinomial_lib}.
 @end itemize
 
 @heading --------------------------------------------------------------------
-@heading Older versions:
 @heading News for version 3-1-2
 
 This version starts some reorganization: a section for new libraries:

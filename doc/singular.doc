@@ -916,6 +916,7 @@ Comments should be send to the author of the library directly.
 * lll_lib:: Integral LLL-Algorithm
 * multigrading_lib:: Multigradings and related computations
 * realclassify_lib:: Classification of real singularities
+* symodstd_lib:: Groebner bases for symmetric ideals
 @end menu
 @c ----------------------------------------------------------
 @node findifs_lib, finitediff_lib, , Experimental libraries
@@ -954,9 +955,14 @@ Todos/Issues:
 
 @c lib multigrading.lib
 @c ----------------------------------------------------------
-@node realclassify_lib,, multigrading_lib, Experimental libraries
+@node realclassify_lib,symodstd_lib, multigrading_lib, Experimental libraries
 @subsection realclassify_lib
 @c lib realclassify.lib
+
+@c ----------------------------------------------------------
+@node symodstd_lib,,realclassify_lib, Experimental libraries
+@subsection symodstd_lib
+@c lib symodstd.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
