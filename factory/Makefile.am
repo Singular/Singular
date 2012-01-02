@@ -17,10 +17,10 @@ endif
 lib_LTLIBRARIES = libfactory.la ${LIB_G}
 
 libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
-libfactory_la_LIBADD     = ${abs_builddir}/libfac/libfac.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
-libfactory_g_la_LIBADD   = ${abs_builddir}/libfac/libfac_g.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+libfactory_g_la_LIBADD   = ${builddir}/libfac/libfac_g.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
 libfactory_g_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
 
@@ -303,7 +303,7 @@ TESTS = test-s-r test-d-r
 endif
 check_PROGRAMS = $(TESTS)
 
-AMLDFLAGS =  -L${abs_builddir}
+AMLDFLAGS =  -L${builddir}
 
 TESTSSOURCES = test.cc
 
