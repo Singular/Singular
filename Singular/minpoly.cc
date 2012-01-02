@@ -6,6 +6,7 @@
 
 
 #include<cmath>
+#include <cstdlib>
 #include "config.h"
 #include<kernel/mod2.h>
 
@@ -384,6 +385,7 @@ int NewVectorMatrix::findLargestNonpivot ()
       return i;
     }
   }
+  abort();
 }
 
 

@@ -146,6 +146,7 @@ int MinorKey::getAbsoluteRowIndex(const int i) const
   }
   /* We should never reach this line of code. */
   assume(false);
+  return -1;
 }
 
 int MinorKey::getAbsoluteColumnIndex(const int i) const
@@ -177,6 +178,7 @@ int MinorKey::getAbsoluteColumnIndex(const int i) const
   }
   /* We should never reach this line of code. */
   assume(false);
+  return -1;
 }
 
 void MinorKey::getAbsoluteRowIndices(int* const target) const
@@ -250,6 +252,7 @@ int MinorKey::getRelativeRowIndex(const int i) const
   }
   /* We should never reach this line of code. */
   assume(false);
+  return -1;
 }
 
 int MinorKey::getRelativeColumnIndex(const int i) const
@@ -281,6 +284,7 @@ int MinorKey::getRelativeColumnIndex(const int i) const
   }
   /* We should never reach this line of code. */
   assume(false);
+  return -1;
 }
 
 unsigned int MinorKey::getRowKey(const int blockIndex) const

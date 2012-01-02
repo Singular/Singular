@@ -933,6 +933,7 @@ static BOOLEAN _p_Content(leftv res, leftv h)
   pWrite(p); PrintLn();
   
   NoReturn(res);
+  return false;
 }
 
 END_NAMESPACE
