@@ -915,6 +915,7 @@ Comments should be send to the author of the library directly.
 * finitediff_lib:: finite difference schemes for linear differential equations
 * lll_lib:: Integral LLL-Algorithm
 * multigrading_lib:: Multigradings and related computations
+* parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
 * symodstd_lib:: Groebner bases for symmetric ideals
 @end menu
@@ -945,7 +946,7 @@ Issues:
 @subsection lll_lib
 @c lib lll.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,realclassify_lib,lll_lib, Experimental libraries
+@node multigrading_lib,parallel_lib,lll_lib, Experimental libraries
 @subsection multigrading_lib
 
 Todos/Issues:
@@ -955,7 +956,12 @@ Todos/Issues:
 
 @c lib multigrading.lib
 @c ----------------------------------------------------------
-@node realclassify_lib,symodstd_lib, multigrading_lib, Experimental libraries
+@node parallel_lib, realclassify_lib,multigrading_lib, Experimental libraries
+@subsection parallel_lib
+
+@c lib parallel.lib
+@c ----------------------------------------------------------
+@node realclassify_lib,symodstd_lib, parallel_lib, Experimental libraries
 @subsection realclassify_lib
 @c lib realclassify.lib
 

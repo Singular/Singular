@@ -418,7 +418,7 @@ EXAMPLE: example primList; shows an example
    intvec L;
    int i,p;
    int ncores = 1;
-   
+
 //-----------------  Initialize optional parameter ncores  ---------------------
    if(size(#) > 0)
    {
@@ -435,7 +435,7 @@ EXAMPLE: example primList; shows an example
          ncores = #[2];
       }
    }
-   
+
    if(size(#) == 0)
    {
       p = 2147483647;
@@ -689,7 +689,7 @@ EXAMPLE: example modpStd; shows an example
       i = interred(i);
       kill HomR;
    }
-   
+
    if(variant == 4)
    {
       def R1 = changeord("dp");
@@ -773,7 +773,7 @@ EXAMPLE: example modStd; shows an example
          int n1 = #[1];
          int exactness = 1;
          if(n1 >= 10)
-         { 
+         {
             int n2 = n1 + 1;
             int n3 = n1;
          }
@@ -788,7 +788,7 @@ EXAMPLE: example modStd; shows an example
          int n1 = #[1];
          int exactness = #[2];
          if(n1 >= 10)
-         { 
+         {
             int n2 = n1 + 1;
             int n3 = n1;
          }
@@ -863,7 +863,7 @@ EXAMPLE: example modStd; shows an example
       {
          variant = 1;
          if(printlevel >= 10) { "variant = 1"; }
-         
+
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
@@ -906,7 +906,7 @@ EXAMPLE: example modStd; shows an example
                rl[1] = L[5];
                def @r = ring(rl);
                setring @r;
-               
+
                def @s = changeord("dp");
                setring @s;
                ideal I = std(fetch(R0,I));
@@ -919,7 +919,7 @@ EXAMPLE: example modStd; shows an example
                {
                   variant = 3;
                   if(printlevel >= 10) { "variant = 3"; }
-               
+
                   int nvar@r = nvars(@r);
                   intvec w;
                   for(i = 1; i <= nvar@r; i++)
@@ -936,7 +936,7 @@ EXAMPLE: example modStd; shows an example
                   Id(1) = std(Id(1));
                   intvec hi = hilb(Id(1), 1, W);
                }
-               
+
                setring R0;
                kill @r,@s;
             }
@@ -1077,9 +1077,9 @@ EXAMPLE: example modStd; shows an example
    while(1)
    {
       tt = timer; rt = rtimer;
-      
+
       if(printlevel >= 10) { "size(L) = "+string(size(L)); }
-         
+
       if(n1 > 1)
       {
          while(j <= size(L) + 1)
@@ -1217,14 +1217,14 @@ EXAMPLE: example modStd; shows an example
          }
 
          attrib(J,"isSB",1);
-         
+
          if(exactness == 0)
          {
             option(set, opt);
             if(n1 > 1) { kill I_for_fork; }
             return(J);
          }
-         
+
          if(exactness == 1)
          {
             tt = timer; rt = rtimer;

@@ -29,7 +29,17 @@
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
+@item new kibrary: parallel.lib (@nref{parallel_lib})
 @item new kibrary: symodstd.lib (@nref{symodstd_lib})
+@item new kibrary: realclassify.lib (@nref{realclassify_lib})
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item 
+grobcov.lib (@nref{grobcov_lib})
+@item
+modstd.lib (@nref{modstd_lib})
 @end itemize
 @heading --------------------------------------------------------------------
 @heading Older versions:
