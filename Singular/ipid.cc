@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc 14372 2011-08-12 08:20:39Z hannes $ */
-
 /*
 * ABSTRACT: identfier handling
 */

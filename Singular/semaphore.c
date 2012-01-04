@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef HAVE_SIMPLEIPC
 #include "simpleipc.h"
 
 // Not yet implemented: SYSV IPC Semaphores
@@ -87,3 +88,4 @@ int simpleipc_cmd(char *cmd, int id, int v)
   else printf("unknown\n");
     return  -2;
 }
+#endif

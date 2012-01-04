@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longtrans.h 12469 2011-02-25 13:38:49Z seelisch $ */
 /*
 * ABSTRACT:   numbers in transcendental field extensions,
               i.e., in rational function fields

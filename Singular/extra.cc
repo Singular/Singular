@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -148,7 +147,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <Singular/gms.h>
 #endif
 
-#define HAVE_SIMPLEIPC
+//#define HAVE_SIMPLEIPC
 #ifdef HAVE_SIMPLEIPC
 #include "simpleipc.h"
 #endif

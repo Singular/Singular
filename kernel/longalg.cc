@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc 12469 2010-01-28 10:39:49Z hannes $ */
 /*
 * ABSTRACT:   algebraic numbers
 */

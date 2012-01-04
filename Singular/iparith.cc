@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc 14447 2011-11-30 20:00:05Z motsak $ */
-
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
