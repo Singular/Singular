@@ -3151,7 +3151,7 @@ static BOOLEAN jjSQR_FREE2(leftv res, leftv u, leftv dummy)
   intvec *v=NULL;
   int sw=(int)(long)dummy->Data();
   int fac_sw=sw;
-  if ((sw<0)||(sw>2)) fac_sw=1;
+  if (sw<0) fac_sw=1;
   singclap_factorize_retry=0;
   ideal f=singclap_sqrfree((poly)(u->CopyD()), &v, fac_sw, currRing);
   if (f==NULL)

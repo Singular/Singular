@@ -968,7 +968,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   if (f==NULL)
   {
     res=idInit(1,1);
-    if (with_exps!=1)
+    if (with_exps!=1 && with_exps!=3)
     {
       (*v)=new intvec(1);
       (**v)[0]=1;
@@ -982,11 +982,14 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     int n=0;
     int e;
     for(i=rVar(r);i>0;i--) if(p_GetExp(f,i,r)!=0) n++;
-    if (with_exps==0) n++; // with coeff
+    if (with_exps==0 || with_exps==3) n++; // with coeff
     res=idInit(si_max(n,1),1);
     switch(with_exps)
     {
       case 0: // with coef & exp.
+        res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
+        // no break
+      case 3: // with coef & exp.
         res->m[0]=p_NSet(n_Copy(pGetCoeff(f),r->cf),r);
         // no break
       case 2: // with exp.
@@ -1040,14 +1043,14 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   {
     //if (f!=NULL) // already tested at start of routine
     number n0=n_Copy(pGetCoeff(f),r->cf);
-    if (with_exps==0)
+    if (with_exps==0 || with_exps==3)
       N=n_Copy(n0,r->cf);
     p_Cleardenom(f, r);
     //after here f should not have a denominator!!
     //PrintS("S:");p_Write(f,r);PrintLn();
     NN=n_Div(n0,pGetCoeff(f),r->cf);
     n_Delete(&n0,r->cf);
-    if (with_exps==0)
+    if (with_exps==0 || with_exps==3)
     {
       n_Delete(&N,r->cf);
       N=n_Copy(NN,r->cf);
@@ -1059,13 +1062,13 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     if (singclap_factorize_retry==0)
     {
       number n0=n_Copy(pGetCoeff(f),r->cf);
-      if (with_exps==0)
+      if (with_exps==0 || with_exps==3)
         N=n_Copy(n0,r->cf);
       p_Norm(f,r);
       p_Cleardenom(f, r);
       NN=n_Div(n0,pGetCoeff(f),r->cf);
       n_Delete(&n0,r->cf);
-      if (with_exps==0)
+      if (with_exps==0 || with_exps==3)
       {
         n_Delete(&N,r->cf);
         N=n_Copy(NN,r->cf);
@@ -1131,7 +1134,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
       }
       *v = new intvec( n );
     }
-    else if (L.getFirst().factor().inCoeffDomain())
+    else if (L.getFirst().factor().inCoeffDomain() && with_exps!=3)
     {
       n--;
       J++;
@@ -1139,7 +1142,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
     {
-      if (with_exps!=1) (**v)[j] = J.getItem().exp();
+      if (with_exps!=1 && with_exps!=3) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp(r) || rField_is_Q(r))
         res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
       else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
@@ -1165,12 +1168,12 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   {
     int i=IDELEMS(res)-1;
     int stop=1;
-    if (with_exps!=0) stop=0;
+    if (with_exps!=0 || with_exps==3) stop=0;
     for(;i>=stop;i--)
     {
       p_Norm(res->m[i],r);
     }
-    if (with_exps==0) p_SetCoeff(res->m[0],old_lead_coeff,r);
+    if (with_exps==0 || with_exps==3) p_SetCoeff(res->m[0],old_lead_coeff,r);
     else n_Delete(&old_lead_coeff,r->cf);
   }
   else
