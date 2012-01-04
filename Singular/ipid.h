@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h 13833 2011-02-09 13:45:48Z hannes $ */
 /*
 * ABSTRACT: identfier handling
 */

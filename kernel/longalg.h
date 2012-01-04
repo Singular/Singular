@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h 12749 2010-04-27 14:17:56Z hannes $ */
 /*
 * ABSTRACT:   algebraic numbers
 */

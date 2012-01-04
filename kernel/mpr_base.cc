@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc 14278 2011-06-14 13:49:47Z hannes $ */
-
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
  *            ( sparse, dense, u-resultant solver )

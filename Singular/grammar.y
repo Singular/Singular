@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y 14372 2011-08-12 08:20:39Z hannes $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */

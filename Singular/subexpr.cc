@@ -4,7 +4,6 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc 14447 2011-11-30 20:00:05Z motsak $ */
 
 #include <stdlib.h>
 #include <stdio.h>
