@@ -29,14 +29,14 @@
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
-@item new kibrary: parallel.lib (@nref{parallel_lib})
-@item new kibrary: symodstd.lib (@nref{symodstd_lib})
-@item new kibrary: realclassify.lib (@nref{realclassify_lib})
+@item new library: parallel.lib (@nref{parallel_lib})
+@item new library: symodstd.lib (@nref{symodstd_lib})
+@item new library: realclassify.lib (@nref{realclassify_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
 @itemize @bullet
-@item 
+@item
 grobcov.lib (@nref{grobcov_lib})
 @item
 modstd.lib (@nref{modstd_lib})
@@ -82,7 +82,7 @@ renamed @code{resbin.lib} to @code{resbinomial.lib}, see @nref{resbinomial_lib}.
 This version starts some reorganization: a section for new libraries:
 (see @nref{Experimental libraries}), preparations for parallel computations
 (see @nref{modstd_lib}, @nref{Ssi links}), some linear algebra (see below),
-many new libaries, 
+many new libaries,
 many bug fixes etc.
 (especially factorization stuff and memory management).
 
@@ -278,7 +278,7 @@ new library: decodegb.lib (see @nref{decodegb_lib}: Generating and solving syste
 new library: dmodapp.lib (see @nref{dmodapp_lib}: applications of D-modules)
 @item
 new library: bfun.lib global (see @nref{bfun_lib}: Bernstein-Sato polynomial)
-@item 
+@item
 new library: freegb.lib (see @nref{freegb_lib}): Twosided Non-commutative Groebner bases in Free Algebras
 @item
 new library: jacobson.lib (see @nref{jacobson_lib}): Algorithms for Smith and Jacobson Normal Form
@@ -296,7 +296,7 @@ normal.lib (@nref{normal_lib}): changed structure of the result,
 @item
 elim.lib (@nref{elim_lib}): @nref{elim}, @nref{nselect}, @nref{select}, @nref{select1}: changed syntax
 @item
-homolog.lib: kernel renamed to @nref{hom_kernel}. 
+homolog.lib: kernel renamed to @nref{hom_kernel}.
 @*(See also @nref{kernel}, @nref{alg_kernel}).
 @item
 matrix.lib (@nref{matrix_lib}): new commands for computing symmetric/exterior powers/bases
@@ -324,7 +324,7 @@ new command: (@nref{variables}): ideal of all variables occurring in a polynomia
 @item
 syntax change: @nref{ncalgebra} should be substituted by @nref{nc_algebra}.
 @code{ncalgebra} is now depreciated, but still supported
-@item 
+@item
 library @nref{nctools_lib} updated to use @code{nc_algebra},@*
 @nref{Weyl}, @nref{Exterior}, @nref{findimAlgebra} do not change the current ring
 but return the new structure
