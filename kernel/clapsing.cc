@@ -1090,7 +1090,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
   if (f==NULL)
   {
     res=idInit(1,1);
-    if (with_exps!=1)
+    if (with_exps!=1 && with_exps!=3)
     {
       (*v)=new intvec(1);
       (**v)[0]=1;
@@ -1104,11 +1104,14 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
     int n=0;
     int e;
     for(i=pVariables;i>0;i--) if(pGetExp(f,i)!=0) n++;
-    if (with_exps==0) n++; // with coeff
+    if (with_exps==0 || with_exps==3) n++; // with coeff
     res=idInit(si_max(n,1),1);
     switch(with_exps)
     {
       case 0: // with coef & exp.
+        res->m[0]=pNSet(nCopy(pGetCoeff(f)));
+        // no break
+      case 3: // with coef & exp.
         res->m[0]=pNSet(nCopy(pGetCoeff(f)));
         // no break
       case 2: // with exp.
@@ -1160,12 +1163,12 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
   {
     //if (f!=NULL) // already tested at start of routine
     number n0= nCopy(pGetCoeff(f));
-    if (with_exps==0)
+    if (with_exps==0 || with_exps==3)
       N=nCopy(n0);
     p_Cleardenom(f, currRing);
     NN= nDiv(n0,pGetCoeff(f));
     nDelete(&n0);
-    if (with_exps==0)
+    if (with_exps==0 || with_exps==3)
     {
       nDelete(&N);
       N=nCopy(NN);
@@ -1177,13 +1180,13 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
     if (singclap_factorize_retry==0)
     {
       number n0= nCopy(pGetCoeff(f));
-      if (with_exps==0)
+      if (with_exps==0 || with_exps==3)
         N=nCopy(n0);
       pNorm(f);
       p_Cleardenom(f, currRing);
       NN=nDiv(n0,pGetCoeff(f));
       nDelete(&n0);
-      if (with_exps==0)
+      if (with_exps==0 || with_exps==3)
       {
         nDelete(&N);
         N=nCopy(NN);
@@ -1252,7 +1255,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
       }
       *v = new intvec( n );
     }
-    else if (L.getFirst().factor().inCoeffDomain())
+    else if (L.getFirst().factor().inCoeffDomain() && with_exps != 3)
     {
       n--;
       J++;
@@ -1260,7 +1263,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
     {
-      if (with_exps!=1) (**v)[j] = J.getItem().exp();
+      if (with_exps!=1 && with_exps != 3) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
         //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
         res->m[j] = convFactoryPSingP( J.getItem().factor() );
