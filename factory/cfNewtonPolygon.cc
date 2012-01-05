@@ -144,7 +144,7 @@ int grahamScan (int** points, int sizePoints)
     k++;
     i++;
   }
-  if (i + 1 < sizePoints)
+  if (i + 1 <= sizePoints || i == sizePoints)
   {
     int relArea=
     (points [i-2][0] - points [i-1][0])*(points [0][1] - points [i-1][1])-
@@ -680,3 +680,58 @@ decompress (const CanonicalForm& F, const mat_ZZ& inverseM, const vec_ZZ& A)
   return result/Lc (result); //normalize
 }
 #endif
+
+//assumes the input is a Newton polygon of a bivariate polynomial which is
+//primitive wrt. x and y, i.e. there is at least one point of the polygon lying
+//on the x-axis and one lying on the y-axis
+int* getRightSide (int** polygon, int sizeOfPolygon, int& sizeOfOutput)
+{
+  int maxY= polygon [0][0];
+  int indexY= 0;
+  for (int i= 1; i < sizeOfPolygon; i++)
+  {
+    if (maxY < polygon [i][0])
+    {
+      maxY= polygon [i][0];
+      indexY= i;
+    }
+    else if (maxY == polygon [i][0])
+    {
+      if (polygon [indexY][1] < polygon[i][1])
+        indexY= i;
+    }
+    if (maxY > polygon [i][0])
+      break;
+  }
+
+  int count= -1;
+  for (int i= indexY; i < sizeOfPolygon; i++)
+  {
+    if (polygon[i][0] == 0)
+    {
+      count= i - indexY;
+      break;
+    }
+  }
+
+  int * result;
+  int index= 0;
+  if (count < 0)
+  {
+    result= new int [sizeOfPolygon - indexY];
+    sizeOfOutput= sizeOfPolygon - indexY;
+    count= sizeOfPolygon - indexY - 1;
+    result [0]= polygon[sizeOfPolygon - 1][0] - polygon [0] [0];
+    index= 1;
+  }
+  else
+  {
+    sizeOfOutput= count;
+    result= new int [count];
+  }
+
+  for (int i= indexY + count; i > indexY; i--, index++)
+    result [index]= polygon [i - 1] [0] - polygon [i] [0];
+
+  return result;
+}
