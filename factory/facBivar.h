@@ -39,8 +39,8 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
 ///         element is the leading coefficient.
 inline
 CFList
-ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
-                    const Variable& v        ///< [in] algebraic variable
+ratBiSqrfFactorize (const CanonicalForm & G,        ///< [in] a bivariate poly
+                    const Variable& v= Variable (1) ///< [in] algebraic variable
                    )
 {
   CFMap N;
@@ -49,8 +49,16 @@ ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
-  contentXFactors= factorize (contentX, v);
-  contentYFactors= factorize (contentY, v);
+  if (v.level() != 1)
+  {
+    contentXFactors= factorize (contentX, v);
+    contentYFactors= factorize (contentY, v);
+  }
+  else
+  {
+    contentXFactors= factorize (contentX);
+    contentYFactors= factorize (contentY);
+  }
   if (contentXFactors.getFirst().factor().inCoeffDomain())
     contentXFactors.removeFirst();
   if (contentYFactors.getFirst().factor().inCoeffDomain())
@@ -93,9 +101,9 @@ ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 inline
 CFFList
-ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
-                const Variable& v,       ///< [in] algebraic variable
-                bool substCheck= true    ///< [in] enables substitute check
+ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
+                const Variable& v= Variable (1), ///< [in] algebraic variable
+                bool substCheck= true        ///< [in] enables substitute check
                )
 {
   CFMap N;
@@ -147,8 +155,16 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
-  contentXFactors= factorize (contentX, v);
-  contentYFactors= factorize (contentY, v);
+  if (v.level() != 1)
+  {
+    contentXFactors= factorize (contentX, v);
+    contentYFactors= factorize (contentY, v);
+  }
+  else
+  {
+    contentXFactors= factorize (contentX);
+    contentYFactors= factorize (contentY);
+  }
   if (contentXFactors.getFirst().factor().inCoeffDomain())
     contentXFactors.removeFirst();
   if (contentYFactors.getFirst().factor().inCoeffDomain())
