@@ -641,12 +641,12 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       if (issqrfree)
       {
         CFList factors;
-        factors= ratSqrfFactorize (fz, Variable (1));
+        factors= ratSqrfFactorize (fz);
         for (CFListIterator i= factors; i.hasItem(); i++)
           F.append (CFFactor (i.getItem(), 1));
       }
       else
-        F = ratFactorize (fz, Variable (1));
+        F = ratFactorize (fz);
       Off (SW_RATIONAL);
     }
 

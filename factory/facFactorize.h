@@ -33,8 +33,8 @@ multiFactorize (const CanonicalForm& F,     ///< [in] poly to be factored
 ///         element is the leading coefficient.
 inline
 CFList
-ratSqrfFactorize (const CanonicalForm & G,       ///<[in] a multivariate poly
-                  const Variable& v              ///<[in] algebraic variable
+ratSqrfFactorize (const CanonicalForm & G,        ///<[in] a multivariate poly
+                  const Variable& v= Variable (1) ///<[in] algebraic variable
                  )
 {
   if (getNumVars (G) == 2)
@@ -57,9 +57,9 @@ ratSqrfFactorize (const CanonicalForm & G,       ///<[in] a multivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 inline
 CFFList
-ratFactorize (const CanonicalForm& G,        ///<[in] a multivariate poly
-              const Variable& v,             ///<[in] algebraic variable
-              bool substCheck= true          ///<[in] enables substitute check
+ratFactorize (const CanonicalForm& G,          ///<[in] a multivariate poly
+              const Variable& v= Variable (1), ///<[in] algebraic variable
+              bool substCheck= true            ///<[in] enables substitute check
              )
 {
   if (getNumVars (G) == 2)
