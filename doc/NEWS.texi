@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi 14111 2011-04-07 14:21:37Z hannes $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
