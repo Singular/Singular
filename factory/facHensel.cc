@@ -559,19 +559,10 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G)
     if ((!F.inCoeffDomain() && !G.inCoeffDomain()) && (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha)))
     {
       CanonicalForm result= mulFLINTQa (F, G, alpha);
-      CanonicalForm test= F*G;
-      if (test != result)
-        printf ("FAILLLLLLLL\n");
       return result;
     }
     else if (!F.inCoeffDomain() && !G.inCoeffDomain())
-    {
-      CanonicalForm result= mulFLINTQ (F,G);
-      CanonicalForm test= F*G;
-      if (test != result)
-        printf ("FAILLLLLLLL2\n");
       return mulFLINTQ (F, G);
-    }
 #endif
     return F*G;
   }
@@ -626,14 +617,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
 #ifdef HAVE_FLINT
     Variable alpha;
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
-    {
-      CanonicalForm result= modFLINTQ (F,G);
-      CanonicalForm test= mod (F, G);
-      if (test != result)
-        printf ("FAILINMOD\n");
-      return result;
-      //return modFLINTQ (F, G);
-    }
+      return modFLINTQ (F, G);
     else
      return mod (F, G);
 #else
@@ -692,14 +676,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
 #ifdef HAVE_FLINT
     Variable alpha;
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
-    {
-      CanonicalForm result= divFLINTQ (F,G);
-      CanonicalForm test= div (F, G);
-      if (test != result)
-        printf ("FAILINDIV\n");
-      return result;
-      //return divFLINTQ (F,G);
-    }
+      return divFLINTQ (F,G);
     else
       return div (F, G);
 #else
@@ -2160,14 +2137,7 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
 #ifdef HAVE_FLINT
   Variable alpha;
   if (getCharacteristic() == 0 && !hasFirstAlgVar (F, alpha) && ! hasFirstAlgVar (G, alpha))
-  {
-    CanonicalForm result= mulMod2FLINTQ (F, G, M);
-    CanonicalForm test= mod (F*G, M);
-    if (test != result)
-      printf ("GOTTVERDAMMT\n");
-    return result;
-    //return mulMod2FLINTQ (F, G, M);
-  }
+    return mulMod2FLINTQ (F, G, M);
 #endif
 
   if (getCharacteristic() > 0 && CFFactory::gettype() != GaloisFieldDomain &&
