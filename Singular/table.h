@@ -77,6 +77,8 @@ struct sValCmd1 dArith1[]=
 ,{D(jjDEGREE),     DEGREE_CMD,      STRING_CMD,     IDEAL_CMD     , NO_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjDEGREE),     DEGREE_CMD,      STRING_CMD,     MODUL_CMD     , NO_PLURAL |ALLOW_RING | NO_ZERODIVISOR}
 ,{D(jjDEFINED),    DEFINED_CMD,     INT_CMD,        DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDENOMINATOR),DENOMINATOR_CMD, NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNUMERATOR),  NUMERATOR_CMD,   NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FACTORY
 ,{D(jjDET_I),      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_PLURAL |ALLOW_RING}
@@ -844,6 +846,7 @@ cmdnames cmds[] =
   { "deg",         0, DEG_CMD ,           CMD_12},
   { "degree",      0, DEGREE_CMD ,        CMD_1},
   { "delete",      0, DELETE_CMD ,        CMD_2},
+  { "denominator", 0, DENOMINATOR_CMD ,   CMD_1},  
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
@@ -957,6 +960,7 @@ cmdnames cmds[] =
   #endif
   { "nrows",       0, ROWS_CMD ,          CMD_1},
   { "number",      0, NUMBER_CMD ,        RING_DECL},
+  { "numerator",   0, NUMERATOR_CMD ,     CMD_1},
   { "nvars",       0, NVARS_CMD ,         CMD_1},
   { "open",        0, OPEN_CMD ,          CMD_1},
   #ifdef HAVE_PLURAL

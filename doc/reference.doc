@@ -71,6 +71,7 @@ and @code{LIB} no brackets are allowed.
 * deg::
 * degree::
 * delete::
+* denominator::
 * det::
 * diff::
 * dim::
@@ -151,6 +152,7 @@ and @code{LIB} no brackets are allowed.
 * npars::
 * nres::
 * nrows::
+* numerator::
 * nvars::
 * open::
 * option::
@@ -1286,7 +1288,7 @@ See
 @ref{mult}.
 @c ref
 @c ---------------------------------------
-@node delete, det, degree, Functions
+@node delete, denominator, degree, Functions
 @subsection delete
 @cindex delete
 
@@ -1312,7 +1314,34 @@ See
 @ref{insert}.
 @c ref
 @c ---------------------------------------
-@node det, diff, delete, Functions
+@node denominator, det, delete, Functions
+@subsection denominator
+@cindex denominator
+
+@table @code
+@item @strong{Syntax:}
+@code{denominator (} number_expression @code{)}
+@item @strong{Type:}
+number
+@item @strong{Purpose:}
+returns the denominator of a number.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = 0, x, dp;
+  number n = 3/2; 
+  denominator(n);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{content};
+@ref{cleardenom};
+@ref{numerator}.
+@c ref
+@c ---------------------------------------
+@node det, diff, denominator, Functions
 @subsection det
 @cindex det
 
@@ -4771,7 +4800,7 @@ See
 @ref{sres}.
 @c ref
 @c ---------------------------------------
-@node nrows, nvars, nres, Functions
+@node nrows, numerator, nres, Functions
 @subsection nrows
 @cindex nrows
 @table @code
@@ -4811,7 +4840,34 @@ See
 @ref{ncols}.
 @c ref
 @c ---------------------------------------
-@node nvars, open, nrows, Functions
+@node numerator, nvars, nrows, Functions
+@subsection numerator
+@cindex numerator
+
+@table @code
+@item @strong{Syntax:}
+@code{numerator (} number_expression @code{)}
+@item @strong{Type:}
+number
+@item @strong{Purpose:}
+returns the numerator of a number.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = 0, x, dp;
+  number n = 3/2; 
+  numerator(n);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{content};
+@ref{cleardenom};
+@ref{denominator}.
+@c ref
+@c ---------------------------------------
+@node nvars, open, numerator, Functions
 @subsection nvars
 @cindex nvars
 @table @code

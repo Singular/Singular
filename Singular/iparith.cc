@@ -80,6 +80,7 @@
 
 #include <kernel/timer.h>
 
+#include <polys/coeffrings.h>
 
 lists rDecompose(const ring r); ring rCompose(const lists  L);
 
@@ -3702,6 +3703,28 @@ static BOOLEAN jjDEFINED(leftv res, leftv v)
   else if (v->rtyp!=0) res->data=(void *)(-1);
   return FALSE;
 }
+
+/// Return the denominator of the input number
+/// NOTE: the input number is normalized as a side effect
+static BOOLEAN jjDENOMINATOR(leftv res, leftv v)
+{
+  number n = reinterpret_cast<number>(v->Data());
+  res->data = reinterpret_cast<void*>(n_GetDenom(n, currRing));
+  return FALSE;
+}
+
+/// Return the numerator of the input number
+/// NOTE: the input number is normalized as a side effect
+static BOOLEAN jjNUMERATOR(leftv res, leftv v)
+{
+  number n = reinterpret_cast<number>(v->Data());
+  res->data = reinterpret_cast<void*>(n_GetNumerator(n, currRing));
+  return FALSE;
+}
+
+
+
+
 #ifdef HAVE_FACTORY
 static BOOLEAN jjDET(leftv res, leftv v)
 {

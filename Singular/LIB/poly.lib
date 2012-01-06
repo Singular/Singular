@@ -20,8 +20,6 @@ PROCEDURES:
  normalize(poly/...);   normalize poly/... such that leading coefficient is 1
  rad_con(p,I);          check radical containment of polynomial p in ideal I
  content(f);            content of polynomial/vector f
- numerator(n);          numerator of number n
- denominator(n)         denominator of number n
  mod2id(M,iv);          conversion of a module M to an ideal
  id2mod(i,iv);          conversion inverse to mod2id
  substitute(I,...)      substitute in I variables by polynomials
@@ -902,44 +900,6 @@ example
    content(v);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-proc numerator(number n)
-"USAGE:    numerator(n); n number
-RETURN:   number, the numerator of n
-SEE ALSO: denominator, content, cleardenom
-EXAMPLE:  example numerator; shows an example
-"
-{
-  poly p = cleardenom(n+var(1));
-  return (number(coeffs(p,var(1))[1,1]));
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,x, dp;
-  number n = 3/2;
-  numerator(n);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc denominator(number n)
-"USAGE:    denominator(n); n number
-RETURN:   number, the denominator of n
-SEE ALSO: numerator, content, cleardenom
-EXAMPLE:  example denominator; shows an example
-"
-{
-  poly p = cleardenom(n+var(1));
-  return (number(coeffs(p,var(1))[2,1]));
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,x, dp;
-  number n = 3/2;
-  denominator(n);
-}
-////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 // The idea of the procedures mod2id, id2mod and subrInterred is, to
