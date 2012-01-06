@@ -2,8 +2,21 @@
 version="$Id$";
 category="General purpose";
 info="
-LIBRARY:   parallel.lib  An Interface for Parallelization
+LIBRARY:   parallel.lib  Tools for Parallelization
 AUTHOR:    Andreas Steenpass, e-mail: steenpass@mathematik.uni-kl.de
+
+OVERVIEW:
+This library provides tools to do several computations in parallel. They
+are aimed at ordinary Singular users as well as authors of Singular
+libraries.
+@* Even without this library, it is possible to do execute self-defined
+Singular commands in parallel using @ref{links}, but the handling of
+such links can be quite tedious. With the pocedures described below,
+this can be done by one-line commands.
+@* There are many parallel 'skeletons' (i.e. ways in which parallel
+tasks rely upon and interact with each other). A few of them are already
+implemented. Future plans include an abstraction layer for modular
+techniques, 'worker farms', and parallel tests.
 
 SEE ALSO:  link, modstd_lib, assprimeszerodim_lib
 
@@ -25,28 +38,37 @@ proc parallelWaitN(list commands, list args, int N, list #)
          linktype string, servers list, maxmemory intvec
 RETURN:  a list, containing the results of commands[i] applied to arg[i],
          i = 1, ..., size(commands).
-         @* The entries of the list commands must be strings.
-         @* The entries of the list args must be lists.
          @* The procedure waits for N jobs to finish.
-         @* An optional timeout in ms can be provided. Default is 0 which
+
+         @* OPTIONAL PARAMETERS:
+
+            An optional timeout in ms can be provided. Default is 0 which
             disables the timeout.
-         @* Supported linktypes are up to now \"ssi\" and \"mp\", see
+
+            Supported linktypes are up to now \"ssi\" and \"mp\", see
             @ref{Ssi links} and @ref{MP links}.
+
+            Servers:
          @* Each server is given by a list containing the address of the server,
             the number of cores to use on this server and the command to start
-            Singular. If the address is \"localhost\", the processes will
-            be generated on the same machine using forks. If the command to
-            start Singular is \"\" (the empty string), \"Singular\" will be
-            used. Default is @code{list(\"localhost\", system(\"cpu\"), \"\")}.
-            There are some obvious shortcuts for servers, e.g. \"myserver\" is
+            Singular.
+         @* If the address is \"localhost\", the processes will be generated on
+            the same machine using forks. If the command to start Singular is
+            \"\" (the empty string), \"Singular\" will be used.
+         @* Default is @code{list(\"localhost\", system(\"cpu\"), \"\")}.
+         @* There are some obvious shortcuts for servers, e.g. \"myserver\" is
             a shortcut for
             @code{list(\"myserver\", [nb. of cores on myserver], \"\")}, or 3
             for @code{list(\"localhost\", 3, \"\")}.
+
+            Memory limits:
          @* If an intvec maxmemory of size @code{size(commands)} is given, the
             i-th job will be killed if it uses more than maxmemory[i] MB of
             memory. If maxmemory[i] is 0, there will be no restraint for the
             i-th job. Default is @code{0:size(commands)}.
-NOTE:       The returned list may contain more than N results if several jobs
+NOTE:       The entries of the list commands must be strings.
+         @* The entries of the list args must be lists.
+         @* The returned list may contain more than N results if several jobs
             finished \"at the same time\". It may contain less than N results in
             the case of timeout or errors occurring.
          @* MP links do not work with a 64 bit version of Singular. If you want
@@ -541,8 +563,8 @@ example
   ring r = 0, (x,y,z), lp;
   ideal i = z8+z6+4z5+4z3+4z2+4, y-z2;
   ideal j = 3x3y+x3+xy3+y2z2, 2x3z-xy-xz3-y4-z2, 2x2yz-2xy2+xz2-y4;
-  list commands = list("std", "primdecGTZ", "primdecSY", "std", "primdecGTZ",
-                       "primdecSY");
+  list commands = list("std", "primdecGTZ", "primdecSY",
+                       "std", "primdecGTZ", "primdecSY");
   list args = list(list(i), list(i), list(i), list(j), list(j), list(j));
   parallelWaitN(commands, args, 3);
 }
