@@ -152,13 +152,16 @@ BOOLEAN npIsMOne (number a, const coeffs r)
 }
 
 #ifdef HAVE_DIV_MOD
+
 #ifdef USE_NTL_XGCD
+
 //ifdef HAVE_NTL // in ntl.a
 //extern void XGCD(long& d, long& s, long& t, long a, long b);
 #include <NTL/ZZ.h>
 #ifdef NTL_CLIENT
 NTL_CLIENT
 #endif
+
 #endif
 
 long InvMod(long a, const coeffs R)
@@ -747,15 +750,22 @@ void   nvInpMult(number &a, number b, const coeffs r)
 }
 
 
-long nvInvMod(long a, const coeffs R)
+inline long nvInvMod(long a, const coeffs R)
 {
+#ifdef HAVE_DIV_MOD
+  return InvMod(a, R);
+#else
+/// TODO: use "long InvMod(long a, const coeffs R)"?!
+  
    long  s;
 
-   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+   long  u, u0, u1, u2, q, r; // v0, v1, v2, 
 
-   u1=1; v1=0;
-   u2=0; v2=1;
-   u = a; v = R->ch;
+   u1=1; // v1=0;
+   u2=0; // v2=1;
+   u = a;
+
+   long v = R->ch;
 
    while (v != 0)
    {
@@ -764,11 +774,11 @@ long nvInvMod(long a, const coeffs R)
       u = v;
       v = r;
       u0 = u2;
-      v0 = v2;
-      u2 =  u1 - q*u2;
-      v2 = v1- q*v2;
+//      v0 = v2;
+      u2 = u1 - q*u2;
+//      v2 = v1 - q*v2;
       u1 = u0;
-      v1 = v0;
+//      v1 = v0;
    }
 
    s = u1;
@@ -776,7 +786,8 @@ long nvInvMod(long a, const coeffs R)
    if (s < 0)
       return s + R->ch;
    else
-      return s;
+     return s;
+#endif
 }
 
 inline number nvInversM (number c, const coeffs r)
