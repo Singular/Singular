@@ -86,6 +86,12 @@ if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
   CXXFLAGS=""
 fi
 
+AC_DEFINE_UNQUOTED([CC],"$CC",[CC])
+AC_DEFINE_UNQUOTED([CXX],"$CXX",[CXX])
+AC_DEFINE_UNQUOTED([CFLAGS],"$CFLAGS",[CFLAGS])
+AC_DEFINE_UNQUOTED([CXXFLAGS],"$CXXFLAGS",[CXXFLAGS])
+AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
+
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
 
