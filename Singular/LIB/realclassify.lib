@@ -8,10 +8,17 @@ AUTHOR:   Magdaleen Marais,  magdaleen@aims.ac.za
 
 OVERVIEW:
    A library for classifying isolated hypersurface singularities over the reals
-   w.r.t. right
-   equivalence, based on the determinator of singularities by V.I. Arnold.
-   This library is based on classify.lib by Kai Krueger, but handles the real
-   case, while classify.lib does the complex classification.
+   w.r.t. right equivalence, based on the determinator of singularities by
+   V.I. Arnold. This library is based on classify.lib by Kai Krueger, but
+   handles the real case, while classify.lib does the complex classification.
+
+REFERENCES:
+Arnold, Varchenko, Gusein-Zade: Singularities of Differentiable Maps.
+Vol. 1: The classification of critical points caustics and wave fronts.
+Birkh\"auser, Boston 1985
+
+Greuel, Lossen, Shustin: Introduction to singularities and deformations.
+Springer, Berlin 2007
 
 PROCEDURES:
  realclassify(f);    real classification of singularities of modality 0 and 1
@@ -30,7 +37,7 @@ proc realclassify(poly f, list #)
 USAGE:    realclassify(f[, printcomments]); f poly, printcomments int
 RETURN:   A list containing (in this order)
           @* - the type of the singularity as a string,
-          @* - the normal form as well as
+          @* - the normal form,
           @* - the corank, the Milnor number, the inertia index and
                a bound for the determinacy as integers.
           @* The normal form involves parameters for singularities of modality
@@ -777,7 +784,6 @@ example
 {
   "EXAMPLE:";
   echo = 2;
-  LIB "realclassify.lib";
   ring r = 0, (x,y,z), ds;
   poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
   realclassify(f, 1);
@@ -1005,7 +1011,6 @@ example
 {
   "EXAMPLE:";
   echo = 2;
-  LIB "realclassify.lib";
   ring r = 0, (x,y,z), ds;
   poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
   realmorsesplit(f);
@@ -1052,7 +1057,6 @@ example
 {
   "EXAMPLE:";
   echo = 2;
-  LIB "realclassify.lib";
   ring r = 0, (x,y), ds;
   poly f = x3+y4;
   milnornumber(f);
@@ -1144,7 +1148,6 @@ example
 {
   "EXAMPLE:";
   echo = 2;
-  LIB "realclassify.lib";
   ring r = 0, (x,y), ds;
   poly f = x3+xy3;
   determinacy(f);
