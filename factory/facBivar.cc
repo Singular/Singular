@@ -524,6 +524,12 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     return factors;
   }
 
+  if (!extension)
+  {
+    for (CFListIterator i= uniFactors; i.hasItem(); i++)
+      i.getItem() /= lc (i.getItem());
+  }
+
   A= A (y + evaluation, y);
 
   int liftBound= degree (A, y) + 1;
@@ -531,14 +537,24 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   bool earlySuccess= false;
   CFList earlyFactors;
   TIMING_START (fac_hensel_lift);
+  //out_cf ("A before= ",A, "\n");
   uniFactors= henselLiftAndEarly0
              (A, earlySuccess, earlyFactors, degs, liftBound,
               uniFactors, evaluation);
   TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
+  //printf ("earlyFactors.length()= %d\n", earlyFactors.length());
+  //printf ("liftBound after= %d\n", liftBound);
+  //printf ("earlySuccess= %d\n", earlySuccess);
   CanonicalForm MODl= power (y, liftBound);
 
+  CanonicalForm test= prod (uniFactors);
+  test *= LC (A,1);
+  test= mod (test, MODl);
+  //printf ("test == A %d\n", test == A);
+  //out_cf ("test= ", test, "\n");
+  //out_cf ("A= ", A, "\n");
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                 uniFactors.length()/2);
 

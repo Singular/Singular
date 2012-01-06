@@ -599,7 +599,11 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   //univariate case
   if (F.isUnivariate())
   {
-    CFList result= conv (factorize (F, v));
+    CFList result;
+    if (v.level() != 1)
+      result= conv (factorize (F, v));
+    else
+      result= conv (factorize (F,true));
     if (result.getFirst().inCoeffDomain())
       result.removeFirst();
     return result;
@@ -650,7 +654,10 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   CFList factors;
   if (A.isUnivariate ())
   {
-    factors= conv (factorize (A, v));
+    if (v.level() != 1)
+      factors= conv (factorize (A, v));
+    else
+      factors= conv (factorize (A,true));
     append (factors, contentAFactors);
     decompress (factors, N);
     return factors;
