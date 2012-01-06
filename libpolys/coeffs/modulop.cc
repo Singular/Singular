@@ -28,6 +28,29 @@
 /// Our Type!
 static const n_coeffType ID = n_Zp;
 
+#ifdef NV_OPS
+#pragma GCC diagnostic ignored "-Wlong-long"
+static inline number nvMultM(number a, number b, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  
+#if SIZEOF_LONG == 4
+#define ULONG64 (unsigned long long)(unsigned long)
+#else
+#define ULONG64 (unsigned long)
+#endif
+  return (number) 
+      (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 r->ch));
+}
+number  nvMult        (number a, number b, const coeffs r);
+number  nvDiv         (number a, number b, const coeffs r);
+number  nvInvers      (number c, const coeffs r);
+void    nvPower       (number a, int i, number * result, const coeffs r);
+#endif
+
+
+
+
 BOOLEAN npGreaterZero (number k, const coeffs r)
 {
   assume( n_Test(k, r) );
