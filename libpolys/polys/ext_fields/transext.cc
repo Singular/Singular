@@ -1118,16 +1118,16 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   int p = rChar(dst->extRing);
-  int n = nlModP(a, p, src);
-  number q = n_Init(n, dst->extRing->cf);
-  poly g;
+  number q = nlModP(a, src, dst->extRing->cf);
+
   if (n_IsZero(q, dst->extRing->cf))
   {
     n_Delete(&q, dst->extRing->cf);
     return NULL;
   }
-  g = p_One(dst->extRing);
-  p_SetCoeff(g, q, dst->extRing);
+  
+  poly g = p_NSet(q, dst->extRing);
+
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = g; // DEN(f) = NULL; COM(f) = 0;
   return (number)f;

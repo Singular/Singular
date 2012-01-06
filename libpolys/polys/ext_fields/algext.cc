@@ -649,10 +649,11 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   int p = rChar(dst->extRing);
-  int n = nlModP(a, p, src);
-  number q = n_Init(n, dst->extRing->cf);
-  poly result = p_One(dst->extRing);
-  p_SetCoeff(result, q, dst->extRing);
+
+  number q = nlModP(a, src, dst->extRing->cf);
+
+  poly result = p_NSet(q, dst->extRing);
+  
   return (number)result;
 }
 

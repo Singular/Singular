@@ -459,7 +459,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfSetMap = npSetMap;
   //r->cfName = ndName;
   r->cfInpMult=ndInpMult;
-  r->cfInit_bigint= npMap0;
+  r->cfInit_bigint= nlModP; // npMap0;
 #ifdef NV_OPS
   if (c>NV_MAX_PRIME)
   {
@@ -543,13 +543,6 @@ BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
   return TRUE;
 }
 #endif
-
-number npMap0(number from, const coeffs src, const coeffs dst_r)
-{
-  int nlModP(number n, int p, const coeffs r);
-
-  return npInit(nlModP(from, dst_r->npPrimeM, src),dst_r);
-}
 
 number npMapP(number from, const coeffs src, const coeffs dst_r)
 {
@@ -685,7 +678,7 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
 #endif
   if (nCoeff_is_Q(src))
   {
-    return npMap0;
+    return nlModP; // npMap0;
   }
   if ( nCoeff_is_Zp(src) )
   {

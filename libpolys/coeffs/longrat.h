@@ -86,7 +86,10 @@ number   nlIntMod(number a, number b, const coeffs r);
 void     nlPower(number x, int exp, number *lu, const coeffs r);
 const char *   nlRead (const char *s, number *a, const coeffs r);
 void     nlWrite(number &a, const coeffs r);
-int      nlModP(number n, int p, const coeffs r);
+
+/// Map q \in QQ \to Zp
+number nlModP(number q, const coeffs Q, const coeffs Zp);
+
 int      nlSize(number n, const coeffs r);
 number   nlGetDenom(number &n, const coeffs r);
 number   nlGetNumerator(number &n, const coeffs r);

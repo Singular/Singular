@@ -54,7 +54,6 @@ BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
 
 nMapFunc npSetMap(const coeffs src, const coeffs dst);
 number  npMapP(number from, const coeffs src, const coeffs r);
-number  npMap0(number from, const coeffs src, const coeffs r);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/
 /* for npMultM, npSubM, npNegM, npEqualM : */
 #ifdef HAVE_DIV_MOD

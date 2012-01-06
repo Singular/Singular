@@ -1255,46 +1255,49 @@ number nlLcm(number a, number b, const coeffs r)
   return result;
 }
 
-int nlModP(number n, int p, const coeffs r)
+// Map q \in QQ \to Zp
+// src = Q, dst = Zp (or an extension of Zp?)
+number nlModP(number q, const coeffs Q, const coeffs Zp)
 {
-  if (SR_HDL(n) & SR_INT)
+  assume( getCoeffType(Q) == ID );
+
+  const int p = n_GetChar(Zp);
+  assume( p > 0 );
+
+  const long P = p;
+  assume( P > 0 );
+
+  // embedded long within q => only long numerator has to be converted
+  // to int (modulo char.)
+  if (SR_HDL(q) & SR_INT)
   {
-    long i=SR_TO_INT(n);
-    if (i<0L) return (((long)p)-((-i)%((long)p)));
-    return i%((long)p);
+    long i = SR_TO_INT(q);
+    if (i<0L)
+      return n_Init( static_cast<int>( P - ((-i)%P) ), Zp);
+    else
+      return n_Init( static_cast<int>( i % P ), Zp );
   }
-  int iz=(int)mpz_fdiv_ui(n->z,(unsigned long)p);
-  if (n->s!=3)
+
+  const unsigned long PP = p;
+
+  // numerator modulo char. should fit into int
+  number z = n_Init( static_cast<int>(mpz_fdiv_ui(q->z, PP)), Zp );  
+
+  // denominator != 1?
+  if (q->s!=3)
   {
-    int in=mpz_fdiv_ui(n->n,(unsigned long)p);
-    long  s;
+    // denominator modulo char. should fit into int
+    number n = n_Init( static_cast<int>(mpz_fdiv_ui(q->n, PP)), Zp );
 
-    long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+    number res = n_Div( z, n, Zp );
 
-     u1=1; v1=0;
-     u2=0; v2=1;
-     u = in; v = p;
+    n_Delete(&z, Zp);
+    n_Delete(&n, Zp);
 
-     while (v != 0)
-     {
-        q = u / v;
-        r = u % v;
-        u = v;
-        v = r;
-        u0 = u2;
-        v0 = v2;
-        u2 =  u1 - q*u2;
-        v2 = v1- q*v2;
-        u1 = u0;
-        v1 = v0;
-     }
-
-     s = u1;
-     if (s < 0) s+=p;
-     u=(s*((long)iz)) % ((long)p); // BUG: integer overflow!!!
-     return (int)u;
+    return res;
   }
-  return iz;
+
+  return z;
 }
 
 #ifdef HAVE_RINGS
