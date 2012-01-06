@@ -21,7 +21,7 @@
 #define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
 #define nNeg(n)           n_Neg(n, currRing->cf)
 #define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
-#define nGetChar()        nInternalChar(currRing->cf)
+#define nGetChar()        n_GetChar(currRing->cf)
 #define nInit(i)          n_Init(i, currRing->cf)
 #define nIsOne(n)         n_IsOne(n, currRing->cf)
 #define nIsMOne(n)        n_IsMOne(n, currRing->cf)

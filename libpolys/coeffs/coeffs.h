@@ -288,12 +288,6 @@ static inline n_coeffType getCoeffType(const coeffs r)
   return r->type;
 }
 
-static inline int nInternalChar(const coeffs r)
-{
-  assume(r != NULL);
-  return r->ch;
-}
-
 /// one-time initialisations for new coeffs
 /// in case of an error return NULL
 coeffs nInitChar(n_coeffType t, void * parameter);
@@ -734,9 +728,12 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 // cfIntMod, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... 
 
-// Deprecated:
+/// Return the characteristic of the coeff. domain.
 static inline int n_GetChar(const coeffs r)
-{ assume(r != NULL); return nInternalChar(r); }
+{
+  assume(r != NULL);
+  return r->ch;
+}
 
 #endif
 
