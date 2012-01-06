@@ -182,6 +182,7 @@ mres_s
 ncfactor_example_all_procedures_s
 ncfactor_inhomog_s
 normal
+parallel_s
 paraplan_s
 pAddManyVarsManyL_s
 pAddManyVars_s
@@ -200,6 +201,7 @@ quotient_s
 rcyclic_15_32003_lp
 rcyclic_16_32003_lp
 rcyclic_17_32003_lp
+realclassify_s
 rInit
 reduce_s
 res_s
