@@ -101,19 +101,6 @@ struct n_Procs_s
    /// output of coeff description via Print
    void (*cfCoeffWrite)(const coeffs r, BOOLEAN details);
 
-   // the union stuff
-
-   // Zp:
-   int npPrimeM;
-   int npPminus1M;
-   #ifdef HAVE_DIV_MOD
-   unsigned short *npInvTable;
-   #endif
-   #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-   unsigned short *npExpTable;
-   unsigned short *npLogTable;
-   #endif
-
    // ?
    // initialisation:
    //void (*cfInitChar)(coeffs r, int parameter); // do one-time initialisations
@@ -208,7 +195,11 @@ struct n_Procs_s
    /// how many variables of factort are already used by this coeff
    int     factoryVarOffset;
    n_coeffType type;
-//-------------------------------------------
+
+   /////////////////////////////////////////////
+   // the union stuff
+
+   //-------------------------------------------
 
   /* for extension fields we need to be able to represent polynomials,
      so here is the polynomial ring: */
@@ -275,6 +266,18 @@ struct n_Procs_s
   unsigned short *m_nfPlus1Table;
   int *m_nfMinPoly;
   char * m_nfParameter;
+
+// ---------------------------------------------------
+// for Zp:
+#ifdef HAVE_DIV_MOD
+  unsigned short *npInvTable;
+#endif
+#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
+  unsigned short *npExpTable;
+  unsigned short *npLogTable;
+#endif
+   //   int npPrimeM; // NOTE: npPrimeM is deprecated, please use ch instead!
+  int npPminus1M; ///< characteristic - 1
 };
 //
 // test properties and type

@@ -66,27 +66,25 @@ extern unsigned short *npLogTable;
 #endif
 #endif
 
-#if 0
-inline number npMultM(number a, number b)
-// return (a*b)%n
-{
-   double ab;
-   long q, res;
-
-   ab = ((double) ((int)a)) * ((double) ((int)b));
-   q  = (long) (ab/((double) npPrimeM));  // q could be off by (+/-) 1
-   res = (long) (ab - ((double) q)*((double) npPrimeM));
-   res += (res >> 31) & npPrimeM;
-   res -= npPrimeM;
-   res += (res >> 31) & npPrimeM;
-   return (number)res;
-}
-#endif
+// inline number npMultM(number a, number b, int npPrimeM)
+// // return (a*b)%n
+// {
+//    double ab;
+//    long q, res;
+// 
+//    ab = ((double) ((int)a)) * ((double) ((int)b));
+//    q  = (long) (ab/((double) npPrimeM));  // q could be off by (+/-) 1
+//    res = (long) (ab - ((double) q)*((double) npPrimeM));
+//    res += (res >> 31) & npPrimeM;
+//    res -= npPrimeM;
+//    res += (res >> 31) & npPrimeM;
+//    return (number)res;
+// }
 #ifdef HAVE_MULT_MOD
 static inline number npMultM(number a, number b, const coeffs r)
 {
   return (number) 
-    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) r->npPrimeM));
+    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) r->ch));
 }
 #else
 static inline number npMultM(number a, number b, const coeffs r)
@@ -120,22 +118,22 @@ inline number npSubAsm(number a, number b, int m)
 static inline number npAddM(number a, number b, const coeffs r)
 {
   long R = (long)a + (long)b;
-  return (number)(R >= r->npPrimeM ? R - r->npPrimeM : R);
+  return (number)(R >= r->ch ? R - r->ch : R);
 }
 static inline number npSubM(number a, number b, const coeffs r)
 {
   return (number)((long)a<(long)b ?
-                       r->npPrimeM-(long)b+(long)a : (long)a-(long)b);
+                       r->ch-(long)b+(long)a : (long)a-(long)b);
 }
 #else
 static inline number npAddM(number a, number b, const coeffs r)
 {
    long res = ((long)a + (long)b);
-   res -= r->npPrimeM;
+   res -= r->ch;
 #if SIZEOF_LONG == 8
-   res += (res >> 63) & r->npPrimeM;
+   res += (res >> 63) & r->ch;
 #else
-   res += (res >> 31) & r->npPrimeM;
+   res += (res >> 31) & r->ch;
 #endif
    return (number)res;
 }
@@ -143,9 +141,9 @@ static inline number npSubM(number a, number b, const coeffs r)
 {
    long res = ((long)a - (long)b);
 #if SIZEOF_LONG == 8
-   res += (res >> 63) & r->npPrimeM;
+   res += (res >> 63) & r->ch;
 #else
-   res += (res >> 31) & r->npPrimeM;
+   res += (res >> 31) & r->ch;
 #endif
    return (number)res;
 }
@@ -156,16 +154,14 @@ static inline BOOLEAN npIsZeroM (number  a, const coeffs)
   return 0 == (long)a;
 }
 
-/*
-*inline number npMultM(number a, number b)
-*{
-*  return (number)(((long)a*(long)b) % npPrimeM);
-*}
-*/
+// inline number npMultM(number a, number b, int npPrimeM)
+// {
+//   return (number)(((long)a*(long)b) % npPrimeM);
+// }
 
-#define npNegM(A,r)      (number)(r->npPrimeM-(long)(A))
+
+#define npNegM(A,r)      (number)(r->ch-(long)(A))
 #define npEqualM(A,B,r)  ((A)==(B))
-
 
 
 #endif

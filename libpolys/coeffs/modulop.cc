@@ -56,14 +56,14 @@ BOOLEAN npGreaterZero (number k, const coeffs r)
   assume( n_Test(k, r) );
   
   int h = (int)((long) k);
-  return ((int)h !=0) && (h <= (r->npPrimeM>>1));
+  return ((int)h !=0) && (h <= (r->ch>>1));
 }
 
-//unsigned long npMultMod(unsigned long a, unsigned long b)
+//unsigned long npMultMod(unsigned long a, unsigned long b, int npPrimeM)
 //{
 //  unsigned long c = a*b;
 //  c = c % npPrimeM;
-//  assume(c == (unsigned long) npMultM((number) a, (number) b));
+//  assume(c == (unsigned long) npMultM((number) a, (number) b, npPrimeM));
 //  return c;
 //}
 
@@ -166,14 +166,14 @@ long InvMod(long a, const coeffs R)
    long d, s, t;
 
 #ifdef USE_NTL_XGCD
-   XGCD(d, s, t, a, R->npPrimeM);
+   XGCD(d, s, t, a, R->ch);
    assume (d == 1);
 #else
    long  u, v, u0, v0, u1, v1, u2, v2, q, r;
 
    assume(a>0);
    u1=1; u2=0;
-   u = a; v = R->npPrimeM;
+   u = a; v = R->ch;
 
    while (v != 0)
    {
@@ -190,7 +190,7 @@ long InvMod(long a, const coeffs R)
    s = u1;
 #endif
    if (s < 0)
-      return s + R->npPrimeM;
+      return s + R->ch;
    else
       return s;
 }
@@ -221,7 +221,7 @@ number npDiv (number a,number b, const coeffs r)
   assume( n_Test(b, r) );
 
 //#ifdef NV_OPS
-//  if (npPrimeM>NV_MAX_PRIME)
+//  if (r->ch>NV_MAX_PRIME)
 //    return nvDiv(a,b);
 //#endif
   if ((long)a==0)
@@ -338,10 +338,10 @@ static const char* npEati(const char *s, int *i, const coeffs r)
     {
       ii *= 10;
       ii += *s++ - '0';
-      if (ii >= (MAX_INT_VAL / 10)) ii = ii % r->npPrimeM;
+      if (ii >= (MAX_INT_VAL / 10)) ii = ii % r->ch;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if (ii >= r->npPrimeM) ii = ii % r->npPrimeM;
+    if (ii >= r->ch) ii = ii % r->ch;
     *i=(int)ii;
   }
   else (*i) = 1;
@@ -367,7 +367,7 @@ const char * npRead (const char *s, number *a, const coeffs r)
     else
     {
 #ifdef NV_OPS
-      if (r->npPrimeM>NV_MAX_PRIME)
+      if (r->ch>NV_MAX_PRIME)
         *a = nvDiv((number)z,(number)n,r);
       else
 #endif
@@ -386,13 +386,13 @@ void npKillChar(coeffs r)
 {
   #ifdef HAVE_DIV_MOD
   if (r->npInvTable!=NULL)
-  omFreeSize( (void *)r->npInvTable, r->npPrimeM*sizeof(unsigned short) );
+  omFreeSize( (void *)r->npInvTable, r->ch*sizeof(unsigned short) );
   r->npInvTable=NULL;
   #else
   if (r->npExpTable!=NULL)
   {
-    omFreeSize( (void *)r->npExpTable, r->npPrimeM*sizeof(unsigned short) );
-    omFreeSize( (void *)r->npLogTable, r->npPrimeM*sizeof(unsigned short) );
+    omFreeSize( (void *)r->npExpTable, r->ch*sizeof(unsigned short) );
+    omFreeSize( (void *)r->npLogTable, r->ch*sizeof(unsigned short) );
     r->npExpTable=NULL; r->npLogTable=NULL;
   }
   #endif
@@ -406,7 +406,7 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 #ifdef HAVE_FACTORY
 CanonicalForm npConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
-  if (setChar) setCharacteristic( r->npPrimeM );
+  if (setChar) setCharacteristic( r->ch );
   CanonicalForm term(npInt( n,r ));
   return term;
 }
@@ -435,8 +435,8 @@ BOOLEAN npInitChar(coeffs r, void* p)
   
   int i, w;
 
-  r->npPrimeM = c;
-  r->npPminus1M = c /*r->npPrimeM*/ - 1;
+  r->ch = c;
+  r->npPminus1M = c /*r->ch*/ - 1;
 
   //r->cfInitChar=npInitChar;
   r->cfKillChar=npKillChar;
@@ -513,15 +513,15 @@ BOOLEAN npInitChar(coeffs r, void* p)
 
   // the tables
 #ifdef NV_OPS
-  if (r->npPrimeM <=NV_MAX_PRIME)
+  if (r->ch <=NV_MAX_PRIME)
 #endif
   {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-    r->npExpTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
-    r->npLogTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
+    r->npExpTable=(unsigned short *)omAlloc( r->ch*sizeof(unsigned short) );
+    r->npLogTable=(unsigned short *)omAlloc( r->ch*sizeof(unsigned short) );
     r->npExpTable[0] = 1;
     r->npLogTable[0] = 0;
-    if (r->npPrimeM > 2)
+    if (r->ch > 2)
     {
       w = 1;
       loop
@@ -533,12 +533,12 @@ BOOLEAN npInitChar(coeffs r, void* p)
         {
           i++;
           r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
-                               % r->npPrimeM);
+                               % r->ch);
           r->npLogTable[r->npExpTable[i]] = i;
-          if (/*(i == npPrimeM - 1 ) ||*/ (r->npExpTable[i] == 1))
+          if (/*(i == r->ch - 1 ) ||*/ (r->npExpTable[i] == 1))
             break;
         }
-        if (i == r->npPrimeM - 1)
+        if (i == r->ch - 1)
           break;
       }
     }
@@ -549,7 +549,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
     }
 #endif
 #ifdef HAVE_DIV_MOD
-    r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
+    r->npInvTable=(unsigned short*)omAlloc0( r->ch*sizeof(unsigned short) );
 #endif
   }
   return FALSE;
@@ -558,7 +558,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
 #ifdef LDEBUG
 BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
 {
-  if (((long)a<0) || ((long)a>r->npPrimeM))
+  if (((long)a<0) || ((long)a>r->ch))
   {
     Print("wrong mod p number %ld at %s,%d\n",(long)a,f,l);
     return FALSE;
@@ -570,12 +570,12 @@ BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
 number npMapP(number from, const coeffs src, const coeffs dst_r)
 {
   long i = (long)from;
-  if (i>src->npPrimeM/2)
+  if (i>src->ch/2)
   {
-    i-=src->npPrimeM;
-    while (i < 0) i+=dst_r->npPrimeM;
+    i-=src->ch;
+    while (i < 0) i+=dst_r->ch;
   }
-  i%=dst_r->npPrimeM;
+  i%=dst_r->ch;
   return (number)i;
 }
 
@@ -603,7 +603,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
     size--;
   }
 
-  if(dst_r->npPrimeM>2)
+  if(dst_r->ch>2)
     e=(*f)[0]._mp_exp-size;
   else
     e=0;
@@ -628,7 +628,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
     ndest->_mp_d = nn;
     ndest->_mp_alloc = ndest->_mp_size = bl;
     res->s = 0;
-    in=mpz_fdiv_ui(ndest,dst_r->npPrimeM);
+    in=mpz_fdiv_ui(ndest,dst_r->ch);
     mpz_clear(ndest);
   }
   else
@@ -643,7 +643,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
 
   dest->_mp_d = dd;
   dest->_mp_alloc = al;
-  iz=mpz_fdiv_ui(dest,dst_r->npPrimeM);
+  iz=mpz_fdiv_ui(dest,dst_r->ch);
   mpz_clear(dest);
   if(res->s==0)
     iz=(long)npDiv((number)iz,(number)in,dst_r);
@@ -660,7 +660,7 @@ number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
 
-  mpz_mod_ui(erg, (int_number) from, dst->npPrimeM);
+  mpz_mod_ui(erg, (int_number) from, dst->ch);
   number r = (number) mpz_get_si(erg);
 
   mpz_clear(erg);
@@ -673,7 +673,7 @@ number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 */
 number npMapMachineInt(number from, const coeffs /*src*/,const coeffs dst)
 {
-  long i = (long) (((unsigned long) from) % dst->npPrimeM);
+  long i = (long) (((unsigned long) from) % dst->ch);
   return (number) i;
 }
 #endif
@@ -681,7 +681,7 @@ number npMapMachineInt(number from, const coeffs /*src*/,const coeffs dst)
 #ifdef HAVE_FACTORY
 number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs dst)
 {
-  setCharacteristic (dst ->npPrimeM);
+  setCharacteristic (dst ->ch);
   CanonicalForm f= CanonicalForm ((InternalCF*)(a));
   return (number) (f.intval());
 }
@@ -755,7 +755,7 @@ long nvInvMod(long a, const coeffs R)
 
    u1=1; v1=0;
    u2=0; v2=1;
-   u = a; v = R->npPrimeM;
+   u = a; v = R->ch;
 
    while (v != 0)
    {
@@ -774,7 +774,7 @@ long nvInvMod(long a, const coeffs R)
    s = u1;
    //t = v1;
    if (s < 0)
-      return s + R->npPrimeM;
+      return s + R->ch;
    else
       return s;
 }
@@ -830,6 +830,6 @@ void nvPower (number a, int i, number * result, const coeffs r)
 
 void    npCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("//   characteristic : %d\n",r->npPrimeM);
+  Print("//   characteristic : %d\n",r->ch);
 }
 
