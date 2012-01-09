@@ -661,6 +661,18 @@ Variable chooseExtension (
                       int k                   ///< [in] some int
                          );
 
+/// compute lifting precisions from the shape of the Newton polygon of F
+///
+/// @return @a getLiftPrecisions returns lifting precisions computed from the
+/// shape of the Newton polygon of F
+int *
+getLiftPrecisions (const CanonicalForm& F, ///< [in] a bivariate poly
+                   int& sizeOfOutput,      ///< [in,out] size of the output
+                   int degreeLC            ///< [in] degree of the leading coeff
+                                           ///< [in] of F wrt. Variable (1)
+                  );
+
+
 /// detects factors of @a F at stage @a deg of Hensel lifting.
 /// No combinations of more than one factor are tested. Lift bound and possible
 /// degree pattern are updated.
