@@ -41,7 +41,7 @@ syModStd(I,pi);
 ring R5 = 0, x(1..4), dp;
 ideal I = cyclic(4);
 tau = 2,3,4,1;
-ideal sJ1 = syModStd(I,tau,3);
+ideal sJ1 = syModStd(I,tau,1);
 ideal sJ2 = syModStd(I,tau,1,1);
 size(reduce(sJ1,sJ2));
 size(reduce(sJ2,sJ1));
