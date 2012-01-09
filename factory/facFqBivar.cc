@@ -777,6 +777,61 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   return result;
 }
 
+int*
+getCombinations (int * rightSide, int sizeOfRightSide, int& sizeOfOutput,
+                 int degreeLC)
+{
+  Variable x= Variable (1);
+  int p= getCharacteristic();
+  int d= getGFDegree();
+  char cGFName= gf_name;
+  setCharacteristic(0);
+  CanonicalForm buf= 1;
+  for (int i= 0; i < sizeOfRightSide; i++)
+    buf *= (power (x, rightSide [i]) + 1);
+
+  int j= 0;
+  for (CFIterator i= buf; i.hasTerms(); i++, j++)
+  {
+    if (i.exp() < degreeLC)
+    {
+      j++;
+      break;
+    }
+  }
+
+  ASSERT ( j > 1, "j > 1 expected" );
+
+  int* result = new int  [j - 1];
+  sizeOfOutput= j - 1;
+
+  int i= 0;
+  for (CFIterator m = buf; i < j - 1; i++, m++)
+    result [i]= m.exp();
+
+  if (d > 1)
+    setCharacteristic (p, d, cGFName);
+  else
+    setCharacteristic (p);
+  return result;
+}
+
+int *
+getLiftPrecisions (const CanonicalForm& F, int& sizeOfOutput, int degreeLC)
+{
+  int sizeOfNewtonPoly;
+  int ** newtonPolyg= newtonPolygon (F, sizeOfNewtonPoly);
+  int sizeOfRightSide;
+  int * rightSide= getRightSide(newtonPolyg, sizeOfNewtonPoly, sizeOfRightSide);
+  int * result= getCombinations(rightSide, sizeOfRightSide, sizeOfOutput,
+                                degreeLC);
+  delete [] rightSide;
+  for (int i= 0; i < sizeOfNewtonPoly; i++)
+    delete [] newtonPolyg[i];
+  delete [] newtonPolyg;
+  return result;
+}
+
 CFList
 henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     earlyFactors, DegreePattern& degs, int& liftBound,
