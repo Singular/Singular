@@ -1136,7 +1136,6 @@ EXAMPLE: example syModStd; shows an example
       "CPU-time for divPrimeList: "+string(timer-tt)+" seconds.";
       "Real-time for divPrimeList: "+string(rtimer-rt)+" seconds.";
    }
-   L[5] = prime(random(an,en));
 
 //---------------------  Decide which variant to take  -------------------------
    int variant;
