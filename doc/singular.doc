@@ -916,7 +916,7 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
-* spacecure_lib:: space curves
+* spacecurve_lib:: space curves
 * symodstd_lib:: Groebner bases for symmetric ideals
 @end menu
 @c ----------------------------------------------------------
@@ -961,17 +961,25 @@ Todos/Issues:
 
 @c lib parallel.lib
 @c ----------------------------------------------------------
-@node realclassify_lib,spacecure_lib, parallel_lib, Experimental libraries
+@node realclassify_lib,spacecurve_lib, parallel_lib, Experimental libraries
 @subsection realclassify_lib
 @c lib realclassify.lib
 
 @c ----------------------------------------------------------
-@node spacecure_lib,symodstd_lib, realclassify_lib, Experimental libraries
-@subsection spacecure_lib
-@c lib spacecure.lib
+@node spacecurve_lib,symodstd_lib, realclassify_lib, Experimental libraries
+@subsection spacecurve_lib
+Issues:
+@itemize
+@item Duplicate node found: BlowingUp
+@item Duplicate node found: CurveRes
+@item Duplicate node found: CurveParam
+@item Duplicate node found: WSemigroup
+@end itemize
+
+@c lib spacecurve.lib
 
 @c ----------------------------------------------------------
-@node symodstd_lib,,spacecure_lib, Experimental libraries
+@node symodstd_lib,,spacecurve_lib, Experimental libraries
 @subsection symodstd_lib
 @c lib symodstd.lib
 
