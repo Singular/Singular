@@ -72,9 +72,8 @@ EXAMPLE:  example tst_ignore; shows examples
     // Check # of args
     if (size(#) < 1 || size(#) > 3)
     {
-      "Error tst_ignore: Wrong number of arguments";
-      "Usage: tst_ignore (any,[keyword], [link]);";
-      return();
+      ERROR("Error tst_ignore: Wrong number of arguments
+      Usage: tst_ignore (any,[keyword], [link]);");
     }
 
     // Get Args
