@@ -15,7 +15,7 @@ parallelWaitN(commands, args, 3);
 
 commands = list("primdecGTZ", "primdecSY");
 args = list(list(i), list(i));
-parallelWaitFirst(commands, args);
+//parallelWaitFirst(commands, args); // not reproducable!
 
 ring s = 0, (x,y,z), dp;
 ideal i1 = z8+z6+4z5+4z3+4z2+4, y-z2;
