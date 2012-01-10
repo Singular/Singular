@@ -126,6 +126,11 @@ FILE * feFopen(const char *path, const char *mode, char *where,
   return f;
 }
 
+FILE * feFopen(const char *path, const char *mode)
+{
+  return feFopen (path, mode, 0,0,0);
+}
+
 // Make sure that mode contains binary option
 FILE* myfopen(const char *path, const char *mode)
 {

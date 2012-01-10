@@ -9,8 +9,9 @@
  *
  *****************************************************************/
 #ifdef __cplusplus
-FILE*feFopen(const char *path, const char *mode, char *where=NULL, BOOLEAN useWerror=FALSE, BOOLEAN path_only=FALSE);
 
+FILE*feFopen(const char *path, const char *mode, char *where, BOOLEAN useWerror=FALSE, BOOLEAN path_only=FALSE);
+FILE*feFopen(const char *path, const char *mode);
 /*
 // These are our versions of fopen and fread They are very similar to
 // the usual fopen and fread, except that on reading, they always
