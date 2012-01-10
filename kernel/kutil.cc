@@ -23,6 +23,7 @@
 #include <kernel/options.h>
 #include <kernel/gring.h>
 #include <kernel/sca.h>
+#include <kernel/weight.h>
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
@@ -6756,7 +6757,23 @@ void kDebugPrint(kStrategy strat)
     else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
     else if (strat->tailRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
     else Print("? (%lx)", (long)strat->tailRing->pLDeg);
-    Print(" syzring:%d, syzComb:%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
+    PrintLn();
+  PrintS("FDeg: ");
+    if (pFDeg==p_Totaldegree) PrintS("p_Totaldegree");
+    else if (pFDeg==pWFirstTotalDegree) PrintS("pWFirstTotalDegree");
+    else if (pFDeg==pDeg) PrintS("pDeg");
+    else if (pFDeg==kHomModDeg) PrintS("kHomModDeg");
+    else if (pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
+    else Print("? (%lx)", (long)pFDeg);
+  PrintS(" / currRing->FDeg: ");
+    if (currRing->pFDeg==p_Totaldegree) PrintS("p_Totaldegree");
+    else if (currRing->pFDeg==pWFirstTotalDegree) PrintS("pWFirstTotalDegree");
+    else if (currRing->pFDeg==pDeg) PrintS("pDeg");
+    else if (currRing->pFDeg==kHomModDeg) PrintS("kHomModDeg");
+    else if (currRing->pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
+    else Print("? (%lx)", (long)currRing->pFDeg);
+    PrintLn();
+  Print(" syzring:%d, syzComb:%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
 
