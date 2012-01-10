@@ -1223,7 +1223,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
   int i;
   for(i=IDELEMS(Q)-1;i>=0;i--)
     if(w==NULL)
-      N=si_max(N,pDeg(Q->m[i]));
+      N=si_max(N,p_Deg(Q->m[i],currRing));
     else
       N=si_max(N,pDegW(Q->m[i],w));
   N+=n;
@@ -1250,7 +1250,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
         else
           p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
         pNormalize(p);
-        if((w==NULL)&&(pDeg(p0)>n)||(w!=NULL)&&(pDegW(p0,w)>n))
+        if((w==NULL)&&(p_Deg(p0,currRing)>n)||(w!=NULL)&&(pDegW(p0,w)>n))
           p_Delete(&p0,currRing);
         else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
@@ -1263,7 +1263,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
           poly p0=p;
           pIter(p);
           pNext(p0)=NULL;
-          if(((w==NULL)&&(pDeg(p0)>n))
+          if(((w==NULL)&&(p_Deg(p0,currRing)>n))
           ||((w!=NULL)&&(pDegW(p0,w)>n)))
             p_Delete(&p0,currRing);
           else
@@ -2132,7 +2132,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
       poly p=h2->m[i];
       if (p!=NULL)
       {
-        d = pDeg(p);
+        d = p_Deg(p,currRing);
         k= pGetComp(p);
         if (slength>0) k--;
         d +=((**w)[k]);

@@ -637,7 +637,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
   poly fp_p=NULL;
   poly fq_p=NULL;
   choice=NULL;
-  while ((iter != NULL) && (pDeg(iter->src, r) > ggt_deg))
+  while ((iter != NULL) && (p_Deg(iter->src, r) > ggt_deg))
   {
     //    maMonomial_Out(iter, r, NULL);
     poly q1, q2, q;
@@ -647,7 +647,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
     {
       int tmp_deg;
       assume((q1!=NULL)&&(q2!=NULL));
-      if ((tmp_deg=pDeg(q,r)) > ggt_deg)
+      if ((tmp_deg=p_Deg(q,r)) > ggt_deg)
       {
         choice=iter;
         if (ggT != NULL)
@@ -656,7 +656,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
           p_LmFree(fp_p, r);
           p_LmFree(fq_p, r);
         }
-        ggt_deg = tmp_deg ; /*pDeg(q, r);*/
+        ggt_deg = tmp_deg ; /*p_Deg(q, r);*/
         ggT = q;
         fp_p = q1;
         fq_p = q2;

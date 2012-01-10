@@ -3237,8 +3237,8 @@ int posInS (const kStrategy strat, const int length,const poly p,
 #endif
   )
   {
-    int o=pDeg(p);
-    int oo=pDeg(set[length]);
+    int o=p_Deg(p,currRing);
+    int oo=p_Deg(set[length],currRing);
 
     if ((oo<o)
     || ((o==oo) && (pLmCmp(set[length],p)!= cmp_int)))
@@ -3248,14 +3248,14 @@ int posInS (const kStrategy strat, const int length,const poly p,
     {
       if (an >= en-1)
       {
-        if ((pDeg(set[an])>=o) && (pLmCmp(set[an],p) == cmp_int))
+        if ((p_Deg(set[an],currRing)>=o) && (pLmCmp(set[an],p) == cmp_int))
         {
           return an;
         }
         return en;
       }
       i=(an+en) / 2;
-      if ((pDeg(set[i])>=o) && (pLmCmp(set[i],p) == cmp_int)) en=i;
+      if ((p_Deg(set[i],currRing)>=o) && (pLmCmp(set[i],p) == cmp_int)) en=i;
       else                              an=i;
     }
   }
@@ -6341,12 +6341,12 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   if (expbound >= currRing->bitmask) return FALSE;
   strat->overflow=FALSE;
   ring new_tailRing = rModifyRing(currRing,
-                                  // Hmmm .. the condition pFDeg == pDeg
+                                  // Hmmm .. the condition pFDeg == p_Deg
                                   // might be too strong
 #ifdef HAVE_RINGS
-                                  (strat->homog && currRing->pFDeg == pDeg && !(rField_is_Ring(currRing))), // TODO Oliver
+                                  (strat->homog && currRing->pFDeg == p_Deg && !(rField_is_Ring(currRing))), // TODO Oliver
 #else
-                                  (strat->homog && pFDeg == pDeg), // omit_degree
+                                  (strat->homog && currRing->pFDeg == p_Deg), // omit_degree
 #endif
                                   (strat->ak==0), // omit_comp if the input is an ideal
                                   expbound); // exp_limit
@@ -6751,7 +6751,16 @@ void kDebugPrint(kStrategy strat)
     else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
     else if (strat->tailRing->pLDeg==maxdegreeWecart) PrintS("maxdegreeWecart");
     else Print("? (%lx)", (long)strat->tailRing->pLDeg);
-    Print(" syzring:%d, syzComp(strat):%d syzComb:%d limit:%ld\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
+    PrintLn();
+  PrintS("currRing->pFDeg: ");
+    if (currRing->pFDeg==p_Totaldegree) PrintS("p_Totaldegree");
+    else if (currRing->pFDeg==p_WFirstTotalDegree) PrintS("pWFirstTotalDegree");
+    else if (currRing->pFDeg==p_Deg) PrintS("p_Deg");
+    else if (currRing->pFDeg==kHomModDeg) PrintS("kHomModDeg");
+    else if (currRing->pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
+    else Print("? (%lx)", (long)currRing->pFDeg);
+    PrintLn();
+    Print(" syzring:%d, syzComp(strat):%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
 

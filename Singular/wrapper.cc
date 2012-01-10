@@ -88,7 +88,7 @@ BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
       if ((flag==1) && dpO)
       {
         //if (pTotaldegree(iT->info->lead) == pTotaldegree(iT->info->history))
-        if (pDeg(iT->info->lead) == pDeg(iT->info->history))
+        if (p_Deg(iT->info->lead,currRing) == p_Deg(iT->info->history,currRing))
         {
           result->m[ideal_length-ideal_index-1]=pCopy(iT->info->root);
           if (!nGreaterZero(pGetCoeff(iT->info->root)))

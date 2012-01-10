@@ -1211,8 +1211,8 @@ int similar(
 void henselFactors(const int xIndex, const int yIndex, const poly h,
                    const poly f0, const poly g0, const int d, poly &f, poly &g)
 {
-  int n = (int)pDeg(f0);
-  int m = (int)pDeg(g0);
+  int n = (int)p_Deg(f0,currRing);
+  int m = (int)p_Deg(g0,currRing);
   matrix aMat = mpNew(n + m, n + m);     /* matrix A for linear system */
   matrix pMat; matrix lMat; matrix uMat; /* for the decomposition of A */
   f = pCopy(f0); g = pCopy(g0);          /* initially: h = f*g mod <x^1> */

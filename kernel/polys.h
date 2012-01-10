@@ -246,7 +246,6 @@ extern BOOLEAN  pVectorOut;
  *
  ***************************************************************/
 inline int pWeight(int i, const ring R = currRing){ return p_Weight(i, R); }
-inline long pDeg(poly p, const ring R = currRing) { return p_Deg(p, R); }
  
 
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
