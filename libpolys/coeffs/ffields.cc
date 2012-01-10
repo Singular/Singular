@@ -610,7 +610,7 @@ void nfReadTable(const int c, const coeffs r)
     if (c>1) r->m_nfCharQ = c;
     else     r->m_nfCharQ = -c;
     char buf[100];
-    sprintf(buf,"%d",r->m_nfCharQ);
+    sprintf(buf,"gftables/%d",r->m_nfCharQ);
     FILE * fp = feFopen(buf,"r",NULL,TRUE);
     if (fp==NULL)
     {

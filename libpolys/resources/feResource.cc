@@ -75,12 +75,11 @@ static feResourceConfig_s feResourceConfigs[] =
    "%r/../LIB;"
    "%d/LIB;"
    "%d/../LIB;"
-   "%b/gftables;"
-   "%b/../share/gftables;"
+   "%b;"
+   "%b/../share;"
    "%b/../share/singular/LIB;"
-   "%b/../factory/gftables;"
-   "%b/../../../factory/gftables;"
-   "%b/../../factory/gftables",
+   "%b/../factory;"
+   "%b/../../factory",
    ""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",(char *)""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME,           (char *)""},

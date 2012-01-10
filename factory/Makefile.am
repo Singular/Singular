@@ -8,16 +8,16 @@ CXXTEMPLFLAGS=
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS}
 
-AM_LDFLAGS =  -L${builddir} -L${builddir}/libfac ${OMALLOC_LDFLAGS}
+AM_LDFLAGS =  -L${builddir}
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
 libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
-libfactory_la_LIBADD     = libfac/libfac.la ${GMP_LIBS} ${NTL_LIBS}
-libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la ${GMP_LIBS} ${NTL_LIBS}
+libfactory_la_LDFLAGS    = ${AM_LDFLAGS} -release ${PACKAGE_VERSION}
 libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
-libfactory_g_la_LIBADD   = libfac/libfac_g.la ${GMP_LIBS} ${NTL_LIBS}
-libfactory_g_la_LDFLAGS  = -release ${PACKAGE_VERSION}
+libfactory_g_la_LIBADD   = ${builddir}/libfac/libfac_g.la ${GMP_LIBS} ${NTL_LIBS}
+libfactory_g_la_LDFLAGS  = ${AM_LDFLAGS} -release ${PACKAGE_VERSION}
 
 
 
@@ -336,20 +336,20 @@ check_PROGRAMS = $(TESTS)
 
 TESTSSOURCES = test.cc
 
-if ENABLE_OMALLOC
-  OMALLOC_R_LDADD = -lomalloc
-  OMALLOC_G_LDADD = -lomalloc_g
-endif
+# The following ('..') is a hack for a while... 
+TESTADDLIBDIRS = ${OMALLOC_LDFLAGS} -L${builddir}/../findexec -L${builddir}/../libpolys
+TESTADDLIB = $(TESTADDLIBDIRS) $(OMALLOC_R_LDADD)
+TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
 
 test_s_g_SOURCES = $(TESTSSOURCES)
 test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
 #ftmpl_inst.o
-test_s_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS) $(OMALLOC_G_LDADD)
+test_s_g_LDADD = -lfactory_g $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
 
 test_s_r_SOURCES = $(TESTSSOURCES)
 test_s_r_CFLAGS = -O3 -fomit-frame-pointer 
 #ftmpl_inst.o
-test_s_r_LDADD = -lfactory $(GMP_LIBS) $(NTL_LIBS) $(OMALLOC_R_LDADD)
+test_s_r_LDADD = -lfactory $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
 
 test_s_r_LDFLAGS = -static ${AM_LDFLAGS}
 test_s_g_LDFLAGS = -static ${AM_LDFLAGS}
@@ -357,11 +357,10 @@ test_s_g_LDFLAGS = -static ${AM_LDFLAGS}
 test_d_g_SOURCES = $(TESTSSOURCES)
 test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
 #ftmpl_inst.o
-test_d_g_LDADD = -L${builddir} -lfactory_g $(GMP_LIBS) $(NTL_LIBS) $(OMALLOC_G_LDADD)
+test_d_g_LDADD = -lfactory_g $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
 
 test_d_r_SOURCES = $(TESTSSOURCES)
 test_d_r_CFLAGS = -O3 -fomit-frame-pointer 
 #ftmpl_inst.o
-test_d_r_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS) $(OMALLOC_R_LDADD)
-
+test_d_r_LDADD = -lfactory $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
 

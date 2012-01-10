@@ -73,8 +73,12 @@ int test2 (int p)
   return 1;
 }*/
 
+extern void feInitResources(const char* argv0 = NULL);
+
 int main( int, char *argv[] )
 {
+  feInitResources(argv[0]);
+   
   int t= test2 (0);
   if (t < 0)
     return t;
