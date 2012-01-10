@@ -9,6 +9,8 @@
 #include "canonicalform.h"
 #include <factory/cf_gmp.h>
 
+extern FILE * feFopen ( const char * path, const char * mode);
+
 /*BEGINPUBLIC*/
 
 void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );

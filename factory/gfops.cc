@@ -21,6 +21,10 @@
 #include "variable.h"
 #include "gfops.h"
 
+#ifdef SINGULAR
+#include "singext.h"
+#endif
+
 
 const int gf_maxtable = 63001;
 const int gf_maxbuffer = 200;
@@ -73,9 +77,29 @@ static void gf_get_table ( int p, int n )
     if ( gf_table == 0 )
         gf_table = new unsigned short[gf_maxtable];
 
+/*#ifdef SINGULAR
+    // just copy the table if Singular already read it
+    //printf("init_gf(gf_get_table) q=%d, nfCharQ=%d\n",q,nfCharQ);
+    if ( q == nfCharQ )
+    {
+        gf_p = p; gf_n = n;
+        gf_q = q; gf_q1 = q - 1;
+        gf_m1 = nfM1;
+        gf_mipo = intVec2CF( nfMinPoly[0], nfMinPoly + 1, 1 );
+        (void)memcpy( gf_table, nfPlus1Table, gf_q * sizeof( unsigned short ) );
+        gf_table[gf_q] = 0;
+        return;
+    }
+#endif*/
+
     // try to open file
-    sprintf( buffer, GFTABLEDIR "/%d", q );
+#ifndef SINGULAR
+    sprintf( buffer, GFTABLEDIR "/%d", q);
     FILE * inputfile = fopen( buffer, "r" );
+#else
+    int check= sprintf( buffer, "gftables/%d", q );
+    FILE * inputfile = feFopen( buffer, "r" );
+#endif
     STICKYASSERT( inputfile, "can not open GF(q) table" );
 
     // read ID
