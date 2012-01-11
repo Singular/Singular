@@ -440,7 +440,7 @@ void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
-void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat);
+void messageStat (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
 void messageSets (kStrategy strat);
 #else
@@ -466,7 +466,7 @@ void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
-BOOLEAN newHEdge(polyset S, kStrategy strat);
+BOOLEAN newHEdge(kStrategy strat);
 // returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);
 

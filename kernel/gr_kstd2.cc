@@ -1067,7 +1067,6 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   intvec *w=NULL;
   intvec *hilb=NULL;
-  int   srmax,lrmax;
   int   olddeg,reduc;
   int red_result=1;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
@@ -1084,14 +1083,11 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   strat->posInT=posInT110;
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
 
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
-
     if (TEST_OPT_DEBUG) messageSets(strat);
 
     if (strat->Ll== 0) strat->interpt=TRUE;
@@ -1247,7 +1243,6 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
-      if (strat->sl>srmax) srmax = strat->sl;
     }
 #ifdef KDEBUG
     strat->P.lcm=NULL;
@@ -1288,7 +1283,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //      ecartWeights=NULL;
 //    }
 //  }
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
 

@@ -148,7 +148,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   om_Opts.MinTrack = 5;
 #endif
 
-  int srmax, lrmax;
   int olddeg, reduc;
   int red_result = 1;
 //  int hilbeledeg = 1, minimcnt = 0;
@@ -167,8 +166,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   strat->posInT=posInT110; // !!!
 
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
 
 
   // compute-------------------------------------------------------
@@ -179,8 +177,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     kTest(strat)
     )
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;// stat.
-
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
@@ -234,8 +230,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     if(strat->P.IsNull()) continue;
 
     addLObject(strat->P, strat);
-
-    if (strat->sl > srmax) srmax = strat->sl;
 
     const poly save = strat->P.p;
 
@@ -306,8 +300,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   //       h.p = save;
   //       addLObject(h, strat);
-
-//         if (strat->sl > srmax) srmax = strat->sl;
       }
 
       // p_Delete( &save, currRing );
@@ -339,7 +331,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     }
   }
 
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 
   if (tempQ!=NULL) updateResult(strat->Shdl,tempQ,strat);
 
@@ -435,7 +427,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   om_Opts.MinTrack = 5;
 #endif
 
-  int   srmax, lrmax, red_result = 1;
+  int   red_result = 1;
   int   olddeg, reduc;
 
 //  int hilbeledeg = 1, minimcnt = 0;
@@ -457,8 +449,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
 //   if (strat->minim>0) strat->M = idInit(IDELEMS(F),F->rank);
 
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
 
 #define NO_BUCKETS
 
@@ -547,8 +538,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   // compute-------------------------------------------------------
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;// stat.
-
 #ifdef KDEBUG
 //     loop_count++;
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -692,8 +681,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
 
-      if (strat->sl>srmax) srmax = strat->sl;
-
       // //////////////////////////////////////////////////////////
       // SCA:
       const poly pSave = strat->P.p;
@@ -835,7 +822,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     }
   }
 
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 
 
 
@@ -968,8 +955,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   kTest_TS(strat);
 
 
-  int srmax = strat->sl;
-  int lrmax = strat->Ll;
   int olddeg = 0;
   int reduc = 0;
   int red_result = 1;
@@ -1035,8 +1020,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
                 pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
               enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
-
-              if (strat->Ll>lrmax) lrmax = strat->Ll;
             }
       }
 
@@ -1051,7 +1034,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #ifdef HAVE_ASSUME
     sca_mora_loop_count++;
 #endif
-    if (lrmax< strat->Ll) lrmax=strat->Ll; // stat
     //test_int_std(strat->kIdeal);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1144,11 +1126,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       strat->P.lcm=NULL;
 
-      if (strat->sl>srmax) srmax = strat->sl; // stat.
-      if (strat->Ll>lrmax) lrmax = strat->Ll;
-
-
-
       // //////////////////////////////////////////////////////////
       // SCA:
       const poly pSave = strat->P.p;
@@ -1185,8 +1162,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
           pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
-
-        if (strat->Ll>lrmax) lrmax = strat->Ll;
       }
 
 #ifdef KDEBUG
@@ -1230,7 +1205,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
   if (TEST_OPT_WEIGHTM)
   {
     pRestoreDegProcs(pFDegOld, pLDegOld);

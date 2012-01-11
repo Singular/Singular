@@ -546,11 +546,9 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
 
 ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
 {
-  int   srmax,lrmax;
   int   olddeg,reduc=0;
   int red_result = 1;
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
   /* compute------------------------------------------------------- */
   if ((strat->Ll==-1) && (strat->sl>=0))
   {
@@ -559,7 +557,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
   kTest_TS(strat);
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     if (TEST_OPT_DEBUG) messageSets(strat);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
@@ -710,8 +707,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
           }
         }
         kTest_TS(n);
-        if (n->sl>srmax) srmax = n->sl;
-
         /* construct D */
         if (IDELEMS(fac)>1)
         {
@@ -887,7 +882,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
     }
   }
   exitBuchMora(strat);
-  if (TEST_OPT_PROT) { PrintLn(); messageStat(srmax,lrmax,0,strat); }
+  if (TEST_OPT_PROT) { PrintLn(); messageStat(0,strat); }
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
 }

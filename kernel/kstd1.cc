@@ -992,7 +992,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
   {
-    if (newHEdge(strat->S,strat))
+    if (newHEdge(strat))
     {
       firstUpdate(strat);
       if (TEST_OPT_FINDET)
@@ -1036,7 +1036,7 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
   enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
-    newHEdge(strat->S,strat);
+    newHEdge(strat);
   else if (strat->kNoether!=NULL)
     strat->kHEdgeFound = TRUE;
 }
@@ -1163,8 +1163,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
   om_Opts.MinTrack = 5;
 #endif
-  int srmax;
-  int lrmax = 0;
   int olddeg = 0;
   int reduc = 0;
   int red_result = 1;
@@ -1204,8 +1202,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     updateL(strat);
     reorderL(strat);
   }
-  srmax = strat->sl;
-
   kTest_TS(strat);
   strat->use_buckets = kMoraUseBucket(strat);
   /*- compute-------------------------------------------*/
@@ -1224,7 +1220,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef HAVE_ASSUME
     mora_loop_count++;
 #endif
-    if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
@@ -1344,8 +1339,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // make sure kTest_TS does not complain about strat->P
       memset(&strat->P,0,sizeof(strat->P));
 #endif
-      if (strat->sl>srmax) srmax = strat->sl; /*stat.*/
-      if (strat->Ll>lrmax) lrmax = strat->Ll;
     }
     if (strat->kHEdgeFound)
     {
@@ -1384,7 +1377,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {
 //    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
@@ -2247,7 +2240,7 @@ ideal kInterRedOld (ideal F, ideal Q)
 ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 {
   need_retry=0;
-  int   srmax,lrmax, red_result = 1;
+  int   red_result = 1;
   int   olddeg,reduc;
   BOOLEAN withT = FALSE;
   BOOLEAN toReset=FALSE;
@@ -2297,8 +2290,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   strat->posInL=posInL0; /* ord according pComp */
 
   /*Shdl=*/initBuchMora(F, Q, strat);
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
 
 #ifndef NO_BUCKETS
   if (!TEST_OPT_NOT_BUCKETS)
@@ -2319,7 +2311,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
@@ -2396,7 +2387,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #else
         pLmFree(strat->P.lcm);
 #endif
-      if (strat->sl>srmax) srmax = strat->sl;
       if (pos<strat->sl)
       {
         need_retry++;
@@ -2491,7 +2481,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 //      ecartWeights=NULL;
 //    }
 //  }
-  //if (TEST_OPT_PROT) messageStat(srmax,lrmax,0/*hilbcount*/,strat);
+  //if (TEST_OPT_PROT) messageStat(0/*hilbcount*/,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   ideal res=strat->Shdl;
   strat->Shdl=NULL;

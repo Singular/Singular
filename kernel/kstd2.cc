@@ -979,7 +979,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int loop_count = 0;
 #endif /* KDEBUG */
   om_Opts.MinTrack = 5;
-  int   srmax,lrmax, red_result = 1;
+  int   red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = FALSE;
@@ -991,8 +991,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
 
 #ifndef NO_BUCKETS
   if (!TEST_OPT_NOT_BUCKETS)
@@ -1036,7 +1035,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
       loop_count++;
       if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1221,7 +1219,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #else
         pLmFree(strat->P.lcm);
 #endif
-      if (strat->sl>srmax) srmax = strat->sl;
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
     {
@@ -1287,7 +1284,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //      ecartWeights=NULL;
 //    }
 //  }
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
 #ifdef KDEBUG
@@ -1462,7 +1459,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   int loop_count = 0;
 #endif
   om_Opts.MinTrack = 5;
-  int   srmax,lrmax, red_result = 1;
+  int   red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = TRUE; // very important for shifts
@@ -1476,8 +1473,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   updateSShift(strat,uptodeg,lV); /* initializes T */
 
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
-  srmax = strat->sl;
-  reduc = olddeg = lrmax = 0;
+  reduc = olddeg = 0;
   strat->lV=lV;
 
 #ifndef NO_BUCKETS
@@ -1499,7 +1495,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
 #ifdef KDEBUG
     loop_count++;
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1717,7 +1712,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
-      if (strat->sl>srmax) srmax = strat->sl;
     }
     else
     {
@@ -1799,7 +1793,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 //      ecartWeights=NULL;
 //    }
 //  }
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
 }

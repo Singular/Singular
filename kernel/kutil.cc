@@ -4765,7 +4765,7 @@ void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
 /*2
 *statistics
 */
-void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat)
+void messageStat (int hilbcount,kStrategy strat)
 {
   //PrintS("\nUsage/Allocation of temporary storage:\n");
   //Print("%d/%d polynomials in standard base\n",srmax,IDELEMS(Shdl));
@@ -5531,7 +5531,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           /*strat->kHEdgeFound =*/ HEckeTest(h.p,strat);
         }
         if (strat->kHEdgeFound)
-          newHEdge(strat->S,strat);
+          newHEdge(strat);
       }
     }
     for (i=0; i<=strat->sl; i++)
@@ -5742,7 +5742,7 @@ void enterT(LObject p, kStrategy strat, int atT)
   kTest_T(&(strat->T[atT]));
 }
 
-void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat)
+void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
 {
   if (strat->homog!=isHomog)
   {
@@ -6133,7 +6133,6 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
         PrintLn();
       }
       #endif
-      poly p;
       if (currRing->OrdSgn == 1)
         strat->S[i] = redtailBba(&L, end_pos, strat, withT);
       else
@@ -6217,7 +6216,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
 * computes the new strat->kHEdge and the new pNoether,
 * returns TRUE, if pNoether has changed
 */
-BOOLEAN newHEdge(polyset S, kStrategy strat)
+BOOLEAN newHEdge(kStrategy strat)
 {
   int i,j;
   poly newNoether;
