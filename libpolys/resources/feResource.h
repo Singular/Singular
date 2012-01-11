@@ -1,13 +1,6 @@
 #ifndef FERESOURCE_H
 #define FERESOURCE_H
 
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-
-#include <misc/auxiliary.h>
-#include <misc/mylimits.h>
-
 #define DIR_SEP '/'
 #define DIR_SEPP "/"
 

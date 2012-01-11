@@ -4931,7 +4931,7 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
   return FALSE;
 }
 
-const short MAX_SHORT = SHRT_MAX; // (1 << (sizeof(short)*8)) - 1;
+const short MAX_SHORT = 32767; // (1 << (sizeof(short)*8)) - 1;
 
 ////////////////////
 //

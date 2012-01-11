@@ -13,7 +13,6 @@
 #include <sys/param.h>
 
 #include "config.h"
-#include <misc/auxiliary.h>
 
 #include <findexec/omFindExec.h>
 
@@ -31,25 +30,14 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 
 #include <reporter/reporter.h>
-#if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc/omalloc.h>
-#else
-char* feResource(const char id, int warn = -1);
-char* feResource(const char* key, int warn = -1);
-#endif
+//char* feResource(const char id, int warn = -1);
+//char* feResource(const char* key, int warn = -1);
 
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
 
-#if defined(MAKE_DISTRIBUTION)
-#if defined(ix86_Win) && ! defined(__CYGWIN__)
-#define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION1
-#else // unix
 #define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"S_VERSION1
-#endif
-#else // ! defined(MAKE_DISTRIBUTION)
-#define SINGULAR_DEFAULT_DIR S_ROOT_DIR
-#endif // defined(MAKE_DISTRIBUTION)
 
 /*****************************************************************
  *
@@ -109,22 +97,18 @@ static feResourceConfig_s feResourceConfigs[] =
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",             (char *)""},
 
-#ifdef ESINGULAR
   {"emacs",     'E',    feResBinary,"ESINGULAR_EMACS",      "%b/emacs",             (char *)""},
   {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs",            (char *)""},
   {"SingularEmacs",'M', feResBinary,"ESINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
   {"EmacsLoad", 'l',    feResFile,  "ESINGULAR_EMACS_LOAD", "%e/.emacs-singular",   (char *)""},
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",  "%r/emacs",             (char *)""},
-#elif defined(TSINGULAR)
   {"SingularXterm",'M', feResBinary,"TSINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
 #ifdef ix86_Win
   {"rxvt",      'X',    feResBinary,"RXVT",                 "%b/rxvt",              (char *)""},
 #else
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             (char *)""},
 #endif
-#else
   {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             (char *)""},
-#endif
   {NULL, 0, feResUndef, NULL, NULL, NULL}, // must be the last record
 };
 
