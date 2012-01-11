@@ -109,7 +109,6 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   Variable x= A.mvar();
   int l= x.level();
   int k;
-  bool GF= false;
   if (CFFactory::gettype() == GaloisFieldDomain)
     k= getGFDegree();
   else if (alpha.level() != 1)
@@ -173,16 +172,29 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
       i.getItem()= CFFactor (i.getItem().factor()/tmp, i.getItem().exp());
       j.getItem()= CFFactor (j.getItem().factor()/tmp, j.getItem().exp());
       if (degree (tmp) > 0 && tmp.level() > 0)
-        result.append (CFFactor (M (tmp),
+      {
+        tmp= M (tmp);
+        result.append (CFFactor (tmp/Lc(tmp),
                        j.getItem().exp()*p + i.getItem().exp()));
+      }
     }
   }
   for (CFFListIterator i= tmp2; i.hasItem(); i++)
+  {
     if (degree (i.getItem().factor()) > 0 && i.getItem().factor().level() >= 0)
-      result.append (CFFactor (M (i.getItem().factor()), i.getItem().exp()));
+    {
+      tmp= M (i.getItem().factor());
+      result.append (CFFactor (tmp/Lc(tmp), i.getItem().exp()));
+    }
+  }
   for (CFFListIterator j= tmp1; j.hasItem(); j++)
+  {
     if (degree (j.getItem().factor()) > 0 && j.getItem().factor().level() >= 0)
-      result.append (CFFactor (M (j.getItem().factor()), j.getItem().exp()*p));
+    {
+      tmp= M (j.getItem().factor());
+      result.append (CFFactor (tmp/Lc(tmp), j.getItem().exp()*p));
+    }
+  }
   return result;
 }
 
