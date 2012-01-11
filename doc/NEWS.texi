@@ -31,11 +31,12 @@
 @item new library: parallel.lib (@nref{parallel_lib})
 @item new library: symodstd.lib (@nref{symodstd_lib})
 @item new library: realclassify.lib (@nref{realclassify_lib})
-@item changed library: curvepar.lib (@nref{curvepar_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
 @itemize @bullet
+@item
+curvepar.lib (@nref{curvepar_lib})
 @item
 grobcov.lib (@nref{grobcov_lib})
 @item
