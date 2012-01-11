@@ -627,15 +627,15 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
     C = gcd( Ci, Ci1 );
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
-#ifdef HAVE_FLINT
+/*#ifdef HAVE_FLINT
         if (isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_flint0(pi, pi1 ) * C;
-#else
+#else*/
 #ifdef HAVE_NTL
         if ( isOn(SW_USE_NTL_GCD_0) && isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_ntl0(pi, pi1 ) * C;
 #endif
-#endif
+//#endif
         return gcd_poly_univar0( pi, pi1, true ) * C;
     }
     else if ( gcd_test_one( pi1, pi, true ) )
