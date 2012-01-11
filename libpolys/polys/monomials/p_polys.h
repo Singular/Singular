@@ -54,12 +54,12 @@ static inline number& pGetCoeff(poly p)
   return p->coef;
 }
 
-// #define p_GetCoeff(p,r)     pGetCoeff(p)
-static inline number& p_GetCoeff(poly p, const ring r)
-{
-  assume(r != NULL);
-  return pGetCoeff(p);
-}
+#define p_GetCoeff(p,r)     pGetCoeff(p)
+//static inline number& p_GetCoeff(poly p, const ring r)
+//{
+//  assume(r != NULL);
+//  return pGetCoeff(p);
+//}
 
 
 

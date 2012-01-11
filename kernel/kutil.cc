@@ -1005,10 +1005,6 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 */
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 {
-#ifdef PDEBUG
-  /*  zaehler++; */
-#endif /*PDEBUG*/
-  int i;
   // this should be corrected
   assume(p.FDeg == p.pFDeg());
 
@@ -1046,14 +1042,14 @@ void initEcartBBA (LObject* h)
   h->length=h->pLength=pLength(h->p);
 }
 
-void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
+void initEcartPairBba (LObject* Lp,poly /*f*/,poly /*g*/,int /*ecartF*/,int /*ecartG*/)
 {
   Lp->FDeg = Lp->pFDeg();
   (*Lp).ecart = 0;
   (*Lp).length = 0;
 }
 
-void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
+void initEcartPairMora (LObject* Lp,poly /*f*/,poly /*g*/,int ecartF,int ecartG)
 {
   Lp->FDeg = Lp->pFDeg();
   (*Lp).ecart = si_max(ecartF,ecartG);
@@ -1294,7 +1290,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 * put the  lcm(s[i],p)  into the set B
 */
 
-BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1)
 {
   number d, s, t;
   assume(i<=strat->sl);
@@ -2349,7 +2345,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
 */
-void chainCritRing (poly p,int ecart,kStrategy strat)
+void chainCritRing (poly p,int, kStrategy strat)
 {
   int i,j,l;
   /*
@@ -2917,7 +2913,7 @@ ideal createG0()
 */
 void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
-  const int iCompH = pGetComp(h);
+  const unsigned long iCompH = pGetComp(h);
   if (!nIsOne(pGetCoeff(h)))
   {
     int j;
@@ -3227,7 +3223,6 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int an = 0;
   int en = length;
   int cmp_int = currRing->OrdSgn;
-  int pc=pGetComp(p);
   if ((currRing->MixedOrder)
 #ifdef HAVE_PLURAL
   && (currRing->real_var_start==0)
@@ -3324,7 +3319,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
 * looks up the position of p in set
 * the position is the last one
 */
-int posInT0 (const TSet set,const int length,LObject &p)
+int posInT0 (const TSet,const int length,LObject &)
 {
   return (length+1);
 }
@@ -3769,7 +3764,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
   int o = p.GetpFDeg() + p.ecart;
-  int c = pGetComp(p.p)*cc;
+  unsigned long c = pGetComp(p.p)*cc;
 
   if (pGetComp(set[length].p)*cc < c)
     return length+1;
@@ -3885,7 +3880,7 @@ int posInT19 (const TSet set,const int length,LObject &p)
 *to the ordering-procedure pComp
 */
 int posInLSpecial (const LSet set, const int length,
-                   LObject *p,const kStrategy strat)
+                   LObject *p,const kStrategy)
 {
   if (length<0) return 0;
 
@@ -3928,7 +3923,7 @@ int posInLSpecial (const LSet set, const int length,
 *to the ordering-procedure pComp
 */
 int posInL0 (const LSet set, const int length,
-             LObject* p,const kStrategy strat)
+             LObject* p,const kStrategy)
 {
   if (length<0) return 0;
 
@@ -3959,7 +3954,7 @@ int posInL0 (const LSet set, const int length,
 * to the ordering-procedure totaldegree,pComp
 */
 int posInL11 (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 /*{
  * int j=0;
  * int o;
@@ -4029,7 +4024,7 @@ inline int getIndexRng(long coeff)
 }
 
 int posInLrg0 (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 /*          if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
         if (pLmCmp(set[i],p) == cmp_int)         en = i;
         else if (pLmCmp(set[i],p) == -cmp_int)   an = i;
@@ -4113,7 +4108,7 @@ int posInLrg0 (const LSet set, const int length,
 * to the ordering-procedure totaldegree,pLength0
 */
 int posInL110 (const LSet set, const int length,
-               LObject* p,const kStrategy strat)
+               LObject* p,const kStrategy)
 {
   if (length<0) return 0;
 
@@ -4159,7 +4154,7 @@ int posInL110 (const LSet set, const int length,
 * to the ordering-procedure totaldegree
 */
 int posInL13 (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 {
   if (length<0) return 0;
 
@@ -4194,7 +4189,7 @@ int posInL13 (const LSet set, const int length,
 * to the ordering-procedure maximaldegree,pComp
 */
 int posInL15 (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 /*{
  * int j=0;
  * int o;
@@ -4252,7 +4247,7 @@ int posInL15 (const LSet set, const int length,
 * to the ordering-procedure totaldegree
 */
 int posInL17 (const LSet set, const int length,
-              LObject* p,const kStrategy strat)
+              LObject* p,const kStrategy)
 {
   if (length<0) return 0;
 
@@ -4300,13 +4295,13 @@ int posInL17 (const LSet set, const int length,
 * to the ordering-procedure pComp
 */
 int posInL17_c (const LSet set, const int length,
-                LObject* p,const kStrategy strat)
+                LObject* p,const kStrategy)
 {
   if (length<0) return 0;
 
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
-  int c = pGetComp(p->p)*cc;
+  unsigned long c = pGetComp(p->p)*cc;
   int o = p->GetpFDeg() + p->ecart;
 
   if (pGetComp(set[length].p)*cc > c)
@@ -4441,8 +4436,6 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
 poly redtail (LObject* L, int pos, kStrategy strat)
 {
   poly h, hn;
-  int j;
-  unsigned long not_sev;
   strat->redTailChange=FALSE;
 
   poly p = L->p;
@@ -4561,7 +4554,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       if (cnt==0)
       {
         cnt=REDTAIL_CANONICALIZE;
-        poly tmp=Ln.CanonicalizeP();
+        /*poly tmp=*/Ln.CanonicalizeP();
         if (normalize)
         {
           Ln.Normalize();
@@ -4649,9 +4642,9 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
       if (cnt==0)
       {
         cnt=REDTAIL_CANONICALIZE;
-        poly tmp=Ln.CanonicalizeP();
+        /*poly tmp=*/Ln.CanonicalizeP();
       }
-      // we are in Z, do not Ccall pNorm
+      // we are in Z, do not call pNorm
       strat->redTailChange=TRUE;
       // test divisibility of coefs:
       poly p_Ln=Ln.GetLmCurrRing();
@@ -5572,7 +5565,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
 */
 void enterSBba (LObject p,int atS,kStrategy strat, int atR)
 {
-  int i;
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
