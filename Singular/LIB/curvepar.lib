@@ -8,7 +8,7 @@ AUTHOR:     Gerhard Pfister    email: pfister@mathematik.uni-kl.de
             Nil Sahin          email: e150916@metu.edu.tr
             Maryna Viazovska   email: viazovsk@mathematik.uni-kl.de
 
-SEE ALSO: spcurve.lib
+SEE ALSO: spcurve_lib
 
 PROCEDURES:
 BlowingUp(f,I,l);             BlowingUp of V(I) at the point 0;
