@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -4581,6 +4580,8 @@ is known.
 @end menu
 @c --------------------------------------------------------------------------------
 @node cone related functions,,,cone
+@subsection cone related functions
+@cindex cone related functions
 
 @smallexample
   coneLink(cone c, intvec point);     // local version of the given cone
@@ -4737,7 +4738,7 @@ Access to cones of the fan is provided in three different ways:
                                       // of G
             // Here a row r = r_1, ...r_n represents the permutation
             // which takes i to r_i. SINGULAR will check for the validity
-            // of the provided rows, i.e. whether {r_1,...,r_n} = {1,...,n}
+            // of the provided rows, i.e. whether @{r_1,...,r_n@} = @{1,...,n@}
   fan f = fullFan(int n);             // ambient dim = n, the fan consists of
                                       // one cone which equals the ambient
                                       // space, symmetry subgroup = <e>
