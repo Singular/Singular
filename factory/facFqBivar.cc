@@ -71,6 +71,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
 {
   fail= false;
   Variable x= Variable(2);
+  Variable y= Variable(1);
   FFRandom genFF;
   GFRandom genGF;
   CanonicalForm random, mipo;
@@ -121,7 +122,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
     }
     if (find (list, random)) continue;
     eval= F (random, x);
-    if (degree (eval) != degree (F, Variable (1)))
+    if (degree (eval) != degree (F, y))
     { //leading coeff vanishes
       if (!find (list, random))
         list.append (random);
@@ -255,6 +256,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   int k= info.getGFDegree();
 
   Variable y= F.mvar();
+  Variable x= Variable (1);
   CFList source, dest;
   if (degs.getLength() <= 1 || factors.length() == 1)
   {
@@ -277,7 +279,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 
   buf= F;
 
-  CanonicalForm g, LCBuf= LC (buf, Variable (1));
+  CanonicalForm g, LCBuf= LC (buf, x);
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
@@ -332,7 +334,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
-          g /= content (g, Variable (1));
+          g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
             buf2= g (y - eval, y);
@@ -343,7 +345,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
               if (degree (buf2, alpha) < degMipoBeta)
               {
                 buf= quot;
-                LCBuf= LC (buf, Variable (1));
+                LCBuf= LC (buf, x);
                 recombination= true;
                 appendTestMapDown (result, buf2, info, source, dest);
                 trueFactor= true;
@@ -354,7 +356,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
               if (!isInExtension (buf2, gamma, k, delta, source, dest))
               {
                 buf= quot;
-                LCBuf= LC (buf, Variable (1));
+                LCBuf= LC (buf, x);
                 recombination= true;
                 appendTestMapDown (result, buf2, info, source, dest);
                 trueFactor= true;
@@ -459,7 +461,9 @@ factorRecombination (CFList& factors, CanonicalForm& F,
 
   T= factors;
   CFList result;
-  CanonicalForm LCBuf= LC (F, Variable (1));
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+  CanonicalForm LCBuf= LC (F, x);
   CanonicalForm g, quot, buf= F;
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
@@ -483,7 +487,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           T.insert (LCBuf);
           g= prodMod (T, M);
           T.removeFirst();
-          result.append (g/content (g, Variable (1)));
+          result.append (g/content (g, x));
           F= 1;
           return result;
         }
@@ -510,14 +514,14 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
-          g /= content (g, Variable (1));
+          g /= content (g, x);
 
           if (fdivides (g, buf, quot))
           {
             recombination= true;
             result.append (g);
             buf= quot;
-            LCBuf= LC (buf, Variable(1));
+            LCBuf= LC (buf, x);
             T= Difference (T, S);
 
             // compute new possible degree pattern
@@ -627,7 +631,8 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
   CFList result;
   CFList T= factors;
   CanonicalForm buf= F;
-  CanonicalForm LCBuf= LC (buf, Variable (1));
+  Variable x= Variable (1);
+  CanonicalForm LCBuf= LC (buf, x);
   CanonicalForm g, quot;
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
@@ -644,13 +649,13 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
       if (fdivides (LC (g), LCBuf))
       {
         g= mulMod2 (i.getItem(), LCBuf, M);
-        g /= content (g, Variable (1));
+        g /= content (g, x);
         if (fdivides (g, buf, quot))
         {
           result.append (g);
           buf= quot;
-          d -= degree (g) + degree (LC (g, Variable (1)));
-          LCBuf= LC (buf, Variable (1));
+          d -= degree (g) + degree (LC (g, x));
+          LCBuf= LC (buf, x);
           T= Difference (T, CFList (i.getItem()));
 
           // compute new possible degree pattern
@@ -694,7 +699,8 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   CFList result;
   CFList T= factors;
   Variable y= F.mvar();
-  CanonicalForm buf= F, LCBuf= LC (buf, Variable (1)), g, buf2;
+  Variable x= Variable (1);
+  CanonicalForm buf= F, LCBuf= LC (buf, x), g, buf2;
   CanonicalForm M= power (y, deg);
   adaptedLiftBound= 0;
   bool trueFactor= false;
@@ -716,20 +722,20 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
       if (fdivides (LC (g), LCBuf))
       {
         g= mulMod2 (i.getItem(), LCBuf, M);
-        g /= content (g, Variable (1));
+        g /= content (g, x);
         if (fdivides (g, buf, quot))
         {
           buf2= g (y - eval, y);
           buf2 /= Lc (buf2);
 
-          if (!k && beta == Variable (1))
+          if (!k && beta == x)
           {
             if (degree (buf2, alpha) < degMipoBeta)
             {
               appendTestMapDown (result, buf2, info, source, dest);
               buf= quot;
-              d -= degree (g) + degree (LC (g, Variable (1)));
-              LCBuf= LC (buf, Variable (1));
+              d -= degree (g) + degree (LC (g, x));
+              LCBuf= LC (buf, x);
               trueFactor= true;
             }
           }
@@ -739,8 +745,8 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
             {
               appendTestMapDown (result, buf2, info, source, dest);
               buf= quot;
-              d -= degree (g) + degree (LC (g, Variable (1)));
-              LCBuf= LC (buf, Variable (1));
+              d -= degree (g) + degree (LC (g, x));
+              LCBuf= LC (buf, x);
               trueFactor= true;
             }
           }
@@ -1259,7 +1265,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y-evaluation, y);
-    if (!k && beta == Variable (1))
+    if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
       {
@@ -1395,7 +1401,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y - evaluation, y);
-    if (!k && beta == Variable (1))
+    if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
       {
@@ -5586,7 +5592,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
     }
-    else if (!extension && (alpha != Variable (1) || GF))
+    else if (!extension && (alpha != x || GF))
     {
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
@@ -5759,7 +5765,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else // not able to pass to GF, pass to F_p(\alpha)
     {
-      CanonicalForm mipo= randomIrredpoly (2, Variable (1));
+      CanonicalForm mipo= randomIrredpoly (2, x);
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);
@@ -5772,14 +5778,14 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     {
       int extDeg= degree (getMipo (alpha));
       extDeg++;
-      CanonicalForm mipo= randomIrredpoly (extDeg + 1, Variable (1));
+      CanonicalForm mipo= randomIrredpoly (extDeg + 1, x);
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);
     }
     else
     {
-      if (beta == Variable (1))
+      if (beta == x)
       {
         Variable v= chooseExtension (alpha, beta, k);
         CanonicalForm primElem, imPrimElem;
