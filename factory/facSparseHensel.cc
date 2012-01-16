@@ -233,8 +233,6 @@ sparseHeuristic (const CanonicalForm& A, const CFList& biFactors,
           delete [] seperator [m];
         }
         delete [] storeFactors;
-        for (m= 0; m < i; m++)
-          delete [] seperator [m][k];
         delete [] seperator;
         return CFList();
       }
