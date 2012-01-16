@@ -3,7 +3,7 @@ Compute the Groebner fan of an ideal
 $Author: monerjan $
 $Date: 2009/11/03 06:57:32 $
 $Header: /usr/local/Singular/cvsroot/kernel/gfan.cc,v 1.103 2009/11/03 06:57:32 monerjan Exp $
-$Id$
+$Id: gfan.cc 14271 2011-06-10 08:00:12Z monerjan $
 */
 
 #include <kernel/mod2.h>
@@ -33,14 +33,9 @@ $Id$
 #define GMPRATIONAL
 #endif
 
-//Hacks for different working places
-#define p800
-
-#ifdef p800
-#include <../cddlib-094f/lib-src-gmp/setoper.h>
-#include <../cddlib-094f/lib-src-gmp/cdd.h>
-#include <../cddlib-094f/lib-src-gmp/cddmp.h>
-#endif
+#include <setoper.h>
+#include <cdd.h>
+#include <cddmp.h>
 
 #ifndef gfan_DEBUG
 // #define gfan_DEBUG

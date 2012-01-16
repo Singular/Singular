@@ -8,7 +8,7 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <kernel/bbfan.h>
-#include <Singular/bbcone.h>
+#include <kernel/bbcone.h>
 #include <ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
@@ -268,7 +268,7 @@ void bbfan_setup()
   iiAddCproc("","fan_full",FALSE,fan_full);
   iiAddCproc("","insert_cone",FALSE,insert_cone);
   fanID=setBlackboxStuff(b,"fan");
-  Print("created type %d (fan)\n",fanID); 
+  //Print("created type %d (fan)\n",fanID); 
 }
 
 #endif

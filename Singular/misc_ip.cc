@@ -10,8 +10,6 @@
  *
  * @author Frank Seelisch
  *
- * @internal @version \$Id$
- *
  **/
 /*****************************************************************************/
 
@@ -787,6 +785,9 @@ char * versionString()
 #endif
 #ifdef HAVE_PLURAL
               StringAppendS("Plural,");
+#endif
+#ifdef HAVE_FANS
+              StringAppendS("fan/cone,");
 #endif
 #ifdef HAVE_DBM
               StringAppendS("DBM,\n\t");

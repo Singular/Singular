@@ -5763,6 +5763,9 @@ echo $ac_n "checking gfanlib""... $ac_c" 1>&6
 echo "configure:5689: checking gfanlib" >&5
 if test "$enable_gfanlib" = yes; then
   echo "$ac_t""yes" 1>&6
+  cat >> confdefs.h <<\EOF
+#define HAVE_FANS 1
+EOF
   NEED_LIBS="${NEED_LIBS} -lgfan -lcddgmp"
 else
   echo "$ac_t""can not build with gfan lib" 1>&6

@@ -751,7 +751,7 @@ void bbcone_setup()
   iiAddCproc("","contains",FALSE,contains);
   iiAddCproc("","setprop",FALSE,setprop);
   coneID=setBlackboxStuff(b,"cone");
-  Print("created type %d (cone)\n",coneID); 
+  //Print("created type %d (cone)\n",coneID); 
 }
 
 #endif
