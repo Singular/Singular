@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
 
 @c ----------------------------------------------------------------------------
-@node  pyobject,,User defined types, Data types
+@node  pyobject,,fan, Data types
 @section pyobject
 @cindex pyobject
 @cindex blackbox

@@ -643,7 +643,7 @@ void bbfan_setup()
   iiAddCproc("","getCone",FALSE,getCone);
   iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   fanID=setBlackboxStuff(b,"fan");
-  Print("created type %d (fan)\n",fanID); 
+  //Print("created type %d (fan)\n",fanID); 
 }
 
 #endif

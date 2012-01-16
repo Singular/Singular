@@ -56,6 +56,8 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * vector::
 * User defined types::
 * pyobject::
+* cone::
+* fan::
 @end menu
 
 @c ---------------------------------------
@@ -4385,7 +4387,7 @@ substitute a ring variable (see @ref{subst})
 @c @example
 @c @end example
 @c ---------------------------------------
-@node User defined types, pyobject, vector, Data types
+@node User defined types, cone, vector, Data types
 @section User defined types
 @cindex User defined types
 @cindex newstruct
@@ -4521,13 +4523,265 @@ operator @code{.} to access the elements
 @c example
 @end smallexample
 
+@c ---------------------------------------
+@node cone, fan, User defined types, Data types
+@section cone
+@cindex cone
+
+The cone is defined as the set of points which can be written as the sum of
+a point in the convex hull of all given half-lines (= rows of the matrix HL)
+plus a point in the span of the given lines (= rows of the matrix L).
+(Note that the convex hull of half lines may already contain linear subspaces,
+e.g. entire lines. Note also, that L may contain zero rows, which may be
+omitted without changing the cone mathematically. Moreover, there may be
+double rows in one of or in both HL and L.)
+
+@smallexample
+  cone c;                             // ambient dim 0, no equations,
+                                      // no inequalities
+  cone c = 17;                        // ambient dim 17, no equations,
+                                      // no inequalities
+
+  cone c = coneViaRays(matrix HL);  // HL = 'half-lines'
+  cone c = coneViaRays(matrix HL,
+                       matrix L);   // L = 'lines'
+  cone c = coneViaRays(matrix HL,
+                         matrix L,
+                         int flags);
+@end smallexample
+
+As to the third constructor, flags is assumed to range in [0..3], defining a
+higher bit and a lower bit. If the higher bit is 1, then this means that the
+extreme rays are known: Each half-line spans a (different) extreme ray of the
+cone. If this bit is zero, than this means that nothing of this sort is known.
+(It may however still be the case, that each half-line spans a different
+extreme ray of the cone.)
+If the lower bit is set, then the lineality space is known to be equal to the
+span of provided lines. Again, a zero bit just says that nothing of this sort
+is known.
+
+@smallexample
+  cone c = coneViaNormals(          // synonymous to cone_via_rays(IE);
+                 matrix IE);        // (This time, half-lines are
+                                    // named inequalities.)
+  cone c = coneViaNormals(          // cone defined by inequalities and
+                 matrix IE,         // equations which hold for all points
+                 matrix E);         // of the cone, and only for these
+  cone c = coneViaNormals(matrix IE, matrix E, int flags);
+               // cone defined by inequalities and equations which hold for
+               // all points of the cone, and only for these; if the higher bit
+               // of flags is set, then all inequalities are already explicit
+               // in IE; if this bit is 0 then this is not known;
+               // if the lower bit is set then all equations are already
+               // explicit in E; if this bit is 0, then this is not known
+@end smallexample
+
+@menu
+* cone related functions::
+@end menu
+@c --------------------------------------------------------------------------------
+@node cone related functions,,,cone
+
+@smallexample
+  coneLink(cone c, intvec point);     // local version of the given cone
+                                      // around the given point of the cone
+  contains(cone c1, cone c2);         // 1 iff c1 entirely contains c2;
+                                      // 0 otherwise
+  contains(cone c, intvec point);     // 1 iff the given cone contains the
+                                      // given point, but not on one of its
+                                      // facets; 0 otherwise
+  containsRelatively(cone c, intvec point); // 1 iff the given cone contains the
+                                      // given point, possibly on one of its
+                                      // facets; 0 otherwise
+  intersectCones(cone c1, cone c2);   // returns a cone that is the intersection
+                                      // of c1 and c2
+  hasFace(cone c1, cone c2);          // checks whether c1 contains c2
+                                      // as a face
+
+                                      // following functions return intmats:
+  getInequalities(cone c);            // half-lines as they had been provided
+  getEquations(cone c);               // lines as they had been provided
+  getFacets(cone c);                  // reduced half-lines, i.e.,
+                                      // row-echelon form without zero rows
+  getImpliedEquations(cone c);        // analogous for the given set of lines
+  getGeneratorsOfSpan(cone c);        // generating vectors of the span of all
+                                      // rays in the cone
+  getGeneratorsOfLinealitySpace(cone c); // generating vectors of the lineality
+                                      // space of the cone
+  getRays(cone c);                    // generators of all extreme rays
+  getQuotientLatticeBasis(cone c);    // quotient of two lattices: Z^n
+                                      // intersected with the span of the cone
+                                      // and Z^n intersected with its lin.
+                                      // space. As the second lattice is
+                                      // saturated, the quotient is torsionfree
+  getLinearForms(cone c);             // all linear forms (that have been
+                                      // defined by setLinearForms)
+
+                                        // following functions return ints:
+  getAmbientDimension(cone c);        // ambient dimension of the cone
+  getDimension(cone c);               // dimension of smallest linear subspace
+                                      // that contains the cone
+  getLinealityDimension(cone c);      // dimension of the lineality space
+  getMultiplicity(cone c);            // multiplicity (= weight) of the cone
+  isOrigin(cone c);                   // 1 iff the cone is just the origin of
+                                      // the ambient space; 0 otherwise
+  isFullSpace(cone c);                // 1 iff the cone is the entire ambient
+                                      // space; 0 otherwise
+  isSimplicial(cone c);               // 1 iff cone is simplicial; 0 other-
+                                      // wise
+  containsPositiveVector(cone c);     // 1 iff the cone contains a point with
+                                      // positive coordinates, only
+
+                                      // following functions return cones:
+  getLinealitySpace(cone c);          // the cone's lineality space as a new
+                                      // cone
+  getDualCone(cone c);                // the dual of the given cone
+  getNegated(cone c);                 // the negated of the given cone
+
+                                      // following functions return intvecs:
+  getSemiGroupGenerator(cone c);      // For a ray (DIM = LINEALITY_DIM + 1)
+                                      // the quotent lattice is isomorphic to
+                                      // Z, and the ray intersected with Z^n
+                                      // modulo the lineality space inter-
+                                      // sected with Z^n is a semigroup
+                                      // generated by just one element which
+                                      // is returned.
+  getRelativeInteriorPoint(cone c);   // an interior point of the cone which
+                                      // does not lie on a facet
+  getUniquePoint(cone c);             // special-purpose interior point which
+                                      // supports recognition of symmetries
+                                      // among non-intersecting cones (to be
+                                      // used in implementation of fans)
+
+  setMultiplicity(cone c);            // sets the multiplicity (= weight)
+  setLinearForms(cone c);             // sets the matrix of linear forms of
+                                      // the cone (= the rows of the matrix)
+@end smallexample
+
+
+@c ---------------------------------------
+@node fan, pyobject, cone, Data types
+@section fan
+@cindex fan
+
+@itemize
+@item
+Every fan has an ambient dimension.
+@item
+Every cone (of a fan) must have the same lineality space. (This follows
+from the mathematical definition of a fan.)
+@item
+The lineality space of a fan equals the intersection of all cones in the fan.
+(Hence, the lineality space is equal to the lineality space of each cone.)
+@item
+In particular, the lineality space of the empty fan is the entire ambient
+space.
+
+@item
+There may be symmetry in a fan: S_n acts on R^n by permuting coordinates;
+thereby it acts on rays, cones and the entire fan.
+@item
+When a fan is invariant under the action of a subgroup of S_n then one may
+want to store not only cones but also that subgroup. Then we also only need
+to store one cone from each orbit. That is what ZFan (= SINGULAR's fan object)
+does.
+@item
+Mathematically, adding a cone to a given fan will also automatically add all
+faces (of every dimension) of that cone. Therefore the implementation only
+stores a subset of the cones in the fan. Hence in the implementation, a cone
+of a fan represents itself and all its faces.
+
+@item
+Internally, there are two ways of representing fans: as a set of (mutually
+distinct) cones and as a complex on the set of rays. The second
+representation allows for the computation of both all orbits (under the
+group action) and orbits of maximal cones, only.
+Once the fan representation has been switched from the former to the latter
+representation, insertion and deletion of cones will not work anymore.
+(A warning will be given.)
+
+@item
+A ray intersected with its orthogonal complement is a one-dimensional ray
+containing a uniqe non-zero primitive vector. Consequently, these vectors
+can be computed uniquely, and stored as rows of a matrix which we will refer
+to as the matrix of ray generators.
+
+@item
+Access to cones of the fan is provided in three different ways:
+@itemize
+@item
+  1. access to the cones as provided by the user (by means of insertion)
+@item
+  2. access to the representatives of all orbits (under the group action)
+     coming from maximal cones
+@item
+  3. access to the representatives of all orbits (under the group action), i.e.,
+     of the orbits of all faces of maximal cones
+@end itemize
+  For variants 2. and 3. access is possible dimension-wise, as specified by the
+  user. Then the returned object can be either a list of indices (to rows of
+  the matrix of ray generators) or a list of ZCones.
+  In the first case, an index must be provided and a ZCone will be returned.
+@end itemize
+
+@smallexample
+  fan f;                              // ambient dim 0, no cones, lineality
+                                      // space = ambient space
+  fan f = fan_empty(int n);           // ambient dim = n, no cones,
+                                      // symmetry subgroup = <e>
+  fan f = n;                          // synonymous convenience method for
+                                      // 'fan f = fan_empty(n)'
+  fan f = emptyFan(
+                 optional intmat G);  // symmetry group generated by rows of
+                                      // G; ambient dim = number of columns
+                                      // of G
+            // Here a row r = r_1, ...r_n represents the permutation
+            // which takes i to r_i. SINGULAR will check for the validity
+            // of the provided rows, i.e. whether {r_1,...,r_n} = {1,...,n}
+  fan f = fullFan(int n);             // ambient dim = n, the fan consists of
+                                      // one cone which equals the ambient
+                                      // space, symmetry subgroup = <e>
+  fan f = fullFan(
+                 optional intmat G);  // symmetry group generated by rows of
+                                      // G; ambient dim = number of columns
+                                      // of G; the fan consists of one cone
+                                      // which equals the ambient space
+@end smallexample
+
+@smallexample
+  insertCone(fan f, cone c);          // inserts a cone in a fan,
+                                      // checks compatibility beforehand
+  quickInsertCone(fan f, cone c);     // inserts a cone in a fan
+                                      // without checking for compatiblity
+  isCompatible(fan f, cone c);        // checks whether fan and cone are compatible
+
+  numberOfConesOfDimension(fan f, int dimension, int orbit, int maximal);
+                                      // returns the number of cones/orbit in f
+                                      // of a given dimension
+                                      // that are either maximal or not
+  ncones(fan f);                      // returns the number of all cones in f
+  nmaxcones(fan f);                   // returns the number of all maximal cones
+
+  getCone(fan f, int dimension, int index, int orbit, int maximal);
+                                      // returns the cone (orbit = 0)
+                                      // or orbit (orbit = 1) of a certain index
+                                      // in a given dimension
+                                      // if maximal = 1, only maximal cones or
+                                      // orbits are considered, if maximal = 0,
+                                      // all cones or orbits of that dimension
+                                      // are considered
+
+  isSimplicial(fan f);                // 1 if f is simplicial, 0 otherwise
+@end smallexample
+
+
 @c ------------------------------
 @ifset withpython
 @include pyobject.tex
 @end ifset
 
 @ifclear withpython
-@node  pyobject,,User defined types, Data types
+@node  pyobject,,fan, Data types
 @section pyobject
 @cindex pyobject
 @cindex blackbox

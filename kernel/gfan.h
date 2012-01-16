@@ -13,12 +13,9 @@ $Id: gfan.h 14338 2011-07-18 12:05:21Z hannes $
 
 #include <kernel/int64vec.h>
 
-#define p800
-#ifdef p800
-#include <../cddlib-094f/lib-src-gmp/setoper.h>
-#include <../cddlib-094f/lib-src-gmp/cdd.h>
-#include <../cddlib-094f/lib-src-gmp/cddmp.h>
-#endif
+#include <setoper.h>
+#include <cdd.h>
+#include <cddmp.h>
 #include <kernel/bbfan.h>
 #include <kernel/bbcone.h>
 extern int gfanHeuristic;

@@ -5,7 +5,6 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id$
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -145,6 +144,8 @@
 #undef HAVE_DYNAMIC_LOADING
 /* Define to enable plural */
 #undef HAVE_PLURAL
+/* Define to enable fans/cones */
+#undef HAVE_FANS
 /* Define to enable ratGB/ ratGRING */
 #undef HAVE_RATGRING
 /* Define to enable shiftbba */

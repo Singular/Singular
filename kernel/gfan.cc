@@ -33,14 +33,9 @@ $Id: gfan.cc 14271 2011-06-10 08:00:12Z monerjan $
 #define GMPRATIONAL
 #endif
 
-//Hacks for different working places
-#define p800
-
-#ifdef p800
-#include <../cddlib-094f/lib-src-gmp/setoper.h>
-#include <../cddlib-094f/lib-src-gmp/cdd.h>
-#include <../cddlib-094f/lib-src-gmp/cddmp.h>
-#endif
+#include <setoper.h>
+#include <cdd.h>
+#include <cddmp.h>
 
 #ifndef gfan_DEBUG
 // #define gfan_DEBUG

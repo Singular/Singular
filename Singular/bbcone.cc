@@ -983,7 +983,7 @@ void bbcone_setup()
   // iiAddCproc("","faceContaining",FALSE,faceContaining);
   iiAddCproc("","hasFace",FALSE,hasFace);
   coneID=setBlackboxStuff(b,"cone");
-  Print("created type %d (cone)\n",coneID); 
+  //Print("created type %d (cone)\n",coneID); 
 }
 
 #endif
