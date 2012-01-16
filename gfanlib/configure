@@ -3584,7 +3584,10 @@ done
 
 for ac_header in cdd.h
 do :
-  ac_fn_c_check_header_mongrel "$LINENO" "cdd.h" "ac_cv_header_cdd_h" "$ac_includes_default"
+  ac_fn_c_check_header_compile "$LINENO" "cdd.h" "ac_cv_header_cdd_h" "
+# include <setoper.h>
+
+"
 if test "x$ac_cv_header_cdd_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_CDD_H 1

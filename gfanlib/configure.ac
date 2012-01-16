@@ -19,7 +19,10 @@ AC_PROG_RANLIB
 AC_HEADER_STDC
 AC_CHECK_HEADERS([gmp.h])
 AC_CHECK_HEADERS([setoper.h])
-AC_CHECK_HEADERS([cdd.h])
+AC_CHECK_HEADERS([cdd.h],,,
+[
+# include <setoper.h>
+])
 
 if test "$ac_cv_header_gmp_h" == no
 then
