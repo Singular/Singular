@@ -1262,18 +1262,8 @@ bool ZCone::hasFace(ZCone const &f)const
   temp.canonicalize();
   ZCone temp2=f;
   temp2.canonicalize();
-  std::string s1 = toString(temp);
-  std::cout << "temp.str() => " << s1 << std::endl;
-  std::string s2 = toString(temp);
-  std::cout << "temp2.str() => " << s2 << std::endl;
-  // int i = (int) temp.dimension()==temp2.dimension();
-  // std::cout << "temp.dimension()==temp2.dimension() => " << i << std::endl;
   if(temp.dimension()==temp2.dimension())
     {
-      // int j = (int) !(temp2!=temp);
-      // std::cout << "!(temp2!=temp) => " << j << std::endl;
-      // int k = (int) (temp2!=temp);
-      // std::cout << "temp2!=temp => " << k << std::endl;
       return !(temp2!=temp);
     }
   else
