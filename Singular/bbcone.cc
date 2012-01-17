@@ -512,7 +512,7 @@ BOOLEAN getLinearForms(leftv res, leftv args)
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getLinearForms();
-    res->rtyp = INTMAT_CMD;
+    res->rtyp = INTVEC_CMD;
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
@@ -619,7 +619,7 @@ BOOLEAN getLinealitySpace(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    gfan::ZCone* zd = &zc->linealitySpace();
+    gfan::ZCone* zd = new gfan::ZCone(zc->linealitySpace());
     res->rtyp = coneID;
     res->data = (void*) zd;
     return FALSE;
@@ -634,7 +634,7 @@ BOOLEAN getDualCone(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    gfan::ZCone* zd = &zc->dualCone();
+    gfan::ZCone* zd = new gfan::ZCone(zc->dualCone());
     res->rtyp = coneID;
     res->data = (void*) zd;
     return FALSE;
@@ -649,7 +649,7 @@ BOOLEAN getNegated(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    gfan::ZCone* zd = &zc->negated();
+    gfan::ZCone* zd = new gfan::ZCone(zc->negated());
     res->rtyp = coneID;
     res->data = (void*) zd;
     return FALSE;
@@ -754,7 +754,7 @@ BOOLEAN setLinearForms(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN coneIntersect(leftv res, leftv args)
+BOOLEAN intersectCones(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -776,7 +776,7 @@ BOOLEAN coneIntersect(leftv res, leftv args)
       return FALSE;
     }
   }
-  WerrorS("cone_intersect: unexpected parameters");
+  WerrorS("intersectCones: unexpected parameters");
   return TRUE;
 }
 
@@ -880,6 +880,7 @@ BOOLEAN contains(leftv res, leftv args)
       {
         res->rtyp = INT_CMD;
         res->data = (void *)(zc->contains(zv) ? 1 : 0);
+	return FALSE;
       }
       Werror("expected ambient dim of cone and size of vector\n"
              "to be equal but got %d and %d", d1, d2);
@@ -906,6 +907,7 @@ BOOLEAN containsRelatively(leftv res, leftv args)
       {
         res->rtyp = INT_CMD;
         res->data = (void *)(zc->containsRelatively(zv) ? 1 : 0);
+        return FALSE;
       }
       Werror("expected ambient dim of cone and size of vector\n"
              "to be equal but got %d and %d", d1, d2);     
@@ -950,7 +952,7 @@ void bbcone_setup()
   b->blackbox_Assign=bbcone_Assign;
   iiAddCproc("","coneViaRays",FALSE,coneViaRays);
   iiAddCproc("","coneViaNormals",FALSE,coneViaNormals);
-  iiAddCproc("","intersectCones",FALSE,coneIntersect);
+  iiAddCproc("","intersectCones",FALSE,intersectCones);
   // iiAddCproc("","takeUnion",FALSE,takeUnion);
   iiAddCproc("","coneLink",FALSE,coneLink);
   iiAddCproc("","contains",FALSE,contains);
