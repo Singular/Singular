@@ -1,0 +1,1302 @@
+@comment -*-texinfo-*-
+@comment this file contains the cone/fan definitions
+
+@c -------------------------------------------------------------------
+@node cone, fan, User defined types, Data types
+@section cone
+@cindex cone
+
+The cone is defined as the set of points which can be written as the sum of
+a point in the convex hull of all given half-lines (= rows of the matrix HL)
+plus a point in the span of the given lines (= rows of the matrix L).
+(Note that the convex hull of half lines may already contain linear subspaces,
+e.g. entire lines. Note also, that L may contain zero rows, which may be
+omitted without changing the cone mathematically. Moreover, there may be
+double rows in one of or in both HL and L.)
+
+@smallexample
+  cone c;                             // ambient dim 0, no equations,
+                                      // no inequalities
+  cone c = 17;                        // ambient dim 17, no equations,
+                                      // no inequalities
+
+  cone c = coneViaRays(matrix HL);  // HL = 'half-lines'
+  cone c = coneViaRays(matrix HL,
+                       matrix L);   // L = 'lines'
+  cone c = coneViaRays(matrix HL,
+                         matrix L,
+                         int flags);
+@end smallexample
+
+As to the third constructor, flags is assumed to range in [0..3], defining a
+higher bit and a lower bit. If the higher bit is 1, then this means that the
+extreme rays are known: Each half-line spans a (different) extreme ray of the
+cone. If this bit is zero, than this means that nothing of this sort is known.
+(It may however still be the case, that each half-line spans a different
+extreme ray of the cone.)
+If the lower bit is set, then the lineality space is known to be equal to the
+span of provided lines. Again, a zero bit just says that nothing of this sort
+is known.
+
+@smallexample
+  cone c = coneViaNormals(          // synonymous to cone_via_rays(IE);
+                 matrix IE);        // (This time, half-lines are
+                                    // named inequalities.)
+  cone c = coneViaNormals(          // cone defined by inequalities and
+                 matrix IE,         // equations which hold for all points
+                 matrix E);         // of the cone, and only for these
+  cone c = coneViaNormals(matrix IE, matrix E, int flags);
+               // cone defined by inequalities and equations which hold for
+               // all points of the cone, and only for these; if the higher bit
+               // of flags is set, then all inequalities are already explicit
+               // in IE; if this bit is 0 then this is not known;
+               // if the lower bit is set then all equations are already
+               // explicit in E; if this bit is 0, then this is not known
+@end smallexample
+
+@menu
+* cone related functions::
+@end menu
+@c --------------------------------------------------------------------------------
+@node cone related functions,,,cone
+@subsection cone related functions
+@cindex cone related functions
+
+@smallexample
+  coneLink(cone c, intvec point);     // local version of the given cone
+                                      // around the given point of the cone
+  contains(cone c1, cone c2);         // 1 iff c1 entirely contains c2;
+                                      // 0 otherwise
+  contains(cone c, intvec point);     // 1 iff the given cone contains the
+                                      // given point, but not on one of its
+                                      // facets; 0 otherwise
+  containsRelatively(cone c, intvec point); // 1 iff the given cone contains the
+                                      // given point, possibly on one of its
+                                      // facets; 0 otherwise
+  intersectCones(cone c1, cone c2);   // returns a cone that is the intersection
+                                      // of c1 and c2
+  hasFace(cone c1, cone c2);          // checks whether c1 contains c2
+                                      // as a face
+
+                                      // following functions return intmats:
+  getInequalities(cone c);            // half-lines as they had been provided
+  getEquations(cone c);               // lines as they had been provided
+  getFacets(cone c);                  // reduced half-lines, i.e.,
+                                      // row-echelon form without zero rows
+  getImpliedEquations(cone c);        // analogous for the given set of lines
+  getGeneratorsOfSpan(cone c);        // generating vectors of the span of all
+                                      // rays in the cone
+  getGeneratorsOfLinealitySpace(cone c); // generating vectors of the lineality
+                                      // space of the cone
+  getRays(cone c);                    // generators of all extreme rays
+  getQuotientLatticeBasis(cone c);    // quotient of two lattices: Z^n
+                                      // intersected with the span of the cone
+                                      // and Z^n intersected with its lin.
+                                      // space. As the second lattice is
+                                      // saturated, the quotient is torsionfree
+  getLinearForms(cone c);             // all linear forms (that have been
+                                      // defined by setLinearForms)
+
+                                        // following functions return ints:
+  getAmbientDimension(cone c);        // ambient dimension of the cone
+  getDimension(cone c);               // dimension of smallest linear subspace
+                                      // that contains the cone
+  getLinealityDimension(cone c);      // dimension of the lineality space
+  getMultiplicity(cone c);            // multiplicity (= weight) of the cone
+  isOrigin(cone c);                   // 1 iff the cone is just the origin of
+                                      // the ambient space; 0 otherwise
+  isFullSpace(cone c);                // 1 iff the cone is the entire ambient
+                                      // space; 0 otherwise
+  isSimplicial(cone c);               // 1 iff cone is simplicial; 0 other-
+                                      // wise
+  containsPositiveVector(cone c);     // 1 iff the cone contains a point with
+                                      // positive coordinates, only
+
+                                      // following functions return cones:
+  getLinealitySpace(cone c);          // the cone's lineality space as a new
+                                      // cone
+  getDualCone(cone c);                // the dual of the given cone
+  getNegated(cone c);                 // the negated of the given cone
+
+                                      // following functions return intvecs:
+  getSemigroupGenerator(cone c);      // For a ray (DIM = LINEALITY_DIM + 1)
+                                      // the quotent lattice is isomorphic to
+                                      // Z, and the ray intersected with Z^n
+                                      // modulo the lineality space inter-
+                                      // sected with Z^n is a semigroup
+                                      // generated by just one element which
+                                      // is returned.
+  getRelativeInteriorPoint(cone c);   // an interior point of the cone which
+                                      // does not lie on a facet
+  getUniquePoint(cone c);             // special-purpose interior point which
+                                      // supports recognition of symmetries
+                                      // among non-intersecting cones (to be
+                                      // used in implementation of fans)
+
+  setMultiplicity(cone c);            // sets the multiplicity (= weight)
+  setLinearForms(cone c);             // sets the matrix of linear forms of
+                                      // the cone (= the rows of the matrix)
+@end smallexample
+
+@menu
+* coneLink::
+* contains::
+* containsPositiveVector::
+* containsRelatively::
+* getAmbientDimension::
+* getDimension::
+* getDualCone::
+* getEquations::
+* getFacets::
+* getGeneratorsOfLinealitySpace::
+* getGeneratorsOfSpan::
+* getImpliedEquations::
+* getInequalities::
+* getLinealityDimension::
+* getLinealitySpace::
+* getLinearForms::
+* getMultiplicity::
+* getNegated::
+* getQuotientLatticeBasis::
+* getRays::
+* getRelativeInteriorPoint::
+* getSemigroupGenerator::
+* getUniquePoint::
+* hasFace::
+* intersectCones::
+* isFullSpace::
+* isOrigin::
+* isSimplicial::
+* setLinearForms::
+* setMultiplicity::
+@end menu
+
+@c --------------------------------------
+@node coneLink,contains,,cone related functions
+@subsubsection coneLink
+@cindex coneLink
+
+@table @code
+@item @strong{Syntax:}
+@code{coneLink (} cone c, intvec point @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+local version of the given cone around the given point of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c=coneViaRays(M);
+intvec v=1,0,0;
+cone cc=coneLink(c,v);
+cc;
+print(getRays(cc));
+intvec w=1,1,1;
+cone cd=coneLink(c,w);
+cd;
+print(getRays(cd));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node contains,containsPositiveVector,coneLink,cone related functions
+@subsubsection contains
+@cindex contains
+
+@table @code
+@item @strong{Syntax:}
+@code{contains (} cone c1, cone c2 @code{)}
+@*@code{contains (} cone c, intvec point @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff c1 entirely contains c2 resp. iff c contains the given point, possibly on one of its facets; 0 otherwise.
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+contains(c,c);
+intmat N1[2][2]=
+1,1,
+0,1;
+cone d1=coneViaRays(N1);
+contains(c,d1);
+intmat N2[2][2]=
+1,1,
+1,-1;
+cone d2=coneViaRays(N2);
+contains(c,d2);
+intvec v1=0,1;
+contains(c,v1);
+intvec v2=1,-1;
+contains(c,v2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node containsPositiveVector,containsRelatively,contains,cone related functions
+@subsubsection containsPositiveVector
+@cindex containsPositiveVector
+
+@table @code
+@item @strong{Syntax:}
+@code{containsPositiveVector(} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the cone contains a point with positive coordinates in its relative interior; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,1,
+1,-1;
+cone c1=coneViaRays(M1);
+containsPositiveVector(c1);
+intmat M2[2][2]=
+0,1,
+-1,0;
+cone c2=coneViaRays(M2);
+containsPositiveVector(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node containsRelatively,getAmbientDimension,containsPositiveVector,cone related functions
+@subsubsection containsRelatively
+@cindex containsRelatively
+
+@table @code
+@item @strong{Syntax:}
+@code{containsRelatively(} cone c, intvec point @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the given cone contains the given point in its relative interior; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+intvec p1=1,1;
+containsRelatively(c,p1);
+intvec p2=0,1;
+containsRelatively(c,p2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getAmbientDimension,getDimension,containsRelatively,cone related functions
+@subsubsection getAmbientDimension
+@cindex getAmbientDimension
+
+@table @code
+@item @strong{Syntax:}
+@code{getAmbientDimension(} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+ambient dimension of the cone;
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+getAmbientDimension(c1);
+intmat M2[2][3]=
+1,0,0,
+0,1,0;
+cone c2=coneViaRays(M2);
+getAmbientDimension(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getDimension,getDualCone,getAmbientDimension,cone related functions
+@subsubsection getDimension
+@cindex getDimension
+
+@table @code
+@item @strong{Syntax:}
+@code{getDimension(} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+dimension of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[1][2]=
+1,0;
+cone c1=coneViaRays(M1);
+getDimension(c1);
+intmat M2[1][2]=
+0,0;
+cone c2=coneViaRays(M2);
+getDimension(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getDualCone,getEquations,getDimension,cone related functions
+@subsubsection getDualCone
+@cindex getDualCone
+
+@table @code
+@item @strong{Syntax:}
+@code{getDualCone(} cone c @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the dual of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+cone d1=getDualCone(c1);
+d1;
+print(getRays(d1));
+intmat M2[2][2]=
+1,1,
+0,1;
+cone c2=coneViaRays(M2);
+cone d2=getDualCone(c2);
+d2;
+print(getRays(d2));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getEquations,getFacets,getDualCone,cone related functions
+@subsubsection getEquations
+@cindex getEquations
+
+@table @code
+@item @strong{Syntax:}
+@code{getEquations(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+equations given by the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat E1=getEquations(c1);
+print(E1);
+intmat M2[1][2]=
+1,0;
+cone c2=coneViaRays(M2);
+intmat E2=getEquations(c2);
+print(E2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getFacets,getGeneratorsOfLinealitySpace,getEquations,cone related functions
+@subsubsection getFacets
+@cindex getFacets
+
+@table @code
+@item @strong{Syntax:}
+@code{getFacets(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+inner normal vectors of the facets of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat F1=getFacets(c1);
+print(F1);
+intmat M2[2][2]=
+1,1,
+0,-1;
+cone c2=coneViaRays(M2);
+intmat F2=getFacets(c2);
+print(F2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getGeneratorsOfLinealitySpace,getGeneratorsOfSpan,getFacets,cone related functions
+@subsubsection getGeneratorsOfLinealitySpace
+@cindex getGeneratorsOfLinealitySpace
+
+@table @code
+@item @strong{Syntax:}
+@code{getGeneratorsOfLinealitySpace(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+generating vectors of the lineality space of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[5][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+intmat L=getGeneratorsOfLinealitySpace(c);
+print(L);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getGeneratorsOfSpan,getImpliedEquations,getGeneratorsOfLinealitySpace,cone related functions
+@subsubsection getGeneratorsOfSpan
+@cindex getGeneratorsOfSpan
+
+@table @code
+@item @strong{Syntax:}
+@code{getGeneratorsOfSpan(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+generating vectors of the span of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][5]=
+1,0,0,0,0,
+0,1,0,0,0,
+0,0,1,0,0;
+cone c=coneViaRays(M);
+intmat S=getGeneratorsOfSpan(c);
+print(S);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getImpliedEquations,getInequalities,getGeneratorsOfSpan,cone related functions
+@subsubsection getImpliedEquations
+@cindex getImpliedEquations
+
+@table @code
+@item @strong{Syntax:}
+@code{getImpliedEquations(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+generating vectors of the orthogonal complement of the sapn of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][5]=
+1,0,0,0,0,
+0,1,0,0,0,
+0,0,1,0,0;
+cone c=coneViaRays(M);
+intmat I=getImpliedEquations(c);
+print(I);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getInequalities,getLinealityDimension,getImpliedEquations,cone related functions
+@subsubsection getInequalities
+@cindex getInequalities
+
+@table @code
+@item @strong{Syntax:}
+@code{getInequalities(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+inequalities given by the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat I1=getInequalities(c1);
+print(I);
+intmat M2[1][2]=
+1,0;
+cone c2=coneViaRays(M2);
+intmat I2=getInequalities(c2);
+print(I2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getLinealityDimension,getLinealitySpace,getInequalities,cone related functions
+@subsubsection getLinealityDimension
+@cindex getLinealityDimension
+
+@table @code
+@item @strong{Syntax:}
+@code{getLinealityDimension(} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+dimension of the lineality space of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+getLinealityDimension(c1);
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0;
+cone c2=coneViaRays(M2);
+getLinealityDimension(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getLinealitySpace,getLinearForms,getLinealityDimension,cone related functions
+@subsubsection getLinealitySpace
+@cindex getLinealitySpace
+
+@table @code
+@item @strong{Syntax:}
+@code{getLinealitySpace} cone c @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the lineality space of the cone as a new cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+cone l1=getLinealitySpace(c1);
+l1;
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0;
+cone c2=coneViaRays(M2);
+cone l2=getLinealitySpace(c2);
+l2;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getLinearForms,getMultiplicity,getLinealitySpace,cone related functions
+@subsubsection getLinearForms
+@cindex getLinearForms
+
+@table @code
+@item @strong{Syntax:}
+@code{getLinearForms(} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+linear forms of the cone (can be set by setLinearForms); returns empty intmat if not set
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getLinearForms(c);
+intvec v=1,1,1;
+setLinearForms(c,v);
+getLinearForms(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getMultiplicity,getNegated,getLinearForms,cone related functions
+@subsubsection getMultiplicity
+@cindex getMultiplicity
+
+@table @code
+@item @strong{Syntax:}
+@code{getMultiplicity(} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+multiplicity of the cone (can be set by setMultiplicity); returns 1 if not set
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getMultiplicity(c);
+setMultiplicity(c,3);
+getMultiplicity(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getNegated,getQuotientLatticeBasis,getMultiplicity,cone related functions
+@subsubsection getNegated
+@cindex getNegated
+
+@table @code
+@item @strong{Syntax:}
+@code{getNegated} cone c @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the negated (or negative) of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+cone cn=getNegated(c);
+cn;
+print(getRays(cn));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getQuotientLatticeBasis,getRays,getNegated,cone related functions
+@subsubsection getQuotientLatticeBasis
+@cindex getQuotientLatticeBasis
+
+@table @code
+@item @strong{Syntax:}
+@code{getQuotientLatticeBasis} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+quotient of Z^n intersected with the span of the cone with Z^n intersected with its lineality space
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaRays(M);
+intmat Q=getQuotientLatticeBasis(c);
+print(Q);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getRays,getRelativeInteriorPoint,getQuotientLatticeBasis,cone related functions
+@subsubsection getRays
+@cindex getRays
+
+@table @code
+@item @strong{Syntax:}
+@code{getRays(} cone c @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+rays of the cone outside the lineality space, rays inside the lineality space will be ignored
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat R1=getRays(c1);
+print(R1);
+intmat M2[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c2=coneViaRays(M2);
+intmat R2=getRays(c2);
+print(R2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getRelativeInteriorPoint,getSemigroupGenerator,getRays,cone related functions
+@subsubsection getRelativeInteriorPoint
+@cindex getRelativeInteriorPoint
+
+@table @code
+@item @strong{Syntax:}
+@code{getRelativeInteriorPoint} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+point in the relative interior of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+getRelativeInteriorPoint(c1);
+intmat M2[2][2]=
+1,0,
+1,1;
+cone c2=coneViaRays(M2);
+getRelativeInteriorPoint(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getSemigroupGenerator,getUniquePoint,getRelativeInteriorPoint,cone related functions
+@subsubsection getSemigroupGenerator
+@cindex getSemigroupGenerator
+
+@table @code
+@item @strong{Syntax:}
+@code{getSemigroupGenerator(} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+if getDimension(c)=getLinealityDimension(c)+1, then the quotient lattice of Z^n intersected with the span and Z^n intersected with the lineality space is Z^1 and the class of the cone is a semigroup. returns a generator of that semigroup. (like getQuotientLatticeBasis(cone c), but as intvec)
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaRays(M);
+getSemigroupGenerator(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getUniquePoint,hasFace,getSemigroupGenerator,cone related functions
+@subsubsection getUniquePoint
+@cindex getUniquePoint
+
+@table @code
+@item @strong{Syntax:}
+@code{getUniquePoint(} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+special-purpose interior point which supports recognition of symmetries among non-intersecting cones (used in implementation of fans)
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+getUniquePoint(c1);
+intmat M2[2][2]=
+1,0,
+1,1;
+cone c2=coneViaRays(M2);
+getUniquePoint(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node hasFace,intersectCones,getUniquePoint,cone related functions
+@subsubsection hasFace
+@cindex hasFace
+
+@table @code
+@item @strong{Syntax:}
+@code{hasFace(} cone c1, cone c2 @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff c1 contains c2 as a face; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+intmat N1[1][2]=
+1,1;
+cone d1=coneViaRays(N1);
+hasFace(c,d1);
+intmat N2[1][2]=
+0,1;
+cone d2=coneViaRays(N2);
+hasFace(c,d2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node intersectCones,isFullSpace,hasFace,cone related functions
+@subsubsection intersectCones
+@cindex intersectCones
+
+@table @code
+@item @strong{Syntax:}
+@code{intersectCones(} cone c1, cone c2 @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the intersection of the two cones
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat M2[2][2]=
+1,1,
+1,-1;
+cone c2=coneViaRays(M2);
+intmat M3[2][2]=
+1,0,
+0,-1;
+cone c3=coneViaRays(M3);
+cone c12=intersectCones(c1,c2);
+c12;
+print(getRays(c12));
+cone c23=intersectCones(c2,c3);
+c23;
+print(getRays(c23));
+cone c13=intersectCones(c1,c3);
+c13;
+print(getRays(c13));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node isFullSpace,isOrigin,intersectCones,cone related functions
+@subsubsection isFullSpace
+@cindex isFullSpace
+
+@table @code
+@item @strong{Syntax:}
+@code{isFullSpace} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the cone is the entire ambient space; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+cone c1;
+isFullSpace(c1);
+intmat M2[2][2]=
+1,0,
+0,1;
+cone c2=coneViaRays(M2);
+isFullSpace(c2);
+intmat M3[4][2]=
+1,0,
+0,1,
+-1,0,
+0,-1;
+cone c3=coneViaRays(M3);
+isFullSpace(c3);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node isOrigin,isSimplicial,isFullSpace,cone related functions
+@subsubsection isOrigin
+@cindex isOrigin
+
+@table @code
+@item @strong{Syntax:}
+@code{isOrigin} cone c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the cone is just the origin of the ambient space; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+cone c1; // full cone in zero-dimensional ambient space
+isOrigin(c1);
+intmat M2[2][2]=
+1,0,
+0,1;
+cone c2=coneViaRays(M2);
+isOrigin(c2);
+intmat M3[4][2]=
+1,0,
+0,1,
+-1,0,
+0,-1;
+cone c3=coneViaRays(M3);
+isOrigin(c3);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node isSimplicial,setLinearForms,isOrigin,cone related functions
+@subsubsection isSimplicial
+@cindex isSimplicial
+
+@table @code
+@item @strong{Syntax:}
+@code{isSimplicial} cone c @code{)}
+@*@code{isSimplicial} fan f @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the cone resp. fan is simplicial; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+isSimplicial(c1);
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+1,1,-1;
+cone c2=coneViaRays(M2);
+isSimplicial(c2);
+/***********************/
+fan f=emptyFan(3);
+// isSimplicial(f);
+intmat N1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone d1=coneViaRays(N1);
+insertCone(f,d1);
+// isSimplicial(f);
+intmat N2[4][3]=
+1,0,0,
+0,1,0,
+1,0,-1,
+0,1,-1;
+cone d2=coneViaRays(N2);
+insertCone(f,d2);
+// isSimplicial(f);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node setLinearForms,setMultiplicity,isSimplicial,cone related functions
+@subsubsection setLinearForms
+@cindex setLinearForms
+
+@table @code
+@item @strong{Syntax:}
+@code{setLinearForms(} cone c, intvec linearform @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+adds the information of a linear form to the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getLinearForms(c);
+intvec v=1,1,1;
+setLinearForms(c,v);
+getLinearForms(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node setMultiplicity,,setLinearForms,cone related functions
+@subsubsection setMultiplicity
+@cindex setMultiplicity
+
+@table @code
+@item @strong{Syntax:}
+@code{setMultiplicity(} cone c, int multiplicity @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+adds the information of a multiplicity to the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getMultiplicity(c);
+setMultiplicity(c,3);
+getMultiplicity(c);
+@c example
+@end smallexample
+@end table
+@c ---------------------------------------
+@node fan, pyobject, cone, Data types
+@section fan
+@cindex fan
+
+@itemize
+@item
+Every fan has an ambient dimension.
+@item
+Every cone (of a fan) must have the same lineality space. (This follows
+from the mathematical definition of a fan.)
+@item
+The lineality space of a fan equals the intersection of all cones in the fan.
+(Hence, the lineality space is equal to the lineality space of each cone.)
+@item
+In particular, the lineality space of the empty fan is the entire ambient
+space.
+
+@item
+There may be symmetry in a fan: S_n acts on R^n by permuting coordinates;
+thereby it acts on rays, cones and the entire fan.
+@item
+When a fan is invariant under the action of a subgroup of S_n then one may
+want to store not only cones but also that subgroup. Then we also only need
+to store one cone from each orbit. That is what ZFan (= SINGULAR's fan object)
+does.
+@item
+Mathematically, adding a cone to a given fan will also automatically add all
+faces (of every dimension) of that cone. Therefore the implementation only
+stores a subset of the cones in the fan. Hence in the implementation, a cone
+of a fan represents itself and all its faces.
+
+@item
+Internally, there are two ways of representing fans: as a set of (mutually
+distinct) cones and as a complex on the set of rays. The second
+representation allows for the computation of both all orbits (under the
+group action) and orbits of maximal cones, only.
+Once the fan representation has been switched from the former to the latter
+representation, insertion and deletion of cones will not work anymore.
+(A warning will be given.)
+
+@item
+A ray intersected with its orthogonal complement is a one-dimensional ray
+containing a uniqe non-zero primitive vector. Consequently, these vectors
+can be computed uniquely, and stored as rows of a matrix which we will refer
+to as the matrix of ray generators.
+
+@item
+Access to cones of the fan is provided in three different ways:
+@itemize
+@item
+  1. access to the cones as provided by the user (by means of insertion)
+@item
+  2. access to the representatives of all orbits (under the group action)
+     coming from maximal cones
+@item
+  3. access to the representatives of all orbits (under the group action), i.e.,
+     of the orbits of all faces of maximal cones
+@end itemize
+  For variants 2. and 3. access is possible dimension-wise, as specified by the
+  user. Then the returned object can be either a list of indices (to rows of
+  the matrix of ray generators) or a list of ZCones.
+  In the first case, an index must be provided and a ZCone will be returned.
+@end itemize
+
+@smallexample
+  fan f;                              // ambient dim 0, no cones, lineality
+                                      // space = ambient space
+  fan f = fan_empty(int n);           // ambient dim = n, no cones,
+                                      // symmetry subgroup = <e>
+  fan f = n;                          // synonymous convenience method for
+                                      // 'fan f = fan_empty(n)'
+  fan f = emptyFan(
+                 optional intmat G);  // symmetry group generated by rows of
+                                      // G; ambient dim = number of columns
+                                      // of G
+            // Here a row r = r_1, ...r_n represents the permutation
+            // which takes i to r_i. SINGULAR will check for the validity
+            // of the provided rows, i.e. whether @{r_1,...,r_n@} = @{1,...,n@}
+  fan f = fullFan(int n);             // ambient dim = n, the fan consists of
+                                      // one cone which equals the ambient
+                                      // space, symmetry subgroup = <e>
+  fan f = fullFan(
+                 optional intmat G);  // symmetry group generated by rows of
+                                      // G; ambient dim = number of columns
+                                      // of G; the fan consists of one cone
+                                      // which equals the ambient space
+@end smallexample
+
+@menu
+* fan related functions::
+@end menu
+@c --------------------------------------------------------------------
+@node fan related functions,,,fan
+@subsection fan related functions
+@cindex fan related functions
+
+@smallexample
+  insertCone(fan f, cone c);          // inserts a cone in a fan,
+                                      // checks compatibility beforehand
+  quickInsertCone(fan f, cone c);     // inserts a cone in a fan
+                                      // without checking for compatiblity
+  isCompatible(fan f, cone c);        // checks whether fan and cone are compatible
+
+  numberOfConesOfDimension(fan f, int dimension, int orbit, int maximal);
+                                      // returns the number of cones/orbit in f
+                                      // of a given dimension
+                                      // that are either maximal or not
+  ncones(fan f);                      // returns the number of all cones in f
+  nmaxcones(fan f);                   // returns the number of all maximal cones
+
+  getCone(fan f, int dimension, int index, int orbit, int maximal);
+                                      // returns the cone (orbit = 0)
+                                      // or orbit (orbit = 1) of a certain index
+                                      // in a given dimension
+                                      // if maximal = 1, only maximal cones or
+                                      // orbits are considered, if maximal = 0,
+                                      // all cones or orbits of that dimension
+                                      // are considered
+
+  isSimplicial(fan f);                // 1 if f is simplicial, 0 otherwise
+@end smallexample
+
+See also @ref{isSimplicial}.
+
+@menu
+* getCone::
+* insertCone::
+* isCompatible::
+* nmaxcones::
+* ncones::
+* numberOfConesOfDimension::
+* quickInsertCone::
+@end menu
+
+@c --------------------------------------------------------------------
+@node getCone,insertCone,,fan related functions
+@subsubsection getCone
+@cindex getCone
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example getCone cones.doc:818 
+@c end example getCone cones.doc:818
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node insertCone,isCompatible,getCone,fan related functions
+@subsubsection insertCone
+@cindex insertCone
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example insertCone cones.doc:834 
+@c end example insertCone cones.doc:834
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node isCompatible,nmaxcones,insertCone,fan related functions
+@subsubsection isCompatible
+@cindex isCompatible
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example isCompatible cones.doc:850 
+@c end example isCompatible cones.doc:850
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node nmaxcones,ncones,isCompatible,fan related functions
+@subsubsection nmaxcones
+@cindex nmaxcones
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example nmaxcones cones.doc:866 
+@c end example nmaxcones cones.doc:866
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node ncones,numberOfConesOfDimension,nmaxcones,fan related functions
+@subsubsection ncones
+@cindex ncones
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example ncones cones.doc:882 
+@c end example ncones cones.doc:882
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node numberOfConesOfDimension,quickInsertCone,ncones,fan related functions
+@subsubsection numberOfConesOfDimension
+@cindex numberOfConesOfDimension
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example numberOfConesOfDimension cones.doc:898 
+@c end example numberOfConesOfDimension cones.doc:898
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node quickInsertCone,,numberOfConesOfDimension,fan related functions
+@subsubsection quickInsertCone
+@cindex quickInsertCone
+
+@table @code
+@item @strong{Syntax:}
+@code{} @code{)}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@smallexample
+@c computed example quickInsertCone cones.doc:914 
+@c end example quickInsertCone cones.doc:914
+@end smallexample
+@end table

@@ -14,6 +14,7 @@
 @cindex libfac
 @cindex surfex
 @cindex surfer
+@cindex gfanlib
 @cindex graphviz
 @cindex normaliz
 
@@ -97,6 +98,8 @@ anonymous ftp through the following addresses:
 @item NTL
 @copyright{} Victor Shoup
 @* @uref{http://www.shoup.net/ntl}
+@item gfanlib
+@copyright{} Anders Jensen
 @item Singular-Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
