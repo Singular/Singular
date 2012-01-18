@@ -21,6 +21,12 @@
 
 @heading News for version @value{VERSION}
 
+@heading New data types
+@itemize @bullet
+@item fan (@nref{fan}) 
+@item cone (@nref{cone}) witrh 30 new functions (@nref{cone related functions}).
+@end itemize
+
 @heading Changed @sc{Singular} commands
 @itemize @bullet
 @item sqrfree: (@nref{sqrfree}): changed implementation, arguments, return type

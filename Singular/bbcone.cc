@@ -283,16 +283,16 @@ BOOLEAN coneViaRays(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == INTMAT_CMD))
   {
     if (u->next == NULL) return jjCONERAYS1(res, u);
-  }
-  leftv v = u->next;
-  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
-  {
-    if (v->next == NULL) return jjCONERAYS2(res, u, v);
-  }
-  leftv w = v->next;
-  if ((w != NULL) && (w->Typ() == INT_CMD))
-  {
-    if (w->next == NULL) return jjCONERAYS3(res, u, v, w);
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+    {
+      if (v->next == NULL) return jjCONERAYS2(res, u, v);
+      leftv w = v->next;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+      {
+        if (w->next == NULL) return jjCONERAYS3(res, u, v, w);
+      }
+    }
   }
   WerrorS("coneViaRays: unexpected parameters");
   return TRUE;
