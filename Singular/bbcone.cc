@@ -959,7 +959,7 @@ void bbcone_setup()
   iiAddCproc("","containsRelatively",FALSE,containsRelatively);
   iiAddCproc("","getRays",FALSE,getRays);
   iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
-  iiAddCproc("","setMultiplicty",FALSE,setMultiplicity);
+  iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
   iiAddCproc("","getLinearForms",FALSE,getLinearForms);
   iiAddCproc("","setLinearForms",FALSE,setLinearForms);
   iiAddCproc("","getInequalities",FALSE,getInequalities);
