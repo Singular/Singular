@@ -12,6 +12,7 @@
 
 #include "setoper.h"
 #include "cdd.h"
+#include <sstream>
 
 namespace gfan{
 
@@ -707,7 +708,7 @@ void ZCone::ensureStateAsMinimum(int s)const
   if((state<3) && (s>=3))
     {
       QMatrix equations2=ZToQMatrix(equations);
-      equations2.reduce();
+      equations2.reduce(false,false,true);
 
       for(int i=0;i<inequalities.getHeight();i++)
         {
@@ -1218,6 +1219,55 @@ ZCone ZCone::link(ZVector const &w)const
   C.setMultiplicity(getMultiplicity());
 
   return C;
+}
+
+std::string toString(gfan::ZMatrix const &m, char *tab=0)
+{
+  std::stringstream s;
+
+  for(int i=0;i<m.getHeight();i++)
+    {
+      if(tab)s<<tab;
+      for(int j=0;j<m.getWidth();j++)
+	{
+	  s<<m[i][j];
+	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
+	    {
+	      s<<",";
+	    }
+	}
+      s<<std::endl;
+    }
+  return s.str();
+}
+
+std::string toString(ZCone const &c)
+{
+  std::stringstream s;
+  ZMatrix i=c.getInequalities();
+  ZMatrix e=c.getEquations();
+  s<<"AMBIENT_DIM"<<std::endl;
+  s<<c.ambientDimension()<<std::endl;
+  s<<"INEQUALITIES"<<std::endl;
+  s<<toString(i);
+  s<<"EQUATIONS"<<std::endl;
+  s<<toString(e);
+  return s.str();
+}
+
+bool ZCone::hasFace(ZCone const &f)const
+{
+  if(!contains(f.getRelativeInteriorPoint()))return false;
+  ZCone temp=faceContaining(f.getRelativeInteriorPoint());
+  temp.canonicalize();
+  ZCone temp2=f;
+  temp2.canonicalize();
+  if(temp.dimension()==temp2.dimension())
+    {
+      return !(temp2!=temp);
+    }
+  else
+    return false;
 }
 
 ZCone ZCone::faceContaining(ZVector const &v)const

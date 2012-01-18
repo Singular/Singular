@@ -258,7 +258,7 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
           for(ConeContainer::const_iterator i=cones.begin();i!=cones.end();i++,I++)
                   if(i->dimension==d)
                     {
-                      numberOfOrbitsOfThisDimension++;
+                  numberOfOrbitsOfThisDimension++;
               if(!onlyMaximal || isMaximal(*i))
                 {
                   numberOfOrbitsOutput++;

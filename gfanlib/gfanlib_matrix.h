@@ -103,14 +103,14 @@ public:
       for(int i=0;i<q.height;i++)p[i]=s*(q[i]);
       return p;
     }
-/*  friend Matrix operator*(const Matrix& a, const Matrix& b)
+  friend Matrix operator*(const Matrix& a, const Matrix& b)
     {
       assert(a.width==b.height);
       Matrix ret(b.width,a.height);
       for(int i=0;i<b.width;i++)
         ret[i]=a.vectormultiply(b.column(i));
       return ret.transposed();
-    }*/
+    }
   /*  template<class T>
     Matrix<T>(const Matrix<T>& c):v(c.size()){
     for(int i=0;i<size();i++)v[i]=typ(c[i]);}
@@ -305,7 +305,7 @@ public:
      make the routine terminate before completion if it discovers that
      the determinant is zero.
   */
-  int reduce(bool returnIfZeroDeterminant=false, bool integral=false)
+  int reduce(bool returnIfZeroDeterminant=false, bool integral=false, bool makePivotsOne=false)
   {
     assert(integral || typ::isField());
     int retSwaps=0;
@@ -321,6 +321,17 @@ public:
               {
                 swapRows(currentRow,s);
                 retSwaps++;
+              }
+            if(makePivotsOne)
+              {//THE PIVOT SHOULD BE SET TO ONE IF INTEGRAL IS FALSE
+                if(!rows[currentRow][i].sign()<0)retSwaps++;
+                typ inverse=typ(1)/rows[currentRow][i];
+                //                if(!rows[currentRow][i].isOne())
+                  {
+                    for(int k=0;k<width;k++)
+                      if(!rows[currentRow][k].isZero())
+                        rows[currentRow][k]*=inverse;
+                  }
               }
             for(int j=currentRow+1;j<height;j++)
               if(integral)
