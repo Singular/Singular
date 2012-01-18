@@ -23,7 +23,7 @@ ac_help="$ac_help
      omalloc               omalloc memory managment"
 ac_help="$ac_help
 \
-     gmp                  Gnu Multiple Precision package"
+     gfanlib              gfanlib"
 ac_help="$ac_help
 \
      MP                   Multi Protocol library"
@@ -2122,9 +2122,9 @@ if test "${enable_omalloc+set}" = set; then
   :
 fi
 
-# Check whether --enable-gmp or --disable-gmp was given.
-if test "${enable_gmp+set}" = set; then
-  enableval="$enable_gmp"
+# Check whether --enable-gfanlib or --disable-gfanlib was given.
+if test "${enable_gfanlib+set}" = set; then
+  enableval="$enable_gfanlib"
   :
 fi
 
@@ -2212,9 +2212,9 @@ if test "${with_libfac+set}" = set; then
   :
 fi
 
-# Check whether --with-gmp or --without-gmp was given.
-if test "${with_gmp+set}" = set; then
-  withval="$with_gmp"
+# Check whether --with-gfanlib or --without-gfanlib was given.
+if test "${with_gfanlib+set}" = set; then
+  withval="$with_gfanlib"
   :
 fi
 
@@ -2287,31 +2287,9 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-if test "$enable_gmp" = yes; then
-# for gmp-3.0 to work for all ix86 processors, set generic target
-if test "$target" = NONE; then 
-case "$ac_cv_singuname" in 
-	ix86*) 
-	gmp_target=`./config.guess | sed 's/^\w*-/i386-/'`
-	ac_configure_args="$ac_configure_args --target=$gmp_target" 
-	;;
-esac
-fi
-# furthermore, disable building of dynamic libraries, for we want to
-# link against the static ones
-if test "$enable_shared" != no; then
-  ac_configure_args="$ac_configure_args --disable-shared"
-fi
-fi
-
 # Check whether we have gmp
-if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
-  { echo "configure: error: can neither find nor built gmp" 1>&2; exit 1; }
-fi
-
-# Check whether we need to cheat subsequent configures with --enable-gmp
-if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
-  ac_configure_args="$ac_configure_args --enable-gmp"
+if test "$ac_gmp_ok" != yes; then
+  { echo "configure: error: can not find gmp" 1>&2; exit 1; }
 fi
 
 #AC_MSG_CHECKING(whether to configure and build MP lib)
@@ -2364,7 +2342,7 @@ echo "configure:2389: checking whether to configure and build MP lib" >&5
 
 if test "$enable_MP" != yes && test "$enable_MP" != no; then
   if test "$with_MP" != no && test "$ac_MP_ok" != yes && test -d MP && \
-     (test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes); then
+     (test "$ac_gmp_ok" = yes); then
     echo "$ac_t""yes" 1>&6
     enable_MP=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
@@ -2379,7 +2357,7 @@ elif test "$enable_MP" = yes; then
     echo "$ac_t""no" 1>&6
     { echo "configure: error: can not build MP without MP directory" 1>&2; exit 1; }
   fi
-  if test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes; then
+  if test "$ac_gmp_ok" = yes; then
     echo "$ac_t""yes" 1>&6
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
     BUILD1_SUBDIRS="$BUILD1_SUBDIRS MP"
@@ -2847,13 +2825,13 @@ fi
 echo $ac_n "checking which apint package to use""... $ac_c" 1>&6
 echo "configure:2874: checking which apint package to use" >&5
 if test "$with_apint" = gmp; then
-  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
+  if test "$ac_gmp_ok" = yes; then
     echo "$ac_t""gmp" 1>&6
   else
     echo "$ac_t""none" 1>&6
-    { echo "configure: error: can not use with gmp without finding or building it" 1>&2; exit 1; }
+    { echo "configure: error: can not use with gmp without finding" 1>&2; exit 1; }
   fi
-elif test "$ac_gmp_ok" = yes || test "$enable_gmp"; then
+elif test "$ac_gmp_ok" = yes; then
     echo "$ac_t""gmp" 1>&6
     ac_configure_args="$ac_configure_args --with-apint=gmp"
 else
@@ -2941,9 +2919,6 @@ fi
 SUBDIRS=""
 if test -d omalloc; then
   SUBDIRS="$SUBDIRS omalloc"
-fi
-if test -d gmp; then
-  SUBDIRS="$SUBDIRS gmp"
 fi
 if test -d MP; then
   SUBDIRS="$SUBDIRS MP"

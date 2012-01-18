@@ -258,8 +258,8 @@ AC_ARG_ENABLE(omalloc, \
   --disable-PACKAGE       do not configure and/or build PACKAGE
    where PACKAGE can be:
      omalloc               omalloc memory managment])
-AC_ARG_ENABLE(gmp, \
- [    gmp                  Gnu Multiple Precision package])
+AC_ARG_ENABLE(gfanlib, \
+ [    gfanlib              gfanlib])
 AC_ARG_ENABLE(MP, \
  [    MP                   Multi Protocol library])
 AC_ARG_ENABLE(factory, \
@@ -369,31 +369,9 @@ else
   AC_MSG_RESULT(no)
 fi
 
-if test "$enable_gmp" = yes; then
-# for gmp-3.0 to work for all ix86 processors, set generic target
-if test "$target" = NONE; then 
-case "$ac_cv_singuname" in 
-	ix86*) 
-	gmp_target=`./config.guess | sed 's/^\w*-/i386-/'`
-	ac_configure_args="$ac_configure_args --target=$gmp_target" 
-	;;
-esac
-fi
-# furthermore, disable building of dynamic libraries, for we want to
-# link against the static ones
-if test "$enable_shared" != no; then
-  ac_configure_args="$ac_configure_args --disable-shared"
-fi
-fi
-
 # Check whether we have gmp
-if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
-  AC_MSG_ERROR(can neither find nor built gmp)
-fi
-
-# Check whether we need to cheat subsequent configures with --enable-gmp
-if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
-  ac_configure_args="$ac_configure_args --enable-gmp"
+if test "$ac_gmp_ok" != yes; then
+  AC_MSG_ERROR(can not find gmp)
 fi
 
 #AC_MSG_CHECKING(whether to configure and build MP lib)
@@ -407,7 +385,7 @@ AC_MSG_CHECKING(whether to configure and build MP lib)
 
 if test "$enable_MP" != yes && test "$enable_MP" != no; then
   if test "$with_MP" != no && test "$ac_MP_ok" != yes && test -d MP && \
-     (test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes); then
+     (test "$ac_gmp_ok" = yes); then
     AC_MSG_RESULT(yes)
     enable_MP=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
@@ -422,7 +400,7 @@ elif test "$enable_MP" = yes; then
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build MP without MP directory)
   fi
-  if test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes; then
+  if test "$ac_gmp_ok" = yes; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
     BUILD1_SUBDIRS="$BUILD1_SUBDIRS MP"
@@ -693,13 +671,13 @@ dnl Check whether or not to use various packages
 dnl
 AC_MSG_CHECKING(which apint package to use)
 if test "$with_apint" = gmp; then
-  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
+  if test "$ac_gmp_ok" = yes; then
     AC_MSG_RESULT(gmp)
   else
     AC_MSG_RESULT(none)
-    AC_MSG_ERROR(can not use with gmp without finding or building it)
+    AC_MSG_ERROR(can not use with gmp without finding it)
   fi
-elif test "$ac_gmp_ok" = yes || test "$enable_gmp"; then
+elif test "$ac_gmp_ok" = yes; then
     AC_MSG_RESULT(gmp)
     ac_configure_args="$ac_configure_args --with-apint=gmp"
 else
@@ -786,9 +764,6 @@ dnl
 SUBDIRS=""
 if test -d omalloc; then
   SUBDIRS="$SUBDIRS omalloc"
-fi
-if test -d gmp; then
-  SUBDIRS="$SUBDIRS gmp"
 fi
 if test -d MP; then
   SUBDIRS="$SUBDIRS MP"
