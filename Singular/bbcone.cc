@@ -848,46 +848,25 @@ BOOLEAN coneLink(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN contains(leftv res, leftv args)
+bool contains(gfan::ZCone* zc, gfan::ZCone* zd)
 {
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-      int d1 = zc->ambientDimension();
-      int d2 = zd->ambientDimension();
-      if (d1 == d2)
-      {
-        res->rtyp = INT_CMD;
-        res->data = (void *)(zc->contains(*zd) ? 1 : 0);
-        return FALSE;
-      }
-      Werror("expected cones with same ambient dimensions\n but got"
-             " dimensions %d and %d", d1, d2);
-    }
-    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      intvec* vec = (intvec*)v->Data();
-      gfan::ZVector zv = intvec2ZVector(vec);
-      int d1 = zc->ambientDimension();
-      int d2 = zv.size();
-      if (d1 == d2)
-      {
-        res->rtyp = INT_CMD;
-        res->data = (void *)(zc->contains(zv) ? 1 : 0);
-	return FALSE;
-      }
-      Werror("expected ambient dim of cone and size of vector\n"
-             "to be equal but got %d and %d", d1, d2);
-    }
-  }
-  WerrorS("contains: unexpected parameters");
-  return TRUE;
+  int d1 = zc->ambientDimension();
+  int d2 = zd->ambientDimension();
+  if (d1 == d2)
+    return (zc->contains(*zd) ? 1 : 0);
+  Werror("expected cones with same ambient dimensions\n but got"
+         " dimensions %d and %d", d1, d2);
+}
+
+bool contains(gfan::ZCone* zc, intvec* vec)
+{
+  gfan::ZVector zv = intvec2ZVector(vec);
+  int d1 = zc->ambientDimension();
+  int d2 = zv.size();
+  if (d1 == d2)
+    return (zc->contains(zv) ? 1 : 0);
+  Werror("expected ambient dim of cone and size of vector\n"
+         "to be equal but got %d and %d", d1, d2);
 }
 
 BOOLEAN containsRelatively(leftv res, leftv args)
@@ -955,7 +934,7 @@ void bbcone_setup()
   iiAddCproc("","intersectCones",FALSE,intersectCones);
   // iiAddCproc("","takeUnion",FALSE,takeUnion);
   iiAddCproc("","coneLink",FALSE,coneLink);
-  iiAddCproc("","contains",FALSE,contains);
+  // iiAddCproc("","contains",FALSE,contains);
   iiAddCproc("","containsRelatively",FALSE,containsRelatively);
   iiAddCproc("","getRays",FALSE,getRays);
   iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);

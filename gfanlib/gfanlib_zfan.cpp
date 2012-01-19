@@ -41,7 +41,9 @@ namespace gfan
   IntVector ZFan::getConeIndices(int dimension, int index, bool orbit, bool maximal)const
   {
     assert(index>=0);
-    assert(index<numberOfConesOfDimension(dimension,orbit,maximal));
+    int nc=numberOfConesOfDimension(dimension,orbit,maximal);
+    assert(index<nc);
+    // assert(index<numberOfConesOfDimension(dimension,orbit,maximal));
     return table(orbit,maximal)[dimension][index];
   }
   void ZFan::ensureConeCollection()const
@@ -269,11 +271,50 @@ namespace gfan
     assert(0);
     return 0;
   }
+  int ZFan::getDimension()const
+  {
+    if(complex)
+      return complex->getMaxDim();
+    if(coneCollection)
+      return coneCollection->getMaxDimension();
+    assert(0);
+    return 0;
+  }
+  ZVector ZFan::getFVector()const
+  {
+    ensureComplex();
+    return complex->fvector();
+  }
+  bool ZFan::isSimplicial()const
+  {
+    ensureComplex();
+    return complex->isSimplicial();
+  }
+  bool ZFan::isPure()const
+  {
+    ensureComplex();
+    return complex->isPure();
+  }
+  bool ZFan::isComplete()const
+  {
+    ensureConeCollection();
+    if(coneCollection->isEmpty())
+      return 0;
+    int ambientdim=coneCollection->getAmbientDimension();
+    int linealitydim=coneCollection->dimensionOfLinealitySpace();
+    return (ambientdim==linealitydim);
+  }
   void ZFan::insert(ZCone const &c)
   {
     ensureConeCollection();
     killComplex();
     coneCollection->insert(c);
+  }
+  void ZFan::remove(ZCone const &c)
+  {
+    ensureConeCollection();
+    killComplex();
+    coneCollection->remove(c);
   }
 
 /*  ZFan::ZFan(int ambientDimension):
