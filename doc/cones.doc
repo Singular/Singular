@@ -314,10 +314,9 @@ intmat M1[2][2]=
 0,1;
 cone c1=coneViaRays(M1);
 getAmbientDimension(c1);
-intmat M2[3][3]=
+intmat M2[2][3]=
 1,0,0,
-0,1,0,
-0,0,1;
+0,1,0;
 cone c2=coneViaRays(M2);
 getAmbientDimension(c2);
 @c example
@@ -482,6 +481,13 @@ generating vectors of the span of the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[3][5]=
+1,0,0,0,0,
+0,1,0,0,0,
+0,0,1,0,0;
+cone c=coneViaRays(M);
+intmat S=getGeneratorsOfSpan(c);
+print(S);
 @c example
 @end smallexample
 @end table
@@ -496,10 +502,17 @@ generating vectors of the span of the cone
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
-
+generating vectors of the orthogonal complement of the span of the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[3][5]=
+1,0,0,0,0,
+0,1,0,0,0,
+0,0,1,0,0;
+cone c=coneViaRays(M);
+intmat I=getImpliedEquations(c);
+print(I);
 @c example
 @end smallexample
 @end table
@@ -518,6 +531,17 @@ inequalities given by the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat I1=getInequalities(c1);
+print(I);
+intmat M2[1][2]=
+1,0;
+cone c2=coneViaRays(M2);
+intmat I2=getInequalities(c2);
+print(I2);
 @c example
 @end smallexample
 @end table
@@ -536,6 +560,19 @@ dimension of the lineality space of the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+getLinealityDimension(c1);
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0;
+cone c2=coneViaRays(M2);
+getLinealityDimension(c2);
 @c example
 @end smallexample
 @end table
@@ -554,6 +591,21 @@ the lineality space of the cone as a new cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+cone l1=getLinealitySpace(c1);
+l1;
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0;
+cone c2=coneViaRays(M2);
+cone l2=getLinealitySpace(c2);
+l2;
 @c example
 @end smallexample
 @end table
@@ -572,6 +624,14 @@ linear forms of the cone (can be set by setLinearForms); returns empty intmat if
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getLinearForms(c);
+intvec v=1,1,1;
+setLinearForms(c,v);
+getLinearForms(c);
 @c example
 @end smallexample
 @end table
@@ -590,6 +650,13 @@ multiplicity of the cone (can be set by setMultiplicity); returns 1 if not set
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getMultiplicity(c);
+setMultiplicity(c,3);
+getMultiplicity(c);
 @c example
 @end smallexample
 @end table
@@ -608,6 +675,13 @@ the negated (or negative) of the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+cone cn=getNegated(c);
+cn;
+print(getRays(cn));
 @c example
 @end smallexample
 @end table
@@ -626,6 +700,13 @@ quotient of Z^n intersected with the span of the cone with Z^n intersected with 
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaRays(M);
+intmat Q=getQuotientLatticeBasis(c);
+print(Q);
 @c example
 @end smallexample
 @end table
@@ -640,10 +721,23 @@ quotient of Z^n intersected with the span of the cone with Z^n intersected with 
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
-rays of the cone
+rays of the cone outside the lineality space, rays inside the lineality space will be ignored
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat R1=getRays(c1);
+print(R1);
+intmat M2[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c2=coneViaRays(M2);
+intmat R2=getRays(c2);
+print(R2);
 @c example
 @end smallexample
 @end table
@@ -662,6 +756,16 @@ point in the relative interior of the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+getRelativeInteriorPoint(c1);
+intmat M2[2][2]=
+1,0,
+1,1;
+cone c2=coneViaRays(M2);
+getRelativeInteriorPoint(c2);
 @c example
 @end smallexample
 @end table
@@ -680,6 +784,12 @@ if getDimension(c)=getLinealityDimension(c)+1, then the quotient lattice of Z^n 
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaRays(M);
+getSemigroupGenerator(c);
 @c example
 @end smallexample
 @end table
@@ -698,6 +808,16 @@ special-purpose interior point which supports recognition of symmetries among no
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+getUniquePoint(c1);
+intmat M2[2][2]=
+1,0,
+1,1;
+cone c2=coneViaRays(M2);
+getUniquePoint(c2);
 @c example
 @end smallexample
 @end table
@@ -716,6 +836,18 @@ int
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+intmat N1[1][2]=
+1,1;
+cone d1=coneViaRays(N1);
+hasFace(c,d1);
+intmat N2[1][2]=
+0,1;
+cone d2=coneViaRays(N2);
+hasFace(c,d2);
 @c example
 @end smallexample
 @end table
@@ -734,6 +866,27 @@ the intersection of the two cones
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+intmat M2[2][2]=
+1,1,
+1,-1;
+cone c2=coneViaRays(M2);
+intmat M3[2][2]=
+1,0,
+0,-1;
+cone c3=coneViaRays(M3);
+cone c12=intersectCones(c1,c2);
+c12;
+print(getRays(c12));
+cone c23=intersectCones(c2,c3);
+c23;
+print(getRays(c23));
+cone c13=intersectCones(c1,c3);
+c13;
+print(getRays(c13));
 @c example
 @end smallexample
 @end table
@@ -752,6 +905,20 @@ int
 @item @strong{Example:}
 @smallexample
 @c example
+cone c1;
+isFullSpace(c1);
+intmat M2[2][2]=
+1,0,
+0,1;
+cone c2=coneViaRays(M2);
+isFullSpace(c2);
+intmat M3[4][2]=
+1,0,
+0,1,
+-1,0,
+0,-1;
+cone c3=coneViaRays(M3);
+isFullSpace(c3);
 @c example
 @end smallexample
 @end table
@@ -770,6 +937,20 @@ int
 @item @strong{Example:}
 @smallexample
 @c example
+cone c1; // full cone in zero-dimensional ambient space
+isOrigin(c1);
+intmat M2[2][2]=
+1,0,
+0,1;
+cone c2=coneViaRays(M2);
+isOrigin(c2);
+intmat M3[4][2]=
+1,0,
+0,1,
+-1,0,
+0,-1;
+cone c3=coneViaRays(M3);
+isOrigin(c3);
 @c example
 @end smallexample
 @end table
@@ -781,13 +962,45 @@ int
 @table @code
 @item @strong{Syntax:}
 @code{isSimplicial} cone c @code{)}
+@*@code{isSimplicial} fan f @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-1 iff the cone is simplicial; 0 otherwise
+1 iff the cone resp. fan is simplicial; 0 otherwise
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+isSimplicial(c1);
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+1,1,-1;
+cone c2=coneViaRays(M2);
+isSimplicial(c2);
+/***********************/
+fan f=emptyFan(3);
+// isSimplicial(f);
+intmat N1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone d1=coneViaRays(N1);
+insertCone(f,d1);
+// isSimplicial(f);
+intmat N2[4][3]=
+1,0,0,
+0,1,0,
+1,0,-1,
+0,1,-1;
+cone d2=coneViaRays(N2);
+insertCone(f,d2);
+// isSimplicial(f);
 @c example
 @end smallexample
 @end table
@@ -805,6 +1018,14 @@ adds the information of a linear form to the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getLinearForms(c);
+intvec v=1,1,1;
+setLinearForms(c,v);
+getLinearForms(c);
 @c example
 @end smallexample
 @end table
@@ -822,6 +1043,13 @@ adds the information of a multiplicity to the cone
 @item @strong{Example:}
 @smallexample
 @c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getMultiplicity(c);
+setMultiplicity(c,3);
+getMultiplicity(c);
 @c example
 @end smallexample
 @end table
