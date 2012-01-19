@@ -19,5 +19,8 @@ int getCodimension(gfan::ZCone* zc);
 int getLinealityDimension(gfan::ZCone* zc);
 int isSimplicial(gfan::ZCone* zc);
 
+bool contains(gfan::ZCone* zc, gfan::ZCone* zd);
+bool contains(gfan::ZCone* zc, intvec* vec);
+
 #endif
 #endif

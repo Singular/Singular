@@ -104,6 +104,11 @@ public:
    * Returns the dimension of the ambient space.
    */
   int getAmbientDimension()const;
+  int getDimension()const;
+  ZVector getFVector()const;
+  bool isSimplicial()const;
+  bool isPure()const;
+  bool isComplete()const;
   /**
    * Inserts c into the fan.
    * It is a mistake to insert a cone which live in a space of the wrong dimension.
@@ -117,7 +122,7 @@ public:
    * Notice that insert() has the effect of reordering cones, orbits and rays of the fan.
    */
   void insert(ZCone const &c);
-//  void remove(ZCone const &c);
+  void remove(ZCone const &c);
   /**
    * Returns the number of cones of dimension d in the collection.
    */
