@@ -100,6 +100,7 @@ anonymous ftp through the following addresses:
 @* @uref{http://www.shoup.net/ntl}
 @item gfanlib
 @copyright{} Anders Jensen
+@* @uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
 @item Singular-Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}

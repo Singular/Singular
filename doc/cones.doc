@@ -166,6 +166,7 @@ is known.
 * intersectCones::
 * isFullSpace::
 * isOrigin::
+* isPure::
 * isSimplicial::
 * setLinearForms::
 * setMultiplicity::
@@ -211,10 +212,12 @@ print(getRays(cd));
 @item @strong{Syntax:}
 @code{contains (} cone c1, cone c2 @code{)}
 @*@code{contains (} cone c, intvec point @code{)}
+@*@code{contains (} fan f, cone c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-1 iff c1 entirely contains c2 resp. iff c contains the given point, possibly on one of its facets; 0 otherwise.
+in the first and second instances: 1 iff c1 entirely contains c2 resp. iff c contains the given point, possibly on one of its facets; 0 otherwise \\
+in the third instance: 1 iff the fan contains the cone; 0 otherwise
 @item @strong{Example:}
 @smallexample
 @c example
@@ -237,6 +240,11 @@ intvec v1=0,1;
 contains(c,v1);
 intvec v2=1,-1;
 contains(c,v2);
+fan f=emptyFan(2);
+insertCone(f,c);
+contains(f,c);
+contains(f,d1);
+contains(f,d2);
 @c example
 @end smallexample
 @end table
@@ -985,14 +993,14 @@ cone c2=coneViaRays(M2);
 isSimplicial(c2);
 /***********************/
 fan f=emptyFan(3);
-// isSimplicial(f);
+isSimplicial(f);
 intmat N1[3][3]=
 1,0,0,
 0,1,0,
 0,0,1;
 cone d1=coneViaRays(N1);
 insertCone(f,d1);
-// isSimplicial(f);
+isSimplicial(f);
 intmat N2[4][3]=
 1,0,0,
 0,1,0,
@@ -1000,7 +1008,7 @@ intmat N2[4][3]=
 0,1,-1;
 cone d2=coneViaRays(N2);
 insertCone(f,d2);
-// isSimplicial(f);
+isSimplicial(f);
 @c example
 @end smallexample
 @end table
@@ -1182,6 +1190,8 @@ See also @ref{isSimplicial}.
 * getCone::
 * insertCone::
 * isCompatible::
+* isComplete::
+* isPure::
 * nmaxcones::
 * ncones::
 * numberOfConesOfDimension::
@@ -1195,12 +1205,24 @@ See also @ref{isSimplicial}.
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{getCone} fan f, int dimension, int index, int orbit, int maximal @code{)}
 @item @strong{Type:}
+cone
 @item @strong{Purpose:}
+cone (orbit=0) or orbit (orbit=1) of a certain index (ranges from 1 to numberOfConesOfDimension(f,2,0,0)) in a given dimension; if maximal=0, all cones and orbits are considered, if maximal=1, only maximal cones and orbits are considered 
 @item @strong{Example:}
 @smallexample
-@c computed example getCone cones.doc:818 
+@c computed example getCone cones.doc:818
+intmat M[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c=coneViaRays(M);
+fan f=emptyFan(3);
+insertCone(f,c);
+getCone(f,2,1,0,0);
+getCone(f,2,2,0,0);
+getCone(f,2,3,0,0);
 @c end example getCone cones.doc:818
 @end smallexample
 @end table
@@ -1211,44 +1233,165 @@ See also @ref{isSimplicial}.
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{insertCone(} fan f, cone c @code{)}
 @item @strong{Type:}
+none
 @item @strong{Purpose:}
+inserts the cone into the fan, checks for compatibility beforehand
 @item @strong{Example:}
 @smallexample
 @c computed example insertCone cones.doc:834 
+fan f=emptyFan(3);
+f;
+intmat M[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c=coneViaRays(M);
+insertCone(f,c);
+f;
 @c end example insertCone cones.doc:834
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node isCompatible,nmaxcones,insertCone,fan related functions
+@node isCompatible,isComplete,insertCone,fan related functions
 @subsubsection isCompatible
 @cindex isCompatible
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{isCompatible(} fan f, cone c @code{)}
 @item @strong{Type:}
+int
 @item @strong{Purpose:}
+1 iff cone is compatible with the fan; 0 otherwise
 @item @strong{Example:}
 @smallexample
 @c computed example isCompatible cones.doc:850 
+fan f=emptyFan(3);
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+isCompatible(f,c1);
+insertCone(f,c1);
+intmat M2[3][3]=
+1,1,1,
+1,0,0,
+0,1,0;
+cone c2=coneViaRays(M2);
+isCompatible(f,c2);
+intmat M3[3][3]=
+1,0,0,
+0,1,0,
+0,0,-1;
+cone c3=coneViaRays(M3);
+isCompatible(f,c3);
 @c end example isCompatible cones.doc:850
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node nmaxcones,ncones,isCompatible,fan related functions
+@node isComplete,isPure,isCompatible,fan related functions
+@subsubsection isComplete
+@cindex isComplete
+
+@table @code
+@item @strong{Syntax:}
+@code{isComplete(} fan f @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the fan is complete; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c computed example isCompatible cones.doc:850 
+fan f=fullFan(2);
+isComplete(f);
+fan g=emptyFan(2);
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+insertCone(g,c1);
+isComplete(g);
+intmat M2[2][2]=
+1,0,
+-1,-1;
+cone c2=coneViaRays(M2);
+insertCone(g,c2);
+isComplete(g,c2);
+intmat M3[2][2]=
+-1,-1,
+0,1;
+cone c3=coneViaRays(M3);
+insertCone(g,c3);
+isComplete(g,c3);
+@c end example isCompatible cones.doc:850
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node isPure,nmaxcones,isComplete,fan related functions
+@subsubsection isPure
+@cindex isPure
+
+@table @code
+@item @strong{Syntax:}
+@code{isPure(} fan f@code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff the fan is pure; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c computed example isCompatible cones.doc:850 
+fan f=fullFan(2);
+isPure(f);
+fan g=emptyFan(2);
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaRays(M1);
+insertCone(g,c1);
+isPure(g);
+intmat M2[1][2]=
+0,-1;
+cone c2=coneViaRays(M2);
+insertCone(g,c2);
+isPure(g,c2);
+@c end example isCompatible cones.doc:850
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node nmaxcones,ncones,isPure,fan related functions
 @subsubsection nmaxcones
 @cindex nmaxcones
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{nmaxcones(} fan f @code{)}
 @item @strong{Type:}
+int
 @item @strong{Purpose:}
+number of maximal cones in f
 @item @strong{Example:}
 @smallexample
 @c computed example nmaxcones cones.doc:866 
+fan f=emptyFan(3);
+nmaxcones(f);
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+insertCone(f,c1);
+nmaxcones(f);
+intmat M2[2][3]=
+1,0,0,
+0,-1,0;
+cone c2=coneViaRays(M2);
+insertCone(f,c2);
+nmaxcones(f);
 @c end example nmaxcones cones.doc:866
 @end smallexample
 @end table
@@ -1259,12 +1402,29 @@ See also @ref{isSimplicial}.
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{ncones(} fan f @code{)}
 @item @strong{Type:}
+int
 @item @strong{Purpose:}
+number of cones in f
 @item @strong{Example:}
 @smallexample
-@c computed example ncones cones.doc:882 
+@c computed example ncones cones.doc:882
+fan f=emptyFan(3);
+ncones(f);
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaRays(M1);
+insertCone(f,c1);
+ncones(f);
+intmat M2[2][3]=
+1,0,0,
+0,-1,0;
+cone c2=coneViaRays(M2);
+insertCone(f,c2);
+ncones(f); 
 @c end example ncones cones.doc:882
 @end smallexample
 @end table
@@ -1275,12 +1435,30 @@ See also @ref{isSimplicial}.
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{numberOfConesOfDimension(} fan f, int dimension, int orbit, int maximal @code{)}
 @item @strong{Type:}
+int
 @item @strong{Purpose:}
+number of cones (orbit=0) or orbits (orbit=1) of a given dimension; if maximal=0, then all cones are considered, if maximal=1, only maximal cones are considered
 @item @strong{Example:}
 @smallexample
 @c computed example numberOfConesOfDimension cones.doc:898 
+fan f=emptyFan(3);
+ncones(f);
+intmat M[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c=coneViaRays(M);
+insertCone(f,c);
+numberOfConesOfDimension(f,0,0,0);
+numberOfConesOfDimension(f,0,0,1);
+numberOfConesOfDimension(f,1,0,0);
+numberOfConesOfDimension(f,0,0,1);
+numberOfConesOfDimension(f,2,0,0);
+numberOfConesOfDimension(f,2,0,1);
+numberOfConesOfDimension(f,3,0,0);
+numberOfConesOfDimension(f,3,0,1);
 @c end example numberOfConesOfDimension cones.doc:898
 @end smallexample
 @end table
@@ -1291,12 +1469,23 @@ See also @ref{isSimplicial}.
 
 @table @code
 @item @strong{Syntax:}
-@code{} @code{)}
+@code{quickInsertCone} fan f @code{)}
 @item @strong{Type:}
+none
 @item @strong{Purpose:}
+inserts the cone into the fan, no checking of compatibility
 @item @strong{Example:}
 @smallexample
 @c computed example quickInsertCone cones.doc:914 
+fan f=emptyFan(3);
+f;
+intmat M[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c=coneViaRays(M);
+quickInsertCone(f,c);
+f;
 @c end example quickInsertCone cones.doc:914
 @end smallexample
 @end table
