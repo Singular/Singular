@@ -147,7 +147,7 @@ is known.
 * getDimension::
 * getDualCone::
 * getEquations::
-* getFacets::
+* getFacetNormals::
 * getGeneratorsOfLinealitySpace::
 * getGeneratorsOfSpan::
 * getImpliedEquations::
@@ -382,7 +382,7 @@ print(getRays(d2));
 @end smallexample
 @end table
 @c --------------------------------------
-@node getEquations,getFacets,getDualCone,cone related functions
+@node getEquations,getFacetNormals,getDualCone,cone related functions
 @subsubsection getEquations
 @cindex getEquations
 
@@ -411,7 +411,7 @@ print(E2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getFacets,getGeneratorsOfLinealitySpace,getEquations,cone related functions
+@node getFacetNormals,getGeneratorsOfLinealitySpace,getEquations,cone related functions
 @subsubsection getFacets
 @cindex getFacets
 
@@ -429,19 +429,19 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat F1=getFacets(c1);
+intmat F1=getFacetNormals(c1);
 print(F1);
 intmat M2[2][2]=
 1,1,
 0,-1;
 cone c2=coneViaRays(M2);
-intmat F2=getFacets(c2);
+intmat F2=getFacetNormals(c2);
 print(F2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getGeneratorsOfLinealitySpace,getGeneratorsOfSpan,getFacets,cone related functions
+@node getGeneratorsOfLinealitySpace,getGeneratorsOfSpan,getFacetNormals,cone related functions
 @subsubsection getGeneratorsOfLinealitySpace
 @cindex getGeneratorsOfLinealitySpace
 
