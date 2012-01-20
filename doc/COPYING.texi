@@ -15,6 +15,9 @@
 @cindex surfex
 @cindex surfer
 @cindex gfanlib
+@cindex cdd
+@cindex cddlib
+@cindex libcdd
 @cindex graphviz
 @cindex normaliz
 
@@ -98,6 +101,9 @@ anonymous ftp through the following addresses:
 @item NTL
 @copyright{} Victor Shoup
 @* @uref{http://www.shoup.net/ntl}
+@item cdd (C implementation of the Double Description Method of Motzkin et al)
+@copyright{} Komei Fukuda
+@* @uref{http://www.ifor.math.ethz.ch/~fukuda/cdd_home}
 @item gfanlib
 @copyright{} Anders Jensen
 @* @uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
