@@ -415,7 +415,7 @@ BOOLEAN getEquations(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getFacets(leftv res, leftv args)
+BOOLEAN getFacetNormals(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -426,7 +426,7 @@ BOOLEAN getFacets(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getFacets: unexpected parameters");
+  WerrorS("getFacetNormals: unexpected parameters");
   return TRUE;
 }
 
@@ -945,7 +945,7 @@ void bbcone_setup()
   iiAddCproc("","getEquations",FALSE,getEquations);
   iiAddCproc("","getGeneratorsOfSpan",FALSE,getGeneratorsOfSpan);
   iiAddCproc("","getGeneratorsOfLinealitySpace",FALSE,getGeneratorsOfLinealitySpace);
-  iiAddCproc("","getFacets",FALSE,getFacets);
+  iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);
   iiAddCproc("","getImpliedEquations",FALSE,getImpliedEquations);
   iiAddCproc("","getRelativeInteriorPoint",FALSE,getRelativeInteriorPoint);
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
