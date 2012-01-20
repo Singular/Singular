@@ -1497,7 +1497,7 @@ void p_Monic(poly p, const ring r)
     number n = n_Mult(p_GetCoeff(p, r), lcInverse, r->cf);
     n_Normalize(n,r->cf);
     p_SetCoeff(p, n, r);   // destroys old leading coefficient!
-    p = pIter(p);
+    pIter(p);
   }
   n_Delete(&lcInverse, r->cf);
   p = pp;

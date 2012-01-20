@@ -7,6 +7,7 @@
 /*
 * ABSTRACT: Resolutions
 */
+#include <misc/mylimits.h>
 #include <kernel/structs.h>
 #include <polys/monomials/ring.h>
 #include <kernel/ideals.h>

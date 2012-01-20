@@ -1,6 +1,8 @@
 #ifndef FERESOURCE_H
 #define FERESOURCE_H
 
+#include <sys/param.h>
+
 #define DIR_SEP '/'
 #define DIR_SEPP "/"
 
