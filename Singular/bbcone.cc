@@ -848,7 +848,7 @@ BOOLEAN coneLink(leftv res, leftv args)
   return TRUE;
 }
 
-bool contains(gfan::ZCone* zc, gfan::ZCone* zd)
+bool containsInSupport(gfan::ZCone* zc, gfan::ZCone* zd)
 {
   int d1 = zc->ambientDimension();
   int d2 = zd->ambientDimension();
@@ -858,7 +858,7 @@ bool contains(gfan::ZCone* zc, gfan::ZCone* zd)
          " dimensions %d and %d", d1, d2);
 }
 
-bool contains(gfan::ZCone* zc, intvec* vec)
+bool containsInSupport(gfan::ZCone* zc, intvec* vec)
 {
   gfan::ZVector zv = intvec2ZVector(vec);
   int d1 = zc->ambientDimension();
