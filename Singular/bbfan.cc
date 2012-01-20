@@ -496,7 +496,52 @@ BOOLEAN insertCone(leftv res, leftv args)
   }
 }
 
-bool contains(gfan::ZFan* zf, gfan::ZCone* zc)
+BOOLEAN containsInSupport(leftv res, leftv args)
+{
+  leftv u=args;                             
+  // if ((u != NULL) && (u->Typ() == fanID))          // TODO
+  // {
+  //   leftv v=u->next;
+  //   if ((v != NULL) && (v->Typ() == coneID))
+  //   {
+  //     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+  //     gfan::ZCone* zc = (gfan::ZCone*)v->Data();
+  //     gfan::ZMatrix zm = zc->extremeRays();
+  //     bool b = 1;
+  //     for(int i=1; i<zm->getHeight(); i++)
+  //     {
+	
+  //     }
+  //     res->rtyp = INT_CMD;
+  //     res->data = (char*) (int) contains(zf,zc);
+  //     return FALSE;
+  //   }
+  // }
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
+      res->rtyp = INT_CMD;
+      res->data = (char*) (int) containsInSupport(zc,zd);
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      intvec* vec = (intvec*)v->Data();
+      res->rtyp = INT_CMD;
+      res->data = (char*) (int) containsInSupport(zc,vec);
+      return FALSE;
+    }
+  }
+  WerrorS("containsInSupport: unexpected parameters");
+  return TRUE;
+}
+
+bool containsInCollection(gfan::ZFan* zf, gfan::ZCone* zc)
 {
   if((zf->getAmbientDimension() == zc->ambientDimension()))
   {
@@ -518,7 +563,7 @@ bool contains(gfan::ZFan* zf, gfan::ZCone* zc)
   }
 }
 
-BOOLEAN contains(leftv res, leftv args)
+BOOLEAN containsInCollection(leftv res, leftv args)
 {
   leftv u=args;                             
   if ((u != NULL) && (u->Typ() == fanID))
@@ -529,31 +574,23 @@ BOOLEAN contains(leftv res, leftv args)
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       res->rtyp = INT_CMD;
-      res->data = (char*) (int) contains(zf,zc);
+      res->data = (char*) (int) containsInCollection(zf,zc);
       return FALSE;
     }
   }
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) contains(zc,zd);
-      return FALSE;
-    }
-    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      intvec* vec = (intvec*)v->Data();
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) contains(zc,vec);
-      return FALSE;
-    }
-  }
-  WerrorS("contains: unexpected parameters");
+  // if ((u != NULL) && (u->Typ() == coneID))
+  // {
+  //   leftv v=u->next;
+  //   if ((v != NULL) && (v->Typ() == coneID))
+  //   {
+  //     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+  //     gfan::ZCone* zd = (gfan::ZCone*)v->Data();
+  //     res->rtyp = INT_CMD;
+  //     res->data = (char*) (int) hasFace(zc,zd);
+  //     return FALSE;
+  //   }
+  // }
+  WerrorS("containsInCollection: unexpected parameters");
   return TRUE;
 }
 
@@ -583,7 +620,7 @@ BOOLEAN removeCone(leftv res, leftv args)
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
-      if(contains(zf,zc))
+      if(containsInCollection(zf,zc))
       {
 	zf->remove(*zc); 
 	res->rtyp = NONE;
@@ -758,7 +795,8 @@ void bbfan_setup()
   iiAddCproc("","isPure",FALSE,isPure);
   iiAddCproc("","isComplete",FALSE,isComplete);
   iiAddCproc("","getFVector",FALSE,getFVector);
-  iiAddCproc("","contains",FALSE,contains);
+  iiAddCproc("","containsInCollection",FALSE,containsInCollection);
+  iiAddCproc("","containsInSupport",FALSE,containsInSupport);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID); 
 }
