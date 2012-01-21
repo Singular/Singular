@@ -76,7 +76,7 @@ gfan::ZVector intvec2ZVector(const intvec* iVec)
   return ret;
 }
 
-std::string toString(gfan::ZMatrix const &m, char *tab=0)
+std::string toString(gfan::ZMatrix const &m, char *tab)
 {
   std::stringstream s;
 
