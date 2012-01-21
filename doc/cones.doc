@@ -140,14 +140,14 @@ is known.
 
 @menu
 * coneLink::
-* contains::
+* containsInSupport::
 * containsPositiveVector::
 * containsRelatively::
 * getAmbientDimension::
 * getDimension::
 * getDualCone::
 * getEquations::
-* getFacets::
+* getFacetNormals::
 * getGeneratorsOfLinealitySpace::
 * getGeneratorsOfSpan::
 * getImpliedEquations::
@@ -173,7 +173,7 @@ is known.
 @end menu
 
 @c --------------------------------------
-@node coneLink,contains,,cone related functions
+@node coneLink,containsInSupport,,cone related functions
 @subsubsection coneLink
 @cindex coneLink
 
@@ -204,7 +204,7 @@ print(getRays(cd));
 @end smallexample
 @end table
 @c --------------------------------------
-@node contains,containsPositiveVector,coneLink,cone related functions
+@node containsInSupport,containsPositiveVector,coneLink,cone related functions
 @subsubsection contains
 @cindex contains
 
@@ -212,12 +212,10 @@ print(getRays(cd));
 @item @strong{Syntax:}
 @code{contains (} cone c1, cone c2 @code{)}
 @*@code{contains (} cone c, intvec point @code{)}
-@*@code{contains (} fan f, cone c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-in the first and second instances: 1 iff c1 entirely contains c2 resp. iff c contains the given point, possibly on one of its facets; 0 otherwise \\
-in the third instance: 1 iff the fan contains the cone; 0 otherwise
+1 iff c1 entirely contains c2 resp. iff c contains the given point, possibly on one of its facets; 0 otherwise
 @item @strong{Example:}
 @smallexample
 @c example
@@ -225,31 +223,26 @@ intmat M[2][2]=
 1,0,
 0,1;
 cone c=coneViaRays(M);
-contains(c,c);
+containsInSupport(c,c);
 intmat N1[2][2]=
 1,1,
 0,1;
 cone d1=coneViaRays(N1);
-contains(c,d1);
+containsInSupport(c,d1);
 intmat N2[2][2]=
 1,1,
 1,-1;
 cone d2=coneViaRays(N2);
-contains(c,d2);
+containsInSupport(c,d2);
 intvec v1=0,1;
-contains(c,v1);
+containsInSupport(c,v1);
 intvec v2=1,-1;
-contains(c,v2);
-fan f=emptyFan(2);
-insertCone(f,c);
-contains(f,c);
-contains(f,d1);
-contains(f,d2);
+containsInSupport(c,v2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node containsPositiveVector,containsRelatively,contains,cone related functions
+@node containsPositiveVector,containsRelatively,containsInSupport,cone related functions
 @subsubsection containsPositiveVector
 @cindex containsPositiveVector
 
@@ -389,7 +382,7 @@ print(getRays(d2));
 @end smallexample
 @end table
 @c --------------------------------------
-@node getEquations,getFacets,getDualCone,cone related functions
+@node getEquations,getFacetNormals,getDualCone,cone related functions
 @subsubsection getEquations
 @cindex getEquations
 
@@ -418,7 +411,7 @@ print(E2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getFacets,getGeneratorsOfLinealitySpace,getEquations,cone related functions
+@node getFacetNormals,getGeneratorsOfLinealitySpace,getEquations,cone related functions
 @subsubsection getFacets
 @cindex getFacets
 
@@ -436,19 +429,19 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat F1=getFacets(c1);
+intmat F1=getFacetNormals(c1);
 print(F1);
 intmat M2[2][2]=
 1,1,
 0,-1;
 cone c2=coneViaRays(M2);
-intmat F2=getFacets(c2);
+intmat F2=getFacetNormals(c2);
 print(F2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getGeneratorsOfLinealitySpace,getGeneratorsOfSpan,getFacets,cone related functions
+@node getGeneratorsOfLinealitySpace,getGeneratorsOfSpan,getFacetNormals,cone related functions
 @subsubsection getGeneratorsOfLinealitySpace
 @cindex getGeneratorsOfLinealitySpace
 
@@ -1187,6 +1180,7 @@ Access to cones of the fan is provided in three different ways:
 See also @ref{isSimplicial}.
 
 @menu
+* containsInCollection::
 * getCone::
 * insertCone::
 * isCompatible::
@@ -1199,7 +1193,33 @@ See also @ref{isSimplicial}.
 @end menu
 
 @c --------------------------------------------------------------------
-@node getCone,insertCone,,fan related functions
+@node containsInCollection,getCone,,fan related functions
+@subsubsection getCone
+@cindex containsInCollection
+
+@table @code
+@item @strong{Syntax:}
+@code{containsInCollection} fan f, cone c @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+1 iff c is contained in the collection of cones that is f; 0 otherwise 
+@item @strong{Example:}
+@smallexample
+@c computed example getCone cones.doc:818
+fan f=emptyFan(2);
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+containsInCollection(f,c);
+insertCone(f,c);
+containsInCollection(f,c);
+@c end example getCone cones.doc:818
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node getCone,insertCone,containsInCollection,fan related functions
 @subsubsection getCone
 @cindex getCone
 

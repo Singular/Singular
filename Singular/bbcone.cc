@@ -415,7 +415,7 @@ BOOLEAN getEquations(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getFacets(leftv res, leftv args)
+BOOLEAN getFacetNormals(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -426,7 +426,7 @@ BOOLEAN getFacets(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getFacets: unexpected parameters");
+  WerrorS("getFacetNormals: unexpected parameters");
   return TRUE;
 }
 
@@ -848,7 +848,7 @@ BOOLEAN coneLink(leftv res, leftv args)
   return TRUE;
 }
 
-bool contains(gfan::ZCone* zc, gfan::ZCone* zd)
+bool containsInSupport(gfan::ZCone* zc, gfan::ZCone* zd)
 {
   int d1 = zc->ambientDimension();
   int d2 = zd->ambientDimension();
@@ -858,7 +858,7 @@ bool contains(gfan::ZCone* zc, gfan::ZCone* zd)
          " dimensions %d and %d", d1, d2);
 }
 
-bool contains(gfan::ZCone* zc, intvec* vec)
+bool containsInSupport(gfan::ZCone* zc, intvec* vec)
 {
   gfan::ZVector zv = intvec2ZVector(vec);
   int d1 = zc->ambientDimension();
@@ -945,7 +945,7 @@ void bbcone_setup()
   iiAddCproc("","getEquations",FALSE,getEquations);
   iiAddCproc("","getGeneratorsOfSpan",FALSE,getGeneratorsOfSpan);
   iiAddCproc("","getGeneratorsOfLinealitySpace",FALSE,getGeneratorsOfLinealitySpace);
-  iiAddCproc("","getFacets",FALSE,getFacets);
+  iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);
   iiAddCproc("","getImpliedEquations",FALSE,getImpliedEquations);
   iiAddCproc("","getRelativeInteriorPoint",FALSE,getRelativeInteriorPoint);
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
