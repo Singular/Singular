@@ -321,6 +321,21 @@ BOOLEAN getVertices(leftv res, leftv args)
   return TRUE;
 }
 
+int getAmbientDimension(gfan::ZCone* zc) // zc is meant to represent a polytope here
+{                                        // hence ambientDimension-1
+  return zc->ambientDimension()-1;
+}
+
+int getCodimension(gfan::ZCone *zc)
+{
+  return zc->codimension();
+}
+
+int getDimension(gfan::ZCone* zc)
+{
+  return zc->dimension()-1;
+}
+
 void bbpolytope_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -336,10 +351,17 @@ void bbpolytope_setup()
   iiAddCproc("","polytopeViaPoints",FALSE,polytopeViaPoints);
   iiAddCproc("","polytopeViaInequalities",FALSE,polytopeViaInequalities);
   iiAddCproc("","getVertices",FALSE,getVertices);
+  /********************************************************/
+  /* the following functions are implemented in bbcone.cc */
+  // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                                 
+  // iiAddCproc("","getDimension",FALSE,getDimension);                                                               
+  /********************************************************/
+  /* the following functions are identical to those in bbcone.cc */
   // iiAddCproc("","setLinearForms",FALSE,setLinearForms);
   // iiAddCproc("","getLinearForms",FALSE,getLinearForms);
   // iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
   // iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
+  /***************************************************************/
   // iiAddCproc("","getEquations",FALSE,getEquations);
   // iiAddCproc("","getInequalities",FALSE,getInequalities);
   polytopeID=setBlackboxStuff(b,"polytope");
