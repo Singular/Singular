@@ -8,5 +8,9 @@ extern int polytopeID;
 
 void bbpolytope_setup();
 
+int getAmbientDimension(gfan::ZCone* zc); // zc is meant to represent a polytope here
+int getCodimension(gfan::ZCone *zc);
+int getDimension(gfan::ZCone* zc);
+
 #endif
 #endif
