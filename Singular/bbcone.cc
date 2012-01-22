@@ -9,11 +9,13 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <gfanlib/gfanlib.h>
-#include <kernel/bbcone.h>
 #include <ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 
+#include <kernel/bbcone.h>
+#include <kernel/bbfan.h>
+#include <kernel/bbpolytope.h>
 
 int coneID;
 
@@ -520,28 +522,109 @@ BOOLEAN getLinearForms(leftv res, leftv args)
   return TRUE;
 }
 
-int getAmbientDimension(gfan::ZCone* zc)
+BOOLEAN getAmbientDimension(leftv res, leftv args)
 {
-  int i = zc->ambientDimension();
-  return i;
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) zc->ambientDimension();
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) getAmbientDimension(zf);
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) getAmbientDimension(zc);
+    return FALSE;
+  }
+  WerrorS("getAmbientDimension: unexpected parameters");
+  return TRUE;
 }
 
-int getDimension(gfan::ZCone* zc)
+BOOLEAN getDimension(leftv res, leftv args)
 {
-  int i = zc->dimension();
-  return i;
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) zc->dimension();
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) getDimension(zf);
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) getDimension(zc);
+    return FALSE;
+  }
+  WerrorS("getDimension: unexpected parameters");
+  return TRUE;
 }
 
-int getCodimension(gfan::ZCone* zc)
+BOOLEAN getCodimension(leftv res, leftv args)
 {
-  int i = zc->codimension();
-  return i;
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      res->rtyp = INT_CMD;
+      res->data = (char*) zc->codimension();
+      return FALSE;
+    }
+  if ((u != NULL) && (u->Typ() == fanID))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      res->rtyp = INT_CMD;
+      res->data = (char*) getCodimension(zf);
+      return FALSE;
+    }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      res->rtyp = INT_CMD;
+      res->data = (char*) getCodimension(zc);
+      return FALSE;
+    }
+  WerrorS("getCodimension: unexpected parameters");
+  return TRUE;
 }
 
-int getLinealityDimension(gfan::ZCone* zc)
+BOOLEAN getLinealityDimension(leftv res, leftv args)
 {
-  int i = zc->dimensionOfLinealitySpace();
-  return i;
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) zc->dimensionOfLinealitySpace();
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    res->rtyp = INT_CMD;
+    res->data = (char*) getLinealityDimension(zf);
+    return FALSE;
+  }
+  WerrorS("getLinealityDimension: unexpected parameters");
+  return TRUE;
 }
 
 BOOLEAN getMultiplicity(leftv res, leftv args)
@@ -948,10 +1031,10 @@ void bbcone_setup()
   iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);
   iiAddCproc("","getImpliedEquations",FALSE,getImpliedEquations);
   iiAddCproc("","getRelativeInteriorPoint",FALSE,getRelativeInteriorPoint);
-  // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
-  // iiAddCproc("","getDimension",FALSE,getDimension);
-  // iiAddCproc("","getCodimension",FALSE,getCodimension);
-  // iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
+  iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
+  iiAddCproc("","getCodimension",FALSE,getCodimension);
+  iiAddCproc("","getDimension",FALSE,getDimension);
+  iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
   iiAddCproc("","isOrigin",FALSE,isOrigin);
   iiAddCproc("","isFullSpace",FALSE,isFullSpace);
   iiAddCproc("","containsPositiveVector",FALSE,containsPositiveVector);
