@@ -368,7 +368,7 @@ BOOLEAN isCompatible(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN quickinsertCone(leftv res, leftv args)  
+BOOLEAN quickInsertCone(leftv res, leftv args)  
 {                                           
   leftv u=args;                             
   if ((u != NULL) && (u->Typ() == fanID))
@@ -385,7 +385,7 @@ BOOLEAN quickinsertCone(leftv res, leftv args)
       return FALSE;
     }
   }
-  WerrorS("quickinsertCone: unexpected parameters");
+  WerrorS("quickInsertCone: unexpected parameters");
   return TRUE;
 }
 
@@ -715,7 +715,7 @@ void bbfan_setup()
   iiAddCproc("","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
   iiAddCproc("","ncones",FALSE,ncones);
   iiAddCproc("","nmaxcones",FALSE,nmaxcones);
-  iiAddCproc("","quickinsertCone",FALSE,quickinsertCone);
+  iiAddCproc("","quickInsertCone",FALSE,quickInsertCone);
   iiAddCproc("","insertCone",FALSE,insertCone);
   iiAddCproc("","removeCone",FALSE,removeCone);
   iiAddCproc("","getCone",FALSE,getCone);

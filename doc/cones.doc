@@ -129,13 +129,13 @@ print(getRays(cd));
 @end table
 @c --------------------------------------
 @node containsInSupport,containsPositiveVector,coneLink,cone related functions
-@subsubsection contains
-@cindex contains
+@subsubsection containsInSupport
+@cindex containsInSupport
 
 @table @code
 @item @strong{Syntax:}
-@code{contains (} cone c1, cone c2 @code{)}
-@*@code{contains (} cone c, intvec point @code{)}
+@code{containsInSupport (} cone c1, cone c2 @code{)}
+@*@code{containsInSupport (} cone c, intvec point @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -508,7 +508,7 @@ getLinealityDimension(c2);
 
 @table @code
 @item @strong{Syntax:}
-@code{getLinealitySpace} cone c @code{)}
+@code{getLinealitySpace(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -592,7 +592,7 @@ getMultiplicity(c);
 
 @table @code
 @item @strong{Syntax:}
-@code{getNegated} cone c @code{)}
+@code{getNegated(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -617,7 +617,7 @@ print(getRays(cn));
 
 @table @code
 @item @strong{Syntax:}
-@code{getQuotientLatticeBasis} cone c @code{)}
+@code{getQuotientLatticeBasis(} cone c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -673,7 +673,7 @@ print(R2);
 
 @table @code
 @item @strong{Syntax:}
-@code{getRelativeInteriorPoint} cone c @code{)}
+@code{getRelativeInteriorPoint(} cone c @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -822,7 +822,7 @@ print(getRays(c13));
 
 @table @code
 @item @strong{Syntax:}
-@code{isFullSpace} cone c @code{)}
+@code{isFullSpace(} cone c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -854,7 +854,7 @@ isFullSpace(c3);
 
 @table @code
 @item @strong{Syntax:}
-@code{isOrigin} cone c @code{)}
+@code{isOrigin(} cone c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -887,7 +887,7 @@ isOrigin(c3);
 @table @code
 @item @strong{Syntax:}
 @code{isSimplicial} cone c @code{)}
-@*@code{isSimplicial} fan f @code{)}
+@*@code{isSimplicial(} fan f @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -1097,14 +1097,14 @@ See also @ref{isSimplicial}.
 
 @table @code
 @item @strong{Syntax:}
-@code{containsInCollection} fan f, cone c @code{)}
+@code{containsInCollection(} fan f, cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
-1 iff c is contained in the collection of cones that is f; 0 otherwise 
+1 iff c is contained in the collection of cones that is f; 0 otherwise
 @item @strong{Example:}
 @smallexample
-@c computed example getCone cones.doc:818
+@c example
 fan f=emptyFan(2);
 intmat M[2][2]=
 1,0,
@@ -1113,7 +1113,7 @@ cone c=coneViaRays(M);
 containsInCollection(f,c);
 insertCone(f,c);
 containsInCollection(f,c);
-@c end example getCone cones.doc:818
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1123,14 +1123,14 @@ containsInCollection(f,c);
 
 @table @code
 @item @strong{Syntax:}
-@code{getCone} fan f, int dimension, int index, int orbit, int maximal @code{)}
+@code{getCone(} fan f, int dimension, int index, int orbit, int maximal @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
-cone (orbit=0) or orbit (orbit=1) of a certain index (ranges from 1 to numberOfConesOfDimension(f,2,0,0)) in a given dimension; if maximal=0, all cones and orbits are considered, if maximal=1, only maximal cones and orbits are considered 
+cone (orbit=0) or orbit (orbit=1) of a certain index (ranges from 1 to numberOfConesOfDimension(f,2,0,0)) in a given dimension; if maximal=0, all cones and orbits are considered, if maximal=1, only maximal cones and orbits are considered
 @item @strong{Example:}
 @smallexample
-@c computed example getCone cones.doc:818
+@c example
 intmat M[3][3]=
 1,0,0,
 0,1,0,
@@ -1141,7 +1141,7 @@ insertCone(f,c);
 getCone(f,2,1,0,0);
 getCone(f,2,2,0,0);
 getCone(f,2,3,0,0);
-@c end example getCone cones.doc:818
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1158,7 +1158,7 @@ none
 inserts the cone into the fan, checks for compatibility beforehand
 @item @strong{Example:}
 @smallexample
-@c computed example insertCone cones.doc:834 
+@c example
 fan f=emptyFan(3);
 f;
 intmat M[3][3]=
@@ -1168,7 +1168,7 @@ intmat M[3][3]=
 cone c=coneViaRays(M);
 insertCone(f,c);
 f;
-@c end example insertCone cones.doc:834
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1185,7 +1185,7 @@ int
 1 iff cone is compatible with the fan; 0 otherwise
 @item @strong{Example:}
 @smallexample
-@c computed example isCompatible cones.doc:850 
+@c example
 fan f=emptyFan(3);
 intmat M1[3][3]=
 1,0,0,
@@ -1206,7 +1206,7 @@ intmat M3[3][3]=
 0,0,-1;
 cone c3=coneViaRays(M3);
 isCompatible(f,c3);
-@c end example isCompatible cones.doc:850
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1223,7 +1223,7 @@ int
 1 iff the fan is complete; 0 otherwise
 @item @strong{Example:}
 @smallexample
-@c computed example isCompatible cones.doc:850 
+@c example
 fan f=fullFan(2);
 isComplete(f);
 fan g=emptyFan(2);
@@ -1245,7 +1245,7 @@ intmat M3[2][2]=
 cone c3=coneViaRays(M3);
 insertCone(g,c3);
 isComplete(g,c3);
-@c end example isCompatible cones.doc:850
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1262,7 +1262,7 @@ int
 1 iff the fan is pure; 0 otherwise
 @item @strong{Example:}
 @smallexample
-@c computed example isCompatible cones.doc:850 
+@c example
 fan f=fullFan(2);
 isPure(f);
 fan g=emptyFan(2);
@@ -1277,7 +1277,7 @@ intmat M2[1][2]=
 cone c2=coneViaRays(M2);
 insertCone(g,c2);
 isPure(g,c2);
-@c end example isCompatible cones.doc:850
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1294,7 +1294,7 @@ int
 number of maximal cones in f
 @item @strong{Example:}
 @smallexample
-@c computed example nmaxcones cones.doc:866 
+@c example
 fan f=emptyFan(3);
 nmaxcones(f);
 intmat M1[3][3]=
@@ -1310,7 +1310,7 @@ intmat M2[2][3]=
 cone c2=coneViaRays(M2);
 insertCone(f,c2);
 nmaxcones(f);
-@c end example nmaxcones cones.doc:866
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1327,7 +1327,7 @@ int
 number of cones in f
 @item @strong{Example:}
 @smallexample
-@c computed example ncones cones.doc:882
+@c example
 fan f=emptyFan(3);
 ncones(f);
 intmat M1[3][3]=
@@ -1342,8 +1342,8 @@ intmat M2[2][3]=
 0,-1,0;
 cone c2=coneViaRays(M2);
 insertCone(f,c2);
-ncones(f); 
-@c end example ncones cones.doc:882
+ncones(f);
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1360,7 +1360,7 @@ int
 number of cones (orbit=0) or orbits (orbit=1) of a given dimension; if maximal=0, then all cones are considered, if maximal=1, only maximal cones are considered
 @item @strong{Example:}
 @smallexample
-@c computed example numberOfConesOfDimension cones.doc:898 
+@c example
 fan f=emptyFan(3);
 ncones(f);
 intmat M[3][3]=
@@ -1377,7 +1377,7 @@ numberOfConesOfDimension(f,2,0,0);
 numberOfConesOfDimension(f,2,0,1);
 numberOfConesOfDimension(f,3,0,0);
 numberOfConesOfDimension(f,3,0,1);
-@c end example numberOfConesOfDimension cones.doc:898
+@c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
@@ -1387,14 +1387,14 @@ numberOfConesOfDimension(f,3,0,1);
 
 @table @code
 @item @strong{Syntax:}
-@code{quickInsertCone} fan f @code{)}
+@code{quickInsertCone(} fan f @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
 inserts the cone into the fan, no checking of compatibility
 @item @strong{Example:}
 @smallexample
-@c computed example quickInsertCone cones.doc:914 
+@c example
 fan f=emptyFan(3);
 f;
 intmat M[3][3]=
@@ -1404,6 +1404,6 @@ intmat M[3][3]=
 cone c=coneViaRays(M);
 quickInsertCone(f,c);
 f;
-@c end example quickInsertCone cones.doc:914
+@c example
 @end smallexample
 @end table
