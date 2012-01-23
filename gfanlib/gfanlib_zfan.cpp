@@ -271,12 +271,30 @@ namespace gfan
     assert(0);
     return 0;
   }
+  int ZFan::getCodimension()const
+  {
+    if(complex)
+      return complex->getAmbientDimension()-complex->getMaxDim();
+    if(coneCollection)
+      return coneCollection->getAmbientDimension()-coneCollection->getMaxDimension();
+    assert(0);
+    return 0;
+  }
   int ZFan::getDimension()const
   {
     if(complex)
       return complex->getMaxDim();
     if(coneCollection)
       return coneCollection->getMaxDimension();
+    assert(0);
+    return 0;
+  }
+  int ZFan::getLinealityDimension()const
+  {
+    if(complex)
+      return complex->getLinDim();
+    if(coneCollection)
+      return coneCollection->dimensionOfLinealitySpace();
     assert(0);
     return 0;
   }

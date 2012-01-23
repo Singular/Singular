@@ -199,6 +199,12 @@ int SymmetricComplex::getMinDim()const
 }
 
 
+int SymmetricComplex::getLinDim()const
+{
+  ZMatrix zm=linealitySpace;
+  return zm.reduceAndComputeRank();
+}
+
 bool SymmetricComplex::isMaximal(Cone const &c)const
 {
   if(c.isKnownToBeNonMaximal())return false;

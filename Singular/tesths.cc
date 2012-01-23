@@ -37,6 +37,7 @@
 
 #ifdef HAVE_FANS
 #include <kernel/bbcone.h>
+#include <kernel/bbpolytope.h>
 #include <kernel/bbfan.h>
 #endif
 
@@ -155,6 +156,7 @@ int main(          /* main entry to Singular */
   pyobject_setup();
 #ifdef HAVE_FANS
   bbcone_setup();
+  bbpolytope_setup();
   bbfan_setup();
 #endif /* HAVE_FANS */
   errorreported = 0;
