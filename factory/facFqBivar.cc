@@ -634,7 +634,7 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
   CanonicalForm g, quot;
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
-  int d= degree (F) + degree (LCBuf);
+  int d= degree (F);
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
     if (!bufDegs1.find (degree (i.getItem(), 1)))
@@ -652,7 +652,7 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
         {
           result.append (g);
           buf= quot;
-          d -= degree (g) + degree (LC (g, x));
+          d -= degree (g);
           LCBuf= LC (buf, x);
           T= Difference (T, CFList (i.getItem()));
 
@@ -670,7 +670,7 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
     }
   }
   adaptedLiftBound= d + 1;
-  if (d < deg)
+  if (adaptedLiftBound < deg)
   {
     factors= T;
     degs= bufDegs1;
@@ -702,7 +702,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   CanonicalForm M= power (y, deg);
   adaptedLiftBound= 0;
   bool trueFactor= false;
-  int d= degree (F) + degree (LCBuf);
+  int d= degree (F);
   CFList source, dest;
   int degMipoBeta= 1;
   if (!k && beta.level() != 1)
@@ -732,7 +732,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
             {
               appendTestMapDown (result, buf2, info, source, dest);
               buf= quot;
-              d -= degree (g) + degree (LC (g, x));
+              d -= degree (g);
               LCBuf= LC (buf, x);
               trueFactor= true;
             }
@@ -743,7 +743,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
             {
               appendTestMapDown (result, buf2, info, source, dest);
               buf= quot;
-              d -= degree (g) + degree (LC (g, x));
+              d -= degree (g);
               LCBuf= LC (buf, x);
               trueFactor= true;
             }
