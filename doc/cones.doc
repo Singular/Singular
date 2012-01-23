@@ -427,7 +427,7 @@ print(S);
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
-generating vectors of the orthogonal complement of the sapn of the cone
+generating vectors of the orthogonal complement of the span of the cone
 @item @strong{Example:}
 @smallexample
 @c example
