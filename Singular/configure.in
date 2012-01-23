@@ -402,26 +402,10 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_AIX
 
-# test for gcc-version: gcc2: prefer CC=gcc, CXX=gcc (if not with boost)
-#                       gcc3:        CC=gcc  CXX=g++
-#                       other:       CC=cc   CXX=c++
-AC_MSG_CHECKING(gcc version)
-AC_CACHE_VAL(ac_cv_c_cpp,
-ac_cv_c_cp="unknown"
-if test -r "gccversion.sh"; then
-  ac_cv_c_cpp=`/bin/sh gccversion.sh`
-fi
-)
-AC_MSG_RESULT($ac_cv_c_cpp)
-
 # we prefer using gcc for compiling C++ files, provided the user did
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
-  if test "${ac_cv_c_cpp}" = gcc2; then
-    CXX=g++
-  elif test "${ac_cv_c_cpp}" = gcc3; then
-    CXX=g++
-  fi
+  CXX=g++
   temp_flags="${CXXFLAGS}"
   AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
@@ -498,7 +482,7 @@ fi
 # we know best when compiling with gcc
 if test "${GXX}" = yes; then
   if test "$ac_cxxflags_set" = no; then
-    CXXFLAGS="-O3 -w -fomit-frame-pointer"
+    CXXFLAGS="-O2 -w -fomit-frame-pointer"
   fi
   temp_flags="${CXXFLAGS}"
   if test "${ac_cv_cxx_have_rtti}" = yes; then
@@ -525,7 +509,7 @@ AC_SUBST(CXXNOOPTFLAGS)
 AC_SUBST(STATIC_LDFLAGS)
 
 if test "${GCC}" = yes && test "$ac_cflags_set" = no ; then
-  CFLAGS="-O3 -w -fomit-frame-pointer"
+  CFLAGS="-O2 -w -fomit-frame-pointer"
 fi
 
 AC_PROG_MAKE_SET
