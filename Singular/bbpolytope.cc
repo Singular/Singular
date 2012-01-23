@@ -20,14 +20,9 @@ int polytopeID;
 std::string bbpolytopeToString(gfan::ZCone const &c)
 {
   std::stringstream s;
-  gfan::ZMatrix i=c.getInequalities();
-  gfan::ZMatrix e=c.getEquations();
-  s<<"AMBIENT_DIM"<<std::endl;
-  s<<c.ambientDimension()<<std::endl;
-  s<<"INEQUALITIES"<<std::endl;
-  s<<toString(i);
-  s<<"EQUATIONS"<<std::endl;
-  s<<toString(e);
+  gfan::ZMatrix r=c.extremeRays();
+  s<<"VERTICES"<<std::endl;
+  s<<toString(r);
   return s.str();
 }
 
@@ -354,6 +349,7 @@ void bbpolytope_setup()
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                                 
+  // iiAddCproc("","getCodimension",FALSE,getAmbientDimension);                                                 
   // iiAddCproc("","getDimension",FALSE,getDimension);                                                               
   /********************************************************/
   /* the following functions are identical to those in bbcone.cc */
