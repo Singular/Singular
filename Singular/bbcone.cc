@@ -9,7 +9,7 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <gfanlib/gfanlib.h>
-#include <ipshell.h>
+#include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 
@@ -425,6 +425,13 @@ BOOLEAN getFacetNormals(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      res->rtyp = INTMAT_CMD;
+      res->data = (void*)getFacetNormals(zc);
+      return FALSE;
+    }
   WerrorS("getFacetNormals: unexpected parameters");
   return TRUE;
 }

@@ -9,7 +9,7 @@
 #include <Singular/subexpr.h>
 #include <kernel/bbfan.h>
 #include <kernel/bbcone.h>
-#include <ipshell.h>
+#include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
@@ -37,10 +37,7 @@ char * bbfan_String(blackbox *b, void *d)
   {
     gfan::ZFan* zf = (gfan::ZFan*)d;
     std::string s = zf->toString();
-    char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
-    sprintf(ns, "%s", s.c_str());
-    omCheckAddr(ns);
-    return ns;
+    return omStrDup(s.c_str());
   }
 }
 

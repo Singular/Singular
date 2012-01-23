@@ -10,7 +10,7 @@
 #include <Singular/subexpr.h>
 #include <gfanlib/gfanlib.h>
 #include <kernel/bbcone.h>
-#include <ipshell.h>
+#include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 
@@ -90,10 +90,7 @@ char* bbpolytope_String(blackbox *b, void *d)
    else
    {
      std::string s=bbpolytopeToString(*((gfan::ZCone*)d));
-     char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
-     sprintf(ns, "%s", s.c_str());
-     omCheckAddr(ns);
-     return ns;
+     return omStrDup(s.c_str());
    }
 }
 
@@ -316,6 +313,12 @@ BOOLEAN getVertices(leftv res, leftv args)
   return TRUE;
 }
 
+intvec* getFacetNormals(gfan::ZCone* zc)
+{
+  gfan::ZMatrix zmat = zc->getFacets();
+  return zMatrix2Intvec(zmat);
+}
+
 int getAmbientDimension(gfan::ZCone* zc) // zc is meant to represent a polytope here
 {                                        // hence ambientDimension-1
   return zc->ambientDimension()-1;
@@ -348,9 +351,9 @@ void bbpolytope_setup()
   iiAddCproc("","getVertices",FALSE,getVertices);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
-  // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                                 
+  // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                               
   // iiAddCproc("","getCodimension",FALSE,getAmbientDimension);                                                 
-  // iiAddCproc("","getDimension",FALSE,getDimension);                                                               
+  // iiAddCproc("","getDimension",FALSE,getDimension);                                                               // iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);  
   /********************************************************/
   /* the following functions are identical to those in bbcone.cc */
   // iiAddCproc("","setLinearForms",FALSE,setLinearForms);
