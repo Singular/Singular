@@ -852,6 +852,9 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CanonicalForm delta= info.getDelta();
   bool extension= info.isInExtension();
 
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (A, sizeOfLiftPre, degree (LC (A, 1), 2));
+
   Variable x= Variable (1);
   Variable y= Variable (2);
   CFArray Pi;
@@ -861,72 +864,127 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CFMatrix M= CFMatrix (liftBound, bufUniFactors.length() - 1);
   earlySuccess= false;
   int newLiftBound= 0;
-  int smallFactorDeg= 11; //this is a tunable parameter
-  if (smallFactorDeg >= liftBound)
+
+  int smallFactorDeg= tmin (11, liftPre [sizeOfLiftPre- 1] + 1);//this is a tunable parameter
+  int dummy;
+  if (smallFactorDeg >= liftBound || degree (A,y) <= 4)
     henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M);
-  else if (smallFactorDeg >= degree (A, y) + 1)
-  {
-    henselLift12 (A, bufUniFactors, degree (A, y) + 1, Pi, diophant, M);
-    if (!extension)
-      earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
-                     degs, earlySuccess, degree (A, y) + 1);
-    else
-      earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
-                     newLiftBound, degs, earlySuccess, info, eval,
-                     degree (A, y) + 1);
-    if (degs.getLength() > 1 && !earlySuccess)
-    {
-      if (newLiftBound > degree (A, y) + 1)
-      {
-        liftBound= newLiftBound;
-        bufUniFactors.insert (LC(A, x));
-        henselLiftResume12 (A, bufUniFactors, degree (A, y) + 1, liftBound,
-                            Pi, diophant, M);
-      }
-    }
-    else if (earlySuccess)
-      liftBound= newLiftBound;
-  }
-  else if (smallFactorDeg < degree (A, y) + 1)
+  else if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
     henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
     if (!extension)
       earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
-                                           degs, earlySuccess,
-                                           smallFactorDeg);
+                     degs, earlySuccess, smallFactorDeg);
     else
       earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
-                     newLiftBound, degs, earlySuccess,
-                     info, eval, smallFactorDeg);
-    if (degs.getLength() > 1 && !earlySuccess)
+                     newLiftBound, degs, earlySuccess, info, eval,
+                     smallFactorDeg);
+    if (degs.getLength() > 1 && !earlySuccess &&
+        smallFactorDeg != liftPre [sizeOfLiftPre-1] + 1)
     {
-      bufUniFactors.insert (LC (A, x));
-      henselLiftResume12 (A, bufUniFactors, smallFactorDeg, degree (A, y)
-                          + 1, Pi, diophant, M);
-      if (!extension)
-        earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
-                       degs, earlySuccess, degree (A, y) + 1);
-      else
-        earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
-                       newLiftBound, degs, earlySuccess,
-                       info, eval, degree(A,y) + 1);
-      if (degs.getLength() > 1 && !earlySuccess)
+      if (newLiftBound >= liftPre[sizeOfLiftPre-1]+1)
       {
-        if (newLiftBound > degree (A, y) + 1)
-        {
-          bufUniFactors.insert (LC(A, x));
-          henselLiftResume12 (A, bufUniFactors, degree (A, y) + 1, liftBound,
-                              Pi, diophant, M);
-        }
+        bufUniFactors.insert (LC (A, x));
+        henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
+                            liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M);
+        if (!extension)
+          earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
+                        degs, earlySuccess, liftPre[sizeOfLiftPre-1] + 1);
+        else
+          earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
+                        newLiftBound, degs, earlySuccess, info, eval,
+                        liftPre[sizeOfLiftPre-1] + 1);
       }
-      else if (earlySuccess)
-        liftBound= newLiftBound;
     }
     else if (earlySuccess)
       liftBound= newLiftBound;
+
+    int i= sizeOfLiftPre - 1;
+    while (degs.getLength() > 1 && !earlySuccess && i - 1 >= 0)
+    {
+      if (newLiftBound >= liftPre[i] + 1)
+      {
+        bufUniFactors.insert (LC (A, x));
+        henselLiftResume12 (A, bufUniFactors, liftPre[i] + 1,
+                            liftPre[i-1] + 1, Pi, diophant, M);
+        if (!extension)
+          earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
+                        degs, earlySuccess, liftPre[i-1] + 1);
+        else
+          earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
+                        newLiftBound, degs, earlySuccess, info, eval,
+                        liftPre[i-1] + 1);
+      }
+      else
+      {
+        liftBound= newLiftBound;
+        break;
+      }
+      i--;
+    }
+    if (earlySuccess)
+      liftBound= newLiftBound;
+    //after here all factors are lifted to liftPre[sizeOfLiftPre-1]
   }
-  if (newLiftBound > 0)
-    liftBound= newLiftBound;
+  else
+  {
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
+    if (!extension)
+      earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
+                     degs, earlySuccess, smallFactorDeg);
+    else
+      earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
+                     newLiftBound, degs, earlySuccess, info, eval,
+                     smallFactorDeg);
+    int i= 1;
+    while ((degree (A,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*i+4);
+    if (degs.getLength() > 1 && !earlySuccess && dummy > smallFactorDeg)
+    {
+      bufUniFactors.insert (LC (A, x));
+      henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
+                          dummy, Pi, diophant, M);
+      if (!extension)
+        earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
+                      degs, earlySuccess, dummy);
+      else
+        earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
+                      newLiftBound, degs, earlySuccess, info, eval,
+                      dummy);
+    }
+    while (degs.getLength() > 1 && !earlySuccess && i < 4)
+    {
+      if (newLiftBound >= dummy)
+      {
+        bufUniFactors.insert (LC (A, x));
+        dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*(i+1)+4);
+        henselLiftResume12 (A, bufUniFactors, (degree (A,y)/4)*i + 4,
+                            dummy, Pi, diophant, M);
+        if (!extension)
+          earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
+                        degs, earlySuccess, dummy);
+        else
+          earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
+                        newLiftBound, degs, earlySuccess, info, eval,
+                        dummy);
+      }
+      else
+      {
+        liftBound= newLiftBound;
+        break;
+      }
+      i++;
+    }
+    if (earlySuccess)
+      liftBound= newLiftBound;
+  }
+
+  if (!earlySuccess)
+    liftBound= degree (A,y) + 1;
+
+  delete [] liftPre;
+
   return bufUniFactors;
 }
 
