@@ -104,7 +104,9 @@ public:
    * Returns the dimension of the ambient space.
    */
   int getAmbientDimension()const;
+  int getCodimension()const;
   int getDimension()const;
+  int getLinealityDimension()const;
   ZVector getFVector()const;
   bool isSimplicial()const;
   bool isPure()const;
