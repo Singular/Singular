@@ -176,10 +176,7 @@ char * bbcone_String(blackbox *b, void *d)
    else
    {
      std::string s=toString(*((gfan::ZCone*)d));
-     char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
-     sprintf(ns, "%s", s.c_str());
-     omCheckAddr(ns);
-     return ns;
+     return omStrDup(s.c_str());
    }
 }
 
