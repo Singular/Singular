@@ -2113,6 +2113,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2240,6 +2241,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2433,6 +2435,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2682,6 +2685,7 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
