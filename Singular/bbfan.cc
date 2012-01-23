@@ -9,7 +9,7 @@
 #include <Singular/subexpr.h>
 #include <kernel/bbfan.h>
 #include <kernel/bbcone.h>
-#include <ipshell.h>
+#include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
@@ -37,10 +37,7 @@ char * bbfan_String(blackbox *b, void *d)
   {
     gfan::ZFan* zf = (gfan::ZFan*)d;
     std::string s = zf->toString();
-    char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
-    sprintf(ns, "%s", s.c_str());
-    omCheckAddr(ns);
-    return ns;
+    return omStrDup(s.c_str());
   }
 }
 
@@ -231,96 +228,24 @@ BOOLEAN fullFan(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getAmbientDimension(leftv res, leftv args)
+int getAmbientDimension(gfan::ZFan* zf)
 {
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      int d = zf->getAmbientDimension();
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  if ((u != NULL) && (u->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      int d = getAmbientDimension(zc);
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  WerrorS("getAmbientDimension: unexpected parameters");
-  return TRUE;  
+  return zf->getAmbientDimension();
 }
 
-BOOLEAN getDimension(leftv res, leftv args)
+int getCodimension(gfan::ZFan* zf)
 {
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      int d = zf->getDimension();
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  if ((u != NULL) && (u->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      int d = getDimension(zc);
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  WerrorS("getDimension: unexpected parameters");
-  return TRUE;  
+  return zf->getCodimension();
 }
 
-BOOLEAN getCodimension(leftv res, leftv args)
+int getDimension(gfan::ZFan* zf)
 {
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      int d = 0; // zf->getAmbientDimension() - zf->dimension();
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  if ((u != NULL) && (u->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      int d = getCodimension(zc);
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  WerrorS("getCodimension: unexpected parameters");
-  return TRUE;  
+  return zf->getDimension();
 }
 
-BOOLEAN getLinealityDimension(leftv res, leftv args)
+int getLinealityDimension(gfan::ZFan* zf)
 {
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      int d = 0; // zf->dimensionOfLinealitySpace();
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  if ((u != NULL) && (u->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      int d = getLinealityDimension(zc);
-      res->rtyp = INT_CMD;
-      res->data = (char*) d;
-      return FALSE;
-    }
-  WerrorS("getLinealityDimension: unexpected parameters");
-  return TRUE;  
+  return zf->getLinealityDimension(); 
 }
 
 BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
@@ -780,9 +705,12 @@ void bbfan_setup()
   b->blackbox_Assign=bbfan_Assign;
   iiAddCproc("","emptyFan",FALSE,emptyFan);
   iiAddCproc("","fullFan",FALSE,fullFan);
-  iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
-  iiAddCproc("","getDimension",FALSE,getDimension);
-  iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
+  /* the following functions are implemented in bbcone.cc */
+  // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
+  // iiAddCproc("","getCodimension",FALSE,getDimension);
+  // iiAddCproc("","getDimension",FALSE,getDimension);
+  // iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
+  /********************************************************/ 
   iiAddCproc("","isCompatible",FALSE,isCompatible);
   iiAddCproc("","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
   iiAddCproc("","ncones",FALSE,ncones);
