@@ -475,7 +475,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
   }
 }
 
-number   nlChineseRemainder(number *x, number *q,int rl)
+number   nlChineseRemainder(number *x, number *q,int rl, const ring)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
 #ifdef HAVE_FACTORY

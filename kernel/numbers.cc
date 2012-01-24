@@ -242,6 +242,16 @@ void nSetChar(ring r)
   nNULL=r->cf->nNULL;
 }
 
+number ndFarey(number,number,const ring r)
+{
+  Werror("farey not implemented for this ring(ch=%d)",r->ch);
+  return NULL;
+}
+number ndChineseRemainder(number *,number *,int,const ring r)
+{
+  Werror("ChineseRemainder not implemented for this ring(ch=%d)",r->ch);
+  return NULL;
+}
 /*2
 * init operations for ring r
 */
@@ -305,6 +315,8 @@ void nInitChar(ring r)
   n->nNormalize=nDummy2;
   n->nGcd  = ndGcd;
   n->nLcm  = ndGcd; /* tricky, isn't it ?*/
+  n->cfFarey=ndFarey;
+  n->cfChineseRemainder=ndChineseRemainder;
 #ifdef HAVE_RINGS
   n->nDivComp = ndDivComp;
   n->nDivBy = ndDivBy;
@@ -508,6 +520,8 @@ void nInitChar(ring r)
     n->nSize  = nlSize;
     n->cfGetDenom = nlGetDenom;
     n->cfGetNumerator = nlGetNumerator;
+    n->cfFarey = nlFarey;
+    n->cfChineseRemainder = nlChineseRemainder;
 #ifdef LDEBUG
     n->nDBTest=nlDBTest;
 #endif

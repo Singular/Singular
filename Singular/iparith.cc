@@ -1519,7 +1519,7 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
     q[i]=nlInit((*p)[i], NULL);
     x[i]=nlInit((*c)[i], NULL);
   }
-  number n=nlChineseRemainder(x,q,rl);
+  number n=nlChineseRemainder(x,q,rl,NULL);
   for(i=rl-1;i>=0;i--)
   {
     nlDelete(&(q[i]),NULL);
@@ -1596,81 +1596,77 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  if ((currRing==NULL) || rField_is_Q())
+  lists c=(lists)u->CopyD(); // list of ideal
+  lists pl=NULL;
+  intvec *p=NULL;
+  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
+  else                    p=(intvec*)v->Data();
+  int rl=c->nr+1;
+  poly r=NULL,h;
+  ideal result;
+  ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
+  int i;
+  int return_type=c->m[0].Typ();
+  if ((return_type!=IDEAL_CMD)
+  && (return_type!=MODUL_CMD)
+  && (return_type!=MATRIX_CMD))
   {
-    lists c=(lists)u->CopyD(); // list of ideal
-    lists pl=NULL;
-    intvec *p=NULL;
-    if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
-    else                    p=(intvec*)v->Data();
-    int rl=c->nr+1;
-    poly r=NULL,h;
-    ideal result;
-    ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
-    int i;
-    int return_type=c->m[0].Typ();
-    if ((return_type!=IDEAL_CMD)
-    && (return_type!=MODUL_CMD)
-    && (return_type!=MATRIX_CMD))
+    WerrorS("ideal/module/matrix expected");
+    omFree(x); // delete c
+    return TRUE;
+  }
+  for(i=rl-1;i>=0;i--)
+  {
+    if (c->m[i].Typ()!=return_type)
     {
-      WerrorS("ideal/module/matrix expected");
+      Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
       omFree(x); // delete c
       return TRUE;
     }
+    x[i]=((ideal)c->m[i].Data());
+  }
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  if (p!=NULL)
+  {
     for(i=rl-1;i>=0;i--)
     {
-      if (c->m[i].Typ()!=return_type)
+      q[i]=n_Init((*p)[i], currRing);
+    }
+  }
+  else
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (pl->m[i].Typ()==INT_CMD)
       {
-        Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
+        q[i]=n_Init((int)(long)pl->m[i].Data(),currRing);
+      }
+      else if (pl->m[i].Typ()==BIGINT_CMD)
+      {
+        q[i]=nInit_bigint((number)(pl->m[i].Data()));
+      }
+      else
+      {
+        Werror("bigint expected at pos %d",i+1);
+        for(i++;i<rl;i++)
+        {
+          n_Delete(&(q[i]),currRing);
+        }
         omFree(x); // delete c
+        omFree(q); // delete pl
         return TRUE;
       }
-      x[i]=((ideal)c->m[i].Data());
     }
-    number *q=(number *)omAlloc(rl*sizeof(number));
-    if (p!=NULL)
-    {
-      for(i=rl-1;i>=0;i--)
-      {
-        q[i]=nlInit((*p)[i], currRing);
-      }
-    }
-    else
-    {
-      for(i=rl-1;i>=0;i--)
-      {
-        if (pl->m[i].Typ()==INT_CMD)
-        {
-          q[i]=nlInit((int)(long)pl->m[i].Data(),currRing);
-        }
-        else if (pl->m[i].Typ()==BIGINT_CMD)
-        {
-          q[i]=nlCopy((number)(pl->m[i].Data()));
-        }
-        else
-        {
-          Werror("bigint expected at pos %d",i+1);
-          for(i++;i<rl;i++)
-          {
-            nlDelete(&(q[i]),currRing);
-          }
-          omFree(x); // delete c
-          omFree(q); // delete pl
-          return TRUE;
-        }
-      }
-    }
-    result=idChineseRemainder(x,q,rl);
-    for(i=rl-1;i>=0;i--)
-    {
-      nlDelete(&(q[i]),currRing);
-    }
-    omFree(q);
-    res->data=(char *)result;
-    res->rtyp=return_type;
-    return FALSE;
   }
-  else return TRUE;
+  result=idChineseRemainder(x,q,rl);
+  for(i=rl-1;i>=0;i--)
+  {
+    n_Delete(&(q[i]),currRing);
+  }
+  omFree(q);
+  res->data=(char *)result;
+  res->rtyp=return_type;
+  return FALSE;
 }
 #endif
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
@@ -1999,22 +1995,18 @@ static BOOLEAN jjFAREY_BI(leftv res, leftv u, leftv v)
   {
     number uu=(number)u->Data();
     number vv=(number)v->Data();
-    res->data=(char *)nlFarey(uu,vv);
+    res->data=(char *)nlFarey(uu,vv,NULL);
     return FALSE;
   }
   else return TRUE;
 }
 static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
 {
-  if (rField_is_Q())
-  {
-    ideal uu=(ideal)u->Data();
-    number vv=(number)v->Data();
-    res->data=(void*)idFarey(uu,vv);
-    res->rtyp=u->Typ();
-    return FALSE;
-  }
-  else return TRUE;
+  ideal uu=(ideal)u->Data();
+  number vv=(number)v->Data();
+  res->data=(void*)idFarey(uu,vv);
+  res->rtyp=u->Typ();
+  return FALSE;
 }
 static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
 {

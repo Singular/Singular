@@ -4174,6 +4174,54 @@ poly id_GCD(poly f, poly g, const ring r)
 * destroys xx
 */
 #ifdef HAVE_FACTORY
+poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
+{
+  poly r,h,hh;
+  int j;
+  poly  res_p=NULL;
+  loop
+  {
+    /* search the lead term */
+    r=NULL;
+    for(j=rl-1;j>=0;j--)
+    {
+      h=xx[j];
+      if ((h!=NULL)
+      &&((r==NULL)||(p_LmCmp(r,h,R)==-1)))
+        r=h;
+    }
+    /* nothing found -> return */
+    if (r==NULL) break;
+    /* create the monomial in h */
+    h=p_Head(r,R);
+    /* collect the coeffs in x[..]*/
+    for(j=rl-1;j>=0;j--)
+    {
+      hh=xx[j];
+      if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
+      {
+        x[j]=pGetCoeff(hh);
+        hh=p_LmFreeAndNext(hh,R);
+        xx[j]=hh;
+      }
+      else
+        x[j]=n_Init(0, R);
+    }
+    number n=n_ChineseRemainder(x,q,rl,R);
+    for(j=rl-1;j>=0;j--)
+    {
+      x[j]=NULL; // nlInit(0...) takes no memory
+    }
+    if (n_IsZero(n,R)) p_Delete(&h,R);
+    else
+    {
+      p_SetCoeff(h,n,R);
+      //Print("new mon:");pWrite(h);
+      res_p=p_Add_q(res_p,h,R);
+    }
+  }
+  return res_p;
+}
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
@@ -4181,51 +4229,22 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
   result->nrows=xx[0]->nrows; // for lifting matrices
   result->ncols=xx[0]->ncols; // for lifting matrices
   int i,j;
-  poly r,h,hh,res_p;
   number *x=(number *)omAlloc(rl*sizeof(number));
+  poly *p=(poly *)omAlloc(rl*sizeof(poly));
   for(i=cnt-1;i>=0;i--)
   {
-    res_p=NULL;
-    loop
+    for(j=rl-1;j>=0;j--)
     {
-      r=NULL;
-      for(j=rl-1;j>=0;j--)
-      {
-        h=xx[j]->m[i];
-        if ((h!=NULL)
-        &&((r==NULL)||(pLmCmp(r,h)==-1)))
-          r=h;
-      }
-      if (r==NULL) break;
-      h=pHead(r);
-      for(j=rl-1;j>=0;j--)
-      {
-        hh=xx[j]->m[i];
-        if ((hh!=NULL) && (pLmCmp(r,hh)==0))
-        {
-          x[j]=pGetCoeff(hh);
-          hh=pLmFreeAndNext(hh);
-          xx[j]->m[i]=hh;
-        }
-        else
-          x[j]=nlInit(0, currRing);
-      }
-      number n=nlChineseRemainder(x,q,rl);
-      for(j=rl-1;j>=0;j--)
-      {
-        x[j]=NULL; // nlInit(0...) takes no memory
-      }
-      if (nlIsZero(n)) pDelete(&h);
-      else
-      {
-        pSetCoeff(h,n);
-        //Print("new mon:");pWrite(h);
-        res_p=pAdd(res_p,h);
-      }
+      p[j]=xx[j]->m[i];
     }
-    result->m[i]=res_p;
+    result->m[i]=p_ChineseRemainder(p,x,q,rl,currRing);
+    for(j=rl-1;j>=0;j--)
+    {
+      xx[j]->m[i]=p[j];
+    }
   }
-  omFree(x);
+  omFreeSize(p,rl*sizeof(poly));
+  omFreeSize(x,rl*sizeof(number));
   for(i=rl-1;i>=0;i--) idDelete(&(xx[i]));
   omFree(xx);
   return result;
@@ -4247,6 +4266,32 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey
  */
+poly p_Farey(poly p, number N, const ring r)
+{
+  poly h=p_Copy(p,r);
+  poly hh=h;
+  while(h!=NULL)
+  {
+    number c=pGetCoeff(h);
+    p_SetCoeff0(h,n_Farey(c,N,r),r);
+    n_Delete(&c,r);
+    pIter(h);
+  }
+  while((hh!=NULL)&&(n_IsZero(pGetCoeff(hh),r)))
+  {
+    p_LmDelete(&hh,r);
+  }
+  h=hh;
+  while((h!=NULL) && (pNext(h)!=NULL))
+  {
+    if(n_IsZero(pGetCoeff(pNext(h)),r))
+    {
+      p_LmDelete(&pNext(h),r);
+    }
+    else pIter(h);
+  }
+  return hh;
+}
 ideal idFarey(ideal x, number N)
 {
   int cnt=IDELEMS(x)*x->nrows;
@@ -4257,28 +4302,7 @@ ideal idFarey(ideal x, number N)
   int i;
   for(i=cnt-1;i>=0;i--)
   {
-    poly h=pCopy(x->m[i]);
-    result->m[i]=h;
-    while(h!=NULL)
-    {
-      number c=pGetCoeff(h);
-      pSetCoeff0(h,nlFarey(c,N));
-      nDelete(&c);
-      pIter(h);
-    }
-    while((result->m[i]!=NULL)&&(nIsZero(pGetCoeff(result->m[i]))))
-    {
-      pLmDelete(&(result->m[i]));
-    }
-    h=result->m[i];
-    while((h!=NULL) && (pNext(h)!=NULL))
-    {
-      if(nIsZero(pGetCoeff(pNext(h))))
-      {
-        pLmDelete(&pNext(h));
-      }
-      else pIter(h);
-    }
+    result->m[i]=p_Farey(x->m[i],N,currRing);
   }
   return result;
 }

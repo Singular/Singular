@@ -81,7 +81,7 @@ int      nlModP(number n, int p);
 int      nlSize(number n);
 number   nlGetDenom(number &n, const ring r);
 number   nlGetNumerator(number &n, const ring r);
-number   nlChineseRemainder(number *x, number *q,int rl);
+number   nlChineseRemainder(number *x, number *q,int rl, const ring);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif
@@ -110,7 +110,7 @@ void nlInpIntDiv(number &a, number b, const ring r);
 LINLINE number   nlInpAdd(number la, number li, const ring r);
 LINLINE void nlInpMult(number &a, number b, ring r);
 
-number nlFarey(number nP, number nN);
+number nlFarey(number nP, number nN, const ring);
 
 #ifdef LDEBUG
 #define nlTest(a) nlDBTest(a,__FILE__,__LINE__)

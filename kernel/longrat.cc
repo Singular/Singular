@@ -2371,7 +2371,7 @@ void nlInpIntDiv(number &a, number b, const ring r)
   }
 }
 
-number nlFarey(number nN, number nP)
+number nlFarey(number nN, number nP, const ring)
 {
   mpz_t tmp; mpz_init(tmp);
   mpz_t A,B,C,D,E,N,P;

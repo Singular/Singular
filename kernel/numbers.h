@@ -37,6 +37,8 @@
 #define n_Size(n,r)           (r)->cf->nSize(n)
 #define n_GetDenom(N,r)       (r)->cf->cfGetDenom((N),r)
 #define n_GetNumerator(N,r)   (r)->cf->cfGetNumerator((N),r)
+#define n_ChineseRemainder(X,Q,l,r) (r)->cf->cfChineseRemainder(X,Q,l,r)
+#define n_Farey(p,n,r)        (r)->cf->cfFarey(p,n,r)
 
 #define n_New(n, r)           nNew(n)
 

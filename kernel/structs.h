@@ -227,6 +227,8 @@ struct n_Procs_s
    number  (*cfGetNumerator)(number &n, const ring r);
    number  (*nGcd)(number a, number b, const ring r);
    number  (*nLcm)(number a, number b, const ring r);
+   number  (*cfFarey)(number p, number n, const ring r);
+   number  (*cfChineseRemainder)(number *x, number *q,int rl, const ring);
    void    (*cfDelete)(number * a, const ring r);
    nMapFunc (*cfSetMap)(const ring src, const ring dst);
    char *  (*nName)(number n);
