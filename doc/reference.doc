@@ -2534,7 +2534,7 @@ If a weight vector w is a given as 3rd argument, then the Hilbert series is comp
 w.r.t.@: these weights w (by default all weights are set to 1).
 @item @strong{Caution:}
 The last entry of the returned intvec is not part of the actual Hilbert series,
-but is used in the Hilbert driven standard basis computation (see @ref{stdhilb}).
+but is used in the Hilbert driven standard basis computation (see @ref{stdhilb}). (It is the minimum weight of the module generators or 0).
 @item @strong{Syntax:}
 @code{hilb (} intvec_expression @code{)}
 @item @strong{Type:}
