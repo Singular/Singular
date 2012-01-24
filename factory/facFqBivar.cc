@@ -5430,12 +5430,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       if (bufUniFactors.length() < uniFactors.length())
       {
-        if (!evaluation.isZero())
-        {
-          uniFactors= bufUniFactors;
-          Aeval= bufAeval;
-          evaluation= bufEvaluation;
-        }
+        uniFactors= bufUniFactors;
+        Aeval= bufAeval;
+        evaluation= bufEvaluation;
       }
     }
     list.append (bufEvaluation);
@@ -5445,9 +5442,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   if (!derivXZero && !fail2)
   {
-    if (!evaluation.isZero() && (uniFactors.length() > uniFactors2.length() ||
+    if (uniFactors.length() > uniFactors2.length() ||
         (uniFactors.length() == uniFactors2.length()
-         && degs.getLength() > degs2.getLength())))
+         && degs.getLength() > degs2.getLength()))
     {
       degs= degs2;
       uniFactors= uniFactors2;
