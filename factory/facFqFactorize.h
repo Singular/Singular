@@ -92,11 +92,59 @@ CFList GFSqrfFactorize (const CanonicalForm & F ///< [in] a multivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 /// @sa FqFactorize(), GFFactorize()
 inline
-CFFList FpFactorize (const CanonicalForm& F ///< [in] a multivariate poly
+CFFList FpFactorize (const CanonicalForm& G,///< [in] a multivariate poly
+                     bool substCheck= true  ///< [in] enables substitute check
                     )
 {
-  if (getNumVars (F) == 2)
-    return FpBiFactorize (F);
+  if (getNumVars (G) == 2)
+    return FpBiFactorize (G, substCheck);
+
+  CanonicalForm F= G;
+  if (substCheck)
+  {
+    bool foundOne= false;
+    int * substDegree= new int [F.level()];
+    for (int i= 1; i <= F.level(); i++)
+    {
+      if (degree (F, i) > 0)
+      {
+        substDegree[i-1]= substituteCheck (F, Variable (i));
+        if (substDegree [i-1] > 1)
+        {
+          foundOne= true;
+          subst (F, F, substDegree[i-1], Variable (i));
+        }
+      }
+      else
+        substDegree[i-1]= -1;
+    }
+    if (foundOne)
+    {
+      CFFList result= FpFactorize (F, false);
+      CFFList newResult, tmp;
+      CanonicalForm tmp2;
+      newResult.insert (result.getFirst());
+      result.removeFirst();
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        tmp2= i.getItem().factor();
+        for (int j= 1; j <= G.level(); j++)
+        {
+          if (substDegree[j-1] > 1)
+            tmp2= reverseSubst (tmp2, substDegree[j-1], Variable (j));
+        }
+        tmp= FpFactorize (tmp2, false);
+        tmp.removeFirst();
+        for (CFFListIterator j= tmp; j.hasItem(); j++)
+          newResult.append (CFFactor (j.getItem().factor(),
+                                      j.getItem().exp()*i.getItem().exp()));
+      }
+      delete [] substDegree;
+      return newResult;
+    }
+    delete [] substDegree;
+  }
+
   ExtensionInfo info= ExtensionInfo (false);
   Variable a= Variable (1);
   CanonicalForm LcF= Lc (F);
@@ -109,7 +157,7 @@ CFFList FpFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   if (degree (pthRoot) > 0)
   {
     pthRoot= maxpthRoot (pthRoot, p, l);
-    result= FpFactorize (pthRoot);
+    result= FpFactorize (pthRoot, false);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
       i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
@@ -124,7 +172,7 @@ CFFList FpFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   }
   if (degree (A) > 0)
   {
-    resultRoot= FpFactorize (A);
+    resultRoot= FpFactorize (A, false);
     resultRoot.removeFirst();
     result= Union (result, resultRoot);
   }
@@ -138,12 +186,60 @@ CFFList FpFactorize (const CanonicalForm& F ///< [in] a multivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 /// @sa FpFactorize(), GFFactorize()
 inline
-CFFList FqFactorize (const CanonicalForm& F, ///< [in] a multivariate poly
-                     const Variable& alpha   ///< [in] algebraic variable
+CFFList FqFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
+                     const Variable& alpha,  ///< [in] algebraic variable
+                     bool substCheck= true   ///< [in] enables substitute check
                     )
 {
-  if (getNumVars (F) == 2)
-    return FqBiFactorize (F, alpha);
+  if (getNumVars (G) == 2)
+    return FqBiFactorize (G, alpha, substCheck);
+
+  CanonicalForm F= G;
+  if (substCheck)
+  {
+    bool foundOne= false;
+    int * substDegree= new int [F.level()];
+    for (int i= 1; i <= F.level(); i++)
+    {
+      if (degree (F, i) > 0)
+      {
+        substDegree[i-1]= substituteCheck (F, Variable (i));
+        if (substDegree [i-1] > 1)
+        {
+          foundOne= true;
+          subst (F, F, substDegree[i-1], Variable (i));
+        }
+      }
+      else
+        substDegree[i-1]= -1;
+    }
+    if (foundOne)
+    {
+      CFFList result= FqFactorize (F, alpha, false);
+      CFFList newResult, tmp;
+      CanonicalForm tmp2;
+      newResult.insert (result.getFirst());
+      result.removeFirst();
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        tmp2= i.getItem().factor();
+        for (int j= 1; j <= G.level(); j++)
+        {
+          if (substDegree[j-1] > 1)
+            tmp2= reverseSubst (tmp2, substDegree[j-1], Variable (j));
+        }
+        tmp= FqFactorize (tmp2, alpha, false);
+        tmp.removeFirst();
+        for (CFFListIterator j= tmp; j.hasItem(); j++)
+          newResult.append (CFFactor (j.getItem().factor(),
+                                      j.getItem().exp()*i.getItem().exp()));
+      }
+      delete [] substDegree;
+      return newResult;
+    }
+    delete [] substDegree;
+  }
+
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CanonicalForm LcF= Lc (F);
   CanonicalForm pthRoot, A;
@@ -156,7 +252,7 @@ CFFList FqFactorize (const CanonicalForm& F, ///< [in] a multivariate poly
   if (degree (pthRoot) > 0)
   {
     pthRoot= maxpthRoot (pthRoot, q, l);
-    result= FqFactorize (pthRoot, alpha);
+    result= FqFactorize (pthRoot, alpha, false);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
       i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
@@ -171,7 +267,7 @@ CFFList FqFactorize (const CanonicalForm& F, ///< [in] a multivariate poly
   }
   if (degree (A) > 0)
   {
-    resultRoot= FqFactorize (A, alpha);
+    resultRoot= FqFactorize (A, alpha, false);
     resultRoot.removeFirst();
     result= Union (result, resultRoot);
   }
@@ -185,13 +281,61 @@ CFFList FqFactorize (const CanonicalForm& F, ///< [in] a multivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 /// @sa FpFactorize(), FqFactorize()
 inline
-CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
+CFFList GFFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
+                     bool substCheck= true   ///< [in] enables substitute check
                     )
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
-  if (getNumVars (F) == 2)
-    return GFBiFactorize (F);
+  if (getNumVars (G) == 2)
+    return GFBiFactorize (G, substCheck);
+
+  CanonicalForm F= G;
+  if (substCheck)
+  {
+    bool foundOne= false;
+    int * substDegree= new int [F.level()];
+    for (int i= 1; i <= F.level(); i++)
+    {
+      if (degree (F, i) > 0)
+      {
+        substDegree[i-1]= substituteCheck (F, Variable (i));
+        if (substDegree [i-1] > 1)
+        {
+          foundOne= true;
+          subst (F, F, substDegree[i-1], Variable (i));
+        }
+      }
+      else
+        substDegree[i-1]= -1;
+    }
+    if (foundOne)
+    {
+      CFFList result= GFFactorize (F, false);
+      CFFList newResult, tmp;
+      CanonicalForm tmp2;
+      newResult.insert (result.getFirst());
+      result.removeFirst();
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        tmp2= i.getItem().factor();
+        for (int j= 1; j <= G.level(); j++)
+        {
+          if (substDegree[j-1] > 1)
+            tmp2= reverseSubst (tmp2, substDegree[j-1], Variable (j));
+        }
+        tmp= GFFactorize (tmp2, false);
+        tmp.removeFirst();
+        for (CFFListIterator j= tmp; j.hasItem(); j++)
+          newResult.append (CFFactor (j.getItem().factor(),
+                                      j.getItem().exp()*i.getItem().exp()));
+      }
+      delete [] substDegree;
+      return newResult;
+    }
+    delete [] substDegree;
+  }
+
   Variable a= Variable (1);
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   CanonicalForm LcF= Lc (F);
@@ -205,7 +349,7 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   if (degree (pthRoot) > 0)
   {
     pthRoot= maxpthRoot (pthRoot, q, l);
-    result= GFFactorize (pthRoot);
+    result= GFFactorize (pthRoot, false);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
       i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
@@ -220,7 +364,7 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   }
   if (degree (A) > 0)
   {
-    resultRoot= GFFactorize (A);
+    resultRoot= GFFactorize (A, false);
     resultRoot.removeFirst();
     result= Union (result, resultRoot);
   }

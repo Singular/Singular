@@ -37,9 +37,10 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
 /// @ return @a ratBiSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
 inline
-CFList ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
-                           const Variable& v
-                         )
+CFList
+ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
+                    const Variable& v        ///< [in] algebraic variable
+                   )
 {
   CFMap N;
   CanonicalForm F= compress (G, N);
@@ -90,12 +91,56 @@ CFList ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 /// @return @a ratBiFactorize returns a list of monic factors with
 ///         multiplicity, the first element is the leading coefficient.
 inline
-CFFList ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
-                        const Variable& v
-                      )
+CFFList
+ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
+                const Variable& v,       ///< [in] algebraic variable
+                bool substCheck= true    ///< [in] enables substitute check
+               )
 {
   CFMap N;
   CanonicalForm F= compress (G, N);
+
+  if (substCheck)
+  {
+    bool foundOne= false;
+    int * substDegree= new int [F.level()];
+    for (int i= 1; i <= F.level(); i++)
+    {
+      substDegree[i-1]= substituteCheck (F, Variable (i));
+      if (substDegree [i-1] > 1)
+      {
+        foundOne= true;
+        subst (F, F, substDegree[i-1], Variable (i));
+      }
+    }
+    if (foundOne)
+    {
+      CFFList result= ratBiFactorize (F, v, false);
+      CFFList newResult, tmp;
+      CanonicalForm tmp2;
+      newResult.insert (result.getFirst());
+      result.removeFirst();
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        tmp2= i.getItem().factor();
+        for (int j= 1; j <= F.level(); j++)
+        {
+          if (substDegree[j-1] > 1)
+            tmp2= reverseSubst (tmp2, substDegree[j-1], Variable (j));
+        }
+        tmp= ratBiFactorize (tmp2, v, false);
+        tmp.removeFirst();
+        for (CFFListIterator j= tmp; j.hasItem(); j++)
+          newResult.append (CFFactor (j.getItem().factor(),
+                                      j.getItem().exp()*i.getItem().exp()));
+      }
+      decompress (newResult, N);
+      delete [] substDegree;
+      return newResult;
+    }
+    delete [] substDegree;
+  }
+
   CanonicalForm LcF= Lc (F);
   CanonicalForm contentX= content (F, 1);
   CanonicalForm contentY= content (F, 2);
