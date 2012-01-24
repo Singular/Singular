@@ -34,9 +34,10 @@ multiFactorize (const CanonicalForm& F,     ///< [in] poly to be factored
 ///         element is the leading coefficient.
 #ifdef HAVE_NTL
 inline
-CFList ratSqrfFactorize (const CanonicalForm & G, ///< [in] a multivariate poly
-                         const Variable& v
-                       )
+CFList
+ratSqrfFactorize (const CanonicalForm & G,       ///<[in] a multivariate poly
+                  const Variable& v              ///<[in] algebraic variable
+                 )
 {
   if (getNumVars (G) == 2)
     return ratBiSqrfFactorize (G, v);
@@ -57,9 +58,11 @@ CFList ratSqrfFactorize (const CanonicalForm & G, ///< [in] a multivariate poly
 /// @return @a ratFactorize returns a list of monic factors with
 ///         multiplicity, the first element is the leading coefficient.
 inline
-CFFList ratFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
-                      const Variable& v
-                    )
+CFFList
+ratFactorize (const CanonicalForm& G,        ///<[in] a multivariate poly
+              const Variable& v,             ///<[in] algebraic variable
+              bool substCheck= true          ///<[in] enables substitute check
+             )
 {
   if (getNumVars (G) == 2)
   {
@@ -67,6 +70,52 @@ CFFList ratFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
     return result;
   }
   CanonicalForm F= G;
+
+  if (substCheck)
+  {
+    bool foundOne= false;
+    int * substDegree= new int [F.level()];
+    for (int i= 1; i <= F.level(); i++)
+    {
+      if (degree (F, i) > 0)
+      {
+        substDegree[i-1]= substituteCheck (F, Variable (i));
+        if (substDegree [i-1] > 1)
+        {
+          foundOne= true;
+          subst (F, F, substDegree[i-1], Variable (i));
+        }
+      }
+      else
+        substDegree[i-1]= -1;
+    }
+    if (foundOne)
+    {
+      CFFList result= ratFactorize (F, v, false);
+      CFFList newResult, tmp;
+      CanonicalForm tmp2;
+      newResult.insert (result.getFirst());
+      result.removeFirst();
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        tmp2= i.getItem().factor();
+        for (int j= 1; j <= G.level(); j++)
+        {
+          if (substDegree[j-1] > 1)
+            tmp2= reverseSubst (tmp2, substDegree[j-1], Variable (j));
+        }
+        tmp= ratFactorize (tmp2, v, false);
+        tmp.removeFirst();
+        for (CFFListIterator j= tmp; j.hasItem(); j++)
+          newResult.append (CFFactor (j.getItem().factor(),
+                                      j.getItem().exp()*i.getItem().exp()));
+      }
+      delete [] substDegree;
+      return newResult;
+    }
+    delete [] substDegree;
+  }
+
   CanonicalForm LcF= Lc (F);
   if (isOn (SW_RATIONAL))
     F *= bCommonDen (F);
