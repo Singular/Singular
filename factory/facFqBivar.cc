@@ -3881,11 +3881,14 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                CFArray& Pi, CFList& diophant
                               )
 {
-  bufF= F;
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
+
+  Variable y= F.mvar();
   factorsFound= 0;
   CanonicalForm LCF= LC (F, 1);
   CFList result;
-  int smallFactorDeg= 11;
+  int smallFactorDeg= tmin (11, liftPre [sizeOfLiftPre- 1] + 1);
   mat_zz_p NTLN= N;
   int * factorsFoundIndex= new int [NTLN.NumCols()];
   for (long i= 0; i < NTLN.NumCols(); i++)
@@ -3904,40 +3907,76 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                       );
     if (result.length() == NTLN.NumCols())
     {
+      delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
     }
   }
 
-  if (l < degree (bufF)/2+2)
+  int i= sizeOfLiftPre - 1;
+  int dummy= 1;
+  if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF)/2 + 2, Pi, diophant, M);
-    l= degree (bufF)/2 + 2;
+    while (i > 0)
+    {
+      if (l < liftPre[i-1] + 1)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        l= liftPre[i-1] + 1;
+      }
+      else
+      {
+        i--;
+        if (i != 0)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i--;
+    }
   }
-  reconstructionTry (result, bufF, factors, degree (bufF)/2 + 2,
-                     factorsFound, factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
+  else
   {
-    delete [] factorsFoundIndex;
-    return result;
+    i= 1;
+    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    while (i < 4)
+    {
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      if (l < dummy)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        l= dummy;
+      }
+      else
+      {
+        i++;
+        if (i < 4)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i++;
+    }
   }
 
-  if (l < degree (F) + 1)
-  {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF) + 1, Pi, diophant, M);
-    l= degree (bufF) + 1;
-  }
-  reconstructionTry (result, bufF, factors, degree (bufF) + 1, factorsFound,
-                     factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
-  {
-    delete [] factorsFoundIndex;
-    return result;
-  }
+  delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
 }
@@ -3949,7 +3988,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
                                CFArray& Pi, CFList& diophant
                               )
 {
-  bufF= F;
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
+  Variable y= F.mvar();
   factorsFound= 0;
   CanonicalForm LCF= LC (F, 1);
   CFList result;
@@ -3958,6 +3999,7 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
   int * factorsFoundIndex= new int [NTLN.NumCols()];
   for (long i= 0; i < NTLN.NumCols(); i++)
     factorsFoundIndex [i]= 0;
+
   if (degree (F) + 1 > smallFactorDeg)
   {
     if (l < smallFactorDeg)
@@ -3971,40 +4013,76 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
                       );
     if (result.length() == NTLN.NumCols())
     {
+      delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
     }
   }
 
-  if (l < degree (bufF)/2+2)
+  int i= sizeOfLiftPre - 1;
+  int dummy= 1;
+  if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF)/2 + 2, Pi, diophant, M);
-    l= degree (bufF)/2 + 2;
+    while (i > 0)
+    {
+      if (l < liftPre[i-1] + 1)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        l= liftPre[i-1] + 1;
+      }
+      else
+      {
+        i--;
+        if (i != 0)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i--;
+    }
   }
-  reconstructionTry (result, bufF, factors, degree (bufF)/2 + 2,
-                     factorsFound, factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
+  else
   {
-    delete [] factorsFoundIndex;
-    return result;
+    i= 1;
+    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    while (i < 4)
+    {
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      if (l < dummy)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        l= dummy;
+      }
+      else
+      {
+        i++;
+        if (i < 4)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i++;
+    }
   }
 
-  if (l < degree (F) + 1)
-  {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF) + 1, Pi, diophant, M);
-    l= degree (bufF) + 1;
-  }
-  reconstructionTry (result, bufF, factors, degree (bufF) + 1, factorsFound,
-                     factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
-  {
-    delete [] factorsFoundIndex;
-    return result;
-  }
+  delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
 }
@@ -4019,7 +4097,9 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                   evaluation
                                  )
 {
-  bufF= F;
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
+  Variable y= F.mvar();
   factorsFound= 0;
   CanonicalForm LCF= LC (F, 1);
   CFList result;
@@ -4040,45 +4120,81 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
     extReconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                           factorsFoundIndex, NTLN, beenInThres, info,
                           evaluation
-                         );
+                      );
     if (result.length() == NTLN.NumCols())
     {
+      delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
     }
   }
 
-  if (l < degree (bufF)/2+2)
+  int i= sizeOfLiftPre - 1;
+  int dummy= 1;
+  if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF)/2 + 2, Pi, diophant, M);
-    l= degree (bufF)/2 + 2;
+    while (i > 0)
+    {
+      if (l < liftPre[i-1] + 1)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        l= liftPre[i-1] + 1;
+      }
+      else
+      {
+        i--;
+        if (i != 0)
+          continue;
+      }
+      extReconstructionTry (result, bufF, factors, l, factorsFound,
+                            factorsFoundIndex, NTLN, beenInThres, info,
+                            evaluation
+                           );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i--;
+    }
   }
-  extReconstructionTry (result, bufF, factors, degree (bufF)/2 + 2,
-                       factorsFound, factorsFoundIndex, NTLN, beenInThres, info,
-                       evaluation
-                       );
-  if (result.length() == NTLN.NumCols())
+  else
   {
-    delete [] factorsFoundIndex;
-    return result;
+    i= 1;
+    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    while (i < 4)
+    {
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      if (l < dummy)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        l= dummy;
+      }
+      else
+      {
+        i++;
+        if (i < 4)
+          continue;
+      }
+      extReconstructionTry (result, bufF, factors, l, factorsFound,
+                            factorsFoundIndex, NTLN, beenInThres, info,
+                            evaluation
+                           );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i++;
+    }
   }
 
-  if (l < degree (bufF) + 1)
-  {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF) + 1, Pi, diophant, M);
-    l= degree (bufF) + 1;
-  }
-
-  extReconstructionTry (result, bufF, factors, degree (bufF) + 1, factorsFound,
-                        factorsFoundIndex, NTLN, beenInThres, info, evaluation
-                       );
-  if (result.length() == NTLN.NumCols())
-  {
-    delete [] factorsFoundIndex;
-    return result;
-  }
+  delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
 }
