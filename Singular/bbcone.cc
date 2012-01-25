@@ -206,6 +206,7 @@ static BOOLEAN jjCONERAYS1(leftv res, leftv v)
   gfan::ZMatrix zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -233,6 +234,7 @@ static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
   gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -271,6 +273,7 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm1, zm2);
   //k should be passed on to zc; not available yet
+  zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -297,6 +300,107 @@ BOOLEAN coneViaRays(leftv res, leftv args)
   return TRUE;
 }
 
+static BOOLEAN qqCONERAYS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from half-lines
+     (cone = convex hull of the half-lines; note: there may be
+     entire lines in the cone);
+     valid parametrizations: (intmat) */
+  intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN qqCONERAYS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from half-lines,
+     and lines (any point in the cone being the sum of a point
+     in the convex hull of the half-lines and a point in the span
+     of the lines; the second argument may contain or entirely consist
+     of zero rows);
+     valid parametrizations: (intmat, intmat)
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns */
+  intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
+  if (rays->cols() != linSpace->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           rays->cols(), linSpace->cols());
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN qqCONERAYS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from half-lines,
+     and lines (any point in the cone being the sum of a point
+     in the convex hull of the half-lines and a point in the span
+     of the lines), and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then the lineality space is known
+     to be the span of the provided lines;
+     if the 2^1-bit of k is set, then the extreme rays are known:
+     each half-line spans a (different) extreme ray */
+  intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
+  if (rays->cols() != linSpace->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           rays->cols(), linSpace->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  //k should be passed on to zc; not available yet
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+BOOLEAN quickConeViaRays(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    if (u->next == NULL) return qqCONERAYS1(res, u);
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+    {
+      if (v->next == NULL) return qqCONERAYS2(res, u, v);
+      leftv w = v->next;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+      {
+        if (w->next == NULL) return qqCONERAYS3(res, u, v, w);
+      }
+    }
+  }
+  WerrorS("quickConeViaRays: unexpected parameters");
+  return TRUE;
+}
+
 static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
 {
   /* method for generating a cone object from inequalities;
@@ -304,6 +408,7 @@ static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
   intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
   gfan::ZMatrix zm = intmat2ZMatrix(inequs);
   gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
+  zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -327,6 +432,7 @@ static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
   gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
   gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
   gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
+  zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -358,6 +464,7 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
   gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
   gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
+  zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -384,12 +491,101 @@ BOOLEAN coneViaNormals(leftv res, leftv args)
   return TRUE;
 }
 
+static BOOLEAN qqCONENORMALS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from inequalities;
+     valid parametrizations: (intmat) */
+  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN qqCONENORMALS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from iequalities,
+     and equations (...)
+     valid parametrizations: (intmat, intmat)
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN qqCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from inequalities, equations,
+     and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then ... */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+BOOLEAN quickConeViaNormals(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    if (u->next == NULL) return qqCONENORMALS1(res, u);
+  }
+  leftv v = u->next;
+  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+  {
+    if (v->next == NULL) return qqCONENORMALS2(res, u, v);
+  }
+  leftv w = v->next;
+  if ((w != NULL) && (w->Typ() == INT_CMD))
+  {
+    if (w->next == NULL) return qqCONENORMALS3(res, u, v, w);
+  }
+  WerrorS("quickConeViaNormals: unexpected parameters");
+  return TRUE;
+}
+
+
 BOOLEAN getInequalities(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    
     gfan::ZMatrix zmat = zc->getInequalities();
     res->rtyp = INTMAT_CMD;
     res->data = (void*)zMatrix2Intvec(zmat);
@@ -1004,6 +1200,20 @@ BOOLEAN hasFace(leftv res, leftv args)
   return TRUE;  
 }
 
+BOOLEAN canonicalizeCone(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZCone* zd = new gfan::ZCone(*zc);
+    zd->canonicalize();
+    res->rtyp = coneID;
+    res->data = (char*) zd;
+    return FALSE;
+  }
+}
+
 void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1016,8 +1226,11 @@ void bbcone_setup()
   b->blackbox_Init=bbcone_Init;
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
+  iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
   iiAddCproc("","coneViaRays",FALSE,coneViaRays);
   iiAddCproc("","coneViaNormals",FALSE,coneViaNormals);
+  iiAddCproc("","quickConeViaRays",FALSE,quickConeViaRays);
+  iiAddCproc("","quickConeViaNormals",FALSE,quickConeViaNormals);
   iiAddCproc("","intersectCones",FALSE,intersectCones);
   // iiAddCproc("","takeUnion",FALSE,takeUnion);
   iiAddCproc("","coneLink",FALSE,coneLink);
