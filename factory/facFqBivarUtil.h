@@ -190,7 +190,8 @@ CFArray logarithmicDerivative (const CanonicalForm& F,///<[in] a bivariate poly
 /// @return an array of coefficients of the logarithmic derivative of G mod
 ///         Variable (2)^l
 CFArray
-logarithmicDerivative (const CanonicalForm& F,   ///< [in] bivariate poly
+logarithmicDerivative (const CanonicalForm& F,   ///< [in] bivariate poly 
+                                                 ///< truncated at Variable(2)^l
                        const CanonicalForm& G,   ///< [in] a factor of F
                        int l,                    ///< [in] lifting precision
                        int oldL,                 ///< [in] old precision

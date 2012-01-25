@@ -1402,6 +1402,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   CFMatrix C;
   CFArray buf;
   CFListIterator j;
+  CanonicalForm truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     if (start)
@@ -1421,12 +1423,14 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
     j= factors;
     j++;
 
+    truncF= mod (F, power (y, l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       else
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
 
     for (int i= 0; i < sizeBounds; i++)
@@ -1518,7 +1522,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   bool reduced= false;
   Variable y= F.mvar();
   Variable x= Variable (1);
-  CanonicalForm powX, imBasis;
+  CanonicalForm powX, imBasis, truncF;
   CFMatrix Mat, C;
   CFArray buf;
   CFIterator iter;
@@ -1565,12 +1569,14 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     j= factors;
     j++;
 
+    truncF= mod (F, power (y, l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       else
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
 
     for (int i= 0; i < sizeBounds; i++)
@@ -1682,6 +1688,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   mat_zz_pE* NTLC, NTLK;
   CFArray buf;
   CFMatrix C;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= liftBound)
   {
     if (start)
@@ -1701,15 +1709,16 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     j= factors;
     j++;
 
+    truncF= mod (F, power (y,l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (l == (minBound+1)*2)
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       }
       else
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]
                                     );
       }
@@ -1796,6 +1805,8 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= liftBound)
   {
     if (start)
@@ -1815,15 +1826,16 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
     j= factors;
     j++;
 
+    truncF= mod (F, power (y,l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (l == (minBound+1)*2)
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       }
       else
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]
                                     );
       }
@@ -1915,20 +1927,23 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y,l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2042,20 +2057,23 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CFMatrix C;
   mat_zz_pE* NTLC, NTLK;
   CFArray buf;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y,l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2174,7 +2192,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CanonicalForm imPrimElemAlpha= info.getDelta();
   CFListIterator j;
   Variable y= F.mvar();
-  CanonicalForm powX, imBasis;
+  CanonicalForm powX, imBasis, truncF;
   CFMatrix Mat, C;
   CFIterator iter;
   mat_zz_p* NTLMat,*NTLC, NTLK;
@@ -2201,17 +2219,18 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2357,23 +2376,25 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
   int stepSize= 2;
   bool useOldQs= false;
   bool hitBound= false;
-  Variable y= Variable (2);
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
   mat_zz_pE* NTLC, NTLK;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2477,20 +2498,23 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
   CFMatrix C;
   mat_zz_p* NTLC, NTLK;
   CFArray buf;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2594,22 +2618,24 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
   CFList bufUniFactors;
+  Variable y= F.mvar();
   while (oldL <= l)
   {
     j= factors;
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -2694,22 +2720,24 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
   CFMatrix C;
   CFArray buf;
   mat_zz_pE* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
   CFList bufUniFactors;
+  Variable y= F.mvar();
   while (oldL <= l)
   {
     j= factors;
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -2803,7 +2831,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     ident (NTLN, factors.length());
   Variable y= F.mvar();
   CFListIterator j;
-  CanonicalForm powX, imBasis, bufF;
+  CanonicalForm powX, imBasis, bufF, truncF;
   CFMatrix Mat, C;
   CFIterator iter;
   mat_zz_p* NTLMat;
@@ -2833,16 +2861,17 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]);
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -2970,22 +2999,24 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
   CFList bufUniFactors;
+  Variable y= F.mvar();
   while (oldL <= l)
   {
     j= factors;
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -3072,7 +3103,8 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
@@ -3080,15 +3112,17 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
     bufFactors.insert (LCF);
     bufFactors.removeFirst();
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3207,21 +3241,24 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   CFListIterator j;
   CFArray buf;
   mat_zz_pE* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3345,7 +3382,7 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
   Variable y= F.mvar();
-  CanonicalForm powX, imBasis, bufF;
+  CanonicalForm powX, imBasis, bufF, truncF;
   CFMatrix Mat, C;
   CFIterator iter;
   mat_zz_p* NTLMat,*NTLC, NTLK;
@@ -3379,15 +3416,17 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3540,21 +3579,24 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   CFListIterator j;
   CFMatrix C;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
