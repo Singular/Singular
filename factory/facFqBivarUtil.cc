@@ -479,7 +479,7 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CanonicalForm q,r;
   CanonicalForm logDeriv;
 
-  CanonicalForm bufF= mod (F, xToL);
+  CanonicalForm bufF= F;
   CanonicalForm oldF= mulMod2 (G, oldQ, xToL);
   bufF -= oldF;
   bufF= div (bufF, xToOldL);
