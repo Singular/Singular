@@ -57,6 +57,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * pyobject::
 * cone::
 * fan::
+* polytope::
 @end menu
 
 @c ---------------------------------------
@@ -4530,7 +4531,7 @@ operator @code{.} to access the elements
 @end ifset
 
 @ifclear withpython
-@node  pyobject,,fan, Data types
+@node  pyobject,,polytope, Data types
 @section pyobject
 @cindex pyobject
 @cindex blackbox

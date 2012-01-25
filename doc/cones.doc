@@ -31,8 +31,8 @@ Singular (see coneViaRays, coneViaNormals).
 @end menu
 @c --------------------------------------------------------------------------------
 @node coneViaRays,coneViaNormals,,cone
-@subsetcion coneViaRays
-@cindes coneViaRays
+@subsection coneViaRays
+@cindex coneViaRays
 @table @code
 @item @strong{Syntax:}
 @code{coneViaRays(} intmat HL @code{)}
@@ -93,8 +93,8 @@ c;
 @end table
 @c --------------------------------------------------------------------------------
 @node coneViaNormals,cone related functions,coneViaRays,cone
-@subsetcion coneViaNormals
-@cindes coneViaNormals
+@subsection coneViaNormals
+@cindex coneViaNormals
 @table @code
 @item @strong{Syntax:}
 @code{coneViaNormals(} intmat IE @code{)}
@@ -149,7 +149,8 @@ cone c=coneViaNormals(IE,E,3);
 c;
 @c example
 @end smallexample
-@end table@c --------------------------------------------------------------------------------
+@end table
+@c --------------------------------------------------------------------------------
 @node cone related functions,,coneViaNormals,cone
 @subsection cone related functions
 @cindex cone related functions
@@ -1517,7 +1518,7 @@ f;
 @cindex polytope related functions
 
 See also @ref{getAmbientDimension},
-@ref{getCodimension}, 
+@c @ref{getCodimension}, 
 @ref{getDimension},
 @ref{getEquations},
 @ref{getFacetNormals},
