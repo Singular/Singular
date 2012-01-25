@@ -1,6 +1,6 @@
 AC_DEFUN([SING_CHECK_ARITH_RINGS],
 [
-AC_MSG_CHECKING(whether arithmetical rings should be disabled)
+AC_MSG_CHECKING(whether arithmetical rings should be enabled)
 
 AC_ARG_ENABLE(arith-rings,
 [  --disable-arith-rings Disable arithmetical rings
@@ -22,7 +22,7 @@ AC_MSG_RESULT($ENABLE_RINGS)
 
 AC_DEFUN([SING_CHECK_FACTORY],
 [
-AC_MSG_CHECKING(whether factory should be disabled)
+AC_MSG_CHECKING(whether factory should be enabled)
 
 AC_ARG_ENABLE(factory,
 [  --disable-factory Disable factory
@@ -52,7 +52,7 @@ AC_MSG_RESULT($ENABLE_FACTORY)
 
 AC_DEFUN([SING_CHECK_PLURAL],
 [
-AC_MSG_CHECKING(whether non-commutative subsystem should be disabled)
+AC_MSG_CHECKING(whether non-commutative subsystem should be enabled)
 
 AC_ARG_ENABLE(plural,
 [  --disable-plural Disable non-commutative subsystem
