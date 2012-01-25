@@ -1004,6 +1004,20 @@ BOOLEAN hasFace(leftv res, leftv args)
   return TRUE;  
 }
 
+BOOLEAN canonicalizeCone(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZCone* zd = new gfan::ZCone(*zc);
+    zd->canonicalize();
+    res->rtyp = coneID;
+    res->data = (char*) zd;
+    return FALSE;
+  }
+}
+
 void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1016,6 +1030,7 @@ void bbcone_setup()
   b->blackbox_Init=bbcone_Init;
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
+  iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
   iiAddCproc("","coneViaRays",FALSE,coneViaRays);
   iiAddCproc("","coneViaNormals",FALSE,coneViaNormals);
   iiAddCproc("","intersectCones",FALSE,intersectCones);
