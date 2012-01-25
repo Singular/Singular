@@ -105,6 +105,8 @@ cone
 @item @strong{Purpose:}
 cone consisting of all points x, such that IE*x >= 0 in each component
 and (if stated) E*x = 0;
+inequalities and (if stated) equations will be transformed, getting rid of
+redundancies;
 flags may range between 0,..,3 defining an upper and lower bit
 (0=0*2+0, 1=0*2+1, 2=1*2+0, 3=1*2+1),
 if higher bit is 1, then program assumes each inequality yields a facet,
@@ -151,16 +153,122 @@ c;
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node cone related functions,,coneViaNormals,cone
+@node coneViaNormals,cone related functions,coneViaRays,cone
+@subsection coneViaNormals
+@cindex coneViaNormals
+@table @code
+@item @strong{Syntax:}
+@code{coneViaNormals(} intmat IE @code{)}
+@*@code{coneViaNormals(} intmat IE, intmat E @code{)}
+@*@code{coneViaNormals(} intmat IE, intmat E, int flags @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+cone consisting of all points x, such that IE*x >= 0 in each component
+and (if stated) E*x = 0;
+inequalities and (if stated) equations will be transformed, getting rid of
+redundancies;
+flags may range between 0,..,3 defining an upper and lower bit
+(0=0*2+0, 1=0*2+1, 2=1*2+0, 3=1*2+1),
+if higher bit is 1, then program assumes each inequality yields a facet,
+if lower bit is 1, then program assumes the kernel of E is the span of the cone,
+if either bit is 0, then program computes the information itself. 
+@item @strong{Example:}
+@smallexample
+@c example
+// Let's define a cone in R^3 given by the following inequalities:
+intmat IE[6][3]=  
+1,3,5,
+1,5,3,
+0,1,-1,
+0,1,1,
+1,0,0,
+-1,0,0;
+cone c=coneViaNormals(IE);
+c;
+// Note that the last two inequalities yield x1 = 0, hence also possible:
+intmat IE[4][3]=  
+0,1,-1,
+0,1,1;
+intmat E[1][3]=  
+1,0,0;
+cone c=coneViaNormals(IE,E);
+c;
+// each inequalities gives rise to a facet
+intmat IE[4][3]=  
+0,1,-1,
+0,1,1;
+intmat E[1][3]=  
+1,0,0;
+cone c=coneViaNormals(IE,E,1);
+c;
+// and the kernel of E is the span of the cone
+intmat IE[4][3]=  
+0,1,-1,
+0,1,1;
+intmat E[1][3]=  
+1,0,0;
+cone c=coneViaNormals(IE,E,3);
+c;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node quickConeViaNormals,cone related functions,coneViaNormals,cone
+@subsection quickConeViaNormals
+@cindex coneViaNormals
+@table @code
+@item @strong{Syntax:}
+@code{quickConeViaNormals(} intmat IE @code{)}
+@*@code{quickConeViaNormals(} intmat IE, intmat E @code{)}
+@*@code{quickConeViaNormals(} intmat IE, intmat E, int flags @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+cone consisting of all points x, such that IE*x >= 0 in each component
+and (if stated) E*x = 0;
+inequalities and (if stated) equations will be not be transformed, 
+only getting rid of obvious redundancies;
+flags may range between 0,..,3 defining an upper and lower bit
+(0=0*2+0, 1=0*2+1, 2=1*2+0, 3=1*2+1),
+if higher bit is 1, then program assumes each inequality yields a facet,
+if lower bit is 1, then program assumes the kernel of E is the span of the cone,
+if either bit is 0, then program computes the information itself. 
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[11][3]=
+0,-1,1,
+-1,1,0,
+-1,0,1,
+-1,-1,2,
+-2,2,0,
+-2,1,1,
+-2,0,2,
+-2,-1,3,
+-3,2,1,
+-3,1,2,
+-3,0,3;
+cone c=quickConeViaNormals(M);
+c;
+cone d=coneViaNormals(M);
+d;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node cone related functions,,quickConeViaNormals,cone
 @subsection cone related functions
 @cindex cone related functions
 
 @menu
+* canonicalizeCone::
 * coneLink::
 * containsInSupport::
 * containsPositiveVector::
 * containsRelatively::
 * getAmbientDimension::
+* getCodimension::
 * getDimension::
 * getDualCone::
 * getEquations::
@@ -190,13 +298,46 @@ c;
 @end menu
 
 @c --------------------------------------
-@node coneLink,containsInSupport,,cone related functions
+@node canonicalizeCone,coneLink,,cone related functions
+@subsubsection canonicalizeCone
+@cindex canonicalizeCone
+
+@table @code
+@item @strong{Syntax:}
+@code{canonicalizeCone(} cone c, intvec point @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+canonicalized version of the cone, no more redundant inequalities and equations
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[11][3]=
+0,-1,1,
+-1,1,0,
+-1,0,1,
+-1,-1,2,
+-2,2,0,
+-2,1,1,
+-2,0,2,
+-2,-1,3,
+-3,2,1,
+-3,1,2,
+-3,0,3;
+cone c=quickConeViaNormals(M);
+c;
+canonicalizeCone(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node coneLink,containsInSupport,canonicalizeCone,cone related functions
 @subsubsection coneLink
 @cindex coneLink
 
 @table @code
 @item @strong{Syntax:}
-@code{coneLink (} cone c, intvec point @code{)}
+@code{coneLink(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -227,8 +368,8 @@ print(getRays(cd));
 
 @table @code
 @item @strong{Syntax:}
-@code{containsInSupport (} cone c1, cone c2 @code{)}
-@*@code{containsInSupport (} cone c, intvec point @code{)}
+@code{containsInSupport(} cone c1, cone c2 @code{)}
+@*@code{containsInSupport(} cone c, intvec point @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -313,13 +454,15 @@ containsRelatively(c,p2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getAmbientDimension,getDimension,containsRelatively,cone related functions
+@node getAmbientDimension,getCodimension,containsRelatively,cone related functions
 @subsubsection getAmbientDimension
 @cindex getAmbientDimension
 
 @table @code
 @item @strong{Syntax:}
 @code{getAmbientDimension(} cone c @code{)}
+@*code{getAmbientDimension(} fan f @code{)}
+@*code{getAmbientDimension(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -341,13 +484,43 @@ getAmbientDimension(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getDimension,getDualCone,getAmbientDimension,cone related functions
+@node getCodimension,getDimension,getAmbientDimension,cone related functions
+@subsubsection getCodimension
+@cindex getCodimension
+
+@table @code
+@item @strong{Syntax:}
+@code{getCodimension(} cone c @code{)}
+@code{getCodimension(} fan f @code{)}
+@code{getCodimension(} polytope c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+codimension of the cone;
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[1][2]=
+1,0;
+cone c1=coneViaRays(M1);
+getCodimension(c1);
+intmat M2[1][2]=
+0,0;
+cone c2=coneViaRays(M2);
+getCodimension(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getDimension,getDualCone,getCodimension,cone related functions
 @subsubsection getDimension
 @cindex getDimension
 
 @table @code
 @item @strong{Syntax:}
 @code{getDimension(} cone c @code{)}
+@code{getDimension(} fan f @code{)}
+@code{getDimension(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -406,6 +579,7 @@ print(getRays(d2));
 @table @code
 @item @strong{Syntax:}
 @code{getEquations(} cone c @code{)}
+@code{getEquations(} polytope p @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -429,12 +603,13 @@ print(E2);
 @end table
 @c --------------------------------------
 @node getFacetNormals,getGeneratorsOfLinealitySpace,getEquations,cone related functions
-@subsubsection getFacets
+@subsubsection getFacetNormals
 @cindex getFacets
 
 @table @code
 @item @strong{Syntax:}
-@code{getFacets(} cone c @code{)}
+@code{getFacetNormals(} cone c @code{)}
+@*code{getFacetNormals(} polytope p @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -571,6 +746,7 @@ print(I2);
 @table @code
 @item @strong{Syntax:}
 @code{getLinealityDimension(} cone c @code{)}
+@code{getLinealityDimension(} fan c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -635,6 +811,7 @@ l2;
 @table @code
 @item @strong{Syntax:}
 @code{getLinearForms(} cone c @code{)}
+@*code{getLinearForms(} polytope p @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -661,6 +838,7 @@ getLinearForms(c);
 @table @code
 @item @strong{Syntax:}
 @code{getMultiplicity(} cone c @code{)}
+@*code{getMultiplicity(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -1030,6 +1208,7 @@ isSimplicial(f);
 @table @code
 @item @strong{Syntax:}
 @code{setLinearForms(} cone c, intvec linearform @code{)}
+@code*{setLinearForms(} polytope c, intvec linearform @code{)}
 @item @strong{Type:}
 @item @strong{Purpose:}
 adds the information of a linear form to the cone
@@ -1055,6 +1234,7 @@ getLinearForms(c);
 @table @code
 @item @strong{Syntax:}
 @code{setMultiplicity(} cone c, int multiplicity @code{)}
+@*code{setMultiplicity(} polytope c, int multiplicity @code{)}
 @item @strong{Type:}
 @item @strong{Purpose:}
 adds the information of a multiplicity to the cone
@@ -1083,7 +1263,7 @@ Every fan has an ambient dimension.
 Every cone (of a fan) must have the same lineality space. (This follows
 from the mathematical definition of a fan.)
 @item
-The lineality space of a fan equals the intersection of all cones in the fan.
+ The lineality space of a fan equals the intersection of all cones in the fan.
 (Hence, the lineality space is equal to the lineality space of each cone.)
 @item
 In particular, the lineality space of the empty fan is the entire ambient
@@ -1122,7 +1302,8 @@ to as the matrix of ray generators.
 Access to cones of the fan is provided in three different ways:
 @itemize
 @item
-  1. access to the cones as provided by the user (by means of insertion)
+  1. access to the cones as provided by the user (by means of insertion, removal, 
+     extraction)
 @item
   2. access to the representatives of all orbits (under the group action)
      coming from maximal cones
@@ -1168,7 +1349,10 @@ Access to cones of the fan is provided in three different ways:
 @subsection fan related functions
 @cindex fan related functions
 
-See also @ref{isSimplicial}.
+See also @ref{getAmbientDimension},
+@ref{getCodimension},
+@ref{getLinealityDimension},
+@ref{isSimplicial}.
 
 @menu
 * containsInCollection::
@@ -1507,18 +1691,99 @@ f;
 @section polytope
 @cindex polytope
 
-... (work in progress)
+A rational convex polytope (in short ``polytope'') in R^n is the convex 
+hull of rational points. It may or may not be bounded.
+It is internally realized as a cone in one dimension higher, intersected 
+with the hyperplane x0=1, we will consider it embedded into the projective 
+space through R^n -> P R^n, x -> (1,x).
+Each polytope is uniquely determined by a minimal set of finitely many 
+points, which we will refer to as ``vertices''.  
+Moreover, a polytope can be represented as a set of points satisfying certain 
+homogeneous linear inequalities and equalities.
+And these are the two main ways of constructing non-trivial polytopes.
 
 @menu
+* polytopeViaVertices::
+* polytopeViaNormals::
 * polytope related functions::
 @end menu
+@c --------------------------------------------------------------------------------
+@node polytopeViaVertices,polytopeViaNormals,,polytope
+@subsection polytopeViaVertices
+@cindex polytopeViaVertices
+@table @code
+@item @strong{Syntax:}
+@code{polytopeViaVertices(} intmat V @code{)}
+@*@code{polytopeViaVertices(} intmat V, int flags @code{)}
+@item @strong{Type:}
+polytope
+@item @strong{Purpose:}
+polytope generated by the row vectors of V 
+(thought of as representatives of points in the projective space);
+flags may only be 0 or 1,
+if flags is 1, then program assumes that each row vector of M is 
+a vertex of the polytope, 
+if flags is 0, then program computes the information itself.
+@item @strong{Example:}
+@smallexample
+@c example
+// Let's a polytope in R^2 generated by:
+intmat V[4][3]= 
+1,0,0,
+1,1,0,
+1,0,1,
+1,1,1;
+polytope p=polytopeViaVertices(V);
+c;
+// the input points are exactly the vertices:
+intmat V[4][3]= 
+1,0,0,
+1,1,0,
+1,0,1,
+1,1,1;
+polytope p=polytopeViaVertices(V,1);
+c;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node polytopeViaNormals,polytope related functions,polytopeViaVertices,cone
+@subsection polytopeViaNormals
+@cindex polytopeViaNormals
+@table @code
+@item @strong{Syntax:}
+@code{polytopeViaNormals(} intmat IE @code{)}
+@*@code{polytopeViaNormals(} intmat IE, intmat E @code{)}
+@*@code{polytopeViaNormals(} intmat IE, intmat E, int flags @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+cone consisting of all points x, such that IE*x >= 0 in each component
+and (if stated) E*x = 0;
+flags may range between 0,..,3 defining an upper and lower bit
+(0=0*2+0, 1=0*2+1, 2=1*2+0, 3=1*2+1),
+if higher bit is 1, then program assumes each inequality yields a facet,
+if lower bit is 1, then program assumes the kernel of E is the span of the cone,
+if either bit is 0, then program computes the information itself. 
+@item @strong{Example:}
+@smallexample
+@c example
+intmat IE[2][3]=
+1,0,0,
+0,1,0;
+intmat E[1][3]=
+0,0,1;
+polytope p=polytopeViaNormals(IE,E);
+@c example
+@end smallexample
+@end table
 @c --------------------------------------------------------------------
 @node polytope related functions,,,polytope
 @subsection polytope related functions
 @cindex polytope related functions
 
 See also @ref{getAmbientDimension},
-@c @ref{getCodimension}, 
+@ref{getCodimension}, 
 @ref{getDimension},
 @ref{getEquations},
 @ref{getFacetNormals},
