@@ -120,51 +120,22 @@ static BOOLEAN ppCONERAYS1(leftv res, leftv v)
   gfan::ZMatrix zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  zc->canonicalize();
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
 }
 
-static BOOLEAN ppCONERAYS2(leftv res, leftv u, leftv v)
+static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
 {
-  /* method for generating a cone object from half-lines,
-     and lines (any point in the cone being the sum of a point
-     in the convex hull of the half-lines and a point in the span
-     of the lines; the second argument may contain or entirely consist
-     of zero rows);
-     valid parametrizations: (intmat, intmat)
-     Errors will be invoked in the following cases:
-     - u and v have different numbers of columns */
-  intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
-  if (rays->cols() != linSpace->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           rays->cols(), linSpace->cols());
-    return TRUE;
-  }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
-  gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
-  res->rtyp = polytopeID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v, leftv w)
-{
-  /* method for generating a cone object from half-lines,
-     and lines (any point in the cone being the sum of a point
+  /* method for generating a cone object from half-lines
+     (any point in the cone being the sum of a point
      in the convex hull of the half-lines and a point in the span
      of the lines), and an integer k;
-     valid parametrizations: (intmat, intmat, int);
+     valid parametrizations: (intmat, int);
      Errors will be invoked in the following cases:
-     - u and v have different numbers of columns,
-     - k not in [0..3];
-     if the 2^0-bit of k is set, then the lineality space is known
-     to be the span of the provided lines;
-     if the 2^1-bit of k is set, then the extreme rays are known:
+     - k not 0 or 1;
+     if the k=1, then the extreme rays are known:
      each half-line spans a (different) extreme ray */
   intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
   intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
@@ -174,14 +145,83 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v, leftv w)
            rays->cols(), linSpace->cols());
     return TRUE;
   }
-  int k = (int)(long)w->Data();
-  if ((k < 0) || (k > 3))
+  int k = (int)(long)v->Data();
+  if ((k < 0) || (k > 1))
   {
-    WerrorS("expected int argument in [0..3]");
+    WerrorS("expected int argument in [0..1]");
     return TRUE;
   }
+  k=k*2;
   gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix zm2;
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  zc->canonicalize();
+  //k should be passed on to zc; not available yet
+  res->rtyp = polytopeID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+BOOLEAN polytopeViaVertices(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    if (u->next == NULL) return ppCONERAYS1(res, u);
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      if (v->next == NULL) return ppCONERAYS3(res, u, v);
+    }
+  }
+  WerrorS("polytopeViaVertices: unexpected parameters");
+  return TRUE;
+}
+
+static BOOLEAN pqCONERAYS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from half-lines
+     (cone = convex hull of the half-lines; note: there may be
+     entire lines in the cone);
+     valid parametrizations: (intmat) */
+  intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  res->rtyp = polytopeID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN pqCONERAYS3(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from half-lines
+     (any point in the cone being the sum of a point
+     in the convex hull of the half-lines and a point in the span
+     of the lines), and an integer k;
+     valid parametrizations: (intmat, int);
+     Errors will be invoked in the following cases:
+     - k not 0 or 1;
+     if the k=1, then the extreme rays are known:
+     each half-line spans a (different) extreme ray */
+  intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
+  if (rays->cols() != linSpace->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           rays->cols(), linSpace->cols());
+    return TRUE;
+  }
+  int k = (int)(long)v->Data();
+  if ((k < 0) || (k > 1))
+  {
+    WerrorS("expected int argument in [0..1]");
+    return TRUE;
+  }
+  k=k*2;
+  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2;
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm1, zm2);
   //k should be passed on to zc; not available yet
@@ -190,24 +230,19 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v, leftv w)
   return FALSE;
 }
 
-BOOLEAN polytopeViaPoints(leftv res, leftv args)
+BOOLEAN quickPolytopeViaVertices(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INTMAT_CMD))
   {
-    if (u->next == NULL) return ppCONERAYS1(res, u);
+    if (u->next == NULL) return pqCONERAYS1(res, u);
     leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+    if ((v != NULL) && (v->Typ() == INT_CMD))
     {
-      if (v->next == NULL) return ppCONERAYS2(res, u, v);
-      leftv w = v->next;
-      if ((w != NULL) && (w->Typ() == INT_CMD))
-      {
-        if (w->next == NULL) return ppCONERAYS3(res, u, v, w);
-      }
+      if (v->next == NULL) return pqCONERAYS3(res, u, v);
     }
   }
-  WerrorS("polytopeViaPoints: unexpected parameters");
+  WerrorS("quickPolytopeViaVertices: unexpected parameters");
   return TRUE;
 }
 
@@ -277,7 +312,7 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   return FALSE;
 }
 
-BOOLEAN polytopeViaInequalities(leftv res, leftv args)
+BOOLEAN polytopeViaNormals(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INTMAT_CMD))
@@ -294,7 +329,94 @@ BOOLEAN polytopeViaInequalities(leftv res, leftv args)
   {
     if (w->next == NULL) return ppCONENORMALS3(res, u, v, w);
   }
-  WerrorS("polytopeViaInequalities: unexpected parameters");
+  WerrorS("polytopeViaNormals: unexpected parameters");
+  return TRUE;
+}
+
+static BOOLEAN pqCONENORMALS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from inequalities;
+     valid parametrizations: (intmat) */
+  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
+  res->rtyp = polytopeID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN pqCONENORMALS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from iequalities,
+     and equations (...)
+     valid parametrizations: (intmat, intmat)
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
+  res->rtyp = polytopeID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN pqCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from inequalities, equations,
+     and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then ... */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
+  res->rtyp = polytopeID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+BOOLEAN quickPolytopeViaNormals(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    if (u->next == NULL) return ppCONENORMALS1(res, u);
+  }
+  leftv v = u->next;
+  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+  {
+    if (v->next == NULL) return ppCONENORMALS2(res, u, v);
+  }
+  leftv w = v->next;
+  if ((w != NULL) && (w->Typ() == INT_CMD))
+  {
+    if (w->next == NULL) return ppCONENORMALS3(res, u, v, w);
+  }
+  WerrorS("quickPolytopeViaNormals: unexpected parameters");
   return TRUE;
 }
 
@@ -346,14 +468,16 @@ void bbpolytope_setup()
   b->blackbox_Init=bbpolytope_Init;
   b->blackbox_Copy=bbpolytope_Copy;
   b->blackbox_Assign=bbpolytope_Assign;
-  iiAddCproc("","polytopeViaPoints",FALSE,polytopeViaPoints);
-  iiAddCproc("","polytopeViaInequalities",FALSE,polytopeViaInequalities);
+  iiAddCproc("","polytopeViaVertices",FALSE,polytopeViaVertices);
+  iiAddCproc("","polytopeViaNormals",FALSE,polytopeViaNormals);
+  iiAddCproc("","quickPolytopeViaVertices",FALSE,quickPolytopeViaVertices);
+  iiAddCproc("","quickPolytopeViaNormals",FALSE,quickPolytopeViaNormals);
   iiAddCproc("","getVertices",FALSE,getVertices);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                               
   // iiAddCproc("","getCodimension",FALSE,getAmbientDimension);                                                 
-  // iiAddCproc("","getDimension",FALSE,getDimension);                                                               // iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);  
+  // iiAddCproc("","getDimension",FALSE,getDimension);                                                                // iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);  
   /********************************************************/
   /* the following functions are identical to those in bbcone.cc */
   // iiAddCproc("","setLinearForms",FALSE,setLinearForms);
