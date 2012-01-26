@@ -27,6 +27,7 @@ Singular (see coneViaRays, coneViaNormals).
 @menu
 * coneViaRays::
 * coneViaNormals::
+* quickConeViaNormals::
 * cone related functions::
 @end menu
 @c --------------------------------------------------------------------------------
@@ -92,68 +93,7 @@ c;
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node coneViaNormals,cone related functions,coneViaRays,cone
-@subsection coneViaNormals
-@cindex coneViaNormals
-@table @code
-@item @strong{Syntax:}
-@code{coneViaNormals(} intmat IE @code{)}
-@*@code{coneViaNormals(} intmat IE, intmat E @code{)}
-@*@code{coneViaNormals(} intmat IE, intmat E, int flags @code{)}
-@item @strong{Type:}
-cone
-@item @strong{Purpose:}
-cone consisting of all points x, such that IE*x >= 0 in each component
-and (if stated) E*x = 0;
-inequalities and (if stated) equations will be transformed, getting rid of
-redundancies;
-flags may range between 0,..,3 defining an upper and lower bit
-(0=0*2+0, 1=0*2+1, 2=1*2+0, 3=1*2+1),
-if higher bit is 1, then program assumes each inequality yields a facet,
-if lower bit is 1, then program assumes the kernel of E is the span of the cone,
-if either bit is 0, then program computes the information itself. 
-@item @strong{Example:}
-@smallexample
-@c example
-// Let's define a cone in R^3 given by the following inequalities:
-intmat IE[6][3]=  
-1,3,5,
-1,5,3,
-0,1,-1,
-0,1,1,
-1,0,0,
--1,0,0;
-cone c=coneViaNormals(IE);
-c;
-// Note that the last two inequalities yield x1 = 0, hence also possible:
-intmat IE[4][3]=  
-0,1,-1,
-0,1,1;
-intmat E[1][3]=  
-1,0,0;
-cone c=coneViaNormals(IE,E);
-c;
-// each inequalities gives rise to a facet
-intmat IE[4][3]=  
-0,1,-1,
-0,1,1;
-intmat E[1][3]=  
-1,0,0;
-cone c=coneViaNormals(IE,E,1);
-c;
-// and the kernel of E is the span of the cone
-intmat IE[4][3]=  
-0,1,-1,
-0,1,1;
-intmat E[1][3]=  
-1,0,0;
-cone c=coneViaNormals(IE,E,3);
-c;
-@c example
-@end smallexample
-@end table
-@c --------------------------------------------------------------------------------
-@node coneViaNormals,cone related functions,coneViaRays,cone
+@node coneViaNormals,quickConeViaNormals,coneViaRays,cone
 @subsection coneViaNormals
 @cindex coneViaNormals
 @table @code
@@ -461,8 +401,8 @@ containsRelatively(c,p2);
 @table @code
 @item @strong{Syntax:}
 @code{getAmbientDimension(} cone c @code{)}
-@*code{getAmbientDimension(} fan f @code{)}
-@*code{getAmbientDimension(} polytope p @code{)}
+@*@code{getAmbientDimension(} fan f @code{)}
+@*@code{getAmbientDimension(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -609,7 +549,7 @@ print(E2);
 @table @code
 @item @strong{Syntax:}
 @code{getFacetNormals(} cone c @code{)}
-@*code{getFacetNormals(} polytope p @code{)}
+@*@code{getFacetNormals(} polytope p @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -811,7 +751,7 @@ l2;
 @table @code
 @item @strong{Syntax:}
 @code{getLinearForms(} cone c @code{)}
-@*code{getLinearForms(} polytope p @code{)}
+@*@code{getLinearForms(} polytope p @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -838,7 +778,7 @@ getLinearForms(c);
 @table @code
 @item @strong{Syntax:}
 @code{getMultiplicity(} cone c @code{)}
-@*code{getMultiplicity(} polytope p @code{)}
+@*@code{getMultiplicity(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -1208,7 +1148,7 @@ isSimplicial(f);
 @table @code
 @item @strong{Syntax:}
 @code{setLinearForms(} cone c, intvec linearform @code{)}
-@code*{setLinearForms(} polytope c, intvec linearform @code{)}
+@*@code{setLinearForms(} polytope c, intvec linearform @code{)}
 @item @strong{Type:}
 @item @strong{Purpose:}
 adds the information of a linear form to the cone
@@ -1234,7 +1174,7 @@ getLinearForms(c);
 @table @code
 @item @strong{Syntax:}
 @code{setMultiplicity(} cone c, int multiplicity @code{)}
-@*code{setMultiplicity(} polytope c, int multiplicity @code{)}
+@*@code{setMultiplicity(} polytope c, int multiplicity @code{)}
 @item @strong{Type:}
 @item @strong{Purpose:}
 adds the information of a multiplicity to the cone
@@ -1747,7 +1687,7 @@ p;
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node polytopeViaNormals,polytope related functions,polytopeViaVertices,cone
+@node polytopeViaNormals,polytope related functions,polytopeViaVertices,polytope
 @subsection polytopeViaNormals
 @cindex polytopeViaNormals
 @table @code
@@ -1779,7 +1719,7 @@ p;
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node polytope related functions,,,polytope
+@node polytope related functions,,polytopeViaNormals,polytope
 @subsection polytope related functions
 @cindex polytope related functions
 
