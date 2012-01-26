@@ -8,18 +8,6 @@
 #ifndef OM_ALLOC_DECL_H
 #define OM_ALLOC_DECL_H
 
-#if defined(OM_NDEBUG) && defined(OMALLOC_H)
-#if (SIZEOF_LONG == 8)
-#define OM_T_FREE1
-#define OM_T_FREE3
-#define OM_T_STR
-#define OM_T_ALLOC
-#define OM_T_REALLOC
-#undef OM_NDEBUG
-#endif
-#endif
-
-
 #if (!defined(OM_NDEBUG) && (defined(OM_CHECK) || (defined(OM_HAVE_TRACK) && defined(OM_TRACK)))) || defined(OM_T1)
 
 /*******************************************************************
