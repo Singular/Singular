@@ -904,7 +904,7 @@ void deleteInS (int i,kStrategy strat)
 #ifdef ENTER_USE_MEMMOVE
   memmove(&(strat->S[i]), &(strat->S[i+1]), (strat->sl - i)*sizeof(poly));
   memmove(&(strat->ecartS[i]),&(strat->ecartS[i+1]),(strat->sl - i)*sizeof(int));
-  memmove(&(strat->sevS[i]),&(strat->sevS[i+1]),(strat->sl - i)*sizeof(long));
+  memmove(&(strat->sevS[i]),&(strat->sevS[i+1]),(strat->sl - i)*sizeof(unsigned long));
   memmove(&(strat->S_2_R[i]),&(strat->S_2_R[i+1]),(strat->sl - i)*sizeof(int));
 #else
   int j;
@@ -5983,7 +5983,7 @@ void exitBuchMora (kStrategy strat)
   omFreeSize(strat->R,(strat->tmax)*sizeof(TObject*));
   omFreeSize(strat->sevT, (strat->tmax)*sizeof(unsigned long));
   omFreeSize(strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
-  omFreeSize(strat->sevS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize(strat->S_2_R,IDELEMS(strat->Shdl)*sizeof(int));
   /*- set L: should be empty -*/
   omFreeSize(strat->L,(strat->Lmax)*sizeof(LObject));
