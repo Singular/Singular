@@ -89,7 +89,9 @@ char* bbpolytope_String(blackbox *b, void *d)
 { if (d==NULL) return omStrDup("invalid object");
    else
    {
-     std::string s=bbpolytopeToString(*((gfan::ZCone*)d));
+     gfan::ZCone* zc = (gfan::ZCone*)d;
+     zc->canonicalize();
+     std::string s=bbpolytopeToString(*zc);
      return omStrDup(s.c_str());
    }
 }
@@ -138,13 +140,6 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
      if the k=1, then the extreme rays are known:
      each half-line spans a (different) extreme ray */
   intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
-  if (rays->cols() != linSpace->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           rays->cols(), linSpace->cols());
-    return TRUE;
-  }
   int k = (int)(long)v->Data();
   if ((k < 0) || (k > 1))
   {
@@ -152,10 +147,9 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
     return TRUE;
   }
   k=k*2;
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2;
+  gfan::ZMatrix zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  *zc = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
   zc->canonicalize();
   //k should be passed on to zc; not available yet
   res->rtyp = polytopeID;
@@ -206,13 +200,6 @@ static BOOLEAN pqCONERAYS3(leftv res, leftv u, leftv v)
      if the k=1, then the extreme rays are known:
      each half-line spans a (different) extreme ray */
   intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
-  if (rays->cols() != linSpace->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           rays->cols(), linSpace->cols());
-    return TRUE;
-  }
   int k = (int)(long)v->Data();
   if ((k < 0) || (k > 1))
   {
@@ -220,10 +207,9 @@ static BOOLEAN pqCONERAYS3(leftv res, leftv u, leftv v)
     return TRUE;
   }
   k=k*2;
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2;
+  gfan::ZMatrix zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  *zc = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
   //k should be passed on to zc; not available yet
   res->rtyp = polytopeID;
   res->data = (char *)zc;
