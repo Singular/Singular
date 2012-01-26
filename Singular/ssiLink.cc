@@ -52,7 +52,7 @@
 //#define HAVE_PSELECT
 //#endif
 
-#define SSI_VERSION 2
+#define SSI_VERSION 3
 
 typedef struct
 {
@@ -203,6 +203,30 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   while(r->order[i]!=0)
   {
     fprintf(d->f_write,"%d %d %d ",r->order[i],r->block0[i], r->block1[i]);
+    switch(r->order[i])
+    {
+      case ringorder_a:
+      case ringorder_wp:
+      case ringorder_Wp:
+      case ringorder_ws:
+      case ringorder_Ws:
+      {
+        int ii;
+	for(ii=r->block0[i];ii<=r->block1[i];ii++)
+	  fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
+      }
+      break;
+
+      case ringorder_a64:
+      case ringorder_M:
+      case ringorder_L:
+      case ringorder_aa:
+      case ringorder_IS:
+        Werror("ring oder not implemented for ssi:%d",r->order[i]);
+	break;
+
+      default: break;
+    }
     i++;
   }
   SSI_UNBLOCK_CHLD;
@@ -452,12 +476,38 @@ ring ssiReadRing(ssiInfo *d)
   int *block0=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block1=(int *)omAlloc0((num_ord+1)*sizeof(int));
   SSI_BLOCK_CHLD;
+  int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
   for(i=0;i<num_ord;i++)
   {
-     fscanf(d->f_read,"%d %d %d",&ord[i],&block0[i],&block1[i]);
+    fscanf(d->f_read,"%d %d %d",&ord[i],&block0[i],&block1[i]);
+    switch(ord[i])
+    {
+      case ringorder_a:
+      case ringorder_wp:
+      case ringorder_Wp:
+      case ringorder_ws:
+      case ringorder_Ws:
+      {
+        wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
+        int ii;
+	for(ii=block0[i];ii<=block1[i];ii++)
+	  fscanf(d->f_read,"%d",&(wvhdl[i][ii-block0[i]]));
+      }
+      break;
+
+      case ringorder_a64:
+      case ringorder_M:
+      case ringorder_L:
+      case ringorder_aa:
+      case ringorder_IS:
+        Werror("ring oder not implemented for ssi:%d",ord[i]);
+	break;
+
+      default: break;
+    }
   }
   SSI_UNBLOCK_CHLD;
-  return rDefault(ch,N,names,num_ord,ord,block0,block1);
+  return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
 }
 
 poly ssiReadPoly(ssiInfo *D)

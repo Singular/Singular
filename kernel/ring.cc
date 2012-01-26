@@ -123,7 +123,7 @@ void rChangeCurrRing(ring r)
   }
 }
 
-ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
+ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int** wvhdl)
 {
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
   r->ch    = ch;
@@ -136,8 +136,11 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
   {
     r->names[i]  = omStrDup(n[i]);
   }
-  /*weights: entries for 2 blocks: NULL*/
-  r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int_ptr));
+  /*weights: entries for ord_size  blocks: NULL*/
+  if (wvhdl==NULL)
+    r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int_ptr));
+  else
+    r->wvhdl=wvhdl;
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
