@@ -12,10 +12,8 @@
 #define GLOBALS_H
 // Include facilities needed by several files:
 
-#include "si_gcc_v.h"
-#ifdef SI_GCC2
-#define HAVE_IOSTREAM_H
-#endif
+// the following is not good! TODO: move to all including sources...
+#include "config.h"
 
 #include <stdio.h>
 #ifndef HAVE_IOSTREAM_H

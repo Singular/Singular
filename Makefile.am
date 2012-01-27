@@ -8,7 +8,7 @@ else
   USE_FACTORY =
 endif
  
-PACKAGES=findexec $(ALLOC) $(USE_FACTORY) libpolys kernel numeric Singular
+PACKAGES=findexec $(ALLOC) $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming
 
 SUBDIRS=$(PACKAGES)
 

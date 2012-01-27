@@ -36,7 +36,7 @@ fi
 
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(unistd.h iostream.h)
 
 AC_CHECK_FUNCS(readlink getcwd getwd)
 
@@ -107,6 +107,7 @@ AC_CONFIG_FILES([findexec/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])
+AC_CONFIG_FILES([IntegerProgramming/Makefile])
 AC_CONFIG_FILES([libsingular-config])
 
 AC_OUTPUT
