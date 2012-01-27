@@ -2699,7 +2699,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
         trueres[i] = idCopy(tr[i]);
       }
     }
-    if (/* id_RankFreeModule(trueres[0], currRing) */ trueres[0] > 0)
+    if ( id_RankFreeModule(trueres[0], currRing) > 0)
       typ0 = MODUL_CMD;
     if (syzstr->weights!=NULL)
     {
