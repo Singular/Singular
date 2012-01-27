@@ -213,7 +213,7 @@ Manual/dsum.tst
 Manual/eigenvals.tst
 Manual/elimpartanyr.tst
 Manual/ellipticRandomPoint.tst
-Manual/Example_of_a_procedure_definition_in_a_library:.tst
+; Manual/Example_of_a_procedure_definition_in_a_library:.tst
 Manual/fetch.tst
 Manual/freemodule.tst
 Manual/gauss_col.tst
@@ -496,7 +496,7 @@ Manual/diag_test.tst
 Manual/dual_code.tst
 Manual/elimpart.tst
 Manual/encode.tst
-Manual/Example_of_an_interactive_procedure_definition_and_its_execution:.tst
+; Manual/Example_of_an_interactive_procedure_definition_and_its_execution:.tst
 Manual/extgcd.tst
 Manual/facstd.tst
 Manual/Factorization.tst
