@@ -210,6 +210,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       case ringorder_Wp:
       case ringorder_ws:
       case ringorder_Ws:
+      case ringorder_aa:
       {
         int ii;
 	for(ii=r->block0[i];ii<=r->block1[i];ii++)
@@ -220,7 +221,6 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       case ringorder_a64:
       case ringorder_M:
       case ringorder_L:
-      case ringorder_aa:
       case ringorder_IS:
         Werror("ring oder not implemented for ssi:%d",r->order[i]);
 	break;
@@ -487,6 +487,7 @@ ring ssiReadRing(ssiInfo *d)
       case ringorder_Wp:
       case ringorder_ws:
       case ringorder_Ws:
+      case ringorder_aa:
       {
         wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
         int ii;
@@ -498,7 +499,6 @@ ring ssiReadRing(ssiInfo *d)
       case ringorder_a64:
       case ringorder_M:
       case ringorder_L:
-      case ringorder_aa:
       case ringorder_IS:
         Werror("ring oder not implemented for ssi:%d",ord[i]);
 	break;
