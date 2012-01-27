@@ -2562,8 +2562,9 @@ number nlFarey(number nN, number nP, const coeffs r)
        nlNormalize(z,r);
        break;
     }
-    mpz_mod(D,E,N);
-    mpz_div(tmp,E,N);
+    //mpz_mod(D,E,N);
+    //mpz_div(tmp,E,N);
+    mpz_divmod(tmp,D,E,N);
     mpz_mul(tmp,tmp,B);
     mpz_sub(C,A,tmp);
     mpz_set(E,N);
