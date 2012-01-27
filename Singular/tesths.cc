@@ -7,12 +7,13 @@
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
 
-#include <misc/options.h>
 #include <misc/auxiliary.h>
+#include <misc/options.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -21,7 +22,6 @@
 
 #include <kernel/febase.h>
 #include <kernel/timer.h>
-#include <kernel/fegetopt.h>
 
 #ifdef HAVE_FANS
 #include <kernel/bbcone.h>
@@ -41,6 +41,7 @@
 #include "bigintm.h"
 #include "mmalloc.h"
 #include "tok.h"
+#include "fegetopt.h"
 
 // #include "pyobject_setup.h"
 

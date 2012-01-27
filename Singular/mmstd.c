@@ -31,7 +31,8 @@
 #include <omalloc/omalloc.c> /// UGLY!!!!!!!!!!!!!!!!
 
 #else
-#include <stdlib.h>
+#include <Singular/mmalloc.h>
+
 void freeSize(void* addr, size_t size)
 {
   if (addr) free(addr);

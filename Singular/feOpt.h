@@ -8,7 +8,7 @@
 * ABSTRACT: Declarations for working with Options
 */
 
-#include <kernel/fegetopt.h>
+#include <Singular/fegetopt.h>
 
 #include <Singular/feOptTab.h>
 
@@ -32,9 +32,12 @@ extern struct fe_option feOptSpec[];
 typedef enum {FE_OPT_UNDEF}  feOptIndex;
 #endif
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void feOptHelp(const char* name);
 
 void* feGetOptValue(feOptIndex opt);
 

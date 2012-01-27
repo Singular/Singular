@@ -8,7 +8,7 @@
 * ABSTRACT: Declarations for working with Options
 */
 
-#include <kernel/fegetopt.h>
+#include <Singular/fegetopt.h>
 
 extern const char SHORT_OPTS_STRING[];
 

@@ -13,7 +13,7 @@ NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 
 CXXTEMPLFLAGS = ## -fno-implicit-templates
 
-INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)
 
 ########################### libSingular* #########################
 
@@ -28,8 +28,8 @@ libSingular_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(
 # -fdiagnostics-show-option 
 
 
-libSingular_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
-libSingular_g_la_CPPFLAGS = -DHAVE_CONFIG_H -DLIBSINGULAR
+libSingular_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DLIBSINGULAR
+libSingular_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DLIBSINGULAR
 
 SOURCES =    Minor.cc\
    MinorInterface.cc\
@@ -86,7 +86,6 @@ SOURCES =    Minor.cc\
    slInit_Static.cc\
    ssiLink.cc\
    subexpr.cc\
-   utils.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
@@ -94,8 +93,8 @@ SOURCES =    Minor.cc\
 
 #   slInit_Dynamic.cc
 
-libSingular_la_SOURCES   = $(SOURCES) feOpt.inc feOptTS.inc feOptES.inc 
-libSingular_g_la_SOURCES = $(SOURCES) feOpt.inc feOptTS.inc feOptES.inc 
+libSingular_la_SOURCES   = $(SOURCES) feOpt.inc
+libSingular_g_la_SOURCES = $(SOURCES) feOpt.inc
 
 SingularHEADERS =    Cache.h \
    CacheImplementation.h \
@@ -153,10 +152,8 @@ SingularHEADERS =    Cache.h \
    subexpr.h \
    table.h \
    tok.h \
-   utils.h \
    version.h \
-   walk.h \
-   feOpt.h 
+   walk.h 
 
 nodist_libSingular_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
 nodist_libSingular_g_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
@@ -170,55 +167,45 @@ else
   USE_FACTORY =
 endif
 
-# noinst_HEADERS = feOpt.h
-## TODO: install all the *.inc?!  
-## If not, move feOpt.h to SOURCES and remove *inc from HEADERS
-
 #########################################################
 # handle all the generated *.inc
 
 AM_LDFLAGS = -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel -L${abs_top_builddir}/libpolys/polys  $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
 
-noinst_PROGRAMS = gentable2 gentable1 feOpt feOptES feOptTS
+noinst_PROGRAMS = gentable2 gentable1 feOptGen feOptES feOptTS
 
 gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
 gentable2_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable2_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-gentable2_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+gentable2_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 
 gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
 gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 gentable1_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-gentable1_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+gentable1_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
-feOpt_SOURCES = feOptGen.cc feOptGen.h
-feOpt_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOpt_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+feOptGen_SOURCES = feOptGen.cc feOptGen.h
+feOptGen_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOptGen_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 
 feOptES_SOURCES = feOptGen.cc feOptGen.h
 feOptES_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptES_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR 
+feOptES_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR 
 
 feOptTS_SOURCES = feOptGen.cc feOptGen.h
 feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptTS_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR
+feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR
 
 ########################### Singular* #########################
 
-bin_PROGRAMS = Singular Singularg Singulard Singulardg 
-# libparse
-# libparse_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DSTANDALONE_PARSER
-# libparse_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-# libparse_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-  
-# libparse_SOURCES = libparse.cc
-# nodist_libparse_SOURCES = libSingular.la
- 
-# # libSingular.la -lnumeric 
-# libparse_LDADD = -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-# libparse_LDFLAGS = -static ${AM_LDFLAGS}
+EXTRA_PROGRAMS = Singulard Singulardg libparse
 
+# the "optional_programs" variable should be defined in the configure
+# script, and listed in an AC_SUBST macro
+optional_Singular_programs = 
+
+bin_PROGRAMS = Singular Singularg ESingular TSingular $(optional_Singular_programs)
 
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 Singularg_CFLAGS = -g ${PIPE}
@@ -229,14 +216,14 @@ Singularg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMP
 nodist_Singular_SOURCES = libSingular.la
 nodist_Singularg_SOURCES =  libSingular_g.la
 
-Singular_SOURCES = tesths.cc
-Singularg_SOURCES = tesths.cc
+Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
+Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 
 Singular_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 Singularg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-Singular_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-Singularg_CPPFLAGS = -DHAVE_CONFIG_H 
+Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 Singular_LDFLAGS = -static
 Singularg_LDFLAGS = -static
@@ -248,18 +235,55 @@ Singulardg_CFLAGS = -g ${PIPE}
 Singulard_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 Singulardg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
-Singulard_SOURCES = tesths.cc
+Singulard_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 nodist_Singulard_SOURCES = libSingular.la
 
-Singulardg_SOURCES = tesths.cc
+Singulardg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 nodist_Singulardg_SOURCES =  libSingular_g.la
 
 Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-Singulard_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-Singulardg_CPPFLAGS = -DHAVE_CONFIG_H 
+Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
+
+#### ESingular 
+
+ESingular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+ESingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR -DPROTO 
+ESingular_LDFLAGS = -static ${AM_LDFLAGS} -L${abs_top_builddir}/libpolys/resources -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/misc
+ESingular_LDADD =  -lresources -lreporter -lmisc -lomalloc -lfindexec 
+
+ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
+
+#### same for TSingular 
+
+TSingular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+TSingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR -DPROTO 
+TSingular_LDFLAGS = -static ${AM_LDFLAGS} -L${abs_top_builddir}/libpolys/resources -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/misc
+TSingular_LDADD =  -lresources -lreporter -lmisc -lomalloc -lfindexec 
+
+TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
+# utils.cc utils.h
+
+
+#### libparse 
+libparse_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DSTANDALONE_PARSER
+libparse_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+libparse_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+  
+libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
+# nodist_libparse_SOURCES = libSingular.la
+ 
+# # libSingular.la -lnumeric 
+libparse_LDADD = -lomalloc
+libparse_LDFLAGS = -static ${AM_LDFLAGS}
+# TODO for libparse:
+# multiple definition of `category_out': libparse.cc v.s. utils.cc
+# undefined reference to `iiInitSingularProcinfo(procinfo*, char const*, char const*, int, long, int)'
 
 #########################################################
 # the Singular library (*.lib files)
@@ -272,9 +296,12 @@ nobase_dist_singularlibrary_DATA = LIB/all.lib LIB/tst.lib LIB/help.cnf ${singul
 EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs LIB/help.cnf
 
 # ${nobase_dist_singularlibrary_DATA}
+
 LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
 	$(MKDIR_P) LIB
 	${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
+
+# [ -d ${builddir}/LIB ] || ( $(MKDIR_P) LIB ; cp ${srcdir}/LIB/*.lib ${builddir}/LIB/ )
 
 ########################### TEST #########################
 
@@ -298,8 +325,8 @@ test_s_g_SOURCES = test.cc
 test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-test_s_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-test_s_g_CPPFLAGS = -DHAVE_CONFIG_H 
+test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 test_s_r_LDFLAGS = -static
 test_s_g_LDFLAGS = -static
@@ -319,21 +346,21 @@ test_d_g_SOURCES = test.cc
 test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
-test_d_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-test_d_g_CPPFLAGS = -DHAVE_CONFIG_H 
+test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 #########################################################
 
 # These files are built first
 BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib MOD 
 
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
 MOD: ${top_builddir}/libpolys/tests/MOD
-	ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
+	[ -d ${builddir}/MOD ] || ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
 
-feOpt.inc: feOpt
-	${abs_builddir}/feOpt
+feOpt.inc: feOptGen
+	${abs_builddir}/feOptGen
 
 feOptES.inc: feOptES
 	${abs_builddir}/feOptES

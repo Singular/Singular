@@ -6,10 +6,11 @@
 * ABSTRACT: Implementation of option buisness
 */
 
+#include "config.h"
+#include <kernel/mod2.h>
+
 #include <string.h>
 #include <stdlib.h>
-
-#include <kernel/mod2.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -138,7 +139,6 @@ void* feGetOptValue(feOptIndex opt)
 //
 // Setting Values
 //
-static void feOptHelp(const char* name);
 //
 // Return: NULL -- everything ok
 //         "error-string" on error
@@ -346,7 +346,7 @@ void fePrintOptValues()
 #endif // ! ESingular
 
 // Prints help message
-static void feOptHelp(const char* name)
+void feOptHelp(const char* name)
 {
   int i = 0;
   char tmp[20];

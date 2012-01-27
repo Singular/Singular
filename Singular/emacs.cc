@@ -6,11 +6,17 @@
 * ABSTRACT: Esingular main file
 */
 
+#include "config.h"
+#include <kernel/mod2.h>
+
+
 #include <stdio.h>
 #include <unistd.h>
+
 #ifdef DecAlpha_OSF1
 #define _BSD
 #endif
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -18,9 +24,11 @@
 #ifdef ix86_Win
 #include <windows.h>
 #endif
-#include <kernel/mod2.h>
-#include <Singular/version.h>
+
 #include <omalloc/omalloc.h>
+#include <Singular/version.h>
+#include <resources/feResource.h>
+#include <Singular/feOpt.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
 #define ESINGULAR
@@ -86,13 +94,14 @@ void fePrintReportBug(char* msg, char* file, int line)
 
 }
 
-#include <resources/feResource.cc>
-#include <Singular/feOpt.cc>
-
 void mainUsage()
 {
   error( "Use `%s --help' for a complete list of options\n", feArgv0);
 }
+
+extern char* feResourceDefault(const char id);
+extern char* feResourceDefault(const char* key);
+
 
 int main(int argc, char** argv)
 {
@@ -118,7 +127,9 @@ int main(int argc, char** argv)
   {
     switch(optc)
     {
-        case 'h':
+      case 'h':
+          extern void feOptHelp(const char* name);
+        
           feOptHelp(feArgv0);
           exit(0);
 

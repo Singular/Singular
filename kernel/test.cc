@@ -101,7 +101,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include "multicnt.h"
 #include "eigenval.h"
 #include "units.h"
-#include "fegetopt.h"
 #include "ratgring.h"
 #include "shiftgb.h"
 // #include "mmalloc.h" // move to Singular!?
@@ -117,7 +116,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include "fast_maps.h"
 #include "fast_mult.h"
 #include "febase.h"
-#include "fegetopt.h"
 
 #include "fglmgauss.h"
 #include "fglm.h"

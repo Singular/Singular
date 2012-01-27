@@ -46,7 +46,7 @@ SOURCES = polys.cc febase.cc feread.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
     ratgring.cc shiftgb.cc gfan.cc \
     linearAlgebra.cc nc.cc preimage.cc \
-    fegetopt.c mod2.h 
+    mod2.h 
 
 libkernel_la_SOURCES   = $(SOURCES)
 libkernel_g_la_SOURCES = $(SOURCES)
@@ -63,7 +63,6 @@ KERNELHEADERS = polys.h hutil.h stairc.h ideals.h \
 	fglm.h fglmgauss.h fglmvec.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
-	fegetopt.h \
 	ratgring.h shiftgb.h nc.h \
 	gfan.h bbcone.h bbfan.h \
 	preimage.h longrat.h timer.h kInline.h modulop.h fast_mult.h \

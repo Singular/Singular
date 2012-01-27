@@ -94,7 +94,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <kernel/multicnt.h>
 #include <kernel/eigenval.h>
 #include <kernel/units.h>
-#include <kernel/fegetopt.h>
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
 #include "mmalloc.h"
@@ -110,7 +109,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <kernel/fast_maps.h>
 #include <kernel/fast_mult.h>
 #include <kernel/febase.h>
-#include <kernel/fegetopt.h>
 
 #include <kernel/fglmgauss.h>
 #include <kernel/fglm.h>
@@ -197,7 +195,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "dbm_sl.h"
 #include "distrib.h"
 #include "eigenval_ip.h"
-#include "feOpt.h"
 #include "gms.h"
 #include "grammar.h"
 #include "interpolation.h"
@@ -241,6 +238,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "utils.h"
 #include "walk.h"
 
+#include "fegetopt.h"
 
 void siInit(char *);
 
