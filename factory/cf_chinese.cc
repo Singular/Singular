@@ -196,6 +196,11 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
     CanonicalForm result = 0;
     CanonicalForm c;
     CFIterator i;
+#ifdef HAVE_NTL
+    ZZ NTLq= convertFacCF2NTLZZ (q);
+    ZZ bound;
+    SqrRoot (bound, NTLq/2);
+#endif
     for ( i = f; i.hasTerms(); i++ )
     {
         c = i.coeff();
@@ -208,9 +213,6 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
             bool lessZero= (sign (NTLc) == -1);
             if (lessZero)
               NTL::negate (NTLc, NTLc);
-            ZZ NTLq= convertFacCF2NTLZZ (q);
-            ZZ bound;
-            SqrRoot (bound, NTLq/2);
             ZZ NTLnum, NTLden;
             if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
             {
