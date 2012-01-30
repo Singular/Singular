@@ -1759,8 +1759,8 @@ intmat M[4][3]=
 1,0,2,
 1,2,2,
 1,1,1;
-polytope p=polytopeViaPoints(M);
-p;
+polytope p=polytopeViaVertices(M);
+getVertices(p);
 @c example
 @end smallexample
 @end table
