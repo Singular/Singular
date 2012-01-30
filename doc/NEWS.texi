@@ -24,7 +24,7 @@
 @heading New data types
 @itemize @bullet
 @item fan (@nref{fan})  with 13 new functions (@nref{fan related functions})
-@item cone (@nref{cone}) witrh 34 new functions (@nref{cone related functions}).
+@item cone (@nref{cone}) with 34 new functions (@nref{cone related functions}).
 @item polytope(@nref{polytope}) with 13 new functions (@nref{polytope related functions})
 @end itemize
 
