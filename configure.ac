@@ -97,27 +97,38 @@ AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
 
-AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--enable-omalloc], [use omalloc for the factory]),
-[if test "x$enableval"  = "xyes"; then
-  enable_omalloc=yes
-fi], enable_omalloc=no)
+AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--disable-omalloc], [do NOT use omalloc within the factory]),
+ [if test "x$enableval"  = "xyes"; then
+   ENABLE_OMALLOC=yes
+ fi], ENABLE_OMALLOC=add)
 
-AC_MSG_CHECKING(whether to use omalloc in factory)
-if test "$enable_omalloc" = yes; then
+ENABLE_OMALLOC_ARG="--with-omalloc-dir=$ac_abs_top_srcdir --with-omalloc-extra-dir=$ac_abs_top_builddir --enable-omalloc-trust"
 
+if test "x$ENABLE_OMALLOC" = xadd; then
+   ENABLE_OMALLOC=yes
+   ENABLE_OMALLOC_ARG="--enable-omalloc $ENABLE_OMALLOC_ARG"
+fi
+
+
+
+
+if test "x$ENABLE_FACTORY" = xyes; then
+ AC_MSG_CHECKING(whether to use omalloc in factory)
+ if test "x$ENABLE_OMALLOC" = xyes; then
   AC_MSG_RESULT(yes)
-  ac_configure_args="$ac_configure_args --with-omalloc-dir=$ac_abs_top_srcdir --with-omalloc-extra-dir=$ac_abs_top_builddir --enable-omalloc-trust"
-else
+  ac_configure_args="$ac_configure_args $ENABLE_OMALLOC_ARG"
+ else
   AC_MSG_RESULT(no)
+ fi
 fi
 
-AC_CONFIG_SUBDIRS(omalloc)
+AC_CONFIG_SUBDIRS([omalloc])
 
-if test x$ENABLE_FACTORY = xyes; then
-  AC_CONFIG_SUBDIRS(factory)
+if test "x$ENABLE_FACTORY" = xyes; then
+ AC_CONFIG_SUBDIRS([factory])
 fi
 
-AC_CONFIG_SUBDIRS(libpolys)
+AC_CONFIG_SUBDIRS([libpolys])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([findexec/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])

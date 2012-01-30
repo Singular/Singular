@@ -50,8 +50,8 @@ AC_ARG_WITH(
 
 AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--enable-omalloc],[build for use with omalloc]),
 [if test "x$enableval" = "xyes"; then
-  enable_omalloc=yes
-fi], enable_omalloc=no)
+  ENABLE_OMALLOC=yes
+fi], ENABLE_OMALLOC=no)
 
 AC_ARG_ENABLE(omalloc_trust, AS_HELP_STRING([--enable-omalloc-trust],[do not check the omalloc header]),
 [if test "x$enableval" = "xyes"; then
@@ -59,7 +59,6 @@ AC_ARG_ENABLE(omalloc_trust, AS_HELP_STRING([--enable-omalloc-trust],[do not che
 fi], omalloc_trust=no)
 
 AC_ARG_WITH(omalloc_dir,[AS_HELP_STRING([--with-omalloc-dir=PTH],[location of omalloc])], with_omalloc_dir="$withval", with_omalloc_dir="")
-
 AC_ARG_WITH(omalloc_extra_dir,[AS_HELP_STRING([--with-omalloc-extra-dir=PTH],[optional extra location of omalloc])], with_omalloc_extra_dir="$withval", with_omalloc_extra_dir="")
 
 AC_ARG_ENABLE(
@@ -359,31 +358,38 @@ fi
 #fi
 
 AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
-AC_MSG_CHECKING(whether to use omalloc)
-if test "$enable_omalloc" = yes; then
-
+AC_MSG_CHECKING([whether to use omalloc/omalloc.h])
+if test "x$ENABLE_OMALLOC" = xyes; then
   AC_MSG_RESULT(yes)
-  CPPFLAGS_save="$CPPFLAGS"
+  
   if test "x$with_omalloc_dir" != "x"; then
     OMALLOC_CFLAGS="-I${with_omalloc_dir}"
+    OMALLOC_LDFLAGS="-L${with_omalloc_dir}/omalloc"
   fi
   if test "x$with_omalloc_extra_dir" != "x"; then
     OMALLOC_CFLAGS="$OMALLOC_CFLAGS -I${with_omalloc_extra_dir}"
+    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc"
   fi
-  if test $omalloc_trust = no; then
-    AC_CHECK_HEADERS(omalloc/omalloc.h)
-    if test "$ac_cv_header_omalloc_omalloc_h" != yes; then
-      AC_MSG_ERROR([You asked for omalloc, but it was not found])
-    fi
+  
+  CPPFLAGS_save="$CPPFLAGS"
+  # adding $with_omalloc_dir and $with_omalloc_extra_dir to header search path
+  CPPFLAGS="$CPPFLAGS ${OMALLOC_CFLAGS}"
+  if test "x$omalloc_trust" = xno; then
+    AC_CHECK_HEADERS([omalloc/omalloc.h],,AC_MSG_ERROR([You asked for omalloc but it cannot be found with your default header search path]))
   else
-    AC_MSG_NOTICE(trusting the omalloc locations given)
-    AC_MSG_RESULT()
+    AC_CHECK_HEADERS([omalloc/omalloc.h],,AC_MSG_WARN([trusting the omalloc locations given: ${OMALLOC_CFLAGS}]))
   fi
-  AC_DEFINE(HAVE_OMALLOC,1, [omalloc support])
+  CPPFLAGS="$CPPFLAGS_save"
+
+  AC_DEFINE(HAVE_OMALLOC, 1, [omalloc support])
+ 
   AC_SUBST(OMALLOC_CFLAGS)
+  AC_SUBST(OMALLOC_LDFLAGS)
 else
   AC_MSG_RESULT(no)
 fi
+
+AM_CONDITIONAL([ENABLE_OMALLOC],[test "x$ENABLE_OMALLOC" = xyes])
 
 
 AH_TEMPLATE([CF_USE_INLINE], [define to use "configurable inline methods" (see cf_inline.cc)])
