@@ -1,4 +1,4 @@
-# Singular help browser file $Id$
+# Singular help browser file
 # each line which start with an # is a comment
 # each other line defines a (possible) help browser
 # the format of the entries is: <name>!<requirements>!<shell command>
@@ -36,6 +36,7 @@ firefox!xDhE:firefox:!firefox %h &
 konqueror!xDhE:konqueror:!konqueror %h &
 galeon!xDhE:galeon:!galeon -n %h &
 netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
+safari!xh:E:/Applications/Safari.app:!open /Applications/Safari.app %h
 tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
 xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
 info!xiE:info:!info -f %i --node='%n'
