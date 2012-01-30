@@ -1752,7 +1752,7 @@ intmat
 vertices of p 
 @item @strong{Example:}
 @smallexample
-@c computed example getCone cones.doc:818
+@c example
 intmat M[4][3]=
 1,0,0,
 1,2,0,
@@ -1761,6 +1761,6 @@ intmat M[4][3]=
 1,1,1;
 polytope p=polytopeViaPoints(M);
 p;
-@c end example getCone cones.doc:818
+@c example
 @end smallexample
 @end table
