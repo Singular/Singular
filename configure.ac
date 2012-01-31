@@ -1,5 +1,7 @@
 AC_INIT([singular],[3.1.3.sw])
 
+_AC_SRCDIRS(["$ac_dir"])
+
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([.])
 
@@ -94,6 +96,20 @@ AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
 
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
+
+AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--enable-omalloc], [use omalloc for the factory]),
+[if test "x$enableval"  = "xyes"; then
+  enable_omalloc=yes
+fi], enable_omalloc=no)
+
+AC_MSG_CHECKING(whether to use omalloc in factory)
+if test "$enable_omalloc" = yes; then
+
+  AC_MSG_RESULT(yes)
+  ac_configure_args="$ac_configure_args --with-omalloc-dir=$ac_abs_top_srcdir --with-omalloc-extra-dir=$ac_abs_top_builddir --enable-omalloc-trust"
+else
+  AC_MSG_RESULT(no)
+fi
 
 AC_CONFIG_SUBDIRS(omalloc)
 

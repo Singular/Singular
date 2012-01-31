@@ -6,7 +6,7 @@ SUBDIRS=$(PACKAGES)
 CXXTEMPLFLAGS=
 ## -fno-implicit-templates
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS}
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS}
 
 AM_LDFLAGS =  -L${builddir} -L${builddir}/libfac
 

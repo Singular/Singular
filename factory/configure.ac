@@ -1,3 +1,4 @@
+
 dnl # emacs edit mode for this file is -*- sh -*-
 dnl # $Id$
 
@@ -47,11 +48,19 @@ AC_ARG_WITH(
   ,
   [with_Singular=yes])
 
+AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--enable-omalloc],[build for use with omalloc]),
+[if test "x$enableval" = "xyes"; then
+  enable_omalloc=yes
+fi], enable_omalloc=no)
 
-AC_ARG_WITH(
-  omalloc,
-  [AS_HELP_STRING([--with-omalloc],[build for use with omalloc])])
+AC_ARG_ENABLE(omalloc_trust, AS_HELP_STRING([--enable-omalloc-trust],[do not check the omalloc header]),
+[if test "x$enableval" = "xyes"; then
+  omalloc_trust=yes
+fi], omalloc_trust=no)
 
+AC_ARG_WITH(omalloc_dir,[AS_HELP_STRING([--with-omalloc-dir=PTH],[location of omalloc])], with_omalloc_dir="$withval", with_omalloc_dir="")
+
+AC_ARG_WITH(omalloc_extra_dir,[AS_HELP_STRING([--with-omalloc-extra-dir=PTH],[optional extra location of omalloc])], with_omalloc_extra_dir="$withval", with_omalloc_extra_dir="")
 
 AC_ARG_ENABLE(
   cf-inline,
@@ -227,8 +236,6 @@ if test "x$enable_timing" != xno; then
                   \`configure --disable-timing') ])
 fi
 
-AC_CHECK_HEADERS(omalloc.h,,)
-
 # font-lock-trick: '
 
 #
@@ -351,36 +358,31 @@ fi
 #  AC_DEFINE([HAS_ARITHMETIC_SHIFT],[1],[HAS_ARITHMETIC_SHIFT])
 #fi
 
-AC_MSG_CHECKING(whether to use omalloc)
-
-if test "$with_omalloc" = yes; then
-  if test "$ac_cv_header_omalloc_h" != yes; then
-    if test "$enable_omalloc" = yes; then
-       warn_omalloc=yes
-    else
-       with_omalloc=no
-    fi
-  fi
-else
-  if test "$with_omalloc" != no; then
-    if test "$enable_omalloc" = yes; then
-      if test "$ac_cv_header_omalloc_h" != yes; then
-        warn_omalloc=yes
-      fi
-      with_omalloc=yes
-    else
-      with_omalloc=no
-    fi
-  fi
-fi
-
 AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
-if test "$with_omalloc" = yes; then
-  AC_DEFINE([HAVE_OMALLOC],[1])
-fi
-AC_MSG_RESULT($with_omalloc)
-if test "$warn_omalloc" = yes; then
-  AC_MSG_WARN(did not find omalloc.h -- install before compiling)
+AC_MSG_CHECKING(whether to use omalloc)
+if test "$enable_omalloc" = yes; then
+
+  AC_MSG_RESULT(yes)
+  CPPFLAGS_save="$CPPFLAGS"
+  if test "x$with_omalloc_dir" != "x"; then
+    OMALLOC_CFLAGS="-I${with_omalloc_dir}"
+  fi
+  if test "x$with_omalloc_extra_dir" != "x"; then
+    OMALLOC_CFLAGS="$OMALLOC_CFLAGS -I${with_omalloc_extra_dir}"
+  fi
+  if test $omalloc_trust = no; then
+    AC_CHECK_HEADERS(omalloc/omalloc.h)
+    if test "$ac_cv_header_omalloc_omalloc_h" != yes; then
+      AC_MSG_ERROR([You asked for omalloc, but it was not found])
+    fi
+  else
+    AC_MSG_NOTICE(trusting the omalloc locations given)
+    AC_MSG_RESULT()
+  fi
+  AC_DEFINE(HAVE_OMALLOC,1, [omalloc support])
+  AC_SUBST(OMALLOC_CFLAGS)
+else
+  AC_MSG_RESULT(no)
 fi
 
 
