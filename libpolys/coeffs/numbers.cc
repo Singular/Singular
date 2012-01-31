@@ -75,6 +75,17 @@ BOOLEAN ndDBTest(number, const char *, const int, const coeffs)
 }
 #endif
 
+number ndFarey(number,number,const coeffs r)
+{
+  Werror("farey not implemented for (c=%d)",getCoeffType(r));
+  return NULL;
+}
+number ndChineseRemainder(number *,number *,int,const coeffs r)
+{
+  Werror("ChineseRemainder not implemented for (c=%d)",getCoeffType(r));
+  return n_Init(0,r); 
+}
+
 
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
@@ -120,7 +131,6 @@ void ndSetChar(const coeffs) {}
 
 number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
 
-number ndChineseRemainder(number *,number *,int,const coeffs r){ return n_Init(0,r); }
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
 int ndDivComp(number, number, const coeffs) { return 2; }
@@ -240,7 +250,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     // temp. removed to catch all the coeffs which miss to implement this!
 
     n->cfChineseRemainder = ndChineseRemainder;
-    n->cfFarey = ndGcd;
+    n->cfFarey = ndFarey;
 
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;

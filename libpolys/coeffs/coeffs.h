@@ -162,8 +162,6 @@ struct n_Procs_s
    number  (*cfGetNumerator)(number &n, const coeffs r);
    number  (*cfGcd)(number a, number b, const coeffs r);
    number  (*cfLcm)(number a, number b, const coeffs r);
-   number  (*cfChineseRemainder)(number *a, number *b, int rl, const coeffs r);
-   number  (*cfFarey)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
 
@@ -177,6 +175,13 @@ struct n_Procs_s
    /// coeffs dst
    /// TODO: to be exchanged with a map!!!
    number  (*cfInit_bigint)(number i, const coeffs dummy, const coeffs dst);
+
+   /// rational reconstruction: best rational with mod p=n
+   number  (*cfFarey)(number p, number n, const coeffs);
+
+   /// chinese remainder
+   /// returns X with X mod q[i]=x[i], i=0..rl-1
+   number  (*cfChineseRemainder)(number *x, number *q,int rl, const coeffs);
 
 #ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
@@ -595,14 +600,12 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 static inline number n_ChineseRemainder(number *a, number *b, int rl, const coeffs r)
 {
   assume(r != NULL);
-  assume(getCoeffType(r)==n_Q);
   return r->cfChineseRemainder(a,b,rl,r);
 }
 
 static inline number n_Farey(number a, number b, const coeffs r)
 {
   assume(r != NULL);
-  assume(getCoeffType(r)==n_Q);
   return r->cfFarey(a,b,r);
 }
 

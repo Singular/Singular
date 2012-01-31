@@ -1589,7 +1589,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
       else
         x[i]=nlInit(0);
     }
-    number n=nlChineseRemainder(x,q,rl);
+    number n=n_ChineseRemainder(x,q,rl,currRing->cf);
     for(i=rl-1;i>=0;i--)
     {
       nlDelete(&(x[i]),currRing);
@@ -1610,80 +1610,76 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  if ((currRing==NULL) || rField_is_Q(currRing))
+  lists c=(lists)u->CopyD(); // list of ideal
+  lists pl=NULL;
+  intvec *p=NULL;
+  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
+  else                    p=(intvec*)v->Data();
+  int rl=c->nr+1;
+  ideal result;
+  ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
+  int i;
+  int return_type=c->m[0].Typ();
+  if ((return_type!=IDEAL_CMD)
+  && (return_type!=MODUL_CMD)
+  && (return_type!=MATRIX_CMD))
   {
-    lists c=(lists)u->CopyD(); // list of ideal
-    lists pl=NULL;
-    intvec *p=NULL;
-    if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
-    else                    p=(intvec*)v->Data();
-    int rl=c->nr+1;
-    ideal result;
-    ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
-    int i;
-    int return_type=c->m[0].Typ();
-    if ((return_type!=IDEAL_CMD)
-    && (return_type!=MODUL_CMD)
-    && (return_type!=MATRIX_CMD))
+    WerrorS("ideal/module/matrix expected");
+    omFree(x); // delete c
+    return TRUE;
+  }
+  for(i=rl-1;i>=0;i--)
+  {
+    if (c->m[i].Typ()!=return_type)
     {
-      WerrorS("ideal/module/matrix expected");
+      Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
       omFree(x); // delete c
       return TRUE;
     }
+    x[i]=((ideal)c->m[i].Data());
+  }
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  if (p!=NULL)
+  {
     for(i=rl-1;i>=0;i--)
     {
-      if (c->m[i].Typ()!=return_type)
+      q[i]=n_Init((*p)[i], currRing->cf);
+    }
+  }
+  else
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (pl->m[i].Typ()==INT_CMD)
       {
-        Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
+        q[i]=n_Init((int)(long)pl->m[i].Data(),currRing->cf);
+      }
+      else if (pl->m[i].Typ()==BIGINT_CMD)
+      {
+        q[i]=n_Init_bigint((number)(pl->m[i].Data()),coeffs_BIGINT,currRing->cf);
+      }
+      else
+      {
+        Werror("bigint expected at pos %d",i+1);
+        for(i++;i<rl;i++)
+        {
+          n_Delete(&(q[i]),currRing->cf);
+        }
         omFree(x); // delete c
+        omFree(q); // delete pl
         return TRUE;
       }
-      x[i]=((ideal)c->m[i].Data());
     }
-    number *q=(number *)omAlloc(rl*sizeof(number));
-    if (p!=NULL)
-    {
-      for(i=rl-1;i>=0;i--)
-      {
-        q[i]=n_Init((*p)[i], currRing->cf);
-      }
-    }
-    else
-    {
-      for(i=rl-1;i>=0;i--)
-      {
-        if (pl->m[i].Typ()==INT_CMD)
-        {
-          q[i]=n_Init((int)(long)pl->m[i].Data(),currRing->cf);
-        }
-        else if (pl->m[i].Typ()==BIGINT_CMD)
-        {
-          q[i]=n_Copy((number)(pl->m[i].Data()),coeffs_BIGINT);
-        }
-        else
-        {
-          Werror("bigint expected at pos %d",i+1);
-          for(i++;i<rl;i++)
-          {
-            n_Delete(&(q[i]),currRing->cf);
-          }
-          omFree(x); // delete c
-          omFree(q); // delete pl
-          return TRUE;
-        }
-      }
-    }
-    result=id_ChineseRemainder(x,q,rl,currRing);
-    for(i=rl-1;i>=0;i--)
-    {
-      n_Delete(&(q[i]),coeffs_BIGINT);
-    }
-    omFree(q);
-    res->data=(char *)result;
-    res->rtyp=return_type;
-    return FALSE;
   }
-  else return TRUE;
+  result=id_ChineseRemainder(x,q,rl,currRing);
+  for(i=rl-1;i>=0;i--)
+  {
+    n_Delete(&(q[i]),currRing->cf);
+  }
+  omFree(q);
+  res->data=(char *)result;
+  res->rtyp=return_type;
+  return FALSE;
 }
 #endif
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
