@@ -326,72 +326,66 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
-        g= prodMod0 (S, M);
-        g= mod (g*LCBuf, M);
-        g /= content (g);
-        if (fdivides (LC (g), LCBuf))
+        S.insert (LCBuf);
+        g= prodMod (S, M);
+        S.removeFirst();
+        g /= content (g, x);
+        if (fdivides (g, buf, quot))
         {
-          S.insert (LCBuf);
-          g= prodMod (S, M);
-          S.removeFirst();
-          g /= content (g, x);
-          if (fdivides (g, buf, quot))
-          {
-            buf2= g (y - eval, y);
-            buf2 /= Lc (buf2);
+          buf2= g (y - eval, y);
+          buf2 /= Lc (buf2);
 
-            if (!k && beta.level() == 1)
+          if (!k && beta.level() == 1)
+          {
+            if (degree (buf2, alpha) < degMipoBeta)
             {
-              if (degree (buf2, alpha) < degMipoBeta)
+              buf= quot;
+              LCBuf= LC (buf, x);
+              recombination= true;
+              appendTestMapDown (result, buf2, info, source, dest);
+              trueFactor= true;
+            }
+          }
+          else
+          {
+            if (!isInExtension (buf2, gamma, k, delta, source, dest))
+            {
+              buf= quot;
+              LCBuf= LC (buf, x);
+              recombination= true;
+              appendTestMapDown (result, buf2, info, source, dest);
+              trueFactor= true;
+            }
+          }
+          if (trueFactor)
+          {
+            T= Difference (T, S);
+            // compute new possible degree pattern
+            bufDegs2= DegreePattern (T);
+            bufDegs1.intersect (bufDegs2);
+            bufDegs1.refine ();
+            if (T.length() < 2*s || T.length() == s ||
+                bufDegs1.getLength() == 1)
+            {
+              delete [] v;
+              if (recombination)
               {
-                buf= quot;
-                LCBuf= LC (buf, x);
-                recombination= true;
-                appendTestMapDown (result, buf2, info, source, dest);
-                trueFactor= true;
+                appendTestMapDown (result, buf (y - eval, y), info, source,
+                                    dest);
+                F= 1;
+                return result;
+              }
+              else
+              {
+                appendMapDown (result, F (y - eval, y), info, source, dest);
+                F= 1;
+                return result;
               }
             }
-            else
-            {
-              if (!isInExtension (buf2, gamma, k, delta, source, dest))
-              {
-                buf= quot;
-                LCBuf= LC (buf, x);
-                recombination= true;
-                appendTestMapDown (result, buf2, info, source, dest);
-                trueFactor= true;
-              }
-            }
-            if (trueFactor)
-            {
-              T= Difference (T, S);
-              // compute new possible degree pattern
-              bufDegs2= DegreePattern (T);
-              bufDegs1.intersect (bufDegs2);
-              bufDegs1.refine ();
-              if (T.length() < 2*s || T.length() == s ||
-                  bufDegs1.getLength() == 1)
-              {
-                delete [] v;
-                if (recombination)
-                {
-                  appendTestMapDown (result, buf (y - eval, y), info, source,
-                                     dest);
-                  F= 1;
-                  return result;
-                }
-                else
-                {
-                  appendMapDown (result, F (y - eval, y), info, source, dest);
-                  F= 1;
-                  return result;
-                }
-              }
-              trueFactor= false;
-              TT= copy (T);
-              indexUpdate (v, s, T.length(), nosubset);
-              if (nosubset) break;
-            }
+            trueFactor= false;
+            TT= copy (T);
+            indexUpdate (v, s, T.length(), nosubset);
+            if (nosubset) break;
           }
         }
       }
@@ -506,49 +500,43 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
-        g= prodMod0 (S, M);
-        g= mod (g*LCBuf, M);
-        g /= content (g);
-        if (fdivides (LC(g), LCBuf))
+        S.insert (LCBuf);
+        g= prodMod (S, M);
+        S.removeFirst();
+        g /= content (g, x);
+
+        if (fdivides (g, buf, quot))
         {
-          S.insert (LCBuf);
-          g= prodMod (S, M);
-          S.removeFirst();
-          g /= content (g, x);
+          recombination= true;
+          result.append (g);
+          buf= quot;
+          LCBuf= LC (buf, x);
+          T= Difference (T, S);
 
-          if (fdivides (g, buf, quot))
+          // compute new possible degree pattern
+          bufDegs2= DegreePattern (T);
+          bufDegs1.intersect (bufDegs2);
+          bufDegs1.refine ();
+          if (T.length() < 2*s || T.length() == s ||
+              bufDegs1.getLength() == 1)
           {
-            recombination= true;
-            result.append (g);
-            buf= quot;
-            LCBuf= LC (buf, x);
-            T= Difference (T, S);
-
-            // compute new possible degree pattern
-            bufDegs2= DegreePattern (T);
-            bufDegs1.intersect (bufDegs2);
-            bufDegs1.refine ();
-            if (T.length() < 2*s || T.length() == s ||
-                bufDegs1.getLength() == 1)
+            delete [] v;
+            if (recombination)
             {
-              delete [] v;
-              if (recombination)
-              {
-                result.append (buf);
-                F= 1;
-                return result;
-              }
-              else
-              {
-                result= CFList (F);
-                F= 1;
-                return result;
-              }
+              result.append (buf);
+              F= 1;
+              return result;
             }
-            TT= copy (T);
-            indexUpdate (v, s, T.length(), nosubset);
-            if (nosubset) break;
+            else
+            {
+              result= CFList (F);
+              F= 1;
+              return result;
+            }
           }
+          TT= copy (T);
+          indexUpdate (v, s, T.length(), nosubset);
+          if (nosubset) break;
         }
       }
     }
@@ -643,30 +631,24 @@ earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
       continue;
     else
     {
-      g= i.getItem() (0, 1);
-      g *= LCBuf;
-      g= mod (g, M);
-      if (fdivides (LC (g), LCBuf))
+      g= mulMod2 (i.getItem(), LCBuf, M);
+      g /= content (g, x);
+      if (fdivides (g, buf, quot))
       {
-        g= mulMod2 (i.getItem(), LCBuf, M);
-        g /= content (g, x);
-        if (fdivides (g, buf, quot))
-        {
-          result.append (g);
-          buf= quot;
-          d -= degree (g);
-          LCBuf= LC (buf, x);
-          T= Difference (T, CFList (i.getItem()));
+        result.append (g);
+        buf= quot;
+        d -= degree (g);
+        LCBuf= LC (buf, x);
+        T= Difference (T, CFList (i.getItem()));
 
-          // compute new possible degree pattern
-          bufDegs2= DegreePattern (T);
-          bufDegs1.intersect (bufDegs2);
-          bufDegs1.refine ();
-          if (bufDegs1.getLength() <= 1)
-          {
-            result.append (buf);
-            break;
-          }
+        // compute new possible degree pattern
+        bufDegs2= DegreePattern (T);
+        bufDegs1.intersect (bufDegs2);
+        bufDegs1.refine ();
+        if (bufDegs1.getLength() <= 1)
+        {
+          result.append (buf);
+          break;
         }
       }
     }
@@ -716,56 +698,50 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
       continue;
     else
     {
-      g= i.getItem() (0, 1);
-      g *= LCBuf;
-      g= mod (g, M);
-      if (fdivides (LC (g), LCBuf))
+      g= mulMod2 (i.getItem(), LCBuf, M);
+      g /= content (g, x);
+      if (fdivides (g, buf, quot))
       {
-        g= mulMod2 (i.getItem(), LCBuf, M);
-        g /= content (g, x);
-        if (fdivides (g, buf, quot))
+        buf2= g (y - eval, y);
+        buf2 /= Lc (buf2);
+
+        if (!k && beta == x)
         {
-          buf2= g (y - eval, y);
-          buf2 /= Lc (buf2);
-
-          if (!k && beta == x)
+          if (degree (buf2, alpha) < degMipoBeta)
           {
-            if (degree (buf2, alpha) < degMipoBeta)
-            {
-              appendTestMapDown (result, buf2, info, source, dest);
-              buf= quot;
-              d -= degree (g);
-              LCBuf= LC (buf, x);
-              trueFactor= true;
-            }
+            appendTestMapDown (result, buf2, info, source, dest);
+            buf= quot;
+            d -= degree (g);
+            LCBuf= LC (buf, x);
+            trueFactor= true;
           }
-          else
+        }
+        else
+        {
+          if (!isInExtension (buf2, gamma, k, delta, source, dest))
           {
-            if (!isInExtension (buf2, gamma, k, delta, source, dest))
-            {
-              appendTestMapDown (result, buf2, info, source, dest);
-              buf= quot;
-              d -= degree (g);
-              LCBuf= LC (buf, x);
-              trueFactor= true;
-            }
+            appendTestMapDown (result, buf2, info, source, dest);
+            buf= quot;
+            d -= degree (g);
+            LCBuf= LC (buf, x);
+            trueFactor= true;
           }
-          if (trueFactor)
-          {
-            T= Difference (T, CFList (i.getItem()));
+        }
+        if (trueFactor)
+        {
+          T= Difference (T, CFList (i.getItem()));
 
-            // compute new possible degree pattern
-            bufDegs2= DegreePattern (T);
-            bufDegs1.intersect (bufDegs2);
-            bufDegs1.refine ();
-            trueFactor= false;
-            if (bufDegs1.getLength() <= 1)
-            {
-              buf= buf (y - eval, y);
-              buf /= Lc (buf);
-              appendMapDown (result, buf, info, source, dest);
-              break;
-            }
+          // compute new possible degree pattern
+          bufDegs2= DegreePattern (T);
+          bufDegs1.intersect (bufDegs2);
+          bufDegs1.refine ();
+          trueFactor= false;
+          if (bufDegs1.getLength() <= 1)
+          {
+            buf= buf (y - eval, y);
+            buf /= Lc (buf);
+            appendMapDown (result, buf, info, source, dest);
+            break;
           }
         }
       }
