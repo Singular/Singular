@@ -5,15 +5,13 @@
 
 // #include <factory/templates/ftmpl_array.cc>
 
-#include <factory/factory.h>
+#include "factory.h"
 
-
-
-#include <factory/templates/ftmpl_array.cc>
-#include <factory/templates/ftmpl_factor.cc>
-#include <factory/templates/ftmpl_list.cc>
-#include <factory/templates/ftmpl_functions.h>
-#include <factory/templates/ftmpl_matrix.cc>
+#include "templates/ftmpl_array.cc"
+#include "templates/ftmpl_factor.cc"
+#include "templates/ftmpl_list.cc"
+#include "templates/ftmpl_functions.h"
+#include "templates/ftmpl_matrix.cc"
 
 template class Factor<CanonicalForm>;
 template class List<CFFactor>;

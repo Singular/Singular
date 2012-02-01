@@ -8,7 +8,7 @@
 
 #include "testdata.h"
 
-main()
+int main(void)
 {
   ofstream output1("IP/testmatrix1");
   random_matrix(3,4,0,5,output1);
@@ -64,5 +64,6 @@ main()
   random_problems(3+5,5,0,5,output6b);
   ofstream output6c("IP/testproblem6c");
   random_problems(3*5,5,0,5,output6c);
+  return 0;
 }
 #endif
