@@ -677,11 +677,11 @@ getLiftPrecisions (const CanonicalForm& F, ///< [in] a bivariate poly
 /// No combinations of more than one factor are tested. Lift bound and possible
 /// degree pattern are updated.
 ///
-/// @return @a earlyFactorDetection returns a list of factors of F (possibly in-
-///         complete), in case of success. Otherwise an empty list.
 /// @sa factorRecombination(), extEarlyFactorDetection()
-CFList
+void
 earlyFactorDetection (
+           CFList& reconstructedFactors, ///< [in,out] list of reconstructed
+                                         ///< factors
            CanonicalForm& F,       ///< [in,out] poly to be factored, returns
                                    ///< poly divided by detected factors in case
                                    ///< of success
@@ -689,6 +689,7 @@ earlyFactorDetection (
                                    ///< @a deg, returns a list of factors
                                    ///< without detected factors
            int& adaptedLiftBound,  ///< [in,out] adapted lift bound
+           int*& factorsFoundIndex,///< [in,out] factors already considered
            DegreePattern& degs,    ///< [in,out] degree pattern, is updated
                                    ///< whenever we find a factor
            bool& success,          ///< [in,out] indicating success
@@ -699,12 +700,11 @@ earlyFactorDetection (
 /// No combinations of more than one factor are tested. Lift bound and possible
 /// degree pattern are updated.
 ///
-/// @return @a extEarlyFactorDetection returns a list of factors of F (possibly
-///         incomplete), whose shift to zero is reversed, in case of success.
-///         Otherwise an empty list.
 /// @sa factorRecombination(), earlyFactorDetection()
-CFList
+void
 extEarlyFactorDetection (
+        CFList& reconstructedFactors, ///< [in,out] list of reconstructed
+                                      ///< factors
         CanonicalForm& F,          ///< [in,out] poly to be factored, returns
                                    ///< poly divided by detected factors in case
                                    ///< of success
@@ -712,6 +712,7 @@ extEarlyFactorDetection (
                                    ///< @a deg, returns a list of factors
                                    ///< without detected factors
         int& adaptedLiftBound,     ///< [in,out] adapted lift bound
+        int*& factorsFoundIndex,   ///< [in,out] factors already considered
         DegreePattern& degs,       ///< [in,out] degree pattern, is updated
                                    ///< whenever we find a factor
         bool& success,             ///< [in,out] indicating success
