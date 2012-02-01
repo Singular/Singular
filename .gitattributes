@@ -1,0 +1,2 @@
+*.lib ident
+.git* export-ignore

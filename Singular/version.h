@@ -1,4 +1,4 @@
 /* dummy version.h */
-#define feVersionId " spielwiese "
-#include "config.h"
+// #include "config.h"
+#define feVersionId "$Id$"
 
