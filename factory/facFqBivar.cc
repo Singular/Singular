@@ -239,7 +239,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 /// multivariate polynomials over a finite field" by L Bernardin.
 CFList
 extFactorRecombination (CFList& factors, CanonicalForm& F,
-                        const CanonicalForm& M, const ExtensionInfo& info,
+                        const CanonicalForm& N, const ExtensionInfo& info,
                         DegreePattern& degs, const CanonicalForm& eval, int s,
                         int thres)
 {
@@ -255,6 +255,8 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   CanonicalForm delta= info.getDelta();
   int k= info.getGFDegree();
 
+  CanonicalForm M= N;
+  int l= degree (N);
   Variable y= F.mvar();
   Variable x= Variable (1);
   CFList source, dest;
@@ -360,6 +362,9 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
           if (trueFactor)
           {
             T= Difference (T, S);
+            l -= degree (g);
+            M= power (y, l);
+
             // compute new possible degree pattern
             bufDegs2= DegreePattern (T);
             bufDegs1.intersect (bufDegs2);
@@ -434,7 +439,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 /// multivariate polynomials over a finite field" by L Bernardin.
 CFList
 factorRecombination (CFList& factors, CanonicalForm& F,
-                     const CanonicalForm& M, DegreePattern& degs, int s,
+                     const CanonicalForm& N, DegreePattern& degs, int s,
                      int thres
                     )
 {
@@ -453,6 +458,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             (LC (F, 1)*prodMod (factors, M) == F));
   CFList T, S;
 
+  CanonicalForm M= N;
+  int l= degree (N);
   T= factors;
   CFList result;
   Variable y= Variable (2);
@@ -512,6 +519,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           buf= quot;
           LCBuf= LC (buf, x);
           T= Difference (T, S);
+          l -= degree (g);
+          M= power (y, l);
 
           // compute new possible degree pattern
           bufDegs2= DegreePattern (T);
