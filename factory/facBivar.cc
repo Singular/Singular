@@ -359,7 +359,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
   A= A (y + evaluation, y);
 
-  int liftBound= degree (A, y) + 1 + degree (LC(A, x));
+  int liftBound= degree (A, y) + 1;
 
   ExtensionInfo dummy= ExtensionInfo (false);
   bool earlySuccess= false;
