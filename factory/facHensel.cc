@@ -236,6 +236,166 @@ mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
   return A;
 }
 
+CanonicalForm
+mulFLINTQTrunc (const CanonicalForm& F, const CanonicalForm& G, int m)
+{
+  if (F.inCoeffDomain() || G.inCoeffDomain())
+    return mod (F*G, power (Variable (1), m));
+  Variable alpha;
+  if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
+    return mulFLINTQaTrunc (F, G, alpha, m);
+
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  CanonicalForm denA= bCommonDen (A);
+  CanonicalForm denB= bCommonDen (B);
+
+  A *= denA;
+  B *= denB;
+  fmpz_poly_t FLINTA,FLINTB;
+  convertFacCF2Fmpz_poly_t (FLINTA, A);
+  convertFacCF2Fmpz_poly_t (FLINTB, B);
+  fmpz_poly_mullow (FLINTA, FLINTA, FLINTB, m);
+  denA *= denB;
+  A= convertFmpz_poly_t2FacCF (FLINTA, F.mvar());
+  A /= denA;
+  fmpz_poly_clear (FLINTA);
+  fmpz_poly_clear (FLINTB);
+
+  return A;
+}
+
+CanonicalForm uniReverse (const CanonicalForm& F, int d)
+{
+  if (d == 0)
+    return F;
+  if (F.inCoeffDomain())
+    return F*power (Variable (1),d);
+  Variable x= Variable (1);
+  CanonicalForm result= 0;
+  CFIterator i= F;
+  while (d - i.exp() < 0)
+    i++;
+
+  for (; i.hasTerms() && (d - i.exp() >= 0); i++)
+    result += i.coeff()*power (x, d - i.exp());
+  return result;
+}
+
+CanonicalForm
+newtonInverse (const CanonicalForm& F, const int n)
+{
+  int l= ilog2(n);
+
+  CanonicalForm g= F [0];
+
+  ASSERT (!g.isZero(), "expected a unit");
+
+  if (!g.isOne())
+    g = 1/g;
+  Variable x= Variable (1);
+  CanonicalForm result;
+  int exp= 0;
+  if (n & 1)
+  {
+    result= g;
+    exp= 1;
+  }
+  CanonicalForm h;
+
+  for (int i= 1; i <= l; i++)
+  {
+    h= mulNTL (g, mod (F, power (x, (1 << i))));
+    h= mod (h, power (x, (1 << i)) - 1);
+    h= div (h, power (x, (1 << (i - 1))));
+    g -= power (x, (1 << (i - 1)))*
+         mulFLINTQTrunc (g, h, 1 << (i-1));
+
+    if (n & (1 << i))
+    {
+      if (exp)
+      {
+        h= mulNTL (result, mod (F, power (x, exp + (1 << i))));
+        h= mod (h, power (x, exp + (1 << i)) - 1);
+        h= div (h, power (x, exp));
+        result -= power(x, exp)*mulFLINTQTrunc (g, h, 1 << i);
+        exp += (1 << i);
+      }
+      else
+      {
+        exp= (1 << i);
+        result= g;
+      }
+    }
+  }
+
+  return result;
+}
+
+void
+newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
+              CanonicalForm& R)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+  Variable x= Variable (1);
+  int degA= degree (A, x);
+  int degB= degree (B, x);
+  int m= degA - degB;
+
+  if (m < 0)
+  {
+    R= A;
+    Q= 0;
+    return;
+  }
+
+  if (degB <= 1)
+    divrem (A, B, Q, R);
+  else
+  {
+    R= uniReverse (A, degA);
+
+    CanonicalForm revB= uniReverse (B, degB);
+    CanonicalForm buf= revB;
+    revB= newtonInverse (revB, m + 1);
+    Q= mulFLINTQTrunc (R, revB, m + 1);
+    Q= uniReverse (Q, m);
+
+    R= A - mulNTL (Q, B);
+  }
+}
+
+void
+newtonDiv (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+  Variable x= Variable (1);
+  int degA= degree (A, x);
+  int degB= degree (B, x);
+  int m= degA - degB;
+
+  if (m < 0)
+  {
+    Q= 0;
+    return;
+  }
+
+  if (degB <= 1)
+    Q= div (A, B);
+  else
+  {
+    CanonicalForm R= uniReverse (A, degA);
+
+    CanonicalForm revB= uniReverse (B, degB);
+    revB= newtonInverse (revB, m + 1);
+    Q= mulFLINTQTrunc (R, revB, m + 1);
+    Q= uniReverse (Q, m);
+  }
+}
+
 #endif
 
 static
@@ -605,8 +765,11 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
       return modFLINTQ (F, G);
     else
-      //TODO newtonDivrem
-     return mod (F, G);
+    {
+      CanonicalForm Q, R;
+      newtonDivrem (F, G, Q, R);
+      return R;
+    }
 #else
     return mod (F, G);
 #endif
@@ -665,8 +828,11 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
       return divFLINTQ (F,G);
     else
-      //TODO newtonDivrem
-      return div (F, G);
+    {
+      CanonicalForm Q;
+      newtonDiv (F, G, Q);
+      return Q;
+    }
 #else
     return div (F, G);
 #endif
