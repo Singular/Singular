@@ -47,35 +47,17 @@ void kronSub (fmpz_poly_t result, const CanonicalForm& A, int d)
     if (i.coeff().inBaseDomain())
       convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d), i.coeff());
     else
-      for (j=i.coeff(); j.hasTerms(); j++)
-        convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result,i.exp()*d+j.exp()), j.coeff());
+      for (j= i.coeff(); j.hasTerms(); j++)
+        convertCF2Fmpz (fmpz_poly_get_coeff_ptr (result, i.exp()*d+j.exp()),
+                        j.coeff());
   }
   _fmpz_poly_normalise(result);
-
-
-  /*fmpz_t coeff;
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inBaseDomain())
-    {
-      convertCF2Fmpz (coeff, i.coeff());
-      fmpz_poly_set_coeff_fmpz (result, i.exp()*d, coeff);
-    }
-    else
-    {
-      for (CFIterator j= i.coeff();j.hasTerms(); j++)
-      {
-        convertCF2Fmpz (coeff, j.coeff());
-        fmpz_poly_set_coeff_fmpz (result, i.exp()*d+j.exp(), coeff);
-      }
-    }
-  }
-  fmpz_clear (coeff);
-  _fmpz_poly_normalise (result);*/
 }
 
 
-CanonicalForm reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha, const CanonicalForm& den)
+CanonicalForm
+reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha,
+              const CanonicalForm& den)
 {
   Variable x= Variable (1);
 
@@ -84,7 +66,7 @@ CanonicalForm reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha, c
   int degf= fmpz_poly_degree (F);
   int k= 0;
   int degfSubK;
-  int repLength;
+  int repLength, j;
   CanonicalForm coeff;
   fmpz* tmp;
   while (degf >= k)
@@ -96,7 +78,7 @@ CanonicalForm reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha, c
     else
       repLength= degfSubK + 1;
 
-    for (int j= 0; j < repLength; j++)
+    for (j= 0; j < repLength; j++)
     {
       tmp= fmpz_poly_get_coeff_ptr (F, j+k);
       if (!fmpz_is_zero (tmp))
@@ -112,7 +94,9 @@ CanonicalForm reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha, c
   return result;
 }
 
-CanonicalForm mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G, const Variable& alpha)
+CanonicalForm
+mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G,
+            const Variable& alpha)
 {
   CanonicalForm A= F;
   CanonicalForm B= G;
@@ -166,7 +150,7 @@ mulFLINTQ (const CanonicalForm& F, const CanonicalForm& G)
   return A;
 }
 
-CanonicalForm
+/*CanonicalForm
 mulFLINTQ2 (const CanonicalForm& F, const CanonicalForm& G)
 {
   CanonicalForm A= F;
@@ -181,7 +165,7 @@ mulFLINTQ2 (const CanonicalForm& F, const CanonicalForm& G)
   fmpq_poly_clear (FLINTA);
   fmpq_poly_clear (FLINTB);
   return A;
-}
+}*/
 
 CanonicalForm
 divFLINTQ (const CanonicalForm& F, const CanonicalForm& G)
@@ -220,7 +204,8 @@ modFLINTQ (const CanonicalForm& F, const CanonicalForm& G)
 }
 
 CanonicalForm
-mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G, const Variable& alpha, int m)
+mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
+                 const Variable& alpha, int m)
 {
   CanonicalForm A= F;
   CanonicalForm B= G;
@@ -556,7 +541,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G)
   {
     Variable alpha;
 #ifdef HAVE_FLINT
-    if ((!F.inCoeffDomain() && !G.inCoeffDomain()) && (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha)))
+    if ((!F.inCoeffDomain() && !G.inCoeffDomain()) &&
+        (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha)))
     {
       CanonicalForm result= mulFLINTQa (F, G, alpha);
       return result;
@@ -619,6 +605,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
       return modFLINTQ (F, G);
     else
+      //TODO newtonDivrem
      return mod (F, G);
 #else
     return mod (F, G);
@@ -678,6 +665,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
       return divFLINTQ (F,G);
     else
+      //TODO newtonDivrem
       return div (F, G);
 #else
     return div (F, G);
@@ -793,13 +781,14 @@ void kronSubFp (nmod_poly_t result, const CanonicalForm& A, int d)
 
   nmod_poly_t buf;
 
+  int j, k, bufRepLength;
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     convertFacCF2nmod_poly_t (buf, i.coeff());
 
-    int k= i.exp()*d;
-    int bufRepLength= (int) nmod_poly_length (buf);
-    for (int j= 0; j < bufRepLength; j++)
+    k= i.exp()*d;
+    bufRepLength= (int) nmod_poly_length (buf);
+    for (j= 0; j < bufRepLength; j++)
       nmod_poly_set_coeff_ui (result, j + k, nmod_poly_get_coeff_ui (buf, j));
     nmod_poly_clear (buf);
   }
@@ -890,6 +879,7 @@ zz_pX kronSubFp (const CanonicalForm& A, int d)
   resultp= result.rep.elts();
   zz_pX buf;
   zz_p *bufp;
+  int j, k, bufRepLength;
 
   for (CFIterator i= A; i.hasTerms(); i++)
   {
@@ -898,10 +888,10 @@ zz_pX kronSubFp (const CanonicalForm& A, int d)
     else
       buf= convertFacCF2NTLzzpX (i.coeff());
 
-    int k= i.exp()*d;
+    k= i.exp()*d;
     bufp= buf.rep.elts();
-    int bufRepLength= (int) buf.rep.length();
-    for (int j= 0; j < bufRepLength; j++)
+    bufRepLength= (int) buf.rep.length();
+    for (j= 0; j < bufRepLength; j++)
       resultp [j + k]= bufp [j];
   }
   result.normalize();
@@ -922,6 +912,7 @@ zz_pEX kronSub (const CanonicalForm& A, int d, const Variable& alpha)
   zz_pE *buf1p;
   zz_pX buf2;
   zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+  int j, k, buf1RepLength;
 
   for (CFIterator i= A; i.hasTerms(); i++)
   {
@@ -933,10 +924,10 @@ zz_pEX kronSub (const CanonicalForm& A, int d, const Variable& alpha)
     else
       buf1= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
 
-    int k= i.exp()*d;
+    k= i.exp()*d;
     buf1p= buf1.rep.elts();
-    int buf1RepLength= (int) buf1.rep.length();
-    for (int j= 0; j < buf1RepLength; j++)
+    buf1RepLength= (int) buf1.rep.length();
+    for (j= 0; j < buf1RepLength; j++)
       resultp [j + k]= buf1p [j];
   }
   result.normalize();
@@ -961,6 +952,7 @@ kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
   zz_pE *bufp;
   zz_pX buf2;
   zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+  int j, k, kk, bufRepLength;
 
   for (CFIterator i= A; i.hasTerms(); i++)
   {
@@ -972,11 +964,11 @@ kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
     else
       buf= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
 
-    int k= i.exp()*d;
-    int kk= (degAy - i.exp())*d;
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
     bufp= buf.rep.elts();
-    int bufRepLength= (int) buf.rep.length();
-    for (int j= 0; j < bufRepLength; j++)
+    bufRepLength= (int) buf.rep.length();
+    for (j= 0; j < bufRepLength; j++)
     {
       subA1p [j + k] += bufp [j];
       subA2p [j + kk] += bufp [j];
@@ -999,16 +991,17 @@ kronSubRecipro (zz_pX& subA1, zz_pX& subA2,const CanonicalForm& A, int d)
   subA2p= subA2.rep.elts();
   zz_pX buf;
   zz_p *bufp;
+  int j, k, kk, bufRepLength;
 
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     buf= convertFacCF2NTLzzpX (i.coeff());
 
-    int k= i.exp()*d;
-    int kk= (degAy - i.exp())*d;
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
     bufp= buf.rep.elts();
-    int bufRepLength= (int) buf.rep.length();
-    for (int j= 0; j < bufRepLength; j++)
+    bufRepLength= (int) buf.rep.length();
+    for (j= 0; j < bufRepLength; j++)
     {
       subA1p [j + k] += bufp [j];
       subA2p [j + kk] += bufp [j];
@@ -1048,8 +1041,7 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
   int lg= d*k;
   int degfSubLf= degf;
   int deggSubLg= degg-lg;
-  int repLengthBuf2;
-  int repLengthBuf1;
+  int repLengthBuf2, repLengthBuf1, ind, tmp;
   zz_pE zzpEZero= zz_pE();
 
   while (degf >= lf || lg >= 0)
@@ -1063,7 +1055,7 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
     buf1.rep.SetLength((long) repLengthBuf1);
 
     buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
       buf1p [ind]= fp [ind + lf];
     buf1.normalize();
 
@@ -1078,10 +1070,8 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
 
     buf2.rep.SetLength ((long) repLengthBuf2);
     buf2p= buf2.rep.elts();
-    for (int ind= 0; ind < repLengthBuf2; ind++)
-    {
+    for (ind= 0; ind < repLengthBuf2; ind++)
       buf2p [ind]= gp [ind + lg];
-    }
     buf2.normalize();
 
     repLengthBuf2= buf2.rep.length();
@@ -1090,11 +1080,11 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
     buf3p= buf3.rep.elts();
     buf2p= buf2.rep.elts();
     buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
       buf3p [ind]= buf1p [ind];
-    for (int ind= repLengthBuf1; ind < d; ind++)
+    for (ind= repLengthBuf1; ind < d; ind++)
       buf3p [ind]= zzpEZero;
-    for (int ind= 0; ind < repLengthBuf2; ind++)
+    for (ind= 0; ind < repLengthBuf2; ind++)
       buf3p [ind + d]= buf2p [ind];
     buf3.normalize();
 
@@ -1114,8 +1104,8 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
     {
       if (repLengthBuf2 > degfSubLf + 1)
         degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (int ind= 0; ind < tmp; ind++)
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      for (ind= 0; ind < tmp; ind++)
         gp [ind + lg] -= buf1p [ind];
     }
 
@@ -1125,7 +1115,7 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
     buf2p= buf2.rep.elts();
     if (degfSubLf >= 0)
     {
-      for (int ind= 0; ind < repLengthBuf2; ind++)
+      for (ind= 0; ind < repLengthBuf2; ind++)
         fp [ind + lf] -= buf2p [ind];
     }
   }
@@ -1163,8 +1153,7 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
   int lg= d*k;
   int degfSubLf= degf;
   int deggSubLg= degg-lg;
-  int repLengthBuf2;
-  int repLengthBuf1;
+  int repLengthBuf2, repLengthBuf1, ind, tmp;
   zz_p zzpZero= zz_p();
   while (degf >= lf || lg >= 0)
   {
@@ -1177,7 +1166,7 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
     buf1.rep.SetLength((long) repLengthBuf1);
 
     buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
       buf1p [ind]= fp [ind + lf];
     buf1.normalize();
 
@@ -1192,7 +1181,7 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
 
     buf2.rep.SetLength ((long) repLengthBuf2);
     buf2p= buf2.rep.elts();
-    for (int ind= 0; ind < repLengthBuf2; ind++)
+    for (ind= 0; ind < repLengthBuf2; ind++)
       buf2p [ind]= gp [ind + lg];
 
     buf2.normalize();
@@ -1204,11 +1193,11 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
     buf3p= buf3.rep.elts();
     buf2p= buf2.rep.elts();
     buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
       buf3p [ind]= buf1p [ind];
-    for (int ind= repLengthBuf1; ind < d; ind++)
+    for (ind= repLengthBuf1; ind < d; ind++)
       buf3p [ind]= zzpZero;
-    for (int ind= 0; ind < repLengthBuf2; ind++)
+    for (ind= 0; ind < repLengthBuf2; ind++)
       buf3p [ind + d]= buf2p [ind];
     buf3.normalize();
 
@@ -1228,8 +1217,8 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
     {
       if (repLengthBuf2 > degfSubLf + 1)
         degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (int ind= 0; ind < tmp; ind++)
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      for (ind= 0; ind < tmp; ind++)
         gp [ind + lg] -= buf1p [ind];
     }
     if (lg < 0)
@@ -1238,7 +1227,7 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
     buf2p= buf2.rep.elts();
     if (degfSubLf >= 0)
     {
-      for (int ind= 0; ind < repLengthBuf2; ind++)
+      for (ind= 0; ind < repLengthBuf2; ind++)
         fp [ind + lf] -= buf2p [ind];
     }
   }
@@ -1260,8 +1249,7 @@ CanonicalForm reverseSubst (const zz_pEX& F, int d, const Variable& alpha)
   int i= 0;
   int degf= deg(f);
   int k= 0;
-  int degfSubK;
-  int repLength;
+  int degfSubK, repLength, j;
   while (degf >= k)
   {
     degfSubK= degf - k;
@@ -1272,7 +1260,7 @@ CanonicalForm reverseSubst (const zz_pEX& F, int d, const Variable& alpha)
 
     buf.rep.SetLength ((long) repLength);
     bufp= buf.rep.elts();
-    for (int j= 0; j < repLength; j++)
+    for (j= 0; j < repLength; j++)
       bufp [j]= fp [j + k];
     buf.normalize();
 
@@ -1298,8 +1286,7 @@ CanonicalForm reverseSubstFp (const zz_pX& F, int d)
   int i= 0;
   int degf= deg(f);
   int k= 0;
-  int degfSubK;
-  int repLength;
+  int degfSubK, repLength, j;
   while (degf >= k)
   {
     degfSubK= degf - k;
@@ -1310,7 +1297,7 @@ CanonicalForm reverseSubstFp (const zz_pX& F, int d)
 
     buf.rep.SetLength ((long) repLength);
     bufp= buf.rep.elts();
-    for (int j= 0; j < repLength; j++)
+    for (j= 0; j < repLength; j++)
       bufp [j]= fp [j + k];
     buf.normalize();
 
@@ -1467,7 +1454,8 @@ mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
 
 #ifdef HAVE_FLINT
 void
-kronSubRecipro (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A, int d)
+kronSubRecipro (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A,
+                int d)
 {
   int degAy= degree (A);
   mp_limb_t ninv= n_preinvert_limb (getCharacteristic());
@@ -1476,17 +1464,28 @@ kronSubRecipro (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A, in
 
   nmod_poly_t buf;
 
+  int k, kk, j, bufRepLength;
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     convertFacCF2nmod_poly_t (buf, i.coeff());
 
-    int k= i.exp()*d;
-    int kk= (degAy - i.exp())*d;
-    int bufRepLength= (int) nmod_poly_length (buf);
-    for (int j= 0; j < bufRepLength; j++)
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
+    bufRepLength= (int) nmod_poly_length (buf);
+    for (j= 0; j < bufRepLength; j++)
     {
-      nmod_poly_set_coeff_ui (subA1, j + k, n_addmod (nmod_poly_get_coeff_ui (subA1, j+k), nmod_poly_get_coeff_ui (buf, j), getCharacteristic())); //TODO muß man subA1 coeffs von subA1 vorher auf null setzen??
-      nmod_poly_set_coeff_ui (subA2, j + kk, n_addmod (nmod_poly_get_coeff_ui (subA2, j + kk),nmod_poly_get_coeff_ui (buf, j), getCharacteristic()));
+      nmod_poly_set_coeff_ui (subA1, j + k,
+                              n_addmod (nmod_poly_get_coeff_ui (subA1, j+k),
+                                        nmod_poly_get_coeff_ui (buf, j),
+                                        getCharacteristic()
+                                       )
+                             );
+      nmod_poly_set_coeff_ui (subA2, j + kk,
+                              n_addmod (nmod_poly_get_coeff_ui (subA2, j + kk),
+                                        nmod_poly_get_coeff_ui (buf, j),
+                                        getCharacteristic()
+                                       )
+                             );
     }
     nmod_poly_clear (buf);
   }
@@ -1495,7 +1494,8 @@ kronSubRecipro (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A, in
 }
 
 void
-kronSubRecipro (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A, int d)
+kronSubRecipro (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A,
+                int d)
 {
   int degAy= degree (A);
   fmpz_poly_init2 (subA1, d*(degAy + 2));
@@ -1504,17 +1504,17 @@ kronSubRecipro (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A, in
   fmpz_poly_t buf;
   fmpz_t coeff1, coeff2;
 
+  int k, kk, j, bufRepLength;
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     convertFacCF2Fmpz_poly_t (buf, i.coeff());
 
-    int k= i.exp()*d;
-    int kk= (degAy - i.exp())*d;
-    int bufRepLength= (int) fmpz_poly_length (buf);
-    for (int j= 0; j < bufRepLength; j++)
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
+    bufRepLength= (int) fmpz_poly_length (buf);
+    for (j= 0; j < bufRepLength; j++)
     {
-      fmpz_poly_get_coeff_fmpz (coeff1, subA1, j+k); //TODO muß man subA1 coeffs von subA1 vorher auf null setzen??
-                                                     // vielleicht ist es schneller fmpz_poly_get_ptr zu nehmen
+      fmpz_poly_get_coeff_fmpz (coeff1, subA1, j+k);
       fmpz_poly_get_coeff_fmpz (coeff2, buf, j);
       fmpz_add (coeff1, coeff1, coeff2);
       fmpz_poly_set_coeff_fmpz (subA1, j + k, coeff1);
@@ -1544,8 +1544,7 @@ CanonicalForm reverseSubstQ (const fmpz_poly_t F, int d)
   int i= 0;
   int degf= fmpz_poly_degree(f);
   int k= 0;
-  int degfSubK;
-  int repLength;
+  int degfSubK, repLength, j;
   fmpz_t coeff;
   while (degf >= k)
   {
@@ -1557,7 +1556,7 @@ CanonicalForm reverseSubstQ (const fmpz_poly_t F, int d)
 
     fmpz_poly_init2 (buf, repLength);
     fmpz_init (coeff);
-    for (int j= 0; j < repLength; j++)
+    for (j= 0; j < repLength; j++)
     {
       fmpz_poly_get_coeff_fmpz (coeff, f, j + k);
       fmpz_poly_set_coeff_fmpz (buf, j, coeff);
@@ -1592,9 +1591,6 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
 
 
   nmod_poly_t buf1,buf2, buf3;
-  /*nmod_poly_init_preinv (buf1, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (buf2, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (buf3, getCharacteristic(), ninv);*/
 
   if (nmod_poly_length (f) < (long) d*(k+1)) //zero padding
     nmod_poly_fit_length (f,(long)d*(k+1));
@@ -1605,9 +1601,7 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
   int lg= d*k;
   int degfSubLf= degf;
   int deggSubLg= degg-lg;
-  int repLengthBuf2;
-  int repLengthBuf1;
-  //zz_p zzpZero= zz_p();
+  int repLengthBuf2, repLengthBuf1, ind, tmp;
   while (degf >= lf || lg >= 0)
   {
     if (degfSubLf >= d)
@@ -1616,15 +1610,11 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
       repLengthBuf1= 0;
     else
       repLengthBuf1= degfSubLf + 1;
-    //cout << "repLengthBuf1= " << repLengthBuf1 << "\n";
-    //cout << "nmod_poly_length (buf1)= " << nmod_poly_length (buf1) << "\n";
     nmod_poly_init2_preinv (buf1, getCharacteristic(), ninv, repLengthBuf1);
-    //cout << "nmod_poly_length (buf1)= " << nmod_poly_length (buf1) << "\n";
 
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
       nmod_poly_set_coeff_ui (buf1, ind, nmod_poly_get_coeff_ui (f, ind+lf));
     _nmod_poly_normalise (buf1);
-    //cout << "nmod_poly_length (buf1)= " << nmod_poly_length (buf1) << "\n";
 
     repLengthBuf1= nmod_poly_length (buf1);
 
@@ -1635,24 +1625,20 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
     else
       repLengthBuf2= deggSubLg + 1;
 
-    //cout << "repLengthBuf2= " << repLengthBuf2 << "\n";
-    //cout << "nmod_poly_length (buf2)= " << nmod_poly_length (buf2) << "\n";
     nmod_poly_init2_preinv (buf2, getCharacteristic(), ninv, repLengthBuf2);
-    //cout << "nmod_poly_length (buf2)= " << nmod_poly_length (buf2) << "\n";
-    for (int ind= 0; ind < repLengthBuf2; ind++)
+    for (ind= 0; ind < repLengthBuf2; ind++)
       nmod_poly_set_coeff_ui (buf2, ind, nmod_poly_get_coeff_ui (g, ind + lg));
 
     _nmod_poly_normalise (buf2);
-    //cout << "nmod_poly_length (buf2)= " << nmod_poly_length (buf2) << "\n";
     repLengthBuf2= nmod_poly_length (buf2);
 
     nmod_poly_init2_preinv (buf3, getCharacteristic(), ninv, repLengthBuf2 + d);
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
       nmod_poly_set_coeff_ui (buf3, ind, nmod_poly_get_coeff_ui (buf1, ind));
-    for (int ind= repLengthBuf1; ind < d; ind++)
+    for (ind= repLengthBuf1; ind < d; ind++)
       nmod_poly_set_coeff_ui (buf3, ind, 0);
-    for (int ind= 0; ind < repLengthBuf2; ind++)
-      nmod_poly_set_coeff_ui (buf3, ind + d, nmod_poly_get_coeff_ui (buf2, ind));
+    for (ind= 0; ind < repLengthBuf2; ind++)
+      nmod_poly_set_coeff_ui (buf3, ind+d, nmod_poly_get_coeff_ui (buf2, ind));
     _nmod_poly_normalise (buf3);
 
     result += convertnmod_poly_t2FacCF (buf3, x)*power (y, i);
@@ -1669,12 +1655,14 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
     {
       if (repLengthBuf2 > degfSubLf + 1)
         degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (int ind= 0; ind < tmp; ind++)
-      //{
-        nmod_poly_set_coeff_ui (g, ind + lg, n_submod (nmod_poly_get_coeff_ui (g, ind + lg), nmod_poly_get_coeff_ui (buf1, ind), getCharacteristic()));
-        //cout << "nmod_poly_get_coeff_ui (g, ind + lg)= " << nmod_poly_get_coeff_ui (g, ind + lg) << "\n";
-      //}
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      for (ind= 0; ind < tmp; ind++)
+        nmod_poly_set_coeff_ui (g, ind + lg,
+                                n_submod (nmod_poly_get_coeff_ui (g, ind + lg),
+                                          nmod_poly_get_coeff_ui (buf1, ind),
+                                          getCharacteristic()
+                                         )
+                               );
     }
     if (lg < 0)
     {
@@ -1685,20 +1673,19 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
     }
     if (degfSubLf >= 0)
     {
-      for (int ind= 0; ind < repLengthBuf2; ind++)
-        nmod_poly_set_coeff_ui (f, ind + lf, n_submod (nmod_poly_get_coeff_ui (f, ind + lf), nmod_poly_get_coeff_ui (buf2, ind), getCharacteristic()));
+      for (ind= 0; ind < repLengthBuf2; ind++)
+        nmod_poly_set_coeff_ui (f, ind + lf,
+                                n_submod (nmod_poly_get_coeff_ui (f, ind + lf),
+                                          nmod_poly_get_coeff_ui (buf2, ind),
+                                          getCharacteristic()
+                                         )
+                               );
     }
     nmod_poly_clear (buf1);
     nmod_poly_clear (buf2);
     nmod_poly_clear (buf3);
-    /*nmod_poly_init_preinv (buf1, getCharacteristic(), ninv);
-    nmod_poly_init_preinv (buf2, getCharacteristic(), ninv);
-    nmod_poly_init_preinv (buf3, getCharacteristic(), ninv);*/
   }
 
-  /*nmod_poly_clear (buf1);
-  nmod_poly_clear (buf2);
-  nmod_poly_clear (buf3);*/
   nmod_poly_clear (f);
   nmod_poly_clear (g);
 
@@ -1721,9 +1708,6 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
 
 
   fmpz_poly_t buf1,buf2, buf3;
-  /*nmod_poly_init_preinv (buf1, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (buf2, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (buf3, getCharacteristic(), ninv);*/
 
   if (fmpz_poly_length (f) < (long) d*(k+1)) //zero padding
     fmpz_poly_fit_length (f,(long)d*(k+1));
@@ -1734,9 +1718,7 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
   int lg= d*k;
   int degfSubLf= degf;
   int deggSubLg= degg-lg;
-  int repLengthBuf2;
-  int repLengthBuf1;
-  //zz_p zzpZero= zz_p();
+  int repLengthBuf2, repLengthBuf1, ind, tmp;
   fmpz_t tmp1, tmp2;
   while (degf >= lf || lg >= 0)
   {
@@ -1746,18 +1728,15 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
       repLengthBuf1= 0;
     else
       repLengthBuf1= degfSubLf + 1;
-    //cout << "repLengthBuf1= " << repLengthBuf1 << "\n";
-    //cout << "nmod_poly_length (buf1)= " << nmod_poly_length (buf1) << "\n";
-    fmpz_poly_init2 (buf1, repLengthBuf1);
-    //cout << "nmod_poly_length (buf1)= " << nmod_poly_length (buf1) << "\n";
 
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    fmpz_poly_init2 (buf1, repLengthBuf1);
+
+    for (ind= 0; ind < repLengthBuf1; ind++)
     {
       fmpz_poly_get_coeff_fmpz (tmp1, f, ind + lf);
       fmpz_poly_set_coeff_fmpz (buf1, ind, tmp1);
     }
     _fmpz_poly_normalise (buf1);
-    //cout << "nmod_poly_length (buf1)= " << nmod_poly_length (buf1) << "\n";
 
     repLengthBuf1= fmpz_poly_length (buf1);
 
@@ -1768,29 +1747,26 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
     else
       repLengthBuf2= deggSubLg + 1;
 
-    //cout << "repLengthBuf2= " << repLengthBuf2 << "\n";
-    //cout << "nmod_poly_length (buf2)= " << nmod_poly_length (buf2) << "\n";
     fmpz_poly_init2 (buf2, repLengthBuf2);
-    //cout << "nmod_poly_length (buf2)= " << nmod_poly_length (buf2) << "\n";
-    for (int ind= 0; ind < repLengthBuf2; ind++)
+
+    for (ind= 0; ind < repLengthBuf2; ind++)
     {
       fmpz_poly_get_coeff_fmpz (tmp1, g, ind + lg);
       fmpz_poly_set_coeff_fmpz (buf2, ind, tmp1);
     }
 
     _fmpz_poly_normalise (buf2);
-    //cout << "nmod_poly_length (buf2)= " << nmod_poly_length (buf2) << "\n";
     repLengthBuf2= fmpz_poly_length (buf2);
 
     fmpz_poly_init2 (buf3, repLengthBuf2 + d);
-    for (int ind= 0; ind < repLengthBuf1; ind++)
+    for (ind= 0; ind < repLengthBuf1; ind++)
     {
       fmpz_poly_get_coeff_fmpz (tmp1, buf1, ind);  //oder fmpz_set (fmpz_poly_get_coeff_ptr (buf3, ind),fmpz_poly_get_coeff_ptr (buf1, ind))
       fmpz_poly_set_coeff_fmpz (buf3, ind, tmp1);
     }
-    for (int ind= repLengthBuf1; ind < d; ind++)
+    for (ind= repLengthBuf1; ind < d; ind++)
       fmpz_poly_set_coeff_ui (buf3, ind, 0);
-    for (int ind= 0; ind < repLengthBuf2; ind++)
+    for (ind= 0; ind < repLengthBuf2; ind++)
     {
       fmpz_poly_get_coeff_fmpz (tmp1, buf2, ind);
       fmpz_poly_set_coeff_fmpz (buf3, ind + d, tmp1);
@@ -1811,14 +1787,13 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
     {
       if (repLengthBuf2 > degfSubLf + 1)
         degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (int ind= 0; ind < tmp; ind++)
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      for (ind= 0; ind < tmp; ind++)
       {
         fmpz_poly_get_coeff_fmpz (tmp1, g, ind + lg);
         fmpz_poly_get_coeff_fmpz (tmp2, buf1, ind);
         fmpz_sub (tmp1, tmp1, tmp2);
         fmpz_poly_set_coeff_fmpz (g, ind + lg, tmp1);
-        //cout << "nmod_poly_get_coeff_ui (g, ind + lg)= " << nmod_poly_get_coeff_ui (g, ind + lg) << "\n";
       }
     }
     if (lg < 0)
@@ -1830,7 +1805,7 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
     }
     if (degfSubLf >= 0)
     {
-      for (int ind= 0; ind < repLengthBuf2; ind++)
+      for (ind= 0; ind < repLengthBuf2; ind++)
       {
         fmpz_poly_get_coeff_fmpz (tmp1, f, ind + lf);
         fmpz_poly_get_coeff_fmpz (tmp2, buf2, ind);
@@ -1841,14 +1816,8 @@ reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
     fmpz_poly_clear (buf1);
     fmpz_poly_clear (buf2);
     fmpz_poly_clear (buf3);
-    /*nmod_poly_init_preinv (buf1, getCharacteristic(), ninv);
-    nmod_poly_init_preinv (buf2, getCharacteristic(), ninv);
-    nmod_poly_init_preinv (buf3, getCharacteristic(), ninv);*/
   }
 
-  /*nmod_poly_clear (buf1);
-  nmod_poly_clear (buf2);
-  nmod_poly_clear (buf3);*/
   fmpz_poly_clear (f);
   fmpz_poly_clear (g);
   fmpz_clear (tmp1);
@@ -1868,13 +1837,11 @@ CanonicalForm reverseSubstFp (const nmod_poly_t F, int d)
   nmod_poly_set (f, F);
 
   nmod_poly_t buf;
-  //nmod_poly_init_preinv (buf, getCharacteristic(), ninv);
   CanonicalForm result= 0;
   int i= 0;
   int degf= nmod_poly_degree(f);
   int k= 0;
-  int degfSubK;
-  int repLength;
+  int degfSubK, repLength, j;
   while (degf >= k)
   {
     degfSubK= degf - k;
@@ -1884,22 +1851,16 @@ CanonicalForm reverseSubstFp (const nmod_poly_t F, int d)
       repLength= degfSubK + 1;
 
     nmod_poly_init2_preinv (buf, getCharacteristic(), ninv, repLength);
-    for (int j= 0; j < repLength; j++)
+    for (j= 0; j < repLength; j++)
       nmod_poly_set_coeff_ui (buf, j, nmod_poly_get_coeff_ui (f, j + k));
-    //printf ("after set\n");
     _nmod_poly_normalise (buf);
-    //printf ("after normalise\n");
 
     result += convertnmod_poly_t2FacCF (buf, x)*power (y, i);
     i++;
     k= d*i;
     nmod_poly_clear (buf);
-    //nmod_poly_init_preinv (buf, getCharacteristic(), ninv);
   }
-  //printf ("after while\n");
-  //nmod_poly_clear (buf);
   nmod_poly_clear (f);
-  //printf ("after clear\n");
 
   return result;
 }
@@ -1917,48 +1878,28 @@ mulMod2FLINTFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   nmod_poly_init_preinv (F1, getCharacteristic(), ninv);
   nmod_poly_init_preinv (F2, getCharacteristic(), ninv);
   kronSubRecipro (F1, F2, F, d1);
-  /*zz_pX TF1, TF2;
-  kronSubRecipro (TF1, TF2, F, d1);
-  Variable x= Variable (1);
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF1, x) == convertnmod_poly_t2FacCF (F1, x)) << "\n";
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF2, x) == convertnmod_poly_t2FacCF (F2, x)) << "\n";*/
 
   nmod_poly_t G1, G2;
   nmod_poly_init_preinv (G1, getCharacteristic(), ninv);
   nmod_poly_init_preinv (G2, getCharacteristic(), ninv);
   kronSubRecipro (G1, G2, G, d1);
-  /*zz_pX TG1, TG2;
-  kronSubRecipro (TG1, TG2, G, d1);
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TG1, x) == convertnmod_poly_t2FacCF (G1, x)) << "\n";
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TG2, x) == convertnmod_poly_t2FacCF (G2, x)) << "\n";*/
-
 
   int k= d1*degree (M);
   nmod_poly_mullow (F1, F1, G1, (long) k);
-  /*MulTrunc (TF1, TF1, TG1, (long) k);
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF1, x) == convertnmod_poly_t2FacCF (F1, x)) << "\n";*/
 
   int degtailF= degree (tailcoeff (F), 1);;
   int degtailG= degree (tailcoeff (G), 1);
   int taildegF= taildegree (F);
   int taildegG= taildegree (G);
 
-  int b= nmod_poly_degree (F2) + nmod_poly_degree (G2) - k - degtailF - degtailG + d1*(2+taildegF + taildegG);
+  int b= nmod_poly_degree (F2) + nmod_poly_degree (G2) - k - degtailF - degtailG
+         + d1*(2+taildegF + taildegG);
   nmod_poly_mulhigh (F2, F2, G2, b);
   nmod_poly_shift_right (F2, F2, b);
-  /*mul (TF2, TF2, TG2);
-  if (deg (TF2) > k)
-  {
-    int b= deg (TF2) - k + 2;
-    TF2 >>= b;
-  }
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF2, x) == convertnmod_poly_t2FacCF (F2, x)) << "\n";*/
   int d2= tmax (nmod_poly_degree (F2)/d1, nmod_poly_degree (F1)/d1);
 
 
   CanonicalForm result= reverseSubst (F1, F2, d1, d2);
-  //CanonicalForm NTLres= reverseSubst (TF1, TF2, d1, d2);
-  //cout << "FINALtestkronSubReci= " << (NTLres == result) << "\n";
 
   nmod_poly_clear (F1);
   nmod_poly_clear (F2);
@@ -2013,49 +1954,27 @@ mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
   fmpz_poly_init (F1);
   fmpz_poly_init (F2);
   kronSubRecipro (F1, F2, F, d1);
-  /*zz_pX TF1, TF2;
-  kronSubRecipro (TF1, TF2, F, d1);
-  Variable x= Variable (1);
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF1, x) == convertnmod_poly_t2FacCF (F1, x)) << "\n";
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF2, x) == convertnmod_poly_t2FacCF (F2, x)) << "\n";*/
 
   fmpz_poly_t G1, G2;
   fmpz_poly_init (G1);
   fmpz_poly_init (G2);
   kronSubRecipro (G1, G2, G, d1);
-  /*zz_pX TG1, TG2;
-  kronSubRecipro (TG1, TG2, G, d1);
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TG1, x) == convertnmod_poly_t2FacCF (G1, x)) << "\n";
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TG2, x) == convertnmod_poly_t2FacCF (G2, x)) << "\n";*/
-
 
   int k= d1*degree (M);
   fmpz_poly_mullow (F1, F1, G1, (long) k);
-  /*MulTrunc (TF1, TF1, TG1, (long) k);
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF1, x) == convertnmod_poly_t2FacCF (F1, x)) << "\n";*/
 
   int degtailF= degree (tailcoeff (F), 1);;
   int degtailG= degree (tailcoeff (G), 1);
   int taildegF= taildegree (F);
   int taildegG= taildegree (G);
 
-  int b= fmpz_poly_degree (F2) + fmpz_poly_degree (G2) - k - degtailF - degtailG + d1*(2+taildegF + taildegG);
+  int b= fmpz_poly_degree (F2) + fmpz_poly_degree (G2) - k - degtailF - degtailG
+         + d1*(2+taildegF + taildegG);
   fmpz_poly_mulhigh_n (F2, F2, G2, b);
   fmpz_poly_shift_right (F2, F2, b);
-  /*mul (TF2, TF2, TG2);
-  if (deg (TF2) > k)
-  {
-    int b= deg (TF2) - k + 2;
-    TF2 >>= b;
-  }
-  cout << "testkronSubReci= " << (convertNTLzzpX2CF (TF2, x) == convertnmod_poly_t2FacCF (F2, x)) << "\n";*/
   int d2= tmax (fmpz_poly_degree (F2)/d1, fmpz_poly_degree (F1)/d1);
 
-
   CanonicalForm result= reverseSubst (F1, F2, d1, d2);
-
-  //CanonicalForm NTLres= reverseSubst (TF1, TF2, d1, d2);
-  //cout << "FINALtestkronSubReci= " << (NTLres == result) << "\n";
 
   fmpz_poly_clear (F1);
   fmpz_poly_clear (F2);
@@ -2072,11 +1991,8 @@ mulMod2FLINTQ (const CanonicalForm& F, const CanonicalForm& G, const
   CanonicalForm B= G;
 
   int degAx= degree (A, 1);
-  //int degAy= degree (A, 2);
   int degBx= degree (B, 1);
-  //int degBy= degree (B, 2);
   int d1= degAx + 1 + degBx;
-  //int d2= tmax (degAy, degBy);
 
   CanonicalForm f= bCommonDen (F);
   CanonicalForm g= bCommonDen (G);
