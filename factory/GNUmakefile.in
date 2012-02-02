@@ -1,5 +1,4 @@
 # @configure_input@
-# $Id$
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the

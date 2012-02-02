@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id$ */
 
 #define _POSIX_SOURCE 1
 

@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id$ */
 
 #ifndef INCL_MEMMAN_H
 #define INCL_MEMMAN_H

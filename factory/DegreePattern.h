@@ -7,8 +7,6 @@
  *
  * @author Martin Lee
  *
- * @internal @version \$Id$
- *
  **/
 /*****************************************************************************/
 #ifndef DEGREE_PATTERN_H

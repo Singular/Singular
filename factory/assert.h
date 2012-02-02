@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id$ */
 
 /* This is for compatibility with standard assert.h */
 #if defined (NDEBUG) && ! defined (NOASSERT)

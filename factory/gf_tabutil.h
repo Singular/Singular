@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 #ifndef INCL_GF_TABUTIL_H
 #define INCL_GF_TABUTIL_H
