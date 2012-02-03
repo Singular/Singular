@@ -676,7 +676,7 @@ static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
 #if PDEBUG > 2
 static inline poly p_New(const ring r, omBin bin)
 #else
-static inline poly p_New(const ring, omBin bin)
+static inline poly p_New(const ring r, omBin bin)
 #endif
 {
   p_CheckRing2(r);
