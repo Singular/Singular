@@ -28,14 +28,14 @@ using namespace polymake;
 /* Functions for converting Integers, Rationals and their Matrices 
    in between C++, gfan, polymake and singular */
 
-gfan::Integer PmInteger2GfInteger (const polymake::Integer pi)
+gfan::Integer PmInteger2GfInteger (const polymake::Integer& pi)
 {
   mpz_class cache(pi.get_rep());
   gfan::Integer gi(cache.get_mpz_t());
   return gi;  
 }
 
-polymake::Integer GfInteger2PmInteger (const gfan::Integer gi)
+polymake::Integer GfInteger2PmInteger (const gfan::Integer& gi)
 {
   mpz_t cache; mpz_init(cache);
   gi.setGmp(cache);
@@ -43,21 +43,21 @@ polymake::Integer GfInteger2PmInteger (const gfan::Integer gi)
   return pi;
 }
 
-int PmInteger2Int(const polymake::Integer pi, bool &ok)
+int PmInteger2Int(const polymake::Integer& pi, bool &ok)
 {
   gfan::Integer gi = PmInteger2GfInteger(pi);
   int i = integerToInt(gi, ok);
   return i;
 }
 
-gfan::Rational PmRational2GfRational (const polymake::Rational pr)
+gfan::Rational PmRational2GfRational (const polymake::Rational& pr)
 {
   mpq_class cache(pr.get_rep());
   gfan::Rational gr(cache.get_mpq_t());
   return gr;
 }
 
-polymake::Rational GfRational2PmRational (const gfan::Rational gr)
+polymake::Rational GfRational2PmRational (const gfan::Rational& gr)
 {
   mpq_t cache; mpq_init(cache);
   gr.setGmp(cache);
@@ -75,98 +75,98 @@ polymake::Vector<polymake::Integer> Intvec2PmVectorInteger (const intvec* iv)
   return vi;
 }
 
-intvec PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer> vi)
+intvec PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi)
 {
-  intvec iv(vi.size());
-  for(int i=1; i<=vi.size(); i++)
+  intvec iv(vi->size());
+  for(int i=1; i<=vi->size(); i++)
     {
-      iv[i-1]=vi[i-1];
+      iv[i-1]=(*vi)[i-1];
     }
   return iv;
 }
 
-gfan::ZMatrix PmMatrixInteger2GfZMatrix (const polymake::Matrix<polymake::Integer> mi)
+gfan::ZMatrix PmMatrixInteger2GfZMatrix (const polymake::Matrix<polymake::Integer>* mi)
 {
-  int rows=mi.rows();
-  int cols=mi.cols();
+  int rows=mi->rows();
+  int cols=mi->cols();
   gfan::ZMatrix zm(rows,cols);
   for(int r=1; r<=rows; r++)
     for(int c=1; c<=cols; c++)
-      zm[r-1][c-1] = PmInteger2GfInteger(mi(r-1,c-1));
+      zm[r-1][c-1] = PmInteger2GfInteger((*mi)(r-1,c-1));
   return zm;
 }
 
-gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Rational> mr)
+gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Rational>* mr)
 {
-  int rows=mr.rows();
-  int cols=mr.cols();
+  int rows=mr->rows();
+  int cols=mr->cols();
   gfan::QMatrix qm(rows,cols);
   for(int r=1; r<=rows; r++)
     for(int c=1; c<=cols; c++)
-      qm[r-1][c-1] = PmRational2GfRational(mr(r-1,c-1));
+      qm[r-1][c-1] = PmRational2GfRational((*mr)(r-1,c-1));
   return qm;
 }
 
-polymake::Matrix<polymake::Integer> GfZMatrix2PmMatrixInteger (const gfan::ZMatrix zm)
+polymake::Matrix<polymake::Integer> GfZMatrix2PmMatrixInteger (const gfan::ZMatrix* zm)
 {
-  int rows=zm.getHeight();
-  int cols=zm.getWidth();
+  int rows=zm->getHeight();
+  int cols=zm->getWidth();
   polymake::Matrix<polymake::Integer> mi(rows,cols);
   for(int r=1; r<=rows; r++)
     for(int c=1; c<=cols; c++)
-      mi(r-1,c-1) = GfInteger2PmInteger(zm[r-1][c-1]);
+      mi(r-1,c-1) = GfInteger2PmInteger((*zm)[r-1][c-1]);
   return mi;
 }
 
-polymake::Matrix<polymake::Rational> GfQMatrix2PmMatrixRational (const gfan::QMatrix qm)
+polymake::Matrix<polymake::Rational> GfQMatrix2PmMatrixRational (const gfan::QMatrix* qm)
 {
-  int rows=qm.getHeight();
-  int cols=qm.getWidth();
+  int rows=qm->getHeight();
+  int cols=qm->getWidth();
   polymake::Matrix<polymake::Rational> mr(rows,cols);
   for(int r=1; r<=rows; r++)
     for(int c=1; c<=cols; c++)
-      mr(r-1,c-1) = GfRational2PmRational(qm[r-1][c-1]);
+      mr(r-1,c-1) = GfRational2PmRational((*qm)[r-1][c-1]);
   return mr;
 }
 
-intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer> mi)
+intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi)
 {
-  int rows = mi.rows();
-  int cols = mi.cols();
+  int rows = mi->rows();
+  int cols = mi->cols();
   intvec* iv = new intvec(rows,cols,0);
-  const polymake::Integer* pi = concat_rows(mi).begin();
+  const polymake::Integer* pi = concat_rows(*mi).begin();
   for (int r = 1; r <= rows; r++) 
     for (int c = 1; c <= cols; c++) 
        IMATELEM(*iv,r,c) = *pi++;
   return iv;  
 }
 
-intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<NonSymmetric> icmat)
+intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<NonSymmetric>* icmat)
 {
-  int rows = icmat.rows();
-  int cols = icmat.cols();
+  int rows = icmat->rows();
+  int cols = icmat->cols();
   intvec* iv = new intvec(rows,cols,0);
   for (int r = 1; r <= rows; r++)
     for (int c = 1; c <= cols; c++)
-      IMATELEM(*iv,r,c) = (int) icmat.row(r).exists(c);
+      IMATELEM(*iv,r,c) = (int) (*icmat).row(r).exists(c);
   return iv;
 }
 
-intvec PmSetInteger2Intvec (polymake::Set<polymake::Integer> si)
+intvec PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si)
 {
-  polymake::Vector<polymake::Integer> vi(si);
-  return PmVectorInteger2Intvec(vi);
+  polymake::Vector<polymake::Integer> vi(*si);
+  return PmVectorInteger2Intvec(&vi);
 }
 
 /* Functions for converting cones and fans in between gfan and polymake,
    Singular shares the same cones and fans with gfan */
 
-gfan::ZCone PmCone2ZCone (polymake::perl::Object pc)
+gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
 {
-  if (pc.isa("Cone"))
+  if (pc->isa("Cone"))
   {
-    polymake::Matrix<polymake::Integer> rays = pc.give("RAYS");
-    gfan::ZMatrix zm = PmMatrixInteger2GfZMatrix(rays);
+    polymake::Matrix<polymake::Integer> rays = pc->give("RAYS");
+    gfan::ZMatrix zm = PmMatrixInteger2GfZMatrix(&rays);
 
     gfan::ZCone zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
     return zc;
@@ -174,12 +174,12 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object pc)
   WerrorS("PmCone2ZCone: unexpected parameters");
 }
 
-gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object pp)
+gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
 {
-  if (pp.isa("Polytope<Rational>"))
+  if (pp->isa("Polytope<Rational>"))
   {
-    polymake::Matrix<polymake::Integer> vertices = pp.give("VERTICES");
-    gfan::ZMatrix zv = PmMatrixInteger2GfZMatrix(vertices);
+    polymake::Matrix<polymake::Integer> vertices = pp->give("VERTICES");
+    gfan::ZMatrix zv = PmMatrixInteger2GfZMatrix(&vertices);
 
     gfan::ZCone zp = gfan::ZCone::givenByRays(zv, gfan::ZMatrix(0, zv.getWidth()));
     return zp;
@@ -187,18 +187,18 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object pp)
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
 }
 
-gfan::ZFan PmFan2ZFan (polymake::perl::Object pf)
+gfan::ZFan PmFan2ZFan (polymake::perl::Object* pf)
 {
-  if (pf.isa("PolyhedralFan"))
+  if (pf->isa("PolyhedralFan"))
   {
-    int d = (int) pf.give("FAN_AMBIENT_DIM");
+    int d = (int) pf->give("FAN_AMBIENT_DIM");
     gfan::ZFan zf = gfan::ZFan(d);
 
-    int n = pf.give("N_MAXIMAL_CONES");
+    int n = pf->give("N_MAXIMAL_CONES");
     for (int i=0; i<n; i++)
       {
-        polymake::perl::Object pmcone=pf.CallPolymakeMethod("cone",i);
-	gfan::ZCone zc=PmCone2ZCone(pmcone);
+        polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
+	gfan::ZCone zc=PmCone2ZCone(&pmcone);
         zf.insert(zc);
       }
     return zf;
@@ -206,10 +206,10 @@ gfan::ZFan PmFan2ZFan (polymake::perl::Object pf)
   WerrorS("PmFan2ZFan: unexpected parameters");
 }
 
-polymake::perl::Object ZCone2PmCone (gfan::ZCone zc)
+polymake::perl::Object ZCone2PmCone (gfan::ZCone* zc)
 {
-  gfan::ZMatrix zm = zc.extremeRays();
-  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(zm);
+  gfan::ZMatrix zm = zc->extremeRays();
+  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
 
   polymake::perl::Object gc("Cone");
   gc.take("INPUT_RAYS") << pm;  
@@ -217,10 +217,10 @@ polymake::perl::Object ZCone2PmCone (gfan::ZCone zc)
   return gc;
 }
 
-polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone zc)
+polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone* zc)
 {
-  gfan::ZMatrix zm = zc.extremeRays();
-  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(zm);
+  gfan::ZMatrix zm = zc->extremeRays();
+  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
 
   polymake::perl::Object pp("Polytope<Rational>");
   pp.take("VERTICES") << pm;
@@ -244,7 +244,7 @@ polymake::Matrix<polymake::Integer> raysOf(gfan::ZFan* zf)
         }
     }
 
-  return GfZMatrix2PmMatrixInteger(zm);
+  return GfZMatrix2PmMatrixInteger(&zm);
 }
 
 int numberOfRaysOf(gfan::ZFan* zf)
@@ -379,7 +379,7 @@ BOOLEAN PMisBounded(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(*zp);
+    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
     bool b = p.give("BOUNDED");
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
@@ -396,7 +396,7 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(*zp);
+    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
     bool b = p.give("REFLEXIVE");
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
@@ -413,7 +413,7 @@ BOOLEAN PMisNormal(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(*zp);
+    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
     bool b = p.give("NORMAL");
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
@@ -430,7 +430,7 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(*zp);
+    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
     bool b = p.give("SMOOTH");
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
@@ -450,13 +450,13 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(*zp);
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       intvec* iv = (intvec*) v->Data();
       polymake::perl::Object o("LinearProgram<Rational>");
       o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
       p.take("LP") << o;
       polymake::Set<polymake::Integer> mf = p.give("LP.MAXIMAL_FACE");
-      intvec* maxface = new intvec(PmSetInteger2Intvec(mf));
+      intvec* maxface = new intvec(PmSetInteger2Intvec(&mf));
       res->rtyp = INTVEC_CMD;
       res->data = (char*) maxface;
       return FALSE;
@@ -476,13 +476,13 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
       if ((v != NULL) && (v->Typ() == INTVEC_CMD))
 	{
 	  gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-	  polymake::perl::Object p = ZPolytope2PmPolytope(*zp);
+	  polymake::perl::Object p = ZPolytope2PmPolytope(zp);
 	  intvec* iv = (intvec*) v->Data();
 	  polymake::perl::Object o("LinearProgram<Rational>");
 	  o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
 	  p.take("LP") << o;
 	  polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
-	  intvec* maxface = new intvec(PmSetInteger2Intvec(mf));
+	  intvec* maxface = new intvec(PmSetInteger2Intvec(&mf));
 	  res->rtyp = INTVEC_CMD;
 	  res->data = (char*) maxface;
 	  return FALSE;
@@ -502,7 +502,7 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(*zp); 
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
       polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
       intvec* iv = (intvec*) v->Data();
       polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
@@ -536,7 +536,7 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(*zp); 
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
       polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
       intvec* iv = (intvec*) v->Data();
       polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
@@ -571,7 +571,7 @@ BOOLEAN visual(leftv res, leftv args)
       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
       gfan::ZMatrix rays = zc->extremeRays();
       polymake::perl::Object p("Polytope<Rational>");
-      p.take("VERTICES") << GfZMatrix2PmMatrixInteger(rays);
+      p.take("VERTICES") << GfZMatrix2PmMatrixInteger(&rays);
       CallPolymakeFunction("jreality",p.CallPolymakeMethod("VISUAL"));
       res->rtyp = NONE;
       res->data = NULL;
@@ -612,10 +612,10 @@ BOOLEAN normalFan(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix rays = zc->extremeRays();
     polymake::perl::Object p("Polytope<Rational>");
-    p.take("VERTICES") << GfZMatrix2PmMatrixInteger(rays);
+    p.take("VERTICES") << GfZMatrix2PmMatrixInteger(&rays);
     polymake::perl::Object pf;
     CallPolymakeFunction("normal_fan", p) >> pf;
-    gfan::ZFan* zf = new gfan::ZFan(PmFan2ZFan(pf));
+    gfan::ZFan* zf = new gfan::ZFan(PmFan2ZFan(&pf));
     res->rtyp = fanID;
     res->data = (char*) zf;
     return FALSE;
@@ -671,7 +671,7 @@ BOOLEAN testingfans(leftv res, leftv args)  // for testing purposes
   {
     gfan::ZFan* zf = (gfan::ZFan*) u->Data();
     perl::Object pf = ZFan2PmFan(zf);
-    gfan::ZFan* zff = new gfan::ZFan(PmFan2ZFan(pf));
+    gfan::ZFan* zff = new gfan::ZFan(PmFan2ZFan(&pf));
     res->rtyp = fanID;
     res->data = (char *)zff;
     return FALSE;
@@ -687,8 +687,8 @@ BOOLEAN testingcones(leftv res, leftv args)  // for testing purposes
   if ((u != NULL) && (u->Typ() == coneID))
     {
       gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-      polymake::perl::Object pc = ZCone2PmCone(*zc);
-      gfan::ZCone* zd = new gfan::ZCone(PmCone2ZCone(pc));
+      polymake::perl::Object pc = ZCone2PmCone(zc);
+      gfan::ZCone* zd = new gfan::ZCone(PmCone2ZCone(&pc));
       res->rtyp = coneID;
       res->data = (char *) zd;
       return FALSE;
@@ -704,8 +704,8 @@ BOOLEAN testingpolytopes(leftv res, leftv args) // for testing purposes
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*) u->Data();
-    polymake::perl::Object pp = ZPolytope2PmPolytope(*zp);
-    gfan::ZCone* zq = new gfan::ZCone(PmPolytope2ZPolytope(pp));
+    polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
+    gfan::ZCone* zq = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
     res->rtyp = polytopeID;
     res->data = (char *) zq;
     return FALSE;
@@ -759,7 +759,7 @@ extern "C" int mod_init(void* polymakesingular)
   // iiAddCproc("","testingtypes",FALSE,testingtypes);
   // iiAddCproc("","testingintvec",FALSE,testingintvec);
   // iiAddCproc("","testingcones",FALSE,testingcones);
-  iiAddCproc("","testingpolytopes",FALSE,testingpolytopes);
+  // iiAddCproc("","testingpolytopes",FALSE,testingpolytopes);
   // iiAddCproc("","testingfans",FALSE,testingfans);
   // iiAddCproc("","testingvisuals",FALSE,testingvisuals);
 
