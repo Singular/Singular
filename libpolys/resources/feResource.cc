@@ -18,7 +18,7 @@
 
 #include "feResource.h"
 
-char* feArgv0 = NULL; 
+char* feArgv0 = NULL;
 
 #ifdef AIX_4
 #define HAVE_PUTENV 1
@@ -30,7 +30,6 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 
 #include <reporter/reporter.h>
-#include <omalloc/omalloc.h>
 //char* feResource(const char id, int warn = -1);
 //char* feResource(const char* key, int warn = -1);
 
@@ -177,12 +176,12 @@ void feInitResources(const char* argv0)
 #endif
   if (argv0==NULL)
   {
-    feArgv0 = (char*)omAlloc0(MAXPATHLEN+strlen("/Singular"));
+    feArgv0 = (char*)malloc(MAXPATHLEN+strlen("/Singular"));
     getcwd(feArgv0, MAXPATHLEN);
     strcpy(feArgv0+strlen(feArgv0),"/Singular");
   }
   else
-    feArgv0 = omStrDup(argv0);
+    feArgv0 = strdup(argv0);
 #ifdef RESOURCE_DEBUG
   printf("feInitResources: entering with argv0=%s=\n", feArgv0);
 #endif
@@ -198,7 +197,7 @@ void feInitResources(const char* argv0)
   printf("feInitResources: setting path with argv0=%s=\n", path);
 #endif
 #ifdef HAVE_PUTENV
-  if (path != NULL) { char *s=(char *)omAlloc0(strlen(path)+6);
+  if (path != NULL) { char *s=(char *)malloc(strlen(path)+6);
                       sprintf(s,"PATH=%s",path);
                       putenv(s);
                     }
@@ -216,7 +215,7 @@ void feReInitResources()
     if (feResourceConfigs[i].value[0] != '\0')
     {
       if (feResourceConfigs[i].value != NULL)
-        omFree(feResourceConfigs[i].value);
+        free(feResourceConfigs[i].value);
       feResourceConfigs[i].value = (char *)"";
     }
     i++;
@@ -269,7 +268,7 @@ static char* feResource(feResourceConfig config, int warn)
 static char* feResourceDefault(feResourceConfig config)
 {
   if (config == NULL) return NULL;
-  char* value = (char*) omAlloc(MAXRESOURCELEN);
+  char* value = (char*) malloc(MAXRESOURCELEN);
   feSprintf(value, config->fmt, -1);
   return value;
 }
@@ -301,7 +300,7 @@ static char* feInitResource(feResourceConfig config, int warn)
 #ifdef RESOURCE_DEBUG
         printf("feInitResource: Set value of %s to =%s=\n", config->key, value);
 #endif
-        config->value = omStrDup(value);
+        config->value = strdup(value);
         return config->value;
       }
     }
@@ -321,7 +320,7 @@ static char* feInitResource(feResourceConfig config, int warn)
 #ifdef RESOURCE_DEBUG
       printf("value:%s\n", value);
 #endif
-      omFree(executable);
+      free(executable);
     }
   }
   // and bindir
@@ -361,7 +360,7 @@ static char* feInitResource(feResourceConfig config, int warn)
 #ifdef RESOURCE_DEBUG
     printf("feInitResource: Set value of %s to =%s=\n", config->key, value);
 #endif
-    config->value = omStrDup(value);
+    config->value = strdup(value);
     return config->value;
   }
   else if (config->type == feResBinary)
@@ -373,7 +372,7 @@ static char* feInitResource(feResourceConfig config, int warn)
       if (feVerifyResourceValue(config->type,
                                 feCleanResourceValue(config->type, value)))
       {
-        config->value = omStrDup(value);
+        config->value = strdup(value);
 #ifdef RESOURCE_DEBUG
         printf("feInitResource: Set value of %s to =%s=\n", config->key, config->value);
 #endif
@@ -433,7 +432,7 @@ static char* feGetExpandedExecutable()
     dReportBug(message);
     return NULL;
   }
-  return omStrDup(value);
+  return strdup(value);
 }
 
 
@@ -518,9 +517,9 @@ static char* feCleanUpFile(char* fname)
       {
         if (*(fn+2) == '.' && (*(fn + 3) == '/' || *(fn + 3) == '\0'))
         {
-	#if 0
-	// this does not work: ./../../mmm will be changed to ./../mmm
-	// but we only want to change ././mmm to ./mmm
+        #if 0
+        // this does not work: ./../../mmm will be changed to ./../mmm
+        // but we only want to change ././mmm to ./mmm
           *fn = '\0';
           s = strrchr(fname, '/');
           if (s != NULL)
@@ -532,7 +531,7 @@ static char* feCleanUpFile(char* fname)
           {
             *fn = '/';
           }
-	#endif
+        #endif
         }
         else if (*(fn+2) == '/' || *(fn+2) == '\0')
         {
@@ -571,7 +570,7 @@ static char* feCleanUpPath(char* path)
     }
   }
 
-  path_comps = (char**) omAlloc(n_comps*sizeof(char*));
+  path_comps = (char**) malloc(n_comps*sizeof(char*));
   path_comps[0]=opath;
   path=opath;
   i = 1;
@@ -651,7 +650,7 @@ static char* feCleanUpPath(char* path)
   {
     *opath = '\0';
   }
-  omFree(path_comps);
+  free(path_comps);
 #ifdef RESOURCE_DEBUG
   Print("feCleanUpPath: leaving with path=%s=\n", opath);
 #endif

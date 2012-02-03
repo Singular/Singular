@@ -23,10 +23,6 @@
 #define MAXPATHLEN 1024
 #endif
 
-#ifdef WINNT
-#include <omalloc/omalloc.h>
-#endif
-
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
 #define ABSOLUTE_FILENAME_P(fname)        (fname[0] == '/')
 
@@ -93,7 +89,7 @@ static char * omFindExec_link (const char *name, char* executable)
     {
       char *extra = NULL;
       /* we are under msdos display */
-      extra = (char*) omAlloc((search != NULL ? strlen(search) : 0) + 3);
+      extra = (char*) malloc((search != NULL ? strlen(search) : 0) + 3);
       strcpy(extra, ".:");
       if (search != NULL) strcat(extra, search);
       search = extra;
@@ -133,7 +129,7 @@ static char * omFindExec_link (const char *name, char* executable)
         {
 #ifdef WINNT
           if (extra != NULL)
-            omFree(extra);
+            free(extra);
 #endif
           strcpy(executable, tbuf);
 #ifdef __CYGWIN__

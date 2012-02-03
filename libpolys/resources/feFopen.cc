@@ -8,7 +8,6 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
-#include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
 
 #include "feFopen.h"
@@ -84,7 +83,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
     char* spath = feResource('s');
     char *s;
 
-    if (where==NULL) s=(char *)omAlloc(250 * sizeof(char));
+    if (where==NULL) s=(char *)malloc(1024);
     else             s=where;
 
     if (spath!=NULL)
@@ -110,7 +109,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
       f=myfopen(s,mode);
       if (f!=NULL)
       {
-        if (where==NULL) omFree((ADDRESS)s);
+        if (where==NULL) free((ADDRESS)s);
         return f;
       }
     }
@@ -119,7 +118,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
       if (where!=NULL) strcpy(s/*where*/,path);
       f=myfopen(path,mode);
     }
-    if (where==NULL) omFree((ADDRESS)s);
+    if (where==NULL) free((ADDRESS)s);
   }
   if ((f==NULL)&&(useWerror))
     Werror("cannot open `%s`",path);
