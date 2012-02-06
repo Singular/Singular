@@ -222,14 +222,14 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
   return  h;
 }
 
-char * idrec::String()
+char * idrec::String(BOOLEAN typed)
 {
   sleftv tmp;
   memset(&tmp,0,sizeof(sleftv));
   tmp.rtyp=IDTYP(this);
   tmp.data=IDDATA(this);
   tmp.name=IDID(this);
-  return tmp.String();
+  return tmp.String(NULL, typed);
 }
 
 idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN search)

@@ -199,23 +199,36 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 
   if ( currRing->idroot != NULL )
   {
-    WerrorS("no minpoly allowed if there are local objects belonging to the basering");
-    return TRUE;
+#ifndef NDEBUG      
+//    return TRUE;
+  idhdl p = currRing->idroot;
+     
+  WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
+  while(p != NULL)
+  {
+    Print(p->String(TRUE)); PrintLn();
+    p = p->next;
+  }    
+#endif
   }
+
+  assume (currRing->idroot==NULL);
   
   number p = (number)a->CopyD(NUMBER_CMD);
 
   if (n_IsZero(p, currRing->cf))
   {
+    n_Delete(&p, currRing);
     WerrorS("cannot set minpoly to 0");
     return TRUE;
   }
 
-  assume (currRing->idroot==NULL);
-  
   // remove all object currently in the ring
   while(currRing->idroot!=NULL)
   {
+#ifndef NDEBUG
+    Warn("killing a local object due to minpoly change: %s", IDID(currRing->idroot));
+#endif
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);
   }
   
