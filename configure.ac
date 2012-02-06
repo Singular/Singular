@@ -40,7 +40,7 @@ fi
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h iostream.h)
 
-AC_CHECK_FUNCS(readlink getcwd getwd)
+AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
 
 
 AC_PROG_CPP

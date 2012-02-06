@@ -21,11 +21,15 @@
 char* feArgv0 = NULL;
 
 #ifdef AIX_4
+#ifndef HAVE_PUTENV
 #define HAVE_PUTENV 1
+#endif
 #endif
 
 #if defined(HPUX_10) || defined(HPUX_9)
+#ifndef HAVE_SETENV
 extern "C" int setenv(const char *name, const char *value, int overwrite);
+#endif
 #endif
 
 
