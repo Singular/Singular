@@ -1572,7 +1572,7 @@ static proc gcdcomb(int a, int b)
   intvec save;
   while(av[1]*bv[1] != 0)
   {
-    bv = bv - (bv[1] - bv[1]%av[1])/av[1] * av;
+    bv = bv - (bv[1] - bv[1]%av[1]) div av[1] * av;
     save = bv;
     bv = av;
     av = save;
@@ -1712,7 +1712,7 @@ EXAMPLE: example smithNormalForm; shows an example
       v = gcdcomb(D[k,k],D[k+1,k+1]);
       transform = unitMatrix(cc);
       transform[k+1,k] = 1;
-      a = -v[3]*D[k+1,k+1]/v[1];
+      a = -v[3]*D[k+1,k+1] div v[1];
       transform[k, k+1] = a;
       transform[k+1, k+1] = a+1;
       //det(transform);
@@ -1722,8 +1722,8 @@ EXAMPLE: example smithNormalForm; shows an example
       transform = unitMatrix(rr);
       transform[k,k] = v[2];
       transform[k,k+1] = v[3];
-      transform[k+1,k] = -c/v[1];
-      transform[k+1,k+1] = b/v[1];
+      transform[k+1,k] = -c div v[1];
+      transform[k+1,k+1] = b div v[1];
       D = transform * D;
       P = transform * P;
       //" ";
@@ -1820,9 +1820,9 @@ EXAMPLE: example hermiteNormalForm; shows an example
               v1 = A[1..rr,column];
               v2 = A[1..rr,j];
               transform = unitMatrix(cc);
-              transform[j,j] = v1[row]/gcdvec[1];
+              transform[j,j] = v1[row] div gcdvec[1];
               transform[column, column] = gcdvec[2];
-              transform[column,j] = -v2[row]/gcdvec[1];
+              transform[column,j] = -v2[row] div gcdvec[1];
               transform[j,column] = gcdvec[3];
               q = q*transform;
               A = A*transform;
@@ -1839,7 +1839,7 @@ EXAMPLE: example hermiteNormalForm; shows an example
       for( j=1; j<column; j++){
         if(A[row, j]!=0){
           transform = unitMatrix(cc);
-          transform[column, j] = (-A[row,j]+A[row, j]%A[row, column])/A[row, column];
+          transform[column, j] = (-A[row,j]+A[row, j]%A[row, column]) div A[row, column];
           if(A[row,j]<0){
             transform[column,j]=transform[column,j]+1;}
           q = q*transform;
@@ -2000,7 +2000,7 @@ EXAMPLE: example isZeroElement; shows an example
       if(H[row,i]!=0)
       {
         v = H[1..r,i];
-        mdeg = mdeg-(mdeg[row]-mdeg[row]%v[row])/v[row]*v;
+        mdeg = mdeg-(mdeg[row]-mdeg[row]%v[row]) div v[row]*v;
       }
     }
   }
