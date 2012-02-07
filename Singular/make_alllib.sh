@@ -7,4 +7,4 @@ do
 	echo "LIB \"$i\";" >>LIB/all.lib.n
 done
 chmod u-w LIB/all.lib.n
-mv LIB/all.lib.n LIB/all.lib
+mv -f LIB/all.lib.n LIB/all.lib
