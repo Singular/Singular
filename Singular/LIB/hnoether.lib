@@ -2940,7 +2940,7 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
     map getminpol=HNhelpring,a;
     mipl=string(getminpol(mipo));    // String umgewandelt mit 'a' als Param.
     execute("minpoly="+mipl+";");    // "minpoly=poly is not supported"
-    kill HNhelpring, getminpol;
+    kill HNhelpring; if(defined(getminpol)){ kill getminpol; }
    }
    if (nvars(altring)==2) {
      poly f=fetch(altring,f);

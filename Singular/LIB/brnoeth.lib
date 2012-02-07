@@ -134,8 +134,7 @@ static proc pd2 (poly g1,poly g2)
     ring raux1=char(basering),(x,y,@a),lp;
     poly G;
     ring raux2=(char(basering),@a),(x,y),lp;
-    map psi=BR,x,@a;
-    minpoly=number(psi(A));
+    map psi=BR,x,@a; minpoly=number(psi(A)); if(!defined(psi)){ map psi=BR,x,@a; }
     poly f=psi(B);
     ideal facts=factorize(f,1);
     s=size(facts);
