@@ -1218,7 +1218,7 @@ void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   // all undefined entries will be set to default in setBlackboxStuff
-  // the default Print is quite usefule,
+  // the default Print is quite usefull,
   // all other are simply error messages
   b->blackbox_destroy=bbcone_destroy;
   b->blackbox_String=bbcone_String;

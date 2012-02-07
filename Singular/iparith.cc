@@ -6106,7 +6106,7 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
   int ni=(int)(long)w->Data();
   if ((mi<1)||(ni<1))
   {
-    WerrorS("matrix dimensions must be positive");
+    Werror("converting ideal to matrix: dimensions must be positive(%dx%d)",mi,ni);
     return TRUE;
   }
   matrix m=mpNew(mi,ni);
@@ -6129,7 +6129,7 @@ static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
   int ni=(int)(long)w->Data();
   if ((mi<1)||(ni<1))
   {
-    WerrorS("matrix dimensions must be positive");
+    Werror("converting module to matrix: dimensions must be positive(%dx%d)",mi,ni);
     return TRUE;
   }
   res->data = (char *)idModule2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
@@ -6142,7 +6142,7 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
   int ni=(int)(long)w->Data();
   if ((mi<1)||(ni<1))
   {
-    WerrorS("matrix dimensions must be positive");
+    Werror("converting matrix to matrix: dimensions must be positive(%dx%d)",mi,ni);
     return TRUE;
   }
   matrix m=mpNew(mi,ni);
