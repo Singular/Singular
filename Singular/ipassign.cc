@@ -193,22 +193,25 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
    
   if ( !nCoeff_is_transExt(currRing->cf) )
   {
-    WerrorS("no minpoly allowed over non-transcendental ground field");
-    return TRUE;
+//    return TRUE;
+#ifndef NDEBUG
+    WarnS("Trying to set minpoly over non-transcendental ground field...");
+#endif
   }
 
   if ( currRing->idroot != NULL )
   {
-#ifndef NDEBUG      
 //    return TRUE;
-  idhdl p = currRing->idroot;
-     
-  WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
-  while(p != NULL)
-  {
-    Print(p->String(TRUE)); PrintLn();
-    p = p->next;
-  }    
+#ifndef NDEBUG      
+    idhdl p = currRing->idroot;
+
+    WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
+
+    while(p != NULL)
+    {
+      Print(p->String(TRUE)); PrintLn();
+      p = p->next;
+    }    
 #endif
   }
 
@@ -219,8 +222,19 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
   if (n_IsZero(p, currRing->cf))
   {
     n_Delete(&p, currRing);
-    WerrorS("cannot set minpoly to 0");
-    return TRUE;
+
+    
+    if( nCoeff_is_transExt(currRing->cf) )
+    {
+#ifndef NDEBUG      
+      WarnS("minpoly is already 0...");
+#endif
+      return FALSE;
+    }
+
+    WarnS("cannot set minpoly to 0 / alg. extension?");
+    
+//    return TRUE;
   }
 
   // remove all object currently in the ring
