@@ -8,7 +8,7 @@ laguerre_solve(f,10);
 // Now with complex coefficients,
 // internal precision is 30 digits (default)
 printlevel=2;
-ring rsc= (real,10,i),x,lp;
+ring rsc= (complex,10,i),x,lp;
 poly f = (15.4+i*5)*x^5 + (25.0e-2+i*2)*x^3 + x2 - 10*i;
 list l = laguerre_solve(f);
 l;
