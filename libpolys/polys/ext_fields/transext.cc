@@ -1045,7 +1045,9 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly p = p_One(dst->extRing);
-  p_SetCoeff(p, n_Copy(a, src), dst->extRing);
+  number na=n_Copy(a, src);
+  n_Normalize(na, src);
+  p_SetCoeff(p, na, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
@@ -1232,6 +1234,21 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
 
   return NULL;                                 /// default
 }
+#if 0
+nMapFunc ntSetMap_T(const coeffs src, const coeffs dst)
+{
+  nMapFunc n=ntSetMap(src,dst);
+  if (n==ntCopyAlg) printf("n=ntCopyAlg\n");
+  else if (n==ntCopyMap) printf("n=ntCopyMap\n");
+  else if (n==ntMapUP) printf("n=ntMapUP\n");
+  else if (n==ntMap0P) printf("n=ntMap0P\n");
+  else if (n==ntMapP0) printf("n=ntMapP0\n");
+  else if (n==ntMap00) printf("n=ntMap00\n");
+  else if (n==NULL) printf("n=NULL\n");
+  else printf("n=?\n");
+  return n;
+}
+#endif
 
 void ntKillChar(coeffs cf)
 {
