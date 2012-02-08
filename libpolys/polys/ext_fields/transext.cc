@@ -908,6 +908,11 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
   }
 }
 
+void ntNormalize (number &a, const coeffs cf)
+{
+  definiteGcdCancellation(a, cf, FALSE);
+}
+
 /* expects *param to be castable to TransExtInfo */
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
 {
@@ -1317,6 +1322,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfCopy         = ntCopy;
   cf->cfWrite        = ntWrite;
   cf->cfRead         = ntRead;
+  cf->cfNormalize    = ntNormalize;
   cf->cfDelete       = ntDelete;
   cf->cfSetMap       = ntSetMap;
   cf->cfGetDenom     = ntGetDenom;
