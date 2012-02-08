@@ -376,13 +376,18 @@ void ngcWrite (number &a, const coeffs r)
 
 BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
-  if (n==ID) {
+  if (n==ID)
+  {
     LongComplexInfo* p = (LongComplexInfo *)(parameter);
-    if (p->float_len == r->float_len && p->float_len2 == r->float_len2 &&
-                    strcmp(p->par_name, r->complex_parameter))
-      return TRUE;
+    
+    if (
+        (p->float_len == r->float_len) &&
+        (p->float_len2 == r->float_len2)
+       )
+      if (strcmp(p->par_name, r->complex_parameter) == 0)
+        return (TRUE);
   }
-  return FALSE;
+  return (FALSE);
 }
 
 BOOLEAN ngcInitChar(coeffs n, void* parameter)

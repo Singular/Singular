@@ -1694,7 +1694,7 @@ void rDecomposeC(leftv h,const ring R)
   if (rField_is_long_C(R))
   {
     L->m[2].rtyp=STRING_CMD;
-    L->m[2].data=(void *)omStrDup(rParameter(R)[0]);
+    L->m[2].data=(void *)omStrDup(*rParameter(R));
   }
   // ----------------------------------------
 }
@@ -1755,7 +1755,6 @@ lists rDecompose(const ring r)
     L->Init(4);
   // ----------------------------------------
   // 0: char/ cf - ring
-  #if 1 /* TODO */
   if (rField_is_numeric(r))
   {
     rDecomposeC(&(L->m[0]),r);
@@ -1774,7 +1773,8 @@ lists rDecompose(const ring r)
       assume( r->cf->extRing != NULL );
       
       rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
-    }else
+    }
+    else
     {
       assume( nCoeff_is_GF(r->cf) );
        
@@ -1787,7 +1787,7 @@ lists rDecompose(const ring r)
       lists Lv=(lists)omAlloc0Bin(slists_bin);
       Lv->Init(1);
       Lv->m[0].rtyp=STRING_CMD;
-      Lv->m[0].data=(void *)omStrDup(rParameter(r)[0]);     
+      Lv->m[0].data=(void *)omStrDup(*rParameter(r));     
       Lc->m[1].rtyp=LIST_CMD;
       Lc->m[1].data=(void*)Lv;
       // ord:
@@ -1821,7 +1821,6 @@ lists rDecompose(const ring r)
     }
   }
   else
-  #endif
   {
     L->m[0].rtyp=INT_CMD;
     L->m[0].data=(void *)r->cf->ch;
@@ -1903,7 +1902,7 @@ lists rDecompose(const ring r)
   else
     L->m[3].data=(void *)idCopy(r->qideal);
   // ----------------------------------------
-  #ifdef HAVE_PLURAL // NC! in rDecompose
+#ifdef HAVE_PLURAL // NC! in rDecompose
   if (rIsPluralRing(r))
   {
     L->m[4].rtyp=MATRIX_CMD;
@@ -1911,7 +1910,7 @@ lists rDecompose(const ring r)
     L->m[5].rtyp=MATRIX_CMD;
     L->m[5].data=(void *)mp_Copy(r->GetNC()->D, r, r);
   }
-  #endif
+#endif
   return L;
 }
 
@@ -1925,7 +1924,7 @@ void rComposeC(lists L, ring R)
     Werror("invald coeff. field description, expecting 0");
     return;
   }
-  R->cf->ch=-1;
+//  R->cf->ch=0;
   // ----------------------------------------
   // 1:
   if (L->m[1].rtyp!=LIST_CMD)
@@ -5061,11 +5060,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
        param.float_len2 = float_len2;
        
        // set the parameter name
-       if (complex_flag) {
-	  if (pn->next == NULL)
-	    param.par_name=(const char*)"i"; //default to i
-	  else
-	    param.par_name = (const char*)pn->next->name;
+       if (complex_flag)
+       {
+         if (pn->next == NULL)
+           param.par_name=(const char*)"i"; //default to i
+         else
+           param.par_name = (const char*)pn->next->name;
        }
 
        cf = nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);

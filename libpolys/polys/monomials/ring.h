@@ -525,6 +525,10 @@ static inline short rPar(const ring r)
     assume( R != NULL );
     return rVar( R );
   }
+  else if (nCoeff_is_long_C(C))
+  {
+    return 1;
+  }
   return 0;
 }
 
@@ -545,6 +549,10 @@ static inline char** rParameter(const ring r)
   else if (nCoeff_is_GF(C))
   {
     return &(C->m_nfParameter);
+  }
+  else if (nCoeff_is_long_C(C))
+  {
+    return &(C->complex_parameter);
   }
   return NULL;
 }

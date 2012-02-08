@@ -580,6 +580,8 @@ char * rVarStr(ring r)
   return s;
 }
 
+/// TODO: make it a virtual method of coeffs, together with:
+/// Decompose & Compose, rParameter & rPar
 char * rCharStr(ring r)
 {
   char *s;
