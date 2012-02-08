@@ -120,7 +120,11 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
 static BOOLEAN warn_handle = FALSE;
 static BOOLEAN warn_proc = FALSE;
 #ifndef DL_TAIL
-#define DL_TAIL "so"
+#ifdef NDEBUG
+#define DL_TAIL ".so"
+#else
+#define DL_TAIL "_g.so"
+#endif
 #endif
 
 void* dynl_open_binary_warn(const char* binary_name, const char* msg)
@@ -131,7 +135,7 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
   {
     const int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name) + strlen(DIR_SEPP) + strlen(bin_dir);
     char* binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
-    snprintf(binary_name_so, binary_name_so_length, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name, DL_TAIL);
+    snprintf(binary_name_so, binary_name_so_length, "%s%s%s%s", bin_dir, DIR_SEPP, binary_name, DL_TAIL);
     handle = dynl_open(binary_name_so);
     omFreeSize((ADDRESS)binary_name_so, binary_name_so_length * sizeof(char) );
   }
@@ -140,7 +144,7 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
   {
     const int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name);
     char* binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
-    snprintf(binary_name_so, binary_name_so_length, "%s.%s", binary_name, DL_TAIL);
+    snprintf(binary_name_so, binary_name_so_length, "%s%s", binary_name, DL_TAIL);
 
     char* pp = (char *)omAlloc0( MAXPATHLEN * sizeof(char) );
     lib_types type = type_of_LIB( binary_name_so, pp );
@@ -154,7 +158,7 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
 
   if (handle == NULL && ! warn_handle)
   {
-      Warn("Could not find dynamic library: %s.%s", binary_name, DL_TAIL);
+      Warn("Could not find dynamic library: %s%s", binary_name, DL_TAIL);
       Warn("Error message from system: %s", dynl_error());
       if (msg != NULL) Warn("%s", msg);
       Warn("See the INSTALL section in the Singular manual for details.");
