@@ -30,8 +30,13 @@
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if ((mpz_cmp_ui(x->z,(long)0)==0)
-  || (mpz_size1(x->z)<=MP_SMALL))
+  if (mpz_cmp_ui(x->z,(long)0)==0)
+  {
+    mpz_clear(x->z);
+    FREE_RNUMBER(x);
+    return INT_TO_SR(0);
+  }
+  if (mpz_size1(x->z)<=MP_SMALL)
   {
     LONG ui=mpz_get_si(x->z);
     if ((((ui<<3)>>3)==ui)
@@ -2137,8 +2142,19 @@ LINLINE BOOLEAN nlIsOne (number a, const coeffs r)
 
 LINLINE BOOLEAN nlIsZero (number a, const coeffs)
 {
+  #if 0
+  if (a==INT_TO_SR(0)) return TRUE;
+  if ((SR_HDL(a) & SR_INT)||(a==NULL)) return FALSE;
+  if (mpz_cmp_si(a->z,(long)0)==0)
+  {
+    printf("gmp-0 in nlIsZero\n");
+    dErrorBreak();
+    return TRUE;
+  }
+  return FALSE;
+  #else
   return (a==INT_TO_SR(0));
-  //return (mpz_cmp_si(a->z,(long)0)==0);
+  #endif
 }
 
 /*2
@@ -2210,18 +2226,18 @@ LINLINE number nlAdd (number a, number b, const coeffs R)
 number nlShort1(number a);
 number nlShort3_noinline(number x);
 
-static inline number nlInpAdd_(number a, number b, const coeffs r)
+LINLINE void nlInpAdd(number &a, number b, const coeffs r)
 {
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     LONG r=SR_HDL(a)+SR_HDL(b)-1L;
     if ( ((r << 1) >> 1) == r )
-      return (number)(long)r;
+      a=(number)(long)r;
     else
-      return nlRInit(SR_TO_INT(r));
+      a=nlRInit(SR_TO_INT(r));
   }
   // a=a+b
-  if (SR_HDL(b) & SR_INT)
+  else if (SR_HDL(b) & SR_INT)
   {
     switch (a->s)
     {
@@ -2248,9 +2264,9 @@ static inline number nlInpAdd_(number a, number b, const coeffs r)
         break;
       }
     }
-    return a;
+    return;
   }
-  if (SR_HDL(a) & SR_INT)
+  else if (SR_HDL(a) & SR_INT)
   {
     number u=ALLOC_RNUMBER();
     #if defined(LDEBUG)
@@ -2287,7 +2303,7 @@ static inline number nlInpAdd_(number a, number b, const coeffs r)
       }
     }
     nlTest(u, r);
-    return u;
+    a=u;
   }
   else
   {
@@ -2356,16 +2372,9 @@ static inline number nlInpAdd_(number a, number b, const coeffs r)
         break;
       }
     }
-    nlTest(a, r);
-    return a;
   }
+  nlTest(a, r);
 }
-
-LINLINE void nlInpAdd(number &a, number b, const coeffs r)
-{
-  a = nlInpAdd_(a, b, r);
-}
-
 
 LINLINE number nlMult (number a, number b, const coeffs R)
 {
