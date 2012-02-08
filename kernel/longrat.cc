@@ -24,8 +24,13 @@
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if ((mpz_cmp_ui(x->z,(long)0)==0)
-  || (mpz_size1(x->z)<=MP_SMALL))
+  if (mpz_cmp_ui(x->z,(long)0)==0)
+  {
+    mpz_clear(x->z);
+    FREE_RNUMBER(x);
+    return INT_TO_SR(0);
+  }
+  if(mpz_size1(x->z)<=MP_SMALL)
   {
     LONG ui=mpz_get_si(x->z);
     if ((((ui<<3)>>3)==ui)
