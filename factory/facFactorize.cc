@@ -477,8 +477,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
       CFArray Pi;
       CFList diophant;
-      henselLift122 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
-                     leadingCoeffs, false);
+      nonMonicHenselLift12 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
+                            leadingCoeffs, false);
 
       if (sqrfPartF.level() > 2)
       {

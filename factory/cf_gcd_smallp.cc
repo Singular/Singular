@@ -22,6 +22,7 @@
 #include "timing.h"
 
 #include "canonicalform.h"
+#include "algext.h"
 #include "cf_map.h"
 #include "cf_util.h"
 #include "templates/ftmpl_functions.h"
@@ -4026,8 +4027,8 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   CFArray lcs= CFArray (2);
   lcs [0]= shiftedLCsEval1.getFirst();
   lcs [1]= shiftedLCsEval2.getFirst();
-  henselLift122 (UEval.getFirst(), factors, liftBound, Pi, diophant, M,
-                 lcs, false);
+  nonMonicHenselLift12 (UEval.getFirst(), factors, liftBound, Pi, diophant, M,
+                        lcs, false);
 
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
@@ -4043,9 +4044,9 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
     liftBounds[0]= liftBound;
     for (int i= 1; i < U.level() - 1; i++)
       liftBounds[i]= degree (shiftedU, Variable (i + 2)) + 1;
-    factors= henselLift2 (UEval, factors, liftBounds, U.level() - 1, false,
-                          shiftedLCsEval1, shiftedLCsEval2, Pi, diophant,
-                          noOneToOne);
+    factors= nonMonicHenselLift2 (UEval, factors, liftBounds, U.level() - 1,
+                                  false, shiftedLCsEval1, shiftedLCsEval2, Pi,
+                                  diophant, noOneToOne);
     delete [] liftBounds;
     if (noOneToOne)
       return 0;

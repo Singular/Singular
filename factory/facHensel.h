@@ -22,9 +22,6 @@
 #include "timing.h"
 
 #include "canonicalform.h"
-#include "cf_iter.h"
-#include "templates/ftmpl_functions.h"
-#include "algext.h"
 
 /// sort a list of polynomials by their degree in @a x.
 ///
@@ -83,7 +80,7 @@ henselLift23 (const CFList& eval,    ///< [in] contains compressed, bivariate
               const CFList& factors, ///< [in] monic bivariate factors,
                                      ///< including leading coefficient
                                      ///< as first element.
-              const int* l,          ///< [in] l[0]: precision of bivariate
+              int* l,          ///< [in] l[0]: precision of bivariate
                                      ///< lifting, l[1] as above
               CFList& diophant,      ///< [in,out] returns the result of
                                      ///< biDiophantine()
@@ -127,8 +124,8 @@ henselLift (const CFList& F,       ///< [in] two compressed, multivariate
             CFList& diophant,      ///< [in,out] result of multiRecDiophantine()
             CFArray& Pi,           ///< [in,out] stores intermediate results
             CFMatrix& M,           ///< [in,out] stores intermediate results
-            const int lOld,       ///< [in] lifting precision of F.mvar()
-            const int lNew        ///< [in] lifting precision of G.mvar()
+            int lOld,       ///< [in] lifting precision of F.mvar()
+            int lNew        ///< [in] lifting precision of G.mvar()
            );
 
 /// Hensel lifting from bivariate to multivariate
@@ -144,16 +141,15 @@ henselLift (const CFList& eval,    ///< [in] a list of polynomials the last
                                    ///< compressed bivariate poly.
             const CFList& factors, ///< [in] bivariate factors, including
                                    ///< leading coefficient
-            const int* l,          ///< [in] lifting bounds
-            const int lLength,     ///< [in] length of l
+            int* l,          ///< [in] lifting bounds
+            int lLength,     ///< [in] length of l
             bool sort= true        ///< [in] sort factors by degree in
                                    ///< Variable(1)
            );
 
-/// two factor Hensel lifting from univariate to bivariate, factors need not to
-/// be monic
+/// Hensel lifting from univariate to bivariate, factors need not to be monic
 void
-henselLift122 (const CanonicalForm& F,///< [in] a bivariate poly
+nonMonicHenselLift12 (const CanonicalForm& F,///< [in] a bivariate poly
                CFList& factors,       ///< [in, out] a list of univariate polys
                                       ///< lifted factors
                int l,                 ///< [in] lift bound
@@ -170,7 +166,7 @@ henselLift122 (const CanonicalForm& F,///< [in] a bivariate poly
 ///
 /// @return @a henselLift122 returns a list of lifted factors
 CFList
-henselLift2 (const CFList& eval,   ///< [in] a list of polynomials the last
+nonMonicHenselLift2 (const CFList& eval,///< [in] a list of polynomials the last
                                    ///< element is a compressed multivariate
                                    ///< poly, last but one element equals the
                                    ///< last elements modulo its main variable
@@ -178,7 +174,7 @@ henselLift2 (const CFList& eval,   ///< [in] a list of polynomials the last
                                    ///< compressed bivariate poly.
              const CFList& factors,///< [in] bivariate factors
              int* l,               ///< [in] lift bounds
-             const int lLength,    ///< [in] length of l
+             int lLength,          ///< [in] length of l
              bool sort,            ///< [in] if true factors are sorted by
                                    ///< their degree in Variable(1)
              const CFList& LCs1,   ///< [in] a list of evaluated LC of first
