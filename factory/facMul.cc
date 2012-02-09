@@ -16,6 +16,7 @@
 #include "canonicalform.h"
 #include "facMul.h"
 #include "algext.h"
+#include "cf_util.h"
 #include "templates/ftmpl_functions.h"
 
 #ifdef HAVE_NTL
@@ -25,6 +26,8 @@
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
 #endif
+
+// univariate polys
 
 #ifdef HAVE_FLINT
 void kronSub (fmpz_poly_t result, const CanonicalForm& A, int d)
@@ -47,8 +50,8 @@ void kronSub (fmpz_poly_t result, const CanonicalForm& A, int d)
 
 
 CanonicalForm
-reverseSubst (const fmpz_poly_t F, int d, const Variable& alpha,
-              const CanonicalForm& den)
+reverseSubstQa (const fmpz_poly_t F, int d, const Variable& alpha,
+                const CanonicalForm& den)
 {
   Variable x= Variable (1);
 
@@ -110,7 +113,7 @@ mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G,
   fmpz_poly_mul (FLINTA, FLINTA, FLINTB);
 
   denA *= denB;
-  A= reverseSubst (FLINTA, d, alpha, denA);
+  A= reverseSubstQa (FLINTA, d, alpha, denA);
 
   fmpz_poly_clear (FLINTA);
   fmpz_poly_clear (FLINTB);
@@ -221,7 +224,7 @@ mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
   fmpz_poly_mullow (FLINTA, FLINTA, FLINTB, k);
 
   denA *= denB;
-  A= reverseSubst (FLINTA, d, alpha, denA);
+  A= reverseSubstQa (FLINTA, d, alpha, denA);
   fmpz_poly_clear (FLINTA);
   fmpz_poly_clear (FLINTB);
   return A;
@@ -569,6 +572,10 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
   return result;
 }
 
+// end univariate polys
+//*************************
+// bivariate polys
+
 #ifdef HAVE_FLINT
 void kronSubFp (nmod_poly_t result, const CanonicalForm& A, int d)
 {
@@ -591,34 +598,6 @@ void kronSubFp (nmod_poly_t result, const CanonicalForm& A, int d)
   _nmod_poly_normalise (result);
 }
 
-/*void kronSubQ (fmpz_poly_t result, const CanonicalForm& A, int d)
-{
-  int degAy= degree (A);
-  fmpz_poly_init2 (result, d*(degAy + 1));
-  _fmpz_poly_set_length (result, d*(degAy+1));
-
-  CFIterator j;
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inBas
-    convertFacCF2Fmpz_poly_t (buf, i.coeff());
-
-    int k= i.exp()*d;
-    int bufRepLength= (int) fmpz_poly_length (buf);
-    for (int j= 0; j < bufRepLength; j++)
-    {
-      fmpz_poly_get_coeff_fmpz (coeff, buf, j);
-      fmpz_poly_set_coeff_fmpz (result, j + k, coeff);
-    }
-    fmpz_poly_clear (buf);
-  }
-  fmpz_clear (coeff);
-  _fmpz_poly_normalise (result);
-}*/
-
-// A is a bivariate poly over Qa!!!!
-// d2= 2*deg_alpha + 1
-// d1= 2*deg_x*d2+1
 void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
 {
   int degAy= degree (A);
@@ -663,595 +642,10 @@ void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
   fmpq_clear (coeff);
   _fmpq_poly_normalise (result);
 }
-#endif
-
-zz_pX kronSubFp (const CanonicalForm& A, int d)
-{
-  int degAy= degree (A);
-  zz_pX result;
-  result.rep.SetLength (d*(degAy + 1));
-
-  zz_p *resultp;
-  resultp= result.rep.elts();
-  zz_pX buf;
-  zz_p *bufp;
-  int j, k, bufRepLength;
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inCoeffDomain())
-      buf= convertFacCF2NTLzzpX (i.coeff());
-    else
-      buf= convertFacCF2NTLzzpX (i.coeff());
-
-    k= i.exp()*d;
-    bufp= buf.rep.elts();
-    bufRepLength= (int) buf.rep.length();
-    for (j= 0; j < bufRepLength; j++)
-      resultp [j + k]= bufp [j];
-  }
-  result.normalize();
-
-  return result;
-}
-
-zz_pEX kronSub (const CanonicalForm& A, int d, const Variable& alpha)
-{
-  int degAy= degree (A);
-  zz_pEX result;
-  result.rep.SetLength (d*(degAy + 1));
-
-  Variable v;
-  zz_pE *resultp;
-  resultp= result.rep.elts();
-  zz_pEX buf1;
-  zz_pE *buf1p;
-  zz_pX buf2;
-  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-  int j, k, buf1RepLength;
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inCoeffDomain())
-    {
-      buf2= convertFacCF2NTLzzpX (i.coeff());
-      buf1= to_zz_pEX (to_zz_pE (buf2));
-    }
-    else
-      buf1= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
-
-    k= i.exp()*d;
-    buf1p= buf1.rep.elts();
-    buf1RepLength= (int) buf1.rep.length();
-    for (j= 0; j < buf1RepLength; j++)
-      resultp [j + k]= buf1p [j];
-  }
-  result.normalize();
-
-  return result;
-}
 
 void
-kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
-                const Variable& alpha)
-{
-  int degAy= degree (A);
-  subA1.rep.SetLength ((long) d*(degAy + 2));
-  subA2.rep.SetLength ((long) d*(degAy + 2));
-
-  Variable v;
-  zz_pE *subA1p;
-  zz_pE *subA2p;
-  subA1p= subA1.rep.elts();
-  subA2p= subA2.rep.elts();
-  zz_pEX buf;
-  zz_pE *bufp;
-  zz_pX buf2;
-  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-  int j, k, kk, bufRepLength;
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inCoeffDomain())
-    {
-      buf2= convertFacCF2NTLzzpX (i.coeff());
-      buf= to_zz_pEX (to_zz_pE (buf2));
-    }
-    else
-      buf= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
-
-    k= i.exp()*d;
-    kk= (degAy - i.exp())*d;
-    bufp= buf.rep.elts();
-    bufRepLength= (int) buf.rep.length();
-    for (j= 0; j < bufRepLength; j++)
-    {
-      subA1p [j + k] += bufp [j];
-      subA2p [j + kk] += bufp [j];
-    }
-  }
-  subA1.normalize();
-  subA2.normalize();
-}
-
-void
-kronSubRecipro (zz_pX& subA1, zz_pX& subA2,const CanonicalForm& A, int d)
-{
-  int degAy= degree (A);
-  subA1.rep.SetLength ((long) d*(degAy + 2));
-  subA2.rep.SetLength ((long) d*(degAy + 2));
-
-  zz_p *subA1p;
-  zz_p *subA2p;
-  subA1p= subA1.rep.elts();
-  subA2p= subA2.rep.elts();
-  zz_pX buf;
-  zz_p *bufp;
-  int j, k, kk, bufRepLength;
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    buf= convertFacCF2NTLzzpX (i.coeff());
-
-    k= i.exp()*d;
-    kk= (degAy - i.exp())*d;
-    bufp= buf.rep.elts();
-    bufRepLength= (int) buf.rep.length();
-    for (j= 0; j < bufRepLength; j++)
-    {
-      subA1p [j + k] += bufp [j];
-      subA2p [j + kk] += bufp [j];
-    }
-  }
-  subA1.normalize();
-  subA2.normalize();
-}
-
-CanonicalForm
-reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
-              const Variable& alpha)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pEX f= F;
-  zz_pEX g= G;
-  int degf= deg(f);
-  int degg= deg(g);
-
-  zz_pEX buf1;
-  zz_pEX buf2;
-  zz_pEX buf3;
-
-  zz_pE *buf1p;
-  zz_pE *buf2p;
-  zz_pE *buf3p;
-  if (f.rep.length() < (long) d*(k+1)) //zero padding
-    f.rep.SetLength ((long)d*(k+1));
-
-  zz_pE *gp= g.rep.elts();
-  zz_pE *fp= f.rep.elts();
-  CanonicalForm result= 0;
-  int i= 0;
-  int lf= 0;
-  int lg= d*k;
-  int degfSubLf= degf;
-  int deggSubLg= degg-lg;
-  int repLengthBuf2, repLengthBuf1, ind, tmp;
-  zz_pE zzpEZero= zz_pE();
-
-  while (degf >= lf || lg >= 0)
-  {
-    if (degfSubLf >= d)
-      repLengthBuf1= d;
-    else if (degfSubLf < 0)
-      repLengthBuf1= 0;
-    else
-      repLengthBuf1= degfSubLf + 1;
-    buf1.rep.SetLength((long) repLengthBuf1);
-
-    buf1p= buf1.rep.elts();
-    for (ind= 0; ind < repLengthBuf1; ind++)
-      buf1p [ind]= fp [ind + lf];
-    buf1.normalize();
-
-    repLengthBuf1= buf1.rep.length();
-
-    if (deggSubLg >= d - 1)
-      repLengthBuf2= d - 1;
-    else if (deggSubLg < 0)
-      repLengthBuf2= 0;
-    else
-      repLengthBuf2= deggSubLg + 1;
-
-    buf2.rep.SetLength ((long) repLengthBuf2);
-    buf2p= buf2.rep.elts();
-    for (ind= 0; ind < repLengthBuf2; ind++)
-      buf2p [ind]= gp [ind + lg];
-    buf2.normalize();
-
-    repLengthBuf2= buf2.rep.length();
-
-    buf3.rep.SetLength((long) repLengthBuf2 + d);
-    buf3p= buf3.rep.elts();
-    buf2p= buf2.rep.elts();
-    buf1p= buf1.rep.elts();
-    for (ind= 0; ind < repLengthBuf1; ind++)
-      buf3p [ind]= buf1p [ind];
-    for (ind= repLengthBuf1; ind < d; ind++)
-      buf3p [ind]= zzpEZero;
-    for (ind= 0; ind < repLengthBuf2; ind++)
-      buf3p [ind + d]= buf2p [ind];
-    buf3.normalize();
-
-    result += convertNTLzz_pEX2CF (buf3, x, alpha)*power (y, i);
-    i++;
-
-
-    lf= i*d;
-    degfSubLf= degf - lf;
-
-    lg= d*(k-i);
-    deggSubLg= degg - lg;
-
-    buf1p= buf1.rep.elts();
-
-    if (lg >= 0 && deggSubLg > 0)
-    {
-      if (repLengthBuf2 > degfSubLf + 1)
-        degfSubLf= repLengthBuf2 - 1;
-      tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (ind= 0; ind < tmp; ind++)
-        gp [ind + lg] -= buf1p [ind];
-    }
-
-    if (lg < 0)
-      break;
-
-    buf2p= buf2.rep.elts();
-    if (degfSubLf >= 0)
-    {
-      for (ind= 0; ind < repLengthBuf2; ind++)
-        fp [ind + lf] -= buf2p [ind];
-    }
-  }
-
-  return result;
-}
-
-CanonicalForm
-reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pX f= F;
-  zz_pX g= G;
-  int degf= deg(f);
-  int degg= deg(g);
-
-  zz_pX buf1;
-  zz_pX buf2;
-  zz_pX buf3;
-
-  zz_p *buf1p;
-  zz_p *buf2p;
-  zz_p *buf3p;
-
-  if (f.rep.length() < (long) d*(k+1)) //zero padding
-    f.rep.SetLength ((long)d*(k+1));
-
-  zz_p *gp= g.rep.elts();
-  zz_p *fp= f.rep.elts();
-  CanonicalForm result= 0;
-  int i= 0;
-  int lf= 0;
-  int lg= d*k;
-  int degfSubLf= degf;
-  int deggSubLg= degg-lg;
-  int repLengthBuf2, repLengthBuf1, ind, tmp;
-  zz_p zzpZero= zz_p();
-  while (degf >= lf || lg >= 0)
-  {
-    if (degfSubLf >= d)
-      repLengthBuf1= d;
-    else if (degfSubLf < 0)
-      repLengthBuf1= 0;
-    else
-      repLengthBuf1= degfSubLf + 1;
-    buf1.rep.SetLength((long) repLengthBuf1);
-
-    buf1p= buf1.rep.elts();
-    for (ind= 0; ind < repLengthBuf1; ind++)
-      buf1p [ind]= fp [ind + lf];
-    buf1.normalize();
-
-    repLengthBuf1= buf1.rep.length();
-
-    if (deggSubLg >= d - 1)
-      repLengthBuf2= d - 1;
-    else if (deggSubLg < 0)
-      repLengthBuf2= 0;
-    else
-      repLengthBuf2= deggSubLg + 1;
-
-    buf2.rep.SetLength ((long) repLengthBuf2);
-    buf2p= buf2.rep.elts();
-    for (ind= 0; ind < repLengthBuf2; ind++)
-      buf2p [ind]= gp [ind + lg];
-
-    buf2.normalize();
-
-    repLengthBuf2= buf2.rep.length();
-
-
-    buf3.rep.SetLength((long) repLengthBuf2 + d);
-    buf3p= buf3.rep.elts();
-    buf2p= buf2.rep.elts();
-    buf1p= buf1.rep.elts();
-    for (ind= 0; ind < repLengthBuf1; ind++)
-      buf3p [ind]= buf1p [ind];
-    for (ind= repLengthBuf1; ind < d; ind++)
-      buf3p [ind]= zzpZero;
-    for (ind= 0; ind < repLengthBuf2; ind++)
-      buf3p [ind + d]= buf2p [ind];
-    buf3.normalize();
-
-    result += convertNTLzzpX2CF (buf3, x)*power (y, i);
-    i++;
-
-
-    lf= i*d;
-    degfSubLf= degf - lf;
-
-    lg= d*(k-i);
-    deggSubLg= degg - lg;
-
-    buf1p= buf1.rep.elts();
-
-    if (lg >= 0 && deggSubLg > 0)
-    {
-      if (repLengthBuf2 > degfSubLf + 1)
-        degfSubLf= repLengthBuf2 - 1;
-      tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (ind= 0; ind < tmp; ind++)
-        gp [ind + lg] -= buf1p [ind];
-    }
-    if (lg < 0)
-      break;
-
-    buf2p= buf2.rep.elts();
-    if (degfSubLf >= 0)
-    {
-      for (ind= 0; ind < repLengthBuf2; ind++)
-        fp [ind + lf] -= buf2p [ind];
-    }
-  }
-
-  return result;
-}
-
-CanonicalForm reverseSubst (const zz_pEX& F, int d, const Variable& alpha)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pEX f= F;
-  zz_pE *fp= f.rep.elts();
-
-  zz_pEX buf;
-  zz_pE *bufp;
-  CanonicalForm result= 0;
-  int i= 0;
-  int degf= deg(f);
-  int k= 0;
-  int degfSubK, repLength, j;
-  while (degf >= k)
-  {
-    degfSubK= degf - k;
-    if (degfSubK >= d)
-      repLength= d;
-    else
-      repLength= degfSubK + 1;
-
-    buf.rep.SetLength ((long) repLength);
-    bufp= buf.rep.elts();
-    for (j= 0; j < repLength; j++)
-      bufp [j]= fp [j + k];
-    buf.normalize();
-
-    result += convertNTLzz_pEX2CF (buf, x, alpha)*power (y, i);
-    i++;
-    k= d*i;
-  }
-
-  return result;
-}
-
-CanonicalForm reverseSubstFp (const zz_pX& F, int d)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pX f= F;
-  zz_p *fp= f.rep.elts();
-
-  zz_pX buf;
-  zz_p *bufp;
-  CanonicalForm result= 0;
-  int i= 0;
-  int degf= deg(f);
-  int k= 0;
-  int degfSubK, repLength, j;
-  while (degf >= k)
-  {
-    degfSubK= degf - k;
-    if (degfSubK >= d)
-      repLength= d;
-    else
-      repLength= degfSubK + 1;
-
-    buf.rep.SetLength ((long) repLength);
-    bufp= buf.rep.elts();
-    for (j= 0; j < repLength; j++)
-      bufp [j]= fp [j + k];
-    buf.normalize();
-
-    result += convertNTLzzpX2CF (buf, x)*power (y, i);
-    i++;
-    k= d*i;
-  }
-
-  return result;
-}
-
-// assumes input to be reduced mod M and to be an element of Fq not Fp
-CanonicalForm
-mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
-                  CanonicalForm& M)
-{
-  int d1= degree (F, 1) + degree (G, 1) + 1;
-  d1 /= 2;
-  d1 += 1;
-
-  zz_pX F1, F2;
-  kronSubRecipro (F1, F2, F, d1);
-  zz_pX G1, G2;
-  kronSubRecipro (G1, G2, G, d1);
-
-  int k= d1*degree (M);
-  MulTrunc (F1, F1, G1, (long) k);
-
-  int degtailF= degree (tailcoeff (F), 1);
-  int degtailG= degree (tailcoeff (G), 1);
-  int taildegF= taildegree (F);
-  int taildegG= taildegree (G);
-  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
-
-  reverse (F2, F2);
-  reverse (G2, G2);
-  MulTrunc (F2, F2, G2, b + 1);
-  reverse (F2, F2, b);
-
-  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
-  return reverseSubst (F1, F2, d1, d2);
-}
-
-//Kronecker substitution
-CanonicalForm
-mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
-              CanonicalForm& M)
-{
-  CanonicalForm A= F;
-  CanonicalForm B= G;
-
-  int degAx= degree (A, 1);
-  int degAy= degree (A, 2);
-  int degBx= degree (B, 1);
-  int degBy= degree (B, 2);
-  int d1= degAx + 1 + degBx;
-  int d2= tmax (degAy, degBy);
-
-  if (d1 > 128 && d2 > 160 && (degAy == degBy) && (2*degAy > degree (M)))
-    return mulMod2NTLFpReci (A, B, M);
-
-  zz_pX NTLA= kronSubFp (A, d1);
-  zz_pX NTLB= kronSubFp (B, d1);
-
-  int k= d1*degree (M);
-  MulTrunc (NTLA, NTLA, NTLB, (long) k);
-
-  A= reverseSubstFp (NTLA, d1);
-
-  return A;
-}
-
-// assumes input to be reduced mod M and to be an element of Fq not Fp
-CanonicalForm
-mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
-                  CanonicalForm& M, const Variable& alpha)
-{
-  int d1= degree (F, 1) + degree (G, 1) + 1;
-  d1 /= 2;
-  d1 += 1;
-
-  zz_pEX F1, F2;
-  kronSubRecipro (F1, F2, F, d1, alpha);
-  zz_pEX G1, G2;
-  kronSubRecipro (G1, G2, G, d1, alpha);
-
-  int k= d1*degree (M);
-  MulTrunc (F1, F1, G1, (long) k);
-
-  int degtailF= degree (tailcoeff (F), 1);
-  int degtailG= degree (tailcoeff (G), 1);
-  int taildegF= taildegree (F);
-  int taildegG= taildegree (G);
-  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
-
-  reverse (F2, F2);
-  reverse (G2, G2);
-  MulTrunc (F2, F2, G2, b + 1);
-  reverse (F2, F2, b);
-
-  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
-  return reverseSubst (F1, F2, d1, d2, alpha);
-}
-
-#ifdef HAVE_FLINT
-CanonicalForm
-mulMod2FLINTFp (const CanonicalForm& F, const CanonicalForm& G, const
-                CanonicalForm& M);
-#endif
-
-CanonicalForm
-mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
-              CanonicalForm& M)
-{
-  Variable alpha;
-  CanonicalForm A= F;
-  CanonicalForm B= G;
-
-  if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
-  {
-    int degAx= degree (A, 1);
-    int degAy= degree (A, 2);
-    int degBx= degree (B, 1);
-    int degBy= degree (B, 2);
-    int d1= degAx + degBx + 1;
-    int d2= tmax (degAy, degBy);
-    zz_p::init (getCharacteristic());
-    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-    zz_pE::init (NTLMipo);
-
-    int degMipo= degree (getMipo (alpha));
-    if ((d1 > 128/degMipo) && (d2 > 160/degMipo) && (degAy == degBy) &&
-        (2*degAy > degree (M)))
-      return mulMod2NTLFqReci (A, B, M, alpha);
-
-    zz_pEX NTLA= kronSub (A, d1, alpha);
-    zz_pEX NTLB= kronSub (B, d1, alpha);
-
-    int k= d1*degree (M);
-
-    MulTrunc (NTLA, NTLA, NTLB, (long) k);
-
-    A= reverseSubst (NTLA, d1, alpha);
-
-    return A;
-  }
-  else
-#ifdef HAVE_FLINT
-    return mulMod2FLINTFp (A, B, M);
-#else
-    return mulMod2NTLFp (A, B, M);
-#endif
-}
-
-#ifdef HAVE_FLINT
-void
-kronSubRecipro (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A,
-                int d)
+kronSubReciproFp (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A,
+                  int d)
 {
   int degAy= degree (A);
   mp_limb_t ninv= n_preinvert_limb (getCharacteristic());
@@ -1290,8 +684,8 @@ kronSubRecipro (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A,
 }
 
 void
-kronSubRecipro (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A,
-                int d)
+kronSubReciproQ (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A,
+                 int d)
 {
   int degAy= degree (A);
   fmpz_poly_init2 (subA1, d*(degAy + 2));
@@ -1371,7 +765,7 @@ CanonicalForm reverseSubstQ (const fmpz_poly_t F, int d)
 }
 
 CanonicalForm
-reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
+reverseSubstReciproFp (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
 {
   Variable y= Variable (2);
   Variable x= Variable (1);
@@ -1489,7 +883,7 @@ reverseSubst (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
 }
 
 CanonicalForm
-reverseSubst (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
+reverseSubstReciproQ (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
 {
   Variable y= Variable (2);
   Variable x= Variable (1);
@@ -1673,12 +1067,12 @@ mulMod2FLINTFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   mp_limb_t ninv= n_preinvert_limb (getCharacteristic());
   nmod_poly_init_preinv (F1, getCharacteristic(), ninv);
   nmod_poly_init_preinv (F2, getCharacteristic(), ninv);
-  kronSubRecipro (F1, F2, F, d1);
+  kronSubReciproFp (F1, F2, F, d1);
 
   nmod_poly_t G1, G2;
   nmod_poly_init_preinv (G1, getCharacteristic(), ninv);
   nmod_poly_init_preinv (G2, getCharacteristic(), ninv);
-  kronSubRecipro (G1, G2, G, d1);
+  kronSubReciproFp (G1, G2, G, d1);
 
   int k= d1*degree (M);
   nmod_poly_mullow (F1, F1, G1, (long) k);
@@ -1695,7 +1089,7 @@ mulMod2FLINTFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   int d2= tmax (nmod_poly_degree (F2)/d1, nmod_poly_degree (F1)/d1);
 
 
-  CanonicalForm result= reverseSubst (F1, F2, d1, d2);
+  CanonicalForm result= reverseSubstReciproFp (F1, F2, d1, d2);
 
   nmod_poly_clear (F1);
   nmod_poly_clear (F2);
@@ -1749,12 +1143,12 @@ mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
   fmpz_poly_t F1, F2;
   fmpz_poly_init (F1);
   fmpz_poly_init (F2);
-  kronSubRecipro (F1, F2, F, d1);
+  kronSubReciproQ (F1, F2, F, d1);
 
   fmpz_poly_t G1, G2;
   fmpz_poly_init (G1);
   fmpz_poly_init (G2);
-  kronSubRecipro (G1, G2, G, d1);
+  kronSubReciproQ (G1, G2, G, d1);
 
   int k= d1*degree (M);
   fmpz_poly_mullow (F1, F1, G1, (long) k);
@@ -1770,7 +1164,7 @@ mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
   fmpz_poly_shift_right (F2, F2, b);
   int d2= tmax (fmpz_poly_degree (F2)/d1, fmpz_poly_degree (F1)/d1);
 
-  CanonicalForm result= reverseSubst (F1, F2, d1, d2);
+  CanonicalForm result= reverseSubstReciproQ (F1, F2, d1, d2);
 
   fmpz_poly_clear (F1);
   fmpz_poly_clear (F2);
@@ -1810,6 +1204,589 @@ mulMod2FLINTQ (const CanonicalForm& F, const CanonicalForm& G, const
 }
 
 #endif
+
+zz_pX kronSubFp (const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  zz_pX result;
+  result.rep.SetLength (d*(degAy + 1));
+
+  zz_p *resultp;
+  resultp= result.rep.elts();
+  zz_pX buf;
+  zz_p *bufp;
+  int j, k, bufRepLength;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+      buf= convertFacCF2NTLzzpX (i.coeff());
+    else
+      buf= convertFacCF2NTLzzpX (i.coeff());
+
+    k= i.exp()*d;
+    bufp= buf.rep.elts();
+    bufRepLength= (int) buf.rep.length();
+    for (j= 0; j < bufRepLength; j++)
+      resultp [j + k]= bufp [j];
+  }
+  result.normalize();
+
+  return result;
+}
+
+zz_pEX kronSubFq (const CanonicalForm& A, int d, const Variable& alpha)
+{
+  int degAy= degree (A);
+  zz_pEX result;
+  result.rep.SetLength (d*(degAy + 1));
+
+  Variable v;
+  zz_pE *resultp;
+  resultp= result.rep.elts();
+  zz_pEX buf1;
+  zz_pE *buf1p;
+  zz_pX buf2;
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+  int j, k, buf1RepLength;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      buf2= convertFacCF2NTLzzpX (i.coeff());
+      buf1= to_zz_pEX (to_zz_pE (buf2));
+    }
+    else
+      buf1= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
+
+    k= i.exp()*d;
+    buf1p= buf1.rep.elts();
+    buf1RepLength= (int) buf1.rep.length();
+    for (j= 0; j < buf1RepLength; j++)
+      resultp [j + k]= buf1p [j];
+  }
+  result.normalize();
+
+  return result;
+}
+
+void
+kronSubReciproFq (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
+                  const Variable& alpha)
+{
+  int degAy= degree (A);
+  subA1.rep.SetLength ((long) d*(degAy + 2));
+  subA2.rep.SetLength ((long) d*(degAy + 2));
+
+  Variable v;
+  zz_pE *subA1p;
+  zz_pE *subA2p;
+  subA1p= subA1.rep.elts();
+  subA2p= subA2.rep.elts();
+  zz_pEX buf;
+  zz_pE *bufp;
+  zz_pX buf2;
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+  int j, k, kk, bufRepLength;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      buf2= convertFacCF2NTLzzpX (i.coeff());
+      buf= to_zz_pEX (to_zz_pE (buf2));
+    }
+    else
+      buf= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
+
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
+    bufp= buf.rep.elts();
+    bufRepLength= (int) buf.rep.length();
+    for (j= 0; j < bufRepLength; j++)
+    {
+      subA1p [j + k] += bufp [j];
+      subA2p [j + kk] += bufp [j];
+    }
+  }
+  subA1.normalize();
+  subA2.normalize();
+}
+
+void
+kronSubReciproFp (zz_pX& subA1, zz_pX& subA2, const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  subA1.rep.SetLength ((long) d*(degAy + 2));
+  subA2.rep.SetLength ((long) d*(degAy + 2));
+
+  zz_p *subA1p;
+  zz_p *subA2p;
+  subA1p= subA1.rep.elts();
+  subA2p= subA2.rep.elts();
+  zz_pX buf;
+  zz_p *bufp;
+  int j, k, kk, bufRepLength;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    buf= convertFacCF2NTLzzpX (i.coeff());
+
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
+    bufp= buf.rep.elts();
+    bufRepLength= (int) buf.rep.length();
+    for (j= 0; j < bufRepLength; j++)
+    {
+      subA1p [j + k] += bufp [j];
+      subA2p [j + kk] += bufp [j];
+    }
+  }
+  subA1.normalize();
+  subA2.normalize();
+}
+
+CanonicalForm
+reverseSubstReciproFq (const zz_pEX& F, const zz_pEX& G, int d, int k,
+                       const Variable& alpha)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pEX f= F;
+  zz_pEX g= G;
+  int degf= deg(f);
+  int degg= deg(g);
+
+  zz_pEX buf1;
+  zz_pEX buf2;
+  zz_pEX buf3;
+
+  zz_pE *buf1p;
+  zz_pE *buf2p;
+  zz_pE *buf3p;
+  if (f.rep.length() < (long) d*(k+1)) //zero padding
+    f.rep.SetLength ((long)d*(k+1));
+
+  zz_pE *gp= g.rep.elts();
+  zz_pE *fp= f.rep.elts();
+  CanonicalForm result= 0;
+  int i= 0;
+  int lf= 0;
+  int lg= d*k;
+  int degfSubLf= degf;
+  int deggSubLg= degg-lg;
+  int repLengthBuf2, repLengthBuf1, ind, tmp;
+  zz_pE zzpEZero= zz_pE();
+
+  while (degf >= lf || lg >= 0)
+  {
+    if (degfSubLf >= d)
+      repLengthBuf1= d;
+    else if (degfSubLf < 0)
+      repLengthBuf1= 0;
+    else
+      repLengthBuf1= degfSubLf + 1;
+    buf1.rep.SetLength((long) repLengthBuf1);
+
+    buf1p= buf1.rep.elts();
+    for (ind= 0; ind < repLengthBuf1; ind++)
+      buf1p [ind]= fp [ind + lf];
+    buf1.normalize();
+
+    repLengthBuf1= buf1.rep.length();
+
+    if (deggSubLg >= d - 1)
+      repLengthBuf2= d - 1;
+    else if (deggSubLg < 0)
+      repLengthBuf2= 0;
+    else
+      repLengthBuf2= deggSubLg + 1;
+
+    buf2.rep.SetLength ((long) repLengthBuf2);
+    buf2p= buf2.rep.elts();
+    for (ind= 0; ind < repLengthBuf2; ind++)
+      buf2p [ind]= gp [ind + lg];
+    buf2.normalize();
+
+    repLengthBuf2= buf2.rep.length();
+
+    buf3.rep.SetLength((long) repLengthBuf2 + d);
+    buf3p= buf3.rep.elts();
+    buf2p= buf2.rep.elts();
+    buf1p= buf1.rep.elts();
+    for (ind= 0; ind < repLengthBuf1; ind++)
+      buf3p [ind]= buf1p [ind];
+    for (ind= repLengthBuf1; ind < d; ind++)
+      buf3p [ind]= zzpEZero;
+    for (ind= 0; ind < repLengthBuf2; ind++)
+      buf3p [ind + d]= buf2p [ind];
+    buf3.normalize();
+
+    result += convertNTLzz_pEX2CF (buf3, x, alpha)*power (y, i);
+    i++;
+
+
+    lf= i*d;
+    degfSubLf= degf - lf;
+
+    lg= d*(k-i);
+    deggSubLg= degg - lg;
+
+    buf1p= buf1.rep.elts();
+
+    if (lg >= 0 && deggSubLg > 0)
+    {
+      if (repLengthBuf2 > degfSubLf + 1)
+        degfSubLf= repLengthBuf2 - 1;
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      for (ind= 0; ind < tmp; ind++)
+        gp [ind + lg] -= buf1p [ind];
+    }
+
+    if (lg < 0)
+      break;
+
+    buf2p= buf2.rep.elts();
+    if (degfSubLf >= 0)
+    {
+      for (ind= 0; ind < repLengthBuf2; ind++)
+        fp [ind + lf] -= buf2p [ind];
+    }
+  }
+
+  return result;
+}
+
+CanonicalForm
+reverseSubstReciproFp (const zz_pX& F, const zz_pX& G, int d, int k)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pX f= F;
+  zz_pX g= G;
+  int degf= deg(f);
+  int degg= deg(g);
+
+  zz_pX buf1;
+  zz_pX buf2;
+  zz_pX buf3;
+
+  zz_p *buf1p;
+  zz_p *buf2p;
+  zz_p *buf3p;
+
+  if (f.rep.length() < (long) d*(k+1)) //zero padding
+    f.rep.SetLength ((long)d*(k+1));
+
+  zz_p *gp= g.rep.elts();
+  zz_p *fp= f.rep.elts();
+  CanonicalForm result= 0;
+  int i= 0;
+  int lf= 0;
+  int lg= d*k;
+  int degfSubLf= degf;
+  int deggSubLg= degg-lg;
+  int repLengthBuf2, repLengthBuf1, ind, tmp;
+  zz_p zzpZero= zz_p();
+  while (degf >= lf || lg >= 0)
+  {
+    if (degfSubLf >= d)
+      repLengthBuf1= d;
+    else if (degfSubLf < 0)
+      repLengthBuf1= 0;
+    else
+      repLengthBuf1= degfSubLf + 1;
+    buf1.rep.SetLength((long) repLengthBuf1);
+
+    buf1p= buf1.rep.elts();
+    for (ind= 0; ind < repLengthBuf1; ind++)
+      buf1p [ind]= fp [ind + lf];
+    buf1.normalize();
+
+    repLengthBuf1= buf1.rep.length();
+
+    if (deggSubLg >= d - 1)
+      repLengthBuf2= d - 1;
+    else if (deggSubLg < 0)
+      repLengthBuf2= 0;
+    else
+      repLengthBuf2= deggSubLg + 1;
+
+    buf2.rep.SetLength ((long) repLengthBuf2);
+    buf2p= buf2.rep.elts();
+    for (ind= 0; ind < repLengthBuf2; ind++)
+      buf2p [ind]= gp [ind + lg];
+
+    buf2.normalize();
+
+    repLengthBuf2= buf2.rep.length();
+
+
+    buf3.rep.SetLength((long) repLengthBuf2 + d);
+    buf3p= buf3.rep.elts();
+    buf2p= buf2.rep.elts();
+    buf1p= buf1.rep.elts();
+    for (ind= 0; ind < repLengthBuf1; ind++)
+      buf3p [ind]= buf1p [ind];
+    for (ind= repLengthBuf1; ind < d; ind++)
+      buf3p [ind]= zzpZero;
+    for (ind= 0; ind < repLengthBuf2; ind++)
+      buf3p [ind + d]= buf2p [ind];
+    buf3.normalize();
+
+    result += convertNTLzzpX2CF (buf3, x)*power (y, i);
+    i++;
+
+
+    lf= i*d;
+    degfSubLf= degf - lf;
+
+    lg= d*(k-i);
+    deggSubLg= degg - lg;
+
+    buf1p= buf1.rep.elts();
+
+    if (lg >= 0 && deggSubLg > 0)
+    {
+      if (repLengthBuf2 > degfSubLf + 1)
+        degfSubLf= repLengthBuf2 - 1;
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      for (ind= 0; ind < tmp; ind++)
+        gp [ind + lg] -= buf1p [ind];
+    }
+    if (lg < 0)
+      break;
+
+    buf2p= buf2.rep.elts();
+    if (degfSubLf >= 0)
+    {
+      for (ind= 0; ind < repLengthBuf2; ind++)
+        fp [ind + lf] -= buf2p [ind];
+    }
+  }
+
+  return result;
+}
+
+CanonicalForm reverseSubstFq (const zz_pEX& F, int d, const Variable& alpha)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pEX f= F;
+  zz_pE *fp= f.rep.elts();
+
+  zz_pEX buf;
+  zz_pE *bufp;
+  CanonicalForm result= 0;
+  int i= 0;
+  int degf= deg(f);
+  int k= 0;
+  int degfSubK, repLength, j;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d)
+      repLength= d;
+    else
+      repLength= degfSubK + 1;
+
+    buf.rep.SetLength ((long) repLength);
+    bufp= buf.rep.elts();
+    for (j= 0; j < repLength; j++)
+      bufp [j]= fp [j + k];
+    buf.normalize();
+
+    result += convertNTLzz_pEX2CF (buf, x, alpha)*power (y, i);
+    i++;
+    k= d*i;
+  }
+
+  return result;
+}
+
+CanonicalForm reverseSubstFp (const zz_pX& F, int d)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pX f= F;
+  zz_p *fp= f.rep.elts();
+
+  zz_pX buf;
+  zz_p *bufp;
+  CanonicalForm result= 0;
+  int i= 0;
+  int degf= deg(f);
+  int k= 0;
+  int degfSubK, repLength, j;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d)
+      repLength= d;
+    else
+      repLength= degfSubK + 1;
+
+    buf.rep.SetLength ((long) repLength);
+    bufp= buf.rep.elts();
+    for (j= 0; j < repLength; j++)
+      bufp [j]= fp [j + k];
+    buf.normalize();
+
+    result += convertNTLzzpX2CF (buf, x)*power (y, i);
+    i++;
+    k= d*i;
+  }
+
+  return result;
+}
+
+// assumes input to be reduced mod M and to be an element of Fq not Fp
+CanonicalForm
+mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
+                  CanonicalForm& M)
+{
+  int d1= degree (F, 1) + degree (G, 1) + 1;
+  d1 /= 2;
+  d1 += 1;
+
+  zz_pX F1, F2;
+  kronSubReciproFp (F1, F2, F, d1);
+  zz_pX G1, G2;
+  kronSubReciproFp (G1, G2, G, d1);
+
+  int k= d1*degree (M);
+  MulTrunc (F1, F1, G1, (long) k);
+
+  int degtailF= degree (tailcoeff (F), 1);
+  int degtailG= degree (tailcoeff (G), 1);
+  int taildegF= taildegree (F);
+  int taildegG= taildegree (G);
+  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
+
+  reverse (F2, F2);
+  reverse (G2, G2);
+  MulTrunc (F2, F2, G2, b + 1);
+  reverse (F2, F2, b);
+
+  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
+  return reverseSubstReciproFp (F1, F2, d1, d2);
+}
+
+//Kronecker substitution
+CanonicalForm
+mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
+              CanonicalForm& M)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  int degAx= degree (A, 1);
+  int degAy= degree (A, 2);
+  int degBx= degree (B, 1);
+  int degBy= degree (B, 2);
+  int d1= degAx + 1 + degBx;
+  int d2= tmax (degAy, degBy);
+
+  if (d1 > 128 && d2 > 160 && (degAy == degBy) && (2*degAy > degree (M)))
+    return mulMod2NTLFpReci (A, B, M);
+
+  zz_pX NTLA= kronSubFp (A, d1);
+  zz_pX NTLB= kronSubFp (B, d1);
+
+  int k= d1*degree (M);
+  MulTrunc (NTLA, NTLA, NTLB, (long) k);
+
+  A= reverseSubstFp (NTLA, d1);
+
+  return A;
+}
+
+// assumes input to be reduced mod M and to be an element of Fq not Fp
+CanonicalForm
+mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
+                  CanonicalForm& M, const Variable& alpha)
+{
+  int d1= degree (F, 1) + degree (G, 1) + 1;
+  d1 /= 2;
+  d1 += 1;
+
+  zz_pEX F1, F2;
+  kronSubReciproFq (F1, F2, F, d1, alpha);
+  zz_pEX G1, G2;
+  kronSubReciproFq (G1, G2, G, d1, alpha);
+
+  int k= d1*degree (M);
+  MulTrunc (F1, F1, G1, (long) k);
+
+  int degtailF= degree (tailcoeff (F), 1);
+  int degtailG= degree (tailcoeff (G), 1);
+  int taildegF= taildegree (F);
+  int taildegG= taildegree (G);
+  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
+
+  reverse (F2, F2);
+  reverse (G2, G2);
+  MulTrunc (F2, F2, G2, b + 1);
+  reverse (F2, F2, b);
+
+  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
+  return reverseSubstReciproFq (F1, F2, d1, d2, alpha);
+}
+
+#ifdef HAVE_FLINT
+CanonicalForm
+mulMod2FLINTFp (const CanonicalForm& F, const CanonicalForm& G, const
+                CanonicalForm& M);
+#endif
+
+CanonicalForm
+mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
+              CanonicalForm& M)
+{
+  Variable alpha;
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
+  {
+    int degAx= degree (A, 1);
+    int degAy= degree (A, 2);
+    int degBx= degree (B, 1);
+    int degBy= degree (B, 2);
+    int d1= degAx + degBx + 1;
+    int d2= tmax (degAy, degBy);
+    zz_p::init (getCharacteristic());
+    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+    zz_pE::init (NTLMipo);
+
+    int degMipo= degree (getMipo (alpha));
+    if ((d1 > 128/degMipo) && (d2 > 160/degMipo) && (degAy == degBy) &&
+        (2*degAy > degree (M)))
+      return mulMod2NTLFqReci (A, B, M, alpha);
+
+    zz_pEX NTLA= kronSubFq (A, d1, alpha);
+    zz_pEX NTLB= kronSubFq (B, d1, alpha);
+
+    int k= d1*degree (M);
+
+    MulTrunc (NTLA, NTLA, NTLB, (long) k);
+
+    A= reverseSubstFq (NTLA, d1, alpha);
+
+    return A;
+  }
+  else
+#ifdef HAVE_FLINT
+    return mulMod2FLINTFp (A, B, M);
+#else
+    return mulMod2NTLFp (A, B, M);
+#endif
+}
 
 CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
                        const CanonicalForm& M)
@@ -1885,6 +1862,10 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
   }
   DEBOUTLN (cerr, "fatal end in mulMod2");
 }
+
+// end bivariate polys
+//**********************
+// multivariate polys
 
 CanonicalForm mod (const CanonicalForm& F, const CFList& M)
 {
@@ -2029,6 +2010,10 @@ CanonicalForm prodMod (const CFList& L, const CFList& M)
     return mulMod (buf1, buf2, M);
   }
 }
+
+// end multivariate polys
+//***************************
+// division
 
 CanonicalForm reverse (const CanonicalForm& F, int d)
 {
@@ -2508,5 +2493,7 @@ void divrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
   }
   return;
 }
+
+// end division
 
 #endif

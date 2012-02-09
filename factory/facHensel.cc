@@ -24,9 +24,9 @@
 #include "debug.h"
 #include "timing.h"
 
+#include "algext.h"
 #include "facHensel.h"
 #include "facMul.h"
-#include "cf_util.h"
 #include "fac_util.h"
 #include "cf_algorithm.h"
 #include "cf_primes.h"
@@ -124,7 +124,7 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
   }
 }
 
-static inline
+static
 CFList mapinto (const CFList& L)
 {
   CFList result;
@@ -133,7 +133,7 @@ CFList mapinto (const CFList& L)
   return result;
 }
 
-static inline
+static
 int mod (const CFList& L, const CanonicalForm& p)
 {
   for (CFListIterator i= L; i.hasItem(); i++)
@@ -145,7 +145,7 @@ int mod (const CFList& L, const CanonicalForm& p)
 }
 
 
-static inline void
+static void
 chineseRemainder (const CFList & x1, const CanonicalForm & q1,
                   const CFList & x2, const CanonicalForm & q2,
                   CFList & xnew, CanonicalForm & qnew)
@@ -161,7 +161,7 @@ chineseRemainder (const CFList & x1, const CanonicalForm & q1,
   qnew= tmp2;
 }
 
-static inline
+static
 CFList Farey (const CFList& L, const CanonicalForm& q)
 {
   CFList result;
@@ -170,7 +170,7 @@ CFList Farey (const CFList& L, const CanonicalForm& q)
   return result;
 }
 
-static inline
+static
 CFList replacevar (const CFList& L, const Variable& a, const Variable& b)
 {
   CFList result;
@@ -358,7 +358,6 @@ void sortList (CFList& list, const Variable& x)
   }
 }
 
-static inline
 CFList diophantine (const CanonicalForm& F, const CFList& factors)
 {
   if (getCharacteristic() == 0)
@@ -668,9 +667,8 @@ henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
   return;
 }
 
-static inline
 CFList
-biDiophantine (const CanonicalForm& F, const CFList& factors, const int d)
+biDiophantine (const CanonicalForm& F, const CFList& factors, int d)
 {
   Variable y= F.mvar();
   CFList result;
@@ -769,10 +767,9 @@ biDiophantine (const CanonicalForm& F, const CFList& factors, const int d)
   }
 }
 
-static inline
 CFList
 multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
-                     const CFList& recResult, const CFList& M, const int d)
+                     const CFList& recResult, const CFList& M, int d)
 {
   Variable y= F.mvar();
   CFList result;
@@ -858,7 +855,7 @@ multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
   return result;
 }
 
-static inline
+static
 void
 henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
             const CFList& diophant, CFMatrix& M, CFArray& Pi, int j,
@@ -1100,7 +1097,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
 }
 
 CFList
-henselLift23 (const CFList& eval, const CFList& factors, const int* l, CFList&
+henselLift23 (const CFList& eval, const CFList& factors, int* l, CFList&
               diophant, CFArray& Pi, CFMatrix& M)
 {
   CFList buf= factors;
@@ -1167,8 +1164,7 @@ henselLiftResume (const CanonicalForm& F, CFList& factors, int start, int end,
 
 CFList
 henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
-            diophant, CFArray& Pi, CFMatrix& M, const int lOld, const int
-            lNew)
+            diophant, CFArray& Pi, CFMatrix& M, int lOld, int lNew)
 {
   diophant= multiRecDiophantine (F.getFirst(), factors, diophant, MOD, lOld);
   int k= 0;
@@ -1208,8 +1204,8 @@ henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 }
 
 CFList
-henselLift (const CFList& eval, const CFList& factors, const int* l, const int
-            lLength, bool sort)
+henselLift (const CFList& eval, const CFList& factors, int* l, int lLength,
+            bool sort)
 {
   CFList diophant;
   CFList buf= factors;
@@ -1242,10 +1238,12 @@ henselLift (const CFList& eval, const CFList& factors, const int* l, const int
   return result;
 }
 
+// nonmonic
+
 void
-henselStep122 (const CanonicalForm& F, const CFList& factors,
-              CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
-              CFArray& Pi, int j, const CFArray& /*LCs*/)
+nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
+                      CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
+                      CFArray& Pi, int j, const CFArray& /*LCs*/)
 {
   Variable x= F.mvar();
   CanonicalForm xToJ= power (x, j);
@@ -1454,8 +1452,9 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
 }
 
 void
-henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
-              CFList& diophant, CFMatrix& M, const CFArray& LCs, bool sort)
+nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
+                      CFArray& Pi, CFList& diophant, CFMatrix& M,
+                      const CFArray& LCs, bool sort)
 {
   if (sort)
     sortList (factors, Variable (1));
@@ -1521,7 +1520,7 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   }
 
   for (i= 1; i < l; i++)
-    henselStep122 (F, bufFactors2, bufFactors, diophant, M, Pi, i, LCs);
+    nonMonicHenselStep12 (F, bufFactors2, bufFactors, diophant, M, Pi, i, LCs);
 
   factors= CFList();
   for (i= 0; i < bufFactors.size(); i++)
@@ -1532,7 +1531,6 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
 
 /// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
 /// mod M, products contains \f$ prod_{j=1, j\neq i}^{r}{f_{i}}} \f$
-static inline
 CFList
 diophantine (const CFList& recResult, const CFList& factors,
              const CFList& products, const CFList& M, const CanonicalForm& E,
@@ -1611,11 +1609,11 @@ diophantine (const CFList& recResult, const CFList& factors,
   return result;
 }
 
-static inline
 void
-henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
-            const CFList& diophant, CFMatrix& M, CFArray& Pi,
-            const CFList& products, int j, const CFList& MOD, bool& noOneToOne)
+nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
+                    CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
+                    CFArray& Pi, const CFList& products, int j,
+                    const CFList& MOD, bool& noOneToOne)
 {
   CanonicalForm E;
   CanonicalForm xToJ= power (F.mvar(), j);
@@ -1851,9 +1849,9 @@ CanonicalForm replaceLC (const CanonicalForm& F, const CanonicalForm& c)
 }
 
 CFList
-henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
-              diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
-              const CFList& LCs2, bool& bad)
+nonMonicHenselLift232(const CFList& eval, const CFList& factors, int* l, CFList&
+                      diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
+                      const CFList& LCs2, bool& bad)
 {
   CFList buf= factors;
   int k= 0;
@@ -1901,7 +1899,8 @@ henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
 
   for (int d= 1; d < l[1]; d++)
   {
-    henselStep2 (j.getItem(), buf, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    nonMonicHenselStep (j.getItem(), buf, bufFactors, diophant, M, Pi, products,
+                        d, MOD, bad);
     if (bad)
       return CFList();
   }
@@ -1913,9 +1912,10 @@ henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
 
 
 CFList
-henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
-            diophant, CFArray& Pi, CFMatrix& M, const int lOld, int&
-            lNew, const CFList& LCs1, const CFList& LCs2, bool& bad)
+nonMonicHenselLift2 (const CFList& F, const CFList& factors, const CFList& MOD,
+                    CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
+                    int& lNew, const CFList& LCs1, const CFList& LCs2, bool& bad
+                   )
 {
   int k= 0;
   CFArray bufFactors= CFArray (factors.length());
@@ -1962,7 +1962,8 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 
   for (int d= 1; d < lNew; d++)
   {
-    henselStep2 (F.getLast(), buf, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    nonMonicHenselStep (F.getLast(), buf, bufFactors, diophant, M, Pi, products,
+                        d, MOD, bad);
     if (bad)
       return CFList();
   }
@@ -1974,9 +1975,9 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 }
 
 CFList
-henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
-             lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
-             const CFArray& Pi, const CFList& diophant, bool& bad)
+nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
+                    lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
+                    const CFArray& Pi, const CFList& diophant, bool& bad)
 {
   CFList bufDiophant= diophant;
   CFList buf= factors;
@@ -1984,8 +1985,8 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
     sortList (buf, Variable (1));
   CFArray bufPi= Pi;
   CFMatrix M= CFMatrix (l[1], factors.length());
-  CFList result= henselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2,
-                               bad);
+  CFList result= 
+    nonMonicHenselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2, bad);
   if (bad)
     return CFList();
 
@@ -2013,8 +2014,8 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
     bufLCs1.append (jj.getItem());
     bufLCs2.append (jjj.getItem());
     M= CFMatrix (l[i], factors.length());
-    result= henselLift2 (bufEval, result, MOD, bufDiophant, bufPi, M, l[i - 1],
-                         l[i], bufLCs1, bufLCs2, bad);
+    result= nonMonicHenselLift2 (bufEval, result, MOD, bufDiophant, bufPi, M,
+                                 l[i - 1], l[i], bufLCs1, bufLCs2, bad);
     if (bad)
       return CFList();
     MOD.append (power (Variable (i + 2), l[i]));
@@ -2111,7 +2112,8 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
   MOD.insert (yToL);
   for (int d= 1; d < liftBound; d++)
   {
-    henselStep2 (F, factors, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    nonMonicHenselStep (F, factors, bufFactors, diophant, M, Pi, products, d,
+                        MOD, bad);
     if (bad)
       return CFList();
   }
@@ -2124,7 +2126,7 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
 
 CFList
 nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
-                    CFList& diophant, CFArray& Pi, CFMatrix& M, const int lOld,
+                    CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
                     int& lNew, const CFList& MOD, bool& noOneToOne
                    )
 {
@@ -2191,8 +2193,8 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
 
   for (int d= 1; d < lNew; d++)
   {
-    henselStep2 (F.getLast(), factors, bufFactors, diophant, M, Pi, products, d,
-                 MOD, noOneToOne);
+    nonMonicHenselStep (F.getLast(), factors, bufFactors, diophant, M, Pi,
+                        products, d, MOD, noOneToOne);
     if (noOneToOne)
       return CFList();
   }
