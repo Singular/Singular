@@ -12,6 +12,8 @@
 #include <kernel/bbcone.h>
 #include <Singular/ipshell.h>
 #include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <kernel/polys.h>
 #include <sstream>
 
 
@@ -442,6 +444,61 @@ int getDimension(gfan::ZCone* zc)
   return zc->dimension()-1;
 }
 
+// intvec* IntStar2IntvecStar(int d, const int* i)
+// {
+//   assume(i != NULL);
+//   intvec* iv = new intvec(1,d);
+//   for(int j=1; i<=d; i++)
+//   {
+//     IMATELEM(*iv, 1, i)=i[j]
+//   }
+//   return iv;
+// }
+
+gfan::ZVector intStar2ZVectorWithLeadingOne(const int d, const int* i)
+{
+  gfan::ZVector zv(d+1);
+  zv[0]=1;
+  for(int j=1; j<=d; j++)
+  {
+    zv[j]=i[j];
+  }
+  return zv;
+}
+
+BOOLEAN newtonPolytope(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    poly p = (poly)u->Data();
+    int r = rVar(currRing);
+    gfan::ZMatrix zm(1,r+1);
+    int *leadexpv = (int*)omAlloc((r+1)*sizeof(int));
+    pGetExpV(p,leadexpv);
+    gfan::ZVector zv = intStar2ZVectorWithLeadingOne(r, leadexpv);
+    zm.appendRow(zv);
+    poly pNextTerm = p;
+    while(pNext(pNextTerm)!=NULL)
+    {
+      pNextTerm=pNext(pNextTerm);
+      int *tailexpv=(int*)omAlloc((r+1)*sizeof(int));
+      pGetExpV(pNextTerm,tailexpv);
+      gfan::ZVector zv = intStar2ZVectorWithLeadingOne(r, tailexpv);
+      zm.appendRow(zv);
+      omFree(tailexpv);
+    }
+    omFree(leadexpv);
+    gfan::ZCone* zc = new gfan::ZCone();
+    *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+    res->rtyp = polytopeID;
+    res->data = (char*) zc;
+    return FALSE;
+  }
+  WerrorS("newtonPolytope: unexpected parameters");
+  return TRUE;
+}
+
 void bbpolytope_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -459,6 +516,7 @@ void bbpolytope_setup()
   iiAddCproc("","quickPolytopeViaVertices",FALSE,quickPolytopeViaVertices);
   iiAddCproc("","quickPolytopeViaNormals",FALSE,quickPolytopeViaNormals);
   iiAddCproc("","getVertices",FALSE,getVertices);
+  iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                               
