@@ -27,6 +27,7 @@
 #include "cf_map_ext.h"
 #include "cf_random.h"
 #include "facHensel.h"
+#include "facMul.h"
 #include "cf_map.h"
 #include "cf_gcd_smallp.h"
 #include "facFqBivarUtil.h"

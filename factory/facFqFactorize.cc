@@ -29,6 +29,7 @@
 #include "cf_map_ext.h"
 #include "algext.h"
 #include "facSparseHensel.h"
+#include "facMul.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEX.h>
