@@ -22,6 +22,7 @@
 #include "facFqBivar.h"
 #include "facBivar.h"
 #include "facHensel.h"
+#include "facMul.h"
 
 #ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(uni_factorize)

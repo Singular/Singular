@@ -26,6 +26,7 @@
 #include "facFqBivarUtil.h"
 #include "cfNewtonPolygon.h"
 #include "facHensel.h"
+#include "facMul.h"
 
 
 void append (CFList& factors1, const CFList& factors2)

@@ -75,6 +75,7 @@ SOURCES = \
 		facFqSquarefree.cc \
 		facHensel.cc \
 		facIrredTest.cc \
+		facMul.cc \
 		facSparseHensel.cc \
 		fieldGCD.cc \
 		ffops.cc \
@@ -159,6 +160,7 @@ factory_headers = \
 		facFqSquarefree.h \
 		facHensel.h \
 		facIrredTest.h \
+		facMul.h \
 		facSparseHensel.h \
 		fieldGCD.h \
 		ffops.h \
