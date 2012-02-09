@@ -1379,7 +1379,7 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
 
   Variable v;
   CanonicalForm Q;
-  if (degB <= 1 || CFFactory::gettype() == GaloisFieldDomain)
+  if (degB < 1 || CFFactory::gettype() == GaloisFieldDomain)
   {
     CanonicalForm R;
     divrem2 (A, B, Q, R, M);

@@ -47,7 +47,7 @@ CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
   else if (L.length() == 1)
     return mod (L.getFirst()(0, 1) , M);
   else if (L.length() == 2)
-    return mod (L.getFirst()(0, 1)*L.getLast()(0, 1), M);
+    return mod (mulNTL (L.getFirst()(0, 1),L.getLast()(0, 1)), M);
   else
   {
     int l= L.length()/2;
@@ -59,7 +59,7 @@ CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
     tmp2= Difference (L, tmp1);
     buf1= prodMod0 (tmp1, M);
     buf2= prodMod0 (tmp2, M);
-    return mod (buf1*buf2, M);
+    return mod (mulNTL (buf1,buf2), M);
   }
 }
 
@@ -69,6 +69,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
 {
   fail= false;
   Variable x= Variable(2);
+  Variable y= Variable(1);
   FFRandom genFF;
   GFRandom genGF;
   CanonicalForm random, mipo;
@@ -119,7 +120,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
     }
     if (find (list, random)) continue;
     eval= F (random, x);
-    if (degree (eval) != degree (F, Variable (1)))
+    if (degree (eval) != degree (F, y))
     { //leading coeff vanishes
       if (!find (list, random))
         list.append (random);
@@ -236,7 +237,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 /// multivariate polynomials over a finite field" by L Bernardin.
 CFList
 extFactorRecombination (CFList& factors, CanonicalForm& F,
-                        const CanonicalForm& M, const ExtensionInfo& info,
+                        const CanonicalForm& N, const ExtensionInfo& info,
                         DegreePattern& degs, const CanonicalForm& eval, int s,
                         int thres)
 {
@@ -252,7 +253,10 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   CanonicalForm delta= info.getDelta();
   int k= info.getGFDegree();
 
+  CanonicalForm M= N;
+  int l= degree (N);
   Variable y= F.mvar();
+  Variable x= Variable (1);
   CFList source, dest;
   if (degs.getLength() <= 1 || factors.length() == 1)
   {
@@ -275,7 +279,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 
   buf= F;
 
-  CanonicalForm g, LCBuf= LC (buf, Variable (1));
+  CanonicalForm g, LCBuf= LC (buf, x);
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
@@ -288,6 +292,8 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   bool nosubset= false;
   bool recombination= false;
   bool trueFactor= false;
+  CanonicalForm test;
+  CanonicalForm buf0= buf (0, x)*LCBuf;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -322,15 +328,15 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
-        g= prodMod0 (S, M);
-        g= mod (g*LCBuf, M);
-        g /= content (g);
-        if (fdivides (LC (g), LCBuf))
+        test= prodMod0 (S, M);
+        test *= LCBuf;
+        test = mod (test, M);
+        if (fdivides (test, buf0))
         {
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
-          g /= content (g, Variable (1));
+          g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
             buf2= g (y - eval, y);
@@ -341,7 +347,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
               if (degree (buf2, alpha) < degMipoBeta)
               {
                 buf= quot;
-                LCBuf= LC (buf, Variable (1));
+                LCBuf= LC (buf, x);
                 recombination= true;
                 appendTestMapDown (result, buf2, info, source, dest);
                 trueFactor= true;
@@ -352,7 +358,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
               if (!isInExtension (buf2, gamma, k, delta, source, dest))
               {
                 buf= quot;
-                LCBuf= LC (buf, Variable (1));
+                LCBuf= LC (buf, x);
                 recombination= true;
                 appendTestMapDown (result, buf2, info, source, dest);
                 trueFactor= true;
@@ -361,6 +367,10 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
             if (trueFactor)
             {
               T= Difference (T, S);
+              l -= degree (g);
+              M= power (y, l);
+              buf0= buf (0, x)*LCBuf;
+
               // compute new possible degree pattern
               bufDegs2= DegreePattern (T);
               bufDegs1.intersect (bufDegs2);
@@ -372,7 +382,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
                 if (recombination)
                 {
                   appendTestMapDown (result, buf (y - eval, y), info, source,
-                                     dest);
+                                      dest);
                   F= 1;
                   return result;
                 }
@@ -436,7 +446,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 /// multivariate polynomials over a finite field" by L Bernardin.
 CFList
 factorRecombination (CFList& factors, CanonicalForm& F,
-                     const CanonicalForm& M, DegreePattern& degs, int s,
+                     const CanonicalForm& N, DegreePattern& degs, int s,
                      int thres
                     )
 {
@@ -455,9 +465,13 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             (LC (F, 1)*prodMod (factors, M) == F));
   CFList T, S;
 
+  CanonicalForm M= N;
+  int l= degree (N);
   T= factors;
   CFList result;
-  CanonicalForm LCBuf= LC (F, Variable (1));
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+  CanonicalForm LCBuf= LC (F, x);
   CanonicalForm g, quot, buf= F;
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
@@ -469,6 +483,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   int subsetDeg;
   TT= copy (factors);
   bool recombination= false;
+  CanonicalForm test;
+  CanonicalForm buf0= buf (0, x)*LCBuf;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -481,7 +497,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           T.insert (LCBuf);
           g= prodMod (T, M);
           T.removeFirst();
-          result.append (g/content (g, Variable (1)));
+          result.append (g/content (g, x));
           F= 1;
           return result;
         }
@@ -500,24 +516,25 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
-        g= prodMod0 (S, M);
-        g= mod (g*LCBuf, M);
-        g /= content (g);
-        if (fdivides (LC(g), LCBuf))
+        test= prodMod0 (S, M);
+        test *= LCBuf;
+        test = mod (test, M);
+        if (fdivides (test, buf0))
         {
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
-          g /= content (g, Variable (1));
-
+          g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
             recombination= true;
             result.append (g);
             buf= quot;
-            LCBuf= LC (buf, Variable(1));
+            LCBuf= LC (buf, x);
             T= Difference (T, S);
-
+            l -= degree (g);
+            M= power (y, l);
+            buf0= buf (0, x)*LCBuf;
             // compute new possible degree pattern
             bufDegs2= DegreePattern (T);
             bufDegs1.intersect (bufDegs2);
@@ -616,72 +633,67 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
   return rootOf (newMipo);
 }
 
-CFList
-earlyFactorDetection (CanonicalForm& F, CFList& factors,int& adaptedLiftBound,
+void
+earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
+                      factors, int& adaptedLiftBound, int*& factorsFoundIndex,
                       DegreePattern& degs, bool& success, int deg)
 {
   DegreePattern bufDegs1= degs;
   DegreePattern bufDegs2;
-  CFList result;
   CFList T= factors;
   CanonicalForm buf= F;
-  CanonicalForm LCBuf= LC (buf, Variable (1));
+  Variable x= Variable (1);
+  CanonicalForm LCBuf= LC (buf, x);
   CanonicalForm g, quot;
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
-  int d= degree (F) + degree (LCBuf);
-  for (CFListIterator i= factors; i.hasItem(); i++)
+  int d= degree (F), l= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
-    if (!bufDegs1.find (degree (i.getItem(), 1)))
+    if (!bufDegs1.find (degree (i.getItem(), 1)) || factorsFoundIndex[l] == 1)
       continue;
     else
     {
-      g= i.getItem() (0, 1);
-      g *= LCBuf;
-      g= mod (g, M);
-      if (fdivides (LC (g), LCBuf))
+      g= mulMod2 (i.getItem(), LCBuf, M);
+      g /= content (g, x);
+      if (fdivides (g, buf, quot))
       {
-        g= mulMod2 (i.getItem(), LCBuf, M);
-        g /= content (g, Variable (1));
-        if (fdivides (g, buf, quot))
-        {
-          result.append (g);
-          buf= quot;
-          d -= degree (g) + degree (LC (g, Variable (1)));
-          LCBuf= LC (buf, Variable (1));
-          T= Difference (T, CFList (i.getItem()));
+        reconstructedFactors.append (g);
+        factorsFoundIndex[l]= 1;
+        buf= quot;
+        d -= degree (g);
+        LCBuf= LC (buf, x);
+        T= Difference (T, CFList (i.getItem()));
+        F= buf;
 
-          // compute new possible degree pattern
-          bufDegs2= DegreePattern (T);
-          bufDegs1.intersect (bufDegs2);
-          bufDegs1.refine ();
-          if (bufDegs1.getLength() <= 1)
-          {
-            result.append (buf);
-            break;
-          }
+        // compute new possible degree pattern
+        bufDegs2= DegreePattern (T);
+        bufDegs1.intersect (bufDegs2);
+        bufDegs1.refine ();
+        if (bufDegs1.getLength() <= 1)
+        {
+          reconstructedFactors.append (buf);
+          break;
         }
       }
     }
   }
   adaptedLiftBound= d + 1;
-  if (d < deg)
+  if (adaptedLiftBound < deg)
   {
-    factors= T;
     degs= bufDegs1;
-    F= buf;
     success= true;
   }
   if (bufDegs1.getLength() <= 1)
     degs= bufDegs1;
-  return result;
 }
 
-CFList
-extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
-                         int& adaptedLiftBound, DegreePattern& degs,
-                         bool& success, const ExtensionInfo& info,
-                         const CanonicalForm& eval, int deg)
+void
+extEarlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
+                         factors,int& adaptedLiftBound, int*& factorsFoundIndex,
+                         DegreePattern& degs, bool& success, const
+                         ExtensionInfo& info, const CanonicalForm& eval, int deg
+                        )
 {
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();
@@ -692,72 +704,70 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   CFList result;
   CFList T= factors;
   Variable y= F.mvar();
-  CanonicalForm buf= F, LCBuf= LC (buf, Variable (1)), g, buf2;
+  Variable x= Variable (1);
+  CanonicalForm buf= F, LCBuf= LC (buf, x), g, buf2;
   CanonicalForm M= power (y, deg);
   adaptedLiftBound= 0;
   bool trueFactor= false;
-  int d= degree (F) + degree (LCBuf);
+  int d= degree (F), l= 0;
   CFList source, dest;
   int degMipoBeta= 1;
   if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
   CanonicalForm quot;
-  for (CFListIterator i= factors; i.hasItem(); i++)
+  for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
-    if (!bufDegs1.find (degree (i.getItem(), 1)))
+    if (!bufDegs1.find (degree (i.getItem(), 1)) || factorsFoundIndex[l] == 1)
       continue;
     else
     {
-      g= i.getItem() (0, 1);
-      g *= LCBuf;
-      g= mod (g, M);
-      if (fdivides (LC (g), LCBuf))
+      g= mulMod2 (i.getItem(), LCBuf, M);
+      g /= content (g, x);
+      if (fdivides (g, buf, quot))
       {
-        g= mulMod2 (i.getItem(), LCBuf, M);
-        g /= content (g, Variable (1));
-        if (fdivides (g, buf, quot))
+        buf2= g (y - eval, y);
+        buf2 /= Lc (buf2);
+
+        if (!k && beta == x)
         {
-          buf2= g (y - eval, y);
-          buf2 /= Lc (buf2);
-
-          if (!k && beta == Variable (1))
+          if (degree (buf2, alpha) < degMipoBeta)
           {
-            if (degree (buf2, alpha) < degMipoBeta)
-            {
-              appendTestMapDown (result, buf2, info, source, dest);
-              buf= quot;
-              d -= degree (g) + degree (LC (g, Variable (1)));
-              LCBuf= LC (buf, Variable (1));
-              trueFactor= true;
-            }
+            appendTestMapDown (reconstructedFactors, buf2, info, source, dest);
+            factorsFoundIndex[l]= 1;
+            buf= quot;
+            d -= degree (g);
+            LCBuf= LC (buf, x);
+            trueFactor= true;
           }
-          else
+        }
+        else
+        {
+          if (!isInExtension (buf2, gamma, k, delta, source, dest))
           {
-            if (!isInExtension (buf2, gamma, k, delta, source, dest))
-            {
-              appendTestMapDown (result, buf2, info, source, dest);
-              buf= quot;
-              d -= degree (g) + degree (LC (g, Variable (1)));
-              LCBuf= LC (buf, Variable (1));
-              trueFactor= true;
-            }
+            appendTestMapDown (reconstructedFactors, buf2, info, source, dest);
+            factorsFoundIndex[l]= 1;
+            buf= quot;
+            d -= degree (g);
+            LCBuf= LC (buf, x);
+            trueFactor= true;
           }
-          if (trueFactor)
-          {
-            T= Difference (T, CFList (i.getItem()));
+        }
+        if (trueFactor)
+        {
+          T= Difference (T, CFList (i.getItem()));
+          F= buf;
 
-            // compute new possible degree pattern
-            bufDegs2= DegreePattern (T);
-            bufDegs1.intersect (bufDegs2);
-            bufDegs1.refine ();
-            trueFactor= false;
-            if (bufDegs1.getLength() <= 1)
-            {
-              buf= buf (y - eval, y);
-              buf /= Lc (buf);
-              appendMapDown (result, buf, info, source, dest);
-              break;
-            }
+          // compute new possible degree pattern
+          bufDegs2= DegreePattern (T);
+          bufDegs1.intersect (bufDegs2);
+          bufDegs1.refine ();
+          trueFactor= false;
+          if (bufDegs1.getLength() <= 1)
+          {
+            buf= buf (y - eval, y);
+            buf /= Lc (buf);
+            appendMapDown (reconstructedFactors, buf, info, source, dest);
+            break;
           }
         }
       }
@@ -766,15 +776,81 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   adaptedLiftBound= d + 1;
   if (adaptedLiftBound < deg)
   {
-    success= true;
-    factors= T;
     degs= bufDegs1;
-    F= buf;
+    success= true;
   }
   if (bufDegs1.getLength() <= 1)
     degs= bufDegs1;
+}
 
+int*
+getCombinations (int * rightSide, int sizeOfRightSide, int& sizeOfOutput,
+                 int degreeLC)
+{
+  Variable x= Variable (1);
+  int p= getCharacteristic();
+  int d= getGFDegree();
+  char cGFName= gf_name;
+  setCharacteristic(0);
+  CanonicalForm buf= 1;
+  for (int i= 0; i < sizeOfRightSide; i++)
+    buf *= (power (x, rightSide [i]) + 1);
+
+  int j= 0;
+  for (CFIterator i= buf; i.hasTerms(); i++, j++)
+  {
+    if (i.exp() < degreeLC)
+    {
+      j++;
+      break;
+    }
+  }
+
+  ASSERT ( j > 1, "j > 1 expected" );
+
+  int* result = new int  [j - 1];
+  sizeOfOutput= j - 1;
+
+  int i= 0;
+  for (CFIterator m = buf; i < j - 1; i++, m++)
+    result [i]= m.exp();
+
+  if (d > 1)
+    setCharacteristic (p, d, cGFName);
+  else
+    setCharacteristic (p);
   return result;
+}
+
+int *
+getLiftPrecisions (const CanonicalForm& F, int& sizeOfOutput, int degreeLC)
+{
+  int sizeOfNewtonPoly;
+  int ** newtonPolyg= newtonPolygon (F, sizeOfNewtonPoly);
+  int sizeOfRightSide;
+  int * rightSide= getRightSide(newtonPolyg, sizeOfNewtonPoly, sizeOfRightSide);
+  int * result= getCombinations(rightSide, sizeOfRightSide, sizeOfOutput,
+                                degreeLC);
+  delete [] rightSide;
+  for (int i= 0; i < sizeOfNewtonPoly; i++)
+    delete [] newtonPolyg[i];
+  delete [] newtonPolyg;
+  return result;
+}
+
+void
+deleteFactors (CFList& factors, int* factorsFoundIndex)
+{
+  CFList result;
+  int i= 0;
+  for (CFListIterator iter= factors; iter.hasItem(); iter++, i++)
+  {
+    if (factorsFoundIndex[i] == 1)
+      continue;
+    else
+      result.append (iter.getItem());
+  }
+  factors= result;
 }
 
 CFList
@@ -789,6 +865,9 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CanonicalForm delta= info.getDelta();
   bool extension= info.isInExtension();
 
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (A, sizeOfLiftPre, degree (LC (A, 1), 2));
+
   Variable x= Variable (1);
   Variable y= Variable (2);
   CFArray Pi;
@@ -798,72 +877,142 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CFMatrix M= CFMatrix (liftBound, bufUniFactors.length() - 1);
   earlySuccess= false;
   int newLiftBound= 0;
-  int smallFactorDeg= 11; //this is a tunable parameter
-  if (smallFactorDeg >= liftBound)
+
+  int smallFactorDeg= tmin (11, liftPre [sizeOfLiftPre- 1] + 1);//this is a tunable parameter
+  int dummy;
+  int * factorsFoundIndex= new int [uniFactors.length()];
+  for (int i= 0; i < uniFactors.length(); i++)
+    factorsFoundIndex [i]= 0;
+  CanonicalForm bufA= A;
+
+  if (smallFactorDeg >= liftBound || degree (A,y) <= 4)
     henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M);
-  else if (smallFactorDeg >= degree (A, y) + 1)
-  {
-    henselLift12 (A, bufUniFactors, degree (A, y) + 1, Pi, diophant, M);
-    if (!extension)
-      earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
-                     degs, earlySuccess, degree (A, y) + 1);
-    else
-      earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
-                     newLiftBound, degs, earlySuccess, info, eval,
-                     degree (A, y) + 1);
-    if (degs.getLength() > 1 && !earlySuccess)
-    {
-      if (newLiftBound > degree (A, y) + 1)
-      {
-        liftBound= newLiftBound;
-        bufUniFactors.insert (LC(A, x));
-        henselLiftResume12 (A, bufUniFactors, degree (A, y) + 1, liftBound,
-                            Pi, diophant, M);
-      }
-    }
-    else if (earlySuccess)
-      liftBound= newLiftBound;
-  }
-  else if (smallFactorDeg < degree (A, y) + 1)
+  else if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
     henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
     if (!extension)
-      earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
-                                           degs, earlySuccess,
-                                           smallFactorDeg);
+      earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                            factorsFoundIndex, degs, earlySuccess,
+                            smallFactorDeg);
     else
-      earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
-                     newLiftBound, degs, earlySuccess,
-                     info, eval, smallFactorDeg);
-    if (degs.getLength() > 1 && !earlySuccess)
+      extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                               factorsFoundIndex, degs, earlySuccess, info,
+                               eval, smallFactorDeg);
+    if (degs.getLength() > 1 && !earlySuccess &&
+        smallFactorDeg != liftPre [sizeOfLiftPre-1] + 1)
     {
-      bufUniFactors.insert (LC (A, x));
-      henselLiftResume12 (A, bufUniFactors, smallFactorDeg, degree (A, y)
-                          + 1, Pi, diophant, M);
-      if (!extension)
-        earlyFactors= earlyFactorDetection (A, bufUniFactors, newLiftBound,
-                       degs, earlySuccess, degree (A, y) + 1);
-      else
-        earlyFactors= extEarlyFactorDetection (A, bufUniFactors,
-                       newLiftBound, degs, earlySuccess,
-                       info, eval, degree(A,y) + 1);
-      if (degs.getLength() > 1 && !earlySuccess)
+      if (newLiftBound >= liftPre[sizeOfLiftPre-1]+1)
       {
-        if (newLiftBound > degree (A, y) + 1)
-        {
-          bufUniFactors.insert (LC(A, x));
-          henselLiftResume12 (A, bufUniFactors, degree (A, y) + 1, liftBound,
-                              Pi, diophant, M);
-        }
+        bufUniFactors.insert (LC (A, x));
+        henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
+                            liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M);
+        if (!extension)
+          earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess,
+                                liftPre[sizeOfLiftPre-1] + 1);
+        else
+          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                   factorsFoundIndex, degs, earlySuccess, info,
+                                   eval, liftPre[sizeOfLiftPre-1] + 1);
       }
-      else if (earlySuccess)
-        liftBound= newLiftBound;
     }
     else if (earlySuccess)
       liftBound= newLiftBound;
+
+    int i= sizeOfLiftPre - 1;
+    while (degs.getLength() > 1 && !earlySuccess && i - 1 >= 0)
+    {
+      if (newLiftBound >= liftPre[i] + 1)
+      {
+        bufUniFactors.insert (LC (A, x));
+        henselLiftResume12 (A, bufUniFactors, liftPre[i] + 1,
+                            liftPre[i-1] + 1, Pi, diophant, M);
+        if (!extension)
+          earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess,
+                                liftPre[i-1] + 1);
+        else
+          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                   factorsFoundIndex, degs, earlySuccess, info,
+                                   eval, liftPre[i-1] + 1);
+      }
+      else
+      {
+        liftBound= newLiftBound;
+        break;
+      }
+      i--;
+    }
+    if (earlySuccess)
+      liftBound= newLiftBound;
+    //after here all factors are lifted to liftPre[sizeOfLiftPre-1]
   }
-  if (newLiftBound > 0)
-    liftBound= newLiftBound;
+  else
+  {
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
+    if (!extension)
+      earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                            factorsFoundIndex, degs, earlySuccess,
+                            smallFactorDeg);
+    else
+      extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                               factorsFoundIndex, degs, earlySuccess, info,
+                               eval, smallFactorDeg);
+    int i= 1;
+    while ((degree (A,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*i+4);
+    if (degs.getLength() > 1 && !earlySuccess && dummy > smallFactorDeg)
+    {
+      bufUniFactors.insert (LC (A, x));
+      henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
+                          dummy, Pi, diophant, M);
+      if (!extension)
+        earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                              factorsFoundIndex, degs, earlySuccess, dummy);
+      else
+        extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                 factorsFoundIndex, degs, earlySuccess, info,
+                                 eval, dummy);
+    }
+    while (degs.getLength() > 1 && !earlySuccess && i < 4)
+    {
+      if (newLiftBound >= dummy)
+      {
+        bufUniFactors.insert (LC (A, x));
+        dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*(i+1)+4);
+        henselLiftResume12 (A, bufUniFactors, (degree (A,y)/4)*i + 4,
+                            dummy, Pi, diophant, M);
+        if (!extension)
+          earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess, dummy);
+        else
+          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                                   factorsFoundIndex, degs, earlySuccess, info,
+                                   eval, dummy);
+      }
+      else
+      {
+        liftBound= newLiftBound;
+        break;
+      }
+      i++;
+    }
+    if (earlySuccess)
+      liftBound= newLiftBound;
+  }
+
+  A= bufA;
+  if (earlyFactors.length() > 0 && degs.getLength() > 1)
+  {
+    liftBound= degree (A,y) + 1;
+    earlySuccess= true;
+    deleteFactors (bufUniFactors, factorsFoundIndex);
+  }
+
+  delete [] factorsFoundIndex;
+  delete [] liftPre;
+
   return bufUniFactors;
 }
 
@@ -1202,7 +1351,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y-evaluation, y);
-    if (!k && beta == Variable (1))
+    if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
       {
@@ -1338,7 +1487,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y - evaluation, y);
-    if (!k && beta == Variable (1))
+    if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
       {
@@ -1400,6 +1549,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   CFMatrix C;
   CFArray buf;
   CFListIterator j;
+  CanonicalForm truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     if (start)
@@ -1419,12 +1570,14 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
     j= factors;
     j++;
 
+    truncF= mod (F, power (y, l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       else
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
 
     for (int i= 0; i < sizeBounds; i++)
@@ -1516,7 +1669,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   bool reduced= false;
   Variable y= F.mvar();
   Variable x= Variable (1);
-  CanonicalForm powX, imBasis;
+  CanonicalForm powX, imBasis, truncF;
   CFMatrix Mat, C;
   CFArray buf;
   CFIterator iter;
@@ -1563,12 +1716,14 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     j= factors;
     j++;
 
+    truncF= mod (F, power (y, l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       else
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
 
     for (int i= 0; i < sizeBounds; i++)
@@ -1680,6 +1835,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   mat_zz_pE* NTLC, NTLK;
   CFArray buf;
   CFMatrix C;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= liftBound)
   {
     if (start)
@@ -1699,15 +1856,16 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     j= factors;
     j++;
 
+    truncF= mod (F, power (y,l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (l == (minBound+1)*2)
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       }
       else
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]
                                     );
       }
@@ -1794,6 +1952,8 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= liftBound)
   {
     if (start)
@@ -1813,15 +1973,16 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
     j= factors;
     j++;
 
+    truncF= mod (F, power (y,l));
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (l == (minBound+1)*2)
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
       }
       else
       {
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]
                                     );
       }
@@ -1913,20 +2074,23 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y,l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -1977,6 +2141,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2040,20 +2205,23 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CFMatrix C;
   mat_zz_pE* NTLC, NTLK;
   CFArray buf;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y,l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2101,6 +2269,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2172,7 +2341,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CanonicalForm imPrimElemAlpha= info.getDelta();
   CFListIterator j;
   Variable y= F.mvar();
-  CanonicalForm powX, imBasis;
+  CanonicalForm powX, imBasis, truncF;
   CFMatrix Mat, C;
   CFIterator iter;
   mat_zz_p* NTLMat,*NTLC, NTLK;
@@ -2199,17 +2368,18 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2293,6 +2463,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2355,23 +2526,25 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
   int stepSize= 2;
   bool useOldQs= false;
   bool hitBound= false;
-  Variable y= Variable (2);
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
   mat_zz_pE* NTLC, NTLK;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i], bufQ[i]);
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2475,20 +2648,23 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
   CFMatrix C;
   mat_zz_p* NTLC, NTLK;
   CFArray buf;
+  Variable y= F.mvar();
+  CanonicalForm truncF;
   while (l <= precision)
   {
     j= factors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     useOldQs= true;
     for (int i= 0; i < d; i++)
@@ -2537,6 +2713,7 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
+          F= 1;
           return result;
         }
         delete [] factorsFoundIndex;
@@ -2592,22 +2769,24 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
   CFList bufUniFactors;
+  Variable y= F.mvar();
   while (oldL <= l)
   {
     j= factors;
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -2692,22 +2871,24 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
   CFMatrix C;
   CFArray buf;
   mat_zz_pE* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
   CFList bufUniFactors;
+  Variable y= F.mvar();
   while (oldL <= l)
   {
     j= factors;
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -2801,7 +2982,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     ident (NTLN, factors.length());
   Variable y= F.mvar();
   CFListIterator j;
-  CanonicalForm powX, imBasis, bufF;
+  CanonicalForm powX, imBasis, bufF, truncF;
   CFMatrix Mat, C;
   CFIterator iter;
   mat_zz_p* NTLMat;
@@ -2831,16 +3012,17 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     if (GF)
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]);
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -2968,22 +3150,24 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
   CFList bufUniFactors;
+  Variable y= F.mvar();
   while (oldL <= l)
   {
     j= factors;
+    truncF= mod (F, power (y, oldL));
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]
                                     );
     }
     else
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), oldL, bufQ [i]);
     }
     useOldQs= true;
 
@@ -3070,7 +3254,8 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   CFMatrix C;
   CFArray buf;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
@@ -3078,15 +3263,17 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
     bufFactors.insert (LCF);
     bufFactors.removeFirst();
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3205,21 +3392,24 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   CFListIterator j;
   CFArray buf;
   mat_zz_pE* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3343,7 +3533,7 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
   Variable y= F.mvar();
-  CanonicalForm powX, imBasis, bufF;
+  CanonicalForm powX, imBasis, bufF, truncF;
   CFMatrix Mat, C;
   CFIterator iter;
   mat_zz_p* NTLMat,*NTLC, NTLK;
@@ -3377,15 +3567,17 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
       setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3538,21 +3730,24 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   CFListIterator j;
   CFMatrix C;
   mat_zz_p* NTLC, NTLK;
-  CanonicalForm bufF;
+  CanonicalForm bufF, truncF;
+  Variable y= F.mvar();
   while (l <= liftBound)
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
     j= bufFactors;
+    truncF= mod (F, power (y, l));
     if (useOldQs)
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, oldL, bufQ[i],bufQ[i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
     }
     else
     {
       for (int i= 0; i < bufFactors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), l, bufQ [i]);
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ [i]);
     }
     for (int i= 0; i < d; i++)
     {
@@ -3714,11 +3909,14 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                CFArray& Pi, CFList& diophant
                               )
 {
-  bufF= F;
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
+
+  Variable y= F.mvar();
   factorsFound= 0;
   CanonicalForm LCF= LC (F, 1);
   CFList result;
-  int smallFactorDeg= 11;
+  int smallFactorDeg= tmin (11, liftPre [sizeOfLiftPre- 1] + 1);
   mat_zz_p NTLN= N;
   int * factorsFoundIndex= new int [NTLN.NumCols()];
   for (long i= 0; i < NTLN.NumCols(); i++)
@@ -3737,40 +3935,76 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                       );
     if (result.length() == NTLN.NumCols())
     {
+      delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
     }
   }
 
-  if (l < degree (bufF)/2+2)
+  int i= sizeOfLiftPre - 1;
+  int dummy= 1;
+  if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF)/2 + 2, Pi, diophant, M);
-    l= degree (bufF)/2 + 2;
+    while (i > 0)
+    {
+      if (l < liftPre[i-1] + 1)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        l= liftPre[i-1] + 1;
+      }
+      else
+      {
+        i--;
+        if (i != 0)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i--;
+    }
   }
-  reconstructionTry (result, bufF, factors, degree (bufF)/2 + 2,
-                     factorsFound, factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
+  else
   {
-    delete [] factorsFoundIndex;
-    return result;
+    i= 1;
+    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    while (i < 4)
+    {
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      if (l < dummy)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        l= dummy;
+      }
+      else
+      {
+        i++;
+        if (i < 4)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i++;
+    }
   }
 
-  if (l < degree (F) + 1)
-  {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF) + 1, Pi, diophant, M);
-    l= degree (bufF) + 1;
-  }
-  reconstructionTry (result, bufF, factors, degree (bufF) + 1, factorsFound,
-                     factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
-  {
-    delete [] factorsFoundIndex;
-    return result;
-  }
+  delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
 }
@@ -3782,7 +4016,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
                                CFArray& Pi, CFList& diophant
                               )
 {
-  bufF= F;
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
+  Variable y= F.mvar();
   factorsFound= 0;
   CanonicalForm LCF= LC (F, 1);
   CFList result;
@@ -3791,6 +4027,7 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
   int * factorsFoundIndex= new int [NTLN.NumCols()];
   for (long i= 0; i < NTLN.NumCols(); i++)
     factorsFoundIndex [i]= 0;
+
   if (degree (F) + 1 > smallFactorDeg)
   {
     if (l < smallFactorDeg)
@@ -3804,40 +4041,76 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
                       );
     if (result.length() == NTLN.NumCols())
     {
+      delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
     }
   }
 
-  if (l < degree (bufF)/2+2)
+  int i= sizeOfLiftPre - 1;
+  int dummy= 1;
+  if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF)/2 + 2, Pi, diophant, M);
-    l= degree (bufF)/2 + 2;
+    while (i > 0)
+    {
+      if (l < liftPre[i-1] + 1)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        l= liftPre[i-1] + 1;
+      }
+      else
+      {
+        i--;
+        if (i != 0)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i--;
+    }
   }
-  reconstructionTry (result, bufF, factors, degree (bufF)/2 + 2,
-                     factorsFound, factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
+  else
   {
-    delete [] factorsFoundIndex;
-    return result;
+    i= 1;
+    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    while (i < 4)
+    {
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      if (l < dummy)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        l= dummy;
+      }
+      else
+      {
+        i++;
+        if (i < 4)
+          continue;
+      }
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, NTLN, beenInThres
+                        );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i++;
+    }
   }
 
-  if (l < degree (F) + 1)
-  {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF) + 1, Pi, diophant, M);
-    l= degree (bufF) + 1;
-  }
-  reconstructionTry (result, bufF, factors, degree (bufF) + 1, factorsFound,
-                     factorsFoundIndex, NTLN, beenInThres
-                    );
-  if (result.length() == NTLN.NumCols())
-  {
-    delete [] factorsFoundIndex;
-    return result;
-  }
+  delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
 }
@@ -3852,7 +4125,9 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                   evaluation
                                  )
 {
-  bufF= F;
+  int sizeOfLiftPre;
+  int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
+  Variable y= F.mvar();
   factorsFound= 0;
   CanonicalForm LCF= LC (F, 1);
   CFList result;
@@ -3873,45 +4148,81 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
     extReconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                           factorsFoundIndex, NTLN, beenInThres, info,
                           evaluation
-                         );
+                      );
     if (result.length() == NTLN.NumCols())
     {
+      delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
     }
   }
 
-  if (l < degree (bufF)/2+2)
+  int i= sizeOfLiftPre - 1;
+  int dummy= 1;
+  if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF)/2 + 2, Pi, diophant, M);
-    l= degree (bufF)/2 + 2;
+    while (i > 0)
+    {
+      if (l < liftPre[i-1] + 1)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        l= liftPre[i-1] + 1;
+      }
+      else
+      {
+        i--;
+        if (i != 0)
+          continue;
+      }
+      extReconstructionTry (result, bufF, factors, l, factorsFound,
+                            factorsFoundIndex, NTLN, beenInThres, info,
+                            evaluation
+                           );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i--;
+    }
   }
-  extReconstructionTry (result, bufF, factors, degree (bufF)/2 + 2,
-                       factorsFound, factorsFoundIndex, NTLN, beenInThres, info,
-                       evaluation
-                       );
-  if (result.length() == NTLN.NumCols())
+  else
   {
-    delete [] factorsFoundIndex;
-    return result;
+    i= 1;
+    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+      i++;
+    while (i < 4)
+    {
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      if (l < dummy)
+      {
+        factors.insert (LCF);
+        henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        l= dummy;
+      }
+      else
+      {
+        i++;
+        if (i < 4)
+          continue;
+      }
+      extReconstructionTry (result, bufF, factors, l, factorsFound,
+                            factorsFoundIndex, NTLN, beenInThres, info,
+                            evaluation
+                           );
+      if (result.length() == NTLN.NumCols())
+      {
+        delete [] liftPre;
+        delete [] factorsFoundIndex;
+        return result;
+      }
+      i++;
+    }
   }
 
-  if (l < degree (bufF) + 1)
-  {
-    factors.insert (LCF);
-    henselLiftResume12 (F, factors, l, degree (bufF) + 1, Pi, diophant, M);
-    l= degree (bufF) + 1;
-  }
-
-  extReconstructionTry (result, bufF, factors, degree (bufF) + 1, factorsFound,
-                        factorsFoundIndex, NTLN, beenInThres, info, evaluation
-                       );
-  if (result.length() == NTLN.NumCols())
-  {
-    delete [] factorsFoundIndex;
-    return result;
-  }
+  delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
 }
@@ -3930,9 +4241,13 @@ sieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
   henselLift12 (F, bufUniFactors, smallFactorDeg, Pi, diophant, M);
   int adaptedLiftBound;
   success= false;
-  CFList earlyFactors= earlyFactorDetection (F, bufUniFactors, adaptedLiftBound,
-                                             degs, success, smallFactorDeg
-                                            );
+  int * factorsFoundIndex= new int [uniFactors.length()];
+  for (int i= 0; i < uniFactors.length(); i++)
+    factorsFoundIndex [i]= 0;
+  CFList earlyFactors;
+  earlyFactorDetection (earlyFactors, F, bufUniFactors, adaptedLiftBound,
+                        factorsFoundIndex, degs, success, smallFactorDeg);
+  delete [] factorsFoundIndex;
   if (degs.getLength() == 1)
   {
     degPat= degs;
@@ -3943,18 +4258,10 @@ sieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
     H= F;
     return earlyFactors;
   }
-  int sizeOldF= size (F);
-  CFList result;
-  CanonicalForm bufF= F;
-  if (earlyFactors.length() > 0)
+  int sizeOldF= size (G);
+  if (size (F) < sizeOldF)
   {
-    for (CFListIterator i= earlyFactors; i.hasItem(); i++)
-      bufF /= i.getItem();
-  }
-
-  if (size (bufF) < sizeOldF)
-  {
-    H= bufF;
+    H= F;
     success= true;
     return earlyFactors;
   }
@@ -3980,10 +4287,14 @@ extSieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
   henselLift12 (F, bufUniFactors, smallFactorDeg, Pi, diophant, M);
   int adaptedLiftBound;
   success= false;
-  CFList earlyFactors= extEarlyFactorDetection (F, bufUniFactors,
-                                                adaptedLiftBound, degs, success,
-                                                info, evaluation, smallFactorDeg
-                                               );
+  int * factorsFoundIndex= new int [uniFactors.length()];
+  for (int i= 0; i < uniFactors.length(); i++)
+    factorsFoundIndex [i]= 0;
+  CFList earlyFactors;
+  extEarlyFactorDetection (earlyFactors, F, bufUniFactors, adaptedLiftBound,
+                           factorsFoundIndex, degs, success, info, evaluation,
+                           smallFactorDeg);
+  delete [] factorsFoundIndex;
   if (degs.getLength() == 1)
   {
     degPat= degs;
@@ -3995,24 +4306,13 @@ extSieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
     return earlyFactors;
   }
   Variable y= F.mvar();
-  CanonicalForm shiftedF= F (y - evaluation, y);
+  CanonicalForm shiftedF= G (y - evaluation, y);
   int sizeOldF= size (shiftedF);
-  CFList result;
-  CanonicalForm bufF= shiftedF;
-  if (earlyFactors.length() > 0)
+  if (size (F) < sizeOldF)
   {
-    for (CFListIterator i= earlyFactors; i.hasItem(); i++)
-    {
-      bufF /= i.getItem();
-      result.append (i.getItem());
-    }
-  }
-
-  if (size (bufF) < sizeOldF)
-  {
-    H= bufF (y + evaluation, y); //shift back to zero
+    H= F (y + evaluation, y); //shift back to zero
     success= true;
-    return result;
+    return earlyFactors;
   }
   else
   {
@@ -5388,12 +5688,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       if (bufUniFactors.length() < uniFactors.length())
       {
-        if (!evaluation.isZero())
-        {
-          uniFactors= bufUniFactors;
-          Aeval= bufAeval;
-          evaluation= bufEvaluation;
-        }
+        uniFactors= bufUniFactors;
+        Aeval= bufAeval;
+        evaluation= bufEvaluation;
       }
     }
     list.append (bufEvaluation);
@@ -5403,9 +5700,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   if (!derivXZero && !fail2)
   {
-    if (!evaluation.isZero() && (uniFactors.length() > uniFactors2.length() ||
+    if (uniFactors.length() > uniFactors2.length() ||
         (uniFactors.length() == uniFactors2.length()
-         && degs.getLength() > degs2.getLength())))
+         && degs.getLength() > degs2.getLength()))
     {
       degs= degs2;
       uniFactors= uniFactors2;
@@ -5433,7 +5730,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   A= A (y + evaluation, y);
 
-  int liftBound= degree (A, y) + 1 + degree (LC(A, x));
+  int liftBound= degree (A, y) + 1;
 
   int boundsLength;
   int * bounds= computeBounds (A (y - evaluation, y), boundsLength);
@@ -5490,7 +5787,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
     }
-    else if (!extension && (alpha != Variable (1) || GF))
+    else if (!extension && (alpha != x || GF))
     {
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
@@ -5663,7 +5960,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else // not able to pass to GF, pass to F_p(\alpha)
     {
-      CanonicalForm mipo= randomIrredpoly (2, Variable (1));
+      CanonicalForm mipo= randomIrredpoly (2, x);
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);
@@ -5676,14 +5973,14 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     {
       int extDeg= degree (getMipo (alpha));
       extDeg++;
-      CanonicalForm mipo= randomIrredpoly (extDeg + 1, Variable (1));
+      CanonicalForm mipo= randomIrredpoly (extDeg + 1, x);
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);
     }
     else
     {
-      if (beta == Variable (1))
+      if (beta == x)
       {
         Variable v= chooseExtension (alpha, beta, k);
         CanonicalForm primElem, imPrimElem;
