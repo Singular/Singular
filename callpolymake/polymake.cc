@@ -198,7 +198,7 @@ gfan::ZFan PmFan2ZFan (polymake::perl::Object* pf)
     for (int i=0; i<n; i++)
       {
         polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
-	gfan::ZCone zc=PmCone2ZCone(&pmcone);
+        gfan::ZCone zc=PmCone2ZCone(&pmcone);
         zf.insert(zc);
       }
     return zf;
@@ -240,7 +240,7 @@ polymake::Matrix<polymake::Integer> raysOf(gfan::ZFan* zf)
       gfan::ZMatrix ray = zc.extremeRays();
       for (int j=0; j<d; j++)
         {
-  	  zm[i][j]=ray[0][j];
+          zm[i][j]=ray[0][j];
         }
     }
 
@@ -279,16 +279,16 @@ polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
   for (int i=0; i<r; i++)
     {
       if (ii>zf->numberOfConesOfDimension(d,0,1))  // if all cones of a dimension are through,
-  	{
-  	  d = d+1;                                 // increase dimension
+        {
+          d = d+1;                                 // increase dimension
           ii = 0;                                  // set counter to 0
-  	}
+        }
       gfan::IntVector v = zf->getConeIndices(d,ii,0,1);
       polymake::Set<int> s;
       for (int j=0; j<v.size(); j++)
-  	{
-  	  s = s+v[j];
-  	}
+        {
+          s = s+v[j];
+        }
       
       L[i] = s;
       ii = ii+1;
@@ -379,8 +379,16 @@ BOOLEAN PMisBounded(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("BOUNDED");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("BOUNDED");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -396,8 +404,16 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("REFLEXIVE");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("REFLEXIVE");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -413,8 +429,16 @@ BOOLEAN PMisGorenstein(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("GORENSTEIN");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("GORENSTEIN");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -430,13 +454,21 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer pgi = p.give("GORENSTEIN_INDEX");
-    bool ok = true;
-    int gi = PmInteger2Int(pgi,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer pgi = p.give("GORENSTEIN_INDEX");
+      bool ok = true;
+      int gi = PmInteger2Int(pgi,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex)
+    {
+      std::cerr << "ERROR: " << ex.what() << endl;
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -454,9 +486,17 @@ BOOLEAN PMgorensteinVector(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Vector<polymake::Integer> pgv = p.give("GORENSTEIN_VECTOR");
-    intvec* gv = PmVectorInteger2Intvec(&pgv);
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Vector<polymake::Integer> pgv = p.give("GORENSTEIN_VECTOR");
+      intvec* gv = PmVectorInteger2Intvec(&pgv);
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTVEC_CMD;
     res->data = (char*) gv;
     return FALSE;
@@ -472,8 +512,16 @@ BOOLEAN PMisCanonical(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("CANONICAL");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("CANONICAL");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -489,8 +537,16 @@ BOOLEAN PMisTerminal(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("TERMINAL");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("TERMINAL");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -504,14 +560,22 @@ BOOLEAN PMisLatticeEmpty(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    try
     {
-      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       bool b = p.give("LATTICE_EMPTY");
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
-      return FALSE;
     }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
+  }
   WerrorS("isLatticeEmpty: unexpected parameters");
   return TRUE;
 }
@@ -523,13 +587,21 @@ BOOLEAN PMlatticeVolume(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer plv = p.give("LATTICE_VOLUME");
-    bool ok = true;
-    int lv = PmInteger2Int(plv,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer plv = p.give("LATTICE_VOLUME");
+      bool ok = true;
+      int lv = PmInteger2Int(plv,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -547,13 +619,21 @@ BOOLEAN PMlatticeDegree(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer pld = p.give("LATTICE_DEGREE");
-    bool ok = true;
-    int ld = PmInteger2Int(pld,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer pld = p.give("LATTICE_DEGREE");
+      bool ok = true;
+      int ld = PmInteger2Int(pld,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -571,13 +651,21 @@ BOOLEAN PMlatticeCodegree(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer plc = p.give("LATTICE_CODEGREE");
-    bool ok = true;
-    int lc = PmInteger2Int(plc,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer plc = p.give("LATTICE_CODEGREE");
+      bool ok = true;
+      int lc = PmInteger2Int(plc,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -595,9 +683,17 @@ BOOLEAN PMehrhartPolynomialCoeff(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Vector<polymake::Integer> pec = p.give("EHRHART_POLYNOMIAL_COEFF");
-    intvec* ec = PmVectorInteger2Intvec(&pec);
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Vector<polymake::Integer> pec = p.give("EHRHART_POLYNOMIAL_COEFF");
+      intvec* ec = PmVectorInteger2Intvec(&pec);
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTVEC_CMD;
     res->data = (char*) ec;
     return FALSE;
@@ -613,9 +709,17 @@ BOOLEAN PMhStarVector(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Vector<polymake::Integer> phv = p.give("H_STAR_VECTOR");
-    intvec* hv = PmVectorInteger2Intvec(&phv);
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Vector<polymake::Integer> phv = p.give("H_STAR_VECTOR");
+      intvec* hv = PmVectorInteger2Intvec(&phv);
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTVEC_CMD;
     res->data = (char*) hv;
     return FALSE;
@@ -631,8 +735,16 @@ BOOLEAN PMisNormal(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("NORMAL");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("NORMAL");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -648,9 +760,17 @@ BOOLEAN PMfacetWidths(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Vector<polymake::Integer> pfw = p.give("FACET_WIDTHS");
-    intvec* fw = PmVectorInteger2Intvec(&pfw);
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Vector<polymake::Integer> pfw = p.give("FACET_WIDTHS");
+      intvec* fw = PmVectorInteger2Intvec(&pfw);
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTVEC_CMD;
     res->data = (char*) fw;
     return FALSE;
@@ -666,13 +786,21 @@ BOOLEAN PMfacetWidth(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer pfw = p.give("FACET_WIDTH");
-    bool ok = true;
-    int fw = PmInteger2Int(pfw,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer pfw = p.give("FACET_WIDTH");
+      bool ok = true;
+      int fw = PmInteger2Int(pfw,ok); 
+      if (!ok)
+      { 
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -690,9 +818,17 @@ BOOLEAN PMfacetVertexLatticeDistances(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Matrix<polymake::Integer> pld = p.give("FACET_VERTEX_LATTICE_DISTANCES");
-    intvec* ld = PmMatrixInteger2Intvec(&pld); 
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> pld = p.give("FACET_VERTEX_LATTICE_DISTANCES");
+      intvec* ld = PmMatrixInteger2Intvec(&pld);
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTMAT_CMD;
     res->data = (char*) ld;
     return FALSE;
@@ -708,8 +844,16 @@ BOOLEAN PMisCompressed(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("COMPRESSED");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("COMPRESSED");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -725,8 +869,16 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("SMOOTH");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("SMOOTH");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -742,8 +894,16 @@ BOOLEAN PMisVeryAmple(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    bool b = p.give("VERY_AMPLE");
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      bool b = p.give("VERY_AMPLE");
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INT_CMD;
     res->data = (char*) (int) b;
     return FALSE;
@@ -759,9 +919,17 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Matrix<polymake::Integer> lp = p.give("LATTICE_POINTS");
-    intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> lp = p.give("LATTICE_POINTS");
+      intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTMAT_CMD;
     res->data = (char*) iv;
     return FALSE;
@@ -777,13 +945,21 @@ BOOLEAN PMnLatticePoints(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer nlp = p.give("N_LATTICE_POINTS");
-    bool ok = true;
-    int n = PmInteger2Int(nlp,ok); 
-    if (!ok)
+    try
+    {    
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer nlp = p.give("N_LATTICE_POINTS");
+      bool ok = true;
+      int n = PmInteger2Int(nlp,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -801,9 +977,17 @@ BOOLEAN PMinteriorLatticePoints(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Matrix<polymake::Integer> lp = p.give("INTERIOR_LATTICE_POINTS");
-    intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> lp = p.give("INTERIOR_LATTICE_POINTS");
+      intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTMAT_CMD;
     res->data = (char*) iv;
     return FALSE;
@@ -819,13 +1003,21 @@ BOOLEAN PMnInteriorLatticePoints(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer nlp = p.give("N_INTERIOR_LATTICE_POINTS");
-    bool ok = true;
-    int n = PmInteger2Int(nlp,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer nlp = p.give("N_INTERIOR_LATTICE_POINTS");
+      bool ok = true;
+      int n = PmInteger2Int(nlp,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -843,9 +1035,17 @@ BOOLEAN PMboundaryLatticePoints(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Matrix<polymake::Integer> lp = p.give("BOUNDARY_LATTICE_POINTS");
-    intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> lp = p.give("BOUNDARY_LATTICE_POINTS");
+      intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTMAT_CMD;
     res->data = (char*) iv;
     return FALSE;
@@ -861,13 +1061,21 @@ BOOLEAN PMnBoundaryLatticePoints(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer nlp = p.give("N_BOUNDARY_LATTICE_POINTS");
-    bool ok = true;
-    int n = PmInteger2Int(nlp,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer nlp = p.give("N_BOUNDARY_LATTICE_POINTS");
+      bool ok = true;
+      int n = PmInteger2Int(nlp,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -885,9 +1093,17 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Matrix<polymake::Integer> lp = p.give("HILBERT_BASIS");
-    intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    try
+    {
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> lp = p.give("HILBERT_BASIS");
+      intvec* iv = PmMatrixInteger2Intvec(&lp); 
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = INTMAT_CMD;
     res->data = (char*) iv;
     return FALSE;
@@ -903,13 +1119,21 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-    polymake::Integer nlp = p.give("N_HILBERT_BASIS");
-    bool ok = true;
-    int n = PmInteger2Int(nlp,ok); 
-    if (!ok)
+    try
     {
-      WerrorS("overflow while converting polymake::Integer to int");
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      polymake::Integer nlp = p.give("N_HILBERT_BASIS");
+      bool ok = true;
+      int n = PmInteger2Int(nlp,ok); 
+      if (!ok)
+      {
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -930,12 +1154,20 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == polytopeID))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
-      polymake::perl::Object pq = ZPolytope2PmPolytope(zq);
-      polymake::perl::Object pms;
-      CallPolymakeFunction("minkowski_sum", pp, pq) >> pms;
-      gfan::ZCone* ms = new gfan::ZCone(PmPolytope2ZPolytope(&pms));
+      try
+      {
+        polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", pp, pq) >> pms;
+        gfan::ZCone* ms = new gfan::ZCone(PmPolytope2ZPolytope(&pms));
+      }
+      catch (const std::exception& ex) 
+      {
+        std::cerr << "ERROR: " << ex.what() << endl; 
+        return TRUE;
+      }
       res->rtyp = polytopeID;
       res->data = (char*) ms;
       return FALSE;
@@ -973,14 +1205,22 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       intvec* iv = (intvec*) v->Data();
-      polymake::perl::Object o("LinearProgram<Rational>");
-      o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
-      p.take("LP") << o;
-      polymake::Set<polymake::Integer> mf = p.give("LP.MAXIMAL_FACE");
-      polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
-      intvec* maxface = new intvec(PmMatrixInteger2Intvec(&rays));
+      try
+      {
+        polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object o("LinearProgram<Rational>");
+        o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
+        p.take("LP") << o;
+        polymake::Set<polymake::Integer> mf = p.give("LP.MAXIMAL_FACE");
+        polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
+        intvec* maxface = new intvec(PmMatrixInteger2Intvec(&rays));
+      }
+      catch (const std::exception& ex) 
+      {
+        std::cerr << "ERROR: " << ex.what() << endl; 
+        return TRUE;
+      }
       res->rtyp = INTVEC_CMD;
       res->data = (char*) maxface;
       return FALSE;
@@ -1000,14 +1240,22 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       intvec* iv = (intvec*) v->Data();
-      polymake::perl::Object o("LinearProgram<Rational>");
-      o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
-      p.take("LP") << o;
-      polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
-      polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
-      intvec* minface = new intvec(PmMatrixInteger2Intvec(&rays));
+      try
+      {
+        polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object o("LinearProgram<Rational>");
+        o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
+        p.take("LP") << o;
+        polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
+        polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
+        intvec* minface = new intvec(PmMatrixInteger2Intvec(&rays));
+      }
+      catch (const std::exception& ex) 
+      {
+        std::cerr << "ERROR: " << ex.what() << endl; 
+        return TRUE;
+      }
       res->rtyp = INTVEC_CMD;
       res->data = (char*) minface;
       return FALSE;
@@ -1027,20 +1275,28 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
-      polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
       intvec* iv = (intvec*) v->Data();
-      polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
-      polymake::perl::Object o("LinearProgram<Rational>");
-      o.take("LINEAR_OBJECTIVE") << lo;
-      p.take("LP") << o;
-      polymake::Integer mv = p.give("LP.MAXIMAL_VALUE"); 
-      bool ok = true;
-      int m = PmInteger2Int(mv,ok); 
-      if (!ok)
+      try
       {
-      	WerrorS("overflow while converting polymake::Integer to int");
-      	return TRUE;
+        polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
+        polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
+        polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
+        polymake::perl::Object o("LinearProgram<Rational>");
+        o.take("LINEAR_OBJECTIVE") << lo;
+        p.take("LP") << o;
+        polymake::Integer mv = p.give("LP.MAXIMAL_VALUE"); 
+        bool ok = true;
+        int m = PmInteger2Int(mv,ok); 
+        if (!ok)
+        {
+          WerrorS("overflow while converting polymake::Integer to int");
+          return TRUE;
+        }
+      }
+      catch (const std::exception& ex) 
+      {
+        std::cerr << "ERROR: " << ex.what() << endl; 
+        return TRUE;
       }
       res->rtyp = INT_CMD;
       res->data = (char*) m;
@@ -1061,20 +1317,28 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-      polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
-      polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
       intvec* iv = (intvec*) v->Data();
-      polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
-      polymake::perl::Object o("LinearProgram<Rational>");
-      o.take("LINEAR_OBJECTIVE") << lo;
-      p.take("LP") << o;
-      polymake::Integer mv = p.give("LP.MINIMAL_VALUE"); 
-      bool ok = true;
-      int m = PmInteger2Int(mv,ok); 
-      if (!ok)
+      try
       {
-      	WerrorS("overflow while converting polymake::Integer to int");
-      	return TRUE;
+        polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
+        polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
+        polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
+        polymake::perl::Object o("LinearProgram<Rational>");
+        o.take("LINEAR_OBJECTIVE") << lo;
+        p.take("LP") << o;
+        polymake::Integer mv = p.give("LP.MINIMAL_VALUE"); 
+        bool ok = true;
+        int m = PmInteger2Int(mv,ok); 
+        if (!ok)
+        {
+          WerrorS("overflow while converting polymake::Integer to int");
+          return TRUE;
+        }
+      }
+      catch (const std::exception& ex) 
+      {
+        std::cerr << "ERROR: " << ex.what() << endl; 
+        return TRUE;
       }
       res->rtyp = INT_CMD;
       res->data = (char*) m;
@@ -1091,39 +1355,39 @@ BOOLEAN visual(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
   {  
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    gfan::ZMatrix rays = zc->extremeRays();
     try
     {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZMatrix rays = zc->extremeRays();
       polymake::perl::Object p("Polytope<Rational>");
       p.take("VERTICES") << GfZMatrix2PmMatrixInteger(&rays);
       VoidCallPolymakeFunction("jreality",p.CallPolymakeMethod("VISUAL"));
-      res->rtyp = NONE;
-      res->data = NULL;
-      return FALSE;
     }
     catch (const std::exception& ex)
     {
       std::cerr << "Error: " << ex.what() << std::endl; 
       return TRUE;
     }
+    res->rtyp = NONE;
+    res->data = NULL;
+    return FALSE;
   }
   if ((u != NULL) && (u->Typ() == fanID))
   {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
     try
     {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       polymake::perl::Object pf=ZFan2PmFan(zf);
       VoidCallPolymakeFunction("jreality",pf.CallPolymakeMethod("VISUAL"));
-      res->rtyp = NONE;
-      res->data = NULL;
-      return FALSE;
     }    
     catch (const std::exception& ex)
     {
       std::cerr << "Error: " << ex.what() << std::endl; 
       return TRUE;
     }
+    res->rtyp = NONE;
+    res->data = NULL;
+    return FALSE;
   }
   WerrorS("visual: unexpected parameters");
   return TRUE;
@@ -1136,11 +1400,19 @@ BOOLEAN normalFan(leftv res, leftv args)
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix rays = zc->extremeRays();
-    polymake::perl::Object p("Polytope<Rational>");
-    p.take("VERTICES") << GfZMatrix2PmMatrixInteger(&rays);
-    polymake::perl::Object pf;
-    CallPolymakeFunction("normal_fan", p) >> pf;
-    gfan::ZFan* zf = new gfan::ZFan(PmFan2ZFan(&pf));
+    try
+    {
+      polymake::perl::Object p("Polytope<Rational>");
+      p.take("VERTICES") << GfZMatrix2PmMatrixInteger(&rays);
+      polymake::perl::Object pf;
+      CallPolymakeFunction("normal_fan", p) >> pf;
+      gfan::ZFan* zf = new gfan::ZFan(PmFan2ZFan(&pf));
+    }
+    catch (const std::exception& ex) 
+    {
+      std::cerr << "ERROR: " << ex.what() << endl; 
+      return TRUE;
+    }
     res->rtyp = fanID;
     res->data = (char*) zf;
     return FALSE;
