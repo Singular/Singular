@@ -1584,6 +1584,147 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
   return u;
 }
 
+number _nlInpAdd_aNoImm_OR_bNoImm(number a, number b)
+{  
+  if (SR_HDL(b) & SR_INT)
+  {
+    switch (a->s)
+    {
+      case 0:
+      case 1:/* b:short, a:1 */
+      {
+        mpz_t x;
+        mpz_init(x);
+        mpz_mul_si(x,a->n,SR_TO_INT(b));
+        mpz_add(a->z,a->z,x);
+        mpz_clear(x);
+        a->s = 0;
+        a=nlShort1(a);
+        break;
+      }
+      case 3:
+      {
+        if ((long)b>0L)
+          mpz_add_ui(a->z,a->z,SR_TO_INT(b));
+        else
+          mpz_sub_ui(a->z,a->z,-SR_TO_INT(b));
+        a->s = 3;
+        a=nlShort3_noinline(a);
+        break;
+      }
+    }
+    return a;
+  }
+  if (SR_HDL(a) & SR_INT)
+  {
+    number u=ALLOC_RNUMBER();
+    #if defined(LDEBUG)
+    u->debug=123456;
+    #endif
+    mpz_init(u->z);
+    switch (b->s)
+    {
+      case 0:
+      case 1:/* a:short, b:1 */
+      {
+        mpz_t x;
+        mpz_init(x);
+
+        mpz_mul_si(x,b->n,SR_TO_INT(a));
+        mpz_add(u->z,b->z,x);
+        mpz_clear(x);
+        // result cannot be 0, if coeffs are normalized
+        mpz_init_set(u->n,b->n);
+        u->s = 0;
+        u=nlShort1(u);
+        break;
+      }
+      case 3:
+      {
+        if ((long)a>0L)
+          mpz_add_ui(u->z,b->z,SR_TO_INT(a));
+        else
+          mpz_sub_ui(u->z,b->z,-SR_TO_INT(a));
+        // result cannot be 0, if coeffs are normalized
+        u->s = 3;
+        u=nlShort3_noinline(u);
+        break;
+      }
+    }
+    nlTest(u);
+    return u;
+  }
+  else
+  {
+    switch (a->s)
+    {
+      case 0:
+      case 1:
+      {
+        switch(b->s)
+        {
+          case 0:
+          case 1: /* a:1 b:1 */
+          {
+            mpz_t x;
+            mpz_t y;
+            mpz_init(x);
+            mpz_init(y);
+            mpz_mul(x,b->z,a->n);
+            mpz_mul(y,a->z,b->n);
+            mpz_add(a->z,x,y);
+            mpz_clear(x);
+            mpz_clear(y);
+            mpz_mul(a->n,a->n,b->n);
+            a->s = 0;
+            break;
+          }
+          case 3: /* a:1 b:3 */
+          {
+            mpz_t x;
+            mpz_init(x);
+            mpz_mul(x,b->z,a->n);
+            mpz_add(a->z,a->z,x);
+            mpz_clear(x);
+            a->s = 0;
+            break;
+          }
+        } /*switch (b->s) */
+        a=nlShort1(a);
+        break;
+      }
+      case 3:
+      {
+        switch(b->s)
+        {
+          case 0:
+          case 1:/* a:3, b:1 */
+          {
+            mpz_t x;
+            mpz_init(x);
+            mpz_mul(x,a->z,b->n);
+            mpz_add(a->z,b->z,x);
+            mpz_clear(x);
+            mpz_init_set(a->n,b->n);
+            a->s = 0;
+            a=nlShort1(a);
+            break;
+          }
+          case 3:
+          {
+            mpz_add(a->z,a->z,b->z);
+            a->s = 3;
+            a=nlShort3_noinline(a);
+            break;
+          }
+        }
+        break;
+      }
+    }
+    nlTest(a);
+    return a;
+  }
+}
 number _nlSub_aNoImm_OR_bNoImm(number a, number b)
 {
   number u=ALLOC_RNUMBER();
@@ -1976,6 +2117,7 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
 number  _nlNeg_NoImm(number a);
 number  _nlAdd_aNoImm_OR_bNoImm(number a, number b);
+number  _nlInpAdd_aNoImm_OR_bNoImm(number a, number b);
 number  _nlSub_aNoImm_OR_bNoImm(number a, number b);
 number  _nlMult_aNoImm_OR_bNoImm(number a, number b);
 number  _nlMult_aImm_bImm_rNoImm(number a, number b);
@@ -2100,6 +2242,7 @@ number nlShort3_noinline(number x);
 
 LINLINE number nlInpAdd (number a, number b, const ring r)
 {
+  // a=a+b
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     LONG r=SR_HDL(a)+SR_HDL(b)-1L;
@@ -2108,145 +2251,7 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
     else
       return nlRInit(SR_TO_INT(r));
   }
-  // a=a+b
-  if (SR_HDL(b) & SR_INT)
-  {
-    switch (a->s)
-    {
-      case 0:
-      case 1:/* b:short, a:1 */
-      {
-        mpz_t x;
-        mpz_init(x);
-        mpz_mul_si(x,a->n,SR_TO_INT(b));
-        mpz_add(a->z,a->z,x);
-        mpz_clear(x);
-        a->s = 0;
-        a=nlShort1(a);
-        break;
-      }
-      case 3:
-      {
-        if ((long)b>0L)
-          mpz_add_ui(a->z,a->z,SR_TO_INT(b));
-        else
-          mpz_sub_ui(a->z,a->z,-SR_TO_INT(b));
-        a->s = 3;
-        a=nlShort3_noinline(a);
-        break;
-      }
-    }
-    return a;
-  }
-  if (SR_HDL(a) & SR_INT)
-  {
-    number u=ALLOC_RNUMBER();
-    #if defined(LDEBUG)
-    u->debug=123456;
-    #endif
-    mpz_init(u->z);
-    switch (b->s)
-    {
-      case 0:
-      case 1:/* a:short, b:1 */
-      {
-        mpz_t x;
-        mpz_init(x);
-
-        mpz_mul_si(x,b->n,SR_TO_INT(a));
-        mpz_add(u->z,b->z,x);
-        mpz_clear(x);
-        // result cannot be 0, if coeffs are normalized
-        mpz_init_set(u->n,b->n);
-        u->s = 0;
-        u=nlShort1(u);
-        break;
-      }
-      case 3:
-      {
-        if ((long)a>0L)
-          mpz_add_ui(u->z,b->z,SR_TO_INT(a));
-        else
-          mpz_sub_ui(u->z,b->z,-SR_TO_INT(a));
-        // result cannot be 0, if coeffs are normalized
-        u->s = 3;
-        u=nlShort3_noinline(u);
-        break;
-      }
-    }
-    nlTest(u);
-    return u;
-  }
-  else
-  {
-    switch (a->s)
-    {
-      case 0:
-      case 1:
-      {
-        switch(b->s)
-        {
-          case 0:
-          case 1: /* a:1 b:1 */
-          {
-            mpz_t x;
-            mpz_t y;
-            mpz_init(x);
-            mpz_init(y);
-            mpz_mul(x,b->z,a->n);
-            mpz_mul(y,a->z,b->n);
-            mpz_add(a->z,x,y);
-            mpz_clear(x);
-            mpz_clear(y);
-            mpz_mul(a->n,a->n,b->n);
-            a->s = 0;
-            break;
-          }
-          case 3: /* a:1 b:3 */
-          {
-            mpz_t x;
-            mpz_init(x);
-            mpz_mul(x,b->z,a->n);
-            mpz_add(a->z,a->z,x);
-            mpz_clear(x);
-            a->s = 0;
-            break;
-          }
-        } /*switch (b->s) */
-        a=nlShort1(a);
-        break;
-      }
-      case 3:
-      {
-        switch(b->s)
-        {
-          case 0:
-          case 1:/* a:3, b:1 */
-          {
-            mpz_t x;
-            mpz_init(x);
-            mpz_mul(x,a->z,b->n);
-            mpz_add(a->z,b->z,x);
-            mpz_clear(x);
-            mpz_init_set(a->n,b->n);
-            a->s = 0;
-            a=nlShort1(a);
-            break;
-          }
-          case 3:
-          {
-            mpz_add(a->z,a->z,b->z);
-            a->s = 3;
-            a=nlShort3_noinline(a);
-            break;
-          }
-        }
-        break;
-      }
-    }
-    nlTest(a);
-    return a;
-  }
+  return _nlInpAdd_aNoImm_OR_bNoImm(a,b);
 }
 
 LINLINE number nlMult (number a, number b)
