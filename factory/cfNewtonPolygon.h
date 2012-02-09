@@ -45,6 +45,16 @@ bool isInPolygon (int ** points, ///< [in] an array of points in the
                   int* point     ///< [in] a point in the plane
                  );
 
+/// get the y-direction slopes of all edges with positive slope in y-direction
+/// of a convex polygon with at least one point of the polygon lying on the
+/// x-axis and one lying on the y-axis
+///
+/// @return an array containing the slopes as described above
+int* getRightSide (int** polygon,     ///<[in] vertices of a polygon
+                   int sizeOfPolygon, ///<[in] number of vertices
+                   int& sizeOfOutput  ///<[in,out] size of the output
+                  );
+
 #ifdef HAVE_NTL
 /// Algorithm 5 as described in Convex-Dense Bivariate Polynomial Factorization
 /// by Berthomieu, Lecerf
