@@ -489,22 +489,23 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     {
       if (k != j - k + 1)
       {
-        if ((one.hasTerms() && one.exp() == j - k + 1) && (two.hasTerms() && two.exp() == j - k + 1))
+        if ((one.hasTerms() && one.exp() == j - k + 1)
+             && (two.hasTerms() && two.exp() == j - k + 1))
         {
-          tmp[0] += mulNTL ((bufFactors[0] [k] + one.coeff()), (bufFactors[1] [k] +
+          tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()), (bufFactors[1][k]+
                      two.coeff())) - M (k + 1, 1) - M (j - k + 2, 1);
           one++;
           two++;
         }
         else if (one.hasTerms() && one.exp() == j - k + 1)
         {
-          tmp[0] += mulNTL ((bufFactors[0] [k] + one.coeff()), bufFactors[1] [k]) -
+          tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()), bufFactors[1][k])-
                      M (k + 1, 1);
           one++;
         }
         else if (two.hasTerms() && two.exp() == j - k + 1)
         {
-          tmp[0] += mulNTL (bufFactors[0] [k], (bufFactors[1] [k] + two.coeff())) -
+          tmp[0] += mulNTL (bufFactors[0][k], (bufFactors[1][k]+two.coeff()))-
                     M (k + 1, 1);
           two++;
         }
@@ -576,20 +577,20 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
           if ((one.hasTerms() && one.exp() == j - k + 1) &&
               (two.hasTerms() && two.exp() == j - k + 1))
           {
-            tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), (Pi[l - 1] [k] +
+            tmp[l] += mulNTL ((bufFactors[l+1][k] + one.coeff()), (Pi[l-1][k] +
                        two.coeff())) - M (k + 1, l + 1) - M (j - k + 2, l + 1);
             one++;
             two++;
           }
           else if (one.hasTerms() && one.exp() == j - k + 1)
           {
-            tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), Pi[l - 1] [k]) -
+            tmp[l] += mulNTL ((bufFactors[l+1][k]+one.coeff()), Pi[l-1][k]) -
                        M (k + 1, l + 1);
             one++;
           }
           else if (two.hasTerms() && two.exp() == j - k + 1)
           {
-            tmp[l] += mulNTL (bufFactors[l + 1] [k], (Pi[l - 1] [k] + two.coeff())) -
+            tmp[l] += mulNTL (bufFactors[l+1][k], (Pi[l-1][k] + two.coeff())) -
                       M (k + 1, l + 1);
             two++;
           }
