@@ -539,8 +539,6 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   bool earlySuccess= false;
   CFList earlyFactors;
   TIMING_START (fac_hensel_lift);
-  //out_cf ("A before= ",A, "\n");
-  printf ("degree (LC (A,1))= %d\n", degree (LC (A,1)));
   //maybe one should use a multiple of LC (A,1) and try a nonmonic lifting here?
   uniFactors= henselLiftAndEarly
               (A, earlySuccess, earlyFactors, degs, liftBound,
@@ -548,17 +546,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
-  //printf ("earlyFactors.length()= %d\n", earlyFactors.length());
-  //printf ("liftBound after= %d\n", liftBound);
-  //printf ("earlySuccess= %d\n", earlySuccess);
   CanonicalForm MODl= power (y, liftBound);
 
-  /*CanonicalForm test= prod (uniFactors);
-  test *= LC (A,1);
-  test= mod (test, MODl);*/
-  //printf ("test == A %d\n", test == A);
-  //out_cf ("test= ", test, "\n");
-  //out_cf ("A= ", A, "\n");
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                 uniFactors.length()/2);
 
