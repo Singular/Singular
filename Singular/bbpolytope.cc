@@ -472,23 +472,17 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == POLY_CMD))
   {
     poly p = (poly)u->Data();
-    int r = rVar(currRing);
-    gfan::ZMatrix zm(1,r+1);
-    int *leadexpv = (int*)omAlloc((r+1)*sizeof(int));
-    pGetExpV(p,leadexpv);
-    gfan::ZVector zv = intStar2ZVectorWithLeadingOne(r, leadexpv);
-    zm.appendRow(zv);
-    poly pNextTerm = p;
-    while(pNext(pNextTerm)!=NULL)
+    int N = rVar(currRing);
+    gfan::ZMatrix zm(1,N+1);
+    int *leadexpv = (int*)omAlloc((N+1)*sizeof(int));
+    while (p!=NULL)
     {
-      pNextTerm=pNext(pNextTerm);
-      int *tailexpv=(int*)omAlloc((r+1)*sizeof(int));
-      pGetExpV(pNextTerm,tailexpv);
-      gfan::ZVector zv = intStar2ZVectorWithLeadingOne(r, tailexpv);
+      pGetExpV(p,leadexpv);
+      gfan::ZVector zv = intStar2ZVectorWithLeadingOne(r, leadexpv);
       zm.appendRow(zv);
-      omFree(tailexpv);
+      pIter(p);
     }
-    omFree(leadexpv);
+    omFreeSize(leadexpv,(N+1)*sizeof(int));
     gfan::ZCone* zc = new gfan::ZCone();
     *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
     res->rtyp = polytopeID;
