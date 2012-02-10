@@ -359,6 +359,11 @@ void nInitChar(ring r)
     n->nSize          = naSize;
     n->cfGetDenom     = napGetDenom;
     n->cfGetNumerator = napGetNumerator;
+    if (r->algring->cf->cfChineseRemainder!=ndChineseRemainder)
+    {
+      n->cfChineseRemainder=naChineseRemainder;
+      n->cfFarey=naFarey;
+    }
 #ifdef LDEBUG
     n->nDBTest        = naDBTest;
 #endif

@@ -2698,3 +2698,44 @@ number   napGetNumerator(number &n, const ring r)
   rr->s = 2;
   return (number)rr;
 }
+
+poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R);
+number naChineseRemainder(number *x, number *q,int rl, const ring r)
+{
+  poly *xx=(poly*)omAlloc0(rl*sizeof(poly));
+  number *qq=(number*)omAlloc0(rl*sizeof(number));
+  number *temp=(number*)omAlloc0(rl*sizeof(number));
+  lnumber t;
+  for(int i=rl-1;i>=0;i--)
+  {
+    if(x[i]!=NULL)
+    {
+      t=(lnumber)x[i];
+      xx[i]=t->z;
+    }
+    t=(lnumber)q[i];
+    qq[i]=pGetCoeff(t->z);
+  }
+  poly rr=p_ChineseRemainder(xx,temp,qq,rl,r->algring);
+  t=ALLOC0_LNUMBER();
+  t->z=rr;
+  t->s=2;
+  return (number)t;
+}
+
+poly p_Farey(poly p, number N, const ring r);
+number naFarey(number nN, number nP, const ring r)
+{
+  lnumber N = (lnumber)nN;
+  /* nP is a BIGINT_CMD */
+  if (N->n!=NULL)
+  {
+    WerrorS("rational function not allowed in naFarey");
+    return NULL;
+  }
+  if (N==NULL) return NULL;
+  lnumber rr=ALLOC0_LNUMBER();
+  rr->z=p_Farey(N->z,nP,r->algring);
+  rr->s = 2;
+  return (number)rr;
+}

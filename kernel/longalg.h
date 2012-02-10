@@ -89,5 +89,8 @@ number   naGetNumerator(number &n, const ring r);
 number  napGetDenom(number &n, const ring r);
 number  napGetNumerator(number &n, const ring r);
 poly    napPermNumber(number z, int * par_perm, int P, ring r);
+
+number naFarey(number nN, number nP, const ring);
+number naChineseRemainder(number *x, number *q,int rl, const ring);
 #endif
 
