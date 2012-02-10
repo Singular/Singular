@@ -951,7 +951,7 @@ reverseSubstReciproQ (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
     fmpz_poly_init2 (buf3, repLengthBuf2 + d);
     for (ind= 0; ind < repLengthBuf1; ind++)
     {
-      fmpz_poly_get_coeff_fmpz (tmp1, buf1, ind);  //oder fmpz_set (fmpz_poly_get_coeff_ptr (buf3, ind),fmpz_poly_get_coeff_ptr (buf1, ind))
+      fmpz_poly_get_coeff_fmpz (tmp1, buf1, ind);
       fmpz_poly_set_coeff_fmpz (buf3, ind, tmp1);
     }
     for (ind= repLengthBuf1; ind < d; ind++)
@@ -1825,7 +1825,8 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
 
 #ifdef HAVE_FLINT
   Variable alpha;
-  if (getCharacteristic() == 0 && !hasFirstAlgVar (F, alpha) && ! hasFirstAlgVar (G, alpha))
+  if (getCharacteristic() == 0 && !hasFirstAlgVar (F, alpha)
+      && !hasFirstAlgVar (G, alpha))
     return mulMod2FLINTQ (F, G, M);
 #endif
 
@@ -2413,7 +2414,8 @@ void divrem2 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     divrem (A, B, Q, R);
     return;
   }
-  if (!(B.level() == 1 && B.isUnivariate()) && (A.level() == 1 && A.isUnivariate()))
+  if (!(B.level() == 1 && B.isUnivariate()) &&
+      (A.level() == 1 && A.isUnivariate()))
   {
     Q= 0;
     R= A;
