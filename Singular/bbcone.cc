@@ -68,6 +68,16 @@ gfan::ZMatrix intmat2ZMatrix(const intvec* iMat)
   return ret;
 }
 
+gfan::ZVector intStar2ZVector(const int d, const int* i)
+{
+  gfan::ZVector zv(d);
+  for(int j=0; j<d; j++)
+  {
+    zv[j]=i[j];
+  }
+  return zv;
+}
+
 /* expects iMat to have just one row */
 gfan::ZVector intvec2ZVector(const intvec* iVec)
 {

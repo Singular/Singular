@@ -3,7 +3,7 @@
 #include </usr/local/include/polymake/Rational.h>
 #include </usr/local/include/polymake/Integer.h>
 #include </usr/local/include/polymake/perl/macros.h>
-#include </usr/local/include/polymake/next/Set.h>
+#include </usr/local/include/polymake/Set.h>
 #include </usr/local/include/polymake/next/IncidenceMatrix.h>
 
 #include </usr/local/include/gfanlib.h>
@@ -934,7 +934,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
       polymake::perl::Object pq = ZPolytope2PmPolytope(zq);
       polymake::perl::Object pms;
-      CallPolymakeFunction("mikowski_sum", pp, pq) >> pms;
+      CallPolymakeFunction("minkowski_sum", pp, pq) >> pms;
       gfan::ZCone* ms = new gfan::ZCone(PmPolytope2ZPolytope(&pms));
       res->rtyp = polytopeID;
       res->data = (char*) ms;
@@ -943,6 +943,24 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
   }
   WerrorS("minkowskiSum: unexpected parameters");
   return TRUE;
+}
+
+
+polymake::Matrix<polymake::Integer> raysOf(const polymake::perl::Object* zf, 
+                                           const polymake::Set<polymake::Integer>* s)
+{
+  polymake::Matrix<polymake::Integer> allrays = zf->give("RAYS");
+  polymake::Matrix<polymake::Integer> wantedrays;
+  bool ok = true;
+  for(Entire<Set<Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
+  {
+    wantedrays = wantedrays / allrays.row(PmInteger2Int(*i,ok));
+  }
+  if (!ok)
+  {
+    WerrorS("overflow while converting polymake::Integer to int in raysOf");
+  }
+  return wantedrays;
 }
 
 
@@ -961,7 +979,8 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
       o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
       p.take("LP") << o;
       polymake::Set<polymake::Integer> mf = p.give("LP.MAXIMAL_FACE");
-      intvec* maxface = new intvec(PmSetInteger2Intvec(&mf));
+      polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
+      intvec* maxface = new intvec(PmMatrixInteger2Intvec(&rays));
       res->rtyp = INTVEC_CMD;
       res->data = (char*) maxface;
       return FALSE;
@@ -976,23 +995,24 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
-      leftv v = u->next;
-      if ((v != NULL) && (v->Typ() == INTVEC_CMD))
-	{
-	  gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-	  polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-	  intvec* iv = (intvec*) v->Data();
-	  polymake::perl::Object o("LinearProgram<Rational>");
-	  o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
-	  p.take("LP") << o;
-	  polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
-	  intvec* maxface = new intvec(PmSetInteger2Intvec(&mf));
-	  res->rtyp = INTVEC_CMD;
-	  res->data = (char*) maxface;
-	  return FALSE;
-	}
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      polymake::perl::Object p = ZPolytope2PmPolytope(zp);
+      intvec* iv = (intvec*) v->Data();
+      polymake::perl::Object o("LinearProgram<Rational>");
+      o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
+      p.take("LP") << o;
+      polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
+      polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
+      intvec* minface = new intvec(PmMatrixInteger2Intvec(&rays));
+      res->rtyp = INTVEC_CMD;
+      res->data = (char*) minface;
+      return FALSE;
     }
+  }
   WerrorS("minimalFace: unexpected parameters");
   return TRUE;
 }
@@ -1244,6 +1264,19 @@ BOOLEAN testingvisuals(leftv res, leftv args)   // for testing purposes
 }
 
 
+BOOLEAN testingstrings(leftv res, leftv args)
+{
+  leftv u = args;
+  gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+  std::string zs = zf->toString();
+  std::istringstream s(zs);
+  gfan::ZFan* zg = new gfan::ZFan(s);
+  res->rtyp = fanID;
+  res->data = (char*) zg;
+  return FALSE;
+}
+
+
 extern "C" int mod_init(void* polymakesingular)
 {
 
@@ -1292,5 +1325,6 @@ extern "C" int mod_init(void* polymakesingular)
   // iiAddCproc("","testingpolytopes",FALSE,testingpolytopes);
   // iiAddCproc("","testingfans",FALSE,testingfans);
   iiAddCproc("","testingvisuals",FALSE,testingvisuals);
+  iiAddCproc("","testingstrings",FALSE,testingstrings);
 
 }
