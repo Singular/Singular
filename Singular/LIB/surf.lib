@@ -304,8 +304,13 @@ EXAMPLE: example surfer; shows an example
       surferPath = windowsCorrection(surferPath);
       surferPath = surferPath[1..size(surferPath)-size("/surfer")];
       singularPath = windowsCorrection(singularPath);
+      int start_path=1;
+      if (singularPath[1..size("/cygdrive/c/")]=="/cygdrive/c/")
+      {
+        start_path=size("/cygdrive/c/");
+      }
       singularPath = "c:"
-         + singularPath[size("/cygdrive/c/")..size(singularPath)];
+         + singularPath[start_path..size(singularPath)];
       surf_call = "cygstart -w -d " + surferPath + " ";
       surf_call = surf_call + surferPath + "/surfer ";
       surf_call = surf_call + singularPath + "/" + lForWindows;
