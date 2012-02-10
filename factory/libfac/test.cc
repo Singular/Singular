@@ -2,6 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Factor - Includes
 #include "libfac.h"
+#include <string.h>
+
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #define CERR std::cerr
