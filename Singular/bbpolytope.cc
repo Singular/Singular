@@ -478,7 +478,7 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
     while (p!=NULL)
     {
       pGetExpV(p,leadexpv);
-      gfan::ZVector zv = intStar2ZVectorWithLeadingOne(r, leadexpv);
+      gfan::ZVector zv = intStar2ZVectorWithLeadingOne(N, leadexpv);
       zm.appendRow(zv);
       pIter(p);
     }
