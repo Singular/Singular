@@ -1625,7 +1625,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
 
     bool success= false;
-    if (LucksWangSparseHeuristic (oldSqrfPartF*power (LC1, factors.length()-1),
+    CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
+    if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
+        LucksWangSparseHeuristic (oldSqrfPartFPowLC,
                                   oldFactors, 1, leadingCoeffs, factors))
     {
       interMedResult= recoverFactors (oldSqrfPartF, factors);
@@ -2601,8 +2603,9 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   A /= hh;
 
-  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
-      factors))
+  if (size (A)/getNumVars (A) < 500 && 
+      LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+                                factors))
   {
     int check= factors.length();
     factors= recoverFactors (A, factors);
