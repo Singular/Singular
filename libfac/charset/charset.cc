@@ -532,10 +532,7 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
         if ( degree(i.getItem()) > 1 )
         {  // search for a non linear elem
           elem=i.getItem();
-          //if (as.length()==1)
-          //  qs = Factorize2(elem,as.getFirst());
-          //else
-            qs= newfactoras(elem,as,success);
+          qs= newfactoras(elem,as,success);
           if ( qs.length() > 1 || qs.getFirst().exp() > 1 )
           { //found elem is reducible
             reducible=elem;
