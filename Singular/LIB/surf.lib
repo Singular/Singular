@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: surf.lib 14246 2011-05-26 11:55:32Z hannes $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -304,13 +304,8 @@ EXAMPLE: example surfer; shows an example
       surferPath = windowsCorrection(surferPath);
       surferPath = surferPath[1..size(surferPath)-size("/surfer")];
       singularPath = windowsCorrection(singularPath);
-      int start_path=1;
-      if (singularPath[1..size("/cygdrive/c/")]=="/cygdrive/c/")
-      {
-        start_path=size("/cygdrive/c/");
-      }
-      singularPath = "c:"
-         + singularPath[start_path..size(singularPath)];
+      link ll = "|: cygpath -w " + singularPath;
+      singularPath = "'\""+read(ll)+"\"'"; close(ll);
       surf_call = "cygstart -w -d " + surferPath + " ";
       surf_call = surf_call + surferPath + "/surfer ";
       surf_call = surf_call + singularPath + "/" + lForWindows;
