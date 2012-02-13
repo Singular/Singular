@@ -1,5 +1,5 @@
 /* compile:
- * SINGUNAME=`./singuane`
+ * SINGUNAME=`./singunane`
  *  g++  -I$SINGUNAME/include -o libsing-test1 libsing-test1.cc -L./Singular -lsingular
  */
 #include <libsingular.h>

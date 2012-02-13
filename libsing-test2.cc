@@ -1,7 +1,10 @@
 /* compile:
- * SINGUNAME=`./singuane`
+ * SINGUNAME=`./singunane`
  *  g++  -I$SINGUNAME/include -o libsing-test2 libsing-test2.cc -L./Singular -lsingular
  */
+//---------------------------
+//  how to call a library function: Primdec::primdecGTZ
+//---------------------------
 #include <libsingular.h>
 main()
 {
@@ -105,7 +108,6 @@ main()
       }
     }
   }
-
 }
 /* coding of objects of type number:
    this depend on the corresponding ring
