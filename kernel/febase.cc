@@ -196,6 +196,8 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   currentVoice->Next();
   //Print(":Buffer%d(%s):%s(%x)\n",
   //  t,BT_name[t],pname,currentVoice);
+  if (currentVoice!=NULL)
+  {
   if (pi!=NULL)
   {
     long l=strlen(pi->procname);
@@ -215,6 +217,7 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   currentVoice->buffer   = s;
   currentVoice->sw       = BI_buffer;
   currentVoice->typ      = t;
+  }
   switch (t)
   {
     case BT_execute:
@@ -236,6 +239,7 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
                      break;
   }
   //Print("start body (%s) at line %d\n",BT_name[t],yylineno);
+  if (currentVoice!=NULL)
   currentVoice->start_lineno = yylineno;
   //printf("start buffer typ %d\n",t);
   //Voice *p=currentVoice;
