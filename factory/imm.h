@@ -25,12 +25,17 @@
 #include "canonicalform.h"
 #include "int_cf.h"
 
-const int INTMARK = 1;
-const int FFMARK = 2;
-const int GFMARK = 3;
+const long INTMARK = 1;
+const long FFMARK = 2;
+const long GFMARK = 3;
 
-const int MINIMMEDIATE = -268435454; // -2^28-2
-const int MAXIMMEDIATE = 268435454;  // 2^28-2
+#if SIZEOF_LONG == 4
+const long MINIMMEDIATE = -268435454; // -2^28-2
+const long MAXIMMEDIATE = 268435454;  // 2^28-2
+#else
+const long MINIMMEDIATE = -(1L<<60)+2L; // -2^60-2
+const long MAXIMMEDIATE = (1L<<60)-2L;  // 2^60-2
+#endif
 #if defined(WINNT) && ! defined(__GNUC__)
 const INT64 MINIMMEDIATELL = -268435454i64;
 const INT64 MAXIMMEDIATELL = 268435454i64;
@@ -43,12 +48,12 @@ const INT64 MAXIMMEDIATELL = 268435454LL;
 //#ifdef HAS_ARITHMETIC_SHIFT
 #if 1
 
-inline int imm2int ( const InternalCF * const imm )
+inline long imm2int ( const InternalCF * const imm )
 {
-    return ((int)((long)imm)) >> 2;
+    return ((long)imm) >> 2;
 }
 
-inline InternalCF * int2imm ( int i )
+inline InternalCF * int2imm ( long i )
 {
     return (InternalCF*)((i << 2) | INTMARK );
 }
@@ -64,7 +69,7 @@ inline int imm2int ( const InternalCF * const imm )
         return (long)imm >> 2;
 }
 
-inline InternalCF * int2imm ( int i )
+inline InternalCF * int2imm ( long i )
 {
     if ( i < 0 )
         return (InternalCF*)(-(((-i) << 2) | INTMARK));
@@ -74,12 +79,12 @@ inline InternalCF * int2imm ( int i )
 
 #endif
 
-inline InternalCF * int2imm_p ( int i )
+inline InternalCF * int2imm_p ( long i )
 {
     return (InternalCF*)((i << 2) | FFMARK );
 }
 
-inline InternalCF * int2imm_gf ( int i )
+inline InternalCF * int2imm_gf ( long i )
 {
     return (InternalCF*)((i << 2) | GFMARK );
 }
@@ -137,7 +142,7 @@ imm_iszero_gf ( const InternalCF * const ptr )
 //}}}
 
 //{{{ conversion functions
-inline int imm_intval ( const InternalCF* const op )
+inline long imm_intval ( const InternalCF* const op )
 {
     if ( is_imm( op ) == FFMARK )
         if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
@@ -247,7 +252,7 @@ imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
 //{{{ arithmetic operators
 inline InternalCF * imm_add ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
-    int result = imm2int( lhs ) + imm2int( rhs );
+    long result = imm2int( lhs ) + imm2int( rhs );
     if ( ( result > MAXIMMEDIATE ) || ( result < MINIMMEDIATE ) )
         return CFFactory::basic( result );
     else
@@ -266,7 +271,7 @@ inline InternalCF * imm_add_gf ( const InternalCF * const lhs, const InternalCF 
 
 inline InternalCF * imm_sub ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
-    int result = imm2int( lhs ) - imm2int( rhs );
+    long result = imm2int( lhs ) - imm2int( rhs );
     if ( ( result > MAXIMMEDIATE ) || ( result < MINIMMEDIATE ) )
         return CFFactory::basic( result );
     else
@@ -286,13 +291,17 @@ inline InternalCF * imm_sub_gf ( const InternalCF * const lhs, const InternalCF 
 inline InternalCF *
 imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
-    INT64 result = (INT64)imm2int( lhs ) * imm2int( rhs );
-    if ( ( result > MAXIMMEDIATELL ) || ( result < MINIMMEDIATELL ) ) {
-        InternalCF * res = CFFactory::basic( IntegerDomain, imm2int( lhs ), true );
+    long a = imm2int( lhs );
+    long b = imm2int( rhs );
+    INT64 result = (INT64)a * (INT64)b;
+    if ( ( a!=0L ) && ((result/a!=b)
+      ||(result>MAXIMMEDIATE)||(result<MINIMMEDIATE) ) )
+    {
+        InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );
     }
     else
-        return int2imm( (int)result );
+        return int2imm( result );
 }
 
 inline InternalCF * imm_mul_p ( const InternalCF * const lhs, const InternalCF * const rhs )
@@ -307,8 +316,8 @@ inline InternalCF * imm_mul_gf ( const InternalCF * const lhs, const InternalCF 
 
 inline InternalCF * imm_div ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
-    int a = imm2int( lhs );
-    int b = imm2int( rhs );
+    long a = imm2int( lhs );
+    long b = imm2int( rhs );
     if ( a > 0 )
         return int2imm( a / b );
     else  if ( b > 0 )
@@ -322,8 +331,8 @@ inline InternalCF * imm_divrat ( const InternalCF * const lhs, const InternalCF 
     if ( cf_glob_switches.isOn( SW_RATIONAL ) )
         return CFFactory::rational( imm2int( lhs ), imm2int( rhs ) );
     else {
-        int a = imm2int( lhs );
-        int b = imm2int( rhs );
+        long a = imm2int( lhs );
+        long b = imm2int( rhs );
         if ( a > 0 )
             return int2imm( a / b );
         else  if ( b > 0 )
@@ -348,8 +357,8 @@ inline InternalCF * imm_mod ( const InternalCF * const lhs, const InternalCF * c
     if ( cf_glob_switches.isOn( SW_RATIONAL ) )
         return int2imm( 0 );
     else {
-        int a = imm2int( lhs );
-        int b = imm2int( rhs );
+        long a = imm2int( lhs );
+        long b = imm2int( rhs );
         if ( a > 0 )
             if ( b > 0 )
                 return int2imm( a % b );
@@ -357,11 +366,11 @@ inline InternalCF * imm_mod ( const InternalCF * const lhs, const InternalCF * c
                 return int2imm( a % (-b) );
         else
             if ( b > 0 ) {
-                int r = (-a) % b;
+                long r = (-a) % b;
                 return int2imm( (r==0) ? r : b-r );
             }
             else {
-                int r = (-a) % (-b);
+                long r = (-a) % (-b);
                 return int2imm( (r==0) ? r : -b-r );
             }
     }
@@ -381,7 +390,7 @@ inline void imm_divrem ( const InternalCF * const lhs, const InternalCF * const 
 {
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
         q = imm_divrat( lhs, rhs );
-        r = CFFactory::basic( 0 );
+        r = CFFactory::basic( 0L );
     }
     else {
         q = imm_div( lhs, rhs );

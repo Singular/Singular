@@ -33,6 +33,7 @@
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
 #include <kernel/modulop.h>
+#include <kernel/clapconv.h>
 #ifdef HAVE_RINGS
 #include <kernel/rmodulon.h>
 #include <kernel/rmodulo2m.h>
@@ -2239,20 +2240,32 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
   res->data=(char *)(long)p0;
   return FALSE;
 }
+//static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
+//{
+//  number a=(number) u->Data();
+//  number b=(number) v->Data();
+//  if (nlIsZero(a))
+//  {
+//    if (nlIsZero(b)) res->data=(char *)nlInit(1, NULL);
+//    else             res->data=(char *)nlCopy(b);
+//  }
+//  else
+//  {
+//    if (nlIsZero(b))  res->data=(char *)nlCopy(a);
+//    else res->data=(char *)nlGcd(a, b, NULL);
+//  }
+//  return FALSE;
+//}
+
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
-{
-  number a=(number) u->Data();
-  number b=(number) v->Data();
-  if (nlIsZero(a))
-  {
-    if (nlIsZero(b)) res->data=(char *)nlInit(1, NULL);
-    else             res->data=(char *)nlCopy(b);
-  }
-  else
-  {
-    if (nlIsZero(b))  res->data=(char *)nlCopy(a);
-    else res->data=(char *)nlGcd(a, b, NULL);
-  }
+{ 
+  number n1 = (number) u->CopyD();
+  number n2 = (number) v->CopyD();
+  CanonicalForm C1 = convSingNFactoryN (n1,NULL);
+  CanonicalForm C2 = convSingNFactoryN (n2,NULL);
+  CanonicalForm G = gcd (C1,C2);
+  number g = convFactoryNSingN (G,NULL);
+  res->data = g;
   return FALSE;
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)

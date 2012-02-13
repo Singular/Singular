@@ -68,6 +68,7 @@ public:
     CF_INLINE CanonicalForm( const CanonicalForm& );
     CF_INLINE CanonicalForm( InternalCF* );
     CF_INLINE CanonicalForm( const int );
+    CF_INLINE CanonicalForm( const long );
     CF_INLINE CanonicalForm( const Variable & );
     CF_INLINE CanonicalForm( const Variable &, int );
     CanonicalForm( const char *, const int base=10 ); // use with caution - does only handle integers !!!
@@ -99,7 +100,7 @@ public:
     bool isHomogeneous() const;
 
     // conversion functions
-    int intval() const;
+    long intval() const;
     CanonicalForm mapinto () const;
 
     CanonicalForm lc () const;
@@ -121,7 +122,7 @@ public:
 
     // assignment operators
     CF_NO_INLINE CanonicalForm& operator = ( const CanonicalForm& );
-    CF_NO_INLINE CanonicalForm& operator = ( const int );
+    CF_NO_INLINE CanonicalForm& operator = ( const long );
 
     CanonicalForm& operator += ( const CanonicalForm& );
     CanonicalForm& operator -= ( const CanonicalForm& );

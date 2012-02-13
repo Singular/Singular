@@ -86,7 +86,7 @@ InternalCF::num ()
 InternalCF *
 InternalCF::den ()
 {
-    return CFFactory::basic( 1 );
+    return CFFactory::basic( 1L );
 }
 //}}}
 
@@ -128,14 +128,14 @@ InternalCF *
 InternalCF::bgcdsame ( const InternalCF * const ) const
 {
     ASSERT1( 0, "bgcd() not implemented for class %s", this->classname() );
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 
 InternalCF *
 InternalCF::bgcdcoeff ( const InternalCF * const )
 {
     ASSERT1( 0, "bgcd() not implemented for class %s", this->classname() );
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 //}}}
 
@@ -146,7 +146,7 @@ InternalCF::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
 {
     ASSERT1( 0, "bextgcd() not implemented for class %s", this->classname() );
     a = 0; b = 0;
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 
 InternalCF *
@@ -154,11 +154,11 @@ InternalCF::bextgcdcoeff ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
 {
     ASSERT1( 0, "bextgcd() not implemented for class %s", this->classname() );
     a = 0; b = 0;
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 //}}}
 
-int
+long
 InternalCF::intval() const
 {
     ASSERT1( 0, "intval() not implemented for class %s", this->classname() );

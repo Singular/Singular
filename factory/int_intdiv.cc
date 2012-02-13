@@ -207,7 +207,7 @@ InternalInteger::modulocoeff ( InternalCF * c, bool invert )
         return int2imm( 0 );
     }
 
-    int intC = imm2int( c );
+    long intC = imm2int( c );
 
     if ( invert ) {
         if ( intC >= 0 ) {

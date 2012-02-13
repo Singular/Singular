@@ -90,7 +90,7 @@ public:
     InternalCF * bextgcdsame ( InternalCF *, CanonicalForm &, CanonicalForm & );
     InternalCF * bextgcdcoeff ( InternalCF *, CanonicalForm &, CanonicalForm & );
 
-    int intval() const;
+    long intval() const;
 
     int sign() const;
 

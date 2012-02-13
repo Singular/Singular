@@ -49,8 +49,13 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
       if ( n->s == 3 )
       {
         mpz_t dummy;
+        long lz=mpz_get_si(n->z);
+        if (mpz_cmp_si(n->z,lz)==0) term=lz;
+        else
+        {
         mpz_init_set( dummy,n->z );
         term = make_cf( dummy );
+        }
       }
       else
       {
@@ -74,8 +79,14 @@ number convFactoryNSingN( const CanonicalForm & n, const ring r)
 {
   if (n.isImm())
   {
+    long lz=n.intval();
+    int iz=(int)lz;
+    if ((long)iz==lz)
+    {
     if (r==NULL) return nlInit(n.intval(),NULL);
     else         return n_Init(n.intval(),r);
+    }
+    else  return nlRInit(lz);
   }
   else
   {
