@@ -8,15 +8,15 @@ CXXTEMPLFLAGS=
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS}
 
-AM_LDFLAGS =  -L${builddir}
+AM_LDFLAGS =  -L${abs_builddir}
 
 lib_LTLIBRARIES = libfactory.la libfactory_g.la
 
 libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
-libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la ${GMP_LIBS} ${NTL_LIBS}
+libfactory_la_LIBADD     = ${abs_builddir}/libfac/libfac.la ${GMP_LIBS} ${NTL_LIBS}
 libfactory_la_LDFLAGS    = ${AM_LDFLAGS} -release ${PACKAGE_VERSION}
 libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
-libfactory_g_la_LIBADD   = ${builddir}/libfac/libfac_g.la ${GMP_LIBS} ${NTL_LIBS}
+libfactory_g_la_LIBADD   = ${abs_builddir}/libfac/libfac_g.la ${GMP_LIBS} ${NTL_LIBS}
 libfactory_g_la_LDFLAGS  = ${AM_LDFLAGS} -release ${PACKAGE_VERSION}
 
 
