@@ -64,7 +64,7 @@
 // place here your own template stuff, not instantiated by factory
   // libfac:
 #ifdef HAVE_LIBFAC
-# include <factory/libfac/factor.h>
+# include <factory/libfac/libfac.h>
 #endif
 
 // class.h:

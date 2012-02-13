@@ -17,7 +17,7 @@
 #include <factory/factory.h>
 
 #ifdef HAVE_LIBFAC
-#include <factory/libfac/factor.h>
+#include <factory/libfac/libfac.h>
 #endif
 
 

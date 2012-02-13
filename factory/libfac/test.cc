@@ -1,7 +1,7 @@
 //static char rcsid[] = "$Id$";
 ///////////////////////////////////////////////////////////////////////////////
 // Factor - Includes
-#include "factor.h"
+#include "libfac.h"
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #define CERR std::cerr

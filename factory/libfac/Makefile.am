@@ -43,7 +43,7 @@ libfac_g_la_SOURCES = $(SOURCES)
 
 libfac_includedir=$(includedir)/factory/libfac
 
-libfac_include_HEADERS   = factor.h 
+libfac_include_HEADERS   = libfac.h 
 
 EXTRA_DIST = factor/class.cc \
       factor/test.cc test.cc testcs.cc header.tpl \

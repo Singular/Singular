@@ -1,7 +1,7 @@
 // $Id$
 
 #include <factory.h>
-#include <factor.h>
+#include <libfac.h>
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #define COUT std::cout
