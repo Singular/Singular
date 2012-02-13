@@ -13,9 +13,14 @@
 
 #include "config.h"
 
-#include <factory/factoryconf.h>
+// #include <factory/factoryconf.h>
+// #include "factory.h"
+#include "cf_iter.h"
+#include "canonicalform.h"
+#include "cf_assert.h"
+#include "cf_reval.h"
+#include "cf_map.h"
 
-#include "factory.h"
 
 #include "templates/ftmpl_array.cc"
 #include "templates/ftmpl_factor.cc"
