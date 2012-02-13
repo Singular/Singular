@@ -28,7 +28,7 @@
 
 #include <libfac/factor/debug.h>
 #include "timing.h"
-TIMING_DEFINE_PRINT(subfactorize_time);
+TIMING_DEFINE_PRINT(subfactorize_time)
 
 
 // forward declarations:

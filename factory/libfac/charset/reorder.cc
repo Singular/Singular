@@ -30,7 +30,7 @@
 
 #include <libfac/factor/debug.h>
 #include "timing.h"
-TIMING_DEFINE_PRINT(neworder_time);
+TIMING_DEFINE_PRINT(neworder_time)
 
 #define __ARRAY_INIT__ -1
 

@@ -33,7 +33,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 #include <libfac/factor/debug.h>
 #include "timing.h"
-TIMING_DEFINE_PRINT(hfactorize_time);
+TIMING_DEFINE_PRINT(hfactorize_time)
 
 #if 0
 ///////////////////////////////////////////////////////////////

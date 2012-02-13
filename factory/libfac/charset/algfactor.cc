@@ -25,7 +25,7 @@
 
 #include <libfac/factor/debug.h>
 #include "timing.h"
-TIMING_DEFINE_PRINT(newfactoras_time);
+TIMING_DEFINE_PRINT(newfactoras_time)
 
 int hasVar(const CanonicalForm &f, const Variable &v);
 

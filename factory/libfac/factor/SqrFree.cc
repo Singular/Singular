@@ -36,8 +36,9 @@ static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathema
 
 #include <libfac/factor/debug.h>
 #include "timing.h"
-TIMING_DEFINE_PRINT(squarefree_time);
-TIMING_DEFINE_PRINT(gcd_time);
+
+TIMING_DEFINE_PRINT(squarefree_time)
+TIMING_DEFINE_PRINT(gcd_time)
 
 static inline CFFactor
 Powerup( const CFFactor & F , int exp=1)

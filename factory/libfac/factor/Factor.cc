@@ -39,12 +39,12 @@ void out_cff(CFFList &L);
 
 #include <libfac/factor/debug.h>
 #include "timing.h"
-TIMING_DEFINE_PRINT(factorize_time);
-TIMING_DEFINE_PRINT(sqrfree_time);
-TIMING_DEFINE_PRINT(discr_time);
-TIMING_DEFINE_PRINT(evaluate_time);
-TIMING_DEFINE_PRINT(hensel_time);
-TIMING_DEFINE_PRINT(truefactor_time);
+TIMING_DEFINE_PRINT(factorize_time)
+TIMING_DEFINE_PRINT(sqrfree_time)
+TIMING_DEFINE_PRINT(discr_time)
+TIMING_DEFINE_PRINT(evaluate_time)
+TIMING_DEFINE_PRINT(hensel_time)
+TIMING_DEFINE_PRINT(truefactor_time)
 
 /*
 * a wrapper for factorize over algebraic extensions:
