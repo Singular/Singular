@@ -9,7 +9,6 @@ CFFList Factorized( const CanonicalForm & F, const CanonicalForm & mipo, int Mai
 /*BEGINPUBLIC*/
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
 CFFList Factorize( const CanonicalForm & F, const CanonicalForm & mi, int is_SqrFree=0 ) ;
-CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly );
 /*ENDPUBLIC*/
 
 #endif /* FACTOR_H */
