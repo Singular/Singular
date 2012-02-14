@@ -86,6 +86,9 @@
 /* define type of your compilers 64 bit integer type */
 #define INT64 long long int
 
+/* define size of long */
+#define SIZEOF_LONG 4
+
 #undef HAVE_NTL
 
 /************** END OF CONFIGURABLE SECTION **************/
