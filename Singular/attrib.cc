@@ -137,12 +137,13 @@ void * atGet(idhdl root,const char * name, int t)
 
 void * atGet(leftv root,const char * name, int t)
 {
-  attr a=*(root->Attribute());
-  attr temp = a->get(name);
-  if ((temp!=NULL) && (temp->atyp==t))
-    return temp->data;
-  else
-    return NULL;
+  attr *a=(root->Attribute());
+  if (a!=NULL)
+  {
+    attr temp = (*a)->get(name);
+    if ((temp!=NULL) && (temp->atyp==t))
+      return temp->data;
+  }
 }
 
 void atSet(idhdl root,const char * name,void * data,int typ)
