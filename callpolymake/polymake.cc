@@ -1,10 +1,10 @@
-#include </usr/local/include/polymake/Main.h>
-#include </usr/local/include/polymake/Matrix.h>
-#include </usr/local/include/polymake/Rational.h>
-#include </usr/local/include/polymake/Integer.h>
-#include </usr/local/include/polymake/perl/macros.h>
-#include </usr/local/include/polymake/Set.h>
-#include </usr/local/include/polymake/next/IncidenceMatrix.h>
+#include <polymake/Main.h>
+#include <polymake/Matrix.h>
+#include <polymake/Rational.h>
+#include <polymake/Integer.h>
+#include <polymake/perl/macros.h>
+#include <polymake/Set.h>
+#include <polymake/IncidenceMatrix.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
