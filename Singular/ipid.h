@@ -68,7 +68,7 @@ extern proclevel *procstack;
 
 typedef struct
 {
-  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
+  int (*iiAddCproc)(const char *libname, const char *procname, BOOLEAN pstatic,
                     BOOLEAN(*func)(leftv res, leftv v));
   int (*iiArithAddCmd)(const char *szName, short nAlias, short nTokval,
                        short nToktype, short nPos);

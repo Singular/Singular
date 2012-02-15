@@ -1004,7 +1004,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {
   procinfov pi;
@@ -1030,7 +1030,7 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
 }
 
 #ifdef HAVE_DYNAMIC_LOADING
-int iiAddCprocTop(char *libname, char *procname, BOOLEAN pstatic,
+int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {
   int r=iiAddCproc(libname,procname,pstatic,func);
@@ -1048,9 +1048,9 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   WerrorS("mod_init: static version can not load modules");
   return TRUE;
 #else
-  int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+  int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                  BOOLEAN(*func)(leftv res, leftv v));
-  typedef int (*fktn_t)(int(*iiAddCproc)(char *libname, char *procname,
+  typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
   typedef int (*fktn2_t)(SModulFunctions*);

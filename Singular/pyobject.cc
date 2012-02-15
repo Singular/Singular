@@ -619,10 +619,10 @@ void sync_contexts()
 
 
 // forward declaration
-int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v));
 
-#define ADD_C_PROC(name) iiAddCproc("", (char*)#name, FALSE, name);
+#define ADD_C_PROC(name) iiAddCproc("", #name, FALSE, name);
 
 
 void pyobject_init() 
