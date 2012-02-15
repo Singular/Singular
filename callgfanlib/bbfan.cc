@@ -1,5 +1,5 @@
 #include <Singular/mod2.h>
-#ifdef HAVE_FANS
+// #ifdef HAVE_FANS
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -730,5 +730,5 @@ void bbfan_setup()
   //Print("created type %d (fan)\n",fanID); 
 }
 
-#endif
+// #endif
 /* HAVE_FANS */

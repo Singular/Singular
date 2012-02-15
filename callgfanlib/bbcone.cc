@@ -1,6 +1,6 @@
 #include <Singular/mod2.h>
 
-#ifdef HAVE_FANS
+// #ifdef HAVE_FANS
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -1277,5 +1277,5 @@ void bbcone_setup()
   //Print("created type %d (cone)\n",coneID); 
 }
 
-#endif
+// #endif
 /* HAVE_FANS */

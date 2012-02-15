@@ -16,9 +16,9 @@
 #include <kernel/febase.h>
 #include <kernel/intvec.h>
 
-#include <kernel/bbcone.h>
-#include <kernel/bbfan.h>
-#include <kernel/bbpolytope.h>
+#include <callgfanlib/bbcone.h>
+#include <callgfanlib/bbfan.h>
+#include <callgfanlib/bbpolytope.h>
 
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
