@@ -16,8 +16,8 @@ $Id: gfan.h 14338 2011-07-18 12:05:21Z hannes $
 #include <setoper.h>
 #include <cdd.h>
 #include <cddmp.h>
-#include <kernel/bbfan.h>
-#include <kernel/bbcone.h>
+#include <callgfanlib/bbfan.h>
+#include <callgfanlib/bbcone.h>
 extern int gfanHeuristic;
 
 #ifndef USE_ZFAN

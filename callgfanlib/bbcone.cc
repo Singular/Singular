@@ -13,9 +13,9 @@
 #include <kernel/intvec.h>
 #include <sstream>
 
-#include <kernel/bbcone.h>
-#include <kernel/bbfan.h>
-#include <kernel/bbpolytope.h>
+#include <callgfanlib/bbcone.h>
+#include <callgfanlib/bbfan.h>
+#include <callgfanlib/bbpolytope.h>
 
 int coneID;
 

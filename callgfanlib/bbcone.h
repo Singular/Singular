@@ -3,6 +3,7 @@
 
 #ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
+#include <kernel/intvec.h>
 
 extern int coneID;
 

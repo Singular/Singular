@@ -7,12 +7,13 @@
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
-#include <kernel/bbfan.h>
-#include <kernel/bbcone.h>
 #include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
+
+#include <callgfanlib/bbfan.h>
+#include <callgfanlib/bbcone.h>
 
 int fanID;
 

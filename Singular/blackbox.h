@@ -1,6 +1,6 @@
 #ifndef BLACKBOX_H
 #define BLACKBOX_H
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
 #include <Singular/silink.h>

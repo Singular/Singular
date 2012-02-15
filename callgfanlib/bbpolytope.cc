@@ -9,13 +9,13 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <gfanlib/gfanlib.h>
-#include <kernel/bbcone.h>
 #include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <kernel/ring.h>
 #include <kernel/polys.h>
 #include <sstream>
 
+#include <callgfanlib/bbcone.h>
 
 int polytopeID;
 

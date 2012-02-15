@@ -25,6 +25,9 @@
 
 using namespace polymake;
 
+
+polymake::Main* init_polymake=NULL;
+
 /* Functions for converting Integers, Rationals and their Matrices 
    in between C++, gfan, polymake and singular */
 
@@ -379,19 +382,20 @@ BOOLEAN PMisBounded(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    bool b;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-      bool b = p.give("BOUNDED");
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
-      return FALSE;
+      b = p.give("BOUNDED");
     }
     catch (const std::exception& ex) 
     {
       std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
   }
   WerrorS("isBounded: unexpected parameters");
   return TRUE;
@@ -404,19 +408,20 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    bool b;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-      bool b = p.give("REFLEXIVE");
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
-      return FALSE;
+      b = p.give("REFLEXIVE");
     }
     catch (const std::exception& ex) 
     {
       std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
   }
   WerrorS("isReflexive: unexpected parameters");
   return TRUE;
@@ -429,19 +434,20 @@ BOOLEAN PMisGorenstein(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    bool b;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
-      bool b = p.give("GORENSTEIN");
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
-      return FALSE;
+      b = p.give("GORENSTEIN");
     }
     catch (const std::exception& ex) 
     {
       std::cerr << "ERROR: " << ex.what() << endl; 
       return TRUE;
     }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
   }
   WerrorS("isGorenstein: unexpected parameters");
   return TRUE;
@@ -466,15 +472,15 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
         WerrorS("overflow while converting polymake::Integer to int");
         return TRUE;
       }
+      res->rtyp = INT_CMD;
+      res->data = (char*) (int) gi;
+      return FALSE;
     }
     catch (const std::exception& ex)
     {
       std::cerr << "ERROR: " << ex.what() << endl;
       return TRUE;
     }
-    res->rtyp = INT_CMD;
-    res->data = (char*) (int) gi;
-    return FALSE;
   }
   WerrorS("gorensteinIndex: unexpected parameters");
   return TRUE;
@@ -1187,7 +1193,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
         CallPolymakeFunction("minkowski_sum", pp, pq) >> pms;
-        gfan::ZCone* ms = new gfan::ZCone(PmPolytope2ZPolytope(&pms));
+        ms = new gfan::ZCone(PmPolytope2ZPolytope(&pms));
       }
       catch (const std::exception& ex) 
       {
@@ -1241,7 +1247,7 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
         p.take("LP") << o;
         polymake::Set<polymake::Integer> mf = p.give("LP.MAXIMAL_FACE");
         polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
-        intvec* maxface = new intvec(PmMatrixInteger2Intvec(&rays));
+        maxface = new intvec(PmMatrixInteger2Intvec(&rays));
       }
       catch (const std::exception& ex) 
       {
@@ -1277,7 +1283,7 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
         p.take("LP") << o;
         polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
         polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
-        intvec* minface = new intvec(PmMatrixInteger2Intvec(&rays));
+        minface = new intvec(PmMatrixInteger2Intvec(&rays));
       }
       catch (const std::exception& ex) 
       {
@@ -1315,7 +1321,7 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
         p.take("LP") << o;
         polymake::Integer mv = p.give("LP.MAXIMAL_VALUE"); 
         bool ok = true;
-        int m = PmInteger2Int(mv,ok); 
+        m = PmInteger2Int(mv,ok); 
         if (!ok)
         {
           WerrorS("overflow while converting polymake::Integer to int");
@@ -1358,7 +1364,7 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
         p.take("LP") << o;
         polymake::Integer mv = p.give("LP.MINIMAL_VALUE"); 
         bool ok = true;
-        int m = PmInteger2Int(mv,ok); 
+        m = PmInteger2Int(mv,ok); 
         if (!ok)
         {
           WerrorS("overflow while converting polymake::Integer to int");
@@ -1383,7 +1389,7 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
 BOOLEAN visual(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == polytopeID))
   {  
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix rays = zc->extremeRays();
@@ -1448,7 +1454,7 @@ BOOLEAN normalFan(leftv res, leftv args)
     res->data = (char*) zf;
     return FALSE;
   }
-  WerrorS("normal_fan: unexpected parameters");
+  WerrorS("normalFan: unexpected parameters");
   return TRUE; 
 }
 
@@ -1544,17 +1550,18 @@ BOOLEAN normalFan(leftv res, leftv args)
 BOOLEAN testingvisuals(leftv res, leftv args)   // for testing purposes
 {                                               // testing visualization of fans
   try{                                          // exactly same as smalltest
-    perl::Object p("Polytope<Rational>");
-    p = CallPolymakeFunction("cube",3);
-    // Matrix<Integer> zm=(unit_matrix<Integer>(3));
-    // p.take("INPUT_RAYS") << zm;
-    // Set<int> s;
-    // s = s+0;
-    // s = s+1;
-    // s = s+2;
-    // Array<Set<int> > ar(1);
-    // ar[0]=s;
-    // p.take("INPUT_CONES") << ar;
+    // perl::Object p("Polytope<Rational>");
+    // p = CallPolymakeFunction("cube",3);
+    perl::Object p("PolyhedralFan");
+    Matrix<Integer> zm=(unit_matrix<Integer>(3));
+    p.take("INPUT_RAYS") << zm;
+    Set<int> s;
+    s = s+0;
+    s = s+1;
+    s = s+2;
+    Array<Set<int> > ar(1);
+    ar[0]=s;
+    p.take("INPUT_CONES") << ar;
     VoidCallPolymakeFunction("jreality",p.CallPolymakeMethod("VISUAL")); 
     res->rtyp = NONE;
     res->data = NULL;
@@ -1613,8 +1620,9 @@ BOOLEAN testingstrings(leftv res, leftv args)
 extern "C" int mod_init(void* polymakesingular)
 {
 
-  polymake::Main init_polymake;
-  init_polymake.set_application("fan");
+  if (init_polymake==NULL) 
+    {init_polymake = new polymake::Main();}
+  init_polymake->set_application("fan");
   // iiAddCproc("","cube",FALSE,cube);
   // iiAddCproc("","cross",FALSE,cross);
   iiAddCproc("","isBounded",FALSE,PMisBounded);

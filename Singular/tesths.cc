@@ -36,9 +36,9 @@
 #include <omalloc/omalloc.h>
 
 #ifdef HAVE_FANS
-#include <kernel/bbcone.h>
-#include <kernel/bbpolytope.h>
-#include <kernel/bbfan.h>
+#include <callgfanlib/bbcone.h>
+#include <callgfanlib/bbpolytope.h>
+#include <callgfanlib/bbfan.h>
 #endif
 
 #ifdef HAVE_FACTORY
