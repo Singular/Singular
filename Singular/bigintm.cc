@@ -14,21 +14,20 @@
 
 
 static char * bigintm_String(blackbox *b, void *d)
-{ if (d==NULL) return omStrDup("oo");
-   else
-   {
-     StringSetS("");
-     number n=(number)d; nlWrite(n,NULL); d=(void*)n;
-     return omStrDup(StringAppendS(""));
-    }
+{
+  if (d==NULL) return omStrDup("oo");
+  else
+  {
+    StringSetS("");
+    number n=(number)d; nlWrite(n,NULL); d=(void*)n;
+    return omStrDup(StringAppendS(""));
+  }
 }
 static void * bigintm_Copy(blackbox*b, void *d)
 {  number n=(number)d; return nlCopy(n); }
 
 static BOOLEAN bigintm_Assign(leftv l, leftv r)
 {
-  blackbox *ll=getBlackboxStuff(l->Typ());
-  
   if (r->Typ()>MAX_TOK)
   {
     if (l->Typ() == r->Typ())
@@ -80,7 +79,6 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
 {
   // interpreter: a1 is ist bigintm
   
-  blackbox *a=getBlackboxStuff(a1->Typ());
   number n1=(number)a1->Data(); 
   switch(op)
   {
