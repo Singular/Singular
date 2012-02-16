@@ -358,10 +358,102 @@ void sortList (CFList& list, const Variable& x)
   }
 }
 
-CFList diophantine (const CanonicalForm& F, const CFList& factors)
+CFList
+diophantine (const CanonicalForm& F, const CFList& factors);
+
+CFList
+diophantineHensel (const CanonicalForm & F, const CFList& factors,
+                   const modpk& b)
+{
+  int p= b.getp();
+  setCharacteristic (p);
+  CFList recResult= diophantine (mapinto (F), mapinto (factors));
+  setCharacteristic (0);
+  recResult= mapinto (recResult);
+  CanonicalForm e= 1;
+  CFList L;
+  CFArray bufFactors= CFArray (factors.length());
+  int k= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, k++)
+  {
+    if (k == 0)
+      bufFactors[k]= i.getItem() (0);
+    else
+      bufFactors [k]= i.getItem();
+  }
+  CanonicalForm tmp, quot;
+  for (k= 0; k < factors.length(); k++) //TODO compute b's faster
+  {
+    tmp= 1;
+    for (int l= 0; l < factors.length(); l++)
+    {
+      if (l == k)
+        continue;
+      else
+      {
+        tmp= mulNTL (tmp, bufFactors[l]);
+      }
+    }
+    L.append (tmp);
+  }
+
+  setCharacteristic (p);
+  for (k= 0; k < factors.length(); k++)
+    bufFactors [k]= bufFactors[k].mapinto();
+  setCharacteristic(0);
+
+  CFListIterator j= L;
+  for (CFListIterator i= recResult; i.hasItem(); i++, j++)
+    e= b (e - mulNTL (i.getItem(),j.getItem(), b));
+
+  if (e.isZero())
+    return recResult;
+  CanonicalForm coeffE;
+  CFList s;
+  CFList result= recResult;
+  CanonicalForm g;
+  CanonicalForm modulus= p;
+  int d= b.getk();
+  for (int i= 1; i < d; i++)
+  {
+    coeffE= div (e, modulus);
+    setCharacteristic (p);
+    coeffE= coeffE.mapinto();
+    setCharacteristic (0);
+    if (!coeffE.isZero())
+    {
+      CFListIterator k= result;
+      CFListIterator l= L;
+      int ii= 0;
+      j= recResult;
+      for (; j.hasItem(); j++, k++, l++, ii++)
+      {
+        setCharacteristic (p);
+        g= coeffE*j.getItem();
+        g= mod (g, bufFactors[ii]);
+        setCharacteristic (0);
+        k.getItem() += g.mapinto()*modulus;
+        e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+        e= b(e);
+        DEBOUTLN (cerr, "mod (e, power (y, i + 1))= " <<
+                  mod (e, power (y, i + 1)));
+      }
+    }
+    modulus *= p;
+    if (e.isZero())
+      break;
+  }
+
+  return result;
+}
+
+CFList
+diophantine (const CanonicalForm& F, const CFList& factors, const modpk& b)
 {
   if (getCharacteristic() == 0)
   {
+    if (b.getp() != 0)
+      return diophantineHensel (F, factors, b);
     Variable v;
     bool hasAlgVar= hasFirstAlgVar (F, v);
     for (CFListIterator i= factors; i.hasItem() && !hasAlgVar; i++)
@@ -398,6 +490,13 @@ CFList diophantine (const CanonicalForm& F, const CFList& factors)
     result.append (T);
   }
   return result;
+}
+
+CFList
+diophantine (const CanonicalForm& F, const CFList& factors)
+{
+  modpk b= modpk();
+  return diophantine (F, factors, b);
 }
 
 void
