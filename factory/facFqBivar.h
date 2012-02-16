@@ -645,10 +645,11 @@ factorRecombination (
                 DegreePattern& degs,   ///< [in] degree pattern
                 int s,                 ///< [in] algorithm starts checking
                                        ///< subsets of size s
-                int thres              ///< [in] threshold for the size of
+                int thres,             ///< [in] threshold for the size of
                                        ///< subsets which are checked, for a
                                        ///< full factor recombination choose
                                        ///< thres= factors.length()/2
+                const modpk& b=modpk() ///< [in] coeff bound
                     );
 
 /// chooses a field extension.
@@ -693,7 +694,8 @@ earlyFactorDetection (
            DegreePattern& degs,    ///< [in,out] degree pattern, is updated
                                    ///< whenever we find a factor
            bool& success,          ///< [in,out] indicating success
-           int deg                 ///< [in] stage of Hensel lifting
+           int deg,                ///< [in] stage of Hensel lifting
+           const modpk& b= modpk() ///< [in] coeff bound
                      );
 
 /// detects factors of @a F at stage @a deg of Hensel lifting.
@@ -740,7 +742,8 @@ henselLiftAndEarly (
         int& liftBound,            ///< [in,out] (adapted) lift bound
         const CFList& uniFactors,  ///< [in] univariate factors
         const ExtensionInfo& info, ///< [in] information about extension
-        const CanonicalForm& eval  ///< [in] evaluation point
+        const CanonicalForm& eval, ///< [in] evaluation point
+        const modpk& b= modpk()    ///< [in] coeff bound
                   );
 
 /// Factorization over an extension of initial field

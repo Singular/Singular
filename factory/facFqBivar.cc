@@ -449,7 +449,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 CFList
 factorRecombination (CFList& factors, CanonicalForm& F,
                      const CanonicalForm& N, DegreePattern& degs, int s,
-                     int thres
+                     int thres, const modpk& b
                     )
 {
   if (factors.length() == 0)
@@ -638,7 +638,8 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 void
 earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
                       factors, int& adaptedLiftBound, int*& factorsFoundIndex,
-                      DegreePattern& degs, bool& success, int deg)
+                      DegreePattern& degs, bool& success, int deg,
+                      const modpk& b)
 {
   DegreePattern bufDegs1= degs;
   DegreePattern bufDegs2;
@@ -859,7 +860,7 @@ CFList
 henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     earlyFactors, DegreePattern& degs, int& liftBound,
                     const CFList& uniFactors, const ExtensionInfo& info,
-                    const CanonicalForm& eval)
+                    const CanonicalForm& eval, const modpk& b)
 {
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();

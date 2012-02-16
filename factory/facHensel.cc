@@ -606,7 +606,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
 
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
-              CFList& diophant, CFMatrix& M, bool sort)
+              CFList& diophant, CFMatrix& M, bool sort, const modpk& b)
 {
   if (sort)
     sortList (factors, Variable (1));
@@ -646,7 +646,8 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
 
 void
 henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
-                    end, CFArray& Pi, const CFList& diophant, CFMatrix& M)
+                    end, CFArray& Pi, const CFList& diophant, CFMatrix& M,
+                    const modpk& b)
 {
   CFArray bufFactors= CFArray (factors.length());
   int i= 0;
