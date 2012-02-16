@@ -144,6 +144,7 @@ void * atGet(leftv root,const char * name, int t)
     if ((temp!=NULL) && (temp->atyp==t))
       return temp->data;
   }
+  return NULL;
 }
 
 void atSet(idhdl root,const char * name,void * data,int typ)
