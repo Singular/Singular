@@ -608,7 +608,6 @@ restart:
 }
 int IsPrime(int p)  /* brute force !!!! */
 {
-  int i,j;
   if      (p == 0)    return 0;
   else if (p == 1)    return 1/*1*/;
   else if ((p == 2)||(p==3))    return p;
@@ -617,7 +616,7 @@ int IsPrime(int p)  /* brute force !!!! */
   return iiIsPrime0((unsigned)(p));
 }
 
-BOOLEAN iiWRITE(leftv res,leftv v)
+BOOLEAN iiWRITE(leftv,leftv v)
 {
   sleftv vf;
   if (iiConvert(v->Typ(),LINK_CMD,iiTestConvert(v->Typ(),LINK_CMD),v,&vf))
@@ -1551,7 +1550,7 @@ idhdl rDefault(const char *s)
   return currRingHdl;
 }
 
-idhdl rFindHdl(ring r, idhdl n, idhdl w)
+idhdl rFindHdl(ring r, idhdl n, idhdl)
 {
   idhdl h=rSimpleFindHdl(r,IDROOT,n);
   if (h!=NULL)  return h;
@@ -2426,7 +2425,6 @@ ring rCompose(const lists  L)
         int *par_perm=NULL;
         int par_perm_size=0;
         nMapFunc nMap;
-        BOOLEAN bo;
 
         if ((nMap=nSetMap(orig_ring->cf))==NULL)
         {
@@ -3076,8 +3074,6 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
   int     n  = 0;          // number of different spectral numbers
   int     z  = 0;          // number of spectral number equal to smax
 
-  int     k = 0;
-
   while( (*node)!=(spectrumPolyNode*)NULL &&
          ( fast==0 || (*node)->weight<=smax ) )
   {
@@ -3303,7 +3299,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
 
 spectrumState   spectrumCompute( poly h,lists *L,int fast )
 {
-  int i,j;
+  int i;
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -4204,7 +4200,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   int ldummy;
   int deg= currRing->pLDeg( gls, &ldummy, currRing );
   //  int deg= pDeg( gls );
-  int len= pLength( gls );
+  //  int len= pLength( gls );
   int i,vpos=0;
   poly piter;
   lists elist;
@@ -4264,7 +4260,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   roots->solver( howclean );
 
   int elem= roots->getAnzRoots();
-  char *out;
   char *dummy;
   int j;
 
@@ -4465,7 +4460,6 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   uResultant::resMatType mtype= determineMType( imtype );
   int i,c,count;
   lists listofroots= NULL;
-  lists emptylist;
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
 
@@ -4566,7 +4560,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
 // from mpr_numeric.cc
 lists listOfRoots( rootArranger* self, const unsigned int oprec )
 {
-  int i,j,tr;
+  int i,j;
   int count= self->roots[0]->getAnzRoots(); // number of roots
   int elem= self->roots[0]->getAnzElems();  // number of koordinates per root
 
@@ -4613,7 +4607,6 @@ lists listOfRoots( rootArranger* self, const unsigned int oprec )
 // from ring.cc
 void rSetHdl(idhdl h)
 {
-  int i;
   ring rg = NULL;
   if (h!=NULL)
   {
@@ -4953,13 +4946,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
-  idhdl tmp = NULL;
   BOOLEAN ffChar=FALSE;
-  int typ = 1;
 
   /* ch -------------------------------------------------------*/
   // get ch of ground field
-  int numberOfAllocatedBlocks;
 
   // allocated ring
   R = (ring) omAlloc0Bin(sip_sring_bin);
@@ -5036,7 +5026,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
-    const int ch=0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
       float_len=(int)(long)pn->next->Data();
@@ -5109,7 +5098,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     // we have an exponent
     if (modExponent > 1)
     {
-      const int ch = modExponent;
       if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
       {
         /* this branch should be active for modExponent = 2..32 resp. 2..64,
@@ -5155,7 +5143,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifndef NDEBUG
     while (p != NULL)
     {
-      Print( "pn[%p]: type: %d [%s]: %p, name: %s", p, p->Typ(), Tok2Cmdname(p->Typ()), p->Data(), (p->name == NULL? "NULL" : p->name) );
+      Print( "pn[%p]: type: %d [%s]: %p, name: %s", (void*)p, p->Typ(), Tok2Cmdname(p->Typ()), p->Data(), (p->name == NULL? "NULL" : p->name) );
       PrintLn();
       p = p->next;
     }
@@ -5164,8 +5152,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
 //  pn=pn->next;
 
-  int l, last;
-  sleftv * sl;
+  int l;
   /*every entry in the new ring is initialized to 0*/
 
   /* characteristic -----------------------------------------------*/
@@ -5266,7 +5253,7 @@ ring rSubring(ring org_ring, sleftv* rv)
 {
   ring R = rCopy0(org_ring);
   int *perm=(int *)omAlloc0((org_ring->N+1)*sizeof(int));
-  int last = 0, o=0, n = rBlocks(org_ring), i=0, typ = 1, j;
+  int n = rBlocks(org_ring), i=0, j;
 
   /* names and number of variables-------------------------------------*/
   {
@@ -5436,9 +5423,7 @@ void rKill(ring r)
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
     }
-    int i=1;
     int j;
-    int *pi=r->order;
 #ifdef USE_IILOCALRING
     for (j=0;j<iiRETURNEXPR_len;j++)
     {

@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: numbers in a rational function field K(t_1, .., t_s) with
 *           transcendental variables t_1, ..., t_s, where s >= 1.

@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: numbers in an algebraic extension field K[a] / < f(a) >
 *           Assuming that we have a coeffs object cf, then these numbers

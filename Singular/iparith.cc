@@ -23,8 +23,6 @@
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
-//#include <polys/ext_fields/longalg.h>
-//#include <polys/ext_fields/longtrans.h>
 #include <kernel/ideals.h>
 #include <polys/prCopy.h>
 #include <polys/matpol.h>
@@ -33,7 +31,6 @@
 
 #include <kernel/preimage.h>
 
-#include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
 #include <kernel/modulop.h>
@@ -222,7 +219,7 @@ int iiOp; /* the current operation*/
 poly pHeadProc(poly p)
 {
   return pHead(p);
-} 
+}
 
 int iiTokType(int op)
 {
@@ -530,7 +527,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   }
   poly u_p=(poly)u->CopyD(POLY_CMD);
   if ((u_p!=NULL)
-  && ((v_i!=0) && 
+  && ((v_i!=0) &&
       ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i)))
   {
     Werror("OVERFLOW in power(d=%ld, e=%d, max=%ld)",
@@ -1341,7 +1338,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
   poly p=(poly)u->CopyD(VECTOR_CMD);
   poly r=p; // pointer to the beginning of component i
   poly o=NULL;
-  int i=(int)(long)v->Data();
+  unsigned i=(unsigned)(long)v->Data();
   while (p!=NULL)
   {
     if (pGetComp(p)!=i)
@@ -1379,7 +1376,7 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
     {
       for(i=0;i<iv->length();i++)
       {
-        if (pGetComp(p)==(*iv)[i])
+        if (((int)pGetComp(p))==(*iv)[i])
         {
           poly h;
           pSplit(p,&h);
@@ -2069,14 +2066,14 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       {
         int r_par=0;
         char ** r_par_names=NULL;
-        if (r->cf->extRing!=NULL) 
+        if (r->cf->extRing!=NULL)
         {
           r_par=r->cf->extRing->N;
           r_par_names=r->cf->extRing->names;
         }
         int c_par=0;
         char ** c_par_names=NULL;
-        if (currRing->cf->extRing!=NULL) 
+        if (currRing->cf->extRing!=NULL)
         {
           c_par=currRing->cf->extRing->N;
           c_par_names=currRing->cf->extRing->names;
@@ -2809,9 +2806,7 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(v);
   ideal ui=(ideal)u->Data();
-  idTest(ui);
   ideal vi=(ideal)v->Data();
-  idTest(vi);
   res->data = (char *)kNF(vi,currQuotient,ui);
   return FALSE;
 }
@@ -4279,7 +4274,7 @@ static number jjLONG2N(long d)
       BOOLEAN s;
     };
     typedef struct snumber_dummy  *number_dummy;
- 
+
     number_dummy z=(number_dummy)omAlloc(sizeof(snumber_dummy));
     #if defined(LDEBUG)
     z->debug=123456;
@@ -4447,16 +4442,35 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
   }
   return FALSE;
 }
-static BOOLEAN jjPARDEG(leftv res, leftv)
+static BOOLEAN jjPARDEG(leftv res, leftv v)
 {
-  if (rField_is_Extension(currRing))
+  res->data = (char *)0L;
+  number nn=(number)v->Data();
+  if (nn!=NULL) 
   {
-    res->data = (char *)(long)currRing->cf->extRing->pFDeg(
-        currRing->cf->extRing->qideal->m[0],
-	currRing->cf->extRing);
+    if (getCoeffType(currRing->cf)==n_algExt)
+    {
+      poly qq=(poly)nn;
+      res->data = (char *)(long)currRing->cf->extRing->pFDeg(qq,
+        currRing->cf->extRing);
+    }
+    if(getCoeffType(currRing->cf)==n_transExt)
+    {
+      /* from transext.h:*/
+      struct fractionObject
+      {
+        poly numerator;
+	poly denominator;
+	int complexity;
+      };
+      typedef struct fractionObject * fraction;
+      #define NUM(f) (((fraction)f)->numerator)
+
+      fraction qq=(fraction)nn;
+      res->data = (char *)(long)currRing->cf->extRing->pFDeg(NUM(qq),
+        currRing->cf->extRing);
+    }
   }
-  else
-    res->data = (char *)0L;
   return FALSE;
 }
 static BOOLEAN jjPARSTR1(leftv res, leftv v)
