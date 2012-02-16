@@ -2496,6 +2496,53 @@ void divrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
   return;
 }
 
+bool
+uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
+{
+  int p= getCharacteristic();
+  if (p > 0)
+  {
+    zz_p::init (p);
+    Variable alpha;
+    if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
+    {
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
+      zz_pEX NTLB= convertFacCF2NTLzz_pEX (B, NTLMipo);
+      return divide (NTLB, NTLA);
+    }
+#ifdef HAVE_FLINT
+    nmod_poly_t FLINTA, FLINTB;
+    convertFacCF2nmod_poly_t (FLINTA, A);
+    convertFacCF2nmod_poly_t (FLINTB, B);
+    nmod_poly_rem (FLINTA, FLINTB, FLINTA);
+    bool result= nmod_poly_is_zero (FLINTA);
+    nmod_poly_clear (FLINTA);
+    nmod_poly_clear (FLINTB);
+    return result;
+#else
+    zz_pX NTLA= convertFacCF2NTLzzpX (A);
+    zz_pX NTLB= convertFacCF2NTLzzpX (B);
+    return divide (NTLB, NTLA);
+#endif
+  }
+#ifdef HAVE_FLINT
+  fmpq_poly_t FLINTA,FLINTB;
+  fmpq_poly_init (FLINTA);
+  fmpq_poly_init (FLINTB);
+  convertFacCF2Fmpq_poly_t (FLINTA, A);
+  convertFacCF2Fmpq_poly_t (FLINTB, B);
+  fmpq_poly_rem (FLINTA, FLINTB, FLINTA);
+  bool result= fmpq_poly_is_zero (FLINTA);
+  fmpq_poly_clear (FLINTA);
+  fmpq_poly_clear (FLINTB);
+  return result;
+#else
+  return fdivides (A, B); //maybe NTL?
+#endif
+}
+
 // end division
 
 #endif
