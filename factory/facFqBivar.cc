@@ -650,32 +650,47 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
   int d= degree (F), l= 0;
+  CanonicalForm buf0= mulNTL (buf (0,x), LCBuf, b);
+  CanonicalForm buf1= mulNTL (buf (1,x), LCBuf, b);
+  CanonicalForm test0, test1;
   for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
     if (!bufDegs1.find (degree (i.getItem(), 1)) || factorsFoundIndex[l] == 1)
       continue;
     else
     {
-      g= mulMod2 (i.getItem(), LCBuf, M);
-      g /= content (g, x);
-      if (fdivides (g, buf, quot))
+      test1= mod (mulNTL (i.getItem() (1,x), LCBuf, b), M);
+      if (uniFdivides (test1, buf1))
       {
-        reconstructedFactors.append (g);
-        factorsFoundIndex[l]= 1;
-        buf= quot;
-        d -= degree (g);
-        LCBuf= LC (buf, x);
-        T= Difference (T, CFList (i.getItem()));
-        F= buf;
-
-        // compute new possible degree pattern
-        bufDegs2= DegreePattern (T);
-        bufDegs1.intersect (bufDegs2);
-        bufDegs1.refine ();
-        if (bufDegs1.getLength() <= 1)
+        test0= mod (mulNTL (i.getItem() (0,x), LCBuf, b), M);
+        if (uniFdivides (test0, buf0))
         {
-          reconstructedFactors.append (buf);
-          break;
+          g= mulMod2 (i.getItem(), LCBuf, M);
+          if (b.getp() != 0)
+            g= b(g);
+          g /= content (g, x);
+          if (fdivides (g, buf, quot))
+          {
+            reconstructedFactors.append (g);
+            factorsFoundIndex[l]= 1;
+            buf= quot;
+            d -= degree (g);
+            LCBuf= LC (buf, x);
+            buf0= mulNTL (buf (0,x), LCBuf, b);
+            buf1= mulNTL (buf (1,x), LCBuf, b);
+            T= Difference (T, CFList (i.getItem()));
+            F= buf;
+
+            // compute new possible degree pattern
+            bufDegs2= DegreePattern (T);
+            bufDegs1.intersect (bufDegs2);
+            bufDegs1.refine ();
+            if (bufDegs1.getLength() <= 1)
+            {
+              reconstructedFactors.append (buf);
+              break;
+            }
+          }
         }
       }
     }
