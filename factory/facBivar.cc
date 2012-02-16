@@ -20,11 +20,65 @@
 #include "facBivar.h"
 #include "facHensel.h"
 #include "facMul.h"
+#include "cf_primes.h"
 
 #ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_hensel_lift)
 TIMING_DEFINE_PRINT(fac_factor_recombination)
+
+static modpk
+coeffBound ( const CanonicalForm & f, int p )
+{
+    int * degs = degrees( f );
+    int M = 0, i, k = f.level();
+    for ( i = 1; i <= k; i++ )
+        M += degs[i];
+    CanonicalForm b = 2 * maxNorm( f ) * power( CanonicalForm( 3 ), M );
+    CanonicalForm B = p;
+    k = 1;
+    while ( B < b ) {
+        B *= p;
+        k++;
+    }
+    return modpk( p, k );
+}
+
+static
+void find_good_prime(const CanonicalForm &f, int &start)
+{
+  if (! f.inBaseDomain() )
+  {
+    CFIterator i = f;
+    for(;;)
+    {
+      if  ( i.hasTerms() )
+      {
+        find_good_prime(i.coeff(),start);
+        if (0==cf_getSmallPrime(start)) return;
+        if((i.exp()!=0) && ((i.exp() % cf_getSmallPrime(start))==0))
+        {
+          start++;
+          i=f;
+        }
+        else  i++;
+      }
+      else break;
+    }
+  }
+  else
+  {
+    if (f.inZ())
+    {
+      if (0==cf_getSmallPrime(start)) return;
+      while((!f.isZero()) && (mod(f,cf_getSmallPrime(start))==0))
+      {
+        start++;
+        if (0==cf_getSmallPrime(start)) return;
+      }
+    }
+  }
+}
 
 CFList conv (const CFFList& L)
 {
@@ -525,15 +579,42 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     return factors;
   }
 
-  if (!extension)
-  {
-    for (CFListIterator i= uniFactors; i.hasItem(); i++)
-      i.getItem() /= lc (i.getItem());
-  }
-
   A= A (y + evaluation, y);
 
   int liftBound= degree (A, y) + 1;
+
+  modpk b= modpk();
+  if ( !extension)
+  {
+    Off (SW_RATIONAL);
+    int i= 0;
+    do
+    {
+      find_good_prime(F,i);
+      find_good_prime(Aeval,i);
+      find_good_prime(A,i);
+      setCharacteristic (cf_getSmallPrime(i));
+      if (gcd (Aeval.mapinto(), deriv (Aeval,x).mapinto()).inCoeffDomain())
+      {
+        setCharacteristic (0);
+        break;
+      }
+      else
+        i++;
+      if (i > cf_getNumSmallPrimes())
+      {
+        printf ("out of primes\n");
+        break;
+      }
+    } while (1);
+
+    int p=cf_getSmallPrime(i);
+    b = coeffBound( A, p );
+    modpk bb= coeffBound (Aeval, p);
+    if (bb.getk() > b.getk() ) b=bb;
+      bb= coeffBound (F, p);
+    if (bb.getk() > b.getk() ) b=bb;
+  }
 
   ExtensionInfo dummy= ExtensionInfo (false);
   bool earlySuccess= false;
@@ -542,14 +623,17 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   //maybe one should use a multiple of LC (A,1) and try a nonmonic lifting here?
   uniFactors= henselLiftAndEarly
               (A, earlySuccess, earlyFactors, degs, liftBound,
-               uniFactors, dummy, evaluation);
+               uniFactors, dummy, evaluation, b);
   TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
   CanonicalForm MODl= power (y, liftBound);
 
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
-                                uniFactors.length()/2);
+                                uniFactors.length()/2, b);
+
+  if (!extension)
+    On (SW_RATIONAL);
 
   if (earlySuccess)
     factors= Union (earlyFactors, factors);
