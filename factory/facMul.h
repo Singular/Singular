@@ -98,6 +98,14 @@ newtonDiv (const CanonicalForm& F, ///< [in] bivariate, compressed polynomial
            const CanonicalForm& M  ///< [in] power of Variable (2)
           );
 
+/// divisibility test for univariate polys
+///
+/// @return @a uniFdivides returns true if A divides B
+bool
+uniFdivides (const CanonicalForm& A, ///< [in] univariate poly
+             const CanonicalForm& B  ///< [in] univariate poly
+            );
+
 /// Karatsuba style modular multiplication for bivariate polynomials.
 ///
 /// @return @a mulMod2 returns @a A * @a B mod @a M.
