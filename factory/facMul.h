@@ -15,6 +15,7 @@
 #define FAC_MUL_H
 
 #include "canonicalform.h"
+#include "fac_util.h"
 
 /// multiplication of univariate polys over a finite field using NTL, if we are
 /// in GF factory's default multiplication is used.
@@ -22,7 +23,8 @@
 /// @return @a mulNTL returns F*G
 CanonicalForm
 mulNTL (const CanonicalForm& F, ///< [in] a univariate poly
-        const CanonicalForm& G  ///< [in] a univariate poly
+        const CanonicalForm& G, ///< [in] a univariate poly
+        const modpk& b= modpk() ///< [in] coeff bound
        );
 
 /// mod of univariate polys over a finite field using NTL, if we are
@@ -31,7 +33,8 @@ mulNTL (const CanonicalForm& F, ///< [in] a univariate poly
 /// @return @a modNTL returns F mod G
 CanonicalForm
 modNTL (const CanonicalForm& F, ///< [in] a univariate poly
-        const CanonicalForm& G  ///< [in] a univariate poly
+        const CanonicalForm& G, ///< [in] a univariate poly
+        const modpk& b= modpk() ///< [in] coeff bound
        );
 
 /// division of univariate polys over a finite field using NTL, if we are
@@ -40,7 +43,8 @@ modNTL (const CanonicalForm& F, ///< [in] a univariate poly
 /// @return @a divNTL returns F/G
 CanonicalForm
 divNTL (const CanonicalForm& F, ///< [in] a univariate poly
-        const CanonicalForm& G  ///< [in] a univariate poly
+        const CanonicalForm& G, ///< [in] a univariate poly
+        const modpk& b= modpk() ///< [in] coeff bound
        );
 
 /// division with remainder of @a F by

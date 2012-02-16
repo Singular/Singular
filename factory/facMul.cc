@@ -393,7 +393,7 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q)
 #endif
 
 CanonicalForm
-mulNTL (const CanonicalForm& F, const CanonicalForm& G)
+mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
   {
@@ -447,7 +447,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G)
 }
 
 CanonicalForm
-modNTL (const CanonicalForm& F, const CanonicalForm& G)
+modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (F.inCoeffDomain() && G.isUnivariate())
     return F;
@@ -510,7 +510,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
 }
 
 CanonicalForm
-divNTL (const CanonicalForm& F, const CanonicalForm& G)
+divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (F.inCoeffDomain() && G.isUnivariate())
     return F;
