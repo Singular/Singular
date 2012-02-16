@@ -497,6 +497,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         {
           T.insert (LCBuf);
           g= prodMod (T, M);
+          if (b.getp() != 0)
+            g= b(g);
           T.removeFirst();
           result.append (g/content (g, x));
           F= 1;
@@ -520,11 +522,15 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         test= prodMod0 (S, M);
         test *= LCBuf;
         test = mod (test, M);
+        if (b.getp() != 0)
+          test= b(test);
         if (fdivides (test, buf0))
         {
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
+          if (b.getp() != 0)
+            g= b(g);
           g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
@@ -890,6 +896,16 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CFArray Pi;
   CFList diophant;
   CFList bufUniFactors= uniFactors;
+  CanonicalForm bufA= A;
+  CanonicalForm lcA0= 0;
+  if (getCharacteristic() == 0 && b.getp() != 0)
+  {
+    lcA0= lc (A (0, 2));
+    A *= b.inverse (lcA0);
+    A= b (A);
+    for (CFListIterator i= bufUniFactors; i.hasItem(); i++)
+      i.getItem()= b (i.getItem()*b.inverse (lc (i.getItem())));
+  }
   bufUniFactors.insert (LC (A, x));
   CFMatrix M= CFMatrix (liftBound, bufUniFactors.length() - 1);
   earlySuccess= false;
@@ -900,17 +916,16 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   int * factorsFoundIndex= new int [uniFactors.length()];
   for (int i= 0; i < uniFactors.length(); i++)
     factorsFoundIndex [i]= 0;
-  CanonicalForm bufA= A;
 
   if (smallFactorDeg >= liftBound || degree (A,y) <= 4)
-    henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M);
+    henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M, true, b);
   else if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, true, b);
     if (!extension)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg);
+                            smallFactorDeg, b);
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                factorsFoundIndex, degs, earlySuccess, info,
@@ -922,11 +937,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       {
         bufUniFactors.insert (LC (A, x));
         henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
-                            liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M);
+                            liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M, b);
         if (!extension)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[sizeOfLiftPre-1] + 1);
+                                liftPre[sizeOfLiftPre-1] + 1, b);
         else
           extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
@@ -943,11 +958,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       {
         bufUniFactors.insert (LC (A, x));
         henselLiftResume12 (A, bufUniFactors, liftPre[i] + 1,
-                            liftPre[i-1] + 1, Pi, diophant, M);
+                            liftPre[i-1] + 1, Pi, diophant, M, b);
         if (!extension)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[i-1] + 1);
+                                liftPre[i-1] + 1, b);
         else
           extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
@@ -966,11 +981,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   }
   else
   {
-    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, true, b);
     if (!extension)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg);
+                            smallFactorDeg, b);
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                factorsFoundIndex, degs, earlySuccess, info,
@@ -983,10 +998,10 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
     {
       bufUniFactors.insert (LC (A, x));
       henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
-                          dummy, Pi, diophant, M);
+                          dummy, Pi, diophant, M, b);
       if (!extension)
         earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                              factorsFoundIndex, degs, earlySuccess, dummy);
+                              factorsFoundIndex, degs, earlySuccess, dummy, b);
       else
         extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                  factorsFoundIndex, degs, earlySuccess, info,
@@ -999,10 +1014,10 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
         bufUniFactors.insert (LC (A, x));
         dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*(i+1)+4);
         henselLiftResume12 (A, bufUniFactors, (degree (A,y)/4)*i + 4,
-                            dummy, Pi, diophant, M);
+                            dummy, Pi, diophant, M, b);
         if (!extension)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                                factorsFoundIndex, degs, earlySuccess, dummy);
+                                factorsFoundIndex, degs, earlySuccess, dummy,b);
         else
           extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
