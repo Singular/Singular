@@ -6,7 +6,8 @@ gfanlib:
 	g++ -DOM_DEBUG -DNDEBUG -o bbpolytope.o -fpic -I../ -c -g bbpolytope.cc
 	g++ -DOM_DEBUG -DNDEBUG -o gfanlib.o -fpic -I../ -c -g gfanlib.cc
 	g++ -shared -o gfanlib.so bbcone.o bbfan.o bbpolytope.o gfanlib.o ../gfanlib/*.o -L/usr/local/lib -lcddgmp -lgmpxx 
+	cp gfanlib.so ../Singular/gfanlib.so
 
 clean:
 	rm *.so *.o
-
+	rm ../Singular/gfanlib.so

@@ -20,6 +20,7 @@
 #include <callgfanlib/bbfan.h>
 #include <callgfanlib/bbpolytope.h>
 
+#include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
 
@@ -311,6 +312,47 @@ polymake::perl::Object ZFan2PmFan (gfan::ZFan* zf)
 
   return pf;
 }
+
+
+/*******************************************************/
+
+
+static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv p, leftv q)
+{
+  gfan::ZCone* zp = (gfan::ZCone*) p->Data();
+  switch(op)
+  {
+    case '+':
+    {
+      if (q->Typ()==polytopeID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) q->Data();
+        gfan::ZCone* ms;
+        try
+        {
+          polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
+          polymake::perl::Object pq = ZPolytope2PmPolytope(zq);
+          polymake::perl::Object pms;
+          CallPolymakeFunction("minkowski_sum", pp, pq) >> pms;
+          ms = new gfan::ZCone(PmPolytope2ZPolytope(&pms));
+        }
+        catch (const std::exception& ex) 
+        {
+          std::cerr << "ERROR: " << ex.what() << endl; 
+          return TRUE;
+        }
+        res->rtyp = polytopeID;
+        res->data = (void*) ms;
+        return FALSE;
+      }
+      return TRUE;
+    }
+    default:
+      return blackboxDefaultOp2(op,res,p,q);
+  }
+  return blackboxDefaultOp2(op,res,p,q);
+}
+
 
 /* Functions for using Polymake in Singular */
 
@@ -1668,4 +1710,7 @@ extern "C" int mod_init(void* polymakesingular)
   iiAddCproc("","testingvisuals",FALSE,testingvisuals);
   iiAddCproc("","testingstrings",FALSE,testingstrings);
 
+  blackbox* b=getBlackboxStuff(polytopeID);
+  b->blackbox_Op2=bbpolytope_Op2;
+ 
 }
