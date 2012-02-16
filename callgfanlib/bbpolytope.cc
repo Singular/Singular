@@ -501,13 +501,12 @@ BOOLEAN scalePolytope(leftv res, leftv args)
     leftv v = u->next;
     if ((v != NULL) && (v->Typ() == polytopeID))
     {
-
-      int* n = (int*) u->Data();
+      int s = (int)(long) u->Data();
       gfan::ZCone* zp = (gfan::ZCone*) v->Data();
       gfan::ZMatrix zm = zp->extremeRays();
-      for (int i=1; i<zm.getHeight(); i++)
+      for (int i=0; i<zm.getHeight(); i++)
         for (int j=1; j<zm.getWidth(); j++)
-          zm[i][j]+=1;
+          zm[i][j]*=s;
       gfan::ZCone* zq = new gfan::ZCone();
       *zq = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
       res->rtyp = polytopeID;

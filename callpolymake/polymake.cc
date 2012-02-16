@@ -351,11 +351,11 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
     {
       if (i2->Typ()==INT_CMD)
       {
-        int* s = (int*) i2->Data();
+        int s = (int)(long) i2->Data();
         gfan::ZMatrix zm = zp->extremeRays();
-        for (int i=1; i<zm.getHeight(); i++)
+        for (int i=0; i<zm.getHeight(); i++)
           for (int j=1; j<zm.getWidth(); j++)
-            zm[i][j]+=1;
+            zm[i][j] *= s;
         gfan::ZCone* zs = new gfan::ZCone();
         *zs = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
         res->rtyp = polytopeID;
