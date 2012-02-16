@@ -94,10 +94,15 @@ lists lCopy_newstruct(lists L)
         N->m[n].data=idrecDataInit(L->m[n].rtyp);
       }
     }
-    else if((L->m[n].rtyp>MAX_TOK)||(L->m[n].rtyp==LIST_CMD))
+    else if(L->m[n].rtyp>MAX_TOK)
     {
       N->m[n].rtyp=L->m[n].rtyp;
       N->m[n].data=(void *)lCopy_newstruct((lists)(L->m[n].data));
+    }
+    else if(L->m[n].rtyp==LIST_CMD)
+    {
+      N->m[n].rtyp=L->m[n].rtyp;
+      N->m[n].data=(void *)lCopy((lists)(L->m[n].data));
     }
     else
       N->m[n].Copy(&L->m[n]);
