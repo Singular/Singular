@@ -406,8 +406,14 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       return result;
     }
     else if (!F.inCoeffDomain() && !G.inCoeffDomain())
+    {
+      if (b.getp() != 0)
+        return b (mulFLINTQ (F, G));
       return mulFLINTQ (F, G);
+    }
 #endif
+    if (b.getp() != 0)
+      return b (F*G);
     return F*G;
   }
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
@@ -450,18 +456,43 @@ CanonicalForm
 modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (F.inCoeffDomain() && G.isUnivariate())
+  {
+    if (b.getp() != 0)
+      return b(F);
     return F;
+  }
   else if (F.inCoeffDomain() && G.inCoeffDomain())
+  {
+    if (b.getp() != 0)
+      return b(F%G);
     return mod (F, G);
+  }
   else if (F.isUnivariate() && G.inCoeffDomain())
+  {
+    if (b.getp() != 0)
+      return b(F%G);
     return mod (F,G);
+  }
 
   if (getCharacteristic() == 0)
   {
 #ifdef HAVE_FLINT
     Variable alpha;
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
+    {
+      if (b.getp() != 0)
+      {
+        ZZ NTLpk= power_ZZ (b.getp(), b.getk());
+        ZZ_p::init (NTLpk);
+        ZZX ZZf= convertFacCF2NTLZZX (F);
+        ZZX ZZg= convertFacCF2NTLZZX (G);
+        ZZ_pX NTLf= to_ZZ_pX (ZZf);
+        ZZ_pX NTLg= to_ZZ_pX (ZZg);
+        rem (NTLf, NTLf, NTLg);
+        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+      }
       return modFLINTQ (F, G);
+    }
     else
     {
       CanonicalForm Q, R;
@@ -469,6 +500,17 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       return R;
     }
 #else
+    if (b.getp() != 0)
+    {
+      ZZ NTLpk= power_ZZ (b.getp(), b.getk());
+      ZZ_p::init (NTLpk);
+      ZZX ZZf= convertFacCF2NTLZZX (F);
+      ZZX ZZg= convertFacCF2NTLZZX (G);
+      ZZ_pX NTLf= to_ZZ_pX (ZZf);
+      ZZ_pX NTLg= to_ZZ_pX (ZZg);
+      rem (NTLf, NTLf, NTLg);
+      return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+    }
     return mod (F, G);
 #endif
   }
@@ -513,18 +555,43 @@ CanonicalForm
 divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (F.inCoeffDomain() && G.isUnivariate())
+  {
+    if (b.getp() != 0)
+      return b(F);
     return F;
+  }
   else if (F.inCoeffDomain() && G.inCoeffDomain())
+  {
+    if (b.getp() != 0)
+      return b(div (F,G));
     return div (F, G);
+  }
   else if (F.isUnivariate() && G.inCoeffDomain())
-    return div (F,G);
+  {
+    if (b.getp() != 0)
+      return b(div (F,G));
+    return div (F, G);
+  }
 
   if (getCharacteristic() == 0)
   {
 #ifdef HAVE_FLINT
     Variable alpha;
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
+    {
+      if (b.getp() != 0)
+      {
+        ZZ NTLpk= power_ZZ (b.getp(), b.getk());
+        ZZ_p::init (NTLpk);
+        ZZX ZZf= convertFacCF2NTLZZX (F);
+        ZZX ZZg= convertFacCF2NTLZZX (G);
+        ZZ_pX NTLf= to_ZZ_pX (ZZf);
+        ZZ_pX NTLg= to_ZZ_pX (ZZg);
+        div (NTLf, NTLf, NTLg);
+        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+      }
       return divFLINTQ (F,G);
+    }
     else
     {
       CanonicalForm Q;
@@ -532,6 +599,17 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       return Q;
     }
 #else
+    if (b.getp() != 0)
+    {
+      ZZ NTLpk= power_ZZ (b.getp(), b.getk());
+      ZZ_p::init (NTLpk);
+      ZZX ZZf= convertFacCF2NTLZZX (F);
+      ZZX ZZg= convertFacCF2NTLZZX (G);
+      ZZ_pX NTLf= to_ZZ_pX (ZZf);
+      ZZ_pX NTLg= to_ZZ_pX (ZZg);
+      div (NTLf, NTLf, NTLg);
+      return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+    }
     return div (F, G);
 #endif
   }
