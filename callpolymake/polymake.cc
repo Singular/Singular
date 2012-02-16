@@ -317,16 +317,16 @@ polymake::perl::Object ZFan2PmFan (gfan::ZFan* zf)
 /*******************************************************/
 
 
-static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv p, leftv q)
+static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
 {
-  gfan::ZCone* zp = (gfan::ZCone*) p->Data();
+  gfan::ZCone* zp = (gfan::ZCone*) i1->Data();
   switch(op)
   {
     case '+':
     {
-      if (q->Typ()==polytopeID)
+      if (i2->Typ()==polytopeID)
       {
-        gfan::ZCone* zq = (gfan::ZCone*) q->Data();
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
         gfan::ZCone* ms;
         try
         {
@@ -347,10 +347,27 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv p, leftv q)
       }
       return TRUE;
     }
+    case '*':
+    {
+      if (i2->Typ()==INT_CMD)
+      {
+        int* s = (int*) i2->Data();
+        gfan::ZMatrix zm = zp->extremeRays();
+        for (int i=1; i<zm.getHeight(); i++)
+          for (int j=1; j<zm.getWidth(); j++)
+            zm[i][j]+=1;
+        gfan::ZCone* zs = new gfan::ZCone();
+        *zs = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+        res->rtyp = polytopeID;
+        res->data = (void*) zs;
+        return FALSE;
+      }
+      return TRUE;
+    }
     default:
-      return blackboxDefaultOp2(op,res,p,q);
+      return blackboxDefaultOp2(op,res,i1,i2);
   }
-  return blackboxDefaultOp2(op,res,p,q);
+  return blackboxDefaultOp2(op,res,i1,i2);
 }
 
 
