@@ -22,6 +22,7 @@
 #include "timing.h"
 
 #include "canonicalform.h"
+#include "fac_util.h"
 
 /// sort a list of polynomials by their degree in @a x.
 ///
@@ -43,8 +44,9 @@ henselLift12 (const CanonicalForm& F, ///< [in] compressed, bivariate poly
               CFArray& Pi,            ///< [in,out] stores intermediate results
               CFList& diophant,       ///< [in,out] result of diophantine()
               CFMatrix& M,            ///< [in,out] stores intermediate results
-              bool sort= true         ///< [in] sort factors by degree in
+              bool sort= true,        ///< [in] sort factors by degree in
                                       ///< Variable(1)
+              const modpk& b= modpk ()///< [in] coeff bound
              );
 
 /// resume Hensel lift from univariate to bivariate. Assumes factors are lifted
@@ -64,8 +66,9 @@ henselLiftResume12 (const CanonicalForm& F, ///< [in] compressed, bivariate poly
                     CFArray& Pi,            ///< [in,out] stores intermediate
                                             ///< results
                     const CFList& diophant, ///< [in] result of diophantine
-                    CFMatrix& M             ///< [in,out] stores intermediate
+                    CFMatrix& M,            ///< [in,out] stores intermediate
                                             ///< results
+                    const modpk& b= modpk() ///< [in] coeff bound
                    );
 
 /// Hensel lifting from bivariate to trivariate.
