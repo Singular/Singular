@@ -1,3 +1,16 @@
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR
+\*****************************************************************************/
+/** @file FLINTconvert.cc
+ *
+ * This file implements functions for conversion to FLINT (www.flintlib.org)
+ * and back.
+ *
+ * @author Martin Lee
+ *
+ **/
+/*****************************************************************************/
+
 
 #include <config.h>
 
