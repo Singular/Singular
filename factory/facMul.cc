@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facHensel.cc
+/** @file facMul.cc
  *
  * This file implements functions for fast multiplication and division with
  * remainder
