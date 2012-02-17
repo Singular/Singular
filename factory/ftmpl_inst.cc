@@ -16,9 +16,9 @@
 #include <templates/ftmpl_functions.h>
 #include <templates/ftmpl_matrix.cc>
 
-#include <canonicalform.h>
-#include <cf_map.h>
-#include <cf_reval.h>
+#include "canonicalform.h"
+#include "cf_map.h"
+#include "cf_reval.h"
 
 
 //{{{ explicit template class instantiations
