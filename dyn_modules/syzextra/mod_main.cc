@@ -335,7 +335,7 @@ static BOOLEAN leadmonom(leftv res, leftv h)
     return FALSE;
   }
 
-  WerrorS("`system(\"leadmonom\",<poly/vector>)` expected");
+  WerrorS("`leadmonom(<poly/vector>)` expected");
   return TRUE;
 }
 
@@ -363,7 +363,7 @@ static BOOLEAN leadcomp(leftv res, leftv h)
     return FALSE;
   }
 
-  WerrorS("`system(\"leadcomp\",<poly/vector>)` expected");
+  WerrorS("`leadcomp(<poly/vector>)` expected");
   return TRUE;
 }
 
@@ -401,7 +401,7 @@ static BOOLEAN leadrawexp(leftv res, leftv h)
     return FALSE;
   }
 
-  WerrorS("`system(\"leadrawexp\",<poly/vector>)` expected");
+  WerrorS("`leadrawexp(<poly/vector>)` expected");
   return TRUE;
 }
 
@@ -434,7 +434,7 @@ static BOOLEAN MakeInducedSchreyerOrdering(leftv res, leftv h)
 
     if( s != -1 && s != 1 )
     {
-      WerrorS("`system(\"MakeInducedSchreyerOrdering\",<int>)` called with wrong integer argument (must be +-1)!");
+      WerrorS("`MakeInducedSchreyerOrdering(<int>)` called with wrong integer argument (must be +-1)!");
       return TRUE;
     }
 
@@ -458,7 +458,7 @@ static BOOLEAN SetSyzComp(leftv res, leftv h)
 
   if( !rIsSyzIndexRing(r) )
   {
-    WerrorS("`system(\"SetSyzComp\",<int>)` called on incompatible ring (not created by 'MakeSyzCompOrdering'!)");
+    WerrorS("`SetSyzComp(<int>)` called on incompatible ring (not created by 'MakeSyzCompOrdering'!)");
     return TRUE;
   }
 
@@ -494,7 +494,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   if( (-1 == pos) )
   {
-    WerrorS("`system(\"GetInducedData\",[int])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
+    WerrorS("`GetInducedData([int])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
     return TRUE;
   }
 
@@ -543,7 +543,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
   if( !( (h!=NULL) && ( (h->Typ()==IDEAL_CMD) || (h->Typ()==MODUL_CMD))) )
   {
-    WerrorS("`system(\"SetInducedReferrence\",<ideal/module>, [int[, int]])` expected");
+    WerrorS("`SetInducedReferrence(<ideal/module>, [int[, int]])` expected");
     return TRUE;
   }
 
@@ -573,7 +573,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
   if( (-1 == posIS) )
   {
-    WerrorS("`system(\"SetInducedReferrence\",<ideal/module>, [int[, int]])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
+    WerrorS("`SetInducedReferrence(<ideal/module>, [int[, int]])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
     return TRUE;
   }
 
@@ -585,7 +585,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 }
 
 
-//    F = system("ISUpdateComponents", F, V, MIN );
+//    F = ISUpdateComponents( F, V, MIN );
 //    // replace gen(i) -> gen(MIN + V[i-MIN]) for all i > MIN in all terms from F!
 static BOOLEAN ISUpdateComponents(leftv res, leftv h)
 {
@@ -613,7 +613,7 @@ static BOOLEAN ISUpdateComponents(leftv res, leftv h)
     }
   }
 
-  WerrorS("`system(\"ISUpdateComponents\",<module>, intvec, int)` expected");
+  WerrorS("`ISUpdateComponents(<module>, intvec, int)` expected");
   return TRUE;
 }
 
@@ -625,7 +625,7 @@ static BOOLEAN reduce_syz(leftv res, leftv h)
 
   if ( !( (h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) ) )
   {
-    WerrorS("`system(\"reduce_syz\",<poly/vector>!, <ideal/module>, <int>, [int])` expected");
+    WerrorS("`reduce_syz(<poly/vector>!, <ideal/module>, <int>, [int])` expected");
     return TRUE;
   }
 
@@ -635,7 +635,7 @@ static BOOLEAN reduce_syz(leftv res, leftv h)
 
   if ( !( (h!=NULL) && (h->Typ()==MODUL_CMD || h->Typ()==IDEAL_CMD ) ) )
   {
-    WerrorS("`system(\"reduce_syz\",<poly/vector>, <ideal/module>!, <int>, [int])` expected");
+    WerrorS("`reduce_syz(<poly/vector>, <ideal/module>!, <int>, [int])` expected");
     return TRUE;
   }
 
@@ -645,7 +645,7 @@ static BOOLEAN reduce_syz(leftv res, leftv h)
 
   if ( !( (h!=NULL) && (h->Typ()== INT_CMD)  ) )
   {
-    WerrorS("`system(\"reduce_syz\",<poly/vector>, <ideal/module>, <int>!, [int])` expected");
+    WerrorS("`reduce_syz(<poly/vector>, <ideal/module>, <int>!, [int])` expected");
     return TRUE;
   }
 
@@ -673,13 +673,13 @@ static BOOLEAN idPrepare(leftv res, leftv h)
 
   if( (!isSyz) && (-1 == posIS) )
   {
-    WerrorS("`system(\"idPrepare\",<...>)` called on incompatible ring (not created by 'MakeSyzCompOrdering' or 'MakeInducedSchreyerOrdering'!)");
+    WerrorS("`idPrepare(<...>)` called on incompatible ring (not created by 'MakeSyzCompOrdering' or 'MakeInducedSchreyerOrdering'!)");
     return TRUE;
   }
 
   if ( !( (h!=NULL) && (h->Typ()==MODUL_CMD) && (h->Data() != NULL) ) )
   {
-    WerrorS("`system(\"idPrepare\",<module>)` expected");
+    WerrorS("`idPrepare(<module>)` expected");
     return TRUE;
   }
 
@@ -755,7 +755,7 @@ static BOOLEAN _p_Content(leftv res, leftv h)
 {
   if ( !( (h!=NULL) && (h->Typ()==POLY_CMD) && (h->Data() != NULL) ) )
   {
-    WerrorS("`system(\"p_Content\",<poly-var>)` expected");
+    WerrorS("`p_Content(<poly-var>)` expected");
     return TRUE;
   }
 
