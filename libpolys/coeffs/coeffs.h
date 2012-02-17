@@ -183,6 +183,9 @@ struct n_Procs_s
    /// returns X with X mod q[i]=x[i], i=0..rl-1
    number  (*cfChineseRemainder)(number *x, number *q,int rl, const coeffs);
 
+   /// degree for coeffcients: -1 for 0, 0 for "constants", ...
+   int (*cfParDeg)(number x,const coeffs r);
+
 #ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
@@ -607,6 +610,12 @@ static inline number n_Farey(number a, number b, const coeffs r)
 {
   assume(r != NULL);
   return r->cfFarey(a,b,r);
+}
+
+static inline int n_ParDeg(number n, const coeffs r)
+{ 
+  assume(r != NULL);
+  return r->cfParDeg(n,r); 
 }
 
 static inline number  n_Init_bigint(number i, const coeffs dummy,

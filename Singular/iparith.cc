@@ -4444,33 +4444,8 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
 }
 static BOOLEAN jjPARDEG(leftv res, leftv v)
 {
-  res->data = (char *)0L;
   number nn=(number)v->Data();
-  if (nn!=NULL) 
-  {
-    if (getCoeffType(currRing->cf)==n_algExt)
-    {
-      poly qq=(poly)nn;
-      res->data = (char *)(long)currRing->cf->extRing->pFDeg(qq,
-        currRing->cf->extRing);
-    }
-    if(getCoeffType(currRing->cf)==n_transExt)
-    {
-      /* from transext.h:*/
-      struct fractionObject
-      {
-        poly numerator;
-	poly denominator;
-	int complexity;
-      };
-      typedef struct fractionObject * fraction;
-      #define NUM(f) (((fraction)f)->numerator)
-
-      fraction qq=(fraction)nn;
-      res->data = (char *)(long)currRing->cf->extRing->pFDeg(NUM(qq),
-        currRing->cf->extRing);
-    }
-  }
+  res->data = (char *)(long)n_ParDeg(nn,currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjPARSTR1(leftv res, leftv v)

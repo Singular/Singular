@@ -738,6 +738,13 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   return NULL;                                           /// default
 }
 
+int naParDeg(number a, const coeffs cf)
+{
+  if (a == NULL) return -1;
+  poly aa=(poly)a;
+  return cf->extRing->pFDeg(aa,cf->extRing);
+}
+
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {  
   assume( infoStruct != NULL );
@@ -809,6 +816,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->convFactoryNSingN=naConvFactoryNSingN;
   cf->convSingNFactoryN=naConvSingNFactoryN;
 #endif
+  cf->cfParDeg = naParDeg;
   
   return FALSE;
 }

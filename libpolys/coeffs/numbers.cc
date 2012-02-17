@@ -86,6 +86,11 @@ number ndChineseRemainder(number *,number *,int,const coeffs r)
   return n_Init(0,r); 
 }
 
+int ndParDeg(number n, const coeffs r)
+{
+  return (-n_IsZero(n,r));
+}
+
 
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
@@ -251,6 +256,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     n->cfChineseRemainder = ndChineseRemainder;
     n->cfFarey = ndFarey;
+    n->cfParDeg = ndParDeg;
 
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;

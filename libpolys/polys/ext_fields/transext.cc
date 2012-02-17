@@ -1280,6 +1280,13 @@ CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
 }
 #endif
 
+int ntParDeg(number a, const coeffs cf)
+{
+  if (IS0(a)) return -1;
+  fraction fa = (fraction)a;
+  return cf->extRing->pFDeg(NUM(fa),cf->extRing);
+}
+
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
@@ -1348,6 +1355,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->convFactoryNSingN =ntConvFactoryNSingN;
   cf->convSingNFactoryN =ntConvSingNFactoryN;
 #endif
+  cf->cfParDeg = ntParDeg;
 
   return FALSE;
 }
