@@ -110,7 +110,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
   if( h->Typ() == RING_CMD)
   {
     const ring r = (const ring)h->Data();
-    rWrite(r);
+    rWrite(r, TRUE);
     PrintLn();
 #ifdef RDEBUG
     rDebugPrint(r);
@@ -680,11 +680,6 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   const bool isSyz = rIsSyzIndexRing(r);
   const int posIS = rGetISPos(0, r);
 
-  if( (!isSyz) && (-1 == posIS) )
-  {
-    WerrorS("`idPrepare(<...>)` called on incompatible ring (not created by 'MakeSyzCompOrdering' or 'MakeInducedSchreyerOrdering'!)");
-    return TRUE;
-  }
 
   if ( !( (h!=NULL) && (h->Typ()==MODUL_CMD) && (h->Data() != NULL) ) )
   {
@@ -705,11 +700,19 @@ static BOOLEAN idPrepare(leftv res, leftv h)
     iComp = (int)((long)(h->Data()));
   } else
   {
+      if( (!isSyz) && (-1 == posIS) )
+      {
+        WerrorS("`idPrepare(<...>)` called on incompatible ring (not created by 'MakeSyzCompOrdering' or 'MakeInducedSchreyerOrdering'!)");
+        return TRUE;
+      }
+
     if( isSyz )
       iComp = rGetCurrSyzLimit(r);
     else
       iComp = id_RankFreeModule(r->typ[posIS].data.is.F, r); // ;
   }
+  
+  assume(iComp >= 0);
 
 
   tHomog hom=testHomog;

@@ -226,7 +226,7 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef NDEBUG
 #if MYTEST
-          Print("p_Setm_General: isTemp ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
+          Print("p_Setm_General: ro_isTemp ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
 #endif
 #endif
           int c = p_GetComp(p, r);
@@ -263,9 +263,7 @@ void p_Setm_General(poly p, const ring r)
           }
 #if MYTEST
 //          if( p->exp[o->data.isTemp.start] > 0 )
-//          {
-//            PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
-//          }
+            PrintS("after Values: "); p_DebugPrint(p, r, r, 1);
 #endif
 #endif
           break;
@@ -287,12 +285,16 @@ void p_Setm_General(poly p, const ring r)
           assume( c >= 0 );
           const ideal F = o->data.is.F;
           const int limit = o->data.is.limit;
+          const int start = o->data.is.start;
+	   
 
           if( F != NULL && c > limit )
           {
 #ifndef NDEBUG
 #if MYTEST
             Print("p_Setm_General: ro_is : in rSetm: pos: %d, c: %d >  limit: %d\n", c, pos, limit); // p_DebugPrint(p, r, r, 1);
+            PrintS("preComputed Values: ");
+            p_DebugPrint(p, r, r, 1);
 #endif
 #endif
 
@@ -315,7 +317,6 @@ void p_Setm_General(poly p, const ring r)
             assume(pp != NULL);
             if(pp == NULL) break;
 
-            const int start = o->data.is.start;
             const int end = o->data.is.end;
 
             assume(start <= end);
@@ -325,23 +326,33 @@ void p_Setm_General(poly p, const ring r)
 
 //	  const int st = o->data.isTemp.start;	     
 
-          if( c > limit )
+//          if( c > limit ) // BUG???
             p->exp[start] = 1;
 //          else
 //            p->exp[start] = 0;
 
-	     
+
 #ifndef NDEBUG
-	    Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
+            Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
 #endif	     
-   
+
+            // p_ExpVectorAdd(p, pp, r);
 
             for( int i = start; i <= end; i++) // v[0] may be here...
               p->exp[i] += pp->exp[i]; // !!!!!!!! ADD corresponding LT(F)
 
-       
+            // p_MemAddAdjust(p, ri);
+            if (r->NegWeightL_Offset != NULL)
+            {
+              for (int i=r->NegWeightL_Size-1; i>=0; i--)
+              {
+                const int _i = r->NegWeightL_Offset[i];
+                if( start <= _i && _i <= end )
+                  p->exp[_i] -= POLY_NEGWEIGHT_OFFSET;
+              }
+            }
 
-	     
+
 #ifndef NDEBUG
             const int* const pVarOffset = o->data.is.pVarOffset;
 
@@ -355,9 +366,14 @@ void p_Setm_General(poly p, const ring r)
                 assume( p_GetExp(p, r, vo) == (p_GetExp(p, i, r) + p_GetExp(pp, r, vo)) );
             }
             // TODO: how to check this for computed values???
+#if MYTEST
+            PrintS("Computed Values: "); p_DebugPrint(p, r, r, 1);
+#endif
 #endif
           } else
           {
+            p->exp[start] = 0; //!!!!????? where?????
+	     
             const int* const pVarOffset = o->data.is.pVarOffset;
 
             // What about v[0] - component: it will be added later by
@@ -369,12 +385,11 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef NDEBUG
 #if MYTEST
-	    Print("p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
+            Print("ELSE p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
             p_DebugPrint(p, r, r, 1);
-#endif	     
-#endif	     
+#endif
+#endif
           }
-	   
 
           break;
         }
