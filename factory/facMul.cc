@@ -408,7 +408,19 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     else if (!F.inCoeffDomain() && !G.inCoeffDomain())
     {
       if (b.getp() != 0)
-        return b (mulFLINTQ (F, G));
+      {
+        fmpz_t FLINTpk;
+        fmpz_init_set_ui (FLINTpk, b.getp());
+        fmpz_pow_ui (FLINTpk, FLINTpk, b.getk());
+        fmpz_mod_poly_t FLINTF, FLINTG;
+        convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
+        convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
+        fmpz_mod_poly_mul (FLINTF, FLINTF, FLINTG);
+        CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF, F.mvar(), b);
+        fmpz_mod_poly_clear (FLINTG);
+        fmpz_mod_poly_clear (FLINTF);
+        return result;
+      }
       return mulFLINTQ (F, G);
     }
 #endif
@@ -482,14 +494,17 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     {
       if (b.getp() != 0)
       {
-        ZZ NTLpk= power_ZZ (b.getp(), b.getk());
-        ZZ_p::init (NTLpk);
-        ZZX ZZf= convertFacCF2NTLZZX (F);
-        ZZX ZZg= convertFacCF2NTLZZX (G);
-        ZZ_pX NTLf= to_ZZ_pX (ZZf);
-        ZZ_pX NTLg= to_ZZ_pX (ZZg);
-        rem (NTLf, NTLf, NTLg);
-        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+        fmpz_t FLINTpk;
+        fmpz_init_set_ui (FLINTpk, b.getp());
+        fmpz_pow_ui (FLINTpk, FLINTpk, b.getk());
+        fmpz_mod_poly_t FLINTF, FLINTG;
+        convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
+        convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
+        fmpz_mod_poly_rem (FLINTF, FLINTF, FLINTG);
+        CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF,F.mvar(),b);
+        fmpz_mod_poly_clear (FLINTG);
+        fmpz_mod_poly_clear (FLINTF);
+        return result;
       }
       return modFLINTQ (F, G);
     }
@@ -581,14 +596,17 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     {
       if (b.getp() != 0)
       {
-        ZZ NTLpk= power_ZZ (b.getp(), b.getk());
-        ZZ_p::init (NTLpk);
-        ZZX ZZf= convertFacCF2NTLZZX (F);
-        ZZX ZZg= convertFacCF2NTLZZX (G);
-        ZZ_pX NTLf= to_ZZ_pX (ZZf);
-        ZZ_pX NTLg= to_ZZ_pX (ZZg);
-        div (NTLf, NTLf, NTLg);
-        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+        fmpz_t FLINTpk;
+        fmpz_init_set_ui (FLINTpk, b.getp());
+        fmpz_pow_ui (FLINTpk, FLINTpk, b.getk());
+        fmpz_mod_poly_t FLINTF, FLINTG;
+        convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
+        convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
+        fmpz_mod_poly_divrem (FLINTF, FLINTG, FLINTF, FLINTG);
+        CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF,F.mvar(),b);
+        fmpz_mod_poly_clear (FLINTG);
+        fmpz_mod_poly_clear (FLINTF);
+        return result;
       }
       return divFLINTQ (F,G);
     }
