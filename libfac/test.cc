@@ -1,6 +1,8 @@
 //static char rcsid[] = "$Id$";
 ///////////////////////////////////////////////////////////////////////////////
 // Factor - Includes
+#include <string.h>
+
 #include "factor.h"
 #ifdef HAVE_IOSTREAM
 #include <iostream>
