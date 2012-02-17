@@ -12,38 +12,39 @@
 
 #include <factory.h>
 
-template class Factor<CanonicalForm>;
-template class List<CFFactor>;
-template class ListIterator<CFFactor>;
-template class List<CanonicalForm>;
-template class ListIterator<CanonicalForm>;
-template class Array<CanonicalForm>;
-template class List<MapPair>;
-template class ListIterator<MapPair>;
-template class Matrix<CanonicalForm>;
-template class SubMatrix<CanonicalForm>;
+// already in factory/ftmpl_inst.cc:
+//template class Factor<CanonicalForm>;
+//template class List<CFFactor>;
+//template class ListIterator<CFFactor>;
+//template class List<CanonicalForm>;
+//template class ListIterator<CanonicalForm>;
+//template class Array<CanonicalForm>;
+//template class List<MapPair>;
+//template class ListIterator<MapPair>;
+//template class Matrix<CanonicalForm>;
+//template class SubMatrix<CanonicalForm>;
 
 #ifndef NOSTREAMIO
-template OSTREAM & operator << ( OSTREAM &, const List<CanonicalForm> & );
-template OSTREAM & operator << ( OSTREAM &, const List<CFFactor> & );
-template OSTREAM & operator << ( OSTREAM &, const List<MapPair> & );
-template OSTREAM & operator << ( OSTREAM &, const Array<CanonicalForm> & );
-template OSTREAM & operator << ( OSTREAM &, const Factor<CanonicalForm> & );
+//template OSTREAM & operator << ( OSTREAM &, const List<CanonicalForm> & );
+//template OSTREAM & operator << ( OSTREAM &, const List<CFFactor> & );
+//template OSTREAM & operator << ( OSTREAM &, const List<MapPair> & );
+//template OSTREAM & operator << ( OSTREAM &, const Array<CanonicalForm> & );
+//template OSTREAM & operator << ( OSTREAM &, const Factor<CanonicalForm> & );
 //template OSTREAM & operator << ( OSTREAM &, const Matrix<CanonicalForm> & );
 #endif
 
-template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
+//template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
 
 /*
 template CanonicalForm crossprod ( const Array<CanonicalForm>&, const Array<CanonicalForm>& );
 template CanonicalForm prod ( const Array<CanonicalForm>& );
 */
 
-template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
-template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
+//template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
+//template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
 
-template int tmax ( const int&, const int& );
-template int tmin ( const int&, const int& );
+//template int tmax ( const int&, const int& );
+//template int tmin ( const int&, const int& );
 
 // place here your own template stuff, not instantiated by factory
 #include "tmpl_inst.h"

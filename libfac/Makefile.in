@@ -1,4 +1,3 @@
-# $Id$
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -132,8 +131,8 @@ libfac.a:	$(OPTFACTOROBJ) $(OPTCHARSETOBJ)
 		$(AR) ${LIBFACNAME}.a $(OPTFACTOROBJ) $(OPTCHARSETOBJ)
 		$(RANLIB) ${LIBFACNAME}.a
 
-libsingfac.a:	$(OPTFACTOROBJ1) $(OPTCHARSETOBJ)
-		$(AR) ${SINGLIBFACNAME}.a $(OPTFACTOROBJ1) $(OPTCHARSETOBJ)
+libsingfac.a:	$(OPTFACTOROBJ) $(OPTCHARSETOBJ)
+		$(AR) ${SINGLIBFACNAME}.a $(OPTFACTOROBJ) $(OPTCHARSETOBJ)
 		$(RANLIB) ${SINGLIBFACNAME}.a
 
 libsingfac_g.a:	$(DEBOBJ)
