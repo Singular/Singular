@@ -16,6 +16,7 @@
 
 #include <config.h>
 #include "canonicalform.h"
+#include "fac_util.h"
 
 #ifdef HAVE_FLINT
 #ifdef __cplusplus
@@ -25,6 +26,7 @@ extern "C"
 #include <fmpz.h>
 #include <fmpq.h>
 #include <fmpz_poly.h>
+#include <fmpz_mod_poly.h>
 #include <fmpq_poly.h>
 #include <nmod_poly.h>
 #ifdef __cplusplus
@@ -102,6 +104,27 @@ convertFLINTnmod_poly_factor2FacCFFList (
                    const Variable& x       ///< [in] variable the result should
                                            ///< have
                                         );
+
+/// conversion of a factory univariate poly over Z to a FLINT poly over
+/// Z/p (for non word size p)
+void
+convertFacCF2Fmpz_mod_poly_t (
+                          fmpz_mod_poly_t result, ///< [in,out] fmpz_mod_poly_t
+                          const CanonicalForm& f, ///< [in] univariate poly over
+                                                  ///< Z
+                          const fmpz_t p          ///< [in] some integer p
+                             );
+
+/// conversion of a FLINT poly over Z/p (for non word size p) to a CanonicalForm
+/// over Z
+CanonicalForm
+convertFmpz_mod_poly_t2FacCF (
+                          fmpz_mod_poly_t poly, ///< [in] fmpz_mod_poly_t
+                          const Variable& x,    ///< [in] variable the result
+                                                ///< should have
+                          const modpk& b        ///< [in] coeff bound to map
+                                                ///< coeffs in (-p/2,p/2)
+                             );
 
 #endif
 #endif

@@ -15,6 +15,7 @@
 #include <config.h>
 
 #include "canonicalform.h"
+#include "fac_util.h"
 #include "cf_iter.h"
 #include "cf_factory.h"
 #include "gmpext.h"
@@ -34,6 +35,7 @@ extern "C"
 #include <fmpz.h>
 #include <fmpq.h>
 #include <fmpz_poly.h>
+#include <fmpz_mod_poly.h>
 #include <nmod_poly.h>
 #include <fmpq_poly.h>
 #ifdef __cplusplus
@@ -267,6 +269,29 @@ convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
     result.append (CFFactor (convertnmod_poly_t2FacCF ((nmod_poly_t &)fac->p[i],x),
                              fac->exp[i]));
   return result;
+}
+
+void
+convertFacCF2Fmpz_mod_poly_t (fmpz_mod_poly_t result, const CanonicalForm& f,
+                              const fmpz_t p)
+{
+  fmpz_mod_poly_init2 (result, p, degree (f) + 1);
+  fmpz_poly_t buf;
+  convertFacCF2Fmpz_poly_t (buf, f);
+  fmpz_mod_poly_set_fmpz_poly (result, buf);
+  fmpz_poly_clear (buf);
+}
+
+CanonicalForm
+convertFmpz_mod_poly_t2FacCF (fmpz_mod_poly_t poly, const Variable& x,
+                              const modpk& b)
+{
+  fmpz_poly_t buf;
+  fmpz_poly_init (buf);
+  fmpz_mod_poly_get_fmpz_poly (buf, poly);
+  CanonicalForm result= convertFmpz_poly_t2FacCF (buf, x);
+  fmpz_poly_clear (buf);
+  return b (result);
 }
 
 #endif
