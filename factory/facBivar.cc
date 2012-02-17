@@ -590,25 +590,11 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   {
     Off (SW_RATIONAL);
     int i= 0;
-    do
-    {
-      find_good_prime(F,i);
-      find_good_prime(Aeval,i);
-      find_good_prime(A,i);
-      setCharacteristic (cf_getSmallPrime(i));
-      if (gcd (Aeval.mapinto(), deriv (Aeval,x).mapinto()).inCoeffDomain())
-      {
-        setCharacteristic (0);
-        break;
-      }
-      else
-        i++;
-      if (i > cf_getNumSmallPrimes())
-      {
-        printf ("out of primes\n");
-        break;
-      }
-    } while (1);
+    find_good_prime(F,i);
+    find_good_prime(Aeval,i);
+    find_good_prime(A,i);
+    if (i >= cf_getNumSmallPrimes())
+      printf ("out of primes\n"); //TODO exit
 
     int p=cf_getSmallPrime(i);
     b = coeffBound( A, p );
