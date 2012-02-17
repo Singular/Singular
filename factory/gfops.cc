@@ -61,6 +61,13 @@ static CanonicalForm intVec2CF ( int degree, int * coeffs, int level )
     return result;
 }
 
+static char *gftable_dir;
+extern "C" {
+  void set_gftable_dir(char *d){
+    gftable_dir = d;
+  }
+}
+
 static void gf_get_table ( int p, int n )
 {
     char buffer[gf_maxbuffer];
@@ -91,14 +98,34 @@ static void gf_get_table ( int p, int n )
 #endif
 
     // try to open file
+    char *gffilename;
+    FILE * inputfile;
+    if (gftable_dir)
+    {
+      sprintf( buffer, "/gftable.%d.%d", p, n );
+      gffilename = (char *)malloc(strlen(gftable_dir) + strlen(buffer) + 1);
+      STICKYASSERT(gffilename,"out of memory");
+      strcpy(gffilename,gftable_dir);
+      strcat(gffilename,buffer);
+      inputfile = fopen( gffilename, "r" );
+    }
+    else
+    {
 #ifndef SINGULAR
-    sprintf( buffer, GFTABLEDIR "/gftable.%d.%d", p, n );
-    FILE * inputfile = fopen( buffer, "r" );
+      sprintf( buffer, GFTABLEDIR "/gftable.%d.%d", p, n );
+      gffilename = buffer;
+      inputfile = fopen( buffer, "r" );
 #else
-    sprintf( buffer, "gftables/%d", q );
-    FILE * inputfile = feFopen( buffer, "r" );
+      sprintf( buffer, "gftables/%d", q );
+      gffilename = buffer;
+      inputfile = feFopen( buffer, "r" );
 #endif
-    STICKYASSERT( inputfile, "can not open GF(q) table" );
+    }
+    if (!inputfile)
+    {
+      fprintf(stderr,"can not open GF(q) addition table: %s\n",gffilename);
+      STICKYASSERT(inputfile, "can not open GF(q) table");
+    }
 
     // read ID
     char * bufptr;

@@ -183,6 +183,7 @@ basefactorysrc := \
 		facSparseHensel.cc \
 		fieldGCD.cc \
 		ffops.cc \
+		ftmpl_inst.cc \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
