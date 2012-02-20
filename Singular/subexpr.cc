@@ -125,12 +125,12 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case RING_CMD:
         case QRING_CMD:
-        {	      
+        {
           PrintNSpaces(spaces);
-	  const ring r = (const ring)d;
+          const ring r = (const ring)d;
           rWrite(r, currRing == r);
           break;
-	}	 
+        }
         case MATRIX_CMD:
           iiWriteMatrix((matrix)d,n,2, currRing, spaces);
           break;
@@ -631,10 +631,10 @@ void * sleftv::CopyD(int t)
     else if ((rtyp==VMINPOLY) && nCoeff_is_algExt(currRing->cf) && (!nCoeff_is_GF(currRing->cf)))
     {
       const ring A = currRing->cf->extRing;
-      
+
       assume( A != NULL );
       assume( A->minideal != NULL );
-    
+
       x=(void *)p_Copy(A->minideal->m[0], A);
     }
     data=NULL;
@@ -831,7 +831,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             if (t/*Typ()*/ == QRING_CMD)
             {
               char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim,
-			      currRing);
+                              currRing);
               ns = (char*) omAlloc(strlen(s) + strlen(id) + 20);
               sprintf(ns, "\"%s\";%sideal(%s)", s,(dim == 2 ? "\n" : " "), id);
             }
@@ -963,6 +963,11 @@ int  sleftv::Typ()
       {
         lists l;
         if (rtyp==IDHDL) l=IDLIST((idhdl)data);
+        else if (rtyp==ALIAS_CMD)
+        {
+          idhdl h=(idhdl)data;
+          l=(lists)(((idhdl)h->data.ustring)->data.ustring);
+        }
         else             l=(lists)data;
         if ((0<e->start)&&(e->start<=l->nr+1))
         {
@@ -1046,15 +1051,15 @@ void * sleftv::Data()
         {
           /* Q(a), Fp(a), but not GF(q) */
           const ring A = currRing->cf->extRing;
-          
+
           assume( A != NULL );
           assume( A->minideal != NULL );
-          
+
           return (void *)A->minideal->m[0];
         }
         else
           return (void *)currRing->cf->nNULL;
-        
+
       case VNOETHER:   return (void *) (currRing->ppNoether);
       case IDHDL:
         return IDDATA((idhdl)data);
@@ -1255,8 +1260,13 @@ leftv sleftv::LData()
 
     if (rtyp==LIST_CMD)
       l=(lists)data;
-    if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
+    else if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
       l=IDLIST((idhdl)data);
+    else if (rtyp==ALIAS_CMD)
+    {
+      idhdl h=(idhdl)data;
+      l= (lists)(((idhdl)h->data.ustring)->data.ustring);
+    }
     if (l!=NULL)
     {
       if ((0>=e->start)||(e->start>l->nr+1))
