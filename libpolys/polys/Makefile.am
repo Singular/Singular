@@ -9,7 +9,7 @@ NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
-INCLUDES	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${includedir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS}
+INCLUDES	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}
 AM_LDFLAGS	= -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${abs_top_builddir}/resources -L${abs_top_builddir}/../omalloc -L${abs_builddir}
 
 if ENABLE_P_PROCS_STATIC
