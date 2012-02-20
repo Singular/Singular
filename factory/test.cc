@@ -1,6 +1,25 @@
 #include <factory/factory.h>
 
-int mmInit(void) {return 1; }
+int mmInit(void) {
+#ifdef SINGULAR
+// this is a hack to make linker baheave on Mac OS X 10.6.8 / 64 bit
+// since otherwise both debug and release DYNAMIC tests failed there with:
+/*
+dyld: lazy symbol binding failed: Symbol not found: __Z7feFopenPKcS0_
+Referenced from: ...BUILDDIR/factory/.libs/libfactory_g-3.1.3.dylib
+Expected in: flat namespace
+    
+dyld: Symbol not found: __Z7feFopenPKcS0_
+Referenced from: ...BUILDDIR/factory/.libs/libfactory_g-3.1.3.dylib
+Expected in: flat namespace
+*/
+extern FILE * feFopen ( const char * path, const char * mode);
+const int f = (int)(long)(void*)feFopen;
+return (f ^ f) + 1; 
+#else
+return 1; 
+#endif
+}
 
 int test2 (int p)
 {
