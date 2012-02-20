@@ -147,6 +147,7 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
     args_found=FALSE;
     s=e; // set s to the starting point of the arg
          // and search for the end
+    while(*s==' ') s++; e=s;
     while ((*e!=',')
     &&((par!=0) || (*e!=')'))
     &&(*e!='\0'))

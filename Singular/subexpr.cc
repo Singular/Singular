@@ -941,6 +941,11 @@ int  sleftv::Typ()
       {
         lists l;
         if (rtyp==IDHDL) l=IDLIST((idhdl)data);
+	else if (rtyp==ALIAS_CMD)
+	{
+	  idhdl h=(idhdl)data; 
+	  l=(lists)(((idhdl)h->data.ustring)->data.ustring);
+	}
         else             l=(lists)data;
         if ((0<e->start)&&(e->start<=l->nr+1))
         {
@@ -1225,8 +1230,13 @@ leftv sleftv::LData()
 
     if (rtyp==LIST_CMD)
       l=(lists)data;
-    if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
+    else if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
       l=IDLIST((idhdl)data);
+    else if (rtyp==ALIAS_CMD)
+    {
+      idhdl h=(idhdl)data;
+      l= (lists)(((idhdl)h->data.ustring)->data.ustring);
+    }
     if (l!=NULL)
     {
       if ((0>=e->start)||(e->start>l->nr+1))
