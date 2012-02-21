@@ -285,8 +285,8 @@ void p_Setm_General(poly p, const ring r)
           assume( c >= 0 );
           const ideal F = o->data.is.F;
           const int limit = o->data.is.limit;
+          assume( limit >= 0 );
           const int start = o->data.is.start;
-	   
 
           if( F != NULL && c > limit )
           {
@@ -297,6 +297,11 @@ void p_Setm_General(poly p, const ring r)
             p_DebugPrint(p, r, r, 1);
 #endif
 #endif
+//          if( c > limit ) // BUG???
+            p->exp[start] = 1;
+//          else
+//            p->exp[start] = 0;
+
 
             c -= limit;
             assume( c > 0 );
@@ -304,7 +309,12 @@ void p_Setm_General(poly p, const ring r)
 
             assume( c < IDELEMS(F) ); // What about others???
 
+            if( c >= IDELEMS(F) )
+              break;
+
             const poly pp = F->m[c]; // get reference monomial!!!
+
+            assume(pp != NULL);
 
 #ifndef NDEBUG
 #if MYTEST
@@ -312,29 +322,17 @@ void p_Setm_General(poly p, const ring r)
             p_DebugPrint(pp, r, r, 1);
 #endif
 #endif
-
-
-            assume(pp != NULL);
             if(pp == NULL) break;
 
             const int end = o->data.is.end;
-
             assume(start <= end);
-	     
-//          const int limit = o->data.is.limit;
-          assume( limit >= 0 );
+
 
 //	  const int st = o->data.isTemp.start;	     
 
-//          if( c > limit ) // BUG???
-            p->exp[start] = 1;
-//          else
-//            p->exp[start] = 0;
-
-
 #ifndef NDEBUG
             Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
-#endif	     
+#endif
 
             // p_ExpVectorAdd(p, pp, r);
 
