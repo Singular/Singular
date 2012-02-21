@@ -34,9 +34,9 @@
 #include <NTL/ZZ_pEX.h>
 #include "NTLconvert.h"
 
-TIMING_DEFINE_PRINT(fac_bi_factorizer);
-TIMING_DEFINE_PRINT(fac_hensel_lift);
-TIMING_DEFINE_PRINT(fac_factor_recombination);
+TIMING_DEFINE_PRINT(fac_bi_factorizer)
+TIMING_DEFINE_PRINT(fac_hensel_lift)
+TIMING_DEFINE_PRINT(fac_factor_recombination)
 
 static inline
 CanonicalForm
@@ -2699,11 +2699,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     CFList MOD;
     bool earlySuccess;
-    CFList earlyFactors;
+    CFList earlyFactors, liftedFactors;
     TIMING_START (fac_hensel_lift);
-    CFList liftedFactors= henselLiftAndEarly
-                          (A, MOD, liftBounds, earlySuccess, earlyFactors,
-                           Aeval, biFactors, evaluation, info);
+    liftedFactors= henselLiftAndEarly
+                   (A, MOD, liftBounds, earlySuccess, earlyFactors,
+                    Aeval, biFactors, evaluation, info);
     TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
 
     if (!extension)

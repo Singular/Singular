@@ -23,6 +23,7 @@
 #include "facFqSquarefree.h"
 #include "facFqBivarUtil.h"
 
+#ifdef HAVE_NTL
 /// Factorization over a finite field
 ///
 /// @return @a multiFactorize returns a factorization of F
@@ -740,6 +741,8 @@ evaluateAtEval (const CanonicalForm& F,  ///<[in] some poly
                 const CFList& evaluation,///<[in] some evaluation point
                 int l                    ///<[in] level to start at
                );
+
+#endif
 
 #endif
 /* FAC_FQ_FACTORIZE_H */

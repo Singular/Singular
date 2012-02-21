@@ -13,6 +13,8 @@
 #ifndef FAC_SPARSE_HENSEL_H
 #define FAC_SPARSE_HENSEL_H
 
+#include "assert.h"
+
 #include "canonicalform.h"
 #include "cf_map_ext.h"
 #include "cf_iter.h"
@@ -491,6 +493,8 @@ CanonicalForm patch (const CanonicalForm& F1, const CanonicalForm& F2,
   return result;
 }
 
+#ifdef HAVE_NTL
+
 /// sparse heuristic lifting by Wang and Lucks
 ///
 /// @return @a LucksWangSparseHeuristic returns true if it was successful
@@ -521,5 +525,7 @@ sparseHeuristic (const CanonicalForm& A,  ///<[in] polynomial to be factored
                  int minFactorsLength     ///<[in] minimal length of bivariate
                                           ///< factorizations
                 );
+
+#endif
 
 #endif

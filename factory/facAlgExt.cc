@@ -26,6 +26,7 @@
 #include "facFqBivarUtil.h"
 #include "facAlgExt.h"
 #include "cfModResultant.h"
+#include "fac_sqrfree.h"
 
 // squarefree part of F
 CanonicalForm
@@ -163,7 +164,6 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   }
 
   factors.insert (CFFactor (Lc(F), 1));
-  ASSERT (degree (buf) <= 0, "bug in AlgExtFactorize");
   if (save_rat) Off(SW_RATIONAL);
   return factors;
 }

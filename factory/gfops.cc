@@ -211,7 +211,7 @@ static void gf_get_table ( int p, int n )
 
 void gf_setcharacteristic ( int p, int n, char name )
 {
-    ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
+    //ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
     gf_name = name;
     gf_get_table( p, n );
 }

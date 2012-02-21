@@ -20,17 +20,17 @@ void deb_inc_level();
 void deb_dec_level();
 extern char * deb_level_msg;
 #define DEBINCLEVEL(stream, msg) \
-(stream << deb_level_msg << "entering << " << msg << " >>" << endl, deb_inc_level())
+(std::stream << deb_level_msg << "entering << " << msg << " >>" << std::endl, deb_inc_level())
 #define DEBDECLEVEL(stream, msg) \
-(deb_dec_level(), stream << deb_level_msg << "leaving << " << msg << " >>" << endl)
+(deb_dec_level(), std::stream << deb_level_msg << "leaving << " << msg << " >>" << std::endl)
 #define DEBOUTSL(stream) \
-(stream << deb_level_msg, stream.flush())
+(std::stream << deb_level_msg, std::stream.flush())
 #define DEBOUT(stream, objects) \
-(stream << objects, stream.flush())
+(std::stream << objects, std::stream.flush())
 #define DEBOUTENDL(stream) \
-(stream << endl)
+(std::stream << std::endl)
 #define DEBOUTLN(stream, objects) \
-(stream << deb_level_msg << objects << endl)
+(std::stream << deb_level_msg << objects << std::endl)
 #else /* DEBUGOUTPUT */
 #define DEBINCLEVEL(stream, msg)
 #define DEBDECLEVEL(stream, msg)

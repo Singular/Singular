@@ -18,6 +18,7 @@
 #include "facBivar.h"
 #include "facFqBivarUtil.h"
 
+#ifdef HAVE_NTL
 /// Factorization over Q (a)
 ///
 /// @return @a multiFactorize returns a factorization of F
@@ -135,6 +136,8 @@ ratFactorize (const CanonicalForm& G,        ///<[in] a multivariate poly
   }
   return result;
 }
+
+#endif
 
 #endif
 
