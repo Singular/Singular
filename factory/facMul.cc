@@ -2624,16 +2624,20 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
 #endif
   }
 #ifdef HAVE_FLINT
-  fmpq_poly_t FLINTA,FLINTB;
-  fmpq_poly_init (FLINTA);
-  fmpq_poly_init (FLINTB);
-  convertFacCF2Fmpq_poly_t (FLINTA, A);
-  convertFacCF2Fmpq_poly_t (FLINTB, B);
-  fmpq_poly_rem (FLINTA, FLINTB, FLINTA);
-  bool result= fmpq_poly_is_zero (FLINTA);
-  fmpq_poly_clear (FLINTA);
-  fmpq_poly_clear (FLINTB);
-  return result;
+  Variable alpha;
+  if (!hasFirstAlgVar (A, alpha) && !hasFirstAlgVar (B, alpha))
+  {
+    fmpq_poly_t FLINTA,FLINTB;
+    fmpq_poly_init (FLINTA);
+    fmpq_poly_init (FLINTB);
+    convertFacCF2Fmpq_poly_t (FLINTA, A);
+    convertFacCF2Fmpq_poly_t (FLINTB, B);
+    fmpq_poly_rem (FLINTA, FLINTB, FLINTA);
+    bool result= fmpq_poly_is_zero (FLINTA);
+    fmpq_poly_clear (FLINTA);
+    fmpq_poly_clear (FLINTB);
+    return result;
+  }
 #else
   return fdivides (A, B); //maybe NTL?
 #endif
