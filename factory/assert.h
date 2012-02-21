@@ -28,12 +28,14 @@
 /* }}} */
 
 #ifdef __cplusplus
+extern "C" {
+#include <stdlib.h>
+}
 #ifdef HAVE_CSTDIO
 #include <cstdio>
 #else
 extern "C" {
 #include <stdio.h>
-#include <stdlib.h>
 }
 #endif
 #else
