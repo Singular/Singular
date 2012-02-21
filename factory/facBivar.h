@@ -25,6 +25,7 @@
 #include "cfNewtonPolygon.h"
 #include "algext.h"
 
+#ifdef HAVE_NTL
 /// @return @a biFactorize returns a list of factors of F. If F is not monic
 ///         its leading coefficient is not outputted.
 CFList
@@ -191,6 +192,8 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 /// convert a CFFList to a CFList by dropping the multiplicity
 CFList conv (const CFFList& L ///< [in] a CFFList
             );
+
+#endif
 
 #endif
 

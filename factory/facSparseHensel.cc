@@ -13,10 +13,14 @@
  **/
 /*****************************************************************************/
 
+#include <config.h>
+
 #include "facSparseHensel.h"
 #include "cf_algorithm.h"
 #include "cf_gcd_smallp.h"
 #include "facFqFactorize.h"
+
+#ifdef HAVE_NTL
 
 bool
 LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
@@ -392,3 +396,5 @@ sparseHeuristic (const CanonicalForm& A, const CFList& biFactors,
 
   return result;
 }
+
+#endif

@@ -27,6 +27,11 @@
 #include "cf_reval.h"
 #include "facSparseHensel.h"
 
+#ifdef HAVE_NTL
+TIMING_DEFINE_PRINT(fac_bi_factorizer)
+TIMING_DEFINE_PRINT(fac_hensel_lift)
+TIMING_DEFINE_PRINT(fac_factor_recombination)
+
 CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
 {
   CFList result;
@@ -964,10 +969,11 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     bool earlySuccess;
     CFList earlyFactors;
     ExtensionInfo info= ExtensionInfo (false);
+    CFList liftedFactors;
     TIMING_START (fac_hensel_lift);
-    CFList liftedFactors= henselLiftAndEarly
-                          (A, MOD, liftBounds, earlySuccess, earlyFactors,
-                           Aeval, biFactors, evaluation, info);
+    liftedFactors= henselLiftAndEarly
+                   (A, MOD, liftBounds, earlySuccess, earlyFactors,
+                    Aeval, biFactors, evaluation, info);
     TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
 
     TIMING_START (fac_factor_recombination);
@@ -1009,3 +1015,5 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   return factors;
 }
+
+#endif

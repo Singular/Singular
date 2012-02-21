@@ -18,6 +18,7 @@
 #include "templates/ftmpl_functions.h"
 #include "cf_map.h"
 #include "cf_algorithm.h"
+#include "cf_iter.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

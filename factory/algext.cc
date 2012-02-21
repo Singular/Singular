@@ -13,6 +13,8 @@
 #endif
 #endif
 
+#include "assert.h"
+
 #include "templates/ftmpl_functions.h"
 #include "cf_defs.h"
 #include "canonicalform.h"
