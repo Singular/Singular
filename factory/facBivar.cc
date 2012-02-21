@@ -19,6 +19,7 @@
 #include "facFqBivar.h"
 #include "facBivar.h"
 
+#ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_hensel_lift)
 TIMING_DEFINE_PRINT(fac_factor_recombination)
@@ -391,3 +392,5 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
   return factors;
 }
+
+#endif

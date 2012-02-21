@@ -19,6 +19,7 @@
 #include "cf_gcd_smallp.h"
 #include "cf_map_ext.h"
 #include "cf_util.h"
+#include "gfops.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -83,6 +84,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
         setCharacteristic (p, 2, 'Z');
       passToGF= true;
     }
+#ifdef HAVE_NTL
     else if (p > 0 && CFFactory::gettype() == GaloisFieldDomain && ipower (p , getGFDegree()) < TEST_ONE_MAX)
     {
       k= getGFDegree();
@@ -149,6 +151,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
         v= v2;
       }
     }
+#endif
 
     CFRandom * sample;
     if ((!algExtension && p > 0) || p == 0)

@@ -27,6 +27,7 @@
 #include "cf_reval.h"
 #include "facSparseHensel.h"
 
+#ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_bi_factorizer)
 TIMING_DEFINE_PRINT(fac_hensel_lift)
 TIMING_DEFINE_PRINT(fac_factor_recombination)
@@ -1014,3 +1015,5 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   return factors;
 }
+
+#endif
