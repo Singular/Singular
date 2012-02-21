@@ -20,6 +20,7 @@
 
 #include <omalloc/omalloc.h>
 #include <misc/mylimits.h>
+#include <misc/intvec.h>
 #include <coeffs/coeffs.h>
 
 #include <polys/monomials/ring.h>

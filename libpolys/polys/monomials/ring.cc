@@ -1905,7 +1905,11 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
     for (pos=0;pos<r->OrdSize;pos++)
     {
       sro_ord* o=&(r->typ[pos]);
-      if ((o->ord_typ == ro_syzcomp) || (o->ord_typ == ro_syz) || (o->ord_typ == ro_is) || (o->ord_typ == ro_isTemp)) return TRUE;
+      if (   (o->ord_typ == ro_syzcomp)
+          || (o->ord_typ == ro_syz)
+          || (o->ord_typ == ro_is)
+          || (o->ord_typ == ro_isTemp))
+        return TRUE;
     }
   }
   return FALSE;
@@ -2046,7 +2050,7 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
           // Skip all intermediate blocks for undone variables:
           if(r->typ[j].data.is.pVarOffset[i] != -1)
           {
-            // ???
+            // TODO???
           }
 
         }
@@ -3058,13 +3062,13 @@ static void rHighSet(ring r, int o_r, int o)
       break;
     case ringorder_IS:
     { // TODO: What is r->ComponentOrder???
-      r->MixedOrder=TRUE;
-/*
-      if( r->block0[o] != 0 ) // Suffix has the comonent
+//      r->MixedOrder=TRUE;
+      if( r->block0[o] != 0 ) // Suffix has the component
         r->ComponentOrder = r->block0[o];
-      else // Prefix has level...
+/*      else // Prefix has level...
         r->ComponentOrder=-1;
 */
+      // TODO: think about this a bit...!?
       break;
     }
 
@@ -3139,6 +3143,8 @@ static void rSetDegStuff(ring r)
   int* block0 = r->block0;
   int* block1 = r->block1;
   int** wvhdl = r->wvhdl;
+
+  
 
   if (order[0]==ringorder_S ||order[0]==ringorder_s || order[0]==ringorder_IS)
   {
@@ -3226,8 +3232,8 @@ static void rSetDegStuff(ring r)
       rSetFirstWv(r, 0, order, block1, wvhdl);
 
     /*the number of orderings:*/
-    int i = 0;
-    while (order[++i] != 0);
+    int i = 0; while (order[++i] != 0);
+
     do
     {
       i--;
@@ -3252,8 +3258,26 @@ static void rSetDegStuff(ring r)
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
     r->pFDeg = p_Deg;
 
+  if( rGetISPos(0, r) != -1 ) // Are there Schreyer induced blocks?
+  {
+    if( r->pFDeg == p_Totaldegree )
+    {
+      extern long p_TotaldegreeIS(poly p, const ring r);
+      r->pFDeg = p_TotaldegreeIS;
+    }
+#ifndef NDEBUG    
+    else
+      assume( r->pFDeg == p_Deg || r->pFDeg == p_WTotaldegree );
+#endif
+    
+    r->pLDeg = pLDeg1;
+  }
+
   r->pFDegOrig = r->pFDeg;
+  // NOTE: this leads to wrong ecart during std
+  // in Old/sre.tst
   rOptimizeLDeg(r); // also sets r->pLDegOrig
+
 }
 
 /*2
@@ -3990,7 +4014,7 @@ void rDebugPrint(ring r)
       PrintS("weights: ");
 
       if( r->typ[j].data.is.componentWeights == NULL )
-        PrintS("NULL == [0,...0]\n");
+        PrintS("NULL == [0,...,0]\n");
       else
       {
         (r->typ[j].data.is.componentWeights)->show(); PrintLn();
@@ -4072,17 +4096,23 @@ void rDebugPrint(ring r)
   }
 
   {
-#define pFDeg_CASE(A) if(r->pFDeg == A) PrintS( "" #A "" )
-    Print("\npFDeg   : ");
+    extern long p_TotaldegreeIS(poly p, const ring r);
 
-    pFDeg_CASE(p_Totaldegree); else
+      PrintLn();
+      Print("pFDeg   : ");
+#define pFDeg_CASE(A) if(r->pFDeg == A) PrintS( "" #A "" )
+      pFDeg_CASE(p_Totaldegree); else
       pFDeg_CASE(p_WFirstTotalDegree); else
       pFDeg_CASE(p_WTotaldegree); else
       pFDeg_CASE(p_Deg); else
+      pFDeg_CASE(p_TotaldegreeIS); else
+#undef pFDeg_CASE
+      
       Print("(%p)", (void*)(r->pFDeg)); // default case
 
-    PrintS("\n");
-#undef pFDeg_CASE
+    PrintLn();
+    Print("pLDeg   : (%p)", (void*)(r->pLDeg));    
+    PrintLn();
   }
 
 }
@@ -4786,6 +4816,7 @@ ring rAssure_C_dp(const ring r)
 
 /// Finds p^th IS ordering, and returns its position in r->typ[]
 /// returns -1 if something went wrong!
+/// p - starts with 0!
 int rGetISPos(const int p, const ring r)
 {
   // Put the reference set F into the ring -ordering -recor
@@ -4796,7 +4827,7 @@ int rGetISPos(const int p, const ring r)
 
   if (r->typ==NULL)
   {
-    dReportError("'rIsIS:' Error: wrong ring! (typ == NULL)");
+//    dReportError("'rIsIS:' Error: wrong ring! (typ == NULL)");
     return -1;
   }
 
@@ -4804,9 +4835,7 @@ int rGetISPos(const int p, const ring r)
   for( int pos = 0; pos < r->OrdSize; pos++ )
     if( r->typ[pos].ord_typ == ro_is)
       if( j-- == 0 )
-      {
         return pos;
-      }
 
   return -1;
 }
