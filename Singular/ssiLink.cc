@@ -1406,6 +1406,7 @@ int slStatusSsiL(lists L, int timeout)
   FD_ZERO(&fdmask);
   FD_ZERO(&mask);
   int max_fd=0; /* 1 + max fd in fd_set */
+  int already_ready=0;
 
   /* timeout */
   #ifdef HAVE_PSELECT
@@ -1473,18 +1474,30 @@ int slStatusSsiL(lists L, int timeout)
       {
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
+	if (d->ungetc_buf=='\0')
+	{
+	  FD_SET(d_fd, &fdmask);
+          if (d_fd > max_fd) max_fd=d_fd;
+	}
+	else
+	  already_ready++;
       }
       else
       {
         dd=(MP_Link_pt)l->data;
         d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
+        FD_SET(d_fd, &fdmask);
+        if (d_fd > max_fd) max_fd=d_fd;
       }
     #else
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
+      if (d->ungetc_buf=='\0')
+      {
+        FD_SET(d_fd, &fdmask);
+        if (d_fd > max_fd) max_fd=d_fd;
+      }
     #endif
-      FD_SET(d_fd, &fdmask);
-      if (d_fd > max_fd) max_fd=d_fd;
     }
   }
   max_fd++;
@@ -1500,21 +1513,25 @@ do_select:
     }
   }
 
-  /* check with select: chars waiting: no -> not ready */
-  #ifdef HAVE_PSELECT
-  s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
-  #else
-  SSI_BLOCK_CHLD;
-  s = select(max_fd, &mask, NULL, NULL, wt_ptr);
-  SSI_UNBLOCK_CHLD;
-  #endif
+  if (max_fd>1)
+  {
+    /* check with select: chars waiting: no -> not ready */
+    #ifdef HAVE_PSELECT
+    s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
+    #else
+    SSI_BLOCK_CHLD;
+    s = select(max_fd, &mask, NULL, NULL, wt_ptr);
+    SSI_UNBLOCK_CHLD;
+    #endif
+  }
+  else s=0;
 
   if (s==-1)
   {
     WerrorS("error in select call");
     return -2; /*error*/
   }
-  if (s==0)
+  if ((s==0)&&(already_ready==0))
   {
     return 0; /*poll: not ready */
   }
@@ -1539,12 +1556,12 @@ do_select:
         {
           d=(ssiInfo*)l->data;
           d_fd=d->fd_read;
-          if(j==d_fd) break;
+          if((j==d_fd)||(d->ungetc_buf)) break;
         }
         #else
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
-        if(j==d_fd) break;
+        if((j==d_fd)||(d->ungetc_buf)) break;
         #endif
       }
     }
@@ -1576,7 +1593,7 @@ do_select:
         if(timeout != -1)
         {
           timeout = si_max(0,
-               timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
+             timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
           wt.tv_sec  = timeout / 1000000;
           #ifdef HAVE_PSELECT
           wt.tv_nsec = 1000 * (timeout % 1000000);
