@@ -501,10 +501,11 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   const int iLimit = r->typ[pos].data.is.limit;
   const ideal F = r->typ[pos].data.is.F;
+  const intvec* componentWeights = r->typ[pos].data.is.componentWeights;
   ideal FF = id_Copy(F, r);
 
   lists l=(lists)omAllocBin(slists_bin);
-  l->Init(2);
+  l->Init(3);
 
   l->m[0].rtyp = INT_CMD;
   l->m[0].data = reinterpret_cast<void *>(iLimit);
@@ -523,7 +524,15 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
   else
     l->m[1].rtyp = IDEAL_CMD;
 
-  l->m[1].data = reinterpret_cast<void *>(FF);        
+  l->m[1].data = reinterpret_cast<void *>(FF);
+
+  l->m[2].rtyp = INTVEC_CMD;
+  
+  if( componentWeights != NULL )
+    l->m[2].data = reinterpret_cast<void *>(new intvec(componentWeights));
+  else
+    l->m[2].data = reinterpret_cast<void *>(new intvec());
+    
 
 
   res->rtyp = LIST_CMD; // list of int/module
