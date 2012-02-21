@@ -463,8 +463,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
     F= 1;
     return result;
   }
-  DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, M) == F " <<
-            (LC (F, 1)*prodMod (factors, M) == F));
+  DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+            (LC (F, 1)*prodMod (factors, N) == F));
   CFList T, S;
 
   CanonicalForm M= N;
@@ -5587,7 +5587,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     TIMING_END_AND_PRINT (fac_uni_factorizer,
                           "time for univariate factorization: ");
     DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
-              prod (bufUniFactors)*Lc (bufAeval) == bufAeval);
+              (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
 
     if (!derivXZero && !fail2)
     {
@@ -5596,7 +5596,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       TIMING_END_AND_PRINT (fac_uni_factorizer,
                             "time for univariate factorization in y: ");
       DEBOUTLN (cerr, "Lc (Aeval2)*prod (uniFactors2)== Aeval2 " <<
-                prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2);
+                (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
     }
 
     if (bufUniFactors.length() == 1 ||
