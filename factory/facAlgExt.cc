@@ -163,7 +163,6 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   }
 
   factors.insert (CFFactor (Lc(F), 1));
-  ASSERT (degree (buf) <= 0, "bug in AlgExtFactorize");
   if (save_rat) Off(SW_RATIONAL);
   return factors;
 }

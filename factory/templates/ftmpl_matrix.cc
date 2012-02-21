@@ -1,6 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 /* $Id$ */
 
+#include <factory/assert.h>
+
 #include <factory/templates/ftmpl_matrix.h>
 
 template <class T>

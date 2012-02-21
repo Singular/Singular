@@ -13,6 +13,8 @@
 #ifndef FAC_SPARSE_HENSEL_H
 #define FAC_SPARSE_HENSEL_H
 
+#include "assert.h"
+
 #include "canonicalform.h"
 #include "cf_map_ext.h"
 #include "cf_iter.h"
