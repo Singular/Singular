@@ -213,8 +213,8 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       case ringorder_aa:
       {
         int ii;
-	for(ii=r->block0[i];ii<=r->block1[i];ii++)
-	  fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
+        for(ii=r->block0[i];ii<=r->block1[i];ii++)
+          fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
       }
       break;
 
@@ -223,7 +223,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       case ringorder_L:
       case ringorder_IS:
         Werror("ring oder not implemented for ssi:%d",r->order[i]);
-	break;
+        break;
 
       default: break;
     }
@@ -491,8 +491,8 @@ ring ssiReadRing(ssiInfo *d)
       {
         wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
         int ii;
-	for(ii=block0[i];ii<=block1[i];ii++)
-	  fscanf(d->f_read,"%d",&(wvhdl[i][ii-block0[i]]));
+        for(ii=block0[i];ii<=block1[i];ii++)
+          fscanf(d->f_read,"%d",&(wvhdl[i][ii-block0[i]]));
       }
       break;
 
@@ -501,7 +501,7 @@ ring ssiReadRing(ssiInfo *d)
       case ringorder_L:
       case ringorder_IS:
         Werror("ring oder not implemented for ssi:%d",ord[i]);
-	break;
+        break;
 
       default: break;
     }
@@ -955,7 +955,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         int sockfd, portno, n;
         struct sockaddr_in serv_addr;
         struct hostent *server;
-  
+
         sscanf(l->name,"%255[^:]:%d",host,&portno);
         //Print("connect to host %s, port %d\n",host,portno);mflush();
         if (portno!=0)
@@ -978,7 +978,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->f_write=fdopen(sockfd,"w");
           d->fd_write=sockfd;
           SI_LINK_SET_RW_OPEN_P(l);
-	  d->send_quit_at_exit=1;
+          d->send_quit_at_exit=1;
           omFree(host);
         }
         else
@@ -994,7 +994,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         // normal link to a file
         FILE *outfile;
         char *filename=l->name;
-  
+
         if(filename[0]=='>')
         {
           if (filename[1]=='>')
@@ -1064,7 +1064,7 @@ BOOLEAN ssiClose(si_link l)
           }
         }
         if (d->send_quit_at_exit)
-        {  
+        {
           fputs("99\n",d->f_write);fflush(d->f_write);
         }
       }
@@ -1406,7 +1406,6 @@ int slStatusSsiL(lists L, int timeout)
   FD_ZERO(&fdmask);
   FD_ZERO(&mask);
   int max_fd=0; /* 1 + max fd in fd_set */
-  int already_ready=0;
 
   /* timeout */
   #ifdef HAVE_PSELECT
@@ -1452,6 +1451,7 @@ int slStatusSsiL(lists L, int timeout)
   char fdmaskempty;
 
   /* check the links and fill in fdmask */
+  /* check ssi links for ungetc_buf */
   for(i=L->nr; i>=0; i--)
   {
     if (L->m[i].Typ()!=DEF_CMD)
@@ -1474,13 +1474,13 @@ int slStatusSsiL(lists L, int timeout)
       {
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
-	if (d->ungetc_buf=='\0')
-	{
-	  FD_SET(d_fd, &fdmask);
+        if (d->ungetc_buf=='\0')
+        {
+          FD_SET(d_fd, &fdmask);
           if (d_fd > max_fd) max_fd=d_fd;
-	}
-	else
-	  already_ready++;
+        }
+        else
+          return i+1;
       }
       else
       {
@@ -1497,6 +1497,8 @@ int slStatusSsiL(lists L, int timeout)
         FD_SET(d_fd, &fdmask);
         if (d_fd > max_fd) max_fd=d_fd;
       }
+      else
+        return i+1;
     #endif
     }
   }
@@ -1513,25 +1515,21 @@ do_select:
     }
   }
 
-  if (max_fd>1)
-  {
-    /* check with select: chars waiting: no -> not ready */
-    #ifdef HAVE_PSELECT
-    s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
-    #else
-    SSI_BLOCK_CHLD;
-    s = select(max_fd, &mask, NULL, NULL, wt_ptr);
-    SSI_UNBLOCK_CHLD;
-    #endif
-  }
-  else s=0;
+  /* check with select: chars waiting: no -> not ready */
+  #ifdef HAVE_PSELECT
+  s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
+  #else
+  SSI_BLOCK_CHLD;
+  s = select(max_fd, &mask, NULL, NULL, wt_ptr);
+  SSI_UNBLOCK_CHLD;
+  #endif
 
   if (s==-1)
   {
     WerrorS("error in select call");
     return -2; /*error*/
   }
-  if ((s==0)&&(already_ready==0))
+  if (s==0)
   {
     return 0; /*poll: not ready */
   }
@@ -1556,17 +1554,16 @@ do_select:
         {
           d=(ssiInfo*)l->data;
           d_fd=d->fd_read;
-          if((j==d_fd)||(d->ungetc_buf)) break;
+          if(j==d_fd) break;
         }
         #else
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
-        if((j==d_fd)||(d->ungetc_buf)) break;
+        if(j==d_fd) break;
         #endif
       }
     }
     // only ssi links:
-    if (d->ungetc_buf) return i+1;
     loop
     {
       /* yes: read 1 char*/
