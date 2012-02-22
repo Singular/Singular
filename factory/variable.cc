@@ -169,7 +169,7 @@ static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable alph
 
 Variable rootOf( const CanonicalForm & mipo, char name )
 {
-    ASSERT( legal_mipo( mipo ), "not a legal extension" );
+    //ASSERT( legal_mipo( mipo ), "not a legal extension" );
 
     int l;
     if ( var_names_ext == 0 ) {
