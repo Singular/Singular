@@ -1,19 +1,26 @@
+#define PLURAL_INTERNAL_DECLARATIONS
+
 #include "mod2.h"
 #include <misc/auxiliary.h>
 
 #include <misc/options.h>
 
 #include <polys/simpleideals.h>
-#include <kernel/polys.h>
-
 #include <polys/prCopy.h>
 
+#include <polys/nc/sca.h>
+#include <polys/nc/gb_hack.h>
+
+#include "polys.h"
 #include "ideals.h"
 #include "kstd1.h"
+#include "kutil.h"
 
 #include "nc.h"
 
-/*
+/// nc_gr_initBba is needed for sca_gr_bba and gr_bba.
+void nc_gr_initBba(ideal F, kStrategy strat); // from gr_kstd2.cc!
+
 void addLObject(LObject& h, kStrategy& strat)
 {
   if(h.IsNull()) return;
@@ -24,7 +31,7 @@ void addLObject(LObject& h, kStrategy& strat)
   // add h into S and L
   int pos=posInS(strat, strat->sl, h.p, h.ecart);
 
-  if ( (pos <= strat->sl) && (pComparePolys(h.p, strat->S[pos])) )
+  if ( (pos <= strat->sl) && (p_ComparePolys(h.p, strat->S[pos], currRing)) )
   {
     if (TEST_OPT_PROT)
       PrintS("d\n");
@@ -87,11 +94,14 @@ void addLObject(LObject& h, kStrategy& strat)
 
 }
 
-*/
 
 ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
-/*
+  const ring save = currRing;
+  if( currRing != _currRing ) rChangeCurrRing(_currRing);
+  assume( currRing == _currRing );
+
+  
 #if MYTEST
    PrintS("<sca_gr_bba>\n");
 #endif
@@ -185,8 +195,8 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
-    && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+    && (strat->L[strat->Ll].ecart+ currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+       || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       // stops computation if
       // 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
@@ -320,16 +330,15 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   // release temp data--------------------------------
   exitBuchMora(strat);
 
-  if (TEST_OPT_WEIGHTM)
-  {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(int));
-      ecartWeights=NULL;
-    }
-  }
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    pRestoreDegProcs(currRing,pFDegOld, pLDegOld);
+//     if (ecartWeights)
+//     {
+//       omFreeSize((ADDRESS)ecartWeights,(rVar(currRing)+1)*sizeof(int));
+//       ecartWeights=NULL;
+//     }
+//  }
 
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 
@@ -352,8 +361,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //   PrintS("</sca_gr_bba>\n");
 #endif
 
+  if( currRing != save )     rChangeCurrRing(save);
+  
   return (strat->Shdl);
-*/
 }
 
 
@@ -363,9 +373,12 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Under development!!!
-ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*hilb*/, kStrategy strat)
+ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*hilb*/, kStrategy strat, const ring _currRing)
 {
-/*
+  const ring save = currRing;
+  if( currRing != _currRing ) rChangeCurrRing(_currRing);
+  assume( currRing == _currRing );
+
 #if MYTEST
   PrintS("\n\n<sca_bba>\n\n");
 #endif
@@ -546,8 +559,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     if (strat->Ll== 0) strat->interpt=TRUE;
 
     if (TEST_OPT_DEGBOUND
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
 
 #ifdef KDEBUG
@@ -559,8 +572,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       // *a predefined number Kstd1_deg
       while ((strat->Ll >= 0)
         && ( (strat->homog==isHomog) || strat->L[strat->Ll].is_special || ((strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)) )
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
             )
       {
 #ifdef KDEBUG
@@ -812,15 +825,15 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   id_Delete(&tempF, currRing);
 
-  if (TEST_OPT_WEIGHTM)
-  {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    pRestoreDegProcs(currRing, pFDegOld, pLDegOld);
+//     if (ecartWeights)
+//     {
+//       omFreeSize((ADDRESS)ecartWeights,(rVar(currRing)+1)*sizeof(short));
+//       ecartWeights=NULL;
+//     }
+//  }
 
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 
@@ -843,14 +856,14 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   PrintS("\n\n</sca_bba>\n\n");
 #endif
 
+  if( currRing != save )     rChangeCurrRing(save);
+  
   return (strat->Shdl);
-*/
 }
 
 // //////////////////////////////////////////////////////////////////////////////
 // sca mora...
 
-/*
 // returns TRUE if mora should use buckets, false otherwise
 static BOOLEAN kMoraUseBucket(kStrategy strat)
 {
@@ -876,7 +889,6 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
 #endif
   return FALSE;
 }
-*/
 
 #ifdef HAVE_ASSUME
 static int sca_mora_count = 0;
@@ -886,7 +898,10 @@ static int sca_mora_loop_count;
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
 ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat, const ring _currRing)
 {
-/*
+  const ring save = currRing;
+  if( currRing != _currRing ) rChangeCurrRing(_currRing);
+  assume( currRing == _currRing );
+
   assume(rIsSCA(currRing));
 
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
@@ -1196,7 +1211,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   if (TEST_OPT_FINDET)
   {
     if (strat->kHEdge!=NULL)
-      Kstd1_mu=pFDeg(strat->kHEdge,currRing);
+      Kstd1_mu=currRing->pFDeg(strat->kHEdge,currRing);
     else
       Kstd1_mu=-1;
   }
@@ -1204,27 +1219,24 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
-  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,(rVar(currRing)+1)*sizeof(BOOLEAN));
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
-  if (TEST_OPT_WEIGHTM)
-  {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    pRestoreDegProcs(currRing, pFDegOld, pLDegOld);
+//     if (ecartWeights)
+//     {
+//       omFreeSize((ADDRESS)ecartWeights,(rVar(currRing)+1)*sizeof(short));
+//       ecartWeights=NULL;
+//     }
+//  }
   if (tempQ!=NULL) updateResult(strat->Shdl,tempQ,strat);
   idTest(strat->Shdl);
 
   id_Delete( &tempF, currRing);
 
+  if( currRing != save )     rChangeCurrRing(save);
+  
   return (strat->Shdl);
-*/
 }
-
-
-
-
 

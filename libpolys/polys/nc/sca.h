@@ -55,10 +55,6 @@ static inline void scaLastAltVar(ring r, int n)
 // return x_i * pPoly; preserve pPoly.
 poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing);
 
-// set pProcs for r and the variable p_Procs
-// should be used by nc_p_ProcsSet in "gring.h"
-void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 // TODO: correct the following descriptions...
@@ -155,6 +151,10 @@ bool sca_Force(ring rGR, int b, int e);
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 
+// set pProcs for r and the variable p_Procs
+// should be used by nc_p_ProcsSet in "gring.h"
+void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
+
 // should be used only inside nc_SetupQuotient!
 // Check whether this our case:
 //  1. rG is  a commutative polynomial ring \otimes anticommutative algebra
@@ -178,5 +178,6 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy);
 // these must not be used at all.
 // #define scaFirstAltVar(R) 0
 // #define scaLastAltVar(R) 0
-#endif
+#endif // HAVE_PLURAL
+
 #endif // #ifndef SCA_H

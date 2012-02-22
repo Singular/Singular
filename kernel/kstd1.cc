@@ -2142,6 +2142,14 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   return res;
 }
 
+poly kNF (ideal F, ideal Q, poly p,int syzComp, int lazyReduce, const ring _currRing)
+{
+  const ring save = currRing; if( currRing != _currRing ) rChangeCurrRing(_currRing);
+  poly ret = kNF(F, Q, p, syzComp, lazyReduce);
+  if( currRing != save )     rChangeCurrRing(save);
+  return ret;
+}
+
 /*2
 *interreduces F
 */

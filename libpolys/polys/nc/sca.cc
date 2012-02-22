@@ -29,6 +29,7 @@
 
 #include <polys/nc/sca.h>
 #include <polys/nc/nc.h>
+#include <polys/nc/gb_hack.h>
 // #include <polys/gring.h>
 
 
@@ -1045,7 +1046,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
         if( !n_IsMOne(c, rBase) )
         {
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
-           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+          Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
@@ -1054,7 +1055,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
         if( !n_IsOne(c, rBase) )
         {
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
-           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+          Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
@@ -1108,37 +1109,23 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
   for ( int i = iAltVarStart; (i <= iAltVarEnd) && bSCA; i++ )
     if( (i < b) || (i > e) ) // otherwise it's ok since rG is an SCA!
-  {
-    poly square = p_One( rG);
-    p_SetExp(square, i, 2, rG); // square = var(i)^2.
-    p_Setm(square, rG);
-
-    // square = NF( var(i)^2 | Q )
-    // NOTE: rSaveRing == currRing now!
-    // NOTE: there is no better way to check this in general!
-    // 
-//////    TODO!!!!!
-//////    extern poly kNF(ideal I, ideal Q, poly f, int a, int b, const ring r);
-//////    square = kNF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
-
-    if( square != NULL ) // var(i)^2 is not in Q?
     {
-      p_Delete(&square, rG);
-      bSCA = false;
-      break;
+      poly square = p_One( rG);
+      p_SetExp(square, i, 2, rG); // square = var(i)^2.
+      p_Setm(square, rG);
+
+      // square = NF( var(i)^2 | Q )
+      // NOTE: there is no better way to check this in general!
+      square = kNF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
+
+      if( square != NULL ) // var(i)^2 is not in Q?
+      {
+        p_Delete(&square, rG);
+        bSCA = false;
+        break;
+      }
     }
-  }
-
-//  assureCurrentRing(rSaveRing);
-
-  if(!bSCA)
-  {
-    WarnS("sca_SetupQuotient: Sorry can not use NF: unfixed implementational issue :(");
-    return false;
-  }
-   
-
-
+  
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   Print("ScaVars!: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
@@ -1286,6 +1273,12 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 //         r->GetNC()->BucketPolyRed() = gnc_kBucketPolyRed;
 //         r->GetNC()->BucketPolyRed_Z()= gnc_kBucketPolyRed_Z;
 #endif
+
+  // local ordering => Mora, otherwise - Buchberger!        
+  if (rHasLocalOrMixedOrdering(rGR))
+    rGR->GetNC()->p_Procs.GB          = cast_A_to_vptr(sca_mora);
+  else
+    rGR->GetNC()->p_Procs.GB          = cast_A_to_vptr(sca_bba); // sca_gr_bba?
 }
 
 

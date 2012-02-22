@@ -43,10 +43,19 @@ static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const i
   // Therefore this is a TODO for a future (large-scale) cleanup.
   if( gb == NULL)
   {
+    if( rIsSCA(r) )
+    {
+      if (rHasLocalOrMixedOrdering(r))
+        gb = sca_mora;
+      else
+        gb = sca_bba; // sca_gr_bba???
+    } else
+    {
       if (rHasLocalOrMixedOrdering(r))
         gb = gnc_gr_mora;
       else
         gb = gnc_gr_bba;
+    }
     
     r->GetNC()->p_Procs.GB = cast_A_to_vptr(gb);
   }

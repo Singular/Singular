@@ -29,10 +29,10 @@ INCLUDES = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_bu
 
 SOURCES = polys.cc febase.cc feread.cc \
     hdegree.cc hilb.cc hutil.cc \
-    gr_kstd2.cc \
     ideals.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
+    nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
     fast_maps.cc \
     fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
@@ -45,7 +45,7 @@ SOURCES = polys.cc febase.cc feread.cc \
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
     ratgring.cc shiftgb.cc gfan.cc \
-    linearAlgebra.cc nc.cc preimage.cc \
+    linearAlgebra.cc preimage.cc \
     mod2.h 
 
 libkernel_la_SOURCES   = $(SOURCES)
