@@ -71,8 +71,8 @@ poly nc_p_CopyPut(poly a, const ring r);
 
 poly nc_p_Bracket_qq(poly p, const poly q, const ring r);
 
-int  iNCExtensions = 0; // SCAMASK; // only SCA can be used by default
-
+// only SCA can be used by default, formulas are off by default
+int  iNCExtensions = SCAMASK | NOFORMULAMASK; 
 
 int& getNCExtensions()
 {
@@ -86,27 +86,10 @@ int setNCExtensions(int iMask)
   return (iOld);
 }
 
-
 bool ncExtensions(int iMask) //  = 0x0FFFF
 {
   return ((getNCExtensions() & iMask) == iMask);
 }
-
-
-
-
-static const bool bNoPluralMultiplication = false;  // use only formula shortcuts in my OOP Multiplier
-
-// the following make sense only if bNoPluralMultiplication is false:
-static const bool bNoFormula = true;  // don't use any formula shortcuts
-static const bool bNoCache   = false; // only formula whenever possible, only make sanse if bNoFormula is false!
-
-
-// false, true, false == old "good" Plural
-// false, false ==>> Plural + Cache + Direct Formula - not much
-// false, false, true ==>> Plural Mult + Direct Formula (no ~cache)
-// true, *, *  == new OOP multiplication!
-
 
 /* global nc_macros : */
 
@@ -1070,7 +1053,7 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 
 static inline poly gnc_uu_Mult_ww_formula (int i, int a, int j, int b, const ring r)
 {
-  if(bNoFormula)
+  if(ncExtensions(NOFORMULAMASK))
     return gnc_uu_Mult_ww_vert(i, a, j, b, r);
 
   CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
@@ -1139,7 +1122,7 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   p_Delete(&out,r);
 
 
-  if(bNoCache && !bNoFormula) // don't use cache whenever possible!
+  if(ncExtensions(NOCACHEMASK) && !ncExtensions(NOFORMULAMASK)) // don't use cache whenever possible!
   { // without cache!?
     CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
     Enum_ncSAType PairType = _ncSA_notImplemented;
@@ -3270,10 +3253,10 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
     sca_p_ProcsSet(rGR, p_Procs);
   }
 
-  if( bNoPluralMultiplication )
+  if( ncExtensions(NOPLURALMASK) )
     ncInitSpecialPairMultiplication(rGR);
 
-  if(!rIsSCA(rGR) && !bNoFormula)
+  if(!rIsSCA(rGR) && !ncExtensions(NOFORMULAMASK))
     ncInitSpecialPowersMultiplication(rGR);
 
 }

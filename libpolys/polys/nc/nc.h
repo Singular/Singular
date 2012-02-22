@@ -351,9 +351,28 @@ poly p_Lcm(const poly a, const poly b, const ring r);
 
 
 
-// const int GRMASK = 1 << 1;
-const int SCAMASK = 1; // For backward compatibility
-const int TESTSYZSCAMASK = 0x0100 | SCAMASK; //
+const int GENERICMASK = 0x000; // gnc... must do its dirty job first!
+const int SCAMASK     = 0x001; 
+
+#if 0
+static const bool bNoPluralMultiplication = false;  // use only formula shortcuts in my OOP Multiplier
+// the following make sense only if bNoPluralMultiplication is false:
+static const bool bNoFormula = true;  // don't use any formula shortcuts
+static const bool bNoCache   = false; // only formula whenever possible, only make sanse if bNoFormula is false!
+#endif
+
+// false, true, false == old "good" Plural
+// false, false ==>> Plural + Cache + Direct Formula - not much
+// false, false, true ==>> Plural Mult + Direct Formula (no ~cache)
+// true, *, *  == new OOP multiplication!
+
+const int NOPLURALMASK= 0x002; // bNoPluralMultiplication
+const int NOFORMULAMASK=0x004; // bNoFormula
+const int NOCACHEMASK = 0x008; // bNoCache
+
+const int TESTSYZSCAMASK = 0x0100 | SCAMASK;
+
+
 
 // NCExtensions Mask Property 
 int& getNCExtensions();
