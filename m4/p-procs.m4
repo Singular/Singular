@@ -76,6 +76,7 @@ fi
 
 if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
   AC_DEFINE(HAVE_DL,1,enable dynamic modules)
+  AC_DEFINE(HAVE_DYNAMIC_LOADING,1,enable dynamic modules)
 fi
 
 AC_SUBST(USEPPROCSDYNAMICLDFLAGS)
