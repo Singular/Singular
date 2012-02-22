@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: ring.cc 14541 2012-01-26 19:00:07Z motsak $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3297,6 +3297,7 @@ static void rOptimizeLDeg(ring r)
     if (r->pLDeg == pLDeg1c)
       r->pLDeg = pLDeg1c_WFirstTotalDegree;
   }
+  r->pLDegOrig = r->pLDeg;
 }
 
 // set pFDeg, pLDeg, MixOrder, ComponentOrder, etc
@@ -3420,8 +3421,7 @@ static void rSetDegStuff(ring r)
     r->pFDeg = pDeg;
 
   r->pFDegOrig = r->pFDeg;
-  r->pLDegOrig = r->pLDeg;
-  rOptimizeLDeg(r);
+  rOptimizeLDeg(r); // also sets r->pLDegOrig
 }
 
 /*2
