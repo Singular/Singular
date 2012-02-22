@@ -23,9 +23,8 @@
 #include "facBivar.h"
 
 #ifdef HAVE_NTL
-TIMING_DEFINE_PRINT(fac_uni_factorizer)
-TIMING_DEFINE_PRINT(fac_hensel_lift)
-TIMING_DEFINE_PRINT(fac_factor_recombination)
+TIMING_DEFINE_PRINT(uni_factorize)
+TIMING_DEFINE_PRINT(hensel_lift12)
 
 CFList conv (const CFFList& L)
 {
@@ -223,23 +222,23 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
 
     // univariate factorization
-    TIMING_START (fac_uni_factorizer);
+    TIMING_START (uni_factorize);
 
     if (extension)
       bufUniFactors= conv (factorize (bufAeval, v));
     else
       bufUniFactors= conv (factorize (bufAeval, true));
-    TIMING_END_AND_PRINT (fac_uni_factorizer,
+    TIMING_END_AND_PRINT (uni_factorize,
                           "time for univariate factorization: ");
     DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
 
-    TIMING_START (fac_uni_factorizer);
+    TIMING_START (uni_factorize);
     if (extension)
       bufUniFactors2= conv (factorize (bufAeval2, v));
     else
       bufUniFactors2= conv (factorize (bufAeval2, true));
-    TIMING_END_AND_PRINT (fac_uni_factorizer,
+    TIMING_END_AND_PRINT (uni_factorize,
                           "time for univariate factorization in y: ");
     DEBOUTLN (cerr, "Lc (Aeval2)*prod (uniFactors2)== Aeval2 " <<
               (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
@@ -368,11 +367,11 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   ExtensionInfo dummy= ExtensionInfo (false);
   bool earlySuccess= false;
   CFList earlyFactors;
-  TIMING_START (fac_hensel_lift);
+  TIMING_START (hensel_lift12);
   uniFactors= henselLiftAndEarly 
              (A, earlySuccess, earlyFactors, degs, liftBound,
               uniFactors, dummy, evaluation);
-  TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+  TIMING_END_AND_PRINT (hensel_lift12, "time for hensel lifting: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
   CanonicalForm MODl= power (y, liftBound);

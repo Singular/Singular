@@ -39,8 +39,7 @@
 #include "NTLconvert.h"
 
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
-TIMING_DEFINE_PRINT(fac_hensel_lift)
-TIMING_DEFINE_PRINT(fac_factor_recombination)
+TIMING_DEFINE_PRINT(fac_hensel_lift12)
 
 CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
 {
@@ -5753,11 +5752,11 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   {
     bool earlySuccess= false;
     CFList earlyFactors;
-    TIMING_START (fac_hensel_lift);
+    TIMING_START (fac_hensel_lift12);
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);
@@ -5776,7 +5775,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
   else if (degree (A) > 4 && beta.level() == 1 && (2*minBound)/degMipo < 32)
   {
-    TIMING_START (fac_hensel_lift);
+    TIMING_START (fac_hensel_lift12);
     if (extension)
     {
       CFList lll= extHenselLiftAndLatticeRecombi (A, uniFactors, info, degs,
@@ -5794,18 +5793,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
     }
-    TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
   }
   else
   {
     bool earlySuccess= false;
     CFList earlyFactors;
-    TIMING_START (fac_hensel_lift);
+    TIMING_START (fac_hensel_lift12);
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);

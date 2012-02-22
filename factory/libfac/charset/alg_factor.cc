@@ -27,8 +27,6 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 #endif
 
 #include <libfac/factor/debug.h>
-#include "timing.h"
-TIMING_DEFINE_PRINT(newfactoras_time)
 
 static Varlist
 Var_is_in_AS(const Varlist & uord, const CFList & Astar);
