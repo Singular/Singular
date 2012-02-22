@@ -1,5 +1,6 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 
+#include "config.h"
 #include "mod2.h"
 #include <misc/auxiliary.h>
 

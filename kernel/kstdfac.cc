@@ -6,6 +6,7 @@
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>

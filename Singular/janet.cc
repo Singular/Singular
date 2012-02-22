@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 

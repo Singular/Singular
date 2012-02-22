@@ -1,3 +1,4 @@
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/kutil.h>
 #include <Singular/lists.h>

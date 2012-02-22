@@ -59,6 +59,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <kernel/polys.h>
 
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #include <kernel/structs.h>

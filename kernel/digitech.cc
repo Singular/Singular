@@ -2,6 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
+#include "config.h"
 #include <kernel/mod2.h>
 #include <polys/monomials/ring.h>
 

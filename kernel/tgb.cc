@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <queue>
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/tgb.h>
 #include <kernel/tgb_internal.h>

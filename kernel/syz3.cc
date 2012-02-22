@@ -6,6 +6,7 @@
 * ABSTRACT: resolutions
 */
  
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/mylimits.h>
 #include <misc/options.h>

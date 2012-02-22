@@ -6,6 +6,7 @@
 * ABSTRACT: Gauss-Manin system normal form
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_GMS

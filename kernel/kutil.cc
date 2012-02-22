@@ -10,6 +10,7 @@
 #define KUTIL_CC
 #include <stdlib.h>
 #include <string.h>
+#include "config.h"
 #include "mod2.h"
 
 #ifndef NDEBUG

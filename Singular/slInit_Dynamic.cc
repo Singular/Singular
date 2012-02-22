@@ -14,6 +14,7 @@
  * MP link Extension inits
  *
  ***************************************************************/
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/silink.h>
 #include <Singular/slInit.h>

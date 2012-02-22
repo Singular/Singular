@@ -1,3 +1,6 @@
+#include "config.h"
+#include <kernel/mod2.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

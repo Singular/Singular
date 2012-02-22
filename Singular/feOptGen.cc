@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #define FE_OPT_STRUCTURE

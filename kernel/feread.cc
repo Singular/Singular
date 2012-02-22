@@ -6,6 +6,7 @@
 * ABSTRACT: input from ttys, simulating fgets
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 // ----------------------------------------

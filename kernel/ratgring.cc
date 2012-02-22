@@ -8,6 +8,7 @@
  *  Created: 8/00 - 11/00
  *  Version: $Id$
  *******************************************************************/
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/ratgring.h>
 #ifdef HAVE_RATGRING

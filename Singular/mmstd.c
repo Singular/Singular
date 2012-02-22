@@ -7,6 +7,7 @@
 * i.e. (malloc/realloc/free)
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>

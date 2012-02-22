@@ -7,6 +7,7 @@
 * ABSTRACT - instantiation of all templates
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 //#include <vector>
 //using namespace std;

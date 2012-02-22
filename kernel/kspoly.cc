@@ -7,6 +7,7 @@
 */
 
 // #define PDEBUG 2
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <kernel/kutil.h>

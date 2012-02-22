@@ -7,6 +7,7 @@
 */
 
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>

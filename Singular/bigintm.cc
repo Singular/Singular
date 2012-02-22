@@ -3,6 +3,7 @@
 //
 #if 0
 //
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>

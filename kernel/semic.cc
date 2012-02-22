@@ -7,6 +7,7 @@
 
 #define SEMIC_CC
 
+#include "config.h"
 #include "mod2.h"
 
 #ifdef HAVE_SPECTRUM

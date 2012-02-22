@@ -18,6 +18,7 @@
  * o FindUnivariatePolys added
  */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 

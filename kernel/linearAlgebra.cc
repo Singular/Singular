@@ -16,6 +16,7 @@
 /*****************************************************************************/
 
 // include header files
+#include "config.h"
 #include "mod2.h"
 
 #include <coeffs/coeffs.h>

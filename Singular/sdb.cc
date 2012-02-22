@@ -8,6 +8,7 @@
 
 #include <unistd.h>   // for unlink,fork,execlp,getpid
 #include <sys/wait.h> // for wait
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>

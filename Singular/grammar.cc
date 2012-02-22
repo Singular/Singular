@@ -319,6 +319,7 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/mylimits.h>
 #include <omalloc/omalloc.h>

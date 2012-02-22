@@ -8,6 +8,7 @@
 
 #define HAVE_WALK 1
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 

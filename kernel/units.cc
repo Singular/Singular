@@ -6,6 +6,7 @@
 * ABSTRACT: procedures to compute with units
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>

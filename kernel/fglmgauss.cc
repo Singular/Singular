@@ -9,6 +9,7 @@
 *  to find linear dependecies of fglmVectors.
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef  HAVE_FACTORY

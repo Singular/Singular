@@ -6,6 +6,7 @@
 * ABSTRACT: automatic type conversions
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

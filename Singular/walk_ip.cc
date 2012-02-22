@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>

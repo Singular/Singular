@@ -6,6 +6,7 @@
 *  ABSTRACT -  Hilbert series
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>

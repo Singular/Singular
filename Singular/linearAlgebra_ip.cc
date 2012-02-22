@@ -1,3 +1,4 @@
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/lists.h>
 #include <kernel/linearAlgebra.h>

@@ -6,6 +6,7 @@ $Header: /usr/local/Singular/cvsroot/kernel/gfan.cc,v 1.103 2009/11/03 06:57:32 
 $Id$
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_FANS

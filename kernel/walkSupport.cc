@@ -1,4 +1,5 @@
 #include <string.h>
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/intvec.h>
 #include <misc/int64vec.h>

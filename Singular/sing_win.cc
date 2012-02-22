@@ -7,6 +7,7 @@
 * ABSTRACT: Windows specific routines
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #ifdef ix86_Win
 #include <windows.h>

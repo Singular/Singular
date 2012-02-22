@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>

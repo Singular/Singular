@@ -10,6 +10,7 @@
 */
 
 
+#include "config.h"
 #include <kernel/mod2.h>
 #if 0
 #include <factoryconf.h>

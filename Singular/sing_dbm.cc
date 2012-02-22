@@ -16,6 +16,7 @@
 #  include <fcntl.h>
 #  include <errno.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_DBM

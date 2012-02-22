@@ -6,6 +6,7 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 

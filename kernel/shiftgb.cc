@@ -6,6 +6,7 @@
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_SHIFTBBA

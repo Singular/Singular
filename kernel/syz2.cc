@@ -6,6 +6,7 @@
 * ABSTRACT: resolutions
 */
 
+#include "config.h"
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>

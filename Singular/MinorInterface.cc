@@ -7,6 +7,7 @@
 #include <kernel/polys.h>
 #include <kernel/structs.h>
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>

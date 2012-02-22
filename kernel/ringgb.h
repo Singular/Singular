@@ -7,7 +7,7 @@
 */
 #ifndef RINGGB_HEADER
 #define RINGGB_HEADER
-#include <kernel/mod2.h>
+// #include <kernel/mod2.h>
 
 #ifdef HAVE_RINGS
 #include <kernel/polys.h>

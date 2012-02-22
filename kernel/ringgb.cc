@@ -8,6 +8,7 @@
 //#define HAVE_TAIL_RING
 #define NO_BUCKETS
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/kutil.h>
 #include <kernel/structs.h>

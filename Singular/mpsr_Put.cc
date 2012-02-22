@@ -14,6 +14,7 @@
  *    Updated putting routines to MP and MPP v1.1
  *
  ***************************************************************/
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_MPSR

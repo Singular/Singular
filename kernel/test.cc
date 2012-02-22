@@ -1,3 +1,4 @@
+#include "config.h"
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>
@@ -67,7 +68,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <coeffs/numbers.h>
 
-#include "mod2.h"
 #include "structs.h"
 
 

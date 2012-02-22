@@ -5,6 +5,7 @@
 /*
 * ABSTRACT: gauss implementation for F4
 */
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <kernel/tgbgauss.h>

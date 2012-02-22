@@ -3,6 +3,7 @@
 ****************************************/
 /* $Id$ */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #ifdef HAVE_FACTORY

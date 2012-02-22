@@ -6,6 +6,7 @@
 * ABSTRACT: conversion between polys and coef vectors
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_PCV

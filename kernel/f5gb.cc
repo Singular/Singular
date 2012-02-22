@@ -5,6 +5,7 @@
 * ABSTRACT: f5gb interface
 */
 
+#include "config.h"
 #include <kernel/mod2.h>
 #ifdef HAVE_F5
 #include <unistd.h>

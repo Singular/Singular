@@ -7,6 +7,7 @@
  *
 */
 #include <string.h>
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/options.h>
 #include <misc/intvec.h>

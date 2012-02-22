@@ -46,6 +46,7 @@
 #include <sys/types.h>
 
 
+#include "config.h"
 #include <kernel/mod2.h>
 #include <misc/intvec.h>
 #include <Singular/cntrlc.h>

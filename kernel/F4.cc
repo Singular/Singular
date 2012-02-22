@@ -1,3 +1,4 @@
+#include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/F4.h>
 #include <kernel/tgb_internal.h>

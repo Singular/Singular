@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: gauss implementation for F4 header
 */
-#include <kernel/mod2.h>
+// #include <kernel/mod2.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/p_polys.h>
 //#include "tgb_internal.h"

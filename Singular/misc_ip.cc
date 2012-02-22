@@ -14,6 +14,7 @@
 
 // include header files
 #include <misc/auxiliary.h>
+#include "config.h"
 #include <kernel/mod2.h>
 
 #ifdef HAVE_FACTORY
