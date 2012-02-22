@@ -1,14 +1,20 @@
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+#include <coeffs/coeffs.h>
 #include <kernel/longrat.h>
+
+#include <kernel/febase.h>
 
 #include <Singular/ipid.h>
 #include <Singular/subexpr.h>
 #include <Singular/tok.h>
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
+
+#include <Singular/ipid.h> 
+// extern coeffs coeffs_BIGINT
+
 
 #include "bigintm.h"
 
@@ -28,12 +34,12 @@ static char * bigintm_String(blackbox *b, void *d)
    else
    {
      StringSetS("");
-     number n=(number)d; nlWrite(n,NULL); d=(void*)n;
+     number n=(number)d; n_Write(n, coeffs_BIGINT); d=(void*)n;
      return omStrDup(StringAppendS(""));
     }
 }
 static void * bigintm_Copy(blackbox*b, void *d)
-{  number n=(number)d; return nlCopy(n); }
+{  number n=(number)d; return n_Copy(n, coeffs_BIGINT); }
 
 static BOOLEAN bigintm_Assign(leftv l, leftv r)
 {
@@ -47,7 +53,7 @@ static BOOLEAN bigintm_Assign(leftv l, leftv r)
     {
       blackbox *rr=getBlackboxStuff(r->Typ());
       
-      if (l->Data()!=NULL) { number n1=(number)l->Data(); nlDelete(&n1,NULL); }
+      if (l->Data()!=NULL) { number n1=(number)l->Data(); n_Delete(&n1,coeffs_BIGINT); }
       number n2=(number)r->CopyD();
       if (l->rtyp==IDHDL)
       {
@@ -69,8 +75,8 @@ static BOOLEAN bigintm_Assign(leftv l, leftv r)
   }
   else if (r->Typ()==INT_CMD)
   {
-    if (l->Data()!=NULL) { number n1=(number)l->Data(); nlDelete(&n1,NULL); }
-    number n2=nlInit((int)(long)r->Data(),NULL);
+    if (l->Data()!=NULL) { number n1=(number)l->Data(); n_Delete(&n1,coeffs_BIGINT); }
+    number n2=n_Init((int)(long)r->Data(),coeffs_BIGINT);
     if (l->rtyp==IDHDL)
     {
       IDDATA((idhdl)l->data)=(char *)n2;
@@ -127,8 +133,8 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
     {
       if (a2->Typ()==INT_CMD)
       {
-        number n2=nlInit((int)(long)a2->Data(),NULL);
-        number n=nlAdd(n1,n2);
+        number n2=n_Init((int)(long)a2->Data(), coeffs_BIGINT);
+        number n=n_Add(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
@@ -136,7 +142,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       else if (a2->Typ()==a1->Typ())
       {
         number n2=(number)a2->Data(); 
-        number n=nlAdd(n1,n2);
+        number n=n_Add(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
@@ -150,8 +156,8 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
     {
       if (a2->Typ()==INT_CMD)
       {
-        number n2=nlInit((int)(long)a2->Data(),NULL);
-        number n=nlSub(n1,n2);
+        number n2=n_Init((int)(long)a2->Data(),coeffs_BIGINT);
+        number n=n_Sub(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
@@ -159,7 +165,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       else if (a2->Typ()==a1->Typ())
       {
         number n2=(number)a2->Data(); 
-        number n=nlSub(n1,n2);
+        number n=n_Sub(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
@@ -175,8 +181,8 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
     {
       if (a2->Typ()==INT_CMD)
       {
-        number n2=nlInit((int)(long)a2->Data(),NULL);
-        number n=nlMult(n1,n2);
+        number n2=n_Init((int)(long)a2->Data(), coeffs_BIGINT);
+        number n=n_Mult(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
@@ -184,7 +190,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       else if (a2->Typ()==a1->Typ())
       {
         number n2=(number)a2->Data(); 
-        number n=nlMult(n1,n2);
+        number n=n_Mult(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
@@ -211,15 +217,15 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       } else
       if (a2->Typ()==INT_CMD)
       {
-        number n2=nlInit((int)(long)a2->Data(),NULL);
-        res->data=(void *) nlEqual(n1,n2);
+        number n2=n_Init((int)(long)a2->Data(), coeffs_BIGINT);
+        res->data=(void *) n_Equal(n1,n2, coeffs_BIGINT);
         res->rtyp= INT_CMD;
         return FALSE;
       }
       else if (a2->Typ()==a1->Typ())
       {
         number n2=(number)a2->Data(); 
-        res->data=(void *) nlEqual(n1,n2);
+        res->data=(void *) n_Equal(n1,n2, coeffs_BIGINT);
         res->rtyp= INT_CMD;
         return FALSE;
       }
@@ -285,7 +291,7 @@ static void bigintm_destroy(blackbox *b, void *d)
   if (d!=NULL)
   {
     number n=(number)d;
-    nlDelete(&n,NULL);
+    n_Delete(&n, coeffs_BIGINT);
   }
 }
 
