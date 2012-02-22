@@ -22,7 +22,7 @@
 #include <misc/auxiliary.h>
 
 #ifndef NDEBUG
-#define OUTPUT 1
+#define OUTPUT MYTEST
 #else
 #define OUTPUT 0
 #endif

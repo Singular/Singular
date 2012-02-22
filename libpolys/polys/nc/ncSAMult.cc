@@ -25,7 +25,7 @@
 
 
 #ifndef NDEBUG
-#define OUTPUT 1
+#define OUTPUT MYTEST
 #else
 #define OUTPUT 0
 #endif
@@ -247,8 +247,7 @@ static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   PrintLn();
 #endif
 
-  if( p_Procs == NULL )
-    p_Procs = rGR->p_Procs;
+  assume( p_Procs != NULL );
   
   // "commutative"
   p_Procs->p_Mult_mm  = rGR->p_Procs->p_Mult_mm  = ggnc_p_Mult_mm;
@@ -264,27 +263,30 @@ static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
 }
 
-bool ncInitSpecialPairMultiplication(ring r)
+BOOLEAN ncInitSpecialPairMultiplication(ring r)
 {
 #if OUTPUT  
   PrintS("ncInitSpecialPairMultiplication(ring), ring: \n");
-  rWrite(r);
+  rWrite(r, TRUE);
   PrintLn();
 #endif
   
-  assume(rIsPluralRing(r));
-  assume(!rIsSCA(r));
+  if(!rIsPluralRing(r));
+    return TRUE;
+  
+  if(rIsSCA(r))
+    return TRUE;
 
   if( r->GetNC()->GetGlobalMultiplier() != NULL )
   {
     WarnS("Already defined!");
-    return false;
+    return TRUE;
   }
 
   r->GetNC()->GetGlobalMultiplier() = new CGlobalMultiplier(r);
 
-  ggnc_p_ProcsSet(r, NULL);
-  return true;
+  ggnc_p_ProcsSet(r, r->p_Procs);
+  return FALSE; // ok!
 }
 
 
@@ -653,6 +655,42 @@ poly CWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRigh
   return CFormulaPowerMultiplier::ncSA_1xy0x0yG(GetI(), GetJ(), expRight, expLeft, m_g, r);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+CHWeylSpecialPairMultiplier::CHWeylSpecialPairMultiplier(ring r, int i, int j, int k):
+    CSpecialPairMultiplier(r, i, j), m_k(k)
+{
+#if OUTPUT  
+  Print("CHWeylSpecialPairMultiplier::CHWeylSpecialPairMultiplier(ring, i: %d, j: %d, k: %d)!", i, j, k);
+  PrintLn();
+#endif
+}
+
+
+CHWeylSpecialPairMultiplier::~CHWeylSpecialPairMultiplier()
+{
+#if OUTPUT  
+  PrintS("CHWeylSpecialPairMultiplier::~CHWeylSpecialPairMultiplier()");
+  PrintLn();
+#endif
+}
+
+// Exponent * Exponent
+poly CHWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
+{
+#if OUTPUT  
+  Print("CHWeylSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+  PrintLn();
+#endif
+  // Char == 0, otherwise - problem!
+
+
+  const ring r = GetBasering();
+
+  assume( expLeft*expRight > 0 );
+
+  return CFormulaPowerMultiplier::ncSA_1xy0x0yT2(GetI(), GetJ(), expRight, expLeft, m_k, r);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring r, int i, int j, int s, number c):
@@ -780,6 +818,9 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
 
   if( type == _ncSA_1xy0xBy0 ) // Shift 2
     return new CShiftSpecialPairMultiplier(r, i, j, j, g);
+
+  if( type == _ncSA_1xy0x0yT2 ) // simple homogenized Weyl algebra
+    return new CHWeylSpecialPairMultiplier(r, i, j, p_IsPurePower(d, r));
 
 }
 

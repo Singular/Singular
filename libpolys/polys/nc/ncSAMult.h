@@ -24,15 +24,15 @@
 // //////////////////////////////////////////////////////////////////////// //
 //
 
-bool ncInitSpecialPairMultiplication(ring r);
+BOOLEAN ncInitSpecialPairMultiplication(ring r);
 
 
 template <typename CExponent>
 class CMultiplier
 {
   protected:
-    ring m_basering;
-    int  m_NVars; // N = number of variables
+    const ring m_basering;
+    const int  m_NVars; // N = number of variables
 
   public:
     CMultiplier(ring rBaseRing): m_basering(rBaseRing), m_NVars(rBaseRing->N) {};
@@ -99,7 +99,7 @@ class CMultiplier
 class CSpecialPairMultiplier: public CMultiplier<int> 
 {
   private:
-    int m_i;
+    int m_i; // 2-gen subalgebra in these variables...
     int m_j;
 
 //    poly m_c_ij;
@@ -551,6 +551,21 @@ class CWeylSpecialPairMultiplier: public CSpecialPairMultiplier
   public:
     CWeylSpecialPairMultiplier(ring r, int i, int j, number g);
     virtual ~CWeylSpecialPairMultiplier();
+
+    // Exponent * Exponent
+    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
+
+//////////////////////////////////////////////////////////////////////////
+class CHWeylSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+  private:
+    const int m_k;
+    // TODO: make cache for some 'good' powers!?
+
+  public:
+    CHWeylSpecialPairMultiplier(ring r, int i, int j, int k);
+    virtual ~CHWeylSpecialPairMultiplier();
 
     // Exponent * Exponent
     virtual poly MultiplyEE(const int expLeft, const int expRight);    

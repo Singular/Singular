@@ -26,7 +26,7 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 
 #ifndef NDEBUG
-#define OUTPUT 1
+#define OUTPUT MYTEST
 #else
 #define OUTPUT 0
 #endif
@@ -51,7 +51,7 @@ bool ncInitSpecialPowersMultiplication(ring r)
 {
 #if OUTPUT  
   Print("ncInitSpecialPowersMultiplication(ring), ring: \n");
-  rWrite(r);
+  rWrite(r, TRUE);
   PrintLn();
 #endif
 
@@ -76,10 +76,65 @@ bool ncInitSpecialPowersMultiplication(ring r)
 
 
 
+
+
+// TODO: return q-coeff?
+static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number *qq*/)
+{
+#if OUTPUT  
+  Print("AreCommutingVariables(ring, k: %d, i: %d)!", j, i);
+  PrintLn();
+#endif
+
+  assume(i != j);
+
+  assume(i > 0);
+  assume(i <= r->N);
+
+
+  assume(j > 0);
+  assume(j <= r->N);
+
+  const BOOLEAN reverse = (i > j);
+
+  if (reverse) { int k = j; j = i; i = k; }
+
+  assume(i < j);
+
+  {
+    const poly d = GetD(r, i, j);
+
+#if OUTPUT  
+    Print("D_{%d, %d} = ", i, j); p_Write(d, r);
+#endif
+
+    if( d != NULL)
+      return FALSE;
+  }
+
+
+  {
+    const number q = p_GetCoeff(GetC(r, i, j), r);
+
+    if( !n_IsOne(q, r) ) 
+      return FALSE;
+  }
+
+  return TRUE; // [VAR(I), VAR(J)] = 0!!
+
+/*
+  if (reverse)
+    *qq = n_Invers(q, r);
+  else
+    *qq = n_Copy(q, r);
+  return TRUE;
+*/
+}
+
 static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
 {
 #if OUTPUT  
-  Print("AnalyzePair(ring, i: %d, j: %d)!", i, j);
+  Print("AnalyzePair(ring, i: %d, j: %d):", i, j);
   PrintLn();
 #endif
 
@@ -90,11 +145,12 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
   assume(j <= N);
 
 
-  const number q = p_GetCoeff(GetC(r, i, j), r);
+  const poly c = GetC(r, i, j);
+  const number q = p_GetCoeff(c, r);
   const poly d = GetD(r, i, j);
 
-#if OUTPUT  
-  Print("C_{%d, %d} = ", i, j);  { number t = n_Copy(q, r);  n_Write(t, r);  n_Delete(&t, r); };
+#if 0 && OUTPUT  
+  Print("C_{%d, %d} = ", i, j); p_Write(c, r); PrintLn();
   Print("D_{%d, %d} = ", i, j); p_Write(d, r);
 #endif
 
@@ -106,38 +162,57 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
     if( n_IsOne(q, r) ) // commutative
       return _ncSA_1xy0x0y0;
 
-    if( n_IsMOne(q, r) )
+    if( n_IsMOne(q, r) ) // anti-commutative
       return _ncSA_Mxy0x0y0;
 
-    return _ncSA_Qxy0x0y0;
+    return _ncSA_Qxy0x0y0; // quasi-commutative
   } else
   {
     if( n_IsOne(q, r) ) // "Lie" case
     {
-      if( pNext(d) == NULL ) // Our Main Special Case! 
+      if( pNext(d) == NULL ) // Our Main Special Case: d is only a term!
       {
 //         const number g = p_GetCoeff(d, r); // not used for now
-	 if( p_LmIsConstantComp(d, r) ) // Weyl
+        if( p_LmIsConstantComp(d, r) ) // Weyl
           return _ncSA_1xy0x0yG;
 
         const int k = p_IsPurePower(d, r); // k if not pure power
 
-        if( k > 0 )
-          if( p_GetExp(d, k, r) == 1 )
+        if( k > 0 ) // d = var(k)^??
+        {
+          const int exp = p_GetExp(d, k, r);
+          
+          if (exp == 1)
           {
-            if(k == i)
+            if(k == i) // 2 -ubalgebra in var(i) & var(j), with linear relation...?
               return _ncSA_1xyAx0y0;
 
             if(k == j)
               return _ncSA_1xy0xBy0;              
+          } else if ( exp == 2 && k!= i && k != j)  // Homogenized Weyl algebra [x, Dx] = t^2?
+          {
+//            number qi, qj;
+            if (AreCommutingVariables(r, k, i/*, &qi*/) && AreCommutingVariables(r, k, j/*, &qj*/) ) // [x, t] = [Dx, t] = 0?
+            {
+              const number g = p_GetCoeff(d, r);
+
+              if (n_IsOne(g, r)) 
+                return _ncSA_1xy0x0yT2; // save k!?, G = LC(d) == qi == qj == 1!!!
+            }
           }
+        }
       }
     }
+    // Hmm, what about a more general case of q != 1???
   }
+#if OUTPUT  
+  Print("C_{%d, %d} = ", i, j); p_Write(c, r);
+  Print("D_{%d, %d} = ", i, j); p_Write(d, r);
+  PrintS("====>>>>_ncSA_notImplemented\n");
+#endif
 
   return _ncSA_notImplemented;
 }
-
 
 
 CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring r): m_BaseRing(r), m_NVars(r->N)
@@ -370,6 +445,112 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
+static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const int m, const int m_k, const ring r)
+{
+#if OUTPUT  
+  Print("ncSA_1xy0x0yT2(var(%d)^{%d}, var(%d)^{%d}, t: var(%d), r)!", j, m, i, n, m_k);  
+  PrintLn();
+#endif
+
+  int kn = n;
+  int km = m;
+
+  // k == 0!
+  number c = n_Init(1, r);
+
+  poly p = p_One( r );
+
+  p_SetExp(p, j, km--, r); // y ^ (m)
+  p_SetExp(p, i, kn--, r); // x ^ (n)
+//  p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k) 
+
+  p_Setm(p, r); // pResult = x^n * y^m
+
+
+  poly pResult = p;
+  poly pLast = p;
+
+  int min = si_min(m, n);
+
+  int k = 1;
+
+  for(; k < min; k++ )
+  {
+    number t = n_Init(km + 1, r);
+//    n_InpMult(t, m_g, r); // t = ((m - k) + 1) * gamma
+    n_InpMult(c, t, r);   // c = c'* ((m - k) + 1) * gamma
+    n_Delete(&t, r);
+
+    t = n_Init(kn + 1, r);
+    n_InpMult(c, t, r);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
+    n_Delete(&t, r);
+
+    t = n_Init(k, r);
+    c = n_Div(c, t, r);
+    n_Delete(&t, r);
+
+// //    n_Normalize(c, r);
+
+    t = n_Copy(c, r); // not the last!
+
+    p = p_NSet(t, r);
+
+    p_SetExp(p, j, km--, r); // y ^ (m-k)
+    p_SetExp(p, i, kn--, r); // x ^ (n-k)
+
+    p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k) 
+    
+    p_Setm(p, r); // pResult = x^(n-k) * y^(m-k)
+
+    pNext(pLast) = p;
+    pLast = p;
+  }
+
+  assume(k == min);
+  assume((km == 0) || (kn == 0) );
+
+  {
+//    n_InpMult(c, m_g, r);   // c = c'* gamma
+
+    if( km > 0 )
+    {
+      number t = n_Init(km + 1, r);
+      n_InpMult(c, t, r);   // c = (c'* gamma) * (m - k + 1)
+      n_Delete(&t, r);
+    }
+
+    if( kn > 0 )
+    {
+      number t = n_Init(kn + 1, r);
+      n_InpMult(c, t, r);   // c = (c'* gamma) * (n - k + 1)
+      n_Delete(&t, r);
+    }
+
+    number t = n_Init(k, r); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
+    c = n_Div(c, t, r);
+    n_Delete(&t, r);
+  }
+
+  p = p_NSet(c, r);
+
+  p_SetExp(p, j, km, r); // y ^ (m-k)
+  p_SetExp(p, i, kn, r); // x ^ (n-k)
+
+  p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k) 
+
+  p_Setm(p, r); // 
+
+  pNext(pLast) = p;
+
+  CorrectPolyWRTOrdering(pResult, r);
+
+  return pResult;
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shiftCoef, const ring r)
 {
   // Char == 0, otherwise - problem!
@@ -500,11 +681,15 @@ static inline poly ncSA_Multiply( Enum_ncSAType type, const int i, const int j, 
     return ::ncSA_Qxy0x0y0(i, j, n, m, q, r);
   }
 
-  const number g = p_GetCoeff(GetD(r, i, j), r);
+  const poly d = GetD(r, i, j);
+  const number g = p_GetCoeff(d, r);
 
   if( type == _ncSA_1xy0x0yG ) // Weyl
     return ::ncSA_1xy0x0yG(i, j, n, m, g, r);
 
+  if( type == _ncSA_1xy0x0yT2 ) // Homogenous Weyl...
+    return ::ncSA_1xy0x0yT2(i, j, n, m, p_IsPurePower(d, r), r);
+  
   if( type == _ncSA_1xyAx0y0 ) // Shift 1
     return ::ncSA_1xyAx0y0(i, j, n, m, g, r);
 
@@ -554,6 +739,11 @@ poly CFormulaPowerMultiplier::ncSA_Qxy0x0y0(const int i, const int j, const int 
 poly CFormulaPowerMultiplier::ncSA_1xy0x0yG(const int i, const int j, const int n, const int m, const number m_g, const ring r)
 {
   return ::ncSA_1xy0x0yG(i, j, n, m, m_g, r);
+}
+
+poly CFormulaPowerMultiplier::ncSA_1xy0x0yT2(const int i, const int j, const int n, const int m, const int k, const ring r)
+{
+  return ::ncSA_1xy0x0yT2(i, j, n, m, k, r);
 }
 
 poly CFormulaPowerMultiplier::ncSA_1xyAx0y0(const int i, const int j, const int n, const int m, const number m_shiftCoef, const ring r)
