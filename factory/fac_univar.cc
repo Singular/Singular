@@ -31,20 +31,20 @@ static modpk theModulus;
 
 #ifdef DEBUGOUTPUT
 #define DEBOUTHPRINT(stream, msg, hg) \
-{stream << deb_level_msg << msg, stream.flush(); hprint( hg ); stream << endl;}
+{std::stream << deb_level_msg << msg, std::stream.flush(); hprint( hg ); std::stream << std::endl;}
 
 static void
 hprint ( int * a )
 {
     int n = a[0];
-    cerr << "( " << n << ": ";
+    std::cerr << "( " << n << ": ";
     int i = 1;
     while ( i < n ) {
         if ( a[i] != 0 )
-            cerr << i << " ";
+            std::cerr << i << " ";
         i++;
     }
-    cerr << ")";
+    std::cerr << ")";
 }
 #else /* DEBUGOUTPUT */
 #define DEBOUTHPRINT(stream, msg, hg)
