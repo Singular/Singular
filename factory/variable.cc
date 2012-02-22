@@ -150,15 +150,6 @@ OSTREAM & operator << ( OSTREAM & os, const Variable & v )
 }
 #endif /* NOSTREAMIO */
 
-//static bool legal_mipo( const CanonicalForm & mipo )
-//{
-//    ASSERT( mipo.inPolyDomain(), "not a legal extension" );
-//    bool ok = true;
-//    for ( CFIterator i = mipo; ok && i.hasTerms(); i++ )
-//        ok = i.coeff().inBaseDomain();
-//    return ok;
-//}
-
 static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable alpha )
 {
     CanonicalForm result;
@@ -169,7 +160,7 @@ static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable alph
 
 Variable rootOf( const CanonicalForm & mipo, char name )
 {
-    //ASSERT( legal_mipo( mipo ), "not a legal extension" );
+    ASSERT (mipo.inPolyDomain() && mipo.isUnivariate(), "not a legal extension");
 
     int l;
     if ( var_names_ext == 0 ) {
