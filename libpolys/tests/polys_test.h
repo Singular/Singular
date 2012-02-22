@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include "common.h"
 using namespace std;
 
