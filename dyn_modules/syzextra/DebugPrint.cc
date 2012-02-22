@@ -21,8 +21,9 @@
 #include "DebugPrint.h"
 
 #include <omalloc/omalloc.h>
+#include <polys/monomials/p_polys.h>
+
 #include <kernel/febase.h>
-#include <kernel/p_polys.h>
 #include <kernel/ideals.h>
 
 
@@ -86,7 +87,7 @@ void dPrint(const ideal id, const ring lmRing, const ring tailRing, const int nT
   else
   {
     Print("Module of rank %ld,real rank %ld and %d generators.\n",
-          id->rank,idRankFreeModule(id, lmRing, tailRing),IDELEMS(id));
+          id->rank,id_RankFreeModule(id, lmRing, tailRing),IDELEMS(id));
 
     int j = (id->ncols*id->nrows) - 1;
     while ((j > 0) && (id->m[j]==NULL)) j--;

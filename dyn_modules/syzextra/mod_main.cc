@@ -2,28 +2,36 @@
 
 #include <omalloc/omalloc.h>
 
-#include <kernel/syz.h>
-#include <kernel/intvec.h>
-#include <kernel/p_polys.h>
-#include <kernel/longrat.h>
+#include <misc/intvec.h>
+
+#include <coeffs/coeffs.h>
+
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+// #include <kernel/longrat.h>
 #include <kernel/kstd1.h>
 
 #include <kernel/polys.h>
+
+#include <kernel/syz.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 
+#include <Singular/ipid.h> 
+// extern coeffs coeffs_BIGINT
+
 #include "singularxx_defs.h"
 #include "DebugPrint.h"
 #include "myNF.h"
 
+extern BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, const intvec * componentWeights);
 
-
-extern void rSetISReference(const ideal F, const int rank, const int p, const intvec * componentWeights, const ring r);
+// extern void rSetISReference(const ideal F, const int rank, const int p, const intvec * componentWeights, const ring r);
 extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
-extern ring rCurrRingAssure_SyzComp();
+// extern ring rCurrRingAssure_SyzComp();
 extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
 extern int rGetISPos(const int p, const ring r);
 
@@ -62,29 +70,9 @@ BOOLEAN noop(leftv __res, leftv /*__v*/)
 }
 
 
-
 static inline number jjLONG2N(long d)
 {
-#if SIZEOF_LONG == 8
-  int i=(int)d;
-  if ((long)i == d)
-    return nlInit(i, NULL);
-  else
-  {
-# if !defined(OM_NDEBUG) && !defined(NDEBUG)
-    omCheckBin(rnumber_bin);
-# endif
-    number z=(number)omAllocBin(rnumber_bin);
-# if defined(LDEBUG)
-    z->debug=123456;
-# endif
-    z->s=3;
-    mpz_init_set_si(z->z,d);
-    return z;
-  }
-#else
-  return nlInit((int)d, NULL);
-#endif
+  return n_Init(d, coeffs_BIGINT);
 }
 
 static inline void view(const intvec* v)
@@ -222,7 +210,7 @@ if ((s)->v != NULL) \
   for (int iLevel = 0; (iLevel < iLength) && ( ((s)->v)[iLevel] != NULL ); iLevel++) \
   { \
     /* const ring rrr = (iLevel > 0) ? save : save; */ \
-    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, reinterpret_cast<const void*>(((s)->v)[iLevel]), ((s)->v)[iLevel]->ncols, idSize(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*idRankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
+    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, reinterpret_cast<const void*>(((s)->v)[iLevel]), ((s)->v)[iLevel]->ncols, idSize(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*id_RankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
     PrintLn(); \
   } \
   PrintLn();
@@ -231,7 +219,7 @@ if ((s)->v != NULL) \
     PRINT_RESOLUTION(syzstr, minres);
     PRINT_RESOLUTION(syzstr, fullres);
 
-    assume (idRankFreeModule (syzstr->res[1], rr) == syzstr->res[1]->rank);
+    assume (id_RankFreeModule (syzstr->res[1], rr) == syzstr->res[1]->rank);
 
     PRINT_RESOLUTION(syzstr, res);
     PRINT_RESOLUTION(syzstr, orderedRes);
@@ -425,7 +413,7 @@ static BOOLEAN MakeSyzCompOrdering(leftv res, leftv /*h*/)
   NoReturn(res);
 
   //    res->data = rCurrRingAssure_SyzComp(); // changes current ring! :(
-  res->data = reinterpret_cast<void *>(rCurrRingAssure_SyzComp());
+  res->data = reinterpret_cast<void *>(rAssure_SyzComp(currRing, TRUE));
   res->rtyp = RING_CMD; // return new ring!
   // QRING_CMD? 
 
@@ -481,7 +469,7 @@ static BOOLEAN SetSyzComp(leftv res, leftv h)
   {
     const int iSyzComp = (int)reinterpret_cast<long>(h->Data());
     assume( iSyzComp > 0 );
-    rSetSyzComp( iSyzComp );
+    rSetSyzComp(iSyzComp, currRing);
   }
 
   return FALSE;
@@ -529,7 +517,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
     l->m[1].rtyp = MODUL_CMD;
 
     //          Print("before: %d\n", FF->nrows);
-    //          FF->nrows = idRankFreeModule(FF, r); // ???
+    //          FF->nrows = id_RankFreeModule(FF, r); // ???
     //          Print("after: %d\n", FF->nrows);
   }
   else
@@ -571,7 +559,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
     rank = (int)((long)(h->Data())); h=h->next;
     assume(rank >= 0);
   } else
-    rank = idRankFreeModule(F, r); // Starting syz-comp (1st: i+1)
+    rank = id_RankFreeModule(F, r); // Starting syz-comp (1st: i+1)
 
   int p = 0; // which IS-block? p^th!
 
@@ -592,7 +580,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
 
   // F & componentWeights belong to that ordering block of currRing now:
-  rSetISReference(F, rank, p, componentWeights, r); // F and componentWeights will be copied!
+  rSetISReference(r, F, rank, p, componentWeights); // F and componentWeights will be copied!
   return FALSE;
 }
 
@@ -711,7 +699,7 @@ static BOOLEAN idPrepare(leftv res, leftv h)
     if( isSyz )
       iComp = rGetCurrSyzLimit(r);
     else
-      iComp = idRankFreeModule(r->typ[posIS].data.is.F, r); // ;
+      iComp = id_RankFreeModule(r->typ[posIS].data.is.F, r); // ;
   }
 
 

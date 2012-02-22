@@ -672,8 +672,8 @@ if( size(NF(S, groebner(SYZ))) > 0 )
 
 number t = (ttN - tN);
 number tt = ((ttS - tS) + (ttG - tG));
-"Factor: ", t / tt;
-"Factor: ", (ttN - tN) / ((ttS - tS) + (ttG - tG));
+"Factor: ", t div tt;
+"Factor: ", (ttN - tN) div ((ttS - tS) + (ttG - tG));
 
 
 $$

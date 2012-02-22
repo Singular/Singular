@@ -29,12 +29,10 @@ ideal I = maxideal(1);
 DetailedPrint(I, 2);
 
 vector v =3 *xyz * [0, 0, 1, x, y, z];
-
 v;
 DetailedPrint(v, 2);
 
-leadmonom(v);
-leadcomp(v);
+leadmonom(v);leadcomp(v);
 leadrawexp(v);
 
 

@@ -20,9 +20,11 @@
 
 // include basic definitions
 #include "singularxx_defs.h"
-#include <kernel/ring.h>
+#include <kernel/polys.h>
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(DEBUG)
+
+
 
 /// debug-print at most nTerms (2 by default) terms from poly/vector p,
 /// assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.

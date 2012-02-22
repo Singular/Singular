@@ -20,8 +20,16 @@
 
 // include basic definitions
 #include "singularxx_defs.h"
-#include <kernel/ring.h>
-#include <kernel/ideals.h>
+
+struct  spolyrec;
+typedef struct spolyrec    polyrec;
+typedef polyrec *          poly;
+
+struct ip_sring;
+typedef struct ip_sring *         ring;
+
+struct sip_sideal;
+typedef struct sip_sideal *       ideal;
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(NF)
 

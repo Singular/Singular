@@ -18,9 +18,17 @@
 // include header file
 #include <kernel/mod2.h>
 
-#include "myNF.h"
 
 #include <omalloc/omalloc.h>
+
+#include <misc/intvec.h>
+
+#include <misc/options.h>
+
+#include <polys/monomials/p_polys.h>
+#include <polys/kbuckets.h>
+
+
 #include <kernel/structs.h>
 #include <kernel/febase.h>
 
@@ -29,24 +37,25 @@
 #include <kernel/ideals.h>
 
 #include <kernel/syz.h>
-#include <kernel/longrat.h>
+// #include <kernel/longrat.h>
 #include <kernel/kutil.h>
 #include <kernel/kstd1.h>
-#include <kernel/options.h>
 
-#include <kernel/kbuckets.h>
 
-#include <kernel/intvec.h>
-#include <kernel/p_polys.h>
+
 #include <kernel/polys.h>
-#include <kernel/pInline2.h>
+// #include <kernel/pInline2.h>
+
+#include "myNF.h"
 
 
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
-#include <kernel/gring.h>
-#include <kernel/sca.h>
+
+#include <polys/nc/sca.h>
+#include <polys/nc/nc.h>
+#include <kernel/nc.h>
 
 
 
@@ -213,7 +222,7 @@ poly kNF2Length (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 
   //if ((idIs0(F))&&(Q==NULL))
   //  return pCopy(q); /*F=0*/
-  //strat->ak = idRankFreeModule(F);
+  //strat->ak = id_RankFreeModule(F, RING!);
   /*- creating temp data structures------------------- -*/
   BITSET save_test=test;
   test|=Sy_bit(OPT_REDTAIL);
@@ -244,7 +253,7 @@ poly kNF2Length (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
 #ifdef HAVE_RINGS
-    if (rField_is_Ring())
+    if (rField_is_Ring(currRing))
     {
       p = redtailBba_Z(p,max_ind,strat);
     }
@@ -308,10 +317,10 @@ poly kNFLength(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
-  strat->ak = si_max(idRankFreeModule(F),pMaxComp(p));
+  strat->ak = si_max(id_RankFreeModule(F, currRing),pMaxComp(p));
   poly res;
 
-  if (pOrdSgn==-1)
+  if (rHasLocalOrMixedOrdering(currRing)==-1)
     res=kNF1(F,Q,pp,strat,lazyReduce);
   else
     res=kNF2Length(F,Q,pp,strat,lazyReduce);
