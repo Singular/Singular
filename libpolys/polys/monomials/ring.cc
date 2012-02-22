@@ -2759,9 +2759,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     res->pFDeg = res->pFDegOrig = p_WFirstTotalDegree;
   }
   if (omitted_degree)
-    res->pLDeg = res->pLDegOrig = r->pLDegOrig;
+    res->pLDeg = r->pLDegOrig;
 
-  rOptimizeLDeg(res);
+  rOptimizeLDeg(res); // also sets res->pLDegOrig
 
   // set syzcomp
   if (res->typ != NULL)
@@ -3129,6 +3129,7 @@ static void rOptimizeLDeg(ring r)
     if (r->pLDeg == pLDeg1c)
       r->pLDeg = pLDeg1c_WFirstTotalDegree;
   }
+  r->pLDegOrig = r->pLDeg;
 }
 
 // set pFDeg, pLDeg, MixOrder, ComponentOrder, etc
@@ -3252,8 +3253,7 @@ static void rSetDegStuff(ring r)
     r->pFDeg = p_Deg;
 
   r->pFDegOrig = r->pFDeg;
-  r->pLDegOrig = r->pLDeg;
-  rOptimizeLDeg(r);
+  rOptimizeLDeg(r); // also sets r->pLDegOrig
 }
 
 /*2
