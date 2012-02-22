@@ -6,9 +6,11 @@
 #LD_LIBC	        = -lc
 #STATIC_LDFLAGS	= -static
 
+WARNCFLAGS = -Wunused-parameter
+# clang has also: -Wunneeded-internal-declaration
 
-NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
-NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer 
+NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer $(WARNCFLAGS)
+NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer $(WARNCFLAGS)
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
 CXXTEMPLFLAGS = ## -fno-implicit-templates
@@ -20,11 +22,11 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_
 libSingular_LTLIBRARIES = libSingular.la libSingular_g.la
 libSingulardir = $(libdir)/singular
 
-libSingular_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
-libSingular_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
+libSingular_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}  $(WARNCFLAGS)
+libSingular_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}  $(WARNCFLAGS)
 
-libSingular_la_CXXFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-libSingular_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+libSingular_la_CXXFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)  $(WARNCFLAGS)
+libSingular_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)   $(WARNCFLAGS)
 # -fdiagnostics-show-option 
 
 
