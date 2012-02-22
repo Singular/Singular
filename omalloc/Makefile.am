@@ -31,8 +31,10 @@ INCLUDES=-I${abs_top_srcdir}/.. -I${abs_top_builddir}/..
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 libomalloc_g_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
-nodist_libomalloc_la_SOURCES = omConfig.h mylimits.h omalloc.h omTables.inc omTables.h
-nodist_libomalloc_g_la_SOURCES = omConfig.h omalloc.h omTables.inc omTables.h
+nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h
+nodist_libomalloc_g_la_SOURCES = omTables.inc omTables.h mylimits.h
+
+nodist_libomalloc_include_HEADERS = omConfig.h mylimits.h omTables.h
 
 ### NOTE: "_g" (debug) means full library
 ### libomalloc_la_CPPFLAGS= -DOM_ALLOC_INTERNAL -DHAVE_CONFIG_H -DOM_NDEBUG

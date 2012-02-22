@@ -152,11 +152,14 @@ SingularHEADERS =    Cache.h \
    subexpr.h \
    table.h \
    tok.h \
-   version.h \
    walk.h 
+
 
 nodist_libSingular_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
 nodist_libSingular_g_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
+
+noinst_HEADERS = version.h
+
 
 libSingular_includedir = ${includedir}/singular/Singular/
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
