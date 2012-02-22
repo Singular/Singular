@@ -21,10 +21,10 @@ void QprintFF( int ** Q, int n )
 {
     for ( int i = 0; i < n; i++ ) {
         for ( int j = 0; j < n; j++ )
-            cerr << Q[i][j] << "  ";
-        cerr << endl;
+            std::cerr << Q[i][j] << "  ";
+        std::cerr << std::endl;
     }
-    cerr << endl;
+    std::cerr << std::endl;
 }
 #endif /* DEBUGOUTPUT */
 
@@ -33,12 +33,12 @@ void QprintGF( int ** Q, int n )
 {
     for ( int i = 0; i < n; i++ ) {
         for ( int j = 0; j < n; j++ ) {
-            gf_print( cerr, Q[i][j] );
-            cerr << "  ";
+            gf_print( std::cerr, Q[i][j] );
+            std::cerr << "  ";
         }
-        cerr << endl;
+        std::cerr << std::endl;
     }
-    cerr << endl;
+    std::cerr << std::endl;
 }
 #endif /* DEBUGOUTPUT */
 
