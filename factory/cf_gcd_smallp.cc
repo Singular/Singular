@@ -1473,7 +1473,6 @@ CFArray
 solveGeneralVandermonde (const CFArray& M, const CFArray& A)
 {
   int r= M.size();
-  ASSERT (c == r, "number of columns and rows not equal");
   ASSERT (A.size() == r, "vector does not have right size");
   if (r == 1)
   {
@@ -1970,8 +1969,8 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   B= M(B);
 
   Variable x= Variable (1);
-  ASSERT (degree (A, y) == 0, "expected degree (F, 1) == 0");
-  ASSERT (degree (B, y) == 0, "expected degree (G, 1) == 0");
+  ASSERT (degree (A, x) == 0, "expected degree (F, 1) == 0");
+  ASSERT (degree (B, x) == 0, "expected degree (G, 1) == 0");
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())
@@ -2228,8 +2227,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   B= M(B);
 
   Variable x= Variable (1);
-  ASSERT (degree (A, y) == 0, "expected degree (F, 1) == 0");
-  ASSERT (degree (B, y) == 0, "expected degree (G, 1) == 0");
+  ASSERT (degree (A, x) == 0, "expected degree (F, 1) == 0");
+  ASSERT (degree (B, x) == 0, "expected degree (G, 1) == 0");
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())

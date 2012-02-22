@@ -2704,11 +2704,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     CFList MOD;
     bool earlySuccess;
-    CFList earlyFactors;
+    CFList earlyFactors, liftedFactors;
     TIMING_START (fac_hensel_lift);
-    CFList liftedFactors= henselLiftAndEarly
-                          (A, MOD, liftBounds, earlySuccess, earlyFactors,
-                           Aeval, biFactors, evaluation, info);
+    liftedFactors= henselLiftAndEarly
+                   (A, MOD, liftBounds, earlySuccess, earlyFactors,
+                    Aeval, biFactors, evaluation, info);
     TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
 
     if (!extension)

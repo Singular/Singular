@@ -30,6 +30,10 @@
 #include "cf_reval.h"
 #include "facSparseHensel.h"
 
+TIMING_DEFINE_PRINT(bi_factorize)
+TIMING_DEFINE_PRINT(hensel_lift)
+TIMING_DEFINE_PRINT(factor_recombination)
+
 #ifdef HAVE_NTL
 CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
 {
@@ -690,9 +694,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
     bufLift= degree (A, y) + 1 + degree (LC(A, x), y);
 
-    TIMING_START (fac_bi_factorizer);
+    TIMING_START (bi_factorize);
     bufBiFactors= ratBiSqrfFactorize (bufAeval.getFirst(), v);
-    TIMING_END_AND_PRINT (fac_bi_factorizer,
+    TIMING_END_AND_PRINT (bi_factorize,
                           "time for bivariate factorization: ");
     bufBiFactors.removeFirst();
 
@@ -968,15 +972,16 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     bool earlySuccess;
     CFList earlyFactors;
     ExtensionInfo info= ExtensionInfo (false);
-    TIMING_START (fac_hensel_lift);
-    CFList liftedFactors= henselLiftAndEarly
-                          (A, MOD, liftBounds, earlySuccess, earlyFactors,
-                           Aeval, biFactors, evaluation, info);
-    TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+    CFList liftedFactors;
+    TIMING_START (hensel_lift);
+    liftedFactors= henselLiftAndEarly
+                   (A, MOD, liftBounds, earlySuccess, earlyFactors,
+                    Aeval, biFactors, evaluation, info);
+    TIMING_END_AND_PRINT (hensel_lift, "time for hensel lifting: ");
 
-    TIMING_START (fac_factor_recombination);
+    TIMING_START (factor_recombination);
     factors= factorRecombination (A, liftedFactors, MOD);
-    TIMING_END_AND_PRINT (fac_factor_recombination,
+    TIMING_END_AND_PRINT (factor_recombination,
                           "time for factor recombination: ");
 
     if (earlySuccess)

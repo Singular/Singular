@@ -165,7 +165,7 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
     for ( i = 1; i <= r; i++ )
         A[i] = remainder( pk( a[i] * C0 ), P0[i], pk );
     DEBOUTLN( cerr, "the first approximation of the correction coefficients is " << A );
-#ifdef DEBUGOUTPUT
+/*#ifdef DEBUGOUTPUT
     if ( check_dummy( A, P, Q ) - C != 0 )
     {
         DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
@@ -173,7 +173,7 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
         DEBOUTLN( cerr, "corresponding P " << P );
         DEBOUTLN( cerr, "              Q " << Q );
     }
-#endif
+#endif*/
     for ( m = 0; m <= h && ( m == 0 || Dm != 0 ); m++ )
     {
         Dm = pk( evalF( P, Q, A, r ) - C );
@@ -215,14 +215,14 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
         }
         DEBOUTLN( cerr, "the correction coefficients at step " << m );
         DEBOUTLN( cerr, "are now " << A );
-#ifdef DEBUGOUTPUT
+/*#ifdef DEBUGOUTPUT
     if ( check_dummy( A, P, Q ) - C != 0 ) {
         DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
         DEBOUTLN( cerr, "fulfill equation F(A)" );
         DEBOUTLN( cerr, "corresponding P " << P );
         DEBOUTLN( cerr, "              Q " << Q );
     }
-#endif
+#endif*/
     }
     DEBDECLEVEL( cerr, "findCorrCoeffs" );
     return A;
