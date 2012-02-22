@@ -75,9 +75,9 @@ AC_ARG_ENABLE(
 
 AC_ARG_ENABLE(
   assertions,
-  [AS_HELP_STRING([--enable-assertions],[build Factory with assertions activated])],
+  [AS_HELP_STRING([--disable-assertions],[build Factory with no assertions])],
   ,
-  enable_assertions=no)
+  enable_assertions=yes)
 
 AC_ARG_ENABLE(
   timing,
