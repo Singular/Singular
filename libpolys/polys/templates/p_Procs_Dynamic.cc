@@ -93,35 +93,35 @@ static void* GetGeneralProc(p_Proc proc)
   switch(proc)
   {
       case p_Copy_Proc:
-        return (void *)p_Copy__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Copy__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Delete_Proc:
-        return (void *)p_Delete__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Delete__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_ShallowCopyDelete_Proc:
-        return (void *)p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Mult_nn_Proc:
-        return (void *)p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_nn_Proc:
-        return (void *)pp_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(pp_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_mm_Proc:
-        return (void *)pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_mm_Noether_Proc:
-        return (void *)pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Mult_mm_Proc:
-        return (void *)p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Add_q_Proc:
-        return (void *)p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Minus_mm_Mult_qq_Proc:
-        return (void *)p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Neg_Proc:
-        return (void *)p_Neg__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Neg__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_Coeff_mm_DivSelect_Proc:
-        return (void *)pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_Coeff_mm_DivSelectMult_Proc:
-        return (void *)pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Merge_q_Proc:
-        return (void *)p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_kBucketSetLm_Proc:
-        return (void *)p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral;
+        return cast_A_to_vptr(p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Unknown_Proc:
         break;
   }
@@ -217,16 +217,16 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
 
 
 #define DoReallySetProc(what, field, length, ord)           \
-  _p_procs->what = (what##_Proc_Ptr)                        \
-     GetDynamicProc(#what, what##_Proc, field, length, ord)
+  _p_procs->what =    cast_vptr_to_A<what##_Proc_Ptr>(      \
+     GetDynamicProc(#what, what##_Proc, field, length, ord))
 
 #ifdef RDEBUG
 #define DoSetProc(what, field, length, ord)                         \
 do                                                                  \
 {                                                                   \
   if (set_names)                                                    \
-    _p_procs->what = (what##_Proc_Ptr)                              \
-       GetDynamicProc(#what,  what##_Proc, field, length, ord, 1);  \
+    _p_procs->what =    cast_vptr_to_A<what##_Proc_Ptr>(            \
+       GetDynamicProc(#what,  what##_Proc, field, length, ord, 1));  \
   else                                                              \
     DoReallySetProc(what, field, length, ord);                      \
 }                                                                   \

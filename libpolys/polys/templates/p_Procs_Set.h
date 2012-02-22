@@ -125,6 +125,7 @@ static p_Procs_s *_p_procs;
 static int set_names = 0;
 #endif
 
+// (which##_Proc_Ptr)F ->-> cast_vptr_to_A<which##_Proc_Ptr>(F)?
 #define CheckProc(which)                                    \
 do                                                          \
 {                                                           \
@@ -133,8 +134,8 @@ do                                                          \
     dReportBug("p_Procs is NULL");                          \
     WarnS("Singular will work properly, but much slower");  \
     WarnS("If you chose a coef ring, it may not work at all");\
-    p_Procs->which = (which##_Proc_Ptr)                     \
-      which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
+    p_Procs->which =                 (which##_Proc_Ptr)(    \
+      which##__FieldGeneral_LengthGeneral_OrdGeneral);       \
   }                                                         \
 }                                                           \
 while (0);
