@@ -1,17 +1,20 @@
+#define PLURAL_INTERNAL_DECLARATIONS
+   
 #include "mod2.h"
 #include <misc/auxiliary.h>
 
 #include <misc/options.h>
 
 #include <polys/simpleideals.h>
+#include <polys/prCopy.h>
+#include <polys/nc/gb_hack.h>
+
 #include <kernel/polys.h>
 
-#include <polys/prCopy.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
 
-#include "ideals.h"
-#include "kstd1.h"
-
-#include "nc.h"
+#include <kernel/nc.h>
 
 ideal twostd(ideal I) // works in currRing only!
 {
@@ -410,4 +413,3 @@ ideal Approx_Step(ideal L)
     return(I);
   }
 }
-

@@ -120,27 +120,4 @@ inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 
 }
 
-inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat)
-{
-  assume(rIsPluralRing(currRing));
-
-  assume(currRing->GetNC()->p_Procs.GB!=NULL);
-  return currRing->GetNC()->p_Procs.GB(F, Q, w, hilb, strat);
-
-/*
-  if (rHasLocalOrMixedOrder(currRing))
-  {
-    assume(currRing->GetNC()->p_Procs.LocalGB!=NULL);
-    return currRing->GetNC()->p_Procs.LocalGB(F, Q, w, hilb, strat);
-  } else
-  {
-    assume(currRing->GetNC()->p_Procs.GlobalGB!=NULL);
-    return currRing->GetNC()->p_Procs.GlobalGB(F, Q, w, hilb, strat);
-  }
-*/
-}
-
-
-
-
 #endif // 

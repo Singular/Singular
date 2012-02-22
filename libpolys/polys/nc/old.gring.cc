@@ -25,7 +25,10 @@
 # define PLURAL_INTERNAL_DECLARATIONS
 #include "nc/nc.h"
 #include "nc/sca.h"
+#include "nc/gb_hack.h"
 
+#include "monomials/ring.h"
+   
 #include <coeffs/numbers.h>
 #include "coeffrings.h"
 
@@ -120,9 +123,6 @@ poly gnc_p_Mult_mm(poly p, const poly m, const ring r);
 poly gnc_mm_Mult_p(const poly m, poly p, const ring r);
 poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r);
 
-
-// set pProcs for r and global variable p_Procs as for general non-commutative algebras.
-void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 /* syzygies : */
 poly gnc_CreateSpolyOld(const poly p1, const poly p2/*, poly spNoether*/, const ring r);
@@ -2747,9 +2747,8 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
 }
 
 
+
 BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient = false); // just for a moment
-
-
 
 /// returns TRUE if there were errors
 /// analyze inputs, check them for consistency
@@ -3063,7 +3062,12 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
   // Setup new NC structure!!!
   if (r->GetNC() != NULL)
+  {
+#ifndef NDEBUG
+    WarnS("Changing the NC-structure of an existing NC-ring!!!");
+#endif    
     nc_rKill(r);
+  }
 
   r->GetNC() = nc_new;
 
@@ -3170,30 +3174,23 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
     }
   }
   r->GetNC()->COM=COM;
+  
 
   nc_p_ProcsSet(r, r->p_Procs);
 
   if(bSetupQuotient) // Test me!!!
-  {
-    nc_SetupQuotient(r);
-  }
+    nc_SetupQuotient(r, NULL, false); // no copy!
 
-
-  // ???
-  if( bNoPluralMultiplication )
-    ncInitSpecialPairMultiplication(r);
-
-
-  if(!rIsSCA(r) && !bNoFormula)
-    ncInitSpecialPowersMultiplication(r);
-
-
+  
 //  if (save != currRing)
 //    rChangeCurrRing(save);
 
   return FALSE;
 }
 
+
+// set pProcs for r and global variable p_Procs as for general non-commutative algebras.
+static inline
 void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 {
   // "commutative"
@@ -3224,7 +3221,19 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   rGR->GetNC()->p_Procs.BucketPolyRed_Z= gnc_kBucketPolyRed_ZNew;
 #endif
 
+  // warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object?
+  if (rHasLocalOrMixedOrdering(rGR))
+    rGR->GetNC()->p_Procs.GB = cast_A_to_vptr(gnc_gr_mora);
+  else
+    rGR->GetNC()->p_Procs.GB = cast_A_to_vptr(gnc_gr_bba);
 
+///////////  rGR->GetNC()->p_Procs.GB          = gnc_gr_bba; // bba even for local case!
+// old ///    r->GetNC()->GB()            = gnc_gr_bba;
+//   rGR->GetNC()->p_Procs.GlobalGB    = gnc_gr_bba;
+//   rGR->GetNC()->p_Procs.LocalGB     = gnc_gr_mora;
+//  const ring save = currRing; if( save != r ) rChangeCurrRing(r);
+//  ideal res = gnc_gr_bba(F, Q, w, hilb, strat/*, r*/);
+//  if( save != r )     rChangeCurrRing(save);     return (res);
 
 
 #if 0
@@ -3260,8 +3269,14 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   {
     sca_p_ProcsSet(rGR, p_Procs);
   }
-}
 
+  if( bNoPluralMultiplication )
+    ncInitSpecialPairMultiplication(rGR);
+
+  if(!rIsSCA(rGR) && !bNoFormula)
+    ncInitSpecialPowersMultiplication(rGR);
+
+}
 
 
 /// substitute the n-th variable by e in p

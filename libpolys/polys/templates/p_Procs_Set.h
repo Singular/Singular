@@ -15,11 +15,6 @@
  *******************************************************************/
 #include <coeffs/modulop.h>
 
-#ifdef HAVE_PLURAL
-// for nc_p_ProcsSet:
-// #include <polys/nc/....h>
-#endif
-
 #include <reporter/reporter.h>
 
 // extract p_Procs properties from a ring
@@ -140,6 +135,8 @@ do                                                          \
 }                                                           \
 while (0);
 
+void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
+
 // Choose a set of p_Procs
 void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 {
@@ -191,8 +188,8 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 #ifndef NDEBUG
   if (rIsPluralRing(r))
   {
-     dReportError("Setting pProcs in p_ProcsSet (rDebugPrint!?)!!!");
-     nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
+    dReportError("Setting pProcs in p_ProcsSet (rDebugPrint!?)!!!");
+    nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
   }
 #endif
 #endif

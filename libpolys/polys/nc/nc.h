@@ -1,16 +1,13 @@
 #ifndef POLYS_NC_H
 #define POLYS_NC_H
 
+#include <polys/monomials/ring.h>
+#include <polys/kbuckets.h>
 
 #ifdef HAVE_PLURAL
 
-
-
 // TODO: the following is a part of ring.h... would be nice to have a
 // clear public NC interface defined here!
-
-#include <polys/monomials/ring.h>
-#include <polys/kbuckets.h>
 
 
 class ip_smatrix;
@@ -74,6 +71,10 @@ public:
 
   SPoly_Proc_Ptr                        SPoly;
   SPolyReduce_Proc_Ptr                  ReduceSPoly;
+
+  void*                                 GB; ///< From "gb_hack.h"
+//                                         GlobalGB, // BBA
+//                                         LocalGB;  // MORA
 };
 
 class CGlobalMultiplier;
@@ -311,14 +312,8 @@ static inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 
 }
 
-
 /* subst: */
 poly nc_pSubst(poly p, int n, poly e, const ring r);
-
-// set pProcs table for rGR and global variable p_Procs
-// this should be used by p_ProcsSet in p_Procs_Set.h
-void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
-
 
 // the part, related to the interface
 // Changes r, Assumes that all other input belongs to curr
@@ -331,12 +326,11 @@ BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
 		      /* allow to create a nc-ring with 1 variable*/);
 
 
-BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // in ring.cc
-
 // this function should be used inside QRing definition!
 // we go from rG into factor ring rGR with factor ideal rGR->qideal.
 bool nc_SetupQuotient(ring rGR, const ring rG = NULL, bool bCopy = false); // rG == NULL means that there is no base G-algebra
 
+BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // in ring.cc
 
 bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
@@ -372,6 +366,11 @@ bool ncExtensions(int iMask); //  = 0x0FFFF
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 
+// set pProcs table for rGR and global variable p_Procs
+// this should be used by p_ProcsSet in p_Procs_Set.h
+void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
+
+
 #include <polys/matpol.h>
 
 // read only access to NC matrices C/D:
@@ -397,7 +396,7 @@ static inline poly GetD( const ring r, int i, int j )
   return ( D->m[ncols * ((i)-1) + (j)-1] );
 }
 
-#endif /* PLURAL_INTERNAL_DECLARATIONS */
+#endif // PLURAL_INTERNAL_DECLARATIONS
 
 #endif /* HAVE_PLURAL */
 

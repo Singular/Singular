@@ -20,6 +20,7 @@
 #include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 
+#include <polys/nc/gb_hack.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 
@@ -31,8 +32,9 @@
 //#include "spolys.h"
 //#include "cntrlc.h"
 #include <kernel/ratgring.h>
-
 #include <kernel/kutil.h>
+
+#include <kernel/nc.h>
 
 #if 0
 /*3
@@ -1042,8 +1044,10 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 
 #define MYTEST 0
 
-ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
+ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
+  const ring save = currRing; if( currRing != _currRing ) rChangeCurrRing(_currRing);
+
 #if MYTEST
    PrintS("<gnc_gr_bba>\n");
 #endif
@@ -1297,16 +1301,19 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   PrintS("</gnc_gr_bba>\n");
 #endif
 
+  if( currRing != save )     rChangeCurrRing(save);
+  
   return (strat->Shdl);
 }
 
-ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy)
+ideal gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
-  PrintS("Sorry, non-commutative mora is not yet implemented!");
-  PrintLn();
-
+#ifndef NDEBUG
   // Not yet!
-  return NULL;
+  WarnS("Sorry, non-commutative mora is not yet implemented!");
+#endif
+
+  return gnc_gr_bba(F, Q, NULL, NULL, strat, _currRing);
 }
 
 #endif

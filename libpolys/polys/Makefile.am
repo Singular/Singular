@@ -42,7 +42,7 @@ SOURCES = \
 	nc/old.gring.cc
 
 LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
-	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h \
+	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h nc/gb_hack.h \
 	operations/pShallowCopyDelete.h \
 	templates/p_Procs.h templates/p_MemAdd.h templates/p_MemCmp.h \
 	monomials/p_polys.h monomials/maps.h prCopy.h \
