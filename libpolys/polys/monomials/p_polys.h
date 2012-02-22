@@ -80,11 +80,12 @@ static inline number& pGetCoeff(poly p)
  ***************************************************************/
 unsigned long p_GetShortExpVector(poly a, const ring r);
 
-/* divisibility check over ground ring (which may contain zero divisors);
+#ifdef HAVE_RINGS
+/*! divisibility check over ground ring (which may contain zero divisors);
    TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
    coefficient c and some monomial m;
-   does not take components into account */
-#ifdef HAVE_RINGS
+   does not take components into account
+ */
 BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r);
 #endif
 
@@ -100,23 +101,23 @@ int p_MinDeg(poly p,intvec *w, const ring R);
 
 long p_DegW(poly p, const short *w, const ring R);
 
-// return TRUE if all monoms have the same component
+/// return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, const ring r);
 
-// return i, if head depends only on var(i)
+/// return i, if head depends only on var(i)
 int       p_IsPurePower(const poly p, const ring r);
 
-// return i, if poly depends only on var(i)
+/// return i, if poly depends only on var(i)
 int       p_IsUnivariate(poly p, const ring r);
 
-// set entry e[i] to 1 if var(i) occurs in p, ignore var(j) if e[j]>0
-// return #(e[i]>0)
+/// set entry e[i] to 1 if var(i) occurs in p, ignore var(j) if e[j]>0
+/// return #(e[i]>0)
 int      p_GetVariables(poly p, int * e, const ring r);
 
-// returns the poly representing the integer i
+/// returns the poly representing the integer i
 poly      p_ISet(int i, const ring r);
 
-// returns the poly representing the number n, destroys n
+/// returns the poly representing the number n, destroys n
 poly      p_NSet(number n, const ring r);
 
 void  p_Vec2Polys(poly v, poly**p, int *len, const ring r);

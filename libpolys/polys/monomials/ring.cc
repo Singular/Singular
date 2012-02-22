@@ -361,11 +361,11 @@ void   rWrite(ring r, BOOLEAN details)
       int i,j;
       for (i = 1; i<r->N; i++)
       {
-	for (j = i+1; j<=r->N; j++)
-	{
-	  nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r), r->cf);
-	  if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
-	  {
+        for (j = i+1; j<=r->N; j++)
+        {
+          nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r), r->cf);
+          if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
+          {
             Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
             pl = MATELEM(r->GetNC()->MT[UPMATELEM(i,j,r->N)],1,1);
             p_Write0(pl, r, r);
