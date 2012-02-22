@@ -985,7 +985,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
   if (TEST_OPT_DEBUG)
   {
     Print("new s%d:",atS);
-    wrp(p.p);
+    p_wrp(p.p,currRing,strat->tailRing);
     PrintLn();
   }
   #endif
