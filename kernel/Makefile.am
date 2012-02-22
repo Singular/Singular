@@ -82,8 +82,9 @@ endif
 AM_LDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/resources -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
 
 
-TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/tests/MOD:${abs_top_builddir}/libpolys/tests/gftables'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
+### TODO: the following has to be addapted...
+TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 
 TESTS = test-s-g test-s-r test-d-g test-d-r 
 check_PROGRAMS = $(TESTS)
@@ -126,14 +127,11 @@ test_d_g_CPPFLAGS = -DHAVE_CONFIG_H
 
 
 # These files are built first
-BUILT_SOURCES = MOD 
+# BUILT_SOURCES = MOD 
 
-MOD: ${top_builddir}/libpolys/tests/MOD
-	ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
-
-
-CLEANFILES = $(TESTS) $(BUILT_SOURCES)
+# MOD: ${top_builddir}/libpolys/tests/MOD
+# 	ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
 
 
-
-
+CLEANFILES = $(TESTS) 
+# $(BUILT_SOURCES)

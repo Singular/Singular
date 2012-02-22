@@ -305,7 +305,7 @@ LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibra
 
 ########################### TEST #########################
 
-TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_builddir}/libpolys/tests/MOD:${abs_top_builddir}/libpolys/tests/gftables'
+TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 
 TESTS=test-s-g test-s-r test-d-g test-d-r
@@ -352,12 +352,9 @@ test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib MOD 
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib
 
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
-
-MOD: ${top_builddir}/libpolys/tests/MOD
-	[ -d ${builddir}/MOD ] || ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
 
 feOpt.inc: feOptGen
 	${abs_builddir}/feOptGen
