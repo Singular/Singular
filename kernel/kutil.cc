@@ -6764,6 +6764,7 @@ void kDebugPrint(kStrategy strat)
     else if (pFDeg==pDeg) PrintS("pDeg");
     else if (pFDeg==kHomModDeg) PrintS("kHomModDeg");
     else if (pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
+    else if (pFDeg==kModDeg) PrintS("kModDeg");
     else Print("? (%lx)", (long)pFDeg);
   PrintS(" / currRing->FDeg: ");
     if (currRing->pFDeg==p_Totaldegree) PrintS("p_Totaldegree");
@@ -6771,6 +6772,7 @@ void kDebugPrint(kStrategy strat)
     else if (currRing->pFDeg==pDeg) PrintS("pDeg");
     else if (currRing->pFDeg==kHomModDeg) PrintS("kHomModDeg");
     else if (currRing->pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
+    else if (currRing->pFDeg==kModDeg) PrintS("kModDeg");
     else Print("? (%lx)", (long)currRing->pFDeg);
     PrintLn();
   Print(" syzring:%d, syzComb:%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
