@@ -233,6 +233,8 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
   if (s==NULL) return NULL;
   idhdl h;
   s=omStrDup(s);
+  idhdl *save_root=root;
+  if (t==PACKAGE_CMD) root=&(basePack->idroot);
   // is it already defined in root ?
   if ((h=(*root)->get(s,lev))!=NULL)
   {
@@ -296,6 +298,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
 #ifndef NDEBUG
   checkall();
 #endif
+  if (t==PACKAGE_CMD) root=save_root;
   return *root;
 
   errlabel:
@@ -303,6 +306,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     Werror("identifier `%s` in use",s);
     //listall();
     omFree((ADDRESS)s);
+    if (t==PACKAGE_CMD) root=save_root;
     return NULL;
 }
 void killid(const char * id, idhdl * ih)

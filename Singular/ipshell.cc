@@ -156,7 +156,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       Print(",%s", IDPACKAGE(h)->libname);
                     PrintS(")");
                     break;
-    case PROC_CMD: if(strlen(IDPROC(h)->libname)>0)
+    case PROC_CMD: if((IDPROC(h)->libname!=NULL) && (strlen(IDPROC(h)->libname)>0))
                      Print(" from %s",IDPROC(h)->libname);
                    if(IDPROC(h)->is_static)
                      PrintS(" (static)");
@@ -2171,8 +2171,8 @@ ring rCompose(const lists  L)
       R->block1[j]=si_max(R->block0[j],R->block0[j]+iv_len-1);
       if (R->block1[j]>R->N)
       {
-	R->block1[j]=R->N;
-	iv_len=R->block1[j]-R->block0[j]+1;
+        R->block1[j]=R->N;
+        iv_len=R->block1[j]-R->block0[j]+1;
       }
       //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
       int i;
@@ -2196,10 +2196,10 @@ ring rCompose(const lists  L)
            for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
            R->block1[j]=si_max(R->block0[j],R->block0[j]+(int)sqrt((double)(iv->length()-1)));
            if (R->block1[j]>R->N)
-	   {
-	     WerrorS("ordering matrix too big");
-	     goto rCompose_err;
-	   }
+           {
+             WerrorS("ordering matrix too big");
+             goto rCompose_err;
+           }
            break;
          case ringorder_ls:
          case ringorder_ds:
