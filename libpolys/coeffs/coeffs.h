@@ -407,7 +407,7 @@ static inline number n_Init(int i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
 /// conversion of a GMP integer to number
-static inline number n_Init(mpz_t n,     const coeffs r)
+static inline number n_InitMPZ(mpz_t n,     const coeffs r)
 { assume(r != NULL); assume(r->cfInitMPZ != NULL); return r->cfInitMPZ(n,r); }
 
 /// conversion of n to an int; 0 if not possible

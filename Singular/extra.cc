@@ -709,7 +709,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           mpz_t m; mpz_init(m);
           mpz_inp_str(m, f, 10);
           fclose(f);
-          number n = n_Init(m, coeffs_BIGINT);
+          number n = n_InitMPZ(m, coeffs_BIGINT);
           res->rtyp = BIGINT_CMD;
           res->data = (void*)n;
           return FALSE;
