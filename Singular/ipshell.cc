@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT:
 */
@@ -168,7 +167,8 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       Print(",%s", IDPACKAGE(h)->libname);
                     PrintS(")");
                     break;
-    case PROC_CMD: if(strlen(IDPROC(h)->libname)>0)
+    case PROC_CMD: if((IDPROC(h)->libname!=NULL)
+                   && (strlen(IDPROC(h)->libname)>0))
                      Print(" from %s",IDPROC(h)->libname);
                    if(IDPROC(h)->is_static)
                      PrintS(" (static)");
@@ -1768,25 +1768,25 @@ lists rDecompose(const ring r)
   {
     if ( rField_is_Extension(r) )// nCoeff_is_algExt(r->cf))
     {
-      assume( r->cf != NULL );	  
+      assume( r->cf != NULL );
       assume( r->cf->extRing != NULL );
-      
+
       rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
     }
     else
     {
       assume( nCoeff_is_GF(r->cf) );
-       
+
       lists Lc=(lists)omAlloc0Bin(slists_bin);
       Lc->Init(4);
       // char:
       Lc->m[0].rtyp=INT_CMD;
       Lc->m[0].data=(void*)r->cf->m_nfCharQ;
-      // var:      
+      // var:
       lists Lv=(lists)omAlloc0Bin(slists_bin);
       Lv->Init(1);
       Lv->m[0].rtyp=STRING_CMD;
-      Lv->m[0].data=(void *)omStrDup(*rParameter(r));     
+      Lv->m[0].data=(void *)omStrDup(*rParameter(r));
       Lc->m[1].rtyp=LIST_CMD;
       Lc->m[1].data=(void*)Lv;
       // ord:
@@ -1796,11 +1796,11 @@ lists rDecompose(const ring r)
       Loo->Init(2);
       Loo->m[0].rtyp=STRING_CMD;
       Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
-       
+
       intvec *iv=new intvec(1); (*iv)[0]=1;
       Loo->m[1].rtyp=INTVEC_CMD;
       Loo->m[1].data=(void *)iv;
-       
+
       Lo->m[0].rtyp=LIST_CMD;
       Lo->m[0].data=(void*)Loo;
 
@@ -5038,16 +5038,16 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
     }
     assume( float_len <= float_len2 );
-     
+
     if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH) )
        cf=nInitChar(n_R, NULL);
     else // longR or longC?
-    { 
+    {
        LongComplexInfo param;
-       
+
        param.float_len = float_len;
        param.float_len2 = float_len2;
-       
+
        // set the parameter name
        if (complex_flag)
        {
@@ -5058,7 +5058,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
        }
 
        cf = nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
-    }   
+    }
     assume( cf != NULL );
   }
 #ifdef HAVE_RINGS
