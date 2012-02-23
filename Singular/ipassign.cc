@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT: interpreter:
@@ -706,7 +705,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     if (!errorreported) Werror("left side `%s` is undefined",l->Fullname());
     return TRUE;
   }
-  if((rt==DEF_CMD)||(rt==NONE))
+  if(rt==NONE)
   {
     WarnS("right side is not a datum, assignment ignored");
     // if (!errorreported)
@@ -720,21 +719,25 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
 
   if (lt==DEF_CMD)
   {
-    if (l->rtyp==IDHDL)
+    if (rt!=DEF_CMD)
     {
-      IDTYP((idhdl)l->data)=rt;
+      if (l->rtyp==IDHDL)
+      {
+        IDTYP((idhdl)l->data)=rt;
+      }
+      else if (l->name!=NULL)
+      {
+        sleftv ll;
+        iiDeclCommand(&ll,l,myynest,rt,&IDROOT);
+        memcpy(l,&ll,sizeof(sleftv));
+      }
+      else
+      {
+        l->rtyp=rt;
+      }
+      lt=rt;
     }
-    else if (l->name!=NULL)
-    {
-      sleftv ll;
-      iiDeclCommand(&ll,l,myynest,rt,&IDROOT);
-      memcpy(l,&ll,sizeof(sleftv));
-    }
-    else
-    {
-      l->rtyp=rt;
-    }
-    lt=rt;
+    // else: def=def: silently ignored
   }
   else
   {
@@ -1665,7 +1668,7 @@ void jjNormalizeQRingId(leftv I)
       switch (I->Typ())
       {
         case IDEAL_CMD:
-	case MODUL_CMD:
+        case MODUL_CMD:
         {
           ideal F=idInit(1,1);
           ideal II=kNF(F,currQuotient,I0);
