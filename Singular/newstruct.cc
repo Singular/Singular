@@ -97,7 +97,8 @@ lists lCopy_newstruct(lists L)
     else if(L->m[n].rtyp>MAX_TOK)
     {
       N->m[n].rtyp=L->m[n].rtyp;
-      N->m[n].data=(void *)lCopy_newstruct((lists)(L->m[n].data));
+      blackbox *b=getBlackboxStuff(N->m[n].rtyp);
+      N->m[n].data=(void *)b->blackbox_Copy(b,L->m[n].data);
     }
     else if(L->m[n].rtyp==LIST_CMD)
     {
