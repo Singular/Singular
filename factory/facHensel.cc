@@ -426,7 +426,7 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
       {
         setCharacteristic (p);
         g= coeffE*j.getItem();
-        g= mod (g, bufFactors[ii]);
+        g= modNTL (g, bufFactors[ii]);
         setCharacteristic (0);
         k.getItem() += g.mapinto()*modulus;
         e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
