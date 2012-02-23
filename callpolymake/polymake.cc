@@ -1369,33 +1369,38 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*) v->Data();
-      int m;
-      try
+      if (iv->rows()==zp->ambientDimension())
       {
-        polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
-        polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
-        polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
-        polymake::perl::Object o("LinearProgram<Rational>");
-        o.take("LINEAR_OBJECTIVE") << lo;
-        p.take("LP") << o;
-        polymake::Integer mv = p.give("LP.MAXIMAL_VALUE"); 
-        bool ok = true;
-        m = PmInteger2Int(mv,ok); 
-        if (!ok)
+        int m;
+        try
         {
-          WerrorS("overflow while converting polymake::Integer to int");
+          polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
+          polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
+          polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
+          polymake::perl::Object o("LinearProgram<Rational>");
+          o.take("LINEAR_OBJECTIVE") << lo;
+          p.take("LP") << o;
+          polymake::Integer mv = p.give("LP.MAXIMAL_VALUE"); 
+          bool ok = true;
+          m = PmInteger2Int(mv,ok); 
+          if (!ok)
+          {
+            WerrorS("overflow while converting polymake::Integer to int");
+            return TRUE;
+          }
+        }
+        catch (const std::exception& ex) 
+        {
+          std::cerr << "ERROR: " << ex.what() << endl; 
           return TRUE;
         }
+        res->rtyp = INT_CMD;
+        res->data = (char*) m;
+        return FALSE;
       }
-      catch (const std::exception& ex) 
-      {
-        std::cerr << "ERROR: " << ex.what() << endl; 
-        return TRUE;
-      }
-      res->rtyp = INT_CMD;
-      res->data = (char*) m;
-      return FALSE;
     }
+    WerrorS("maximalValue: vector is of wrong size");
+    return TRUE;
   }
   WerrorS("maximalValue: unexpected parameters");
   return TRUE;
@@ -1412,33 +1417,38 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*) v->Data();
-      int m;
-      try
+      if (iv->rows()==zp->ambientDimension())
       {
-        polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
-        polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
-        polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
-        polymake::perl::Object o("LinearProgram<Rational>");
-        o.take("LINEAR_OBJECTIVE") << lo;
-        p.take("LP") << o;
-        polymake::Integer mv = p.give("LP.MINIMAL_VALUE"); 
-        bool ok = true;
-        m = PmInteger2Int(mv,ok); 
-        if (!ok)
+        int m;
+        try
         {
-          WerrorS("overflow while converting polymake::Integer to int");
+          polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
+          polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
+          polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
+          polymake::perl::Object o("LinearProgram<Rational>");
+          o.take("LINEAR_OBJECTIVE") << lo;
+          p.take("LP") << o;
+          polymake::Integer mv = p.give("LP.MINIMAL_VALUE"); 
+          bool ok = true;
+          m = PmInteger2Int(mv,ok); 
+          if (!ok)
+          {
+            WerrorS("overflow while converting polymake::Integer to int");
+            return TRUE;
+          }
+        }
+        catch (const std::exception& ex) 
+        {
+          std::cerr << "ERROR: " << ex.what() << endl; 
           return TRUE;
         }
+        res->rtyp = INT_CMD;
+        res->data = (char*) m;
+        return FALSE;
       }
-      catch (const std::exception& ex) 
-      {
-        std::cerr << "ERROR: " << ex.what() << endl; 
-        return TRUE;
-      }
-      res->rtyp = INT_CMD;
-      res->data = (char*) m;
-      return FALSE;
     }
+    WerrorS("minimalValue: vector is of wrong size");
+    return TRUE;
   }
   WerrorS("minimalValue: unexpected parameters");
   return TRUE;
