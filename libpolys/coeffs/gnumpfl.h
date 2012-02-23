@@ -25,7 +25,7 @@ BOOLEAN  ngfEqual(number a, number b, const coeffs r);
 BOOLEAN  ngfIsOne(number a, const coeffs r);
 BOOLEAN  ngfIsMOne(number a, const coeffs r);
 BOOLEAN  ngfIsZero(number za, const coeffs r);
-number   ngfInit(int i, const coeffs r);
+number   ngfInit(long i, const coeffs r);
 int      ngfInt(number &n, const coeffs r);
 number   ngfNeg(number za, const coeffs r);
 number   ngfInvers(number a, const coeffs r);

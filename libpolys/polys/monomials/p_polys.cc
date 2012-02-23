@@ -1155,7 +1155,7 @@ int  p_GetVariables(poly p, int * e, const ring r)
 /*2
 * returns a polynomial representing the integer i
 */
-poly p_ISet(int i, const ring r)
+poly p_ISet(long i, const ring r)
 {
   poly rc = NULL;
   if (i!=0)

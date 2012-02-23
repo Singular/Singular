@@ -70,7 +70,7 @@ number nrMult (number a,number b, const coeffs r)
 /*2
 * create a number from int
 */
-number nrInit (int i, const coeffs r)
+number nrInit (long i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 

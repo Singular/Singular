@@ -200,7 +200,7 @@ void nr2mPower(number a, int i, number * result, const coeffs r)
 /*
  * create a number from int
  */
-number nr2mInit(int i, const coeffs r)
+number nr2mInit(long i, const coeffs r)
 {
   if (i == 0) return (number)(NATNUMBER)i;
 

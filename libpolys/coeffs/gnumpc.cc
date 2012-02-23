@@ -51,7 +51,7 @@ number   ngcPar(int i, const coeffs r)
 /*2
 * n := i
 */
-number ngcInit (int i, const coeffs r)
+number ngcInit (long i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 

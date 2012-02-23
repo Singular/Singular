@@ -21,7 +21,7 @@ BOOLEAN nr2mInitChar    (coeffs r, void*);
 number  nr2mCopy        (number a, const coeffs r);
 BOOLEAN nr2mGreaterZero (number k, const coeffs r);
 number  nr2mMult        (number a, number b, const coeffs r);
-number  nr2mInit        (int i, const coeffs r);
+number  nr2mInit        (long i, const coeffs r);
 int     nr2mInt         (number &n, const coeffs r);
 number  nr2mAdd         (number a, number b, const coeffs r);
 number  nr2mSub         (number a, number b, const coeffs r);

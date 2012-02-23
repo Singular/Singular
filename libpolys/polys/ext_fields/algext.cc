@@ -81,7 +81,7 @@ BOOLEAN  naEqual(number a, number b, const coeffs cf);
 BOOLEAN  naIsOne(number a, const coeffs cf);
 BOOLEAN  naIsMOne(number a, const coeffs cf);
 BOOLEAN  naIsZero(number a, const coeffs cf);
-number   naInit(int i, const coeffs cf);
+number   naInit(long i, const coeffs cf);
 int      naInt(number &a, const coeffs cf);
 number   naNeg(number a, const coeffs cf);
 number   naInvers(number a, const coeffs cf);
@@ -252,7 +252,7 @@ number naInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs 
 
 
 
-number naInit(int i, const coeffs cf)
+number naInit(long i, const coeffs cf)
 {
   if (i == 0) return NULL;
   else        return (number)p_ISet(i, naRing);

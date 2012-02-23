@@ -115,7 +115,7 @@ int       p_IsUnivariate(poly p, const ring r);
 int      p_GetVariables(poly p, int * e, const ring r);
 
 /// returns the poly representing the integer i
-poly      p_ISet(int i, const ring r);
+poly      p_ISet(long i, const ring r);
 
 /// returns the poly representing the number n, destroys n
 poly      p_NSet(number n, const ring r);

@@ -20,7 +20,7 @@ BOOLEAN nrInitChar(coeffs r, void*);
 
 BOOLEAN nrGreaterZero (number k, const coeffs r);
 number  nrMult        (number a, number b, const coeffs r);
-number  nrInit        (int i, const coeffs r);
+number  nrInit        (long i, const coeffs r);
 int     nrInt         (number &n, const coeffs r);
 number  nrAdd         (number a, number b, const coeffs r);
 number  nrSub         (number a, number b, const coeffs r);

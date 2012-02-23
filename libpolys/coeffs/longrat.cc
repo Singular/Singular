@@ -2225,7 +2225,7 @@ number nlInit2gmp (mpz_t i, mpz_t j, const coeffs r)
 #else // DO_LINLINE
 
 // declare immedate routines
-number nlRInit (int i);
+number nlRInit (long i);
 BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
 number  _nlNeg_NoImm(number a);
@@ -2258,7 +2258,7 @@ LINLINE BOOLEAN nlEqual (number a, number b, const coeffs r)
   return _nlEqual_aNoImm_OR_bNoImm(a, b);
 }
 
-LINLINE number nlInit (int i, const coeffs r)
+LINLINE number nlInit (long i, const coeffs r)
 {
   number n;
   LONG ii=(LONG)i;

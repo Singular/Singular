@@ -39,7 +39,7 @@ union nf
 /*2
 * n := i
 */
-number ngfInit (int i, const coeffs r)
+number ngfInit (long i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   

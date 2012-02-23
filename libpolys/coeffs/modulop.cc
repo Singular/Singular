@@ -82,7 +82,7 @@ number npMult (number a,number b, const coeffs r)
 /*2
 * create a number from int
 */
-number npInit (int i, const coeffs r)
+number npInit (long i, const coeffs r)
 {
   long ii=i;
   while (ii <  0L)                         ii += (long)r->ch;

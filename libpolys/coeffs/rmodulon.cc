@@ -99,7 +99,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 /*
  * create a number from int
  */
-number nrnInit(int i, const coeffs r)
+number nrnInit(long i, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);

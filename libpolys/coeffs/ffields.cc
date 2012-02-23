@@ -159,7 +159,7 @@ number nfMult (number a,number b, const coeffs r)
 /*2
 * int -> number
 */
-number nfInit (int i, const coeffs r)
+number nfInit (long i, const coeffs r)
 {
   assume( r->m_nfPlus1Table != NULL );
   // Hmm .. this is just to prevent initialization

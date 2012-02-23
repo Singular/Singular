@@ -21,7 +21,7 @@ int     nrnSize        (number a, const coeffs r);
 void    nrnDelete      (number *a, const coeffs r);
 BOOLEAN nrnGreaterZero (number k, const coeffs r);
 number  nrnMult        (number a, number b, const coeffs r);
-number  nrnInit        (int i, const coeffs r);
+number  nrnInit        (long i, const coeffs r);
 int     nrnInt         (number &n, const coeffs r);
 number  nrnAdd         (number a, number b, const coeffs r);
 number  nrnSub         (number a, number b, const coeffs r);

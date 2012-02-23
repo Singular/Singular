@@ -99,7 +99,7 @@ BOOLEAN  ntEqual(number a, number b, const coeffs cf);
 BOOLEAN  ntIsOne(number a, const coeffs cf);
 BOOLEAN  ntIsMOne(number a, const coeffs cf);
 BOOLEAN  ntIsZero(number a, const coeffs cf);
-number   ntInit(int i, const coeffs cf);
+number   ntInit(long i, const coeffs cf);
 int      ntInt(number &a, const coeffs cf);
 number   ntNeg(number a, const coeffs cf);
 number   ntInvers(number a, const coeffs cf);
@@ -335,7 +335,7 @@ number ntInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs 
 }
 
    
-number ntInit(int i, const coeffs cf)
+number ntInit(long i, const coeffs cf)
 {
   if (i == 0) return NULL;
   else

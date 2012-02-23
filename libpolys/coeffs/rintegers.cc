@@ -89,7 +89,7 @@ void nrzPower (number a, int i, number * result, const coeffs)
 /*
  * create a number from int
  */
-number nrzInit (int i, const coeffs)
+number nrzInit (long i, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);

@@ -112,7 +112,7 @@ struct n_Procs_s
    numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
    
    /// init with an integer
-   number  (*cfInit)(int i,const coeffs r);
+   number  (*cfInit)(long i,const coeffs r);
 
    /// init with a GMP integer
    number  (*cfInitMPZ)(mpz_t i, const coeffs r);
@@ -403,7 +403,7 @@ static inline number n_GetUnit(number n, const coeffs r)
 #endif
 
 /// a number representing i in the given coeff field/ring r
-static inline number n_Init(int i,       const coeffs r)
+static inline number n_Init(long i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
 /// conversion of a GMP integer to number

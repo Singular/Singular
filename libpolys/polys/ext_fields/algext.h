@@ -52,7 +52,7 @@ BOOLEAN  naEqual(number a, number b, const coeffs cf);
 BOOLEAN  naIsOne(number a, const coeffs cf);
 BOOLEAN  naIsMOne(number a, const coeffs cf);
 BOOLEAN  naIsZero(number a, const coeffs cf);
-number   naInit(int i, const coeffs cf);
+number   naInit(long i, const coeffs cf);
 int      naInt(number &a, const coeffs cf);
 number   naNeg(number a, const coeffs cf);
 number   naInvers(number a, const coeffs cf);

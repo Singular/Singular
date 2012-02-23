@@ -27,7 +27,7 @@ BOOLEAN npInitChar(coeffs r, void* p);
 
 BOOLEAN npGreaterZero (number k, const coeffs r);
 number  npMult        (number a, number b, const coeffs r);
-number  npInit        (int i, const coeffs r);
+number  npInit        (long i, const coeffs r);
 int     npInt         (number &n, const coeffs r);
 number  npAdd         (number a, number b,const coeffs r);
 number  npSub         (number a, number b,const coeffs r);

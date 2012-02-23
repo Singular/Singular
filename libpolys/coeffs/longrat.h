@@ -44,7 +44,7 @@ struct snumber
 #endif // DO_LINLINE
 
 LINLINE BOOLEAN  nlEqual(number a, number b, const coeffs r);
-LINLINE number   nlInit(int i, const coeffs r);
+LINLINE number   nlInit(long i, const coeffs r);
 number nlRInit (long i);
 LINLINE BOOLEAN  nlIsOne(number a, const coeffs r);
 LINLINE BOOLEAN  nlIsZero(number za, const coeffs r);
