@@ -37,15 +37,6 @@ typedef struct sip_sideal *       ideal;
 struct sip_smap;
 typedef struct sip_smap *         map;
 
-
-#if SIZEOF_LONG == 4
-typedef long long int64;
-#elif SIZEOF_LONG == 8
-typedef long int64;
-#else
-#error int64 undefined
-#endif
-
 /* the function pointer types */
 
 typedef long     (*pLDegProc)(poly p, int *length, ring r);

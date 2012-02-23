@@ -20,8 +20,11 @@
 #endif
 
 
+// #define ULONG_MAX (~0UL) // ??
 #define ULONG_MAX (~0L)
 
+// TODO: fixing the following BUG (!?) leads to wrong ring::bitmask
+// #if ~0UL != 4294967295UL
 #if ~0UL == 4294967295UL
 #define LONG_MAX 9223372036854775807L
 #else

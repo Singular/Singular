@@ -10,7 +10,12 @@
 /* includes */
 #include <math.h>
 
+#include "config.h"
+
 #include <omalloc/omalloc.h>
+
+#include <misc/auxiliary.h>
+#include <misc/mylimits.h>
 #include <misc/options.h>
 #include <misc/int64vec.h>
 
