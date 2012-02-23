@@ -28,16 +28,18 @@ const int gf_maxtable = 63001;
 const int gf_maxbuffer = 200;
 
 const int gf_primes_len = 42;
-//static unsigned short gf_primes [] =
-//{
-//      2,   3,   5,   7,  11,  13,  17,  19,
-//     23,  29,  31,  37,  41,  43,  47,  53,
-//     59,  61,  67,  71,  73,  79,  83,  89,
-//     97, 101, 103, 107, 109, 113, 127, 131,
-//    137, 139, 149, 151, 157, 163, 167, 173,
-//    179, 181, 191, 193, 197, 199, 223, 211,
-//    227, 229, 233, 239, 241, 251
-//};
+#ifndef NOASSERT
+static unsigned short gf_primes [] =
+{
+      2,   3,   5,   7,  11,  13,  17,  19,
+     23,  29,  31,  37,  41,  43,  47,  53,
+     59,  61,  67,  71,  73,  79,  83,  89,
+     97, 101, 103, 107, 109, 113, 127, 131,
+    137, 139, 149, 151, 157, 163, 167, 173,
+    179, 181, 191, 193, 197, 199, 223, 211,
+    227, 229, 233, 239, 241, 251
+};
+#endif
 
 int gf_q = 0;
 int gf_p = 0;
@@ -187,31 +189,33 @@ static void gf_get_table ( int p, int n )
     (void)fclose( inputfile );
 }
 
-//static bool gf_valid_combination ( int p, int n )
-//{
-//    int i = 0;
-//    while ( i < gf_primes_len && gf_primes[i] != p ) i++;
-//    if ( i == gf_primes_len )
-//        return false;
-//    else
-//    {
-//        i = n;
-//        int a = 1;
-//        while ( a < gf_maxtable && i > 0 )
-//        {
-//            a *= p;
-//            i--;
-//        }
-//        if ( i > 0 || a > gf_maxtable )
-//            return false;
-//        else
-//            return true;
-//    }
-//}
+#ifndef NOASSERT
+static bool gf_valid_combination ( int p, int n )
+{
+    int i = 0;
+    while ( i < gf_primes_len && gf_primes[i] != p ) i++;
+    if ( i == gf_primes_len )
+        return false;
+    else
+    {
+        i = n;
+        int a = 1;
+        while ( a < gf_maxtable && i > 0 )
+        {
+            a *= p;
+            i--;
+        }
+        if ( i > 0 || a > gf_maxtable )
+            return false;
+        else
+            return true;
+    }
+}
+#endif
 
 void gf_setcharacteristic ( int p, int n, char name )
 {
-    //ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
+    ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
     gf_name = name;
     gf_get_table( p, n );
 }
