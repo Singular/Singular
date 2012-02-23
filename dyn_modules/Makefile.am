@@ -1,0 +1,7 @@
+ACLOCAL_AMFLAGS = -I ../m4
+
+PACKAGES=bigintm syzextra
+SUBDIRS=$(PACKAGES)
+
+TESTDIRS=$(PACKAGES)
+

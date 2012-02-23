@@ -6,7 +6,7 @@ else
   USE_FACTORY =
 endif
  
-PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming
+PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming dyn_modules
 
 SUBDIRS=$(PACKAGES)
 

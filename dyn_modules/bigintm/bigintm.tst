@@ -6,18 +6,18 @@ echo = 2;
 if( system("with", "ndebug") )
 {
   "Loading the Release version!";
-  LIB("./bigintm.so");
+  LIB("bigintm.so");
 }
 else
 {
   "Loading the Debug version!";
-  LIB("./bigintm_g.sog");
+  LIB("bigintm_g.so");
 }
 
 printBlackboxTypes();
 bigintm_setup();
 printBlackboxTypes();
-bigintm_setup();
+bigintm_setup(); // error is expected!!!
 printBlackboxTypes();
 
 
@@ -43,6 +43,8 @@ a - b;
 a * b;
 
 typeof(_);
+
+$ // the rest is more for checking the Singular interpreter!
 
 a();
 

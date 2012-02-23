@@ -30,12 +30,12 @@ echo = 2;
 if( system("with", "ndebug") )
 {
   "Loading the Release version!";
-  LIB("./syzextra.so");
+  LIB("syzextra.so");
 }
 else
 {
   "Loading the Debug version!";
-  LIB("./syzextra_g.sog");
+  LIB("syzextra_g.so");
 }
 
 noop();

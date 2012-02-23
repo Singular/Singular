@@ -135,6 +135,9 @@ AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])
 AC_CONFIG_FILES([IntegerProgramming/Makefile])
+AC_CONFIG_FILES([dyn_modules/Makefile])
+AC_CONFIG_FILES([dyn_modules/bigintm/Makefile])
+AC_CONFIG_FILES([dyn_modules/syzextra/Makefile])
 AC_CONFIG_FILES([libsingular-config])
 
 AC_OUTPUT
