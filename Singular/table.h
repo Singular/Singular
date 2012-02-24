@@ -1181,6 +1181,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_LINK),     LINK_CMD,       STRING_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }
+,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
 ,{NULL,         0,              0 }
 };
 struct sValAssign_sys dAssign_sys[]=
