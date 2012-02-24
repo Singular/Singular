@@ -1,0 +1,382 @@
+////////////////////////////////////////////////////////////////////////////////
+version="$Id: modnormal.lib 14273 2011-06-10 10:44:10Z steidel $";
+category = "Commutative Algebra";
+info="
+LIBRARY:  modnormal.lib      Normalization of rings with modular techniques
+
+AUTHORS:  
+
+
+@*
+
+OVERVIEW:
+
+We implement a class divisor on an algebraic variety and methods
+for computing with them. Divisors are represented by tuples of ideals
+defining the positive and the negative part. In particular, we implement the group
+structure on divisors, computing global sections and testing linear
+equivalence.
+
+In addition to this we provide a class formaldivisor which implements
+formal sums of divisors (not necessarily prime). A formal divisor
+can be evaluated to a divisor, and a divisor can be decomposed into
+a formal sum.
+
+
+REFERENCES:
+
+For the class divisor we closely follow
+http://www.math.uiuc.edu/Macaulay2/doc/Macaulay2-1.4/share/doc/Macaulay2/Macaulay2Doc/html/___Tutorial_co_sp__Divisors.html
+
+
+PROCEDURES:
+
+makeDivisor(ideal,ideal)                        create a divisor
+divisorplus(divisor,divisor)                    add two divisors
+multdivisor(int,divisor)                        multiply a divisor by an interger
+normalform(divisor)                             normalform of a divisor
+isEqualDivisor(divisor,divisor)                 test whether two divisors are equal
+purify1(ideal)                                  purify an S2 ideal in codim 1
+globalSections(divisor)                         compute the global sections of a divisor
+degreeDivisor(divisor)                          degree of a divisor
+linearlyEquivalent(divisor,divisor)             test whether two divisors a linearly equivalent
+effective(divisor)                              compute an effective divisor linearly equivalent to a divisor
+
+makeFormalDivisor(list)                         make a formal integer sum of divisors
+evaluateFormalDivisor(formaldivisor)            evalutate a formal sum of divisors to a divisor
+formaldivisorplus(formaldivisor,formaldivisor)  add two formal divisors
+multformaldivisor(int,formaldivisor)            multiply a formal divisor by an interger
+degreeFormalDivisor(formaldivisor)              degree of a formal divisor
+
+primDecDivisor(divisor)                         decompose a divisor into a formal divisor of primary divisors
+
+makePDivisor(List)                              make a formal polyhedral sum of divisors
+
+KEYWORDS:
+
+";
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+LIB "primdec.lib";
+
+proc mod_init()
+{
+//if (!defined(Gfanlib::coneViaRays)) {
+  LIB("gfanlib.so");
+  export(Gfanlib);
+//}
+//if (!defined(Polymake::minkowskiSum)) {
+  LIB("polymake.so");
+  export(Polymake);
+//}
+newstruct("divisor","ideal den,ideal num");
+newstruct("formaldivisor","list summands");
+newstruct("pdivisor","list summands, cone tail");
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// divisors as numerator and denomiator ideals
+
+proc makeDivisor(ideal I, ideal J){
+divisor C;
+C.num = purify1(I);
+C.den = purify1(J);
+return(C);
+}
+
+
+proc divisorplus(divisor A, divisor B){
+return(makeDivisor(interred(A.num*B.num),interred(A.den*B.den)));
+}
+
+proc multdivisor(int n, divisor A){
+if (n<0) {return(multdivisor(-n,negativedivisor(A)));}
+return(makeDivisor(interred((A.num)^n),interred((A.den)^n)));
+}
+
+proc negativedivisor(divisor A){
+divisor B;
+B.num=A.den;
+B.den=A.num;
+return(B);
+}
+
+proc normalForm(divisor A){
+divisor B;
+B.num=quotient(A.num,A.den);
+B.den=quotient(A.den,A.num);
+return(B);}
+
+
+proc isEqualIdeal(ideal A,ideal B){
+return((size(NF(A,std(B)))==0) && (size(NF(B,std(A)))==0));
+}
+
+
+proc isEqualDivisor(divisor A,divisor B){
+A=normalForm(A);
+B=normalForm(B);
+return((isEqualIdeal(A.num,B.num)) && (isEqualIdeal(A.den,B.den)));
+}
+
+
+proc purify1(ideal I)
+{
+I = simplify(I,2);
+if (I[1]==0){ERROR("expected a non-zero ideal");}
+ideal f = I[1];
+return(minbase(quotient(f,quotient(f,I))));
+}
+
+
+proc basis(ideal I,int d)
+{
+I=simplify(jet(intersect(I,maxideal(d)),d),2);
+return(I)}
+
+//basis(ideal(x,y^3),2);
+
+proc globalSections(divisor D)
+{
+poly f =(simplify(D.num,2))[1];
+ideal LD = basis(purify1(quotient(f*D.den,D.num)),deg(f));
+list L = simplify(LD,2),f;
+return(L);
+}
+
+
+proc sectionIdeal(poly f, poly g, divisor D){
+return(purify1(quotient(quotient(f*D.num,g), D.den)));
+}
+
+proc degreeDivisor(divisor A){
+  return( deg(std(A.num))-deg(std(A.den)));
+}
+
+proc linearlyEquivalent(divisor A, divisor B){
+divisor F = normalForm(divisorplus(A,negativedivisor(B)));
+list LB = globalSections(F);
+if (size(LB[1])!=1) {return(0);}
+ideal V = sectionIdeal(LB[1][1,1],LB[2],F);
+if (isEqualIdeal(V,ideal(1))==1) {return(list(LB[1][1,1],LB[2]));}
+return(0);}
+
+
+proc effective(divisor A){
+list LB = globalSections(A);
+if (size(LB[1])==0) {ERROR("the divisor is not linearly equivalent to an effective divisor");}
+ideal V = sectionIdeal(LB[1][1,1],LB[2],A);
+return(makeDivisor(V,ideal(1)));}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// formal sums of divisors
+
+proc makeFormalDivisor(list L){
+formaldivisor C;
+C.summands = L;
+return(C);
+}
+
+proc evaluateFormalDivisor(formaldivisor D){
+list L = D.summands;
+if (size(L)==0) {return(makeDivisor(ideal(1),ideal(1)));}
+int i;
+divisor E = multdivisor(L[1][1],L[1][2]);
+  for ( i=2; i <= size(L); i++ )
+  {
+    E = divisorplus(E, multdivisor(L[i][1],L[i][2]));
+  }
+return(E);}
+
+
+
+proc position(divisor I,list L){
+int i;
+for (i=1; i <=size(L); i++){
+   if (isEqualDivisor(I,L[i][2])==1) {return(i);}
+}
+return(0);}
+
+
+proc formaldivisorplus(formaldivisor A, formaldivisor B){
+formaldivisor C;
+int i,p;
+int j=1;
+list L;
+list LA=A.summands;
+list LB=B.summands;
+for (i=1; i<=size(LA);i++){
+   p=position(LA[i][2],L);
+   if (p==0) {
+        L[j]=list(); 
+        L[j][2]=LA[i][2];
+        L[j][1]=LA[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=L[p][1]+LA[i][1];
+   };
+}
+for (i=1; i<=size(LB);i++){
+   p=position(LB[i][2],L);
+   if (p==0) { 
+        L[j]=list(); 
+        L[j][2]=LB[i][2];
+        L[j][1]=LB[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=L[p][1]+LB[i][1];
+   };
+}
+//C.summands = (A.summands)+(B.summands);
+return(L);
+}
+
+proc degreeFormalDivisor(formaldivisor A){
+int i,s;
+list L = A.summands;
+for (i=1;i<=size(L);i++){
+    s=s+L[i][1]*degreeDivisor(L[i][2]);
+}
+return(s);
+}
+
+
+proc multformaldivisor(int n,formaldivisor A){
+formaldivisor B;
+list L=A.summands;
+int i;
+for (i=1;i<=size(L);i++){
+  L[i][1]=n*L[i][1];
+}
+B.summands=L;
+return(B);
+}
+
+proc negativeformaldivisor(formaldivisor A){
+formaldivisor B;
+list L=A.summands;
+int i;
+for (i=1;i<=size(L);i++){
+  L[i][1]=-L[i][1];
+}
+B.summands=L;
+return(B);
+}
+
+
+proc primDecDivisor(divisor D){
+formaldivisor E;
+ideal I = D.num;
+ideal J = D.den;
+list L;
+int i;
+int j = 1;
+list LI = primdecGTZ(I);
+for (i=1;i<=size(LI);i++){
+   LI[i][2];
+   L[j]=list(1,makeDivisor(LI[i][1],ideal(1)));
+   j=j+1;
+};
+list LJ = primdecGTZ(J);
+for (i=1;i<=size(LJ);i++){
+   LJ[i][2];
+   L[j]=list(-1,makeDivisor(LJ[i][1],ideal(1)));
+   j=j+1;
+};
+E.summands=L;
+return(E);}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// P-divisors
+
+proc makePDivisor(list L){
+pdivisor P;
+P.summands = L;
+cone C = tailCone(L[1][1]);
+P.tail = C;
+return(P);
+}
+
+proc tailCone(polytope P){
+intmat rays = Gfanlib::getVertices(P);
+int i,j;
+for (i=1; i<=nrows(rays);i++){
+   if (rays[i,1]==1) {
+      for (j=1; j<=ncols(rays);j++){
+         rays[i,j]=0;
+      }  
+   }
+}
+cone C = Gfanlib::coneViaRays(rays);
+return(C);
+}
+
+
+proc evaluatePDivisor(pdivisor D,intvec v){
+formaldivisor vD;
+//
+list L = D.summands;
+list vL;
+int i;
+intvec vv = 0;
+for (i=1; i<=size(v);i++){
+   vv[i+1]=v[i];
+}
+for (i=1; i<=size(L);i++){
+        vL[i]=list(); 
+        vL[i][2]=L[i][2];
+        vL[i][1]=Polymake::minimalValue(L[i][1],vv);
+}
+vD.summands = vL;
+return(vD);}
+
+
+
+
+
+proc pdivisorplus(pdivisor A, pdivisor B){
+pdivisor C;
+int i,p;
+int j=1;
+if (!(Gfanlib::isEqual(A.tailcone,B.tailcone))) {ERROR("tail cones should be equal");}
+list L;
+list LA=A.summands;
+list LB=B.summands;
+for (i=1; i<=size(LA);i++){
+   p=position(LA[i][2],L);
+   if (p==0) {
+        L[j]=list(); 
+        L[j][2]=LA[i][2];
+        L[j][1]=LA[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=Polymake::minkowskiSum(L[p][1],LA[i][1]);
+   };
+}
+for (i=1; i<=size(LB);i++){
+   p=position(LB[i][2],L);
+   if (p==0) { 
+        L[j]=list(); 
+        L[j][2]=LB[i][2];
+        L[j][1]=LB[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=Polymake::minkowskiSum(L[p][1],LB[i][1]);
+   };
+}
+C.summands = L;
+C.tail = A.tail;
+return(C);
+}
+
+
+
+
