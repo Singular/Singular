@@ -821,6 +821,11 @@ static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
+static BOOLEAN jiA_DEF(leftv res, leftv a, Subexpr e)
+{
+  res->data=(void *)0;
+  return FALSE;
+}
 /*=================== table =================*/
 #define IPASSIGN
 #define D(A)     A
@@ -857,25 +862,21 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   int i=0;
   if (lt==DEF_CMD)
   {
-    if (rt!=DEF_CMD)
+    if (l->rtyp==IDHDL)
     {
-      if (l->rtyp==IDHDL)
-      {
-        IDTYP((idhdl)l->data)=rt;
-      }
-      else if (l->name!=NULL)
-      {
-        sleftv ll;
-        iiDeclCommand(&ll,l,myynest,rt,&IDROOT);
-        memcpy(l,&ll,sizeof(sleftv));
-      }
-      else
-      {
-        l->rtyp=rt;
-      }
-      lt=rt;
+      IDTYP((idhdl)l->data)=rt;
     }
-    // else: def=def: silently ignored
+    else if (l->name!=NULL)
+    {
+      sleftv ll;
+      iiDeclCommand(&ll,l,myynest,rt,&IDROOT);
+      memcpy(l,&ll,sizeof(sleftv));
+    }
+    else
+    {
+      l->rtyp=rt;
+    }
+    lt=rt;
   }
   else
   {
