@@ -1,6 +1,6 @@
 #include <Singular/mod2.h>
 
-#ifdef HAVE_FANS
+// #ifdef HAVE_FANS
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -9,13 +9,13 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <gfanlib/gfanlib.h>
-#include <kernel/bbcone.h>
 #include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <kernel/ring.h>
 #include <kernel/polys.h>
 #include <sstream>
 
+#include <callgfanlib/bbcone.h>
 
 int polytopeID;
 
@@ -493,6 +493,32 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
   return TRUE;
 }
 
+BOOLEAN scalePolytope(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INT_CMD))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      int s = (int)(long) u->Data();
+      gfan::ZCone* zp = (gfan::ZCone*) v->Data();
+      gfan::ZMatrix zm = zp->extremeRays();
+      for (int i=0; i<zm.getHeight(); i++)
+        for (int j=1; j<zm.getWidth(); j++)
+          zm[i][j]*=s;
+      gfan::ZCone* zq = new gfan::ZCone();
+      *zq = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+      res->rtyp = polytopeID;
+      res->data = (char*) zq;
+      return FALSE;
+    }
+  }
+  WerrorS("scalePolytope: unexpected parameters");
+  return TRUE;
+
+}
+
 void bbpolytope_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -511,6 +537,7 @@ void bbpolytope_setup()
   iiAddCproc("","quickPolytopeViaNormals",FALSE,quickPolytopeViaNormals);
   iiAddCproc("","getVertices",FALSE,getVertices);
   iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
+  iiAddCproc("","scalePolytope",FALSE,scalePolytope);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                               
@@ -529,5 +556,5 @@ void bbpolytope_setup()
   //Print("created type %d (polytope)\n",polytopeID); 
 }
 
-#endif
+// #endif
 /* HAVE_FANS */

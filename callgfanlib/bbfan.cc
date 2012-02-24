@@ -1,5 +1,5 @@
 #include <Singular/mod2.h>
-#ifdef HAVE_FANS
+// #ifdef HAVE_FANS
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -7,12 +7,13 @@
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
-#include <kernel/bbfan.h>
-#include <kernel/bbcone.h>
 #include <Singular/ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
+
+#include <callgfanlib/bbfan.h>
+#include <callgfanlib/bbcone.h>
 
 int fanID;
 
@@ -729,5 +730,5 @@ void bbfan_setup()
   //Print("created type %d (fan)\n",fanID); 
 }
 
-#endif
+// #endif
 /* HAVE_FANS */
