@@ -127,10 +127,3 @@ template class Cache<MinorKey, IntMinorValue>;
 template class Cache<MinorKey, PolyMinorValue>;
 #endif
 
-#ifdef HAVE_FANS
-template class gfan::Vector<gfan::Integer>;
-template class gfan::Vector<gfan::Rational>;
-template class gfan::Matrix<gfan::Integer>;
-template class gfan::Matrix<gfan::Rational>;
-#endif
-//template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);
