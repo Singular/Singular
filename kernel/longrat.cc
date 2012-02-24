@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -475,7 +474,7 @@ int nlSize(number a)
   if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
   int s=a->z[0]._mp_alloc;
-//  while ((s>0) &&(a->z._mp_d[s]==0L)) s--; 
+//  while ((s>0) &&(a->z._mp_d[s]==0L)) s--;
 //#if SIZEOF_LONG == 8
 //  if (a->z._mp_d[s] < (unsigned long)0x100000000L) s=s*2-1;
 //  else s *=2;
@@ -484,7 +483,7 @@ int nlSize(number a)
   if (a->s<2)
   {
     int d=a->n[0]._mp_alloc;
-//    while ((d>0) && (a->n._mp_d[d]==0L)) d--; 
+//    while ((d>0) && (a->n._mp_d[d]==0L)) d--;
 //#if SIZEOF_LONG == 8
 //    if (a->n._mp_d[d] < (unsigned long)0x100000000L) d=d*2-1;
 //    else d *=2;
@@ -843,7 +842,7 @@ number nlDiv (number a, number b)
     long i=SR_TO_INT(a);
     long j=SR_TO_INT(b);
     if ((i==-POW_2_28) && (j== -1L))
-    {  
+    {
       FREE_RNUMBER(u);
       return nlRInit(POW_2_28);
     }
@@ -1585,7 +1584,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
 }
 
 number _nlInpAdd_aNoImm_OR_bNoImm(number a, number b)
-{  
+{
   if (SR_HDL(b) & SR_INT)
   {
     switch (a->s)
@@ -2403,20 +2402,30 @@ number nlFarey(number nN, number nP, const ring)
     mpz_add(tmp,tmp,tmp);
     if (mpz_cmp(tmp,P)<0)
     {
-       // return N/B
-       z=ALLOC_RNUMBER();
-       #ifdef LDEBUG
-       z->debug=123456;
-       #endif
        if (mpz_isNeg(B))
        {
          mpz_neg(B,B);
          mpz_neg(N,N);
        }
-       mpz_init_set(z->z,N);
-       mpz_init_set(z->n,B);
-       z->s = 0;
-       nlNormalize(z);
+       // check for gcd(N,B)==1
+       mpz_gcd(tmp,N,B);
+       if (mpz_cmp_ui(tmp,1)==0)
+       {
+         // return N/B
+         z=ALLOC_RNUMBER();
+         #ifdef LDEBUG
+         z->debug=123456;
+         #endif
+         mpz_init_set(z->z,N);
+         mpz_init_set(z->n,B);
+         z->s = 0;
+         nlNormalize(z);
+       }
+       else
+       {
+         // return nN (the input) instead of "fail"
+         z=nlCopy(nN);
+       }
        break;
     }
     //mpz_mod(D,E,N);
