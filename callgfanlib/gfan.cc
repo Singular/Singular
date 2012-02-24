@@ -17,7 +17,7 @@ $Id: gfan.cc 14271 2011-06-10 08:00:12Z monerjan $
 #include <kernel/kmatrix.h>
 #include <kernel/GMPrat.h>
 
-#include "ring.h"	//apparently not needed
+//#include "ring.h"	//apparently not needed
 #include <Singular/lists.h>
 #include <kernel/prCopy.h>
 #include <kernel/stairc.h>
@@ -61,7 +61,7 @@ $Id: gfan.cc 14271 2011-06-10 08:00:12Z monerjan $
   #define USE_ZFAN
 #endif
 
-#include <gfan.h>
+#include <callgfanlib/gfan.h>
 using namespace std;
 
 #define ivIsStrictlyPositive iv64isStrictlyPositive
@@ -287,7 +287,7 @@ static bool areEqual(facet *f, facet *s)
 	const int64vec* sNormal;
 	fNormal = f->getRef2FacetNormal();
 	sNormal = s->getRef2FacetNormal();
-#include "intvec.h"
+#include <kernel/intvec.h>
 	//Do not need parallelity. Too time consuming
 //  	if(!isParallel(*fNormal,*sNormal))
 // 	if(fNormal->compare(ivNeg(sNormal))!=0)//This results in a Mandelbug

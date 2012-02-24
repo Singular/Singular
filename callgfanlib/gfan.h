@@ -26,7 +26,7 @@ extern int gfanHeuristic;
 #ifndef USE_ZFAN
   lists grfan(ideal inputIdeal, int heuristic, bool singleCone);
 #else
-  #include <../gfanlib/gfanlib.h>
+  #include <gfanlib/gfanlib.h>
   gfan::ZFan *grfan(ideal inputIdeal, int h, bool singleCone);
 #endif
 // lists grcone_by_intvec(ideal inputIdeal);

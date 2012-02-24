@@ -62,7 +62,7 @@
 #endif
 
 #ifdef HAVE_FANS
-#include <kernel/gfan.h>
+#include <callgfanlib/gfan.h>
 #include <gfanlib/gfanlib.h>
 #endif
 
