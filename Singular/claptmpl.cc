@@ -24,10 +24,6 @@
   template class ListIterator<fglmDelem>;
 #endif
 
-#ifdef HAVE_FANS
-#include <gfanlib/gfanlib.h>
-#endif
-
 // ----------------------------------------------------------------------------
 //  kmatrix.cc
 //  begin of file
@@ -115,6 +111,8 @@ template void noro_step<tgb_uint16>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
 //
+#endif
+
 /* next lines are templates used in new minor code */
 #include <list>
 #include <Singular/Minor.h>
@@ -125,5 +123,4 @@ template class std::list<IntMinorValue>;
 template class std::list<PolyMinorValue>;
 template class Cache<MinorKey, IntMinorValue>;
 template class Cache<MinorKey, PolyMinorValue>;
-#endif
 
