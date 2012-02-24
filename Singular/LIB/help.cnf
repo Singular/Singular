@@ -36,7 +36,7 @@ firefox!xDhE:firefox:!firefox %h &
 konqueror!xDhE:konqueror:!konqueror %h &
 galeon!xDhE:galeon:!galeon -n %h &
 netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
-safari!xh:E:/Applications/Safari.app:!open /Applications/Safari.app %h
+safari!xhE:/Applications/Safari.app:!open /Applications/Safari.app %h
 tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
 xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
 info!xiE:info:!info -f %i --node='%n'

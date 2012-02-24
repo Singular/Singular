@@ -612,6 +612,9 @@ export SINGULAR_ROOT_DIR
 
 # determine Makefiles to output
 OUTPUT_MAKEFILES="Makefile"
+if test "$enable_gfanlib" = yes; then
+   OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES callgfanlib/Makefile"
+fi
 if test -d "doc"; then
    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES doc/Makefile doc/version.texi doc/uname.texi"
 fi
@@ -2278,8 +2281,8 @@ echo "configure:2286: checking whether to configure and build gfan lib" >&5
 if test "$enable_gfanlib" = yes; then
   if test -d gfanlib; then
     echo "$ac_t""yes" 1>&6
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib"
-    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib"
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib callgfanlib"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib callgfanlib"
   else
     echo "$ac_t""no" 1>&6
   fi

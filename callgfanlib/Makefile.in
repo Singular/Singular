@@ -1,0 +1,25 @@
+CXX             = @CXX@
+PIPE            = @PIPE@
+DEFS            = -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
+CXXFLAGS        = @CXXFLAGS@ -I.. -I@prefix@ ${PIPE}
+CPPFLAGS        = -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@
+
+all: callgfan libcallgfan.a
+
+callgfan: 
+	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbcone.o  -c bbcone.cc
+	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbfan.o  -c bbfan.cc
+	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbpolytope.o -c bbpolytope.cc
+	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gfanlib.o -c gfanlib.cc
+	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gfan.o -c gfan.cc
+
+gfanlib.so:
+	$(CXX) -shared -o gfanlib.so bbcone.o bbfan.o bbpolytope.o gfanlib.o gfan.o ../gfanlib/*.o -L/usr/local/lib -lcddgmp -lgmpxx 
+	cp gfanlib.so ../Singular/gfanlib.so
+
+libcallgfan.a: bbcone.o bbfan.o bbpolytope.o  gfanlib.o gfan.o
+	ar cr $@ $^
+
+clean:
+	rm *.so *.o
+	rm ../Singular/gfanlib.so
