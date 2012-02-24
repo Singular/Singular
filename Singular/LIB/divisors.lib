@@ -2,10 +2,15 @@
 version="$Id: modnormal.lib 14273 2011-06-10 10:44:10Z steidel $";
 category = "Commutative Algebra";
 info="
-LIBRARY:  modnormal.lib      Normalization of rings with modular techniques
+LIBRARY:  divisors.lib      Divisors and P-Divisors
 
 AUTHORS:  
 
+boehm@mathematik.uni-kl.de
+blorenz@math.uni-frankfurt.de
+hannes@mathematik.uni-kl.de
+kastner@math.fu-berlin.de
+ren@mathematik.uni-kl.de
 
 @*
 
@@ -64,12 +69,12 @@ LIB "primdec.lib";
 proc mod_init()
 {
 //if (!defined(Gfanlib::coneViaRays)) {
-  LIB("gfanlib.so");
-  export(Gfanlib);
+//  LIB("gfanlib.so");
+//  export(Gfanlib);
 //}
 //if (!defined(Polymake::minkowskiSum)) {
-  LIB("polymake.so");
-  export(Polymake);
+//  LIB("polymake.so");
+//  export(Polymake);
 //}
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
@@ -346,7 +351,7 @@ proc pdivisorplus(pdivisor A, pdivisor B){
 pdivisor C;
 int i,p;
 int j=1;
-if (!(Gfanlib::isEqual(A.tailcone,B.tailcone))) {ERROR("tail cones should be equal");}
+if (!(A.tail==B.tail)) {ERROR("tail cones should be equal");}
 list L;
 list LA=A.summands;
 list LB=B.summands;
