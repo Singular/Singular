@@ -206,6 +206,77 @@ void * bbcone_Copy(blackbox*b, void *d)
   return newZc;
 }
 
+static BOOLEAN bbcone_Op2(int op, leftv res, leftv i1, leftv i2)
+{
+  gfan::ZCone* zp = (gfan::ZCone*) i1->Data();
+  switch(op)
+  {
+    case '&':
+    {  
+      if (i2->Typ()==coneID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
+        int d1 = zp->ambientDimension();
+        int d2 = zq->ambientDimension();
+        if (d1 != d2)
+        {
+          Werror("mismatching ambient dimensions");
+          return TRUE;
+        }
+        gfan::ZCone* zs = new gfan::ZCone();
+        *zs = gfan::intersection(*zp, *zq);
+        zs->canonicalize();
+        res->rtyp = coneID;
+        res->data = (void*) zs;
+        return FALSE;
+      }
+      return blackboxDefaultOp2(op,res,i1,i2);
+    }
+    case '|':
+    {
+      if(i2->Typ()==coneID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
+        int d1 = zp->ambientDimension();
+        int d2 = zq->ambientDimension();
+        if (d1 != d2)
+        {
+          Werror("mismatching ambient dimensions");
+          return TRUE;
+        }
+        gfan::ZMatrix rays = zp->extremeRays();
+        rays.append(zq->extremeRays());
+        gfan::ZMatrix lineality = zp->generatorsOfLinealitySpace();
+        lineality.append(zq->generatorsOfLinealitySpace());
+        gfan::ZCone* zs = new gfan::ZCone();
+        *zs = gfan::ZCone::givenByRays(rays,lineality);
+        zs->canonicalize();
+        res->rtyp = coneID;
+        res->data = (void*) zs;
+        return FALSE;
+      }
+    return blackboxDefaultOp2(op,res,i1,i2);
+    }
+    case EQUAL_EQUAL:
+    {
+      if(i2->Typ()==coneID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
+        zp->canonicalize();
+        zq->canonicalize();
+        bool b = !((*zp)!=(*zq));
+        res->rtyp = INT_CMD;
+        res->data = (char*) (int) b;
+        return FALSE;
+      }
+      return blackboxDefaultOp2(op,res,i1,i2);
+    }
+    default:
+      return blackboxDefaultOp2(op,res,i1,i2);
+  }
+  return blackboxDefaultOp2(op,res,i1,i2);
+}
+
 static BOOLEAN jjCONERAYS1(leftv res, leftv v)
 {
   /* method for generating a cone object from half-lines
@@ -1236,6 +1307,7 @@ void bbcone_setup()
   b->blackbox_Init=bbcone_Init;
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
+  b->blackbox_Op2=bbcone_Op2;
   iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
   iiAddCproc("","coneViaRays",FALSE,coneViaRays);
   iiAddCproc("","coneViaNormals",FALSE,coneViaNormals);

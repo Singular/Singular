@@ -23,6 +23,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
+#include <Singular/tok.h>
 
 using namespace polymake;
 
@@ -345,7 +346,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         res->data = (void*) ms;
         return FALSE;
       }
-      return TRUE;
+      return blackboxDefaultOp2(op,res,i1,i2);
     }
     case '*':
     {
@@ -362,7 +363,67 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         res->data = (void*) zs;
         return FALSE;
       }
-      return TRUE;
+      return blackboxDefaultOp2(op,res,i1,i2);
+    }
+    case '&':
+    {  
+      if (i2->Typ()==polytopeID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
+        int d1 = zp->ambientDimension();
+        int d2 = zq->ambientDimension();
+        if (d1 != d2)
+        {
+          Werror("mismatching ambient dimensions");
+          return TRUE;
+        }
+        gfan::ZCone* zs = new gfan::ZCone();
+        *zs = gfan::intersection(*zp, *zq);
+        zs->canonicalize();
+        res->rtyp = polytopeID;
+        res->data = (void*) zs;
+        return FALSE;
+      }
+      return blackboxDefaultOp2(op,res,i1,i2);
+    }
+    case '|':
+    {
+      if(i2->Typ()==polytopeID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
+        int d1 = zp->ambientDimension();
+        int d2 = zq->ambientDimension();
+        if (d1 != d2)
+        {
+          Werror("mismatching ambient dimensions");
+          return TRUE;
+        }
+        gfan::ZMatrix rays = zp->extremeRays();
+        rays.append(zq->extremeRays());
+        gfan::ZMatrix lineality = zp->generatorsOfLinealitySpace();
+        lineality.append(zq->generatorsOfLinealitySpace());
+        gfan::ZCone* zs = new gfan::ZCone();
+        *zs = gfan::ZCone::givenByRays(rays,lineality);
+        zs->canonicalize();
+        res->rtyp = polytopeID;
+        res->data = (void*) zs;
+        return FALSE;
+      }
+    return blackboxDefaultOp2(op,res,i1,i2);
+    }
+    case EQUAL_EQUAL:
+    {
+      if(i2->Typ()==polytopeID)
+      {
+        gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
+        zp->canonicalize();
+        zq->canonicalize();
+        bool b = !((*zp)!=(*zq));
+        res->rtyp = INT_CMD;
+        res->data = (char*) (int) b;
+        return FALSE;
+      }
+      return blackboxDefaultOp2(op,res,i1,i2);
     }
     default:
       return blackboxDefaultOp2(op,res,i1,i2);
