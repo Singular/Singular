@@ -70,6 +70,7 @@ bug_homog
 bug_interpol
 bug_mres
 bug_napMultT
+bug_newstruct
 bug_pd
 bug_presolve
 bug_primdec
