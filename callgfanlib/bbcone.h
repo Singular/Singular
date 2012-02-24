@@ -1,7 +1,7 @@
 #ifndef BBCONE_H
 #define BBCONE_H
 
-// #ifdef HAVE_FANS
+#ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
 #include <kernel/intvec.h>
 
@@ -24,5 +24,5 @@ int isSimplicial(gfan::ZCone* zc);
 bool containsInSupport(gfan::ZCone* zc, gfan::ZCone* zd);
 bool containsInSupport(gfan::ZCone* zc, intvec* vec);
 
-// #endif
+ #endif
 #endif

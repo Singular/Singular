@@ -231,10 +231,6 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     denom_list.cc \
     minpoly.cc
 
-ifdef HAVE_FANS
-CXXSOURCES+= bbcone.cc bbpolytope.cc bbfan.cc
-endif
-
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
 	mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \

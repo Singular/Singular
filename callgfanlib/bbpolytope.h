@@ -1,7 +1,7 @@
 #ifndef BBPOLYTOPE_H
 #define BBPOLYTOPE_H
 
-// #ifdef HAVE_FANS
+#ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
 
 extern int polytopeID;
@@ -13,5 +13,5 @@ int getAmbientDimension(gfan::ZCone* zc); // zc is meant to represent a polytope
 int getCodimension(gfan::ZCone *zc);
 int getDimension(gfan::ZCone* zc);
 
-// #endif
+#endif
 #endif

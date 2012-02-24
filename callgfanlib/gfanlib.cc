@@ -1,4 +1,5 @@
 #include <Singular/mod2.h>
+#ifdef HAVE_FANS
 #include <callgfanlib/bbcone.h>
 #include <callgfanlib/bbfan.h>
 #include <callgfanlib/bbpolytope.h>
@@ -14,3 +15,4 @@ extern "C" int mod_init(void* gfanlibsingular)
   bbfan_setup();
   bbpolytope_setup();
 }
+#endif
