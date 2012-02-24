@@ -3,15 +3,17 @@ PM_CFLAGS := -fPIC -DPOLYMAKE_DEBUG=0
 PM_LIBS := $(shell polymake-config --libs)
 PM_LDFLAGS := $(shell polymake-config --ldflags)
 
-CFLAGS += -march=native
-LDFLAGS += -Wl,-rpath,/home/ren/polymake-2.9.10/build.x86_64/perlx-5.10.1-x86_64-linux-gnu-thread-multi/ -lxml2
+CFLAGS += -march=native -DOM_NDEBUG -DNDEBUG
+LDFLAGS += -Wl,-rpath,/usr/local/include/polymake/ -lxml2
 
 all: polymake
 
 polymake: 
-	g++ -o polymake.o -I. ${PM_INC} ${PM_CFLAGS} ${CFLAGS} ${PM_LDFLAGS} ${PM_LIBS} -I/home/ren/Sources/ -c -g polymake.cc
-	g++ -shared -o polymake.so ${PM_INC} ${PM_CFLAGS} ${CFLAGS} ${PM_LDFLAGS} ${PM_LIBS} ${LDFLAGS} -lgmpxx -lgmp -g polymake.o
+	g++ -o polymake.o -I. ${PM_INC} ${PM_CFLAGS} ${CFLAGS} ${LDFLAGS} -I../ -c -g polymake.cc
+	g++ -shared -o polymake.so ${PM_LDFLAGS} ${LDFLAGS} -g polymake.o ${PM_LIBS} -lgmpxx -lgmp 
+	cp polymake.so ../Singular/polymake.so
 
 clean:
 	rm *.so *.o
+	rm ../Singular/polymake.so
 
