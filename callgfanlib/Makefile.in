@@ -20,6 +20,8 @@ gfanlib.so:
 libcallgfan.a: bbcone.o bbfan.o bbpolytope.o  gfanlib.o gfan.o
 	ar cr $@ $^
 
+install: libcallgfan.a
+
 clean:
 	rm *.so *.o
 	rm ../Singular/gfanlib.so
