@@ -4,13 +4,21 @@ DEFS            = -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 CXXFLAGS        = @CXXFLAGS@ -I.. -I@prefix@ ${PIPE}
 CPPFLAGS        = -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@
 
-all: callgfan libcallgfan.a
+all: libcallgfan.a
 
-callgfan: 
+bbcone.o: bbcone.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbcone.o  -c bbcone.cc
+
+bbfan.o: bbfan.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbfan.o  -c bbfan.cc
+
+bbpolytope.o: bbpolytope.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbpolytope.o -c bbpolytope.cc
+
+gfanlib.o: gfanlib.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gfanlib.o -c gfanlib.cc
+
+gfan.o: gfan.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gfan.o -c gfan.cc
 
 gfanlib.so:
