@@ -61,11 +61,6 @@
 #include <kernel/ringgb.h>
 #endif
 
-#ifdef HAVE_FANS
-#include <callgfanlib/gfan.h>
-#include <gfanlib/gfanlib.h>
-#endif
-
 #ifdef HAVE_F5
 #include <Singular/f5gb.h>
 #endif
@@ -3724,57 +3719,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                 */
 
   #endif
-
-#ifdef HAVE_FANS
-  /*======== GFAN ==============*/
-  /*
-   WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
-  */
-  if (strcmp(sys_cmd,"grfan")==0)
-  {
-    /*
-    heuristic:
-    0 = keep all Gröbner bases in memory
-    1 = write all Gröbner bases to disk and read whenever necessary
-    2 = use a mixed heuristic, based on length of Gröbner bases
-    */
-    if( h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
-    {
-      int heuristic;
-      heuristic=(int)(long)h->next->Data();
-      ideal I=((ideal)h->Data());
-      #ifndef USE_ZFAN
-        #define USE_ZFAN
-      #endif
-      #ifndef USE_ZFAN
-        res->rtyp=LIST_CMD; //res->rtyp=coneID; res->data(char*)zcone;
-        res->data=(lists) grfan(I,heuristic,FALSE);
-      #else
-        extern int fanID;
-        res->rtyp=fanID;
-        res->data=(void*)(grfan(I,heuristic,FALSE));
-      #endif
-      return FALSE;
-    }
-    else
-    {
-      WerrorS("Usage: system(\"grfan\",I,int)");
-      return TRUE;
-    }
-  }
-  //Possibility to have only one Gröbner cone computed by specifying a weight vector FROM THE RELATIVE INTERIOR!
-  //Needs wp as ordering!
-//   if(strcmp(sys_cmd,"grcone")==0)
-//   {
-//     if(h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
-//     {
-//       ideal I=((ideal)h->Data());
-//       res->rtyp=LIST_CMD;
-//       res->data=(lists)grcone_by_intvec(I);
-//     }
-//   }
-  else
-#endif
 /*==================== semaphore =================*/
 #ifdef HAVE_SIMPLEIPC
     if (strcmp(sys_cmd,"semaphore")==0)
@@ -3782,8 +3726,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if((h!=NULL) && (h->Typ()==STRING_CMD) && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
       {
         int v=1;
-	if ((h->next->next!=NULL)&& (h->next->next->Typ()==INT_CMD))
-	  v=(int)(long)h->next->next->Data();
+        if ((h->next->next!=NULL)&& (h->next->next->Typ()==INT_CMD))
+          v=(int)(long)h->next->next->Data();
         res->data=(char *)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
         res->rtyp=INT_CMD;
         return FALSE;
