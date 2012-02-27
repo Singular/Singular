@@ -634,7 +634,7 @@ installtest:	test_install
 #
 # - install targets.
 #
-install install-libsingular:	$(installtargets)
+install install-libsingular:	$(installtargets) cf_gmp.h
 
 install_all:    install libsingcf_p.a 
 		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a 
