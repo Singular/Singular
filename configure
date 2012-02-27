@@ -2276,20 +2276,6 @@ fi
   fi
 fi
 
-echo $ac_n "checking whether to configure and build gfan lib""... $ac_c" 1>&6
-echo "configure:2286: checking whether to configure and build gfan lib" >&5
-if test "$enable_gfanlib" = yes; then
-  if test -d gfanlib; then
-    echo "$ac_t""yes" 1>&6
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib callgfanlib"
-    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib callgfanlib"
-  else
-    echo "$ac_t""no" 1>&6
-  fi
-else
-  echo "$ac_t""no" 1>&6
-fi
-
 # Check whether we have gmp
 if test "$ac_gmp_ok" != yes; then
   { echo "configure: error: can not find gmp" 1>&2; exit 1; }
@@ -2549,6 +2535,20 @@ elif  test "$enable_libfac" = yes; then
   else
     echo "$ac_t""no" 1>&6
     { echo "configure: error: Can not build libfac without factory" 1>&2; exit 1; }
+  fi
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+echo $ac_n "checking whether to configure and build gfan lib""... $ac_c" 1>&6
+echo "configure:2286: checking whether to configure and build gfan lib" >&5
+if test "$enable_gfanlib" = yes; then
+  if test -d gfanlib; then
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib callgfanlib"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib callgfanlib"
+  else
+    echo "$ac_t""no" 1>&6
   fi
 else
   echo "$ac_t""no" 1>&6

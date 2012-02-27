@@ -359,19 +359,6 @@ fi
   fi
 fi
 
-AC_MSG_CHECKING(whether to configure and build gfan lib)
-if test "$enable_gfanlib" = yes; then
-  if test -d gfanlib; then
-    AC_MSG_RESULT(yes)
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib callgfanlib"
-    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib callgfanlib"
-  else
-    AC_MSG_RESULT(no)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
-
 # Check whether we have gmp
 if test "$ac_gmp_ok" != yes; then
   AC_MSG_ERROR(can not find gmp)
@@ -501,6 +488,19 @@ elif  test "$enable_libfac" = yes; then
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(Can not build libfac without factory)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to configure and build gfan lib)
+if test "$enable_gfanlib" = yes; then
+  if test -d gfanlib; then
+    AC_MSG_RESULT(yes)
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib callgfanlib"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib callgfanlib"
+  else
+    AC_MSG_RESULT(no)
   fi
 else
   AC_MSG_RESULT(no)
