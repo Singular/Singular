@@ -2826,8 +2826,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
             rSetISReference( res,
               F,  // WILL BE COPIED!
               r->typ[i].data.is.limit,
-              j++,
-              r->typ[i].data.is.componentWeights // WILL BE COPIED
+              j++
               )
             );
           id_Delete(&F, res);
@@ -3315,17 +3314,11 @@ static void rSetDegStuff(ring r)
 
   if( rGetISPos(0, r) != -1 ) // Are there Schreyer induced blocks?
   {
-    if( r->pFDeg == p_Totaldegree )
-    {
-      extern long p_TotaldegreeIS(poly p, const ring r);
-      r->pFDeg = p_TotaldegreeIS;
-    }
 #ifndef NDEBUG
-    else
-      assume( r->pFDeg == p_Deg || r->pFDeg == p_WTotaldegree );
+      assume( r->pFDeg == p_Deg || r->pFDeg == p_WTotaldegree || r->pFDeg == p_Totaldegree);
 #endif
 
-    r->pLDeg = pLDeg1;
+    r->pLDeg = pLDeg1; // ?
   }
 
   r->pFDegOrig = r->pFDeg;
@@ -3858,12 +3851,6 @@ void rUnComplete(ring r)
           id_Delete(&r->typ[i].data.is.F, r);
           r->typ[i].data.is.F = NULL; // ?
 
-          if( r->typ[i].data.is.componentWeights != NULL )
-          {
-            delete r->typ[i].data.is.componentWeights;
-            r->typ[i].data.is.componentWeights = NULL; // ?
-          }
-
           if( r->typ[i].data.is.pVarOffset != NULL )
           {
             omFreeSize((ADDRESS)r->typ[i].data.is.pVarOffset, (r->N +1)*sizeof(int));
@@ -4075,18 +4062,11 @@ void rDebugPrint(ring r)
 //      for( int k = 0; k <= r->N; k++) if (r->typ[j].data.is.pVarOffset[k] != -1) Print("[%2d]: %04x; ", k, r->typ[j].data.is.pVarOffset[k]);
 
       Print("  limit %d",r->typ[j].data.is.limit);
-      #ifndef NDEBUG
+#ifndef NDEBUG
       //PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
-      #endif
+#endif
 
-      PrintS(", weights: ");
-
-      if( r->typ[j].data.is.componentWeights == NULL )
-        PrintS("NULL == [0,...,0]\n");
-      else
-      {
-        (r->typ[j].data.is.componentWeights)->show(); PrintLn();
-      }
+      PrintLn();
     }
     else if  (r->typ[j].ord_typ==ro_am)
     {
@@ -4180,8 +4160,6 @@ void rDebugPrint(ring r)
   }
 
   {
-    extern long p_TotaldegreeIS(poly p, const ring r);
-
       PrintLn();
       Print("pFDeg   : ");
 #define pFDeg_CASE(A) if(r->pFDeg == A) PrintS( "" #A "" )
@@ -4189,7 +4167,6 @@ void rDebugPrint(ring r)
       pFDeg_CASE(p_WFirstTotalDegree); else
       pFDeg_CASE(p_WTotaldegree); else
       pFDeg_CASE(p_Deg); else
-      pFDeg_CASE(p_TotaldegreeIS); else
 #undef pFDeg_CASE
       Print("(%p)", (void*)(r->pFDeg)); // default case
 
@@ -4938,20 +4915,12 @@ int rGetISPos(const int p, const ring r)
 
 
 /// Changes r by setting induced ordering parameters: limit and reference leading terms
-/// F belong to r, we will DO a copy! (same to componentWeights)
+/// F belong to r, we will DO a copy!
 /// We will use it AS IS!
 /// returns true is everything was allright!
-BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, const intvec * componentWeights)
+BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p)
 {
   // Put the reference set F into the ring -ordering -recor
-
-  // TEST THAT THERE ARE DEGs!!!
-  // assume( componentWeights == NULL  ); // ???
-  if( componentWeights != NULL )
-  {
-//    assure that the ring r has degrees!!!
-//    Add weights to degrees of F[i]
-  }
 
   if (r->typ==NULL)
   {
@@ -4988,23 +4957,6 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, c
   assume(r->typ[pos].data.is.F == NULL);
 
   r->typ[pos].data.is.F = FF; // F is owened by ring now! TODO: delete at the end!
-
-  if(r->typ[pos].data.is.componentWeights != NULL)
-  {
-#if MYTEST
-    PrintS("Deleting old componentWeights: "); r->typ[pos].data.is.componentWeights->show(); PrintLn();
-#endif
-    delete r->typ[pos].data.is.componentWeights;
-    r->typ[pos].data.is.componentWeights = NULL;
-  }
-
-
-  assume(r->typ[pos].data.is.componentWeights == NULL);
-
-  if( componentWeights != NULL )
-    componentWeights = ivCopy(componentWeights); // componentWeights is owened by ring now! TODO: delete at the end!
-
-  r->typ[pos].data.is.componentWeights = componentWeights;
 
   r->typ[pos].data.is.limit = i; // First induced component
 

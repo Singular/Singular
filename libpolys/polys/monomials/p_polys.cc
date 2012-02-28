@@ -572,46 +572,8 @@ long p_WTotaldegree(poly p, const ring r)
       case ringorder_S:
       case ringorder_s:
       case ringorder_aa:
-        break;
       case ringorder_IS:
-      {
-        assume( b0 == b1 );
-        assume( (-2 < b0) && (b0 < 2) ); // 0 => prefix! +/-1 => suffix!
-
-        if( b0 != 0) // suffix?
-          break;
-
-        // only prefix adds the weight...
-
-        if( (k = p_GetComp(p, r)) == 0 )
-          break;
-
-        const int ord_pos = rGetISPos(pIS++, r);
-
-        const intvec* componentWeights = r->typ[ord_pos].data.is.componentWeights;
-
-        if( componentWeights == NULL )
-          break;
-
-        const int limit = r->typ[ord_pos].data.is.limit;
-        assume( limit >= 0 );
-
-        if( k > limit )
-        {
-          k -= (limit + 1);
-          assume( k >= 0 );
-
-          assume( componentWeights != NULL );
-
-          if( k < componentWeights->length() )
-            j += (*componentWeights)[k]; // j += the weight of k^th-component
-#ifndef NDEBUG
-          else
-            Warn("Unknown (out of known-range (%d)) component index:%d for IS[%d at %d] ordering\n",componentWeights->length(), k, pIS-1, ord_pos);
-#endif
-        }
         break;
-      }
       case ringorder_a:
         for (k=b0 /*r->block0[i]*/;k<=b1 /*r->block1[i]*/;k++)
         { // only one line
@@ -629,56 +591,6 @@ long p_WTotaldegree(poly p, const ring r)
   }
   return  j;
 }
-
-
-/// compute the total monomial weight for the case of Induced ordering,
-/// where we already have weight for module components!
-/// It is only needed to be known by rOptimizeLDeg and rSetDegStuff
-long p_TotaldegreeIS(poly p, const ring r)
-{
-  long s = p_Totaldegree(p, r);
-
-  int k = p_GetComp(p, r) - 1;
-
-  if ( (k > 0) && (r->typ!=NULL) )
-  {
-    int pIS = 0;
-    for( int pos = 0; pos < r->OrdSize; pos++ )
-      if( r->typ[pos].ord_typ == ro_is)
-      {
-        const intvec* componentWeights = r->typ[pos].data.is.componentWeights;
-
-        if( componentWeights == NULL )
-          continue;
-
-        const int limit = r->typ[pos].data.is.limit;
-        assume( limit >= 0 );
-
-
-        if( k > limit )
-        {
-          k -= (limit + 1);
-          assume( k >= 0 );
-
-          assume( componentWeights != NULL );
-
-          if( k < componentWeights->length() )
-            s += (*componentWeights)[k]; // j += the weight of k^th-component
-#ifndef NDEBUG
-          else
-            Warn("Unknown (out of known-range (%d)) component index:%d for IS[%d at %d] ordering\n",componentWeights->length(), k, pIS-1, pos);
-#endif
-        }
-
-        pIS++;
-
-        return s; // multiple ro_is blocks are not really supported at the moment...
-      }
-  }
-
-  return s;
-}
-
 
 long p_DegW(poly p, const short *w, const ring R)
 {

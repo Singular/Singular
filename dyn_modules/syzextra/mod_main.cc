@@ -29,9 +29,6 @@
 #include "DebugPrint.h"
 #include "myNF.h"
 
-extern BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, const intvec * componentWeights);
-
-// extern void rSetISReference(const ideal F, const int rank, const int p, const intvec * componentWeights, const ring r);
 extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
 // extern ring rCurrRingAssure_SyzComp();
 extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
@@ -503,11 +500,10 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   const int iLimit = r->typ[pos].data.is.limit;
   const ideal F = r->typ[pos].data.is.F;
-  const intvec* componentWeights = r->typ[pos].data.is.componentWeights;
   ideal FF = id_Copy(F, r);
 
   lists l=(lists)omAllocBin(slists_bin);
-  l->Init(3);
+  l->Init(2);
 
   l->m[0].rtyp = INT_CMD;
   l->m[0].data = reinterpret_cast<void *>(iLimit);
@@ -527,15 +523,6 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
     l->m[1].rtyp = IDEAL_CMD;
 
   l->m[1].data = reinterpret_cast<void *>(FF);
-
-  l->m[2].rtyp = INTVEC_CMD;
-  
-  if( componentWeights != NULL )
-    l->m[2].data = reinterpret_cast<void *>(new intvec(componentWeights));
-  else
-    l->m[2].data = reinterpret_cast<void *>(new intvec());
-    
-
 
   res->rtyp = LIST_CMD; // list of int/module
   res->data = reinterpret_cast<void *>(l);
@@ -557,8 +544,6 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
     WerrorS("`SetInducedReferrence(<ideal/module>, [int[, int]])` expected");
     return TRUE;
   }
-
-  intvec * componentWeights = (intvec *)atGet(h,"isHomog",INTVEC_CMD); // No copy!
 
   const ideal F = (ideal)h->Data(); ; // No copy!
   h=h->next;
@@ -591,7 +576,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
 
   // F & componentWeights belong to that ordering block of currRing now:
-  rSetISReference(r, F, rank, p, componentWeights); // F and componentWeights will be copied!
+  rSetISReference(r, F, rank, p); // F will be copied!
   return FALSE;
 }
 

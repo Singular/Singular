@@ -164,7 +164,6 @@ struct sro_IS
 
   // reference poly set?? // Should it be owned by ring?!!!
   ideal F; // reference leading (module)-monomials set. owned by ring...
-  const intvec* componentWeights; // component weights! owned by ring...
 };
 
 typedef struct sro_IS sro_IS;
@@ -744,7 +743,7 @@ void rSetWeightVec(ring r, int64 *wv);
    varIndex starts at index 1 */
 poly rGetVar(const int varIndex, const ring r);
 
-BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL);
+BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int p = 0);
 
 /// return the position of the p^th IS block order block in r->typ[]...
 int rGetISPos(const int p, const ring r);
