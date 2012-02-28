@@ -531,7 +531,67 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 // OUTPUT: The converted Factory-integer of type canonicalform                //
 ////////////////////////////////////////////////////////////////////////////////
 
-static char *cf_stringtemp;
+static unsigned char *cf_stringtemp;
+static unsigned long cf_stringtemp_l=0L;
+CanonicalForm
+convertZZ2CF (ZZ a)
+{
+  long coeff_long=to_long(a);
+
+  CanonicalForm result;
+  if ( (NumBits(a)<((long)NTL_ZZ_NBITS))
+  && (coeff_long>((long)MINIMMEDIATE))
+  && (coeff_long<((long)MAXIMMEDIATE)))
+  {
+    return CanonicalForm(coeff_long);
+  }
+  else
+  {
+    long sizeofrep= ((long *) a.rep) [1];
+    bool lessZero= false;
+    if (sizeofrep < 0)
+    {
+      lessZero= true;
+      sizeofrep= -sizeofrep;
+    }
+    if (cf_stringtemp_l == 0)
+    {
+      cf_stringtemp_l= sizeofrep*sizeof(mp_limb_t)*2;
+      cf_stringtemp= (unsigned char*) Alloc (cf_stringtemp_l);
+    }
+    else if (cf_stringtemp_l < sizeofrep*sizeof(mp_limb_t)*2)
+    {
+      Free (cf_stringtemp, cf_stringtemp_l);
+      cf_stringtemp_l= sizeofrep*sizeof(mp_limb_t)*2;
+      cf_stringtemp= (unsigned char*) Alloc (cf_stringtemp_l);
+    }
+    int cc= mpn_get_str (cf_stringtemp, 16, (mp_limb_t *) (((long *) (a.rep)) + 2), sizeofrep);
+
+    char* cf_stringtemp2;
+    if (lessZero)
+    {
+      cf_stringtemp2= new char [cc + 2];
+      cf_stringtemp2[0]='-';
+      for (int j= 1; j <= cc; j++)
+        cf_stringtemp2[j]= IntValToChar ((int) cf_stringtemp [j-1]);
+      cf_stringtemp2[cc+1]='\0';
+    }
+    else
+    {
+      cf_stringtemp2= new char [cc + 1];
+      for (int j= 0; j < cc; j++)
+        cf_stringtemp2[j]= IntValToChar ((int) cf_stringtemp [j]);
+      cf_stringtemp2[cc]='\0';
+    }
+
+    result= CanonicalForm (cf_stringtemp2, 16);
+    delete [] cf_stringtemp2;
+    return result;
+  }
+  return result;
+}
+
+/*static char *cf_stringtemp;
 static char *cf_stringtemp2;
 static int cf_stringtemp_l=0;
 CanonicalForm convertZZ2CF(ZZ coefficient)
@@ -628,7 +688,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   //convert the string to canonicalform using the char*-Constructor
   return CanonicalForm(cf_stringtemp2,16);
   //return tmp;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // NAME: convertFacCF2NTLZZX                                                  //
