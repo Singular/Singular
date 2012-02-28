@@ -21,6 +21,8 @@
 #include <Singular/attrib.h>
 
 #include <Singular/ipid.h> 
+#include <Singular/ipshell.h> // For iiAddCproc
+
 // extern coeffs coeffs_BIGINT
 
 #include "singularxx_defs.h"
@@ -793,29 +795,31 @@ extern "C"
 
 int mod_init(SModulFunctions* psModulFunctions) 
 {
-  
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"DetailedPrint",FALSE, DetailedPrint);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"leadmonom",FALSE, leadmonom);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"leadcomp",FALSE, leadcomp);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"leadrawexp",FALSE, leadrawexp);
+#define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
+// #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
+  #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
+  ADD(psModulFunctions, currPack->libname, "DetailedPrint", FALSE, DetailedPrint);
+  ADD(psModulFunctions, currPack->libname, "leadmonom", FALSE, leadmonom);
+  ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
+  ADD(psModulFunctions, currPack->libname, "leadrawexp", FALSE, leadrawexp);
 
 
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"ISUpdateComponents",FALSE, ISUpdateComponents);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"SetInducedReferrence",FALSE, SetInducedReferrence);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"GetInducedData",FALSE, GetInducedData);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"SetSyzComp",FALSE, SetSyzComp);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"MakeInducedSchreyerOrdering",FALSE, MakeInducedSchreyerOrdering);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"MakeSyzCompOrdering",FALSE, MakeSyzCompOrdering);
+  ADD(psModulFunctions, currPack->libname, "ISUpdateComponents", FALSE, ISUpdateComponents);
+  ADD(psModulFunctions, currPack->libname, "SetInducedReferrence", FALSE, SetInducedReferrence);
+  ADD(psModulFunctions, currPack->libname, "GetInducedData", FALSE, GetInducedData);
+  ADD(psModulFunctions, currPack->libname, "SetSyzComp", FALSE, SetSyzComp);
+  ADD(psModulFunctions, currPack->libname, "MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
+  ADD(psModulFunctions, currPack->libname, "MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
   
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"noop",FALSE, noop);
+  ADD(psModulFunctions, currPack->libname, "noop", FALSE, noop);
  
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"idPrepare",FALSE, idPrepare);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"reduce_syz",FALSE, reduce_syz);
+  ADD(psModulFunctions, currPack->libname, "idPrepare", FALSE, idPrepare);
+  ADD(psModulFunctions, currPack->libname, "reduce_syz", FALSE, reduce_syz);
 
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"p_Content",FALSE, _p_Content);
+  ADD(psModulFunctions, currPack->libname, "p_Content", FALSE, _p_Content);
 
-  //  psModulFunctions->iiAddCproc(currPack->libname,(char*)"",FALSE, );
-  
+  //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
+#undef ADD  
   return 0;
 }
 }

@@ -1,16 +1,21 @@
 "ndebug?: ", system("with", "ndebug");
 "om_ndebug?: ", system("with", "om_ndebug");
 
+listvar(Top);
+
 if( system("with", "ndebug") )
 {
   "Loading the Release version!";
   LIB("syzextra.so");
+  listvar(Syzextra);
 }
 else
 {
   "Loading the Debug version!";
   LIB("syzextra_g.so");
+  listvar(Syzextra_g);
 }
+
 
 noop();
 
