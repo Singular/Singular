@@ -336,13 +336,16 @@ void p_Setm_General(poly p, const ring r)
             assume( c > 0 );
             c--;
 
-            assume( c < IDELEMS(F) ); // What about others???
-
             if( c >= IDELEMS(F) )
               break;
 
+            assume( c < IDELEMS(F) ); // What about others???
+            
             const poly pp = F->m[c]; // get reference monomial!!!
 
+            if(pp == NULL)
+              break;
+            
             assume(pp != NULL);
 
 #ifndef NDEBUG
@@ -351,7 +354,6 @@ void p_Setm_General(poly p, const ring r)
             p_DebugPrint(pp, r, r, 1);
 #endif
 #endif
-            if(pp == NULL) break;
 
             const int end = o->data.is.end;
             assume(start <= end);
