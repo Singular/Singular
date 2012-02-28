@@ -608,10 +608,11 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    int constIndex = idPosConstant(id);
-    if (constIndex != -1)
-    WerrorS("ideal contains constant; please modify ground field/ring instead");
-    return TRUE;
+    if (idPosConstant(id) != -1)
+    {
+      WerrorS("constant in q-ideal; please modify ground field/ring instead");
+      return TRUE;
+    }
   }
 #endif
 
