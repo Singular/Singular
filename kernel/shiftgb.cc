@@ -255,9 +255,11 @@ int pmLastVblock(poly p, int lV)
 #ifdef PDEBUG
     PrintS("pmLastVblock: unexpected zero exponent vector\n");
 #endif
+    freeT(e, currRing->N);
     return(j);
   }
   b = (int)(j/lV) + 1; /* the number of the block, >=1 */
+  freeT(e, currRing->N);
   return (b);
 }
 
