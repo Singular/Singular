@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists
@@ -188,10 +186,10 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 #ifndef NDEBUG
     WarnS("Set minpoly over non-transcendental ground field to 0?!");
 #endif
-    return FALSE;    
+    return FALSE;
   }
-   
-   
+
+
   if ( !nCoeff_is_transExt(currRing->cf) )
   {
 //    return TRUE;
@@ -203,7 +201,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
   if ( currRing->idroot != NULL )
   {
 //    return TRUE;
-#ifndef NDEBUG      
+#ifndef NDEBUG
     idhdl p = currRing->idroot;
 
     WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
@@ -212,29 +210,29 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
     {
       Print(p->String(TRUE)); PrintLn();
       p = p->next;
-    }    
+    }
 #endif
   }
 
   assume (currRing->idroot==NULL);
-  
+
   number p = (number)a->CopyD(NUMBER_CMD);
 
   if (n_IsZero(p, currRing->cf))
   {
     n_Delete(&p, currRing);
 
-    
+
     if( nCoeff_is_transExt(currRing->cf) )
     {
-#ifndef NDEBUG      
+#ifndef NDEBUG
       WarnS("minpoly is already 0...");
 #endif
       return FALSE;
     }
 
     WarnS("cannot set minpoly to 0 / alg. extension?");
-    
+
 //    return TRUE;
   }
 
@@ -246,16 +244,16 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 #endif
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);
   }
-  
+
   n_Normalize(p, currRing->cf);
 
   AlgExtInfo A;
-  
+
   A.r = currRing->cf->extRing; // Use the same ground field!
   A.i = idInit(1,1);
 
   assume( DEN((fractionObject *)(p)) == NULL ); // minpoly must be a poly...!?
-  
+
   A.i->m[0] = NUM((fractionObject *)p);
 
 #if 0
@@ -267,9 +265,9 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 #endif
 
   NUM((fractionObject *)p) = NULL; n_Delete(&p, currRing->cf);
-  
+
   coeffs new_cf = nInitChar(n_algExt, &A);
-  
+
   if (new_cf==NULL)
   {
     Werror("Could not construct the alg. extension: llegal minpoly?");
@@ -691,10 +689,11 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    int constIndex = idPosConstant(id);
-    if (constIndex != -1)
-    WerrorS("ideal contains constant; please modify ground field/ring instead");
-    return TRUE;
+    if (idPosConstant(id) != -1)
+    {
+      WerrorS("constant in q-ideal; please modify ground field/ring instead");
+      return TRUE;
+    }
   }
 #endif
 
@@ -1747,7 +1746,7 @@ void jjNormalizeQRingId(leftv I)
       switch (I->Typ())
       {
         case IDEAL_CMD:
-	case MODUL_CMD:
+        case MODUL_CMD:
         {
           ideal F=idInit(1,1);
           ideal II=kNF(F,currQuotient,I0);
