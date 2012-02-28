@@ -4,7 +4,6 @@
 /***************************************************************
  * File:    ssiLink.h
  *  Purpose: declaration of sl_link routines for ssi
- *  Version: $Id$
  ***************************************************************/
 #include <stdio.h>
 #include <fcntl.h>
@@ -64,7 +63,7 @@ typedef struct snumber_dummy  *number_dummy;
 //#define HAVE_PSELECT
 //#endif
 
-#define SSI_VERSION 2
+#define SSI_VERSION 3
 
 typedef struct
 {
@@ -219,6 +218,29 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   while(r->order[i]!=0)
   {
     fprintf(d->f_write,"%d %d %d ",r->order[i],r->block0[i], r->block1[i]);
+    switch(r->order[i])
+    {
+      case ringorder_a:
+      case ringorder_wp:
+      case ringorder_Wp:
+      case ringorder_ws:
+      case ringorder_Ws:
+      case ringorder_aa:
+      {
+        int ii;
+        for(ii=r->block0[i];ii<=r->block1[i];ii++)
+          fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
+      }
+      break;
+      case ringorder_a64:
+      case ringorder_M:
+      case ringorder_L:
+      case ringorder_IS:
+        Werror("ring oder not implemented for ssi:%d",r->order[i]);
+        break;
+
+      default: break;
+    }
     i++;
   }
   SSI_UNBLOCK_CHLD;
@@ -468,12 +490,38 @@ ring ssiReadRing(ssiInfo *d)
   int *block0=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block1=(int *)omAlloc0((num_ord+1)*sizeof(int));
   SSI_BLOCK_CHLD;
+  int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
   for(i=0;i<num_ord;i++)
   {
-     fscanf(d->f_read,"%d %d %d",&ord[i],&block0[i],&block1[i]);
+    fscanf(d->f_read,"%d %d %d",&ord[i],&block0[i],&block1[i]);
+    switch(ord[i])
+    {
+      case ringorder_a:
+      case ringorder_wp:
+      case ringorder_Wp:
+      case ringorder_ws:
+      case ringorder_Ws:
+      case ringorder_aa:
+      {
+        wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
+        int ii;
+        for(ii=block0[i];ii<=block1[i];ii++)
+          fscanf(d->f_read,"%d",&(wvhdl[i][ii-block0[i]]));
+      }
+      break;
+
+      case ringorder_a64:
+      case ringorder_M:
+      case ringorder_L:
+      case ringorder_IS:
+        Werror("ring oder not implemented for ssi:%d",ord[i]);
+        break;
+
+      default: break;
+    }
   }
   SSI_UNBLOCK_CHLD;
-  return rDefault(ch,N,names,num_ord,ord,block0,block1);
+  return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
 }
 
 poly ssiReadPoly(ssiInfo *D)
@@ -921,7 +969,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         int sockfd, portno, n;
         struct sockaddr_in serv_addr;
         struct hostent *server;
-  
+
         sscanf(l->name,"%255[^:]:%d",host,&portno);
         //Print("connect to host %s, port %d\n",host,portno);mflush();
         if (portno!=0)
@@ -944,7 +992,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->f_write=fdopen(sockfd,"w");
           d->fd_write=sockfd;
           SI_LINK_SET_RW_OPEN_P(l);
-	  d->send_quit_at_exit=1;
+          d->send_quit_at_exit=1;
           omFree(host);
         }
         else
@@ -960,7 +1008,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         // normal link to a file
         FILE *outfile;
         char *filename=l->name;
-  
+
         if(filename[0]=='>')
         {
           if (filename[1]=='>')
@@ -1030,7 +1078,7 @@ BOOLEAN ssiClose(si_link l)
           }
         }
         if (d->send_quit_at_exit)
-        {  
+        {
           fputs("99\n",d->f_write);fflush(d->f_write);
         }
       }
@@ -1417,6 +1465,7 @@ int slStatusSsiL(lists L, int timeout)
   char fdmaskempty;
 
   /* check the links and fill in fdmask */
+  /* check ssi links for ungetc_buf */
   for(i=L->nr; i>=0; i--)
   {
     if (L->m[i].Typ()!=DEF_CMD)
@@ -1439,18 +1488,32 @@ int slStatusSsiL(lists L, int timeout)
       {
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
+        if (d->ungetc_buf=='\0')
+        {
+          FD_SET(d_fd, &fdmask);
+          if (d_fd > max_fd) max_fd=d_fd;
+        }
+        else
+          return i+1;
       }
       else
       {
         dd=(MP_Link_pt)l->data;
         d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
+        FD_SET(d_fd, &fdmask);
+        if (d_fd > max_fd) max_fd=d_fd;
       }
     #else
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
+      if (d->ungetc_buf=='\0')
+      {
+        FD_SET(d_fd, &fdmask);
+        if (d_fd > max_fd) max_fd=d_fd;
+      }
+      else
+        return i+1;
     #endif
-      FD_SET(d_fd, &fdmask);
-      if (d_fd > max_fd) max_fd=d_fd;
     }
   }
   max_fd++;
@@ -1515,7 +1578,6 @@ do_select:
       }
     }
     // only ssi links:
-    if (d->ungetc_buf) return i+1;
     loop
     {
       /* yes: read 1 char*/

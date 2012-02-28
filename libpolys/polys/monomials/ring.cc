@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT - the interpreter related ring operations
 */
@@ -107,7 +105,7 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
+ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int** wvhdl)
 {
   assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
@@ -122,7 +120,10 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bloc
     r->names[i]  = omStrDup(n[i]);
   }
   /*weights: entries for 2 blocks: NULL*/
-  r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int *));
+  if (wvhdl==NULL)
+    r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int *));
+  else
+    r->wvhdl=wvhdl;
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
@@ -133,13 +134,13 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bloc
   rComplete(r);
   return r;
 }
-ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
+ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1,int ** wvhdl)
 {
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);
   assume( cf != NULL);
-  return rDefault(cf,N,n,ord_size,ord,block0,block1);
+  return rDefault(cf,N,n,ord_size,ord,block0,block1,wvhdl);
 }
 ring   rDefault(const coeffs cf, int N, char **n)
 {

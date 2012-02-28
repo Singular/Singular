@@ -316,8 +316,8 @@ struct ip_sring
 
 ring   rDefault(int ch, int N, char **n);
 ring   rDefault(const coeffs cf, int N, char **n);
-ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
-ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
+ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
+ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
@@ -602,7 +602,7 @@ typedef enum rRingOrder_t
   ringorder_L,
   // the following are only used internally
   ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
-  ringorder_rs, ///< ???
+  ringorder_rs, ///< opposite of ls
   ringorder_IS, ///< Induced (Schreyer) ordering
   ringorder_unspec
 } rRingOrder_t;
