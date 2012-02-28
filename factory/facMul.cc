@@ -2638,6 +2638,8 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     fmpq_poly_clear (FLINTB);
     return result;
   }
+  else
+    return fdivides (A, B);
 #else
   return fdivides (A, B); //maybe NTL?
 #endif
