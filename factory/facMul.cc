@@ -2741,7 +2741,8 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     return result;
   }
   else
-    return fdivides (A, B);
+    return true;
+    //return fdivides (A, B);
 #else
   return fdivides (A, B); //maybe NTL?
 #endif
