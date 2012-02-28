@@ -861,6 +861,78 @@ CanonicalForm reverseSubstQ (const fmpz_poly_t F, int d)
 }
 
 CanonicalForm
+reverseSubstQa (const fmpq_poly_t F, int d1, int d2, const Variable& alpha,
+                const fmpq_poly_t mipo)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  fmpq_poly_t f;
+  fmpq_poly_init (f);
+  fmpq_poly_set (f, F);
+
+  fmpq_poly_t buf;
+  CanonicalForm result= 0, result2;
+  int i= 0;
+  int degf= fmpq_poly_degree(f);
+  int k= 0;
+  int degfSubK;
+  int repLength;
+  fmpq_t coeff;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d1)
+      repLength= d1;
+    else
+      repLength= degfSubK + 1;
+
+    fmpq_init (coeff);
+    int j= 0;
+    int l;
+    result2= 0;
+    while (j*d2 < repLength)
+    {
+      fmpq_poly_init2 (buf, d2);
+      for (l= 0; l < d2; l++)
+      {
+        fmpq_poly_get_coeff_fmpq (coeff, f, k + j*d2 + l);
+        fmpq_poly_set_coeff_fmpq (buf, l, coeff);
+      }
+      _fmpq_poly_normalise (buf);
+      fmpq_poly_rem (buf, buf, mipo);
+      result2 += convertFmpq_poly_t2FacCF (buf, alpha)*power (x, j);
+      j++;
+      fmpq_poly_clear (buf);
+    }
+    if (repLength - j*d2 != 0 && j*d2 - repLength < d2)
+    {
+      j--;
+      repLength -= j*d2;
+      fmpq_poly_init2 (buf, repLength);
+      j++;
+      for (l= 0; l < repLength; l++)
+      {
+        fmpq_poly_get_coeff_fmpq (coeff, f, k + j*d2 + l);
+        fmpq_poly_set_coeff_fmpq (buf, l, coeff);
+      }
+      _fmpq_poly_normalise (buf);
+      fmpq_poly_rem (buf, buf, mipo);
+      result2 += convertFmpq_poly_t2FacCF (buf, alpha)*power (x, j);
+      fmpq_poly_clear (buf);
+    }
+    fmpq_clear (coeff);
+
+    result += result2*power (y, i);
+    i++;
+    k= d1*i;
+  }
+
+  fmpq_poly_clear (f);
+  return result;
+}
+
+CanonicalForm
 reverseSubstReciproFp (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
 {
   Variable y= Variable (2);
@@ -1297,6 +1369,38 @@ mulMod2FLINTQ (const CanonicalForm& F, const CanonicalForm& G, const
   fmpz_poly_clear (FLINTA);
   fmpz_poly_clear (FLINTB);
   return A/(f*g);
+}
+
+CanonicalForm
+mulMod2FLINTQa (const CanonicalForm& F, const CanonicalForm& G,
+                const CanonicalForm& M)
+{
+  Variable a;
+  if (!hasFirstAlgVar (F,a) && !hasFirstAlgVar (G, a))
+    return mulMod2FLINTQ (F, G, M);
+  CanonicalForm A= F;
+
+  int degFx= degree (F, 1);
+  int degFa= degree (F, a);
+  int degGx= degree (G, 1);
+  int degGa= degree (G, a);
+
+  int d2= degFa+degGa+1;
+  int d1= degFx + 1 + degGx;
+  d1 *= d2;
+
+  fmpq_poly_t FLINTF, FLINTG;
+  kronSubQa (FLINTF, F, d1, d2);
+  kronSubQa (FLINTG, G, d1, d2);
+
+  fmpq_poly_mullow (FLINTF, FLINTF, FLINTG, d1*degree (M));
+
+  fmpq_poly_t mipo;
+  convertFacCF2Fmpq_poly_t (mipo, getMipo (a));
+  CanonicalForm result= reverseSubstQa (FLINTF, d1, d2, a, mipo);
+  fmpq_poly_clear (FLINTF);
+  fmpq_poly_clear (FLINTG);
+  return result;
 }
 
 #endif
@@ -1920,10 +2024,8 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
     return mod (F*G, M);
 
 #ifdef HAVE_FLINT
-  Variable alpha;
-  if (getCharacteristic() == 0 && !hasFirstAlgVar (F, alpha)
-      && !hasFirstAlgVar (G, alpha))
-    return mulMod2FLINTQ (F, G, M);
+  if (getCharacteristic() == 0)
+    return mulMod2FLINTQa (F, G, M);
 #endif
 
   if (getCharacteristic() > 0 && CFFactory::gettype() != GaloisFieldDomain &&
