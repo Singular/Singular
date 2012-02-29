@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc 14541 2012-01-26 19:00:07Z motsak $ */
-
 /*
 * ABSTRACT - the interpreter related ring operations
 */
@@ -60,6 +58,7 @@ static const char * const ringorder_name[] =
   "Ds", ///< ringorder_Ds,
   "ws", ///< ringorder_ws,
   "Ws", ///< ringorder_Ws,
+  "am",  ///< ringorder_am,
   "L", ///< ringorder_L,
   "aa", ///< ringorder_aa
   "rs", ///< ringorder_rs,
@@ -364,6 +363,7 @@ void rWrite(ring r)
     (  (r->order[l] >= ringorder_lp)
     ||(r->order[l] == ringorder_M)
     ||(r->order[l] == ringorder_a)
+    ||(r->order[l] == ringorder_am)
     ||(r->order[l] == ringorder_a64)
     ||(r->order[l] == ringorder_aa) ) && (r->order[l] < ringorder_IS) )
     {
@@ -397,6 +397,13 @@ void rWrite(ring r)
             Print(" %*d" ,nlen,r->wvhdl[l][i+j]);
         }
         if (r->order[l]!=ringorder_M) break;
+      }
+      if (r->order[l]==ringorder_am) /*j==0*/
+      {
+        int m=r->wvhdl[l][i];
+        Print("\n//                  : %d module weights ",m);
+        m+=i;i++;
+        for(;i<=m;i++) Print(" %*d" ,nlen,r->wvhdl[l][i]);
       }
     }
   }
@@ -1941,7 +1948,7 @@ BOOLEAN rHasSimpleOrder(const ring r)
   assume(blocks >= 1);
   if (blocks == 1) return TRUE;
 
-  int s = 0; 
+  int s = 0;
   while( (s < blocks) && (r->order[s] == ringorder_IS) && (r->order[blocks-1] == ringorder_IS) )
   {
     s++;
@@ -1951,7 +1958,7 @@ BOOLEAN rHasSimpleOrder(const ring r)
   if ((blocks - s) > 2)  return FALSE;
 
   assume( blocks == s + 2 );
-  
+
   if (
      (r->order[s] != ringorder_c)
   && (r->order[s] != ringorder_C)
@@ -2016,7 +2023,7 @@ BOOLEAN rHasSimpleOrderAA(ring r)
   assume(blocks >= 1);
   if (blocks == 1) return TRUE;
 
-  int s = 0; 
+  int s = 0;
   while( (s < blocks) && (r->order[s] == ringorder_IS) && (r->order[blocks-1] == ringorder_IS) )
   {
     s++;
@@ -2024,7 +2031,7 @@ BOOLEAN rHasSimpleOrderAA(ring r)
   }
 
   if ((blocks - s) > 3)  return FALSE;
-  
+
 //  if ((blocks > 3) || (blocks < 2)) return FALSE;
   if ((blocks - s) == 3)
   {
@@ -2325,6 +2332,24 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
       break;
     }
   }
+}
+
+static void rO_WMDegree(int &place, int &bitplace, int start, int end,
+    long *o, sro_ord &ord_struct, int *weights)
+{
+  // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
+  while((start<end) && (weights[0]==0)) { start++; weights++; }
+  while((start<end) && (weights[end-start]==0)) { end--; }
+  rO_Align(place,bitplace);
+  ord_struct.ord_typ=ro_am;
+  ord_struct.data.am.start=start;
+  ord_struct.data.am.end=end;
+  ord_struct.data.am.place=place;
+  ord_struct.data.am.len_gen=weights[end-start+1];
+  ord_struct.data.am.weights=weights;
+  o[place]=1;
+  place++;
+  rO_Align(place,bitplace);
 }
 
 static void rO_WDegree64(int &place, int &bitplace, int start, int end,
@@ -3196,6 +3221,7 @@ static void rHighSet(ring r, int o_r, int o)
     case ringorder_rp:
     case ringorder_a:
     case ringorder_aa:
+    case ringorder_am:
     case ringorder_a64:
       if (r->OrdSgn==-1) r->MixedOrder=TRUE;
       break;
@@ -3297,7 +3323,7 @@ static void rOptimizeLDeg(ring r)
     if (r->pLDeg == pLDeg1c)
       r->pLDeg = pLDeg1c_WFirstTotalDegree;
   }
-  r->pLDegOrig = r->pLDeg;
+  r->pLDegOrig=r->pLDeg;
 }
 
 // set pFDeg, pLDeg, MixOrder, ComponentOrder, etc
@@ -3321,11 +3347,34 @@ static void rSetDegStuff(ring r)
   r->pFDeg = p_Totaldegree;
   r->pLDeg = (r->OrdSgn == 1 ? pLDegb : pLDeg0);
 
+  /*======== ordering type is (am,_) ==================*/
+  if ((order[0]==ringorder_am)
+  )
+  {
+    r->MixedOrder = FALSE;
+    for(int ii=block0[0];ii<=block1[0];ii++)
+      if (wvhdl[0][ii-1]<0) { r->MixedOrder=TRUE;break;}
+    r->LexOrder=FALSE;
+    for(int ii=block0[0];ii<=block1[0];ii++)
+      if (wvhdl[0][ii-1]==0) { r->LexOrder=TRUE;break;}
+    if ((block0[0]==1)&&(block1[0]==r->N))
+    {
+      r->pFDeg==pDeg;
+      r->pLDeg = pLDeg1c_Deg;
+    }
+    else
+    {
+      r->pFDeg = pWTotaldegree;
+      r->LexOrder=TRUE;
+      r->pLDeg = pLDeg1c_WFirstTotalDegree;
+    }
+    r->firstwv = wvhdl[0];
+  }
   /*======== ordering type is (_,c) =========================*/
-  if ((order[0]==ringorder_unspec) || (order[1] == 0)
+  else if ((order[0]==ringorder_unspec) || (order[1] == 0)
       ||(
     ((order[1]==ringorder_c)||(order[1]==ringorder_C)
-     ||(order[1]==ringorder_S) 
+     ||(order[1]==ringorder_S)
      ||(order[1]==ringorder_s))
     && (order[0]!=ringorder_M)
     && (order[2]==0))
@@ -3416,7 +3465,7 @@ static void rSetDegStuff(ring r)
     }
     r->pFDeg = pWTotaldegree; // may be improved: p_Totaldegree for lp/dp/ls/.. blocks
   }
-  
+
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
     r->pFDeg = pDeg;
 
@@ -3523,6 +3572,12 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_a:
       case ringorder_aa:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
+                   r->wvhdl[i]);
+        typ_i++;
+        break;
+
+      case ringorder_am:
+        rO_WMDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
         typ_i++;
         break;
@@ -3661,7 +3716,7 @@ BOOLEAN rComplete(ring r, int force)
              rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                                      tmp_typ[typ_i]);
              typ_i++;
-	     rCheckOrdSgn(r,i);
+             rCheckOrdSgn(r,i);
           }
         }
         if (r->block1[i]!=r->block0[i])
@@ -3687,7 +3742,7 @@ BOOLEAN rComplete(ring r, int force)
              rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                                      tmp_typ[typ_i]);
              typ_i++;
-	     rCheckOrdSgn(r,i);
+             rCheckOrdSgn(r,i);
           }
         }
         if (r->block1[i]!=r->block0[i])
@@ -3706,7 +3761,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits, r->block0[i]);
         }
-	rCheckOrdSgn(r,i);
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_Ws:
@@ -3718,7 +3773,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
         }
-	rCheckOrdSgn(r,i);
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_S:
@@ -4073,7 +4128,7 @@ void rDebugPrint(ring r)
     return;
   }
   // corresponds to ro_typ from ring.h:
-  const char *TYP[]={"ro_dp","ro_wp","ro_wp64","ro_wp_neg","ro_cp",
+  const char *TYP[]={"ro_dp","ro_wp","ro_am", "ro_wp64","ro_wp_neg","ro_cp",
                      "ro_syzcomp", "ro_syz", "ro_isTemp", "ro_is", "ro_none"};
   int i,j;
 
@@ -4148,6 +4203,22 @@ void rDebugPrint(ring r)
       {
         (r->typ[j].data.is.componentWeights)->show(); PrintLn();
       }
+    }
+    else if  (r->typ[j].ord_typ==ro_am)
+    {
+      Print("  place %d",r->typ[j].data.am.place);
+      Print("  start %d",r->typ[j].data.am.start);
+      Print("  end %d",r->typ[j].data.am.end);
+      Print("  len_gen %d",r->typ[j].data.am.len_gen);
+      PrintS(" w:");
+      int l=0;
+      for(l=r->typ[j].data.am.start;l<=r->typ[j].data.am.end;l++)
+            Print(" %d",r->typ[j].data.am.weights[l-r->typ[j].data.am.start]);
+      l=r->typ[j].data.am.end+1;
+      int ll=r->typ[j].data.am.weights[l-r->typ[j].data.am.start];
+      PrintS(" m:");
+      for(int lll=l+1;lll<l+ll+1;lll++)
+            Print(" %d",r->typ[j].data.am.weights[lll-r->typ[j].data.am.start]);
     }
     else
     {
@@ -4226,18 +4297,28 @@ void rDebugPrint(ring r)
 
   {
 #define pFDeg_CASE(A) if(r->pFDeg == A) PrintS( "" #A "" )
-    Print("\npFDeg   : ");
-    
+    Print("pFDeg   : ");
+
     pFDeg_CASE(p_Totaldegree); else
       pFDeg_CASE(pWFirstTotalDegree); else
       pFDeg_CASE(pWTotaldegree); else
       pFDeg_CASE(pDeg); else
       Print("(%p)", r->pFDeg); // default case
-    
-    PrintS("\n");
+
+    PrintLn();
 #undef pFDeg_CASE
   }
-    
+  Print("pSetm:");
+  void p_Setm_Dummy(poly p, const ring r);
+  void p_Setm_TotalDegree(poly p, const ring r);
+  void p_Setm_WFirstTotalDegree(poly p, const ring r);
+  void p_Setm_General(poly p, const ring r);
+  if (r->p_Setm==p_Setm_General) PrintS("p_Setm_General\n");
+  else if (r->p_Setm==p_Setm_Dummy) PrintS("p_Setm_Dummy\n");
+  else if (r->p_Setm==p_Setm_TotalDegree) PrintS("p_Setm_Totaldegree\n");
+  else if (r->p_Setm==p_Setm_WFirstTotalDegree) PrintS("p_Setm_WFirstTotalDegree\n");
+  else Print("%x\n",r->p_Setm);
+
 }
 
 void p_DebugPrint(poly p, const ring r)
@@ -4370,7 +4451,7 @@ void rDBChangeSComps(int* currComponents,
                      ring r)
 {
   assume(r->typ[1].ord_typ == ro_syzcomp);
-      
+
   r->typ[1].data.syzcomp.length = length;
   rNChangeSComps( currComponents, currShiftedComponents, r);
 }
@@ -4380,7 +4461,7 @@ void rDBGetSComps(int** currComponents,
                  ring r)
 {
   assume(r->typ[1].ord_typ == ro_syzcomp);
-  
+
   *length = r->typ[1].data.syzcomp.length;
   rNGetSComps( currComponents, currShiftedComponents, r);
 }

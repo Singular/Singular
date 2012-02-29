@@ -4,7 +4,6 @@
 /***************************************************************
  * File:    ssiLink.h
  *  Purpose: declaration of sl_link routines for ssi
- *  Version: $Id$
  ***************************************************************/
 #include <stdio.h>
 #include <fcntl.h>

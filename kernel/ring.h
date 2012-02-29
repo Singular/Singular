@@ -6,7 +6,6 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id$ */
 
 /* includes */
 #include <kernel/structs.h>
@@ -80,7 +79,7 @@ static inline bool rIsPluralRing(const ring r)
 {
 #ifdef HAVE_PLURAL
   nc_struct *n;
-  return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/; 
+  return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
 #else
   return false;
 #endif
@@ -91,7 +90,7 @@ static inline bool rIsRatGRing(const ring r)
 #ifdef HAVE_PLURAL
   /* nc_struct *n; */
   return (r != NULL) /* && ((n=r->GetNC()) != NULL) */
-	  && (r->real_var_start>1);
+          && (r->real_var_start>1);
 #else
   return false;
 #endif
@@ -346,10 +345,11 @@ typedef enum rRingOrder_t
   ringorder_Ds,
   ringorder_ws,
   ringorder_Ws,
+  ringorder_am,
   ringorder_L,
   // the following are only used internally
   ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
-  ringorder_rs, ///< ???
+  ringorder_rs, ///< opposite of ls
   ringorder_IS, ///< Induced (Schreyer) ordering
   ringorder_unspec
 } rRingOrder_t;

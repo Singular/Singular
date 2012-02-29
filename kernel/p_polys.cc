@@ -6,7 +6,6 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 
@@ -85,6 +84,36 @@ void p_Setm_General(poly p, const ring r)
           }
 #endif
           p->exp[o->data.wp.place]=ord;
+          break;
+        }
+        case ro_am:
+        {
+          ord=POLY_NEGWEIGHT_OFFSET;
+          int a,e;
+          a=o->data.am.start;
+          e=o->data.am.end;
+          int *w=o->data.am.weights;
+#if 1
+          for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
+          int c=p_GetComp(p,r);
+#else
+          long ai;
+          int ei,wi;
+          for(int i=a;i<=e;i++)
+          {
+             ei=p_GetExp(p,i,r);
+             wi=w[i-a];
+             ai=ei*wi;
+             if (ai/ei!=wi) pSetm_error=TRUE;
+             ord+=ai;
+             if (ord<ai) pSetm_error=TRUE;
+          }
+#endif
+          if ((c>0)&&(c<=o->data.am.len_gen))
+          {
+            ord+=w[c-(e-a)+2];
+          }
+          p->exp[o->data.am.place]=ord;
           break;
         }
       case ro_wp64:
@@ -171,7 +200,7 @@ void p_Setm_General(poly p, const ring r)
           const unsigned long c = p_GetComp(p, r);
           const short place = o->data.syz.place;
           const int limit = o->data.syz.limit;
-          
+
           if (c > limit)
             p->exp[place] = o->data.syz.curr_index;
           else if (c > 0)
@@ -218,7 +247,7 @@ void p_Setm_General(poly p, const ring r)
               assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
-	   
+
 #ifndef NDEBUG
           for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
           {
@@ -230,7 +259,7 @@ void p_Setm_General(poly p, const ring r)
             }
           }
 #endif
-	   
+
 #ifndef NDEBUG
 #if MYTEST
           PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
@@ -275,7 +304,7 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef NDEBUG
 #if MYTEST
-            Print("Respective F[c - %d: %d] pp: ", limit, c); 
+            Print("Respective F[c - %d: %d] pp: ", limit, c);
             p_DebugPrint(pp, r, r, 1);
 #endif
 #endif
@@ -288,29 +317,29 @@ void p_Setm_General(poly p, const ring r)
             const int end = o->data.is.end;
 
             assume(start <= end);
-	     
+
 //          const int limit = o->data.is.limit;
           assume( limit >= 0 );
 
-//	  const int st = o->data.isTemp.start;	     
+//          const int st = o->data.isTemp.start;
 
           if( c > limit )
             p->exp[start] = 1;
 //          else
 //            p->exp[start] = 0;
 
-	     
+
 #ifndef NDEBUG
-	    Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
-#endif	     
-   
+            Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
+#endif
+
 
             for( int i = start; i <= end; i++) // v[0] may be here...
               p->exp[i] += pp->exp[i]; // !!!!!!!! ADD corresponding LT(F)
 
-       
 
-	     
+
+
 #ifndef NDEBUG
             const int* const pVarOffset = o->data.is.pVarOffset;
 
@@ -345,13 +374,11 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef NDEBUG
 #if MYTEST
-	    Print("p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
+            Print("p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
             p_DebugPrint(p, r, r, 1);
-#endif	     
-#endif	     
+#endif
+#endif
           }
-	   
-
           break;
         }
         default:

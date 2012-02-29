@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT
 */
@@ -254,6 +253,7 @@ typedef enum
 {
   ro_dp, // ordering is a degree ordering
   ro_wp, // ordering is a weighted degree ordering
+  ro_am, // ordering is am: weights for vars + weights for gen
   ro_wp64, // ordering is a weighted64 degree ordering
   ro_wp_neg, // ordering is a weighted degree ordering
              // with possibly negative weights
@@ -283,6 +283,18 @@ struct sro_wp
   int *weights; // pointers into wvhdl field
 };
 typedef struct sro_wp sro_wp;
+
+// ordering is a weighted degree ordering
+struct sro_am
+{
+  short place;  // where weighted degree is stored (in L)
+  short start;  // bounds of ordering (in E)
+  short end;
+  short len_gen; // i>len_gen: weight(gen(i)):=0
+  int *weights; // pointers into wvhdl field of length (end-start+1) + len_gen
+                // contents w_1,... w_n, len, mod_w_1, .. mod_w_len, 0
+};
+typedef struct sro_am sro_am;
 
 // ordering is a weighted degree ordering
 struct sro_wp64
@@ -365,6 +377,7 @@ struct sro_ord
   {
      sro_dp dp;
      sro_wp wp;
+     sro_am am;
      sro_wp64 wp64;
      sro_cp cp;
      sro_syzcomp syzcomp;
@@ -412,7 +425,7 @@ struct nc_struct
   // initial data: square matrices rVar() x rVar()
   // logically: upper triangular!!!
   // TODO: eliminate this waste of memory!!!!
-  matrix C; 
+  matrix C;
   matrix D;
 
   // computed data:
@@ -420,7 +433,7 @@ struct nc_struct
   matrix COM;
   int *MTsize; // size 0.. (rVar()*rVar()-1)/2
 
-  // IsSkewConstant indicates whethere coeffs C_ij are all equal, 
+  // IsSkewConstant indicates whethere coeffs C_ij are all equal,
   // effective together with nc_type=nc_skew
   int IsSkewConstant;
 
@@ -437,8 +450,8 @@ struct nc_struct
         // 1 <= iAltVarsStart <= iAltVarsEnd <= r->N
         unsigned int iFirstAltVar, iLastAltVar; // = 0 by default
 
-        // for factors of super-commutative algebras we need 
-        // the part of general quotient ideal modulo squares!    
+        // for factors of super-commutative algebras we need
+        // the part of general quotient ideal modulo squares!
         ideal idSCAQuotient; // = NULL by default. // must be deleted in Kill!
       } sca;
     } data;
@@ -447,21 +460,21 @@ struct nc_struct
     CFormulaPowerMultiplier* m_PowerMultiplier;
 
   public:
-    
+
     inline nc_type& ncRingType() { return (type); };
     inline nc_type ncRingType() const { return (type); };
 
-    inline unsigned int& FirstAltVar() 
+    inline unsigned int& FirstAltVar()
         { assume(ncRingType() == nc_exterior); return (data.sca.iFirstAltVar); };
-    inline unsigned int& LastAltVar () 
+    inline unsigned int& LastAltVar ()
         { assume(ncRingType() == nc_exterior); return (data.sca.iLastAltVar ); };
 
-    inline unsigned int FirstAltVar() const 
+    inline unsigned int FirstAltVar() const
         { assume(ncRingType() == nc_exterior); return (data.sca.iFirstAltVar); };
-    inline unsigned int LastAltVar () const 
+    inline unsigned int LastAltVar () const
         { assume(ncRingType() == nc_exterior); return (data.sca.iLastAltVar ); };
 
-    inline ideal& SCAQuotient() 
+    inline ideal& SCAQuotient()
         { assume(ncRingType() == nc_exterior); return (data.sca.idSCAQuotient); };
 
     inline CGlobalMultiplier* GetGlobalMultiplier() const
@@ -476,7 +489,7 @@ struct nc_struct
 
     inline CFormulaPowerMultiplier*& GetFormulaPowerMultiplier()
         { return (m_PowerMultiplier); };
-    
+
   public:
     nc_pProcs p_Procs; // NC procedures.
 

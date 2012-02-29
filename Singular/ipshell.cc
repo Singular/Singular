@@ -1848,12 +1848,20 @@ lists rDecompose(const ring r)
     } else
     if (r->block1[i]-r->block0[i] >=0 )
     {
-      j=r->block1[i]-r->block0[i];
-      if (r->order[i]==ringorder_M)  j=(j+1)*(j+1)-1;
+      int bl=j=r->block1[i]-r->block0[i];
+      if (r->order[i]==ringorder_M)
+      {
+        j=(j+1)*(j+1)-1;
+	bl=j+1;
+      }
+      else if (r->order[i]==ringorder_am)
+      {
+        j=omSizeWOfAddr(r->wvhdl[i])-3;
+      }
       iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
       {
-        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j];
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j+(j>bl)];
       }
       else switch (r->order[i])
       {
@@ -4547,7 +4555,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       n--;
     }
     else if (((*iv)[1]!=ringorder_a)
-    && ((*iv)[1]!=ringorder_a64))
+    && ((*iv)[1]!=ringorder_a64)
+    && ((*iv)[1]!=ringorder_am))
       o++;
     n++;
     sl=sl->next;
@@ -4687,6 +4696,27 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
               R->wvhdl[n][i-2]=(*iv)[i];
               last++;
               if (weights[last]==0) weights[last]=(*iv)[i]*typ;
+            }
+            last=R->block0[n]-1;
+            break;
+          }
+          case ringorder_am:
+          {
+            R->block0[n] = last+1;
+            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->wvhdl[n] = (int*)omAlloc(iv->length()*sizeof(int));
+	    if (R->block1[n]- R->block0[n]+2>=iv->length())
+	      WarnS("missing module weights");
+            for (i=2; i<=(R->block1[n]-R->block0[n]+2); i++)
+            {
+              R->wvhdl[n][i-2]=(*iv)[i];
+              last++;
+              if (weights[last]==0) weights[last]=(*iv)[i]*typ;
+            }
+            R->wvhdl[n][i-2]=iv->length() -3 -(R->block1[n]- R->block0[n]);
+            for (; i<iv->length(); i++)
+            {
+              R->wvhdl[n][i-1]=(*iv)[i];
             }
             last=R->block0[n]-1;
             break;
