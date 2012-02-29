@@ -3548,9 +3548,9 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
         n_Normalize(n, dst->cf);
 
-      p_GetCoeff(qq, dst) = n;
-      // coef may be zero:
-      p_Test(qq, dst);
+      p_GetCoeff(qq, dst) = n;// Note: n can be a ZERO!!!
+      // coef may be zero:  
+//      p_Test(qq, dst);
     }
     else
     {

@@ -5127,7 +5127,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     // module is 0 ---> integers ringtype = 4;
     // we have an exponent
-    if (modExponent > 1)
+    if (modExponent > 1 && cf == NULL)
     {
       if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
       {
@@ -5143,7 +5143,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
     }
     // just a module m > 1
-    else
+    else if (cf == NULL)
     {
       ringtype = 2;
       const int ch = mpz_get_ui(modBase);
