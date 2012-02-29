@@ -2422,7 +2422,7 @@ ring rCompose(const lists  L)
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
     {
-      if (R->cf->ch!=currRing->cf->ch)
+      if (R != currRing) //->cf->ch!=currRing->cf->ch)
       {
       #if 0
             WerrorS("coefficient fields must be equal if q-ideal !=0");
