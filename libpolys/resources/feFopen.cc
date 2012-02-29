@@ -11,7 +11,7 @@
 #include <reporter/reporter.h>
 
 #include "feFopen.h"
-#include "feResource.h"
+#include <findexec/feResource.h>
 
 
 

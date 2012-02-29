@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: output system
 */
@@ -21,6 +20,7 @@
 #endif
 
 #include <reporter/reporter.h>
+#include <findexec/feResource.h>
 #include <omalloc/omalloc.h>
 //#include "options.h"
 
@@ -409,4 +409,18 @@ const char* eati(const char *s, int *i)
   }
   else *i = 1;
   return s;
+}
+
+void feStringAppendResources(int warn)
+{
+  int i = 0;
+  char* r;
+  StringAppend("%-10s:\t%s\n", "argv[0]", feArgv0);
+  while (feResourceConfigs[i].key != NULL)
+  {
+    r = feResource(feResourceConfigs[i].key, warn);
+    StringAppend("%-10s:\t%s\n", feResourceConfigs[i].key,
+                 (r != NULL ? r : ""));
+    i++;
+  }
 }

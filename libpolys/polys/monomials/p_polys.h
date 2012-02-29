@@ -7,13 +7,11 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 /***************************************************************
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -64,7 +62,7 @@ static inline number& pGetCoeff(poly p)
 
 
 
-// 
+//
 // deletes old coeff before setting the new one???
 #define pSetCoeff0(p,n)     (p)->coef=(n)
 
@@ -227,7 +225,7 @@ void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
 
 void      p_Content(poly p, const ring r);
-#if 1 
+#if 1
 // currently only used by Singular/janet
 void      p_SimpleContent(poly p, int s, const ring r);
 #endif
@@ -706,7 +704,7 @@ static inline void p_LmFree(poly p, ring)
 #if PDEBUG > 2
 static inline void p_LmFree(poly *p, ring r)
 #else
-static inline void p_LmFree(poly *p, ring) 
+static inline void p_LmFree(poly *p, ring)
 #endif
 {
   p_LmCheckPolyRing2(*p, r);
@@ -1057,7 +1055,7 @@ extern poly  _p_Mult_q(poly p, poly q, const int copy, const ring r);
 static inline poly p_Mult_q(poly p, poly q, const ring r)
 {
   assume( (p != q) || (p == NULL && q == NULL) );
-  
+
   if (p == NULL)
   {
     r->p_Procs->p_Delete(&q, r);

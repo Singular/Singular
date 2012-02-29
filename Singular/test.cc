@@ -14,7 +14,7 @@
 #include <reporter/reporter.h>
 
 #include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include <findexec/feResource.h>
 
 #include <coeffs/coeffs.h>
 
@@ -127,7 +127,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 #include <kernel/GMPrat.h>
 
-// #include "htmlhelp.h" // For Windows // 
+// #include "htmlhelp.h" // For Windows //
 #include <kernel/hutil.h>
 // #include <kernel/Ideal.h> // Too old?
 
@@ -243,14 +243,14 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 void siInit(char *);
 
-int main( int, char *argv[] ) 
+int main( int, char *argv[] )
 {
   // init path names etc.
 //  feInitResources(argv[0]); //???
   siInit(argv[0]); // ?
 
   // Libpolys tests:
-   
+
   // construct the ring Z/32003[x,y,z]
   // the variable names
   char **n=(char**)omalloc(3*sizeof(char*));
@@ -258,14 +258,14 @@ int main( int, char *argv[] )
   n[1]=omStrDup("y");
   n[2]=omStrDup("z2");
 
-   
+
 /*
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
   PrintS(StringAppendS("\n"));
 
-   
-   
+
+
   ring R=rDefault(32003,3,n);
   // make R the default ring:
   rChangeCurrRing(R);
@@ -284,60 +284,60 @@ int main( int, char *argv[] )
 
   // compute p1+p2
   p1=p_Add_q(p1,p2,R); p2=NULL;
-  pWrite(p1); 
+  pWrite(p1);
 
   // clean up:
   pDelete(&p1);
-   
+
   rDelete(R);
   rChangeCurrRing(NULL);
-   
+
 */
-   
-   
-   
+
+
+
   currentVoice=feInitStdin(NULL);
-   
+
   int err=iiEStart(omStrDup("ring R = (0, a), x, dp; R; system(\"r\", R); minpoly=a*a+1; R; system(\"r\", R); kill R; return();\n"),NULL);
-  
+
   printf("interpreter returns %d\n",err);
-  if (err) 
+  if (err)
      errorreported = 0; // reset error handling
-   
+
   assume( err == 0 );
-   
-   
-   
+
+
+
   // hook for error handling:
   // WerrorS_callback=......; of type p(const char *)
   err=iiEStart(omStrDup("int ver=system(\"version\");export ver;return();\n"),NULL);
-  
+
   printf("interpreter returns %d\n",err);
-  if (err) 
+  if (err)
      errorreported = 0; // reset error handling
-   
+
   assume( err == 0 );
 
   idhdl h=ggetid("ver");
-   
+
   if (h != NULL)
     printf("singular variable ver of type %d contains %d\n",h->typ,(int)(long)IDDATA(h));
   else
     printf("variable ver does not exist\n");
-   
+
   assume( h != NULL );
 
-   
+
   err = iiEStart(
-		 omStrDup("system(\"--version\");return();\n"),
-		 NULL);
-   
+                 omStrDup("system(\"--version\");return();\n"),
+                 NULL);
+
   printf("interpreter returns %d\n",err);
-  if (err) 
-     errorreported = 0; // reset error handling   
-   
+  if (err)
+     errorreported = 0; // reset error handling
+
   assume( err == 0 );
-   
+
   // calling a singular-library function
   idhdl datetime=ggetid("datetime");
   if (datetime==NULL)
@@ -357,7 +357,7 @@ int main( int, char *argv[] )
                            RING_CMD,
                            &IDROOT,
                            FALSE);
-  
+
   IDRING(newRingHdl)=R;
   // make R the default ring (include rChangeCurrRing):
   rSetHdl(newRingHdl);
@@ -369,16 +369,16 @@ int main( int, char *argv[] )
   arg.rtyp=STRING_CMD;
   arg.data=omStrDup("huhu");
   err=iiExprArith1(&r1,&arg,TYPEOF_CMD);
-  
+
   printf("interpreter returns %d\n",err);
-  if (err) 
-     errorreported = 0; // reset error handling   
-  else 
+  if (err)
+     errorreported = 0; // reset error handling
+  else
      printf("typeof returned type %d, >>%s<<\n",r1.Typ(),r1.Data());
-   
+
   // clean up r1:
   r1.CleanUp();
-   
+
   return 0;
 }
 

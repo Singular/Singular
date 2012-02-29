@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: management of resources
 */
@@ -9,7 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <sys/param.h>
 
 #include "config.h"
@@ -33,33 +32,20 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 
-#include <reporter/reporter.h>
+//#include <reporter/reporter.h>
 //char* feResource(const char id, int warn = -1);
 //char* feResource(const char* key, int warn = -1);
 
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
 
-#define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"S_VERSION1
+#define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"PACKAGE_VERSION
 
 /*****************************************************************
  *
  * Declarations: Data  structures
  *
  *****************************************************************/
-typedef enum {feResUndef = 0, feResBinary, feResDir, feResFile, feResUrl, feResPath} feResourceType;
-
-typedef struct feResourceConfig_s
-{
-  const char*           key;   // key to identify resource
-  const char            id;    // char id to identify resource
-  feResourceType  type;  // type of Resource
-  const char*           env;   // env variable to look for
-  const char*           fmt;   // format string -- see below for epxlaination
-  char*                 value; // what it was set to: may be changed
-} feResourceConfig_s;
-typedef feResourceConfig_s * feResourceConfig;
-
 // feSprintf transforms format strings as follows:
 // 1.) substrings of the form %c (c being a letter) are replaced by respective resource value
 // 2.) substrings of the form $string are replaced by value of resp. env variable
@@ -67,7 +53,7 @@ typedef feResourceConfig_s * feResourceConfig;
 // feCleanResource makes furthermore  the following transformations (except for URL resources)
 // 1.) '/' characters are replaced by respective directory - separators
 // 2.) ';' characters are replaced by respective path separators
-static feResourceConfig_s feResourceConfigs[] =
+feResourceConfig_s feResourceConfigs[] =
 {
   {"SearchPath",    's', feResPath,  NULL,
    "$SINGULARPATH;"
@@ -95,7 +81,7 @@ static feResourceConfig_s feResourceConfigs[] =
 #ifdef ix86_Win
   {"HtmlHelpFile",'C',  feResFile,  "SINGULAR_CHM_FILE",    "%r/doc/Manual.chm",    (char *)""},
 #endif
-  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    (char *)""},
+  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"PACKAGE_VERSION,    (char *)""},
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",             (char *)""},
 
@@ -129,7 +115,7 @@ static char* feResource(feResourceConfig config, int warn);
 static char* feResourceDefault(feResourceConfig config);
 static char* feInitResource(feResourceConfig config, int warn);
 static char* feGetExpandedExecutable();
-static BOOLEAN feVerifyResourceValue(feResourceType type, char* value);
+static int feVerifyResourceValue(feResourceType type, char* value);
 static char* feCleanResourceValue(feResourceType type, char* value);
 static char* feCleanUpFile(char* fname);
 static char* feCleanUpPath(char* path);
@@ -277,7 +263,7 @@ static char* feResourceDefault(feResourceConfig config)
 
 static char* feInitResource(feResourceConfig config, int warn)
 {
-  assume(config != NULL);
+  /*assume(config != NULL);*/
 #ifdef RESOURCE_DEBUG
   printf("feInitResource: entering for %s\n", config->key);
 #endif
@@ -350,8 +336,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   }
   else if (config->fmt == NULL)
   {
-    sprintf(value, "Wrong Resource Specification of %s", config->key);
-    dReportBug(value);
+    printf("Bug >>Wrong Resource Specification of %s<< at %s:%d\n",config->key,__FILE__,__LINE__);
     return NULL;
   }
 
@@ -387,11 +372,11 @@ static char* feInitResource(feResourceConfig config, int warn)
   // this value is gotten for the first time
   if (warn > 0 || (warn < 0 && config->value != NULL))
   {
-    Warn("Could not get %s. ", config->key);
-    Warn("Either set environment variable %s to %s,",
+    printf("// ** Could not get %s. ", config->key);
+    printf("// ** Either set environment variable %s to %s,",
          config->env, config->key);
     feSprintf(value, config->fmt, warn);
-    Warn("or make sure that %s is at %s", config->key, value);
+    printf("// ** or make sure that %s is at %s", config->key, value);
   }
 #ifdef RESOURCE_DEBUG
       printf("feInitResource: Set value of %s to NULL", config->key);
@@ -404,8 +389,10 @@ static char* feGetExpandedExecutable()
 {
   if (feArgv0 == NULL || *feArgv0 == '\0')
   {
-    if (feArgv0 == NULL) dReportBug("feArgv0 == NULL");
-    else dReportBug("feArgv0 == ''");
+    if (feArgv0 == NULL)
+      printf("Bug >>feArgv0 == NULL<< at %s:%d\n",__FILE__,__LINE__);
+    else
+      printf("Bug >>feArgv0 == ''<< at %s:%d\n",__FILE__,__LINE__);
     return NULL;
   }
 #ifdef ix86_Win // stupid WINNT sometimes gives you argv[0] within ""
@@ -429,16 +416,14 @@ static char* feGetExpandedExecutable()
 #endif
   if (value == NULL)
   {
-    char message[MAXRESOURCELEN];
-    sprintf(message, "Could not get expanded executable from %s", feArgv0);
-    dReportBug(message);
+    printf("Bug >>Could not get expanded executable from %s<< at %s:%d\n",feArgv0,__FILE__,__LINE__);
     return NULL;
   }
   return strdup(value);
 }
 
 
-static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
+static int feVerifyResourceValue(feResourceType type, char* value)
 {
 #ifdef RESOURCE_DEBUG
   printf("feVerifyResourceValue: entering with =%s=\n", value);
@@ -448,7 +433,7 @@ static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
   {
       case feResUrl:
       case feResPath:
-        return TRUE;
+        return 1;
 
       case feResFile:
         return ! access(value, R_OK);
@@ -458,7 +443,7 @@ static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
         return ! access(value, X_OK);
 
       default:
-        return FALSE;
+        return 0;
   }
 }
 
@@ -662,7 +647,7 @@ static char* feCleanUpPath(char* path)
 // strcpy where source and destination may overlap
 static void mystrcpy(char* d, char* s)
 {
-  assume(d != NULL && s != NULL);
+  /*assume(d != NULL && s != NULL);*/
   while (*s != '\0')
   {
     *d = *s;
@@ -726,16 +711,3 @@ static char* feSprintf(char* s, const char* fmt, int warn)
   return s_in;
 }
 
-void feStringAppendResources(int warn)
-{
-  int i = 0;
-  char* r;
-  StringAppend("%-10s:\t%s\n", "argv[0]", feArgv0);
-  while (feResourceConfigs[i].key != NULL)
-  {
-    r = feResource(feResourceConfigs[i].key, warn);
-    StringAppend("%-10s:\t%s\n", feResourceConfigs[i].key,
-                 (r != NULL ? r : ""));
-    i++;
-  }
-}

@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -27,7 +26,7 @@
 
 #include <omalloc/omalloc.h>
 #include <Singular/version.h>
-#include <resources/feResource.h>
+#include <findexec/feResource.h>
 #include <Singular/feOpt.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
@@ -129,7 +128,7 @@ int main(int argc, char** argv)
     {
       case 'h':
           extern void feOptHelp(const char* name);
-        
+
           feOptHelp(feArgv0);
           exit(0);
 
@@ -305,7 +304,7 @@ int main(int argc, char** argv)
   // Note: option -no-init-file should be equivalent to -q. Anyhow,
   // xemacs-20.4 sometimes crashed on startup when using -q. Don´t know why.
   sprintf(syscall, "%s %sno-init-file %seval '(progn (setq singular-emacs-home-directory \"%s\") (load-file \"%s\") (singular-other \"%s\" \"%s\" (list ",
-          emacs, prefix, prefix, emacs_dir, emacs_load, 
+          emacs, prefix, prefix, emacs_dir, emacs_load,
           singular, cwd);
 
 

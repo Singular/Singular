@@ -16,6 +16,21 @@
  * Resource management (feResources.cc)
  *
  *****************************************************************/
+typedef enum {feResUndef = 0, feResBinary, feResDir, feResFile, feResUrl, feResPath} feResourceType;
+
+typedef struct feResourceConfig_s
+{
+  const char*           key;   // key to identify resource
+  const char            id;    // char id to identify resource
+  feResourceType  type;  // type of Resource
+  const char*           env;   // env variable to look for
+  const char*           fmt;   // format string -- see below for epxlaination
+  char*                 value; // what it was set to: may be changed
+} feResourceConfig_s;
+typedef feResourceConfig_s * feResourceConfig;
+
+extern feResourceConfig_s feResourceConfigs[];
+
 // returns value of Resource as read-only string, or NULL
 // if Resource not found
 // issues warning, if explicitely requested (warn > 0), or
@@ -35,8 +50,6 @@ char* feGetResource(const char id);
 void feInitResources(const char* argv0 = NULL);
 // Re-inits resources, should be called after changing env. variables
 void feReInitResources();
-// Prints resources into string with StringAppend, etc
-void feStringAppendResources(int warn = -1);
 #endif /* end ifdef __cplusplus */
 
 extern char* feArgv0; 

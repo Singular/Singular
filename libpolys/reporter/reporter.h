@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: basic output
 */
@@ -64,6 +63,8 @@ void    Warn(const char *fmt, ...);
 
 const char *  eati(const char *s, int *i);
 
+// Prints resources into string with StringAppend, etc
+void feStringAppendResources(int warn = -1);
 #endif /* c++ only */
 
 /* everything in between calls to these procedures is printed into a string

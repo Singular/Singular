@@ -15,13 +15,13 @@ libfindexec_g_la_CPPFLAGS = -DHAVE_CONFIG_H
 
 INCLUDES = -I${top_srcdir} -I${top_builddir} 
 
-SOURCES  = omFindExec.c
+SOURCES  = omFindExec.c feResource.cc
 libfindexec_la_SOURCES   = $(SOURCES)
 libfindexec_g_la_SOURCES = $(SOURCES)
 
 libfindexec_includedir  =$(includedir)/singular/findexec/
 
-libfindexec_include_HEADERS = omFindExec.h
+libfindexec_include_HEADERS = omFindExec.h feResource.h
 
 
 

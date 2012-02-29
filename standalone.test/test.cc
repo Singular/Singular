@@ -5,7 +5,7 @@
 #include <coeffs/numbers.h>
 
 #include <reporter/reporter.h>
-#include <resources/feResource.h>
+#include <findexec/feResource.h>
 
 #ifdef HAVE_FACTORY
 // int initializeGMP(){ return 1; }
@@ -35,19 +35,19 @@ BOOLEAN Test(const n_coeffType type, void* param)
     PrintS( "Coeff-domain: " ); n_CoeffWrite(r); PrintLn();
   }
 
-  number t = n_Init(1, r);  
-  ndInpAdd(t, t, r);  
-  
+  number t = n_Init(1, r);
+  ndInpAdd(t, t, r);
+
   number two = n_Init(2, r);
   assume(n_Equal(two, t, r));
   ret = ret && n_Equal(two, t, r);
   n_Delete(&t, r);
   n_Delete(&two, r);
-  
+
 
   const int N = 2; // number of vars
   char* n[N] = {"x", "y"}; // teir names
-  
+
   ring R = rDefault( r, N, n);  // now r belongs to R!
 
   if( R == NULL )
@@ -65,7 +65,7 @@ BOOLEAN Test(const n_coeffType type, void* param)
   #endif
 
   const int exp[N] = {5, 8};
-  
+
   poly p = p_ISet(1, R);
   assume( p != NULL );
   assume(pNext(p) == NULL);
@@ -78,16 +78,16 @@ BOOLEAN Test(const n_coeffType type, void* param)
   assume( p_GetExp(p, 1, R) == exp[0] );
   assume( p_GetExp(p, 2, R) == exp[1] );
 
-  p = p_Add_q(p_Copy(p, R), p, R);  
+  p = p_Add_q(p_Copy(p, R), p, R);
 
   ret = ret && p_EqualPolys(p, p, R);
 
-  
+
   poly p2 = p_ISet(2, R);
   assume( p2 != NULL );
   assume(pNext(p2) == NULL);
   ret = ret && (pNext(p2) == NULL);
-  
+
   p_SetExp(p2,1,exp[0],R);
   p_SetExp(p2,2,exp[1],R);
   p_Setm(p, R);
@@ -98,14 +98,14 @@ BOOLEAN Test(const n_coeffType type, void* param)
   number s = p_GetCoeff(p, R);
   two = n_Init(2, r);
   assume(n_Equal(two, s, r));
-  ret = ret && n_Equal(s, two, r);  
+  ret = ret && n_Equal(s, two, r);
   n_Delete(&two, r);
 
   assume(p_EqualPolys(p2, p, R));
   ret = ret && p_EqualPolys(p, p, R);
 
   p_Delete(&p, R);
-  
+
   p_Delete(&p2, R);
 
 
@@ -124,7 +124,7 @@ BOOLEAN simple(const n_coeffType _type, void* param = NULLp)
 
 
 
-int main( int, char *argv[] ) 
+int main( int, char *argv[] )
 {
   feInitResources(argv[0]);
 
@@ -134,19 +134,19 @@ int main( int, char *argv[] )
   // longrat
   if( simple(n_Q) )
     PrintS("Q: Test Passed!");
-  else 
+  else
     PrintS("Q: Test: Failed!");
   PrintLn();
 
   // modulop
   if( simple(n_Zp, (void*)7) )
     PrintS("Zp: Test Passed!");
-  else 
+  else
     PrintS("Zp: Test: Failed!");
   PrintLn();
-  
+
   // due to coeffs/ffields.h
-  struct 
+  struct
   {
     int GFChar;
     int GFDegree;
@@ -159,9 +159,9 @@ int main( int, char *argv[] )
 
   if( simple(n_GF, (void*)&param) )
     PrintS("GF: Test Passed!");
-  else 
+  else
     PrintS("GF: Test: Failed!");
   PrintLn();
- 
+
   return 0;
 }
