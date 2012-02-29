@@ -1,3 +1,5 @@
+#define HAVE_FANS
+
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
 #include <polymake/Rational.h>
@@ -112,6 +114,17 @@ gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Ratio
   return qm;
 }
 
+polymake::Matrix<polymake::Integer> Intvec2PmMatrixInteger (const intvec* im)
+{
+  int rows=im->rows();
+  int cols=im->cols();
+  polymake::Matrix<polymake::Integer> mi(rows,cols);
+  for(int r=0; r<rows; r++)
+    for(int c=0; c<cols; c++)
+      mi(r-1,c-1) = (polymake::Integer) IMATELEM(*im, r+1, c+1);
+  return mi;
+}
+
 polymake::Matrix<polymake::Integer> GfZMatrix2PmMatrixInteger (const gfan::ZMatrix* zm)
 {
   int rows=zm->getHeight();
@@ -170,10 +183,12 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
 {
   if (pc->isa("Cone"))
   {
-    polymake::Matrix<polymake::Integer> rays = pc->give("RAYS");
-    gfan::ZMatrix zm = PmMatrixInteger2GfZMatrix(&rays);
+    polymake::Matrix<polymake::Integer> inequalities = pc->give("FACETS");
+    polymake::Matrix<polymake::Integer> equalities = pc->give("LINEAR_SPAN");
+    gfan::ZMatrix zm = PmMatrixInteger2GfZMatrix(&inequalities);
+    gfan::ZMatrix zn = PmMatrixInteger2GfZMatrix(&equalities);
 
-    gfan::ZCone zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+    gfan::ZCone zc = gfan::ZCone(zm,zn);
     return zc;
   }
   WerrorS("PmCone2ZCone: unexpected parameters");
@@ -183,10 +198,30 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
 {
   if (pp->isa("Polytope<Rational>"))
   {
-    polymake::Matrix<polymake::Integer> vertices = pp->give("VERTICES");
-    gfan::ZMatrix zv = PmMatrixInteger2GfZMatrix(&vertices);
+    polymake::Integer ambientdim1 = pp->give("CONE_AMBIENT_DIM");
+    polymake::cout << ambientdim1 << polymake::endl;
+    bool ok=true; int ambientdim2 = PmInteger2Int(ambientdim1, ok);
+    if (!ok)
+    {
+      WerrorS("overflow while converting polymake::Integer to int");
+      return TRUE;
+    }
+    polymake::Matrix<polymake::Integer> inequalities = pp->give("FACETS");
+    polymake::Matrix<polymake::Integer> equalities = pp->give("AFFINE_HULL");
 
-    gfan::ZCone zp = gfan::ZCone::givenByRays(zv, gfan::ZMatrix(0, zv.getWidth()));
+    gfan::ZMatrix zv, zw;
+    
+    if (inequalities.cols()!=0)
+      zv = PmMatrixInteger2GfZMatrix(&inequalities);
+    else
+      zv = gfan::ZMatrix(0, ambientdim2);
+
+    if (equalities.cols()!=0)
+      zw = PmMatrixInteger2GfZMatrix(&equalities);
+    else
+      zw = gfan::ZMatrix(0, ambientdim2);
+
+    gfan::ZCone zp = gfan::ZCone(zv,zw);
     return zp;
   }
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
@@ -1747,6 +1782,26 @@ BOOLEAN testingstrings(leftv res, leftv args)
 // }
 
 
+BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    intvec* iv = (intvec*) u->Data(); 
+    gfan::ZMatrix zm = intmat2ZMatrix(iv);
+    polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
+
+    polymake::perl::Object pp("Polytope<Rational>");
+    pp.take("POINTS") << pm;
+
+    gfan::ZCone* zc = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
+    res->rtyp = polytopeID;
+    res->data = (char*) zc;
+    return FALSE;
+  }    
+}
+
+
 extern "C" int mod_init(void* polymakesingular)
 {
 
@@ -1755,6 +1810,7 @@ extern "C" int mod_init(void* polymakesingular)
   init_polymake->set_application("fan");
   // iiAddCproc("","cube",FALSE,cube);
   // iiAddCproc("","cross",FALSE,cross);
+  iiAddCproc("","polytopeViaVertices",FALSE,PMpolytopeViaVertices);
   iiAddCproc("","isBounded",FALSE,PMisBounded);
   iiAddCproc("","isReflexive",FALSE,PMisReflexive);
   iiAddCproc("","isGorenstein",FALSE,PMisGorenstein);
