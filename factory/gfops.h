@@ -37,7 +37,17 @@ inline bool gf_iszero ( int a )
     return gf_q == a;
 }
 
+inline bool gf_iszero ( long a )
+{
+    return gf_q == a;
+}
+
 inline bool gf_isone ( int a )
+{
+    return 0 == a;
+}
+
+inline bool gf_isone ( long a )
 {
     return 0 == a;
 }
@@ -53,6 +63,22 @@ inline int gf_int2gf ( int i )
     if ( i == 0 )
 	return gf_q;
     int c = 0;
+    while ( i > 1 ) {
+	c = gf_table[c];
+	i--;
+    }
+    return c;
+}
+
+inline long gf_int2gf ( long i )
+{
+    while ( i < 0 )
+	i += gf_p;
+    while ( i >= gf_p )
+	i -= gf_p;
+    if ( i == 0 )
+	return gf_q;
+    long c = 0;
     while ( i > 1 ) {
 	c = gf_table[c];
 	i--;
@@ -137,6 +163,17 @@ inline int gf_mul ( int a, int b )
     }
 }
 
+inline long gf_mul ( long a, int b )
+{
+    if ( a == gf_q || b == gf_q )
+	return gf_q;
+    else {
+	long i = a + b;
+	if ( i >= gf_q1 ) i -= gf_q1;
+	return i;
+    }
+}
+
 inline int gf_div ( int a, int b )
 {
     ASSERT( b != gf_q, "divide by zero" );
@@ -183,6 +220,16 @@ inline int gf_power ( int a, int n )
     else
 	return gf_mul( a, gf_power( a, n-1 ) );
 }
+
+inline long gf_power ( long a, int n )
+{
+    if ( n == 0 )
+	return 0;
+    else if ( n == 1 )
+	return a;
+    else
+	return gf_mul( a, gf_power( a, n-1 ) );
+}
 //}}}
 
 void gf_setcharacteristic ( int p, int n, char name );
@@ -190,8 +237,10 @@ void gf_setcharacteristic ( int p, int n, char name );
 // Singular needs this
 /*BEGINPUBLIC*/
 
+long gf_gf2ff ( long a );
 int gf_gf2ff ( int a );
 
+bool gf_isff ( long a );
 bool gf_isff ( int a );
 
 /*ENDPUBLIC*/

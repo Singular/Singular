@@ -332,10 +332,8 @@ a small test program (`application.cc') from the subdirectory `examples/'
 of the Factory source directory ('\' at the end of a line denotes line
 continuation):
 
-  g++ -c /usr/local/include/templates/ftmpl_inst.cc \
-    -fno-implicit-templates -O2 -fomit-frame-pointer -o ftmpl_inst.o
-  g++ -c application.cc -fno-implicit-templates -O2 -fomit-frame-pointer \
-    ftmpl_inst.o -lcf -lcfmem -lm -lgmp
+  g++ -c /usr/local/include/templates/ftmpl_inst.cc -fno-implicit-templates -O2 -fomit-frame-pointer -o ftmpl_inst.o
+  g++ -c application.cc -fno-implicit-templates -O2 -fomit-frame-pointer ftmpl_inst.o -lcf -lcfmem -lm -lgmp
 
   This should work fine provided that you installed Factory in a location
 where `g++' may find it (here I have assumed `/usr/local/') and all the

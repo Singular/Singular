@@ -18,6 +18,11 @@ InternalInteger::InternalInteger()
     mpz_init( thempi );
 }
 
+InternalInteger::InternalInteger( const int i )
+{
+    mpz_init_set_si( thempi, i );
+}
+
 InternalInteger::InternalInteger( const long i )
 {
     mpz_init_set_si( thempi, i );

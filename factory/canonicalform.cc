@@ -1281,12 +1281,12 @@ CanonicalForm::sqrt () const
         if ( n == 0 || n == 1 )
             return CanonicalForm( n );
         else {
-            int x, y = n;
+            long x, y = n;
             do {
                 x = y;
                 // the intermediate result may not fit into an
                 // integer, but the result does
-                y = (unsigned int)(x + n/x)/2;
+                y = (unsigned long)(x + n/x)/2;
             } while ( y < x );
             return CanonicalForm( x );
         }

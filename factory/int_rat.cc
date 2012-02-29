@@ -527,7 +527,7 @@ InternalCF* InternalRational::addcoeff( InternalCF* c )
     mpz_t n, d;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         if ( cc == 0 )
             return this;
         else
@@ -564,7 +564,7 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
     mpz_t n, d;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         if ( cc == 0 )
         {
             if ( negate )
@@ -621,7 +621,7 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
     mpz_t n, d, g;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         if ( cc == 0 )
         {
             if ( deleteObject() ) delete this;
@@ -674,7 +674,7 @@ InternalCF* InternalRational::dividecoeff( InternalCF* c, bool invert )
     mpz_t n, d, g;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         ASSERT( c != 0 || invert, "divide by zero" );
         if ( cc == 0 )
         {
@@ -854,7 +854,7 @@ long InternalRational::intval() const
 {
 
     ASSERT( mpz_cmp_si( _den, 1 ) == 0, "illegal operation" );
-    return mpz_get_si( &_num );
+    return mpz_get_si( _num );
 
 }
 
