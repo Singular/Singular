@@ -6,7 +6,6 @@
  *  Purpose: implementation of ring independent poly procedures?
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 
@@ -120,6 +119,36 @@ void p_Setm_General(poly p, const ring r)
           p->exp[o->data.wp.place]=ord;
           break;
         }
+        case ro_am:
+        {
+          ord=POLY_NEGWEIGHT_OFFSET;
+          int a,e;
+          a=o->data.am.start;
+          e=o->data.am.end;
+          int *w=o->data.am.weights;
+#if 1
+          for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
+          int c=p_GetComp(p,r);
+#else
+          long ai;
+          int ei,wi;
+          for(int i=a;i<=e;i++)
+          {
+             ei=p_GetExp(p,i,r);
+             wi=w[i-a];
+             ai=ei*wi;
+             if (ai/ei!=wi) pSetm_error=TRUE;
+             ord+=ai;
+             if (ord<ai) pSetm_error=TRUE;
+          }
+#endif
+          if ((c>0)&&(c<=o->data.am.len_gen))
+          {
+            ord+=w[c-(e-a)+2];
+          }
+          p->exp[o->data.am.place]=ord;
+          break;
+        }
       case ro_wp64:
         {
           int64 ord=0;
@@ -204,7 +233,7 @@ void p_Setm_General(poly p, const ring r)
           const unsigned long c = p_GetComp(p, r);
           const short place = o->data.syz.place;
           const int limit = o->data.syz.limit;
-          
+
           if (c > limit)
             p->exp[place] = o->data.syz.curr_index;
           else if (c > 0)
@@ -318,7 +347,7 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef NDEBUG
 #if MYTEST
-            Print("Respective F[c - %d: %d] pp: ", limit, c); 
+            Print("Respective F[c - %d: %d] pp: ", limit, c);
             p_DebugPrint(pp, r, r, 1);
 #endif
 #endif
@@ -328,7 +357,7 @@ void p_Setm_General(poly p, const ring r)
             assume(start <= end);
 
 
-//	  const int st = o->data.isTemp.start;	     
+//          const int st = o->data.isTemp.start;
 
 #ifndef NDEBUG
             Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
@@ -371,7 +400,7 @@ void p_Setm_General(poly p, const ring r)
           } else
           {
             p->exp[start] = 0; //!!!!????? where?????
-	     
+
             const int* const pVarOffset = o->data.is.pVarOffset;
 
             // What about v[0] - component: it will be added later by
@@ -487,7 +516,7 @@ long p_WTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i, k;
-  int pIS = 0; 
+  int pIS = 0;
   long j =0;
 
   // iterate through each block:
@@ -550,28 +579,28 @@ long p_WTotaldegree(poly p, const ring r)
         if( b0 != 0) // suffix?
           break;
 
-        // only prefix adds the weight... 
+        // only prefix adds the weight...
 
         if( (k = p_GetComp(p, r)) == 0 )
           break;
 
         const int ord_pos = rGetISPos(pIS++, r);
-        
+
         const intvec* componentWeights = r->typ[ord_pos].data.is.componentWeights;
 
         if( componentWeights == NULL )
           break;
-              
+
         const int limit = r->typ[ord_pos].data.is.limit;
         assume( limit >= 0 );
-        
+
         if( k > limit )
         {
           k -= (limit + 1);
           assume( k >= 0 );
-          
+
           assume( componentWeights != NULL );
-          
+
           if( k < componentWeights->length() )
             j += (*componentWeights)[k]; // j += the weight of k^th-component
 #ifndef NDEBUG
@@ -622,7 +651,7 @@ long p_TotaldegreeIS(poly p, const ring r)
 
         const int limit = r->typ[pos].data.is.limit;
         assume( limit >= 0 );
-        
+
 
         if( k > limit )
         {
@@ -1559,7 +1588,7 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
 {
   assume(divisor != NULL);
   if (p == NULL) return NULL;
-  
+
   poly result = NULL;
   number divisorLC = p_GetCoeff(divisor, r);
   int divisorLE = p_GetExp(divisor, 1, r);
@@ -1633,7 +1662,7 @@ poly p_GcdHelper(poly &p, poly &q, ring r)
 poly p_Gcd(poly p, poly q, ring r)
 {
   assume((p != NULL) || (q != NULL));
-  
+
   poly a = p; poly b = q;
   if (p_Deg(a, r) < p_Deg(b, r)) { a = q; b = p; }
   a = p_Copy(a, r); b = p_Copy(b, r);
@@ -1677,7 +1706,7 @@ poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
    leaves p and q unmodified */
 poly p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r)
 {
-  assume((p != NULL) || (q != NULL));  
+  assume((p != NULL) || (q != NULL));
   poly a = p; poly b = q; BOOLEAN aCorrespondsToP = TRUE;
   if (p_Deg(a, r) < p_Deg(b, r))
   { a = q; b = p; aCorrespondsToP = FALSE; }
@@ -2227,7 +2256,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     return;
   }
 
-   
+
   poly p=ph;
   number h=d;
   if (smax==1) smax=2;
@@ -3404,7 +3433,7 @@ poly p_Subst(poly p, int n, poly e, const ring r)
 }
 
 /*2
- * returns a re-ordered convertion of a number as a polynomial, 
+ * returns a re-ordered convertion of a number as a polynomial,
  * with permutation of parameters
  * NOTE: this only works for Frank's alg. & trans. fields
  */
@@ -3420,10 +3449,10 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
     PrintS("z: "); n_Write(zz, src->cf);
     n_Delete(&zz, src->cf);
   }
-   
+
   PrintS("\nDestination Ring: \n");
   rWrite(dst);
-   
+
   Print("\nOldPar: %d\n", OldPar);
   for( int i = 1; i <= OldPar; i++ )
   {
@@ -3432,18 +3461,18 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
 #endif
   if( z == NULL )
      return NULL;
-   
+
   const coeffs srcCf = src->cf;
   assume( srcCf != NULL );
 
   assume( !nCoeff_is_GF(srcCf) );
   assume( rField_is_Extension(src) );
-   
+
   poly zz = NULL;
-   
+
   const ring srcExtRing = srcCf->extRing;
   assume( srcExtRing != NULL );
-   
+
   const coeffs dstCf = dst->cf;
   assume( dstCf != NULL );
 
@@ -3453,39 +3482,39 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
 
     if( zz == NULL )
        return NULL;
-     
-  } else if (nCoeff_is_transExt(srcCf)) 
-  {   
+
+  } else if (nCoeff_is_transExt(srcCf))
+  {
     assume( !IS0(z) );
-     
+
     zz = NUM(z);
     p_Test (zz, srcExtRing);
-     
+
     if( zz == NULL )
        return NULL;
-     
+
     if( !DENIS1(z) )
       WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
   } else
      {
-	assume (FALSE);
-	Werror("Number permutation is not implemented for this data yet!");
-	return NULL;
+        assume (FALSE);
+        Werror("Number permutation is not implemented for this data yet!");
+        return NULL;
      }
-   
+
   assume( zz != NULL );
   p_Test (zz, srcExtRing);
 
-  
+
   nMapFunc nMap = n_SetMap(srcExtRing->cf, dstCf);
-     
+
   assume( nMap != NULL );
-     
+
   poly qq = p_PermPoly(zz, par_perm - 1, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
 //       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
-   
+
 //  assume( FALSE );  WarnS("longalg missing 2");
-     
+
   return qq;
 }
 
@@ -3500,7 +3529,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     p_Test(p, oldRing);
     PrintS("\np_PermPoly::p: "); p_Write(p, oldRing, oldRing); PrintLn();
 #endif
-  
+
   const int OldpVariables = rVar(oldRing);
   poly result = NULL;
   poly result_last = NULL;
@@ -3515,43 +3544,43 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       qq = p_Init(dst);
       assume( nMap != NULL );
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
-       
+
       if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
         n_Normalize(n, dst->cf);
-       
+
       p_GetCoeff(qq, dst) = n;
-      // coef may be zero:  
+      // coef may be zero:
       p_Test(qq, dst);
     }
     else
     {
-      qq = p_One(dst);       
+      qq = p_One(dst);
 
 //      aq = naPermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing); // no dst???
 //      poly    n_PermNumber(const number z, const int *par_perm, const int P, const ring src, const ring dst)
       aq = n_PermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing, dst);
 
       p_Test(aq, dst);
-       
+
       if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
       {
         p_Normalize(aq,dst);
-	 
+
       }
       if (aq == NULL)
-	p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
-	 
+        p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
+
       p_Test(aq, dst);
     }
-     
-    if (rRing_has_Comp(dst)) 
+
+    if (rRing_has_Comp(dst))
        p_SetComp(qq, p_GetComp(p, oldRing), dst);
 
     if ( n_IsZero(pGetCoeff(qq), dst->cf) )
     {
       p_LmDelete(&qq,dst);
       qq = NULL;
-    }     
+    }
     else
     {
       // map pars:
@@ -3570,40 +3599,40 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
             number c = p_GetCoeff(qq, dst);
             if (rField_is_GF(dst))
             {
- 	      assume( dst->cf->extRing == NULL );
+               assume( dst->cf->extRing == NULL );
               number ee = nfPar(1, dst->cf); // NOTE: using nfPar is a BAD thing to do...
 
-	      number eee;
-	      n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);
-	       
+              number eee;
+              n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);
+
               ee = n_Mult(c, eee, dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
             }
             else if (nCoeff_is_Extension(dst->cf))
             {
-	      const int par = -perm[i];
-	      assume( par > 0 );
+              const int par = -perm[i];
+              assume( par > 0 );
 
 //              WarnS("longalg missing 3");
 #if 1
-	      const coeffs C = dst->cf;
-	      assume( C != NULL );
-	      
-	      const ring R = C->extRing;
-	      assume( R != NULL );
-	       
-	      assume( par <= rVar(R) );
-	       
-	      poly pcn; // = (number)c
-	      
-	      assume( !n_IsZero(c, C) );
-	       
-	      if( nCoeff_is_algExt(C) )
-		 pcn = (poly) c;
-	       else //            nCoeff_is_transExt(C)
-		 pcn = NUM(c);
-	      
+              const coeffs C = dst->cf;
+              assume( C != NULL );
+
+              const ring R = C->extRing;
+              assume( R != NULL );
+
+              assume( par <= rVar(R) );
+
+              poly pcn; // = (number)c
+
+              assume( !n_IsZero(c, C) );
+
+              if( nCoeff_is_algExt(C) )
+                 pcn = (poly) c;
+               else //            nCoeff_is_transExt(C)
+                 pcn = NUM(c);
+
               if (pNext(pcn) == NULL) // c->z
                 p_AddExp(pcn, -perm[i], e, R);
               else /* more difficult: we have really to multiply: */
@@ -3611,19 +3640,19 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
                 poly mmc = p_ISet(1, R);
                 p_SetExp(mmc, -perm[i], e, R);
                 p_Setm(mmc, R);
-		 
-		number nnc;
-		// convert back to a number: number nnc = mmc; 
-		if( nCoeff_is_algExt(C) ) 
-		   nnc = (number) mmc;
-	        else //            nCoeff_is_transExt(C)
-	          nnc = ntInit(mmc, C);
-		
+
+                number nnc;
+                // convert back to a number: number nnc = mmc;
+                if( nCoeff_is_algExt(C) )
+                   nnc = (number) mmc;
+                else //            nCoeff_is_transExt(C)
+                  nnc = ntInit(mmc, C);
+
                 p_GetCoeff(qq, dst) = n_Mult((number)c, nnc, C);
                 n_Delete((number *)&c, C);
                 n_Delete((number *)&nnc, C);
               }
-	       
+
               mapped_to_par=1;
 #endif
             }
@@ -3644,33 +3673,33 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       }
     }
     pIter(p);
-     
+
 #if 0
     p_Test(aq,dst);
     PrintS("\naq: "); p_Write(aq, dst, dst); PrintLn();
 #endif
-     
+
 
 #if 1
     if (qq!=NULL)
     {
       p_Setm(qq,dst);
-       
+
       p_Test(aq,dst);
       p_Test(qq,dst);
-       
+
 #if 0
     p_Test(qq,dst);
     PrintS("\nqq: "); p_Write(qq, dst, dst); PrintLn();
 #endif
-       
-      if (aq!=NULL) 
-	 qq=p_Mult_q(aq,qq,dst);
-       
+
+      if (aq!=NULL)
+         qq=p_Mult_q(aq,qq,dst);
+
       aq = qq;
-       
+
       while (pNext(aq) != NULL) pIter(aq);
-       
+
       if (result_last==NULL)
       {
         result=qq;
@@ -3687,7 +3716,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       p_Delete(&aq,dst);
     }
   }
-   
+
   result=p_SortAdd(result,dst);
 #else
   //  if (qq!=NULL)
@@ -3718,7 +3747,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   //}
 #endif
   p_Test(result,dst);
-   
+
 #if 0
   p_Test(result,dst);
   PrintS("\nresult: "); p_Write(result,dst,dst); PrintLn();
