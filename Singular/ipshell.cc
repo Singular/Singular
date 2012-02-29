@@ -1852,11 +1852,11 @@ lists rDecompose(const ring r)
       if (r->order[i]==ringorder_M)
       {
         j=(j+1)*(j+1)-1;
-	bl=j+1;
+        bl=j+1;
       }
       else if (r->order[i]==ringorder_am)
       {
-        j=omSizeWOfAddr(r->wvhdl[i])-3;
+        j+=r->wvhdl[i][bl+1];
       }
       iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
@@ -4705,8 +4705,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             R->block0[n] = last+1;
             R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
             R->wvhdl[n] = (int*)omAlloc(iv->length()*sizeof(int));
-	    if (R->block1[n]- R->block0[n]+2>=iv->length())
-	      WarnS("missing module weights");
+            if (R->block1[n]- R->block0[n]+2>=iv->length())
+              WarnS("missing module weights");
             for (i=2; i<=(R->block1[n]-R->block0[n]+2); i++)
             {
               R->wvhdl[n][i-2]=(*iv)[i];
