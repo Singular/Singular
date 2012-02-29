@@ -3359,7 +3359,7 @@ static void rSetDegStuff(ring r)
       if (wvhdl[0][ii-1]==0) { r->LexOrder=TRUE;break;}
     if ((block0[0]==1)&&(block1[0]==r->N))
     {
-      r->pFDeg==pDeg;
+      r->pFDeg = pDeg;
       r->pLDeg = pLDeg1c_Deg;
     }
     else
