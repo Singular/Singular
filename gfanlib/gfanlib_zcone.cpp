@@ -757,6 +757,22 @@ ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preass
   ensureStateAsMinimum(1);
 }
 
+ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, ZMatrix const &cachedExtremeRays_, int preassumptions_):
+  inequalities(inequalities_),
+  equations(equations_),
+  cachedExtremeRays(cachedExtremeRays_),
+  state(0),
+  preassumptions(preassumptions_),
+  multiplicity(1),
+  haveExtremeRaysBeenCached(true),
+  n(inequalities_.getWidth()),
+  linearForms(ZMatrix(0,inequalities_.getWidth()))
+  {
+  assert(preassumptions_<4);//OTHERWISE WE ARE DOING SOMETHING STUPID LIKE SPECIFYING AMBIENT DIMENSION
+  assert(equations_.getWidth()==n);
+  ensureStateAsMinimum(1);
+}
+
 void ZCone::canonicalize()
 {
   ensureStateAsMinimum(3);

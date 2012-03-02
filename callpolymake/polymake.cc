@@ -1,9 +1,12 @@
-#define HAVE_FANS
+// #ifndef HAVE_FANS
+// #define HAVE_FANS
+// #endif
 
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
 #include <polymake/Rational.h>
 #include <polymake/Integer.h>
+#include <polymake/polytope/lattice_tools.h>
 #include <polymake/perl/macros.h>
 #include <polymake/Set.h>
 #include <polymake/IncidenceMatrix.h>
@@ -35,12 +38,7 @@ polymake::Main* init_polymake=NULL;
 /* Functions for converting Integers, Rationals and their Matrices 
    in between C++, gfan, polymake and singular */
 
-gfan::Integer PmInteger2GfInteger (const polymake::Integer& pi)
-{
-  mpz_class cache(pi.get_rep());
-  gfan::Integer gi(cache.get_mpz_t());
-  return gi;  
-}
+/* gfan -> polymake */
 
 polymake::Integer GfInteger2PmInteger (const gfan::Integer& gi)
 {
@@ -48,20 +46,6 @@ polymake::Integer GfInteger2PmInteger (const gfan::Integer& gi)
   gi.setGmp(cache);
   polymake::Integer pi(cache);
   return pi;
-}
-
-int PmInteger2Int(const polymake::Integer& pi, bool &ok)
-{
-  gfan::Integer gi = PmInteger2GfInteger(pi);
-  int i = integerToInt(gi, ok);
-  return i;
-}
-
-gfan::Rational PmRational2GfRational (const polymake::Rational& pr)
-{
-  mpq_class cache(pr.get_rep());
-  gfan::Rational gr(cache.get_mpq_t());
-  return gr;
 }
 
 polymake::Rational GfRational2PmRational (const gfan::Rational& gr)
@@ -80,49 +64,6 @@ polymake::Vector<polymake::Integer> Intvec2PmVectorInteger (const intvec* iv)
     vi[i-1]=(*iv)[i-1];
   }
   return vi;
-}
-
-intvec* PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi)
-{
-  intvec* iv = new intvec(vi->size());
-  for(int i=1; i<=vi->size(); i++)
-    {
-      (*iv)[i-1]=(*vi)[i-1];
-    }
-  return iv;
-}
-
-gfan::ZMatrix PmMatrixInteger2GfZMatrix (const polymake::Matrix<polymake::Integer>* mi)
-{
-  int rows=mi->rows();
-  int cols=mi->cols();
-  gfan::ZMatrix zm(rows,cols);
-  for(int r=1; r<=rows; r++)
-    for(int c=1; c<=cols; c++)
-      zm[r-1][c-1] = PmInteger2GfInteger((*mi)(r-1,c-1));
-  return zm;
-}
-
-gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Rational>* mr)
-{
-  int rows=mr->rows();
-  int cols=mr->cols();
-  gfan::QMatrix qm(rows,cols);
-  for(int r=1; r<=rows; r++)
-    for(int c=1; c<=cols; c++)
-      qm[r-1][c-1] = PmRational2GfRational((*mr)(r-1,c-1));
-  return qm;
-}
-
-polymake::Matrix<polymake::Integer> Intvec2PmMatrixInteger (const intvec* im)
-{
-  int rows=im->rows();
-  int cols=im->cols();
-  polymake::Matrix<polymake::Integer> mi(rows,cols);
-  for(int r=0; r<rows; r++)
-    for(int c=0; c<cols; c++)
-      mi(r-1,c-1) = (polymake::Integer) IMATELEM(*im, r+1, c+1);
-  return mi;
 }
 
 polymake::Matrix<polymake::Integer> GfZMatrix2PmMatrixInteger (const gfan::ZMatrix* zm)
@@ -147,6 +88,71 @@ polymake::Matrix<polymake::Rational> GfQMatrix2PmMatrixRational (const gfan::QMa
   return mr;
 }
 
+/* gfan <- polymake */
+
+gfan::Integer PmInteger2GfInteger (const polymake::Integer& pi)
+{
+  mpz_class cache(pi.get_rep());
+  gfan::Integer gi(cache.get_mpz_t());
+  return gi;  
+}
+
+gfan::Rational PmRational2GfRational (const polymake::Rational& pr)
+{
+  mpq_class cache(pr.get_rep());
+  gfan::Rational gr(cache.get_mpq_t());
+  return gr;
+}
+
+gfan::ZMatrix PmMatrixInteger2GfZMatrix (const polymake::Matrix<polymake::Integer>* mi)
+{
+  int rows=mi->rows();
+  int cols=mi->cols();
+  gfan::ZMatrix zm(rows,cols);
+  for(int r=1; r<=rows; r++)
+    for(int c=1; c<=cols; c++)
+      zm[r-1][c-1] = PmInteger2GfInteger((*mi)(r-1,c-1));
+  return zm;
+}
+
+gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Rational>* mr)
+{
+  int rows=mr->rows();
+  int cols=mr->cols();
+  gfan::QMatrix qm(rows,cols);
+  for(int r=1; r<=rows; r++)
+    for(int c=1; c<=cols; c++)
+      qm[r-1][c-1] = PmRational2GfRational((*mr)(r-1,c-1));
+  return qm;
+}
+
+/* polymake -> singular */
+
+int PmInteger2Int(const polymake::Integer& pi, bool &ok)
+{
+  int i;
+  try
+  { 
+    i = (int) pi; 
+  }
+  catch (const std::exception& ex)
+  {
+    WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+    ok = false;
+  }
+  return i;
+}
+
+intvec* PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi, bool &ok)
+{
+  intvec* iv = new intvec(vi->size());
+  for(int i=1; i<=vi->size(); i++)
+  {
+    (*iv)[i-1] = PmInteger2Int((*vi)[i-1],ok);
+  }
+  return iv;
+}
+
 intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi)
 {
   int rows = mi->rows();
@@ -155,8 +161,21 @@ intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi)
   const polymake::Integer* pi = concat_rows(*mi).begin();
   for (int r = 1; r <= rows; r++) 
     for (int c = 1; c <= cols; c++) 
-       IMATELEM(*iv,r,c) = *pi++;
+      IMATELEM(*iv,r,c) = *pi++;
   return iv;  
+}
+
+/* polymake <- singular */
+
+polymake::Matrix<polymake::Integer> Intvec2PmMatrixInteger (const intvec* im)
+{
+  int rows=im->rows();
+  int cols=im->cols();
+  polymake::Matrix<polymake::Integer> mi(rows,cols);
+  for(int r=0; r<rows; r++)
+    for(int c=0; c<cols; c++)
+      mi(r,c) = polymake::Integer(IMATELEM(*im, r+1, c+1));
+  return mi;
 }
 
 intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<NonSymmetric>* icmat)
@@ -170,10 +189,10 @@ intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<NonSymmetric>* icmat
   return iv;
 }
 
-intvec* PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si)
+intvec* PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si, bool &b)
 {
   polymake::Vector<polymake::Integer> vi(*si);
-  return PmVectorInteger2Intvec(&vi);
+  return PmVectorInteger2Intvec(&vi,b);
 }
 
 /* Functions for converting cones and fans in between gfan and polymake,
@@ -183,12 +202,40 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
 {
   if (pc->isa("Cone"))
   {
-    polymake::Matrix<polymake::Integer> inequalities = pc->give("FACETS");
-    polymake::Matrix<polymake::Integer> equalities = pc->give("LINEAR_SPAN");
-    gfan::ZMatrix zm = PmMatrixInteger2GfZMatrix(&inequalities);
-    gfan::ZMatrix zn = PmMatrixInteger2GfZMatrix(&equalities);
+    polymake::Integer ambientdim1 = pc->give("CONE_AMBIENT_DIM");
+    bool ok=true; int ambientdim2 = PmInteger2Int(ambientdim1, ok);
+    if (!ok)
+    {
+      WerrorS("PmCone2ZCone: overflow while converting polymake::Integer to int");
+    }
+    polymake::Matrix<polymake::Rational> ineqrational = pc->give("FACETS");
+    polymake::Matrix<polymake::Rational> eqrational = pc->give("LINEAR_SPAN");
+    polymake::Matrix<polymake::Rational> exraysrational = pc->give("RAYS");
 
-    gfan::ZCone zc = gfan::ZCone(zm,zn);
+    gfan::ZMatrix zv, zw, zx;
+    if (ineqrational.cols()!=0)
+    {  
+      polymake::Matrix<polymake::Integer> ineqinteger = polymake::polytope::multiply_by_common_denominator(ineqrational);
+      zv = PmMatrixInteger2GfZMatrix(&ineqinteger);
+    }
+    else
+      zv = gfan::ZMatrix(0, ambientdim2);
+    if (eqrational.cols()!=0)
+    {  
+      polymake::Matrix<polymake::Integer> eqinteger = polymake::polytope::multiply_by_common_denominator(eqrational);
+      zw = PmMatrixInteger2GfZMatrix(&eqinteger);
+    }
+    else
+      zw = gfan::ZMatrix(0, ambientdim2);
+    if (exraysrational.cols()!=0)
+    {
+    polymake::Matrix<polymake::Integer> exraysinteger = polymake::polytope::multiply_by_common_denominator(exraysrational);
+      zx = PmMatrixInteger2GfZMatrix(&exraysinteger);
+    }
+    else
+      zx = gfan::ZMatrix(0, ambientdim2);
+
+    gfan::ZCone zc = gfan::ZCone(zv,zw,zx,2);
     return zc;
   }
   WerrorS("PmCone2ZCone: unexpected parameters");
@@ -199,29 +246,42 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
   if (pp->isa("Polytope<Rational>"))
   {
     polymake::Integer ambientdim1 = pp->give("CONE_AMBIENT_DIM");
-    polymake::cout << ambientdim1 << polymake::endl;
     bool ok=true; int ambientdim2 = PmInteger2Int(ambientdim1, ok);
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
       return TRUE;
     }
-    polymake::Matrix<polymake::Integer> inequalities = pp->give("FACETS");
-    polymake::Matrix<polymake::Integer> equalities = pp->give("AFFINE_HULL");
+    polymake::Matrix<polymake::Rational> ineqrational = pp->give("FACETS");
+    polymake::Matrix<polymake::Rational> eqrational = pp->give("AFFINE_HULL");
+    polymake::Matrix<polymake::Rational> vertrational = pp->give("VERTICES");
 
-    gfan::ZMatrix zv, zw;
-    
-    if (inequalities.cols()!=0)
-      zv = PmMatrixInteger2GfZMatrix(&inequalities);
+    gfan::ZMatrix zv, zw, zx;
+    if (ineqrational.cols()!=0)
+    {
+      polymake::Matrix<polymake::Integer> ineqinteger = polymake::polytope::multiply_by_common_denominator(ineqrational);
+      zv = PmMatrixInteger2GfZMatrix(&ineqinteger);
+    }
     else
       zv = gfan::ZMatrix(0, ambientdim2);
 
-    if (equalities.cols()!=0)
-      zw = PmMatrixInteger2GfZMatrix(&equalities);
+    if (eqrational.cols()!=0)
+    {
+      polymake::Matrix<polymake::Integer> eqinteger = polymake::polytope::multiply_by_common_denominator(eqrational);
+      zw = PmMatrixInteger2GfZMatrix(&eqinteger);
+    }
     else
       zw = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone zp = gfan::ZCone(zv,zw);
+    if (vertrational.cols()!=0)
+    {
+      polymake::Matrix<polymake::Integer> vertinteger = polymake::polytope::multiply_by_common_denominator(vertrational);
+      zx = PmMatrixInteger2GfZMatrix(&vertinteger);
+    }
+    else
+      zx = gfan::ZMatrix(0, ambientdim2);
+
+    gfan::ZCone zp = gfan::ZCone(zv,zw,zx,2);
     return zp;
   }
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
@@ -374,7 +434,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         }
         catch (const std::exception& ex) 
         {
-          std::cerr << "ERROR: " << ex.what() << endl; 
+          WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
           return TRUE;
         }
         res->rtyp = polytopeID;
@@ -545,7 +605,7 @@ BOOLEAN PMisBounded(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -571,7 +631,7 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -597,7 +657,7 @@ BOOLEAN PMisGorenstein(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -633,7 +693,7 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
-      std::cerr << "ERROR: " << ex.what() << endl;
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
       return TRUE;
     }
   }
@@ -649,15 +709,21 @@ BOOLEAN PMgorensteinVector(leftv res, leftv args)
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* gv;
+    bool ok = true;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Vector<polymake::Integer> pgv = p.give("GORENSTEIN_VECTOR");
-      gv = PmVectorInteger2Intvec(&pgv);
+      gv = PmVectorInteger2Intvec(&pgv,ok);
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    if (!ok)
+    {
+      WerrorS("gorensteinVector: overflow in PmVectorInteger2Intvec");
       return TRUE;
     }
     res->rtyp = INTVEC_CMD;
@@ -683,7 +749,7 @@ BOOLEAN PMisCanonical(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -709,7 +775,7 @@ BOOLEAN PMisTerminal(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -735,7 +801,7 @@ BOOLEAN PMisLatticeEmpty(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -771,7 +837,7 @@ BOOLEAN PMlatticeVolume(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
   }
@@ -798,15 +864,15 @@ BOOLEAN PMlatticeDegree(leftv res, leftv args)
         WerrorS("overflow while converting polymake::Integer to int");
         return TRUE;
       }
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) ld;
-      return FALSE;
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) ld;
+    return FALSE;
   }
   WerrorS("latticeDegree: unexpected parameters");
   return TRUE;
@@ -834,7 +900,7 @@ BOOLEAN PMlatticeCodegree(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -853,15 +919,21 @@ BOOLEAN PMehrhartPolynomialCoeff(leftv res, leftv args)
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* ec;
+    bool ok = true;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Vector<polymake::Integer> pec = p.give("EHRHART_POLYNOMIAL_COEFF");
-      ec = PmVectorInteger2Intvec(&pec);
+      ec = PmVectorInteger2Intvec(&pec,ok);
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    if(!ok)
+    {
+      WerrorS("ehrhartPolynomialCoeff: overflow in PmVectorInteger2Intvec");
       return TRUE;
     }
     res->rtyp = INTVEC_CMD;
@@ -880,15 +952,21 @@ BOOLEAN PMhStarVector(leftv res, leftv args)
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* hv;
+    bool ok = true;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Vector<polymake::Integer> phv = p.give("H_STAR_VECTOR");
-      hv = PmVectorInteger2Intvec(&phv);
+      hv = PmVectorInteger2Intvec(&phv,ok);
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    if(!ok)
+    {
+      WerrorS("hStarVector: overflow in PmVectorInteger2Intvec");
       return TRUE;
     }
     res->rtyp = INTVEC_CMD;
@@ -914,7 +992,7 @@ BOOLEAN PMisNormal(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -933,15 +1011,21 @@ BOOLEAN PMfacetWidths(leftv res, leftv args)
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* fw;
+    bool ok = true;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Vector<polymake::Integer> pfw = p.give("FACET_WIDTHS");
-      fw = PmVectorInteger2Intvec(&pfw);
+      fw = PmVectorInteger2Intvec(&pfw,ok);
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    if(!ok)
+    {
+      WerrorS("facetWidths: overflow in PmVectorInteger2Intvec");
       return TRUE;
     }
     res->rtyp = INTVEC_CMD;
@@ -974,7 +1058,7 @@ BOOLEAN PMfacetWidth(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1001,7 +1085,7 @@ BOOLEAN PMfacetVertexLatticeDistances(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INTMAT_CMD;
@@ -1027,7 +1111,7 @@ BOOLEAN PMisCompressed(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1053,7 +1137,7 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1079,7 +1163,7 @@ BOOLEAN PMisVeryAmple(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1106,7 +1190,7 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INTMAT_CMD;
@@ -1139,7 +1223,7 @@ BOOLEAN PMnLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1166,7 +1250,7 @@ BOOLEAN PMinteriorLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INTMAT_CMD;
@@ -1199,7 +1283,7 @@ BOOLEAN PMnInteriorLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1226,7 +1310,7 @@ BOOLEAN PMboundaryLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INTMAT_CMD;
@@ -1259,7 +1343,7 @@ BOOLEAN PMnBoundaryLatticePoints(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1286,7 +1370,7 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INTMAT_CMD;
@@ -1319,7 +1403,7 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = INT_CMD;
@@ -1352,7 +1436,7 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
       }
       catch (const std::exception& ex) 
       {
-        std::cerr << "ERROR: " << ex.what() << endl; 
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
         return TRUE;
       }
       res->rtyp = polytopeID;
@@ -1406,7 +1490,7 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
       }
       catch (const std::exception& ex) 
       {
-        std::cerr << "ERROR: " << ex.what() << endl; 
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
         return TRUE;
       }
       res->rtyp = INTVEC_CMD;
@@ -1442,7 +1526,7 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
       }
       catch (const std::exception& ex) 
       {
-        std::cerr << "ERROR: " << ex.what() << endl; 
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
         return TRUE;
       }
       res->rtyp = INTVEC_CMD;
@@ -1487,7 +1571,7 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
         }
         catch (const std::exception& ex) 
         {
-          std::cerr << "ERROR: " << ex.what() << endl; 
+          WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
           return TRUE;
         }
         res->rtyp = INT_CMD;
@@ -1535,7 +1619,7 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
         }
         catch (const std::exception& ex) 
         {
-          std::cerr << "ERROR: " << ex.what() << endl; 
+          WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
           return TRUE;
         }
         res->rtyp = INT_CMD;
@@ -1566,7 +1650,7 @@ BOOLEAN visual(leftv res, leftv args)
     }
     catch (const std::exception& ex)
     {
-      std::cerr << "Error: " << ex.what() << std::endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = NONE;
@@ -1583,7 +1667,7 @@ BOOLEAN visual(leftv res, leftv args)
     }    
     catch (const std::exception& ex)
     {
-      std::cerr << "Error: " << ex.what() << std::endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = NONE;
@@ -1612,7 +1696,7 @@ BOOLEAN normalFan(leftv res, leftv args)
     }
     catch (const std::exception& ex) 
     {
-      std::cerr << "ERROR: " << ex.what() << endl; 
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
       return TRUE;
     }
     res->rtyp = fanID;
@@ -1734,7 +1818,7 @@ BOOLEAN testingvisuals(leftv res, leftv args)   // for testing purposes
   } 
   catch (const std::exception& ex) 
   {
-    std::cerr << "ERROR: " << ex.what() << endl; 
+    WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
     return TRUE;
   }
 }
@@ -1782,23 +1866,80 @@ BOOLEAN testingstrings(leftv res, leftv args)
 // }
 
 
+BOOLEAN testingmatrices(leftv res, leftv args)
+{
+  intvec* im = (intvec*) args->Data();
+  polymake::Matrix<polymake::Integer> pm = Intvec2PmMatrixInteger(im);
+  res->rtyp = NONE;
+  res->data = NULL;
+  return FALSE;
+}
+
+
+BOOLEAN PMconeViaRays(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    polymake::perl::Object pc("Cone<Rational>");
+    intvec* hlines = (intvec*) u->Data(); // these will are half lines in the cone
+    polymake::Matrix<polymake::Integer> pmhlines = Intvec2PmMatrixInteger(hlines);
+    pc.take("INPUT_RAYS") << pmhlines;
+
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+    {
+      intvec* lines = (intvec*) v->Data(); // these will be lines in the cone
+      polymake::Matrix<polymake::Integer> pmlines = Intvec2PmMatrixInteger(lines);
+      pc.take("INPUT_LINEALITY") << pmlines;
+
+      leftv w = v->next;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+      {
+        int flag = (int) (long) w->Data(); // TODO: this will indicate whether the
+                                           // information provided are exact
+      } 
+    }
+    gfan::ZCone* zc = new gfan::ZCone(PmCone2ZCone(&pc));
+    res->rtyp = coneID;
+    res->data = (char*) zc;
+    return FALSE;
+  }    
+  WerrorS("coneViaRays: unexpected parameters");
+  return TRUE;
+}
+
+
 BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == INTMAT_CMD))
   {
-    intvec* iv = (intvec*) u->Data(); 
-    gfan::ZMatrix zm = intmat2ZMatrix(iv);
-    polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
-
     polymake::perl::Object pp("Polytope<Rational>");
-    pp.take("POINTS") << pm;
+    intvec* points = (intvec*) u->Data(); // these will be vertices of or points in the polytope
+    polymake::Matrix<polymake::Integer> pmpoints = Intvec2PmMatrixInteger(points);
 
-    gfan::ZCone* zc = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      int flag = (int) (long) v->Data();
+      switch(flag)
+      {
+        case 0:  pp.take("POINTS") << pmpoints;   // case means the matrix may contain points inside the polytope
+        case 1:  pp.take("VERTICES") << pmpoints; // case means the matrix only contains vertices of the polytope
+        default: WerrorS("polytopeViaVertices: invalid flag");
+      }
+    }
+    else
+      pp.take("POINTS") << pmpoints;
+    
+    gfan::ZCone* zp = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
     res->rtyp = polytopeID;
-    res->data = (char*) zc;
+    res->data = (char*) zp;
     return FALSE;
-  }    
+  }  
+  WerrorS("polytopeViaVertices: unexpected parameters");
+  return TRUE;
 }
 
 
@@ -1810,6 +1951,7 @@ extern "C" int mod_init(void* polymakesingular)
   init_polymake->set_application("fan");
   // iiAddCproc("","cube",FALSE,cube);
   // iiAddCproc("","cross",FALSE,cross);
+  iiAddCproc("","coneViaRays",FALSE,PMconeViaRays);
   iiAddCproc("","polytopeViaVertices",FALSE,PMpolytopeViaVertices);
   iiAddCproc("","isBounded",FALSE,PMisBounded);
   iiAddCproc("","isReflexive",FALSE,PMisReflexive);
@@ -1853,6 +1995,7 @@ extern "C" int mod_init(void* polymakesingular)
   // iiAddCproc("","testingfans",FALSE,testingfans);
   iiAddCproc("","testingvisuals",FALSE,testingvisuals);
   iiAddCproc("","testingstrings",FALSE,testingstrings);
+  iiAddCproc("","testingmatrices",FALSE,testingmatrices);
 
   blackbox* b=getBlackboxStuff(polytopeID);
   b->blackbox_Op2=bbpolytope_Op2;

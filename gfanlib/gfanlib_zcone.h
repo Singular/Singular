@@ -116,7 +116,10 @@ public:
     * which tells what is known about the description already.
     */
      ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preassumptions_=PCP_none);
-
+   /**
+    * Same as above except that cachedExtremeRays may be set. Those are always believed to be right!
+    */
+     ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, ZMatrix const &cachedExtremeRays_, int preassumptions_=PCP_none);
      /**
       * Get the multiplicity of the cone.
       */
