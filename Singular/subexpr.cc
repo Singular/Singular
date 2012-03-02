@@ -4,7 +4,6 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id$ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -230,7 +229,7 @@ void sleftv::Print(leftv store, int spaces)
         case LIST_CMD:
         {
           lists l=(lists)d;
-          if (l->nr<0)
+          if (lSize(l)<0)
           {
              PrintNSpaces(spaces);
              PrintS("empty list\n");

@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3597,7 +3596,7 @@ static BOOLEAN jjCOUNT_N(leftv res, leftv v)
 static BOOLEAN jjCOUNT_L(leftv res, leftv v)
 {
   lists l=(lists)v->Data();
-  res->data = (char *)(long)(l->nr+1);
+  res->data = (char *)(long)(lSize(l)+1);
   return FALSE;
 }
 static BOOLEAN jjCOUNT_M(leftv res, leftv v)

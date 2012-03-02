@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -49,6 +48,7 @@ class slists
 
 typedef slists *           lists;
 
+int lSize(lists L);
 lists lCopy(lists L);
 lists lInsert0(lists ul, leftv v, int pos);
 BOOLEAN lInsert(leftv res, leftv u, leftv v);
