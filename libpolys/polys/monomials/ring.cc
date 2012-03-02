@@ -4942,7 +4942,7 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p)
     Print("Changing record on pos: %d\nOld limit: %d --->> New Limit: %d\n", pos, r->typ[pos].data.is.limit, i);
 #endif
 
-  const ideal FF = id_Copy(F, r); // idrHeadR(F, r, r);
+  const ideal FF = idrHeadR(F, r, r); // id_Copy(F, r); // ???
 
 
   if( r->typ[pos].data.is.F != NULL)
