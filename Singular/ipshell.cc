@@ -2318,6 +2318,19 @@ ring rCompose(const lists  L)
              R->wvhdl[j][i]=(*iv)[i];
            }
            break;
+         case ringorder_am:
+           R->wvhdl[j] =( int *)omAlloc((iv->length()+1)*sizeof(int));
+           for (i=0; i<iv_len;i++)
+           {
+             R->wvhdl[j][i]=(*iv)[i];
+           }
+           R->wvhdl[j][i]=iv->length() - iv_len;
+           //printf("ivlen:%d,iv->len:%d,mod:%d\n",iv_len,iv->length(),R->wvhdl[j][i]);
+           for (; i<iv->length(); i++)
+           {
+              R->wvhdl[j][i+1]=(*iv)[i];
+           }
+           break;
          case ringorder_M:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
            for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];

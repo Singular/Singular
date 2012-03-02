@@ -3346,7 +3346,9 @@ static void rSetNegWeight(ring r)
     l=0;
     for(i=0;i<r->OrdSize;i++)
     {
-      if(r->typ[i].ord_typ==ro_wp_neg) l++;
+      if((r->typ[i].ord_typ==ro_wp_neg)
+      ||(r->typ[i].ord_typ==ro_am))
+        l++;
     }
     if (l>0)
     {
@@ -3358,6 +3360,11 @@ static void rSetNegWeight(ring r)
         if(r->typ[i].ord_typ==ro_wp_neg)
         {
           r->NegWeightL_Offset[l]=r->typ[i].data.wp.place;
+          l++;
+        }
+        else if(r->typ[i].ord_typ==ro_am)
+        {
+          r->NegWeightL_Offset[l]=r->typ[i].data.am.place;
           l++;
         }
       }
