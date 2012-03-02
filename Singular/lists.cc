@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -20,6 +19,13 @@
 #include <Singular/lists.h>
 
 omBin slists_bin = omGetSpecBin(sizeof(slists));
+
+int lSize(lists L)
+{
+  int n=L->nr;
+  while ((n>=0)&&(L->m[n].rtyp==DEF_CMD)) n--;
+  return n;
+}
 
 lists lCopy(lists L)
 {
@@ -154,15 +160,16 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
 {
   lists ul=(lists)u->Data();
   int VIndex=(int)(long)v->Data()-1;
+  int EndIndex=lSize(ul);
 
   if((0<=VIndex)&&(VIndex<=ul->nr))
   {
     ul=(lists)u->CopyD();
     int i,j;
     lists l=(lists) omAllocBin(slists_bin);
-    l->Init(ul->nr);
+    l->Init(EndIndex+(VIndex>EndIndex));
 
-    for(i=j=0;i<=ul->nr;i++,j++)
+    for(i=j=0;i<=EndIndex;i++,j++)
     {
       if (i!=VIndex)
       {

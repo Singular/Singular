@@ -215,7 +215,7 @@ void sleftv::Print(leftv store, int spaces)
         case LIST_CMD:
         {
           lists l=(lists)d;
-          if (l->nr<0)
+          if (lSize(l)<0)
           {
              PrintNSpaces(spaces);
              PrintS("empty list\n");
@@ -941,11 +941,11 @@ int  sleftv::Typ()
       {
         lists l;
         if (rtyp==IDHDL) l=IDLIST((idhdl)data);
-	else if (rtyp==ALIAS_CMD)
-	{
-	  idhdl h=(idhdl)data; 
-	  l=(lists)(((idhdl)h->data.ustring)->data.ustring);
-	}
+        else if (rtyp==ALIAS_CMD)
+        {
+          idhdl h=(idhdl)data;
+          l=(lists)(((idhdl)h->data.ustring)->data.ustring);
+        }
         else             l=(lists)data;
         if ((0<e->start)&&(e->start<=l->nr+1))
         {
