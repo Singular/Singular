@@ -20,6 +20,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   $_ = shift(@ARGV);
   if (/^-o$/)    { $out_file = shift(@ARGV); next;}
   if (/^-db$/) { $db_file = shift(@ARGV); next;}
+  if (/^-tag$/) { $tag = $tag . " tag:" . shift(@ARGV); next;}
   if (/^-no_fun$/)    { $no_fun = 1;next;}
   if (/^-doc$/)       { $doc = 1; next;}
   if (/^-h(elp)?$/)   { print $Usage; exit;}
@@ -120,7 +121,7 @@ unless ($no_fun)
 	($ex = &CleanUpExample($lib, $example{$procs[$i]})))
     {
       print LDOC "\@strong{Example:}\n";
-      print LDOC "\@smallexample\n\@c example\n";
+      print LDOC "\@smallexample\n\@c example$tag\n";
       print LDOC $ex;
       print LDOC "\n\@c example\n\@end smallexample\n";
     }

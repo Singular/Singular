@@ -442,7 +442,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node normaliz_lib, pointid_lib, normal_lib, Commutative algebra
 @subsection normaliz_lib
-@c lib normaliz.lib
+@c lib normaliz.lib tag:normaliz
 @c ----------------------------------------------------------
 @node pointid_lib, primdec_lib, normaliz_lib, Commutative algebra
 @subsection pointid_lib
@@ -474,7 +474,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node sing4ti2_lib, toric_lib, sagbi_lib, Commutative algebra
 @subsection sing4ti2_lib
-@c lib sing4ti2.lib
+@c lib sing4ti2.lib tag:sing4ti2
 @c ---------------------------------------------------------
 @node toric_lib, , sing4ti2_lib, Commutative algebra
 @subsection toric_lib
@@ -531,7 +531,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ---------------------------------------------------------
 @node sheafcoh_lib, ,reszeta_lib, Algebraic geometry
 @subsection sheafcoh_lib
-@c lib sheafcoh.lib
+@c lib sheafcoh.lib tag:memory
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Algebraic geometry, SINGULAR libraries
 @section Singularities

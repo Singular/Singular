@@ -787,7 +787,7 @@ which allows ignoring all but the first j entries of vectors when
 forming the pairs in the standard basis computation.
 
 @smallexample
-@c example
+@c example tag:dynlib
 ring r=0,(x,y),dp;
 module mo=[x^2-y^2,1,0,0],[xy+y^2,0,1,0],[y^2,0,0,1];
 print(mo);

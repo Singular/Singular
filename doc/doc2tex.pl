@@ -539,7 +539,7 @@ sub HandleRef
 
 sub HandleLib
 {
-  my($lib, $proc, $n_fun, $n_ex, $section, $tex_file);
+  my($lib, $proc, $n_fun, $n_ex, $section, $tex_file, $tag);
 
   if (/^\@c\s*lib\s+([^\.]+)\.lib(.*)/)
   {
@@ -551,6 +551,14 @@ sub HandleLib
     warn "$WARNING need .lib file to process '$_'\n";
     print TEX $_;
     return;
+  }
+  if (/tag:(\w+)/)
+  {
+    $tag = "TAG='-tag ".$1."'";
+  }
+  else
+  {
+    $tag = '';
   }
 
   $proc = $1 if (/^:(.*?) /);
@@ -574,7 +582,7 @@ sub HandleLib
   if ($make)
   {
     print "<lib $lib " if ($verbose);
-    System("$make $make_opts VERBOSE=$verbose $tex_file"); 
+    System("$make $make_opts $tag VERBOSE=$verbose $tex_file"); 
   }
   
   # make sure file exists
