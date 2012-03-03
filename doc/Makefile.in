@@ -66,10 +66,12 @@ endif
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
+DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@
 DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
-		  -exdir ${EX_SUBDIR} @DOC2TEX_EXAMPLE_EXCLUSIONS@
-PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
+		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
+TAG		=
+PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= @TMP_DIR@
