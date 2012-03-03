@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id$
+// $Id: tmpl_inst.cc 14599 2012-02-17 18:00:31Z motsak $
 ////////////////////////////////////////////////////////////
 
 
@@ -60,8 +60,8 @@ template class Substitution<CanonicalForm>;
 template class List<SForm>;
 template class ListIterator<SForm>;
 
-template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
-template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
+//template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
+//template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
 
 #ifndef NOSTREAMIO
 template OSTREAM & operator << ( OSTREAM &, const List<int> & );
@@ -85,7 +85,7 @@ template OSTREAM & operator << ( OSTREAM &, const Array<int> & );
 
 template class Array<int>;
 template class Array<Variable>;
-template class Array<REvaluation>;
+//template class Array<REvaluation>;
 
 // for database
 #ifdef HAVE_DATABASE
