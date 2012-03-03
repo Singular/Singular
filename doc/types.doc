@@ -1638,7 +1638,7 @@ either for reading or for writing, but not for both at the same time. A
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example tag:MP
   ring r;
   link l="MPfile:w example.mp"; // type=MPfile, mode=overwrite
   l;
@@ -1786,7 +1786,7 @@ is data to read.
 
 @*@strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   LIB "general.lib"; // needed for "killall" command
   link l="MPtcp:launch";
   open(l); l;        // l is ready for writing but not for reading

@@ -2913,7 +2913,7 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 
 @strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   ring r; poly p = x+y;
   dump("MPfile:w test.mp");   // dump the session to the file test.mp
   kill r;                     // kill the basering
@@ -2934,7 +2934,7 @@ Links have various properties which can be queried using the
 
 @strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   link l = "MPtcp:fork";
   l;
   open(l);
@@ -2988,7 +2988,7 @@ MPfile links are implemented on Unix-like operating systems only.
 
 @strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   ring r;
   // (over)write MPfile test.mp, link is specified as string
   write("MPfile:w test.mp", x+y);
@@ -3015,7 +3015,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 
 @strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   ring r;
   link l = "MPtcp:launch"; // declare a link explicitly
   open(l);  // needs an open, launches another SINGULAR as a server

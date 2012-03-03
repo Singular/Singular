@@ -1604,7 +1604,7 @@ with @code{quote} and @code{write} to
 prevent local evaluations  when writing to an MPtcp link.
 @item @strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   link l="MPfile:w example.mp";
   ring r=0,(x,y,z),ds;
   ideal i=maxideal(3);
@@ -5708,7 +5708,7 @@ quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
 effect of exactly one quote).
 @item @strong{Example:}
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
   link l="MPfile:w example.mp";
   ring r=0,(x,y,z),ds;
   ideal i=maxideal(3);
