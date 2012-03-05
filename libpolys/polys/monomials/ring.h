@@ -92,8 +92,11 @@ struct sro_am
   short start;  // bounds of ordering (in E)
   short end;
   short len_gen; // i>len_gen: weight(gen(i)):=0
-  int *weights; // pointers into wvhdl field of length (end-start+1) + len_gen
-                // contents w_1,... w_n, len, mod_w_1, .. mod_w_len, 0
+  int *weights; // pointers into wvhdl field of length (end-start+1) + len_gen + 1
+                // contents w_{start},... w_{end}, len, mod_w_1, .. mod_w_len, 0
+  int *weights_m; // pointers into wvhdl field of length len_gen + 1
+                // len_gen, mod_w_1, .. mod_w_len, 0
+  
 };
 typedef struct sro_am sro_am;
 

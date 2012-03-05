@@ -121,32 +121,38 @@ void p_Setm_General(poly p, const ring r)
         }
         case ro_am:
         {
-          ord=POLY_NEGWEIGHT_OFFSET;
-          int a,e;
-          a=o->data.am.start;
-          e=o->data.am.end;
-          int *w=o->data.am.weights;
+          ord = POLY_NEGWEIGHT_OFFSET;
+          const short a=o->data.am.start;
+          const short e=o->data.am.end;
+          const int * w=o->data.am.weights;
 #if 1
-          for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
-          int c=p_GetComp(p,r);
+          for(short i=a; i<=e; i++, w++)
+            ord += ((*w) * p_GetExp(p,i,r));
 #else
           long ai;
           int ei,wi;
-          for(int i=a;i<=e;i++)
+          for(short i=a;i<=e;i++)
           {
              ei=p_GetExp(p,i,r);
              wi=w[i-a];
              ai=ei*wi;
              if (ai/ei!=wi) pSetm_error=TRUE;
-             ord+=ai;
+             ord += ai;
              if (ord<ai) pSetm_error=TRUE;
           }
 #endif
-          if ((c>0)&&(c<=o->data.am.len_gen))
+          const int c = p_GetComp(p,r);
+
+          const short len_gen= o->data.am.len_gen;
+          
+          if ((c > 0) && (c <= len_gen))
           {
-            ord+=w[c-(e-a)+2];
+            const int * const wm = o->data.am.weights_m;
+            assume( wm[0] == len_gen );
+            ord += wm[c];
           }
-          p->exp[o->data.am.place]=ord;
+          
+          p->exp[o->data.am.place] = ord;
           break;
         }
       case ro_wp64:

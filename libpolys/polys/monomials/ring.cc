@@ -356,7 +356,7 @@ void   rWrite(ring r, BOOLEAN details)
         }
         if (r->order[l]!=ringorder_M) break;
       }
-      if (r->order[l]==ringorder_am) /*j==0*/
+      if (r->order[l]==ringorder_am)
       {
         int m=r->wvhdl[l][i];
         Print("\n//                  : %d module weights ",m);
@@ -2206,16 +2206,20 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
 static void rO_WMDegree(int &place, int &bitplace, int start, int end,
     long *o, sro_ord &ord_struct, int *weights)
 {
+  assume(weights != NULL);
+  
   // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
-  while((start<end) && (weights[0]==0)) { start++; weights++; }
-  while((start<end) && (weights[end-start]==0)) { end--; }
+//  while((start<end) && (weights[0]==0)) { start++; weights++; }
+//  while((start<end) && (weights[end-start]==0)) { end--; }
   rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_am;
   ord_struct.data.am.start=start;
   ord_struct.data.am.end=end;
   ord_struct.data.am.place=place;
-  ord_struct.data.am.len_gen=weights[end-start+1];
   ord_struct.data.am.weights=weights;
+  ord_struct.data.am.weights_m = weights + (end-start+1);
+  ord_struct.data.am.len_gen=weights[end-start+1];
+  assume( ord_struct.data.am.weights_m[0] == ord_struct.data.am.len_gen );
   o[place]=1;
   place++;
   rO_Align(place,bitplace);
