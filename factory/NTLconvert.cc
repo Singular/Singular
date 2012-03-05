@@ -83,24 +83,7 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
     }
     NTLcurrentExp=i.exp();
 
-    CanonicalForm c=i.coeff();
-    if (!c.isImm()) c=c.mapinto(); //c%= getCharacteristic();
-    if (!c.isImm())
-    {  //This case will never happen if the characteristic is in fact a prime
-       // number, since all coefficients are represented as immediates
-       #ifndef NOSTREAMIO
-       cout<<"convertFacCF2NTLZZ_pX: coefficient not immediate! : "<<f<<"\n";
-       #else
-       //NTL_SNS
-       printf("convertFacCF2NTLZZ_pX: coefficient not immediate!, char=%d\n",
-              getCharacteristic());
-       #endif
-       NTL_SNS exit(1);
-    }
-    else
-    {
-      SetCoeff(ntl_poly,NTLcurrentExp,c.intval());
-    }
+    SetCoeff(ntl_poly,NTLcurrentExp,to_ZZ_p (convertFacCF2NTLZZ (i.coeff())));
     NTLcurrentExp--;
   }
 
@@ -264,32 +247,7 @@ GF2X convertFacCF2NTLGF2X(CanonicalForm f)
 
 CanonicalForm convertNTLZZpX2CF(ZZ_pX poly,Variable x)
 {
-  //printf("convertNTLZZpX2CF\n");
-  CanonicalForm bigone;
-
-
-  if (deg(poly)>0)
-  {
-    // poly is non-constant
-    bigone=0;
-    bigone.mapinto();
-    // Compute the canonicalform coefficient by coefficient,
-    // bigone summarizes the result.
-    for (int j=0;j<=deg(poly);j++)
-    {
-      if (coeff(poly,j)!=0)
-      {
-        bigone+=(power(x,j)*CanonicalForm(to_long(rep(coeff(poly,j)))));
-      }
-    }
-  }
-  else
-  {
-    // poly is immediate
-    bigone=CanonicalForm(to_long(rep(coeff(poly,0))));
-    bigone.mapinto();
-  }
-  return bigone;
+  return convertNTLZZX2CF (to_ZZX (poly), x);
 }
 
 CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x)
@@ -1140,6 +1098,29 @@ CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
   else
   {
     bigone= convertNTLzzpE2CF(coeff(f,0),alpha);
+    bigone.mapinto();
+  }
+  return bigone;
+}
+
+CanonicalForm convertNTLZZ_pEX2CF (ZZ_pEX f, Variable x, Variable alpha)
+{
+  CanonicalForm bigone;
+  if (deg (f) > 0)
+  {
+    bigone= 0;
+    bigone.mapinto();
+    for (int j=0;j<deg(f)+1;j++)
+    {
+      if (coeff(f,j)!=0)
+      {
+        bigone+=(power(x,j)*convertNTLZZpE2CF(coeff(f,j),alpha));
+      }
+    }
+  }
+  else
+  {
+    bigone= convertNTLZZpE2CF(coeff(f,0),alpha);
     bigone.mapinto();
   }
   return bigone;
