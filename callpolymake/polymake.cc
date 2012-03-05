@@ -308,11 +308,14 @@ gfan::ZFan PmFan2ZFan (polymake::perl::Object* pf)
 
 polymake::perl::Object ZCone2PmCone (gfan::ZCone* zc)
 {
-  gfan::ZMatrix zm = zc->extremeRays();
-  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
+  gfan::ZMatrix zm1 = zc->extremeRays();
+  polymake::Matrix<polymake::Integer> extremeRays = GfZMatrix2PmMatrixInteger(&zm1);
+  gfan::ZMatrix zm2 = zc->generatorsOfLinealitySpace();
+  polymake::Matrix<polymake::Integer> lineality = GfZMatrix2PmMatrixInteger(&zm2);
 
   polymake::perl::Object gc("Cone");
-  gc.take("INPUT_RAYS") << pm;  
+  gc.take("INPUT_RAYS") << extremeRays;
+  gc.take("INPUT_LINEALITY") << lineality;
 
   return gc;
 }
@@ -1640,13 +1643,11 @@ BOOLEAN visual(leftv res, leftv args)
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
   {  
-    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    gfan::ZMatrix rays = zc->extremeRays();
+    gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     try
     {
-      polymake::perl::Object p("Polytope<Rational>");
-      p.take("VERTICES") << GfZMatrix2PmMatrixInteger(&rays);
-      VoidCallPolymakeFunction("jreality",p.CallPolymakeMethod("VISUAL"));
+      polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
+      VoidCallPolymakeFunction("jreality",pp.CallPolymakeMethod("VISUAL"));
     }
     catch (const std::exception& ex)
     {
@@ -1762,39 +1763,41 @@ BOOLEAN normalFan(leftv res, leftv args)
 //   return TRUE;
 // }
 
-// BOOLEAN testingcones(leftv res, leftv args)  // for testing purposes       
-// {                                            // taking a cone from Singular,
-//                                              // handing it over to polymake 
-//                                              // and back                    
-//   leftv u = args;
-//   if ((u != NULL) && (u->Typ() == coneID))
-//     {
-//       gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-//       polymake::perl::Object pc = ZCone2PmCone(zc);
-//       gfan::ZCone* zd = new gfan::ZCone(PmCone2ZCone(&pc));
-//       res->rtyp = coneID;
-//       res->data = (char *) zd;
-//       return FALSE;
-//     }
-//   return TRUE;
-// }
+BOOLEAN testingcones(leftv res, leftv args)  // for testing purposes       
+{                                            // taking a cone from Singular,
+                                             // handing it over to polymake 
+                                             // and back                    
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+      polymake::perl::Object pc = ZCone2PmCone(zc);
+      gfan::ZCone* zd = new gfan::ZCone(PmCone2ZCone(&pc));
+      // res->rtyp = coneID;
+      // res->data = (char *) zd;
+      res->rtyp = NONE;
+      res->data = NULL;
+      return FALSE;
+    }
+  return TRUE;
+}
 
-// BOOLEAN testingpolytopes(leftv res, leftv args) // for testing purposes
-// {                                                // taking a cone from Singular,
-//                                                  // handing it over to polymake
-//                                                  // and back
-//   leftv u = args;
-//   if ((u != NULL) && (u->Typ() == polytopeID))
-//   {
-//     gfan::ZCone* zp = (gfan::ZCone*) u->Data();
-//     polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
-//     gfan::ZCone* zq = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
-//     res->rtyp = polytopeID;
-//     res->data = (char *) zq;
-//     return FALSE;
-//   }
-//   return TRUE;
-// }   
+BOOLEAN testingpolytopes(leftv res, leftv args) // for testing purposes
+{                                                // taking a cone from Singular,
+                                                 // handing it over to polymake
+                                                 // and back
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*) u->Data();
+    polymake::perl::Object pp = ZPolytope2PmPolytope(zp);
+    gfan::ZCone* zq = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
+    res->rtyp = polytopeID;
+    res->data = (char *) zq;
+    return FALSE;
+  }
+  return TRUE;
+}   
 
 BOOLEAN testingvisuals(leftv res, leftv args)   // for testing purposes
 {                                               // testing visualization of fans
@@ -1990,8 +1993,8 @@ extern "C" int mod_init(void* polymakesingular)
   iiAddCproc("","normalFan",FALSE,normalFan);
   // iiAddCproc("","testingtypes",FALSE,testingtypes);
   // iiAddCproc("","testingintvec",FALSE,testingintvec);
-  // iiAddCproc("","testingcones",FALSE,testingcones);
-  // iiAddCproc("","testingpolytopes",FALSE,testingpolytopes);
+  iiAddCproc("","testingcones",FALSE,testingcones);
+  iiAddCproc("","testingpolytopes",FALSE,testingpolytopes);
   // iiAddCproc("","testingfans",FALSE,testingfans);
   iiAddCproc("","testingvisuals",FALSE,testingvisuals);
   iiAddCproc("","testingstrings",FALSE,testingstrings);
