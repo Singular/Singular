@@ -102,9 +102,12 @@ void sleftv::Print(leftv store, int spaces)
       {
         case UNKNOWN:
         case DEF_CMD:
-        case PACKAGE_CMD:
           PrintNSpaces(spaces);
           PrintS("`");PrintS(n);PrintS("`");
+          break;
+        case PACKAGE_CMD:
+          PrintNSpaces(spaces);
+          paPrint(n,(package)d);
           break;
         case NONE:
           return;
@@ -421,7 +424,7 @@ static inline void * s_internalCopy(const int t,  void *d)
         return NULL;
       }
       else
-      Warn("s_internalCopy: cannot copy type %s(%d)",
+        Warn("s_internalCopy: cannot copy type %s(%d)",
             Tok2Cmdname(t),t);
     }
   }
@@ -873,7 +876,6 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
   }
   return omStrDup("");
 }
-
 
 int  sleftv::Typ()
 {

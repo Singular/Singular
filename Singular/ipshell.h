@@ -189,6 +189,10 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v));
 
 void iiCheckPack(package &p);
+
+/* ================================================================== */
+void paPrint(const char *n,package p);
+/* ================================================================== */
 #ifndef NDEBUG
 void checkall();
 #endif
