@@ -743,7 +743,29 @@ henselLiftAndEarly (
         const CFList& uniFactors,  ///< [in] univariate factors
         const ExtensionInfo& info, ///< [in] information about extension
         const CanonicalForm& eval, ///< [in] evaluation point
-        const modpk& b= modpk()    ///< [in] coeff bound
+        modpk& b                   ///< [in] coeff bound
+                  );
+
+/// hensel Lifting and early factor detection
+///
+/// @return @a henselLiftAndEarly returns monic (wrt Variable (1)) lifted
+///         factors without factors which have been detected at an early stage
+///         of Hensel lifting
+/// @sa earlyFactorDetection(), extEarlyFactorDetection()
+
+CFList
+henselLiftAndEarly (
+        CanonicalForm& A,          ///< [in,out] poly to be factored,
+                                   ///< returns poly divided by detected factors
+                                   ///< in case of success
+        bool& earlySuccess,        ///< [in,out] indicating success
+        CFList& earlyFactors,      ///< [in,out] list of factors detected
+                                   ///< at early stage of Hensel lifting
+        DegreePattern& degs,       ///< [in,out] degree pattern
+        int& liftBound,            ///< [in,out] (adapted) lift bound
+        const CFList& uniFactors,  ///< [in] univariate factors
+        const ExtensionInfo& info, ///< [in] information about extension
+        const CanonicalForm& eval  ///< [in] evaluation point
                   );
 
 /// Factorization over an extension of initial field

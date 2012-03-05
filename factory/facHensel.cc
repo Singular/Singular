@@ -448,7 +448,8 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
 }
 
 CFList
-diophantine (const CanonicalForm& F, const CFList& factors, const modpk& b)
+diophantine (const CanonicalForm& F, const CanonicalForm& G,
+             const CFList& factors, modpk& b)
 {
   if (getCharacteristic() == 0)
   {
@@ -496,7 +497,7 @@ CFList
 diophantine (const CanonicalForm& F, const CFList& factors)
 {
   modpk b= modpk();
-  return diophantine (F, factors, b);
+  return diophantine (F, 1, factors, b);
 }
 
 void
@@ -723,13 +724,13 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
 
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
-              CFList& diophant, CFMatrix& M, bool sort, const modpk& b)
+              CFList& diophant, CFMatrix& M, modpk& b, bool sort)
 {
   if (sort)
     sortList (factors, Variable (1));
   Pi= CFArray (factors.length() - 1);
   CFListIterator j= factors;
-  diophant= diophantine (F[0], factors, b);
+  diophant= diophantine (F[0], F, factors, b);
   DEBOUTLN (cerr, "diophant= " << diophant);
   j++;
   Pi [0]= mulNTL (j.getItem(), mod (factors.getFirst(), F.mvar()), b);
@@ -758,7 +759,14 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   for (i= 0; i < factors.length (); i++, k++)
     k.getItem()= bufFactors[i];
   factors.removeFirst();
-  return;
+}
+
+void
+henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
+              CFList& diophant, CFMatrix& M, bool sort)
+{
+  modpk dummy= modpk();
+  henselLift12 (F, factors, l, Pi, diophant, M, dummy, sort);
 }
 
 void

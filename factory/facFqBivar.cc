@@ -881,7 +881,7 @@ CFList
 henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     earlyFactors, DegreePattern& degs, int& liftBound,
                     const CFList& uniFactors, const ExtensionInfo& info,
-                    const CanonicalForm& eval, const modpk& b)
+                    const CanonicalForm& eval, modpk& b)
 {
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();
@@ -919,10 +919,10 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
     factorsFoundIndex [i]= 0;
 
   if (smallFactorDeg >= liftBound || degree (A,y) <= 4)
-    henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M, true, b);
+    henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M, b, true);
   else if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, true, b);
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, b, true);
     if (!extension)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
@@ -982,7 +982,7 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   }
   else
   {
-    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, true, b);
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, b, true);
     if (!extension)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
@@ -1047,6 +1047,17 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   delete [] liftPre;
 
   return bufUniFactors;
+}
+
+CFList
+henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
+                    earlyFactors, DegreePattern& degs, int& liftBound,
+                    const CFList& uniFactors, const ExtensionInfo& info,
+                    const CanonicalForm& eval)
+{
+  modpk dummy= modpk();
+  return henselLiftAndEarly (A, earlySuccess, earlyFactors, degs, liftBound,
+                             uniFactors, info, eval, dummy);
 }
 
 long isReduced (const mat_zz_p& M)
