@@ -54,11 +54,13 @@ extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, c
 extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
 extern int rGetISPos(const int p, const ring r);
 
-
 USING_NAMESPACE( SINGULARXXNAME :: DEBUG )
 USING_NAMESPACE( SINGULARXXNAME :: NF )
 
+
 BEGIN_NAMESPACE_NONAME
+
+
 static inline void NoReturn(leftv& res)
 {
   res->rtyp = NONE;
@@ -1075,6 +1077,118 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 }
 
 
+/* // the following turned out to be unnecessary...   
+/// Finds p^th AM ordering, and returns its position in r->typ[] AND
+/// corresponding &r->wvhdl[]
+/// returns FALSE if something went wrong!
+/// p - starts with 0!
+BOOLEAN rGetAMPos(const ring r, const int p, int &typ_pos, int &wvhdl_pos, const BOOLEAN bSearchWvhdl = FALSE)
+{
+#if MYTEST
+  Print("rGetAMPos(p: %d...)\nF:", p);
+  PrintLn();
+#endif
+  typ_pos = -1;
+  wvhdl_pos = -1;
+
+  if (r->typ==NULL)
+    return FALSE;
+
+
+  int j = p; // Which IS record to use...
+  for( int pos = 0; pos < r->OrdSize; pos++ )
+    if( r->typ[pos].ord_typ == ro_am)
+      if( j-- == 0 )
+      {
+        typ_pos = pos;
+
+        if( bSearchWvhdl )
+        {
+          const int nblocks = rBlocks(r) - 1;
+          const int* w = r->typ[pos].data.am.weights; // ?
+
+          for( pos = 0; pos <= nblocks; pos ++ )
+            if (r->order[pos] == ringorder_am)
+              if( r->wvhdl[pos] == w )
+              {
+                wvhdl_pos = pos;
+                break;
+              }
+          if (wvhdl_pos < 0)
+            return FALSE;
+
+          assume(wvhdl_pos >= 0);
+        }
+        assume(typ_pos >= 0);
+        return TRUE;
+      }
+
+  return FALSE;
+}
+
+// // ?
+// static BOOLEAN GetAMData(leftv res, leftv h)
+// {
+//   NoReturn(res);
+// 
+//   const ring r = currRing;
+// 
+//   int p = 0; // which IS-block? p^th!
+// 
+//   if ((h!=NULL) && (h->Typ()==INT_CMD))
+//     p = (int)((long)(h->Data())); h=h->next;
+// 
+//   assume(p >= 0);
+// 
+//   int d, w;
+//   
+//   if( !rGetAMPos(r, p, d, w, TRUE) )
+//   {
+//     Werror("`GetAMData([int])`: no %d^th _am block-ordering!", p);
+//     return TRUE;
+//   }
+// 
+//   assume( r->typ[d].ord_typ == ro_am );
+//   assume( r->order[w] == ringorder_am );
+// 
+// 
+//   const short start = r->typ[d].data.am.start;  // bounds of ordering (in E)
+//   const short end = r->typ[d].data.am.end;
+//   const short len_gen = r->typ[d].data.am.len_gen; // i>len_gen: weight(gen(i)):=0
+//   const int *weights = r->typ[d].data.am.weights; // pointers into wvhdl field of length (end-start+1) + len_gen
+//   // contents w_1,... w_n, len, mod_w_1, .. mod_w_len, 0
+// 
+//   assume( weights == r->wvhdl[w] );
+// 
+//   
+//   lists l=(lists)omAllocBin(slists_bin);
+//   l->Init(2);
+// 
+//   const short V = end-start+1;
+//   intvec* ww_vars = new intvec(V);
+//   intvec* ww_gens = new intvec(len_gen);
+// 
+//   for (int i = 0; i < V; i++ )
+//     (*ww_vars)[i] = weights[i];
+// 
+//   assume( weights[V] == len_gen );
+// 
+//   for (int i = 0; i < len_gen; i++ )
+//     (*ww_gens)[i] = weights[i - V - 1];
+//   
+// 
+//   l->m[0].rtyp = INTVEC_CMD;
+//   l->m[0].data = reinterpret_cast<void *>(ww_vars);
+// 
+//   l->m[1].rtyp = INTVEC_CMD;
+//   l->m[1].data = reinterpret_cast<void *>(ww_gens);
+// 
+// 
+//   return FALSE;
+// 
+// }
+*/
+
 /// Returns old SyzCompLimit, can set new limit
 static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 {
@@ -1346,6 +1460,8 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD(psModulFunctions, currPack->libname, "ClearContent", FALSE, _ClearContent);
   ADD(psModulFunctions, currPack->libname, "ClearDenominators", FALSE, _ClearDenominators);
 
+  ADD(psModulFunctions, currPack->libname, "m2_end", FALSE, _m2_end);
+
   ADD(psModulFunctions, currPack->libname, "DetailedPrint", FALSE, DetailedPrint);
   ADD(psModulFunctions, currPack->libname, "leadmonomial", FALSE, leadmonom);
   ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
@@ -1370,9 +1486,9 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD(psModulFunctions, currPack->libname, "ComputeLeadingSyzygyTerms", FALSE, ComputeLeadingSyzygyTerms);
   ADD(psModulFunctions, currPack->libname, "Sort_c_ds", FALSE, Sort_c_ds);
   
-  //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
+  //  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
 
-  ADD(psModulFunctions, currPack->libname, "m2_end", FALSE, _m2_end);
+  //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
 
 #undef ADD  
   return 0;
