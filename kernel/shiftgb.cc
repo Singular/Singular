@@ -149,7 +149,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   //  number c = pGetCoeff(p);
   //  p_SetCoeff0(m,p_GetCoeff(p,r),r);
   p_SetComp(m,p_GetComp(p,r),r); // component is preserved
-  p_SetCoeff0(m,p_GetCoeff(p,r),r);  // coeff is preserved
+  p_SetCoeff0(m,n_Copy(p_GetCoeff(p,r),r->cf),r);  // coeff is preserved
   return(m);
 }
 
