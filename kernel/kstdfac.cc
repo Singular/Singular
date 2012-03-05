@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -600,7 +599,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
       if (TEST_OPT_PROT)
         message(pFDeg(strat->P.p,currRing),&olddeg,&reduc,strat, red_result);
     }
-    /* reduction of the element choosen from L */
+    /* reduction of the element chosen from L */
     kTest_TS(strat);
     red_result = strat->red(&strat->P,strat);
     if (strat->P.p != NULL)

@@ -92,7 +92,7 @@ public:
    vec_T(const vec_T& a); 
    // copy constructor;  currently, this is implemented by
    // initializing elements using T's defaults constructor and 
-   // copying elements from a using T's assigment operator.
+   // copying elements from a using T's assignment operator.
 
    vec_T& operator=(const vec_T& a);  
    // assignment...performs an element-wise assignment

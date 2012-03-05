@@ -181,7 +181,7 @@ EXAMPLE: example normal; shows an example
   {
     if ( typeof(#[i]) == "string" )
     {
-//--------------------------- choosen methods -----------------------
+//--------------------------- chosen methods -----------------------
       if ( (#[i]=="isprim") or (#[i]=="isPrim") )
       {decomp = 0;}
 
@@ -377,11 +377,11 @@ EXAMPLE: example normal; shows an example
       for(j = 1; j <= size(norComp); j++)
       {
         newR = norComp[j][3];
-	if(!defined(savebasering)) { def savebasering;}
+        if(!defined(savebasering)) { def savebasering;}
         savebasering=basering;
         setring newR; // must be in a compatible ring to newR
                       // as ringlist may produce ring-dep. stuff
-	if(!defined(newRList)) { list newRList;}
+        if(!defined(newRList)) { list newRList;}
         newRList = ringlist(newR);
         setring savebasering;
         U = norComp[j][1];
@@ -5593,7 +5593,7 @@ EXAMPLE: example normalC; shows an example
      }
    }
 
-   //--------------------------- choosen methods -----------------------
+   //--------------------------- chosen methods -----------------------
    // "withGens": computes algebra generators for each irreducible component
    // ### the extra code for withGens should be incorporated in the general case
 

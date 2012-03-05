@@ -6751,7 +6751,7 @@ proc comb(int n, int p)
 // Output: S=(w_1,..,w_j)
 //    where the w_l=(n_l1,..,n_ls) are intvec of length size(L), where
 //    n_lt fixes which element of (v_t1,..,v_tk_t) is to be
-//    choosen to form the tth (Q,P) for the lth element of the sheaf
+//    chosen to form the tth (Q,P) for the lth element of the sheaf
 //    representing the I-regular function.
 // The selection is done to obtian the minimal number of elements
 //    of the sheaf that specializes to non-null everywhere.

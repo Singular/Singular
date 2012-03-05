@@ -328,7 +328,7 @@ RETURN:
               K[y(1),...,y(m)] ---> basering,  y(i) --> fi.
 @end format
 NOTE:    Three different algorithms are used depending on c = 1,2,3.
-         If c is not given or c=0, a heuristically best method is choosen.
+         If c is not given or c=0, a heuristically best method is chosen.
          The basering may be a quotient ring.
          To access to the ring l[2] and see ker you must give the ring a name,
          e.g. def S=l[2]; setring S; ker;
@@ -531,7 +531,7 @@ RETURN:
            ideal 'ker', depending only on the y(i), the kernel of the given map
 @end format
 NOTE:    Three differnt algorithms are used depending on c = 1,2,3.
-         If c is not given or c=0, a heuristically best method is choosen.
+         If c is not given or c=0, a heuristically best method is chosen.
          The basering may be a quotient ring. However, if the preimage ring is
          a quotient ring, say pr = P/I, consider phi as a map from P and then
          the algorithm returns 1 if the kernel of phi is 0 mod I.

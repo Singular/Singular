@@ -258,7 +258,7 @@ lists primeFactorisation(const number n, const number pBound)
               }
               p_ui +=add;
               //add += 2; if (add == 6) add = 2;
-	      add =2+2*(add==2);
+              add =2+2*(add==2);
             }
             mpz_set_ui(nn,nn_ui);
             break;
@@ -1128,7 +1128,7 @@ void siInit(char *name)
   siRandomStart=t;
   feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
 
-// ressource table: ----------------------------------------------------
+// resource table: ----------------------------------------------------
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   // hack such that all shared' libs in the bindir are loaded correctly
   feInitResources(name);

@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
@@ -106,7 +105,7 @@ walkConsistency( ring sring, ring dring, int * vperm )
     for ( k= npar-1; (k >= 0) && (state == WalkOk); k-- )
         if ( pperm[k] >= 0 )
         {
-            WerrorS( "paramater names do not agree" );
+            WerrorS( "parameter names do not agree" );
             state= WalkIncompatibleRings;
         }
 

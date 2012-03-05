@@ -1452,7 +1452,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
       if ( epos == 0 )
       {
         // this can happen, if the shift vektor or the lift funktions
-        // are not generically choosen.
+        // are not generically chosen.
         Werror("resMatrixSparse::createMatrix: Found exponent not in E, id %d, set [%d, %d]!",
                i,(*E)[i]->rc.set,(*E)[i]->rc.pnt);
         return i;
@@ -2708,7 +2708,7 @@ uResultant::uResultant( const ideal _gls, const resMatType _rmt, BOOLEAN extIdea
     break;
 #endif
   default:
-    WerrorS("uResultant::uResultant: Unknown resultant matrix type choosen!");
+    WerrorS("uResultant::uResultant: Unknown resultant matrix type chosen!");
   }
 }
 
@@ -2739,7 +2739,7 @@ ideal uResultant::extendIdeal( const ideal igls, poly linPoly, const resMatType 
     }
     break;
   default:
-    WerrorS("uResultant::extendIdeal: Unknown resultant matrix type choosen!");
+    WerrorS("uResultant::extendIdeal: Unknown resultant matrix type chosen!");
   }
 
   return( newGls );

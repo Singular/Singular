@@ -127,7 +127,7 @@ EXAMPLE: example nashmult; shows an example"
    kill rplug;
 
 
-   // consider all sequences of lenght <step-1> giving rise to a
+   // consider all sequences of length <step-1> giving rise to a
    // family...
 
    for(loop=1;loop<=setsize;loop++)

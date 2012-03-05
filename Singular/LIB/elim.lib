@@ -405,7 +405,7 @@ RETURN: ideal/module obtained from id by eliminating either the variables
         Works also in a qring.
 METHOD: elim uses elimRing to create a ring with an elimination ordering for
         the variables to be eliminated and then applies std if \"std\"
-        is given, or slimgb if \"slimgb\" is given, or a heuristically choosen
+        is given, or slimgb if \"slimgb\" is given, or a heuristically chosen
         method.
 @*      If the variables in the basering have weights these weights are used
         in elimRing. If a string \"withWeigts\" as (optional) argument is given

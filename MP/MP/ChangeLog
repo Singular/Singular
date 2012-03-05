@@ -1,43 +1,43 @@
 1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
-	* MP_Error.c: Added prefix MP: to error strings, added skip & init 
-	message errors, added procedure MP_StatusErrorStr
+        * MP_Error.c: Added prefix MP: to error strings, added skip & init
+        message errors, added procedure MP_StatusErrorStr
 
-	* MP_PariBigInt.[c,h]: Added memory management functions for Pari
-	Bigints 
+        * MP_PariBigInt.[c,h]: Added memory management functions for Pari
+        Bigints
 
-	* MP_TcpTransp.c: added MP_KillLink, -MPrsh option to MP_OpenLink
+        * MP_TcpTransp.c: added MP_KillLink, -MPrsh option to MP_OpenLink
 
-	* MP_Util.c: Added IMP_StrDup function
+        * MP_Util.c: Added IMP_StrDup function
 
 1998-04-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* MP_Util.c (IMP_GetCmdlineArg): Allow long option names
+        * MP_Util.c (IMP_GetCmdlineArg): Allow long option names
 
-	* MP_TcpTransp.c (open_tcp_launch_mode): When long option names
-	were used for specification of MPapplication, use long option
-	names for MP options which are appended to application. 
+        * MP_TcpTransp.c (open_tcp_launch_mode): When long option names
+        were used for specification of MPapplication, use long option
+        names for MP options which are appended to application.
 
 Mon Jun 30 17:46:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* if no -MPhost spec is given, use env->thishost as default
+        * if no -MPhost spec is given, use env->thishost as default
 
-	* got rid of RSH_N and
-	  RSH_HOST --- $rsh hostname -n command seems to work everywhere
+        * got rid of RSH_N and
+          RSH_HOST --- $rsh hostname -n command seems to work everywhere
 
-	* MP_TcpTransp.c (open_tcp_launch_mode): incoporated
-	  MP_RSH_COMMAND which is set by configure; 
+        * MP_TcpTransp.c (open_tcp_launch_mode): incoporated
+          MP_RSH_COMMAND which is set by configure;
 
 Wed Jun 25 09:04:25 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* MP_Env.c: extern "C" wrapper for includes sys/stat.h 
+        * MP_Env.c: extern "C" wrapper for includes sys/stat.h
 
-	* MP_Put.c: changed bool identifier to mbool to avaoid clashes
-	  when compiling with g++
+        * MP_Put.c: changed bool identifier to mbool to avaoid clashes
+          when compiling with g++
 
 Fri Jun 20 11:24:18 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* MP_Link.c: MP_SetLinkOptions: case MP_LINK_LOG_MASK_OPT,
-	  assigned oldval
+        * MP_Link.c: MP_SetLinkOptions: case MP_LINK_LOG_MASK_OPT,
+          assigned oldval
 
 Fri Jun  6 15:55:04 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
@@ -46,7 +46,7 @@ Fri Jun  6 15:55:04 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 
 Tue May 27 13:57:13 1997  Olaf Bachmann  <obachman@ratchwu>
 
-	* MP_TcpTransp.h: Added fork mode to MPtcp links
+        * MP_TcpTransp.h: Added fork mode to MPtcp links
 
 Tue May 27 13:57:13 1997  Olaf Bachmann  <obachman@ratchwu>
 
@@ -54,51 +54,51 @@ Tue May 27 13:57:13 1997  Olaf Bachmann  <obachman@ratchwu>
 
 Tue May 20 17:38:53 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (target MP.h): explicitely user perl to call makeheaders
+        * Makefile.in (target MP.h): explicitely user perl to call makeheaders
 
 Sat May  3 19:55:06 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* MP_BigNum.c Changed MP_DEFAULT_BIG* to MP_DEFAULT_AP to reflect
-	  names choosen in configure
+        * MP_BigNum.c Changed MP_DEFAULT_BIG* to MP_DEFAULT_AP to reflect
+          names chosen in configure
 
-	* MP_Memory.c (mrealloc): inserted return statements
+        * MP_Memory.c (mrealloc): inserted return statements
 
-	* MP_TcpTransp.c: added #include <string.h> for declaration of strcat
-	
-	* MP_TcpTransp.c: added stdlib.h which conatins declaration of
-	  atoi, strtol
+        * MP_TcpTransp.c: added #include <string.h> for declaration of strcat
 
-	* MP_TcpTransp.c: added #include <unistd.h> which contains
-	  declaration of gethostname, vfork, execvp, close (at least on
-	  the HP's)
+        * MP_TcpTransp.c: added stdlib.h which conatins declaration of
+          atoi, strtol
 
-	* MP_Util.c, MP_Env.s: added */ at the end of intro header
+        * MP_TcpTransp.c: added #include <unistd.h> which contains
+          declaration of gethostname, vfork, execvp, close (at least on
+          the HP's)
 
-	* MP_Get.c: (MP_GetApIntPacket, MP_GetApRealPacket) Fixed logging
-	  so that *num_annots instead of num_annot is printed
+        * MP_Util.c, MP_Env.s: added */ at the end of intro header
 
-	* Makefile.in (CPPFLAGS): Put -I. before other CPPFLAGS
+        * MP_Get.c: (MP_GetApIntPacket, MP_GetApRealPacket) Fixed logging
+          so that *num_annots instead of num_annot is printed
+
+        * Makefile.in (CPPFLAGS): Put -I. before other CPPFLAGS
 
 Fri May  2 14:18:02 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_Env.c, MPFileTransp.c, MP_Link.c, MP_PvmTransp.c,
-	  MP_TbTransp.c, MP_TcpTransp.c, MP_Env.h - Changed transp_type to
-	  transp_dev which is more accurate and descriptive and doesn't
-	  clash with the use of "type" in MP types (e.g., MP_Sint32Type).
-	  Also changed the defines in MP_Env.h from MP_<dev>TranspType to
-	  MP_<dev>TranspDev.
+        * MP_Env.c, MPFileTransp.c, MP_Link.c, MP_PvmTransp.c,
+          MP_TbTransp.c, MP_TcpTransp.c, MP_Env.h - Changed transp_type to
+          transp_dev which is more accurate and descriptive and doesn't
+          clash with the use of "type" in MP types (e.g., MP_Sint32Type).
+          Also changed the defines in MP_Env.h from MP_<dev>TranspType to
+          MP_<dev>TranspDev.
 
 Fri Apr 18 12:21:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
  (Olaf Bachmann)>
 
-	 * MP_TcpTransp.c (open_tcp_launch_mode): Determine the length of
-	   appstr using rsh_argv[3] instead of rsh_argv[2]
+         * MP_TcpTransp.c (open_tcp_launch_mode): Determine the length of
+           appstr using rsh_argv[3] instead of rsh_argv[2]
 
 
 Fri Apr  11 17:06:35 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_Link.c: Changed order of cval and dtag for MP_PeekHeader() 
-	  to make it consistent with all the Put and Get routines.
+        * MP_Link.c: Changed order of cval and dtag for MP_PeekHeader()
+          to make it consistent with all the Put and Get routines.
 
 Tue Apr  8 12:28:36 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
  (Olaf Bachmann)>
@@ -113,56 +113,56 @@ Tue Apr  8 12:28:36 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 
 Fri Apr  4 17:42:35 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_SacBigInt.c: Completed changes and done testing.  
+        * MP_SacBigInt.c: Completed changes and done testing.
 
 Sat Mar 29 10:11:05 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_Link.c: Changed logging code that could overflow the fixed
-	  size log_msg array to use a dynamically allocated msg array.
+        * MP_Link.c: Changed logging code that could overflow the fixed
+          size log_msg array to use a dynamically allocated msg array.
 
-	* MP_TbTransp.c: Added mp_tb_flush() to the transport interface to
-	  make it consistent with the new ADI.  The routine is empty for
-	  now.  
+        * MP_TbTransp.c: Added mp_tb_flush() to the transport interface to
+          make it consistent with the new ADI.  The routine is empty for
+          now.
 
-	* MP_FileTransp.c: Fixed logging bug in file_open_connection() so
-	  now it allocates memory for the logging message.  If the
-	  filename is big, we were running out of room in the fixed-size
-	  log_msg char array.
+        * MP_FileTransp.c: Fixed logging bug in file_open_connection() so
+          now it allocates memory for the logging message.  If the
+          filename is big, we were running out of room in the fixed-size
+          log_msg char array.
 
-	* MP_Env.c: Changed MP_SetEnvBigIntlFormat() and
-	  MP_SetEnvBigRealFormat() so that they will accept a set of
-	  user-supplied routines that is different from those already
-	  supported by MP (GMP, PARI, SAC).  We cannot make any check that
-	  the supplied routines are correct!
+        * MP_Env.c: Changed MP_SetEnvBigIntlFormat() and
+          MP_SetEnvBigRealFormat() so that they will accept a set of
+          user-supplied routines that is different from those already
+          supported by MP (GMP, PARI, SAC).  We cannot make any check that
+          the supplied routines are correct!
 
-	* Makefile.in: Removed all references to $(MP_ARCH) which is
-	  obsolete because it is handled by configure.
+        * Makefile.in: Removed all references to $(MP_ARCH) which is
+          obsolete because it is handled by configure.
 
 Fri Mar 28 09:57:03 1997  Simon Gray  (sgray@Pooh)
 
-	* Makefile.in: (in MP dir)  updated install to install the header
-	  files in the location specified by --prefix to configure.  Also
-	  updated uninstall to rm these files.
+        * Makefile.in: (in MP dir)  updated install to install the header
+          files in the location specified by --prefix to configure.  Also
+          updated uninstall to rm these files.
 
-	* MP_Put.c, MP_Get.c: updated MP_Put/GetAnnotationPacket()
-	  logging.  Annotations are spread out through a variety of header
-	  files, so giving a string version of the annotation is not
-	  practical at this time.  Maybe have they are stable we can
-	  create function to do a (dtag, atype) mapping to a string.
+        * MP_Put.c, MP_Get.c: updated MP_Put/GetAnnotationPacket()
+          logging.  Annotations are spread out through a variety of header
+          files, so giving a string version of the annotation is not
+          practical at this time.  Maybe have they are stable we can
+          create function to do a (dtag, atype) mapping to a string.
 
-	* MP_Put.c: Fixed ommission in MP_PutMetaType() so that it now
-	  sends the dictionary tag.
+        * MP_Put.c: Fixed ommission in MP_PutMetaType() so that it now
+          sends the dictionary tag.
 
 Fri Mar 28 21:53:37 1997  Olaf Bachmann <obachman@ratchwum.mathematik.uni-kl.de
  (Olaf Bachmann)>
 
         * MP_Util.c Added MP_ErrorStr() to return an error string.  This
-	  function returns the string that MP_PrintError() would have
-	  printed as determined by the value of link->errno.
+          function returns the string that MP_PrintError() would have
+          printed as determined by the value of link->errno.
 
 Wed Mar 26 13:30:42 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_Util.c: - removed references to obsolete MpOperator.
+        * MP_Util.c: - removed references to obsolete MpOperator.
 
 Wed Mar 26 16:53:41 1997  Olaf Bachmann <obachman@ratchwum.mathematik.uni-kl.de
  (Olaf Bachmann)>
@@ -176,122 +176,122 @@ Mon Mar 24 16:43:52 1997  Olaf Bachmann <obachman@ratchwum.mathematik.uni-kl.de
 
 Sun Mar 23 10:59:20 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_GmpBigInt.c: fixed incorrect name for IMP_GmpIntAsciiSize().
+        * MP_GmpBigInt.c: fixed incorrect name for IMP_GmpIntAsciiSize().
 
 
-	* MP_Env.c: Added MP_SetEnvBigRealFormat() and updated
-	  MP_SetEnvBigIntFormat(). 
+        * MP_Env.c: Added MP_SetEnvBigRealFormat() and updated
+          MP_SetEnvBigIntFormat().
 
 Sat Mar 22 13:37:32 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_TcpTransp.c: set TCP_NODELAY option on the socket so that it
-	  won't attempt to coalesce small hunks of data (e.g., small MP
-	  trees) to fill a single TCP buffer.  We want to trees to be sent
-	  out, as promised, when the write operation is done and completed
-	  when the MP_EndMsg() call is done.
+        * MP_TcpTransp.c: set TCP_NODELAY option on the socket so that it
+          won't attempt to coalesce small hunks of data (e.g., small MP
+          trees) to fill a single TCP buffer.  We want to trees to be sent
+          out, as promised, when the write operation is done and completed
+          when the MP_EndMsg() call is done.
 
-	* MP_FileTransp.[c,h]: Added file_flush() routine and updated code
-	  to use FILE * instead of int file descriptor.  This change was 
+        * MP_FileTransp.[c,h]: Added file_flush() routine and updated code
+          to use FILE * instead of int file descriptor.  This change was
           made to support the new flush routine.
 
 Mon Mar 17 16:54:52 1997  Simon Gray  (sgray@Pooh)
 
-	* MP_Get.[c,h], MP_Put.[c.h], MP_Env.c, MP_Vector.c - updated
-	  routines to use the new ordering (dict, value) instead of
-	  (value, dict).
-      
+        * MP_Get.[c,h], MP_Put.[c.h], MP_Env.c, MP_Vector.c - updated
+          routines to use the new ordering (dict, value) instead of
+          (value, dict).
+
         * MP_Put.[c,h], MP_Get.[c,h] - "MetaPacket" changed to
-	  "MetaTypePacket" and parameter for dictionary added.
+          "MetaTypePacket" and parameter for dictionary added.
 
-	* MP_Env.c, MP_Link.c - updated routines to use numeric values for
-	  transport types instead of string names.
+        * MP_Env.c, MP_Link.c - updated routines to use numeric values for
+          transport types instead of string names.
 
-	* MP_TcpTransp.c, MP_TbTransp.c, MP_FileTransp.c, MP_PvmTransp.c -
-	  dumped string name (e.g., "TCP", "FILE"), now using an int
-	  defined in MP_Env.h  
+        * MP_TcpTransp.c, MP_TbTransp.c, MP_FileTransp.c, MP_PvmTransp.c -
+          dumped string name (e.g., "TCP", "FILE"), now using an int
+          defined in MP_Env.h
 
 
 Sun Mar 16 10:39:20 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Updated names of dict defined items to reflect agreed upon
-	  naming scheme
+        * Updated names of dict defined items to reflect agreed upon
+          naming scheme
 
 Sat Mar 15 16:53:46 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (depend): added target "depend" to MP/Makefile.in and
-	  MPT/Makefile.in 
+        * Makefile.in (depend): added target "depend" to MP/Makefile.in and
+          MPT/Makefile.in
 
-	* added MPT lib to MP distribution: *.c files into subdir MPT;
-	  MPT.h int include/; changed Makefile.in and configure to built
-	  MPT, as well.
+        * added MPT lib to MP distribution: *.c files into subdir MPT;
+          MPT.h int include/; changed Makefile.in and configure to built
+          MPT, as well.
 
-	* added targets tar, star, tags to Makefile.in
+        * added targets tar, star, tags to Makefile.in
 
-	* Makefile.in, README: shortly explained how to customize
-	  compilation w.r.t. BigNum's, gave examples in Makefile.in
+        * Makefile.in, README: shortly explained how to customize
+          compilation w.r.t. BigNum's, gave examples in Makefile.in
 
-	* MP_Env.c: open_logfile: For Unix, use stat(...) to determine
-	  whether logfile exists (instead of fopen(..,"r")): The latter
-	  fails for cases where file exists but is not readable/writable
-	  by current user.
+        * MP_Env.c: open_logfile: For Unix, use stat(...) to determine
+          whether logfile exists (instead of fopen(..,"r")): The latter
+          fails for cases where file exists but is not readable/writable
+          by current user.
 
-	* Tossed #include "MP_CommonConstantDict.h", and  #include
-	  "CommonOpDict.h" from MP.h
+        * Tossed #include "MP_CommonConstantDict.h", and  #include
+          "CommonOpDict.h" from MP.h
 
-	* fixed logging of MetaOps
+        * fixed logging of MetaOps
 
-	* MP_Get.c, MP_Put.c MP_Util.c made independent of
-	  MP_MetaTypesDict.h and tossed #include "MP_MetaTypesDict.h" from
-	  MP.h
+        * MP_Get.c, MP_Put.c MP_Util.c made independent of
+          MP_MetaTypesDict.h and tossed #include "MP_MetaTypesDict.h" from
+          MP.h
 
 
 Fri Mar 14 10:28:57 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* MP_FileTransp.c: file_init_transport: initalize bignum format of
-	  link to GMP -- the "MP default" one
+        * MP_FileTransp.c: file_init_transport: initalize bignum format of
+          link to GMP -- the "MP default" one
 
-	* MP_GmpBigReal.c: changed determination of size of _mp_d to
-	  apreal->_mp_prec + 1 
+        * MP_GmpBigReal.c: changed determination of size of _mp_d to
+          apreal->_mp_prec + 1
 
-	* MP_Error.c (MP_errlist): added MP_DummyBigNum
+        * MP_Error.c (MP_errlist): added MP_DummyBigNum
 
-	* MP_Env.c: Initialization of bignum format when opening an Env
-	  set to imp_default_* 
+        * MP_Env.c: Initialization of bignum format when opening an Env
+          set to imp_default_*
 
 Fri Mar 14 09:29:34 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* MP_Put.c: Changed argument type of ApNum's from ApNum_pt to ApNum_t
+        * MP_Put.c: Changed argument type of ApNum's from ApNum_pt to ApNum_t
 
 Thu Mar 13 17:38:52 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* updated Makefile.in to refelct new BigNum philosopy
+        * updated Makefile.in to refelct new BigNum philosopy
 
-	* Cleaned up logging in MP_Put.c MP_Get.c to use extended BigNum
-	  interface functions
+        * Cleaned up logging in MP_Put.c MP_Get.c to use extended BigNum
+          interface functions
 
-	* added MP_PariBigInt.c
+        * added MP_PariBigInt.c
 
-	* tore MP_BigNum.c apart into MP_BigNum.c, MP_GmpBigInt.c,
-	  MP_GmpBigReal.c
+        * tore MP_BigNum.c apart into MP_BigNum.c, MP_GmpBigInt.c,
+          MP_GmpBigReal.c
 
 
 Mon Aug 19 15:31:27 1996  Marcus Thiessel  <thiessel@cochlea.e-technik.uni-kl.de>
 
-	* MP_SacBigInt.c: Not really important changes. Only function
- 	definitions fixed to work with _ANSI_ARGS_ macro. Functions
- 	declared static are left out.
+        * MP_SacBigInt.c: Not really important changes. Only function
+         definitions fixed to work with _ANSI_ARGS_ macro. Functions
+         declared static are left out.
 
-	* MP_TbTransp.c: Not really important changes. Only function
- 	definitions fixed to work with _ANSI_ARGS_ macro. Functions
- 	declared static are left out.
+        * MP_TbTransp.c: Not really important changes. Only function
+         definitions fixed to work with _ANSI_ARGS_ macro. Functions
+         declared static are left out.
 
 Fri Aug 16 17:09:39 1996  Marcus Thiessel  <thiessel@cochlea.e-technik.uni-kl.de>
 
-	* Makefile: The Makefile is modified to support all feature of
- 	HP-UX A.09.05 environment.
+        * Makefile: The Makefile is modified to support all feature of
+         HP-UX A.09.05 environment.
 
-	* MP_FileTransp.c: changes in progress for this file. The stuff
- 	about the WIN95/NT port. (done by Eckhard Hennig)
+        * MP_FileTransp.c: changes in progress for this file. The stuff
+         about the WIN95/NT port. (done by Eckhard Hennig)
 
-	* MP_Link.c: changes in progress for this file.
+        * MP_Link.c: changes in progress for this file.
 

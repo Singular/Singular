@@ -6,33 +6,32 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
 
 /***************************************************************
- *  
+ *
  * Configurations
- * 
+ *
  *******************************************************************/
 
 /***************************************************************
  Here is how it works:
- At run-time, SetProcs is used to choose the appropriate PolyProcs 
+ At run-time, SetProcs is used to choose the appropriate PolyProcs
               based on the ring properies.
- At generate-time, SetProcs is used to generate all 
+ At generate-time, SetProcs is used to generate all
               possible PolyProcs.
- Which PolyProcs are generated/used can be controled by values of 
+ Which PolyProcs are generated/used can be controled by values of
  HAVE_FAST_P_PROCS, HAVE_FAST_LENGTH, HAVE_FAST_ORD, and FAST_FIELD
- 
+
  At generate-time, the file p_Procs.inc is generated,
  which provides implementations of the p_Procs, based on
  the p_*_Templates.cc and header files which provide the respective
  macros.
 
- At run-time, a fast proc is set/choosen if found/generated, else 
- a general proc is set/choosen.
+ At run-time, a fast proc is set/chosen if found/generated, else
+ a general proc is set/chosen.
  *******************************************************************/
 
 // Define HAVE_FAST_P_PROCS to:
@@ -51,7 +50,7 @@
 //   1 -- special cases for FieldZp
 //   2 -- plus special cases for FieldQ
 //   nothing else is implemented, yet
-#ifndef HAVE_FAST_FIELD 
+#ifndef HAVE_FAST_FIELD
 #define HAVE_FAST_FIELD 0
 #endif
 
@@ -61,7 +60,7 @@
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-#ifndef HAVE_FAST_LENGTH 
+#ifndef HAVE_FAST_LENGTH
 #define HAVE_FAST_LENGTH 0
 #endif
 
@@ -71,15 +70,15 @@
 //  2  -- special for ords with n_min <= 2
 //  3  -- special ords for with n_min <= 3
 //  4  -- special for all ords
-#ifndef HAVE_FAST_ORD 
+#ifndef HAVE_FAST_ORD
 #define HAVE_FAST_ORD 0
 #endif
 
 // Define HAVE_FAST_ZERO_ORD to:
-//  0 -- no zero ords are considered 
+//  0 -- no zero ords are considered
 //  1 -- only ZeroOrds for OrdPosNomogPosZero, OrdNomogPosZero, OrdPomogNegZero
 //  2 -- ZeroOrds for all
-#ifndef HAVE_FAST_ZERO_ORD 
+#ifndef HAVE_FAST_ZERO_ORD
 #define HAVE_FAST_ZERO_ORD 0
 #endif
 
@@ -128,7 +127,7 @@ typedef enum p_Field
 typedef enum p_Length // Length of exponent vector in words
 {
   LengthGeneral = 0, // n >= 1
-  LengthEight,       // n == 8   
+  LengthEight,       // n == 8
   LengthSeven,
   LengthSix,
   LengthFive,
@@ -138,10 +137,10 @@ typedef enum p_Length // Length of exponent vector in words
   LengthOne,
   LengthUnknown
 } p_Length;
-typedef enum p_Ord  
-{                   
-  OrdGeneral = 0,   
-                    //     ordsgn   
+typedef enum p_Ord
+{
+  OrdGeneral = 0,
+                    //     ordsgn
                     //  0   1   i   n-1 n   n_min   Example
   OrdPomog,         //  +   +   +   +   +   1       (lp,C)
   OrdNomog,         //  -   -   -   -   -   1       (ls, c), (ds, c)
@@ -206,7 +205,7 @@ static inline const char* p_FieldEnum_2_String(p_Field field)
   switch(field)
   {
       case FieldGeneral: return "FieldGeneral";
-      case FieldZp: return "FieldZp";          
+      case FieldZp: return "FieldZp";
       case FieldQ: return "FieldQ";
       case FieldR: return "FieldR";
       case FieldGF: return "FieldGF";
@@ -228,8 +227,8 @@ static inline const char* p_LengthEnum_2_String(p_Length length)
 {
   switch(length)
   {
-      case LengthGeneral: return "LengthGeneral"; 
-      case LengthEight: return "LengthEight";       
+      case LengthGeneral: return "LengthGeneral";
+      case LengthEight: return "LengthEight";
       case LengthSeven: return "LengthSeven";
       case LengthSix: return "LengthSix";
       case LengthFive: return "LengthFive";
@@ -246,23 +245,23 @@ static inline const char* p_OrdEnum_2_String(p_Ord ord)
 {
   switch(ord)
   {
-      case OrdGeneral: return "OrdGeneral";   
-      case OrdPomog: return "OrdPomog";         
-      case OrdNomog: return "OrdNomog";         
-      case OrdNegPomog: return "OrdNegPomog";      
-      case OrdPomogNeg: return "OrdPomogNeg";      
-      case OrdPosNomog: return "OrdPosNomog";      
-      case OrdNomogPos: return "OrdNomogPos";      
-      case OrdPosPosNomog: return "OrdPosPosNomog";   
-      case OrdPosNomogPos: return "OrdPosNomogPos";   
-      case OrdNegPosNomog: return "OrdNegPosNomog";   
+      case OrdGeneral: return "OrdGeneral";
+      case OrdPomog: return "OrdPomog";
+      case OrdNomog: return "OrdNomog";
+      case OrdNegPomog: return "OrdNegPomog";
+      case OrdPomogNeg: return "OrdPomogNeg";
+      case OrdPosNomog: return "OrdPosNomog";
+      case OrdNomogPos: return "OrdNomogPos";
+      case OrdPosPosNomog: return "OrdPosPosNomog";
+      case OrdPosNomogPos: return "OrdPosNomogPos";
+      case OrdNegPosNomog: return "OrdNegPosNomog";
 #ifdef HAVE_LENGTH_DIFF
-      case OrdNegPomogZero: return "OrdNegPomogZero";  
-      case OrdPomogNegZero: return "OrdPomogNegZero";  
-      case OrdPomogZero: return "OrdPomogZero";     
-      case OrdNomogZero: return "OrdNomogZero";     
-      case OrdNomogPosZero: return "OrdNomogPosZero";  
-      case OrdPosNomogZero: return "OrdPosNomogZero";  
+      case OrdNegPomogZero: return "OrdNegPomogZero";
+      case OrdPomogNegZero: return "OrdPomogNegZero";
+      case OrdPomogZero: return "OrdPomogZero";
+      case OrdNomogZero: return "OrdNomogZero";
+      case OrdNomogPosZero: return "OrdNomogPosZero";
+      case OrdPosNomogZero: return "OrdPosNomogZero";
       case OrdPosPosNomogZero: return "OrdPosPosNomogZero";
       case OrdPosNomogPosZero: return "OrdPosNomogPosZero";
       case OrdNegPosNomogZero: return "OrdNegPosNomogZero";
@@ -314,7 +313,7 @@ static inline int p_ProcDependsOn_Ord(p_Proc proc)
       case p_kBucketSetLm_Proc:
       case p_Merge_q_Proc:
         return 1;
-        
+
       default:
         return 0;
   }
@@ -328,12 +327,12 @@ static inline int p_ProcDependsOn_Length(p_Proc proc)
       case p_Mult_nn_Proc:
       case p_Neg_Proc:
         return 0;
-        
+
       default:
         return 1;
   }
 }
-  
+
 // returns string specifying the module into which the p_Proc
 // should go
 static inline const char* p_ProcField_2_Module(p_Proc proc,  p_Field field)
@@ -348,10 +347,10 @@ static inline const char* p_ProcField_2_Module(p_Proc proc,  p_Field field)
 }
 
 /***************************************************************
- *  
- * 
+ *
+ *
  * Deal with OrdZero
- * 
+ *
  *******************************************************************/
 #ifdef HAVE_LENGTH_DIFF
 static inline int IsZeroOrd(p_Ord ord)
@@ -375,7 +374,7 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
         case OrdPosNomogZero:   return OrdPosNomog;
         case OrdPosPosNomogZero:    return OrdPosPosNomog;
         case OrdNegPosNomogZero:    return OrdNegPosNomog;
-        default:    
+        default:
           if (strict) return OrdGeneral;
           else if (ord == OrdPomogNegZero) return OrdPomogNeg;
           else if (ord == OrdNomogPosZero) return OrdNomogPos;
@@ -394,13 +393,13 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
 #endif
 
 /***************************************************************
- *  
- * Filters which are applied to field/length/ord, before a proc is 
- * choosen
- * 
+ *
+ * Filters which are applied to field/length/ord, before a proc is
+ * chosen
+ *
  *******************************************************************/
 #ifdef p_Procs_Static
-static inline void StaticKernelFilter(p_Field &field, p_Length &length, 
+static inline void StaticKernelFilter(p_Field &field, p_Length &length,
                                       p_Ord &ord, const p_Proc proc)
 {
   // simply exclude some things
@@ -503,12 +502,12 @@ static inline void p_Add_q__Filter(p_Length &length, p_Ord &ord)
   }
 }
 
-static inline void pp_Mult_mm_Noether_Filter(p_Field &field, 
+static inline void pp_Mult_mm_Noether_Filter(p_Field &field,
                                              p_Length &length, p_Ord &ord)
 {
-  if (ord == OrdPomog 
+  if (ord == OrdPomog
       || ord == OrdPomogZero
-      || (ord == OrdPomogNeg && length > LengthTwo) 
+      || (ord == OrdPomogNeg && length > LengthTwo)
 #ifdef HAVE_LENGTH_DIFF
       || (ord == OrdPomogZero)
       || (ord == OrdPomogNegZero && length > LengthThree)
@@ -648,8 +647,8 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 
 
 /***************************************************************
- * 
- * Macros for setting procs -- these are used for 
+ *
+ * Macros for setting procs -- these are used for
  * generation and setting
  *
  ***************************************************************/
@@ -664,7 +663,7 @@ do                                                          \
   DoSetProc(what, t_field, t_length, t_ord);                \
 }                                                           \
 while (0)                                                   \
-  
+
 #define SetProcs(field, length, ord)                                    \
 do                                                                      \
 {                                                                       \

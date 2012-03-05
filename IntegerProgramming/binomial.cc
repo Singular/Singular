@@ -298,7 +298,7 @@ binomial& binomial::operator=(const binomial& b)
     if(_number_of_variables<=0)
     {
       cerr<<"\nWARNING: binomial& binomial::operator=(const binomial&):\n"
-        "assigment from corrupt binomial"<<endl;
+        "assignment from corrupt binomial"<<endl;
       exponent_vector=NULL;
       return (*this);
     }

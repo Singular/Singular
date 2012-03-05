@@ -167,7 +167,7 @@ static proc spolynomialsGB(ideal algebra,r,int method)
   {
     kernNew[i-nvars(r)+nvars(br)]=leadTermsAlgebra[i]-listOfVariables[i+nvars(br)];
   }
-  //--------------- calculate kernel of Phi depending on method choosen ---------------
+  //--------------- calculate kernel of Phi depending on method chosen ---------------
   dbprint(ppl,"//Spoly-2- Groebner basis computation");
   attrib(kernOld,"isSB",1);
   ideal kern=stdKernPhi(kernNew,kernOld,leadTermsAlgebra,method);
@@ -345,7 +345,7 @@ static proc reductionGB(ideal F, ideal algebra,r, int tailreduction,int method,i
       p=reduce(leadF,kern);
       if (leadmonom(p)<varsBasering[numVarsBasering])
       {
-        //as choosen ordering is a block ordering,
+        //as chosen ordering is a block ordering,
         //lm(p) in K[y_1...y_m] is equivalent to lm(p)<x_n
         //Needs to be changed, if no block ordering is used!
         setring br;

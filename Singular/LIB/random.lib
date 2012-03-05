@@ -410,7 +410,7 @@ example
 proc randomBinomial(int k, int u, list #)
 "USAGE:   randomBinomial(k,u[,o,b]);  k,u,o,b integers
 RETURN:  binomial ideal, k homogeneous generators of degree d, u<=d<=o, with
-         randomly choosen monomials and coefficients in the interval [-b,b]
+         randomly chosen monomials and coefficients in the interval [-b,b]
          (default: u=o, b=10).
 EXAMPLE: example randomBinomial; shows an example
 "

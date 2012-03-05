@@ -33,14 +33,14 @@ idhdl enter_id(char *name, char *value, idtyp t)
   h=enterid(omStrDup(name),0, t, &(currPack->idroot), TRUE/*FALSE*/);
   if(h!=NULL) {
      switch(t) {
-         case STRING_CMD: 
+         case STRING_CMD:
               omFree(IDSTRING(h));
               IDSTRING(h) = omStrDup(value);
               break;
          case PACKAGE_CMD: break;
          case PROC_CMD: break;
      }
-  } else 
+  } else
       Warn("Cannot create '%s'\n", name);
   return(h);
 }
@@ -75,7 +75,7 @@ idhdl add_singular_proc(FILE* binfp, char *procname,int line,
   pi->data.s.body_lineno = line;
   pi->data.s.example_lineno = 0;
   pi->data.s.help_chksum = 0;
-  
+
   rewind(binfp);
   fseek(binfp,pos,SEEK_CUR);
   tempstr=(char *)omAlloc(end-pos+2);
@@ -89,7 +89,7 @@ idhdl add_singular_proc(FILE* binfp, char *procname,int line,
 
 unsigned long crccheck(
   char *file
-  ) 
+  )
 {
   unsigned char buf[BUFLEN1];
   unsigned long crc = 0;
@@ -101,7 +101,7 @@ unsigned long crccheck(
   fp = fopen (file, "rb");
   if (fp == NULL) return 0;
 
-  // read the file chunk by chunk, determine the lenght and
+  // read the file chunk by chunk, determine the length and
   // start computing the checksum
   while ((bytes_read = fread (buf, 1, BUFLEN1, fp)) > 0)
   {
@@ -112,7 +112,7 @@ unsigned long crccheck(
     }
 
   // check if something went wrong and close the file
-  if (ferror (fp)) return 0; 
+  if (ferror (fp)) return 0;
   if (fclose(fp)==EOF) return 0;
 
   // second part of checksum computation
@@ -132,8 +132,6 @@ void fill_example_package();
 
 #line 2 "python.mod"
 /*
- *  $Id$
- *
  *  Test mod fuer modgen
  */
 
@@ -160,25 +158,25 @@ extern "C" {
 {
   idhdl h;
   char * tempstr;
-  FILE * binfp; 
+  FILE * binfp;
   int ret;
-  struct stat sb; 
+  struct stat sb;
 
   tempstr = (char *)omAlloc(strlen(currPack->libname)+5);
   memset(tempstr,0,strlen(currPack->libname)+1);
   memcpy(tempstr,currPack->libname,strlen(currPack->libname));
   memcpy(tempstr+strlen(currPack->libname)-3,".bin",4);
   ret=stat(tempstr,&sb);
-  if(ret==0) { 
-    if ((sb.st_mode & S_IFMT) == S_IFREG) { 
+  if(ret==0) {
+    if ((sb.st_mode & S_IFMT) == S_IFREG) {
       if (crccheck(tempstr)!=crcsum)
       {   Warn("file %s does not agree with module version - ignoring file",tempstr);
           ret=-1;
       }
       if ((binfp = fopen(tempstr,"r")) == NULL) return -1;
-    } 
-    else 
-      ret=-1; 
+    }
+    else
+      ret=-1;
   }
 
   fill_help_package();
@@ -230,7 +228,7 @@ BOOLEAN mod_python(leftv __res, leftv __h)
 {
 #line 37 "python.mod"
 #line 214 "python.cc"
- 
+
 #line 38 "python.mod"
 #line 217 "python.cc"
   leftv __v = __h, __v_save;

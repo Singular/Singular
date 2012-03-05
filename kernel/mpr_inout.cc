@@ -2,8 +2,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id$ */
-
 /*
 * ABSTRACT - multipolynomial resultant
 */
@@ -64,7 +62,7 @@ void mprPrintError( mprState state, const char * name )
   switch (state)
   {
   case mprWrongRType:
-    WerrorS("Unknown resultant matrix type choosen!");
+    WerrorS("Unknown resultant matrix type chosen!");
     break;
   case mprHasOne:
     Werror("One element of the ideal %s is constant!",name);

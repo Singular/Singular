@@ -1,7 +1,3 @@
-//$Id$
-
-
-
 #ifndef POLYCPP_HEADER
 #define POLYCPP_HEADER
 #include <kernel/mod2.h>
@@ -100,7 +96,7 @@ class PolyImpl{
       return *this;
     }
     p=p_Add_q(p,p_Copy(p2.p,p2.r.get()),r.get());
-   
+
     return *this;
   }
   PolyImpl& operator*=(const PolyImpl & p2){
@@ -121,7 +117,7 @@ class PolyImpl{
       Werror("not the same ring");
       return *this;
     }
-    
+
     p=p_Mult_nn(p,n.n,r.get());
     return *this;
   }
@@ -140,19 +136,19 @@ class PolyImpl{
     pc=p_Neg(pc,r.get());
     p=p_Add_q(p,pc,r.get());
 
-    
+
     return *this;
   }
 
 
   PolyImpl& operator=(int n){
- 
+
     p_Delete(&p,r.get());
     p=p_ISet(n,r.get());
     return *this;
- 
+
   }
-  
+
 
   PolyImpl(){
     r=currRing;
@@ -175,10 +171,10 @@ class PolyImpl{
     this->r=r;
   }
   PolyImpl(const Number & n){
-    
+
     r=n.r.get();
     this->p=p_NSet(n_Copy(n.n,r.get()),r.get());
-    
+
   }
   explicit PolyImpl(int n){
     r=currRing;
@@ -262,14 +258,14 @@ template<class T> class ConstTermReference{
   bool isConstant() const{
     return p_LmIsConstant(t,r);
   }
-  
+
 };
 
 template<class T> class PolyInputIterator:
 public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTermReference<T> >
 {
 
-  
+
  private:
   poly t;
   ring r;
@@ -332,7 +328,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
       res[i]=p_GetExp(ptr->p,i+1,ptr->getRing());
     }
     return res;
-  }  
+  }
   void copy_on_write(){
     if (!ptr.unique()){
       ptr.reset(new PolyImpl(*ptr));
@@ -341,7 +337,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   void print() const {
     ptr->print();
   }
-  //* ressource managed by Singular
+  //* resource managed by Singular
   char* c_string() const{
 
     return p_String(ptr->p,ptr->getRing(),ptr->getRing());
@@ -366,14 +362,14 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
     checkIsSameRing(p2);
     copy_on_write();
     *ptr += *p2.ptr;
-    
+
     return *this;
   }
   PolyBase& operator*=(const Poly & p2);
   PolyBase& operator*=(Number n){
     copy_on_write();
     *ptr *=n;
-    
+
     return *this;
   }
   /*  void print(){
@@ -411,9 +407,9 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
     return erg;
   }
  protected:
-  
+
   PolyBase(PolyImpl& impl):ptr(&impl){
-   
+
   }
   poly getInternalReference(){
     return ptr->getInternalReference();
@@ -434,19 +430,19 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly, MyErrorHandler>{
   Poly(ring r=currRing):Base ((poly)NULL,r,0){
   }
   Poly(int n, ring r=currRing):Base(*(new PolyImpl(n,r))){
-    
+
   }
   Poly(const char* c, ring r=currRing):Base(c,r){
 
   }
   Poly(const Base& p):Base(p){
   }
-  
+
   Poly(const Number& n):Base(*(new PolyImpl(n))){
-    
+
   }
   Poly(poly p, ring r):Base(p,r){
-    
+
   }
   Poly(poly p, ring r, int):Base(p,r,0){
   }
@@ -486,17 +482,17 @@ class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, MyErrorHandler>{
   Vector(ring r=currRing):Base ((poly)NULL,r,0){
   }
   Vector(int n, ring r=currRing):Base(*(new PolyImpl(n,r))){
-    
+
   }
   Vector(const char* c, ring r=currRing):Base(c,r){
 
   }
   Vector(const Base& p):Base(p){
   }
-  
+
 
   Vector(poly p, ring r):Base(p,r){
-    
+
   }
   Vector(poly p, ring r, int):Base(p,r,0){
   }
@@ -556,10 +552,10 @@ inline Vector operator*(const Number& n, const Vector& v){
 }
 
 //assumes monomials commute with numbers
-template <poly_variant variant, class create_type, class error_traits> 
-  inline typename PolyBase<variant,create_type, error_traits>::create_type 
+template <poly_variant variant, class create_type, class error_traits>
+  inline typename PolyBase<variant,create_type, error_traits>::create_type
   operator*
-  (const Number& n, 
+  (const Number& n,
    const PolyBase<variant,create_type, class error_tratis>& p)
 {
   typename PolyBase<variant, create_type,error_traits>::create_type erg(p);
@@ -589,10 +585,10 @@ inline bool operator==(const Vector& p1, const Vector& p2){
   if (r1!=r2) return false;
   return p_EqualPolys(p1.ptr->p,p2.ptr->p,r1);
 }
-template <poly_variant variant, class create_type,class error_traits> 
-  inline typename PolyBase<variant,create_type,error_traits>::create_type 
+template <poly_variant variant, class create_type,class error_traits>
+  inline typename PolyBase<variant,create_type,error_traits>::create_type
   operator+
-  (const PolyBase<variant,create_type,error_traits>& b1, 
+  (const PolyBase<variant,create_type,error_traits>& b1,
    const PolyBase<variant,create_type,error_traits>& b2)
 {
   typename PolyBase<variant, create_type, error_traits>::create_type erg(b1);
@@ -609,13 +605,13 @@ inline Poly operator*(const Number& n, const Poly & p){
   res*=n;
   return res;
 }
-template <poly_variant variant, class create_type, class error_traits> 
-   
-inline PolyBase<variant, create_type, error_traits>& 
+template <poly_variant variant, class create_type, class error_traits>
+
+inline PolyBase<variant, create_type, error_traits>&
 PolyBase<variant, create_type, error_traits>::operator*=(const Poly & p2){
     copy_on_write();
     *ptr *= *p2.ptr;
-    
+
     return *this;
   }
 #endif

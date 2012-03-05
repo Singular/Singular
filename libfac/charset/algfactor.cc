@@ -1,7 +1,6 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id$ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -142,7 +141,7 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
   DEBOUTLN(CERR, "                  g= ", g);
   DEBOUTLN(CERR, "                 as= ", as);
   DEBOUTLN(CERR, "              order= ", order);
-  DEBOUTLN(CERR, "         choosen vf= ", vf);
+  DEBOUTLN(CERR, "          chosen vf= ", vf);
 
   // check trivial case:
   if ( degree(f, order.getLast())==0 || degree(g, order.getLast())==0)

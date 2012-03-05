@@ -242,7 +242,7 @@ EXAMPLE: example assPrimes; shows an example
          int n1 = #[2];
          int alg = 1;
          if(n1 >= 10)
-         { 
+         {
             int n2 = n1 + 1;
             int n3 = n1;
          }
@@ -257,7 +257,7 @@ EXAMPLE: example assPrimes; shows an example
          int n1 = #[2];
          int alg = #[3];
          if(n1 >= 10)
-         { 
+         {
             int n2 = n1 + 1;
             int n3 = n1;
          }
@@ -275,7 +275,7 @@ EXAMPLE: example assPrimes; shows an example
       int n2 = 10;
       int n3 = 10;
    }
-   
+
    if(printlevel >= 10)
    {
       "n1 = "+string(n1)+", n2 = "+string(n2)+", n3 = "+string(n3);
@@ -291,7 +291,7 @@ EXAMPLE: example assPrimes; shows an example
    list H = ideal(0);
    ideal F;
    poly F1;
-   
+
    if(printlevel >= 10) { "========== Start modStd =========="; }
    I = modStd(I,n1);
    if(printlevel >= 10) { "=========== End modStd ==========="; }
@@ -414,14 +414,14 @@ EXAMPLE: example assPrimes; shows an example
 
    int tt = timer;
    int rt = rtimer;
-   
+
    while(1)
    {
       tt = timer;
       rt = rtimer;
-      
+
       if(printlevel >= 9) { "size(L) = "+string(size(L)); }
-     
+
       if(n1 > 1)
       {
          while(j <= size(L) + 1)
@@ -470,7 +470,7 @@ EXAMPLE: example assPrimes; shows an example
             j++;
          }
       }
-      
+
       if(printlevel >= 9)
       {
          "Real-time for computing list in assPrimes is "+string(rtimer - rt)+
@@ -489,7 +489,7 @@ EXAMPLE: example assPrimes; shows an example
       if(printlevel >= 10) { "Lifting-process takes "+string(timer - tt)
                              +" seconds"; }
 
-      if(pTestPoly(F[1], ringL, alg, L))                             
+      if(pTestPoly(F[1], ringL, alg, L))
       {
          F = cleardenom(F[1]);
 
@@ -512,13 +512,13 @@ EXAMPLE: example assPrimes; shows an example
                setring SPR;
                phi = rHelp,var(nvars(SPR));
                H = phi(H);
-               
+
                if(printlevel >= 9)
                {
                   "Real-time without test is "+string(rtimer - RT)+" seconds.";
                   "CPU-time without test is "+string(timer - T)+" seconds.";
                }
-               
+
                T = timer;
                RT = rtimer;
 
@@ -727,7 +727,7 @@ static proc findGen(ideal J, list #)
 //=== try to find a sparse linear form r such that
 //=== vector space dim(basering/J)=deg(F),
 //=== F a poly in Q[T] such that <F>=kernel(Q[T]--->basering) mapping T to r
-//=== if not found returns a generic (randomly choosen) r
+//=== if not found returns a generic (randomly chosen) r
    int d = vdim(J);
    def R = basering;
    int n = nvars(R);
@@ -918,7 +918,7 @@ static proc pTestPoly(poly testF, list ringL, int alg, list L)
 {
    int i,j,p;
    def R0 = basering;
-   
+
    while(!i)
    {
       i = 1;
@@ -928,7 +928,7 @@ static proc pTestPoly(poly testF, list ringL, int alg, list L)
          if(p == L[j]) { i = 0; break; }
       }
    }
-   
+
    ringL[1] = p;
    def @R = ring(ringL);
    setring @R;
@@ -941,7 +941,7 @@ static proc pTestPoly(poly testF, list ringL, int alg, list L)
    setring @S;
    poly testF = fetch(R0,testF);
    int k = (testF == F);
-   
+
    setring R0;
    return(k);
 }

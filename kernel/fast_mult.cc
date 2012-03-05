@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 #include <kernel/mod2.h>
 #include <kernel/ring.h>
 #include <kernel/fast_mult.h>
@@ -590,7 +589,7 @@ poly pFastPowerMC(poly f, int n, ring r)
   if (n<=1)
     Werror("not implemented for so small n, recursion fails");//should be length(f)
    if (pLength(f)<=1)
-    Werror("not implemented for so small lenght of f, recursion fails");
+    Werror("not implemented for so small length of f, recursion fails");
   //  number null_number=n_Init(0,r);
   number* facult=(number*) omAlloc((n+1)*sizeof(number));
   facult[0]=n_Init(1,r);

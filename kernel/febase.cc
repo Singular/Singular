@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: i/o system
 */
@@ -112,7 +111,7 @@ void VoiceBackTrack()
 }
 
 /*2
-* init a new voice similiar to the current
+* init a new voice similar to the current
 */
 void Voice::Next()
 {

@@ -1379,7 +1379,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       }
       if(like_lists)
       {
-        if (TEST_V_ALLWARN) PrintS("assign list[..]=...or similiar\n");
+        if (TEST_V_ALLWARN) PrintS("assign list[..]=...or similar\n");
         b=jiAssign_list(l,r);
         if((!b) && (like_lists==2))
         {
@@ -1407,7 +1407,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         return b;
       }
     }
-    // end of handling elems of list and similiar
+    // end of handling elems of list and similar
     rl=r->listLength();
     if (rl==1)
     {

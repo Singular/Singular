@@ -52,7 +52,7 @@ PROCEDURES:
  createlist(L1,L2);                 creates a list of lists of two elements
 ";
 // inidata(K,k);                      verifies input data, a binomial ideal K of k generators
-// data(K,k,n);                       transforms data on lists of lenght n
+// data(K,k,n);                       transforms data on lists of length n
 // list0(n);                          creates a list of zeros of size n
 
 LIB "general.lib";

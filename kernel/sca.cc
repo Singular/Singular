@@ -6,7 +6,6 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id$
  *******************************************************************/
 
 // set it here if needed.
@@ -1738,7 +1737,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     if (test_PosInL!=NULL) strat->posInL=test_PosInL;
     kDebugPrint(strat);
   }
-  
+
 
   ///////////////////////////////////////////////////////////////
   // SCA:
@@ -1873,7 +1872,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat, red_result);
 
-    /* reduction of the element choosen from L */
+    /* reduction of the element chosen from L */
     red_result = strat->red(&strat->P,strat);
 
 
@@ -1996,7 +1995,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
         h.PrepareRed(strat->use_buckets);
 
-        // reduction of the element choosen from L(?)
+        // reduction of the element chosen from L(?)
         red_result = strat->red(&h,strat);
 
         // reduction to non-zero new poly

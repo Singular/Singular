@@ -86,7 +86,7 @@ static int heCurrentHelpBrowserIndex= -1;
  * Definition: available help browsers
  *
  *****************************************************************/
-// order is improtant -- first possible help is choosen
+// order is improtant -- first possible help is chosen
 // moved to LIB/help.cnf
 static heBrowser_s *heHelpBrowsers=NULL;
 
@@ -871,14 +871,14 @@ static BOOLEAN heGenInit(int warn, int br)
       case 'h': /* html dir */
                if (feResource(*p, warn) == NULL)
                {
-                 if (warn) Warn("ressource `%c` not found",*p);
+                 if (warn) Warn("resource `%c` not found",*p);
                  return FALSE;
                }
                break;
       case 'D': /* DISPLAY */
                if (getenv("DISPLAY") == NULL)
                {
-                 if (warn) WarnS("ressource `D` not found");
+                 if (warn) WarnS("resource `D` not found");
                  return FALSE;
                }
                break;

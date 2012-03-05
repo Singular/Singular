@@ -1,5 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////////
-/* $Id$ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -121,7 +120,7 @@ choose_main_variable( const CanonicalForm & f, int Mainvar=0){
 
 ///////////////////////////////////////////////////////////////
 // Check if the derivative is nonzero for oldmainvar.        //
-// Returns the level of the choosen main variable.           //
+// Returns the level of the chosen main variable.            //
 ///////////////////////////////////////////////////////////////
 static int
 necessary_condition( const CanonicalForm & F, int oldmainvar){
@@ -631,7 +630,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
   mainvar = choose_main_variable(F);
   // Let`s look if @f/@mainvar is nonzero
   mainvar = necessary_condition(F,mainvar);
-  // Now we have definetly choosen a main variable
+  // Now we have definetly chosen a main variable
   // swap poly such that the mainvar has highest level
   f=swapvar(F,mainvar,level(F));
 
