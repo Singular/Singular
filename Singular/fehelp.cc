@@ -1121,7 +1121,7 @@ static void heBuiltinHelp(heEntry hentry, int br)
 #define HELP_NOT_OPEN  1
 #define HELP_NOT_FOUND 2
 #define BUF_LEN        256
-#define IDX_LEN        64
+#define IDX_LEN        256
 #define MAX_LINES      21
 
 static inline char tolow(char p)
