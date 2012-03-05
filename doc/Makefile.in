@@ -183,17 +183,17 @@ usercard.ps: usercard.dvi
 # texinfo targets
 #
 manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} singular.doc $(STANDALONE_TEXI_FILES)
-	${DOC2TEX} -no_fun -o manual.tex singular.doc
+	+${DOC2TEX} -no_fun -o manual.tex singular.doc
 
 singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc $(STANDALONE_TEXI_FILES)
-	${DOC2TEX} -o singular.tex singular.doc
+	+${DOC2TEX} -o singular.tex singular.doc
 
 #pattern rule for tex files
 %_noEx.tex : %.doc doc2tex.pl ${SINGULAR}
-	${DOC2TEX} -o $@ -no_ex $<
+	+${DOC2TEX} -o $@ -no_ex $<
 
 %.tex: %.doc doc2tex.pl ${SINGULAR}
-	${DOC2TEX} -o $@ $<
+	+${DOC2TEX} -o $@ $<
 
 # pattern rules for lib docus
 ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
