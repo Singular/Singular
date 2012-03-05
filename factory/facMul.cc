@@ -421,8 +421,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       if (b.getp() != 0)
       {
         fmpz_t FLINTpk;
-        fmpz_init_set_ui (FLINTpk, b.getp());
-        fmpz_pow_ui (FLINTpk, FLINTpk, b.getk());
+        fmpz_init (FLINTpk);
+        convertCF2Fmpz (FLINTpk, b.getpk());
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
@@ -430,6 +430,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF, F.mvar(), b);
         fmpz_mod_poly_clear (FLINTG);
         fmpz_mod_poly_clear (FLINTF);
+        fmpz_clear (FLINTpk);
         return result;
       }
       return mulFLINTQ (F, G);
@@ -543,8 +544,8 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       if (b.getp() != 0)
       {
         fmpz_t FLINTpk;
-        fmpz_init_set_ui (FLINTpk, b.getp());
-        fmpz_pow_ui (FLINTpk, FLINTpk, b.getk());
+        fmpz_init (FLINTpk);
+        convertCF2Fmpz (FLINTpk, b.getpk());
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
@@ -552,6 +553,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF,F.mvar(),b);
         fmpz_mod_poly_clear (FLINTG);
         fmpz_mod_poly_clear (FLINTF);
+        fmpz_clear (FLINTpk);
         return result;
       }
       return modFLINTQ (F, G);
@@ -685,8 +687,8 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       if (b.getp() != 0)
       {
         fmpz_t FLINTpk;
-        fmpz_init_set_ui (FLINTpk, b.getp());
-        fmpz_pow_ui (FLINTpk, FLINTpk, b.getk());
+        fmpz_init (FLINTpk);
+        convertCF2Fmpz (FLINTpk, b.getpk());
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
@@ -694,6 +696,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF,F.mvar(),b);
         fmpz_mod_poly_clear (FLINTG);
         fmpz_mod_poly_clear (FLINTF);
+        fmpz_clear (FLINTpk);
         return result;
       }
       return divFLINTQ (F,G);
