@@ -86,7 +86,9 @@ void mp_MinorToResult(ideal, int &, matrix, int, int, ideal, const ring);
 
 BOOLEAN mp_IsDiagUnit(matrix U, const ring r);
 
-void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces=0);
+/// set spaces to zero by default
+void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces);
+
 char * iiStringMatrix(matrix im, int dim, const ring r, char ch=',');
 
 extern omBin ip_smatrix_bin;

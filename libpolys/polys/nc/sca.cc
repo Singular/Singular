@@ -1139,9 +1139,9 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   PrintS("Quotient: \n");
-  iiWriteMatrix((matrix)idQuotient,"__",1);
+  iiWriteMatrix((matrix)idQuotient,"__",1, rG, 0);
   PrintS("tempSCAQuotient: \n");
-  iiWriteMatrix((matrix)tempQ,"__",1);
+  iiWriteMatrix((matrix)tempQ,"__",1, rG, 0);
 #endif
 
   idSkipZeroes( tempQ );
@@ -1162,7 +1162,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   PrintS("SCAQuotient: \n");
   if(tempQ != NULL)
-    iiWriteMatrix((matrix)tempQ,"__",1);
+    iiWriteMatrix((matrix)tempQ,"__",1, rGR, 0);
   else
     PrintS("(NULL)\n");
 #endif

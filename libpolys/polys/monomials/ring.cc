@@ -282,7 +282,7 @@ void   rWrite(ring r, BOOLEAN details)
       }
       //if (r->minideal!=NULL)
       //{
-      //  iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
+      //  iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,r,0);
       //  PrintLn();
       //}
     }
@@ -390,7 +390,7 @@ void   rWrite(ring r, BOOLEAN details)
     } else
       PrintS(" ...");
 
-#if 0  /*Singularg should not differ from Singular except in error case*/
+#if MYTEST  /*Singularg should not differ from Singular except in error case*/
     Print("\n//   noncommutative type:%d", (int)ncRingType(r));
     Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);
     if( rIsSCA(r) )
@@ -404,10 +404,10 @@ void   rWrite(ring r, BOOLEAN details)
 //        if (r==currRing)
 //        {
 //          PrintLn();
-//          iiWriteMatrix((matrix)Q,"scaQ",1);
+          iiWriteMatrix((matrix)Q,"scaQ",1,r,0);
 //        }
 //        else
-            PrintS(" ...");
+//            PrintS(" ...");
       }
       else
         PrintS(" (NULL)");
@@ -421,7 +421,7 @@ void   rWrite(ring r, BOOLEAN details)
     if( details )
     {
       PrintLn();
-      iiWriteMatrix((matrix)r->qideal,"_",1,r);
+      iiWriteMatrix((matrix)r->qideal,"_",1,r,0);
     } else PrintS(" ...");
   }
 }

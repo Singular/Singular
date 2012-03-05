@@ -1272,7 +1272,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   {
     Warn("char_series returns %d x %d matrix from %d input polys (%d)",
       m,n,IDELEMS(I)+1,LL.length());
-    iiWriteMatrix((matrix)I,"I",2,0);
+    iiWriteMatrix((matrix)I,"I",2,r,0);
     m=si_max(m,1);
     n=si_max(n,1);
   }

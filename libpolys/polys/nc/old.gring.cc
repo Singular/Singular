@@ -2785,12 +2785,12 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   if( CCC != NULL )
   {
     PrintS("nc_CallPlural(), Input data, CCC: \n");
-    iiWriteMatrix(CCC, "C", 2, 4, curr);
+    iiWriteMatrix(CCC, "C", 2, curr, 4);
   }
   if( DDD != NULL )
   {
     PrintS("nc_CallPlural(), Input data, DDD: \n");
-    iiWriteMatrix(DDD, "D", 2, 4, curr);
+    iiWriteMatrix(DDD, "D", 2, curr, 4);
   }
 #endif
 
@@ -3009,10 +3009,10 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
 #if OUTPUT
   PrintS("nc_CallPlural(), Computed data, C: \n");
-  iiWriteMatrix(C, "C", 2, 4, r);
+  iiWriteMatrix(C, "C", 2, r, 4);
 
   PrintS("nc_CallPlural(), Computed data, D: \n");
-  iiWriteMatrix(D, "D", 2, 4, r);
+  iiWriteMatrix(D, "D", 2, r, 4);
 
   Print("\nTemporary: type = %d, IsSkewConstant = %d\n", nctype, IsSkewConstant);
 #endif

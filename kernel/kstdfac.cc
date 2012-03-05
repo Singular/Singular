@@ -408,7 +408,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
         if (TEST_OPT_DEBUG)
         {
           PrintS("new D:\n");
-          iiWriteMatrix((matrix)n->D,"D",1,0);
+          iiWriteMatrix((matrix)n->D,"D",1,currRing,0);
           PrintLn();
         }
       }
@@ -500,7 +500,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
               {
                 Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
                 PrintS("L:\n");
-                iiWriteMatrix((matrix)Lj->d,"L",1,0);
+                iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
               }
 #endif
             if (idIs0(r))
@@ -726,7 +726,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
           if (TEST_OPT_DEBUG)
           {
             PrintS("new D:\n");
-            iiWriteMatrix((matrix)n->D,"D",1,0);
+            iiWriteMatrix((matrix)n->D,"D",1,currRing,0);
             PrintLn();
           }
         }
@@ -822,7 +822,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
                 {
                   Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
                   PrintS("L:\n");
-                  iiWriteMatrix((matrix)Lj->d,"L",1,0);
+                  iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
                 }
 #endif
                 if (TEST_OPT_DEBUG)
@@ -956,7 +956,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     //if (!idIs0(r))
     //{
     //  PrintS("===================================================\n");
-    //  iiWriteMatrix((matrix)r,"S",1,0);
+    //  iiWriteMatrix((matrix)r,"S",1,currRing,0);
     //  PrintS("\n===================================================\n");
     //}
     //else
