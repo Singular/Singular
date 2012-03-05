@@ -44,9 +44,27 @@ henselLift12 (const CanonicalForm& F, ///< [in] compressed, bivariate poly
               CFArray& Pi,            ///< [in,out] stores intermediate results
               CFList& diophant,       ///< [in,out] result of diophantine()
               CFMatrix& M,            ///< [in,out] stores intermediate results
-              bool sort= true,        ///< [in] sort factors by degree in
+              modpk& b,               ///< [in] coeff bound
+              bool sort= true         ///< [in] sort factors by degree in
                                       ///< Variable(1)
-              const modpk& b= modpk ()///< [in] coeff bound
+             );
+
+/// Hensel lift from univariate to bivariate.
+///
+/// @sa henselLiftResume12(), henselLift23(), henselLiftResume(), henselLift()
+void
+henselLift12 (const CanonicalForm& F, ///< [in] compressed, bivariate poly
+              CFList& factors,        ///< [in, out] monic univariate factors of
+                                      ///< F, including leading coefficient as
+                                      ///< first element. Returns monic lifted
+                                      ///< factors without the leading
+                                      ///< coefficient
+              int l,                  ///< [in] lifting precision
+              CFArray& Pi,            ///< [in,out] stores intermediate results
+              CFList& diophant,       ///< [in,out] result of diophantine()
+              CFMatrix& M,            ///< [in,out] stores intermediate results
+              bool sort= true        ///< [in] sort factors by degree in
+                                      ///< Variable(1)
              );
 
 /// resume Hensel lift from univariate to bivariate. Assumes factors are lifted
