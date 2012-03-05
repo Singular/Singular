@@ -61,7 +61,7 @@ reverseSubstQa (const fmpz_poly_t F, int d, const Variable& alpha,
   int k= 0;
   int degfSubK;
   int repLength, j;
-  CanonicalForm coeff;
+  CanonicalForm coeff, ff;
   fmpz* tmp;
   while (degf >= k)
   {
@@ -77,14 +77,15 @@ reverseSubstQa (const fmpz_poly_t F, int d, const Variable& alpha,
       tmp= fmpz_poly_get_coeff_ptr (F, j+k);
       if (!fmpz_is_zero (tmp))
       {
-        CanonicalForm ff= convertFmpz2CF (tmp)/den;
-        coeff += ff*power (alpha, j);
+        ff= convertFmpz2CF (tmp);
+        coeff += ff*power (alpha, j); //TODO faster reduction mod alpha
       }
     }
     result += coeff*power (x, i);
     i++;
     k= d*i;
   }
+  result /= den;
   return result;
 }
 
