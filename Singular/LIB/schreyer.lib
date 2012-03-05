@@ -1,0 +1,555 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="General purpose";
+info="
+LIBRARY: schreyer.lib     Helpers for working with the Schreyer induced ordering
+AUTHOR:  Oleksandr Motsak <U@D>, where U={motsak}, D={mathematik.uni-kl.de}
+
+PROCEDURES:
+ Sres(M,l)      Schreyer resolution of module M of maximal length l
+ Ssyz(M)        Schreyer resolution of module M of length 1
+ Scontinue(l)   continue the resolution computation by most l steps
+
+KEYWORDS:  syzygy; Schreyer induced ordering; Schreyer free resolution
+NOTE:  requires the dynamic module: syzextra
+";
+
+static proc prepareSyz( module I, list # )
+{
+  int i;
+  int k = 0;
+  int r = nrows(I);
+  int c = ncols(I);
+
+
+  if( size(#) > 0 )
+  {
+    if( typeof(#[1]) == "int" || typeof(#[1]) == "bigint" )
+    {
+      k = #[1];
+    }
+  }
+
+  if( k < r )
+  {
+    "// *** Wrong k: ", k, " < nrows: ", r, " => setting k = r = ", r;
+    k = r;
+  }
+
+//   "k: ", k;  "c: ", c;   "I: ", I;
+
+  for( i = c; i > 0; i-- )
+  {
+    I[i] = I[i] + gen(k + i);
+  }
+
+//  DetailedPrint(I);
+
+  return(I);
+}
+
+static proc separateSyzGB( module J, int c )
+{
+  module II, G; vector v; int i;
+
+  J = simplify(J, 2);
+
+  for( i = ncols(J); i > 0; i-- )
+  {
+    v = J[i];
+    if( leadcomp(v) > c )
+    {
+      II[i] = v;
+    } else
+    {
+      G[i] = v; // leave only gen(i): i <= c
+    }
+  }
+
+  II = simplify(II, 2);
+  G = simplify(G, 2);
+
+  return (list(G, II));
+}
+
+static proc splitSyzGB( module J, int c )
+{
+  module JJ; vector v, vv; int i;
+
+  for( i = ncols(J); i > 0; i-- )
+  {
+    v = J[i];
+
+    vv = 0;
+    
+    while( leadcomp(v) <= c )
+    {
+      vv = vv + lead(v);
+      v  = v  - lead(v);
+    }
+
+    J[i] = vv;
+    JJ[i] = v;
+  }
+
+  J = simplify(J, 2);
+  JJ = simplify(JJ, 2);
+
+  return (list(J, JJ));
+}
+
+
+static proc Sinit(module M)
+{
+  def @save = basering;
+  
+  int @DEBUG = !system("with", "ndebug");
+  if( @DEBUG )
+  {
+    "Sinit::Input";
+    type(M);
+    DetailedPrint(M);
+    attrib(M);
+  }
+
+  int @RANK = nrows(M); int @SIZE = ncols(M);
+
+  int @IS_A_SB = attrib(M, "isSB"); // ??? only if all weights were zero?!
+
+  if( !@IS_A_SB ) 
+  {
+    M = std(M); // this should be faster than computing std in S (later on)
+  }
+
+  def S = MakeInducedSchreyerOrdering(1); // 1 puts history terms to the back
+  // TODO: NOTE: +1 causes trouble to Singular interpreter!!!???
+  setring S; // a new ring with a Schreyer ordering
+
+  if( @DEBUG )
+  {
+    "Sinit::StartingISRing";
+    basering; 
+//    DetailedPrint(basering);
+  }
+
+  // Setup the leading syzygy^{-1} module to zero:
+  module Z = 0; Z[@RANK] = 0; attrib(Z, "isHomog", intvec(0));  
+
+  module MRES = Z;
+  
+  list RES; RES[1] = Z;
+
+  module F = freemodule(@RANK);
+  intvec @V = deg(F[1..@RANK]);
+  
+  module M = imap(@save, M);
+  attrib(M, "isHomog", @V);
+  attrib(M, "isSB", 1);
+
+  
+  if( @DEBUG )
+  {
+    "Sinit::SB_Input: ";
+    type(M);
+    attrib(M);
+    attrib(M, "isHomog");
+    DetailedPrint(M);
+  }
+
+  // 0^th syz. property
+  if( size(module(transpose( transpose(M) * transpose(MRES) ))) > 0 )
+  {
+    transpose( transpose(M) * transpose(MRES) );
+    "transpose( transpose(M) * transpose(MRES) ) != 0!!!";
+    $
+  }
+
+  RES[size(RES)+1] = M; // list of all syzygy modules
+  MRES = MRES, M;
+
+  attrib(MRES, "isHomog", @V);  
+
+  attrib(S, "InducionLeads", lead(M));
+  attrib(S, "InducionStart", @RANK);  
+  
+  if( @DEBUG )
+  {
+    "Sinit::MRES";
+    DetailedPrint(MRES);
+    attrib(MRES, "isHomog");
+    attrib(S);
+  }
+
+  export RES;
+  export MRES;
+  return (S);
+}
+
+static proc Sstep()
+{
+  int @DEBUG = !system("with", "ndebug");
+
+  if( @DEBUG )
+  {
+    "Sstep::NextInducedRing";
+    DetailedPrint(basering);
+
+    attrib(basering, "InducionLeads");
+    attrib(basering, "InducionStart");
+
+    GetInducedData();
+  }
+
+  // syzygy step:
+
+/*
+  // is initial weights are all zeroes!
+  def L =  lead(M);
+  intvec @V = deg(M[1..ncols(M)]);  @W;  @V;  @W = @V;  attrib(L, "isHomog", @W);  
+  SetInducedReferrence(L, @RANK, 0);
+*/
+
+//  def L =  lead(MRES);
+//  @W = @W, @V;
+//  attrib(L, "isHomog", @W);  
+
+
+  // General setting:
+//  SetInducedReferrence(MRES, 0, 0); // limit: 0!
+  int @l = size(RES);
+
+  module M = RES[@l];
+
+  module L = attrib(basering, "InducionLeads");
+  int limit = attrib(basering, "InducionStart");
+
+//  L;  limit;
+  
+  int @RANK = ncols(MRES) - ncols(M); // nrows(M); // what if M is zero?!
+
+/*
+  if( @RANK !=  nrows(M) )
+  {
+    type(MRES);
+    @RANK;
+    type(M);
+    pause();
+  }
+*/
+  
+  intvec @W = attrib(M, "isHomog");
+  intvec @V = deg(M[1..ncols(M)]);
+  @V = @W, @V;
+   
+  if( @DEBUG )
+  {
+    "Sstep::NextInput: ";
+    M;
+    @V;
+    @RANK;   
+    DetailedPrint(MRES);
+    attrib(MRES, "isHomog");
+  }
+
+  
+      
+  SetInducedReferrence(L, limit, 0);
+  
+  def K = prepareSyz(M, @RANK);
+//  K;
+  
+//   attrib(K, "isHomog", @V);   DetailedPrint(K, 1000);
+
+//  pause();
+  
+  K = idPrepare(K, @RANK); // std(K); // ?
+  K = simplify(K, 2);
+
+//  K;
+
+  module N = separateSyzGB(K, @RANK)[2]; // 1^st syz. module: vectors which start in lower part (comp >= @RANK)
+  attrib(N, "isHomog", @V);
+
+// "N_0: "; N; DetailedPrint(N, 10);
+  
+  N = std(N); // TODO: fix "wrong weights"!!!?
+  attrib(N, "isHomog", @V);
+
+//  N;
+  
+  if( size(N) > 0 )
+  {
+    // next syz. property
+    if( size(module(transpose( transpose(N) * transpose(MRES) ))) > 0 )
+    {
+      MRES;
+
+      "N: "; N; DetailedPrint(N, 10);
+
+      "K:"; K; DetailedPrint(K, 10);
+
+      "RANKS: ", @RANK;
+
+      "transpose( transpose(N) * transpose(MRES) ) != 0!!!";
+      transpose( transpose(N) * transpose(MRES) );
+
+      "transpose(N) * transpose(MRES): ";
+      transpose(N) * transpose(MRES);
+      DetailedPrint(module(_), 2);
+      $
+    }
+  }
+  
+  RES[@l + 1] = N; // list of all syzygy modules
+  
+  MRES = MRES, N;
+  attrib(MRES, "isHomog", @V);
+
+
+  L = L, lead(N);
+  attrib(basering, "InducionLeads", L);
+
+  if( @DEBUG )
+  {
+    "Sstep::NextSyzOutput: ";
+    DetailedPrint(N);
+    attrib(N, "isHomog");
+  }
+
+}
+
+proc Scontinue(int l)
+"USAGE:  Scontinue(l)
+RETURN:  nothing, instead it changes RES and MRES variables in the current ring
+PURPOSE: computes further (at most l) syzygies 
+NOTE:    must be used within a ring returned by Sres or Ssyz. RES and MRES are
+         explained in Sres
+EXAMPLE: example Scontinue; shows an example
+"
+{
+  def data = GetInducedData();
+           
+  if( (!defined(RES)) || (!defined(MRES)) || (typeof(data) != "list") || (size(data) != 2) )
+  {
+    ERROR("Sorry, but basering does not seem to be returned by Sres or Ssyz");
+  }
+  for (;  (l != 0) && (size(RES[size(RES)]) > 0); l-- )
+  {
+    Sstep(); 
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  module M = maxideal(1); M;
+  def S = Ssyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES; MRES;
+  "More syzygies: ";
+  Scontinue(10);
+  RES; MRES;
+}
+
+proc Ssyz(module M)
+"USAGE:  Ssyz(M)
+RETURN:  ring, containing a list of modules RES and a module MRES
+PURPOSE: computes the first syzygy module of M (wrt some Schreyer ordering)
+NOTE:    The output is explained in Sres
+EXAMPLE: example Ssyz; shows an example
+"
+{
+  def S = Sinit(M); setring S;
+  
+  Sstep(); // NOTE: what if M is zero?
+
+  return (S);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  module M = maxideal(1); M;
+  def S = Ssyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES;
+  MRES; // Note gen(i)
+  kill S;
+  setring r; kill M;
+
+  module M = 0;
+  def S = Ssyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES;
+  MRES;
+  
+}
+
+proc Sres(module M, int l)
+"USAGE:  Sres(M, l)
+RETURN:  ring, containing a list of modules RES and a module MRES
+PURPOSE: computes (at most l) syzygy modules of M wrt the classical Schreyer
+         induced ordering with gen(i) > gen(j) if i > j, provided both gens
+         are from the same syzygy level.
+NOTE:    RES contains the images of maps subsituting the beginning of the
+         Schreyer free resolution of baseRing^r/M, while MRES is a sum of
+         these images in a big free sum, containing all the syzygy modules.
+         The syzygy modules are shifted so that gen(i) correspons to MRES[i].
+         The leading zero module RES[0] indicates the fact that coker of the
+         first map is zero. The number of zeroes inducates the rank of input.
+NOTE:    If l == 0 then l is set to be nvars(basering) + 1
+EXAMPLE: example Sres; shows an example
+"
+{
+  def S = Sinit(M); setring S;
+
+  if (l == 0)
+  {
+    l = nvars(basering) + 1; // not really an estimate...?!
+  }
+  
+  Sstep(); l = l - 1;
+  
+  Scontinue(l);
+  
+  return (S);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  module M = maxideal(1); M;
+  def S = Sres(M, 0); setring S; S;
+  RES;
+  MRES;
+  kill S;
+  setring r; kill M;
+
+  def A = nc_algebra(-1,0); setring A;
+  ideal Q = var(1)^2, var(2)^2, var(3)^2;
+  qring SCA = twostd(Q);
+  basering;
+
+  module M = maxideal(1);
+  def S = Sres(M, 2); setring S; S;
+  RES;
+  MRES;
+}
+
+
+
+
+static proc loadme()
+{
+  int @DEBUG = !system("with", "ndebug");
+
+  if( @DEBUG )
+  {
+    
+    "ndebug?: ", system("with", "ndebug");
+    "om_ndebug?: ", system("with", "om_ndebug");
+
+    listvar(Top);
+    listvar(Schreyer);
+  }
+//  listvar(Syzextra); listvar(Syzextra_g);
+
+  if( !defined(DetailedPrint) )
+  {
+    if( !@DEBUG )
+    {
+
+      if( @DEBUG )
+      {
+        "Loading the Release version!";
+      }
+      load("syzextra.so");
+
+      if( @DEBUG )
+      {
+        listvar(Syzextra);
+      }
+      
+//      export Syzextra;
+
+//      exportto(Schreyer, Syzextra::noop);
+      exportto(Schreyer, Syzextra::DetailedPrint);
+//      exportto(Schreyer, Syzextra::leadmonom);
+      exportto(Schreyer, Syzextra::leadcomp);
+//      exportto(Schreyer, Syzextra::leadrawexp);
+//      exportto(Schreyer, Syzextra::ISUpdateComponents);
+      exportto(Schreyer, Syzextra::SetInducedReferrence);
+      exportto(Schreyer, Syzextra::GetInducedData);
+      exportto(Schreyer, Syzextra::GetAMData);
+//      exportto(Schreyer, Syzextra::SetSyzComp);
+      exportto(Schreyer, Syzextra::MakeInducedSchreyerOrdering);
+//      exportto(Schreyer, Syzextra::MakeSyzCompOrdering);
+      exportto(Schreyer, Syzextra::idPrepare);
+//      exportto(Schreyer, Syzextra::reduce_syz);
+//      exportto(Schreyer, Syzextra::p_Content);
+
+    }
+    else
+    {
+      if( @DEBUG )
+      {
+        "Loading the Debug version!";
+      }
+
+      load("syzextra_g.so");
+
+      if( @DEBUG )
+      {      
+        listvar(Syzextra_g);
+      }
+      
+//      export Syzextra_g;
+//      exportto(Schreyer, Syzextra_g::noop);
+      exportto(Schreyer, Syzextra_g::DetailedPrint);
+//      exportto(Schreyer, Syzextra_g::leadmonom);
+      exportto(Schreyer, Syzextra_g::leadcomp);
+//      exportto(Schreyer, Syzextra_g::leadrawexp);
+//      exportto(Schreyer, Syzextra_g::ISUpdateComponents);
+      exportto(Schreyer, Syzextra_g::SetInducedReferrence);
+      exportto(Schreyer, Syzextra_g::GetInducedData);
+      exportto(Schreyer, Syzextra_g::GetAMData);
+//      exportto(Schreyer, Syzextra_g::SetSyzComp);
+      exportto(Schreyer, Syzextra_g::MakeInducedSchreyerOrdering);
+//      exportto(Schreyer, Syzextra_g::MakeSyzCompOrdering);
+      exportto(Schreyer, Syzextra_g::idPrepare);
+//      exportto(Schreyer, Syzextra_g::reduce_syz);
+//      exportto(Schreyer, Syzextra_g::p_Content);
+
+      
+    }
+
+    exportto(Top, DetailedPrint);
+    exportto(Top, GetInducedData);
+
+    if( @DEBUG )
+    {
+      listvar(Top);
+      listvar(Schreyer);
+    }
+  }
+  
+  if( !defined(GetInducedData) )
+  {
+    ERROR("Sorry but we are missing the dynamic module (syzextra(_g)?.so)...");
+  }
+
+}
+
+static proc mod_init()
+{
+  loadme();
+}
+
+
+proc testallSexamples()
+{
+  example Ssyz;
+  example Scontinue;
+  example Sres;  
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  testallSexamples();
+}
