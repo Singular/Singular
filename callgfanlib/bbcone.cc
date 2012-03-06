@@ -1295,6 +1295,38 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   }
 }
 
+BOOLEAN areExtremeRaysKnown(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    bool b = zc->areExtremeRaysKnown();
+    int bb = (int) b;
+    res->rtyp = INT_CMD;
+    res->data = (char*) bb;
+    return FALSE;
+  }
+  WerrorS("haveExtremeRaysBeenCached: unexpected parameters");
+  return TRUE;  
+}
+
+BOOLEAN areGeneratorsOfLinealitySpaceKnown(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    bool b = zc->areGeneratorsOfLinealitySpaceKnown();
+    int bb = (int) b;
+    res->rtyp = INT_CMD;
+    res->data = (char*) bb;
+    return FALSE;
+  }
+  WerrorS("haveExtremeRaysBeenCached: unexpected parameters");
+  return TRUE;  
+}
+
 void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1345,6 +1377,8 @@ void bbcone_setup()
   iiAddCproc("","getUniquePoint",FALSE,getUniquePoint);
   // iiAddCproc("","faceContaining",FALSE,faceContaining);
   iiAddCproc("","hasFace",FALSE,hasFace);
+  iiAddCproc("","areExtremeRaysKnown",FALSE,areExtremeRaysKnown);
+  iiAddCproc("","areGeneratorsOfLinealitySpaceKnown",FALSE,areGeneratorsOfLinealitySpaceKnown);
   coneID=setBlackboxStuff(b,"cone");
   //Print("created type %d (cone)\n",coneID); 
 }

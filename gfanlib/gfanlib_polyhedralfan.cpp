@@ -8,6 +8,7 @@
 #include <sstream>
 #include "gfanlib_polyhedralfan.h"
 #include "gfanlib_polymakefile.h"
+#include "gfanlib_zcone.h"
 
 using namespace std;
 namespace gfan{

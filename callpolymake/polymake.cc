@@ -211,8 +211,9 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
     polymake::Matrix<polymake::Rational> ineqrational = pc->give("FACETS");
     polymake::Matrix<polymake::Rational> eqrational = pc->give("LINEAR_SPAN");
     polymake::Matrix<polymake::Rational> exraysrational = pc->give("RAYS");
+    polymake::Matrix<polymake::Rational> linrational = pc->give("LINEALITY_SPACE");
 
-    gfan::ZMatrix zv, zw, zx;
+    gfan::ZMatrix zv, zw, zx, zy;
     if (ineqrational.cols()!=0)
     {  
       polymake::Matrix<polymake::Integer> ineqinteger = polymake::polytope::multiply_by_common_denominator(ineqrational);
@@ -229,13 +230,24 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
       zw = gfan::ZMatrix(0, ambientdim2);
     if (exraysrational.cols()!=0)
     {
-    polymake::Matrix<polymake::Integer> exraysinteger = polymake::polytope::multiply_by_common_denominator(exraysrational);
+      polymake::Matrix<polymake::Integer> exraysinteger = polymake::polytope::multiply_by_common_denominator(exraysrational);
       zx = PmMatrixInteger2GfZMatrix(&exraysinteger);
     }
     else
       zx = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone zc = gfan::ZCone(zv,zw,zx,2);
+    gfan::ZCone zc = gfan::ZCone(zv,zw,zx,3);
+
+    if (linrational.cols()!=0)
+    {
+      polymake::Matrix<polymake::Integer> lininteger = polymake::polytope::multiply_by_common_denominator(linrational);
+      zy = PmMatrixInteger2GfZMatrix(&lininteger);
+    }
+    else
+      zy = gfan::ZMatrix(0, ambientdim2);
+
+    zc.setGeneratorsOfLinealitySpace(zy);
+
     return zc;
   }
   WerrorS("PmCone2ZCone: unexpected parameters");
@@ -281,7 +293,7 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
     else
       zx = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone zp = gfan::ZCone(zv,zw,zx,2);
+    gfan::ZCone zp = gfan::ZCone(zv,zw,zx,3);
     return zp;
   }
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
@@ -311,21 +323,21 @@ polymake::perl::Object ZCone2PmCone (gfan::ZCone* zc)
   polymake::perl::Object gc("Cone<Rational>");
 
   gfan::ZMatrix inequalities = zc->getInequalities();
-  gc.take("INEQUALITIES") << GfZMatrix2PmMatrixInteger(&inequalities);
+  gc.take("FACETS") << GfZMatrix2PmMatrixInteger(&inequalities);
 
   gfan::ZMatrix equations = zc->getEquations();
-  gc.take("EQUATIONS") << GfZMatrix2PmMatrixInteger(&equations);
+  gc.take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
 
   if(zc->areExtremeRaysKnown())
     {  
       gfan::ZMatrix extremeRays = zc->extremeRays();
-      gc.take("INPUT_RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
+      gc.take("RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
     }
 
   if(zc->areGeneratorsOfLinealitySpaceKnown())
     {
       gfan::ZMatrix lineality = zc->generatorsOfLinealitySpace();
-      gc.take("INPUT_LINEALITY") << GfZMatrix2PmMatrixInteger(&lineality);
+      gc.take("LINEALITY_SPACE") << GfZMatrix2PmMatrixInteger(&lineality);
     }
 
   return gc;
@@ -336,15 +348,15 @@ polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone* zc)
   polymake::perl::Object pp("Polytope<Rational>");
 
   gfan::ZMatrix inequalities = zc->getInequalities();
-  gc.take("INEQUALITIES") << GfZMatrix2PmMatrixInteger(&inequalities);
+  pp.take("FACETS") << GfZMatrix2PmMatrixInteger(&inequalities);
 
   gfan::ZMatrix equations = zc->getEquations();
-  gc.take("EQUATIONS") << GfZMatrix2PmMatrixInteger(&equations);
+  pp.take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
 
-  if(zc->areExtremeRays())
+  if(zc->areExtremeRaysKnown())
     {
       gfan::ZMatrix vertices = zc->extremeRays();
-      pp.take("VERTICES") << GfZMatrix2PmMatrixInteger(&zm);
+      pp.take("VERTICES") << GfZMatrix2PmMatrixInteger(&vertices);
     }
 
   return pp;
@@ -1782,6 +1794,22 @@ BOOLEAN normalFan(leftv res, leftv args)
 //   return TRUE;
 // }
 
+BOOLEAN testingmatrices(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+      gfan::ZMatrix zm = zc->getInequalities();
+      polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
+      gfan::ZMatrix zn = PmMatrixInteger2GfZMatrix(&pm);
+      res->rtyp = NONE;
+      res->data = NULL;
+      return FALSE;
+    }
+  return TRUE;
+}
+
 BOOLEAN testingcones(leftv res, leftv args)  // for testing purposes       
 {                                            // taking a cone from Singular,
                                              // handing it over to polymake 
@@ -1888,16 +1916,6 @@ BOOLEAN testingstrings(leftv res, leftv args)
 // }
 
 
-BOOLEAN testingmatrices(leftv res, leftv args)
-{
-  intvec* im = (intvec*) args->Data();
-  polymake::Matrix<polymake::Integer> pm = Intvec2PmMatrixInteger(im);
-  res->rtyp = NONE;
-  res->data = NULL;
-  return FALSE;
-}
-
-
 BOOLEAN PMconeViaRays(leftv res, leftv args)
 {
   leftv u = args;
@@ -1913,7 +1931,7 @@ BOOLEAN PMconeViaRays(leftv res, leftv args)
     {
       intvec* lines = (intvec*) v->Data(); // these will be lines in the cone
       polymake::Matrix<polymake::Integer> pmlines = Intvec2PmMatrixInteger(lines);
-      pc.take("INPUT_LINEALITY") << pmlines;
+      pc.take("INPUT_LINEALITY_SPACE") << pmlines;
 
       leftv w = v->next;
       if ((w != NULL) && (w->Typ() == INT_CMD))

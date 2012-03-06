@@ -1045,8 +1045,18 @@ ZCone ZCone::dualCone()const
 //  assert(state>=1);
 
   ZMatrix dualInequalities,dualEquations;
-  lpSolver.dual(inequalities,equations,dualInequalities,dualEquations);
-  ZCone ret(dualInequalities,dualEquations);
+  if(this->areExtremeRaysKnown())
+    dualInequalities=cachedExtremeRays;
+  else 
+    dualInequalities=this->extremeRays();
+    
+  if(this->areGeneratorsOfLinealitySpaceKnown())
+    dualEquations=cachedGeneratorsOfLinealitySpace;
+  else
+    dualEquations=this->generatorsOfLinealitySpace();
+
+  // lpSolver.dual(inequalities,equations,dualInequalities,dualEquations);
+  ZCone ret(dualInequalities,dualEquations,3);
   ret.ensureStateAsMinimum(state);
 
   return ret;
