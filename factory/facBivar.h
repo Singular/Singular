@@ -270,6 +270,14 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
 CFList conv (const CFFList& L ///< [in] a CFFList
             );
 
+modpk
+coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo );
+
+void findGoodPrime(const CanonicalForm &f, int &start);
+
+modpk
+coeffBound ( const CanonicalForm & f, int p );
+
 #endif
 
 #endif
