@@ -257,8 +257,8 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
     polymake::Matrix<polymake::Rational> vertrational = pp->give("VERTICES");
 
     gfan::ZMatrix zv, zw, zx;
-    if (ineqrational.cols()!=0)
-    {
+    if (ineqrational.cols()!=0)  // the following branching statements are to cover the cases
+    {                            // when polymake returns an empty matrix
       polymake::Matrix<polymake::Integer> ineqinteger = polymake::polytope::multiply_by_common_denominator(ineqrational);
       zv = PmMatrixInteger2GfZMatrix(&ineqinteger);
     }
@@ -308,25 +308,44 @@ gfan::ZFan PmFan2ZFan (polymake::perl::Object* pf)
 
 polymake::perl::Object ZCone2PmCone (gfan::ZCone* zc)
 {
-  gfan::ZMatrix zm1 = zc->extremeRays();
-  polymake::Matrix<polymake::Integer> extremeRays = GfZMatrix2PmMatrixInteger(&zm1);
-  gfan::ZMatrix zm2 = zc->generatorsOfLinealitySpace();
-  polymake::Matrix<polymake::Integer> lineality = GfZMatrix2PmMatrixInteger(&zm2);
+  polymake::perl::Object gc("Cone<Rational>");
 
-  polymake::perl::Object gc("Cone");
-  gc.take("INPUT_RAYS") << extremeRays;
-  gc.take("INPUT_LINEALITY") << lineality;
+  gfan::ZMatrix inequalities = zc->getInequalities();
+  gc.take("INEQUALITIES") << GfZMatrix2PmMatrixInteger(&inequalities);
+
+  gfan::ZMatrix equations = zc->getEquations();
+  gc.take("EQUATIONS") << GfZMatrix2PmMatrixInteger(&equations);
+
+  if(zc->areExtremeRaysKnown())
+    {  
+      gfan::ZMatrix extremeRays = zc->extremeRays();
+      gc.take("INPUT_RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
+    }
+
+  if(zc->areGeneratorsOfLinealitySpaceKnown())
+    {
+      gfan::ZMatrix lineality = zc->generatorsOfLinealitySpace();
+      gc.take("INPUT_LINEALITY") << GfZMatrix2PmMatrixInteger(&lineality);
+    }
 
   return gc;
 }
 
 polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone* zc)
 {
-  gfan::ZMatrix zm = zc->extremeRays();
-  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
-
   polymake::perl::Object pp("Polytope<Rational>");
-  pp.take("VERTICES") << pm;
+
+  gfan::ZMatrix inequalities = zc->getInequalities();
+  gc.take("INEQUALITIES") << GfZMatrix2PmMatrixInteger(&inequalities);
+
+  gfan::ZMatrix equations = zc->getEquations();
+  gc.take("EQUATIONS") << GfZMatrix2PmMatrixInteger(&equations);
+
+  if(zc->areExtremeRays())
+    {
+      gfan::ZMatrix vertices = zc->extremeRays();
+      pp.take("VERTICES") << GfZMatrix2PmMatrixInteger(&zm);
+    }
 
   return pp;
 }
@@ -1934,7 +1953,7 @@ BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
       }
     }
     else
-      pp.take("POINTS") << pmpoints;
+      pp.take("POINTS") << pmpoints;              // by default, we assume that matrix may contain non-vertices
     
     gfan::ZCone* zp = new gfan::ZCone(PmPolytope2ZPolytope(&pp));
     res->rtyp = polytopeID;

@@ -18,7 +18,7 @@ A PolyhedralCone is represented by linear inequalities and equations. The inequa
 and stored as the rows of a matrix and the equations are stored as rows of a second matrix.
 
 A cone can be in one of the four states:
-0) Nothing has been done to remove redundancies. This is the initial state.
+0) Nothing has been done to remove redundancies. This is the initial state
 1) A basis for the true, implied equations space has been computed. This means that
    the implied equations have been computed. In particular the dimension of the cone is known.
 2) Redundant inequalities have been computed and have been eliminated.
@@ -100,11 +100,34 @@ class ZCone
   ZMatrix linearForms;
   mutable ZMatrix inequalities;
   mutable ZMatrix equations;
+
   mutable ZMatrix cachedExtremeRays;
 /**
- * If this bool is true it means that cachedExtremeRays contains the extreme rays as found by extremeRays().
+ * If this true it means that cachedExtremeRays contains the extreme rays as found by extremeRays().
  */
   mutable bool haveExtremeRaysBeenCached;
+
+  mutable ZMatrix cachedGeneratorsOfSpan;
+/**
+ * If this true it means that cachedGeneratorsOfSpan contains 
+ * the generators of the span as found by generatorsOfSpan().
+ */
+  mutable bool haveGeneratorsOfSpanBeenCached;
+
+  mutable ZMatrix cachedGeneratorsOfLinealitySpace;
+/**
+ * If true it means that cachedGeneratorsOfLinealitySpace contains 
+ * the generators of the lineality space as found by generatorsOfLinealitySpace().
+ */
+  mutable bool haveGeneratorsOfLinealitySpaceBeenCached;
+
+  mutable ZMatrix cachedQuotientLatticeBasis;
+/**
+ * If true it means that cachedQuotientLatticeBasis contains 
+ * the basis of the quotient lattice as found by quotientLatticeBasis().
+ */
+  mutable bool hasQuotientLatticeBasisBeenCached;
+
   void ensureStateAsMinimum(int s)const;
 
   bool isInStateMinimum(int s)const;
@@ -161,7 +184,22 @@ public:
       * Returns true iff it is known that the set of equations span the space of implied equations of the description.
       */
      bool areImpliedEquationsKnown()const{return (state>=1)||(preassumptions&PCP_impliedEquationsKnown);}
-
+     /**
+      * The following functions return true iff the respective data is cashed.
+      */
+     bool areExtremeRaysKnown()const{return haveExtremeRaysBeenCached;}
+     bool areGeneratorsOfSpanKnown()const{return haveGeneratorsOfSpanBeenCached;}
+     bool areGeneratorsOfLinealitySpaceKnown()const{return haveGeneratorsOfLinealitySpaceBeenCached;}
+     bool isQuotientLatticeBasisKnown()const{return hasQuotientLatticeBasisBeenCached;}
+     /**
+      * The following functions set the respective data to be the given input.
+      * The input will always assumed to be correct, there are no checks.
+      * Should it not be correct, future calculations relying on it might break.
+      */ 
+     void setExtremeRays(ZMatrix const &extremeRays_);
+     void setGeneratorsOfSpan(ZMatrix const &generatorsOfSpan_);
+     void setGeneratorsOfLinealitySpace(ZMatrix const &generatorsOfLinealitySpace_);
+     void setQuotientLatticeBasis(ZMatrix const &quotientLatticeBasis_);
      /**
       * Takes the cone to a canonical form. After taking cones to canonical form, two cones are the same
       * if and only if their matrices of equations and inequalities are the same.
@@ -308,7 +346,7 @@ public:
       * If generators for the lineality space are known, they can be supplied. This can
       * speed up computations a lot.
       */
-    ZMatrix extremeRays(ZMatrix const *generatorsOfLinealitySpace=0)const;
+     ZMatrix extremeRays(ZMatrix const *generatorsOfLinealitySpace=0, bool b=true)const;
     /**
        The cone defines two lattices, namely Z^n intersected with the
        span of the cone and Z^n intersected with the lineality space of
