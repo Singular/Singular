@@ -2841,9 +2841,16 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     fmpq_poly_clear (FLINTB);
     return result;
   }
-  else
-    return true;
-    //return fdivides (A, B);
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+  CanonicalForm Q, R;
+  Variable x= Variable (1);
+  Variable y= Variable (2);
+  newtonDivrem (swapvar (B, y, x), swapvar (A, y, x), Q, R);
+  if (!isRat)
+    Off (SW_RATIONAL);
+  return R.isZero();
 #else
   return fdivides (A, B); //maybe NTL?
 #endif
