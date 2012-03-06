@@ -407,6 +407,9 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
   CanonicalForm coeffE;
   CFList s;
   CFList result= recResult;
+  setCharacteristic (p);
+  recResult= mapinto (recResult);
+  setCharacteristic (0);
   CanonicalForm g;
   CanonicalForm modulus= p;
   int d= b.getk();
@@ -425,7 +428,7 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
-        g= coeffE*j.getItem();
+        g= mulNTL (coeffE, j.getItem());
         g= modNTL (g, bufFactors[ii]);
         setCharacteristic (0);
         k.getItem() += g.mapinto()*modulus;
