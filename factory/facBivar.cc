@@ -29,14 +29,22 @@
 TIMING_DEFINE_PRINT(uni_factorize)
 TIMING_DEFINE_PRINT(hensel_lift12)
 
-static modpk
+// bound on coeffs of f (cf. Musser: Multivariate Polynomial Factorization,
+//                          Gelfond: Transcendental and Algebraic Numbers)
+modpk
 coeffBound ( const CanonicalForm & f, int p )
 {
     int * degs = degrees( f );
     int M = 0, i, k = f.level();
+    CanonicalForm b= 1;
     for ( i = 1; i <= k; i++ )
-        M += degs[i];
-    CanonicalForm b = 2 * maxNorm( f ) * power( CanonicalForm( 3 ), M );
+    {
+      M += degs[i];
+      b *= degs[i] + 1;
+    }
+    b /= power (CanonicalForm (2), k);
+    b= b.sqrt() + 1;
+    b *= 2 * maxNorm( f ) * power( CanonicalForm( 2 ), M );
     CanonicalForm B = p;
     k = 1;
     while ( B < b ) {
@@ -46,8 +54,7 @@ coeffBound ( const CanonicalForm & f, int p )
     return modpk( p, k );
 }
 
-static
-void find_good_prime(const CanonicalForm &f, int &start)
+void findGoodPrime(const CanonicalForm &f, int &start)
 {
   if (! f.inBaseDomain() )
   {
@@ -56,7 +63,7 @@ void find_good_prime(const CanonicalForm &f, int &start)
     {
       if  ( i.hasTerms() )
       {
-        find_good_prime(i.coeff(),start);
+        findGoodPrime(i.coeff(),start);
         if (0==cf_getBigPrime(start)) return;
         if((i.exp()!=0) && ((i.exp() % cf_getBigPrime(start))==0))
         {
@@ -80,6 +87,40 @@ void find_good_prime(const CanonicalForm &f, int &start)
       }
     }
   }
+}
+
+modpk
+coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo )
+{
+    int * degs = degrees( f );
+    int M = 0, i, k = f.level();
+    CanonicalForm K= 1;
+    for ( i = 1; i <= k; i++ )
+    {
+        M += degs[i];
+        K *= degs[i] + 1;
+    }
+    K /= power (CanonicalForm (2), k);
+    K= K.sqrt()+1;
+    K *= power (CanonicalForm (2), M);
+    int N= degree (mipo);
+    CanonicalForm b;
+    b= 2*power (maxNorm (f), N)*power (maxNorm (mipo), 4*N)*K*power (CanonicalForm (2), N)*(CanonicalForm (M+1).sqrt()+1)*power (CanonicalForm (N+1).sqrt()+1, 7*N);
+    b /= power (abs (lc (mipo)), N);
+
+    ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
+    ZZX NTLLcf= convertFacCF2NTLZZX (Lc (f));
+    ZZ NTLf= resultant (NTLmipo, NTLLcf);
+    ZZ NTLD= discriminant (NTLmipo);
+    b /= abs (convertZZ2CF (NTLf))*abs (convertZZ2CF (NTLD));
+
+    CanonicalForm B = p;
+    k = 1;
+    while ( B < b ) {
+        B *= p;
+        k++;
+    }
+    return modpk( p, k );
 }
 
 CFList conv (const CFFList& L)
@@ -590,9 +631,9 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   {
     Off (SW_RATIONAL);
     int i= 0;
-    find_good_prime(F,i);
-    find_good_prime(Aeval,i);
-    find_good_prime(A,i);
+    findGoodPrime(F,i);
+    findGoodPrime(Aeval,i);
+    findGoodPrime(A,i);
     if (i >= cf_getNumBigPrimes())
       printf ("out of primes\n"); //TODO exit
 
