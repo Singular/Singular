@@ -477,7 +477,7 @@ static proc loadme()
 //      exportto(Schreyer, Syzextra::ISUpdateComponents);
       exportto(Schreyer, Syzextra::SetInducedReferrence);
       exportto(Schreyer, Syzextra::GetInducedData);
-      exportto(Schreyer, Syzextra::GetAMData);
+//      exportto(Schreyer, Syzextra::GetAMData);
 //      exportto(Schreyer, Syzextra::SetSyzComp);
       exportto(Schreyer, Syzextra::MakeInducedSchreyerOrdering);
 //      exportto(Schreyer, Syzextra::MakeSyzCompOrdering);
@@ -509,7 +509,7 @@ static proc loadme()
 //      exportto(Schreyer, Syzextra_g::ISUpdateComponents);
       exportto(Schreyer, Syzextra_g::SetInducedReferrence);
       exportto(Schreyer, Syzextra_g::GetInducedData);
-      exportto(Schreyer, Syzextra_g::GetAMData);
+//      exportto(Schreyer, Syzextra_g::GetAMData);
 //      exportto(Schreyer, Syzextra_g::SetSyzComp);
       exportto(Schreyer, Syzextra_g::MakeInducedSchreyerOrdering);
 //      exportto(Schreyer, Syzextra_g::MakeSyzCompOrdering);
