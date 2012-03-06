@@ -351,13 +351,10 @@ if (!(containsInSupport(dC,vv))) {ERROR("the linear form given should be in the 
 for (i=1; i<=size(L);i++){
         vL[i]=list(); 
         vL[i][2]=L[i][2];
-	vL[i][1]=Polymake::minimalValue(L[i][1],vv);
+	      vL[i][1]=Polymake::minimalValue(L[i][1],vv);
 }
 vD.summands = vL;
 return(vD);}
-
-
-
 
 
 proc pdivisorplus(pdivisor A, pdivisor B){

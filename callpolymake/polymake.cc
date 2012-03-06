@@ -362,6 +362,17 @@ polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone* zc)
   return pp;
 }
 
+polymake::perl::Object oldZPolytope2PmPolytope (gfan::ZCone* zc)
+{
+  gfan::ZMatrix zm = zc->extremeRays();
+
+  polymake::Matrix<polymake::Integer> pm = GfZMatrix2PmMatrixInteger(&zm);
+  polymake::perl::Object pp("Polytope<Rational>");
+  pp.take("VERTICES") << pm;
+
+  return pp;
+}
+
 polymake::Matrix<polymake::Integer> raysOf(gfan::ZFan* zf)
 {
   int d = zf->getAmbientDimension();
@@ -1589,7 +1600,6 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
         try
         {
           polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
-          polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
           polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
           polymake::perl::Object o("LinearProgram<Rational>");
           o.take("LINEAR_OBJECTIVE") << lo;
@@ -1620,7 +1630,6 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
   return TRUE;
 }
 
-
 BOOLEAN PMminimalValue(leftv res, leftv args)
 {
   leftv u = args;
@@ -1637,7 +1646,6 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
         try
         {
           polymake::perl::Object p = ZPolytope2PmPolytope(zp); 
-          polymake::Matrix<polymake::Rational> ver = p.give("VERTICES");
           polymake::Vector<polymake::Integer> lo = Intvec2PmVectorInteger(iv);
           polymake::perl::Object o("LinearProgram<Rational>");
           o.take("LINEAR_OBJECTIVE") << lo;
@@ -1818,7 +1826,9 @@ BOOLEAN testingcones(leftv res, leftv args)  // for testing purposes
   if ((u != NULL) && (u->Typ() == coneID))
     {
       gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+      Print("converting gfan cone to polymake cone...\n");
       polymake::perl::Object pc = ZCone2PmCone(zc);
+      Print("converting polymake cone to gfan cone...\n");
       gfan::ZCone* zd = new gfan::ZCone(PmCone2ZCone(&pc));
       // res->rtyp = coneID;
       // res->data = (char *) zd;
@@ -1931,7 +1941,7 @@ BOOLEAN PMconeViaRays(leftv res, leftv args)
     {
       intvec* lines = (intvec*) v->Data(); // these will be lines in the cone
       polymake::Matrix<polymake::Integer> pmlines = Intvec2PmMatrixInteger(lines);
-      pc.take("INPUT_LINEALITY_SPACE") << pmlines;
+      pc.take("INPUT_LINEALITY") << pmlines;
 
       leftv w = v->next;
       if ((w != NULL) && (w->Typ() == INT_CMD))
