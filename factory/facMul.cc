@@ -396,6 +396,8 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q)
 CanonicalForm
 mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
+  if (CFFactory::gettype() == GaloisFieldDomain)
+    return F*G;
   if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
   {
     Variable alpha;
@@ -479,8 +481,6 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
   }
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-    return F*G;
   zz_p::init (getCharacteristic());
   Variable alpha;
   CanonicalForm result;
@@ -516,6 +516,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 CanonicalForm
 modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
+  if (CFFactory::gettype() == GaloisFieldDomain)
+    return mod (F, G);
   if (F.inCoeffDomain() && G.isUnivariate())
   {
     if (b.getp() != 0)
@@ -592,8 +594,6 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-    return mod (F, G);
   zz_p::init (getCharacteristic());
   Variable alpha;
   CanonicalForm result;
@@ -629,6 +629,8 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 CanonicalForm
 divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
+  if (CFFactory::gettype() == GaloisFieldDomain)
+    return div (F, G);
   if (F.inCoeffDomain() && G.isUnivariate())
   {
     if (b.getp() != 0)
@@ -735,8 +737,6 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-    return div (F, G);
   zz_p::init (getCharacteristic());
   Variable alpha;
   CanonicalForm result;
@@ -2798,6 +2798,12 @@ void divrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
 bool
 uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
 {
+  if (B.isZero())
+    return true;
+  if (A.isZero())
+    return false;
+  if (CFFactory::gettype() == GaloisFieldDomain)
+    return fdivides (A, B);
   int p= getCharacteristic();
   if (p > 0)
   {
@@ -2805,6 +2811,13 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     Variable alpha;
     if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
     {
+      if (A.inCoeffDomain() || B.inCoeffDomain())
+      {
+        if (A.inCoeffDomain())
+          return true;
+        else
+          return false;
+      }
       zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
       zz_pE::init (NTLMipo);
       zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
@@ -2831,8 +2844,6 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
   if (!hasFirstAlgVar (A, alpha) && !hasFirstAlgVar (B, alpha))
   {
     fmpq_poly_t FLINTA,FLINTB;
-    fmpq_poly_init (FLINTA);
-    fmpq_poly_init (FLINTB);
     convertFacCF2Fmpq_poly_t (FLINTA, A);
     convertFacCF2Fmpq_poly_t (FLINTB, B);
     fmpq_poly_rem (FLINTA, FLINTB, FLINTA);
@@ -2852,7 +2863,13 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     Off (SW_RATIONAL);
   return R.isZero();
 #else
-  return fdivides (A, B); //maybe NTL?
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+  bool result= fdivides (A, B);
+  if (!isRat)
+    Off (SW_RATIONAL);
+  return result; //maybe NTL?
 #endif
 }
 
