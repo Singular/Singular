@@ -26,6 +26,7 @@
 #include "fac_util.h"
 #include "cf_algorithm.h"
 #include "cf_primes.h"
+#include "facBivar.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
@@ -447,22 +448,142 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
 }
 
 CFList
+diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
+                     const CFList& factors, modpk& b, const Variable& alpha)
+{
+  int p= b.getp();
+  setCharacteristic (p);
+  bool fail= false;
+  CFList recResult;
+  CanonicalForm modMipo, mipo;
+  mipo= getMipo (alpha);
+  setReduce (alpha, false);
+  while (1)
+  {
+    setCharacteristic (p);
+    modMipo= mapinto (mipo);
+    modMipo /= lc (modMipo);
+    tryDiophantine (recResult, mapinto (F), mapinto (factors), modMipo, fail);
+    if (fail)
+    {
+      int i= 0;
+      while (cf_getBigPrime (i) < p)
+        i++;
+      findGoodPrime (F, i);
+      findGoodPrime (G, i);
+      p=cf_getBigPrime(i);
+      b = coeffBound( G, p, mipo );
+      modpk bb= coeffBound (F, p, mipo );
+      if (bb.getk() > b.getk() ) b=bb;
+    }
+    else
+      break;
+  }
+  setCharacteristic (0);
+  recResult= mapinto (recResult);
+  setReduce (alpha, true);
+  CanonicalForm e= 1;
+  CFList L;
+  CFArray bufFactors= CFArray (factors.length());
+  int k= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, k++)
+  {
+    if (k == 0)
+      bufFactors[k]= i.getItem() (0);
+    else
+      bufFactors [k]= i.getItem();
+  }
+  CanonicalForm tmp, quot;
+  for (k= 0; k < factors.length(); k++) //TODO compute b's faster
+  {
+    tmp= 1;
+    for (int l= 0; l < factors.length(); l++)
+    {
+      if (l == k)
+        continue;
+      else
+      {
+        tmp= mulNTL (tmp, bufFactors[l]);
+      }
+    }
+    L.append (tmp);
+  }
+
+  setCharacteristic (p);
+  for (k= 0; k < factors.length(); k++)
+    bufFactors [k]= bufFactors[k].mapinto();
+  setCharacteristic(0);
+
+  CFListIterator j= L;
+  for (CFListIterator i= recResult; i.hasItem(); i++, j++)
+    e= b (e - mulNTL (i.getItem(),j.getItem(), b));
+
+  if (e.isZero())
+    return recResult;
+  CanonicalForm coeffE;
+  CFList s;
+  CFList result= recResult;
+  setCharacteristic (p);
+  recResult= mapinto (recResult);
+  setCharacteristic (0);
+  CanonicalForm g;
+  CanonicalForm modulus= p;
+  int d= b.getk();
+  for (int i= 1; i < d; i++)
+  {
+    coeffE= div (e, modulus);
+    setCharacteristic (p);
+    coeffE= coeffE.mapinto();
+    setCharacteristic (0);
+    if (!coeffE.isZero())
+    {
+      CFListIterator k= result;
+      CFListIterator l= L;
+      int ii= 0;
+      j= recResult;
+      for (; j.hasItem(); j++, k++, l++, ii++)
+      {
+        setCharacteristic (p);
+        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (g, bufFactors[ii]);
+        setCharacteristic (0);
+        k.getItem() += g.mapinto()*modulus;
+        e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+        e= b(e);
+        DEBOUTLN (cerr, "mod (e, power (y, i + 1))= " <<
+                  mod (e, power (y, i + 1)));
+      }
+    }
+    modulus *= p;
+    if (e.isZero())
+      break;
+  }
+
+  return result;
+}
+
+CFList
 diophantine (const CanonicalForm& F, const CanonicalForm& G,
              const CFList& factors, modpk& b)
 {
   if (getCharacteristic() == 0)
   {
-    if (b.getp() != 0)
-      return diophantineHensel (F, factors, b);
     Variable v;
     bool hasAlgVar= hasFirstAlgVar (F, v);
     for (CFListIterator i= factors; i.hasItem() && !hasAlgVar; i++)
       hasAlgVar= hasFirstAlgVar (i.getItem(), v);
     if (hasAlgVar)
     {
+      if (b.getp() != 0)
+      {
+        CFList result= diophantineHenselQa (F, G, factors, b, v);
+        return result;
+      }
       CFList result= modularDiophant (F, factors, getMipo (v));
       return result;
     }
+    if (b.getp() != 0)
+      return diophantineHensel (F, factors, b);
   }
 
   CanonicalForm buf1, buf2, buf3, S, T;
