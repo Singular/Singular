@@ -42,14 +42,14 @@
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_hensel_lift12)
 
-CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
+CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M, const modpk& b)
 {
   if (L.isEmpty())
     return 1;
   else if (L.length() == 1)
     return mod (L.getFirst()(0, 1) , M);
   else if (L.length() == 2)
-    return mod (mulNTL (L.getFirst()(0, 1),L.getLast()(0, 1)), M);
+    return mod (mulNTL (L.getFirst()(0, 1),L.getLast()(0, 1), b), M);
   else
   {
     int l= L.length()/2;
@@ -59,9 +59,9 @@ CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
     for (int j= 1; j <= l; j++, i++)
       tmp1.append (i.getItem());
     tmp2= Difference (L, tmp1);
-    buf1= prodMod0 (tmp1, M);
-    buf2= prodMod0 (tmp2, M);
-    return mod (mulNTL (buf1,buf2), M);
+    buf1= prodMod0 (tmp1, M, b);
+    buf2= prodMod0 (tmp2, M, b);
+    return mod (mulNTL (buf1,buf2, b), M);
   }
 }
 
@@ -486,7 +486,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   TT= copy (factors);
   bool recombination= false;
   CanonicalForm test;
-  CanonicalForm buf0= buf (0, x)*LCBuf;
+  CanonicalForm buf0= mulNTL (buf (0, x), LCBuf, b);
+  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -520,12 +521,10 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
-        test= prodMod0 (S, M);
-        test *= LCBuf;
-        test = mod (test, M);
-        if (b.getp() != 0)
-          test= b(test);
-        if (fdivides (test, buf0))
+        test= prodMod0 (S, M, b);
+        test= mulNTL (test, LCBuf, b);
+        test= mod (test, M);
+        if (uniFdivides (test, buf0))
         {
           S.insert (LCBuf);
           g= prodMod (S, M);
@@ -533,6 +532,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           if (b.getp() != 0)
             g= b(g);
           g /= content (g, x);
+          if (!isRat)
+            On (SW_RATIONAL);
           if (fdivides (g, buf, quot))
           {
             recombination= true;
@@ -542,7 +543,9 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             T= Difference (T, S);
             l -= degree (g);
             M= power (y, l);
-            buf0= buf (0, x)*LCBuf;
+            if (!isRat)
+              Off (SW_RATIONAL);
+            buf0= mulNTL (buf (0, x), LCBuf, b);
             // compute new possible degree pattern
             bufDegs2= DegreePattern (T);
             bufDegs1.intersect (bufDegs2);
@@ -568,6 +571,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             indexUpdate (v, s, T.length(), nosubset);
             if (nosubset) break;
           }
+          if (!isRat)
+            Off (SW_RATIONAL);
         }
       }
     }
@@ -660,6 +665,7 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   CanonicalForm buf0= mulNTL (buf (0,x), LCBuf, b);
   CanonicalForm buf1= mulNTL (buf (1,x), LCBuf, b);
   CanonicalForm test0, test1;
+  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
   for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
     if (!bufDegs1.find (degree (i.getItem(), 1)) || factorsFoundIndex[l] == 1)
@@ -676,6 +682,8 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           if (b.getp() != 0)
             g= b(g);
           g /= content (g, x);
+          if (!isRat)
+            On (SW_RATIONAL);
           if (fdivides (g, buf, quot))
           {
             reconstructedFactors.append (g);
@@ -683,6 +691,8 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
             buf= quot;
             d -= degree (g);
             LCBuf= LC (buf, x);
+            if (!isRat)
+              Off (SW_RATIONAL);
             buf0= mulNTL (buf (0,x), LCBuf, b);
             buf1= mulNTL (buf (1,x), LCBuf, b);
             T= Difference (T, CFList (i.getItem()));
@@ -698,6 +708,8 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
               break;
             }
           }
+          if (!isRat)
+            Off (SW_RATIONAL);
         }
       }
     }

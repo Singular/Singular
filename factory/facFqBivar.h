@@ -577,7 +577,8 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 /// @sa prodMod()
 CanonicalForm prodMod0 (const CFList& L,       ///< [in] a list of compressed,
                                                ///< bivariate polynomials
-                        const CanonicalForm& M ///< [in] a power of Variable (2)
+                        const CanonicalForm& M,///< [in] a power of Variable (2)
+                        const modpk& b= modpk()///< [in] coeff bound
                        );
 
 /// find an evaluation point p, s.t. F(p,y) is squarefree and
