@@ -55,8 +55,8 @@ void find_good_prime(const CanonicalForm &f, int &start)
       if  ( i.hasTerms() )
       {
         find_good_prime(i.coeff(),start);
-        if (0==cf_getSmallPrime(start)) return;
-        if((i.exp()!=0) && ((i.exp() % cf_getSmallPrime(start))==0))
+        if (0==cf_getBigPrime(start)) return;
+        if((i.exp()!=0) && ((i.exp() % cf_getBigPrime(start))==0))
         {
           start++;
           i=f;
@@ -70,11 +70,11 @@ void find_good_prime(const CanonicalForm &f, int &start)
   {
     if (f.inZ())
     {
-      if (0==cf_getSmallPrime(start)) return;
-      while((!f.isZero()) && (mod(f,cf_getSmallPrime(start))==0))
+      if (0==cf_getBigPrime(start)) return;
+      while((!f.isZero()) && (mod(f,cf_getBigPrime(start))==0))
       {
         start++;
-        if (0==cf_getSmallPrime(start)) return;
+        if (0==cf_getBigPrime(start)) return;
       }
     }
   }
@@ -591,10 +591,10 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     find_good_prime(F,i);
     find_good_prime(Aeval,i);
     find_good_prime(A,i);
-    if (i >= cf_getNumSmallPrimes())
+    if (i >= cf_getNumBigPrimes())
       printf ("out of primes\n"); //TODO exit
 
-    int p=cf_getSmallPrime(i);
+    int p=cf_getBigPrime(i);
     b = coeffBound( A, p );
     modpk bb= coeffBound (Aeval, p);
     if (bb.getk() > b.getk() ) b=bb;
