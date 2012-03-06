@@ -80,9 +80,37 @@ ratBiSqrfFactorize (const CanonicalForm & G,        ///< [in] a bivariate poly
   mat_ZZ M;
   vec_ZZ S;
   F= compress (F, M, S);
-  CFList result= biFactorize (F, v);
-  for (CFListIterator i= result; i.hasItem(); i++)
-    i.getItem()= N (decompress (i.getItem(), M, S));
+  Variable tmp1, tmp2;
+  CanonicalForm mipoTmp1;
+  bool substAlgVar= false;
+  if (v.level() != 1)
+  {
+    mipoTmp1= getMipo (v);
+    if (!bCommonDen (getMipo (v)).isOne())
+    {
+      tmp2= v;
+      mipoTmp1 *= bCommonDen (mipoTmp1);
+      mipoTmp1= replacevar (mipoTmp1, v, Variable (1));
+      tmp1= rootOf (mipoTmp1);
+      F= replacevar (F, tmp2, tmp1);
+      substAlgVar= true;
+    }
+    else
+      tmp1= v;
+  }
+  else
+    tmp1= v;
+  CFList result= biFactorize (F, tmp1);
+  if (substAlgVar)
+  {
+    for (CFListIterator i= result; i.hasItem(); i++)
+      i.getItem()= N (decompress (replacevar (i.getItem(), tmp1, tmp2), M, S));
+  }
+  else
+  {
+    for (CFListIterator i= result; i.hasItem(); i++)
+      i.getItem()= N (decompress (i.getItem(), M, S));
+  }
   for (CFFListIterator i= contentXFactors; i.hasItem(); i++)
     result.append (N(i.getItem().factor()));
   for (CFFListIterator i= contentYFactors; i.hasItem(); i++)
@@ -185,14 +213,47 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
   mat_ZZ M;
   vec_ZZ S;
   F= compress (F, M, S);
+  Variable tmp1, tmp2;
+  CanonicalForm mipoTmp1;
+  bool substAlgVar= false;
+  if (v.level() != 1)
+  {
+    mipoTmp1= getMipo (v);
+    if (!bCommonDen (getMipo (v)).isOne())
+    {
+      tmp2= v;
+      mipoTmp1 *= bCommonDen (mipoTmp1);
+      mipoTmp1= replacevar (mipoTmp1, v, Variable (1));
+      tmp1= rootOf (mipoTmp1);
+      F= replacevar (F, tmp2, tmp1);
+      substAlgVar= true;
+    }
+    else
+      tmp1= v;
+  }
+  else
+    tmp1= v;
   CFFList sqrfFactors= sqrFree (F);
   for (CFFListIterator i= sqrfFactors; i.hasItem(); i++)
   {
-    CFList tmp= ratBiSqrfFactorize (i.getItem().factor(), v);
-    for (CFListIterator j= tmp; j.hasItem(); j++)
+    CFList tmp= ratBiSqrfFactorize (i.getItem().factor(), tmp1);
+    if (substAlgVar)
     {
-      if (j.getItem().inCoeffDomain()) continue;
-      result.append (CFFactor (N (decompress (j.getItem(), M, S)), i.getItem().exp()));
+      for (CFListIterator j= tmp; j.hasItem(); j++)
+      {
+        if (j.getItem().inCoeffDomain()) continue;
+        result.append (CFFactor (N (decompress (replacevar (j.getItem(),
+                                 tmp1, tmp2), M, S)), i.getItem().exp()));
+      }
+    }
+    else
+    {
+      for (CFListIterator j= tmp; j.hasItem(); j++)
+      {
+        if (j.getItem().inCoeffDomain()) continue;
+        result.append (CFFactor (N (decompress (j.getItem(), M, S)),
+                                 i.getItem().exp()));
+      }
     }
   }
   result= Union (result, contentXFactors);
