@@ -85,40 +85,40 @@ all: OPTOBJ ${TARGETNAME} libsingfac_g.a
 OPTOBJ:
 	${MKINSTALLDIRS} OPTOBJ
 
-OPTOBJ/%.o: %.cc OPTOBJ
+OPTOBJ/%.o: %.cc | OPTOBJ
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.o: charset/%.cc OPTOBJ
+OPTOBJ/%.o: charset/%.cc | OPTOBJ
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.o: factor/%.cc OPTOBJ
+OPTOBJ/%.o: factor/%.cc | OPTOBJ
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/tmpl_inst.o: factor/tmpl_inst.cc  OPTOBJ
+OPTOBJ/tmpl_inst.o: factor/tmpl_inst.cc  | OPTOBJ
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.op: %.cc  OPTOBJ
+OPTOBJ/%.op: %.cc | OPTOBJ
 	$(CXX) -O -pg $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.op: charset/%.cc  OPTOBJ
+OPTOBJ/%.op: charset/%.cc | OPTOBJ
 	$(CXX) -O -pg $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.op: factor/%.cc OPTOBJ
+OPTOBJ/%.op: factor/%.cc | OPTOBJ
 	$(CXX) -O -pg $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/tmpl_inst.op: factor/tmpl_inst.cc  OPTOBJ
+OPTOBJ/tmpl_inst.op: factor/tmpl_inst.cc | OPTOBJ
 	$(CXX) -O -pg $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.og: %.cc  OPTOBJ
+OPTOBJ/%.og: %.cc | OPTOBJ
 	$(CXX) -g $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.og: charset/%.cc  OPTOBJ
+OPTOBJ/%.og: charset/%.cc | OPTOBJ
 	$(CXX) -g $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/%.og: factor/%.cc OPTOBJ
+OPTOBJ/%.og: factor/%.cc | OPTOBJ
 	$(CXX) -g $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-OPTOBJ/tmpl_inst.og: factor/tmpl_inst.cc  OPTOBJ
+OPTOBJ/tmpl_inst.og: factor/tmpl_inst.cc | OPTOBJ
 	$(CXX) -g $(CPPFLAGS) $(DEFS) -c $< -o $@
 
 libfac:		OPTOBJ libfac.a
