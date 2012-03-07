@@ -5492,7 +5492,8 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
   int n=0;
   for(i=I->nrows*I->ncols-1;i>=0;i--)
   {
-    n=pGetVariables(I->m[i],e);
+    int n0= pGetVariables(I->m[i],e);
+    if (n0>n) n=n0;
   }
   jjINT_S_TO_ID(n,e,res);
   return FALSE;
