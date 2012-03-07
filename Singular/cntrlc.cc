@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -217,7 +216,7 @@ void sigsegv_handler(int sig, sigcontext s)
   }
 #endif /* __OPTIMIZE__ */
 #ifdef CALL_GDB
-  if (sig!=SIGINT) 
+  if (sig!=SIGINT)
   {
     if (singular_in_batchmode) debug(STACK_TRACE);
     else                       debug(INTERACTIVE);
@@ -242,7 +241,7 @@ void sigsegv_handler(int sig, sigcontext s)
 /*---------------------------------------------------------------------*/
 void sig_chld_hdl(int sig)
 {
- waitpid(-1,NULL,WNOHANG);  
+  waitpid(-1,NULL,WNOHANG);
 }
 
 /*2
@@ -391,6 +390,7 @@ void init_signals()
 /*2
 * signal handler for SIGINT
 */
+int sigint_handler_cnt=0;
 void sigint_handler(int sig)
 {
   mflush();
@@ -411,7 +411,7 @@ void sigint_handler(int sig)
         Tok2Cmdname(iiOp),my_yylinebuf);
       if (feGetOptValue(FE_OPT_EMACS) == NULL)
       {
-        fputs("abort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
+        fputs("abort  after this command(a), abort immidiately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
         c = fgetc(stdin);
       }
       else
@@ -425,7 +425,19 @@ void sigint_handler(int sig)
       case 'q':
                 m2_end(2);
       case 'r':
-                longjmp(si_start_jmpbuf,1);
+                if (sigint_handler_cnt<3)
+                {
+                  sigint_handler_cnt++;
+                  fputs("** Warning: Singular should be restarted as soon as possible **\n",stderr);
+                  fflush(stderr);
+                  longjmp(si_start_jmpbuf,1);
+                }
+                else
+                {
+                  fputs("** tried too often, try another possibility **\n",stderr);
+                  fflush(stderr);
+                }
+                break;
       case 'b':
                 VoiceBackTrack();
                 break;
