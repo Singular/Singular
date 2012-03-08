@@ -51,7 +51,6 @@ BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
 #endif
 
 
-// Why is this here? who needs it?
-// number ngcMapQ(number from, const coeffs r, const coeffs aRing);
+number ngcMapQ(number from, const coeffs r, const coeffs aRing);
 #endif
 /* GMPCOMPLEX_H */
