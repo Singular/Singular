@@ -453,7 +453,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
     ((procinfo *)res->data)->data.s.body=(char *)a->CopyD(STRING_CMD);
   }
   else
-    res->data=(void *)a->CopyD(PROC_CMD);
+    res->data=(void *)a->CopyD();
   jiAssignAttr(res,a);
   return FALSE;
 }

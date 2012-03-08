@@ -18,10 +18,21 @@ struct  newstruct_member_s
   int            pos;
 };
 
+struct newstruct_proc_s;
+typedef struct newstruct_proc_a *newstruct_proc;
+struct  newstruct_proc_a
+{
+  newstruct_proc next;
+  int            t; /*tok id */
+  int            args; /* number of args */
+  procinfov      p;
+};
+
 struct newstruct_desc_s
 {
   newstruct_member member;
   newstruct_desc   parent;
+  newstruct_proc   procs;
   int            size; // number of mebers +1
   int            id;   // the type id assigned to this bb
 };
@@ -257,6 +268,29 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
       }
     }
   }
+  newstruct_proc p=nt->procs;
+  while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(a1);
+    tmp.next=(leftv)omAlloc0(sizeof(sleftv));
+    tmp.next->Copy(a2);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl==NULL) return TRUE;
+    else
+    {
+      res->Copy(sl);
+      return FALSE;
+    }
+  }
   return blackboxDefaultOp2(op,res,a1,a2);
 }
 
@@ -353,15 +387,38 @@ BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
   return FALSE;
 }
 
+void newstruct_Print(blackbox *b,void *d)
+{
+  newstruct_desc dd=(newstruct_desc)b->data;
+  newstruct_proc p=dd->procs;
+  while((p!=NULL)&&(p->t!=PRINT_CMD))
+    p=p->next;
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(tmp));
+    tmp.rtyp=dd->id;
+    tmp.data=(void*)newstruct_Copy(b,d);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+  }
+  else
+    blackbox_default_Print(b,d);
+}
 void newstruct_setup(const char *n, newstruct_desc d )
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   // all undefined entries will be set to default in setBlackboxStuff
-  // the default Print is quite usefule,
+  // the default Print is quite useful,
   // all other are simply error messages
   b->blackbox_destroy=newstruct_destroy;
   b->blackbox_String=newstruct_String;
-  //b->blackbox_Print=blackbox_default_Print;
+  b->blackbox_Print=newstruct_Print;//blackbox_default_Print;
   b->blackbox_Init=newstruct_Init;
   b->blackbox_Copy=newstruct_Copy;
   b->blackbox_Assign=newstruct_Assign;
@@ -487,4 +544,26 @@ newstruct_desc newstructChildFromString(const char *parent, const char *s)
   res->parent=parent_desc;
 
   return scanNewstructFromString(s,res);
+}
+
+BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinfov pr)
+{
+  int id=0;
+  blackboxIsCmd(bbname,id);
+  blackbox *bb=getBlackboxStuff(id);
+  newstruct_desc desc=(newstruct_desc)bb->data;
+  newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
+  p->next=desc->procs; desc->procs=p;
+  if(!IsCmd(func,p->t))
+  {
+    if (func[1]=='\0') p->t=func[0];
+    else
+    {
+      Werror(">>%s<< is not e kernel command",func);
+      return TRUE;
+    }
+  }
+  p->args=args;
+  p->p=pr; pr->ref++;
+  return FALSE;
 }

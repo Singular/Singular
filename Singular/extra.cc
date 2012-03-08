@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <kernel/mod2.h>
 #include <misc_ip.h>
+#include <newstruct.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -3747,6 +3748,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     extern lists get_denom_list();
     res->data=(lists)get_denom_list();
     return FALSE;
+  }
+  else
+/*==================== install newstruct =================*/
+  if (strcmp(sys_cmd,"install")==0)
+  {
+    if ((h!=NULL) && (h->Typ()==STRING_CMD)
+    && (h->next!=NULL) && (h->next->Typ()==STRING_CMD)
+    && (h->next->next!=NULL) && (h->next->next->Typ()==PROC_CMD)
+    && (h->next->next->next!=NULL) && (h->next->next->next->Typ()==INT_CMD))
+    {
+      return newstruct_set_proc((char*)h->Data(),(char*)h->next->Data(),
+                                (int)(long)h->next->next->next->Data(),
+				(procinfov)h->next->next->Data());
+    }
+    return TRUE;
   }
   else
 /*==================== Error =================*/
