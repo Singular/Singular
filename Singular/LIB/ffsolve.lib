@@ -1,0 +1,752 @@
+////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Symbolic-numerical solving";
+info="
+LIBRARY: ffsolve.lib        multivariate equation solving over finite fields
+AUTHOR: Gergo Gyula Borus, borisz@borisz.net
+KEYWORDS: multivariate equations; finite field
+
+PROCEDURES:
+ffsolve();         finite field solving using heuristically chosen method
+speoff();          solve system of multivariate equations over finite field
+simpleSolver();   solver using modified brute-force search
+gbsolve();         multivariate solver using Groebner-basis
+";
+
+LIB "presolve.lib";
+LIB "general.lib";
+LIB "ring.lib";
+LIB "standard.lib";
+LIB "matrix.lib";
+
+////////////////////////////////////////////////////////////////////
+proc ffsolve(ideal equations, list #)
+"USAGE:         ffsolve(I[, L]); I ideal, L list of strings
+RETURN:         list L, the common roots of I as ideal
+ASSUME:         basering is a finite field of type (p^n,a)
+"
+{
+  list solutions, possibleSolvers, tempsols;
+  int i,j, k, found;
+  ideal factors, linfacs;
+  poly lp;
+  // check assumptions
+  if(npars(basering)>1){
+    ERROR("Basering must have at most one parameter");
+  }
+  if(char(basering)==0){
+    ERROR("Basering must have finite characteristic");
+  }
+
+  //   heuristic choice of solver
+  //   not yet implemented
+  if(size(#)){
+    if(size(#)==1 and typeof(#[1])=="list"){
+      possibleSolvers = #[1];
+    }else{
+      possibleSolvers = #;
+    }
+  }else{
+    possibleSolvers = "simpleSolver", "speoff", "gbsolve";
+  }
+  string solver = possibleSolvers[random(1,size(possibleSolvers))];
+
+  if(nvars(basering)==1){
+    return(facstd(equations));
+  }
+
+  // search for the first univariate polynomial
+  found = 0;
+  for(i=1; i<=ncols(equations); i++){
+    if(univariate(equations[i])>0){
+      factors=factorize(equations[i],1);
+      for(j=1; j<=ncols(factors); j++){
+        if(deg(factors[j])==1){
+          linfacs[size(linfacs)+1] = factors[j];
+        }
+      }
+      if(deg(linfacs[1])>0){
+        found=1;
+        break;
+      }
+    }
+  }
+  //   if there is, collect its the linear factors
+  if(found){
+    // substitute the root and call recursively
+    ideal neweqs, invmapideal, ti;
+    map invmap;
+    for(k=1; k<=ncols(linfacs); k++){
+      lp = linfacs[k];
+      neweqs = reduce(equations, lp);
+
+      intvec varexp = leadexp(lp);
+      def original_ring = basering;
+      def newRing = clonering(nvars(original_ring)-1);
+      setring newRing;
+      ideal mappingIdeal;
+      j=1;
+      for(i=1; i<=size(varexp); i++){
+        if(varexp[i]){
+          mappingIdeal[i] = 0;
+        }else{
+          mappingIdeal[i] = var(j);
+          j++;
+        }
+      }
+      map recmap = original_ring, mappingIdeal;
+      list tsols = ffsolve(recmap(neweqs), possibleSolvers);
+      if(size(tsols)==0){
+        tsols = list(ideal(1));
+      }
+      setring original_ring;
+      j=1;
+      for(i=1;i<=size(varexp);i++){
+        if(varexp[i]==0){
+          invmapideal[j] = var(i);
+          j++;
+        }
+      }
+      invmap = newRing, invmapideal;
+      tempsols = invmap(tsols);
+
+      // combine the solutions
+      for(j=1; j<=size(tempsols); j++){
+        ti =  std(tempsols[j]+lp);
+        if(deg(ti)>0){
+          solutions = insert(solutions,ti);
+        }
+      }
+    }
+  }else{
+    execute("solutions="+solver+"(equations);") ;
+  }
+  return(solutions);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = (2,a),x(1..3),lp;
+  minpoly=a2+a+1;
+  ideal I;
+  I[1]=x(1)^2*x(2)+(a)*x(1)*x(2)^2+(a+1);
+  I[2]=x(1)^2*x(2)*x(3)^2+(a)*x(1);
+  I[3]=(a+1)*x(1)*x(3)+(a+1)*x(1);
+  ffsolve(I);
+}
+////////////////////////////////////////////////////////////////////
+proc speoff (ideal L, list #)
+"USAGE:         speoff(I[, i]); I ideal, i optional integer
+RETURN:         list if optional parameter is not given or set to 2,
+integer if optional is set to 0
+ASSUME:         basering is a finite field of type (p^n,a)
+NOTE:           When the optional parameter is set to 0, speoff only
+checks if I has common roots, then return 1, otherwise return 0.
+
+"
+{
+  system("--ticks-per-sec", 1000);
+  int t = rtimer;
+  int mode, i,j;
+  list results, rs, start;
+  poly g;
+  // check assumptions
+  if(npars(basering)>1){
+    ERROR("Basering must have at most one parameter");
+  }
+  if(char(basering)==0){
+    ERROR("Basering must have finite characteristic");
+  }
+
+  if( size(#) > 0 ){
+    mode = #[1];
+  }else{
+    mode = 2;
+  }
+  L = simplify(L,15);
+  g = productOfEqs( L );
+
+  if(g == 0){
+    if(voice==2){printf("Runtime: %s ms", rtimer-t)};
+    if(mode==0){
+      return(0);
+    }
+    return( list() );
+  }
+  if(g == 1){
+    list vectors = every_vector();
+    for(j=1; j<=size(vectors); j++){
+      ideal res;
+      for(i=1; i<=nvars(basering); i++){
+        res[i] = var(i)-vectors[j][i];
+      }
+      results[size(results)+1] = std(res);
+    }
+    if(voice==2){printf("Runtime: %s ms", rtimer-t)};
+    return( results );
+  }
+
+  if( mode == 0 ){
+    if(voice==2){printf("Runtime: %s ms", rtimer-t)};
+    return( 1 );
+  }else{
+    for(i=1; i<=nvars(basering); i++){
+      start[i] = 0:order_of_extension();
+    }
+
+    if( mode == 1){
+      results[size(results)+1] = melyseg(g, start);
+    }else{
+      while(1){
+        start = melyseg(g, start);
+        if( size(start) > 0 ){
+          ideal res;
+          for(i=1; i<=nvars(basering); i++){
+            res[i] = var(i)-vec2elm(start[i]);
+          }
+          results[size(results)+1] = std(res);
+          start = increment(start);
+        }else{
+          break;
+        }
+      }
+    }
+  }
+
+  if(voice==2){printf("Runtime: %s ms", rtimer-t)};
+  return(results);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = (2,a),x(1..3),lp;
+  minpoly=a2+a+1;
+  ideal I;
+  I[1]=x(1)^2*x(2)+(a)*x(1)*x(2)^2+(a+1);
+  I[2]=x(1)^2*x(2)*x(3)^2+(a)*x(1);
+  I[3]=(a+1)*x(1)*x(3)+(a+1)*x(1);
+  ffsolve(I);
+}
+////////////////////////////////////////////////////////////////////
+proc simpleSolver(ideal E)
+"USAGE:         simpleSolver(I); I ideal
+RETURN:         list L, the common roots of I as ideal
+ASSUME:         basering is a finite field of type (p^n,a)
+"
+{
+  int SStime = rtimer;
+  int i,j,k,t, correct;
+  list solutions = list(std(ideal()));
+  list partial_solutions;
+  ideal partial_system, curr_sol, curr_sys, factors;
+  poly univar_poly;
+  E = E+defaultIdeal();
+  // check assumptions
+  if(npars(basering)>1){
+    ERROR("Basering must have at most one parameter");
+  }
+  if(char(basering)==0){
+    ERROR("Basering must have finite characteristic");
+  }
+
+  for(k=1; k<=nvars(basering); k++){
+    partial_solutions = list();
+    for(i=1; i<=size(solutions); i++){
+      partial_system = reduce(E, solutions[i]);
+      for(j=1; j<=ncols(partial_system); j++){
+        if(univariate(partial_system[j])>0){
+          univar_poly = partial_system[j];
+          break;
+        }
+      }
+      factors = factorize(univar_poly,1);
+      for(j=1; j<=ncols(factors); j++){
+        if(deg(factors[j])==1){
+          curr_sol = std(solutions[i]+ideal(factors[j]));
+          curr_sys = reduce(E, curr_sol);
+          correct = 1;
+          for(t=1; t<=ncols(curr_sys); t++){
+            if(deg(curr_sys[t])==0){
+              correct = 0;
+              break;
+            }
+          }
+          if(correct){
+            partial_solutions = insert(partial_solutions, curr_sol);
+          }
+        }
+      }
+    }
+    solutions = partial_solutions;
+  }
+  if(voice==2){printf("Runtime: %s ms", rtimer-SStime)};
+  return(solutions);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = (2,a),x(1..3),lp;
+  minpoly=a2+a+1;
+  ideal I;
+  I[1]=x(1)^2*x(2)+(a)*x(1)*x(2)^2+(a+1);
+  I[2]=x(1)^2*x(2)*x(3)^2+(a)*x(1);
+  I[3]=(a+1)*x(1)*x(3)+(a+1)*x(1);
+  ffsolve(I);
+}
+////////////////////////////////////////////////////////////////////
+proc gbsolve(ideal equation_system)
+"USAGE:         gbsolve(I); I ideal
+RETURN:         list L, the common roots of I as ideal
+ASSUME:         basering is a finite field of type (p^n,a)
+"
+{
+  option(redSB);
+  system("--ticks-per-sec",1000);
+  int i,j, prop, newelement, number_new_vars;
+  int t=rtimer;
+  ideal ls;
+  list results, slvbl, linsol, ctrl, new_sols, varinfo;
+  ideal I, linear_solution, unsolved_part, univar_part, multivar_part, unsolved_vars;
+  intvec unsolved_var_nums;
+  string new_vars;
+  // check assumptions
+  if(npars(basering)>1){
+    ERROR("Basering must have at most one parameter");
+  }
+  if(char(basering)==0){
+    ERROR("Basering must have finite characteristic");
+  }
+
+  def original_ring = basering;
+  if(npars(basering)==1){
+    int prime_coeff_field=0;
+    string minpolystr = "minpoly="+
+    get_minpoly_str(size(original_ring),parstr(original_ring,1))+";" ;
+  }else{
+    int prime_coeff_field=1;
+  }
+
+  equation_system = simplify(equation_system,15);
+
+  ideal standard_basis = std(equation_system);
+  printf("std(): %s ms", rtimer-t);
+  list basis_factors = facstd(standard_basis);
+  printf("facstd(): %s ms", rtimer-t);
+  if( basis_factors[1][1] == 1){
+    printf("Runtime: %s ms", rtimer-t);
+    return(results)
+  };
+
+  for(i=1; i<= size(basis_factors); i++){
+    prop = 0;
+    for(j=1; j<=size(basis_factors[i]); j++){
+      if( univariate(basis_factors[i][j])>0 and deg(basis_factors[i][j])>1){
+        prop =1;
+        break;
+      }
+    }
+
+    if(prop == 0){
+      ls = Presolve::solvelinearpart( basis_factors[i] );
+      if(ncols(ls) == nvars(basering) ){
+        ctrl, newelement = add_if_new(ctrl, ls);
+        if(newelement){
+          results = insert(results, ls);
+        }
+      }else{
+        slvbl = insert(slvbl, list(basis_factors[i],ls) );
+      }
+    }
+  }
+
+  if(size(slvbl)<>0){
+    for(int E = 1; E<= size(slvbl); E++){
+      I = slvbl[E][1];
+      linear_solution = slvbl[E][2];
+      unsolved_part = reduce(I,linear_solution);
+      univar_part = ideal();
+      multivar_part = ideal();
+      for(i=1; i<=ncols(I); i++){
+        if(univariate(I[i])>0){
+          univar_part = univar_part+I[i];
+        }else{
+          multivar_part = multivar_part+I[i];
+        }
+      }
+
+      //       list varinfo = Presolve::findvars(linear_solution,1);
+      varinfo = Presolve::findvars(univar_part,1);
+      unsolved_vars = varinfo[3];
+      unsolved_var_nums = varinfo[4];
+      number_new_vars = ncols(unsolved_vars);
+
+      new_vars = "@y(1.."+string(number_new_vars)+")";
+      def R_new = Ring::changevar(new_vars, original_ring);
+      setring R_new;
+      if( !prime_coeff_field ){
+        execute(minpolystr);
+      }
+
+      ideal mapping_ideal;
+      for(i=1; i<=size(unsolved_var_nums); i++){
+        mapping_ideal[unsolved_var_nums[i]] = var(i);
+      }
+
+      map F = original_ring, mapping_ideal;
+      ideal I_new = F( multivar_part );
+
+      list sol_new;
+      int unsolvable = 0;
+      sol_new = simpleSolver(I_new);
+      if( size(sol_new) == 0){
+        unsolvable = 1;
+      }
+
+      setring original_ring;
+
+      if(unsolvable){
+        list sol_old = list();
+      }else{
+        map G = R_new, unsolved_vars;
+        new_sols = G(sol_new);
+        for(i=1; i<=size(new_sols); i++){
+          ideal sol = new_sols[i]+linear_solution;
+          sol = std(sol);
+          ctrl, newelement = add_if_new(ctrl, sol);
+          if(newelement){
+            results = insert(results, sol);
+          }
+          kill sol;
+        }
+      }
+      kill G;
+      kill R_new;
+    }
+  }
+
+  if(voice==2){printf("Runtime: %s ms", rtimer-t)};
+  return( results  );
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = (2,a),x(1..3),lp;
+  minpoly=a2+a+1;
+  ideal I;
+  I[1]=x(1)^2*x(2)+(a)*x(1)*x(2)^2+(a+1);
+  I[2]=x(1)^2*x(2)*x(3)^2+(a)*x(1);
+  I[3]=(a+1)*x(1)*x(3)+(a+1)*x(1);
+  ffsolve(I);
+}
+
+
+////////////////////////////////////////////////////////////////////
+
+
+static proc melyseg(poly g, list start)
+{
+  list gsub = g;
+  int i = 1;
+
+  while( start[1][1] <> char(basering) ){
+    gsub[i+1] = subst( gsub[i], var(i), vec2elm(start[i]));
+    if( gsub[i+1] == 0 ){
+      list new = increment(start,i);
+      for(int l=1; l<=size(start); l++){
+        if(start[l]<>new[l]){
+          i = l;
+          break;
+        }
+      }
+      start = new;
+    }else{
+      if(i == nvars(basering)){
+        return(start);
+      }else{
+        i++;
+      }
+    }
+  }
+  return(list());
+}
+
+static proc productOfEqs(ideal I)
+{
+  system("--no-warn", 1);
+  ideal eqs = sort_ideal(I);
+  int i,q;
+  poly g = 1;
+  q = size(basering);
+  ideal I = defaultIdeal();
+
+  for(i=1; i<=size(eqs); i++){
+    if(g==0){return(g);}
+    g = reduce(g*(eqs[i]^(q-1)-1), I);
+  }
+  return( g );
+}
+
+static proc notSoQuickReduce(poly P)
+{
+  int q = ringlist( basering )[1];
+  int nov = nvars( basering );
+  poly reducedPoly = 0;
+  poly M;
+  int i, j, e;
+  intvec exps;
+
+  for(i=1; i<=size(P); i++){
+    if( deg(P[i]) > q-1 ){
+      M = leadcoef( P[i] );
+      exps = leadexp( P[i] );
+      for(j=1; j<=size(exps); j++){
+        if( exps[j] > q-1 ){
+          e = exps[j] % (q-1);
+          if( e == 0 ){ e = q-1; }
+        }else{
+          e = exps[j];
+        }
+        M = M*var(j)^e;
+      }
+    }else{
+      M = P[i];
+    }
+    reducedPoly = reducedPoly + M;
+  }
+  return( reducedPoly );
+}
+
+static proc polypowmod(poly P, int E, ideal I)
+{
+  system("--no-warn", 1);
+  list pot;
+  poly rs = 1;
+
+  while( E > 0 ){
+    pot[ size(pot)+1 ] = E % 2;
+    E = E / 2;
+    if( pot[size(pot)] ){
+      rs = reduce(rs*P, I);
+    }
+    P = reduce(P*P,I);
+  }
+  return( reduce(rs, I) );
+}
+
+static proc clonering(list #)
+{
+  def original_ring = basering;
+  int n = nvars(original_ring);
+  int prime_field=npars(basering);
+  if(prime_field){
+    string minpolystr = "minpoly="+
+    get_minpoly_str(size(original_ring),parstr(original_ring,1))+";" ;
+  }
+
+  if(size(#)){
+    int newvars = #[1];
+
+  }else{
+    int newvars = nvars(original_ring);
+  }
+  string newvarstr = "v(1.."+string(newvars)+")";
+  def newring = Ring::changevar(newvarstr, original_ring);
+  setring newring;
+  if( prime_field ){
+    execute(minpolystr);
+  }
+  return(newring);
+}
+
+static proc defaultIdeal()
+{
+  ideal I;
+  for(int i=1; i<=nvars(basering); i++){
+    I[i] = var(i)^size(basering)-var(i);
+  }
+  return( std(I) );
+}
+
+static proc order_of_extension()
+{
+  int oe=1;
+  list rl = ringlist(basering);
+  if( size(rl[1]) <> 1){
+    oe = deg( subst(minpoly,par(1),var(1)) );
+  }
+  return(oe);
+}
+
+
+static proc vec2elm(intvec v)
+{
+  number g = 1;
+  if(npars(basering) == 1){ g=par(1); }
+  number e=0;
+  int oe = size(v);
+  for(int i=1; i<=oe; i++){
+    e = e+v[i]*g^(oe-i);
+  }
+  return(e);
+}
+
+static proc random_vector()
+{
+  int c = char(basering);
+  intvec v = 0:order_of_extension();
+  for(int i=1; i<=size(v); i++){
+    v[i] = random(0, c-1);
+  }
+  return(v);
+}
+
+static proc increment(list l, list #)
+{
+  int c, i, j, oe;
+  oe = order_of_extension();
+  c = char(basering);
+
+  if( size(#) == 1 ){
+    i = #[1];
+  }else{
+    i = size(l);
+  }
+
+  l[i] = nextVec(l[i]);
+  while( l[i][1] == c && i>1 ){
+    l[i] = 0:oe;
+    i--;
+    l[i] = nextVec(l[i]);
+  }
+  if( i < size(l) ){
+    for(j=i+1; j<=size(l); j++){
+      l[j] = 0:oe;
+    }
+  }
+  return(l);
+}
+
+static proc nextVec(intvec l)
+{
+  int c, i, j;
+  i = size(l);
+  c = char(basering);
+  l[i] = l[i] + 1;
+  while( l[i] == c && i>1 ){
+    l[i] = 0;
+    i--;
+    l[i] = l[i] + 1;
+  }
+  return(l);
+}
+
+
+
+static proc every_vector()
+{
+  list element, list_of_elements;
+
+  for(int i=1; i<=nvars(basering); i++){
+    element[i] = 0:order_of_extension();
+  }
+
+  while(size(list_of_elements) < size(basering)^nvars(basering)){
+    list_of_elements = list_of_elements + list(element);
+    element = increment(element);
+  }
+  for(int i=1; i<=size(list_of_elements); i++){
+    for(int j=1; j<=size(list_of_elements[i]); j++){
+      list_of_elements[i][j] = vec2elm(list_of_elements[i][j]);
+    }
+  }
+  return(list_of_elements);
+}
+
+static proc num2int(number a)
+{
+  int N=0;
+  if(order_of_extension() == 1){
+    N = int(a);
+    if(N<0){
+      N = N + char(basering);
+    }
+  }else{
+    ideal C = coeffs(subst(a,par(1),var(1)),var(1));
+    for(int i=1; i<=ncols(C); i++){
+      int c = int(C[i]);
+      if(c<0){ c = c + char(basering); }
+      N = N + c*char(basering)^(i-1);
+    }
+  }
+  return(N);
+}
+
+static proc listnum2int(list L){
+  int N=0;
+  int q = size(basering);
+  for(int i=1; i<=nvars(basering); i++){
+    N = N + num2int(number(L[i]))*q^(nvars(basering)-i);
+  }
+  return(N);
+}
+
+static proc get_minpoly_str(int size_of_ring, string parname)
+{
+  def original_ring = basering;
+  ring new_ring = (size_of_ring, A),x,lp;
+  string S = string(minpoly);
+  string SMP;
+  if(S=="0"){
+    SMP = SMP+parname;
+  }else{
+    for(int i=1; i<=size(S); i++){
+      if(S[i]=="A"){
+        SMP = SMP+parname;
+      }else{
+        SMP = SMP+S[i];
+      }
+    }
+  }
+  return(SMP);
+}
+
+static proc sort_ideal(ideal I)
+{
+  ideal OI;
+  int i,j,M;
+  poly P;
+  M = ncols(I);
+  OI = I;
+  for(i=2; i<=M; i++){
+    j=i;
+    while(size(OI[j-1])>size(OI[j])){
+      P = OI[j-1];
+      OI[j-1] = OI[j];
+      OI[j] = P;
+      j--;
+      if(j==1){ break; }
+    }
+  }
+  return(OI);
+}
+
+static proc add_if_new(list L, ideal I)
+{
+  int i, newelement;
+  poly P;
+
+  for(i=1; i<=nvars(basering); i++){
+    P = P +  reduce(var(i),I)*var(1)^(i-1);
+  }
+  newelement=1;
+  for(i=1; i<=size(L); i++){
+    if(L[i]==P){
+      newelement=0;
+      break;
+    }
+  }
+  if(newelement){
+    L = insert(L, P);
+  }
+  return(L,newelement);
+}
