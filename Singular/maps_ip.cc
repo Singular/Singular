@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -68,10 +67,10 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         if (currRing->minpoly!=NULL)
         {
           number a=(number)res->data;
-	  number one=nInit(1);
+          number one=nInit(1);
           number product = nMult(a,one );
-	  nDelete(&one);
-	  nDelete(&a);
+          nDelete(&one);
+          nDelete(&a);
           res->data=(void *)product;
         }
         #ifdef LDEBUG

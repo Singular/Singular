@@ -1,0 +1,35 @@
+Chanes since 3-1-3-3:
+- new library: realclassify.lib
+- new library: parallel.lib
+- test code for threads/semaphores
+- libray grobcov.lib updated
+- library modstd.lib updated
+- fix sqrfree
+- new library: symodstd.lib
+
+Chanes since 3-1-3-2:
+- blackbox types, newstruct etc.
+- factory fixes: implemnts factorize/gcd for more kinds of polynomials
+- Do 29. Sep 17:34:08 CEST 2011: 3-1-3-3
+
+Changes since 3-1-3-1:
+- libsingular fixed (and examples provided)
+- Di 24. Mai 17:32:18 CEST 2011: 3-1-3-2
+
+Changes since 3-1-3:
+- update normliz/normaliz.lib to 2.7
+- missing ncfactor.lib -> Singular-share
+- operator / for int yields a warning
+- port to SolarisStudio compiler on linux
+  (./configure --without-dl;make install;cd Singular;make Singular-static)
+- fixes to ssiLinks: can also transmit newstruct
+- added to newstruct: for each rin-dep. member a an additional,
+  read-only member r_a iis added (the ring a is in) 
+- degBound also for non-commutive rings
+- added all that libs that missed the 3-1-3 deadline
+- Di 26. Apr 12:07:06 CEST 2011: 3-1-3-1
+
+Do 7. Apr 2011
+Release 3-1-3
+
+
