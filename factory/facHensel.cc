@@ -475,6 +475,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       b = coeffBound( G, p, mipo );
       modpk bb= coeffBound (F, p, mipo );
       if (bb.getk() > b.getk() ) b=bb;
+      fail= false;
     }
     else
       break;
@@ -502,9 +503,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       if (l == k)
         continue;
       else
-      {
         tmp= mulNTL (tmp, bufFactors[l]);
-      }
     }
     L.append (tmp);
   }
@@ -521,7 +520,6 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   if (e.isZero())
     return recResult;
   CanonicalForm coeffE;
-  CFList s;
   CFList result= recResult;
   setCharacteristic (p);
   recResult= mapinto (recResult);
@@ -839,7 +837,6 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
       tmp[l]= b (tmp[l]);
     Pi[l] += tmp[l]*xToJ*F.mvar();
   }
-  return;
 }
 
 void
