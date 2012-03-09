@@ -450,7 +450,7 @@ apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
 CanonicalForm
 mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
 {
-    if ( f.inCoeffDomain() )
+    if ( f.inBaseDomain() )
         return mf( f );
     else
     {
