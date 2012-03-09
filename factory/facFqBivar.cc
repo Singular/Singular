@@ -485,7 +485,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   TT= copy (factors);
   bool recombination= false;
   CanonicalForm test;
-  CanonicalForm buf0= mulNTL (buf (0, x), LCBuf, b);
+  CanonicalForm buf0= mulNTL (buf (0, x), LCBuf);
   bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
   while (T.length() >= 2*s && s <= thres)
   {
@@ -544,7 +544,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             M= power (y, l);
             if (!isRat)
               Off (SW_RATIONAL);
-            buf0= mulNTL (buf (0, x), LCBuf, b);
+            buf0= mulNTL (buf (0, x), LCBuf);
             // compute new possible degree pattern
             bufDegs2= DegreePattern (T);
             bufDegs1.intersect (bufDegs2);
@@ -661,8 +661,8 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
   int d= degree (F), l= 0;
-  CanonicalForm buf0= mulNTL (buf (0,x), LCBuf, b);
-  CanonicalForm buf1= mulNTL (buf (1,x), LCBuf, b);
+  CanonicalForm buf0= mulNTL (buf (0,x), LCBuf);
+  CanonicalForm buf1= mulNTL (buf (1,x), LCBuf);
   CanonicalForm test0, test1;
   bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
   for (CFListIterator i= factors; i.hasItem(); i++, l++)
@@ -692,8 +692,8 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
             LCBuf= LC (buf, x);
             if (!isRat)
               Off (SW_RATIONAL);
-            buf0= mulNTL (buf (0,x), LCBuf, b);
-            buf1= mulNTL (buf (1,x), LCBuf, b);
+            buf0= mulNTL (buf (0,x), LCBuf);
+            buf1= mulNTL (buf (1,x), LCBuf);
             T= Difference (T, CFList (i.getItem()));
             F= buf;
 
@@ -912,11 +912,30 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CanonicalForm lcA0= 0;
   if (getCharacteristic() == 0 && b.getp() != 0)
   {
-    lcA0= lc (A (0, 2));
-    A *= b.inverse (lcA0);
-    A= b (A);
-    for (CFListIterator i= bufUniFactors; i.hasItem(); i++)
-      i.getItem()= b (i.getItem()*b.inverse (lc (i.getItem())));
+    if (alpha.level() == 1)
+    {
+      lcA0= lc (A (0, 2));
+      A *= b.inverse (lcA0);
+      A= b (A);
+      for (CFListIterator i= bufUniFactors; i.hasItem(); i++)
+        i.getItem()= b (i.getItem()*b.inverse (lc (i.getItem())));
+    }
+    else
+    {
+      lcA0= Lc (A (0,2));
+      ZZX NTLlcA0= convertFacCF2NTLZZX (lcA0);
+      ZZX NTLmipo= convertFacCF2NTLZZX (getMipo (alpha));
+      ZZ NTLpk= power_ZZ (b.getp(), b.getk());
+      ZZ_p::init (NTLpk);
+      ZZ_pX S, T, G;
+      XGCD (G, S, T, to_ZZ_pX (NTLlcA0), to_ZZ_pX(NTLmipo));
+      CanonicalForm lcA0inverse= convertNTLZZX2CF (to_ZZX (S), alpha);
+      A *= lcA0inverse;
+      A= b (A);
+      // Lc of bufUniFactors is in Z
+      for (CFListIterator i= bufUniFactors; i.hasItem(); i++)
+        i.getItem()= b (i.getItem()*b.inverse (lc (i.getItem())));
+    }
   }
   bufUniFactors.insert (LC (A, x));
   CFMatrix M= CFMatrix (liftBound, bufUniFactors.length() - 1);
