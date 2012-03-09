@@ -103,7 +103,9 @@ coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo )
     K *= power (CanonicalForm (2), M);
     int N= degree (mipo);
     CanonicalForm b;
-    b= 2*power (maxNorm (f), N)*power (maxNorm (mipo), 4*N)*K*power (CanonicalForm (2), N)*(CanonicalForm (M+1).sqrt()+1)*power (CanonicalForm (N+1).sqrt()+1, 7*N);
+    b= 2*power (maxNorm (f), N)*power (maxNorm (mipo), 4*N)*K*
+       power (CanonicalForm (2), N)*(CanonicalForm (M+1).sqrt()+1)*
+       power (CanonicalForm (N+1).sqrt()+1, 7*N);
     b /= power (abs (lc (mipo)), N);
 
     ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
@@ -354,6 +356,10 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     A= F*bCommonDen (F);
   else
     A= F;
+
+  CanonicalForm mipo;
+  if (extension)
+    mipo= getMipo (v);
 
   if (A.isUnivariate())
   {
@@ -609,7 +615,6 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     swap2= true;
   }
 
-
   if (degs.getLength() == 1) // A is irreducible
   {
     factors.append (A);
@@ -642,12 +647,35 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
       bb= coeffBound (F, p);
     if (bb.getk() > b.getk() ) b=bb;
   }
+  else
+  {
+    A /= Lc (Aeval);
+    A *= bCommonDen (A);
+    // make factors elements of Z(a)[x] disable for modularDiophant
+    for (CFListIterator i= uniFactors; i.hasItem(); i++)
+      i.getItem()= i.getItem()*bCommonDen(i.getItem());
+    Off (SW_RATIONAL);
+    int i= 0;
+    ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
+    CanonicalForm discMipo= convertZZ2CF (discriminant (NTLmipo));
+    findGoodPrime (F*discMipo,i);
+    findGoodPrime (Aeval*discMipo,i);
+    findGoodPrime (A*discMipo,i);
+
+    int p=cf_getBigPrime(i);
+    b = coeffBound( A, p, mipo );
+    modpk bb= coeffBound (Aeval, p, mipo);
+    if (bb.getk() > b.getk() ) b=bb;
+      bb= coeffBound (F, p, mipo);
+    if (bb.getk() > b.getk() ) b=bb;
+  }
 
   ExtensionInfo dummy= ExtensionInfo (false);
+  if (extension)
+    dummy= ExtensionInfo (v, false);
   bool earlySuccess= false;
   CFList earlyFactors;
   TIMING_START (fac_hensel_lift);
-  //maybe one should use a multiple of LC (A,1) and try a nonmonic lifting here?
   uniFactors= henselLiftAndEarly
               (A, earlySuccess, earlyFactors, degs, liftBound,
                uniFactors, dummy, evaluation, b);
@@ -659,8 +687,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                 uniFactors.length()/2, b);
 
-  if (!extension)
-    On (SW_RATIONAL);
+  On (SW_RATIONAL);
 
   if (earlySuccess)
     factors= Union (earlyFactors, factors);
