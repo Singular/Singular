@@ -50,10 +50,9 @@ void kronSub (fmpz_poly_t result, const CanonicalForm& A, int d)
 
 
 CanonicalForm
-reverseSubstQa (const fmpz_poly_t F, int d, const Variable& alpha,
-                const CanonicalForm& den)
+reverseSubstQa (const fmpz_poly_t F, int d, const Variable& x,
+                const Variable& alpha, const CanonicalForm& den)
 {
-  Variable x= Variable (1);
 
   CanonicalForm result= 0;
   int i= 0;
@@ -114,7 +113,7 @@ mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G,
   fmpz_poly_mul (FLINTA, FLINTA, FLINTB);
 
   denA *= denB;
-  A= reverseSubstQa (FLINTA, d, alpha, denA);
+  A= reverseSubstQa (FLINTA, d, F.mvar(), alpha, denA);
 
   fmpz_poly_clear (FLINTA);
   fmpz_poly_clear (FLINTB);
@@ -225,7 +224,7 @@ mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
   fmpz_poly_mullow (FLINTA, FLINTA, FLINTB, k);
 
   denA *= denB;
-  A= reverseSubstQa (FLINTA, d, alpha, denA);
+  A= reverseSubstQa (FLINTA, d, F.mvar(), alpha, denA);
   fmpz_poly_clear (FLINTA);
   fmpz_poly_clear (FLINTB);
   return A;
@@ -518,7 +517,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (CFFactory::gettype() == GaloisFieldDomain)
     return mod (F, G);
-  if (F.inCoeffDomain() && G.isUnivariate())
+  if (F.inCoeffDomain() && G.isUnivariate() && !G.inCoeffDomain())
   {
     if (b.getp() != 0)
       return b(F);
@@ -631,11 +630,9 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (CFFactory::gettype() == GaloisFieldDomain)
     return div (F, G);
-  if (F.inCoeffDomain() && G.isUnivariate())
+  if (F.inCoeffDomain() && G.isUnivariate() && !G.inCoeffDomain())
   {
-    if (b.getp() != 0)
-      return b(F);
-    return F;
+    return 0;
   }
   else if (F.inCoeffDomain() && G.inCoeffDomain())
   {
@@ -652,7 +649,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         ZZ_pX NTLg= convertFacCF2NTLZZpX (G);
         ZZ_pX NTLf= convertFacCF2NTLZZpX (F);
         ZZ_pE result;
-        div (result, to_ZZ_pE (NTLg), to_ZZ_pE (NTLf));
+        div (result, to_ZZ_pE (NTLf), to_ZZ_pE (NTLg));
         return b (convertNTLZZpX2CF (rep (result), alpha));
       }
       return b(div (F,G));
@@ -2841,6 +2838,9 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
   }
 #ifdef HAVE_FLINT
   Variable alpha;
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
   if (!hasFirstAlgVar (A, alpha) && !hasFirstAlgVar (B, alpha))
   {
     fmpq_poly_t FLINTA,FLINTB;
@@ -2850,11 +2850,10 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     bool result= fmpq_poly_is_zero (FLINTA);
     fmpq_poly_clear (FLINTA);
     fmpq_poly_clear (FLINTB);
+    if (!isRat)
+      Off (SW_RATIONAL);
     return result;
   }
-  bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
   CanonicalForm Q, R;
   Variable x= Variable (1);
   Variable y= Variable (2);
