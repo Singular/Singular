@@ -131,6 +131,7 @@ int main(          /* main entry to Singular */
   int cpus = (int)(long)feOptValue(FE_OPT_CPUS);
   sipc_semaphore_init(0, cpus);
 #endif
+
   /* say hello */
   //for official version: not active
   //bigintm_setup();
