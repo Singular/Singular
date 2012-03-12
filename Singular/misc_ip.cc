@@ -1214,6 +1214,15 @@ void siInit(char *name)
 // singular links: --------------------------------------------------
   slStandardInit();
   myynest=0;
+// semapohore 0 -----------------------------------------------------
+  int cpus=2;
+  int cpu_n;
+  #ifdef _SC_NPROCESSORS_ONLN
+  if ((cpu_n=sysconf(_SC_NPROCESSORS_ONLN))>cpus) cpus=cpu_n;
+  #elif defined(_SC_NPROCESSORS_CONF)
+  if ((cpu_n=sysconf(_SC_NPROCESSORS_CONF))>cpus) cpus=cpu_n;
+  #endif
+  feSetOptValue(FE_OPT_CPUS, cpus);
 
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
