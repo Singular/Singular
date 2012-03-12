@@ -79,7 +79,19 @@ proc mod_init()
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
 newstruct("pdivisor","list summands, cone tail");
+
+system("install","divisor","print",divisor_print,1);
+
+system("install","divisor","+",divisorplus,2);
 }
+
+
+
+proc divisor_print(divisor D)
+{
+"Divisor = ("+string(D.den)+") - ("+string(D.num)+")";
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +108,7 @@ return(C);
 proc divisorplus(divisor A, divisor B){
 return(makeDivisor(interred(A.num*B.num),interred(A.den*B.den)));
 }
+
 
 proc multdivisor(int n, divisor A){
 if (n<0) {return(multdivisor(-n,negativedivisor(A)));}
@@ -351,10 +364,13 @@ if (!(containsInSupport(dC,vv))) {ERROR("the linear form given should be in the 
 for (i=1; i<=size(L);i++){
         vL[i]=list(); 
         vL[i][2]=L[i][2];
-	      vL[i][1]=Polymake::minimalValue(L[i][1],vv);
+	vL[i][1]=Polymake::minimalValue(L[i][1],vv);
 }
 vD.summands = vL;
 return(vD);}
+
+
+
 
 
 proc pdivisorplus(pdivisor A, pdivisor B){
