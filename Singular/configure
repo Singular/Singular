@@ -1419,13 +1419,11 @@ cross_compiling=$ac_cv_prog_cc_cross
 fi
 
 # check whether the compiler accepts -pipe
-if test x$ac_cv_c_cpp = xgcc2 -o  x$ac_cv_c_cpp = xgcc3
-then
-  echo $ac_n "checking whether compiler accepts -pipe""... $ac_c" 1>&6
+echo $ac_n "checking whether compiler accepts -pipe""... $ac_c" 1>&6
 echo "configure:1448: checking whether compiler accepts -pipe" >&5
-  temp_cflags="${CFLAGS}"
-  CFLAGS="${CFLAGS} -pipe"
-  if eval "test \"`echo '$''{'ac_cv_cxx_have_pipe'+set}'`\" = set"; then
+temp_cflags="${CFLAGS}"
+CFLAGS="${CFLAGS} -pipe"
+if eval "test \"`echo '$''{'ac_cv_cxx_have_pipe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
@@ -1448,11 +1446,8 @@ fi
 rm -f conftest*
 fi
 
-  echo "$ac_t""${ac_cv_cxx_have_pipe}" 1>&6
-  CFLAGS=${temp_cflags}
-else
-  ac_cv_cxx_have_pipe="no"
-fi
+echo "$ac_t""${ac_cv_cxx_have_pipe}" 1>&6
+CFLAGS=${temp_cflags}
 
 if test "${ac_cv_cxx_have_pipe}" != yes; then
   PIPE=
@@ -5865,9 +5860,9 @@ fi
 
 NEED_LIBSG="${NEED_LIBS}"
 if test "$ac_cv_sizeof_voidp" != 4; then
-  NEED_LIBS="${NEED_LIBS} -lomalloc"
+  NEED_LIBS="${NEED_LIBS} -lomalloc -lrt -lpthread"
 else
-  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug"
+  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lrt -lpthread"
 fi
 
 

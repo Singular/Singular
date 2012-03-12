@@ -81,6 +81,9 @@ Use RSH for MP connections
 .TP
 \fB\-\-ticks\-per\-sec\fR=\fITICKS\fR
 Sets unit of timer to TICKS per second
+.TP
+\fB\-\-cpus\fR=\fICPUS\fR
+maximal number of CPUs to use
 .PP
 For more information, type `help;' from within Singular or visit
 http://www.singular.uni\-kl.de or consult the

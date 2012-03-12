@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -137,6 +136,9 @@ struct fe_option feOptSpec[] =
 
   {"min-time",          required_argument,  LONG_OPTION_RETURN,
   "SECS",     "Do not display times smaller than SECS (in seconds)",   feOptString, (void*) "0.5",  0},
+
+  {"cpus",            required_argument,    LONG_OPTION_RETURN,
+   "#CPUs",   "maximal number of CPUs to use",                         feOptInt,    (void*)2,      0},
 
   {"MPport",           required_argument,   LONG_OPTION_RETURN,
    "PORT",     "Use PORT number for conections",                       feOptString,    0,      0},
@@ -397,7 +399,7 @@ static const char* feOptAction(feOptIndex opt)
 
       case FE_OPT_RANDOM:
         siRandomStart = (unsigned int) ((unsigned long)
-			                  (feOptSpec[FE_OPT_RANDOM].value));
+                                          (feOptSpec[FE_OPT_RANDOM].value));
         siSeed=siRandomStart;
 #ifdef HAVE_FACTORY
         factoryseed(siRandomStart);

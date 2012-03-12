@@ -47,6 +47,9 @@
 #include <Singular/mpsr.h>
 #endif
 
+#ifdef HAVE_SIMPLEIPC
+#include <Singular/simpleipc.h>
+#endif
 //#if (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
 //#define HAVE_PSELECT
 //#endif
@@ -1515,12 +1518,18 @@ do_select:
   }
 
   /* check with select: chars waiting: no -> not ready */
+  #ifdef HAVE_SIMPLEIPC
+  sipc_semaphore_release(0);
+  #endif
   #ifdef HAVE_PSELECT
   s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
   #else
   SSI_BLOCK_CHLD;
   s = select(max_fd, &mask, NULL, NULL, wt_ptr);
   SSI_UNBLOCK_CHLD;
+  #endif
+  #ifdef HAVE_SIMPLEIPC
+  sipc_semaphore_acquire(0);
   #endif
 
   if (s==-1)
