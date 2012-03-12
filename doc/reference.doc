@@ -1,4 +1,4 @@
-@comment -*-texinfo-*-
+s@comment -*-texinfo-*-
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6991,7 +6991,7 @@ sent literally to the shell.
 @cindex pid
 @cindex system, pid
 returns the process number as int (for creating unique names).
-@item @code{system("cpu")}
+@item @code{system("--cpus")}
 @cindex cpu
 @cindex system, cpu
 returns the number of cpu cores as int (for using multiple cores).
