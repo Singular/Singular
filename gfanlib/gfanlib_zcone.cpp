@@ -737,9 +737,8 @@ ZCone::ZCone(int ambientDimension):
   preassumptions(PCP_impliedEquationsKnown|PCP_facetsKnown),
   multiplicity(1),
   haveExtremeRaysBeenCached(false),
-  haveGeneratorsOfSpanBeenCached(false),
   haveGeneratorsOfLinealitySpaceBeenCached(false),
-  hasQuotientLatticeBasisBeenCached(false),
+  haveGeneratorsOfSpanBeenCached(false),
   linearForms(ZMatrix(0,ambientDimension))
 {
 }
@@ -752,9 +751,8 @@ ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preass
   preassumptions(preassumptions_),
   multiplicity(1),
   haveExtremeRaysBeenCached(false),
-  haveGeneratorsOfSpanBeenCached(false),
   haveGeneratorsOfLinealitySpaceBeenCached(false),
-  hasQuotientLatticeBasisBeenCached(false),
+  haveGeneratorsOfSpanBeenCached(false),
   n(inequalities_.getWidth()),
   linearForms(ZMatrix(0,inequalities_.getWidth()))
   {
@@ -763,20 +761,27 @@ ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preass
   ensureStateAsMinimum(1);
 }
 
-ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, ZMatrix const &cachedExtremeRays_, int preassumptions_):
+ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, ZMatrix const &cachedExtremeRays_, ZMatrix const &cachedGeneratorsOfLinealitySpace_, ZMatrix const &cachedGeneratorsOfSpan_, int preassumptions_):
   inequalities(inequalities_),
   equations(equations_),
   cachedExtremeRays(cachedExtremeRays_),
+  cachedGeneratorsOfLinealitySpace(cachedExtremeRays_),
+  cachedGeneratorsOfSpan(cachedGeneratorsOfSpan_),
   state(0),
   preassumptions(preassumptions_),
   multiplicity(1),
-  haveExtremeRaysBeenCached(true),
-  haveGeneratorsOfSpanBeenCached(false),
+  haveExtremeRaysBeenCached(false),
   haveGeneratorsOfLinealitySpaceBeenCached(false),
-  hasQuotientLatticeBasisBeenCached(false),
+  haveGeneratorsOfSpanBeenCached(false),
   n(inequalities_.getWidth()),
   linearForms(ZMatrix(0,inequalities_.getWidth()))
   {
+    if (cachedExtremeRays_.getWidth()!=0)
+      haveExtremeRaysBeenCached=true;
+    if (cachedGeneratorsOfLinealitySpace_.getWidth()!=0)
+      haveGeneratorsOfLinealitySpaceBeenCached=true;
+    if (cachedGeneratorsOfSpan_.getWidth()!=0)
+      haveGeneratorsOfSpanBeenCached=true;
   assert(preassumptions_<4);//OTHERWISE WE ARE DOING SOMETHING STUPID LIKE SPECIFYING AMBIENT DIMENSION
   assert(equations_.getWidth()==n);
   ensureStateAsMinimum(1);
@@ -858,6 +863,8 @@ int ZCone::dimension()const
 
 int ZCone::dimensionOfLinealitySpace()const
 {
+  if(haveGeneratorsOfLinealitySpaceBeenCached)
+    return cachedGeneratorsOfLinealitySpace.getHeight();
   ZMatrix temp=inequalities;
   temp.append(equations);
   ZCone temp2(ZMatrix(0,n),temp);
@@ -1190,34 +1197,6 @@ void ZCone::setLinearForms(ZMatrix const &linearForms_)
 }
 
 
-void ZCone::setExtremeRays(ZMatrix const &extremeRays_)
-{
-  cachedExtremeRays=extremeRays_;
-  haveExtremeRaysBeenCached=true;
-}
-
-
-void ZCone::setGeneratorsOfSpan(ZMatrix const &generatorsOfSpan_)
-{
-  cachedGeneratorsOfSpan=generatorsOfSpan_;
-  haveGeneratorsOfSpanBeenCached=true;
-}
-
-
-void ZCone::setGeneratorsOfLinealitySpace(ZMatrix const &generatorsOfLinealitySpace_)
-{
-  cachedGeneratorsOfLinealitySpace=generatorsOfLinealitySpace_;
-  haveGeneratorsOfLinealitySpaceBeenCached=true;
-}
-
-
-void ZCone::setQuotientLatticeBasis(ZMatrix const &quotientLatticeBasis_)
-{
-  cachedQuotientLatticeBasis=quotientLatticeBasis_;
-  hasQuotientLatticeBasisBeenCached=true;
-}
-
-
 ZMatrix ZCone::quotientLatticeBasis()const
 {
 //  assert(isInStateMinimum(1));// Implied equations must have been computed in order to know the span of the cone
@@ -1373,16 +1352,26 @@ ZMatrix ZCone::getEquations()const
 
 ZMatrix ZCone::generatorsOfSpan()const
 {
+  if(haveGeneratorsOfSpanBeenCached)
+      return cachedGeneratorsOfSpan;
+
   ensureStateAsMinimum(1);
   QMatrix l=ZToQMatrix(equations);
-  return QToZMatrixPrimitive(l.reduceAndComputeKernel());
+  cachedGeneratorsOfSpan=QToZMatrixPrimitive(l.reduceAndComputeKernel());
+  haveGeneratorsOfSpanBeenCached=true;
+  return cachedGeneratorsOfSpan;
 }
 
 
 ZMatrix ZCone::generatorsOfLinealitySpace()const
 {
+  if(haveGeneratorsOfLinealitySpaceBeenCached)
+    return cachedGeneratorsOfLinealitySpace;
+
   QMatrix l=ZToQMatrix(combineOnTop(inequalities,equations));
-  return QToZMatrixPrimitive(l.reduceAndComputeKernel());
+  cachedGeneratorsOfLinealitySpace=QToZMatrixPrimitive(l.reduceAndComputeKernel());
+  haveGeneratorsOfLinealitySpaceBeenCached=true;
+  return cachedGeneratorsOfLinealitySpace;
 }
 
 };
