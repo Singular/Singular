@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -29,10 +28,22 @@
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #define BYTES_TO_CHECK 7
 
+char* si_bultin_libs[]={ "huhu.so", NULL };
+
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
   const char mach_o[]={0xfe,0xed,0xfa,0xce,0};
   const char mach_o_module[]={0xce,0xfa,0xed,0xfe,0};
+  int i=0;
+  while(si_bultin_libs[i]!=NULL)
+  {
+    if (strcmp(newlib,si_bultin_libs[i])==0)
+    {
+      if(libnamebuf!=NULL) strcpy(libnamebuf,newlib);
+      return LT_BUILTIN;
+    }
+    i++;
+  }
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
@@ -85,7 +96,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-   
+
   if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
   {
     LT = LT_HPUX;
@@ -202,7 +213,7 @@ void *dynl_open(
   else
     Werror("module %s already loaded",filename);
   return NULL;
-// alternative  
+// alternative
 //    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 }
 

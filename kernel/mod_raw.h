@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -13,7 +12,7 @@
  *           dunl_close()
 */
 
-typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O} lib_types;
+typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O, LT_BUILTIN} lib_types;
 
 lib_types type_of_LIB(char *newlib, char *fullname);
 

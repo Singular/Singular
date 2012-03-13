@@ -171,6 +171,10 @@ int main(          /* main entry to Singular */
 #endif /* HAVE_FANS */
   errorreported = 0;
 
+  // -- example for "static" modules ------
+  //load_builtin("huhu.so",FALSE,(SModulFunc_t)huhu_mod_init);
+  //module_help_main("huhu.so","Help for huhu\nhaha\n");
+  //module_help_proc("huhu.so","p","Help for huhu::p\nhaha\n");
   setjmp(si_start_jmpbuf);
 
   // Now, put things on the stack of stuff to do
