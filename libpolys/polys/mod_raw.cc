@@ -33,6 +33,8 @@
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #define BYTES_TO_CHECK 7
 
+char* si_bultin_libs[]={ "huhu.so", NULL };
+
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
   const unsigned char mach_o[]={0xfe,0xed,0xfa,0xce,0};
@@ -41,6 +43,16 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   const unsigned char mach_o64[]={0xfe,0xed,0xfa,0xcf,0};
   const unsigned char mach_O64[]={0xcf,0xfa,0xed,0xfe,0};
    
+  int i=0;
+  while(si_bultin_libs[i]!=NULL)
+  {
+    if (strcmp(newlib,si_bultin_libs[i])==0)
+    {
+      if(libnamebuf!=NULL) strcpy(libnamebuf,newlib);
+      return LT_BUILTIN;
+    }
+    i++;
+  }
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
@@ -92,7 +104,8 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     //newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
-   
+
+
   if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
   {
     LT = LT_HPUX;
@@ -206,7 +219,11 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(ix86Mac_darwin)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(x86_64Mac_darwin)
 #define HAVE_ELF_SYSTEM
 #endif
 

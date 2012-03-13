@@ -5193,6 +5193,8 @@ BOOLEAN jjLOAD(char *s, BOOLEAN autoexport)
         IDPACKAGE(pl)->loaded=(!bo);
         return bo;
       }
+      case LT_BUILTIN:
+        return FALSE;
       case LT_MACH_O:
       case LT_ELF:
       case LT_HPUX:

@@ -699,6 +699,10 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
       else if ((LT==LT_ELF) || (LT==LT_HPUX))
         LoadResult = load_modules(s,libnamebuf,FALSE);
       #endif
+      else if (LT==LT_BUILTIN)
+      {
+        LoadResult=load_builtin(s,FALSE,(SModulFunc_t)NULL);
+      }
       if(!LoadResult )
       {
         v->name = iiConvName(libname);
@@ -1021,8 +1025,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
-  typedef int (*fktn2_t)(SModulFunctions*);
-  fktn2_t fktn;
+  SModulFunc_t fktn;
   idhdl pl;
   char *plib = iiConvName(newlib);
   BOOLEAN RET=TRUE;
@@ -1069,7 +1072,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
 
     package s=currPack;
     currPack=IDPACKAGE(pl);
-    fktn = (fktn2_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
+    fktn = (SModulFunc_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL)
     {
       sModulFunctions.iiArithAddCmd = iiArithAddCmd;
@@ -1088,6 +1091,82 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   return RET;
 #endif /*STATIC */
 }
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
+{
+  int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
+                 BOOLEAN(*func)(leftv res, leftv v));
+  typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
+                               BOOLEAN pstatic,
+                               BOOLEAN(*func)(leftv res, leftv v)));
+  SModulFunc_t fktn;
+  idhdl pl;
+  char *plib = iiConvName(newlib);
+  BOOLEAN RET=TRUE;
+  int token;
+
+  pl = IDROOT->get(plib,0);
+  if (pl==NULL)
+  {
+    pl = enterid( plib,0, PACKAGE_CMD, &IDROOT,
+                  TRUE );
+    IDPACKAGE(pl)->language = LANG_C;
+    IDPACKAGE(pl)->libname=omStrDup(newlib);
+  }
+  IDPACKAGE(pl)->handle=(void *)NULL;
+  SModulFunctions sModulFunctions;
+
+  package s=currPack;
+  currPack=IDPACKAGE(pl);
+  if( init!= NULL)
+  {
+    sModulFunctions.iiArithAddCmd = iiArithAddCmd;
+    if (autoexport) sModulFunctions.iiAddCproc = iiAddCprocTop;
+    else            sModulFunctions.iiAddCproc = iiAddCproc;
+    (*init)(&sModulFunctions);
+  }
+  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", newlib);
+  currPack->loaded=1;
+  currPack=s;
+
+  return FALSE;
+}
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+void module_help_main(char *newlib,const char *help)
+{
+  char *plib = iiConvName(newlib);
+  idhdl pl = IDROOT->get(plib,0);
+  if ((pl==NULL)||(IDTYP(pl)!=PACKAGE_CMD))
+    Werror(">>%s<< is not a package",plib);
+  else
+  {
+    package s=currPack;
+    currPack=IDPACKAGE(pl);
+    idhdl h=enterid(omStrDup("info"),0,STRING_CMD,&IDROOT,FALSE);
+    IDSTRING(h)=omStrDup(help);
+    currPack=s;
+  }
+}
+void module_help_proc(char *newlib,const char *p, const char *help)
+{
+  char *plib = iiConvName(newlib);
+  idhdl pl = IDROOT->get(plib,0);
+  if ((pl==NULL)||(IDTYP(pl)!=PACKAGE_CMD))
+    Werror(">>%s<< is not a package",plib);
+  else
+  {
+    package s=currPack;
+    currPack=IDPACKAGE(pl);
+    char buff[256];
+    buff[255]='\0';
+    strncpy(buff,p,255);
+    strncat(buff,"_help",255-strlen(p));
+    idhdl h=enterid(omStrDup(buff),0,STRING_CMD,&IDROOT,FALSE);
+    IDSTRING(h)=omStrDup(help);
+    currPack=s;
+  }
+}
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
 // loads a dynamic module from the binary path and returns a named function
 // returns NULL, if something fails

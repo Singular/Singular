@@ -78,6 +78,15 @@ typedef struct
 
 
 extern idhdl      currRingHdl;
+/* ================================================================== */
+/* module support */
+typedef int (*SModulFunc_t)(SModulFunctions*);
+BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init);
+void module_help_main(char *newlib,const char *help);
+void module_help_proc(char *newlib,const char *p, const char *help);
+
+/* ================================================================== */
+
 /*extern ring     currRing;  in ring.h */
 /*extern ideal      currQuotient; in structs.h */
 
