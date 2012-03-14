@@ -333,7 +333,6 @@ void yyerror(const char * fmt)
 %type <i>    setrings
 %type <i>    ringcmd1
 %type <i>    mat_cmd
-%type <i>    typ_list1
 
 %type <i>    '=' '<' '>' '+' '-' COLONCOLON
 %type <i>    '/' '[' ']' '^' ',' ';'
@@ -709,7 +708,11 @@ expr:   expr_arithmetic
           {
             if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
-        | typ_list1  '(' expr ')'
+        | RING_DECL_LIST  '(' expr ')'
+          {
+            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
+          }
+        | mat_cmd  '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
@@ -1082,11 +1085,6 @@ mat_cmd: MATRIX_CMD
            { $$ = $1; }
          ;
 
-typ_list1: RING_DECL_LIST
-           { $$ = $1; }
-           | mat_cmd
-           { $$ = $1; }
-	   ;
 /* --------------------------------------------------------------------*/
 /* section of pure commands                                            */
 /* --------------------------------------------------------------------*/
@@ -1219,7 +1217,13 @@ listcmd:
               list_cmd($5,NULL,"// ",TRUE);
             $3.CleanUp();
           }
-        | LISTVAR_CMD '(' elemexpr ',' typ_list1 ')'
+        | LISTVAR_CMD '(' elemexpr ',' RING_DECL_LIST ')'
+          {
+            if($3.Typ() == PACKAGE_CMD)
+              list_cmd($5,NULL,"// ",TRUE);
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' mat_cmd ')'
           {
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
