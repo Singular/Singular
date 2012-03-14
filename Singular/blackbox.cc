@@ -88,12 +88,12 @@ BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2)
   return WrongOp("blackbox_Op2", op, r1);
 }
 
-BOOLEAN blackbox_default_Op3(int op,leftv l, leftv r1,leftv r2, leftv r3)
+BOOLEAN blackboxDefaultOp3(int op,leftv l, leftv r1,leftv r2, leftv r3)
 {
   return WrongOp("blackbox_Op3", op, r1);
 }
 
-BOOLEAN blackbox_default_OpM(int op,leftv res, leftv args)
+BOOLEAN blackboxDefaultOpM(int op,leftv res, leftv args)
 {
   if (op==LIST_CMD)
   {
@@ -161,8 +161,8 @@ int setBlackboxStuff(blackbox *bb, const char *n)
     if (bb->blackbox_Copy==NULL)    bb->blackbox_Copy=blackbox_default_Copy;
     if (bb->blackbox_Op1==NULL)     bb->blackbox_Op1=blackboxDefaultOp1;
     if (bb->blackbox_Op2==NULL)     bb->blackbox_Op2=blackboxDefaultOp2;
-    if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackbox_default_Op3;
-    if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackbox_default_OpM;
+    if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackboxDefaultOp3;
+    if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackboxDefaultOpM;
     if (bb->blackbox_Check==NULL)   bb->blackbox_Check=blackbox_default_Check;
     if (bb->blackbox_serialize==NULL) bb->blackbox_serialize=blackbox_default_serialize;
     if (bb->blackbox_deserialize==NULL) bb->blackbox_deserialize=blackbox_default_deserialize;

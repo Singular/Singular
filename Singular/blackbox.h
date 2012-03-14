@@ -52,7 +52,7 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);
 BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2);
 
 /// default procedure blackboxDefaultOpM, to be called as "default:" branch
-BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r);
+BOOLEAN blackboxDefaultOpM(int op,leftv l, leftv r);
 
 /// default procedure blackbox_default_Print: print the string
 void blackbox_default_Print(blackbox *b,void *d);

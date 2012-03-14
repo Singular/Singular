@@ -299,6 +299,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
 {
   // interpreter: args->1. arg is newstruct
   blackbox *a=getBlackboxStuff(args->Typ());
+  newstruct_desc nt=(newstruct_desc)a->data;
   switch(op)
   {
     case STRING_CMD:
@@ -308,10 +309,30 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
     default:
-      return blackbox_default_OpM(op,res,args);
       break;
   }
-  return TRUE;
+  newstruct_proc p=nt->procs;
+  while((p!=NULL) &&(p->t=op)&&(p->args!=4)) p=p->next;
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(args);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl==NULL) return TRUE;
+    else
+    {
+      res->Copy(sl);
+      return FALSE;
+    }
+  }
+  return blackboxDefaultOpM(op,res,args);
 }
 
 void newstruct_destroy(blackbox *b, void *d)
