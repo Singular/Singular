@@ -377,8 +377,8 @@ lines:
             if(siCntrlc)
             {
               WerrorS("abort...");
-	      while((currentVoice!=NULL) && (currentVoice->prev!=NULL)) exitVoice();
-	      if (currentVoice!=NULL) currentVoice->ifsw=0;
+              while((currentVoice!=NULL) && (currentVoice->prev!=NULL)) exitVoice();
+              if (currentVoice!=NULL) currentVoice->ifsw=0;
             }
             if (errorreported) /* also catches abort... */
             {
@@ -514,16 +514,16 @@ elemexpr:
           }
         | elemexpr '(' exprlist ')'
           {
-	    if ($1.rtyp==UNKNOWN)
-	    { // for x(i)(j)
-	      if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
-	    }
-	    else
-	    {
+            if ($1.rtyp==UNKNOWN)
+            { // for x(i)(j)
+              if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
+            }
+            else
+            {
               $1.next=(leftv)omAllocBin(sleftv_bin);
               memcpy($1.next,&$3,sizeof(sleftv));
               if(iiExprArithM(&$$,&$1,'(')) YYERROR;
-	    }
+            }
           }
         | '[' exprlist ']'
           {
@@ -644,6 +644,10 @@ expr:   expr_arithmetic
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
+        | RING_DECL_LIST '(' exprlist ')'
+          {
+            if(iiExprArithM(&$$,&$3,$1)) YYERROR;
+          }
         | RING_DECL_LIST '(' ')'
           {
             if(iiExprArithM(&$$,NULL,$1)) YYERROR;
@@ -708,11 +712,7 @@ expr:   expr_arithmetic
           {
             if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
-        | RING_DECL_LIST  '(' expr ')'
-          {
-            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
-          }
-        | mat_cmd  '(' expr ')'
+        | mat_cmd '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
@@ -893,18 +893,18 @@ declare_ip_variable:
           {
             if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
-        | mat_cmd  elemexpr '[' expr ']' '[' expr ']'
+        | mat_cmd elemexpr '[' expr ']' '[' expr ']'
           {
-	    leftv v;
-	    idhdl h;
             int r; TESTSETINT($4,r);
             int c; TESTSETINT($7,c);
             if (r < 1)
               MYYERROR("rows must be greater than 0");
             if (c < 0)
               MYYERROR("cols must be greater than -1");
-	    if ($1==MATRIX_CMD)
-	    {
+            leftv v;
+            idhdl h;
+            if ($1 == MATRIX_CMD)
+            {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
               v=&$$;
               h=(idhdl)v->data;
@@ -912,25 +912,28 @@ declare_ip_variable:
               IDMATRIX(h) = mpNew(r,c);
               if (IDMATRIX(h)==NULL) YYERROR;
             }
-	    else if ($1==INTMAT_CMD)
-	    {
+            else if ($1 == INTMAT_CMD)
+            {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
                 YYERROR;
-               v=&$$;
-               h=(idhdl)v->data;
-               delete IDINTVEC(h);
-               IDINTVEC(h) = new intvec(r,c,0);
-               if (IDINTVEC(h)==NULL) YYERROR;
-	    }
-	  }
+              v=&$$;
+              h=(idhdl)v->data;
+              delete IDINTVEC(h);
+              IDINTVEC(h) = new intvec(r,c,0);
+              if (IDINTVEC(h)==NULL) YYERROR;
+            }
+            else /* BIGINTMAT_CMD */
+            {
+            }
+          }
         | mat_cmd elemexpr
           {
-	    if ($1==MATRIX_CMD)
+            if ($1 == MATRIX_CMD)
             {
-	      if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
-	    }
-	    else if ($1==INTMAT_CMD)
-	    {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
+            }
+            else if ($1 == INTMAT_CMD)
+            {
               if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
                 YYERROR;
               leftv v=&$$;
@@ -942,7 +945,10 @@ declare_ip_variable:
                  IDINTVEC(h) = new intvec(1,1,0);
                  v=v->next;
               } while (v!=NULL);
-	    }
+            }
+            else /* BIGINTMAT_CMD */
+            {
+            }
           }
         | declare_ip_variable ',' elemexpr
           {
@@ -1078,12 +1084,12 @@ cmdeq:  '='
         ;
 
 mat_cmd: MATRIX_CMD
-           { $$ = $1; }
-	 | INTMAT_CMD
-           { $$ = $1; }
-	 | BIGINTMAT_CMD
-           { $$ = $1; }
-         ;
+            { $$ = $1; }
+        | INTMAT_CMD
+            { $$ = $1; }
+        | BIGINTMAT_CMD
+            { $$ = $1; }
+          ;
 
 /* --------------------------------------------------------------------*/
 /* section of pure commands                                            */
@@ -1223,13 +1229,13 @@ listcmd:
               list_cmd($5,NULL,"// ",TRUE);
             $3.CleanUp();
           }
-        | LISTVAR_CMD '(' elemexpr ',' mat_cmd ')'
+        | LISTVAR_CMD '(' elemexpr ',' RING_CMD ')'
           {
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
             $3.CleanUp();
           }
-        | LISTVAR_CMD '(' elemexpr ',' RING_CMD ')'
+        | LISTVAR_CMD '(' elemexpr ',' mat_cmd ')'
           {
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
@@ -1566,15 +1572,15 @@ proccmd:
 parametercmd:
         PARAMETER declare_ip_variable
           {
-	    // decl. of type proc p(int i)
+            // decl. of type proc p(int i)
             if ($1==PARAMETER)  { if (iiParameter(&$2)) YYERROR; }
-	    else                { if (iiAlias(&$2)) YYERROR; } 
+            else                { if (iiAlias(&$2)) YYERROR; }
           }
         | PARAMETER expr
           {
-	    // decl. of type proc p(i)
+            // decl. of type proc p(i)
             sleftv tmp_expr;
-	    if ($1==ALIAS_CMD) MYYERROR("alias requires a type");
+            if ($1==ALIAS_CMD) MYYERROR("alias requires a type");
             if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;
