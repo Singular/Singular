@@ -1308,10 +1308,16 @@ else
 fi
 
 NEED_LIBSG="${NEED_LIBS}"
+
+AC_CHECK_LIB(rt)
+if test "$ac_cv_lib_rt" = yes; then
+  NEED_LIBS="${NEED_LIBS} -lrt"
+fi
+
 if test "$ac_cv_sizeof_voidp" != 4; then
-  NEED_LIBS="${NEED_LIBS} -lomalloc -lrt -lpthread"
+  NEED_LIBS="${NEED_LIBS} -lomalloc -lpthread"
 else
-  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lrt -lpthread"
+  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lpthread"
 fi
 
 
