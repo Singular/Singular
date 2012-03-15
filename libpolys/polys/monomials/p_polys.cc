@@ -3848,6 +3848,52 @@ BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r)
   return (p1==p2);
 }
 
+static inline BOOLEAN p_ExpVectorEqual(poly p1, poly p2, const ring r1, const ring r2)
+{
+  assume( r1 == r2 || rSamePolyRep(r1, r2) );
+
+  p_LmCheckPolyRing1(p1, r1);
+  p_LmCheckPolyRing1(p2, r2);
+
+  int i = r1->ExpL_Size;
+
+  assume( r1->ExpL_Size == r2->ExpL_Size );
+
+  unsigned long *ep = p1->exp;
+  unsigned long *eq = p2->exp;
+
+  do
+  {
+    i--;
+    if (ep[i] != eq[i]) return FALSE;
+  }
+  while (i);
+
+  return TRUE;
+}
+
+BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r1, const ring r2)
+{
+  assume( r1 == r2 || rSamePolyRep(r1, r2) ); // will be used in rEqual!
+  assume( r1->cf == r2->cf );
+  
+  while ((p1 != NULL) && (p2 != NULL))
+  {
+    // returns 1 if ExpVector(p)==ExpVector(q): does not compare numbers !!
+    // #define p_LmEqual(p1, p2, r) p_ExpVectorEqual(p1, p2, r)
+
+    if (! p_ExpVectorEqual(p1, p2, r1, r2))
+      return FALSE;
+    
+    if (! n_Equal(p_GetCoeff(p1,r1), p_GetCoeff(p2,r2), r1->cf ))
+      return FALSE;
+    
+    pIter(p1);
+    pIter(p2);
+  }
+  return (p1==p2);
+}
+
 /*2
 *returns TRUE if p1 is a skalar multiple of p2
 *assume p1 != NULL and p2 != NULL

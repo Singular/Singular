@@ -407,7 +407,11 @@ long pLDeg1_Totaldegree(poly p,int *l, ring r);
 long pLDeg1c_Totaldegree(poly p,int *l, ring r);
 long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r);
 long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r);
+
 BOOLEAN p_EqualPolys(poly p1, poly p2, const ring r);
+
+/// same as the usual p_EqualPolys for polys belonging to *equal* rings
+BOOLEAN p_EqualPolys(poly p1, poly p2, const ring r1, const ring r2);
 
 long p_Deg(poly a, const ring r);
 
