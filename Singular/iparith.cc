@@ -6012,13 +6012,13 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
     return TRUE;
   }
 #endif
-  if (!(ringvar=pVar(p)))
+  if ((ringvar=pVar(p))==0)
   {
     if (rField_is_Extension(currRing))
     {
       assume(currRing->cf->extRing!=NULL);
       number n = pGetCoeff(p);
-      ringvar=- n_IsParam(n, currRing);
+      ringvar= -n_IsParam(n, currRing);
     }
     if(ringvar==0)
     {
