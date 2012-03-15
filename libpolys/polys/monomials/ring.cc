@@ -432,6 +432,11 @@ void rDelete(ring r)
 
   if (r == NULL) return;
 
+  assume( r->ref <= 0 );
+
+  if( r->ref > 0 ) // ->ref means the number of Interpreter objects refearring to the ring...
+    return; // NOTE: There may be memory leaks due to inconsisten use of r->ref!!! (e.g. due to ext_fields)
+
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
     nc_rKill(r);
