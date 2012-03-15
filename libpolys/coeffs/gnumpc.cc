@@ -431,7 +431,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
 
   n->cfSetChar=ngcSetChar;
 
-//  r->cfInit_bigint=ngcInit_bigint;
+  n->cfInit_bigint=ngcMapQ;
 
 /*
   //r->cfInitChar=nlInitChar;

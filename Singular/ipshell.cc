@@ -5090,12 +5090,17 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
        LongComplexInfo param;
 
-       param.float_len = float_len;
-       param.float_len2 = float_len2;
+       param.float_len = si_min (float_len, 32767);
+       param.float_len2 = si_min (float_len2, 32767);
 
        // set the parameter name
        if (complex_flag)
        {
+         if (param.float_len < SHORT_REAL_LENGTH)
+         {
+           param.float_len= SHORT_REAL_LENGTH;
+           param.float_len2= SHORT_REAL_LENGTH;
+         }
          if (pn->next == NULL)
            param.par_name=(const char*)"i"; //default to i
          else

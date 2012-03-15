@@ -246,11 +246,23 @@ number ntGetNumerator(number &a, const coeffs cf)
   definiteGcdCancellation(a, cf, FALSE);
   if (IS0(a)) return NULL;
   fraction f = (fraction)a;
-  poly g = p_Copy(NUM(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(result) = g;
-  DEN(result) = NULL;
-  COM(result) = 0;
+  BOOLEAN denis1= DENIS1 (f);
+  if (getCoeffType (ntCoeffs) == n_Q && !denis1)
+    handleNestedFractionsOverQ (f, cf);
+  NUM (result)= p_Copy (NUM (f), ntRing);
+  DEN (result) = NULL;
+  COM (result) = 0;
+  if (getCoeffType (ntCoeffs) == n_Q && denis1)
+  {
+    if (!p_IsConstant (NUM (result), ntRing) && pNext (NUM(result)) != NULL)
+      p_Cleardenom (NUM(result), ntRing);
+    else
+    {
+      number g= p_GetAllDenom (NUM (result), ntRing);
+      NUM (result)= p_Mult_nn (NUM (result), g, ntRing);
+    }
+  }
   return (number)result;
 }
 
@@ -259,13 +271,31 @@ number ntGetDenom(number &a, const coeffs cf)
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  poly g;
-  if (IS0(f) || DENIS1(f)) g = p_One(ntRing);
-  else g = p_Copy(DEN(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(result) = g;
-  DEN(result) = NULL;
-  COM(result) = 0;
+  number g;
+  if (IS0(f) || (DENIS1 (f) && getCoeffType (ntCoeffs) != n_Q))
+  {
+    NUM (result)= p_One(ntRing);
+    DEN (result)= NULL;
+    COM (result)= 0;
+  }
+  else if (DENIS1 (f))
+  {
+    poly num= p_Copy (NUM (f), ntRing);
+    if (!p_IsConstant (num, ntRing) && pNext(num) != NULL)
+      p_Cleardenom_n (num, ntRing, g);
+    else
+      g= p_GetAllDenom (num, ntRing);
+    result= (fraction) ntSetMap (ntRing->cf, cf) (g, ntRing->cf, cf);
+  }
+  else
+  {
+    if (getCoeffType (ntCoeffs) == n_Q)
+      handleNestedFractionsOverQ (f, cf);
+    NUM (result)= p_Copy (DEN (f), ntRing);
+    DEN (result) = NULL;
+    COM (result) = 0;
+  }
   return (number)result;
 }
 
@@ -1048,10 +1078,10 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
-  poly p = p_One(dst->extRing);
+  poly p = p_Init(dst->extRing);
   number na=n_Copy(a, src);
   n_Normalize(na, src);
-  p_SetCoeff(p, na, dst->extRing);
+  p_SetCoeff0(p, na, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;

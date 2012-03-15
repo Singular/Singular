@@ -108,21 +108,8 @@ for (i=1;i<=n; i++){if (varstr(i)[1]=="x" or varstr(i)[1]=="y"){cont=cont+1;}}
 // change them if there exists some variable different from x(i) or y(i)
 
 if (cont!=n or n<=2){
-
-             // defining the new variables in Lring2[2]
-
-              list Lring,Lring2;
-              Lring=ringlist(basering);
-
-              ring raux=0,(x(1..n)),dp;
-              setring r;
-              Lring2=ringlist(raux);
-
              // making the change
-
-              for (i=1;i<=n; i++){ Lring[2][i]=Lring2[2][i];}
-
-              def Rnew=ring(Lring);
+              def Rnew=changevar ("x()");
               setring Rnew;
                 // print("INVERTIBLE VARIABLES NOT CONSIDERED AT THE BEGINNING");
               return(Rnew,1);

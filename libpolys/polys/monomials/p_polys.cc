@@ -3413,8 +3413,8 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
     if( zz == NULL )
        return NULL;
 
-    if( !DENIS1(z) )
-      WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
+    //if( !DENIS1(z) )
+      //WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
   } else
      {
         assume (FALSE);

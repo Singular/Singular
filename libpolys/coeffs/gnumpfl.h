@@ -41,6 +41,6 @@ void     ngfCoeffWrite(const coeffs r, BOOLEAN details);
 
 void     ngfDelete(number *a, const coeffs r);
 
-number ngfMapQ(number from, const coeffs r);
+number ngfMapQ(number from, const coeffs src, const coeffs r);
 
 #endif
