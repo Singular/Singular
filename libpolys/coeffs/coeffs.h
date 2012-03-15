@@ -53,9 +53,11 @@ typedef mpz_ptr int_number;
 
 struct ip_sring;
 typedef struct ip_sring *         ring;
+typedef struct ip_sring const *   const_ring;
 
 struct n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
+typedef struct  n_Procs_s  const * const_coeffs;
 
 typedef number (*numberfunc)(number a, number b, const coeffs r);
 

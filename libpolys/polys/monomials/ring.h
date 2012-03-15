@@ -19,9 +19,11 @@ class idrec;
 typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
 struct  spolyrec;
 typedef struct spolyrec    polyrec;
-typedef polyrec *          poly;
+typedef struct spolyrec *         poly;
+typedef struct spolyrec const *   const_poly;
 struct ip_sring;
 typedef struct ip_sring *         ring;
+typedef struct ip_sring const *   const_ring;
 class intvec;
 class int64vec;
 struct p_Procs_s;
@@ -33,9 +35,11 @@ typedef kBucket*           kBucket_pt;
 
 struct sip_sideal;
 typedef struct sip_sideal *       ideal;
+typedef struct sip_sideal const * const_ideal;
 
 struct sip_smap;
 typedef struct sip_smap *         map;
+typedef struct sip_smap const *   const_map;
 
 /* the function pointer types */
 
