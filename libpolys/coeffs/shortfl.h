@@ -43,7 +43,7 @@ BOOLEAN nrDBTest(number a, const coeffs r, const char *f, const int l);
 
 // Where are the following used?
 // int     nrGetChar();
-// number nrMapQ(number from, const coeffs r, const coeffs aRing);
+number nrMapQ(number from, const coeffs r, const coeffs aRing);
 
 
 /// Converts a n_R number into a float. Needed by Maps

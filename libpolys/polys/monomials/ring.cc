@@ -794,6 +794,14 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.cf=r1->cf;
         r1->cf->ref++;
       }
+      else if ((getCoeffType (r2->cf)==n_algExt || getCoeffType (r2->cf)==n_transExt) && rChar(r2) == rChar(r1))
+      {
+        /*AlgExtInfo extParam;
+        extParam.r = r2->cf->extRing;
+        extParam.i = r2->cf->extRing->minideal;*/
+        tmpR.cf=r2->cf;
+        r2->cf->ref++;
+      }
       else
       {
         WerrorS("Z/p+...");
@@ -808,6 +816,11 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     else if (getCoeffType(r1->cf)==n_Q)
     {
       if (getCoeffType(r2->cf)==n_Zp)
+      {
+        tmpR.cf=r2->cf;
+        r2->cf->ref++;
+      }
+      else if (getCoeffType(r2->cf)==n_algExt || getCoeffType(r2->cf)==n_transExt)
       {
         tmpR.cf=r2->cf;
         r2->cf->ref++;

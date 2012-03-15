@@ -571,6 +571,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfPower = nrPower;
   n->cfSetMap = nrSetMap;
   n->cfCoeffWrite  = nrCoeffWrite;
+  n->cfInit_bigint = nrMapQ;
 
     /* nName= ndName; */
     /*nSize  = ndSize;*/

@@ -69,6 +69,7 @@ static proc extendRing(r, ideal leadTermsAlgebra, int method) {
 
   //-------- extend current baserring r with new variables @y,
   // one for each new element in ideal algebra  -------------
+  setring r;
   list l = ringlist(r);
   for (i=nvars(r)-nvars(br)+1; i<=numTotalAdditionalVars;i++)
   {
