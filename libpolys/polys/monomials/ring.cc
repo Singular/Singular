@@ -1644,23 +1644,19 @@ ring rCopy(ring r)
   return res;
 }
 
-// returns TRUE, if r1 equals r2 FALSE, otherwise Equality is
-// determined componentwise, if qr == 1, then qrideal equality is
-// tested, as well
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 {
+  if( !rSamePolyRep(r1, r2) )
+    return FALSE;
+
   int i, j;
 
   if (r1 == r2) return TRUE;
-
   if (r1 == NULL || r2 == NULL) return FALSE;
 
-  if ((r1->cf->type != r2->cf->type)
-  || (rVar(r1) != rVar(r2))
-  || (r1->OrdSgn != r2->OrdSgn)
-  || (rPar(r1) != rPar(r2)))
-    return FALSE;
-
+  assume( r1->cf == r2->cf );
+  assume( rVar(r1) == rVar(r2) );
+  
   for (i=0; i<rVar(r1); i++)
   {
     if (r1->names[i] != NULL && r2->names[i] != NULL)
@@ -1672,43 +1668,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
       return FALSE;
     }
   }
-
-  i=0;
-  while (r1->order[i] != 0)
-  {
-    if (r2->order[i] == 0) return FALSE;
-    if ((r1->order[i] != r2->order[i])
-    || (r1->block0[i] != r2->block0[i])
-    || (r1->block1[i] != r2->block1[i]))
-      return FALSE;
-    if (r1->wvhdl[i] != NULL)
-    {
-      if (r2->wvhdl[i] == NULL)
-        return FALSE;
-      for (j=0; j<r1->block1[i]-r1->block0[i]+1; j++)
-        if (r2->wvhdl[i][j] != r1->wvhdl[i][j])
-          return FALSE;
-    }
-    else if (r2->wvhdl[i] != NULL) return FALSE;
-    i++;
-  }
-  if (r2->order[i] != 0) return FALSE;
-
-  for (i=0; i<rPar(r1);i++)
-  {
-      if (strcmp(rParameter(r1)[i], rParameter(r2)[i])!=0)
-        return FALSE;
-  }
-
-  if ( !rMinpolyIsNULL(r1) )
-  {
-    if ( rMinpolyIsNULL(r2) ) return FALSE;
-    if (! p_EqualPolys(r1->cf->extRing->minideal->m[0],
-                  r2->cf->extRing->minideal->m[0],
-                  r1->cf->extRing))
-      return FALSE;
-  }
-  else if (!rMinpolyIsNULL(r2)) return FALSE;
 
   if (qr)
   {
@@ -1725,7 +1684,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
         m1 = id1->m;
         m2 = id2->m;
         for (i=0; i<n; i++)
-          if (! p_EqualPolys(m1[i],m2[i],r1)) return FALSE;
+          if (! p_EqualPolys(m1[i],m2[i], r1, r2)) return FALSE;
       }
     }
     else if (r2->qideal != NULL) return FALSE;
@@ -1734,9 +1693,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   return TRUE;
 }
 
-// returns TRUE, if r1 and r2 represents the monomials in the same way
-// FALSE, otherwise
-// this is an analogue to rEqual but not so strict
 BOOLEAN rSamePolyRep(ring r1, ring r2)
 {
   int i, j;
@@ -1745,14 +1701,10 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
 
   if (r1 == NULL || r2 == NULL) return FALSE;
 
-  if ((r1->cf->type != r2->cf->type)
+  if ((r1->cf != r2->cf)
   || (rVar(r1) != rVar(r2))
-  || (r1->OrdSgn != r2->OrdSgn)
-  || (rPar(r1) != rPar(r2)))
+  || (r1->OrdSgn != r2->OrdSgn))
     return FALSE;
-
-  if (rVar(r1)!=rVar(r2)) return FALSE;
-  if (rPar(r1)!=rPar(r2)) return FALSE;
 
   i=0;
   while (r1->order[i] != 0)
@@ -1775,6 +1727,7 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   }
   if (r2->order[i] != 0) return FALSE;
 
+  // we do not check variable names
   // we do not check minpoly/minideal
   // we do not check qideal
 

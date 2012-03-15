@@ -391,8 +391,16 @@ char * rParStr(ring r);
 int    rSum(ring r1, ring r2, ring &sum);
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 
-BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
+/// returns TRUE, if r1 equals r2 FALSE, otherwise Equality is
+/// determined componentwise, if qr == 1, then qrideal equality is
+/// tested, as well
+BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = TRUE);
+
+/// returns TRUE, if r1 and r2 represents the monomials in the same way
+/// FALSE, otherwise
+/// this is an analogue to rEqual but not so strict
 BOOLEAN rSamePolyRep(ring r1, ring r2);
+
 void   rUnComplete(ring r);
 
 BOOLEAN rRing_is_Homog(ring r);
