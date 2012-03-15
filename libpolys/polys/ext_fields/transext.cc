@@ -952,7 +952,17 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
      this expectation is based on the assumption that we have properly
      registered cf and perform reference counting rather than creating
      multiple copies of the same coefficient field/domain/ring */
-  return (ntRing == e->r);
+  if (ntRing == e->r)
+    return TRUE;
+
+  // NOTE: Q(a)[x] && Q(a)[y] should better share the _same_ Q(a)...
+  if( rEqual(ntRing, e->r, TRUE) )
+  {
+    rDelete(e->r);
+    return TRUE;
+  }
+
+  return FALSE;  
 }
 
 number ntLcm(number a, number b, const coeffs cf)

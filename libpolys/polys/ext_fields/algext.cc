@@ -520,9 +520,30 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
      this expectation is based on the assumption that we have properly
      registered cf and perform reference counting rather than creating
      multiple copies of the same coefficient field/domain/ring */
-  return (naRing == e->r);
+  if (naRing == e->r)
+    return TRUE;
   /* (Note that then also the minimal ideals will necessarily be
      the same, as they are attached to the ring.) */
+
+  // NOTE: Q(a)[x] && Q(a)[y] should better share the _same_ Q(a)...
+  if( rEqual(naRing, e->r, TRUE) )
+  {
+    const ideal mi = naRing->minideal; 
+    assume( IDELEMS(mi) == 1 );
+    ideal ii = e->i;
+    assume( IDELEMS(ii) == 1 );
+
+    // TODO: the following should be extended for 2 *equal* rings...
+    if( p_EqualPolys(mi->m[0], ii->m[0], naRing, e->r) )
+    {
+      id_Delete(&ii, e->r);
+      rDelete(e->r);
+      return TRUE;
+    }
+  }
+
+  return FALSE;  
+  
 }
 
 int naSize(number a, const coeffs cf)
