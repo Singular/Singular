@@ -26,8 +26,8 @@
 #define nIsOne(n)         n_IsOne(n, currRing->cf)
 #define nIsMOne(n)        n_IsMOne(n, currRing->cf)
 #define nGreaterZero(n)   n_GreaterZero(n, currRing->cf)
-#define nGreater(a, b)   n_Greater (a,b,currRing->cf)
-#define nWrite(n)         n_Write(n,currRing->cf)
+#define nGreater(a, b)    n_Greater (a,b,currRing->cf)
+#define nWrite(n)         n_Write(n, currRing->cf, rShortOut(currRing))
 #define nNormalize(n)     n_Normalize(n,currRing->cf)
 
 inline number nGcd(number a, number b, const coeffs cf) { return n_Gcd(a, b, cf); }

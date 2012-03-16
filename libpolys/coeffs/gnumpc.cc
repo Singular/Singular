@@ -415,7 +415,10 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfIsOne   = ngcIsOne;
   n->cfIsMOne  = ngcIsMOne;
   n->cfGreaterZero = ngcGreaterZero;
-  n->cfWrite  = ngcWrite;
+
+  n->cfWriteLong  = ngcWrite;
+  n->cfWriteShort = ngcWrite;
+  
   n->cfRead    = ngcRead;
   n->cfPower   = ngcPower;
   n->cfSetMap = ngcSetMap;
@@ -458,7 +461,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->cfCopy  = nl_Copy;
   r->cfRePart = nl_Copy;
   r->cfImPart = ndReturn0;
-  r->cfWrite = nlWrite;
+  r->cfWriteLong = nlWrite;
   r->cfRead = nlRead;
   r->cfNormalize=nlNormalize;
   r->cfGreater = nlGreater;

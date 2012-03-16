@@ -76,7 +76,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfIsOne       = nr2mIsOne;
   r->cfIsMOne      = nr2mIsMOne;
   r->cfGreaterZero = nr2mGreaterZero;
-  r->cfWrite       = nr2mWrite;
+  r->cfWriteLong       = nr2mWrite;
   r->cfRead        = nr2mRead;
   r->cfPower       = nr2mPower;
   r->cfSetMap      = nr2mSetMap;

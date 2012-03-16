@@ -91,7 +91,8 @@ number   naMult(number a, number b, const coeffs cf);
 number   naDiv(number a, number b, const coeffs cf);
 void     naPower(number a, int exp, number *b, const coeffs cf);
 number   naCopy(number a, const coeffs cf);
-void     naWrite(number &a, const coeffs cf);
+void     naWriteLong(number &a, const coeffs cf);
+void     naWriteShort(number &a, const coeffs cf);
 number   naRePart(number a, const coeffs cf);
 number   naImPart(number a, const coeffs cf);
 number   naGetDenom(number &a, const coeffs cf);
@@ -467,7 +468,7 @@ void heuristicReduce(poly &p, poly reducer, const coeffs cf)
     definiteReduce(p, reducer, cf);
 }
 
-void naWrite(number &a, const coeffs cf)
+void naWriteLong(number &a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)
@@ -480,7 +481,25 @@ void naWrite(number &a, const coeffs cf)
        a constant living in naCoeffs = cf->extRing->cf */
     BOOLEAN useBrackets = !(p_IsConstant(aAsPoly, naRing));
     if (useBrackets) StringAppendS("(");
-    p_String0(aAsPoly, naRing, naRing);
+    p_String0Long(aAsPoly, naRing, naRing);
+    if (useBrackets) StringAppendS(")");
+  }
+}
+
+void naWriteShort(number &a, const coeffs cf)
+{
+  naTest(a);
+  if (a == NULL)
+    StringAppendS("0");
+  else
+  {
+    poly aAsPoly = (poly)a;
+    /* basically, just write aAsPoly using p_Write,
+       but use brackets around the output, if a is not
+       a constant living in naCoeffs = cf->extRing->cf */
+    BOOLEAN useBrackets = !(p_IsConstant(aAsPoly, naRing));
+    if (useBrackets) StringAppendS("(");
+    p_String0Short(aAsPoly, naRing, naRing);
     if (useBrackets) StringAppendS(")");
   }
 }
@@ -816,7 +835,14 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfExactDiv     = naDiv;
   cf->cfPower        = naPower;
   cf->cfCopy         = naCopy;
-  cf->cfWrite        = naWrite;
+
+  cf->cfWriteLong        = naWriteLong;
+
+  if( rCanShortOut(naRing) )
+    cf->cfWriteShort = naWriteShort;
+  else
+    cf->cfWriteShort = naWriteLong;
+    
   cf->cfRead         = naRead;
   cf->cfDelete       = naDelete;
   cf->cfSetMap       = naSetMap;

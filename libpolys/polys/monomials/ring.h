@@ -521,7 +521,12 @@ static inline char* rRingVar(short i, const ring r)
 }
 static inline BOOLEAN rShortOut(const ring r)
 {
-  assume(r != NULL); assume(r->cf != NULL); return (r->ShortOut);
+  assume(r != NULL); return (r->ShortOut);
+}
+
+static inline BOOLEAN rCanShortOut(const ring r)
+{
+  assume(r != NULL); return (r->CanShortOut);
 }
 
 /// #define rVar(r) (r->N)

@@ -566,7 +566,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfIsOne = nrIsOne;
   n->cfIsMOne = nrIsMOne;
   n->cfGreaterZero = nrGreaterZero;
-  n->cfWrite = nrWrite;
+  n->cfWriteLong = nrWrite;
   n->cfRead = nrRead;
   n->cfPower = nrPower;
   n->cfSetMap = nrSetMap;

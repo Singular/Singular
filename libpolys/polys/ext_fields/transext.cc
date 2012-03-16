@@ -109,7 +109,8 @@ number   ntMult(number a, number b, const coeffs cf);
 number   ntDiv(number a, number b, const coeffs cf);
 void     ntPower(number a, int exp, number *b, const coeffs cf);
 number   ntCopy(number a, const coeffs cf);
-void     ntWrite(number &a, const coeffs cf);
+void     ntWriteLong(number &a, const coeffs cf);
+void     ntWriteShort(number &a, const coeffs cf);
 number   ntRePart(number a, const coeffs cf);
 number   ntImPart(number a, const coeffs cf);
 number   ntGetDenom(number &a, const coeffs cf);
@@ -895,8 +896,8 @@ void definiteGcdCancellation(number a, const coeffs cf,
 #endif /* HAVE_FACTORY */
 }
 
-/* modifies a */
-void ntWrite(number &a, const coeffs cf)
+// NOTE: modifies a
+void ntWriteLong(number &a, const coeffs cf)
 {
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
@@ -908,14 +909,40 @@ void ntWrite(number &a, const coeffs cf)
     // stole logic from napWrite from kernel/longtrans.cc of legacy singular
     BOOLEAN omitBrackets = p_IsConstant(NUM(f), ntRing);
     if (!omitBrackets) StringAppendS("(");
-    p_String0(NUM(f), ntRing, ntRing);
+    p_String0Long(NUM(f), ntRing, ntRing);
     if (!omitBrackets) StringAppendS(")");
     if (!DENIS1(f))
     {
       StringAppendS("/");
       omitBrackets = p_IsConstant(DEN(f), ntRing);
       if (!omitBrackets) StringAppendS("(");
-      p_String0(DEN(f), ntRing, ntRing);
+      p_String0Long(DEN(f), ntRing, ntRing);
+      if (!omitBrackets) StringAppendS(")");
+    }    
+  }
+}
+
+// NOTE: modifies a
+void ntWriteShort(number &a, const coeffs cf)
+{
+  ntTest(a);
+  definiteGcdCancellation(a, cf, FALSE);
+  if (IS0(a))
+    StringAppendS("0");
+  else
+  {
+    fraction f = (fraction)a;
+    // stole logic from napWrite from kernel/longtrans.cc of legacy singular
+    BOOLEAN omitBrackets = p_IsConstant(NUM(f), ntRing);
+    if (!omitBrackets) StringAppendS("(");
+    p_String0Short(NUM(f), ntRing, ntRing);
+    if (!omitBrackets) StringAppendS(")");
+    if (!DENIS1(f))
+    {
+      StringAppendS("/");
+      omitBrackets = p_IsConstant(DEN(f), ntRing);
+      if (!omitBrackets) StringAppendS("(");
+      p_String0Short(DEN(f), ntRing, ntRing);
       if (!omitBrackets) StringAppendS(")");
     }
   }
@@ -1368,7 +1395,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfExactDiv     = ntDiv;
   cf->cfPower        = ntPower;
   cf->cfCopy         = ntCopy;
-  cf->cfWrite        = ntWrite;
+  cf->cfWriteLong    = ntWriteLong;
   cf->cfRead         = ntRead;
   cf->cfNormalize    = ntNormalize;
   cf->cfDelete       = ntDelete;
@@ -1388,6 +1415,11 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfInvers       = ntInvers;
   cf->cfIntDiv       = ntDiv;
   cf->cfKillChar     = ntKillChar;
+
+  if( rCanShortOut(ntRing) )
+    cf->cfWriteShort = ntWriteShort;
+  else
+    cf->cfWriteShort = ntWriteLong;
 
 #ifndef HAVE_FACTORY
   PrintS("// Warning: The 'factory' module is not available.\n");

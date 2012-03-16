@@ -383,7 +383,7 @@ BOOLEAN nfEqual (number a,number b, const coeffs r)
 /*2
 * write via StringAppend
 */
-void nfWrite (number &a, const coeffs r)
+static void nfWriteLong (number &a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -396,7 +396,28 @@ void nfWrite (number &a, const coeffs r)
     StringAppendS(r->m_nfParameter);
     if ((long)a!=1L)
     {
-      if(r->ShortOut==0)  StringAppendS("^");
+      StringAppend("^%d",(int)((long)a)); // long output!
+    }
+  }
+}
+
+
+/*2
+* write (shortert output) via StringAppend
+*/
+static void nfWriteShort (number &a, const coeffs r)
+{
+#ifdef LDEBUG
+  nfTest(a, r);
+#endif
+  if ((long)a==(long)r->m_nfCharQ)  StringAppendS("0");
+  else if ((long)a==0L)   StringAppendS("1");
+  else if (nfIsMOne(a, r))   StringAppendS("-1");
+  else
+  {
+    StringAppendS(r->m_nfParameter);
+    if ((long)a!=1L)
+    {
       StringAppend("%d",(int)((long)a));
     }
   }
@@ -785,7 +806,9 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfCopy  = ndCopy;
   //r->cfRePart = ndCopy;
   //r->cfImPart = ndReturn0;
-  r->cfWrite = nfWrite;
+  
+  r->cfWriteLong = nfWriteLong;
+  
   r->cfRead = nfRead;
   //r->cfNormalize=ndNormalize;
   r->cfGreater = nfGreater;
@@ -823,12 +846,10 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->m_nfParameter= omStrDup(name); //TODO use omAlloc for allocating memory and use strcpy?
   r->m_nfPlus1Table= NULL;
 
-  if (strlen(name) > 1) {
-    r->ShortOut = 0;
-    r->CanShortOut = FALSE;
-  } else {
-    r->ShortOut = 1;
-  }
+  if (strlen(name) > 1)
+    r->cfWriteShort = nfWriteLong;
+  else
+    r->cfWriteShort = nfWriteShort;
 
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;

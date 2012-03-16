@@ -249,7 +249,7 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
   TS_ASSERT_EQUALS( getCoeffType(r), type );
 
   TS_ASSERT_DIFFERS( r->cfInit, NULLp );
-  TS_ASSERT_DIFFERS( r->cfWrite, NULLp );
+  TS_ASSERT_DIFFERS( r->cfWriteLong, NULLp );
   TS_ASSERT_DIFFERS( r->cfAdd, NULLp );
   TS_ASSERT_DIFFERS( r->cfDelete, NULLp );
 
@@ -258,7 +258,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_Q:
     {
       TS_ASSERT_EQUALS( r->cfInit, nlInit );
-      TS_ASSERT_EQUALS( r->cfWrite, nlWrite );
       TS_ASSERT_EQUALS( r->cfAdd, nlAdd );
       TS_ASSERT_EQUALS( r->cfDelete, nlDelete );
 
@@ -288,7 +287,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_long_R:
     {
       TS_ASSERT_EQUALS( r->cfInit, ngfInit );
-      TS_ASSERT_EQUALS( r->cfWrite, ngfWrite );
       TS_ASSERT_EQUALS( r->cfAdd, ngfAdd );
       TS_ASSERT_EQUALS( r->cfDelete, ngfDelete );
       break;
@@ -296,7 +294,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_long_C:
     {
       TS_ASSERT_EQUALS( r->cfInit, ngcInit );
-      TS_ASSERT_EQUALS( r->cfWrite, ngcWrite );
       TS_ASSERT_EQUALS( r->cfAdd, ngcAdd );
       TS_ASSERT_EQUALS( r->cfDelete, ngcDelete );
       break;
@@ -304,7 +301,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_R:
     {
       TS_ASSERT_EQUALS( r->cfInit, nrInit );
-      TS_ASSERT_EQUALS( r->cfWrite, nrWrite );
       TS_ASSERT_EQUALS( r->cfAdd, nrAdd );
   //    TS_ASSERT_EQUALS( r->cfDelete, nrDelete ); // No?
       break;
@@ -312,7 +308,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_GF:
     {
       TS_ASSERT_EQUALS( r->cfInit, nfInit );
-      TS_ASSERT_EQUALS( r->cfWrite, nfWrite );
       TS_ASSERT_EQUALS( r->cfAdd, nfAdd );
       //TS_ASSERT_EQUALS( r->cfDelete, nfDelete );
       break;
@@ -321,7 +316,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_Z2m:
     {
       TS_ASSERT_EQUALS( r->cfInit, nr2mInit );
-      TS_ASSERT_EQUALS( r->cfWrite, nr2mWrite );
       TS_ASSERT_EQUALS( r->cfAdd, nr2mAdd );
       TS_ASSERT_EQUALS( r->cfDelete, ndDelete );
       break;
@@ -329,7 +323,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     case n_Zn:
     {
       TS_ASSERT_EQUALS( r->cfInit, nrnInit );
-      TS_ASSERT_EQUALS( r->cfWrite, nrnWrite );
       TS_ASSERT_EQUALS( r->cfAdd, nrnAdd );
       TS_ASSERT_EQUALS( r->cfDelete, nrnDelete );
       break;

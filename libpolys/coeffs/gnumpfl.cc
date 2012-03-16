@@ -427,7 +427,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfIsOne   = ngfIsOne;
   n->cfIsMOne  = ngfIsMOne;
   n->cfGreaterZero = ngfGreaterZero;
-  n->cfWrite  = ngfWrite;
+  n->cfWriteLong  = ngfWrite;
   n->cfRead    = ngfRead;
   n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;

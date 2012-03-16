@@ -240,6 +240,10 @@ void   rWrite(ring r, BOOLEAN details)
   if ((r==NULL)||(r->order==NULL))
     return; /*to avoid printing after errors....*/
 
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+  
   int nblocks=rBlocks(r);
 
   // omCheckAddrSize(r,sizeof(ip_sring));
@@ -251,7 +255,23 @@ void   rWrite(ring r, BOOLEAN details)
 
   nblocks--;
 
-  n_CoeffWrite(r->cf, details);
+
+  if( nCoeff_is_algExt(C) )
+  {
+    // NOTE: the following (non-thread-safe!) UGLYNESS
+    // (changing naRing->ShortOut for a while) is due to Hans!
+    // Just think of other ring using the VERY SAME naRing and possible
+    // side-effects...
+    ring R = C->extRing;
+    const BOOLEAN bSaveShortOut = rShortOut(R); R->ShortOut = rShortOut(r) & rCanShortOut(R);
+
+    n_CoeffWrite(C, details); // for correct printing of minpoly... WHAT AN UGLYNESS!!!
+    
+    R->ShortOut = bSaveShortOut;
+  }
+  else
+    n_CoeffWrite(C, details);
+  
 #if 0
   {
     PrintS("//   characteristic : ");
@@ -278,7 +298,7 @@ void   rWrite(ring r, BOOLEAN details)
       }
       else
       {
-        StringSetS(""); n_Write(r->cf->minpoly,r->cf); PrintS(StringAppendS("\n"));
+        StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringAppendS("\n"));
       }
       //if (r->minideal!=NULL)
       //{
@@ -2987,7 +3007,7 @@ void rKillModified_Wp_Ring(ring r)
 static void rSetOutParams(ring r)
 {
   r->VectorOut = (r->order[0] == ringorder_c);
-  r->ShortOut = TRUE;
+  r->CanShortOut = TRUE;
   {
     int i;
     if (rParameter(r)!=NULL)
@@ -2996,12 +3016,12 @@ static void rSetOutParams(ring r)
       {
         if(strlen(rParameter(r)[i])>1)
         {
-          r->ShortOut=FALSE;
+          r->CanShortOut=FALSE;
           break;
         }
       }
     }
-    if (r->ShortOut)
+    if (r->CanShortOut)
     {
       // Hmm... sometimes (e.g., from maGetPreimage) new variables
       // are introduced, but their names are never set
@@ -3013,13 +3033,15 @@ static void rSetOutParams(ring r)
       {
         if(r->names[i] != NULL && strlen(r->names[i])>1)
         {
-          r->ShortOut=FALSE;
+          r->CanShortOut=FALSE;
           break;
         }
       }
     }
   }
-  r->CanShortOut = r->ShortOut;
+  r->ShortOut = r->CanShortOut;
+
+  assume( !( !r->CanShortOut && r->ShortOut ) );
 }
 
 /*2

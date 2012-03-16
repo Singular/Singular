@@ -290,7 +290,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;
 #endif
-   
+
+    if(n->cfWriteShort==NULL)
+      n->cfWriteShort = n->cfWriteLong;
+    
 #ifndef NDEBUG
     assume(n->nCoeffIsEqual!=NULL);
     if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
@@ -315,7 +318,14 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfCopy!=NULL);
     assume(n->cfRePart!=NULL);
     assume(n->cfImPart!=NULL);
-    assume(n->cfWrite!=NULL);
+
+    assume(n->cfWriteLong!=NULL);
+    assume(n->cfWriteShort!=NULL);
+
+
+    if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
+    if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
+    
     assume(n->cfRead!=NULL);
     assume(n->cfNormalize!=NULL);
     assume(n->cfGreater!=NULL);

@@ -3366,7 +3366,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   if(0)
   {
     number zz = n_Copy(z, src->cf);
-    PrintS("z: "); n_Write(zz, src->cf);
+    PrintS("z: "); n_Write(zz, src);
     n_Delete(&zz, src->cf);
   }
 

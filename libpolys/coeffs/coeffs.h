@@ -144,7 +144,14 @@ struct n_Procs_s
    number  (*cfCopy)(number a, const coeffs r);
    number  (*cfRePart)(number a, const coeffs r);
    number  (*cfImPart)(number a, const coeffs r);
-   void    (*cfWrite)(number &a, const coeffs r);
+
+   /// print a given number (long format)
+   void    (*cfWriteLong)(number &a, const coeffs r);
+   
+   /// print a given number in a shorter way, if possible
+   /// e.g. in K(a): a2 instead of a^2
+   void    (*cfWriteShort)(number &a, const coeffs r);
+   
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
    void    (*cfNormalize)(number &a, const coeffs r);
    BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
@@ -261,9 +268,9 @@ struct n_Procs_s
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
 
-  BOOLEAN   CanShortOut; //< if the elements can be printed in short format
-		       // this is set to FALSE if a parameter name has >2 chars
-  BOOLEAN   ShortOut; //< if the elements should print in short format
+//  BOOLEAN   CanShortOut; //< if the elements can be printed in short format
+//		       // this is set to FALSE if a parameter name has >2 chars
+//  BOOLEAN   ShortOut; //< if the elements should print in short format
 
 // ---------------------------------------------------
   // for n_GF
@@ -448,8 +455,17 @@ static inline void   n_Normalize(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfNormalize!=NULL); r->cfNormalize(n,r); }
 
 /// write to the output buffer of the currently used reporter
-static inline void   n_Write(number& n,  const coeffs r)
-{ assume(r != NULL); assume(r->cfWrite!=NULL); r->cfWrite(n,r); }
+static inline void   n_WriteLong(number& n,  const coeffs r)
+{ assume(r != NULL); assume(r->cfWriteLong!=NULL); r->cfWriteLong(n,r); }
+
+/// write to the output buffer of the currently used reporter
+/// in a shortest possible way, e.g. in K(a): a2 instead of a^2
+static inline void   n_WriteShort(number& n,  const coeffs r)
+{ assume(r != NULL); assume(r->cfWriteShort!=NULL); r->cfWriteShort(n,r); }
+
+static inline void   n_Write(number& n,  const coeffs r, const BOOLEAN bShortOut = TRUE)
+{ if (bShortOut) n_WriteShort(n, r); else n_WriteLong(n, r); }
+
 
 /// @todo: Describe me!!! --> Hans
 ///
