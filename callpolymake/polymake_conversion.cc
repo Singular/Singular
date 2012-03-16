@@ -1,30 +1,30 @@
+#include <gmpxx.h>
+
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
 #include <polymake/Rational.h>
 #include <polymake/Integer.h>
-#include <polymake/polytope/lattice_tools.h>
-#include <polymake/perl/macros.h>
 #include <polymake/Set.h>
-#include <polymake/IncidenceMatrix.h>
+#include <polymake/common/lattice_tools.h>
+// #include <polymake/perl/macros.h>
+// #include <polymake/IncidenceMatrix.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include <gmpxx.h>
-
 #include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
+// #include <kernel/structs.h>
+// #include <kernel/febase.h>
 #include <kernel/intvec.h>
 
-#include <callgfanlib/bbcone.h>
-#include <callgfanlib/bbfan.h>
-#include <callgfanlib/bbpolytope.h>
+// #include <callgfanlib/bbcone.h>
+// #include <callgfanlib/bbfan.h>
+// #include <callgfanlib/bbpolytope.h>
 
-#include <Singular/blackbox.h>
-#include <Singular/ipshell.h>
-#include <Singular/subexpr.h>
-#include <Singular/tok.h>
+// #include <Singular/blackbox.h>
+// #include <Singular/ipshell.h>
+// #include <Singular/subexpr.h>
+// #include <Singular/tok.h>
 
 
 /* Functions for converting Integers, Rationals and their Matrices 
@@ -125,7 +125,7 @@ int PmInteger2Int(const polymake::Integer& pi, bool &ok)
   int i;
   try
   { 
-    i = (int) pi; 
+    i = pi.to_int(); 
   }
   catch (const std::exception& ex)
   {
@@ -145,7 +145,7 @@ intvec* PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi, b
   return iv;
 }
 
-intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi)
+intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi, bool &ok)
 {
   int rows = mi->rows();
   int cols = mi->cols();
@@ -153,20 +153,23 @@ intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi)
   const polymake::Integer* pi = concat_rows(*mi).begin();
   for (int r = 1; r <= rows; r++) 
     for (int c = 1; c <= cols; c++) 
-      IMATELEM(*iv,r,c) = *pi++;
+    {
+      IMATELEM(*iv,r,c) = PmInteger2Int(*pi, ok); 
+      pi++; 
+    }
   return iv;  
 }
 
-intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat)
-{
-  int rows = icmat->rows();
-  int cols = icmat->cols();
-  intvec* iv = new intvec(rows,cols,0);
-  for (int r = 1; r <= rows; r++)
-    for (int c = 1; c <= cols; c++)
-      IMATELEM(*iv,r,c) = (int) (*icmat).row(r).exists(c);
-  return iv;
-}
+// intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat)
+// {
+//   int rows = icmat->rows();
+//   int cols = icmat->cols();
+//   intvec* iv = new intvec(rows,cols,0);
+//   for (int r = 1; r <= rows; r++)
+//     for (int c = 1; c <= cols; c++)
+//       IMATELEM(*iv,r,c) = (int) (*icmat).row(r).exists(c);
+//   return iv;
+// }
 
 intvec* PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si, bool &b)
 {
@@ -210,28 +213,28 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
     // by convention, gfanlib ignores empty matrices, hence zero matrices of right dimensions have to be supplied
     if (ineqrational.cols()!=0) 
     {  
-      polymake::Matrix<polymake::Integer> ineqinteger = polymake::polytope::multiply_by_common_denominator(ineqrational);
+      polymake::Matrix<polymake::Integer> ineqinteger = polymake::common::primitive(ineqrational);
       zv = PmMatrixInteger2GfZMatrix(&ineqinteger);
     }
     else
       zv = gfan::ZMatrix(0, ambientdim2);
     if (eqrational.cols()!=0)
     {  
-      polymake::Matrix<polymake::Integer> eqinteger = polymake::polytope::multiply_by_common_denominator(eqrational);
+      polymake::Matrix<polymake::Integer> eqinteger = polymake::common::primitive(eqrational);
       zw = PmMatrixInteger2GfZMatrix(&eqinteger);
     }
     else
       zw = gfan::ZMatrix(0, ambientdim2);
     if (exraysrational.cols()!=0)
     {
-      polymake::Matrix<polymake::Integer> exraysinteger = polymake::polytope::multiply_by_common_denominator(exraysrational);
+      polymake::Matrix<polymake::Integer> exraysinteger = polymake::common::primitive(exraysrational);
       zx = PmMatrixInteger2GfZMatrix(&exraysinteger);
     }
     else
       zx = gfan::ZMatrix(0, ambientdim2);
     if (linrational.cols()!=0)
     {
-      polymake::Matrix<polymake::Integer> lininteger = polymake::polytope::multiply_by_common_denominator(linrational);
+      polymake::Matrix<polymake::Integer> lininteger = polymake::common::primitive(linrational);
       zy = PmMatrixInteger2GfZMatrix(&lininteger);
     }
     else
@@ -265,7 +268,7 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
     // by convention, gfanlib ignores empty matrices, hence zero matrices of right dimensions have to be supplied
     if (ineqrational.cols()!=0)
     {
-      polymake::Matrix<polymake::Integer> ineqinteger = polymake::polytope::multiply_by_common_denominator(ineqrational);
+      polymake::Matrix<polymake::Integer> ineqinteger = polymake::common::primitive(ineqrational);
       zv = PmMatrixInteger2GfZMatrix(&ineqinteger);
     }
     else
@@ -273,7 +276,7 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
 
     if (eqrational.cols()!=0)
     {
-      polymake::Matrix<polymake::Integer> eqinteger = polymake::polytope::multiply_by_common_denominator(eqrational);
+      polymake::Matrix<polymake::Integer> eqinteger = polymake::common::primitive(eqrational);
       zw = PmMatrixInteger2GfZMatrix(&eqinteger);
     }
     else
@@ -281,14 +284,14 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
 
     if (vertrational.cols()!=0)
     {
-      polymake::Matrix<polymake::Integer> vertinteger = polymake::polytope::multiply_by_common_denominator(vertrational);
+      polymake::Matrix<polymake::Integer> vertinteger = polymake::common::primitive(vertrational);
       zx = PmMatrixInteger2GfZMatrix(&vertinteger);
     }
     else
       zx = gfan::ZMatrix(0, ambientdim2);
     if (linrational.cols()!=0)
       {
-        polymake::Matrix<polymake::Integer> lininteger = polymake::polytope::multiply_by_common_denominator(linrational);
+        polymake::Matrix<polymake::Integer> lininteger = polymake::common::primitive(linrational);
         zy = PmMatrixInteger2GfZMatrix(&lininteger);
       }
     else

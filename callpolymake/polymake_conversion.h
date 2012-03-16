@@ -1,30 +1,30 @@
+#include <gmpxx.h>
+
 #include <polymake/Main.h>
 #include <polymake/Matrix.h>
 #include <polymake/Rational.h>
 #include <polymake/Integer.h>
-#include <polymake/polytope/lattice_tools.h>
-#include <polymake/perl/macros.h>
 #include <polymake/Set.h>
-#include <polymake/IncidenceMatrix.h>
+#include <polymake/common/lattice_tools.h>
+// #include <polymake/perl/macros.h>
+// #include <polymake/IncidenceMatrix.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include <gmpxx.h>
-
 #include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
+/* #include <kernel/structs.h> */
+/* #include <kernel/febase.h> */
 #include <kernel/intvec.h>
 
-#include <callgfanlib/bbcone.h>
-#include <callgfanlib/bbfan.h>
-#include <callgfanlib/bbpolytope.h>
+/* #include <callgfanlib/bbcone.h> */
+/* #include <callgfanlib/bbfan.h> */
+/* #include <callgfanlib/bbpolytope.h> */
 
-#include <Singular/blackbox.h>
-#include <Singular/ipshell.h>
-#include <Singular/subexpr.h>
-#include <Singular/tok.h>
+/* #include <Singular/blackbox.h> */
+/* #include <Singular/ipshell.h> */
+/* #include <Singular/subexpr.h> */
+/* #include <Singular/tok.h> */
 
 
 /* Functions for converting Integers, Rationals and their Matrices 
@@ -49,8 +49,8 @@ gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Ratio
 
 int PmInteger2Int(const polymake::Integer& pi, bool &ok);
 intvec* PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi, bool &ok);
-intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi);
-intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat);
+intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi, bool &ok);
+// intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat);
 intvec* PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si, bool &b);
 
 /* polymake <- singular */

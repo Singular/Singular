@@ -1,25 +1,23 @@
-// #ifndef HAVE_FANS
-// #define HAVE_FANS
-// #endif
+#include <polymake_conversion.h>
 
-#include <polymake/Main.h>
-#include <polymake/Matrix.h>
-#include <polymake/Rational.h>
-#include <polymake/Integer.h>
-#include <polymake/polytope/lattice_tools.h>
-#include <polymake/perl/macros.h>
-#include <polymake/Set.h>
-#include <polymake/IncidenceMatrix.h>
+// #include <polymake/Main.h>
+// #include <polymake/Matrix.h>
+// #include <polymake/Rational.h>
+// #include <polymake/Integer.h>
+// #include <polymake/common/lattice_tools.h>
+// #include <polymake/perl/macros.h>
+// #include <polymake/Set.h>
+// #include <polymake/IncidenceMatrix.h>
 
-#include <gfanlib/gfanlib.h>
-#include <gfanlib/gfanlib_q.h>
+// #include <gfanlib/gfanlib.h>
+// #include <gfanlib/gfanlib_q.h>
 
-#include <gmpxx.h>
+// #include <gmpxx.h>
 
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <kernel/intvec.h>
+// #include <kernel/mod2.h>
+// #include <kernel/structs.h>
+// #include <kernel/febase.h>
+// #include <kernel/intvec.h>
 
 #include <callgfanlib/bbcone.h>
 #include <callgfanlib/bbfan.h>
@@ -28,9 +26,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
-#include <Singular/tok.h>
-
-#include <polymake_conversion.h>
+// #include <Singular/tok.h>
 
 using namespace polymake;
 
@@ -701,11 +697,17 @@ BOOLEAN PMfacetVertexLatticeDistances(leftv res, leftv args)
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* ld;
+    bool ok=true;
     try
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Matrix<polymake::Integer> pld = p.give("FACET_VERTEX_LATTICE_DISTANCES");
-      ld = PmMatrixInteger2Intvec(&pld);
+      ld = PmMatrixInteger2Intvec(&pld,ok);
+      if (!ok)
+      { 
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex) 
     {
@@ -810,7 +812,13 @@ BOOLEAN PMlatticePoints(leftv res, leftv args)
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Matrix<polymake::Integer> lp = p.give("LATTICE_POINTS");
-      iv = PmMatrixInteger2Intvec(&lp); 
+      bool ok = true;
+      iv = PmMatrixInteger2Intvec(&lp,ok); 
+      if (!ok)
+      { 
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex) 
     {
@@ -870,7 +878,13 @@ BOOLEAN PMinteriorLatticePoints(leftv res, leftv args)
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Matrix<polymake::Integer> lp = p.give("INTERIOR_LATTICE_POINTS");
-      iv = PmMatrixInteger2Intvec(&lp); 
+      bool ok = true;
+      iv = PmMatrixInteger2Intvec(&lp,ok); 
+      if (!ok)
+      { 
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex) 
     {
@@ -930,7 +944,13 @@ BOOLEAN PMboundaryLatticePoints(leftv res, leftv args)
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Matrix<polymake::Integer> lp = p.give("BOUNDARY_LATTICE_POINTS");
-      iv = PmMatrixInteger2Intvec(&lp); 
+      bool ok = true;
+      iv = PmMatrixInteger2Intvec(&lp,ok); 
+      if (!ok)
+      { 
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex) 
     {
@@ -990,7 +1010,13 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
     {
       polymake::perl::Object p = ZPolytope2PmPolytope(zp);
       polymake::Matrix<polymake::Integer> lp = p.give("HILBERT_BASIS");
-      iv = PmMatrixInteger2Intvec(&lp); 
+      bool ok = true;
+      iv = PmMatrixInteger2Intvec(&lp,ok); 
+      if (!ok)
+      { 
+        WerrorS("overflow while converting polymake::Integer to int");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex) 
     {
@@ -1110,7 +1136,13 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
         p.take("LP") << o;
         polymake::Set<polymake::Integer> mf = p.give("LP.MAXIMAL_FACE");
         polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
-        maxface = new intvec(PmMatrixInteger2Intvec(&rays));
+        bool ok = true;
+        maxface = new intvec(PmMatrixInteger2Intvec(&rays,ok));
+        if (!ok)
+        { 
+          WerrorS("overflow while converting polymake::Integer to int");
+          return TRUE;
+        }
       }
       catch (const std::exception& ex) 
       {
@@ -1146,7 +1178,13 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
         p.take("LP") << o;
         polymake::Set<polymake::Integer> mf = p.give("LP.MINIMAL_FACE");
         polymake::Matrix<polymake::Integer> rays = raysOf(&p,&mf);
-        minface = new intvec(PmMatrixInteger2Intvec(&rays));
+        bool ok = true;
+        minface = new intvec(PmMatrixInteger2Intvec(&rays,ok));
+        if (!ok)
+        { 
+          WerrorS("overflow while converting polymake::Integer to int");
+          return TRUE;
+        }
       }
       catch (const std::exception& ex) 
       {
