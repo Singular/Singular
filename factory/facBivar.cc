@@ -632,7 +632,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   int liftBound= degree (A, y) + 1;
 
   modpk b= modpk();
-  if ( !extension)
+  bool mipoHasDen= false;
+  if (!extension)
   {
     Off (SW_RATIONAL);
     int i= 0;
@@ -656,6 +657,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     // make factors elements of Z(a)[x] disable for modularDiophant
     for (CFListIterator i= uniFactors; i.hasItem(); i++)
       i.getItem()= i.getItem()*bCommonDen(i.getItem());
+    mipoHasDen= !bCommonDen(mipo).isOne();
+    mipo *= bCommonDen (mipo);
     Off (SW_RATIONAL);
     int i= 0;
     ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
@@ -685,6 +688,16 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
   CanonicalForm MODl= power (y, liftBound);
+
+  if (mipoHasDen)
+  {
+    Variable vv;
+    for (CFListIterator iter= uniFactors; iter.hasItem(); iter++)
+      if (hasFirstAlgVar (iter.getItem(), vv))
+        break;
+    for (CFListIterator iter= uniFactors; iter.hasItem(); iter++)
+      iter.getItem()= replacevar (iter.getItem(), vv, v);
+  }
 
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                 uniFactors.length()/2, b);

@@ -35,6 +35,7 @@
 #include "facFqBivarUtil.h"
 #include "facFqBivar.h"
 #include "cfNewtonPolygon.h"
+#include "algext.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -521,19 +522,33 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
-        test= prodMod0 (S, M, b);
+        if (!isRat)
+          On (SW_RATIONAL);
+        test= prodMod0 (S, M);
+        if (!isRat)
+        {
+          test *= bCommonDen (test);
+          Off (SW_RATIONAL);
+        }
         test= mulNTL (test, LCBuf, b);
         test= mod (test, M);
         if (uniFdivides (test, buf0))
         {
+          if (!isRat)
+            On (SW_RATIONAL);
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
+          if (!isRat)
+          {
+            g *= bCommonDen(g);
+            Off (SW_RATIONAL);
+          }
           if (b.getp() != 0)
             g= b(g);
-          g /= content (g, x);
           if (!isRat)
             On (SW_RATIONAL);
+          g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
             recombination= true;
@@ -678,12 +693,19 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
         test0= mod (mulNTL (i.getItem() (0,x), LCBuf, b), M);
         if (uniFdivides (test0, buf0))
         {
-          g= mulMod2 (i.getItem(), LCBuf, M);
-          if (b.getp() != 0)
-            g= b(g);
-          g /= content (g, x);
           if (!isRat)
             On (SW_RATIONAL);
+          g= mulMod2 (i.getItem(), LCBuf, M);
+          if (!isRat)
+          {
+            g *= bCommonDen(g);
+            Off (SW_RATIONAL);
+          }
+          if (b.getp() != 0)
+            g= b(g);
+          if (!isRat)
+            On (SW_RATIONAL);
+          g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
             reconstructedFactors.append (g);
@@ -911,6 +933,7 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CFList bufUniFactors= uniFactors;
   CanonicalForm bufA= A;
   CanonicalForm lcA0= 0;
+  bool mipoHasDen= false;
   if (getCharacteristic() == 0 && b.getp() != 0)
   {
     if (alpha.level() == 1)
@@ -924,13 +947,10 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
     else
     {
       lcA0= Lc (A (0,2));
-      ZZX NTLlcA0= convertFacCF2NTLZZX (lcA0);
-      ZZX NTLmipo= convertFacCF2NTLZZX (getMipo (alpha));
-      ZZ NTLpk= power_ZZ (b.getp(), b.getk());
-      ZZ_p::init (NTLpk);
-      ZZ_pX S, T, G;
-      XGCD (G, S, T, to_ZZ_pX (NTLlcA0), to_ZZ_pX(NTLmipo));
-      CanonicalForm lcA0inverse= convertNTLZZX2CF (to_ZZX (S), alpha);
+      On (SW_RATIONAL);
+      mipoHasDen= !bCommonDen(getMipo(alpha)).isOne();
+      Off (SW_RATIONAL);
+      CanonicalForm lcA0inverse= b.inverse (lcA0);
       A *= lcA0inverse;
       A= b (A);
       // Lc of bufUniFactors is in Z
@@ -949,15 +969,38 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   for (int i= 0; i < uniFactors.length(); i++)
     factorsFoundIndex [i]= 0;
 
+  CFList bufBufUniFactors;
+  Variable v= alpha;
   if (smallFactorDeg >= liftBound || degree (A,y) <= 4)
     henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M, b, true);
   else if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
     henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, b, true);
+    if (mipoHasDen)
+    {
+      for (CFListIterator iter= bufUniFactors; iter.hasItem(); iter++)
+        if (hasFirstAlgVar (iter.getItem(), v))
+          break;
+      if (v != alpha)
+      {
+        bufBufUniFactors= bufUniFactors;
+        for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+          iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        A= replacevar (A, alpha, v);
+      }
+    }
+
     if (!extension)
-      earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                            factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg, b);
+    {
+      if (v==alpha)
+        earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                              factorsFoundIndex, degs, earlySuccess,
+                              smallFactorDeg, b);
+      else
+        earlyFactorDetection(earlyFactors, bufA, bufBufUniFactors, newLiftBound,
+                             factorsFoundIndex, degs, earlySuccess,
+                             smallFactorDeg, b);
+    }
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                factorsFoundIndex, degs, earlySuccess, info,
@@ -970,12 +1013,25 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
         bufUniFactors.insert (LC (A, x));
         henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
                             liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M, b);
+        if (v!=alpha)
+        {
+          bufBufUniFactors= bufUniFactors;
+          for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+            iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        }
         if (!extension)
+        {
+          if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
                                 liftPre[sizeOfLiftPre-1] + 1, b);
+          else
+          earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess,
+                                liftPre[sizeOfLiftPre-1] + 1, b);
+        }
         else
-          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+          extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
                                    eval, liftPre[sizeOfLiftPre-1] + 1);
       }
@@ -991,12 +1047,25 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
         bufUniFactors.insert (LC (A, x));
         henselLiftResume12 (A, bufUniFactors, liftPre[i] + 1,
                             liftPre[i-1] + 1, Pi, diophant, M, b);
+        if (v!=alpha)
+        {
+          bufBufUniFactors= bufUniFactors;
+          for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+            iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        }
         if (!extension)
+        {
+          if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
                                 liftPre[i-1] + 1, b);
+          else
+          earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess,
+                                liftPre[i-1] + 1, b);
+        }
         else
-          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+          extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
                                    eval, liftPre[i-1] + 1);
       }
@@ -1014,10 +1083,30 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   else
   {
     henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, b, true);
+    if (mipoHasDen)
+    {
+      for (CFListIterator iter= bufUniFactors; iter.hasItem(); iter++)
+        if (hasFirstAlgVar (iter.getItem(), v))
+          break;
+      if (v != alpha)
+      {
+        bufBufUniFactors= bufUniFactors;
+        for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+          iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        A= replacevar (A, alpha, v);
+      }
+    }
     if (!extension)
+    {
+      if (v==alpha)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
                             smallFactorDeg, b);
+      else
+      earlyFactorDetection (earlyFactors, bufA, bufBufUniFactors, newLiftBound,
+                            factorsFoundIndex, degs, earlySuccess,
+                            smallFactorDeg, b);
+    }
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                factorsFoundIndex, degs, earlySuccess, info,
@@ -1031,11 +1120,23 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       bufUniFactors.insert (LC (A, x));
       henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
                           dummy, Pi, diophant, M, b);
+      if (v!=alpha)
+      {
+        bufBufUniFactors= bufUniFactors;
+        for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+          iter.getItem()= replacevar (iter.getItem(), v, alpha);
+      }
       if (!extension)
+      {
+        if (v==alpha)
         earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                               factorsFoundIndex, degs, earlySuccess, dummy, b);
+        else
+        earlyFactorDetection (earlyFactors, bufA,bufBufUniFactors, newLiftBound,
+                              factorsFoundIndex, degs, earlySuccess, dummy, b);
+      }
       else
-        extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+        extEarlyFactorDetection (earlyFactors, bufA,bufUniFactors, newLiftBound,
                                  factorsFoundIndex, degs, earlySuccess, info,
                                  eval, dummy);
     }
@@ -1047,11 +1148,23 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
         dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*(i+1)+4);
         henselLiftResume12 (A, bufUniFactors, (degree (A,y)/4)*i + 4,
                             dummy, Pi, diophant, M, b);
+        if (v!=alpha)
+        {
+          bufBufUniFactors= bufUniFactors;
+          for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+            iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        }
         if (!extension)
+        {
+          if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess, dummy,b);
+          else
+          earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess, dummy,b);
+        }
         else
-          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+          extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
                                    eval, dummy);
       }
