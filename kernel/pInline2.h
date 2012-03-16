@@ -46,6 +46,7 @@ PINLINE2 long p_GetOrder(poly p, ring r)
   {
     switch(r->typ[i].ord_typ)
     {
+      case ro_am:
       case ro_wp_neg:
         return (((long)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
       case ro_syzcomp:
