@@ -780,7 +780,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   return NULL;                                           /// default
 }
 
-int naParDeg(number a, const coeffs cf)
+static int naParDeg(number a, const coeffs cf)
 {
   if (a == NULL) return -1;
   poly aa=(poly)a;

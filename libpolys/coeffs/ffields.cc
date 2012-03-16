@@ -27,7 +27,6 @@ BOOLEAN nfGreaterZero (number k, const coeffs r);
 number  nfMult        (number a, number b, const coeffs r);
 number  nfInit        (long i, const coeffs r);
 number  nfParameter   (int i, const coeffs r);
-int     nfParDeg      (number n, const coeffs r);
 int     nfInt         (number &n, const coeffs r);
 number  nfAdd         (number a, number b, const coeffs r);
 number  nfSub         (number a, number b, const coeffs r);
@@ -236,7 +235,7 @@ number nfParameter (int i, const coeffs)
 /*2
 * the degree of the "alg. number"
 */
-int nfParDeg(number n, const coeffs r)
+static int nfParDeg(number n, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(n, r);
@@ -883,6 +882,8 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfName = ndName;
   // debug stuff
   r->cfCoeffWrite=nfCoeffWrite;
+   
+  r->cfParDeg = nfParDeg;
 
 #ifdef LDEBUG
   r->cfDBTest=nfDBTest;

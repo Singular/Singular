@@ -86,7 +86,7 @@ number ndChineseRemainder(number *,number *,int,const coeffs r)
   return n_Init(0,r); 
 }
 
-int ndParDeg(number n, const coeffs r)
+static int ndParDeg(number n, const coeffs r)
 {
   return (-n_IsZero(n,r));
 }

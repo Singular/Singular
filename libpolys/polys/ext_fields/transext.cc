@@ -1349,7 +1349,7 @@ CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
 }
 #endif
 
-int ntParDeg(number a, const coeffs cf)
+static int ntParDeg(number a, const coeffs cf)
 {
   if (IS0(a)) return -1;
   fraction fa = (fraction)a;

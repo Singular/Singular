@@ -46,6 +46,6 @@ static inline number n_GetUnit(number n, const ring r){ return n_GetUnit(n, r->c
 static inline BOOLEAN n_DivBy(number a, number b, const ring r){ return n_DivBy(a,b, r->cf);}
 #endif
 
-
+static inline int n_ParDeg(number n, const ring r){ assume(r != NULL); assume(r->cf != NULL); return n_ParDeg(n,r->cf); }
 
 #endif /* COEFFRINGS_H */

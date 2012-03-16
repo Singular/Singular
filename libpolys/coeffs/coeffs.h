@@ -629,20 +629,17 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 
 static inline number n_ChineseRemainder(number *a, number *b, int rl, const coeffs r)
 {
-  assume(r != NULL);
-  return r->cfChineseRemainder(a,b,rl,r);
+  assume(r != NULL); assume(r->cfChineseRemainder != NULL); return r->cfChineseRemainder(a,b,rl,r);
 }
 
 static inline number n_Farey(number a, number b, const coeffs r)
 {
-  assume(r != NULL);
-  return r->cfFarey(a,b,r);
+  assume(r != NULL); assume(r->cfFarey != NULL); return r->cfFarey(a,b,r);
 }
 
 static inline int n_ParDeg(number n, const coeffs r)
 { 
-  assume(r != NULL);
-  return r->cfParDeg(n,r); 
+  assume(r != NULL); assume(r->cfParDeg != NULL); return r->cfParDeg(n,r); 
 }
 
 /// Returns the number of parameters

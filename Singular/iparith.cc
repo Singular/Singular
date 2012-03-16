@@ -4445,7 +4445,7 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
 static BOOLEAN jjPARDEG(leftv res, leftv v)
 {
   number nn=(number)v->Data();
-  res->data = (char *)(long)n_ParDeg(nn,currRing->cf);
+  res->data = (char *)(long)n_ParDeg(nn, currRing);
   return FALSE;
 }
 static BOOLEAN jjPARSTR1(leftv res, leftv v)
