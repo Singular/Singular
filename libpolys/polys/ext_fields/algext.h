@@ -45,42 +45,6 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst);
 /// Initialize the coeffs object
 BOOLEAN  naInitChar(coeffs cf, void* infoStruct);
 
-/* Private hidden interface
-BOOLEAN  naGreaterZero(number a, const coeffs cf); 
-BOOLEAN  naGreater(number a, number b, const coeffs cf);
-BOOLEAN  naEqual(number a, number b, const coeffs cf);
-BOOLEAN  naIsOne(number a, const coeffs cf);
-BOOLEAN  naIsMOne(number a, const coeffs cf);
-BOOLEAN  naIsZero(number a, const coeffs cf);
-number   naInit(long i, const coeffs cf);
-int      naInt(number &a, const coeffs cf);
-number   naNeg(number a, const coeffs cf);
-number   naInvers(number a, const coeffs cf);
-number   naAdd(number a, number b, const coeffs cf);
-number   naSub(number a, number b, const coeffs cf);
-number   naMult(number a, number b, const coeffs cf);
-number   naDiv(number a, number b, const coeffs cf);
-void     naPower(number a, int exp, number *b, const coeffs cf);
-number   naCopy(number a, const coeffs cf);
-void     naWrite(number &a, const coeffs cf);
-number   naRePart(number a, const coeffs cf);
-number   naImPart(number a, const coeffs cf);
-number   naGetDenom(number &a, const coeffs cf);
-number   naGetNumerator(number &a, const coeffs cf);
-number   naGcd(number a, number b, const coeffs cf);
-number   naLcm(number a, number b, const coeffs cf);
-number   naSize(number a, const coeffs cf);
-void     naDelete(number * a, const coeffs cf);
-void     naCoeffWrite(const coeffs cf);
-number   naIntDiv(number a, number b, const coeffs cf);
-const char * naRead(const char *s, number *a, const coeffs cf);
-static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
-*/
-
-/// return the specified parameter as a number in the given alg. field
-number naParam(short iParameter, const coeffs cf);
-
-
 /// if m == var(i)/1 => return i, 
 int naIsParam(number, const coeffs);
 

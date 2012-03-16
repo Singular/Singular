@@ -796,7 +796,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
             if (rField_is_GF())
             {
               number c=pGetCoeff(qq);
-              number ee=nfPar(1);
+              number ee=n_Parameter(1, currRing->cf); // ?
               number eee;nfPower(ee,e,&eee); //nfDelete(ee,currRing);
               ee=nfMult(c,eee);
               //nfDelete(c,currRing);nfDelete(eee,currRing);

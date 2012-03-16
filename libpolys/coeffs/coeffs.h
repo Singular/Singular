@@ -194,6 +194,9 @@ struct n_Procs_s
    /// degree for coeffcients: -1 for 0, 0 for "constants", ...
    int (*cfParDeg)(number x,const coeffs r);
 
+   /// create i^th parameter or NULL if not possible
+   number  (*cfParameter)(const int i, const coeffs r);
+
 #ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
@@ -212,6 +215,16 @@ struct n_Procs_s
    int     factoryVarOffset;
    n_coeffType type;
 
+
+   /// Number of Parameters in the coeffs (default 0)
+   int iNumberOfParameters;
+
+   /// array containing the names of Parameters (default NULL)
+   char const * const * pParameterNames;
+   // NOTE that it replaces the following:
+// char* complex_parameter; //< the name of sqrt(-1) in n_long_C , i.e. 'i' or 'j' etc...?
+// char * m_nfParameter; //< the name of parameter in n_GF
+
    /////////////////////////////////////////////
    // the union stuff
 
@@ -226,8 +239,6 @@ struct n_Procs_s
 
 
 //-------------------------------------------
-  char* complex_parameter; //< the name of sqrt(-1), i.e. 'i' or 'j' etc...?
-
 #ifdef HAVE_RINGS
   /* The following members are for representing the ring Z/n,
      where n is not a prime. We distinguish four cases:
@@ -281,8 +292,7 @@ struct n_Procs_s
   int m_nfCharQ1; ///< q-1
   unsigned short *m_nfPlus1Table;
   int *m_nfMinPoly;
-  char * m_nfParameter;
-
+  
 // ---------------------------------------------------
 // for Zp:
 #ifdef HAVE_DIV_MOD
@@ -634,6 +644,24 @@ static inline int n_ParDeg(number n, const coeffs r)
   assume(r != NULL);
   return r->cfParDeg(n,r); 
 }
+
+/// Returns the number of parameters
+static inline int n_NumberOfParameters(const coeffs r){ return r->iNumberOfParameters; }
+
+/// Returns a (const!) pointer to (const char*) names of parameters
+static inline char const * const * n_ParameterNames(const coeffs r){ return r->pParameterNames; }
+
+
+/// return the (iParameter^th) parameter as a NEW number
+/// NOTE: parameter numbering: 1..n_NumberOfParameters(...)
+static inline number n_Param(const int iParameter, const coeffs r)
+{
+  assume(r != NULL);
+  assume((iParameter >= 1) || (iParameter <= n_NumberOfParameters(r)));
+  assume(r->cfParameter != NULL);
+  return r->cfParameter(iParameter, r);  
+}
+
 
 static inline number  n_Init_bigint(number i, const coeffs dummy,
 		const coeffs dst)

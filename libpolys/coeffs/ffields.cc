@@ -6,17 +6,57 @@
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 
-#include <misc/auxiliary.h>
-#include <string.h>
-#include <coeffs/coeffs.h>
-#include <misc/mylimits.h>
+#include "config.h"
+
 #include <omalloc/omalloc.h>
+
+#include <misc/auxiliary.h>
+#include <misc/mylimits.h>
+
 #include <reporter/reporter.h>
+#include <resources/feFopen.h>
+
+#include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 #include <coeffs/ffields.h>
-#include <resources/feFopen.h>
+
+#include <string.h>
 #include <math.h>
 
+BOOLEAN nfGreaterZero (number k, const coeffs r);
+number  nfMult        (number a, number b, const coeffs r);
+number  nfInit        (long i, const coeffs r);
+number  nfParameter   (int i, const coeffs r);
+int     nfParDeg      (number n, const coeffs r);
+int     nfInt         (number &n, const coeffs r);
+number  nfAdd         (number a, number b, const coeffs r);
+number  nfSub         (number a, number b, const coeffs r);
+void    nfPower       (number a, int i, number * result, const coeffs r);
+BOOLEAN nfIsZero      (number a, const coeffs r);
+BOOLEAN nfIsOne       (number a, const coeffs r);
+BOOLEAN nfIsMOne      (number a, const coeffs r);
+number  nfDiv         (number a, number b, const coeffs r);
+number  nfNeg         (number c, const coeffs r);
+number  nfInvers      (number c, const coeffs r);
+BOOLEAN nfGreater     (number a, number b, const coeffs r);
+BOOLEAN nfEqual       (number a, number b, const coeffs r);
+const char *  nfRead  (const char *s, number *a, const coeffs r);
+#ifdef LDEBUG
+BOOLEAN nfDBTest      (number a, const char *f, const int l, const coeffs r);
+#endif
+//void    nfSetChar     (const coeffs r);
+
+nMapFunc nfSetMap     (const coeffs src, const coeffs dst);
+char *  nfName        (number n, const coeffs r);
+void    nfReadTable   (const int c, const coeffs r);
+
+void    nfCoeffWrite(const coeffs r, BOOLEAN details);
+void    nfShowMipo(const coeffs r);
+
+
+
+/// Our Type!
+static const n_coeffType ID = n_GF;
 
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 
@@ -183,10 +223,14 @@ number nfInit (long i, const coeffs r)
 /*
 * the generating element `z`
 */
-number nfPar (int i, const coeffs)
+number nfParameter (int i, const coeffs)
 {
   assume(i==1);
-  return (number)1;
+  
+  if( i == 1 )
+    return (number)1;
+
+  return NULL;
 }
 
 /*2
@@ -393,7 +437,7 @@ static void nfWriteLong (number &a, const coeffs r)
   else if (nfIsMOne(a, r))   StringAppendS("-1");
   else
   {
-    StringAppendS(r->m_nfParameter);
+    StringAppendS(n_ParameterNames(r)[0]);
     if ((long)a!=1L)
     {
       StringAppend("^%d",(int)((long)a)); // long output!
@@ -415,7 +459,7 @@ static void nfWriteShort (number &a, const coeffs r)
   else if (nfIsMOne(a, r))   StringAppendS("-1");
   else
   {
-    StringAppendS(r->m_nfParameter);
+    StringAppendS(n_ParameterNames(r)[0]);
     if ((long)a!=1L)
     {
       StringAppend("%d",(int)((long)a));
@@ -432,16 +476,16 @@ char * nfName(number a, const coeffs r)
   nfTest(a, r);
 #endif
   char *s;
-  char *nfParameter=r->m_nfParameter;
+  const char * const nf_Parameter=n_ParameterNames(r)[0];
   if (((long)a==(long)r->m_nfCharQ) || ((long)a==0L)) return NULL;
   else if ((long)a==1L)
   {
-    return omStrDup(nfParameter);
+    return omStrDup(nf_Parameter);
   }
   else
   {
-    s=(char *)omAlloc(4+strlen(nfParameter));
-    sprintf(s,"%s%d",nfParameter,(int)((long)a));
+    s=(char *)omAlloc(4+strlen(nf_Parameter));
+    sprintf(s,"%s%d",nf_Parameter,(int)((long)a));
   }
   return s;
 }
@@ -512,10 +556,11 @@ const char * nfRead (const char *s, number *a, const coeffs r)
     n=nfInit(i, r);
     *a = nfDiv(z,n,r);
   }
-  char *nfParameter=r->m_nfParameter;
-  if (strncmp(s,nfParameter,strlen(nfParameter))==0)
+  const char * const nf_Parameter = n_ParameterNames(r)[0];
+  const int N = strlen(nf_Parameter);
+  if (strncmp(s,nf_Parameter, N)==0)
   {
-    s+=strlen(nfParameter);
+    s += N;
     if ((*s >= '0') && (*s <= '9'))
     {
       s=eati(s,&i);
@@ -572,7 +617,7 @@ void nfShowMipo(const coeffs r)
   {
     j++;
     if (nfMinPoly[j]!=0)
-      StringAppend("%d*%s^%d",nfMinPoly[j],r->m_nfParameter,i);
+      StringAppend("%d*%s^%d",nfMinPoly[j],n_ParameterNames(r)[0],i);
     i--;
     if(i<0) break;
     if (nfMinPoly[j]!=0)
@@ -778,10 +823,23 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
 
 static BOOLEAN nfCoeffIsEqual(const coeffs, n_coeffType, void*);
 
+static void nfKillChar(coeffs r)
+{
+  char** p = (char**)n_ParameterNames(r);
+
+  const int P = n_NumberOfParameters(r);
+  
+  for( int i = 1; i <= P; i++ )
+    if (p[i-1] != NULL) 
+      omFree( (ADDRESS)p[i-1] );
+  
+  omFreeSize((ADDRESS)p, P * sizeof(char*));  
+}
+
 BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
   //r->cfInitChar=npInitChar;
-  //r->cfKillChar=nfKillChar;
+  r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;
 
   r->cfMult  = nfMult;
@@ -843,7 +901,21 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->m_nfCharQ = 0;
   r->m_nfCharP = p->GFChar;
   r->m_nfCharQ1 = 0;
-  r->m_nfParameter= omStrDup(name); //TODO use omAlloc for allocating memory and use strcpy?
+
+  r->iNumberOfParameters = 1;
+  r->cfParameter = nfParameter;
+
+  char ** pParameterNames = (char **) omAlloc0(sizeof(char *));
+  pParameterNames[0] = omStrDup(name); //TODO use omAlloc for allocating memory and use strcpy?
+
+  assume( pParameterNames != NULL );
+  assume( pParameterNames[0] != NULL );
+  
+  r->pParameterNames = pParameterNames;
+  // NOTE: r->m_nfParameter was replaced by n_ParameterNames(r)[0]
+
+  // TODO: nfKillChar MUST destroy r->pParameterNames[0] (0-term. string) && r->pParameterNames (array of size 1)
+
   r->m_nfPlus1Table= NULL;
 
   if (strlen(name) > 1)
@@ -892,7 +964,7 @@ void    nfCoeffWrite  (const coeffs r, BOOLEAN details)
 {
   // m_nfCharQ = p^k where p is the characteristic (r->CharP) and k is GFDegree
   Print("//   # ground field : %d\n",r->m_nfCharQ);
-  Print("//   primitive element : %s\n", r->m_nfParameter);
+  Print("//   primitive element : %s\n", n_ParameterNames(r)[0]);
   if ( details )
   {
     StringSetS("//   minpoly        : ");
@@ -907,7 +979,7 @@ static BOOLEAN nfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
   if (n==n_GF) {
     GFInfo* p = (GFInfo *)(parameter);
     int c = pow (p->GFChar, p->GFDegree);
-    if ((c == r->m_nfCharQ) && (strcmp(r->m_nfParameter,p->GFPar_name) == 0))
+    if ((c == r->m_nfCharQ) && (strcmp(n_ParameterNames(r)[0], p->GFPar_name) == 0))
       return TRUE;
   }
   return FALSE;

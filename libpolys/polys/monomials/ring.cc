@@ -275,10 +275,14 @@ void   rWrite(ring r, BOOLEAN details)
 #if 0
   {
     PrintS("//   characteristic : ");
-    if (rParameter(r)!=NULL)
+    
+    char const * const * const params = rParameter(r);
+    
+    if (params!=NULL)
     {
       Print ("//   %d parameter    : ",rPar(r));
-      char **sp= rParameter(r);
+      
+      char const * const * sp= params;
       int nop=0;
       while (nop<rPar(r))
       {
@@ -290,7 +294,7 @@ void   rWrite(ring r, BOOLEAN details)
       if ( rField_is_long_C(r) )
       {
         // i^2+1:
-        Print("(%s^2+1)\n",rParameter(r)[0]);
+        Print("(%s^2+1)\n", params[0]);
       }
       else if (rMinpolyIsNULL(r))
       {
@@ -665,7 +669,7 @@ char * rCharStr(ring r)
   {
     return omStrDup("real"); /* short real */
   }
-  char **params = rParameter(r);
+  char const * const * const params = rParameter(r);
   if (params==NULL)
   {
     s=(char *)omAlloc(MAX_INT_LEN+1);
@@ -689,7 +693,7 @@ char * rCharStr(ring r)
   int l=0;
   for(i=0; i<rPar(r);i++)
   {
-    l+=(strlen(rParameter(r)[i])+1);
+    l+=(strlen(params[i])+1);
   }
   s=(char *)omAlloc((long)(l+MAX_INT_LEN+1));
   s[0]='\0';
@@ -700,7 +704,7 @@ char * rCharStr(ring r)
   for(i=0; i<rPar(r);i++)
   {
     strcat(s,tt);
-    strcat(s,rParameter(r)[i]);
+    strcat(s,params[i]);
   }
   return s;
 }
@@ -709,21 +713,23 @@ char * rParStr(ring r)
 {
   if ((r==NULL)||(rParameter(r)==NULL)) return omStrDup("");
 
+  char const * const * const params = rParameter(r);
+
   int i;
   int l=2;
 
   for (i=0; i<rPar(r); i++)
   {
-    l+=strlen(rParameter(r)[i])+1;
+    l+=strlen(params[i])+1;
   }
   char *s=(char *)omAlloc((long)l);
   s[0]='\0';
   for (i=0; i<rPar(r)-1; i++)
   {
-    strcat(s,rParameter(r)[i]);
+    strcat(s, params[i]);
     strcat(s,",");
   }
-  strcat(s,rParameter(r)[i]);
+  strcat(s, params[i]);
   return s;
 }
 
@@ -5633,35 +5639,14 @@ poly rGetVar(const int varIndex, const ring r)
 }
 
 
-
-number n_Param(const short iParameter, const ring r)
+/// TODO: rewrite somehow...
+int n_IsParam(const number m, const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  const n_coeffType _filed_type = getCoeffType(C);
-
-  if ( iParameter <= 0 || iParameter > rPar(r) )
-    // Wrong parameter
-    return NULL;
-
-  if( _filed_type == n_algExt )
-    return naParam(iParameter, C);
-
-  if( _filed_type == n_transExt )
-    return ntParam(iParameter, C);
-
-  return NULL;
-}
-
-
-
-int n_IsParam(number m, const ring r)
-{
-  assume(r != NULL);
-  const coeffs C = r->cf;
-  assume(C != NULL);
+  assume( nCoeff_is_Extension(C) );
 
   const n_coeffType _filed_type = getCoeffType(C);
 
@@ -5671,6 +5656,8 @@ int n_IsParam(number m, const ring r)
   if( _filed_type == n_transExt )
     return ntIsParam(m, C);
 
+  Werror("n_IsParam: IsParam is not to be used for (coeff_type = %d)",getCoeffType(C));
+  
   return 0;
 }
 

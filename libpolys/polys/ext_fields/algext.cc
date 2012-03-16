@@ -787,6 +787,32 @@ int naParDeg(number a, const coeffs cf)
   return cf->extRing->pFDeg(aa,cf->extRing);
 }
 
+/// return the specified parameter as a number in the given alg. field
+static number naParameter(const int iParameter, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );  
+  assume( 0 < iParameter && iParameter <= rVar(R) );
+
+  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
+
+  return (number) p; 
+}
+
+
+/// if m == var(i)/1 => return i, 
+int naIsParam(number m, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );  
+
+  return p_Var( (poly)m, R ); 
+}
+
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {  
   assume( infoStruct != NULL );
@@ -804,16 +830,20 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                     // coeff type;
-  
-  cf->extRing           = e->r;
-  cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!
 
-  cf->extRing->minideal = e->i; // make a copy? 
+  ring R = e->r;
+  assume(R != NULL);
+  
+  R->ref ++; // increase the ref.counter for the ground poly. ring!
+
+  R->minideal = e->i; // make a copy? 
+
+  cf->extRing           = R;
 
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
-  cf->ch = cf->extRing->cf->ch;
-  
+  cf->ch = R->cf->ch;
+
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);
   #endif
@@ -867,31 +897,9 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 #endif
   cf->cfParDeg = naParDeg;
   
+  cf->iNumberOfParameters = rVar(R);
+  cf->pParameterNames = R->names;
+  cf->cfParameter = naParameter;
+  
   return FALSE;
-}
-
-
-number naParam(const short iParameter, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-  
-  const ring R = cf->extRing;
-  assume( R != NULL );  
-  assume( 0 < iParameter && iParameter <= rVar(R) );
-  
-  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
-  
-  return (number) p; 
-}
-
-
-/// if m == var(i)/1 => return i, 
-int naIsParam(number m, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-
-  const ring R = cf->extRing;
-  assume( R != NULL );  
-
-  return p_Var( (poly)m, R ); 
 }

@@ -453,7 +453,9 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
    
   assume( n->float_len <= n->float_len2 );
   assume( n->float_len2 >= SHORT_REAL_LENGTH );
-  assume( n->complex_parameter == NULL );
+  
+  assume( n_NumberOfParameters(n) == 0 );
+  assume( n_ParameterNames(n) == NULL );
 
   return FALSE;
 }

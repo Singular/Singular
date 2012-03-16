@@ -537,54 +537,91 @@ static inline short rVar(const ring r)
 }
 
 /// (r->cf->P)
-static inline short rPar(const ring r)
+static inline int rPar(const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) )
-  {
-    const ring R = C->extRing;
-    assume( R != NULL );
-    return rVar( R );
-  }
-  else if (nCoeff_is_long_C(C))
-  {
-    return 1;
-  }
-  return 0;
+  return n_NumberOfParameters(C);
+//   if( nCoeff_is_Extension(C) )
+//   {
+//     const ring R = C->extRing;
+//     assume( R != NULL );
+//     return rVar( R );
+//   }
+//   else if (nCoeff_is_GF(C))
+//   {
+//     return 1;
+//   }
+//   else if (nCoeff_is_long_C(C))
+//   {
+//     return 1;
+//   }
+//   return 0;
 }
 
 
 /// (r->cf->parameter)
-static inline char** rParameter(const ring r)
+static inline char const * const * rParameter(const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) ) // only alg / trans. exts...
-  {
-    const ring R = C->extRing;
-    assume( R != NULL );
-    return R->names;
-  }
-  else if (nCoeff_is_GF(C))
-  {
-    return &(C->m_nfParameter);
-  }
-  else if (nCoeff_is_long_C(C))
-  {
-    return &(C->complex_parameter);
-  }
-  return NULL;
+  return n_ParameterNames(C);
+//   if( nCoeff_is_Extension(C) ) // only alg / trans. exts...
+//   {
+//     const ring R = C->extRing;
+//     assume( R != NULL );
+//     return R->names;
+//   }
+//   else if (nCoeff_is_GF(C))
+//   {
+//     return &(C->m_nfParameter);
+//   }
+//   else if (nCoeff_is_long_C(C))
+//   {
+//     return &(C->complex_parameter);
+//   }
+//   return NULL;
 }
 
 /// return the specified parameter as a (new!) number in the given
 /// polynomial ring, or NULL if invalid
 /// parameters (as variables) begin with 1!
-number n_Param(const short iParameter, const ring r);
+static inline number n_Param(const short iParameter, const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+  return n_Param(iParameter, C);
+//   const n_coeffType _filed_type = getCoeffType(C);
+// 
+//   if ( iParameter <= 0 || iParameter > rPar(r) )
+//     // Wrong parameter
+//     return NULL;
+// 
+//   if( _filed_type == n_algExt )
+//     return naParameter(iParameter, C);
+// 
+//   if( _filed_type == n_transExt )
+//     return ntParameter(iParameter, C);
+// 
+//   if (_filed_type == n_GF)// if (nCoeff_is_GF(C))
+//   {
+//     number nfPar (int i, const coeffs);
+//     return nfPar(iParameter, C);
+//   }
+//   
+//   if (_filed_type == n_long_C) // if (nCoeff_is_long_C(C))
+//   {
+//     number   ngcPar(int i, const coeffs r);    
+//     return ngcPar(iParameter, C);
+//   }
+// 
+//   return NULL;
+}
 
 /// if m == var(i)/1 => return i, 
 int n_IsParam(number m, const ring r);
@@ -602,8 +639,11 @@ static inline int rInternalChar(const ring r)
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)
 {
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
 //  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
-  return rField_is_Extension(r) || nCoeff_is_GF(r->cf) ;
+  return nCoeff_is_Extension(C) || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
 }
 
 /// Tests whether '(r->cf->minpoly) == NULL'

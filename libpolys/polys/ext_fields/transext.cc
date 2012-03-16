@@ -1356,6 +1356,43 @@ int ntParDeg(number a, const coeffs cf)
   return cf->extRing->pFDeg(NUM(fa),cf->extRing);
 }
 
+/// return the specified parameter as a number in the given trans.ext.
+static number ntParameter(const int iParameter, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+  assume( 0 < iParameter && iParameter <= rVar(R) );
+
+  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
+
+//  return (number) p;
+
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(f) = p;
+  DEN(f) = NULL;
+  COM(f) = 0;
+
+  return (number)f;
+}
+
+/// if m == var(i)/1 => return i,
+int ntIsParam(number m, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+
+  fraction f = (fraction)m;
+
+  if( DEN(f) != NULL )
+    return 0;
+
+  return p_Var( NUM(f), R );
+}
+
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
@@ -1370,14 +1407,17 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                // coeff type;
 
-  cf->extRing           = e->r;
-  cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!
-  cf->factoryVarOffset = cf->extRing->cf->factoryVarOffset+rVar(cf->extRing);
+  ring R = e->r;
+  assume(R != NULL);
+  
+  R->ref ++; // increase the ref.counter for the ground poly. ring!
 
+  cf->extRing           = R;
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
-  cf->ch = cf->extRing->cf->ch;
-
+  cf->ch = R->cf->ch;
+  cf->factoryVarOffset = R->cf->factoryVarOffset + rVar(R);
+  
   cf->cfGreaterZero  = ntGreaterZero;
   cf->cfGreater      = ntGreater;
   cf->cfEqual        = ntEqual;
@@ -1431,43 +1471,10 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 #endif
   cf->cfParDeg = ntParDeg;
 
+  cf->iNumberOfParameters = rVar(R);
+  cf->pParameterNames = R->names;
+  cf->cfParameter = ntParameter;
+
+
   return FALSE;
-}
-
-
-number ntParam(const short iParameter, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-
-  const ring R = cf->extRing;
-  assume( R != NULL );
-  assume( 0 < iParameter && iParameter <= rVar(R) );
-
-  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
-
-//  return (number) p;
-
-  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(f) = p;
-  DEN(f) = NULL;
-  COM(f) = 0;
-
-  return (number)f;
-}
-
-
-/// if m == var(i)/1 => return i,
-int ntIsParam(number m, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-
-  const ring R = cf->extRing;
-  assume( R != NULL );
-
-  fraction f = (fraction)m;
-
-  if( DEN(f) != NULL )
-    return 0;
-
-  return p_Var( NUM(f), R );
 }

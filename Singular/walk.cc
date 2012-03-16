@@ -1942,18 +1942,22 @@ static void DefRingPar(intvec* va)
 
   res->VarOffset = NULL;
   res->ref=0;
-  if (currRing->cf->extRing!=NULL)
-    currRing->cf->extRing->ref++;
 
-  if (rParameter (currRing)!=NULL)
-  {
-    res->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0],currRing->cf->extRing);
-    int l=rPar(currRing);
-    res->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-
-    for(i=l-1;i>=0;i--)
-      rParameter (res)[i]=omStrDup(rParameter (currRing)[i]);
-  }
+  res->cf = currRing->cf; currRing->cf->ref++;
+            
+//   if (currRing->cf->extRing!=NULL)
+//     currRing->cf->extRing->ref++;
+// 
+//   if (rParameter (currRing)!=NULL)
+//   {
+//     res->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0],currRing->cf->extRing);
+//     int l=rPar(currRing);
+//     
+//     res->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
+// 
+//     for(i=l-1;i>=0;i--)
+//       rParameter (res)[i]=omStrDup(rParameter (currRing)[i]);
+//   }
 
   intvec* iva = va;
 
@@ -2021,18 +2025,21 @@ static void DefRingParlp(void)
 
   r->VarOffset = NULL;
   r->ref=0;
-  if (currRing->cf->extRing!=NULL)
-    currRing->cf->extRing->ref++;
 
-  if (rParameter (currRing)!=NULL)
-  {
-    r->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0], currRing->cf->extRing);
-    int l=rPar(currRing);
-    r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-
-    for(i=l-1;i>=0;i--)
-      rParameter(r)[i]=omStrDup(rParameter (currRing)[i]);
-  }
+  r->cf = currRing->cf; currRing->cf->ref++;
+  
+//   if (currRing->cf->extRing!=NULL)
+//     currRing->cf->extRing->ref++;
+// 
+//   if (rParameter (currRing)!=NULL)
+//   {
+//     r->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0], currRing->cf->extRing);
+//     int l=rPar(currRing);
+//     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
+// 
+//     for(i=l-1;i>=0;i--)
+//       rParameter(r)[i]=omStrDup(rParameter (currRing)[i]);
+//   }
 
 
   r->cf  = currRing->cf;
@@ -2072,15 +2079,15 @@ static void DefRingParlp(void)
   r->OrdSgn    = 1;
 
 
-  if (rParameter(currRing)!=NULL)
-  {
-    r->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0], currRing->cf->extRing);
-    int l=rPar(currRing);
-    r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-
-    for(i=l-1;i>=0;i--)
-      rParameter(r)[i]=omStrDup(rParameter(currRing)[i]);
-  }
+//   if (rParameter(currRing)!=NULL)
+//   {
+//     r->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0], currRing->cf->extRing);
+//     int l=rPar(currRing);
+//     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
+// 
+//     for(i=l-1;i>=0;i--)
+//       rParameter(r)[i]=omStrDup(rParameter(currRing)[i]);
+//   }
 
   /* complete ring intializations */
   rComplete(r);

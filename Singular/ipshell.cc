@@ -2073,10 +2073,14 @@ static void rRenameVars(ring R)
     {
       if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
-        Warn("name conflict par(%d) and var(%d): `%s`, rename to `@@(%d)`",i+1,j+1,R->names[j],i+1);
-        omFree(rParameter(R)[i]);
-        rParameter(R)[i]=(char *)omAlloc(10);
-        sprintf(rParameter(R)[i],"@@(%d)",i+1);
+        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+//        omFree(rParameter(R)[i]);
+//        rParameter(R)[i]=(char *)omAlloc(10);
+//        sprintf(rParameter(R)[i],"@@(%d)",i+1);
+        
+        omFree(R->names[j]);
+        R->names[j]=(char *)omAlloc(10);
+        sprintf(R->names[j],"@@(%d)",i+1);
       }
     }
   }

@@ -76,11 +76,11 @@ bool TestArith(const coeffs r)
   
   PrintS("two: "); PrintSized(two, r);
 
-  if (getCoeffType(r) == n_GF) //some special test for GF
+  if (n_NumberOfParameters(r) > 0) 
   {
-    number z = nfPar (0, r); // also any integer instead of 0//?
+    number z = n_Param(1, r); // also any integer instead of 0//?
 
-    PrintS("Generator: "); PrintSized(z, r);
+    PrintS("Parameter: "); PrintSized(z, r);
     
     n_Delete(&z, r);    
   }
@@ -213,9 +213,9 @@ bool Test(const n_coeffType type, void* p = NULL)
   }
   else if( type == n_long_C )
   {
-    assume( r->cfInit == ngcInit );
-    assume( r->cfAdd == ngcAdd );
-    assume( r->cfDelete == ngcDelete );    
+//     assume( r->cfInit == ngcInit );
+//     assume( r->cfAdd == ngcAdd );
+//     assume( r->cfDelete == ngcDelete );    
   }
   else if( type == n_R )
   {
@@ -239,8 +239,8 @@ bool Test(const n_coeffType type, void* p = NULL)
 #endif
   else if( type == n_GF )
   {
-    assume( r->cfInit == nfInit );
-    assume( r->cfAdd == nfAdd );
+//     assume( r->cfInit == nfInit );
+//     assume( r->cfAdd == nfAdd );
     //assume( r->cfDelete == nfDelete );
   }
   else

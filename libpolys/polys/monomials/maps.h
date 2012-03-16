@@ -22,8 +22,8 @@ map maCopy(map theMap, const ring dst_ring);
 
 poly maIMap(ring src_ring, ring dst_ring, poly p);
 
-void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
-                char **names,       int n,       char **par,       int nop,
+void maFindPerm(char const * const * const preim_names, int preim_n, char const * const * const preim_par, int preim_p,
+                char const * const * const names,       int n,       char const * const * const par,       int nop,
                 int * perm, int *par_perm, n_coeffType ch);
 poly pSubstPoly(poly p, int var, poly image);
 ideal  idSubstPoly(ideal id, int n, poly e);

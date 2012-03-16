@@ -3519,8 +3519,8 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
             number c = p_GetCoeff(qq, dst);
             if (rField_is_GF(dst))
             {
-               assume( dst->cf->extRing == NULL );
-              number ee = nfPar(1, dst->cf); // NOTE: using nfPar is a BAD thing to do...
+              assume( dst->cf->extRing == NULL );
+              number ee = n_Param(1, dst);
 
               number eee;
               n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);

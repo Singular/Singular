@@ -7,38 +7,17 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-#include <coeffs/coeffs.h>
+#include <misc/auxiliary.h>
 
+struct n_Procs_s;
+typedef struct  n_Procs_s  *coeffs;
+
+//// Initialize r (n_GF)
 BOOLEAN nfInitChar(coeffs r, void*);
 
-BOOLEAN nfGreaterZero (number k, const coeffs r);
-number  nfMult        (number a, number b, const coeffs r);
-number  nfInit        (long i, const coeffs r);
-number  nfPar         (int i, const coeffs r);
-int     nfParDeg      (number n, const coeffs r);
-int     nfInt         (number &n, const coeffs r);
-number  nfAdd         (number a, number b, const coeffs r);
-number  nfSub         (number a, number b, const coeffs r);
-void    nfPower       (number a, int i, number * result, const coeffs r);
-BOOLEAN nfIsZero      (number a, const coeffs r);
-BOOLEAN nfIsOne       (number a, const coeffs r);
-BOOLEAN nfIsMOne      (number a, const coeffs r);
-number  nfDiv         (number a, number b, const coeffs r);
-number  nfNeg         (number c, const coeffs r);
-number  nfInvers      (number c, const coeffs r);
-BOOLEAN nfGreater     (number a, number b, const coeffs r);
-BOOLEAN nfEqual       (number a, number b, const coeffs r);
-void    nfWrite       (number &a, const coeffs r);
-const char *  nfRead  (const char *s, number *a, const coeffs r);
-#ifdef LDEBUG
-BOOLEAN nfDBTest      (number a, const char *f, const int l, const coeffs r);
-#endif
-//void    nfSetChar     (const coeffs r);
-
-nMapFunc nfSetMap     (const coeffs src, const coeffs dst);
-char *  nfName        (number n, const coeffs r);
-void    nfReadTable   (const int c, const coeffs r);
-
-void    nfCoeffWrite(const coeffs r, BOOLEAN details);
+/// Show the mininimal polynom....
+/// NOTE: this is used by char *  sleftv::String(void *d, BOOLEAN typed, int dim) (from Singular/subexpr.cc)
+/// TODO: rewrite this UGLYNESS!!!
 void    nfShowMipo(const coeffs r);
+
 #endif

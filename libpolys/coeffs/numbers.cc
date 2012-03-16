@@ -91,6 +91,11 @@ int ndParDeg(number n, const coeffs r)
   return (-n_IsZero(n,r));
 }
 
+static number ndParameter(const int i, const coeffs r)
+{
+  Werror("ndParameter: n_Parameter is not implemented/relevant for (coeff_type = %d)",getCoeffType(r));
+  return NULL;
+}
 
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
@@ -257,6 +262,8 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfChineseRemainder = ndChineseRemainder;
     n->cfFarey = ndFarey;
     n->cfParDeg = ndParDeg;
+    
+    n->cfParameter = ndParameter;
 
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
@@ -322,6 +329,13 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfWriteLong!=NULL);
     assume(n->cfWriteShort!=NULL);
 
+    assume(n->iNumberOfParameters>= 0);
+
+    assume( (n->iNumberOfParameters == 0 && n->pParameterNames == NULL) ||
+            (n->iNumberOfParameters >  0 && n->pParameterNames != NULL) );           
+
+    assume(n->cfParameter!=NULL);
+    assume(n->cfParDeg!=NULL);
 
     if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);

@@ -10,18 +10,70 @@
 
 #include "config.h"
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
-#include <coeffs/modulop.h>
-#include <coeffs/gnumpc.h>
-#include <coeffs/gnumpfl.h>
-#include <coeffs/mpr_complex.h>
-#include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
 
+#include <misc/auxiliary.h>
+#include <misc/mylimits.h>
 
+#include <reporter/reporter.h>
+#include <resources/feFopen.h>
+
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
+
+#include <coeffs/longrat.h>
+#include <coeffs/modulop.h>
+
+#include <coeffs/gnumpc.h>
+#include <coeffs/gnumpfl.h>
 #include <coeffs/shortfl.h>
+
+#include <coeffs/mpr_complex.h>
+
+
+/// Get a mapping function from src into the domain of this type: long_C!
+nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
+
+number ngcMapQ(number from, const coeffs r, const coeffs aRing);
+
+void ngcSetChar(const coeffs r);
+
+// Private interface should be hidden!!!
+
+/// Note: MAY NOT WORK AS EXPECTED!
+BOOLEAN  ngcGreaterZero(number za, const coeffs r); 
+BOOLEAN  ngcGreater(number a, number b, const coeffs r);
+BOOLEAN  ngcEqual(number a, number b, const coeffs r);
+BOOLEAN  ngcIsOne(number a, const coeffs r);
+BOOLEAN  ngcIsMOne(number a, const coeffs r);
+BOOLEAN  ngcIsZero(number za, const coeffs r);
+number   ngcInit(long i, const coeffs r);
+int      ngcInt(number &n, const coeffs r);
+number   ngcNeg(number za, const coeffs r);
+number   ngcInvers(number a, const coeffs r);
+number   ngcParameter(int i, const coeffs r);
+number   ngcAdd(number la, number li, const coeffs r);
+number   ngcSub(number la, number li, const coeffs r);
+number   ngcMult(number a, number b, const coeffs r);
+number   ngcDiv(number a, number b, const coeffs r);
+void     ngcPower(number x, int exp, number *lu, const coeffs r);
+number   ngcCopy(number a, const coeffs r);
+number   ngc_Copy(number a, coeffs r);
+const char * ngcRead (const char *s, number *a, const coeffs r);
+void     ngcWrite(number &a, const coeffs r);
+number   ngcRePart(number a, const coeffs r);
+number   ngcImPart(number a, const coeffs r);
+
+void     ngcDelete(number *a, const coeffs r);
+void     ngcCoeffWrite(const coeffs r, BOOLEAN details);
+
+#ifdef LDEBUG
+BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
+#endif
+
+
+// Why is this here? who needs it?
+// number ngcMapQ(number from, const coeffs r, const coeffs aRing);
 
 /// Our Type!
 static const n_coeffType ID = n_long_C;
@@ -37,16 +89,16 @@ BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
 }
 #endif
 
-/*
-number   ngcPar(int i, const coeffs r)
+number   ngcParameter(int i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume(i==1);
 
-  gmp_complex* n= new gmp_complex( (long)0, (long)1 );
-  return (number)n;
+  if( i == 1 )
+    return (number)(new gmp_complex( (long)0, (long)1 ));
+
+  return NULL; // new gmp_complex( )  // 0? 
 }
-*/
 
 /*2
 * n := i
@@ -328,7 +380,9 @@ BOOLEAN ngcIsMOne (number a, const coeffs r)
 const char * ngcRead (const char * s, number * a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  assume( r->complex_parameter != NULL );
+  const char * const complex_parameter = n_ParameterNames(r)[0];
+  assume( complex_parameter != NULL );
+  const int N = strlen(complex_parameter);
 
   if ((*s >= '0') && (*s <= '9'))
   {
@@ -338,9 +392,9 @@ const char * ngcRead (const char * s, number * a, const coeffs r)
     *a=(number)aa;
     delete re;
   }
-  else if (strncmp(s, r->complex_parameter,strlen(r->complex_parameter))==0)
+  else if (strncmp(s, complex_parameter, N)==0)
   {
-    s+=strlen(r->complex_parameter);
+    s += N;
     gmp_complex *aa=new gmp_complex((long)0,(long)1);
     *a=(number)aa;
   }
@@ -384,17 +438,30 @@ BOOLEAN ngcCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
         (p->float_len == r->float_len) &&
         (p->float_len2 == r->float_len2)
        )
-      if (strcmp(p->par_name, r->complex_parameter) == 0)
+      if (strcmp(p->par_name, n_ParameterNames(r)[0]) == 0)
         return (TRUE);
   }
   return (FALSE);
+}
+
+static void ngcKillChar(coeffs r)
+{
+  char** p = (char**)n_ParameterNames(r);
+
+  const int P = n_NumberOfParameters(r);
+
+  for( int i = 1; i <= P; i++ )
+    if (p[i-1] != NULL) 
+      omFree( (ADDRESS)p[i-1] );
+
+  omFreeSize((ADDRESS)p, P * sizeof(char*));  
 }
 
 BOOLEAN ngcInitChar(coeffs n, void* parameter)
 {
   assume( getCoeffType(n) == ID );
 
-  n->cfKillChar = ndKillChar; /* dummy */
+  n->cfKillChar = ngcKillChar;
   n->ch = 0;
 
   n->cfDelete  = ngcDelete;
@@ -495,25 +562,36 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
 */
-   
+
+  n->iNumberOfParameters = 1;
+  n->cfParameter = ngcParameter;
+
+  char ** pParameterNames = (char **) omAlloc0(sizeof(char *));
+
   if( parameter != NULL)
   {
     LongComplexInfo* p = (LongComplexInfo*)parameter;
-    n->complex_parameter = omStrDup(p->par_name);
+    pParameterNames[0] = omStrDup(p->par_name); //TODO use omAlloc for allocating memory and use strcpy?
     n->float_len = p->float_len;
     n->float_len2 = p->float_len2;
     
   } else // default values, just for testing!
   {
-    n->complex_parameter = omStrDup("i");
+    pParameterNames[0] = omStrDup("i");
     n->float_len = SHORT_REAL_LENGTH;
     n->float_len2 = SHORT_REAL_LENGTH;     
   }
    
   assume( n->float_len <= n->float_len2 );
   assume( n->float_len2 >= SHORT_REAL_LENGTH );
-  assume( n->complex_parameter != NULL );
+  assume( pParameterNames != NULL );
+  assume( pParameterNames[0] != NULL );
+  
+  n->pParameterNames = pParameterNames;
 
+  // NOTE: n->complex_parameter was replaced by n_ParameterNames(n)[0]
+  // TODO: nfKillChar MUST destroy n->pParameterNames[0] (0-term. string) && n->pParameterNames (array of size 1)
+  
   return FALSE;
 }
 
@@ -622,6 +700,6 @@ void    ngcCoeffWrite  (const coeffs r, BOOLEAN details)
 {
   Print("//   characteristic : 0 (complex:%d digits, additional %d digits)\n",
         r->float_len, r->float_len2);  /* long C */
-  Print("//   1 parameter    : %s\n", r->complex_parameter);
-  Print("//   minpoly        : (%s^2+1)\n", r->complex_parameter);  
+  Print("//   1 parameter    : %s \n", n_ParameterNames(r)[0]); // this trailing space is for compatibility with the legacy Singular
+  Print("//   minpoly        : (%s^2+1)\n", n_ParameterNames(r)[0]);  
 }
