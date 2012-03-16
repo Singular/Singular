@@ -1307,19 +1307,18 @@ else
   AC_MSG_RESULT(no)
 fi
 
-NEED_LIBSG="${NEED_LIBS}"
-
 AC_CHECK_LIB(rt)
 if test "$ac_cv_lib_rt" = yes; then
   NEED_LIBS="${NEED_LIBS} -lrt"
 fi
+
+NEED_LIBSG="${NEED_LIBS} -lpthread"
 
 if test "$ac_cv_sizeof_voidp" != 4; then
   NEED_LIBS="${NEED_LIBS} -lomalloc -lpthread"
 else
   NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lpthread"
 fi
-
 
 AC_SUBST(NEED_LIBS)
 AC_SUBST(NEED_LIBSG)

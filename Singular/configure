@@ -5860,8 +5860,6 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-NEED_LIBSG="${NEED_LIBS}"
-
 echo $ac_n "checking for  in -lrt""... $ac_c" 1>&6
 echo "configure:5867: checking for  in -lrt" >&5
 ac_lib_var=`echo rt'_' | sed 'y%./+-%__p_%'`
@@ -5912,6 +5910,8 @@ fi
 if test "$ac_cv_lib_rt" = yes; then
   NEED_LIBS="${NEED_LIBS} -lrt"
 fi
+
+NEED_LIBSG="${NEED_LIBS} -lpthread"
 
 if test "$ac_cv_sizeof_voidp" != 4; then
   NEED_LIBS="${NEED_LIBS} -lomalloc -lpthread"
