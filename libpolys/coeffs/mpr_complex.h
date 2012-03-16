@@ -125,9 +125,9 @@ public:
   inline int sign()    // t>0:+1, t==0:0, t<0:-1
   { return mpf_sgn( t ); };
 
-  bool isZero();  // t == 0 ?
-  bool isOne();   // t == 1 ?
-  bool isMOne();  // t == -1 ?
+  bool isZero() const;  // t == 0 ?
+  bool isOne() const;   // t == 1 ?
+  bool isMOne() const;  // t == -1 ?
 
   void setFromStr(const char * in );
 

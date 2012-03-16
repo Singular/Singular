@@ -250,12 +250,12 @@ bool operator == ( const gmp_float & a, const gmp_float & b )
     return false;
 }
 // t == 0 ?
-bool gmp_float::isZero()
+bool gmp_float::isZero() const
 {
   return (mpf_sgn( t ) == 0);
 }
 // t == 1 ?
-bool gmp_float::isOne()
+bool gmp_float::isOne() const
 {
 #ifdef  VARIANTE_1
   return (mpf_cmp_ui( t , 1 ) == 0);
@@ -271,7 +271,7 @@ bool gmp_float::isOne()
 #endif
 }
 // t == -1 ?
-bool gmp_float::isMOne()
+bool gmp_float::isMOne() const
 {
 #ifdef VARIANTE_1
   return (mpf_cmp_si( t , -1 ) == 0);
