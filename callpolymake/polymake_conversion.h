@@ -61,9 +61,9 @@ polymake::Matrix<polymake::Integer> Intvec2PmMatrixInteger (const intvec* im);
 /* Functions for converting cones and fans in between gfan and polymake,
    Singular shares the same cones and fans with gfan */
 
-gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc);
-gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp);
-gfan::ZFan PmFan2ZFan (polymake::perl::Object* pf);
-polymake::perl::Object ZCone2PmCone (gfan::ZCone* zc);
-polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone* zc);
-polymake::perl::Object ZFan2PmFan (gfan::ZFan* zf);
+gfan::ZCone* PmCone2ZCone (polymake::perl::Object* pc);
+gfan::ZCone* PmPolytope2ZPolytope (polymake::perl::Object* pp);
+gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf);
+polymake::perl::Object* ZCone2PmCone (gfan::ZCone* zc);
+polymake::perl::Object* ZPolytope2PmPolytope (gfan::ZCone* zc);
+polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf);

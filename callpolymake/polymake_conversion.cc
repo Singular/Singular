@@ -193,7 +193,7 @@ polymake::Matrix<polymake::Integer> Intvec2PmMatrixInteger (const intvec* im)
 /* Functions for converting cones and fans in between gfan and polymake,
    Singular shares the same cones and fans with gfan */
 
-gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
+gfan::ZCone* PmCone2ZCone (polymake::perl::Object* pc)
 {
   if (pc->isa("Cone"))
   {
@@ -240,14 +240,14 @@ gfan::ZCone PmCone2ZCone (polymake::perl::Object* pc)
     else
       zy = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone zc = gfan::ZCone(zv,zw,zx,zy,zz,3);
+    gfan::ZCone* zc = new gfan::ZCone(zv,zw,zx,zy,zz,3);
 
     return zc;
   }
   WerrorS("PmCone2ZCone: unexpected parameters");
 }
 
-gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
+gfan::ZCone* PmPolytope2ZPolytope (polymake::perl::Object* pp)
 {
   if (pp->isa("Polytope<Rational>"))
   {
@@ -256,7 +256,6 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
     if (!ok)
     {
       WerrorS("overflow while converting polymake::Integer to int");
-      return TRUE;
     }
     polymake::Matrix<polymake::Rational> ineqrational = pp->give("FACETS");
     polymake::Matrix<polymake::Rational> eqrational = pp->give("AFFINE_HULL");
@@ -297,70 +296,71 @@ gfan::ZCone PmPolytope2ZPolytope (polymake::perl::Object* pp)
     else
       zy = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone zp = gfan::ZCone(zv,zw,zx,zy,zz,3);  
+    gfan::ZCone* zp = new gfan::ZCone(zv,zw,zx,zy,zz,3);  
     return zp;
   }
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
 }
 
-gfan::ZFan PmFan2ZFan (polymake::perl::Object* pf)
+gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
 {
   if (pf->isa("PolyhedralFan"))
   {
     int d = (int) pf->give("FAN_AMBIENT_DIM");
-    gfan::ZFan zf = gfan::ZFan(d);
+    Print("creating an empty fan of dimension %d\n",d);
+    gfan::ZFan* zf = new gfan::ZFan(d);
 
     int n = pf->give("N_MAXIMAL_CONES");
     for (int i=0; i<n; i++)
       {
         polymake::perl::Object pmcone=pf->CallPolymakeMethod("cone",i);
-        gfan::ZCone zc=PmCone2ZCone(&pmcone);
-        zf.insert(zc);
+        gfan::ZCone* zc=PmCone2ZCone(&pmcone);
+        zf->insert(*zc);
       }
     return zf;
   }
   WerrorS("PmFan2ZFan: unexpected parameters");
 }
 
-polymake::perl::Object ZCone2PmCone (gfan::ZCone* zc)
+polymake::perl::Object* ZCone2PmCone (gfan::ZCone* zc)
 {
-  polymake::perl::Object gc("Cone<Rational>");
+  polymake::perl::Object* gc = new polymake::perl::Object("Cone<Rational>");
 
   gfan::ZMatrix inequalities = zc->getInequalities();
-  gc.take("FACETS") << GfZMatrix2PmMatrixInteger(&inequalities);
+  gc->take("FACETS") << GfZMatrix2PmMatrixInteger(&inequalities);
 
   gfan::ZMatrix equations = zc->getEquations();
-  gc.take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
+  gc->take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
 
   if(zc->areExtremeRaysKnown())
     {  
       gfan::ZMatrix extremeRays = zc->extremeRays();
-      gc.take("RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
+      gc->take("RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
     }
 
   if(zc->areGeneratorsOfLinealitySpaceKnown())
     {
       gfan::ZMatrix lineality = zc->generatorsOfLinealitySpace();
-      gc.take("LINEALITY_SPACE") << GfZMatrix2PmMatrixInteger(&lineality);
+      gc->take("LINEALITY_SPACE") << GfZMatrix2PmMatrixInteger(&lineality);
     }
 
   return gc;
 }
 
-polymake::perl::Object ZPolytope2PmPolytope (gfan::ZCone* zc)
+polymake::perl::Object* ZPolytope2PmPolytope (gfan::ZCone* zc)
 {
-  polymake::perl::Object pp("Polytope<Rational>");
+  polymake::perl::Object* pp = new polymake::perl::Object("Polytope<Rational>");
 
   gfan::ZMatrix inequalities = zc->getInequalities();
-  pp.take("FACETS") << GfZMatrix2PmMatrixInteger(&inequalities);
+  pp->take("FACETS") << GfZMatrix2PmMatrixInteger(&inequalities);
 
   gfan::ZMatrix equations = zc->getEquations();
-  pp.take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
+  pp->take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
 
   if(zc->areExtremeRaysKnown())
     {
       gfan::ZMatrix vertices = zc->extremeRays();
-      pp.take("VERTICES") << GfZMatrix2PmMatrixInteger(&vertices);
+      pp->take("VERTICES") << GfZMatrix2PmMatrixInteger(&vertices);
     }
 
   return pp;
@@ -434,15 +434,15 @@ polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
   return L;
 }
 
-polymake::perl::Object ZFan2PmFan (gfan::ZFan* zf)
+polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf)
 {
-  polymake::perl::Object pf("PolyhedralFan");
+  polymake::perl::Object* pf = new polymake::perl::Object("PolyhedralFan");
 
   polymake::Matrix<polymake::Integer> zm = raysOf(zf);
-  pf.take("INPUT_RAYS") << zm;
+  pf->take("INPUT_RAYS") << zm;
 
   polymake::Array<polymake::Set<int> > ar = conesOf(zf);
-  pf.take("INPUT_CONES") << ar;
+  pf->take("INPUT_CONES") << ar;
 
   return pf;
 }
