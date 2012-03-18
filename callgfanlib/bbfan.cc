@@ -281,7 +281,7 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
             }
         }
     }
-  WerrorS("getAmbientDimension: unexpected parameters");
+  WerrorS("numberOfConesOfDimension: unexpected parameters");
   return TRUE;
 }
 
