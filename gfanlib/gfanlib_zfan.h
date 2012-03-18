@@ -61,6 +61,10 @@ class ZFan
   std::vector<std::vector<IntVector> > &table(bool orbit, bool maximal)const;
 public:
   ~ZFan();
+  ZFan():
+    coneCollection(0),
+    complex(0)
+  {}
   ZFan(ZFan const& f);
   /**
    *
