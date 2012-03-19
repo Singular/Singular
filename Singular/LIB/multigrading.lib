@@ -3827,8 +3827,8 @@ EXAMPLE: example hilbertSeries; shows an example
   // a dimension we need uniqueness for this. I think we would lose
   // this uniqueness if switching to this torsion ring.
 
-  poly monom, summand, numerator;
-  poly denominator = 1;
+  poly monom, summand, @numerator;
+  poly @denominator = 1;
 
   for( i = 1; i <= cc; i++)
   {
@@ -3852,7 +3852,7 @@ EXAMPLE: example hilbertSeries; shows an example
       ERROR("Multigrading not positive.");
     }
 
-    denominator = denominator * (1 - monom);
+    @denominator = @denominator * (1 - monom);
   }
 
   for( j = 1; j<= l; j++)
@@ -3877,26 +3877,26 @@ EXAMPLE: example hilbertSeries; shows an example
       }
       summand = summand + monom;
     }
-    numerator = numerator - (-1)^j * summand;
+    @numerator = @numerator - (-1)^j * summand;
   }
 
-  if( denominator == 0 )
+  if( @denominator == 0 )
   {
     ERROR("Multigrading not positive.");
   }
 
-  poly denominator1 = denominator;
-  poly numerator1 = numerator;
+  poly denominator1 = @denominator;
+  poly numerator1 = @numerator;
 
   export denominator1;
   export numerator1;
 
   if( numerator != 0 )
   {
-    poly d = gcd(denominator, numerator);
+    poly d = gcd(@denominator, @numerator);
 
-    poly denominator2 = denominator/d;
-    poly numerator2 = numerator/d;
+    poly denominator2 = @denominator/d;
+    poly numerator2 = @numerator/d;
 
     if( gcd(denominator2, numerator2) != 1 )
     {
@@ -3905,8 +3905,8 @@ EXAMPLE: example hilbertSeries; shows an example
   }
   else
   {
-    poly denominator2 = denominator;
-    poly numerator2 = numerator;
+    poly denominator2 = @denominator;
+    poly numerator2 = @numerator;
   }
 
 
