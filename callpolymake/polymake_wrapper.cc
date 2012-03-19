@@ -212,6 +212,33 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
 // }
 
 
+BOOLEAN PMisLatticePolytope(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    bool b;
+    try
+    {
+      polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      b = p->give("Lattice");
+      delete p;
+    }
+    catch (const std::exception& ex) 
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+      return TRUE;
+    }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
+  }
+  WerrorS("isLatticePolytope: unexpected parameters");
+  return TRUE;
+}
+
+
 BOOLEAN PMisBounded(leftv res, leftv args)
 {
   leftv u = args;
@@ -304,9 +331,19 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
-      polymake::Integer pgi = p->give("GORENSTEIN_INDEX");
-      gi = PmInteger2Int(pgi,ok); 
-      delete p;
+      bool b = p->give("GORENSTEIN");
+      if (b)
+      {
+        polymake::Integer pgi = p->give("GORENSTEIN_INDEX");
+        gi = PmInteger2Int(pgi,ok);
+        delete p;
+      }
+      else
+      {
+        delete p;
+        WerrorS("gorensteinIndex: input polytope not gorenstein");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex)
     {
@@ -338,9 +375,19 @@ BOOLEAN PMgorensteinVector(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
-      polymake::Vector<polymake::Integer> pgv = p->give("GORENSTEIN_VECTOR");
-      delete p;
-      gv = PmVectorInteger2Intvec(&pgv,ok);
+      bool b = p->give("GORENSTEIN");
+      if (b)
+      {
+        polymake::Vector<polymake::Integer> pgv = p->give("GORENSTEIN_VECTOR");
+        gv = PmVectorInteger2Intvec(&pgv,ok);
+        delete p;
+      }
+      else
+      {
+        delete p;
+        WerrorS("gorensteinIndex: input polytope not gorenstein");
+        return TRUE;
+      }
     }
     catch (const std::exception& ex) 
     {
@@ -578,6 +625,74 @@ BOOLEAN PMehrhartPolynomialCoeff(leftv res, leftv args)
 }
 
 
+BOOLEAN PMfVector(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    intvec* hv;
+    bool ok = true;
+    try
+    {
+      polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      polymake::Vector<polymake::Integer> phv = p->give("F_VECTOR");
+      delete p;
+      hv = PmVectorInteger2Intvec(&phv,ok);
+    }
+    catch (const std::exception& ex) 
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    if (!ok)
+    {
+      WerrorS("fVector: overflow in PmVectorInteger2Intvec");
+      return TRUE;
+    }
+    res->rtyp = INTVEC_CMD;
+    res->data = (char*) hv;
+    return FALSE;
+  }
+  WerrorS("fVector: unexpected parameters");
+  return TRUE;
+}
+
+
+BOOLEAN PMhVector(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    intvec* hv;
+    bool ok = true;
+    try
+    {
+      polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      polymake::Vector<polymake::Integer> phv = p->give("H_VECTOR");
+      delete p;
+      hv = PmVectorInteger2Intvec(&phv,ok);
+    }
+    catch (const std::exception& ex) 
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    if (!ok)
+    {
+      WerrorS("hVector: overflow in PmVectorInteger2Intvec");
+      return TRUE;
+    }
+    res->rtyp = INTVEC_CMD;
+    res->data = (char*) hv;
+    return FALSE;
+  }
+  WerrorS("hVector: unexpected parameters");
+  return TRUE;
+}
+
+
 BOOLEAN PMhStarVector(leftv res, leftv args)
 {
   leftv u = args;
@@ -771,6 +886,25 @@ BOOLEAN PMisCompressed(leftv res, leftv args)
 BOOLEAN PMisSmooth(leftv res, leftv args)
 {
   leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    bool b;
+    try
+    {
+      polymake::perl::Object* p = ZCone2PmCone(zc);
+      b = p->give("SMOOTH_CONE");
+      delete p;
+    }
+    catch (const std::exception& ex) 
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
+  }
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
@@ -779,6 +913,25 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
     {
       polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
       b = p->give("SMOOTH");
+      delete p;
+    }
+    catch (const std::exception& ex) 
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    res->rtyp = INT_CMD;
+    res->data = (char*) (int) b;
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    gfan::ZCone* zf = (gfan::ZCone*)u->Data();
+    bool b;
+    try
+    {
+      polymake::perl::Object* p = ZPolytope2PmPolytope(zf);
+      b = p->give("SMOOTH_FAN");
       delete p;
     }
     catch (const std::exception& ex) 
@@ -1029,7 +1182,7 @@ BOOLEAN PMnBoundaryLatticePoints(leftv res, leftv args)
 BOOLEAN PMhilbertBasis(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == polytopeID))
+  if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     intvec* iv;
@@ -1063,7 +1216,7 @@ BOOLEAN PMhilbertBasis(leftv res, leftv args)
 BOOLEAN PMnHilbertBasis(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == polytopeID))
+  if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
     int n;
@@ -1655,6 +1808,7 @@ extern "C" int mod_init(void* polymakesingular)
   // iiAddCproc("","cross",FALSE,cross);
   iiAddCproc("","coneViaRays",FALSE,PMconeViaRays);
   iiAddCproc("","polytopeViaVertices",FALSE,PMpolytopeViaVertices);
+  iiAddCproc("","isLatticePolytope",FALSE,PMisLatticePolytope);
   iiAddCproc("","isBounded",FALSE,PMisBounded);
   iiAddCproc("","isReflexive",FALSE,PMisReflexive);
   iiAddCproc("","isGorenstein",FALSE,PMisGorenstein);
@@ -1667,6 +1821,8 @@ extern "C" int mod_init(void* polymakesingular)
   iiAddCproc("","latticeDegree",FALSE,PMlatticeDegree);
   iiAddCproc("","latticeCodegree",FALSE,PMlatticeCodegree);
   iiAddCproc("","ehrhartPolynomialCoeff",FALSE,PMehrhartPolynomialCoeff);
+  iiAddCproc("","fVector",FALSE,PMfVector);
+  iiAddCproc("","hVector",FALSE,PMhVector);
   iiAddCproc("","hStarVector",FALSE,PMhStarVector);
   iiAddCproc("","isNormal",FALSE,PMisNormal);
   iiAddCproc("","facetWidths",FALSE,PMfacetWidths);
