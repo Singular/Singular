@@ -399,8 +399,18 @@ int ntInt(number &a, const coeffs cf)
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
   if (!DENIS1(f)) return 0;
-  if (!p_IsConstant(NUM(f), ntRing)) return 0;
-  return n_Int(p_GetCoeff(NUM(f), ntRing), ntCoeffs);
+  
+  const poly aAsPoly = NUM(f);
+
+  if(aAsPoly == NULL)
+    return 0;
+  
+  if (!p_IsConstant(aAsPoly, ntRing))
+    return 0;
+
+  assume( aAsPoly != NULL );
+  
+  return n_Int(p_GetCoeff(aAsPoly, ntRing), ntCoeffs);
 }
 
 /* This method will only consider the numerators of a and b, without

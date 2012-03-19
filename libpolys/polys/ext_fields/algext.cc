@@ -263,7 +263,11 @@ int naInt(number &a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
-  if (!p_IsConstant(aAsPoly, naRing)) return 0;
+  if(aAsPoly == NULL)
+    return 0;
+  if (!p_IsConstant(aAsPoly, naRing))
+    return 0;
+  assume( aAsPoly != NULL );
   return n_Int(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
