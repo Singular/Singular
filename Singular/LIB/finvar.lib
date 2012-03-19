@@ -616,7 +616,7 @@ EXAMPLE: example molien; shows an example
       map f=Q,ideal(e);
       minpoly=number(f(minq));         // e is now a r-th primitive root of
                                        // unity -
-      kill Q, f;                       // no longer needed -
+      kill Q;                       // no longer needed -
       poly p=1;                        // used to build the denominator of the
                                        // new term in the Molien series
       matrix s[1][2];                  // used for canceling -
