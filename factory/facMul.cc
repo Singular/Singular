@@ -400,7 +400,6 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
   if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
   {
     Variable alpha;
-#ifdef HAVE_FLINT
     if ((!F.inCoeffDomain() && !G.inCoeffDomain()) &&
         (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha)))
     {
@@ -414,11 +413,16 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         mul (NTLf, NTLf, NTLg);
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
       }
+#ifdef HAVE_FLINT
       CanonicalForm result= mulFLINTQa (F, G, alpha);
       return result;
+#else
+      return F*G;
+#endif
     }
     else if (!F.inCoeffDomain() && !G.inCoeffDomain())
     {
+#ifdef HAVE_FLINT
       if (b.getp() != 0)
       {
         fmpz_t FLINTpk;
@@ -435,8 +439,20 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         return result;
       }
       return mulFLINTQ (F, G);
-    }
+#else
+      if (b.getp() != 0)
+      {
+        ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
+        ZZX ZZf= convertFacCF2NTLZZX (F);
+        ZZX ZZg= convertFacCF2NTLZZX (G);
+        ZZ_pX NTLf= to_ZZ_pX (ZZf);
+        ZZ_pX NTLg= to_ZZ_pX (ZZg);
+        mul (NTLf, NTLf, NTLg);
+        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+      }
+      return F*G;
 #endif
+    }
     if (b.getp() != 0)
     {
       if (!F.inBaseDomain() && !G.inBaseDomain())
@@ -538,10 +554,10 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   if (getCharacteristic() == 0)
   {
-#ifdef HAVE_FLINT
     Variable alpha;
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
     {
+#ifdef HAVE_FLINT
       if (b.getp() != 0)
       {
         fmpz_t FLINTpk;
@@ -558,6 +574,19 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         return result;
       }
       return modFLINTQ (F, G);
+#else
+      if (b.getp() != 0)
+      {
+        ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
+        ZZX ZZf= convertFacCF2NTLZZX (F);
+        ZZX ZZg= convertFacCF2NTLZZX (G);
+        ZZ_pX NTLf= to_ZZ_pX (ZZf);
+        ZZ_pX NTLg= to_ZZ_pX (ZZg);
+        rem (NTLf, NTLf, NTLg);
+        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+      }
+      return mod (F, G);
+#endif
     }
     else
     {
@@ -571,24 +600,14 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         rem (NTLf, NTLf, NTLg);
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
       }
+#ifdef HAVE_FLINT
       CanonicalForm Q, R;
       newtonDivrem (F, G, Q, R);
       return R;
-    }
 #else
-    if (b.getp() != 0)
-    {
-      ZZ NTLpk= power_ZZ (b.getp(), b.getk());
-      ZZ_p::init (NTLpk);
-      ZZX ZZf= convertFacCF2NTLZZX (F);
-      ZZX ZZg= convertFacCF2NTLZZX (G);
-      ZZ_pX NTLf= to_ZZ_pX (ZZf);
-      ZZ_pX NTLg= to_ZZ_pX (ZZg);
-      rem (NTLf, NTLf, NTLg);
-      return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
-    }
-    return mod (F, G);
+      return mod (F,G);
 #endif
+    }
   }
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
@@ -679,10 +698,11 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   if (getCharacteristic() == 0)
   {
-#ifdef HAVE_FLINT
+
     Variable alpha;
     if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G, alpha))
     {
+#ifdef HAVE_FLINT
       if (b.getp() != 0)
       {
         fmpz_t FLINTpk;
@@ -699,6 +719,19 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         return result;
       }
       return divFLINTQ (F,G);
+#else
+      if (b.getp() != 0)
+      {
+        ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
+        ZZX ZZf= convertFacCF2NTLZZX (F);
+        ZZX ZZg= convertFacCF2NTLZZX (G);
+        ZZ_pX NTLf= to_ZZ_pX (ZZf);
+        ZZ_pX NTLg= to_ZZ_pX (ZZg);
+        div (NTLf, NTLf, NTLg);
+        return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
+      }
+      return div (F, G);
+#endif
     }
     else
     {
@@ -712,24 +745,14 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         div (NTLf, NTLf, NTLg);
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
       }
+#ifdef HAVE_FLINT
       CanonicalForm Q;
       newtonDiv (F, G, Q);
       return Q;
-    }
 #else
-    if (b.getp() != 0)
-    {
-      ZZ NTLpk= power_ZZ (b.getp(), b.getk());
-      ZZ_p::init (NTLpk);
-      ZZX ZZf= convertFacCF2NTLZZX (F);
-      ZZX ZZg= convertFacCF2NTLZZX (G);
-      ZZ_pX NTLf= to_ZZ_pX (ZZf);
-      ZZ_pX NTLg= to_ZZ_pX (ZZg);
-      div (NTLf, NTLf, NTLg);
-      return b (convertNTLZZX2CF (to_ZZX (NTLf), F.mvar()));
-    }
-    return div (F, G);
+      return div (F,G);
 #endif
+    }
   }
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
