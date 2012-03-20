@@ -19,6 +19,7 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 #include <coeffs/ffields.h>
+#include <coeffs/longrat.h>
 
 #include <string.h>
 #include <math.h>
@@ -865,7 +866,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfImPart = ndReturn0;
   
   r->cfWriteLong = nfWriteLong;
-  
+  r->cfInit_bigint = nlModP;
   r->cfRead = nfRead;
   //r->cfNormalize=ndNormalize;
   r->cfGreater = nfGreater;
