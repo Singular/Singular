@@ -825,11 +825,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.cf=r1->cf;
         r1->cf->ref++;
       }
-      else if ((getCoeffType (r2->cf)==n_algExt || getCoeffType (r2->cf)==n_transExt) && rChar(r2) == rChar(r1))
+      else if (nCoeff_is_Extension(r2->cf) && rChar(r2) == rChar(r1))
       {
-        /*AlgExtInfo extParam;
-        extParam.r = r2->cf->extRing;
-        extParam.i = r2->cf->extRing->minideal;*/
         tmpR.cf=r2->cf;
         r2->cf->ref++;
       }
@@ -851,7 +848,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.cf=r2->cf;
         r2->cf->ref++;
       }
-      else if (getCoeffType(r2->cf)==n_algExt || getCoeffType(r2->cf)==n_transExt)
+      else if (nCoeff_is_Extension(r2->cf))
       {
         tmpR.cf=r2->cf;
         r2->cf->ref++;
@@ -859,6 +856,24 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       else
       {
         WerrorS("Q+...");
+        return -1;
+      }
+    }
+    else if (nCoeff_is_Extension(r1->cf))
+    {
+      if (r1->cf->extRing->cf==r2->cf)
+      {
+        tmpR.cf=r1->cf;
+        r1->cf->ref++;
+      }
+      else if (getCoeffType(r1->cf->extRing->cf)==n_Zp && getCoeffType(r2->cf)==n_Q) //r2->cf == n_Zp should have been handled above
+      {
+        tmpR.cf=r1->cf;
+        r1->cf->ref++;
+      }
+      else
+      {
+        WerrorS ("coeff sum of two extension fields not implemented");
         return -1;
       }
     }
