@@ -171,7 +171,12 @@ CanonicalForm evalPoint (const CanonicalForm& F, int& i)
       else
       {
         if (testPoint (F, result, -i))
+        {
+          i= -i;
           return result;
+        }
+        else if (i < 0)
+          i= -i;
       }
       k++;
     }
@@ -486,7 +491,6 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     bufAeval2= buf;
     bufAeval2= evalPoint (buf, bufEvaluation2);
 
-
     // univariate factorization
     TIMING_START (fac_uni_factorizer);
 
@@ -591,21 +595,24 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
       }
       if (bufUniFactors.length() < uniFactors.length())
       {
-        if (evaluation != 0)
-        {
-          uniFactors= bufUniFactors;
-          Aeval= bufAeval;
-          evaluation= bufEvaluation;
-        }
+        uniFactors= bufUniFactors;
+        Aeval= bufAeval;
+        evaluation= bufEvaluation;
       }
     }
-    bufEvaluation++;
-    bufEvaluation2++;
+    if (bufEvaluation > 0)
+      bufEvaluation++;
+    else
+      bufEvaluation= -bufEvaluation + 1;
+    if (bufEvaluation > 0)
+      bufEvaluation2++;
+    else
+      bufEvaluation2= -bufEvaluation2 + 1;
   }
 
-  if (evaluation != 0 && (uniFactors.length() > uniFactors2.length() ||
+  if (uniFactors.length() > uniFactors2.length() ||
       (uniFactors.length() == uniFactors2.length()
-       && degs.getLength() > degs2.getLength())))
+       && degs.getLength() > degs2.getLength()))
   {
     degs= degs2;
     uniFactors= uniFactors2;
