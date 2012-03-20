@@ -2819,7 +2819,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CanonicalForm mipo= randomIrredpoly (extDeg + 1, w);
       Variable v= rootOf (mipo);
       ExtensionInfo info= ExtensionInfo (v);
-      factors= biFactorize (A, info);
+      factors= multiFactorize (A, info);
     }
     else
     {
@@ -2840,7 +2840,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         CanonicalForm bufA= mapUp (A, alpha, v, primElem, imPrimElem,
                                    source, dest);
         ExtensionInfo info= ExtensionInfo (v, alpha, imPrimElem, primElem);
-        factors= biFactorize (bufA, info);
+        factors= multiFactorize (bufA, info);
       }
       else
       {
@@ -2860,7 +2860,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         dest= CFList();
         bufA= mapUp (bufA, beta, v, delta, imPrimElem, source, dest);
         ExtensionInfo info= ExtensionInfo (v, beta, imPrimElem, delta);
-        factors= biFactorize (bufA, info);
+        factors= multiFactorize (bufA, info);
       }
     }
     return factors;
