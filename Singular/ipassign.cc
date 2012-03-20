@@ -1120,34 +1120,6 @@ static BOOLEAN jjA_L_STRING(leftv l,leftv r)
   IDDATA((idhdl)(l->data))=s;
   return FALSE;
 }
-static BOOLEAN jjA_LIST_L(leftv l,leftv r)
-{
-  /*left side are something, right side are lists*/
-  /*e.g. a,b,c=l */
-  //int ll=l->listLength();
-  if (l->listLength()==1) return jiAssign_1(l,r);
-  BOOLEAN nok;
-  sleftv t;
-  leftv h;
-  lists L=(lists)r->Data();
-  int rl=L->nr;
-  int i=0;
-
-  memset(&t,0,sizeof(sleftv));
-  while ((i<=rl)&&(l!=NULL))
-  {
-    memset(&t,0,sizeof(sleftv));
-    t.Copy(&L->m[i]);
-    h=l->next;
-    l->next=NULL;
-    nok=jiAssign_1(l,&t);
-    if (nok) return TRUE;
-    i++;
-    l=h;
-  }
-  r->CleanUp();
-  return FALSE;
-}
 static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
 {
   /* right side is matrix, left side is list (of poly)*/
