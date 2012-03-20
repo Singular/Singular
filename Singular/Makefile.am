@@ -156,9 +156,9 @@ SingularHEADERS =    Cache.h \
    tok.h \
    walk.h 
 
-
-nodist_libSingular_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
-nodist_libSingular_g_la_SOURCES = mpsr_Tok.inc iparith.inc plural_cmd.inc
+# plural_cmd.inc 
+nodist_libSingular_la_SOURCES = mpsr_Tok.inc iparith.inc
+nodist_libSingular_g_la_SOURCES = mpsr_Tok.inc iparith.inc
 
 noinst_HEADERS = version.h
 
@@ -357,7 +357,7 @@ test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc plural_cmd.inc LIB/all.lib
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc LIB/all.lib plural_cmd.inc 
 
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
@@ -373,8 +373,8 @@ feOptTS.inc: feOptTS
 plural_cmd.inc iparith.inc: gentable1
 	${abs_builddir}/gentable1
 
-# fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
-plural_cmd.inc: iparith.inc
+# # fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
+# plural_cmd.inc: iparith.inc
 
 mpsr_Tok.inc: gentable2
 	${abs_builddir}/gentable2
