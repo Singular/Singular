@@ -2128,7 +2128,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           return result;
         }
         else
-          return CFList (buf);
+          return CFList (buf/myContent(buf));
       }
 
       S= subset (v, s, TT, noSubset);
@@ -2167,6 +2167,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           if (T.length() < 2*s || T.length() == s)
           {
             delete [] v;
+            buf /= myContent (buf);
             buf /= Lc (buf);
             appendTestMapDown (result, buf, info, source, dest);
             return result;
@@ -2182,7 +2183,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     if (T.length() < 2*s || T.length() == s)
     {
       delete [] v;
-      appendTestMapDown (result, buf, info, source, dest);
+      appendTestMapDown (result, buf/myContent(buf), info, source, dest);
       return result;
     }
     for (int i= 0; i < T.length(); i++)
@@ -2190,7 +2191,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     noSubset= false;
   }
   if (T.length() < 2*s)
-    appendMapDown (result, F, info, source, dest);
+    appendMapDown (result, F/myContent(F), info, source, dest);
 
   delete [] v;
   return result;
@@ -2615,6 +2616,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (extension)
         factors= extNonMonicFactorRecombination (factors, A, info);
 
+      if (v.level() != 1)
+      {
+        for (CFListIterator iter= factors; iter.hasItem(); iter++)
+          iter.getItem()= swapvar (iter.getItem(), v, y);
+      }
       appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                             swapLevel2, x);
       normalize (factors);
