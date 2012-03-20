@@ -397,7 +397,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 {
   if (CFFactory::gettype() == GaloisFieldDomain)
     return F*G;
-  if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
+  if (getCharacteristic() == 0)
   {
     Variable alpha;
     if ((!F.inCoeffDomain() && !G.inCoeffDomain()) &&
@@ -494,6 +494,8 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     }
     return F*G;
   }
+  else if (F.inCoeffDomain() || G.inCoeffDomain())
+    return F*G;
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
   zz_p::init (getCharacteristic());
