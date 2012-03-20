@@ -3456,6 +3456,9 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   poly aq = NULL; /* the map coefficient */
   poly qq; /* the mapped monomial */
 
+  assume(dst != NULL);
+  assume(dst->cf != NULL);
+  
   while (p != NULL)
   {
     // map the coefficient
@@ -3465,7 +3468,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       assume( nMap != NULL );
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
 
-      if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
+      if ( nCoeff_is_algExt(dst->cf) )
         n_Normalize(n, dst->cf);
 
       p_GetCoeff(qq, dst) = n;// Note: n can be a ZERO!!!
@@ -3482,11 +3485,9 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
 
       p_Test(aq, dst);
 
-      if ( (!rMinpolyIsNULL(dst)) && (rField_is_Zp_a(dst) || rField_is_Q_a(dst)) )
-      {
+      if ( nCoeff_is_algExt(dst->cf) )
         p_Normalize(aq,dst);
-
-      }
+      
       if (aq == NULL)
         p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
 
@@ -3585,10 +3586,10 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
           }
         }
       }
-      if ( mapped_to_par && (!rMinpolyIsNULL(dst)) )
+      if ( mapped_to_par && nCoeff_is_algExt(dst->cf) )
       {
         number n = p_GetCoeff(qq, dst);
-        n_Normalize(n,dst->cf);
+        n_Normalize(n, dst->cf);
         p_GetCoeff(qq, dst) = n;
       }
     }

@@ -271,47 +271,44 @@ void   rWrite(ring r, BOOLEAN details)
   }
   else
     n_CoeffWrite(C, details);
-  
-#if 0
-  {
-    PrintS("//   characteristic : ");
-    
-    char const * const * const params = rParameter(r);
-    
-    if (params!=NULL)
-    {
-      Print ("//   %d parameter    : ",rPar(r));
-      
-      char const * const * sp= params;
-      int nop=0;
-      while (nop<rPar(r))
-      {
-        PrintS(*sp);
-        PrintS(" ");
-        sp++; nop++;
-      }
-      PrintS("\n//   minpoly        : ");
-      if ( rField_is_long_C(r) )
-      {
-        // i^2+1:
-        Print("(%s^2+1)\n", params[0]);
-      }
-      else if (rMinpolyIsNULL(r))
-      {
-        PrintS("0\n");
-      }
-      else
-      {
-        StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringAppendS("\n"));
-      }
-      //if (r->qideal!=NULL)
-      //{
-      //  iiWriteMatrix((matrix)r->qideal,"//   minpolys",1,r,0);
-      //  PrintLn();
-      //}
-    }
-  }
-#endif
+//   {
+//     PrintS("//   characteristic : ");
+//     
+//     char const * const * const params = rParameter(r);
+//     
+//     if (params!=NULL)
+//     {
+//       Print ("//   %d parameter    : ",rPar(r));
+//       
+//       char const * const * sp= params;
+//       int nop=0;
+//       while (nop<rPar(r))
+//       {
+//         PrintS(*sp);
+//         PrintS(" ");
+//         sp++; nop++;
+//       }
+//       PrintS("\n//   minpoly        : ");
+//       if ( rField_is_long_C(r) )
+//       {
+//         // i^2+1:
+//         Print("(%s^2+1)\n", params[0]);
+//       }
+//       else if (rMinpolyIsNULL(r))
+//       {
+//         PrintS("0\n");
+//       }
+//       else
+//       {
+//         StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringAppendS("\n"));
+//       }
+//       //if (r->qideal!=NULL)
+//       //{
+//       //  iiWriteMatrix((matrix)r->qideal,"//   minpolys",1,r,0);
+//       //  PrintLn();
+//       //}
+//     }
+//   }
   Print("//   number of vars : %d",r->N);
 
   //for (nblocks=0; r->order[nblocks]; nblocks++);
@@ -2130,8 +2127,15 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
     }
   }
 
-  if (!rMinpolyIsNULL(r))
+  assume(r != NULL);
+  assume(r->cf != NULL);
+  
+  if (nCoeff_is_algExt(r->cf))
+  {
+    assume(r->cf->extRing != NULL);
+    assume(r->cf->extRing->qideal != NULL);
     omCheckAddr(r->cf->extRing->qideal->m[0]);
+  }
 
   //assume(r->cf!=NULL);
 
@@ -5629,25 +5633,6 @@ void rModify_a_to_A(ring r)
    }
 }
 
-
-BOOLEAN rMinpolyIsNULL(const ring r)
-{
-  assume(r != NULL);
-  const coeffs C = r->cf;
-  assume(C != NULL);
-
-  const BOOLEAN ret = nCoeff_is_algExt(C); //  || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
-
-  if( ret )
-  {
-    const ring R = C->extRing;
-    assume( R != NULL );
-    assume( !idIs0(R->qideal) );
-  }
-  
-  // TODO: it should be "!ret" but it'd lead to test fails (due to rDecompose?)
-  return ret;
-}
 
 poly rGetVar(const int varIndex, const ring r)
 {

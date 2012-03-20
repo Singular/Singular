@@ -648,7 +648,26 @@ static inline BOOLEAN rIsExtension(const ring r)
 }
 
 /// Tests whether '(r->cf->minpoly) == NULL'
-BOOLEAN rMinpolyIsNULL(const ring r);
+static inline BOOLEAN rMinpolyIsNULL(const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  const BOOLEAN ret = nCoeff_is_algExt(C); //  || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
+
+  if( ret )
+  {
+    const ring R = C->extRing;
+    assume( R != NULL );
+    BOOLEAN idIs0 (ideal h);
+    assume( !idIs0(R->qideal) );
+  }
+
+  // TODO: this leads to test fails (due to rDecompose?)
+  return !ret;
+}
+
 
 
 /// order stuff

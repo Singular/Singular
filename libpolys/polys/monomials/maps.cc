@@ -151,7 +151,12 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const rin
       }
       omFreeSize((ADDRESS)monoms,l*sizeof(poly));
     }
-    if (!rMinpolyIsNULL(dst_r)) result=p_MinPolyNormalize(result, dst_r);
+
+    assume(dst_r != NULL);
+    assume(dst_r->cf != NULL);
+    
+    if (nCoeff_is_algExt(dst_r->cf))
+      result = p_MinPolyNormalize(result, dst_r);
   }
   return result;
 }
@@ -317,7 +322,8 @@ max_deg_fertig_p:
 // MinPoly
 poly p_MinPolyNormalize(poly p, const ring r)
 {
-  number one = n_Init(1, r->cf);
+  const coeffs C = r->cf;
+  number one = n_Init(1, C);
   spolyrec rp;
 
   poly q = &rp;
@@ -325,19 +331,20 @@ poly p_MinPolyNormalize(poly p, const ring r)
   while (p != NULL)
   {
     // this returns 0, if p == MinPoly
-    number product = n_Mult(pGetCoeff(p), one,r->cf);
-    if ((product == NULL)||(n_IsZero(product,r->cf)))
+    number product = n_Mult(p_GetCoeff(p, r), one, C);
+    if ((product == NULL)||(n_IsZero(product, C)))
     {
-      p_LmDelete(&p,r);
+      p_LmDelete(&p, r);
     }
     else
     {
-      p_SetCoeff(p, product,r);
+      p_SetCoeff(p, product, r);
       pNext(q) = p;
       q = p;
       p = pNext(p);
     }
   }
   pNext(q) = NULL;
+  n_Delete(&one, C);
   return rp.next;
 }
