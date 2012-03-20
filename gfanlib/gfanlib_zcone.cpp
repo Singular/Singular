@@ -765,7 +765,7 @@ ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, ZMatrix co
   inequalities(inequalities_),
   equations(equations_),
   cachedExtremeRays(cachedExtremeRays_),
-  cachedGeneratorsOfLinealitySpace(cachedExtremeRays_),
+  cachedGeneratorsOfLinealitySpace(cachedGeneratorsOfLinealitySpace_),
   cachedGeneratorsOfSpan(cachedGeneratorsOfSpan_),
   state(0),
   preassumptions(preassumptions_),
@@ -965,13 +965,20 @@ ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpac
   dual.findFacets();
   dual.canonicalize();
   ZMatrix inequalities=dual.extremeRays();
+  // because extremeRays was called, the following is already in canonical form
+  ZMatrix extremeRays=dual.getInequalities();
+  ZMatrix linSpace=dual.getEquations();
 
   ZMatrix span=generators;
   span.append(linealitySpace);
   QMatrix m2Q=ZToQMatrix(span);
   ZMatrix equations=QToZMatrixPrimitive(m2Q.reduceAndComputeKernel());
+  // ZMatrix equations=dual.generatorsOfLinealitySpace();
 
-  return ZCone(inequalities,equations);
+  //nothing of the span is known, passed empty matrix will be ignored
+  ZMatrix sspan;
+
+  return ZCone(inequalities,equations,extremeRays,linSpace,sspan,3);
 }
 
 
