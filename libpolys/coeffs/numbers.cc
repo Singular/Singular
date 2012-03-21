@@ -47,9 +47,6 @@
 //static int characteristic = 0;
 extern int IsPrime(int p);
 
-/*0 implementation*/
-number nNULL; /* the 0 as constant */
-
 n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
@@ -300,11 +297,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     if(n->cfWriteShort==NULL)
       n->cfWriteShort = n->cfWriteLong;
-    
-#ifndef NDEBUG
+
     assume(n->nCoeffIsEqual!=NULL);
-    if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
-		assume(n->cfSetChar!=NULL);
+    assume(n->cfSetChar!=NULL);
     assume(n->cfMult!=NULL);
     assume(n->cfSub!=NULL);
     assume(n->cfAdd!=NULL);
@@ -336,10 +331,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     assume(n->cfParameter!=NULL);
     assume(n->cfParDeg!=NULL);
-
-    if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
-    if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
-    
+     
     assume(n->cfRead!=NULL);
     assume(n->cfNormalize!=NULL);
     assume(n->cfGreater!=NULL);
@@ -364,7 +356,15 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfDBTest!=NULL);
 #endif
     assume(n->type==t);
+     
+#ifndef NDEBUG
+    if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
+    if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
+    if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
 #endif
+     
+   if( n->nNULL == NULL )
+     n->nNULL = n_Init(0, n); // may still remain NULL
   }
   else
   {

@@ -208,7 +208,8 @@ struct n_Procs_s
    BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
 #endif
 
-   number nNULL; /* the 0 as constant */
+   /// the 0 as constant, NULL by default
+   number nNULL; 
    int     char_flag;
    int     ref;
    /// how many variables of factort are already used by this coeff
