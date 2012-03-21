@@ -1777,8 +1777,10 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -1945,8 +1947,8 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
                                    );
               buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -2069,8 +2071,10 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         {
 
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
 
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
@@ -2185,8 +2189,10 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
 
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
@@ -2289,8 +2295,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -2420,8 +2428,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -2599,8 +2609,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                                    );
               buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -2743,8 +2753,10 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -2863,8 +2875,10 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -2986,8 +3000,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -3088,8 +3104,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -3243,8 +3261,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
                                    );
               buf= getCoeffs (A[ii] [i], k, oldL, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -3367,8 +3385,10 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -3471,8 +3491,10 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -3607,8 +3629,10 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -3796,8 +3820,8 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
                                    );
               buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -3946,8 +3970,10 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
         {
           CFArray buf;
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
