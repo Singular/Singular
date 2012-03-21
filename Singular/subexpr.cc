@@ -633,9 +633,9 @@ void * sleftv::CopyD(int t)
       const ring A = currRing->cf->extRing;
 
       assume( A != NULL );
-      assume( A->minideal != NULL );
+      assume( A->qideal != NULL );
 
-      x=(void *)p_Copy(A->minideal->m[0], A);
+      x=(void *)p_Copy(A->qideal->m[0], A);
     }
     data=NULL;
     return x;
@@ -1053,9 +1053,9 @@ void * sleftv::Data()
           const ring A = currRing->cf->extRing;
 
           assume( A != NULL );
-          assume( A->minideal != NULL );
+          assume( A->qideal != NULL );
 
-          return (void *)A->minideal->m[0];
+          return (void *)A->qideal->m[0];
         }
         else
           return (void *)currRing->cf->nNULL;

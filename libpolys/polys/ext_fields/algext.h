@@ -15,9 +15,9 @@
 *               itself be some extension field, thus allowing for extension
 *               towers).
 *           2.) Moreover, this implementation assumes that
-*               cf->extRing->minideal is not NULL but an ideal with at
+*               cf->extRing->qideal is not NULL but an ideal with at
 *               least one non-zero generator which may be accessed by
-*               cf->extRing->minideal->m[0] and which represents the minimal
+*               cf->extRing->qideal->m[0] and which represents the minimal
 *               polynomial f(a) of the extension variable 'a' in K[a].
 *           3.) As soon as an std method for polynomial rings becomes
 *               availabe, all reduction steps modulo f(a) should be replaced

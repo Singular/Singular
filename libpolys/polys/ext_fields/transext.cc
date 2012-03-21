@@ -476,7 +476,7 @@ void ntCoeffWrite(const coeffs cf, BOOLEAN details)
   for (int nop=0; nop < P; nop ++)
     Print("%s ", rRingVar(nop, A));
 
-  assume( A->minideal == NULL );
+  assume( A->qideal == NULL );
 
   PrintS("\n//   minpoly        : 0\n");
 
@@ -1412,7 +1412,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   assume( e->r                != NULL);      // extRing;
   assume( e->r->cf            != NULL);      // extRing->cf;
-  assume( e->r->minideal == NULL );
+  assume( e->r->qideal == NULL );
 
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                // coeff type;

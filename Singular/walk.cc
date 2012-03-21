@@ -1950,7 +1950,7 @@ static void DefRingPar(intvec* va)
 // 
 //   if (rParameter (currRing)!=NULL)
 //   {
-//     res->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0],currRing->cf->extRing);
+//     res->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0],currRing->cf->extRing);
 //     int l=rPar(currRing);
 //     
 //     res->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
@@ -2033,7 +2033,7 @@ static void DefRingParlp(void)
 // 
 //   if (rParameter (currRing)!=NULL)
 //   {
-//     r->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0], currRing->cf->extRing);
+//     r->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0], currRing->cf->extRing);
 //     int l=rPar(currRing);
 //     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
 // 
@@ -2081,7 +2081,7 @@ static void DefRingParlp(void)
 
 //   if (rParameter(currRing)!=NULL)
 //   {
-//     r->cf->extRing->minideal->m[0]=p_Copy(currRing->cf->extRing->minideal->m[0], currRing->cf->extRing);
+//     r->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0], currRing->cf->extRing);
 //     int l=rPar(currRing);
 //     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
 // 

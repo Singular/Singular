@@ -1657,9 +1657,9 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
     L->m[3].data=(void *)idInit(1,1);
   else
   {
-    ideal q=idInit(IDELEMS(r->minideal));
+    ideal q=idInit(IDELEMS(r->qideal));
     q->m[0]=p_Init(R);
-    pSetCoeff0(q->m[0],(number)(r->minideal->m[0]));
+    pSetCoeff0(q->m[0],(number)(r->qideal->m[0]));
     L->m[3].data=(void *)q;
 //    I->m[0] = pNSet(R->minpoly);
   }
@@ -2472,7 +2472,7 @@ ring rCompose(const lists  L)
             par_perm_size=rPar(orig_ring);
             BITSET save_test=test;
 
-//            if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
+//            if ((orig_ring->minpoly != NULL) || (orig_ring->qideal != NULL))
 //              naSetChar(rInternalChar(orig_ring),orig_ring);
 //            else ntSetChar(rInternalChar(orig_ring),orig_ring);
 

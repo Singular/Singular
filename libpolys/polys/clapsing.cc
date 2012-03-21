@@ -74,13 +74,13 @@ static poly singclap_gcd_r ( poly f, poly g, const ring r )
   {
     if ( rField_is_Q_a(r)) setCharacteristic( 0 );
     else                   setCharacteristic( rChar(r) );
-    if (r->cf->extRing->minideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL)
     {
       bool b1=isOn(SW_USE_QGCD);
       bool b2=isOn(SW_USE_fieldGCD);
       if ( rField_is_Q_a(r) ) On(SW_USE_QGCD);
       else                   On(SW_USE_fieldGCD);
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                            r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
@@ -159,10 +159,10 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r)
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else               setCharacteristic( rChar(r) );
     Variable X(i+rPar(r));
-    if (r->cf->extRing->minideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL)
     {
       //Variable X(i);
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                            r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
@@ -305,9 +305,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const 
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else                 setCharacteristic( rChar(r) );
     CanonicalForm Fa,Gb;
-    if (r->cf->extRing->minideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL)
     {
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                            r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
@@ -373,9 +373,9 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else               setCharacteristic( rChar(r) );
-    if (r->cf->extRing->minideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL)
     {
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                                  r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
@@ -529,9 +529,9 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
     }
     else if (rField_is_Extension(r))
     {
-      if (r->cf->extRing->minideal!=NULL)
+      if (r->cf->extRing->qideal!=NULL)
       {
-        CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+        CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                     r->cf->extRing);
         a=rootOf(mipo);
         F=convSingAPFactoryAP( f,a,r );
@@ -562,7 +562,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
         }
         else if (rField_is_Extension(r))
         {
-          if (r->cf->extRing->minideal!=NULL)
+          if (r->cf->extRing->qideal!=NULL)
           {
             q= convFactoryAPSingAP( Q,r );
           }
@@ -732,9 +732,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   {
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rChar(r) );
-    if (r->cf->extRing->minideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL)
     {
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                            r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f, a, r ) );
@@ -794,7 +794,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       {
         intvec *w=NULL;
         if (v!=NULL) w=*v;
-        if (r->cf->extRing->minideal==NULL)
+        if (r->cf->extRing->qideal==NULL)
         {
           if(!count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor(),r ),r))
           {
@@ -926,7 +926,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       }
     }
   }
-  if (rField_is_Q_a(r) && (r->cf->extRing->minideal!=NULL))
+  if (rField_is_Q_a(r) && (r->cf->extRing->qideal!=NULL))
   {
     int i=IDELEMS(res)-1;
     int stop=1;
@@ -1090,9 +1090,9 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   {
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rChar(r) );
-    if (r->cf->extRing->minideal!=NULL)
+    if (r->cf->extRing->qideal!=NULL)
     {
-      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
                                            r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f, a, r ) );
@@ -1152,7 +1152,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
         res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
       else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
       {
-        if (r->cf->extRing->minideal==NULL)
+        if (r->cf->extRing->qideal==NULL)
           res->m[j]=convFactoryPSingTrP( J.getItem().factor(),r );
         else
           res->m[j]=convFactoryAPSingAP( J.getItem().factor(),r );
@@ -1169,7 +1169,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
       N=NULL;
     }
   }
-  if (rField_is_Q_a(r) && (r->cf->extRing->minideal!=NULL))
+  if (rField_is_Q_a(r) && (r->cf->extRing->qideal!=NULL))
   {
     int i=IDELEMS(res)-1;
     int stop=1;

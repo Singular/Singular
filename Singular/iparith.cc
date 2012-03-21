@@ -3619,9 +3619,9 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
   {
 #ifdef HAVE_FACTORY
     extern int ipower ( int b, int n ); /* factory/cf_util */
-    elems=ipower(r->cf->ch,r->cf->extRing->pFDeg(r->cf->extRing->minideal->m[0],r->cf->extRing));
+    elems=ipower(r->cf->ch,r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
 #else
-    elems=(int)pow((double) r->cf->ch,(double)r->cf->extRing->pFDeg(r->cf->extRing->minideal->m[0],r->cf->extRing));
+    elems=(int)pow((double) r->cf->ch,(double)r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
 #endif
   }
   res->data = (char *)(long)elems;

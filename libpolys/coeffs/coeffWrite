@@ -63,9 +63,9 @@
       {
         PrintS("...\n");
       }
-      if (r->minideal!=NULL)
+      if (r->qideal!=NULL)
       {
-        if (r==currRing) iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,r,0);
+        if (r==currRing) iiWriteMatrix((matrix)r->qideal,"//   minpolys",1,r,0);
         else PrintS("//   minpolys=...");
         PrintLn();
       }

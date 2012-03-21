@@ -236,7 +236,7 @@ struct n_Procs_s
   ring          extRing;
 
   //number     minpoly;  //< no longer needed: replaced by
-  //                     //< extRing->minideal->[0]
+  //                     //< extRing->qideal->[0]
 
 
 //-------------------------------------------

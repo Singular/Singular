@@ -13,9 +13,9 @@
   *               itself be some extension field, thus allowing for extension
   *               towers).
   *           2.) Moreover, this implementation assumes that
-  *               cf->extRing->minideal is not NULL but an ideal with at
+  *               cf->extRing->qideal is not NULL but an ideal with at
   *               least one non-zero generator which may be accessed by
-  *               cf->extRing->minideal->m[0] and which represents the minimal
+  *               cf->extRing->qideal->m[0] and which represents the minimal
   *               polynomial f(a) of the extension variable 'a' in K[a].
   *           3.) As soon as an std method for polynomial rings becomes
   *               availabe, all reduction steps modulo f(a) should be replaced
@@ -72,7 +72,7 @@ static const n_coeffType ID = n_algExt;
 #define naCoeffs cf->extRing->cf
 
 /* minimal polynomial */
-#define naMinpoly naRing->minideal->m[0]
+#define naMinpoly naRing->qideal->m[0]
 
 /// forward declarations
 BOOLEAN  naGreaterZero(number a, const coeffs cf);
@@ -320,7 +320,7 @@ void naCoeffWrite(const coeffs cf, BOOLEAN details)
 
   PrintLn();
 
-  const ideal I = A->minideal;
+  const ideal I = A->qideal;
 
   assume( I != NULL );
   assume( IDELEMS(I) == 1 );
@@ -342,7 +342,7 @@ void naCoeffWrite(const coeffs cf, BOOLEAN details)
 
   Print("//   Coefficients live in the extension field K[%s]/<f(%s)>\n", x, x);
   Print("//   with the minimal polynomial f(%s) = %s\n", x,
-        p_String(A->minideal->m[0], A));
+        p_String(A->qideal->m[0], A));
   PrintS("//   and K: ");
 */
 }
@@ -554,7 +554,7 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
   // NOTE: Q(a)[x] && Q(a)[y] should better share the _same_ Q(a)...
   if( rEqual(naRing, e->r, TRUE) )
   {
-    const ideal mi = naRing->minideal;
+    const ideal mi = naRing->qideal; 
     assume( IDELEMS(mi) == 1 );
     ideal ii = e->i;
     assume( IDELEMS(ii) == 1 );
@@ -834,7 +834,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
          (IDELEMS(e->i) != 0)    &&    // non-zero generator
          (e->i->m[0]    != NULL)    ); // at m[0];
 
-  assume( e->r->minideal == NULL );
+  assume( e->r->qideal == NULL );
 
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                     // coeff type;
@@ -843,7 +843,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 
   R->ref ++; // increase the ref.counter for the ground poly. ring!
 
-  R->minideal = e->i; // make a copy?
+  R->qideal = e->i; // make a copy? 
 
   cf->extRing           = R;
 

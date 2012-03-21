@@ -3538,7 +3538,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           n->z=(napoly)mipo_id->m[i];
           mipo_id->m[i]=p;
         }
-        new_ring->minideal=id_Copy(alg_ring->qideal,new_ring);
+        new_ring->qideal=id_Copy(alg_ring->qideal,new_ring);
         // convert factors =============================================
         ideal fac_id=idInit(L.length(),1);
         CFFListIterator J=L;

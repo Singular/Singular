@@ -304,9 +304,9 @@ void   rWrite(ring r, BOOLEAN details)
       {
         StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringAppendS("\n"));
       }
-      //if (r->minideal!=NULL)
+      //if (r->qideal!=NULL)
       //{
-      //  iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,r,0);
+      //  iiWriteMatrix((matrix)r->qideal,"//   minpolys",1,r,0);
       //  PrintLn();
       //}
     }
@@ -827,6 +827,9 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       }
       else if (nCoeff_is_Extension(r2->cf) && rChar(r2) == rChar(r1))
       {
+        /*AlgExtInfo extParam;
+        extParam.r = r2->cf->extRing;
+        extParam.i = r2->cf->extRing->qideal;*/
         tmpR.cf=r2->cf;
         r2->cf->ref++;
       }
@@ -1445,7 +1448,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     r->extRing->ref++;
 
   res->extRing=r->extRing;
-  //memset: res->minideal=NULL;
+  //memset: res->qideal=NULL;
 */
 
 
@@ -1589,7 +1592,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
     r->extRing->ref++;
 
   res->extRing=r->extRing;
-  //memset: res->minideal=NULL;
+  //memset: res->qideal=NULL;
 */
 
 
@@ -2128,7 +2131,7 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   }
 
   if (!rMinpolyIsNULL(r))
-    omCheckAddr(r->cf->extRing->minideal->m[0]);
+    omCheckAddr(r->cf->extRing->qideal->m[0]);
 
   //assume(r->cf!=NULL);
 
@@ -5633,15 +5636,16 @@ BOOLEAN rMinpolyIsNULL(const ring r)
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  const BOOLEAN ret = nCoeff_is_algExt(C);
+  const BOOLEAN ret = nCoeff_is_algExt(C); //  || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
 
   if( ret )
   {
     const ring R = C->extRing;
     assume( R != NULL );
-    assume( !idIs0(R->minideal) );
+    assume( !idIs0(R->qideal) );
   }
-
+  
+  // TODO: it should be "!ret" but it'd lead to test fails (due to rDecompose?)
   return ret;
 }
 
