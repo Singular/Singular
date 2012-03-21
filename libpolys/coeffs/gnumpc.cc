@@ -503,6 +503,9 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
 
   n->cfInit_bigint=ngcMapQ;
 
+// we need to initialize n->nNULL at least for minpoly printing
+  n->nNULL  = n->cfInit(0,n);
+
 /*
   //r->cfInitChar=nlInitChar;
   r->cfKillChar=NULL;
