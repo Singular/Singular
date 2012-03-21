@@ -1653,13 +1653,14 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
   // 3: qideal
   L->m[3].rtyp=IDEAL_CMD;
-  if (rMinpolyIsNULL(R))
+  if (nCoeff_is_transExt(R->cf))
     L->m[3].data=(void *)idInit(1,1);
   else
   {
-    const ring RR = R->cf->extRing;
-
-    L->m[3].data=(void *) idCopy(RR->minideal, RR);
+    ideal q=idInit(IDELEMS(r->minideal));
+    q->m[0]=p_Init(R);
+    pSetCoeff0(q->m[0],(number)(r->minideal->m[0]));
+    L->m[3].data=(void *)q;
 //    I->m[0] = pNSet(R->minpoly);
   }
   // ----------------------------------------
@@ -2077,7 +2078,6 @@ static void rRenameVars(ring R)
 //        omFree(rParameter(R)[i]);
 //        rParameter(R)[i]=(char *)omAlloc(10);
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
-        
         omFree(R->names[j]);
         R->names[j]=(char *)omAlloc(10);
         sprintf(R->names[j],"@@(%d)",i+1);

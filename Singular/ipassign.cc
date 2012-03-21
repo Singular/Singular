@@ -57,36 +57,36 @@
 
 
 /*=================== proc =================*/
-static BOOLEAN jjECHO(leftv res, leftv a)
+static BOOLEAN jjECHO(leftv, leftv a)
 {
   si_echo=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjPRINTLEVEL(leftv res, leftv a)
+static BOOLEAN jjPRINTLEVEL(leftv, leftv a)
 {
   printlevel=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjCOLMAX(leftv res, leftv a)
+static BOOLEAN jjCOLMAX(leftv, leftv a)
 {
   colmax=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjTIMER(leftv res, leftv a)
+static BOOLEAN jjTIMER(leftv, leftv a)
 {
   timerv=(int)((long)(a->Data()));
   initTimer();
   return FALSE;
 }
 #ifdef HAVE_GETTIMEOFDAY
-static BOOLEAN jjRTIMER(leftv res, leftv a)
+static BOOLEAN jjRTIMER(leftv, leftv a)
 {
   rtimerv=(int)((long)(a->Data()));
   initRTimer();
   return FALSE;
 }
 #endif
-static BOOLEAN jjMAXDEG(leftv res, leftv a)
+static BOOLEAN jjMAXDEG(leftv, leftv a)
 {
   Kstd1_deg=(int)((long)(a->Data()));
   if (Kstd1_deg!=0)
@@ -104,12 +104,12 @@ static BOOLEAN jjMAXMULT(leftv res, leftv a)
     test &=(~Sy_bit(OPT_MULTBOUND));
   return FALSE;
 }
-static BOOLEAN jjTRACE(leftv res, leftv a)
+static BOOLEAN jjTRACE(leftv, leftv a)
 {
   traceit=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjSHORTOUT(leftv res, leftv a)
+static BOOLEAN jjSHORTOUT(leftv, leftv a)
 {
   if (currRing != NULL)
   {
@@ -179,7 +179,7 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-static BOOLEAN jjMINPOLY(leftv res, leftv a)
+static BOOLEAN jjMINPOLY(leftv, leftv a)
 {
   if( !nCoeff_is_transExt(currRing->cf) && (currRing->idroot == NULL) && n_IsZero((number)a->Data(), currRing->cf) )
   {
@@ -208,7 +208,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 
     while(p != NULL)
     {
-      Print(p->String(TRUE)); PrintLn();
+      PrintS(p->String(TRUE)); PrintLn();
       p = p->next;
     }
 #endif
@@ -281,7 +281,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 
   return FALSE;
 }
-static BOOLEAN jjNOETHER(leftv res, leftv a)
+static BOOLEAN jjNOETHER(leftv, leftv a)
 {
   poly p=(poly)a->CopyD(POLY_CMD);
   pDelete(&(currRing->ppNoether));
@@ -797,8 +797,6 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   }
 
   int i=0;
-  BOOLEAN nok=FALSE;
-
   if (lt==DEF_CMD)
   {
     if (l->rtyp==IDHDL)
@@ -1196,34 +1194,6 @@ static BOOLEAN jjA_L_STRING(leftv l,leftv r)
   IDDATA((idhdl)(l->data))=s;
   return FALSE;
 }
-static BOOLEAN jjA_LIST_L(leftv l,leftv r)
-{
-  /*left side are something, right side are lists*/
-  /*e.g. a,b,c=l */
-  //int ll=l->listLength();
-  if (l->listLength()==1) return jiAssign_1(l,r);
-  BOOLEAN nok;
-  sleftv t;
-  leftv h;
-  lists L=(lists)r->Data();
-  int rl=L->nr;
-  int i=0;
-
-  memset(&t,0,sizeof(sleftv));
-  while ((i<=rl)&&(l!=NULL))
-  {
-    memset(&t,0,sizeof(sleftv));
-    t.Copy(&L->m[i]);
-    h=l->next;
-    l->next=NULL;
-    nok=jiAssign_1(l,&t);
-    if (nok) return TRUE;
-    i++;
-    l=h;
-  }
-  r->CleanUp();
-  return FALSE;
-}
 static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
 {
   /* right side is matrix, left side is list (of poly)*/
@@ -1303,8 +1273,6 @@ static BOOLEAN jiA_STRING_L(leftv l,leftv r)
   /*e.g. s[2..3]="12" */
   /*the case s=t[1..4] is handled in iiAssign,
   * the case s[2..3]=t[3..4] is handled in iiAssgn_rec*/
-  int ll=l->listLength();
-  int rl=r->listLength();
   BOOLEAN nok=FALSE;
   sleftv t;
   leftv h,l1=l;
