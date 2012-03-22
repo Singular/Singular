@@ -568,7 +568,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         fmpz_mod_poly_t FLINTF, FLINTG;
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
-        fmpz_mod_poly_rem (FLINTF, FLINTF, FLINTG);
+        fmpz_mod_poly_divrem (FLINTG, FLINTF, FLINTF, FLINTG);
         CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF,F.mvar(),b);
         fmpz_mod_poly_clear (FLINTG);
         fmpz_mod_poly_clear (FLINTF);
@@ -2850,7 +2850,7 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     nmod_poly_t FLINTA, FLINTB;
     convertFacCF2nmod_poly_t (FLINTA, A);
     convertFacCF2nmod_poly_t (FLINTB, B);
-    nmod_poly_rem (FLINTA, FLINTB, FLINTA);
+    nmod_poly_divrem (FLINTB, FLINTA, FLINTB, FLINTA);
     bool result= nmod_poly_is_zero (FLINTA);
     nmod_poly_clear (FLINTA);
     nmod_poly_clear (FLINTB);
