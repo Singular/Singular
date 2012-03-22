@@ -39,12 +39,13 @@
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 
-//TODO add a configure check for HAVE_DYNAMIC_LOADING ??
+#ifndef HAVE_DYNAMIC_LOADING
 /* eigenvalues */
-#undef HAVE_EIGENVAL
+#define HAVE_EIGENVAL 1
 
 /* Gauss-Manin system */
 #define HAVE_GMS 1
+#endif
 
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
