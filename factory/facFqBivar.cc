@@ -4565,7 +4565,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   CanonicalForm H;
   bool success;
   smallFactors= sieveSmallFactors (F, bufUniFactors, degs, H, diophant, Pi, M,
-                                   success, 2*(minBound + 1)
+                                   success, minBound + 1
                                   );
 
   if (smallFactors.length() > 0)
@@ -4690,20 +4690,20 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   else
   {
     if (alpha.level() == 1)
-      oldL= liftAndComputeLattice (F, bounds, d, 2*(minBound + 1), liftBound,
+      oldL= liftAndComputeLattice (F, bounds, d, minBound + 1, liftBound,
                                    minBound, bufUniFactors, NTLN, diophant, M,
                                    Pi, bufQ, irreducible
                                   );
     else
     {
       if (reduceFq2Fp)
-        oldL= liftAndComputeLatticeFq2Fp (F, bounds, d, 2*(minBound + 1),
+        oldL= liftAndComputeLatticeFq2Fp (F, bounds, d, minBound + 1,
                                           liftBound, minBound, bufUniFactors,
                                           NTLN, diophant, M, Pi, bufQ,
                                           irreducible, alpha
                                          );
       else
-        oldL= liftAndComputeLattice (F, bounds, d, 2*(minBound + 1), liftBound,
+        oldL= liftAndComputeLattice (F, bounds, d, minBound + 1, liftBound,
                                      minBound, bufUniFactors, NTLNe, diophant,
                                      M, Pi, bufQ, irreducible
                                     );
