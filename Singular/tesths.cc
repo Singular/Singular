@@ -129,7 +129,7 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_SIMPLEIPC
   feOptIndex cpu_opt = feGetOptIndex("cpus");
   int cpus = (int)(long)feOptValue(FE_OPT_CPUS);
-  sipc_semaphore_init(0, cpus);
+  sipc_semaphore_init(0, cpus-1);
 #endif
 
   /* say hello */
