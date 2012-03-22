@@ -39,8 +39,9 @@
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 
+//TODO add a configure check for HAVE_DYNAMIC_LOADING ??
 /* eigenvalues */
-#define HAVE_EIGENVAL 1
+#undef HAVE_EIGENVAL
 
 /* Gauss-Manin system */
 #define HAVE_GMS 1
