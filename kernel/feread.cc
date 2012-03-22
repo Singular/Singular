@@ -27,11 +27,6 @@
 #undef HAVE_DYN_RL
 #endif
 
-#ifdef ix86_Linux
-#undef HAVE_FEREAD
-// not compatible with glibc2
-#endif
-
 #if defined(HAVE_DYN_RL)
 #include <unistd.h>
 #endif

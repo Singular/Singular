@@ -54,10 +54,12 @@ extern "C"
   #define HAVE_FEREAD 1
 #elif ! defined(HAVE_READLINE)
 #ifndef ix86_Win
+#ifdef HAVE_TERM_H
   #define HAVE_FEREAD 1
 #endif
 #endif
-#ifdef ix86_Linux
+#endif
+#if defined(ix86_Linux) || defined(x86_64_Linux)
   // FEREAD stuff does not work with glibc2
   #undef HAVE_FEREAD
 #endif
