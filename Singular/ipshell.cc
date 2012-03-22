@@ -1732,12 +1732,19 @@ void rDecomposeRing(leftv h,const ring R)
 
 lists rDecompose(const ring r)
 {
+  assume( r != NULL );
+  const coeffs C = r->cf;
+  assume( C != NULL );
+  
   // sanity check: require currRing==r for rings with polynomial data
-  if ( (r!=currRing) && (!rMinpolyIsNULL(r)
+  if ( (r!=currRing) && ( 
+	   (nCoeff_is_algExt(C) && (C != currRing->cf))
+	|| (r->qideal != NULL)		 
 #ifdef HAVE_PLURAL
-  || (rIsPluralRing(r))
+        || (rIsPluralRing(r))
 #endif
-  ))
+                        )
+     )
   {
     WerrorS("ring with polynomial data must be the base ring or compatible");
     return NULL;
