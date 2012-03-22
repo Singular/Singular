@@ -37,7 +37,7 @@ struct ip_sring; typedef struct ip_sring * ring;
 struct sip_sideal; typedef struct sip_sideal * ideal;
 
 /// struct for passing initialization parameters to naInitChar
-typedef struct { ring r; ideal i; } AlgExtInfo;
+typedef struct { ring r; /*ideal i;*/ } AlgExtInfo; // `r.qideal` is supposed to be `i`
 
 /// Get a mapping function from src into the domain of this type (n_algExt)
 nMapFunc naSetMap(const coeffs src, const coeffs dst);

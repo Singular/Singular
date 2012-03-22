@@ -246,15 +246,18 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   }
 
   n_Normalize(p, currRing->cf);
+   
+  assume( currRing->cf->extRing->qideal == NULL );
 
   AlgExtInfo A;
 
-  A.r = currRing->cf->extRing; // Use the same ground field!
-  A.i = idInit(1,1);
+  A.r = rCopy(currRing->cf->extRing); // Copy  ground field!
+  ideal q = idInit(1,1);
 
   assume( DEN((fractionObject *)(p)) == NULL ); // minpoly must be a poly...!?
 
-  A.i->m[0] = NUM((fractionObject *)p);
+  q->m[0] = NUM((fractionObject *)p);
+  A.r->qideal = q;
 
 #if 0
   PrintS("\nTrying to conver the currRing into an algebraic field: ");
@@ -272,6 +275,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   {
     Werror("Could not construct the alg. extension: llegal minpoly?");
     // cleanup A: TODO
+    rDelete( A.r );
     return TRUE;
   }
   else

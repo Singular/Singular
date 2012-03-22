@@ -2176,10 +2176,7 @@ ring rCompose(const lists  L)
         {
           AlgExtInfo extParam;
 
-          extParam.i = extRing->qideal;
           extParam.r = extRing;
-
-          extRing->qideal = NULL; // ???
 
           R->cf = nInitChar(n_algExt, (void*)&extParam);
         }
@@ -2187,6 +2184,7 @@ ring rCompose(const lists  L)
         {
           TransExtInfo extParam;
           extParam.r = extRing;
+	  assume( extRing->qideal == NULL );
 
           R->cf = nInitChar(n_transExt, &extParam);
         }
@@ -5186,7 +5184,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     AlgExtInfo extParam;
     extParam.r = (ring)pn->Data();
-    extParam.i = (extParam.r->qideal);
 
     cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
   }

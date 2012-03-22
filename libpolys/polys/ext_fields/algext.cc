@@ -552,20 +552,19 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
      the same, as they are attached to the ring.) */
 
   // NOTE: Q(a)[x] && Q(a)[y] should better share the _same_ Q(a)...
-  if( rEqual(naRing, e->r, TRUE) )
+  if( rEqual(naRing, e->r, TRUE) ) // also checks the equality of qideals
   {
     const ideal mi = naRing->qideal; 
     assume( IDELEMS(mi) == 1 );
-    ideal ii = e->i;
+    const ideal ii = e->r->qideal;
     assume( IDELEMS(ii) == 1 );
 
     // TODO: the following should be extended for 2 *equal* rings...
-    if( p_EqualPolys(mi->m[0], ii->m[0], naRing, e->r) )
-    {
-      id_Delete(&ii, e->r);
-      rDelete(e->r);
-      return TRUE;
-    }
+    assume( p_EqualPolys(mi->m[0], ii->m[0], naRing, e->r) );
+    
+    rDelete(e->r);
+    
+    return TRUE;
   }
 
   return FALSE;
@@ -830,22 +829,18 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 
   assume(e->r                     != NULL);      // extRing;
   assume(e->r->cf                 != NULL);      // extRing->cf;
-  assume((e->i          != NULL) &&    // minideal has one
-         (IDELEMS(e->i) != 0)    &&    // non-zero generator
-         (e->i->m[0]    != NULL)    ); // at m[0];
 
-  assume( e->r->qideal == NULL );
+  assume((e->r->qideal            != NULL) &&    // minideal has one
+         (IDELEMS(e->r->qideal)   == 1)    &&    // non-zero generator
+         (e->r->qideal->m[0]      != NULL)    ); // at m[0];
 
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                     // coeff type;
 
-  ring R = e->r;
-
-  R->ref ++; // increase the ref.counter for the ground poly. ring!
-
-  R->qideal = e->i; // make a copy? 
-
-  cf->extRing           = R;
+  e->r->ref ++; // increase the ref.counter for the ground poly. ring!
+  const ring R = e->r; // no copy!
+  assume( R->qideal == e->r->qideal );
+  cf->extRing  = R;
 
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
