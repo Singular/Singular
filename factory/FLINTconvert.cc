@@ -265,9 +265,9 @@ convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
 
   long i;
 
-  for (i = 0; i < fac->num; i++)
-    result.append (CFFactor (convertnmod_poly_t2FacCF ((nmod_poly_t &)fac->p[i],x),
-                             fac->exp[i]));
+  for (i = 0; i < fac->num_factors; i++)
+    result.append (CFFactor (convertnmod_poly_t2FacCF ((nmod_poly_t &)fac->factors[i],x),
+                             fac->exponents[i]));
   return result;
 }
 
