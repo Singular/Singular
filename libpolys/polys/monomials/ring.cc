@@ -458,6 +458,13 @@ void rDelete(ring r)
   if( r->ref > 0 ) // ->ref means the number of Interpreter objects refearring to the ring...
     return; // NOTE: There may be memory leaks due to inconsisten use of r->ref!!! (e.g. due to ext_fields)
 
+  if( r->qideal != NULL )
+  {
+    ideal q = r->qideal;
+    r->qideal = NULL;
+    id_Delete(&q, r);
+  }
+
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
     nc_rKill(r);
@@ -497,19 +504,6 @@ void rDelete(ring r)
     omFreeSize((ADDRESS)r->names,r->N*sizeof(char *));
   }
 
-//   // delete parameter
-//   if (rParameter(r)!=NULL)
-//   {
-//     char **s= rParameter(r);
-//     j = 0;
-//     while (j < rPar(r))
-//     {
-//       if (*s != NULL) omFree((ADDRESS)*s);
-//       s++;
-//       j++;
-//     }
-//     omFreeSize((ADDRESS)rParameter(r),rPar(r)*sizeof(char *));
-//   }
   omFreeBin(r, sip_sring_bin);
 }
 
