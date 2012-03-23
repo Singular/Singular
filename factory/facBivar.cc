@@ -356,7 +356,6 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
   bool extension= (v.level() != 1);
   CanonicalForm A;
-  CanonicalForm multiplier= 1;
   if (isOn (SW_RATIONAL))
     A= F*bCommonDen (F);
   else
@@ -658,10 +657,16 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   else
   {
     A /= Lc (Aeval);
-    A *= bCommonDen (A);
     // make factors elements of Z(a)[x] disable for modularDiophant
+    CanonicalForm multiplier= 1;
     for (CFListIterator i= uniFactors; i.hasItem(); i++)
+    {
+      multiplier *= bCommonDen (i.getItem());
       i.getItem()= i.getItem()*bCommonDen(i.getItem());
+    }
+    A *= multiplier;
+    A *= bCommonDen (A);
+
     mipoHasDen= !bCommonDen(mipo).isOne();
     mipo *= bCommonDen (mipo);
     Off (SW_RATIONAL);
