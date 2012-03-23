@@ -90,14 +90,14 @@ EXAMPLE: example ImageGroup; shows an example
   int i, j, k, newVars, nrt, imageSize, dbPrt;
   ideal matrixEntries;
   matrix coMx;
-  poly tVars, mPoly;
+  poly tVars;
   string ringSTR1, ringSTR2, order;
 
   dbPrt = printlevel-voice+2;
   dbprint(dbPrt, "Image Group of " + string(Grp) + ", action =  "
                                    + string(Gaction));
   def RIGB = basering;
-  mPoly = minpoly;
+  string @mPoly = string(minpoly);
   tVars = 1;
   k = 0;
 
@@ -129,7 +129,7 @@ EXAMPLE: example ImageGroup; shows an example
   ringSTR1 = "ring RIGR = (" + charstr(basering) + "), (" + varstr(basering)
                              + ", z(1.." + string(newVars) + "))," + order;
   execute(ringSTR1);
-  minpoly = number(imap(RIGB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
   ideal I1, I2, Gn, G, F, mEntries, newGaction;
   G = imap(RIGB, Grp);
   F = imap(RIGB, Gaction);
@@ -154,7 +154,7 @@ EXAMPLE: example ImageGroup; shows an example
   ringSTR2 = "ring RIGS = (" + charstr(basering) + "), (s(1.."
                      + string(newVars) + "), t(1.." + string(nrt) + ")), lp;";
   execute(ringSTR2);
-  minpoly = number(imap(RIGB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
   ideal mapIdeal, groupid, actionid;
   int offset;
 
@@ -297,12 +297,12 @@ EXAMPLE: example ImageVariety; shows an example
 
   // create new ring for elimination, Y(1),...,Y(m) are slack variables.
 
-  poly mPoly = minpoly;
+  string @mPoly = string(minpoly);
   order = "(dp(" + string(nvars(basering)) + "), dp);";
   ringSTR1 = "ring RAR1 = (" + charstr(basering) + "), (" + varstr(basering) + ", Y(1.." + string(nrNewVars) + ")), " + order;
   ringSTR2 = "ring RAR2 = (" + charstr(basering) + "), Y(1.." + string(nrNewVars) + "), dp;";
   execute(ringSTR1);
-  minpoly = number(imap(RARB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
 
   ideal I, J1, J2, Fm;
 
@@ -330,7 +330,7 @@ EXAMPLE: example ImageVariety; shows an example
   J2 = nselect(J1, 1.. nvars(RARB));
 
   execute(ringSTR2);
-  minpoly = number(imap(RARB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
   ideal imageid = imap(RAR1, J2);
   export(imageid);
      dbprint(dbPrt+1, "
@@ -375,12 +375,12 @@ EXAMPLE: example LinearizeAction; shows an example
   ideal action, basis, G, reduceIdeal;
   matrix decompMx;
   poly actCoeff;
-  string str, order, mPoly;
+  string str, order;
 
   dbPrt = printlevel-voice+2;
   dbprint(dbPrt, "LinearizeAction " + string(Gaction));
   def RLAR = basering;
-  mPoly = "minpoly = " + string(minpoly) + ";";
+  string @mPoly = string(minpoly);
   order = ordstr(basering);
   nrt = ncols(Gaction);
   for(i = 1; i <= nrs; i++) { wt[i] = 0;}
@@ -430,7 +430,7 @@ EXAMPLE: example LinearizeAction; shows an example
         def RLAB = basering;
         if(defined(RLAR)) { kill RLAR;}
         execute("ring RLAR = " + str + "(" + order + ");");
-        execute(mPoly);
+        execute("minpoly = number(" + @mPoly + ");");
 
         ideal basis, action, G, reduceIdeal;
         matrix decompMx;
@@ -861,7 +861,6 @@ EXAMPLE: example NullCone; shows an example
 "
 {
   int i, nt, dbPrt, offset, groupVars;
-  poly minPoly;
   string ringSTR, vars, order;
   def RNCB = basering;
 
@@ -877,10 +876,10 @@ EXAMPLE: example NullCone; shows an example
   ringSTR = "ring RNCR = (" + charstr(basering) +  "),"  + vars;
   // ring for the computation
 
-  minPoly = minpoly;
+  string @minPoly = string(minpoly);
   offset =  size(G) + nt;
   execute(ringSTR);
-  def aaa=imap(RNCB, minPoly);
+  execute("poly aaa = number(" + @minPoly + ");");
   if (aaa!=0) { minpoly = number(aaa); }
   ideal action, G, I, J, N, generators;
   map F;

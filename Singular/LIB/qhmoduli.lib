@@ -129,7 +129,7 @@ EXAMPLE: example ModEqn; shows an example
                 kill groupid,embedid;
     def RME4 = QuotientEquations(G, actionid, variety, opt);
     setring RME4;
-    poly mPoly = minpoly;
+    string @mPoly = string(minpoly);
     kill RME3;
     export(RME4);
 
@@ -142,7 +142,7 @@ EXAMPLE: example ModEqn; shows an example
       dbprint(dbPrt, " number of variables = " + string(size(sList[3])));
       ringSTR = "ring RME5 = (" + charstr(basering) + "), (Y(1.." + string(size(sList[3])) + ")),dp;";
       execute(ringSTR);
-      minpoly = number(imap(RME4, mPoly));
+      execute("minpoly = number(" + @mPoly + ");");
       ideal modid = imap(RME4, newid);
     }
     else {
@@ -328,7 +328,7 @@ EXAMPLE: example ArnoldAction; shows an example
   dbprint(dbPrt, "ArnoldAction of f = ", f, ", upper base = " + string(B));
 
   setring STR1;
-  poly mPoly = minpoly;
+  string @mPoly = string(minpoly);
   setring RAAB;
 
   // setup new ring with s(..) and t(..) as parameters
@@ -350,10 +350,10 @@ EXAMPLE: example ArnoldAction; shows an example
 
   execute(ringSTR1);
   export(RAAR);
-  ideal upperBasis, stabaction, action, mPoly, reduceIdeal;
+  ideal upperBasis, stabaction, action, reduceIdeal;
   poly f, F, monos, h;
 
-  reduceIdeal = imap(STR1, mPoly), imap(STR1, stabid);
+  execute("reduceIdeal = " + @mPoly + ";"); reduceIdeal = reduceIdeal, imap(STR1, stabid);
   f = imap(RAAB, f);
   F = f;
   upperBasis = imap(RAAB, B);
@@ -379,7 +379,7 @@ EXAMPLE: example ArnoldAction; shows an example
     action[pos] = parts[2][i]/parts[1][i];
   }
   execute(ringSTR2);
-  minpoly = number(imap(STR1, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
   ideal actionid = imap(RAAR, action);
   ideal stabid = imap(STR1, stabid);
   export(actionid);
@@ -481,7 +481,6 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 {
   int i, j, c, k, r, nrVars, offset, n, sln, dbPrt;
   list Variables, rd, temp, sList, varSubsList;
-  poly mPoly;
   string ringSTR, ringSTR1, varString, parString;
 
   dbPrt = printlevel-voice+2;
@@ -506,7 +505,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   else { parString = "0"; }
 
   def RSTB = basering;
-  mPoly = minpoly;
+  string @mPoly = string(minpoly);
   ringSTR = "ring RSTR = " + parString + ", (" + varstr(basering) + ", " + varString + "), dp;";  // dp
         ringSTR1 = "ring RSTT = " + parString + ", (" + varString + ", " + varstr(basering) + "), dp;";
 
@@ -514,11 +513,11 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
         if(defined(RSTT)) { kill RSTT;}
         execute(ringSTR1);      // this ring is only used for the result, where the variables
   export(RSTT);           // are s(1..m),t(1..n), as needed for Derksens algorithm (NullCone)
-  minpoly = number(imap(RSTB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
 
   execute(ringSTR);
   export(RSTR);
-  minpoly = number(imap(RSTB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
   poly f, f1, g, h, vars, pp;      // f1 is the polynomial after subs,
   ideal allEqns, qhsubs, actionid, stabid, J;
   list ringList;          // all t(i)`s which do not appear in f1
@@ -611,7 +610,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   varString = "s(1.." + string(sln) + ")";
   ringSTR = "ring RSTS = " + parString + ", (" + varString + "), dp;";
   execute(ringSTR);
-  minpoly = number(imap(RSTB, mPoly));
+  execute("minpoly = number(" + @mPoly + ");");
   ideal stabid = std(imap(RSTR, stabid));
   export(stabid);
   ringList[1] = RSTS;

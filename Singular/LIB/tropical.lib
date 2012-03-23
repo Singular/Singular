@@ -649,9 +649,9 @@ EXAMPLE: example tropicalLifting;   shows an example"
         {
           // pass first to a ring where a and @a
           // are variables in order to use maps
-          poly mp=minpoly;
+          string @mp= string(minpoly);
           ring INTERRING=char(LIFTRING),(t,@a,a),dp;
-          poly mp=imap(LIFTRING,mp);
+          execute("poly mp=" + @mp + ";");
           ideal LIFT=imap(LIFTRING,LIFT);
           kill LIFTRING;
           // replace @a by a in minpoly and in LIFT
@@ -1011,10 +1011,10 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
   if ((1<var(1)) or (1<var(2)))
   {
     def GLOBALRING=basering;
-    number mp=minpoly;
+    string @mp= string(minpoly);
     execute("ring LOCALRING=("+charstr(basering)+"),("+varstr(basering)+"),ds;");
+    execute("minpoly= " + @mp + ";");
     poly f=imap(GLOBALRING,f);
-    minpoly=imap(GLOBALRING,mp);
   }
   // check if a substitution is necessary
   int noResubst;
@@ -1048,10 +1048,11 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
     // if the base field has a minimal polynomial change the base ring and the ideal
     if (minpoly!=0)
     {
-      poly mp=minpoly;
+      string @mp= string(minpoly);
       def OLDRING=basering;
       execute("ring NEWRING=0,("+varstr(basering)+","+parstr(basering)+"),ds;");
-      ideal I=imap(OLDRING,mp),imap(OLDRING,f);
+      execute("ideal I = " + @mp + ";");
+      I = I,imap(OLDRING,f);
     }
     else
     {
@@ -1132,9 +1133,9 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
     }
     else
     {
-      poly mp=minpoly;
+      string @mp= string(minpoly);
       ring degreering=0,a,dp;
-      poly mp=imap(countring,mp);
+      execute("poly mp=" + @mp + ";");
       numberofbranchesfound=numberofbranchesfound+deg(mp);
       setring countring;
       kill degreering;
@@ -5455,9 +5456,9 @@ NOTE:     the procedure is called from tropicalLifting"
     else // absolute primary decomposition was used
     {
       setring LIFTRing;
-      poly mp=minpoly;
+      string @mp= string(minpoly);
       execute("ring TESTRing=("+charstr(LIFTRing)+"),("+varstr(BASERING)+"),dp;");
-      minpoly=number(imap(LIFTRing,mp));
+      execute("minpoly= " + @mp + ";");
       ideal i=imap(BASERING,i);
     }
   }
@@ -5829,7 +5830,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         if (anzahlvariablen<nvars(basering))
         {
           execute("ring PARARing=("+string(char(basering))+",@a),t,ls;");
-          minpoly=number(imap(PREGFANRING,m));
+          minpoly=number(imap(PREGFANRING,m)); // ?
         }
         else
         {
