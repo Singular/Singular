@@ -184,12 +184,10 @@
 #define FAST_AND_DIRTY
 
 /* eigenvalues */
-#ifndef HAVE_DYNAMIC_LOADING
-#define HAVE_EIGENVAL 1
+#undef HAVE_EIGENVAL
 
 /* Gauss-Manin system */
-#define HAVE_GMS 1
-#endif
+#undef HAVE_GMS
 
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
