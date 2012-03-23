@@ -12,6 +12,7 @@
 /*****************************************************************************/
 
 #include "debug.h"
+#include "config.h"
 
 #include "canonicalform.h"
 #include "facMul.h"
