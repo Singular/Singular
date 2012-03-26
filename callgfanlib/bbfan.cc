@@ -115,8 +115,9 @@ static gfan::IntMatrix permutationIntMatrix(const intvec* iv)
         for (int r = 1; r <= rr; r++)
           for (int c = 1; c <= cc; c++)
             IMATELEM(*ivCopy, r, c) = IMATELEM(*iv, r, c) - 1;
-        gfan::ZMatrix zm = intmat2ZMatrix(ivCopy);
-        gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(zm));
+        gfan::ZMatrix* zm = intmat2ZMatrix(ivCopy);
+        gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(*zm));
+        delete zm;
         return *im;
 }
 static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
