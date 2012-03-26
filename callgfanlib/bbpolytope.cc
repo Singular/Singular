@@ -22,9 +22,26 @@ int polytopeID;
 std::string bbpolytopeToString(gfan::ZCone const &c)
 {
   std::stringstream s;
-  gfan::ZMatrix r=c.extremeRays();
-  s<<"VERTICES"<<std::endl;
-  s<<toString(r);
+  gfan::ZMatrix i=c.getInequalities();
+  gfan::ZMatrix e=c.getEquations();
+  s<<"AMBIENT_DIM"<<std::endl;
+  s<<c.ambientDimension()<<std::endl;
+  s<<"INEQUALITIES"<<std::endl;
+  s<<toString(i);
+  s<<"EQUATIONS"<<std::endl;
+  s<<toString(e);
+  if(c.areExtremeRaysKnown())
+  {
+    gfan::ZMatrix r=c.extremeRays();
+    s<<"VERTICES"<<std::endl;
+    s<<toString(r);
+  }
+  if(c.areGeneratorsOfLinealitySpaceKnown())
+  {
+    gfan::ZMatrix r=c.generatorsOfLinealitySpace();
+    s<<"LINEALITY_SPACE"<<std::endl;
+    s<<toString(r);
+  }
   return s.str();
 }
 
@@ -516,7 +533,21 @@ BOOLEAN scalePolytope(leftv res, leftv args)
   }
   WerrorS("scalePolytope: unexpected parameters");
   return TRUE;
+}
 
+BOOLEAN dualPolytope(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*) u->Data();
+    gfan::ZCone* zq = new gfan::ZCone(zp->dualCone());
+    res->rtyp = polytopeID;
+    res->data = (char*) zq;
+    return FALSE;
+  }
+  WerrorS("dualPolytope: unexpected parameters");
+  return TRUE;
 }
 
 void bbpolytope_setup()
@@ -538,6 +569,7 @@ void bbpolytope_setup()
   iiAddCproc("","getVertices",FALSE,getVertices);
   iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   iiAddCproc("","scalePolytope",FALSE,scalePolytope);
+  iiAddCproc("","dualPolytope",FALSE,dualPolytope);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                               

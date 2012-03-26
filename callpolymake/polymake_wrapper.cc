@@ -1,4 +1,5 @@
 #include <polymake_conversion.h>
+#include <polymake_documentation.h>
 
 // #include <polymake/Main.h>
 // #include <polymake/Matrix.h>
@@ -1798,9 +1799,18 @@ BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
 }
 
 
+BOOLEAN loadPolymakeDocumentation(leftv res, leftv args)
+{
+  init_polymake_help();
+
+  res->rtyp = NONE;
+  res->data = NULL;
+  return FALSE;
+}
+
+
 extern "C" int mod_init(void* polymakesingular)
 {
-
   if (init_polymake==NULL) 
     {init_polymake = new polymake::Main();}
   init_polymake->set_application("fan");
@@ -1854,8 +1864,10 @@ extern "C" int mod_init(void* polymakesingular)
   // iiAddCproc("","testingvisuals",FALSE,testingvisuals);
   // iiAddCproc("","testingstrings",FALSE,testingstrings);
   // iiAddCproc("","testingmatrices",FALSE,testingmatrices);
+  iiAddCproc("","loadPolymakeDocumentation",FALSE,loadPolymakeDocumentation);
 
   blackbox* b=getBlackboxStuff(polytopeID);
   b->blackbox_Op2=bbpolytope_Op2;
  
+  // init_polymake_help();
 }
