@@ -783,6 +783,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           SI_LINK_SET_RW_OPEN_P(l);
           //myynest=0;
           fe_fgets_stdin=fe_fgets_dummy;
+	  WerrorS_callback=WerrorS_batch;
           if ((u!=NULL)&&(u->rtyp==IDHDL))
           {
             idhdl h=(idhdl)u->data;

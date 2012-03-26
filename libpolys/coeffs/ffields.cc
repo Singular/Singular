@@ -14,7 +14,6 @@
 #include <misc/mylimits.h>
 
 #include <reporter/reporter.h>
-#include <resources/feFopen.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>

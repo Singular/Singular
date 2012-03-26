@@ -21,6 +21,7 @@
 
 #include <reporter/reporter.h>
 #include <findexec/feResource.h>
+#include <findexec/feFopen.h>
 #include <omalloc/omalloc.h>
 //#include "options.h"
 
@@ -36,13 +37,12 @@
 static long feBufferLength=INITIAL_PRINT_BUFFER;
 static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
-BOOLEAN errorreported = FALSE;
 char *  feErrors=NULL;
 int     feErrorsLen=0;
 BOOLEAN feWarn = TRUE;
 BOOLEAN feOut = TRUE;
 
-void (*WerrorS_callback)(const char *s) = NULL;
+//void (*WerrorS_callback)(const char *s) = NULL;
 
 const char feNotImplemented[]="not implemented";
 
@@ -146,68 +146,25 @@ void PrintTCLS(const char c, const char *s)
 }
 #endif
 
-extern "C" {
-void WerrorS(const char *s)
+void WerrorS_batch(const char *s)
 {
-#ifdef HAVE_MPSR
-  if (fe_fgets_stdin==fe_fgets_dummy)
+  if (feErrors==NULL)
   {
-    if (feErrors==NULL)
-    {
-      feErrors=(char *)omAlloc(256);
-      feErrorsLen=256;
-      *feErrors = '\0';
-    }
-    else
-    {
-      if (((int)(strlen((char *)s)+ 20 +strlen(feErrors)))>=feErrorsLen)
-      {
-        feErrors=(char *)omReallocSize(feErrors,feErrorsLen,feErrorsLen+256);
-        feErrorsLen+=256;
-      }
-    }
-    strcat(feErrors, "Singular error: ");
-    strcat(feErrors, (char *)s);
+    feErrors=(char *)omAlloc(256);
+    feErrorsLen=256;
+    *feErrors = '\0';
   }
   else
-#endif
   {
-#ifdef HAVE_TCL
-    if (tclmode)
+    if (((int)(strlen((char *)s)+ 20 +strlen(feErrors)))>=feErrorsLen)
     {
-      PrintTCLS('E',(char *)s);
-      PrintTCLS('E',"\n");
-    }
-    else
-#endif
-    {
-      if (WerrorS_callback == NULL)
-      {
-        fwrite("   ? ",1,5,stderr);
-        fwrite((char *)s,1,strlen((char *)s),stderr);
-        fwrite("\n",1,1,stderr);
-        fflush(stderr);
-      }
-      else
-      {
-        WerrorS_callback(s);
-      }
-      if (feProt&PROT_O)
-      {
-        fwrite("   ? ",1,5,feProtFile);
-        fwrite((char *)s,1,strlen((char *)s),feProtFile);
-        fwrite("\n",1,1,feProtFile);
-      }
+      feErrors=(char *)omReallocSize(feErrors,feErrorsLen,feErrorsLen+256);
+      feErrorsLen+=256;
     }
   }
+  strcat(feErrors, "Singular error: ");
+  strcat(feErrors, (char *)s);
   errorreported = TRUE;
-#ifdef HAVE_FACTORY
-#ifdef HAVE_LIBFAC
-  // libfac:
-  extern int libfac_interruptflag;
-  libfac_interruptflag=1;
-#endif
-#endif
 }
 
 void Werror(const char *fmt, ...)
@@ -247,7 +204,6 @@ void WarnS(const char *s)
     }
   }
 }
-} /* end extern "C" */
 
 void Warn(const char *fmt, ...)
 {

@@ -15,13 +15,13 @@ libresources_g_la_CPPFLAGS = -DHAVE_CONFIG_H
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
-SOURCES = feFopen.cc
+SOURCES = 
 libresources_la_SOURCES   = $(SOURCES)
 libresources_g_la_SOURCES = $(SOURCES)
 
 libresources_includedir  =$(includedir)/singular/resources
 
-libresources_include_HEADERS   = feFopen.h
+libresources_include_HEADERS   =
 
 
 
