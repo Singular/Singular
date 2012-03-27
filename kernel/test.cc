@@ -14,7 +14,7 @@
 
 #include <reporter/reporter.h>
 
-#include <resources/feFopen.h>
+#include <findexec/feFopen.h>
 #include <findexec/feResource.h>
 
 #include <coeffs/coeffs.h>
