@@ -952,28 +952,12 @@ ZCone ZCone::positiveOrthant(int dimension)
 
 ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpace)
 {
-  //rewrite modulo lineality space
-  ZMatrix newGenerators(generators.getHeight(),generators.getWidth());
-  {
-    QMatrix l=ZToQMatrix(linealitySpace);
-    l.reduce();
-    for(int i=0;i<generators.getHeight();i++)
-      newGenerators[i]=QToZVectorPrimitive(l.canonicalize(ZToQVector(generators[i])));
-  }
-
   ZCone dual(newGenerators,linealitySpace);
-  dual.findFacets();
-  dual.canonicalize();
   ZMatrix inequalities=dual.extremeRays();
   // because extremeRays was called, the following is already in canonical form
   ZMatrix extremeRays=dual.getInequalities();
   ZMatrix linSpace=dual.getEquations();
-
-  ZMatrix span=generators;
-  span.append(linealitySpace);
-  QMatrix m2Q=ZToQMatrix(span);
-  ZMatrix equations=QToZMatrixPrimitive(m2Q.reduceAndComputeKernel());
-  // ZMatrix equations=dual.generatorsOfLinealitySpace();
+  ZMatrix equations=dual.generatorsOfLinealitySpace();
 
   //nothing of the span is known, passed empty matrix will be ignored
   ZMatrix sspan;

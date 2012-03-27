@@ -1283,10 +1283,10 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
 }
 
 
-polymake::Matrix<polymake::Integer> raysOf(const polymake::perl::Object* zf, 
-                                           const polymake::Set<polymake::Integer>* s)
+polymake::Matrix<polymake::Integer> verticesOf(const polymake::perl::Object* p, 
+                                               const polymake::Set<polymake::Integer>* s)
 {
-  polymake::Matrix<polymake::Integer> allrays = zf->give("RAYS");
+  polymake::Matrix<polymake::Integer> allrays = p->give("VERTICES");
   polymake::Matrix<polymake::Integer> wantedrays;
   bool ok = true;
   for(Entire<Set<Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
@@ -1320,9 +1320,9 @@ BOOLEAN PMmaximalFace(leftv res, leftv args)
         o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
         p->take("LP") << o;
         polymake::Set<polymake::Integer> mf = p->give("LP.MAXIMAL_FACE");
+        polymake::Matrix<polymake::Integer> vertices = verticesOf(p,&mf);
         delete p;
-        polymake::Matrix<polymake::Integer> rays = raysOf(p,&mf);
-        maxface = new intvec(PmMatrixInteger2Intvec(&rays,ok));
+        maxface = new intvec(PmMatrixInteger2Intvec(&vertices,ok));
       }
       catch (const std::exception& ex) 
       {
@@ -1363,9 +1363,9 @@ BOOLEAN PMminimalFace(leftv res, leftv args)
         o.take("LINEAR_OBJECTIVE") << Intvec2PmVectorInteger(iv);
         p->take("LP") << o;
         polymake::Set<polymake::Integer> mf = p->give("LP.MINIMAL_FACE");
+        polymake::Matrix<polymake::Integer> vertices = verticesOf(p,&mf);
         delete p;
-        polymake::Matrix<polymake::Integer> rays = raysOf(p,&mf);
-        minface = new intvec(PmMatrixInteger2Intvec(&rays,ok));
+        minface = new intvec(PmMatrixInteger2Intvec(&vertices,ok));
       }
       catch (const std::exception& ex) 
       {
