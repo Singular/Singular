@@ -952,7 +952,7 @@ ZCone ZCone::positiveOrthant(int dimension)
 
 ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpace)
 {
-  ZCone dual(newGenerators,linealitySpace);
+  ZCone dual(generators,linealitySpace);
   ZMatrix inequalities=dual.extremeRays();
   // because extremeRays was called, the following is already in canonical form
   ZMatrix extremeRays=dual.getInequalities();
