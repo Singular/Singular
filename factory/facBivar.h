@@ -178,6 +178,15 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
     if (isOn (SW_RATIONAL))
     {
       normalize (result);
+      if (v.level() == 1)
+      {
+        for (CFFListIterator i= result; i.hasItem(); i++)
+        {
+          LcF /= bCommonDen (i.getItem().factor());
+          i.getItem()= CFFactor (i.getItem().factor()*
+                       bCommonDen(i.getItem().factor()), i.getItem().exp());
+        }
+      }
       result.insert (CFFactor (LcF, 1));
     }
     return result;
@@ -201,6 +210,15 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
   if (isOn (SW_RATIONAL))
   {
     normalize (result);
+    if (v.level() == 1)
+    {
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        LcF /= bCommonDen (i.getItem().factor());
+        i.getItem()= CFFactor (i.getItem().factor()*
+                     bCommonDen(i.getItem().factor()), i.getItem().exp());
+      }
+    }
     result.insert (CFFactor (LcF, 1));
   }
   return result;
