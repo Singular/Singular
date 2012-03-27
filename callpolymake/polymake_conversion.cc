@@ -418,7 +418,6 @@ polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
       for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
         {
           gfan::IntVector v = zf->getConeIndices(d,i,0,1);
-          std::cout << "this is v: " << v << std::cout;
           polymake::Set<int> s;
           for (int j=0; j<v.size(); j++)
             {
