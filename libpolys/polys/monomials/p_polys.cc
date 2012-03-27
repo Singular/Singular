@@ -2004,8 +2004,7 @@ poly p_Power(poly p, int i, const ring r)
             return p_Pow(p,i,r);
           if ((char_p==0) || (i<=char_p))
             return p_TwoMonPower(p,i,r);
-          poly p_p=p_TwoMonPower(p_Copy(p,r),(i/char_p)*char_p,r);
-          return p_Mult_q(p_Power(p,i % char_p,r),p_p,r);
+          return p_Pow(p,i,r);
         }
       /*end default:*/
     }
