@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
 * independent of representation
@@ -185,6 +183,20 @@ static poly p_MonMultC(poly p, poly q, const ring rr)
   return r;
 }
 
+static poly p_Pow(poly p, int i, const ring r)
+{
+  poly rc = p_Copy(p,r);
+  i -= 2;
+  do
+  {
+    rc = p_Mult_q(rc,p_Copy(p,r),r);
+    p_Normalize(rc,r);
+    i--;
+  }
+  while (i != 0);
+  return p_Mult_q(rc,p,r);
+}
+
 /*
 *  compute for a poly p = head+tail, tail is monomial
 *          (head + tail)^exp, exp > 1
@@ -202,12 +214,17 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   tail = pNext(p);
   if (bin == NULL)
   {
-    p_MonPower(p,exp,r);
-    p_MonPower(tail,exp,r);
+    if (rChar(r)==exp)
+    {
+      p_MonPower(p,exp,r);
+      p_MonPower(tail,exp,r);
 #ifdef PDEBUG
-    p_Test(p,r);
+      p_Test(p,r);
 #endif
-    return p;
+      return p;
+    }
+    else
+      return p_Pow(p,exp,r);
   }
   eh = exp >> 1;
   al = (exp + 1) * sizeof(poly);
@@ -257,20 +274,6 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   p_Test(res,r);
 #endif
   return res;
-}
-
-static poly p_Pow(poly p, int i, const ring r)
-{
-  poly rc = p_Copy(p,r);
-  i -= 2;
-  do
-  {
-    rc = p_Mult_q(rc,p_Copy(p,r),r);
-    p_Normalize(rc,r);
-    i--;
-  }
-  while (i != 0);
-  return p_Mult_q(rc,p,r);
 }
 
 /*2
@@ -344,8 +347,7 @@ poly p_Power(poly p, int i, const ring r)
             return p_Pow(p,i,r);
           if ((char_p==0) || (i<=char_p))
             return p_TwoMonPower(p,i,r);
-          poly p_p=p_TwoMonPower(p_Copy(p,r),(i/char_p)*char_p,r);
-          return p_Mult_q(p_Power(p,i % char_p,r),p_p,r);
+          return p_Pow(p,i,r);
         }
       /*end default:*/
     }
@@ -1059,7 +1061,7 @@ poly p_Cleardenom(poly ph, const ring r)
       }
     }
     if (h!=NULL) nDelete(&h);
-  
+
     p_Content(ph,r);
 #ifdef HAVE_RATGRING
     if (rIsRatGRing(r))
@@ -1200,7 +1202,7 @@ BOOLEAN pIsHomogeneous (poly p)
   pFDegProc d;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
     d=p_Totaldegree;
-  else 
+  else
     d=pFDeg;
   o = d(p,currRing);
   do
@@ -1294,7 +1296,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
                 napSetm(mmc->z);
                 pGetCoeff(qq)=naMult((number)c,(number)mmc);
                 nDelete((number *)&c);
-                nDelete((number *)&mmc); 
+                nDelete((number *)&mmc);
               }
               mapped_to_par=1;
             }
