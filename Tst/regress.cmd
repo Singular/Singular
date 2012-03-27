@@ -264,9 +264,19 @@ sub testSuiteFinished
 
 $failed = 0;
 
+sub testNameRemoveLeadingUnderscore
+{
+  # make NN/_abs.tst - > NN/abs.tst
+  local($t) = $_[0];
+  $t =~ s/^_([a-z0-9][^\/]*)$/\1/g;
+  $t =~ s/[\/]_([a-z0-9][^\/]*)$/\/\1/g;
+  return ($t);  
+}
+
 sub testStarted
 {
-  local($v) = $_[0];        
+  local($v) = $_[0];
+  $v = testNameRemoveLeadingUnderscore($v);
   putTCmsgNV2( "testStarted", "name", $v, "captureStandardOutput", "true");
   $failed = 0;    
 }
@@ -274,6 +284,7 @@ sub testFinished
 { 
   local($v) = $_[0];
   local($d) = $_[1];
+  $v = testNameRemoveLeadingUnderscore($v);
   putTCmsgNV2( "testFinished", "name", $v, "duration", $d);
   $failed = 0;   
 }
@@ -282,6 +293,8 @@ sub testFailed
 {
   local($n) = $_[0];
   local($m) = $_[1];
+
+  $n = testNameRemoveLeadingUnderscore($n);
     
   if( !$failed )
   {
@@ -297,6 +310,9 @@ sub testFailed2
   local($n) = tc_filter($_[0]);
   local($m) = tc_filter($_[1]);
   local($t) = tc_filter($_[2]);
+
+  $n = testNameRemoveLeadingUnderscore($n);
+  
   if( !$failed )
   {
     putTCmsg( "testFailed", "name=\'$n\' message=\'$m\' details=\'$t\'"); 
@@ -314,6 +330,9 @@ sub testFailedCMP
   local($details) = tc_filter($_[2]);
   local($expected) = tc_filter($_[3]);
   local($actual) = tc_filter($_[4]);
+    
+  $name = testNameRemoveLeadingUnderscore($name);
+    
   if( !$failed )
   {
     putTCmsg( "testFailed", "type=\'comparisonFailure\' name=\'$name\' message=\'$msg\' details=\'$details\' expected=\'$expected\' actual=\'$actual\'");
@@ -330,6 +349,9 @@ sub testIgnored
 { 
   local($n) = $_[0];
   local($m) = $_[1];
+  
+  $n = testNameRemoveLeadingUnderscore($n);
+
   putTCmsgNV2( "testIgnored", "name", $n, "message", $m);
 }
 
@@ -587,6 +609,13 @@ sub tst_check
   local($root) = $_[0];
   local($system_call, $exit_status, $ignore_pattern, $error_cause);
 
+  local($my_test_file) = testNameRemoveLeadingUnderscore($test_file);
+    
+  if (! ($my_test_file eq $test_file))
+  {
+    tcLog("The test '$test_file' will be reported to TeamCity as '$my_test_file' as it was _renamed :-/");
+  }   
+  
   if( exists($test_files{$test_file}) && (length($teamcity) > 0) )
   {
      tcWarn("The test '$test_file' have been alreeady tests (with result: $test_files{$test_file})... skipping!");
