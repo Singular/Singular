@@ -439,7 +439,7 @@ polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf)
   polymake::perl::Object* pf = new polymake::perl::Object("PolyhedralFan");
 
   polymake::Matrix<polymake::Integer> zm = raysOf(zf);
-  pf->take("INPUT_RAYS") << zm;
+  pf->take("RAYS") << zm;  // using rays here instead of INPUT_RAYS prevents redundant computations
 
   polymake::Array<polymake::Set<int> > ar = conesOf(zf);
   pf->take("INPUT_CONES") << ar;
