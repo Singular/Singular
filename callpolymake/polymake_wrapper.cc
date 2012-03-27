@@ -927,11 +927,11 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
   }
   if ((u != NULL) && (u->Typ() == fanID))
   {
-    gfan::ZCone* zf = (gfan::ZCone*)u->Data();
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
     bool b;
     try
     {
-      polymake::perl::Object* p = ZPolytope2PmPolytope(zf);
+      polymake::perl::Object* p = ZFan2PmFan(zf);
       b = p->give("SMOOTH_FAN");
       delete p;
     }
@@ -1534,11 +1534,10 @@ BOOLEAN normalFan(leftv res, leftv args)
     try
     {
       polymake::perl::Object* p=ZPolytope2PmPolytope(zp);
-      polymake::perl::Object* pf;
-      CallPolymakeFunction("normal_fan", p) >> *pf;
+      polymake::perl::Object pf;
+      CallPolymakeFunction("normal_fan", *p) >> pf;
       delete p;
-      zf = PmFan2ZFan(pf);
-      delete pf;
+      zf = PmFan2ZFan(&pf);
     }
     catch (const std::exception& ex) 
     {
