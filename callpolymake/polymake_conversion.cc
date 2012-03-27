@@ -396,9 +396,9 @@ int numberOfMaximalConesOf(gfan::ZFan* zf)
   int d = zf->getAmbientDimension();
   int n = 0;
 
-  for (int i=0; i<=n; i++)
+  for (int i=0; i<=d; i++)
     {
-      int n = n + zf->numberOfConesOfDimension(i,0,1);
+      n = n + zf->numberOfConesOfDimension(i,0,1);
     }
 
   return n;
@@ -412,24 +412,21 @@ polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
   polymake::Matrix<polymake::Integer> pm=raysOf(zf);
   polymake::Array<polymake::Set<int> > L(r);
 
-  int d = 1;  // runs through all dimensions
-  int ii = 0; // runs through all cones of a given dimension
-  for (int i=0; i<r; i++)
+  int ii = 0;
+  for (int d=1; d<=zf->getDimension(); d++)
     {
-      if (ii>zf->numberOfConesOfDimension(d,0,1))  // if all cones of a dimension are through,
+      for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
         {
-          d = d+1;                                 // increase dimension
-          ii = 0;                                  // set counter to 0
+          gfan::IntVector v = zf->getConeIndices(d,i,0,1);
+          std::cout << "this is v: " << v << std::cout;
+          polymake::Set<int> s;
+          for (int j=0; j<v.size(); j++)
+            {
+              s = s+v[j];
+            }
+          L[ii] = s;
+          ii = ii + 1;
         }
-      gfan::IntVector v = zf->getConeIndices(d,ii,0,1);
-      polymake::Set<int> s;
-      for (int j=0; j<v.size(); j++)
-        {
-          s = s+v[j];
-        }
-      
-      L[i] = s;
-      ii = ii+1;
     }
   return L;
 }
@@ -442,7 +439,7 @@ polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf)
   pf->take("RAYS") << zm;  // using rays here instead of INPUT_RAYS prevents redundant computations
 
   polymake::Array<polymake::Set<int> > ar = conesOf(zf);
-  pf->take("INPUT_CONES") << ar;
+  pf->take("MAXIMAL_CONES") << ar;
 
   return pf;
 }
