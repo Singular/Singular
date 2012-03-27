@@ -4252,7 +4252,7 @@ void prepareGfanLib(gcone *gc, gfan::ZFan *fan)
    while(gcAct!=NULL)
   {
     intvec *rays=gcRays2Intmat(gcAct);
-    ZMatrix zm = intmat2ZMatrix(rays);
+    ZMatrix zm = *intmat2ZMatrix(rays);
     delete rays;
     ZCone *zc = new ZCone();
     *zc = ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
