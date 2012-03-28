@@ -386,7 +386,7 @@ BOOLEAN PMgorensteinVector(leftv res, leftv args)
       else
       {
         delete p;
-        WerrorS("gorensteinIndex: input polytope not gorenstein");
+        WerrorS("gorensteinVector: input polytope not gorenstein");
         return TRUE;
       }
     }
