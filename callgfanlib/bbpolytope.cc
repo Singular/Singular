@@ -22,9 +22,26 @@ int polytopeID;
 std::string bbpolytopeToString(gfan::ZCone const &c)
 {
   std::stringstream s;
-  gfan::ZMatrix r=c.extremeRays();
-  s<<"VERTICES"<<std::endl;
-  s<<toString(r);
+  gfan::ZMatrix i=c.getInequalities();
+  gfan::ZMatrix e=c.getEquations();
+  s<<"AMBIENT_DIM"<<std::endl;
+  s<<c.ambientDimension()<<std::endl;
+  s<<"INEQUALITIES"<<std::endl;
+  s<<toString(i);
+  s<<"EQUATIONS"<<std::endl;
+  s<<toString(e);
+  if(c.areExtremeRaysKnown())
+  {
+    gfan::ZMatrix r=c.extremeRays();
+    s<<"VERTICES"<<std::endl;
+    s<<toString(r);
+  }
+  if(c.areGeneratorsOfLinealitySpaceKnown())
+  {
+    gfan::ZMatrix r=c.generatorsOfLinealitySpace();
+    s<<"LINEALITY_SPACE"<<std::endl;
+    s<<toString(r);
+  }
   return s.str();
 }
 
@@ -121,9 +138,10 @@ static BOOLEAN ppCONERAYS1(leftv res, leftv v)
      entire lines in the cone);
      valid parametrizations: (intmat) */
   intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  *zc = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   zc->canonicalize();
   res->rtyp = polytopeID;
   res->data = (char *)zc;
@@ -149,9 +167,10 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
     return TRUE;
   }
   k=k*2;
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+  *zc = gfan::ZCone::givenByRays(*zm,gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   zc->canonicalize();
   //k should be passed on to zc; not available yet
   res->rtyp = polytopeID;
@@ -182,9 +201,10 @@ static BOOLEAN pqCONERAYS1(leftv res, leftv v)
      entire lines in the cone);
      valid parametrizations: (intmat) */
   intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  *zc = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -209,9 +229,10 @@ static BOOLEAN pqCONERAYS3(leftv res, leftv u, leftv v)
     return TRUE;
   }
   k=k*2;
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
+  *zc = gfan::ZCone::givenByRays(*zm,gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   //k should be passed on to zc; not available yet
   res->rtyp = polytopeID;
   res->data = (char *)zc;
@@ -239,8 +260,9 @@ static BOOLEAN ppCONENORMALS1(leftv res, leftv v)
   /* method for generating a cone object from inequalities;
      valid parametrizations: (intmat) */
   intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
-  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
+  gfan::ZMatrix* zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -261,9 +283,10 @@ static BOOLEAN ppCONENORMALS2(leftv res, leftv u, leftv v)
            inequs->cols(), equs->cols());
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
+  delete zm1, zm2;
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -292,9 +315,10 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
+  delete zm1, zm2;
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -326,8 +350,8 @@ static BOOLEAN pqCONENORMALS1(leftv res, leftv v)
   /* method for generating a cone object from inequalities;
      valid parametrizations: (intmat) */
   intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
-  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
+  gfan::ZMatrix* zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -348,9 +372,10 @@ static BOOLEAN pqCONENORMALS2(leftv res, leftv u, leftv v)
            inequs->cols(), equs->cols());
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
+  delete zm1, zm2;
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -379,9 +404,10 @@ static BOOLEAN pqCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
+  delete zm1, zm2;
   res->rtyp = polytopeID;
   res->data = (char *)zc;
   return FALSE;
@@ -516,7 +542,21 @@ BOOLEAN scalePolytope(leftv res, leftv args)
   }
   WerrorS("scalePolytope: unexpected parameters");
   return TRUE;
+}
 
+BOOLEAN dualPolytope(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*) u->Data();
+    gfan::ZCone* zq = new gfan::ZCone(zp->dualCone());
+    res->rtyp = polytopeID;
+    res->data = (char*) zq;
+    return FALSE;
+  }
+  WerrorS("dualPolytope: unexpected parameters");
+  return TRUE;
 }
 
 void bbpolytope_setup()
@@ -538,6 +578,7 @@ void bbpolytope_setup()
   iiAddCproc("","getVertices",FALSE,getVertices);
   iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   iiAddCproc("","scalePolytope",FALSE,scalePolytope);
+  iiAddCproc("","dualPolytope",FALSE,dualPolytope);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);                                               
