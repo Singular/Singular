@@ -57,20 +57,20 @@ intvec* zMatrix2Intvec(const gfan::ZMatrix zm)
   return iv;
 }
 
-gfan::ZMatrix intmat2ZMatrix(const intvec* iMat)
+gfan::ZMatrix* intmat2ZMatrix(const intvec* iMat)
 {
   int d=iMat->rows();
   int n=iMat->cols();
-  gfan::ZMatrix ret(d,n);
+  gfan::ZMatrix* ret = new gfan::ZMatrix(d,n);
   for(int i=0;i<d;i++)
     for(int j=0;j<n;j++)
-      ret[i][j]=IMATELEM(*iMat, i+1, j+1);
+      (*ret)[i][j]=IMATELEM(*iMat, i+1, j+1);
   return ret;
 }
 
-gfan::ZVector intStar2ZVector(const int d, const int* i)
+gfan::ZVector* intStar2ZVector(const int d, const int* i)
 {
-  gfan::ZVector zv(d);
+  gfan::ZVector* zv=new gfan::ZVector(d);
   for(int j=0; j<d; j++)
   {
     zv[j]=i[j];
@@ -79,12 +79,12 @@ gfan::ZVector intStar2ZVector(const int d, const int* i)
 }
 
 /* expects iMat to have just one row */
-gfan::ZVector intvec2ZVector(const intvec* iVec)
+gfan::ZVector* intvec2ZVector(const intvec* iVec)
 {
   int n =iVec->rows();
-  gfan::ZVector ret(n);
+  gfan::ZVector* ret = new gfan::ZVector(n);
   for(int j=0;j<n;j++)
-    ret[j]=IMATELEM(*iVec, j+1, 1);
+    (*ret)[j]=IMATELEM(*iVec, j+1, 1);
   return ret;
 }
 
@@ -119,6 +119,18 @@ std::string toString(gfan::ZCone const &c)
   s<<toString(i);
   s<<"EQUATIONS"<<std::endl;
   s<<toString(e);
+  if(c.areExtremeRaysKnown())
+  {
+    gfan::ZMatrix r=c.extremeRays();
+    s<<"EXTREME_RAYS"<<std::endl;
+    s<<toString(r);
+  }
+  if(c.areGeneratorsOfLinealitySpaceKnown())
+  {
+    gfan::ZMatrix r=c.generatorsOfLinealitySpace();
+    s<<"LINEALITY_SPACE"<<std::endl;
+    s<<toString(r);
+  }
   return s.str();
 }
 
@@ -277,6 +289,194 @@ static BOOLEAN bbcone_Op2(int op, leftv res, leftv i1, leftv i2)
   return blackboxDefaultOp2(op,res,i1,i2);
 }
 
+
+/* singular wrapper for gfanlib functions */
+
+
+static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from inequalities;
+     valid parametrizations: (intmat) */
+  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix* zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
+  zc->canonicalize();
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from iequalities,
+     and equations (...)
+     valid parametrizations: (intmat, intmat)
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
+  delete zm1, zm2;
+  zc->canonicalize();
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from inequalities, equations,
+     and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then ... */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
+  delete zm1, zm2;
+  zc->canonicalize();
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+BOOLEAN coneViaNormals(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    if (u->next == NULL) return jjCONENORMALS1(res, u);
+  }
+  leftv v = u->next;
+  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+  {
+    if (v->next == NULL) return jjCONENORMALS2(res, u, v);
+  }
+  leftv w = v->next;
+  if ((w != NULL) && (w->Typ() == INT_CMD))
+  {
+    if (w->next == NULL) return jjCONENORMALS3(res, u, v, w);
+  }
+  WerrorS("coneViaNormals: unexpected parameters");
+  return TRUE;
+}
+
+static BOOLEAN qqCONENORMALS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from inequalities;
+     valid parametrizations: (intmat) */
+  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix* zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN qqCONENORMALS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from iequalities,
+     and equations (...)
+     valid parametrizations: (intmat, intmat)
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
+  delete zm1, zm2;
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+static BOOLEAN qqCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from inequalities, equations,
+     and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then ... */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
+  delete zm1, zm2;
+  res->rtyp = coneID;
+  res->data = (char *)zc;
+  return FALSE;
+}
+
+BOOLEAN quickConeViaNormals(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  {
+    if (u->next == NULL) return qqCONENORMALS1(res, u);
+  }
+  leftv v = u->next;
+  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
+  {
+    if (v->next == NULL) return qqCONENORMALS2(res, u, v);
+  }
+  leftv w = v->next;
+  if ((w != NULL) && (w->Typ() == INT_CMD))
+  {
+    if (w->next == NULL) return qqCONENORMALS3(res, u, v, w);
+  }
+  WerrorS("quickConeViaNormals: unexpected parameters");
+  return TRUE;
+}
+
+
 static BOOLEAN jjCONERAYS1(leftv res, leftv v)
 {
   /* method for generating a cone object from half-lines
@@ -284,9 +484,10 @@ static BOOLEAN jjCONERAYS1(leftv res, leftv v)
      entire lines in the cone);
      valid parametrizations: (intmat) */
   intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  *zc = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
@@ -311,10 +512,11 @@ static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
            rays->cols(), linSpace->cols());
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  *zc = gfan::ZCone::givenByRays(*zm1, *zm2);
+  delete zm1, zm2;
   zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
@@ -349,11 +551,12 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  *zc = gfan::ZCone::givenByRays(*zm1, *zm2);
   //k should be passed on to zc; not available yet
+  delete zm1, zm2;
   zc->canonicalize();
   res->rtyp = coneID;
   res->data = (char *)zc;
@@ -388,9 +591,10 @@ static BOOLEAN qqCONERAYS1(leftv res, leftv v)
      entire lines in the cone);
      valid parametrizations: (intmat) */
   intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm = intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  *zc = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -414,10 +618,11 @@ static BOOLEAN qqCONERAYS2(leftv res, leftv u, leftv v)
            rays->cols(), linSpace->cols());
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  *zc = gfan::ZCone::givenByRays(*zm1, *zm2);
+  delete zm1, zm2;
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -451,11 +656,12 @@ static BOOLEAN qqCONERAYS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix* zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix* zm2 = intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  *zc = gfan::ZCone::givenByRays(*zm1, *zm2);
   //k should be passed on to zc; not available yet
+  delete zm1, zm2;
   res->rtyp = coneID;
   res->data = (char *)zc;
   return FALSE;
@@ -482,185 +688,77 @@ BOOLEAN quickConeViaRays(leftv res, leftv args)
   return TRUE;
 }
 
-static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
-{
-  /* method for generating a cone object from inequalities;
-     valid parametrizations: (intmat) */
-  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
-  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
-  zc->canonicalize();
-  res->rtyp = coneID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
-{
-  /* method for generating a cone object from iequalities,
-     and equations (...)
-     valid parametrizations: (intmat, intmat)
-     Errors will be invoked in the following cases:
-     - u and v have different numbers of columns */
-  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
-  if (inequs->cols() != equs->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           inequs->cols(), equs->cols());
-    return TRUE;
-  }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
-  zc->canonicalize();
-  res->rtyp = coneID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
-{
-  /* method for generating a cone object from inequalities, equations,
-     and an integer k;
-     valid parametrizations: (intmat, intmat, int);
-     Errors will be invoked in the following cases:
-     - u and v have different numbers of columns,
-     - k not in [0..3];
-     if the 2^0-bit of k is set, then ... */
-  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
-  if (inequs->cols() != equs->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           inequs->cols(), equs->cols());
-    return TRUE;
-  }
-  int k = (int)(long)w->Data();
-  if ((k < 0) || (k > 3))
-  {
-    WerrorS("expected int argument in [0..3]");
-    return TRUE;
-  }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
-  zc->canonicalize();
-  res->rtyp = coneID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-BOOLEAN coneViaNormals(leftv res, leftv args)
+BOOLEAN ZCone(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  if ((u != NULL) && ((u->Typ() == INTMAT_CMD) || (u->Typ() == INT_CMD)))
   {
-    if (u->next == NULL) return jjCONENORMALS1(res, u);
+    leftv v = u->next;
+    if ((u != NULL) && ((v->Typ() == INTMAT_CMD) || (v->Typ() == INT_CMD)))
+    {
+      leftv w = v->next;
+      if ((u != NULL) && ((w->Typ() == INTMAT_CMD) || (w->Typ() == INT_CMD)))
+      {
+        leftv x = w->next;
+        if ((u != NULL) && ((x->Typ() == INTMAT_CMD) || (x->Typ() == INT_CMD)))
+        {
+          leftv y = x->next;
+          if ((u != NULL) && ((y->Typ() == INTMAT_CMD) || (y->Typ() == INT_CMD)))
+          {
+            leftv z = y->next;
+            if ((u != NULL) && (z->Typ() == INT_CMD))
+            {
+              gfan::ZMatrix* gfineq = new gfan::ZMatrix();
+              gfan::ZMatrix* gfeq = new gfan::ZMatrix();
+              gfan::ZMatrix* gfexRays = new gfan::ZMatrix();
+              gfan::ZMatrix* gflinSpace = new gfan::ZMatrix();
+              gfan::ZMatrix* gfspan = new gfan::ZMatrix();
+              // if user has given int as input, an empty ZMatrix will be passed to gfan
+              // which will be ignored by the constructor
+              if (u->Typ() == INTMAT_CMD) 
+              {
+                intvec* ineq = (intvec*) u->Data();
+                gfineq = intmat2ZMatrix(ineq);
+              }
+              if (v->Typ() == INTMAT_CMD)
+              {
+                intvec* eq = (intvec*) v->Data();
+                gfeq = intmat2ZMatrix(eq);
+              }
+              if (w->Typ() == INTMAT_CMD)
+              {
+                intvec* exRays = (intvec*) w->Data();
+                gfexRays = intmat2ZMatrix(exRays);
+              }
+              if (x->Typ() == INTMAT_CMD)
+              {
+                intvec* linSpace = (intvec*) x->Data();
+                gflinSpace = intmat2ZMatrix(linSpace);
+              }
+              if (y->Typ() == INTMAT_CMD)
+              {
+                intvec* span = (intvec*) y->Data();
+                gfspan = intmat2ZMatrix(span);
+              }
+              int flag = (int)(long) z->Data();
+              
+              gfan::ZCone* zc = new gfan::ZCone(*gfineq,*gfeq,*gfexRays,*gflinSpace,*gfspan,flag);
+              delete gfineq, gfeq, gfexRays, gflinSpace, gfspan;
+              res->rtyp = coneID;
+              res->data = (char*) zc;
+              return FALSE;
+            }
+          }
+        }
+      }
+    }
   }
-  leftv v = u->next;
-  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
-  {
-    if (v->next == NULL) return jjCONENORMALS2(res, u, v);
-  }
-  leftv w = v->next;
-  if ((w != NULL) && (w->Typ() == INT_CMD))
-  {
-    if (w->next == NULL) return jjCONENORMALS3(res, u, v, w);
-  }
-  WerrorS("coneViaNormals: unexpected parameters");
-  return TRUE;
-}
-
-static BOOLEAN qqCONENORMALS1(leftv res, leftv v)
-{
-  /* method for generating a cone object from inequalities;
-     valid parametrizations: (intmat) */
-  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
-  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
-  res->rtyp = coneID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-static BOOLEAN qqCONENORMALS2(leftv res, leftv u, leftv v)
-{
-  /* method for generating a cone object from iequalities,
-     and equations (...)
-     valid parametrizations: (intmat, intmat)
-     Errors will be invoked in the following cases:
-     - u and v have different numbers of columns */
-  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
-  if (inequs->cols() != equs->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           inequs->cols(), equs->cols());
-    return TRUE;
-  }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
-  res->rtyp = coneID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-static BOOLEAN qqCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
-{
-  /* method for generating a cone object from inequalities, equations,
-     and an integer k;
-     valid parametrizations: (intmat, intmat, int);
-     Errors will be invoked in the following cases:
-     - u and v have different numbers of columns,
-     - k not in [0..3];
-     if the 2^0-bit of k is set, then ... */
-  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
-  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
-  if (inequs->cols() != equs->cols())
-  {
-    Werror("expected same number of columns but got %d vs. %d",
-           inequs->cols(), equs->cols());
-    return TRUE;
-  }
-  int k = (int)(long)w->Data();
-  if ((k < 0) || (k > 3))
-  {
-    WerrorS("expected int argument in [0..3]");
-    return TRUE;
-  }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
-  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
-  res->rtyp = coneID;
-  res->data = (char *)zc;
-  return FALSE;
-}
-
-BOOLEAN quickConeViaNormals(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
-  {
-    if (u->next == NULL) return qqCONENORMALS1(res, u);
-  }
-  leftv v = u->next;
-  if ((v != NULL) && (v->Typ() == INTMAT_CMD))
-  {
-    if (v->next == NULL) return qqCONENORMALS2(res, u, v);
-  }
-  leftv w = v->next;
-  if ((w != NULL) && (w->Typ() == INT_CMD))
-  {
-    if (w->next == NULL) return qqCONENORMALS3(res, u, v, w);
-  }
-  WerrorS("quickConeViaNormals: unexpected parameters");
+  WerrorS("ZCone: unexpected parameters");
   return TRUE;
 }
 
 
-BOOLEAN getInequalities(leftv res, leftv args)
+BOOLEAN inequalities(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -672,11 +770,11 @@ BOOLEAN getInequalities(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getInequalities: unexpected parameters");
+  WerrorS("inequalities: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getEquations(leftv res, leftv args)
+BOOLEAN equations(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -687,11 +785,11 @@ BOOLEAN getEquations(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getEquations: unexpected parameters");
+  WerrorS("equations: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getFacetNormals(leftv res, leftv args)
+BOOLEAN facets(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -709,11 +807,11 @@ BOOLEAN getFacetNormals(leftv res, leftv args)
       res->data = (void*)getFacetNormals(zc);
       return FALSE;
     }
-  WerrorS("getFacetNormals: unexpected parameters");
+  WerrorS("facets: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getImpliedEquations(leftv res, leftv args)
+BOOLEAN impliedEquations(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -724,11 +822,11 @@ BOOLEAN getImpliedEquations(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getImpliedEquations: unexpected parameters");
+  WerrorS("impliedEquations: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getGeneratorsOfSpan(leftv res, leftv args)
+BOOLEAN generatorsOfSpan(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -739,11 +837,11 @@ BOOLEAN getGeneratorsOfSpan(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getGeneratorsOfSpan: unexpected parameters");
+  WerrorS("generatorsOfSpan: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getGeneratorsOfLinealitySpace(leftv res, leftv args)
+BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -754,11 +852,11 @@ BOOLEAN getGeneratorsOfLinealitySpace(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getGeneratorsOfLinealitySpace: unexpected parameters");
+  WerrorS("generatorsOfLinealitySpace: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getRays(leftv res, leftv args)
+BOOLEAN rays(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -769,11 +867,11 @@ BOOLEAN getRays(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getRays: unexpected parameters");
+  WerrorS("rays: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getQuotientLatticeBasis(leftv res, leftv args)
+BOOLEAN quotientLatticeBasis(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -784,11 +882,11 @@ BOOLEAN getQuotientLatticeBasis(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getQuotientLatticeBasis: unexpected parameters");
+  WerrorS("quotientLatticeBasis: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getLinearForms(leftv res, leftv args)
+BOOLEAN linearForms(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -799,11 +897,11 @@ BOOLEAN getLinearForms(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
-  WerrorS("getLinearForms: unexpected parameters");
+  WerrorS("linearForms: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getAmbientDimension(leftv res, leftv args)
+BOOLEAN ambientDimension(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -827,11 +925,11 @@ BOOLEAN getAmbientDimension(leftv res, leftv args)
     res->data = (char*) getAmbientDimension(zc);
     return FALSE;
   }
-  WerrorS("getAmbientDimension: unexpected parameters");
+  WerrorS("ambientDimension: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getDimension(leftv res, leftv args)
+BOOLEAN dimension(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -855,11 +953,11 @@ BOOLEAN getDimension(leftv res, leftv args)
     res->data = (char*) getDimension(zc);
     return FALSE;
   }
-  WerrorS("getDimension: unexpected parameters");
+  WerrorS("dimension: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getCodimension(leftv res, leftv args)
+BOOLEAN codimension(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -887,7 +985,7 @@ BOOLEAN getCodimension(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getLinealityDimension(leftv res, leftv args)
+BOOLEAN linealityDimension(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -904,11 +1002,11 @@ BOOLEAN getLinealityDimension(leftv res, leftv args)
     res->data = (char*) getLinealityDimension(zf);
     return FALSE;
   }
-  WerrorS("getLinealityDimension: unexpected parameters");
+  WerrorS("linealityDimension: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getMultiplicity(leftv res, leftv args)
+BOOLEAN multiplicity(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -922,7 +1020,7 @@ BOOLEAN getMultiplicity(leftv res, leftv args)
     res->data = (void*) i;
     return FALSE;
   }
-  WerrorS("getMultiplicity: unexpected parameters");
+  WerrorS("multiplicity: unexpected parameters");
   return TRUE;
 }
 
@@ -977,7 +1075,7 @@ BOOLEAN containsPositiveVector(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getLinealitySpace(leftv res, leftv args)
+BOOLEAN linealitySpace(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -988,11 +1086,11 @@ BOOLEAN getLinealitySpace(leftv res, leftv args)
     res->data = (void*) zd;
     return FALSE;
   }
-  WerrorS("getLinealitySpace: unexpected parameters");
+  WerrorS("linealitySpace: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getDualCone(leftv res, leftv args)
+BOOLEAN dualCone(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1003,11 +1101,11 @@ BOOLEAN getDualCone(leftv res, leftv args)
     res->data = (void*) zd;
     return FALSE;
   }
-  WerrorS("getDualCone: unexpected parameters");
+  WerrorS("dualCone: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getNegated(leftv res, leftv args)
+BOOLEAN negatedCone(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1018,11 +1116,11 @@ BOOLEAN getNegated(leftv res, leftv args)
     res->data = (void*) zd;
     return FALSE;
   }
-  WerrorS("getNegated: unexpected parameters");
+  WerrorS("negatedCone: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getSemigroupGenerator(leftv res, leftv args)
+BOOLEAN semigroupGenerator(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1043,11 +1141,11 @@ BOOLEAN getSemigroupGenerator(leftv res, leftv args)
              "but got dimensions %d and %d", d, dLS);
     }
   }
-  WerrorS("getSemigroupGenerator: unexpected parameters");
+  WerrorS("semigroupGenerator: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getRelativeInteriorPoint(leftv res, leftv args)
+BOOLEAN relativeInteriorPoint(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1058,11 +1156,11 @@ BOOLEAN getRelativeInteriorPoint(leftv res, leftv args)
     res->data = (void*) zVector2Intvec(zv);
     return FALSE;
   }
-  WerrorS("getRelativeInteriorPoint: unexpected parameters");
+  WerrorS("relativeInteriorPoint: unexpected parameters");
   return TRUE;
 }
 
-BOOLEAN getUniquePoint(leftv res, leftv args)
+BOOLEAN uniquePoint(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -1073,7 +1171,7 @@ BOOLEAN getUniquePoint(leftv res, leftv args)
     res->data = (void*) zVector2Intvec(zv);
     return FALSE;
   }
-  WerrorS("getUniquePoint: unexpected parameters");
+  WerrorS("uniquePoint: unexpected parameters");
   return TRUE;
 }
 
@@ -1107,8 +1205,9 @@ BOOLEAN setLinearForms(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
     {
       intvec* mat = (intvec*)v->Data();
-      gfan::ZMatrix zm = intmat2ZMatrix(mat);
-      zc->setLinearForms(zm);
+      gfan::ZMatrix* zm = intmat2ZMatrix(mat);
+      zc->setLinearForms(*zm);
+      delete zm;
       res->rtyp = NONE;
       res->data = NULL;
       return FALSE;
@@ -1144,44 +1243,44 @@ BOOLEAN intersectCones(leftv res, leftv args)
   return TRUE;
 }
 
-// BOOLEAN takeUnion(leftv res, leftv args)
-// {
-//   leftv u = args;
-//   std::cout << u->Typ() << (u != NULL) << std::endl;
-//   if ((u != NULL) && (u->Typ() == coneID))
-//   {
-//     leftv v = u->next;
-//     std::cout << v->Typ() << (v != NULL) << std::endl;
-//     if ((v != NULL) && (v->Typ() == coneID))
-//     {
-//       gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
-//       gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
-//       int d1 = zc1->ambientDimension();
-//       int d2 = zc2->ambientDimension();
-//       if (d1 != d2)
-//         Werror("expected ambient dims of both cones to coincide\n"
-//                "but got %d and %d", d1, d2);
-//       gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
-//       zc3.canonicalize();
-//       if (zc1->hasFace(zc3) && zc2->hasFace(zc3))
-//       {
-// 	gfan::ZMatrix zm1 = zc1->extremeRays();
-// 	gfan::ZMatrix zm2 = zc2->extremeRays();
-// 	gfan::ZMatrix zm11 = zc1->generatorsOfLinealitySpace();
-// 	gfan::ZMatrix zm22 = zc2->generatorsOfLinealitySpace();
-// 	gfan::ZMatrix zm = combineOnTop(combineOnTop(combineOnTop(zm1,zm2),zm11),zm22);
-//         gfan::ZCone* zc = new gfan::ZCone();
-//         *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
-//         res->rtyp = coneID;
-//         res->data = (char*) zc;
-//         return FALSE;
-//       }
-//       WerrorS("takeUnion: cones do not share common edge");
-//     }
-//   }
-//   WerrorS("takeUnion: unexpected parameters");
-//   return TRUE;
-// }
+BOOLEAN takeUnion(leftv res, leftv args)
+{
+  leftv u = args;
+  std::cout << u->Typ() << (u != NULL) << std::endl;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    std::cout << v->Typ() << (v != NULL) << std::endl;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+      int d1 = zc1->ambientDimension();
+      int d2 = zc2->ambientDimension();
+      if (d1 != d2)
+        Werror("expected ambient dims of both cones to coincide\n"
+               "but got %d and %d", d1, d2);
+      gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+      zc3.canonicalize();
+      if (zc1->hasFace(zc3) && zc2->hasFace(zc3))
+      {
+	gfan::ZMatrix zm1 = zc1->extremeRays();
+	gfan::ZMatrix zm2 = zc2->extremeRays();
+	gfan::ZMatrix zm11 = zc1->generatorsOfLinealitySpace();
+	gfan::ZMatrix zm22 = zc2->generatorsOfLinealitySpace();
+	gfan::ZMatrix zm = combineOnTop(combineOnTop(combineOnTop(zm1,zm2),zm11),zm22);
+        gfan::ZCone* zc = new gfan::ZCone();
+        *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+        res->rtyp = coneID;
+        res->data = (char*) zc;
+        return FALSE;
+      }
+      WerrorS("takeUnion: cones do not share common face");
+    }
+  }
+  WerrorS("takeUnion: unexpected parameters");
+  return TRUE;
+}
 
 BOOLEAN coneLink(leftv res, leftv args)
 {
@@ -1193,18 +1292,20 @@ BOOLEAN coneLink(leftv res, leftv args)
     {
       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
       intvec* iv = (intvec*)v->Data();
-      gfan::ZVector zv= intvec2ZVector(iv);
+      gfan::ZVector* zv= intvec2ZVector(iv);
       int d1 = zc->ambientDimension();
-      int d2 = zv.size();
+      int d2 = zv->size();
       if (d1 != d2)
         Werror("expected ambient dim of cone and size of vector\n"
                "to be equal but got %d and %d", d1, d2);
-      if(!zc->contains(zv))
+      if(!zc->contains(*zv))
       {
         WerrorS("the provided intvec does not lie in the cone");
       }
+      gfan::ZCone* zd = new gfan::ZCone(zc->link(*zv));
+      delete zv;
       res->rtyp = coneID;
-      res->data = (void *)new gfan::ZCone(zc->link(zv));
+      res->data = (void *) zd;
       return FALSE;
     }
   }
@@ -1224,11 +1325,15 @@ bool containsInSupport(gfan::ZCone* zc, gfan::ZCone* zd)
 
 bool containsInSupport(gfan::ZCone* zc, intvec* vec)
 {
-  gfan::ZVector zv = intvec2ZVector(vec);
+  gfan::ZVector* zv = intvec2ZVector(vec);
   int d1 = zc->ambientDimension();
-  int d2 = zv.size();
+  int d2 = zv->size();
   if (d1 == d2)
-    return (zc->contains(zv) ? 1 : 0);
+  {
+    bool b = (zc->contains(*zv) ? 1 : 0);
+    delete zv;
+    return b;
+  }
   Werror("expected ambient dim of cone and size of vector\n"
          "to be equal but got %d and %d", d1, d2);
 }
@@ -1243,13 +1348,15 @@ BOOLEAN containsRelatively(leftv res, leftv args)
     {
       gfan::ZCone* zc = (gfan::ZCone*)u->Data();
       intvec* vec = (intvec*)v->Data();
-      gfan::ZVector zv = intvec2ZVector(vec);
+      gfan::ZVector* zv = intvec2ZVector(vec);
       int d1 = zc->ambientDimension();
-      int d2 = zv.size();
+      int d2 = zv->size();
       if (d1 == d2)
       {
+        bool b = (zc->containsRelatively(*zv) ? 1 : 0);
+        delete zv;
         res->rtyp = INT_CMD;
-        res->data = (void *)(zc->containsRelatively(zv) ? 1 : 0);
+        res->data = (void *) b;
         return FALSE;
       }
       Werror("expected ambient dim of cone and size of vector\n"
@@ -1293,6 +1400,40 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
     res->data = (char*) zd;
     return FALSE;
   }
+  WerrorS("canonicalizeCone: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN areExtremeRaysKnown(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    bool b = zc->areExtremeRaysKnown();
+    int bb = (int) b;
+    res->rtyp = INT_CMD;
+    res->data = (char*) bb;
+    return FALSE;
+  }
+  WerrorS("haveExtremeRaysBeenCached: unexpected parameters");
+  return TRUE;  
+}
+
+BOOLEAN areGeneratorsOfLinealitySpaceKnown(leftv res, leftv args)
+{
+  leftv u=args;                             
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+    bool b = zc->areGeneratorsOfLinealitySpaceKnown();
+    int bb = (int) b;
+    res->rtyp = INT_CMD;
+    res->data = (char*) bb;
+    return FALSE;
+  }
+  WerrorS("haveExtremeRaysBeenCached: unexpected parameters");
+  return TRUE;  
 }
 
 void bbcone_setup()
@@ -1308,43 +1449,54 @@ void bbcone_setup()
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
   b->blackbox_Op2=bbcone_Op2;
-  iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
-  iiAddCproc("","coneViaRays",FALSE,coneViaRays);
   iiAddCproc("","coneViaNormals",FALSE,coneViaNormals);
-  iiAddCproc("","quickConeViaRays",FALSE,quickConeViaRays);
   iiAddCproc("","quickConeViaNormals",FALSE,quickConeViaNormals);
-  iiAddCproc("","intersectCones",FALSE,intersectCones);
-  // iiAddCproc("","takeUnion",FALSE,takeUnion);
-  iiAddCproc("","coneLink",FALSE,coneLink);
-  // iiAddCproc("","contains",FALSE,contains);
-  iiAddCproc("","containsRelatively",FALSE,containsRelatively);
-  iiAddCproc("","getRays",FALSE,getRays);
-  iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
+  iiAddCproc("","coneViaRays",FALSE,coneViaRays);
+  iiAddCproc("","quickConeViaRays",FALSE,quickConeViaRays);
+  iiAddCproc("","ZCone",FALSE,ZCone);
+  iiAddCproc("","areExtremeRaysKnown",FALSE,areExtremeRaysKnown);
+  iiAddCproc("","areGeneratorsOfLinealitySpaceKnown",FALSE,areGeneratorsOfLinealitySpaceKnown);
+  iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
+
+  iiAddCproc("","inequalities",FALSE,inequalities);
+  iiAddCproc("","impliedInequalities",FALSE,facets);
+  iiAddCproc("","facets",FALSE,facets);
+  iiAddCproc("","equations",FALSE,equations);
+  iiAddCproc("","impliedEquations",FALSE,impliedEquations);
+  iiAddCproc("","rays",FALSE,rays);
+  iiAddCproc("","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
+  iiAddCproc("","linealitySpace",FALSE,linealitySpace);
+  iiAddCproc("","generatorsOfSpan",FALSE,generatorsOfSpan);
+
+  iiAddCproc("","dimension",FALSE,dimension);
+  iiAddCproc("","codimension",FALSE,codimension);
+  iiAddCproc("","ambientDimension",FALSE,ambientDimension);
+  iiAddCproc("","linealityDimension",FALSE,linealityDimension);
+
   iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
-  iiAddCproc("","getLinearForms",FALSE,getLinearForms);
+  iiAddCproc("","multiplicity",FALSE,multiplicity);
   iiAddCproc("","setLinearForms",FALSE,setLinearForms);
-  iiAddCproc("","getInequalities",FALSE,getInequalities);
-  iiAddCproc("","getEquations",FALSE,getEquations);
-  iiAddCproc("","getGeneratorsOfSpan",FALSE,getGeneratorsOfSpan);
-  iiAddCproc("","getGeneratorsOfLinealitySpace",FALSE,getGeneratorsOfLinealitySpace);
-  iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);
-  iiAddCproc("","getImpliedEquations",FALSE,getImpliedEquations);
-  iiAddCproc("","getRelativeInteriorPoint",FALSE,getRelativeInteriorPoint);
-  iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
-  iiAddCproc("","getCodimension",FALSE,getCodimension);
-  iiAddCproc("","getDimension",FALSE,getDimension);
-  iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
+  iiAddCproc("","linearForms",FALSE,linearForms);
+
+  iiAddCproc("","dualCone",FALSE,dualCone);
+  iiAddCproc("","negatedCone",FALSE,negatedCone);
+  iiAddCproc("","coneLink",FALSE,coneLink);
+  iiAddCproc("","intersectCones",FALSE,intersectCones);
+  // iiAddCproc("","uniteCones",FALSE,takeUnion);
+
   iiAddCproc("","isOrigin",FALSE,isOrigin);
   iiAddCproc("","isFullSpace",FALSE,isFullSpace);
+
+  iiAddCproc("","containsAsFace",FALSE,hasFace);
+  iiAddCproc("","containsRelatively",FALSE,containsRelatively);
   iiAddCproc("","containsPositiveVector",FALSE,containsPositiveVector);
-  iiAddCproc("","getLinealitySpace",FALSE,getLinealitySpace);
-  iiAddCproc("","getDualCone",FALSE,getDualCone);
-  iiAddCproc("","getNegated",FALSE,getNegated);
-  iiAddCproc("","getQuotientLatticeBasis",FALSE,getQuotientLatticeBasis);
-  iiAddCproc("","getSemigroupGenerator",FALSE,getSemigroupGenerator);
-  iiAddCproc("","getUniquePoint",FALSE,getUniquePoint);
+
+  // iiAddCproc("","contains",FALSE,contains);
+  iiAddCproc("","relativeInteriorPoint",FALSE,relativeInteriorPoint);
+  iiAddCproc("","quotientLatticeBasis",FALSE,quotientLatticeBasis);
+  iiAddCproc("","semigroupGenerator",FALSE,semigroupGenerator);
+  iiAddCproc("","uniquePoint",FALSE,uniquePoint);
   // iiAddCproc("","faceContaining",FALSE,faceContaining);
-  iiAddCproc("","hasFace",FALSE,hasFace);
   coneID=setBlackboxStuff(b,"cone");
   //Print("created type %d (cone)\n",coneID); 
 }

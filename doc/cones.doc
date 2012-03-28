@@ -207,26 +207,26 @@ d;
 * containsInSupport::
 * containsPositiveVector::
 * containsRelatively::
-* getAmbientDimension::
-* getCodimension::
-* getDimension::
-* getDualCone::
-* getEquations::
-* getFacetNormals::
-* getGeneratorsOfLinealitySpace::
-* getGeneratorsOfSpan::
-* getImpliedEquations::
-* getInequalities::
-* getLinealityDimension::
-* getLinealitySpace::
-* getLinearForms::
-* getMultiplicity::
-* getNegated::
-* getQuotientLatticeBasis::
-* getRays::
-* getRelativeInteriorPoint::
-* getSemigroupGenerator::
-* getUniquePoint::
+* ambientDimension::
+* codimension::
+* dimension::
+* dualCone::
+* equations::
+* facets::
+* generatorsOfLinealitySpace::
+* generatorsOfSpan::
+* impliedEquations::
+* inequalities::
+* linealityDimension::
+* linealitySpace::
+* linearForms::
+* multiplicity::
+* negatedCone::
+* quotientLatticeBasis::
+* rays::
+* relativeInteriorPoint::
+* semigroupGenerator::
+* uniquePoint::
 * hasFace::
 * intersectCones::
 * isFullSpace::
@@ -293,11 +293,11 @@ cone c=coneViaRays(M);
 intvec v=1,0,0;
 cone cc=coneLink(c,v);
 cc;
-print(getRays(cc));
+print(rays(cc));
 intvec w=1,1,1;
 cone cd=coneLink(c,w);
 cd;
-print(getRays(cd));
+print(rays(cd));
 @c example
 @end smallexample
 @end table
@@ -368,7 +368,7 @@ containsPositiveVector(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node containsRelatively,getAmbientDimension,containsPositiveVector,cone related functions
+@node containsRelatively,ambientDimension,containsPositiveVector,cone related functions
 @subsubsection containsRelatively
 @cindex containsRelatively
 
@@ -394,15 +394,15 @@ containsRelatively(c,p2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getAmbientDimension,getCodimension,containsRelatively,cone related functions
-@subsubsection getAmbientDimension
-@cindex getAmbientDimension
+@node ambientDimension,codimension,containsRelatively,cone related functions
+@subsubsection ambientDimension
+@cindex ambientDimension
 
 @table @code
 @item @strong{Syntax:}
-@code{getAmbientDimension(} cone c @code{)}
-@*@code{getAmbientDimension(} fan f @code{)}
-@*@code{getAmbientDimension(} polytope p @code{)}
+@code{ambientDimension(} cone c @code{)}
+@*@code{ambientDimension(} fan f @code{)}
+@*@code{ambientDimension(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -414,25 +414,25 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-getAmbientDimension(c1);
+ambientDimension(c1);
 intmat M2[2][3]=
 1,0,0,
 0,1,0;
 cone c2=coneViaRays(M2);
-getAmbientDimension(c2);
+ambientDimension(c2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getCodimension,getDimension,getAmbientDimension,cone related functions
-@subsubsection getCodimension
-@cindex getCodimension
+@node codimension,dimension,ambientDimension,cone related functions
+@subsubsection codimension
+@cindex codimension
 
 @table @code
 @item @strong{Syntax:}
-@code{getCodimension(} cone c @code{)}
-@code{getCodimension(} fan f @code{)}
-@code{getCodimension(} polytope c @code{)}
+@code{codimension(} cone c @code{)}
+@code{codimension(} fan f @code{)}
+@code{codimension(} polytope c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -443,24 +443,24 @@ codimension of the cone;
 intmat M1[1][2]=
 1,0;
 cone c1=coneViaRays(M1);
-getCodimension(c1);
+codimension(c1);
 intmat M2[1][2]=
 0,0;
 cone c2=coneViaRays(M2);
-getCodimension(c2);
+codimension(c2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getDimension,getDualCone,getCodimension,cone related functions
-@subsubsection getDimension
-@cindex getDimension
+@node dimension,dualCone,codimension,cone related functions
+@subsubsection dimension
+@cindex dimension
 
 @table @code
 @item @strong{Syntax:}
-@code{getDimension(} cone c @code{)}
-@code{getDimension(} fan f @code{)}
-@code{getDimension(} polytope p @code{)}
+@code{dimension(} cone c @code{)}
+@code{dimension(} fan f @code{)}
+@code{dimension(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -471,22 +471,22 @@ dimension of the cone
 intmat M1[1][2]=
 1,0;
 cone c1=coneViaRays(M1);
-getDimension(c1);
+dimension(c1);
 intmat M2[1][2]=
 0,0;
 cone c2=coneViaRays(M2);
-getDimension(c2);
+dimension(c2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getDualCone,getEquations,getDimension,cone related functions
-@subsubsection getDualCone
-@cindex getDualCone
+@node dualCone,equations,dimension,cone related functions
+@subsubsection dualCone
+@cindex dualCone
 
 @table @code
 @item @strong{Syntax:}
-@code{getDualCone(} cone c @code{)}
+@code{dualCone(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -498,28 +498,28 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-cone d1=getDualCone(c1);
+cone d1=dualCone(c1);
 d1;
-print(getRays(d1));
+print(rays(d1));
 intmat M2[2][2]=
 1,1,
 0,1;
 cone c2=coneViaRays(M2);
-cone d2=getDualCone(c2);
+cone d2=dualCone(c2);
 d2;
-print(getRays(d2));
+print(rays(d2));
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getEquations,getFacetNormals,getDualCone,cone related functions
-@subsubsection getEquations
-@cindex getEquations
+@node equations,facets,dualCone,cone related functions
+@subsubsection equations
+@cindex equations
 
 @table @code
 @item @strong{Syntax:}
-@code{getEquations(} cone c @code{)}
-@code{getEquations(} polytope p @code{)}
+@code{equations(} cone c @code{)}
+@code{equations(} polytope p @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -531,25 +531,25 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat E1=getEquations(c1);
+intmat E1=equations(c1);
 print(E1);
 intmat M2[1][2]=
 1,0;
 cone c2=coneViaRays(M2);
-intmat E2=getEquations(c2);
+intmat E2=equations(c2);
 print(E2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getFacetNormals,getGeneratorsOfLinealitySpace,getEquations,cone related functions
-@subsubsection getFacetNormals
+@node facets,generatorsOfLinealitySpace,equations,cone related functions
+@subsubsection facets
 @cindex getFacets
 
 @table @code
 @item @strong{Syntax:}
-@code{getFacetNormals(} cone c @code{)}
-@*@code{getFacetNormals(} polytope p @code{)}
+@code{facets(} cone c @code{)}
+@*@code{facets(} polytope p @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -561,25 +561,25 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat F1=getFacetNormals(c1);
+intmat F1=facets(c1);
 print(F1);
 intmat M2[2][2]=
 1,1,
 0,-1;
 cone c2=coneViaRays(M2);
-intmat F2=getFacetNormals(c2);
+intmat F2=facets(c2);
 print(F2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getGeneratorsOfLinealitySpace,getGeneratorsOfSpan,getFacetNormals,cone related functions
-@subsubsection getGeneratorsOfLinealitySpace
-@cindex getGeneratorsOfLinealitySpace
+@node generatorsOfLinealitySpace,generatorsOfSpan,facets,cone related functions
+@subsubsection generatorsOfLinealitySpace
+@cindex generatorsOfLinealitySpace
 
 @table @code
 @item @strong{Syntax:}
-@code{getGeneratorsOfLinealitySpace(} cone c @code{)}
+@code{generatorsOfLinealitySpace(} cone c @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -594,19 +594,19 @@ intmat M[5][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-intmat L=getGeneratorsOfLinealitySpace(c);
+intmat L=generatorsOfLinealitySpace(c);
 print(L);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getGeneratorsOfSpan,getImpliedEquations,getGeneratorsOfLinealitySpace,cone related functions
-@subsubsection getGeneratorsOfSpan
-@cindex getGeneratorsOfSpan
+@node generatorsOfSpan,impliedEquations,generatorsOfLinealitySpace,cone related functions
+@subsubsection generatorsOfSpan
+@cindex generatorsOfSpan
 
 @table @code
 @item @strong{Syntax:}
-@code{getGeneratorsOfSpan(} cone c @code{)}
+@code{generatorsOfSpan(} cone c @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -619,19 +619,19 @@ intmat M[3][5]=
 0,1,0,0,0,
 0,0,1,0,0;
 cone c=coneViaRays(M);
-intmat S=getGeneratorsOfSpan(c);
+intmat S=generatorsOfSpan(c);
 print(S);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getImpliedEquations,getInequalities,getGeneratorsOfSpan,cone related functions
-@subsubsection getImpliedEquations
-@cindex getImpliedEquations
+@node impliedEquations,inequalities,generatorsOfSpan,cone related functions
+@subsubsection impliedEquations
+@cindex impliedEquations
 
 @table @code
 @item @strong{Syntax:}
-@code{getImpliedEquations(} cone c @code{)}
+@code{impliedEquations(} cone c @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -644,19 +644,19 @@ intmat M[3][5]=
 0,1,0,0,0,
 0,0,1,0,0;
 cone c=coneViaRays(M);
-intmat I=getImpliedEquations(c);
+intmat I=impliedEquations(c);
 print(I);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getInequalities,getLinealityDimension,getImpliedEquations,cone related functions
-@subsubsection getInequalities
-@cindex getInequalities
+@node inequalities,linealityDimension,impliedEquations,cone related functions
+@subsubsection inequalities
+@cindex inequalities
 
 @table @code
 @item @strong{Syntax:}
-@code{getInequalities(} cone c @code{)}
+@code{inequalities(} cone c @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -668,25 +668,25 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat I1=getInequalities(c1);
+intmat I1=inequalities(c1);
 print(I);
 intmat M2[1][2]=
 1,0;
 cone c2=coneViaRays(M2);
-intmat I2=getInequalities(c2);
+intmat I2=inequalities(c2);
 print(I2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getLinealityDimension,getLinealitySpace,getInequalities,cone related functions
-@subsubsection getLinealityDimension
-@cindex getLinealityDimension
+@node linealityDimension,linealitySpace,inequalities,cone related functions
+@subsubsection linealityDimension
+@cindex linealityDimension
 
 @table @code
 @item @strong{Syntax:}
-@code{getLinealityDimension(} cone c @code{)}
-@code{getLinealityDimension(} fan c @code{)}
+@code{linealityDimension(} cone c @code{)}
+@code{linealityDimension(} fan c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -699,25 +699,25 @@ intmat M1[3][3]=
 0,1,0,
 0,0,1;
 cone c1=coneViaRays(M1);
-getLinealityDimension(c1);
+linealityDimension(c1);
 intmat M2[4][3]=
 1,0,0,
 0,1,0,
 0,0,1,
 -1,0,0;
 cone c2=coneViaRays(M2);
-getLinealityDimension(c2);
+linealityDimension(c2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getLinealitySpace,getLinearForms,getLinealityDimension,cone related functions
-@subsubsection getLinealitySpace
-@cindex getLinealitySpace
+@node linealitySpace,linearForms,linealityDimension,cone related functions
+@subsubsection linealitySpace
+@cindex linealitySpace
 
 @table @code
 @item @strong{Syntax:}
-@code{getLinealitySpace(} cone c @code{)}
+@code{linealitySpace(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -730,7 +730,7 @@ intmat M1[3][3]=
 0,1,0,
 0,0,1;
 cone c1=coneViaRays(M1);
-cone l1=getLinealitySpace(c1);
+cone l1=linealitySpace(c1);
 l1;
 intmat M2[4][3]=
 1,0,0,
@@ -738,20 +738,20 @@ intmat M2[4][3]=
 0,0,1,
 -1,0,0;
 cone c2=coneViaRays(M2);
-cone l2=getLinealitySpace(c2);
+cone l2=linealitySpace(c2);
 l2;
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getLinearForms,getMultiplicity,getLinealitySpace,cone related functions
-@subsubsection getLinearForms
-@cindex getLinearForms
+@node linearForms,multiplicity,linealitySpace,cone related functions
+@subsubsection linearForms
+@cindex linearForms
 
 @table @code
 @item @strong{Syntax:}
-@code{getLinearForms(} cone c @code{)}
-@*@code{getLinearForms(} polytope p @code{)}
+@code{linearForms(} cone c @code{)}
+@*@code{linearForms(} polytope p @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -763,22 +763,22 @@ intmat M[2][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-getLinearForms(c);
+linearForms(c);
 intvec v=1,1,1;
 setLinearForms(c,v);
-getLinearForms(c);
+linearForms(c);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getMultiplicity,getNegated,getLinearForms,cone related functions
-@subsubsection getMultiplicity
-@cindex getMultiplicity
+@node multiplicity,negatedCone,linearForms,cone related functions
+@subsubsection multiplicity
+@cindex multiplicity
 
 @table @code
 @item @strong{Syntax:}
-@code{getMultiplicity(} cone c @code{)}
-@*@code{getMultiplicity(} polytope p @code{)}
+@code{multiplicity(} cone c @code{)}
+@*@code{multiplicity(} polytope p @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -790,20 +790,20 @@ intmat M[2][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-getMultiplicity(c);
+multiplicity(c);
 setMultiplicity(c,3);
-getMultiplicity(c);
+multiplicity(c);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getNegated,getQuotientLatticeBasis,getMultiplicity,cone related functions
-@subsubsection getNegated
-@cindex getNegated
+@node negatedCone,quotientLatticeBasis,multiplicity,cone related functions
+@subsubsection negatedCone
+@cindex negatedCone
 
 @table @code
 @item @strong{Syntax:}
-@code{getNegated(} cone c @code{)}
+@code{negatedCone(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -815,20 +815,20 @@ intmat M[2][2]=
 1,0,
 0,1;
 cone c=coneViaRays(M);
-cone cn=getNegated(c);
+cone cn=negatedCone(c);
 cn;
-print(getRays(cn));
+print(rays(cn));
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getQuotientLatticeBasis,getRays,getNegated,cone related functions
-@subsubsection getQuotientLatticeBasis
-@cindex getQuotientLatticeBasis
+@node quotientLatticeBasis,rays,negatedCone,cone related functions
+@subsubsection quotientLatticeBasis
+@cindex quotientLatticeBasis
 
 @table @code
 @item @strong{Syntax:}
-@code{getQuotientLatticeBasis(} cone c @code{)}
+@code{quotientLatticeBasis(} cone c @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -841,19 +841,19 @@ intmat M[3][2]=
 0,1,
 -1,0;
 cone c=coneViaRays(M);
-intmat Q=getQuotientLatticeBasis(c);
+intmat Q=quotientLatticeBasis(c);
 print(Q);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getRays,getRelativeInteriorPoint,getQuotientLatticeBasis,cone related functions
-@subsubsection getRays
-@cindex getRays
+@node rays,relativeInteriorPoint,quotientLatticeBasis,cone related functions
+@subsubsection rays
+@cindex rays
 
 @table @code
 @item @strong{Syntax:}
-@code{getRays(} cone c @code{)}
+@code{rays(} cone c @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -865,26 +865,26 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat R1=getRays(c1);
+intmat R1=rays(c1);
 print(R1);
 intmat M2[3][2]=
 1,0,
 0,1,
 -1,0;
 cone c2=coneViaRays(M2);
-intmat R2=getRays(c2);
+intmat R2=rays(c2);
 print(R2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getRelativeInteriorPoint,getSemigroupGenerator,getRays,cone related functions
-@subsubsection getRelativeInteriorPoint
-@cindex getRelativeInteriorPoint
+@node relativeInteriorPoint,semigroupGenerator,rays,cone related functions
+@subsubsection relativeInteriorPoint
+@cindex relativeInteriorPoint
 
 @table @code
 @item @strong{Syntax:}
-@code{getRelativeInteriorPoint(} cone c @code{)}
+@code{relativeInteriorPoint(} cone c @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -896,27 +896,27 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-getRelativeInteriorPoint(c1);
+relativeInteriorPoint(c1);
 intmat M2[2][2]=
 1,0,
 1,1;
 cone c2=coneViaRays(M2);
-getRelativeInteriorPoint(c2);
+relativeInteriorPoint(c2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getSemigroupGenerator,getUniquePoint,getRelativeInteriorPoint,cone related functions
-@subsubsection getSemigroupGenerator
-@cindex getSemigroupGenerator
+@node semigroupGenerator,uniquePoint,relativeInteriorPoint,cone related functions
+@subsubsection semigroupGenerator
+@cindex semigroupGenerator
 
 @table @code
 @item @strong{Syntax:}
-@code{getSemigroupGenerator(} cone c @code{)}
+@code{semigroupGenerator(} cone c @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
-if getDimension(c)=getLinealityDimension(c)+1, then the quotient lattice of Z^n intersected with the span and Z^n intersected with the lineality space is Z^1 and the class of the cone is a semigroup. returns a generator of that semigroup. (like getQuotientLatticeBasis(cone c), but as intvec)
+if dimension(c)=linealityDimension(c)+1, then the quotient lattice of Z^n intersected with the span and Z^n intersected with the lineality space is Z^1 and the class of the cone is a semigroup. returns a generator of that semigroup. (like quotientLatticeBasis(cone c), but as intvec)
 @item @strong{Example:}
 @smallexample
 @c example
@@ -925,18 +925,18 @@ intmat M[3][2]=
 0,1,
 -1,0;
 cone c=coneViaRays(M);
-getSemigroupGenerator(c);
+semigroupGenerator(c);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node getUniquePoint,hasFace,getSemigroupGenerator,cone related functions
-@subsubsection getUniquePoint
-@cindex getUniquePoint
+@node uniquePoint,hasFace,semigroupGenerator,cone related functions
+@subsubsection uniquePoint
+@cindex uniquePoint
 
 @table @code
 @item @strong{Syntax:}
-@code{getUniquePoint(} cone c @code{)}
+@code{uniquePoint(} cone c @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -948,17 +948,17 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-getUniquePoint(c1);
+uniquePoint(c1);
 intmat M2[2][2]=
 1,0,
 1,1;
 cone c2=coneViaRays(M2);
-getUniquePoint(c2);
+uniquePoint(c2);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node hasFace,intersectCones,getUniquePoint,cone related functions
+@node hasFace,intersectCones,uniquePoint,cone related functions
 @subsubsection hasFace
 @cindex hasFace
 
@@ -1016,13 +1016,13 @@ intmat M3[2][2]=
 cone c3=coneViaRays(M3);
 cone c12=intersectCones(c1,c2);
 c12;
-print(getRays(c12));
+print(rays(c12));
 cone c23=intersectCones(c2,c3);
 c23;
-print(getRays(c23));
+print(rays(c23));
 cone c13=intersectCones(c1,c3);
 c13;
-print(getRays(c13));
+print(rays(c13));
 @c example
 @end smallexample
 @end table
@@ -1159,10 +1159,10 @@ intmat M[2][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-getLinearForms(c);
+linearForms(c);
 intvec v=1,1,1;
 setLinearForms(c,v);
-getLinearForms(c);
+linearForms(c);
 @c example
 @end smallexample
 @end table
@@ -1185,9 +1185,9 @@ intmat M[2][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-getMultiplicity(c);
+multiplicity(c);
 setMultiplicity(c,3);
-getMultiplicity(c);
+multiplicity(c);
 @c example
 @end smallexample
 @end table
@@ -1289,9 +1289,9 @@ Access to cones of the fan is provided in three different ways:
 @subsection fan related functions
 @cindex fan related functions
 
-See also @ref{getAmbientDimension},
-@ref{getCodimension},
-@ref{getLinealityDimension},
+See also @ref{ambientDimension},
+@ref{codimension},
+@ref{linealityDimension},
 @ref{isSimplicial}.
 
 @menu
@@ -1723,14 +1723,14 @@ p;
 @subsection polytope related functions
 @cindex polytope related functions
 
-See also @ref{getAmbientDimension},
-@ref{getCodimension}, 
-@ref{getDimension},
-@ref{getEquations},
-@ref{getFacetNormals},
-@ref{getInequalities},
-@ref{getLinearForms},
-@ref{getMultiplicity},
+See also @ref{ambientDimension},
+@ref{codimension}, 
+@ref{dimension},
+@ref{equations},
+@ref{facets},
+@ref{inequalities},
+@ref{linearForms},
+@ref{multiplicity},
 @ref{setLinearForms},
 @ref{setMultiplicity}.
 

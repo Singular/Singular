@@ -18,7 +18,7 @@ A PolyhedralCone is represented by linear inequalities and equations. The inequa
 and stored as the rows of a matrix and the equations are stored as rows of a second matrix.
 
 A cone can be in one of the four states:
-0) Nothing has been done to remove redundancies. This is the initial state.
+0) Nothing has been done to remove redundancies. This is the initial state
 1) A basis for the true, implied equations space has been computed. This means that
    the implied equations have been computed. In particular the dimension of the cone is known.
 2) Redundant inequalities have been computed and have been eliminated.
@@ -100,11 +100,27 @@ class ZCone
   ZMatrix linearForms;
   mutable ZMatrix inequalities;
   mutable ZMatrix equations;
+
   mutable ZMatrix cachedExtremeRays;
 /**
- * If this bool is true it means that cachedExtremeRays contains the extreme rays as found by extremeRays().
+ * If this true it means that cachedExtremeRays contains the extreme rays as found by extremeRays().
  */
   mutable bool haveExtremeRaysBeenCached;
+
+  mutable ZMatrix cachedGeneratorsOfLinealitySpace;
+/**
+ * If true it means that cachedGeneratorsOfLinealitySpace contains 
+ * the generators of the lineality space as found by generatorsOfLinealitySpace().
+ */
+  mutable bool haveGeneratorsOfLinealitySpaceBeenCached;
+
+  mutable ZMatrix cachedGeneratorsOfSpan;
+/**
+ * If this true it means that cachedGeneratorsOfSpan contains 
+ * the generators of the span as found by generatorsOfSpan().
+ */
+  mutable bool haveGeneratorsOfSpanBeenCached;
+
   void ensureStateAsMinimum(int s)const;
 
   bool isInStateMinimum(int s)const;
@@ -116,7 +132,11 @@ public:
     * which tells what is known about the description already.
     */
      ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preassumptions_=PCP_none);
-
+   /**
+    * Same as above except that additional data may be set. Those are always believed to be right!
+    * No checks for validality will be done!
+    */
+     ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, ZMatrix const &cachedExtremeRays_, ZMatrix const &cachedGeneratorsOfLinealitySpace_, ZMatrix const &cachedGeneratorsOfSpan_, int preassumptions_=PCP_none);
      /**
       * Get the multiplicity of the cone.
       */
@@ -133,7 +153,6 @@ public:
       * Store a matrix of linear forms in the cone object.
       */
      void setLinearForms(ZMatrix const &linearForms_);
-
      /**
       * Get the inequalities in the description of the cone.
       */
@@ -158,7 +177,12 @@ public:
       * Returns true iff it is known that the set of equations span the space of implied equations of the description.
       */
      bool areImpliedEquationsKnown()const{return (state>=1)||(preassumptions&PCP_impliedEquationsKnown);}
-
+     /**
+      * The following functions return true iff the respective data is cached.
+      */
+     bool areExtremeRaysKnown()const{return haveExtremeRaysBeenCached;}
+     bool areGeneratorsOfSpanKnown()const{return haveGeneratorsOfSpanBeenCached;}
+     bool areGeneratorsOfLinealitySpaceKnown()const{return haveGeneratorsOfLinealitySpaceBeenCached;}
      /**
       * Takes the cone to a canonical form. After taking cones to canonical form, two cones are the same
       * if and only if their matrices of equations and inequalities are the same.
@@ -185,7 +209,7 @@ public:
      void findImpliedEquations();
 
      /**
-      * Constructor for polyhedral cone with no inequalities or equations. Tthat is, the full space of some dimension.
+      * Constructor for polyhedral cone with no inequalities or equations. That is, the full space of some dimension.
       */
      ZCone(int ambientDimension=0);
 
@@ -193,15 +217,15 @@ public:
       * Computes are relative interior point of the cone.
       */
      ZVector getRelativeInteriorPoint()const;
-  /**
-     Assuming that this cone C is in state at least 3 (why not 2?), this routine returns a relative interior point v(C) of C with the following properties:
-     1) v is a function, that is v(C) is found deterministically
-     2) for any angle preserving, lattice preserving and lineality space preserving transformation T of R^n we have that v(T(C))=T(v(C)). This makes it easy to check if two cones in the same fan are equal up to symmetry. Here preserving the lineality space L just means T(L)=L.
-  */
+     /**
+        Assuming that this cone C is in state at least 3 (why not 2?), this routine returns a relative interior point v(C) of C with the following properties:
+        1) v is a function, that is v(C) is found deterministically
+        2) for any angle preserving, lattice preserving and lineality space preserving transformation T of R^n we have that v(T(C))=T(v(C)). This makes it easy to check if two cones in the same fan are equal up to symmetry. Here preserving the lineality space L just means T(L)=L.
+     */
      ZVector getUniquePoint()const;
-  /**
-   * Takes a list of possible extreme rays and add up those actually contained in the cone.
-   */
+     /**
+      * Takes a list of possible extreme rays and add up those actually contained in the cone.
+      */
      ZVector getUniquePointFromExtremeRays(ZMatrix const &extremeRays)const;
      /**
       * Returns the dimension of the ambient space.
@@ -275,7 +299,7 @@ public:
       * Returns true iff the PolyhedralCone contains v in its relative interior. False otherwise. The cone must be in state at least 1.
       */
      bool containsRelatively(ZVector const &v)const;
-     /*
+     /**
       * Returns true iff the cone is simplicial. That is, iff the dimension of the cone equals the number of facets.
       */
      bool isSimplicial()const;
@@ -305,7 +329,7 @@ public:
       * If generators for the lineality space are known, they can be supplied. This can
       * speed up computations a lot.
       */
-    ZMatrix extremeRays(ZMatrix const *generatorsOfLinealitySpace=0)const;
+     ZMatrix extremeRays(ZMatrix const *generatorsOfLinealitySpace=0, bool b=true)const;
     /**
        The cone defines two lattices, namely Z^n intersected with the
        span of the cone and Z^n intersected with the lineality space of

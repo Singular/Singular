@@ -68,7 +68,7 @@ LIB "primdec.lib";
 
 proc mod_init()
 {
-//if (!defined(Gfanlib::coneViaRays)) {
+//if (!defined(coneViaRays)) {
 //  LIB("gfanlib.so");
 //  export(Gfanlib);
 //}
@@ -79,7 +79,19 @@ proc mod_init()
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
 newstruct("pdivisor","list summands, cone tail");
+
+system("install","divisor","print",divisor_print,1);
+
+system("install","divisor","+",divisorplus,2);
 }
+
+
+
+proc divisor_print(divisor D)
+{
+"Divisor = ("+string(D.den)+") - ("+string(D.num)+")";
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +108,7 @@ return(C);
 proc divisorplus(divisor A, divisor B){
 return(makeDivisor(interred(A.num*B.num),interred(A.den*B.den)));
 }
+
 
 proc multdivisor(int n, divisor A){
 if (n<0) {return(multdivisor(-n,negativedivisor(A)));}
@@ -304,41 +317,54 @@ return(E);}
 
 proc makePDivisor(list L){
 pdivisor P;
-P.summands = L;
-cone C = tailCone(L[1][1]);
-P.tail = C;
+list CP = decomposePolyhedron(L[1][1]);
+P.tail = CP[1];
+list LP;
+LP[1]=list(CP[2],L[1][2]);
+int i;
+for (i=2; i<=size(L);i++){
+   CP = decomposePolyhedron(L[i][1]);
+   if (!(CP[1]==P.tail)) {ERROR("All P-coefficients should have the same tail cone");}
+   LP[i]=list(CP[2],L[i][2]);
+}
+P.summands = LP;
 return(P);
 }
 
-proc tailCone(polytope P){
-intmat rays = Gfanlib::getVertices(P);
+proc decomposePolyhedron(polytope P){
+intmat rays = getVertices(P);
+intmat rays2 = rays;
 int i,j;
 for (i=1; i<=nrows(rays);i++){
    if (rays[i,1]==1) {
       for (j=1; j<=ncols(rays);j++){
          rays[i,j]=0;
       }  
+   } else {
+      for (j=1; j<=ncols(rays);j++){
+         rays2[i,j]=0;
+      }       
    }
 }
-cone C = Gfanlib::coneViaRays(rays);
-return(C);
+cone C = coneViaRays(rays);
+polytope C2 = polytopeViaVertices(rays2);
+return(list(C,C2));
 }
 
 
 proc evaluatePDivisor(pdivisor D,intvec v){
 formaldivisor vD;
-//
 list L = D.summands;
+cone C = D.tail;
+cone dC = getDualCone(C);
 list vL;
 int i;
-intvec vv = 0;
-for (i=1; i<=size(v);i++){
-   vv[i+1]=v[i];
-}
+intvec vv = 0,v;
+if (!(containsInSupport(dC,vv))) {ERROR("the linear form given should be in the dual tail cone");}
 for (i=1; i<=size(L);i++){
         vL[i]=list(); 
         vL[i][2]=L[i][2];
-        vL[i][1]=Polymake::minimalValue(L[i][1],vv);
+	vL[i][1]=Polymake::minimalValue(L[i][1],vv);
 }
 vD.summands = vL;
 return(vD);}
