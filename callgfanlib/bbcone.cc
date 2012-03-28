@@ -1384,8 +1384,22 @@ BOOLEAN hasFace(leftv res, leftv args)
       return FALSE;
     }
   }
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
+      bool b = zc->hasFace(*zd);
+      int bb = (int) b;
+      res->rtyp = INT_CMD;
+      res->data = (char*) bb;
+      return FALSE;
+    }
+  }
   WerrorS("hasFace: unexpected parameters");
-  return TRUE;  
+  return TRUE;
 }
 
 BOOLEAN canonicalizeCone(leftv res, leftv args)

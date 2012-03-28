@@ -590,6 +590,7 @@ void bbpolytope_setup()
   // iiAddCproc("","getLinearForms",FALSE,getLinearForms);
   // iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
   // iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
+  // iiAddCproc("","hasFace",FALSE,hasFace);
   /***************************************************************/
   // iiAddCproc("","getEquations",FALSE,getEquations);
   // iiAddCproc("","getInequalities",FALSE,getInequalities);

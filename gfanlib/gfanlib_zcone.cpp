@@ -691,6 +691,7 @@ void ZCone::ensureStateAsMinimum(int s)const
         {
           QMatrix m=ZToQMatrix(equations);
           m.reduce();
+	  m.REformToRREform();
           ZMatrix inequalities2(0,equations.getWidth());
           for(int i=0;i<inequalities.getHeight();i++)
             {
@@ -709,6 +710,7 @@ void ZCone::ensureStateAsMinimum(int s)const
     {
       QMatrix equations2=ZToQMatrix(equations);
       equations2.reduce(false,false,true);
+      equations2.REformToRREform();
 
       for(int i=0;i<inequalities.getHeight();i++)
         {
@@ -1299,16 +1301,11 @@ std::string toString(ZCone const &c)
 bool ZCone::hasFace(ZCone const &f)const
 {
   if(!contains(f.getRelativeInteriorPoint()))return false;
-  ZCone temp=faceContaining(f.getRelativeInteriorPoint());
-  temp.canonicalize();
+  ZCone temp1=faceContaining(f.getRelativeInteriorPoint());
+  temp1.canonicalize();
   ZCone temp2=f;
   temp2.canonicalize();
-  if(temp.dimension()==temp2.dimension())
-    {
-      return !(temp2!=temp);
-    }
-  else
-    return false;
+  return !(temp2!=temp1);
 }
 
 ZCone ZCone::faceContaining(ZVector const &v)const
