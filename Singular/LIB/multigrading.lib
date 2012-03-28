@@ -3891,7 +3891,7 @@ EXAMPLE: example hilbertSeries; shows an example
   export denominator1;
   export numerator1;
 
-  if( numerator != 0 )
+  if( @numerator != 0 )
   {
     poly d = gcd(@denominator, @numerator);
 
