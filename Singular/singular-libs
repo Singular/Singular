@@ -22,7 +22,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	noether.lib normal.lib normaliz.lib   ntsolve.lib \
 	paraplanecurves.lib phindex.lib \
 	pointid.lib poly.lib \
-	polymake.lib presolve.lib  primdec.lib  primdecint.lib \
+	oldpolymake.lib presolve.lib  primdec.lib  primdecint.lib \
 	primitiv.lib  qhmoduli.lib random.lib realclassify.lib \
 	realrad.lib  reesclos.lib  resbinomial.lib \
 	resgraph.lib  resjung.lib resolve.lib \

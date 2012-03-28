@@ -72,10 +72,10 @@ proc mod_init()
 //  LIB("gfanlib.so");
 //  export(Gfanlib);
 //}
-//if (!defined(Polymake::minkowskiSum)) {
-//  LIB("polymake.so");
-//  export(Polymake);
-//}
+if (!defined(Polymake::minkowskiSum)) {
+  LIB("polymake.so");
+  export(Polymake);
+}
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
 newstruct("pdivisor","list summands, cone tail");

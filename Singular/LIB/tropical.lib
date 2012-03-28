@@ -203,7 +203,7 @@ LIB "solve.lib";
 LIB "poly.lib";
 LIB "elim.lib";
 LIB "linalg.lib";
-LIB "polymake.lib";
+LIB "oldpolymake.lib";
 LIB "primdec.lib";
 LIB "absfact.lib";
 LIB "hnoether.lib";
