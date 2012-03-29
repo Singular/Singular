@@ -7478,7 +7478,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
       else          return TRUE;
     }
-    else if (bt>MAX_TOK)
+    else if ((bt>MAX_TOK)&&(op!='('))
     {
       blackbox *bb=getBlackboxStuff(bt);
       if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
