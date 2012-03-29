@@ -180,10 +180,11 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 {
   // interpreter: a1 or a2 is newstruct
   blackbox *a=getBlackboxStuff(a1->Typ());
-  newstruct_desc nt=(newstruct_desc)a->data;
+  newstruct_desc nt;
   lists al=(lists)a1->Data();
   if (a!=NULL)
   {
+    nt=(newstruct_desc)a->data;
     switch(op)
     {
       case '.':
@@ -274,8 +275,8 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
   else
   {
     a=getBlackboxStuff(a2->Typ());
-    lists al=(lists)a2->Data();
     nt=(newstruct_desc)a->data;
+    lists al=(lists)a2->Data();
   }
   newstruct_proc p=nt->procs;
   while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
