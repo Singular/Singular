@@ -29,8 +29,9 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
 
 
-AMLDFLAGS	= -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel \
--L${abs_top_builddir}/libpolys/polys $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
+AMLDFLAGS	= 
+# -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel \
+# -L${abs_top_builddir}/libpolys/polys $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
 
 
 SOURCES = mod_main.cc bigintm.cc bigintm.h
