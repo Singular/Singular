@@ -1,10 +1,10 @@
 CXXTEMPLFLAGS      =  
 ## -fno-implicit-templates
-noinst_LTLIBRARIES = libmisc.la libmisc_g.la
-# libmiscdir = $(libdir)/singular
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
+lib_LTLIBRARIES = libmisc.la libmisc_g.la
+libmiscdir = $(libdir)/singular
 
 libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libmisc_g_la_CFLAGS = ${PIPE}

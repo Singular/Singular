@@ -99,8 +99,8 @@ testsources = test.cc
 test_s_r_SOURCES = $(testsources)
 test_s_g_SOURCES = $(testsources)
 
-test_s_r_LDADD = -lkernel -lpolys -lcoeffs  -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 

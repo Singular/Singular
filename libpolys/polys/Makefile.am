@@ -136,8 +136,6 @@ libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 libpolys_la_CPPFLAGS = ${NODEBUGDEFS} ${AM_CPPFLAGS}
 
 
-libpolys_la_LIBADD = ${abs_top_builddir}/misc/libmisc.la ${abs_top_builddir}/reporter/libreporter.la ${abs_top_builddir}/coeffs/libcoeffs.la
-libpolys_g_la_LIBADD = ${abs_top_builddir}/misc/libmisc_g.la ${abs_top_builddir}/reporter/libreporter_g.la ${abs_top_builddir}/coeffs/libcoeffs_g.la
 
 
 #################################################
@@ -150,8 +148,8 @@ templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
 templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
 templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
-templates_p_Procs_Generate_LDADD    = -lreporter -lomalloc
 
+templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lfindexec
 
 templates/p_Procs.inc: templates/p_Procs_Generate
 	${builddir}/templates/p_Procs_Generate > ${builddir}/templates/p_Procs.inc

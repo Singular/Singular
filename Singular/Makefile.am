@@ -224,8 +224,8 @@ nodist_Singularg_SOURCES =  libSingular_g.la
 Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 
-Singular_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-Singularg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+Singular_LDADD = libSingular.la ${abs_top_builddir}/numeric/libnumeric.la ${abs_top_builddir}/kernel/libkernel.la ${abs_top_builddir}/libpolys/polys/libpolys.la -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+Singularg_LDADD = libSingular_g.la ${abs_top_builddir}/numeric/libnumeric_g.la ${abs_top_builddir}/kernel/libkernel_g.la ${abs_top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
@@ -246,8 +246,8 @@ nodist_Singulard_SOURCES = libSingular.la
 Singulardg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 nodist_Singulardg_SOURCES =  libSingular_g.la
 
-Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
@@ -327,8 +327,8 @@ test_s_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPL
 test_s_r_SOURCES = test.cc
 test_s_g_SOURCES = test.cc
 
-test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
@@ -348,8 +348,8 @@ test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPL
 test_d_r_SOURCES = test.cc
 test_d_g_SOURCES = test.cc
 
-test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 

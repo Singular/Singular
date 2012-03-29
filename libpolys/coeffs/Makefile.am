@@ -1,10 +1,10 @@
-noinst_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
-# libcoeffsdir = $(libdir)/singular
-
 CXXTEMPLFLAGS =  
 ## -fno-implicit-templates
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
+
+lib_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
+libcoeffsdir = $(libdir)/singular
 
 libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libcoeffs_g_la_CFLAGS = ${PIPE}
@@ -64,7 +64,6 @@ test_s_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -l
 
 test_d_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS} 
 test_d_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS} 
-
 
 
 test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}

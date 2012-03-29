@@ -1,10 +1,10 @@
 CXXTEMPLFLAGS =  
 ## -fno-implicit-templates
-noinst_LTLIBRARIES=libreporter.la libreporter_g.la
-# libreporterdir = $(libdir)/singular
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
+lib_LTLIBRARIES = libreporter.la libreporter_g.la
+libreporterdir = $(libdir)/singular
 
 libreporter_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libreporter_g_la_CFLAGS = ${PIPE}
