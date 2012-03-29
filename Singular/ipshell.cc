@@ -102,6 +102,34 @@ const char * iiTwoOps(int t)
   }
 }
 
+int iiOpsTwoChar(const char *s)
+{
+/* not handling: &&, ||, ** */
+  if (s[1]=='\0') return s[0];
+  else if (s[2]!='\0') return 0;
+  switch(s[0])
+  {
+    case '.': if (s[1]=='.') return DOTDOT;
+              else           return 0;
+    case ':': if (s[1]==':') return COLONCOLON;
+              else           return 0;
+    case '-': if (s[1]=='-') return COLONCOLON;
+              else           return 0;
+    case '+': if (s[1]=='+') return PLUSPLUS;
+              else           return 0;
+    case '=': if (s[1]=='=') return EQUAL_EQUAL;
+              else           return 0;
+    case '<': if (s[1]=='=') return LE;
+              else if (s[1]=='>') return NOTEQUAL;
+              else           return 0;
+    case '>': if (s[1]=='=') return GE;
+              else           return 0;
+    case '!': if (s[1]=='=') return NOTEQUAL;
+              else           return 0;
+    defaukt: return 0;
+  }
+}
+
 static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 {
   char buffer[22];

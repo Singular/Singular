@@ -577,10 +577,15 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   p->next=desc->procs; desc->procs=p;
   if(!IsCmd(func,p->t))
   {
+    int t=0;
     if (func[1]=='\0') p->t=func[0];
+    else if((t=iiOpsTwoChar(func))!=0)
+    {
+      p->t=t;
+    }
     else
     {
-      Werror(">>%s<< is not e kernel command",func);
+      Werror(">>%s<< is not a kernel command",func);
       return TRUE;
     }
   }

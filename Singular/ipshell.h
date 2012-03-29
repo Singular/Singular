@@ -45,6 +45,7 @@ void    killlocals(int v);
 int     exprlist_length(leftv v);
 const char *  Tok2Cmdname(int i);
 const char *  iiTwoOps(int t);
+int           iiOpsTwoChar(const char *s);
 int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
