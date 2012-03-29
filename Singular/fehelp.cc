@@ -658,7 +658,6 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
 }
 
 // test for h being a string and print it
-// return TRUE an success
 static BOOLEAN hePrintHelpStr(const idhdl hh,const char *id,const char *pa)
 {
   if ((hh!=NULL) && (IDTYP(hh)==STRING_CMD))
@@ -669,7 +668,7 @@ static BOOLEAN hePrintHelpStr(const idhdl hh,const char *id,const char *pa)
   }
   else
     Print("`%s` not found in package %s\n",id,pa);
-  return FALSE;
+  return TRUE;;
 }
 // try to find the help string as a loaded procedure or library
 // if found, display the help and return TRUE
@@ -718,7 +717,7 @@ static BOOLEAN heOnlineHelp(char* s)
       return hePrintHelpStr(hh,s_help,s);
     }
     else Print("package %s not found\n",s);
-    return FALSE;
+    return TRUE; /* do not search the manual */
   }
 
   // try help for a library
