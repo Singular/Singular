@@ -35,15 +35,14 @@ libcoeffs_includedir  =$(includedir)/singular/coeffs
 libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h shortfl.h mpr_complex.h mpr_global.h
 
 
+## for testing...
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory
 else
   USE_FACTORY =
 endif
 
-## for testing...
-AM_LDFLAGS = -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${abs_top_builddir}/../findexec -L${abs_builddir}
-
+AMLDFLAGS = -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${abs_top_builddir}/../findexec
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
@@ -91,6 +90,8 @@ test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 
+test_s_r_LDFLAGS = -static ${AMLDFLAGS}
+test_s_g_LDFLAGS = -static ${AMLDFLAGS}
 
-test_s_r_LDFLAGS = -static
-test_s_g_LDFLAGS = -static
+test_d_r_LDFLAGS = ${AMLDFLAGS}
+test_d_g_LDFLAGS = ${AMLDFLAGS}

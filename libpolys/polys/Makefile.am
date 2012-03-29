@@ -9,7 +9,6 @@ NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
-AM_LDFLAGS	= -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${abs_top_builddir}/../omalloc -L${abs_builddir}
 AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}
 
 
@@ -87,9 +86,7 @@ p_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 p_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
 P_PROCS_MODULE_LDFLAGS = -shared -module
-# -L${top_builddir}/coeffs -lcoeffs 
 P_PROCS_MODULE_LDFLAGSG = -shared -module
-# -L${top_builddir}/coeffs -lcoeffs_g
 
 p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
@@ -150,6 +147,7 @@ templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
 templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
 
 templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lfindexec
+templates_p_Procs_Generate_LDFLAGS  = -L${abs_builddir} -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${top_builddir}/misc -L${abs_top_builddir}/../omalloc -L${abs_top_builddir}/../findexec
 
 templates/p_Procs.inc: templates/p_Procs_Generate
 	${builddir}/templates/p_Procs_Generate > ${builddir}/templates/p_Procs.inc
