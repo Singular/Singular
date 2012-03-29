@@ -1165,7 +1165,7 @@ BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
   return FALSE;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-void module_help_main(char *newlib,const char *help)
+void module_help_main(const char *newlib,const char *help)
 {
   char *plib = iiConvName(newlib);
   idhdl pl = basePack->idroot->get(plib,0); /* always start at Top level */
@@ -1180,7 +1180,7 @@ void module_help_main(char *newlib,const char *help)
     currPack=s;
   }
 }
-void module_help_proc(char *newlib,const char *p, const char *help)
+void module_help_proc(const char *newlib,const char *p, const char *help)
 {
   char *plib = iiConvName(newlib);
   idhdl pl = basePack->idroot->get(plib,0);
