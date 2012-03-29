@@ -337,7 +337,7 @@ check_PROGRAMS = $(TESTS)
 TESTSSOURCES = test.cc
 
 # The following ('..') is a hack for a while... 
-TESTADDLIBDIRS = ${OMALLOC_LDFLAGS} -L${builddir}/../findexec -L${builddir}/../libpolys
+TESTADDLIBDIRS = ${OMALLOC_LDFLAGS}
 TESTADDLIB = $(TESTADDLIBDIRS) $(OMALLOC_R_LDADD)
 TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
 

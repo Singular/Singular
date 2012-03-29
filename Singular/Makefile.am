@@ -258,8 +258,8 @@ Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 ESingular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 ESingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR -DPROTO 
-ESingular_LDFLAGS = -static ${AM_LDFLAGS} -L${abs_top_builddir}/libpolys/resources -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/misc
-ESingular_LDADD =  -lresources -lreporter -lmisc -lomalloc -lfindexec 
+ESingular_LDFLAGS = -static ${AM_LDFLAGS}  -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/misc
+ESingular_LDADD =   -lreporter -lmisc -lomalloc -lfindexec 
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 
@@ -268,8 +268,8 @@ ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 TSingular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 TSingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR -DPROTO 
-TSingular_LDFLAGS = -static ${AM_LDFLAGS} -L${abs_top_builddir}/libpolys/resources -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/misc
-TSingular_LDADD =  -lresources -lreporter -lmisc -lomalloc -lfindexec 
+TSingular_LDFLAGS = -static ${AM_LDFLAGS}  -L${abs_top_builddir}/libpolys/reporter -L${abs_top_builddir}/libpolys/misc
+TSingular_LDADD =   -lreporter -lmisc -lomalloc -lfindexec 
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
 # utils.cc utils.h

@@ -122,6 +122,7 @@ if test "x$ENABLE_FACTORY" = xyes; then
  fi
 fi
 
+AC_CONFIG_SUBDIRS([findexec]) 
 AC_CONFIG_SUBDIRS([omalloc])
 
 if test "x$ENABLE_FACTORY" = xyes; then
@@ -130,7 +131,6 @@ fi
 
 AC_CONFIG_SUBDIRS([libpolys])
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([findexec/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])

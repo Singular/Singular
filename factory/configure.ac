@@ -371,7 +371,7 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   if test "x$with_omalloc_extra_dir" != "x"; then
     OMALLOC_CFLAGS="$OMALLOC_CFLAGS -I${with_omalloc_extra_dir}"
-    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc -L${with_omalloc_extra_dir}/findexec -L${with_omalloc_extra_dir}/libpolys/resources -L${with_omalloc_extra_dir}/libpolys/reporter -L${with_omalloc_extra_dir}/libpolys/misc"
+    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc -L${with_omalloc_extra_dir}/findexec"
   fi
   
   CPPFLAGS_save="$CPPFLAGS"
@@ -384,8 +384,8 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   CPPFLAGS="$CPPFLAGS_save"
 
-  OMALLOC_G_LDADD="-lresources_g -lreporter_g -lmisc_g -lfindexec_g -lomalloc_g"
-  OMALLOC_R_LDADD="-lresources -lreporter -lmisc -lfindexec -lomalloc"
+  OMALLOC_G_LDADD="-lfindexec_g -lomalloc_g"
+  OMALLOC_R_LDADD="-lfindexec -lomalloc"
   
   AC_DEFINE(HAVE_OMALLOC, 1, [omalloc support])
  

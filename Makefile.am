@@ -10,7 +10,7 @@ PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular Intege
 
 SUBDIRS=$(PACKAGES)
 
-TESTDIRS=$(ALLOC) $(USE_FACTORY) libpolys kernel Singular
+TESTDIRS=$(PACKAGES)
 
 
 emacsdir=$(datadir)/emacs

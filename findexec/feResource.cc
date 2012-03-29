@@ -13,7 +13,7 @@
 
 #include "config.h"
 
-#include <findexec/omFindExec.h>
+#include "omFindExec.h"
 
 #include "feResource.h"
 
@@ -39,7 +39,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
 
-#define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"PACKAGE_VERSION
+#define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"
 
 /*****************************************************************
  *
@@ -70,8 +70,8 @@ feResourceConfig_s feResourceConfigs[] =
    "%b/../factory;"
    "%b/../../factory",
    ""},
-  {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",(char *)""},
-  {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME,           (char *)""},
+  {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
+  {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
@@ -81,7 +81,7 @@ feResourceConfig_s feResourceConfigs[] =
 #ifdef ix86_Win
   {"HtmlHelpFile",'C',  feResFile,  "SINGULAR_CHM_FILE",    "%r/doc/Manual.chm",    (char *)""},
 #endif
-  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"PACKAGE_VERSION,    (char *)""},
+  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/index.php/singular-manual.html",    (char *)""},
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",             (char *)""},
 

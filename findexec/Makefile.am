@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I ../m4
+
 libfindexec_LTLIBRARIES = libfindexec.la libfindexec_g.la
 libfindexecdir = $(libdir)/singular
 

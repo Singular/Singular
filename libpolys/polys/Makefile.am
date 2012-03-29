@@ -10,7 +10,7 @@ AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
 INCLUDES	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}
-AM_LDFLAGS	= -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${abs_top_builddir}/resources -L${abs_top_builddir}/../omalloc -L${abs_builddir}
+AM_LDFLAGS	= -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${abs_top_builddir}/../omalloc -L${abs_builddir}
 
 if ENABLE_P_PROCS_STATIC
   USE_P_PROCS_STATIC_CC = templates/p_Procs_Static.cc
@@ -135,8 +135,8 @@ libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 libpolys_la_CPPFLAGS = ${NODEBUGDEFS}
 
 
-libpolys_la_LIBADD = ${abs_top_builddir}/misc/libmisc.la ${abs_top_builddir}/reporter/libreporter.la ${abs_top_builddir}/resources/libresources.la ${abs_top_builddir}/coeffs/libcoeffs.la
-libpolys_g_la_LIBADD = ${abs_top_builddir}/misc/libmisc_g.la ${abs_top_builddir}/reporter/libreporter_g.la ${abs_top_builddir}/resources/libresources_g.la ${abs_top_builddir}/coeffs/libcoeffs_g.la
+libpolys_la_LIBADD = ${abs_top_builddir}/misc/libmisc.la ${abs_top_builddir}/reporter/libreporter.la ${abs_top_builddir}/coeffs/libcoeffs.la
+libpolys_g_la_LIBADD = ${abs_top_builddir}/misc/libmisc_g.la ${abs_top_builddir}/reporter/libreporter_g.la ${abs_top_builddir}/coeffs/libcoeffs_g.la
 
 
 #################################################
