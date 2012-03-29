@@ -178,95 +178,104 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
 
 BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 {
-  // interpreter: a1 is newstruct
+  // interpreter: a1 or a2 is newstruct
   blackbox *a=getBlackboxStuff(a1->Typ());
   newstruct_desc nt=(newstruct_desc)a->data;
   lists al=(lists)a1->Data();
-  switch(op)
+  if (a!=NULL)
   {
-    case '.':
+    switch(op)
     {
-      if (a2->name!=NULL)
+      case '.':
       {
-        BOOLEAN search_ring=FALSE;
-        newstruct_member nm=nt->member;
-        while ((nm!=NULL)&&(strcmp(nm->name,a2->name)!=0)) nm=nm->next;
-        if ((nm==NULL) && (strncmp(a2->name,"r_",2)==0))
+        if (a2->name!=NULL)
         {
-          nm=nt->member;
-          while ((nm!=NULL)&&(strcmp(nm->name,a2->name+2)!=0)) nm=nm->next;
-          if ((nm!=NULL)&&(RingDependend(nm->typ)))
-            search_ring=TRUE;
-          else
-            nm=NULL;
-        }
-        if (nm==NULL)
-        {
-          Werror("member %s nor found", a2->name);
-          return TRUE;
-        }
-        if (search_ring)
-        {
-          ring r;
-          res->rtyp=RING_CMD;
-          res->data=al->m[nm->pos-1].data;
-          r=(ring)res->data;
-          if (r==NULL) { res->data=(void *)currRing; r=currRing; }
-          if (r!=NULL) r->ref++;
-          else Werror("ring of this member is not set and no basering found");
-          return r==NULL;
-        }
-        else if (RingDependend(nm->typ))
-        {
-          if (al->m[nm->pos].data==NULL)
+          BOOLEAN search_ring=FALSE;
+          newstruct_member nm=nt->member;
+          while ((nm!=NULL)&&(strcmp(nm->name,a2->name)!=0)) nm=nm->next;
+          if ((nm==NULL) && (strncmp(a2->name,"r_",2)==0))
           {
-            // NULL belongs to any ring
-            ring r=(ring)al->m[nm->pos-1].data;
-            if (r!=NULL)
+            nm=nt->member;
+            while ((nm!=NULL)&&(strcmp(nm->name,a2->name+2)!=0)) nm=nm->next;
+            if ((nm!=NULL)&&(RingDependend(nm->typ)))
+              search_ring=TRUE;
+            else
+              nm=NULL;
+          }
+          if (nm==NULL)
+          {
+            Werror("member %s nor found", a2->name);
+            return TRUE;
+          }
+          if (search_ring)
+          {
+            ring r;
+            res->rtyp=RING_CMD;
+            res->data=al->m[nm->pos-1].data;
+            r=(ring)res->data;
+            if (r==NULL) { res->data=(void *)currRing; r=currRing; }
+            if (r!=NULL) r->ref++;
+            else Werror("ring of this member is not set and no basering found");
+            return r==NULL;
+          }
+          else if (RingDependend(nm->typ))
+          {
+            if (al->m[nm->pos].data==NULL)
             {
-              r->ref--;
-              al->m[nm->pos-1].data=NULL;
-              al->m[nm->pos-1].rtyp=DEF_CMD;
+              // NULL belongs to any ring
+              ring r=(ring)al->m[nm->pos-1].data;
+              if (r!=NULL)
+              {
+                r->ref--;
+                al->m[nm->pos-1].data=NULL;
+                al->m[nm->pos-1].rtyp=DEF_CMD;
+              }
+            }
+            else
+            {
+              //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
+              if ((al->m[nm->pos-1].data!=(void *)currRing)
+              &&(al->m[nm->pos-1].data!=(void*)0L))
+              {
+                Werror("different ring %lx(data) - %lx(basering)",
+                  (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
+                return TRUE;
+              }
+            }
+            if ((currRing!=NULL)&&(al->m[nm->pos-1].data==NULL))
+            {
+              // remember the ring, if not already set
+              al->m[nm->pos-1].data=(void *)currRing;
+              al->m[nm->pos-1].rtyp=RING_CMD;
+              currRing->ref++;
             }
           }
+          Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
+          r->start = nm->pos+1;
+          memcpy(res,a1,sizeof(sleftv));
+          memset(a1,0,sizeof(sleftv));
+          if (res->e==NULL) res->e=r;
           else
           {
-            //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
-            if ((al->m[nm->pos-1].data!=(void *)currRing)
-            &&(al->m[nm->pos-1].data!=(void*)0L))
-            {
-              Werror("different ring %lx(data) - %lx(basering)",
-                (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
-              return TRUE;
-            }
+            Subexpr sh=res->e;
+            while (sh->next != NULL) sh=sh->next;
+            sh->next=r;
           }
-          if ((currRing!=NULL)&&(al->m[nm->pos-1].data==NULL))
-          {
-            // remember the ring, if not already set
-            al->m[nm->pos-1].data=(void *)currRing;
-            al->m[nm->pos-1].rtyp=RING_CMD;
-            currRing->ref++;
-          }
+          return FALSE;
         }
-        Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
-        r->start = nm->pos+1;
-        memcpy(res,a1,sizeof(sleftv));
-        memset(a1,0,sizeof(sleftv));
-        if (res->e==NULL) res->e=r;
         else
         {
-          Subexpr sh=res->e;
-          while (sh->next != NULL) sh=sh->next;
-          sh->next=r;
+          WerrorS("name expected");
+          return TRUE;
         }
-        return FALSE;
-      }
-      else
-      {
-        WerrorS("name expected");
-        return TRUE;
       }
     }
+  }
+  else
+  {
+    a=getBlackboxStuff(a2->Typ());
+    lists al=(lists)a2->Data();
+    nt=(newstruct_desc)a->data;
   }
   newstruct_proc p=nt->procs;
   while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
