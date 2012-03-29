@@ -9,8 +9,9 @@ NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
-INCLUDES	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}
 AM_LDFLAGS	= -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${abs_top_builddir}/../omalloc -L${abs_builddir}
+AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}
+
 
 if ENABLE_P_PROCS_STATIC
   USE_P_PROCS_STATIC_CC = templates/p_Procs_Static.cc
@@ -63,7 +64,7 @@ EXTRA_DIST = \
 	templates/p_kBucketSetLm__T.cc templates/p_Minus_mm_Mult_qq__T.cc \
 	templates/p_Merge_q__T.cc templates/p_Add_q__T.cc templates/p_Neg__T.cc
 
-P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
+P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS} -DDYNAMIC_VERSION 
 
 p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
 p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
@@ -132,7 +133,7 @@ libpolys_g_la_SOURCES = ${SOURCES}
 EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
 libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-libpolys_la_CPPFLAGS = ${NODEBUGDEFS}
+libpolys_la_CPPFLAGS = ${NODEBUGDEFS} ${AM_CPPFLAGS}
 
 
 libpolys_la_LIBADD = ${abs_top_builddir}/misc/libmisc.la ${abs_top_builddir}/reporter/libreporter.la ${abs_top_builddir}/coeffs/libcoeffs.la
@@ -148,7 +149,7 @@ noinst_PROGRAMS = templates/p_Procs_Generate
 templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
 templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
-templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC}
+templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
 templates_p_Procs_Generate_LDADD    = -lreporter -lomalloc
 
 

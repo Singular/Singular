@@ -4,6 +4,8 @@ noinst_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
 CXXTEMPLFLAGS =  
 ## -fno-implicit-templates
 
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
+
 libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libcoeffs_g_la_CFLAGS = ${PIPE}
 
@@ -11,8 +13,8 @@ libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libcoeffs_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libcoeffs_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-libcoeffs_g_la_CPPFLAGS = -DHAVE_CONFIG_H
+libcoeffs_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+libcoeffs_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 
 # noinst_HEADERS= \
@@ -20,8 +22,6 @@ libcoeffs_g_la_CPPFLAGS = -DHAVE_CONFIG_H
 #	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
 #	mpr_complex.h mpr_global.h
 
-
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
@@ -85,11 +85,12 @@ test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPL
 
 
 
-test_s_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-test_s_g_CPPFLAGS = -DHAVE_CONFIG_H
+test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-test_d_r_CPPFLAGS = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-test_d_g_CPPFLAGS = -DHAVE_CONFIG_H
+test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
+
 
 
 test_s_r_LDFLAGS = -static

@@ -1,7 +1,10 @@
+CXXTEMPLFLAGS =  
+## -fno-implicit-templates
 noinst_LTLIBRARIES=libreporter.la libreporter_g.la
 # libreporterdir = $(libdir)/singular
 
-CXXTEMPLFLAGS =  ## -fno-implicit-templates
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
+
 
 libreporter_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libreporter_g_la_CFLAGS = ${PIPE}
@@ -10,10 +13,9 @@ libreporter_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libreporter_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libreporter_la_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-libreporter_g_la_CPPFLAGS = -DHAVE_CONFIG_H
+libreporter_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+libreporter_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
 SOURCES  = dError.c reporter.cc
 libreporter_la_SOURCES   = $(SOURCES)
