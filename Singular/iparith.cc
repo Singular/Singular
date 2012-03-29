@@ -7743,13 +7743,19 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     }
 #endif
     int at=a->Typ();
+    int bt=b->Typ();
     if (at>MAX_TOK)
     {
       blackbox *bb=getBlackboxStuff(at);
       if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
       else          return TRUE;
     }
-    int bt=b->Typ();
+    else if (bt>MAX_TOK)
+    {
+      blackbox *bb=getBlackboxStuff(bt);
+      if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
+      else          return TRUE;
+    }
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
     int index=i;
 
