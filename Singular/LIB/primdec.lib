@@ -287,37 +287,10 @@ EXAMPLE: example factor; shows an example
   intvec @v,@w;
   int @j,@k,@n;
 
-  if(deg(p)<=1)
-  {
-    @i=ideal(p);
-    @v=1;
-    @l[1]=@i;
-    @l[2]=@v;
-    return(@l);
-  }
-  if (size(p)==1)
-  {
-    @w=leadexp(p);
-    for(@j=1;@j<=nvars(basering);@j++)
-    {
-      if(@w[@j]!=0)
-      {
-        @k++;
-        @v[@k]=@w[@j];
-        @i=@i+ideal(var(@j));
-      }
-    }
-    @l[1]=@i;
-    @l[2]=@v;
-    return(@l);
-  }
-  //  @l=factorize(p,2);
   @l=factorize(p);
-  // if(npars(basering)>0)
-  // {
     for(@j=1;@j<=size(@l[1]);@j++)
     {
-      if(deg(@l[1][@j])==0)
+      if(leadcoef(@l[1][@j])==@l[1][@j])
       {
         @n++;
       }
@@ -336,7 +309,7 @@ EXAMPLE: example factor; shows an example
         int pleh;
         for(@j=1;@j<=size(@l[1]);@j++)
         {
-          if(deg(@l[1][@j])!=0)
+          if(leadcoef(@l[1][@j])!=@l[1][@j])
           {
             @k++;
             @i=@i+ideal(@l[1][@j]);
