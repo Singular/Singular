@@ -41,7 +41,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
   {
     case '+':
     {
-      if (i2->Typ()==polytopeID)
+      if (i2->Typ()==polytopeID || i2->Typ()==coneID)
       {
         gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
         gfan::ZCone* ms;
@@ -1251,10 +1251,10 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
 BOOLEAN PMminkowskiSum(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == polytopeID))
+  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
   {
     leftv v = u->next;
-    if ((v != NULL) && (v->Typ() == polytopeID))
+    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
