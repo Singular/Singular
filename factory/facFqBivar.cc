@@ -486,8 +486,13 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   TT= copy (factors);
   bool recombination= false;
   CanonicalForm test;
-  CanonicalForm buf0= mulNTL (buf (0, x), LCBuf);
   bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
+  if (!isRat)
+    On (SW_RATIONAL);
+  CanonicalForm buf0= mulNTL (buf (0, x), LCBuf);
+  if (!isRat)
+    Off (SW_RATIONAL);
+  buf0= buf(0,x)*LCBuf;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -557,9 +562,9 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             T= Difference (T, S);
             l -= degree (g);
             M= power (y, l);
+            buf0= mulNTL (buf (0, x), LCBuf);
             if (!isRat)
               Off (SW_RATIONAL);
-            buf0= mulNTL (buf (0, x), LCBuf);
             // compute new possible degree pattern
             bufDegs2= DegreePattern (T);
             bufDegs1.intersect (bufDegs2);
@@ -676,10 +681,15 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
   int d= degree (F), l= 0;
+  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
+  if (!isRat)
+    On (SW_RATIONAL);
   CanonicalForm buf0= mulNTL (buf (0,x), LCBuf);
   CanonicalForm buf1= mulNTL (buf (1,x), LCBuf);
+  if (!isRat)
+    Off (SW_RATIONAL);
   CanonicalForm test0, test1;
-  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
+
   for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
     if (!bufDegs1.find (degree (i.getItem(), 1)) || factorsFoundIndex[l] == 1)
@@ -712,10 +722,10 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
             buf= quot;
             d -= degree (g);
             LCBuf= LC (buf, x);
-            if (!isRat)
-              Off (SW_RATIONAL);
             buf0= mulNTL (buf (0,x), LCBuf);
             buf1= mulNTL (buf (1,x), LCBuf);
+            if (!isRat)
+              Off (SW_RATIONAL);
             T= Difference (T, CFList (i.getItem()));
             F= buf;
 
