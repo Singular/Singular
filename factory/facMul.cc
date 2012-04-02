@@ -2828,19 +2828,19 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
   if (CFFactory::gettype() == GaloisFieldDomain)
     return fdivides (A, B);
   int p= getCharacteristic();
+  if (A.inCoeffDomain() || B.inCoeffDomain())
+  {
+    if (A.inCoeffDomain())
+      return true;
+    else
+      return false;
+  }
   if (p > 0)
   {
     zz_p::init (p);
     Variable alpha;
     if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
     {
-      if (A.inCoeffDomain() || B.inCoeffDomain())
-      {
-        if (A.inCoeffDomain())
-          return true;
-        else
-          return false;
-      }
       zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
       zz_pE::init (NTLMipo);
       zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
