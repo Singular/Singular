@@ -447,7 +447,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
 
     bool success= false;
-    if (LucksWangSparseHeuristic (oldSqrfPartF*power (LC1, factors.length()-1),
+    CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
+    if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
+        LucksWangSparseHeuristic (oldSqrfPartFPowLC,
                                   oldFactors, 1, leadingCoeffs, factors))
     {
       interMedResult= recoverFactors (oldSqrfPartF, factors);
@@ -477,8 +479,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
       CFArray Pi;
       CFList diophant;
-      henselLift122 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
-                     leadingCoeffs, false);
+      nonMonicHenselLift12 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
+                            leadingCoeffs, false);
 
       if (sqrfPartF.level() > 2)
       {
@@ -599,7 +601,11 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   //univariate case
   if (F.isUnivariate())
   {
-    CFList result= conv (factorize (F, v));
+    CFList result;
+    if (v.level() != 1)
+      result= conv (factorize (F, v));
+    else
+      result= conv (factorize (F,true));
     if (result.getFirst().inCoeffDomain())
       result.removeFirst();
     return result;
@@ -650,7 +656,10 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   CFList factors;
   if (A.isUnivariate ())
   {
-    factors= conv (factorize (A, v));
+    if (v.level() != 1)
+      factors= conv (factorize (A, v));
+    else
+      factors= conv (factorize (A,true));
     append (factors, contentAFactors);
     decompress (factors, N);
     return factors;
@@ -873,8 +882,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A /= hh;
 
-  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
-      factors))
+  if (size (A)/getNumVars (A) < 500 &&
+      LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+                                factors))
   {
     int check= factors.length();
     factors= recoverFactors (A, factors);

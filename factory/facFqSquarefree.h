@@ -15,7 +15,7 @@
 #define FAC_FQ_SQUAREFREE_H
 
 #include "assert.h"
-
+#include "fac_sqrfree.h"
 
 /// squarefree factorization over a finite field
 /// @a return a list of squarefree factors with multiplicity
@@ -33,11 +33,36 @@ squarefreeFactorization
 ///
 /// @return a list of squarefree factors with multiplicity
 inline
-CFFList FpSqrf (const CanonicalForm& F ///< [in] a poly
+CFFList FpSqrf (const CanonicalForm& F, ///< [in] a poly
+                bool sort= true         ///< [in] sort factors by exponent?
                )
 {
   Variable a= 1;
-  CFFList result= squarefreeFactorization (F, a);
+  int n= F.level();
+  CanonicalForm cont, bufF= F;
+  CFFList bufResult;
+
+  CFFList result;
+  for (int i= n; i >= 1; i++)
+  {
+    cont= content (bufF, i);
+    bufResult= squarefreeFactorization (cont, a);
+    if (bufResult.getFirst().factor().inCoeffDomain())
+      bufResult.removeFirst();
+    result= Union (result, bufResult);
+    bufF /= cont;
+    if (bufF.inCoeffDomain())
+      break;
+  }
+  if (!bufF.inCoeffDomain())
+  {
+    bufResult= squarefreeFactorization (bufF, a);
+    if (bufResult.getFirst().factor().inCoeffDomain())
+      bufResult.removeFirst();
+    result= Union (result, bufResult);
+  }
+  if (sort)
+    result= sortCFFList (result);
   result.insert (CFFactor (Lc(F), 1));
   return result;
 }
@@ -48,10 +73,35 @@ CFFList FpSqrf (const CanonicalForm& F ///< [in] a poly
 /// @return a list of squarefree factors with multiplicity
 inline
 CFFList FqSqrf (const CanonicalForm& F, ///< [in] a poly
-                const Variable& alpha   ///< [in] algebraic variable
+                const Variable& alpha,  ///< [in] algebraic variable
+                bool sort= true         ///< [in] sort factors by exponent?
                )
 {
-  CFFList result= squarefreeFactorization (F, alpha);
+  int n= F.level();
+  CanonicalForm cont, bufF= F;
+  CFFList bufResult;
+
+  CFFList result;
+  for (int i= n; i >= 1; i++)
+  {
+    cont= content (bufF, i);
+    bufResult= squarefreeFactorization (cont, alpha);
+    if (bufResult.getFirst().factor().inCoeffDomain())
+      bufResult.removeFirst();
+    result= Union (result, bufResult);
+    bufF /= cont;
+    if (bufF.inCoeffDomain())
+      break;
+  }
+  if (!bufF.inCoeffDomain())
+  {
+    bufResult= squarefreeFactorization (bufF, alpha);
+    if (bufResult.getFirst().factor().inCoeffDomain())
+      bufResult.removeFirst();
+    result= Union (result, bufResult);
+  }
+  if (sort)
+    result= sortCFFList (result);
   result.insert (CFFactor (Lc(F), 1));
   return result;
 }
@@ -61,15 +111,13 @@ CFFList FqSqrf (const CanonicalForm& F, ///< [in] a poly
 ///
 /// @return a list of squarefree factors with multiplicity
 inline
-CFFList GFSqrf (const CanonicalForm& F ///< [in] a poly
+CFFList GFSqrf (const CanonicalForm& F, ///< [in] a poly
+                bool sort= true         ///< [in] sort factors by exponent?
                )
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
-  Variable a= 1;
-  CFFList result= squarefreeFactorization (F, a);
-  result.insert (CFFactor (Lc(F), 1));
-  return result;
+  return FpSqrf (F, sort);
 }
 
 /// squarefree part of @a F/g, where g is the product of those squarefree

@@ -91,6 +91,8 @@
 
 #undef HAVE_NTL
 
+#undef HAVE_FLINT
+
 /************** END OF CONFIGURABLE SECTION **************/
 
 #endif /* ! INCL_CONFIG_H */

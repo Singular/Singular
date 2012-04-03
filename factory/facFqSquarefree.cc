@@ -84,7 +84,7 @@ sqrfPosDer (const CanonicalForm & F, const Variable & x,
   while (j < p - 1 && degree(u) >= 0)
   {
     g= gcd (w, u);
-    if (degree(g) > 0)
+    if (!g.inCoeffDomain())
       result.append (CFFactor (g, j));
     w= w/g;
     c= c/w;
@@ -92,7 +92,7 @@ sqrfPosDer (const CanonicalForm & F, const Variable & x,
     u= v - deriv (w, x);
     j++;
   }
-  if (degree(w) > 0)
+  if (!w.inCoeffDomain())
     result.append (CFFactor (w, j));
   return result;
 }
@@ -129,7 +129,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
       {
         found= false;
         CFFListIterator k= tmp2;
-        if (!k.hasItem()) tmp2.append (j.getItem());
+        if (!k.hasItem() && !j.getItem().factor().inCoeffDomain()) tmp2.append (j.getItem());
         else
         {
           for (; k.hasItem(); k++)
@@ -141,7 +141,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
               found= true;
             }
           }
-          if (found == false)
+          if (found == false && !j.getItem().factor().inCoeffDomain())
             tmp2.append(j.getItem());
         }
       }
@@ -169,7 +169,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
       tmp= gcd (i.getItem().factor(), j.getItem().factor());
       i.getItem()= CFFactor (i.getItem().factor()/tmp, i.getItem().exp());
       j.getItem()= CFFactor (j.getItem().factor()/tmp, j.getItem().exp());
-      if (degree (tmp) > 0 && tmp.level() > 0)
+      if (!tmp.inCoeffDomain())
       {
         tmp= M (tmp);
         result.append (CFFactor (tmp/Lc(tmp),
@@ -179,7 +179,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   }
   for (CFFListIterator i= tmp2; i.hasItem(); i++)
   {
-    if (degree (i.getItem().factor()) > 0 && i.getItem().factor().level() >= 0)
+    if (!i.getItem().factor().inCoeffDomain())
     {
       tmp= M (i.getItem().factor());
       result.append (CFFactor (tmp/Lc(tmp), i.getItem().exp()));
@@ -187,7 +187,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   }
   for (CFFListIterator j= tmp1; j.hasItem(); j++)
   {
-    if (degree (j.getItem().factor()) > 0 && j.getItem().factor().level() >= 0)
+    if (!j.getItem().factor().inCoeffDomain())
     {
       tmp= M (j.getItem().factor());
       result.append (CFFactor (tmp/Lc(tmp), j.getItem().exp()*p));

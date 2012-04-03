@@ -39,8 +39,8 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
 ///         element is the leading coefficient.
 inline
 CFList
-ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
-                    const Variable& v        ///< [in] algebraic variable
+ratBiSqrfFactorize (const CanonicalForm & G,        ///< [in] a bivariate poly
+                    const Variable& v= Variable (1) ///< [in] algebraic variable
                    )
 {
   CFMap N;
@@ -49,8 +49,16 @@ ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
-  contentXFactors= factorize (contentX, v);
-  contentYFactors= factorize (contentY, v);
+  if (v.level() != 1)
+  {
+    contentXFactors= factorize (contentX, v);
+    contentYFactors= factorize (contentY, v);
+  }
+  else
+  {
+    contentXFactors= factorize (contentX);
+    contentYFactors= factorize (contentY);
+  }
   if (contentXFactors.getFirst().factor().inCoeffDomain())
     contentXFactors.removeFirst();
   if (contentYFactors.getFirst().factor().inCoeffDomain())
@@ -93,9 +101,9 @@ ratBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 inline
 CFFList
-ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
-                const Variable& v,       ///< [in] algebraic variable
-                bool substCheck= true    ///< [in] enables substitute check
+ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
+                const Variable& v= Variable (1), ///< [in] algebraic variable
+                bool substCheck= true        ///< [in] enables substitute check
                )
 {
   CFMap N;
@@ -147,8 +155,16 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
-  contentXFactors= factorize (contentX, v);
-  contentYFactors= factorize (contentY, v);
+  if (v.level() != 1)
+  {
+    contentXFactors= factorize (contentX, v);
+    contentYFactors= factorize (contentY, v);
+  }
+  else
+  {
+    contentXFactors= factorize (contentX);
+    contentYFactors= factorize (contentY);
+  }
   if (contentXFactors.getFirst().factor().inCoeffDomain())
     contentXFactors.removeFirst();
   if (contentYFactors.getFirst().factor().inCoeffDomain())
@@ -162,6 +178,15 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
     if (isOn (SW_RATIONAL))
     {
       normalize (result);
+      if (v.level() == 1)
+      {
+        for (CFFListIterator i= result; i.hasItem(); i++)
+        {
+          LcF /= bCommonDen (i.getItem().factor());
+          i.getItem()= CFFactor (i.getItem().factor()*
+                       bCommonDen(i.getItem().factor()), i.getItem().exp());
+        }
+      }
       result.insert (CFFactor (LcF, 1));
     }
     return result;
@@ -176,7 +201,8 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
     for (CFListIterator j= tmp; j.hasItem(); j++)
     {
       if (j.getItem().inCoeffDomain()) continue;
-      result.append (CFFactor (N (decompress (j.getItem(), M, S)), i.getItem().exp()));
+      result.append (CFFactor (N (decompress (j.getItem(), M, S)),
+                               i.getItem().exp()));
     }
   }
   result= Union (result, contentXFactors);
@@ -184,6 +210,15 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   if (isOn (SW_RATIONAL))
   {
     normalize (result);
+    if (v.level() == 1)
+    {
+      for (CFFListIterator i= result; i.hasItem(); i++)
+      {
+        LcF /= bCommonDen (i.getItem().factor());
+        i.getItem()= CFFactor (i.getItem().factor()*
+                     bCommonDen(i.getItem().factor()), i.getItem().exp());
+      }
+    }
     result.insert (CFFactor (LcF, 1));
   }
   return result;
@@ -192,6 +227,14 @@ ratBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 /// convert a CFFList to a CFList by dropping the multiplicity
 CFList conv (const CFFList& L ///< [in] a CFFList
             );
+
+modpk
+coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo );
+
+void findGoodPrime(const CanonicalForm &f, int &start);
+
+modpk
+coeffBound ( const CanonicalForm & f, int p );
 
 #endif
 

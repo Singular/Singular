@@ -149,33 +149,16 @@ CFFList FpFactorize (const CanonicalForm& G,///< [in] a multivariate poly
   ExtensionInfo info= ExtensionInfo (false);
   Variable a= Variable (1);
   CanonicalForm LcF= Lc (F);
-  CanonicalForm pthRoot, A;
-  CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, a);
-  CFList buf, bufRoot;
-  CFFList result, resultRoot;
-  int p= getCharacteristic();
-  int l;
-  if (degree (pthRoot) > 0)
+  CFFList sqrf= FpSqrf (F, false);
+  CFFList result;
+  CFList bufResult;
+  sqrf.removeFirst();
+  CFListIterator i;
+  for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
-    pthRoot= maxpthRoot (pthRoot, p, l);
-    result= FpFactorize (pthRoot, false);
-    result.removeFirst();
-    for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
-    result.insert (CFFactor (LcF, 1));
-    return result;
-  }
-  else
-  {
-    buf= multiFactorize (sqrfP, info);
-    A= F/LcF;
-    result= multiplicity (A, buf);
-  }
-  if (degree (A) > 0)
-  {
-    resultRoot= FpFactorize (A, false);
-    resultRoot.removeFirst();
-    result= Union (result, resultRoot);
+    bufResult= multiFactorize (iter.getItem().factor(), info);
+    for (i= bufResult; i.hasItem(); i++)
+      result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
   result.insert (CFFactor (LcF, 1));
   return result;
@@ -243,34 +226,16 @@ CFFList FqFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
 
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CanonicalForm LcF= Lc (F);
-  CanonicalForm pthRoot, A;
-  CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, alpha);
-  CFList buf, bufRoot;
-  CFFList result, resultRoot;
-  int p= getCharacteristic();
-  int q= ipower (p, degree (getMipo (alpha)));
-  int l;
-  if (degree (pthRoot) > 0)
+  CFFList sqrf= FqSqrf (F, alpha, false);
+  CFFList result;
+  CFList bufResult;
+  sqrf.removeFirst();
+  CFListIterator i;
+  for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
-    pthRoot= maxpthRoot (pthRoot, q, l);
-    result= FqFactorize (pthRoot, alpha, false);
-    result.removeFirst();
-    for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
-    result.insert (CFFactor (LcF, 1));
-    return result;
-  }
-  else
-  {
-    buf= multiFactorize (sqrfP, info);
-    A= F/LcF;
-    result= multiplicity (A, buf);
-  }
-  if (degree (A) > 0)
-  {
-    resultRoot= FqFactorize (A, alpha, false);
-    resultRoot.removeFirst();
-    result= Union (result, resultRoot);
+    bufResult= multiFactorize (iter.getItem().factor(), info);
+    for (i= bufResult; i.hasItem(); i++)
+      result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
   result.insert (CFFactor (LcF, 1));
   return result;
@@ -340,34 +305,16 @@ CFFList GFFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
   Variable a= Variable (1);
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   CanonicalForm LcF= Lc (F);
-  CanonicalForm pthRoot, A;
-  CanonicalForm sqrfP= sqrfPart (F/LcF, pthRoot, a);
-  CFList buf;
-  CFFList result, resultRoot;
-  int p= getCharacteristic();
-  int q= ipower (p, getGFDegree());
-  int l;
-  if (degree (pthRoot) > 0)
+  CFFList sqrf= GFSqrf (F, false);
+  CFFList result;
+  CFList bufResult;
+  sqrf.removeFirst();
+  CFListIterator i;
+  for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
-    pthRoot= maxpthRoot (pthRoot, q, l);
-    result= GFFactorize (pthRoot, false);
-    result.removeFirst();
-    for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
-    result.insert (CFFactor (LcF, 1));
-    return result;
-  }
-  else
-  {
-    buf= multiFactorize (sqrfP, info);
-    A= F/LcF;
-    result= multiplicity (A, buf);
-  }
-  if (degree (A) > 0)
-  {
-    resultRoot= GFFactorize (A, false);
-    resultRoot.removeFirst();
-    result= Union (result, resultRoot);
+    bufResult= multiFactorize (iter.getItem().factor(), info);
+    for (i= bufResult; i.hasItem(); i++)
+      result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
   result.insert (CFFactor (LcF, 1));
   return result;
@@ -704,24 +651,6 @@ gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
               CFFList& factors2  ///< [in,out] list of factors, returns gcd free
                                  ///< factors
              );
-
-/// heuristic algorithm for lifting sparse polynomials
-///
-/// @return a list of factors of A, possibly incomplete
-CFList
-sparseHeuristic (const CanonicalForm& A,  ///<[in] polynomial to be factored
-                 const CFList& biFactors, ///<[in] list of bivariate factors wrt
-                                          ///< Variable 1 and 2
-                 CFList*& moreBiFactors,  ///<[in,out] more bivariate factors
-                                          ///< wrt different second variables.
-                                          ///< May be recombined s.t. there are
-                                          ///< only minFactorsLength factors and
-                                          ///< resorted s.t. the sequence of
-                                          ///< univariate factors in biFactors
-                                          ///< and moreBiFactors coincides 
-                 const CFList& evaluation,///<[in] evaluation point
-                 int minFactorsLength     ///<[in] minimal number of factors
-                );
 
 /// evaluate @a F at @a evaluation
 ///
