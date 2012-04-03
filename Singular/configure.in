@@ -1080,7 +1080,7 @@ ac_cv_have_readline="no"
       ac_cv_have_readline="yes"
     fi
   fi
-  if test "$ac_cv_have_readline" = yes; then
+  if test "$ac_cv_lib_readline_completion_matches" = yes; then
     AC_DEFINE(HAVE_READLINE)
   fi
 AC_LANG_RESTORE
@@ -1090,8 +1090,9 @@ AC_MSG_CHECKING(which readline to use)
 if test "$ac_cv_with_readline" = dynamic; then
   AC_MSG_RESULT(dynamic)
   AC_DEFINE(HAVE_DYN_RL)
-elif test "$ac_cv_have_readline" = yes; then
+elif test "$ac_cv_lib_readline_completion_matches" = yes; then
   AC_MSG_RESULT(static)
+  AC_DEFINE(HAVE_READLINE)
 elif test "$ac_cv_singuname" = PowerMacintosh-darwin; then
   AC_MSG_ERROR(building without readline impossible on PowerMacintosh-darwin)
 else

@@ -8088,7 +8088,7 @@ $as_echo "$ac_cv_have_readline" >&6; }
       ac_cv_have_readline="yes"
     fi
   fi
-  if test "$ac_cv_have_readline" = yes; then
+  if test "$ac_cv_lib_readline_completion_matches" = yes; then
     $as_echo "#define HAVE_READLINE 1" >>confdefs.h
 
   fi
@@ -8107,9 +8107,10 @@ if test "$ac_cv_with_readline" = dynamic; then
 $as_echo "dynamic" >&6; }
   $as_echo "#define HAVE_DYN_RL 1" >>confdefs.h
 
-elif test "$ac_cv_have_readline" = yes; then
+elif test "$ac_cv_lib_readline_completion_matches" = yes; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: static" >&5
 $as_echo "static" >&6; }
+  $as_echo "#define HAVE_READLINE 1" >>confdefs.h
 elif test "$ac_cv_singuname" = PowerMacintosh-darwin; then
   as_fn_error $? "building without readline impossible on PowerMacintosh-darwin" "$LINENO" 5
 else
