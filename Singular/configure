@@ -7823,9 +7823,9 @@ return completion_matches ();
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_readline_completion_matchese=yes
+  ac_cv_lib_readline_completion_matches=yes
 else
-  ac_cv_lib_readline_completion_matchese=no
+  ac_cv_lib_readline_completion_matches=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
