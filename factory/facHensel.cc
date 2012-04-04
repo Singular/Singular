@@ -439,8 +439,6 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
         k.getItem() += g.mapinto()*modulus;
         e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
         e= b(e);
-        DEBOUTLN (cerr, "mod (e, power (y, i + 1))= " <<
-                  mod (e, power (y, i + 1)));
       }
     }
     modulus *= p;
@@ -637,8 +635,6 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
           e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
         }
         e= b(e);
-        DEBOUTLN (cerr, "mod (e, power (y, i + 1))= " <<
-                  mod (e, power (y, i + 1)));
       }
     }
     modulus *= p;
@@ -1202,7 +1198,7 @@ multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
     j= p;
     for (CFListIterator i= result; i.hasItem(); i++, j++)
       test += mod (i.getItem()*j.getItem(), power (y, d));
-    DEBOUTLN (cerr, "test= " << test);
+    DEBOUTLN (cerr, "test in multiRecDiophantine= " << test);
 #endif
   return result;
 }
@@ -1232,7 +1228,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     CanonicalForm test2= mod (F-test, xToJ);
 
     test2= mod (test2, MOD);
-    DEBOUTLN (cerr, "test= " << test2);
+    DEBOUTLN (cerr, "test in henselStep= " << test2);
 #endif
   }
   else
@@ -1249,7 +1245,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     test= mod (test, power (x, j));
     test= mod (test, MOD);
     CanonicalForm test2= mod (F, power (x, j - 1)) - mod (test, power (x, j-1));
-    DEBOUTLN (cerr, "test= " << test2);
+    DEBOUTLN (cerr, "test in henselStep= " << test2);
 #endif
 
     if (degree (Pi [factors.length() - 2], x) > 0)
@@ -1984,7 +1980,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
     test= mod (test, power (x, j));
     test= mod (test, MOD);
     CanonicalForm test2= mod (F, power (x, j - 1)) - mod (test, power (x, j-1));
-    DEBOUTLN (cerr, "test= " << test2);
+    DEBOUTLN (cerr, "test in nonMonicHenselStep= " << test2);
 #endif
 
   if (degree (Pi [factors.length() - 2], x) > 0)

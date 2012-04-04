@@ -501,8 +501,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
       bufUniFactors= conv (factorize (bufAeval, true));
     TIMING_END_AND_PRINT (uni_factorize,
                           "time for univariate factorization: ");
-    DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
-              (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
+    DEBOUTLN (cerr, "prod (bufUniFactors)== bufAeval " <<
+              (prod (bufUniFactors) == bufAeval));
 
     TIMING_START (uni_factorize);
     if (extension)
@@ -511,8 +511,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
       bufUniFactors2= conv (factorize (bufAeval2, true));
     TIMING_END_AND_PRINT (uni_factorize,
                           "time for univariate factorization in y: ");
-    DEBOUTLN (cerr, "Lc (Aeval2)*prod (uniFactors2)== Aeval2 " <<
-              (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
+    DEBOUTLN (cerr, "prod (bufuniFactors2)== bufAeval2 " <<
+              (prod (bufUniFactors2) == bufAeval2));
 
     if (bufUniFactors.getFirst().inCoeffDomain())
       bufUniFactors.removeFirst();
