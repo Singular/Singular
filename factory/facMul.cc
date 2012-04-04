@@ -2421,7 +2421,6 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
            M)
 {
   ASSERT (getCharacteristic() > 0, "positive characteristic expected");
-  ASSERT (CFFactory::gettype() != GaloisFieldDomain, "no GF expected");
 
   CanonicalForm A= mod (F, M);
   CanonicalForm B= mod (G, M);
@@ -2574,7 +2573,6 @@ void divrem21 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     R= A;
     return;
   }
-  ASSERT (2*degB > degA, "expected degree (F, 1) < 2*degree (G, 1)");
   if (degB < 1)
   {
     divrem (A, B, Q, R);
@@ -2582,8 +2580,8 @@ void divrem21 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     R= mod (R, M);
     return;
   }
-
   int m= (int) ceil ((double) (degB + 1)/2.0) + 1;
+  ASSERT (4*m >= degA, "expected degree (F, 1) < 2*degree (G, 1)");
   CFList splitA= split (A, m, x);
   if (splitA.length() == 3)
     splitA.insert (0);
@@ -2646,7 +2644,6 @@ void divrem32 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     R= A;
     return;
   }
-  ASSERT (3*(degB/2) > degA, "expected degree (F, 1) < 3*(degree (G, 1)/2)");
   if (degB < 1)
   {
     divrem (A, B, Q, R);
@@ -2655,7 +2652,7 @@ void divrem32 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     return;
   }
   int m= (int) ceil ((double) (degB + 1)/ 2.0);
-
+  ASSERT (3*m > degA, "expected degree (F, 1) < 3*degree (G, 1)");
   CFList splitA= split (A, m, x);
   CFList splitB= split (B, m, x);
 
