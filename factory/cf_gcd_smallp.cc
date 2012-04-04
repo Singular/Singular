@@ -3986,7 +3986,7 @@ Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
 
   Evaluation result= Evaluation (A.min(), A.max());
   ASSERT (A.min() == 2, "expected A.min() == 2");
-  ASSERT (A.max() == n, "expected A.max() == n");
+  ASSERT (A.max() >= n, "expected A.max() >= n");
   int max_deg;
   int k= n;
   int l= 1;

@@ -143,7 +143,8 @@ CFList
 uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 {
   Variable x= A.mvar();
-  ASSERT (A.isUnivariate(), "univariate polynomial expected");
+  ASSERT (A.isUnivariate() || A.inCoeffDomain(), 
+          "univariate polynomial expected or constant expected");
   CFFList factorsA;
   ZZ p= to_ZZ (getCharacteristic());
   ZZ_p::init (p);
