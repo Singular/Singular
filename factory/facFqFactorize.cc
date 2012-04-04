@@ -2792,8 +2792,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       A= A.mapinto();
       factors= multiFactorize (A, info);
 
-      Variable vBuf= rootOf (gf_mipo);
+      CanonicalForm mipo= gf_mipo;
       setCharacteristic (getCharacteristic());
+      Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
     }
@@ -2872,8 +2873,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (pow ((double) p, (double) extensionDeg) < (1<<16))
       // pass to GF(p^k+1)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         setCharacteristic (p, extensionDeg, 'Z');
         ExtensionInfo info= ExtensionInfo (extension);
@@ -2881,8 +2883,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to another GF, pass to F_p(\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info= ExtensionInfo (v, extension);
@@ -2901,8 +2904,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to GF (p^2k), pass to F_p (\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable v1= rootOf (gf_mipo);
+        Variable v1= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, v1);
         Variable v2= chooseExtension (v1, v1, k);
         CanonicalForm primElem, imPrimElem;

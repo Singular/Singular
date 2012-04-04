@@ -673,7 +673,6 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     mipo /= mipo.lc();
     // here: mipo is monic
     tryBrownGCD( mapinto(f), mapinto(g), mipo, Dp, fail );
-    setCharacteristic(0);
     if( fail ) // mipo splits in char p
       continue;
     if( Dp.inCoeffDomain() ) // early termination
@@ -683,8 +682,10 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
         continue;
       setReduce(a,true);
       if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
+      setCharacteristic(0);
       return CanonicalForm(1);
     }
+    setCharacteristic(0);
     // here: Dp NOT inCoeffDomain
     for(int i=1; i<=mv; i++)
       other[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)

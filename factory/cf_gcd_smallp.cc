@@ -4364,8 +4364,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       On (SW_USE_EZGCD_P);
       if (passToGF)
       {
-        Variable alpha= rootOf (gf_mipo);
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
+        Variable alpha= rootOf (mipo.mapinto());
         result= GF2FalphaRep (result, alpha);
       }
       if (k > 1)
@@ -4397,8 +4398,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         On (SW_USE_EZGCD_P);
         if (passToGF)
         {
-          Variable alpha= rootOf (gf_mipo);
+          CanonicalForm mipo= gf_mipo;
           setCharacteristic (p);
+          Variable alpha= rootOf (mipo.mapinto());
           result= GF2FalphaRep (result, alpha);
         }
         if (k > 1)
@@ -4438,8 +4440,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         {
           if (passToGF)
           {
-            Variable alpha= rootOf (gf_mipo);
+            CanonicalForm mipo= gf_mipo;
             setCharacteristic (p);
+            Variable alpha= rootOf (mipo.mapinto());
             F= GF2FalphaRep (F, alpha);
           }
           if (k > 1)
@@ -4460,8 +4463,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         {
           if (passToGF)
           {
-            Variable alpha= rootOf (gf_mipo);
+            CanonicalForm mipo= gf_mipo;
             setCharacteristic (p);
+            Variable alpha= rootOf (mipo.mapinto());
             G= GF2FalphaRep (G, alpha);
           }
           if (k > 1)
@@ -4514,8 +4518,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         On (SW_USE_EZGCD_P);
         if (passToGF)
         {
-          Variable alpha= rootOf (gf_mipo);
+          CanonicalForm mipo= gf_mipo;
           setCharacteristic (p);
+          Variable alpha= rootOf (mipo.mapinto());
           result= GF2FalphaRep (result, alpha);
         }
         if (k > 1)
@@ -4544,8 +4549,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           result= GCD_GF (F, G);
           if (passToGF)
           {
-            Variable alpha= rootOf (gf_mipo);
+            CanonicalForm mipo= gf_mipo;
             setCharacteristic (p);
+            Variable alpha= rootOf (mipo.mapinto());
             result= GF2FalphaRep (result, alpha);
           }
           if (k > 1)
@@ -4568,8 +4574,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         On (SW_USE_EZGCD_P);
         if (passToGF)
         {
-          Variable alpha= rootOf (gf_mipo);
+          CanonicalForm mipo= gf_mipo;
           setCharacteristic (p);
+          Variable alpha= rootOf (mipo.mapinto());
           result= GF2FalphaRep (result, alpha);
         }
         if (k > 1)
@@ -4589,8 +4596,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 
         if (passToGF && gcdfound)
         {
-          Variable alpha= rootOf (gf_mipo);
+          CanonicalForm mipo= gf_mipo;
           setCharacteristic (p);
+          Variable alpha= rootOf (mipo.mapinto());
           cand= GF2FalphaRep (cand, alpha);
         }
         if (k > 1 && gcdfound)
