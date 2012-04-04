@@ -16,6 +16,7 @@
 #include "cf_iter.h"
 #include "templates/ftmpl_functions.h"
 #include "gfops.h"
+#include "cf_factory.h"
 
 
 DegreePattern::DegreePattern (const CFList& l)
@@ -29,8 +30,13 @@ DegreePattern::DegreePattern (const CFList& l)
 
   Variable x= Variable (1);
   int p= getCharacteristic();
-  int d= getGFDegree();
-  char cGFName= gf_name;
+  int d= 0;
+  char cGFName;
+  if (CFFactory::gettype() == GaloisFieldDomain)
+  {
+    d= getGFDegree();
+    cGFName= gf_name;
+  }
   setCharacteristic(0);
   CanonicalForm buf= 1;
   CFListIterator k= l;
