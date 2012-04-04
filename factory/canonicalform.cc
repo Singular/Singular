@@ -1315,7 +1315,13 @@ CanonicalForm::ilog2 () const
         ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
         int a = imm2int( value );
         ASSERT( a > 0, "arg to ilog2() less or equal zero" );
-        return ::ilog2(a);
+        int n = -1;
+        while ( a > 0 )
+        {
+          n++;
+          a /=2;
+        }
+        return n;
     }
     else
         return value->ilog2();
