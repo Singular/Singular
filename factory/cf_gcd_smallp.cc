@@ -722,8 +722,12 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
     }
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable (G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 == 0)
     {
       if (substitute > 1)
@@ -742,8 +746,12 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     (gcdlcAlcB(random_element, x)/uni_lcoeff (G_random_element))
     * G_random_element;
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable(G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 <  d)
     {
       m= gcdlcAlcB;
@@ -995,8 +1003,12 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
     }
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable (G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 == 0)
     {
       if (inextension)
@@ -1027,8 +1039,11 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     G_random_element=
     (gcdlcAlcB(random_element, x)/uni_lcoeff(G_random_element)) *
      G_random_element;
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable (G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
 
     if (d0 < d)
     {
@@ -1354,8 +1369,11 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
     }
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable (G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
 
     if (d0 == 0)
     {
@@ -1375,8 +1393,11 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
                        *G_random_element;
 
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable(G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
 
     if (d0 <  d)
     {
@@ -2988,8 +3009,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
     }
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable (G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 == 0)
     {
       if (substitute > 1)
@@ -3009,8 +3034,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     * G_random_element;
 
     skeleton= G_random_element;
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable(G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 <  d)
     {
       m= gcdlcAlcB;
@@ -3166,8 +3195,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "G_random_element= " << G_random_element);
         }
 
-        d0= totaldegree (G_random_element, Variable(2),
-                        Variable (G_random_element.level()));
+        if (!G_random_element.inCoeffDomain())
+          d0= totaldegree (G_random_element, Variable(2),
+                           Variable (G_random_element.level()));
+        else
+          d0= 0;
+
         if (d0 == 0)
         {
           if (substitute > 1)
@@ -3186,8 +3219,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
         (gcdlcAlcB(random_element, x)/uni_lcoeff (G_random_element))
         * G_random_element;
 
-        d0= totaldegree (G_random_element, Variable(2),
-                        Variable(G_random_element.level()));
+        if (!G_random_element.inCoeffDomain())
+          d0= totaldegree (G_random_element, Variable(2),
+                          Variable (G_random_element.level()));
+        else
+          d0= 0;
+
         if (d0 <  d)
         {
           m= gcdlcAlcB;
@@ -3473,8 +3510,12 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
     }
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable (G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 == 0)
     {
       if (substitute > 1)
@@ -3495,8 +3536,12 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 
     skeleton= G_random_element;
 
-    d0= totaldegree (G_random_element, Variable(2),
-                     Variable(G_random_element.level()));
+    if (!G_random_element.inCoeffDomain())
+      d0= totaldegree (G_random_element, Variable(2),
+                       Variable (G_random_element.level()));
+    else
+      d0= 0;
+
     if (d0 <  d)
     {
       m= gcdlcAlcB;
@@ -3689,8 +3734,12 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
         if (sparseFail)
           break;
 
-        d0= totaldegree (G_random_element, Variable(2),
-                        Variable (G_random_element.level()));
+        if (!G_random_element.inCoeffDomain())
+          d0= totaldegree (G_random_element, Variable(2),
+                           Variable (G_random_element.level()));
+        else
+          d0= 0;
+
         if (d0 == 0)
         {
           if (substitute > 1)
@@ -3709,8 +3758,12 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
         (gcdlcAlcB(random_element, x)/uni_lcoeff (G_random_element))
         * G_random_element;
 
-        d0= totaldegree (G_random_element, Variable(2),
-                        Variable(G_random_element.level()));
+        if (!G_random_element.inCoeffDomain())
+          d0= totaldegree (G_random_element, Variable(2),
+                           Variable (G_random_element.level()));
+        else
+          d0= 0;
+
         if (d0 <  d)
         {
           m= gcdlcAlcB;
