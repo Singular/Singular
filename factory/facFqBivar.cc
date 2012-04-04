@@ -268,7 +268,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   }
 
   DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, M) == F " <<
-            (LC (F, 1)*prodMod (factors, M) == F));
+            (mod (LC (F, 1)*prodMod (factors, M), M)/Lc (mod (LC (F, 1)*prodMod (factors, M), M)) == F/Lc (F)));
   int degMipoBeta= 1;
   if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
@@ -463,8 +463,14 @@ factorRecombination (CFList& factors, CanonicalForm& F,
     F= 1;
     return result;
   }
-  DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
-            (LC (F, 1)*prodMod (factors, N) == F));
+#ifdef DEBUGOUTPUT
+  if (b.getp() == 0)
+    DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+              (mod (LC (F, 1)*prodMod (factors, N),N)/Lc (mod (LC (F, 1)*prodMod (factors, N),N)) == F/Lc(F)));
+  else
+    DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+              (mod (b(LC (F, 1)*prodMod (factors, N)),N)/Lc (mod (b(LC (F, 1)*prodMod (factors, N)),N)) == F/Lc(F)));
+#endif
   CFList T, S;
 
   CanonicalForm M= N;
@@ -5816,7 +5822,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       bufUniFactors2= uniFactorizer (bufAeval2, alpha, GF);
       TIMING_END_AND_PRINT (fac_uni_factorizer,
                             "time for univariate factorization in y: ");
-      DEBOUTLN (cerr, "Lc (Aeval2)*prod (uniFactors2)== Aeval2 " <<
+      DEBOUTLN (cerr, "Lc (bufAeval2)*prod (bufUniFactors2)== bufAeval2 " <<
                 (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
     }
 
