@@ -1260,7 +1260,8 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
       g= gcd (iter2.getItem(), content);
       if (degree (g) > 0)
       {
-        iter2.getItem() /= tmp;
+        if (!tmp.isZero())
+          iter2.getItem() /= tmp;
         content /= g;
         iter1.getItem() *= g;
       }
