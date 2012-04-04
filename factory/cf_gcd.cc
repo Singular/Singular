@@ -294,6 +294,18 @@ icontent ( const CanonicalForm & f )
 CanonicalForm
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
+  if (f.isZero())
+  {
+    a= 0;
+    b= 1;
+    return g;
+  }
+  else if (g.isZero())
+  {
+    a= 1;
+    b= 0;
+    return f;
+  }
 #ifdef HAVE_NTL
   if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
