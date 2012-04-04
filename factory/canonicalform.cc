@@ -1847,7 +1847,7 @@ power ( const CanonicalForm & f, int n )
 CanonicalForm
 power ( const Variable & v, int n )
 {
-    ASSERT( n >= 0, "illegal exponent" );
+    //ASSERT( n >= 0, "illegal exponent" );
     if ( n == 0 )
         return 1;
     else  if ( n == 1 )

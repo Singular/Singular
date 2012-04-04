@@ -221,8 +221,6 @@ CanonicalForm::CanonicalForm ( const Variable & v )
 // Variables of level `LEVELBASE' are transformed to one from the
 // current domain.
 //
-// `e' has to be positive.
-//
 // Type info:
 // ----------
 // v: Anything
@@ -232,7 +230,7 @@ CF_INLINE
 CanonicalForm::CanonicalForm ( const Variable & v, int e )
     : value( CFFactory::poly( v, e ) )
 {
-    ASSERT( e > 0, "math error: exponent has to be positive" );
+    //ASSERT( e > 0, "math error: exponent has to be positive" );
 }
 //}}}
 
