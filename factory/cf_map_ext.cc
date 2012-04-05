@@ -282,7 +282,7 @@ CanonicalForm mapUp (const CanonicalForm& F, const CanonicalForm& G,
       counter++;
       if (buf == buf2) break;
     }
-    ASSERT (counter >= bound, "alpha is not primitive");
+    ASSERT (counter <= bound, "alpha is not primitive");
     if (pos == 0)
     {
       H_power= buf*power (H, counter);
