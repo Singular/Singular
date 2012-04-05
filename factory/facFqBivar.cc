@@ -143,20 +143,22 @@ CFList
 uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 {
   Variable x= A.mvar();
-  ASSERT (A.isUnivariate(), "univariate polynomial expected");
+  ASSERT (A.isUnivariate() || A.inCoeffDomain(), 
+          "univariate polynomial expected or constant expected");
   CFFList factorsA;
   ZZ p= to_ZZ (getCharacteristic());
   ZZ_p::init (p);
   if (GF)
   {
-    Variable beta= rootOf (gf_mipo);
     int k= getGFDegree();
     char cGFName= gf_name;
+    CanonicalForm mipo= gf_mipo;
     setCharacteristic (getCharacteristic());
+    Variable beta= rootOf (mipo.mapinto());
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (gf_mipo);
+      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (mipo.mapinto());
       ZZ_pE::init (NTLMipo);
       ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (buf, NTLMipo);
       MakeMonic (NTLA);
@@ -167,7 +169,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     }
     else
     {
-      GF2X NTLMipo= convertFacCF2NTLGF2X (gf_mipo);
+      GF2X NTLMipo= convertFacCF2NTLGF2X (mipo.mapinto());
       GF2E::init (NTLMipo);
       GF2EX NTLA= convertFacCF2NTLGF2EX (buf, NTLMipo);
       MakeMonic (NTLA);
@@ -268,7 +270,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   }
 
   DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, M) == F " <<
-            (LC (F, 1)*prodMod (factors, M) == F));
+            (mod (LC (F, 1)*prodMod (factors, M), M)/Lc (mod (LC (F, 1)*prodMod (factors, M), M)) == F/Lc (F)));
   int degMipoBeta= 1;
   if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
@@ -463,8 +465,14 @@ factorRecombination (CFList& factors, CanonicalForm& F,
     F= 1;
     return result;
   }
-  DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
-            (LC (F, 1)*prodMod (factors, N) == F));
+#ifdef DEBUGOUTPUT
+  if (b.getp() == 0)
+    DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+              (mod (LC (F, 1)*prodMod (factors, N),N)/Lc (mod (LC (F, 1)*prodMod (factors, N),N)) == F/Lc(F)));
+  else
+    DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+              (mod (b(LC (F, 1)*prodMod (factors, N)),N)/Lc (mod (b(LC (F, 1)*prodMod (factors, N)),N)) == F/Lc(F)));
+#endif
   CFList T, S;
 
   CanonicalForm M= N;
@@ -5816,7 +5824,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       bufUniFactors2= uniFactorizer (bufAeval2, alpha, GF);
       TIMING_END_AND_PRINT (fac_uni_factorizer,
                             "time for univariate factorization in y: ");
-      DEBOUTLN (cerr, "Lc (Aeval2)*prod (uniFactors2)== Aeval2 " <<
+      DEBOUTLN (cerr, "Lc (bufAeval2)*prod (bufUniFactors2)== bufAeval2 " <<
                 (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
     }
 
@@ -6176,8 +6184,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       ExtensionInfo info2= ExtensionInfo (extension);
       factors= biFactorize (A, info2);
 
-      Variable vBuf= rootOf (gf_mipo);
+      CanonicalForm mipo= gf_mipo;
       setCharacteristic (getCharacteristic());
+      Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
     }
@@ -6256,8 +6265,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (ipower (p, extensionDeg) < (1<<16))
       // pass to GF(p^k+1)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         setCharacteristic (p, extensionDeg, 'Z');
         ExtensionInfo info2= ExtensionInfo (extension);
@@ -6265,8 +6275,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to another GF, pass to F_p(\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info2= ExtensionInfo (v, extension);
@@ -6285,8 +6296,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to GF (p^2k), pass to F_p (\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable v1= rootOf (gf_mipo);
+        Variable v1= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, v1);
         Variable v2= chooseExtension (v1, v1, k);
         CanonicalForm primElem, imPrimElem;

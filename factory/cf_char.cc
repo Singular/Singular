@@ -72,7 +72,7 @@ int getExp()
 
 int getGFDegree()
 {
-    ASSERT( theDegree > 0, "not in GF(q)" );
+    //ASSERT( theDegree > 0, "not in GF(q)" );
     return theDegree;
 }
 
