@@ -80,6 +80,7 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f,zz_pX mipo);
 CanonicalForm convertNTLzzpE2CF(zz_pE f, Variable x);
 CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha);
 CanonicalForm convertNTLzz_pEX2CF(zz_pEX f, Variable x, Variable alpha);
+CanonicalForm convertNTLZZ_pEX2CF(ZZ_pEX f, Variable x, Variable alpha);
 
 mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m);
 CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m);

@@ -19,10 +19,10 @@ static CanonicalForm mappksymmetric ( const CanonicalForm& );
 
 modpk::modpk()
 {
-    p = 3;
-    k = 1;
-    pk = power( CanonicalForm( p ), k );
-    pkhalf = pk / 2;
+    p = 0;
+    k = 0;
+    pk = 1;
+    pkhalf = 0;
 }
 
 modpk::modpk( int q, int l )
