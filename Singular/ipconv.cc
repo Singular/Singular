@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -277,8 +276,13 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
         output->name=omStrDup(IDID((idhdl)(input->data)));
       else if (input->name!=NULL)
       {
-        output->name=input->name;
-        input->name=NULL;
+        if (input->rtyp==ALIAS_CMD)
+          output->name=omStrDup(input->name);
+        else
+        {
+          output->name=input->name;
+          input->name=NULL;
+        }
       }
       else if ((input->rtyp==POLY_CMD) && (input->name==NULL))
       {
