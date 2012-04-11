@@ -7797,9 +7797,9 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for completion_matches in -lreadline" >&5
-$as_echo_n "checking for completion_matches in -lreadline... " >&6; }
-if ${ac_cv_lib_readline_completion_matches+:} false; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for rl_completion_matches in -lreadline" >&5
+$as_echo_n "checking for rl_completion_matches in -lreadline... " >&6; }
+if ${ac_cv_lib_readline_rl_completion_matches+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -7813,27 +7813,27 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char completion_matches ();
+char rl_completion_matches ();
 int
 main ()
 {
-return completion_matches ();
+return rl_completion_matches ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_readline_completion_matches=yes
+  ac_cv_lib_readline_rl_completion_matches=yes
 else
-  ac_cv_lib_readline_completion_matches=no
+  ac_cv_lib_readline_rl_completion_matches=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_completion_matches" >&5
-$as_echo "$ac_cv_lib_readline_completion_matches" >&6; }
-if test "x$ac_cv_lib_readline_completion_matches" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_rl_completion_matches" >&5
+$as_echo "$ac_cv_lib_readline_rl_completion_matches" >&6; }
+if test "x$ac_cv_lib_readline_rl_completion_matches" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBREADLINE 1
 _ACEOF
@@ -8088,7 +8088,7 @@ $as_echo "$ac_cv_have_readline" >&6; }
       ac_cv_have_readline="yes"
     fi
   fi
-  if test "$ac_cv_lib_readline_completion_matches" = yes; then
+  if test "$ac_cv_lib_readline_rl_completion_matches" = yes; then
     $as_echo "#define HAVE_READLINE 1" >>confdefs.h
 
   fi
@@ -8107,7 +8107,7 @@ if test "$ac_cv_with_readline" = dynamic; then
 $as_echo "dynamic" >&6; }
   $as_echo "#define HAVE_DYN_RL 1" >>confdefs.h
 
-elif test "$ac_cv_lib_readline_completion_matches" = yes; then
+elif test "$ac_cv_lib_readline_rl_completion_matches" = yes; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: static" >&5
 $as_echo "static" >&6; }
   $as_echo "#define HAVE_READLINE 1" >>confdefs.h
