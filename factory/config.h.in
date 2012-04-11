@@ -66,6 +66,9 @@
 /* Define if NTL is installed */
 #undef HAVE_NTL
 
+/* Define if FLINT is installed */
+#undef FLINT
+
 /* omalloc support */
 #undef HAVE_OMALLOC
 

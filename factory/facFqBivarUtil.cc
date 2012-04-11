@@ -15,6 +15,7 @@
 #include "config.h"
 
 #include "cf_map.h"
+#include "algext.h"
 #include "cf_map_ext.h"
 #include "templates/ftmpl_functions.h"
 #include "ExtensionInfo.h"
@@ -26,6 +27,7 @@
 #include "facFqBivarUtil.h"
 #include "cfNewtonPolygon.h"
 #include "facHensel.h"
+#include "facMul.h"
 
 
 void append (CFList& factors1, const CFList& factors2)
@@ -546,8 +548,8 @@ writeInMatrix (CFMatrix& M, const CFArray& A, const int column,
                const int startIndex
               )
 {
-  ASSERT (A.size () - startIndex > 0, "wrong starting index");
-  ASSERT (A.size () - startIndex == M.rows(), "wrong starting index");
+  ASSERT (A.size () - startIndex >= 0, "wrong starting index");
+  ASSERT (A.size () - startIndex <= M.rows(), "wrong starting index");
   ASSERT (column > 0 && column <= M.columns(), "wrong column");
   if (A.size() - startIndex <= 0) return;
   int j= 1;
@@ -557,7 +559,7 @@ writeInMatrix (CFMatrix& M, const CFArray& A, const int column,
 
 CFArray getCoeffs (const CanonicalForm& F, const int k)
 {
-  ASSERT (F.isUnivariate(), "univariate input expected");
+  ASSERT (F.isUnivariate() || F.inCoeffDomain(), "univariate input expected");
   if (degree (F, 2) < k)
     return CFArray();
 
@@ -580,7 +582,7 @@ CFArray getCoeffs (const CanonicalForm& F, const int k)
 
 CFArray getCoeffs (const CanonicalForm& F, const int k, const Variable& alpha)
 {
-  ASSERT (F.isUnivariate(), "univariate input expected");
+  ASSERT (F.isUnivariate() || F.inCoeffDomain(), "univariate input expected");
   if (degree (F, 2) < k)
     return CFArray ();
 
@@ -623,7 +625,7 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
            const Variable& alpha, const CanonicalForm& evaluation,
            const mat_zz_p& M)
 {
-  ASSERT (G.isUnivariate(), "univariate input expected");
+  ASSERT (G.isUnivariate() || G.inCoeffDomain(), "univariate input expected");
   CanonicalForm F= G (G.mvar() - evaluation, G.mvar());
   if (F.isZero())
     return CFArray ();

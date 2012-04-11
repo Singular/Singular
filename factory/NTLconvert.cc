@@ -83,24 +83,7 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
     }
     NTLcurrentExp=i.exp();
 
-    CanonicalForm c=i.coeff();
-    if (!c.isImm()) c=c.mapinto(); //c%= getCharacteristic();
-    if (!c.isImm())
-    {  //This case will never happen if the characteristic is in fact a prime
-       // number, since all coefficients are represented as immediates
-       #ifndef NOSTREAMIO
-       cout<<"convertFacCF2NTLZZ_pX: coefficient not immediate! : "<<f<<"\n";
-       #else
-       //NTL_SNS
-       printf("convertFacCF2NTLZZ_pX: coefficient not immediate!, char=%d\n",
-              getCharacteristic());
-       #endif
-       NTL_SNS exit(1);
-    }
-    else
-    {
-      SetCoeff(ntl_poly,NTLcurrentExp,c.intval());
-    }
+    SetCoeff(ntl_poly,NTLcurrentExp,to_ZZ_p (convertFacCF2NTLZZ (i.coeff())));
     NTLcurrentExp--;
   }
 
@@ -264,32 +247,7 @@ GF2X convertFacCF2NTLGF2X(CanonicalForm f)
 
 CanonicalForm convertNTLZZpX2CF(ZZ_pX poly,Variable x)
 {
-  //printf("convertNTLZZpX2CF\n");
-  CanonicalForm bigone;
-
-
-  if (deg(poly)>0)
-  {
-    // poly is non-constant
-    bigone=0;
-    bigone.mapinto();
-    // Compute the canonicalform coefficient by coefficient,
-    // bigone summarizes the result.
-    for (int j=0;j<=deg(poly);j++)
-    {
-      if (coeff(poly,j)!=0)
-      {
-        bigone+=(power(x,j)*CanonicalForm(to_long(rep(coeff(poly,j)))));
-      }
-    }
-  }
-  else
-  {
-    // poly is immediate
-    bigone=CanonicalForm(to_long(rep(coeff(poly,0))));
-    bigone.mapinto();
-  }
-  return bigone;
+  return convertNTLZZX2CF (to_ZZX (poly), x);
 }
 
 CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x)
@@ -531,7 +489,67 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 // OUTPUT: The converted Factory-integer of type canonicalform                //
 ////////////////////////////////////////////////////////////////////////////////
 
-static char *cf_stringtemp;
+static unsigned char *cf_stringtemp;
+static unsigned long cf_stringtemp_l=0L;
+CanonicalForm
+convertZZ2CF (ZZ a)
+{
+  long coeff_long=to_long(a);
+
+  CanonicalForm result;
+  if ( (NumBits(a)<((long)NTL_ZZ_NBITS))
+  && (coeff_long>((long)MINIMMEDIATE))
+  && (coeff_long<((long)MAXIMMEDIATE)))
+  {
+    return CanonicalForm(coeff_long);
+  }
+  else
+  {
+    long sizeofrep= ((long *) a.rep) [1];
+    bool lessZero= false;
+    if (sizeofrep < 0)
+    {
+      lessZero= true;
+      sizeofrep= -sizeofrep;
+    }
+    if (cf_stringtemp_l == 0)
+    {
+      cf_stringtemp_l= sizeofrep*sizeof(mp_limb_t)*2;
+      cf_stringtemp= (unsigned char*) Alloc (cf_stringtemp_l);
+    }
+    else if (cf_stringtemp_l < sizeofrep*sizeof(mp_limb_t)*2)
+    {
+      Free (cf_stringtemp, cf_stringtemp_l);
+      cf_stringtemp_l= sizeofrep*sizeof(mp_limb_t)*2;
+      cf_stringtemp= (unsigned char*) Alloc (cf_stringtemp_l);
+    }
+    int cc= mpn_get_str (cf_stringtemp, 16, (mp_limb_t *) (((long *) (a.rep)) + 2), sizeofrep);
+
+    char* cf_stringtemp2;
+    if (lessZero)
+    {
+      cf_stringtemp2= new char [cc + 2];
+      cf_stringtemp2[0]='-';
+      for (int j= 1; j <= cc; j++)
+        cf_stringtemp2[j]= IntValToChar ((int) cf_stringtemp [j-1]);
+      cf_stringtemp2[cc+1]='\0';
+    }
+    else
+    {
+      cf_stringtemp2= new char [cc + 1];
+      for (int j= 0; j < cc; j++)
+        cf_stringtemp2[j]= IntValToChar ((int) cf_stringtemp [j]);
+      cf_stringtemp2[cc]='\0';
+    }
+
+    result= CanonicalForm (cf_stringtemp2, 16);
+    delete [] cf_stringtemp2;
+    return result;
+  }
+  return result;
+}
+
+/*static char *cf_stringtemp;
 static char *cf_stringtemp2;
 static int cf_stringtemp_l=0;
 CanonicalForm convertZZ2CF(ZZ coefficient)
@@ -628,7 +646,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   //convert the string to canonicalform using the char*-Constructor
   return CanonicalForm(cf_stringtemp2,16);
   //return tmp;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // NAME: convertFacCF2NTLZZX                                                  //
@@ -1080,6 +1098,29 @@ CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
   else
   {
     bigone= convertNTLzzpE2CF(coeff(f,0),alpha);
+    bigone.mapinto();
+  }
+  return bigone;
+}
+
+CanonicalForm convertNTLZZ_pEX2CF (ZZ_pEX f, Variable x, Variable alpha)
+{
+  CanonicalForm bigone;
+  if (deg (f) > 0)
+  {
+    bigone= 0;
+    bigone.mapinto();
+    for (int j=0;j<deg(f)+1;j++)
+    {
+      if (coeff(f,j)!=0)
+      {
+        bigone+=(power(x,j)*convertNTLZZpE2CF(coeff(f,j),alpha));
+      }
+    }
+  }
+  else
+  {
+    bigone= convertNTLZZpE2CF(coeff(f,0),alpha);
     bigone.mapinto();
   }
   return bigone;

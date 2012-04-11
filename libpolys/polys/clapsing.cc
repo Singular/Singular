@@ -792,28 +792,39 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       #endif
       else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
       {
+#ifndef NDEBUG
         intvec *w=NULL;
         if (v!=NULL) w=*v;
+#endif
         if (r->cf->extRing->qideal==NULL)
         {
+#ifdef NDEBUG
+          res->m[j]= convFactoryPSingTrP( J.getItem().factor(),r );
+#else
           if(!count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor(),r ),r))
           {
             if (w!=NULL)
               (*w)[j]=1;
             res->m[j]=p_One(r);
           }
+#endif
         }
         else
         {
+#ifdef NDEBUG
+          res->m[j]= convFactoryAPSingAP( J.getItem().factor(),r );
+#else
           if (!count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor(),r ),r))
           {
             if (w!=NULL)
               (*w)[j]=1;
             res->m[j]=p_One(r);
           }
+#endif
         }
       }
     }
+#ifndef NDEBUG
     if (rField_is_Extension(r) && (!p_IsConstantPoly(ff,r)))
     {
       singclap_factorize_retry++;
@@ -862,6 +873,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         res->m[1]=ff; ff=NULL;
       }
     }
+#endif
     p_Delete(&ff,r);
     if (N!=NULL)
     {
