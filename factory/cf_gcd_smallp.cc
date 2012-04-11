@@ -776,12 +776,12 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         CFList u, v;
         //maybe it's better to test if ppH is an element of F(\alpha) before
         //mapping down
-        DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-        ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
-        ppH /= Lc(ppH);
-        DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-        if (fdivides (ppH, A) && fdivides (ppH, B))
+        if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
         {
+          DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
+          ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
+          ppH /= Lc(ppH);
+          DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (substitute > 1)
           {
             ppH= reverseSubst (ppH, substitute);
@@ -790,7 +790,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           return N(gcdcAcB*ppH);
         }
       }
-      else if (fdivides (ppH, A) && fdivides (ppH, B))
+      else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
       {
         if (substitute > 1)
         {
@@ -1065,7 +1065,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       ppH= H/cH;
       if (inextension)
       {
-        if (fdivides(ppH, GFMapUp(A, k)) && fdivides(ppH, GFMapUp(B,k)))
+        if (fdivides(ppH, ppA) && fdivides(ppH, ppB))
         {
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= GFMapDown (ppH, k);
@@ -1081,7 +1081,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       }
       else
       {
-        if (fdivides (ppH, A) && fdivides (ppH, B))
+        if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
         {
           if (substitute > 1)
           {
@@ -1420,7 +1420,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       ppH= H/cH;
       ppH /= Lc (ppH);
       DEBOUTLN (cerr, "ppH= " << ppH);
-      if (fdivides (ppH, A) && fdivides (ppH, B))
+      if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
       {
         if (substitute > 1)
         {
@@ -3059,12 +3059,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
         CFList u, v;
         //maybe it's better to test if ppH is an element of F(\alpha) before
         //mapping down
-        DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-        ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
-        ppH /= Lc(ppH);
-        DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-        if (fdivides (ppH, A) && fdivides (ppH, B))
+        if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
         {
+          DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
+          ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
+          ppH /= Lc(ppH);
+          DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (substitute > 1)
           {
             ppH= reverseSubst (ppH, substitute);
@@ -3073,7 +3073,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           return N(gcdcAcB*ppH);
         }
       }
-      else if (fdivides (ppH, A) && fdivides (ppH, B))
+      else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
       {
         if (substitute > 1)
         {
@@ -3249,12 +3249,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
             CFList u, v;
             //maybe it's better to test if ppH is an element of F(\alpha) before
             //mapping down
-            DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-            ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
-            ppH /= Lc(ppH);
-            DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-            if (fdivides (ppH, A) && fdivides (ppH, B))
+            if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
             {
+              DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
+              ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
+              ppH /= Lc(ppH);
+              DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
               if (substitute > 1)
               {
                 ppH= reverseSubst (ppH, substitute);
@@ -3263,7 +3263,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
               return N(gcdcAcB*ppH);
             }
           }
-          else if (fdivides (ppH, A) && fdivides (ppH, B))
+          else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
           {
             if (substitute > 1)
             {
@@ -3560,7 +3560,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       ppH /= Lc (ppH);
       DEBOUTLN (cerr, "ppH= " << ppH);
 
-      if (fdivides (ppH, A) && fdivides (ppH, B))
+      if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
       {
         if (substitute > 1)
         {
@@ -3785,7 +3785,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           ppH= H/cH;
           ppH /= Lc (ppH);
           DEBOUTLN (cerr, "ppH= " << ppH);
-          if (fdivides (ppH, A) && fdivides (ppH, B))
+          if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
           {
             if (substitute > 1)
             {
