@@ -26,6 +26,7 @@
 #include "cf_map.h"
 #include "cfNewtonPolygon.h"
 #include "algext.h"
+#include "fac_util.h"
 
 /// @return @a biFactorize returns a list of factors of F. If F is not monic
 ///         its leading coefficient is not outputted.
