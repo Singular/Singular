@@ -221,6 +221,58 @@ int ** getPoints (const CanonicalForm& F, int& n)
   return points;
 }
 
+int **
+merge (int ** points1, int sizePoints1, int ** points2, int sizePoints2,
+       int& sizeResult)
+{
+  int i, j;
+  sizeResult= sizePoints1+sizePoints2;
+  for (i= 0; i < sizePoints1; i++)
+  {
+    for (j= 0; j < sizePoints2; j++)
+    {
+      if (points1[i][0] != points2[j][0])
+        continue;
+      else
+      {
+        if (points1[i][1] != points2[j][1])
+          continue;
+        else
+        {
+          points2[j][0]= -1;
+          points2[j][1]= -1;
+          sizeResult--;
+        }
+      }
+    }
+  }
+  if (sizeResult == 0)
+    return points1;
+
+  int ** result= new int *[sizeResult];
+  for (i= 0; i < sizeResult; i++)
+    result [i]= new int [2];
+
+  int k= 0;
+  for (i= 0; i < sizePoints1; i++, k++)
+  {
+    result[k][0]= points1[i][0];
+    result[k][1]= points1[i][1];
+  }
+  for (i= 0; i < sizePoints2; i++)
+  {
+    if (points2[i][0] < 0)
+      continue;
+    else
+    {
+      result[k][0]= points2[i][0];
+      result[k][1]= points2[i][1];
+      k++;
+    }
+  }
+  return result;
+}
+
 // assumes a bivariate poly as input
 int ** newtonPolygon (const CanonicalForm& F, int& sizeOfNewtonPoly)
 {
@@ -256,6 +308,68 @@ int ** newtonPolygon (const CanonicalForm& F, int& sizeOfNewtonPoly)
   for (int i= 0; i < sizeF; i++)
     delete [] points[i];
   delete [] points;
+
+  return result;
+}
+
+// assumes a bivariate polys as input
+int ** newtonPolygon (const CanonicalForm& F, const CanonicalForm& G,
+                      int& sizeOfNewtonPoly)
+{
+  int sizeF= size (F);
+  int ** pointsF= new int* [sizeF];
+  for (int i= 0; i < sizeF; i++)
+    pointsF [i]= new int [2];
+  int j= 0;
+  int * buf;
+  int bufSize;
+  for (CFIterator i= F; i.hasTerms(); i++)
+  {
+    buf= getDegrees (i.coeff(), bufSize);
+    for (int k= 0; k < bufSize; k++, j++)
+    {
+      pointsF [j] [0]= i.exp();
+      pointsF [j] [1]= buf [k];
+    }
+    delete [] buf;
+  }
+
+  int sizeG= size (G);
+  int ** pointsG= new int* [sizeG];
+  for (int i= 0; i < sizeG; i++)
+    pointsG [i]= new int [2];
+  j= 0;
+  for (CFIterator i= G; i.hasTerms(); i++)
+  {
+    buf= getDegrees (i.coeff(), bufSize);
+    for (int k= 0; k < bufSize; k++, j++)
+    {
+      pointsG [j] [0]= i.exp();
+      pointsG [j] [1]= buf [k];
+    }
+    delete [] buf;
+  }
+
+  int sizePoints;
+  int ** points= merge (pointsF, sizeF, pointsG, sizeG, sizePoints);
+
+  int n= polygon (points, sizePoints);
+
+  int ** result= new int* [n];
+  for (int i= 0; i < n; i++)
+  {
+    result [i]= new int [2];
+    result [i] [0]= points [i] [0];
+    result [i] [1]= points [i] [1];
+  }
+
+  sizeOfNewtonPoly= n;
+  for (int i= 0; i < sizeF; i++)
+    delete [] pointsF[i];
+  delete [] pointsF;
+  for (int i= 0; i < sizeG; i++)
+    delete [] pointsG[i];
+  delete [] pointsG;
 
   return result;
 }

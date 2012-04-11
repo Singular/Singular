@@ -39,6 +39,15 @@ int ** newtonPolygon (const CanonicalForm& F,///< [in] a bivariate polynomial
                       int& sizeOfNewtonPoly  ///< [in, out] size of the result
                      );
 
+/// compute the convex hull of the support of two bivariate polynomials
+///
+/// @return an array of points in the plane which are the vertices of the convex
+///         hull of the support of F and G
+int ** newtonPolygon (const CanonicalForm& F,///< [in] a bivariate polynomial
+                      const CanonicalForm& G,///< [in] a bivariate polynomial
+                      int& sizeOfNewtonPoly  ///< [in, out] size of the result
+                     );
+
 /// check if @a point is inside a polygon described by points
 ///
 /// @return true if @a point is inside a polygon described by points
