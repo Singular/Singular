@@ -32,6 +32,7 @@
 #include "cf_random.h"
 #include "cf_reval.h"
 #include "facHensel.h"
+#include "cf_iter.h"
 
 // iinline helper functions:
 #include "cf_map_ext.h"
