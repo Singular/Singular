@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -166,7 +165,7 @@ static void * iiBI2N(void *data)
   // a bigint is really a number from char 0, with diffrent
   // operations...
   number n = n_Init_bigint((number)data, coeffs_BIGINT, currRing->cf);
-  n_Delete((number *)&data, coeffs_BIGINT);  
+  n_Delete((number *)&data, coeffs_BIGINT);
   return (void*)n;
 }
 
@@ -280,8 +279,13 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
         output->name=omStrDup(IDID((idhdl)(input->data)));
       else if (input->name!=NULL)
       {
-        output->name=input->name;
-        input->name=NULL;
+        if (input->rtyp==ALIAS_CMD)
+        output->name=omStrDup(input->name);
+        else
+        {
+          output->name=input->name;
+          input->name=NULL;
+        }
       }
       else if ((input->rtyp==POLY_CMD) && (input->name==NULL))
       {

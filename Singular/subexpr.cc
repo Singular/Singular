@@ -623,7 +623,7 @@ void sleftv::Copy(leftv source)
 
 void * sleftv::CopyD(int t)
 {
-  if ((rtyp!=IDHDL)&&(e==NULL))
+  if ((rtyp!=IDHDL)&&(rtyp!=ALIAS_CMD)&&(e==NULL))
   {
     if (iiCheckRing(t)) return NULL;
     void *x = data;

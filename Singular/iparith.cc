@@ -682,7 +682,6 @@ static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
-  return FALSE;
 }
 static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 {
