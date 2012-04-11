@@ -84,8 +84,10 @@ void convexDense (int** points,  ///< [in, out] a set of points in Z^2, returns
 CanonicalForm
 compress (const CanonicalForm& F, ///< [in] compressed, i.e. F.level()==2,
                                   ///< bivariate poly
-          mat_ZZ& inverseM,       ///< [in,out] returns the inverse of M
-          vec_ZZ& A               ///< [in,out] returns translation
+          mat_ZZ& inverseM,       ///< [in,out] returns the inverse of M,
+                                  ///< if computeMA==true, M otherwise
+          vec_ZZ& A,              ///< [in,out] returns translation
+          bool computeMA= true    ///< [in] whether to compute M and A
          );
 
 /// decompress a bivariate poly
