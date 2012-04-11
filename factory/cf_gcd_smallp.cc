@@ -29,6 +29,7 @@
 #include "cf_random.h"
 #include "cf_reval.h"
 #include "facHensel.h"
+#include "cfNewtonPolygon.h"
 
 // iinline helper functions:
 #include "cf_map_ext.h"
@@ -593,6 +594,67 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     ppB= B/cB;
   }
 
+  int sizeNewtonPolyg;
+  int ** newtonPolyg= NULL;
+  mat_ZZ MM;
+  vec_ZZ V;
+  bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
+  if (compressConvexDense)
+  {
+    cA= content (ppA, 1);
+    cB= content (ppB, 1);
+    ppA /= cA;
+    ppB /= cB;
+    gcdcAcB *= gcd (cA, cB);
+    if (ppA.isUnivariate() || ppB.isUnivariate())
+    {
+      if (ppA.level() == ppB.level())
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcd (ppA, ppB)*gcdcAcB, substitute));
+        else
+          return N (gcd (ppA, ppB)*gcdcAcB);
+      }
+      else
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N (gcdcAcB);
+      }
+    }
+
+    newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
+    convexDense (newtonPolyg, sizeNewtonPolyg, MM, V);
+
+    for (int i= 0; i < sizeNewtonPolyg; i++)
+      delete [] newtonPolyg[i];
+    delete [] newtonPolyg;
+
+    ppA= compress (ppA, MM, V, false);
+    ppB= compress (ppB, MM, V, false);
+    MM= inv (MM);
+
+    if (ppA.isUnivariate() && ppB.isUnivariate())
+    {
+      if (ppA.level() == ppB.level())
+      {
+        if (substitute > 1)
+          return N (reverseSubst (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB,
+                                  substitute));
+        else
+          return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
+      }
+      else
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N (gcdcAcB);
+      }
+    }
+  }
+
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB;
 
@@ -778,6 +840,8 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
           ppH /= Lc(ppH);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
+          if (compressConvexDense)
+            ppH= decompress (ppH, MM, V);
           if (substitute > 1)
           {
             ppH= reverseSubst (ppH, substitute);
@@ -788,6 +852,8 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       }
       else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
       {
+        if (compressConvexDense)
+          ppH= decompress (ppH, MM, V);
         if (substitute > 1)
         {
           ppH= reverseSubst (ppH, substitute);
@@ -898,6 +964,67 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     gcdcAcB= gcd (cA, cB);
     ppA= A/cA;
     ppB= B/cB;
+  }
+
+  int sizeNewtonPolyg;
+  int ** newtonPolyg= NULL;
+  mat_ZZ MM;
+  vec_ZZ V;
+  bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
+  if (compressConvexDense)
+  {
+    cA= content (ppA, 1);
+    cB= content (ppB, 1);
+    ppA /= cA;
+    ppB /= cB;
+    gcdcAcB *= gcd (cA, cB);
+    if (ppA.isUnivariate() || ppB.isUnivariate())
+    {
+      if (ppA.level() == ppB.level())
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcd (ppA, ppB)*gcdcAcB, substitute));
+        else
+          return N (gcd (ppA, ppB)*gcdcAcB);
+      }
+      else
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N (gcdcAcB);
+      }
+    }
+
+    newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
+    convexDense (newtonPolyg, sizeNewtonPolyg, MM, V);
+
+    for (int i= 0; i < sizeNewtonPolyg; i++)
+      delete [] newtonPolyg[i];
+    delete [] newtonPolyg;
+
+    ppA= compress (ppA, MM, V, false);
+    ppB= compress (ppB, MM, V, false);
+    MM= inv (MM);
+
+    if (ppA.isUnivariate() && ppB.isUnivariate())
+    {
+      if (ppA.level() == ppB.level())
+      {
+        if (substitute > 1)
+          return N (reverseSubst (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB,
+                                  substitute));
+        else
+          return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
+      }
+      else
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N (gcdcAcB);
+      }
+    }
   }
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
@@ -1066,6 +1193,8 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= GFMapDown (ppH, k);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
+          if (compressConvexDense)
+            ppH= decompress (ppH, MM, V);
           if (substitute > 1)
           {
             ppH= reverseSubst (ppH, substitute);
@@ -1079,6 +1208,8 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       {
         if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
         {
+          if (compressConvexDense)
+            ppH= decompress (ppH, MM, V);
           if (substitute > 1)
           {
             ppH= reverseSubst (ppH, substitute);
@@ -1197,6 +1328,67 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     gcdcAcB= gcd (cA, cB);
     ppA= A/cA;
     ppB= B/cB;
+  }
+
+  int sizeNewtonPolyg;
+  int ** newtonPolyg= NULL;
+  mat_ZZ MM;
+  vec_ZZ V;
+  bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
+  if (compressConvexDense)
+  {
+    cA= content (ppA, 1);
+    cB= content (ppB, 1);
+    ppA /= cA;
+    ppB /= cB;
+    gcdcAcB *= gcd (cA, cB);
+    if (ppA.isUnivariate() || ppB.isUnivariate())
+    {
+      if (ppA.level() == ppB.level())
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcd (ppA, ppB)*gcdcAcB, substitute));
+        else
+          return N (gcd (ppA, ppB)*gcdcAcB);
+      }
+      else
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N (gcdcAcB);
+      }
+    }
+
+    newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
+    convexDense (newtonPolyg, sizeNewtonPolyg, MM, V);
+
+    for (int i= 0; i < sizeNewtonPolyg; i++)
+      delete [] newtonPolyg[i];
+    delete [] newtonPolyg;
+
+    ppA= compress (ppA, MM, V, false);
+    ppB= compress (ppB, MM, V, false);
+    MM= inv (MM);
+
+    if (ppA.isUnivariate() && ppB.isUnivariate())
+    {
+      if (ppA.level() == ppB.level())
+      {
+        if (substitute > 1)
+          return N (reverseSubst (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB,
+                                  substitute));
+        else
+          return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
+      }
+      else
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N (gcdcAcB);
+      }
+    }
   }
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
@@ -1418,6 +1610,8 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       DEBOUTLN (cerr, "ppH= " << ppH);
       if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
       {
+        if (compressConvexDense)
+          ppH= decompress (ppH, MM, V);
         if (substitute > 1)
         {
           ppH= reverseSubst (ppH, substitute);

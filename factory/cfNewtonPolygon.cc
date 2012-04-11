@@ -594,11 +594,15 @@ void convexDense(int** points, int sizePoints, mat_ZZ& M, vec_ZZ& A)
 }
 
 CanonicalForm
-compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A)
+compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A, bool computeMA)
 {
   int n;
-  int ** newtonPolyg= newtonPolygon (F, n);
-  convexDense (newtonPolyg, n, M, A);
+  int ** newtonPolyg;
+  if (computeMA)
+  {
+    newtonPolyg= newtonPolygon (F, n);
+    convexDense (newtonPolyg, n, M, A);
+  }
   CanonicalForm result= 0;
   ZZ expX, expY;
   Variable x= Variable (1);
@@ -675,11 +679,14 @@ compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A)
     result += Lc (tmp)*power (x, d);
   }
 
-  for (int i= 0; i < n; i++)
-    delete [] newtonPolyg [i];
-  delete [] newtonPolyg;
+  if (computeMA)
+  {
+    for (int i= 0; i < n; i++)
+      delete [] newtonPolyg [i];
+    delete [] newtonPolyg;
+    M= inv (M);
+  }
 
-  M= inv (M);
   return result;
 }
 
