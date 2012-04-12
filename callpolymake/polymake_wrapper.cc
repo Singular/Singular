@@ -1530,7 +1530,7 @@ BOOLEAN normalFan(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == polytopeID))
   {
     gfan::ZCone* zp = (gfan::ZCone*)u->Data();
-    gfan::ZFan* zf = new gfan::ZFan();
+    gfan::ZFan* zf = new gfan::ZFan(0);
     try
     {
       polymake::perl::Object* p=ZPolytope2PmPolytope(zp);

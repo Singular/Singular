@@ -30,18 +30,6 @@ std::string bbpolytopeToString(gfan::ZCone const &c)
   s<<toString(i);
   s<<"EQUATIONS"<<std::endl;
   s<<toString(e);
-  if(c.areExtremeRaysKnown())
-  {
-    gfan::ZMatrix r=c.extremeRays();
-    s<<"VERTICES"<<std::endl;
-    s<<toString(r);
-  }
-  if(c.areGeneratorsOfLinealitySpaceKnown())
-  {
-    gfan::ZMatrix r=c.generatorsOfLinealitySpace();
-    s<<"LINEALITY_SPACE"<<std::endl;
-    s<<toString(r);
-  }
   return s.str();
 }
 

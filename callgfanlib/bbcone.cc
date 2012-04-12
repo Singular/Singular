@@ -119,18 +119,6 @@ std::string toString(gfan::ZCone const &c)
   s<<toString(i);
   s<<"EQUATIONS"<<std::endl;
   s<<toString(e);
-  if(c.areExtremeRaysKnown())
-  {
-    gfan::ZMatrix r=c.extremeRays();
-    s<<"EXTREME_RAYS"<<std::endl;
-    s<<toString(r);
-  }
-  if(c.areGeneratorsOfLinealitySpaceKnown())
-  {
-    gfan::ZMatrix r=c.generatorsOfLinealitySpace();
-    s<<"LINEALITY_SPACE"<<std::endl;
-    s<<toString(r);
-  }
   return s.str();
 }
 
@@ -685,75 +673,6 @@ BOOLEAN quickConeViaRays(leftv res, leftv args)
     }
   }
   WerrorS("quickConeViaRays: unexpected parameters");
-  return TRUE;
-}
-
-BOOLEAN ZCone(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && ((u->Typ() == INTMAT_CMD) || (u->Typ() == INT_CMD)))
-  {
-    leftv v = u->next;
-    if ((u != NULL) && ((v->Typ() == INTMAT_CMD) || (v->Typ() == INT_CMD)))
-    {
-      leftv w = v->next;
-      if ((u != NULL) && ((w->Typ() == INTMAT_CMD) || (w->Typ() == INT_CMD)))
-      {
-        leftv x = w->next;
-        if ((u != NULL) && ((x->Typ() == INTMAT_CMD) || (x->Typ() == INT_CMD)))
-        {
-          leftv y = x->next;
-          if ((u != NULL) && ((y->Typ() == INTMAT_CMD) || (y->Typ() == INT_CMD)))
-          {
-            leftv z = y->next;
-            if ((u != NULL) && (z->Typ() == INT_CMD))
-            {
-              gfan::ZMatrix* gfineq = new gfan::ZMatrix();
-              gfan::ZMatrix* gfeq = new gfan::ZMatrix();
-              gfan::ZMatrix* gfexRays = new gfan::ZMatrix();
-              gfan::ZMatrix* gflinSpace = new gfan::ZMatrix();
-              gfan::ZMatrix* gfspan = new gfan::ZMatrix();
-              // if user has given int as input, an empty ZMatrix will be passed to gfan
-              // which will be ignored by the constructor
-              if (u->Typ() == INTMAT_CMD) 
-              {
-                intvec* ineq = (intvec*) u->Data();
-                gfineq = intmat2ZMatrix(ineq);
-              }
-              if (v->Typ() == INTMAT_CMD)
-              {
-                intvec* eq = (intvec*) v->Data();
-                gfeq = intmat2ZMatrix(eq);
-              }
-              if (w->Typ() == INTMAT_CMD)
-              {
-                intvec* exRays = (intvec*) w->Data();
-                gfexRays = intmat2ZMatrix(exRays);
-              }
-              if (x->Typ() == INTMAT_CMD)
-              {
-                intvec* linSpace = (intvec*) x->Data();
-                gflinSpace = intmat2ZMatrix(linSpace);
-              }
-              if (y->Typ() == INTMAT_CMD)
-              {
-                intvec* span = (intvec*) y->Data();
-                gfspan = intmat2ZMatrix(span);
-              }
-              int flag = (int)(long) z->Data();
-              
-              gfan::ZCone* zc = new gfan::ZCone(*gfineq,*gfeq,*gfexRays,*gflinSpace,*gfspan,flag);
-              delete gfineq, gfeq, gfexRays, gflinSpace, gfspan;
-              res->rtyp = coneID;
-              res->data = (char*) zc;
-              return FALSE;
-            }
-          }
-        }
-      }
-    }
-  }
-  WerrorS("ZCone: unexpected parameters");
   return TRUE;
 }
 
@@ -1418,38 +1337,6 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN areExtremeRaysKnown(leftv res, leftv args)
-{
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    bool b = zc->areExtremeRaysKnown();
-    int bb = (int) b;
-    res->rtyp = INT_CMD;
-    res->data = (char*) bb;
-    return FALSE;
-  }
-  WerrorS("haveExtremeRaysBeenCached: unexpected parameters");
-  return TRUE;  
-}
-
-BOOLEAN areGeneratorsOfLinealitySpaceKnown(leftv res, leftv args)
-{
-  leftv u=args;                             
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    bool b = zc->areGeneratorsOfLinealitySpaceKnown();
-    int bb = (int) b;
-    res->rtyp = INT_CMD;
-    res->data = (char*) bb;
-    return FALSE;
-  }
-  WerrorS("haveExtremeRaysBeenCached: unexpected parameters");
-  return TRUE;  
-}
-
 void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1467,9 +1354,6 @@ void bbcone_setup()
   iiAddCproc("","quickConeViaNormals",FALSE,quickConeViaNormals);
   iiAddCproc("","coneViaRays",FALSE,coneViaRays);
   iiAddCproc("","quickConeViaRays",FALSE,quickConeViaRays);
-  iiAddCproc("","ZCone",FALSE,ZCone);
-  iiAddCproc("","areExtremeRaysKnown",FALSE,areExtremeRaysKnown);
-  iiAddCproc("","areGeneratorsOfLinealitySpaceKnown",FALSE,areGeneratorsOfLinealitySpaceKnown);
   iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
 
   iiAddCproc("","inequalities",FALSE,inequalities);
