@@ -218,123 +218,6 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   return 1;
 }
 
-int
-substituteCheck (const CanonicalForm& F, const CanonicalForm& G)
-{
-  if (F.inCoeffDomain() || G.inCoeffDomain())
-    return 0;
-  Variable x= Variable (1);
-  if (degree (F, x) <= 1 || degree (G, x) <= 1)
-    return 0;
-  CanonicalForm f= swapvar (F, F.mvar(), x); //TODO swapping is pretty expensive
-  CanonicalForm g= swapvar (G, G.mvar(), x);
-  int sizef= 0;
-  int sizeg= 0;
-  for (CFIterator i= f; i.hasTerms(); i++, sizef++)
-  {
-    if (i.exp() == 1)
-      return 0;
-  }
-  for (CFIterator i= g; i.hasTerms(); i++, sizeg++)
-  {
-    if (i.exp() == 1)
-      return 0;
-  }
-  int * expf= new int [sizef];
-  int * expg= new int [sizeg];
-  int j= 0;
-  for (CFIterator i= f; i.hasTerms(); i++, j++)
-  {
-    expf [j]= i.exp();
-  }
-  j= 0;
-  for (CFIterator i= g; i.hasTerms(); i++, j++)
-  {
-    expg [j]= i.exp();
-  }
-
-  int indf= sizef - 1;
-  int indg= sizeg - 1;
-  if (expf[indf] == 0)
-    indf--;
-  if (expg[indg] == 0)
-    indg--;
-
-  if (expg[indg] != expf [indf] || (expg[indg] == 1 && expf[indf] == 1))
-  {
-    delete [] expg;
-    delete [] expf;
-    return 0;
-  }
-  // expf[indg] == expf[indf] after here
-  int result= expg[indg];
-  for (int i= indf - 1; i >= 0; i--)
-  {
-    if (expf [i]%result != 0)
-    {
-      delete [] expg;
-      delete [] expf;
-      return 0;
-    }
-  }
-
-  for (int i= indg - 1; i >= 0; i--)
-  {
-    if (expg [i]%result != 0)
-    {
-      delete [] expg;
-      delete [] expf;
-      return 0;
-    }
-  }
-
-  delete [] expg;
-  delete [] expf;
-  return result;
-}
-
-// substiution
-void
-subst (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& A,
-       CanonicalForm& B, const int d
-      )
-{
-  if (d == 1)
-  {
-    A= F;
-    B= G;
-    return;
-  }
-
-  CanonicalForm C= 0;
-  CanonicalForm D= 0;
-  Variable x= Variable (1);
-  CanonicalForm f= swapvar (F, x, F.mvar());
-  CanonicalForm g= swapvar (G, x, G.mvar());
-  for (CFIterator i= f; i.hasTerms(); i++)
-    C += i.coeff()*power (f.mvar(), i.exp()/ d);
-  for (CFIterator i= g; i.hasTerms(); i++)
-    D += i.coeff()*power (g.mvar(), i.exp()/ d);
-  A= swapvar (C, x, F.mvar());
-  B= swapvar (D, x, G.mvar());
-}
-
-CanonicalForm
-reverseSubst (const CanonicalForm& F, const int d)
-{
-  if (d == 1)
-    return F;
-
-  Variable x= Variable (1);
-  if (degree (F, x) <= 0)
-    return F;
-  CanonicalForm f= swapvar (F, x, F.mvar());
-  CanonicalForm result= 0;
-  for (CFIterator i= f; i.hasTerms(); i++)
-    result += i.coeff()*power (f.mvar(), d*i.exp());
-  return swapvar (result, x, F.mvar());
-}
-
 static inline CanonicalForm
 uni_content (const CanonicalForm & F);
 
@@ -573,11 +456,6 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd(A,B));
 
-  int substitute= substituteCheck (A, B);
-
-  if (substitute > 1)
-    subst (A, B, A, B, substitute);
-
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
@@ -613,19 +491,9 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     if (ppA.isUnivariate() || ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcd (ppA, ppB)*gcdcAcB, substitute));
-        else
-          return N (gcd (ppA, ppB)*gcdcAcB);
-      }
+        return N (gcd (ppA, ppB)*gcdcAcB);
       else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N (gcdcAcB);
-      }
+        return N (gcdcAcB);
     }
 
     newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
@@ -642,20 +510,9 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     if (ppA.isUnivariate() && ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-      {
-        if (substitute > 1)
-          return N (reverseSubst (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB,
-                                  substitute));
-        else
-          return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
-      }
+        return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
       else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N (gcdcAcB);
-      }
+        return N (gcdcAcB);
     }
   }
 
@@ -681,22 +538,13 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   int d= totaldegree (ppA, Variable(2), Variable (ppA.level()));
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N (reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
+
   int d0= totaldegree (ppB, Variable(2), Variable (ppB.level()));
   if (d0 < d)
     d= d0;
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N (reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
   CanonicalForm newtonPoly;
@@ -792,12 +640,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       d0= 0;
 
     if (d0 == 0)
-    {
-      if (substitute > 1)
-        return N (reverseSubst (gcdcAcB, substitute));
-      else
-        return N(gcdcAcB);
-    }
+      return N(gcdcAcB);
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -846,11 +689,6 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
             ppH= decompress (ppH, MM, V);
-          if (substitute > 1)
-          {
-            ppH= reverseSubst (ppH, substitute);
-            gcdcAcB= reverseSubst (gcdcAcB, substitute);
-          }
           return N(gcdcAcB*ppH);
         }
       }
@@ -858,11 +696,6 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       {
         if (compressConvexDense)
           ppH= decompress (ppH, MM, V);
-        if (substitute > 1)
-        {
-          ppH= reverseSubst (ppH, substitute);
-          gcdcAcB= reverseSubst (gcdcAcB, substitute);
-        }
         return N(gcdcAcB*ppH);
       }
     }
@@ -945,11 +778,6 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
-  int substitute= substituteCheck (A, B);
-
-  if (substitute > 1)
-    subst (A, B, A, B, substitute);
-
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
@@ -985,19 +813,9 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (ppA.isUnivariate() || ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcd (ppA, ppB)*gcdcAcB, substitute));
-        else
-          return N (gcd (ppA, ppB)*gcdcAcB);
-      }
+        return N (gcd (ppA, ppB)*gcdcAcB);
       else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N (gcdcAcB);
-      }
+        return N (gcdcAcB);
     }
 
     newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
@@ -1014,20 +832,9 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (ppA.isUnivariate() && ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-      {
-        if (substitute > 1)
-          return N (reverseSubst (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB,
-                                  substitute));
-        else
-          return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
-      }
+        return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
       else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N (gcdcAcB);
-      }
+        return N (gcdcAcB);
     }
   }
 
@@ -1052,22 +859,12 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
 
   int d= totaldegree (ppA, Variable(2), Variable (ppA.level()));
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N (reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
   int d0= totaldegree (ppB, Variable(2), Variable (ppB.level()));
   if (d0 < d)
     d= d0;
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N (reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
   CanonicalForm newtonPoly;
@@ -1140,22 +937,8 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (d0 == 0)
     {
       if (inextension)
-      {
         setCharacteristic (p, k, gf_name_buf);
-        {
-          if (substitute > 1)
-            return N (reverseSubst (gcdcAcB, substitute));
-          else
-            return N(gcdcAcB);
-        }
-      }
-      else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N(gcdcAcB);
-      }
+      return N(gcdcAcB);
     }
     if (d0 >  d)
     {
@@ -1199,11 +982,6 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
             ppH= decompress (ppH, MM, V);
-          if (substitute > 1)
-          {
-            ppH= reverseSubst (ppH, substitute);
-            gcdcAcB= reverseSubst (gcdcAcB, substitute);
-          }
           setCharacteristic (p, k, gf_name_buf);
           return N(gcdcAcB*ppH);
         }
@@ -1214,11 +992,6 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
         {
           if (compressConvexDense)
             ppH= decompress (ppH, MM, V);
-          if (substitute > 1)
-          {
-            ppH= reverseSubst (ppH, substitute);
-            gcdcAcB= reverseSubst (gcdcAcB, substitute);
-          }
           return N(gcdcAcB*ppH);
         }
       }
@@ -1309,11 +1082,6 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
-  int substitute= substituteCheck (A, B);
-
-  if (substitute > 1)
-    subst (A, B, A, B, substitute);
-
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
@@ -1349,19 +1117,9 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     if (ppA.isUnivariate() || ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcd (ppA, ppB)*gcdcAcB, substitute));
-        else
-          return N (gcd (ppA, ppB)*gcdcAcB);
-      }
+        return N (gcd (ppA, ppB)*gcdcAcB);
       else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N (gcdcAcB);
-      }
+        return N (gcdcAcB);
     }
 
     newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
@@ -1378,20 +1136,9 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     if (ppA.isUnivariate() && ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-      {
-        if (substitute > 1)
-          return N (reverseSubst (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB,
-                                  substitute));
-        else
-          return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
-      }
+        return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
       else
-      {
-        if (substitute > 1)
-          return N (reverseSubst (gcdcAcB, substitute));
-        else
-          return N (gcdcAcB);
-      }
+        return N (gcdcAcB);
     }
   }
 
@@ -1417,24 +1164,15 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   int d0;
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N (reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
+
   d0= totaldegree (ppB, Variable (2), Variable (ppB.level()));
 
   if (d0 < d)
     d= d0;
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N (reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
   CanonicalForm newtonPoly= 1;
@@ -1569,12 +1307,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       d0= 0;
 
     if (d0 == 0)
-    {
-      if (substitute > 1)
-        return N (reverseSubst (gcdcAcB, substitute));
-      else
-        return N(gcdcAcB);
-    }
+      return N(gcdcAcB);
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -1616,11 +1349,6 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       {
         if (compressConvexDense)
           ppH= decompress (ppH, MM, V);
-        if (substitute > 1)
-        {
-          ppH= reverseSubst (ppH, substitute);
-          gcdcAcB= reverseSubst (gcdcAcB, substitute);
-        }
         return N(gcdcAcB*ppH);
       }
     }
@@ -3048,11 +2776,6 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
-  int substitute= substituteCheck (A, B);
-
-  if (substitute > 1)
-    subst (A, B, A, B, substitute);
-
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
@@ -3094,24 +2817,14 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
   int d0;
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N(reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
   d0= totaldegree (ppB, Variable (2), Variable (ppB.level()));
 
   if (d0 < d)
     d= d0;
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N(reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH, skeleton;
   CanonicalForm newtonPoly= 1;
@@ -3211,12 +2924,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       d0= 0;
 
     if (d0 == 0)
-    {
-      if (substitute > 1)
-        return N(reverseSubst (gcdcAcB, substitute));
-      else
-        return N(gcdcAcB);
-    }
+      return N(gcdcAcB);
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -3259,23 +2967,11 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
           ppH /= Lc(ppH);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-          if (substitute > 1)
-          {
-            ppH= reverseSubst (ppH, substitute);
-            gcdcAcB= reverseSubst (gcdcAcB, substitute);
-          }
           return N(gcdcAcB*ppH);
         }
       }
       else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
-      {
-        if (substitute > 1)
-        {
-          ppH= reverseSubst (ppH, substitute);
-          gcdcAcB= reverseSubst (gcdcAcB, substitute);
-        }
         return N(gcdcAcB*ppH);
-      }
     }
     G_m= H;
     newtonPoly= newtonPoly*(x - random_element);
@@ -3397,12 +3093,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           d0= 0;
 
         if (d0 == 0)
-        {
-          if (substitute > 1)
-            return N(reverseSubst (gcdcAcB, substitute));
-          else
-            return N(gcdcAcB);
-        }
+          return N(gcdcAcB);
         if (d0 >  d)
         {
           if (!find (l, random_element))
@@ -3449,21 +3140,11 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
               ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
               ppH /= Lc(ppH);
               DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-              if (substitute > 1)
-              {
-                ppH= reverseSubst (ppH, substitute);
-                gcdcAcB= reverseSubst (gcdcAcB, substitute);
-              }
               return N(gcdcAcB*ppH);
             }
           }
           else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
           {
-            if (substitute > 1)
-            {
-              ppH= reverseSubst (ppH, substitute);
-              gcdcAcB= reverseSubst (gcdcAcB, substitute);
-            }
             return N(gcdcAcB*ppH);
           }
         }
@@ -3506,11 +3187,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
-  int substitute= substituteCheck (A, B);
-
-  if (substitute > 1)
-    subst (A, B, A, B, substitute);
-
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
@@ -3552,24 +3228,15 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   int d0;
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N(reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
+
   d0= totaldegree (ppB, Variable (2), Variable (ppB.level()));
 
   if (d0 < d)
     d= d0;
 
   if (d == 0)
-  {
-    if (substitute > 1)
-      return N(reverseSubst (gcdcAcB, substitute));
-    else
-      return N(gcdcAcB);
-  }
+    return N(gcdcAcB);
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH, skeleton;
   CanonicalForm newtonPoly= 1;
@@ -3712,12 +3379,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       d0= 0;
 
     if (d0 == 0)
-    {
-      if (substitute > 1)
-        return N(reverseSubst (gcdcAcB, substitute));
-      else
-        return N(gcdcAcB);
-    }
+      return N(gcdcAcB);
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -3755,14 +3417,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "ppH= " << ppH);
 
       if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
-      {
-        if (substitute > 1)
-        {
-          ppH= reverseSubst (ppH, substitute);
-          gcdcAcB= reverseSubst (gcdcAcB, substitute);
-        }
         return N(gcdcAcB*ppH);
-      }
     }
     G_m= H;
     newtonPoly= newtonPoly*(x - random_element);
@@ -3936,12 +3591,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           d0= 0;
 
         if (d0 == 0)
-        {
-          if (substitute > 1)
-            return N(reverseSubst (gcdcAcB, substitute));
-          else
-            return N(gcdcAcB);
-        }
+          return N(gcdcAcB);
         if (d0 >  d)
         {
           if (!find (l, random_element))
@@ -3980,14 +3630,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           ppH /= Lc (ppH);
           DEBOUTLN (cerr, "ppH= " << ppH);
           if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
-          {
-            if (substitute > 1)
-            {
-              ppH= reverseSubst (ppH, substitute);
-              gcdcAcB= reverseSubst (gcdcAcB, substitute);
-            }
             return N(gcdcAcB*ppH);
-          }
         }
 
         G_m= H;
