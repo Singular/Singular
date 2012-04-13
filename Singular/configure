@@ -607,8 +607,6 @@ PLURAL
 DL_KERNEL
 NEED_LIBSG
 NEED_LIBS
-SING_HAVE_FLINT_FALSE
-SING_HAVE_FLINT_TRUE
 FLINT_HOME
 FLINT_LIBS
 FLINT_CFLAGS
@@ -744,8 +742,12 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP
+CPPFLAGS
 CXX
 CXXFLAGS
+LDFLAGS
+LIBS
+CPPFLAGS
 CCC
 CXXCPP'
 
@@ -2577,6 +2579,18 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 ac_config_headers="$ac_config_headers mod2.h"
+
+
+
+# Check for FLINT
+# Bradford Hovinen, 2001-06-13
+# Modified by Pascal Giorgi, 2003-12-03
+# Inspired by gnome-bonobo-check.m4 by Miguel de Icaza, 99-04-12
+# Stolen from Chris Lahey       99-2-5
+# stolen from Manish Singh again
+# stolen back from Frank Belew
+# stolen from Manish Singh
+# Shamelessly stolen from Owen Taylor
 
 
 
@@ -7791,12 +7805,6 @@ fi
 
 if test "$with_readline" != dynamic && test "$with_readline" != no; then
 
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for rl_completion_matches in -lreadline" >&5
 $as_echo_n "checking for rl_completion_matches in -lreadline... " >&6; }
 if ${ac_cv_lib_readline_rl_completion_matches+:} false; then :
@@ -7822,7 +7830,7 @@ return rl_completion_matches ();
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
+if ac_fn_c_try_link "$LINENO"; then :
   ac_cv_lib_readline_rl_completion_matches=yes
 else
   ac_cv_lib_readline_rl_completion_matches=no
@@ -7834,152 +7842,53 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_rl_completion_matches" >&5
 $as_echo "$ac_cv_lib_readline_rl_completion_matches" >&6; }
 if test "x$ac_cv_lib_readline_rl_completion_matches" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBREADLINE 1
-_ACEOF
-
-  LIBS="-lreadline $LIBS"
-
+  ac_cv_have_readline=yes
 fi
 
-   ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how to run the C++ preprocessor" >&5
-$as_echo_n "checking how to run the C++ preprocessor... " >&6; }
-if test -z "$CXXCPP"; then
-  if ${ac_cv_prog_CXXCPP+:} false; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for completion_matches in -lreadline" >&5
+$as_echo_n "checking for completion_matches in -lreadline... " >&6; }
+if ${ac_cv_lib_readline_completion_matches+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-      # Double quotes because CXXCPP needs to be expanded
-    for CXXCPP in "$CXX -E" "/lib/cpp"
-    do
-      ac_preproc_ok=false
-for ac_cxx_preproc_warn_flag in '' yes
-do
-  # Use a header file that comes with gcc, so configuring glibc
-  # with a fresh cross-compiler works.
-  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-  # <limits.h> exists even on freestanding compilers.
-  # On the NeXT, cc -E runs the code through the compiler's parser,
-  # not just through cpp. "Syntax error" is here to catch this case.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lreadline  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
 #endif
-		     Syntax error
+char completion_matches ();
+int
+main ()
+{
+return completion_matches ();
+  ;
+  return 0;
+}
 _ACEOF
-if ac_fn_cxx_try_cpp "$LINENO"; then :
-
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_readline_completion_matches=yes
 else
-  # Broken: fails on valid input.
-continue
+  ac_cv_lib_readline_completion_matches=no
 fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-  # OK, works on sane cases.  Now check whether nonexistent headers
-  # can be detected and how.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <ac_nonexistent.h>
-_ACEOF
-if ac_fn_cxx_try_cpp "$LINENO"; then :
-  # Broken: success on invalid input.
-continue
-else
-  # Passes both tests.
-ac_preproc_ok=:
-break
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-done
-# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
-rm -f conftest.i conftest.err conftest.$ac_ext
-if $ac_preproc_ok; then :
-  break
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_completion_matches" >&5
+$as_echo "$ac_cv_lib_readline_completion_matches" >&6; }
+if test "x$ac_cv_lib_readline_completion_matches" = xyes; then :
+  ac_cv_have_readline=yes
 fi
 
-    done
-    ac_cv_prog_CXXCPP=$CXXCPP
-
-fi
-  CXXCPP=$ac_cv_prog_CXXCPP
-else
-  ac_cv_prog_CXXCPP=$CXXCPP
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXXCPP" >&5
-$as_echo "$CXXCPP" >&6; }
-ac_preproc_ok=false
-for ac_cxx_preproc_warn_flag in '' yes
-do
-  # Use a header file that comes with gcc, so configuring glibc
-  # with a fresh cross-compiler works.
-  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-  # <limits.h> exists even on freestanding compilers.
-  # On the NeXT, cc -E runs the code through the compiler's parser,
-  # not just through cpp. "Syntax error" is here to catch this case.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-		     Syntax error
-_ACEOF
-if ac_fn_cxx_try_cpp "$LINENO"; then :
-
-else
-  # Broken: fails on valid input.
-continue
-fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-  # OK, works on sane cases.  Now check whether nonexistent headers
-  # can be detected and how.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <ac_nonexistent.h>
-_ACEOF
-if ac_fn_cxx_try_cpp "$LINENO"; then :
-  # Broken: success on invalid input.
-continue
-else
-  # Passes both tests.
-ac_preproc_ok=:
-break
-fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-done
-# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
-rm -f conftest.i conftest.err conftest.$ac_ext
-if $ac_preproc_ok; then :
-
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "C++ preprocessor \"$CXXCPP\" fails sanity check
-See \`config.log' for more details" "$LINENO" 5; }
-fi
-
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-for ac_header in readline/readline.h readline/history.h
+   for ac_header in readline/readline.h readline/history.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
@@ -7989,7 +7898,7 @@ fi
 
 done
 
-   if test "$ac_cv_lib_readline_readline" = yes && \
+   if test "$with_readline" = static && \
       test "$ac_cv_header_readline_readline_h" = yes; then
      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether readline.h is ok" >&5
 $as_echo_n "checking whether readline.h is ok... " >&6; }
@@ -8013,7 +7922,7 @@ main ()
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
+if ac_fn_c_try_link "$LINENO"; then :
   ac_cv_header_readline_readline_h_ok="yes"
 else
   ac_cv_header_readline_readline_h_ok="no"
@@ -8034,8 +7943,6 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
-extern "C"
-{
 extern char * rl_readline_name;
 extern char *rl_line_buffer;
 char *filename_completion_function();
@@ -8047,7 +7954,6 @@ char * readline ();
 void add_history ();
 int write_history ();
 int read_history();
-}
 #ifndef NULL
 #define NULL 0
 #endif
@@ -8069,7 +7975,7 @@ write_history(NULL);
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
+if ac_fn_c_try_link "$LINENO"; then :
   ac_cv_have_readline="yes"
 
 else
@@ -8088,9 +7994,12 @@ $as_echo "$ac_cv_have_readline" >&6; }
       ac_cv_have_readline="yes"
     fi
   fi
-  if test "$ac_cv_lib_readline_rl_completion_matches" = yes; then
+  if test "$ac_cv_have_readline" = yes; then
     $as_echo "#define HAVE_READLINE 1" >>confdefs.h
 
+    $as_echo "#define HAVE_LIBREADLINE 1" >>confdefs.h
+
+    LIBS="-lreadline $LIBS"
   fi
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -8111,6 +8020,7 @@ elif test "$ac_cv_lib_readline_rl_completion_matches" = yes; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: static" >&5
 $as_echo "static" >&6; }
   $as_echo "#define HAVE_READLINE 1" >>confdefs.h
+
 elif test "$ac_cv_singuname" = PowerMacintosh-darwin; then
   as_fn_error $? "building without readline impossible on PowerMacintosh-darwin" "$LINENO" 5
 else
@@ -8495,7 +8405,141 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-  for ac_header in boost/dynamic_bitset.hpp
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how to run the C++ preprocessor" >&5
+$as_echo_n "checking how to run the C++ preprocessor... " >&6; }
+if test -z "$CXXCPP"; then
+  if ${ac_cv_prog_CXXCPP+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+      # Double quotes because CXXCPP needs to be expanded
+    for CXXCPP in "$CXX -E" "/lib/cpp"
+    do
+      ac_preproc_ok=false
+for ac_cxx_preproc_warn_flag in '' yes
+do
+  # Use a header file that comes with gcc, so configuring glibc
+  # with a fresh cross-compiler works.
+  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+  # <limits.h> exists even on freestanding compilers.
+  # On the NeXT, cc -E runs the code through the compiler's parser,
+  # not just through cpp. "Syntax error" is here to catch this case.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+		     Syntax error
+_ACEOF
+if ac_fn_cxx_try_cpp "$LINENO"; then :
+
+else
+  # Broken: fails on valid input.
+continue
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+  # OK, works on sane cases.  Now check whether nonexistent headers
+  # can be detected and how.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ac_nonexistent.h>
+_ACEOF
+if ac_fn_cxx_try_cpp "$LINENO"; then :
+  # Broken: success on invalid input.
+continue
+else
+  # Passes both tests.
+ac_preproc_ok=:
+break
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+done
+# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
+rm -f conftest.i conftest.err conftest.$ac_ext
+if $ac_preproc_ok; then :
+  break
+fi
+
+    done
+    ac_cv_prog_CXXCPP=$CXXCPP
+
+fi
+  CXXCPP=$ac_cv_prog_CXXCPP
+else
+  ac_cv_prog_CXXCPP=$CXXCPP
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXXCPP" >&5
+$as_echo "$CXXCPP" >&6; }
+ac_preproc_ok=false
+for ac_cxx_preproc_warn_flag in '' yes
+do
+  # Use a header file that comes with gcc, so configuring glibc
+  # with a fresh cross-compiler works.
+  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+  # <limits.h> exists even on freestanding compilers.
+  # On the NeXT, cc -E runs the code through the compiler's parser,
+  # not just through cpp. "Syntax error" is here to catch this case.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+		     Syntax error
+_ACEOF
+if ac_fn_cxx_try_cpp "$LINENO"; then :
+
+else
+  # Broken: fails on valid input.
+continue
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+  # OK, works on sane cases.  Now check whether nonexistent headers
+  # can be detected and how.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ac_nonexistent.h>
+_ACEOF
+if ac_fn_cxx_try_cpp "$LINENO"; then :
+  # Broken: success on invalid input.
+continue
+else
+  # Passes both tests.
+ac_preproc_ok=:
+break
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+done
+# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
+rm -f conftest.i conftest.err conftest.$ac_ext
+if $ac_preproc_ok; then :
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "C++ preprocessor \"$CXXCPP\" fails sanity check
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+for ac_header in boost/dynamic_bitset.hpp
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "boost/dynamic_bitset.hpp" "ac_cv_header_boost_dynamic_bitset_hpp" "$ac_includes_default"
 if test "x$ac_cv_header_boost_dynamic_bitset_hpp" = xyes; then :
@@ -8861,15 +8905,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
- if test "x$HAVE_FLINT" = "xyes"; then
-  SING_HAVE_FLINT_TRUE=
-  SING_HAVE_FLINT_FALSE='#'
-else
-  SING_HAVE_FLINT_TRUE='#'
-  SING_HAVE_FLINT_FALSE=
-fi
-
-
 CFLAGS=${BACKUP_CFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
@@ -9186,10 +9221,6 @@ LTLIBOBJS=$ac_ltlibobjs
 
 
 
-if test -z "${SING_HAVE_FLINT_TRUE}" && test -z "${SING_HAVE_FLINT_FALSE}"; then
-  as_fn_error $? "conditional \"SING_HAVE_FLINT\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0
