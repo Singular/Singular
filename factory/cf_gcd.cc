@@ -756,7 +756,26 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   }
   else if (!fc_and_gc_Univariate)
   {
-    if (
+    if ( isOn( SW_USE_EZGCD ) )
+    {
+      fc= ezgcd (fc, gc);
+      /*if ( pe == 1 )
+        fc = ezgcd( fc, gc );
+      else if ( pe > 0 )// no variable at position 1
+      {
+        fc = replacevar( fc, Variable(pe), Variable(1) );
+        gc = replacevar( gc, Variable(pe), Variable(1) );
+        fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+      else
+      {
+        pe = -pe;
+        fc = swapvar( fc, Variable(pe), Variable(1) );
+        gc = swapvar( gc, Variable(pe), Variable(1) );
+        fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }*/
+    }
+    else if (
     isOn(SW_USE_CHINREM_GCD)
     && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
     )
@@ -773,24 +792,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #else
       fc = chinrem_gcd( fc, gc);
     #endif
-    }
-    else if ( isOn( SW_USE_EZGCD ) )
-    {
-      if ( pe == 1 )
-        fc = ezgcd( fc, gc );
-      else if ( pe > 0 )// no variable at position 1
-      {
-        fc = replacevar( fc, Variable(pe), Variable(1) );
-        gc = replacevar( gc, Variable(pe), Variable(1) );
-        fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
-      else
-      {
-        pe = -pe;
-        fc = swapvar( fc, Variable(pe), Variable(1) );
-        gc = swapvar( gc, Variable(pe), Variable(1) );
-        fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
     }
     else
     {
