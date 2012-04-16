@@ -103,9 +103,6 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for programs
 dnl
 AC_CHECK_PROG(AR, ar, ar, :)
-if test "$ac_cv_prog_AR" != ar; then
-  AC_MSG_ERROR(*** ar program not found)
-fi
 AC_CHECK_PROGS(PERL, perl, "no")
 if test "$ac_cv_prog_PERL" = no; then
   AC_MSG_ERROR(*** perl program not found)
