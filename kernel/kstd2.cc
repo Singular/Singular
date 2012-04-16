@@ -65,7 +65,6 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
   int j = start;
   poly p=L->p;
   ring r=currRing;
-  if (p==NULL)  { r=L->tailRing; p=L->t_p; }
   L->GetLm(p, r);
 
   pAssume(~not_sev == p_GetShortExpVector(p, r));
