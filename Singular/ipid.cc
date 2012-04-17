@@ -14,6 +14,7 @@
 #include <kernel/options.h>
 #include <Singular/ipshell.h>
 #include <kernel/intvec.h>
+#include <kernel/bigintmat.h>
 #include <kernel/febase.h>
 #include <kernel/numbers.h>
 #include <kernel/longrat.h>
@@ -122,6 +123,8 @@ void *idrecDataInit(int t)
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)new intvec();
+    case BIGINTMAT_CMD:
+      return (void *)new bigintmat();
     case NUMBER_CMD:
       return (void *) nInit(0);
     case BIGINT_CMD:

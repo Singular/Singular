@@ -20,6 +20,7 @@
 #include <Singular/stype.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
+#include <kernel/bigintmat.h>
 #include <kernel/febase.h>
 #include <kernel/matpol.h>
 #include <kernel/ring.h>
@@ -924,6 +925,13 @@ declare_ip_variable:
             }
             else /* BIGINTMAT_CMD */
             {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+                YYERROR;
+              v=&$$;
+              h=(idhdl)v->data;
+              delete IDBIMAT(h);
+              IDBIMAT(h) = new bigintmat(r,c);
+              if (IDBIMAT(h)==NULL) YYERROR;
             }
           }
         | mat_cmd elemexpr
@@ -948,6 +956,8 @@ declare_ip_variable:
             }
             else /* BIGINTMAT_CMD */
             {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+                YYERROR;
             }
           }
         | declare_ip_variable ',' elemexpr

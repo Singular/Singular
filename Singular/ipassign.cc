@@ -17,6 +17,7 @@
 #include <Singular/ipid.h>
 #include <kernel/idrec.h>
 #include <kernel/intvec.h>
+#include <kernel/bigintmat.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
@@ -297,8 +298,40 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 {
   number p=(number)a->CopyD(BIGINT_CMD);
-  if (res->data!=NULL) nlDelete((number *)&res->data,NULL);
-  res->data=(void *)p;
+  if (e==NULL)
+  {
+    if (res->data!=NULL) nlDelete((number *)&res->data,NULL);
+    res->data=(void *)p;
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in bigintmat (%d,%d)",i+1,c,iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else
+      {
+        nlDelete((number *)&BIMATELEM(*iv,i+1,c),NULL);
+        BIMATELEM(*iv,i+1,c) = p;
+      }
+    }
+  }
   jiAssignAttr(res,a);
   return FALSE;
 }
@@ -462,8 +495,17 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
   //if ((res->data==NULL) || (res->Typ()==a->Typ()))
   {
     if (res->data!=NULL) delete ((intvec *)res->data);
-    res->data=(void *)a->CopyD(INTVEC_CMD);
-    jiAssignAttr(res,a);
+    switch (a->Typ())
+    {
+      case INTMAT_CMD:
+      case INTVEC_CMD:
+        res->data=(void *)a->CopyD(INTVEC_CMD);
+        jiAssignAttr(res,a);
+        break;
+      case BIGINTMAT_CMD:
+        res->data=(void *)bim2iv((bigintmat *)a->Data());
+        break;
+    }
     return FALSE;
   }
 #if 0
@@ -479,6 +521,21 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
     return FALSE; //(r->length()< s->length());
   }
 #endif
+}
+static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr e)
+{
+  if (res->data!=NULL) delete ((bigintmat *)res->data);
+  switch (a->Typ())
+  {
+    case BIGINTMAT_CMD:
+      res->data=(void *)a->CopyD(BIGINTMAT_CMD);
+      jiAssignAttr(res,a);
+      break;
+    case INTMAT_CMD:
+      res->data=(void *)iv2bim((intvec *)a->Data());
+      break;
+  }
+  return FALSE;
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {

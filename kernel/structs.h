@@ -114,6 +114,7 @@ typedef number (*nMapFunc)(number a);
 #ifdef __cplusplus
 class ip_smatrix;
 class intvec;
+class bigintmat;
 class sleftv;
 class slists;
 class sattr;

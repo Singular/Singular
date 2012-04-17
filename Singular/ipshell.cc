@@ -16,6 +16,7 @@
 #include <kernel/options.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
+#include <kernel/bigintmat.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
@@ -149,6 +150,8 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
     case INT_CMD:   Print(" %d",IDINT(h)); break;
     case INTVEC_CMD:Print(" (%d)",IDINTVEC(h)->length()); break;
     case INTMAT_CMD:Print(" %d x %d",IDINTVEC(h)->rows(),IDINTVEC(h)->cols());
+                    break;
+    case BIGINTMAT_CMD:Print(" %d x %d",IDBIMAT(h)->rows(),IDBIMAT(h)->cols());
                     break;
     case POLY_CMD:
     case VECTOR_CMD:if (c)

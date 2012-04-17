@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT
 */
@@ -22,6 +21,7 @@ union uutypes
   matrix        umatrix;
   char *        ustring;
   intvec *      iv;
+  bigintmat *   bim;
   lists         l;
   si_link       li;
   package       pack;

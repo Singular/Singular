@@ -17,6 +17,7 @@
 #include <kernel/options.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
+#include <kernel/bigintmat.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
@@ -222,6 +223,38 @@ int iiTokType(int op)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
+static BOOLEAN jjOP_BIM_I(leftv res, leftv u, leftv v)
+{
+  bigintmat* aa= (bigintmat *)u->CopyD(BIGINTMAT_CMD);
+  int bb = (int)(long)(v->Data());
+  if (errorreported) return TRUE;
+  switch (iiOp)
+  {
+    case '*': (*aa) *= bb; break;
+  }
+  res->data=(char *)aa;
+  return FALSE;
+}
+static BOOLEAN jjOP_I_BIM(leftv res, leftv u, leftv v)
+{
+  return jjOP_BIM_I(res, v, u);
+}
+static BOOLEAN jjOP_BIM_BI(leftv res, leftv u, leftv v)
+{
+  bigintmat* aa= (bigintmat *)u->CopyD(BIGINTMAT_CMD);
+  number bb = (number)(v->Data());
+  if (errorreported) return TRUE;
+  switch (iiOp)
+  {
+    case '*': (*aa) *= bb; break;
+  }
+  res->data=(char *)aa;
+  return FALSE;
+}
+static BOOLEAN jjOP_BI_BIM(leftv res, leftv u, leftv v)
+{
+  return jjOP_BIM_BI(res, v, u);
+}
 static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
 {
   intvec* aa= (intvec *)u->CopyD(INTVEC_CMD);
@@ -286,6 +319,34 @@ static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
 {
   intvec*    a = (intvec * )(u->Data());
   intvec*    b = (intvec * )(v->Data());
+  int r=a->compare(b);
+  switch  (iiOp)
+  {
+    case '<':
+      res->data  = (char *) (r<0);
+      break;
+    case '>':
+      res->data  = (char *) (r>0);
+      break;
+    case LE:
+      res->data  = (char *) (r<=0);
+      break;
+    case GE:
+      res->data  = (char *) (r>=0);
+      break;
+    case EQUAL_EQUAL:
+    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+      res->data  = (char *) (r==0);
+      break;
+  }
+  jjEQUAL_REST(res,u,v);
+  if(r==-2) { WerrorS("size incompatible"); return TRUE; }
+  return FALSE;
+}
+static BOOLEAN jjCOMPARE_BIM(leftv res, leftv u, leftv v)
+{
+  bigintmat*    a = (bigintmat * )(u->Data());
+  bigintmat*    b = (bigintmat * )(v->Data());
   int r=a->compare(b);
   switch  (iiOp)
   {
@@ -671,6 +732,16 @@ static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
+static BOOLEAN jjPLUS_BIM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)bimAdd((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
+  if (res->data==NULL)
+  {
+    WerrorS("bigintmat size not compatible");
+    return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+}
 static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 {
   matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
@@ -751,6 +822,16 @@ static BOOLEAN jjMINUS_IV(leftv res, leftv u, leftv v)
   {
      WerrorS("intmat size not compatible");
      return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+}
+static BOOLEAN jjMINUS_BIM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)bimSub((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
+  if (res->data==NULL)
+  {
+    WerrorS("bigintmat size not compatible");
+    return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
@@ -865,6 +946,18 @@ static BOOLEAN jjTIMES_IV(leftv res, leftv u, leftv v)
   {
      WerrorS("intmat size not compatible");
      return TRUE;
+  }
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjTIMES_BIM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)bimMult((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
+  if (res->data==NULL)
+  {
+    WerrorS("bigintmat size not compatible");
+    return TRUE;
   }
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
@@ -3481,6 +3574,13 @@ static BOOLEAN jjUMINUS_IV(leftv res, leftv u)
   res->data = (char *)iv;
   return FALSE;
 }
+static BOOLEAN jjUMINUS_BIM(leftv res, leftv u)
+{
+  bigintmat *bim=(bigintmat *)u->CopyD(BIGINTMAT_CMD);
+  (*bim)*=(-1);
+  res->data = (char *)bim;
+  return FALSE;
+}
 static BOOLEAN jjPROC1(leftv res, leftv u)
 {
   return jjPROC(res,u,NULL);
@@ -5232,6 +5332,34 @@ static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
   Subexpr e=jjMakeSub(v);
           e->next=jjMakeSub(w);
   if (u->e==NULL) res->e=e;
+  else
+  {
+    Subexpr h=u->e;
+    while (h->next!=NULL) h=h->next;
+    h->next=e;
+    res->e=u->e;
+    u->e=NULL;
+  }
+  return FALSE;
+}
+static BOOLEAN jjBRACK_Bim(leftv res, leftv u, leftv v, leftv w)
+{
+  bigintmat *bim = (bigintmat *)u->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
+  if ((r<1)||(r>bim->rows())||(c<1)||(c>bim->cols()))
+  {
+    Werror("wrong range[%d,%d] in bigintmat %s(%d x %d)",
+           r,c,u->Fullname(),bim->rows(),bim->cols());
+    return TRUE;
+  }
+  res->data=u->data; u->data=NULL;
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->name=u->name; u->name=NULL;
+  Subexpr e=jjMakeSub(v);
+          e->next=jjMakeSub(w);
+  if (u->e==NULL)
+    res->e=e;
   else
   {
     Subexpr h=u->e;
