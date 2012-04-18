@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -219,14 +218,18 @@ number nr2mInit(long i, const coeffs r)
  * note that the code computes a long which will then
  * automatically casted to int
  */
-int nr2mInt(number &n, const coeffs r)
+static long nr2mLong(number &n, const coeffs r)
 {
   NATNUMBER nn = (unsigned long)(NATNUMBER)n & r->mod2mMask;
   unsigned long l = r->mod2mMask >> 1; l++; /* now: l = 2^(m-1) */
   if ((NATNUMBER)nn > l)
-    return (int)((NATNUMBER)nn - r->mod2mMask - 1);
+    return (long)((NATNUMBER)nn - r->mod2mMask - 1);
   else
-    return (int)((NATNUMBER)nn);
+    return (long)((NATNUMBER)nn);
+}
+int nr2mInt(number &n, const coeffs r)
+{
+  return (int)nr2mLong(n,r);
 }
 
 number nr2mAdd(number a, number b, const coeffs r)
@@ -472,7 +475,7 @@ number nr2mMod(number a, number b, const coeffs r)
   assume((NATNUMBER) b != 0);
   NATNUMBER g = 1;
   NATNUMBER b_div = (NATNUMBER) b;
-  
+
   /*
    * b_div is unsigned, so that (b_div < 0) evaluates false at compile-time
    *
@@ -673,8 +676,8 @@ BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
 
 void nr2mWrite (number &a, const coeffs r)
 {
-  int i = nr2mInt(a, r);
-  StringAppend("%d", i);
+  long i = nr2mLong(a, r);
+  StringAppend("%ld", i);
 }
 
 static const char* nr2mEati(const char *s, int *i, const coeffs r)
