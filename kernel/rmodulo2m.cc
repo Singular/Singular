@@ -147,14 +147,18 @@ number nr2mInit (int i, const ring r)
  * note that the code computes a long which will then
  * automatically casted to int
  */
-int nr2mInt(number &n, const ring r)
+long nr2mLong(number &n, const ring r)
 {
   NATNUMBER nn = (unsigned long)(NATNUMBER)n & r->nr2mModul;
   unsigned long l = r->nr2mModul >> 1; l++; /* now: l = 2^(m-1) */
   if ((NATNUMBER)nn > l)
-    return (int)((NATNUMBER)nn - r->nr2mModul - 1);
+    return (long)((NATNUMBER)nn - r->nr2mModul - 1);
   else
-    return (int)((NATNUMBER)nn);
+    return (long)((NATNUMBER)nn);
+}
+int nr2mInt(number &n, const ring r)
+{
+  return (int)nr2mLong(n,r);
 }
 
 number nr2mAdd (number a, number b)
@@ -602,8 +606,8 @@ BOOLEAN nr2mDBTest (number a, const char *f, const int l)
 
 void nr2mWrite (number &a, const ring r)
 {
-  int i = nr2mInt(a, r);
-  StringAppend("%d", i);
+  long i = nr2mLong(a, r);
+  StringAppend("%ld", i);
 }
 
 static const char* nr2mEati(const char *s, int *i)
