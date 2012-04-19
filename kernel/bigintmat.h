@@ -7,10 +7,10 @@
 * ABSTRACT: class bigintmat: matrizes of big integers
 */
 #include <string.h>
-#include <omalloc/omalloc.h>  
-#include <kernel/febase.h>    
-#include <kernel/longrat.h>   
-#include <kernel/intvec.h>    
+#include <omalloc/omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/longrat.h>
+#include <kernel/intvec.h>
 
 
 class bigintmat
@@ -42,8 +42,8 @@ public:
       }
     }
   }
-  
-  
+
+
   inline number& operator[](int i)
     {
 #ifndef NDEBUG
@@ -64,7 +64,7 @@ public:
 #endif
       return v[i];
     }
-    
+
 #define BIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
   void operator*=(int intop);
   void operator*=(number bintop);
@@ -83,9 +83,10 @@ public:
   number get(int i);
   void set(int i, int j, number n);
   void set(int i, number n);
-  void print();
-  void prettyprint(int swid);
+  char * String();
+  void pprint(int maxwid);
   int compare(const bigintmat* op) const;
+  int getwid(int maxwid);
 };
 bool operator==(bigintmat & lhr, bigintmat & rhr);
 bool operator!=(bigintmat & lhr, bigintmat & rhr);
@@ -94,6 +95,9 @@ bigintmat * bimSub(bigintmat * a, bigintmat * b);
 bigintmat * bimMult(bigintmat * a, bigintmat * b);
 intvec * bim2iv(bigintmat * b);
 bigintmat * bimCopy(const bigintmat * b);
+static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
+static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
+                     int ready, int all);
 
 bigintmat * iv2bim(intvec * b);
 #endif

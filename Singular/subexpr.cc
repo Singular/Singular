@@ -116,8 +116,7 @@ void sleftv::Print(leftv store, int spaces)
           ((intvec *)d)->show(t,spaces);
           break;
         case BIGINTMAT_CMD:
-          ((bigintmat *)d)->print();
-         // PrintS(((bigintmat *)d)->prettyprint(spaces));
+          ((bigintmat *)d)->pprint(80);
           break;
         case RING_CMD:
         case QRING_CMD:
@@ -814,7 +813,20 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           else
             return s;
         }
-
+        case BIGINTMAT_CMD:
+        {
+          bigintmat *bim=(bigintmat*)d;
+          s = bim->String();
+          if (typed)
+          {
+            char* ns = (char*) omAlloc0(strlen(s) + 40);
+            sprintf(ns, "bigintmat(bigintvec(%s),%d,%d)", s, bim->rows(), bim->cols());
+            omCheckAddr(ns);
+            return ns;
+          }
+          else
+            return omStrDup(s);
+        } 
         case RING_CMD:
         case QRING_CMD:
           s  = rString((ring)d);

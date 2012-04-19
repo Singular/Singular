@@ -8,6 +8,7 @@
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
+#include <kernel/bigintmat.h>
 #include <kernel/intvec.h>
 #include <kernel/options.h>
 #include <omalloc/omalloc.h>
@@ -181,6 +182,16 @@ static void * iiIm2Ma(void *data)
   }
   delete iv;
   return (void *)m;
+}
+
+static void * iiIm2Bim(void *data)
+{
+  return (void *)iv2bim((intvec*)data);
+}
+
+static void * iiBim2Im(void *data)
+{
+  return (void *)bim2iv((bigintmat*)data);
 }
 
 static void * iiN2P(void *data)

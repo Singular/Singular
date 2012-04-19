@@ -1120,6 +1120,10 @@ struct sConvertTypes dConvertTypes[] =
    { INTVEC_CMD,      INTMAT_CMD,     D(iiDummy), NULL },
 //  intvec -> matrix
    { INTVEC_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL },
+//  intmat -> bigintmat
+   { INTMAT_CMD,      BIGINTMAT_CMD,  D(iiIm2Bim) , NULL },
+//  bigintmat -> intmat
+   { BIGINTMAT_CMD,   INTMAT_CMD,     D(iiBim2Im) , NULL },
 //  intmat -> matrix
    { INTMAT_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL },
 //  number -> poly
@@ -1186,9 +1190,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_INTVEC),   INTVEC_CMD,     INTVEC_CMD }
 ,{D(jiA_INTVEC),   INTMAT_CMD,     INTMAT_CMD }
 //,{D(jiA_INTVEC),   INTMAT_CMD,     INTVEC_CMD }
-,{D(jiA_INTVEC),   INTMAT_CMD,     BIGINTMAT_CMD}
 ,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
-,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  INTMAT_CMD }
 ,{D(jiA_NUMBER),   NUMBER_CMD,     NUMBER_CMD }
 ,{D(jiA_BIGINT),   BIGINT_CMD,     BIGINT_CMD }
 ,{D(jiA_LIST_RES), LIST_CMD,       RESOLUTION_CMD }

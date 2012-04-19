@@ -4921,6 +4921,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case RING_CMD:       res->data=omStrDup("ring"); break;
     case QRING_CMD:      res->data=omStrDup("qring"); break;
     case INTMAT_CMD:     res->data=omStrDup("intmat"); break;
+    case BIGINTMAT_CMD:  res->data=omStrDup("bigintmat"); break;
     case NUMBER_CMD:     res->data=omStrDup("number"); break;
     case BIGINT_CMD:     res->data=omStrDup("bigint"); break;
     case LIST_CMD:       res->data=omStrDup("list"); break;

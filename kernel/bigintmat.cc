@@ -1,33 +1,18 @@
-/* Probleme:
-3) Ausgabe als String fehlt noch
-5) Welche der eingebundenen Dateien werden wirklich benötigt?
-
-in Makefile.in
-Dateien eintragen, in /SIngular/ config.status ausführen
-
-table.h in /Singular/
-
-
-//spielwiese
-autogen.sh
-
-/libpoly/misc/Makefile.am
-*/
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
 /*
 * ABSTRACT: class bigintmat: matrizes of big integers
 */
-#include <kernel/mod2.h>                     
-#include <kernel/febase.h>                     
-#include <kernel/options.h>                        
+#include <kernel/mod2.h>
+#include <kernel/febase.h>
+#include <kernel/options.h>
 #include <kernel/bigintmat.h>
-#include <omalloc/omalloc.h>                    
-#include <kernel/longrat.h>                   
-#include <kernel/intvec.h>  
-#include <math.h>        
-#include <string.h>        
+#include <omalloc/omalloc.h>
+#include <kernel/longrat.h>
+#include <kernel/intvec.h>
+#include <math.h>
+#include <string.h>
 
 #define BIGIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
 
@@ -79,11 +64,11 @@ void bigintmat::operator*=(int intop)
 {
   for (int i=0; i<row*col; i++)
   {
-  	number iop = nlInit(intop, NULL);
-  	number prod = nlMult(v[i], iop);
-  	nlDelete(&(v[i]), NULL);
-  	nlDelete(&iop, NULL);
-  	v[i] = prod;
+          number iop = nlInit(intop, NULL);
+          number prod = nlMult(v[i], iop);
+          nlDelete(&(v[i]), NULL);
+          nlDelete(&iop, NULL);
+          v[i] = prod;
   }
 }
 
@@ -91,9 +76,9 @@ void bigintmat::operator*=(number bintop)
 {
   for (int i=0; i<row*col; i++)
   {
-  	number prod = nlMult(v[i], bintop);
-  	nlDelete(&(v[i]), NULL);
-  	v[i] = prod;
+          number prod = nlMult(v[i], bintop);
+          nlDelete(&(v[i]), NULL);
+          v[i] = prod;
   }
 }
 
@@ -108,7 +93,7 @@ bool operator==(bigintmat & lhr, bigintmat & rhr)
   if (lhr.rows() != rhr.rows()) { return false; }
   for (int i=0; i<(lhr.rows())*(lhr.cols()); i++)
   {
-    if (!nlEqual(lhr[i], rhr[i])) { return false; }  
+    if (!nlEqual(lhr[i], rhr[i])) { return false; }
   }
   return true;
 }
@@ -139,7 +124,7 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
     {
       if (ma == a->rows())
       {
-        for(i=mn; i<ma; i++) 
+        for(i=mn; i<ma; i++)
         {
           bim->set(i, (*a)[i]);
         }
@@ -160,7 +145,7 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
   {
     number n = nlAdd((*a)[i], (*b)[i]);
     bim->set(i, n);
-    nlDelete(&n, NULL); 
+    nlDelete(&n, NULL);
   }
   return bim;
 }
@@ -185,7 +170,7 @@ bigintmat * bimSub(bigintmat * a, bigintmat * b)
     {
       if (ma == a->rows())
       {
-        for(i=mn; i<ma; i++) 
+        for(i=mn; i<ma; i++)
         {
           bim->set(i, (*a)[i]);
         }
@@ -312,64 +297,202 @@ bigintmat * bimCopy(const bigintmat * b)
   return a;
 }
 
-void bigintmat::print()
+char* bigintmat::String()
 {
   StringSetS("");
-  for (int i=0; i<col*row; i++)
+  int i;
+  for (i=0; i<col*row-1; i++)
   {
-    //int n = nlInt(v[i], NULL);
-    //char tmp[10];
-    //sprintf(tmp, "%d", n);
     nlWrite(v[i], NULL);
-    //PrintS(tmp); //
-    if (i != col*row-1)
-    {
-      StringAppend(",");
-      if ((i+1)%col == 0)
-        StringAppend("\n");
-    }    
+    StringAppendS(",");
   }
-  PrintS(StringAppend(""));
+  nlWrite(v[i], NULL);
+   /* if (i != col*row-1)
+    {
+      StringAppendS(",");
+      if ((i+1)%col == 0)
+        StringAppendS("\n");
+    }   */
+  return StringAppendS("");
 }
 
-void bigintmat::prettyprint(int swid)
+int bigintmat::getwid(int maxwid)
 {
- // if (col*row == 0) return "";
-  int colwid = floor((swid-2*(col-1))/col); // Berechnung der Spaltenbreite (im Zweifel abrunden)
-  char * ps;
-  ps = (char*) omAlloc(sizeof(char)*(colwid*col+2*(col-1)+row-1));  //Reale Länge des Strings
-  int pos = 0;
+  int wid=0;
+  int colwid = floor((maxwid-2*(col-1))/col);
   for (int i=0; i<col*row; i++)
   {
-    SPrintStart();
+    StringSetS("");
     nlWrite(v[i], NULL);
-    char * ts = SPrintEnd();
-    int nl = strlen(ts); 
-    if (nl > colwid)  // Zu lange Zahl wird durch ### dargestellt
+    char * tmp = StringAppendS("");
+    char * ts = omStrDup(tmp);
+    int nl = strlen(ts);
+    if (nl > wid)
     {
-      for (int j=0; j<colwid; j++)
-        ps[pos+j] = '#';
+      if (nl > colwid)
+      {
+        int phwid = floor(log10(row))+floor(log10(col))+5;
+        if ((colwid > phwid) && (wid < phwid))
+          wid = phwid;
+      }
+      else
+        wid = nl;
     }
-    else  // Mit Leerzeichen auffüllen und zahl reinschreiben
+  }
+  return wid;
+}
+
+void bigintmat::pprint(int maxwid)
+{
+  if ((col==0) || (row==0))
+    PrintS("");
+  else
+  {
+    int colwid = getwid(maxwid);
+    if (colwid*col+2*(col-1) > maxwid)
+      colwid = floor((maxwid-2*(col-1))/col);
+    char * ps;
+    ps = (char*) omAlloc0(sizeof(char)*(colwid*col*row+2*(col-1)*row+row));
+    int pos = 0;
+    for (int i=0; i<col*row; i++)
     {
-      for (int j=0; j<colwid-nl; j++)
-        ps[pos+j] = ' ';
-      for (int j=0; j<nl; j++)
-        ps[pos+colwid-nl+j] = ts[j];
+      StringSetS("");
+      nlWrite(v[i], NULL);
+      char * temp = StringAppendS("");
+      char * ts = omStrDup(temp);
+      int nl = strlen(ts);
+      if (nl > colwid)
+      {
+        StringSetS("");
+        int cj = i%col;
+        int ci = floor(i/col);
+        StringAppend("[%d,%d]", ci+1, cj+1);
+        char *tmp = StringAppendS("");
+        char * ph = omStrDup(tmp);
+        int phl = strlen(ph);
+        if (phl > colwid)
+        {
+          for (int j=0; j<colwid; j++)
+            ps[pos+j] = '*';
+        }
+        else
+        {
+          for (int j=0; j<colwid-phl; j++)
+            ps[pos+j] = ' ';
+          for (int j=0; j<phl; j++)
+            ps[pos+colwid-phl+j] = ph[j];
+        }
+        omFree(ph);
+      }
+      else  // Mit Leerzeichen auffüllen und zahl reinschreiben
+      {
+        for (int j=0; j<colwid-nl; j++)
+          ps[pos+j] = ' ';
+        for (int j=0; j<nl; j++)
+          ps[pos+colwid-nl+j] = ts[j];
+      }
+      // ", " oder "\n" einfügen
+      if ((i+1)%col == 0)
+      {
+        if (i != col*row-1)
+        {
+          ps[pos+colwid] = '\n';
+          pos += colwid+1;
+        }
+      }
+      else
+      {
+        ps[pos+colwid] = ',';
+        ps[pos+colwid+1] = ' ';
+        pos += colwid+2;
+      }
+    // Hier ts zerstören
     }
-    
-    // ", " oder "\n" einfügen
-    if (((i+1)%col == 0) && (i != col*row))
-    {
-      ps[colwid] = '\n';
-      pos += colwid+1;
-    }
-    else
-    {
-      ps[colwid] = ',';
-      ps[colwid+1] = ' ';
-      pos += colwid+2;
-    }
-  // Hier ts zerstören
+    PrintS(ps);
+    omFree(ps);
   }
 }
+
+// Ungetestet
+static void bimRowContent(bigintmat *bimat, int rowpos, int colpos)
+{
+  number tgcd, m;
+  int i=bimat->cols();
+
+  loop
+  {
+    tgcd = nlCopy(BIMATELEM(*bimat,rowpos,i--));
+    if (!nlIsZero(tgcd)) break;
+    if (i<colpos) return;
+  }
+  if ((!nlGreaterZero(tgcd)) && (!nlIsZero(tgcd))) tgcd = nlNeg(tgcd);
+  if (nlIsOne(tgcd)) return;
+  loop
+  {
+    m = nlCopy(BIMATELEM(*bimat,rowpos,i--));
+    if (!nlIsZero(m))
+    {
+      number tp1 = nlGcd(tgcd, m, NULL);
+      nlDelete(&tgcd, NULL);
+      tgcd = tp1;
+    }
+    if (nlIsOne(tgcd)) return;
+    if (i<colpos) break;
+  }
+  for (i=bimat->cols();i>=colpos;i--)
+  {
+    number tp2 = nlDiv(BIMATELEM(*bimat,rowpos,i), tgcd);
+    nlDelete(&BIMATELEM(*bimat,rowpos,i), NULL);
+    BIMATELEM(*bimat,rowpos,i) = tp2;
+  }
+  nlDelete(&tgcd, NULL);
+  nlDelete(&m, NULL);
+}
+
+static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
+                     int ready, int all)
+{
+  number tgcd, ce, m1, m2;
+  int j, i;
+  number piv = BIMATELEM(*bimat,rpiv,colpos);
+
+  for (j=all;j>ready;j--)
+  {
+    ce = nlCopy(BIMATELEM(*bimat,j,colpos));
+    if (!nlIsZero(ce))
+    {
+      nlDelete(&BIMATELEM(*bimat,j,colpos), NULL);
+      BIMATELEM(*bimat,j,colpos) = nlInit(0, NULL);
+      m1 = nlCopy(piv);
+      m2 = nlCopy(ce);
+      tgcd = nlGcd(m1, m2, NULL);
+      if (!nlIsOne(tgcd))
+      {
+        number tp1 = nlDiv(m1, tgcd);
+        number tp2 = nlDiv(m2, tgcd);
+        nlDelete(&m1, NULL);
+        nlDelete(&m2, NULL);
+        m1 = tp1;
+        m2 = tp2;
+      }
+      for (i=bimat->cols();i>colpos;i--)
+      {
+        nlDelete(&BIMATELEM(*bimat,j,i), NULL);
+        number tp1 = nlMult(BIMATELEM(*bimat,j,i), m1);
+        number tp2 = nlMult(BIMATELEM(*bimat,rpiv,i), m2);
+        BIMATELEM(*bimat,j,i) = nlSub(tp1, tp2);
+        nlDelete(&tp1, NULL);
+        nlDelete(&tp2, NULL);
+      }
+      bimRowContent(bimat, j, colpos+1);
+      nlDelete(&m1, NULL);
+      nlDelete(&m2, NULL);
+    }
+    nlDelete(&ce, NULL);
+  }
+}
+
+
+
+
+

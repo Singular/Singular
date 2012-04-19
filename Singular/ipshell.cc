@@ -231,6 +231,8 @@ void type_cmd(leftv v)
     case MAP_CMD:Print(" from %s\n",((map)(v->Data()))->preimage); break;
     case INTMAT_CMD: Print(" %d x %d\n",((intvec*)(v->Data()))->rows(),
                                       ((intvec*)(v->Data()))->cols()); break;
+    case BIGINTMAT_CMD: Print(" %d x %d\n",((bigintmat*)(v->Data()))->rows(),
+                                      ((bigintmat*)(v->Data()))->cols()); break;
     case MATRIX_CMD:Print(" %u x %u\n" ,
        MATROWS((matrix)(v->Data())),
        MATCOLS((matrix)(v->Data())));break;

@@ -495,17 +495,8 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
   //if ((res->data==NULL) || (res->Typ()==a->Typ()))
   {
     if (res->data!=NULL) delete ((intvec *)res->data);
-    switch (a->Typ())
-    {
-      case INTMAT_CMD:
-      case INTVEC_CMD:
-        res->data=(void *)a->CopyD(INTVEC_CMD);
-        jiAssignAttr(res,a);
-        break;
-      case BIGINTMAT_CMD:
-        res->data=(void *)bim2iv((bigintmat *)a->Data());
-        break;
-    }
+    res->data=(void *)a->CopyD(INTVEC_CMD);
+    jiAssignAttr(res,a);
     return FALSE;
   }
 #if 0
@@ -525,16 +516,8 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) delete ((bigintmat *)res->data);
-  switch (a->Typ())
-  {
-    case BIGINTMAT_CMD:
-      res->data=(void *)a->CopyD(BIGINTMAT_CMD);
-      jiAssignAttr(res,a);
-      break;
-    case INTMAT_CMD:
-      res->data=(void *)iv2bim((intvec *)a->Data());
-      break;
-  }
+  res->data=(void *)a->CopyD(BIGINTMAT_CMD);
+  jiAssignAttr(res,a);
   return FALSE;
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
