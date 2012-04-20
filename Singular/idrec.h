@@ -3,14 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
-* ABSTRACT
+* ABSTRACT interpreter type for variables
 */
 
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/silink.h>
+#include <misc/bigintmat.h>
 
 typedef union uutypes      utypes;
 union uutypes
@@ -24,6 +24,7 @@ union uutypes
   matrix        umatrix;
   char *        ustring;
   intvec *      iv;
+  bigintmat *   bim;
   lists         l;
   si_link       li;
   package       pack;

@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -116,6 +115,7 @@ void ipListFlag(idhdl h);
 #define IDDATA(a)   ((a)->data.ustring)
 #define IDRING(a)   ((a)->data.uring)
 #define IDINTVEC(a) ((a)->data.iv)
+#define IDBIMAT(a)  ((a)->data.bim)
 #define IDPOLY(a)   ((a)->data.p)
 #define IDBIGINT(a) ((a)->data.n)
 #define IDNUMBER(a) ((a)->data.n)
