@@ -573,6 +573,29 @@ NOTE:    T_1(id) itself is usually of minor importance. Nevertheless, from it
 EXAMPLE: example T_1; shows an example
 "
 {
+   def RR=basering;
+   list RRL=ringlist(RR);
+   if(RRL[4]!=0)
+   {
+      int aa=size(#);
+      ideal QU=RRL[4];
+      RRL[4]=ideal(0);
+      def RS=ring(RRL);
+      setring RS;
+      ideal id=imap(RR,id);
+      ideal QU=imap(RR,QU);
+      if(aa)
+      {
+         list RES=T_1(id+QU,1);
+      }
+      else
+      {
+         module RES=T_1(id+QU);
+      }
+      setring RR;
+      def RES=imap(RS,RES);
+      return(RES);
+   }
    ideal J=simplify(id,10);
 //--------------------------- hypersurface case -------------------------------
   if( size(J)<2 )
@@ -654,6 +677,30 @@ NOTE:    The most important information is probably vdim(T_2(id)).
 EXAMPLE: example T_2; shows an example
 "
 {
+   def RR=basering;
+   list RRL=ringlist(RR);
+   if(RRL[4]!=0)
+   {
+      int aa=size(#);
+      ideal QU=RRL[4];
+      RRL[4]=ideal(0);
+      def RS=ring(RRL);
+      setring RS;
+      ideal id=imap(RR,id);
+      ideal QU=imap(RR,QU);
+      if(aa)
+      {
+         list RES=T_2(id+QU,1);
+      }
+      else
+      {
+         module RES=T_2(id+QU);
+      }
+      setring RR;
+      def RES=imap(RS,RES);
+      return(RES);
+   }
+
 //--------------------------- initialisation ----------------------------------
   def P = basering;
    ideal J = id;
@@ -728,6 +775,30 @@ NOTE:    Use proc miniversal from deform.lib to get miniversal deformation of i,
 EXAMPLE: example T_12; shows an example
 "
 {
+   def RR=basering;
+   list RRL=ringlist(RR);
+   if(RRL[4]!=0)
+   {
+      int aa=size(#);
+      ideal QU=RRL[4];
+      RRL[4]=ideal(0);
+      def RS=ring(RRL);
+      setring RS;
+      ideal id=imap(RR,id);
+      ideal QU=imap(RR,QU);
+      if(aa)
+      {
+         list RES=T_12(id+QU,1);
+      }
+      else
+      {
+         list RES=T_12(id+QU);
+      }
+      setring RR;
+      list RES=imap(RS,RES);
+      return(RES);
+   }
+
 //--------------------------- initialisation ----------------------------------
    int  n,r1,r2,d1,d2;
    def P = basering;
