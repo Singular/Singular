@@ -397,7 +397,6 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   }
   mat_ZZ M;
   vec_ZZ S;
-  CanonicalForm oldF= F;
   F= compress (F, M, S);
   CanonicalForm pthRoot, A, tmp;
   CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, alpha);

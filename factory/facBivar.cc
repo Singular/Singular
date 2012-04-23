@@ -425,7 +425,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   }
 
   //check trivial case
-  if (degree (A) == 1 || degree (A, 1) == 1)
+  if (degree (A) == 1 || degree (A, 1) == 1 ||
+      (size (A) == 2 && gcd (degree (A), degree (A,1)).isOne()))
   {
     CFList factors;
     factors.append (A);
