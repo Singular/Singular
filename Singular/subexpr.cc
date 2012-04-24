@@ -1335,7 +1335,12 @@ BOOLEAN assumeStdFlag(leftv h)
   if (!hasFlag(h,FLAG_STD))
   {
     if (!TEST_VERB_NSB)
-      Warn("%s is no standard basis",h->Name());
+    {
+      if (TEST_V_ALLWARN)
+        Warn("%s is no standard basis in >>%s<<",h->Name(),my_yylinebuf);
+      else
+        Warn("%s is no standard basis",h->Name());
+    }
     return FALSE;
   }
   return TRUE;
