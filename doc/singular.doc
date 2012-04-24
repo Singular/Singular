@@ -910,6 +910,7 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
+* ffsolve_lib:: multivariate equation solving over finite fields
 * findifs_lib:: Tools for the finite difference schemes
 * finitediff_lib:: finite difference schemes for linear differential equations
 * lll_lib:: Integral LLL-Algorithm
@@ -919,7 +920,12 @@ Comments should be send to the author of the library directly.
 * symodstd_lib:: Groebner bases for symmetric ideals
 @end menu
 @c ----------------------------------------------------------
-@node findifs_lib, finitediff_lib, , Experimental libraries
+@node ffsolve_lib, findifs_lib, , Experimental libraries
+@subsection ffsolve_lib
+
+@c lib ffsolve.lib
+@c ----------------------------------------------------------
+@node findifs_lib, finitediff_lib, ffsolve_lib, Experimental libraries
 @subsection findifs_lib
 
 @c lib findifs.lib
