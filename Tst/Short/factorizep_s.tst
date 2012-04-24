@@ -324,4 +324,21 @@ f= x^14-1;
 
 l= factorize (f); testfactors (l, f);
 
+kill r;
+
+ring r = (2,a),(x,y),dp;
+minpoly = a^2 + a + 1;
+poly f=(a + 1)*x^145*y^84 + (a + 1)*x^205*y^17 + x^32*y^112 + x^92*y^45;
+list l;
+for (int i= 1; i < 33002; i= i+33)
+{
+  system ("--random", i);
+  l= factorize (f);
+  if (size (l[1]) != 5)
+  {
+    l;
+    break;
+  }
+}
+
 tst_status(1);$
