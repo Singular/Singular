@@ -1126,6 +1126,56 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
   IDINTVEC((idhdl)l->data)=iv;
   return FALSE;
 }
+static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
+{
+  /* left side is bigintmat, right side is list (of int,intvec,intmat)*/
+  leftv hh=r;
+  int i = 0;
+  while (hh!=NULL)
+  {
+    if (i>=bim->length())
+    {
+      if (TEST_V_ALLWARN)
+      {
+        Warn("expression list length(%d) does not match bigintmat size(%d)",
+              bim->length()+exprlist_length(hh),bim->length());
+      }
+      break;
+    }
+    if (hh->Typ() == INT_CMD)
+    {
+      number tp = nlInit((int)((long)(hh->Data())), NULL);
+      bim->set(i++, tp);
+      nlDelete(&tp, NULL);
+    }
+    else if (hh->Typ() == BIGINT_CMD)
+    {
+      bim->set(i++, (number)(hh->Data()));
+      number s = (number)(hh->Data()); 
+      nlDelete(&s, NULL);
+    } 
+    /*
+    ((hh->Typ() == INTVEC_CMD)
+            ||(hh->Typ() == INTMAT_CMD))
+    {
+      intvec *ivv = (intvec *)(hh->Data());
+      int ll = 0,l = si_min(ivv->length(),iv->length());
+      for (; l>0; l--)
+      {
+        (*iv)[i++] = (*ivv)[ll++];
+      }
+    }*/
+    else
+    {
+      delete bim;
+      return TRUE;
+    }
+    hh = hh->next;
+  }
+  if (IDBIMAT((idhdl)l->data)!=NULL) delete IDBIMAT((idhdl)l->data);
+  IDBIMAT((idhdl)l->data)=bim;
+  return FALSE;
+}
 static BOOLEAN jjA_L_STRING(leftv l,leftv r)
 {
   /* left side is string, right side is list of string*/
@@ -1517,6 +1567,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
     case INTMAT_CMD:
     {
       nok=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
+      break;
+    }
+    case BIGINTMAT_CMD:
+    {
+      nok=jjA_L_BIGINTMAT(l, r, new bigintmat(IDBIMAT((idhdl)l->data)));
       break;
     }
     case MAP_CMD:

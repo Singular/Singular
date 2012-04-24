@@ -23,6 +23,11 @@ void bigintmat::set(int i, int j, number n)
   v[(i-1)*col+j-1] = nlCopy(n);
 }
 
+int bigintmat::length()
+{
+  return col*row;
+}
+
 // Beginnt bei [0]
 void bigintmat::set(int i, number n)
 {
@@ -316,30 +321,86 @@ char* bigintmat::String()
   return StringAppendS("");
 }
 
-int bigintmat::getwid(int maxwid)
+int intArrSum(int * a, int length)
 {
-  int wid=0;
-  int colwid = floor((maxwid-2*(col-1))/col);
-  for (int i=0; i<col*row; i++)
+  int sum = 0;
+  for (int i=0; i<length; i++)
+    sum += a[i];
+  return sum;
+}
+
+// Eingabe muss erlaubt sein (kein Vektor mit nur 0)
+int findLongest(int * a, int length)
+{
+  int l = 0;
+  int index;
+  for (int i=0; i<length; i++)
   {
-    StringSetS("");
-    nlWrite(v[i], NULL);
-    char * tmp = StringAppendS("");
-    char * ts = omStrDup(tmp);
-    int nl = strlen(ts);
-    if (nl > wid)
+    if (a[i] > l)
     {
-      if (nl > colwid)
-      {
-        int phwid = floor(log10(row))+floor(log10(col))+5;
-        if ((colwid > phwid) && (wid < phwid))
-          wid = phwid;
-      }
-      else
-        wid = nl;
+      l = a[i];
+      index = i;
     }
   }
-  return wid;
+  return index;
+}
+
+int getShorter (int * a, int l, int j, int cols, int rows)
+{
+  int sndlong = 0;
+  for (int i=0; i<rows; i++)
+  {
+    int index = cols*i+j;
+    if ((a[index] > sndlong) && (a[index] < l))
+    {
+      int min = floor(log10(cols))+floor(log10(rows))+5;
+      if ((a[index] < min) && (min < l))
+        sndlong = min;
+      else
+        sndlong = a[index];
+    }
+  }
+  if (sndlong == 0)
+  {
+    int min = floor(log10(cols))+floor(log10(rows))+5;
+    if (min < l)
+      sndlong = min;
+    else
+      sndlong = l-1;
+  }
+  return sndlong;
+}
+
+int * bigintmat::getwid(int maxwid)
+{
+  int const c = 2*(col-1)+1;
+  if (col + c > maxwid-1) { return NULL; }
+  int * wv = (int*)omAlloc(sizeof(int)*col*row);
+  int * cwv = (int*)omAlloc(sizeof(int)*col);
+  for (int j=0; j<col; j++)
+  {
+    cwv[j] = 0;
+    for (int i=0; i<row; i++)
+    {
+      StringSetS("");
+      nlWrite(v[col*i+j], NULL);
+      char * tmp = StringAppendS("");
+      char * ts = omStrDup(tmp);
+      int nl = strlen(ts);
+      wv[col*i+j] = nl;
+      if (nl > cwv[j])
+        cwv[j] = nl;
+    }
+  }
+
+  // Größen verkleinern
+  while (intArrSum(cwv, col)+c > maxwid)
+  {
+    int j = findLongest(cwv, col);
+    cwv[j] = getShorter(wv, cwv[j], j, col, row);
+  }
+  omFree(wv);
+  return cwv;
 }
 
 void bigintmat::pprint(int maxwid)
@@ -348,11 +409,18 @@ void bigintmat::pprint(int maxwid)
     PrintS("");
   else
   {
-    int colwid = getwid(maxwid);
-    if (colwid*col+2*(col-1) > maxwid)
-      colwid = floor((maxwid-2*(col-1))/col);
+    int * colwid = getwid(maxwid);
+    if (colwid == NULL)
+    {
+      WerrorS("not enough space to print bigintmat");
+      return;
+    }
     char * ps;
-    ps = (char*) omAlloc0(sizeof(char)*(colwid*col*row+2*(col-1)*row+row));
+    int slength = 0;
+    for (int j=0; j<col; j++)
+      slength += colwid[j]*row;
+    slength += 2*(col-1)*row+row;
+    ps = (char*) omAlloc0(sizeof(char)*(slength));
     int pos = 0;
     for (int i=0; i<col*row; i++)
     {
@@ -361,52 +429,52 @@ void bigintmat::pprint(int maxwid)
       char * temp = StringAppendS("");
       char * ts = omStrDup(temp);
       int nl = strlen(ts);
-      if (nl > colwid)
+      int cj = i%col;
+      if (nl > colwid[cj])
       {
         StringSetS("");
-        int cj = i%col;
         int ci = floor(i/col);
         StringAppend("[%d,%d]", ci+1, cj+1);
         char *tmp = StringAppendS("");
         char * ph = omStrDup(tmp);
         int phl = strlen(ph);
-        if (phl > colwid)
+        if (phl > colwid[cj])
         {
-          for (int j=0; j<colwid; j++)
+          for (int j=0; j<colwid[cj]; j++)
             ps[pos+j] = '*';
         }
         else
         {
-          for (int j=0; j<colwid-phl; j++)
+          for (int j=0; j<colwid[cj]-phl; j++)
             ps[pos+j] = ' ';
           for (int j=0; j<phl; j++)
-            ps[pos+colwid-phl+j] = ph[j];
+            ps[pos+colwid[cj]-phl+j] = ph[j];
         }
         omFree(ph);
       }
       else  // Mit Leerzeichen auffüllen und zahl reinschreiben
       {
-        for (int j=0; j<colwid-nl; j++)
+        for (int j=0; j<colwid[cj]-nl; j++)
           ps[pos+j] = ' ';
         for (int j=0; j<nl; j++)
-          ps[pos+colwid-nl+j] = ts[j];
+          ps[pos+colwid[cj]-nl+j] = ts[j];
       }
       // ", " oder "\n" einfügen
       if ((i+1)%col == 0)
       {
         if (i != col*row-1)
         {
-          ps[pos+colwid] = '\n';
-          pos += colwid+1;
+          ps[pos+colwid[cj]] = '\n';
+          pos += colwid[cj]+1;
         }
       }
       else
       {
-        ps[pos+colwid] = ',';
-        ps[pos+colwid+1] = ' ';
-        pos += colwid+2;
+        ps[pos+colwid[cj]] = ',';
+        ps[pos+colwid[cj]+1] = ' ';
+        pos += colwid[cj]+2;
       }
-    // Hier ts zerstören
+    omFree(ts);
     }
     PrintS(ps);
     omFree(ps);
@@ -429,7 +497,7 @@ static void bimRowContent(bigintmat *bimat, int rowpos, int colpos)
   if (nlIsOne(tgcd)) return;
   loop
   {
-    m = nlCopy(BIMATELEM(*bimat,rowpos,i--));
+    m = BIMATELEM(*bimat,rowpos,i--);
     if (!nlIsZero(m))
     {
       number tp1 = nlGcd(tgcd, m, NULL);
@@ -446,7 +514,6 @@ static void bimRowContent(bigintmat *bimat, int rowpos, int colpos)
     BIMATELEM(*bimat,rowpos,i) = tp2;
   }
   nlDelete(&tgcd, NULL);
-  nlDelete(&m, NULL);
 }
 
 static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
