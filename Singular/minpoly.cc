@@ -1,7 +1,8 @@
-/***********************************************
- * Copyright (C) 2011 Sebastian Jambor         *
- * sebastian@momo.math.rwth-aachen.de          *
- ***********************************************/
+/*************************************************
+ * Author: Sebastian Jambor, 2011                *
+ * GPL (email from 23. April 2012 17:44:14 MESZ) *
+ * sebastian@momo.math.rwth-aachen.de            *
+ ************************************************/
 
 
 #include<cmath>

@@ -1,5 +1,6 @@
 /***********************************************************************************
- * Copyright (C) 2011 Sebastian Jambor                                             *
+ * Author: Sebastian Jambor, 2011                                                  *
+ * (C) GPL (email from 23. April 2012 17:44:14 MESZ)                               *
  * sebastian@momo.math.rwth-aachen.de                                              *
  *                                                                                 *
  * Implementation of an algorithm to compute the minimal polynomial of a           *
