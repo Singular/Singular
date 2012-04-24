@@ -341,24 +341,96 @@ int Hensel (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   return 1;
 }
 
+static
+bool findeval (const CanonicalForm & F, const CanonicalForm & G,
+               CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db,
+               REvaluation & b, int delta, int degF, int degG, int maxeval,
+               int & count, int& k, int bound, int& l)
+{
+  if( count == 0 && delta != 0)
+  {
+    if( count++ > maxeval )
+      return false;
+  }
+  if (count > 0)
+  {
+    b.nextpoint(k);
+    if (k == 0)
+      k++;
+    l++;
+    if (l > bound)
+    {
+      l= 1;
+      k++;
+      if (k > tmax (F.level(), G.level()) - 1)
+        return false;
+      b.nextpoint (k);
+    }
+    if (count++ > maxeval)
+      return false;
+  }
+  while( true )
+  {
+    Fb = b( F );
+    if( degree( Fb, 1 ) == degF )
+    {
+      Gb = b( G );
+      if( degree( Gb, 1 ) == degG )
+      {
+        Db = gcd( Fb, Gb );
+        if( delta > 0 )
+        {
+          if( degree( Db, 1 ) <= delta )
+            return true;
+        }
+        else
+        {
+          k++;
+          return true;
+        }
+      }
+    }
+    if (k == 0)
+      k++;
+    b.nextpoint(k);
+    l++;
+    if (l > bound)
+    {
+      l= 1;
+      k++;
+      if (k > tmax (F.level(), G.level()) - 1)
+        return false;
+      b.nextpoint (k);
+    }
+    if( count++ > maxeval )
+      return false;
+  }
+}
+
 static CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         bool internal )
 {
   bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
   CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG,
                 lcD, cand, result;
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
-  int degF, degG, delta, t;
+  int degF, degG, delta, t, count, maxeval;
   REvaluation bt;
   bool gcdfound = false;
   Variable x = Variable(1);
-  modpk bound;
+  count= 0;
+  maxeval= 200;
+  int o, l;
+  o= 0;
+  l= 1;
 
-  F= FF;
-  G= GG;
+  if (!isRat)
+    On (SW_RATIONAL);
+  F= FF*bCommonDen (FF);
+  G= GG*bCommonDen (GG);
+  if (!isRat)
+    Off (SW_RATIONAL);
 
   CFMap M,N;
   int smallestDegLev;
@@ -366,32 +438,49 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 
   if (best_level == 0)
   {
-    if (!isRat)
-      Off (SW_RATIONAL);
+    DEBDECLEVEL( cerr, "ezgcd" );
     return G.genOne();
   }
 
   F= M (F);
   G= M (G);
 
-
   DEBINCLEVEL( cerr, "ezgcd" );
   DEBOUTLN( cerr, "FF = " << FF );
   DEBOUTLN( cerr, "GG = " << GG );
   f = content( F, x ); g = content( G, x ); d = gcd( f, g );
+  d /= icontent (d);
   DEBOUTLN( cerr, "f = " << f );
   DEBOUTLN( cerr, "g = " << g );
   F /= f; G /= g;
   if ( F.isUnivariate() && G.isUnivariate() )
   {
     DEBDECLEVEL( cerr, "ezgcd" );
-    if (!isRat)
-      Off (SW_RATIONAL);
     if(F.mvar()==G.mvar())
       d*=gcd(F,G);
     return N (d);
   }
-  else  if ( gcd_test_one( F, G, false ) )
+
+  int maxNumVars= tmax (getNumVars (F), getNumVars (G));
+  int sizeF= size (F);
+  int sizeG= size (G);
+
+
+  if (!isRat)
+    On (SW_RATIONAL);
+  if (sizeF/maxNumVars > 500 && sizeG/maxNumVars > 500)
+  {
+    Off(SW_USE_EZGCD);
+    result=gcd( F, G );
+    On(SW_USE_EZGCD);
+    if (!isRat)
+      Off (SW_RATIONAL);
+    result /= icontent (result);
+    DEBDECLEVEL( cerr, "ezgcd" );
+    return N (d*result);
+  }
+
+  if ( gcd_test_one( F, G, false ) )
   {
     DEBDECLEVEL( cerr, "ezgcd" );
     if (!isRat)
@@ -403,7 +492,6 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   delta = 0;
   degF = degree( F, x ); degG = degree( G, x );
   t = tmax( F.level(), G.level() );
-  //bound = findBound( F, G, lcF, lcG, degF, degG );
   if ( ! internal )
     b = REvaluation( 2, t, IntRandom( 25 ) );
   while ( ! gcdfound )
@@ -412,7 +500,18 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     DEBOUTLN( cerr, "search for evaluation, delta = " << delta );
     DEBOUTLN( cerr, "F = " << F );
     DEBOUTLN( cerr, "G = " << G );
-    findeval( F, G, Fb, Gb, Db, b, delta, degF, degG );
+    if (!findeval( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count,
+                   o, 25, l))
+    {
+      Off(SW_USE_EZGCD);
+      result=gcd( F, G );
+      On(SW_USE_EZGCD);
+      if (!isRat)
+        Off (SW_RATIONAL);
+      DEBDECLEVEL( cerr, "ezgcd" );
+      result /= icontent (result);
+      return N (d*result);
+    }
     DEBOUTLN( cerr, "found evaluation b = " << b );
     DEBOUTLN( cerr, "F(b) = " << Fb );
     DEBOUTLN( cerr, "G(b) = " << Gb );
@@ -431,7 +530,18 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     while ( 1 ) 
     {
       bt = b;
-      findeval( F, G, Fbt, Gbt, Dbt, bt, delta + 1, degF, degG );
+      if (!findeval( F, G, Fbt, Gbt, Dbt, bt, delta, degF, degG, maxeval, count,
+                     o, 25,l ))
+      {
+        Off(SW_USE_EZGCD);
+        result=gcd( F, G );
+        On(SW_USE_EZGCD);
+        if (!isRat)
+          Off (SW_RATIONAL);
+        DEBDECLEVEL( cerr, "ezgcd" );
+        result /= icontent (result);
+        return N (d*result);
+      }
       int dd=degree( Dbt );
       if ( dd /*degree( Dbt )*/ == 0 )
       {
@@ -514,6 +624,8 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         On(SW_USE_EZGCD);
         if (!isRat)
           Off (SW_RATIONAL);
+        DEBDECLEVEL( cerr, "ezgcd" );
+        result /= icontent (result);
         return N (d*result);
       }
       /// ---> A7
@@ -534,6 +646,8 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         On (SW_USE_EZGCD);
         if (!isRat)
           Off (SW_RATIONAL);
+        DEBDECLEVEL( cerr, "ezgcd" );
+        result /= icontent (result);
         return N (d*result);
       }
 
@@ -548,8 +662,10 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   }
   /// ---> A9
   DEBDECLEVEL( cerr, "ezgcd" );
+  cand *= bCommonDen (cand);
   if (!isRat)
     Off (SW_RATIONAL);
+  cand /= icontent (cand);
   return N (d*cand);
 }
 
