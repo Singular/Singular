@@ -5681,8 +5681,10 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
+  
   //check trivial case
-  if (degree (A) == 1 || degree (A, 1) == 1)
+  if (degree (A) == 1 || degree (A, 1) == 1 || 
+      (size (A) == 2 && gcd (degree (A), degree (A,1)).isOne()))
   {
     factors.append (A);
 
@@ -5959,18 +5961,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
-  A= A (y + evaluation, y);
-
   int liftBound= degree (A, y) + 1;
 
   int boundsLength;
-  int * bounds= computeBounds (A (y - evaluation, y), boundsLength);
+  int * bounds= computeBounds (A, boundsLength);
   int minBound= bounds[0];
   for (int i= 1; i < boundsLength; i++)
   {
     if (bounds[i] != 0)
       minBound= tmin (minBound, bounds[i]);
   }
+
+  A= A (y + evaluation, y);
 
   int degMipo= 1;
   if (extension && alpha.level() != 1 && k==1)
