@@ -1,50 +1,72 @@
-#ifndef BIGINTMAT_H
-#define BIGINTMAT_H
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
 * ABSTRACT: class bigintmat: matrizes of big integers
 */
-#include <string.h>
+
+#ifndef BIGINTMAT_H
+#define BIGINTMAT_H
+
 #include <omalloc/omalloc.h>
+#include <findexec/feFopen.h>
 #include <coeffs/coeffs.h>
-#include <coeffs/longrat.h>
-#include <misc/intvec.h>
 
-
+/// matrix of numbers
+/// NOTE: no reference counting!!!
 class bigintmat
 {
-private:
-  number *v;
-  int row;
-  int col;
-public:
+  private:
+    coeffs m_coeffs;
+    number *v;
+    int row;
+    int col;
+  public:
 
-  bigintmat()
-  {
-    row = 1;
-    col = 0;
-    v = NULL;
-  }
-  bigintmat(int r, int c);
+    bigintmat(): m_coeffs(NULL), v(NULL), row(1), col(0){}
 
-  bigintmat(const bigintmat *m)
-  {
-    row = m->rows();
-    col = m->cols();
-    if (row*col>0)
+    bigintmat(int r, int c, const coeffs n): m_coeffs(n), v(NULL), row(r), col(c)
     {
-      v = (number *)omAlloc(sizeof(number)*row*col);
-      for (int i=row*col-1; i>=0; i--)
+      assume (rows() > 0);
+      assume (cols() > 0);
+
+      const int l = r*c;
+
+      if (l>0) /*(r>0) && (c>0) */
       {
-        v[i] = nlCopy((*m)[i],NULL);
+        v = (number *)omAlloc(sizeof(number)*l);
+
+        assume (basecoeffs() != NULL);
+        for (int i = l - 1; i>=0; i--)
+        {
+          v[i] = n_Init(0, basecoeffs());
+        }
       }
     }
-  }
 
+    bigintmat(const bigintmat *m): m_coeffs(m->basecoeffs()), v(NULL), row(m->rows()), col(m->cols())
+    {
+      const int l = row*col;
 
-  inline number& operator[](int i)
+      if (l > 0)
+      {
+        assume (rows() > 0);
+        assume (cols() > 0);
+
+        assume (m->v != NULL);
+
+        v = (number *)omAlloc(sizeof(number)*row*col);
+
+        assume (basecoeffs() != NULL);
+
+        for (int i = l-1; i>=0; i--)
+        {
+          v[i] = n_Copy((*m)[i], basecoeffs());
+        }
+      }
+    }
+
+    inline number& operator[](int i)
     {
 #ifndef NDEBUG
       if((i<0)||(i>=row*col))
@@ -52,9 +74,11 @@ public:
         Werror("wrong bigintmat index:%d\n",i);
       }
 #endif
+      assume ( !((i<0)||(i>=row*col)) );
+
       return v[i];  // Hier sollte imho kein nlCopy rein...
     }
-  inline const number& operator[](int i) const
+    inline const number& operator[](int i) const
     {
 #ifndef NDEBUG
       if((i<0)||(i>=row*col))
@@ -62,42 +86,110 @@ public:
         Werror("wrong bigintmat index:%d\n",i);
       }
 #endif
+      assume ( !((i<0)||(i>=row*col)) );
+
       return v[i];
     }
 
-#define BIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
-  void operator*=(int intop);
-  void operator*=(number bintop);
-  inline int  cols() const { return col; }
-  inline int  rows() const { return row; }
-  inline ~bigintmat()
+    /// UEberladener *=-Operator (fuer int und bigint)
+    /// Frage hier: *= verwenden oder lieber = und * einzeln?
+    void operator*=(int intop);
+    
+    void inpMult(number bintop, const coeffs C = NULL);
+
+    inline int  cols() const { return col; }
+    inline int  rows() const { return row; }
+    inline coeffs basecoeffs() const { return m_coeffs; }
+
+    ~bigintmat()
     {
       if (v!=NULL)
       {
-        for (int i=0; i<row*col; i++) { nlDelete(&(v[i]), NULL); }
-        omFreeSize((ADDRESS)v,sizeof(number)*row*col);
+        for (int i=0; i<row*col; i++) { n_Delete(&(v[i]), basecoeffs()); }
+        omFreeSize((ADDRESS)v, sizeof(number)*row*col);
         v=NULL;
       }
     }
-  number get(int i, int j);
-  number get(int i);
-  void set(int i, int j, number n);
-  void set(int i, number n);
-  char * String();
-  void pprint(int maxwid);
-  int compare(const bigintmat* op) const;
-  int getwid(int maxwid);
+
+    int index(int r, int c) const
+    {
+      assume (rows() >= 0 && cols() >= 0);
+      
+      assume (r > 0 && c > 0);
+      assume (r <= rows() && r <= cols());
+
+      const int index = ((r-1)*cols() + (c-1));
+
+      assume (index >= 0 && index < rows() * cols());
+      return index;
+    }
+
+    /// get a copy of an entry. NOTE: starts at [1,1]
+    number get(int i, int j) const;
+
+    /// get a copy of an entry. NOTE: starts at [0]
+    number get(int i) const;
+
+    /// replace an entry with a copy (delete old + copy new!).
+    /// NOTE: starts at [1,1]
+    void set(int i, int j, number n, const coeffs C = NULL);
+    
+    /// replace an entry with a copy (delete old + copy new!).
+    /// NOTE: starts at [0]
+    void set(int i, number n, const coeffs C = NULL);
+
+
+    /// replace an entry with the given number n (only delete old).
+    /// NOTE: starts at [0]
+    inline void rawset(int i, number n, const coeffs C = NULL)
+    {
+      assume (C == NULL || C == basecoeffs());
+      assume (i >= 0);
+      const int l = rows() * cols();
+      assume (i<l);
+
+      if (i < l)
+      {
+        n_Delete(&(v[i]), basecoeffs()); v[i] = n;
+      } else
+      {
+#ifndef NDEBUG
+        Werror("wrong bigintmat index:%d\n",i);
+#endif
+      }
+    }
+    
+    inline void rawset(int i, int j, number n, const coeffs C = NULL)
+    {
+      rawset( index(i,j), n, C);
+    }
+
+    char * String();
+    void pprint(int maxwid);
+    int compare(const bigintmat* op) const;
+    int getwid(int maxwid);
 };
-bool operator==(bigintmat & lhr, bigintmat & rhr);
-bool operator!=(bigintmat & lhr, bigintmat & rhr);
+
+bool operator==(const bigintmat & lhr, const bigintmat & rhr);
+bool operator!=(const bigintmat & lhr, const bigintmat & rhr);
+
+/// Matrix-Add/-Sub/-Mult so oder mit operator+/-/* ?
+/// NOTE: NULL as a result means an error (non-compatible matrices?)
 bigintmat * bimAdd(bigintmat * a, bigintmat * b);
 bigintmat * bimSub(bigintmat * a, bigintmat * b);
 bigintmat * bimMult(bigintmat * a, bigintmat * b);
-intvec * bim2iv(bigintmat * b);
 bigintmat * bimCopy(const bigintmat * b);
+
+
+
+// Ungetestet
 static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
 static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
-                     int ready, int all);
+                      int ready, int all);
 
-bigintmat * iv2bim(intvec * b);
-#endif
+class intvec;
+intvec * bim2iv(bigintmat * b);
+bigintmat * iv2bim(intvec * b, const coeffs C);
+
+
+#endif // #ifndef BIGINTMAT_H

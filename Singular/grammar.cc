@@ -3174,7 +3174,7 @@ yyreduce:
               v=&(yyval.lv);
               h=(idhdl)v->data;
               delete IDBIMAT(h);
-              IDBIMAT(h) = new bigintmat(r,c);
+              IDBIMAT(h) = new bigintmat(r, c, coeffs_BIGINT);
               if (IDBIMAT(h)==NULL) YYERROR;
             }
           ;}

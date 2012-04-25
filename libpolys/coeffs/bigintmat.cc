@@ -1,103 +1,99 @@
 /*****************************************
-*  Computer Algebra System SINGULAR      *
-*****************************************/
+ *  Computer Algebra System SINGULAR      *
+ *****************************************/
 /*
-* ABSTRACT: class bigintmat: matrizes of big integers
-*/
-#include <kernel/mod2.h>
-//#include <kernel/options.h>
+ * ABSTRACT: class bigintmat: matrizes of big integers
+ */
 #include "bigintmat.h"
-#include <omalloc/omalloc.h>
-#include <coeffs/longrat.h>
+
 #include <misc/intvec.h>
+
+//#include <kernel/mod2.h>
+//#include <kernel/options.h>
+
 #include <math.h>
 #include <string.h>
 
-#define BIGIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
+#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
-// Beginnt bei [1,1]
-void bigintmat::set(int i, int j, number n)
-{
-  nlDelete(&(v[(i-1)*col+j-1]), NULL);
-  v[(i-1)*col+j-1] = nlCopy(n,NULL);
-}
 
 // Beginnt bei [0]
-void bigintmat::set(int i, number n)
+void bigintmat::set(int i, number n, const coeffs C)
 {
-  if (i<row*col)
-  {
-    nlDelete(&(v[i]), NULL);
-    v[i] = nlCopy(n,NULL);
-  }
+  assume (C == NULL || C == basecoeffs());
+
+  rawset(i, n_Copy(n, basecoeffs()), basecoeffs());
 }
 
-number bigintmat::get(int i, int j)
+// Beginnt bei [1,1]
+void bigintmat::set(int i, int j, number n, const coeffs C)
 {
-  return nlCopy(v[(i-1)*col+j-1],NULL);
+  assume (C == NULL || C == basecoeffs());
+  assume (i > 0 && j > 0);
+  assume (i <= rows() && j <= cols());
+  
+  set(index(i, j), n, C);
 }
 
-number bigintmat::get(int i)
+number bigintmat::get(int i) const
 {
-  return nlCopy(v[i],NULL);
+  assume (i >= 0);
+  assume (i<rows()*cols());
+  
+  return n_Copy(v[i], basecoeffs());
 }
 
-bigintmat::bigintmat(int r, int c)
+number bigintmat::get(int i, int j) const
 {
-  row = r;
-  col = c;
-  int l = r*c;
-  if (l>0) /*(r>0) && (c>0) */
-    v = (number *)omAlloc(sizeof(number)*l);
-  else
-    v = NULL;
-  for (int i=0; i<l; i++)
-  {
-    v[i] = nlInit(0, NULL);
-  }
+  assume (i > 0 && j > 0);
+  assume (i <= rows() && j <= cols());
+  
+  return get(index(i, j));
 }
 
 // Überladener *=-Operator (für int und bigint)
 // Frage hier: *= verwenden oder lieber = und * einzeln?
 void bigintmat::operator*=(int intop)
 {
-  for (int i=0; i<row*col; i++)
-  {
-          number iop = nlInit(intop, NULL);
-          number prod = nlMult(v[i], iop,NULL);
-          nlDelete(&(v[i]), NULL);
-          nlDelete(&iop, NULL);
-          v[i] = prod;
-  }
+  number iop = n_Init(intop, basecoeffs());
+  
+  inpMult(iop, basecoeffs());
+  
+  n_Delete(&iop, basecoeffs());
 }
 
-void bigintmat::operator*=(number bintop)
+void bigintmat::inpMult(number bintop, const coeffs C)
 {
-  for (int i=0; i<row*col; i++)
-  {
-          number prod = nlMult(v[i], bintop,NULL);
-          nlDelete(&(v[i]), NULL);
-          v[i] = prod;
-  }
+  assume (C == NULL || C == basecoeffs());
+  
+  const int l = rows() * cols();
+
+  for (int i=0; i < l; i++)
+    n_InpMult(v[i], bintop, basecoeffs());
 }
 
 // Stimmen Parameter?
 // Welche der beiden Methoden?
 // Oder lieber eine comp-Funktion?
 
-bool operator==(bigintmat & lhr, bigintmat & rhr)
+bool operator==(const bigintmat & lhr, const bigintmat & rhr)
 {
   if (&lhr == &rhr) { return true; }
   if (lhr.cols() != rhr.cols()) { return false; }
   if (lhr.rows() != rhr.rows()) { return false; }
-  for (int i=0; i<(lhr.rows())*(lhr.cols()); i++)
+  if (lhr.basecoeffs() != rhr.basecoeffs()) { return false; }
+
+  const int l = (lhr.rows())*(lhr.cols());
+  
+  for (int i=0; i < l; i++)
   {
-    if (!nlEqual(lhr[i], rhr[i],NULL)) { return false; }
+    if (!n_Equal(lhr[i], rhr[i], lhr.basecoeffs())) { return false; }
   }
+  
   return true;
 }
 
-bool operator!=(bigintmat & lhr, bigintmat & rhr)
+bool operator!=(const bigintmat & lhr, const bigintmat & rhr)
 {
   return !(lhr==rhr);
 }
@@ -105,177 +101,201 @@ bool operator!=(bigintmat & lhr, bigintmat & rhr)
 // Matrix-Add/-Sub/-Mult so oder mit operator+/-/* ?
 bigintmat * bimAdd(bigintmat * a, bigintmat * b)
 {
-  bigintmat * bim;
-  int mn, ma, i;
   if (a->cols() != b->cols()) return NULL;
-  mn = si_min(a->rows(),b->rows());
-  ma = si_max(a->rows(),b->rows());
+  if (a->basecoeffs() != b->basecoeffs()) { return NULL; }
+  
+  const int mn = si_min(a->rows(),b->rows());
+  const int ma = si_max(a->rows(),b->rows());
+
+  const coeffs basecoeffs = a->basecoeffs();
+  
+  int i;
+
   if (a->cols() == 1)
   {
-    bim = new bigintmat(ma, 1);
+    bigintmat * bim = new bigintmat(ma, 1, basecoeffs);
+    
     for (i=0; i<mn; i++)
-    {
-      number n = nlAdd((*a)[i], (*b)[i],NULL);
-      bim->set(i, n);
-      nlDelete(&n, NULL);
-    }
+      bim->rawset(i, n_Add((*a)[i], (*b)[i], basecoeffs), basecoeffs);
+    
     if (ma > mn)
     {
       if (ma == a->rows())
-      {
         for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*a)[i]);
-        }
-      }
+          bim->set(i, (*a)[i], basecoeffs);
       else
-      {
         for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*b)[i]);
-        }
-      }
+          bim->set(i, (*b)[i], basecoeffs);
     }
     return bim;
   }
+  
   if (mn != ma) return NULL;
-  bim = new bigintmat(mn, a->cols());
+
+  bigintmat * bim = new bigintmat(mn, a->cols(), basecoeffs);
+  
   for (i=0; i<mn*a->cols(); i++)
-  {
-    number n = nlAdd((*a)[i], (*b)[i],NULL);
-    bim->set(i, n);
-    nlDelete(&n, NULL);
-  }
+    bim->rawset(i, n_Add((*a)[i], (*b)[i], basecoeffs), basecoeffs);
+  
   return bim;
 }
 
 bigintmat * bimSub(bigintmat * a, bigintmat * b)
 {
-  bigintmat * bim;
-  int mn, ma, i;
   if (a->cols() != b->cols()) return NULL;
-  mn = si_min(a->rows(),b->rows());
-  ma = si_max(a->rows(),b->rows());
+  if (a->basecoeffs() != b->basecoeffs()) { return NULL; }
+
+  const int mn = si_min(a->rows(),b->rows());
+  const int ma = si_max(a->rows(),b->rows());
+
+  const coeffs basecoeffs = a->basecoeffs();
+
+  int i;
+
   if (a->cols() == 1)
   {
-    bim = new bigintmat(ma, 1);
+    bigintmat * bim = new bigintmat(ma, 1, basecoeffs);
+    
     for (i=0; i<mn; i++)
-    {
-      number n = nlSub((*a)[i], (*b)[i],NULL);
-      bim->set(i, n);
-      nlDelete(&n, NULL);
-    }
+      bim->rawset(i, n_Sub((*a)[i], (*b)[i], basecoeffs), basecoeffs);
+
     if (ma > mn)
     {
       if (ma == a->rows())
       {
         for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*a)[i]);
-        }
+          bim->set(i, (*a)[i], basecoeffs);
       }
       else
-      {
         for(i=mn; i<ma; i++)
         {
-          bim->set(i, (*b)[i]);
+          number n = b->get(i);
+          n = n_Neg(n, basecoeffs);
+          bim->rawset(i, n, basecoeffs);
         }
-      }
     }
     return bim;
   }
+  
   if (mn != ma) return NULL;
-  bim = new bigintmat(mn, a->cols());
+  
+  bigintmat * bim = new bigintmat(mn, a->cols(), basecoeffs);
+  
   for (i=0; i<mn*a->cols(); i++)
-  {
-    number n = nlSub((*a)[i], (*b)[i],NULL);
-    bim->set(i, n);
-    nlDelete(&n, NULL);
-  }
+    bim->rawset(i, n_Sub((*a)[i], (*b)[i], basecoeffs), basecoeffs);
+  
   return bim;
 }
 
 bigintmat * bimMult(bigintmat * a, bigintmat * b)
 {
-  int i, j, k,
-      ra = a->rows(), ca = a->cols(),
-      rb = b->rows(), cb = b->cols();
-  number sum;
-  bigintmat * bim;
-  if (ca != rb) return NULL;
-  bim = new bigintmat(ra, cb);
-  for (i=0; i<ra; i++)
+  const int ca = a->cols();
+  const int cb = b->cols();
+
+  const int ra = a->rows();
+  const int rb = b->rows();
+  
+  if (ca != rb)
   {
+#ifndef NDEBUG
+    Werror("wrong bigintmat sizes at multiplication a * b: acols: %d != brows: %d\n", ca, rb);
+#endif
+    return NULL;
+  }
+  
+  assume (ca == rb);
+  
+  if (a->basecoeffs() != b->basecoeffs()) { return NULL; }
+  
+  const coeffs basecoeffs = a->basecoeffs();
+
+  int i, j, k;
+  
+  number sum;
+  
+  bigintmat * bim = new bigintmat(ra, cb, basecoeffs);
+  
+  for (i=0; i<ra; i++)
     for (j=0; j<cb; j++)
     {
-      sum = nlInit(0, NULL);
+      sum = n_Init(0, basecoeffs);
+      
       for (k=0; k<ca; k++)
       {
-        number prod = nlMult((*a)[i*ca+k], (*b)[k*cb+j],NULL);
-        number sum2 = nlAdd(sum, prod,NULL);
-        nlDelete(&sum, NULL);
+        number prod = n_Mult( BIMATELEM(*a, i, k), BIMATELEM(*b, k, j), basecoeffs);
+        
+        number sum2 = n_Add(sum, prod, basecoeffs); // no inplace add :(
+        
+        n_Delete(&sum, basecoeffs); n_Delete(&prod, basecoeffs);
+        
         sum = sum2;
-        nlDelete(&prod, NULL);
       }
-      bim->set(i+1, j+1, sum);
-      nlDelete(&sum, NULL);
+      bim->rawset(i+1, j+1, sum, basecoeffs);
     }
-  }
   return bim;
 }
 
+// ----------------------------------------------------------------- //
 // Korrekt?
 
 intvec * bim2iv(bigintmat * b)
 {
-  intvec * iv;
-  iv = new intvec(b->rows(), b->cols(), 0);
-  for (int i=0; i<(b->rows())*(b->cols()); i++) { (*iv)[i] = nlInt((*b)[i], NULL); } // Geht das so?
+  intvec * iv = new intvec(b->rows(), b->cols(), 0);
+  for (int i=0; i<(b->rows())*(b->cols()); i++)
+    (*iv)[i] = n_Int((*b)[i], b->basecoeffs()); // Geht das so?
   return iv;
 }
 
-bigintmat * iv2bim(intvec * b)
+bigintmat * iv2bim(intvec * b, const coeffs C)
 {
-  bigintmat * bim;
-  bim = new bigintmat(b->rows(), b->cols());
-  for (int i=0; i<(b->rows())*(b->cols()); i++)
-  {
-    number n = nlInit((*b)[i], NULL);
-    bim->set(i, n);
-    nlDelete(&n, NULL);
-  }
+  const int l = (b->rows())*(b->cols());
+  bigintmat * bim = new bigintmat(b->rows(), b->cols(), C);
+  
+  for (int i=0; i < l; i++)
+    bim->rawset(i, n_Init((*b)[i], C), C);
+  
   return bim;
 }
 
+// ----------------------------------------------------------------- //
+
 int bigintmat::compare(const bigintmat* op) const
 {
+  assume (basecoeffs() == op->basecoeffs() );
+
+#ifndef NDEBUG
+  if (basecoeffs() != op->basecoeffs() )
+    WerrorS("wrong bigintmat comparison: different basecoeffs!\n");
+#endif
+
   if ((col!=1) ||(op->cols()!=1))
   {
     if((col!=op->cols())
-    || (row!=op->rows()))
+       || (row!=op->rows()))
       return -2;
   }
+
   int i;
   for (i=0; i<si_min(row*col,op->rows()*op->cols()); i++)
   {
-    if (nlGreater(v[i], (*op)[i],NULL))
+    if ( n_Greater(v[i], (*op)[i], basecoeffs()) )
       return 1;
-    else if (!nlEqual(v[i], (*op)[i],NULL))
+    else if (! n_Equal(v[i], (*op)[i], basecoeffs()))
       return -1;
   }
 
   for (; i<row; i++)
   {
-    if (nlGreaterZero(v[i],NULL))
+    if ( n_GreaterZero(v[i], basecoeffs()) )
       return 1;
-    else if (!nlIsZero(v[i],NULL))
+    else if (! n_IsZero(v[i], basecoeffs()) )
       return -1;
   }
   for (; i<op->rows(); i++)
   {
-    if (nlGreaterZero((*op)[i],NULL))
+    if ( n_GreaterZero((*op)[i], basecoeffs()) )
       return -1;
-    else if (!nlIsZero((*op)[i],NULL))
+    else if (! n_IsZero((*op)[i], basecoeffs()) )
       return 1;
   }
   return 0;
@@ -284,34 +304,31 @@ int bigintmat::compare(const bigintmat* op) const
 
 bigintmat * bimCopy(const bigintmat * b)
 {
-  bigintmat * a=NULL;
-  if (b!=NULL)
-  {
-    a = new bigintmat(b->rows(), b->cols());
-    for (int i=0; i<(b->rows())*(b->cols()); i++)
-    {
-      a->set(i, (*b)[i]);
-    }
-  }
-  return a;
+  if (b == NULL)
+    return NULL;
+    
+  return new bigintmat(b);
 }
 
 char* bigintmat::String()
 {
+  assume (rows() > 0);
+  assume (cols() > 0);
+
   StringSetS("");
-  int i;
-  for (i=0; i<col*row-1; i++)
+  const int l = cols()*rows();
+
+  n_Write(v[0], basecoeffs());
+  for (int i = 1; i < l; i++)
   {
-    nlWrite(v[i], NULL);
-    StringAppendS(",");
+    StringAppendS(","); n_Write(v[i], basecoeffs());
   }
-  nlWrite(v[i], NULL);
-   /* if (i != col*row-1)
-    {
-      StringAppendS(",");
-      if ((i+1)%col == 0)
-        StringAppendS("\n");
-    }   */
+  /* if (i != col*row-1)
+  {
+  StringAppendS(",");
+  if ((i+1)%col == 0)
+  StringAppendS("\n");
+  }   */
   return StringAppendS("");
 }
 
@@ -322,20 +339,20 @@ int bigintmat::getwid(int maxwid)
   for (int i=0; i<col*row; i++)
   {
     StringSetS("");
-    nlWrite(v[i], NULL);
+    n_Write(v[i], basecoeffs());
     char * tmp = StringAppendS("");
-    char * ts = omStrDup(tmp);
-    int nl = strlen(ts);
-    if (nl > wid)
+//    char * ts = omStrDup(tmp);
+    const int _nl = strlen(tmp); // ts?
+    if (_nl > wid)
     {
-      if (nl > colwid)
+      if (_nl > colwid)
       {
         int phwid = floor(log10(row))+floor(log10(col))+5;
         if ((colwid > phwid) && (wid < phwid))
           wid = phwid;
       }
       else
-        wid = nl;
+        wid = _nl;
     }
   }
   return wid;
@@ -356,11 +373,11 @@ void bigintmat::pprint(int maxwid)
     for (int i=0; i<col*row; i++)
     {
       StringSetS("");
-      nlWrite(v[i], NULL);
+      n_Write(v[i], basecoeffs());
       char * temp = StringAppendS("");
       char * ts = omStrDup(temp);
-      int nl = strlen(ts);
-      if (nl > colwid)
+      const int _nl = strlen(ts);
+      if (_nl > colwid)
       {
         StringSetS("");
         int cj = i%col;
@@ -385,10 +402,10 @@ void bigintmat::pprint(int maxwid)
       }
       else  // Mit Leerzeichen auffüllen und zahl reinschreiben
       {
-        for (int j=0; j<colwid-nl; j++)
+        for (int j=0; j<colwid-_nl; j++)
           ps[pos+j] = ' ';
-        for (int j=0; j<nl; j++)
-          ps[pos+colwid-nl+j] = ts[j];
+        for (int j=0; j<_nl; j++)
+          ps[pos+colwid-_nl+j] = ts[j];
       }
       // ", " oder "\n" einfügen
       if ((i+1)%col == 0)
@@ -405,7 +422,7 @@ void bigintmat::pprint(int maxwid)
         ps[pos+colwid+1] = ' ';
         pos += colwid+2;
       }
-    // Hier ts zerstören
+      // Hier ts zerstören
     }
     PrintS(ps);
     omFree(ps);
@@ -415,79 +432,83 @@ void bigintmat::pprint(int maxwid)
 // Ungetestet
 static void bimRowContent(bigintmat *bimat, int rowpos, int colpos)
 {
+  const coeffs basecoeffs = bimat->basecoeffs();
+  
   number tgcd, m;
   int i=bimat->cols();
 
   loop
   {
-    tgcd = nlCopy(BIMATELEM(*bimat,rowpos,i--),NULL);
-    if (!nlIsZero(tgcd,NULL)) break;
+    tgcd = n_Copy(BIMATELEM(*bimat,rowpos,i--), basecoeffs);
+    if (! n_IsZero(tgcd, basecoeffs)) break;
     if (i<colpos) return;
   }
-  if ((!nlGreaterZero(tgcd,NULL)) && (!nlIsZero(tgcd,NULL))) tgcd = nlNeg(tgcd,NULL);
-  if (nlIsOne(tgcd,NULL)) return;
+  if ((! n_GreaterZero(tgcd, basecoeffs)) && (! n_IsZero(tgcd, basecoeffs))) tgcd = n_Neg(tgcd, basecoeffs);
+  if ( n_IsOne(tgcd,basecoeffs)) return;
   loop
   {
-    m = nlCopy(BIMATELEM(*bimat,rowpos,i--),NULL);
-    if (!nlIsZero(m,NULL))
+    m = n_Copy(BIMATELEM(*bimat,rowpos,i--), basecoeffs);
+    if (! n_IsZero(m,basecoeffs))
     {
-      number tp1 = nlGcd(tgcd, m, NULL);
-      nlDelete(&tgcd, NULL);
+      number tp1 = n_Gcd(tgcd, m, basecoeffs);
+      n_Delete(&tgcd, basecoeffs);
       tgcd = tp1;
     }
-    if (nlIsOne(tgcd,NULL)) return;
+    if ( n_IsOne(tgcd,basecoeffs)) return;
     if (i<colpos) break;
   }
   for (i=bimat->cols();i>=colpos;i--)
   {
-    number tp2 = nlDiv(BIMATELEM(*bimat,rowpos,i), tgcd,NULL);
-    nlDelete(&BIMATELEM(*bimat,rowpos,i), NULL);
+    number tp2 = n_Div(BIMATELEM(*bimat,rowpos,i), tgcd,basecoeffs);
+    n_Delete(&BIMATELEM(*bimat,rowpos,i), basecoeffs);
     BIMATELEM(*bimat,rowpos,i) = tp2;
   }
-  nlDelete(&tgcd, NULL);
-  nlDelete(&m, NULL);
+  n_Delete(&tgcd, basecoeffs);
+  n_Delete(&m, basecoeffs);
 }
 
 static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
-                     int ready, int all)
+                      int ready, int all)
 {
+  const coeffs basecoeffs = bimat->basecoeffs();
+
   number tgcd, ce, m1, m2;
   int j, i;
   number piv = BIMATELEM(*bimat,rpiv,colpos);
 
   for (j=all;j>ready;j--)
   {
-    ce = nlCopy(BIMATELEM(*bimat,j,colpos),NULL);
-    if (!nlIsZero(ce,NULL))
+    ce = n_Copy(BIMATELEM(*bimat,j,colpos),basecoeffs);
+    if (! n_IsZero(ce, basecoeffs))
     {
-      nlDelete(&BIMATELEM(*bimat,j,colpos), NULL);
-      BIMATELEM(*bimat,j,colpos) = nlInit(0, NULL);
-      m1 = nlCopy(piv,NULL);
-      m2 = nlCopy(ce,NULL);
-      tgcd = nlGcd(m1, m2, NULL);
-      if (!nlIsOne(tgcd,NULL))
+      n_Delete(&BIMATELEM(*bimat,j,colpos), basecoeffs);
+      BIMATELEM(*bimat,j,colpos) = n_Init(0, basecoeffs);
+      m1 = n_Copy(piv,basecoeffs);
+      m2 = n_Copy(ce,basecoeffs);
+      tgcd = n_Gcd(m1, m2, basecoeffs);
+      if (! n_IsOne(tgcd,basecoeffs))
       {
-        number tp1 = nlDiv(m1, tgcd,NULL);
-        number tp2 = nlDiv(m2, tgcd,NULL);
-        nlDelete(&m1, NULL);
-        nlDelete(&m2, NULL);
+        number tp1 = n_Div(m1, tgcd,basecoeffs);
+        number tp2 = n_Div(m2, tgcd,basecoeffs);
+        n_Delete(&m1, basecoeffs);
+        n_Delete(&m2, basecoeffs);
         m1 = tp1;
         m2 = tp2;
       }
       for (i=bimat->cols();i>colpos;i--)
       {
-        nlDelete(&BIMATELEM(*bimat,j,i), NULL);
-        number tp1 = nlMult(BIMATELEM(*bimat,j,i), m1,NULL);
-        number tp2 = nlMult(BIMATELEM(*bimat,rpiv,i), m2,NULL);
-        BIMATELEM(*bimat,j,i) = nlSub(tp1, tp2,NULL);
-        nlDelete(&tp1, NULL);
-        nlDelete(&tp2, NULL);
+        n_Delete(&BIMATELEM(*bimat,j,i), basecoeffs);
+        number tp1 = n_Mult(BIMATELEM(*bimat,j,i), m1,basecoeffs);
+        number tp2 = n_Mult(BIMATELEM(*bimat,rpiv,i), m2,basecoeffs);
+        BIMATELEM(*bimat,j,i) = n_Sub(tp1, tp2,basecoeffs);
+        n_Delete(&tp1, basecoeffs);
+        n_Delete(&tp2, basecoeffs);
       }
       bimRowContent(bimat, j, colpos+1);
-      nlDelete(&m1, NULL);
-      nlDelete(&m2, NULL);
+      n_Delete(&m1, basecoeffs);
+      n_Delete(&m2, basecoeffs);
     }
-    nlDelete(&ce, NULL);
+    n_Delete(&ce, basecoeffs);
   }
 }
 
