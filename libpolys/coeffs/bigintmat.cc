@@ -6,7 +6,7 @@
 */
 #include <kernel/mod2.h>
 //#include <kernel/options.h>
-#include <misc/bigintmat.h>
+#include "bigintmat.h"
 #include <omalloc/omalloc.h>
 #include <coeffs/longrat.h>
 #include <misc/intvec.h>

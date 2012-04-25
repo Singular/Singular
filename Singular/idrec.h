@@ -10,8 +10,8 @@
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/silink.h>
-#include <misc/bigintmat.h>
 
+class bigintmat;
 typedef union uutypes      utypes;
 union uutypes
 {

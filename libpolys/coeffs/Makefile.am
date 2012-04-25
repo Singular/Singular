@@ -26,13 +26,15 @@ libcoeffs_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
 	gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc ffields.cc \
-	modulop.cc mpr_complex.cc
+	modulop.cc mpr_complex.cc \
+  bigintmat.cc 
 
 libcoeffs_la_SOURCES   = $(SOURCES)
 libcoeffs_g_la_SOURCES = $(SOURCES)
 
 libcoeffs_includedir  =$(includedir)/singular/coeffs
-libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h shortfl.h mpr_complex.h mpr_global.h
+libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h shortfl.h mpr_complex.h mpr_global.h \
+  bigintmat.h 
 
 
 ## for testing...

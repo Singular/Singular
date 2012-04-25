@@ -104,6 +104,7 @@
 #include <Singular/lists.h>
 #include <kernel/longrat.h>
 #include <Singular/libparse.h>
+#include <coeffs/bigintmat.h>
 
 #if 0
 void debug_list(leftv v)
