@@ -1259,10 +1259,12 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     else
       minCommonDeg= tmin (minCommonDeg, tmin (degree (g, i), degree (f, i)));
   }
-  b= 2*tmin (maxNorm (f), maxNorm (g))*abs (cl)*power (CanonicalForm (2), minCommonDeg);
+  b= 2*tmin (maxNorm (f), maxNorm (g))*abs (cl)*
+     power (CanonicalForm (2), minCommonDeg);
   bool equal= false;
   i = cf_getNumBigPrimes() - 1;
 
+  CanonicalForm cof, cog, cofp, cogp, newCof, newCog, cofn, cogn;
   //Off (SW_RATIONAL);
   while ( true )
   {
@@ -1276,7 +1278,12 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     //printf("try p=%d\n",p);
     setCharacteristic( p );
     Dp = gcd_poly( mapinto( f ), mapinto( g ) );
+    //Dp = GCD_small_p (mapinto (f), mapinto (g), cofp, cogp);
     Dp /=Dp.lc();
+    cofp= mapinto (f)/Dp;
+    cogp= mapinto (g)/Dp;
+    cofp /= lc (cofp);
+    cogp /= lc (cogp);
     setCharacteristic( 0 );
     dp_deg=totaldegree(Dp);
     if ( dp_deg == 0 )
@@ -1287,6 +1294,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     if ( q.isZero() )
     {
       D = mapinto( Dp );
+      cof= mapinto (cofp);
+      cog= mapinto (cogp);
       d_deg=dp_deg;
       q = p;
     }
@@ -1295,6 +1304,10 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       if ( dp_deg == d_deg )
       {
         chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
+        chineseRemainder( cof, q, mapinto (cofp), p, newCof, newq);
+        chineseRemainder( cog, q, mapinto (cogp), p, newCog, newq);
+        cof= newCof;
+        cog= newCog;
         q = newq;
         D = newD;
       }
@@ -1304,6 +1317,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         // all previous p's are bad primes
         q = p;
         D = mapinto( Dp );
+        cof= mapinto (cof);
+        cog= mapinto (cog);
         d_deg=dp_deg;
         test= 0;
         equal= false;
@@ -1317,9 +1332,13 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     if ( i >= 0 )
     {
       Dn= Farey(D,q);
+      cofn= Farey(cof,q);
+      cogn= Farey(cog,q);
       int is_rat= isOn (SW_RATIONAL);
       On (SW_RATIONAL);
       cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
+      cofn *= bCommonDen (cofn);
+      cogn *= bCommonDen (cogn);
       if (!is_rat)
         Off (SW_RATIONAL);
       Dn *=cd;
@@ -1328,7 +1347,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       else
         equal= true;
       //Dn /=vcontent(Dn,Variable(1));
-      if ((equal || q > b) && fdivides( Dn, f ) && fdivides( Dn, g ) )
+      if ((equal || q > b) || ((cofn*Dn==f) && (cogn*Dn==g)))
       {
         //printf(" -> success\n");
         return Dn*gcdcfcg;
@@ -1346,4 +1365,5 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
   }
 }
+
 
