@@ -1236,11 +1236,33 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   //g /=vcontent(g,Variable(1));
 
   CanonicalForm Dn, test= 0;
+  cl =  gcd (f.lc(),g.lc());
+  CanonicalForm b= 1;
+  int minCommonDeg= 0;
+  CanonicalForm gcdcfcg= gcd (cf, cg);
+  for (i= tmax (f.level(), g.level()); i > 0; i--)
+  {
+    if (degree (f, i) <= 0 || degree (g, i) <= 0)
+      continue;
+    else
+    {
+      minCommonDeg= tmin (degree (g, i), degree (f, i));
+      break;
+    }
+  }
+  if (i == 0)
+    return gcdcfcg;
+  for (; i > 0; i--)
+  {
+    if (degree (f, i) <= 0 || degree (g, i) <= 0)
+      continue;
+    else
+      minCommonDeg= tmin (minCommonDeg, tmin (degree (g, i), degree (f, i)));
+  }
+  b= 2*tmin (maxNorm (f), maxNorm (g))*abs (cl)*power (CanonicalForm (2), minCommonDeg);
   bool equal= false;
   i = cf_getNumBigPrimes() - 1;
-  cl =  gcd (f.lc(),g.lc());
 
-  CanonicalForm gcdcfcg= gcd (cf, cg);
   //Off (SW_RATIONAL);
   while ( true )
   {
@@ -1306,7 +1328,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       else
         equal= true;
       //Dn /=vcontent(Dn,Variable(1));
-      if (equal && fdivides( Dn, f ) && fdivides( Dn, g ) )
+      if ((equal || q > b) && fdivides( Dn, f ) && fdivides( Dn, g ) )
       {
         //printf(" -> success\n");
         return Dn*gcdcfcg;

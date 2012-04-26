@@ -559,6 +559,8 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   Variable V_buf= alpha;
   CanonicalForm prim_elem, im_prim_elem;
   CFList source, dest;
+  int bound= tmin (degree (ppA, 1), degree (ppB, 1));
+  int count= 0;
   do
   {
     random_element= randomElement (m, V_buf, l, fail);
@@ -664,6 +666,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       newtonPoly= 1;
       G_m= 0;
       d= d0;
+      count= 0;
     }
 
     TIMING_START (newton_interpolation);
@@ -671,6 +674,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     TIMING_END_AND_PRINT (newton_interpolation,
                           "time for newton interpolation: ");
 
+    count++;
     //termination test
     if (uni_lcoeff (H) == gcdlcAlcB)
     {
@@ -681,7 +685,11 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         CFList u, v;
         //maybe it's better to test if ppH is an element of F(\alpha) before
         //mapping down
-        if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
+        DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
+        ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
+        ppH /= Lc(ppH);
+        DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
+        if ((count == bound) || (fdivides (ppH, ppA) && fdivides (ppH, ppB)))
         {
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
@@ -692,7 +700,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           return N(gcdcAcB*ppH);
         }
       }
-      else if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
+      else if ((count == bound) || (fdivides (ppH, ppA) && fdivides (ppH, ppB)))
       {
         if (compressConvexDense)
           ppH= decompress (ppH, MM, V);
@@ -881,6 +889,8 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   int kk;
   int expon;
   char gf_name_buf= gf_name;
+  int bound= tmin (degree (ppA, 1), degree (ppB, 1));
+  int count= 0;
   do
   {
     random_element= GFRandomElement (m, l, fail);
@@ -962,12 +972,14 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       newtonPoly= 1;
       G_m= 0;
       d= d0;
+      count= 0;
     }
 
     TIMING_START (newton_interpolation);
     H= newtonInterp (random_element, G_random_element, newtonPoly, G_m, x);
     TIMING_END_AND_PRINT (newton_interpolation, "time for newton interpolation: ");
 
+    count++;
     //termination test
     if (uni_lcoeff (H) == gcdlcAlcB)
     {
@@ -975,7 +987,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       ppH= H/cH;
       if (inextension)
       {
-        if (fdivides(ppH, ppA) && fdivides(ppH, ppB))
+        if ((count == bound) || (fdivides(ppH, ppA) && fdivides(ppH, ppB)))
         {
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= GFMapDown (ppH, k);
@@ -1185,6 +1197,8 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   bool inextensionextension= false;
   topLevel= false;
   CFList source, dest;
+  int bound= tmin (degree (ppA, 1), degree (ppB, 1));
+  int count= 0;
   do
   {
     if (inextension)
@@ -1331,6 +1345,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       newtonPoly= 1;
       G_m= 0;
       d= d0;
+      count= 0;
     }
 
     TIMING_START (newton_interpolation);
@@ -1338,6 +1353,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     TIMING_END_AND_PRINT (newton_interpolation,
                           "time for newton_interpolation: ");
 
+    count++;
     //termination test
     if (uni_lcoeff (H) == gcdlcAlcB)
     {
@@ -1345,7 +1361,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       ppH= H/cH;
       ppH /= Lc (ppH);
       DEBOUTLN (cerr, "ppH= " << ppH);
-      if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
+      if ((count == bound) || (fdivides (ppH, ppA) && fdivides (ppH, ppB)))
       {
         if (compressConvexDense)
           ppH= decompress (ppH, MM, V);
