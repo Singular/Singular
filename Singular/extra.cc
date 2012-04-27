@@ -3843,6 +3843,33 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     return TRUE;
   }
   else
+/*==================== reserved port =================*/
+  if (strcmp(sys_cmd,"reserve")==0)
+  {
+    int ssiReservePort(int clients);
+    if ((h!=NULL) && (h->Typ()==INT_CMD))
+    {
+      res->rtyp=INT_CMD;
+      int p=ssiReservePort((int)(long)h->Data());
+      res->data=(void*)(long)p;
+      return (p==0);
+    }
+    else
+    {
+      WerrorS("system(\"reserve\",<int>)");
+    }
+    return TRUE;
+  }
+  else
+  if (strcmp(sys_cmd,"reservedLink")==0)
+  {
+    si_link ssiCommandLink();
+    res->rtyp=LINK_CMD;
+    si_link p=ssiCommandLink();
+    res->data=(void*)p;
+    return (p==NULL);
+  }
+  else
   /*==================== Test Boos Epure ==================================*/
   if (strcmp(sys_cmd, "Hallo")==0)
   {
