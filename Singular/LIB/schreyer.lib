@@ -380,7 +380,6 @@ example
   "Only the first syzygy: ";
   RES;
   MRES;
-  
 }
 
 proc Sres(module M, int l)
@@ -433,6 +432,511 @@ example
   MRES;
 }
 
+
+
+// ================================================================== //
+
+
+LIB "general.lib"; // for sort
+
+// TODO: in C++!
+static proc Tail(def M)
+{
+  int i = ncols(M); def m;
+  while (i > 0)
+  {
+    m = M[i];
+
+    m = m - lead(m); // m = tail(m)
+    
+    M[i] = m;
+    
+    i--;
+  }
+  return (M);
+}
+
+/* static */ proc SSinit(module M)
+{
+  if( (typeof(M) != "module") && (typeof(M) != "ideal") )
+  {
+    ERROR("Sorry: need an ideal or a module for input");
+  }
+
+  // TODO! DONE?
+  def @save = basering;
+  
+  int @DEBUG = !system("with", "ndebug");
+  if( @DEBUG )
+  {
+    "SSinit::Input";
+    type(M);
+    DetailedPrint(M);
+    attrib(M);
+  }
+
+  int @RANK = nrows(M); int @SIZE = ncols(M);
+
+  int @IS_A_SB = attrib(M, "isSB"); // ??? only if all weights were zero?!
+
+  if( !@IS_A_SB ) 
+  {
+    def opts = option(get);
+    option(redSB); option(redTail); 
+    M = std(M);
+    option(set, opts);
+    kill opts;
+  } else
+  {
+    M = simplify(M, 2 + 4 + 32);
+  }
+
+  def LEAD = lead(M);
+
+  // sort wrt neg.deg.rev.lex!
+  intvec iv_ds = sort(LEAD, "ds", 1)[2]; // ,1 => reversed!
+
+  M = M[iv_ds]; // sort M wrt ds on current leading terms
+  LEAD = LEAD[iv_ds];
+  
+  def TAIL = Tail(M);
+  
+  intvec @DEGS = deg(M[1..@SIZE]); // store actuall degrees of input elements
+  
+  // TODO: what about real modules? weighted ones?
+  
+  list @l = ringlist(@save);
+
+  int @z = 0; ideal @m = maxideal(1); intvec @wdeg = deg(@m[1..ncols(@m)]);
+
+  // NOTE: @wdeg will be ignored anyway :(
+  @l[3] = list(list("C", @z), list("lp", @wdeg)); 
+
+  kill @z, @wdeg; // since these vars are ring independent!
+
+  def S = ring(@l); // --MakeInducedSchreyerOrdering(1);
+
+  module F = freemodule(@RANK);
+  intvec @V = deg(F[1..@RANK]);
+  
+  setring S; // ring with an easy divisibility test ("C, lex")
+
+  if( @DEBUG )
+  {
+    "SSinit::StartingISRing";
+    basering; 
+//    DetailedPrint(basering);
+  }
+
+  // Setup the leading syzygy^{-1} module to zero:
+  module Z = 0; Z[@RANK] = 0; attrib(Z, "isHomog", intvec(0));  
+
+  module MRES = Z;
+  
+  list RES;  RES[1] = Z;
+  list LRES; LRES[1] = Z;
+  list TRES; TRES[1] = Z;
+  
+  def M = imap(@save, M);
+  attrib(M, "isHomog", @V);
+  attrib(M, "isSB", 1);
+
+  attrib(M, "degrees", @DEGS);  
+  
+  def LEAD = imap(@save, LEAD);
+  attrib(LEAD, "isHomog", @V);
+  attrib(LEAD, "isSB", 1);  
+  
+  def TAIL = imap(@save, TAIL);
+
+  if( @DEBUG )
+  {
+    "SSinit::(sorted) SB_Input: ";
+    type(M);
+    attrib(M);
+    attrib(M, "isHomog");
+    DetailedPrint(M);
+  }
+
+  // 0^th syz. property
+  if( size(module(transpose( transpose(M) * transpose(MRES) ))) > 0 )
+  {
+    transpose( transpose(M) * transpose(MRES) );
+    "ERROR: transpose( transpose(M) * transpose(MRES) ) != 0!!!";
+    $
+  }
+
+  RES[size(RES)+1] = M; // list of all syzygy modules
+  LRES[size(LRES)+1] = LEAD; // list of all syzygy modules
+  TRES[size(TRES)+1] = TAIL; // list of all syzygy modules
+  
+  MRES = MRES, M; //?
+
+  attrib(MRES, "isHomog", @V);  
+
+  attrib(S, "InducionStart", @RANK);
+  
+  if( @DEBUG )
+  {
+    "SSinit::MRES";
+    DetailedPrint(MRES);
+    attrib(MRES, "isHomog");
+    attrib(S);
+  }
+
+  export RES;
+  export MRES;
+  export LRES;
+  export TRES;
+  return (S);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (w, x, y, z), dp;
+
+  def M = maxideal(1);
+  def S = SSinit(M); setring S; S;
+  
+  "Only the first initialization: ";
+  RES; LRES; TRES;
+  MRES; 
+
+  kill S; setring R; kill M;
+  
+  ideal M = w^2 - x*z,  w*x - y*z,  x^2 - w*y, x*y - z^2, y^2 - w*z;
+  def S = SSinit(M); setring S; S;
+
+  "Only the first initialization: ";
+  RES; LRES; TRES;
+  MRES; 
+
+  kill S; setring R; kill M;
+}
+
+// module (N, LL, TT) = SSComputeSyzygy(L, T, @RANK); // shift syz.comp by @RANK!
+proc SSComputeSyzygy(def M, def L, def T, int iCompShift)
+{
+  int @DEBUG = !system("with", "ndebug");
+
+  if( @DEBUG )
+  {
+    "SSComputeSyzygy::Input";
+    "basering: ", basering; attrib(basering);
+//    DetailedPrint(basering);
+
+    "iCompShift: ", iCompShift;
+
+    "M: "; M;
+    "L: "; L;
+    "T: "; T;
+  }
+
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+
+
+  def opts = option(get); option(redSB); option(redTail); 
+  module SYZ = std(syz(M)); // TODO: !!!!!!!!!!!
+  option(set, opts); kill opts;
+
+  "SYZ: ";  SYZ;  print(SYZ);
+
+  module Z; Z[iCompShift] = 0; Z = Z, transpose(SYZ); SYZ = transpose(Z);
+
+  "shifted SYZ: ";  SYZ;  print(SYZ);
+  
+  module LL, TT;
+
+  LL = lead(SYZ); // TODO: WRONG ORDERING!!!!!!!!
+  TT = Tail(SYZ);
+
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
+  
+  intvec iv_ds = sort(LL, "ds", 1)[2]; // ,1 => reversed!
+  LL = LL[iv_ds];
+  TT = TT[iv_ds];
+  
+  if( @DEBUG )
+  {
+    "SSComputeSyzygy::Output";
+
+    "SYZ: "; SYZ;
+    "LL: "; LL;
+    "TT: "; TT;
+  }
+
+  return (SYZ, LL, TT);
+}
+
+// resolution/syzygy step:
+static proc SSstep()
+{
+  /// TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  int @DEBUG = !system("with", "ndebug");
+
+  if( @DEBUG )
+  {
+    "SSstep::NextInducedRing"; 
+    "basering: ", basering; attrib(basering);
+//    DetailedPrint(basering);
+  }
+
+/*
+  // is initial weights are all zeroes!
+  def L =  lead(M);
+  intvec @V = deg(M[1..ncols(M)]);  @W;  @V;  @W = @V;  attrib(L, "isHomog", @W);  
+  SetInducedReferrence(L, @RANK, 0);
+*/
+
+//  def L =  lead(MRES);
+//  @W = @W, @V;
+//  attrib(L, "isHomog", @W);  
+
+
+  // General setting:
+//  SetInducedReferrence(MRES, 0, 0); // limit: 0!
+  int @l = size(RES);
+
+  def M =  RES[@l];
+
+  def L = LRES[@l];
+  def T = TRES[@l];
+
+
+  //// TODO: wrong !!!!!
+  int @RANK = ncols(MRES) - ncols(M); // nrows(M); // what if M is zero?!
+
+  
+
+/*
+  if( @RANK !=  nrows(M) )
+  {
+    type(MRES);
+    @RANK;
+    type(M);
+    pause();
+  }
+*/
+  
+  intvec @W = attrib(M, "isHomog"); intvec @V = attrib(M, "degrees"); @V = @W, @V;
+   
+  if( @DEBUG )
+  {
+    "Sstep::NextInput: ";
+    M;
+    L;
+    @V;
+    @RANK;
+    DetailedPrint(MRES);
+    attrib(MRES, "isHomog");
+  }
+
+      
+  // TODO: N  = SYZ( M )!!!
+  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(M, L, T, @RANK); // shift syz.comp by @RANK!
+
+  attrib(N, "isHomog", @V);
+
+  // TODO: correct the following: 
+  intvec @DEGS = deg(N[1..ncols(N)]); // no mod. comp. weights :(
+  attrib(N, "degrees", @DEGS);  
+  
+  if( size(N) > 0 )
+  {
+    N;
+    MRES;
+    // next syz. property
+    if( size(module(transpose( transpose(N) * transpose(MRES) ))) > 0 )
+    {
+      MRES;
+
+      "N: "; N; // DetailedPrint(N, 2);
+
+      "LL:"; LL; // DetailedPrint(LL, 1);
+      "TT:"; TT; // DetailedPrint(TT, 10);
+
+      "RANKS: ", @RANK;
+
+      "transpose( transpose(N) * transpose(MRES) ) != 0!!!";
+      transpose( transpose(N) * transpose(MRES) );
+
+      "transpose(N) * transpose(MRES): ";
+      transpose(N) * transpose(MRES);
+      // DetailedPrint(module(_), 2);
+      $
+    }
+  }
+  
+   RES[@l + 1] = N; // list of all syzygy modules
+  LRES[@l + 1] = LL; // list of all syzygy modules
+  TRES[@l + 1] = TT; // list of all syzygy modules
+
+  MRES = MRES, N;
+  attrib(MRES, "isHomog", @V);
+
+//  L = L, lead(N);  attrib(basering, "InducionLeads", L);
+
+  if( @DEBUG )
+  {
+    "SSstep::NextSyzOutput: ";
+    DetailedPrint(N);
+    attrib(N);
+  }
+
+}
+
+proc SScontinue(int l)
+"USAGE:  SScontinue(l)
+RETURN:  nothing, instead it changes RES and MRES variables in the current ring
+PURPOSE: computes further (at most l) syzygies 
+NOTE:    must be used within a ring returned by Sres or Ssyz. RES and MRES are
+         explained in Sres
+EXAMPLE: example Scontinue; shows an example
+"
+{
+
+  /// TODO!
+//  def data = GetInducedData();
+
+  if( (!defined(RES)) || (!defined(MRES)) ) /* || (typeof(data) != "list") || (size(data) != 2) */
+  {
+    ERROR("Sorry, but basering does not seem to be returned by Sres or Ssyz");
+  }
+  for (;  (l != 0) && (size(RES[size(RES)]) > 0); l-- )
+  {
+    SSstep(); 
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  module M = maxideal(1); M;
+  def S = SSsyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES; MRES;
+  "More syzygies: ";
+  SScontinue(10);
+  RES; MRES;
+}
+
+proc SSsyz(def M)
+"USAGE:  SSsyz(M)
+RETURN:  ring, containing a list of modules RES and a module MRES
+PURPOSE: computes the first syzygy module of M (wrt some Schreyer ordering)?
+NOTE:    The output is explained in Sres
+EXAMPLE: example Ssyz; shows an example
+"
+{
+  if( (typeof(M) != "module") && (typeof(M) != "ideal") )
+  {
+    ERROR("Sorry: need an ideal or a module for input");
+  }
+
+  def SS = SSinit(M); setring SS;
+  
+  SSstep(); // NOTE: what if M is zero?
+
+  return (SS);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+
+/*  ideal M = 0;
+  def S = SSsyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES; LRES; TRES;
+  MRES;
+  
+  kill S; setring r; kill M;
+*/  
+
+  module M = maxideal(1); M;
+  def S = SSsyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES; LRES; TRES;
+  MRES;
+
+  kill S; setring r; kill M;
+
+  kill r;
+  
+  ring R = 0, (w, x, y, z), dp;
+  ideal M = w^2 - x*z,  w*x - y*z,  x^2 - w*y, x*y - z^2, y^2 - w*z;
+  
+  def S = SSsyz(M); setring S; S;
+  "Only the first syzygy: ";
+  RES; LRES; TRES;
+  MRES;
+}
+
+proc SSres(def M, int l)
+"USAGE:  SSres(I, l)
+RETURN:  ring, containing a list of modules RES and a module MRES
+PURPOSE: computes (at most l) syzygy modules of M wrt the classical Schreyer
+         induced ordering with gen(i) > gen(j) if i > j, provided both gens
+         are from the same syzygy level.???
+NOTE:    RES contains the images of maps subsituting the beginning of the
+         Schreyer free resolution of baseRing^r/M, while MRES is a sum of
+         these images in a big free sum, containing all the syzygy modules.
+         The syzygy modules are shifted so that gen(i) correspons to MRES[i].
+         The leading zero module RES[0] indicates the fact that coker of the
+         first map is zero. The number of zeroes inducates the rank of input.
+NOTE:    If l == 0 then l is set to be nvars(basering) + 1
+EXAMPLE: example SSres; shows an example
+"
+{
+  if( (typeof(M) != "module") && (typeof(M) != "ideal") )
+  {
+    ERROR("Sorry: need an ideal or a module for input");
+  }
+
+  def SS = SSinit(M); setring SS;
+
+  if (l == 0)
+  {
+    l = nvars(basering) + 1; // not really an estimate...?!
+  }
+
+  SSstep(); l = l - 1;
+
+  SScontinue(l);
+
+  return (SS);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  module M = maxideal(1); M;
+  def S = SSres(M, 0); setring S; S;
+  RES;
+  MRES;
+  kill S;
+  setring r; kill M;
+
+  def A = nc_algebra(-1,0); setring A;
+  ideal Q = var(1)^2, var(2)^2, var(3)^2;
+  qring SCA = twostd(Q);
+  basering;
+
+  module M = maxideal(1);
+  def S = SSres(M, 2); setring S; S;
+  RES;
+  MRES;
+}
 
 
 
@@ -549,7 +1053,16 @@ proc testallSexamples()
   example Scontinue;
   example Sres;  
 }
+
+proc testallSSexamples()
+{
+  example SSsyz;
+  example SScontinue;
+  example SSres;  
+}
+
 example
 { "EXAMPLE:"; echo = 2;
   testallSexamples();
+  testallSSexamples();
 }
