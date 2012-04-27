@@ -1651,6 +1651,106 @@ int ssiBatch(const char *host, const char * port)
   exit(0);
 }
 
+static int ssiReserved_P=0;
+static int ssiReserved_sockfd;
+static  struct sockaddr_in ssiResverd_serv_addr;
+static int  ssiReserved_Clients;
+int ssiReservePort(int clients)
+{
+  if (ssiReserved_P!=0)
+  {
+    WerrorS("ERROR already a reverved port requested");
+    return 0;
+  }
+  int portno;
+  int n;
+  ssiReserved_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if(ssiReserved_sockfd < 0)
+  {
+    WerrorS("ERROR opening socket");
+    return 0;
+  }
+  memset((char *) &ssiResverd_serv_addr,0, sizeof(ssiResverd_serv_addr));
+  portno = 1025;
+  ssiResverd_serv_addr.sin_family = AF_INET;
+  ssiResverd_serv_addr.sin_addr.s_addr = INADDR_ANY;
+  do
+  {
+    portno++;
+    ssiResverd_serv_addr.sin_port = htons(portno);
+    if(portno > 50000)
+    {
+      WerrorS("ERROR on binding (no free port available?)");
+      return 0;
+    }
+  }
+  while(bind(ssiReserved_sockfd, (struct sockaddr *) &ssiResverd_serv_addr, sizeof(ssiResverd_serv_addr)) < 0);
+  ssiReserved_P=portno;
+  listen(ssiReserved_sockfd,clients);
+  ssiReserved_Clients=clients;
+  return portno;
+}
+
+extern si_link_extension si_link_root;
+si_link ssiCommandLink()
+{
+  if (ssiReserved_P==0)
+  {
+    WerrorS("ERROR no reverved port requested");
+    return NULL;
+  }
+  struct sockaddr_in cli_addr;
+  int clilen = sizeof(cli_addr);
+  int newsockfd = accept(ssiReserved_sockfd, (struct sockaddr *) &cli_addr, (socklen_t *)&clilen);
+  if(newsockfd < 0)
+  {
+    Werror("ERROR on accept (errno=%d)",errno);
+    return NULL;
+  }
+  si_link l=(si_link) omAlloc0Bin(sip_link_bin);
+  si_link_extension s = si_link_root;
+  si_link_extension prev = s;
+  while (strcmp(s->type, "ssi") != 0)
+  {
+    if (s->next == NULL)
+    {
+      prev = s;
+      s = NULL;
+      break;
+    }
+    else
+    {
+      s = s->next;
+    }
+  }
+  if (s != NULL)
+    l->m = s;
+  else
+  {
+    si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
+    prev->next=slInitSsiExtension(ns);
+    l->m = prev->next;
+  }
+  l->name=omStrDup("");
+  l->mode=omStrDup("tcp");
+  l->ref=1;
+  ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
+  sigprocmask(SIG_SETMASK, NULL, &ssi_sigmask);
+  sigaddset(&ssi_sigmask, SIGCHLD);
+  l->data=d;
+  d->fd_read = newsockfd;
+  d->fd_write = newsockfd;
+  d->f_read = fdopen(newsockfd, "r");
+  d->f_write = fdopen(newsockfd, "w");
+  SI_LINK_SET_RW_OPEN_P(l);
+  ssiReserved_Clients--;
+  if (ssiReserved_Clients<=0)
+  {
+    ssiReserved_P=0;
+    close(ssiReserved_sockfd);
+  }
+  return l;
+}
 // ----------------------------------------------------------------
 // format
 // 1 int %d
