@@ -23,6 +23,9 @@
 extern "C"
 {
 #endif
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
 #include <fmpz.h>
 #include <fmpq.h>
 #include <fmpz_poly.h>
@@ -32,6 +35,8 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+#include <factory/cf_gmp.h>
 
 /// conversion of a factory integer to fmpz_t
 void
