@@ -2283,7 +2283,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                    int oldNumCols, int oldL, int precision
                   )
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   CFArray * A= new CFArray [factors.length()];
@@ -2346,7 +2345,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           CanonicalForm G= F;
@@ -2416,7 +2414,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                    int precision
                   )
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   CFArray * A= new CFArray [factors.length()];
@@ -2479,7 +2476,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2551,7 +2547,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   bool GF= (CFFactory::gettype()==GaloisFieldDomain);
   int degMipo= degree (getMipo (info.getAlpha()));
   Variable alpha= info.getAlpha();
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
 
@@ -2668,7 +2663,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
 
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           Variable y= Variable (2);
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
@@ -2740,7 +2734,6 @@ CFList
 increasePrecision2 (const CanonicalForm& F, CFList& factors,
                     const Variable& alpha, int precision)
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   CFArray * A= new CFArray [factors.length()];
@@ -2804,7 +2797,6 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2862,7 +2854,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
                         int precision
                        )
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   int extensionDeg= degree (getMipo (alpha));
@@ -2926,7 +2917,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2994,7 +2984,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                   )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
@@ -3051,7 +3040,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -3059,7 +3047,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       delete [] A;
       return CFList (F);
     }
@@ -3101,7 +3088,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                   )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
@@ -3155,7 +3141,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -3163,7 +3148,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       delete [] A;
       return CFList (F);
     }
@@ -3209,7 +3193,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
                      )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2; //be careful
   bool hitBound= false;
@@ -3320,7 +3303,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
 
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           Variable y= Variable (2);
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
@@ -3332,7 +3314,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       Variable y= Variable (2);
       CanonicalForm tmp= F (y - evaluation, y);
       CFList source, dest;
@@ -3381,7 +3362,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
                        )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int extensionDeg= degree (getMipo (alpha));
   int oldL2= oldL/2;
@@ -3436,7 +3416,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
