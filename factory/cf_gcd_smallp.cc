@@ -1590,8 +1590,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   Variable alpha, V_buf;
   bool fail= false;
   bool inextension= false;
-  bool inextensionextension= false;
-  bool topLevel2= false;
+  topLevel= false;
   CFList source, dest;
   int bound1= degree (ppA, 1);
   int bound2= degree (ppB, 1);
@@ -1608,7 +1607,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_START (gcd_recursion);
       G_random_element=
       GCD_small_p (ppA (random_element,x), ppB (random_element,x),
-                   coF_random_element, coG_random_element, topLevel2,
+                   coF_random_element, coG_random_element, topLevel,
                    list);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -1621,7 +1620,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       G_random_element=
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, alpha,
-                        list, topLevel2);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1647,7 +1646,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       G_random_element=
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, alpha,
-                        list, topLevel2);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1692,7 +1691,6 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
       DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (V_buf2));
 
-      inextensionextension= true;
       for (CFListIterator i= l; i.hasItem(); i++)
         i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem,
                              im_prim_elem, source, dest);
@@ -1716,7 +1714,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       G_random_element=
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, V_buf,
-                        list, topLevel2);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -3015,15 +3013,14 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       }
     }
 
-    long rk;
     matColumns= biggestSize2 - 1;
     matRows= 0;
     for (int i= 0; i < skelSize; i++)
     {
       if (V_buf.level() == 1)
-        rk= gaussianElimFp (pMat[i], pL[i]);
+        (void) gaussianElimFp (pMat[i], pL[i]);
       else
-        rk= gaussianElimFq (pMat[i], pL[i], V_buf);
+        (void) gaussianElimFq (pMat[i], pL[i], V_buf);
 
       if (pMat[i] (coeffMonoms[i].size(), coeffMonoms[i].size()) == 0)
       {
@@ -3698,7 +3695,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   bool fail= false;
   topLevel= false;
   bool inextension= false;
-  bool inextensionextension= false;
   Variable V_buf, alpha;
   CanonicalForm prim_elem, im_prim_elem;
   CFList source, dest;
@@ -3799,7 +3795,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
       DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (V_buf2));
 
-      inextensionextension= true;
       for (CFListIterator i= l; i.hasItem(); i++)
         i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem,
                              im_prim_elem, source, dest);
@@ -4001,7 +3996,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
           DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (V_buf2));
 
-          inextensionextension= true;
           for (CFListIterator i= l; i.hasItem(); i++)
             i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem,
                                 im_prim_elem, source, dest);
