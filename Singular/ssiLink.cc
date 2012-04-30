@@ -842,7 +842,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         }
         while(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0);
         Print("waiting on port %d\n", portno);mflush();
-        listen(sockfd,5);
+        listen(sockfd,1);
         newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, (socklen_t *)&clilen);
         if(newsockfd < 0)
         {
@@ -902,7 +902,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         }
         while(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0);
         //Print("waiting on port %d\n", portno);mflush();
-        listen(sockfd,5);
+        listen(sockfd,1);
         char* cli_host = (char*)omAlloc(256);
         char* path = (char*)omAlloc(1024);
         int r = sscanf(l->name,"%255[^:]:%s",cli_host,path);
@@ -1335,7 +1335,9 @@ const char* slStatusSsi(si_link l, const char* request)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   if (d==NULL) return "not open";
-  if (((strcmp(l->mode,"fork")==0)||(strcmp(l->mode,"tcp")==0))
+  if (((strcmp(l->mode,"fork")==0)
+  ||(strcmp(l->mode,"tcp")==0)
+  ||(strcmp(l->mode,"connect")==0))
   && (strcmp(request, "read") == 0))
   {
     fd_set  mask, fdmask;
