@@ -4627,7 +4627,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       b = REvaluation( 2, tmax(F.level(), G.level()), GFRandom() );
   }
 
-  CanonicalForm cand;
+  CanonicalForm cand, contcand;
   CanonicalForm result;
   int o, t;
   o= 0;
@@ -4870,8 +4870,12 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 
       if (gcdfound == 1)
       {
-        cand = DD[2] / content( DD[2], Variable(1) );
-        gcdfound = fdivides( cand, G ) && fdivides ( cand, F ); //TODO use multiplication instead of fdivides
+        contcand= content (DD[2], Variable (1));
+        cand = DD[2] / contcand;
+        if (B_is_F)
+          gcdfound = fdivides( cand, G ) && cand*(DD[1]/(lcD/contcand)) == F;
+        else
+          gcdfound = fdivides( cand, F ) && cand*(DD[1]/(lcD/contcand)) == G;
 
         if (passToGF && gcdfound)
         {
