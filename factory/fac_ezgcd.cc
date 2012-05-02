@@ -413,7 +413,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 {
   bool isRat= isOn (SW_RATIONAL);
   CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG,
-                lcD, cand, result;
+                lcD, cand, contcand, result;
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
   int degF, degG, delta, t, count, maxeval;
   REvaluation bt;
@@ -653,8 +653,12 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 
       if (gcdfound)
       {
-        cand = DD[2] / content( DD[2], Variable(1) );
-        gcdfound = fdivides( cand, G ) && fdivides ( cand, F );
+        contcand= content (DD[2], Variable (1));
+        cand = DD[2] / contcand;
+        if (B_is_F)
+          gcdfound = fdivides( cand, G ) && cand*(DD[1]/(lcD/contcand)) == F;
+        else
+          gcdfound = fdivides( cand, F ) && cand*(DD[1]/(lcD/contcand)) == G;
       }
       /// ---> A8 (gcdfound)
     }
