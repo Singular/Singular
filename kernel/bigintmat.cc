@@ -16,7 +16,7 @@
 
 #define BIGIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
 
-// Beginnt bei [1,1]
+// first entry is [1,1]
 void bigintmat::set(int i, int j, number n)
 {
   nlDelete(&(v[(i-1)*col+j-1]), NULL);
@@ -28,7 +28,7 @@ int bigintmat::length()
   return col*row;
 }
 
-// Beginnt bei [0]
+// sees matrix as vector, first entry is [0]
 void bigintmat::set(int i, number n)
 {
   if (i<row*col)
@@ -53,7 +53,7 @@ bigintmat::bigintmat(int r, int c)
   row = r;
   col = c;
   int l = r*c;
-  if (l>0) /*(r>0) && (c>0) */
+  if (l>0)
     v = (number *)omAlloc(sizeof(number)*l);
   else
     v = NULL;
@@ -63,8 +63,6 @@ bigintmat::bigintmat(int r, int c)
   }
 }
 
-// Überladener *=-Operator (für int und bigint)
-// Frage hier: *= verwenden oder lieber = und * einzeln?
 void bigintmat::operator*=(int intop)
 {
   for (int i=0; i<row*col; i++)
@@ -84,6 +82,50 @@ void bigintmat::operator*=(number bintop)
           number prod = nlMult(v[i], bintop);
           nlDelete(&(v[i]), NULL);
           v[i] = prod;
+  }
+}
+
+void bigintmat::operator-=(int intop)
+{
+  for (int i=0; i<row*col; i++)
+  {
+          number iop = nlInit(intop, NULL);
+          number diff = nlSub(v[i], iop);
+          nlDelete(&(v[i]), NULL);
+          nlDelete(&iop, NULL);
+          v[i] = diff;
+  }
+}
+
+void bigintmat::operator-=(number bintop)
+{
+  for (int i=0; i<row*col; i++)
+  {
+          number diff = nlSub(v[i], bintop);
+          nlDelete(&(v[i]), NULL);
+          v[i] = diff;
+  }
+}
+
+void bigintmat::operator+=(int intop)
+{
+  for (int i=0; i<row*col; i++)
+  {
+          number iop = nlInit(intop, NULL);
+          number sum = nlAdd(v[i], iop);
+          nlDelete(&(v[i]), NULL);
+          nlDelete(&iop, NULL);
+          v[i] = sum;
+  }
+}
+
+void bigintmat::operator+=(number bintop)
+{
+  for (int i=0; i<row*col; i++)
+  {
+          number sum = nlAdd(v[i], bintop);
+          nlDelete(&(v[i]), NULL);
+          v[i] = sum;
   }
 }
 
@@ -477,7 +519,7 @@ void bigintmat::pprint(int maxwid)
     omFree(ts);
     }
     PrintS(ps);
-    omFree(ps);
+//    omFree(ps);
   }
 }
 

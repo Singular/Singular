@@ -230,6 +230,8 @@ static BOOLEAN jjOP_BIM_I(leftv res, leftv u, leftv v)
   if (errorreported) return TRUE;
   switch (iiOp)
   {
+    case '+': (*aa) += bb; break;
+    case '-': (*aa) -= bb; break;
     case '*': (*aa) *= bb; break;
   }
   res->data=(char *)aa;

@@ -7,10 +7,10 @@
 * ABSTRACT: class bigintmat: matrizes of big integers
 */
 #include <string.h>
-#include <omalloc/omalloc.h>  
-#include <kernel/febase.h>    
-#include <kernel/longrat.h>   
-#include <kernel/intvec.h>    
+#include <omalloc/omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/longrat.h>
+#include <kernel/intvec.h>
 
 
 class bigintmat
@@ -42,8 +42,8 @@ public:
       }
     }
   }
-  
-  
+
+
   inline number& operator[](int i)
     {
 #ifndef NDEBUG
@@ -64,11 +64,15 @@ public:
 #endif
       return v[i];
     }
-    
+
 #define BIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
   int length();
   void operator*=(int intop);
   void operator*=(number bintop);
+  void operator+=(int intop);
+  void operator+=(number bintop);
+  void operator-=(int intop);
+  void operator-=(number bintop);
   inline int  cols() const { return col; }
   inline int  rows() const { return row; }
   inline ~bigintmat()
