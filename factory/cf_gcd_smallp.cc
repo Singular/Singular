@@ -424,28 +424,80 @@ void choose_extension (const int& d, const int& num_vars, Variable& beta)
   beta= rootOf (mipo);
 }
 
+CanonicalForm
+GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+                  CanonicalForm& coF, CanonicalForm& coG,
+                  Variable & alpha, CFList& l, bool& topLevel);
+
+CanonicalForm
+GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+                  Variable & alpha, CFList& l, bool& topLevel)
+{
+  CanonicalForm dummy1, dummy2;
+  CanonicalForm result= GCD_Fp_extension (F, G, dummy1, dummy2, alpha, l,
+                                          topLevel);
+  return result;
+}
+
 /// GCD of F and G over \f$ F_{p}(\alpha ) \f$ ,
 /// l and topLevel are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
 CanonicalForm
 GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+                  CanonicalForm& coF, CanonicalForm& coG,
                   Variable & alpha, CFList& l, bool& topLevel)
 {
   CanonicalForm A= F;
   CanonicalForm B= G;
-  if (F.isZero() && degree(G) > 0) return G/Lc(G);
-  else if (G.isZero() && degree (F) > 0) return F/Lc(F);
-  else if (F.isZero() && G.isZero()) return F.genOne();
-  if (F.inBaseDomain() || G.inBaseDomain()) return F.genOne();
-  if (F.isUnivariate() && fdivides(F, G)) return F/Lc(F);
-  if (G.isUnivariate() && fdivides(G, F)) return G/Lc(G);
-  if (F == G) return F/Lc(F);
+  if (F.isZero() && degree(G) > 0)
+  {
+    coF= 0;
+    coG= Lc (G);
+    return G/Lc(G);
+  }
+  else if (G.isZero() && degree (F) > 0)
+  {
+    coF= Lc (F);
+    coG= 0;
+    return F/Lc(F);
+  }
+  else if (F.isZero() && G.isZero())
+  {
+    coF= coG= 0;
+    return F.genOne();
+  }
+  if (F.inBaseDomain() || G.inBaseDomain())
+  {
+    coF= F;
+    coG= G;
+    return F.genOne();
+  }
+  if (F.isUnivariate() && fdivides(F, G, coG))
+  {
+    coF= Lc (F);
+    return F/Lc(F);
+  }
+  if (G.isUnivariate() && fdivides(G, F, coF))
+  {
+    coG= Lc (G);
+    return G/Lc(G);
+  }
+  if (F == G)
+  {
+    coF= coG= Lc (F);
+    return F/Lc(F);
+  }
 
   CFMap M,N;
   int best_level= myCompress (A, B, M, N, topLevel);
 
-  if (best_level == 0) return B.genOne();
+  if (best_level == 0)
+  {
+    coF= F;
+    coG= G;
+    return B.genOne();
+  }
 
   A= M(A);
   B= M(B);
@@ -454,7 +506,12 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())
-    return N (gcd(A,B));
+  {
+    CanonicalForm result= gcd (A, B);
+    coF= N (A/result);
+    coG= N (B/result);
+    return N (result);
+  }
 
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
@@ -483,17 +540,30 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
   if (compressConvexDense)
   {
+    CanonicalForm bufcA= cA;
+    CanonicalForm bufcB= cB;
     cA= content (ppA, 1);
     cB= content (ppB, 1);
     ppA /= cA;
     ppB /= cB;
     gcdcAcB *= gcd (cA, cB);
+    cA *= bufcA;
+    cB *= bufcB;
     if (ppA.isUnivariate() || ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-        return N (gcd (ppA, ppB)*gcdcAcB);
+      {
+        CanonicalForm result= gcd (ppA, ppB);
+        coF= N ((ppA/result)*(cA/gcdcAcB));
+        coG= N ((ppB/result)*(cB/gcdcAcB));
+        return N (result*gcdcAcB);
+      }
       else
+      {
+        coF= N (ppA*(cA/gcdcAcB));
+        coG= N (ppB*(cB/gcdcAcB));
         return N (gcdcAcB);
+      }
     }
 
     newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
@@ -510,9 +580,18 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     if (ppA.isUnivariate() && ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-        return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
+      {
+        CanonicalForm result= gcd (ppA, ppB);
+        coF= N (decompress ((ppA/result), MM, V)*(cA/gcdcAcB));
+        coG= N (decompress ((ppB/result), MM, V)*(cB/gcdcAcB));
+        return N (decompress (result, MM, V)*gcdcAcB);
+      }
       else
+      {
+        coF= N (decompress (ppA, MM, V));
+        coG= N (decompress (ppB, MM, V));
         return N (gcdcAcB);
+      }
     }
   }
 
@@ -522,7 +601,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
 
-  if (fdivides (lcA, lcB))
+  /*if (fdivides (lcA, lcB))
   {
     if (fdivides (A, B))
       return F/Lc(F);
@@ -531,27 +610,38 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   {
     if (fdivides (B, A))
       return G/Lc(G);
-  }
+  }*/
 
   gcdlcAlcB= gcd (lcA, lcB);
 
   int d= totaldegree (ppA, Variable(2), Variable (ppA.level()));
 
   if (d == 0)
+  {
+    coF= N (ppA*(cA/gcdcAcB));
+    coG= N (ppB*(cB/gcdcAcB));
     return N(gcdcAcB);
+  }
 
   int d0= totaldegree (ppB, Variable(2), Variable (ppB.level()));
   if (d0 < d)
     d= d0;
   if (d == 0)
+  {
+    coF= N (ppA*(cA/gcdcAcB));
+    coG= N (ppB*(cB/gcdcAcB));
     return N(gcdcAcB);
+  }
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
-  CanonicalForm newtonPoly;
+  CanonicalForm newtonPoly, coF_random_element, coG_random_element, coF_m,
+                coG_m, ppCoF, ppCoG;
 
   newtonPoly= 1;
   m= gcdlcAlcB;
   G_m= 0;
+  coF= 0;
+  coG= 0;
   H= 0;
   bool fail= false;
   topLevel= false;
@@ -559,11 +649,11 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   Variable V_buf= alpha;
   CanonicalForm prim_elem, im_prim_elem;
   CFList source, dest;
-  int bound= tmin (degree (ppA, 1), degree (ppB, 1));
-  int count= 0;
+  int bound1= degree (ppA, 1);
+  int bound2= degree (ppB, 1);
   do
   {
-    random_element= randomElement (m, V_buf, l, fail);
+    random_element= randomElement (m*lcA*lcB, V_buf, l, fail);
     if (fail)
     {
       source= CFList();
@@ -578,13 +668,17 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       if (V_buf3 != alpha)
       {
         m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
-        G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        G_m= mapDown (G_m, prim_elem, im_prim_elem, alpha, source, dest);
+        coF_m= mapDown (coF_m, prim_elem, im_prim_elem, alpha, source, dest);
+        coG_m= mapDown (coG_m, prim_elem, im_prim_elem, alpha, source, dest);
         newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
                              source, dest);
         ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
         ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
         gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha,
                             source, dest);
+        lcA= mapDown (lcA, prim_elem, im_prim_elem, alpha, source, dest);
+        lcB= mapDown (lcB, prim_elem, im_prim_elem, alpha, source, dest);
         for (CFListIterator i= l; i.hasItem(); i++)
           i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
                                 source, dest);
@@ -604,20 +698,25 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
                              im_prim_elem, source, dest);
       m= mapUp (m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       G_m= mapUp (G_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      coF_m= mapUp (coF_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      coG_m= mapUp (coG_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       newtonPoly= mapUp (newtonPoly, alpha, V_buf, prim_elem, im_prim_elem,
                           source, dest);
       ppA= mapUp (ppA, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       ppB= mapUp (ppB, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       gcdlcAlcB= mapUp (gcdlcAlcB, alpha, V_buf, prim_elem, im_prim_elem,
                          source, dest);
+      lcA= mapUp (lcA, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      lcB= mapUp (lcB, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
 
       fail= false;
-      random_element= randomElement (m, V_buf, l, fail );
+      random_element= randomElement (m*lcA*lcB, V_buf, l, fail );
       DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), V_buf,
+      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+                        coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -628,7 +727,8 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA(random_element, x), ppB(random_element, x), V_buf,
+      GCD_Fp_extension (ppA(random_element, x), ppB(random_element, x),
+                        coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -642,7 +742,11 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       d0= 0;
 
     if (d0 == 0)
+    {
+      coF= N (ppA*(cA/gcdcAcB));
+      coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
+    }
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -653,6 +757,10 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     G_random_element=
     (gcdlcAlcB(random_element, x)/uni_lcoeff (G_random_element))
     * G_random_element;
+    coF_random_element= (lcA(random_element,x)/uni_lcoeff(coF_random_element))
+                        *coF_random_element;
+    coG_random_element= (lcB(random_element,x)/uni_lcoeff(coG_random_element))
+                        *coG_random_element;
 
     if (!G_random_element.inCoeffDomain())
       d0= totaldegree (G_random_element, Variable(2),
@@ -666,49 +774,77 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       newtonPoly= 1;
       G_m= 0;
       d= d0;
-      count= 0;
+      coF_m= 0;
+      coG_m= 0;
     }
 
     TIMING_START (newton_interpolation);
     H= newtonInterp (random_element, G_random_element, newtonPoly, G_m, x);
+    coF= newtonInterp (random_element, coF_random_element, newtonPoly, coF_m,x);
+    coG= newtonInterp (random_element, coG_random_element, newtonPoly, coG_m,x);
     TIMING_END_AND_PRINT (newton_interpolation,
                           "time for newton interpolation: ");
 
-    count++;
     //termination test
-    if (uni_lcoeff (H) == gcdlcAlcB)
+    if ((uni_lcoeff (H) == gcdlcAlcB) || (G_m == H))
     {
-      cH= uni_content (H);
+      if (gcdlcAlcB.isOne())
+        cH= 1;
+      else
+        cH= uni_content (H);
       ppH= H/cH;
+      CanonicalForm lcppH= gcdlcAlcB/cH;
+      CanonicalForm ccoF= lcA/lcppH;
+      ccoF /= Lc (ccoF);
+      CanonicalForm ccoG= lcB/lcppH;
+      ccoG /= Lc (ccoG);
+      ppCoF= coF/ccoF;
+      ppCoG= coG/ccoG;
       if (inextension)
       {
-        CFList u, v;
-        //maybe it's better to test if ppH is an element of F(\alpha) before
-        //mapping down
-        DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-        ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
-        ppH /= Lc(ppH);
-        DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-        if ((count == bound) || (fdivides (ppH, ppA) && fdivides (ppH, ppB)))
+        if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
+             (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
+             (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) || 
+             (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
+          CFList u, v;
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
+          ppCoF= mapDown (ppCoF, prim_elem, im_prim_elem, alpha, u, v);
+          ppCoF= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
           ppH /= Lc(ppH);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
+          {
             ppH= decompress (ppH, MM, V);
+            ppCoF= decompress (ppCoF, MM, V);
+            ppCoG= decompress (ppCoG, MM, V);
+          }
+          coF= N ((cA/gcdcAcB)*ppCoF);
+          coG= N ((cB/gcdcAcB)*ppCoG);
           return N(gcdcAcB*ppH);
         }
       }
-      else if ((count == bound) || (fdivides (ppH, ppA) && fdivides (ppH, ppB)))
+      else if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
+                (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
+                (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+                (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
         if (compressConvexDense)
+        {
           ppH= decompress (ppH, MM, V);
+          ppCoF= decompress (ppCoF, MM, V);
+          ppCoG= decompress (ppCoG, MM, V);
+        }
+        coF= N ((cA/gcdcAcB)*ppCoF);
+        coG= N ((cB/gcdcAcB)*ppCoG);;
         return N(gcdcAcB*ppH);
       }
     }
 
     G_m= H;
+    coF_m= coF;
+    coG_m= coG;
     newtonPoly= newtonPoly*(x - random_element);
     m= m*(x - random_element);
     if (!find (l, random_element))
@@ -754,28 +890,80 @@ GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
+CanonicalForm
+GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
+        CanonicalForm& coF, CanonicalForm& coG,
+        CFList& l, bool& topLevel);
+
+CanonicalForm
+GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
+        bool& topLevel)
+{
+  CanonicalForm dummy1, dummy2;
+  CanonicalForm result= GCD_GF (F, G, dummy1, dummy2, l, topLevel);
+  return result;
+}
+
 /// GCD of F and G over GF, based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
 /// Usually this algorithm will be faster than GCD_Fp_extension since GF has
 /// faster field arithmetics, however it might fail if the input is large since
 /// the size of the base field is bounded by 2^16, output is monic
-CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
+CanonicalForm
+GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
+        CanonicalForm& coF, CanonicalForm& coG,
         CFList& l, bool& topLevel)
 {
   CanonicalForm A= F;
   CanonicalForm B= G;
-  if (F.isZero() && degree(G) > 0) return G/Lc(G);
-  else if (G.isZero() && degree (F) > 0) return F/Lc(F);
-  else if (F.isZero() && G.isZero()) return F.genOne();
-  if (F.inBaseDomain() || G.inBaseDomain()) return F.genOne();
-  if (F.isUnivariate() && fdivides(F, G)) return F/Lc(F);
-  if (G.isUnivariate() && fdivides(G, F)) return G/Lc(G);
-  if (F == G) return F/Lc(F);
+  if (F.isZero() && degree(G) > 0)
+  {
+    coF= 0;
+    coG= Lc (G);
+    return G/Lc(G);
+  }
+  else if (G.isZero() && degree (F) > 0)
+  {
+    coF= Lc (F);
+    coG= 0;
+    return F/Lc(F);
+  }
+  else if (F.isZero() && G.isZero())
+  {
+    coF= coG= 0;
+    return F.genOne();
+  }
+  if (F.inBaseDomain() || G.inBaseDomain())
+  {
+    coF= F;
+    coG= G;
+    return F.genOne();
+  }
+  if (F.isUnivariate() && fdivides(F, G, coG))
+  {
+    coF= Lc (F);
+    return F/Lc(F);
+  }
+  if (G.isUnivariate() && fdivides(G, F, coF))
+  {
+    coG= Lc (G);
+    return G/Lc(G);
+  }
+  if (F == G)
+  {
+    coF= coG= Lc (F);
+    return F/Lc(F);
+  }
 
   CFMap M,N;
   int best_level= myCompress (A, B, M, N, topLevel);
 
-  if (best_level == 0) return B.genOne();
+  if (best_level == 0)
+  {
+    coF= F;
+    coG= G;
+    return B.genOne();
+  }
 
   A= M(A);
   B= M(B);
@@ -784,7 +972,12 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())
-    return N (gcd (A, B));
+  {
+    CanonicalForm result= gcd (A, B);
+    coF= N (A/result);
+    coG= N (B/result);
+    return N (result);
+  }
 
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
@@ -813,17 +1006,30 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
   if (compressConvexDense)
   {
+    CanonicalForm bufcA= cA;
+    CanonicalForm bufcB= cB;
     cA= content (ppA, 1);
     cB= content (ppB, 1);
     ppA /= cA;
     ppB /= cB;
     gcdcAcB *= gcd (cA, cB);
+    cA *= bufcA;
+    cB *= bufcB;
     if (ppA.isUnivariate() || ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-        return N (gcd (ppA, ppB)*gcdcAcB);
+      {
+        CanonicalForm result= gcd (ppA, ppB);
+        coF= N ((ppA/result)*(cA/gcdcAcB));
+        coG= N ((ppB/result)*(cB/gcdcAcB));
+        return N (result*gcdcAcB);
+      }
       else
+      {
+        coF= N (ppA*(cA/gcdcAcB));
+        coG= N (ppB*(cB/gcdcAcB));
         return N (gcdcAcB);
+      }
     }
 
     newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
@@ -840,9 +1046,18 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (ppA.isUnivariate() && ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-        return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
+      {
+        CanonicalForm result= gcd (ppA, ppB);
+        coF= N (decompress ((ppA/result), MM, V)*(cA/gcdcAcB));
+        coG= N (decompress ((ppB/result), MM, V)*(cB/gcdcAcB));
+        return N (decompress (result, MM, V)*gcdcAcB);
+      }
       else
+      {
+        coF= N (decompress (ppA, MM, V));
+        coG= N (decompress (ppB, MM, V));
         return N (gcdcAcB);
+      }
     }
   }
 
@@ -852,48 +1067,71 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
 
-  if (fdivides (lcA, lcB))
+  /*if (fdivides (lcA, lcB))
   {
-    if (fdivides (A, B))
+    if (fdivides (ppA, ppB, coG))
+    {
+      coF= 1;
+      if (compressConvexDense)
+        coG= decompress (coG, MM, V);
+      coG= N (coG*(cB/gcdcAcB));
       return F;
+    }
   }
   if (fdivides (lcB, lcA))
   {
-    if (fdivides (B, A))
+    if (fdivides (ppB, ppA, coF))
+    {
+      coG= 1;
+      if (compressConvexDense)
+        coF= decompress (coF, MM, V);
+      coF= N (coF*(cA/gcdcAcB));
       return G;
-  }
+    }
+  }*/
 
   gcdlcAlcB= gcd (lcA, lcB);
 
   int d= totaldegree (ppA, Variable(2), Variable (ppA.level()));
   if (d == 0)
+  {
+    coF= N (ppA*(cA/gcdcAcB));
+    coG= N (ppB*(cB/gcdcAcB));
     return N(gcdcAcB);
+  }
   int d0= totaldegree (ppB, Variable(2), Variable (ppB.level()));
   if (d0 < d)
     d= d0;
   if (d == 0)
+  {
+    coF= N (ppA*(cA/gcdcAcB));
+    coG= N (ppB*(cB/gcdcAcB));
     return N(gcdcAcB);
+  }
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
-  CanonicalForm newtonPoly;
+  CanonicalForm newtonPoly, coF_random_element, coG_random_element, coF_m,
+                coG_m, ppCoF, ppCoG;
 
   newtonPoly= 1;
   m= gcdlcAlcB;
   G_m= 0;
+  coF= 0;
+  coG= 0;
   H= 0;
   bool fail= false;
-  topLevel= false;
+  //topLevel= false;
   bool inextension= false;
   int p=-1;
   int k= getGFDegree();
   int kk;
   int expon;
   char gf_name_buf= gf_name;
-  int bound= tmin (degree (ppA, 1), degree (ppB, 1));
-  int count= 0;
+  int bound1= degree (ppA, 1);
+  int bound2= degree (ppB, 1);
   do
   {
-    random_element= GFRandomElement (m, l, fail);
+    random_element= GFRandomElement (m*lcA*lcB, l, fail);
     if (fail)
     {
       p= getCharacteristic();
@@ -914,14 +1152,19 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       m= GFMapUp (m, kk);
       G_m= GFMapUp (G_m, kk);
       newtonPoly= GFMapUp (newtonPoly, kk);
+      coF_m= GFMapUp (coF_m, kk);
+      coG_m= GFMapUp (coG_m, kk);
       ppA= GFMapUp (ppA, kk);
       ppB= GFMapUp (ppB, kk);
       gcdlcAlcB= GFMapUp (gcdlcAlcB, kk);
-      random_element= GFRandomElement (m, l, fail);
+      lcA= GFMapUp (lcA, kk);
+      lcB= GFMapUp (lcB, kk);
+      random_element= GFRandomElement (m*lcA*lcB, l, fail);
       DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x),
+                                coF_random_element, coG_random_element,
                                 list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -932,6 +1175,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x),
+                                coF_random_element, coG_random_element,
                                 list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -948,6 +1192,8 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     {
       if (inextension)
         setCharacteristic (p, k, gf_name_buf);
+      coF= N (ppA*(cA/gcdcAcB));
+      coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
     }
     if (d0 >  d)
@@ -960,6 +1206,12 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     G_random_element=
     (gcdlcAlcB(random_element, x)/uni_lcoeff(G_random_element)) *
      G_random_element;
+
+    coF_random_element= (lcA(random_element,x)/uni_lcoeff(coF_random_element))
+                        *coF_random_element;
+    coG_random_element= (lcB(random_element,x)/uni_lcoeff(coG_random_element))
+                        *coG_random_element;
+
     if (!G_random_element.inCoeffDomain())
       d0= totaldegree (G_random_element, Variable(2),
                        Variable (G_random_element.level()));
@@ -972,44 +1224,79 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       newtonPoly= 1;
       G_m= 0;
       d= d0;
-      count= 0;
+      coF_m= 0;
+      coG_m= 0;
     }
 
     TIMING_START (newton_interpolation);
     H= newtonInterp (random_element, G_random_element, newtonPoly, G_m, x);
-    TIMING_END_AND_PRINT (newton_interpolation, "time for newton interpolation: ");
+    coF= newtonInterp (random_element, coF_random_element, newtonPoly, coF_m,x);
+    coG= newtonInterp (random_element, coG_random_element, newtonPoly, coG_m,x);
+    TIMING_END_AND_PRINT (newton_interpolation,
+                          "time for newton interpolation: ");
 
-    count++;
     //termination test
-    if (uni_lcoeff (H) == gcdlcAlcB)
+    if ((uni_lcoeff (H) == gcdlcAlcB) || (G_m == H))
     {
-      cH= uni_content (H);
+      if (gcdlcAlcB.isOne())
+        cH= 1;
+      else
+        cH= uni_content (H);
       ppH= H/cH;
+      CanonicalForm lcppH= gcdlcAlcB/cH;
+      CanonicalForm ccoF= lcA/lcppH;
+      ccoF /= Lc (ccoF);
+      CanonicalForm ccoG= lcB/lcppH;
+      ccoG /= Lc (ccoG);
+      ppCoF= coF/ccoF;
+      ppCoG= coG/ccoG;
       if (inextension)
       {
-        if ((count == bound) || (fdivides(ppH, ppA) && fdivides(ppH, ppB)))
+        if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
+             (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
+             (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+             (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= GFMapDown (ppH, k);
+          ppCoF= GFMapDown (ppCoF, k);
+          ppCoG= GFMapDown (ppCoG, k);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
+          {
             ppH= decompress (ppH, MM, V);
+            ppCoF= decompress (ppCoF, MM, V);
+            ppCoG= decompress (ppCoG, MM, V);
+          }
+          coF= N ((cA/gcdcAcB)*ppCoF);
+          coG= N ((cB/gcdcAcB)*ppCoG);
           setCharacteristic (p, k, gf_name_buf);
           return N(gcdcAcB*ppH);
         }
       }
       else
       {
-        if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
+      if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
+           (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
+           (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+           (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
           if (compressConvexDense)
+          {
             ppH= decompress (ppH, MM, V);
+            ppCoF= decompress (ppCoF, MM, V);
+            ppCoG= decompress (ppCoG, MM, V);
+          }
+          coF= N ((cA/gcdcAcB)*ppCoF);
+          coG= N ((cB/gcdcAcB)*ppCoG);
           return N(gcdcAcB*ppH);
         }
       }
     }
 
     G_m= H;
+    coF_m= coF;
+    coG_m= coG;
     newtonPoly= newtonPoly*(x - random_element);
     m= m*(x - random_element);
     if (!find (l, random_element))
@@ -1067,23 +1354,74 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
-CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
-                           bool& topLevel, CFList& l)
+CanonicalForm
+GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
+             CanonicalForm& coF, CanonicalForm& coG,
+             bool& topLevel, CFList& l);
+
+CanonicalForm
+GCD_small_p (const CanonicalForm& F, const CanonicalForm& G,
+             bool& topLevel, CFList& l)
+{
+  CanonicalForm dummy1, dummy2;
+  CanonicalForm result= GCD_small_p (F, G, dummy1, dummy2, topLevel, l);
+  return result;
+}
+
+CanonicalForm
+GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
+             CanonicalForm& coF, CanonicalForm& coG,
+             bool& topLevel, CFList& l)
 {
   CanonicalForm A= F;
   CanonicalForm B= G;
-  if (F.isZero() && degree(G) > 0) return G/Lc(G);
-  else if (G.isZero() && degree (F) > 0) return F/Lc(F);
-  else if (F.isZero() && G.isZero()) return F.genOne();
-  if (F.inBaseDomain() || G.inBaseDomain()) return F.genOne();
-  if (F.isUnivariate() && fdivides(F, G)) return F/Lc(F);
-  if (G.isUnivariate() && fdivides(G, F)) return G/Lc(G);
-  if (F == G) return F/Lc(F);
-
+  if (F.isZero() && degree(G) > 0)
+  {
+    coF= 0;
+    coG= Lc (G);
+    return G/Lc(G);
+  }
+  else if (G.isZero() && degree (F) > 0)
+  {
+    coF= Lc (F);
+    coG= 0;
+    return F/Lc(F);
+  }
+  else if (F.isZero() && G.isZero())
+  {
+    coF= coG= 0;
+    return F.genOne();
+  }
+  if (F.inBaseDomain() || G.inBaseDomain())
+  {
+    coF= F;
+    coG= G;
+    return F.genOne();
+  }
+  if (F.isUnivariate() && fdivides(F, G, coG))
+  {
+    coF= Lc (F);
+    return F/Lc(F);
+  }
+  if (G.isUnivariate() && fdivides(G, F, coF))
+  {
+    coG= Lc (G);
+    return G/Lc(G);
+  }
+  if (F == G)
+  {
+    coF= coG= Lc (F);
+    return F/Lc(F);
+  }
   CFMap M,N;
   int best_level= myCompress (A, B, M, N, topLevel);
 
-  if (best_level == 0) return B.genOne();
+  if (best_level == 0)
+  {
+    coF= F;
+    coG= G;
+    return B.genOne();
+  }
 
   A= M(A);
   B= M(B);
@@ -1092,7 +1430,12 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())
-    return N (gcd (A, B));
+  {
+    CanonicalForm result= gcd (A, B);
+    coF= N (A/result);
+    coG= N (B/result);
+    return N (result);
+  }
 
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
@@ -1121,17 +1464,30 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
   if (compressConvexDense)
   {
+    CanonicalForm bufcA= cA;
+    CanonicalForm bufcB= cB;
     cA= content (ppA, 1);
     cB= content (ppB, 1);
     ppA /= cA;
     ppB /= cB;
     gcdcAcB *= gcd (cA, cB);
+    cA *= bufcA;
+    cB *= bufcB;
     if (ppA.isUnivariate() || ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-        return N (gcd (ppA, ppB)*gcdcAcB);
+      {
+        CanonicalForm result= gcd (ppA, ppB);
+        coF= N ((ppA/result)*(cA/gcdcAcB));
+        coG= N ((ppB/result)*(cB/gcdcAcB));
+        return N (result*gcdcAcB);
+      }
       else
+      {
+        coF= N (ppA*(cA/gcdcAcB));
+        coG= N (ppB*(cB/gcdcAcB));
         return N (gcdcAcB);
+      }
     }
 
     newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
@@ -1148,9 +1504,18 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     if (ppA.isUnivariate() && ppB.isUnivariate())
     {
       if (ppA.level() == ppB.level())
-        return N (decompress (gcd (ppA, ppB), MM, V)*gcdcAcB);
+      {
+        CanonicalForm result= gcd (ppA, ppB);
+        coF= N (decompress ((ppA/result), MM, V)*(cA/gcdcAcB));
+        coG= N (decompress ((ppB/result), MM, V)*(cB/gcdcAcB));
+        return N (decompress (result, MM, V)*gcdcAcB);
+      }
       else
+      {
+        coF= N (decompress (ppA, MM, V));
+        coG= N (decompress (ppB, MM, V));
         return N (gcdcAcB);
+      }
     }
   }
 
@@ -1159,7 +1524,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
 
-  if (fdivides (lcA, lcB))
+  /*if (fdivides (lcA, lcB))
   {
     if (fdivides (A, B))
       return F/Lc(F);
@@ -1168,7 +1533,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   {
     if (fdivides (B, A))
       return G/Lc(G);
-  }
+  }*/
 
   gcdlcAlcB= gcd (lcA, lcB);
 
@@ -1176,7 +1541,11 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   int d0;
 
   if (d == 0)
+  {
+    coF= N (ppA*(cA/gcdcAcB));
+    coG= N (ppB*(cB/gcdcAcB));
     return N(gcdcAcB);
+  }
 
   d0= totaldegree (ppB, Variable (2), Variable (ppB.level()));
 
@@ -1184,35 +1553,45 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     d= d0;
 
   if (d == 0)
+  {
+    coF= N (ppA*(cA/gcdcAcB));
+    coG= N (ppB*(cB/gcdcAcB));
     return N(gcdcAcB);
+  }
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
-  CanonicalForm newtonPoly= 1;
+  CanonicalForm newtonPoly, coF_random_element, coG_random_element,
+                coF_m, coG_m, ppCoF, ppCoG;
+
+  newtonPoly= 1;
   m= gcdlcAlcB;
   H= 0;
+  coF= 0;
+  coG= 0;
   G_m= 0;
   Variable alpha, V_buf;
   bool fail= false;
   bool inextension= false;
   bool inextensionextension= false;
-  topLevel= false;
+  bool topLevel2= false;
   CFList source, dest;
-  int bound= tmin (degree (ppA, 1), degree (ppB, 1));
-  int count= 0;
+  int bound1= degree (ppA, 1);
+  int bound2= degree (ppB, 1);
   do
   {
     if (inextension)
-      random_element= randomElement (m, V_buf, l, fail);
+      random_element= randomElement (m*lcA*lcB, V_buf, l, fail);
     else
-      random_element= FpRandomElement (m, l, fail);
+      random_element= FpRandomElement (m*lcA*lcB, l, fail);
 
     if (!fail && !inextension)
     {
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_small_p (ppA (random_element,x), ppB (random_element,x), topLevel,
-      list);
+      GCD_small_p (ppA (random_element,x), ppB (random_element,x),
+                   coF_random_element, coG_random_element, topLevel2,
+                   list);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1222,8 +1601,9 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), alpha,
-                        list, topLevel);
+      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+                        coF_random_element, coG_random_element, alpha,
+                        list, topLevel2);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1240,15 +1620,16 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
         alpha= rootOf (mipo);
         inextension= true;
         fail= false;
-        random_element= randomElement (m, alpha, l, fail);
+        random_element= randomElement (m*lcA*lcB, alpha, l, fail);
         deg++;
       } while (fail);
       list= CFList();
       V_buf= alpha;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), alpha,
-                        list, topLevel);
+      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+                        coF_random_element, coG_random_element, alpha,
+                        list, topLevel2);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1268,13 +1649,17 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       if (V_buf3 != alpha)
       {
         m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
-        G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        G_m= mapDown (G_m, prim_elem, im_prim_elem, alpha, source, dest);
+        coF_m= mapDown (coF_m, prim_elem, im_prim_elem, alpha, source, dest);
+        coG_m= mapDown (coG_m, prim_elem, im_prim_elem, alpha, source, dest);
         newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
                              source, dest);
         ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
         ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
         gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha, source,
                             dest);
+        lcA= mapDown (lcA, prim_elem, im_prim_elem, alpha, source, dest);
+        lcB= mapDown (lcB, prim_elem, im_prim_elem, alpha, source, dest);
         for (CFListIterator i= l; i.hasItem(); i++)
           i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
                                 source, dest);
@@ -1295,20 +1680,25 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
                              im_prim_elem, source, dest);
       m= mapUp (m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       G_m= mapUp (G_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      coF_m= mapUp (coF_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      coG_m= mapUp (coG_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       newtonPoly= mapUp (newtonPoly, alpha, V_buf, prim_elem, im_prim_elem,
                           source, dest);
       ppA= mapUp (ppA, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       ppB= mapUp (ppB, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       gcdlcAlcB= mapUp (gcdlcAlcB, alpha, V_buf, prim_elem, im_prim_elem,
                          source, dest);
+      lcA= mapUp (lcA, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      lcB= mapUp (lcB, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
       fail= false;
-      random_element= randomElement (m, V_buf, l, fail );
+      random_element= randomElement (m*lcA*lcB, V_buf, l, fail );
       DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), V_buf,
-                        list, topLevel);
+      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+                        coF_random_element, coG_random_element, V_buf,
+                        list, topLevel2);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1321,7 +1711,12 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       d0= 0;
 
     if (d0 == 0)
+    {
+      coF= N (ppA*(cA/gcdcAcB));
+      coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
+    }
+
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -1332,6 +1727,10 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     G_random_element= (gcdlcAlcB(random_element,x)/uni_lcoeff(G_random_element))
                        *G_random_element;
 
+    coF_random_element= (lcA(random_element,x)/uni_lcoeff(coF_random_element))
+                        *coF_random_element;
+    coG_random_element= (lcB(random_element,x)/uni_lcoeff(coG_random_element))
+                        *coG_random_element;
 
     if (!G_random_element.inCoeffDomain())
       d0= totaldegree (G_random_element, Variable(2),
@@ -1345,31 +1744,52 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       newtonPoly= 1;
       G_m= 0;
       d= d0;
-      count= 0;
+      coF_m= 0;
+      coG_m= 0;
     }
 
     TIMING_START (newton_interpolation);
     H= newtonInterp (random_element, G_random_element, newtonPoly, G_m, x);
+    coF= newtonInterp (random_element, coF_random_element, newtonPoly, coF_m,x);
+    coG= newtonInterp (random_element, coG_random_element, newtonPoly, coG_m,x);
     TIMING_END_AND_PRINT (newton_interpolation,
                           "time for newton_interpolation: ");
 
-    count++;
     //termination test
-    if (uni_lcoeff (H) == gcdlcAlcB)
+    if ((uni_lcoeff (H) == gcdlcAlcB) || (G_m == H))
     {
-      cH= uni_content (H);
+      if (gcdlcAlcB.isOne())
+        cH= 1;
+      else
+        cH= uni_content (H);
       ppH= H/cH;
       ppH /= Lc (ppH);
+      CanonicalForm lcppH= gcdlcAlcB/cH;
+      CanonicalForm ccoF= lcppH/Lc (lcppH);
+      CanonicalForm ccoG= lcppH/Lc (lcppH);
+      ppCoF= coF/ccoF;
+      ppCoG= coG/ccoG;
       DEBOUTLN (cerr, "ppH= " << ppH);
-      if ((count == bound) || (fdivides (ppH, ppA) && fdivides (ppH, ppB)))
+      if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
+           (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
+           (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+           (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
         if (compressConvexDense)
+        {
           ppH= decompress (ppH, MM, V);
+          ppCoF= decompress (ppCoF, MM, V);
+          ppCoG= decompress (ppCoG, MM, V);
+        }
+        coF= N ((cA/gcdcAcB)*ppCoF);
+        coG= N ((cB/gcdcAcB)*ppCoG);
         return N(gcdcAcB*ppH);
       }
     }
 
     G_m= H;
+    coF_m= coF;
+    coG_m= coG;
     newtonPoly= newtonPoly*(x - random_element);
     m= m*(x - random_element);
     if (!find (l, random_element))
@@ -4451,7 +4871,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       if (gcdfound == 1)
       {
         cand = DD[2] / content( DD[2], Variable(1) );
-        gcdfound = fdivides( cand, G ) && fdivides ( cand, F );
+        gcdfound = fdivides( cand, G ) && fdivides ( cand, F ); //TODO use multiplication instead of fdivides
 
         if (passToGF && gcdfound)
         {
