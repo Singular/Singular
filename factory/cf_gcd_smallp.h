@@ -41,12 +41,22 @@ static inline CanonicalForm GCD_Fp_extension (const CanonicalForm& A, const Cano
 CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
                            bool& top_level, CFList& l);
 
+CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G, CanonicalForm& coF, CanonicalForm& coG,
+                           bool& topLevel, CFList& l);
+
 ///GCD of A and B over \f$ F_{p} \f$
 static inline CanonicalForm GCD_small_p (const CanonicalForm& A, const CanonicalForm& B)
 {
   CFList list;
   bool top_level= true;
   return GCD_small_p (A, B, top_level, list);
+}
+
+static inline CanonicalForm GCD_small_p (const CanonicalForm& A, const CanonicalForm& B, CanonicalForm& coA, CanonicalForm& coB)
+{
+  CFList list;
+  bool top_level= true;
+  return GCD_small_p (A, B, coA, coB, top_level, list);
 }
 
 CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,

@@ -1236,9 +1236,9 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 
   CanonicalForm Dn, test= 0;
   cl =  gcd (f.lc(),g.lc());
+  CanonicalForm gcdcfcg= gcd (cf, cg);
   CanonicalForm b= 1;
   int minCommonDeg= 0;
-  CanonicalForm gcdcfcg= gcd (cf, cg);
   for (i= tmax (f.level(), g.level()); i > 0; i--)
   {
     if (degree (f, i) <= 0 || degree (g, i) <= 0)
@@ -1269,18 +1269,15 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   {
     p = cf_getBigPrime( i );
     i--;
-    while ( i >= 0 && mod( cl, p ) == 0 )
+    while ( i >= 0 && mod( cl*(lc(f)/cl)*(lc(g)/cl), p ) == 0 )
     {
       p = cf_getBigPrime( i );
       i--;
     }
     //printf("try p=%d\n",p);
     setCharacteristic( p );
-    Dp = gcd_poly( mapinto( f ), mapinto( g ) );
-    //Dp = GCD_small_p (mapinto (f), mapinto (g), cofp, cogp);
+    Dp = GCD_small_p (mapinto (f), mapinto (g), cofp, cogp);
     Dp /=Dp.lc();
-    cofp= mapinto (f)/Dp;
-    cogp= mapinto (g)/Dp;
     cofp /= lc (cofp);
     cogp /= lc (cogp);
     setCharacteristic( 0 );
@@ -1346,7 +1343,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       else
         equal= true;
       //Dn /=vcontent(Dn,Variable(1));
-      if ((equal || q > b) || ((cofn*Dn==f) && (cogn*Dn==g)))
+      if (((abs (cofn*Dn)==abs (f)) && (abs (cogn*Dn)==abs (g))) ||
+          ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
       {
         //printf(" -> success\n");
         return Dn*gcdcfcg;
