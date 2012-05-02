@@ -34,6 +34,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
 * bigint::
+* bigintmat::
 * def::
 * ideal::
 * int::
@@ -61,7 +62,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 @end menu
 
 @c ---------------------------------------
-@node bigint, def, Data types, Data types
+@node bigint, bigintmat, Data types, Data types
 @section bigint
 @cindex bigint
 
@@ -195,7 +196,175 @@ See
 @c ref
 
 @c ---------------------------------------
-@node def, ideal, bigint, Data types
+@node bigintmat, def, bigint, Data types
+@section bigintmat
+@cindex bigintmat
+
+Big integer matrices are matrices with big integer entries.
+No basering definition is required to use bigint matrices, for they
+do not belong to a ring. Bigintmat entries can have any size because
+of the use of bigint.
+
+@menu
+* bigintmat declarations::
+* bigintmat expressions::
+* bigintmat type cast::
+* bigintmat operations::
+@end menu
+
+@c ------------------------------
+@node bigintmat declarations, bigintmat expressions, bigintmat, bigintmat
+@subsection bigintmat declarations
+@cindex bigintmat declarations
+
+@table @strong
+@item Syntax:
+@code{bigintmat} name @code{=} bigintmat_expression @code{;}
+@*@code{bigintmat} name @code{[} rows @code{] [} cols @code{] =} bigintmat_expression @code{;}
+@*@code{bigintmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_and_bigint expressions @code{;}
+@*rows and cols must be positive int expressions.
+
+@item Purpose:
+defines a bigintmat variable.
+@* Given a list of (big) integers, the matrix is filled
+up with the first row from the left to the right, then the second
+one and so on. If the (big-)int_list contains less than rows*cols
+elements, the remaining ones are set to zero; if it contains
+more elements, only the first rows*cols ones are considered.
+
+@item Default:
+empty (1x0 matrix)
+
+@item Example:
+@smallexample
+@c example
+ bigintmat bim[4][3]=2, 5, 224553233465, 232444, 434, 0, 0, 4544232222;
+ bim;
+ bim[2, 1];
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+@node bigintmat expressions, bigintmat type cast, bigintmat declaration, bigintmat
+@subsection bigintmat expressions
+@cindex bigintmat expressions
+
+A bigintmat expression is:
+@enumerate
+@item
+an identifier of type bigintmat
+@item
+a function returning bigintmat
+@item
+a bigintmat operation involving (big-)ints and int operations (@code{+}, @code{-}, @code{*})
+@item
+an expression involving bigintmats and the operations (@code{+}, @code{-}, @code{*})
+@item
+a type cast to bigintmat (@pxref{bigintmat type cast})
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+  bigintmat m1[2][2]=1, 2, 6, 3;
+  m1*3;
+  intmat im[3][2] = intmat(m1*3);
+  bigintmat m2 = bigintmat(im); // cast intmat im to bigintmat
+  m2;
+  m2*m1+m2;
+  _+4;
+@c example
+@end smallexample
+@c ref
+See
+@ref{bigintmat};
+@ref{Type conversion and casting}.
+@c ref
+
+@c ------------------------------
+@node bigintmat type cast,  bigintmat operations, bigintmat expressions, bigintmat
+@subsection bigintmat type cast
+@cindex bigintmat type cast
+@table @code
+@item @strong{Syntax:}
+@code{bigintmat (} expression @code{)}
+@item @strong{Type:}
+bigintmat
+@item @strong{Purpose:}
+Converts expression to a bigintmat, where expression must be of type
+intmat, or bigintmat.The size (resp.@: dimension) of the created bigintmat
+equals the size (resp.@: dimension) of the expression.
+@item @strong{Example:}
+@smallexample
+@c example
+  intmat im[2][1]=2, 3;
+  bigintmat(im);
+  bigintmat(_);
+  bigintmat(intmat(intvec(1,2,3,4), 2, 2)); //casts at first to intmat, then to bigintmat
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{bigintmat};
+@ref{Type conversion and casting};
+@ref{intmat type cast}.
+@c ref
+
+@c ------------------------------
+@node bigintmat operations, bigintmat type cast, bigintmat
+@subsection bigintmat operations
+@cindex bigintmat operations
+@cindex +
+@cindex -
+@cindex *
+
+@table @asis
+@item @code{+}
+addition with intmat, int, or bigint. In case of (big-)int, it is added to
+every entry of the matrix.
+
+@item @code{-}
+negation or subtraction with intmat, int, or bigint. In case of (big-)int,
+it is subtracted from every entry of the matrix.
+
+@item @code{*}
+multiplication with intmat, int, or bigint; In case of (big-)int, every entry
+of the matrix is multiplied by the (big-)int
+
+@item @code{<>}, @code{==}
+comparators
+
+@item bigintmat_expression @code{[} int@code{,} int @code{]}
+is a bigintmat entry, where the first index indicates the row and the
+second the column
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example error
+  bigintmat m[3][4] = 3,3,6,3,5,2,2,7,0,0,45,3;
+  m;
+  m[1,3];               // show entry at [row 1, col 3]
+  m[1,3] = 10;          // set entry at [row 1, col 3] to 10
+  m;
+  size(m);         // number of entries
+  bigintmat n[2][3] = 2,6,0,4,0,5;
+  n * m;
+  typeof(_);
+  -m;
+  bigintmat o;
+  o=n-10;
+  o;
+  m*2;           // double each entry of m
+  o-2*m;
+@c example
+@end smallexample
+
+
+@c ---------------------------------------
+@node def, ideal, bigintmat, Data types
 @section def
 @cindex def
 @cindex untyped definitions
@@ -1050,11 +1219,12 @@ See
 intmat
 @item @strong{Purpose:}
 Converts expression to an intmat, where expression must be of type
-intvec, or intmat. If
+intvec, intmat, or bigintmat. If
 int_n and int_m are supplied, then they specify the dimension of the
 intmat. Otherwise, the size (resp.@: dimensions) of the intmat
 are determined  by the size (resp.@: dimensions) of the
-expression.
+expression. If expression is a bigintmat containing an entry larger the the
+limit of int, it is set to 0 in the returning intmat.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1063,6 +1233,8 @@ expression.
   intmat(intvec(1,2,3,4), 2, 2);
   intmat(_, 2, 3);
   intmat(_, 2, 1);
+  bigintmat bim[2][3]=34, 64, 345553234, 35553, 6434, 6563335675;
+  intmat(bim);
 @c example
 @end smallexample
 @end table
