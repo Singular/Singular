@@ -1151,8 +1151,6 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
     else if (hh->Typ() == BIGINT_CMD)
     {
       bim->set(i++, (number)(hh->Data()));
-      number s = (number)(hh->Data()); 
-      nlDelete(&s, NULL);
     } 
     /*
     ((hh->Typ() == INTVEC_CMD)
