@@ -1344,7 +1344,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       else
         equal= true;
       //Dn /=vcontent(Dn,Variable(1));
-      if (((abs (cofn*Dn)==abs (f)) && (abs (cogn*Dn)==abs (g))) ||
+      if ((terminationTest (f,g, cofn, cogn, Dn)) ||
           ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
       {
         //printf(" -> success\n");

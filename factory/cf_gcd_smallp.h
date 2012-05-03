@@ -111,4 +111,9 @@ randomIrredpoly (int i, const Variable & x) ;
 
 CFArray
 getMonoms (const CanonicalForm& F);
+
+bool
+terminationTest (const CanonicalForm& F, const CanonicalForm& G,
+                 const CanonicalForm& coF, const CanonicalForm& coG,
+                 const CanonicalForm& cand);
 #endif
