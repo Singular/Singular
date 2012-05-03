@@ -1,4 +1,4 @@
-#include "factoryconf.h"
+#include <config.h>
 
 #ifdef HAVE_CSTDIO
 #include <cstdio>
