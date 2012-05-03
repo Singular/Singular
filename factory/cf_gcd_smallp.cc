@@ -46,6 +46,28 @@
 TIMING_DEFINE_PRINT(gcd_recursion);
 TIMING_DEFINE_PRINT(newton_interpolation);
 
+bool
+terminationTest (const CanonicalForm& F, const CanonicalForm& G,
+                 const CanonicalForm& coF, const CanonicalForm& coG,
+                 const CanonicalForm& cand)
+{
+  CanonicalForm LCCand= abs (LC (cand));
+  if (LCCand*abs (LC (coF)) == abs (LC (F)))
+  {
+    if (LCCand*abs (LC (coG)) == abs (LC (G)))
+    {
+      if (abs (cand)*abs (coF) == abs (F))
+      {
+        if (abs (cand)*abs (coG) == abs (G))
+          return true;
+      }
+      return false;
+    }
+    return false;
+  }
+  return false;
+}
+
 static const double log2exp= 1.442695041;
 
 /// compressing two polynomials F and G, M is used for compressing,
@@ -800,7 +822,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       {
         if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
              (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
-             (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) || 
+             terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) || 
              (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
           CFList u, v;
@@ -823,7 +845,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       }
       else if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
                 (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
-                (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+                terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
                 (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
         if (compressConvexDense)
@@ -1250,7 +1272,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       {
         if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
              (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
-             (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+             terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
              (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
@@ -1274,7 +1296,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       {
       if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
            (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
-           (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+           terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
            (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
           if (compressConvexDense)
@@ -1768,7 +1790,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       DEBOUTLN (cerr, "ppH= " << ppH);
       if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
            (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
-           (ppA == ppCoF*ppH && ppB == ppCoG*ppH)) ||
+           terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
            (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
         if (compressConvexDense)
