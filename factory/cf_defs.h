@@ -37,8 +37,7 @@ const int SW_USE_NTL_GCD_P=8;
 const int SW_USE_NTL_SORT=9;
 const int SW_USE_CHINREM_GCD=10;
 const int SW_USE_QGCD=11;
-const int SW_USE_fieldGCD=12;
-const int SW_USE_FF_MOD_GCD=13;
+const int SW_USE_FF_MOD_GCD=12;
 //}}}
 
 /*ENDPUBLIC*/

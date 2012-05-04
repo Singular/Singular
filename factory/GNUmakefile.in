@@ -182,7 +182,6 @@ basefactorysrc := \
 		facIrredTest.cc \
 		facMul.cc \
 		facSparseHensel.cc \
-		fieldGCD.cc \
 		ffops.cc \
 		ftmpl_inst.cc \
 		FLINTconvert.cc \
@@ -269,7 +268,6 @@ basefactoryincl := \
 		facIrredTest.h \
 		facMul.h \
 		facSparseHensel.h \
-		fieldGCD.h \
 		ffops.h \
 		FLINTconvert.h \
 		ftmpl_list.h \

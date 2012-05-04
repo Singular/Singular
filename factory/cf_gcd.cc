@@ -15,7 +15,6 @@
 #include "fac_util.h"
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
-#include "fieldGCD.h"
 #include "cf_gcd_smallp.h"
 #include "cf_map_ext.h"
 #include "cf_util.h"
@@ -722,14 +721,8 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   gc = g;
   if ( getCharacteristic() != 0 )
   {
-    if ((!fc_and_gc_Univariate)
-    && isOn(SW_USE_fieldGCD)
-    && (getCharacteristic() >100))
-    {
-      return fieldGCD(f,g);
-    }
     #ifdef HAVE_NTL
-    else if ((!fc_and_gc_Univariate) && (isOn( SW_USE_EZGCD_P )))
+    if ((!fc_and_gc_Univariate) && (isOn( SW_USE_EZGCD_P )))
     {
       fc= EZGCD_P (fc, gc);
     }
