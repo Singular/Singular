@@ -264,7 +264,8 @@ convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
                                          )
 {
   CFFList result;
-  result.insert (CFFactor (CanonicalForm ((long) leadingCoeff), 1));
+  if (leadingCoeff != 1)
+    result.insert (CFFactor (CanonicalForm ((long) leadingCoeff), 1));
 
   long i;
 
