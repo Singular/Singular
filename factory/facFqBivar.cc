@@ -665,7 +665,7 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 {
   zz_p::init (getCharacteristic());
   zz_pX NTLIrredpoly;
-  int i, m;
+  int i=1, m= 2;
   // extension of F_p needed
   if (alpha.level() == 1 && beta.level() == 1 && k == 1)
   {

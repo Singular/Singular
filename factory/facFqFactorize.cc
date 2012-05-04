@@ -1496,7 +1496,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   int j= 0;
   if (!pass)
   {
-    int lev;
+    int lev= 0;
     // LCF is non-constant here
     for (int i= 1; i <= LCF.level(); i++)
     {

@@ -317,7 +317,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   int j= 0;
   if (!pass)
   {
-    int lev;
+    int lev= 0;
     for (int i= 1; i <= LCF.level(); i++)
     {
       if(degree (LCF, i) > 0)
