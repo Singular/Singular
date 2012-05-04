@@ -77,7 +77,6 @@ SOURCES = \
 		facIrredTest.cc \
 		facMul.cc \
 		facSparseHensel.cc \
-		fieldGCD.cc \
 		ffops.cc \
 		FLINTconvert.cc \
 		gf_tabutil.cc \
@@ -160,7 +159,6 @@ factory_headers = \
 		facIrredTest.h \
 		facMul.h \
 		facSparseHensel.h \
-		fieldGCD.h \
 		ffops.h \
 		FLINTconvert.h \
 		gf_tabutil.h \
