@@ -29,6 +29,7 @@
 #include "cf_map.h"
 #include "facHensel.h"
 
+#ifdef HAVE_NTL
 static
 int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                     CFMap & N, int& both_non_zero)
@@ -672,11 +673,18 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   cand /= icontent (cand);
   return N (d*cand);
 }
+#endif
 
 CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
+#ifdef HAVE_NTL
   REvaluation b;
   return ezgcd( FF, GG, b, false );
+#else
+  Off (SW_USE_EZGCD);
+  return gcd (FF, GG);
+  On (SW_USE_EZGCD);
+#endif
 }
 

@@ -34,6 +34,7 @@
 #include "facHensel.h"
 #include "cf_iter.h"
 #include "cfNewtonPolygon.h"
+#include "cf_algorithm.h"
 
 // iinline helper functions:
 #include "cf_map_ext.h"
@@ -44,8 +45,6 @@
 #endif
 
 #include "cf_gcd_smallp.h"
-
-#ifdef HAVE_NTL
 
 TIMING_DEFINE_PRINT(gcd_recursion)
 TIMING_DEFINE_PRINT(newton_interpolation)
@@ -71,6 +70,8 @@ terminationTest (const CanonicalForm& F, const CanonicalForm& G,
   }
   return false;
 }
+
+#ifdef HAVE_NTL
 
 static const double log2exp= 1.442695041;
 
