@@ -756,7 +756,26 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   }
   else if (!fc_and_gc_Univariate)
   {
-    if (
+    if ( isOn( SW_USE_EZGCD ) )
+    {
+      fc= ezgcd (fc, gc);
+      /*if ( pe == 1 )
+        fc = ezgcd( fc, gc );
+      else if ( pe > 0 )// no variable at position 1
+      {
+        fc = replacevar( fc, Variable(pe), Variable(1) );
+        gc = replacevar( gc, Variable(pe), Variable(1) );
+        fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+      else
+      {
+        pe = -pe;
+        fc = swapvar( fc, Variable(pe), Variable(1) );
+        gc = swapvar( gc, Variable(pe), Variable(1) );
+        fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }*/
+    }
+    else if (
     isOn(SW_USE_CHINREM_GCD)
     && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
     )
@@ -773,24 +792,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #else
       fc = chinrem_gcd( fc, gc);
     #endif
-    }
-    else if ( isOn( SW_USE_EZGCD ) )
-    {
-      if ( pe == 1 )
-        fc = ezgcd( fc, gc );
-      else if ( pe > 0 )// no variable at position 1
-      {
-        fc = replacevar( fc, Variable(pe), Variable(1) );
-        gc = replacevar( gc, Variable(pe), Variable(1) );
-        fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
-      else
-      {
-        pe = -pe;
-        fc = swapvar( fc, Variable(pe), Variable(1) );
-        gc = swapvar( gc, Variable(pe), Variable(1) );
-        fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
     }
     else
     {
@@ -1235,25 +1236,51 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   //g /=vcontent(g,Variable(1));
 
   CanonicalForm Dn, test= 0;
+  cl =  gcd (f.lc(),g.lc());
+  CanonicalForm gcdcfcg= gcd (cf, cg);
+  CanonicalForm b= 1;
+  int minCommonDeg= 0;
+  for (i= tmax (f.level(), g.level()); i > 0; i--)
+  {
+    if (degree (f, i) <= 0 || degree (g, i) <= 0)
+      continue;
+    else
+    {
+      minCommonDeg= tmin (degree (g, i), degree (f, i));
+      break;
+    }
+  }
+  if (i == 0)
+    return gcdcfcg;
+  for (; i > 0; i--)
+  {
+    if (degree (f, i) <= 0 || degree (g, i) <= 0)
+      continue;
+    else
+      minCommonDeg= tmin (minCommonDeg, tmin (degree (g, i), degree (f, i)));
+  }
+  b= 2*tmin (maxNorm (f), maxNorm (g))*abs (cl)*
+     power (CanonicalForm (2), minCommonDeg);
   bool equal= false;
   i = cf_getNumBigPrimes() - 1;
-  cl =  gcd (f.lc(),g.lc());
 
-  CanonicalForm gcdcfcg= gcd (cf, cg);
+  CanonicalForm cof, cog, cofp, cogp, newCof, newCog, cofn, cogn;
   //Off (SW_RATIONAL);
   while ( true )
   {
     p = cf_getBigPrime( i );
     i--;
-    while ( i >= 0 && mod( cl, p ) == 0 )
+    while ( i >= 0 && mod( cl*(lc(f)/cl)*(lc(g)/cl), p ) == 0 )
     {
       p = cf_getBigPrime( i );
       i--;
     }
     //printf("try p=%d\n",p);
     setCharacteristic( p );
-    Dp = gcd_poly( mapinto( f ), mapinto( g ) );
+    Dp = GCD_small_p (mapinto (f), mapinto (g), cofp, cogp);
     Dp /=Dp.lc();
+    cofp /= lc (cofp);
+    cogp /= lc (cogp);
     setCharacteristic( 0 );
     dp_deg=totaldegree(Dp);
     if ( dp_deg == 0 )
@@ -1264,6 +1291,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     if ( q.isZero() )
     {
       D = mapinto( Dp );
+      cof= mapinto (cofp);
+      cog= mapinto (cogp);
       d_deg=dp_deg;
       q = p;
     }
@@ -1272,6 +1301,10 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       if ( dp_deg == d_deg )
       {
         chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
+        chineseRemainder( cof, q, mapinto (cofp), p, newCof, newq);
+        chineseRemainder( cog, q, mapinto (cogp), p, newCog, newq);
+        cof= newCof;
+        cog= newCog;
         q = newq;
         D = newD;
       }
@@ -1281,6 +1314,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         // all previous p's are bad primes
         q = p;
         D = mapinto( Dp );
+        cof= mapinto (cof);
+        cog= mapinto (cog);
         d_deg=dp_deg;
         test= 0;
         equal= false;
@@ -1294,9 +1329,13 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     if ( i >= 0 )
     {
       Dn= Farey(D,q);
+      cofn= Farey(cof,q);
+      cogn= Farey(cog,q);
       int is_rat= isOn (SW_RATIONAL);
       On (SW_RATIONAL);
       cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
+      cofn *= bCommonDen (cofn);
+      cogn *= bCommonDen (cogn);
       if (!is_rat)
         Off (SW_RATIONAL);
       Dn *=cd;
@@ -1305,7 +1344,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       else
         equal= true;
       //Dn /=vcontent(Dn,Variable(1));
-      if (equal && fdivides( Dn, f ) && fdivides( Dn, g ) )
+      if ((terminationTest (f,g, cofn, cogn, Dn)) ||
+          ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
       {
         //printf(" -> success\n");
         return Dn*gcdcfcg;
@@ -1323,4 +1363,5 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
   }
 }
+
 
