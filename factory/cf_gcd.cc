@@ -1276,7 +1276,13 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     //printf("try p=%d\n",p);
     setCharacteristic( p );
+#ifdef HAVE_NTL
     Dp = GCD_small_p (mapinto (f), mapinto (g), cofp, cogp);
+#else
+    Dp= gcd_poly (mapinto (f), mapinto (g));
+    cofp= mapinto (f)/Dp;
+    cogp= mapinto (g)/Dp;
+#endif
     Dp /=Dp.lc();
     cofp /= lc (cofp);
     cogp /= lc (cogp);

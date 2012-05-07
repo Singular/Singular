@@ -638,6 +638,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
     else
     {
+      #ifdef HAVE_NTL
       On (SW_RATIONAL);
       if (issqrfree)
       {
@@ -649,6 +650,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       else
         F = ratFactorize (fz);
       Off (SW_RATIONAL);
+      #else
+      ASSERT( 0, "multivariate factorization without NTL not implemented" );
+      #endif
     }
 
     if ( on_rational )
