@@ -246,7 +246,7 @@ empty (1x0 matrix)
 @end table
 
 @c ------------------------------
-@node bigintmat expressions, bigintmat type cast, bigintmat declaration, bigintmat
+@node bigintmat expressions, bigintmat type cast, bigintmat declarations, bigintmat
 @subsection bigintmat expressions
 @cindex bigintmat expressions
 
@@ -313,7 +313,7 @@ See
 @c ref
 
 @c ------------------------------
-@node bigintmat operations, bigintmat type cast, bigintmat
+@node bigintmat operations,, bigintmat type cast, bigintmat
 @subsection bigintmat operations
 @cindex bigintmat operations
 @cindex +
