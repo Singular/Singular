@@ -297,7 +297,7 @@ if ((s)->v != NULL) \
 
 
 
-/// Get leading monom (no module component)
+/// Get leading term without a module component
 static BOOLEAN leadmonom(leftv res, leftv h)
 {
   NoReturn(res);
@@ -315,7 +315,7 @@ static BOOLEAN leadmonom(leftv res, leftv h)
       assume( p_LmTest(p, r) );
 
       m = p_LmInit(p, r);
-      p_SetCoeff0(m, n_Init(1, r), r);
+      p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
 
       //            if( p_GetComp(m, r) != 0 )
       //            {
@@ -343,22 +343,27 @@ static BOOLEAN leadcomp(leftv res, leftv h)
 {
   NoReturn(res);
 
-  if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) && (h->Data() != NULL))
+  if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD))
   {
     const ring r = currRing;
 
     const poly p = (poly)(h->Data());
 
-    assume( p != NULL );
-    assume( p_LmTest(p, r) );
+    if (p != NULL )
+    {
+      assume( p != NULL );
+      assume( p_LmTest(p, r) );
 
-    const unsigned long iComp = p_GetComp(p, r);
+      const unsigned long iComp = p_GetComp(p, r);
 
-    assume( iComp > 0 ); // p is a vector
+  //    assume( iComp > 0 ); // p is a vector
+
+      res->data = reinterpret_cast<void *>(jjLONG2N(iComp));
+    } else
+      res->data = reinterpret_cast<void *>(jjLONG2N(0));
+      
 
     res->rtyp = BIGINT_CMD;
-    res->data = reinterpret_cast<void *>(jjLONG2N(iComp));
-
     return FALSE;
   }
 
@@ -784,7 +789,7 @@ int mod_init(SModulFunctions* psModulFunctions)
 // #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
   #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
   ADD(psModulFunctions, currPack->libname, "DetailedPrint", FALSE, DetailedPrint);
-  ADD(psModulFunctions, currPack->libname, "leadmonom", FALSE, leadmonom);
+  ADD(psModulFunctions, currPack->libname, "leadmonomial", FALSE, leadmonom);
   ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
   ADD(psModulFunctions, currPack->libname, "leadrawexp", FALSE, leadrawexp);
 

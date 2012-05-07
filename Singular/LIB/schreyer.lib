@@ -456,7 +456,7 @@ static proc Tail(def M)
   return (M);
 }
 
-/* static */ proc SSinit(module M)
+/* static */ proc SSinit(def M)
 {
   if( (typeof(M) != "module") && (typeof(M) != "ideal") )
   {
@@ -471,7 +471,7 @@ static proc Tail(def M)
   {
     "SSinit::Input";
     type(M);
-    DetailedPrint(M);
+//    DetailedPrint(M);
     attrib(M);
   }
 
@@ -555,7 +555,7 @@ static proc Tail(def M)
     type(M);
     attrib(M);
     attrib(M, "isHomog");
-    DetailedPrint(M);
+//    DetailedPrint(M);
   }
 
   // 0^th syz. property
@@ -579,7 +579,8 @@ static proc Tail(def M)
   if( @DEBUG )
   {
     "SSinit::MRES";
-    DetailedPrint(MRES);
+    MRES;
+//    DetailedPrint(MRES);
     attrib(MRES, "isHomog");
     attrib(S);
   }
@@ -626,7 +627,6 @@ proc SSComputeLeadingSyzygyTerms(def L, int iCompShift)
     "SSComputeLeadingSyzygyTerms::Input: ";
     L;
     "iCompShift: ", iCompShift;
-
   }
 
   int i, j, r; intvec iv_ds;
@@ -643,25 +643,40 @@ proc SSComputeLeadingSyzygyTerms(def L, int iCompShift)
   for(i = 1; i <= N; i++)
   {
     a = L[i];
-    "a: ", a;
+//    "a: ", a;
     c = leadcomp(a);
     r = int(c);
-    aa = a[r];
+
+    if(r > 0)
+    {
+      aa = a[r];
+    } else
+    {
+      aa = a;
+    }
 
     M = 0;
     
     for(j = i-1; j > 0; j--)
     {
       b = L[j];
-      "b: ", b;
+//      "b: ", b;
 
       if( leadcomp(b) == c )
       {
-        bb = b[r];
+        if(r > 0)
+        {
+          bb = b[r];
+        } else
+        {
+          bb = b;
+        }
 
         M[j] = (lcm(aa, bb) / aa);
       }
     }
+    
+    // TODO: add quotient relations here...
 
     M = simplify(M, 1 + 2 + 32);
 
@@ -681,17 +696,110 @@ proc SSComputeLeadingSyzygyTerms(def L, int iCompShift)
     S;
   }
 
+  attrib(S, "isSB", 1); 
+
   return (S);
 
 }
 
-proc Traverse(mult, index, Leads, Tails, LSyz)
+proc SSReduce(poly m, def t, def L, def T, module LS)
 {
+  int @DEBUG = !system("with", "ndebug");
 
+  if( @DEBUG )
+  {
+    "SSReduce::Input: ";
 
+    "mult: ", m;
+    "term: ", t;
+    "L: ", L;
+    "T: ", T;
+    "LS: ", LS;
+  }
+  
+  vector s = 0;
+
+  if( t == 0 )
+  {
+    return (s);
+  }
+
+  def product = m * t;
+
+  bigint c = leadcomp(t);
+  int r = int(c);
+
+  
+  def a, b, nf;
+
+  // looking for an appropriate reducer
+  for( int k = ncols(L); k > 0; k-- )
+  {
+    a = L[k];
+    // with the same mod. component
+    if( leadcomp(a) == c )
+    {
+      b = - (leadmonomial(product) / leadmonomial(L[k]));
+      // which divides the product
+      if( b != 0 )
+      {
+//        "b: ", b;
+        nf = NF(b * gen(k), LS);
+
+//        "NF: ", nf;
+        // while the complement (the fraction) is not reducible by leading syzygies 
+        if( nf != 0 )
+        {
+          s = b * gen(k) + SSTraverse(b, k, L, T, LS);
+          break;
+        }
+      }
+    }
+  }  
+  if( @DEBUG )
+  {
+    "SSReduce::Output: ", s;
+  }
+  return (s);
 }
 
+proc SSTraverse(poly m, int i, def L, def T, module LS)
+{
+  int @DEBUG = !system("with", "ndebug");
 
+  if( @DEBUG )
+  {
+    "SSTraverse::Input: ";
+
+    "index: ", i;
+    "mult: ", m;
+
+    "lead: ", L[i];
+    "tail: ", T[i];
+
+    "LSyz: ", LS;
+  }
+
+  //  reduce the product m * ( L[i] + T[i] ):
+//  SSReduce(m, L[i], L, T, LS);
+
+  def @tail = T[i]; def @l;
+
+  vector s = 0;
+
+  while( size(@tail) > 0 )
+  {
+    @l = lead(@tail);
+    s = s + SSReduce(m, @l, L, T, LS);
+    @tail = @tail - @l;
+  }
+
+  if( @DEBUG )
+  {
+    "SSTraverse::Output: ", s;
+  }
+  return (s);
+}
 
 // module (N, LL, TT) = SSComputeSyzygy(L, T, @RANK); // shift syz.comp by @RANK!
 proc SSComputeSyzygy(def M, def L, def T, int iCompShift)
@@ -711,37 +819,50 @@ proc SSComputeSyzygy(def M, def L, def T, int iCompShift)
     "T: "; T;
   }
 
-
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! //
-
   def a; bigint c; int r, k; poly aa;
   
-  def LS = SSComputeLeadingSyzygyTerms(L, 0); // iCompShift // 0?
-  for(k = ncols(LS); k >= 0; k-- )
-  {
-    a = LS[k];
-    "A: ", a;
-    c = leadcomp(a);
-    r = int(c);
-    aa = a[r];
+  module LL = SSComputeLeadingSyzygyTerms(L, 0); // iCompShift // 0?
 
-    Traverse(aa, r, L, T, LS);
+  module TT, SYZ;
+
+  if( size(LL) > 0 )
+  {  
+    intvec iv_ds = sort(LL, "ds", 1)[2]; // ,1 => reversed!
+    LL = LL[iv_ds];
+
+    vector @tail;
+
+    for(k = ncols(LL); k > 0; k-- )
+    {
+      a = LL[k];
+      c = leadcomp(a); r = int(c);
+
+      if (r > 0)
+      {
+        aa = a[r];
+      } else
+      {
+        aa = a;
+      }
+  //    "A: ", a, " --->>>> ", aa, " **** [", r, "]: ";
+      @tail = SSReduce(aa, L[r], L, T, LL) + SSTraverse(aa, r, L, T, LL);
+      TT[k] = @tail;
+      SYZ[k] = a + @tail;
+    }
   }
 
+  module Z;
+  Z = 0; Z[iCompShift] = 0; Z = Z, transpose(LL);   LL = transpose(Z);
+  Z = 0; Z[iCompShift] = 0; Z = Z, transpose(TT);   TT = transpose(Z);
+  Z = 0; Z[iCompShift] = 0; Z = Z, transpose(SYZ); SYZ = transpose(Z);
 
+  
+/*  
   def opts = option(get); option(redSB); option(redTail); 
   module SYZ = std(syz(M)); // TODO: !!!!!!!!!!!
   option(set, opts); kill opts;
 
   "SYZ: ";  SYZ;  print(SYZ);
-
-  module Z; Z[iCompShift] = 0; Z = Z, transpose(SYZ); SYZ = transpose(Z);
 
   "shifted SYZ: ";  SYZ;  print(SYZ);
   
@@ -749,19 +870,7 @@ proc SSComputeSyzygy(def M, def L, def T, int iCompShift)
 
   LL = lead(SYZ); // TODO: WRONG ORDERING!!!!!!!!
   TT = Tail(SYZ);
-
-
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!! // 
-  
-  intvec iv_ds = sort(LL, "ds", 1)[2]; // ,1 => reversed!
-  LL = LL[iv_ds];
-  TT = TT[iv_ds];
+*/
   
   if( @DEBUG )
   {
@@ -785,7 +894,6 @@ static proc SSstep()
   {
     "SSstep::NextInducedRing"; 
     "basering: ", basering; attrib(basering);
-//    DetailedPrint(basering);
   }
 
 /*
@@ -834,7 +942,7 @@ static proc SSstep()
     L;
     @V;
     @RANK;
-    DetailedPrint(MRES);
+//    DetailedPrint(MRES);
     attrib(MRES, "isHomog");
   }
 
@@ -886,7 +994,7 @@ static proc SSstep()
   if( @DEBUG )
   {
     "SSstep::NextSyzOutput: ";
-    DetailedPrint(N);
+//    DetailedPrint(N);
     attrib(N);
   }
 
@@ -959,7 +1067,7 @@ example
 */  
 
   module M = maxideal(1); M;
-  def S = SSsyz(M); setring S; S;
+  def S = SSres(M, 0); setring S; S;
   "Only the first syzygy: ";
   RES; LRES; TRES;
   MRES;
@@ -971,7 +1079,7 @@ example
   ring R = 0, (w, x, y, z), dp;
   ideal M = w^2 - x*z,  w*x - y*z,  x^2 - w*y, x*y - z^2, y^2 - w*z;
   
-  def S = SSsyz(M); setring S; S;
+  def S = SSres(M, 0); setring S; S;
   "Only the first syzygy: ";
   RES; LRES; TRES;
   MRES;
@@ -1069,7 +1177,7 @@ static proc loadme()
 
 //      exportto(Schreyer, Syzextra::noop);
       exportto(Schreyer, Syzextra::DetailedPrint);
-//      exportto(Schreyer, Syzextra::leadmonom);
+      exportto(Schreyer, Syzextra::leadmonomial);
       exportto(Schreyer, Syzextra::leadcomp);
 //      exportto(Schreyer, Syzextra::leadrawexp);
 //      exportto(Schreyer, Syzextra::ISUpdateComponents);
@@ -1101,7 +1209,7 @@ static proc loadme()
 //      export Syzextra_g;
 //      exportto(Schreyer, Syzextra_g::noop);
       exportto(Schreyer, Syzextra_g::DetailedPrint);
-//      exportto(Schreyer, Syzextra_g::leadmonom);
+      exportto(Schreyer, Syzextra_g::leadmonomial);
       exportto(Schreyer, Syzextra_g::leadcomp);
 //      exportto(Schreyer, Syzextra_g::leadrawexp);
 //      exportto(Schreyer, Syzextra_g::ISUpdateComponents);
