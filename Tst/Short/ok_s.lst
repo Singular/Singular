@@ -135,6 +135,14 @@ equising_s
 facstd
 factorizep_s
 factorizeQa_s
+fermat_gcd_1var
+fermat_gcd_2var
+fermat_gcd_3var
+fermat_gcd_4var
+fermat_gcd_mod_1var
+fermat_gcd_mod_2var
+fermat_gcd_mod_3var
+fermat_gcd_mod_4var
 fetch_s
 fglm1_s
 fglmquot1_s
@@ -144,6 +152,12 @@ finvarlb
 fpadim_s
 gaussm_ex
 gcd0_s
+gcd2test
+gcd3primtest
+gcd3test
+gcd4test
+gcd5primtest
+gcd5test
 gcdp_s
 gerhard_1_32003_lp
 Gonnet-83_32003_dp_slim
