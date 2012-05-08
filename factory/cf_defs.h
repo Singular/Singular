@@ -27,22 +27,19 @@
 //
 //}}}
 const int SW_RATIONAL = 0;
-const int SW_QUOTIENT = 1;
-const int SW_SYMMETRIC_FF = 2;
-const int SW_BERLEKAMP = 3;
-const int SW_FAC_USE_BIG_PRIMES = 4;
-const int SW_FAC_QUADRATICLIFT = 5;
-const int SW_USE_EZGCD = 6;
-const int SW_USE_EZGCD_P = 7;
-const int SW_USE_SPARSEMOD = 8;
-const int SW_USE_NTL=9;
-const int SW_USE_NTL_GCD_0=10;
-const int SW_USE_NTL_GCD_P=11;
-const int SW_USE_NTL_SORT=12;
-const int SW_USE_CHINREM_GCD=13;
-const int SW_USE_QGCD=14;
-const int SW_USE_fieldGCD=15;
-const int SW_USE_FF_MOD_GCD=16;
+const int SW_SYMMETRIC_FF = 1;
+const int SW_BERLEKAMP = 2;
+const int SW_FAC_QUADRATICLIFT = 3;
+const int SW_USE_EZGCD = 4;
+const int SW_USE_EZGCD_P = 5;
+const int SW_USE_NTL=6;
+const int SW_USE_NTL_GCD_0=7;
+const int SW_USE_NTL_GCD_P=8;
+const int SW_USE_NTL_SORT=9;
+const int SW_USE_CHINREM_GCD=10;
+const int SW_USE_QGCD=11;
+const int SW_USE_fieldGCD=12;
+const int SW_USE_FF_MOD_GCD=13;
 //}}}
 
 /*ENDPUBLIC*/
