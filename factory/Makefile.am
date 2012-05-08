@@ -89,8 +89,6 @@ SOURCES = \
 		int_poly.cc \
 		int_pp.cc \
 		int_rat.cc \
-		sm_sparsemod.cc \
-		sm_util.cc \
 		variable.cc \
 		NTLconvert.cc \
 		abs_fac.cc \
@@ -174,8 +172,6 @@ factory_headers = \
 		int_poly.h \
 		int_pp.h \
 		int_rat.h \
-		sm_sparsemod.h \
-		sm_util.h \
 		timing.h \
 		variable.h \
 		NTLconvert.h \

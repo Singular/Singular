@@ -687,7 +687,7 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
 //
 // This is the dispatcher for polynomial gcd calculation.  We call either
 // ezgcd(), sparsemod() or gcd_poly1() in dependecy on the current
-// characteristic and settings of SW_USE_EZGCD and SW_USE_SPARSEMOD, resp.
+// characteristic and settings of SW_USE_EZGCD.
 //
 // Used by gcd() and gcd_poly_univar0().
 //
