@@ -90,9 +90,6 @@ SOURCES = \
 		int_rat.cc \
 		variable.cc \
 		NTLconvert.cc \
-		abs_fac.cc \
-		bifac.cc \
-		lgs.cc \
 		singext.cc \
 		parseutil.cc \
 		ftmpl_inst.cc
@@ -173,9 +170,6 @@ factory_headers = \
 		timing.h \
 		variable.h \
 		NTLconvert.h \
-		bifac.h \
-		bifacConfig.h \
-		lgs.h \
 		algext.h \
 		singext.h \
 		parseutil.h
