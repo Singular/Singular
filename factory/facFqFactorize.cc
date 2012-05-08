@@ -32,7 +32,6 @@
 #include "facMul.h"
 
 #ifdef HAVE_NTL
-#include <NTL/ZZ_pEX.h>
 #include "NTLconvert.h"
 
 TIMING_DEFINE_PRINT(fac_bi_factorizer)
