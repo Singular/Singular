@@ -106,8 +106,6 @@ mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G,
   int d= degAa + 1 + degBa;
 
   fmpz_poly_t FLINTA,FLINTB;
-  fmpz_poly_init (FLINTA);
-  fmpz_poly_init (FLINTB);
   kronSub (FLINTA, A, d);
   kronSub (FLINTB, B, d);
 
@@ -216,8 +214,6 @@ mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
   int d= degAa + 1 + degBa;
 
   fmpz_poly_t FLINTA,FLINTB;
-  fmpz_poly_init (FLINTA);
-  fmpz_poly_init (FLINTB);
   kronSub (FLINTA, A, d);
   kronSub (FLINTB, B, d);
 
@@ -1356,14 +1352,9 @@ mulMod2FLINTFpReci (const CanonicalForm& F, const CanonicalForm& G, const
   d1 += 1;
 
   nmod_poly_t F1, F2;
-  mp_limb_t ninv= n_preinvert_limb (getCharacteristic());
-  nmod_poly_init_preinv (F1, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (F2, getCharacteristic(), ninv);
   kronSubReciproFp (F1, F2, F, d1);
 
   nmod_poly_t G1, G2;
-  nmod_poly_init_preinv (G1, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (G2, getCharacteristic(), ninv);
   kronSubReciproFp (G1, G2, G, d1);
 
   int k= d1*degree (M);
@@ -1408,9 +1399,6 @@ mulMod2FLINTFp (const CanonicalForm& F, const CanonicalForm& G, const
     return mulMod2FLINTFpReci (A, B, M);
 
   nmod_poly_t FLINTA, FLINTB;
-  mp_limb_t ninv= n_preinvert_limb (getCharacteristic());
-  nmod_poly_init_preinv (FLINTA, getCharacteristic(), ninv);
-  nmod_poly_init_preinv (FLINTB, getCharacteristic(), ninv);
   kronSubFp (FLINTA, A, d1);
   kronSubFp (FLINTB, B, d1);
 
@@ -1433,13 +1421,9 @@ mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
   d1 += 1;
 
   fmpz_poly_t F1, F2;
-  fmpz_poly_init (F1);
-  fmpz_poly_init (F2);
   kronSubReciproQ (F1, F2, F, d1);
 
   fmpz_poly_t G1, G2;
-  fmpz_poly_init (G1);
-  fmpz_poly_init (G2);
   kronSubReciproQ (G1, G2, G, d1);
 
   int k= d1*degree (M);
@@ -1482,8 +1466,6 @@ mulMod2FLINTQ (const CanonicalForm& F, const CanonicalForm& G, const
   B *= g;
 
   fmpz_poly_t FLINTA, FLINTB;
-  fmpz_poly_init (FLINTA);
-  fmpz_poly_init (FLINTB);
   kronSub (FLINTA, A, d1);
   kronSub (FLINTB, B, d1);
   int k= d1*degree (M);
