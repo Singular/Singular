@@ -346,56 +346,10 @@ hdrtemplsrc := \
 		factory.template
 hdrtempldep :=	$(hdrtemplsrc:.template=.d)
 
-# FTE source files
-ftestsrc :=	\
-		ftest_io.cc \
-		ftest_util.cc \
-		ntl_util.cc
-
-# FTE header files
-ftestincl :=	\
-		ftest_io.h \
-		ftest_util.h \
-		ntl_util.h
-
-# FTE m4 source files (exported for `GNUmakefile' in `ftest/').
-# The variable `$(ftestm4develsrc)' may be already initialized
-# from the development `GNUmakefile'.
-ftestm4src :=	$(ftestm4develsrc) \
-		commonden.m4 \
-		degree.m4 \
-		deriv.m4 \
-		divides.m4 \
-		divrem.m4 \
-		extgcd.m4 \
-		factorize.m4 \
-		fbinops.m4 \
-		feval.m4 \
-		gcd.m4 \
-		gcd.ntl.m4 \
-		insert.m4 \
-		norm.m4 \
-		resultant.m4 \
-		revert.m4 \
-		sqrfree.m4 \
-		size.m4 \
-		totaldegree.m4
-export ftestm4src
-
-# other files from the FTE
-ftestdistfiles := \
-		ChangeLog \
-		GNUmakefile.in \
-		ftest_util.m4
-
-# FTE executables
-ftestexec :=	$(ftestm4src:.m4=)
-
 # all the C/C++ source files in the distribution
 distsrc :=	\
 		$(distfactorysrc) $(distmemmansrc) \
 		$(addprefix templates/,$(templatesrc)) \
-		$(addprefix ftest/,$(ftestsrc)) \
 		readcf.cc ftmpl_inst.cc \
 		gengftables.cc gengftables-conway.cc test_install.cc
 
@@ -403,13 +357,10 @@ distsrc :=	\
 distincl :=	\
 		$(distfactoryincl) $(distmemmanincl) \
 		$(addprefix templates/,$(templateincl)) \
-		$(addprefix ftest/,$(ftestincl))
 
 # all files in the distribution
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
-		$(addprefix ftest/,$(ftestm4src)) \
-		$(addprefix ftest/,$(ftestdistfiles)) \
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
 		factory.cfg gen_cf_gmp.template \
@@ -426,7 +377,6 @@ distfiles :=	\
 		clean mostlyclean distclean maintainer-clean \
 		install installcf installmem installgftables installtest \
 		uninstall uninstallcf uninstallmem uninstallgftables \
-		ftestall ftestclean ftestdistclean \
 		doxy doxyclean
 
 #
@@ -536,27 +486,6 @@ doxy:		factory.cfg $(doxysrc) $(doxyincl)
 
 doxyclean:
 		rm -rf doxygen
-
-#
-# - Factory Test Environment.
-#
-$(ftestexec):	conftest factoryconf.h factory.h libcf.a libcfmem.a ftmpl_inst.o
-		cd ftest && $(MAKE) $@
-		@if test -r "$@"; then \
-		  :; \
-		else \
-		  echo "$(LN_S) ftest/$@ $@"; \
-		  $(LN_S) ftest/$@ $@; \
-		fi
-
-ftestall:	$(ftestexec)
-
-ftestclean:
-		-cd ftest && $(MAKE) clean
-
-ftestdistclean:
-		-cd ftest && $(MAKE) distclean
-		-rmdir ftest
 
 #
 # - GF(q) table generation.
@@ -689,7 +618,6 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/bin
 		$(MKINSTALLDIRS) $(distname)/examples
-		$(MKINSTALLDIRS) $(distname)/ftest
 		$(MKINSTALLDIRS) $(distname)/templates
 		@echo "Copying files to distribution directory ..."
 		@for file in $(distfiles); do \
@@ -702,9 +630,9 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 #
 # - cleaning up.
 #
-clean:		ftestclean
+clean:
 		-rm -f $(libfactory) libcfmem.a libsingcf_g.a libsingcf_p.a \
-		  $(ftestexec) gengftables test_install \
+		  gengftables test_install \
 		  factoryconf.h factory.h *.o *.og *.op *.d *.dtmp cf_gmp.h
 
 # remove gftables only if we built them
@@ -714,7 +642,7 @@ mostlyclean:	clean doxyclean
 		  rm -rf gftables; \
 		fi
 
-distclean:	ftestdistclean mostlyclean
+distclean:	mostlyclean
 		-rm -f $(distname).tgz GNUmakefile stamp-h \
 		  config.cache config.log config.status config.h
 		-rm -rf $(distname)
@@ -761,9 +689,6 @@ stamp-h:	config.h.in config.status
 
 GNUmakefile:	GNUmakefile.in config.status
 		CONFIG_FILES=GNUmakefile CONFIG_HEADERS= ./config.status
-
-ftest/GNUmakefile: ftest/GNUmakefile.in config.status
-		CONFIG_FILES=ftest/GNUmakefile CONFIG_HEADERS= ./config.status
 
 config.status:	configure
 		./config.status --recheck
