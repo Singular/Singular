@@ -250,7 +250,7 @@ basefactoryincl := \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_distrib.h \
-		facFactorize. h \
+		facFactorize.h \
 		fac_iterfor.h \
 		fac_multivar.h \
 		fac_sqrfree.h \
@@ -267,8 +267,6 @@ basefactoryincl := \
 		facSparseHensel.h \
 		ffops.h \
 		FLINTconvert.h \
-		ftmpl_list.h \
-		ftmpl_matrix.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
@@ -407,12 +405,6 @@ distincl :=	\
 		$(addprefix templates/,$(templateincl)) \
 		$(addprefix ftest/,$(ftestincl))
 
-# all files for the Windows NT environment
-distntfiles :=	\
-		config.h nt.mak \
-		factory.h factoryconf.h \
-		INSTALL.nt
-
 # all files in the distribution
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
@@ -421,7 +413,6 @@ distfiles :=	\
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
 		factory.cfg gen_cf_gmp.template \
-		$(addprefix winnt/,$(distntfiles)) \
 		examples/GNUmakefile examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
@@ -437,10 +428,6 @@ distfiles :=	\
 		uninstall uninstallcf uninstallmem uninstallgftables \
 		ftestall ftestclean ftestdistclean \
 		doxy doxyclean
-
-# we make these targets phony to make sure that they are
-# up to date when a new distribution is built
-.PHONY:		$(srcdir)/winnt/factory.h $(srcdir)/winnt/factoryconf.h
 
 #
 # - pattern rules.
@@ -517,13 +504,6 @@ ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 # note that this is a non-source file which is distributed!
 $(srcdir)/readcf.cc: readcf.y
 		@./bin/gen-readcf "${BISON}"
-
-# note that these are non-source files which are distributed!
-# We do not specify any dependencies except the most important ones.
-$(srcdir)/winnt/factory.h: factory.template
-		$(MAKEHEADER) $(MAKEHEADERFLAGS) $< $@
-$(srcdir)/winnt/factoryconf.h: factoryconf.template winnt/config.h
-		$(MAKEHEADER) -I$(srcdir)/winnt $(MAKEHEADERFLAGS) $< $@
 
 # specify dependency in case user does not 'make depend'
 factoryconf.h:	config.h cf_gmp.h
@@ -704,14 +684,12 @@ uninstallgftables:
 #
 # - building a distribution.
 #
-dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
-		$(srcdir)/winnt/factory.h $(srcdir)/winnt/factoryconf.h
+dist:		$(srcdir)/readcf.cc $(srcdir)/configure 
 		rm -f $(distname).tgz
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/bin
 		$(MKINSTALLDIRS) $(distname)/examples
 		$(MKINSTALLDIRS) $(distname)/ftest
-		$(MKINSTALLDIRS) $(distname)/winnt
 		$(MKINSTALLDIRS) $(distname)/templates
 		@echo "Copying files to distribution directory ..."
 		@for file in $(distfiles); do \
