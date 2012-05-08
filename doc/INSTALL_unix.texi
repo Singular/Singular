@@ -73,7 +73,7 @@ Simply change to the directory in which you wish to install
 @smallexample
 cd /usr/local
 or
-mkdir install;cd install 
+mkdir install;cd install
 (you do not need root privileges in this case)
 @end smallexample
 
@@ -190,7 +190,7 @@ You may download most of these programs from
 @item Customize the on-line help system:
 
 By default, on-line help is displayed in @code{html} format using
-the @code{netscape} program.
+a web browser.
 
 However, this behavior can be customized in several ways
 using the @sc{Singular} commands @code{system("--browser",<browser>)}
