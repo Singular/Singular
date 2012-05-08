@@ -500,14 +500,6 @@ void singclap_divide_content ( poly f, const ring r )
   }
 }
 
-static int primepower(int c, const ring r)
-{
-  int p=1;
-  int cc=c;
-  while(cc!= rChar(r)) { cc*=c; p++; }
-  return p;
-}
-
 BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
 {
   p_Test(f,r);
