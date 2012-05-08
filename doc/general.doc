@@ -178,6 +178,7 @@ the default includes:
 @code{konqueror} (displays HTML help pages via @code{konqueror}),@*
 @code{galeon} (displays HTML help pages via @code{galeon}),@*
 @code{netscape} (displays HTML help pages via @code{netscape}),@*
+@code{safari} (displays HTML help pages on MacOsX via @code{safari}),@*
 @code{tkinfo} (displays INFO help pages via @code{tkinfo}),@*
 @code{xinfo} (displays INFO help pages via @code{info}),@*
 @code{info} (displays INFO help pages via @code{info}),@*
@@ -216,7 +217,7 @@ if (! system("--emacs"))
   // only set help browser if not running within emacs
   system("--browser", "info");
 @}
-// if help browser is later on set to netscape,
+// if help browser is later on set to a web browser,
 // allow it to fetch HTML pages from the net
 system("--allow-net", 1);
 @end smallexample
@@ -459,7 +460,7 @@ Print a one-line description of each command line option and exit.
 @cindex net access
 @cindex allowing net access
 @cindex help, accessing over the net
-Allow the @code{netscape} and @code{html} help browser to fetch HTML manual pages over
+Allow the help browsers based on a web browser to fetch HTML manual pages over
 the net from the WWW home-site of @sc{Singular}. @xref{The online help
 system}, for more info.
 
@@ -467,11 +468,13 @@ system}, for more info.
 @cindex --browser
 @cindex browser, command line option
 Use @code{VAL} as browser for the @sc{Singular} online manual.
-@*@code{VAL} may be one of @code{html} (Windows only), @code{netscape}, @code{xinfo},
-@code{tkinfo}, @code{info}, @code{builtin}, or @code{emacs}. Depending
-on your platform and local
+@*@code{VAL} may be one of the browsers mentioned in @code{LIB/help.cnf},
+for example @code{html} (Windows only), @code{mozilla}, @code{firefox},
+@code{konqueror}, @code{galeon}, @code{netscape}, @code{safari} (OsX only),
+@code{xinfo}, @code{tkinfo}, @code{info}, @code{builtin}, or @code{emacs}.
+Depending on your platform and local
 installation, only some browsers might be available. The default browser
-is @code{html} for Windows and @code{netscape} for Unix
+is @code{html} for Windows and one based on a web browser for Unix
 platforms. @xref{The online help system}, for more info.
 
 @item @code{--no-rc}
@@ -3391,7 +3394,7 @@ No line of a library should consist of more than 60 characters.
 @end itemize
 
 @menu
-* Libraries in the SINGULAR  Documentation::	
+* Libraries in the SINGULAR  Documentation::
 * Version string::
 * Category string::
 * Info string::

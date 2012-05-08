@@ -701,6 +701,16 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
 int singclap_factorize_retry;
 extern int libfac_interruptflag;
 
+#if 0
+static int primepower(int c, const ring r)
+{
+  int p=1;
+  int cc=c;
+  while(cc!= rChar(r)) { cc*=c; p++; }
+  return p;
+}
+#endif
+
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 /* destroys f, sets *v */
 {

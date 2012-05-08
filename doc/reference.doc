@@ -7103,10 +7103,10 @@ system("--min-time", "0.02");
 system("--ticks-per-sec", 100);
 // re-seed random number generator
 system("--random", 12345678);
-// allow netscape to access HTML pages from the net
+// allow your web browser to access HTML pages from the net
 system("--allow-net", 1);
-// and set help browser to netscape
-system("--browser", "netscape");
+// and set help browser to firefox
+system("--browser", "firefox");
 @c example
 @end smallexample
 @end table

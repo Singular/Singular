@@ -3,7 +3,7 @@ This is the README file for lib2doc.
 @end ifclear
 
 @code{lib2doc} is a utility to generate the stand-alone documentation for
-a @sc{Singular} library in various formats. 
+a @sc{Singular} library in various formats.
 
 The @code{lib2doc} utility should be used by developers of @sc{Singular}
 libraries to check the generation of the documentation of their
@@ -13,8 +13,8 @@ libraries.
 @url{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/misc/lib2doc.tar.gz}
 
 
-@strong{Important:} 
-@*To use @code{lib2doc}, you need 
+@strong{Important:}
+@*To use @code{lib2doc}, you need
 to have @code{perl} (version 5 or
 higher), @code{texinfo} (version 3.12 or higher)  and @code{Singular}
 and @code{libparse} (version 1-3-4 or higher) installed on your system.
@@ -26,23 +26,23 @@ Unpack lib2doc.tar.gz
 @smallexample
 gzip -dc  lib2doc.tar.gz | tar -pxf -
 @end smallexample
-and 
+and
 @smallexample
 cd lib2doc
 @end smallexample
 
-@item 
+@item
 Edit the beginning of the file @code{Makefile}, filling in the values for
-@code{SINGULAR} and @code{LIBPARSE}. Check also the values of @code{PERL} 
+@code{SINGULAR} and @code{LIBPARSE}. Check also the values of @code{PERL}
 and @code{LATEX2HTML}.
 
-@item 
+@item
 Copy your library to the current directory:
 @smallexample
 cp <path-where-your-lib-is>/mylib.lib .
 @end smallexample
 
-@item 
+@item
 Now you can run the following commands:
 @table @code
 @item make mylib.hlp
@@ -67,7 +67,7 @@ ghostview mylib.dvi
 Generates the file @code{mylib.html} -- the HTML file for the documentation
 of @code{mylib.lib}. This file can be viewed using (for example)
 @smallexample
-netscape mylib.html
+firefox mylib.html
 @end smallexample
 @item make clean
 Deletes all generated files.
@@ -75,7 +75,7 @@ Deletes all generated files.
 
 
 Note that you can safely ignore messages complaining about undefined
-references.  
+references.
 
 @end enumerate
 
