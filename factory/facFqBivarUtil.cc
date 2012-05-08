@@ -664,7 +664,6 @@ int * computeBounds (const CanonicalForm& F, int& n)
   int sizeOfNewtonPolygon;
   int** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
 
-  int minXIndex= 0, minYIndex= 0, maxXIndex= 0, maxYIndex= 0;
   int minX, minY, maxX, maxY;
   minX= newtonPolyg [0] [0];
   minY= newtonPolyg [0] [1];
@@ -673,25 +672,13 @@ int * computeBounds (const CanonicalForm& F, int& n)
   for (int i= 1; i < sizeOfNewtonPolygon; i++)
   {
     if (minX > newtonPolyg [i] [0])
-    {
       minX= newtonPolyg [i] [0];
-      minXIndex= i;
-    }
     if (maxX < newtonPolyg [i] [0])
-    {
       maxX= newtonPolyg [i] [0];
-      maxXIndex= i;
-    }
     if (minY > newtonPolyg [i] [1])
-    {
       minY= newtonPolyg [i] [1];
-      minYIndex= i;
-    }
     if (maxY < newtonPolyg [i] [1])
-    {
       maxY= newtonPolyg [i] [1];
-      maxYIndex= i;
-    }
   }
 
   int k= maxX;

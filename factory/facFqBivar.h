@@ -25,6 +25,7 @@
 #include "facFqSquarefree.h"
 #include "cf_map.h"
 #include "cfNewtonPolygon.h"
+#include "fac_util.h"
 
 static const double log2exp= 1.442695041;
 

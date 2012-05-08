@@ -597,7 +597,7 @@ CanonicalForm
 compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A, bool computeMA)
 {
   int n;
-  int ** newtonPolyg;
+  int ** newtonPolyg= NULL;
   if (computeMA)
   {
     newtonPolyg= newtonPolygon (F, n);
