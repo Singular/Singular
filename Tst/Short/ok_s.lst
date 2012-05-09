@@ -155,6 +155,9 @@ gcd4test
 gcd5primtest
 gcd5test
 gcdp_s
+gcd_univar_p_s
+gcd_univar_p_alpha_s
+gcd_univar_p_create
 gerhard_1_32003_lp
 Gonnet-83_32003_dp_slim
 Gonnet-83_1_32003_dp_slim
