@@ -10,8 +10,8 @@
 #include <vector>
 #include <set>
 
-#include "cdd/setoper.h"
-#include "cdd/cdd.h"
+#include "setoper.h"
+#include "cdd.h"
 
 namespace gfan{
 
