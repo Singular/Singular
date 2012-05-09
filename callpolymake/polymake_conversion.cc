@@ -205,8 +205,8 @@ gfan::ZCone* PmCone2ZCone (polymake::perl::Object* pc)
     }
     polymake::Matrix<polymake::Rational> ineqrational = pc->give("FACETS");
     polymake::Matrix<polymake::Rational> eqrational = pc->give("LINEAR_SPAN");
-    polymake::Matrix<polymake::Rational> exraysrational = pc->give("RAYS");
-    polymake::Matrix<polymake::Rational> linrational = pc->give("LINEALITY_SPACE");
+    // polymake::Matrix<polymake::Rational> exraysrational = pc->give("RAYS");
+    // polymake::Matrix<polymake::Rational> linrational = pc->give("LINEALITY_SPACE");
 
     gfan::ZMatrix zv, zw, zx, zy, zz;
     // the following branching statements are to cover cases in which polymake returns empty matrices
@@ -225,22 +225,23 @@ gfan::ZCone* PmCone2ZCone (polymake::perl::Object* pc)
     }
     else
       zw = gfan::ZMatrix(0, ambientdim2);
-    if (exraysrational.cols()!=0)
-    {
-      polymake::Matrix<polymake::Integer> exraysinteger = polymake::common::primitive(exraysrational);
-      zx = PmMatrixInteger2GfZMatrix(&exraysinteger);
-    }
-    else
-      zx = gfan::ZMatrix(0, ambientdim2);
-    if (linrational.cols()!=0)
-    {
-      polymake::Matrix<polymake::Integer> lininteger = polymake::common::primitive(linrational);
-      zy = PmMatrixInteger2GfZMatrix(&lininteger);
-    }
-    else
-      zy = gfan::ZMatrix(0, ambientdim2);
+    // if (exraysrational.cols()!=0)
+    // {
+    //   polymake::Matrix<polymake::Integer> exraysinteger = polymake::common::primitive(exraysrational);
+    //   zx = PmMatrixInteger2GfZMatrix(&exraysinteger);
+    // }
+    // else
+    //   zx = gfan::ZMatrix(0, ambientdim2);
+    // if (linrational.cols()!=0)
+    // {
+    //   polymake::Matrix<polymake::Integer> lininteger = polymake::common::primitive(linrational);
+    //   zy = PmMatrixInteger2GfZMatrix(&lininteger);
+    // }
+    // else
+    //   zy = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone* zc = new gfan::ZCone(zv,zw,zx,zy,zz,3);
+    // gfan::ZCone* zc = new gfan::ZCone(zv,zw,zx,zy,zz,3);
+    gfan::ZCone* zc = new gfan::ZCone(zv,zw,3);
 
     return zc;
   }
@@ -259,10 +260,10 @@ gfan::ZCone* PmPolytope2ZPolytope (polymake::perl::Object* pp)
     }
     polymake::Matrix<polymake::Rational> ineqrational = pp->give("FACETS");
     polymake::Matrix<polymake::Rational> eqrational = pp->give("AFFINE_HULL");
-    polymake::Matrix<polymake::Rational> vertrational = pp->give("VERTICES");
-    polymake::Matrix<polymake::Rational> linrational = pp->give("LINEALITY_SPACE");
+    // polymake::Matrix<polymake::Rational> vertrational = pp->give("VERTICES");
+    // polymake::Matrix<polymake::Rational> linrational = pp->give("LINEALITY_SPACE");
 
-    gfan::ZMatrix zv, zw, zx, zy, zz;
+    gfan::ZMatrix zv, zw;
     // the following branching statements are to cover the cases when polymake returns empty matrices 
     // by convention, gfanlib ignores empty matrices, hence zero matrices of right dimensions have to be supplied
     if (ineqrational.cols()!=0)
@@ -281,22 +282,24 @@ gfan::ZCone* PmPolytope2ZPolytope (polymake::perl::Object* pp)
     else
       zw = gfan::ZMatrix(0, ambientdim2);
 
-    if (vertrational.cols()!=0)
-    {
-      polymake::Matrix<polymake::Integer> vertinteger = polymake::common::primitive(vertrational);
-      zx = PmMatrixInteger2GfZMatrix(&vertinteger);
-    }
-    else
-      zx = gfan::ZMatrix(0, ambientdim2);
-    if (linrational.cols()!=0)
-      {
-        polymake::Matrix<polymake::Integer> lininteger = polymake::common::primitive(linrational);
-        zy = PmMatrixInteger2GfZMatrix(&lininteger);
-      }
-    else
-      zy = gfan::ZMatrix(0, ambientdim2);
+    // if (vertrational.cols()!=0)
+    // {
+    //   polymake::Matrix<polymake::Integer> vertinteger = polymake::common::primitive(vertrational);
+    //   zx = PmMatrixInteger2GfZMatrix(&vertinteger);
+    // }
+    // else
+    //   zx = gfan::ZMatrix(0, ambientdim2);
+    // if (linrational.cols()!=0)
+    //   {
+    //     polymake::Matrix<polymake::Integer> lininteger = polymake::common::primitive(linrational);
+    //     zy = PmMatrixInteger2GfZMatrix(&lininteger);
+    //   }
+    // else
+    //   zy = gfan::ZMatrix(0, ambientdim2);
 
-    gfan::ZCone* zp = new gfan::ZCone(zv,zw,zx,zy,zz,3);  
+    // gfan::ZCone* zp = new gfan::ZCone(zv,zw,zx,zy,zz,3);  
+    gfan::ZCone* zp = new gfan::ZCone(zv,zw,3);
+
     return zp;
   }
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
@@ -332,17 +335,17 @@ polymake::perl::Object* ZCone2PmCone (gfan::ZCone* zc)
   gfan::ZMatrix equations = zc->getEquations();
   gc->take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
 
-  if(zc->areExtremeRaysKnown())
-    {  
-      gfan::ZMatrix extremeRays = zc->extremeRays();
-      gc->take("RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
-    }
+  // if(zc->areExtremeRaysKnown())
+  //   {  
+  //     gfan::ZMatrix extremeRays = zc->extremeRays();
+  //     gc->take("RAYS") << GfZMatrix2PmMatrixInteger(&extremeRays);
+  //   }
 
-  if(zc->areGeneratorsOfLinealitySpaceKnown())
-    {
-      gfan::ZMatrix lineality = zc->generatorsOfLinealitySpace();
-      gc->take("LINEALITY_SPACE") << GfZMatrix2PmMatrixInteger(&lineality);
-    }
+  // if(zc->areGeneratorsOfLinealitySpaceKnown())
+  //   {
+  //     gfan::ZMatrix lineality = zc->generatorsOfLinealitySpace();
+  //     gc->take("LINEALITY_SPACE") << GfZMatrix2PmMatrixInteger(&lineality);
+  //   }
 
   return gc;
 }
@@ -357,11 +360,11 @@ polymake::perl::Object* ZPolytope2PmPolytope (gfan::ZCone* zc)
   gfan::ZMatrix equations = zc->getEquations();
   pp->take("LINEAR_SPAN") << GfZMatrix2PmMatrixInteger(&equations);
 
-  if(zc->areExtremeRaysKnown())
-    {
-      gfan::ZMatrix vertices = zc->extremeRays();
-      pp->take("VERTICES") << GfZMatrix2PmMatrixInteger(&vertices);
-    }
+  // if(zc->areExtremeRaysKnown())
+  //   {
+  //     gfan::ZMatrix vertices = zc->extremeRays();
+  //     pp->take("VERTICES") << GfZMatrix2PmMatrixInteger(&vertices);
+  //   }
 
   return pp;
 }
@@ -413,7 +416,7 @@ polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
   polymake::Array<polymake::Set<int> > L(r);
 
   int ii = 0;
-  for (int d=1; d<=zf->getDimension(); d++)
+  for (int d=1; d<=zf->getAmbientDimension(); d++)
     {
       for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
         {
