@@ -33,7 +33,7 @@ DegreePattern::DegreePattern (const CFList& l)
   Variable x= Variable (1);
   int p= getCharacteristic();
   int d= 0;
-  char cGFName;
+  char cGFName= 'Z';
   if (CFFactory::gettype() == GaloisFieldDomain)
   {
     d= getGFDegree();
