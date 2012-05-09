@@ -23,7 +23,6 @@
 #include "cf_util.h"
 
 #ifdef HAVE_NTL
-#include <NTL/ZZ_pEXFactoring.h>
 #include "NTLconvert.h"
 #endif
 

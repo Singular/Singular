@@ -590,10 +590,10 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   fail = true;
 }
 
-#ifdef HAVE_NTL
 static CanonicalForm
 myicontent ( const CanonicalForm & f, const CanonicalForm & c )
 {
+#ifdef HAVE_NTL
     if (f.isOne() || c.isOne())
       return 1;
     if ( f.inBaseDomain() && c.inBaseDomain())
@@ -621,8 +621,10 @@ myicontent ( const CanonicalForm & f, const CanonicalForm & c )
             g = myicontent( i.coeff(), g );
         return g;
     }
-}
+#else
+    return 1;
 #endif
+}
 
 CanonicalForm
 myicontent ( const CanonicalForm & f )

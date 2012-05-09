@@ -38,6 +38,10 @@
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_hensel_lift)
 TIMING_DEFINE_PRINT(fac_factor_recombination)
@@ -143,11 +147,12 @@ CFList
 uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 {
   Variable x= A.mvar();
-  ASSERT (A.isUnivariate() || A.inCoeffDomain(), 
+  if (A.inCoeffDomain())
+    return CFList();
+  ASSERT (A.isUnivariate(),
           "univariate polynomial expected or constant expected");
   CFFList factorsA;
-  ZZ p= to_ZZ (getCharacteristic());
-  ZZ_p::init (p);
+  zz_p::init (getCharacteristic());
   if (GF)
   {
     int k= getGFDegree();
@@ -158,13 +163,13 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (mipo.mapinto());
-      ZZ_pE::init (NTLMipo);
-      ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (buf, NTLMipo);
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (mipo.mapinto());
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (buf, NTLMipo);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pEX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_pE multi= to_ZZ_pE (1);
-      factorsA= convertNTLvec_pair_ZZpEX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pEX_long NTLFactorsA= CanZass (NTLA);
+      zz_pE multi= to_zz_pE (1);
+      factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                          x, beta);
     }
     else
@@ -190,13 +195,13 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   {
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (getMipo (alpha));
-      ZZ_pE::init (NTLMipo);
-      ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (A, NTLMipo);
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pEX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_pE multi= to_ZZ_pE (1);
-      factorsA= convertNTLvec_pair_ZZpEX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pEX_long NTLFactorsA= CanZass (NTLA);
+      zz_pE multi= to_zz_pE (1);
+      factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                            x, alpha);
     }
     else
@@ -213,13 +218,25 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   }
   else
   {
+#ifdef HAVE_FLINT
+    nmod_poly_t FLINTA;
+    convertFacCF2nmod_poly_t (FLINTA, A);
+    nmod_poly_factor_t result;
+    nmod_poly_factor_init (result);
+    mp_limb_t leadingCoeff= nmod_poly_factor (result, FLINTA);
+    factorsA= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, x);
+    if (factorsA.getFirst().factor().inCoeffDomain())
+      factorsA.removeFirst();
+    nmod_poly_factor_clear (result);
+    nmod_poly_clear (FLINTA);
+#else
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLA= convertFacCF2NTLZZpX (A);
+      zz_pX NTLA= convertFacCF2NTLzzpX (A);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_p multi= to_ZZ_p (1);
-      factorsA= convertNTLvec_pair_ZZpX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pX_long NTLFactorsA= CanZass (NTLA);
+      zz_p multi= to_zz_p (1);
+      factorsA= convertNTLvec_pair_zzpX_long2FacCFFList (NTLFactorsA, multi,
                                                           x);
     }
     else
@@ -230,6 +247,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       factorsA= convertNTLvec_pair_GF2X_long2FacCFFList (NTLFactorsA, multi,
                                                           x);
     }
+#endif
   }
   CFList uniFactors;
   for (CFFListIterator i= factorsA; i.hasItem(); i++)
@@ -646,7 +664,7 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 {
   zz_p::init (getCharacteristic());
   zz_pX NTLIrredpoly;
-  int i, m;
+  int i=1, m= 2;
   // extension of F_p needed
   if (alpha.level() == 1 && beta.level() == 1 && k == 1)
   {
@@ -2263,7 +2281,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                    int oldNumCols, int oldL, int precision
                   )
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   CFArray * A= new CFArray [factors.length()];
@@ -2326,7 +2343,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           CanonicalForm G= F;
@@ -2396,7 +2412,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                    int precision
                   )
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   CFArray * A= new CFArray [factors.length()];
@@ -2459,7 +2474,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2531,7 +2545,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   bool GF= (CFFactory::gettype()==GaloisFieldDomain);
   int degMipo= degree (getMipo (info.getAlpha()));
   Variable alpha= info.getAlpha();
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
 
@@ -2648,7 +2661,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
 
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           Variable y= Variable (2);
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
@@ -2720,7 +2732,6 @@ CFList
 increasePrecision2 (const CanonicalForm& F, CFList& factors,
                     const Variable& alpha, int precision)
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   CFArray * A= new CFArray [factors.length()];
@@ -2784,7 +2795,6 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2842,7 +2852,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
                         int precision
                        )
 {
-  bool irreducible= false;
   int d;
   int* bounds= computeBounds (F, d);
   int extensionDeg= degree (getMipo (alpha));
@@ -2906,7 +2915,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2974,7 +2982,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                   )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
@@ -3031,7 +3038,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -3039,7 +3045,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       delete [] A;
       return CFList (F);
     }
@@ -3081,7 +3086,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                   )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
@@ -3135,7 +3139,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -3143,7 +3146,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       delete [] A;
       return CFList (F);
     }
@@ -3189,7 +3191,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
                      )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2; //be careful
   bool hitBound= false;
@@ -3300,7 +3301,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
 
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           Variable y= Variable (2);
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
@@ -3312,7 +3312,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       Variable y= Variable (2);
       CanonicalForm tmp= F (y - evaluation, y);
       CFList source, dest;
@@ -3361,7 +3360,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
                        )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int extensionDeg= degree (getMipo (alpha));
   int oldL2= oldL/2;
@@ -3416,7 +3414,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }

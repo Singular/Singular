@@ -32,6 +32,9 @@
 extern "C"
 {
 #endif
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
 #include <fmpz.h>
 #include <fmpq.h>
 #include <fmpz_poly.h>
@@ -261,7 +264,8 @@ convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
                                          )
 {
   CFFList result;
-  result.insert (CFFactor (CanonicalForm ((long) leadingCoeff), 1));
+  if (leadingCoeff != 1)
+    result.insert (CFFactor (CanonicalForm ((long) leadingCoeff), 1));
 
   long i;
 
