@@ -248,41 +248,8 @@ templatesrc =	templates/ftmpl_array.cc \
 hdrtemplsrc = 	factoryconf.template \
 		factory.template
 
-# FTE source files
-ftestsrc =	ftest/ftest_io.cc \
-		ftest/ftest_util.cc \
-		ftest/ntl_util.cc
-
-# FTE header files
-ftestincl =	ftest/ftest_io.h \
-		ftest/ftest_util.h \
-		ftest/ntl_util.h
-
-ftestm4src =	ftest/commonden.m4 \
-		ftest/degree.m4 \
-		ftest/deriv.m4 \
-		ftest/divides.m4 \
-		ftest/divrem.m4 \
-		ftest/extgcd.m4 \
-		ftest/factorize.m4 \
-		ftest/fbinops.m4 \
-		ftest/feval.m4 \
-		ftest/gcd.m4 \
-		ftest/gcd.ntl.m4 \
-		ftest/insert.m4 \
-		ftest/norm.m4 \
-		ftest/resultant.m4 \
-		ftest/revert.m4 \
-		ftest/sqrfree.m4 \
-		ftest/size.m4 \
-		ftest/totaldegree.m4
-
-ftestdistfiles = \
-		ftest/ftest_util.m4
-
 EXTRA_DIST =	test_install.cc \
 		$(templatesrc) $(hdrtemplsrc) \
-		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
 		doxygen.cfg factory.cfg \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
