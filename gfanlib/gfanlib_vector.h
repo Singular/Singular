@@ -179,7 +179,7 @@ public:
 /*  inline friend Vector operator*(const Vektor& p, const Vektor& q){assert(p.size()==q.size());Vektor p1=p;for(int i=0;i<p.size();i++)p1.v[i]*=q.v[i];return p1;}
   inline friend Vektor operator+(const Vektor& p, const Vektor& q){assert(p.size()==q.size());Vektor p1=p;for(int i=0;i<p.size();i++)p1[i]+=q[i];return p1;}
 */
-  inline friend Vector operator/(const Vector& p, typ const &s){Vector ret(p.size());for(unsigned i=0;i<p.size();i++)ret[i]=p[i]/s;return ret;}
+  inline friend Vector operator/(const Vector& p, typ const &s){Vector ret(p.size());for(int i=0;i<p.size();i++)ret[i]=p[i]/s;return ret;}
   inline friend Vector operator+(const Vector& p, const Vector& q){assert(p.size()==q.size());Vector p1=p;for(int i=0;i<p.size();i++)p1[i]+=q[i];return p1;}
   inline friend Vector operator-(const Vector& p, const Vector& q){assert(p.size()==q.size());Vector p1=p;for(int i=0;i<p.size();i++)p1[i]-=q[i];return p1;}
   inline friend Vector max(const Vector& p, const Vector& q){assert(p.size()==q.size());Vector p1=p;for(int i=0;i<p.size();i++)if(p1[i]<q[i])p1[i]=q[i];return p1;}

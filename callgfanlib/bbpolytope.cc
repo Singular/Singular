@@ -30,18 +30,6 @@ std::string bbpolytopeToString(gfan::ZCone const &c)
   s<<toString(i);
   s<<"EQUATIONS"<<std::endl;
   s<<toString(e);
-  if(c.areExtremeRaysKnown())
-  {
-    gfan::ZMatrix r=c.extremeRays();
-    s<<"VERTICES"<<std::endl;
-    s<<toString(r);
-  }
-  if(c.areGeneratorsOfLinealitySpaceKnown())
-  {
-    gfan::ZMatrix r=c.generatorsOfLinealitySpace();
-    s<<"LINEALITY_SPACE"<<std::endl;
-    s<<toString(r);
-  }
   return s.str();
 }
 
@@ -590,6 +578,7 @@ void bbpolytope_setup()
   // iiAddCproc("","getLinearForms",FALSE,getLinearForms);
   // iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
   // iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
+  // iiAddCproc("","hasFace",FALSE,hasFace);
   /***************************************************************/
   // iiAddCproc("","getEquations",FALSE,getEquations);
   // iiAddCproc("","getInequalities",FALSE,getInequalities);

@@ -41,9 +41,7 @@ namespace gfan
   IntVector ZFan::getConeIndices(int dimension, int index, bool orbit, bool maximal)const
   {
     assert(index>=0);
-    int nc=numberOfConesOfDimension(dimension,orbit,maximal);
-    assert(index<nc);
-    // assert(index<numberOfConesOfDimension(dimension,orbit,maximal));
+    assert(index<numberOfConesOfDimension(dimension,orbit,maximal));
     return table(orbit,maximal)[dimension][index];
   }
   void ZFan::ensureConeCollection()const
