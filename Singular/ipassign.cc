@@ -24,6 +24,7 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
+#include <coeffs/bigintmat.h>
 
 
 #include <polys/ext_fields/algext.h>
@@ -246,7 +247,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   }
 
   n_Normalize(p, currRing->cf);
-   
+
   assume( currRing->cf->extRing->qideal == NULL );
 
   AlgExtInfo A;
@@ -382,8 +383,40 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 {
   number p=(number)a->CopyD(BIGINT_CMD);
-  if (res->data!=NULL) n_Delete((number *)&res->data,coeffs_BIGINT);
-  res->data=(void *)p;
+  if (e==NULL)
+  {
+    if (res->data!=NULL) n_Delete((number *)&res->data,coeffs_BIGINT);
+    res->data=(void *)p;
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in bigintmat (%d,%d)",i+1,c,iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = p;
+      }
+    }
+  }
   jiAssignAttr(res,a);
   return FALSE;
 }
@@ -564,6 +597,13 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
     return FALSE; //(r->length()< s->length());
   }
 #endif
+}
+static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr e)
+{
+  if (res->data!=NULL) delete ((bigintmat *)res->data);
+  res->data=(void *)a->CopyD(BIGINTMAT_CMD);
+  jiAssignAttr(res,a);
+  return FALSE;
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
@@ -1164,6 +1204,54 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
   IDINTVEC((idhdl)l->data)=iv;
   return FALSE;
 }
+static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
+{
+  /* left side is bigintmat, right side is list (of int,intvec,intmat)*/
+  leftv hh=r;
+  int i = 0;
+  while (hh!=NULL)
+  {
+    if (i>=bim->cols()*bim->rows())
+    {
+      if (TEST_V_ALLWARN)
+      {
+        Warn("expression list length(%d) does not match bigintmat size(%d x %d)",
+              exprlist_length(hh),bim->rows(),bim->cols());
+      }
+      break;
+    }
+    if (hh->Typ() == INT_CMD)
+    {
+      number tp = n_Init((int)((long)(hh->Data())), coeffs_BIGINT);
+      bim->set(i++, tp);
+      n_Delete(&tp, coeffs_BIGINT);
+    }
+    else if (hh->Typ() == BIGINT_CMD)
+    {
+      bim->set(i++, (number)(hh->Data()));
+    } 
+    /*
+    ((hh->Typ() == INTVEC_CMD)
+            ||(hh->Typ() == INTMAT_CMD))
+    {
+      intvec *ivv = (intvec *)(hh->Data());
+      int ll = 0,l = si_min(ivv->length(),iv->length());
+      for (; l>0; l--)
+      {
+        (*iv)[i++] = (*ivv)[ll++];
+      }
+    }*/
+    else
+    {
+      delete bim;
+      return TRUE;
+    }
+    hh = hh->next;
+  }
+  if (IDBIMAT((idhdl)l->data)!=NULL) delete IDBIMAT((idhdl)l->data);
+  IDBIMAT((idhdl)l->data)=bim;
+  return FALSE;
+}
 static BOOLEAN jjA_L_STRING(leftv l,leftv r)
 {
   /* left side is string, right side is list of string*/
@@ -1553,6 +1641,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
     case INTMAT_CMD:
     {
       nok=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
+      break;
+    }
+    case BIGINTMAT_CMD:
+    {
+      nok=jjA_L_BIGINTMAT(l, r, new bigintmat(IDBIMAT((idhdl)l->data)));
       break;
     }
     case MAP_CMD:

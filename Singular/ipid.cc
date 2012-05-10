@@ -17,6 +17,7 @@
 #include <misc/intvec.h>
 #include <kernel/febase.h>
 #include <coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
 #include <kernel/longrat.h>
 #include <kernel/polys.h>
 #include <polys/monomials/ring.h>
@@ -125,6 +126,8 @@ void *idrecDataInit(int t)
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)new intvec();
+    case BIGINTMAT_CMD:
+      return (void *)new bigintmat();
     case NUMBER_CMD:
       return (void *) nInit(0);
     case BIGINT_CMD:

@@ -18,6 +18,7 @@
 #include <Singular/subexpr.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/bigintmat.h>
 //#include <polys/ext_fields/longalg.h>
 #ifdef HAVE_RINGS
 #include <coeffs/rmodulon.h>
@@ -184,6 +185,16 @@ static void * iiIm2Ma(void *data)
   }
   delete iv;
   return (void *)m;
+}
+
+static void * iiIm2Bim(void *data)
+{
+  return (void *)iv2bim((intvec*)data,coeffs_BIGINT);
+}
+
+static void * iiBim2Im(void *data)
+{
+  return (void *)bim2iv((bigintmat*)data);
 }
 
 static void * iiN2P(void *data)

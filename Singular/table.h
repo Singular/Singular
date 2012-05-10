@@ -30,6 +30,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjUMINUS_MA),  '-',             MATRIX_CMD,     MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjUMINUS_IV),  '-',             INTVEC_CMD,     INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjUMINUS_IV),  '-',             INTMAT_CMD,     INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjUMINUS_BIM), '-',             BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjPROC1),      '(',             ANY_TYPE/*set by p*/,PROC_CMD , ALLOW_PLURAL |ALLOW_RING}
 // and the procedures with 1 argument:
 ,{D(atATTRIB1),    ATTRIB_CMD,      NONE,           DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
@@ -42,6 +43,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjDUMMY),      BIGINT_CMD,      BIGINT_CMD,     BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjN2BI),       BIGINT_CMD,      BIGINT_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjP2BI),       BIGINT_CMD,      BIGINT_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjDUMMY),      BIGINTMAT_CMD,   BIGINTMAT_CMD,  BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCHAR),       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCHAR),       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCHARSERIES), CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD     , NO_PLURAL |NO_RING}
@@ -304,6 +306,11 @@ struct sValCmd2 dArith2[]=
 ,{D(jjOP_I_IM),   '+',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_IV),   '+',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_IV),   '+',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjPLUS_BIM),  '+',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BIM_I),  '+',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_I_BIM),  '+',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BIM_BI),  '+',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BI_BIM),  '+',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(lAdd),        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjRSUM),      '+',            RING_CMD,       RING_CMD,   RING_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjRSUM),      '+',            QRING_CMD,      QRING_CMD,  RING_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -320,6 +327,11 @@ struct sValCmd2 dArith2[]=
 ,{D(jjOP_IM_I),   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_IV),  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMINUS_IV),  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjMINUS_BIM), '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BIM_I),  '-',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_I_BIM),  '-',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BIM_BI),  '-',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BI_BIM),  '-',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjTIMES_I),   '*',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -353,6 +365,11 @@ struct sValCmd2 dArith2[]=
 ,{D(jjTIMES_IV),  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjTIMES_IV),  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjTIMES_IV),  '*',            INTMAT_CMD,     INTVEC_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjTIMES_BIM), '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BIM_I),  '*',            BIGINTMAT_CMD,  BIGINTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_I_BIM),  '*',            BIGINTMAT_CMD,  INT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BIM_BI),  '*',           BIGINTMAT_CMD,  BIGINTMAT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjOP_BI_BIM),  '*',           BIGINTMAT_CMD,  BIGINT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_N),     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_P),     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_P),     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -423,6 +440,7 @@ struct sValCmd2 dArith2[]=
 ,{D(jjCOMPARE_IV_I),EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_IV),EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_IV),EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCOMPARE_BIM),EQUAL_EQUAL,   INT_CMD,        BIGINTMAT_CMD, BIGINTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjEQUAL_Ma),  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{  jjWRONG2 ,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -662,6 +680,7 @@ struct sValCmd3 dArith3[]=
 ,{D(jjBRACK_Ma_I_IV),  '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_I),  '[',        INT_CMD,    INTMAT_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_IV), '[',        INT_CMD,    INTMAT_CMD, INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjBRACK_Bim),      '[',        BIGINT_CMD, BIGINTMAT_CMD, INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma),       '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_I_IV),  '[',        POLY_CMD,   MATRIX_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_IV_I),  '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -824,6 +843,7 @@ cmdnames cmds[] =
   { "bareiss",     0, BAREISS_CMD ,       CMD_13},
   { "betti",       0, BETTI_CMD ,         CMD_12},
   { "bigint",      0, BIGINT_CMD ,        ROOT_DECL},
+  { "bigintmat",   0, BIGINTMAT_CMD ,     BIGINTMAT_CMD},
   #ifdef HAVE_PLURAL
   { "bracket",     0, BRACKET_CMD ,       CMD_2},
   #endif
@@ -846,7 +866,7 @@ cmdnames cmds[] =
   { "deg",         0, DEG_CMD ,           CMD_12},
   { "degree",      0, DEGREE_CMD ,        CMD_1},
   { "delete",      0, DELETE_CMD ,        CMD_2},
-  { "denominator", 0, DENOMINATOR_CMD ,   CMD_1},  
+  { "denominator", 0, DENOMINATOR_CMD ,   CMD_1},
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
@@ -1109,6 +1129,10 @@ struct sConvertTypes dConvertTypes[] =
    { INTVEC_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL },
 //  intmat -> matrix
    { INTMAT_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL },
+//  intmat -> bigintmat
+   { INTMAT_CMD,      BIGINTMAT_CMD,  D(iiIm2Bim) , NULL },
+//  bigintmat -> intmat
+   { BIGINTMAT_CMD,   INTMAT_CMD,     D(iiBim2Im) , NULL },
 //  number -> poly
    { NUMBER_CMD,      POLY_CMD,       D(iiN2P)  , NULL },
 //  number -> matrix
@@ -1173,6 +1197,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_INTVEC),   INTVEC_CMD,     INTVEC_CMD }
 ,{D(jiA_INTVEC),   INTMAT_CMD,     INTMAT_CMD }
 //,{D(jiA_INTVEC),   INTMAT_CMD,     INTVEC_CMD }
+,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
 ,{D(jiA_NUMBER),   NUMBER_CMD,     NUMBER_CMD }
 ,{D(jiA_BIGINT),   BIGINT_CMD,     BIGINT_CMD }
 ,{D(jiA_LIST_RES), LIST_CMD,       RESOLUTION_CMD }

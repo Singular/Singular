@@ -90,11 +90,12 @@ class bigintmat
 
       return v[i];
     }
+#define BIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
 
     /// UEberladener *=-Operator (fuer int und bigint)
     /// Frage hier: *= verwenden oder lieber = und * einzeln?
     void operator*=(int intop);
-    
+
     void inpMult(number bintop, const coeffs C = NULL);
 
     inline int  cols() const { return col; }
@@ -114,7 +115,7 @@ class bigintmat
     int index(int r, int c) const
     {
       assume (rows() >= 0 && cols() >= 0);
-      
+
       assume (r > 0 && c > 0);
       assume (r <= rows() && r <= cols());
 
@@ -133,7 +134,7 @@ class bigintmat
     /// replace an entry with a copy (delete old + copy new!).
     /// NOTE: starts at [1,1]
     void set(int i, int j, number n, const coeffs C = NULL);
-    
+
     /// replace an entry with a copy (delete old + copy new!).
     /// NOTE: starts at [0]
     void set(int i, number n, const coeffs C = NULL);
@@ -151,14 +152,15 @@ class bigintmat
       if (i < l)
       {
         n_Delete(&(v[i]), basecoeffs()); v[i] = n;
-      } else
-      {
-#ifndef NDEBUG
-        Werror("wrong bigintmat index:%d\n",i);
-#endif
       }
+#ifndef NDEBUG
+      else
+      {
+        Werror("wrong bigintmat index:%d\n",i);
+      }
+#endif
     }
-    
+
     inline void rawset(int i, int j, number n, const coeffs C = NULL)
     {
       rawset( index(i,j), n, C);
@@ -176,8 +178,12 @@ bool operator!=(const bigintmat & lhr, const bigintmat & rhr);
 /// Matrix-Add/-Sub/-Mult so oder mit operator+/-/* ?
 /// NOTE: NULL as a result means an error (non-compatible matrices?)
 bigintmat * bimAdd(bigintmat * a, bigintmat * b);
+bigintmat * bimAdd(bigintmat * a, int b);
 bigintmat * bimSub(bigintmat * a, bigintmat * b);
+bigintmat * bimSub(bigintmat * a, int b);
 bigintmat * bimMult(bigintmat * a, bigintmat * b);
+bigintmat * bimMult(bigintmat * a, int b);
+bigintmat * bimMult(bigintmat * a, number b, const coeffs cf);
 bigintmat * bimCopy(const bigintmat * b);
 
 
