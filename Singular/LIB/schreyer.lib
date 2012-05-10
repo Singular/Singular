@@ -474,6 +474,7 @@ static proc Tail(def M)
   def @save = basering;
   
   int @DEBUG = !system("with", "ndebug");
+  int @SYZCHECK = 1 || @DEBUG; // TODO: only for now!!
   
   if( @DEBUG )
   {
@@ -567,7 +568,7 @@ static proc Tail(def M)
 //    DetailedPrint(M);
   }
 
-  if( @DEBUG )
+  if( @SYZCHECK )
   {
     // 0^th syz. property
     if( size(module(transpose( transpose(M) * transpose(MRES) ))) > 0 )
@@ -586,10 +587,11 @@ static proc Tail(def M)
 
   attrib(MRES, "isHomog", @V);
   
-  attrib(S, "InducionStart", @RANK);
+//  attrib(S, "InducionStart", @RANK);
   attrib(S, "LEAD2SYZ", 1);
   attrib(S, "TAILREDSYZ", 0);
   attrib(S, "DEBUG", @DEBUG);
+  attrib(S, "SYZCHECK", @SYZCHECK);
   
   if( @DEBUG )
   {
@@ -735,6 +737,15 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
     int @DEBUG = !system("with", "ndebug");
   }
 
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
+  
+
   if( @DEBUG )
   {
     "SSCompute2LeadingSyzygyTerms::Input: ";
@@ -803,7 +814,10 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
   if( @DEBUG )
   {
     "SSCompute2LeadingSyzygyTerms::Syz(LEAD): "; S;
+  }
 
+  if( @SYZCHECK )
+  {
     if( size(S) > 0 and size(L) > 0 )
     {
       if( size(module(transpose( transpose(S) * transpose(L) ))) > 0 )
@@ -1074,8 +1088,22 @@ proc SSComputeSyzygy(def L, def T)
 // resolution/syzygy step:
 static proc SSstep()
 {
-  /// TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  int @DEBUG = !system("with", "ndebug");
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
+
+
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
 
   if( @DEBUG )
   {
@@ -1145,9 +1173,9 @@ static proc SSstep()
   Z = 0; Z[@RANK] = 0; Z = Z, transpose(N);     N = transpose(Z);
 
 
-  if( size(N) > 0 )
+  if( @SYZCHECK )
   {
-    if( @DEBUG )
+    if( size(N) > 0 )
     {
       // next syz. property
       if( size(module(transpose( transpose(N) * transpose(MRES) ))) > 0 )
