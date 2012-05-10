@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -133,7 +132,7 @@ Some external programs are optional:
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
 @copyright{} Winfried Bruns and Bogdan Ichim
 @* @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}
-@item polymake (used by polymake.lib, @pxref{polymake_lib})
+@item polymake (used by oldpolymake.lib, @pxref{oldpolymake_lib})
 @copyright{} Ewgenij Gawrilow and Michael Joswig
 @* @uref{http://www.polymake.de/}
 @item surf (used by surf.lib, @pxref{surf_lib})
@@ -144,7 +143,7 @@ Some external programs are optional:
 @item surfex (used by surfex.lib, @pxref{surfex_lib})
 @copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 @* @uref{http://surfex.AlgebraicSurface.net}
-@item TOPCOM (used by polymake.lib, @pxref{polymake_lib})
+@item TOPCOM (used by oldpolymake.lib, @pxref{oldpolymake_lib})
 @copyright{} J@"org Rambau
 @* @uref{http://www.rambau.wm.uni-bayreuth.de/TOPCOM/}
 @end table

@@ -400,7 +400,7 @@ BOOLEAN insertCone(leftv res, leftv args)
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      gfan::ZFan* zf = (gfan::ZFan*)u->CopyD();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
       if (iscompatible(zf,zc))
