@@ -1015,6 +1015,15 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
+  #ifndef NDEBUG
+  int dummy;
+  if (IsCmd(procname,dummy))
+  {
+    Werror(">>%s< is a reserved name",procname);
+    return 0;
+  }
+  #endif
+
   h = enterid(procname,0, PROC_CMD, &IDROOT, TRUE);
   if ( h!= NULL )
   {
