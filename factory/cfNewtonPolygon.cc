@@ -856,3 +856,43 @@ int* getRightSide (int** polygon, int sizeOfPolygon, int& sizeOfOutput)
 
   return result;
 }
+
+bool irreducibilityTest (const CanonicalForm& F)
+{
+  int sizeOfNewtonPolygon;
+  int ** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
+  if (sizeOfNewtonPolygon == 3)
+  {
+    bool check1=
+        (newtonPolyg[0][0]==0 || newtonPolyg[1][0]==0 || newtonPolyg[2][0]==0);
+    if (check1)
+    {
+      bool check2=
+        (newtonPolyg[0][1]==0 || newtonPolyg[1][1]==0 || newtonPolyg[2][0]==0);
+      if (check2)
+      {
+        bool isRat= isOn (SW_RATIONAL);
+        if (isRat)
+          Off (SW_RATIONAL);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        tmp= gcd (tmp, newtonPolyg[1][0]);
+        tmp= gcd (tmp, newtonPolyg[1][1]);
+        tmp= gcd (tmp, newtonPolyg[2][0]);
+        tmp= gcd (tmp, newtonPolyg[2][1]);
+        if (isRat)
+          On (SW_RATIONAL);
+        if (tmp == 1)
+        {
+          for (int i= 0; i < sizeOfNewtonPolygon; i++)
+            delete [] newtonPolyg [i];
+          delete [] newtonPolyg;
+        }
+        return (tmp==1);
+      }
+    }
+  }
+  for (int i= 0; i < sizeOfNewtonPolygon; i++)
+    delete [] newtonPolyg [i];
+  delete [] newtonPolyg;
+  return false;
+}

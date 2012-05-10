@@ -459,6 +459,17 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     return factors;
   }
 
+  if (irreducibilityTest (A))
+  {
+    CFList factors;
+    factors.append (A);
+
+    appendSwapDecompress (factors, conv (contentAxFactors),
+                          conv (contentAyFactors), false, false, N);
+
+    normalize (factors);
+    return factors;
+  }
   bool swap= false;
   if (degree (A) > degree (A, x))
   {
