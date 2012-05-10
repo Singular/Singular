@@ -531,7 +531,7 @@ static proc Tail(def M)
 
   if( @DEBUG )
   {
-    "SSinit::StartingISRing";
+    "SSinit::NewRing(C, lex)";
     basering; 
 //    DetailedPrint(basering);
   }
@@ -587,6 +587,9 @@ static proc Tail(def M)
   attrib(MRES, "isHomog", @V);
   
   attrib(S, "InducionStart", @RANK);
+  attrib(S, "LEAD2SYZ", 1);
+  attrib(S, "TAILREDSYZ", 0);
+  attrib(S, "DEBUG", @DEBUG);
   
   if( @DEBUG )
   {
@@ -634,7 +637,13 @@ LIB "poly.lib"; // for lcm
 /// Compute L(Syz(L))
 proc SSComputeLeadingSyzygyTerms(def L)
 {
-  int @DEBUG = !system("with", "ndebug");
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
 
   if( @DEBUG )
   {
@@ -716,14 +725,21 @@ proc SSComputeLeadingSyzygyTerms(def L)
 }
 
 /// Compute Syz(L), where L is a monomial (leading) module
-proc SSCompute2LeadingSyzygyTerms(def L)
+proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
 {
-  int @DEBUG = !system("with", "ndebug");
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
 
   if( @DEBUG )
   {
     "SSCompute2LeadingSyzygyTerms::Input: ";
     L;
+    "@TAILREDSYZ: ", @TAILREDSYZ;
   }
 
   int i, j, r; 
@@ -769,12 +785,18 @@ proc SSCompute2LeadingSyzygyTerms(def L)
     S = S, M;
   }
 
-  // Make sure that 2nd syzygy terms are not reducible by 1st
-  def opts = option(get);
-  option(redSB); option(redTail); 
-  S = std(S); // binomial module
-  option(set, opts);
-//  kill opts;  
+  if( @TAILREDSYZ )
+  {
+    // Make sure that 2nd syzygy terms are not reducible by 1st
+    def opts = option(get);
+    option(redSB); option(redTail); 
+    S = std(S); // binomial module
+    option(set, opts);
+    //  kill opts;
+  } else
+  {
+    S = simplify(S, 2 + 32);
+  }
 
   S = sort(S, "ds", 1)[1]; // ,1 => reversed!
 
@@ -809,9 +831,15 @@ proc SSCompute2LeadingSyzygyTerms(def L)
 // -------------------------------------------------------- //
 
 /// TODO: save shortcut LM(m) * "t" -> ?
-proc SSReduce(poly m, def t, def L, def T, def LS)
+proc SSReduceTerm(poly m, def t, def L, def T, list #)
 {
-  int @DEBUG = !system("with", "ndebug");
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
 
   if( @DEBUG )
   {
@@ -821,7 +849,10 @@ proc SSReduce(poly m, def t, def L, def T, def LS)
     "term: ", t;
     "L: ", L;
     "T: ", T;
-    "LS: ", LS;
+    if( size(#) > 0 )
+    {
+      "LSyz: ", #;
+    }
 //    "attrib(LS, 'isSB')", attrib(LS, "isSB");
   }
   
@@ -836,7 +867,6 @@ proc SSReduce(poly m, def t, def L, def T, def LS)
 
   bigint c = leadcomp(t);
   int r = int(c);
-
   
   def a, b, nf, bb;
 
@@ -854,13 +884,24 @@ proc SSReduce(poly m, def t, def L, def T, def LS)
       {
 //        "b: ", b;
         bb = b * gen(k);
-        nf = NF(bb, LS);
+        nf = bb;
 
+        if( size(#) > 0 )
+        {
+          if( typeof(#[1]) == "module" )
+          {
+            nf = NF(bb, #[1]);
 //        "NF: ", nf;
+          }
+        }
+
         // while the complement (the fraction) is not reducible by leading syzygies 
         if( nf != 0 )
         {
-          s = bb + SSTraverse(b, k, L, T, LS);
+          /// TODO: save shortcut LM(m) * T[i] -> ?
+
+          // choose ANY such reduction... (with the biggest index?)
+          s = bb + SSTraverseTail(b, T[k], L, T, #);
           break;
         }
       }
@@ -868,47 +909,50 @@ proc SSReduce(poly m, def t, def L, def T, def LS)
   }  
   if( @DEBUG )
   {
-    "SSReduce::Output: ", s;
+    "SSReduceTerm::Output: ", s;
   }
   return (s);
 }
 
-/// TODO: save shortcut LM(m) * T[i] -> ?
-proc SSTraverse(poly m, int i, def L, def T, def LS)
+// TODO: store m * @tail -.-^-.-^-.--> ?
+proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
 {
-  int @DEBUG = !system("with", "ndebug");
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
 
   if( @DEBUG )
   {
     "SSTraverse::Input: ";
 
-    "index: ", i;
     "mult: ", m;
+    "tail: ", @tail; // T[i];
 
-    "lead: ", L[i];
-    "tail: ", T[i];
-
-    "LSyz: ", LS;
-//    "attrib(LS, 'isSB')", attrib(LS, "isSB");
+    if( size(#) > 0 )
+    {
+      "LSyz: "; #[1];
+    }
   }
-
-  //  reduce the product m * ( L[i] + T[i] ):
-//  SSReduce(m, L[i], L, T, LS);
-
-  def @tail = T[i]; def @l;
 
   vector s = 0;
 
+  def @l;
+
+  // iterate tail-terms in ANY order!
   while( size(@tail) > 0 )
   {
     @l = lead(@tail);
-    s = s + SSReduce(m, @l, L, T, LS);
+    s = s + SSReduceTerm(m, @l, L, T, #);
     @tail = @tail - @l;
   }
 
   if( @DEBUG )
   {
-    "SSTraverse::Output: ", s;
+    "SSTraverseTail::Output: ", s;
   }
   return (s);
 }
@@ -917,10 +961,16 @@ proc SSTraverse(poly m, int i, def L, def T, def LS)
 
 // module (N, LL, TT) = SSComputeSyzygy(L, T);
 // Compute Syz(L ++ T) = N = LL ++ TT
-proc SSComputeSyzygy(/*def M, */ def L, def T)
+proc SSComputeSyzygy(def L, def T)
 {
-  int @DEBUG = !system("with", "ndebug");
-
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
+  
   if( @DEBUG )
   {
     "SSComputeSyzygy::Input";
@@ -929,57 +979,84 @@ proc SSComputeSyzygy(/*def M, */ def L, def T)
 
 //    "iCompShift: ", iCompShift;
 
-//    "M: "; M;
     "L: "; L;
     "T: "; T;
   }
 
-  def a, a2; bigint c; int r, r2, k; poly aa, aa2;
+  def a; bigint c; int r, k; poly aa;
 
+  int @LEAD2SYZ = 0;
+  if( typeof( attrib(basering, "LEAD2SYZ") ) == "int" )
+  {
+    @LEAD2SYZ = attrib(basering, "LEAD2SYZ");
+  }
+
+  int @TAILREDSYZ = 1;
+  if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
+  {
+    @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
+//    @TAILREDSYZ;
+  }
+  
   /// Get the critical leading syzygy terms
-  // module LL = SSComputeLeadingSyzygyTerms(L);
-
-  module LL, LL2; (LL, LL2) = SSCompute2LeadingSyzygyTerms(L);
+  if( @LEAD2SYZ ) // & 2nd syz. term
+  {
+    def a2; int r2; poly aa2;  
+    module LL, LL2;
+    (LL, LL2) = SSCompute2LeadingSyzygyTerms(L, @TAILREDSYZ); // ++ 
+  } else
+  {
+    module LL = SSComputeLeadingSyzygyTerms(L);
+  }
 
   module TT, SYZ;
 
   if( size(LL) > 0 )
-  {  
+  {
+    list LS;
+
+    if( @TAILREDSYZ )
+    {
+      LS = list(LL);
+    }
+    
     vector @tail;
 
     for(k = ncols(LL); k > 0; k-- )
     {
       // leading syz. term:
       a = LL[k]; c = leadcomp(a); r = int(c); aa = leadmonomial(a);
+      //    "A: ", a, " --->>>> ", aa, " **** [", r, "]: ";
 
-      // 2nd syz. term:
-      a2 = LL2[k]; c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
+      /// TODO: save shortcut (aa) * T[r] -> ?
+      @tail = SSTraverseTail(aa, T[r], L, T, LS);
+             
+      // get the 2nd syzygy term...
+      
+      if( @LEAD2SYZ ) // with the 2nd syz. term:
+      {      
+        a2 = LL2[k]; c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
+        @tail = @tail + 
+             /// TODO: save shortcut (aa2) * T[r2] -> ?
+             a2 + SSTraverseTail(aa2, T[r2], L, T, LS);
+      } else
+      {
+        @tail = @tail + SSReduceTerm(aa, L[r], L, T, LS);
+      }
       
       
-  //    "A: ", a, " --->>>> ", aa, " **** [", r, "]: ";
-      @tail = a2 +  
-             SSTraverse(aa, r, L, T, LL) + 
-             SSTraverse(aa2, r2, L, T, LL)
-//                SSReduce(aa, L[r], L, T, LL) // get the 2nd syzygy term...
-             ;
       TT[k] = @tail;
       SYZ[k] = a + @tail;
     }
   }
 
-/*  
+/*
   def opts = option(get); option(redSB); option(redTail); 
-  module SYZ = std(syz(M)); // TODO: !!!!!!!!!!!
+  module SYZ = std(syz(M)); 
   option(set, opts); kill opts;
-
-  "SYZ: ";  SYZ;  print(SYZ);
-
-  "shifted SYZ: ";  SYZ;  print(SYZ);
   
-  module LL, TT;
-
-  LL = lead(SYZ); // TODO: WRONG ORDERING!!!!!!!!
-  TT = Tail(SYZ);
+  module LL = lead(SYZ); // TODO: WRONG ORDERING!!!!!!!!
+  module TT = Tail(SYZ);
 */
   
   if( @DEBUG )
