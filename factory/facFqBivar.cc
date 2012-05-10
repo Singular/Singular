@@ -1891,7 +1891,6 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   l= tmax (l, 2);
   if (start > l)
     l= start;
-  int startl= l;
   int oldL= l/2;
   bool reduced= false;
   Variable y= F.mvar();
@@ -2009,7 +2008,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
           irreducible= true;
           break;
         }
-        if (isReduced (NTLN) && l > startl)
+        if (isReduced (NTLN))
         {
           reduced= true;
           break;
