@@ -694,41 +694,54 @@ BOOLEAN getFVector(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN grFan(leftv res, leftv h)
+gfan::ZMatrix rays(gfan::ZFan* zf)
 {
-  /*======== GFAN ==============*/
-  /*
-   WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
-  */
-  /*
-    heuristic:
-    0 = keep all Groebner bases in memory
-    1 = write all Groebner bases to disk and read whenever necessary
-    2 = use a mixed heuristic, based on length of Groebner bases
-  */
-  if( h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
+  int linDim = zf->getLinealityDimension();
+  gfan::ZMatrix rays(0,zf->getAmbientDimension());
+  for (int i=0; i<zf->numberOfConesOfDimension(linDim+1,0,0); i++)
   {
-    int heuristic;
-    heuristic=(int)(long)h->next->Data();
-    ideal I=((ideal)h->Data());
-    #ifndef USE_ZFAN
-        #define USE_ZFAN
-    #endif
-    #ifndef USE_ZFAN
-    res->rtyp=LIST_CMD; //res->rtyp=coneID; res->data(char*)zcone;
-    res->data=(lists) grfan(I,heuristic,FALSE);
-    #else
-    res->rtyp=fanID;
-    res->data=(void*)(grfan(I,heuristic,FALSE));
-    #endif
-    return FALSE;
+    gfan::ZCone zc = zf->getCone(linDim+1, i, 0, 0);
+    rays.append(zc.extremeRays());
   }
-  else
-  {
-    WerrorS("Usage: grfan(<ideal>,<int>)");
-    return TRUE;
-  }
+  return rays;
 }
+
+
+// BOOLEAN grFan(leftv res, leftv h)
+// {
+//   /*======== GFAN ==============*/
+//   /*
+//    WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
+//   */
+//   /*
+//     heuristic:
+//     0 = keep all Groebner bases in memory
+//     1 = write all Groebner bases to disk and read whenever necessary
+//     2 = use a mixed heuristic, based on length of Groebner bases
+//   */
+//   if( h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
+//   {
+//     int heuristic;
+//     heuristic=(int)(long)h->next->Data();
+//     ideal I=((ideal)h->Data());
+//     #ifndef USE_ZFAN
+//         #define USE_ZFAN
+//     #endif
+//     #ifndef USE_ZFAN
+//     res->rtyp=LIST_CMD; //res->rtyp=coneID; res->data(char*)zcone;
+//     res->data=(lists) grfan(I,heuristic,FALSE);
+//     #else
+//     res->rtyp=fanID;
+//     res->data=(void*)(grfan(I,heuristic,FALSE));
+//     #endif
+//     return FALSE;
+//   }
+//   else
+//   {
+//     WerrorS("Usage: grfan(<ideal>,<int>)");
+//     return TRUE;
+//   }
+// }
   //Possibility to have only one Groebner cone computed by specifying a weight vector FROM THE RELATIVE INTERIOR!
   //Needs wp as ordering!
 //   if(strcmp(sys_cmd,"grcone")==0)
@@ -776,7 +789,7 @@ void bbfan_setup()
   iiAddCproc("","getFVector",FALSE,getFVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
   iiAddCproc("","containsInSupport",FALSE,containsInSupport);
-  iiAddCproc("","grFan",FALSE,grFan);
+  // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
 }
