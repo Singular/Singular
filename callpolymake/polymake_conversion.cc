@@ -310,7 +310,6 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
   if (pf->isa("PolyhedralFan"))
   {
     int d = (int) pf->give("FAN_AMBIENT_DIM");
-    Print("creating an empty fan of dimension %d\n",d);
     gfan::ZFan* zf = new gfan::ZFan(d);
 
     int n = pf->give("N_MAXIMAL_CONES");

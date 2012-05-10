@@ -204,6 +204,7 @@ d;
 @menu
 * canonicalizeCone::
 * coneLink::
+* containsAsFace::
 * containsInSupport::
 * containsPositiveVector::
 * containsRelatively::
@@ -215,19 +216,18 @@ d;
 * facets::
 * generatorsOfLinealitySpace::
 * generatorsOfSpan::
+* getmultiplicity::
 * impliedEquations::
 * inequalities::
 * linealityDimension::
 * linealitySpace::
 * linearForms::
-* multiplicity::
 * negatedCone::
 * quotientLatticeBasis::
 * rays::
 * relativeInteriorPoint::
 * semigroupGenerator::
 * uniquePoint::
-* hasFace::
 * intersectCones::
 * isFullSpace::
 * isOrigin::
@@ -271,7 +271,7 @@ canonicalizeCone(c);
 @end smallexample
 @end table
 @c --------------------------------------
-@node coneLink,containsInSupport,canonicalizeCone,cone related functions
+@node coneLink,containsAsFace,canonicalizeCone,cone related functions
 @subsubsection coneLink
 @cindex coneLink
 
@@ -302,7 +302,37 @@ print(rays(cd));
 @end smallexample
 @end table
 @c --------------------------------------
-@node containsInSupport,containsPositiveVector,coneLink,cone related functions
+@node containsAsFace,coneLink,containsInSupport,cone related functions
+@subsubsection containsAsFace
+@cindex containsAsFace
+
+@table @code
+@item @strong{Syntax:}
+@code{containsAsFace(} cone c1, cone c2 @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+1 iff c1 contains c2 as a face; 0 otherwise
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaRays(M);
+intmat N1[1][2]=
+1,1;
+cone d1=coneViaRays(N1);
+containsAsFace(c,d1);
+intmat N2[1][2]=
+0,1;
+cone d2=coneViaRays(N2);
+containsAsFace(c,d2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node containsAsFace,containsPositiveVector,coneLink,cone related functions
 @subsubsection containsInSupport
 @cindex containsInSupport
 
@@ -600,7 +630,7 @@ print(L);
 @end smallexample
 @end table
 @c --------------------------------------
-@node generatorsOfSpan,impliedEquations,generatorsOfLinealitySpace,cone related functions
+@node generatorsOfSpan,getMultiplicity,generatorsOfLinealitySpace,cone related functions
 @subsubsection generatorsOfSpan
 @cindex generatorsOfSpan
 
@@ -625,7 +655,33 @@ print(S);
 @end smallexample
 @end table
 @c --------------------------------------
-@node impliedEquations,inequalities,generatorsOfSpan,cone related functions
+@node getMultiplicity,inequalities,generatorsOfSpan,cone related functions
+@subsubsection getMultiplicity
+@cindex getMultiplicity
+
+@table @code
+@item @strong{Syntax:}
+@code{getMultiplicity(} cone c @code{)}
+@*@code{getMultiplicity(} polytope p @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+getMultiplicity of the cone (can be set by setMultiplicity); returns 1 if not set
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaRays(M);
+getMultiplicity(c);
+setMultiplicity(c,3);
+getMultiplicity(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node impliedEquations,inequalities,getMultiplicity,cone related functions
 @subsubsection impliedEquations
 @cindex impliedEquations
 
@@ -744,7 +800,7 @@ l2;
 @end smallexample
 @end table
 @c --------------------------------------
-@node linearForms,multiplicity,linealitySpace,cone related functions
+@node linearForms,negatedCone,linealitySpace,cone related functions
 @subsubsection linearForms
 @cindex linearForms
 
@@ -771,33 +827,7 @@ linearForms(c);
 @end smallexample
 @end table
 @c --------------------------------------
-@node multiplicity,negatedCone,linearForms,cone related functions
-@subsubsection multiplicity
-@cindex multiplicity
-
-@table @code
-@item @strong{Syntax:}
-@code{multiplicity(} cone c @code{)}
-@*@code{multiplicity(} polytope p @code{)}
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-multiplicity of the cone (can be set by setMultiplicity); returns 1 if not set
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[2][3]=
--1,0,0,
-0,-1,0;
-cone c=coneViaRays(M);
-multiplicity(c);
-setMultiplicity(c,3);
-multiplicity(c);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node negatedCone,quotientLatticeBasis,multiplicity,cone related functions
+@node negatedCone,quotientLatticeBasis,linearForms,cone related functions
 @subsubsection negatedCone
 @cindex negatedCone
 
@@ -930,7 +960,7 @@ semigroupGenerator(c);
 @end smallexample
 @end table
 @c --------------------------------------
-@node uniquePoint,hasFace,semigroupGenerator,cone related functions
+@node uniquePoint,intersectCones,semigroupGenerator,cone related functions
 @subsubsection uniquePoint
 @cindex uniquePoint
 
@@ -958,37 +988,7 @@ uniquePoint(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node hasFace,intersectCones,uniquePoint,cone related functions
-@subsubsection hasFace
-@cindex hasFace
-
-@table @code
-@item @strong{Syntax:}
-@code{hasFace(} cone c1, cone c2 @code{)}
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-1 iff c1 contains c2 as a face; 0 otherwise
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[2][2]=
-1,0,
-0,1;
-cone c=coneViaRays(M);
-intmat N1[1][2]=
-1,1;
-cone d1=coneViaRays(N1);
-hasFace(c,d1);
-intmat N2[1][2]=
-0,1;
-cone d2=coneViaRays(N2);
-hasFace(c,d2);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node intersectCones,isFullSpace,hasFace,cone related functions
+@node intersectCones,isFullSpace,uniquePoint,cone related functions
 @subsubsection intersectCones
 @cindex intersectCones
 

@@ -786,6 +786,14 @@ BOOLEAN rays(leftv res, leftv args)
     res->data = (void*)zMatrix2Intvec(zmat);
     return FALSE;
   }
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    gfan::ZMatrix zmat = rays(zf);
+    res->rtyp = INTMAT_CMD;
+    res->data = (void*)zMatrix2Intvec(zmat);
+    return FALSE;
+  }
   WerrorS("rays: unexpected parameters");
   return TRUE;
 }
@@ -925,7 +933,7 @@ BOOLEAN linealityDimension(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN multiplicity(leftv res, leftv args)
+BOOLEAN getMultiplicity(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == coneID))
@@ -939,7 +947,7 @@ BOOLEAN multiplicity(leftv res, leftv args)
     res->data = (void*) i;
     return FALSE;
   }
-  WerrorS("multiplicity: unexpected parameters");
+  WerrorS("getMultiplicity: unexpected parameters");
   return TRUE;
 }
 
@@ -1372,7 +1380,7 @@ void bbcone_setup()
   iiAddCproc("","linealityDimension",FALSE,linealityDimension);
 
   iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
-  iiAddCproc("","multiplicity",FALSE,multiplicity);
+  iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
   iiAddCproc("","setLinearForms",FALSE,setLinearForms);
   iiAddCproc("","linearForms",FALSE,linearForms);
 
