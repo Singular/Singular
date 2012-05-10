@@ -661,12 +661,47 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
 }
 #endif
 
-int * computeBounds (const CanonicalForm& F, int& n)
+int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
 {
   n= degree (F, 1);
   int* result= new int [n];
   int sizeOfNewtonPolygon;
   int** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
+
+  isIrreducible= false;
+  if (sizeOfNewtonPolygon == 3)
+  {
+    bool check1=
+        (newtonPolyg[0][0]==0 || newtonPolyg[1][0]==0 || newtonPolyg[2][0]==0);
+    if (check1)
+    {
+      bool check2=
+        (newtonPolyg[0][1]==0 || newtonPolyg[1][1]==0 || newtonPolyg[2][0]==0);
+      if (check2)
+      {
+        int p=getCharacteristic();
+        int d=1;
+        char bufGFName='Z';
+        bool GF= (CFFactory::gettype()==GaloisFieldDomain);
+        if (GF)
+        {
+          d= getGFDegree();
+          bufGFName=gf_name;
+        }
+        setCharacteristic(0);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        tmp= gcd (tmp, newtonPolyg[1][0]);
+        tmp= gcd (tmp, newtonPolyg[1][1]);
+        tmp= gcd (tmp, newtonPolyg[2][0]);
+        tmp= gcd (tmp, newtonPolyg[2][1]);
+        isIrreducible= (tmp==1);
+        if (GF)
+          setCharacteristic (p, d, bufGFName);
+        else
+          setCharacteristic(p);
+      }
+    }
+  }
 
   int minX, minY, maxX, maxY;
   minX= newtonPolyg [0] [0];

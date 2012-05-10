@@ -2282,7 +2282,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                   )
 {
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
   mat_zz_p NTLN;
@@ -2413,7 +2421,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                   )
 {
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
   mat_zz_pE NTLN;
@@ -2476,7 +2492,9 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         {
           delete [] A;
           delete [] bounds;
-          return CFList (F);
+          CanonicalForm G= F;
+          F= 1;
+          return CFList (G);
         }
       }
     }
@@ -2546,7 +2564,15 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   int degMipo= degree (getMipo (info.getAlpha()));
   Variable alpha= info.getAlpha();
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
 
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
@@ -2667,6 +2693,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           tmp= mapDown (tmp, info, source, dest);
           delete [] A;
           delete [] bounds;
+          F= 1;
           return CFList (tmp);
         }
       }
@@ -2733,7 +2760,13 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
                     const Variable& alpha, int precision)
 {
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    return CFList (F);
+  }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
   zz_p::init (getCharacteristic());
@@ -2853,7 +2886,15 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
                        )
 {
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
   int extensionDeg= degree (getMipo (alpha));
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
@@ -2917,7 +2958,9 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         {
           delete [] A;
           delete [] bounds;
-          return CFList (F);
+          CanonicalForm G= F;
+          F= 1;
+          return CFList (G);
         }
       }
     }
@@ -4560,8 +4603,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   Variable y= F.mvar();
   Variable x= Variable (1);
   int d;
-  int* bounds= computeBounds (F, d);
-
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    return CFList (G);
+  }
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -4629,7 +4677,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   {
     F= H;
     delete [] bounds;
-    bounds= computeBounds (F, d);
+    bounds= computeBounds (F, d, isIrreducible);
+    if (isIrreducible)
+    {
+      smallFactors.append (F);
+      delete [] bounds;
+      return smallFactors;
+    }
     LCF= LC (F, 1);
 
     minBound= bounds[0];
@@ -5106,7 +5160,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   degs.refine();
 
   delete [] bounds;
-  bounds= computeBounds (F, d);
+  bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    result= Union (result, smallFactors);
+    result.append (F);
+    return result;
+  }
   minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -5213,7 +5274,13 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   CanonicalForm LCF= LC (F, 1);
 
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    return CFList (F);
+  }
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -5285,7 +5352,16 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   {
     F= H;
     delete [] bounds;
-    bounds= computeBounds (F, d);
+    bounds= computeBounds (F, d, isIrreducible);
+    if (isIrreducible)
+    {
+      delete [] bounds;
+      CFList source, dest;
+      CanonicalForm tmp= F (y - evaluation, y);
+      tmp= mapDown (tmp, info, source, dest);
+      smallFactors.append (tmp);
+      return smallFactors;
+    }
     LCF= LC (F, 1);
 
     minBound= bounds[0];
@@ -5576,7 +5652,17 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   degs.refine();
 
   delete [] bounds;
-  bounds= computeBounds (F, d);
+  bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CFList source, dest;
+    CanonicalForm tmp= F (y - evaluation, y);
+    tmp= mapDown (tmp, info, source, dest);
+    smallFactors.append (tmp);
+    result= Union (result, smallFactors);
+    return result;
+  }
   minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -5745,6 +5831,21 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       derivYZero= swap;
       swap= true;
     }
+  }
+
+  int boundsLength;
+  bool isIrreducible= false;
+  int * bounds= computeBounds (A, boundsLength, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    factors.append (A);
+
+    appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
+                          swap, false, N);
+
+    normalize (factors);
+    return factors;
   }
 
   bool fail= false;
@@ -5960,8 +6061,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   int liftBound= degree (A, y) + 1;
 
-  int boundsLength;
-  int * bounds= computeBounds (A, boundsLength);
+  if (swap2)
+    bounds= computeBounds (A, boundsLength, isIrreducible);
+
   int minBound= bounds[0];
   for (int i= 1; i < boundsLength; i++)
   {
