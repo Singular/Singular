@@ -21,6 +21,7 @@ finvar_l
 finvar2_l
 gcd0_l
 gcdp_l
+gcd_univar_p_create
 groebner_l
 hnoether_l
 homtest
