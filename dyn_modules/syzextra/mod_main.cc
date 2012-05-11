@@ -297,6 +297,68 @@ if ((s)->v != NULL) \
 
 
 
+
+
+
+static BOOLEAN Tail(leftv res, leftv h)
+{
+  NoReturn(res);
+
+  if( h == NULL )
+  {
+    WarnS("Tail needs an argument...");
+    return TRUE;
+  }
+
+  assume( h != NULL );
+
+  if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
+  {
+    const poly p = (const poly)h->Data();
+
+    res->rtyp = h->Typ();
+
+    if( p == NULL)
+      res->data = NULL;
+    else
+      res->data = p_Copy( pNext(p), currRing );
+
+    h = h->Next(); assume (h == NULL);
+    
+    return FALSE;
+  }
+
+  if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
+  {
+    const ideal id = (const ideal)h->Data();
+
+    res->rtyp = h->Typ();
+
+    if( id == NULL)
+      res->data = NULL;
+    else
+    {
+      const ideal newid = idInit(IDELEMS(id),id->rank);
+      for (int i=IDELEMS(id) - 1; i >= 0; i--)
+        if( id->m[i] != NULL )
+          newid->m[i] = p_Copy(pNext(id->m[i]), currRing);
+        else
+          newid->m[i] = NULL;
+      
+      res->data = newid; 
+    }
+    
+    h = h->Next(); assume (h == NULL);
+    
+    return FALSE;
+  }
+
+  WarnS("Tail needs a single poly/vector/ideal/module argument...");
+  return TRUE;
+}
+
+
+
 /// Get leading term without a module component
 static BOOLEAN leadmonom(leftv res, leftv h)
 {
@@ -792,6 +854,8 @@ int mod_init(SModulFunctions* psModulFunctions)
   ADD(psModulFunctions, currPack->libname, "leadmonomial", FALSE, leadmonom);
   ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
   ADD(psModulFunctions, currPack->libname, "leadrawexp", FALSE, leadrawexp);
+
+  ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
 
 
   ADD(psModulFunctions, currPack->libname, "ISUpdateComponents", FALSE, ISUpdateComponents);

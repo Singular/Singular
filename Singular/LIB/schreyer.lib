@@ -446,22 +446,19 @@ example
 
 LIB "general.lib"; // for sort
 
-// TODO: in C++!
-static proc Tail(def M)
+/* static proc Tail(def M) // DONE: in C++ (dyn. module: syzextra)!
 {
   int i = ncols(M); def m;
   while (i > 0)
   {
     m = M[i];
-
-    m = m - lead(m); // m = tail(m)
-    
-    M[i] = m;
-    
+    m = m - lead(m); // m = tail(m)    
+    M[i] = m;    
     i--;
   }
   return (M);
-}
+}*/
+
 
 /* static */ proc SSinit(def M)
 {
@@ -1425,6 +1422,7 @@ static proc loadme()
 //      exportto(Schreyer, Syzextra::reduce_syz);
 //      exportto(Schreyer, Syzextra::p_Content);
 
+      exportto(Schreyer, Syzextra::Tail);
     }
     else
     {
@@ -1457,6 +1455,7 @@ static proc loadme()
 //      exportto(Schreyer, Syzextra_g::reduce_syz);
 //      exportto(Schreyer, Syzextra_g::p_Content);
 
+      exportto(Schreyer, Syzextra_g::Tail);
       
     }
 
