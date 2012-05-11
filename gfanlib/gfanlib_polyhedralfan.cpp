@@ -861,8 +861,10 @@ int PolyhedralFan::size()const
 
 int PolyhedralFan::dimensionOfLinealitySpace()const
 {
-  assert(cones.size());//slow!
-  return cones.begin()->dimensionOfLinealitySpace();
+  if(cones.size()) //slow!
+    return 0;
+  else
+    return cones.begin()->dimensionOfLinealitySpace();
 }
 
 

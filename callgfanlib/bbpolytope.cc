@@ -422,7 +422,7 @@ BOOLEAN quickPolytopeViaNormals(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getVertices(leftv res, leftv args)
+BOOLEAN vertices(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == polytopeID))
@@ -433,7 +433,7 @@ BOOLEAN getVertices(leftv res, leftv args)
       res->data = (void*)zMatrix2Intvec(zmat);
       return FALSE;
     }
-  WerrorS("getVertices: unexpected parameters");
+  WerrorS("vertices: unexpected parameters");
   return TRUE;
 }
 
@@ -563,7 +563,7 @@ void bbpolytope_setup()
   iiAddCproc("","polytopeViaNormals",FALSE,polytopeViaNormals);
   iiAddCproc("","quickPolytopeViaVertices",FALSE,quickPolytopeViaVertices);
   iiAddCproc("","quickPolytopeViaNormals",FALSE,quickPolytopeViaNormals);
-  iiAddCproc("","getVertices",FALSE,getVertices);
+  iiAddCproc("","vertices",FALSE,vertices);
   iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   iiAddCproc("","scalePolytope",FALSE,scalePolytope);
   iiAddCproc("","dualPolytope",FALSE,dualPolytope);
