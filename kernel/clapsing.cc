@@ -60,9 +60,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     if (r->minpoly!=NULL)
     {
       bool b1=isOn(SW_USE_QGCD);
-      bool b2=isOn(SW_USE_fieldGCD);
       if ( rField_is_Q_a() ) On(SW_USE_QGCD);
-      else                   On(SW_USE_fieldGCD);
       CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
                                            r->algring);
       Variable a=rootOf(mipo);
@@ -70,7 +68,6 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
                     G( convSingAPFactoryAP( g,a,r ) );
       res= convFactoryAPSingAP( gcd( F, G ),currRing );
       if (!b1) Off(SW_USE_QGCD);
-      if (!b2) Off(SW_USE_fieldGCD);
     }
     else
     {

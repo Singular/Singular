@@ -24,7 +24,6 @@
 #include "cf_reval.h"
 #include "cf_random.h"
 #include "cf_primes.h"
-#include "fac_distrib.h"
 #include "templates/ftmpl_functions.h"
 #include "cf_map.h"
 #include "facHensel.h"
