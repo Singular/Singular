@@ -395,12 +395,12 @@ BOOLEAN quickInsertCone(leftv res, leftv args)
 BOOLEAN insertCone(leftv res, leftv args)
 {
   leftv u=args;
-  if ((u != NULL) && (u->Typ() == fanID))
+  if ((u != NULL) && (u->rtyp==IDHDL) && (u->e==NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == coneID))
     {
-      gfan::ZFan* zf = (gfan::ZFan*)u->CopyD();
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
       if (iscompatible(zf,zc))
@@ -408,6 +408,7 @@ BOOLEAN insertCone(leftv res, leftv args)
           zf->insert(*zc);
           res->rtyp = NONE;
           res->data = NULL;
+	  IDDATA((idhdl)u->data)=(char *)zf;
           return FALSE;
         }
       else
