@@ -216,7 +216,7 @@ d;
 * facets::
 * generatorsOfLinealitySpace::
 * generatorsOfSpan::
-* getmultiplicity::
+* getMultiplicity::
 * impliedEquations::
 * inequalities::
 * linealityDimension::
@@ -302,7 +302,7 @@ print(rays(cd));
 @end smallexample
 @end table
 @c --------------------------------------
-@node containsAsFace,coneLink,containsInSupport,cone related functions
+@node containsAsFace,containsInSupport,coneLink,cone related functions
 @subsubsection containsAsFace
 @cindex containsAsFace
 
@@ -332,7 +332,7 @@ containsAsFace(c,d2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node containsAsFace,containsPositiveVector,coneLink,cone related functions
+@node containsInSupport,containsPositiveVector,containsAsFace,cone related functions
 @subsubsection containsInSupport
 @cindex containsInSupport
 
@@ -655,7 +655,7 @@ print(S);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getMultiplicity,inequalities,generatorsOfSpan,cone related functions
+@node getMultiplicity,impliedEquations,generatorsOfSpan,cone related functions
 @subsubsection getMultiplicity
 @cindex getMultiplicity
 
@@ -1185,9 +1185,9 @@ intmat M[2][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-multiplicity(c);
+getMultiplicity(c);
 setMultiplicity(c,3);
-multiplicity(c);
+getMultiplicity(c);
 @c example
 @end smallexample
 @end table
@@ -1730,22 +1730,22 @@ See also @ref{ambientDimension},
 @ref{facets},
 @ref{inequalities},
 @ref{linearForms},
-@ref{multiplicity},
+@ref{getMultiplicity},
 @ref{setLinearForms},
 @ref{setMultiplicity}.
 
 @menu
-* getVertices::
+* vertices::
 @end menu
 
 @c --------------------------------------------------------------------
-@node getVertices,,,polytope related functions
-@subsubsection getVertices
-@cindex getVertices
+@node vertices,,,polytope related functions
+@subsubsection vertices
+@cindex vertices
 
 @table @code
 @item @strong{Syntax:}
-@code{getVertices(} polytope p @code{)}
+@code{vertices(} polytope p @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
@@ -1760,7 +1760,7 @@ intmat M[4][3]=
 1,2,2,
 1,1,1;
 polytope p=polytopeViaVertices(M);
-getVertices(p);
+vertices(p);
 @c example
 @end smallexample
 @end table
