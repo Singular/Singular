@@ -554,7 +554,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   int ** newtonPolyg= NULL;
   mat_ZZ MM;
   vec_ZZ V;
-  bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
+  bool compressConvexDense= false; //(ppA.level() == 2 && ppB.level() == 2);
   if (compressConvexDense)
   {
     CanonicalForm bufcA= cA;
@@ -1020,7 +1020,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   int ** newtonPolyg= NULL;
   mat_ZZ MM;
   vec_ZZ V;
-  bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
+  bool compressConvexDense= false; //(ppA.level() == 2 && ppB.level() == 2);
   if (compressConvexDense)
   {
     CanonicalForm bufcA= cA;
@@ -1477,7 +1477,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   int ** newtonPolyg= NULL;
   mat_ZZ MM;
   vec_ZZ V;
-  bool compressConvexDense= (ppA.level() == 2 && ppB.level() == 2);
+  bool compressConvexDense= false; //(ppA.level() == 2 && ppB.level() == 2);
   if (compressConvexDense)
   {
     CanonicalForm bufcA= cA;
