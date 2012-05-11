@@ -104,7 +104,10 @@ int main( int, char *argv[] )
   feInitResources(argv[0]);
 
 //  On (SW_USE_EZGCD); On (SW_USE_EZGCD_P); // TODO&NOTE: these switches lead to failed tests (with nonzero p)!
-  
+
+  Off (SW_USE_EZGCD);
+  Off (SW_USE_CHINREM_GCD);
+
   int t= test2 (0);
   if (t < 0)
     ret = t;
