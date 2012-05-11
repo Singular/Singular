@@ -22,7 +22,6 @@
 #include "cf_primes.h"
 #include "cf_algorithm.h"
 #include "algext.h"
-#include "fieldGCD.h"
 #include "cf_map.h"
 #include "cf_generator.h"
 

@@ -82,10 +82,6 @@
 #include <kernel/spectrum.h>
 #endif
 
-#ifdef HAVE_BIFAC
-#include <bifac.h>
-#endif
-
 #include <Singular/attrib.h>
 
 #if defined(HPUX_10) || defined(HPUX_9)
@@ -3460,93 +3456,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return(FALSE);
       }
       else
-  /*==================== bifac =================*/
-  #ifdef HAVE_BIFAC
-      if (strcmp(sys_cmd, "bifac")==0)
-      {
-        if (h->Typ()!=POLY_CMD)
-        {
-          WerrorS("`system(\"bifac\",<poly>) expected");
-          return TRUE;
-        }
-        if (!rField_is_Q())
-        {
-          WerrorS("coeff field must be Q");
-          return TRUE;
-        }
-        BIFAC B;
-        CFFList C;
-        int sw_rat=isOn(SW_RATIONAL);
-        On(SW_RATIONAL);
-        CanonicalForm F( convSingPClapP((poly)(h->Data())));
-        B.bifac(F, 1);
-        CFFList L=B.getFactors();
-        // construct the ring ==============================================
-        int i;
-        int lev=ExtensionLevel();
-        char **names=(char**)omAlloc0(lev*sizeof(char_ptr));
-        for(i=1;i<=lev; i++)
-        {
-          StringSetS("");
-          names[i-1]=omStrDup(StringAppend("a(%d)",i));
-        }
-        ring alg_ring=rDefault(0,lev,names);
-        ring new_ring=rCopy0(currRing); // all variable names, ordering etc.
-        new_ring->P=lev;
-        new_ring->parameter=names;
-        new_ring->algring=alg_ring;
-        new_ring->ch=1;
-        rComplete(new_ring,TRUE);
-        // set the mipo ===============================================
-        ring save_currRing=currRing; idhdl save_currRingHdl=currRingHdl;
-        rChangeCurrRing(alg_ring);
-        ideal mipo_id=idInit(lev,1);
-        for (i=lev; i>0;i--)
-        {
-          CanonicalForm Mipo=getMipo(Variable(-i),Variable(i));
-          mipo_id->m[i-1]=convClapPSingP(Mipo);
-        }
-        idShow(mipo_id);
-        alg_ring->qideal=mipo_id;
-        rChangeCurrRing(new_ring);
-        for (i=lev-1; i>=0;i--)
-        {
-          poly p=pOne();
-          lnumber n=(lnumber)pGetCoeff(p);
-          // no need to delete nac 1
-          n->z=(napoly)mipo_id->m[i];
-          mipo_id->m[i]=p;
-        }
-        new_ring->minideal=id_Copy(alg_ring->qideal,new_ring);
-        // convert factors =============================================
-        ideal fac_id=idInit(L.length(),1);
-        CFFListIterator J=L;
-        i=0;
-        intvec *v = new intvec( L.length() );
-        for ( ; J.hasItem(); J++,i++ )
-        {
-          fac_id->m[i]=convClapAPSingAP( J.getItem().factor() );
-          (*v)[i]=J.getItem().exp();
-        }
-        idhdl hh=enterid("factors",0,LIST_CMD,&(currRing->idroot),FALSE);
-        lists LL=(lists)omAllocBin( slists_bin);
-        LL->Init(2);
-        LL->m[0].rtyp=IDEAL_CMD;
-        LL->m[0].data=(char *)fac_id;
-        LL->m[1].rtyp=INTVEC_CMD;
-        LL->m[1].data=(char *)v;
-        IDDATA(hh)=(char *)LL;
-
-        rChangeCurrRing(save_currRing);
-        currRingHdl=save_currRingHdl;
-        if (!sw_rat) Off(SW_RATIONAL);
-
-        res->data=new_ring;
-        res->rtyp=RING_CMD;
-        return FALSE;
-      }
-      else
-  #endif
   /*==================== gcd-varianten =================*/
   #ifdef HAVE_FACTORY
       if (strcmp(sys_cmd, "gcd") == 0)
@@ -3559,9 +3468,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
           Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
           Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
-          Print("SPARSEMOD:%d (use SPARSEMOD for gcd of polynomials in char 0)\n",isOn(SW_USE_SPARSEMOD));
           Print("QGCD:%d (use QGCD for gcd of polynomials in alg. ext.)\n",isOn(SW_USE_QGCD));
-          Print("FGCD:%d (use fieldGCD for gcd of polynomials in Z/p)\n",isOn(SW_USE_fieldGCD));
 #endif
           Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
           return FALSE;
@@ -3578,9 +3485,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
           if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
           if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
-          if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); } else
           if (strcmp(s,"QGCD")==0) { if (d) On(SW_USE_QGCD); else Off(SW_USE_QGCD); } else
-          if (strcmp(s,"FGCD")==0) { if (d) On(SW_USE_fieldGCD); else Off(SW_USE_fieldGCD); } else
 #endif
           if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
           return TRUE;

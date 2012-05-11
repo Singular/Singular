@@ -4,7 +4,7 @@
 //
 // cf_chinese.cc - algorithms for chinese remaindering.
 //
-// Used by: cf_gcd.cc, cf_linsys.cc, sm_util.cc
+// Used by: cf_gcd.cc, cf_linsys.cc
 //
 // Header file: cf_algorithm.h
 //

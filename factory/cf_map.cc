@@ -4,7 +4,7 @@
 //
 // cf_map.cc - definition of class CFMap.
 //
-// Used by: cf_gcd.cc, fac_multivar.cc, sm_sparsemod.cc
+// Used by: cf_gcd.cc, fac_multivar.cc
 //
 //}}}
 

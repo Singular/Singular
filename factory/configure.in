@@ -548,4 +548,4 @@ AC_DEFINE_UNQUOTED(FACTORYVERSION, "$factory_version")
 AC_DEFINE_UNQUOTED(FACTORYCONFIGURATION, "$factory_configuration")
 AC_DEFINE_UNQUOTED(GFTABLEDIR, "$explicit_gftabledir")
 
-AC_OUTPUT(GNUmakefile ftest/GNUmakefile)
+AC_OUTPUT(GNUmakefile)
