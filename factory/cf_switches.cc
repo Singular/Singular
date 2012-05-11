@@ -37,6 +37,5 @@ CFSwitches::CFSwitches ()
   On(SW_USE_EZGCD);
   //On(SW_USE_EZGCD_P); // still testing
   On(SW_USE_QGCD);
-  //On(SW_USE_fieldGCD);
 }
 //}}}

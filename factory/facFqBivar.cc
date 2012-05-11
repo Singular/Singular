@@ -153,8 +153,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   ASSERT (A.isUnivariate(),
           "univariate polynomial expected or constant expected");
   CFFList factorsA;
-  ZZ p= to_ZZ (getCharacteristic());
-  ZZ_p::init (p);
+  zz_p::init (getCharacteristic());
   if (GF)
   {
     int k= getGFDegree();
@@ -165,13 +164,13 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (mipo.mapinto());
-      ZZ_pE::init (NTLMipo);
-      ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (buf, NTLMipo);
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (mipo.mapinto());
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (buf, NTLMipo);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pEX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_pE multi= to_ZZ_pE (1);
-      factorsA= convertNTLvec_pair_ZZpEX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pEX_long NTLFactorsA= CanZass (NTLA);
+      zz_pE multi= to_zz_pE (1);
+      factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                          x, beta);
     }
     else
@@ -197,13 +196,13 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   {
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (getMipo (alpha));
-      ZZ_pE::init (NTLMipo);
-      ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (A, NTLMipo);
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pEX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_pE multi= to_ZZ_pE (1);
-      factorsA= convertNTLvec_pair_ZZpEX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pEX_long NTLFactorsA= CanZass (NTLA);
+      zz_pE multi= to_zz_pE (1);
+      factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                            x, alpha);
     }
     else
@@ -234,11 +233,11 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 #else
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLA= convertFacCF2NTLZZpX (A);
+      zz_pX NTLA= convertFacCF2NTLzzpX (A);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_p multi= to_ZZ_p (1);
-      factorsA= convertNTLvec_pair_ZZpX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pX_long NTLFactorsA= CanZass (NTLA);
+      zz_p multi= to_zz_p (1);
+      factorsA= convertNTLvec_pair_zzpX_long2FacCFFList (NTLFactorsA, multi,
                                                           x);
     }
     else

@@ -40,7 +40,6 @@
 #include "cf_map_ext.h"
 
 #ifdef HAVE_NTL
-#include <NTL/ZZ_pEX.h>
 #include <NTLconvert.h>
 #endif
 
@@ -434,16 +433,15 @@ static inline
 void choose_extension (const int& d, const int& num_vars, Variable& beta)
 {
   int p= getCharacteristic();
-  ZZ NTLp= to_ZZ (p);
-  ZZ_p::init (NTLp);
-  ZZ_pX NTLirredpoly;
+  zz_p::init (p);
+  zz_pX NTLirredpoly;
   //TODO: replace d by max_{i} (deg_x{i}(f))
   int i= (int) (log ((double) ipower (d + 1, num_vars))/log ((double) p));
   int m= degree (getMipo (beta));
   if (i <= 1)
     i= 2;
   BuildIrred (NTLirredpoly, i*m);
-  CanonicalForm mipo= convertNTLZZpX2CF (NTLirredpoly, Variable(1));
+  CanonicalForm mipo= convertNTLzzpX2CF (NTLirredpoly, Variable(1));
   beta= rootOf (mipo);
 }
 
@@ -1334,12 +1332,11 @@ CanonicalForm
 randomIrredpoly (int i, const Variable & x)
 {
   int p= getCharacteristic();
-  ZZ NTLp= to_ZZ (p);
-  ZZ_p::init (NTLp);
-  ZZ_pX NTLirredpoly;
+  zz_p::init (p);
+  zz_pX NTLirredpoly;
   CanonicalForm CFirredpoly;
   BuildIrred (NTLirredpoly, i + 1);
-  CFirredpoly= convertNTLZZpX2CF (NTLirredpoly, x);
+  CFirredpoly= convertNTLzzpX2CF (NTLirredpoly, x);
   return CFirredpoly;
 }
 

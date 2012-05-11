@@ -77,7 +77,6 @@ SOURCES = \
 		facIrredTest.cc \
 		facMul.cc \
 		facSparseHensel.cc \
-		fieldGCD.cc \
 		ffops.cc \
 		FLINTconvert.cc \
 		gf_tabutil.cc \
@@ -89,13 +88,8 @@ SOURCES = \
 		int_poly.cc \
 		int_pp.cc \
 		int_rat.cc \
-		sm_sparsemod.cc \
-		sm_util.cc \
 		variable.cc \
 		NTLconvert.cc \
-		abs_fac.cc \
-		bifac.cc \
-		lgs.cc \
 		singext.cc \
 		parseutil.cc \
 		ftmpl_inst.cc
@@ -162,7 +156,6 @@ factory_headers = \
 		facIrredTest.h \
 		facMul.h \
 		facSparseHensel.h \
-		fieldGCD.h \
 		ffops.h \
 		FLINTconvert.h \
 		gf_tabutil.h \
@@ -174,14 +167,9 @@ factory_headers = \
 		int_poly.h \
 		int_pp.h \
 		int_rat.h \
-		sm_sparsemod.h \
-		sm_util.h \
 		timing.h \
 		variable.h \
 		NTLconvert.h \
-		bifac.h \
-		bifacConfig.h \
-		lgs.h \
 		algext.h \
 		singext.h \
 		parseutil.h
@@ -260,41 +248,8 @@ templatesrc =	templates/ftmpl_array.cc \
 hdrtemplsrc = 	factoryconf.template \
 		factory.template
 
-# FTE source files
-ftestsrc =	ftest/ftest_io.cc \
-		ftest/ftest_util.cc \
-		ftest/ntl_util.cc
-
-# FTE header files
-ftestincl =	ftest/ftest_io.h \
-		ftest/ftest_util.h \
-		ftest/ntl_util.h
-
-ftestm4src =	ftest/commonden.m4 \
-		ftest/degree.m4 \
-		ftest/deriv.m4 \
-		ftest/divides.m4 \
-		ftest/divrem.m4 \
-		ftest/extgcd.m4 \
-		ftest/factorize.m4 \
-		ftest/fbinops.m4 \
-		ftest/feval.m4 \
-		ftest/gcd.m4 \
-		ftest/gcd.ntl.m4 \
-		ftest/insert.m4 \
-		ftest/norm.m4 \
-		ftest/resultant.m4 \
-		ftest/revert.m4 \
-		ftest/sqrfree.m4 \
-		ftest/size.m4 \
-		ftest/totaldegree.m4
-
-ftestdistfiles = \
-		ftest/ftest_util.m4
-
 EXTRA_DIST =	test_install.cc \
 		$(templatesrc) $(hdrtemplsrc) \
-		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
 		doxygen.cfg factory.cfg \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
