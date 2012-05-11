@@ -341,4 +341,35 @@ for (int i= 1; i < 33002; i= i+33)
   }
 }
 
+ring r = 2,(x,y),dp;
+poly f=x^6 + y^5 + x^5 + y^4;
+poly g=x^6 + y^6 + x^5 + x^3 + x + 1;
+poly h=x^6 + x*y^5 + y^5 + y^4 + x*y^2 + y^3 + 1;
+list l1, l2, l3;
+for (int i= 1; i < 33002; i= i+33)
+{
+  system ("--random", i);
+  l1= factorize (f);
+  l2= factorize (g);
+  l3= factorize (h);
+  l1;
+  l2;
+  l3;
+  if (size (l1[1]) != 2)
+  {
+    l1;
+    break;
+  }
+  if (size (l2[1]) != 3)
+  {
+    l2;
+    break;
+  }
+  if (size (l3[1]) != 3)
+  {
+    l3;
+    break;
+  }
+}
+
 tst_status(1);$
