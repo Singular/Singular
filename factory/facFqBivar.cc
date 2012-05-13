@@ -1330,6 +1330,26 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
   Variable y= Variable (2);
   Variable x= Variable (1);
   CanonicalForm yToL= power (y, liftBound);
+  if (factors.length() == 2)
+  {
+    CanonicalForm tmp1, tmp2;
+    tmp1= factors.getFirst();
+    tmp2= factors.getLast();
+    tmp1 *= LC (F, x);
+    tmp1= mod (tmp1, yToL);
+    tmp1 /= content (tmp1, x);
+    tmp2 *= LC (F, x);
+    tmp2= mod (tmp2, yToL);
+    tmp2 /= content (tmp2, x);
+    if (degree (tmp1) + degree (tmp2) == degree (F))
+    {
+      factorsFound++;
+      F= 1;
+      reconstructedFactors.append (tmp1);
+      reconstructedFactors.append (tmp2);
+      return;
+    }
+  }
   CanonicalForm quot, buf;
   CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
@@ -1385,8 +1405,28 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
 {
   Variable y= Variable (2);
   Variable x= Variable (1);
-  CanonicalForm quot, buf;
   CanonicalForm yToL= power (y, liftBound);
+  if (factors.length() == 2)
+  {
+    CanonicalForm tmp1, tmp2;
+    tmp1= factors.getFirst();
+    tmp2= factors.getLast();
+    tmp1 *= LC (F, x);
+    tmp1= mod (tmp1, yToL);
+    tmp1 /= content (tmp1, x);
+    tmp2 *= LC (F, x);
+    tmp2= mod (tmp2, yToL);
+    tmp2 /= content (tmp2, x);
+    if (degree (tmp1) + degree (tmp2) == degree (F))
+    {
+      factorsFound++;
+      F= 1;
+      reconstructedFactors.append (tmp1);
+      reconstructedFactors.append (tmp2);
+      return;
+    }
+  }
+  CanonicalForm quot, buf;
   CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
@@ -1679,8 +1719,32 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
   CanonicalForm gamma= info.getGamma();
   CanonicalForm delta= info.getDelta();
   CanonicalForm yToL= power (y, liftBound);
-  CanonicalForm quot, buf, buf2;
   CFList source, dest;
+  if (factors.length() == 2)
+  {
+    CanonicalForm tmp1, tmp2;
+    tmp1= factors.getFirst();
+    tmp2= factors.getLast();
+    tmp1 *= LC (F, x);
+    tmp1= mod (tmp1, yToL);
+    tmp1 /= content (tmp1, x);
+    tmp2 *= LC (F, x);
+    tmp2= mod (tmp2, yToL);
+    tmp2 /= content (tmp2, x);
+    if (degree (tmp1) + degree (tmp2) == degree (F))
+    {
+      tmp1= tmp1 (y - evaluation, y);
+      tmp2= tmp2 (y - evaluation, y);
+      factorsFound++;
+      F= 1;
+      tmp1= mapDown (tmp1, info, source, dest);
+      tmp2= mapDown (tmp2, info, source, dest);
+      reconstructedFactors.append (tmp1);
+      reconstructedFactors.append (tmp2);
+      return;
+    }
+  }
+  CanonicalForm quot, buf, buf2;
   CFListIterator iter;
   for (long i= 1; i <= N.NumCols(); i++)
   {
