@@ -2,13 +2,13 @@
 #ifdef HAVE_FANS
 
 #include <Singular/ipid.h>
+#include <kernel/bigintmat.h>
 #include <Singular/blackbox.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
-#include <kernel/intvec.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
 
@@ -106,16 +106,22 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
 
 /* returns 1 iff all rows consist of entries 1..n,
    where n is the number of columns of the provided
-   intmat; 0 otherwise */
-static gfan::IntMatrix permutationIntMatrix(const intvec* iv)
+   bigintmat; 0 otherwise */
+static gfan::IntMatrix permutationIntMatrix(const bigintmat* iv)
 {
         int cc = iv->cols();
         int rr = iv->rows();
-        intvec* ivCopy = new intvec(rr, cc, 0);
+        bigintmat* ivCopy = new bigintmat(rr, cc);
         for (int r = 1; r <= rr; r++)
           for (int c = 1; c <= cc; c++)
-            IMATELEM(*ivCopy, r, c) = IMATELEM(*iv, r, c) - 1;
-        gfan::ZMatrix* zm = intmat2ZMatrix(ivCopy);
+	  {
+	    number temp1 = nlInit(1,NULL);
+	    number temp2 = nlSub(IMATELEM(*iv, r, c),temp1);
+	    ivCopy->set(r,c,temp2);
+	    nlDelete(&temp1,NULL); 
+	    nlDelete(&temp2,NULL);
+	  }
+        gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
         gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(*zm));
         delete zm;
         return *im;
@@ -135,12 +141,12 @@ static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
 
 static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
 {
-  intvec* permutations = (intvec*)v->Data();
+  bigintmat* permutations = (bigintmat*)v->Data();
   int ambientDim = permutations->cols();
   gfan::IntMatrix im = permutationIntMatrix(permutations);
   if (!gfan::Permutation::arePermutations(im))
   {
-    Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
+    Werror("provided bigintmat contains invalid permutations of {1, ..., %d}", ambientDim);
     return TRUE;
   }
   gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
@@ -163,7 +169,7 @@ BOOLEAN emptyFan(leftv res, leftv args)
   {
     if (u->next == NULL) return jjFANEMPTY_I(res, u);
   }
-  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  if ((u != NULL) && (u->Typ() == BIGINTMAT_CMD))
   {
     if (u->next == NULL) return jjFANEMPTY_IM(res, u);
   }
@@ -186,12 +192,12 @@ static BOOLEAN jjFANFULL_I(leftv res, leftv v)
 }
 static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
 {
-  intvec* permutations = (intvec*)v->Data();
+  bigintmat* permutations = (bigintmat*)v->Data();
   int ambientDim = permutations->cols();
   gfan::IntMatrix im = permutationIntMatrix(permutations);
   if (!gfan::Permutation::arePermutations(im))
   {
-    Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
+    Werror("provided bigintmat contains invalid permutations of {1, ..., %d}", ambientDim);
     return TRUE;
   }
   gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
@@ -223,7 +229,7 @@ BOOLEAN fullFan(leftv res, leftv args)
   {
     if (u->next == NULL) return jjFANFULL_I(res, u);
   }
-  if ((u != NULL) && (u->Typ() == INTMAT_CMD))
+  if ((u != NULL) && (u->Typ() == BIGINTMAT_CMD))
   {
     if (u->next == NULL) return jjFANFULL_IM(res, u);
   }
@@ -425,51 +431,6 @@ BOOLEAN insertCone(leftv res, leftv args)
   }
 }
 
-BOOLEAN containsInSupport(leftv res, leftv args)
-{
-  leftv u=args;
-  // if ((u != NULL) && (u->Typ() == fanID))          // TODO
-  // {
-  //   leftv v=u->next;
-  //   if ((v != NULL) && (v->Typ() == coneID))
-  //   {
-  //     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-  //     gfan::ZCone* zc = (gfan::ZCone*)v->Data();
-  //     gfan::ZMatrix zm = zc->extremeRays();
-  //     bool b = 1;
-  //     for(int i=1; i<zm->getHeight(); i++)
-  //     {
-
-  //     }
-  //     res->rtyp = INT_CMD;
-  //     res->data = (char*) (int) contains(zf,zc);
-  //     return FALSE;
-  //   }
-  // }
-  if ((u != NULL) && (u->Typ() == coneID))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) containsInSupport(zc,zd);
-      return FALSE;
-    }
-    if ((v != NULL) && (v->Typ() == INTVEC_CMD))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      intvec* vec = (intvec*)v->Data();
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) containsInSupport(zc,vec);
-      return FALSE;
-    }
-  }
-  WerrorS("containsInSupport: unexpected parameters");
-  return TRUE;
-}
-
 bool containsInCollection(gfan::ZFan* zf, gfan::ZCone* zc)
 {
   if((zf->getAmbientDimension() == zc->ambientDimension()))
@@ -528,10 +489,10 @@ BOOLEAN containsInCollection(leftv res, leftv args)
 //   leftv u=args;
 //   if ((u != NULL) && (u->Typ() == fanID))
 //   {
-//     if ((v != NULL) && (v->Typ() == INTVEC_CMD))
+//     if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
 //     {
 //       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-//       intvec* vec = (intvec*)v->Data();
+//       bigintmat* vec = (bigintmat*)v->Data();
 //     }
 //   }
 //   WerrorS("coneContaining: unexpected parameters");
@@ -687,8 +648,8 @@ BOOLEAN getFVector(leftv res, leftv args)
     {
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       gfan::ZVector zv=zf->getFVector();
-      res->rtyp = INTVEC_CMD;
-      res->data = (void*) zVector2Intvec(zv);
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(zv);
       return FALSE;
     }
   WerrorS("getFVector: unexpected parameters");
@@ -771,6 +732,7 @@ void bbfan_setup()
   iiAddCproc("","emptyFan",FALSE,emptyFan);
   iiAddCproc("","fullFan",FALSE,fullFan);
   /* the following functions are implemented in bbcone.cc */
+  // iiAddCproc("","containsInSupport",FALSE,containsInSupport);
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
   // iiAddCproc("","getCodimension",FALSE,getDimension);
   // iiAddCproc("","getDimension",FALSE,getDimension);
@@ -789,7 +751,6 @@ void bbfan_setup()
   iiAddCproc("","isComplete",FALSE,isComplete);
   iiAddCproc("","getFVector",FALSE,getFVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
-  iiAddCproc("","containsInSupport",FALSE,containsInSupport);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
