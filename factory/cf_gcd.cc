@@ -737,8 +737,9 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       else
         fc=GCD_small_p (fc, gc);
     }
+    else
     #endif
-    else if ( p1 == fc.level() )
+    if ( p1 == fc.level() )
       fc = gcd_poly_p( fc, gc );
     else
     {
