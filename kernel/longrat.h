@@ -46,6 +46,7 @@ struct snumber
 
 LINLINE BOOLEAN  nlEqual(number a, number b);
 LINLINE number   nlInit(int i, const ring r);
+LINLINE number nlInitgmp (mpz_t i);
 number nlRInit (long i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);

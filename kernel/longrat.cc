@@ -2155,6 +2155,19 @@ LINLINE number nlInit (int i, const ring r)
   return n;
 }
 
+number nlInitgmp (mpz_t i)
+{
+  number z=ALLOC_RNUMBER();
+#if defined(LDEBUG)
+  z->debug=123456;
+#endif
+  mpz_init_set(z->z,i);
+  z->s = 3;
+  nlNormalize(z);
+  return z;
+}
+
+
 
 /*2
 * a == 1 ?
