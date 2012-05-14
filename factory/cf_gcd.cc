@@ -1230,6 +1230,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   CanonicalForm Dn, test= 0;
   cl =  gcd (f.lc(),g.lc());
   CanonicalForm gcdcfcg= gcd (cf, cg);
+  CanonicalForm fp, gp;
   CanonicalForm b= 1;
   int minCommonDeg= 0;
   for (i= tmax (f.level(), g.level()); i > 0; i--)
@@ -1257,6 +1258,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   i = cf_getNumBigPrimes() - 1;
 
   CanonicalForm cof, cog, cofp, cogp, newCof, newCog, cofn, cogn;
+  int maxNumVars= tmax (getNumVars (f), getNumVars (g));
   //Off (SW_RATIONAL);
   while ( true )
   {
@@ -1269,12 +1271,21 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     //printf("try p=%d\n",p);
     setCharacteristic( p );
+    fp= mapinto (f);
+    gp= mapinto (g);
 #ifdef HAVE_NTL
-    Dp = GCD_small_p (mapinto (f), mapinto (g), cofp, cogp);
+    if (size (fp)/maxNumVars > 500 && size (gp)/maxNumVars > 500)
+      Dp = GCD_small_p (fp, gp, cofp, cogp);
+    else
+    {
+      Dp= gcd_poly (fp, gp);
+      cofp= fp/Dp;
+      cogp= gp/Dp;
+    }
 #else
-    Dp= gcd_poly (mapinto (f), mapinto (g));
-    cofp= mapinto (f)/Dp;
-    cogp= mapinto (g)/Dp;
+    Dp= gcd_poly (fp, gp);
+    cofp= fp/Dp;
+    cogp= gp/Dp;
 #endif
     Dp /=Dp.lc();
     cofp /= lc (cofp);
