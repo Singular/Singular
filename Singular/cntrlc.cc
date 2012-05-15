@@ -411,7 +411,7 @@ void sigint_handler(int sig)
         Tok2Cmdname(iiOp),my_yylinebuf);
       if (feGetOptValue(FE_OPT_EMACS) == NULL)
       {
-        fputs("abort  after this command(a), abort immidiately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
+        fputs("abort  after this command(a), abort immediately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
         c = fgetc(stdin);
       }
       else
