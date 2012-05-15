@@ -551,7 +551,7 @@ print(rays(d2));
 @code{equations(} cone c @code{)}
 @code{equations(} polytope p @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 equations given by the cone
 @item @strong{Example:}
@@ -561,12 +561,12 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat E1=equations(c1);
+bigintmat E1=equations(c1);
 print(E1);
 intmat M2[1][2]=
 1,0;
 cone c2=coneViaRays(M2);
-intmat E2=equations(c2);
+bigintmat E2=equations(c2);
 print(E2);
 @c example
 @end smallexample
@@ -581,7 +581,7 @@ print(E2);
 @code{facets(} cone c @code{)}
 @*@code{facets(} polytope p @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 inner normal vectors of the facets of the cone
 @item @strong{Example:}
@@ -591,13 +591,13 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat F1=facets(c1);
+bigintmat F1=facets(c1);
 print(F1);
 intmat M2[2][2]=
 1,1,
 0,-1;
 cone c2=coneViaRays(M2);
-intmat F2=facets(c2);
+bigintmat F2=facets(c2);
 print(F2);
 @c example
 @end smallexample
@@ -611,7 +611,7 @@ print(F2);
 @item @strong{Syntax:}
 @code{generatorsOfLinealitySpace(} cone c @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 generating vectors of the lineality space of the cone
 @item @strong{Example:}
@@ -624,7 +624,7 @@ intmat M[5][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaRays(M);
-intmat L=generatorsOfLinealitySpace(c);
+bigintmat L=generatorsOfLinealitySpace(c);
 print(L);
 @c example
 @end smallexample
@@ -638,7 +638,7 @@ print(L);
 @item @strong{Syntax:}
 @code{generatorsOfSpan(} cone c @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 generating vectors of the span of the cone
 @item @strong{Example:}
@@ -649,7 +649,7 @@ intmat M[3][5]=
 0,1,0,0,0,
 0,0,1,0,0;
 cone c=coneViaRays(M);
-intmat S=generatorsOfSpan(c);
+bigintmat S=generatorsOfSpan(c);
 print(S);
 @c example
 @end smallexample
@@ -689,7 +689,7 @@ getMultiplicity(c);
 @item @strong{Syntax:}
 @code{impliedEquations(} cone c @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 generating vectors of the orthogonal complement of the span of the cone
 @item @strong{Example:}
@@ -700,7 +700,7 @@ intmat M[3][5]=
 0,1,0,0,0,
 0,0,1,0,0;
 cone c=coneViaRays(M);
-intmat I=impliedEquations(c);
+bigintmat I=impliedEquations(c);
 print(I);
 @c example
 @end smallexample
@@ -714,7 +714,7 @@ print(I);
 @item @strong{Syntax:}
 @code{inequalities(} cone c @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 inequalities given by the cone
 @item @strong{Example:}
@@ -724,12 +724,12 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat I1=inequalities(c1);
+bigintmat I1=inequalities(c1);
 print(I);
 intmat M2[1][2]=
 1,0;
 cone c2=coneViaRays(M2);
-intmat I2=inequalities(c2);
+bigintmat I2=inequalities(c2);
 print(I2);
 @c example
 @end smallexample
@@ -860,7 +860,7 @@ print(rays(cn));
 @item @strong{Syntax:}
 @code{quotientLatticeBasis(} cone c @code{)}
 @item @strong{Type:}
-int
+bigintmat%
 @item @strong{Purpose:}
 quotient of Z^n intersected with the span of the cone with Z^n intersected with its lineality space
 @item @strong{Example:}
@@ -871,7 +871,7 @@ intmat M[3][2]=
 0,1,
 -1,0;
 cone c=coneViaRays(M);
-intmat Q=quotientLatticeBasis(c);
+bigintmat Q=quotientLatticeBasis(c);
 print(Q);
 @c example
 @end smallexample
@@ -885,7 +885,7 @@ print(Q);
 @item @strong{Syntax:}
 @code{rays(} cone c @code{)}
 @item @strong{Type:}
-intmat
+bigintmat
 @item @strong{Purpose:}
 rays of the cone outside the lineality space, rays inside the lineality space will be ignored
 @item @strong{Example:}
@@ -895,14 +895,14 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaRays(M1);
-intmat R1=rays(c1);
+bigintmat R1=rays(c1);
 print(R1);
 intmat M2[3][2]=
 1,0,
 0,1,
 -1,0;
 cone c2=coneViaRays(M2);
-intmat R2=rays(c2);
+bigintmat R2=rays(c2);
 print(R2);
 @c example
 @end smallexample
