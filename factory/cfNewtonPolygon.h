@@ -64,6 +64,15 @@ int* getRightSide (int** polygon,     ///<[in] vertices of a polygon
                    int& sizeOfOutput  ///<[in,out] size of the output
                   );
 
+/// computes the Newton polygon of F and checks if it satisfies the
+/// irreducibility criterion from S.Gao "Absolute irreducibility of polynomials
+/// via polytopes", Example 1
+///
+/// @return true if it satisfies the above criterion, false otherwise
+bool
+irreducibilityTest (const CanonicalForm& F ///<[in] a bivariate polynomial
+                   );
+
 #ifdef HAVE_NTL
 /// Algorithm 5 as described in Convex-Dense Bivariate Polynomial Factorization
 /// by Berthomieu, Lecerf
