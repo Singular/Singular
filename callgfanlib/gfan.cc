@@ -14,6 +14,7 @@ Date: 2009/11/03 06:57:32
 #include <kernel/ideals.h>
 #include <kernel/kmatrix.h>
 #include <kernel/GMPrat.h>
+#include <kernel/intvec.h>
 
 //#include "ring.h"        //apparently not needed
 #include <Singular/lists.h>
@@ -72,6 +73,18 @@ using namespace std;
 
 /** \brief The default constructor for facets
 */
+
+gfan::ZMatrix* intmat2ZMatrix(const intvec* iMat)
+{
+  int d=iMat->rows();
+  int n=iMat->cols();
+  gfan::ZMatrix* ret = new gfan::ZMatrix(d,n);
+  for(int i=0;i<d;i++)
+    for(int j=0;j<n;j++)
+      (*ret)[i][j]=IMATELEM(*iMat, i+1, j+1);
+  return ret;
+}
+
 facet::facet()
 {
         // Pointer to next facet.  */
