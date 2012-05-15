@@ -135,7 +135,7 @@ intmat E[1][3]=
 cone c=coneViaNormals(IE,E);
 c;
 // each inequalities gives rise to a facet
-intmat IE[4][3]=  
+intmat IE[2][3]=  
 0,1,-1,
 0,1,1;
 intmat E[1][3]=  
@@ -143,7 +143,7 @@ intmat E[1][3]=
 cone c=coneViaNormals(IE,E,1);
 c;
 // and the kernel of E is the span of the cone
-intmat IE[4][3]=  
+intmat IE[2][3]=  
 0,1,-1,
 0,1,1;
 intmat E[1][3]=  
