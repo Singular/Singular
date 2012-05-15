@@ -68,20 +68,11 @@ LIB "primdec.lib";
 
 proc mod_init()
 {
-//if (!defined(coneViaRays)) {
-//  LIB("gfanlib.so");
-//  export(Gfanlib);
-//}
-if (!defined(Polymake::minkowskiSum)) {
-  LIB("polymake.so");
-  export(Polymake);
-}
 newstruct("divisor","ideal den,ideal num");
 newstruct("formaldivisor","list summands");
 newstruct("pdivisor","list summands, cone tail");
 
 system("install","divisor","print",divisor_print,1);
-
 system("install","divisor","+",divisorplus,2);
 }
 

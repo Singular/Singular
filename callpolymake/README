@@ -1,0 +1,342 @@
+How to wrap a polymake function for singular:
+============================================
+
+The general form of a simple polymake wrapper function has the form
+
+BOOLEAN PMfunctionName(leftv res, leftv args)
+{
+
+  [1. reading the input and checking for correctness]
+
+  [2. converting the input to polymake types]
+
+  [3. doing the calculation in polymake]
+
+  [4. converting the result back to singular or gfan types]
+
+  [5. returning the result and ending the call]
+
+}
+
+There might be two exceptions to this form, namely
+
+[6. changing the input during the procedure]
+(and expecting the changes to be carried over in the console)
+
+[7. ending the call without returning any result]
+
+This readme will explain how each step can be done.
+
+
+1. reading the input and checking for correctness:
+-------------------------------------------------
+
+The input is stored in "args" which is of type leftv.
+
+Should the function need multiple arguments, 
+then first one will be stored in "leftv u = args",
+the second one will be stored in "leftv v = u->next",
+the third one will the stored in "leftv w = v->next",
+etc... 
+
+Given a leftv u which represents one of your arguments,
+you can see the type of the argument with "u->Typ()".
+A list of possible types can be found in "Singular/table.h",
+"coneID", "polytopeID", and "fanID" are also possible.
+
+Should the type of the input be incorrect,
+you can print an error message in the console
+through "WerrorS(" error message ");".
+
+Given a leftv u which represents one of your arguments,
+you must cast it to a suitable C++ type before starting 
+to work with it.
+
+EXAMPLE: 
+function calculating the minkowski sum of two convex objects,
+valid convex objects being either polytopes or cones.
+
+BOOLEAN PMminkowskiSum(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+
+      [converting the input to polymake types]
+
+      [doing the calculation in polymake]
+
+      [converting the result back to gfan types]
+
+      [returning the result and ending the call]
+    }
+  }
+  WerrorS("minkowskiSum: unexpected parameters");
+  [...]
+}
+
+
+
+2. converting the input to polymake types:
+-----------------------------------------
+
+To convert a Singular or Gfan C++ type to a polymake type,
+a list of functions at your disposition can be found in "polymake_conversion.h".
+
+Note that everything related to polymake 
+needs to be done in a "try{}" enviroment,
+because of the way polymake handles error.
+The error handling is done in the subsequent "catch{}".
+
+EXAMPLE:
+
+BOOLEAN PMminkowskiSum(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        
+        [converting the input to polymake types]
+
+        [doing the calculation in polymake]
+
+        [converting the result back to gfan types]
+
+      }
+      catch (const std::exception& ex) 
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+        [...]
+      }
+
+      [returning the result and ending the call]
+
+    }
+  }
+  WerrorS("minkowskiSum: unexpected parameters");
+  [...]
+}
+
+
+
+3. doing the calculation in polymake:
+------------------------------------
+
+To do the calculations in polymake, you need to know whether you 
+calculate properties or call functions,
+which can be found out by looking into the respective .rules file
+or by try and error.
+
+A detailed guide on doing both can be found under:
+http://www.polymake.org/doku.php/reference/clients
+
+Once you are done with polymake::perl::Objects, delete them manually.
+
+EXAMPLE:
+
+BOOLEAN PMminkowskiSum(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        delete pp, pq;
+
+        [converting the result back to singular or gfan types]
+
+      }
+      catch (const std::exception& ex)
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        [...]
+      }
+
+      [returning the result and ending the call]
+
+    }
+  }
+  WerrorS("minkowskiSum: unexpected parameters");
+  [...]
+}
+
+
+
+4. converting the result back to singular or gfan types:
+-------------------------------------------------------
+
+To convert a polymake C++ type to Singular or Gfan C++ type,
+a list of functions at your disposition can be found in "polymake_conversion.h".
+
+Note that the variable you are assigning the converted result to
+needs to be deklared outside the "try{}" enviroment.
+
+EXAMPLE:
+
+BOOLEAN PMminkowskiSum(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+      gfan::ZCone* ms;
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        delete pp, pq;
+        ms = PmPolytope2ZPolytope(&pms);
+      }
+      catch (const std::exception& ex) 
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+        [...]
+      }
+
+      [returning the result and ending the call]
+
+    }
+  }
+  WerrorS("minkowskiSum: unexpected parameters");
+  [...]
+}
+
+
+
+5. returning the result and ending the call:
+-------------------------------------------
+
+To return the result, you assign it to "leftv res".
+First you declare its type through setting "res->rtyp",
+then you assign the result to it 
+by passing a respective pointer to "res->data".
+
+To end the call, returning "FALSE" tells the Singular interpreter
+that the procedure terminated with no error,
+returning "TRUE" tells the Singular interpreter
+that the procedure terminated with an error.
+The appropiate message will then be shown in the console.
+
+BOOLEAN PMminkowskiSum(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+      gfan::ZCone* ms;
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        delete pp, pq;
+        ms = PmPolytope2ZPolytope(&pms);
+      }
+      catch (const std::exception& ex) 
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+        return TRUE;
+      }
+      res->rtyp = polytopeID;
+      res->data = (char*) ms;
+      return FALSE;
+    }
+  }
+  WerrorS("minkowskiSum: unexpected parameters");
+  return TRUE;
+}
+
+
+
+6. changing the input during the procedure:
+------------------------------------------
+(and expecting the changes to be carried over in the console)
+
+I have no clue how to do that, let me ask Hans.
+
+
+
+7. ending the call without returning any result:
+-----------------------------------------------
+
+If you don't want to return a result, simply set
+"res->rtyp = NONE;" and "res->data = NULL;".
+
+EXAMPLE:
+function calling the visual routines of polymake for a polytope or fan.
+
+BOOLEAN visual(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {  
+    gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+    try
+    {
+      polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+      VoidCallPolymakeFunction("jreality",pp->CallPolymakeMethod("VISUAL"));
+      delete pp;
+    }
+    catch (const std::exception& ex)
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    res->rtyp = NONE;
+    res->data = NULL;
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    try
+    {
+      polymake::perl::Object* pf=ZFan2PmFan(zf);
+      VoidCallPolymakeFunction("jreality",pf->CallPolymakeMethod("VISUAL"));
+    }    
+    catch (const std::exception& ex)
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+      return TRUE;
+    }
+    res->rtyp = NONE;
+    res->data = NULL;
+    return FALSE;
+  }
+  WerrorS("visual: unexpected parameters");
+  return TRUE;
+}

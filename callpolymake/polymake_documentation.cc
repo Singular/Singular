@@ -12,8 +12,19 @@
 void init_polymake_help()
 {
 
+  std::string polymake_banner = 
+    "Welcome to polymake\nCopyright (c) 1997-2012\nEwgenij Gawrilow, Michael Joswig (TU Darmstadt)\nhttp://www.polymake.org\n";
+
+  Print(omStrDup(polymake_banner.c_str()));
+
+  std::string polymake_help = 
+    "SHARED LIBRARY: polymake.so  Interface to polymake (http://www.polymake.org)\nAUTHORS: Janko Boehm, boehm@mathematik.uni-kl.de\n         Yue Ren,     ren@mathematik.uni-kl.de\n\nOVERVIEW:\nPolymake is a tool to study the combinatorics \nand the geometry of convex polytopes and polyhedra. \nIt is also capable of dealing with simplicial complexes, \nmatroids, polyhedral fans, graphs, tropical objects.\nThe interface relies on the callable library functionality,\nby Ewgenij Gawrilow.\n\nREFERENCES:\nEwgenij Gawrilow and Michael Joswig. polymake: a framework for analyzing convex polytopes. \nPolytopes—combinatorics and computation (Oberwolfach, 1997), 43–73, DMV Sem., 29, Birkhäuser, Basel, 2000. MR1785292 (2001f:52033)\n\nPROCEDURES:\n  boundaryLatticePoints(polytope p);\n  ehrhartPolynomialCoeff(polytope p);\n  facetVertexLatticeDistances(polytope p);\n  facetWidth(polytope p);\n  facetWidths(polytope p);\n  fVector(polytope p);\n  gorensteinIndex(polytope p);\n  gorensteinVector(polytope p);\n  hilbertBasis(cone c);\n  hStarVector(polytope p);\n  hVector(polytope p);\n  interiorLatticePoints(polytope p);\n  isBounded(polytope p);\n  isCanonical(polytope p);\n  isCompressed(polytope p);\n  isGorenstein(polytope p);\n  isLatticeEmpty(polytope p);\n  isNormal(polytope p);\n  isReflexive(polytope p);\n  isSmooth(polytope p);\n  isVeryAmple(polytope p);\n  latticeCodegree(polytope p);\n  latticeDegree(polytope p);\n  latticePoints(polytope p);\n  latticeVolume(polytope p);\n  maximalFace(polytope p, intvec v);\n  maximalValue(polytope p, intvec v);\n  minimalFace(polytope p, intvec v);\n  minimalValue(polytope p, intvec v);\n  minkowskiSum(polytope p, polytope q);\n  nBoundaryLatticePoints(polytope p);\n  nHilbertBasis(cone c);\n";
+
+  module_help_main("polymake.so",omStrDup(polymake_help.c_str()));
+
+
   std::string isReflexive_help = 
-    "USAGE:    isReflexive(p); p polytope\nRETURN:   int, 1 if p is reflexive and 0 otherwise\nKEYWORDS: polytopes; polymake; reflexive\nEXAMPLE:  example isReflexive shows an example\nexample\n{ \"EXAMPLE: \";\nintmat M[4][4]=1,1,0,0, 1,0,1,0, 1,0,0,1, 1,-1,-1,-1;\npolytope p = polytopeViaVertices(M);\nPolymake::isReflexive(p);\nintmat N[4][4]=1,2,0,0, 1,0,2,0, 1,0,0,2, 1,-2,-2,-2;\nq = polytopeViaVertices(N);\nPolymake::isReflexive(q);\n}\n";
+    "USAGE:    isReflexive(polytope p)\nRETURN:   int, 1 if p is reflexive and 0 otherwise\nKEYWORDS: polytopes; polymake; reflexive\nEXAMPLE:  example isReflexive shows an example\nexample\n{ \"EXAMPLE: \";\nintmat M[4][4]=1,1,0,0, 1,0,1,0, 1,0,0,1, 1,-1,-1,-1;\npolytope p = polytopeViaVertices(M);\nPolymake::isReflexive(p);\nintmat N[4][4]=1,2,0,0, 1,0,2,0, 1,0,0,2, 1,-2,-2,-2;\nq = polytopeViaVertices(N);\nPolymake::isReflexive(q);\n}\n";
 
  module_help_proc("polymake.so","isReflexive", omStrDup(isReflexive_help.c_str()));
 
