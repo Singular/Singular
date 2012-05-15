@@ -12,6 +12,11 @@
 void init_polymake_help()
 {
 
+  std::string polymake_banner = 
+    "Welcome to polymake\nCopyright (c) 1997-2012\nEwgenij Gawrilow, Michael Joswig (TU Darmstadt)\nhttp://www.polymake.org\n";
+
+  Print(omStrDup(polymake_banner.c_str()));
+
   std::string isReflexive_help = 
     "USAGE:    isReflexive(p); p polytope\nRETURN:   int, 1 if p is reflexive and 0 otherwise\nKEYWORDS: polytopes; polymake; reflexive\nEXAMPLE:  example isReflexive shows an example\nexample\n{ \"EXAMPLE: \";\nintmat M[4][4]=1,1,0,0, 1,0,1,0, 1,0,0,1, 1,-1,-1,-1;\npolytope p = polytopeViaVertices(M);\nPolymake::isReflexive(p);\nintmat N[4][4]=1,2,0,0, 1,0,2,0, 1,0,0,2, 1,-2,-2,-2;\nq = polytopeViaVertices(N);\nPolymake::isReflexive(q);\n}\n";
 
