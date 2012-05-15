@@ -2163,7 +2163,7 @@ number nlInitgmp (mpz_t i)
 #endif
   mpz_init_set(z->z,i);
   z->s = 3;
-  nlNormalize(z);
+  z=nlShort3(z);
   return z;
 }
 
