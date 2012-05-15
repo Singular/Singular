@@ -435,7 +435,7 @@ BOOLEAN coneViaNormals(leftv res, leftv args)
     if (u->next == NULL) return jjCONENORMALS1(res, u);
   }
   leftv v = u->next;
-  if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == BIGINTMAT_CMD)))
+  if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTMAT_CMD)))
   {
     if (v->next == NULL) return jjCONENORMALS2(res, u, v);
   }
