@@ -5434,6 +5434,8 @@ static BOOLEAN jjBRACK_Ma_I_IV(leftv res, leftv u, leftv v,leftv w)
     memcpy(u,&ut,sizeof(ut));
     if (u->Typ() == MATRIX_CMD)
       nok=jjBRACK_Ma(p,u,v,&t);
+    else if (u->Typ() == BIGINTMAT_CMD)
+      nok=jjBRACK_Bim(p,u,v,&t);
     else /* INTMAT_CMD */
       nok=jjBRACK_Im(p,u,v,&t);
     if (nok)
@@ -5482,6 +5484,8 @@ static BOOLEAN jjBRACK_Ma_IV_I(leftv res, leftv u, leftv v,leftv w)
     memcpy(u,&ut,sizeof(ut));
     if (u->Typ() == MATRIX_CMD)
       nok=jjBRACK_Ma(p,u,&t,w);
+    else if (u->Typ() == BIGINTMAT_CMD)
+      nok=jjBRACK_Bim(p,u,&t,w);
     else /* INTMAT_CMD */
       nok=jjBRACK_Im(p,u,&t,w);
     if (nok)
@@ -5536,6 +5540,8 @@ static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
       memcpy(u,&ut,sizeof(ut));
       if (u->Typ() == MATRIX_CMD)
         nok=jjBRACK_Ma(p,u,&t1,&t2);
+      else if (u->Typ() == BIGINTMAT_CMD)
+        nok=jjBRACK_Bim(p,u,&t1,&t2);
       else /* INTMAT_CMD */
         nok=jjBRACK_Im(p,u,&t1,&t2);
       if (nok)
