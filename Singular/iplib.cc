@@ -1133,6 +1133,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   return RET;
 #endif /*STATIC */
 }
+#endif /* HAVE_DYNAMIC_LOADING */
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
 {
@@ -1209,7 +1210,7 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
   }
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-
+#ifdef HAVE_DYNAMIC_LOADING
 // loads a dynamic module from the binary path and returns a named function
 // returns NULL, if something fails
 void* binary_module_function(const char* newlib, const char* funcname)
