@@ -515,7 +515,10 @@ public:
    */
   int reduceAndComputeRank()
   {
-    reduce();
+    if (typ::isField())
+      reduce();
+    else
+      reduce(false,true,false);
     int ret=0;
     int pivotI=-1;
     int pivotJ=-1;
