@@ -1043,7 +1043,6 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   return(0);
 }
 
-#ifdef HAVE_DYNAMIC_LOADING
 int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {
@@ -1056,6 +1055,7 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#ifdef HAVE_DYNAMIC_LOADING
 BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
 {
 #ifdef HAVE_STATIC
@@ -1210,7 +1210,6 @@ void module_help_proc(const char *newlib,const char *p, const char *help)
   }
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#ifdef HAVE_DYNAMIC_LOADING
 // loads a dynamic module from the binary path and returns a named function
 // returns NULL, if something fails
 void* binary_module_function(const char* newlib, const char* funcname)
@@ -1220,6 +1219,7 @@ void* binary_module_function(const char* newlib, const char* funcname)
 #ifdef HAVE_STATIC
   WerrorS("static version can not load function from dynamic modules");
 #else
+#ifdef HAVE_DYNAMIC_LOADING
   const char* bin_dir = feGetResource('b');
   if (!bin_dir)  { return NULL; }
 
@@ -1234,12 +1234,12 @@ void* binary_module_function(const char* newlib, const char* funcname)
   }
   result = dynl_sym(openlib, funcname);
   if (!result) Werror("%s: %s\n", funcname, dynl_error());
+#endif /* HAVE_DYNAMIC_LOADING */
 #endif
 
   return result;
 }
 
-#endif /* HAVE_DYNAMIC_LOADING */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 char mytoupper(char c)
