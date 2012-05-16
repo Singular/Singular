@@ -23,8 +23,9 @@
 
 @heading New data types
 @itemize @bullet
+@item bigintmat (@nref{bigintmat}) (experimental)
 @item fan (@nref{fan})  with 13 new functions (@nref{fan related functions})
-@item cone (@nref{cone}) with 34 new functions (@nref{cone related functions}).
+@item cone (@nref{cone}) with 34 new functions (@nref{cone related functions})
 @item polytope(@nref{polytope}) with 13 new functions (@nref{polytope related functions})
 @end itemize
 
@@ -48,6 +49,16 @@ curvepar.lib (@nref{curvepar_lib})
 grobcov.lib (@nref{grobcov_lib})
 @item
 modstd.lib (@nref{modstd_lib})
+@item
+renamed polymake.lib to oldpolymake.lib (@nref{oldpolymake_lib})
+@end itemize
+
+@heading Interface to gfanlib/polymake
+@itemize @bullet
+@item
+use gfanlib via fan/cone/polytope
+@item
+use polymake via @code{polymake.so}
 @end itemize
 @heading --------------------------------------------------------------------
 @heading Older versions:
