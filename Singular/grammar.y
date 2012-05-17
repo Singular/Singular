@@ -505,10 +505,6 @@ elemexpr:
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
           }
-        | elemexpr '.' elemexpr
-          {
-            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
-          }
         | elemexpr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
@@ -828,6 +824,10 @@ expr_arithmetic:
         | expr ':' expr
           {
             if(iiExprArith2(&$$,&$1,':',&$3)) YYERROR;
+          }
+        | expr '.' expr
+          {
+            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
           }
         | NOT expr
           {
