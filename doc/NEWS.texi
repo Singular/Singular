@@ -60,6 +60,12 @@ use gfanlib via fan/cone/polytope
 @item
 use polymake via @code{polymake.so}
 @end itemize
+
+@heading Internal Changes
+@itemize @bullet
+@item
+new factorization code for extension fields
+@end itemize
 @heading --------------------------------------------------------------------
 @heading Older versions:
 @heading News for version 3-1-3
