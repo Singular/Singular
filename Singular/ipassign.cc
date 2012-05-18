@@ -1484,6 +1484,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       /* a = ... */
       if ((lt!=MATRIX_CMD)
       &&(lt!=INTMAT_CMD)
+      &&(lt!=BIGINTMAT_CMD)
       &&((lt==rt)||(lt!=LIST_CMD)))
       {
         b=jiAssign_1(l,r);
@@ -1503,6 +1504,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       if (((lt!=LIST_CMD)
         &&((rt==MATRIX_CMD)
           ||(rt==INTMAT_CMD)
+          ||(rt==BIGINTMAT_CMD)
           ||(rt==INTVEC_CMD)
           ||(rt==MODUL_CMD)))
       ||((lt==LIST_CMD)
