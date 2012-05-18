@@ -1073,12 +1073,13 @@ void m2_end(int i)
   mmEndStat();
   #endif
   fe_reset_input_mode();
-  idhdl h = IDROOT;
+  idhdl h = currPack->idroot;
   while(h != NULL)
   {
     if(IDTYP(h) == LINK_CMD)
     {
       idhdl hh=h->next;
+      //Print("kill %s\n",IDID(h));
       killhdl(h, currPack);
       h = hh;
     }
@@ -1087,7 +1088,15 @@ void m2_end(int i)
       h = h->next;
     }
   }
-  if(!singular_in_batchmode)
+  extern link_list ssiToBeClosed;
+  link_list hh=ssiToBeClosed;
+  while(hh!=NULL)
+  {
+    //Print("close %s\n",hh->l->name);
+    slClose(hh->l);
+    hh=ssiToBeClosed;
+  }
+  if (!singular_in_batchmode)
   {
     if (i<=0)
     {
