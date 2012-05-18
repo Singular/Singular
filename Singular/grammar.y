@@ -591,6 +591,12 @@ elemexpr:
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
+        | expr '.' extendedid
+          {
+	    sleftv tmp;
+	    syMake(&tmp,$3);
+            if(iiExprArith2(&$$, &$1, '.', &tmp)) YYERROR;
+          }
         ;
 
 exprlist:
@@ -825,10 +831,6 @@ expr_arithmetic:
         | expr ':' expr
           {
             if(iiExprArith2(&$$,&$1,':',&$3)) YYERROR;
-          }
-        | expr '.' expr
-          {
-            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
           }
         | NOT expr
           {
