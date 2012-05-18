@@ -329,6 +329,7 @@ void yyerror(const char * fmt)
 %type <name> stringexpr
 %type <lv>   expr elemexpr exprlist expr_arithmetic
 %type <lv>   declare_ip_variable left_value
+%type <i>    error
 %type <i>    ordername
 %type <i>    cmdeq
 %type <i>    setrings
@@ -419,13 +420,13 @@ pprompt:
             if (inerror)
             {
 /*  bison failed here*/
-              if ((inerror!=3) && ($1.i<UMINUS) && ($1.i>' '))
+              if ((inerror!=3) && ($1<UMINUS) && ($1>' '))
               {
                 // 1: yyerror called
                 // 2: scanner put actual string
                 // 3: error rule put token+\n
                 inerror=3;
-                Print(" error at token `%s`\n",iiTwoOps($1.i));
+                Print(" error at token `%s`\n",iiTwoOps($1));
               }
 /**/
 

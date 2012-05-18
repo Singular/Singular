@@ -1,27 +1,36 @@
-/* A Bison parser, made by GNU Bison 1.875d.  */
+/* A Bison parser, made by GNU Bison 2.4.3.  */
 
-/* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+/* Skeleton interface for Bison's Yacc-like parsers in C
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2009, 2010 Free Software Foundation, Inc.
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+   
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
+
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -157,143 +166,14 @@
      UMINUS = 383
    };
 #endif
-#define DOTDOT 258
-#define EQUAL_EQUAL 259
-#define GE 260
-#define LE 261
-#define MINUSMINUS 262
-#define NOT 263
-#define NOTEQUAL 264
-#define PLUSPLUS 265
-#define COLONCOLON 266
-#define GRING_CMD 267
-#define BIGINTMAT_CMD 268
-#define INTMAT_CMD 269
-#define PROC_CMD 270
-#define RING_CMD 271
-#define BEGIN_RING 272
-#define IDEAL_CMD 273
-#define MAP_CMD 274
-#define MATRIX_CMD 275
-#define MODUL_CMD 276
-#define NUMBER_CMD 277
-#define POLY_CMD 278
-#define RESOLUTION_CMD 279
-#define VECTOR_CMD 280
-#define BETTI_CMD 281
-#define COEFFS_CMD 282
-#define COEF_CMD 283
-#define CONTRACT_CMD 284
-#define DEGREE_CMD 285
-#define DEG_CMD 286
-#define DIFF_CMD 287
-#define DIM_CMD 288
-#define DIVISION_CMD 289
-#define ELIMINATION_CMD 290
-#define E_CMD 291
-#define FAREY_CMD 292
-#define FETCH_CMD 293
-#define FREEMODULE_CMD 294
-#define KEEPRING_CMD 295
-#define HILBERT_CMD 296
-#define HOMOG_CMD 297
-#define IMAP_CMD 298
-#define INDEPSET_CMD 299
-#define INTERRED_CMD 300
-#define INTERSECT_CMD 301
-#define JACOB_CMD 302
-#define JET_CMD 303
-#define KBASE_CMD 304
-#define KOSZUL_CMD 305
-#define LEADCOEF_CMD 306
-#define LEADEXP_CMD 307
-#define LEAD_CMD 308
-#define LEADMONOM_CMD 309
-#define LIFTSTD_CMD 310
-#define LIFT_CMD 311
-#define MAXID_CMD 312
-#define MINBASE_CMD 313
-#define MINOR_CMD 314
-#define MINRES_CMD 315
-#define MODULO_CMD 316
-#define MONOM_CMD 317
-#define MRES_CMD 318
-#define MULTIPLICITY_CMD 319
-#define ORD_CMD 320
-#define PAR_CMD 321
-#define PARDEG_CMD 322
-#define PREIMAGE_CMD 323
-#define QUOTIENT_CMD 324
-#define QHWEIGHT_CMD 325
-#define REDUCE_CMD 326
-#define REGULARITY_CMD 327
-#define RES_CMD 328
-#define SIMPLIFY_CMD 329
-#define SORTVEC_CMD 330
-#define SRES_CMD 331
-#define STD_CMD 332
-#define SUBST_CMD 333
-#define SYZYGY_CMD 334
-#define VAR_CMD 335
-#define VDIM_CMD 336
-#define WEDGE_CMD 337
-#define WEIGHT_CMD 338
-#define VALTVARS 339
-#define VMAXDEG 340
-#define VMAXMULT 341
-#define VNOETHER 342
-#define VMINPOLY 343
-#define END_RING 344
-#define CMD_1 345
-#define CMD_2 346
-#define CMD_3 347
-#define CMD_12 348
-#define CMD_13 349
-#define CMD_23 350
-#define CMD_123 351
-#define CMD_M 352
-#define ROOT_DECL 353
-#define ROOT_DECL_LIST 354
-#define RING_DECL 355
-#define RING_DECL_LIST 356
-#define EXAMPLE_CMD 357
-#define EXPORT_CMD 358
-#define HELP_CMD 359
-#define KILL_CMD 360
-#define LIB_CMD 361
-#define LISTVAR_CMD 362
-#define SETRING_CMD 363
-#define TYPE_CMD 364
-#define STRINGTOK 365
-#define BLOCKTOK 366
-#define INT_CONST 367
-#define UNKNOWN_IDENT 368
-#define RINGVAR 369
-#define PROC_DEF 370
-#define BREAK_CMD 371
-#define CONTINUE_CMD 372
-#define ELSE_CMD 373
-#define EVAL 374
-#define QUOTE 375
-#define FOR_CMD 376
-#define IF_CMD 377
-#define SYS_BREAK 378
-#define WHILE_CMD 379
-#define RETURN 380
-#define PARAMETER 381
-#define SYSVAR 382
-#define UMINUS 383
 
 
 
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-typedef int YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 
 
