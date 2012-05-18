@@ -329,12 +329,12 @@ void yyerror(const char * fmt)
 %type <name> stringexpr
 %type <lv>   expr elemexpr exprlist expr_arithmetic
 %type <lv>   declare_ip_variable left_value
-%type <i>    error
 %type <i>    ordername
 %type <i>    cmdeq
 %type <i>    setrings
 %type <i>    ringcmd1
 %type <i>    mat_cmd
+%type <i>    error
 
 %type <i>    '=' '<' '>' '+' '-' COLONCOLON
 %type <i>    '/' '[' ']' '^' ',' ';'
@@ -506,6 +506,10 @@ elemexpr:
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
           }
+        | elemexpr '.' elemexpr
+          {
+            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
+          }
         | elemexpr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
@@ -590,12 +594,6 @@ elemexpr:
         | PROC_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
-          }
-        | expr '.' extendedid
-          {
-	    sleftv tmp;
-	    syMake(&tmp,$3);
-            if(iiExprArith2(&$$, &$1, '.', &tmp)) YYERROR;
           }
         ;
 
