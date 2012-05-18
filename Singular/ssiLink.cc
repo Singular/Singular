@@ -1193,7 +1193,7 @@ leftv ssiRead1(si_link l)
                 verbose=n98_o2;
                 return ssiRead1(l);
              }
-    case 99: ssiClose(l); exit(0);
+    case 99: ssiClose(l); m2_end(0);
     case 0: if (feof(d->f_read))
             {
               ssiClose(l);
