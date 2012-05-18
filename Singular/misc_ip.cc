@@ -1040,6 +1040,7 @@ void m2_end(int i)
       //    _exit(0);
       //  #endif
       //#endif
+      i=0;
     }
     else
     {
