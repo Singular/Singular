@@ -1390,7 +1390,7 @@ const char* slStatusSsi(si_link l, const char* request)
 int slStatusSsiL(lists L, int timeout)
 {
 // input: L: a list with links of type
-//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
+//           ssi-connect, ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
 //           Note: Not every entry in L must be set.
 //        timeout: timeout for select in micro-seconds
 //           or -1 for infinity
@@ -1467,10 +1467,10 @@ int slStatusSsiL(lists L, int timeout)
       { WerrorS("all links must be open"); return -2;}
       if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
       || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
-        && (strcmp(l->mode,"launch")!=0)))
+        && (strcmp(l->mode,"launch")!=0) && (strcmp(l->mode,"connect")!=0)))
       {
-        WerrorS("all links must be of type ssi:fork, ssi:tcp, MPtcp:fork\n");
-        WerrorS("or MPtcp:launch");
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect,");
+        WerrorS(" MPtcp:fork or MPtcp:launch");
         return -2;
       }
     #ifdef HAVE_MPSR

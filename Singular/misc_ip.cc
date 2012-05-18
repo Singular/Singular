@@ -1023,8 +1023,10 @@ void m2_end(int i)
       h = h->next;
     }
   }
-  if (i<=0)
+  if (!singular_in_batchmode)
   {
+    if (i<=0)
+    {
       if (TEST_V_QUIET)
       {
         if (i==0)
@@ -1032,20 +1034,17 @@ void m2_end(int i)
         else
           printf("\n$Bye.\n");
       }
-    //#ifdef sun
-    //  #ifndef __svr4__
-    //    _cleanup();
-    //    _exit(0);
-    //  #endif
-    //#endif
-    exit(0);
-  }
-  else
-  {
-      if(!singular_in_batchmode)
-      {
-        printf("\nhalt %d\n",i);
-      }
+      //#ifdef sun
+      //  #ifndef __svr4__
+      //    _cleanup();
+      //    _exit(0);
+      //  #endif
+      //#endif
+    }
+    else
+    {
+      printf("\nhalt %d\n",i);
+    }
   }
   #ifdef HAVE_MPSR
   if (MP_Exit_Env_Ptr!=NULL) (*MP_Exit_Env_Ptr)();
