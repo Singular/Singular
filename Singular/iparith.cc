@@ -2089,7 +2089,10 @@ static BOOLEAN jjFAREY_BI(leftv res, leftv u, leftv v)
   {
     number uu=(number)u->Data();
     number vv=(number)v->Data();
-    res->data=(char *)nlFarey(uu,vv,NULL);
+    mpz_t TEMP[8];
+    for (int i=0;i<8;i++) mpz_init(TEMP[i]);
+    res->data=(char *)nlFarey(uu,vv,(mpz_ptr)TEMP,NULL);
+    for (int i=0;i<8;i++) mpz_clear(TEMP[i]);
     return FALSE;
   }
   else return TRUE;
@@ -3689,6 +3692,11 @@ static BOOLEAN jjCOLS(leftv res, leftv v)
   res->data = (char *)(long)MATCOLS((matrix)(v->Data()));
   return FALSE;
 }
+static BOOLEAN jjCOLS_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(long)((bigintmat*)(v->Data()))->cols();
+  return FALSE;
+}
 static BOOLEAN jjCOLS_IV(leftv res, leftv v)
 {
   res->data = (char *)(long)((intvec*)(v->Data()))->cols();
@@ -4703,6 +4711,11 @@ static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
   res->data = (char *)i->rank;
+  return FALSE;
+}
+static BOOLEAN jjROWS_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(long)((bigintmat*)(v->Data()))->rows();
   return FALSE;
 }
 static BOOLEAN jjROWS_IV(leftv res, leftv v)
