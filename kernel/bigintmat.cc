@@ -65,14 +65,14 @@ bigintmat::bigintmat(int r, int c)
 
 void bigintmat::operator*=(int intop)
 {
+  number iop = nlInit(intop, NULL);
   for (int i=0; i<row*col; i++)
   {
-          number iop = nlInit(intop, NULL);
           number prod = nlMult(v[i], iop);
           nlDelete(&(v[i]), NULL);
-          nlDelete(&iop, NULL);
           v[i] = prod;
   }
+  nlDelete(&iop, NULL);
 }
 
 void bigintmat::operator*=(number bintop)
@@ -87,14 +87,14 @@ void bigintmat::operator*=(number bintop)
 
 void bigintmat::operator-=(int intop)
 {
+  number iop = nlInit(intop, NULL);
   for (int i=0; i<row*col; i++)
   {
-          number iop = nlInit(intop, NULL);
           number diff = nlSub(v[i], iop);
           nlDelete(&(v[i]), NULL);
-          nlDelete(&iop, NULL);
           v[i] = diff;
   }
+  nlDelete(&iop, NULL);
 }
 
 void bigintmat::operator-=(number bintop)
@@ -109,14 +109,14 @@ void bigintmat::operator-=(number bintop)
 
 void bigintmat::operator+=(int intop)
 {
+  number iop = nlInit(intop, NULL);
   for (int i=0; i<row*col; i++)
   {
-          number iop = nlInit(intop, NULL);
           number sum = nlAdd(v[i], iop);
           nlDelete(&(v[i]), NULL);
-          nlDelete(&iop, NULL);
           v[i] = sum;
   }
+  nlDelete(&iop, NULL);
 }
 
 void bigintmat::operator+=(number bintop)
