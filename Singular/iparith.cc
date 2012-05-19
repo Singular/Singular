@@ -2089,10 +2089,7 @@ static BOOLEAN jjFAREY_BI(leftv res, leftv u, leftv v)
   {
     number uu=(number)u->Data();
     number vv=(number)v->Data();
-    mpz_t TEMP[8];
-    for (int i=0;i<8;i++) mpz_init(TEMP[i]);
-    res->data=(char *)nlFarey(uu,vv,(mpz_ptr)TEMP,NULL);
-    for (int i=0;i<8;i++) mpz_clear(TEMP[i]);
+    res->data=(char *)nlFarey(uu,vv,NULL);
     return FALSE;
   }
   else return TRUE;
