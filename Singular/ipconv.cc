@@ -101,11 +101,10 @@ static void * iiP2V(void *data)
 static void * iiP2Id(void *data)
 {
   ideal I=idInit(1,1);
-
-  I->m[0]=(poly)data;
   if (data!=NULL)
   {
     poly p=(poly)data;
+    I->m[0]=p;
     if (pGetComp(p)!=0) I->rank=pMaxComp(p);
   }
   return (void *)I;
@@ -164,7 +163,10 @@ static void * iiBI2N(void *data)
 {
   if (currRing==NULL) return NULL;
   // a bigint is really a number from char 0, with diffrent operations...
-  return (void*)nInit_bigint((number)data);
+  number n=(number)data;
+  void *r= (void*)nInit_bigint(n);
+  nlDelete(&n,NULL);
+  return r;
 }
 
 static void * iiIm2Ma(void *data)
@@ -186,12 +188,18 @@ static void * iiIm2Ma(void *data)
 
 static void * iiIm2Bim(void *data)
 {
-  return (void *)iv2bim((intvec*)data);
+  intvec *iv=(intvec*)data;
+  void *r=(void *)iv2bim((intvec*)data);
+  delete iv;
+  return r;
 }
 
 static void * iiBim2Im(void *data)
 {
-  return (void *)bim2iv((bigintmat*)data);
+  bigintmat *b=(bigintmat*)data;
+  void *r=(void *)bim2iv((bigintmat*)data);
+  delete b;
+  return r;
 }
 
 static void * iiN2P(void *data)
