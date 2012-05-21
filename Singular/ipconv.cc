@@ -102,10 +102,10 @@ static void * iiP2Id(void *data)
 {
   ideal I=idInit(1,1);
 
-  I->m[0]=(poly)data;
   if (data!=NULL)
   {
     poly p=(poly)data;
+    I->m[0]=p;
     if (pGetComp(p)!=0) I->rank=pMaxComp(p);
   }
   return (void *)I;
@@ -189,12 +189,18 @@ static void * iiIm2Ma(void *data)
 
 static void * iiIm2Bim(void *data)
 {
-  return (void *)iv2bim((intvec*)data,coeffs_BIGINT);
+  intvec *iv=(intvec*)data;
+  void *r=(void *)iv2bim(iv,coeffs_BIGINT);
+  delete iv;
+  return r;
 }
 
 static void * iiBim2Im(void *data)
 {
-  return (void *)bim2iv((bigintmat*)data);
+  bigintmat *b=(bigintmat*)data;
+  void *r=(void *)bim2iv(b);
+  delete b;
+  return r;
 }
 
 static void * iiN2P(void *data)
