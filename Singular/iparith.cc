@@ -3673,6 +3673,11 @@ static BOOLEAN jjCOLS(leftv res, leftv v)
   res->data = (char *)(long)MATCOLS((matrix)(v->Data()));
   return FALSE;
 }
+static BOOLEAN jjCOLS_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(long)((bigintmat*)(v->Data()))->cols();
+  return FALSE;
+}
 static BOOLEAN jjCOLS_IV(leftv res, leftv v)
 {
   res->data = (char *)(long)((intvec*)(v->Data()))->cols();
@@ -4701,6 +4706,11 @@ static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
   res->data = (char *)i->rank;
+  return FALSE;
+}
+static BOOLEAN jjROWS_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(long)((bigintmat*)(v->Data()))->rows();
   return FALSE;
 }
 static BOOLEAN jjROWS_IV(leftv res, leftv v)
