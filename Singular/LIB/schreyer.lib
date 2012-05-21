@@ -524,7 +524,7 @@ LIB "general.lib"; // for sort
   def LEAD = lead(M);
 
   // sort wrt neg.deg.rev.lex!
-  intvec iv_ds = sort(LEAD, "ds", 1)[2]; // ,1 => reversed!
+  intvec iv_ds = sort(LEAD, "c,ds", 1)[2]; // ,1 => reversed!
 
   M = M[iv_ds]; // sort M wrt ds on current leading terms
   LEAD = LEAD[iv_ds];
@@ -555,7 +555,7 @@ LIB "general.lib"; // for sort
   {
     "SSinit::NewRing(C, lex)";
     basering; 
-//    DetailedPrint(basering);
+    DetailedPrint(basering);
   }
 
   // Setup the leading syzygy^{-1} module to zero:
@@ -600,7 +600,7 @@ LIB "general.lib"; // for sort
     }
   }
 
-  RES[size(RES)+1] = M; // list of all syzygy modules
+  RES [size(RES)+1] = M; // list of all syzygy modules
   LRES[size(LRES)+1] = LEAD; // list of all syzygy modules
   TRES[size(TRES)+1] = TAIL; // list of all syzygy modules
   
@@ -609,8 +609,8 @@ LIB "general.lib"; // for sort
   attrib(MRES, "isHomog", @V);
   
 //  attrib(S, "InducionStart", @RANK);
-  attrib(S, "LEAD2SYZ", 1);
-  attrib(S, "TAILREDSYZ", 0);
+  attrib(S, "LEAD2SYZ", 0);
+  attrib(S, "TAILREDSYZ", 1);
   attrib(S, "DEBUG", @DEBUG);
   attrib(S, "SYZCHECK", @SYZCHECK);
   
@@ -668,83 +668,102 @@ proc SSComputeLeadingSyzygyTerms(def L)
     int @DEBUG = !system("with", "ndebug");
   }
 
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
+  
   if( @DEBUG )
   {
     "SSComputeLeadingSyzygyTerms::Input: ";
     L;
   }
 
-  int i, j, r; intvec iv_ds;
-  int N = ncols(L);
-  def a, b;
-  poly aa, bb;
+  module SS = ComputeLeadingSyzygyTerms(L);
+  SS = sort(SS, "c,ds", 1)[1]; // ,1 => reversed! // TODO: not needed?
 
-  bigint c;
+  if( @SYZCHECK )
+  {  
+    int i, j, r; intvec iv_ds;
+    int N = ncols(L);
+    def a, b;
+    poly aa, bb;
 
-  ideal M;
+    bigint c;
 
-  module S = 0;
-  
-  for(i = 1; i <= N; i++)
-  {
-    a = L[i];
-//    "a: ", a;
-    c = leadcomp(a);
-    r = int(c);
+    ideal M;
 
-    if(r > 0)
+    module S = 0;
+
+    for(i = 1; i <= N; i++)
     {
-      aa = a[r];
-    } else
-    {
-      aa = a;
-    }
+      a = L[i];
+      c = leadcomp(a);
+      r = int(c);
 
-    M = 0;
-    
-    for(j = i-1; j > 0; j--)
-    {
-      b = L[j];
-//      "b: ", b;
+      aa = leadmonomial(a);
 
-      if( leadcomp(b) == c )
+      M = 0;
+
+      for(j = i-1; j > 0; j--)
       {
-        if(r > 0)
+        b = L[j];
+
+        if( leadcomp(b) == c )
         {
-          bb = b[r];
-        } else
-        {
-          bb = b;
+          bb = leadmonomial(b);
+
+          M[j] = (lcm(aa, bb) / aa);
         }
-
-        M[j] = (lcm(aa, bb) / aa);
       }
+
+      // TODO: add quotient relations here...
+
+      M = simplify(M, 1 + 2 + 32);
+
+      iv_ds = sort(M, "c,ds", 1)[2]; // ,1 => reversed!
+
+      M = M[iv_ds];
+
+      S = S, M * gen(i);
     }
-    
-    // TODO: add quotient relations here...
 
-    M = simplify(M, 1 + 2 + 32);
+    S = simplify(S, 2);
+    S = sort(S, "c,ds", 1)[1]; // ,1 => reversed! // TODO: not needed?
 
-    iv_ds = sort(M, "ds", 1)[2]; // ,1 => reversed!
+    if( size(module(matrix(S) - matrix(SS))) > 0 )
+    {
+        "ERROR: S != SS ";
 
-    M = M[iv_ds];
-    
-    S = S, M * gen(i);
+        "basering: ";
+        DetailedPrint(basering);
+
+        "S: ";  S;
+        DetailedPrint(S, 1);
+        "SS: "; SS;
+        DetailedPrint(SS, 1);
+
+        "DIFF: ";
+        print(matrix(S) - matrix(SS));
+        DetailedPrint(module(matrix(S) - matrix(SS)), 2);      
+        $
+    }
   }
 
-  S = simplify(S, 2);
-
-  S = sort(S, "ds", 1)[1]; // ,1 => reversed! // TODO: not needed?
   
   if( @DEBUG )
   {
     "SSComputeLeadingSyzygyTerms::Output: ";
-    S;
-  }  
+    "SS: "; 
+    SS;
+  }
+  
+  attrib(SS, "isSB", 1); 
 
-  attrib(S, "isSB", 1); 
-
-  return (S);
+  return (SS);
 }
 
 /// Compute Syz(L), where L is a monomial (leading) module
@@ -830,7 +849,7 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
     S = simplify(S, 2 + 32);
   }
 
-  S = sort(S, "ds", 1)[1]; // ,1 => reversed!
+  S = sort(S, "c,ds", 1)[1]; // ,1 => reversed!
 
   if( @DEBUG )
   {
@@ -1032,7 +1051,7 @@ proc SSComputeSyzygy(def L, def T)
     @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
 //    @TAILREDSYZ;
   }
-  
+
   /// Get the critical leading syzygy terms
   if( @LEAD2SYZ ) // & 2nd syz. term
   {
@@ -1077,8 +1096,7 @@ proc SSComputeSyzygy(def L, def T)
       } else
       {
         @tail = @tail + SSReduceTerm(aa, L[r], L, T, LS);
-      }
-      
+      }      
       
       TT[k] = @tail;
       SYZ[k] = a + @tail;
@@ -1315,7 +1333,7 @@ example
   kill S; setring r; kill M;
 */  
 
-  module M = maxideal(1); M;
+  ideal M = maxideal(1); M;
   def S = SSres(M, 0); setring S; S;
   MRES;
   RES;
@@ -1430,6 +1448,8 @@ static proc loadme()
 
       exportto(Top, Syzextra::ClearContent);
       exportto(Top, Syzextra::ClearDenominators);
+
+      exportto(Schreyer, Syzextra::m2_end);
       
 //      export Syzextra;
 
@@ -1452,8 +1472,7 @@ static proc loadme()
       exportto(Schreyer, Syzextra::ProfilerStart); exportto(Schreyer, Syzextra::ProfilerStop);
 
       exportto(Schreyer, Syzextra::Tail);
-
-      exportto(Schreyer, Syzextra::m2_end);
+      exportto(Schreyer, Syzextra::ComputeLeadingSyzygyTerms);      
     }
 /*
     else
@@ -1472,6 +1491,8 @@ static proc loadme()
       
       exportto(Top, Syzextra_g::ClearContent);
       exportto(Top, Syzextra_g::ClearDenominators);
+
+      exportto(Schreyer, Syzextra_g::m2_end);
 
 //      export Syzextra_g;
 //      exportto(Schreyer, Syzextra_g::noop);
@@ -1493,9 +1514,7 @@ static proc loadme()
       exportto(Schreyer, Syzextra_g::ProfilerStart); exportto(Schreyer, Syzextra_g::ProfilerStop);
 
       exportto(Schreyer, Syzextra_g::Tail);
-      
-      
-      exportto(Schreyer, Syzextra_g::m2_end);
+      exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);      
     }
 */
 

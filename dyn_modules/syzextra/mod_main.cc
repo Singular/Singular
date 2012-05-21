@@ -518,6 +518,167 @@ static BOOLEAN Tail(leftv res, leftv h)
 }
 
 
+static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
+{
+  const ring r = currRing;
+  NoReturn(res);
+
+  if( h == NULL )
+  {
+    WarnS("ComputeLeadingSyzygyTerms needs an argument...");
+    return TRUE;
+  }
+
+  assume( h != NULL );  
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
+  {
+    const ideal id = (const ideal)h->Data();
+
+    assume(id != NULL);
+
+    if( __DEBUG__ )
+    {
+      PrintS("ComputeLeadingSyzygyTerms::Input: \n");
+      
+      const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
+      const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
+      const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
+
+      Print("\nSYZCHECK: \t%d", __SYZCHECK__);
+      Print(", DEBUG: \t%d", __DEBUG__);
+      Print(", LEAD2SYZ: \t%d", __LEAD2SYZ__);
+      Print(", TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
+
+      dPrint(id, r, r, 1);
+    }
+
+    h = h->Next(); assume (h == NULL);
+
+    // 1. set of components S?
+    // 2. for each component c from S: set of indices of leading terms
+    // with this component?
+    // 3. short exp. vectors for each leading term?
+
+    const int size = IDELEMS(id);
+
+    if( size < 2 )
+    {
+      const ideal newid = idInit(1, 0); // zero ideal...
+
+      newid->m[0] = NULL;
+      
+      res->data = newid;
+      res->rtyp = MODUL_CMD;
+
+      return FALSE;
+    }
+    
+
+    // TODO/NOTE: input is supposed to be sorted wrt "C,ds"!??
+
+    // components should come in groups: count elements in each group
+    // && estimate the real size!!!
+
+
+    // use just a vector instead???
+    const ideal newid = idInit( (size * (size-1))/2, size); // maximal size: ideal case!
+    
+    int k = 0;
+
+    for (int j = 0; j < size; j++)
+    {
+      const poly p = id->m[j];
+      assume( p != NULL );
+      const int  c = p_GetComp(p, r);
+
+      for (int i = j - 1; i >= 0; i--)
+      {
+        const poly pp = id->m[i];
+        assume( pp != NULL );
+        const int  cc = p_GetComp(pp, r);
+
+        if( c != cc )
+          continue;
+
+        const poly m = p_Init(r); // p_New???
+
+        // m = LCM(p, pp) / p! // TODO: optimize: knowing the ring structure: (C/lp)!
+        for (int v = rVar(r); v > 0; v--)
+        {
+          assume( v > 0 );
+          assume( v <= rVar(r) );
+          
+          const short e1 = p_GetExp(p , v, r);
+          const short e2 = p_GetExp(pp, v, r);
+
+          if( e1 >= e2 )
+            p_SetExp(m, v, 0, r);
+          else
+            p_SetExp(m, v, e2 - e1, r);
+            
+        }
+
+        assume( (j > i) && (i >= 0) );
+
+        p_SetComp(m, j + 1, r);
+        pNext(m) = NULL;
+        p_SetCoeff0(m, n_Init(1, r->cf), r); // for later...
+
+        p_Setm(m, r); // should not do anything!!!
+
+        newid->m[k++] = m;
+      }
+    }
+
+    if( __DEBUG__ && FALSE )
+    {
+      PrintS("ComputeLeadingSyzygyTerms::Temp0: \n");
+      dPrint(newid, r, r, 1);
+    }
+
+    // the rest of newid is assumed to be zeroes...
+
+    // simplify(newid, 2 + 32)??
+    // sort(newid, "C,ds")[1]???
+    id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
+
+    if( __DEBUG__ && FALSE )
+    {
+      PrintS("ComputeLeadingSyzygyTerms::Temp1: \n");
+      dPrint(newid, r, r, 1);
+    }
+
+    idSkipZeroes(newid); // #define SIMPL_NULL 2
+
+    if( __DEBUG__ )
+    {
+      PrintS("ComputeLeadingSyzygyTerms::Output: \n");
+      dPrint(newid, r, r, 1);
+    }
+
+
+    // TODO: add sorting wrt <c,ds> & reversing...
+
+    res->data = newid;
+    res->rtyp = MODUL_CMD;
+    
+    return FALSE;
+  }
+
+  WarnS("ComputeLeadingSyzygyTerms needs a single ideal/module argument...");
+  return TRUE;
+}
+
+
+
+
 
 /// Get leading term without a module component
 static BOOLEAN leadmonom(leftv res, leftv h)
@@ -1035,8 +1196,6 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
   ADD(psModulFunctions, currPack->libname, "leadrawexp", FALSE, leadrawexp);
 
-  ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
-
   ADD(psModulFunctions, currPack->libname, "ISUpdateComponents", FALSE, ISUpdateComponents);
   ADD(psModulFunctions, currPack->libname, "SetInducedReferrence", FALSE, SetInducedReferrence);
   ADD(psModulFunctions, currPack->libname, "GetInducedData", FALSE, GetInducedData);
@@ -1052,8 +1211,13 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 
   ADD(psModulFunctions, currPack->libname, "p_Content", FALSE, _p_Content);
 
-  ADD(psModulFunctions, currPack->libname, "m2_end", FALSE, _m2_end);
+  ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
+  ADD(psModulFunctions, currPack->libname, "ComputeLeadingSyzygyTerms", FALSE, ComputeLeadingSyzygyTerms);
+  
   //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
+
+  ADD(psModulFunctions, currPack->libname, "m2_end", FALSE, _m2_end);
+
 #undef ADD  
   return 0;
 }
