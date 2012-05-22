@@ -1385,8 +1385,11 @@ BOOLEAN intersectCones(leftv res, leftv args)
       int d1 = zc1->ambientDimension();
       int d2 = zc2->ambientDimension();
       if (d1 != d2)
+      {
         Werror("expected ambient dims of both cones to coincide\n"
                "but got %d and %d", d1, d2);
+        return TRUE;
+      }
       gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
       zc3.canonicalize();
       res->rtyp = coneID;
