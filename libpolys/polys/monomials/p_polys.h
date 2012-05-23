@@ -257,25 +257,20 @@ static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
   __p_GetComp(p,r) = c;
   return c;
 }
-// sets component of poly a to i, returns length of p
+// sets component of poly a to i
 static inline   void p_SetCompP(poly p, int i, ring r)
 {
   if (p != NULL)
   {
 #ifdef PDEBUG
-    poly q = p;
-    int l = 0;
+    p_Test(p, r);
 #endif
-
     if (rOrd_SetCompRequiresSetm(r))
     {
       do
       {
         p_SetComp(p, i, r);
         p_SetmComp(p, r);
-#ifdef PDEBUG
-        l++;
-#endif
         pIter(p);
       }
       while (p != NULL);
@@ -285,17 +280,10 @@ static inline   void p_SetCompP(poly p, int i, ring r)
       do
       {
         p_SetComp(p, i, r);
-#ifdef PDEBUG
-        l++;
-#endif
         pIter(p);
       }
       while(p != NULL);
     }
-#ifdef PDEBUG
-    p_Test(q, r);
-    assume(l == pLength(q));
-#endif
   }
 }
 

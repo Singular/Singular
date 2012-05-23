@@ -1929,6 +1929,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
       if (   (o->ord_typ == ro_syzcomp)
           || (o->ord_typ == ro_syz)
           || (o->ord_typ == ro_is)
+          || (o->ord_typ == ro_am)
           || (o->ord_typ == ro_isTemp))
         return TRUE;
     }
