@@ -483,6 +483,61 @@ LIB "general.lib"; // for sort
   return (M);
 }*/
 
+/* static */
+proc MySort(def M)
+{
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
+
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
+
+
+  if( @DEBUG )
+  {
+    "MySort:: Input: "; M;
+  }
+
+  def @N = M; Sort_c_ds(@N);
+  
+  if( @SYZCHECK )
+  {
+    def iv = sort(lead(M), "c,ds", 1)[2]; // ,1 => reversed! // TODO: not needed?
+    def @M = M;
+    @M = M[iv];
+    
+    // 0^th syz. property
+    if( size(module( matrix(@N) - matrix(@M) )) > 0 )
+    {
+      "@M:"; @M;
+      "@N:"; @N;
+
+      "module( matrix(@N) - matrix(@M) ): ";
+      module( matrix(@N) - matrix(@M) );
+
+      "ERROR: wrong sorting in 'MySort': @N != @M!!!";
+      $
+    }
+  }
+
+  if( @DEBUG )
+  {
+    "MySort:: Ouput: "; @N;
+  }
+ 
+  return (@N);
+}
+
 
 /* static */ proc SSinit(def M)
 {
@@ -521,13 +576,51 @@ LIB "general.lib"; // for sort
     M = simplify(M, 2 + 4 + 32);
   }
 
-  def LEAD = lead(M);
+  def @N = MySort(M); // TODO: replace with inplace sorting!!!
+  def LEAD = lead(@N);
 
-  // sort wrt neg.deg.rev.lex!
-  intvec iv_ds = sort(LEAD, "c,ds", 1)[2]; // ,1 => reversed!
+  if( @SYZCHECK )
+  {
+    def @LEAD = lead(M);
 
-  M = M[iv_ds]; // sort M wrt ds on current leading terms
-  LEAD = LEAD[iv_ds];
+    // sort wrt neg.deg.rev.lex!
+    intvec iv_ds = sort(@LEAD, "c,ds", 1)[2]; // ,1 => reversed!
+
+    M = M[iv_ds]; // sort M wrt ds on current leading terms
+    @LEAD = @LEAD[iv_ds];
+
+    // 0^th syz. property
+    if( size(module( matrix(@N) - matrix(M) )) > 0 )
+    {
+      "M:"; M;
+      "@N:"; @N;
+
+      "module( matrix(@N) - matrix(M) ): ";
+      module( matrix(@N) - matrix(M) );
+
+      "ERROR: wrong sorting (in SSnit): @N != M!!!";
+      $
+    }
+
+    // 0^th syz. property
+    if( size(module( matrix(@LEAD) - matrix(LEAD) )) > 0 )
+    {
+      "LEAD:"; LEAD;
+      "@LEAD:"; @LEAD;
+
+      "module( matrix(@LEAD) - matrix(LEAD) ): ";
+      module( matrix(@LEAD) - matrix(LEAD) );
+
+      "ERROR: wrong sorting (in SSnit): @LEAD != LEAD!!!";
+      $
+    }
+    
+  }
+
+  M = @N;
+  
+  
+ 
   
   def TAIL = Tail(M);
   
@@ -683,11 +776,10 @@ proc SSComputeLeadingSyzygyTerms(def L)
   }
 
   module SS = ComputeLeadingSyzygyTerms(L);
-  SS = sort(SS, "c,ds", 1)[1]; // ,1 => reversed! // TODO: not needed?
 
   if( @SYZCHECK )
   {  
-    int i, j, r; intvec iv_ds;
+    int i, j, r; 
     int N = ncols(L);
     def a, b;
     poly aa, bb;
@@ -724,15 +816,12 @@ proc SSComputeLeadingSyzygyTerms(def L)
 
       M = simplify(M, 1 + 2 + 32);
 
-      iv_ds = sort(M, "c,ds", 1)[2]; // ,1 => reversed!
-
-      M = M[iv_ds];
+      M = MySort(M);
 
       S = S, M * gen(i);
     }
 
-    S = simplify(S, 2);
-    S = sort(S, "c,ds", 1)[1]; // ,1 => reversed! // TODO: not needed?
+    S = MySort(simplify(S, 2));
 
     if( size(module(matrix(S) - matrix(SS))) > 0 )
     {
@@ -785,7 +874,6 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
     int @SYZCHECK = @DEBUG;
   }
   
-
   if( @DEBUG )
   {
     "SSCompute2LeadingSyzygyTerms::Input: ";
@@ -849,7 +937,7 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
     S = simplify(S, 2 + 32);
   }
 
-  S = sort(S, "c,ds", 1)[1]; // ,1 => reversed!
+  S = MySort(S);
 
   if( @DEBUG )
   {
@@ -1473,6 +1561,7 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::Tail);
       exportto(Schreyer, Syzextra::ComputeLeadingSyzygyTerms);      
+      exportto(Schreyer, Syzextra::Sort_c_ds);
     }
 /*
     else
@@ -1514,7 +1603,9 @@ static proc loadme()
       exportto(Schreyer, Syzextra_g::ProfilerStart); exportto(Schreyer, Syzextra_g::ProfilerStop);
 
       exportto(Schreyer, Syzextra_g::Tail);
-      exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);      
+      exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);
+      exportto(Schreyer, Syzextra_g::Sort_c_ds);
+      
     }
 */
 

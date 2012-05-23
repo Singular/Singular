@@ -518,6 +518,83 @@ static BOOLEAN Tail(leftv res, leftv h)
 }
 
 
+static int cmp_c_ds(const void *p1, const void *p2, void *R)
+{
+  const int YES = 1;
+  const int NO = -1;
+
+  const ring r =  (const ring) R; // TODO/NOTE: the structure is known: C, lp!!!
+
+  const poly a = *(const poly*)p1;
+  const poly b = *(const poly*)p2;
+
+  assume( p_LmTest(a, r) );
+  assume( p_LmTest(b, r) );
+
+
+  const signed long iCompDiff = p_GetComp(a, r) - p_GetComp(b, r);
+
+  // TODO: test this!!!!!!!!!!!!!!!!
+
+  //return -( compare (c, ds) )
+
+  const int __DEBUG__ = 0;
+
+#ifndef NDEBUG
+  if( __DEBUG__ )
+  {
+    PrintS("cmp_c_ds: a, b: \np1: "); dPrint(a, r, r, 2);
+    PrintS("b: "); dPrint(b, r, r, 2);
+    PrintLn();
+  }
+#endif
+
+
+  if( iCompDiff > 0 )
+    return YES;
+
+  if( iCompDiff < 0 )
+    return  NO;
+
+  assume( iCompDiff == 0 );
+
+  const signed long iDegDiff = p_Totaldegree(a, r) - p_Totaldegree(b, r);
+
+  if( iDegDiff > 0 )
+    return YES;
+
+  if( iDegDiff < 0 )
+    return  NO;
+
+  assume( iDegDiff == 0 );
+
+#ifndef NDEBUG
+  if( __DEBUG__ )
+  {
+    PrintS("   a & b have the same comp & deg! "); PrintLn();
+  }
+#endif
+
+  for (int v = rVar(r); v > 0; v--)
+  {
+    assume( v > 0 );
+    assume( v <= rVar(r) );
+
+    const signed int d = p_GetExp(a, v, r) - p_GetExp(b, v, r);
+
+    if( d > 0 )
+      return YES;
+
+    if( d < 0 )
+      return NO;
+
+    assume( d == 0 );
+  }
+
+  return 0;  
+}
+
+
 static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
 {
   const ring r = currRing;
@@ -581,7 +658,7 @@ static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
     }
     
 
-    // TODO/NOTE: input is supposed to be sorted wrt "C,ds"!??
+    // TODO/NOTE: input is supposed to be (reverse-) sorted wrt "(c,ds)"!??
 
     // components should come in groups: count elements in each group
     // && estimate the real size!!!
@@ -663,7 +740,11 @@ static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
       dPrint(newid, r, r, 1);
     }
 
+    const int sizeNew = IDELEMS(newid);
 
+    if( sizeNew >= 2 )
+      qsort_r(newid->m, sizeNew, sizeof(poly), cmp_c_ds, r);
+    
     // TODO: add sorting wrt <c,ds> & reversing...
 
     res->data = newid;
@@ -676,7 +757,81 @@ static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
   return TRUE;
 }
 
+///  sorting wrt <c,ds> & reversing...
+/// change the input inplace!!!
+// TODO: use a ring with >_{c, ds}!???
+static BOOLEAN Sort_c_ds(leftv res, leftv h)
+{
+  NoReturn(res);
 
+  const ring r = currRing;
+  NoReturn(res);
+
+  if( h == NULL )
+  {
+    WarnS("Sort_c_ds needs an argument...");
+    return TRUE;
+  }
+
+  assume( h != NULL );  
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  if(    (h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
+      && (h->rtyp  == IDHDL) // must be a variable!
+      && (h->e == NULL) // not a list element
+      ) 
+  {
+    const ideal id = (const ideal)h->Data();
+
+    assume(id != NULL);
+
+    if( __DEBUG__ )
+    {
+      PrintS("Sort_c_ds::Input: \n");
+
+      const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
+      const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
+      const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
+
+      Print("\nSYZCHECK: \t%d", __SYZCHECK__);
+      Print(", DEBUG: \t%d", __DEBUG__);
+      Print(", LEAD2SYZ: \t%d", __LEAD2SYZ__);
+      Print(", TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
+
+      dPrint(id, r, r, 1);      
+    }
+
+    assume (h->Next() == NULL);
+
+    id_Test(id, r);
+
+    const int size = IDELEMS(id);
+
+    const ideal newid = id; // id_Copy(id, r); // copy???
+
+    if( size >= 2 )
+      qsort_r(newid->m, size, sizeof(poly), cmp_c_ds, r);
+    
+//    res->data = newid;
+//    res->rtyp = h->Typ();
+    
+    if( __DEBUG__ )
+    {
+      PrintS("Sort_c_ds::Output: \n");
+      dPrint(newid, r, r, 1);
+    }
+
+    return FALSE;
+  }
+
+  WarnS("ComputeLeadingSyzygyTerms needs a single ideal/module argument (must be a variable!)...");
+  return TRUE;  
+}
 
 
 
@@ -1213,6 +1368,7 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 
   ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
   ADD(psModulFunctions, currPack->libname, "ComputeLeadingSyzygyTerms", FALSE, ComputeLeadingSyzygyTerms);
+  ADD(psModulFunctions, currPack->libname, "Sort_c_ds", FALSE, Sort_c_ds);
   
   //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
 
