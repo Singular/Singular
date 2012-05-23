@@ -23,11 +23,6 @@ void bigintmat::set(int i, int j, number n)
   v[(i-1)*col+j-1] = nlCopy(n);
 }
 
-int bigintmat::length()
-{
-  return col*row;
-}
-
 // sees matrix as vector, first entry is [0]
 void bigintmat::set(int i, number n)
 {

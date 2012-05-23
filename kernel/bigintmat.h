@@ -66,13 +66,13 @@ public:
     }
 
 #define BIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
-  int length();
   void operator*=(int intop);
   void operator*=(number bintop);
   void operator+=(int intop);
   void operator+=(number bintop);
   void operator-=(int intop);
   void operator-=(number bintop);
+  inline int length() { return col*row; }
   inline int  cols() const { return col; }
   inline int  rows() const { return row; }
   inline ~bigintmat()

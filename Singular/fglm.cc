@@ -55,7 +55,7 @@ ideal fglmUpdatesource( const ideal sourceIdeal )
 {
     int k, l, offset;
     BOOLEAN found;
-    ideal newSource= idInit( IDELEMS( sourceIdeal ) + IDELEMS( currQuotient ), 1 );
+    ideal newSource= idInit( IDELEMS( sourceIdeal ) + IDELEMS( currQuotient ) );
     for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
         (newSource->m)[k]= pCopy( (sourceIdeal->m)[k] );
     offset= IDELEMS( sourceIdeal );
@@ -182,7 +182,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         // check if sring->qideal is contained in dring->qideal:
         rSetHdl( dringHdl );
         nMapFunc nMap=nSetMap( sring );
-        ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
+        ideal sqind = idInit( IDELEMS( sring->qideal ) );
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
           (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring, nMap);
         ideal sqindred = kNF( dring->qideal, NULL, sqind );
@@ -200,7 +200,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0,
                     dsvperm, NULL, sring->ch);
         nMap=nSetMap(dring);
-        ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
+        ideal dqins = idInit( IDELEMS( dring->qideal ) );
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
           (dqins->m)[k]=pPermPoly( (dring->qideal->m)[k], dsvperm, sring, nMap);
         ideal dqinsred = kNF( sring->qideal, NULL, dqins );
@@ -314,28 +314,28 @@ fglmProc( leftv result, leftv first, leftv second )
             if ( currQuotient != NULL ) fglmUpdateresult( destIdeal );
             break;
         case FglmHasOne:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
             (destIdeal->m)[0]= pOne();
             state= FglmOk;
             break;
         case FglmIncompatibleRings:
             Werror( "ring %s and current ring are incompatible", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNoIdeal:
             Werror( "Can't find ideal %s in ring %s", second->Name(), first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotZeroDim:
             Werror( "The ideal %s has to be 0-dimensional", second->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotReduced:
             Werror( "The ideal %s has to be given by a reduced SB", second->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         default:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
     }
 
     result->rtyp = IDEAL_CMD;
@@ -376,32 +376,32 @@ fglmQuotProc( leftv result, leftv first, leftv second )
         case FglmOk:
             break;
         case FglmHasOne:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
             (destIdeal->m)[0]= pOne();
             state= FglmOk;
             break;
         case FglmNotZeroDim:
             Werror( "The ideal %s has to be 0-dimensional", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotReduced:
             Werror( "The poly %s has to be reduced", second->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmPolyIsOne:
             int k;
-            destIdeal= idInit( IDELEMS(sourceIdeal), 1 );
+            destIdeal= idInit( IDELEMS(sourceIdeal) );
             for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
               (destIdeal->m)[k]= pCopy( (sourceIdeal->m)[k] );
             state= FglmOk;
             break;
         case FglmPolyIsZero:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
             (destIdeal->m)[0]= pOne();
             state= FglmOk;
             break;
         default:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
     }
 
     result->rtyp = IDEAL_CMD;
@@ -447,7 +447,7 @@ findUniProc( leftv result, leftv first )
       }
       if (count==pVariables)
       {
-        destIdeal=idInit(pVariables,1);
+        destIdeal=idInit(pVariables);
         for(k=pVariables-1; k>=0; k--) destIdeal->m[k]=pCopy(sourceIdeal->m[purePowers[k]]);
       }
       omFreeSize((ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
@@ -461,20 +461,20 @@ findUniProc( leftv result, leftv first )
         case FglmOk:
             break;
         case FglmHasOne:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
             (destIdeal->m)[0]= pOne();
             state= FglmOk;
             break;
         case FglmNotZeroDim:
             Werror( "The ideal %s has to be 0-dimensional", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotReduced:
             Werror( "The ideal %s has to be reduced", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         default:
-            destIdeal= idInit(1,1);
+            destIdeal= idInit(1);
     }
 
     result->rtyp = IDEAL_CMD;

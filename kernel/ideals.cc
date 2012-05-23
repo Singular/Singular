@@ -209,7 +209,7 @@ void idSkipZeroes (ideal ide)
 */
 ideal idCopyFirstK (const ideal ide, const int k)
 {
-  ideal newI = idInit(k, 0);
+  ideal newI = idInit(k);
   for (int i = 0; i < k; i++)
     newI->m[i] = pCopy(ide->m[i]);
   return newI;

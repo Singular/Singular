@@ -95,7 +95,7 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
 
   /* the ideal to be returned: */
-  ideal iii = idInit(1, 0);
+  ideal iii = idInit(1, 1);
 
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are requested,
                                              omitting zero minors */
@@ -116,7 +116,7 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
   ideal jjj;
-  if (collectedMinors == 0) jjj = idInit(1, 0);
+  if (collectedMinors == 0) jjj = idInit(1, 1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
   delete[] myColumnIndices;
@@ -149,7 +149,7 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   int collectedMinors = 0;
 
   /* the ideal to be returned: */
-  ideal iii = idInit(1, 0);
+  ideal iii = idInit(1, 1);
 
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are
                                              requested, omitting zero minors */
@@ -181,7 +181,7 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
   ideal jjj;
-  if (collectedMinors == 0) jjj = idInit(1, 0);
+  if (collectedMinors == 0) jjj = idInit(1, 1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
   delete[] myColumnIndices;
@@ -321,7 +321,7 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
 
   /* the ideal to be returned: */
-  ideal iii = idInit(1, 0);
+  ideal iii = idInit(1, 1);
 
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are
                                              requested, omitting zero minors */
@@ -342,7 +342,7 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
   ideal jjj;
-  if (collectedMinors == 0) jjj = idInit(1, 0);
+  if (collectedMinors == 0) jjj = idInit(1, 1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
   delete[] myColumnIndices;
@@ -378,7 +378,7 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   int collectedMinors = 0;
 
   /* the ideal to be returned: */
-  ideal iii = idInit(1, 0);
+  ideal iii = idInit(1, 1);
 
   bool zeroOk = ((k < 0) ? true : false); /* for k = 0, all minors are
                                              requested, omitting zero minors */
@@ -410,7 +410,7 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
   ideal jjj;
-  if (collectedMinors == 0) jjj = idInit(1, 0);
+  if (collectedMinors == 0) jjj = idInit(1, 1);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
   delete[] myColumnIndices;
