@@ -3955,7 +3955,7 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
     if (h==NULL)
     {
       L->Init(1);
-      L->m[0].data=(char *)idInit(0,1);
+      L->m[0].data=(char *)idInit(1);
       L->m[0].rtyp=IDEAL_CMD;
     }
     else

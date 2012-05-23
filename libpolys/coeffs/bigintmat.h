@@ -98,6 +98,7 @@ class bigintmat
 
     void inpMult(number bintop, const coeffs C = NULL);
 
+    inline int length() { return col*row; }
     inline int  cols() const { return col; }
     inline int  rows() const { return row; }
     inline coeffs basecoeffs() const { return m_coeffs; }

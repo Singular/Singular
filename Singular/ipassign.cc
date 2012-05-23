@@ -1209,6 +1209,7 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
   /* left side is bigintmat, right side is list (of int,intvec,intmat)*/
   leftv hh=r;
   int i = 0;
+  if (bim->length()==0) { WerrorS("bigintmat is 1x0"); delete bim; return TRUE; }
   while (hh!=NULL)
   {
     if (i>=bim->cols()*bim->rows())
@@ -1229,7 +1230,7 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
     else if (hh->Typ() == BIGINT_CMD)
     {
       bim->set(i++, (number)(hh->Data()));
-    } 
+    }
     /*
     ((hh->Typ() == INTVEC_CMD)
             ||(hh->Typ() == INTMAT_CMD))

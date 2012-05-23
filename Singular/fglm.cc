@@ -1,5 +1,4 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id$
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -195,7 +194,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
           (sqind->m)[k]= p_PermPoly( (sring->qideal->m)[k], vperm, sring,
-			  currRing, nMap);
+                          currRing, nMap);
         ideal sqindred = kNF( dring->qideal, NULL, sqind );
         if ( ! idIs0( sqindred ) )
         {
@@ -214,7 +213,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
           (dqins->m)[k]=p_PermPoly( (dring->qideal->m)[k], dsvperm, sring,
-			 currRing, nMap);
+                         currRing, nMap);
         ideal dqinsred = kNF( sring->qideal, NULL, dqins );
         if ( ! idIs0( dqinsred ) )
         {
@@ -332,19 +331,19 @@ fglmProc( leftv result, leftv first, leftv second )
             break;
         case FglmIncompatibleRings:
             Werror( "ring %s and current ring are incompatible", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNoIdeal:
             Werror( "Can't find ideal %s in ring %s", second->Name(), first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotZeroDim:
             Werror( "The ideal %s has to be 0-dimensional", second->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotReduced:
             Werror( "The ideal %s has to be given by a reduced SB", second->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         default:
             destIdeal= idInit(1,1);
@@ -394,11 +393,11 @@ fglmQuotProc( leftv result, leftv first, leftv second )
             break;
         case FglmNotZeroDim:
             Werror( "The ideal %s has to be 0-dimensional", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotReduced:
             Werror( "The poly %s has to be reduced", second->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmPolyIsOne:
             int k;
@@ -479,11 +478,11 @@ findUniProc( leftv result, leftv first )
             break;
         case FglmNotZeroDim:
             Werror( "The ideal %s has to be 0-dimensional", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         case FglmNotReduced:
             Werror( "The ideal %s has to be reduced", first->Name() );
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             break;
         default:
             destIdeal= idInit(1,1);
