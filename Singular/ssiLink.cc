@@ -18,6 +18,7 @@
 #include <ctype.h>   /*for isdigit*/
 #include <netdb.h>
 #include <sys/wait.h>
+#include <time.h>
 
 
 
@@ -1042,6 +1043,47 @@ BOOLEAN ssiClose(si_link l)
     if (d!=NULL)
     {
       if (d->r!=NULL) rKill(d->r);
+      if (d->send_quit_at_exit)
+      {
+        fputs("99\n",d->f_write);fflush(d->f_write);
+      }
+      if (d->pid!=0)
+      {
+        int status;
+        waitpid(d->pid,&status,WNOHANG);
+        if(!WIFEXITED(status))
+        {
+          struct timespec t,tt;
+          t.tv_sec=0;
+          t.tv_nsec=100000000;
+          int r=nanosleep(&t,&tt);
+          if(r!=-1)
+          {
+            kill(d->pid,15);
+            waitpid(d->pid,&status,WNOHANG);
+            if(!WIFEXITED(status))
+            {
+              r=nanosleep(&t,&tt);
+              if (r==0)
+              {
+                kill(d->pid,9); // just to be sure
+                waitpid(d->pid,NULL,0);
+              }
+            }
+          }
+          else
+            waitpid(d->pid,NULL,WNOHANG);
+        }
+      }
+      else
+      {
+        if (strcmp(l->mode,"fork")!=0)
+        {
+          sleep(1);
+        }
+      }
+      if (d->f_read!=NULL) fclose(d->f_read);
+      if (d->f_write!=NULL) fclose(d->f_write);
       if ((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
       {
@@ -1065,19 +1107,6 @@ BOOLEAN ssiClose(si_link l)
             hh=(link_list)hh->next;
           }
         }
-        if (d->send_quit_at_exit)
-        {
-          fputs("99\n",d->f_write);fflush(d->f_write);
-        }
-      }
-      if (d->f_read!=NULL) fclose(d->f_read);
-      if (d->f_write!=NULL) fclose(d->f_write);
-      if (d->pid!=0)
-      {
-        kill(d->pid,15);
-        waitpid(d->pid,NULL,WNOHANG);
-        kill(d->pid,9); // just to be sure
-        waitpid(d->pid,NULL,0);
       }
       omFreeSize((ADDRESS)d,(sizeof *d));
     }
