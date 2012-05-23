@@ -4032,14 +4032,24 @@ void rDebugPrint(ring r)
   Print("CmpL_Size:%d ",r->CmpL_Size);
   Print("VarL_Size:%d\n",r->VarL_Size);
   Print("bitmask=0x%lx (expbound=%ld) \n",r->bitmask, r->bitmask);
+  Print("divmask=%lx\n", r->divmask);
   Print("BitsPerExp=%d ExpPerLong=%d MinExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->MinExpPerLong, r->VarL_Offset[0]);
-  PrintS("varoffset:\n");
+
+  Print("VarL_LowIndex: %d\n", r->VarL_LowIndex);
+  PrintS("VarL_Offset:\n");
+  if (r->VarL_Offset==NULL) PrintS(" NULL");
+  else
+    for(j = 0; j < r->VarL_Size; j++)
+      Print("  VarL_Offset[%d]: %d ", j, r->VarL_Offset[j]);
+  PrintLn();
+      
+
+  PrintS("VarOffset:\n");
   if (r->VarOffset==NULL) PrintS(" NULL\n");
   else
     for(j=0;j<=r->N;j++)
       Print("  v%d at e-pos %d, bit %d\n",
             j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
-  Print("divmask=%lx\n", r->divmask);
   PrintS("ordsgn:\n");
   for(j=0;j<r->CmpL_Size;j++)
     Print("  ordsgn %ld at pos %d\n",r->ordsgn[j],j);
@@ -4163,6 +4173,13 @@ void rDebugPrint(ring r)
       PrintLn();
   }
   Print("LexOrder:%d, MixedOrder:%d\n",r->LexOrder, r->MixedOrder);
+
+  Print("NegWeightL_Size: %d, NegWeightL_Offset: ", r->NegWeightL_Size);
+  if (r->NegWeightL_Offset==NULL) PrintS(" NULL");
+  else
+    for(j = 0; j < r->NegWeightL_Size; j++)
+      Print("  [%d]: %d ", j, r->NegWeightL_Offset[j]);
+  PrintLn();
 
   // p_Procs stuff
   p_Procs_s proc_names;

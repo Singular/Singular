@@ -127,13 +127,13 @@ void * atGet(leftv root,const char * name)
     return NULL;
 }
 
-void * atGet(idhdl root,const char * name, int t)
+void * atGet(idhdl root,const char * name, int t, void *defaultReturnValue)
 {
   attr temp = root->attribute->get(name);
   if ((temp!=NULL) && (temp->atyp==t))
     return temp->data;
   else
-    return NULL;
+    return defaultReturnValue;
 }
 
 void * atGet(leftv root,const char * name, int t)

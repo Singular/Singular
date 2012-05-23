@@ -147,9 +147,9 @@ void p_Setm_General(poly p, const ring r)
           
           if ((c > 0) && (c <= len_gen))
           {
-            const int * const wm = o->data.am.weights_m;
-            assume( wm[0] == len_gen );
-            ord += wm[c];
+            assume( w == o->data.am.weights_m );
+            assume( w[0] == len_gen );
+            ord += w[c];
           }
           
           p->exp[o->data.am.place] = ord;

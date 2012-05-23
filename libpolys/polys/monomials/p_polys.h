@@ -47,6 +47,9 @@
 
 // coeff
 // #define pGetCoeff(p)        ((p)->coef)
+/// return an alias to the leading coefficient of p
+/// assumes that p != NULL
+/// NOTE: not copy
 static inline number& pGetCoeff(poly p)
 {
   assume(p != NULL);

@@ -433,9 +433,7 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r)
 }
 #endif
 
-/*3
-* for idSort: compare a and b revlex inclusive module comp.
-*/
+///3 for idSort: compare a and b revlex inclusive module comp.
 static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
 {
   if (b==NULL) return 1;
@@ -468,11 +466,9 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
   return -1;
 }
 
-/*2
-*sorts the ideal w.r.t. the actual ringordering
-*uses lex-ordering when nolex = FALSE
-*/
-intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r)
+// sorts the ideal w.r.t. the actual ringordering
+// uses lex-ordering when nolex = FALSE
+intvec *id_Sort(const ideal id, const BOOLEAN nolex, const ring r)
 {
   intvec * result = new intvec(IDELEMS(id));
   int i, j, actpos=0, newpos;

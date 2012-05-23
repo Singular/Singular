@@ -33,7 +33,7 @@ class sattr
 
 void * atGet(idhdl root,const char * name);
 void * atGet(leftv root,const char * name);
-void * atGet(idhdl root,const char * name, int t);
+void * atGet(idhdl root,const char * name, int t, void *defaultReturnValue = NULL);
 void * atGet(leftv root,const char * name, int t);
 void atSet(idhdl root,const char * name,void * data,int typ);
 void atSet(leftv root,const char * name,void * data,int typ);
