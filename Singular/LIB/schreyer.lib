@@ -702,7 +702,7 @@ proc MySort(def M)
   attrib(MRES, "isHomog", @V);
   
 //  attrib(S, "InducionStart", @RANK);
-  attrib(S, "LEAD2SYZ", 0);
+  attrib(S, "LEAD2SYZ", 1);
   attrib(S, "TAILREDSYZ", 1);
   attrib(S, "DEBUG", @DEBUG);
   attrib(S, "SYZCHECK", @SYZCHECK);
@@ -856,7 +856,7 @@ proc SSComputeLeadingSyzygyTerms(def L)
 }
 
 /// Compute Syz(L), where L is a monomial (leading) module
-proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
+proc SSCompute2LeadingSyzygyTerms(def L)
 {
   if( typeof( attrib(basering, "DEBUG") ) == "int" )
   {
@@ -873,12 +873,18 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
   {
     int @SYZCHECK = @DEBUG;
   }
+
+  int @TAILREDSYZ = 1;
+  if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
+  {
+    @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
+  }
+  
   
   if( @DEBUG )
   {
     "SSCompute2LeadingSyzygyTerms::Input: ";
     L;
-    "@TAILREDSYZ: ", @TAILREDSYZ;
   }
 
   int i, j, r; 
@@ -955,7 +961,31 @@ proc SSCompute2LeadingSyzygyTerms(def L, int @TAILREDSYZ)
         $
       }
     }
-  }
+    
+    module SS = Compute2LeadingSyzygyTerms(L);
+
+    "S: ";  DetailedPrint(S);
+    "SS: "; DetailedPrint(SS);
+    
+    if( size(module(matrix(S) - matrix(SS))) > 0 )
+    {
+      "ERROR: S != SS ";
+
+      "basering: ";
+      DetailedPrint(basering);
+
+      "S: ";  S;
+      DetailedPrint(S, 2);
+      "SS: "; SS;
+      DetailedPrint(SS, 2);
+
+      "DIFF: ";
+      print(matrix(S) - matrix(SS));
+      DetailedPrint(module(matrix(S) - matrix(SS)), 4);
+      $
+    }
+    
+  }  
 
   module S2 = Tail(S);
   S = lead(S); // (C,lp) on base ring!
@@ -1145,7 +1175,7 @@ proc SSComputeSyzygy(def L, def T)
   {
     def a2; int r2; poly aa2;  
     module LL, LL2;
-    (LL, LL2) = SSCompute2LeadingSyzygyTerms(L, @TAILREDSYZ); // ++ 
+    (LL, LL2) = SSCompute2LeadingSyzygyTerms(L); // ++ 
   } else
   {
     module LL = SSComputeLeadingSyzygyTerms(L);
@@ -1561,6 +1591,7 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::Tail);
       exportto(Schreyer, Syzextra::ComputeLeadingSyzygyTerms);      
+      exportto(Schreyer, Syzextra::Compute2LeadingSyzygyTerms);
       exportto(Schreyer, Syzextra::Sort_c_ds);
     }
 /*
@@ -1604,6 +1635,7 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra_g::Tail);
       exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);
+      exportto(Schreyer, Syzextra_g::Compute2LeadingSyzygyTerms);
       exportto(Schreyer, Syzextra_g::Sort_c_ds);
       
     }
