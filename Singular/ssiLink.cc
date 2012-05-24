@@ -1050,30 +1050,23 @@ BOOLEAN ssiClose(si_link l)
       if (d->pid!=0)
       {
         int status;
-        waitpid(d->pid,&status,WNOHANG);
-        if(!WIFEXITED(status))
+        struct timespec t;
+        t.tv_sec=0;
+        t.tv_nsec=100000000;
+        int r=nanosleep(&t,NULL);
+        if (r== 0)
         {
-          struct timespec t,tt;
-          t.tv_sec=0;
-          t.tv_nsec=100000000;
-          int r=nanosleep(&t,&tt);
-          if(r!=-1)
+          kill(d->pid,15);
+          r=nanosleep(&t,NULL);
+          waitpid(d->pid,&status,WNOHANG);
+          if(!WIFEXITED(status))
           {
-            kill(d->pid,15);
-            waitpid(d->pid,&status,WNOHANG);
-            if(!WIFEXITED(status))
-            {
-              r=nanosleep(&t,&tt);
-              if (r==0)
-              {
-                kill(d->pid,9); // just to be sure
-                waitpid(d->pid,NULL,0);
-              }
-            }
+            kill(d->pid,9); // just to be sure
+            waitpid(d->pid,NULL,0);
           }
-          else
-            waitpid(d->pid,NULL,WNOHANG);
         }
+        else
+          waitpid(d->pid,&status,WNOHANG);
       }
       else
       {
