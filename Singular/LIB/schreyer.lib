@@ -923,86 +923,88 @@ proc SSCompute2LeadingSyzygyTerms(def L)
     L;
   }
 
-  int i, j, r; 
-  int N = ncols(L);
-  def a, b;
-
-  poly aa, bb, @lcm;
-
-  bigint c;
-
-  module M;
-
-  module S = 0;
-
-  for(i = 1; i <= N; i++)
-  {
-    a = L[i];
-//    "a: ", a;
-    c = leadcomp(a);
-    r = int(c);
-
-    aa = leadmonomial(a);
-
-    M = 0;
-
-    for(j = i-1; j > 0; j--)
-    {
-      b = L[j];
-//      "b: ", b;
-
-      if( leadcomp(b) == c )
-      {
-        bb = leadmonomial(b);
-        @lcm = lcm(aa, bb);
-
-        M[j] = (@lcm / aa)* gen(i) - (@lcm / bb)* gen(j);
-      }
-    }
-    
-    M = simplify(M, 2);
-
-    // TODO: add quotient relations here...
-    S = S, M;
-  }
-
-  if( @TAILREDSYZ )
-  {
-    // Make sure that 2nd syzygy terms are not reducible by 1st
-    def opts = option(get);
-    option(redSB); option(redTail); 
-    S = std(S); // binomial module
-    option(set, opts);
-    //  kill opts;
-  } else
-  {
-    S = simplify(S, 2 + 32);
-  }
-
-  S = MySort(S);
+  module SS = Compute2LeadingSyzygyTerms(L);
 
   if( @DEBUG )
   {
-    "SSCompute2LeadingSyzygyTerms::Syz(LEAD): "; S;
+    "SSCompute2LeadingSyzygyTerms::Syz(SS): "; SS;
   }
-
+  
   if( @SYZCHECK )
   {
-    if( size(S) > 0 and size(L) > 0 )
+    if( size(SS) > 0 and size(L) > 0 )
     {
-      if( size(module(transpose( transpose(S) * transpose(L) ))) > 0 )
+      if( size(module(transpose( transpose(SS) * transpose(L) ))) > 0 )
       {
-        transpose( transpose(S) * transpose(L) );
-        "ERROR: transpose( transpose(S) * transpose(L) ) != 0!!!";
+        transpose( transpose(SS) * transpose(L) );
+        "ERROR: transpose( transpose(SS) * transpose(L) ) != 0!!!";
         $
       }
     }
-    
-    module SS = Compute2LeadingSyzygyTerms(L);
 
-    "S: ";  DetailedPrint(S);
-    "SS: "; DetailedPrint(SS);
-    
+    int i, j, r; 
+    int N = ncols(L);
+    def a, b;
+
+    poly aa, bb, @lcm;
+
+    bigint c;
+
+    module M;
+
+    module S = 0;
+
+    for(i = 1; i <= N; i++)
+    {
+      a = L[i];
+  //    "a: ", a;
+      c = leadcomp(a);
+      r = int(c);
+
+      aa = leadmonomial(a);
+
+      M = 0;
+
+      for(j = i-1; j > 0; j--)
+      {
+        b = L[j];
+  //      "b: ", b;
+
+        if( leadcomp(b) == c )
+        {
+          bb = leadmonomial(b);
+          @lcm = lcm(aa, bb);
+
+          M[j] = (@lcm / aa)* gen(i) - (@lcm / bb)* gen(j);
+        }
+      }
+
+      M = simplify(M, 2);
+
+      // TODO: add quotient relations here...
+      S = S, M;
+    }
+
+    if( @TAILREDSYZ )
+    {
+      // Make sure that 2nd syzygy terms are not reducible by 1st
+      def opts = option(get);
+      option(redSB); option(redTail); 
+      S = std(S); // binomial module
+      option(set, opts);
+      //  kill opts;
+    } else
+    {
+      S = simplify(S, 2 + 32);
+    }
+
+    S = MySort(S);
+
+    if( @DEBUG )
+    {
+      "SSCompute2LeadingSyzygyTerms::Syz(S): "; S;
+    }
+
     if( size(module(matrix(S) - matrix(SS))) > 0 )
     {
       "ERROR: S != SS ";
@@ -1020,20 +1022,19 @@ proc SSCompute2LeadingSyzygyTerms(def L)
       DetailedPrint(module(matrix(S) - matrix(SS)), 4);
       $
     }
-    
-  }  
-
-  module S2 = Tail(S);
-  S = lead(S); // (C,lp) on base ring!
+  }
+  
+  module S2 = Tail(SS);
+  SS = lead(SS); // (C,lp) on base ring!
               
   if( @DEBUG )
   {
-    "SSCompute2LeadingSyzygyTerms::Output: "; S; S2;
+    "SSCompute2LeadingSyzygyTerms::Output: "; SS; S2;
   }  
   
-  attrib(S, "isSB", 1); 
+  attrib(SS, "isSB", 1); 
 
-  return (S, S2);
+  return (SS, S2);
 }
 
 // -------------------------------------------------------- //
