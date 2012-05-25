@@ -25,7 +25,7 @@ std::string bbpolytopeToString(gfan::ZCone const &c)
   gfan::ZMatrix i=c.getInequalities();
   gfan::ZMatrix e=c.getEquations();
   s<<"AMBIENT_DIM"<<std::endl;
-  s<<c.ambientDimension()<<std::endl;
+  s<<c.ambientDimension()-1<<std::endl;
   s<<"INEQUALITIES"<<std::endl;
   s<<toString(i);
   s<<"EQUATIONS"<<std::endl;
