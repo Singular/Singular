@@ -1050,27 +1050,40 @@ BOOLEAN ssiClose(si_link l)
       if (d->pid!=0)
       {
         int status;
-        struct timespec t;
-        t.tv_sec=0;
-        t.tv_nsec=100000000;
-        int r=nanosleep(&t,NULL);
-        if (r== 0)
+        if (waitpid(d->pid,&status,WNOHANG)==0)
         {
-          kill(d->pid,15);
-          r=nanosleep(&t,NULL);
-          waitpid(d->pid,&status,WNOHANG);
-          if(!WIFEXITED(status))
+          struct timespec t,tt;
+          t.tv_sec=0;
+          t.tv_nsec=100000000;
+          int r=nanosleep(&t,&tt);
+          if(r!=-1)
           {
-            kill(d->pid,9); // just to be sure
-            waitpid(d->pid,NULL,0);
+            kill(d->pid,15);
+            if(waitpid(d->pid,&status,WNOHANG)==0)
+            {
+              t.tv_sec=0;
+              t.tv_nsec=100000000;
+              r=nanosleep(&t,&tt);
+              if(waitpid(d->pid,&status,WNOHANG)==0)
+              {
+                kill(d->pid,9); // just to be sure
+                waitpid(d->pid,NULL,0);
+              }
+            }
+          }
+          else
+          {
+            if(waitpid(d->pid,&status,WNOHANG)==0)
+            {
+              kill(d->pid,9); // just to be sure
+              waitpid(d->pid,NULL,0);
+            }
           }
         }
-        else
-          waitpid(d->pid,&status,WNOHANG);
       }
       else
       {
-        if (strcmp(l->mode,"fork")!=0)
+        if (d->send_quit_at_exit)
         {
           sleep(1);
         }
