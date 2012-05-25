@@ -550,7 +550,18 @@ proc MySort(def M)
   def @save = basering;
   
   int @DEBUG = !system("with", "ndebug");
-  int @SYZCHECK = 1 || @DEBUG; // TODO: only for now!!
+
+  if( typeof( attrib(SSinit, "DEBUG") ) == "int" )
+  {
+    @DEBUG = attrib(SSinit, "DEBUG");
+  }
+
+  int @SYZCHECK = @DEBUG; 
+
+  if( typeof( attrib(SSinit, "SYZCHECK") ) == "int" )
+  {
+    @SYZCHECK = attrib(SSinit, "SYZCHECK");
+  }
   
   if( @DEBUG )
   {
@@ -702,8 +713,33 @@ proc MySort(def M)
   attrib(MRES, "isHomog", @V);
   
 //  attrib(S, "InducionStart", @RANK);
-  attrib(S, "LEAD2SYZ", 1);
-  attrib(S, "TAILREDSYZ", 1);
+
+
+  if( typeof( attrib(SSinit, "LEAD2SYZ") ) == "int" )
+  {
+    attrib(S, "LEAD2SYZ", attrib(SSinit, "LEAD2SYZ") );
+  } else
+  { 
+    attrib(S, "LEAD2SYZ", 1);
+  }
+
+  if( typeof( attrib(SSinit, "TAILREDSYZ") ) == "int" )
+  {
+    attrib(S, "TAILREDSYZ", attrib(SSinit, "TAILREDSYZ") );
+  } else
+  { 
+    attrib(S, "TAILREDSYZ", 1);
+  }
+
+
+  if( typeof( attrib(SSinit, "HYBRIDNF") ) == "int" )
+  {
+    attrib(S, "HYBRIDNF", attrib(SSinit, "HYBRIDNF") );
+  } else
+  { 
+    attrib(S, "HYBRIDNF", 0);
+  }
+  
   attrib(S, "DEBUG", @DEBUG);
   attrib(S, "SYZCHECK", @SYZCHECK);
   
@@ -1142,6 +1178,15 @@ proc SSComputeSyzygy(def L, def T)
   {
     int @DEBUG = !system("with", "ndebug");
   }
+
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
+  
   
   if( @DEBUG )
   {
