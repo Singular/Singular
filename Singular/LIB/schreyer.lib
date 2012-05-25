@@ -1039,8 +1039,8 @@ proc SSCompute2LeadingSyzygyTerms(def L)
 
 // -------------------------------------------------------- //
 
-/// TODO: save shortcut LM(m) * "t" -> ?
-proc SSReduceTerm(poly m, def t, def L, def T, list #)
+/// TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
+proc SSFindReducer(def product, def syzterm, def L, def T, list #)
 {
   if( typeof( attrib(basering, "DEBUG") ) == "int" )
   {
@@ -1050,10 +1050,121 @@ proc SSReduceTerm(poly m, def t, def L, def T, list #)
     int @DEBUG = !system("with", "ndebug");
   }
 
+
+  if( @DEBUG )
+  {
+    "SSFindReducer::Input: ";
+
+    "syzterm: ", syzterm;
+    "product: ", product;
+    "L: ", L;
+    "T: ", T;
+    if( size(#) > 0 )
+    {
+      "LSyz: ", #;
+    }
+  }
+
+
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
+  
+  if( @SYZCHECK && (syzterm != 0) )
+  {
+    def @@c = leadcomp(syzterm); int @@r = int(@@c);
+    def @@product = leadmonomial(syzterm) * L[@@r];
+
+    if( @@product != product)
+    {
+      "product: ", product, ", @@product: ", @@product;
+      "ERROR: 'syzterm' results in wrong product !!!???";
+      $
+    }
+  }
+
+//  def product = m * t;
+
+  bigint c = leadcomp(product); int r = int(c);
+
+  def a, b, bb;
+
+  vector nf = [0];
+
+  // looking for an appropriate diviser
+  for( int k = ncols(L); k > 0; k-- )
+  {
+    a = L[k];
+    // with the same mod. component
+    if( leadcomp(a) == c )
+    {
+      b = - (leadmonomial(product) / leadmonomial(L[k]));
+
+      // which divides the product: looking for the 1st appropriate one!
+      if( b != 0 )
+      {
+        bb = b * gen(k);
+        
+        if (size(bb + syzterm) == 0) // cannot allow something like: a*gen(i) - a*gen(i)
+        {
+          nf = [0];
+        } else
+        {
+          nf = bb;
+        }
+
+        // new syz. term should not be in <LS = #>
+        if( size(#) > 0 )
+        {
+          if( typeof(#[1]) == "module" )
+          {
+            nf = NF(bb, #[1]);
+          }
+        }
+
+        // while the complement (the fraction) is not reducible by leading syzygies 
+        if( nf != 0 ) // nf must be == bb!!!
+        {
+          /// TODO: save shortcut LM(m) * T[i] -> ?
+
+          // choose ANY such reduction... (with the biggest index?)
+          break;
+        }
+      }
+    }
+  }  
+  if( @DEBUG )
+  {
+    "SSFindReducer::Output: ", nf;
+  }
+  return (nf);
+}
+
+
+
+
+
+/// TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
+proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
+{
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
+
+
   if( @DEBUG )
   {
     "SSReduce::Input: ";
 
+    "syzterm: ", syzterm;
     "mult: ", m;
     "term: ", t;
     "L: ", L;
@@ -1064,64 +1175,56 @@ proc SSReduceTerm(poly m, def t, def L, def T, list #)
     }
 //    "attrib(LS, 'isSB')", attrib(LS, "isSB");
   }
-  
-  vector s = 0;
 
-  if( t == 0 )
+
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
   {
-    return (s);
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
   }
 
-  def product = m * t;
-
-  bigint c = leadcomp(t);
-  int r = int(c);
-  
-  def a, b, nf, bb;
-
-  // looking for an appropriate reducer
-  for( int k = ncols(L); k > 0; k-- )
+  if( @SYZCHECK && (syzterm != 0) )
   {
-    a = L[k];
-    // with the same mod. component
-    if( leadcomp(a) == c )
+    def @@c = leadcomp(syzterm); int @@r = int(@@c);
+    poly @@m = leadmonomial(syzterm); def @@t = L[@@r];
+
+    if( (@@m != m) || (@@t != t))
     {
-      b = - (leadmonomial(product) / leadmonomial(L[k]));
-      
-      // which divides the product
-      if( b != 0 )
-      {
-//        "b: ", b;
-        bb = b * gen(k);
-        nf = bb;
-
-        if( size(#) > 0 )
-        {
-          if( typeof(#[1]) == "module" )
-          {
-            nf = NF(bb, #[1]);
-//        "NF: ", nf;
-          }
-        }
-
-        // while the complement (the fraction) is not reducible by leading syzygies 
-        if( nf != 0 )
-        {
-          /// TODO: save shortcut LM(m) * T[i] -> ?
-
-          // choose ANY such reduction... (with the biggest index?)
-          s = bb + SSTraverseTail(b, T[k], L, T, #);
-          break;
-        }
-      }
+      "m: ", m, ", t: ", t;
+      "@@m: ", @@m, ", @@t: ", @@t;
+      "ERROR: 'syzterm' results in wrong m * t !!!";
+      $
     }
-  }  
+  }
+
+  vector s = [0];
+
+  if( size(t) > 0 )
+  {
+    def product = m * t;
+
+    s = SSFindReducer(product, syzterm, L, T, #);
+
+    if( size(s) != 0 )
+    {
+      poly b = leadmonomial(s);
+
+      def c = leadcomp(s); int k = int(c);
+
+      s = s + SSTraverseTail(b, T[k], L, T, #); // !!!   
+    }
+  }
+    
   if( @DEBUG )
   {
     "SSReduceTerm::Output: ", s;
   }
+  
   return (s);
 }
+
 
 // TODO: store m * @tail -.-^-.-^-.--> ?
 proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
@@ -1155,7 +1258,7 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
   while( size(@tail) > 0 )
   {
     @l = lead(@tail);
-    s = s + SSReduceTerm(m, @l, L, T, #);
+    s = s + SSReduceTerm(m, @l, [0], L, T, #); // :(
     @tail = @tail - @l;
   }
 
@@ -1213,31 +1316,38 @@ proc SSComputeSyzygy(def L, def T)
   if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
   {
     @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
-//    @TAILREDSYZ;
   }
+
+  int @HYBRIDNF = 0;
+  if( typeof( attrib(basering, "HYBRIDNF") ) == "int" )
+  {
+    @HYBRIDNF = attrib(basering, "HYBRIDNF");
+  }
+
+  module LL;
+  def a2; int r2; poly aa2;  
 
   /// Get the critical leading syzygy terms
   if( @LEAD2SYZ ) // & 2nd syz. term
   {
-    def a2; int r2; poly aa2;  
-    module LL, LL2;
+    module LL2;
     (LL, LL2) = SSCompute2LeadingSyzygyTerms(L); // ++ 
   } else
   {
-    module LL = SSComputeLeadingSyzygyTerms(L);
+    LL = SSComputeLeadingSyzygyTerms(L);
   }
 
-  module TT, SYZ;
+  module TT, SYZ; def spoly;
 
   if( size(LL) > 0 )
   {
     list LS;
 
-    if( @TAILREDSYZ )
+    if( @TAILREDSYZ)
     {
       LS = list(LL);
     }
-    
+
     vector @tail;
 
     for(k = ncols(LL); k > 0; k-- )
@@ -1246,36 +1356,76 @@ proc SSComputeSyzygy(def L, def T)
       a = LL[k]; c = leadcomp(a); r = int(c); aa = leadmonomial(a);
       //    "A: ", a, " --->>>> ", aa, " **** [", r, "]: ";
 
-      /// TODO: save shortcut (aa) * T[r] -> ?
-      @tail = SSTraverseTail(aa, T[r], L, T, LS);
-             
-      // get the 2nd syzygy term...
-      
-      if( @LEAD2SYZ ) // with the 2nd syz. term:
-      {      
-        a2 = LL2[k]; c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
-        @tail = @tail + 
-             /// TODO: save shortcut (aa2) * T[r2] -> ?
-             a2 + SSTraverseTail(aa2, T[r2], L, T, LS);
+      // NF reduction:
+      if( !@HYBRIDNF )
+      {
+        /// TODO: save shortcut (aa) * T[r] -> ?
+        @tail = SSTraverseTail(aa, T[r], L, T, LS);
+  // //      @tail = SSTraverseTail(a, L, T, LS);
+
+        // get the 2nd syzygy term...
+
+        if( @LEAD2SYZ ) // with the 2nd syz. term:
+        {      
+          a2 = LL2[k]; c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
+
+          @tail = @tail + a2 + 
+               /// TODO: save shortcut (aa2) * T[r2] -> ?
+               SSTraverseTail(aa2, T[r2], L, T, LS);
+  // //               SSTraverseTail(a2, L, T, LS);
+        } else
+        {
+          @tail = @tail +
+                  SSReduceTerm(aa, L[r], a, L, T, LS);
+  // //                  SSReduceTerm(a, L, T, LS);
+        }
       } else
       {
-        @tail = @tail + SSReduceTerm(aa, L[r], L, T, LS);
-      }      
+        spoly = aa * T[r];
+
+        if( @LEAD2SYZ )
+        {
+          a2 = LL2[k];
+        } else
+        {
+          a2 = SSFindReducer( aa * L[r], a, L, T, LS);
+        }
+
+        if ( (@SYZCHECK || @DEBUG) )
+        {
+          if( size(a2) == 0 ) // if syzterm == 0!!!!
+          {
+            "ERROR: could not find the 2nd syzygy term during the hybrid NF!!!";
+            $
+          }
+        }
+        
+        c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
+        
+        spoly = spoly + aa2 * T[r2];
+        @tail = a2;
+
+        while (size(spoly) > 0)
+        {
+          a2 = SSFindReducer( lead(spoly), [0], L, T, LS);
+          spoly = Tail(spoly);
+
+          if( size(a2) != 0)
+          {          
+            c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
+
+            spoly = spoly + aa2 * T[r2];
+            @tail = @tail + a2;
+          }
+        }
+        
+      }
       
       TT[k] = @tail;
       SYZ[k] = a + @tail;
     }
   }
 
-/*
-  def opts = option(get); option(redSB); option(redTail); 
-  module SYZ = std(syz(M)); 
-  option(set, opts); kill opts;
-  
-  module LL = lead(SYZ); // TODO: WRONG ORDERING!!!!!!!!
-  module TT = Tail(SYZ);
-*/
-  
   if( @DEBUG )
   {
     "SSComputeSyzygy::Output";
@@ -1498,6 +1648,7 @@ example
 */  
 
   ideal M = maxideal(1); M;
+
   def S = SSres(M, 0); setring S; S;
   MRES;
   RES;
