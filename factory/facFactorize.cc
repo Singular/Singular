@@ -112,30 +112,43 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
   irred= false;
   Variable v;
   CFList factors;
-  for (int j= 0; j < A.level() - 2; j++)
+  CanonicalForm LCA= LC (A,1);
+  if (!LCA.inCoeffDomain())
   {
-    if (!Aeval[j].isEmpty())
+    for (int j= 0; j < A.level() - 2; j++)
     {
-      v= Variable (Aeval[j].getFirst().level());
-
-      factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
-
-      if (factors.getFirst().inCoeffDomain())
-        factors.removeFirst();
-
-      if (minFactorsLength == 0)
-        minFactorsLength= factors.length();
-      else
-        minFactorsLength= tmin (minFactorsLength, factors.length());
-
-      if (factors.length() == 1)
+      if (!Aeval[j].isEmpty() && (degree (LCA, j+3) > 0))
       {
-        irred= true;
-        return;
+        v= Variable (Aeval[j].getFirst().level());
+
+        factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
+
+        if (factors.getFirst().inCoeffDomain())
+          factors.removeFirst();
+
+        if (minFactorsLength == 0)
+          minFactorsLength= factors.length();
+        else
+          minFactorsLength= tmin (minFactorsLength, factors.length());
+
+        if (factors.length() == 1)
+        {
+          irred= true;
+          return;
+        }
+        sortList (factors, x);
+        Aeval [j]= factors;
       }
-      sortList (factors, x);
-      Aeval [j]= factors;
+      else if (!Aeval[j].isEmpty())
+      {
+        Aeval[j]=CFList();
+      }
     }
+  }
+  else
+  {
+    for (int j= 0; j < A.level() - 2; j++)
+      Aeval[j]= CFList();
   }
 }
 
