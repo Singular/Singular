@@ -1049,35 +1049,20 @@ BOOLEAN ssiClose(si_link l)
       }
       if (d->pid!=0)
       {
-        int status;
-        if (waitpid(d->pid,&status,WNOHANG)==0)
+        struct timespec t;
+        t.tv_sec=0;
+        t.tv_nsec=100000000; // <=100 ms
+        int r=nanosleep(&t,NULL);
+        if(waitpid(d->pid,NULL,WNOHANG)==0)
         {
-          struct timespec t,tt;
+          kill(d->pid,15);
           t.tv_sec=0;
-          t.tv_nsec=100000000;
-          int r=nanosleep(&t,&tt);
-          if(r!=-1)
+          t.tv_nsec=10000000; // <=100 ms
+          r=nanosleep(&t,NULL);
+          if(waitpid(d->pid,NULL,WNOHANG)==0)
           {
-            kill(d->pid,15);
-            if(waitpid(d->pid,&status,WNOHANG)==0)
-            {
-              t.tv_sec=0;
-              t.tv_nsec=100000000;
-              r=nanosleep(&t,&tt);
-              if(waitpid(d->pid,&status,WNOHANG)==0)
-              {
-                kill(d->pid,9); // just to be sure
-                waitpid(d->pid,NULL,0);
-              }
-            }
-          }
-          else
-          {
-            if(waitpid(d->pid,&status,WNOHANG)==0)
-            {
-              kill(d->pid,9); // just to be sure
-              waitpid(d->pid,NULL,0);
-            }
+            kill(d->pid,9); // just to be sure
+            waitpid(d->pid,NULL,0);
           }
         }
       }
