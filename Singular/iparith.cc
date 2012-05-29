@@ -6951,7 +6951,6 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   if (!idIsConstant((ideal)pMat)
   ||(!idIsConstant((ideal)lMat))
   ||(!idIsConstant((ideal)uMat))
-  ||(!idIsConstant((ideal)bVec))
   )
   {
     WerrorS("matrices must be constant");
