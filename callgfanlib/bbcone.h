@@ -22,5 +22,7 @@ int getCodimension(gfan::ZCone* zc);
 int getLinealityDimension(gfan::ZCone* zc);
 int isSimplicial(gfan::ZCone* zc);
 
+gfan::ZCone liftUp(const gfan::ZCone &zc);
+
  #endif
 #endif
