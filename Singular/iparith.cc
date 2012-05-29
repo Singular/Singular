@@ -4394,6 +4394,11 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
      Then, we also have P * M = L * U.
      A list [P, L, U] is returned. */
   matrix mat = (const matrix)v->Data();
+  if (!idIsConstant((ideal)mat))
+  {
+    WerrorS("matrix must be constant");
+    return TRUE;
+  }
   int rr = mat->rows();
   int cc = mat->cols();
   matrix pMat;
@@ -6828,6 +6833,11 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
         Werror("given matrix (%d x %d) is not quadratic, hence not invertible", rr, cc);
         return TRUE;
       }
+      if (!idIsConstant((ideal)aMat))
+      {
+        WerrorS("matrix must be constant");
+        return TRUE;
+      }
       invertible = luInverse(aMat, iMat);
     }
   }
@@ -6848,6 +6858,14 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
               rr, cc);
        return TRUE;
      }
+      if (!idIsConstant((ideal)pMat)
+      || (!idIsConstant((ideal)lMat))
+      || (!idIsConstant((ideal)uMat))
+      )
+      {
+        WerrorS("matricesx must be constant");
+        return TRUE;
+      }
      invertible = luInverseFromLUDecomp(pMat, lMat, uMat, iMat);
   }
   else
@@ -6928,6 +6946,15 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   {
     Werror("third matrix (%d x %d) and vector (%d x 1) do not fit",
            uMat->rows(), uMat->cols(), bVec->rows());
+    return TRUE;
+  }
+  if (!idIsConstant((ideal)pMat)
+  ||(!idIsConstant((ideal)lMat))
+  ||(!idIsConstant((ideal)uMat))
+  ||(!idIsConstant((ideal)bVec))
+  )
+  {
+    WerrorS("matrices must be constant");
     return TRUE;
   }
   solvable = luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, homogSolSpace);
