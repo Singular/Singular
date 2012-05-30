@@ -58,16 +58,17 @@ void paCleanUp(package pack);
 int iiS2I(const char *s)
 {
   int i;
+  int c;
   i=s[0];
-  if (s[1]!='\0')
+  if ((c=s[1])!='\0')
   {
-    i=(i<<8)+s[1];
-    if (s[2]!='\0')
+    i=(i<<8)+c;
+    if ((c=s[2])!='\0')
     {
-      i=(i<<8)+s[2];
-      if (s[3]!='\0')
+      i=(i<<8)+c;
+      if ((c=s[3])!='\0')
       {
-        i=(i<<8)+s[3];
+        i=(i<<8)+c;
       }
     }
   }
