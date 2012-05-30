@@ -508,29 +508,36 @@ proc MySort(def M)
     "MySort:: Input: "; M;
   }
 
-  def @N = M; Sort_c_ds(@N);
+  def @N = M;
   
-  if( @KERCHECK )
+  if( size(M) > 0 )
   {
-    def iv = sort(lead(M), "c,ds", 1)[2]; // ,1 => reversed! // TODO: not needed?
-    def @M = M;
-    @M = M[iv];
-    
-    // 0^th syz. property
-    if(size(@N) * size(@M) > 0 )
-    {
-    if( size(module( matrix(module(matrix(@N))) - matrix(module(matrix(@M))) )) > 0 )
-    {
-      "@M:"; @M;
-      "@N:"; @N;
+    Sort_c_ds(@N);
 
-      "module( matrix(@N) - matrix(@M) ): ";
-      module( matrix(@N) - matrix(@M) );
+    if( @KERCHECK )
+    {
+      def iv = sort(lead(M), "c,ds", 1)[2]; // ,1 => reversed! // TODO: not needed?
+      def @M = M;
+      @M = M[iv];
 
-      "ERROR: MySort: wrong sorting in 'MySort': @N != @M!!!";
-      $
+      // 0^th syz. property
+      if( (size(@N) + size(@M)) > 0 )
+      {
+        if( size(module( matrix(module(matrix(@N))) - matrix(module(matrix(@M))) )) > 0 )
+        {
+          "ERROR: MySort: wrong sorting in 'MySort': @N != @M!!!";
+          
+          "@M:"; @M;
+          "@N:"; @N;
+
+          "module( matrix(module(matrix(@N))) - matrix(module(matrix(@M))) ): ";
+          module( matrix(module(matrix(@N))) - matrix(module(matrix(@M))) );
+
+          "ERROR: MySort: wrong sorting in 'MySort': @N != @M!!!";
+          $
+        }
+      } 
     }
-    } 
   }
 
   if( @DEBUG )
@@ -878,7 +885,7 @@ proc SSComputeLeadingSyzygyTerms(def L)
 
     S = MySort(simplify(S, 2));
 
-    if( size(S) * size(SS) > 0 )
+    if( (size(S) + size(SS)) > 0 )
     {
     if( size(module(matrix(S) - matrix(SS))) > 0 )
     {
