@@ -345,12 +345,32 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
   return blackboxDefaultOpM(op,res,args);
 }
 
+void lClean_newstruct(lists l)
+{
+  if (l->nr>=0)
+  {
+    int i;
+    ring r=NULL;
+    for(i=l->nr;i>=0;i--)
+    {
+      if ((i>0) && (l->m[i-1].rtyp==RING_CMD))
+        r=(ring)(l->m[i-1].data);
+      else
+        r=NULL;
+      l->m[i].CleanUp(r);
+    }
+    omFreeSize((ADDRESS)l->m, (l->nr+1)*sizeof(sleftv));
+    l->nr=-1;
+  }
+  omFreeBin((ADDRESS)l,slists_bin);
+}
+
 void newstruct_destroy(blackbox *b, void *d)
 {
   if (d!=NULL)
   {
     lists n=(lists)d;
-    n->Clean();
+    lClean_newstruct(n);
   }
 }
 
@@ -575,6 +595,17 @@ newstruct_desc newstructChildFromString(const char *parent, const char *s)
   res->parent=parent_desc;
 
   return scanNewstructFromString(s,res);
+}
+void newstructShow(newstruct_desc d)
+{
+  newstruct_member elem;
+  Print("id: %d\n",d->id);
+  elem=d->member;
+  while (elem!=NULL)
+  {
+    Print(">>%s<< at pos %d, type %d\n",elem->name,elem->pos,elem->typ);
+    elem=elem->next;
+  }
 }
 
 BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinfov pr)
