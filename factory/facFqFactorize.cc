@@ -34,9 +34,9 @@
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
 
-TIMING_DEFINE_PRINT(fac_bi_factorizer)
-TIMING_DEFINE_PRINT(fac_hensel_lift)
-TIMING_DEFINE_PRINT(fac_factor_recombination)
+TIMING_DEFINE_PRINT(fac_fq_bi_factorizer)
+TIMING_DEFINE_PRINT(fac_fq_hensel_lift)
+TIMING_DEFINE_PRINT(fac_fq_factor_recombination)
 
 static inline
 CanonicalForm
@@ -2406,14 +2406,14 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     bufLift= degree (A, y) + 1 + degree (LC(A, x), y);
 
-    TIMING_START (fac_bi_factorizer);
+    TIMING_START (fac_fq_bi_factorizer);
     if (!GF && alpha.level() == 1)
       bufBiFactors= FpBiSqrfFactorize (bufAeval.getFirst());
     else if (GF)
       bufBiFactors= GFBiSqrfFactorize (bufAeval.getFirst());
     else
       bufBiFactors= FqBiSqrfFactorize (bufAeval.getFirst(), alpha);
-    TIMING_END_AND_PRINT (fac_bi_factorizer,
+    TIMING_END_AND_PRINT (fac_fq_bi_factorizer,
                           "time for bivariate factorization: ");
     bufBiFactors.removeFirst();
 
@@ -2710,24 +2710,24 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     CFList MOD;
     bool earlySuccess;
     CFList earlyFactors, liftedFactors;
-    TIMING_START (fac_hensel_lift);
+    TIMING_START (fac_fq_hensel_lift);
     liftedFactors= henselLiftAndEarly
                    (A, MOD, liftBounds, earlySuccess, earlyFactors,
                     Aeval, biFactors, evaluation, info);
-    TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_hensel_lift, "time for hensel lifting: ");
 
     if (!extension)
     {
-      TIMING_START (fac_factor_recombination);
+      TIMING_START (fac_fq_factor_recombination);
       factors= factorRecombination (A, liftedFactors, MOD);
-      TIMING_END_AND_PRINT (fac_factor_recombination,
+      TIMING_END_AND_PRINT (fac_fq_factor_recombination,
                             "time for factor recombination: ");
     }
     else
     {
-      TIMING_START (fac_factor_recombination);
+      TIMING_START (fac_fq_factor_recombination);
       factors= extFactorRecombination (liftedFactors, A, MOD, info, evaluation);
-      TIMING_END_AND_PRINT (fac_factor_recombination,
+      TIMING_END_AND_PRINT (fac_fq_factor_recombination,
                             "time for factor recombination: ");
     }
 
