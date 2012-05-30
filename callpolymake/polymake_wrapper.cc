@@ -1251,10 +1251,10 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
 BOOLEAN PMminkowskiSum(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && ((u->Typ() == polytopeID) || (u->Typ() == coneID)))
+  if ((u != NULL) && (u->Typ() == polytopeID))
   {
     leftv v = u->next;
-    if ((v != NULL) && ((v->Typ() == polytopeID) && (v->Typ() == coneID)))
+    if ((v != NULL) && (v->Typ() == polytopeID))
     {
       gfan::ZCone* zp = (gfan::ZCone*)u->Data();
       gfan::ZCone* zq = (gfan::ZCone*)v->Data();
@@ -1274,6 +1274,85 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         return TRUE;
       }
       res->rtyp = polytopeID;
+      res->data = (char*) ms;
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zc = (gfan::ZCone*)v->Data();
+      gfan::ZCone* zq = new gfan::ZCone(liftUp(*zc));
+      gfan::ZCone* ms;
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        delete pp, pq;
+        ms = PmPolytope2ZPolytope(&pms);
+      }
+      catch (const std::exception& ex) 
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+        delete zq;
+        return TRUE;
+      }
+      res->rtyp = polytopeID;
+      res->data = (char*) ms;
+      delete zq;
+      return FALSE;
+    }
+  }
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == polytopeID))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zp = new gfan::ZCone(liftUp(*zc));
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+      gfan::ZCone* ms;
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        delete pp, pq;
+        ms = PmPolytope2ZPolytope(&pms);
+      }
+      catch (const std::exception& ex) 
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+        delete zp;
+        return TRUE;
+      }
+      res->rtyp = polytopeID;
+      res->data = (char*) ms;
+      delete zp;
+      return FALSE;
+    }
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      gfan::ZCone* zp = (gfan::ZCone*)u->Data();
+      gfan::ZCone* zq = (gfan::ZCone*)v->Data();
+      gfan::ZCone* ms;
+      try
+      {
+        polymake::perl::Object* pp = ZPolytope2PmPolytope(zp);
+        polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
+        polymake::perl::Object pms;
+        CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
+        delete pp, pq;
+        ms = PmPolytope2ZPolytope(&pms);
+      }
+      catch (const std::exception& ex) 
+      {
+        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n"); 
+        return TRUE;
+      }
+      res->rtyp = coneID;
       res->data = (char*) ms;
       return FALSE;
     }
