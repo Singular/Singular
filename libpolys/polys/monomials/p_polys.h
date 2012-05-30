@@ -1570,14 +1570,14 @@ static inline int p_Cmp(poly p1, poly p2, ring r)
  * divisibility
  *
  ***************************************************************/
-// return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
-//         TRUE, otherwise
-// (1) Consider long vars, instead of single exponents
-// (2) Clearly, if la > lb, then FALSE
-// (3) Suppose la <= lb, and consider first bits of single exponents in l:
-//     if TRUE, then value of these bits is la ^ lb
-//     if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
-//               la ^ lb != la - lb
+/// return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
+///         TRUE, otherwise
+/// (1) Consider long vars, instead of single exponents
+/// (2) Clearly, if la > lb, then FALSE
+/// (3) Suppose la <= lb, and consider first bits of single exponents in l:
+///     if TRUE, then value of these bits is la ^ lb
+///     if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
+///               la ^ lb != la - lb
 static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, const ring r)
 {
   int i=r->VarL_Size - 1;
