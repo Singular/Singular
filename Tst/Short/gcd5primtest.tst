@@ -1,7 +1,7 @@
 LIB "tst.lib";tst_init();
 proc test5prim (int p)
 {
-  ring r= 3, x(1..11), dp;
+  ring r= p, x(1..11), dp;
   poly d1= x(1);
   poly d2= x(2);
   poly f1= x(1);
