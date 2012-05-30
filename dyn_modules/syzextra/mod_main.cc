@@ -594,7 +594,7 @@ static int cmp_c_ds(const void *p1, const void *p2)
 #ifndef NDEBUG
   if( __DEBUG__ )
   {
-    PrintS("   a & b have the same comp & deg! "); PrintLn();
+    PrintS("cmp_c_ds: a & b have the same comp & deg! "); PrintLn();
   }
 #endif
 
@@ -1069,6 +1069,226 @@ static BOOLEAN Compute2LeadingSyzygyTerms(leftv res, leftv h)
 }
 
 
+/// return a new term: leading coeff * leading monomial of p
+/// with 0 leading component!
+static inline poly leadmonom(const poly p, const ring r)
+{
+  poly m = NULL;
+
+  if( p != NULL )
+  {
+    assume( p != NULL );
+    assume( p_LmTest(p, r) );
+
+    m = p_LmInit(p, r);
+    p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
+
+    p_SetComp(m, 0, r);
+    p_Setm(m, r);
+
+    assume( p_GetComp(m, r) == 0 );
+    assume( m != NULL );
+    assume( pNext(m) == NULL );
+    assume( p_LmTest(m, r) );
+  }
+
+  return m;
+}
+
+
+/// TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
+/// proc SSFindReducer(def product, def syzterm, def L, def T, list #)
+static BOOLEAN FindReducer(leftv res, leftv h)
+{
+  const ring r = currRing;
+
+  NoReturn(res);
+
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
+  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
+  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
+
+  if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
+  {
+    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    return TRUE;    
+  }
+    
+  const poly product = (poly) h->Data(); h = h->Next();
+
+  assume (product != NULL);
+
+    
+  if ((h==NULL) || (h->Typ()!=VECTOR_CMD))
+  {
+    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    return TRUE;    
+  }
+
+  const poly syzterm = (poly) h->Data(); h = h->Next();
+
+  int c = 0;
+  
+  if (syzterm != NULL)
+    c = p_GetComp(syzterm, r) - 1;
+  
+  
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    return TRUE;    
+  }
+  
+  const ideal L = (ideal) h->Data(); h = h->Next();
+
+  assume( IDELEMS(L) > 0 );
+  assume( c >= 0 && c < IDELEMS(L) );
+
+  
+/*
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    return TRUE;    
+  }
+
+  const ideal T = (ideal) h->Data(); h = h->Next();
+*/
+
+  ideal LS = NULL;
+
+  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
+  {
+    LS = (ideal)h->Data();
+    h = h->Next();
+  }
+
+  if( __TAILREDSYZ__ )
+    assume (LS != NULL);
+
+  assume( h == NULL );
+
+  if( __DEBUG__ )
+  {
+    PrintS("FindReducer(product, syzterm, L, T, #)::Input: \n");
+
+    PrintS("product: "); dPrint(product, r, r, 2);
+    PrintS("syzterm: "); dPrint(syzterm, r, r, 2);
+    PrintS("L: "); dPrint(L, r, r, 2);
+//    PrintS("T: "); dPrint(T, r, r, 4);
+
+    if( LS == NULL )
+      PrintS("LS: NULL\n");
+    else
+    {
+      PrintS("LS: "); dPrint(LS, r, r, 2);
+    }
+  }
+
+
+  if (__SYZCHECK__ && syzterm != NULL)
+  {
+    const poly m = L->m[c];
+
+    assume( m != NULL ); assume( pNext(m) == NULL );
+
+    poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
+    assume( p_EqualPolys(lm, product, r) );
+
+    //  def @@c = leadcomp(syzterm); int @@r = int(@@c);
+    //  def @@product = leadmonomial(syzterm) * L[@@r];
+
+    p_Delete(&lm, r);    
+  }
+
+  
+  res->rtyp = VECTOR_CMD;
+
+  // looking for an appropriate diviser q = L[k]...
+  for( int k = IDELEMS(L)-1; k>= 0; k-- )
+  {
+    const poly p = L->m[k];    
+
+    // ... which divides the product, looking for the _1st_ appropriate one!
+    if( !p_LmDivisibleBy(p, product, r) )
+      continue;
+
+
+    const poly q = p_New(r);
+    pNext(q) = NULL;
+    p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
+    p_SetComp(q, k + 1, r);
+    p_Setm(q, r);
+
+    // cannot allow something like: a*gen(i) - a*gen(i)
+    if (syzterm != NULL && (k == c))
+      if (p_ExpVectorEqual(syzterm, q, r))
+      {
+        if( __DEBUG__ )
+        {
+          Print("FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          dPrint(syzterm, r, r, 1);
+        }    
+        
+        p_LmFree(q, r);
+        continue;
+      }
+
+    // while the complement (the fraction) is not reducible by leading syzygies 
+    if( LS != NULL )
+    {
+      BOOLEAN ok = TRUE;
+      
+      for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
+      {
+        const poly pp = LS->m[kk];
+
+        if( p_LmDivisibleBy(pp, q, r) )
+        {
+          if( __DEBUG__ )
+          {
+            Print("FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", kk+1);
+            dPrint(pp, r, r, 1);
+          }    
+
+          ok = FALSE; // q in <LS> :((
+          break;                 
+        }
+      }
+      
+      if(!ok)
+      {
+        p_LmFree(q, r);
+        continue;
+      }
+    }
+
+    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+
+    if( __DEBUG__ )
+    {
+      PrintS("FindReducer::Output: \n");
+      dPrint(q, r, r, 1);
+    }    
+
+    res->data = q;
+    return FALSE;
+  }
+
+  res->data = NULL;
+  return FALSE;   
+  
+}
+
+
+
 /// Get leading term without a module component
 static BOOLEAN leadmonom(leftv res, leftv h)
 {
@@ -1079,26 +1299,7 @@ static BOOLEAN leadmonom(leftv res, leftv h)
     const ring r = currRing;
     const poly p = (poly)(h->Data());
 
-    poly m = NULL;
-
-    if( p != NULL )
-    {
-      assume( p != NULL );
-      assume( p_LmTest(p, r) );
-
-      m = p_LmInit(p, r);
-      p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
-
-      //            if( p_GetComp(m, r) != 0 )
-      //            {
-      p_SetComp(m, 0, r);
-      p_Setm(m, r);
-      //            }
-
-      assume( p_GetComp(m, r) == 0 );
-      assume( m != NULL );
-      assume( p_LmTest(m, r) );
-    }
+    const poly m = leadmonom(p, r);
 
     res->rtyp = POLY_CMD;
     res->data = reinterpret_cast<void *>(m);
@@ -1720,6 +1921,8 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD(psModulFunctions, currPack->libname, "Compute2LeadingSyzygyTerms", FALSE, Compute2LeadingSyzygyTerms);
   
   ADD(psModulFunctions, currPack->libname, "Sort_c_ds", FALSE, Sort_c_ds);
+  ADD(psModulFunctions, currPack->libname, "FindReducer", FALSE, FindReducer);
+  
   
   //  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
 

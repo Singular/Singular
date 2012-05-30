@@ -1077,7 +1077,7 @@ proc SSCompute2LeadingSyzygyTerms(def L)
 // -------------------------------------------------------- //
 
 /// TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
-proc SSFindReducer(def product, def syzterm, def L, def T, list #)
+proc SSFindReducer(def product, def syzterm, def L/*, def T*/, list #)
 {
   if( typeof( attrib(basering, "DEBUG") ) == "int" )
   {
@@ -1095,7 +1095,7 @@ proc SSFindReducer(def product, def syzterm, def L, def T, list #)
     "syzterm: ", syzterm;
     "product: ", product;
     "L: ", L;
-    "T: ", T;
+//    "T: ", T;
     if( size(#) > 0 )
     {
       "LSyz: ", #;
@@ -1124,61 +1124,79 @@ proc SSFindReducer(def product, def syzterm, def L, def T, list #)
     }
   }
 
-//  def product = m * t;
-
-  bigint c = leadcomp(product); int r = int(c);
-
-  def a, b, bb;
-
-  vector nf = [0];
-
-  // looking for an appropriate diviser
-  for( int k = ncols(L); k > 0; k-- )
+  if( typeof(#[1]) == "module" )
   {
-    a = L[k];
-    // with the same mod. component
-    if( leadcomp(a) == c )
+    vector my = FindReducer(product, syzterm, L/*, T*/, #[1]);
+  } else
+  {
+    vector my = FindReducer(product, syzterm, L/*, T*/);
+  }
+  
+
+  if( @SYZCHECK )
+  {
+    bigint c = leadcomp(product); int r = int(c);
+
+    def a, b, bb;
+
+    vector nf = [0];
+
+    // looking for an appropriate diviser
+    for( int k = ncols(L); k > 0; k-- )
     {
-      b = - (leadmonomial(product) / leadmonomial(L[k]));
-
-      // which divides the product: looking for the 1st appropriate one!
-      if( b != 0 )
+      a = L[k];
+      // with the same mod. component
+      if( leadcomp(a) == c )
       {
-        bb = b * gen(k);
-        
-        if (size(bb + syzterm) == 0) // cannot allow something like: a*gen(i) - a*gen(i)
-        {
-          nf = [0];
-        } else
-        {
-          nf = bb;
-        }
+        b = - (leadmonomial(product) / leadmonomial(L[k]));
 
-        // new syz. term should not be in <LS = #>
-        if( size(#) > 0 )
+        // which divides the product: looking for the 1st appropriate one!
+        if( b != 0 )
         {
-          if( typeof(#[1]) == "module" )
+          bb = b * gen(k);
+
+          if (size(bb + syzterm) == 0) // cannot allow something like: a*gen(i) - a*gen(i)
           {
-            nf = NF(bb, #[1]);
+            nf = [0];
+          } else
+          {
+            nf = bb;
           }
-        }
 
-        // while the complement (the fraction) is not reducible by leading syzygies 
-        if( nf != 0 ) // nf must be == bb!!!
-        {
-          /// TODO: save shortcut LM(m) * T[i] -> ?
+          // new syz. term should not be in <LS = #>
+          if( size(#) > 0 )
+          {
+            if( typeof(#[1]) == "module" )
+            {
+              nf = NF(bb, #[1]);
+            }
+          }
 
-          // choose ANY such reduction... (with the biggest index?)
-          break;
+          // while the complement (the fraction) is not reducible by leading syzygies 
+          if( nf != 0 ) // nf must be == bb!!!
+          {
+            /// TODO: save shortcut LM(m) * T[i] -> ?
+
+            // choose ANY such reduction... (with the biggest index?)
+            break;
+          }
         }
       }
     }
-  }  
+
+    if( my != nf )
+    {
+      "ERROR in FindReducer => ", my, " != nf: ", nf;
+      $;
+    }
+  }
+
   if( @DEBUG )
   {
-    "SSFindReducer::Output: ", nf;
+    "SSFindReducer::Output: ", my;
   }
-  return (nf);
+ 
+  return (my);
 }
 
 
@@ -1242,7 +1260,7 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
   {
     def product = m * t;
 
-    s = SSFindReducer(product, syzterm, L, T, #);
+    s = SSFindReducer(product, syzterm, L/*, T*/, #);
 
     if( size(s) != 0 )
     {
@@ -1425,7 +1443,7 @@ proc SSComputeSyzygy(def L, def T)
           a2 = LL2[k];
         } else
         {
-          a2 = SSFindReducer( aa * L[r], a, L, T, LS);
+          a2 = SSFindReducer( aa * L[r], a, L/*, T*/, LS);
         }
 
         if ( (@SYZCHECK || @DEBUG) )
@@ -1444,7 +1462,7 @@ proc SSComputeSyzygy(def L, def T)
 
         while (size(spoly) > 0)
         {
-          a2 = SSFindReducer( lead(spoly), [0], L, T, LS);
+          a2 = SSFindReducer( lead(spoly), [0], L/*, T*/, LS);
           spoly = Tail(spoly);
 
           if( size(a2) != 0)
@@ -1826,6 +1844,8 @@ static proc loadme()
       exportto(Schreyer, Syzextra::ComputeLeadingSyzygyTerms);      
       exportto(Schreyer, Syzextra::Compute2LeadingSyzygyTerms);
       exportto(Schreyer, Syzextra::Sort_c_ds);
+
+      exportto(Schreyer, Syzextra::FindReducer);
     }
 /*
     else
@@ -1870,6 +1890,8 @@ static proc loadme()
       exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);
       exportto(Schreyer, Syzextra_g::Compute2LeadingSyzygyTerms);
       exportto(Schreyer, Syzextra_g::Sort_c_ds);
+
+      exportto(Schreyer, Syzextra_g::FindReducer);
       
     }
 */
