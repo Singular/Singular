@@ -114,6 +114,34 @@ const char * iiTwoOps(int t)
   }
 }
 
+int iiOpsTwoChar(const char *s)
+{
+/* not handling: &&, ||, ** */
+  if (s[1]=='\0') return s[0];
+  else if (s[2]!='\0') return 0;
+  switch(s[0])
+  {
+    case '.': if (s[1]=='.') return DOTDOT;
+              else           return 0;
+    case ':': if (s[1]==':') return COLONCOLON;
+              else           return 0;
+    case '-': if (s[1]=='-') return COLONCOLON;
+              else           return 0;
+    case '+': if (s[1]=='+') return PLUSPLUS;
+              else           return 0;
+    case '=': if (s[1]=='=') return EQUAL_EQUAL;
+              else           return 0;
+    case '<': if (s[1]=='=') return LE;
+              else if (s[1]=='>') return NOTEQUAL;
+              else           return 0;
+    case '>': if (s[1]=='=') return GE;
+              else           return 0;
+    case '!': if (s[1]=='=') return NOTEQUAL;
+              else           return 0;
+  }
+  return 0;
+}
+
 static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 {
   char buffer[22];
@@ -1735,11 +1763,11 @@ lists rDecompose(const ring r)
   assume( r != NULL );
   const coeffs C = r->cf;
   assume( C != NULL );
-  
+
   // sanity check: require currRing==r for rings with polynomial data
-  if ( (r!=currRing) && ( 
-	   (nCoeff_is_algExt(C) && (C != currRing->cf))
-	|| (r->qideal != NULL)		 
+  if ( (r!=currRing) && (
+           (nCoeff_is_algExt(C) && (C != currRing->cf))
+        || (r->qideal != NULL)
 #ifdef HAVE_PLURAL
         || (rIsPluralRing(r))
 #endif
@@ -2191,7 +2219,7 @@ ring rCompose(const lists  L)
         {
           TransExtInfo extParam;
           extParam.r = extRing;
-	  assume( extRing->qideal == NULL );
+          assume( extRing->qideal == NULL );
 
           R->cf = nInitChar(n_transExt, &extParam);
         }
