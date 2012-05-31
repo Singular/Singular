@@ -44,8 +44,9 @@
 #include "FLINTconvert.h"
 #endif
 
-TIMING_DEFINE_PRINT(fac_uni_factorizer)
-TIMING_DEFINE_PRINT(fac_hensel_lift12)
+TIMING_DEFINE_PRINT(fac_fq_uni_factorizer)
+TIMING_DEFINE_PRINT(fac_fq_bi_hensel_lift)
+TIMING_DEFINE_PRINT(fac_fq_bi_factor_recombination)
 
 CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M, const modpk& b)
 {
@@ -5911,18 +5912,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       break;
 
     // univariate factorization
-    TIMING_START (fac_uni_factorizer);
+    TIMING_START (fac_fq_uni_factorizer);
     bufUniFactors= uniFactorizer (bufAeval, alpha, GF);
-    TIMING_END_AND_PRINT (fac_uni_factorizer,
+    TIMING_END_AND_PRINT (fac_fq_uni_factorizer,
                           "time for univariate factorization: ");
     DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
 
     if (!derivXZero && !fail2)
     {
-      TIMING_START (fac_uni_factorizer);
+      TIMING_START (fac_fq_uni_factorizer);
       bufUniFactors2= uniFactorizer (bufAeval2, alpha, GF);
-      TIMING_END_AND_PRINT (fac_uni_factorizer,
+      TIMING_END_AND_PRINT (fac_fq_uni_factorizer,
                             "time for univariate factorization in y: ");
       DEBOUTLN (cerr, "Lc (bufAeval2)*prod (bufUniFactors2)== bufAeval2 " <<
                 (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
@@ -6083,11 +6084,11 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   {
     bool earlySuccess= false;
     CFList earlyFactors;
-    TIMING_START (fac_hensel_lift12);
+    TIMING_START (fac_fq_bi_hensel_lift);
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);
@@ -6106,7 +6107,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
   else if (degree (A) > 4 && beta.level() == 1 && (2*minBound)/degMipo < 32)
   {
-    TIMING_START (fac_hensel_lift12);
+    TIMING_START (fac_fq_bi_hensel_lift);
     if (extension)
     {
       CFList lll= extHenselLiftAndLatticeRecombi (A, uniFactors, info, degs,
@@ -6124,18 +6125,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
     }
-    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
   }
   else
   {
     bool earlySuccess= false;
     CFList earlyFactors;
-    TIMING_START (fac_hensel_lift12);
+    TIMING_START (fac_fq_bi_hensel_lift);
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);

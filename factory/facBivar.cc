@@ -26,8 +26,9 @@
 #include "cf_primes.h"
 
 #ifdef HAVE_NTL
-TIMING_DEFINE_PRINT(uni_factorize)
-TIMING_DEFINE_PRINT(hensel_lift12)
+TIMING_DEFINE_PRINT(fac_uni_factorizer)
+TIMING_DEFINE_PRINT(fac_bi_hensel_lift)
+TIMING_DEFINE_PRINT(fac_bi_factor_recombination)
 
 // bound on coeffs of f (cf. Musser: Multivariate Polynomial Factorization,
 //                          Gelfond: Transcendental and Algebraic Numbers)
@@ -704,11 +705,11 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     dummy= ExtensionInfo (v, false);
   bool earlySuccess= false;
   CFList earlyFactors;
-  TIMING_START (fac_hensel_lift);
+  TIMING_START (fac_bi_hensel_lift);
   uniFactors= henselLiftAndEarly
               (A, earlySuccess, earlyFactors, degs, liftBound,
                uniFactors, dummy, evaluation, b);
-  TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+  TIMING_END_AND_PRINT (fac_bi_hensel_lift, "time for hensel lifting: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
   CanonicalForm MODl= power (y, liftBound);
