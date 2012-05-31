@@ -3685,6 +3685,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     return TRUE;
   }
   else
+/*==================== newstruct =================*/
+  if (strcmp(sys_cmd,"newstruct")==0)
+  {
+    if ((h!=NULL) && (h->Typ()==STRING_CMD))
+    {
+      int id=0;
+      blackboxIsCmd((char*)h->Data(),id);
+      blackbox *bb=getBlackboxStuff(id);
+      newstruct_desc desc=(newstruct_desc)bb->data;
+      newstructShow(desc);
+      return FALSE;
+    }
+    return TRUE;
+  }
+  else
 /*==================== reserved port =================*/
   if (strcmp(sys_cmd,"reserve")==0)
   {

@@ -127,8 +127,8 @@ int iiOpsTwoChar(const char *s)
               else           return 0;
     case '!': if (s[1]=='=') return NOTEQUAL;
               else           return 0;
-    defaukt: return 0;
   }
+  return 0;
 }
 
 static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)

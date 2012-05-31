@@ -130,7 +130,6 @@ void * newstruct_Copy(blackbox*b, void *d)
 
 BOOLEAN newstruct_Assign(leftv l, leftv r)
 {
-  blackbox *ll=getBlackboxStuff(l->Typ());
   if (r->Typ()>MAX_TOK)
   {
     blackbox *rr=getBlackboxStuff(r->Typ());
@@ -276,7 +275,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
   {
     a=getBlackboxStuff(a2->Typ());
     nt=(newstruct_desc)a->data;
-    lists al=(lists)a2->Data();
+    al=(lists)a2->Data();
   }
   newstruct_proc p=nt->procs;
   while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
