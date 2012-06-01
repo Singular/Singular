@@ -361,7 +361,8 @@ char* bigintmat::String()
     nlWrite(v[i], NULL);
     StringAppendS(",");
   }
-  nlWrite(v[i], NULL);
+  if ((col!=0) && (row!=0))
+    nlWrite(v[i], NULL);
    /* if (i != col*row-1)
     {
       StringAppendS(",");
