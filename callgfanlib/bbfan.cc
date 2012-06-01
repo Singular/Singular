@@ -121,9 +121,8 @@ static gfan::IntMatrix permutationIntMatrix(const bigintmat* iv)
 	    nlDelete(&temp1,NULL); 
 	    nlDelete(&temp2,NULL);
 	  }
-        gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
-        gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(*zm));
-        delete zm;
+        gfan::ZMatrix zm = bigintmatToZMatrix(ivCopy);
+        gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(zm));
         return *im;
 }
 static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
@@ -649,7 +648,7 @@ BOOLEAN getFVector(leftv res, leftv args)
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       gfan::ZVector zv=zf->getFVector();
       res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) zVectorToBigintmat(zv);
+      res->data = (void*) new bigintmat(zVectorToBigintmat(zv));
       return FALSE;
     }
   WerrorS("getFVector: unexpected parameters");
