@@ -25,6 +25,8 @@ class bigintmat
 
     bigintmat(): m_coeffs(NULL), v(NULL), row(1), col(0){}
 
+    bigintmat * transpose();
+
     bigintmat(int r, int c, const coeffs n): m_coeffs(n), v(NULL), row(r), col(c)
     {
       assume (rows() > 0);
@@ -170,7 +172,7 @@ class bigintmat
     char * String();
     void pprint(int maxwid);
     int compare(const bigintmat* op) const;
-    int getwid(int maxwid);
+    int * getwid(int maxwid);
 };
 
 bool operator==(const bigintmat & lhr, const bigintmat & rhr);
@@ -187,6 +189,9 @@ bigintmat * bimMult(bigintmat * a, int b);
 bigintmat * bimMult(bigintmat * a, number b, const coeffs cf);
 bigintmat * bimCopy(const bigintmat * b);
 
+int getShorter (int * a, int l, int j, int cols, int rows);
+int findLongest(int * a, int length);
+int intArrSum(int * a, int length);
 
 
 // Ungetestet

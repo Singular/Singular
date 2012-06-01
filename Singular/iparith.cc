@@ -4864,6 +4864,11 @@ static BOOLEAN jjTRACE_IV(leftv res, leftv v)
   res->data = (char *)(long)ivTrace((intvec*)(v->Data()));
   return FALSE;
 }
+static BOOLEAN jjTRANSP_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(((bigintmat*)(v->Data()))->transpose());
+  return FALSE;
+}
 static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
 {
   res->data = (char *)ivTranp((intvec*)(v->Data()));

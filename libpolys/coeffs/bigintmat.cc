@@ -16,6 +16,18 @@
 
 #define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
+bigintmat * bigintmat::transpose()
+{
+  bigintmat * t = new bigintmat(col, row, basecoeffs());
+  for (int i=1; i<=row; i++)
+  {
+    for (int j=1; j<=col; j++)
+    {
+      t->set(j, i, v[(i-1)*col+(j-1)]);
+    }
+  }
+  return t;
+}
 
 // Beginnt bei [0]
 void bigintmat::set(int i, number n, const coeffs C)
@@ -252,12 +264,12 @@ bigintmat * bimMult(bigintmat * a, bigintmat * b)
 
   bigintmat * bim = new bigintmat(ra, cb, basecoeffs);
 
-  for (i=0; i<ra; i++)
-    for (j=0; j<cb; j++)
+  for (i=1; i<=ra; i++)
+    for (j=1; j<=cb; j++)
     {
       sum = n_Init(0, basecoeffs);
 
-      for (k=0; k<ca; k++)
+      for (k=1; k<=ca; k++)
       {
         number prod = n_Mult( BIMATELEM(*a, i, k), BIMATELEM(*b, k, j), basecoeffs);
 
@@ -267,7 +279,7 @@ bigintmat * bimMult(bigintmat * a, bigintmat * b)
 
         sum = sum2;
       }
-      bim->rawset(i+1, j+1, sum, basecoeffs);
+      bim->rawset(i, j, sum, basecoeffs);
     }
   return bim;
 }
@@ -406,30 +418,86 @@ char* bigintmat::String()
   return StringAppendS("");
 }
 
-int bigintmat::getwid(int maxwid)
+int intArrSum(int * a, int length)
 {
-  int wid=0;
-  int colwid = floor((maxwid-2*(col-1))/col);
-  for (int i=0; i<col*row; i++)
+  int sum = 0;
+  for (int i=0; i<length; i++)
+    sum += a[i];
+  return sum;
+}
+
+int findLongest(int * a, int length)
+{
+  int l = 0;
+  int index;
+  for (int i=0; i<length; i++)
   {
-    StringSetS("");
-    n_Write(v[i], basecoeffs());
-    char * tmp = StringAppendS("");
-//    char * ts = omStrDup(tmp);
-    const int _nl = strlen(tmp); // ts?
-    if (_nl > wid)
+    if (a[i] > l)
     {
-      if (_nl > colwid)
-      {
-        int phwid = floor(log10(row))+floor(log10(col))+5;
-        if ((colwid > phwid) && (wid < phwid))
-          wid = phwid;
-      }
-      else
-        wid = _nl;
+      l = a[i];
+      index = i;
     }
   }
-  return wid;
+  return index;
+}
+
+int getShorter (int * a, int l, int j, int cols, int rows)
+{
+  int sndlong = 0;
+  int min;
+  for (int i=0; i<rows; i++)
+  {
+    int index = cols*i+j;
+    if ((a[index] > sndlong) && (a[index] < l))
+    {
+      min = floor(log10(cols))+floor(log10(rows))+5;
+      if ((a[index] < min) && (min < l))
+        sndlong = min;
+      else
+        sndlong = a[index];
+    }
+  }
+  if (sndlong == 0)
+  {
+    min = floor(log10(cols))+floor(log10(rows))+5;
+    if (min < l)
+      sndlong = min;
+    else
+      sndlong = 1;
+  }
+  return sndlong;
+}
+
+
+int * bigintmat::getwid(int maxwid)
+{
+  int const c = /*2**/(col-1)+1;
+  if (col + c > maxwid-1) return NULL;
+  int * wv = (int*)omAlloc(sizeof(int)*col*row);
+  int * cwv = (int*)omAlloc(sizeof(int)*col);
+  for (int j=0; j<col; j++)
+  {
+    cwv[j] = 0;
+    for (int i=0; i<row; i++)
+    {
+      StringSetS("");
+      n_Write(v[col*i+j], basecoeffs());
+      char * tmp = StringAppendS("");
+      const int _nl = strlen(tmp);
+      wv[col*i+j] = _nl;
+      if (_nl > cwv[j])
+        cwv[j]=_nl;
+    }
+  }
+
+  // Groesse verkleinern, bis < maxwid
+  while (intArrSum(cwv, col)+c > maxwid)
+  {
+    int j = findLongest(cwv, col);
+    cwv[j] = getShorter(wv, cwv[j], j, col, row);
+  }
+  omFree(wv);
+  return cwv;
 }
 
 void bigintmat::pprint(int maxwid)
@@ -438,11 +506,18 @@ void bigintmat::pprint(int maxwid)
     PrintS("");
   else
   {
-    int colwid = getwid(maxwid);
-    if (colwid*col+2*(col-1) > maxwid)
-      colwid = floor((maxwid-2*(col-1))/col);
+    int * colwid = getwid(maxwid);
+    if (colwid == NULL)
+    {
+      WerrorS("not enough space to print bigintmat");
+      return;
+    }
     char * ps;
-    ps = (char*) omAlloc0(sizeof(char)*(colwid*col*row+2*(col-1)*row+row));
+    int slength = 0;
+    for (int j=0; j<col; j++)
+      slength += colwid[j]*row;
+    slength += col*row+row;
+    ps = (char*) omAlloc0(sizeof(char)*(slength));
     int pos = 0;
     for (int i=0; i<col*row; i++)
     {
@@ -451,55 +526,57 @@ void bigintmat::pprint(int maxwid)
       char * temp = StringAppendS("");
       char * ts = omStrDup(temp);
       const int _nl = strlen(ts);
-      if (_nl > colwid)
+      int cj = i%col;
+      if (_nl > colwid[cj])
       {
         StringSetS("");
-        int cj = i%col;
         int ci = floor(i/col);
         StringAppend("[%d,%d]", ci+1, cj+1);
         char *tmp = StringAppendS("");
         char * ph = omStrDup(tmp);
         int phl = strlen(ph);
-        if (phl > colwid)
+        if (phl > colwid[cj])
         {
-          for (int j=0; j<colwid; j++)
-            ps[pos+j] = '*';
+          for (int j=0; j<colwid[cj]-1; j++)
+            ps[pos+j] = ' ';
+          ps[pos+colwid[cj]-1] = '*';
         }
         else
         {
-          for (int j=0; j<colwid-phl; j++)
+          for (int j=0; j<colwid[cj]-phl; j++)
             ps[pos+j] = ' ';
           for (int j=0; j<phl; j++)
-            ps[pos+colwid-phl+j] = ph[j];
+            ps[pos+colwid[cj]-phl+j] = ph[j];
         }
         omFree(ph);
       }
       else  // Mit Leerzeichen auffüllen und zahl reinschreiben
       {
-        for (int j=0; j<colwid-_nl; j++)
+        for (int j=0; j<colwid[cj]-_nl; j++)
           ps[pos+j] = ' ';
         for (int j=0; j<_nl; j++)
-          ps[pos+colwid-_nl+j] = ts[j];
+          ps[pos+colwid[cj]-_nl+j] = ts[j];
       }
-      // ", " oder "\n" einfügen
+      // ", " und (evtl) "\n" einfügen
       if ((i+1)%col == 0)
       {
         if (i != col*row-1)
         {
-          ps[pos+colwid] = '\n';
-          pos += colwid+1;
+          ps[pos+colwid[cj]] = ',';
+          ps[pos+colwid[cj]+1] = '\n';
+          pos += colwid[cj]+2;
         }
       }
       else
       {
-        ps[pos+colwid] = ',';
-        ps[pos+colwid+1] = ' ';
-        pos += colwid+2;
+        ps[pos+colwid[cj]] = ',';
+        pos += colwid[cj]+1;
       }
-      // Hier ts zerstören
+
+      omFree(ts);  // Hier ts zerstören
     }
     PrintS(ps);
-    omFree(ps);
+   // omFree(ps);
   }
 }
 
