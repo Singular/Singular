@@ -37,29 +37,29 @@ number integerToNumber(const gfan::Integer &I)
 bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
 {
   int d=zv.size();
-  bigintmat* bm = new bigintmat(d,1);
+  bigintmat* bim = new bigintmat(d,1);
   for(int i=1;i<=d;i++)
   {
     number temp = integerToNumber(zv[i-1]); 
-    bm->set(i,1,temp);
+    bim->set(i,1,temp);
     nlDelete(&temp,NULL);
   }
-  return bm;
+  return bim;
 }
 
 bigintmat* zMatrixToBigintmat(const gfan::ZMatrix &zm)
 {
   int d=zm.getHeight();
   int n=zm.getWidth();
-  bigintmat* bm = new bigintmat(d,n);
+  bigintmat* bim = new bigintmat(d,n);
   for(int i=1;i<=d;i++)
     for(int j=1; j<=n; j++)
     {
       number temp = integerToNumber(zm[i-1][j-1]); 
-      bm->set(i,j,temp);
+      bim->set(i,j,temp);
       nlDelete(&temp,NULL);
     }
-  return bm;
+  return bim;
 }
 
 gfan::Integer numberToInteger(const number &n)
@@ -70,66 +70,54 @@ gfan::Integer numberToInteger(const number &n)
     return n->z;
 }
 
-gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim)
+gfan::ZMatrix bigintmatToZMatrix(const bigintmat* const bim)
 {
-  int d=bim.rows();
-  int n=bim.cols();
-  gfan::ZMatrix* zm = new gfan::ZMatrix(d,n);
+  int d=bim->rows();
+  int n=bim->cols();
+  gfan::ZMatrix zm = gfan::ZMatrix(d,n);
   for(int i=0;i<d;i++)
     for(int j=0;j<n;j++)
     {
-      number temp = BIMATELEM(bim, i+1, j+1);
-      (*zm)[i][j] = numberToInteger(temp);
+      number temp = BIMATELEM(*bim, i+1, j+1);
+      zm[i][j] = numberToInteger(temp);
       nlDelete(&temp,NULL);
     }
   return zm;
 }
 
-gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
+gfan::ZVector bigintmatToZVector(const bigintmat* const bim)
 {
-  gfan::ZVector* zv=new gfan::ZVector(bim.rows());
-  for(int j=0; j<bim.rows(); j++)
+  gfan::ZVector zv = gfan::ZVector(bim->rows());
+  for(int j=0; j<bim->rows(); j++)
   {
-    number temp = BIMATELEM(bim, j+1, 1);
-    (*zv)[j] = numberToInteger(temp);
+    number temp = BIMATELEM(*bim, j+1, 1);
+    zv[j] = numberToInteger(temp);
     nlDelete(&temp,NULL);
   }
   return zv;
 }
 
-std::string toString(gfan::ZMatrix const &m, char *tab)
+char* toString(gfan::ZMatrix const &zm)
 {
-  std::stringstream s;
-
-  for(int i=0;i<m.getHeight();i++)
-  {
-    if(tab)s<<tab;
-    for(int j=0;j<m.getWidth();j++)
-    {
-      s<<m[i][j];
-      if(i+1!=m.getHeight() || j+1!=m.getWidth())
-        s<<",";
-      s<<std::endl;
-    }
-  }
-  return s.str();
+  bigintmat bim = zMatrixToBigintmat(zm);
+  return bim.String();
 }
 
-std::string toString(gfan::ZCone const &c)
+std::string toString(const gfan::ZCone* const c)
 {
   std::stringstream s;
-  gfan::ZMatrix i=c.getInequalities();
-  gfan::ZMatrix e=c.getEquations();
+  gfan::ZMatrix i=c->getInequalities();
+  gfan::ZMatrix e=c->getEquations();
   s<<"AMBIENT_DIM"<<std::endl;
-  s<<c.ambientDimension()<<std::endl;
+  s<<c->ambientDimension()<<std::endl;
   s<<"INEQUALITIES"<<std::endl;
-  s<<toString(i);
+  s<<toString(i)<<std::endl;
   s<<"EQUATIONS"<<std::endl;
-  s<<toString(e);
+  s<<toString(e)<<std::endl;
   return s.str();
 }
 
-void *bbcone_Init(blackbox *b)
+void* bbcone_Init(blackbox *b)
 {
   return (void*)(new gfan::ZCone());
 }
@@ -188,11 +176,11 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
   return FALSE;
 }
 
-char * bbcone_String(blackbox *b, void *d)
+char* bbcone_String(blackbox *b, void *d)
 { if (d==NULL) return omStrDup("invalid object");
    else
    {
-     std::string s=toString(*((gfan::ZCone*)d));
+     std::string s=toString((gfan::ZCone*) d);
      return omStrDup(s.c_str());
    }
 }
@@ -206,7 +194,7 @@ void bbcone_destroy(blackbox *b, void *d)
   }
 }
 
-void * bbcone_Copy(blackbox*b, void *d)
+void* bbcone_Copy(blackbox*b, void *d)
 {       
   gfan::ZCone* zc = (gfan::ZCone*)d;
   gfan::ZCone* newZc = new gfan::ZCone(*zc);
@@ -300,9 +288,8 @@ static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
   }
   else
     ineq = (bigintmat*) v->Data();
-  gfan::ZMatrix* zm = bigintmatToZMatrix(ineq);
-  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
-  delete zm;
+  gfan::ZMatrix zm = bigintmatToZMatrix(ineq);
+  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
   if (v->Typ() == INTMAT_CMD)
     delete ineq;
   res->rtyp = coneID;
@@ -339,10 +326,9 @@ static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
            ineq->cols(), eq->cols());
     return TRUE;
   }
-  gfan::ZMatrix* zm1 = bigintmatToZMatrix(ineq);
-  gfan::ZMatrix* zm2 = bigintmatToZMatrix(eq);
-  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
-  delete zm1, zm2;
+  gfan::ZMatrix zm1 = bigintmatToZMatrix(ineq);
+  gfan::ZMatrix zm2 = bigintmatToZMatrix(eq);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
   if (u->Typ() == INTMAT_CMD)
     delete ineq;
   if (v->Typ() == INTMAT_CMD)
@@ -388,10 +374,9 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix* zm1 = bigintmatToZMatrix(ineq);
-  gfan::ZMatrix* zm2 = bigintmatToZMatrix(eq);
-  gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
-  delete zm1, zm2;
+  gfan::ZMatrix zm1 = bigintmatToZMatrix(ineq);
+  gfan::ZMatrix zm2 = bigintmatToZMatrix(eq);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
   if (u->Typ() == INTMAT_CMD)
     delete ineq;
   if (v->Typ() == INTMAT_CMD)
@@ -437,13 +422,12 @@ static BOOLEAN jjCONERAYS1(leftv res, leftv v)
   else
     rays = (bigintmat*) v->Data();
 
-  gfan::ZMatrix* zm = bigintmatToZMatrix(rays);
+  gfan::ZMatrix zm = bigintmatToZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
   res->rtyp = coneID;
   res->data = (char *)zc;
 
-  delete zm;
   if (v->Typ() == INTMAT_CMD)
     delete rays;
   return FALSE;
@@ -481,14 +465,13 @@ static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
            rays->cols(), linSpace->cols());
     return TRUE;
   }
-  gfan::ZMatrix* zm1 = bigintmatToZMatrix(rays);
-  gfan::ZMatrix* zm2 = bigintmatToZMatrix(linSpace);
+  gfan::ZMatrix zm1 = bigintmatToZMatrix(rays);
+  gfan::ZMatrix zm2 = bigintmatToZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(*zm1, *zm2);
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
   res->rtyp = coneID;
   res->data = (char *)zc;
 
-  delete zm1, zm2;
   if (u->Typ() == INTMAT_CMD)
     delete rays;
   if (v->Typ() == INTMAT_CMD)
@@ -538,15 +521,14 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix* zm1 = bigintmatToZMatrix(rays);
-  gfan::ZMatrix* zm2 = bigintmatToZMatrix(linSpace);
+  gfan::ZMatrix zm1 = bigintmatToZMatrix(rays);
+  gfan::ZMatrix zm2 = bigintmatToZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
-  *zc = gfan::ZCone::givenByRays(*zm1, *zm2);
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
   //k should be passed on to zc; not available yet
   res->rtyp = coneID;
   res->data = (char *)zc;
 
-  delete zm1, zm2;
   if (u->Typ() == INTMAT_CMD)
     delete rays;
   if (v->Typ() == INTMAT_CMD)
@@ -584,7 +566,7 @@ BOOLEAN inequalities(leftv res, leftv args)
     
     gfan::ZMatrix zmat = zc->getInequalities();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("inequalities: unexpected parameters");
@@ -599,7 +581,7 @@ BOOLEAN equations(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getEquations();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("equations: unexpected parameters");
@@ -614,7 +596,7 @@ BOOLEAN facets(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zm = zc->getFacets();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (char*)zMatrixToBigintmat(zm);
+    res->data = (char*) new bigintmat(zMatrixToBigintmat(zm));
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == polytopeID))
@@ -636,7 +618,7 @@ BOOLEAN impliedEquations(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getImpliedEquations();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("impliedEquations: unexpected parameters");
@@ -651,7 +633,7 @@ BOOLEAN generatorsOfSpan(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->generatorsOfSpan();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("generatorsOfSpan: unexpected parameters");
@@ -666,7 +648,7 @@ BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->generatorsOfLinealitySpace();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("generatorsOfLinealitySpace: unexpected parameters");
@@ -681,7 +663,7 @@ BOOLEAN rays(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zm = zc->extremeRays();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (char*)zMatrixToBigintmat(zm);
+    res->data = (char*) new bigintmat(zMatrixToBigintmat(zm));
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == fanID))
@@ -689,7 +671,7 @@ BOOLEAN rays(leftv res, leftv args)
     gfan::ZFan* zf = (gfan::ZFan*)u->Data();
     gfan::ZMatrix zmat = rays(zf);
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("rays: unexpected parameters");
@@ -704,7 +686,7 @@ BOOLEAN quotientLatticeBasis(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->quotientLatticeBasis();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("quotientLatticeBasis: unexpected parameters");
@@ -719,7 +701,7 @@ BOOLEAN linearForms(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getLinearForms();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*)zMatrixToBigintmat(zmat);
+    res->data = (void*) new bigintmat(zMatrixToBigintmat(zmat));
     return FALSE;
   }
   WerrorS("linearForms: unexpected parameters");
@@ -954,7 +936,7 @@ BOOLEAN semigroupGenerator(leftv res, leftv args)
     {
       gfan::ZVector zv = zc->semiGroupGeneratorOfRay();
       res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) zVectorToBigintmat(zv);
+      res->data = (void*) new bigintmat(zVectorToBigintmat(zv));
       return FALSE;
     }
     Werror("expected dim of cone one larger than dim of lin space\n"
@@ -972,7 +954,7 @@ BOOLEAN relativeInteriorPoint(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZVector zv = zc->getRelativeInteriorPoint();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*) zVectorToBigintmat(zv);
+    res->data = (void*) new bigintmat(zVectorToBigintmat(zv));
     return FALSE;
   }
   WerrorS("relativeInteriorPoint: unexpected parameters");
@@ -987,7 +969,7 @@ BOOLEAN uniquePoint(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZVector zv = zc->getUniquePoint();
     res->rtyp = BIGINTMAT_CMD;
-    res->data = (void*) zVectorToBigintmat(zv);
+    res->data = (void*) new bigintmat(zVectorToBigintmat(zv));
     return FALSE;
   }
   WerrorS("uniquePoint: unexpected parameters");
@@ -1031,12 +1013,11 @@ BOOLEAN setLinearForms(leftv res, leftv args)
       }
       else
         mat = (bigintmat*) v->Data();
-      gfan::ZMatrix* zm = bigintmatToZMatrix(mat);
-      zc->setLinearForms(*zm);
+      gfan::ZMatrix zm = bigintmatToZMatrix(mat);
+      zc->setLinearForms(zm);
       res->rtyp = NONE;
       res->data = NULL;
 
-      delete zm;
       if (v->Typ() == INTVEC_CMD)
         delete mat;
      return FALSE;
@@ -1295,25 +1276,24 @@ BOOLEAN coneLink(leftv res, leftv args)
       }
       else
         iv = (bigintmat*)v->Data();
-      gfan::ZVector* zv = bigintmatToZVector(iv);
+      gfan::ZVector zv = bigintmatToZVector(iv);
       int d1 = zc->ambientDimension();
-      int d2 = zv->size();
+      int d2 = zv.size();
       if (d1 != d2)
       {
         Werror("expected ambient dim of cone and size of vector\n"
                 "to be equal but got %d and %d", d1, d2);
         return TRUE;
       }
-      if(!zc->contains(*zv))
+      if(!zc->contains(zv))
       {
         WerrorS("the provided intvec does not lie in the cone");
         return TRUE;
       }
-      gfan::ZCone* zd = new gfan::ZCone(zc->link(*zv));
+      gfan::ZCone* zd = new gfan::ZCone(zc->link(zv));
       res->rtyp = coneID;
       res->data = (void *) zd;
 
-      delete zv;
       if (v->Typ() == INTMAT_CMD)
         delete iv;
       return FALSE;
@@ -1375,20 +1355,19 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       }
       else
         iv = (bigintmat*)v->Data();
-      gfan::ZVector* zv = bigintmatToZVector(iv);
+      gfan::ZVector zv = bigintmatToZVector(iv);
       int d1 = zc->ambientDimension();
-      int d2 = zv->size();
+      int d2 = zv.size();
       if (d1 != d2)
       {
         Werror("expected cones with same ambient dimensions\n but got"
                " dimensions %d and %d", d1, d2);
         return TRUE;
       }
-      bool b = (zc->contains(*zv) ? 1 : 0);
+      bool b = (zc->contains(zv) ? 1 : 0);
       res->rtyp = INT_CMD;
       res->data = (char*) (int) b;
 
-      delete zv;
       if (v->Typ() == INTMAT_CMD)
         delete iv;
       return FALSE;
@@ -1415,20 +1394,18 @@ BOOLEAN containsRelatively(leftv res, leftv args)
       }
       else
         iv = (bigintmat*)v->Data();
-      gfan::ZVector* zv = bigintmatToZVector(iv);
+      gfan::ZVector zv = bigintmatToZVector(iv);
       int d1 = zc->ambientDimension();
-      int d2 = zv->size();
+      int d2 = zv.size();
       if (d1 == d2)
       {
-        bool b = (zc->containsRelatively(*zv) ? 1 : 0);
+        bool b = (zc->containsRelatively(zv) ? 1 : 0);
         res->rtyp = INT_CMD;
         res->data = (void *) b;
-        delete zv;
         if (v->Typ() == INTMAT_CMD)
           delete iv;
         return FALSE;
       }
-      delete zv;
       if (v->Typ() == INTMAT_CMD)
         delete iv;
       Werror("expected ambient dim of cone and size of vector\n"
