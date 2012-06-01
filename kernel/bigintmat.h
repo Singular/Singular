@@ -92,6 +92,7 @@ public:
   void pprint(int maxwid);
   int compare(const bigintmat* op) const;
   int * getwid(int maxwid);
+  bigintmat * transpose();
 };
 bool operator==(bigintmat & lhr, bigintmat & rhr);
 bool operator!=(bigintmat & lhr, bigintmat & rhr);
