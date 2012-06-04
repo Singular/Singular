@@ -972,6 +972,7 @@ static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
     h=l->next;
     l->next=NULL;
     nok=jiAssign_1(l,&t);
+    l->next=h;
     if (nok) return TRUE;
     i++;
     l=h;
