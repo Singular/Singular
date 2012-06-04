@@ -1006,6 +1006,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
     h=l->next;
     l->next=NULL;
     nok=jiAssign_1(l,&t);
+    l->next=h;
     t.CleanUp();
     if (nok)
     {
@@ -1153,7 +1154,7 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
     else if (hh->Typ() == BIGINT_CMD)
     {
       bim->set(i++, (number)(hh->Data()));
-    } 
+    }
     /*
     ((hh->Typ() == INTVEC_CMD)
             ||(hh->Typ() == INTMAT_CMD))
