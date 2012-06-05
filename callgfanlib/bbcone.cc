@@ -103,8 +103,10 @@ gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
 
 char* toString(gfan::ZMatrix const &zm)
 {
-  bigintmat bim = zMatrixToBigintmat(zm);
-  return bim.String();
+  bigintmat* bim = zMatrixToBigintmat(zm);
+  char* s = bim->String();
+  delete bim;
+  return s;
 }
 
 std::string toString(const gfan::ZCone* const c)
@@ -114,9 +116,15 @@ std::string toString(const gfan::ZCone* const c)
   gfan::ZMatrix e=c->getEquations();
   s<<"AMBIENT_DIM"<<std::endl;
   s<<c->ambientDimension()<<std::endl;
-  s<<"INEQUALITIES"<<std::endl;
+  if (c->areFacetsKnown())
+    s<<"FACETS"<<std::endl;
+  else
+    s<<"INEQUALITIES"<<std::endl;
   s<<toString(i)<<std::endl;
-  s<<"EQUATIONS"<<std::endl;
+  if (c->areImpliedEquationsKnown())
+    s<<"LINEAR_SPAN"<<std::endl;
+  else
+    s<<"EQUATIONS"<<std::endl;
   s<<toString(e)<<std::endl;
   return s.str();
 }
