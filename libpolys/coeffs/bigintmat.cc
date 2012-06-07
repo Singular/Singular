@@ -14,7 +14,7 @@
 #include <math.h>
 #include <string.h>
 
-#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
+//#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
 bigintmat * bigintmat::transpose()
 {

@@ -205,7 +205,7 @@ BOOLEAN naIsOne(number a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
-  if (!p_IsConstant(aAsPoly, naRing)) return FALSE;
+  if ((a==NULL) || (!p_IsConstant(aAsPoly, naRing))) return FALSE;
   return n_IsOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
@@ -213,7 +213,7 @@ BOOLEAN naIsMOne(number a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
-  if (!p_IsConstant(aAsPoly, naRing)) return FALSE;
+  if ((a==NULL) || (!p_IsConstant(aAsPoly, naRing))) return FALSE;
   return n_IsMOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
@@ -599,7 +599,10 @@ void definiteReduce(poly &p, poly reducer, const coeffs cf)
   p_Test((poly)p, naRing);
   p_Test((poly)reducer, naRing);
   #endif
-  p_PolyDiv(p, reducer, FALSE, naRing);
+  if ((p!=NULL) && (p_GetExp(p,1,naRing)>=p_GetExp(reducer,1,naRing)))
+  {
+    p_PolyDiv(p, reducer, FALSE, naRing);
+  }
 }
 
 void  naNormalize(number &a, const coeffs cf)
