@@ -1332,7 +1332,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
   CanonicalForm yToL= power (y, liftBound);
   if (factors.length() == 2)
   {
-    CanonicalForm tmp1, tmp2;
+    CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
     tmp1 *= LC (F, x);
@@ -1341,7 +1341,8 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     tmp2 *= LC (F, x);
     tmp2= mod (tmp2, yToL);
     tmp2 /= content (tmp2, x);
-    if (degree (tmp1) + degree (tmp2) == degree (F))
+    tmp3 = tmp1*tmp2;
+    if (tmp3/Lc (tmp3) == F/Lc (F))
     {
       factorsFound++;
       F= 1;
@@ -1408,7 +1409,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
   CanonicalForm yToL= power (y, liftBound);
   if (factors.length() == 2)
   {
-    CanonicalForm tmp1, tmp2;
+    CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
     tmp1 *= LC (F, x);
@@ -1417,7 +1418,8 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     tmp2 *= LC (F, x);
     tmp2= mod (tmp2, yToL);
     tmp2 /= content (tmp2, x);
-    if (degree (tmp1) + degree (tmp2) == degree (F))
+    tmp3 = tmp1*tmp2;
+    if (tmp3/Lc (tmp3) == F/Lc (F))
     {
       factorsFound++;
       F= 1;
@@ -1722,7 +1724,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
   CFList source, dest;
   if (factors.length() == 2)
   {
-    CanonicalForm tmp1, tmp2;
+    CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
     tmp1 *= LC (F, x);
@@ -1731,17 +1733,33 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     tmp2 *= LC (F, x);
     tmp2= mod (tmp2, yToL);
     tmp2 /= content (tmp2, x);
-    if (degree (tmp1) + degree (tmp2) == degree (F))
+    tmp3 = tmp1*tmp2;
+    if (tmp3/Lc (tmp3) == F/Lc (F))
     {
       tmp1= tmp1 (y - evaluation, y);
       tmp2= tmp2 (y - evaluation, y);
-      factorsFound++;
-      F= 1;
-      tmp1= mapDown (tmp1, info, source, dest);
-      tmp2= mapDown (tmp2, info, source, dest);
-      reconstructedFactors.append (tmp1);
-      reconstructedFactors.append (tmp2);
-      return;
+      if (!k && beta == x && degree (tmp2, alpha) < 1 &&
+          degree (tmp1, alpha) < 1)
+      {
+        factorsFound++;
+        F= 1;
+        tmp1= mapDown (tmp1, info, source, dest);
+        tmp2= mapDown (tmp2, info, source, dest);
+        reconstructedFactors.append (tmp1);
+        reconstructedFactors.append (tmp2);
+        return;
+      }
+      else if (!isInExtension (tmp2, gamma, k, delta, source, dest) &&
+               !isInExtension (tmp1, gamma, k, delta, source, dest))
+      {
+        factorsFound++;
+        F= 1;
+        tmp1= mapDown (tmp1, info, source, dest);
+        tmp2= mapDown (tmp2, info, source, dest);
+        reconstructedFactors.append (tmp1);
+        reconstructedFactors.append (tmp2);
+        return;
+      }
     }
   }
   CanonicalForm quot, buf, buf2;
@@ -4640,11 +4658,10 @@ extSieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
     return earlyFactors;
   }
   Variable y= F.mvar();
-  CanonicalForm shiftedF= G (y - evaluation, y);
-  int sizeOldF= size (shiftedF);
+  int sizeOldF= size (G);
   if (size (F) < sizeOldF)
   {
-    H= F (y + evaluation, y); //shift back to zero
+    H= F;
     success= true;
     return earlyFactors;
   }
@@ -4688,7 +4705,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
   CFList smallFactors;
   CanonicalForm H;
-  bool success;
+  bool success= false;
   smallFactors= sieveSmallFactors (F, bufUniFactors, degs, H, diophant, Pi, M,
                                    success, minBound + 1
                                   );
@@ -5342,7 +5359,10 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   if (isIrreducible)
   {
     delete [] bounds;
-    return CFList (F);
+    CFList source, dest;
+    CanonicalForm tmp= G (y - evaluation, y);
+    tmp= mapDown (tmp, info, source, dest);
+    return CFList (tmp);
   }
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
@@ -5360,7 +5380,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
 
   CFList smallFactors;
   CanonicalForm H;
-  bool success;
+  bool success= false;
   smallFactors= extSieveSmallFactors (F, bufUniFactors, degs, H, diophant, Pi,
                                       M, success, minBound + 1, evaluation, info
                                      );
