@@ -199,7 +199,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                      }
                      break;
                    }
-    case LIST_CMD: Print(", size: %d",IDLIST(h)->nr+1);
+    case LIST_CMD: Print(", size: %d",lSize(IDLIST(h))+1);
                    break;
     case QRING_CMD:
     case RING_CMD:

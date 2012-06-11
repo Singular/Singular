@@ -303,11 +303,12 @@ void ssiWriteProc(ssiInfo *d,procinfov p)
 void ssiWriteList(si_link l,lists dd)
 {
   ssiInfo *d=(ssiInfo*)l->data;
+  int Ll=lSize(dd);
   SSI_BLOCK_CHLD;
-  fprintf(d->f_write,"%d ",dd->nr+1);
+  fprintf(d->f_write,"%d ",Ll+1);
   SSI_UNBLOCK_CHLD;
   int i;
-  for(i=0;i<=dd->nr;i++)
+  for(i=0;i<=Ll;i++)
   {
     ssiWrite(l,&(dd->m[i]));
   }
