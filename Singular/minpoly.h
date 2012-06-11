@@ -1,6 +1,6 @@
 /***********************************************************************************
  * Author: Sebastian Jambor, 2011                                                  *
- * (C) GPL (email from 23. April 2012 17:44:14 MESZ)                               *
+ * (C) GPL (e-mail from June 6, 2012, 17:00:31 MESZ)                               *
  * sebastian@momo.math.rwth-aachen.de                                              *
  *                                                                                 *
  * Implementation of an algorithm to compute the minimal polynomial of a           *
@@ -110,6 +110,7 @@ private:
     unsigned long n;
     unsigned long **matrix;
     unsigned *pivots;
+    unsigned *nonPivots;
     unsigned rows;
 
 public:
@@ -135,6 +136,8 @@ public:
     // Finds the smallest integer between 0 and n-1, which is not a pivot position.
     // If no such number exists, return -1.
     int findSmallestNonpivot();
+
+    int findLargestNonpivot();
 };
 
 
@@ -161,7 +164,7 @@ unsigned long* computeMinimalPolynomial(unsigned long** matrix, unsigned n, unsi
 // is the same as long, and on 32bit, we need long long so that the variables can hold negative values.
 unsigned long modularInverse(long long x, long long p);
 
-void vectorMatrixMult(unsigned long* vec, unsigned long **mat, unsigned long* result, unsigned n, unsigned long p);
+void vectorMatrixMult(unsigned long* vec, unsigned long **mat, unsigned **nonzeroIndices, unsigned *nonzeroCounts, unsigned long* result, unsigned n, unsigned long p);
 
 // a is a vector of length at least dega + 1, and q is a vector of length at least degq + 1,
 // representing polynomials \sum_i a[i]t^i \in \F_p[t].
