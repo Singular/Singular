@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: management of resources
 */
@@ -214,10 +213,10 @@ void feReInitResources()
   int i = 0;
   while (feResourceConfigs[i].key != NULL)
   {
-    if (feResourceConfigs[i].value[0] != '\0')
+    if ((feResourceConfigs[i].value != NULL)
+    &&(feResourceConfigs[i].value[0] != '\0'))
     {
-      if (feResourceConfigs[i].value != NULL)
-        omFree(feResourceConfigs[i].value);
+      omFree(feResourceConfigs[i].value);
       feResourceConfigs[i].value = (char *)"";
     }
     i++;
