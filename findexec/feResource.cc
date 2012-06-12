@@ -200,10 +200,10 @@ void feReInitResources()
   int i = 0;
   while (feResourceConfigs[i].key != NULL)
   {
-    if (feResourceConfigs[i].value[0] != '\0')
+    if ((feResourceConfigs[i].value != NULL)
+    && (feResourceConfigs[i].value[0] != '\0'))
     {
-      if (feResourceConfigs[i].value != NULL)
-        free(feResourceConfigs[i].value);
+      free(feResourceConfigs[i].value);
       feResourceConfigs[i].value = (char *)"";
     }
     i++;
