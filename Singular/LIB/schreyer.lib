@@ -1047,22 +1047,75 @@ proc SSCompute2LeadingSyzygyTerms(def L)
       "SSCompute2LeadingSyzygyTerms::Syz(S): "; S;
     }
 
-    if( size(module(matrix(S) - matrix(SS))) > 0 )
+    if( @SYZCHECK )
     {
-      "ERROR: SSCompute2LeadingSyzygyTerms: S != SS ";
+      if( size(S) > 0 and size(L) > 0 )
+      {
+        if( size(module(transpose( transpose(S) * transpose(L) ))) > 0 )
+        {
+          transpose( transpose(S) * transpose(L) );
+          "ERROR: transpose( transpose(S) * transpose(L) ) != 0!!!";
+          $
+        }
+      }
+    }
 
-      "basering: ";
-      DetailedPrint(basering);
+    if(size(S) != size(SS))
+    {
+      "ERROR: SSCompute2LeadingSyzygyTerms: size(S) != size(SS)";
+
+      "basering: "; basering; //      DetailedPrint(basering);
 
       "S: ";  S;
-      DetailedPrint(S, 2);
+//      DetailedPrint(S, 2);
       "SS: "; SS;
-      DetailedPrint(SS, 2);
-
-      "DIFF: ";
-      print(matrix(S) - matrix(SS));
-      DetailedPrint(module(matrix(S) - matrix(SS)), 4);
+//      DetailedPrint(SS, 2);
       $
+    }    
+
+    if(size(S) > 0 && size(SS) > 0)
+    {
+      if( size(module(matrix(lead(S)) - matrix(lead(SS)))) > 0 )
+      {
+        "ERROR: SSCompute2LeadingSyzygyTerms: lead(S) != lead(SS) ";
+
+        "basering: ";  basering;
+//        DetailedPrint(basering);
+
+        "lead(S ): "; lead(S );
+//        DetailedPrint(_, 2);
+        "lead(SS): "; lead(SS);
+//        DetailedPrint(_, 2);
+
+        "DIFF: ";
+        print( matrix(lead(S)) - matrix(lead(SS))  );
+        module(matrix(lead(S)) - matrix(lead(SS)));
+//        DetailedPrint(_ , 4);
+        $
+      }
+
+
+      if( @TAILREDSYZ )
+      {
+      if( size(module(matrix(Tail(S)) - matrix(Tail(SS)))) > 0 )
+      {
+        "ERROR: SSCompute2LeadingSyzygyTerms: Tail(S) != Tail(SS) ";
+
+        "basering: ";  basering;
+//        DetailedPrint(basering);
+
+        "Tail(S ): "; Tail(S );
+//        DetailedPrint(_, 2);
+        "Tail(SS): "; Tail(SS);
+//        DetailedPrint(_, 2);
+
+        "DIFF: ";
+        module( matrix(Tail(S)) - matrix(Tail(SS)) );
+//        DetailedPrint(_, 4);
+        print( matrix(Tail(S)) - matrix(Tail(SS)) );
+        $
+      }
+      }
     }
   }
   
