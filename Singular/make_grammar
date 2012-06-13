@@ -1,4 +1,5 @@
 #!/bin/sh
+bison -d -t -o grammar.cc grammar.y
 if [ -f grammar.hh ]
 then
   mv grammar.hh grammar.cc.h
@@ -17,3 +18,4 @@ else
   echo generating grammar.h
   mv grammar.cc.h grammar.h
 fi
+
