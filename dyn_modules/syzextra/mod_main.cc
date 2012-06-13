@@ -1096,6 +1096,115 @@ static inline poly leadmonom(const poly p, const ring r)
 }
 
 
+
+static poly FindReducer(poly product, poly syzterm,
+                        ideal L, ideal LS,
+                        const ring r)
+{
+  assume( product != NULL );
+  assume( L != NULL );
+
+  int c = 0;
+
+  if (syzterm != NULL)
+    c = p_GetComp(syzterm, r) - 1;
+
+  assume( c >= 0 && c < IDELEMS(L) );
+  
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  long debug = __DEBUG__;
+  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)debug)));   
+  
+  if (__SYZCHECK__ && syzterm != NULL)
+  {
+    const poly m = L->m[c];
+
+    assume( m != NULL ); assume( pNext(m) == NULL );
+
+    poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
+    assume( p_EqualPolys(lm, product, r) );
+
+    //  def @@c = leadcomp(syzterm); int @@r = int(@@c);
+    //  def @@product = leadmonomial(syzterm) * L[@@r];
+
+    p_Delete(&lm, r);    
+  }
+  
+  // looking for an appropriate diviser q = L[k]...
+  for( int k = IDELEMS(L)-1; k>= 0; k-- )
+  {
+    const poly p = L->m[k];    
+
+    // ... which divides the product, looking for the _1st_ appropriate one!
+    if( !p_LmDivisibleBy(p, product, r) )
+      continue;
+
+
+    const poly q = p_New(r);
+    pNext(q) = NULL;
+    p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
+    p_SetComp(q, k + 1, r);
+    p_Setm(q, r);
+
+    // cannot allow something like: a*gen(i) - a*gen(i)
+    if (syzterm != NULL && (k == c))
+      if (p_ExpVectorEqual(syzterm, q, r))
+      {
+        if( __DEBUG__ )
+        {
+          Print("FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          dPrint(syzterm, r, r, 1);
+        }    
+
+        p_LmFree(q, r);
+        continue;
+      }
+
+    // while the complement (the fraction) is not reducible by leading syzygies 
+    if( LS != NULL )
+    {
+      BOOLEAN ok = TRUE;
+
+      for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
+      {
+        const poly pp = LS->m[kk];
+
+        if( p_LmDivisibleBy(pp, q, r) )
+        {
+          
+          if( __DEBUG__ )
+          {
+            Print("FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", kk+1);
+            dPrint(pp, r, r, 1);
+          }    
+
+          ok = FALSE; // q in <LS> :((
+          break;                 
+        }
+      }
+
+      if(!ok)
+      {
+        p_LmFree(q, r);
+        continue;
+      }
+    }
+
+    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+    return q;
+
+  }
+
+  
+  return NULL;
+}
+
+
 /// TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
 /// proc SSFindReducer(def product, def syzterm, def L, def T, list #)
 static BOOLEAN FindReducer(leftv res, leftv h)
@@ -1130,14 +1239,14 @@ static BOOLEAN FindReducer(leftv res, leftv h)
     return TRUE;    
   }
 
-  const poly syzterm = (poly) h->Data(); h = h->Next();
+  poly syzterm = NULL;
 
-  int c = 0;
-  
-  if (syzterm != NULL)
-    c = p_GetComp(syzterm, r) - 1;
-  
-  
+  if(h->Typ()==VECTOR_CMD) 
+    syzterm = (poly) h->Data();
+
+
+
+  h = h->Next();
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
@@ -1147,18 +1256,6 @@ static BOOLEAN FindReducer(leftv res, leftv h)
   const ideal L = (ideal) h->Data(); h = h->Next();
 
   assume( IDELEMS(L) > 0 );
-  assume( c >= 0 && c < IDELEMS(L) );
-
-  
-/*
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
-  {
-    WerrorS(usage);
-    return TRUE;    
-  }
-
-  const ideal T = (ideal) h->Data(); h = h->Next();
-*/
 
   ideal LS = NULL;
 
@@ -1179,111 +1276,499 @@ static BOOLEAN FindReducer(leftv res, leftv h)
 
     PrintS("product: "); dPrint(product, r, r, 2);
     PrintS("syzterm: "); dPrint(syzterm, r, r, 2);
-    PrintS("L: "); dPrint(L, r, r, 2);
+    PrintS("L: "); dPrint(L, r, r, 0);
 //    PrintS("T: "); dPrint(T, r, r, 4);
 
     if( LS == NULL )
       PrintS("LS: NULL\n");
     else
     {
-      PrintS("LS: "); dPrint(LS, r, r, 2);
+      PrintS("LS: "); dPrint(LS, r, r, 0);
     }
   }
 
-
-  if (__SYZCHECK__ && syzterm != NULL)
-  {
-    const poly m = L->m[c];
-
-    assume( m != NULL ); assume( pNext(m) == NULL );
-
-    poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
-    assume( p_EqualPolys(lm, product, r) );
-
-    //  def @@c = leadcomp(syzterm); int @@r = int(@@c);
-    //  def @@product = leadmonomial(syzterm) * L[@@r];
-
-    p_Delete(&lm, r);    
-  }
-
-  
   res->rtyp = VECTOR_CMD;
+  res->data = FindReducer(product, syzterm, L, LS, r);
 
-  // looking for an appropriate diviser q = L[k]...
-  for( int k = IDELEMS(L)-1; k>= 0; k-- )
+  if( __DEBUG__ )
   {
-    const poly p = L->m[k];    
-
-    // ... which divides the product, looking for the _1st_ appropriate one!
-    if( !p_LmDivisibleBy(p, product, r) )
-      continue;
-
-
-    const poly q = p_New(r);
-    pNext(q) = NULL;
-    p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
-    p_SetComp(q, k + 1, r);
-    p_Setm(q, r);
-
-    // cannot allow something like: a*gen(i) - a*gen(i)
-    if (syzterm != NULL && (k == c))
-      if (p_ExpVectorEqual(syzterm, q, r))
-      {
-        if( __DEBUG__ )
-        {
-          Print("FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
-          dPrint(syzterm, r, r, 1);
-        }    
-        
-        p_LmFree(q, r);
-        continue;
-      }
-
-    // while the complement (the fraction) is not reducible by leading syzygies 
-    if( LS != NULL )
-    {
-      BOOLEAN ok = TRUE;
-      
-      for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
-      {
-        const poly pp = LS->m[kk];
-
-        if( p_LmDivisibleBy(pp, q, r) )
-        {
-          if( __DEBUG__ )
-          {
-            Print("FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", kk+1);
-            dPrint(pp, r, r, 1);
-          }    
-
-          ok = FALSE; // q in <LS> :((
-          break;                 
-        }
-      }
-      
-      if(!ok)
-      {
-        p_LmFree(q, r);
-        continue;
-      }
-    }
-
-    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
-
-    if( __DEBUG__ )
-    {
-      PrintS("FindReducer::Output: \n");
-      dPrint(q, r, r, 1);
-    }    
-
-    res->data = q;
-    return FALSE;
-  }
-
-  res->data = NULL;
+    PrintS("FindReducer::Output: \n");
+    dPrint((poly)res->data, r, r, 2);
+  }    
+  
   return FALSE;   
   
 }
+
+static poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck,
+                       ideal L, ideal T, ideal LS, const ring r);
+
+static poly TraverseTail(poly multiplier, poly tail, 
+                         ideal L, ideal T, ideal LS,
+                         const ring r)
+{
+  assume( multiplier != NULL );
+
+  assume( L != NULL );
+  assume( T != NULL );
+
+  poly s = NULL;
+
+  // iterate over the tail
+  for(poly p = tail; p != NULL; p = pNext(p))
+    s = p_Add_q(s, ReduceTerm(multiplier, p, NULL, L, T, LS, r), r);  
+    
+  return s;
+}
+
+
+static poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck,
+                       ideal L, ideal T, ideal LS, const ring r)
+{
+  assume( multiplier != NULL );
+  assume( term4reduction != NULL );
+
+
+  assume( L != NULL );
+  assume( T != NULL );
+  
+  // assume(r == currRing); // ?
+
+  // simple implementation with FindReducer:
+  poly s = NULL;
+  
+  if(1)
+  {
+    // NOTE: only LT(term4reduction) should be used in the following:
+    poly product = pp_Mult_mm(multiplier, term4reduction, r);
+    s = FindReducer(product, syztermCheck, L, LS, r);
+    p_Delete(&product, r);
+  }
+
+  if( s == NULL ) // No Reducer?
+    return s;
+
+  poly b = leadmonom(s, r);
+
+  const int c = p_GetComp(s, r) - 1;
+  assume( c >= 0 && c < IDELEMS(T) );
+
+  const poly tail = T->m[c];
+
+  if( tail != NULL )
+    s = p_Add_q(s, TraverseTail(b, tail, L, T, LS, r), r);  
+  
+  return s;
+}
+
+
+static poly SchreyerSyzygyNF(poly syz_lead, poly syz_2, ideal L, ideal T, ideal LS, const ring r)
+{
+  assume( syz_lead != NULL );
+  assume( syz_2 != NULL );
+
+  assume( L != NULL );
+  assume( T != NULL );
+
+  assume( IDELEMS(L) == IDELEMS(T) );
+
+  int  c = p_GetComp(syz_lead, r) - 1;
+
+  assume( c >= 0 && c < IDELEMS(T) );
+
+  poly p = leadmonom(syz_lead, r); // :(  
+  poly spoly = pp_Mult_qq(p, T->m[c], r);
+  p_Delete(&p, r);
+
+  
+  c = p_GetComp(syz_2, r) - 1;
+  assume( c >= 0 && c < IDELEMS(T) );
+
+  p = leadmonom(syz_2, r); // :(
+  spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
+  p_Delete(&p, r);
+
+  poly tail = p_Copy(syz_2, r); // TODO: use bucket!?
+
+  while (spoly != NULL)
+  {
+    poly t = FindReducer(spoly, NULL, L, LS, r);
+
+    p_LmDelete(&spoly, r);
+    
+    if( t != NULL )
+    {
+      p = leadmonom(t, r); // :(
+      c = p_GetComp(t, r) - 1;
+
+      assume( c >= 0 && c < IDELEMS(T) );
+      
+      spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
+
+      p_Delete(&p, r);
+      
+      tail = p_Add_q(tail, t, r);
+    }    
+  }
+  
+  return tail;
+}
+
+// proc SchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
+static BOOLEAN SchreyerSyzygyNF(leftv res, leftv h)
+{
+  const char* usage = "`SchreyerSyzygyNF(<vector>, <vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
+  const ring r = currRing;
+
+  NoReturn(res);
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
+//  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
+  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
+
+  if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const poly syz_lead = (poly) h->Data(); assume (syz_lead != NULL);
+
+
+  h = h->Next();
+  if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const poly syz_2 = (poly) h->Data(); assume (syz_2 != NULL);
+
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal L = (ideal) h->Data(); assume( IDELEMS(L) > 0 );
+
+
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal T = (ideal) h->Data();
+
+  assume( IDELEMS(L) == IDELEMS(T) );
+
+  ideal LS = NULL;
+
+  h = h->Next();
+  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
+  {
+    LS = (ideal)h->Data();
+    h = h->Next();
+  }
+
+  if( __TAILREDSYZ__ )
+    assume (LS != NULL);
+
+  assume( h == NULL );
+
+  if( __DEBUG__ )
+  {
+    PrintS("SchreyerSyzygyNF(syz_lead, syz_2, L, T, #)::Input: \n");
+
+    PrintS("syz_lead: "); dPrint(syz_lead, r, r, 2);
+    PrintS("syz_2: "); dPrint(syz_2, r, r, 2);
+
+    PrintS("L: "); dPrint(L, r, r, 0);
+    PrintS("T: "); dPrint(T, r, r, 0);
+
+    if( LS == NULL )
+      PrintS("LS: NULL\n");
+    else
+    {
+      PrintS("LS: "); dPrint(LS, r, r, 0);
+    }
+  }
+  
+  res->rtyp = VECTOR_CMD;
+  res->data = SchreyerSyzygyNF(syz_lead, syz_2, L, T, LS, r);
+
+  if( __DEBUG__ )
+  {
+    PrintS("SchreyerSyzygyNF::Output: ");
+
+    dPrint((poly)res->data, r, r, 2);
+  }
+
+
+  return FALSE;
+}
+
+
+
+/// TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
+/// proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
+static BOOLEAN ReduceTerm(leftv res, leftv h)
+{
+  const char* usage = "`ReduceTerm(<poly>, <poly/vector>, <vector/0>, <ideal/module>, <ideal/module>[,<module>])` expected";
+  const ring r = currRing;
+
+  NoReturn(res);
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
+//  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
+  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
+
+  if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const poly multiplier = (poly) h->Data(); assume (multiplier != NULL);
+
+  
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const poly term4reduction = (poly) h->Data(); assume( term4reduction != NULL );
+
+  
+  poly syztermCheck = NULL;
+  
+  h = h->Next();
+  if ((h==NULL) || !((h->Typ()==VECTOR_CMD) || (h->Data() == NULL)) )
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  if(h->Typ()==VECTOR_CMD) 
+    syztermCheck = (poly) h->Data();
+
+  
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal L = (ideal) h->Data(); assume( IDELEMS(L) > 0 );
+
+  
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal T = (ideal) h->Data();
+
+  assume( IDELEMS(L) == IDELEMS(T) );
+
+  ideal LS = NULL;
+
+  h = h->Next();
+  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
+  {
+    LS = (ideal)h->Data();
+    h = h->Next();
+  }
+
+  if( __TAILREDSYZ__ )
+    assume (LS != NULL);
+
+  assume( h == NULL );
+
+  if( __DEBUG__ )
+  {
+    PrintS("ReduceTerm(m, t, syzterm, L, T, #)::Input: \n");
+
+    PrintS("m: "); dPrint(multiplier, r, r, 2);
+    PrintS("t: "); dPrint(term4reduction, r, r, 2);
+    PrintS("syzterm: "); dPrint(syztermCheck, r, r, 2);
+    
+    PrintS("L: "); dPrint(L, r, r, 0);
+    PrintS("T: "); dPrint(T, r, r, 0);
+
+    if( LS == NULL )
+      PrintS("LS: NULL\n");
+    else
+    {
+      PrintS("LS: "); dPrint(LS, r, r, 0);
+    }
+  }
+
+
+  if (__SYZCHECK__ && syztermCheck != NULL)
+  {
+    const int c = p_GetComp(syztermCheck, r) - 1;
+    assume( c >= 0 && c < IDELEMS(L) );
+    
+    const poly p = L->m[c];
+    assume( p != NULL ); assume( pNext(p) == NULL );    
+
+    assume( p_EqualPolys(term4reduction, p, r) ); // assume? TODO
+
+
+    poly m = leadmonom(syztermCheck, r);
+    assume( m != NULL ); assume( pNext(m) == NULL );
+
+    assume( p_EqualPolys(multiplier, m, r) ); // assume? TODO
+
+    p_Delete(&m, r);    
+    
+// NOTE:   leadmonomial(syzterm) == m &&  L[leadcomp(syzterm)] == t
+  }
+
+  res->rtyp = VECTOR_CMD;
+  res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, r);
+
+
+  if( __DEBUG__ )
+  {
+    PrintS("ReduceTerm::Output: ");
+
+    dPrint((poly)res->data, r, r, 2);
+  }
+  
+  
+  return FALSE;
+}
+
+
+
+
+// TODO: store m * @tail -.-^-.-^-.--> ?
+// proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
+static BOOLEAN TraverseTail(leftv res, leftv h)
+{
+  const char* usage = "`TraverseTail(<poly>, <poly/vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
+  const ring r = currRing;
+
+  NoReturn(res);
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)1)));
+
+  if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const poly multiplier = (poly) h->Data(); assume (multiplier != NULL);
+
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const poly tail = (poly) h->Data(); 
+
+  h = h->Next();
+
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal L = (ideal) h->Data();
+
+  assume( IDELEMS(L) > 0 );
+
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal T = (ideal) h->Data();
+
+  assume( IDELEMS(L) == IDELEMS(T) );
+
+  h = h->Next();
+  
+  ideal LS = NULL;
+
+  if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
+  {
+    LS = (ideal)h->Data();
+    h = h->Next();
+  }
+
+  if( __TAILREDSYZ__ )
+    assume (LS != NULL);
+
+  assume( h == NULL );
+
+  if( __DEBUG__ )
+  {
+    PrintS("TraverseTail(m, t, L, T, #)::Input: \n");
+
+    PrintS("m: "); dPrint(multiplier, r, r, 2);
+    PrintS("t: "); dPrint(tail, r, r, 10);
+
+    PrintS("L: "); dPrint(L, r, r, 0);
+    PrintS("T: "); dPrint(T, r, r, 0);
+
+    if( LS == NULL )
+      PrintS("LS: NULL\n");
+    else
+    {
+      PrintS("LS: "); dPrint(LS, r, r, 0);
+    }
+  }
+
+  res->rtyp = VECTOR_CMD;
+  res->data = TraverseTail(multiplier, tail, L, T, LS, r);
+
+
+  if( __DEBUG__ )
+  {
+    PrintS("TraverseTail::Output: ");
+    dPrint((poly)res->data, r, r, 2);
+  }
+
+  return FALSE;
+}
+
+
+
 
 
 
@@ -1920,7 +2405,13 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   
   ADD(psModulFunctions, currPack->libname, "Sort_c_ds", FALSE, Sort_c_ds);
   ADD(psModulFunctions, currPack->libname, "FindReducer", FALSE, FindReducer);
-  
+
+
+  ADD(psModulFunctions, currPack->libname, "ReduceTerm", FALSE, ReduceTerm);
+  ADD(psModulFunctions, currPack->libname, "TraverseTail", FALSE, TraverseTail);
+
+    
+  ADD(psModulFunctions, currPack->libname, "SchreyerSyzygyNF", FALSE, SchreyerSyzygyNF);
   
   //  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
 

@@ -1270,30 +1270,51 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
     }
   }
 
-  vector s = [0];
-
-  if( size(t) > 0 )
+  if( typeof(#[1]) == "module" )
   {
-    def product = m * t;
-
-    s = SSFindReducer(product, syzterm, L/*, T*/, #);
-
-    if( size(s) != 0 )
-    {
-      poly b = leadmonomial(s);
-
-      def c = leadcomp(s); int k = int(c);
-
-      s = s + SSTraverseTail(b, T[k], L, T, #); // !!!   
-    }
+    vector ss = ReduceTerm(m, t, syzterm, L, T, #[1]);
+  } else
+  {
+    vector ss = ReduceTerm(m, t, syzterm, L, T);
   }
+
+  if( @KERCHECK )
+  {
+    vector s = 0;
+
+    if( size(t) > 0 )
+    {
+      def product = m * t;
+
+      s = SSFindReducer(product, syzterm, L, #);
+
+      if( size(s) != 0 )
+      {
+        poly @b = leadmonomial(s);
+
+        def @c = leadcomp(s); int k = int(@c);
+
+        s = s + SSTraverseTail(@b, T[k], L, T, #); // !!!   
+      }
+    }
     
+    if( s != ss )
+    {
+      "ERROR in ReduceTerm => old: ", s, " != ker: ", ss;
+      "m: ", m;
+      "t: ", t;
+      "syzterm: ", syzterm;
+      L; T; #;
+      $;
+    }  
+  }
+
   if( @DEBUG )
   {
-    "SSReduceTerm::Output: ", s;
+    "SSReduceTerm::Output: ", ss;
   }
   
-  return (s);
+  return (ss);
 }
 
 
@@ -1330,24 +1351,133 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
     }
   }
 
-  vector s = 0;
+  if( typeof(#[1]) == "module" )
+  {
+    vector ss = TraverseTail(m, @tail, L, T, #[1]);
+  } else
+  {
+    vector ss = TraverseTail(m, @tail, L, T);
+  }
 
-  def @l;
+  if( @KERCHECK )
+  {
+    vector s = 0;
+
+    def @l, @p;
+    @p = @tail;
 
   // iterate tail-terms in ANY order!
-  while( size(@tail) > 0 )
-  {
-    @l = lead(@tail);
-    s = s + SSReduceTerm(m, @l, [0], L, T, #); // :(
-    @tail = @tail - @l;
+    while( size(@p) > 0 )
+    {
+      @l = lead(@p);
+      s = s + SSReduceTerm(m, @l, [0], L, T, #); // :(
+      @p = @p - @l;
+    }
+    
+    if( s != ss )
+    {
+      "ERROR in TraverseTail => old: ", s, " != ker: ", ss;
+      "m: ", m;
+      "@tail: ", @tail;
+      L; T; #;
+      $;
+    }  
   }
 
   if( @DEBUG )
   {
-    "SSTraverseTail::Output: ", s;
+    "SSTraverseTail::Output: ", ss;
   }
-  return (s);
+  
+  return (ss);
 }
+
+// -------------------------------------------------------- //
+
+proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
+"
+   Hybrid Syzygy computation: 'reduce' spoly by eliminating _any_ terms
+   while discurding terms of lower order!
+
+   Return the tail syzygy (without: syz_lead, starting with: syz_2)
+"
+{
+  if( typeof( attrib(basering, "DEBUG") ) == "int" )
+  {
+    int @DEBUG = attrib(basering, "DEBUG");
+  } else
+  {
+    int @DEBUG = !system("with", "ndebug");
+  }
+
+  if( @DEBUG )
+  {
+    "SSSchreyerSyzygyNF::Input: ";
+
+    "syzygy_lead: ", syz_lead;
+    "syzygy 2nd : ", syz_2;
+    L; T; 
+    if( size(#) > 0 )
+    {
+      "LSyz: "; #[1];
+    }
+  }
+
+  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
+  {
+    int @KERCHECK = attrib(basering, "KERCHECK");
+  } else
+  {
+    int @KERCHECK = @DEBUG;
+  }
+
+  if( typeof(#[1]) == "module" )
+  {
+    def my = SchreyerSyzygyNF(syz_lead, syz_2, L, T, #[1]);
+  } else
+  {
+    def my = SchreyerSyzygyNF(syz_lead, syz_2, L, T);
+  }
+
+  if( @KERCHECK )
+  {
+    def spoly = leadmonomial(syz_lead) * T[int(leadcomp(syz_lead))] 
+              + leadmonomial(syz_2)    * T[int(leadcomp(syz_2))];
+
+    vector @tail = syz_2;
+
+    while (size(spoly) > 0)
+    {
+      syz_2 = SSFindReducer(lead(spoly), 0, L, #); spoly = Tail(spoly);
+
+      if( size(syz_2) != 0)
+      {          
+        spoly = spoly + leadmonomial(syz_2) * T[int(leadcomp(syz_2))];
+        @tail = @tail + syz_2;
+      }
+    }
+    
+    if( my != @tail )
+    {
+      "ERROR in SchreyerSyzygyNF => old: ", @tail, " != ker: ", my;
+      
+      "syzygy_lead: ", syz_lead;
+      "syzygy 2nd : ", syz_2;
+      
+      L; T; #;
+      $;
+    }
+  }
+
+  if( @DEBUG )
+  {
+    "SSSchreyerSyzygyNF::Output: ", my;
+  }
+  
+  return (my);
+}
+
+
 
 // -------------------------------------------------------- //
 
@@ -1461,8 +1591,6 @@ proc SSComputeSyzygy(def L, def T)
         }
       } else
       {
-        spoly = aa * T[r];
-
         if( @LEAD2SYZ )
         {
           a2 = LL2[k];
@@ -1479,26 +1607,8 @@ proc SSComputeSyzygy(def L, def T)
             $
           }
         }
-        
-        c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
-        
-        spoly = spoly + aa2 * T[r2];
-        @tail = a2;
 
-        while (size(spoly) > 0)
-        {
-          a2 = SSFindReducer( lead(spoly), [0], L/*, T*/, LS);
-          spoly = Tail(spoly);
-
-          if( size(a2) != 0)
-          {          
-            c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
-
-            spoly = spoly + aa2 * T[r2];
-            @tail = @tail + a2;
-          }
-        }
-        
+        @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
       }
       
       TT[k] = @tail;
@@ -1871,6 +1981,11 @@ static proc loadme()
       exportto(Schreyer, Syzextra::Sort_c_ds);
 
       exportto(Schreyer, Syzextra::FindReducer);
+
+      exportto(Schreyer, Syzextra::ReduceTerm);
+      exportto(Schreyer, Syzextra::TraverseTail);
+
+      exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
     }
 /*
     else
@@ -1918,6 +2033,10 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra_g::FindReducer);
       
+      exportto(Schreyer, Syzextra_g::ReduceTerm);
+      exportto(Schreyer, Syzextra_g::TraverseTail);
+
+      exportto(Schreyer, Syzextra_g::SchreyerSyzygyNF);
     }
 */
 
