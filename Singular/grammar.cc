@@ -179,7 +179,7 @@ int        inerror = 0;
      WerrorS("no int expression");                     \
      YYERROR;                                          \
    }                                                   \
-   (i) = (int)((long)(a).Data());
+   (i) = (int)((long)(a).Data());(a).CleanUp()
 
 #define MYYERROR(a) { WerrorS(a); YYERROR; }
 
