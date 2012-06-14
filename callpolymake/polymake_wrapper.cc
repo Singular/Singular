@@ -52,7 +52,8 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
           polymake::perl::Object pms;
           CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
           ms = PmPolytope2ZPolytope(&pms);
-          delete pp, pq;
+          delete pp;
+          delete pq;
         }
         catch (const std::exception& ex) 
         {
@@ -1265,7 +1266,8 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
-        delete pp, pq;
+        delete pp;
+        delete pq;
         ms = PmPolytope2ZPolytope(&pms);
       }
       catch (const std::exception& ex) 
@@ -1289,7 +1291,8 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
-        delete pp, pq;
+        delete pp;
+        delete pq;
         ms = PmPolytope2ZPolytope(&pms);
       }
       catch (const std::exception& ex) 
@@ -1319,7 +1322,8 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
-        delete pp, pq;
+        delete pp;
+        delete pq;
         ms = PmPolytope2ZPolytope(&pms);
       }
       catch (const std::exception& ex) 
@@ -1344,7 +1348,8 @@ BOOLEAN PMminkowskiSum(leftv res, leftv args)
         polymake::perl::Object* pq = ZPolytope2PmPolytope(zq);
         polymake::perl::Object pms;
         CallPolymakeFunction("minkowski_sum", *pp, *pq) >> pms;
-        delete pp, pq;
+        delete pp;
+        delete pq;
         ms = PmPolytope2ZPolytope(&pms);
       }
       catch (const std::exception& ex) 
@@ -1827,12 +1832,12 @@ BOOLEAN PMconeViaRays(leftv res, leftv args)
       polymake::Matrix<polymake::Integer> pmlines = Intvec2PmMatrixInteger(lines);
       pc.take("INPUT_LINEALITY") << pmlines;
 
-      leftv w = v->next;
-      if ((w != NULL) && (w->Typ() == INT_CMD))
-      {
-        int flag = (int) (long) w->Data(); // TODO: this will indicate whether the
-                                           // information provided are exact
-      } 
+      // leftv w = v->next;
+      // if ((w != NULL) && (w->Typ() == INT_CMD))
+      // {
+      //   int flag = (int) (long) w->Data(); // TODO: this will indicate whether the
+      //                                      // information provided are exact
+      // } 
     }
     gfan::ZCone* zc = PmCone2ZCone(&pc);
     res->rtyp = coneID;
@@ -1948,4 +1953,5 @@ extern "C" int mod_init(void* polymakesingular)
   b->blackbox_Op2=bbpolytope_Op2;
  
   init_polymake_help();
+  return 0;
 }
