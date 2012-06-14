@@ -276,6 +276,7 @@ private:
   BOOLEAN python_to(leftv result) const
   {
     result->data = m_ptr;
+    Py_XINCREF(m_ptr);
     result->rtyp = PythonInterpreter::id();
     return !m_ptr;
   }
