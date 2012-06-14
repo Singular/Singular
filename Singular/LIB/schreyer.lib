@@ -1577,118 +1577,179 @@ proc SSComputeSyzygy(def L, def T)
     "T: "; T;
   }
 
-  def a; bigint c; int r, k; poly aa;
+  list @res = ComputeSyzygy(L, T); 
 
-  int @LEAD2SYZ = 0;
-  if( typeof( attrib(basering, "LEAD2SYZ") ) == "int" )
+  module @LL = @res[1]; module @TT = @res[2];
+
+  if( @KERCHECK )
   {
-    @LEAD2SYZ = attrib(basering, "LEAD2SYZ");
-  }
-
-  int @TAILREDSYZ = 1;
-  if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
-  {
-    @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
-  }
-
-  int @HYBRIDNF = 0;
-  if( typeof( attrib(basering, "HYBRIDNF") ) == "int" )
-  {
-    @HYBRIDNF = attrib(basering, "HYBRIDNF");
-  }
-
-  module LL;
-  def a2; int r2; poly aa2;  
-
-  /// Get the critical leading syzygy terms
-  if( @LEAD2SYZ ) // & 2nd syz. term
-  {
-    module LL2;
-    (LL, LL2) = SSCompute2LeadingSyzygyTerms(L); // ++ 
-  } else
-  {
-    LL = SSComputeLeadingSyzygyTerms(L);
-  }
-
-  module TT, SYZ; def spoly;
-
-  if( size(LL) > 0 )
-  {
-    list LS;
-
-    if( @TAILREDSYZ)
+    if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
     {
-      LS = list(LL);
+      int @SYZCHECK = attrib(basering, "SYZCHECK");
+    } else
+    {
+      int @SYZCHECK = @DEBUG;
     }
 
-    vector @tail;
-
-    for(k = ncols(LL); k > 0; k-- )
+    int @LEAD2SYZ = 1;
+    if( typeof( attrib(basering, "LEAD2SYZ") ) == "int" )
     {
-      // leading syz. term:
-      a = LL[k]; c = leadcomp(a); r = int(c); aa = leadmonomial(a);
-      //    "A: ", a, " --->>>> ", aa, " **** [", r, "]: ";
+      @LEAD2SYZ = attrib(basering, "LEAD2SYZ");
+    }
 
-      // NF reduction:
-      if( !@HYBRIDNF )
+    int @TAILREDSYZ = 1;
+    if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
+    {
+      @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
+    }
+
+    int @HYBRIDNF = 0;
+    if( typeof( attrib(basering, "HYBRIDNF") ) == "int" )
+    {
+      @HYBRIDNF = attrib(basering, "HYBRIDNF");
+    }
+
+    module LL;
+
+    /// Get the critical leading syzygy terms
+    if( @LEAD2SYZ ) // & 2nd syz. term
+    {
+      module LL2;
+      (LL, LL2) = SSCompute2LeadingSyzygyTerms(L); 
+    } else
+    {
+      LL = SSComputeLeadingSyzygyTerms(L);
+    }
+
+    module TT, SYZ;
+
+    vector a, a2; bigint c; int r; poly aa;
+
+    if( size(LL) > 0 )
+    {
+      list LS;
+
+      if( @TAILREDSYZ)
       {
-        /// TODO: save shortcut (aa) * T[r] -> ?
-        @tail = SSTraverseTail(aa, T[r], L, T, LS);
-  // //      @tail = SSTraverseTail(a, L, T, LS);
-
-        // get the 2nd syzygy term...
-
-        if( @LEAD2SYZ ) // with the 2nd syz. term:
-        {      
-          a2 = LL2[k]; c = leadcomp(a2); r2 = int(c); aa2 = leadmonomial(a2);
-
-          @tail = @tail + a2 + 
-               /// TODO: save shortcut (aa2) * T[r2] -> ?
-               SSTraverseTail(aa2, T[r2], L, T, LS);
-  // //               SSTraverseTail(a2, L, T, LS);
-        } else
-        {
-          @tail = @tail +
-                  SSReduceTerm(aa, L[r], a, L, T, LS);
-  // //                  SSReduceTerm(a, L, T, LS);
-        }
-      } else
-      {
-        if( @LEAD2SYZ )
-        {
-          a2 = LL2[k];
-        } else
-        {
-          a2 = SSFindReducer( aa * L[r], a, L, LS);
-        }
-
-        if ( (@SYZCHECK || @DEBUG) )
-        {
-          if( size(a2) == 0 ) // if syzterm == 0!!!!
-          {
-            "ERROR: could not find the 2nd syzygy term during the hybrid NF!!!";
-            $
-          }
-        }
-
-        @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
+        LS = list(LL);
       }
-      
-      TT[k] = @tail;
-      SYZ[k] = a + @tail;
+
+      vector @tail;
+
+      for(int k = ncols(LL); k > 0; k-- )
+      {
+        // leading syz. term:
+        a = LL[k]; c = leadcomp(a); r = int(c); aa = leadmonomial(a);
+
+        // NF reduction:
+        if( !@HYBRIDNF ) // Traverse approach:
+        {        
+          @tail = SSTraverseTail(aa, T[r], L, T, LS);
+
+          // get the 2nd syzygy term...
+          if( @LEAD2SYZ ) // with the 2nd syz. term:
+          {      
+            a2 = LL2[k]; c = leadcomp(a2); r = int(c); aa = leadmonomial(a2);
+
+            @tail = a2 + @tail + SSTraverseTail(aa, T[r], L, T, LS);
+          } else
+          {
+            @tail = @tail + SSReduceTerm(aa, L[r], a, L, T, LS);
+          }
+
+        } else // Hybrid approach:
+        {
+
+          // get the 2nd syzygy term...
+          if( @LEAD2SYZ )
+          {
+            a2 = LL2[k];
+          } else
+          {
+            a2 = SSFindReducer( aa * L[r], a, L, LS);
+          }
+
+          if ( (@SYZCHECK || @DEBUG) )
+          {
+            if( size(a2) == 0 ) // if syzterm == 0!!!!
+            {
+              "ERROR in SSComputeSyzygy: could not find the 2nd syzygy term during the hybrid NF!!!";
+              $
+            }
+          }
+
+          @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
+        }
+
+        TT[k] = @tail;
+        SYZ[k] = a + @tail;
+      }
     }
+
+    if( ncols(LL) != ncols(@LL) )
+    {
+      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      $
+    }
+
+    if( ncols(TT) != ncols(@TT) )
+    {
+      "ERROR in SSComputeSyzygy: wrong tail syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      "";
+      type(TT);
+      type(@TT);
+      $
+    }
+    
+    if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
+    {
+      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      $
+    }
+
+
+    if( size( module( matrix(TT) - matrix(@TT) ) ) != 0 )
+    {
+      "ERROR in SSComputeSyzygy: wrong tail syzygies!?";
+      TT; @TT;
+      L; T;
+      $
+    }   
+    
   }
 
+  module @SYZ;
+  
+  for(int @k = ncols(@LL); @k > 0; @k-- )
+  {
+    @SYZ[@k] = @LL[@k] + @TT[@k];
+  }
+  
   if( @DEBUG )
   {
     "SSComputeSyzygy::Output";
 
-    "SYZ: "; SYZ;
-    "LL: "; LL;
-    "TT: "; TT;
+//    "SYZ: "; @SYZ;
+    "LL: "; @LL;
+    "TT: "; @TT;
   }
 
-  return (SYZ, LL, TT);
+  return (@SYZ, @LL, @TT);
 }
 
 // resolution/syzygy step:
@@ -2049,6 +2110,7 @@ static proc loadme()
       exportto(Schreyer, Syzextra::TraverseTail);
 
       exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
+      exportto(Schreyer, Syzextra::ComputeSyzygy);
     }
 /*
     else
@@ -2100,6 +2162,7 @@ static proc loadme()
       exportto(Schreyer, Syzextra_g::TraverseTail);
 
       exportto(Schreyer, Syzextra_g::SchreyerSyzygyNF);
+      exportto(Schreyer, Syzextra_g::ComputeSyzygy);
     }
 */
 

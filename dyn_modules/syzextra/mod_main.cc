@@ -1773,6 +1773,173 @@ static BOOLEAN TraverseTail(leftv res, leftv h)
 
 
 
+static void ComputeSyzygy(const ideal L, const ideal T, ideal& LL, ideal& TT, const ring R)
+{
+  assume( R == currRing ); // For attributes :-/
+
+  assume( IDELEMS(L) == IDELEMS(T) );
+  
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)1)));
+  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)1)));
+  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)__DEBUG__)));
+
+  const BOOLEAN __HYBRIDNF__ = (BOOLEAN)((long)(atGet(currRingHdl,"HYBRIDNF",INT_CMD, (void*)0)));
+
+
+  if( __LEAD2SYZ__ )
+    LL = Compute2LeadingSyzygyTerms(L, R); // 2 terms!
+  else
+    LL = ComputeLeadingSyzygyTerms(L, R); // 1 term!
+
+  const int size = IDELEMS(LL);
+
+  TT = idInit(size, 0);
+
+  if( size == 1 && LL->m[0] == NULL )
+    return;
+  
+
+  ideal LS = NULL;
+  
+  if( __TAILREDSYZ__ )
+    LS = LL;
+
+  for( int k = size - 1; k >= 0; k-- )
+  {
+    const poly a = LL->m[k]; assume( a != NULL );
+    
+    const int r = p_GetComp(a, R) - 1; 
+    
+    assume( r >= 0 && r < IDELEMS(T) );
+    assume( r >= 0 && r < IDELEMS(L) );
+
+    poly aa = leadmonom(a, R); assume( aa != NULL); // :(    
+    
+    poly a2 = pNext(a);    
+
+    if( a2 != NULL )
+    {
+      TT->m[k] = a2; pNext(a) = NULL;
+    }
+
+    if( ! __HYBRIDNF__ )
+    {
+      poly t = TraverseTail(aa, T->m[r], L, T, LS, R);
+
+      if( a2 != NULL )
+      {
+        assume( __LEAD2SYZ__ );
+
+        const int r2 = p_GetComp(a2, R) - 1; poly aa2 = leadmonom(a2, R); // :(
+
+        assume( r2 >= 0 && r2 < IDELEMS(T) );
+        
+        TT->m[k] = p_Add_q(a2, p_Add_q(t, TraverseTail(aa2, T->m[r2], L, T, LS, R), R), R);
+
+        p_Delete(&aa2, R);
+      } else
+        TT->m[k] = p_Add_q(t, ReduceTerm(aa, L->m[r], a, L, T, LS, R), R);
+
+    } else
+    {
+      if( a2 == NULL )
+      {
+        aa = p_Mult_mm(aa, L->m[r], R);
+        a2 = FindReducer(aa, a, L, LS, R); 
+      }
+      assume( a2 != NULL );
+        
+      TT->m[k] = SchreyerSyzygyNF(a, a2, L, T, LS, R); // will copy a2 :(
+      
+      p_Delete(&a2, R);
+    }
+    p_Delete(&aa, R);    
+  }
+
+  TT->rank = id_RankFreeModule(TT, R);
+}
+
+
+
+// module (N, LL, TT) = SSComputeSyzygy(L, T);
+// Compute Syz(L ++ T) = N = LL ++ TT
+// proc SSComputeSyzygy(def L, def T)
+static BOOLEAN ComputeSyzygy(leftv res, leftv h)
+{
+  const char* usage = "`ComputeSyzygy(<ideal/module>, <ideal/module>])` expected";
+  const ring r = currRing;
+
+  NoReturn(res);
+
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal L = (ideal) h->Data();
+
+  assume( IDELEMS(L) > 0 );
+
+  h = h->Next();
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  const ideal T = (ideal) h->Data();
+  assume( IDELEMS(L) == IDELEMS(T) );
+
+
+  h = h->Next(); assume( h == NULL );  
+
+  if( __DEBUG__ )
+  {
+    PrintS("ComputeSyzygy(L, T)::Input: \n");
+
+    PrintS("L: "); dPrint(L, r, r, 0);
+    PrintS("T: "); dPrint(T, r, r, 0);
+  }
+
+  ideal LL, TT;
+
+  ComputeSyzygy(L, T, LL, TT, r);
+
+  lists l = (lists)omAllocBin(slists_bin); l->Init(2);
+
+  l->m[0].rtyp = MODUL_CMD; l->m[0].data = reinterpret_cast<void *>(LL);
+
+  l->m[1].rtyp = MODUL_CMD; l->m[1].data = reinterpret_cast<void *>(TT);
+  
+  res->data = l; res->rtyp = LIST_CMD;
+  
+  if( __DEBUG__ )
+  {
+    PrintS("ComputeSyzygy::Output: ");
+    dPrint(LL, r, r, 0);
+    dPrint(TT, r, r, 0);
+  }
+
+  return FALSE;
+
+}
+
+
+
+
 
 
 
@@ -2418,6 +2585,7 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 
     
   ADD(psModulFunctions, currPack->libname, "SchreyerSyzygyNF", FALSE, SchreyerSyzygyNF);
+  ADD(psModulFunctions, currPack->libname, "ComputeSyzygy", FALSE, ComputeSyzygy);
   
   //  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
 
