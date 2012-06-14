@@ -618,6 +618,116 @@ static int cmp_c_ds(const void *p1, const void *p2)
 }
 
 
+
+static ideal ComputeLeadingSyzygyTerms(const ideal& id, const ring r)
+{
+  // 1. set of components S?
+  // 2. for each component c from S: set of indices of leading terms
+  // with this component?
+  // 3. short exp. vectors for each leading term?
+
+  const int size = IDELEMS(id);
+
+  if( size < 2 )
+  {
+    const ideal newid = idInit(1, 0); newid->m[0] = NULL; // zero ideal...        
+    return newid;
+  }
+
+
+  // TODO/NOTE: input is supposed to be (reverse-) sorted wrt "(c,ds)"!??
+
+  // components should come in groups: count elements in each group
+  // && estimate the real size!!!
+
+
+  // use just a vector instead???
+  const ideal newid = idInit( (size * (size-1))/2, size); // maximal size: ideal case!
+
+  int k = 0;
+
+  for (int j = 0; j < size; j++)
+  {
+    const poly p = id->m[j];
+    assume( p != NULL );
+    const int  c = p_GetComp(p, r);
+
+    for (int i = j - 1; i >= 0; i--)
+    {
+      const poly pp = id->m[i];
+      assume( pp != NULL );
+      const int  cc = p_GetComp(pp, r);
+
+      if( c != cc )
+        continue;
+
+      const poly m = p_Init(r); // p_New???
+
+      // m = LCM(p, pp) / p! // TODO: optimize: knowing the ring structure: (C/lp)!
+      for (int v = rVar(r); v > 0; v--)
+      {
+        assume( v > 0 );
+        assume( v <= rVar(r) );
+
+        const short e1 = p_GetExp(p , v, r);
+        const short e2 = p_GetExp(pp, v, r);
+
+        if( e1 >= e2 )
+          p_SetExp(m, v, 0, r);
+        else
+          p_SetExp(m, v, e2 - e1, r);
+
+      }
+
+      assume( (j > i) && (i >= 0) );
+
+      p_SetComp(m, j + 1, r);
+      pNext(m) = NULL;
+      p_SetCoeff0(m, n_Init(1, r->cf), r); // for later...
+
+      p_Setm(m, r); // should not do anything!!!
+
+      newid->m[k++] = m;
+    }
+  }
+
+//   if( __DEBUG__ && FALSE )
+//   {
+//     PrintS("ComputeLeadingSyzygyTerms::Temp0: \n");
+//     dPrint(newid, r, r, 1);
+//   }
+
+  // the rest of newid is assumed to be zeroes...
+
+  // simplify(newid, 2 + 32)??
+  // sort(newid, "C,ds")[1]???
+  id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
+
+//   if( __DEBUG__ && FALSE )
+//   {
+//     PrintS("ComputeLeadingSyzygyTerms::Temp1: \n");
+//     dPrint(newid, r, r, 1);
+//   }
+
+  idSkipZeroes(newid); // #define SIMPL_NULL 2
+
+//   if( __DEBUG__ )
+//   {
+//     PrintS("ComputeLeadingSyzygyTerms::Output: \n");
+//     dPrint(newid, r, r, 1);
+//   }
+
+  const int sizeNew = IDELEMS(newid);
+
+  if( sizeNew >= 2 )
+    qsort_my(newid->m, sizeNew, sizeof(poly), r, cmp_c_ds);
+
+  newid->rank = id_RankFreeModule(newid, r);
+
+  return newid;
+}
+
+
 static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
 {
   const ring r = currRing;
@@ -664,121 +774,9 @@ static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
     h = h->Next(); assume (h == NULL);
 
-    // 1. set of components S?
-    // 2. for each component c from S: set of indices of leading terms
-    // with this component?
-    // 3. short exp. vectors for each leading term?
-
-    const int size = IDELEMS(id);
-
-    if( size < 2 )
-    {
-      const ideal newid = idInit(1, 0); // zero ideal...
-
-      newid->m[0] = NULL;
-      
-      res->data = newid;
-      res->rtyp = MODUL_CMD;
-
-      return FALSE;
-    }
+    const ideal newid = ComputeLeadingSyzygyTerms(id, r);
     
-
-    // TODO/NOTE: input is supposed to be (reverse-) sorted wrt "(c,ds)"!??
-
-    // components should come in groups: count elements in each group
-    // && estimate the real size!!!
-
-
-    // use just a vector instead???
-    const ideal newid = idInit( (size * (size-1))/2, size); // maximal size: ideal case!
-    
-    int k = 0;
-
-    for (int j = 0; j < size; j++)
-    {
-      const poly p = id->m[j];
-      assume( p != NULL );
-      const int  c = p_GetComp(p, r);
-
-      for (int i = j - 1; i >= 0; i--)
-      {
-        const poly pp = id->m[i];
-        assume( pp != NULL );
-        const int  cc = p_GetComp(pp, r);
-
-        if( c != cc )
-          continue;
-
-        const poly m = p_Init(r); // p_New???
-
-        // m = LCM(p, pp) / p! // TODO: optimize: knowing the ring structure: (C/lp)!
-        for (int v = rVar(r); v > 0; v--)
-        {
-          assume( v > 0 );
-          assume( v <= rVar(r) );
-          
-          const short e1 = p_GetExp(p , v, r);
-          const short e2 = p_GetExp(pp, v, r);
-
-          if( e1 >= e2 )
-            p_SetExp(m, v, 0, r);
-          else
-            p_SetExp(m, v, e2 - e1, r);
-            
-        }
-
-        assume( (j > i) && (i >= 0) );
-
-        p_SetComp(m, j + 1, r);
-        pNext(m) = NULL;
-        p_SetCoeff0(m, n_Init(1, r->cf), r); // for later...
-
-        p_Setm(m, r); // should not do anything!!!
-
-        newid->m[k++] = m;
-      }
-    }
-
-    if( __DEBUG__ && FALSE )
-    {
-      PrintS("ComputeLeadingSyzygyTerms::Temp0: \n");
-      dPrint(newid, r, r, 1);
-    }
-
-    // the rest of newid is assumed to be zeroes...
-
-    // simplify(newid, 2 + 32)??
-    // sort(newid, "C,ds")[1]???
-    id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
-
-    if( __DEBUG__ && FALSE )
-    {
-      PrintS("ComputeLeadingSyzygyTerms::Temp1: \n");
-      dPrint(newid, r, r, 1);
-    }
-
-    idSkipZeroes(newid); // #define SIMPL_NULL 2
-
-    if( __DEBUG__ )
-    {
-      PrintS("ComputeLeadingSyzygyTerms::Output: \n");
-      dPrint(newid, r, r, 1);
-    }
-
-    const int sizeNew = IDELEMS(newid);
-
-    if( sizeNew >= 2 )
-      qsort_my(newid->m, sizeNew, sizeof(poly), r, cmp_c_ds);
-
-    if (IDELEMS(newid) == 0 || (IDELEMS(newid) == 1 && newid->m[0] == NULL) )
-      newid->rank = 1;    
-    
-    // TODO: add sorting wrt <c,ds> & reversing...
-
-    res->data = newid;
-    res->rtyp = MODUL_CMD;
-    
+    res->data = newid; res->rtyp = MODUL_CMD;
     return FALSE;
   }
 
@@ -864,6 +862,163 @@ static BOOLEAN Sort_c_ds(leftv res, leftv h)
 
 
 
+static ideal Compute2LeadingSyzygyTerms(const ideal& id, const ring r)
+{
+#ifndef NDEBUG
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
+#else
+  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
+#endif
+
+  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
+  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
+
+
+
+  // 1. set of components S?
+  // 2. for each component c from S: set of indices of leading terms
+  // with this component?
+  // 3. short exp. vectors for each leading term?
+
+  const int size = IDELEMS(id);
+
+  if( size < 2 )
+  {
+    const ideal newid = idInit(1, 1); newid->m[0] = NULL; // zero module...   
+    return newid;
+  }
+
+
+    // TODO/NOTE: input is supposed to be sorted wrt "C,ds"!??
+
+    // components should come in groups: count elements in each group
+    // && estimate the real size!!!
+
+
+    // use just a vector instead???
+  ideal newid = idInit( (size * (size-1))/2, size); // maximal size: ideal case!
+
+  int k = 0;
+
+  for (int j = 0; j < size; j++)
+  {
+    const poly p = id->m[j];
+    assume( p != NULL );
+    const int  c = p_GetComp(p, r);
+
+    for (int i = j - 1; i >= 0; i--)
+    {
+      const poly pp = id->m[i];
+      assume( pp != NULL );
+      const int  cc = p_GetComp(pp, r);
+
+      if( c != cc )
+        continue;
+
+        // allocate memory & zero it out!
+      const poly m = p_Init(r); const poly mm = p_Init(r);
+
+
+        // m = LCM(p, pp) / p! mm = LCM(p, pp) / pp!
+        // TODO: optimize: knowing the ring structure: (C/lp)!
+
+      for (int v = rVar(r); v > 0; v--)
+      {
+        assume( v > 0 );
+        assume( v <= rVar(r) );
+
+        const short e1 = p_GetExp(p , v, r);
+        const short e2 = p_GetExp(pp, v, r);
+
+        if( e1 >= e2 )
+          p_SetExp(mm, v, e1 - e2, r); //            p_SetExp(m, v, 0, r);
+        else
+          p_SetExp(m, v, e2 - e1, r); //            p_SetExp(mm, v, 0, r);
+
+      }
+
+      assume( (j > i) && (i >= 0) );
+
+      p_SetComp(m, j + 1, r);
+      p_SetComp(mm, i + 1, r);
+
+      const number& lc1 = p_GetCoeff(p , r);
+      const number& lc2 = p_GetCoeff(pp, r);
+
+      number g = n_Lcm( lc1, lc2, r );
+
+      p_SetCoeff0(m ,       n_Div(g, lc1, r), r);
+      p_SetCoeff0(mm, n_Neg(n_Div(g, lc2, r), r), r);
+
+      n_Delete(&g, r);
+
+      p_Setm(m, r); // should not do anything!!!
+      p_Setm(mm, r); // should not do anything!!!
+
+      pNext(m) = mm; //        pNext(mm) = NULL;
+
+      newid->m[k++] = m;
+    }
+  }
+
+//   if( __DEBUG__ && FALSE )
+//   {
+//     PrintS("Compute2LeadingSyzygyTerms::Temp0: \n");
+//     dPrint(newid, r, r, 1);
+//   }
+
+  if( !__TAILREDSYZ__ )
+  {
+      // simplify(newid, 2 + 32)??
+      // sort(newid, "C,ds")[1]???
+    id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
+
+//     if( __DEBUG__ && FALSE )
+//     {
+//       PrintS("Compute2LeadingSyzygyTerms::Temp1 (deldiv): \n");
+//       dPrint(newid, r, r, 1);
+//     }
+  }
+  else
+  {
+      //      option(redSB); option(redTail);
+      //      TEST_OPT_REDSB
+      //      TEST_OPT_REDTAIL
+    assume( r == currRing );
+    BITSET _save_test = test;
+    test |= (Sy_bit(OPT_REDTAIL) | Sy_bit(OPT_REDSB));
+
+    intvec* w=new intvec(IDELEMS(newid));
+    ideal tmp = kStd(newid, currQuotient, isHomog, &w);
+    delete w;
+
+    test = _save_test;
+
+    id_Delete(&newid, r);
+    newid = tmp;
+
+//     if( __DEBUG__ && FALSE )
+//     {
+//       PrintS("Compute2LeadingSyzygyTerms::Temp1 (std): \n");
+//       dPrint(newid, r, r, 1);
+//     }
+
+  }
+
+  idSkipZeroes(newid);
+
+  const int sizeNew = IDELEMS(newid);
+
+  if( sizeNew >= 2 )
+    qsort_my(newid->m, sizeNew, sizeof(poly), r, cmp_c_ds);
+
+  newid->rank = id_RankFreeModule(newid, r);
+  
+  return newid;
+}
+
+
+
 static BOOLEAN Compute2LeadingSyzygyTerms(leftv res, leftv h)
 {
   const ring r = currRing;
@@ -883,11 +1038,8 @@ static BOOLEAN Compute2LeadingSyzygyTerms(leftv res, leftv h)
   const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
 #endif
 
-  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
   const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
-
-
+  
   assume( __LEAD2SYZ__ );
   
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
@@ -899,166 +1051,12 @@ static BOOLEAN Compute2LeadingSyzygyTerms(leftv res, leftv h)
     if( __DEBUG__ )
     {
       PrintS("Compute2LeadingSyzygyTerms::Input: \n");
-
-      Print("\nSYZCHECK: \t%d", __SYZCHECK__);
-      Print(", DEBUG: \t%d", __DEBUG__);
-      Print(", LEAD2SYZ: \t%d", __LEAD2SYZ__);
-      Print(", TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
-
-      dPrint(id, r, r, 1);
+      dPrint(id, r, r, 0);
     }
 
     h = h->Next(); assume (h == NULL);
 
-    // 1. set of components S?
-    // 2. for each component c from S: set of indices of leading terms
-    // with this component?
-    // 3. short exp. vectors for each leading term?
-
-    const int size = IDELEMS(id);
-
-    if( size < 2 )
-    {
-      const ideal newid = idInit(1, 1); // zero module...
-
-      newid->m[0] = NULL;
-
-      res->data = newid;
-      res->rtyp = MODUL_CMD;
-
-      return FALSE;
-    }
-
-
-    // TODO/NOTE: input is supposed to be sorted wrt "C,ds"!??
-
-    // components should come in groups: count elements in each group
-    // && estimate the real size!!!
-
-
-    // use just a vector instead???
-    ideal newid = idInit( (size * (size-1))/2, size); // maximal size: ideal case!
-
-    int k = 0;
-
-    for (int j = 0; j < size; j++)
-    {
-      const poly p = id->m[j];
-      assume( p != NULL );
-      const int  c = p_GetComp(p, r);
-
-      for (int i = j - 1; i >= 0; i--)
-      {
-        const poly pp = id->m[i];
-        assume( pp != NULL );
-        const int  cc = p_GetComp(pp, r);
-
-        if( c != cc )
-          continue;
-
-        // allocate memory & zero it out!
-        const poly m = p_Init(r); const poly mm = p_Init(r);
-        
-
-        // m = LCM(p, pp) / p! mm = LCM(p, pp) / pp!
-        // TODO: optimize: knowing the ring structure: (C/lp)!
-        
-        for (int v = rVar(r); v > 0; v--)
-        {
-          assume( v > 0 );
-          assume( v <= rVar(r) );
-
-          const short e1 = p_GetExp(p , v, r);
-          const short e2 = p_GetExp(pp, v, r);
-
-          if( e1 >= e2 )
-            p_SetExp(mm, v, e1 - e2, r); //            p_SetExp(m, v, 0, r);
-          else
-            p_SetExp(m, v, e2 - e1, r); //            p_SetExp(mm, v, 0, r);
-
-        }
-
-        assume( (j > i) && (i >= 0) );
-
-        p_SetComp(m, j + 1, r);
-        p_SetComp(mm, i + 1, r);
-        
-        const number& lc1 = p_GetCoeff(p , r);
-        const number& lc2 = p_GetCoeff(pp, r);
-
-        number g = n_Lcm( lc1, lc2, r );
-
-        p_SetCoeff0(m ,       n_Div(g, lc1, r), r);
-        p_SetCoeff0(mm, n_Neg(n_Div(g, lc2, r), r), r);
-
-        n_Delete(&g, r);
-
-        p_Setm(m, r); // should not do anything!!!
-        p_Setm(mm, r); // should not do anything!!!
-
-        pNext(m) = mm; //        pNext(mm) = NULL;
-        
-        newid->m[k++] = m;
-      }
-    }
-
-    if( __DEBUG__ && FALSE )
-    {
-      PrintS("Compute2LeadingSyzygyTerms::Temp0: \n");
-      dPrint(newid, r, r, 1);
-    }
-
-    if( !__TAILREDSYZ__ )
-    {
-      // simplify(newid, 2 + 32)??
-      // sort(newid, "C,ds")[1]???
-      id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
-
-      if( __DEBUG__ && FALSE )
-      {
-        PrintS("Compute2LeadingSyzygyTerms::Temp1 (deldiv): \n");
-        dPrint(newid, r, r, 1);
-      }
-    }
-    else
-    {
-      //      option(redSB); option(redTail);
-      //      TEST_OPT_REDSB
-      //      TEST_OPT_REDTAIL
-      assume( r == currRing );
-      BITSET _save_test = test;
-      test |= (Sy_bit(OPT_REDTAIL) | Sy_bit(OPT_REDSB));
-
-      intvec* w=new intvec(IDELEMS(newid));
-      ideal tmp = kStd(newid, currQuotient, isHomog, &w);
-      delete w;
-      
-      test = _save_test;
-      
-      id_Delete(&newid, r);
-      newid = tmp;
-
-      if( __DEBUG__ && FALSE )
-      {
-        PrintS("Compute2LeadingSyzygyTerms::Temp1 (std): \n");
-        dPrint(newid, r, r, 1);
-      }
-      
-    }
-
-    idSkipZeroes(newid);
-
-    const int sizeNew = IDELEMS(newid);
-
-    if( sizeNew >= 2 )
-      qsort_my(newid->m, sizeNew, sizeof(poly), r, cmp_c_ds);
-
-    if (IDELEMS(newid) == 0 || (IDELEMS(newid) == 1 && newid->m[0] == NULL) )
-      newid->rank = 1;
-
-    // TODO: add sorting wrt <c,ds> & reversing...
-
-    res->data = newid;
+    res->data = Compute2LeadingSyzygyTerms(id, r);
     res->rtyp = MODUL_CMD;
 
     return FALSE;
