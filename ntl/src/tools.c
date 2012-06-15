@@ -112,15 +112,15 @@ void PrintTime(double t)
    ss = ss - mm*60;
 
    if (hh > 0)
-      printf("%d:",hh);
+      printf("%ld:",hh);
 
    if (hh > 0 || mm > 0) {
       if (hh > 0 && mm < 10) printf("0");
-      printf("%d:",mm);
+      printf("%ld:",mm);
    }
 
    if ((hh > 0 || mm > 0) && ss < 10) printf("0");
-   printf("%d:",ss);
+   printf("%ld:",ss);
 }
 
 NTL_END_IMPL
