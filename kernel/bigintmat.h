@@ -101,9 +101,9 @@ bigintmat * bimSub(bigintmat * a, bigintmat * b);
 bigintmat * bimMult(bigintmat * a, bigintmat * b);
 intvec * bim2iv(bigintmat * b);
 bigintmat * bimCopy(const bigintmat * b);
-static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
-static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
-                     int ready, int all);
+// static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
+// static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
+//                       int ready, int all);
 int getShorter (int * a, int l, int j, int cols, int rows);
 int findLonges(int * a, int length);
 int intArrSum(int * a, int length);
