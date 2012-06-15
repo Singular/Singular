@@ -173,7 +173,7 @@ c;
 * dual::
 * equations::
 * facets::
-* linSpace::
+* linspace::
 * generatorsOfSpan::
 * getMultiplicity::
 * span::
