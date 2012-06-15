@@ -211,12 +211,12 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
             ZZ NTLc= convertFacCF2NTLZZ (c);
             bool lessZero= (sign (NTLc) == -1);
             if (lessZero)
-              NTL::negate (NTLc, NTLc);
+              negate (NTLc, NTLc);
             ZZ NTLnum, NTLden;
             if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
             {
               if (lessZero)
-                NTL::negate (NTLnum, NTLnum);
+                negate (NTLnum, NTLnum);
               CanonicalForm num= convertNTLZZX2CF (to_ZZX (NTLnum), Variable (1));
               CanonicalForm den= convertNTLZZX2CF (to_ZZX (NTLden), Variable (1));
               On (SW_RATIONAL);
