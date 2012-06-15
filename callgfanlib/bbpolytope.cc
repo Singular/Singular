@@ -197,7 +197,7 @@ BOOLEAN polytopeViaVertices(leftv res, leftv args)
       if (v->next == NULL) return ppCONERAYS3(res, u, v);
     }
   }
-  WerrorS("polytopeViaVertices: unexpected parameters");
+  WerrorS("polytopeViaPoints: unexpected parameters");
   return TRUE;
 }
 
@@ -334,7 +334,7 @@ BOOLEAN polytopeViaNormals(leftv res, leftv args)
   {
     if (w->next == NULL) return ppCONENORMALS3(res, u, v, w);
   }
-  WerrorS("polytopeViaNormals: unexpected parameters");
+  WerrorS("polytopeViaInequalities: unexpected parameters");
   return TRUE;
 }
 
@@ -464,8 +464,8 @@ void bbpolytope_setup()
   b->blackbox_Init=bbpolytope_Init;
   b->blackbox_Copy=bbpolytope_Copy;
   b->blackbox_Assign=bbpolytope_Assign;
-  iiAddCproc("","polytopeViaVertices",FALSE,polytopeViaVertices);
-  iiAddCproc("","polytopeViaNormals",FALSE,polytopeViaNormals);
+  iiAddCproc("","polytopeViaPoints",FALSE,polytopeViaVertices);
+  iiAddCproc("","polytopeViaInequalities",FALSE,polytopeViaNormals);
   iiAddCproc("","vertices",FALSE,vertices);
   iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
   iiAddCproc("","scalePolytope",FALSE,scalePolytope);

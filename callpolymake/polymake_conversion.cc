@@ -122,7 +122,7 @@ gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Ratio
 
 int PmInteger2Int(const polymake::Integer& pi, bool &ok)
 {
-  int i;
+  int i=0;
   try
   { 
     i = pi.to_int(); 
@@ -242,10 +242,10 @@ gfan::ZCone* PmCone2ZCone (polymake::perl::Object* pc)
 
     // gfan::ZCone* zc = new gfan::ZCone(zv,zw,zx,zy,zz,3);
     gfan::ZCone* zc = new gfan::ZCone(zv,zw,3);
-
     return zc;
   }
   WerrorS("PmCone2ZCone: unexpected parameters");
+  return NULL;
 }
 
 gfan::ZCone* PmPolytope2ZPolytope (polymake::perl::Object* pp)
@@ -303,6 +303,7 @@ gfan::ZCone* PmPolytope2ZPolytope (polymake::perl::Object* pp)
     return zp;
   }
   WerrorS("PmPolytope2ZPolytope: unexpected parameters");
+  return NULL;
 }
 
 gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
@@ -322,6 +323,7 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf)
     return zf;
   }
   WerrorS("PmFan2ZFan: unexpected parameters");
+  return NULL;
 }
 
 polymake::perl::Object* ZCone2PmCone (gfan::ZCone* zc)
@@ -408,7 +410,6 @@ int numberOfMaximalConesOf(gfan::ZFan* zf)
 
 polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
 {
-  int c = numberOfRaysOf(zf);
   int r = numberOfMaximalConesOf(zf);
 
   polymake::Matrix<polymake::Integer> pm=raysOf(zf);
@@ -421,7 +422,7 @@ polymake::Array<polymake::Set<int> > conesOf(gfan::ZFan* zf)
         {
           gfan::IntVector v = zf->getConeIndices(d,i,0,1);
           polymake::Set<int> s;
-          for (int j=0; j<v.size(); j++)
+          for (int j=0; j<(int)v.size(); j++)
             {
               s = s+v[j];
             }
