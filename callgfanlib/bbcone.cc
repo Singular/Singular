@@ -418,7 +418,7 @@ BOOLEAN coneViaNormals(leftv res, leftv args)
   {
     if (w->next == NULL) return jjCONENORMALS3(res, u, v, w);
   }
-  WerrorS("coneViaNormals: unexpected parameters");
+  WerrorS("coneViaInequalities: unexpected parameters");
   return TRUE;
 }
 
@@ -571,7 +571,7 @@ BOOLEAN coneViaRays(leftv res, leftv args)
       }
     }
   }
-  WerrorS("coneViaRays: unexpected parameters");
+  WerrorS("coneViaPoints: unexpected parameters");
   return TRUE;
 }
 
@@ -639,7 +639,7 @@ BOOLEAN impliedEquations(leftv res, leftv args)
     res->data = (void*)zMatrixToBigintmat(zmat);
     return FALSE;
   }
-  WerrorS("impliedEquations: unexpected parameters");
+  WerrorS("span: unexpected parameters");
   return TRUE;
 }
 
@@ -669,7 +669,7 @@ BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
     res->data = (void*)zMatrixToBigintmat(zmat);
     return FALSE;
   }
-  WerrorS("generatorsOfLinealitySpace: unexpected parameters");
+  WerrorS("linspace: unexpected parameters");
   return TRUE;
 }
 
@@ -923,7 +923,7 @@ BOOLEAN dualCone(leftv res, leftv args)
     res->data = (void*) zd;
     return FALSE;
   }
-  WerrorS("dualCone: unexpected parameters");
+  WerrorS("dual: unexpected parameters");
   return TRUE;
 }
 
@@ -1168,7 +1168,7 @@ BOOLEAN intersectCones(leftv res, leftv args)
       return FALSE;
     }
   }
-  WerrorS("intersectCones: unexpected parameters");
+  WerrorS("convexIntersection: unexpected parameters");
   return TRUE;
 }
 
@@ -1503,18 +1503,17 @@ void bbcone_setup()
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
   b->blackbox_Op2=bbcone_Op2;
-  iiAddCproc("","coneViaNormals",FALSE,coneViaNormals);
-  iiAddCproc("","coneViaRays",FALSE,coneViaRays);
+  iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
+  iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
   iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
   iiAddCproc("","makePolytope",FALSE,coneToPolytope);
 
   iiAddCproc("","inequalities",FALSE,inequalities);
-  iiAddCproc("","impliedInequalities",FALSE,facets);
   iiAddCproc("","facets",FALSE,facets);
   iiAddCproc("","equations",FALSE,equations);
-  iiAddCproc("","impliedEquations",FALSE,impliedEquations);
+  iiAddCproc("","span",FALSE,impliedEquations);
   iiAddCproc("","rays",FALSE,rays);
-  iiAddCproc("","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
+  iiAddCproc("","linspace",FALSE,generatorsOfLinealitySpace);
   iiAddCproc("","linealitySpace",FALSE,linealitySpace);
   iiAddCproc("","generatorsOfSpan",FALSE,generatorsOfSpan);
 
@@ -1528,10 +1527,10 @@ void bbcone_setup()
   iiAddCproc("","setLinearForms",FALSE,setLinearForms);
   iiAddCproc("","linearForms",FALSE,linearForms);
 
-  iiAddCproc("","dualCone",FALSE,dualCone);
+  iiAddCproc("","dual",FALSE,dualCone);
   iiAddCproc("","negatedCone",FALSE,negatedCone);
   iiAddCproc("","coneLink",FALSE,coneLink);
-  iiAddCproc("","intersectCones",FALSE,intersectCones);
+  iiAddCproc("","convexIntersection",FALSE,intersectCones);
   iiAddCproc("","convexHull",FALSE,convexHull);
 
   iiAddCproc("","isOrigin",FALSE,isOrigin);

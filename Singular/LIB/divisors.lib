@@ -337,8 +337,8 @@ for (i=1; i<=nrows(rays);i++){
       }       
    }
 }
-cone C = coneViaRays(rays);
-polytope C2 = polytopeViaVertices(rays2);
+cone C = coneViaPoints(rays);
+polytope C2 = polytopeViaPoints(rays2);
 return(list(C,C2));
 }
 
@@ -347,7 +347,7 @@ proc evaluatePDivisor(pdivisor D,intvec v){
 formaldivisor vD;
 list L = D.summands;
 cone C = D.tail;
-cone dC = dualCone(C);
+cone dC = dual(C);
 list vL;
 int i;
 intvec vv = 0,v;

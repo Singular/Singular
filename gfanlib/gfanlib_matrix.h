@@ -20,9 +20,9 @@ template <class typ> class Matrix{
 public:
   inline int getHeight()const{return height;};
   inline int getWidth()const{return width;};
-  Matrix(const Matrix &a):rows(a.rows),width(a.getWidth()),height(a.getHeight()){
+  Matrix(const Matrix &a):width(a.getWidth()),height(a.getHeight()),rows(a.rows){
   }
-  Matrix(int height_, int width_):rows(height_),height(height_),width(width_){
+  Matrix(int height_, int width_):width(width_),height(height_),rows(height_){
     assert(height>=0);
     assert(width>=0);
     for(int i=0;i<getHeight();i++)rows[i]=Vector<typ>(width);
