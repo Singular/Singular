@@ -279,7 +279,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
     al=(lists)a2->Data();
   }
   newstruct_proc p=nt->procs;
-  while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
+  while((p!=NULL) && ( (p->t!=op) || (p->args!=2) )) p=p->next;
   if (p!=NULL)
   {
     leftv sl;
@@ -322,7 +322,9 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       break;
   }
   newstruct_proc p=nt->procs;
-  while((p!=NULL) &&(p->t=op)&&(p->args!=4)) p=p->next;
+  
+  while((p!=NULL) &&( (p->t!=op) || (p->args!=4) )) p=p->next;
+
   if (p!=NULL)
   {
     leftv sl;
