@@ -175,6 +175,39 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
   return TRUE;
 }
 
+BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
+{
+  // interpreter: arg is newstruct
+  blackbox *a=getBlackboxStuff(arg->Typ());
+  newstruct_desc nt=(newstruct_desc)a->data;
+  newstruct_proc p=nt->procs;
+
+  while((p!=NULL) &&( (p->t!=op) || (p->args!=1) )) p=p->next;
+
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(arg);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl==NULL) return TRUE;
+    else
+    {
+      res->Copy(sl);
+      return FALSE;
+    }
+  }
+  return blackboxDefaultOp1(op,res,arg);
+}
+
+
+
 BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 {
   // interpreter: a1 or a2 is newstruct
@@ -474,7 +507,7 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->blackbox_Init=newstruct_Init;
   b->blackbox_Copy=newstruct_Copy;
   b->blackbox_Assign=newstruct_Assign;
-  //b->blackbox_Op1=blackboxDefaultOp1;
+  b->blackbox_Op1=newstruct_Op1;
   b->blackbox_Op2=newstruct_Op2;
   //b->blackbox_Op3=blackbox_default_Op3;
   b->blackbox_OpM=newstruct_OpM;
