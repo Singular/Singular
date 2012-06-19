@@ -4258,7 +4258,8 @@ CFList
 earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                CanonicalForm& bufF, CFList& factors, int& l,
                                int& factorsFound, bool beenInThres, CFMatrix& M,
-                               CFArray& Pi, CFList& diophant
+                               CFArray& Pi, CFList& diophant, bool symmetric,
+                               const CanonicalForm& evaluation
                               )
 {
   int sizeOfLiftPre;
@@ -4328,19 +4329,56 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
     i= 1;
     while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
       i++;
-    while (i < 4)
+    while (i < 5)
     {
-      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*i+4);
       if (l < dummy)
       {
         factors.insert (LCF);
         henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
         l= dummy;
+        if (i == 1 && degree (F)%4==0 && symmetric && factors.length() == 2 &&
+            LC (F,1).inCoeffDomain() &&
+           (degree (factors.getFirst(), 1) == degree (factors.getLast(),1)))
+        {
+          Variable x= Variable (1);
+          CanonicalForm g, h, gg, hh, multiplier1, multiplier2, check1, check2;
+          int m= degree (F)/4+1;
+          g= factors.getFirst();
+          h= factors.getLast();
+          g= mod (g, power (y,m));
+          h= mod (h, power (y,m));
+          g= g (y-evaluation, y);
+          h= h (y-evaluation, y);
+          gg= mod (swapvar (g,x,y),power (x,m));
+          gg= gg (y + evaluation, y);
+          multiplier1= factors.getLast()[m-1][0]/gg[m-1][0];
+          gg= div (gg, power (y,m));
+          gg= gg*power (y,m);
+          hh= mod (swapvar (h,x,y),power (x,m));
+          hh= hh (y + evaluation, y);
+          multiplier2= factors.getFirst()[m-1][0]/hh[m-1][0];
+          hh= div (hh, power (y,m));
+          hh= hh*power (y,m);
+          gg= multiplier1*gg+mod (factors.getLast(), power (y,m));
+          hh= multiplier2*hh+mod (factors.getFirst(), power (y,m));
+          check1= gg (y-evaluation,y);
+          check2= hh (y-evaluation,y);
+          check1= swapvar (check1, x, y);
+          if (check1/Lc (check1) == check2/Lc (check2))
+          {
+            result.append (gg);
+            result.append (hh);
+            delete [] liftPre;
+            delete [] factorsFoundIndex;
+            return result;
+          }
+        }
       }
       else
       {
         i++;
-        if (i < 4)
+        if (i < 5)
           continue;
       }
       reconstructionTry (result, bufF, factors, l, factorsFound,
@@ -4434,9 +4472,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
     i= 1;
     while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
       i++;
-    while (i < 4)
+    while (i < 5)
     {
-      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*i+4);
       if (l < dummy)
       {
         factors.insert (LCF);
@@ -4446,7 +4484,7 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
       else
       {
         i++;
-        if (i < 4)
+        if (i < 5)
           continue;
       }
       reconstructionTry (result, bufF, factors, l, factorsFound,
@@ -4545,9 +4583,9 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
     i= 1;
     while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
       i++;
-    while (i < 4)
+    while (i < 5)
     {
-      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*(i+1)+4);
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*i+4);
       if (l < dummy)
       {
         factors.insert (LCF);
@@ -4557,7 +4595,7 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
       else
       {
         i++;
-        if (i < 4)
+        if (i < 5)
           continue;
       }
       extReconstructionTry (result, bufF, factors, l, factorsFound,
@@ -4674,7 +4712,8 @@ extSieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
 
 CFList
 henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
-                             const Variable& alpha, const DegreePattern& degPat
+                             const Variable& alpha, const DegreePattern& degPat,
+                             bool symmetric, const CanonicalForm& evaluation
                             )
 {
   DegreePattern degs= degPat;
@@ -5004,7 +5043,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   {
     result= earlyReconstructionAndLifting (F, NTLN, bufF, bufUniFactors, l,
                                            factorsFound, beenInThres, M, Pi,
-                                           diophant
+                                           diophant, symmetric, evaluation
                                           );
 
     if (result.length() == NTLN.NumCols())
@@ -5142,7 +5181,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       return result;
     }
     return Union (result, henselLiftAndLatticeRecombi (bufF, bufUniFactors,
-                                                       alpha, degs
+                                                       alpha, degs, symmetric,
+                                                       evaluation
                                                       )
                  );
   }
@@ -5272,7 +5312,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       i.getItem()= mod (i.getItem(), y);
     delete [] bounds;
     return Union (result, henselLiftAndLatticeRecombi (F, bufUniFactors, alpha,
-                                                       degs
+                                                       degs,symmetric, evaluation
                                                       )
                  );
   }
@@ -5932,7 +5972,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
 
   bool fail= false;
-  CanonicalForm Aeval, evaluation, bufAeval, bufEvaluation, buf;
+  CanonicalForm Aeval, evaluation, bufAeval, bufEvaluation, buf, tmp;
   CFList uniFactors, list, bufUniFactors;
   DegreePattern degs;
   DegreePattern bufDegs;
@@ -5950,13 +5990,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   int factorNums= 3;
   int subCheck1= substituteCheck (A, x);
   int subCheck2= substituteCheck (A, y);
+  bool symmetric= false;
   for (int i= 0; i < factorNums; i++)
   {
     bufAeval= A;
     bufEvaluation= evalPoint (A, bufAeval, alpha, list, GF, fail);
     if (!derivXZero && !fail2)
     {
-      buf= swapvar (A, x, y);
+      if (i == 0)
+      {
+        buf= swapvar (A, x, y);
+        symmetric= (A/Lc (A) == buf/Lc (buf));
+      }
       bufAeval2= buf;
       bufEvaluation2= evalPoint (buf, bufAeval2, alpha, list2, GF, fail2);
     }
@@ -5969,7 +6014,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         int dummy= subCheck2;
         subCheck2= subCheck1;
         subCheck1= dummy;
+        tmp= A;
         A= buf;
+        buf= tmp;
         bufAeval= bufAeval2;
         swap2= true;
         fail= false;
@@ -6199,12 +6246,14 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else if (alpha.level() == 1 && !GF)
     {
-      CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
+      CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs, 
+                                               symmetric, evaluation);
       factors= Union (lll, factors);
     }
     else if (!extension && (alpha != x || GF))
     {
-      CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
+      CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs,
+                                               symmetric, evaluation);
       factors= Union (lll, factors);
     }
     TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
