@@ -29,7 +29,13 @@ MKINSTALLDIRS   = ../mkinstalldirs
 ##
 CPPFLAGS	= -I. @CPPFLAGS@
 CXXFLAGS        = @CXXFLAGS@
+
+ifdef LD_STATIC
+LDFLAGS         = -L${libdir} @LDFLAGS@ -lgmp -static
+else
 LDFLAGS         = -L${libdir} @LDFLAGS@ -lgmp
+endif
+
 
 
 MAIN1	:= solve_IP
