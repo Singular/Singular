@@ -4403,7 +4403,8 @@ CFList
 earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
                                CanonicalForm& bufF, CFList& factors, int& l,
                                int& factorsFound, bool beenInThres, CFMatrix& M,
-                               CFArray& Pi, CFList& diophant
+                               CFArray& Pi, CFList& diophant, bool symmetric,
+                               const CanonicalForm& evaluation
                               )
 {
   int sizeOfLiftPre;
@@ -4480,6 +4481,43 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
         factors.insert (LCF);
         henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
         l= dummy;
+        if (i == 1 && degree (F)%4==0 && symmetric && factors.length() == 2 &&
+            LC (F,1).inCoeffDomain() &&
+           (degree (factors.getFirst(), 1) == degree (factors.getLast(),1)))
+        {
+          Variable x= Variable (1);
+          CanonicalForm g, h, gg, hh, multiplier1, multiplier2, check1, check2;
+          int m= degree (F)/4+1;
+          g= factors.getFirst();
+          h= factors.getLast();
+          g= mod (g, power (y,m));
+          h= mod (h, power (y,m));
+          g= g (y-evaluation, y);
+          h= h (y-evaluation, y);
+          gg= mod (swapvar (g,x,y),power (x,m));
+          gg= gg (y + evaluation, y);
+          multiplier1= factors.getLast()[m-1][0]/gg[m-1][0];
+          gg= div (gg, power (y,m));
+          gg= gg*power (y,m);
+          hh= mod (swapvar (h,x,y),power (x,m));
+          hh= hh (y + evaluation, y);
+          multiplier2= factors.getFirst()[m-1][0]/hh[m-1][0];
+          hh= div (hh, power (y,m));
+          hh= hh*power (y,m);
+          gg= multiplier1*gg+mod (factors.getLast(), power (y,m));
+          hh= multiplier2*hh+mod (factors.getFirst(), power (y,m));
+          check1= gg (y-evaluation,y);
+          check2= hh (y-evaluation,y);
+          check1= swapvar (check1, x, y);
+          if (check1/Lc (check1) == check2/Lc (check2))
+          {
+            result.append (gg);
+            result.append (hh);
+            delete [] liftPre;
+            delete [] factorsFoundIndex;
+            return result;
+          }
+        }
       }
       else
       {
@@ -5056,7 +5094,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   {
     result= earlyReconstructionAndLifting (F, NTLNe, bufF, bufUniFactors, l,
                                            factorsFound, beenInThres, M, Pi,
-                                           diophant
+                                           diophant, symmetric, evaluation
                                           );
 
     if (result.length() == NTLNe.NumCols())
