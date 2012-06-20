@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
   if((argc==2) && !strcmp(argv[1],"--help"))
     // help required
   {
-    system("less toric_ideal.hlp");
+    if(system("less toric_ideal.hlp"));  // silencing ignoring return value warning
     return 0;
   }
 

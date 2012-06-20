@@ -13,6 +13,7 @@ then
   CC=cc
 fi
 cat >tmp.c <<EOF
+#include <stdlib.h>
 #include <stdio.h>
 int main() {
 FILE *f=fopen("si_gcc_v.h","w");
