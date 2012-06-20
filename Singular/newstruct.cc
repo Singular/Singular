@@ -136,6 +136,14 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
     if (l->Typ()!=r->Typ())
     {
       newstruct_desc rrn=(newstruct_desc)rr->data;
+
+      if (!rrn)
+      {
+        Werror("custom type %s(%d) cannot be assigned to newstruct %s(%d)",
+               Tok2Cmdname(r->Typ()), r->Typ(), Tok2Cmdname(l->Typ()), l->Typ());
+        return TRUE;
+      }
+
       newstruct_desc rrp=rrn->parent;
       while ((rrp!=NULL)&&(rrp->id!=l->Typ())) rrp=rrp->parent;
       if (rrp!=NULL)
@@ -148,6 +156,12 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         {
           l->rtyp=r->Typ();
         }
+      }
+      else                      // unrelated types - look for custom conversion
+      {
+        sleftv tmp;
+        BOOLEAN newstruct_Op1(int, leftv, leftv);  // forward declaration
+        if (! newstruct_Op1(l->Typ(), &tmp, r))  return newstruct_Assign(l, &tmp);
       }
     }
     if (l->Typ()==r->Typ())
@@ -648,6 +662,13 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   blackboxIsCmd(bbname,id);
   blackbox *bb=getBlackboxStuff(id);
   newstruct_desc desc=(newstruct_desc)bb->data;
+  if (desc == NULL)
+  {
+    desc=(newstruct_desc)omAlloc0(sizeof(*desc));
+    desc->size=0;
+    bb->data = (void*)desc;
+  }
+
   newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
   p->next=desc->procs; desc->procs=p;
   if(!IsCmd(func,p->t))
