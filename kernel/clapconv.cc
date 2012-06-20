@@ -227,7 +227,8 @@ CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r)
   int e, n = pVariables;
   int off=rPar(currRing);
 
-  On(SW_RATIONAL);
+  if (!rField_is_Zp_a())
+    On(SW_RATIONAL);
   while ( p!=NULL)
   {
     CanonicalForm term=convSingAFactoryA(((lnumber)pGetCoeff(p))->z,a, r);
