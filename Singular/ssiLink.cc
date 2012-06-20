@@ -267,7 +267,7 @@ void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
    SSI_BLOCK_CHLD;
    if (typ==MATRIX_CMD)
    {
-     mn=MATROWS(M)*MATCOLS(M)
+     mn=MATROWS(M)*MATCOLS(M);
      fprintf(d->f_write,"%d %d ", MATROWS(M),MATCOLS(M));
    }
    else
