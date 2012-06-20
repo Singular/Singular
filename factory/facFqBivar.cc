@@ -6033,7 +6033,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   {
     bufAeval= A;
     bufEvaluation= evalPoint (A, bufAeval, alpha, list, GF, fail);
-    if (!derivXZero && !fail2)
+    if (!derivXZero && !fail2 && !symmetric)
     {
       if (i == 0)
       {
@@ -6046,7 +6046,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     // first try to change main variable if there is no valid evaluation point
     if (fail && (i == 0))
     {
-      if (!derivXZero && !fail2)
+      if (!derivXZero && !fail2 && !symmetric)
       {
         bufEvaluation= bufEvaluation2;
         int dummy= subCheck2;
@@ -6086,7 +6086,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
 
-    if (!derivXZero && !fail2)
+    if (!derivXZero && !fail2 && !symmetric)
     {
       TIMING_START (fac_fq_uni_factorizer);
       bufUniFactors2= uniFactorizer (bufAeval2, alpha, GF);
@@ -6097,7 +6097,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
 
     if (bufUniFactors.length() == 1 ||
-        (!fail2 && !derivXZero && (bufUniFactors2.length() == 1)))
+        (!fail2 && !derivXZero && !symmetric && (bufUniFactors2.length() == 1)))
     {
       if (extension)
       {
@@ -6135,7 +6135,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         }
       }
 
-      if (!derivXZero && !fail2 && subCheck2 > 0)
+      if (!derivXZero && !fail2 && !symmetric && subCheck2 > 0)
       {
         int subCheck= substituteCheck (bufUniFactors2);
 
@@ -6155,7 +6155,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     // degree analysis
     bufDegs = DegreePattern (bufUniFactors);
-    if (!derivXZero && !fail2)
+    if (!derivXZero && !fail2 && !symmetric)
       bufDegs2= DegreePattern (bufUniFactors2);
 
     if (i == 0)
@@ -6164,7 +6164,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       evaluation= bufEvaluation;
       uniFactors= bufUniFactors;
       degs= bufDegs;
-      if (!derivXZero && !fail2)
+      if (!derivXZero && !fail2 && !symmetric)
       {
         Aeval2= bufAeval2;
         evaluation2= bufEvaluation2;
@@ -6175,7 +6175,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     else
     {
       degs.intersect (bufDegs);
-      if (!derivXZero && !fail2)
+      if (!derivXZero && !fail2 && !symmetric)
       {
         degs2.intersect (bufDegs2);
         if (bufUniFactors2.length() < uniFactors2.length())
@@ -6193,11 +6193,11 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
     }
     list.append (bufEvaluation);
-    if (!derivXZero && !fail2)
+    if (!derivXZero && !fail2 && !symmetric)
       list2.append (bufEvaluation2);
   }
 
-  if (!derivXZero && !fail2)
+  if (!derivXZero && !fail2 && !symmetric)
   {
     if (uniFactors.length() > uniFactors2.length() ||
         (uniFactors.length() == uniFactors2.length()
