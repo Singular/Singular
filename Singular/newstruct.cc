@@ -139,7 +139,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
 
       if (!rrn)
       {
-        Werror("custom type %s(%d) cannot be assigned to newstructed type %s(%d)",
+        Werror("custom type %s(%d) cannot be assigned to newstruct %s(%d)",
                Tok2Cmdname(r->Typ()), r->Typ(), Tok2Cmdname(l->Typ()), l->Typ());
         return TRUE;
       }
