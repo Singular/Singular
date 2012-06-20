@@ -1066,7 +1066,7 @@ static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
 {
-  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data()));
+  res->data = (char *) (long)(nGreater((number)u->Data(),(number)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLE_BI(leftv res, leftv u, leftv v)
