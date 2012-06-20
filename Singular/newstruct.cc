@@ -137,6 +137,14 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
     if (l->Typ()!=r->Typ())
     {
       newstruct_desc rrn=(newstruct_desc)rr->data;
+
+      if (!rrn)
+      {
+        Werror("custom type %s(%d) cannot be assigned to newstructed type %s(%d)",
+               Tok2Cmdname(r->Typ()), r->Typ(), Tok2Cmdname(l->Typ()), l->Typ());
+        return TRUE;
+      }
+
       newstruct_desc rrp=rrn->parent;
       while ((rrp!=NULL)&&(rrp->id!=l->Typ())) rrp=rrp->parent;
       if (rrp!=NULL)
