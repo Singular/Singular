@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
   if((argc==2) && !strcmp(argv[1],"--help"))
     // help required
   {
-    if(system("less solve_IP.hlp")); // silencing ignoring return value warning
+    int dummy=system("less solve_IP.hlp"); // silencing ignoring return value warning
     return 0;
   }
 
