@@ -2433,6 +2433,10 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
     }
     else
     {
+      bool zz_pEbak= zz_pE::initialized();
+      zz_pEBak bak;
+      if (zz_pEbak)
+        bak.save();
       zz_pX mipo= convertFacCF2NTLzzpX (M);
       Variable y= Variable (2);
       zz_pEX NTLA, NTLB;
@@ -2440,6 +2444,8 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
       NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
       div (NTLA, NTLA, NTLB);
       Q= convertNTLzz_pEX2CF (NTLA, x, y);
+      if (zz_pEbak)
+        bak.restore();
     }
   }
 

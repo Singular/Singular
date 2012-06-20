@@ -28,7 +28,7 @@
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #define BYTES_TO_CHECK 7
 
-char* si_bultin_libs[]={ "huhu.so", NULL };
+char* si_bultin_libs[]={ (char*) "huhu.so", NULL };
 
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
