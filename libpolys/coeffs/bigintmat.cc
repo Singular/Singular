@@ -23,7 +23,7 @@ bigintmat * bigintmat::transpose()
   {
     for (int j=1; j<=col; j++)
     {
-      t->set(j, i, v[(i-1)*col+(j-1)]);
+      t->set(j, i, BIMATELEM(*this,i,j));
     }
   }
   return t;
@@ -114,39 +114,16 @@ bool operator!=(const bigintmat & lhr, const bigintmat & rhr)
 bigintmat * bimAdd(bigintmat * a, bigintmat * b)
 {
   if (a->cols() != b->cols()) return NULL;
+  if (a->rows() != b->rows()) return NULL;
   if (a->basecoeffs() != b->basecoeffs()) { return NULL; }
-
-  const int mn = si_min(a->rows(),b->rows());
-  const int ma = si_max(a->rows(),b->rows());
 
   const coeffs basecoeffs = a->basecoeffs();
 
   int i;
 
-  if (a->cols() == 1)
-  {
-    bigintmat * bim = new bigintmat(ma, 1, basecoeffs);
+  bigintmat * bim = new bigintmat(a->rows(), a->cols(), basecoeffs);
 
-    for (i=0; i<mn; i++)
-      bim->rawset(i, n_Add((*a)[i], (*b)[i], basecoeffs), basecoeffs);
-
-    if (ma > mn)
-    {
-      if (ma == a->rows())
-        for(i=mn; i<ma; i++)
-          bim->set(i, (*a)[i], basecoeffs);
-      else
-        for(i=mn; i<ma; i++)
-          bim->set(i, (*b)[i], basecoeffs);
-    }
-    return bim;
-  }
-
-  if (mn != ma) return NULL;
-
-  bigintmat * bim = new bigintmat(mn, a->cols(), basecoeffs);
-
-  for (i=0; i<mn*a->cols(); i++)
+  for (i=a->rows()*a->cols()-1;i>=0; i--)
     bim->rawset(i, n_Add((*a)[i], (*b)[i], basecoeffs), basecoeffs);
 
   return bim;
@@ -173,45 +150,16 @@ bigintmat * bimAdd(bigintmat * a, int b)
 bigintmat * bimSub(bigintmat * a, bigintmat * b)
 {
   if (a->cols() != b->cols()) return NULL;
+  if (a->rows() != b->rows()) return NULL;
   if (a->basecoeffs() != b->basecoeffs()) { return NULL; }
-
-  const int mn = si_min(a->rows(),b->rows());
-  const int ma = si_max(a->rows(),b->rows());
 
   const coeffs basecoeffs = a->basecoeffs();
 
   int i;
 
-  if (a->cols() == 1)
-  {
-    bigintmat * bim = new bigintmat(ma, 1, basecoeffs);
+  bigintmat * bim = new bigintmat(a->rows(), a->cols(), basecoeffs);
 
-    for (i=0; i<mn; i++)
-      bim->rawset(i, n_Sub((*a)[i], (*b)[i], basecoeffs), basecoeffs);
-
-    if (ma > mn)
-    {
-      if (ma == a->rows())
-      {
-        for(i=mn; i<ma; i++)
-          bim->set(i, (*a)[i], basecoeffs);
-      }
-      else
-        for(i=mn; i<ma; i++)
-        {
-          number n = b->get(i);
-          n = n_Neg(n, basecoeffs);
-          bim->rawset(i, n, basecoeffs);
-        }
-    }
-    return bim;
-  }
-
-  if (mn != ma) return NULL;
-
-  bigintmat * bim = new bigintmat(mn, a->cols(), basecoeffs);
-
-  for (i=0; i<mn*a->cols(); i++)
+  for (i=a->rows()*a->cols()-1;i>=0; i--)
     bim->rawset(i, n_Sub((*a)[i], (*b)[i], basecoeffs), basecoeffs);
 
   return bim;
