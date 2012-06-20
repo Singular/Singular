@@ -672,6 +672,10 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
 
   newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
   p->next=desc->procs; desc->procs=p;
+
+  idhdl save_ring=currRingHdl;
+  currRingHdl=(idhdl)1; // fake ring detection
+
   if(!IsCmd(func,p->t))
   {
     int t=0;
@@ -683,10 +687,12 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
     else
     {
       Werror(">>%s<< is not a kernel command",func);
+      currRingHdl = save_ring;
       return TRUE;
     }
   }
   p->args=args;
   p->p=pr; pr->ref++;
+  currRingHdl = save_ring;
   return FALSE;
 }
