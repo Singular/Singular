@@ -1347,7 +1347,7 @@ CanonicalForm
 mulMod2FLINTFpReci (const CanonicalForm& F, const CanonicalForm& G, const
                     CanonicalForm& M)
 {
-  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
+  int d1= degree (F, 1) + degree (G, 1) + 1;
   d1 /= 2;
   d1 += 1;
 
@@ -1416,7 +1416,7 @@ CanonicalForm
 mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
                     CanonicalForm& M)
 {
-  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
+  int d1= degree (F, 1) + degree (G, 1) + 1;
   d1 /= 2;
   d1 += 1;
 
