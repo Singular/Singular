@@ -263,11 +263,18 @@ void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
    // syntax: 7 # of elements <poly 1> <poly2>.....
    // syntax: 8 <rows> <cols> <poly 1> <poly2>.....
    matrix M=(matrix)I;
+   int mn;
    SSI_BLOCK_CHLD;
    if (typ==MATRIX_CMD)
-        fprintf(d->f_write,"%d %d ", MATROWS(M),MATCOLS(M));
+   {
+     mn=MATROWS(M)*MATCOLS(M)
+     fprintf(d->f_write,"%d %d ", MATROWS(M),MATCOLS(M));
+   }
    else
+   {
+     mn=IDELEMS(I);
      fprintf(d->f_write,"%d ",IDELEMS(I));
+   }
     SSI_UNBLOCK_CHLD;
 
    int i;
@@ -275,11 +282,12 @@ void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
    if (typ==MODUL_CMD) tt=VECTOR_CMD;
    else                tt=POLY_CMD;
 
-   for(i=0;i<IDELEMS(I);i++)
+   for(i=0;i<mn;i++)
    {
      ssiWritePoly(d,tt,I->m[i]);
    }
 }
+
 void ssiWriteCommand(si_link l, command D)
 {
   ssiInfo *d=(ssiInfo*)l->data;
