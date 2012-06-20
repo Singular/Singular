@@ -20,7 +20,6 @@
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
-#include <Singular/newstruct.h>
 
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
@@ -656,7 +655,6 @@ void pyobject_init()
   b->blackbox_Op2     = pyobject_Op2;
   b->blackbox_Op3     = pyobject_Op3;
   b->blackbox_OpM     = pyobject_OpM;
-  b->data = newstructDesc();
 
   PythonInterpreter::init(setBlackboxStuff(b,"pyobject"));
 

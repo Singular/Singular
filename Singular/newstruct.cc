@@ -611,19 +611,13 @@ error_in_newstruct_def:
    currRingHdl=save_ring;
    return NULL;
 }
-
-newstruct_desc newstructDesc()
+newstruct_desc newstructFromString(const char *s)
 {
   newstruct_desc res=(newstruct_desc)omAlloc0(sizeof(*res));
   res->size=0;
-  return res;
-}
 
-newstruct_desc newstructFromString(const char *s)
-{
-  return scanNewstructFromString(s, newstructDesc());
+  return scanNewstructFromString(s,res);
 }
-
 newstruct_desc newstructChildFromString(const char *parent, const char *s)
 {
   // find parent:
@@ -668,6 +662,13 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   blackboxIsCmd(bbname,id);
   blackbox *bb=getBlackboxStuff(id);
   newstruct_desc desc=(newstruct_desc)bb->data;
+  if (desc == NULL)
+  {
+    desc=(newstruct_desc)omAlloc0(sizeof(*desc));
+    desc->size=0;
+    bb->data = (void*)desc;
+  }
+
   newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
   p->next=desc->procs; desc->procs=p;
   if(!IsCmd(func,p->t))
