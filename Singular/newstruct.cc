@@ -157,6 +157,12 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
           l->rtyp=r->Typ();
         }
       }
+      else                      // unrelated types - look for custom conversion
+      {
+        sleftv tmp;
+        BOOLEAN newstruct_Op1(int, leftv, leftv);  // forward declaration
+        if (! newstruct_Op1(l->Typ(), &tmp, r))  return newstruct_Assign(l, &tmp);
+      }
     }
     if (l->Typ()==r->Typ())
     {
@@ -605,13 +611,19 @@ error_in_newstruct_def:
    currRingHdl=save_ring;
    return NULL;
 }
-newstruct_desc newstructFromString(const char *s)
+
+newstruct_desc newstructDesc()
 {
   newstruct_desc res=(newstruct_desc)omAlloc0(sizeof(*res));
   res->size=0;
-
-  return scanNewstructFromString(s,res);
+  return res;
 }
+
+newstruct_desc newstructFromString(const char *s)
+{
+  return scanNewstructFromString(s, newstructDesc());
+}
+
 newstruct_desc newstructChildFromString(const char *parent, const char *s)
 {
   // find parent:
