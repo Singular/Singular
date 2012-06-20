@@ -19,8 +19,8 @@
 // first entry is [1,1]
 void bigintmat::set(int i, int j, number n)
 {
-  nlDelete(&(v[(i-1)*col+j-1]), NULL);
-  v[(i-1)*col+j-1] = nlCopy(n);
+  nlDelete(&(BIMATELEM(*this,i,j)), NULL);
+  BIMATELEM(*this,i,j) = nlCopy(n);
 }
 
 // sees matrix as vector, first entry is [0]
@@ -151,43 +151,13 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
   bigintmat * bim;
   int mn, ma, i;
   if (a->cols() != b->cols()) return NULL;
-  mn = si_min(a->rows(),b->rows());
-  ma = si_max(a->rows(),b->rows());
-  if (a->cols() == 1)
-  {
-    bim = new bigintmat(ma, 1);
-    for (i=0; i<mn; i++)
-    {
-      number n = nlAdd((*a)[i], (*b)[i]);
-      bim->set(i, n);
-      nlDelete(&n, NULL);
-    }
-    if (ma > mn)
-    {
-      if (ma == a->rows())
-      {
-        for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*a)[i]);
-        }
-      }
-      else
-      {
-        for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*b)[i]);
-        }
-      }
-    }
-    return bim;
-  }
-  if (mn != ma) return NULL;
-  bim = new bigintmat(mn, a->cols());
-  for (i=0; i<mn*a->cols(); i++)
+  if (a->rows() != b->rows()) return NULL;
+  bim = new bigintmat(a->rows(), a->cols());
+  for (i=0; i<a->rows()*a->cols(); i++)
   {
     number n = nlAdd((*a)[i], (*b)[i]);
-    bim->set(i, n);
-    nlDelete(&n, NULL);
+    nlDelete(&(*bim)[i], NULL);
+    (*bim)[i]=n;
   }
   return bim;
 }
@@ -197,43 +167,13 @@ bigintmat * bimSub(bigintmat * a, bigintmat * b)
   bigintmat * bim;
   int mn, ma, i;
   if (a->cols() != b->cols()) return NULL;
-  mn = si_min(a->rows(),b->rows());
-  ma = si_max(a->rows(),b->rows());
-  if (a->cols() == 1)
-  {
-    bim = new bigintmat(ma, 1);
-    for (i=0; i<mn; i++)
-    {
-      number n = nlSub((*a)[i], (*b)[i]);
-      bim->set(i, n);
-      nlDelete(&n, NULL);
-    }
-    if (ma > mn)
-    {
-      if (ma == a->rows())
-      {
-        for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*a)[i]);
-        }
-      }
-      else
-      {
-        for(i=mn; i<ma; i++)
-        {
-          bim->set(i, (*b)[i]);
-        }
-      }
-    }
-    return bim;
-  }
-  if (mn != ma) return NULL;
-  bim = new bigintmat(mn, a->cols());
-  for (i=0; i<mn*a->cols(); i++)
+  if (a->rows() != b->rows()) return NULL;
+  bim = new bigintmat(a->rows(), a->cols());
+  for (i=0; i<a->rows()*a->cols(); i++)
   {
     number n = nlSub((*a)[i], (*b)[i]);
-    bim->set(i, n);
-    nlDelete(&n, NULL);
+    nlDelete(&(*bim)[i], NULL);
+    (*bim)[i]=n;
   }
   return bim;
 }
@@ -247,21 +187,21 @@ bigintmat * bimMult(bigintmat * a, bigintmat * b)
   bigintmat * bim;
   if (ca != rb) return NULL;
   bim = new bigintmat(ra, cb);
-  for (i=0; i<ra; i++)
+  for (i=1; i<=ra; i++)
   {
-    for (j=0; j<cb; j++)
+    for (j=1; j<=cb; j++)
     {
       sum = nlInit(0, NULL);
-      for (k=0; k<ca; k++)
+      for (k=1; k<=ca; k++)
       {
-        number prod = nlMult((*a)[i*ca+k], (*b)[k*cb+j]);
+        number prod = nlMult(BIMATELEM((*a),i,k), BIMATELEM((*b),k,j));
         number sum2 = nlAdd(sum, prod);
         nlDelete(&sum, NULL);
         sum = sum2;
         nlDelete(&prod, NULL);
       }
-      bim->set(i+1, j+1, sum);
-      nlDelete(&sum, NULL);
+      nlDelete(&BIMATELEM((*bim),i,j),NULL);
+      BIMATELEM((*bim),i,j)=sum;
     }
   }
   return bim;
@@ -346,7 +286,7 @@ bigintmat * bigintmat::transpose()
   {
     for (int j=1; j<=col; j++)
     {
-      t->set(j, i, v[(i-1)*col+(j-1)]);
+      t->set(j, i, BIMATELEM(*this,i,j));
     }
   }
   return t;
