@@ -37,6 +37,10 @@ struct newstruct_desc_s
   int            id;   // the type id assigned to this bb
 };
 
+int newstruct_desc_size() 
+{
+  return sizeof(newstruct_desc_s);
+}
 
 char * newstruct_String(blackbox *b, void *d)
 {
@@ -662,13 +666,6 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   blackboxIsCmd(bbname,id);
   blackbox *bb=getBlackboxStuff(id);
   newstruct_desc desc=(newstruct_desc)bb->data;
-  if (desc == NULL)
-  {
-    desc=(newstruct_desc)omAlloc0(sizeof(*desc));
-    desc->size=0;
-    bb->data = (void*)desc;
-  }
-
   newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
   p->next=desc->procs; desc->procs=p;
 
