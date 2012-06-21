@@ -157,9 +157,10 @@ public:
   {
     switch(op)
     {
-      case ATTRIB_CMD: PyObject_SetAttr(*this, arg1, arg2); return self();
+      case ATTRIB_CMD: 
+        if(PyObject_SetAttr(*this, arg1, arg2) == -1) handle_exception();
+        return self();
     }
-    Werror("ternary operation %s not implemented for 'pyobject`", iiTwoOps(op));
     return self(null_tag());
   }
 
@@ -226,7 +227,7 @@ protected:
     return pylist;
   }
 
-  void handle_exception() {
+  void handle_exception() const {
     
     PyObject *pType, *pMessage, *pTraceback;
     PyErr_Fetch(&pType, &pMessage, &pTraceback);
@@ -556,7 +557,8 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   PythonCastDynamic rhs1(arg2);
   PythonCastDynamic rhs2(arg3);
 
-  return lhs(op, rhs1, rhs2).assign_to(res);
+  if (!lhs(op, rhs1, rhs2).assign_to(res))
+    return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
 }
 
 
