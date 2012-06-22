@@ -42,6 +42,7 @@
 #include <Singular/cntrlc.h>
 #include <Singular/lists.h>
 #include <Singular/blackbox.h>
+#include <Singular/s_buff.h>
 #include <Singular/ssiLink.h>
 
 #ifdef HAVE_MPSR
@@ -59,21 +60,18 @@
 
 typedef struct
 {
-  FILE *f_read;
+  s_buff f_read;
   FILE *f_write;
   ring r;
   pid_t pid; /* only valid for fork/tcp mode*/
   int fd_read,fd_write; /* only valid for fork/tcp mode*/
   char level;
-  char ungetc_buf; /* status sets to !=0, if ungetc was used, ssiRead* set to 0*/
   char send_quit_at_exit;
 
 } ssiInfo;
 
 
 link_list ssiToBeClosed=NULL;
-sigset_t ssi_sigmask;
-sigset_t ssi_oldmask;
 #define SSI_BLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_sigmask, &ssi_oldmask)
 #define SSI_UNBLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_oldmask, NULL)
 
@@ -337,49 +335,37 @@ char *ssiReadString(ssiInfo *d)
 {
   char *buf;
   int l;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d ",&l);
-  SSI_UNBLOCK_CHLD;
-  buf=(char*)omAlloc(l+1);
-  SSI_BLOCK_CHLD;
-  fread(buf,1,l,d->f_read);
-  SSI_UNBLOCK_CHLD;
+  l=s_readint(d->f_read);
+  buf=(char*)omAlloc0(l+1);
+  int c =s_getc(d->f_read); /* skip ' '*/
+  int ll=s_readbytes(buf,l,d->f_read);
+  //if (ll!=l) printf("want %d, got %d bytes\n",l,ll);
   buf[l]='\0';
   return buf;
 }
 
-int ssiReadInt(FILE *fich)
+int ssiReadInt(s_buff fich)
 {
-  int d;
-  SSI_BLOCK_CHLD;
-  fscanf(fich,"%d",&d);
-  SSI_UNBLOCK_CHLD;
-  return d;
+  return s_readint(fich);
 }
 
 number ssiReadBigInt(ssiInfo *d)
 {
   int sub_type=-1;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d",&sub_type);
-  SSI_UNBLOCK_CHLD;
+  sub_type=s_readint(d->f_read);
   switch(sub_type)
   {
    case 3:
      {// read int or mpz_t or mpz_t, mpz_t
        number n=nlRInit(0);
-       SSI_BLOCK_CHLD;
-       mpz_inp_str(n->z,d->f_read,0);
-       SSI_UNBLOCK_CHLD;
+       s_readmpz(d->f_read,n->z);
        n->s=sub_type;
        return n;
      }
    case 4:
      {
        int dd;
-       SSI_BLOCK_CHLD;
-       fscanf(d->f_read,"%d",&dd);
-       SSI_UNBLOCK_CHLD;
+       dd=s_readint(d->f_read);
        return INT_TO_SR(dd);
      }
    default:
@@ -393,9 +379,7 @@ number ssiReadNumber(ssiInfo *d)
   if (rField_is_Q(d->r))
   {
      int sub_type=-1;
-     SSI_BLOCK_CHLD;
-     fscanf(d->f_read,"%d",&sub_type);
-     SSI_UNBLOCK_CHLD;
+     sub_type=s_readint(d->f_read);
      switch(sub_type)
      {
      case 0:
@@ -403,9 +387,8 @@ number ssiReadNumber(ssiInfo *d)
        {// read mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         SSI_BLOCK_CHLD;
-         gmp_fscanf(d->f_read,"%Zd %Zd",n->z,n->n);
-         SSI_UNBLOCK_CHLD;
+         s_readmpz(d->f_read,n->z);
+         s_readmpz(d->f_read,n->n);
          n->s=sub_type;
          return n;
        }
@@ -413,18 +396,14 @@ number ssiReadNumber(ssiInfo *d)
      case 3:
        {// read mpz_t
          number n=nlRInit(0);
-         SSI_BLOCK_CHLD;
-         gmp_fscanf(d->f_read,"%Zd",n->z);
-         SSI_UNBLOCK_CHLD;
+         s_readmpz(d->f_read,n->z);
          n->s=3; /*sub_type*/
          return n;
        }
      case 4:
        {
          int dd;
-         SSI_BLOCK_CHLD;
-         fscanf(d->f_read,"%d",&dd);
-         SSI_UNBLOCK_CHLD;
+         dd=s_readint(d->f_read);
          return INT_TO_SR(dd);
        }
      case 5:
@@ -432,19 +411,15 @@ number ssiReadNumber(ssiInfo *d)
        {// read raw mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         SSI_BLOCK_CHLD;
-         mpz_inp_str (n->z, d->f_read, 32);
-         mpz_inp_str (n->n, d->f_read, 32);
-         SSI_UNBLOCK_CHLD;
+         s_readmpz_base (d->f_read,n->z, 32);
+         s_readmpz_base (d->f_read,n->n, 32);
          n->s=sub_type-5;
          return n;
        }
      case 8:
        {// read raw mpz_t
          number n=nlRInit(0);
-         SSI_BLOCK_CHLD;
-         mpz_inp_str (n->z, d->f_read, 32);
-         SSI_UNBLOCK_CHLD;
+         s_readmpz_base (d->f_read,n->z, 32);
          n->s=sub_type=3; /*subtype-5*/
          return n;
        }
@@ -457,9 +432,7 @@ number ssiReadNumber(ssiInfo *d)
   {
     // read int
     int dd;
-    SSI_BLOCK_CHLD;
-    fscanf(d->f_read,"%d",&dd);
-    SSI_UNBLOCK_CHLD;
+    dd=s_readint(d->f_read);
     return (number)dd;
   }
   else Werror("coeffs not implemented");
@@ -471,9 +444,8 @@ ring ssiReadRing(ssiInfo *d)
 /* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
   int ch, N,i,l;
   char **names;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d %d ",&ch,&N);
-  SSI_UNBLOCK_CHLD;
+  ch=s_readint(d->f_read);
+  N=s_readint(d->f_read);
   names=(char**)omAlloc(N*sizeof(char*));
   for(i=0;i<N;i++)
   {
@@ -481,17 +453,16 @@ ring ssiReadRing(ssiInfo *d)
   }
   // read the orderings:
   int num_ord; // number of orderings
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d",&num_ord);
-  SSI_UNBLOCK_CHLD;
+  num_ord=s_readint(d->f_read);
   int *ord=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block0=(int *)omAlloc0((num_ord+1)*sizeof(int));
   int *block1=(int *)omAlloc0((num_ord+1)*sizeof(int));
-  SSI_BLOCK_CHLD;
   int **wvhdl=(int**)omAlloc0((num_ord+1)*sizeof(int*));
   for(i=0;i<num_ord;i++)
   {
-    fscanf(d->f_read,"%d %d %d",&ord[i],&block0[i],&block1[i]);
+    ord[i]=s_readint(d->f_read);
+    block0[i]=s_readint(d->f_read);
+    block1[i]=s_readint(d->f_read);
     switch(ord[i])
     {
       case ringorder_a:
@@ -504,7 +475,7 @@ ring ssiReadRing(ssiInfo *d)
         wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
         int ii;
         for(ii=block0[i];ii<=block1[i];ii++)
-          fscanf(d->f_read,"%d",&(wvhdl[i][ii-block0[i]]));
+          wvhdl[i][ii-block0[i]]-s_readint(d->f_read);
       }
       break;
 
@@ -518,7 +489,6 @@ ring ssiReadRing(ssiInfo *d)
       default: break;
     }
   }
-  SSI_UNBLOCK_CHLD;
   return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
 }
 
@@ -539,15 +509,11 @@ poly ssiReadPoly(ssiInfo *D)
     p=p_Init(D->r);
     pGetCoeff(p)=ssiReadNumber(D);
     int d;
-    SSI_BLOCK_CHLD;
-    fscanf(D->f_read,"%d",&d);
-    SSI_UNBLOCK_CHLD;
+    d=s_readint(D->f_read);
     p_SetComp(p,d,D->r);
     for(i=1;i<=rVar(D->r);i++)
     {
-      SSI_BLOCK_CHLD;
-      fscanf(D->f_read,"%d",&d);
-      SSI_UNBLOCK_CHLD;
+      d=s_readint(D->f_read);
       p_SetExp(p,i,d,D->r);
     }
     p_Setm(p,D->r);
@@ -563,9 +529,7 @@ ideal ssiReadIdeal(ssiInfo *d)
 {
   int n,i;
   ideal I;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d",&n);
-  SSI_UNBLOCK_CHLD;
+  n=s_readint(d->f_read);
   I=idInit(n,1);
   for(i=0;i<IDELEMS(I);i++) // read n terms
   {
@@ -577,9 +541,8 @@ ideal ssiReadIdeal(ssiInfo *d)
 matrix ssiReadMatrix(ssiInfo *d)
 {
   int n,m,i,j;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d %d",&m,&n);
-  SSI_UNBLOCK_CHLD;
+  m=s_readint(d->f_read);
+  n=s_readint(d->f_read);
   matrix M=mpNew(m,n);
   poly p;
   for(int i=1;i<=MATROWS(M);i++)
@@ -597,9 +560,8 @@ command ssiReadCommand(si_link l)
   // syntax: <num ops> <operation> <op1> <op2> ....
   command D=(command)omAlloc0(sizeof(*D));
   int argc,op;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d %d",&argc,&op);
-  SSI_UNBLOCK_CHLD;
+  argc=s_readint(d->f_read);
+  op=s_readint(d->f_read);
   D->argc=argc; D->op=op;
   leftv v;
   if (argc >0)
@@ -652,9 +614,7 @@ lists ssiReadList(si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   int nr;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d",&nr);
-  SSI_UNBLOCK_CHLD;
+  nr=s_readint(d->f_read);
   lists L=(lists)omAlloc(sizeof(*L));
   L->Init(nr);
 
@@ -671,16 +631,12 @@ lists ssiReadList(si_link l)
 intvec* ssiReadIntvec(ssiInfo *d)
 {
   int nr;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d",&nr);
-  SSI_UNBLOCK_CHLD;
+  nr=s_readint(d->f_read);
   intvec *v=new intvec(nr);
-  SSI_BLOCK_CHLD;
   for(int i=0;i<nr;i++)
   {
-    fscanf(d->f_read,"%d",&((*v)[i]));
+    (*v)[i]=s_readint(d->f_read);
   }
-  SSI_UNBLOCK_CHLD;
   return v;
 }
 
@@ -688,9 +644,7 @@ void ssiReadBlackbox(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   int throwaway;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d ",&throwaway);
-  SSI_UNBLOCK_CHLD;
+  throwaway=s_readint(d->f_read);
   char *name=ssiReadString(d);
   int tok;
   blackboxIsCmd(name,tok);
@@ -758,7 +712,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           while(hh!=NULL)
           {
             ssiInfo *dd=(ssiInfo*)hh->l->data;
-            fclose(dd->f_read);
+            s_close(dd->f_read);
             fclose(dd->f_write);
             if (dd->r!=NULL) rKill(dd->r);
             omFreeSize((ADDRESS)dd,(sizeof *dd));
@@ -770,7 +724,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           }
           ssiToBeClosed->next=NULL;
           close(pc[1]); close(cp[0]);
-          d->f_read=fdopen(pc[0],"r");
+          d->f_read=s_open(pc[0]);
           d->fd_read=pc[0];
           d->f_write=fdopen(cp[1],"w");
           d->fd_write=cp[1];
@@ -805,7 +759,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         {
           d->pid=pid;
           close(pc[0]); close(cp[1]);
-          d->f_read=fdopen(cp[0],"r");
+          d->f_read=s_open(cp[0]);
           d->fd_read=cp[0];
           d->f_write=fdopen(pc[1],"w");
           d->fd_write=pc[1];
@@ -864,7 +818,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         PrintS("client accepted\n");
         d->fd_read = newsockfd;
         d->fd_write = newsockfd;
-        d->f_read = fdopen(newsockfd, "r");
+        d->f_read = s_open(newsockfd);
         d->f_write = fdopen(newsockfd, "w");
         SI_LINK_SET_RW_OPEN_P(l);
         close(sockfd);
@@ -953,7 +907,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         //PrintS("client accepted\n");
         d->fd_read = newsockfd;
         d->fd_write = newsockfd;
-        d->f_read = fdopen(newsockfd, "r");
+        d->f_read = s_open(newsockfd);
         d->f_write = fdopen(newsockfd, "w");
         SI_LINK_SET_RW_OPEN_P(l);
         d->send_quit_at_exit=1;
@@ -985,7 +939,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           if (connect(sockfd,(sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
           { Werror("ERROR connecting(errno=%d)",errno); return TRUE; }
           //PrintS("connected\n");mflush();
-          d->f_read=fdopen(sockfd,"r");
+          d->f_read=s_open(sockfd);
           d->fd_read=sockfd;
           d->f_write=fdopen(sockfd,"w");
           d->fd_write=sockfd;
@@ -1023,7 +977,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         outfile=myfopen(filename,mode);
         if (outfile!=NULL)
         {
-          if (strcmp(l->mode,"r")==0) d->f_read = outfile;
+          if (strcmp(l->mode,"r")==0)
+          {
+            fclose(outfile);
+            d->f_read=s_open_by_name(filename);
+          }
           else
           {
             d->f_write = outfile;
@@ -1082,7 +1040,7 @@ BOOLEAN ssiClose(si_link l)
           sleep(1);
         }
       }
-      if (d->f_read!=NULL) fclose(d->f_read);
+      if (d->f_read!=NULL) s_close(d->f_read);
       if (d->f_write!=NULL) fclose(d->f_write);
       if ((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
@@ -1120,12 +1078,9 @@ BOOLEAN ssiClose(si_link l)
 leftv ssiRead1(si_link l)
 {
   ssiInfo *d = (ssiInfo *)l->data;
-  d->ungetc_buf='\0';
   leftv res=(leftv)omAlloc0(sizeof(sleftv));
   int t=0;
-  SSI_BLOCK_CHLD;
-  fscanf(d->f_read,"%d",&t);
-  SSI_UNBLOCK_CHLD;
+  t=s_readint(d->f_read);
   //Print("got type %d\n",t);
   switch(t)
   {
@@ -1206,9 +1161,10 @@ leftv ssiRead1(si_link l)
              {
                 int n98_v,n98_m;
                 BITSET n98_o1,n98_o2;
-                SSI_BLOCK_CHLD;
-                fscanf(d->f_read,"%d %d %u %u\n",&n98_v,&n98_m,&n98_o1,&n98_o2);
-                SSI_UNBLOCK_CHLD;
+                n98_v=s_readint(d->f_read);
+                n98_m=s_readint(d->f_read);
+                n98_o1=s_readint(d->f_read);
+                n98_o2=s_readint(d->f_read);
                 if ((n98_v!=SSI_VERSION) ||(n98_m!=MAX_TOK))
                 {
                   Print("incompatible versions of ssi: %d/%d vs %d/%d",
@@ -1223,7 +1179,7 @@ leftv ssiRead1(si_link l)
                 return ssiRead1(l);
              }
     case 99: ssiClose(l); m2_end(0);
-    case 0: if (feof(d->f_read))
+    case 0: if (s_iseof(d->f_read))
             {
               ssiClose(l);
               res->rtyp=DEF_CMD;
@@ -1371,7 +1327,7 @@ const char* slStatusSsi(si_link l, const char* request)
   {
     fd_set  mask, fdmask;
     struct timeval wt;
-    if (d->ungetc_buf) return "ready";
+    if (s_isready(d->f_read)) return "ready";
     loop
     {
       /* Don't block. Return socket status immediately. */
@@ -1390,11 +1346,11 @@ const char* slStatusSsi(si_link l, const char* request)
       }
     /* yes: read 1 char*/
     /* if \n, check again with select else ungetc(c), ready*/
-      int c=fgetc(d->f_read);
+      int c=s_getc(d->f_read);
       //Print("try c=%d\n",c);
       if (c== -1) return "eof"; /* eof or error */
       else if (isdigit(c))
-      { ungetc(c,d->f_read); d->ungetc_buf='\1'; return "ready"; }
+      { s_ungetc(c,d->f_read); return "ready"; }
       else if (c>' ')
       {
         Werror("unknown char in ssiLink(%d)",c);
@@ -1405,7 +1361,7 @@ const char* slStatusSsi(si_link l, const char* request)
   }
   else if (strcmp(request, "read") == 0)
   {
-    if (SI_LINK_R_OPEN_P(l) && (!feof(d->f_read))) return "ready";
+    if (SI_LINK_R_OPEN_P(l) && (!s_iseof(d->f_read)) && (s_isready(d->f_read))) return "ready";
     else return "not ready";
   }
   else if (strcmp(request, "write") == 0)
@@ -1507,7 +1463,7 @@ int slStatusSsiL(lists L, int timeout)
       {
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
-        if (d->ungetc_buf=='\0')
+        if (!s_isready(d->f_read))
         {
           FD_SET(d_fd, &fdmask);
           if (d_fd > max_fd) max_fd=d_fd;
@@ -1525,7 +1481,7 @@ int slStatusSsiL(lists L, int timeout)
     #else
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
-      if (d->ungetc_buf=='\0')
+      if (!s_isready(d->f_read))
       {
         FD_SET(d_fd, &fdmask);
         if (d_fd > max_fd) max_fd=d_fd;
@@ -1608,7 +1564,7 @@ do_select:
       /* yes: read 1 char*/
       /* if \n, check again with select else ungetc(c), ready*/
       /* setting: d: current ssiInfo, j current fd, i current entry in L*/
-      int c=fgetc(d->f_read);
+      int c=s_getc(d->f_read);
       //Print("try c=%d\n",c);
       if (c== -1) /* eof */
       {
@@ -1641,7 +1597,7 @@ do_select:
       }
 
       else if (isdigit(c))
-      { ungetc(c,d->f_read); d->ungetc_buf='\1'; return i+1; }
+      { s_ungetc(c,d->f_read); return i+1; }
       else if (c>' ')
       {
         Werror("unknown char in ssiLink(%d)",c);
@@ -1771,7 +1727,7 @@ si_link ssiCommandLink()
   l->data=d;
   d->fd_read = newsockfd;
   d->fd_write = newsockfd;
-  d->f_read = fdopen(newsockfd, "r");
+  d->f_read = s_open(newsockfd);
   d->f_write = fdopen(newsockfd, "w");
   SI_LINK_SET_RW_OPEN_P(l);
   ssiReserved_Clients--;

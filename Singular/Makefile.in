@@ -216,7 +216,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     newstruct.cc lists.cc \
     sdb.cc \
     fglm.cc interpolation.cc\
-    silink.cc ssiLink.cc \
+    silink.cc ssiLink.cc s_buff.cc \
     subexpr.cc \
     janet.cc wrapper.cc\
     libparse.cc sing_win.cc\
@@ -271,7 +271,7 @@ HEADERS=lists.h attrib.h \
 	subexpr.h ipid.h \
 	cntrlc.h ipprint.h sdb.h \
 	ipshell.h tok.h \
-	silink.h ssiLink.h \
+	silink.h ssiLink.h s_buff.h \
 	sing_dbm.h maps_ip.h interpolation.h \
 	mpsr.h mpsr_sl.h\
 	mpsr_Get.h janet.h\
