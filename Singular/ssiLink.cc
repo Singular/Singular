@@ -1056,7 +1056,7 @@ BOOLEAN ssiClose(si_link l)
           else while(hh!=NULL)
           {
             link_list hhh=(link_list)hh->next;
-            if (hhh->l==l)
+            if ((hhh!=NULL) && (hhh->l==l))
             {
               hh->next=hhh->next;
               omFreeSize(hhh,sizeof(link_struct));
