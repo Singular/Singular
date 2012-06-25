@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: Implementation of option buisness
+* ABSTRACT: Implementation of option business
 */
 
 #include <string.h>
@@ -116,6 +116,9 @@ struct fe_option feOptSpec[] =
 
   {"browser",           required_argument,  LONG_OPTION_RETURN,
    "BROWSER",  "Display help in BROWSER (see help.cnf)",       feOptString, 0,   0},
+
+  {"cntrlc",           optional_argument,   LONG_OPTION_RETURN,
+   "CHAR",     "Automatic answer for CTRL-C prompt",                   feOptString, 0,   0},
 
 #ifndef ESINGULAR
   {"emacs",             no_argument,        LONG_OPTION_RETURN,
@@ -359,6 +362,13 @@ static const char* feOptAction(feOptIndex opt)
         if (feOptSpec[FE_OPT_BATCH].value)
           fe_fgets_stdin=fe_fgets_dummy;
         return NULL;
+
+      //case FE_OPT_CNTRLC:
+      //  if (feOptSpec[FE_OPT_CNTRLC].value)
+      //    cntrlc_prompt_answer = ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0];
+      //  else
+      //    cntrlc_prompt_answer = 0;
+      //  return NULL;
 
       case FE_OPT_HELP:
         feOptHelp(feArgv0);
