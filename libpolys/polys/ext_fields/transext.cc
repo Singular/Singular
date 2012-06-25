@@ -436,8 +436,9 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
     bNumDeg = p_Totaldegree(NUM(fb), ntRing);
     bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
   }
-  if (aNumDeg != bNumDeg) return FALSE;
-  else return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
+  if (aNumDeg > bNumDeg) return TRUE;
+  if (aNumDeg < bNumDeg) return FALSE;
+  return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
 }
 
 /* this method will only consider the numerator of a, without cancelling
