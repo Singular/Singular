@@ -274,17 +274,24 @@ int naInt(number &a, const coeffs cf)
   return n_Int(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
-/* TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b))) */
+/* TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b) or (deg(a)==deg(b) && lc(a)>lc(b))) */
 BOOLEAN naGreater(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
-  if (naIsZero(a, cf)) return FALSE;
-  if (naIsZero(b, cf)) return TRUE;
-  int aDeg = 0;
-  if (a != NULL) aDeg = p_Totaldegree((poly)a, naRing);
-  int bDeg = 0;
-  if (b != NULL) bDeg = p_Totaldegree((poly)b, naRing);
-  return (aDeg > bDeg);
+  if (naIsZero(a, cf))
+  {
+    if (naIsZero(b, cf)) return FALSE;
+    return !n_GreaterZero(pGetCoeff((poly)b),cf);
+  }
+  if (naIsZero(b, cf))
+  {
+    return n_GreaterZero(pGetCoeff((poly)a),cf);
+  }
+  int aDeg = p_Totaldegree((poly)a, naRing);
+  int bDeg = p_Totaldegree((poly)b, naRing);
+  if (aDeg>bDeg) return TRUE;
+  if (aDeg<bDeg) return FALSE;
+  return n_Greater(pGetCoeff((poly)a),pGetCoeff((poly)b),cf);
 }
 
 /* TRUE iff a != 0 and (LC(a) > 0 or deg(a) > 0) */
