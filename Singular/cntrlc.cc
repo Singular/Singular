@@ -377,7 +377,7 @@ void init_signals()
   #endif /* SIGIOT */
   #ifdef SIGXCPU
   si_set_signal(SIGXCPU, (void (*)(int))SIG_IGN);
-  #endif /* SIGIOT */
+  #endif /* SIGXCPU */
   si_set_signal(SIGINT ,sigint_handler);
   #if defined(HPUX_9) || defined(HPUX_10)
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
@@ -401,9 +401,14 @@ void sigint_handler(int sig)
   {
     int cnt=0;
     int c;
-    if(singular_in_batchmode)
+
+    if (singular_in_batchmode)
     {
       c = 'q';
+    }
+    else if (((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
+    {
+      c = ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0];
     }
     else
     {
@@ -422,7 +427,7 @@ void sigint_handler(int sig)
 
     switch(c)
     {
-      case 'q':
+      case 'q': case EOF:
                 m2_end(2);
       case 'r':
                 if (sigint_handler_cnt<3)
@@ -444,7 +449,11 @@ void sigint_handler(int sig)
       case 'a':
                 siCntrlc++;
       case 'c':
-                if (feGetOptValue(FE_OPT_EMACS) == NULL) fgetc(stdin);
+                if (feGetOptValue(FE_OPT_EMACS) == NULL && !(((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0]))
+                {
+                  /* Read until a newline or EOF */
+                  while (c != EOF && c != '\n') c = fgetc(stdin);
+                }
                 si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
                 return;
                 //siCntrlc ++;

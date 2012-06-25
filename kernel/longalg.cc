@@ -1448,10 +1448,19 @@ BOOLEAN naEqual (number a, number b)
 BOOLEAN naGreater (number a, number b)
 {
   if (naIsZero(a))
-    return FALSE;
+  {
+    if (naIsZero(b)) return FALSE;
+    return !(nacGreaterZero(pGetCoeff(((lnumber)b)->z)));
+  }
   if (naIsZero(b))
-    return TRUE; /* a!= 0)*/
-  return napDeg(((lnumber)a)->z)>napDeg(((lnumber)b)->z);
+  {
+    return (nacGreaterZero(pGetCoeff(((lnumber)a)->z)));
+  }
+  int da=napDeg(((lnumber)a)->z);
+  int db=napDeg(((lnumber)b)->z);
+  if (da>db) return TRUE;
+  if (da<db) return FALSE;
+  return n_Greater(pGetCoeff(((lnumber)a)->z),pGetCoeff(((lnumber)b)->z),nacRing);
 }
 
 /*2
@@ -1795,11 +1804,11 @@ void naCoefNormalize(number pp)
       if (!n_IsOne(ng,nacRing))
       {
         number ni=n_Invers(ng,nacRing);
-	p->z=p_Mult_nn(p->z,ni,nacRing);
-	p->n=p_Mult_nn(p->n,ni,nacRing);
+        p->z=p_Mult_nn(p->z,ni,nacRing);
+        p->n=p_Mult_nn(p->n,ni,nacRing);
         p_Normalize(p->z,nacRing);
         p_Normalize(p->n,nacRing);
-	n_Delete(&ni,nacRing);
+        n_Delete(&ni,nacRing);
       }
       n_Delete(&ng,nacRing);
     }
@@ -1859,7 +1868,7 @@ void naNormalize(number &pp)
     norm=naIsChar0;
   }
   /* normalize all coefficients in n and z (if in Q) */
-  if (norm) 
+  if (norm)
   {
     naCoefNormalize(pp);
     x = p->z;

@@ -571,6 +571,10 @@ reported by the @code{timer} and @code{rtimer} variable divided by
 
 @item @code{--cpus=CPUs}
 set the maximal number of CPUs to use.
+
+@item @code{--cntrlc=C}
+set the default answer for interupt signals to C which should be
+a for abort, c for continue or q for quit.
 @end table
 
 The next three options are of interest for the use with MP links:
