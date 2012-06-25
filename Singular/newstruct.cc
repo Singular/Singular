@@ -189,6 +189,33 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
       return FALSE;
     }
   }
+
+  else if(l->Typ() > MAX_TOK)
+  {
+    blackbox *ll=getBlackboxStuff(l->Typ());
+    newstruct_desc nt=(newstruct_desc)ll->data;
+    newstruct_proc p=nt->procs;
+
+    while( (p!=NULL) && ((p->t!='=')||(p->args!=1)) ) p=p->next;
+
+    if (p!=NULL)
+    {
+      idrec hh;
+      memset(&hh,0,sizeof(hh));
+      hh.id=Tok2Cmdname(p->t);
+      hh.typ=PROC_CMD;
+      hh.data.pinf=p->p;
+      sleftv tmp;
+      memset(&tmp,0,sizeof(sleftv));
+      tmp.Copy(r);
+      leftv sl = iiMake_proc(&hh, NULL, &tmp);
+      if (sl != NULL)
+      {
+        if (sl->Typ()==l->Typ()) return newstruct_Assign(l, sl);
+        else sl->CleanUp();     // @todo Is this enough to kill 'sh`?
+      }
+    }
+  }
   Werror("assign %s(%d) = %s(%d)",
         Tok2Cmdname(l->Typ()),l->Typ(),Tok2Cmdname(r->Typ()),r->Typ());
   return TRUE;
