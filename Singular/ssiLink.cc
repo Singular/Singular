@@ -1033,13 +1033,6 @@ BOOLEAN ssiClose(si_link l)
           }
         }
       }
-      else
-      {
-        if (d->send_quit_at_exit)
-        {
-          sleep(1);
-        }
-      }
       if (d->f_read!=NULL) s_close(d->f_read);
       if (d->f_write!=NULL) fclose(d->f_write);
       if ((strcmp(l->mode,"tcp")==0)
