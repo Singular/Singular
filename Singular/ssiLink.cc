@@ -1053,16 +1053,17 @@ BOOLEAN ssiClose(si_link l)
              ssiToBeClosed=(link_list)hh->next;
              omFreeSize(hh,sizeof(link_struct));
           }
-          else while(hh!=NULL)
+          else while(hh->next!=NULL)
           {
             link_list hhh=(link_list)hh->next;
-            if ((hhh!=NULL) && (hhh->l==l))
+            if (hhh->l==l)
             {
               hh->next=hhh->next;
               omFreeSize(hhh,sizeof(link_struct));
               break;
             }
-            hh=(link_list)hh->next;
+	    else
+              hh=(link_list)hh->next;
           }
         }
       }
