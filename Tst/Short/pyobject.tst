@@ -137,5 +137,10 @@ killattrib(new_pyobj, 17);         // -> error message
 
 attrib(new_pyobj, "new_attr");     // -> error message
 
+// python list from empty Singular list (bug fixed?)
+pyobject ll_empty = list();
+ll_empty;
+
+
 tst_status(1);
 $
