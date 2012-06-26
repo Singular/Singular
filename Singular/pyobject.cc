@@ -358,7 +358,7 @@ inline PythonObject::ptr_type
 PythonCastStatic<CastType>::get(lists value)
 {
   ptr_type pylist(PyList_New(0));
-  for (std::size_t i = 0; i <= value->nr; ++i)
+  for (int i = 0; i <= value->nr; ++i)
     PyList_Append(pylist, PythonCastDynamic((value->m) + i));
 
   return pylist;
