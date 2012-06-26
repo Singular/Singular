@@ -111,11 +111,11 @@ class PythonObject
 public:
   typedef PyObject* ptr_type;
   struct sequence_tag{};
-  struct null_tag {};
 
   PythonObject(): m_ptr(Py_None) { }
-  PythonObject(null_tag): m_ptr(NULL) { }
-  PythonObject(ptr_type ptr): m_ptr(ptr) {if (!ptr) handle_exception();}
+  PythonObject(ptr_type ptr): m_ptr(ptr) { 
+    if (!ptr && handle_exception()) m_ptr = Py_None;
+  }
 
   ptr_type check_context(ptr_type ptr) const {
     if(ptr) sync_contexts(); 
@@ -134,7 +134,7 @@ public:
     if (op == PythonInterpreter::id())
       return *this;
 
-    return self(null_tag());
+    return self(NULL);
   }
 
   /// Binary and n-ary operations
@@ -153,7 +153,7 @@ public:
       case LIST_CMD:     return args2list(arg);
       case '.': case COLONCOLON: case ATTRIB_CMD: return attr(arg);
     }
-    return self(null_tag());
+    return self(NULL);
   }
 
   /// Ternary operations
@@ -165,7 +165,7 @@ public:
         if(PyObject_SetAttr(*this, arg1, arg2) == -1) handle_exception();
         return self();
     }
-    return self(null_tag());
+    return self(NULL);
   }
 
   /// Get item
@@ -231,7 +231,9 @@ protected:
     return pylist;
   }
 
-  void handle_exception() const {
+  BOOLEAN handle_exception() const {
+
+    if(!PyErr_Occurred()) return FALSE;
     
     PyObject *pType, *pMessage, *pTraceback;
     PyErr_Fetch(&pType, &pMessage, &pTraceback);
@@ -244,6 +246,7 @@ protected:
     Py_XDECREF(pTraceback);
     
     PyErr_Clear();
+    return TRUE;
   }
 
   void append_iter(self iterator) {
@@ -562,7 +565,9 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   PythonCastDynamic rhs2(arg3);
 
   if (!lhs(op, rhs1, rhs2).assign_to(res))
-    return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
+    return FALSE;
+
+  return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
 }
 
 
