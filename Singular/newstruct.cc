@@ -189,10 +189,12 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
     }
   }
 
-  else if(l->Typ() > MAX_TOK)
+  else
   {
+    assume(l->Typ() > MAX_TOK);
     blackbox *ll=getBlackboxStuff(l->Typ());
     newstruct_desc nt=(newstruct_desc)ll->data;
+    assume(l->Typ() == nt->id);
     newstruct_proc p=nt->procs;
 
     while( (p!=NULL) && ((p->t!='=')||(p->args!=1)) ) p=p->next;
