@@ -212,7 +212,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
       if (sl != NULL)
       {
         if (sl->Typ()==l->Typ()) return newstruct_Assign(l, sl);
-        else sl->CleanUp();     // @todo Is this enough to kill 'sh`?
+        else sl->CleanUp();
       }
     }
   }
