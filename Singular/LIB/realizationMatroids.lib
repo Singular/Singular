@@ -1,0 +1,772 @@
+/////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Tropical Geometry";
+info="
+LIBRARY:  realizationMatroids.lib   Deciding Relative Realizability for Tropical Fan Curves in 2-Dimensional Matroidal Fans
+AUTHORS:  Anna Lena Winstel, winstel@mathematik.uni-kl.de
+OVERVIEW: In tropical geometry, one question to ask is the following: given a one-dimensional balanced polyhedral fan C which is set theoretically contained in the tropicalization trop(Y) of an algebraic variety Y, does there exist a curve X in Y such that trop(X) = C? This equality of C and trop(X) denotes an equality of both, the fans trop(X) and C and their weights on the maximal cones. The relative realization space of C with respect to Y is the space of all algebraic curves in Y which tropicalize to C.
+
+This library provides procedures deciding relative realizability for tropical fan curves, i.e. one-dimensional weighted balanced polyhedral fans, contained in two-dimensional matroidal fans trop(Y) where Y is a projective plane.
+
+NOTATION: If Y is a projective plane in (n-1)-dimensional projective space, we consider trop(Y) in R^n/<1>. Moreover, for the relative realization space of C with respect to Y we only consider algebraic curves of degree deg(C) in Y which tropicalize to C.
+
+PROCEDURES:
+
+realizationDim(I,C);          For a given tropical fan curve C in trop(Y), where Y = V(I) is a projective plane, this routine returns the dimension of the relative realization space of C with respect to Y, that is the space of all algebraic curves of degree deg(C) in Y which tropicalize to C. If the realization space is empty, the output is set to -1.
+
+irrRealizationDim(I,C);       This routine returns the dimension of the irreducible relative realization space of the tropical fan curve C with respect to Y = V(I), that is the space of all irreducible algebraic curves of degree deg(C) in Y which tropicalize to C. If the irreducible relative realization space is empty, the output is set to -1.
+
+realizationDimPoly(I,C);      If C is a tropical fan curve contained in the tropicalization trop(Y) of the projective plane Y = V(I) such that the relative realization space M of C is non-empty, this routine returns the tuple (dim(M),f) where f is an example of a homogeneous polynomial of degree deg(C) cutting out a curve X in Y which tropicalizes to C. If M is empty, the output is set to -1.
+
+";
+
+LIB "control.lib";
+LIB "qhmoduli.lib";
+
+static proc gcdvector(intvec v)
+{
+  int i;
+  int ggt = 0;
+  for(i=1;i<=size(v);i++)
+  {
+    ggt = gcd(ggt,v[i]);
+    if( ggt == 1 )
+    {
+      return(ggt);
+    }
+  }
+  return(ggt);
+}
+
+static proc balanced(list lInput)
+{
+  list ba;
+  int i;
+  int j;
+  if(size(lInput)>0)
+  {
+    for(i=1;i<=size(lInput[1]);i++) 
+    {
+      ba[i] = 0;
+      for(j=1;j<=size(lInput);j++)
+      {
+        ba[i] = ba[i] + lInput[j][i];
+      }
+    }
+    int boolean = 1;
+    for(i=2;i<=size(ba);i++)
+    {
+      if(ba[i] != ba[1])
+      {
+        boolean = 0;
+      }
+    }
+    if(boolean == 1)
+    {
+      return(ba[1]);
+    }
+    else
+    {
+      return(0);
+    }
+  }
+  else
+  {
+    return(0);
+  }
+}
+
+static proc genPoly(int d, int i, int j, int k)
+{
+  int ii;
+  int ij;
+  int ik = 1;
+  poly f = 0;
+  for(ii=0;ii<=d;ii++)
+  {
+    for(ij=0;ij<=d-ii;ij++)
+    {
+       f = f + a(ik)*x(i)^(d-ii-ij)*x(j)^ij*x(k)^ii;
+       ik = ik + 1;
+    }
+  }
+  return(f);
+}
+
+static proc prodvar(int n)
+{
+  int i;
+  poly f = 1;
+  for(i=1;i<=n;i++)
+  {
+    f = f * x(i);
+  }
+  return(f);
+}
+
+static proc lessThan(int i, int j, intvec v, intvec w)
+{
+  number a = v[i];
+  number b = v[j];
+  number c = w[i];
+  number d = w[j];
+  if((a/b)<(c/d))
+  { return(1); }
+  else
+  { return(0); }
+}
+
+static proc sortSlope(int i, int j, list lInput)
+{
+  int k;
+  int l;
+  intvec v;
+  for(k=1;k<size(lInput);k++)
+  {
+    for(l=1;l<=size(lInput)-k;l++)
+    {
+      if(lessThan(i,j,lInput[l+1],lInput[l]))
+      {
+        v = lInput[l];
+        lInput[l] = lInput[l+1];
+        lInput[l+1] = v;
+      }
+    }
+  }
+  return(lInput);
+}
+
+static proc coefMonomial(poly f, poly g, int n)
+{
+  matrix m = coef(f,prodvar(n));
+  poly h;
+  for(int i=1;i<=ncols(m);i++)
+  {
+    if(m[1,i] == g)
+    {
+      h = m[2,i];
+    }
+  }
+  return(h);
+}
+
+static proc ismultiple(intvec v, intvec w)
+{
+  int boolean = 1;
+  if(v[1] != 0)
+  {
+    if((number(w[2]) == number(v[2])*number(w[1])/number(v[1])) and (number(w[3]) == number(v[3])*number(w[1])/number(v[1])))
+    {
+      return(1);
+    }
+    else 
+    {
+      return(0);
+    }
+  }
+  else
+  {
+    if(v[2] != 0)
+    {
+      if((number(w[1]) == number(v[1])*number(w[2])/number(v[2])) and (number(w[3]) == number(v[3])*number(w[2])/number(v[2])))
+      {
+        return(1);
+      }
+      else 
+      {
+        return(0);
+      }
+    }
+    else
+    {
+      if((w[2] == 0) and (w[1] == 0))
+      {
+        return(1);
+      }
+      else
+      {
+        return(0);
+      }
+    }
+  }
+}
+
+static proc simplifyList(list lInput);
+{
+  int i;
+  int k = size(lInput);
+  for(i=1;i<=k;i++)
+  {
+    if(lInput[i] == intvec(0,0,0))
+    {
+      lInput = delete(lInput,i);
+      k = k-1;
+      i = i-1;
+    }
+  }
+  k = size(lInput);
+  int j;
+  for(i=1;i<k;i++)
+  {
+    for(j=i+1;j<=k;j++)
+    {
+      if(ismultiple(lInput[i],lInput[j]))
+      {
+        lInput[i] = lInput[i] + lInput[j];
+        lInput = delete(lInput,j);
+        j = j-1;
+        k = k-1;
+      }
+    }
+  }
+  return(lInput);
+}
+
+static proc realizationDimIdeal(ideal iInput, list lInput)
+{
+  //normalize the vectors
+  intvec helpintvec = 1;
+  int i;
+  int c;
+  for(i=1;i<size(lInput[1]);i++)
+  {
+    helpintvec = helpintvec,1;
+  }
+  for(i=1;i<=size(lInput);i++)
+  {
+    lInput[i] = lInput[i] - Min(lInput[i])*helpintvec;
+  }
+
+  //check if the curve is balanced and compute its degree
+  int d = balanced(lInput);
+  if(d == 0)
+  {
+    printf("The curve is not balanced.");
+    return(-2);
+  }
+
+  //change basering, store the actual basering in a variable
+  def save = basering;
+  int n = size(lInput[1]);
+  int N = (d+2)*(d+1) div 2;
+  ring r1;     
+  ring r = 0,(x(1..n),a(1..N),t),dp;
+  setring r;
+  ideal I = fetch(save,iInput);
+  I = std(I);
+
+  if(dim(I) != (4+N))
+  {
+    printf("The ideal is not defining a projective plane.");
+    return(-2);
+  }
+
+  //for any three variables, compute the projection
+  int i2;
+  int i3;
+  int i4;
+  int j;
+  int k;
+  int l;
+  int i_w;
+  int good;
+  int i_good = 0;
+  list P;
+  intvec v;
+  intvec w;
+  ideal E;
+  list NE;
+  list S1;
+  list S2;
+  list S3;
+  poly h;
+  poly g;
+  poly coefMon;
+  matrix F;
+  matrix G;
+  list listunitvec;
+  v = 1;
+  for(i=2;i<=n+N+1;i++)
+  {
+    v = v,0;
+  }
+  listunitvec = list(v);
+  for(i=2;i<=n;i++)
+  {
+    v = 0;
+    for(j=2;j<=n+N+1;j++)
+    {
+      if(i != j)
+      {
+        v = v,0;
+      }
+      else
+      {
+        v = v,1;
+      }
+    }
+    listunitvec = listunitvec + list(v);
+  }
+  intmat M[n+N+1][n+N+1];
+  for(i=n+1;i<=n+N+1;i++)
+  {
+    M[i,i] = 1;
+  }
+  int i_start;
+  list luv1;
+  intmat M1[n+N+1][n+N+1];
+  for(i=1;i<=n-2;i++)
+  {
+    for(j=i+1;j<=n-1;j++)
+    {
+      for(k=j+1;k<=n;k++)
+      {
+        //compute the algebraic projection
+        luv1 = listunitvec;
+        luv1 = delete(luv1,k);
+        luv1 = delete(luv1,j);
+        luv1 = delete(luv1,i);
+        luv1 = luv1 + list(listunitvec[i],listunitvec[j],listunitvec[k]);
+        M1 = M;
+        for(l=1;l<=size(luv1);l++)
+        {
+          M1[l,1..(n+N+1)] = luv1[l];
+        }
+        r1 = ring(0,(x(1..n),a(1..N),t),M(M1));
+        setring r1;
+        ideal Ir1 = fetch(r,I);
+        Ir1 = std(Ir1);
+        //check if this projection is "good"
+        good = 1;
+        ideal Ii = x(i);
+        ideal Ij = x(j);
+        ideal Ik = x(k);
+        for(l=1;l<=size(Ir1);l++)
+        {
+          if((reduce(lead(Ir1[l]),Ii) == 0) or (reduce(lead(Ir1[l]),Ij) == 0) or (reduce(lead(Ir1[l]),Ik) == 0))
+          {
+            good = 0;
+          }
+        }
+        if(good == 1)
+        {
+          //for the first "good" projection, initialise the general polynomial f
+          if(i_good == 0)
+          {
+            setring r;
+            poly f = genPoly(d,i,j,k);
+            setring r1;
+            i_good = 1;
+            intvec vgood = i,j,k;
+          }
+          poly fr1 = fetch(r,f);
+          poly hr1 = reduce(fr1,Ir1);
+          setring r;
+          h = fetch(r1,hr1);
+          //compute the tropical projection
+          P = list();
+          for(l=1;l<=size(lInput);l++)
+          {
+            v = lInput[l][i],lInput[l][j],lInput[l][k];
+            P[l] = v;
+          }
+          P = simplifyList(P);
+          //collect the conditions coming from the Newton polytopes
+          S1 = list();
+          S2 = list();
+          S3 = list();
+          for(l=1;l<=size(P);l++)
+          {
+            if((P[l][1] != 0) and (P[l][2] != 0))
+            { S3 = S3 + list(P[l]); }
+            if((P[l][2] != 0) and (P[l][3] != 0))
+            { S1 = S1 + list(P[l]); }
+            if((P[l][1] != 0) and (P[l][3] != 0))
+            { S2 = S2 + list(P[l]); }
+          }
+          //sort the lists
+          S1 = sortSlope(3,2,S1);
+          S2 = sortSlope(1,3,S2);
+          S3 = sortSlope(2,1,S3);
+          //find conditions from S1
+          i_start = 0;
+          for(l=1;l<=size(S1);l++)
+          {
+            i_start = i_start + S1[l][2];
+          }
+          //find starting point
+          w = intvec(0,i_start);
+          coefMon = coefMonomial(h,x(k)^(w[2])*x(i)^(d-w[2]),n);
+          NE = NE + list(coefMon);
+          for(i2=1;i2<=size(S1);i2++)
+          {
+            w[1] = w[1] + S1[i2][3];
+            w[2] = w[2] - S1[i2][2];
+            coefMon = coefMonomial(h,x(k)^(w[2])*x(j)^(w[1])*x(i)^(d-w[1]-w[2]),n);
+            NE = NE + list(coefMon);
+            g = subst(h,x(j),x(j)*t^(S1[i2][2]),x(k),x(k)*t^(S1[i2][3]));
+            i_w = S1[i2][2]*w[1] + S1[i2][3]*w[2];
+            F = coeffs(g,t);
+            for(i3=1;i3<=i_w;i3++)
+            {
+              G = coef(F[i3,1],prodvar(n));
+              for(i4=1;i4<=ncols(G);i4++)
+              {
+ 	              E = E + ideal(G[2,i4]);
+              }
+            }
+          }
+          //find conditions from S2
+          i_start = 0;
+          for(l=1;l<=size(S2);l++)
+          {
+            i_start = i_start + S2[l][3];
+          }
+          //find starting point
+          w = intvec(i_start,0);
+          coefMon = coefMonomial(h,x(i)^(w[1])*x(j)^(d-w[1]),n);
+          NE = NE + list(coefMon);
+          for(i2=1;i2<=size(S2);i2++)
+          {
+            w[1] = w[1] - S2[i2][3];
+            w[2] = w[2] + S2[i2][1];
+            coefMon = coefMonomial(h,x(i)^(w[1])*x(k)^(w[2])*x(j)^(d-w[1]-w[2]),n);
+            NE = NE + list(coefMon);
+            g = subst(h,x(i),x(i)*t^(S2[i2][1]),x(k),x(k)*t^(S2[i2][3]));
+            i_w = S2[i2][3]*w[2] + S2[i2][1]*w[1];
+            F = coeffs(g,t);
+            for(i3=1;i3<=i_w;i3++)
+            {
+              G = coef(F[i3,1],prodvar(n));
+              for(i4=1;i4<=ncols(G);i4++)
+              {
+ 	              E = E + ideal(G[2,i4]);
+              }
+            }
+          }
+          //find conditions from S3
+          i_start = 0;
+          for(l=1;l<=size(S3);l++)
+          {
+            i_start = i_start + S3[l][1];
+          }
+          //find starting point
+          w = intvec(0,i_start);
+          coefMon = coefMonomial(h,x(j)^(w[2])*x(k)^(d-w[2]),n);
+          NE = NE + list(coefMon);
+          for(i2=1;i2<=size(S3);i2++)
+          {
+            w[1] = w[1] + S3[i2][2];
+            w[2] = w[2] - S3[i2][1];
+            coefMon = coefMonomial(h,x(i)^(w[1])*x(j)^(w[2])*x(k)^(d-w[1]-w[2]),n);
+            NE = NE + list(coefMon);
+            g = subst(h,x(i),x(i)*t^(S3[i2][1]),x(j),x(j)*t^(S3[i2][2]));
+            i_w = S3[i2][2]*w[2] + S3[i2][1]*w[1];
+            F = coeffs(g,t);
+            for(i3=1;i3<=i_w;i3++)
+            {
+              G = coef(F[i3,1],prodvar(n));
+              for(i4=1;i4<=ncols(G);i4++)
+              {
+ 	              E = E + ideal(G[2,i4]);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //check whether or not there is a common solution
+  setring r;
+  int isRealizable = 1;
+  E = std(E);
+  int i_dim = dim(E)-n-2;
+  for(i=1;i<=size(NE);i++)
+  { 
+    if(reduce(NE[i],E) == 0)
+    {
+      isRealizable = 0;
+    }
+  }
+
+  if(isRealizable == 1)
+  {
+    setring save;
+    return(i_dim,fetch(r,E),fetch(r,NE),vgood);
+  }
+  else
+  {
+    return(-1);
+  }
+}
+
+proc realizationDim(ideal iInput, list lInput)
+"USAGE:   realizationDim(I,C); where I is a homogeneous linear ideal defining the projective plane Y = V(I) and C is a list of intvectors such that each intvector represents a one-dimensional cone in the tropical fan curve whose relative realizability should be checked. This representation is done in the following way: the one-dimensional cone K is represented by a vector w whose equivalence class [w] in R^n/<1> can be written as [w] = m*[v] where [v] is the primitive generator of K and m is the weight of K.
+RETURNS:  the dimension of the relative realization space of the tropical curve C with respect to Y, and -1 if the relative realization space is empty.
+EXAMPLE:  realizationDim; shows an example"
+{
+  int ret = realizationDimIdeal(iInput,lInput)[1];
+  if(ret[1] == -2)
+  {
+    printf("WARNING: no computation possible, return value is not meaningful!");
+    return(-2);
+  }
+  else
+  {
+    return(ret);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r = 0,(x(1..4)),dp;
+  ideal I = x(1)+x(2)+x(3)+x(4);
+  list C = list(intvec(2,2,0,0),intvec(0,0,2,1),intvec(0,0,0,1));
+  //C represents the tropical fan curve which consists of the cones
+  //cone([(1,1,0,0)]) (with weight 2), cone([(0,0,2,1)]) (with weight 1) 
+  //and cone([(0,0,0,1)]) (with weight 1)
+  realizationDim(I,C);
+}
+
+proc irrRealizationDim(ideal iInput, list lInput)
+"USAGE:   irrRealizationDim(I,C); where I is a homogeneous linear ideal defining the projective plane Y = V(I) and C is a list of intvectors such that each intvector represents a one-dimensional cone in the tropical fan curve whose irreducible relative realizability should be checked. This representation is done in the following way: a one-dimensional cone K is represented by a vector w whose equivalence class [w] in R^n/<1> can be written as [w] = m*[v] where [v] is the primitive generator of K and m is the weight of K.
+RETURNS:  the dimension of the irreducible relative realization space of C with respect to Y, and -1 if the irreducible realization space is empty.
+EXAMPLE:  irrRealizationDim; shows an example"
+{
+  int i;
+  int i_dim = realizationDim(iInput,lInput);
+  if(i_dim > -1)
+  {
+    //check if also realizable by an irreducible curve
+    list lweight;
+    int i_rdim = -1;
+    //substitute the vectors by a primitve one and store the multiplicities
+    for(i=1;i<=size(lInput);i++)
+    {
+      lweight[i] = gcdvector(lInput[i]);
+      lInput[i] = lInput[i] div lweight[i];
+    }
+    //find all decompositions into two tropical curves
+    intvec tm;
+    for(i=1;i<=size(lInput);i++)
+    {
+      tm[i] = 0;
+    }
+    int na;
+    list C1;
+    list C2;
+    int dimC1;
+    int dimC2;
+    while(na==0)
+    {
+      na = 1;
+      for(i=1;i<=size(lInput);i++)
+      {
+        if(tm[i] < lweight[i])
+        {
+          tm[i] = tm[i]+1;
+          na = 0;
+          i = size(lInput);
+        }
+        else
+        {
+          tm[i] = 0;
+        }
+      }
+      if(na == 0)
+      {
+        C1 = list();
+        C2 = list();
+        for(i=1;i<=size(lInput);i++)
+        {
+          if(tm[i] > 0)
+          {
+            C1 = C1 + list(tm[i]*lInput[i]);
+            if(tm[i] < lweight[i])
+            {
+              C2 = C2 + list((lweight[i]-tm[i])*lInput[i]);
+            }
+          }
+          else
+          {
+            C2 = C2 + list(lweight[i]*lInput[i]);
+          }
+        }
+        if((balanced(C2) != 0) and (balanced(C2) <= balanced(C1)))
+        {
+          dimC1 = realizationDim(iInput,C1);
+          dimC2 = realizationDim(iInput,C2);
+          if((dimC1 >= 0) and (dimC2 >= 0))
+          {
+            i_rdim = Max(intvec(i_rdim,dimC1 + dimC2));
+          }
+        }
+      }
+    }
+    if(i_rdim < i_dim)
+    {
+      return(i_dim);
+    }
+    else
+    {
+      return(-1);
+    }
+  }
+  else
+  {
+    return(-1);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r = 0,(x(1..4)),dp;
+  ideal I = x(1)+x(2)+x(3)+x(4);
+  list C = list(intvec(2,2,0,0),intvec(0,0,2,2));
+  //C represents the tropical fan curve which consists of the cones 
+  //cone([(1,1,0,0)]) and cone([(1,1,0,0)]), both with weight 2
+  realizationDim(I,C);
+  irrRealizationDim(I,C);
+}
+
+proc realizationDimPoly(ideal iInput, list lInput)
+"USAGE:   realizationDimPoly(I,C); where I is a homogeneous linear ideal defining the projective plane Y = V(I) and C is a list of intvectors such that each intvector represents a one-dimensional cone in the tropical fan curve whose relative realizability should be checked. This representation is done in the following way: the one-dimensional cone K is represented by a vector w whose equivalence class [w] in R^n/<1> can be written as [w] = m*[v] where [v] is the primitive generator of K and m is the weight of K.
+RETURNS:  If the relative realization space of the tropical fan curve C is non-empty, this routine returns the tuple (r,f), where r is the dimension of the relative realization space and f is an example of a homogeneous polynomial of degree deg(C) cutting out a curve X in Y which tropicalizes to C. In case the relative realization space is empty, the output is set to -1.
+EXAMPLE:  realizationDimPoly; shows an example"
+{
+  def save = basering;
+  int d = balanced(lInput);
+  int n = size(lInput[1]);
+  int N = (d+2)*(d+1) div 2;  
+  int i; 
+  ring r = 0,(x(1..n),a(1..N)),dp;
+  list ret = realizationDimIdeal(fetch(save,iInput),lInput);
+  int realdim = ret[1];
+  if(realdim != -1)
+  {
+    ideal E = ret[2];
+    list NE = ret[3];
+    E = std(E);
+    //find variables which are free to choose
+    intvec v;
+    for(i=1;i<=size(E);i++)
+    {
+      v = v + leadexp(E[i]);
+    }
+    int j;
+    int k;
+    int boolean;
+    ideal E1;
+    list NE1;
+    poly f;
+    poly g;
+    //initialize the list of the free variables
+    list lValues;
+    if(size(v) > 1)
+    {
+      for(j=1;j<=N;j++)
+      {
+        if(v[j+n] == 0)
+        {
+          lValues = lValues + list(list(a(j),0));
+        }
+      }
+    }
+    else
+    {
+      for(j=1;j<=N;j++)
+      {
+        lValues = lValues + list(list(a(j),0));
+      }
+    }
+    //try to find an easy solution
+    boolean = 1;
+    for(j=1;j<=size(lValues);j++)
+    {
+      if(boolean == 1)
+      {
+        lValues[j][2] = 0;
+      }
+      else
+      {
+        lValues[j][2] = lValues[j][2] + 1;
+      }
+      boolean = 1;
+      E1 = E;
+      for(i=1;i<=size(E1);i++)
+      {
+        for(k=1;k<=j;k++)
+        {
+          E1[i] = subst(E1[i],lValues[k][1],lValues[k][2]);
+        }
+      }
+      NE1 = NE;
+      for(i=1;i<=size(NE);i++)
+      {
+        for(k=1;k<=j;k++)
+        {
+          NE1[i] = subst(NE1[i],lValues[k][1],lValues[k][2]);
+        }
+      }
+      E1 = std(E1);
+      for(i=1;i<=size(NE1);i++)
+      {
+        if(reduce(NE1[i],E1) == 0)
+        {
+          boolean = 0;
+        }
+      }
+      if(boolean == 0)
+      {
+        j = j-1;
+      }
+    }
+    //compute the values of the dependent variables
+    for(j=1;j<=size(E);j++)
+    {
+      f = E[j];
+      for(k=1;k<=size(lValues);k++)
+      {
+        f = subst(f,lValues[k][1],lValues[k][2]);
+      }
+      if(leadcoef(f) != 1)
+      {
+        for(k=1;k<=size(lValues);k++)
+        {
+          lValues[k][2] = lValues[k][2] * leadcoef(f);
+        }
+      }
+      f = subst(f,leadmonom(f),0);
+      lValues = lValues + list(list(leadmonom(E[j]),-f));
+    }
+    g = genPoly(d,ret[4][1],ret[4][2],ret[4][3]);
+    for(j=1;j<=N;j++)
+    { 
+      g = subst(g,lValues[j][1],lValues[j][2]);
+    }
+    setring save;
+    return(realdim,fetch(r,g));
+  }
+  else
+  {
+    return(-1);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r = 0,(x(1..4)),dp;
+  ideal I = x(1)+x(2)+x(3)+x(4);
+  list C = list(intvec(2,2,0,0),intvec(0,0,2,2));
+  //C represents the tropical fan curve which consists of the cones 
+  //cone([(1,1,0,0)]) and cone([(1,1,0,0)]), both with weight 2
+  realizationDimPoly(I,C);
+  C = list(intvec(0,0,0,4),intvec(0,1,3,0),intvec(1,0,1,0),intvec(0,2,0,0),intvec(3,1,0,0));
+  //C represents the tropical fan curve which consists of the cones
+  //cone([(0,0,0,1)]) with weight 4,
+  //cone([(0,1,3,0)]), cone([(1,0,1,0)]) both with weight 1,
+  //cone([(0,1,0,0)]) with weight 2, and
+  //cone([(3,1,0,0)]) with weight 1
+  realizationDimPoly(I,C);
+}
