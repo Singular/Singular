@@ -141,6 +141,24 @@ attrib(new_pyobj, "new_attr");     // -> error message
 pyobject ll_empty = list();
 ll_empty;
 
+// converting to and from intvec
+intvec v0;
+v0;
+pyobject obj0 = v0;
+obj0;
+
+intvec v=(1,2,3);
+pyobject obj = v;
+obj;
+intvec(obj);
+
+intvec(python_eval("[1,2,9999999999]")); // -> error
+intvec(python_eval("[1,2,list()]"));     // -> error
+
+ring r=0,x,lp;
+def rl = ringlist(r);
+
+python_eval("tuple")(list(rl[1..3]));
 
 tst_status(1);
 $
