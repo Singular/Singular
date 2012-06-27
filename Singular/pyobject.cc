@@ -342,16 +342,20 @@ private:
     case LIST_CMD:   return PythonCastStatic<lists>(value);
     }
 
+    sleftv tmp;
+    BOOLEAN newstruct_equal(int, leftv, leftv); // declaring overloaded '='
+    if (!newstruct_equal(PythonInterpreter::id(), &tmp, value))  
+      return PythonCastStatic<>(&tmp);        
+
     if (typeId > MAX_TOK)       // custom types
     {
       blackbox *bbx = getBlackboxStuff(typeId);
-      sleftv tmp;
-      if (! bbx->blackbox_Op1(PythonInterpreter::id(), &tmp, value) )
-        return PythonCastStatic<>(&tmp);
+      assume(bbx != NULL);
+      if (! bbx->blackbox_Op1(PythonInterpreter::id(), &tmp, value))
+        return PythonCastStatic<>(&tmp);        
     }
-    else
-      Werror("type '%s` incompatible with 'pyobject`", iiTwoOps(typeId));
 
+    Werror("type '%s` incompatible with 'pyobject`", iiTwoOps(typeId));
     return PythonObject();
   }
 };
