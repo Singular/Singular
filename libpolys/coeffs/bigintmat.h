@@ -120,7 +120,7 @@ class bigintmat
       assume (rows() >= 0 && cols() >= 0);
 
       assume (r > 0 && c > 0);
-      assume (r <= rows() && r <= cols());
+      assume (r <= rows() && c <= cols());
 
       const int index = ((r-1)*cols() + (c-1));
 
