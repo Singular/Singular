@@ -2,7 +2,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id$
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -19,6 +18,7 @@
 #include <polys/simpleideals.h>
 #include <misc/intvec.h>
 #include <polys/matpol.h>
+#include <coeffs/bigintmat.h>
 //#include <polys/clapconv.h>
 //#include <kernel/longtrans.h>
 
@@ -61,6 +61,7 @@ BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );
+number singclap_det_bi( bigintmat * m, const coeffs cf);
 
 number   nChineseRemainder(number *x, number *q,int rl, const coeffs r);
 

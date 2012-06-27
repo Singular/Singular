@@ -2,7 +2,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id$
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -24,6 +23,7 @@
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/bigintmat.h>
 
 // #include <kernel/ffields.h>
 
@@ -1429,7 +1429,24 @@ int singclap_det_i( intvec * m, const ring r)
     }
   }
   int res= convFactoryISingI( determinant(M,m->rows()) ) ;
-  Off(SW_RATIONAL); // ?
+  return res;
+}
+
+number singclap_det_bi( bigintmat * m, const coeffs cf)
+{
+  assume(m->basecoeffs()==cf);
+  CFMatrix M(m->rows(),m->cols());
+  int i,j;
+  BOOLEAN setchar=TRUE;
+  for(i=m->rows();i>0;i--)
+  {
+    for(j=m->cols();j>0;j--)
+    {
+      M(i,j)=cf->convSingNFactoryN(BIMATELEM(*m,i,j),setchar,cf);
+      setchar=FALSE;
+    }
+  }
+  number res= cf->convFactoryNSingN( determinant(M,m->rows()),cf ) ;
   return res;
 }
 
