@@ -217,6 +217,10 @@ released;
 released = p;
 released;
 
+proc from_ideal(ideal arg) { pyobject res = "(missing)"; return (res); }
+system("install", "pyobject", "=", from_ideal, 1);
+pyobject ported = ringlist(r);
+ported;
 
 tst_status(1);
 $
