@@ -37,7 +37,7 @@ struct newstruct_desc_s
   int            id;   // the type id assigned to this bb
 };
 
-int newstruct_desc_size() 
+int newstruct_desc_size()
 {
   return sizeof(newstruct_desc_s);
 }
@@ -440,7 +440,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       break;
   }
   newstruct_proc p=nt->procs;
-  
+
   while((p!=NULL) &&( (p->t!=op) || (p->args!=4) )) p=p->next;
 
   if (p!=NULL)
@@ -509,7 +509,22 @@ void *newstruct_Init(blackbox *b)
   return l;
 }
 
-BOOLEAN newstruct_Check(blackbox *b, void *d)
+BOOLEAN newstruct_CheckAssign(blackbox *b, leftv L, leftv R)
+{
+  int lt=L->Typ();
+  int rt=R->Typ();
+  if ((lt!=DEF_CMD)&&(lt!=rt))
+  {
+    Werror("can not assign %s(%d) to member of type %s(%d)",
+            Tok2Cmdname(rt),rt,
+            Tok2Cmdname(lt),lt);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/* check internal structure:
+* BOOLEAN newstruct_Check(blackbox *b, void *d)
 {
   newstruct_desc n=(newstruct_desc)b->data;
   lists l=(lists)d;
@@ -528,6 +543,7 @@ BOOLEAN newstruct_Check(blackbox *b, void *d)
   }
   return FALSE;
 }
+*/
 
 BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
 {
@@ -597,7 +613,7 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->blackbox_Op2=newstruct_Op2;
   //b->blackbox_Op3=blackbox_default_Op3;
   b->blackbox_OpM=newstruct_OpM;
-  b->blackbox_Check=newstruct_Check;
+  b->blackbox_CheckAssign=newstruct_CheckAssign;
   b->blackbox_serialize=newstruct_serialize;
   b->blackbox_deserialize=newstruct_deserialize;
   b->data=d;
