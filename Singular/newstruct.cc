@@ -48,6 +48,36 @@ char * newstruct_String(blackbox *b, void *d)
   else
   {
     newstruct_desc ad=(newstruct_desc)(b->data);
+
+    newstruct_proc p=ad->procs;
+    while((p!=NULL)&&(p->t!=STRING_CMD))
+      p=p->next;
+
+    if (p!=NULL)
+    {
+      leftv sl;
+      sleftv tmp;
+      memset(&tmp,0,sizeof(tmp));
+      tmp.rtyp=ad->id;
+      void * newstruct_Copy(blackbox*, void *); //forward declaration
+      tmp.data=(void*)newstruct_Copy(b,d);
+      idrec hh;
+      memset(&hh,0,sizeof(hh));
+      hh.id=Tok2Cmdname(p->t);
+      hh.typ=PROC_CMD;
+      hh.data.pinf=p->p;
+      sl=iiMake_proc(&hh,NULL,&tmp);
+
+      if (sl->Typ() == STRING_CMD)
+      {
+        char *res = omStrDup((char*)sl->Data());
+        sl->CleanUp();
+        return res;
+      }
+      else
+        sl->CleanUp();      
+    }
+
     lists l=(lists)d;
     newstruct_member a=ad->member;
     StringSetS("");
@@ -132,6 +162,37 @@ void * newstruct_Copy(blackbox*b, void *d)
   return (void*)lCopy_newstruct(n1);
 }
 
+// Used by newstruct_Assign for overloaded '='
+BOOLEAN newstruct_equal(int op, leftv l, leftv r)
+{
+  blackbox *ll=getBlackboxStuff(op);
+  assume(ll->data != NULL);
+  newstruct_desc nt=(newstruct_desc)ll->data;
+  newstruct_proc p=nt->procs;
+  
+  while( (p!=NULL) && ((p->t!='=')||(p->args!=1)) ) p=p->next;
+
+  if (p!=NULL)
+  {
+    leftv sl;
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(r);
+    sl = iiMake_proc(&hh, NULL, &tmp);
+    if (sl != NULL)
+    {
+      if (sl->Typ() == op) { l->Copy(sl); return FALSE;}
+      else sl->CleanUp();
+    }
+  }
+  return TRUE;
+}
+
 BOOLEAN newstruct_Assign(leftv l, leftv r)
 {
   if (r->Typ()>MAX_TOK)
@@ -192,30 +253,8 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
   else
   {
     assume(l->Typ() > MAX_TOK);
-    blackbox *ll=getBlackboxStuff(l->Typ());
-    newstruct_desc nt=(newstruct_desc)ll->data;
-    assume(l->Typ() == nt->id);
-    newstruct_proc p=nt->procs;
-
-    while( (p!=NULL) && ((p->t!='=')||(p->args!=1)) ) p=p->next;
-
-    if (p!=NULL)
-    {
-      idrec hh;
-      memset(&hh,0,sizeof(hh));
-      hh.id=Tok2Cmdname(p->t);
-      hh.typ=PROC_CMD;
-      hh.data.pinf=p->p;
-      sleftv tmp;
-      memset(&tmp,0,sizeof(sleftv));
-      tmp.Copy(r);
-      leftv sl = iiMake_proc(&hh, NULL, &tmp);
-      if (sl != NULL)
-      {
-        if (sl->Typ()==l->Typ()) return newstruct_Assign(l, sl);
-        else sl->CleanUp();
-      }
-    }
+    sleftv tmp;
+    if(!newstruct_equal(l->Typ(), &tmp, r)) return newstruct_Assign(l, &tmp);
   }
   Werror("assign %s(%d) = %s(%d)",
         Tok2Cmdname(l->Typ()),l->Typ(),Tok2Cmdname(r->Typ()),r->Typ());
