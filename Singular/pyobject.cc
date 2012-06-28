@@ -25,6 +25,7 @@
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
+#include <kernel/intvec.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
 
@@ -111,11 +112,11 @@ class PythonObject
 public:
   typedef PyObject* ptr_type;
   struct sequence_tag{};
-  struct null_tag {};
 
   PythonObject(): m_ptr(Py_None) { }
-  PythonObject(null_tag): m_ptr(NULL) { }
-  PythonObject(ptr_type ptr): m_ptr(ptr) {if (!ptr) handle_exception();}
+  PythonObject(ptr_type ptr): m_ptr(ptr) { 
+    if (!ptr && handle_exception()) m_ptr = Py_None;
+  }
 
   ptr_type check_context(ptr_type ptr) const {
     if(ptr) sync_contexts(); 
@@ -134,7 +135,7 @@ public:
     if (op == PythonInterpreter::id())
       return *this;
 
-    return self(null_tag());
+    return self(NULL);
   }
 
   /// Binary and n-ary operations
@@ -153,7 +154,7 @@ public:
       case LIST_CMD:     return args2list(arg);
       case '.': case COLONCOLON: case ATTRIB_CMD: return attr(arg);
     }
-    return self(null_tag());
+    return self(NULL);
   }
 
   /// Ternary operations
@@ -165,7 +166,7 @@ public:
         if(PyObject_SetAttr(*this, arg1, arg2) == -1) handle_exception();
         return self();
     }
-    return self(null_tag());
+    return self(NULL);
   }
 
   /// Get item
@@ -231,7 +232,9 @@ protected:
     return pylist;
   }
 
-  void handle_exception() const {
+  BOOLEAN handle_exception() const {
+
+    if(!PyErr_Occurred()) return FALSE;
     
     PyObject *pType, *pMessage, *pTraceback;
     PyErr_Fetch(&pType, &pMessage, &pTraceback);
@@ -244,6 +247,7 @@ protected:
     Py_XDECREF(pTraceback);
     
     PyErr_Clear();
+    return TRUE;
   }
 
   void append_iter(self iterator) {
@@ -298,6 +302,7 @@ private:
 template <class CastType = PythonObject::ptr_type>
 class PythonCastStatic:
   public PythonObject {
+  typedef PythonCastStatic self;
 public:
 
   PythonCastStatic(void* value):
@@ -309,12 +314,23 @@ public:
 private:
   ptr_type get(ptr_type value)       { return value; }
   ptr_type get(long value)           { return PyInt_FromLong(value); }
+  ptr_type get(int value)            { return PyInt_FromLong((long)value); }
   ptr_type get(const char* value)    { return PyString_FromString(value); }
   ptr_type get(char* value) { return get(const_cast<const char*>(value)); }
+  ptr_type get(intvec* value);       // inlined below
   ptr_type get(lists value);         // inlined after PythonObjectDynamic
 };
 
+template <class CastType>
+inline PythonObject::ptr_type
+PythonCastStatic<CastType>::get(intvec* value)
+{
+  ptr_type pylist(PyList_New(0));
+  for (int idx = 0; idx < value->length(); ++idx)
+    PyList_Append(pylist, self::get((*value)[idx]));
 
+  return pylist;
+}
 
 /** @class PythonCastDynamic
  * This class does conversion of Singular objects to python objects on runtime.
@@ -337,18 +353,23 @@ private:
     case INT_CMD:    return PythonCastStatic<long>(value);
     case STRING_CMD: return PythonCastStatic<const char*>(value);
     case LIST_CMD:   return PythonCastStatic<lists>(value);
+    case INTVEC_CMD: return PythonCastStatic<intvec*>(value);
     }
+
+    sleftv tmp;
+    BOOLEAN newstruct_equal(int, leftv, leftv); // declaring overloaded '='
+    if (!newstruct_equal(PythonInterpreter::id(), &tmp, value))  
+      return PythonCastStatic<>(&tmp);        
 
     if (typeId > MAX_TOK)       // custom types
     {
       blackbox *bbx = getBlackboxStuff(typeId);
-      sleftv tmp;
-      if (! bbx->blackbox_Op1(PythonInterpreter::id(), &tmp, value) )
-        return PythonCastStatic<>(&tmp);
+      assume(bbx != NULL);
+      if (! bbx->blackbox_Op1(PythonInterpreter::id(), &tmp, value))
+        return PythonCastStatic<>(&tmp);        
     }
-    else
-      Werror("type '%s` incompatible with 'pyobject`", iiTwoOps(typeId));
 
+    Werror("type '%s` incompatible with 'pyobject`", iiTwoOps(typeId));
     return PythonObject();
   }
 };
@@ -517,7 +538,7 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
     case TYPEOF_CMD:
       res->data = (void*) omStrDup("pyobject");
       res->rtyp = STRING_CMD;  
-      return FALSE; 
+      return FALSE;
   }
 
   if (!PythonCastStatic<>(head)(op).assign_to(res))
@@ -562,15 +583,15 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   PythonCastDynamic rhs2(arg3);
 
   if (!lhs(op, rhs1, rhs2).assign_to(res))
-    return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
+    return FALSE;
+
+  return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
 }
 
 
 /// blackbox support - n-ary operations
 BOOLEAN pyobject_OpM(int op, leftv res, leftv args)
 {
-  typedef PythonCastStatic<PythonObject::sequence_tag> seq_type;
-
   switch(op)                    // built-in return types first
   {
     case STRING_CMD:
@@ -580,8 +601,30 @@ BOOLEAN pyobject_OpM(int op, leftv res, leftv args)
       res->rtyp = STRING_CMD;
       return FALSE;
     }
-  }
 
+    case INTVEC_CMD:
+      PythonObject obj = PythonCastStatic<>(args->Data());
+      unsigned long len = obj.size();
+
+      intvec* vec = new intvec(len);
+      for(unsigned long idx = 0; idx != len; ++idx) {
+        long value = PyInt_AsLong(obj[idx]);
+        (*vec)[idx] = static_cast<int>(value);
+
+        if ((value == -1) &&  PyErr_Occurred()) {
+          value = 0;
+          PyErr_Clear();
+        }
+        if (value != long((*vec)[idx])) {
+          delete vec;
+          Werror("'pyobject` cannot be converted to intvec");
+          return TRUE;
+        }
+      }
+      res->data = (void *)vec;
+      res->rtyp = op;
+      return FALSE;
+  }
   typedef PythonCastStatic<PythonObject::sequence_tag> seq_type;
   if (! PythonCastStatic<>(args)(op, seq_type(args->next)).assign_to(res))
     return FALSE;

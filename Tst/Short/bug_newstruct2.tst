@@ -73,4 +73,27 @@ system("install", "myunion", "int", to_int, 1);
 poly(uni); // -> x+1
 int(uni);   // -> 17
 
+// ---------------------------------------------------------
+
+newstruct("stringifiable", "int i");
+stringifiable stry;
+stry;
+string(stry);
+
+proc to_str(def arg) { return ("(overloaded)"); }
+system("install", "stringifiable", "string", to_str,1);
+stry;  // print falls back to string
+string(stry);
+
+proc to_str_wrong(def arg) { return (17); }
+system("install", "stringifiable", "string", to_str_wrong,1);
+stry;  // incorrectly converted, fall back to default
+string(stry);
+
+proc printing(def arg) { ("(overloaded)"); }
+system("install", "stringifiable", "print", printing,1);
+
+stry;  // now only print works correctly
+string(stry); // incorrectly converted, fall back to default
+
 tst_status(1);$
