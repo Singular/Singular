@@ -1509,16 +1509,21 @@ BOOLEAN iiAssign(leftv l, leftv r)
       || ((l->rtyp==IDHDL) && ((bt=IDTYP((idhdl)l->data))>MAX_TOK)))
       {
         bb=getBlackboxStuff(bt);
-        like_lists=BB_LIKE_LIST(bb);
+        like_lists=BB_LIKE_LIST(bb); // bb like a list
       }
       else if (((l->rtyp==IDHDL) && (IDTYP((idhdl)l->data)==LIST_CMD))
         || (l->rtyp==LIST_CMD))
       {
-        like_lists=2;
+        like_lists=2; // bb in a list
       }
       if(like_lists)
       {
         if (TEST_V_ALLWARN) PrintS("assign list[..]=...or similiar\n");
+        if (like_lists==1)
+        {
+          // check blackbox/newtype type:
+          if(bb->blackbox_CheckAssign(bb,l,r)) return TRUE;
+        }
         b=jiAssign_list(l,r);
         if((!b) && (like_lists==2))
         {
@@ -1537,11 +1542,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
           h=l->e->next;
           omFreeBin((ADDRESS)l->e, sSubexpr_bin);
           l->e=h;
-        }
-        if ((!b) && (like_lists==1))
-        {
-          // check blackbox/newtype type:
-          if(bb->blackbox_Check(bb,l->Data())) return TRUE;
         }
         return b;
       }

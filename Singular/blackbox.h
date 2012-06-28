@@ -38,8 +38,8 @@ struct  blackbox_struct
   BOOLEAN (*blackbox_Op3)(int op,leftv l, leftv r1,leftv r2, leftv r3);
   /// interpreter: operations with undefined number of operands
   BOOLEAN (*blackbox_OpM)(int op,leftv l, leftv r);
-  /// check internal structure
-  BOOLEAN (*blackbox_Check)(blackbox *b,void *d);
+  /// is an assign of r to l (part of b) impossible?
+  BOOLEAN (*blackbox_CheckAssign)(blackbox *b,leftv l, leftv r);
   /// serialize
   BOOLEAN (*blackbox_serialize)(blackbox *b,void *d, si_link f);
   /// deserialize
