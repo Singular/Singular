@@ -48,6 +48,36 @@ char * newstruct_String(blackbox *b, void *d)
   else
   {
     newstruct_desc ad=(newstruct_desc)(b->data);
+
+    newstruct_proc p=ad->procs;
+    while((p!=NULL)&&(p->t!=STRING_CMD))
+      p=p->next;
+
+    if (p!=NULL)
+    {
+      leftv sl;
+      sleftv tmp;
+      memset(&tmp,0,sizeof(tmp));
+      tmp.rtyp=ad->id;
+      void * newstruct_Copy(blackbox*, void *); //forward declaration
+      tmp.data=(void*)newstruct_Copy(b,d);
+      idrec hh;
+      memset(&hh,0,sizeof(hh));
+      hh.id=Tok2Cmdname(p->t);
+      hh.typ=PROC_CMD;
+      hh.data.pinf=p->p;
+      sl=iiMake_proc(&hh,NULL,&tmp);
+
+      if (sl->Typ() == STRING_CMD)
+      {
+        char *res = omStrDup((char*)sl->Data());
+        sl->CleanUp();
+        return res;
+      }
+      else
+        sl->CleanUp();      
+    }
+
     lists l=(lists)d;
     newstruct_member a=ad->member;
     StringSetS("");
