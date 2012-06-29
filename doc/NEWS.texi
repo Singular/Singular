@@ -27,6 +27,7 @@
 @item fan (@nref{fan})  with 13 new functions (@nref{fan related functions})
 @item cone (@nref{cone}) with 34 new functions (@nref{cone related functions})
 @item polytope(@nref{polytope}) with 13 new functions (@nref{polytope related functions})
+@item user defined type(@nref{User defined types}): many improvements
 @end itemize
 
 @heading Changed @sc{Singular} commands
@@ -39,6 +40,7 @@
 @item new library: parallel.lib (@nref{parallel_lib})
 @item new library: symodstd.lib (@nref{symodstd_lib})
 @item new library: realclassify.lib (@nref{realclassify_lib})
+@item new library: realizationMatroids.lib (@nref{realizationMatroids_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries

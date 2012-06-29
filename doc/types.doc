@@ -4576,12 +4576,16 @@ belong to different rings.
 * Definition of a user defined type::
 * Declaration of objects of a user defined type::
 * Access to elements of a user defined type::
+* Commands for user defined types::
+* Assignments for user defined types::
 @end menu
 
 @c ------------------------------
 @node Definition of a user defined type, Declaration of objects of a user defined type, User defined types, User defined types
 @subsection Definition of a user defined type
 @cindex Definition of a user defined type
+@cindex type,custom
+@cindex custom type
 
 @table @strong
 @item Syntax:
@@ -4678,7 +4682,7 @@ operator @code{.} to access the elements
 @c @c ref
 
 @c ------------------------------
-@node Access to elements of a user defined type, , Declaration of objects of a user defined type, User defined types
+@node Access to elements of a user defined type, Commands for user defined types, Declaration of objects of a user defined type, User defined types
 @subsection Access to elements of a user defined type
 @cindex Access to elements of a user defined type
 
@@ -4692,6 +4696,84 @@ operator @code{.} to access the elements
   ring r;
   A.b=poly(1); // assignment: expression must be of the given type
   A;
+@c example
+@end smallexample
+@c ------------------------------
+@node Commands for user defined types, Assignments for user defined types,Access to elements of a user defined type, User defined types
+@subsection Commands for user defined types
+@cindex Commands for user defined types
+@cindex command,custom
+@cindex custom command
+
+User defined types are normal data types (which do not belong to a ring,
+even if they have ring dependent parts), so they can be passed as argument
+to procedures, and recieved as result from procedures.
+
+In order to apply kernel commands to these types (like @code{string}, @code{+}),
+provide a usual procedure (say @code{proc p}..) for that task and 
+install it via @code{system("install",} user_type @code{,} kernel_command @code{,p,} number_of_args @code{);}.
+The user_type and kernel_command have to be given as strings.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  newstruct("nt","int a,poly b,string c");
+  nt A;
+  A;
+  ring r;
+  // a pretty print routine for nt:
+  proc pretty_print(nt A)
+  {
+    "nt with string c:"+A.c+" and poly:"+string(A.b);
+  }
+  system("install","nt","print",pretty_print,1); // default printing uses print
+  A;
+  // a custem add for nt:
+  proc nt_add(nt A,nt B)
+  {
+    nt C;
+    C.a=A.a+B.a; C.b=A.b+B.b; C.c=A.c+B.c;
+    return(C);
+  }
+  system("install","nt","+",nt_add,2);
+  A.b=x;
+  nt B; B.c="B"; B.b=y;
+  A+B;
+@c example
+@end smallexample
+
+@c ------------------------------
+@node Assignments for user defined types,,Commands for user defined types, User defined types
+@subsection Assignments for user defined types
+@cindex Assignments for user defined types
+@cindex assignment,custom
+@cindex custom assignment
+
+By default, only objects of the same (user defined) type can be assigned,
+there is no automatic type conversion as for the kernel data types.
+
+But the operator @code{=} can be overidden in oder to write custom
+constructors:
+via @code{system("install",} user_type @code{,"="} @code{,p,1);}.
+The user_type has to be given as a string.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  newstruct("wrapping","poly p");
+  proc wrap(poly p)
+  {
+    wrapping w; w.p = p;
+    return  (w);
+  }
+  system("install", "wrapping", "=", wrap, 1);
+  ring r = 0,x,dp;
+  wrapping w = x+1;
+  w;
+  w = int(1); // via conversion int->poly
+  w;
+  w=number(2); // via conversion number->poly
+  w;
 @c example
 @end smallexample
 
