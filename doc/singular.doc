@@ -917,6 +917,7 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
+* realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * symodstd_lib:: Groebner bases for symmetric ideals
 @end menu
 @c ----------------------------------------------------------
@@ -966,12 +967,16 @@ Todos/Issues:
 
 @c lib parallel.lib
 @c ----------------------------------------------------------
-@node realclassify_lib,symodstd_lib, parallel_lib, Experimental libraries
+@node realclassify_lib,realizationMatroids_lib, parallel_lib, Experimental libraries
 @subsection realclassify_lib
 @c lib realclassify.lib
 
 @c ----------------------------------------------------------
-@node symodstd_lib,,realclassify_lib, Experimental libraries
+@node realizationMatroids_lib,symodstd_lib,realclassify_lib, Experimental libraries
+@subsection realizationMatroids_lib
+@c lib realizationMatroids.lib
+@c ----------------------------------------------------------
+@node symodstd_lib,,realizationMatroids_lib, Experimental libraries
 @subsection symodstd_lib
 @c lib symodstd.lib
 
