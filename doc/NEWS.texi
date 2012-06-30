@@ -24,9 +24,9 @@
 @heading New data types
 @itemize @bullet
 @item bigintmat (@nref{bigintmat}) (experimental)
-@item fan (@nref{fan})  with 13 new functions (@nref{fan related functions})
-@item cone (@nref{cone}) with 34 new functions (@nref{cone related functions})
-@item polytope(@nref{polytope}) with 13 new functions (@nref{polytope related functions})
+@item fan (@nref{fan})  improved (@nref{fan related functions})
+@item cone (@nref{cone}) improved (@nref{cone related functions})
+@item polytope(@nref{polytope}) improved (@nref{polytope related functions})
 @item user defined type(@nref{User defined types}): many improvements
 @end itemize
 
@@ -37,10 +37,44 @@
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
+@item new library: realizationMatroids.lib (@nref{realizationMatroids_lib})
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item
+renamed polymake.lib to oldpolymake.lib (@nref{oldpolymake_lib})
+@end itemize
+
+@heading Interface to gfanlib/polymake
+@itemize @bullet
+@item
+use gfanlib via fan/cone/polytope
+@item
+use polymake via @code{polymake.so}
+@end itemize
+
+@heading Internal Changes
+@itemize @bullet
+@item
+factorization code for extension fields improved
+@end itemize
+@heading --------------------------------------------------------------------
+@heading Older versions:
+@heading News for version 3-1-4
+
+@heading New data types
+@itemize @bullet
+@item fan (@nref{fan})  with 13 new functions (@nref{fan related functions})
+@item cone (@nref{cone}) with 34 new functions (@nref{cone related functions})
+@item polytope(@nref{polytope}) with 13 new functions (@nref{polytope related functions})
+@end itemize
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
 @item new library: parallel.lib (@nref{parallel_lib})
 @item new library: symodstd.lib (@nref{symodstd_lib})
 @item new library: realclassify.lib (@nref{realclassify_lib})
-@item new library: realizationMatroids.lib (@nref{realizationMatroids_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
@@ -68,8 +102,7 @@ use polymake via @code{polymake.so}
 @item
 new factorization code for extension fields
 @end itemize
-@heading --------------------------------------------------------------------
-@heading Older versions:
+
 @heading News for version 3-1-3
 @heading User defined types
 New types can be defined, see @nref{User defined types}.
