@@ -2004,22 +2004,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int incremental, int arri, in
       if (w!=NULL)
         r=sba(F,Q,*w,hilb,strat);
       else
-		if (arri == 2)
-		{
-			r=ssg(F,Q,NULL,hilb,strat);
-		}
-		if (arri == 3)
-		{
-			r=ssgnoninc(F,Q,NULL,hilb,strat);
-		}
-		if (arri == 4)
-		{
-			r=ssgincschreyer(F,Q,NULL,hilb,strat);
-		}
-		else
-		{
-			r=sba(F,Q,NULL,hilb,strat);
-		}
+			  r=sba(F,Q,NULL,hilb,strat);
     }
   }
 #ifdef KDEBUG
