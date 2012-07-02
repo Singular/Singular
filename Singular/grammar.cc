@@ -395,7 +395,8 @@ void yyerror(const char * fmt)
      RETURN = 380,
      PARAMETER = 381,
      SYSVAR = 382,
-     UMINUS = 383
+     UMINUS = 383,
+     SBA_CMD = 384
    };
 #endif
 

@@ -261,6 +261,7 @@ void yyerror(const char * fmt)
 %token <i> REDUCE_CMD
 %token <i> REGULARITY_CMD
 %token <i> RES_CMD
+%token <i> SBA_CMD
 %token <i> SIMPLIFY_CMD
 %token <i> SORTVEC_CMD
 %token <i> SRES_CMD
