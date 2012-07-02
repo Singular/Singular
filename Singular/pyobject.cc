@@ -270,6 +270,7 @@ protected:
 private:
   BOOLEAN none_to(leftv result) const
   {
+    Py_XINCREF(m_ptr);
     result->data = NULL;
     result->rtyp = NONE;
     return FALSE;
@@ -444,6 +445,8 @@ BOOLEAN python_run(leftv result, leftv arg)
 
   PyRun_SimpleString(reinterpret_cast<const char*>(arg->Data()));
   sync_contexts();
+
+  Py_XINCREF(Py_None);
   return PythonCastStatic<>(Py_None).assign_to(result);
 }
 
@@ -476,12 +479,14 @@ BOOLEAN python_import(leftv result, leftv value) {
   from_module_import_all(reinterpret_cast<const char*>(value->Data()));
   sync_contexts();
 
+  Py_XINCREF(Py_None);
   return PythonCastStatic<>(Py_None).assign_to(result);
 }
 
 /// blackbox support - initialization
 void* pyobject_Init(blackbox*)
 {
+  Py_XINCREF(Py_None);
   return Py_None;
 }
 
