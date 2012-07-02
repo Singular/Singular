@@ -270,7 +270,7 @@ protected:
 private:
   BOOLEAN none_to(leftv result) const
   {
-    Py_XINCREF(m_ptr);
+    Py_XDECREF(m_ptr);
     result->data = NULL;
     result->rtyp = NONE;
     return FALSE;
