@@ -56,6 +56,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <polys/kbuckets.h>
+#include <polys/prCopy.h>
 //#include "cntrlc.h"
 #include <polys/weight.h>
 #include <misc/intvec.h>
@@ -1496,7 +1497,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (sRing!=currRingOld)
     {
       rChangeCurrRing (sRing);
-      F = idrMoveR (F0, currRingOld);
+      F = idrMoveR (F0, currRingOld, currRing);
     }
   }
 #if 0
@@ -1512,6 +1513,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
+  long zeroreductions = 0;
   LObject L;
   BOOLEAN withT     = FALSE;
   BOOLEAN newrules  = FALSE;
@@ -1554,7 +1556,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif /* KDEBUG */
 
 #ifdef HAVE_TAIL_RING
-  if(!idIs0(F) &&(!rField_is_Ring()))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
+  if(!idIs0(F) &&(!rField_is_Ring(currRing)))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
     kStratInitChangeTailRing(strat);
 #endif
   if (BVERBOSE(23))
@@ -1579,8 +1581,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
       /*
        *stops computation if
@@ -1589,8 +1591,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
        */
       while ((strat->Ll >= 0)
         && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
-        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
-            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
         )
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       if (strat->Ll<0) break;
@@ -1971,16 +1973,16 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   else if (TEST_OPT_PROT) PrintLn();
 
   exitSba(strat);
-  if (TEST_OPT_WEIGHTM)
-  {
-    pRestoreDegProcs(pFDegOld, pLDegOld);
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+//  if (TEST_OPT_WEIGHTM)
+//  {
+//    pRestoreDegProcs(pFDegOld, pLDegOld);
+//    if (ecartWeights)
+//    {
+//      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+//      ecartWeights=NULL;
+//    }
+//  }
+  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
 #ifdef KDEBUG
@@ -2001,8 +2003,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (strat->incremental && sRing!=currRingOld)
   {
     rChangeCurrRing (currRingOld);
-    F0          = idrMoveR (F, sRing);
-    strat->Shdl = idrMoveR_NoSort (strat->Shdl, sRing);
+    F0          = idrMoveR (F, sRing, currRing);
+    strat->Shdl = idrMoveR_NoSort (strat->Shdl, sRing, currRing);
     rDelete (sRing);
   }
   idTest(strat->Shdl);
@@ -2207,7 +2209,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       h.t_p = strat->T[strat->tl].t_p;
       if (h.p!=NULL)
       {
-        if (pOrdSgn==-1)
+        if (currRing->OrdSgn==-1)
         {
           cancelunit(&h);  
           deleteHC(&h, strat);
