@@ -20,7 +20,7 @@
 
 //typedef struct s_buff_s * s_buff;
 
-#define S_BUFF_LEN 128
+#define S_BUFF_LEN 4096
 
 sigset_t ssi_sigmask; // set in ssiLink.cc
 sigset_t ssi_oldmask; // set in ssiLink.cc
