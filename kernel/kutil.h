@@ -66,6 +66,8 @@ extern denominator_list DENOMINATOR_LIST;
 class sTObject
 {
 public:
+  unsigned long sevSig;
+  poly sig;   // the signature of the element
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
   poly t_p;     // t_p \in tailRing: as monomials Lm(t_p) == Lm(p)
   poly max;     // p_GetMaxExpP(pNext(p))
@@ -76,6 +78,18 @@ public:
     pLength,    // either == 0, or == pLength(p)
     i_r;        // index of TObject in R set, or -1 if not in T
   BOOLEAN is_normalized; // true, if pNorm was called on p, false otherwise
+  // used in incremental sba() with F5C:
+  // we know some of the redundant elements in 
+  // strat->T beforehand, so we can just discard
+  // them and do not need to consider them in the
+  // interreduction process
+  BOOLEAN is_redundant;
+  // used in sba's sig-safe reduction:
+  // sometimes we already know that a reducer
+  // is sig-safe, so no need for a real
+  // sig-safeness check
+  BOOLEAN is_sigsafe;
+
 
 #ifdef HAVE_PLURAL  
   BOOLEAN is_special; // true, it is a new special S-poly (e.g. for SCA)
@@ -166,6 +180,14 @@ class sLObject : public sTObject
 
 public:
   unsigned long sev;
+  unsigned long from; // from which polynomial it comes from
+            // this is important for signature-based
+            // algorithms
+  unsigned long checked; // this is the index of S up to which
+                      // the corresponding LObject was already checked in
+                      // critical pair creation => when entering the
+                      // reduction process it is enough to start a second
+                      // rewritten criterion check from checked+1 onwards
   poly  p1,p2; /*- the pair p comes from,
                  lm(pi) in currRing, tail(pi) in tailring -*/
 
@@ -251,8 +273,11 @@ class skStrategy
 public:
   kStrategy next;
   int (*red)(LObject * L,kStrategy strat);
+  int (*red2)(LObject * L,kStrategy strat);
   void (*initEcart)(LObject * L);
   int (*posInT)(const TSet T,const int tl,LObject &h);
+  int (*posInLSba)(const LSet set, const int length,
+                LObject* L,const kStrategy strat);
   int (*posInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
   void (*enterS)(LObject h, int pos,kStrategy strat, int atR/* =-1*/ );
@@ -261,6 +286,9 @@ public:
                    LObject* Lo,const kStrategy strat);
   void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR /*= -1*/);
   void (*chainCrit) (poly p,int ecart,kStrategy strat);
+  BOOLEAN (*syzCrit) (poly sig, unsigned long not_sevSig, kStrategy strat);
+  BOOLEAN (*rewCrit1) (poly sig, unsigned long not_sevSig, kStrategy strat, int start /*= 0*/);
+  BOOLEAN (*rewCrit2) (poly sig, unsigned long not_sevSig, kStrategy strat, int start /*= 0*/);
   pFDegProc pOrigFDeg;
   pLDegProc pOrigLDeg;
   pFDegProc pOrigFDeg_TailRing;
@@ -271,11 +299,24 @@ public:
   ideal D; /*V(S) is in D(D)*/
   ideal M; /*set of minimal generators*/
   polyset S;
+  polyset syz;
+  polyset sig;
   intset ecartS;
+  intset fromS; // from which S[i] S[j] comes from
+                // this is important for signature-based
+                // algorithms
+  intset syzIdx;// index in the syz array at which the first
+                // syzygy of component i comes up
+                // important for signature-based algorithms
+  BOOLEAN incremental;
+  unsigned long currIdx;
+  int max_lower_index;
   intset lenS;
   wlen_set lenSw; /* for tgb.ccc */
   intset fromQ;
   unsigned long* sevS;
+  unsigned long* sevSyz;
+  unsigned long* sevSig;
   unsigned long* sevT;
   TSet T;
   LSet L;
@@ -305,6 +346,7 @@ public:
   int cp,c3;
   int cv; // in shift bases: counting V criterion
   int sl,mu;
+  int syzl,syzmax,syzidxmax;
   int tl,tmax;
   int Ll,Lmax;
   int Bl,Bmax;
@@ -366,12 +408,14 @@ public:
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
 void deleteHC(LObject* L, kStrategy strat, BOOLEAN fromNext = FALSE);
 void deleteInS (int i,kStrategy strat);
+void deleteInSSba (int i,kStrategy strat);
 void cleanT (kStrategy strat);
 static inline LSet initL (int nr=setmaxL)
 { return (LSet)omAlloc(nr*sizeof(LObject)); }
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);
+void enterSSba (LObject p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (const kStrategy strat, const int length, const poly p, 
@@ -380,6 +424,7 @@ int posInT0 (const TSet set,const int length,LObject &p);
 int posInT1 (const TSet set,const int length,LObject &p);
 int posInT2 (const TSet set,const int length,LObject &p);
 int posInT11 (const TSet set,const int length,LObject &p);
+int posInTSig (const TSet set,const int length,LObject &p);
 int posInT110 (const TSet set,const int length,LObject &p);
 int posInT13 (const TSet set,const int length,LObject &p);
 int posInT15 (const TSet set,const int length,LObject &p);
@@ -395,6 +440,10 @@ int posInT_pLength(const TSet set,const int length,LObject &p);
 
 
 void reorderS (int* suc,kStrategy strat);
+int posInLF5C (const LSet set, const int length,
+               LObject* L,const kStrategy strat);
+int posInLSig (const LSet set, const int length,
+               LObject* L,const kStrategy strat);
 int posInL0 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL11 (const LSet set, const int length,
@@ -436,6 +485,9 @@ ideal createG0();
 #endif
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);
+int redSig (LObject* h,kStrategy strat);
+//adds hSig to be able to check with F5's criteria when entering pairs!
+void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
@@ -451,22 +503,46 @@ void initEcartNormal (LObject* h);
 void initEcartBBA (LObject* h);
 void initS (ideal F, ideal Q,kStrategy strat);
 void initSL (ideal F, ideal Q,kStrategy strat);
+void initSLSba (ideal F, ideal Q,kStrategy strat);
+/*************************************************
+ * when initializing a new bunch of principal 
+ * syzygies at the beginning of a new iteration
+ * step in a signature-based algorithm we 
+ * compute ONLY the leading elements of those
+ * syzygies, NOT the whole syzygy
+ * NOTE: this needs to be adjusted for a more
+ * general approach on signature-based algorithms
+ ***********************************************/
+void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
+void enterSyz (LObject p,kStrategy strat);
 void enterT (LObject p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
+void initSbaCrit(kStrategy strat);
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);
 void initBuchMoraPos(kStrategy strat);
+void initSbaPos(kStrategy strat);
 void initBuchMora (ideal F, ideal Q,kStrategy strat);
+void initSbaBuchMora (ideal F, ideal Q,kStrategy strat);
 void exitBuchMora (kStrategy strat);
+void exitSba (kStrategy strat);
 void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
+void enterOnePairSig (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
+void chainCritSig (poly p,int ecart,kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(kStrategy strat);
+BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat);
+BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat);
+KINLINE BOOLEAN arriRewDummy(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
+BOOLEAN arriRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
+BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
+BOOLEAN findMinLMPair(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
 // returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);
 
@@ -540,9 +616,17 @@ BOOLEAN kTest_S(kStrategy strat);
  ***************************************************************/
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing);
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+ideal sba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+ideal ssg (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+ideal ssgincschreyer (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+ideal ssgnoninc (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
 void initBba(ideal F,kStrategy strat);
+void initSba(ideal F,kStrategy strat);
+void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg, 
+          int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
+          intvec *w,intvec *hilb );
 
 /***************************************************************
  *
@@ -564,6 +648,27 @@ void initBba(ideal F,kStrategy strat);
 //            bound of currRing
 int ksReducePoly(LObject* PR,
                  TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+
+// Reduces PR with PW
+// Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
+// Changes: PR
+// Const:   PW
+// If coef != NULL, then *coef is a/gcd(a,b), where a = LC(PR), b = LC(PW)
+// If strat != NULL, tailRing is changed if reduction would violate exp bound
+// of tailRing
+// Returns: 0 everything ok, no tailRing change
+//          1 tailRing has successfully changed (strat != NULL)
+//          2 no reduction performed, tailRing needs to be changed first
+//            (strat == NULL)
+//          3 no reduction performed, not sig-safe!!!
+//         -1 tailRing change could not be performed due to exceeding exp
+//            bound of currRing
+int ksReducePolySig(LObject* PR,
+                 TObject* PW,
+                 long idx,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
@@ -637,6 +742,8 @@ void kStratInitChangeTailRing(kStrategy strat);
 /// Output some debug info about a given strategy
 void kDebugPrint(kStrategy strat);
 
+// getting sb order for sba computations
+ring sbaRing(kStrategy strat, const ring r=currRing, BOOLEAN complete=TRUE, int sgn=1);
 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);

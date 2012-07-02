@@ -33,6 +33,20 @@
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
+
+#define DEBUGF50  0
+#define DEBUGF51  0
+
+#ifdef DEBUGF5
+#undef DEBUGF5
+//#define DEBUGF5 1
+#endif
+
+#define F5C       1
+#if F5C
+  #define F5CTAILRED 0
+#endif
+
 #include <kernel/kutil.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
@@ -477,6 +491,175 @@ int redHomog (LObject* h,kStrategy strat)
 #endif
         h->Clear();
         return -1;
+      }
+    }
+  }
+}
+
+/*2
+*  reduction procedure for signature-based standard
+*  basis algorithms:
+*  all reductions have to be sig-safe!
+*
+*  2 is returned if and only if the pair is rejected by the rewritten criterion
+*  at exactly this point of the computations. This is the last possible point
+*  such a check can be done => checks with the biggest set of available
+*  signatures
+*/
+int redSig (LObject* h,kStrategy strat)
+{
+  if (strat->tl<0) return 1;
+  //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
+  //printf("FDEGS: %ld -- %ld\n",h->FDeg, h->pFDeg());
+  assume(h->FDeg == h->pFDeg());
+//#if 1
+#ifdef DEBUGF5
+  Print("------- IN REDSIG -------\n");
+  Print("p: ");
+  pWrite(pHead(h->p));
+  Print("p1: ");
+  pWrite(pHead(h->p1));
+  Print("p2: ");
+  pWrite(pHead(h->p2));
+  Print("---------------------------\n");
+#endif
+  poly h_p;
+  int i,j,at,pass, ii;
+  int start=0;
+  int sigSafe;
+  unsigned long not_sev;
+  long reddeg,d;
+
+  pass = j = 0;
+  d = reddeg = h->GetpFDeg();
+  h->SetShortExpVector();
+  int li;
+  h_p = h->GetLmTailRing();
+  not_sev = ~ h->sev;
+  loop
+  {
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, start);
+    if (j < 0)
+    {
+      return 1;
+    }
+
+    li = strat->T[j].pLength;
+    ii = j;
+    /*
+     * the polynomial to reduce with (up to the moment) is;
+     * pi with length li
+     */
+    i = j;
+#if 1
+    if (TEST_OPT_LENGTH)
+    loop
+    {
+      /*- search the shortest possible with respect to length -*/
+      i++;
+      if (i > strat->tl)
+        break;
+      if (li<=1)
+        break;
+      if ((strat->T[i].pLength < li)
+         &&
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                               h_p, not_sev, strat->tailRing))
+      {
+        /*
+         * the polynomial to reduce with is now;
+         */
+        li = strat->T[i].pLength;
+        ii = i;
+      }
+    }
+    start = ii+1;
+#endif
+
+    /*
+     * end of search: have to reduce with pi
+     */
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("red:");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[ii].wrp();
+    }
+#endif
+    assume(strat->fromT == FALSE);
+//#if 1
+#ifdef DEBUGF5
+    Print("BEFORE REDUCTION WITH %d:\n",ii);
+    Print("--------------------------------\n");
+    pWrite(h->sig);
+    pWrite(strat->T[ii].sig);
+    pWrite(h->GetLmCurrRing());
+    pWrite(pHead(h->p1));
+    pWrite(pHead(h->p2));
+    pWrite(pHead(strat->T[ii].p));
+    Print("--------------------------------\n");
+    printf("INDEX OF REDUCER T: %d\n",ii);
+#endif
+    sigSafe = ksReducePolySig(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
+    // if reduction has taken place, i.e. the reduction was sig-safe
+    // otherwise start is already at the next position and the loop
+    // searching reducers in T goes on from index start
+//#if 1
+#ifdef DEBUGF5
+    Print("SigSAFE: %d\n",sigSafe);
+#endif
+    if (sigSafe != 3)
+    {
+      // start the next search for reducers in T from the beginning
+      start = 0;
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("\nto ");
+        h->wrp();
+        PrintLn();
+      }
+#endif
+
+      h_p = h->GetLmTailRing();
+      if (h_p == NULL)
+      {
+        if (h->lcm!=NULL) pLmFree(h->lcm);
+#ifdef KDEBUG
+        h->lcm=NULL;
+#endif
+        return 0;
+      }
+      h->SetShortExpVector();
+      not_sev = ~ h->sev;
+      /*
+      * try to reduce the s-polynomial h
+      *test first whether h should go to the lazyset L
+      *-if the degree jumps
+      *-if the number of pre-defined reductions jumps
+      */
+      pass++;
+      if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
+      {
+        h->SetLmCurrRing();
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
+        if (at <= strat->Ll)
+        {
+          int dummy=strat->sl;
+          if (kFindDivisibleByInS(strat, &dummy, h) < 0)
+          {
+            return 1;
+          }
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+          if (TEST_OPT_DEBUG)
+            Print(" lazy: -> L%d\n",at);
+#endif
+          h->Clear();
+          return -1;
+        }
       }
     }
   }
@@ -1295,6 +1478,1439 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   return (strat->Shdl);
 }
+ideal ssgincschreyer (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+{
+	int 
+		time_interred = 0, time_prepare = 0, time_reduction_search = 0, time_reduction = 0,
+		time_add_r = 0, time_filter_b = 0, time_add_b1_testings = 0, time_add_b1_insertion = 0,
+		time_add_b2 = 0;
+
+	time_from_last_call();
+	int current_input_idx = 0;
+	while (F->m[current_input_idx] == NULL && current_input_idx < IDELEMS(F))
+	{
+		++current_input_idx;
+	}
+	ideal I0 = idInit(1);
+	if (current_input_idx >= IDELEMS(F))
+	{
+		return I0;
+	}
+	I0->m[0] = pCopy(F->m[current_input_idx]);
+	int zero_reductions = 0;
+	LabeledPoly::GvwLess gvw_less;
+  poly pEins = pOne();
+	for (current_input_idx +=1; current_input_idx < IDELEMS(F); ++current_input_idx)
+	{
+		if (!F->m[current_input_idx]) continue;
+		idDelDiv(I0);
+		idSkipZeroes(I0);
+#ifndef SSG_NO_INTERRED
+		std::sort(I0->m, I0->m+IDELEMS(I0), LmCompareForNonZeroPolys());
+		
+		ideal I0_tail_reduced = idInit(IDELEMS(I0));
+		//tail reducton
+		for(int n0 = IDELEMS(I0) - 1; n0 > 0; --n0)
+		{
+			poly p_old = NULL;
+			std::swap(p_old,I0->m[n0]);
+			poly p_new = kNF(I0, Q, p_old);
+			pDelete(&p_old);
+			I0_tail_reduced->m[n0] = p_new;
+		}
+		std::swap(I0_tail_reduced->m[0], I0->m[0]);
+		idDelete(&I0);
+		I0 = I0_tail_reduced;
+#endif
+		time_interred += time_from_last_call();
+		LPolysByGvw R;
+		LPolysMuledBySig B;
+    //LabeledPoly* p = LabeledPoly::CreateOneSig(F->m[current_input_idx]);
+    LabeledPoly* p = LabeledPoly::CreateOneSig(F->m[current_input_idx], 
+    current_input_idx);
+		for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+		{
+			R.push_back(LabeledPoly::CreateZeroSig(I0->m[n0]));
+		}
+		const LPolysByGvw::iterator first_zero_sig = R.begin();
+    /*
+		for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+		{
+      for (int m0 = n0-1; m0>=0; --m0)
+      {
+			  R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0], n0, I0->m[m0], m0));
+      }
+		}
+    */
+		for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+		{
+      //R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0]));
+			R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0],current_input_idx+1,F->m[current_input_idx]));
+		}
+				/*
+        printf("\nR-init = \n");
+				for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+				{
+					printf("p = ");pWrite((*ir)->p_);
+					printf("s = ");pWrite((*ir)->s_monom_);
+				}
+        */
+    LabeledPolyMuled bnew;
+    bnew.Init();
+    bnew.FillBy(pEins, *p);
+    LPolysByGvw::iterator known_gvw_greater_p = first_zero_sig;
+    /*
+    const LPolysByGvw::iterator p_insert_pos =
+      R.insert(known_gvw_greater_p, p);
+    */
+    bool rejected = false;
+		SigMuledMinimumFinder b_min_finder(B);
+    /*
+    for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != p_insert_pos;++ir2)
+    {
+      if ((*ir2)->sig_divides(bnew))
+      {
+        rejected = true;
+        break;
+      }
+    }
+    */
+    if (!rejected)
+    {
+      B.push_back(bnew);
+      b_min_finder.UpdateBy(B.size() - 1);
+      bnew.Init();
+      //time_add_b1_insertion += time_from_last_call();
+    }
+    bnew.Release();
+		time_prepare += time_from_last_call();
+    // first test in B
+			if (b_min_finder.minimum_idx_ == SigMuledMinimumFinder::NO_ELEMENTS)
+			{
+				break;
+			}else{
+				p = LabeledPoly::ConvertFromAndRelease(B[b_min_finder.minimum_idx_]);
+				B.erase_and_move_from_back(b_min_finder.minimum_idx_);
+			}
+		while(1)
+		{
+			bool reduced_to_zero = false;
+			LPolysByGvw::iterator known_gvw_greater_p = first_zero_sig;
+#if 1
+      /*
+			if (n ==  IDELEMS(F) - 1)
+			{
+      */
+        /*
+        printf("\nR = \n");
+				for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+				{
+					printf("p = ");pWrite((*ir)->p_);
+					printf("s = ");pWrite((*ir)->s_monom_);
+				}
+				printf("B = \n");
+				for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+				{
+					printf("smuled = ");pWrite((*ib).smuled_monom_);
+          //printf("s = ");pWrite((*ib)->not_muled_.s_monom_);
+				}
+        */
+			/*
+      }
+      */
+#endif
+			while(1)
+			{
+        //printf("p to reduce = ");pWrite (p->p_);
+				bool was_reduced = false;
+				LPolysByGvw::iterator ir = --R.end();
+				while(1)
+				{
+					was_reduced = p->can_reduce_by(*ir);
+					if (was_reduced)
+					{
+						time_reduction_search += time_from_last_call();
+						p->reduce_by(*ir);
+						time_reduction += time_from_last_call();
+						break;
+					}
+					if (ir == known_gvw_greater_p) break;
+					--ir;
+				}
+				if (!was_reduced && ir != R.begin())
+				{
+					--ir;
+					while(1)
+					{
+						if (!gvw_less(p, *ir))
+						{
+							++ir;
+							break;
+						}
+						was_reduced = p->can_reduce_by(*ir);
+						if (was_reduced)
+						{
+							time_reduction_search += time_from_last_call();
+							p->reduce_by(*ir);
+							time_reduction += time_from_last_call();
+							break;
+						}
+						if (ir == R.begin()) break;
+						--ir;
+					}
+					known_gvw_greater_p = ir;
+				}
+				if (!was_reduced) break;
+				reduced_to_zero = p->p_ == NULL;
+				if (reduced_to_zero)
+				{
+					++zero_reductions;
+					known_gvw_greater_p = R.begin();
+					break;
+				}
+			}
+			time_reduction_search += time_from_last_call();
+			const LPolysByGvw::iterator p_insert_pos =
+				R.insert(known_gvw_greater_p, p);
+			time_add_r += time_from_last_call();
+			SigMuledMinimumFinder b_min_finder(B);
+			for(int i=0;i<B.size();)
+			{
+				LabeledPolyMuled& b = B[i];
+				if (p->sig_divides(b) && gvw_less(p,b.not_muled_))
+				{
+					b.Release();
+					B.erase_and_move_from_back(i);
+				}else
+				{
+					b_min_finder.UpdateBy(i);
+					++i;
+				}
+			}
+			time_filter_b += time_from_last_call();
+			if (!reduced_to_zero)
+			{
+				LabeledPolyMuled bnew;
+				bnew.Init();
+				for(LPolysByGvw::const_iterator ir = --R.end();ir != p_insert_pos;--ir)
+				{
+					bnew.FillBy((*ir)->p_, *p);
+					bool rejected = false;
+					for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != p_insert_pos;++ir2)
+					{
+						if ((*ir2)->sig_divides(bnew))
+						{
+							rejected = true;
+							break;
+						}
+					}
+					time_add_b1_testings += time_from_last_call();
+					if (!rejected)
+					{
+						B.push_back(bnew);
+						b_min_finder.UpdateBy(B.size() - 1);
+						bnew.Init();
+						time_add_b1_insertion += time_from_last_call();
+					}
+				}
+				for(LPolysByGvw::const_iterator ir = R.begin();ir != p_insert_pos;++ir)
+				{
+					if (!gvw_less(*ir, p)) break;
+					if ((*ir)->p_ == NULL) continue;
+					bool rejected = false;
+					bnew.FillBy(p->p_, *(*ir));
+					for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != ir;++ir2)
+					{
+						if ((*ir2)->sig_divides(bnew))
+						{
+							rejected = true;
+							break;
+						}
+					}
+					if (!rejected)
+					{
+						B.push_back(bnew);
+						b_min_finder.UpdateBy(B.size() - 1);
+						bnew.Init();
+					}
+				}
+				bnew.Release();
+				time_add_b2 += time_from_last_call();
+			}
+      /*
+				printf("B = \n");
+				for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+				{
+					printf("smuled = ");pWrite((*ib).smuled_monom_);
+          //printf("s = ");pWrite((*ib).not_muled_.s_monom_);
+				}
+        */
+			if (b_min_finder.minimum_idx_ == SigMuledMinimumFinder::NO_ELEMENTS)
+			{
+				break;
+			}else{
+				p = LabeledPoly::ConvertFromAndRelease(B[b_min_finder.minimum_idx_]);
+				B.erase_and_move_from_back(b_min_finder.minimum_idx_);
+			}
+		}
+		idDelete(&I0);
+		I0 = idInit(R.size());
+		int i0_idx = 0;
+		for(LPolysByGvw::iterator ir = R.begin();ir != R.end();++ir,++i0_idx)
+		{
+			std::swap(I0->m[i0_idx], (*ir)->p_);
+			delete (*ir);
+			
+		}
+		R.clear();
+	}
+
+	printf("time time_interred = %d\n", time_interred);
+	printf("time time_prepare = %d\n", time_prepare);
+	printf("time time_reduction_search = %d\n", time_reduction_search);
+	printf("time time_reduction = %d\n", time_reduction);
+	printf("time time_add_r = %d\n", time_add_r);
+	printf("time time_filter_b = %d\n", time_filter_b);
+	printf("time time_add_b1_testings = %d\n", time_add_b1_testings);
+	printf("time time_add_b1_insertion = %d\n", time_add_b1_insertion);
+	printf("time time_add_b2 = %d\n", time_add_b2);
+
+	printf("ZERO REDUCTIONS: %d\n", zero_reductions);
+
+	return I0;
+}
+ideal ssgnoninc (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+{
+  int 
+    time_interred = 0, time_prepare = 0, time_reduction_search = 0, time_reduction = 0,
+                  time_add_r = 0, time_filter_b = 0, time_add_b1_testings = 0, time_add_b1_insertion = 0,
+                  time_add_b2 = 0;
+
+  time_from_last_call();
+  int current_input_idx = 0;
+  while (F->m[current_input_idx] == NULL && current_input_idx < IDELEMS(F))
+  {
+    ++current_input_idx;
+  }
+  ideal I0 = idInit(1);
+  if (current_input_idx >= IDELEMS(F))
+  {
+    return I0;
+  }
+  I0->m[0] = pCopy(F->m[current_input_idx]);
+  int zero_reductions = 0;
+  LabeledPoly::GvwLess gvw_less;
+  poly pEins = pOne();
+  // made these global for non-incremental computation
+  // -------------------------------------------------
+  LPolysByGvw R;
+  LPolysMuledBySig B;
+  SigMuledMinimumFinder b_min_finder(B);
+  LabeledPoly* p;
+  LPolysByGvw::iterator first_zero_sig_temp = R.begin();
+  bool set_first_zero_sig                   = true;
+  // -------------------------------------------------
+  for (current_input_idx +=1; current_input_idx < IDELEMS(F); ++current_input_idx)
+  {
+    if (!F->m[current_input_idx]) continue;
+    idDelDiv(I0);
+    idSkipZeroes(I0);
+#ifndef SSG_NO_INTERRED
+    std::sort(I0->m, I0->m+IDELEMS(I0), LmCompareForNonZeroPolys());
+
+    ideal I0_tail_reduced = idInit(IDELEMS(I0));
+    //tail reducton
+    for(int n0 = IDELEMS(I0) - 1; n0 > 0; --n0)
+    {
+      poly p_old = NULL;
+      std::swap(p_old,I0->m[n0]);
+      poly p_new = kNF(I0, Q, p_old);
+      pDelete(&p_old);
+      I0_tail_reduced->m[n0] = p_new;
+    }
+    std::swap(I0_tail_reduced->m[0], I0->m[0]);
+    idDelete(&I0);
+    I0 = I0_tail_reduced;
+#endif
+    time_interred += time_from_last_call();
+    //LPolysByGvw R;
+    //LPolysMuledBySig B;
+    //LabeledPoly* p = LabeledPoly::CreateOneSig(F->m[current_input_idx]);
+    p = LabeledPoly::CreateOneSig(F->m[current_input_idx], 
+        current_input_idx);
+    for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+    {
+      R.push_back(LabeledPoly::CreateZeroSig(I0->m[n0]));
+    }
+    //const LPolysByGvw::iterator first_zero_sig = R.begin();
+    if (set_first_zero_sig)
+    {
+      first_zero_sig_temp = R.begin();
+      set_first_zero_sig  = false;
+    }
+    /*
+       for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+       {
+       for (int m0 = n0-1; m0>=0; --m0)
+       {
+       R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0], n0, I0->m[m0], m0));
+       }
+       }
+       */
+    for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+    {
+      //R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0]));
+      R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0],current_input_idx+1,F->m[current_input_idx]));
+    }
+    /*
+       printf("\nR-init = \n");
+       for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+       {
+       printf("p = ");pWrite((*ir)->p_);
+       printf("s = ");pWrite((*ir)->s_monom_);
+       }
+       */
+    LabeledPolyMuled bnew;
+    bnew.Init();
+    bnew.FillBy(pEins, *p);
+    LPolysByGvw::iterator known_gvw_greater_p = first_zero_sig_temp;
+    /*
+       const LPolysByGvw::iterator p_insert_pos =
+       R.insert(known_gvw_greater_p, p);
+       */
+    bool rejected = false;
+    //SigMuledMinimumFinder b_min_finder(B);
+    //SigMuledMinimumFinder b_min_finder(B);
+    /*
+       for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != p_insert_pos;++ir2)
+       {
+       if ((*ir2)->sig_divides(bnew))
+       {
+       rejected = true;
+       break;
+       }
+       }
+       */
+    if (!rejected)
+    {
+      B.push_back(bnew);
+      b_min_finder.UpdateBy(B.size() - 1);
+      bnew.Init();
+      //time_add_b1_insertion += time_from_last_call();
+    }
+    bnew.Release();
+  }
+  const LPolysByGvw::iterator first_zero_sig = first_zero_sig_temp;
+  //SigMuledMinimumFinder b_min_finder(B);
+  /*
+  printf("B = \n");
+  for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+  {
+    printf("smuled = ");pWrite((*ib).smuled_monom_);
+    //printf("s = ");pWrite((ib)->not_muled_.s_monom_);
+  }
+  */
+  time_prepare += time_from_last_call();
+  // first test in B
+  if (b_min_finder.minimum_idx_ == SigMuledMinimumFinder::NO_ELEMENTS)
+  {
+    return I0;
+    //break;
+  }else{
+    p = LabeledPoly::ConvertFromAndRelease(B[b_min_finder.minimum_idx_]);
+    B.erase_and_move_from_back(b_min_finder.minimum_idx_);
+  }
+  while(1)
+  {
+    bool reduced_to_zero = false;
+    LPolysByGvw::iterator known_gvw_greater_p = first_zero_sig;
+#if 1
+    /*
+       if (n ==  IDELEMS(F) - 1)
+       {
+       */
+    /*
+       printf("\nR = \n");
+       for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+       {
+       printf("p = ");pWrite((*ir)->p_);
+       printf("s = ");pWrite((*ir)->s_monom_);
+       }
+       printf("B = \n");
+       for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+       {
+       printf("smuled = ");pWrite((*ib).smuled_monom_);
+    //printf("s = ");pWrite((*ib)->not_muled_.s_monom_);
+    }
+    */
+    /*
+       }
+       */
+#endif
+    while(1)
+    {
+      //printf("p to reduce = ");pWrite (p->p_);
+      bool was_reduced = false;
+      LPolysByGvw::iterator ir = --R.end();
+      while(1)
+      {
+        was_reduced = p->can_reduce_by(*ir);
+        if (was_reduced)
+        {
+          time_reduction_search += time_from_last_call();
+          p->reduce_by(*ir);
+          time_reduction += time_from_last_call();
+          break;
+        }
+        if (ir == known_gvw_greater_p) break;
+        --ir;
+      }
+      if (!was_reduced && ir != R.begin())
+      {
+        --ir;
+        while(1)
+        {
+          if (!gvw_less(p, *ir))
+          {
+            ++ir;
+            break;
+          }
+          was_reduced = p->can_reduce_by(*ir);
+          if (was_reduced)
+          {
+            time_reduction_search += time_from_last_call();
+            p->reduce_by(*ir);
+            time_reduction += time_from_last_call();
+            break;
+          }
+          if (ir == R.begin()) break;
+          --ir;
+        }
+        known_gvw_greater_p = ir;
+      }
+      if (!was_reduced) break;
+      reduced_to_zero = p->p_ == NULL;
+      if (reduced_to_zero)
+      {
+        ++zero_reductions;
+        known_gvw_greater_p = R.begin();
+        break;
+      }
+    }
+    time_reduction_search += time_from_last_call();
+    const LPolysByGvw::iterator p_insert_pos =
+      R.insert(known_gvw_greater_p, p);
+    time_add_r += time_from_last_call();
+    SigMuledMinimumFinder b_min_finder(B);
+    for(int i=0;i<B.size();)
+    {
+      LabeledPolyMuled& b = B[i];
+      if (p->sig_divides(b) && gvw_less(p,b.not_muled_))
+      {
+        b.Release();
+        B.erase_and_move_from_back(i);
+      }else
+      {
+        b_min_finder.UpdateBy(i);
+        ++i;
+      }
+    }
+    time_filter_b += time_from_last_call();
+    if (!reduced_to_zero)
+    {
+      LabeledPolyMuled bnew;
+      bnew.Init();
+       /*
+        printf("\nR = \n");
+       for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+       {
+       printf("p = ");pWrite((*ir)->p_);
+       printf("s = ");pWrite((*ir)->s_monom_);
+       }
+       */
+      for(LPolysByGvw::const_iterator ir = --R.end();ir != p_insert_pos;--ir)
+      {
+        //printf ("pNew = "); pWrite(p->p_);
+        bnew.FillBy((*ir)->p_, *p);
+        bool rejected = false;
+        for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != p_insert_pos;++ir2)
+        {
+          if ((*ir2)->sig_divides(bnew))
+          {
+            rejected = true;
+            break;
+          }
+        }
+        time_add_b1_testings += time_from_last_call();
+        if (!rejected)
+        {
+          B.push_back(bnew);
+          b_min_finder.UpdateBy(B.size() - 1);
+          bnew.Init();
+          time_add_b1_insertion += time_from_last_call();
+        }
+      }
+      for(LPolysByGvw::const_iterator ir = R.begin();ir != p_insert_pos;++ir)
+      {
+        if (!gvw_less(*ir, p)) break;
+        if ((*ir)->p_ == NULL) continue;
+        bool rejected = false;
+        bnew.FillBy(p->p_, *(*ir));
+        for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != ir;++ir2)
+        {
+          if ((*ir2)->sig_divides(bnew))
+          {
+            rejected = true;
+            break;
+          }
+        }
+        if (!rejected)
+        {
+          B.push_back(bnew);
+          b_min_finder.UpdateBy(B.size() - 1);
+          bnew.Init();
+        }
+      }
+      bnew.Release();
+      time_add_b2 += time_from_last_call();
+    }
+    /*
+       printf("B = \n");
+       for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+       {
+       printf("smuled = ");pWrite((*ib).smuled_monom_);
+    //printf("s = ");pWrite((*ib).not_muled_.s_monom_);
+    }
+    */
+    if (b_min_finder.minimum_idx_ == SigMuledMinimumFinder::NO_ELEMENTS)
+    {
+      break;
+    }else{
+      p = LabeledPoly::ConvertFromAndRelease(B[b_min_finder.minimum_idx_]);
+      B.erase_and_move_from_back(b_min_finder.minimum_idx_);
+    }
+  }
+  idDelete(&I0);
+  I0 = idInit(R.size());
+  int i0_idx = 0;
+  for(LPolysByGvw::iterator ir = R.begin();ir != R.end();++ir,++i0_idx)
+  {
+    std::swap(I0->m[i0_idx], (*ir)->p_);
+    delete (*ir);
+
+  }
+  R.clear();
+
+  printf("time time_interred = %d\n", time_interred);
+  printf("time time_prepare = %d\n", time_prepare);
+  printf("time time_reduction_search = %d\n", time_reduction_search);
+  printf("time time_reduction = %d\n", time_reduction);
+  printf("time time_add_r = %d\n", time_add_r);
+  printf("time time_filter_b = %d\n", time_filter_b);
+  printf("time time_add_b1_testings = %d\n", time_add_b1_testings);
+  printf("time time_add_b1_insertion = %d\n", time_add_b1_insertion);
+  printf("time time_add_b2 = %d\n", time_add_b2);
+
+  printf("ZERO REDUCTIONS: %d\n", zero_reductions);
+
+  return I0;
+}
+ideal ssg (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+{
+	int 
+		time_interred = 0, time_prepare = 0, time_reduction_search = 0, time_reduction = 0,
+		time_add_r = 0, time_filter_b = 0, time_add_b1_testings = 0, time_add_b1_insertion = 0,
+		time_add_b2 = 0;
+
+	time_from_last_call();
+	int current_input_idx = 0;
+	while (F->m[current_input_idx] == NULL && current_input_idx < IDELEMS(F))
+	{
+		++current_input_idx;
+	}
+	ideal I0 = idInit(1);
+	if (current_input_idx >= IDELEMS(F))
+	{
+		return I0;
+	}
+	I0->m[0] = pCopy(F->m[current_input_idx]);
+	int zero_reductions = 0;
+	LabeledPoly::GvwLess gvw_less;
+	for (current_input_idx +=1; current_input_idx < IDELEMS(F); ++current_input_idx)
+	{
+		if (!F->m[current_input_idx]) continue;
+		idDelDiv(I0);
+		idSkipZeroes(I0);
+#ifndef SSG_NO_INTERRED
+		std::sort(I0->m, I0->m+IDELEMS(I0), LmCompareForNonZeroPolys());
+		
+		ideal I0_tail_reduced = idInit(IDELEMS(I0));
+		//tail reducton
+		for(int n0 = IDELEMS(I0) - 1; n0 > 0; --n0)
+		{
+			poly p_old = NULL;
+			std::swap(p_old,I0->m[n0]);
+			poly p_new = kNF(I0, Q, p_old);
+			pDelete(&p_old);
+			I0_tail_reduced->m[n0] = p_new;
+		}
+		std::swap(I0_tail_reduced->m[0], I0->m[0]);
+		idDelete(&I0);
+		I0 = I0_tail_reduced;
+#endif
+		time_interred += time_from_last_call();
+		LPolysByGvw R;
+		LPolysMuledBySig B;
+		LabeledPoly* p = LabeledPoly::CreateOneSig(F->m[current_input_idx]);
+		for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+		{
+			R.push_back(LabeledPoly::CreateZeroSig(I0->m[n0]));
+		}
+		const LPolysByGvw::iterator first_zero_sig = R.begin();
+		for(int n0 = IDELEMS(I0) - 1; n0 >=0; --n0)
+		{
+			R.push_front(LabeledPoly::CreateZeroPoly(I0->m[n0]));
+		}
+    /*
+				printf("\nR-init = \n");
+				for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+				{
+					printf("p = ");pWrite((*ir)->p_);
+					printf("s = ");pWrite((*ir)->s_monom_);
+				}
+    */
+		time_prepare += time_from_last_call();
+		while(1)
+		{
+			bool reduced_to_zero = false;
+			LPolysByGvw::iterator known_gvw_greater_p = first_zero_sig;
+#if 1
+      /*
+			if (n ==  IDELEMS(F) - 1)
+			{
+      */
+				/*
+        printf("\nR = \n");
+				for(LPolysByGvw::iterator ir = R.begin(); ir != R.end(); ++ir)
+				{
+					printf("p = ");pWrite((*ir)->p_);
+					printf("s = ");pWrite((*ir)->s_monom_);
+				}
+				printf("B = \n");
+				for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+				{
+					printf("smuled = ");pWrite((*ib).smuled_monom_);
+          //printf("s = ");pWrite((*ib)->not_muled_.s_monom_);
+				}
+        */
+			/*
+      }
+      */
+#endif
+			while(1)
+			{
+				bool was_reduced = false;
+				LPolysByGvw::iterator ir = --R.end();
+        //printf("p to reduce = ");pWrite (p->p_);
+				while(1)
+				{
+					was_reduced = p->can_reduce_by(*ir);
+					if (was_reduced)
+					{
+						time_reduction_search += time_from_last_call();
+						p->reduce_by(*ir);
+						time_reduction += time_from_last_call();
+						break;
+					}
+					if (ir == known_gvw_greater_p) break;
+					--ir;
+				}
+				if (!was_reduced && ir != R.begin())
+				{
+					--ir;
+					while(1)
+					{
+						if (!gvw_less(p, *ir))
+						{
+							++ir;
+							break;
+						}
+						was_reduced = p->can_reduce_by(*ir);
+						if (was_reduced)
+						{
+							time_reduction_search += time_from_last_call();
+							p->reduce_by(*ir);
+							time_reduction += time_from_last_call();
+							break;
+						}
+						if (ir == R.begin()) break;
+						--ir;
+					}
+					known_gvw_greater_p = ir;
+				}
+				if (!was_reduced) break;
+				reduced_to_zero = p->p_ == NULL;
+				if (reduced_to_zero)
+				{
+					++zero_reductions;
+					known_gvw_greater_p = R.begin();
+					break;
+				}
+			}
+			time_reduction_search += time_from_last_call();
+			const LPolysByGvw::iterator p_insert_pos =
+				R.insert(known_gvw_greater_p, p);
+			time_add_r += time_from_last_call();
+			SigMuledMinimumFinder b_min_finder(B);
+			for(int i=0;i<B.size();)
+			{
+				LabeledPolyMuled& b = B[i];
+				if (p->sig_divides(b) && gvw_less(p,b.not_muled_))
+				{
+					b.Release();
+					B.erase_and_move_from_back(i);
+				}else
+				{
+					b_min_finder.UpdateBy(i);
+					++i;
+				}
+			}
+			time_filter_b += time_from_last_call();
+			if (!reduced_to_zero)
+			{
+				LabeledPolyMuled bnew;
+				bnew.Init();
+				for(LPolysByGvw::const_iterator ir = --R.end();ir != p_insert_pos;--ir)
+				{
+					bnew.FillBy((*ir)->p_, *p);
+					bool rejected = false;
+					for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != p_insert_pos;++ir2)
+					{
+						if ((*ir2)->sig_divides(bnew))
+						{
+							rejected = true;
+							break;
+						}
+					}
+					time_add_b1_testings += time_from_last_call();
+					if (!rejected)
+					{
+						B.push_back(bnew);
+						b_min_finder.UpdateBy(B.size() - 1);
+						bnew.Init();
+						time_add_b1_insertion += time_from_last_call();
+					}
+				}
+				for(LPolysByGvw::const_iterator ir = R.begin();ir != p_insert_pos;++ir)
+				{
+					if (!gvw_less(*ir, p)) break;
+					if ((*ir)->p_ == NULL) continue;
+					bool rejected = false;
+					bnew.FillBy(p->p_, *(*ir));
+					for(LPolysByGvw::const_iterator ir2 = R.begin();ir2 != ir;++ir2)
+					{
+						if ((*ir2)->sig_divides(bnew))
+						{
+							rejected = true;
+							break;
+						}
+					}
+					if (!rejected)
+					{
+						B.push_back(bnew);
+						b_min_finder.UpdateBy(B.size() - 1);
+						bnew.Init();
+					}
+				}
+				bnew.Release();
+				time_add_b2 += time_from_last_call();
+			}
+				/*
+        printf("B = \n");
+				for(LPolysMuledBySig::iterator ib = B.begin(); ib != B.end(); ++ib)
+				{
+					printf("smuled = ");pWrite((*ib).smuled_monom_);
+          //printf("s = ");pWrite((*ib).not_muled_.s_monom_);
+				}
+        */
+			if (b_min_finder.minimum_idx_ == SigMuledMinimumFinder::NO_ELEMENTS)
+			{
+				break;
+			}else{
+				p = LabeledPoly::ConvertFromAndRelease(B[b_min_finder.minimum_idx_]);
+				B.erase_and_move_from_back(b_min_finder.minimum_idx_);
+			}
+      
+		}
+		idDelete(&I0);
+		I0 = idInit(R.size());
+		int i0_idx = 0;
+		for(LPolysByGvw::iterator ir = R.begin();ir != R.end();++ir,++i0_idx)
+		{
+			std::swap(I0->m[i0_idx], (*ir)->p_);
+			delete (*ir);
+			
+		}
+		R.clear();
+	}
+
+	printf("time time_interred = %d\n", time_interred);
+	printf("time time_prepare = %d\n", time_prepare);
+	printf("time time_reduction_search = %d\n", time_reduction_search);
+	printf("time time_reduction = %d\n", time_reduction);
+	printf("time time_add_r = %d\n", time_add_r);
+	printf("time time_filter_b = %d\n", time_filter_b);
+	printf("time time_add_b1_testings = %d\n", time_add_b1_testings);
+	printf("time time_add_b1_insertion = %d\n", time_add_b1_insertion);
+	printf("time time_add_b2 = %d\n", time_add_b2);
+
+	printf("ZERO REDUCTIONS: %d\n", zero_reductions);
+
+	return I0;
+}
+ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+{
+  // ring order stuff:
+  // in sba we have (until now) two possibilities:
+  // 1. an incremental computation w.r.t. (C,monomial order)
+  // 2. a (possibly non-incremental) computation w.r.t. the 
+  //    induced Schreyer order.
+  // The corresponding orders are computed in sbaRing(), depending
+  // on the flag strat->incremental
+  ideal F = F0;
+  ring sRing, currRingOld;
+  currRingOld  = currRing; 
+  if (strat->incremental)
+  {
+    sRing = sbaRing(strat);
+    if (sRing!=currRingOld)
+    {
+      rChangeCurrRing (sRing);
+      F = idrMoveR (F0, currRingOld);
+    }
+  }
+#if 0
+  printf("SBA COMPUTATIONS DONE IN THE FOLLOWING RING:\n");
+  rWrite (currRing);
+  printf("\n");
+#endif
+#ifdef KDEBUG
+  bba_count++;
+  int loop_count = 0;
+#endif /* KDEBUG */
+  om_Opts.MinTrack = 5;
+  int   srmax,lrmax, red_result = 1;
+  int   olddeg,reduc;
+  int hilbeledeg=1,hilbcount=0,minimcnt=0;
+  LObject L;
+  BOOLEAN withT     = FALSE;
+  BOOLEAN newrules  = FALSE;
+  strat->max_lower_index = 0;
+
+  //initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initSbaCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initSbaPos(strat);
+  //initBuchMoraPos(strat);
+  initHilbCrit(F,Q,&hilb,strat);
+  initSba(F,strat);
+  /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
+  /*Shdl=*/initSbaBuchMora(F, Q,strat);
+  if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
+  srmax = strat->sl;
+  reduc = olddeg = lrmax = 0;
+
+#ifndef NO_BUCKETS
+  if (!TEST_OPT_NOT_BUCKETS)
+    strat->use_buckets = 1;
+#endif
+
+  // redtailBBa against T for inhomogenous input
+  if (!TEST_OPT_OLDSTD)
+    withT = ! strat->homog;
+
+  // strat->posInT = posInT_pLength;
+  kTest_TS(strat);
+
+#ifdef KDEBUG
+#if MYTEST
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("bba start GB: currRing: ");
+    // rWrite(currRing);PrintLn();
+    rDebugPrint(currRing);
+    PrintLn();
+  }
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
+#ifdef HAVE_TAIL_RING
+  if(!idIs0(F) &&(!rField_is_Ring()))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
+    kStratInitChangeTailRing(strat);
+#endif
+  if (BVERBOSE(23))
+  {
+    if (test_PosInT!=NULL) strat->posInT=test_PosInT;
+    if (test_PosInL!=NULL) strat->posInL=test_PosInL;
+    kDebugPrint(strat);
+  }
+
+
+#ifdef KDEBUG
+  //kDebugPrint(strat);
+#endif
+  /* compute------------------------------------------------------- */
+  arriAgain:
+  while (strat->Ll >= 0)
+  {
+    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+    #ifdef KDEBUG
+      loop_count++;
+      if (TEST_OPT_DEBUG) messageSets(strat);
+    #endif
+    if (strat->Ll== 0) strat->interpt=TRUE;
+    if (TEST_OPT_DEGBOUND
+        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
+    {
+      /*
+       *stops computation if
+       * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+       *a predefined number Kstd1_deg
+       */
+      while ((strat->Ll >= 0)
+        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
+        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+        )
+        deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      if (strat->Ll<0) break;
+      else strat->noClearS=TRUE;
+    }
+    if (strat->incremental && pGetComp(strat->L[strat->Ll].sig) != strat->currIdx)
+    {
+      strat->currIdx  = pGetComp(strat->L[strat->Ll].sig);
+#if F5C
+      // 1. interreduction of the current standard basis
+      // 2. generation of new principal syzygy rules for syzCriterion
+      f5c ( strat, olddeg, minimcnt, hilbeledeg, hilbcount, srmax, 
+            lrmax, reduc, Q, w, hilb );
+#endif
+      // initialize new syzygy rules for the next iteration step  
+      initSyzRules(strat);
+    }
+    /*********************************************************************
+     * interrreduction step is done, we can go on with the next iteration
+     * step of the signature-based algorithm
+     ********************************************************************/
+    /* picks the last element from the lazyset L */
+    strat->P = strat->L[strat->Ll];
+    strat->Ll--;
+//#if 1
+#ifdef DEBUGF5
+    Print("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
+    Print("-------------------------------------------------\n");
+    pWrite(strat->P.sig);
+    pWrite(pHead(strat->P.p));
+    pWrite(pHead(strat->P.p1));
+    pWrite(pHead(strat->P.p2));
+    Print("-------------------------------------------------\n");
+#endif
+    if (pNext(strat->P.p) == strat->tail)
+    {
+      // deletes the short spoly
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        pLmDelete(strat->P.p);
+      else
+#endif
+        pLmFree(strat->P.p);
+
+      // TODO: needs some masking
+      // TODO: masking needs to vanish once the signature
+      //       sutff is completely implemented
+      strat->P.p = NULL;
+      poly m1 = NULL, m2 = NULL;
+
+      // check that spoly creation is ok
+      while (strat->tailRing != currRing &&
+             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+      {
+        assume(m1 == NULL && m2 == NULL);
+        // if not, change to a ring where exponents are at least
+        // large enough
+        if (!kStratChangeTailRing(strat))
+        {
+          WerrorS("OVERFLOW...");
+          break;
+        }
+      }
+      // create the real one
+      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+                    strat->tailRing, m1, m2, strat->R);
+
+    }
+    else if (strat->P.p1 == NULL)
+    {
+      if (strat->minim > 0)
+        strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
+      // for input polys, prepare reduction
+      strat->P.PrepareRed(strat->use_buckets);
+    }
+
+    if (strat->P.p == NULL && strat->P.t_p == NULL)
+    {
+      red_result = 0;
+    }
+    else
+    {
+      if (TEST_OPT_PROT)
+        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+                &olddeg,&reduc,strat, red_result);
+
+//#if 1
+#ifdef DEBUGF5
+      Print("Poly before red: ");
+      pWrite(strat->P.p);
+#endif
+      /* reduction of the element choosen from L */
+      if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1))
+        red_result = strat->red(&strat->P,strat);
+      else
+      {
+        if (strat->P.lcm!=NULL)
+          pLmFree(strat->P.lcm);
+        red_result = 2;
+      }
+      if (errorreported)  break;
+    }
+
+    if (strat->overflow)
+    {
+        if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
+    }
+    if (strat->incremental)
+    {
+      for (int jj = 0; jj<strat->tl+1; jj++)
+      {
+        if (pGetComp(strat->T[jj].sig) == strat->currIdx)
+        {
+          strat->T[jj].is_sigsafe = FALSE;
+        }
+      }
+    }
+    else
+    {
+      for (int jj = 0; jj<strat->tl+1; jj++)
+      {
+        strat->T[jj].is_sigsafe = FALSE;
+      }
+    }
+
+    // reduction to non-zero new poly
+    if (red_result == 1)
+    {
+      // get the polynomial (canonicalize bucket, make sure P.p is set)
+      strat->P.GetP(strat->lmBin);
+      
+      // sig-safe computations may lead to wrong FDeg computation, thus we need 
+      // to recompute it to make sure everything is alright
+      (strat->P).FDeg = (strat->P).pFDeg();
+      // in the homogeneous case FDeg >= pFDeg (sugar/honey)
+      // but now, for entering S, T, we reset it
+      // in the inhomogeneous case: FDeg == pFDeg
+      if (strat->homog) strat->initEcart(&(strat->P));
+
+      /* statistic */
+      if (TEST_OPT_PROT) PrintS("s");
+
+      //int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+      // in F5E we know that the last reduced element is already the
+      // the one with highest signature
+      int pos = strat->sl+1;
+
+#ifdef KDEBUG
+#if MYTEST
+      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
+      // reduce the tail and normalize poly
+      // in the ring case we cannot expect LC(f) = 1,
+      // therefore we call pContent instead of pNorm
+      /*
+      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+      {
+        strat->P.pCleardenom();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+        {
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          strat->P.pCleardenom();
+        }
+      }
+      else
+      {
+        strat->P.pNorm();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+      }
+      */
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
+#if MYTEST
+//#if 1
+      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
+      // min_std stuff
+      if ((strat->P.p1==NULL) && (strat->minim>0))
+      {
+        if (strat->minim==1)
+        {
+          strat->M->m[minimcnt]=p_Copy(strat->P.p,currRing,strat->tailRing);
+          p_Delete(&strat->P.p2, currRing, strat->tailRing);
+        }
+        else
+        {
+          strat->M->m[minimcnt]=strat->P.p2;
+          strat->P.p2=NULL;
+        }
+        if (strat->tailRing!=currRing && pNext(strat->M->m[minimcnt])!=NULL)
+          pNext(strat->M->m[minimcnt])
+            = strat->p_shallow_copy_delete(pNext(strat->M->m[minimcnt]),
+                                           strat->tailRing, currRing,
+                                           currRing->PolyBin);
+        minimcnt++;
+      }
+
+      // enter into S, L, and T
+      //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      if(!strat->incremental)
+      {
+        BOOLEAN overwrite = TRUE;
+        for (int tk=0; tk<strat->sl+1; tk++)
+        {
+          if (pGetComp(strat->sig[tk]) == pGetComp(strat->P.sig))
+          {
+            //printf("TK %d / %d\n",tk,strat->sl);
+            overwrite = FALSE;
+            break;
+          }
+        }
+        //printf("OVERWRITE %d\n",overwrite);
+        if (overwrite)
+        {
+          int cmp = pGetComp(strat->P.sig);
+          int* vv = (int*)omAlloc((currRing->N+1)*sizeof(int));
+          pGetExpV (strat->P.p,vv);
+          pSetExpV (strat->P.sig, vv);
+          pSetComp (strat->P.sig,cmp);
+
+          strat->P.sevSig = pGetShortExpVector (strat->P.sig);
+          for(int ps=0;ps<strat->sl+1;ps++)
+          {
+            int i = strat->syzl;
+
+            strat->newt = TRUE;
+            if (strat->syzl == strat->syzmax)
+            {
+              pEnlargeSet(&strat->syz,strat->syzmax,setmaxTinc);
+              strat->sevSyz = (unsigned long*) omRealloc0Size(strat->sevSyz,
+                  (strat->syzmax)*sizeof(unsigned long),
+                  ((strat->syzmax)+setmaxTinc)
+                  *sizeof(unsigned long));
+              strat->syzmax += setmaxTinc;
+            }
+            strat->syz[i] = pCopy(strat->P.sig);
+            // add LM(F->m[i]) to the signature to get a Schreyer order
+            // without changing the underlying polynomial ring at all
+            p_ExpVectorAdd (strat->syz[i],strat->S[ps],currRing);  
+            // since p_Add_q() destroys all input
+            // data we need to recreate help 
+            // each time
+            // ----------------------------------------------------------
+            // in the Schreyer order we always know that the multiplied 
+            // module monomial strat->P.sig gives the leading monomial of
+            // the corresponding principal syzygy
+            // => we do not need to compute the "real" syzygy completely
+            poly help = pCopy(strat->sig[ps]);
+            p_ExpVectorAdd (help,strat->P.p,currRing);  
+            strat->syz[i] = p_Add_q(strat->syz[i],help,currRing);
+            //printf("%d. SYZ  ",i+1);
+            //pWrite(strat->syz[i]);
+            strat->sevSyz[i] = p_GetShortExpVector(strat->syz[i],currRing);
+            strat->syzl++;
+          }
+        }
+      }
+        enterT(strat->P, strat);
+        strat->T[strat->tl].is_sigsafe = FALSE;
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+      else
+#endif
+        enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+      // posInS only depends on the leading term
+      strat->enterS(strat->P, pos, strat, strat->tl);
+//#if 1
+#if DEBUGF50
+    printf("---------------------------\n");
+    Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
+    Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
+    Print("SIGNATURE:  "); pWrite(strat->sig[strat->sl]);
+#endif
+      /*
+      if (newrules)
+      {
+        newrules  = FALSE;
+      }
+      */
+#if 0
+      int pl=pLength(strat->P.p);
+      if (pl==1)
+      {
+        //if (TEST_OPT_PROT)
+        //PrintS("<1>");
+      }
+      else if (pl==2)
+      {
+        //if (TEST_OPT_PROT)
+        //PrintS("<2>");
+      }
+#endif
+      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+//      Print("[%d]",hilbeledeg);
+      if (strat->P.lcm!=NULL)
+#ifdef HAVE_RINGS
+        pLmDelete(strat->P.lcm);
+#else
+        pLmFree(strat->P.lcm);
+#endif
+      if (strat->sl>srmax) srmax = strat->sl;
+    }
+    else
+    {
+      // adds signature of the zero reduction to
+      // strat->syz. This is the leading term of
+      // syzygy and can be used in syzCriterion()
+      // the signature is added if and only if the
+      // pair was not detected by the rewritten criterion in strat->red = redSig
+      if (red_result!=2) {
+        zeroreductions++;
+        enterSyz(strat->P,strat);
+//#if 1
+#ifdef DEBUGF5
+        Print("ADDING STUFF TO SYZ :  ");
+        pWrite(strat->P.p);
+        pWrite(strat->P.sig);
+#endif
+      }
+      if (strat->P.p1 == NULL && strat->minim > 0)
+      {
+        p_Delete(&strat->P.p2, currRing, strat->tailRing);
+      }
+    }
+
+#ifdef KDEBUG
+    memset(&(strat->P), 0, sizeof(strat->P));
+#endif /* KDEBUG */
+    kTest_TS(strat);
+  }
+#ifdef KDEBUG
+#if MYTEST
+  PrintS("bba finish GB: currRing: "); rWrite(currRing);
+#endif /* MYTEST */
+  if (TEST_OPT_DEBUG) messageSets(strat);
+#endif /* KDEBUG */
+
+  if (TEST_OPT_SB_1)
+  {
+    int k=1;
+    int j;
+    while(k<=strat->sl)
+    {
+      j=0;
+      loop
+      {
+        if (j>=k) break;
+        clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+        j++;
+      }
+      k++;
+    }
+  }
+
+  /* complete reduction of the standard basis--------- */
+  if (TEST_OPT_REDSB)
+  {
+    completeReduce(strat);
+#ifdef HAVE_TAIL_RING
+    if (strat->completeReduce_retry)
+    {
+      // completeReduce needed larger exponents, retry
+      // to reduce with S (instead of T)
+      // and in currRing (instead of strat->tailRing)
+      cleanT(strat);strat->tailRing=currRing;
+      int i;
+      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+      completeReduce(strat);
+    }
+#endif
+  }
+  else if (TEST_OPT_PROT) PrintLn();
+
+  exitSba(strat);
+  if (TEST_OPT_WEIGHTM)
+  {
+    pRestoreDegProcs(pFDegOld, pLDegOld);
+    if (ecartWeights)
+    {
+      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      ecartWeights=NULL;
+    }
+  }
+  if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+  if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+
+#ifdef KDEBUG
+#if MYTEST
+  PrintS("bba_end: currRing: "); rWrite(currRing);
+#endif /* MYTEST */
+#endif /* KDEBUG */
+  // using F5C it is possible that there is some data stored in the last
+  // entries of strat->Shdl which are dirty, i.e. not correct, but also not NULL
+  // => we need to delete them before return the ideal
+#if F5C
+  for(int i=strat->sl+1;i<IDELEMS(strat->Shdl);i++)
+  {
+    //pDelete (&strat->Shdl->m[i]);
+    strat->Shdl->m[i] = NULL;
+  }
+#endif
+  if (strat->incremental && sRing!=currRingOld)
+  {
+    rChangeCurrRing (currRingOld);
+    F0          = idrMoveR (F, sRing);
+    strat->Shdl = idrMoveR_NoSort (strat->Shdl, sRing);
+    rDelete (sRing);
+  }
+  idTest(strat->Shdl);
+
+#ifdef DEBUGF5
+  printf("SIZE OF SHDL: %d\n",IDELEMS(strat->Shdl));
+  int oo = 0;
+  while (oo<IDELEMS(strat->Shdl))
+  {
+    printf(" %d.   ",oo+1);
+    pWrite(pHead(strat->Shdl->m[oo]));
+    oo++;
+  }
+#endif
+  printf("ZERO REDUCTIONS: %ld\n",zeroreductions);
+  zeroreductions  = 0;
+  return (strat->Shdl);
+}
 
 poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 {
@@ -1446,6 +3062,323 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   if (TEST_OPT_PROT) PrintLn();
   return res;
 }
+
+#if F5C
+/*********************************************************************
+* interrreduction step of the signature-based algorithm:
+* 1. all strat->S are interpreted as new critical pairs
+* 2. those pairs need to be completely reduced by the usual (non sig-
+*    safe) reduction process (including tail reductions)
+* 3. strat->S and strat->T are completely new computed in these steps
+********************************************************************/
+void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg, 
+          int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
+          intvec *w,intvec *hilb )
+{
+  int Ll_old, red_result = 1;
+  BOOLEAN withT = FALSE;
+  int pos  = 0;
+  hilbeledeg=1;
+  hilbcount=0;
+  minimcnt=0;
+  srmax = 0; // strat->sl is 0 at this point
+  reduc = olddeg = lrmax = 0;
+  // we cannot use strat->T anymore
+  //cleanT(strat);
+  //strat->tl = -1;
+  Ll_old    = strat->Ll;
+  while (strat->tl >= 0)
+  {
+    if(!strat->T[strat->tl].is_redundant)
+    {
+      LObject h;
+      h.p = strat->T[strat->tl].p;
+      h.tailRing = strat->T[strat->tl].tailRing;
+      h.t_p = strat->T[strat->tl].t_p;
+      if (h.p!=NULL)
+      {
+        if (pOrdSgn==-1)
+        {
+          cancelunit(&h);  
+          deleteHC(&h, strat);
+        }
+        if (h.p!=NULL)
+        {
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            //pContent(h.p);
+            h.pCleardenom(); // also does a pContent
+          }
+          else
+          {
+            h.pNorm();
+          }
+          strat->initEcart(&h);
+          pos = strat->Ll+1;
+          h.sev = pGetShortExpVector(h.p);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        }
+      }
+    }
+    strat->tl--;
+  }
+  strat->sl = -1;
+#if 0
+//#ifdef HAVE_TAIL_RING
+  if(!rField_is_Ring())  // create strong gcd poly computes with tailring and S[i] ->to be fixed
+    kStratInitChangeTailRing(strat);
+#endif
+  //enterpairs(pOne(),0,0,-1,strat,strat->tl);
+  //strat->sl = -1;
+  /* picks the last element from the lazyset L */
+  while (strat->Ll>Ll_old)
+  {
+    strat->P = strat->L[strat->Ll];
+    strat->Ll--;
+//#if 1
+#ifdef DEBUGF5
+    Print("NEXT PAIR TO HANDLE IN INTERRED ALGORITHM\n");
+    Print("-------------------------------------------------\n");
+    pWrite(pHead(strat->P.p));
+    pWrite(pHead(strat->P.p1));
+    pWrite(pHead(strat->P.p2));
+    printf("%d\n",strat->tl);
+    Print("-------------------------------------------------\n");
+#endif
+    if (pNext(strat->P.p) == strat->tail)
+    {
+      // deletes the short spoly
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        pLmDelete(strat->P.p);
+      else
+#endif
+        pLmFree(strat->P.p);
+
+      // TODO: needs some masking
+      // TODO: masking needs to vanish once the signature
+      //       sutff is completely implemented
+      strat->P.p = NULL;
+      poly m1 = NULL, m2 = NULL;
+
+      // check that spoly creation is ok
+      while (strat->tailRing != currRing &&
+          !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+      {
+        assume(m1 == NULL && m2 == NULL);
+        // if not, change to a ring where exponents are at least
+        // large enough
+        if (!kStratChangeTailRing(strat))
+        {
+          WerrorS("OVERFLOW...");
+          break;
+        }
+      }
+      // create the real one
+      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+          strat->tailRing, m1, m2, strat->R);
+    }
+    else if (strat->P.p1 == NULL)
+    {
+      if (strat->minim > 0)
+        strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
+      // for input polys, prepare reduction
+      strat->P.PrepareRed(strat->use_buckets);
+    }
+
+    if (strat->P.p == NULL && strat->P.t_p == NULL)
+    {
+      red_result = 0;
+    }
+    else
+    {
+      if (TEST_OPT_PROT)
+        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+            &olddeg,&reduc,strat, red_result);
+
+#ifdef DEBUGF5
+      Print("Poly before red: ");
+      pWrite(strat->P.p);
+#endif
+      /* complete reduction of the element choosen from L */
+      red_result = strat->red2(&strat->P,strat);
+      if (errorreported)  break;
+    }
+
+    if (strat->overflow)
+    {
+      if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
+    }
+
+    // reduction to non-zero new poly
+    if (red_result == 1)
+    {
+      // get the polynomial (canonicalize bucket, make sure P.p is set)
+      strat->P.GetP(strat->lmBin);
+      // in the homogeneous case FDeg >= pFDeg (sugar/honey)
+      // but now, for entering S, T, we reset it
+      // in the inhomogeneous case: FDeg == pFDeg
+      if (strat->homog) strat->initEcart(&(strat->P));
+
+      /* statistic */
+      if (TEST_OPT_PROT) PrintS("s");
+
+      int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+
+#ifdef KDEBUG
+#if MYTEST
+      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
+      // reduce the tail and normalize poly
+      // in the ring case we cannot expect LC(f) = 1,
+      // therefore we call pContent instead of pNorm
+#if F5CTAILRED
+      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
+      {
+        strat->P.pCleardenom();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+        {
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          strat->P.pCleardenom();
+        }
+      }
+      else
+      {
+        strat->P.pNorm();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+      }
+#endif
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
+#if MYTEST
+//#if 1
+      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
+      // min_std stuff
+      if ((strat->P.p1==NULL) && (strat->minim>0))
+      {
+        if (strat->minim==1)
+        {
+          strat->M->m[minimcnt]=p_Copy(strat->P.p,currRing,strat->tailRing);
+          p_Delete(&strat->P.p2, currRing, strat->tailRing);
+        }
+        else
+        {
+          strat->M->m[minimcnt]=strat->P.p2;
+          strat->P.p2=NULL;
+        }
+        if (strat->tailRing!=currRing && pNext(strat->M->m[minimcnt])!=NULL)
+          pNext(strat->M->m[minimcnt])
+            = strat->p_shallow_copy_delete(pNext(strat->M->m[minimcnt]),
+                strat->tailRing, currRing,
+                currRing->PolyBin);
+        minimcnt++;
+      }
+
+      // enter into S, L, and T
+      // here we need to recompute new signatures, but those are trivial ones
+      //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      enterT(strat->P, strat);
+      // posInS only depends on the leading term
+      strat->enterS(strat->P, pos, strat, strat->tl);
+//#if 1
+#ifdef DEBUGF5
+      Print("ELEMENT ADDED TO GCURR DURING INTERRED: ");
+      pWrite(pHead(strat->S[strat->sl]));
+      pWrite(strat->sig[strat->sl]);
+#endif
+      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      //      Print("[%d]",hilbeledeg);
+      if (strat->P.lcm!=NULL)
+#ifdef HAVE_RINGS
+        pLmDelete(strat->P.lcm);
+#else
+      pLmFree(strat->P.lcm);
+#endif
+      if (strat->sl>srmax) srmax = strat->sl;
+    }
+    else
+    {
+      // adds signature of the zero reduction to
+      // strat->syz. This is the leading term of
+      // syzygy and can be used in syzCriterion()
+      // the signature is added if and only if the
+      // pair was not detected by the rewritten criterion in strat->red = redSig
+      if (strat->P.p1 == NULL && strat->minim > 0)
+      {
+        p_Delete(&strat->P.p2, currRing, strat->tailRing);
+      }
+    }
+
+#ifdef KDEBUG
+    memset(&(strat->P), 0, sizeof(strat->P));
+#endif /* KDEBUG */
+  }
+  int cc = 0;
+  while (cc<strat->tl+1)
+  {
+    strat->T[cc].sig        = pOne();
+    p_SetComp(strat->T[cc].sig,cc+1,currRing);
+    strat->T[cc].sevSig     = pGetShortExpVector(strat->T[cc].sig);
+    strat->sig[cc]          = strat->T[cc].sig;
+    strat->sevSig[cc]       = strat->T[cc].sevSig;
+    strat->T[cc].is_sigsafe = TRUE;  
+    cc++;
+  }
+  strat->max_lower_index = strat->tl;
+  // set current signature index of upcoming iteration step
+  // NOTE:  this needs to be set here, as otherwise initSyzRules cannot compute
+  //        the corresponding syzygy rules correctly
+  strat->currIdx = cc+1;
+  for (int cd=strat->Ll; cd>=0; cd--)
+  {
+    p_SetComp(strat->L[cd].sig,cc+1,currRing);
+    cc++;
+  }
+//#if 1
+#if DEBUGF5
+  Print("------------------- STRAT S ---------------------\n");
+  cc = 0;
+  while (cc<strat->tl+1)
+  {
+    pWrite(pHead(strat->S[cc]));
+    pWrite(strat->sig[cc]);
+    printf("- - - - - -\n");
+    cc++;
+  }
+  Print("-------------------------------------------------\n");
+  Print("------------------- STRAT T ---------------------\n");
+  cc = 0;
+  while (cc<strat->tl+1)
+  {
+    pWrite(pHead(strat->T[cc].p));
+    pWrite(strat->T[cc].sig);
+    printf("- - - - - -\n");
+    cc++;
+  }
+  Print("-------------------------------------------------\n");
+  Print("------------------- STRAT L ---------------------\n");
+  cc = 0;
+  while (cc<strat->Ll+1)
+  {
+    pWrite(pHead(strat->L[cc].p));
+    pWrite(pHead(strat->L[cc].p1));
+    pWrite(pHead(strat->L[cc].p2));
+    pWrite(strat->L[cc].sig);
+    printf("- - - - - -\n");
+    cc++;
+  }
+  Print("-------------------------------------------------\n");
+  printf("F5C DONE\nSTRAT SL: %d -- %d\n",strat->sl, strat->currIdx);
+#endif
+
+}
+#endif
 
 /* shiftgb stuff */
 #ifdef HAVE_SHIFTBBA
