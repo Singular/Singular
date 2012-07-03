@@ -1976,7 +1976,15 @@ void rComposeC(lists L, ring R)
   lists LL=(lists)L->m[1].data;
   int r1=(int)(long)LL->m[0].data;
   int r2=(int)(long)LL->m[1].data;
-  if ((r1<=SHORT_REAL_LENGTH)
+  if (L->nr==2) // complex
+    R->cf = nInitChar(n_long_C, NULL);
+  else if ((r1<=SHORT_REAL_LENGTH)
+  && (r2=SHORT_REAL_LENGTH))
+    R->cf = nInitChar(n_R, NULL);
+  else
+    R->cf = nInitChar(n_long_R, NULL);
+
+  if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
   && (r2=SHORT_REAL_LENGTH))
   {
     R->cf->float_len=SHORT_REAL_LENGTH/2;

@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT:
@@ -545,7 +544,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == ID );
    
-  assume( p == NULL ); p;
+  assume( p == NULL );
    
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
