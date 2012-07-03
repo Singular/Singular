@@ -59,7 +59,7 @@ int s_getc(s_buff F)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return 0;
   }
   if (F->bp>=F->end)
@@ -88,7 +88,7 @@ int s_isready(s_buff F)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return 0;
   }
   if (F->bp>=F->end) return 0;
@@ -102,7 +102,7 @@ int s_ungetc(int c, s_buff F)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return 0;
   }
   if (F->bp>=0)
@@ -116,7 +116,7 @@ int s_readint(s_buff F)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return 0;
   }
   char c;
@@ -144,7 +144,7 @@ int s_readbytes(char *buff,int len, s_buff F)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return 0;
   }
   int i=0;
@@ -160,7 +160,7 @@ void s_readmpz(s_buff F, mpz_t a)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return;
   }
   mpz_set_ui(a,0);
@@ -185,7 +185,7 @@ void s_readmpz_base(s_buff F, mpz_ptr a, int base)
 {
   if (F==NULL)
   {
-    WerrorS("link closed");
+    printf("link closed");
     return;
   }
   mpz_set_ui(a,0);
