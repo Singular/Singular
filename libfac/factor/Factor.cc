@@ -804,12 +804,7 @@ int find_mvar(const CanonicalForm &f);
 CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 {
   //out_cf("Factorize ",F,"\n");
-  CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
-  ListIterator<CFFactor> i,j;
-  CanonicalForm g=1,unit=1,r=1;
-  Variable minpoly; // dummy
-  int exp;
-  CFMap m;
+  CFFList Outputlist;
 
   // INTERRUPTHANDLER
   if ( interrupt_handle() ) return CFFList() ;
@@ -831,6 +826,12 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
     TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
     return Outputlist;
   }
+  CFFList SqrFreeList,Intermediatelist,Outputlist2;
+  ListIterator<CFFactor> i,j;
+  CanonicalForm g=1,unit=1,r=1;
+  Variable minpoly; // dummy
+  int exp;
+  CFMap m;
   TIMING_START(factorize_time);
   // search an "optimal" main variavble
   int mv=F.level();

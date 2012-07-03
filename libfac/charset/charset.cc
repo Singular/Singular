@@ -1,6 +1,5 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id$ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -493,7 +492,7 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
     DEBOUT(CERR, "irras: factoring: ", elem);
     if ( degree(elem) > 1 ) // linear poly's are irreduzible
     {
-      qs = Factorize(elem);
+      qs = factorize(elem);
       // remove a constant
       if (qs.getFirst().factor().degree()==0) qs.removeFirst();
     }
