@@ -57,6 +57,11 @@ int    s_close(s_buff &F)
 
 int s_getc(s_buff F)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return 0;
+  }
   if (F->bp>=F->end)
   {
     memset(F->buff,0,S_BUFF_LEN); /*debug*/
@@ -81,6 +86,11 @@ int s_getc(s_buff F)
 }
 int s_isready(s_buff F)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return 0;
+  }
   if (F->bp>=F->end) return 0;
   int p=F->bp+1;
   while((p<F->end)&&(F->buff[p]<=' ')) p++;
@@ -90,6 +100,11 @@ int s_isready(s_buff F)
 
 int s_ungetc(int c, s_buff F)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return 0;
+  }
   if (F->bp>=0)
   {
     F->buff[F->bp]=c;
@@ -99,6 +114,11 @@ int s_ungetc(int c, s_buff F)
 
 int s_readint(s_buff F)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return 0;
+  }
   char c;
   int neg=1;
   int r=0;
@@ -122,6 +142,11 @@ int s_readint(s_buff F)
 
 int s_readbytes(char *buff,int len, s_buff F)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return 0;
+  }
   int i=0;
   while((!F->is_eof)&&(i<len))
   {
@@ -133,6 +158,11 @@ int s_readbytes(char *buff,int len, s_buff F)
 
 void s_readmpz(s_buff F, mpz_t a)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return;
+  }
   mpz_set_ui(a,0);
   char c;
   int neg=1;
@@ -153,6 +183,11 @@ void s_readmpz(s_buff F, mpz_t a)
 
 void s_readmpz_base(s_buff F, mpz_ptr a, int base)
 {
+  if (F==NULL)
+  {
+    WerrorS("link closed");
+    return;
+  }
   mpz_set_ui(a,0);
   char c;
   int neg=1;
