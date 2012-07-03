@@ -27,6 +27,30 @@
 BEGIN_NAMESPACE_SINGULARXX     BEGIN_NAMESPACE(SYZEXTRA)
 
 
+poly p_Tail(const poly p, const ring r)
+{
+  if( p == NULL)
+    return NULL;
+  else
+    return p_Copy( pNext(p), r );
+}
+
+
+ideal id_Tail(const ideal id, const ring r)
+{
+  if( id == NULL)
+    return NULL;
+
+  const ideal newid = idInit(IDELEMS(id),id->rank);
+  
+  for (int i=IDELEMS(id) - 1; i >= 0; i--)
+    newid->m[i] = p_Tail( id->m[i], r );
+
+  newid->rank = id_RankFreeModule(newid, currRing);
+
+  return newid;  
+}
+
 
 
 

@@ -33,6 +33,18 @@ typedef struct sip_sideal *       ideal;
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
 
+/// return the tail of a given polynomial or vector
+/// returns NULL if input is NULL, otherwise
+/// the result is a new polynomial/vector in the ring r
+poly p_Tail(const poly p, const ring r);
+
+
+/// return the tail of a given ideal or module
+/// returns NULL if input is NULL, otherwise
+/// the result is a new ideal/module in the ring r
+/// NOTE: the resulting rank is autocorrected
+ideal id_Tail(const ideal id, const ring r);
+
 
 
 END_NAMESPACE               END_NAMESPACE_SINGULARXX

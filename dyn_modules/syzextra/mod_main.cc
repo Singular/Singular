@@ -468,33 +468,25 @@ if ((s)->v != NULL) \
   return FALSE;
 }
 
-
-
-
-
-
+/// wrapper around p_Tail and id_Tail
 static BOOLEAN Tail(leftv res, leftv h)
 {
   NoReturn(res);
 
   if( h == NULL )
   {
-    WarnS("Tail needs an argument...");
+    WarnS("Tail needs a poly/vector/ideal/module argument...");
     return TRUE;
   }
 
   assume( h != NULL );
 
+  const ring r =  currRing;
+
   if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
   {
-    const poly p = (const poly)h->Data();
-
+    res->data = p_Tail( (const poly)h->Data(), r );
     res->rtyp = h->Typ();
-
-    if( p == NULL)
-      res->data = NULL;
-    else
-      res->data = p_Copy( pNext(p), currRing );
 
     h = h->Next(); assume (h == NULL);
     
@@ -503,25 +495,8 @@ static BOOLEAN Tail(leftv res, leftv h)
 
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
-    const ideal id = (const ideal)h->Data();
-
+    res->data = id_Tail( (const ideal)h->Data(), r );      
     res->rtyp = h->Typ();
-
-    if( id == NULL)
-      res->data = NULL;
-    else
-    {
-      const ideal newid = idInit(IDELEMS(id),id->rank);
-      for (int i=IDELEMS(id) - 1; i >= 0; i--)
-        if( id->m[i] != NULL )
-          newid->m[i] = p_Copy(pNext(id->m[i]), currRing);
-        else
-          newid->m[i] = NULL;
-      
-      newid->rank = id_RankFreeModule(newid, currRing);
-      
-      res->data = newid; 
-    }
     
     h = h->Next(); assume (h == NULL);
     
