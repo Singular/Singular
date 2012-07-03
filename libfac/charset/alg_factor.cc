@@ -163,7 +163,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
-    else{
+    else
+    {
       DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
       // Look at SqrFreeTest!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
@@ -183,7 +184,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
       DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
-    if ( ! sqfreetest ){
+    if ( ! sqfreetest )
+    {
       myrandom.next();
       DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
       if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
@@ -213,7 +215,8 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
   // Norm, resultante taken with respect to y
-  while ( !sqfreetest ){
+  while ( !sqfreetest )
+  {
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);

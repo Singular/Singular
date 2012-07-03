@@ -51,6 +51,7 @@ TIMING_DEFINE_PRINT(truefactor_time)
 * before calling factorize(f,alpha)
 * ( in factorize, alpha.level() must be < 0 )
 */
+static
 CFFList factorize2 ( const CanonicalForm & f,
                      const Variable & alpha, const CanonicalForm & mipo )
 {
