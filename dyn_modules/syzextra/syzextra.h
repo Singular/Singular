@@ -32,6 +32,7 @@ typedef struct sip_sideal *       ideal;
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
+poly leadmonom(const poly p, const ring r);
 
 /// return the tail of a given polynomial or vector
 /// returns NULL if input is NULL, otherwise
@@ -45,6 +46,33 @@ poly p_Tail(const poly p, const ring r);
 /// NOTE: the resulting rank is autocorrected
 ideal id_Tail(const ideal id, const ring r);
 
+
+/// inplace sorting of the module (ideal) id wrt >_(c,ds)
+void Sort_c_ds(const ideal id, const ring r);
+
+ideal ComputeLeadingSyzygyTerms(const ideal& id, const ring r);
+
+ideal Compute2LeadingSyzygyTerms(const ideal& id, const ring r);
+
+
+poly FindReducer(poly product, poly syzterm,
+                 ideal L, ideal LS,
+                 const ring r);
+
+
+poly TraverseTail(poly multiplier, poly tail, 
+                  ideal L, ideal T, ideal LS,
+                  const ring r);
+
+poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck,
+                ideal L, ideal T, ideal LS, const ring r);
+
+
+
+poly SchreyerSyzygyNF(poly syz_lead, poly syz_2, ideal L, ideal T, ideal LS, const ring r);
+
+
+void ComputeSyzygy(const ideal L, const ideal T, ideal& LL, ideal& TT, const ring R);
 
 
 END_NAMESPACE               END_NAMESPACE_SINGULARXX
