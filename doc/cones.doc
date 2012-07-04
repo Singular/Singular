@@ -187,6 +187,7 @@ c;
 * relativeInteriorPoint::
 * semigroupGenerator::
 * uniquePoint::
+* convexHull::
 * convexIntersection::
 * isFullSpace::
 * isOrigin::
@@ -441,7 +442,7 @@ codimension(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node dimension,dual,codimension,cone related functions
+@node dimension,dualCone,codimension,cone related functions
 @subsubsection dimension
 @cindex dimension
 
@@ -469,13 +470,13 @@ dimension(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node dual,equations,dimension,cone related functions
+@node dualCone,equations,dimension,cone related functions
 @subsubsection dual
 @cindex dual
 
 @table @code
 @item @strong{Syntax:}
-@code{dual(} cone c @code{)}
+@code{dualCone(} cone c @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
@@ -487,21 +488,21 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaPoints(M1);
-cone d1=dual(c1);
+cone d1=dualCone(c1);
 d1;
 print(rays(d1));
 intmat M2[2][2]=
 1,1,
 0,1;
 cone c2=coneViaPoints(M2);
-cone d2=dual(c2);
+cone d2=dualCone(c2);
 d2;
 print(rays(d2));
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node equations,facets,dual,cone related functions
+@node equations,facets,dualCone,cone related functions
 @subsubsection equations
 @cindex equations
 
@@ -947,17 +948,62 @@ uniquePoint(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node convexIntersection,isFullSpace,uniquePoint,cone related functions
+@node convexHull,isFullSpace,convexIntersection,cone related functions
+@subsubsection convexHull
+@cindex convexHull
+
+@table @code
+@item @strong{Syntax:}
+@code{convexHull(} cone c1, cone c2 @code{)}
+@*@code{convexHull(} cone c1, polytope p1 @code{)}
+@*@code{convexHull(} polytope p1, cone c1 @code{)}
+@*@code{convexHull(} polytope p1, polytope p2 @code{)}
+@item @strong{Type:}
+cone if both input arguments are cones, else polytope
+@item @strong{Purpose:}
+the hull of the two objects
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaPoints(M1);
+intmat M2[2][2]=
+1,1,
+1,-1;
+cone c2=coneViaPoints(M2);
+intmat M3[2][2]=
+1,0,
+0,-1;
+cone c3=coneViaPoints(M3);
+cone c12=convexHull(c1,c2);
+c12;
+print(rays(c12));
+cone c23=convexHull(c2,c3);
+c23;
+print(rays(c23));
+cone c13=convexHull(c1,c3);
+c13;
+print(rays(c13));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node convexIntersection,convexHull,uniquePoint,cone related functions
 @subsubsection convexIntersection
 @cindex convexIntersection
 
 @table @code
 @item @strong{Syntax:}
 @code{convexIntersection(} cone c1, cone c2 @code{)}
+@*@code{convexIntersection(} cone c1, polytope p1 @code{)}
+@*@code{convexIntersection(} polytope p1, cone c1 @code{)}
+@*@code{convexIntersection(} polytope p1, polytope p2 @code{)}
 @item @strong{Type:}
-cone
+cone if both input arguments are cones, else polytope
 @item @strong{Purpose:}
-the intersection of the two cones
+the intersection of the two objects
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1255,6 +1301,9 @@ See also @ref{ambientDimension},
 
 @menu
 * containsInCollection::
+* emptyFan::
+* fullFan::
+* fVector::
 * getCone::
 * insertCone::
 * isCompatible::
@@ -1263,7 +1312,7 @@ See also @ref{ambientDimension},
 * nmaxcones::
 * ncones::
 * numberOfConesOfDimension::
-* quickInsertCone::
+* removeCone::
 @end menu
 
 @c --------------------------------------------------------------------
@@ -1293,7 +1342,71 @@ containsInCollection(f,c);
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node getCone,insertCone,containsInCollection,fan related functions
+@node emptyFan,fullFan,containsInCollection,fan related functions
+@subsubsection emptyFan
+@cindex emptyFan
+
+@table @code
+@item @strong{Syntax:}
+@code{emptyFan(} int d @code{)}
+@item @strong{Type:}
+fan
+@item @strong{Purpose:}
+empty fan in ambient dimension d
+@item @strong{Example:}
+@smallexample
+@c example
+fan f=emptyFan(2);
+f;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node fullFan,fVector,emptyFan,fan related functions
+@subsubsection fullFan
+@cindex fullFan
+
+@table @code
+@item @strong{Syntax:}
+@code{fullFan(} int d @code{)}
+@item @strong{Type:}
+fan
+@item @strong{Purpose:}
+full fan in ambient dimension d
+@item @strong{Example:}
+@smallexample
+@c example
+fan f=fullFan(2);
+f;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node fVector,insertCone,fullFan,fan related functions
+@subsubsection fullFan
+@cindex fVector
+
+@table @code
+@item @strong{Syntax:}
+@code{fVector(} fan f @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+F-Vector of the fan
+@item @strong{Example:}
+@smallexample
+@c example
+fan f=emptyFan(2);
+fVector(f);
+intmat M[2][2]=1,0,0,1;
+cone c=coneViaPoints(M);
+insertCone(f,c);
+fVector(f);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------
+@node getCone,insertCone,fVector,fan related functions
 @subsubsection getCone
 @cindex getCone
 
@@ -1328,10 +1441,11 @@ getCone(f,2,3,0,0);
 @table @code
 @item @strong{Syntax:}
 @code{insertCone(} fan f, cone c @code{)}
+@*@code{insertCone(} fan f, cone c, int check @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-inserts the cone into the fan, checks for compatibility beforehand
+inserts the cone into the fan; checks for compatibility beforehand unless check is passed and equal 0
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1525,7 +1639,7 @@ ncones(f);
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node numberOfConesOfDimension,quickInsertCone,ncones,fan related functions
+@node numberOfConesOfDimension,removeCone,ncones,fan related functions
 @subsubsection numberOfConesOfDimension
 @cindex numberOfConesOfDimension
 
@@ -1559,28 +1673,30 @@ numberOfConesOfDimension(f,3,0,1);
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node quickInsertCone,,numberOfConesOfDimension,fan related functions
-@subsubsection quickInsertCone
-@cindex quickInsertCone
+@node removeCone,,numberOfConesOfDimension,fan related functions
+@subsubsection removeCone
+@cindex removeCone
 
 @table @code
 @item @strong{Syntax:}
-@code{quickInsertCone(} fan f @code{)}
+@code{removeCone(} fan f, cone c @code{)}
+@*@code{removeCone(} fan f, cone c, int check @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-inserts the cone into the fan, no checking of compatibility
+removes the cone from the fan; checks for compatibility beforehand unless check is passed and equal 0
 @item @strong{Example:}
 @smallexample
 @c example
-fan f=emptyFan(3);
-f;
-intmat M[3][3]=
-1,0,0,
-0,1,0,
-0,0,1;
+intmat M[2][2]=1,0,0,1;
+intmat N[2][2]=1,0,1,-1;
 cone c=coneViaPoints(M);
-quickInsertCone(f,c);
+cone d=coneViaPoints(N);
+fan f=emptyFan(2);
+insertCone(f,c);
+insertCone(f,d);
+f;
+removeCone(f,c);
 f;
 @c example
 @end smallexample
@@ -1694,11 +1810,56 @@ See also @ref{ambientDimension},
 @ref{setMultiplicity}.
 
 @menu
+* dualPolytope::
+* newtonPolytope::
 * vertices::
 @end menu
 
 @c --------------------------------------------------------------------
-@node vertices,,,polytope related functions
+@node dualPolytope,newtonPolytope,,polytope related functions
+@subsubsection dualPolytope
+@cindex dualPolytope
+
+@table @code
+@item @strong{Syntax:}
+@code{dualPolytope(} polytope p @code{)}
+@item @strong{Type:}
+polytope
+@item @strong{Purpose:}
+Newton polytope of f 
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[4][2]=
+0,0,
+1,0,
+0,1,
+1,1;
+polytope p=polytopeViaPoints(M);
+dualPolytope(p);
+@c example
+@c --------------------------------------------------------------------
+@node newtonPolytope,vertices,dualPolytope,polytope related functions
+@subsubsection newtonPolytope
+@cindex newtonPolytope
+
+@table @code
+@item @strong{Syntax:}
+@code{newtonpolytope(} poly f @code{)}
+@item @strong{Type:}
+polytope
+@item @strong{Purpose:}
+Newton polytope of f 
+@item @strong{Example:}
+@smallexample
+@c example
+ring r;
+poly f=x+y+z;
+polytope p=newtonPolytope(f);
+p;
+@c example
+@c --------------------------------------------------------------------
+@node vertices,,newtonPolytope,polytope related functions
 @subsubsection vertices
 @cindex vertices
 
