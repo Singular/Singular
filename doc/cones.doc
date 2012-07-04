@@ -170,7 +170,7 @@ c;
 * ambientDimension::
 * codimension::
 * dimension::
-* dual::
+* dualCone::
 * equations::
 * facets::
 * linspace::
@@ -920,7 +920,7 @@ semigroupGenerator(c);
 @end smallexample
 @end table
 @c --------------------------------------
-@node uniquePoint,convexIntersection,semigroupGenerator,cone related functions
+@node uniquePoint,convexHull,semigroupGenerator,cone related functions
 @subsubsection uniquePoint
 @cindex uniquePoint
 
@@ -948,7 +948,7 @@ uniquePoint(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node convexHull,isFullSpace,convexIntersection,cone related functions
+@node convexHull,convexIntersection,uniquePoint,cone related functions
 @subsubsection convexHull
 @cindex convexHull
 
@@ -990,7 +990,7 @@ print(rays(c13));
 @end smallexample
 @end table
 @c --------------------------------------
-@node convexIntersection,convexHull,uniquePoint,cone related functions
+@node convexIntersection,isFullSpace,convexHull,cone related functions
 @subsubsection convexIntersection
 @cindex convexIntersection
 
@@ -1316,7 +1316,7 @@ See also @ref{ambientDimension},
 @end menu
 
 @c --------------------------------------------------------------------
-@node containsInCollection,getCone,,fan related functions
+@node containsInCollection,emptyFan,,fan related functions
 @subsubsection containsInCollection
 @cindex containsInCollection
 
@@ -1382,7 +1382,7 @@ f;
 @end smallexample
 @end table
 @c --------------------------------------------------------------------
-@node fVector,insertCone,fullFan,fan related functions
+@node fVector,getCone,fullFan,fan related functions
 @subsubsection fullFan
 @cindex fVector
 
@@ -1838,6 +1838,8 @@ intmat M[4][2]=
 polytope p=polytopeViaPoints(M);
 dualPolytope(p);
 @c example
+@end smallexample
+@end table
 @c --------------------------------------------------------------------
 @node newtonPolytope,vertices,dualPolytope,polytope related functions
 @subsubsection newtonPolytope
@@ -1858,6 +1860,8 @@ poly f=x+y+z;
 polytope p=newtonPolytope(f);
 p;
 @c example
+@end smallexample
+@end table
 @c --------------------------------------------------------------------
 @node vertices,,newtonPolytope,polytope related functions
 @subsubsection vertices
