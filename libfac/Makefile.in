@@ -71,7 +71,7 @@ OPTFACTOROBJ =	$(OPTFACTOROBJ2) $(OPTFACTOROBJ1)
 OPTCHARSETOBJ =	OPTOBJ/csutil.o OPTOBJ/charset.o OPTOBJ/reorder.o \
 		OPTOBJ/alg_factor.o OPTOBJ/algfactor.o
 
-DEBOBJ = $(OPTFACTOROBJ1:%.o=%.og) $(OPTCHARSETOBJ:%.o=%.og)
+DEBOBJ = $(OPTFACTOROBJ:%.o=%.og) $(OPTCHARSETOBJ:%.o=%.og)
 PROFOBJ = $(OPTFACTOROBJ1:%.o=%.op) $(OPTCHARSETOBJ:%.o=%.op)
 
 ##
