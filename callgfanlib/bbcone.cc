@@ -1506,7 +1506,7 @@ void bbcone_setup()
   iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
   iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
   iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
-  iiAddCproc("","makePolytope",FALSE,coneToPolytope);
+  // iiAddCproc("","makePolytope",FALSE,coneToPolytope);
 
   iiAddCproc("","inequalities",FALSE,inequalities);
   iiAddCproc("","facets",FALSE,facets);
@@ -1527,7 +1527,7 @@ void bbcone_setup()
   iiAddCproc("","setLinearForms",FALSE,setLinearForms);
   iiAddCproc("","linearForms",FALSE,linearForms);
 
-  iiAddCproc("","dual",FALSE,dualCone);
+  iiAddCproc("","dualCone",FALSE,dualCone);
   iiAddCproc("","negatedCone",FALSE,negatedCone);
   iiAddCproc("","coneLink",FALSE,coneLink);
   iiAddCproc("","convexIntersection",FALSE,intersectCones);
