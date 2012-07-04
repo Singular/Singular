@@ -377,27 +377,6 @@ BOOLEAN isCompatible(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN quickInsertCone(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == fanID))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == coneID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      gfan::ZCone* zc = (gfan::ZCone*)v->Data();
-      zc->canonicalize();
-      zf->insert(*zc);
-      res->rtyp = NONE;
-      res->data = NULL;
-      return FALSE;
-    }
-  }
-  WerrorS("quickInsertCone: unexpected parameters");
-  return TRUE;
-}
-
 BOOLEAN insertCone(leftv res, leftv args)
 {
   leftv u=args;
@@ -409,19 +388,26 @@ BOOLEAN insertCone(leftv res, leftv args)
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
-      if (iscompatible(zf,zc))
-        {
-          zf->insert(*zc);
-          res->rtyp = NONE;
-          res->data = NULL;
-	  IDDATA((idhdl)u->data)=(char *)zf;
-          return FALSE;
-        }
-      else
-        {
+
+      leftv w=v->next;
+      int n = 1;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+        int n = (int)(long) w;
+
+      if (n != 0)
+      {
+        if (!iscompatible(zf,zc))
+        {          
           WerrorS("insertCone: cone and fan not compatible");
           return TRUE;
         }
+      }
+
+      zf->insert(*zc);
+      res->rtyp = NONE;
+      res->data = NULL;
+      IDDATA((idhdl)u->data)=(char *)zf;
+      return FALSE;
     }
   }
   else
@@ -510,13 +496,25 @@ BOOLEAN removeCone(leftv res, leftv args)
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
       zc->canonicalize();
-      if(containsInCollection(zf,zc))
+
+      leftv w=v->next; int n = 1;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+        int n = (int)(long) w;
+
+      if (n != 0)
       {
-        zf->remove(*zc);
-        res->rtyp = NONE;
-        res->data = NULL;
-        return FALSE;
+        if (!containsInCollection(zf,zc))
+        {          
+          WerrorS("removeCone: cone not contained in fan");
+          return TRUE;
+        }
       }
+
+      zf->remove(*zc);
+      res->rtyp = NONE;
+      res->data = NULL;
+      IDDATA((idhdl)u->data)=(char *)zf;
+      return FALSE;
     }
   }
   WerrorS("removeCone: unexpected parameters");
@@ -641,7 +639,7 @@ BOOLEAN isComplete(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getFVector(leftv res, leftv args)
+BOOLEAN fVector(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
@@ -652,7 +650,7 @@ BOOLEAN getFVector(leftv res, leftv args)
       res->data = (void*) zVectorToBigintmat(zv);
       return FALSE;
     }
-  WerrorS("getFVector: unexpected parameters");
+  WerrorS("fVector: unexpected parameters");
   return TRUE;
 }
 
@@ -742,14 +740,13 @@ void bbfan_setup()
   iiAddCproc("","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
   iiAddCproc("","ncones",FALSE,ncones);
   iiAddCproc("","nmaxcones",FALSE,nmaxcones);
-  iiAddCproc("","quickInsertCone",FALSE,quickInsertCone);
   iiAddCproc("","insertCone",FALSE,insertCone);
   iiAddCproc("","removeCone",FALSE,removeCone);
   iiAddCproc("","getCone",FALSE,getCone);
   iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   iiAddCproc("","isPure",FALSE,isPure);
-  iiAddCproc("","isComplete",FALSE,isComplete);
-  iiAddCproc("","getFVector",FALSE,getFVector);
+  // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
+  iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
