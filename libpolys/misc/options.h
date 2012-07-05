@@ -73,6 +73,7 @@ extern unsigned verbose;
 #define OPT_NO_SYZ_MINIM   8
 #define OPT_RETURN_SB      9
 #define OPT_FASTHC        10
+#define OPT_LPDVGEBMOELL  15
 #define OPT_OLDSTD        20
 
 #define OPT_STAIRCASEBOUND 22
@@ -111,6 +112,7 @@ extern unsigned verbose;
 #define TEST_OPT_REDTHROUGH        BTEST1(OPT_REDTHROUGH)
 #define TEST_OPT_OLDSTD            BTEST1(OPT_OLDSTD)
 #define TEST_OPT_NO_SYZ_MINIM      BTEST1(OPT_NO_SYZ_MINIM)
+#define TEST_OPT_LPDVGEBMOELL      BTEST1(OPT_LPDVGEBMOELL)
 
 
 #define TEST_OPT_CONTENTSB         BVERBOSE(V_CONTENTSB)

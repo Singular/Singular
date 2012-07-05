@@ -149,7 +149,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   //  number c = pGetCoeff(p);
   //  p_SetCoeff0(m,p_GetCoeff(p,r),r);
   p_SetComp(m,p_GetComp(p,r),r); // component is preserved
-  p_SetCoeff0(m,p_GetCoeff(p,r),r);  // coeff is preserved
+  p_SetCoeff0(m,n_Copy(p_GetCoeff(p,r),r->cf),r);  // coeff is preserved
   return(m);
 }
 
@@ -251,6 +251,7 @@ int pmLastVblock(poly p, int lV)
   int j,b;
   j = currRing->N;
   while ( (!e[j]) && (j>=1) ) j--;
+  freeT(e, currRing->N);  //BOCO: did I add this?
   if (j==0)
   {
 #ifdef PDEBUG
@@ -568,7 +569,7 @@ poly p_mShrink(poly p, int lV, const ring r)
   freeT(S, r->N);
   /*  p_Setm(s,r); // done by p_SetExpV */
   p_SetComp(s,p_GetComp(p,r),r); // component is preserved
-  p_SetCoeff(s,p_GetCoeff(p,r),r);  // coeff is preserved
+  p_SetCoeff(s,n_Copy(p_GetCoeff(p,r),r),r);  // coeff is preserved
 #ifdef PDEBUG
   //  Print("p_mShrink: from "); p_wrp(p,r); Print(" to "); p_wrp(s,r); PrintLn();
 #endif
