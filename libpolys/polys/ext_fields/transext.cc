@@ -109,7 +109,8 @@ number   ntMult(number a, number b, const coeffs cf);
 number   ntDiv(number a, number b, const coeffs cf);
 void     ntPower(number a, int exp, number *b, const coeffs cf);
 number   ntCopy(number a, const coeffs cf);
-void     ntWrite(number &a, const coeffs cf);
+void     ntWriteLong(number &a, const coeffs cf);
+void     ntWriteShort(number &a, const coeffs cf);
 number   ntRePart(number a, const coeffs cf);
 number   ntImPart(number a, const coeffs cf);
 number   ntGetDenom(number &a, const coeffs cf);
@@ -246,11 +247,23 @@ number ntGetNumerator(number &a, const coeffs cf)
   definiteGcdCancellation(a, cf, FALSE);
   if (IS0(a)) return NULL;
   fraction f = (fraction)a;
-  poly g = p_Copy(NUM(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(result) = g;
-  DEN(result) = NULL;
-  COM(result) = 0;
+  BOOLEAN denis1= DENIS1 (f);
+  if (getCoeffType (ntCoeffs) == n_Q && !denis1)
+    handleNestedFractionsOverQ (f, cf);
+  NUM (result)= p_Copy (NUM (f), ntRing);
+  DEN (result) = NULL;
+  COM (result) = 0;
+  if (getCoeffType (ntCoeffs) == n_Q && denis1)
+  {
+    if (!p_IsConstant (NUM (result), ntRing) && pNext (NUM(result)) != NULL)
+      p_Cleardenom (NUM(result), ntRing);
+    else
+    {
+      number g= p_GetAllDenom (NUM (result), ntRing);
+      NUM (result)= p_Mult_nn (NUM (result), g, ntRing);
+    }
+  }
   return (number)result;
 }
 
@@ -259,13 +272,31 @@ number ntGetDenom(number &a, const coeffs cf)
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  poly g;
-  if (IS0(f) || DENIS1(f)) g = p_One(ntRing);
-  else g = p_Copy(DEN(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(result) = g;
-  DEN(result) = NULL;
-  COM(result) = 0;
+  number g;
+  if (IS0(f) || (DENIS1 (f) && getCoeffType (ntCoeffs) != n_Q))
+  {
+    NUM (result)= p_One(ntRing);
+    DEN (result)= NULL;
+    COM (result)= 0;
+  }
+  else if (DENIS1 (f))
+  {
+    poly num= p_Copy (NUM (f), ntRing);
+    if (!p_IsConstant (num, ntRing) && pNext(num) != NULL)
+      p_Cleardenom_n (num, ntRing, g);
+    else
+      g= p_GetAllDenom (num, ntRing);
+    result= (fraction) ntSetMap (ntRing->cf, cf) (g, ntRing->cf, cf);
+  }
+  else
+  {
+    if (getCoeffType (ntCoeffs) == n_Q)
+      handleNestedFractionsOverQ (f, cf);
+    NUM (result)= p_Copy (DEN (f), ntRing);
+    DEN (result) = NULL;
+    COM (result) = 0;
+  }
   return (number)result;
 }
 
@@ -368,8 +399,18 @@ int ntInt(number &a, const coeffs cf)
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
   if (!DENIS1(f)) return 0;
-  if (!p_IsConstant(NUM(f), ntRing)) return 0;
-  return n_Int(p_GetCoeff(NUM(f), ntRing), ntCoeffs);
+  
+  const poly aAsPoly = NUM(f);
+
+  if(aAsPoly == NULL)
+    return 0;
+  
+  if (!p_IsConstant(aAsPoly, ntRing))
+    return 0;
+
+  assume( aAsPoly != NULL );
+  
+  return n_Int(p_GetCoeff(aAsPoly, ntRing), ntCoeffs);
 }
 
 /* This method will only consider the numerators of a and b, without
@@ -395,8 +436,9 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
     bNumDeg = p_Totaldegree(NUM(fb), ntRing);
     bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
   }
-  if (aNumDeg != bNumDeg) return FALSE;
-  else return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
+  if (aNumDeg > bNumDeg) return TRUE;
+  if (aNumDeg < bNumDeg) return FALSE;
+  return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
 }
 
 /* this method will only consider the numerator of a, without cancelling
@@ -435,7 +477,7 @@ void ntCoeffWrite(const coeffs cf, BOOLEAN details)
   for (int nop=0; nop < P; nop ++)
     Print("%s ", rRingVar(nop, A));
 
-  assume( A->minideal == NULL );
+  assume( A->qideal == NULL );
 
   PrintS("\n//   minpoly        : 0\n");
 
@@ -865,8 +907,8 @@ void definiteGcdCancellation(number a, const coeffs cf,
 #endif /* HAVE_FACTORY */
 }
 
-/* modifies a */
-void ntWrite(number &a, const coeffs cf)
+// NOTE: modifies a
+void ntWriteLong(number &a, const coeffs cf)
 {
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
@@ -878,14 +920,40 @@ void ntWrite(number &a, const coeffs cf)
     // stole logic from napWrite from kernel/longtrans.cc of legacy singular
     BOOLEAN omitBrackets = p_IsConstant(NUM(f), ntRing);
     if (!omitBrackets) StringAppendS("(");
-    p_String0(NUM(f), ntRing, ntRing);
+    p_String0Long(NUM(f), ntRing, ntRing);
     if (!omitBrackets) StringAppendS(")");
     if (!DENIS1(f))
     {
       StringAppendS("/");
       omitBrackets = p_IsConstant(DEN(f), ntRing);
       if (!omitBrackets) StringAppendS("(");
-      p_String0(DEN(f), ntRing, ntRing);
+      p_String0Long(DEN(f), ntRing, ntRing);
+      if (!omitBrackets) StringAppendS(")");
+    }    
+  }
+}
+
+// NOTE: modifies a
+void ntWriteShort(number &a, const coeffs cf)
+{
+  ntTest(a);
+  definiteGcdCancellation(a, cf, FALSE);
+  if (IS0(a))
+    StringAppendS("0");
+  else
+  {
+    fraction f = (fraction)a;
+    // stole logic from napWrite from kernel/longtrans.cc of legacy singular
+    BOOLEAN omitBrackets = p_IsConstant(NUM(f), ntRing);
+    if (!omitBrackets) StringAppendS("(");
+    p_String0Short(NUM(f), ntRing, ntRing);
+    if (!omitBrackets) StringAppendS(")");
+    if (!DENIS1(f))
+    {
+      StringAppendS("/");
+      omitBrackets = p_IsConstant(DEN(f), ntRing);
+      if (!omitBrackets) StringAppendS("(");
+      p_String0Short(DEN(f), ntRing, ntRing);
       if (!omitBrackets) StringAppendS(")");
     }
   }
@@ -922,7 +990,17 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
      this expectation is based on the assumption that we have properly
      registered cf and perform reference counting rather than creating
      multiple copies of the same coefficient field/domain/ring */
-  return (ntRing == e->r);
+  if (ntRing == e->r)
+    return TRUE;
+
+  // NOTE: Q(a)[x] && Q(a)[y] should better share the _same_ Q(a)...
+  if( rEqual(ntRing, e->r, TRUE) )
+  {
+    rDelete(e->r);
+    return TRUE;
+  }
+
+  return FALSE;  
 }
 
 number ntLcm(number a, number b, const coeffs cf)
@@ -1048,10 +1126,10 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
-  poly p = p_One(dst->extRing);
+  poly p = p_Init(dst->extRing);
   number na=n_Copy(a, src);
   n_Normalize(na, src);
-  p_SetCoeff(p, na, dst->extRing);
+  p_SetCoeff0(p, na, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
@@ -1176,6 +1254,8 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
   /* dst is expected to be a rational function field */
   assume(getCoeffType(dst) == ID);
 
+  if( src == dst ) return ndCopyMap;
+
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
   coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
@@ -1280,11 +1360,48 @@ CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
 }
 #endif
 
-int ntParDeg(number a, const coeffs cf)
+static int ntParDeg(number a, const coeffs cf)
 {
   if (IS0(a)) return -1;
   fraction fa = (fraction)a;
   return cf->extRing->pFDeg(NUM(fa),cf->extRing);
+}
+
+/// return the specified parameter as a number in the given trans.ext.
+static number ntParameter(const int iParameter, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+  assume( 0 < iParameter && iParameter <= rVar(R) );
+
+  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
+
+//  return (number) p;
+
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(f) = p;
+  DEN(f) = NULL;
+  COM(f) = 0;
+
+  return (number)f;
+}
+
+/// if m == var(i)/1 => return i,
+int ntIsParam(number m, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+
+  fraction f = (fraction)m;
+
+  if( DEN(f) != NULL )
+    return 0;
+
+  return p_Var( NUM(f), R );
 }
 
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
@@ -1296,19 +1413,22 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   assume( e->r                != NULL);      // extRing;
   assume( e->r->cf            != NULL);      // extRing->cf;
-  assume( e->r->minideal == NULL );
+  assume( e->r->qideal == NULL );
 
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                // coeff type;
 
-  cf->extRing           = e->r;
-  cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!
-  cf->factoryVarOffset = cf->extRing->cf->factoryVarOffset+rVar(cf->extRing);
+  ring R = e->r;
+  assume(R != NULL);
+  
+  R->ref ++; // increase the ref.counter for the ground poly. ring!
 
+  cf->extRing           = R;
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
-  cf->ch = cf->extRing->cf->ch;
-
+  cf->ch = R->cf->ch;
+  cf->factoryVarOffset = R->cf->factoryVarOffset + rVar(R);
+  
   cf->cfGreaterZero  = ntGreaterZero;
   cf->cfGreater      = ntGreater;
   cf->cfEqual        = ntEqual;
@@ -1326,7 +1446,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfExactDiv     = ntDiv;
   cf->cfPower        = ntPower;
   cf->cfCopy         = ntCopy;
-  cf->cfWrite        = ntWrite;
+  cf->cfWriteLong    = ntWriteLong;
   cf->cfRead         = ntRead;
   cf->cfNormalize    = ntNormalize;
   cf->cfDelete       = ntDelete;
@@ -1347,6 +1467,11 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfIntDiv       = ntDiv;
   cf->cfKillChar     = ntKillChar;
 
+  if( rCanShortOut(ntRing) )
+    cf->cfWriteShort = ntWriteShort;
+  else
+    cf->cfWriteShort = ntWriteLong;
+
 #ifndef HAVE_FACTORY
   PrintS("// Warning: The 'factory' module is not available.\n");
   PrintS("//          Hence gcd's cannot be cancelled in any\n");
@@ -1357,43 +1482,10 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 #endif
   cf->cfParDeg = ntParDeg;
 
+  cf->iNumberOfParameters = rVar(R);
+  cf->pParameterNames = R->names;
+  cf->cfParameter = ntParameter;
+
+
   return FALSE;
-}
-
-
-number ntParam(const short iParameter, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-
-  const ring R = cf->extRing;
-  assume( R != NULL );
-  assume( 0 < iParameter && iParameter <= rVar(R) );
-
-  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
-
-//  return (number) p;
-
-  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(f) = p;
-  DEN(f) = NULL;
-  COM(f) = 0;
-
-  return (number)f;
-}
-
-
-/// if m == var(i)/1 => return i,
-int ntIsParam(number m, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-
-  const ring R = cf->extRing;
-  assume( R != NULL );
-
-  fraction f = (fraction)m;
-
-  if( DEN(f) != NULL )
-    return 0;
-
-  return p_Var( NUM(f), R );
 }

@@ -29,8 +29,9 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
 
 
-AM_LDFLAGS	= -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel \
--L${abs_top_builddir}/libpolys/polys $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
+AMLDFLAGS	= 
+# -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel \
+# -L${abs_top_builddir}/libpolys/polys $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
 
 
 SOURCES = mod_main.cc DebugPrint.cc DebugPrint.h myNF.cc myNF.h singularxx_defs.h
@@ -46,8 +47,8 @@ syzextra_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 syzextra_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
 syzextra_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-P_PROCS_MODULE_LDFLAGS = -shared -module
-P_PROCS_MODULE_LDFLAGSG = -shared -module
+P_PROCS_MODULE_LDFLAGS = -shared -module ${AMLDFLAGS}
+P_PROCS_MODULE_LDFLAGSG = -shared -module ${AMLDFLAGS}
 
 # Add under Mac OS X: -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 

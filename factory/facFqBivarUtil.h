@@ -207,7 +207,8 @@ logarithmicDerivative (const CanonicalForm& F,   ///< [in] bivariate poly
 /// @return @a computeBounds returns bounds as described above
 int *
 computeBounds (const CanonicalForm& F,///< [in] compressed bivariate polynomial
-               int& n                 ///< [in,out] length of output
+               int& n,                ///< [in,out] length of output
+               bool& isIrreducible    ///< [in,out] check if poly is irreducible
               );
 
 /// extract coefficients of \f$ x^i \f$ for \f$i\geq k\f$ where \f$ x \f$ is

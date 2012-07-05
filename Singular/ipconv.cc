@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -19,6 +18,7 @@
 #include <Singular/subexpr.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/bigintmat.h>
 //#include <polys/ext_fields/longalg.h>
 #ifdef HAVE_RINGS
 #include <coeffs/rmodulon.h>
@@ -102,10 +102,10 @@ static void * iiP2Id(void *data)
 {
   ideal I=idInit(1,1);
 
-  I->m[0]=(poly)data;
   if (data!=NULL)
   {
     poly p=(poly)data;
+    I->m[0]=p;
     if (pGetComp(p)!=0) I->rank=pMaxComp(p);
   }
   return (void *)I;
@@ -166,7 +166,7 @@ static void * iiBI2N(void *data)
   // a bigint is really a number from char 0, with diffrent
   // operations...
   number n = n_Init_bigint((number)data, coeffs_BIGINT, currRing->cf);
-  n_Delete((number *)&data, coeffs_BIGINT);  
+  n_Delete((number *)&data, coeffs_BIGINT);
   return (void*)n;
 }
 
@@ -185,6 +185,22 @@ static void * iiIm2Ma(void *data)
   }
   delete iv;
   return (void *)m;
+}
+
+static void * iiIm2Bim(void *data)
+{
+  intvec *iv=(intvec*)data;
+  void *r=(void *)iv2bim(iv,coeffs_BIGINT);
+  delete iv;
+  return r;
+}
+
+static void * iiBim2Im(void *data)
+{
+  bigintmat *b=(bigintmat*)data;
+  void *r=(void *)bim2iv(b);
+  delete b;
+  return r;
 }
 
 static void * iiN2P(void *data)
@@ -280,8 +296,13 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
         output->name=omStrDup(IDID((idhdl)(input->data)));
       else if (input->name!=NULL)
       {
-        output->name=input->name;
-        input->name=NULL;
+        if (input->rtyp==ALIAS_CMD)
+        output->name=omStrDup(input->name);
+        else
+        {
+          output->name=input->name;
+          input->name=NULL;
+        }
       }
       else if ((input->rtyp==POLY_CMD) && (input->name==NULL))
       {

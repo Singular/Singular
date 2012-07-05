@@ -2674,7 +2674,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfCopy  = nlCopy;
   r->cfRePart = nlCopy;
   //r->cfImPart = ndReturn0;
-  r->cfWrite = nlWrite;
+  r->cfWriteLong = nlWrite;
   r->cfRead = nlRead;
   r->cfNormalize=nlNormalize;
   r->cfGreater = nlGreater;

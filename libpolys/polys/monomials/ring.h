@@ -19,9 +19,11 @@ class idrec;
 typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
 struct  spolyrec;
 typedef struct spolyrec    polyrec;
-typedef polyrec *          poly;
+typedef struct spolyrec *         poly;
+typedef struct spolyrec const *   const_poly;
 struct ip_sring;
 typedef struct ip_sring *         ring;
+typedef struct ip_sring const *   const_ring;
 class intvec;
 class int64vec;
 struct p_Procs_s;
@@ -33,9 +35,11 @@ typedef kBucket*           kBucket_pt;
 
 struct sip_sideal;
 typedef struct sip_sideal *       ideal;
+typedef struct sip_sideal const * const_ideal;
 
 struct sip_smap;
 typedef struct sip_smap *         map;
+typedef struct sip_smap const *   const_map;
 
 /* the function pointer types */
 
@@ -54,6 +58,7 @@ typedef enum
 {
   ro_dp, // ordering is a degree ordering
   ro_wp, // ordering is a weighted degree ordering
+  ro_am, // ordering is am: weights for vars + weights for gen
   ro_wp64, // ordering is a weighted64 degree ordering
   ro_wp_neg, // ordering is a weighted degree ordering
              // with possibly negative weights
@@ -83,6 +88,21 @@ struct sro_wp
   int *weights; // pointers into wvhdl field
 };
 typedef struct sro_wp sro_wp;
+
+// ordering is a weighted degree ordering
+struct sro_am
+{
+  short place;  // where weighted degree is stored (in L)
+  short start;  // bounds of ordering (in E)
+  short end;
+  short len_gen; // i>len_gen: weight(gen(i)):=0
+  int *weights; // pointers into wvhdl field of length (end-start+1) + len_gen + 1
+                // contents w_{start},... w_{end}, len, mod_w_1, .. mod_w_len, 0
+  int *weights_m; // pointers into wvhdl field of length len_gen + 1
+                // len_gen, mod_w_1, .. mod_w_len, 0
+  
+};
+typedef struct sro_am sro_am;
 
 // ordering is a weighted degree ordering
 struct sro_wp64
@@ -151,7 +171,6 @@ struct sro_IS
 
   // reference poly set?? // Should it be owned by ring?!!!
   ideal F; // reference leading (module)-monomials set. owned by ring...
-  const intvec* componentWeights; // component weights! owned by ring...
 };
 
 typedef struct sro_IS sro_IS;
@@ -165,6 +184,7 @@ struct sro_ord
   {
      sro_dp dp;
      sro_wp wp;
+     sro_am am;
      sro_wp64 wp64;
      sro_cp cp;
      sro_syzcomp syzcomp;
@@ -189,13 +209,6 @@ struct ip_sring
   int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
   int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
 //  char**     parameter; /* names of parameters, rInit */
-//  number     minpoly;  /* replaced by minideal->m[0] */
-  ideal      minideal;   /* for Q_a/Zp_a, rInit;
-                            for a start, we assume that there is either no
-                            or exactly one generator in minideal, playing
-                            the role of the former minpoly; minideal may
-                            also be NULL which coincides with the
-                            no-generator-case */
   int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
   char **    names;  /* array of variable names, rInit */
 
@@ -212,7 +225,15 @@ struct ip_sring
 
   int*     VarOffset;
 
-  ideal      qideal; /* extension to the ring structure: qring, rInit */
+//  ideal      minideal;
+//  number     minpoly;  /* replaced by minideal->m[0] */
+  ideal      qideal; /**< extension to the ring structure: qring, rInit, OR
+                          for Q_a/Zp_a, rInit (replaces minideal!);
+                          for a start, we assume that there is either no
+                          or exactly one generator in minideal, playing
+                          the role of the former minpoly; minideal may
+                          also be NULL which coincides with the
+                          no-generator-case **/
 
   int*     firstwv;
 
@@ -316,8 +337,8 @@ struct ip_sring
 
 ring   rDefault(int ch, int N, char **n);
 ring   rDefault(const coeffs cf, int N, char **n);
-ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
-ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
+ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
+ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
@@ -375,8 +396,16 @@ char * rParStr(ring r);
 int    rSum(ring r1, ring r2, ring &sum);
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 
-BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
+/// returns TRUE, if r1 equals r2 FALSE, otherwise Equality is
+/// determined componentwise, if qr == 1, then qrideal equality is
+/// tested, as well
+BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = TRUE);
+
+/// returns TRUE, if r1 and r2 represents the monomials in the same way
+/// FALSE, otherwise
+/// this is an analogue to rEqual but not so strict
 BOOLEAN rSamePolyRep(ring r1, ring r2);
+
 void   rUnComplete(ring r);
 
 BOOLEAN rRing_is_Homog(ring r);
@@ -493,7 +522,12 @@ static inline char* rRingVar(short i, const ring r)
 }
 static inline BOOLEAN rShortOut(const ring r)
 {
-  assume(r != NULL); assume(r->cf != NULL); return (r->ShortOut);
+  assume(r != NULL); return (r->ShortOut);
+}
+
+static inline BOOLEAN rCanShortOut(const ring r)
+{
+  assume(r != NULL); return (r->CanShortOut);
 }
 
 /// #define rVar(r) (r->N)
@@ -504,54 +538,91 @@ static inline short rVar(const ring r)
 }
 
 /// (r->cf->P)
-static inline short rPar(const ring r)
+static inline int rPar(const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) )
-  {
-    const ring R = C->extRing;
-    assume( R != NULL );
-    return rVar( R );
-  }
-  else if (nCoeff_is_long_C(C))
-  {
-    return 1;
-  }
-  return 0;
+  return n_NumberOfParameters(C);
+//   if( nCoeff_is_Extension(C) )
+//   {
+//     const ring R = C->extRing;
+//     assume( R != NULL );
+//     return rVar( R );
+//   }
+//   else if (nCoeff_is_GF(C))
+//   {
+//     return 1;
+//   }
+//   else if (nCoeff_is_long_C(C))
+//   {
+//     return 1;
+//   }
+//   return 0;
 }
 
 
 /// (r->cf->parameter)
-static inline char** rParameter(const ring r)
+static inline char const * const * rParameter(const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  if( rField_is_Extension(r) ) // only alg / trans. exts...
-  {
-    const ring R = C->extRing;
-    assume( R != NULL );
-    return R->names;
-  }
-  else if (nCoeff_is_GF(C))
-  {
-    return &(C->m_nfParameter);
-  }
-  else if (nCoeff_is_long_C(C))
-  {
-    return &(C->complex_parameter);
-  }
-  return NULL;
+  return n_ParameterNames(C);
+//   if( nCoeff_is_Extension(C) ) // only alg / trans. exts...
+//   {
+//     const ring R = C->extRing;
+//     assume( R != NULL );
+//     return R->names;
+//   }
+//   else if (nCoeff_is_GF(C))
+//   {
+//     return &(C->m_nfParameter);
+//   }
+//   else if (nCoeff_is_long_C(C))
+//   {
+//     return &(C->complex_parameter);
+//   }
+//   return NULL;
 }
 
 /// return the specified parameter as a (new!) number in the given
 /// polynomial ring, or NULL if invalid
 /// parameters (as variables) begin with 1!
-number n_Param(const short iParameter, const ring r);
+static inline number n_Param(const short iParameter, const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+  return n_Param(iParameter, C);
+//   const n_coeffType _filed_type = getCoeffType(C);
+// 
+//   if ( iParameter <= 0 || iParameter > rPar(r) )
+//     // Wrong parameter
+//     return NULL;
+// 
+//   if( _filed_type == n_algExt )
+//     return naParameter(iParameter, C);
+// 
+//   if( _filed_type == n_transExt )
+//     return ntParameter(iParameter, C);
+// 
+//   if (_filed_type == n_GF)// if (nCoeff_is_GF(C))
+//   {
+//     number nfPar (int i, const coeffs);
+//     return nfPar(iParameter, C);
+//   }
+//   
+//   if (_filed_type == n_long_C) // if (nCoeff_is_long_C(C))
+//   {
+//     number   ngcPar(int i, const coeffs r);    
+//     return ngcPar(iParameter, C);
+//   }
+// 
+//   return NULL;
+}
 
 /// if m == var(i)/1 => return i, 
 int n_IsParam(number m, const ring r);
@@ -569,12 +640,34 @@ static inline int rInternalChar(const ring r)
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)
 {
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
 //  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
-  return rField_is_Extension(r) || nCoeff_is_GF(r->cf) ;
+  return nCoeff_is_Extension(C) || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
 }
 
 /// Tests whether '(r->cf->minpoly) == NULL'
-BOOLEAN rMinpolyIsNULL(const ring r);
+static inline BOOLEAN rMinpolyIsNULL(const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  const BOOLEAN ret = nCoeff_is_algExt(C); //  || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
+
+  if( ret )
+  {
+    const ring R = C->extRing;
+    assume( R != NULL );
+    BOOLEAN idIs0 (ideal h);
+    assume( !idIs0(R->qideal) );
+  }
+
+  // TODO: this leads to test fails (due to rDecompose?)
+  return !ret;
+}
+
 
 
 /// order stuff
@@ -599,10 +692,11 @@ typedef enum rRingOrder_t
   ringorder_Ds,
   ringorder_ws,
   ringorder_Ws,
+  ringorder_am,
   ringorder_L,
   // the following are only used internally
   ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
-  ringorder_rs, ///< ???
+  ringorder_rs, ///< opposite of ls
   ringorder_IS, ///< Induced (Schreyer) ordering
   ringorder_unspec
 } rRingOrder_t;
@@ -729,7 +823,7 @@ void rSetWeightVec(ring r, int64 *wv);
    varIndex starts at index 1 */
 poly rGetVar(const int varIndex, const ring r);
 
-BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL);
+BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int p = 0);
 
 /// return the position of the p^th IS block order block in r->typ[]...
 int rGetISPos(const int p, const ring r);

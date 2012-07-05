@@ -55,6 +55,7 @@ LT_INIT
 # Checks for libraries.
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
@@ -122,6 +123,7 @@ if test "x$ENABLE_FACTORY" = xyes; then
  fi
 fi
 
+AC_CONFIG_SUBDIRS([findexec]) 
 AC_CONFIG_SUBDIRS([omalloc])
 
 if test "x$ENABLE_FACTORY" = xyes; then
@@ -130,7 +132,6 @@ fi
 
 AC_CONFIG_SUBDIRS([libpolys])
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([findexec/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])

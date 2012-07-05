@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT
 */
@@ -54,9 +53,11 @@ typedef mpz_ptr int_number;
 
 struct ip_sring;
 typedef struct ip_sring *         ring;
+typedef struct ip_sring const *   const_ring;
 
 struct n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
+typedef struct  n_Procs_s  const * const_coeffs;
 
 typedef number (*numberfunc)(number a, number b, const coeffs r);
 
@@ -143,7 +144,14 @@ struct n_Procs_s
    number  (*cfCopy)(number a, const coeffs r);
    number  (*cfRePart)(number a, const coeffs r);
    number  (*cfImPart)(number a, const coeffs r);
-   void    (*cfWrite)(number &a, const coeffs r);
+
+   /// print a given number (long format)
+   void    (*cfWriteLong)(number &a, const coeffs r);
+   
+   /// print a given number in a shorter way, if possible
+   /// e.g. in K(a): a2 instead of a^2
+   void    (*cfWriteShort)(number &a, const coeffs r);
+   
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
    void    (*cfNormalize)(number &a, const coeffs r);
    BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
@@ -186,6 +194,9 @@ struct n_Procs_s
    /// degree for coeffcients: -1 for 0, 0 for "constants", ...
    int (*cfParDeg)(number x,const coeffs r);
 
+   /// create i^th parameter or NULL if not possible
+   number  (*cfParameter)(const int i, const coeffs r);
+
 #ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
@@ -197,12 +208,23 @@ struct n_Procs_s
    BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
 #endif
 
-   number nNULL; /* the 0 as constant */
+   /// the 0 as constant, NULL by default
+   number nNULL; 
    int     char_flag;
    int     ref;
    /// how many variables of factort are already used by this coeff
    int     factoryVarOffset;
    n_coeffType type;
+
+
+   /// Number of Parameters in the coeffs (default 0)
+   int iNumberOfParameters;
+
+   /// array containing the names of Parameters (default NULL)
+   char const * const * pParameterNames;
+   // NOTE that it replaces the following:
+// char* complex_parameter; //< the name of sqrt(-1) in n_long_C , i.e. 'i' or 'j' etc...?
+// char * m_nfParameter; //< the name of parameter in n_GF
 
    /////////////////////////////////////////////
    // the union stuff
@@ -214,12 +236,10 @@ struct n_Procs_s
   ring          extRing;
 
   //number     minpoly;  //< no longer needed: replaced by
-  //                     //< extRing->minideal->[0]
+  //                     //< extRing->qideal->[0]
 
 
 //-------------------------------------------
-  char* complex_parameter; //< the name of sqrt(-1), i.e. 'i' or 'j' etc...?
-
 #ifdef HAVE_RINGS
   /* The following members are for representing the ring Z/n,
      where n is not a prime. We distinguish four cases:
@@ -260,9 +280,9 @@ struct n_Procs_s
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
 
-  BOOLEAN   CanShortOut; //< if the elements can be printed in short format
-		       // this is set to FALSE if a parameter name has >2 chars
-  BOOLEAN   ShortOut; //< if the elements should print in short format
+//  BOOLEAN   CanShortOut; //< if the elements can be printed in short format
+//		       // this is set to FALSE if a parameter name has >2 chars
+//  BOOLEAN   ShortOut; //< if the elements should print in short format
 
 // ---------------------------------------------------
   // for n_GF
@@ -273,8 +293,7 @@ struct n_Procs_s
   int m_nfCharQ1; ///< q-1
   unsigned short *m_nfPlus1Table;
   int *m_nfMinPoly;
-  char * m_nfParameter;
-
+  
 // ---------------------------------------------------
 // for Zp:
 #ifdef HAVE_DIV_MOD
@@ -447,8 +466,17 @@ static inline void   n_Normalize(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfNormalize!=NULL); r->cfNormalize(n,r); }
 
 /// write to the output buffer of the currently used reporter
-static inline void   n_Write(number& n,  const coeffs r)
-{ assume(r != NULL); assume(r->cfWrite!=NULL); r->cfWrite(n,r); }
+static inline void   n_WriteLong(number& n,  const coeffs r)
+{ assume(r != NULL); assume(r->cfWriteLong!=NULL); r->cfWriteLong(n,r); }
+
+/// write to the output buffer of the currently used reporter
+/// in a shortest possible way, e.g. in K(a): a2 instead of a^2
+static inline void   n_WriteShort(number& n,  const coeffs r)
+{ assume(r != NULL); assume(r->cfWriteShort!=NULL); r->cfWriteShort(n,r); }
+
+static inline void   n_Write(number& n,  const coeffs r, const BOOLEAN bShortOut = TRUE)
+{ if (bShortOut) n_WriteShort(n, r); else n_WriteLong(n, r); }
+
 
 /// @todo: Describe me!!! --> Hans
 ///
@@ -602,21 +630,36 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 
 static inline number n_ChineseRemainder(number *a, number *b, int rl, const coeffs r)
 {
-  assume(r != NULL);
-  return r->cfChineseRemainder(a,b,rl,r);
+  assume(r != NULL); assume(r->cfChineseRemainder != NULL); return r->cfChineseRemainder(a,b,rl,r);
 }
 
 static inline number n_Farey(number a, number b, const coeffs r)
 {
-  assume(r != NULL);
-  return r->cfFarey(a,b,r);
+  assume(r != NULL); assume(r->cfFarey != NULL); return r->cfFarey(a,b,r);
 }
 
 static inline int n_ParDeg(number n, const coeffs r)
 { 
-  assume(r != NULL);
-  return r->cfParDeg(n,r); 
+  assume(r != NULL); assume(r->cfParDeg != NULL); return r->cfParDeg(n,r); 
 }
+
+/// Returns the number of parameters
+static inline int n_NumberOfParameters(const coeffs r){ return r->iNumberOfParameters; }
+
+/// Returns a (const!) pointer to (const char*) names of parameters
+static inline char const * const * n_ParameterNames(const coeffs r){ return r->pParameterNames; }
+
+
+/// return the (iParameter^th) parameter as a NEW number
+/// NOTE: parameter numbering: 1..n_NumberOfParameters(...)
+static inline number n_Param(const int iParameter, const coeffs r)
+{
+  assume(r != NULL);
+  assume((iParameter >= 1) || (iParameter <= n_NumberOfParameters(r)));
+  assume(r->cfParameter != NULL);
+  return r->cfParameter(iParameter, r);  
+}
+
 
 static inline number  n_Init_bigint(number i, const coeffs dummy,
 		const coeffs dst)

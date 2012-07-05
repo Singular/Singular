@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -15,6 +14,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include <coeffs/bigintmat.h>
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>
@@ -236,6 +236,42 @@ int iiTokType(int op)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
+static BOOLEAN jjOP_BIM_I(leftv res, leftv u, leftv v)
+{
+  bigintmat* aa= (bigintmat *)u->Data();
+  int bb = (int)(long)(v->Data());
+  if (errorreported) return TRUE;
+  bigintmat *cc=NULL;
+  switch (iiOp)
+  {
+    case '+': cc=bimAdd(aa,bb); break;
+    case '-': cc=bimSub(aa,bb); break;
+    case '*': cc=bimMult(aa,bb); break;
+  }
+  res->data=(char *)cc;
+  return cc==NULL;
+}
+static BOOLEAN jjOP_I_BIM(leftv res, leftv u, leftv v)
+{
+  return jjOP_BIM_I(res, v, u);
+}
+static BOOLEAN jjOP_BIM_BI(leftv res, leftv u, leftv v)
+{
+  bigintmat* aa= (bigintmat *)u->Data();
+  number bb = (number)(v->Data());
+  if (errorreported) return TRUE;
+  bigintmat *cc=NULL;
+  switch (iiOp)
+  {
+    case '*': cc=bimMult(aa,bb,coeffs_BIGINT); break;
+  }
+  res->data=(char *)cc;
+  return cc==NULL;
+}
+static BOOLEAN jjOP_BI_BIM(leftv res, leftv u, leftv v)
+{
+  return jjOP_BIM_BI(res, v, u);
+}
 static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
 {
   intvec* aa= (intvec *)u->CopyD(INTVEC_CMD);
@@ -300,6 +336,34 @@ static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
 {
   intvec*    a = (intvec * )(u->Data());
   intvec*    b = (intvec * )(v->Data());
+  int r=a->compare(b);
+  switch  (iiOp)
+  {
+    case '<':
+      res->data  = (char *) (r<0);
+      break;
+    case '>':
+      res->data  = (char *) (r>0);
+      break;
+    case LE:
+      res->data  = (char *) (r<=0);
+      break;
+    case GE:
+      res->data  = (char *) (r>=0);
+      break;
+    case EQUAL_EQUAL:
+    case NOTEQUAL: /* negation handled by jjEQUAL_REST */
+      res->data  = (char *) (r==0);
+      break;
+  }
+  jjEQUAL_REST(res,u,v);
+  if(r==-2) { WerrorS("size incompatible"); return TRUE; }
+  return FALSE;
+}
+static BOOLEAN jjCOMPARE_BIM(leftv res, leftv u, leftv v)
+{
+  bigintmat*    a = (bigintmat * )(u->Data());
+  bigintmat*    b = (bigintmat * )(v->Data());
   int r=a->compare(b);
   switch  (iiOp)
   {
@@ -683,7 +747,16 @@ static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
-  return FALSE;
+}
+static BOOLEAN jjPLUS_BIM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)bimAdd((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
+  if (res->data==NULL)
+  {
+    WerrorS("bigintmat size not compatible");
+    return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 {
@@ -765,6 +838,16 @@ static BOOLEAN jjMINUS_IV(leftv res, leftv u, leftv v)
   {
      WerrorS("intmat size not compatible");
      return TRUE;
+  }
+  return jjPLUSMINUS_Gen(res,u,v);
+}
+static BOOLEAN jjMINUS_BIM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)bimSub((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
+  if (res->data==NULL)
+  {
+    WerrorS("bigintmat size not compatible");
+    return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
@@ -878,6 +961,18 @@ static BOOLEAN jjTIMES_IV(leftv res, leftv u, leftv v)
   {
      WerrorS("intmat size not compatible");
      return TRUE;
+  }
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjTIMES_BIM(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)bimMult((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
+  if (res->data==NULL)
+  {
+    WerrorS("bigintmat size not compatible");
+    return TRUE;
   }
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
@@ -3500,6 +3595,13 @@ static BOOLEAN jjUMINUS_IV(leftv res, leftv u)
   res->data = (char *)iv;
   return FALSE;
 }
+static BOOLEAN jjUMINUS_BIM(leftv res, leftv u)
+{
+  bigintmat *bim=(bigintmat *)u->CopyD(BIGINTMAT_CMD);
+  (*bim)*=(-1);
+  res->data = (char *)bim;
+  return FALSE;
+}
 static BOOLEAN jjPROC1(leftv res, leftv u)
 {
   return jjPROC(res,u,NULL);
@@ -3571,6 +3673,11 @@ static BOOLEAN jjCOLS(leftv res, leftv v)
   res->data = (char *)(long)MATCOLS((matrix)(v->Data()));
   return FALSE;
 }
+static BOOLEAN jjCOLS_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(long)((bigintmat*)(v->Data()))->cols();
+  return FALSE;
+}
 static BOOLEAN jjCOLS_IV(leftv res, leftv v)
 {
   res->data = (char *)(long)((intvec*)(v->Data()))->cols();
@@ -3597,7 +3704,7 @@ static BOOLEAN jjCOUNT_N(leftv res, leftv v)
 static BOOLEAN jjCOUNT_L(leftv res, leftv v)
 {
   lists l=(lists)v->Data();
-  res->data = (char *)(long)(l->nr+1);
+  res->data = (char *)(long)(lSize(l)+1);
   return FALSE;
 }
 static BOOLEAN jjCOUNT_M(leftv res, leftv v)
@@ -3733,6 +3840,20 @@ static BOOLEAN jjDET(leftv res, leftv v)
   res ->data = (char *)p;
   return FALSE;
 }
+static BOOLEAN jjDET_BI(leftv res, leftv v)
+{
+  bigintmat * m=(bigintmat*)v->Data();
+  int i,j;
+  i=m->rows();j=m->cols();
+  if(i==j)
+    res->data = (char *)(long)singclap_det_bi(m,coeffs_BIGINT);
+  else
+  {
+    Werror("det of %d x %d bigintmat",i,j);
+    return TRUE;
+  }
+  return FALSE;
+}
 static BOOLEAN jjDET_I(leftv res, leftv v)
 {
   intvec * m=(intvec*)v->Data();
@@ -3848,7 +3969,7 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
     if (h==NULL)
     {
       L->Init(1);
-      L->m[0].data=(char *)idInit(0,1);
+      L->m[0].data=(char *)idInit(1);
       L->m[0].rtyp=IDEAL_CMD;
     }
     else
@@ -4307,6 +4428,11 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
      Then, we also have P * M = L * U.
      A list [P, L, U] is returned. */
   matrix mat = (const matrix)v->Data();
+  if (!idIsConstant((ideal)mat))
+  {
+    WerrorS("matrix must be constant");
+    return TRUE;
+  }
   matrix pMat;
   matrix lMat;
   matrix uMat;
@@ -4446,7 +4572,7 @@ static BOOLEAN jjPAR1(leftv res, leftv v)
 static BOOLEAN jjPARDEG(leftv res, leftv v)
 {
   number nn=(number)v->Data();
-  res->data = (char *)(long)n_ParDeg(nn,currRing->cf);
+  res->data = (char *)(long)n_ParDeg(nn, currRing);
   return FALSE;
 }
 static BOOLEAN jjPARSTR1(leftv res, leftv v)
@@ -4601,6 +4727,11 @@ static BOOLEAN jjROWS(leftv res, leftv v)
   res->data = (char *)i->rank;
   return FALSE;
 }
+static BOOLEAN jjROWS_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(long)((bigintmat*)(v->Data()))->rows();
+  return FALSE;
+}
 static BOOLEAN jjROWS_IV(leftv res, leftv v)
 {
   res->data = (char *)(long)((intvec*)(v->Data()))->rows();
@@ -4745,6 +4876,11 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
 static BOOLEAN jjTRACE_IV(leftv res, leftv v)
 {
   res->data = (char *)(long)ivTrace((intvec*)(v->Data()));
+  return FALSE;
+}
+static BOOLEAN jjTRANSP_BIM(leftv res, leftv v)
+{
+  res->data = (char *)(((bigintmat*)(v->Data()))->transpose());
   return FALSE;
 }
 static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
@@ -5224,6 +5360,34 @@ static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
   Subexpr e=jjMakeSub(v);
           e->next=jjMakeSub(w);
   if (u->e==NULL) res->e=e;
+  else
+  {
+    Subexpr h=u->e;
+    while (h->next!=NULL) h=h->next;
+    h->next=e;
+    res->e=u->e;
+    u->e=NULL;
+  }
+  return FALSE;
+}
+static BOOLEAN jjBRACK_Bim(leftv res, leftv u, leftv v, leftv w)
+{
+  bigintmat *bim = (bigintmat *)u->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
+  if ((r<1)||(r>bim->rows())||(c<1)||(c>bim->cols()))
+  {
+    Werror("wrong range[%d,%d] in bigintmat %s(%d x %d)",
+           r,c,u->Fullname(),bim->rows(),bim->cols());
+    return TRUE;
+  }
+  res->data=u->data; u->data=NULL;
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->name=u->name; u->name=NULL;
+  Subexpr e=jjMakeSub(v);
+          e->next=jjMakeSub(w);
+  if (u->e==NULL)
+    res->e=e;
   else
   {
     Subexpr h=u->e;
@@ -6013,13 +6177,13 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
     return TRUE;
   }
 #endif
-  if (!(ringvar=pVar(p)))
+  if ((ringvar=pVar(p))==0)
   {
     if (rField_is_Extension(currRing))
     {
       assume(currRing->cf->extRing!=NULL);
       number n = pGetCoeff(p);
-      ringvar=- n_IsParam(n, currRing);
+      ringvar= -n_IsParam(n, currRing);
     }
     if(ringvar==0)
     {
@@ -6675,6 +6839,11 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
         Werror("given matrix (%d x %d) is not quadratic, hence not invertible", rr, cc);
         return TRUE;
       }
+      if (!idIsConstant((ideal)aMat))
+      {
+        WerrorS("matrix must be constant");
+        return TRUE;
+      }
       invertible = luInverse(aMat, iMat);
     }
   }
@@ -6695,6 +6864,14 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
               rr, cc);
        return TRUE;
      }
+      if (!idIsConstant((ideal)pMat)
+      || (!idIsConstant((ideal)lMat))
+      || (!idIsConstant((ideal)uMat))
+      )
+      {
+        WerrorS("matricesx must be constant");
+        return TRUE;
+      }
      invertible = luInverseFromLUDecomp(pMat, lMat, uMat, iMat);
   }
   else
@@ -6775,6 +6952,14 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   {
     Werror("third matrix (%d x %d) and vector (%d x 1) do not fit",
            uMat->rows(), uMat->cols(), bVec->rows());
+    return TRUE;
+  }
+  if (!idIsConstant((ideal)pMat)
+  ||(!idIsConstant((ideal)lMat))
+  ||(!idIsConstant((ideal)uMat))
+  )
+  {
+    WerrorS("matrices must be constant");
     return TRUE;
   }
   solvable = luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, homogSolSpace);

@@ -5,6 +5,7 @@
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
+#define TRANSEXT_PRIVATES
 
 #include "config.h"
 #include <kernel/mod2.h>
@@ -17,6 +18,7 @@
 #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
 #include <polys/prCopy.h>
+#include <polys/ext_fields/transext.h>
 
 //#include <libpolys/polys/ext_fields/longtrans.h>
 // #include <kernel/longalg.h>
@@ -233,7 +235,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 poly pSubstPar(poly p, int par, poly image)
 {
   ideal theMapI = idInit(rPar(currRing),1);
-  nMapFunc nMap = n_SetMap(currRing->cf->extRing->cf, currRing->cf->extRing->cf);
+  nMapFunc nMap = n_SetMap(currRing->cf->extRing->cf, currRing->cf);
 
   int i;
   for(i = rPar(currRing);i>0;i--)
@@ -254,25 +256,26 @@ poly pSubstPar(poly p, int par, poly image)
 
   while (p!=NULL)
   {
-    memset(&tmpW,0,sizeof(sleftv));
     memset(v,0,sizeof(sleftv));
-    tmpW.rtyp=POLY_CMD;
-    
-    number n = pGetCoeff(p);
-    tmpW.data = n_GetNumerator(n, currRing); 
-    
-    if(1)
-    {
-      number d = n_GetDenom(n, currRing);
-      if ( d != NULL ) WarnS("ignoring denominators of coefficients...");
-      n_Delete(&d, currRing);
-    }
+
+    number d = n_GetDenom(p_GetCoeff(p, currRing), currRing);
+    if (!n_IsOne (d, currRing->cf)) WarnS("ignoring denominators of coefficients...");
+    n_Delete(&d, currRing);
+
+    number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing); 
+
+    memset(&tmpW,0,sizeof(sleftv));
+    tmpW.rtyp = POLY_CMD;
+    tmpW.data = NUM (num); // a copy of this poly will be used
       
     if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->cf->extRing,NULL,NULL,0,nMap))
     {
       WerrorS("map failed");
       v->data=NULL;
     }
+    n_Delete(&num, currRing);
+
+    //TODO check for memory leaks
     poly pp = pHead(p);
     //PrintS("map:");pWrite(pp);
     pSetCoeff(pp, nInit(1));

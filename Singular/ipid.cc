@@ -17,6 +17,7 @@
 #include <misc/intvec.h>
 #include <kernel/febase.h>
 #include <coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
 #include <kernel/longrat.h>
 #include <kernel/polys.h>
 #include <polys/monomials/ring.h>
@@ -125,6 +126,8 @@ void *idrecDataInit(int t)
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)new intvec();
+    case BIGINTMAT_CMD:
+      return (void *)new bigintmat();
     case NUMBER_CMD:
       return (void *) nInit(0);
     case BIGINT_CMD:
@@ -237,13 +240,11 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
   idhdl h;
   s=omStrDup(s);
   idhdl *save_root=root;
-  BOOLEAN to_reset=FALSE;
   if (t==PACKAGE_CMD)
   {
     if (root!=&(basePack->idroot))
     {
       root=&(basePack->idroot);
-      to_reset=TRUE;
     }
   }
   // is it already defined in root ?
@@ -309,7 +310,6 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
 #ifndef NDEBUG
   checkall();
 #endif
-  if (to_reset) root=save_root;
   return *root;
 
   errlabel:
@@ -317,7 +317,6 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     Werror("identifier `%s` in use",s);
     //listall();
     omFree((ADDRESS)s);
-    if (to_reset) root=save_root;
     return NULL;
 }
 void killid(const char * id, idhdl * ih)

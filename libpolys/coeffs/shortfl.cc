@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT:
@@ -545,7 +544,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == ID );
    
-  assume( p == NULL ); p;
+  assume( p == NULL );
    
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
@@ -566,11 +565,12 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfIsOne = nrIsOne;
   n->cfIsMOne = nrIsMOne;
   n->cfGreaterZero = nrGreaterZero;
-  n->cfWrite = nrWrite;
+  n->cfWriteLong = nrWrite;
   n->cfRead = nrRead;
   n->cfPower = nrPower;
   n->cfSetMap = nrSetMap;
   n->cfCoeffWrite  = nrCoeffWrite;
+  n->cfInit_bigint = nrMapQ;
 
     /* nName= ndName; */
     /*nSize  = ndSize;*/

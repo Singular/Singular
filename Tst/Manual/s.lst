@@ -1,5 +1,5 @@
 typeof.tst
-trace.tst
+_trace.tst
 janet.tst
 kbase.tst
 killattrib.tst
@@ -65,7 +65,7 @@ PBW_maxDeg.tst
 PBW_maxMonom.tst
 poly_expressions_BR_PLURAL_BR.tst
 pyobject.tst
-quotient.tst
+_quotient.tst
 random.tst
 rMacaulay.tst
 show.tst
@@ -335,7 +335,7 @@ integralSection.tst
 intInverse.tst
 intRank.tst
 is_active.tst
-isoncurve.tst
+_isoncurve.tst
 jordanmatrix.tst
 jordannf.tst
 katsura.tst
@@ -351,7 +351,7 @@ maxabs.tst
 minMult.tst
 Miscellaneous_oddities_4.tst
 nameof.tst
-names.tst
+_names.tst
 Names_3.tst
 ncols.tst
 noether.tst
@@ -589,7 +589,7 @@ symmat.tst
 symmfunc.tst
 T_2.tst
 timestep.tst
-tjurina.tst
+_tjurina.tst
 toric_std.tst
 UpOneMatrix.tst
 VarToPar.tst
@@ -924,7 +924,7 @@ A_L.tst
 absPrimdecGTZ.tst
 annfspecial.tst
 autonom.tst
-center.tst
+_center.tst
 centralizer.tst
 centralizerVS.tst
 CentralSaturation.tst
@@ -933,7 +933,7 @@ coords.tst
 corank.tst
 createQuotientGroup.tst
 defineHomogeneous.tst
-depth.tst
+_depth.tst
 displayInvariants.tst
 evaluate_reynolds.tst
 exportNuminvs.tst
@@ -1016,7 +1016,7 @@ iv2lpMat.tst
 ivHilbert.tst
 lift_rel_kb.tst
 liftstd_BR_PLURAL_BR.tst
-lll.tst
+_lll.tst
 localInvar.tst
 lp2ivId.tst
 magnitude.tst
@@ -1255,13 +1255,13 @@ Adj_div.tst
 annfsBMI.tst
 EOrdlist.tst
 findInvo.tst
-invariantRing.tst
+_invariantRing.tst
 lpHilbert.tst
 lpOrdMisLex.tst
 sheafCoh.tst
 sheafCohBGG.tst
 charInfo.tst
-delta.tst
+_delta.tst
 G_a_-Invariants.tst
 lpDHilbert.tst
 lpSickle.tst

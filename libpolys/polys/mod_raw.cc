@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -24,8 +23,7 @@
 
 #include <reporter/reporter.h>
 
-#include <resources/feResource.h>
-#include <resources/feFopen.h>
+#include <findexec/feResource.h>
 
 #include "mod_raw.h"
 
@@ -91,7 +89,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-   
+
   if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
   {
     LT = LT_HPUX;

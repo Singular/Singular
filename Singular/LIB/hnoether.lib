@@ -3913,15 +3913,13 @@ RETURN: list: first entry = list of HNErings,
      if (EXTHNEnumber>number_of_letztring) {
        // ----- fuer aktuelle Kante war Koerpererweiterung erforderlich -------
        EXTHNEnumber++;
-       if (not(defined(minPol))) { poly miniPol; }
-       miniPol=minpoly;
+       string @miniPol_EXTHNEring(EXTHNEnumber-1) = string(minpoly);
        setring SaveRing;
-       if (not(defined(miniPol))) { poly miniPol; }
-       miniPol=minpoly;
+       string @miniPol_SaveRing = string(minpoly);
        setring HNE_noparam;
        if (not(defined(a_x))){ map a_x,a_y; poly mp_save, mp_new; }
-       mp_save=imap(SaveRing,miniPol);
-       mp_new=imap(EXTHNEring(EXTHNEnumber-1),miniPol);
+       execute("mp_save= " + @miniPol_SaveRing + ";");
+       execute("mp_new = " + @miniPol_EXTHNEring(EXTHNEnumber-1) + ";" );;
        if (mp_save==mp_new) { // Sonderfall: wieder gleicher Ring
          def EXTHNEring(EXTHNEnumber)=SaveRing;
          setring EXTHNEring(EXTHNEnumber);

@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT - the interpreter related ring operations
 */
@@ -74,6 +72,7 @@ static const char * const ringorder_name[] =
   "Ds", ///< ringorder_Ds,
   "ws", ///< ringorder_ws,
   "Ws", ///< ringorder_Ws,
+  "am",  ///< ringorder_am,
   "L", ///< ringorder_L,
   "aa", ///< ringorder_aa
   "rs", ///< ringorder_rs,
@@ -107,7 +106,7 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
+ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int** wvhdl)
 {
   assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
@@ -122,7 +121,10 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bloc
     r->names[i]  = omStrDup(n[i]);
   }
   /*weights: entries for 2 blocks: NULL*/
-  r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int *));
+  if (wvhdl==NULL)
+    r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int *));
+  else
+    r->wvhdl=wvhdl;
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
@@ -133,13 +135,13 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bloc
   rComplete(r);
   return r;
 }
-ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
+ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1,int ** wvhdl)
 {
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);
   assume( cf != NULL);
-  return rDefault(cf,N,n,ord_size,ord,block0,block1);
+  return rDefault(cf,N,n,ord_size,ord,block0,block1,wvhdl);
 }
 ring   rDefault(const coeffs cf, int N, char **n)
 {
@@ -238,6 +240,10 @@ void   rWrite(ring r, BOOLEAN details)
   if ((r==NULL)||(r->order==NULL))
     return; /*to avoid printing after errors....*/
 
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+  
   int nblocks=rBlocks(r);
 
   // omCheckAddrSize(r,sizeof(ip_sring));
@@ -249,43 +255,60 @@ void   rWrite(ring r, BOOLEAN details)
 
   nblocks--;
 
-  n_CoeffWrite(r->cf, details);
-#if 0
+
+  if( nCoeff_is_algExt(C) )
   {
-    PrintS("//   characteristic : ");
-    if (rParameter(r)!=NULL)
-    {
-      Print ("//   %d parameter    : ",rPar(r));
-      char **sp= rParameter(r);
-      int nop=0;
-      while (nop<rPar(r))
-      {
-        PrintS(*sp);
-        PrintS(" ");
-        sp++; nop++;
-      }
-      PrintS("\n//   minpoly        : ");
-      if ( rField_is_long_C(r) )
-      {
-        // i^2+1:
-        Print("(%s^2+1)\n",rParameter(r)[0]);
-      }
-      else if (rMinpolyIsNULL(r))
-      {
-        PrintS("0\n");
-      }
-      else
-      {
-        StringSetS(""); n_Write(r->cf->minpoly,r->cf); PrintS(StringAppendS("\n"));
-      }
-      //if (r->minideal!=NULL)
-      //{
-      //  iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
-      //  PrintLn();
-      //}
-    }
+    // NOTE: the following (non-thread-safe!) UGLYNESS
+    // (changing naRing->ShortOut for a while) is due to Hans!
+    // Just think of other ring using the VERY SAME naRing and possible
+    // side-effects...
+    ring R = C->extRing;
+    const BOOLEAN bSaveShortOut = rShortOut(R); R->ShortOut = rShortOut(r) & rCanShortOut(R);
+
+    n_CoeffWrite(C, details); // for correct printing of minpoly... WHAT AN UGLYNESS!!!
+    
+    R->ShortOut = bSaveShortOut;
   }
-#endif
+  else
+    n_CoeffWrite(C, details);
+//   {
+//     PrintS("//   characteristic : ");
+//     
+//     char const * const * const params = rParameter(r);
+//     
+//     if (params!=NULL)
+//     {
+//       Print ("//   %d parameter    : ",rPar(r));
+//       
+//       char const * const * sp= params;
+//       int nop=0;
+//       while (nop<rPar(r))
+//       {
+//         PrintS(*sp);
+//         PrintS(" ");
+//         sp++; nop++;
+//       }
+//       PrintS("\n//   minpoly        : ");
+//       if ( rField_is_long_C(r) )
+//       {
+//         // i^2+1:
+//         Print("(%s^2+1)\n", params[0]);
+//       }
+//       else if (rMinpolyIsNULL(r))
+//       {
+//         PrintS("0\n");
+//       }
+//       else
+//       {
+//         StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringAppendS("\n"));
+//       }
+//       //if (r->qideal!=NULL)
+//       //{
+//       //  iiWriteMatrix((matrix)r->qideal,"//   minpolys",1,r,0);
+//       //  PrintLn();
+//       //}
+//     }
+//   }
   Print("//   number of vars : %d",r->N);
 
   //for (nblocks=0; r->order[nblocks]; nblocks++);
@@ -319,6 +342,7 @@ void   rWrite(ring r, BOOLEAN details)
     (  (r->order[l] >= ringorder_lp)
     ||(r->order[l] == ringorder_M)
     ||(r->order[l] == ringorder_a)
+    ||(r->order[l] == ringorder_am)
     ||(r->order[l] == ringorder_a64)
     ||(r->order[l] == ringorder_aa) ) && (r->order[l] < ringorder_IS) )
     {
@@ -353,6 +377,13 @@ void   rWrite(ring r, BOOLEAN details)
         }
         if (r->order[l]!=ringorder_M) break;
       }
+      if (r->order[l]==ringorder_am)
+      {
+        int m=r->wvhdl[l][i];
+        Print("\n//                  : %d module weights ",m);
+        m+=i;i++;
+        for(;i<=m;i++) Print(" %*d" ,nlen,r->wvhdl[l][i]);
+      }
     }
   }
 #ifdef HAVE_PLURAL
@@ -379,8 +410,8 @@ void   rWrite(ring r, BOOLEAN details)
       }
     } else
       PrintS(" ...");
-     
-#if 0  /*Singularg should not differ from Singular except in error case*/
+
+#if MYTEST  /*Singularg should not differ from Singular except in error case*/
     Print("\n//   noncommutative type:%d", (int)ncRingType(r));
     Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);
     if( rIsSCA(r) )
@@ -394,10 +425,10 @@ void   rWrite(ring r, BOOLEAN details)
 //        if (r==currRing)
 //        {
 //          PrintLn();
-//          iiWriteMatrix((matrix)Q,"scaQ",1);
+          iiWriteMatrix((matrix)Q,"scaQ",1,r,0);
 //        }
 //        else
-            PrintS(" ...");
+//            PrintS(" ...");
       }
       else
         PrintS(" (NULL)");
@@ -410,8 +441,8 @@ void   rWrite(ring r, BOOLEAN details)
     PrintS("\n// quotient ring from ideal");
     if( details )
     {
-      PrintLn();       
-      iiWriteMatrix((matrix)r->qideal,"_",1,r);
+      PrintLn();
+      iiWriteMatrix((matrix)r->qideal,"_",1,r,0);
     } else PrintS(" ...");
   }
 }
@@ -421,6 +452,18 @@ void rDelete(ring r)
   int i, j;
 
   if (r == NULL) return;
+
+  assume( r->ref <= 0 );
+
+  if( r->ref > 0 ) // ->ref means the number of Interpreter objects refearring to the ring...
+    return; // NOTE: There may be memory leaks due to inconsisten use of r->ref!!! (e.g. due to ext_fields)
+
+  if( r->qideal != NULL )
+  {
+    ideal q = r->qideal;
+    r->qideal = NULL;
+    id_Delete(&q, r);
+  }
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
@@ -461,19 +504,6 @@ void rDelete(ring r)
     omFreeSize((ADDRESS)r->names,r->N*sizeof(char *));
   }
 
-//   // delete parameter
-//   if (rParameter(r)!=NULL)
-//   {
-//     char **s= rParameter(r);
-//     j = 0;
-//     while (j < rPar(r))
-//     {
-//       if (*s != NULL) omFree((ADDRESS)*s);
-//       s++;
-//       j++;
-//     }
-//     omFreeSize((ADDRESS)rParameter(r),rPar(r)*sizeof(char *));
-//   }
   omFreeBin(r, sip_sring_bin);
 }
 
@@ -630,7 +660,7 @@ char * rCharStr(ring r)
   {
     return omStrDup("real"); /* short real */
   }
-  char **params = rParameter(r);
+  char const * const * const params = rParameter(r);
   if (params==NULL)
   {
     s=(char *)omAlloc(MAX_INT_LEN+1);
@@ -654,7 +684,7 @@ char * rCharStr(ring r)
   int l=0;
   for(i=0; i<rPar(r);i++)
   {
-    l+=(strlen(rParameter(r)[i])+1);
+    l+=(strlen(params[i])+1);
   }
   s=(char *)omAlloc((long)(l+MAX_INT_LEN+1));
   s[0]='\0';
@@ -665,7 +695,7 @@ char * rCharStr(ring r)
   for(i=0; i<rPar(r);i++)
   {
     strcat(s,tt);
-    strcat(s,rParameter(r)[i]);
+    strcat(s,params[i]);
   }
   return s;
 }
@@ -674,21 +704,23 @@ char * rParStr(ring r)
 {
   if ((r==NULL)||(rParameter(r)==NULL)) return omStrDup("");
 
+  char const * const * const params = rParameter(r);
+
   int i;
   int l=2;
 
   for (i=0; i<rPar(r); i++)
   {
-    l+=strlen(rParameter(r)[i])+1;
+    l+=strlen(params[i])+1;
   }
   char *s=(char *)omAlloc((long)l);
   s[0]='\0';
   for (i=0; i<rPar(r)-1; i++)
   {
-    strcat(s,rParameter(r)[i]);
+    strcat(s, params[i]);
     strcat(s,",");
   }
-  strcat(s,rParameter(r)[i]);
+  strcat(s, params[i]);
   return s;
 }
 
@@ -784,6 +816,14 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.cf=r1->cf;
         r1->cf->ref++;
       }
+      else if (nCoeff_is_Extension(r2->cf) && rChar(r2) == rChar(r1))
+      {
+        /*AlgExtInfo extParam;
+        extParam.r = r2->cf->extRing;
+        extParam.i = r2->cf->extRing->qideal;*/
+        tmpR.cf=r2->cf;
+        r2->cf->ref++;
+      }
       else
       {
         WerrorS("Z/p+...");
@@ -802,9 +842,32 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.cf=r2->cf;
         r2->cf->ref++;
       }
+      else if (nCoeff_is_Extension(r2->cf))
+      {
+        tmpR.cf=r2->cf;
+        r2->cf->ref++;
+      }
       else
       {
         WerrorS("Q+...");
+        return -1;
+      }
+    }
+    else if (nCoeff_is_Extension(r1->cf))
+    {
+      if (r1->cf->extRing->cf==r2->cf)
+      {
+        tmpR.cf=r1->cf;
+        r1->cf->ref++;
+      }
+      else if (getCoeffType(r1->cf->extRing->cf)==n_Zp && getCoeffType(r2->cf)==n_Q) //r2->cf == n_Zp should have been handled above
+      {
+        tmpR.cf=r1->cf;
+        r1->cf->ref++;
+      }
+      else
+      {
+        WerrorS ("coeff sum of two extension fields not implemented");
         return -1;
       }
     }
@@ -1148,7 +1211,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       id_Test((ideal)C, sum);
 
       nMapFunc nMap1 = n_SetMap(R1->cf,sum->cf); /* can change something global: not usable
-						    after the next nSetMap call :( */
+                                                    after the next nSetMap call :( */
       // Create blocked C and D matrices:
       for (i=1; i<= rVar(R1); i++)
         for (j=i+1; j<=rVar(R1); j++)
@@ -1165,7 +1228,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
 
       nMapFunc nMap2 = n_SetMap(R2->cf,sum->cf); /* can change something global: not usable
-						    after the next nSetMap call :( */
+                                                    after the next nSetMap call :( */
       for (i=1; i<= rVar(R2); i++)
         for (j=i+1; j<=rVar(R2); j++)
         {
@@ -1374,12 +1437,12 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 /*
   if (r->extRing!=NULL)
     r->extRing->ref++;
-  
-  res->extRing=r->extRing;  
-  //memset: res->minideal=NULL;
+
+  res->extRing=r->extRing;
+  //memset: res->qideal=NULL;
 */
-  
-  
+
+
   if (copy_ordering == TRUE)
   {
     i=rBlocks(r);
@@ -1518,12 +1581,12 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
 /*
   if (r->extRing!=NULL)
     r->extRing->ref++;
-  
-  res->extRing=r->extRing;  
-  //memset: res->minideal=NULL;
+
+  res->extRing=r->extRing;
+  //memset: res->qideal=NULL;
 */
-  
-  
+
+
   if (copy_ordering == TRUE)
   {
     i=rBlocks(r)+1; // DIFF to rCopy0
@@ -1616,23 +1679,19 @@ ring rCopy(ring r)
   return res;
 }
 
-// returns TRUE, if r1 equals r2 FALSE, otherwise Equality is
-// determined componentwise, if qr == 1, then qrideal equality is
-// tested, as well
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 {
+  if( !rSamePolyRep(r1, r2) )
+    return FALSE;
+
   int i, j;
 
   if (r1 == r2) return TRUE;
-
   if (r1 == NULL || r2 == NULL) return FALSE;
 
-  if ((r1->cf->type != r2->cf->type)
-  || (rVar(r1) != rVar(r2))
-  || (r1->OrdSgn != r2->OrdSgn)
-  || (rPar(r1) != rPar(r2)))
-    return FALSE;
-
+  assume( r1->cf == r2->cf );
+  assume( rVar(r1) == rVar(r2) );
+  
   for (i=0; i<rVar(r1); i++)
   {
     if (r1->names[i] != NULL && r2->names[i] != NULL)
@@ -1644,43 +1703,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
       return FALSE;
     }
   }
-
-  i=0;
-  while (r1->order[i] != 0)
-  {
-    if (r2->order[i] == 0) return FALSE;
-    if ((r1->order[i] != r2->order[i])
-    || (r1->block0[i] != r2->block0[i])
-    || (r1->block1[i] != r2->block1[i]))
-      return FALSE;
-    if (r1->wvhdl[i] != NULL)
-    {
-      if (r2->wvhdl[i] == NULL)
-        return FALSE;
-      for (j=0; j<r1->block1[i]-r1->block0[i]+1; j++)
-        if (r2->wvhdl[i][j] != r1->wvhdl[i][j])
-          return FALSE;
-    }
-    else if (r2->wvhdl[i] != NULL) return FALSE;
-    i++;
-  }
-  if (r2->order[i] != 0) return FALSE;
-
-  for (i=0; i<rPar(r1);i++)
-  {
-      if (strcmp(rParameter(r1)[i], rParameter(r2)[i])!=0)
-        return FALSE;
-  }
-
-  if ( !rMinpolyIsNULL(r1) )
-  {
-    if ( rMinpolyIsNULL(r2) ) return FALSE;
-    if (! p_EqualPolys(r1->cf->extRing->minideal->m[0],
-                  r2->cf->extRing->minideal->m[0], 
-		  r1->cf->extRing))
-      return FALSE;
-  }
-  else if (!rMinpolyIsNULL(r2)) return FALSE;
 
   if (qr)
   {
@@ -1697,7 +1719,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
         m1 = id1->m;
         m2 = id2->m;
         for (i=0; i<n; i++)
-          if (! p_EqualPolys(m1[i],m2[i],r1)) return FALSE;
+          if (! p_EqualPolys(m1[i],m2[i], r1, r2)) return FALSE;
       }
     }
     else if (r2->qideal != NULL) return FALSE;
@@ -1706,9 +1728,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   return TRUE;
 }
 
-// returns TRUE, if r1 and r2 represents the monomials in the same way
-// FALSE, otherwise
-// this is an analogue to rEqual but not so strict
 BOOLEAN rSamePolyRep(ring r1, ring r2)
 {
   int i, j;
@@ -1717,14 +1736,10 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
 
   if (r1 == NULL || r2 == NULL) return FALSE;
 
-  if ((r1->cf->type != r2->cf->type)
+  if ((r1->cf != r2->cf)
   || (rVar(r1) != rVar(r2))
-  || (r1->OrdSgn != r2->OrdSgn)
-  || (rPar(r1) != rPar(r2)))
+  || (r1->OrdSgn != r2->OrdSgn))
     return FALSE;
-
-  if (rVar(r1)!=rVar(r2)) return FALSE;
-  if (rPar(r1)!=rPar(r2)) return FALSE;
 
   i=0;
   while (r1->order[i] != 0)
@@ -1747,6 +1762,7 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   }
   if (r2->order[i] != 0) return FALSE;
 
+  // we do not check variable names
   // we do not check minpoly/minideal
   // we do not check qideal
 
@@ -1913,6 +1929,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
       if (   (o->ord_typ == ro_syzcomp)
           || (o->ord_typ == ro_syz)
           || (o->ord_typ == ro_is)
+          || (o->ord_typ == ro_am)
           || (o->ord_typ == ro_isTemp))
         return TRUE;
     }
@@ -2105,8 +2122,15 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
     }
   }
 
-  if (!rMinpolyIsNULL(r))
-    omCheckAddr(r->cf->extRing->minideal->m[0]);
+  assume(r != NULL);
+  assume(r->cf != NULL);
+  
+  if (nCoeff_is_algExt(r->cf))
+  {
+    assume(r->cf->extRing != NULL);
+    assume(r->cf->extRing->qideal != NULL);
+    omCheckAddr(r->cf->extRing->qideal->m[0]);
+  }
 
   //assume(r->cf!=NULL);
 
@@ -2191,6 +2215,28 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
       break;
     }
   }
+}
+
+static void rO_WMDegree(int &place, int &bitplace, int start, int end,
+    long *o, sro_ord &ord_struct, int *weights)
+{
+  assume(weights != NULL);
+  
+  // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
+//  while((start<end) && (weights[0]==0)) { start++; weights++; }
+//  while((start<end) && (weights[end-start]==0)) { end--; }
+  rO_Align(place,bitplace);
+  ord_struct.ord_typ=ro_am;
+  ord_struct.data.am.start=start;
+  ord_struct.data.am.end=end;
+  ord_struct.data.am.place=place;
+  ord_struct.data.am.weights=weights;
+  ord_struct.data.am.weights_m = weights + (end-start+1);
+  ord_struct.data.am.len_gen=weights[end-start+1];
+  assume( ord_struct.data.am.weights_m[0] == ord_struct.data.am.len_gen );
+  o[place]=1;
+  place++;
+  rO_Align(place,bitplace);
 }
 
 static void rO_WDegree64(int &place, int &bitplace, int start, int end,
@@ -2798,8 +2844,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
             rSetISReference( res,
               F,  // WILL BE COPIED!
               r->typ[i].data.is.limit,
-              j++,
-              r->typ[i].data.is.componentWeights // WILL BE COPIED
+              j++
               )
             );
           id_Delete(&F, res);
@@ -2985,7 +3030,7 @@ void rKillModified_Wp_Ring(ring r)
 static void rSetOutParams(ring r)
 {
   r->VectorOut = (r->order[0] == ringorder_c);
-  r->ShortOut = TRUE;
+  r->CanShortOut = TRUE;
   {
     int i;
     if (rParameter(r)!=NULL)
@@ -2994,12 +3039,12 @@ static void rSetOutParams(ring r)
       {
         if(strlen(rParameter(r)[i])>1)
         {
-          r->ShortOut=FALSE;
+          r->CanShortOut=FALSE;
           break;
         }
       }
     }
-    if (r->ShortOut)
+    if (r->CanShortOut)
     {
       // Hmm... sometimes (e.g., from maGetPreimage) new variables
       // are introduced, but their names are never set
@@ -3011,13 +3056,15 @@ static void rSetOutParams(ring r)
       {
         if(r->names[i] != NULL && strlen(r->names[i])>1)
         {
-          r->ShortOut=FALSE;
+          r->CanShortOut=FALSE;
           break;
         }
       }
     }
   }
-  r->CanShortOut = r->ShortOut;
+  r->ShortOut = r->CanShortOut;
+
+  assume( !( !r->CanShortOut && r->ShortOut ) );
 }
 
 /*2
@@ -3037,6 +3084,7 @@ static void rHighSet(ring r, int o_r, int o)
     case ringorder_rp:
     case ringorder_a:
     case ringorder_aa:
+    case ringorder_am:
     case ringorder_a64:
       if (r->OrdSgn==-1) r->MixedOrder=TRUE;
       break;
@@ -3149,8 +3197,6 @@ static void rSetDegStuff(ring r)
   int* block1 = r->block1;
   int** wvhdl = r->wvhdl;
 
-  
-
   if (order[0]==ringorder_S ||order[0]==ringorder_s || order[0]==ringorder_IS)
   {
     order++;
@@ -3164,8 +3210,31 @@ static void rSetDegStuff(ring r)
   r->pFDeg = p_Totaldegree;
   r->pLDeg = (r->OrdSgn == 1 ? pLDegb : pLDeg0);
 
+  /*======== ordering type is (am,_) ==================*/
+  if ((order[0]==ringorder_am)
+  )
+  {
+    r->MixedOrder = FALSE;
+    for(int ii=block0[0];ii<=block1[0];ii++)
+      if (wvhdl[0][ii-1]<0) { r->MixedOrder=TRUE;break;}
+    r->LexOrder=FALSE;
+    for(int ii=block0[0];ii<=block1[0];ii++)
+      if (wvhdl[0][ii-1]==0) { r->LexOrder=TRUE;break;}
+    if ((block0[0]==1)&&(block1[0]==r->N))
+    {
+      r->pFDeg = p_Deg;
+      r->pLDeg = pLDeg1c_Deg;
+    }
+    else
+   {
+      r->pFDeg = p_WTotaldegree;
+      r->LexOrder=TRUE;
+      r->pLDeg = pLDeg1c_WFirstTotalDegree;
+    }
+    r->firstwv = wvhdl[0];
+  }
   /*======== ordering type is (_,c) =========================*/
-  if ((order[0]==ringorder_unspec) || (order[1] == 0)
+  else if ((order[0]==ringorder_unspec) || (order[1] == 0)
       ||(
     ((order[1]==ringorder_c)||(order[1]==ringorder_C)
      ||(order[1]==ringorder_S)
@@ -3265,17 +3334,11 @@ static void rSetDegStuff(ring r)
 
   if( rGetISPos(0, r) != -1 ) // Are there Schreyer induced blocks?
   {
-    if( r->pFDeg == p_Totaldegree )
-    {
-      extern long p_TotaldegreeIS(poly p, const ring r);
-      r->pFDeg = p_TotaldegreeIS;
-    }
-#ifndef NDEBUG    
-    else
-      assume( r->pFDeg == p_Deg || r->pFDeg == p_WTotaldegree );
+#ifndef NDEBUG
+      assume( r->pFDeg == p_Deg || r->pFDeg == p_WTotaldegree || r->pFDeg == p_Totaldegree);
 #endif
-    
-    r->pLDeg = pLDeg1;
+
+    r->pLDeg = pLDeg1; // ?
   }
 
   r->pFDegOrig = r->pFDeg;
@@ -3296,7 +3359,9 @@ static void rSetNegWeight(ring r)
     l=0;
     for(i=0;i<r->OrdSize;i++)
     {
-      if(r->typ[i].ord_typ==ro_wp_neg) l++;
+      if((r->typ[i].ord_typ==ro_wp_neg)
+      ||(r->typ[i].ord_typ==ro_am))
+        l++;
     }
     if (l>0)
     {
@@ -3308,6 +3373,11 @@ static void rSetNegWeight(ring r)
         if(r->typ[i].ord_typ==ro_wp_neg)
         {
           r->NegWeightL_Offset[l]=r->typ[i].data.wp.place;
+          l++;
+        }
+        else if(r->typ[i].ord_typ==ro_am)
+        {
+          r->NegWeightL_Offset[l]=r->typ[i].data.am.place;
           l++;
         }
       }
@@ -3403,6 +3473,12 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_a:
       case ringorder_aa:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
+                   r->wvhdl[i]);
+        typ_i++;
+        break;
+
+      case ringorder_am:
+        rO_WMDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
         typ_i++;
         break;
@@ -3541,7 +3617,7 @@ BOOLEAN rComplete(ring r, int force)
              rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                                      tmp_typ[typ_i]);
              typ_i++;
-	     rCheckOrdSgn(r,i);
+             rCheckOrdSgn(r,i);
           }
         }
         if (r->block1[i]!=r->block0[i])
@@ -3567,7 +3643,7 @@ BOOLEAN rComplete(ring r, int force)
              rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                                      tmp_typ[typ_i]);
              typ_i++;
-	     rCheckOrdSgn(r,i);
+             rCheckOrdSgn(r,i);
           }
         }
         if (r->block1[i]!=r->block0[i])
@@ -3586,7 +3662,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits, r->block0[i]);
         }
-	rCheckOrdSgn(r,i);
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_Ws:
@@ -3598,7 +3674,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
         }
-	rCheckOrdSgn(r,i);
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_S:
@@ -3795,12 +3871,6 @@ void rUnComplete(ring r)
           id_Delete(&r->typ[i].data.is.F, r);
           r->typ[i].data.is.F = NULL; // ?
 
-          if( r->typ[i].data.is.componentWeights != NULL )
-          {
-            delete r->typ[i].data.is.componentWeights;
-            r->typ[i].data.is.componentWeights = NULL; // ?
-          }
-
           if( r->typ[i].data.is.pVarOffset != NULL )
           {
             omFreeSize((ADDRESS)r->typ[i].data.is.pVarOffset, (r->N +1)*sizeof(int));
@@ -3954,7 +4024,7 @@ void rDebugPrint(ring r)
     return;
   }
   // corresponds to ro_typ from ring.h:
-  const char *TYP[]={"ro_dp","ro_wp","ro_wp64","ro_wp_neg","ro_cp",
+  const char *TYP[]={"ro_dp","ro_wp","ro_am","ro_wp64","ro_wp_neg","ro_cp",
                      "ro_syzcomp", "ro_syz", "ro_isTemp", "ro_is", "ro_none"};
   int i,j;
 
@@ -3962,14 +4032,24 @@ void rDebugPrint(ring r)
   Print("CmpL_Size:%d ",r->CmpL_Size);
   Print("VarL_Size:%d\n",r->VarL_Size);
   Print("bitmask=0x%lx (expbound=%ld) \n",r->bitmask, r->bitmask);
+  Print("divmask=%lx\n", r->divmask);
   Print("BitsPerExp=%d ExpPerLong=%d MinExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->MinExpPerLong, r->VarL_Offset[0]);
-  PrintS("varoffset:\n");
+
+  Print("VarL_LowIndex: %d\n", r->VarL_LowIndex);
+  PrintS("VarL_Offset:\n");
+  if (r->VarL_Offset==NULL) PrintS(" NULL");
+  else
+    for(j = 0; j < r->VarL_Size; j++)
+      Print("  VarL_Offset[%d]: %d ", j, r->VarL_Offset[j]);
+  PrintLn();
+      
+
+  PrintS("VarOffset:\n");
   if (r->VarOffset==NULL) PrintS(" NULL\n");
   else
     for(j=0;j<=r->N;j++)
       Print("  v%d at e-pos %d, bit %d\n",
             j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
-  Print("divmask=%lx\n", r->divmask);
   PrintS("ordsgn:\n");
   for(j=0;j<r->CmpL_Size;j++)
     Print("  ordsgn %ld at pos %d\n",r->ordsgn[j],j);
@@ -4011,19 +4091,28 @@ void rDebugPrint(ring r)
 
 //      for( int k = 0; k <= r->N; k++) if (r->typ[j].data.is.pVarOffset[k] != -1) Print("[%2d]: %04x; ", k, r->typ[j].data.is.pVarOffset[k]);
 
-      Print("  limit %d\n",r->typ[j].data.is.limit);
-      #ifndef NDEBUG
+      Print("  limit %d",r->typ[j].data.is.limit);
+#ifndef NDEBUG
       //PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
-      #endif
+#endif
 
-      PrintS("weights: ");
-
-      if( r->typ[j].data.is.componentWeights == NULL )
-        PrintS("NULL == [0,...,0]\n");
-      else
-      {
-        (r->typ[j].data.is.componentWeights)->show(); PrintLn();
-      }
+      PrintLn();
+    }
+    else if  (r->typ[j].ord_typ==ro_am)
+    {
+      Print("  place %d",r->typ[j].data.am.place);
+      Print("  start %d",r->typ[j].data.am.start);
+      Print("  end %d",r->typ[j].data.am.end);
+      Print("  len_gen %d",r->typ[j].data.am.len_gen);
+      PrintS(" w:");
+      int l=0;
+      for(l=r->typ[j].data.am.start;l<=r->typ[j].data.am.end;l++)
+            Print(" %d",r->typ[j].data.am.weights[l-r->typ[j].data.am.start]);
+      l=r->typ[j].data.am.end+1;
+      int ll=r->typ[j].data.am.weights[l-r->typ[j].data.am.start];
+      PrintS(" m:");
+      for(int lll=l+1;lll<l+ll+1;lll++)
+            Print(" %d",r->typ[j].data.am.weights[lll-r->typ[j].data.am.start]);
     }
     else
     {
@@ -4085,6 +4174,13 @@ void rDebugPrint(ring r)
   }
   Print("LexOrder:%d, MixedOrder:%d\n",r->LexOrder, r->MixedOrder);
 
+  Print("NegWeightL_Size: %d, NegWeightL_Offset: ", r->NegWeightL_Size);
+  if (r->NegWeightL_Offset==NULL) PrintS(" NULL");
+  else
+    for(j = 0; j < r->NegWeightL_Size; j++)
+      Print("  [%d]: %d ", j, r->NegWeightL_Offset[j]);
+  PrintLn();
+
   // p_Procs stuff
   p_Procs_s proc_names;
   const char* field;
@@ -4101,8 +4197,6 @@ void rDebugPrint(ring r)
   }
 
   {
-    extern long p_TotaldegreeIS(poly p, const ring r);
-
       PrintLn();
       Print("pFDeg   : ");
 #define pFDeg_CASE(A) if(r->pFDeg == A) PrintS( "" #A "" )
@@ -4110,16 +4204,23 @@ void rDebugPrint(ring r)
       pFDeg_CASE(p_WFirstTotalDegree); else
       pFDeg_CASE(p_WTotaldegree); else
       pFDeg_CASE(p_Deg); else
-      pFDeg_CASE(p_TotaldegreeIS); else
 #undef pFDeg_CASE
-      
       Print("(%p)", (void*)(r->pFDeg)); // default case
 
     PrintLn();
-    Print("pLDeg   : (%p)", (void*)(r->pLDeg));    
+    Print("pLDeg   : (%p)", (void*)(r->pLDeg));
     PrintLn();
   }
-
+  Print("pSetm:");
+  void p_Setm_Dummy(poly p, const ring r);
+  void p_Setm_TotalDegree(poly p, const ring r);
+  void p_Setm_WFirstTotalDegree(poly p, const ring r);
+  void p_Setm_General(poly p, const ring r);
+  if (r->p_Setm==p_Setm_General) PrintS("p_Setm_General\n");
+  else if (r->p_Setm==p_Setm_Dummy) PrintS("p_Setm_Dummy\n");
+  else if (r->p_Setm==p_Setm_TotalDegree) PrintS("p_Setm_Totaldegree\n");
+  else if (r->p_Setm==p_Setm_WFirstTotalDegree) PrintS("p_Setm_WFirstTotalDegree\n");
+  else Print("%x\n",r->p_Setm);
 }
 
 void p_DebugPrint(poly p, const ring r)
@@ -4591,16 +4692,16 @@ ring rAssure_CompLastBlock(ring r, BOOLEAN complete)
 ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
 {
   rTest(r);
-   
+
   ring new_r_1 = rAssure_CompLastBlock(r, FALSE); // due to this FALSE - no completion!
   ring new_r = rAssure_SyzComp(new_r_1, FALSE); // new_r_1 is used only here!!!
 
   if (new_r == r)
      return r;
-     
+
   ring old_r = r;
   if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
-     
+
    rComplete(new_r, 1);
 #ifdef HAVE_PLURAL
    if (rIsPluralRing(old_r))
@@ -4608,12 +4709,12 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
        if ( nc_rComplete(old_r, new_r, false) ) // no qideal!
        {
 # ifndef NDEBUG
-	  WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
+          WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
 # endif
        }
    }
 #endif
-     
+
 ///?    rChangeCurrRing(new_r);
    if (old_r->qideal != NULL)
    {
@@ -4626,7 +4727,7 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
      if( nc_SetupQuotient(new_r, old_r, true) )
        {
 #ifndef NDEBUG
-	  WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
 #endif
        }
 #endif
@@ -4637,7 +4738,7 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
    assume(rIsSCA(new_r) == rIsSCA(old_r));
    assume(ncRingType(new_r) == ncRingType(old_r));
 #endif
-   
+
    rTest(new_r);
    rTest(old_r);
    return new_r;
@@ -4851,20 +4952,12 @@ int rGetISPos(const int p, const ring r)
 
 
 /// Changes r by setting induced ordering parameters: limit and reference leading terms
-/// F belong to r, we will DO a copy! (same to componentWeights)
+/// F belong to r, we will DO a copy!
 /// We will use it AS IS!
 /// returns true is everything was allright!
-BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, const intvec * componentWeights)
+BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p)
 {
   // Put the reference set F into the ring -ordering -recor
-
-  // TEST THAT THERE ARE DEGs!!!
-  // assume( componentWeights == NULL  ); // ???
-  if( componentWeights != NULL )
-  {
-//    assure that the ring r has degrees!!!
-//    Add weights to degrees of F[i]
-  }
 
   if (r->typ==NULL)
   {
@@ -4886,7 +4979,7 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, c
     Print("Changing record on pos: %d\nOld limit: %d --->> New Limit: %d\n", pos, r->typ[pos].data.is.limit, i);
 #endif
 
-  const ideal FF = id_Copy(F, r); // idrHeadR(F, r, r);
+  const ideal FF = idrHeadR(F, r, r); // id_Copy(F, r); // ???
 
 
   if( r->typ[pos].data.is.F != NULL)
@@ -4901,23 +4994,6 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, c
   assume(r->typ[pos].data.is.F == NULL);
 
   r->typ[pos].data.is.F = FF; // F is owened by ring now! TODO: delete at the end!
-
-  if(r->typ[pos].data.is.componentWeights != NULL)
-  {
-#if MYTEST
-    PrintS("Deleting old componentWeights: "); r->typ[pos].data.is.componentWeights->show(); PrintLn();
-#endif
-    delete r->typ[pos].data.is.componentWeights;
-    r->typ[pos].data.is.componentWeights = NULL;
-  }
-
-
-  assume(r->typ[pos].data.is.componentWeights == NULL);
-
-  if( componentWeights != NULL )
-    componentWeights = ivCopy(componentWeights); // componentWeights is owened by ring now! TODO: delete at the end!
-
-  r->typ[pos].data.is.componentWeights = componentWeights;
 
   r->typ[pos].data.is.limit = i; // First induced component
 
@@ -5570,24 +5646,6 @@ void rModify_a_to_A(ring r)
 }
 
 
-BOOLEAN rMinpolyIsNULL(const ring r)
-{
-  assume(r != NULL);
-  const coeffs C = r->cf;
-  assume(C != NULL);
-
-  const BOOLEAN ret = nCoeff_is_algExt(C);
-  
-  if( ret )
-  {
-    const ring R = C->extRing;
-    assume( R != NULL );
-    assume( !idIs0(R->minideal) );
-  }
-  
-  return ret;
-}
-
 poly rGetVar(const int varIndex, const ring r)
 {
     poly p = p_ISet(1, r);
@@ -5597,35 +5655,14 @@ poly rGetVar(const int varIndex, const ring r)
 }
 
 
-
-number n_Param(const short iParameter, const ring r)
+/// TODO: rewrite somehow...
+int n_IsParam(const number m, const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
 
-  const n_coeffType _filed_type = getCoeffType(C);
-
-  if ( iParameter <= 0 || iParameter > rPar(r) )
-    // Wrong parameter
-    return NULL;
-
-  if( _filed_type == n_algExt )
-    return naParam(iParameter, C);
-  
-  if( _filed_type == n_transExt )
-    return ntParam(iParameter, C);
-    
-  return NULL;
-}
-
-
-
-int n_IsParam(number m, const ring r)
-{
-  assume(r != NULL);
-  const coeffs C = r->cf;
-  assume(C != NULL);
+  assume( nCoeff_is_Extension(C) );
 
   const n_coeffType _filed_type = getCoeffType(C);
 
@@ -5635,6 +5672,8 @@ int n_IsParam(number m, const ring r)
   if( _filed_type == n_transExt )
     return ntIsParam(m, C);
 
+  Werror("n_IsParam: IsParam is not to be used for (coeff_type = %d)",getCoeffType(C));
+  
   return 0;
 }
 

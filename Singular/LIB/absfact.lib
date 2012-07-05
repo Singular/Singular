@@ -291,11 +291,11 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
     return(list(var(n+1), p));
   }
 
+  list tmp = ringlist(MPz)[2];
   // Go into the quotient by q(z)=0
   ring MP_z = (0,var(n+1)), (x(1..n)), dp;
   list lMP_z = ringlist(MP_z);
   lMP_z[1][4] = ideal(imap(MPz,q));
-  list tmp = ringlist(MPz)[2];
   lMP_z[2] = list(tmp[1..n]);
   def MPq = ring(lMP_z);
   setring(MPq);
@@ -386,6 +386,7 @@ EXAMPLE: example absFactorize; shows an example
   int n = nvars(MP);
   int pa=npars(MP);
   list lMP= ringlist(MP);
+  list buflMP= lMP;
   intvec vv,vk;
   for(i=1;i<=n;i++){vv[i]=1;}
   vk=vv,1;
@@ -508,6 +509,7 @@ EXAMPLE: example absFactorize; shows an example
   // taking care about constant factors
   if(pa)
   {
+    setring(MP);
     n=nvars(MP);
     list lM=ringlist(MP);
     orst[1]=list("wp",vk);

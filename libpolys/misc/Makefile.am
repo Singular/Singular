@@ -1,7 +1,10 @@
-noinst_LTLIBRARIES = libmisc.la libmisc_g.la
-# libmiscdir = $(libdir)/singular
+CXXTEMPLFLAGS      =  
+## -fno-implicit-templates
 
-CXXTEMPLFLAGS      =  ## -fno-implicit-templates
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
+
+lib_LTLIBRARIES = libmisc.la libmisc_g.la
+libmiscdir = $(libdir)/singular
 
 libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libmisc_g_la_CFLAGS = ${PIPE}
@@ -10,10 +13,8 @@ libmisc_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 libmisc_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-libmisc_la_CPPFLAGS   = -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-libmisc_g_la_CPPFLAGS = -DHAVE_CONFIG_H
-
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
+libmisc_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+libmisc_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 SOURCES  = intvec.cc int64vec.cc options.c
 libmisc_la_SOURCES   = $(SOURCES)

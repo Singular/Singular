@@ -250,12 +250,12 @@ bool operator == ( const gmp_float & a, const gmp_float & b )
     return false;
 }
 // t == 0 ?
-bool gmp_float::isZero()
+bool gmp_float::isZero() const
 {
   return (mpf_sgn( t ) == 0);
 }
 // t == 1 ?
-bool gmp_float::isOne()
+bool gmp_float::isOne() const
 {
 #ifdef  VARIANTE_1
   return (mpf_cmp_ui( t , 1 ) == 0);
@@ -271,7 +271,7 @@ bool gmp_float::isOne()
 #endif
 }
 // t == -1 ?
-bool gmp_float::isMOne()
+bool gmp_float::isMOne() const
 {
 #ifdef VARIANTE_1
   return (mpf_cmp_si( t , -1 ) == 0);
@@ -707,7 +707,16 @@ gmp_complex sqrt( const gmp_complex & x )
 //
 char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src )
 {
-  assume( src->complex_parameter != NULL );
+  const char * complex_parameter = "I";
+  int N = 1; // strlen(complex_parameter);
+   
+  if (nCoeff_is_long_C(src))
+  {
+    complex_parameter = n_ParameterNames(src)[0];
+    N = strlen(complex_parameter);
+  }
+
+  assume( complex_parameter != NULL && N > 0);
   
   char *out,*in_imag,*in_real;
 
@@ -720,19 +729,19 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src 
 
     if (nCoeff_is_long_C(src))
     {
-      int len=(strlen(in_real)+strlen(in_imag)+7+strlen(src->complex_parameter))*sizeof(char);
+      int len=(strlen(in_real)+strlen(in_imag)+7+N)*sizeof(char);
       out=(char*)omAlloc(len);
       memset(out,0,len);
       if (  !c.real().isZero() )  // (-23-i*5.43) or (15.1+i*5.3)
-        sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",src->complex_parameter,in_imag);
+        sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",complex_parameter,in_imag);
       else // (-i*43) or (i*34)
       {
         if (c.imag().isOne())
-          sprintf(out,"%s",src->complex_parameter);
+          sprintf(out,"%s", complex_parameter);
         else if (c.imag().isMOne())
-          sprintf(out,"-%s",src->complex_parameter);
+          sprintf(out,"-%s", complex_parameter);
         else
-          sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",src->complex_parameter,in_imag);
+          sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-", complex_parameter,in_imag);
       }
     }
     else

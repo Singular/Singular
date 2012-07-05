@@ -7,13 +7,11 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 /***************************************************************
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -49,6 +47,9 @@
 
 // coeff
 // #define pGetCoeff(p)        ((p)->coef)
+/// return an alias to the leading coefficient of p
+/// assumes that p != NULL
+/// NOTE: not copy
 static inline number& pGetCoeff(poly p)
 {
   assume(p != NULL);
@@ -64,7 +65,7 @@ static inline number& pGetCoeff(poly p)
 
 
 
-// 
+//
 // deletes old coeff before setting the new one???
 #define pSetCoeff0(p,n)     (p)->coef=(n)
 
@@ -227,7 +228,7 @@ void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
 
 void      p_Content(poly p, const ring r);
-#if 1 
+#if 1
 // currently only used by Singular/janet
 void      p_SimpleContent(poly p, int s, const ring r);
 #endif
@@ -259,25 +260,20 @@ static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
   __p_GetComp(p,r) = c;
   return c;
 }
-// sets component of poly a to i, returns length of p
+// sets component of poly a to i
 static inline   void p_SetCompP(poly p, int i, ring r)
 {
   if (p != NULL)
   {
 #ifdef PDEBUG
-    poly q = p;
-    int l = 0;
+    p_Test(p, r);
 #endif
-
     if (rOrd_SetCompRequiresSetm(r))
     {
       do
       {
         p_SetComp(p, i, r);
         p_SetmComp(p, r);
-#ifdef PDEBUG
-        l++;
-#endif
         pIter(p);
       }
       while (p != NULL);
@@ -287,17 +283,10 @@ static inline   void p_SetCompP(poly p, int i, ring r)
       do
       {
         p_SetComp(p, i, r);
-#ifdef PDEBUG
-        l++;
-#endif
         pIter(p);
       }
       while(p != NULL);
     }
-#ifdef PDEBUG
-    p_Test(q, r);
-    assume(l == pLength(q));
-#endif
   }
 }
 
@@ -380,11 +369,19 @@ void      pEnlargeSet(poly**p, int length, int increment);
  * I/O
  *
  ***************************************************************/
-char*     p_String(poly p, ring lmRing, ring tailRing);
+/// print p according to ShortOut in lmRing & tailRing
 char*     p_String0(poly p, ring lmRing, ring tailRing);
+char*     p_String(poly p, ring lmRing, ring tailRing);
 void      p_Write(poly p, ring lmRing, ring tailRing);
 void      p_Write0(poly p, ring lmRing, ring tailRing);
 void      p_wrp(poly p, ring lmRing, ring tailRing);
+
+/// print p in a short way, if possible
+char* p_String0Short(const poly p, ring lmRing, ring tailRing);
+
+/// print p in a long way
+char* p_String0Long(const poly p, ring lmRing, ring tailRing);
+
 
 /***************************************************************
  *
@@ -409,7 +406,11 @@ long pLDeg1_Totaldegree(poly p,int *l, ring r);
 long pLDeg1c_Totaldegree(poly p,int *l, ring r);
 long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r);
 long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r);
+
 BOOLEAN p_EqualPolys(poly p1, poly p2, const ring r);
+
+/// same as the usual p_EqualPolys for polys belonging to *equal* rings
+BOOLEAN p_EqualPolys(poly p1, poly p2, const ring r1, const ring r2);
 
 long p_Deg(poly a, const ring r);
 
@@ -438,6 +439,7 @@ static inline long p_GetOrder(poly p, ring r)
   {
     switch(r->typ[i].ord_typ)
     {
+      case ro_am:
       case ro_wp_neg:
         return (((long)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
       case ro_syzcomp:
@@ -706,7 +708,7 @@ static inline void p_LmFree(poly p, ring)
 #if PDEBUG > 2
 static inline void p_LmFree(poly *p, ring r)
 #else
-static inline void p_LmFree(poly *p, ring) 
+static inline void p_LmFree(poly *p, ring)
 #endif
 {
   p_LmCheckPolyRing2(*p, r);
@@ -1057,7 +1059,7 @@ extern poly  _p_Mult_q(poly p, poly q, const int copy, const ring r);
 static inline poly p_Mult_q(poly p, poly q, const ring r)
 {
   assume( (p != q) || (p == NULL && q == NULL) );
-  
+
   if (p == NULL)
   {
     r->p_Procs->p_Delete(&q, r);

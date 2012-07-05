@@ -26,7 +26,7 @@ static inline number n_Neg(number n,     const ring r){ return n_Neg(n,r->cf); }
 static inline number n_Invers(number a,  const ring r){ return n_Invers(a,r->cf); }
 static inline int    n_Size(number n,    const ring r){ return n_Size(n,r->cf); }
 static inline void   n_Normalize(number& n, const ring r){ return n_Normalize(n,r->cf); }
-static inline void   n_Write(number& n,  const ring r){ return n_Write(n,r->cf); }
+static inline void   n_Write(number& n,  const ring r){ return n_Write(n, r->cf, rShortOut(r)); }
 static inline number n_GetDenom(number& n, const ring r){ return n_GetDenom(n, r->cf);}
 static inline number n_GetNumerator(number& n, const ring r){ return n_GetNumerator(n, r->cf);}
 static inline void   n_Power(number a, int b, number *res, const ring r){ n_Power(a,b,res,r->cf); }
@@ -46,6 +46,6 @@ static inline number n_GetUnit(number n, const ring r){ return n_GetUnit(n, r->c
 static inline BOOLEAN n_DivBy(number a, number b, const ring r){ return n_DivBy(a,b, r->cf);}
 #endif
 
-
+static inline int n_ParDeg(number n, const ring r){ assume(r != NULL); assume(r->cf != NULL); return n_ParDeg(n,r->cf); }
 
 #endif /* COEFFRINGS_H */

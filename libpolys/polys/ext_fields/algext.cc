@@ -13,9 +13,9 @@
   *               itself be some extension field, thus allowing for extension
   *               towers).
   *           2.) Moreover, this implementation assumes that
-  *               cf->extRing->minideal is not NULL but an ideal with at
+  *               cf->extRing->qideal is not NULL but an ideal with at
   *               least one non-zero generator which may be accessed by
-  *               cf->extRing->minideal->m[0] and which represents the minimal
+  *               cf->extRing->qideal->m[0] and which represents the minimal
   *               polynomial f(a) of the extension variable 'a' in K[a].
   *           3.) As soon as an std method for polynomial rings becomes
   *               availabe, all reduction steps modulo f(a) should be replaced
@@ -72,10 +72,10 @@ static const n_coeffType ID = n_algExt;
 #define naCoeffs cf->extRing->cf
 
 /* minimal polynomial */
-#define naMinpoly naRing->minideal->m[0]
+#define naMinpoly naRing->qideal->m[0]
 
 /// forward declarations
-BOOLEAN  naGreaterZero(number a, const coeffs cf); 
+BOOLEAN  naGreaterZero(number a, const coeffs cf);
 BOOLEAN  naGreater(number a, number b, const coeffs cf);
 BOOLEAN  naEqual(number a, number b, const coeffs cf);
 BOOLEAN  naIsOne(number a, const coeffs cf);
@@ -91,7 +91,8 @@ number   naMult(number a, number b, const coeffs cf);
 number   naDiv(number a, number b, const coeffs cf);
 void     naPower(number a, int exp, number *b, const coeffs cf);
 number   naCopy(number a, const coeffs cf);
-void     naWrite(number &a, const coeffs cf);
+void     naWriteLong(number &a, const coeffs cf);
+void     naWriteShort(number &a, const coeffs cf);
 number   naRePart(number a, const coeffs cf);
 number   naImPart(number a, const coeffs cf);
 number   naGetDenom(number &a, const coeffs cf);
@@ -112,7 +113,8 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
   assume(getCoeffType(cf) == ID);
   if (a == NULL) return TRUE;
   p_Test((poly)a, naRing);
-  if(p_Totaldegree((poly)a, naRing) >= p_Totaldegree(naMinpoly, naRing))
+  if((((poly)a)!=naMinpoly)
+  && p_Totaldegree((poly)a, naRing) >= p_Totaldegree(naMinpoly, naRing))
   {
     Print("deg >= deg(minpoly) in %s:%d\n",f,l);
     return FALSE;
@@ -151,6 +153,7 @@ BOOLEAN naIsZero(number a, const coeffs cf)
 void naDelete(number * a, const coeffs cf)
 {
   if (*a == NULL) return;
+  if (((poly)*a)==naMinpoly) { *a=NULL;return;}
   poly aAsPoly = (poly)(*a);
   p_Delete(&aAsPoly, naRing);
   *a = NULL;
@@ -159,7 +162,7 @@ void naDelete(number * a, const coeffs cf)
 BOOLEAN naEqual(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
-  
+
   /// simple tests
   if (a == b) return TRUE;
   if ((a == NULL) && (b != NULL)) return FALSE;
@@ -171,7 +174,7 @@ BOOLEAN naEqual(number a, number b, const coeffs cf)
   int bDeg = 0;
   if (b != NULL) bDeg = p_Totaldegree((poly)b, naRing);
   if (aDeg != bDeg) return FALSE;
-  
+
   /// subtraction test
   number c = naSub(a, b, cf);
   BOOLEAN result = naIsZero(c, cf);
@@ -183,6 +186,7 @@ number naCopy(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL) return NULL;
+  if (((poly)a)==naMinpoly) return a;
   return (number)p_Copy((poly)a, naRing);
 }
 
@@ -201,7 +205,7 @@ BOOLEAN naIsOne(number a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
-  if (!p_IsConstant(aAsPoly, naRing)) return FALSE;
+  if ((a==NULL) || (!p_IsConstant(aAsPoly, naRing))) return FALSE;
   return n_IsOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
@@ -209,7 +213,7 @@ BOOLEAN naIsMOne(number a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
-  if (!p_IsConstant(aAsPoly, naRing)) return FALSE;
+  if ((a==NULL) || (!p_IsConstant(aAsPoly, naRing))) return FALSE;
   return n_IsMOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
@@ -246,7 +250,7 @@ number naInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs 
     n_Delete(&n, C);
     return NULL;
   }
-  
+
   return (number)p_NSet(n, A);
 }
 
@@ -262,21 +266,32 @@ int naInt(number &a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
-  if (!p_IsConstant(aAsPoly, naRing)) return 0;
+  if(aAsPoly == NULL)
+    return 0;
+  if (!p_IsConstant(aAsPoly, naRing))
+    return 0;
+  assume( aAsPoly != NULL );
   return n_Int(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
-/* TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b))) */
+/* TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b) or (deg(a)==deg(b) && lc(a)>lc(b))) */
 BOOLEAN naGreater(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
-  if (naIsZero(a, cf)) return FALSE;
-  if (naIsZero(b, cf)) return TRUE;
-  int aDeg = 0;
-  if (a != NULL) aDeg = p_Totaldegree((poly)a, naRing);
-  int bDeg = 0;
-  if (b != NULL) bDeg = p_Totaldegree((poly)b, naRing);
-  return (aDeg > bDeg);
+  if (naIsZero(a, cf))
+  {
+    if (naIsZero(b, cf)) return FALSE;
+    return !n_GreaterZero(pGetCoeff((poly)b),cf);
+  }
+  if (naIsZero(b, cf))
+  {
+    return n_GreaterZero(pGetCoeff((poly)a),cf);
+  }
+  int aDeg = p_Totaldegree((poly)a, naRing);
+  int bDeg = p_Totaldegree((poly)b, naRing);
+  if (aDeg>bDeg) return TRUE;
+  if (aDeg<bDeg) return FALSE;
+  return n_Greater(pGetCoeff((poly)a),pGetCoeff((poly)b),cf);
 }
 
 /* TRUE iff a != 0 and (LC(a) > 0 or deg(a) > 0) */
@@ -292,31 +307,31 @@ BOOLEAN naGreaterZero(number a, const coeffs cf)
 void naCoeffWrite(const coeffs cf, BOOLEAN details)
 {
   assume( cf != NULL );
-  
+
   const ring A = cf->extRing;
-  
+
   assume( A != NULL );
   assume( A->cf != NULL );
-   
+
   n_CoeffWrite(A->cf, details);
- 
+
 //  rWrite(A);
-  
+
   const int P = rVar(A);
   assume( P > 0 );
-  
+
   Print("//   %d parameter    : ", P);
-  
+
   for (int nop=0; nop < P; nop ++)
     Print("%s ", rRingVar(nop, A));
-  
+
   PrintLn();
-  
-  const ideal I = A->minideal;
+
+  const ideal I = A->qideal;
 
   assume( I != NULL );
   assume( IDELEMS(I) == 1 );
-  
+
 
   if ( details )
   {
@@ -326,15 +341,15 @@ void naCoeffWrite(const coeffs cf, BOOLEAN details)
   }
   else
     PrintS("//   minpoly        : ...");
-  
+
   PrintLn();
-  
+
 /*
   char *x = rRingVar(0, A);
 
   Print("//   Coefficients live in the extension field K[%s]/<f(%s)>\n", x, x);
   Print("//   with the minimal polynomial f(%s) = %s\n", x,
-        p_String(A->minideal->m[0], A));
+        p_String(A->qideal->m[0], A));
   PrintS("//   and K: ");
 */
 }
@@ -394,7 +409,7 @@ number naDiv(number a, number b, const coeffs cf)
 void naPower(number a, int exp, number *b, const coeffs cf)
 {
   naTest(a);
-  
+
   /* special cases first */
   if (a == NULL)
   {
@@ -404,9 +419,9 @@ void naPower(number a, int exp, number *b, const coeffs cf)
   else if (exp ==  0) { *b = naInit(1, cf); return; }
   else if (exp ==  1) { *b = naCopy(a, cf); return; }
   else if (exp == -1) { *b = naInvers(a, cf); return; }
-  
+
   int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
-  
+
   /* now compute a^expAbs */
   poly pow; poly aAsPoly = (poly)a;
   if (expAbs <= 7)
@@ -440,7 +455,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
     p_Delete(&factor, naRing);
     definiteReduce(pow, naMinpoly, cf);
   }
-  
+
   /* invert if original exponent was negative */
   number n = (number)pow;
   if (exp < 0)
@@ -467,7 +482,7 @@ void heuristicReduce(poly &p, poly reducer, const coeffs cf)
     definiteReduce(p, reducer, cf);
 }
 
-void naWrite(number &a, const coeffs cf)
+void naWriteLong(number &a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)
@@ -480,7 +495,25 @@ void naWrite(number &a, const coeffs cf)
        a constant living in naCoeffs = cf->extRing->cf */
     BOOLEAN useBrackets = !(p_IsConstant(aAsPoly, naRing));
     if (useBrackets) StringAppendS("(");
-    p_String0(aAsPoly, naRing, naRing);
+    p_String0Long(aAsPoly, naRing, naRing);
+    if (useBrackets) StringAppendS(")");
+  }
+}
+
+void naWriteShort(number &a, const coeffs cf)
+{
+  naTest(a);
+  if (a == NULL)
+    StringAppendS("0");
+  else
+  {
+    poly aAsPoly = (poly)a;
+    /* basically, just write aAsPoly using p_Write,
+       but use brackets around the output, if a is not
+       a constant living in naCoeffs = cf->extRing->cf */
+    BOOLEAN useBrackets = !(p_IsConstant(aAsPoly, naRing));
+    if (useBrackets) StringAppendS("(");
+    p_String0Short(aAsPoly, naRing, naRing);
     if (useBrackets) StringAppendS(")");
   }
 }
@@ -520,9 +553,29 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
      this expectation is based on the assumption that we have properly
      registered cf and perform reference counting rather than creating
      multiple copies of the same coefficient field/domain/ring */
-  return (naRing == e->r);
+  if (naRing == e->r)
+    return TRUE;
   /* (Note that then also the minimal ideals will necessarily be
      the same, as they are attached to the ring.) */
+
+  // NOTE: Q(a)[x] && Q(a)[y] should better share the _same_ Q(a)...
+  if( rEqual(naRing, e->r, TRUE) ) // also checks the equality of qideals
+  {
+    const ideal mi = naRing->qideal; 
+    assume( IDELEMS(mi) == 1 );
+    const ideal ii = e->r->qideal;
+    assume( IDELEMS(ii) == 1 );
+
+    // TODO: the following should be extended for 2 *equal* rings...
+    assume( p_EqualPolys(mi->m[0], ii->m[0], naRing, e->r) );
+    
+    rDelete(e->r);
+    
+    return TRUE;
+  }
+
+  return FALSE;
+
 }
 
 int naSize(number a, const coeffs cf)
@@ -553,13 +606,17 @@ void definiteReduce(poly &p, poly reducer, const coeffs cf)
   p_Test((poly)p, naRing);
   p_Test((poly)reducer, naRing);
   #endif
-  p_PolyDiv(p, reducer, FALSE, naRing);
+  if ((p!=NULL) && (p_GetExp(p,1,naRing)>=p_GetExp(reducer,1,naRing)))
+  {
+    p_PolyDiv(p, reducer, FALSE, naRing);
+  }
 }
 
 void  naNormalize(number &a, const coeffs cf)
 {
   poly aa=(poly)a;
-  definiteReduce(aa,naMinpoly,cf); 
+  if (aa!=naMinpoly)
+    definiteReduce(aa,naMinpoly,cf);
   a=(number)aa;
 }
 
@@ -601,7 +658,7 @@ number naInvers(number a, const coeffs cf)
   poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
   naTest((number)theGcd); naTest((number)aFactor); naTest((number)mFactor);
   /* the gcd must be 1 since naMinpoly is irreducible and a != NULL: */
-  assume(naIsOne((number)theGcd, cf));      
+  assume(naIsOne((number)theGcd, cf));
   p_Delete(&theGcd, naRing);
   p_Delete(&mFactor, naRing);
   return (number)(aFactor);
@@ -653,7 +710,7 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
   number q = nlModP(a, src, dst->extRing->cf);
 
   poly result = p_NSet(q, dst->extRing);
-  
+
   return (number)result;
 }
 
@@ -683,11 +740,13 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be an algebraic field extension */
   assume(getCoeffType(dst) == ID);
-  
+
+  if( src == dst ) return ndCopyMap;
+
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
   coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
-  
+
   /* for the time being, we only provide maps if h = 1 and if b is Q or
      some field Z/pZ: */
   if (h==0)
@@ -707,7 +766,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   if (h != 1) return NULL;
   if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
   if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
-  
+
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
     if (strcmp(rRingVar(0, src->extRing),
@@ -721,7 +780,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
     else
       return NULL;                               /// Q(b)   --> Q(a)
   }
-  
+
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
     if (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0)
@@ -734,19 +793,45 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
     else
       return NULL;                               /// Z/p(b) --> Z/p(a)
   }
-  
+
   return NULL;                                           /// default
 }
 
-int naParDeg(number a, const coeffs cf)
+static int naParDeg(number a, const coeffs cf)
 {
   if (a == NULL) return -1;
   poly aa=(poly)a;
   return cf->extRing->pFDeg(aa,cf->extRing);
 }
 
+/// return the specified parameter as a number in the given alg. field
+static number naParameter(const int iParameter, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+  assume( 0 < iParameter && iParameter <= rVar(R) );
+
+  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
+
+  return (number) p;
+}
+
+
+/// if m == var(i)/1 => return i,
+int naIsParam(number m, const coeffs cf)
+{
+  assume(getCoeffType(cf) == ID);
+
+  const ring R = cf->extRing;
+  assume( R != NULL );
+
+  return p_Var( (poly)m, R );
+}
+
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
-{  
+{
   assume( infoStruct != NULL );
 
   AlgExtInfo *e = (AlgExtInfo *)infoStruct;
@@ -754,28 +839,27 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 
   assume(e->r                     != NULL);      // extRing;
   assume(e->r->cf                 != NULL);      // extRing->cf;
-  assume((e->i          != NULL) &&    // minideal has one
-         (IDELEMS(e->i) != 0)    &&    // non-zero generator
-         (e->i->m[0]    != NULL)    ); // at m[0];
 
-  assume( e->r->minideal == NULL );
+  assume((e->r->qideal            != NULL) &&    // minideal has one
+         (IDELEMS(e->r->qideal)   == 1)    &&    // non-zero generator
+         (e->r->qideal->m[0]      != NULL)    ); // at m[0];
 
   assume( cf != NULL );
   assume(getCoeffType(cf) == ID);                     // coeff type;
-  
-  cf->extRing           = e->r;
-  cf->extRing->ref ++; // increase the ref.counter for the ground poly. ring!
 
-  cf->extRing->minideal = e->i; // make a copy? 
+  e->r->ref ++; // increase the ref.counter for the ground poly. ring!
+  const ring R = e->r; // no copy!
+  assume( R->qideal == e->r->qideal );
+  cf->extRing  = R;
 
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
-  cf->ch = cf->extRing->cf->ch;
-  
+  cf->ch = R->cf->ch;
+
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);
   #endif
-  
+
   cf->cfGreaterZero  = naGreaterZero;
   cf->cfGreater      = naGreater;
   cf->cfEqual        = naEqual;
@@ -783,7 +867,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = naIsOne;
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
-  cf->cfInit_bigint  = naInit_bigint;  
+  cf->cfInit_bigint  = naInit_bigint;
   cf->cfInt          = naInt;
   cf->cfNeg          = naNeg;
   cf->cfAdd          = naAdd;
@@ -793,7 +877,14 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfExactDiv     = naDiv;
   cf->cfPower        = naPower;
   cf->cfCopy         = naCopy;
-  cf->cfWrite        = naWrite;
+
+  cf->cfWriteLong        = naWriteLong;
+
+  if( rCanShortOut(naRing) )
+    cf->cfWriteShort = naWriteShort;
+  else
+    cf->cfWriteShort = naWriteLong;
+
   cf->cfRead         = naRead;
   cf->cfDelete       = naDelete;
   cf->cfSetMap       = naSetMap;
@@ -817,32 +908,10 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->convSingNFactoryN=naConvSingNFactoryN;
 #endif
   cf->cfParDeg = naParDeg;
-  
+
+  cf->iNumberOfParameters = rVar(R);
+  cf->pParameterNames = R->names;
+  cf->cfParameter = naParameter;
+
   return FALSE;
-}
-
-
-number naParam(const short iParameter, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-  
-  const ring R = cf->extRing;
-  assume( R != NULL );  
-  assume( 0 < iParameter && iParameter <= rVar(R) );
-  
-  poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
-  
-  return (number) p; 
-}
-
-
-/// if m == var(i)/1 => return i, 
-int naIsParam(number m, const coeffs cf)
-{
-  assume(getCoeffType(cf) == ID);
-
-  const ring R = cf->extRing;
-  assume( R != NULL );  
-
-  return p_Var( (poly)m, R ); 
 }

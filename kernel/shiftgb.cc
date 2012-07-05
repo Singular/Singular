@@ -251,7 +251,7 @@ int pmLastVblock(poly p, int lV)
   int j,b;
   j = currRing->N;
   while ( (!e[j]) && (j>=1) ) j--;
-  freeT(e, currRing->N);  //BOCO: did I add this?
+  freeT(e, currRing->N);
   if (j==0)
   {
 #ifdef PDEBUG

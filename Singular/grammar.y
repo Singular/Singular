@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -41,6 +40,7 @@
 #include <Singular/lists.h>
 #include <kernel/longrat.h>
 #include <Singular/libparse.h>
+#include <coeffs/bigintmat.h>
 
 #if 0
 void debug_list(leftv v)
@@ -115,7 +115,7 @@ int        inerror = 0;
      WerrorS("no int expression");                     \
      YYERROR;                                          \
    }                                                   \
-   (i) = (int)((long)(a).Data());
+   (i) = (int)((long)(a).Data());(a).CleanUp()
 
 #define MYYERROR(a) { WerrorS(a); YYERROR; }
 
@@ -194,6 +194,7 @@ void yyerror(const char * fmt)
 
 /* types, part 1 (ring indep.)*/
 %token <i> GRING_CMD
+%token <i> BIGINTMAT_CMD
 %token <i> INTMAT_CMD
 %token <i> PROC_CMD
 %token <i> RING_CMD
@@ -330,10 +331,12 @@ void yyerror(const char * fmt)
 %type <name> stringexpr
 %type <lv>   expr elemexpr exprlist expr_arithmetic
 %type <lv>   declare_ip_variable left_value
+%type <i>    error
 %type <i>    ordername
 %type <i>    cmdeq
 %type <i>    setrings
 %type <i>    ringcmd1
+%type <i>    mat_cmd
 
 %type <i>    '=' '<' '>' '+' '-' COLONCOLON
 %type <i>    '/' '[' ']' '^' ',' ';'
@@ -378,8 +381,8 @@ lines:
             if(siCntrlc)
             {
               WerrorS("abort...");
-	      while((currentVoice!=NULL) && (currentVoice->prev!=NULL)) exitVoice();
-	      if (currentVoice!=NULL) currentVoice->ifsw=0;
+              while((currentVoice!=NULL) && (currentVoice->prev!=NULL)) exitVoice();
+              if (currentVoice!=NULL) currentVoice->ifsw=0;
             }
             if (errorreported) /* also catches abort... */
             {
@@ -419,13 +422,13 @@ pprompt:
             if (inerror)
             {
 /*  bison failed here*/
-              if ((inerror!=3) && ($1.i<UMINUS) && ($1.i>' '))
+              if ((inerror!=3) && ($1<UMINUS) && ($1>' '))
               {
                 // 1: yyerror called
                 // 2: scanner put actual string
                 // 3: error rule put token+\n
                 inerror=3;
-                Print(" error at token `%s`\n",iiTwoOps($1.i));
+                Print(" error at token `%s`\n",iiTwoOps($1));
               }
 /**/
 
@@ -515,16 +518,16 @@ elemexpr:
           }
         | elemexpr '(' exprlist ')'
           {
-	    if ($1.rtyp==UNKNOWN)
-	    { // for x(i)(j)
-	      if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
-	    }
-	    else
-	    {
+            if ($1.rtyp==UNKNOWN)
+            { // for x(i)(j)
+              if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
+            }
+            else
+            {
               $1.next=(leftv)omAllocBin(sleftv_bin);
               memcpy($1.next,&$3,sizeof(sleftv));
               if(iiExprArithM(&$$,&$1,'(')) YYERROR;
-	    }
+            }
           }
         | '[' exprlist ']'
           {
@@ -709,21 +712,13 @@ expr:   expr_arithmetic
           {
             if(iiExprArithM(&$$,&$3,$1)) YYERROR;
           }
-        | MATRIX_CMD '(' expr ',' expr ',' expr ')'
+        | mat_cmd '(' expr ',' expr ',' expr ')'
           {
-            if(iiExprArith3(&$$,MATRIX_CMD,&$3,&$5,&$7)) YYERROR;
+            if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
-        | MATRIX_CMD '(' expr ')'
+        | mat_cmd '(' expr ')'
           {
-            if(iiExprArith1(&$$,&$3,MATRIX_CMD)) YYERROR;
-          }
-        | INTMAT_CMD '(' expr ',' expr ',' expr ')'
-          {
-            if(iiExprArith3(&$$,INTMAT_CMD,&$3,&$5,&$7)) YYERROR;
-          }
-        | INTMAT_CMD '(' expr ')'
-          {
-            if(iiExprArith1(&$$,&$3,INTMAT_CMD)) YYERROR;
+            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
         | RING_CMD '(' rlist ',' rlist ',' ordering ')'
           {
@@ -902,27 +897,7 @@ declare_ip_variable:
           {
             if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
-        | MATRIX_CMD elemexpr '[' expr ']' '[' expr ']'
-          {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
-            int r; TESTSETINT($4,r);
-            int c; TESTSETINT($7,c);
-            if (r < 1)
-              MYYERROR("rows must be greater than 0");
-            if (c < 0)
-              MYYERROR("cols must be greater than -1");
-            leftv v=&$$;
-            //while (v->next!=NULL) { v=v->next; }
-            idhdl h=(idhdl)v->data;
-            idDelete(&IDIDEAL(h));
-            IDMATRIX(h) = mpNew(r,c);
-            if (IDMATRIX(h)==NULL) YYERROR;
-          }
-        | MATRIX_CMD elemexpr
-          {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
-          }
-        | INTMAT_CMD elemexpr '[' expr ']' '[' expr ']'
+        | mat_cmd elemexpr '[' expr ']' '[' expr ']'
           {
             int r; TESTSETINT($4,r);
             int c; TESTSETINT($7,c);
@@ -930,27 +905,63 @@ declare_ip_variable:
               MYYERROR("rows must be greater than 0");
             if (c < 0)
               MYYERROR("cols must be greater than -1");
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
-              YYERROR;
-            leftv v=&$$;
-            idhdl h=(idhdl)v->data;
-            delete IDINTVEC(h);
-            IDINTVEC(h) = new intvec(r,c,0);
-            if (IDINTVEC(h)==NULL) YYERROR;
-          }
-        | INTMAT_CMD elemexpr
-          {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
-              YYERROR;
-            leftv v=&$$;
+            leftv v;
             idhdl h;
-            do
+            if ($1 == MATRIX_CMD)
             {
-               h=(idhdl)v->data;
-               delete IDINTVEC(h);
-               IDINTVEC(h) = new intvec(1,1,0);
-               v=v->next;
-            } while (v!=NULL);
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
+              v=&$$;
+              h=(idhdl)v->data;
+              idDelete(&IDIDEAL(h));
+              IDMATRIX(h) = mpNew(r,c);
+              if (IDMATRIX(h)==NULL) YYERROR;
+            }
+            else if ($1 == INTMAT_CMD)
+            {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+                YYERROR;
+              v=&$$;
+              h=(idhdl)v->data;
+              delete IDINTVEC(h);
+              IDINTVEC(h) = new intvec(r,c,0);
+              if (IDINTVEC(h)==NULL) YYERROR;
+            }
+            else /* BIGINTMAT_CMD */
+            {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+                YYERROR;
+              v=&$$;
+              h=(idhdl)v->data;
+              delete IDBIMAT(h);
+              IDBIMAT(h) = new bigintmat(r, c, coeffs_BIGINT);
+              if (IDBIMAT(h)==NULL) YYERROR;
+            }
+          }
+        | mat_cmd elemexpr
+          {
+            if ($1 == MATRIX_CMD)
+            {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
+            }
+            else if ($1 == INTMAT_CMD)
+            {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+                YYERROR;
+              leftv v=&$$;
+              idhdl h;
+              do
+              {
+                 h=(idhdl)v->data;
+                 delete IDINTVEC(h);
+                 IDINTVEC(h) = new intvec(1,1,0);
+                 v=v->next;
+              } while (v!=NULL);
+            }
+            else /* BIGINTMAT_CMD */
+            {
+              if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+                YYERROR;
+            }
           }
         | declare_ip_variable ',' elemexpr
           {
@@ -1085,6 +1096,13 @@ cmdeq:  '='
           }
         ;
 
+mat_cmd: MATRIX_CMD
+            { $$ = $1; }
+        | INTMAT_CMD
+            { $$ = $1; }
+        | BIGINTMAT_CMD
+            { $$ = $1; }
+          ;
 
 /* --------------------------------------------------------------------*/
 /* section of pure commands                                            */
@@ -1187,14 +1205,10 @@ listcmd:
           {
             list_cmd(RING_CMD,NULL,"// ",TRUE);
           }
-        | LISTVAR_CMD '(' MATRIX_CMD ')'
+        | LISTVAR_CMD '(' mat_cmd ')'
           {
-            list_cmd(MATRIX_CMD,NULL,"// ",TRUE);
+            list_cmd($3,NULL,"// ",TRUE);
            }
-        | LISTVAR_CMD '(' INTMAT_CMD ')'
-          {
-            list_cmd(INTMAT_CMD,NULL,"// ",TRUE);
-          }
         | LISTVAR_CMD '(' PROC_CMD ')'
           {
             list_cmd(PROC_CMD,NULL,"// ",TRUE);
@@ -1234,13 +1248,7 @@ listcmd:
               list_cmd($5,NULL,"// ",TRUE);
             $3.CleanUp();
           }
-        | LISTVAR_CMD '(' elemexpr ',' MATRIX_CMD ')'
-          {
-            if($3.Typ() == PACKAGE_CMD)
-              list_cmd($5,NULL,"// ",TRUE);
-            $3.CleanUp();
-          }
-        | LISTVAR_CMD '(' elemexpr ',' INTMAT_CMD ')'
+        | LISTVAR_CMD '(' elemexpr ',' mat_cmd ')'
           {
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
@@ -1577,15 +1585,15 @@ proccmd:
 parametercmd:
         PARAMETER declare_ip_variable
           {
-	    // decl. of type proc p(int i)
+            // decl. of type proc p(int i)
             if ($1==PARAMETER)  { if (iiParameter(&$2)) YYERROR; }
-	    else                { if (iiAlias(&$2)) YYERROR; } 
+            else                { if (iiAlias(&$2)) YYERROR; }
           }
         | PARAMETER expr
           {
-	    // decl. of type proc p(i)
+            // decl. of type proc p(i)
             sleftv tmp_expr;
-	    if ($1==ALIAS_CMD) MYYERROR("alias requires a type");
+            if ($1==ALIAS_CMD) MYYERROR("alias requires a type");
             if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;

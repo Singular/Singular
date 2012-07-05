@@ -16,7 +16,7 @@ matrix TT;
 matrix MM = coeffs(I,y);
 print (MM);
 matrix NN = coeffs(I,y,TT);
-// should be similiar:
+// should be similar:
 TT*NN;
 I;
 

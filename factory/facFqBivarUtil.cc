@@ -15,6 +15,7 @@
 #include "config.h"
 
 #include "cf_map.h"
+#include "algext.h"
 #include "cf_map_ext.h"
 #include "templates/ftmpl_functions.h"
 #include "ExtensionInfo.h"
@@ -26,6 +27,7 @@
 #include "facFqBivarUtil.h"
 #include "cfNewtonPolygon.h"
 #include "facHensel.h"
+#include "facMul.h"
 
 
 void append (CFList& factors1, const CFList& factors2)
@@ -546,8 +548,8 @@ writeInMatrix (CFMatrix& M, const CFArray& A, const int column,
                const int startIndex
               )
 {
-  ASSERT (A.size () - startIndex > 0, "wrong starting index");
-  ASSERT (A.size () - startIndex == M.rows(), "wrong starting index");
+  ASSERT (A.size () - startIndex >= 0, "wrong starting index");
+  ASSERT (A.size () - startIndex <= M.rows(), "wrong starting index");
   ASSERT (column > 0 && column <= M.columns(), "wrong column");
   if (A.size() - startIndex <= 0) return;
   int j= 1;
@@ -557,7 +559,7 @@ writeInMatrix (CFMatrix& M, const CFArray& A, const int column,
 
 CFArray getCoeffs (const CanonicalForm& F, const int k)
 {
-  ASSERT (F.isUnivariate(), "univariate input expected");
+  ASSERT (F.isUnivariate() || F.inCoeffDomain(), "univariate input expected");
   if (degree (F, 2) < k)
     return CFArray();
 
@@ -580,7 +582,7 @@ CFArray getCoeffs (const CanonicalForm& F, const int k)
 
 CFArray getCoeffs (const CanonicalForm& F, const int k, const Variable& alpha)
 {
-  ASSERT (F.isUnivariate(), "univariate input expected");
+  ASSERT (F.isUnivariate() || F.inCoeffDomain(), "univariate input expected");
   if (degree (F, 2) < k)
     return CFArray ();
 
@@ -623,7 +625,7 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
            const Variable& alpha, const CanonicalForm& evaluation,
            const mat_zz_p& M)
 {
-  ASSERT (G.isUnivariate(), "univariate input expected");
+  ASSERT (G.isUnivariate() || G.inCoeffDomain(), "univariate input expected");
   CanonicalForm F= G (G.mvar() - evaluation, G.mvar());
   if (F.isZero())
     return CFArray ();
@@ -659,14 +661,48 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
 }
 #endif
 
-int * computeBounds (const CanonicalForm& F, int& n)
+int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
 {
   n= degree (F, 1);
   int* result= new int [n];
   int sizeOfNewtonPolygon;
   int** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
 
-  int minXIndex= 0, minYIndex= 0, maxXIndex= 0, maxYIndex= 0;
+  isIrreducible= false;
+  if (sizeOfNewtonPolygon == 3)
+  {
+    bool check1=
+        (newtonPolyg[0][0]==0 || newtonPolyg[1][0]==0 || newtonPolyg[2][0]==0);
+    if (check1)
+    {
+      bool check2=
+        (newtonPolyg[0][1]==0 || newtonPolyg[1][1]==0 || newtonPolyg[2][0]==0);
+      if (check2)
+      {
+        int p=getCharacteristic();
+        int d=1;
+        char bufGFName='Z';
+        bool GF= (CFFactory::gettype()==GaloisFieldDomain);
+        if (GF)
+        {
+          d= getGFDegree();
+          bufGFName=gf_name;
+        }
+        setCharacteristic(0);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        tmp= gcd (tmp, newtonPolyg[1][0]);
+        tmp= gcd (tmp, newtonPolyg[1][1]);
+        tmp= gcd (tmp, newtonPolyg[2][0]);
+        tmp= gcd (tmp, newtonPolyg[2][1]);
+        isIrreducible= (tmp==1);
+        if (GF)
+          setCharacteristic (p, d, bufGFName);
+        else
+          setCharacteristic(p);
+      }
+    }
+  }
+
   int minX, minY, maxX, maxY;
   minX= newtonPolyg [0] [0];
   minY= newtonPolyg [0] [1];
@@ -675,25 +711,13 @@ int * computeBounds (const CanonicalForm& F, int& n)
   for (int i= 1; i < sizeOfNewtonPolygon; i++)
   {
     if (minX > newtonPolyg [i] [0])
-    {
       minX= newtonPolyg [i] [0];
-      minXIndex= i;
-    }
     if (maxX < newtonPolyg [i] [0])
-    {
       maxX= newtonPolyg [i] [0];
-      maxXIndex= i;
-    }
     if (minY > newtonPolyg [i] [1])
-    {
       minY= newtonPolyg [i] [1];
-      minYIndex= i;
-    }
     if (maxY < newtonPolyg [i] [1])
-    {
       maxY= newtonPolyg [i] [1];
-      maxYIndex= i;
-    }
   }
 
   int k= maxX;

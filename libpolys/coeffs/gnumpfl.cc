@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -427,11 +426,12 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfIsOne   = ngfIsOne;
   n->cfIsMOne  = ngfIsMOne;
   n->cfGreaterZero = ngfGreaterZero;
-  n->cfWrite  = ngfWrite;
+  n->cfWriteLong  = ngfWrite;
   n->cfRead    = ngfRead;
   n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;
   n->cfCoeffWrite = ngfCoeffWrite;
+  n->cfInit_bigint = ngfMapQ;
 #ifdef LDEBUG
   n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
@@ -452,7 +452,9 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
    
   assume( n->float_len <= n->float_len2 );
   assume( n->float_len2 >= SHORT_REAL_LENGTH );
-  assume( n->complex_parameter == NULL );
+  
+  assume( n_NumberOfParameters(n) == 0 );
+  assume( n_ParameterNames(n) == NULL );
 
   return FALSE;
 }

@@ -16,7 +16,7 @@ int N= nvars(basering);
 matrix W[N][N]=0;
 W[1,3]=1;
 W[2,4]=1;
-nc_algebra(1,W);
+def A = nc_algebra(1,W); setring A;
 
 ideal I;
 I[1]=2*x1*x2^3*d1+3*x2^4*d2+2*x1^3*d1+3*x1^2*x2*d2-6*x2^3*s1-9*x2^3*s2-6*x1^2*s1-4*x1^2*s2;

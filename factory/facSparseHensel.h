@@ -411,6 +411,12 @@ isEqual (const CFArray& A, const CFArray& B)
 inline CFArray
 getTerms2 (const CanonicalForm& F)
 {
+  if (F.inCoeffDomain())
+  {
+    CFArray result= CFArray (1);
+    result[0]= F;
+    return result;
+  }
   CFArray result= CFArray (size (F));
   int j= 0;
   Variable x= F.mvar();
@@ -418,8 +424,16 @@ getTerms2 (const CanonicalForm& F)
   CFIterator k;
   for (CFIterator i= F; i.hasTerms(); i++)
   {
-    for (k= i.coeff(); k.hasTerms(); k++, j++)
-      result[j]= k.coeff()*power (x,i.exp())*power (y,k.exp());
+    if (i.coeff().inCoeffDomain())
+    {
+      result[j]= i.coeff()*power (x,i.exp());
+      j++;
+    }
+    else
+    {
+      for (k= i.coeff(); k.hasTerms(); k++, j++)
+        result[j]= k.coeff()*power (x,i.exp())*power (y,k.exp());
+    }
   }
   sort (result);
   return result;
@@ -484,7 +498,7 @@ CanonicalForm patch (const CanonicalForm& F1, const CanonicalForm& F2,
                      const CanonicalForm& eval)
 {
   CanonicalForm result= F1;
-  if (F2.level() != 1)
+  if (F2.level() != 1 && !F2.inCoeffDomain())
   {
     int d= degree (F2);
     result *= power (F2.mvar(), d);

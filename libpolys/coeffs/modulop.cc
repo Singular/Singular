@@ -467,7 +467,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfCopy  = ndCopy;
   //r->cfRePart = ndCopy;
   //r->cfImPart = ndReturn0;
-  r->cfWrite = npWrite;
+  r->cfWriteLong = npWrite;
   r->cfRead = npRead;
   //r->cfNormalize=ndNormalize;
   r->cfGreater = npGreater;

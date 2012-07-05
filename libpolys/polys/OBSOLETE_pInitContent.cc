@@ -167,7 +167,7 @@ void p_Content(poly ph, const ring r)
   }
 }
 
-void pSimpleContent(poly ph,int smax)
+void pSimpleContent(poly ph,int smax) // in currRing!
 {
   //if(TEST_OPT_CONTENTSB) return;
   if (ph==NULL) return;
@@ -227,7 +227,7 @@ void pSimpleContent(poly ph,int smax)
   nlDelete(&h,currRing);
 }
 
-number pInitContent(poly ph)
+number pInitContent(poly ph)  // in currRing!
 // only for coefficients in Q
 #if 0
 {
@@ -312,12 +312,12 @@ number pInitContent(poly ph)
 }
 #endif
 
-number pInitContent_a(poly ph)
+number pInitContent_a(poly ph) // in currRing!
 // only for coefficients in K(a) anf K(a,...)
 {
   number d=pGetCoeff(ph);
-  int s=naParDeg(d);
-  if (s /* naParDeg(d)*/ <=1) return naCopy(d);
+  int s=n_ParDeg(d, currRing);
+  if (s /* n_ParDeg(d, currRing)*/ <=1) return naCopy(d);
   int s2=-1;
   number d2;
   int ss;
@@ -329,7 +329,7 @@ number pInitContent_a(poly ph)
       if (s2==-1) return naCopy(d);
       break;
     }
-    if ((ss=naParDeg(pGetCoeff(ph)))<s)
+    if ((ss=n_ParDeg(pGetCoeff(ph), currRing))<s)
     {
       s2=s;
       d2=d;
@@ -796,7 +796,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
             if (rField_is_GF())
             {
               number c=pGetCoeff(qq);
-              number ee=nfPar(1);
+              number ee=n_Parameter(1, currRing->cf); // ?
               number eee;nfPower(ee,e,&eee); //nfDelete(ee,currRing);
               ee=nfMult(c,eee);
               //nfDelete(c,currRing);nfDelete(eee,currRing);

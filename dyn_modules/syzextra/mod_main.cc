@@ -21,15 +21,14 @@
 #include <Singular/attrib.h>
 
 #include <Singular/ipid.h> 
+#include <Singular/ipshell.h> // For iiAddCproc
+
 // extern coeffs coeffs_BIGINT
 
 #include "singularxx_defs.h"
 #include "DebugPrint.h"
 #include "myNF.h"
 
-extern BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, const intvec * componentWeights);
-
-// extern void rSetISReference(const ideal F, const int rank, const int p, const intvec * componentWeights, const ring r);
 extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
 // extern ring rCurrRingAssure_SyzComp();
 extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
@@ -298,7 +297,69 @@ if ((s)->v != NULL) \
 
 
 
-/// Get leading monom (no module component)
+
+
+
+static BOOLEAN Tail(leftv res, leftv h)
+{
+  NoReturn(res);
+
+  if( h == NULL )
+  {
+    WarnS("Tail needs an argument...");
+    return TRUE;
+  }
+
+  assume( h != NULL );
+
+  if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
+  {
+    const poly p = (const poly)h->Data();
+
+    res->rtyp = h->Typ();
+
+    if( p == NULL)
+      res->data = NULL;
+    else
+      res->data = p_Copy( pNext(p), currRing );
+
+    h = h->Next(); assume (h == NULL);
+    
+    return FALSE;
+  }
+
+  if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
+  {
+    const ideal id = (const ideal)h->Data();
+
+    res->rtyp = h->Typ();
+
+    if( id == NULL)
+      res->data = NULL;
+    else
+    {
+      const ideal newid = idInit(IDELEMS(id),id->rank);
+      for (int i=IDELEMS(id) - 1; i >= 0; i--)
+        if( id->m[i] != NULL )
+          newid->m[i] = p_Copy(pNext(id->m[i]), currRing);
+        else
+          newid->m[i] = NULL;
+      
+      res->data = newid; 
+    }
+    
+    h = h->Next(); assume (h == NULL);
+    
+    return FALSE;
+  }
+
+  WarnS("Tail needs a single poly/vector/ideal/module argument...");
+  return TRUE;
+}
+
+
+
+/// Get leading term without a module component
 static BOOLEAN leadmonom(leftv res, leftv h)
 {
   NoReturn(res);
@@ -316,7 +377,7 @@ static BOOLEAN leadmonom(leftv res, leftv h)
       assume( p_LmTest(p, r) );
 
       m = p_LmInit(p, r);
-      p_SetCoeff0(m, n_Init(1, r), r);
+      p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
 
       //            if( p_GetComp(m, r) != 0 )
       //            {
@@ -344,22 +405,27 @@ static BOOLEAN leadcomp(leftv res, leftv h)
 {
   NoReturn(res);
 
-  if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) && (h->Data() != NULL))
+  if ((h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD))
   {
     const ring r = currRing;
 
     const poly p = (poly)(h->Data());
 
-    assume( p != NULL );
-    assume( p_LmTest(p, r) );
+    if (p != NULL )
+    {
+      assume( p != NULL );
+      assume( p_LmTest(p, r) );
 
-    const unsigned long iComp = p_GetComp(p, r);
+      const unsigned long iComp = p_GetComp(p, r);
 
-    assume( iComp > 0 ); // p is a vector
+  //    assume( iComp > 0 ); // p is a vector
+
+      res->data = reinterpret_cast<void *>(jjLONG2N(iComp));
+    } else
+      res->data = reinterpret_cast<void *>(jjLONG2N(0));
+      
 
     res->rtyp = BIGINT_CMD;
-    res->data = reinterpret_cast<void *>(jjLONG2N(iComp));
-
     return FALSE;
   }
 
@@ -501,11 +567,10 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   const int iLimit = r->typ[pos].data.is.limit;
   const ideal F = r->typ[pos].data.is.F;
-  const intvec* componentWeights = r->typ[pos].data.is.componentWeights;
   ideal FF = id_Copy(F, r);
 
   lists l=(lists)omAllocBin(slists_bin);
-  l->Init(3);
+  l->Init(2);
 
   l->m[0].rtyp = INT_CMD;
   l->m[0].data = reinterpret_cast<void *>(iLimit);
@@ -525,15 +590,6 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
     l->m[1].rtyp = IDEAL_CMD;
 
   l->m[1].data = reinterpret_cast<void *>(FF);
-
-  l->m[2].rtyp = INTVEC_CMD;
-  
-  if( componentWeights != NULL )
-    l->m[2].data = reinterpret_cast<void *>(new intvec(componentWeights));
-  else
-    l->m[2].data = reinterpret_cast<void *>(new intvec());
-    
-
 
   res->rtyp = LIST_CMD; // list of int/module
   res->data = reinterpret_cast<void *>(l);
@@ -555,8 +611,6 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
     WerrorS("`SetInducedReferrence(<ideal/module>, [int[, int]])` expected");
     return TRUE;
   }
-
-  intvec * componentWeights = (intvec *)atGet(h,"isHomog",INTVEC_CMD); // No copy!
 
   const ideal F = (ideal)h->Data(); ; // No copy!
   h=h->next;
@@ -589,7 +643,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
 
   // F & componentWeights belong to that ordering block of currRing now:
-  rSetISReference(r, F, rank, p, componentWeights); // F and componentWeights will be copied!
+  rSetISReference(r, F, rank, p); // F will be copied!
   return FALSE;
 }
 
@@ -793,29 +847,33 @@ extern "C"
 
 int mod_init(SModulFunctions* psModulFunctions) 
 {
-  
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"DetailedPrint",FALSE, DetailedPrint);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"leadmonom",FALSE, leadmonom);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"leadcomp",FALSE, leadcomp);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"leadrawexp",FALSE, leadrawexp);
+#define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
+// #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
+  #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
+  ADD(psModulFunctions, currPack->libname, "DetailedPrint", FALSE, DetailedPrint);
+  ADD(psModulFunctions, currPack->libname, "leadmonomial", FALSE, leadmonom);
+  ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
+  ADD(psModulFunctions, currPack->libname, "leadrawexp", FALSE, leadrawexp);
+
+  ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
 
 
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"ISUpdateComponents",FALSE, ISUpdateComponents);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"SetInducedReferrence",FALSE, SetInducedReferrence);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"GetInducedData",FALSE, GetInducedData);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"SetSyzComp",FALSE, SetSyzComp);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"MakeInducedSchreyerOrdering",FALSE, MakeInducedSchreyerOrdering);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"MakeSyzCompOrdering",FALSE, MakeSyzCompOrdering);
+  ADD(psModulFunctions, currPack->libname, "ISUpdateComponents", FALSE, ISUpdateComponents);
+  ADD(psModulFunctions, currPack->libname, "SetInducedReferrence", FALSE, SetInducedReferrence);
+  ADD(psModulFunctions, currPack->libname, "GetInducedData", FALSE, GetInducedData);
+  ADD(psModulFunctions, currPack->libname, "SetSyzComp", FALSE, SetSyzComp);
+  ADD(psModulFunctions, currPack->libname, "MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
+  ADD(psModulFunctions, currPack->libname, "MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
   
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"noop",FALSE, noop);
+  ADD(psModulFunctions, currPack->libname, "noop", FALSE, noop);
  
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"idPrepare",FALSE, idPrepare);
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"reduce_syz",FALSE, reduce_syz);
+  ADD(psModulFunctions, currPack->libname, "idPrepare", FALSE, idPrepare);
+  ADD(psModulFunctions, currPack->libname, "reduce_syz", FALSE, reduce_syz);
 
-  psModulFunctions->iiAddCproc(currPack->libname,(char*)"p_Content",FALSE, _p_Content);
+  ADD(psModulFunctions, currPack->libname, "p_Content", FALSE, _p_Content);
 
-  //  psModulFunctions->iiAddCproc(currPack->libname,(char*)"",FALSE, );
-  
+  //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
+#undef ADD  
   return 0;
 }
 }

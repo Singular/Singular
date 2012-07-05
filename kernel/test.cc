@@ -14,8 +14,8 @@
 
 #include <reporter/reporter.h>
 
-#include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include <findexec/feFopen.h>
+#include <findexec/feResource.h>
 
 #include <coeffs/coeffs.h>
 
@@ -52,7 +52,7 @@
 
 #ifdef HAVE_FACTORY
 // The following are needed due to FACTORY (e.g. initCanonicalForm)
-int initializeGMP(){ return 1; } 
+int initializeGMP(){ return 1; }
 int mmInit(void) {return 1; }
 #endif
 
@@ -133,7 +133,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include "GMPrat.h"
 
-// #include "htmlhelp.h" // For Windows // 
+// #include "htmlhelp.h" // For Windows //
 #include "hutil.h"
 // #include "Ideal.h" // Too old?
 
@@ -202,10 +202,10 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 void TestGBEngine()
 {
-   
+
   //  R = MPolynomialRing_polydict(QQ,5,'w,x,y,z,C', order='degrevlex')
   //  J = (w*w - x*z, w*x - y*z, x*x - w*y, x*y - z*z, y*y - w*z)
-	 
+
   const short w = 1;
   const short x = 2;
   const short y = 3;
@@ -215,7 +215,7 @@ void TestGBEngine()
 
   char **n=(char**)omalloc(N*sizeof(char*));
 
-  
+
   n[w-1]=omStrDup("w");
   n[x-1]=omStrDup("x");
   n[y-1]=omStrDup("y");
@@ -235,9 +235,9 @@ void TestGBEngine()
   block0[1] = 1;
   block1[1] = N;
 
-  ring R = rDefault(0, N, n, D, order, block0, block1); 
-  
-//   ring R = rDefault(0, N, n); 
+  ring R = rDefault(0, N, n, D, order, block0, block1);
+
+//   ring R = rDefault(0, N, n);
 
   rWrite(R); PrintLn();
 
@@ -252,7 +252,7 @@ void TestGBEngine()
   {
     // -xz
     poly p = p_ISet(-1,R);
-    
+
     p_SetExp(p, x, 1, R);
     p_SetExp(p, z, 1, R);
     p_Setm(p, R);
@@ -301,7 +301,7 @@ void TestGBEngine()
 
     MATELEM(I, 1, ++gen) = p_Add_q(lp, p, R); // wx - yz
   }
-  
+
 
   {
     // -wy
@@ -328,7 +328,7 @@ void TestGBEngine()
 
     MATELEM(I, 1, ++gen) = p_Add_q(lp, p, R); // x2 - wy
   }
-  
+
 
   {
     // -z2
@@ -355,7 +355,7 @@ void TestGBEngine()
 
     MATELEM(I, 1, ++gen) = p_Add_q(lp, p, R); // xy - z2
   }
-  
+
 
   {
     // -wz
@@ -407,7 +407,7 @@ void TestGBEngine()
   {
     intvec *weights = NULL;
     ideal SYZ = idSyzygies(I, testHomog, &weights);
-    
+
 #ifdef PDEBUG
     PrintS("SYZ: ");
     idShow(SYZ, R, R, 0);
@@ -436,12 +436,12 @@ void TestGBEngine()
 
     b = syBettiOfComputation(r, TRUE);
     PrintS("min. betti: \n");    b->show();    PrintLn();
-    delete b;    
+    delete b;
 
     Print("length: %d\n", sySize(r));
 
     syPrint(r, "R");
-    
+
     syKillComputation(r, R);
   }
 
@@ -464,7 +464,7 @@ void TestGBEngine()
 
     b = syBettiOfComputation(r, TRUE);
     PrintS("min. betti: \n");    b->show();    PrintLn();
-    delete b;    
+    delete b;
 
     Print("length: %d\n", sySize(r));
 
@@ -473,7 +473,7 @@ void TestGBEngine()
     syKillComputation(r, R);
   }
 
-    
+
 
   {
     PrintS("\n**********************************\n");
@@ -494,7 +494,7 @@ void TestGBEngine()
 
     b = syBettiOfComputation(r, TRUE);
     PrintS("min. betti: \n");    b->show();    PrintLn();
-    delete b;    
+    delete b;
 
     Print("length: %d\n", sySize(r));
 
@@ -502,7 +502,7 @@ void TestGBEngine()
 
     syKillComputation(r, R);
   }
-  
+
 
   {
     PrintS("\n**********************************\n");
@@ -523,7 +523,7 @@ void TestGBEngine()
 
     b = syBettiOfComputation(r, TRUE);
     PrintS("min. betti: \n");    b->show();    PrintLn();
-    delete b;    
+    delete b;
 
     Print("length: %d\n", sySize(r));
 
@@ -531,13 +531,13 @@ void TestGBEngine()
 
     syKillComputation(r, R);
   }
-  
 
 
-  
-  idDelete( &I, R);  
+
+
+  idDelete( &I, R);
   rDelete(R); // should cleanup every belonging polynomial, right!?
-   
+
 }
 
 
@@ -595,13 +595,13 @@ void TestSimpleRingArithmetcs()
   pSetm(p2);
 
   // print p1 + p2
-  Print("p1: "); pWrite0(p1); 
-  Print(" + p2: "); pWrite0(p2); 
+  Print("p1: "); pWrite0(p1);
+  Print(" + p2: "); pWrite0(p2);
   Print("  ---- >>>> ");
 
   // compute p1+p2
   p1=p_Add_q(p1,p2,R); p2=NULL;
-  pWrite(p1); 
+  pWrite(p1);
 
   // clean up:
 //  pDelete(&p1);
@@ -610,7 +610,7 @@ void TestSimpleRingArithmetcs()
 }
 
 
-int main( int, char *argv[] ) 
+int main( int, char *argv[] )
 {
   feInitResources(argv[0]);
 
@@ -620,6 +620,6 @@ int main( int, char *argv[] )
 
   TestGBEngine();
   TestSimpleRingArithmetcs();
-   
+
   return 0;
 }

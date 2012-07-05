@@ -112,30 +112,43 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
   irred= false;
   Variable v;
   CFList factors;
-  for (int j= 0; j < A.level() - 2; j++)
+  CanonicalForm LCA= LC (A,1);
+  if (!LCA.inCoeffDomain())
   {
-    if (!Aeval[j].isEmpty())
+    for (int j= 0; j < A.level() - 2; j++)
     {
-      v= Variable (Aeval[j].getFirst().level());
-
-      factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
-
-      if (factors.getFirst().inCoeffDomain())
-        factors.removeFirst();
-
-      if (minFactorsLength == 0)
-        minFactorsLength= factors.length();
-      else
-        minFactorsLength= tmin (minFactorsLength, factors.length());
-
-      if (factors.length() == 1)
+      if (!Aeval[j].isEmpty() && (degree (LCA, j+3) > 0))
       {
-        irred= true;
-        return;
+        v= Variable (Aeval[j].getFirst().level());
+
+        factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
+
+        if (factors.getFirst().inCoeffDomain())
+          factors.removeFirst();
+
+        if (minFactorsLength == 0)
+          minFactorsLength= factors.length();
+        else
+          minFactorsLength= tmin (minFactorsLength, factors.length());
+
+        if (factors.length() == 1)
+        {
+          irred= true;
+          return;
+        }
+        sortList (factors, x);
+        Aeval [j]= factors;
       }
-      sortList (factors, x);
-      Aeval [j]= factors;
+      else if (!Aeval[j].isEmpty())
+      {
+        Aeval[j]=CFList();
+      }
     }
+  }
+  else
+  {
+    for (int j= 0; j < A.level() - 2; j++)
+      Aeval[j]= CFList();
   }
 }
 
@@ -320,7 +333,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   int j= 0;
   if (!pass)
   {
-    int lev;
+    int lev= 0;
     for (int i= 1; i <= LCF.level(); i++)
     {
       if(degree (LCF, i) > 0)
@@ -450,7 +463,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
 
     bool success= false;
-    if (LucksWangSparseHeuristic (oldSqrfPartF*power (LC1, factors.length()-1),
+    CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
+    if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
+        LucksWangSparseHeuristic (oldSqrfPartFPowLC,
                                   oldFactors, 1, leadingCoeffs, factors))
     {
       interMedResult= recoverFactors (oldSqrfPartF, factors);
@@ -480,8 +495,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
       CFArray Pi;
       CFList diophant;
-      henselLift122 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
-                     leadingCoeffs, false);
+      nonMonicHenselLift12 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
+                            leadingCoeffs, false);
 
       if (sqrfPartF.level() > 2)
       {
@@ -602,7 +617,11 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   //univariate case
   if (F.isUnivariate())
   {
-    CFList result= conv (factorize (F, v));
+    CFList result;
+    if (v.level() != 1)
+      result= conv (factorize (F, v));
+    else
+      result= conv (factorize (F,true));
     if (result.getFirst().inCoeffDomain())
       result.removeFirst();
     return result;
@@ -653,7 +672,10 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   CFList factors;
   if (A.isUnivariate ())
   {
-    factors= conv (factorize (A, v));
+    if (v.level() != 1)
+      factors= conv (factorize (A, v));
+    else
+      factors= conv (factorize (A,true));
     append (factors, contentAFactors);
     decompress (factors, N);
     return factors;
@@ -876,8 +898,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A /= hh;
 
-  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
-      factors))
+  if (size (A)/getNumVars (A) < 500 &&
+      LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+                                factors))
   {
     int check= factors.length();
     factors= recoverFactors (A, factors);

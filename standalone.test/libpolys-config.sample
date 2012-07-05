@@ -62,7 +62,7 @@ while test $# -gt 0; do
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lomalloc_g -ldl -lgmp  " 
+	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g -lomalloc_g -ldl -lgmp  " 
 	;;
 
     *)

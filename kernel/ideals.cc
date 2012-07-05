@@ -49,13 +49,6 @@
 /* #define WITH_OLD_MINOR */
 #define pCopy_noCheck(p) pCopy(p)
 
-static poly * idpower;
-/*collects the monomials in makemonoms, must be allocated befor*/
-static int idpowerpoint;
-/*index of the actual monomial in idpower*/
-static poly * givenideal;
-/*the ideal from which a power is computed*/
-
 /*0 implementation*/
 
 /*2
@@ -545,7 +538,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 {
   ideal   h2, h3;
   int     i;
-  int     j,jj=0,k;
+  int     j,k;
   poly    p,q;
 
   if (idIs0(h1)) return NULL;
@@ -640,7 +633,6 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
                   BOOLEAN setRegularity, int *deg)
 {
   ideal s_h1;
-  poly  p;
   int   j, k, length=0,reg;
   BOOLEAN isMonomial=TRUE;
   int ii, idElemens_h1;
@@ -788,7 +780,6 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 ideal idXXX (ideal  h1, int k)
 {
   ideal s_h1;
-  int j;
   intvec *w=NULL;
 
   assume(currRing != NULL);
@@ -836,7 +827,7 @@ ideal idXXX (ideal  h1, int k)
 ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 {
   int   i, j, k, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
-  poly  p=NULL, q, qq;
+  poly  p=NULL, q;
   intvec *w=NULL;
 
   idDelete((ideal*)ma);
@@ -1251,7 +1242,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
         else
           p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
         pNormalize(p);
-        if((w==NULL)&&(p_Deg(p0,currRing)>n)||(w!=NULL)&&(pDegW(p0,w)>n))
+        if(((w==NULL)&&(p_Deg(p0,currRing)>n))||((w!=NULL)&&(pDegW(p0,w)>n)))
           p_Delete(&p0,currRing);
         else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
@@ -1407,7 +1398,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
     return res;
   }
   BITSET old_test=test;
-  int i,l,ll,k,kkk,kmax;
+  int i, kmax;
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
   intvec * weights1;
@@ -1975,7 +1966,6 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
   for (i=length-1;i>=0;i--)
   {
     p=P[i];
-    poly q=p;
     if (p!=NULL)
     {
       int d=currRing->pFDeg(p,currRing);
@@ -2106,7 +2096,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
 {
   intvec *wtmp=NULL;
 
-  int i,j,k,rk,flength=0,slength,length;
+  int i,k,rk,flength=0,slength,length;
   poly p,q;
 
   if (idIs0(h2))

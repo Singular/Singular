@@ -2001,9 +2001,9 @@ public:
     n_coeffType type = nRegister(n_algExt, naInitChar);
     TS_ASSERT(type == n_algExt);
 
+    r->qideal = minIdeal;
     AlgExtInfo extParam;
     extParam.r = r;
-    extParam.i = minIdeal;
 
     clog << "Next create the extension field Q[a]/<a2+1>..." << endl;
 
@@ -2102,9 +2102,9 @@ public:
     n_coeffType type = nRegister(n_algExt, naInitChar);
     TS_ASSERT(type == n_algExt);
 
+    r->qideal = minIdeal;
     AlgExtInfo extParam;
     extParam.r = r;
-    extParam.i = minIdeal;
 
     clog << "Next create the extension field Q[b]/<b^7+17>..." << endl;
 
@@ -2246,9 +2246,9 @@ public:
     n_coeffType type = nRegister(n_algExt, naInitChar);
     TS_ASSERT(type == n_algExt);
 
+    r->qideal = minIdeal;
     AlgExtInfo extParam;
     extParam.r = r;
-    extParam.i = minIdeal;
 
     clog << "Next create the extension field Z_17[a]/<a^2+3>..." << endl;
 

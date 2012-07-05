@@ -39,6 +39,9 @@
 #endif
 
 #include <factory/cf_gmp.h>
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
 
 int getExp(); /* cf_char.cc */
 
@@ -429,7 +432,17 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   {
     if (f.isUnivariate())
     {
-      #ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+      nmod_poly_t f1;
+      convertFacCF2nmod_poly_t (f1, f);
+      nmod_poly_factor_t result;
+      nmod_poly_factor_init (result);
+      mp_limb_t leadingCoeff= nmod_poly_factor (result, f1);
+      F= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, f.mvar());
+      nmod_poly_factor_clear (result);
+      nmod_poly_clear (f1);
+#else
+#ifdef HAVE_NTL
       if (isOn(SW_USE_NTL) && (isPurePoly(f)))
       {
         // USE NTL
@@ -528,13 +541,14 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         }
       }
       else
-      #endif
+#endif //HAVE_NTL
       {  // Use Factory without NTL
         if ( isOn( SW_BERLEKAMP ) )
           F=FpFactorizeUnivariateB( f, issqrfree );
         else
           F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
       }
+#endif //HAVE_FLINT
     }
     else
     {
@@ -630,7 +644,17 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     else
     {
       #ifdef HAVE_NTL
-      F = ZFactorizeMultivariate( fz, issqrfree );
+      On (SW_RATIONAL);
+      if (issqrfree)
+      {
+        CFList factors;
+        factors= ratSqrfFactorize (fz);
+        for (CFListIterator i= factors; i.hasItem(); i++)
+          F.append (CFFactor (i.getItem(), 1));
+      }
+      else
+        F = ratFactorize (fz);
+      Off (SW_RATIONAL);
       #else
       factoryError ("multivariate factorization not implemented");
       return CFFList (CFFactor (f, 1));

@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -47,9 +46,6 @@
 //static int characteristic = 0;
 extern int IsPrime(int p);
 
-/*0 implementation*/
-number nNULL; /* the 0 as constant */
-
 n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
@@ -86,11 +82,16 @@ number ndChineseRemainder(number *,number *,int,const coeffs r)
   return n_Init(0,r); 
 }
 
-int ndParDeg(number n, const coeffs r)
+static int ndParDeg(number n, const coeffs r)
 {
   return (-n_IsZero(n,r));
 }
 
+static number ndParameter(const int i, const coeffs r)
+{
+  Werror("ndParameter: n_Parameter is not implemented/relevant for (coeff_type = %d)",getCoeffType(r));
+  return NULL;
+}
 
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
@@ -257,6 +258,8 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfChineseRemainder = ndChineseRemainder;
     n->cfFarey = ndFarey;
     n->cfParDeg = ndParDeg;
+    
+    n->cfParameter = ndParameter;
 
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
@@ -290,11 +293,12 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;
 #endif
-   
-#ifndef NDEBUG
+
+    if(n->cfWriteShort==NULL)
+      n->cfWriteShort = n->cfWriteLong;
+
     assume(n->nCoeffIsEqual!=NULL);
-    if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
-		assume(n->cfSetChar!=NULL);
+    assume(n->cfSetChar!=NULL);
     assume(n->cfMult!=NULL);
     assume(n->cfSub!=NULL);
     assume(n->cfAdd!=NULL);
@@ -315,7 +319,18 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfCopy!=NULL);
     assume(n->cfRePart!=NULL);
     assume(n->cfImPart!=NULL);
-    assume(n->cfWrite!=NULL);
+
+    assume(n->cfWriteLong!=NULL);
+    assume(n->cfWriteShort!=NULL);
+
+    assume(n->iNumberOfParameters>= 0);
+
+    assume( (n->iNumberOfParameters == 0 && n->pParameterNames == NULL) ||
+            (n->iNumberOfParameters >  0 && n->pParameterNames != NULL) );           
+
+    assume(n->cfParameter!=NULL);
+    assume(n->cfParDeg!=NULL);
+     
     assume(n->cfRead!=NULL);
     assume(n->cfNormalize!=NULL);
     assume(n->cfGreater!=NULL);
@@ -340,7 +355,15 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfDBTest!=NULL);
 #endif
     assume(n->type==t);
+     
+#ifndef NDEBUG
+    if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
+    if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
+    if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
 #endif
+     
+   if( n->nNULL == NULL )
+     n->nNULL = n_Init(0, n); // may still remain NULL
   }
   else
   {

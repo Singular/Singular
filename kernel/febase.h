@@ -3,15 +3,13 @@
 /****************************************
  * *  Computer Algebra System SINGULAR     *
  * ****************************************/
-/* $Id: febase.h 14137 2011-04-11 16:39:34Z hannes $ */
 /*
  * * ABSTRACT: basic i/o
  * */
 
 #include <reporter/reporter.h>
 
-#include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include <findexec/feResource.h>
 
 #include <kernel/structs.h>
 
@@ -193,4 +191,4 @@ void    myyoldbuffer(void * oldb);
 
 #endif
 #endif
-  
+

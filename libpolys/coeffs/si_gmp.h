@@ -4,9 +4,8 @@
 
 // just assume that factory have been built (cplusplus.h!)
 // instead of duplicating cf_gmp.h here for now...
-#include <factory/cf_gmp.h>
+//#include <factory/cf_gmp.h>
 
-/*
 #if defined(__cplusplus) && defined(__GNUC__)
   #define __cplusplus_backup __cplusplus
   #undef __cplusplus
@@ -17,7 +16,6 @@
 #else
   #include <gmp.h>
 #endif
-*/
 
 
 #ifndef mpz_size1

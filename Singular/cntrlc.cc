@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -222,7 +221,7 @@ void sigsegv_handler(int sig, sigcontext s)
   }
 #endif /* __OPTIMIZE__ */
 #ifdef CALL_GDB
-  if (sig!=SIGINT) 
+  if (sig!=SIGINT)
   {
     if (singular_in_batchmode) debug(STACK_TRACE);
     else                       debug(INTERACTIVE);
@@ -247,7 +246,7 @@ void sigsegv_handler(int sig, sigcontext s)
 /*---------------------------------------------------------------------*/
 void sig_chld_hdl(int sig)
 {
- waitpid(-1,NULL,WNOHANG);  
+  waitpid(-1,NULL,WNOHANG);
 }
 
 /*2

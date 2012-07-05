@@ -289,9 +289,9 @@ poly convFactoryASingA ( const CanonicalForm & f, const ring r )
   }
   if (a!=NULL)
   {
-    if (r->cf->extRing->minideal->m[0]!=NULL)
+    if (r->cf->extRing->qideal->m[0]!=NULL)
     {
-      poly l=r->cf->extRing->minideal->m[0];
+      poly l=r->cf->extRing->qideal->m[0];
       if (p_GetExp(a,1,r->cf->extRing) >= p_GetExp(l,1,r->cf->extRing))
         a = p_PolyDiv (a, l, FALSE, r->cf->extRing);
     }

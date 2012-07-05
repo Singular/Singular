@@ -11,7 +11,7 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
-// #include <resources/feFopen.h>
+// #include <findexec/feFopen.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 

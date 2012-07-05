@@ -407,7 +407,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
-  r->cfWrite = nrzWrite;
+  r->cfWriteLong = nrzWrite;
   r->cfRead = nrzRead;
   r->cfGreater = nrzGreater;
   r->cfEqual = nrzEqual;

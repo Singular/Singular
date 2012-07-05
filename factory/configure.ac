@@ -196,6 +196,8 @@ LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use
 
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
+LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+
 # arithmetic shift
 #AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
 #AC_CACHE_VAL(ac_cv_shift,
@@ -371,7 +373,7 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   if test "x$with_omalloc_extra_dir" != "x"; then
     OMALLOC_CFLAGS="$OMALLOC_CFLAGS -I${with_omalloc_extra_dir}"
-    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc -L${with_omalloc_extra_dir}/findexec -L${with_omalloc_extra_dir}/libpolys/resources -L${with_omalloc_extra_dir}/libpolys/reporter -L${with_omalloc_extra_dir}/libpolys/misc"
+    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc -L${with_omalloc_extra_dir}/findexec"
   fi
   
   CPPFLAGS_save="$CPPFLAGS"
@@ -384,8 +386,8 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   CPPFLAGS="$CPPFLAGS_save"
 
-  OMALLOC_G_LDADD="-lresources_g -lreporter_g -lmisc_g -lfindexec_g -lomalloc_g"
-  OMALLOC_R_LDADD="-lresources -lreporter -lmisc -lfindexec -lomalloc"
+  OMALLOC_G_LDADD="-lfindexec_g -lomalloc_g"
+  OMALLOC_R_LDADD="-lfindexec -lomalloc"
   
   AC_DEFINE(HAVE_OMALLOC, 1, [omalloc support])
  

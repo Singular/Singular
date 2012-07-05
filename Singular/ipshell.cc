@@ -114,6 +114,34 @@ const char * iiTwoOps(int t)
   }
 }
 
+int iiOpsTwoChar(const char *s)
+{
+/* not handling: &&, ||, ** */
+  if (s[1]=='\0') return s[0];
+  else if (s[2]!='\0') return 0;
+  switch(s[0])
+  {
+    case '.': if (s[1]=='.') return DOTDOT;
+              else           return 0;
+    case ':': if (s[1]==':') return COLONCOLON;
+              else           return 0;
+    case '-': if (s[1]=='-') return COLONCOLON;
+              else           return 0;
+    case '+': if (s[1]=='+') return PLUSPLUS;
+              else           return 0;
+    case '=': if (s[1]=='=') return EQUAL_EQUAL;
+              else           return 0;
+    case '<': if (s[1]=='=') return LE;
+              else if (s[1]=='>') return NOTEQUAL;
+              else           return 0;
+    case '>': if (s[1]=='=') return GE;
+              else           return 0;
+    case '!': if (s[1]=='=') return NOTEQUAL;
+              else           return 0;
+  }
+  return 0;
+}
+
 static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 {
   char buffer[22];
@@ -1653,13 +1681,14 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
   // 3: qideal
   L->m[3].rtyp=IDEAL_CMD;
-  if (rMinpolyIsNULL(R))
+  if (nCoeff_is_transExt(R->cf))
     L->m[3].data=(void *)idInit(1,1);
   else
   {
-    const ring RR = R->cf->extRing;
-
-    L->m[3].data=(void *) idCopy(RR->minideal, RR);
+    ideal q=idInit(IDELEMS(r->qideal));
+    q->m[0]=p_Init(R);
+    pSetCoeff0(q->m[0],(number)(r->qideal->m[0]));
+    L->m[3].data=(void *)q;
 //    I->m[0] = pNSet(R->minpoly);
   }
   // ----------------------------------------
@@ -1731,12 +1760,19 @@ void rDecomposeRing(leftv h,const ring R)
 
 lists rDecompose(const ring r)
 {
+  assume( r != NULL );
+  const coeffs C = r->cf;
+  assume( C != NULL );
+
   // sanity check: require currRing==r for rings with polynomial data
-  if ( (r!=currRing) && (!rMinpolyIsNULL(r)
+  if ( (r!=currRing) && (
+           (nCoeff_is_algExt(C) && (C != currRing->cf))
+        || (r->qideal != NULL)
 #ifdef HAVE_PLURAL
-  || (rIsPluralRing(r))
+        || (rIsPluralRing(r))
 #endif
-  ))
+                        )
+     )
   {
     WerrorS("ring with polynomial data must be the base ring or compatible");
     return NULL;
@@ -1862,15 +1898,23 @@ lists rDecompose(const ring r)
 
       iv=new intvec(1);
       (*iv)[0] = s;
-    } else
-    if (r->block1[i]-r->block0[i] >=0 )
+    }
+    else if (r->block1[i]-r->block0[i] >=0 )
     {
-      j=r->block1[i]-r->block0[i];
-      if (r->order[i]==ringorder_M)  j=(j+1)*(j+1)-1;
+      int bl=j=r->block1[i]-r->block0[i];
+      if (r->order[i]==ringorder_M)
+      {
+        j=(j+1)*(j+1)-1;
+        bl=j+1;
+      }
+      else if (r->order[i]==ringorder_am)
+      {
+        j+=r->wvhdl[i][bl+1];
+      }
       iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
       {
-        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j];
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j+(j>bl)];
       }
       else switch (r->order[i])
       {
@@ -1932,7 +1976,15 @@ void rComposeC(lists L, ring R)
   lists LL=(lists)L->m[1].data;
   int r1=(int)(long)LL->m[0].data;
   int r2=(int)(long)LL->m[1].data;
-  if ((r1<=SHORT_REAL_LENGTH)
+  if (L->nr==2) // complex
+    R->cf = nInitChar(n_long_C, NULL);
+  else if ((r1<=SHORT_REAL_LENGTH)
+  && (r2=SHORT_REAL_LENGTH))
+    R->cf = nInitChar(n_R, NULL);
+  else
+    R->cf = nInitChar(n_long_R, NULL);
+
+  if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
   && (r2=SHORT_REAL_LENGTH))
   {
     R->cf->float_len=SHORT_REAL_LENGTH/2;
@@ -2065,10 +2117,13 @@ static void rRenameVars(ring R)
     {
       if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
-        Warn("name conflict par(%d) and var(%d): `%s`, rename to `@@(%d)`",i+1,j+1,R->names[j],i+1);
-        omFree(rParameter(R)[i]);
-        rParameter(R)[i]=(char *)omAlloc(10);
-        sprintf(rParameter(R)[i],"@@(%d)",i+1);
+        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+//        omFree(rParameter(R)[i]);
+//        rParameter(R)[i]=(char *)omAlloc(10);
+//        sprintf(rParameter(R)[i],"@@(%d)",i+1);
+        omFree(R->names[j]);
+        R->names[j]=(char *)omAlloc(10);
+        sprintf(R->names[j],"@@(%d)",i+1);
       }
     }
   }
@@ -2164,10 +2219,7 @@ ring rCompose(const lists  L)
         {
           AlgExtInfo extParam;
 
-          extParam.i = extRing->qideal;
           extParam.r = extRing;
-
-          extRing->qideal = NULL; // ???
 
           R->cf = nInitChar(n_algExt, (void*)&extParam);
         }
@@ -2175,6 +2227,7 @@ ring rCompose(const lists  L)
         {
           TransExtInfo extParam;
           extParam.r = extRing;
+          assume( extRing->qideal == NULL );
 
           R->cf = nInitChar(n_transExt, &extParam);
         }
@@ -2269,6 +2322,7 @@ ring rCompose(const lists  L)
          while((jj>=0)
          && ((R->order[jj]== ringorder_a)
             || (R->order[jj]== ringorder_aa)
+            || (R->order[jj]== ringorder_am)
             || (R->order[jj]== ringorder_c)
             || (R->order[jj]== ringorder_C)
             || (R->order[jj]== ringorder_s)
@@ -2308,6 +2362,19 @@ ring rCompose(const lists  L)
            for (i=0; i<iv_len;i++)
            {
              R->wvhdl[j][i]=(*iv)[i];
+           }
+           break;
+         case ringorder_am:
+           R->wvhdl[j] =( int *)omAlloc((iv->length()+1)*sizeof(int));
+           for (i=0; i<iv_len;i++)
+           {
+             R->wvhdl[j][i]=(*iv)[i];
+           }
+           R->wvhdl[j][i]=iv->length() - iv_len;
+           //printf("ivlen:%d,iv->len:%d,mod:%d\n",iv_len,iv->length(),R->wvhdl[j][i]);
+           for (; i<iv->length(); i++)
+           {
+              R->wvhdl[j][i+1]=(*iv)[i];
            }
            break;
          case ringorder_M:
@@ -2414,7 +2481,7 @@ ring rCompose(const lists  L)
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
     {
-      if (R->cf->ch!=currRing->cf->ch)
+      if (R->cf != currRing->cf) //->cf->ch!=currRing->cf->ch)
       {
       #if 0
             WerrorS("coefficient fields must be equal if q-ideal !=0");
@@ -2446,7 +2513,7 @@ ring rCompose(const lists  L)
             par_perm_size=rPar(orig_ring);
             BITSET save_test=test;
 
-//            if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
+//            if ((orig_ring->minpoly != NULL) || (orig_ring->qideal != NULL))
 //              naSetChar(rInternalChar(orig_ring),orig_ring);
 //            else ntSetChar(rInternalChar(orig_ring),orig_ring);
 
@@ -4459,7 +4526,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   else howclean= (int)(long)v->Data();
 
   uResultant::resMatType mtype= determineMType( imtype );
-  int i,c,count;
+  int i,count;
   lists listofroots= NULL;
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
@@ -4516,7 +4583,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
     muiproots= ures->specializeInU( true, smv );
 
 #ifdef mprDEBUG_PROT
-  c= iproots[0]->getAnzElems();
+  int c= iproots[0]->getAnzElems();
   for (i=0; i < c; i++) pWrite(iproots[i]->getPoly());
   c= muiproots[0]->getAnzElems();
   for (i=0; i < c; i++) pWrite(muiproots[i]->getPoly());
@@ -4660,7 +4727,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       n--;
     }
     else if (((*iv)[1]!=ringorder_a)
-    && ((*iv)[1]!=ringorder_a64))
+    && ((*iv)[1]!=ringorder_a64)
+    && ((*iv)[1]!=ringorder_am))
       o++;
     n++;
     sl=sl->next;
@@ -4800,6 +4868,27 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
               R->wvhdl[n][i-2]=(*iv)[i];
               last++;
               if (weights[last]==0) weights[last]=(*iv)[i]*typ;
+            }
+            last=R->block0[n]-1;
+            break;
+          }
+          case ringorder_am:
+          {
+            R->block0[n] = last+1;
+            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->wvhdl[n] = (int*)omAlloc(iv->length()*sizeof(int));
+            if (R->block1[n]- R->block0[n]+2>=iv->length())
+               WarnS("missing module weights");
+            for (i=2; i<=(R->block1[n]-R->block0[n]+2); i++)
+            {
+              R->wvhdl[n][i-2]=(*iv)[i];
+              last++;
+              if (weights[last]==0) weights[last]=(*iv)[i]*typ;
+            }
+            R->wvhdl[n][i-2]=iv->length() -3 -(R->block1[n]- R->block0[n]);
+            for (; i<iv->length(); i++)
+            {
+              R->wvhdl[n][i-1]=(*iv)[i];
             }
             last=R->block0[n]-1;
             break;
@@ -5046,12 +5135,17 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
        LongComplexInfo param;
 
-       param.float_len = float_len;
-       param.float_len2 = float_len2;
+       param.float_len = si_min (float_len, 32767);
+       param.float_len2 = si_min (float_len2, 32767);
 
        // set the parameter name
        if (complex_flag)
        {
+         if (param.float_len < SHORT_REAL_LENGTH)
+         {
+           param.float_len= SHORT_REAL_LENGTH;
+           param.float_len2= SHORT_REAL_LENGTH;
+         }
          if (pn->next == NULL)
            param.par_name=(const char*)"i"; //default to i
          else
@@ -5097,7 +5191,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     // module is 0 ---> integers ringtype = 4;
     // we have an exponent
-    if (modExponent > 1)
+    if (modExponent > 1 && cf == NULL)
     {
       if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
       {
@@ -5113,7 +5207,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
     }
     // just a module m > 1
-    else
+    else if (cf == NULL)
     {
       ringtype = 2;
       const int ch = mpz_get_ui(modBase);
@@ -5133,7 +5227,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     AlgExtInfo extParam;
     extParam.r = (ring)pn->Data();
-    extParam.i = (extParam.r->qideal);
 
     cf = nInitChar(n_algExt, &extParam);   // Q[a]/<minideal>
   }
@@ -5612,7 +5705,8 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
   int n=0;
   for(i=I->nrows*I->ncols-1;i>=0;i--)
   {
-    n=pGetVariables(I->m[i],e);
+    int n0=pGetVariables(I->m[i],e);
+    if (n0>n) n=n0;
   }
   jjINT_S_TO_ID(n,e,res);
   return FALSE;

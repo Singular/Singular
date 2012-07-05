@@ -8,7 +8,7 @@
 #include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
-#include <resources/feResource.h>
+#include <findexec/feResource.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
@@ -76,11 +76,11 @@ bool TestArith(const coeffs r)
   
   PrintS("two: "); PrintSized(two, r);
 
-  if (getCoeffType(r) == n_GF) //some special test for GF
+  if (n_NumberOfParameters(r) > 0) 
   {
-    number z = nfPar (0, r); // also any integer instead of 0//?
+    number z = n_Param(1, r); // also any integer instead of 0//?
 
-    PrintS("Generator: "); PrintSized(z, r);
+    PrintS("Parameter: "); PrintSized(z, r);
     
     n_Delete(&z, r);    
   }
@@ -195,35 +195,31 @@ bool Test(const n_coeffType type, void* p = NULL)
   assume( getCoeffType(r) == type );
 
   assume( r->cfInit != NULL );
-  assume( r->cfWrite != NULL );
+  assume( r->cfWriteLong != NULL );
   assume( r->cfAdd != NULL );
   assume( r->cfDelete != NULL );
 
   if( type == n_Q )
   {
     assume( r->cfInit == nlInit );
-    assume( r->cfWrite == nlWrite );
     assume( r->cfAdd == nlAdd );
     assume( r->cfDelete == nlDelete );    
   }
   else if( type == n_long_R )
   {
     assume( r->cfInit == ngfInit );
-    assume( r->cfWrite == ngfWrite );
     assume( r->cfAdd == ngfAdd );
     assume( r->cfDelete == ngfDelete );
   }
   else if( type == n_long_C )
   {
-    assume( r->cfInit == ngcInit );
-    assume( r->cfWrite == ngcWrite );
-    assume( r->cfAdd == ngcAdd );
-    assume( r->cfDelete == ngcDelete );    
+//     assume( r->cfInit == ngcInit );
+//     assume( r->cfAdd == ngcAdd );
+//     assume( r->cfDelete == ngcDelete );    
   }
   else if( type == n_R )
   {
     assume( r->cfInit == nrInit );
-    assume( r->cfWrite == nrWrite );
     assume( r->cfAdd == nrAdd );
 //    assume( r->cfDelete == nrDelete ); // No?
   }
@@ -231,23 +227,20 @@ bool Test(const n_coeffType type, void* p = NULL)
   else if( type == n_Z2m )
   {
     assume( r->cfInit == nr2mInit );
-    assume( r->cfWrite == nr2mWrite );
     assume( r->cfAdd == nr2mAdd );
     assume( r->cfDelete == ndDelete );
   }
   else if( type == n_Zn )
   {
     assume( r->cfInit == nrnInit );
-    assume( r->cfWrite == nrnWrite );
     assume( r->cfAdd == nrnAdd );
     assume( r->cfDelete == nrnDelete );
   }
 #endif
   else if( type == n_GF )
   {
-    assume( r->cfInit == nfInit );
-    assume( r->cfWrite == nfWrite );
-    assume( r->cfAdd == nfAdd );
+//     assume( r->cfInit == nfInit );
+//     assume( r->cfAdd == nfAdd );
     //assume( r->cfDelete == nfDelete );
   }
   else

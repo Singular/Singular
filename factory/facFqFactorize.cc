@@ -31,14 +31,14 @@
 #include "cf_map_ext.h"
 #include "algext.h"
 #include "facSparseHensel.h"
+#include "facMul.h"
 
 #ifdef HAVE_NTL
-#include <NTL/ZZ_pEX.h>
 #include "NTLconvert.h"
 
-TIMING_DEFINE_PRINT(fac_bi_factorizer)
-TIMING_DEFINE_PRINT(fac_hensel_lift)
-TIMING_DEFINE_PRINT(fac_factor_recombination)
+TIMING_DEFINE_PRINT(fac_fq_bi_factorizer)
+TIMING_DEFINE_PRINT(fac_fq_hensel_lift)
+TIMING_DEFINE_PRINT(fac_fq_factor_recombination)
 
 static inline
 CanonicalForm
@@ -1259,7 +1259,8 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
       g= gcd (iter2.getItem(), content);
       if (degree (g) > 0)
       {
-        iter2.getItem() /= tmp;
+        if (!tmp.isZero())
+          iter2.getItem() /= tmp;
         content /= g;
         iter1.getItem() *= g;
       }
@@ -1496,7 +1497,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   int j= 0;
   if (!pass)
   {
-    int lev;
+    int lev= 0;
     // LCF is non-constant here
     for (int i= 1; i <= LCF.level(); i++)
     {
@@ -1626,7 +1627,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
 
     bool success= false;
-    if (LucksWangSparseHeuristic (oldSqrfPartF*power (LC1, factors.length()-1),
+    CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
+    if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
+        LucksWangSparseHeuristic (oldSqrfPartFPowLC,
                                   oldFactors, 1, leadingCoeffs, factors))
     {
       interMedResult= recoverFactors (oldSqrfPartF, factors);
@@ -1656,8 +1659,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
       CFArray Pi;
       CFList diophant;
-      henselLift122 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
-                     leadingCoeffs, false);
+      nonMonicHenselLift12 (newSqrfPartF, factors, liftBound, Pi, diophant, M,
+                            leadingCoeffs, false);
 
       if (sqrfPartF.level() > 2)
       {
@@ -2130,7 +2133,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           return result;
         }
         else
-          return CFList (buf);
+          return CFList (buf/myContent(buf));
       }
 
       S= subset (v, s, TT, noSubset);
@@ -2169,6 +2172,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
           if (T.length() < 2*s || T.length() == s)
           {
             delete [] v;
+            buf /= myContent (buf);
             buf /= Lc (buf);
             appendTestMapDown (result, buf, info, source, dest);
             return result;
@@ -2184,7 +2188,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     if (T.length() < 2*s || T.length() == s)
     {
       delete [] v;
-      appendTestMapDown (result, buf, info, source, dest);
+      appendTestMapDown (result, buf/myContent(buf), info, source, dest);
       return result;
     }
     for (int i= 0; i < T.length(); i++)
@@ -2192,7 +2196,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     noSubset= false;
   }
   if (T.length() < 2*s)
-    appendMapDown (result, F, info, source, dest);
+    appendMapDown (result, F/myContent(F), info, source, dest);
 
   delete [] v;
   return result;
@@ -2407,14 +2411,14 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     bufLift= degree (A, y) + 1 + degree (LC(A, x), y);
 
-    TIMING_START (fac_bi_factorizer);
+    TIMING_START (fac_fq_bi_factorizer);
     if (!GF && alpha.level() == 1)
       bufBiFactors= FpBiSqrfFactorize (bufAeval.getFirst());
     else if (GF)
       bufBiFactors= GFBiSqrfFactorize (bufAeval.getFirst());
     else
       bufBiFactors= FqBiSqrfFactorize (bufAeval.getFirst(), alpha);
-    TIMING_END_AND_PRINT (fac_bi_factorizer,
+    TIMING_END_AND_PRINT (fac_fq_bi_factorizer,
                           "time for bivariate factorization: ");
     bufBiFactors.removeFirst();
 
@@ -2605,8 +2609,9 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   A /= hh;
 
-  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
-      factors))
+  if (size (A)/getNumVars (A) < 500 && 
+      LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+                                factors))
   {
     int check= factors.length();
     factors= recoverFactors (A, factors);
@@ -2616,6 +2621,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (extension)
         factors= extNonMonicFactorRecombination (factors, A, info);
 
+      if (v.level() != 1)
+      {
+        for (CFListIterator iter= factors; iter.hasItem(); iter++)
+          iter.getItem()= swapvar (iter.getItem(), v, y);
+      }
       appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                             swapLevel2, x);
       normalize (factors);
@@ -2705,24 +2715,24 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     CFList MOD;
     bool earlySuccess;
     CFList earlyFactors, liftedFactors;
-    TIMING_START (fac_hensel_lift);
+    TIMING_START (fac_fq_hensel_lift);
     liftedFactors= henselLiftAndEarly
                    (A, MOD, liftBounds, earlySuccess, earlyFactors,
                     Aeval, biFactors, evaluation, info);
-    TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_hensel_lift, "time for hensel lifting: ");
 
     if (!extension)
     {
-      TIMING_START (fac_factor_recombination);
+      TIMING_START (fac_fq_factor_recombination);
       factors= factorRecombination (A, liftedFactors, MOD);
-      TIMING_END_AND_PRINT (fac_factor_recombination,
+      TIMING_END_AND_PRINT (fac_fq_factor_recombination,
                             "time for factor recombination: ");
     }
     else
     {
-      TIMING_START (fac_factor_recombination);
+      TIMING_START (fac_fq_factor_recombination);
       factors= extFactorRecombination (liftedFactors, A, MOD, info, evaluation);
-      TIMING_END_AND_PRINT (fac_factor_recombination,
+      TIMING_END_AND_PRINT (fac_fq_factor_recombination,
                             "time for factor recombination: ");
     }
 
@@ -2786,8 +2796,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       A= A.mapinto();
       factors= multiFactorize (A, info);
 
-      Variable vBuf= rootOf (gf_mipo);
+      CanonicalForm mipo= gf_mipo;
       setCharacteristic (getCharacteristic());
+      Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
     }
@@ -2809,7 +2820,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CanonicalForm mipo= randomIrredpoly (extDeg + 1, w);
       Variable v= rootOf (mipo);
       ExtensionInfo info= ExtensionInfo (v);
-      factors= biFactorize (A, info);
+      factors= multiFactorize (A, info);
     }
     else
     {
@@ -2830,7 +2841,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         CanonicalForm bufA= mapUp (A, alpha, v, primElem, imPrimElem,
                                    source, dest);
         ExtensionInfo info= ExtensionInfo (v, alpha, imPrimElem, primElem);
-        factors= biFactorize (bufA, info);
+        factors= multiFactorize (bufA, info);
       }
       else
       {
@@ -2850,7 +2861,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         dest= CFList();
         bufA= mapUp (bufA, beta, v, delta, imPrimElem, source, dest);
         ExtensionInfo info= ExtensionInfo (v, beta, imPrimElem, delta);
-        factors= biFactorize (bufA, info);
+        factors= multiFactorize (bufA, info);
       }
     }
     return factors;
@@ -2866,8 +2877,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (pow ((double) p, (double) extensionDeg) < (1<<16))
       // pass to GF(p^k+1)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         setCharacteristic (p, extensionDeg, 'Z');
         ExtensionInfo info= ExtensionInfo (extension);
@@ -2875,8 +2887,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to another GF, pass to F_p(\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info= ExtensionInfo (v, extension);
@@ -2895,8 +2908,9 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to GF (p^2k), pass to F_p (\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable v1= rootOf (gf_mipo);
+        Variable v1= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, v1);
         Variable v2= chooseExtension (v1, v1, k);
         CanonicalForm primElem, imPrimElem;

@@ -1,4 +1,4 @@
-#include <factory/factoryconf.h>
+#include "config.h"
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
@@ -13,6 +13,8 @@
 #endif
 #endif
 
+#include "cf_assert.h"
+
 #include "templates/ftmpl_functions.h"
 #include "cf_defs.h"
 #include "canonicalform.h"
@@ -20,9 +22,12 @@
 #include "cf_primes.h"
 #include "cf_algorithm.h"
 #include "algext.h"
-#include "fieldGCD.h"
 #include "cf_map.h"
 #include "cf_generator.h"
+
+#ifdef HAVE_NTL
+#include "NTLconvert.h"
+#endif
 
 /// compressing two polynomials F and G, M is used for compressing,
 /// N to reverse the compression
@@ -584,6 +589,52 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   fail = true;
 }
 
+static CanonicalForm
+myicontent ( const CanonicalForm & f, const CanonicalForm & c )
+{
+#ifdef HAVE_NTL
+    if (f.isOne() || c.isOne())
+      return 1;
+    if ( f.inBaseDomain() && c.inBaseDomain())
+    {
+      if (c.isZero()) return abs(f);
+      return bgcd( f, c );
+    }
+    else if ( (f.inCoeffDomain() && c.inCoeffDomain()) ||
+              (f.inCoeffDomain() && c.inBaseDomain()) ||
+              (f.inBaseDomain() && c.inCoeffDomain()))
+    {
+      if (c.isZero()) return abs (f);
+      ZZX NTLf= convertFacCF2NTLZZX (f);
+      ZZX NTLc= convertFacCF2NTLZZX (c);
+      NTLc= GCD (NTLc, NTLf);
+      if (f.inCoeffDomain())
+        return convertNTLZZX2CF(NTLc,f.mvar());
+      else
+        return convertNTLZZX2CF(NTLc,c.mvar());
+    }
+    else
+    {
+        CanonicalForm g = c;
+        for ( CFIterator i = f; i.hasTerms() && ! g.isOne(); i++ )
+            g = myicontent( i.coeff(), g );
+        return g;
+    }
+#else
+    return 1;
+#endif
+}
+
+CanonicalForm
+myicontent ( const CanonicalForm & f )
+{
+#ifdef HAVE_NTL
+    return myicontent( f, 0 );
+#else
+    return 1;
+#endif
+}
+
 CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
 { // f,g in Q(a)[x1,...,xn]
   if(F.isZero())
@@ -611,6 +662,11 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   On( SW_RATIONAL ); // needed by bCommonDen
   f = F * bCommonDen(F);
   g = G * bCommonDen(G);
+  CanonicalForm contf= myicontent (f);
+  CanonicalForm contg= myicontent (g);
+  f /= contf;
+  g /= contg;
+  CanonicalForm gcdcfcg= myicontent (contf, contg);
   Variable a, b;
   if(hasFirstAlgVar(f,a))
   {
@@ -626,7 +682,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     {
       Off( SW_RATIONAL );
       Off( SW_USE_QGCD );
-      tmp = gcd( F, G );
+      tmp = gcdcfcg*gcd( f, g );
       On( SW_USE_QGCD );
       if (off_rational) Off(SW_RATIONAL);
       return tmp;
@@ -671,7 +727,6 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     mipo /= mipo.lc();
     // here: mipo is monic
     tryBrownGCD( mapinto(f), mapinto(g), mipo, Dp, fail );
-    setCharacteristic(0);
     if( fail ) // mipo splits in char p
       continue;
     if( Dp.inCoeffDomain() ) // early termination
@@ -681,8 +736,10 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
         continue;
       setReduce(a,true);
       if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
-      return CanonicalForm(1);
+      setCharacteristic(0);
+      return gcdcfcg;
     }
+    setCharacteristic(0);
     // here: Dp NOT inCoeffDomain
     for(int i=1; i<=mv; i++)
       other[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)
@@ -710,7 +767,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
         Off( SW_RATIONAL );
         setReduce(a,true);
         if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
-        return tmp;
+        return tmp*gcdcfcg;
       }
       Off( SW_RATIONAL );
       setReduce(a,false); // do not reduce expressions modulo mipo
@@ -727,7 +784,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   // hopefully, we never reach this point
   setReduce(a,true);
   Off( SW_USE_QGCD );
-  D = gcd( f, g );
+  D = gcdcfcg*gcd( f, g );
   On( SW_USE_QGCD );
   if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
   return D;

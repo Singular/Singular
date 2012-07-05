@@ -300,7 +300,7 @@ cantormult.tst
 cantorred.tst
 cantreetoMaple.tst
 cardGroup.tst
-center.tst
+_center.tst
 centerRed.tst
 centerVS.tst
 central1st.tst
@@ -402,10 +402,10 @@ degreepart.tst
 delete.tst
 deleteGenerator.tst
 deleteSublist.tst
-delta.tst
+_delta.tst
 deltaLoc.tst
 denominator.tst
-depth.tst
+_depth.tst
 depthIdeal.tst
 derivate.tst
 det.tst
@@ -660,7 +660,7 @@ intmat_type_cast.tst
 intvec_declarations.tst
 intvec_expressions.tst
 intvec_operations.tst
-invariantRing.tst
+_invariantRing.tst
 invariant_algebra_perm.tst
 invariant_algebra_reynolds.tst
 invariant_basis.tst
@@ -729,7 +729,7 @@ isartinianMon.tst
 isgenericMon.tst
 ishyper.tst
 isirreducibleMon.tst
-isoncurve.tst
+_isoncurve.tst
 isparam.tst
 isprimaryMon.tst
 isprimeMon.tst
@@ -812,7 +812,7 @@ list_declarations.tst
 list_expressions.tst
 list_operations.tst
 listvar.tst
-lll.tst
+_lll.tst
 load.tst
 load_1.tst
 locAtZero.tst
@@ -967,7 +967,7 @@ multrow.tst
 multseq2charexp.tst
 multsequence.tst
 nameof.tst
-names.tst
+_names.tst
 nashmult.tst
 ncRelations.tst
 nc_algebra.tst
@@ -1135,7 +1135,7 @@ quadraticSieve.tst
 quantMat.tst
 quickclass.tst
 quote.tst
-quotient.tst
+_quotient.tst
 quotientMon.tst
 quotient_BR_PLURAL_BR.tst
 rMacaulay.tst
@@ -1384,14 +1384,14 @@ timeFactorize.tst
 timeStd.tst
 timer.tst
 timestep.tst
-tjurina.tst
+_tjurina.tst
 tmatrix.tst
 tolessvars.tst
 toric_ideal.tst
 toric_std.tst
 torusInvariants.tst
 totalmultiplicities.tst
-trace.tst
+_trace.tst
 tracemult.tst
 transpose.tst
 trapezoid.tst

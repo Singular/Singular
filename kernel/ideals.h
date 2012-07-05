@@ -178,7 +178,7 @@ ideal   idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL);
 
 inline BOOLEAN idIsZeroDim(ideal i, const ring R = currRing)
 {
-  return idIsZeroDim(i, R);
+  return id_IsZeroDim(i, R);
 }
 
 matrix  idDiff(matrix i, int k);

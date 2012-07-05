@@ -778,7 +778,7 @@ static int DumpRhs(FILE *fd, idhdl h)
         IDRING(h)->cf->type==n_algExt)
     {
       StringSetS("");
-      p_Write(IDRING(h)->cf->extRing->minideal->m[0],IDRING(h)->cf->extRing);
+      p_Write(IDRING(h)->cf->extRing->qideal->m[0],IDRING(h)->cf->extRing);
       rhs = StringAppendS("");
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
     }

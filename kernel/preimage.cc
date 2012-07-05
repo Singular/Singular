@@ -91,12 +91,17 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
      return NULL;
   }
 
-  if (n_SetMap(theImageRing->cf,dst_r->cf) != ndCopyMap)
+  assume(n_SetMap(theImageRing->cf, dst_r->cf) == ndCopyMap);
+
+  if (theImageRing->cf != dst_r->cf)
   {
+    /// TODO: there might be extreme cases where this doesn't hold...
     Werror("Coefficient fields/rings must be equal");
     return NULL;
   }
 
+  const ring save_ring = currRing; if (currRing!=tmpR) rChangeCurrRing(tmpR); // due to kStd
+  
   if (id==NULL)
     j = 0;
   else
@@ -122,7 +127,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
     }
     temp1->m[i] = p;
   }
-  idTest(temp1);
+  id_Test(temp1, tmpR);
   for (i=sourcering->N;i<sourcering->N+j0;i++)
   {
     temp1->m[i] = p_SortMerge(
@@ -136,7 +141,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
 			      tmpR);
   }
   // we ignore here homogenity - may be changed later:
+
   temp2 = kStd(temp1,NULL,isNotHomog,NULL);
+
   id_Delete(&temp1,tmpR);
   for (i=0;i<IDELEMS(temp2);i++)
   {
@@ -166,6 +173,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   }
   id_Delete(&temp2, tmpR);
   idSkipZeroes(temp1);
+
+  if (currRing!=save_ring) rChangeCurrRing(save_ring);
+  
   rDelete(tmpR);
   return temp1;
 }

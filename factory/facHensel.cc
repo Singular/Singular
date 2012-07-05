@@ -3,8 +3,7 @@
 \*****************************************************************************/
 /** @file facHensel.cc
  *
- * This file implements functions to lift factors via Hensel lifting and
- * functions for modular multiplication and division with remainder.
+ * This file implements functions to lift factors via Hensel lifting.
  *
  * ABSTRACT: Hensel lifting is described in "Efficient Multivariate
  * Factorization over Finite Fields" by L. Bernardin & M. Monagon. Division with
@@ -25,11 +24,13 @@
 #include "debug.h"
 #include "timing.h"
 
+#include "algext.h"
 #include "facHensel.h"
-#include "cf_util.h"
+#include "facMul.h"
 #include "fac_util.h"
 #include "cf_algorithm.h"
 #include "cf_primes.h"
+#include "facBivar.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
@@ -124,7 +125,7 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
   }
 }
 
-static inline
+static
 CFList mapinto (const CFList& L)
 {
   CFList result;
@@ -133,7 +134,7 @@ CFList mapinto (const CFList& L)
   return result;
 }
 
-static inline
+static
 int mod (const CFList& L, const CanonicalForm& p)
 {
   for (CFListIterator i= L; i.hasItem(); i++)
@@ -145,7 +146,7 @@ int mod (const CFList& L, const CanonicalForm& p)
 }
 
 
-static inline void
+static void
 chineseRemainder (const CFList & x1, const CanonicalForm & q1,
                   const CFList & x2, const CanonicalForm & q2,
                   CFList & xnew, CanonicalForm & qnew)
@@ -161,7 +162,7 @@ chineseRemainder (const CFList & x1, const CanonicalForm & q1,
   qnew= tmp2;
 }
 
-static inline
+static
 CFList Farey (const CFList& L, const CanonicalForm& q)
 {
   CFList result;
@@ -170,7 +171,7 @@ CFList Farey (const CFList& L, const CanonicalForm& q)
   return result;
 }
 
-static inline
+static
 CFList replacevar (const CFList& L, const Variable& a, const Variable& b)
 {
   CFList result;
@@ -331,1440 +332,6 @@ modularDiophant (const CanonicalForm& f, const CFList& factors,
   return result;
 }
 
-CanonicalForm
-mulNTL (const CanonicalForm& F, const CanonicalForm& G)
-{
-  if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
-    return F*G;
-  ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
-  ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-    return F*G;
-  zz_p::init (getCharacteristic());
-  Variable alpha;
-  CanonicalForm result;
-  if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
-  {
-    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-    zz_pE::init (NTLMipo);
-    zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
-    zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
-    mul (NTLF, NTLF, NTLG);
-    result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
-  }
-  else
-  {
-    zz_pX NTLF= convertFacCF2NTLzzpX (F);
-    zz_pX NTLG= convertFacCF2NTLzzpX (G);
-    mul (NTLF, NTLF, NTLG);
-    result= convertNTLzzpX2CF(NTLF, F.mvar());
-  }
-  return result;
-}
-
-CanonicalForm
-modNTL (const CanonicalForm& F, const CanonicalForm& G)
-{
-  if (F.inCoeffDomain() && G.isUnivariate())
-    return F;
-  else if (F.inCoeffDomain() && G.inCoeffDomain())
-    return mod (F, G);
-  else if (F.isUnivariate() && G.inCoeffDomain())
-    return mod (F,G);
-
-  if (getCharacteristic() == 0)
-    return mod (F, G);
-
-  ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
-  ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-    return mod (F, G);
-  zz_p::init (getCharacteristic());
-  Variable alpha;
-  CanonicalForm result;
-  if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
-  {
-    zz_pX NTLMipo= convertFacCF2NTLzzpX(getMipo (alpha));
-    zz_pE::init (NTLMipo);
-    zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
-    zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
-    rem (NTLF, NTLF, NTLG);
-    result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
-  }
-  else
-  {
-    zz_pX NTLF= convertFacCF2NTLzzpX (F);
-    zz_pX NTLG= convertFacCF2NTLzzpX (G);
-    rem (NTLF, NTLF, NTLG);
-    result= convertNTLzzpX2CF(NTLF, F.mvar());
-  }
-  return result;
-}
-
-CanonicalForm
-divNTL (const CanonicalForm& F, const CanonicalForm& G)
-{
-  if (F.inCoeffDomain() && G.isUnivariate())
-    return F;
-  else if (F.inCoeffDomain() && G.inCoeffDomain())
-    return div (F, G);
-  else if (F.isUnivariate() && G.inCoeffDomain())
-    return div (F,G);
-
-  if (getCharacteristic() == 0)
-    return div (F, G);
-
-  ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
-  ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-    return div (F, G);
-  zz_p::init (getCharacteristic());
-  Variable alpha;
-  CanonicalForm result;
-  if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
-  {
-    zz_pX NTLMipo= convertFacCF2NTLzzpX(getMipo (alpha));
-    zz_pE::init (NTLMipo);
-    zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
-    zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
-    div (NTLF, NTLF, NTLG);
-    result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
-  }
-  else
-  {
-    zz_pX NTLF= convertFacCF2NTLzzpX (F);
-    zz_pX NTLG= convertFacCF2NTLzzpX (G);
-    div (NTLF, NTLF, NTLG);
-    result= convertNTLzzpX2CF(NTLF, F.mvar());
-  }
-  return result;
-}
-
-/*
-void
-divremNTL (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-           CanonicalForm& R)
-{
-  if (F.inCoeffDomain() && G.isUnivariate())
-  {
-    R= F;
-    Q= 0;
-  }
-  else if (F.inCoeffDomain() && G.inCoeffDomain())
-  {
-    divrem (F, G, Q, R);
-    return;
-  }
-  else if (F.isUnivariate() && G.inCoeffDomain())
-  {
-    divrem (F, G, Q, R);
-    return;
-  }
-
-  ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
-  ASSERT (F.level() == G.level(), "expected polys of same level");
-  if (CFFactory::gettype() == GaloisFieldDomain)
-  {
-    divrem (F, G, Q, R);
-    return;
-  }
-  zz_p::init (getCharacteristic());
-  Variable alpha;
-  CanonicalForm result;
-  if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
-  {
-    zz_pX NTLMipo= convertFacCF2NTLzzpX(getMipo (alpha));
-    zz_pE::init (NTLMipo);
-    zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
-    zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
-    zz_pEX NTLQ;
-    zz_pEX NTLR;
-    DivRem (NTLQ, NTLR, NTLF, NTLG);
-    Q= convertNTLzz_pEX2CF(NTLQ, F.mvar(), alpha);
-    R= convertNTLzz_pEX2CF(NTLR, F.mvar(), alpha);
-    return;
-  }
-  else
-  {
-    zz_pX NTLF= convertFacCF2NTLzzpX (F);
-    zz_pX NTLG= convertFacCF2NTLzzpX (G);
-    zz_pX NTLQ;
-    zz_pX NTLR;
-    DivRem (NTLQ, NTLR, NTLF, NTLG);
-    Q= convertNTLzzpX2CF(NTLQ, F.mvar());
-    R= convertNTLzzpX2CF(NTLR, F.mvar());
-    return;
-  }
-}*/
-
-CanonicalForm mod (const CanonicalForm& F, const CFList& M)
-{
-  CanonicalForm A= F;
-  for (CFListIterator i= M; i.hasItem(); i++)
-    A= mod (A, i.getItem());
-  return A;
-}
-
-zz_pX kronSubFp (const CanonicalForm& A, int d)
-{
-  int degAy= degree (A);
-  zz_pX result;
-  result.rep.SetLength (d*(degAy + 1));
-
-  zz_p *resultp;
-  resultp= result.rep.elts();
-  zz_pX buf;
-  zz_p *bufp;
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inCoeffDomain())
-      buf= convertFacCF2NTLzzpX (i.coeff());
-    else
-      buf= convertFacCF2NTLzzpX (i.coeff());
-
-    int k= i.exp()*d;
-    bufp= buf.rep.elts();
-    int bufRepLength= (int) buf.rep.length();
-    for (int j= 0; j < bufRepLength; j++)
-      resultp [j + k]= bufp [j];
-  }
-  result.normalize();
-
-  return result;
-}
-
-zz_pEX kronSub (const CanonicalForm& A, int d, const Variable& alpha)
-{
-  int degAy= degree (A);
-  zz_pEX result;
-  result.rep.SetLength (d*(degAy + 1));
-
-  Variable v;
-  zz_pE *resultp;
-  resultp= result.rep.elts();
-  zz_pEX buf1;
-  zz_pE *buf1p;
-  zz_pX buf2;
-  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inCoeffDomain())
-    {
-      buf2= convertFacCF2NTLzzpX (i.coeff());
-      buf1= to_zz_pEX (to_zz_pE (buf2));
-    }
-    else
-      buf1= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
-
-    int k= i.exp()*d;
-    buf1p= buf1.rep.elts();
-    int buf1RepLength= (int) buf1.rep.length();
-    for (int j= 0; j < buf1RepLength; j++)
-      resultp [j + k]= buf1p [j];
-  }
-  result.normalize();
-
-  return result;
-}
-
-void
-kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
-                const Variable& alpha)
-{
-  int degAy= degree (A);
-  subA1.rep.SetLength ((long) d*(degAy + 2));
-  subA2.rep.SetLength ((long) d*(degAy + 2));
-
-  Variable v;
-  zz_pE *subA1p;
-  zz_pE *subA2p;
-  subA1p= subA1.rep.elts();
-  subA2p= subA2.rep.elts();
-  zz_pEX buf;
-  zz_pE *bufp;
-  zz_pX buf2;
-  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    if (i.coeff().inCoeffDomain())
-    {
-      buf2= convertFacCF2NTLzzpX (i.coeff());
-      buf= to_zz_pEX (to_zz_pE (buf2));
-    }
-    else
-      buf= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
-
-    int k= i.exp()*d;
-    int kk= (degAy - i.exp())*d;
-    bufp= buf.rep.elts();
-    int bufRepLength= (int) buf.rep.length();
-    for (int j= 0; j < bufRepLength; j++)
-    {
-      subA1p [j + k] += bufp [j];
-      subA2p [j + kk] += bufp [j];
-    }
-  }
-  subA1.normalize();
-  subA2.normalize();
-}
-
-void
-kronSubRecipro (zz_pX& subA1, zz_pX& subA2,const CanonicalForm& A, int d)
-{
-  int degAy= degree (A);
-  subA1.rep.SetLength ((long) d*(degAy + 2));
-  subA2.rep.SetLength ((long) d*(degAy + 2));
-
-  zz_p *subA1p;
-  zz_p *subA2p;
-  subA1p= subA1.rep.elts();
-  subA2p= subA2.rep.elts();
-  zz_pX buf;
-  zz_p *bufp;
-
-  for (CFIterator i= A; i.hasTerms(); i++)
-  {
-    buf= convertFacCF2NTLzzpX (i.coeff());
-
-    int k= i.exp()*d;
-    int kk= (degAy - i.exp())*d;
-    bufp= buf.rep.elts();
-    int bufRepLength= (int) buf.rep.length();
-    for (int j= 0; j < bufRepLength; j++)
-    {
-      subA1p [j + k] += bufp [j];
-      subA2p [j + kk] += bufp [j];
-    }
-  }
-  subA1.normalize();
-  subA2.normalize();
-}
-
-CanonicalForm
-reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
-              const Variable& alpha)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pEX f= F;
-  zz_pEX g= G;
-  int degf= deg(f);
-  int degg= deg(g);
-
-  zz_pEX buf1;
-  zz_pEX buf2;
-  zz_pEX buf3;
-
-  zz_pE *buf1p;
-  zz_pE *buf2p;
-  zz_pE *buf3p;
-  if (f.rep.length() < (long) d*(k+1)) //zero padding
-    f.rep.SetLength ((long)d*(k+1));
-
-  zz_pE *gp= g.rep.elts();
-  zz_pE *fp= f.rep.elts();
-  CanonicalForm result= 0;
-  int i= 0;
-  int lf= 0;
-  int lg= d*k;
-  int degfSubLf= degf;
-  int deggSubLg= degg-lg;
-  int repLengthBuf2;
-  int repLengthBuf1;
-  zz_pE zzpEZero= zz_pE();
-
-  while (degf >= lf || lg >= 0)
-  {
-    if (degfSubLf >= d)
-      repLengthBuf1= d;
-    else if (degfSubLf < 0)
-      repLengthBuf1= 0;
-    else
-      repLengthBuf1= degfSubLf + 1;
-    buf1.rep.SetLength((long) repLengthBuf1);
-
-    buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
-      buf1p [ind]= fp [ind + lf];
-    buf1.normalize();
-
-    repLengthBuf1= buf1.rep.length();
-
-    if (deggSubLg >= d - 1)
-      repLengthBuf2= d - 1;
-    else if (deggSubLg < 0)
-      repLengthBuf2= 0;
-    else
-      repLengthBuf2= deggSubLg + 1;
-
-    buf2.rep.SetLength ((long) repLengthBuf2);
-    buf2p= buf2.rep.elts();
-    for (int ind= 0; ind < repLengthBuf2; ind++)
-    {
-      buf2p [ind]= gp [ind + lg];
-    }
-    buf2.normalize();
-
-    repLengthBuf2= buf2.rep.length();
-
-    buf3.rep.SetLength((long) repLengthBuf2 + d);
-    buf3p= buf3.rep.elts();
-    buf2p= buf2.rep.elts();
-    buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
-      buf3p [ind]= buf1p [ind];
-    for (int ind= repLengthBuf1; ind < d; ind++)
-      buf3p [ind]= zzpEZero;
-    for (int ind= 0; ind < repLengthBuf2; ind++)
-      buf3p [ind + d]= buf2p [ind];
-    buf3.normalize();
-
-    result += convertNTLzz_pEX2CF (buf3, x, alpha)*power (y, i);
-    i++;
-
-
-    lf= i*d;
-    degfSubLf= degf - lf;
-
-    lg= d*(k-i);
-    deggSubLg= degg - lg;
-
-    buf1p= buf1.rep.elts();
-
-    if (lg >= 0 && deggSubLg > 0)
-    {
-      if (repLengthBuf2 > degfSubLf + 1)
-        degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (int ind= 0; ind < tmp; ind++)
-        gp [ind + lg] -= buf1p [ind];
-    }
-
-    if (lg < 0)
-      break;
-
-    buf2p= buf2.rep.elts();
-    if (degfSubLf >= 0)
-    {
-      for (int ind= 0; ind < repLengthBuf2; ind++)
-        fp [ind + lf] -= buf2p [ind];
-    }
-  }
-
-  return result;
-}
-
-CanonicalForm
-reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pX f= F;
-  zz_pX g= G;
-  int degf= deg(f);
-  int degg= deg(g);
-
-  zz_pX buf1;
-  zz_pX buf2;
-  zz_pX buf3;
-
-  zz_p *buf1p;
-  zz_p *buf2p;
-  zz_p *buf3p;
-
-  if (f.rep.length() < (long) d*(k+1)) //zero padding
-    f.rep.SetLength ((long)d*(k+1));
-
-  zz_p *gp= g.rep.elts();
-  zz_p *fp= f.rep.elts();
-  CanonicalForm result= 0;
-  int i= 0;
-  int lf= 0;
-  int lg= d*k;
-  int degfSubLf= degf;
-  int deggSubLg= degg-lg;
-  int repLengthBuf2;
-  int repLengthBuf1;
-  zz_p zzpZero= zz_p();
-  while (degf >= lf || lg >= 0)
-  {
-    if (degfSubLf >= d)
-      repLengthBuf1= d;
-    else if (degfSubLf < 0)
-      repLengthBuf1= 0;
-    else
-      repLengthBuf1= degfSubLf + 1;
-    buf1.rep.SetLength((long) repLengthBuf1);
-
-    buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
-      buf1p [ind]= fp [ind + lf];
-    buf1.normalize();
-
-    repLengthBuf1= buf1.rep.length();
-
-    if (deggSubLg >= d - 1)
-      repLengthBuf2= d - 1;
-    else if (deggSubLg < 0)
-      repLengthBuf2= 0;
-    else
-      repLengthBuf2= deggSubLg + 1;
-
-    buf2.rep.SetLength ((long) repLengthBuf2);
-    buf2p= buf2.rep.elts();
-    for (int ind= 0; ind < repLengthBuf2; ind++)
-      buf2p [ind]= gp [ind + lg];
-
-    buf2.normalize();
-
-    repLengthBuf2= buf2.rep.length();
-
-
-    buf3.rep.SetLength((long) repLengthBuf2 + d);
-    buf3p= buf3.rep.elts();
-    buf2p= buf2.rep.elts();
-    buf1p= buf1.rep.elts();
-    for (int ind= 0; ind < repLengthBuf1; ind++)
-      buf3p [ind]= buf1p [ind];
-    for (int ind= repLengthBuf1; ind < d; ind++)
-      buf3p [ind]= zzpZero;
-    for (int ind= 0; ind < repLengthBuf2; ind++)
-      buf3p [ind + d]= buf2p [ind];
-    buf3.normalize();
-
-    result += convertNTLzzpX2CF (buf3, x)*power (y, i);
-    i++;
-
-
-    lf= i*d;
-    degfSubLf= degf - lf;
-
-    lg= d*(k-i);
-    deggSubLg= degg - lg;
-
-    buf1p= buf1.rep.elts();
-
-    if (lg >= 0 && deggSubLg > 0)
-    {
-      if (repLengthBuf2 > degfSubLf + 1)
-        degfSubLf= repLengthBuf2 - 1;
-      int tmp= tmin (repLengthBuf1, deggSubLg + 1);
-      for (int ind= 0; ind < tmp; ind++)
-        gp [ind + lg] -= buf1p [ind];
-    }
-    if (lg < 0)
-      break;
-
-    buf2p= buf2.rep.elts();
-    if (degfSubLf >= 0)
-    {
-      for (int ind= 0; ind < repLengthBuf2; ind++)
-        fp [ind + lf] -= buf2p [ind];
-    }
-  }
-
-  return result;
-}
-
-CanonicalForm reverseSubst (const zz_pEX& F, int d, const Variable& alpha)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pEX f= F;
-  zz_pE *fp= f.rep.elts();
-
-  zz_pEX buf;
-  zz_pE *bufp;
-  CanonicalForm result= 0;
-  int i= 0;
-  int degf= deg(f);
-  int k= 0;
-  int degfSubK;
-  int repLength;
-  while (degf >= k)
-  {
-    degfSubK= degf - k;
-    if (degfSubK >= d)
-      repLength= d;
-    else
-      repLength= degfSubK + 1;
-
-    buf.rep.SetLength ((long) repLength);
-    bufp= buf.rep.elts();
-    for (int j= 0; j < repLength; j++)
-      bufp [j]= fp [j + k];
-    buf.normalize();
-
-    result += convertNTLzz_pEX2CF (buf, x, alpha)*power (y, i);
-    i++;
-    k= d*i;
-  }
-
-  return result;
-}
-
-CanonicalForm reverseSubstFp (const zz_pX& F, int d)
-{
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-
-  zz_pX f= F;
-  zz_p *fp= f.rep.elts();
-
-  zz_pX buf;
-  zz_p *bufp;
-  CanonicalForm result= 0;
-  int i= 0;
-  int degf= deg(f);
-  int k= 0;
-  int degfSubK;
-  int repLength;
-  while (degf >= k)
-  {
-    degfSubK= degf - k;
-    if (degfSubK >= d)
-      repLength= d;
-    else
-      repLength= degfSubK + 1;
-
-    buf.rep.SetLength ((long) repLength);
-    bufp= buf.rep.elts();
-    for (int j= 0; j < repLength; j++)
-      bufp [j]= fp [j + k];
-    buf.normalize();
-
-    result += convertNTLzzpX2CF (buf, x)*power (y, i);
-    i++;
-    k= d*i;
-  }
-
-  return result;
-}
-
-// assumes input to be reduced mod M and to be an element of Fq not Fp
-CanonicalForm
-mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
-                  CanonicalForm& M)
-{
-  int d1= degree (F, 1) + degree (G, 1) + 1;
-  d1 /= 2;
-  d1 += 1;
-
-  zz_pX F1, F2;
-  kronSubRecipro (F1, F2, F, d1);
-  zz_pX G1, G2;
-  kronSubRecipro (G1, G2, G, d1);
-
-  int k= d1*degree (M);
-  MulTrunc (F1, F1, G1, (long) k);
-
-  int degtailF= degree (tailcoeff (F), 1);
-  int degtailG= degree (tailcoeff (G), 1);
-  int taildegF= taildegree (F);
-  int taildegG= taildegree (G);
-  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
-
-  reverse (F2, F2);
-  reverse (G2, G2);
-  MulTrunc (F2, F2, G2, b + 1);
-  reverse (F2, F2, b);
-
-  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
-  return reverseSubst (F1, F2, d1, d2);
-}
-
-//Kronecker substitution
-CanonicalForm
-mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
-              CanonicalForm& M)
-{
-  CanonicalForm A= F;
-  CanonicalForm B= G;
-
-  int degAx= degree (A, 1);
-  int degAy= degree (A, 2);
-  int degBx= degree (B, 1);
-  int degBy= degree (B, 2);
-  int d1= degAx + 1 + degBx;
-  int d2= tmax (degAy, degBy);
-
-  if (d1 > 128 && d2 > 160 && (degAy == degBy) && (2*degAy > degree (M)))
-    return mulMod2NTLFpReci (A, B, M);
-
-  zz_pX NTLA= kronSubFp (A, d1);
-  zz_pX NTLB= kronSubFp (B, d1);
-
-  int k= d1*degree (M);
-  MulTrunc (NTLA, NTLA, NTLB, (long) k);
-
-  A= reverseSubstFp (NTLA, d1);
-
-  return A;
-}
-
-// assumes input to be reduced mod M and to be an element of Fq not Fp
-CanonicalForm
-mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
-                  CanonicalForm& M, const Variable& alpha)
-{
-  int d1= degree (F, 1) + degree (G, 1) + 1;
-  d1 /= 2;
-  d1 += 1;
-
-  zz_pEX F1, F2;
-  kronSubRecipro (F1, F2, F, d1, alpha);
-  zz_pEX G1, G2;
-  kronSubRecipro (G1, G2, G, d1, alpha);
-
-  int k= d1*degree (M);
-  MulTrunc (F1, F1, G1, (long) k);
-
-  int degtailF= degree (tailcoeff (F), 1);
-  int degtailG= degree (tailcoeff (G), 1);
-  int taildegF= taildegree (F);
-  int taildegG= taildegree (G);
-  int b= k + degtailF + degtailG - d1*(2+taildegF+taildegG);
-
-  reverse (F2, F2);
-  reverse (G2, G2);
-  MulTrunc (F2, F2, G2, b + 1);
-  reverse (F2, F2, b);
-
-  int d2= tmax (deg (F2)/d1, deg (F1)/d1);
-  return reverseSubst (F1, F2, d1, d2, alpha);
-}
-
-CanonicalForm
-mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
-              CanonicalForm& M)
-{
-  Variable alpha;
-  CanonicalForm A= F;
-  CanonicalForm B= G;
-
-  if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
-  {
-    int degAx= degree (A, 1);
-    int degAy= degree (A, 2);
-    int degBx= degree (B, 1);
-    int degBy= degree (B, 2);
-    int d1= degAx + degBx + 1;
-    int d2= tmax (degAy, degBy);
-    zz_p::init (getCharacteristic());
-    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
-    zz_pE::init (NTLMipo);
-
-    int degMipo= degree (getMipo (alpha));
-    if ((d1 > 128/degMipo) && (d2 > 160/degMipo) && (degAy == degBy) &&
-        (2*degAy > degree (M)))
-      return mulMod2NTLFqReci (A, B, M, alpha);
-
-    zz_pEX NTLA= kronSub (A, d1, alpha);
-    zz_pEX NTLB= kronSub (B, d1, alpha);
-
-    int k= d1*degree (M);
-
-    MulTrunc (NTLA, NTLA, NTLB, (long) k);
-
-    A= reverseSubst (NTLA, d1, alpha);
-
-    return A;
-  }
-  else
-    return mulMod2NTLFp (A, B, M);
-}
-
-CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
-                       const CanonicalForm& M)
-{
-  if (A.isZero() || B.isZero())
-    return 0;
-
-  ASSERT (M.isUnivariate(), "M must be univariate");
-
-  CanonicalForm F= mod (A, M);
-  CanonicalForm G= mod (B, M);
-  if (F.inCoeffDomain() || G.inCoeffDomain())
-    return F*G;
-  Variable y= M.mvar();
-  int degF= degree (F, y);
-  int degG= degree (G, y);
-
-  if ((degF < 1 && degG < 1) && (F.isUnivariate() && G.isUnivariate()) &&
-      (F.level() == G.level()))
-  {
-    CanonicalForm result= mulNTL (F, G);
-    return mod (result, M);
-  }
-  else if (degF <= 1 && degG <= 1)
-  {
-    CanonicalForm result= F*G;
-    return mod (result, M);
-  }
-
-  int sizeF= size (F);
-  int sizeG= size (G);
-
-  int fallBackToNaive= 50;
-  if (sizeF < fallBackToNaive || sizeG < fallBackToNaive)
-    return mod (F*G, M);
-
-  if (getCharacteristic() > 0 && CFFactory::gettype() != GaloisFieldDomain &&
-      (((degF-degG) < 50 && degF > degG) || ((degG-degF) < 50 && degF <= degG)))
-    return mulMod2NTLFq (F, G, M);
-
-  int m= (int) ceil (degree (M)/2.0);
-  if (degF >= m || degG >= m)
-  {
-    CanonicalForm MLo= power (y, m);
-    CanonicalForm MHi= power (y, degree (M) - m);
-    CanonicalForm F0= mod (F, MLo);
-    CanonicalForm F1= div (F, MLo);
-    CanonicalForm G0= mod (G, MLo);
-    CanonicalForm G1= div (G, MLo);
-    CanonicalForm F0G1= mulMod2 (F0, G1, MHi);
-    CanonicalForm F1G0= mulMod2 (F1, G0, MHi);
-    CanonicalForm F0G0= mulMod2 (F0, G0, M);
-    return F0G0 + MLo*(F0G1 + F1G0);
-  }
-  else
-  {
-    m= (int) ceil (tmax (degF, degG)/2.0);
-    CanonicalForm yToM= power (y, m);
-    CanonicalForm F0= mod (F, yToM);
-    CanonicalForm F1= div (F, yToM);
-    CanonicalForm G0= mod (G, yToM);
-    CanonicalForm G1= div (G, yToM);
-    CanonicalForm H00= mulMod2 (F0, G0, M);
-    CanonicalForm H11= mulMod2 (F1, G1, M);
-    CanonicalForm H01= mulMod2 (F0 + F1, G0 + G1, M);
-    return H11*yToM*yToM + (H01 - H11 - H00)*yToM + H00;
-  }
-  DEBOUTLN (cerr, "fatal end in mulMod2");
-}
-
-CanonicalForm mulMod (const CanonicalForm& A, const CanonicalForm& B,
-                      const CFList& MOD)
-{
-  if (A.isZero() || B.isZero())
-    return 0;
-
-  if (MOD.length() == 1)
-    return mulMod2 (A, B, MOD.getLast());
-
-  CanonicalForm M= MOD.getLast();
-  CanonicalForm F= mod (A, M);
-  CanonicalForm G= mod (B, M);
-  if (F.inCoeffDomain() || G.inCoeffDomain())
-    return F*G;
-  Variable y= M.mvar();
-  int degF= degree (F, y);
-  int degG= degree (G, y);
-
-  if ((degF <= 1 && F.level() <= M.level()) &&
-      (degG <= 1 && G.level() <= M.level()))
-  {
-    CFList buf= MOD;
-    buf.removeLast();
-    if (degF == 1 && degG == 1)
-    {
-      CanonicalForm F0= mod (F, y);
-      CanonicalForm F1= div (F, y);
-      CanonicalForm G0= mod (G, y);
-      CanonicalForm G1= div (G, y);
-      if (degree (M) > 2)
-      {
-        CanonicalForm H00= mulMod (F0, G0, buf);
-        CanonicalForm H11= mulMod (F1, G1, buf);
-        CanonicalForm H01= mulMod (F0 + F1, G0 + G1, buf);
-        return H11*y*y + (H01 - H00 - H11)*y + H00;
-      }
-      else //here degree (M) == 2
-      {
-        buf.append (y);
-        CanonicalForm F0G1= mulMod (F0, G1, buf);
-        CanonicalForm F1G0= mulMod (F1, G0, buf);
-        CanonicalForm F0G0= mulMod (F0, G0, MOD);
-        CanonicalForm result= F0G0 + y*(F0G1 + F1G0);
-        return result;
-      }
-    }
-    else if (degF == 1 && degG == 0)
-      return mulMod (div (F, y), G, buf)*y + mulMod (mod (F, y), G, buf);
-    else if (degF == 0 && degG == 1)
-      return mulMod (div (G, y), F, buf)*y + mulMod (mod (G, y), F, buf);
-    else
-      return mulMod (F, G, buf);
-  }
-  int m= (int) ceil (degree (M)/2.0);
-  if (degF >= m || degG >= m)
-  {
-    CanonicalForm MLo= power (y, m);
-    CanonicalForm MHi= power (y, degree (M) - m);
-    CanonicalForm F0= mod (F, MLo);
-    CanonicalForm F1= div (F, MLo);
-    CanonicalForm G0= mod (G, MLo);
-    CanonicalForm G1= div (G, MLo);
-    CFList buf= MOD;
-    buf.removeLast();
-    buf.append (MHi);
-    CanonicalForm F0G1= mulMod (F0, G1, buf);
-    CanonicalForm F1G0= mulMod (F1, G0, buf);
-    CanonicalForm F0G0= mulMod (F0, G0, MOD);
-    return F0G0 + MLo*(F0G1 + F1G0);
-  }
-  else
-  {
-    m= (int) ceil (tmax (degF, degG)/2.0);
-    CanonicalForm yToM= power (y, m);
-    CanonicalForm F0= mod (F, yToM);
-    CanonicalForm F1= div (F, yToM);
-    CanonicalForm G0= mod (G, yToM);
-    CanonicalForm G1= div (G, yToM);
-    CanonicalForm H00= mulMod (F0, G0, MOD);
-    CanonicalForm H11= mulMod (F1, G1, MOD);
-    CanonicalForm H01= mulMod (F0 + F1, G0 + G1, MOD);
-    return H11*yToM*yToM + (H01 - H11 - H00)*yToM + H00;
-  }
-  DEBOUTLN (cerr, "fatal end in mulMod");
-}
-
-CanonicalForm prodMod (const CFList& L, const CanonicalForm& M)
-{
-  if (L.isEmpty())
-    return 1;
-  int l= L.length();
-  if (l == 1)
-    return mod (L.getFirst(), M);
-  else if (l == 2) {
-    CanonicalForm result= mulMod2 (L.getFirst(), L.getLast(), M);
-    return result;
-  }
-  else
-  {
-    l /= 2;
-    CFList tmp1, tmp2;
-    CFListIterator i= L;
-    CanonicalForm buf1, buf2;
-    for (int j= 1; j <= l; j++, i++)
-      tmp1.append (i.getItem());
-    tmp2= Difference (L, tmp1);
-    buf1= prodMod (tmp1, M);
-    buf2= prodMod (tmp2, M);
-    CanonicalForm result= mulMod2 (buf1, buf2, M);
-    return result;
-  }
-}
-
-CanonicalForm prodMod (const CFList& L, const CFList& M)
-{
-  if (L.isEmpty())
-    return 1;
-  else if (L.length() == 1)
-    return L.getFirst();
-  else if (L.length() == 2)
-    return mulMod (L.getFirst(), L.getLast(), M);
-  else
-  {
-    int l= L.length()/2;
-    CFListIterator i= L;
-    CFList tmp1, tmp2;
-    CanonicalForm buf1, buf2;
-    for (int j= 1; j <= l; j++, i++)
-      tmp1.append (i.getItem());
-    tmp2= Difference (L, tmp1);
-    buf1= prodMod (tmp1, M);
-    buf2= prodMod (tmp2, M);
-    return mulMod (buf1, buf2, M);
-  }
-}
-
-
-CanonicalForm reverse (const CanonicalForm& F, int d)
-{
-  if (d == 0)
-    return F;
-  CanonicalForm A= F;
-  Variable y= Variable (2);
-  Variable x= Variable (1);
-  if (degree (A, x) > 0)
-  {
-    A= swapvar (A, x, y);
-    CanonicalForm result= 0;
-    CFIterator i= A;
-    while (d - i.exp() < 0)
-      i++;
-
-    for (; i.hasTerms() && (d - i.exp() >= 0); i++)
-      result += swapvar (i.coeff(),x,y)*power (x, d - i.exp());
-    return result;
-  }
-  else
-    return A*power (x, d);
-}
-
-CanonicalForm
-newtonInverse (const CanonicalForm& F, const int n, const CanonicalForm& M)
-{
-  int l= ilog2(n);
-
-  CanonicalForm g= mod (F, M)[0] [0];
-
-  ASSERT (!g.isZero(), "expected a unit");
-
-  Variable alpha;
-
-  if (!g.isOne())
-    g = 1/g;
-  Variable x= Variable (1);
-  CanonicalForm result;
-  int exp= 0;
-  if (n & 1)
-  {
-    result= g;
-    exp= 1;
-  }
-  CanonicalForm h;
-
-  for (int i= 1; i <= l; i++)
-  {
-    h= mulMod2 (g, mod (F, power (x, (1 << i))), M);
-    h= mod (h, power (x, (1 << i)) - 1);
-    h= div (h, power (x, (1 << (i - 1))));
-    h= mod (h, M);
-    g -= power (x, (1 << (i - 1)))*
-         mod (mulMod2 (g, h, M), power (x, (1 << (i - 1))));
-
-    if (n & (1 << i))
-    {
-      if (exp)
-      {
-        h= mulMod2 (result, mod (F, power (x, exp + (1 << i))), M);
-        h= mod (h, power (x, exp + (1 << i)) - 1);
-        h= div (h, power (x, exp));
-        h= mod (h, M);
-        result -= power(x, exp)*mod (mulMod2 (g, h, M),
-                                       power (x, (1 << i)));
-        exp += (1 << i);
-      }
-      else
-      {
-        exp= (1 << i);
-        result= g;
-      }
-    }
-  }
-
-  return result;
-}
-
-CanonicalForm
-newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
-           M)
-{
-  ASSERT (getCharacteristic() > 0, "positive characteristic expected");
-  ASSERT (CFFactory::gettype() != GaloisFieldDomain, "no GF expected");
-
-  CanonicalForm A= mod (F, M);
-  CanonicalForm B= mod (G, M);
-
-  Variable x= Variable (1);
-  int degA= degree (A, x);
-  int degB= degree (B, x);
-  int m= degA - degB;
-  if (m < 0)
-    return 0;
-
-  Variable v;
-  CanonicalForm Q;
-  if (degB < 1 || CFFactory::gettype() == GaloisFieldDomain)
-  {
-    CanonicalForm R;
-    divrem2 (A, B, Q, R, M);
-  }
-  else
-  {
-    if (hasFirstAlgVar (A, v) || hasFirstAlgVar (B, v))
-    {
-      CanonicalForm R= reverse (A, degA);
-      CanonicalForm revB= reverse (B, degB);
-      revB= newtonInverse (revB, m + 1, M);
-      Q= mulMod2 (R, revB, M);
-      Q= mod (Q, power (x, m + 1));
-      Q= reverse (Q, m);
-    }
-    else
-    {
-      zz_pX mipo= convertFacCF2NTLzzpX (M);
-      Variable y= Variable (2);
-      zz_pEX NTLA, NTLB;
-      NTLA= convertFacCF2NTLzz_pEX (swapvar (A, x, y), mipo);
-      NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
-      div (NTLA, NTLA, NTLB);
-      Q= convertNTLzz_pEX2CF (NTLA, x, y);
-    }
-  }
-
-  return Q;
-}
-
-void
-newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-              CanonicalForm& R, const CanonicalForm& M)
-{
-  CanonicalForm A= mod (F, M);
-  CanonicalForm B= mod (G, M);
-  Variable x= Variable (1);
-  int degA= degree (A, x);
-  int degB= degree (B, x);
-  int m= degA - degB;
-
-  if (m < 0)
-  {
-    R= A;
-    Q= 0;
-    return;
-  }
-
-  Variable v;
-  if (degB <= 1 || CFFactory::gettype() == GaloisFieldDomain)
-  {
-     divrem2 (A, B, Q, R, M);
-  }
-  else
-  {
-    if (hasFirstAlgVar (A, v) || hasFirstAlgVar (B, v))
-    {
-      R= reverse (A, degA);
-
-      CanonicalForm revB= reverse (B, degB);
-      revB= newtonInverse (revB, m + 1, M);
-      Q= mulMod2 (R, revB, M);
-
-      Q= mod (Q, power (x, m + 1));
-      Q= reverse (Q, m);
-
-      R= A - mulMod2 (Q, B, M);
-    }
-    else
-    {
-      zz_pX mipo= convertFacCF2NTLzzpX (M);
-      Variable y= Variable (2);
-      zz_pEX NTLA, NTLB;
-      NTLA= convertFacCF2NTLzz_pEX (swapvar (A, x, y), mipo);
-      NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
-      zz_pEX NTLQ, NTLR;
-      DivRem (NTLQ, NTLR, NTLA, NTLB);
-      Q= convertNTLzz_pEX2CF (NTLQ, x, y);
-      R= convertNTLzz_pEX2CF (NTLR, x, y);
-    }
-  }
-}
-
-static inline
-CFList split (const CanonicalForm& F, const int m, const Variable& x)
-{
-  CanonicalForm A= F;
-  CanonicalForm buf= 0;
-  bool swap= false;
-  if (degree (A, x) <= 0)
-    return CFList(A);
-  else if (x.level() != A.level())
-  {
-    swap= true;
-    A= swapvar (A, x, A.mvar());
-  }
-
-  int j= (int) floor ((double) degree (A)/ m);
-  CFList result;
-  CFIterator i= A;
-  for (; j >= 0; j--)
-  {
-    while (i.hasTerms() && i.exp() - j*m >= 0)
-    {
-      if (swap)
-        buf += i.coeff()*power (A.mvar(), i.exp() - j*m);
-      else
-        buf += i.coeff()*power (x, i.exp() - j*m);
-      i++;
-    }
-    if (swap)
-      result.append (swapvar (buf, x, F.mvar()));
-    else
-      result.append (buf);
-    buf= 0;
-  }
-  return result;
-}
-
-static inline
-void divrem32 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-               CanonicalForm& R, const CFList& M);
-
-static inline
-void divrem21 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-               CanonicalForm& R, const CFList& M)
-{
-  CanonicalForm A= mod (F, M);
-  CanonicalForm B= mod (G, M);
-  Variable x= Variable (1);
-  int degB= degree (B, x);
-  int degA= degree (A, x);
-  if (degA < degB)
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
-  ASSERT (2*degB > degA, "expected degree (F, 1) < 2*degree (G, 1)");
-  if (degB < 1)
-  {
-    divrem (A, B, Q, R);
-    Q= mod (Q, M);
-    R= mod (R, M);
-    return;
-  }
-
-  int m= (int) ceil ((double) (degB + 1)/2.0) + 1;
-  CFList splitA= split (A, m, x);
-  if (splitA.length() == 3)
-    splitA.insert (0);
-  if (splitA.length() == 2)
-  {
-    splitA.insert (0);
-    splitA.insert (0);
-  }
-  if (splitA.length() == 1)
-  {
-    splitA.insert (0);
-    splitA.insert (0);
-    splitA.insert (0);
-  }
-
-  CanonicalForm xToM= power (x, m);
-
-  CFListIterator i= splitA;
-  CanonicalForm H= i.getItem();
-  i++;
-  H *= xToM;
-  H += i.getItem();
-  i++;
-  H *= xToM;
-  H += i.getItem();
-  i++;
-
-  divrem32 (H, B, Q, R, M);
-
-  CFList splitR= split (R, m, x);
-  if (splitR.length() == 1)
-    splitR.insert (0);
-
-  H= splitR.getFirst();
-  H *= xToM;
-  H += splitR.getLast();
-  H *= xToM;
-  H += i.getItem();
-
-  CanonicalForm bufQ;
-  divrem32 (H, B, bufQ, R, M);
-
-  Q *= xToM;
-  Q += bufQ;
-  return;
-}
-
-static inline
-void divrem32 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-               CanonicalForm& R, const CFList& M)
-{
-  CanonicalForm A= mod (F, M);
-  CanonicalForm B= mod (G, M);
-  Variable x= Variable (1);
-  int degB= degree (B, x);
-  int degA= degree (A, x);
-  if (degA < degB)
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
-  ASSERT (3*(degB/2) > degA, "expected degree (F, 1) < 3*(degree (G, 1)/2)");
-  if (degB < 1)
-  {
-    divrem (A, B, Q, R);
-    Q= mod (Q, M);
-    R= mod (R, M);
-    return;
-  }
-  int m= (int) ceil ((double) (degB + 1)/ 2.0);
-
-  CFList splitA= split (A, m, x);
-  CFList splitB= split (B, m, x);
-
-  if (splitA.length() == 2)
-  {
-    splitA.insert (0);
-  }
-  if (splitA.length() == 1)
-  {
-    splitA.insert (0);
-    splitA.insert (0);
-  }
-  CanonicalForm xToM= power (x, m);
-
-  CanonicalForm H;
-  CFListIterator i= splitA;
-  i++;
-
-  if (degree (splitA.getFirst(), x) < degree (splitB.getFirst(), x))
-  {
-    H= splitA.getFirst()*xToM + i.getItem();
-    divrem21 (H, splitB.getFirst(), Q, R, M);
-  }
-  else
-  {
-    R= splitA.getFirst()*xToM + i.getItem() + splitB.getFirst() -
-       splitB.getFirst()*xToM;
-    Q= xToM - 1;
-  }
-
-  H= mulMod (Q, splitB.getLast(), M);
-
-  R= R*xToM + splitA.getLast() - H;
-
-  while (degree (R, x) >= degB)
-  {
-    xToM= power (x, degree (R, x) - degB);
-    Q += LC (R, x)*xToM;
-    R -= mulMod (LC (R, x), B, M)*xToM;
-    Q= mod (Q, M);
-    R= mod (R, M);
-  }
-
-  return;
-}
-
-void divrem2 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-              CanonicalForm& R, const CanonicalForm& M)
-{
-  CanonicalForm A= mod (F, M);
-  CanonicalForm B= mod (G, M);
-
-  if (B.inCoeffDomain())
-  {
-    divrem (A, B, Q, R);
-    return;
-  }
-  if (A.inCoeffDomain() && !B.inCoeffDomain())
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
-
-  if (B.level() < A.level())
-  {
-    divrem (A, B, Q, R);
-    return;
-  }
-  if (A.level() > B.level())
-  {
-    R= A;
-    Q= 0;
-    return;
-  }
-  if (B.level() == 1 && B.isUnivariate())
-  {
-    divrem (A, B, Q, R);
-    return;
-  }
-  if (!(B.level() == 1 && B.isUnivariate()) && (A.level() == 1 && A.isUnivariate()))
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
-
-  Variable x= Variable (1);
-  int degB= degree (B, x);
-  if (degB > degree (A, x))
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
-
-  CFList splitA= split (A, degB, x);
-
-  CanonicalForm xToDegB= power (x, degB);
-  CanonicalForm H, bufQ;
-  Q= 0;
-  CFListIterator i= splitA;
-  H= i.getItem()*xToDegB;
-  i++;
-  H += i.getItem();
-  CFList buf;
-  while (i.hasItem())
-  {
-    buf= CFList (M);
-    divrem21 (H, B, bufQ, R, buf);
-    i++;
-    if (i.hasItem())
-      H= R*xToDegB + i.getItem();
-    Q *= xToDegB;
-    Q += bufQ;
-  }
-  return;
-}
-
-void divrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
-             CanonicalForm& R, const CFList& MOD)
-{
-  CanonicalForm A= mod (F, MOD);
-  CanonicalForm B= mod (G, MOD);
-  Variable x= Variable (1);
-  int degB= degree (B, x);
-  if (degB > degree (A, x))
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
-
-  if (degB <= 0)
-  {
-    divrem (A, B, Q, R);
-    Q= mod (Q, MOD);
-    R= mod (R, MOD);
-    return;
-  }
-  CFList splitA= split (A, degB, x);
-
-  CanonicalForm xToDegB= power (x, degB);
-  CanonicalForm H, bufQ;
-  Q= 0;
-  CFListIterator i= splitA;
-  H= i.getItem()*xToDegB;
-  i++;
-  H += i.getItem();
-  while (i.hasItem())
-  {
-    divrem21 (H, B, bufQ, R, MOD);
-    i++;
-    if (i.hasItem())
-      H= R*xToDegB + i.getItem();
-    Q *= xToDegB;
-    Q += bufQ;
-  }
-  return;
-}
-
 void sortList (CFList& list, const Variable& x)
 {
   int l= 1;
@@ -1792,8 +359,295 @@ void sortList (CFList& list, const Variable& x)
   }
 }
 
-static inline
-CFList diophantine (const CanonicalForm& F, const CFList& factors)
+CFList
+diophantine (const CanonicalForm& F, const CFList& factors);
+
+CFList
+diophantineHensel (const CanonicalForm & F, const CFList& factors,
+                   const modpk& b)
+{
+  int p= b.getp();
+  setCharacteristic (p);
+  CFList recResult= diophantine (mapinto (F), mapinto (factors));
+  setCharacteristic (0);
+  recResult= mapinto (recResult);
+  CanonicalForm e= 1;
+  CFList L;
+  CFArray bufFactors= CFArray (factors.length());
+  int k= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, k++)
+  {
+    if (k == 0)
+      bufFactors[k]= i.getItem() (0);
+    else
+      bufFactors [k]= i.getItem();
+  }
+  CanonicalForm tmp, quot;
+  for (k= 0; k < factors.length(); k++) //TODO compute b's faster
+  {
+    tmp= 1;
+    for (int l= 0; l < factors.length(); l++)
+    {
+      if (l == k)
+        continue;
+      else
+      {
+        tmp= mulNTL (tmp, bufFactors[l]);
+      }
+    }
+    L.append (tmp);
+  }
+
+  setCharacteristic (p);
+  for (k= 0; k < factors.length(); k++)
+    bufFactors [k]= bufFactors[k].mapinto();
+  setCharacteristic(0);
+
+  CFListIterator j= L;
+  for (CFListIterator i= recResult; i.hasItem(); i++, j++)
+    e= b (e - mulNTL (i.getItem(),j.getItem(), b));
+
+  if (e.isZero())
+    return recResult;
+  CanonicalForm coeffE;
+  CFList s;
+  CFList result= recResult;
+  setCharacteristic (p);
+  recResult= mapinto (recResult);
+  setCharacteristic (0);
+  CanonicalForm g;
+  CanonicalForm modulus= p;
+  int d= b.getk();
+  for (int i= 1; i < d; i++)
+  {
+    coeffE= div (e, modulus);
+    setCharacteristic (p);
+    coeffE= coeffE.mapinto();
+    setCharacteristic (0);
+    if (!coeffE.isZero())
+    {
+      CFListIterator k= result;
+      CFListIterator l= L;
+      int ii= 0;
+      j= recResult;
+      for (; j.hasItem(); j++, k++, l++, ii++)
+      {
+        setCharacteristic (p);
+        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (g, bufFactors[ii]);
+        setCharacteristic (0);
+        k.getItem() += g.mapinto()*modulus;
+        e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+        e= b(e);
+      }
+    }
+    modulus *= p;
+    if (e.isZero())
+      break;
+  }
+
+  return result;
+}
+
+CFList
+diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
+                     const CFList& factors, modpk& b, const Variable& alpha)
+{
+  bool fail= false;
+  CFList recResult;
+  CanonicalForm modMipo, mipo;
+  //here SW_RATIONAL is off
+  On (SW_RATIONAL);
+  mipo= getMipo (alpha);
+  bool mipoHasDen= false;
+  if (!bCommonDen (mipo).isOne())
+  {
+    mipo *= bCommonDen (mipo);
+    mipoHasDen= true;
+  }
+  Off (SW_RATIONAL);
+  int p= b.getp();
+  setCharacteristic (p);
+  setReduce (alpha, false);
+  while (1)
+  {
+    setCharacteristic (p);
+    modMipo= mapinto (mipo);
+    modMipo /= lc (modMipo);
+    tryDiophantine (recResult, mapinto (F), mapinto (factors), modMipo, fail);
+    if (fail)
+    {
+      int i= 0;
+      while (cf_getBigPrime (i) < p)
+        i++;
+      findGoodPrime (F, i);
+      findGoodPrime (G, i);
+      p=cf_getBigPrime(i);
+      b = coeffBound( G, p, mipo );
+      modpk bb= coeffBound (F, p, mipo );
+      if (bb.getk() > b.getk() ) b=bb;
+      fail= false;
+    }
+    else
+      break;
+  }
+  setCharacteristic (0);
+  recResult= mapinto (recResult);
+  setReduce (alpha, true);
+  CanonicalForm e= 1;
+  CFList L;
+  CFArray bufFactors= CFArray (factors.length());
+  int k= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, k++)
+  {
+    if (k == 0)
+      bufFactors[k]= i.getItem() (0);
+    else
+      bufFactors [k]= i.getItem();
+  }
+  CanonicalForm tmp;
+  On (SW_RATIONAL);
+  for (k= 0; k < factors.length(); k++) //TODO compute b's faster
+  {
+    tmp= 1;
+    for (int l= 0; l < factors.length(); l++)
+    {
+      if (l == k)
+        continue;
+      else
+        tmp= mulNTL (tmp, bufFactors[l]);
+    }
+    L.append (tmp*bCommonDen(tmp));
+  }
+
+  Variable gamma;
+  CanonicalForm den;
+  if (mipoHasDen)
+  {
+    modMipo= getMipo (alpha);
+    den= bCommonDen (modMipo);
+    modMipo *= den;
+    Off (SW_RATIONAL);
+    setReduce (alpha, false);
+    gamma= rootOf (b (modMipo*b.inverse (den)));
+    setReduce (alpha, true);
+  }
+
+  setCharacteristic (p);
+  Variable beta;
+  Off (SW_RATIONAL);
+  if (mipoHasDen)
+  {
+    setReduce (alpha, false);
+    modMipo= modMipo.mapinto();
+    modMipo /= lc (modMipo);
+    beta= rootOf (modMipo);
+    setReduce (alpha, true);
+  }
+
+  for (k= 0; k < factors.length(); k++)
+  {
+    if (!mipoHasDen)
+      bufFactors [k]= bufFactors[k].mapinto();
+    else
+    {
+      bufFactors [k]= bufFactors[k].mapinto();
+      bufFactors [k]= replacevar (bufFactors[k], alpha, beta);
+    }
+  }
+  setCharacteristic(0);
+
+  CFListIterator j= L;
+  for (;j.hasItem(); j++)
+  {
+    if (mipoHasDen)
+      j.getItem()= replacevar (b(j.getItem()*b.inverse(lc(j.getItem()))),
+                               alpha, gamma);
+    else
+      j.getItem()= b(j.getItem()*b.inverse(lc(j.getItem())));
+  }
+  j= L;
+  for (CFListIterator i= recResult; i.hasItem(); i++, j++)
+  {
+    if (mipoHasDen)
+      e= b (e - mulNTL (replacevar (i.getItem(), alpha, gamma),j.getItem(), b));
+    else
+      e= b (e - mulNTL (i.getItem(), j.getItem(), b));
+  }
+
+  if (e.isZero())
+  {
+    if (mipoHasDen)
+    {
+      for (CFListIterator i= recResult; i.hasItem(); i++)
+        i.getItem()= replacevar (i.getItem(), alpha, gamma);
+    }
+    return recResult;
+  }
+  CanonicalForm coeffE;
+  CFList result= recResult;
+  if (mipoHasDen)
+  {
+    for (CFListIterator i= result; i.hasItem(); i++)
+      i.getItem()= replacevar (i.getItem(), alpha, gamma);
+  }
+  setCharacteristic (p);
+  recResult= mapinto (recResult);
+  if (mipoHasDen)
+  {
+    for (CFListIterator i= recResult; i.hasItem(); i++)
+      i.getItem()= replacevar (i.getItem(), alpha, beta);
+  }
+
+  setCharacteristic (0);
+  CanonicalForm g;
+  CanonicalForm modulus= p;
+  int d= b.getk();
+  for (int i= 1; i < d; i++)
+  {
+    coeffE= div (e, modulus);
+    setCharacteristic (p);
+    coeffE= coeffE.mapinto();
+    if (mipoHasDen)
+      coeffE= replacevar (coeffE, gamma, beta);
+    setCharacteristic (0);
+    if (!coeffE.isZero())
+    {
+      CFListIterator k= result;
+      CFListIterator l= L;
+      int ii= 0;
+      j= recResult;
+      for (; j.hasItem(); j++, k++, l++, ii++)
+      {
+        setCharacteristic (p);
+        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (g, bufFactors[ii]);
+        setCharacteristic (0);
+        if (mipoHasDen)
+        {
+          k.getItem() += replacevar (g.mapinto()*modulus, beta, gamma);
+          e -= mulNTL (replacevar (g.mapinto(), beta, gamma)*modulus,
+                                   l.getItem(), b);
+        }
+        else
+        {
+          k.getItem() += g.mapinto()*modulus;
+          e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+        }
+        e= b(e);
+      }
+    }
+    modulus *= p;
+    if (e.isZero())
+      break;
+  }
+
+  return result;
+}
+
+CFList
+diophantine (const CanonicalForm& F, const CanonicalForm& G,
+             const CFList& factors, modpk& b)
 {
   if (getCharacteristic() == 0)
   {
@@ -1803,9 +657,16 @@ CFList diophantine (const CanonicalForm& F, const CFList& factors)
       hasAlgVar= hasFirstAlgVar (i.getItem(), v);
     if (hasAlgVar)
     {
+      if (b.getp() != 0)
+      {
+        CFList result= diophantineHenselQa (F, G, factors, b, v);
+        return result;
+      }
       CFList result= modularDiophant (F, factors, getMipo (v));
       return result;
     }
+    if (b.getp() != 0)
+      return diophantineHensel (F, factors, b);
   }
 
   CanonicalForm buf1, buf2, buf3, S, T;
@@ -1835,10 +696,17 @@ CFList diophantine (const CanonicalForm& F, const CFList& factors)
   return result;
 }
 
+CFList
+diophantine (const CanonicalForm& F, const CFList& factors)
+{
+  modpk b= modpk();
+  return diophantine (F, 1, factors, b);
+}
+
 void
 henselStep12 (const CanonicalForm& F, const CFList& factors,
               CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
-              CFArray& Pi, int j)
+              CFArray& Pi, int j, const modpk& b)
 {
   CanonicalForm E;
   CanonicalForm xToJ= power (F.mvar(), j);
@@ -1854,6 +722,8 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
       E= F[j];
   }
 
+  if (b.getp() != 0)
+    E= b(E);
   CFArray buf= CFArray (diophant.length());
   bufFactors[0]= mod (factors.getFirst(), power (F.mvar(), j + 1));
   int k= 0;
@@ -1864,53 +734,65 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     if (degree (bufFactors[k], x) > 0)
     {
       if (k > 0)
-        remainder= modNTL (E, bufFactors[k] [0]);
+        remainder= modNTL (E, bufFactors[k] [0], b);
       else
         remainder= E;
     }
     else
-      remainder= modNTL (E, bufFactors[k]);
+      remainder= modNTL (E, bufFactors[k], b);
 
-    buf[k]= mulNTL (i.getItem(), remainder);
+    buf[k]= mulNTL (i.getItem(), remainder, b);
     if (degree (bufFactors[k], x) > 0)
-      buf[k]= modNTL (buf[k], bufFactors[k] [0]);
+      buf[k]= modNTL (buf[k], bufFactors[k] [0], b);
     else
-      buf[k]= modNTL (buf[k], bufFactors[k]);
+      buf[k]= modNTL (buf[k], bufFactors[k], b);
   }
   for (k= 1; k < factors.length(); k++)
+  {
     bufFactors[k] += xToJ*buf[k];
+    if (b.getp() != 0)
+      bufFactors[k]= b(bufFactors[k]);
+  }
 
   // update Pi [0]
   int degBuf0= degree (bufFactors[0], x);
   int degBuf1= degree (bufFactors[1], x);
   if (degBuf0 > 0 && degBuf1 > 0)
-    M (j + 1, 1)= mulNTL (bufFactors[0] [j], bufFactors[1] [j]);
+    M (j + 1, 1)= mulNTL (bufFactors[0] [j], bufFactors[1] [j], b);
   CanonicalForm uIZeroJ;
   if (j == 1)
   {
     if (degBuf0 > 0 && degBuf1 > 0)
       uIZeroJ= mulNTL ((bufFactors[0] [0] + bufFactors[0] [j]),
-                  (bufFactors[1] [0] + buf[1])) - M(1, 1) - M(j + 1, 1);
+                  (bufFactors[1] [0] + buf[1]), b) - M(1, 1) - M(j + 1, 1);
     else if (degBuf0 > 0)
-      uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1]);
+      uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1], b);
     else if (degBuf1 > 0)
-      uIZeroJ= mulNTL (bufFactors[0], buf[1]);
+      uIZeroJ= mulNTL (bufFactors[0], buf[1], b);
     else
       uIZeroJ= 0;
+    if (b.getp() != 0)
+      uIZeroJ= b (uIZeroJ);
     Pi [0] += xToJ*uIZeroJ;
+    if (b.getp() != 0)
+      Pi [0]= b (Pi[0]);
   }
   else
   {
     if (degBuf0 > 0 && degBuf1 > 0)
       uIZeroJ= mulNTL ((bufFactors[0] [0] + bufFactors[0] [j]),
-                  (bufFactors[1] [0] + buf[1])) - M(1, 1) - M(j + 1, 1);
+                  (bufFactors[1] [0] + buf[1]), b) - M(1, 1) - M(j + 1, 1);
     else if (degBuf0 > 0)
-      uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1]);
+      uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1], b);
     else if (degBuf1 > 0)
-      uIZeroJ= mulNTL (bufFactors[0], buf[1]);
+      uIZeroJ= mulNTL (bufFactors[0], buf[1], b);
     else
       uIZeroJ= 0;
+    if (b.getp() != 0)
+      uIZeroJ= b (uIZeroJ);
     Pi [0] += xToJ*uIZeroJ;
+    if (b.getp() != 0)
+      Pi [0]= b (Pi[0]);
   }
   CFArray tmp= CFArray (factors.length() - 1);
   for (k= 0; k < factors.length() - 1; k++)
@@ -1924,23 +806,24 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     {
       if (k != j - k + 1)
       {
-        if ((one.hasTerms() && one.exp() == j - k + 1) && (two.hasTerms() && two.exp() == j - k + 1))
+        if ((one.hasTerms() && one.exp() == j - k + 1)
+             && (two.hasTerms() && two.exp() == j - k + 1))
         {
-          tmp[0] += mulNTL ((bufFactors[0] [k] + one.coeff()), (bufFactors[1] [k] +
-                     two.coeff())) - M (k + 1, 1) - M (j - k + 2, 1);
+          tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()), (bufFactors[1][k]+
+                     two.coeff()), b) - M (k + 1, 1) - M (j - k + 2, 1);
           one++;
           two++;
         }
         else if (one.hasTerms() && one.exp() == j - k + 1)
         {
-          tmp[0] += mulNTL ((bufFactors[0] [k] + one.coeff()), bufFactors[1] [k]) -
-                     M (k + 1, 1);
+          tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()), bufFactors[1][k], b)
+                    - M (k + 1, 1);
           one++;
         }
         else if (two.hasTerms() && two.exp() == j - k + 1)
         {
-          tmp[0] += mulNTL (bufFactors[0] [k], (bufFactors[1] [k] + two.coeff())) -
-                    M (k + 1, 1);
+          tmp[0] += mulNTL (bufFactors[0][k], (bufFactors[1][k]+two.coeff()), b)
+                    - M (k + 1, 1);
           two++;
         }
       }
@@ -1950,6 +833,8 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
       }
     }
   }
+  if (b.getp() != 0)
+    tmp[0]= b (tmp[0]);
   Pi [0] += tmp[0]*xToJ*F.mvar();
 
   // update Pi [l]
@@ -1959,31 +844,31 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     degPi= degree (Pi [l - 1], x);
     degBuf= degree (bufFactors[l + 1], x);
     if (degPi > 0 && degBuf > 0)
-      M (j + 1, l + 1)= mulNTL (Pi [l - 1] [j], bufFactors[l + 1] [j]);
+      M (j + 1, l + 1)= mulNTL (Pi [l - 1] [j], bufFactors[l + 1] [j], b);
     if (j == 1)
     {
       if (degPi > 0 && degBuf > 0)
         Pi [l] += xToJ*(mulNTL (Pi [l - 1] [0] + Pi [l - 1] [j],
-                  bufFactors[l + 1] [0] + buf[l + 1]) - M (j + 1, l +1) -
+                  bufFactors[l + 1] [0] + buf[l + 1], b) - M (j + 1, l +1) -
                   M (1, l + 1));
       else if (degPi > 0)
-        Pi [l] += xToJ*(mulNTL (Pi [l - 1] [j], bufFactors[l + 1]));
+        Pi [l] += xToJ*(mulNTL (Pi [l - 1] [j], bufFactors[l + 1], b));
       else if (degBuf > 0)
-        Pi [l] += xToJ*(mulNTL (Pi [l - 1], buf[l + 1]));
+        Pi [l] += xToJ*(mulNTL (Pi [l - 1], buf[l + 1], b));
     }
     else
     {
       if (degPi > 0 && degBuf > 0)
       {
-        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1] [0]);
-        uIZeroJ += mulNTL (Pi [l - 1] [0], buf [l + 1]);
+        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1] [0], b);
+        uIZeroJ += mulNTL (Pi [l - 1] [0], buf [l + 1], b);
       }
       else if (degPi > 0)
-        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1]);
+        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1], b);
       else if (degBuf > 0)
       {
-        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1] [0]);
-        uIZeroJ += mulNTL (Pi [l - 1], buf[l + 1]);
+        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1] [0], b);
+        uIZeroJ += mulNTL (Pi [l - 1], buf[l + 1], b);
       }
       Pi[l] += xToJ*uIZeroJ;
     }
@@ -1993,12 +878,12 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     {
       if (degBuf > 0 && degPi > 0)
       {
-          tmp[l] += mulNTL (two.coeff(), bufFactors[l + 1][0]);
+          tmp[l] += mulNTL (two.coeff(), bufFactors[l + 1][0], b);
           two++;
       }
       else if (degPi > 0)
       {
-          tmp[l] += mulNTL (two.coeff(), bufFactors[l + 1]);
+          tmp[l] += mulNTL (two.coeff(), bufFactors[l + 1], b);
           two++;
       }
     }
@@ -2011,21 +896,21 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
           if ((one.hasTerms() && one.exp() == j - k + 1) &&
               (two.hasTerms() && two.exp() == j - k + 1))
           {
-            tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), (Pi[l - 1] [k] +
-                       two.coeff())) - M (k + 1, l + 1) - M (j - k + 2, l + 1);
+            tmp[l] += mulNTL ((bufFactors[l+1][k] + one.coeff()), (Pi[l-1][k] +
+                      two.coeff()),b) - M (k + 1, l + 1) - M (j - k + 2, l + 1);
             one++;
             two++;
           }
           else if (one.hasTerms() && one.exp() == j - k + 1)
           {
-            tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), Pi[l - 1] [k]) -
+            tmp[l] += mulNTL ((bufFactors[l+1][k]+one.coeff()), Pi[l-1][k], b) -
                        M (k + 1, l + 1);
             one++;
           }
           else if (two.hasTerms() && two.exp() == j - k + 1)
           {
-            tmp[l] += mulNTL (bufFactors[l + 1] [k], (Pi[l - 1] [k] + two.coeff())) -
-                      M (k + 1, l + 1);
+            tmp[l] += mulNTL (bufFactors[l+1][k], (Pi[l-1][k] + two.coeff()), b)
+                      - M (k + 1, l + 1);
             two++;
           }
         }
@@ -2033,30 +918,50 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
           tmp[l] += M (k + 1, l + 1);
       }
     }
+    if (b.getp() != 0)
+      tmp[l]= b (tmp[l]);
     Pi[l] += tmp[l]*xToJ*F.mvar();
   }
-  return;
 }
 
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
-              CFList& diophant, CFMatrix& M, bool sort)
+              CFList& diophant, CFMatrix& M, modpk& b, bool sort)
 {
   if (sort)
     sortList (factors, Variable (1));
   Pi= CFArray (factors.length() - 1);
   CFListIterator j= factors;
-  diophant= diophantine (F[0], factors);
+  diophant= diophantine (F[0], F, factors, b);
+  CanonicalForm bufF= F;
+  if (getCharacteristic() == 0 && b.getp() != 0)
+  {
+    Variable v;
+    bool hasAlgVar= hasFirstAlgVar (F, v);
+    for (CFListIterator i= factors; i.hasItem() && !hasAlgVar; i++)
+      hasAlgVar= hasFirstAlgVar (i.getItem(), v);
+    Variable w;
+    bool hasAlgVar2= false;
+    for (CFListIterator i= diophant; i.hasItem() && !hasAlgVar2; i++)
+      hasAlgVar2= hasFirstAlgVar (i.getItem(), w);
+    if (hasAlgVar && hasAlgVar2 && v!=w)
+    {
+      bufF= replacevar (bufF, v, w);
+      for (CFListIterator i= factors; i.hasItem(); i++)
+        i.getItem()= replacevar (i.getItem(), v, w);
+    }
+  }
+
   DEBOUTLN (cerr, "diophant= " << diophant);
   j++;
-  Pi [0]= mulNTL (j.getItem(), mod (factors.getFirst(), F.mvar()));
+  Pi [0]= mulNTL (j.getItem(), mod (factors.getFirst(), F.mvar()), b);
   M (1, 1)= Pi [0];
   int i= 1;
   if (j.hasItem())
     j++;
   for (; j.hasItem(); j++, i++)
   {
-    Pi [i]= mulNTL (Pi [i - 1], j.getItem());
+    Pi [i]= mulNTL (Pi [i - 1], j.getItem(), b);
     M (1, i + 1)= Pi [i];
   }
   CFArray bufFactors= CFArray (factors.length());
@@ -2069,18 +974,26 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
       bufFactors[i]= k.getItem();
   }
   for (i= 1; i < l; i++)
-    henselStep12 (F, factors, bufFactors, diophant, M, Pi, i);
+    henselStep12 (bufF, factors, bufFactors, diophant, M, Pi, i, b);
 
   CFListIterator k= factors;
   for (i= 0; i < factors.length (); i++, k++)
     k.getItem()= bufFactors[i];
   factors.removeFirst();
-  return;
+}
+
+void
+henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
+              CFList& diophant, CFMatrix& M, bool sort)
+{
+  modpk dummy= modpk();
+  henselLift12 (F, factors, l, Pi, diophant, M, dummy, sort);
 }
 
 void
 henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
-                    end, CFArray& Pi, const CFList& diophant, CFMatrix& M)
+                    end, CFArray& Pi, const CFList& diophant, CFMatrix& M,
+                    const modpk& b)
 {
   CFArray bufFactors= CFArray (factors.length());
   int i= 0;
@@ -2093,7 +1006,7 @@ henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
       bufFactors[i]= k.getItem();
   }
   for (i= start; i < end; i++)
-    henselStep12 (F, factors, bufFactors, diophant, M, Pi, i);
+    henselStep12 (F, factors, bufFactors, diophant, M, Pi, i, b);
 
   CFListIterator k= factors;
   for (i= 0; i < factors.length(); k++, i++)
@@ -2102,9 +1015,8 @@ henselLiftResume12 (const CanonicalForm& F, CFList& factors, int start, int
   return;
 }
 
-static inline
 CFList
-biDiophantine (const CanonicalForm& F, const CFList& factors, const int d)
+biDiophantine (const CanonicalForm& F, const CFList& factors, int d)
 {
   Variable y= F.mvar();
   CFList result;
@@ -2203,10 +1115,9 @@ biDiophantine (const CanonicalForm& F, const CFList& factors, const int d)
   }
 }
 
-static inline
 CFList
 multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
-                     const CFList& recResult, const CFList& M, const int d)
+                     const CFList& recResult, const CFList& M, int d)
 {
   Variable y= F.mvar();
   CFList result;
@@ -2287,12 +1198,12 @@ multiRecDiophantine (const CanonicalForm& F, const CFList& factors,
     j= p;
     for (CFListIterator i= result; i.hasItem(); i++, j++)
       test += mod (i.getItem()*j.getItem(), power (y, d));
-    DEBOUTLN (cerr, "test= " << test);
+    DEBOUTLN (cerr, "test in multiRecDiophantine= " << test);
 #endif
   return result;
 }
 
-static inline
+static
 void
 henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
             const CFList& diophant, CFMatrix& M, CFArray& Pi, int j,
@@ -2317,7 +1228,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     CanonicalForm test2= mod (F-test, xToJ);
 
     test2= mod (test2, MOD);
-    DEBOUTLN (cerr, "test= " << test2);
+    DEBOUTLN (cerr, "test in henselStep= " << test2);
 #endif
   }
   else
@@ -2334,7 +1245,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     test= mod (test, power (x, j));
     test= mod (test, MOD);
     CanonicalForm test2= mod (F, power (x, j - 1)) - mod (test, power (x, j-1));
-    DEBOUTLN (cerr, "test= " << test2);
+    DEBOUTLN (cerr, "test in henselStep= " << test2);
 #endif
 
     if (degree (Pi [factors.length() - 2], x) > 0)
@@ -2534,7 +1445,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
 }
 
 CFList
-henselLift23 (const CFList& eval, const CFList& factors, const int* l, CFList&
+henselLift23 (const CFList& eval, const CFList& factors, int* l, CFList&
               diophant, CFArray& Pi, CFMatrix& M)
 {
   CFList buf= factors;
@@ -2601,8 +1512,7 @@ henselLiftResume (const CanonicalForm& F, CFList& factors, int start, int end,
 
 CFList
 henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
-            diophant, CFArray& Pi, CFMatrix& M, const int lOld, const int
-            lNew)
+            diophant, CFArray& Pi, CFMatrix& M, int lOld, int lNew)
 {
   diophant= multiRecDiophantine (F.getFirst(), factors, diophant, MOD, lOld);
   int k= 0;
@@ -2642,8 +1552,8 @@ henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 }
 
 CFList
-henselLift (const CFList& eval, const CFList& factors, const int* l, const int
-            lLength, bool sort)
+henselLift (const CFList& eval, const CFList& factors, int* l, int lLength,
+            bool sort)
 {
   CFList diophant;
   CFList buf= factors;
@@ -2676,10 +1586,12 @@ henselLift (const CFList& eval, const CFList& factors, const int* l, const int
   return result;
 }
 
+// nonmonic
+
 void
-henselStep122 (const CanonicalForm& F, const CFList& factors,
-              CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
-              CFArray& Pi, int j, const CFArray& /*LCs*/)
+nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
+                      CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
+                      CFArray& Pi, int j, const CFArray& /*LCs*/)
 {
   Variable x= F.mvar();
   CanonicalForm xToJ= power (x, j);
@@ -2888,8 +1800,9 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
 }
 
 void
-henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
-              CFList& diophant, CFMatrix& M, const CFArray& LCs, bool sort)
+nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
+                      CFArray& Pi, CFList& diophant, CFMatrix& M,
+                      const CFArray& LCs, bool sort)
 {
   if (sort)
     sortList (factors, Variable (1));
@@ -2955,7 +1868,7 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   }
 
   for (i= 1; i < l; i++)
-    henselStep122 (F, bufFactors2, bufFactors, diophant, M, Pi, i, LCs);
+    nonMonicHenselStep12 (F, bufFactors2, bufFactors, diophant, M, Pi, i, LCs);
 
   factors= CFList();
   for (i= 0; i < bufFactors.size(); i++)
@@ -2966,7 +1879,6 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
 
 /// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
 /// mod M, products contains \f$ prod_{j=1, j\neq i}^{r}{f_{i}}} \f$
-static inline
 CFList
 diophantine (const CFList& recResult, const CFList& factors,
              const CFList& products, const CFList& M, const CanonicalForm& E,
@@ -3045,11 +1957,11 @@ diophantine (const CFList& recResult, const CFList& factors,
   return result;
 }
 
-static inline
 void
-henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
-            const CFList& diophant, CFMatrix& M, CFArray& Pi,
-            const CFList& products, int j, const CFList& MOD, bool& noOneToOne)
+nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
+                    CFArray& bufFactors, const CFList& diophant, CFMatrix& M,
+                    CFArray& Pi, const CFList& products, int j,
+                    const CFList& MOD, bool& noOneToOne)
 {
   CanonicalForm E;
   CanonicalForm xToJ= power (F.mvar(), j);
@@ -3068,7 +1980,7 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     test= mod (test, power (x, j));
     test= mod (test, MOD);
     CanonicalForm test2= mod (F, power (x, j - 1)) - mod (test, power (x, j-1));
-    DEBOUTLN (cerr, "test= " << test2);
+    DEBOUTLN (cerr, "test in nonMonicHenselStep= " << test2);
 #endif
 
   if (degree (Pi [factors.length() - 2], x) > 0)
@@ -3285,9 +2197,9 @@ CanonicalForm replaceLC (const CanonicalForm& F, const CanonicalForm& c)
 }
 
 CFList
-henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
-              diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
-              const CFList& LCs2, bool& bad)
+nonMonicHenselLift232(const CFList& eval, const CFList& factors, int* l, CFList&
+                      diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
+                      const CFList& LCs2, bool& bad)
 {
   CFList buf= factors;
   int k= 0;
@@ -3335,7 +2247,8 @@ henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
 
   for (int d= 1; d < l[1]; d++)
   {
-    henselStep2 (j.getItem(), buf, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    nonMonicHenselStep (j.getItem(), buf, bufFactors, diophant, M, Pi, products,
+                        d, MOD, bad);
     if (bad)
       return CFList();
   }
@@ -3347,9 +2260,10 @@ henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
 
 
 CFList
-henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
-            diophant, CFArray& Pi, CFMatrix& M, const int lOld, int&
-            lNew, const CFList& LCs1, const CFList& LCs2, bool& bad)
+nonMonicHenselLift2 (const CFList& F, const CFList& factors, const CFList& MOD,
+                    CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
+                    int& lNew, const CFList& LCs1, const CFList& LCs2, bool& bad
+                   )
 {
   int k= 0;
   CFArray bufFactors= CFArray (factors.length());
@@ -3396,7 +2310,8 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 
   for (int d= 1; d < lNew; d++)
   {
-    henselStep2 (F.getLast(), buf, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    nonMonicHenselStep (F.getLast(), buf, bufFactors, diophant, M, Pi, products,
+                        d, MOD, bad);
     if (bad)
       return CFList();
   }
@@ -3408,9 +2323,9 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 }
 
 CFList
-henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
-             lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
-             const CFArray& Pi, const CFList& diophant, bool& bad)
+nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
+                    lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
+                    const CFArray& Pi, const CFList& diophant, bool& bad)
 {
   CFList bufDiophant= diophant;
   CFList buf= factors;
@@ -3418,8 +2333,8 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
     sortList (buf, Variable (1));
   CFArray bufPi= Pi;
   CFMatrix M= CFMatrix (l[1], factors.length());
-  CFList result= henselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2,
-                               bad);
+  CFList result= 
+    nonMonicHenselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2, bad);
   if (bad)
     return CFList();
 
@@ -3447,8 +2362,8 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
     bufLCs1.append (jj.getItem());
     bufLCs2.append (jjj.getItem());
     M= CFMatrix (l[i], factors.length());
-    result= henselLift2 (bufEval, result, MOD, bufDiophant, bufPi, M, l[i - 1],
-                         l[i], bufLCs1, bufLCs2, bad);
+    result= nonMonicHenselLift2 (bufEval, result, MOD, bufDiophant, bufPi, M,
+                                 l[i - 1], l[i], bufLCs1, bufLCs2, bad);
     if (bad)
       return CFList();
     MOD.append (power (Variable (i + 2), l[i]));
@@ -3545,7 +2460,8 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
   MOD.insert (yToL);
   for (int d= 1; d < liftBound; d++)
   {
-    henselStep2 (F, factors, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    nonMonicHenselStep (F, factors, bufFactors, diophant, M, Pi, products, d,
+                        MOD, bad);
     if (bad)
       return CFList();
   }
@@ -3558,7 +2474,7 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
 
 CFList
 nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
-                    CFList& diophant, CFArray& Pi, CFMatrix& M, const int lOld,
+                    CFList& diophant, CFArray& Pi, CFMatrix& M, int lOld,
                     int& lNew, const CFList& MOD, bool& noOneToOne
                    )
 {
@@ -3625,8 +2541,8 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
 
   for (int d= 1; d < lNew; d++)
   {
-    henselStep2 (F.getLast(), factors, bufFactors, diophant, M, Pi, products, d,
-                 MOD, noOneToOne);
+    nonMonicHenselStep (F.getLast(), factors, bufFactors, diophant, M, Pi,
+                        products, d, MOD, noOneToOne);
     if (noOneToOne)
       return CFList();
   }

@@ -4,7 +4,6 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id$ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,6 +22,7 @@
 
 #include <coeffs/ffields.h>
 #include <coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
 
 #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
@@ -123,6 +123,9 @@ void sleftv::Print(leftv store, int spaces)
         case INTVEC_CMD:
         case INTMAT_CMD:
           ((intvec *)d)->show(t,spaces);
+          break;
+        case BIGINTMAT_CMD:
+          ((bigintmat *)d)->pprint(80);
           break;
         case RING_CMD:
         case QRING_CMD:
@@ -230,7 +233,7 @@ void sleftv::Print(leftv store, int spaces)
         case LIST_CMD:
         {
           lists l=(lists)d;
-          if (l->nr<0)
+          if (lSize(l)<0)
           {
              PrintNSpaces(spaces);
              PrintS("empty list\n");
@@ -384,6 +387,8 @@ static inline void * s_internalCopy(const int t,  void *d)
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)ivCopy((intvec *)d);
+    case BIGINTMAT_CMD:
+      return (void*)bimCopy((bigintmat *)d);
     case MATRIX_CMD:
       return (void *)mp_Copy((matrix)d, currRing);
     case IDEAL_CMD:
@@ -451,6 +456,12 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case INTMAT_CMD:
     {
       intvec *v=(intvec*)d;
+      delete v;
+      break;
+    }
+    case BIGINTMAT_CMD:
+    {
+      bigintmat *v=(bigintmat*)d;
       delete v;
       break;
     }
@@ -624,7 +635,7 @@ void sleftv::Copy(leftv source)
 
 void * sleftv::CopyD(int t)
 {
-  if ((rtyp!=IDHDL)&&(e==NULL))
+  if ((rtyp!=IDHDL)&&(rtyp!=ALIAS_CMD)&&(e==NULL))
   {
     if (iiCheckRing(t)) return NULL;
     void *x = data;
@@ -634,9 +645,9 @@ void * sleftv::CopyD(int t)
       const ring A = currRing->cf->extRing;
 
       assume( A != NULL );
-      assume( A->minideal != NULL );
+      assume( A->qideal != NULL );
 
-      x=(void *)p_Copy(A->minideal->m[0], A);
+      x=(void *)p_Copy(A->qideal->m[0], A);
     }
     data=NULL;
     return x;
@@ -821,6 +832,20 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           else
             return s;
         }
+        case BIGINTMAT_CMD:
+        {
+          bigintmat *bim=(bigintmat*)d;
+          s = bim->String();
+          if (typed)
+          {
+            char* ns = (char*) omAlloc0(strlen(s) + 40);
+            sprintf(ns, "bigintmat(bigintvec(%s),%d,%d)", s, bim->rows(), bim->cols());
+            omCheckAddr(ns);
+            return ns;
+          }
+          else
+            return omStrDup(s);
+        } 
 
         case RING_CMD:
         case QRING_CMD:
@@ -942,6 +967,9 @@ int  sleftv::Typ()
     case INTMAT_CMD:
       r=INT_CMD;
       break;
+    case BIGINTMAT_CMD:
+      r=BIGINT_CMD;
+      break;
     case IDEAL_CMD:
     case MATRIX_CMD:
     case MAP_CMD:
@@ -1054,9 +1082,9 @@ void * sleftv::Data()
           const ring A = currRing->cf->extRing;
 
           assume( A != NULL );
-          assume( A->minideal != NULL );
+          assume( A->qideal != NULL );
 
-          return (void *)A->minideal->m[0];
+          return (void *)A->qideal->m[0];
         }
         else
           return (void *)currRing->cf->nNULL;
@@ -1118,6 +1146,22 @@ void * sleftv::Data()
       }
       else
         r=(char *)(IMATELEM((*iv),index,e->next->start));
+      break;
+    }
+    case BIGINTMAT_CMD:
+    {
+      bigintmat *m=(bigintmat *)d;
+      if ((index<1)
+         ||(index>m->rows())
+         ||(e->next->start<1)
+         ||(e->next->start>m->cols()))
+      {
+        if (!errorreported)
+        Werror("wrong range[%d,%d] in bigintmat(%dx%d)",index,e->next->start,
+                                                     m->rows(),m->cols());
+      }
+      else
+        r=(char *)(BIMATELEM((*m),index,e->next->start));
       break;
     }
     case IDEAL_CMD:

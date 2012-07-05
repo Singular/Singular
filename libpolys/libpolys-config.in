@@ -68,11 +68,11 @@ while test $# -gt 0; do
 	;;
 
     --libsg)
-	${ECHOn} " -L${libdir} -L${libdir}/singular -lpolys_g @FACTORY_LIBS@ -lomalloc_g -lfindexec_g @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
+	${ECHOn} " -L${libdir} -L${libdir}/singular -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g @FACTORY_LIBS@ -lomalloc_g -lfindexec_g @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -L${libdir}/singular -lpolys @FACTORY_LIBS@ -lomalloc -lfindexec @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
+	${ECHOn} " -L${libdir} -L${libdir}/singular -lpolys -lcoeffs -lreporter -lmisc @FACTORY_LIBS@ -lomalloc -lfindexec @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
 	;;
 
     *)

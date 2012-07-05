@@ -29,26 +29,33 @@
 #include "cf_map_ext.h"
 #include "cf_random.h"
 #include "facHensel.h"
+#include "facMul.h"
 #include "cf_map.h"
 #include "cf_gcd_smallp.h"
 #include "facFqBivarUtil.h"
 #include "facFqBivar.h"
 #include "cfNewtonPolygon.h"
+#include "algext.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
 
-TIMING_DEFINE_PRINT(fac_uni_factorizer)
-TIMING_DEFINE_PRINT(fac_hensel_lift12)
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
 
-CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
+TIMING_DEFINE_PRINT(fac_fq_uni_factorizer)
+TIMING_DEFINE_PRINT(fac_fq_bi_hensel_lift)
+TIMING_DEFINE_PRINT(fac_fq_bi_factor_recombination)
+
+CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M, const modpk& b)
 {
   if (L.isEmpty())
     return 1;
   else if (L.length() == 1)
     return mod (L.getFirst()(0, 1) , M);
   else if (L.length() == 2)
-    return mod (mulNTL (L.getFirst()(0, 1),L.getLast()(0, 1)), M);
+    return mod (mulNTL (L.getFirst()(0, 1),L.getLast()(0, 1), b), M);
   else
   {
     int l= L.length()/2;
@@ -58,9 +65,9 @@ CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M)
     for (int j= 1; j <= l; j++, i++)
       tmp1.append (i.getItem());
     tmp2= Difference (L, tmp1);
-    buf1= prodMod0 (tmp1, M);
-    buf2= prodMod0 (tmp2, M);
-    return mod (mulNTL (buf1,buf2), M);
+    buf1= prodMod0 (tmp1, M, b);
+    buf2= prodMod0 (tmp2, M, b);
+    return mod (mulNTL (buf1,buf2, b), M);
   }
 }
 
@@ -142,31 +149,34 @@ CFList
 uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 {
   Variable x= A.mvar();
-  ASSERT (A.isUnivariate(), "univariate polynomial expected");
+  if (A.inCoeffDomain())
+    return CFList();
+  ASSERT (A.isUnivariate(),
+          "univariate polynomial expected or constant expected");
   CFFList factorsA;
-  ZZ p= to_ZZ (getCharacteristic());
-  ZZ_p::init (p);
+  zz_p::init (getCharacteristic());
   if (GF)
   {
-    Variable beta= rootOf (gf_mipo);
     int k= getGFDegree();
     char cGFName= gf_name;
+    CanonicalForm mipo= gf_mipo;
     setCharacteristic (getCharacteristic());
+    Variable beta= rootOf (mipo.mapinto());
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (gf_mipo);
-      ZZ_pE::init (NTLMipo);
-      ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (buf, NTLMipo);
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (mipo.mapinto());
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (buf, NTLMipo);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pEX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_pE multi= to_ZZ_pE (1);
-      factorsA= convertNTLvec_pair_ZZpEX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pEX_long NTLFactorsA= CanZass (NTLA);
+      zz_pE multi= to_zz_pE (1);
+      factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                          x, beta);
     }
     else
     {
-      GF2X NTLMipo= convertFacCF2NTLGF2X (gf_mipo);
+      GF2X NTLMipo= convertFacCF2NTLGF2X (mipo.mapinto());
       GF2E::init (NTLMipo);
       GF2EX NTLA= convertFacCF2NTLGF2EX (buf, NTLMipo);
       MakeMonic (NTLA);
@@ -187,13 +197,13 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   {
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLMipo= convertFacCF2NTLZZpX (getMipo (alpha));
-      ZZ_pE::init (NTLMipo);
-      ZZ_pEX NTLA= convertFacCF2NTLZZ_pEX (A, NTLMipo);
+      zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+      zz_pE::init (NTLMipo);
+      zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pEX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_pE multi= to_ZZ_pE (1);
-      factorsA= convertNTLvec_pair_ZZpEX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pEX_long NTLFactorsA= CanZass (NTLA);
+      zz_pE multi= to_zz_pE (1);
+      factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                            x, alpha);
     }
     else
@@ -210,13 +220,25 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   }
   else
   {
+#ifdef HAVE_FLINT
+    nmod_poly_t FLINTA;
+    convertFacCF2nmod_poly_t (FLINTA, A);
+    nmod_poly_factor_t result;
+    nmod_poly_factor_init (result);
+    mp_limb_t leadingCoeff= nmod_poly_factor (result, FLINTA);
+    factorsA= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, x);
+    if (factorsA.getFirst().factor().inCoeffDomain())
+      factorsA.removeFirst();
+    nmod_poly_factor_clear (result);
+    nmod_poly_clear (FLINTA);
+#else
     if (getCharacteristic() > 2)
     {
-      ZZ_pX NTLA= convertFacCF2NTLZZpX (A);
+      zz_pX NTLA= convertFacCF2NTLzzpX (A);
       MakeMonic (NTLA);
-      vec_pair_ZZ_pX_long NTLFactorsA= CanZass (NTLA);
-      ZZ_p multi= to_ZZ_p (1);
-      factorsA= convertNTLvec_pair_ZZpX_long2FacCFFList (NTLFactorsA, multi,
+      vec_pair_zz_pX_long NTLFactorsA= CanZass (NTLA);
+      zz_p multi= to_zz_p (1);
+      factorsA= convertNTLvec_pair_zzpX_long2FacCFFList (NTLFactorsA, multi,
                                                           x);
     }
     else
@@ -227,6 +249,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       factorsA= convertNTLvec_pair_GF2X_long2FacCFFList (NTLFactorsA, multi,
                                                           x);
     }
+#endif
   }
   CFList uniFactors;
   for (CFFListIterator i= factorsA; i.hasItem(); i++)
@@ -267,7 +290,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
   }
 
   DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, M) == F " <<
-            (LC (F, 1)*prodMod (factors, M) == F));
+            (mod (LC (F, 1)*prodMod (factors, M), M)/Lc (mod (LC (F, 1)*prodMod (factors, M), M)) == F/Lc (F)));
   int degMipoBeta= 1;
   if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
@@ -448,7 +471,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 CFList
 factorRecombination (CFList& factors, CanonicalForm& F,
                      const CanonicalForm& N, DegreePattern& degs, int s,
-                     int thres
+                     int thres, const modpk& b
                     )
 {
   if (factors.length() == 0)
@@ -462,8 +485,14 @@ factorRecombination (CFList& factors, CanonicalForm& F,
     F= 1;
     return result;
   }
-  DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
-            (LC (F, 1)*prodMod (factors, N) == F));
+#ifdef DEBUGOUTPUT
+  if (b.getp() == 0)
+    DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+              (mod (LC (F, 1)*prodMod (factors, N),N)/Lc (mod (LC (F, 1)*prodMod (factors, N),N)) == F/Lc(F)));
+  else
+    DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
+              (mod (b(LC (F, 1)*prodMod (factors, N)),N)/Lc (mod (b(LC (F, 1)*prodMod (factors, N)),N)) == F/Lc(F)));
+#endif
   CFList T, S;
 
   CanonicalForm M= N;
@@ -485,7 +514,13 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   TT= copy (factors);
   bool recombination= false;
   CanonicalForm test;
-  CanonicalForm buf0= buf (0, x)*LCBuf;
+  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
+  if (!isRat)
+    On (SW_RATIONAL);
+  CanonicalForm buf0= mulNTL (buf (0, x), LCBuf);
+  if (!isRat)
+    Off (SW_RATIONAL);
+  buf0= buf(0,x)*LCBuf;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -497,6 +532,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         {
           T.insert (LCBuf);
           g= prodMod (T, M);
+          if (b.getp() != 0)
+            g= b(g);
           T.removeFirst();
           result.append (g/content (g, x));
           F= 1;
@@ -517,14 +554,32 @@ factorRecombination (CFList& factors, CanonicalForm& F,
         continue;
       else
       {
+        if (!isRat)
+          On (SW_RATIONAL);
         test= prodMod0 (S, M);
-        test *= LCBuf;
-        test = mod (test, M);
-        if (fdivides (test, buf0))
+        if (!isRat)
         {
+          test *= bCommonDen (test);
+          Off (SW_RATIONAL);
+        }
+        test= mulNTL (test, LCBuf, b);
+        test= mod (test, M);
+        if (uniFdivides (test, buf0))
+        {
+          if (!isRat)
+            On (SW_RATIONAL);
           S.insert (LCBuf);
           g= prodMod (S, M);
           S.removeFirst();
+          if (!isRat)
+          {
+            g *= bCommonDen(g);
+            Off (SW_RATIONAL);
+          }
+          if (b.getp() != 0)
+            g= b(g);
+          if (!isRat)
+            On (SW_RATIONAL);
           g /= content (g, x);
           if (fdivides (g, buf, quot))
           {
@@ -535,7 +590,9 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             T= Difference (T, S);
             l -= degree (g);
             M= power (y, l);
-            buf0= buf (0, x)*LCBuf;
+            buf0= mulNTL (buf (0, x), LCBuf);
+            if (!isRat)
+              Off (SW_RATIONAL);
             // compute new possible degree pattern
             bufDegs2= DegreePattern (T);
             bufDegs1.intersect (bufDegs2);
@@ -561,6 +618,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
             indexUpdate (v, s, T.length(), nosubset);
             if (nosubset) break;
           }
+          if (!isRat)
+            Off (SW_RATIONAL);
         }
       }
     }
@@ -607,7 +666,7 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 {
   zz_p::init (getCharacteristic());
   zz_pX NTLIrredpoly;
-  int i, m;
+  int i=1, m= 2;
   // extension of F_p needed
   if (alpha.level() == 1 && beta.level() == 1 && k == 1)
   {
@@ -637,7 +696,8 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 void
 earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
                       factors, int& adaptedLiftBound, int*& factorsFoundIndex,
-                      DegreePattern& degs, bool& success, int deg)
+                      DegreePattern& degs, bool& success, int deg,
+                      const modpk& b)
 {
   DegreePattern bufDegs1= degs;
   DegreePattern bufDegs2;
@@ -649,32 +709,66 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
   int d= degree (F), l= 0;
+  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
+  if (!isRat)
+    On (SW_RATIONAL);
+  CanonicalForm buf0= mulNTL (buf (0,x), LCBuf);
+  CanonicalForm buf1= mulNTL (buf (1,x), LCBuf);
+  if (!isRat)
+    Off (SW_RATIONAL);
+  CanonicalForm test0, test1;
+
   for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
     if (!bufDegs1.find (degree (i.getItem(), 1)) || factorsFoundIndex[l] == 1)
       continue;
     else
     {
-      g= mulMod2 (i.getItem(), LCBuf, M);
-      g /= content (g, x);
-      if (fdivides (g, buf, quot))
+      test1= mod (mulNTL (i.getItem() (1,x), LCBuf, b), M);
+      if (uniFdivides (test1, buf1))
       {
-        reconstructedFactors.append (g);
-        factorsFoundIndex[l]= 1;
-        buf= quot;
-        d -= degree (g);
-        LCBuf= LC (buf, x);
-        T= Difference (T, CFList (i.getItem()));
-        F= buf;
-
-        // compute new possible degree pattern
-        bufDegs2= DegreePattern (T);
-        bufDegs1.intersect (bufDegs2);
-        bufDegs1.refine ();
-        if (bufDegs1.getLength() <= 1)
+        test0= mod (mulNTL (i.getItem() (0,x), LCBuf, b), M);
+        if (uniFdivides (test0, buf0))
         {
-          reconstructedFactors.append (buf);
-          break;
+          if (!isRat)
+            On (SW_RATIONAL);
+          g= mulMod2 (i.getItem(), LCBuf, M);
+          if (!isRat)
+          {
+            g *= bCommonDen(g);
+            Off (SW_RATIONAL);
+          }
+          if (b.getp() != 0)
+            g= b(g);
+          if (!isRat)
+            On (SW_RATIONAL);
+          g /= content (g, x);
+          if (fdivides (g, buf, quot))
+          {
+            reconstructedFactors.append (g);
+            factorsFoundIndex[l]= 1;
+            buf= quot;
+            d -= degree (g);
+            LCBuf= LC (buf, x);
+            buf0= mulNTL (buf (0,x), LCBuf);
+            buf1= mulNTL (buf (1,x), LCBuf);
+            if (!isRat)
+              Off (SW_RATIONAL);
+            T= Difference (T, CFList (i.getItem()));
+            F= buf;
+
+            // compute new possible degree pattern
+            bufDegs2= DegreePattern (T);
+            bufDegs1.intersect (bufDegs2);
+            bufDegs1.refine ();
+            if (bufDegs1.getLength() <= 1)
+            {
+              reconstructedFactors.append (buf);
+              break;
+            }
+          }
+          if (!isRat)
+            Off (SW_RATIONAL);
         }
       }
     }
@@ -858,7 +952,7 @@ CFList
 henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     earlyFactors, DegreePattern& degs, int& liftBound,
                     const CFList& uniFactors, const ExtensionInfo& info,
-                    const CanonicalForm& eval)
+                    const CanonicalForm& eval, modpk& b)
 {
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();
@@ -874,6 +968,33 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CFArray Pi;
   CFList diophant;
   CFList bufUniFactors= uniFactors;
+  CanonicalForm bufA= A;
+  CanonicalForm lcA0= 0;
+  bool mipoHasDen= false;
+  if (getCharacteristic() == 0 && b.getp() != 0)
+  {
+    if (alpha.level() == 1)
+    {
+      lcA0= lc (A (0, 2));
+      A *= b.inverse (lcA0);
+      A= b (A);
+      for (CFListIterator i= bufUniFactors; i.hasItem(); i++)
+        i.getItem()= b (i.getItem()*b.inverse (lc (i.getItem())));
+    }
+    else
+    {
+      lcA0= Lc (A (0,2));
+      On (SW_RATIONAL);
+      mipoHasDen= !bCommonDen(getMipo(alpha)).isOne();
+      Off (SW_RATIONAL);
+      CanonicalForm lcA0inverse= b.inverse (lcA0);
+      A *= lcA0inverse;
+      A= b (A);
+      // Lc of bufUniFactors is in Z
+      for (CFListIterator i= bufUniFactors; i.hasItem(); i++)
+        i.getItem()= b (i.getItem()*b.inverse (lc (i.getItem())));
+    }
+  }
   bufUniFactors.insert (LC (A, x));
   CFMatrix M= CFMatrix (liftBound, bufUniFactors.length() - 1);
   earlySuccess= false;
@@ -884,17 +1005,39 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   int * factorsFoundIndex= new int [uniFactors.length()];
   for (int i= 0; i < uniFactors.length(); i++)
     factorsFoundIndex [i]= 0;
-  CanonicalForm bufA= A;
 
+  CFList bufBufUniFactors;
+  Variable v= alpha;
   if (smallFactorDeg >= liftBound || degree (A,y) <= 4)
-    henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M);
+    henselLift12 (A, bufUniFactors, liftBound, Pi, diophant, M, b, true);
   else if (sizeOfLiftPre > 1 && sizeOfLiftPre < 30)
   {
-    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, b, true);
+    if (mipoHasDen)
+    {
+      for (CFListIterator iter= bufUniFactors; iter.hasItem(); iter++)
+        if (hasFirstAlgVar (iter.getItem(), v))
+          break;
+      if (v != alpha)
+      {
+        bufBufUniFactors= bufUniFactors;
+        for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+          iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        A= replacevar (A, alpha, v);
+      }
+    }
+
     if (!extension)
-      earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                            factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg);
+    {
+      if (v==alpha)
+        earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+                              factorsFoundIndex, degs, earlySuccess,
+                              smallFactorDeg, b);
+      else
+        earlyFactorDetection(earlyFactors, bufA, bufBufUniFactors, newLiftBound,
+                             factorsFoundIndex, degs, earlySuccess,
+                             smallFactorDeg, b);
+    }
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                factorsFoundIndex, degs, earlySuccess, info,
@@ -906,13 +1049,26 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       {
         bufUniFactors.insert (LC (A, x));
         henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
-                            liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M);
+                            liftPre[sizeOfLiftPre-1] + 1, Pi, diophant, M, b);
+        if (v!=alpha)
+        {
+          bufBufUniFactors= bufUniFactors;
+          for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+            iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        }
         if (!extension)
+        {
+          if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[sizeOfLiftPre-1] + 1);
+                                liftPre[sizeOfLiftPre-1] + 1, b);
+          else
+          earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess,
+                                liftPre[sizeOfLiftPre-1] + 1, b);
+        }
         else
-          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+          extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
                                    eval, liftPre[sizeOfLiftPre-1] + 1);
       }
@@ -927,13 +1083,26 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       {
         bufUniFactors.insert (LC (A, x));
         henselLiftResume12 (A, bufUniFactors, liftPre[i] + 1,
-                            liftPre[i-1] + 1, Pi, diophant, M);
+                            liftPre[i-1] + 1, Pi, diophant, M, b);
+        if (v!=alpha)
+        {
+          bufBufUniFactors= bufUniFactors;
+          for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+            iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        }
         if (!extension)
+        {
+          if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[i-1] + 1);
+                                liftPre[i-1] + 1, b);
+          else
+          earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess,
+                                liftPre[i-1] + 1, b);
+        }
         else
-          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+          extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
                                    eval, liftPre[i-1] + 1);
       }
@@ -950,11 +1119,31 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   }
   else
   {
-    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M);
+    henselLift12 (A, bufUniFactors, smallFactorDeg, Pi, diophant, M, b, true);
+    if (mipoHasDen)
+    {
+      for (CFListIterator iter= bufUniFactors; iter.hasItem(); iter++)
+        if (hasFirstAlgVar (iter.getItem(), v))
+          break;
+      if (v != alpha)
+      {
+        bufBufUniFactors= bufUniFactors;
+        for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+          iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        A= replacevar (A, alpha, v);
+      }
+    }
     if (!extension)
+    {
+      if (v==alpha)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg);
+                            smallFactorDeg, b);
+      else
+      earlyFactorDetection (earlyFactors, bufA, bufBufUniFactors, newLiftBound,
+                            factorsFoundIndex, degs, earlySuccess,
+                            smallFactorDeg, b);
+    }
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                factorsFoundIndex, degs, earlySuccess, info,
@@ -967,12 +1156,24 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
     {
       bufUniFactors.insert (LC (A, x));
       henselLiftResume12 (A, bufUniFactors, smallFactorDeg,
-                          dummy, Pi, diophant, M);
+                          dummy, Pi, diophant, M, b);
+      if (v!=alpha)
+      {
+        bufBufUniFactors= bufUniFactors;
+        for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+          iter.getItem()= replacevar (iter.getItem(), v, alpha);
+      }
       if (!extension)
+      {
+        if (v==alpha)
         earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                              factorsFoundIndex, degs, earlySuccess, dummy);
+                              factorsFoundIndex, degs, earlySuccess, dummy, b);
+        else
+        earlyFactorDetection (earlyFactors, bufA,bufBufUniFactors, newLiftBound,
+                              factorsFoundIndex, degs, earlySuccess, dummy, b);
+      }
       else
-        extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+        extEarlyFactorDetection (earlyFactors, bufA,bufUniFactors, newLiftBound,
                                  factorsFoundIndex, degs, earlySuccess, info,
                                  eval, dummy);
     }
@@ -983,12 +1184,24 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
         bufUniFactors.insert (LC (A, x));
         dummy= tmin (degree (A,y)+1, (degree (A,y)/4)*(i+1)+4);
         henselLiftResume12 (A, bufUniFactors, (degree (A,y)/4)*i + 4,
-                            dummy, Pi, diophant, M);
+                            dummy, Pi, diophant, M, b);
+        if (v!=alpha)
+        {
+          bufBufUniFactors= bufUniFactors;
+          for (CFListIterator iter= bufBufUniFactors; iter.hasItem(); iter++)
+            iter.getItem()= replacevar (iter.getItem(), v, alpha);
+        }
         if (!extension)
+        {
+          if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                                factorsFoundIndex, degs, earlySuccess, dummy);
+                                factorsFoundIndex, degs, earlySuccess, dummy,b);
+          else
+          earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
+                                factorsFoundIndex, degs, earlySuccess, dummy,b);
+        }
         else
-          extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
+          extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
                                    factorsFoundIndex, degs, earlySuccess, info,
                                    eval, dummy);
       }
@@ -1015,6 +1228,17 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   delete [] liftPre;
 
   return bufUniFactors;
+}
+
+CFList
+henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
+                    earlyFactors, DegreePattern& degs, int& liftBound,
+                    const CFList& uniFactors, const ExtensionInfo& info,
+                    const CanonicalForm& eval)
+{
+  modpk dummy= modpk();
+  return henselLiftAndEarly (A, earlySuccess, earlyFactors, degs, liftBound,
+                             uniFactors, info, eval, dummy);
 }
 
 long isReduced (const mat_zz_p& M)
@@ -1591,8 +1815,10 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -1665,7 +1891,6 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   l= tmax (l, 2);
   if (start > l)
     l= start;
-  int startl= l;
   int oldL= l/2;
   bool reduced= false;
   Variable y= F.mvar();
@@ -1759,8 +1984,8 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
                                    );
               buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -1783,7 +2008,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
           irreducible= true;
           break;
         }
-        if (isReduced (NTLN) && l > startl)
+        if (isReduced (NTLN))
         {
           reduced= true;
           break;
@@ -1883,8 +2108,10 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         {
 
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
 
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
@@ -1999,8 +2226,10 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
         for (int ii= 0; ii < factors.length() - 1; ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
 
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
@@ -2053,9 +2282,16 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                    int oldNumCols, int oldL, int precision
                   )
 {
-  bool irreducible= false;
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
   mat_zz_p NTLN;
@@ -2103,8 +2339,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -2114,7 +2352,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           CanonicalForm G= F;
@@ -2184,9 +2421,16 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                    int precision
                   )
 {
-  bool irreducible= false;
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
   mat_zz_pE NTLN;
@@ -2234,8 +2478,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -2245,10 +2491,11 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
-          return CFList (F);
+          CanonicalForm G= F;
+          F= 1;
+          return CFList (G);
         }
       }
     }
@@ -2317,9 +2564,16 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   bool GF= (CFFactory::gettype()==GaloisFieldDomain);
   int degMipo= degree (getMipo (info.getAlpha()));
   Variable alpha= info.getAlpha();
-  bool irreducible= false;
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
 
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
@@ -2413,8 +2667,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
                                    );
               buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -2434,13 +2688,13 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
 
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           Variable y= Variable (2);
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
           tmp= mapDown (tmp, info, source, dest);
           delete [] A;
           delete [] bounds;
+          F= 1;
           return CFList (tmp);
         }
       }
@@ -2506,9 +2760,14 @@ CFList
 increasePrecision2 (const CanonicalForm& F, CFList& factors,
                     const Variable& alpha, int precision)
 {
-  bool irreducible= false;
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    return CFList (F);
+  }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
   zz_p::init (getCharacteristic());
@@ -2557,8 +2816,10 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -2568,7 +2829,6 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
           return CFList (F);
@@ -2626,9 +2886,16 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
                         int precision
                        )
 {
-  bool irreducible= false;
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CanonicalForm G= F;
+    F= 1;
+    return CFList (G);
+  }
   int extensionDeg= degree (getMipo (alpha));
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
@@ -2677,8 +2944,10 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -2688,10 +2957,11 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           delete [] bounds;
-          return CFList (F);
+          CanonicalForm G= F;
+          F= 1;
+          return CFList (G);
         }
       }
     }
@@ -2756,7 +3026,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                   )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
@@ -2800,8 +3069,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -2811,7 +3082,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -2819,7 +3089,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       delete [] A;
       return CFList (F);
     }
@@ -2861,7 +3130,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                   )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
@@ -2902,8 +3170,10 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -2913,7 +3183,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -2921,7 +3190,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       delete [] A;
       return CFList (F);
     }
@@ -2967,7 +3235,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
                      )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2; //be careful
   bool hitBound= false;
@@ -3057,8 +3324,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
                                    );
               buf= getCoeffs (A[ii] [i], k, oldL, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -3078,7 +3345,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
 
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           Variable y= Variable (2);
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
@@ -3090,7 +3356,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     }
     if (NTLN.NumCols() == 1)
     {
-      irreducible= true;
       Variable y= Variable (2);
       CanonicalForm tmp= F (y - evaluation, y);
       CFList source, dest;
@@ -3139,7 +3404,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
                        )
 {
   CFList result= CFList();
-  bool irreducible= false;
   CFArray * A= new CFArray [factors.length()];
   int extensionDeg= degree (getMipo (alpha));
   int oldL2= oldL/2;
@@ -3181,8 +3445,10 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
         for (int ii= 0; ii < factors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -3192,7 +3458,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
         NTLN *= NTLK;
         if (NTLN.NumCols() == 1)
         {
-          irreducible= true;
           delete [] A;
           return CFList (F);
         }
@@ -3285,8 +3550,10 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -3421,8 +3688,10 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         for (int ii= 0; ii < bufFactors.length(); ii++)
         {
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_pE(C);
         NTLK= (*NTLC)*NTLN;
@@ -3610,8 +3879,8 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
                                    );
               buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, *NTLMat);
             }
+            writeInMatrix (C, buf, ii + 1, 0);
           }
-          writeInMatrix (C, buf, ii + 1, 0);
           if (GF)
             setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
         }
@@ -3760,8 +4029,10 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
         {
           CFArray buf;
           if (A[ii].size() - 1 >= i)
+          {
             buf= getCoeffs (A[ii] [i], k, alpha);
-          writeInMatrix (C, buf, ii + 1, 0);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
         }
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
@@ -4333,8 +4604,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   Variable y= F.mvar();
   Variable x= Variable (1);
   int d;
-  int* bounds= computeBounds (F, d);
-
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    return CFList (G);
+  }
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -4352,7 +4628,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   CanonicalForm H;
   bool success;
   smallFactors= sieveSmallFactors (F, bufUniFactors, degs, H, diophant, Pi, M,
-                                   success, 2*(minBound + 1)
+                                   success, minBound + 1
                                   );
 
   if (smallFactors.length() > 0)
@@ -4402,7 +4678,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   {
     F= H;
     delete [] bounds;
-    bounds= computeBounds (F, d);
+    bounds= computeBounds (F, d, isIrreducible);
+    if (isIrreducible)
+    {
+      smallFactors.append (F);
+      delete [] bounds;
+      return smallFactors;
+    }
     LCF= LC (F, 1);
 
     minBound= bounds[0];
@@ -4477,20 +4759,20 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   else
   {
     if (alpha.level() == 1)
-      oldL= liftAndComputeLattice (F, bounds, d, 2*(minBound + 1), liftBound,
+      oldL= liftAndComputeLattice (F, bounds, d, minBound + 1, liftBound,
                                    minBound, bufUniFactors, NTLN, diophant, M,
                                    Pi, bufQ, irreducible
                                   );
     else
     {
       if (reduceFq2Fp)
-        oldL= liftAndComputeLatticeFq2Fp (F, bounds, d, 2*(minBound + 1),
+        oldL= liftAndComputeLatticeFq2Fp (F, bounds, d, minBound + 1,
                                           liftBound, minBound, bufUniFactors,
                                           NTLN, diophant, M, Pi, bufQ,
                                           irreducible, alpha
                                          );
       else
-        oldL= liftAndComputeLattice (F, bounds, d, 2*(minBound + 1), liftBound,
+        oldL= liftAndComputeLattice (F, bounds, d, minBound + 1, liftBound,
                                      minBound, bufUniFactors, NTLNe, diophant,
                                      M, Pi, bufQ, irreducible
                                     );
@@ -4879,7 +5161,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   degs.refine();
 
   delete [] bounds;
-  bounds= computeBounds (F, d);
+  bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    result= Union (result, smallFactors);
+    result.append (F);
+    return result;
+  }
   minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -4986,7 +5275,13 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   CanonicalForm LCF= LC (F, 1);
 
   int d;
-  int* bounds= computeBounds (F, d);
+  bool isIrreducible= false;
+  int* bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    return CFList (F);
+  }
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -5058,7 +5353,16 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   {
     F= H;
     delete [] bounds;
-    bounds= computeBounds (F, d);
+    bounds= computeBounds (F, d, isIrreducible);
+    if (isIrreducible)
+    {
+      delete [] bounds;
+      CFList source, dest;
+      CanonicalForm tmp= F (y - evaluation, y);
+      tmp= mapDown (tmp, info, source, dest);
+      smallFactors.append (tmp);
+      return smallFactors;
+    }
     LCF= LC (F, 1);
 
     minBound= bounds[0];
@@ -5349,7 +5653,17 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   degs.refine();
 
   delete [] bounds;
-  bounds= computeBounds (F, d);
+  bounds= computeBounds (F, d, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    CFList source, dest;
+    CanonicalForm tmp= F (y - evaluation, y);
+    tmp= mapDown (tmp, info, source, dest);
+    smallFactors.append (tmp);
+    result= Union (result, smallFactors);
+    return result;
+  }
   minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -5451,8 +5765,10 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
+  
   //check trivial case
-  if (degree (A) == 1 || degree (A, 1) == 1)
+  if (degree (A) == 1 || degree (A, 1) == 1 || 
+      (size (A) == 2 && gcd (degree (A), degree (A,1)).isOne()))
   {
     factors.append (A);
 
@@ -5518,6 +5834,21 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
   }
 
+  int boundsLength;
+  bool isIrreducible= false;
+  int * bounds= computeBounds (A, boundsLength, isIrreducible);
+  if (isIrreducible)
+  {
+    delete [] bounds;
+    factors.append (A);
+
+    appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
+                          swap, false, N);
+
+    normalize (factors);
+    return factors;
+  }
+
   bool fail= false;
   CanonicalForm Aeval, evaluation, bufAeval, bufEvaluation, buf;
   CFList uniFactors, list, bufUniFactors;
@@ -5581,20 +5912,20 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       break;
 
     // univariate factorization
-    TIMING_START (fac_uni_factorizer);
+    TIMING_START (fac_fq_uni_factorizer);
     bufUniFactors= uniFactorizer (bufAeval, alpha, GF);
-    TIMING_END_AND_PRINT (fac_uni_factorizer,
+    TIMING_END_AND_PRINT (fac_fq_uni_factorizer,
                           "time for univariate factorization: ");
     DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
 
     if (!derivXZero && !fail2)
     {
-      TIMING_START (fac_uni_factorizer);
+      TIMING_START (fac_fq_uni_factorizer);
       bufUniFactors2= uniFactorizer (bufAeval2, alpha, GF);
-      TIMING_END_AND_PRINT (fac_uni_factorizer,
+      TIMING_END_AND_PRINT (fac_fq_uni_factorizer,
                             "time for univariate factorization in y: ");
-      DEBOUTLN (cerr, "Lc (Aeval2)*prod (uniFactors2)== Aeval2 " <<
+      DEBOUTLN (cerr, "Lc (bufAeval2)*prod (bufUniFactors2)== bufAeval2 " <<
                 (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
     }
 
@@ -5729,18 +6060,19 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
-  A= A (y + evaluation, y);
-
   int liftBound= degree (A, y) + 1;
 
-  int boundsLength;
-  int * bounds= computeBounds (A (y - evaluation, y), boundsLength);
+  if (swap2)
+    bounds= computeBounds (A, boundsLength, isIrreducible);
+
   int minBound= bounds[0];
   for (int i= 1; i < boundsLength; i++)
   {
     if (bounds[i] != 0)
       minBound= tmin (minBound, bounds[i]);
   }
+
+  A= A (y + evaluation, y);
 
   int degMipo= 1;
   if (extension && alpha.level() != 1 && k==1)
@@ -5752,11 +6084,11 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   {
     bool earlySuccess= false;
     CFList earlyFactors;
-    TIMING_START (fac_hensel_lift12);
+    TIMING_START (fac_fq_bi_hensel_lift);
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);
@@ -5775,7 +6107,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
   else if (degree (A) > 4 && beta.level() == 1 && (2*minBound)/degMipo < 32)
   {
-    TIMING_START (fac_hensel_lift12);
+    TIMING_START (fac_fq_bi_hensel_lift);
     if (extension)
     {
       CFList lll= extHenselLiftAndLatticeRecombi (A, uniFactors, info, degs,
@@ -5793,18 +6125,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs);
       factors= Union (lll, factors);
     }
-    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
   }
   else
   {
     bool earlySuccess= false;
     CFList earlyFactors;
-    TIMING_START (fac_hensel_lift12);
+    TIMING_START (fac_fq_bi_hensel_lift);
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_hensel_lift12, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);
@@ -5954,8 +6286,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       ExtensionInfo info2= ExtensionInfo (extension);
       factors= biFactorize (A, info2);
 
-      Variable vBuf= rootOf (gf_mipo);
+      CanonicalForm mipo= gf_mipo;
       setCharacteristic (getCharacteristic());
+      Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
     }
@@ -6034,8 +6367,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (ipower (p, extensionDeg) < (1<<16))
       // pass to GF(p^k+1)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         setCharacteristic (p, extensionDeg, 'Z');
         ExtensionInfo info2= ExtensionInfo (extension);
@@ -6043,8 +6377,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to another GF, pass to F_p(\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable vBuf= rootOf (gf_mipo);
+        Variable vBuf= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, vBuf);
         Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info2= ExtensionInfo (v, extension);
@@ -6063,8 +6398,9 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else // not able to pass to GF (p^2k), pass to F_p (\alpha)
       {
+        CanonicalForm mipo= gf_mipo;
         setCharacteristic (p);
-        Variable v1= rootOf (gf_mipo);
+        Variable v1= rootOf (mipo.mapinto());
         A= GF2FalphaRep (A, v1);
         Variable v2= chooseExtension (v1, v1, k);
         CanonicalForm primElem, imPrimElem;

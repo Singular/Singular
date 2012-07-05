@@ -7,8 +7,6 @@
  *
  * For more general information, see the documentation in misc_ip.h.
  *
- * @internal @version \$Id$
- *
  **/
 /*****************************************************************************/
 
@@ -261,7 +259,7 @@ lists primeFactorisation(const number n, const number pBound)
               }
               p_ui +=add;
               //add += 2; if (add == 6) add = 2;
-	      add =2+2*(add==2);
+              add =2+2*(add==2);
             }
             mpz_set_ui(nn,nn_ui);
             break;
@@ -678,14 +676,14 @@ BOOLEAN setOption(leftv res, leftv v)
     omFree((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);
-   
+
 #ifdef OM_SINGULAR_CONFIG_H
    // set global variable to show memory usage
   extern int om_sing_opt_show_mem;
   if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
   else om_sing_opt_show_mem = 0;
 #endif
-   
+
   return FALSE;
 }
 
@@ -1031,8 +1029,10 @@ void m2_end(int i)
       h = h->next;
     }
   }
-  if (i<=0)
+  if(!singular_in_batchmode)
   {
+    if (i<=0)
+    {
       if (TEST_V_QUIET)
       {
         if (i==0)
@@ -1040,20 +1040,18 @@ void m2_end(int i)
         else
           printf("\n$Bye.\n");
       }
-    //#ifdef sun
-    //  #ifndef __svr4__
-    //    _cleanup();
-    //    _exit(0);
-    //  #endif
-    //#endif
-    exit(0);
-  }
-  else
-  {
-      if(!singular_in_batchmode)
-      {
+      //#ifdef sun
+      //  #ifndef __svr4__
+      //    _cleanup();
+      //    _exit(0);
+      //  #endif
+      //#endif
+      i=0;
+    }
+    else
+    {
         printf("\nhalt %d\n",i);
-      }
+    }
   }
   #ifdef HAVE_MPSR
   if (MP_Exit_Env_Ptr!=NULL) (*MP_Exit_Env_Ptr)();
@@ -1089,7 +1087,6 @@ void siInit(char *name)
   On(SW_USE_EZGCD);
   On(SW_USE_CHINREM_GCD);
   //On(SW_USE_FF_MOD_GCD);
-  //On(SW_USE_fieldGCD);
   On(SW_USE_EZGCD_P);
   On(SW_USE_QGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
@@ -1114,7 +1111,7 @@ void siInit(char *name)
 #endif
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
-  
+
   extern int iiInitArithmetic(); iiInitArithmetic(); // iparith.cc
 
   basePack=(package)omAlloc0(sizeof(*basePack));
@@ -1127,14 +1124,14 @@ void siInit(char *name)
   basePackHdl=h;
 
   coeffs_BIGINT = nInitChar(n_Q,NULL);
-  
-#if 1 
+
+#if 1
    // def HAVE_POLYEXTENSIONS
   if(TRUE)
   {
     n_coeffType type = nRegister(n_algExt, naInitChar);
     assume(type == n_algExt);
-     
+
     type = nRegister(n_transExt, ntInitChar);
     assume(type == n_transExt);
   }

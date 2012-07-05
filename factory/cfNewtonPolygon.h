@@ -39,6 +39,15 @@ int ** newtonPolygon (const CanonicalForm& F,///< [in] a bivariate polynomial
                       int& sizeOfNewtonPoly  ///< [in, out] size of the result
                      );
 
+/// compute the convex hull of the support of two bivariate polynomials
+///
+/// @return an array of points in the plane which are the vertices of the convex
+///         hull of the support of F and G
+int ** newtonPolygon (const CanonicalForm& F,///< [in] a bivariate polynomial
+                      const CanonicalForm& G,///< [in] a bivariate polynomial
+                      int& sizeOfNewtonPoly  ///< [in, out] size of the result
+                     );
+
 /// check if @a point is inside a polygon described by points
 ///
 /// @return true if @a point is inside a polygon described by points
@@ -58,6 +67,15 @@ int* getRightSide (int** polygon,     ///<[in] vertices of a polygon
                    int& sizeOfOutput  ///<[in,out] size of the output
                   );
 
+/// computes the Newton polygon of F and checks if it satisfies the
+/// irreducibility criterion from S.Gao "Absolute irreducibility of polynomials
+/// via polytopes", Example 1
+///
+/// @return true if it satisfies the above criterion, false otherwise
+bool
+irreducibilityTest (const CanonicalForm& F ///<[in] a bivariate polynomial
+                   );
+
 #ifdef HAVE_NTL
 /// Algorithm 5 as described in Convex-Dense Bivariate Polynomial Factorization
 /// by Berthomieu, Lecerf
@@ -75,8 +93,10 @@ void convexDense (int** points,  ///< [in, out] a set of points in Z^2, returns
 CanonicalForm
 compress (const CanonicalForm& F, ///< [in] compressed, i.e. F.level()==2,
                                   ///< bivariate poly
-          mat_ZZ& inverseM,       ///< [in,out] returns the inverse of M
-          vec_ZZ& A               ///< [in,out] returns translation
+          mat_ZZ& inverseM,       ///< [in,out] returns the inverse of M,
+                                  ///< if computeMA==true, M otherwise
+          vec_ZZ& A,              ///< [in,out] returns translation
+          bool computeMA= true    ///< [in] whether to compute M and A
          );
 
 /// decompress a bivariate poly

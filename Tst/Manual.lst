@@ -1,5 +1,5 @@
 Manual/typeof.tst
-Manual/trace.tst
+Manual/_trace.tst
 Manual/janet.tst
 Manual/kbase.tst
 Manual/killattrib.tst
@@ -63,7 +63,7 @@ Manual/PBW_maxDeg.tst
 Manual/PBW_maxMonom.tst
 Manual/poly_expressions_BR_PLURAL_BR.tst
 Manual/pyobject.tst
-Manual/quotient.tst
+Manual/_quotient.tst
 Manual/random.tst
 Manual/rMacaulay.tst
 Manual/show.tst
@@ -327,7 +327,7 @@ Manual/integralSection.tst
 Manual/intInverse.tst
 Manual/intRank.tst
 Manual/is_active.tst
-Manual/isoncurve.tst
+Manual/_isoncurve.tst
 Manual/jordanmatrix.tst
 Manual/jordannf.tst
 Manual/katsura.tst
@@ -342,7 +342,7 @@ Manual/Max.tst
 Manual/maxabs.tst
 Manual/Miscellaneous_oddities_4.tst
 Manual/nameof.tst
-Manual/names.tst
+Manual/_names.tst
 Manual/Names_3.tst
 Manual/ncols.tst
 Manual/noether.tst
@@ -577,7 +577,7 @@ Manual/symmat.tst
 Manual/symmfunc.tst
 Manual/T_2.tst
 Manual/timestep.tst
-Manual/tjurina.tst
+Manual/_tjurina.tst
 Manual/toric_std.tst
 Manual/UpOneMatrix.tst
 Manual/VarToPar.tst
@@ -911,7 +911,7 @@ Manual/A_L.tst
 Manual/absPrimdecGTZ.tst
 Manual/annfspecial.tst
 Manual/autonom.tst
-Manual/center.tst
+Manual/_center.tst
 Manual/centralizer.tst
 Manual/centralizerVS.tst
 Manual/CentralSaturation.tst
@@ -920,7 +920,7 @@ Manual/coords.tst
 Manual/corank.tst
 Manual/createQuotientGroup.tst
 Manual/defineHomogeneous.tst
-Manual/depth.tst
+Manual/_depth.tst
 Manual/displayInvariants.tst
 Manual/evaluate_reynolds.tst
 Manual/exportNuminvs.tst
@@ -1003,7 +1003,7 @@ Manual/iv2lpMat.tst
 Manual/ivHilbert.tst
 Manual/lift_rel_kb.tst
 Manual/liftstd_BR_PLURAL_BR.tst
-Manual/lll.tst
+Manual/_lll.tst
 Manual/localInvar.tst
 Manual/lp2ivId.tst
 Manual/magnitude.tst
@@ -1241,13 +1241,13 @@ Manual/Adj_div.tst
 Manual/annfsBMI.tst
 Manual/EOrdlist.tst
 Manual/findInvo.tst
-Manual/invariantRing.tst
+Manual/_invariantRing.tst
 Manual/lpHilbert.tst
 Manual/lpOrdMisLex.tst
 Manual/sheafCoh.tst
 Manual/sheafCohBGG.tst
 Manual/charInfo.tst
-Manual/delta.tst
+Manual/_delta.tst
 Manual/G_a_-Invariants.tst
 Manual/lpDHilbert.tst
 Manual/lpSickle.tst

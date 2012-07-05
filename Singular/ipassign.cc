@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists
@@ -26,6 +24,7 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
+#include <coeffs/bigintmat.h>
 
 
 #include <polys/ext_fields/algext.h>
@@ -59,36 +58,36 @@
 
 
 /*=================== proc =================*/
-static BOOLEAN jjECHO(leftv res, leftv a)
+static BOOLEAN jjECHO(leftv, leftv a)
 {
   si_echo=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjPRINTLEVEL(leftv res, leftv a)
+static BOOLEAN jjPRINTLEVEL(leftv, leftv a)
 {
   printlevel=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjCOLMAX(leftv res, leftv a)
+static BOOLEAN jjCOLMAX(leftv, leftv a)
 {
   colmax=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjTIMER(leftv res, leftv a)
+static BOOLEAN jjTIMER(leftv, leftv a)
 {
   timerv=(int)((long)(a->Data()));
   initTimer();
   return FALSE;
 }
 #ifdef HAVE_GETTIMEOFDAY
-static BOOLEAN jjRTIMER(leftv res, leftv a)
+static BOOLEAN jjRTIMER(leftv, leftv a)
 {
   rtimerv=(int)((long)(a->Data()));
   initRTimer();
   return FALSE;
 }
 #endif
-static BOOLEAN jjMAXDEG(leftv res, leftv a)
+static BOOLEAN jjMAXDEG(leftv, leftv a)
 {
   Kstd1_deg=(int)((long)(a->Data()));
   if (Kstd1_deg!=0)
@@ -106,12 +105,12 @@ static BOOLEAN jjMAXMULT(leftv res, leftv a)
     test &=(~Sy_bit(OPT_MULTBOUND));
   return FALSE;
 }
-static BOOLEAN jjTRACE(leftv res, leftv a)
+static BOOLEAN jjTRACE(leftv, leftv a)
 {
   traceit=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjSHORTOUT(leftv res, leftv a)
+static BOOLEAN jjSHORTOUT(leftv, leftv a)
 {
   if (currRing != NULL)
   {
@@ -181,17 +180,17 @@ static void jjMINPOLY_red(idhdl h)
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
 }
-static BOOLEAN jjMINPOLY(leftv res, leftv a)
+static BOOLEAN jjMINPOLY(leftv, leftv a)
 {
   if( !nCoeff_is_transExt(currRing->cf) && (currRing->idroot == NULL) && n_IsZero((number)a->Data(), currRing->cf) )
   {
 #ifndef NDEBUG
     WarnS("Set minpoly over non-transcendental ground field to 0?!");
 #endif
-    return FALSE;    
+    return FALSE;
   }
-   
-   
+
+
   if ( !nCoeff_is_transExt(currRing->cf) )
   {
 //    return TRUE;
@@ -203,38 +202,38 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
   if ( currRing->idroot != NULL )
   {
 //    return TRUE;
-#ifndef NDEBUG      
+#ifndef NDEBUG
     idhdl p = currRing->idroot;
 
     WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
 
     while(p != NULL)
     {
-      Print(p->String(TRUE)); PrintLn();
+      PrintS(p->String(TRUE)); PrintLn();
       p = p->next;
-    }    
+    }
 #endif
   }
 
   assume (currRing->idroot==NULL);
-  
+
   number p = (number)a->CopyD(NUMBER_CMD);
 
   if (n_IsZero(p, currRing->cf))
   {
     n_Delete(&p, currRing);
 
-    
+
     if( nCoeff_is_transExt(currRing->cf) )
     {
-#ifndef NDEBUG      
+#ifndef NDEBUG
       WarnS("minpoly is already 0...");
 #endif
       return FALSE;
     }
 
     WarnS("cannot set minpoly to 0 / alg. extension?");
-    
+
 //    return TRUE;
   }
 
@@ -246,17 +245,20 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 #endif
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);
   }
-  
+
   n_Normalize(p, currRing->cf);
 
+  assume( currRing->cf->extRing->qideal == NULL );
+
   AlgExtInfo A;
-  
-  A.r = currRing->cf->extRing; // Use the same ground field!
-  A.i = idInit(1,1);
+
+  A.r = rCopy(currRing->cf->extRing); // Copy  ground field!
+  ideal q = idInit(1,1);
 
   assume( DEN((fractionObject *)(p)) == NULL ); // minpoly must be a poly...!?
-  
-  A.i->m[0] = NUM((fractionObject *)p);
+
+  q->m[0] = NUM((fractionObject *)p);
+  A.r->qideal = q;
 
 #if 0
   PrintS("\nTrying to conver the currRing into an algebraic field: ");
@@ -267,13 +269,14 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 #endif
 
   NUM((fractionObject *)p) = NULL; n_Delete(&p, currRing->cf);
-  
+
   coeffs new_cf = nInitChar(n_algExt, &A);
-  
+
   if (new_cf==NULL)
   {
     Werror("Could not construct the alg. extension: llegal minpoly?");
     // cleanup A: TODO
+    rDelete( A.r );
     return TRUE;
   }
   else
@@ -283,7 +286,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
 
   return FALSE;
 }
-static BOOLEAN jjNOETHER(leftv res, leftv a)
+static BOOLEAN jjNOETHER(leftv, leftv a)
 {
   poly p=(poly)a->CopyD(POLY_CMD);
   pDelete(&(currRing->ppNoether));
@@ -380,8 +383,40 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 {
   number p=(number)a->CopyD(BIGINT_CMD);
-  if (res->data!=NULL) n_Delete((number *)&res->data,coeffs_BIGINT);
-  res->data=(void *)p;
+  if (e==NULL)
+  {
+    if (res->data!=NULL) n_Delete((number *)&res->data,coeffs_BIGINT);
+    res->data=(void *)p;
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in bigintmat (%d,%d)",i+1,c,iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = p;
+      }
+    }
+  }
   jiAssignAttr(res,a);
   return FALSE;
 }
@@ -563,6 +598,13 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
   }
 #endif
 }
+static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr e)
+{
+  if (res->data!=NULL) delete ((bigintmat *)res->data);
+  res->data=(void *)a->CopyD(BIGINTMAT_CMD);
+  jiAssignAttr(res,a);
+  return FALSE;
+}
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
@@ -691,10 +733,11 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    int constIndex = idPosConstant(id);
-    if (constIndex != -1)
-    WerrorS("ideal contains constant; please modify ground field/ring instead");
-    return TRUE;
+    if (idPosConstant(id) != -1)
+    {
+      WerrorS("constant in q-ideal; please modify ground field/ring instead");
+      return TRUE;
+    }
   }
 #endif
 
@@ -798,8 +841,6 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   }
 
   int i=0;
-  BOOLEAN nok=FALSE;
-
   if (lt==DEF_CMD)
   {
     if (l->rtyp==IDHDL)
@@ -1009,6 +1050,7 @@ static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
     h=l->next;
     l->next=NULL;
     nok=jiAssign_1(l,&t);
+    l->next=h;
     if (nok) return TRUE;
     i++;
     l=h;
@@ -1042,6 +1084,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
     h=l->next;
     l->next=NULL;
     nok=jiAssign_1(l,&t);
+    l->next=h;
     t.CleanUp();
     if (nok)
     {
@@ -1163,6 +1206,55 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
   IDINTVEC((idhdl)l->data)=iv;
   return FALSE;
 }
+static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
+{
+  /* left side is bigintmat, right side is list (of int,intvec,intmat)*/
+  leftv hh=r;
+  int i = 0;
+  if (bim->length()==0) { WerrorS("bigintmat is 1x0"); delete bim; return TRUE; }
+  while (hh!=NULL)
+  {
+    if (i>=bim->cols()*bim->rows())
+    {
+      if (TEST_V_ALLWARN)
+      {
+        Warn("expression list length(%d) does not match bigintmat size(%d x %d)",
+              exprlist_length(hh),bim->rows(),bim->cols());
+      }
+      break;
+    }
+    if (hh->Typ() == INT_CMD)
+    {
+      number tp = n_Init((int)((long)(hh->Data())), coeffs_BIGINT);
+      bim->set(i++, tp);
+      n_Delete(&tp, coeffs_BIGINT);
+    }
+    else if (hh->Typ() == BIGINT_CMD)
+    {
+      bim->set(i++, (number)(hh->Data()));
+    }
+    /*
+    ((hh->Typ() == INTVEC_CMD)
+            ||(hh->Typ() == INTMAT_CMD))
+    {
+      intvec *ivv = (intvec *)(hh->Data());
+      int ll = 0,l = si_min(ivv->length(),iv->length());
+      for (; l>0; l--)
+      {
+        (*iv)[i++] = (*ivv)[ll++];
+      }
+    }*/
+    else
+    {
+      delete bim;
+      return TRUE;
+    }
+    hh = hh->next;
+  }
+  if (IDBIMAT((idhdl)l->data)!=NULL) delete IDBIMAT((idhdl)l->data);
+  IDBIMAT((idhdl)l->data)=bim;
+  return FALSE;
+}
 static BOOLEAN jjA_L_STRING(leftv l,leftv r)
 {
   /* left side is string, right side is list of string*/
@@ -1195,34 +1287,6 @@ static BOOLEAN jjA_L_STRING(leftv l,leftv r)
   s[sl]='\0';
   omFree((ADDRESS)IDDATA((idhdl)(l->data)));
   IDDATA((idhdl)(l->data))=s;
-  return FALSE;
-}
-static BOOLEAN jjA_LIST_L(leftv l,leftv r)
-{
-  /*left side are something, right side are lists*/
-  /*e.g. a,b,c=l */
-  //int ll=l->listLength();
-  if (l->listLength()==1) return jiAssign_1(l,r);
-  BOOLEAN nok;
-  sleftv t;
-  leftv h;
-  lists L=(lists)r->Data();
-  int rl=L->nr;
-  int i=0;
-
-  memset(&t,0,sizeof(sleftv));
-  while ((i<=rl)&&(l!=NULL))
-  {
-    memset(&t,0,sizeof(sleftv));
-    t.Copy(&L->m[i]);
-    h=l->next;
-    l->next=NULL;
-    nok=jiAssign_1(l,&t);
-    if (nok) return TRUE;
-    i++;
-    l=h;
-  }
-  r->CleanUp();
   return FALSE;
 }
 static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
@@ -1304,8 +1368,6 @@ static BOOLEAN jiA_STRING_L(leftv l,leftv r)
   /*e.g. s[2..3]="12" */
   /*the case s=t[1..4] is handled in iiAssign,
   * the case s[2..3]=t[3..4] is handled in iiAssgn_rec*/
-  int ll=l->listLength();
-  int rl=r->listLength();
   BOOLEAN nok=FALSE;
   sleftv t;
   leftv h,l1=l;
@@ -1584,6 +1646,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
       nok=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
       break;
     }
+    case BIGINTMAT_CMD:
+    {
+      nok=jjA_L_BIGINTMAT(l, r, new bigintmat(IDBIMAT((idhdl)l->data)));
+      break;
+    }
     case MAP_CMD:
     {
       // first element in the list sl (r) must be a ring
@@ -1747,7 +1814,7 @@ void jjNormalizeQRingId(leftv I)
       switch (I->Typ())
       {
         case IDEAL_CMD:
-	case MODUL_CMD:
+        case MODUL_CMD:
         {
           ideal F=idInit(1,1);
           ideal II=kNF(F,currQuotient,I0);

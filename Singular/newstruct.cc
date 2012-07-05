@@ -19,10 +19,21 @@ struct  newstruct_member_s
   int            pos;
 };
 
+struct newstruct_proc_s;
+typedef struct newstruct_proc_a *newstruct_proc;
+struct  newstruct_proc_a
+{
+  newstruct_proc next;
+  int            t; /*tok id */
+  int            args; /* number of args */
+  procinfov      p;
+};
+
 struct newstruct_desc_s
 {
   newstruct_member member;
   newstruct_desc   parent;
+  newstruct_proc   procs;
   int            size; // number of mebers +1
   int            id;   // the type id assigned to this bb
 };
@@ -95,16 +106,16 @@ lists lCopy_newstruct(lists L)
         N->m[n].data=idrecDataInit(L->m[n].rtyp);
       }
     }
+    else if(L->m[n].rtyp==LIST_CMD)
+    {
+      N->m[n].rtyp=L->m[n].rtyp;
+      N->m[n].data=(void *)lCopy((lists)(L->m[n].data));
+    }
     else if(L->m[n].rtyp>MAX_TOK)
     {
       N->m[n].rtyp=L->m[n].rtyp;
       blackbox *b=getBlackboxStuff(N->m[n].rtyp);
       N->m[n].data=(void *)b->blackbox_Copy(b,L->m[n].data);
-    }
-    else if(L->m[n].rtyp==LIST_CMD)
-    {
-      N->m[n].rtyp=L->m[n].rtyp;
-      N->m[n].data=(void *)lCopy((lists)(L->m[n].data));
     }
     else
       N->m[n].Copy(&L->m[n]);
@@ -112,7 +123,7 @@ lists lCopy_newstruct(lists L)
   if (currRing!=save_ring) rChangeCurrRing(save_ring);
   return N;
 }
-void * newstruct_Copy(blackbox*b, void *d)
+void * newstruct_Copy(blackbox*, void *d)
 {
   lists n1=(lists)d;
   return (void*)lCopy_newstruct(n1);
@@ -120,7 +131,6 @@ void * newstruct_Copy(blackbox*b, void *d)
 
 BOOLEAN newstruct_Assign(leftv l, leftv r)
 {
-  blackbox *ll=getBlackboxStuff(l->Typ());
   if (r->Typ()>MAX_TOK)
   {
     blackbox *rr=getBlackboxStuff(r->Typ());
@@ -168,94 +178,127 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
 
 BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 {
-  // interpreter: a1 is newstruct
+  // interpreter: a1 or a2 is newstruct
   blackbox *a=getBlackboxStuff(a1->Typ());
-  newstruct_desc nt=(newstruct_desc)a->data;
+  newstruct_desc nt;
   lists al=(lists)a1->Data();
-  switch(op)
+  if (a!=NULL)
   {
-    case '.':
+    nt=(newstruct_desc)a->data;
+    switch(op)
     {
-      if (a2->name!=NULL)
+      case '.':
       {
-        BOOLEAN search_ring=FALSE;
-        newstruct_member nm=nt->member;
-        while ((nm!=NULL)&&(strcmp(nm->name,a2->name)!=0)) nm=nm->next;
-        if ((nm==NULL) && (strncmp(a2->name,"r_",2)==0))
+        if (a2->name!=NULL)
         {
-          nm=nt->member;
-          while ((nm!=NULL)&&(strcmp(nm->name,a2->name+2)!=0)) nm=nm->next;
-          if ((nm!=NULL)&&(RingDependend(nm->typ)))
-            search_ring=TRUE;
-          else
-            nm=NULL;
-        }
-        if (nm==NULL)
-        {
-          Werror("member %s nor found", a2->name);
-          return TRUE;
-        }
-        if (search_ring)
-        {
-          ring r;
-          res->rtyp=RING_CMD;
-          res->data=al->m[nm->pos-1].data;
-          r=(ring)res->data;
-          if (r==NULL) { res->data=(void *)currRing; r=currRing; }
-          if (r!=NULL) r->ref++;
-          else Werror("ring of this member is not set and no basering found");
-          return r==NULL;
-        }
-        else if (RingDependend(nm->typ))
-        {
-          if (al->m[nm->pos].data==NULL)
+          BOOLEAN search_ring=FALSE;
+          newstruct_member nm=nt->member;
+          while ((nm!=NULL)&&(strcmp(nm->name,a2->name)!=0)) nm=nm->next;
+          if ((nm==NULL) && (strncmp(a2->name,"r_",2)==0))
           {
-            // NULL belongs to any ring
-            ring r=(ring)al->m[nm->pos-1].data;
-            if (r!=NULL)
+            nm=nt->member;
+            while ((nm!=NULL)&&(strcmp(nm->name,a2->name+2)!=0)) nm=nm->next;
+            if ((nm!=NULL)&&(RingDependend(nm->typ)))
+              search_ring=TRUE;
+            else
+              nm=NULL;
+          }
+          if (nm==NULL)
+          {
+            Werror("member %s nor found", a2->name);
+            return TRUE;
+          }
+          if (search_ring)
+          {
+            ring r;
+            res->rtyp=RING_CMD;
+            res->data=al->m[nm->pos-1].data;
+            r=(ring)res->data;
+            if (r==NULL) { res->data=(void *)currRing; r=currRing; }
+            if (r!=NULL) r->ref++;
+            else Werror("ring of this member is not set and no basering found");
+            return r==NULL;
+          }
+          else if (RingDependend(nm->typ))
+          {
+            if (al->m[nm->pos].data==NULL)
             {
-              r->ref--;
-              al->m[nm->pos-1].data=NULL;
-              al->m[nm->pos-1].rtyp=DEF_CMD;
+              // NULL belongs to any ring
+              ring r=(ring)al->m[nm->pos-1].data;
+              if (r!=NULL)
+              {
+                r->ref--;
+                al->m[nm->pos-1].data=NULL;
+                al->m[nm->pos-1].rtyp=DEF_CMD;
+              }
+            }
+            else
+            {
+              //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
+              if ((al->m[nm->pos-1].data!=(void *)currRing)
+              &&(al->m[nm->pos-1].data!=(void*)0L))
+              {
+                Werror("different ring %lx(data) - %lx(basering)",
+                  (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
+                return TRUE;
+              }
+            }
+            if ((currRing!=NULL)&&(al->m[nm->pos-1].data==NULL))
+            {
+              // remember the ring, if not already set
+              al->m[nm->pos-1].data=(void *)currRing;
+              al->m[nm->pos-1].rtyp=RING_CMD;
+              currRing->ref++;
             }
           }
+          Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
+          r->start = nm->pos+1;
+          memcpy(res,a1,sizeof(sleftv));
+          memset(a1,0,sizeof(sleftv));
+          if (res->e==NULL) res->e=r;
           else
           {
-            //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
-            if ((al->m[nm->pos-1].data!=(void *)currRing)
-            &&(al->m[nm->pos-1].data!=(void*)0L))
-            {
-              Werror("different ring %lx(data) - %lx(basering)",
-                (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
-              return TRUE;
-            }
+            Subexpr sh=res->e;
+            while (sh->next != NULL) sh=sh->next;
+            sh->next=r;
           }
-          if ((currRing!=NULL)&&(al->m[nm->pos-1].data==NULL))
-          {
-            // remember the ring, if not already set
-            al->m[nm->pos-1].data=(void *)currRing;
-            al->m[nm->pos-1].rtyp=RING_CMD;
-            currRing->ref++;
-          }
+          return FALSE;
         }
-        Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
-        r->start = nm->pos+1;
-        memcpy(res,a1,sizeof(sleftv));
-        memset(a1,0,sizeof(sleftv));
-        if (res->e==NULL) res->e=r;
         else
         {
-          Subexpr sh=res->e;
-          while (sh->next != NULL) sh=sh->next;
-          sh->next=r;
+          WerrorS("name expected");
+          return TRUE;
         }
-        return FALSE;
       }
-      else
-      {
-        WerrorS("name expected");
-        return TRUE;
-      }
+    }
+  }
+  else
+  {
+    a=getBlackboxStuff(a2->Typ());
+    nt=(newstruct_desc)a->data;
+    al=(lists)a2->Data();
+  }
+  newstruct_proc p=nt->procs;
+  while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(a1);
+    tmp.next=(leftv)omAlloc0(sizeof(sleftv));
+    tmp.next->Copy(a2);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl==NULL) return TRUE;
+    else
+    {
+      res->Copy(sl);
+      return FALSE;
     }
   }
   return blackboxDefaultOp2(op,res,a1,a2);
@@ -266,6 +309,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
 {
   // interpreter: args->1. arg is newstruct
   blackbox *a=getBlackboxStuff(args->Typ());
+  newstruct_desc nt=(newstruct_desc)a->data;
   switch(op)
   {
     case STRING_CMD:
@@ -275,10 +319,50 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
     default:
-      return blackbox_default_OpM(op,res,args);
       break;
   }
-  return TRUE;
+  newstruct_proc p=nt->procs;
+  while((p!=NULL) &&(p->t=op)&&(p->args!=4)) p=p->next;
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(args);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl==NULL) return TRUE;
+    else
+    {
+      res->Copy(sl);
+      return FALSE;
+    }
+  }
+  return blackbox_default_OpM(op,res,args);
+}
+
+void lClean_newstruct(lists l)
+{
+  if (l->nr>=0)
+  {
+    int i;
+    ring r=NULL;
+    for(i=l->nr;i>=0;i--)
+    {
+      if ((i>0) && (l->m[i-1].rtyp==RING_CMD))
+        r=(ring)(l->m[i-1].data);
+      else
+        r=NULL;
+      l->m[i].CleanUp(r);
+    }
+    omFreeSize((ADDRESS)l->m, (l->nr+1)*sizeof(sleftv));
+    l->nr=-1;
+  }
+  omFreeBin((ADDRESS)l,slists_bin);
 }
 
 void newstruct_destroy(blackbox *b, void *d)
@@ -286,7 +370,7 @@ void newstruct_destroy(blackbox *b, void *d)
   if (d!=NULL)
   {
     lists n=(lists)d;
-    n->Clean();
+    lClean_newstruct(n);
   }
 }
 
@@ -354,15 +438,38 @@ BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
   return FALSE;
 }
 
+void newstruct_Print(blackbox *b,void *d)
+{
+  newstruct_desc dd=(newstruct_desc)b->data;
+  newstruct_proc p=dd->procs;
+  while((p!=NULL)&&(p->t!=PRINT_CMD))
+    p=p->next;
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(tmp));
+    tmp.rtyp=dd->id;
+    tmp.data=(void*)newstruct_Copy(b,d);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+  }
+  else
+    blackbox_default_Print(b,d);
+}
 void newstruct_setup(const char *n, newstruct_desc d )
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   // all undefined entries will be set to default in setBlackboxStuff
-  // the default Print is quite usefule,
+  // the default Print is quite useful,
   // all other are simply error messages
   b->blackbox_destroy=newstruct_destroy;
   b->blackbox_String=newstruct_String;
-  //b->blackbox_Print=blackbox_default_Print;
+  b->blackbox_Print=newstruct_Print;//blackbox_default_Print;
   b->blackbox_Init=newstruct_Init;
   b->blackbox_Copy=newstruct_Copy;
   b->blackbox_Assign=newstruct_Assign;
@@ -488,4 +595,42 @@ newstruct_desc newstructChildFromString(const char *parent, const char *s)
   res->parent=parent_desc;
 
   return scanNewstructFromString(s,res);
+}
+void newstructShow(newstruct_desc d)
+{
+  newstruct_member elem;
+  Print("id: %d\n",d->id);
+  elem=d->member;
+  while (elem!=NULL)
+  {
+    Print(">>%s<< at pos %d, type %d\n",elem->name,elem->pos,elem->typ);
+    elem=elem->next;
+  }
+}
+
+BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinfov pr)
+{
+  int id=0;
+  blackboxIsCmd(bbname,id);
+  blackbox *bb=getBlackboxStuff(id);
+  newstruct_desc desc=(newstruct_desc)bb->data;
+  newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
+  p->next=desc->procs; desc->procs=p;
+  if(!IsCmd(func,p->t))
+  {
+    int t=0;
+    if (func[1]=='\0') p->t=func[0];
+    else if((t=iiOpsTwoChar(func))!=0)
+    {
+      p->t=t;
+    }
+    else
+    {
+      Werror(">>%s<< is not a kernel command",func);
+      return TRUE;
+    }
+  }
+  p->args=args;
+  p->p=pr; pr->ref++;
+  return FALSE;
 }

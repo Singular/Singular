@@ -397,7 +397,6 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   }
   mat_ZZ M;
   vec_ZZ S;
-  CanonicalForm oldF= F;
   F= compress (F, M, S);
   CanonicalForm pthRoot, A, tmp;
   CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, alpha);
@@ -577,7 +576,8 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
 /// @sa prodMod()
 CanonicalForm prodMod0 (const CFList& L,       ///< [in] a list of compressed,
                                                ///< bivariate polynomials
-                        const CanonicalForm& M ///< [in] a power of Variable (2)
+                        const CanonicalForm& M,///< [in] a power of Variable (2)
+                        const modpk& b= modpk()///< [in] coeff bound
                        );
 
 /// find an evaluation point p, s.t. F(p,y) is squarefree and
@@ -645,10 +645,11 @@ factorRecombination (
                 DegreePattern& degs,   ///< [in] degree pattern
                 int s,                 ///< [in] algorithm starts checking
                                        ///< subsets of size s
-                int thres              ///< [in] threshold for the size of
+                int thres,             ///< [in] threshold for the size of
                                        ///< subsets which are checked, for a
                                        ///< full factor recombination choose
                                        ///< thres= factors.length()/2
+                const modpk& b=modpk() ///< [in] coeff bound
                     );
 
 /// chooses a field extension.
@@ -693,7 +694,8 @@ earlyFactorDetection (
            DegreePattern& degs,    ///< [in,out] degree pattern, is updated
                                    ///< whenever we find a factor
            bool& success,          ///< [in,out] indicating success
-           int deg                 ///< [in] stage of Hensel lifting
+           int deg,                ///< [in] stage of Hensel lifting
+           const modpk& b= modpk() ///< [in] coeff bound
                      );
 
 /// detects factors of @a F at stage @a deg of Hensel lifting.
@@ -720,6 +722,29 @@ extEarlyFactorDetection (
         const CanonicalForm& eval, ///< [in] evaluation point
         int deg                    ///< [in] stage of Hensel lifting
                       );
+
+/// hensel Lifting and early factor detection
+///
+/// @return @a henselLiftAndEarly returns monic (wrt Variable (1)) lifted
+///         factors without factors which have been detected at an early stage
+///         of Hensel lifting
+/// @sa earlyFactorDetection(), extEarlyFactorDetection()
+
+CFList
+henselLiftAndEarly (
+        CanonicalForm& A,          ///< [in,out] poly to be factored,
+                                   ///< returns poly divided by detected factors
+                                   ///< in case of success
+        bool& earlySuccess,        ///< [in,out] indicating success
+        CFList& earlyFactors,      ///< [in,out] list of factors detected
+                                   ///< at early stage of Hensel lifting
+        DegreePattern& degs,       ///< [in,out] degree pattern
+        int& liftBound,            ///< [in,out] (adapted) lift bound
+        const CFList& uniFactors,  ///< [in] univariate factors
+        const ExtensionInfo& info, ///< [in] information about extension
+        const CanonicalForm& eval, ///< [in] evaluation point
+        modpk& b                   ///< [in] coeff bound
+                  );
 
 /// hensel Lifting and early factor detection
 ///

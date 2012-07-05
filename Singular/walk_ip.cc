@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: frwalk: interpreter link
 */
@@ -121,33 +120,33 @@ walkProc(leftv first, leftv second)
         case WalkIncompatibleRings:
           Werror("ring %s and current ring are incompatible\n",
                  first->Name() );
-          destIdeal= idInit(0,0);
+          destIdeal= NULL;
           break;
 
         case WalkIncompatibleDestRing:
           Werror( "Order of basering not allowed,\n must be a combination of a,A,lp,dp,Dp,wp,Wp,M and C.\n");
-          destIdeal= idInit(0,0);
+          destIdeal= NULL;
           break;
 
         case WalkIncompatibleSourceRing:
           Werror( "Order of %s not allowed,\n must be a combination of a,A,lp,dp,Dp,wp,Wp,M and C.\n",first->Name());
           rChangeCurrRing(destRing);
-          destIdeal= idInit(0,0);
+          destIdeal= NULL;
           break;
 
         case WalkNoIdeal:
           Werror( "Can't find ideal %s in ring %s.\n",
                    second->Name(), first->Name() );
-          destIdeal= idInit(0,0);
+          destIdeal= NULL;
           break;
 
         case WalkOverFlowError:
           Werror( "Overflow occured.\n");
-          destIdeal= idInit(0,0);
+          destIdeal= NULL;
           break;
 
         default:
-           destIdeal= idInit(1,1);
+           destIdeal= NULL;
     }
 
     return destIdeal;
@@ -233,14 +232,14 @@ fractalWalkProc(leftv first, leftv second)
             Werror( "ring %s and current ring are incompatible\n",
                      first->Name() );
             rChangeCurrRing(destRing);
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             return destIdeal;
             break;
 
         case WalkIncompatibleDestRing:
             Werror( "Order of basering not allowed,\n must be a combination of lp,dp,Dp,wp,Wp and C or just M.\n");
             rChangeCurrRing(destRing);
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             return destIdeal;
             break;
 
@@ -248,7 +247,7 @@ fractalWalkProc(leftv first, leftv second)
             Werror( "Order of %s not allowed,\n must be a combination of lp,dp,Dp,wp,Wp and C or just M.\n",
                      first->Name());
             rChangeCurrRing(destRing);
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             return destIdeal;
             break;
 
@@ -256,14 +255,14 @@ fractalWalkProc(leftv first, leftv second)
             Werror( "Can't find ideal %s in ring %s.\n",
                      second->Name(), first->Name() );
             rChangeCurrRing(destRing);
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             return destIdeal;
             break;
 
         case WalkOverFlowError:
             Werror( "Overflow occured in ring %s.\n", first->Name() );
             rChangeCurrRing(destRing);
-            destIdeal= idInit(0,0);
+            destIdeal= NULL;
             return destIdeal;
             break;
 

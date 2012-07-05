@@ -3,13 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: basic output
 */
 #include <stdio.h>
 #include <string.h>
 #include <misc/auxiliary.h>
+#include <findexec/feFopen.h>
 
 extern char*  feErrors;
 extern int    feErrorsLen;
@@ -18,7 +18,6 @@ extern int    pagelength, colmax;
 extern int    yy_blocklineno;
 extern int    yy_noeof;
 extern const char feNotImplemented[];
-extern BOOLEAN errorreported;
 extern int     feProt;
 extern BOOLEAN feWarn;
 extern BOOLEAN feOut;
@@ -44,7 +43,7 @@ extern "C" {
 #endif
 
 void    Werror(const char *fmt, ...) __attribute__((format(printf,1,2)));
-void    WerrorS(const char *s);
+void    WerrorS_batch(const char *s);
 void    WarnS(const char *s);
 void    Print(const char* fmt, ...) __attribute__((format(printf,1,2)));
 /* Print should not produce more than strlen(fmt)+510 characters! */
@@ -64,6 +63,8 @@ void    Warn(const char *fmt, ...);
 
 const char *  eati(const char *s, int *i);
 
+// Prints resources into string with StringAppend, etc
+void feStringAppendResources(int warn = -1);
 #endif /* c++ only */
 
 /* everything in between calls to these procedures is printed into a string
@@ -79,7 +80,6 @@ char* SPrintEnd();
 extern "C"
 {
 #endif
-extern void (*WerrorS_callback)(const char *s);
 extern int dReportError(const char* fmt, ...);
 #define dReportBug(s) \
   dReportError("Bug reported: %s\n occured at %s,%d\n", s, __FILE__, __LINE__)
