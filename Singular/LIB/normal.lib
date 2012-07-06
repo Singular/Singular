@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: normal.lib 14661 2012-03-05 11:00:14Z motsak $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -24,6 +24,8 @@ PROCEDURES:
  getSmallest(J);     computes the polynomial of smallest degree of J
  getOneVar(J, vari); computes a polynomial of J in the variable vari
  changeDenominator(U1, c1, c2, I); computes ideal U2 such that 1/c1*U1=1/c2*U2
+
+SEE ALSO: locnormal_lib;modnormal_lib
 ";
 
 LIB "general.lib";
