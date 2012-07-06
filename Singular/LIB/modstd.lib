@@ -385,6 +385,8 @@ proc primeTest(def II, bigint p)
       ideal I = II;
    }
 
+   I = simplify(I, 2);   // erase zero generators
+
    int i,j;
    poly f;
    number cnt;
