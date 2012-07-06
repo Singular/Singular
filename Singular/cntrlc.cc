@@ -406,7 +406,8 @@ void sigint_handler(int sig)
     {
       c = 'q';
     }
-    else if (((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
+    else if ((feOptSpec[FE_OPT_CNTRLC].value!=NULL)
+    && ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
     {
       c = ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0];
     }
