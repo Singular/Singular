@@ -37,7 +37,9 @@
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
-@item new library: realizationMatroids.lib (@nref{realizationMatroids_lib})
+@item new library: locnormal.lib: Normalization of affine domains using local methods (@nref{locnormal_lib})
+@item new library: modnormal.lib: Normalization of affine domains using modular methods (@nref{modnormal_lib})
+@item new library: realizationMatroids.lib: Deciding Relative Realizability for Tropical Fan Curves in 2-Dimensional Matroidal Fans (@nref{realizationMatroids_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
