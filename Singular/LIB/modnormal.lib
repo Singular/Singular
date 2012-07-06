@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: modnormal.lib 14273 2011-06-10 10:44:10Z steidel $";
+version="$Id$";
 category = "Commutative Algebra";
 info="
 LIBRARY:  modnormal.lib    Normalization of affine domains using modular methods
@@ -289,8 +289,7 @@ EXAMPLE: example modNormal; shows an example
   int lastPrime;
   while (ptn==0)
   {
-    L = primeList(I,k*n2+1, 536870909);
-    L = primeList(I,k*n2+1, 536870627);
+    L = primeList(I,k*n2+1,intvec(536870627),1);
     maxModularTime=0;
     totalModularTime = timer;
     if (k==1) {sh=0;} else {sh=1;}
