@@ -914,6 +914,8 @@ Comments should be send to the author of the library directly.
 * findifs_lib:: Tools for the finite difference schemes
 * finitediff_lib:: finite difference schemes for linear differential equations
 * lll_lib:: Integral LLL-Algorithm
+* locnormal_lib:: Normalization of affine domains using local methods
+* modnormal_lib:: Normalization of affine domains using modular methods
 * multigrading_lib:: Multigradings and related computations
 * parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
@@ -948,11 +950,19 @@ Issues:
 @c lib finitediff.lib
 
 @c ----------------------------------------------------------
-@node lll_lib, multigrading_lib, finitediff_lib, Experimental libraries
+@node lll_lib, locnormal_lib, finitediff_lib, Experimental libraries
 @subsection lll_lib
 @c lib lll.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,parallel_lib,lll_lib, Experimental libraries
+@node locnormal_lib, modnormal_lib, lll_lib, Experimental libraries
+@subsection locnormal_lib
+@c lib locnormal.lib
+@c ----------------------------------------------------------
+@node modnormal_lib, multigrading_lib, locnormal_lib, Experimental libraries
+@subsection modnormal_lib
+@c lib modnormal.lib
+@c ----------------------------------------------------------
+@node multigrading_lib,parallel_lib,modnormal_lib, Experimental libraries
 @subsection multigrading_lib
 
 Todos/Issues:
