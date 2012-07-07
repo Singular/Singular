@@ -25,11 +25,8 @@
 #include "cfNewtonPolygon.h"
 #include "algext.h"
 
-<<<<<<< HEAD
 #ifdef HAVE_NTL
-=======
 
->>>>>>> use 64 bits integers
 /// @return @a biFactorize returns a list of factors of F. If F is not monic
 ///         its leading coefficient is not outputted.
 CFList

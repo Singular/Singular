@@ -23,11 +23,8 @@
 #include "facFqSquarefree.h"
 #include "facFqBivarUtil.h"
 
-<<<<<<< HEAD
 #ifdef HAVE_NTL
-=======
 
->>>>>>> use 64 bits integers
 /// Factorization over a finite field
 ///
 /// @return @a multiFactorize returns a factorization of F

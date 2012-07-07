@@ -28,6 +28,22 @@ static int intgcd( int a, int b )
     return a;
 }
 
+static long intgcd( long a, long b )
+{
+    if ( a < 0 ) a = -a;
+    if ( b < 0 ) b = -b;
+
+    long c;
+
+    while ( b != 0 )
+    {
+        c = a % b;
+        a = b;
+        b = c;
+    }
+    return a;
+}
+
 
 InternalRational::InternalRational()
 {
@@ -52,6 +68,36 @@ InternalRational::InternalRational( const int n, const int d )
     else
     {
         int g = intgcd( n, d );
+        if ( d < 0 )
+        {
+          mpz_init_set_si( _num, -n / g );
+          mpz_init_set_si( _den, -d / g );
+        }
+        else
+        {
+          mpz_init_set_si( _num, n / g );
+          mpz_init_set_si( _den, d / g );
+        }
+    }
+}
+
+InternalRational::InternalRational( const long i )
+{
+    mpz_init_set_si( _num, i );
+    mpz_init_set_si( _den, 1 );
+}
+
+InternalRational::InternalRational( const long n, const long d )
+{
+    ASSERT( d != 0, "divide by zero" );
+    if ( n == 0 )
+    {
+        mpz_init_set_si( _num, 0 );
+        mpz_init_set_si( _den, 1 );
+    }
+    else
+    {
+        long g = intgcd( n, d );
         if ( d < 0 )
         {
           mpz_init_set_si( _num, -n / g );

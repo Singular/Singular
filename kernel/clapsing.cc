@@ -869,6 +869,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       else
       {
         //  over Q(a)
+        //out_cf ("F= ", F, "\n");
         L= factorize (F, a);
       }
     }

@@ -292,7 +292,7 @@ InternalInteger::divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF *
     ASSERT( invert || imm2int( c ) != 0,
             "math error: divide by zero" );
 
-    int intC = imm2int( c );
+    long intC = imm2int( c );
 
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
         mpz_t n, d;
