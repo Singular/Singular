@@ -38,7 +38,7 @@ public:
 
 static ext_entry * algextensions = 0;
 static char * var_names = 0;
-static char * var_names_ext = 0;
+       char * var_names_ext = 0;
 static char default_name = 'v';
 static char default_name_ext = 'a';
 

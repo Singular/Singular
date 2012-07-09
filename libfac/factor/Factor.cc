@@ -26,7 +26,7 @@ static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathema
 #include "Factor.h"
 
 #include "alg_factor.h"
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 void out_cff(CFFList &L);
 
 
@@ -61,19 +61,17 @@ CFFList factorize2 ( const CanonicalForm & f,
   }
   else
   {
-    bool repl=(f.mvar() != alpha);
     //out_cf("f2 - factor:",f,"\n");
     //out_cf("f2 - ext:",alpha,"\n");
     //out_cf("f2 - mipo:",mipo,"\n");
     Variable X=rootOf(mipo);
     CanonicalForm F=f;
-    if (repl) F=replacevar(f,alpha,X);
+    F=replacevar(f,alpha,X);
     //out_cf("call - factor:",F,"\n");
     //out_cf("call - ext:",X,"\n");
     //out_cf("call - mipo:",getMipo(X,'A'),"\n");
     CFFList L=factorize(F,X);
     CFFListIterator i=L;
-    if (repl)
     {
       CFFList Outputlist;
       for(;i.hasItem(); i++ )
@@ -82,9 +80,9 @@ CFFList factorize2 ( const CanonicalForm & f,
         replacevar(i.getItem().factor(),X,alpha),
         i.getItem().exp()));
       }
+      //out_cff(Outputlist);
       return Outputlist;
     }
-    else return L;
   }
 }
 ///////////////////////////////////////////////////////////////
@@ -465,7 +463,8 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
 }
 
 static int
-specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList & Substitutionlist, int i,int j){
+specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList & Substitutionlist, int i,int j)
+{
   Variable minpoly= Extension;
   int ok,extended= degree(Extension), working_over_extension;
 
@@ -474,12 +473,23 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
   else                    { working_over_extension = 0; extended = 1; }
   // First try:
   ok = try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
-  while ( ! ok ){ // we have to extend!
+  while ( ! ok ) // we have to extend!
+  {
+    SFormList origS=Substitutionlist;
     extended+= 1;
-    if ( ! working_over_extension ){
+    if ( ! working_over_extension )
+    {
       minpoly= rootOf(generate_mipo( extended,Extension ));
       Extension= minpoly;
       ok= try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
+      if (!ok)
+      {
+        Substitutionlist=origS;
+	// very bad hack: TODO
+	// we want to remove the newly created variable minpoly:
+        extern char *var_names_ext;
+        var_names_ext[strlen(var_names_ext)]='\0';
+      }
     }
     else
     {

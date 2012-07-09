@@ -1,5 +1,4 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in 14157 2011-04-14 08:21:34Z hannes $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +11,6 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in 14157 2011-04-14 08:21:34Z hannes $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -24,7 +22,7 @@ dnl #
 dnl # Change version here, do not believe the comment in the
 dnl # preceding lines.
 dnl #
-factory_version="3.1.4"
+factory_version="3.1.5"
 factory_configuration="'$ac_configure_args' in `pwd`"
 
 #
