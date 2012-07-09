@@ -17,7 +17,7 @@
 // some CC's need this:
 #include "alg_factor.h"
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 #ifdef ALGFACTORDEBUG
 #  define DEBUGOUTPUT
