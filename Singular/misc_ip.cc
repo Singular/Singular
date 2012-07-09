@@ -1024,13 +1024,17 @@ void m2_end(int i)
       h = h->next;
     }
   }
-  extern link_list ssiToBeClosed;
-  link_list hh=ssiToBeClosed;
-  while(hh!=NULL)
+  if (ssiToBeClosed_inactive)
   {
-    //Print("close %s\n",hh->l->name);
-    slClose(hh->l);
-    hh=ssiToBeClosed;
+    ssiToBeClosed_inactive=FALSE;
+
+    link_list hh=ssiToBeClosed;
+    while(hh!=NULL)
+    {
+      //Print("close %s\n",hh->l->name);
+      slClose(hh->l);
+      hh=ssiToBeClosed;
+    }
   }
   if (!singular_in_batchmode)
   {

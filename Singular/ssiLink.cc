@@ -72,6 +72,7 @@ typedef struct
 
 
 link_list ssiToBeClosed=NULL;
+BOOLEAN ssiToBeClosed_inactive=TRUE;
 #define SSI_BLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_sigmask, &ssi_oldmask)
 #define SSI_UNBLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_oldmask, NULL)
 

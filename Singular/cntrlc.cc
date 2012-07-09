@@ -85,13 +85,18 @@ void sig_pipe_hdl(int sig)
 
 void sig_term_hdl(int sig)
 {
- while (ssiToBeClosed!=NULL)
- {
-   slClose(ssiToBeClosed->l);
-   if (ssiToBeClosed==NULL) break;
-   ssiToBeClosed=(link_list)ssiToBeClosed->next;
- }
- exit(1);
+  if (ssiToBeClosed_inactive)
+  {
+    ssiToBeClosed_inactive=FALSE;
+    while (ssiToBeClosed!=NULL)
+    {
+      slClose(ssiToBeClosed->l);
+      if (ssiToBeClosed==NULL) break;
+      ssiToBeClosed=(link_list)ssiToBeClosed->next;
+    }
+    exit(1);
+  }
+  //else: we already shutting down: let's do m2_end ist work
 }
 
 /*---------------------------------------------------------------------*
