@@ -3,10 +3,6 @@
 ****************************************/
 
 //**************************************************************************/
-//
-// $Id$
-//
-//**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
 // for the original Copyright of this file and 'ndbm.h' see below .
 //

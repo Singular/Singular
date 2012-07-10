@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings

@@ -2,7 +2,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id$
 /*
 * ABSTRACT: interface between Singular and factory
 */

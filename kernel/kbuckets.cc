@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 #include <kernel/mod2.h>
 #include <kernel/structs.h>

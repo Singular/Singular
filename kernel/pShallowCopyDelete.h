@@ -6,7 +6,6 @@
  *  Purpose: implementation of pShallowCopyDelete routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 // returns a poly from dest_r which is a ShallowCopy of s_p from source_r

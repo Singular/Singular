@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: Declaration of the Groebner walk
 */

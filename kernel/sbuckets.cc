@@ -7,7 +7,6 @@
  *           a bucket sort
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 #include <kernel/mod2.h>
 

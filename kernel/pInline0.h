@@ -6,7 +6,6 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H

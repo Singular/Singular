@@ -4,7 +4,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 #include <kernel/ring.h>
 #include <kernel/gring.h>

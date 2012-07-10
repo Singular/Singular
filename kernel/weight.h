@@ -6,7 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Id$ */
 
 #include <kernel/structs.h>
 #include <kernel/ring.h>

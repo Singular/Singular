@@ -3,8 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT - multipolynomial resultants -
 *                                global definitions and debugging stuff

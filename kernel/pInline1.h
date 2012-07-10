@@ -6,7 +6,6 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H

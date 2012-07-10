@@ -6,7 +6,6 @@
  *  Purpose: Configuration for static p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef P_PROCS_STATIC_H

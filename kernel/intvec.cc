@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */

@@ -6,7 +6,6 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

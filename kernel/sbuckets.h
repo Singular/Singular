@@ -9,7 +9,6 @@
  *           use kbuckets, instead.
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H

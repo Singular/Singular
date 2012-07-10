@@ -4,8 +4,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id$ */
-
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
 *            ( root finder, vandermonde system solver, simplex )

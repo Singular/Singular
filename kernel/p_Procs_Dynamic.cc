@@ -6,7 +6,6 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 #include <kernel/mod2.h>
 #include <kernel/structs.h>

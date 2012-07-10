@@ -6,7 +6,6 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 
 #include <kernel/mod2.h>

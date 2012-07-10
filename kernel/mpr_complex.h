@@ -3,8 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
 *            and complex numbers based on pairs of real floating-point numbers

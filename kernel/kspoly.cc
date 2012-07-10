@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */

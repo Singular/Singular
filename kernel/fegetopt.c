@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /* Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what

@@ -1,5 +1,4 @@
 /*
- * $Id$
  * part of modgen
  */
 

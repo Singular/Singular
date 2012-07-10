@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp

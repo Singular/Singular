@@ -6,7 +6,6 @@
  *  Purpose: declaration for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef DERROR_H
 #define DERROR_H

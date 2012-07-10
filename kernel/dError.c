@@ -6,7 +6,6 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C

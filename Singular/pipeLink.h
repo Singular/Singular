@@ -4,7 +4,6 @@
 /***************************************************************
  * File:    pipeLink.h
  *  Purpose: declaration of sl_link routines for pipe
- *  Version: $Id$
  ***************************************************************/
 #ifndef PIPELINK_H
 #define PIPELINK_H

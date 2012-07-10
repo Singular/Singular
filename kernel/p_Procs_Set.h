@@ -11,7 +11,6 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 #include <kernel/modulop.h>
 

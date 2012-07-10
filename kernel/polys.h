@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing

@@ -3,7 +3,6 @@
  *
  *  tmult.cc: p_Mult_nn with pthreads - experimental
  *
- *  Version: $Id$
  *******************************************************************/
 #include <kernel/mod2.h>
 #include <kernel/structs.h>

@@ -6,7 +6,6 @@
  *  Purpose: macros for memory addition
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef P_MEM_COPY_H
 #define P_MEM_COPY_H

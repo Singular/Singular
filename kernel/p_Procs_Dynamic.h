@@ -7,7 +7,6 @@
  *  Purpose: Configuration for p_Procs as dynamic library procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef P_PROCS_DYNAMIC_H

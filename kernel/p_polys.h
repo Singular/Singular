@@ -7,7 +7,6 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H

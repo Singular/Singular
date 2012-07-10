@@ -7,8 +7,6 @@
  *          (bareis, ...)
  *
  *******************************************************************/
-/* $Id$ */
-
 
 poly smMult(poly, poly);
 void smPolyDiv(poly, poly);

@@ -6,7 +6,6 @@
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
  *  Created:
- *  Version: $Id$
  *******************************************************************/
 
 

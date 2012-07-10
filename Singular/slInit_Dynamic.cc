@@ -6,7 +6,6 @@
  *  Purpose: link initialization for dynamic linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 
 /***************************************************************

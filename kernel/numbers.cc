@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics

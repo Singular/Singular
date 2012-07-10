@@ -7,7 +7,6 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 

@@ -3,7 +3,6 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id$ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes

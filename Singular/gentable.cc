@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
-
 /*
 * ABSTRACT: generate iparith.inc etc.
 */

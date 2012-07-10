@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 #include <kernel/structs.h>
 #include <kernel/p_Procs.h>
 #include <kernel/pShallowCopyDelete.h>

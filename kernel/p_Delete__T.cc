@@ -6,7 +6,6 @@
  *  Purpose: template for p_Delete
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 LINKAGE void p_Delete(poly* pp, const ring r)

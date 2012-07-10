@@ -6,7 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Id$ */
 #include <kernel/structs.h>
 
 BOOLEAN nrGreaterZero (number k);

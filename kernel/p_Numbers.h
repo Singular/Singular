@@ -6,7 +6,6 @@
  *  Purpose: macros/inline functions for number operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H

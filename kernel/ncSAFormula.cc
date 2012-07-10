@@ -6,7 +6,6 @@
  *  Purpose: implementation of multiplication by formulas in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

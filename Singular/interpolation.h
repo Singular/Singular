@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: ideals of points (with multiplicities)
 */

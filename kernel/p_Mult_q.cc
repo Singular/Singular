@@ -6,7 +6,6 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #include <kernel/mod2.h>
 

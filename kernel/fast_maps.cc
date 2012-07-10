@@ -6,7 +6,6 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id$
  *******************************************************************/
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>

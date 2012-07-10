@@ -6,7 +6,6 @@
  *  Purpose: declarations of link initialization functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef SL_INIT_H
 #define SL_INIT_H
