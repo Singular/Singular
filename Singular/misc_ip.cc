@@ -1073,25 +1073,25 @@ void m2_end(int i)
   mmEndStat();
   #endif
   fe_reset_input_mode();
-  idhdl h = currPack->idroot;
-  while(h != NULL)
-  {
-    if(IDTYP(h) == LINK_CMD)
-    {
-      idhdl hh=h->next;
-      //Print("kill %s\n",IDID(h));
-      killhdl(h, currPack);
-      h = hh;
-    }
-    else
-    {
-      h = h->next;
-    }
-  }
   if (ssiToBeClosed_inactive)
   {
     ssiToBeClosed_inactive=FALSE;
 
+    idhdl h = currPack->idroot;
+    while(h != NULL)
+    {
+      if(IDTYP(h) == LINK_CMD)
+      {
+        idhdl hh=h->next;
+        //Print("kill %s\n",IDID(h));
+        killhdl(h, currPack);
+        h = hh;
+      }
+      else
+      {
+        h = h->next;
+      }
+    }
     link_list hh=ssiToBeClosed;
     while(hh!=NULL)
     {
