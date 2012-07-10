@@ -70,7 +70,6 @@ typedef struct
 
 } ssiInfo;
 
-
 link_list ssiToBeClosed=NULL;
 BOOLEAN ssiToBeClosed_inactive=TRUE;
 #define SSI_BLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_sigmask, &ssi_oldmask)
@@ -1733,6 +1732,46 @@ si_link ssiCommandLink()
   }
   return l;
 }
+/*---------------------------------------------------------------------*/
+/**
+ * @brief additional default signal handler
+
+  // some newer Linux version cannot have SIG_IGN for SIGCHLD,
+  // so use this nice routine here:
+  //  SuSe 9.x reports -1 always
+  //  Redhat 9.x/FC x reports sometimes -1
+  // see also: hpux_system
+  // also needed by getrusage (timer etc.)
+
+ @param[in] sig
+**/
+/*---------------------------------------------------------------------*/
+void sig_chld_hdl(int sig)
+{
+  pid_t kidpid;
+  int status;
+
+  while ((kidpid = waitpid(-1, &status, WNOHANG)) > 0)
+  {
+     //printf("Child %ld terminated\n", kidpid);
+     link_list hh=ssiToBeClosed;
+     while(hh!=NULL)
+     {
+       if((hh->l!=NULL) && (hh->l->m->Open==ssiOpen))
+       {
+          ssiInfo *d = (ssiInfo *)hh->l->data;
+          if(d->pid==kidpid)
+          {
+            slClose(hh->l); 
+            hh=ssiToBeClosed;
+          }
+          else hh=(link_list)hh->next;
+       }
+       else hh=(link_list)hh->next;
+     }
+  }
+}
+
 // ----------------------------------------------------------------
 // format
 // 1 int %d

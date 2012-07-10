@@ -26,6 +26,7 @@
 #include <Singular/feOpt.h>
 #include <Singular/version.h>
 #include <Singular/silink.h>
+#include <Singular/ssiLink.h>
 
 /* undef, if you don't want GDB to come up on error */
 
@@ -230,25 +231,6 @@ void sigsegv_handler(int sig, sigcontext s)
   exit(0);
 }
 
-/*---------------------------------------------------------------------*/
-/**
- * @brief additional default signal handler
-
-  // some newer Linux version cannot have SIG_IGN for SIGCHLD,
-  // so use this nice routine here:
-  //  SuSe 9.x reports -1 always
-  //  Redhat 9.x/FC x reports sometimes -1
-  // see also: hpux_system
-  // also needed by getrusage (timer etc.)
-
- @param[in] sig
-**/
-/*---------------------------------------------------------------------*/
-void sig_chld_hdl(int sig)
-{
-  waitpid(-1,NULL,WNOHANG);
-}
-
 /*2
 * init signal handlers, linux/i386 version
 */
@@ -323,7 +305,7 @@ void init_signals()
   si_set_signal(SIGILL, sigsegv_handler);
   si_set_signal(SIGIOT, sigsegv_handler);
   si_set_signal(SIGINT ,sigint_handler);
-  si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
   si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
 }
 #else
