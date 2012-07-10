@@ -563,6 +563,7 @@ proc ord_test (r)
 "USAGE:   ord_test(r);  r ring/qring
 RETURN:  int 1 (resp. -1, resp. 0) if ordering of r is global (resp. local,
          resp. mixed)
+SEE ALSO: attrib
 EXAMPLE: example ord_test; shows an example
 "
 {
