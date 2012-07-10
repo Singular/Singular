@@ -1767,9 +1767,9 @@ void sig_chld_hdl(int sig)
               ssiToBeClosed_inactive=FALSE;
               slClose(hh->l);
               ssiToBeClosed_inactive=TRUE;
-              hh=ssiToBeClosed;
+              break;
             }
-            else return;
+            else break;
           }
           else hh=(link_list)hh->next;
        }
