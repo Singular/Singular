@@ -294,12 +294,20 @@ imm_mul ( InternalCF * lhs, InternalCF * rhs )
     long a = imm2int( lhs );
     long b = imm2int( rhs );
     INT64 result = (INT64)a * (INT64)b;
+    #if SIZEOF_LONG == 4
+    if ((result>(INT64)MAXIMMEDIATE)||(result<(INT64)MINIMMEDIATE))
+    {
+        InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
+        return res->mulcoeff( rhs );
+    }
+    #else
     if ( ( a!=0L ) && ((result/a!=b)
       ||(result>MAXIMMEDIATE)||(result<MINIMMEDIATE) ) )
     {
         InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );
     }
+    #endif
     else
         return int2imm( result );
 }
