@@ -594,14 +594,14 @@ modNormal(i,1);
 
 
 ring s24 = 0,(x,y),dp;
-int a=7;
+int a=8;
 ideal i = ((x-1)^a-y^3)*((x+1)^a-y^3)*((x)^a-y^3)*((x-2)^a-y^3)*((x+2)^a-y^3)+y^15;
 
 //locNormal(i);
 modNormal(i,1);
 
 ring s24 = 0,(x,y),dp;
-int a=7;
+int a=9;
 ideal i = ((x-1)^a-y^3)*((x+1)^a-y^3)*((x)^a-y^3)*((x-2)^a-y^3)*((x+2)^a-y^3)+y^15;
 
 //locNormal(i);
