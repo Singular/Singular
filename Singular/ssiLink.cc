@@ -1006,6 +1006,7 @@ BOOLEAN ssiClose(si_link l)
 {
   if (l!=NULL)
   {
+    SI_LINK_SET_CLOSE_P(l);
     ssiInfo *d = (ssiInfo *)l->data;
     if (d!=NULL)
     {
@@ -1055,7 +1056,7 @@ BOOLEAN ssiClose(si_link l)
               omFreeSize(hhh,sizeof(link_struct));
               break;
             }
-	    else
+            else
               hh=(link_list)hh->next;
           }
         }
@@ -1063,7 +1064,6 @@ BOOLEAN ssiClose(si_link l)
       omFreeSize((ADDRESS)d,(sizeof *d));
     }
     l->data=NULL;
-    SI_LINK_SET_CLOSE_P(l);
   }
   return FALSE;
 }
@@ -1762,8 +1762,14 @@ void sig_chld_hdl(int sig)
           ssiInfo *d = (ssiInfo *)hh->l->data;
           if(d->pid==kidpid)
           {
-            slClose(hh->l); 
-            hh=ssiToBeClosed;
+            if(ssiToBeClosed_inactive)
+            {
+              ssiToBeClosed_inactive=FALSE;
+              slClose(hh->l);
+              ssiToBeClosed_inactive=TRUE;
+              hh=ssiToBeClosed;
+            }
+            else return;
           }
           else hh=(link_list)hh->next;
        }
