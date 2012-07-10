@@ -46,7 +46,7 @@ poly p_Tail(const poly p, const ring r);
 /// NOTE: the resulting rank is autocorrected
 ideal id_Tail(const ideal id, const ring r);
 
-/// inplace sorting of the module (ideal) id wrt >_(c,ds)
+/// inplace sorting of the module (ideal) id wrt <_(c,ds)
 void Sort_c_ds(const ideal id, const ring r);
 
 
@@ -94,9 +94,15 @@ class SchreyerSyzygyComputation
     /// The result is stored into m_syzLeads
     void ComputeLeadingSyzygyTerms(bool bComputeSecondTerms = true);
 
+    // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
     poly FindReducer(poly product, poly syzterm);
+    
     poly SchreyerSyzygyNF(poly syz_lead, poly syz_2);
+
+    // TODO: store m * @tail -.-^-.-^-.--> ?
     poly TraverseTail(poly multiplier, poly tail);
+
+    // TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
     poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck);
 
     
