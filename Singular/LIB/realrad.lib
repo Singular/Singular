@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: realrad.lib 13597 2010-11-05 09:40:57Z hannes $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals

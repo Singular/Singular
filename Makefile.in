@@ -686,9 +686,7 @@ windist: ${SINGULAR}
 srcdist:
 	rm -rf ${SI_TMPDIR}
 	${MKINSTALLDIRS} ${SI_TMPDIR}
-	svnversion >svnver
 	cd ${SI_TMPDIR}; svn export http://www.singular.uni-kl.de/svn/trunk Singular-${S_VERSION}
-	mv svnver ${SI_TMPDIR}/Singular-${S_VERSION}/Singular/svnver
 	cd  ${SI_TMPDIR}/Singular-${S_VERSION}/Singular; sleep 2;\
 	touch  grammar.cc;\
 	touch  scanner.cc;\

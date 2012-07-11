@@ -734,9 +734,9 @@ char * showOption()
 char * versionString()
 {
   char* str = StringSetS("");
-  StringAppend("Singular for %s version %s (%d-%s)  %s\nwith\n",
+  StringAppend("Singular for %s version %s (%d)  %s\nwith\n",
                S_UNAME, S_VERSION1, SINGULAR_VERSION,
-               feVersionId,singular_date);
+               singular_date);
   StringAppendS("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);

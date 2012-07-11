@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: resgraph.lib 12231 2009-11-02 10:12:22Z hannes $";
 category="Visualization";
 info="
 LIBRARY:  resgraph.lib            Visualization of Resolution Data

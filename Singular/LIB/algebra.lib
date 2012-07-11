@@ -2,7 +2,7 @@
 //help for finitenessTest and mapIsFinite edited
 //new proc  nonZeroEntry(id), used to fix a bug in proc finitenessTest
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: algebra.lib 14661 2012-03-05 11:00:14Z motsak $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps

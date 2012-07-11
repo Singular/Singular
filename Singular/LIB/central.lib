@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: central.lib 13733 2010-12-06 13:30:59Z hannes $";
 category="Noncommutative";
 info="
 LIBRARY:  central.lib      Computation of central elements of GR-algebras

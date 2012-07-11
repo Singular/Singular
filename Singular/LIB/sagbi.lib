@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: sagbi.lib 14661 2012-03-05 11:00:14Z motsak $";
 category="Commutative Algebra";
 info="
 LIBRARY: sagbi.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra

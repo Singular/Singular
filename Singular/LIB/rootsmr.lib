@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: rootsmr.lib 13499 2010-10-15 09:55:26Z hannes $";
 category="Teaching";
 info="
 LIBRARY: rootsmr.lib Counting the number of real roots of polynomial systems

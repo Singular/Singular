@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id$";
+version="$Id: factor.lib 13499 2010-10-15 09:55:26Z hannes $";
 info="
 LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
 

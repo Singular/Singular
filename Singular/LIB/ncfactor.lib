@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////
-version = "$Id$";
+version = "$Id: ncfactor.lib 14196 2011-05-04 17:50:18Z hannes $";
 category="Noncommutative";
 info="
 LIBRARY: ncfactor.lib  Tools for factorization in some noncommutative algebras

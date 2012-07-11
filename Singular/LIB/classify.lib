@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id$";
+version  = "$Id: classify.lib 14661 2012-03-05 11:00:14Z motsak $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities

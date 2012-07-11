@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: mondromy.lib 14192 2011-05-04 14:45:40Z hannes $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity

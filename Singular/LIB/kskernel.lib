@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: kskernel.lib 12231 2009-11-02 10:12:22Z hannes $";
 category="General purpose";
 info="
 LIBRARY:  kskernel.lib   PROCEDURES FOR COMPUTING THE KERNEL

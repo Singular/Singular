@@ -1,5 +1,5 @@
 //
-version="$Id$";
+version="$Id: absfact.lib 14191 2011-05-04 13:11:46Z hannes $";
 category="Factorization";
 info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0

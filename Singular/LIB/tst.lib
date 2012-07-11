@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id$";
+version="$Id: tst.lib 14482 2012-01-09 14:00:09Z motsak $";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests

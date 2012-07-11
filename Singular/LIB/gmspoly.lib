@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: gmspoly.lib 13866 2011-02-18 13:15:02Z hannes $";
 category="Singularities";
 
 info="

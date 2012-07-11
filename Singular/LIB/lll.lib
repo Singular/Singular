@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: lll.lib 12231 2009-11-02 10:12:22Z hannes $";
 category="Commutative Algebra";
 info="
 LIBRARY: LLL.lib      Integral LLL-Algorithm

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: sheafcoh.lib 14426 2011-11-11 18:00:08Z motsak $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology

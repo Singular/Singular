@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: crypto.lib 14306 2011-06-27 12:48:57Z hannes $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: surfacesignature.lib 14364 2011-08-10 07:39:25Z steidel $";
 category="Singularities";
 info="
 LIBRARY:  surfacesignature.lib        signature of surface singularity

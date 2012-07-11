@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: decodegb.lib 13483 2010-10-13 18:12:01Z hannes $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB

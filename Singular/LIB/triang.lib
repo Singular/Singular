@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: triang.lib 13499 2010-10-15 09:55:26Z hannes $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets

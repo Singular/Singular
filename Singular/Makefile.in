@@ -431,13 +431,9 @@ mpsr_Tok.inc: gentable2.cc grammar.h tok.h table.h mod2.h
 	/bin/rm -f gentable2 gentable2.exe
 
 
-svnver: 
-	svnversion >svnver
-
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
-           configure.in svnver
-	echo "#define feVersionId \""  `cat svnver` "\"" >version.h
-	echo "#define CC \"" ${CC} ${CFLAGS} ${DEFS}"\"" >>version.h
+           configure.in
+	echo "#define CC \"" ${CC} ${CFLAGS} ${DEFS}"\"" >version.h
 	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
 
 libparse: libparse_main.o utils.o

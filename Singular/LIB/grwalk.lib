@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 
-version="$Id$";
+version="$Id: grwalk.lib 13499 2010-10-15 09:55:26Z hannes $";
 category="Commutative Algebra";
 
 info="

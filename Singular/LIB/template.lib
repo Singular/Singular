@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: template.lib 13536 2010-10-18 13:32:34Z hannes $";
 category="Miscellaneous";
 // summary description of the library
 info="

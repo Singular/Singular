@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: all.lib 14883 2012-05-09 16:00:16Z motsak $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)

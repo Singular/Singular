@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: poly.lib 14852 2012-04-30 17:00:06Z motsak $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules

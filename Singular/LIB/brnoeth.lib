@@ -1,5 +1,5 @@
 //
-version="$Id$";
+version="$Id: brnoeth.lib 14192 2011-05-04 14:45:40Z hannes $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes

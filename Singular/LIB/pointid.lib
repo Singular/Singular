@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: pointid.lib 12231 2009-11-02 10:12:22Z hannes $";
+version="$Id: pointid.lib 14980 2012-06-01 11:00:06Z motsak $";
 category="Commutative algebra";
 info="
 LIBRARY:  pointid.lib     Procedures for computing a factorized lex GB of

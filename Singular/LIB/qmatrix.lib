@@ -1,5 +1,5 @@
 //
-version="$Id$";
+version="$Id: qmatrix.lib 13334 2010-09-29 15:48:48Z hannes $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups

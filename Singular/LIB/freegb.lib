@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: freegb.lib 14203 2011-05-05 12:19:42Z hannes $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via

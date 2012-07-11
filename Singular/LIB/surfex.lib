@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: surfex.lib 13499 2010-10-15 09:55:26Z hannes $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.

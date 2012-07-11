@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: ring.lib 15100 2012-07-10 17:00:10Z motsak $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps

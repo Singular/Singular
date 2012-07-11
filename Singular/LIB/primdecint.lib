@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: primdecint.lib 14307 2011-06-27 12:49:19Z hannes $";
 category = "Commutative Algebra";
 info="
 LIBRARY:  primdecint.lib   primary decomposition of an ideal in the polynomial

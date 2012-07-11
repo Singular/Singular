@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: ncalg.lib 14203 2011-05-05 12:19:42Z hannes $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important G- and GR-algebras

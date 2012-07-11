@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: teachstd.lib 13499 2010-10-15 09:55:26Z hannes $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases

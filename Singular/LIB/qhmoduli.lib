@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: qhmoduli.lib 14203 2011-05-05 12:19:42Z hannes $";
 category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities

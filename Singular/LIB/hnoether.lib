@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: hnoether.lib 14196 2011-05-04 17:50:18Z hannes $";
 
 category="Singularities";
 info="

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib 14192 2011-05-04 14:45:40Z hannes $";
+version="$Id: primdec.lib 14732 2012-03-30 17:00:06Z motsak $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals

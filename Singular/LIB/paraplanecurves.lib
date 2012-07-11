@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: paraplanecurves.lib 14461 2011-12-14 11:00:17Z motsak $";
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves

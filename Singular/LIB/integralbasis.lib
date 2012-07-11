@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: integralbasis.lib 13553 2010-10-22 12:39:54Z laplagne $";
 category="Commutative Algebra";
 info="
 LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields

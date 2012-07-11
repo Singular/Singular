@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: makedbm.lib 12231 2009-11-02 10:12:22Z hannes $";
 category="Miscellaneous";
 info="
 LIBRARY:  makedbm.lib     Data Base of Singularities for the Arnold-Classifier

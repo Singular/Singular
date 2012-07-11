@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: fpadim.lib 14246 2011-05-26 11:55:32Z hannes $";
 category="Noncommutative";
 info="
 LIBRARY: fpadim.lib     Algorithms for quotient algebras in the letterplace case
