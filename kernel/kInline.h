@@ -1172,5 +1172,12 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   (*k)--;
 }
 
+// dummy function for function pointer strat->rewCrit being usable in all
+// possible choices for criteria
+KINLINE BOOLEAN arriRewDummy(poly sig, unsigned long not_sevSig, kStrategy strat, int start=0)
+{
+  return FALSE;
+}
+
 #endif // defined(KINLINE) || defined(KUTIL_CC)
 #endif // KINLINE_H
