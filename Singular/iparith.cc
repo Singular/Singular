@@ -1214,11 +1214,11 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   { /* This means that q != 0 consists of just one term,
        or that currRing is over a coefficient ring. */
 #ifdef HAVE_RINGS
-    if (!rField_is_Domain())
-    {
-      WerrorS("division only defined over coefficient domains");
-      return TRUE;
-    }
+    //if (!rField_is_Domain())
+    //{
+    //  WerrorS("division only defined over coefficient domains");
+    //  return TRUE;
+    //}
     if (pNext(q)!=NULL)
     {
       WerrorS("division over a coefficient domain only implemented for terms");
