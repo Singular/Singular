@@ -27,7 +27,9 @@
 #include <kernel/febase.h> //For Print stuff
 
 #if DEBOGRI > 0
+#if 0
 #include <fstream>
+#endif
 #endif
 
 
@@ -1185,6 +1187,7 @@ bool ShiftDVec::loGriToFile
   if( ShiftDVec::deBoGri & flag 
       && !assume && !ShiftDVec::isSilenced )
   {
+#if 0 //Replaced
     std::ofstream toFile;
     toFile.open(logfile, std::ios::out | std::ios::app);
     for(int i = indent; i; --i) toFile << " ";
@@ -1192,6 +1195,13 @@ bool ShiftDVec::loGriToFile
     if(addr){ toFile << " Adresse: " << addr << "\n";}
     else    { toFile << "\n"; }
     toFile.close();
+#else //Replacement
+    //TODO: addr als Adresse printen
+    FILE* log = fopen(logfile, "a");
+    for(int i = indent; i; --i) fprintf(log, " ");
+    fprintf(log, "%s%d Adresse: %p\n", message, number, addr);
+    fclose(log);
+#endif
   }
   return assume;
 }
