@@ -716,6 +716,8 @@ matrix mpCoeffs (ideal I, int var)
     }
   }
   co=mpNew((m+1)*I->rank,IDELEMS(I));
+  sBucket_pt *rb=(sBucket_pt*)omAlloc0((m+1)*I->rank*sizeof(sBucket_pt));
+  for(i=(m+1)*I->rank-1;i>=0;i--) rb[i]=sBucketCreate(currRing);
   /* divide each monomial by a power of x_var,
   * remember the power in l and the component in c*/
   for (i=IDELEMS(I)-1; i>=0; i--)
@@ -734,12 +736,20 @@ matrix mpCoeffs (ideal I, int var)
       pNext(f)=NULL;
       //MATELEM(co,c*(m+1)-l,i+1)
       //  =pAdd(MATELEM(co,c*(m+1)-l,i+1),f);
-      MATELEM(co,(c-1)*(m+1)+l+1,i+1)
-        =pAdd(MATELEM(co,(c-1)*(m+1)+l+1,i+1),f);
+      //MATELEM(co,(c-1)*(m+1)+l+1,i+1)
+      //  =pAdd(MATELEM(co,(c-1)*(m+1)+l+1,i+1),f);
+      sBucket_Merge_p(rb[(c-1)*(m+1)+l],f,1);
       /* iterate f*/
       f=h;
     }
+    for(int rbi=(m+1)*I->rank-1;rbi>=0;rbi--)
+    {
+      int dummy;
+      sBucketDestroyMerge(rb[rbi],&(MATELEM(co,rbi+1,i+1)),&dummy);
+      if (i>0) rb[rbi]=sBucketCreate(currRing);
+    }
   }
+  omFreeSize(rb,(m+1)*I->rank*sizeof(sBucket_pt));
   idDelete(&I);
   return co;
 }
