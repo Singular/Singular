@@ -1097,6 +1097,73 @@ void initBba(ideal F,kStrategy strat)
 //  }
 }
 
+
+void initSba(ideal F,kStrategy strat)
+{
+  int i;
+  //idhdl h;
+ /* setting global variables ------------------- */
+  strat->enterS = enterSSba;
+    strat->red2 = redHoney;
+  if (strat->honey)
+    strat->red2 = redHoney;
+  else if (currRing->pLexOrder && !strat->homog)
+    strat->red2 = redLazy;
+  else
+  {
+    strat->LazyPass *=4;
+    strat->red2 = redHomog;
+  }
+#ifdef HAVE_RINGS  //TODO Oliver
+  if (rField_is_Ring(currRing))
+  {
+    strat->red2 = redRing;
+  }
+#endif
+  if (currRing->pLexOrder && strat->honey)
+    strat->initEcart = initEcartNormal;
+  else
+    strat->initEcart = initEcartBBA;
+  if (strat->honey)
+    strat->initEcartPair = initEcartPairMora;
+  else
+    strat->initEcartPair = initEcartPairBba;
+  //strat->kIdeal = NULL;
+  //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
+  //else              strat->kIdeal->rtyp=MODUL_CMD;
+  //strat->kIdeal->data=(void *)strat->Shdl;
+  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
+  {
+    //interred  machen   Aenderung
+    strat->pOrigFDeg  = currRing->pFDeg;
+    strat->pOrigLDeg  = currRing->pLDeg;
+    //h=ggetid("ecart");
+    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
+    //{
+    //  ecartWeights=iv2array(IDINTVEC(h));
+    //}
+    //else
+    {
+      ecartWeights=(short *)omAlloc(((currRing->N)+1)*sizeof(short));
+      /*uses automatic computation of the ecartWeights to set them*/
+      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights, currRing);
+    }
+    pRestoreDegProcs(currRing, totaldegreeWecart, maxdegreeWecart);
+    if (TEST_OPT_PROT)
+    {
+      for(i=1; i<=(currRing->N); i++)
+        Print(" %d",ecartWeights[i]);
+      PrintLn();
+      mflush();
+    }
+  }
+  // for sig-safe reductions in signature-based
+  // standard basis computations
+  strat->red          = redSig;
+  //strat->incremental  = TRUE;
+  strat->currIdx      = 1;
+}
+
 void initMora(ideal F,kStrategy strat)
 {
   int i,j;
@@ -1794,6 +1861,150 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
         r=bba(F,Q,*w,hilb,strat);
       else
         r=bba(F,Q,NULL,hilb,strat);
+    }
+  }
+#ifdef KDEBUG
+  idTest(r);
+#endif
+  if (toReset)
+  {
+    kModW = NULL;
+    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
+  }
+  currRing->pLexOrder = b;
+//Print("%d reductions canceled \n",strat->cel);
+  HCord=strat->HCord;
+  delete(strat);
+  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  return r;
+}
+
+ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int incremental, int arri, intvec *hilb,int syzComp,
+          int newIdeal, intvec *vw)
+{
+  if(idIs0(F))
+    return idInit(1,F->rank);
+
+  ideal r;
+  BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
+  BOOLEAN delete_w=(w==NULL);
+  kStrategy strat=new skStrategy;
+  if (incremental!=0)
+  {
+    strat->incremental = TRUE;
+  }
+  else
+  {
+    strat->incremental = FALSE;
+  }
+  if (arri!=0)
+  {
+    strat->rewCrit1 = arriRewDummy;
+    strat->rewCrit2 = arriRewCriterion;
+  }
+  else
+  {
+    strat->rewCrit1 = faugereRewCriterion;
+    strat->rewCrit2 = faugereRewCriterion;
+  }
+
+  if(!TEST_OPT_RETURN_SB)
+    strat->syzComp = syzComp;
+  if (TEST_OPT_SB_1)
+    strat->newIdeal = newIdeal;
+  if (rField_has_simple_inverse(currRing))
+    strat->LazyPass=20;
+  else
+    strat->LazyPass=2;
+  strat->LazyDegree = 1;
+  strat->enterOnePair=enterOnePairNormal;
+  strat->chainCrit=chainCritNormal;
+  strat->ak = id_RankFreeModule(F,currRing);
+  strat->kModW=kModW=NULL;
+  strat->kHomW=kHomW=NULL;
+  if (vw != NULL)
+  {
+    currRing->pLexOrder=FALSE;
+    strat->kHomW=kHomW=vw;
+    strat->pOrigFDeg = currRing->pFDeg;
+    strat->pOrigLDeg = currRing->pLDeg;
+    pSetDegProcs(currRing,kHomModDeg);
+    toReset = TRUE;
+  }
+  if (h==testHomog)
+  {
+    if (strat->ak == 0)
+    {
+      h = (tHomog)idHomIdeal(F,Q);
+      w=NULL;
+    }
+    else if (!TEST_OPT_DEGBOUND)
+    {
+      h = (tHomog)idHomModule(F,Q,w);
+    }
+  }
+  currRing->pLexOrder=b;
+  if (h==isHomog)
+  {
+    if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+    {
+      strat->kModW = kModW = *w;
+      if (vw == NULL)
+      {
+        strat->pOrigFDeg = currRing->pFDeg;
+        strat->pOrigLDeg = currRing->pLDeg;
+        pSetDegProcs(currRing,kModDeg);
+        toReset = TRUE;
+      }
+    }
+    currRing->pLexOrder = TRUE;
+    if (hilb==NULL) strat->LazyPass*=2;
+  }
+  strat->homog=h;
+#ifdef KDEBUG
+  idTest(F);
+  idTest(Q);
+
+#if MYTEST
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("// kSTD: currRing: ");
+    rWrite(currRing);
+  }
+#endif
+
+#endif
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
+    strat->no_prod_crit   = ! bIsSCA;
+    if (w!=NULL)
+      r = nc_GB(F, Q, *w, hilb, strat, currRing);
+    else
+      r = nc_GB(F, Q, NULL, hilb, strat, currRing);
+  }
+  else
+#endif
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+    r=bba(F,Q,NULL,hilb,strat);
+  else
+#endif
+  {
+    if (currRing->OrdSgn==-1)
+    {
+      if (w!=NULL)
+        r=mora(F,Q,*w,hilb,strat);
+      else
+        r=mora(F,Q,NULL,hilb,strat);
+    }
+    else
+    {
+      if (w!=NULL)
+        r=sba(F,Q,*w,hilb,strat);
+      else
+			  r=sba(F,Q,NULL,hilb,strat);
     }
   }
 #ifdef KDEBUG

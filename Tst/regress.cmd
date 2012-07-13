@@ -1096,8 +1096,8 @@ foreach (@ARGV)
     $extension = $2;
   } else
   {
-    print ("Wrong input: [$_] has no extension!");
-    tcWarn("Wrong input: [$_] has no extension!");
+#    print ("Wrong input: [$_] has no extension!");
+#    tcWarn("Wrong input: [$_] has no extension!");
     next;
   }
     

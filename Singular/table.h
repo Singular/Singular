@@ -237,6 +237,8 @@ struct sValCmd1 dArith1[]=
 ,{D(jjROWS_IV),    ROWS_CMD,        INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjROWS_BIM),   ROWS_CMD,        INT_CMD,        BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOUNT_IV),   ROWS_CMD,        INT_CMD,        INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSBA),        SBA_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSBA),        SBA_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSLIM_GB),    SLIM_GB_CMD,     IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL }
 ,{D(jjSLIM_GB),    SLIM_GB_CMD,     MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL }
 ,{D(jjSort_Id),    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
@@ -661,6 +663,8 @@ struct sValCmd2 dArith2[]=
 //,{D(jjRES),       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
 ,{D(jjRES),       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
 ,{D(jjRES),       SRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
+,{D(jjSBA_1),     SBA_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSBA_1),     SBA_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD_1),     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD_1),     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD_1),     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -759,6 +763,8 @@ struct sValCmd3 dArith3[]=
 ,{D(jjRES3),           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, NO_PLURAL |ALLOW_RING}
 ,{D(jjRES3),           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE, NO_PLURAL |ALLOW_RING}
 #endif
+,{D(jjSBA_2),          SBA_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSBA_2),          SBA_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTATUS3),        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSTD_HILB_W),     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD, NO_PLURAL |NO_RING}
 ,{D(jjSTD_HILB_W),     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD, NO_PLURAL |NO_RING}
@@ -827,6 +833,9 @@ struct sValCmdM dArithM[]=
 ,{D(jjSTATUS_M),  STATUS_CMD,      INT_CMD,             4      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(loSimplex),   SIMPLEX_CMD,     LIST_CMD,            6      , NO_PLURAL |NO_RING}
 ,{D(nuUResSolve), URSOLVE_CMD,     LIST_CMD,            4      , NO_PLURAL |NO_RING}
+,{D(jjCALL1ARG),  SBA_CMD,         IDEAL_CMD,           1      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL2ARG),  SBA_CMD,         IDEAL_CMD,           2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL3ARG),  SBA_CMD,         IDEAL_CMD,           3      , NO_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  STD_CMD,         IDEAL_CMD,           1      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  STD_CMD,         IDEAL_CMD,           2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  STD_CMD,         IDEAL_CMD,           3      , NO_PLURAL |ALLOW_RING}
@@ -1026,6 +1035,7 @@ cmdnames cmds[] =
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "ringlist",    0, RINGLIST_CMD ,      CMD_1},
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
+  { "sba",         0, SBA_CMD ,           CMD_M},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
   { "simplex",     0, SIMPLEX_CMD,        CMD_M},
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
