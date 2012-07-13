@@ -23,6 +23,8 @@ void initRTimer();
 int  getRTimer();
 
 void SetTimerResolution(int res);
+void SetTimerResolution(double res);
+double GetTimerResolution();
 void SetMinDisplayTime(double mtime);
 
 #endif

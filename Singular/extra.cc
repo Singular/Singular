@@ -3491,6 +3491,120 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
   #endif
   #endif
+  /*====== Used for debugging of multiplication ======*/
+      if (strcmp(sys_cmd, "pMultM") == 0)
+      {
+        poly p,m;
+        //the polynomials are expected to have shift 0 and to be
+        //correctly formatted letterplace element - especially
+        //they musn't have gaps or exponents greater than 1 .
+        //We will not check for errerneous input!!!
+        //m is expected to be a monomial
+
+        int uptodeg, lVblock;
+        //for p and m totaldeg(p) + totaldeg(m) < uptodeg should
+        //hold.  We will not check for errerneous input!!!
+
+        if ((h!=NULL) && (h->Typ()==POLY_CMD))
+        {
+          p=(poly)h->Data();
+          h=h->next;
+        } else return TRUE;
+        if ((h!=NULL) && (h->Typ()==POLY_CMD))
+        {
+          m=(poly)h->Data();
+          h=h->next;
+        } else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          uptodeg=(int)((long)(h->Data()));
+          h=h->next;
+        } else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          lVblock=(int)((long)(h->Data()));
+        } else return TRUE;
+
+        //res->data = lpMult(p, m, uptodeg, lVblock);
+        res->data = lpMult(p, m, uptodeg, lVblock);
+        res->rtyp = POLY_CMD;
+
+#if 0
+        if (res->data == NULL)
+        {
+          /* that is there were input errors */
+          //BOCO: yes... ? -> TODO: check for input errors
+        }
+#endif
+        return FALSE;
+      }
+      else
+  /*====== Multiplication test for letterplace polynomials  ======*/
+      if (strcmp(sys_cmd, "lpMultTest") == 0)
+      {
+        //lists of pairs (pairs are lists of size 2)
+        //Each pair consists of a polynomial and a monomial
+        //which are both expected to be correctly formatted
+        //letterplace polynomials with shift 0 - especially the
+        //musn't have gaps or exponents greater than 1 .
+        //We will not check for errerneous input!!!
+        lists L;
+
+        int uptodeg, lVblock, repetitions = 100, resolution = 0;
+        //for a pair [p,m] in L totaldeg(p) + totaldeg(m) should
+        //be smaller than uptodeg.
+        //We will not check for errerneous input!!!
+
+        //list of (polynomial,monomial) pairs
+        if ((h!=NULL) && (h->Typ()==LIST_CMD))
+          L=(lists)h->Data();
+        else return TRUE;
+
+        //uptodeg
+        h=h->next;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+          uptodeg=(int)((long)(h->Data()));
+        else return TRUE;
+
+        //lVblock (number of variables)
+        h=h->next;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+          lVblock=(int)((long)(h->Data()));
+        else return TRUE;
+
+        //repetitions (optional)
+        h=h->next;
+        if ( h!=NULL )
+          if( h->Typ() == INT_CMD )
+            repetitions=(int)((long)(h->Data()));
+          else return TRUE;
+
+        //resolution (optional) - if 0, slightly different
+        //algorithm is applied
+        if ( h!=NULL && (h=h->next) != NULL )
+        {
+          if( h->Typ() == INT_CMD )
+            resolution=(int)((long)(h->Data()));
+          else return TRUE;
+          //BOCO: see kstd2.cc for explanation of lpMultProfiler
+          res->data = lpMultProfilerR
+            (L, uptodeg, lVblock, repetitions, resolution );
+        }
+        else
+          res->data = 
+            lpMultProfiler(L, uptodeg, lVblock, repetitions );
+
+        res->rtyp = LIST_CMD;
+
+        if (res->data == NULL)
+        {
+          /* that is there were input errors */
+          return TRUE;
+        }
+
+        return FALSE;
+      }
+      else
   /*==================== t-rep-GB ==================================*/
       if (strcmp(sys_cmd, "unifastmult")==0)
       {
