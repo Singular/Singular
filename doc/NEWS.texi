@@ -60,6 +60,8 @@ use polymake via @code{polymake.so}
 @itemize @bullet
 @item
 factorization code for extension fields improved
+@item
+set the reaction to Cntrl-C (see @nref{Command line options}).
 @end itemize
 @heading --------------------------------------------------------------------
 @heading Older versions:
