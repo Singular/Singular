@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ln -s ../libpolys/polys/.libs/p_Procs_FieldIndep.so
+ln -s ../libpolys/polys/.libs/p_Procs_FieldQ.so
