@@ -1,4 +1,4 @@
-s@comment -*-texinfo-*-
+@comment -*-texinfo-*-
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -81,7 +81,6 @@ and @code{LIB} no brackets are allowed.
 * ERROR::
 * example::
 * execute::
-* exit::
 * extgcd::
 * facstd::
 * factmodd::
@@ -167,6 +166,7 @@ and @code{LIB} no brackets are allowed.
 * prune::
 * qhweight::
 * qrds::
+* quit::
 * quote::
 * quotient::
 * random::
@@ -8319,7 +8319,8 @@ See
 @anchor{exit}
 @table @code
 @item @strong{Syntax:}
-@code{quit;}
+@code{exit;}
+@*@code{quit;}
 @item @strong{Purpose:}
 quits @sc{Singular};
 works also from inside a procedure or from an interrupt. Instead of @code{quit}, the synonymous command
@@ -8329,10 +8330,6 @@ works also from inside a procedure or from an interrupt. Instead of @code{quit},
   quit;
 @end smallexample
 @end table
-@c ref
-See
-@ref{exit}.
-@c ref
 @c ---------------------------------------
 @node return, while, quit, Control structures
 @subsection return
