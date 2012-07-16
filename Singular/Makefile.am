@@ -363,7 +363,8 @@ test_d_g_LDFLAGS = ${AMLDFLAGS}
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc LIB/all.lib plural_cmd.inc 
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc LIB/all.lib plural_cmd.inc \
+                gftables MOD
 
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
@@ -385,3 +386,10 @@ plural_cmd.inc iparith.inc: gentable1
 mpsr_Tok.inc: gentable2
 	${abs_builddir}/gentable2
 
+
+
+gftables: ${abs_top_srcdir}/factory/gftables
+	ln -snf ${abs_top_srcdir}/factory/gftables ${abs_builddir}/gftables
+
+MOD: ${abs_top_builddir}/libpolys/polys/.libs
+	ln -snf ${abs_top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD
