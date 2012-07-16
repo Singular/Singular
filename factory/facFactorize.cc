@@ -266,8 +266,11 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     return result;
   }
 
-  CFMap N;
-  CanonicalForm F= compress (LCF, N);
+  CFMap N, M;
+  CFArray dummy= CFArray (1);
+  dummy [0]= LCF;
+  compress (dummy, M, N);
+  CanonicalForm F= M (LCF);
   if (LCF.isUnivariate())
   {
     CFList result;
@@ -310,9 +313,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
   CFList factors= LCFFactors;
 
-  CFMap dummy;
   for (CFListIterator i= factors; i.hasItem(); i++)
-    i.getItem()= compress (i.getItem(), dummy);
+    i.getItem()= M (i.getItem());
 
   CanonicalForm sqrfPartF;
   CFFList * bufSqrfFactors= new CFFList [factors.length()];
@@ -332,14 +334,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   if (!pass)
   {
     int lev= 0;
-    for (int i= 1; i <= LCF.level(); i++)
-    {
-      if(degree (LCF, i) > 0)
-      {
-        lev= i - 1;
-        break;
-      }
-    }
     for (int i= 0; i < length; i++)
     {
       CanonicalForm bufF, swap;
@@ -354,6 +348,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           {
             allConstant= false;
             y= Variable (iter.getItem().level());
+            lev= M(y).level();
           }
         }
         if (allConstant)
@@ -363,7 +358,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         for (iter= bufFactors; iter.hasItem(); iter++)
           iter.getItem()= swapvar (iter.getItem(), x, y);
         bufF= F;
-        z= Variable (y.level() - lev);
+        z= Variable (lev);
         bufF= swapvar (bufF, x, z);
         bufBufFactors= bufFactors;
         evalPoint= CFArray (evaluation.length() - 1);
@@ -535,7 +530,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   }
   else
   {
-    factors= CFList (oldSqrfPartF);
+    CanonicalForm contF=content (oldSqrfPartF,1);
+    factors= CFList (oldSqrfPartF/contF);
     interMedResult= recoverFactors (oldSqrfPartF, factors);
   }
 
@@ -798,7 +794,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     }
     if (!zeroOccured)
     {
-      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation, minFactorsLength);
+      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation,
+                                minFactorsLength);
       if (factors.length() == biFactors.length())
       {
         appendSwapDecompress (factors, contentAFactors, N, 0, 0, x);
@@ -831,17 +828,6 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   if (w.level() != 1)
   {
     A= swapvar (A, y, w);
-    for (int i= 0; i < A.level() - 2; i++)
-    {
-      if (oldAeval[i].isEmpty())
-        continue;
-      if (oldAeval[i].getFirst().level() == w.level())
-      {
-        biFactors= CFList();
-        for (CFListIterator iter= oldAeval [i]; iter.hasItem(); iter++)
-          biFactors.append (swapvar (iter.getItem(), w, y));
-      }
-    }
     int i= A.level();
     CanonicalForm evalPoint;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++, i--)
@@ -853,6 +839,28 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         evaluation.removeLast();
         evaluation.append (evalPoint);
         break;
+      }
+    }
+    for (i= 0; i < A.level() - 2; i++)
+    {
+      if (oldAeval[i].isEmpty())
+        continue;
+      if (oldAeval[i].getFirst().level() == w.level())
+      {
+        CFArray tmp= copy (oldAeval[i]);
+        for (int ii= 0; ii < tmp.size(); ii++)
+          tmp[ii]= swapvar (tmp[ii], w, y);
+        CFArray tmp2= CFArray (tmp.size());
+        CanonicalForm buf;
+        for (int ii= 0; ii < tmp.size(); ii++)
+        {
+          buf= tmp[ii] (evaluation.getLast(),y);
+          buf /= Lc (buf);
+          tmp2[findItem (uniFactors, buf)-1]=tmp[ii];
+        }
+        biFactors= CFList();
+        for (int j= 0; j < tmp2.size(); j++)
+          biFactors.append (tmp2[j]);
       }
     }
   }
@@ -905,6 +913,13 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
     if (check == factors.length())
     {
+
+      if (w.level() != 1)
+      {
+        for (CFListIterator iter= factors; iter.hasItem(); iter++)
+          iter.getItem()= swapvar (iter.getItem(), w, y);
+      }
+
       appendSwapDecompress (factors, contentAFactors, N, 0, 0, x);
       normalize (factors);
       delete [] Aeval2;

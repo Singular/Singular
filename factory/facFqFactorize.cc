@@ -1181,7 +1181,7 @@ gcdFreeBasis (CFFList& factors1, CFFList& factors2)
     for (j= factors2; (m < l && j.hasItem()); j++, m++)
     {
       g= gcd (i.getItem().factor(), j.getItem().factor());
-      if (degree (g) > 0)
+      if (degree (g,1) > 0)
       {
         j.getItem()= CFFactor (j.getItem().factor()/g, j.getItem().exp());
         i.getItem()= CFFactor (i.getItem().factor()/g, i.getItem().exp());
@@ -1431,8 +1431,11 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     return result;
   }
 
-  CFMap N;
-  CanonicalForm F= compress (LCF, N);
+  CFMap N, M;
+  CFArray dummy= CFArray (1);
+  dummy [0]= LCF;
+  compress (dummy, M, N);
+  CanonicalForm F= M (LCF);
   if (LCF.isUnivariate())
   {
     CFList result;
@@ -1475,9 +1478,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
   CFList factors= LCFFactors;
 
-  CFMap dummy;
   for (CFListIterator i= factors; i.hasItem(); i++)
-    i.getItem()= compress (i.getItem(), dummy);
+    i.getItem()= M (i.getItem());
 
   CanonicalForm sqrfPartF;
   CFFList * bufSqrfFactors= new CFFList [factors.length()];
@@ -1497,14 +1499,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   {
     int lev= 0;
     // LCF is non-constant here
-    for (int i= 1; i <= LCF.level(); i++)
-    {
-      if(degree (LCF, i) > 0)
-      {
-        lev= i - 1;
-        break;
-      }
-    }
     CFList bufBufFactors;
     CanonicalForm bufF, swap;
     CFArray buf;
@@ -1519,6 +1513,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           {
             allConstant= false;
             y= Variable (iter.getItem().level());
+            lev= M(y).level();
           }
         }
         if (allConstant)
@@ -1528,7 +1523,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         for (iter= bufFactors; iter.hasItem(); iter++)
           iter.getItem()= swapvar (iter.getItem(), x, y);
         bufF= F;
-        z= Variable (y.level() - lev);
+        z= Variable (lev);
         bufF= swapvar (bufF, x, z);
         bufBufFactors= bufFactors;
         evalPoint= CFArray (evaluation.length() - 1);
@@ -1699,7 +1694,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   }
   else
   {
-    factors= CFList (oldSqrfPartF);
+    CanonicalForm contF=content (oldSqrfPartF,1);
+    factors= CFList (oldSqrfPartF/contF);
     interMedResult= recoverFactors (oldSqrfPartF, factors);
   }
 
@@ -2546,17 +2542,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   if (v.level() != 1)
   {
     A= swapvar (A, y, v);
-    for (int i= 0; i < A.level() - 2; i++)
-    {
-      if (oldAeval[i].isEmpty())
-        continue;
-      if (oldAeval[i].getFirst().level() == v.level())
-      {
-        biFactors= CFList();
-        for (CFListIterator iter= oldAeval [i]; iter.hasItem(); iter++)
-          biFactors.append (swapvar (iter.getItem(), v, y));
-      }
-    }
     int i= A.level();
     CanonicalForm evalPoint;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++, i--)
@@ -2568,6 +2553,28 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         evaluation.removeLast();
         evaluation.append (evalPoint);
         break;
+      }
+    }
+    for (i= 0; i < A.level() - 2; i++)
+    {
+      if (oldAeval[i].isEmpty())
+        continue;
+      if (oldAeval[i].getFirst().level() == v.level())
+      {
+        CFArray tmp= copy (oldAeval[i]);
+        for (int ii= 0; ii < tmp.size(); ii++)
+          tmp[ii]= swapvar (tmp[ii], v, y);
+        CFArray tmp2= CFArray (tmp.size());
+        CanonicalForm buf;
+        for (int ii= 0; ii < tmp.size(); ii++)
+        {
+          buf= tmp[ii] (evaluation.getLast(),y);
+          buf /= Lc (buf);
+          tmp2[findItem (uniFactors, buf)-1]=tmp[ii];
+        }
+        biFactors= CFList();
+        for (int j= 0; j < tmp2.size(); j++)
+          biFactors.append (tmp2[j]);
       }
     }
   }
