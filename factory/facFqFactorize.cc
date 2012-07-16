@@ -1834,9 +1834,9 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
   TT= copy (factors1);
   while (T.length() >= 2*s && s <= thres)
   {
-    while (nosubset == false) 
+    while (nosubset == false)
     {
-      if (T.length() == s) 
+      if (T.length() == s)
       {
         delete [] v;
         result.append (prod (T));
