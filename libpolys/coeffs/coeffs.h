@@ -20,24 +20,23 @@ class CanonicalForm;
 enum n_coeffType
 {
   n_unknown=0,
-  n_Zp,
-  n_Q,
-  n_R,
-  n_GF,
-  n_long_R,
+  n_Zp, /**< \F{p < ?} */
+  n_Q,  /**< rational (GMP) numbers */
+  n_R,  /**< single prescision (6,6) real numbers */
+  n_GF, /**< \GF{p^n < 32001?} */
+  n_long_R, /**< real (GMP) numbers */
   n_algExt,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */
   n_transExt,  /**< used for all transcendental extensions, i.e.,
                   the top-most extension in an extension tower
                   is transcendental */
-  n_long_C,
-  // only used if HAVE_RINGS is defined:
-  n_Z,
-  n_Zn,
-  n_Zpn, // does no longer exist?
-  n_Z2m,
-  n_CF
+  n_long_C, /**< complex (GMP) numbers */
+  n_Z, /**< only used if HAVE_RINGS is defined: ? */
+  n_Zn, /**< only used if HAVE_RINGS is defined: ? */
+  n_Zpn, /**< only used if HAVE_RINGS is defined: does no longer exist? */
+  n_Z2m, /**< only used if HAVE_RINGS is defined: ? */
+  n_CF /**< ? */
 };
 
 extern unsigned short fftable[];
@@ -332,6 +331,14 @@ static inline void nSetChar(const coeffs r)
 
 void           nNew(number * a);
 #define n_New(n, r)           nNew(n)
+
+
+/// Return the characteristic of the coeff. domain.
+static inline int n_GetChar(const coeffs r)
+{
+  assume(r != NULL);
+  return r->ch;
+}
 
 
 // the access methods (part 2):
@@ -722,7 +729,7 @@ static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
 {
   assume(r != NULL);
-  return ((r->ringtype == 0) && (r->ch != 0) && nCoeff_is_Extension(r));
+  return ((!nCoeff_is_Ring(r)) && (n_GetChar(r) != 0) && nCoeff_is_Extension(r));
 }
 
 /* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
@@ -735,7 +742,8 @@ static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
 {
   assume(r != NULL);
-  return ((r->ringtype == 0) && (r->ch == p) && nCoeff_is_Extension(r));
+  assume(p != 0);
+  return ((!nCoeff_is_Ring(r)) && (n_GetChar(r) == p) && nCoeff_is_Extension(r));
 }
 
 /* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
@@ -747,7 +755,7 @@ static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
 static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
 {
   assume(r != NULL);
-  return ((r->ringtype == 0) && (r->ch == 0) && nCoeff_is_Extension(r));
+  return ((!nCoeff_is_Ring(r)) && (n_GetChar(r) == 0) && nCoeff_is_Extension(r));
 }
 
 static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
@@ -783,12 +791,6 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 // cfIntMod, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... 
 
-/// Return the characteristic of the coeff. domain.
-static inline int n_GetChar(const coeffs r)
-{
-  assume(r != NULL);
-  return r->ch;
-}
 
 #endif
 

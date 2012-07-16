@@ -87,7 +87,7 @@ static int ndParDeg(number n, const coeffs r)
   return (-n_IsZero(n,r));
 }
 
-static number ndParameter(const int i, const coeffs r)
+static number ndParameter(const int, const coeffs r)
 {
   Werror("ndParameter: n_Parameter is not implemented/relevant for (coeff_type = %d)",getCoeffType(r));
   return NULL;
