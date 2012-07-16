@@ -558,32 +558,32 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         b = bt;
         Db = Dbt; Fb = Fbt; Gb = Gbt;
       }
-    }
-    DEBOUTLN( cerr, "now after A4, delta = " << delta );
-    /// ---> A5
-    if (delta == degF)
-    {
-      if (degF <= degG  && fdivides (F, G))
+      DEBOUTLN( cerr, "now after A4, delta = " << delta );
+      /// ---> A5
+      if (delta == degF)
       {
-        DEBDECLEVEL( cerr, "ezgcd" );
-        if (!isRat)
-          Off (SW_RATIONAL);
-        return N (d*F);
+        if (degF <= degG  && fdivides (F, G))
+        {
+          DEBDECLEVEL( cerr, "ezgcd" );
+          if (!isRat)
+            Off (SW_RATIONAL);
+          return N (d*F);
+        }
+        else
+          delta--;
       }
-      else
-        delta--;
-    }
-    else if (delta == degG)
-    {
-      if (degG <= degF && fdivides( G, F ))
+      else if (delta == degG)
       {
-        DEBDECLEVEL( cerr, "ezgcd" );
-        if (!isRat)
-          Off (SW_RATIONAL);
-        return N (d*G);
+        if (degG <= degF && fdivides( G, F ))
+        {
+          DEBDECLEVEL( cerr, "ezgcd" );
+          if (!isRat)
+            Off (SW_RATIONAL);
+          return N (d*G);
+        }
+        else
+          delta--;
       }
-      else
-        delta--;
     }
     if ( delta != degF && delta != degG )
     {
