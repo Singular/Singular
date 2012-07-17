@@ -41,11 +41,11 @@ SOURCES = \
 	clapsing.cc clapconv.cc \
 	nc/old.gring.cc
 
-LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
+LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \ 
+  monomials/p_polys.h monomials/maps.h PolyEnumerator.h  prCopy.h \
 	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h nc/gb_hack.h \
 	operations/pShallowCopyDelete.h \
 	templates/p_Procs.h templates/p_MemAdd.h templates/p_MemCmp.h \
-	monomials/p_polys.h monomials/maps.h prCopy.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
 	sparsmat.h clapsing.h clapconv.h coeffrings.h \
 	ext_fields/algext.h ext_fields/transext.h mod_raw.h  

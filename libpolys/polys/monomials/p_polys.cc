@@ -21,6 +21,8 @@
 #include <coeffs/longrat.h> // ???
 #include <coeffs/ffields.h>
 
+#include <polys/PolyEnumerator.h>
+
 #define TRANSEXT_PRIVATES
 
 #include <polys/ext_fields/transext.h>
@@ -2020,6 +2022,16 @@ static number p_InitContent(poly ph, const ring r);
 
 void p_Content(poly ph, const ring r)
 {
+#if 0
+  if( ph != NULL )
+  {
+    CPolyCoeffsEnumerator itr(ph);
+    n_ClearContent(itr, r->cf);
+//    return;
+  }
+#endif
+
+  
 #ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
@@ -2427,6 +2439,16 @@ void p_Content(poly ph, const ring r)
 poly p_Cleardenom(poly ph, const ring r)
 {
   poly start=ph;
+
+#if 0
+  if( ph != NULL )
+  {
+    CPolyCoeffsEnumerator itr(ph);
+    n_ClearDenominators(itr, r->cf);
+    //  return start;
+  }
+#endif
+
   number d, h;
   poly p;
 
@@ -2551,6 +2573,15 @@ poly p_Cleardenom(poly ph, const ring r)
 
 void p_Cleardenom_n(poly ph,const ring r,number &c)
 {
+#if 0
+  if( ph != NULL )
+  {
+    CPolyCoeffsEnumerator itr(ph);
+    n_ClearDenominators(itr, c, r->cf);
+//    return;
+  }
+#endif
+  
   number d, h;
   poly p;
 
