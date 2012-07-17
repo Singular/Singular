@@ -23,14 +23,15 @@
 
 #define TRANSEXT_PRIVATES
 
-#include "ext_fields/transext.h"
-#include "ext_fields/algext.h"
+#include <polys/ext_fields/transext.h>
+#include <polys/ext_fields/algext.h>
 
-#include "weight.h"
-#include "simpleideals.h"
+#include <polys/weight.h>
+#include <polys/simpleideals.h>
 
-#include "monomials/ring.h"
-#include "monomials/p_polys.h"
+#include "ring.h"
+#include "p_polys.h"
+
 #include <polys/templates/p_MemCmp.h>
 #include <polys/templates/p_MemAdd.h>
 #include <polys/templates/p_MemCopy.h>

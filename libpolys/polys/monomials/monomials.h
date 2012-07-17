@@ -9,8 +9,13 @@
 */
 
 #include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
-#include <polys/monomials/ring.h>
+
+struct snumber;
+typedef struct snumber *   number;
+
+struct ip_sring;
+typedef struct ip_sring *         ring;
+typedef struct ip_sring const *   const_ring;
 
 /***************************************************************
  *
@@ -20,12 +25,52 @@
 
 struct spolyrec;
 typedef struct spolyrec *          poly;
+
 struct  spolyrec
 {
   poly      next;           // next needs to be the first field
   number    coef;           // and coef the second --- do not change this !!!
   unsigned long exp[1];     // make sure that exp is aligned
 };
+
+/***************************************************************
+ *
+ * Primitives for accessing and setting fields of a poly
+ * poly must be != NULL
+ *
+ ***************************************************************/
+// next
+#define pNext(p)            ((p)->next)
+#define pIter(p)            ((p) = (p)->next)
+
+// coeff
+// #define pGetCoeff(p)        ((p)->coef)
+/// return an alias to the leading coefficient of p
+/// assumes that p != NULL
+/// NOTE: not copy
+static inline number& pGetCoeff(poly p)
+{
+  assume(p != NULL);
+  return p->coef;
+}
+
+#define p_GetCoeff(p,r)     pGetCoeff(p)
+//static inline number& p_GetCoeff(poly p, const ring r)
+//{
+//  assume(r != NULL);
+//  return pGetCoeff(p);
+//}
+
+
+//
+// deletes old coeff before setting the new one???
+#define pSetCoeff0(p,n)     (p)->coef=(n)
+#define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
+
+
+#define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
+#define p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
+
 
 /***************************************************************
  *
