@@ -34,7 +34,7 @@ libcoeffs_g_la_SOURCES = $(SOURCES)
 
 libcoeffs_includedir  =$(includedir)/singular/coeffs
 libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h shortfl.h mpr_complex.h mpr_global.h \
-  bigintmat.h 
+  bigintmat.h Enumerator.h
 
 
 ## for testing...

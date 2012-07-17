@@ -13,6 +13,8 @@
 
 #include <coeffs/si_gmp.h>
 
+#include <coeffs/Enumerator.h>
+
 #ifdef HAVE_FACTORY
 class CanonicalForm;
 #endif
@@ -62,6 +64,16 @@ typedef number (*numberfunc)(number a, number b, const coeffs r);
 
 /// maps "a", which lives in src, into dst
 typedef number (*nMapFunc)(number a, const coeffs src, const coeffs dst);
+
+
+/// Abstract interface for an enumerator of number coefficients for an
+/// object, e.g. a polynomial
+typedef IEnumerator<number> ICoeffsEnumerator;
+
+/// goes over coeffs given by the ICoeffsEnumerator and changes them.
+/// Additionally returns a number;
+typedef void (*nCoeffsEnumeratorFunc)(ICoeffsEnumerator& numberCollectionEnumerator, number& output, const coeffs r);
+
 
 /// Creation data needed for finite fields
 typedef struct 
@@ -195,6 +207,12 @@ struct n_Procs_s
 
    /// create i^th parameter or NULL if not possible
    number  (*cfParameter)(const int i, const coeffs r);
+       
+   /// function pointer behind n_ClearContent
+   nCoeffsEnumeratorFunc cfClearContent;
+
+   /// function pointer behind n_ClearDenominators
+   nCoeffsEnumeratorFunc cfClearDenominators;
 
 #ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
@@ -790,6 +808,47 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 // Missing wrappers for: (TODO: review this?)
 // cfIntMod, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... 
+
+
+/// Computes the content and (inplace) divides it out on a collection
+/// of numbers
+/// NOTE/TODO: see the description by Hans
+/// TODO: what exactly is c?
+static inline void n_ClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
+{
+  assume(r != NULL);
+  r->cfClearContent(numberCollectionEnumerator, c, r);
+}
+
+/// (inplace) Clears denominators on a collection of numbers
+/// NOTE/TODO: see the description by Hans
+/// TODO: what exactly is d?
+static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& d, const coeffs r)
+{
+  assume(r != NULL);
+  r->cfClearDenominators(numberCollectionEnumerator, d, r);
+}
+
+// convenience helpers (no number returned - but the input enumeration
+// is to be changed
+// TODO: do we need separate hooks for these as our existing code does
+// *different things* there: compare p_Cleardenom (which calls
+// *p_Content) and p_Cleardenom_n (which doesn't)!!!
+
+static inline void n_ClearContent(ICoeffsEnumerator& numberCollectionEnumerator, const coeffs r)
+{
+  number c;
+  n_ClearContent(numberCollectionEnumerator, c, r);
+  n_Delete(&c, r);
+}
+
+static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, const coeffs r)
+{
+  assume(r != NULL);
+  number d;
+  n_ClearDenominators(numberCollectionEnumerator, d, r);
+  n_Delete(&d, r);
+}
 
 
 #endif

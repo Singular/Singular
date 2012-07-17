@@ -123,6 +123,77 @@ number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
+/// divide by the first (leading) number and return it, i.e. make monic
+static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
+{
+  assume(r != NULL);
+
+  // no fractions
+  assume(!(  nCoeff_is_Q(r) || nCoeff_is_Q_a(r) ));
+  // all coeffs are given by integers!!!
+  assume( nCoeff_is_Ring(r) || nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r) );
+
+  numberCollectionEnumerator.Reset();
+  
+#ifdef HAVE_RINGS
+  /// TODO: move to a separate implementation 
+  if (nCoeff_is_Ring(r))
+  {
+    if (nCoeff_has_Units(r))
+    {
+      c = n_GetUnit(numberCollectionEnumerator.Current(), r);
+      
+      if (!n_IsOne(c, r))
+      {
+        number inv = n_Invers(c, r);
+
+        do
+        {
+          n_InpMult(numberCollectionEnumerator.Current(), inv, r);
+        }
+        while( numberCollectionEnumerator.MoveNext() );
+
+        n_Delete(&inv, r);        
+      }      
+    } else c = n_Init(1, r);
+    
+    return;
+  }
+#endif
+
+  assume(!nCoeff_is_Ring(r));
+
+  c = numberCollectionEnumerator.Current();
+  
+  n_Normalize(c, r);
+
+  if (!n_IsOne(c, r))
+  {    
+    numberCollectionEnumerator.Current() = n_Init(1, r); // ???
+    
+    number inv = n_Invers(c, r);
+    
+    while( numberCollectionEnumerator.MoveNext() )
+    {
+      number &n = numberCollectionEnumerator.Current();
+      n_Normalize(n, r); // ?
+      n_InpMult(n, inv, r);
+    }
+    
+    n_Delete(&inv, r);
+  }
+}
+
+/// does nothing (just returns a dummy one number)
+static void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)
+{
+  assume( r != NULL );
+  assume( !(nCoeff_is_Q(r) || nCoeff_is_transExt(r)) );
+  assume( nCoeff_is_Ring(r) || nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || (getCoeffType(r)==n_algExt) );
+
+  d = n_Init(1, r);
+}
+
 number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
@@ -261,6 +332,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     
     n->cfParameter = ndParameter;
 
+    n->cfClearContent = ndClearContent;
+    n->cfClearDenominators = ndClearDenominators;
+
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
@@ -351,6 +425,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfInpMult!=NULL);
 //    assume(n->cfInit_bigint!=NULL);
     assume(n->cfCoeffWrite != NULL);
+
+    assume(n->cfClearContent != NULL);
+    assume(n->cfClearDenominators != NULL);
+    
 #ifdef LDEBUG
     assume(n->cfDBTest!=NULL);
 #endif
