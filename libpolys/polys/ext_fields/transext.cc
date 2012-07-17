@@ -72,7 +72,7 @@
 #define ntTest(a) ntDBTest(a,__FILE__,__LINE__,cf)
 BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
 #else
-#define ntTest(a) (TRUE)
+#define ntTest(a) ((void)(TRUE))
 #endif
 
 /// Our own type!

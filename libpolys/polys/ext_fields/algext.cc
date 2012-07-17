@@ -56,7 +56,7 @@
 #define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
 BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
 #else
-#define naTest(a) (TRUE)
+#define naTest(a) ((void)(TRUE))
 #endif
 
 /// Our own type!

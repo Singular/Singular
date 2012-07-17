@@ -58,7 +58,7 @@ static inline int idSize(const ideal id)
 #define idTest(A) id_DBTest(A, PDEBUG, __FILE__,__LINE__,currRing)
 #define idPrint(id) idShow(id, currRing, currRing)
 #else
-#define idTest(A)  (TRUE)
+#define idTest(A)  ((void)(TRUE))
 #define idPrint(A) ((void)0)
 #endif
 
