@@ -644,6 +644,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     return factors;
   }
 
+  A *= bCommonDen (A);
   A= A (y + evaluation, y);
 
   int liftBound= degree (A, y) + 1;
@@ -721,6 +722,10 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     for (CFListIterator iter= uniFactors; iter.hasItem(); iter++)
       iter.getItem()= replacevar (iter.getItem(), vv, v);
   }
+
+  On (SW_RATIONAL);
+  A *= bCommonDen (A);
+  Off (SW_RATIONAL);
 
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                 uniFactors.length()/2, b);
