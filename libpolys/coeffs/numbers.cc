@@ -123,8 +123,7 @@ number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
-/// divide by the first (leading) number and return it, i.e. make monic
-static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
+void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
 {
   assume(r != NULL);
 
@@ -184,8 +183,7 @@ static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   }
 }
 
-/// does nothing (just returns a dummy one number)
-static void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)
+void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)
 {
   assume( r != NULL );
   assume( !(nCoeff_is_Q(r) || nCoeff_is_transExt(r)) );

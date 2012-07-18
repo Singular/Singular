@@ -94,4 +94,10 @@ void   ndNormalize(number& d, const coeffs); // nNormalize...
 typedef BOOLEAN (*cfInitCharProc)(coeffs, void *);
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p);
 
+/// divide by the first (leading) number and return it, i.e. make monic
+void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r);
+
+/// does nothing (just returns a dummy one number)
+void ndClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& d, const coeffs r);
+
 #endif

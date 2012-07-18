@@ -2637,6 +2637,48 @@ number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 #endif
 }
 
+static void nlClearContent(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
+{
+  assume(cf != NULL);
+  assume(getCoeffType(cf) == ID);
+  // all coeffs are given by integers!!!
+
+  c = n_Init(1, cf);
+  assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
+
+//   numberCollectionEnumerator.Reset();
+// 
+//   c = numberCollectionEnumerator.Current();
+// 
+//   n_Normalize(c, r);
+// 
+//   if (!n_IsOne(c, r))
+//   {    
+//     numberCollectionEnumerator.Current() = n_Init(1, r); // ???
+// 
+//     number inv = n_Invers(c, r);
+// 
+//     while( numberCollectionEnumerator.MoveNext() )
+//     {
+//       number &n = numberCollectionEnumerator.Current();
+//       n_Normalize(n, r); // ?
+//       n_InpMult(n, inv, r);
+//     }
+// 
+//     n_Delete(&inv, r);
+//   }
+}
+
+static void nlClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
+{
+  assume(cf != NULL);
+  assume(getCoeffType(cf) == ID);
+  // all coeffs are given by integers!!!
+
+  c = n_Init(1, cf);
+  assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
+}
+
 BOOLEAN nlInitChar(coeffs r, void*)
 {
   assume( getCoeffType(r) == ID );
@@ -2694,6 +2736,10 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfInpMult=nlInpMult;
   r->cfInit_bigint=nlCopyMap;
   r->cfCoeffWrite=nlCoeffWrite;
+
+  r->cfClearContent = nlClearContent;
+  r->cfClearDenominators = nlClearDenominators;
+  
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=nlDBTest;

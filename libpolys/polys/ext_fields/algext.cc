@@ -830,6 +830,40 @@ int naIsParam(number m, const coeffs cf)
   return p_Var( (poly)m, R );
 }
 
+static void naClearContent(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
+{
+  assume(cf != NULL);
+  assume(getCoeffType(cf) == ID);
+  assume(nCoeff_is_Q_a(cf)); // only over Q[a]/m(a), while the default impl. is used over Zp[a]/m(a) !
+  // all coeffs are given by integers!!!
+
+  c = n_Init(1, cf);
+  assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
+
+//   numberCollectionEnumerator.Reset();
+// 
+//   c = numberCollectionEnumerator.Current();
+// 
+//   n_Normalize(c, r);
+// 
+//   if (!n_IsOne(c, r))
+//   {    
+//     numberCollectionEnumerator.Current() = n_Init(1, r); // ???
+// 
+//     number inv = n_Invers(c, r);
+// 
+//     while( numberCollectionEnumerator.MoveNext() )
+//     {
+//       number &n = numberCollectionEnumerator.Current();
+//       n_Normalize(n, r); // ?
+//       n_InpMult(n, inv, r);
+//     }
+// 
+//     n_Delete(&inv, r);
+//   }
+}
+
+
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
   assume( infoStruct != NULL );
@@ -913,5 +947,8 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->pParameterNames = R->names;
   cf->cfParameter = naParameter;
 
+  if( nCoeff_is_Q(R->cf) )
+    cf->cfClearContent = naClearContent;
+  
   return FALSE;
 }

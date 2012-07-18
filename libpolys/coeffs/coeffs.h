@@ -812,8 +812,11 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 
 /// Computes the content and (inplace) divides it out on a collection
 /// of numbers
-/// NOTE/TODO: see the description by Hans
-/// TODO: what exactly is c?
+/// number @em c is the content (i.e. the GCD of all the coeffs, which
+/// we divide out inplace)
+/// NOTE: it assumes all coefficient numbers to be integer!!!
+/// NOTE/TODO: see also the description by Hans
+/// TODO: rename into n_ClearIntegerContent
 static inline void n_ClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
 {
   assume(r != NULL);
@@ -821,8 +824,9 @@ static inline void n_ClearContent(ICoeffsEnumerator& numberCollectionEnumerator,
 }
 
 /// (inplace) Clears denominators on a collection of numbers
-/// NOTE/TODO: see the description by Hans
-/// TODO: what exactly is d?
+/// number @em d is the LCM of all the coefficient denominators (i.e. the number
+/// with which all the number coeffs. were multiplied)
+/// NOTE/TODO: see also the description by Hans
 static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& d, const coeffs r)
 {
   assume(r != NULL);
