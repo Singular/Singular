@@ -126,7 +126,7 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
   {
     if ( f.isImm() )
     {
-      printf("+%d",f.intval());
+      printf("+%ld",f.intval());
     }
     else
     {
