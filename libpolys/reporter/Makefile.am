@@ -17,7 +17,7 @@ libreporter_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 libreporter_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 
-SOURCES  = dError.c reporter.cc
+SOURCES  = dError.cc reporter.cc
 libreporter_la_SOURCES   = $(SOURCES)
 libreporter_g_la_SOURCES = $(SOURCES)
 
