@@ -14,7 +14,7 @@ AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER(omConfig.h)
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
 
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([omConfig.h],[],[omConfig.h])
@@ -98,6 +98,7 @@ AC_PROG_CPP
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
+# AM_PROG_AR
 AC_C_CONST
 AC_C_INLINE
 
@@ -165,6 +166,7 @@ dnl
 AC_MSG_CHECKING(size of system page)
 AC_CACHE_VAL(ac_cv_pagesize,
 AC_TRY_RUN([#include <stdio.h>
+#include <stdlib.h>
 #include "omGetPageSize.h"
 
 main()
@@ -195,6 +197,7 @@ if test "$ac_cv_func_mmap" = yes; then
 AC_MSG_CHECKING(whether mmap works)
 AC_CACHE_VAL(ac_cv_working_mmap,
 AC_TRY_RUN([
+#include <stdlib.h>
 #include "omMmap.c"
 main()
 {
@@ -214,6 +217,7 @@ dnl for strict alignment
 dnl
 AC_CACHE_CHECK(whether alignment needs to be strict, ac_cv_align_need_strict,
 AC_TRY_RUN([
+#include <stdlib.h>
 main()
 {
   void* ptr = (void*) malloc(12);
@@ -284,6 +288,7 @@ elif test "${ac_cv_malloc_sizeof_addr}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURC
    AC_MSG_RESULT( (cached) yes)
 else
 AC_TRY_RUN([
+#include <stdlib.h>
 #include "$OM_MALLOC_HEADER"
 #ifdef OM_HAVE_MALLOC_SOURCE
 #include "$OM_MALLOC_SOURCE"
@@ -323,6 +328,7 @@ elif test "${ac_cv_working_valloc}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}";
   AC_MSG_RESULT( (cached) yes)
 else
 AC_TRY_RUN([
+#include <stdlib.h>
 #include "$OM_MALLOC_HEADER"
 #ifdef OM_HAVE_MALLOC_SOURCE
 #include "$OM_MALLOC_SOURCE"
@@ -442,12 +448,13 @@ dnl
 AC_MSG_CHECKING(whether GET_RET_ADDR works)
 AC_CACHE_VAL(ac_cv_get_return_addr_works,
 AC_TRY_RUN([
+#include <stdlib.h>
 #include "omReturn.h"
 int test_return_addr()
 {
   char* f;
   GET_RET_ADDR(f);
-  return (int) f;
+  return (int)(long) f;
 }
 int main()
 {
@@ -464,8 +471,9 @@ fi
 AC_MSG_CHECKING(whether omGetBackTrace works)
 AC_CACHE_VAL(ac_cv_get_backtrace_works,
 AC_TRY_RUN([
-#include "omGetBackTrace.c"
 #include <stdio.h>
+#include <stdlib.h>
+#include "omGetBackTrace.c"
 int test_backtrace()
 {
   void* bt;
@@ -491,6 +499,7 @@ fi
 AC_MSG_CHECKING(whether addr2line works)
 AC_CACHE_VAL(ac_cv_prog_addr2line_works,
 AC_TRY_RUN([
+#include <stdlib.h>
 #undef OM_GET_BACKTRACE_WORKS
 #include "omReturn.h"
 #include "omStructs.h"

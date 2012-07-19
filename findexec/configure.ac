@@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR([omFindExec.h])
 AC_CONFIG_HEADER([config.h])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
@@ -31,13 +31,9 @@ else
   fi
 fi
 
-# Turn off shared libraries during beta-testing, since they
-# make the build process take too long.
-LT_INIT
-# ([shared])
-# LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
-
 AM_PROG_CC_C_O
+# AM_PROG_AR
+
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
@@ -46,13 +42,17 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h sys/stat.h sys/types.h])
 AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
 
-
-
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 AC_HEADER_STDBOOL
 AC_TYPE_SIZE_T
+
+# Turn off shared libraries during beta-testing, since they
+# make the build process take too long.
+LT_INIT
+# ([shared])
+# LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
 
 
 SING_CHECK_PIPE

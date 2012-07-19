@@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([config.h misc/auxiliary.h])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
@@ -31,15 +31,16 @@ else
   fi
 fi
 
+AM_PROG_CC_C_O
+AC_PROG_LN_S
+AC_PROG_INSTALL
+
+# AM_PROG_AR
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
 LT_INIT
 # ([shared])
 # LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
-
-AM_PROG_CC_C_O
-AC_PROG_LN_S
-AC_PROG_INSTALL
 
 # Checks for libraries.
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))

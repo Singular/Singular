@@ -4,7 +4,7 @@ AC_CONFIG_SRCDIR(dummy.c)
 AC_CONFIG_AUX_DIR([.])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects -Werror silent-rules -Wno-extra-portability])
 
 AC_PROG_MAKE_SET
 AC_PROG_CC

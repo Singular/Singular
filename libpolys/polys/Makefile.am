@@ -41,7 +41,7 @@ SOURCES = \
 	clapsing.cc clapconv.cc \
 	nc/old.gring.cc
 
-LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \ 
+LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
   monomials/p_polys.h monomials/maps.h PolyEnumerator.h  prCopy.h \
 	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h nc/gb_hack.h \
 	operations/pShallowCopyDelete.h \

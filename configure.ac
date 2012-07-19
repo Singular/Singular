@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR([Singular/tesths.cc])
 AC_CONFIG_HEADER([config.h])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
@@ -50,6 +50,7 @@ AM_PROG_CC_C_O
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
+# AM_PROG_AR
 LT_INIT
    
 # Checks for libraries.
