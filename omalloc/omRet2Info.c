@@ -91,9 +91,10 @@ File:Line
       }
       pclose(pipe);
     }
+    return filled;
   }
 #endif
-  return filled;
+  return j;
 }
 
 int omPrintRetInfo(omRetInfo info, int max, FILE* fd, const char* fmt)

@@ -485,8 +485,8 @@ int main()
    int i;
    omInitGetBackTrace();
    i = test_backtrace();
-   if (i == 1) exit(0);
-   else exit(i+1);
+   if (i > 0) exit(0);
+   else exit(i+10);
 }
 ], ac_cv_get_backtrace_works=yes,
    ac_cv_get_backtrace_works=no,
