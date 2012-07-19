@@ -267,8 +267,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   }
 
   CFMap N, M;
-  CFArray dummy= CFArray (1);
+  CFArray dummy= CFArray (2);
   dummy [0]= LCF;
+  dummy [1]= Variable (2);
   compress (dummy, M, N);
   CanonicalForm F= M (LCF);
   if (LCF.isUnivariate())
@@ -320,9 +321,20 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   CFFList * bufSqrfFactors= new CFFList [factors.length()];
   CFList evalSqrfPartF, bufFactors;
   CFArray evalPoint= CFArray (evaluation.length() - 1);
+  CFArray buf= CFArray (evaluation.length());
+  CFArray swap= CFArray (evaluation.length());
   CFListIterator iter= evaluation;
-  for (int i= evaluation.length() - 2; i > -1; i--, iter++)
-    evalPoint[i]= iter.getItem();
+  CanonicalForm vars=getVars (LCF);
+  for (int i= evaluation.length() +1; i > 1; i--, iter++)
+  {
+    buf[i-2]=iter.getItem();
+    if (degree (vars, i) > 0)
+      swap[M(Variable (i)).level()-1]=buf[i-2];
+  }
+  buf= swap;
+  for (int i= 0; i < evaluation.length() - 1; i++)
+    evalPoint[i]= buf[i+1];
+
   //TODO sqrfPartF einmal berechnen nicht ständig
   int pass= testFactors (F, factors, sqrfPartF,
                          bufFactors, bufSqrfFactors, evalSqrfPartF, evalPoint);
@@ -334,11 +346,10 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   if (!pass)
   {
     int lev= 0;
+    CanonicalForm bufF;
+    CFList bufBufFactors;
     for (int i= 0; i < length; i++)
     {
-      CanonicalForm bufF, swap;
-      CFList bufBufFactors;
-      CFArray buf;
       if (!differentSecondVarLCs [i].isEmpty())
       {
         bool allConstant= true;
@@ -362,21 +373,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         bufF= swapvar (bufF, x, z);
         bufBufFactors= bufFactors;
         evalPoint= CFArray (evaluation.length() - 1);
-        buf= CFArray (evaluation.length());
-        iter= evaluation;
-        int k= evaluation.length() - 1;
-        for (; iter.hasItem(); iter++, k--)
-          buf[k]= iter.getItem();
-        swap= buf[z.level() - 1];
-        buf[z.level() - 1]= buf[0];
-        buf[0]= 0;
-        int l= 0;
-        for (k= 0; k < evaluation.length(); k++)
+        for (int k= 0; k < evaluation.length()-1; k++)
         {
-          if (buf[k].isZero())
-            continue;
-          evalPoint[l]= buf[k];
-          l++;
+          if (k+1 != lev)
+            evalPoint[k]= buf[k+1];
+          else
+            evalPoint[k]= buf[0];
         }
         pass= testFactors (bufF, bufBufFactors, sqrfPartF, bufFactors,
                            bufSqrfFactors, evalSqrfPartF, evalPoint);
@@ -420,29 +422,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
   bufFactors= factors;
   CFList evaluation2;
-  if (y == x)
-    evaluation2= evaluation;
-  else
-  {
-    CanonicalForm tmp;
-    evaluation2= evaluation;
-    int i= evaluation.length() + 1;
-    for (CFListIterator iter= evaluation2; iter.hasItem(); iter++, i--)
-    {
-      if (i == y.level())
-      {
-        tmp= iter.getItem();
-        iter.getItem()= evaluation2.getLast();
-        evaluation2.removeLast();
-        evaluation2.append (tmp);
-        break;
-      }
-    }
-  }
+  for (int i= 0; i < F.level()-1; i++)
+    evaluation2.insert (evalPoint[i]);
 
   CFList interMedResult;
   CanonicalForm oldSqrfPartF= sqrfPartF;
-  sqrfPartF= shift2Zero (sqrfPartF, evalSqrfPartF, evaluation2, 1);
+  sqrfPartF= shift2Zero (sqrfPartF, evalSqrfPartF, evaluation2);
   if (factors.length() > 1)
   {
     CanonicalForm LC1= LC (oldSqrfPartF, 1);
@@ -450,7 +435,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     for (int i= 0; i < factors.length(); i++)
       leadingCoeffs.append (LC1);
 
-    CFList LC1eval= evaluateAtEval (LC1, evaluation2, 1);
+    CFList LC1eval= evaluateAtEval (LC1, evaluation2,2);
     CFList oldFactors= factors;
     for (CFListIterator i= oldFactors; i.hasItem(); i++)
       i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
@@ -459,7 +444,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
     if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
         LucksWangSparseHeuristic (oldSqrfPartFPowLC,
-                                  oldFactors, 1, leadingCoeffs, factors))
+                                  oldFactors, 2, leadingCoeffs, factors))
     {
       interMedResult= recoverFactors (oldSqrfPartF, factors);
       if (oldFactors.length() == interMedResult.length())
@@ -474,10 +459,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         leadingCoeffs[i]= LC1;
 
       for (CFListIterator i= factors; i.hasItem(); i++)
-      {
-        i.getItem()= i.getItem() (x + evaluation2.getLast(), x);
         i.getItem() *= LC1 (0,2)/Lc (i.getItem());
-      }
       factors.insert (1);
 
       CanonicalForm
@@ -521,10 +503,10 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         delete [] liftBounds;
       }
       for (CFListIterator iter= factors; iter.hasItem(); iter++)
-        iter.getItem()= reverseShift (iter.getItem(), evaluation2, 1);
+        iter.getItem()= reverseShift (iter.getItem(), evaluation2);
 
       interMedResult=
-      recoverFactors (reverseShift(evalSqrfPartF.getLast(),evaluation2,1),
+      recoverFactors (reverseShift(evalSqrfPartF.getLast(),evaluation2),
                       factors);
     }
   }
