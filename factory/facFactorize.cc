@@ -763,7 +763,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   else if (biFactors.length() > minFactorsLength)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
 
-  if (differentSecondVar == A.level() - 2)
+  if (differentSecondVar == A.level() - 2 && getNumVars(LC(A,1)) == A.level()-1)
   {
     bool zeroOccured= false;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++)
