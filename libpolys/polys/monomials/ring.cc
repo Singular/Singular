@@ -5004,6 +5004,10 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p)
   return TRUE;
 }
 
+#ifdef PDEBUG
+int pDBsyzComp=0;
+#endif
+
 
 void rSetSyzComp(int k, const ring r)
 {
