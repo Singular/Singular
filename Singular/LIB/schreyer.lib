@@ -1726,8 +1726,13 @@ proc SSComputeSyzygy(def L, def T)
     if( size( module( matrix(TT) - matrix(@TT) ) ) != 0 )
     {
       "ERROR in SSComputeSyzygy: wrong tail syzygies!?";
+      "";
       TT; @TT;
+      "";
       L; T;
+      "";
+      type(LL);
+      type(@LL);
       $
     }   
     

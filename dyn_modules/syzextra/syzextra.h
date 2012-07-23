@@ -137,6 +137,13 @@ class SchreyerSyzygyComputation
     poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const;
 
   protected:
+
+    /// just leading terms
+    ideal Compute1LeadingSyzygyTerms();
+
+    /// leading + second terms
+    ideal Compute2LeadingSyzygyTerms();
+    
     
     /// Clean up all the accumulated data
     void CleanUp() {}
