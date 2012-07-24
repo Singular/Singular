@@ -3042,8 +3042,8 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 {
   int j = pos;
   if ( (!strat->fromT)
-  && (1//(strat->syzComp==0)
-    //||(pGetComp(h)<=strat->syzComp)))
+  && ((strat->syzComp==0)
+    ||(pGetComp(h)<=strat->syzComp)
   ))
   {
     // Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
