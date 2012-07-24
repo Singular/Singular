@@ -478,6 +478,12 @@ CanonicalForm::degree( const Variable & v ) const
 // are considered polynomials, not coefficients, and such may
 // have a taildegree larger than zero.
 //
+// tailcoeff( v ) returns the tail coefficient of CO where CO is
+// considered an univariate polynomial in the polynomial variable
+// v.
+// Note: If v is less than the main variable of CO we have to
+// swap variables which may be quite expensive.
+//
 // See also: InternalCF::tailcoeff(), InternalCF::tailcoeff(),
 // InternalPoly::tailcoeff(), InternalPoly::taildegree,
 // ::tailcoeff(), ::taildegree()
@@ -490,6 +496,27 @@ CanonicalForm::tailcoeff () const
         return *this;
     else
         return value->tailcoeff();
+}
+
+CanonicalForm
+CanonicalForm::tailcoeff (const Variable& v) const
+{
+    if ( is_imm( value ) || value->inCoeffDomain() )
+        return *this;
+
+    Variable x = value->variable();
+    if ( v > x )
+        return *this;
+    else if ( v == x )
+        return value->tailcoeff();
+    else {
+        CanonicalForm f = swapvar( *this, v, x );
+         if ( f.mvar() == x )
+             return swapvar( f.value->tailcoeff(), v, x );
+         else
+            // v did not occur in f
+            return *this;
+    }
 }
 
 int
