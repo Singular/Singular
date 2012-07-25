@@ -247,7 +247,7 @@ int main(          /* main entry to Singular */
       else
         return 1;
     #else
-      assume(0);
+      // assume(0); // commented out as MP was deprecated!!!
     #endif
     }
   }

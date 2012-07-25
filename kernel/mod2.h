@@ -321,7 +321,12 @@
 
 /* Undefine to disable debugging of MP stuff */
 #ifdef HAVE_MPSR
-#define MPSR_DEBUG
+#undef HAVE_MPSR
+// #define MPSR_DEBUG
+#endif
+
+#ifdef MPSR_DEBUG
+#undef MPSR_DEBUG
 #endif
 
 
