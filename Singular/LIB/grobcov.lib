@@ -4348,7 +4348,7 @@ static proc RrepNN(ideal N, ideal W, poly f)
   option(redSB);
   N1=std(N1);
   //attrib(N1,"IsSB",1);
-  def H=sqrfree(f);
+  def H=sqrfree(f, 1);
   int i;
   for(i=1;i<=size(H);i++){W1[size(W1)+1]=reduce(H[i],N1);}
 
