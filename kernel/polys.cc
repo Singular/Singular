@@ -12,14 +12,26 @@ ideal currQuotient = NULL;
 
 void rChangeCurrRing(ring r)
 {
-   currRing = r;
-   currQuotient = r->qideal;
-   //------------ global variables related to coefficients ------------
-   nSetChar(r->cf);
-   //------------ global variables related to polys -------------------
+  if( r != NULL )
+  {
+    rTest(r);    
+
+    //------------ set global ring vars --------------------------------
+    currRing = r;
+    currQuotient = r->qideal;
+    //------------ global variables related to coefficients ------------
+    assume( r->cf!= NULL );
+    nSetChar(r->cf);
+    //------------ global variables related to polys
+    p_SetGlobals(r);
+    //------------ global variables related to factory -----------------
+  } else
+  {
+    currRing = NULL;
+    currQuotient = NULL;
+  }
 }
 /*
-
 /// internally changes the gloabl ring and resets the relevant
 /// global variables:
 /// SHOULD BE DEPRECATED NOW...?
