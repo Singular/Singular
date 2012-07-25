@@ -2892,6 +2892,9 @@ poly lpMult
     ( p, currRing, currRing, m, currRing, uptodeg, lV );
 }
 
+namespace ShiftDVec
+{ uint CreateDVec(poly p, ring r, uint*& dvec); }
+
 /* L is a list of Pairs. Each Pair is a list, containing a
  * polynomial as first entry and a monomial as second entry.
  * lpMultProfiler will successively start each multiplication
@@ -2936,12 +2939,14 @@ lists lpMultProfiler
         for( int j = 1; j < n; ++j )
         {
           result = lpMultFunctions.pp_Mult_mm[i]
-            ( p, currRing, currRing, m, currRing, uptodeg, lV );
+            ( p, currRing, currRing, m, currRing, 
+              uptodeg, lV, NULL, 0                );
           p_Delete(&(result->next), currRing);
           p_LmFree(result, currRing);
         }
         result = lpMultFunctions.pp_Mult_mm[i]
-          ( p, currRing, currRing, m, currRing, uptodeg, lV );
+          ( p, currRing, currRing, m, currRing, 
+            uptodeg, lV, NULL, 0                );
         time = getTimer();
 
         //store timing and result into a new pair
@@ -2994,6 +2999,9 @@ lists lpMultProfilerR
       {
         poly p = (poly) Pair->m[0].data;
         poly m = (poly) Pair->m[1].data;
+        uint* mDVec;
+        uint  mDVsize = 
+          ShiftDVec::CreateDVec(m, currRing, mDVec);
 
         //create timing and get multiplication result
         initRTimer();
@@ -3005,14 +3013,16 @@ lists lpMultProfilerR
           for( int j = 1; j < n; ++j )
           {
             result = lpMultFunctions.pp_Mult_mm[i]
-              ( p, currRing, currRing, m, currRing, uptodeg, lV );
+              ( p, currRing, currRing, m, currRing, 
+                uptodeg, lV, mDVec, mDVsize         );
             p_Delete(&(result->next), currRing);
             p_LmFree(result, currRing);
           }
         }
         else startRTimer();
         result = lpMultFunctions.pp_Mult_mm[i]
-          ( p, currRing, currRing, m, currRing, uptodeg, lV );
+          ( p, currRing, currRing, m, currRing, 
+            uptodeg, lV, mDVec, mDVsize         );
         time = getRTimer();
 
         //store timing and result into a new pair
@@ -3026,6 +3036,7 @@ lists lpMultProfilerR
         //put this pair into the list from above
         rtPL->m[k].rtyp = LIST_CMD;
         rtPL->m[k].data = (char *) rtP;
+        omFreeSize( (ADDRESS)mDVec, (mDVsize) * sizeof(uint) );
       }
       else
       {

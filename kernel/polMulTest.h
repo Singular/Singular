@@ -7,40 +7,66 @@ poly p_Shrink(poly p, int lV, const ring r);
 
 inline poly pp_Mult_mm_normal
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_shift_n_shrink
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_v0
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_v1
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_v1_a
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_v2
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_v2_a
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  );
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v2_a_with_mDVec
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
 
 struct letterplace_multiplication_functions
 {
- poly (*pp_Mult_mm[7])
-  (poly, const ring, const ring, poly, const ring, int, int);
-   int size;
+  poly (*pp_Mult_mm[8])
+    ( poly, const ring, const ring, poly, const ring, 
+      int uptodeg, int lV, uint* mDVec, uint dvSize   );
+  int size;
    
 }; 
-struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a }, 7, };
+
+struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
+
+/*
+struct letterplace_multiplication_functions lpMultFunctions = 
+{ { &pp_Mult_mm_normal, 
+    &lp_pp_Mult_mm_shift_n_shrink, 
+    &lp_pp_Mult_mm_v0, 
+    &lp_pp_Mult_mm_v1, 
+    &lp_pp_Mult_mm_v2, 
+    &lp_pp_Mult_mm_v1_a, 
+    &lp_pp_Mult_mm_v2_a, 
+    &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
+*/
 
 //Note to me: How to use lists
 #if 2>3
@@ -247,7 +273,8 @@ inline long max(long a, long b)
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly pp_Mult_mm_normal
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
@@ -261,7 +288,8 @@ inline poly pp_Mult_mm_normal
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_shift_n_shrink
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
@@ -288,7 +316,8 @@ inline poly lp_pp_Mult_mm_shift_n_shrink
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_v0
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
@@ -342,7 +371,8 @@ inline poly lp_pp_Mult_mm_v0
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_v1
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
@@ -394,7 +424,8 @@ inline void p_SetOneBit(const poly p, const int VarOffset)
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_v2
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
@@ -457,12 +488,13 @@ inline poly lp_pp_Mult_mm_v2
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_v1_a
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
   uint* dvec, * dvIt;
-  uint dvSize = ShiftDVec::CreateDVec(m, r_m, dvec);
+  dvSize = ShiftDVec::CreateDVec(m, r_m, dvec);
   uint* dvLast = &(dvec[dvSize]);
 
   poly rt = p_Head(p, r_lm_p);
@@ -493,7 +525,8 @@ inline poly lp_pp_Mult_mm_v1_a
 // output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_v2_a
   ( poly p, const ring r_lm_p, const ring r_t_p,
-    poly m, const ring r_m, int uptodeg, int lV  )
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
 {
   if( p == NULL || m == NULL ) return NULL;
 
@@ -502,7 +535,7 @@ inline poly lp_pp_Mult_mm_v2_a
   int* VOffPtr = VOffset;
 
   uint* dvec, * dvIt;
-  uint dvSize = ShiftDVec::CreateDVec(m, r_m, dvec);
+  dvSize = ShiftDVec::CreateDVec(m, r_m, dvec);
   uint* dvLast = &(dvec[dvSize]);
 
   poly rt = p_Head(p, r_lm_p);
@@ -524,6 +557,46 @@ inline poly lp_pp_Mult_mm_v2_a
   }
 
   omFreeSize( (ADDRESS)dvec, (dvSize) * sizeof(uint) );
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v2_a_with_mDVec
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL || mDVec == NULL ) return NULL;
+
+  int numVars = r_t_p->N;
+  int* VOffset = r_t_p->VarOffset;
+  int* VOffPtr = VOffset;
+
+  uint* dvIt;
+  uint* dvLast = &(mDVec[dvSize]);
+
+  poly rt = p_Head(p, r_lm_p);
+  long indexP = p_Totaldegree(p, r_lm_p)*lV;
+  indexP += mDVec[0];
+  for(dvIt = mDVec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
+    p_SetOneBit(rt, r_lm_p->VarOffset[indexP]);
+
+  poly rt_it = rt;
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    indexP = p_Totaldegree(p, r_t_p) * lV;
+    VOffPtr = VOffset + indexP + mDVec[0];
+    for(dvIt = mDVec; dvIt != dvLast; ++dvIt, VOffPtr += *dvIt)
+      p_SetOneBit(rt_it, *VOffPtr);
+    pIter(p);
+  }
 
   number coeffM = p_GetCoeff(m, r_m);
   return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
