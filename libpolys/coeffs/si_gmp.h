@@ -2,21 +2,13 @@
 #define COEFFS_SI_GMP_H
 
 
+#ifdef HAVE_FACTORY
 // just assume that factory have been built (cplusplus.h!)
 // instead of duplicating cf_gmp.h here for now...
-//#include <factory/cf_gmp.h>
-
-#if defined(__cplusplus) && defined(__GNUC__)
-  #define __cplusplus_backup __cplusplus
-  #undef __cplusplus
-  extern "C" {
-  #include <gmp.h>
-  }
-  #define __cplusplus __cplusplus_backup
+#include <factory/cf_gmp.h>
 #else
-  #include <gmp.h>
+#include <gmp.h>
 #endif
-
 
 #ifndef mpz_size1
 // This is taken from longrat.h: it seems to be generally GMP-related
