@@ -56,7 +56,12 @@ AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1], [Define if vsnprint
 # Checks for header files.
 AC_HEADER_STDC
 AC_STDC_HEADERS
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h float.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h float.h execinfo.h])
+
+# If the compiler supports GCC C++ ABI name demangling (has header
+#   cxxabi.h and abi::__cxa_demangle() function), define
+#   HAVE_GCC_ABI_DEMANGLE
+AX_CXX_GCC_ABI_DEMANGLE
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

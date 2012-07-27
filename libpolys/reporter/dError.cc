@@ -23,20 +23,21 @@ static inline void malloc_free( void * ptr )
   free(ptr);
 }
 
-#define HAVE_EXECINFO
-#define HAVE_CXXABI
-
-#ifdef HAVE_EXECINFO
+#ifdef HAVE_EXECINFO_H
 #include <execinfo.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_CXXABI
+#ifdef HAVE_GCC_ABI_DEMANGLE
 #include <cxxabi.h>
 #endif
 
 
 #include <reporter/reporter.h>
+
 #ifdef HAVE_CONFIG_H
 #include <omalloc/omalloc.h>
 #endif
@@ -55,7 +56,7 @@ extern "C"
 
 int dReportError(const char* fmt, ...)
 {
-#ifdef HAVE_EXECINFO
+#ifdef HAVE_EXECINFO_H
 #define SIZE 50
   void *buffer[SIZE+1]; int i, j, k, ret, status; char **ptr; char *demangledName; char *s; char *ss;
 #endif
@@ -73,14 +74,14 @@ int dReportError(const char* fmt, ...)
   omPrintCurrentBackTraceMax(stderr, 8);
 #endif
 
-#ifdef HAVE_EXECINFO
-  ret = backtrace( buffer, SIZE );
+#ifdef HAVE_EXECINFO_H
+  ret = backtrace( buffer, SIZE ); // execinfo.h
   fprintf(stderr, "\nExecinfo backtrace (with %zd stack frames): \n", ret);
   
-#ifndef HAVE_CXXABI
-  backtrace_symbols_fd(buffer, ret, STDERR_FILENO);
+#ifndef HAVE_GCC_ABI_DEMANGLE
+  backtrace_symbols_fd(buffer, ret, STDERR_FILENO); // execinfo.h
 #else
-  ptr = backtrace_symbols( buffer, ret );
+  ptr = backtrace_symbols( buffer, ret ); // execinfo.h
 
   for (i = 0; i < ret; i++)
   {
@@ -99,7 +100,7 @@ int dReportError(const char* fmt, ...)
     if ( ss != NULL )
     {
       ss[0] = 0;
-      demangledName = abi::__cxa_demangle( s, NULL, NULL, &status );
+      demangledName = abi::__cxa_demangle( s, NULL, NULL, &status ); // cxxabi.h!
       if( status == 0 && demangledName != NULL )
         fprintf (stderr, " '%s'", (demangledName[0] != 0)? demangledName: s);
       else
@@ -128,7 +129,7 @@ int dReportError(const char* fmt, ...)
   
   dErrorBreak();
 #else
-  fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
+  fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR::Spielwiese.");
   fprintf(stderr, "// !!! Please, email the input\n// and the following error message to singular@mathematik.uni-kl.de")
   vfprintf(stderr, fmt, ap);
 #endif
