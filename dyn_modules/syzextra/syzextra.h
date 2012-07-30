@@ -16,6 +16,8 @@
 #ifndef SYZEXTRA_H
 #define SYZEXTRA_H
 
+#include <vector>
+
 // include basic definitions
 #include "singularxx_defs.h"
 
@@ -77,6 +79,20 @@ struct SchreyerSyzygyComputationFlags
 
 };
 
+class SchreyerSyzygyComputation;
+
+class CLCM: public std::vector<bool>
+{
+  public:
+    CLCM(const SchreyerSyzygyComputation& data);
+
+    bool Check(const poly m) const;
+    
+  private:
+    const SchreyerSyzygyComputation& m_data;
+
+    bool m_compute;
+};
 
 
 /** @class SchreyerSyzygyComputation syzextra.h
@@ -91,19 +107,28 @@ struct SchreyerSyzygyComputationFlags
  */
 class SchreyerSyzygyComputation
 {
+  friend class CLCM;
+  
   public:
+
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ring rBaseRing, const SchreyerSyzygyComputationFlags attribues):
         m_rBaseRing(rBaseRing),
         m_idLeads(idLeads), m_idTails(idTails), 
-        m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL), m_atttributes(attribues) {}
+        m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL), m_atttributes(attribues),
+        m_lcm(*this)
+    {
+    }
 
 
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const ring rBaseRing, const SchreyerSyzygyComputationFlags attribues):
         m_rBaseRing(rBaseRing),
         m_idLeads(idLeads), m_idTails(idTails), 
-        m_syzLeads(NULL), m_syzTails(NULL), m_LS(syzLeads), m_atttributes(attribues) {}
+        m_syzLeads(NULL), m_syzTails(NULL), m_LS(syzLeads), m_atttributes(attribues),
+        m_lcm(*this)
+    {
+    }
 
     
     /// Destructor should not destruct the resulting m_syzLeads, m_syzTails. 
@@ -143,8 +168,7 @@ class SchreyerSyzygyComputation
 
     /// leading + second terms
     ideal Compute2LeadingSyzygyTerms();
-    
-    
+
     /// Clean up all the accumulated data
     void CleanUp() {}
 
@@ -167,6 +191,9 @@ class SchreyerSyzygyComputation
     /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
 
     const SchreyerSyzygyComputationFlags m_atttributes;
+
+    /// Bitmask for variables occuring in leading terms
+    const CLCM m_lcm;
 };
 
 
