@@ -13,6 +13,7 @@
 
 int ipower ( int b, int n );
 int ilog2 (int a);
+int igcd (int a, int b);
 
 /*BEGINPUBLIC*/
 void factoryError_intern(const char *s);

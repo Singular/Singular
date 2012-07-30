@@ -46,6 +46,22 @@ int ilog2 (int a)
   return n;
 }
 
+int igcd( int a, int b )
+{
+    if ( a < 0 ) a = -a;
+    if ( b < 0 ) b = -b;
+
+    int c;
+
+    while ( b != 0 )
+    {
+        c = a % b;
+        a = b;
+        b = c;
+    }
+    return a;
+}
+
 #include<stdio.h>
 #include<stdlib.h>
 
