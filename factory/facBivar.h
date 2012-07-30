@@ -185,7 +185,7 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
       {
         for (CFFListIterator i= result; i.hasItem(); i++)
         {
-          LcF /= bCommonDen (i.getItem().factor());
+          LcF /= power (bCommonDen (i.getItem().factor()), i.getItem().exp());
           i.getItem()= CFFactor (i.getItem().factor()*
                        bCommonDen(i.getItem().factor()), i.getItem().exp());
         }
@@ -217,7 +217,7 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
     {
       for (CFFListIterator i= result; i.hasItem(); i++)
       {
-        LcF /= bCommonDen (i.getItem().factor());
+        LcF /= power (bCommonDen (i.getItem().factor()), i.getItem().exp());
         i.getItem()= CFFactor (i.getItem().factor()*
                      bCommonDen(i.getItem().factor()), i.getItem().exp());
       }
