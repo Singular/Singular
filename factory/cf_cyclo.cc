@@ -10,9 +10,6 @@
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
- * @internal
- * @version \$Id$
- *
 **/
 //*****************************************************************************
 
