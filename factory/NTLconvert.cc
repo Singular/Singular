@@ -1,4 +1,3 @@
-/* $Id$ */
 #include "config.h"
 
 #include "cf_assert.h"

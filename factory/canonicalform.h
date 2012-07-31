@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
