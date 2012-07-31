@@ -27,6 +27,7 @@
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
+#include <Singular/ipshell.h>
 #include <omalloc/omalloc.h>
 #include <kernel/ring.h>
 #include <kernel/matpol.h>
@@ -56,7 +57,7 @@
 //#define HAVE_PSELECT
 //#endif
 
-#define SSI_VERSION 3
+#define SSI_VERSION 4
 
 typedef struct
 {
@@ -303,7 +304,12 @@ void ssiWriteCommand(si_link l, command D)
 
 void ssiWriteProc(ssiInfo *d,procinfov p)
 {
-  ssiWriteString(d,p->data.s.body);
+  if (p->data.s.body==NULL)
+    iiGetLibProcBuffer(p);
+  if (p->data.s.body!=NULL)
+    ssiWriteString(d,p->data.s.body);
+  else
+    ssiWriteString(d,"");
 }
 
 void ssiWriteList(si_link l,lists dd)
@@ -323,6 +329,17 @@ void ssiWriteIntvec(ssiInfo *d,intvec * v)
 {
   SSI_BLOCK_CHLD;
   fprintf(d->f_write,"%d ",v->length());
+  int i;
+  for(i=0;i<v->length();i++)
+  {
+    fprintf(d->f_write,"%d ",(*v)[i]);
+  }
+  SSI_UNBLOCK_CHLD;
+}
+void ssiWriteIntmat(ssiInfo *d,intvec * v)
+{
+  SSI_BLOCK_CHLD;
+  fprintf(d->f_write,"%d %d ",v->rows(),v->cols());
   int i;
   for(i=0;i<v->length();i++)
   {
@@ -634,6 +651,18 @@ intvec* ssiReadIntvec(ssiInfo *d)
   nr=s_readint(d->f_read);
   intvec *v=new intvec(nr);
   for(int i=0;i<nr;i++)
+  {
+    (*v)[i]=s_readint(d->f_read);
+  }
+  return v;
+}
+intvec* ssiReadIntmat(ssiInfo *d)
+{
+  int r,c;
+  r=s_readint(d->f_read);
+  c=s_readint(d->f_read);
+  intvec *v=new intvec(r,c,0);
+  for(int i=0;i<r*c;i++)
   {
     (*v)[i]=s_readint(d->f_read);
   }
@@ -1148,6 +1177,9 @@ leftv ssiRead1(si_link l)
     case 17: res->rtyp=INTVEC_CMD;
              res->data=ssiReadIntvec(d);
              break;
+    case 18: res->rtyp=INTMAT_CMD;
+             res->data=ssiReadIntmat(d);
+             break;
     case 20: ssiReadBlackbox(res,l);
              break;
     // ------------
@@ -1274,6 +1306,10 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                    fputs("17 ",d->f_write);
                    ssiWriteIntvec(d,(intvec *)dd);
                    break;
+          case INTMAT_CMD:
+                   fputs("18 ",d->f_write);
+                   ssiWriteIntmat(d,(intvec *)dd);
+                   break;
           default:
             if (tt>MAX_TOK)
             {
@@ -1296,6 +1332,9 @@ BOOLEAN ssiWrite(si_link l, leftv data)
   return FALSE;
 }
 
+BOOLEAN ssiGetDump(si_link l);
+BOOLEAN ssiDump(si_link l);
+
 si_link_extension slInitSsiExtension(si_link_extension s)
 {
   s->Open=ssiOpen;
@@ -1304,6 +1343,8 @@ si_link_extension slInitSsiExtension(si_link_extension s)
   s->Read=ssiRead1;
   s->Read2=(slRead2Proc)NULL;
   s->Write=ssiWrite;
+  s->Dump=ssiDump;
+  s->GetDump=ssiGetDump;
 
   s->Status=slStatusSsi;
   s->type="ssi";
@@ -1778,6 +1819,116 @@ void sig_chld_hdl(int sig)
   }
 }
 
+static BOOLEAN DumpSsiIdhdl(si_link l, idhdl h)
+{
+  int type_id = IDTYP(h);
+
+  // C-proc not to be dumped, also LIB-proc not
+  if (type_id == PROC_CMD)
+  {
+    if (IDPROC(h)->language == LANG_C) return FALSE;
+    if (IDPROC(h)->libname != NULL) return FALSE;
+  }
+  // do not dump links
+  if (type_id == LINK_CMD) return FALSE;
+
+  // do not dump ssi internal rings: ssiRing*
+  if ((type_id == RING_CMD) && (strncmp(IDID(h),"ssiRing",7)==0))
+    return FALSE;
+
+  command D=(command)omAlloc0(sizeof(*D));
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
+  tmp.rtyp=COMMAND;
+  tmp.data=D; 
+
+  if (type_id == PACKAGE_CMD)
+  {
+    // do not dump Top
+    if (strcmp(IDID(h), "Top") == 0) return FALSE;
+    package p=(package)IDDATA(h);
+    // dump Singular-packages as load("...");
+    if (p->language==LANG_SINGULAR)
+    {
+      D->op=LOAD_CMD;
+      D->argc=1;
+      D->arg1.rtyp=STRING_CMD;
+      D->arg1.data=p->libname;
+      ssiWrite(l,&tmp);
+      omFree(D);
+      return FALSE;
+    }
+  }
+
+  // handle qrings separately
+  //if (type_id == QRING_CMD)
+  //  return DumpSsiQringQring(l, h);
+
+  // put type and name
+  //Print("generic dump:%s,%s\n",IDID(h),Tok2Cmdname(IDTYP(h)));
+  D->op='=';
+  D->argc=2;
+  D->arg1.rtyp=DEF_CMD;
+  D->arg1.name=IDID(h);
+  D->arg2.rtyp=IDTYP(h);
+  D->arg2.data=IDDATA(h);
+  ssiWrite(l,&tmp);
+  omFree(D);
+  return FALSE;
+}
+static BOOLEAN ssiDumpIter(si_link l, idhdl h)
+{
+  if (h == NULL) return FALSE;
+
+  if (ssiDumpIter(l, IDNEXT(h))) return TRUE;
+
+  // need to set the ring before writing it, otherwise we get in
+  // trouble with minpoly
+  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+    rSetHdl(h);
+
+  if (DumpSsiIdhdl(l, h)) return TRUE;
+
+  // do not dump ssi internal rings: ssiRing*
+  // but dump objects of all other rings
+  if ((IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  && (strncmp(IDID(h),"ssiRing",7)!=0))
+    return ssiDumpIter(l, IDRING(h)->idroot);
+  else
+    return FALSE;
+}
+BOOLEAN ssiDump(si_link l)
+{
+  idhdl h = IDROOT, rh = currRingHdl;
+  BOOLEAN status = ssiDumpIter(l, h);
+
+  //if (! status ) status = DumpAsciiMaps(fd, h, NULL);
+
+  if (currRingHdl != rh) rSetHdl(rh);
+  //fprintf(fd, "option(set, intvec(%d, %d));\n", test, verbose);
+
+  return status;
+}
+BOOLEAN ssiGetDump(si_link l)
+{
+  ssiInfo *d=(ssiInfo*)l->data;
+  loop
+  {
+    if (!SI_LINK_OPEN_P(l)) break;
+    if (s_iseof(d->f_read)) break;
+    leftv h=ssiRead1(l); /*contains an exit.... */
+    if (feErrors != NULL && *feErrors != '\0')
+    {
+      // handle errors:
+      PrintS(feErrors); /* currently quite simple */
+      return TRUE;
+      *feErrors = '\0';
+    }
+    h->CleanUp();
+    omFreeBin(h, sleftv_bin);
+  }
+  return FALSE;
+}
 // ----------------------------------------------------------------
 // format
 // 1 int %d
@@ -1797,6 +1948,7 @@ void sig_chld_hdl(int sig)
 // 15 setring .......
 // 16 nothing
 // 17 intvec <len> ...
+// 18 intmat
 //
 // 20 blackbox <name> ...
 //
