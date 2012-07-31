@@ -657,6 +657,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     return factors;
   }
 
+  A *= bCommonDen (A);
   // check main variable
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
   int factorNums= 3;
@@ -944,6 +945,47 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   Aeval.removeFirst();
   bool noOneToOne= false;
+
+  CFList commonDenominators;
+  for (CFListIterator iter=biFactors; iter.hasItem(); iter++)
+    commonDenominators.append (bCommonDen (iter.getItem()));
+  CanonicalForm tmp1, tmp2, tmp3=1;
+  CFListIterator iter1, iter2;
+  for (int i= 0; i < A.level() - 2; i++)
+  {
+    iter2= commonDenominators;
+    for (iter1= leadingCoeffs2[i]; iter1.hasItem(); iter1++, iter2++)
+    {
+      tmp1= bCommonDen (iter1.getItem());
+      Off (SW_RATIONAL);
+      iter2.getItem()= lcm (iter2.getItem(), tmp1);
+      On (SW_RATIONAL);
+    }
+  }
+  tmp1= prod (commonDenominators);
+  for (iter1= Aeval; iter1.hasItem(); iter1++)
+  {
+    tmp2= bCommonDen (iter1.getItem());
+    Off (SW_RATIONAL);
+    tmp3= lcm (tmp2,tmp3);
+    On (SW_RATIONAL);
+  }
+  CanonicalForm multiplier;
+  multiplier= tmp3/tmp1;
+  iter2= commonDenominators;
+  for (iter1=biFactors; iter1.hasItem(); iter1++, iter2++)
+    iter1.getItem() *= iter2.getItem()*multiplier;
+
+  for (iter1= Aeval; iter1.hasItem(); iter1++)
+    iter1.getItem() *= tmp3*power (multiplier, biFactors.length() - 1);
+
+  for (int i= 0; i < A.level() - 2; i++)
+  {
+    iter2= commonDenominators;
+    for (iter1= leadingCoeffs2[i]; iter1.hasItem(); iter1++, iter2++)
+      iter1.getItem() *= iter2.getItem()*multiplier;
+  }
+
 
   factors= nonMonicHenselLift (Aeval, biFactors, leadingCoeffs2, diophant,
                                Pi, liftBounds, liftBoundsLength, noOneToOne);
