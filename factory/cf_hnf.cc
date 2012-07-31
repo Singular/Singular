@@ -12,7 +12,6 @@
 #include "config.h"
 
 #ifdef HAVE_NTL
-#if 1
 #include "NTLconvert.h"
 #include "canonicalform.h"
 #include "cf_defs.h"
@@ -54,5 +53,4 @@ CFMatrix* cf_LLL(CFMatrix& A)
   delete AA;
   return r;
 }
-#endif
 #endif
