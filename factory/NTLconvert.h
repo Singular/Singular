@@ -1,4 +1,3 @@
-/* $Id$ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 

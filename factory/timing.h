@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */

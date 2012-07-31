@@ -1,5 +1,4 @@
-/* Emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
+/* emacs edit mode for this file is -*- C++ -*- */
 
 //{{{ docu
 //

@@ -1347,7 +1347,7 @@ CanonicalForm
 mulMod2FLINTFpReci (const CanonicalForm& F, const CanonicalForm& G, const
                     CanonicalForm& M)
 {
-  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
+  int d1= degree (F, 1) + degree (G, 1) + 1;
   d1 /= 2;
   d1 += 1;
 
@@ -1416,7 +1416,7 @@ CanonicalForm
 mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
                     CanonicalForm& M)
 {
-  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
+  int d1= degree (F, 1) + degree (G, 1) + 1;
   d1 /= 2;
   d1 += 1;
 
@@ -2434,6 +2434,10 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
     }
     else
     {
+      bool zz_pEbak= zz_pE::initialized();
+      zz_pEBak bak;
+      if (zz_pEbak)
+        bak.save();
       zz_pX mipo= convertFacCF2NTLzzpX (M);
       Variable y= Variable (2);
       zz_pEX NTLA, NTLB;
@@ -2441,6 +2445,8 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
       NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
       div (NTLA, NTLA, NTLB);
       Q= convertNTLzz_pEX2CF (NTLA, x, y);
+      if (zz_pEbak)
+        bak.restore();
     }
   }
 
