@@ -30,15 +30,19 @@ sigset_t ssi_oldmask; // set in ssiLink.cc
 
 s_buff s_open(int fd)
 {
+  SSI_BLOCK_CHLD;
   s_buff F=(s_buff)omAlloc0(sizeof(*F));
   F->fd=fd;
   F->buff=(char*)omAlloc(S_BUFF_LEN);
+  SSI_UNBLOCK_CHLD;
   return F;
 }
 
 s_buff s_open_by_name(const char *n)
 {
+  SSI_BLOCK_CHLD;
   int fd=open(n,O_RDONLY);
+  SSI_UNBLOCK_CHLD;
   return s_open(fd);
 }
 
@@ -46,10 +50,12 @@ int    s_close(s_buff &F)
 {
   if (F!=NULL)
   {
+    SSI_BLOCK_CHLD;
     omFreeSize(F->buff,S_BUFF_LEN);
     int r=close(F->fd);
     omFreeSize(F,sizeof(*F));
     F=NULL;
+    SSI_UNBLOCK_CHLD;
     return r;
   }
   return 0;
