@@ -77,6 +77,7 @@ Variable rootOf( const CanonicalForm &, char name = '@' );
 inline int level( const Variable & v ) { return v.level(); }
 inline char name( const Variable & v ) { return v.name(); }
 
+void setMipo ( const Variable & alpha, const CanonicalForm & mipo);
 CanonicalForm getMipo( const Variable & alpha, const Variable & x );
 bool hasMipo( const Variable & alpha );
 
