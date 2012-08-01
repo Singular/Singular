@@ -1,0 +1,1655 @@
+///////////////////////////////////////////////////////////////////////
+version = "$Id: decomp.lib,v 0.99 2012/05/21 q$";
+
+// last changed  21.5.12 C.G. reversal wieder eingefuegt (standalone)
+category = "general";
+info =
+"
+LIBRARY: decomp.lib  Functional Decomposition of Polynomials
+AUTHOR:  Christian Gorzel, University of Muenster
+email: gorzelc@math.uni-muenster.de
+
+
+OVERVIEW:
+@texinfo
+ This library implements functional uni-multivariate decomposition
+ of multivariate polynomials.
+
+    A (multivariate) polynomial f is a composite if it can be written as
+    @math{g \\circ h} where g is univariate and h is multivariate,
+    where @math{\\deg(g), \\deg(h)>1}.
+
+    Uniqueness for monic polynomials is up to linear coordinate change
+@tex
+     $g\\circ h  = g(x/c -d) \\circ c(h(x)+d)$.
+@end tex
+
+    If f is a composite, then @code{decompose(f);} returns an ideal (g,h);
+    such that @math{\\deg(g) < \\deg(f)} is maximal, (@math{\\deg(h)\\geq 2}).
+    The polynomial h is, by the maximality of @math{\\deg(g)}, not a composite.
+
+    The polynomial g is univariate in the (first) variable vvar of f,
+    such that deg_vvar(f) is maximal.
+
+    @code{decompose(f,1);} computes a full decomposition, i.e. if f is a
+    composite, then an ideal @math{(g_1,\\dots ,g_m,h)} is returned, where
+    @math{g_i} are univariate and each entry is primitive such that
+    @math{f=g_1\\circ \\dots \\circ g_m\\circ h}.
+
+    If f is not a composite, for instance if @math{\\deg(f)} is prime,
+    then @code{decompose(f);} returns f.
+
+    The command @code{decompose} is the inverse: @code{compose(decompose(f,1))==f}.
+
+    Recall, that Chebyshev polynomials of the first kind commute by composition. @*
+
+    The decomposition algorithms work in the tame case, that is if
+    char(basering)=0 or p:=char(basering) > 0 but deg(g) is not divisible by
+    p.
+    Additionally, it works for monic polynomials over @math{Z} and in some
+    cases for monic polyomials over coefficient rings. @* See
+    @code{is_composite} for examples.  (It also works over the reals but
+    there it seems not be numerical stable.) @*
+
+    More information on the univariate resp. multivariate case. @*
+
+    Univariate decomposition is created, with the additional assumption
+    @math{\\deg(g), \\deg(h)>1}. @*
+
+    A multivariate polynomial f is a composite, if f can be written as
+    @math{g \\circ h}, where @math{g} is a univariate polynomial and @math{h}
+    is multivariate.  Note, that unlike in the univariate case, the polynomial
+    @math{h} may be of degree @math{1}. @*
+    E.g. @math{f = (x+y)^2+ 2(x+y) +1} is the composite of
+    @math{g = x^2+2x+1} and @math{h = x+y}. @*
+
+    If @code{nvars(basering)>1}, then, by default, a single-variable
+    multivariate polynomial is not considered to be the same as in the
+    one-variable polynomial ring; it will always be decomposed. That is: @*
+   @code{> ring r1=0,x,dp;} @*
+   @code{> decompose(x3+2x+1);} @*
+   @code{x3+2x+1} @*
+    but: @*
+   @code{> ring r2=0,(x,y),dp;} @*
+   @code{> decompose(x3+2x+1);} @*
+   @code{_[1]=x3+2x+1} @*
+   @code{_[2]=x} @*
+
+    In particular: @*
+    @code{is_composite(x3+2x+1)==1;}  in @code{ring r1} but  @*
+    @code{is_composite(x3+2x+1)==0;}  in @code{ring r2}. @*
+
+   This is justified by interpreting the polynomial decomposition as an
+   affine Stein factorization of the mapping @math{f:k^n \\to k, n\\geq 2}.
+
+      The behaviour can changed by the some global variables.
+
+    @code{int DECMETH;} choose von zur Gathen's or Kozen-Landau's method.
+@*    @code{int MINS;} compute f = g o h, such that h(0) = 0. @*
+    @code{int IMPROVE;} simplify the coefficients of g and h if f is
+    not monic. @*
+    @code{int DEGONE;} single-variable multivariate are
+    considered uni-variate. @*
+
+    See @code{decompopts;} for more information.
+
+    Additional information is displayed if @code{printlevel > 0}.
+@end texinfo
+REFERENCES:
+@texinfo
+@tex
+D. Kozen, S. Landau: Polynomial Decomposition Algorithms, \\par
+  \\quad \\qquad          J. Symb. Comp. (1989), 7, 445-456. \\par
+J. von zu Gathen: Functional Decomposition of Polynomials: the Tame Case,\\par
+  \\quad \\qquad          J. Symb. Comp. (1990), 9, 281-299. \\par
+ J. von zur Gathen, J. Gerhard:  Modern computer algebra,  \\par
+  \\quad \\qquad          Cambridge University Press, Cambridge, 2003.
+@end tex
+@end texinfo
+PROCEDURES:
+// decompunivmonic(f,r);
+// decompmultivmonic(f,var,s);
+ decompopts([\"reset\"]);    displays resp. resets global options
+ decompose(f[,1]);           [complete] functional decomposition of poly f
+ is_composite(f);            predicate, is f a composite polynomial?
+ chebyshev(n[,1]);           the nth Chebyshev polynomial of the first kind
+ compose(f1,..,fn);          compose f1 (f2 (...(fn))), f_i polys of ideal
+
+AUXILIARY PROCEDURES:
+ makedistinguished(f,var);   transforms f to a var-distinguished polynomial
+// divisors(n[,1]);            intvec [increasing] of the divisors d of n
+// gcdv(v);                    the gcd of the entries in intvec v
+// maxdegs(f);                 maximal degree for each variable of the poly f
+// randomintvec(n,a,b[,1]);    random intvec size n, [non-zero] entries in {a,b}
+KEYWORDS: Functional decomposition
+";
+
+/*
+ decompunivpoly(poly f,list #)  // f = goh; r = deg g, s = deg h;
+
+ Ablauf ist:
+
+decompose(f)
+| check whether f is the composite by a monomial
+| check whether f is univariate
+| transformation to a distinguished polynomial
+     decompmultivmonic(f,vvar,r)
+         decompunivmonic(f,r)   // detect vvar by maxdegs
+     |lift univariate decomposition
+| back-transformation
+| fulldecompose, iterate
+   | decompuniv for g
+
+*/
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc decompopts(list #)
+"USAGE:  decompopts(); or decompopts(\"reset\");
+RETURN: nothing
+NOTE:
+@texinfo
+        in the first case, it shows the setting of the control parameters;@*
+        in the second case, it kills the user-defined control parameters and@*
+                            resets to the default setting which will then
+                            be diplayed. @* @*
+        int DECMETH; Method for computing the univariate decomposition@*
+                 0 : (default) Kozen-Landau @*
+                 1 : von zur Gathen @*
+
+        int IMPROVE Choice of coefficients for the decomposition @*
+         @math{(g_1,\ldots,g_l,h)} of a non-monic polynomials f. @*
+         0 : leadcoef(@math{g_1}) = leadcoef(@math{f})
+              and @math{g_2,\ldots,g_l,h} are monic @*
+         1 : (default), content(@math{g_i}) = 1 @*
+
+        int MINS @*
+         @math{f=g\circ h, (g_1,\ldots,g_m,h)} of a non-monic polynomials f.@*
+               0 : g(0) = f(0), h(0) = 0   [ueberlegen fuer complete] @*
+               1 : (default),  g(0)=0, h(0) = f(0) @*
+               2 : Tschirnhaus @*
+
+        int DECORD; The order in which the decomposition will be computed@*
+               0 : minfirst @*
+               1 : (default) maxfirst @*
+
+      int DEGONE; decompose also polynomials built on linear ones @*
+               0 : (default) @*
+               1 :
+@end texinfo
+EXAMPLE: example decompopts; shows an example
+"
+{
+/*
+  siehe Erlaeuterungen, globale Variablen wie im Header angegeben,
+  suchen mit CTRL-S Top::
+  diese eintragen
+*/
+  if (size(#))
+  {
+    if (string(#[1]) == "reset")
+    {
+      if (defined(DECMETH)) {kill DECMETH;}
+      //   if (defined(DECORD)) {kill DECORD;}
+      if (defined(MINS)) {kill MINS;}
+      if (defined(IMPROVE)) {kill IMPROVE;}
+    }
+  }
+
+ if (voice==2)
+ {
+  "";
+  "  === Global variables for decomp.lib === ";
+  "";
+
+  if (!defined(DECMETH)) {" -- DECMETH (int) not defined, implicitly 1";}
+  else
+  {
+    if (DECMETH!=0 and DECMETH!=1) { DECMETH=1; }
+   " -- DECMETH =", DECMETH;
+  }
+/*
+  if (!defined(DECORD)) {" -- DECORD (int) not defined, implicitly 1";}
+  else
+  {
+    if (DECORD!=0 and DECORD!=1) { DECORD=1; }
+   " -- (int) DECORD =", DECORD;
+  }
+*/
+  if (!defined(MINS)) {" -- MINS (int) not defined, implicitly 0";}
+  else
+  {
+    if (MINS!=0 and MINS!=1) { MINS = 0; }
+   " -- (int) MINS =", MINS;
+  }
+
+  if (!defined(IMPROVE)) {" -- IMPROVE (int) not defined, implicitly 1";}
+  else
+  {
+   if (IMPROVE!=0 and IMPROVE!=1) { IMPROVE=1; }
+   " -- (int) IMPROVE =", IMPROVE;
+  }
+ }
+}
+example;
+{ "EXAMPLE:"; echo =2;
+   decompopts();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+//static
+proc decompmonom(poly f, list #)
+"USAGE: decompmonom(f[,vvar]); f poly, vvar poly
+PURPOSE: compute a maximal decomposition in case that
+         f = g o h, where g is univariate and h is a single monomial
+RETURN: ideal, (g,h); g univariate, h monomial if such a decomposition exist,
+        poly, the input, otherwise
+ASSUME: f is non-constant
+EXAMPLE: example decompmonom; shows an example
+"
+{
+  int i,k;
+  poly g;
+
+  poly vvar = var(1);
+  if (size(#)) { vvar = var(rvar(#[1])); }
+
+  //poly vvar = maxdeg(f);
+  poly zeropart = jet(f,0);
+  poly ff = f - zeropart;
+  int mindeg = -deg(ff,-1:nvars(basering));
+  poly minff = jet(ff,mindeg);
+  if (size(minff)>1) { return(f); }
+  intvec minv = leadexp(minff);
+  minv = minv/gcdv(minv);
+  for (i=1;i<=size(ff);i++)
+  {
+    k = divintvecs(leadexp(ff[i]),minv);
+    if (k==0)  { return(f); }
+    else { g = g + leadcoef(ff[i])*vvar^k; }
+  }
+  g = g + zeropart;
+  dbprint("* Sucessfully multivariate decomposed by a monomial"+newline);
+  return(ideal(g,monomial(minv)));
+}
+example
+{ "EXAMPLE:"; echo =2;
+   ring r = 0,(x,y),dp;
+   poly f = subst((x2+x3)^150,x,x2y3);
+   decompmonom(f);
+
+   ring rxyz = 0,(x,y,z),dp;
+   poly g = 1+x2+x3+x5;
+   poly G = subst(g,x,x7y5z3);
+   ideal I = decompmonom(G^50);
+   I[2];
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc divintvecs(intvec v,intvec w)
+"USAGE: divintvecs(v,w); v,w intvec, w!=0
+RETURN: int, k if  v = k*w,
+             0 otherwise
+NOTE: if w==0, then an Error message occurs
+EXAMPLE: example divintevcs; shows an example
+"
+{
+  if (w==0) {
+    ERROR("// Error: proc divintvecs: the second argument has to be non-zero.");
+    return(0);
+  }
+  int i=1;
+  while (w[i]==0) { i++; }
+  int k = v[i] div w[i];
+  if (v == k*w) { return(k); }
+  else { return(0); }
+}
+example
+{ "EXAMPLE:"; echo =2;
+  intvec v = 1,2,3;
+  intvec w = 2,4,6;
+  divintvecs(w,v);
+  divintvecs(intvec(3,2,9),v);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc gcdv(intvec v)
+"USAGE: gcdv(v); intvec v
+RETURN: int, the gcd of the entries in v
+NOTE:   if v=0, then gcdv(v)=1 @*
+        this is different from Singular's builtin gcd, where gcd(0,0)==0
+EXAMPLE: example gcdv; shows an example
+"
+{
+  int ggt;
+  int i,n;
+
+  ggt = v[1];
+  for (i=2;i<=size(v);i++)
+  {
+    ggt = gcd(ggt,v[i]);
+  }
+  if (ggt==0)
+  {
+    ggt = 1;
+  }
+  return(ggt);
+}
+example
+{ "EXAMPLE:"; echo =2;
+  intvec v = 6,15,21;
+  gcdv(v);
+  gcdv(0:3);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc divisors(int n,list #)
+"USAGE:  divisors(n); n int
+         divisors(n,1); n int
+RETURN: intvec, the positive divisors of n  @*
+           in decreasing order (default) @*
+           in increasing order in the second case
+EXAMPLE: example divisors; shows an example
+"
+{
+  int i,j;
+  intvec v = 1;
+
+  list l = primefactors(n);
+  list primesl = l[1];
+  list multl = l[2];
+
+  for (i=1;i<=size(primesl);i++)
+  {
+   for (j=1;j<=multl[i];j++)
+     { v = v,primesl[i]*v;}
+  }
+
+  ring rhelp =0,x,dp;        // sort the intvec
+  poly h;
+  for(i=1;i<=size(v);i++)
+  {
+    h = h+x^v[i];
+  }
+  v=0;
+  for(i=1;i<=size(h);i++)
+  {
+   v[i]=leadexp(h[i])[1];
+  }
+  if (size(#)) {
+    return(intvec(v[size(v)..1]));
+  }
+
+  return(v);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  divisors(30);
+  divisors(-24,1);
+}
+///////////////////////////////////////////////////////////////////////////////
+//
+// Dies wirkt sich nur aus wenn Brueche vorhanden sind?!
+// Laeuft dann so statt cleardenom usw. problemlos ueber Z,Z_m
+// ansehen.
+//
+static proc improvecoef(poly g0,poly h0,number lc)
+"USAGE: improvecoef(g0,h0,lc); g0, h0 poly; lc number
+RETURN: poly, poly, number
+ASSUME: global ordering
+EXAMPLE: example improvecoef; shows an example
+"
+{
+  int Zcoefs = find(charstr(basering),"integer");
+  poly vvar = var(univariate(g0));
+  number lch0 = leadcoef(h0);
+  number denom;
+
+  if (Zcoefs and lch0<0)  // da cleardenom fuer integer buggy ist.
+  {
+    h0 = h0/(-1);
+    denom = -1;
+  }
+  else
+  {
+   h0 = cleardenom(h0);
+   denom = leadcoef(h0)/lch0;
+  }
+  g0 = subst(g0,vvar,1/denom*vvar);
+  g0 = lc*g0;
+  lc = leadcoef(g0);
+  g0= 1/lc*g0;
+  return(g0,h0,lc);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,x,dp;
+
+   poly g = 3x2+5x;
+   poly h = 4x3+2/3x;
+   number lc = 7;
+
+   improvecoef(g,h,lc);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc compose(list #)
+"USAGE: compose(f1,...,fn); f1,...,fn poly
+        compose(I); I ideal,  @*
+ASSUME: the ideal consists of n=ncols(I) >= 1 entries, @*
+          where I[1],...,I[n-1] are univariate in the same variable @*
+          but I[n] may be multivariate.
+RETURN: poly, the composition  I[1](I[2](...I[n]))
+NOTE:   this procedure is the inverse of decompose
+EXAMPLE: example compose; shows some examples
+SEE: decompose
+"
+{
+  def d = basering;   // Ohne dies kommt es zu Fehler, wenn auf Toplevel
+                      // ring r definiert ist.
+
+  ideal I = ideal(#[1..size(#)]);
+  int n=ncols(I);
+  poly f=I[1];
+  map phisubst;
+  ideal phiid = maxideal(1);
+
+  int varnum = univariate(f);
+
+  if (varnum<0) {
+    " // the first polynomial is a constant";
+    return(f);
+  }
+  if (varnum==0 and n>1) {
+    " // the first polynomial is not univariate";
+    return(f);
+  }
+  // Hier noch einen Test ergaenzen
+
+  poly vvar = var(varnum);
+
+  for(int i=2;i<=n;i++)
+  {
+    phiid[varnum]=I[i];
+    // phisubst=d,phiid;
+    phisubst=basering,phiid;
+    f = phisubst(f);
+  }
+  return(f);
+}
+example
+{ "EXAMPLE:"; echo =2;
+   ring r = 0,(x,y),dp;
+   compose(x3+1,x2,y3+x);
+   // or the input as one ideal
+   compose(ideal(x3+1,x2,x3+y));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc is_composite(poly f)
+"USAGE: is_composite(f); f poly
+RETURN: int @*
+     1, if f is decomposable @*
+     0, if f is not decomposable @*
+ -1, if char(basering)>0 and deg(f) is  divisible by char(basering) but no
+      decomposition has been found.
+NOTE:  The last case means that it could exist a decomposition f=g o h  with
+char(basering)|deg(g), but this wild case cannot be decided by the algorithm.@*
+       Some additional information will be displayed when called by the user.
+EXAMPLE: example is_composite; shows some examples
+"
+{
+  int d = deg(f,nvars(basering));
+  int cb = char(basering);
+
+  if (d<1)
+  {
+    " The polynomial is constant ";
+    return(0);
+  }
+  if (d==1)
+  {
+    " The polynomial is linear ";
+    return(0);
+  }
+
+  if (nvars(basering)==1 and d==prime(d))
+  {
+    " The degree is prime.";
+    return(0);
+  }
+
+  if (nvars(basering)>1 and univariate(f))  // and not(defined(DEGONE))
+  {
+    return(1);
+  }
+
+  // else try to decompose
+  int nc = ncols(ideal(decompose(f)));
+
+  if (cb > 0)   // check the not covered wild case
+  {
+    if ((d mod cb == 0) and (nc == 1))
+    {
+      if (voice==2)
+      {
+        "// -- Warning: wild case, cannot decide whether the polynomial has a";
+        "// -- decomposition goh with deg(g) divisible by char(basering) = "
+          + string(cb) + ".";
+       }
+      return(-1);
+    }
+  }
+  // in the tame case, decompose gives the correct result
+  return(nc>1);
+}
+example
+{ "EXAMPLE:"; echo =2;
+
+   ring r0 = 0,x,dp;
+   is_composite(x4+5x2+6);    // biquadratic polynomial
+
+   is_composite(2x2+x+1);     // prime degree
+   // -----------------------------------------------------------------------
+   // polynomial ring with several variables
+   ring R = 0,(x,y),dp;
+   // -----------------------------------------------------------------------
+   // single-variable multivariate polynomials
+   is_composite(2x+1);
+   is_composite(2x2+x+1);
+   // -----------------------------------------------------------------------
+   // prime characteristic
+   ring r7 = 7,x,dp;
+   is_composite(compose(ideal(x2+x,x14)));     // is_composite(x14+x7);
+   is_composite(compose(ideal(x14+x,x2)));     // is_composite(x14+x2);
+
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc decompose(poly f,list #)
+"USAGE:  decompose(f); f poly
+        decompose(f,1); f poly
+RETURN: poly, the input, if f is not a composite
+        ideal, if the input is a composite
+NOTE: computes a full decomposition if called by the second variant
+EXAMPLE: example decompose; shows some examples
+SEE: compose
+"
+{
+ if (!defined(IMPROVE)){ int IMPROVE = 1; }
+ if (!defined(MINFIRST)){ int MINFIRST = 0; }
+ int fulldecompose;
+
+ if (size(#)) {        // cf. ERROR-msg in randomintvec
+   if (typeof(#[1])=="int") {
+       fulldecompose = (#[1]==1);
+   }
+ }
+
+ int m,iscomposed;
+ int globalord = 1;
+ ideal I;
+
+// --- preparatory stuff ----------------------------------------------------
+  // The degree is not independent of the term order
+ int n = deg(f,1:nvars(basering));
+ int varnum = univariate(f);  // to avoid transformation if f is univariate
+
+ // if (deg(f)<=1) {return(f);} //steigt automatisch bei der for-schleife aus m = 2
+ if (n==prime(n) and nvars(basering)==1
+     //  or (varnum>0 and nvars(basering))
+  ) {return(f);}
+
+ if (varnum<0)
+ {
+   ERROR("// -- Error proc decompoly: the polynomial is constant.");
+ }
+ //--------------------------------------------------------------------------
+
+ int minfirst = MINFIRST!=0;
+ list mdeg;
+ intvec maxdegv,degcand;
+
+ // -- switch to global order, necessary for division -- // Weiter nach oben
+ if (typeof(attrib(basering,"global"))!="int") {
+   globalord = 0;
+ }
+ else {
+   globalord = attrib(basering,"global");
+ }
+
+ if (!globalord) {
+   def d = basering;
+   list ll = ringlist(basering);
+   ll[3] = list(list("dp",1:nvars(basering)),list("C",0));
+   def rneu = ring(ll);
+   setring rneu;
+   poly f = fetch(d,f);
+   ideal I;
+ }
+ // -----------------------------------------------------------------------
+
+ map phiback;
+ poly f0,g0,h0,vvar;
+ number lc;
+ ideal J;   // wird erst in fulldecompose benoetigt
+
+ // --- Determine the candidates for deg(g) a decreasing sequence of divisors
+ poly lf = jet(f,n)-jet(f,n-1);
+ //"lf = ",lf;
+ if (size(lf)==1)         // the leading homogeneous part is a monomial
+ {
+     degcand = divisors(gcdv(leadexp(lf)));
+ }
+ else
+ {
+   degcand = divisors(n);            // Das ist absteigend
+ }
+
+ if(printlevel>0) {degcand;}
+
+ // --- preparatory steps for the multivariate case -------------------------
+
+ if (varnum>0)            // -- univariate polynomial
+ {
+  vvar = var(varnum);
+  f0 = f;   // save f
+ }
+ else  // i.e. multivariate (varnum==0),the case varnum < 0 is excluded above
+ {
+  // -- find variable with  maximal degree
+  mdeg = maxdegs(f);
+  maxdegv = mdeg[2];
+  varnum = maxdegv[2];
+  vvar = var(varnum);
+  phiback = maxideal(1);
+
+// special case, the polynomial is  a composite of a single monomial //20.6.10
+   if (qhweight(f)!=0) { I = decompmonom(f,vvar); }
+   iscomposed = size(I)>1;
+   if (iscomposed)          // 3.6.11 - dies decompmonom
+   { //I;
+      ideal J = decompunivmonic(I[1],deg(I[1]));
+      I[2]= subst(J[2],vvar,I[2]);
+      I[1] = J[1];
+      //I;
+   }
+
+   if (!iscomposed) // -- transform into a distinguished polynomial
+   {
+     f0,phiback = makedistinguished(f,vvar);
+   }
+ }
+ // ------ Start computation ------------------------------------------------
+ // -- normalize and  save the leading coefficient
+ lc = 1;
+ //f0;
+ //"vvar = ",vvar;
+
+ // --- 11.4.11 hier auch noch gewichteten Grad beruecksichtigen ? --
+
+  if (!iscomposed) { lc = leadcoef(coeffs(f0,vvar)[deg(f0)+1,1]); } // 20.6.10
+
+  // if Z, Z_m, and f is not monic (and  content !=1) // if (f0/lc*lc!=f0)
+  if (find(charstr(basering),"integer") and not(lc==1 or lc==-1)) // 6.4.11
+  {
+    ERROR("// -- Error proc decompose: Can not decompose non-monic polynomial over Z!");
+  }
+
+  if (lc!=1){ f0 = 1/number(lc)*f0;}      // --- normalize the polynomial
+
+  // -- Now the input is prepared to be monic and vvar-distinguished
+  //----------------------------------------------------------------
+  m = 1;
+
+  // --- Special case: a multivariate can be composite of a linear polynom
+  if (univariate(f) and nvars(basering)==1) // 11.8.09 d.h.
+  {    // --- if univariate ----------------------------------------
+    if(minfirst) {degcand = divisors(n,1);} // dies ist aufsteigend
+    m = 2;                                  // skip first entry
+  }
+  // if decomposed as the decomposition with a monomial
+  // then skip the multivariate process // 20.6.10 detected as decompmonomial
+  if (iscomposed) { degcand = 1; }
+
+  if (printlevel>0 and !iscomposed) { "* Degree candidates are", degcand; }
+
+  // -- check succesively for each candidate
+  // whether f is decomposable with deg g = r
+
+  for(;m<size(degcand);m++)   // decreasing
+  { //r = degcand[m];
+    I =  decompmultivmonic(f0,vvar,degcand[m]);
+    if (size(I)>1)
+    {
+     iscomposed = 1;
+     break;
+    }
+  }
+ // -- all candidates have be checked but f is primitive
+ if(!iscomposed) {
+   if (!globalord) { setring d; }   // restore old ring
+   dbprint("** not decomposable: linear / not tame / prime degree --");
+   return(f);
+ }
+
+ // -- the monic vvar-distinguished polynomial f0 is decomposed -------
+ // -- retransformation for the multivariate case ---------------------
+  g0,h0 = I;
+
+  if (!univariate(f)) { h0 = phiback(h0);}
+
+  if (IMPROVE) { g0,h0,lc=improvecoef(g0,h0,lc);}  //  ueber switch
+  I = h0;
+
+ // -- Full decomposition: try to decompose g further ------------------
+  if (fulldecompose) {
+    dbprint(newline+"** Compute a complete decomposition");
+    while (iscomposed) {
+     iscomposed=0;
+     degcand=divisors(deg(g0,1:nvars(basering)));  // absteigend
+     if (printlevel> 0) { "** Degree candidates are now: ", degcand; }
+     for (m=2;m<size(degcand);m++) //OK, ergibt lexicographically ..
+     {
+       J =decompunivmonic(g0,degcand[m]); /*      J =decompuniv(g0);*/
+       g0 = J[1];
+       h0=J[2];
+       iscomposed = deg(h0,1:nvars(basering))>1;
+       if (iscomposed) {
+         if (IMPROVE) { g0,h0,lc=improvecoef(g0,h0,lc); }  //  ueber switch
+         I = h0,I;
+         break;
+       }
+      }
+    }
+  dbprint("** completely decomposed"+newline);
+  }
+  I = lc*g0,I;
+  if (!globalord) {
+   setring d;
+   I = fetch(rneu,I);
+  }
+  return(I);
+}
+example
+{ "EXAMPLE:"; echo =2;
+   ring r2 = 0,(x,y),dp;
+
+   decompose(((x3+2y)^6+x3+2y)^4);
+
+   // complete decomposition
+   decompose(((x3+2y)^6+x3+2y)^4,1);
+   // -----------------------------------------------------------------------
+   // decompose over the integers
+   ring rZ = integer,x,dp;
+   decompose(compose(ideal(x3,x2+2x,x3+2)),1);
+   // -----------------------------------------------------------------------
+   // prime characteristic
+   ring r7 = 7,x,dp;
+   decompose(compose(ideal(x2+x,x7)));   // tame case
+   // -----------------------------------------------------------------------
+   decompose(compose(ideal(x7+x,x2)));   // wild case
+   // -----------------------------------------------------------------------
+   ring ry = (0,y),x,dp;     // y is now a parameter
+   compose(x2+yx+5,x5-2yx3+x);
+   decompose(_);
+
+  // Usage of variable IMPROVE
+  ideal J = x2+10x, 64x7-112x5+56x3-7x, 4x3-3x;
+  decompose(compose(J),1);
+  int IMPROVE=0;
+  exportto(Decomp,IMPROVE);
+  decompose(compose(J),1);
+}
+///////////////////////////////////////////////////////////////////////////////
+/*   ring rt =(0,t),x,dp;
+   poly f = 36*x6+12*x4+15*x3+x2+5/2*x+(-t);
+   decompose(f);
+*/
+
+
+// Dies gibt stets ein ideal zurueck, wenn f composite ist
+// gibt das polynom zurueck, wenn es primitiv ist
+// static
+proc decompmultivmonic(poly f,poly vvar,int r)
+"USAGE:  decompmultivmonic(f,vvar,r); f,vvar poly; r int
+RETURN:  ideal, I = ideal(g,h) if f = g o h with deg(g) = r@*
+           poly f, if  f is not a composite or char(basering) divides r
+ASSUME:  f is monic and distinguished w.r.t. vvar,
+         1<=r<=deg(f) is a divisor of deg(f)
+         and char(basering) does not divide r.
+EXAMPLE: example decompmultivmonic; shows an example
+"
+{
+  def d = basering;
+ int i,isprimitive;
+ int m = nvars(basering);
+ int n = deg(f);
+ int varnum = rvar(vvar);
+ intvec v = 1:m;   // weight-vector for jet
+   v[varnum]=0;
+ int s = n div r;
+ // r = deg g; s = deg h;
+
+ poly f0 = f;
+ poly h,h0,g,gp,fgp,k,t,u;
+ ideal I,rem,phiid;
+ list l;
+ map phisubst;
+
+// -- entscheidet intern, abhaengig von der Anzahl der Ringvariablen,
+// -- ob f0 primitive ist.
+// " r = ",r;
+
+ if (s*r!=n)
+ {
+   ERROR("// -- Error proc decompmultivmonic: r = "+string(r)+
+             " does not divide deg(f) = "+string(n)+".");
+ }
+
+ int cb = char(basering);  // oder dies in decompunivmonic
+ if (cb>0)
+ {
+     if (r mod cb == 0)
+     {
+       if (voice == 2)
+       {
+        "// Warning: wild case in characteristic " + string(cb) +
+         ". We cannot decide";
+         "// whether a decomposition goh with deg(g) = " + string(r)+
+         " exists.";"";
+       }
+       return(f);
+     }
+ }
+//---------------------------------------------------------------------------
+
+ for (i=1;i<=m;i++)
+ {
+  if (i!=varnum) {f0 = subst(f0,var(i),0);}
+ }
+ //" f0 = ",f0;
+ // f0 ist nun das univariate
+
+ // 24.3.09   // 11.8.09  nochmals ansehen
+ if (r==deg(f0)) // the case of a linear multivarcomposite
+ {
+   dbprint("** try to decompose in linear h, deg g = "+string(r));
+  I = f0,vvar;   // Das ist hier wichtig
+ }
+ else   // find decomposition of the univariate f0
+ {
+  I = decompunivmonic(f0,r);
+  // dbprint(" ** monic decomposed");//" I = ";I;
+
+  isprimitive=(deg(I[2])==1);
+  if (isprimitive) {return(f);}
+ }
+
+//---- proceed in the multivariate case
+//---- lift the univariate decomposition
+ if (!univariate(f))
+ {
+   dbprint("* Lift the univariate decomposition");
+   g,h0 = I;
+   k = h0;
+   gp = diff(g,vvar);
+
+   // -- This is substitution ----
+   // t = substitute(gp,vvar,h0);
+   phiid = maxideal(1);
+   phiid[varnum]=h0;
+   phisubst=basering,phiid;
+    t = phisubst(gp);
+   // -- substitution ende
+   fgp = 1;
+   i = 0;
+   while(fgp!=0)
+   {
+     i++;
+     // -- This  is substitution ----
+     //gp = substitute(g,vvar,k);
+     phiid[varnum]=k;
+     phisubst=basering,phiid;
+     gp = phisubst(g);
+     // --  substitution ende
+
+     fgp = f - gp;
+     u = jet(fgp,i,v) - jet(fgp,i-1,v);    // oder mit reduce(maxideal(x))
+     l = division(u,t);                    // die kleineren Terme abschneiden
+     rem = l[2];
+     u = l[1][1,1];    // the factor
+     if (rem!=0)
+     {
+       isprimitive = 1;
+       break;
+     }
+     k = k + u;
+   }
+   h = k;
+   I = g,h;
+   //"decomposed as =";
+   //I;
+ }
+ if (isprimitive) {
+   dbprint(">>> not multivariate decomposed"+newline);
+  return(f);
+ }
+ else {
+   dbprint("* Sucessfully multivariate decomposed"+newline);
+  return(I);
+ }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y),lp;
+   poly f = 3xy4 + 2xy2 + x5y3 + x + y6;
+   decompmultivmonic(f,y,2);
+
+   ring rx = 0,x,lp;
+   decompmultivmonic(x8,x,4);
+}
+///////////////////////////////////////////////////////////////////////////////
+//static
+proc decompunivmonic(poly f,int r)
+"USAGE: decompunivmonic(f,r); f poly, r int
+RETURN:  ideal,  (g,h) such that f = goh and deg(g) = r
+         poly f, if such a decomposition does not exist.
+ASSUME:  f is univariate, r is a divisor of deg(f)      @*
+         and char(basering) does not divide r in case that char(basering) > 0.
+         global order of the basering is assumed.
+EXAMPLE: example decompunivmonic; shows an example
+"
+{
+ int d = deg(f);
+ int s;    // r = deg g; s = deg h;
+ int minf,mins;
+ int iscomposed = 1;
+
+ if (!defined(MINS)) { int MINS = 0; }
+ if (!defined(DECMETH)) { int DECMETH = 1; }
+ int savedecmeth = DECMETH;
+ int Zcoefs =charstr(basering)=="integer";//find(charstr(basering),"integer");
+
+ number cf;
+ poly h,g;
+ ideal I;
+ matrix cc;
+
+ // --- Check input and create the results for the simple cases
+
+ if (deg(f)<1){return(ideal(f,var(1)));}  // wird dies aufgerufen?
+ //-------------------------
+
+ int varnum = univariate(f);
+
+ if (varnum==0)
+ {
+   "// -- The polynomial is not univariate";
+   return(f);
+ }
+
+ poly vvar = var(varnum);
+ I = f,vvar;
+
+ if (leadcoef(f)!=1)
+ {
+     "// -- Error proc decompunivmonic: the polynomial is not monic.";
+     return(f);
+ }
+ /* Dies einklammern, wenn (x+1)^2 zerlegt werden sollte
+  // aus decompose heraus, wird dies gar nicht aufgerufen!
+ if (deg(f)==1 or deg(f)==prime(deg(f)))
+ {
+   "// -- The polynomial is not a composite.";
+  return(I);
+ }
+ */
+ /* ---------------------------------------------------- */
+ s = d div r;
+
+ if (d!=s*r)
+ {
+   ERROR("// -- Error proc decompunivmonic: the second argument does not divide deg f.");
+ }
+ int cb = char(basering);
+ if (cb>0)
+ {
+     if (r mod cb ==0)
+     {
+         "wild case: cannot determine a decomposition";
+         return(I);
+     }
+ }
+// -------------------------------------------------------------------------
+ // The Newton iteration only works over coefficient *fields*
+ // Therefore use in this case the Kozen-Landau method i.e. set DECMETH = 1;
+ if (savedecmeth==0 and Zcoefs) { DECMETH=1; }
+
+// -- Start the computation ----------------------------------------------
+
+  dbprint("* STEP 1: Determine h");
+  dbprint(" d = deg f = " +string(n) + " f = goh"," r = deg g = "+string(r),
+          " s = deg h = " +string(s));
+  int tt = timer;
+
+  if(DECMETH==1) {  // Kozen-Landau
+    dbprint("* Kozen-Landau method");
+
+   // Determine ord(f);
+   //cc  = coef(f,vvar);  // extract coefficents of f
+   //print(cc); read("");
+
+   // dbprint("time: "+string(timer-tt)); tt = timer;
+   // minf = deg(cc[1,ncols(cc)]);   // 11.8.09 Doch OK.
+   minf = -deg(f,-1:nvars(basering));  // this is local ord 15.3.10
+
+   // oder: mins = 1;  if (minf) { .. dies .. }
+   mins = (minf div r) + (minf mod r) > 0;  // i.e. ceil(minf/r)
+
+   if (mins==0 and MINS) { mins=1; } // omit the constant term i.e. h(0) = 0
+
+   dbprint("** min f = "+string(minf) + " | min s = "+string(mins) +
+           " | s-mins = "+ string(s-mins));
+
+   // Dies wird wohl nicht benoetigt.
+   //  int minr=  (minf div s) + ((minf mod s)>0); // ceil
+   dbprint("** extract the coeffs ");
+   cc  = coeffs(f,vvar);
+
+   dbprint("time: "+ string(timer -tt));
+
+   h = vvar^s;
+   for (int j=1;j<=s-mins;j++)
+   {
+/*
+     timer = 1;H = Power(h,r);  "Power H"; timer;
+     timer = 1;G = h^r;  "h^r"; timer;
+*/
+    cf = (number(cc[d-j+1,1])-number(coeffs(h^r,vvar)[d-j+1,1]));
+
+//    d-j+1,"cf =",cf, " r= ",r;
+// dbprint("*** "+ string(d-j+1) + " cf = "+string(cf) + " r= "+string(r));
+
+    if (Zcoefs) { if (bigint(cf) mod r != 0) { iscomposed = 0; break; }}
+    cf = cf/r;
+
+    //else { cf = cf/r; }
+    h = h + cf*vvar^(s-j);
+//    " h = ",h;
+   }
+  } else {
+   dbprint("* von zur Gathen-method");
+   //  "f=",f;
+   h = reversal(newtonrroot(reversal(f,d),r,s+!MINS),s,vvar);  // verdreht OK
+   //   " h = ",h;
+   dbprint("* END STEP 1: time: "+string(timer -tt));
+  }
+  DECMETH=savedecmeth;   // restore the original method
+
+  if (iscomposed == 0) {
+    dbprint("** Failed in STEP 1: not decomposed with deg h = "+string(s)+newline);
+    return(I);
+  }
+
+  // -- Step 2: try to rewrite f as a sum of powers of h ---
+  dbprint("* STEP 2: Determine g");
+  poly H = h^r;
+  int dalt = r;
+  int ds;
+  number c;
+  while (d >= 0)   // i.e. f!=0
+  {
+    //dbprint("d = ",d);
+    ds = d div s;
+    if (ds * s !=d)   // d mod s != 0, i.e. remaining f is a power of h
+    {
+      iscomposed = 0;
+      break;
+    }
+    c = leadcoef(f);
+    g = g + c*vvar^ds;
+    H = division(H,h^(dalt - ds))[1][1,1];   // 10.3.10
+    // H = H / h^(dalt - ds);
+    f = f - c*H;
+    //"f = ",f;
+
+    dalt = ds;
+    d = deg(f);
+  }
+  dbprint("* END STEP 2: time: "+string(timer -tt));
+  if (iscomposed)
+  {
+   dbprint("** Sucessfully univariate decomposed with deg g = "+string(r)+newline);
+    I = g,h;
+  } else {
+   dbprint("** Failed in STEP 2: not decomposed with deg g = "+string(r)+newline);
+  }
+
+ return(I);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),dp;
+  decompunivmonic((x2+x+1)^3,3);
+  decompunivmonic((x2+x)^3,3);
+
+  decompunivmonic((y2+y+1)^3,3);
+}
+///////////////////////////////////////////////////////////////////////////////
+// aus polyaux.lib
+proc reversal(poly f,list #)
+"USAGE: reversal(f); f poly
+         reversal(f,k); f poly, k int
+         reversal(f,k,vvar); f poly, k int, vvar poly (a ring variable)
+RETURN: poly, the reversal x^k*f(1/x) of the input f
+ASSUME: f is univariate and that  k>=deg(f)
+@*      since no negative exponents are possible in Singular
+@*      if k<deg(f) then k = deg(f) is used
+NOTE: reversal(f); is by default reversal(f,deg(f));
+      the third variant is needed if f is a non-zero constant and k>0 @*
+@*    reversal is only idempotent,
+@*    if called twice with the deg(f) as second argument
+EXAMPLE: example reversal; shows an example
+"
+{
+  int k = 0;
+  poly vvar = var(1);
+
+  if (size(#)) {
+    k  = #[1] - deg(f) ;
+    if (k<0) { k=0; }
+    if (size(#)==2){            // check whether second optional argument
+      vvar = var(univariate(#[2]));     // is a ring variable
+    }
+  }
+
+  int varnum = univariate(f);
+
+  if (varnum==0) {
+    ERROR("// -- the input is not univariate.");
+  }
+  if (varnum<0) {  // the polynomial is  constant
+    return(f*vvar^k);
+  }
+
+  def d = basering;
+  list l = ringlist(d);
+  list varl = l[2];
+  varl = insert(varl,"@z",size(varl));
+  l[2] = varl;
+  def rnew = ring(l);
+  setring rnew;
+  poly f = fetch(d,f);
+  f = subst(homog(f,@z),var(varnum),1,@z,var(varnum))*var(varnum)^k;
+
+  setring d;
+  f = fetch(rnew,f);
+  return(f);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,x,dp;
+   poly f = x3+2x+5;
+   reversal(f);
+   // the same as
+   reversal(f,3);
+   reversal(f,5);
+
+   poly g  = x3+2x;
+   reversal(g);
+
+   // Not idempotent
+   reversal(reversal(g));
+
+   // idempotent
+   reversal(reversal(g,deg(g)),deg(g));
+   // or for short
+   // reversal(reversal(g),deg(g));
+}
+///////////////////////////////////////////////////////////////////////////////
+// aus polyaux.lib
+proc newtonrroot(poly f,int r,int l)
+"USAGE: newtonrroot(f,r,l); f poly; r int; l int
+RETURN:  poly h, the solution of h^r = f modulo vvar^l
+ASSUME: f(0) = 1
+NOTE: this uses p-adic Newton iteration. It is the adaption of Algorithm 9.22@*
+        of von zur Gathen & Gerhard p. 264 for the special case: phi = Y^r - f
+EXAMPLE: example newtonrroot; shows some examples
+"
+{
+ // phi = Y^r - f
+
+ poly g = 1;  // start polynomial
+
+ poly s =  1/number(r); // initial solution
+ int i = 2;
+ //"s initial",s;
+
+ while(i<l) {
+   // "iteration i",i;
+
+  //  g = (g -(g^r-f)*s) mod x^i;
+  g = jet((g -(g^r-f)*s), i-1);
+  //  s = 2*s - (r*g^(r-1)*s^2) mod x^i;
+  s = jet(2*s - (r*g^(r-1)*s^2),i-1);
+  // "s is now ",s;
+
+  i = 2*i;
+ }
+ //"return newtonrroot";
+ //jet((g -(g^r-f)*s),l-1);
+
+ return(jet((g -(g^r-f)*s),l-1));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,x,dp;
+
+   ring r3 = 3,x,dp;
+   poly f = x+1;
+   // determine square root of f modulo x^4
+   poly g = newtonrroot(f,2,4);
+   g;
+   g^2;
+   ring R = (0,b,c,d),x,ds;
+//   poly f = 1 + bx +cx2+dx3;
+   poly f = 1 + 5bx +5cx2+5dx3;
+   poly g2 = newtonrroot(f,2,4);
+   g2;
+   f-g2^2;
+   poly f5 = 1 +5*(bx+cx2+dx3);
+   poly g5 = newtonrroot(f5,5,4);
+   g5;
+   f5-g5^5;
+   // Multivariate polynomials
+   ring r = 0,(x,y,z),ds;
+   ring r2 =(0,a,b,c,d,e),(x,y),ds;
+//   poly f = 1 +ax+by+cx2+dxy+ey2;
+   poly f3 = 1 +9*(ax+by+cx2+dxy+ey2);
+   poly g3 = newtonrroot(f3,3,4);
+   jet(g3^3-f3,5);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc randomintvec(int n,int a,int b,list #)
+"USAGE: randomintvec(n,a,b); n,a,b int;
+        randomintvec(n,a,b,1); n,a,b int;
+RETURN: intvec, say v, of length n
+        with entries a<=v[i]<=b, in the first case, resp.
+        with entries a<=v[i]<=b, where v[i]!=0, in the second case
+NOTE:   a<=b should be satisfied, otherwise always v[i]=b (due to random).
+EXAMPLE: example randomintvec; shows some examples
+"
+{
+  int i,randint,nozeroes;
+  intvec v;
+
+  if (size(#)) {
+   if (typeof(#[1])!="int") {
+     ERROR("4th argument can only be an integer, assumed 1.");
+   }
+    nozeroes = #[1]==1;
+  }
+
+  for (i=1;i<=n;i++)
+  {
+    randint = random(a,b);
+    while (nozeroes and randint==0) { randint = random(a,b); }
+    v[i] = randint;
+  }
+  return(v);
+}
+example
+{ "EXAMPLE:"; echo = 1;
+  int randval = system("--random");  // store initial value
+  system("--random",0815);
+  echo = 2;
+  randomintvec(7,-1,1);   // 7 entries in {-1,0,1}
+  randomintvec(7,-1,1,1); // 7 entries either -1 or 1
+  randomintvec(3,-10,10);
+  echo = 1;
+  system("--random",randval);      // reset random generator
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc makedistinguished(poly f,poly vvar)
+"USAGE:  makedistinguished(f,vvar); f, vvar poly; where vvar is a ring variable
+RETURN:  (poly, ideal): the transformed polynomial and an ideal defining
+                       the map which reverses the transformation.
+PURPOSE: let vvar = var(1). Then  f is transformed by a random linear
+         coordinate change
+         phi = (var(1), var(2)+c_2*vvar,...,var(n)+c_n*vvar)  @*
+         such that phi(f) = f o phi becomes distinguished with respect
+         to vvar. That is, the new polynomial contains the monomial vvar^d,
+         where d is the degree of f. @*
+         If already f is distinguished w.r.t. vvar, then f is left unchanged
+         and the re-transformation is the identity.
+NOTE 1:  (this proc correctly works independent of the term ordering.)
+         to apply the reverse transformation, either define a map
+         or use substitute (to be loaded from poly.lib).
+NOTE 2:  If p=char(basering) > 0, then there exist polynomials of degree d>=p,
+         e.g. @math{(p-1)x^p y + xy^p}, that cannot be transformed to a
+         vvar-distinguished polynomial. @*
+         In this case, *p random trials will be made and the proc
+         may leave with an ERROR message.
+EXAMPLE: example makedistinguished; shows some examples
+"
+{
+  def d = basering;   // eigentlich ueberfluessig // wg Bug mit example part
+  map phi;            // erforderlich
+  ideal Db= maxideal(1);
+  int n,b = nvars(basering),1;
+  intvec v= 0:n;
+  intvec w =v;
+  int varnum = rvar(vvar);
+  w[varnum]=1;   // weight vector for deg
+
+  poly g = f;
+  int degg = deg(g);
+
+  int count = 1; // limit the number of trials in char(p) > 0
+  //int count =2*char(basering);
+
+  while(deg(g,w)!=degg and (count-2*char(basering)))  // do a transformation
+  {
+    v = randomintvec(n,-b,b,1);  // n non-zero entries
+    v[varnum] = 0;
+    phi = d,ideal(matrix(maxideal(1),n,1) + var(varnum)*v);  // transformation;
+    g = phi(f);
+    b++;    // increase the range for the random values
+    // count--;
+    count++;
+  }
+  if (deg(g,w)!=degg) {
+   ERROR("it could not be transform to a "+string(vvar)+"-distinguished polynomial.");
+  }
+  Db = ideal(matrix(maxideal(1),n,1) - var(varnum)*v); // back transformation
+  return(g,Db);
+}
+example
+{ "EXAMPLE:";
+  int randval = system("--random");  // store initial value
+  system("--random",0815);
+  echo = 2;
+
+   ring r = 0,(x,y),dp;
+   poly g;
+   map phi;
+   // -----------------------------------------------------------------------
+   // Example 1:
+   poly f = 3xy4 + 2xy2 + x5y3 + x + y6;    // degree 8
+   // make the polynomial y-distinguished
+   g, phi = makedistinguished(f,y);
+   g;
+   phi;
+
+   // to reverse the transformation apply the map
+   f == phi(g);
+
+   //  -----------------------------------------------------------------------
+   // Example 2:
+   // The following polynomial is already x-distinguished
+   f = x6+y4+xy;
+   g,phi = makedistinguished(f,x);
+   g;                         // f is left unchanged
+   phi;                       // the transformation is the identity.
+   echo = 1;
+
+   system("--random",randval);      // reset random generator
+   // -----------------------------------------------------------------------
+   echo = 2;
+   // Example 3:    // polynomials which cannot be transformed
+   // If p=char(basering)>0, then (p-1)*x^p*y + x*y^p factorizes completely
+   // in linear factors, since (p-1)*x^p+x equiv 0 on F_p. Hence,
+   // such polynomials cannot be transformed to a distinguished polynomial.
+
+   ring r3 = 3,(x,y),dp;
+   makedistinguished(2x3y+xy3,y);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc maxdegs(poly f)
+"USAGE: maxdegs(f); f poly
+RETURN:  list of two intvecs
+         _[1] intvec: degree for variable i, 1<=i<=nvars(basering) @*
+         _[2] intvec: max of _[1], index of first variable with this max degree
+EXAMPLE: example maxdegs; shows an example
+"
+{
+  int i,n;
+  intvec degs,maxdeg;
+  list l;
+
+  n = nvars(basering);
+
+  for (i=1;i<=n;i++)
+  {
+   degs[i] = nrows(coeffs(f,var(i)))-1;
+   if (degs[i] > maxdeg)
+   {
+    maxdeg[1] = degs[i];
+    maxdeg[2] = i;
+   }
+  }
+  return(list(degs,maxdeg));
+}
+example
+{ "EXAMPLE:"; echo =2;
+   ring r = 0,(x,y,z),lp;
+   poly f = 3xy4 + 2xy2 + x5y3 + xz6 + y6;
+   maxdegs(f);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc chebyshev(int n,list #)
+"USAGE:   chebyshev(n); n int, n >= 0
+         chebyshev(n,c); n int, n >= 0, c number, c!=0
+RETURN:  poly, the [monic] nth Chebyshev polynomial of the first kind. @*
+         The polynomials are defined in the first variable, say x, of the
+         basering.
+NOTE:   @texinfo
+ The (generalized) Chebyshev polynomials of the first kind  can be
+         defined by the recursion:
+@tex
+$C_0 = c,\ C_1 = x,\ C_n = 2/c\cdot x\cdot C_{n-1}-C_{n-2},\ n \geq 2,c\neq 0$.
+@end tex
+@end texinfo
+        These polynomials commute by composition:
+        @math{C_m \circ C_n = C_n\circ C_m}. @*
+        For c=1, we obtain the standard (non monic) Chebyshev polynomials
+        @math{T_n} which satisfy @math{T_n(x)  = \cos(n \cdot \arccos(x))}. @*
+        For c=2 (default), we obtain the monic Chebyshev polynomials @math{P_n}
+        which satisfy the relation @math{P_n(x+ 1/x) = x^n+ 1/x^n}. @*
+        By default the monic Chebyshev polynomials are returned:
+        @math{P_n =}@code{chebyshev(n)} and @math{T_n=}@code{chebyshev(n,1)}.@*
+        It holds @math{P_n(x) = 2\cdot T_n(x/2)} and more generally
+        @math{C_n(c\cdot x) = c\cdot T_n(x)} @*
+        That is @code{subst(chebyshev(n,c),var(1),c*var(1))= c*chebyshev(n,1)}.
+
+        If @code{char(basering) = 2}, then
+        @math{C_0 = 1, C_1 = x, C_2 = 1, C_3 = x}, and so on.
+EXAMPLE: example chebyshev; shows some examples
+"
+{
+ number startv = 2;
+
+ if (size(#)){ startv = #[1]; }
+ if (startv == 0) { startv = 1; }
+
+ poly f0,f1 = startv,var(1);
+ poly fneu,falt = f1,f0;
+ poly fh;
+
+ if (n<=0) {return(f0);}
+ if (n==1) {return(f1);}
+
+ for(int i=2;i<=n;i++)
+ {
+   fh = 2/startv*var(1)*fneu - falt;
+  // fh = 2*var(1)*fneu - falt;
+  falt = fneu;
+  fneu = fh;
+ }
+ return(fh);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,x,lp;
+
+   // The monic Chebyshev polynomials
+   chebyshev(0);
+   chebyshev(1);
+   chebyshev(2);
+   chebyshev(3);
+
+   // These polynomials commute
+   compose(chebyshev(2),chebyshev(6)) ==
+   compose(chebyshev(6),chebyshev(2));
+
+   // The standard Chebyshev polynomials
+   chebyshev(0,1);
+   chebyshev(1,1);
+   chebyshev(2,1);
+   chebyshev(3,1);
+   // -----------------------------------------------------------------------
+   // The relation for the various Chebyshev polynomials
+   5*chebyshev(3,1)==subst(chebyshev(3,5),x,5x);
+   // -----------------------------------------------------------------------
+   // char 2 case
+   ring r2 = 2,x,dp;
+   chebyshev(2);
+   chebyshev(3);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+
+// Examples for decomp.lib
+
+ring r02 = 0,(x,y),dp;
+
+decompose(compose(x6,chebyshev(4),x2+y3+x5y7),1);
+
+int  MINS = 0;
+decompose((xy+1)^7);
+//_[1]=x7
+//_[2]=xy+1
+
+decompose((x2y3+1)^7);
+//_[1]=y7
+//_[2]=x2y3+1
+
+MINS = 1;
+ring r01 = 0,x,dp;
+decompose((x+1)^7);
+//x7+7x6+21x5+35x4+35x3+21x2+7x+1
+
+decompunivmonic((x+1)^7,7);
+//_[1]=x7
+//_[2]=x+1
+
+int MINS =1;
+ decompunivmonic((x+1)^7,7);
+//_[1]=x7+7x6+21x5+35x4+35x3+21x2+7x+1
+//_[2]=x
+
+ // --  Example -------------
+
+//  Comparision Kozen-Landau vs. von zur Gathen
+
+ ring r02 = 0,(x,y),dp;
+
+  // printlevel = 5;
+
+ decompopts("reset");
+
+ poly F = compose(x6,chebyshev(4)+3,8x2+y3+7x5y7+2);
+ deg(F);
+
+ timer = 1;decompose(F,1);timer;
+
+ int MINS = 1;
+ timer = 1;decompose(F,1);timer;
+ int IMPROVE  =0;
+ timer = 1;decompose(F,1);timer;
+
+ decompopts("reset");
+ int DECMETH = 0;  // von zur Gathen
+
+ timer = 1;decompose(F,1);timer;
+
+decompopts("reset");
+
+ // -- Example -------------
+
+ring rZ10 = (integer,10),x,dp;
+chebyshev(2);
+//x2+8
+chebyshev(3);
+//x3+7x
+
+compose(chebyshev(2),chebyshev(3));
+//x6+4x4+9x2+8
+decompose(_);
+int MINS =1;
+decompose(compose(chebyshev(2),chebyshev(3)));
+compose(_);
+
+decompopts("reset");
+
+// --  Example -------------
+
+ring rT =(0,y),x,dp;
+compose(x2,x3+y,(y+1)*x2);
+//(y6+6y5+15y4+20y3+15y2+6y+1)*x12+(2y4+6y3+6y2+2y)*x6+(y2)
+
+ decompose(_,1);
+//_[1]=(y6+6y5+15y4+20y3+15y2+6y+1)*x2
+//_[2]=x3+(y)/(y3+3y2+3y+1)
+//_[3]=x2
+
+int MINS =1;
+compose(x2,x3+y,(y+1)*x2);
+//(y6+6y5+15y4+20y3+15y2+6y+1)*x12+(2y4+6y3+6y2+2y)*x6+(y2)
+
+decompose(_,1);
+//_[1]=(y6+6y5+15y4+20y3+15y2+6y+1)*x2+(2y4+6y3+6y2+2y)*x+(y2)
+//_[2]=x3
+//_[3]=x2
+
+//ring rt =(0,t),x,dp;
+//compose(x2+tx+5,x5-2tx3+x);
+//x10+(-4t)*x8+(4t2+2)*x6+(t)*x5+(-4t)*x4+(-2t2)*x3+x2+(t)*x+5
+
+decompose(_);
+//_[1]=x2+(-1/4t2+5)
+//_[2]=x5+(-2t)*x3+x+(1/2t)
+
+int IMPROVE = 1;
+compose(x2+tx+5,x5-2tx3+x);
+//x10+(-4t)*x8+(4t2+2)*x6+(t)*x5+(-4t)*x4+(-2t2)*x3+x2+(t)*x+5
+
+decompose(_);
+//_[1]=x2+(-1/4t2+5)
+//_[2]=x5+(-2t)*x3+x+(1/2t)
+
+int IMPROVE = 0;
+compose(x2+tx+5,x5-2tx3+x);
+//x10+(-4t)*x8+(4t2+2)*x6+(t)*x5+(-4t)*x4+(-2t2)*x3+x2+(t)*x+5
+decompose(_);
+//_[1]=x2+(-1/4t2+5)
+//_[2]=x5+(-2t)*x3+x+(1/2t)
+
+int MINS = 1;
+compose(x2+tx+5,x5-2tx3+x);
+//x10+(-4t)*x8+(4t2+2)*x6+(t)*x5+(-4t)*x4+(-2t2)*x3+x2+(t)*x+5
+
+decompose(_);
+//_[1]=x2+(t)*x+5
+//_[2]=x5+(-2t)*x3+x
+
+*/
+///////////////////////////////////////////////////////////////////////////////
+// --- End of decomp.lib --------------------------------------------------- //
+///////////////////////////////////////////////////////////////////////////////
