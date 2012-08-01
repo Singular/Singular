@@ -391,14 +391,8 @@ specialize_agvariable( CanonicalForm & f, int deg, SFormList & Substitutionlist,
 CanonicalForm
 generate_mipo( int degree_of_Extension , const Variable & Extension ){
   FFRandom gen;
-  if ( degree(Extension) > 0 ) GFRandom gen;
-  else {
-    if ( degree(Extension) == 0 ) FFRandom gen;
-    else
-    {
-      factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
-    }
-  }
+  if (degree (Extension) < 0)
+    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
   return find_irreducible( degree_of_Extension, gen, Variable(1) );
 }
 
@@ -479,17 +473,18 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
     extended+= 1;
     if ( ! working_over_extension )
     {
-      minpoly= rootOf(generate_mipo( extended,Extension ));
+      if (!hasMipo(Extension))
+        minpoly= rootOf (generate_mipo (extended, Extension));
+      else
+      {
+        setReduce (Extension, false);
+        setMipo (minpoly, generate_mipo ( extended, Extension));
+        setReduce (Extension, true);
+      }
       Extension= minpoly;
       ok= try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
       if (!ok)
-      {
         Substitutionlist=origS;
-	// very bad hack: TODO
-	// we want to remove the newly created variable minpoly:
-        extern char *var_names_ext;
-        var_names_ext[strlen(var_names_ext)]='\0';
-      }
     }
     else
     {
