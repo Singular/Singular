@@ -250,7 +250,6 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
     return newid;
   }
 
-
   // TODO/NOTE: input is supposed to be (reverse-) sorted wrt "(c,ds)"!??
 
   // components should come in groups: count elements in each group
@@ -488,6 +487,49 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
   return newid;
 }
 
+
+CReducerFinder::CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
+    m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
+    { }
+
+
+CReducerFinder::~CReducerFinder()
+{
+  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++ )
+  {
+    const TReducers& v = it->second;
+    for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
+      delete const_cast<CLeadingTerm*>(*vit);
+  }
+}
+                                   
+CReducerFinder::CReducerFinder(const SchreyerSyzygyComputation& data): m_data(data), m_hash()
+{
+
+  const ideal& L = data.m_idLeads;
+  const ring&  R = data.m_rBaseRing;
+//   const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
+// 
+//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
+
+  assume( L != NULL );
+  assume( R != NULL );
+  assume( R == currRing );
+
+  for( int k = IDELEMS(L) - 1; k >= 0; k-- )
+  {
+    const poly a = L->m[k]; assume( a != NULL );
+
+    // NOTE: label is k \in 0 ... |L|-1!!!
+    m_hash[p_GetComp(a, R)].push_back( new CLeadingTerm(k, a, R) );
+  }
+}
+
+
 CLCM::CLCM(const SchreyerSyzygyComputation& data): std::vector<bool>(), m_data(data), m_compute(false)
 {
   const ideal& L = data.m_idLeads;
@@ -605,6 +647,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
     poly a2 = pNext(a);    
 
+    // Splitting 2-terms Leading syzygy module
     if( a2 != NULL )
     {
       TT->m[k] = a2; pNext(a) = NULL;
@@ -632,8 +675,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     {
       if( a2 == NULL )
       {
-        aa = p_Mult_mm(aa, L->m[r], R);
-        a2 = FindReducer(aa, a); 
+        aa = p_Mult_mm(aa, L->m[r], R); a2 = m_div.FindReducer(aa, a); 
       }
       assume( a2 != NULL );
 
@@ -676,7 +718,7 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
   (void)( __LEAD2SYZ__ );
 }
 
-poly SchreyerSyzygyComputation::FindReducer(poly product, poly syzterm) const
+poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
 {
 //  return FROM_NAMESPACE(INTERNAL, _FindReducer(product, syzterm, m_idLeads, m_LS, m_rBaseRing, m_atttributes));
 //  poly _FindReducer(poly product, poly syzterm,
@@ -684,10 +726,10 @@ poly SchreyerSyzygyComputation::FindReducer(poly product, poly syzterm) const
 //                     const ring r,
 //                     const SchreyerSyzygyComputationFlags attributes)
 
-  const ideal& L = m_idLeads;
-  const ideal& LS = m_LS;
-  const ring& r = m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+  const ideal& L = m_data.m_idLeads;
+  const ideal& LS = m_data.m_LS;
+  const ring& r = m_data.m_rBaseRing;
+  const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
 
 
   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
@@ -699,14 +741,14 @@ poly SchreyerSyzygyComputation::FindReducer(poly product, poly syzterm) const
   assume( product != NULL );
   assume( L != NULL );
 
-  int c = 0;
+  long c = 0;
 
   if (syzterm != NULL)
     c = p_GetComp(syzterm, r) - 1;
 
   assume( c >= 0 && c < IDELEMS(L) );
-
-  if (__SYZCHECK__ && syzterm != NULL)
+  
+  if (__DEBUG__ && (syzterm != NULL))
   {
     const poly m = L->m[c];
 
@@ -721,14 +763,50 @@ poly SchreyerSyzygyComputation::FindReducer(poly product, poly syzterm) const
     p_Delete(&lm, r);    
   }
 
-  // looking for an appropriate diviser q = L[k]...
-  for( int k = IDELEMS(L)-1; k>= 0; k-- )
-  {
-    const poly p = L->m[k];    
+  const long comp = p_GetComp(product, r);
+  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
 
-    // ... which divides the product, looking for the _1st_ appropriate one!
-    if( !p_LmDivisibleBy(p, product, r) )
-      continue;
+  assume( comp >= 0 );
+
+   // looking for an appropriate diviser p = L[k]...
+#if 1
+  CReducersHash::const_iterator it = m_hash.find(p_GetComp(product, r)); // same module component
+   
+  if( it == m_hash.end() )
+    return NULL;
+
+  const TReducers& reducers = it->second;  
+  
+  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+  {
+     const poly p = (*vit)->m_lt;
+
+     assume( p_GetComp(p, r) == comp );
+     
+     const int k = (*vit)->m_label;
+
+     assume( L->m[k] == p );
+     
+     const unsigned long p_sev = (*vit)->m_sev;
+
+     assume( p_sev == p_GetShortExpVector(p, r) );     
+#else  
+   for( int k = IDELEMS(L)-1; k>= 0; k-- )
+   {
+     const poly p = L->m[k];
+     
+     if ( p_GetComp(p, r) != comp )
+       continue;
+       
+     const unsigned long p_sev = p_GetShortExpVector(p, r); // to be stored in m_hash!!!
+#endif
+     
+     if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
+       continue;     
+
+//     // ... which divides the product, looking for the _1st_ appropriate one!
+//     if( !p_LmDivisibleByNoComp(p, product, r) ) // included inside  p_LmShortDivisibleBy!
+//       continue;
 
 
     const poly q = p_New(r);
@@ -757,6 +835,7 @@ poly SchreyerSyzygyComputation::FindReducer(poly product, poly syzterm) const
       assume( __TAILREDSYZ__ );
       BOOLEAN ok = TRUE;
 
+      // TODO: FindReducer in LS !!! there should be no divisors!
       for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
       {
         const poly pp = LS->m[kk];
@@ -841,7 +920,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) cons
 
   while (spoly != NULL)
   {
-    poly t = FindReducer(spoly, NULL);
+    poly t = m_div.FindReducer(spoly, NULL);
 
     p_LmDelete(&spoly, r);
 
@@ -941,7 +1020,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   {
     // NOTE: only LT(term4reduction) should be used in the following:
     poly product = pp_Mult_mm(multiplier, term4reduction, r);
-    s = FindReducer(product, syztermCheck);
+    s = m_div.FindReducer(product, syztermCheck);
     p_Delete(&product, r);
   }
 

@@ -17,6 +17,7 @@
 #define SYZEXTRA_H
 
 #include <vector>
+#include <map>
 
 // include basic definitions
 #include "singularxx_defs.h"
@@ -95,6 +96,47 @@ class CLCM: public std::vector<bool>
 };
 
 
+class CReducerFinder
+{
+  private:
+    class CLeadingTerm
+    {
+      public: 
+        CLeadingTerm(unsigned int id,  const poly p, const ring);
+
+      private:
+        CLeadingTerm();
+
+      public:
+
+        const unsigned long m_sev; ///< not short exp. vector
+        // NOTE/TODO: either of the following should be enough:
+        const unsigned int  m_label; ///< index in the main L[] + 1
+        const poly          m_lt; ///< the leading term itself L[label-1]
+    };
+
+    typedef long TComponentKey;
+    typedef std::vector<const CLeadingTerm*> TReducers;
+    typedef std::map< TComponentKey, TReducers> CReducersHash;
+    
+  public:
+
+    /// goes over all leading terms
+    CReducerFinder(const SchreyerSyzygyComputation& data);
+
+    ~CReducerFinder();
+
+    // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?    
+    poly FindReducer(const poly product, const poly syzterm) const;
+
+  private:
+    const SchreyerSyzygyComputation& m_data;
+
+    CReducersHash m_hash; // can also be replaced with a vector indexed by components
+};
+
+
+
 /** @class SchreyerSyzygyComputation syzextra.h
  * 
  * Computing syzygies after Schreyer
@@ -108,6 +150,7 @@ class CLCM: public std::vector<bool>
 class SchreyerSyzygyComputation
 {
   friend class CLCM;
+  friend class CReducerFinder;
   
   public:
 
@@ -116,7 +159,7 @@ class SchreyerSyzygyComputation
         m_rBaseRing(rBaseRing),
         m_idLeads(idLeads), m_idTails(idTails), 
         m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL), m_atttributes(attribues),
-        m_lcm(*this)
+        m_lcm(*this), m_div(*this)
     {
     }
 
@@ -126,7 +169,7 @@ class SchreyerSyzygyComputation
         m_rBaseRing(rBaseRing),
         m_idLeads(idLeads), m_idTails(idTails), 
         m_syzLeads(NULL), m_syzTails(NULL), m_LS(syzLeads), m_atttributes(attribues),
-        m_lcm(*this)
+        m_lcm(*this), m_div(*this)
     {
     }
 
@@ -150,9 +193,6 @@ class SchreyerSyzygyComputation
     /// The result is stored into m_syzLeads
     void ComputeLeadingSyzygyTerms(bool bComputeSecondTerms = true);
 
-    // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
-    poly FindReducer(poly product, poly syzterm) const;
-    
     poly SchreyerSyzygyNF(poly syz_lead, poly syz_2) const;
 
     // TODO: store m * @tail -.-^-.-^-.--> ?
@@ -161,6 +201,11 @@ class SchreyerSyzygyComputation
     // TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
     poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const;
 
+  public:
+    /// just for testing via the wrapper below
+    inline poly _FindReducer(const poly product, const poly syzterm) const
+        { return m_div.FindReducer(product, syzterm); }  
+    
   protected:
 
     /// just leading terms
@@ -194,6 +239,9 @@ class SchreyerSyzygyComputation
 
     /// Bitmask for variables occuring in leading terms
     const CLCM m_lcm;
+
+    /// Divisor finder
+    const CReducerFinder m_div;
 };
 
 
@@ -228,7 +276,7 @@ static inline poly FindReducer(poly product, poly syzterm,
                                ideal L, ideal LS, const ring R, const SchreyerSyzygyComputationFlags A)
 {
   SchreyerSyzygyComputation syz(L, NULL, LS, R, A);
-  return syz.FindReducer(product, syzterm);
+  return syz._FindReducer(product, syzterm);
 }
 
 static inline poly TraverseTail(poly multiplier, poly tail, 

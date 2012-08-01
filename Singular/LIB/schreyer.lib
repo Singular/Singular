@@ -2348,13 +2348,16 @@ proc TestSSresAttribs2tr(def M)
 }
 
 
-proc testSimple()
+proc testSimple(list #)
 {
+  def DEBUG = 0;
+  if(size(#) > 0) { DEBUG = #[1]; }
+
   system("--min-time", "1.0");
   system("--ticks-per-sec", 1);
 
   // TODO: only for now!!
-  attrib(SSinit, "DEBUG", 0); 
+  attrib(SSinit, "DEBUG", (DEBUG > 0)); 
   attrib(SSinit, "SYZCHECK", 1); 
   attrib(SSinit, "KERCHECK", 1); 
 
@@ -2470,9 +2473,9 @@ b^2*c^2*e^2, a*b*c^2*e^2;
   M;
   TestSSresAttribs2tr(M);
 /*
-options:  1 1 0 :  Time:  10 (35 without LCM)
-options:  1 1 1 :  Time:  25
-lres  Time:  5/6
+options:  1 1 0 :  Time:  9/10 (35 without LCM)
+options:  1 1 1 :  Time:  8/25
+lres  Time:  5
 nres  Time:  5
 sres  Time:  693
 */
@@ -2549,10 +2552,10 @@ a*c^2*d^2*e^2, b^2*c*d^2*e^2, a*b*c*d^2*e^2;
   M;
   TestSSresAttribs2tr(M);
 /*
-options:  1 1 0 :  Time:  92 (316 without LCM)
-options:  1 1 1 :  Time:  202
-lres  Time:  27/28
-nres  Time:  21/23
+options:  1 1 0 :  Time:  73/92 (316 without LCM)
+options:  1 1 1 :  Time:  43/202
+lres  Time:  25
+nres  Time:  20
 sres  Time:  71
 */
   kill M;
