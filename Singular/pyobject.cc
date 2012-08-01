@@ -520,6 +520,12 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
 
   }
 
+  if (op > MAX_TOK)       // custom types
+  {
+    BOOLEAN newstruct_Op1(int, leftv, leftv);
+    if (! newstruct_Op1(op, res, head) ) return FALSE;
+  }
+
   return PythonCastStatic<>(head)(op).assign_to(res);
 }
 
@@ -645,6 +651,7 @@ void pyobject_init()
   b->blackbox_Op2     = pyobject_Op2;
   b->blackbox_Op3     = pyobject_Op3;
   b->blackbox_OpM     = pyobject_OpM;
+  b->data = newstructDesc();
 
   PythonInterpreter::init(setBlackboxStuff(b,"pyobject"));
 
