@@ -1658,6 +1658,14 @@ static inline BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, const ring r)
   p_LmCheckPolyRing1(b, r);
   return _p_LmDivisibleByNoComp(a, b, r);
 }
+
+static inline BOOLEAN p_LmDivisibleByNoComp(poly a, const ring ra, poly b, const ring rb)
+{
+  p_LmCheckPolyRing1(a, ra);
+  p_LmCheckPolyRing1(b, rb);
+  return _p_LmDivisibleByNoComp(a, ra, b, rb);
+}
+
 static inline BOOLEAN p_LmDivisibleBy(poly a, poly b, const ring r)
 {
   p_LmCheckPolyRing1(b, r);
@@ -1691,6 +1699,7 @@ static inline BOOLEAN p_LmDivisibleBy(poly a, const ring r_a, poly b, const ring
   p_LmCheckPolyRing(b, r_b);
   return _p_LmDivisibleBy(a, r_a, b, r_b);
 }
+
 static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
                                     poly b, unsigned long not_sev_b, const ring r)
 {
@@ -1708,6 +1717,26 @@ static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
   return p_LmDivisibleBy(a, b, r);
 #else
   return pDebugLmShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
+#endif
+}
+
+static inline BOOLEAN p_LmShortDivisibleByNoComp(poly a, unsigned long sev_a,
+                                           poly b, unsigned long not_sev_b, const ring r)
+{
+  p_LmCheckPolyRing1(a, r);
+  p_LmCheckPolyRing1(b, r);
+#ifndef PDIV_DEBUG
+  _pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
+  _pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
+
+  if (sev_a & not_sev_b)
+  {
+    pAssume1(p_LmDivisibleByNoComp(a, b, r) == FALSE);
+    return FALSE;
+  }
+  return p_LmDivisibleByNoComp(a, b, r);
+#else
+  return pDebugLmShortDivisibleByNoComp(a, sev_a, r, b, not_sev_b, r);
 #endif
 }
 

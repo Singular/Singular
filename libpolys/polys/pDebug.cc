@@ -346,6 +346,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
 static unsigned long pDivisibleBy_number = 1;
 static unsigned long pDivisibleBy_FALSE = 1;
 static unsigned long pDivisibleBy_ShortFalse = 1;
+
 BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
                                poly p2, unsigned long not_sev_2, ring r_2)
 {
@@ -358,6 +359,30 @@ BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
     ret = p_LmDivisibleBy(p1, p2, r_1);
   else
     ret = p_LmDivisibleBy(p1, r_1, p2, r_2);
+
+  if (! ret) pDivisibleBy_FALSE++;
+  if (sev_1 & not_sev_2)
+  {
+    pDivisibleBy_ShortFalse++;
+    if (ret)
+      dReportError("p1 divides p2, but sev's are wrong");
+  }
+  return ret;
+}
+
+BOOLEAN pDebugLmShortDivisibleByNoComp(poly p1, unsigned long sev_1, ring r_1,
+                                       poly p2, unsigned long not_sev_2, ring r_2)
+{
+//  _pPolyAssume((p_GetComp(p1, r_1) == p_GetComp(p2, r_2)) || (p_GetComp(p1, r_1) == 0));
+  _pPolyAssume(p_GetShortExpVector(p1, r_1) == sev_1, p1, r_1);
+  _pPolyAssume(p_GetShortExpVector(p2, r_2) == ~ not_sev_2, p2, r_2);
+
+  pDivisibleBy_number++;
+  BOOLEAN ret;
+  if (r_1 == r_2)
+    ret = p_LmDivisibleByNoComp(p1, p2, r_1);
+  else
+    ret = p_LmDivisibleByNoComp(p1, r_1, p2, r_2);
 
   if (! ret) pDivisibleBy_FALSE++;
   if (sev_1 & not_sev_2)
