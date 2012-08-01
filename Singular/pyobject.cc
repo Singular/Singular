@@ -19,7 +19,6 @@
 #include <omalloc/omalloc.h>
 
 #include <kernel/febase.h>
-// #include <kernel/longrat.h>
 
 #include "subexpr.h"
 #include "lists.h"
@@ -128,7 +127,7 @@ public:
     if (op == PythonInterpreter::id())
       return *this;
 
-    Werror("unary op %d not implemented for pyobject", op);
+    Werror("unary operation '%s` not implemented for 'pyobject`", iiTwoOps(op));
     return self();
   }
 
@@ -148,7 +147,7 @@ public:
       case LIST_CMD:     return args2list(arg);
       case '.': case COLONCOLON: case ATTRIB_CMD: return attr(arg);
     }
-    Werror("binary op %d not implemented for pyobject!", op);
+    Werror("binary operation '%d` not implemented for 'pyobject`", iiTwoOps(op));
 
     return self();
   }
@@ -161,7 +160,7 @@ public:
       case ATTRIB_CMD: PyObject_SetAttr(*this, arg1, arg2); return self();
     }
 
-    Werror("ternary op %d not implemented for pyobject!", op);
+    Werror("ternary operation %s not implemented for 'pyobject`", iiTwoOps(op));
     return self();
   }
 
@@ -334,10 +333,18 @@ private:
     case INT_CMD:    return PythonCastStatic<long>(value);
     case STRING_CMD: return PythonCastStatic<const char*>(value);
     case LIST_CMD:   return PythonCastStatic<lists>(value);
-      //    case UNKNOWN:    return PythonCastStatic<const char*>((void*)value->Name());
     }
-    
-    Werror("type # %d incompatible with pyobject", typeId);
+
+    if (typeId > MAX_TOK)       // custom types
+    {
+      blackbox *bbx = getBlackboxStuff(typeId);
+      sleftv tmp;
+      if (! bbx->blackbox_Op1(PythonInterpreter::id(), &tmp, value) )
+        return PythonCastStatic<>(&tmp);
+    }
+    else
+      Werror("type '%s` incompatible with 'pyobject`", iiTwoOps(typeId));
+
     return PythonObject();
   }
 };
@@ -495,7 +502,7 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
     {
       long value = PyInt_AsLong(PythonCastStatic<>(head));
       if( (value == -1) &&  PyErr_Occurred() ) {
-        Werror("pyobject cannot be converted to integer");
+        Werror("'pyobject` cannot be converted to integer");
         PyErr_Clear();
         return TRUE;
       }
@@ -512,6 +519,7 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
     return FALSE;
 
   }
+
   return PythonCastStatic<>(head)(op).assign_to(res);
 }
 
