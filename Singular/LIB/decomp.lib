@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-version = "$Id: decomp.lib,v 0.99 2012/05/21 q$";
+version = "$Id$";
 
 // last changed  21.5.12 C.G. reversal wieder eingefuegt (standalone)
 category = "general";
