@@ -222,8 +222,8 @@ void setMipo ( const Variable & alpha, const CanonicalForm & mipo)
 
 bool hasMipo( const Variable & alpha )
 {
-    ASSERT( alpha.level() < 0 && alpha.level() != LEVELBASE, "illegal extension" );
-    return ((algextensions!=NULL) && getReduce(alpha) );
+    ASSERT( alpha.level() < 0, "illegal extension" );
+    return (alpha.level() != LEVELBASE && (algextensions!=NULL) && getReduce(alpha) );
 }
 
 bool getReduce( const Variable & alpha )
