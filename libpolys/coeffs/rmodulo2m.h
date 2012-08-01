@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: numbers modulo 2^m such that 2^m - 1
 *           fits in an unsigned long

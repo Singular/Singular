@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi

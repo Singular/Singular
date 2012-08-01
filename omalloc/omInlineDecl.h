@@ -4,7 +4,6 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_INLINE_DECL_H
 #define OM_INLINE_DECL_H

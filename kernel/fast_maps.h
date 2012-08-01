@@ -7,7 +7,6 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id$
  *******************************************************************/
 
 /*******************************************************************************

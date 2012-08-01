@@ -3,7 +3,6 @@
  *  Purpose: implementation of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
 #include <omalloc/omalloc.h>

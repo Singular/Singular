@@ -6,7 +6,6 @@
  *  Purpose: source for shared library of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 
 #ifdef DYNAMIC_VERSION

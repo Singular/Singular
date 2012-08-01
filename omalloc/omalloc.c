@@ -4,7 +4,6 @@
  *           -- the real version
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 
 #include <stdlib.h>

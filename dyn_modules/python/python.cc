@@ -132,7 +132,6 @@ void fill_example_package();
 
 #line 2 "python.mod"
 /*
- *  $Id$
  *
  *  Test mod fuer modgen
  */

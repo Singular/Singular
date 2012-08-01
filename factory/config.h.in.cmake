@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.14 2008/08/20 13:35:55 Singular Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H

@@ -6,7 +6,6 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id$
  *******************************************************************/
 #include "config.h"
 #include <kernel/mod2.h>

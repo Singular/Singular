@@ -6,7 +6,6 @@
  *  Purpose: source for static version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 #include "config.h"
 #include <misc/auxiliary.h>

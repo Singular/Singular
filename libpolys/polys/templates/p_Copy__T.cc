@@ -6,7 +6,6 @@
  *  Purpose: template for p_Copy__T
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 LINKAGE poly p_Copy__T(poly s_p, const ring r)

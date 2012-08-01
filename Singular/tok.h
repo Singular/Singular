@@ -6,7 +6,6 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id$ */
 
 #ifndef MYYSTYPE
 #include <kernel/structs.h>

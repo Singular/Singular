@@ -5,7 +5,6 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id$
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H

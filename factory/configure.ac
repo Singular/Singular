@@ -1,6 +1,5 @@
 
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id$
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate

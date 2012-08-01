@@ -6,7 +6,6 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id$
  *******************************************************************/
 
 // set it here if needed.

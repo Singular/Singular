@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc 14320 2011-07-04 14:48:27Z hannes $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */

@@ -6,7 +6,6 @@
  *  Purpose: implementation of pShallowCopyDelete routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 #ifndef PSHALLOWCOPYDELETE_H
 #define PSHALLOWCOPYDELETE_H

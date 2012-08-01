@@ -1,7 +1,5 @@
 %{
 /*
- *  $Id:
- *
  *  Test mod fuer modgen
  */
 

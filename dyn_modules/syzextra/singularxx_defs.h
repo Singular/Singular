@@ -10,9 +10,6 @@
  * @par Copyright:
  *   (c) 2009 by The SINGULAR Team, see LICENSE file
  *
- * @internal 
- * @version \$Id: singularxx_defs.h,v 1.3 2009/07/02 11:21:31 dreyer Exp $
- *
 **/
 //*****************************************************************************
 

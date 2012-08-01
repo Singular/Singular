@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @c FILE: README_distribution.texi
 @c PURPOSE: general README file to be included in the distribution
 @c

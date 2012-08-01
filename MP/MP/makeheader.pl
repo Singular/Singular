@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# $Id$
 #
 # makeheader.pl - generate a header file out of several header file (ver 1.2).
 #

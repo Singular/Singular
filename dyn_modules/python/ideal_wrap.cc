@@ -1,4 +1,3 @@
-//$Id$
 #include <boost/python.hpp>
 #include <kernel/mod2.h>
 #include "Poly.h"

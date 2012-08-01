@@ -3,7 +3,6 @@
  *  Purpose: low-level Macros for memory operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef OM_MEM_OPS_H

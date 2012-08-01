@@ -3,7 +3,6 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id$ */
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 

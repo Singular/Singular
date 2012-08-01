@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
 

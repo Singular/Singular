@@ -3,7 +3,6 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C

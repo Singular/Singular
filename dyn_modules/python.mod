@@ -1,6 +1,5 @@
 %{
 /*
- *  $Id$
  *
  *  Python module
  */

@@ -4,7 +4,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
  * ABSTRACT: tgb internal .h file
 */

@@ -1,5 +1,4 @@
 ;; emacs edit mode for this file is -*- Emacs-Lisp -*-
-;; $Id$
 
 ;;{{{ docu
 ;;

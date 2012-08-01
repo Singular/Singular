@@ -3,7 +3,6 @@
  *  Purpose: implementation of Error handling routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 
 #include <stdarg.h>

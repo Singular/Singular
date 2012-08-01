@@ -1,4 +1,3 @@
-//$Id$
 #ifndef INTVEC_WRAP_HEADER
 #define INTVEC_WRAP_HEADER
 #include <vector>

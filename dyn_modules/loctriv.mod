@@ -1,7 +1,6 @@
 %{
 /*
  *
- *  $Id $
  *
  *  Module file for computing locally trivial vector fields
  *  by a Groebner basis computation similar to the syzygies

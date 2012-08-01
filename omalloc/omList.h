@@ -3,7 +3,6 @@
  *  Purpose: declaration of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef OM_LIST_H

@@ -3,7 +3,6 @@
  *  Purpose: implementation of emulated omalloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #include <stdlib.h>
 #include <string.h>

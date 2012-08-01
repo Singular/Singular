@@ -2,7 +2,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

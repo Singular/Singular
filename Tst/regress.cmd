@@ -1,7 +1,6 @@
 #!/usr/bin/perl -CS
 
 #################################################################
-# $Id$
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98

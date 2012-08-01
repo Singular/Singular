@@ -6,7 +6,6 @@
  *  Purpose: declaration of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef _SINGULAR_MPSR_SL_H_

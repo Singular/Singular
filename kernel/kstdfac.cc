@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */

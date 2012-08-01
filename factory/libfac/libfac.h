@@ -1,6 +1,5 @@
 // Header file for libfac.a
 // Created by -- makeheader --
-// $Id$
 ///////////////////////////////////////
 #ifndef FACTOR_H
 #define FACTOR_H

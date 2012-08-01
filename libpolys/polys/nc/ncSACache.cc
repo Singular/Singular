@@ -6,7 +6,6 @@
  *  Purpose: implementation of special Cache+Hash for Multiplier 
  *  Author:  motsak
  *  Created: 
- *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

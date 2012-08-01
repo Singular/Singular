@@ -3,7 +3,6 @@
  *  Purpose: implementing valloc via mmap
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #include <unistd.h>
 #include <fcntl.h>

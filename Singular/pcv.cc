@@ -1,7 +1,6 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id$ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */

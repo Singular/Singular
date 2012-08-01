@@ -4,7 +4,6 @@
  *  Purpose: limits.h configuration for omalloc
  *  Author:  hannes (Hans Schoenemann)
  *  Created: 03/01
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef _MYLIMITS_H

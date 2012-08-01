@@ -6,7 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Id$ */
 #include <coeffs/coeffs.h>
 
 

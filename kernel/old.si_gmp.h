@@ -1,4 +1,3 @@
-/* $Id$ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H

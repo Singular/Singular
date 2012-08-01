@@ -1,4 +1,3 @@
-//$Id$
 #ifndef RING_WRAP_HEADER
 #define RING_WRAP_HEADER
 #include "ring.h"

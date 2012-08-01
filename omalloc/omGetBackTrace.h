@@ -3,7 +3,6 @@
  *  Purpose: routines for getting Backtraces of stack
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_GET_BACKTRACE_H
 #define OM_GET_BACKTRACE_H

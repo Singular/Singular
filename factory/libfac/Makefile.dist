@@ -1,4 +1,3 @@
-# $Id$
 #################################################
 factoryversion = 1.2b
 factorypath = ../factory/$(factoryversion)

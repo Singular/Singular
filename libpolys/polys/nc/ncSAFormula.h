@@ -3,7 +3,6 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id$ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType

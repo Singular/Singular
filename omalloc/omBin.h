@@ -3,7 +3,6 @@
  *  Purpose: declaration of routines related to Bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_BIN_H
 #define OM_BIN_H

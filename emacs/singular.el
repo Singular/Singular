@@ -1,6 +1,5 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id$
 
 ;;; Commentary:
 

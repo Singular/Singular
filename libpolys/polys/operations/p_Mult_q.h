@@ -7,7 +7,6 @@
  *           p_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef P_MULT_Q_H

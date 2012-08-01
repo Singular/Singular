@@ -6,7 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Id$ */
 
 #include <polys/monomials/ring.h>
 

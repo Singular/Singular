@@ -3,7 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.9 1998/06/02 15:29:58 Singular Exp $ */
 /*
 * ABSTRACT
 */

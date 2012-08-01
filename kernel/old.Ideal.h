@@ -1,6 +1,5 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id$
 #include <vector>
 #include <kernel/Poly.h>
 #include <kernel/ideals.h>

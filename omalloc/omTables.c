@@ -3,7 +3,6 @@
  *  Purpose: program which generates omTables.inc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 
 #ifndef MH_TABLE_C

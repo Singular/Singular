@@ -3,7 +3,6 @@
  *  Purpose: configuration which are derived from omConfig.h
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_DERIVED_CONFIG_H
 #define OM_DERIVED_CONFIG_H

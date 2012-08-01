@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c

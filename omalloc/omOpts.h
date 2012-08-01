@@ -3,7 +3,6 @@
  *  Purpose: declaration of options for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_OPTS_H
 #define OM_OPTS_H

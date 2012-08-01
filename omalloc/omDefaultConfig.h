@@ -3,7 +3,6 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 
 /********************************************************************

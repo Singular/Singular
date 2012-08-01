@@ -4,7 +4,6 @@ gfan.h Interface to gfan.cc
 $Author: monerjan $
 $Date: 2009/11/03 06:57:32 $
 $Header: /usr/local/Singular/cvsroot/kernel/gfan.h,v 1.13 2009/11/03 06:57:32 monerjan Exp $
-$Id$
 */
 #ifdef HAVE_FANS
 

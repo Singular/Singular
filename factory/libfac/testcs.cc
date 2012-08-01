@@ -1,4 +1,3 @@
-// $Id$
 
 #include <factory.h>
 #include <libfac.h>

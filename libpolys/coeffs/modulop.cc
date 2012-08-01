@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc 14402 2011-09-29 17:16:19Z hannes $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */

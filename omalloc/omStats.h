@@ -3,7 +3,6 @@
  *  Purpose: declaration of statistics related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_STATS_H
 #define OM_STATS_H

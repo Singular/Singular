@@ -2,7 +2,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id$
 /*
 * ABSTRACT: convert data between Singular and factory
 */

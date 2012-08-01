@@ -5,7 +5,6 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.42 2009/08/21 11:00:48 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -647,7 +646,6 @@ while (0)
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.42 2009/08/21 11:00:48 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H

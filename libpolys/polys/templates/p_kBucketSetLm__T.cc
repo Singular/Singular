@@ -6,7 +6,6 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id$
  *******************************************************************/
 #undef USE_COEF_BUCKETS
 #ifdef HAVE_COEF_BUCKETS

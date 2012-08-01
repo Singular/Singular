@@ -6,7 +6,6 @@
 /*
 *  ABSTRACT - get the computing time
 */
-/* $Id$ */
 
 extern int timerv;
 void startTimer(void);

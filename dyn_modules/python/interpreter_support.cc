@@ -1,4 +1,3 @@
-//$Id$
 
 #include <sstream>
 #include <boost/python.hpp>

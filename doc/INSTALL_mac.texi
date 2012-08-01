@@ -1,5 +1,4 @@
 @comment -*-texinfo-*-
-@comment $Id$
 @c FILE:    INSTALL_classicMac.texi
 @c PURPOSE: Installation instructions for Singular on Macintosh
 

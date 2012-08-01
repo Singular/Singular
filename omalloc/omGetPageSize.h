@@ -3,7 +3,6 @@
  *  Purpose: figure out how to get the pagesize
  *  This is adapted from dlmalloc's mechanisms which in fact derived it from
  *  bsd/gnu getpagesize.h
- *  Version: $Id$
  *******************************************************************/
 #include <unistd.h>
 

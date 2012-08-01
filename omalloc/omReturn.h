@@ -19,7 +19,6 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id$
  */
 
 /*

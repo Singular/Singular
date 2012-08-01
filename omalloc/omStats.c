@@ -3,7 +3,6 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #include <unistd.h>
 #include <omalloc/omConfig.h>

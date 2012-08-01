@@ -3,7 +3,6 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>

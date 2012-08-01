@@ -1,5 +1,4 @@
 #! /bin/sh
-# $Id$
 
 #
 # makeheader.sh - generate a header file out of several header files.

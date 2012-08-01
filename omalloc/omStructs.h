@@ -3,7 +3,6 @@
  *  Purpose: declaration of structs and typedefs of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #ifndef OM_STRUCTS_H
 #define OM_STRUCTS_H

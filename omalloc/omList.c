@@ -3,7 +3,6 @@
  *  Purpose: implementation of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id$
  *******************************************************************/
 #include <omalloc/omConfig.h>
 

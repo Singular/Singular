@@ -70,7 +70,6 @@ void fill_example_package(idhdl pl);
 
 #line 2 "pcv.mod"
 /*
- *  $Id$
  *
  *  Test mod fuer modgen
  */

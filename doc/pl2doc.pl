@@ -1,5 +1,4 @@
 #!/usr/local/bin/perl
-# $Id$
 ###################################################################
 #  Computer Algebra System SINGULAR
 #

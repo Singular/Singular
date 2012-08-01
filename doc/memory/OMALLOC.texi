@@ -2,7 +2,6 @@
 @setfilename omalloc.hlp
 
 @comment -*-texinfo-*-
-@comment $Id$
 @comment Unix
 
 @majorheading An Overview of @code{omalloc}

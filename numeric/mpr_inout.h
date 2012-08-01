@@ -4,7 +4,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id$ */
 
 /*
 * ABSTRACT - multipolynomial resultants - interface to Singular
