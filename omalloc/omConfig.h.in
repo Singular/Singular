@@ -141,10 +141,6 @@
 #ifndef OM_HAVE_DENSE_BIN_DISTRIBUTION
 #undef OM_HAVE_DENSE_BIN_DISTRIBUTION
 #endif
-/* define to disable all debugging stuff */
-#ifndef OM_NDEBUG
-#undef OM_NDEBUG
-#endif
 /* define to enable debug tracking */
 #ifndef OM_HAVE_TRACK
 #undef OM_HAVE_TRACK

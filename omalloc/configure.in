@@ -414,7 +414,6 @@ if test "$with_debug" != no; then
 AC_MSG_RESULT(no)
 else
 AC_MSG_RESULT(yes)
-AC_DEFINE(OM_NDEBUG)
 with_track=no
 fi
 

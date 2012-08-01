@@ -2196,10 +2196,6 @@ if test "$with_debug" != no; then
 echo "$ac_t""no" 1>&6
 else
 echo "$ac_t""yes" 1>&6
-cat >> confdefs.h <<\EOF
-#define OM_NDEBUG 1
-EOF
-
 with_track=no
 fi
 
