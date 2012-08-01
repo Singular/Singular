@@ -15,6 +15,7 @@
 #include "config.h"
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
+#include "newstruct.h"
 
 #include <omalloc/omalloc.h>
 
@@ -106,8 +107,10 @@ class PythonObject
 public:
   typedef PyObject* ptr_type;
   struct sequence_tag{};
+  struct null_tag {};
 
   PythonObject(): m_ptr(Py_None) { }
+  PythonObject(null_tag): m_ptr(NULL) { }
   PythonObject(ptr_type ptr): m_ptr(ptr) {if (!ptr) handle_exception();}
 
   ptr_type check_context(ptr_type ptr) const {
@@ -127,8 +130,7 @@ public:
     if (op == PythonInterpreter::id())
       return *this;
 
-    Werror("unary operation '%s` not implemented for 'pyobject`", iiTwoOps(op));
-    return self();
+    return self(null_tag());
   }
 
   /// Binary and n-ary operations
@@ -147,9 +149,7 @@ public:
       case LIST_CMD:     return args2list(arg);
       case '.': case COLONCOLON: case ATTRIB_CMD: return attr(arg);
     }
-    Werror("binary operation '%d` not implemented for 'pyobject`", iiTwoOps(op));
-
-    return self();
+    return self(null_tag());
   }
 
   /// Ternary operations
@@ -159,9 +159,8 @@ public:
     {
       case ATTRIB_CMD: PyObject_SetAttr(*this, arg1, arg2); return self();
     }
-
     Werror("ternary operation %s not implemented for 'pyobject`", iiTwoOps(op));
-    return self();
+    return self(null_tag());
   }
 
   /// Get item
@@ -184,7 +183,7 @@ public:
 
   BOOLEAN assign_to(leftv result)
   {
-    return (m_ptr == Py_None? none_to(result): python_to(result));
+    return (m_ptr? (m_ptr == Py_None? none_to(result): python_to(result)): TRUE);
   }
 
   void import_as(const char* name) const {
@@ -514,19 +513,13 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
       res->data = (void*) omStrDup("pyobject");
       res->rtyp = STRING_CMD;  
       return FALSE; 
+  }
 
-  case LIST_CMD:
+  if (!PythonCastStatic<>(head)(op).assign_to(res))
     return FALSE;
 
-  }
-
-  if (op > MAX_TOK)       // custom types
-  {
-    BOOLEAN newstruct_Op1(int, leftv, leftv);
-    if (! newstruct_Op1(op, res, head) ) return FALSE;
-  }
-
-  return PythonCastStatic<>(head)(op).assign_to(res);
+  BOOLEAN newstruct_Op1(int, leftv, leftv); // forward declaration
+  return newstruct_Op1(op, res, head);
 }
 
 
@@ -546,8 +539,14 @@ BOOLEAN pyobject_Op2(int op, leftv res, leftv arg1, leftv arg2)
     case '.': case COLONCOLON: case ATTRIB_CMD:
       return lhs.attr(get_attrib_name(arg2)).assign_to(res);
   }
+
   PythonCastDynamic rhs(arg2);
-  return lhs(op, rhs).assign_to(res);
+  if (!lhs(op, rhs).assign_to(res))
+    return FALSE;
+
+  BOOLEAN newstruct_Op2(int, leftv, leftv, leftv); // forward declaration
+  return newstruct_Op2(op, res, arg1, arg2);
+
 }
 
 /// blackbox support - ternary operations
@@ -578,7 +577,11 @@ BOOLEAN pyobject_OpM(int op, leftv res, leftv args)
   }
 
   typedef PythonCastStatic<PythonObject::sequence_tag> seq_type;
-  return PythonCastStatic<>(args)(op, seq_type(args->next)).assign_to(res);
+  if (! PythonCastStatic<>(args)(op, seq_type(args->next)).assign_to(res))
+    return FALSE;
+
+  BOOLEAN newstruct_OpM(int, leftv, leftv); // forward declaration
+  return newstruct_OpM(op, res, args);
 }
 
 /// blackbox support - destruction
@@ -651,6 +654,7 @@ void pyobject_init()
   b->blackbox_Op2     = pyobject_Op2;
   b->blackbox_Op3     = pyobject_Op3;
   b->blackbox_OpM     = pyobject_OpM;
+  b->data             = omAlloc0(newstruct_desc_size());
 
   PythonInterpreter::init(setBlackboxStuff(b,"pyobject"));
 
