@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 static int deb_level = -1;
 char * deb_level_msg = (char *)"";

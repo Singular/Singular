@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 #ifndef INCL_VAR_INTGLOBAL_H
 #define INCL_VAR_INTGLOBAL_H

@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H

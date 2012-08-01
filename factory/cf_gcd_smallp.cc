@@ -12,9 +12,6 @@
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
- * @internal
- * @version \$Id$
- *
 **/
 //*****************************************************************************
 
@@ -538,21 +535,11 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
 
-  if (topLevel)
-  {
-    if (best_level <= 2)
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
-    else
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);
-  }
-  else
-  {
-    cA = uni_content (A);
-    cB = uni_content (B);
-    gcdcAcB= gcd (cA, cB);
-    ppA= A/cA;
-    ppB= B/cB;
-  }
+  cA = uni_content (A);
+  cB = uni_content (B);
+  gcdcAcB= gcd (cA, cB);
+  ppA= A/cA;
+  ppB= B/cB;
 
   int sizeNewtonPolyg;
   int ** newtonPolyg= NULL;
@@ -1004,21 +991,11 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
 
-  if (topLevel)
-  {
-    if (best_level <= 2)
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
-    else
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);
-  }
-  else
-  {
-    cA = uni_content (A);
-    cB = uni_content (B);
-    gcdcAcB= gcd (cA, cB);
-    ppA= A/cA;
-    ppB= B/cB;
-  }
+  cA = uni_content (A);
+  cB = uni_content (B);
+  gcdcAcB= gcd (cA, cB);
+  ppA= A/cA;
+  ppB= B/cB;
 
   int sizeNewtonPolyg;
   int ** newtonPolyg= NULL;
@@ -1461,21 +1438,11 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
 
-  if (topLevel)
-  {
-    if (best_level <= 2)
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
-    else
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);
-  }
-  else
-  {
-    cA = uni_content (A);
-    cB = uni_content (B);
-    gcdcAcB= gcd (cA, cB);
-    ppA= A/cA;
-    ppB= B/cB;
-  }
+  cA = uni_content (A);
+  cB = uni_content (B);
+  gcdcAcB= gcd (cA, cB);
+  ppA= A/cA;
+  ppB= B/cB;
 
   int sizeNewtonPolyg;
   int ** newtonPolyg= NULL;
@@ -3232,21 +3199,12 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
-  if (topLevel)
-  {
-    if (best_level <= 2)
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
-    else
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);
-  }
-  else
-  {
-    cA = uni_content (A);
-    cB = uni_content (B);
-    gcdcAcB= gcd (cA, cB);
-    ppA= A/cA;
-    ppB= B/cB;
-  }
+
+  cA = uni_content (A);
+  cB = uni_content (B);
+  gcdcAcB= gcd (cA, cB);
+  ppA= A/cA;
+  ppB= B/cB;
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB;
@@ -3643,21 +3601,12 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
-  if (topLevel)
-  {
-    if (best_level <= 2)
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
-    else
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);
-  }
-  else
-  {
-    cA = uni_content (A);
-    cB = uni_content (B);
-    gcdcAcB= gcd (cA, cB);
-    ppA= A/cA;
-    ppB= B/cB;
-  }
+
+  cA = uni_content (A);
+  cB = uni_content (B);
+  gcdcAcB= gcd (cA, cB);
+  ppA= A/cA;
+  ppB= B/cB;
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB;

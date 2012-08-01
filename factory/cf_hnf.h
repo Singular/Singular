@@ -6,8 +6,6 @@
 
 #ifdef HAVE_NTL
 
-/* $Id$ */
-
 //{{{ docu
 //
 // The input matrix A is square matrix of integers

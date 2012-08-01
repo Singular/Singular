@@ -1,5 +1,4 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id$ */
 
 #include <factory/templates/ftmpl_matrix.h>
 
