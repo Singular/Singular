@@ -2636,36 +2636,50 @@ number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 #endif
 }
 
-static void nlClearContent(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
+static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == ID);
   // all coeffs are given by integers!!!
 
-  c = n_Init(1, cf);
-  assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
-
-//   numberCollectionEnumerator.Reset();
-// 
-//   c = numberCollectionEnumerator.Current();
-// 
-//   n_Normalize(c, r);
-// 
-//   if (!n_IsOne(c, r))
-//   {    
-//     numberCollectionEnumerator.Current() = n_Init(1, r); // ???
-// 
-//     number inv = n_Invers(c, r);
-// 
-//     while( numberCollectionEnumerator.MoveNext() )
-//     {
-//       number &n = numberCollectionEnumerator.Current();
-//       n_Normalize(n, r); // ?
-//       n_InpMult(n, inv, r);
-//     }
-// 
-//     n_Delete(&inv, r);
-//   }
+  // part 1, find a small candidate for gcd
+  number cand1,cand;
+  int s1,s;
+  s=2147483647; // max. int
+  numberCollectionEnumerator.Reset();
+  do
+  {
+    cand1= numberCollectionEnumerator.Current();
+    if (SR_HDL(cand1)&SR_INT) { cand=cand1;break;}
+    s1=mpz_size1(cand1->z);
+    if (s>s1)
+    {
+      cand=cand1;
+      s=s1;
+    }
+  } while (numberCollectionEnumerator.MoveNext() ); 
+ 
+  // part 2: compute gcd(cand,all coeffs)
+  numberCollectionEnumerator.Reset();
+  do
+  {
+    nlNormalize(numberCollectionEnumerator.Current(),cf);
+    cand1= nlGcd(cand,numberCollectionEnumerator.Current(),cf);
+    nlDelete(&cand,cf);
+    cand=cand1;
+    if(nlIsOne(cand,cf)) { c=cand; return; }
+  } while (numberCollectionEnumerator.MoveNext() ); 
+ 
+  // part3: all coeffs = all coeffs / cand
+  c=cand;
+  numberCollectionEnumerator.Reset();
+  do
+  {
+    number t=nlIntDiv(numberCollectionEnumerator.Current(),cand,cf);
+    nlDelete(&numberCollectionEnumerator.Current(),cf);
+    numberCollectionEnumerator.Current()=t;
+  } while (numberCollectionEnumerator.MoveNext() ); 
+ 
 }
 
 static void nlClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
