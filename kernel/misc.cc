@@ -21,10 +21,6 @@
 #include <coeffs/si_gmp.h>
 #include <omalloc/omalloc.h>
 
-#ifdef HAVE_MPSR
-#include <MP_Config.h>
-#endif
-
 /* init bins */
 
 omBin char_ptr_bin = omGetSpecBin(sizeof(char*));

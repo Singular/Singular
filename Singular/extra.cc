@@ -433,9 +433,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             TEST_FOR("factory")
             //TEST_FOR("libfac")
           #endif
-          #ifdef HAVE_MPSR
-            TEST_FOR("MP")
-          #endif
           #ifdef HAVE_READLINE
             TEST_FOR("readline")
           #endif
@@ -2236,7 +2233,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #  ifdef HAVE_NEWTON
 #    include <hc_newton.h>
 #  endif
-#  include <mpsr.h>
 #  include <polys/mod_raw.h>
 #  include <polys/monomials/ring.h>
 #  include <kernel/shiftgb.h>

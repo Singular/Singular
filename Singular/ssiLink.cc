@@ -44,10 +44,6 @@
 #include <Singular/blackbox.h>
 #include <Singular/ssiLink.h>
 
-#ifdef HAVE_MPSR
-#include <Singular/mpsr.h>
-#endif
-
 struct snumber_dummy
 {
   mpz_t z;
@@ -1413,9 +1409,6 @@ int slStatusSsiL(lists L, int timeout)
 //           i>0: (at least) L[i] is ready
   si_link l;
   ssiInfo *d;
-  #ifdef HAVE_MPSR
-  MP_Link_pt dd;
-  #endif
   int d_fd;
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
@@ -1484,27 +1477,6 @@ int slStatusSsiL(lists L, int timeout)
         WerrorS(" MPtcp:fork or MPtcp:launch");
         return -2;
       }
-    #ifdef HAVE_MPSR
-      if (strcmp(l->m->type,"ssi")==0)
-      {
-        d=(ssiInfo*)l->data;
-        d_fd=d->fd_read;
-        if (d->ungetc_buf=='\0')
-        {
-          FD_SET(d_fd, &fdmask);
-          if (d_fd > max_fd) max_fd=d_fd;
-        }
-        else
-          return i+1;
-      }
-      else
-      {
-        dd=(MP_Link_pt)l->data;
-        d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-        FD_SET(d_fd, &fdmask);
-        if (d_fd > max_fd) max_fd=d_fd;
-      }
-    #else
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
       if (d->ungetc_buf=='\0')
@@ -1514,7 +1486,6 @@ int slStatusSsiL(lists L, int timeout)
       }
       else
         return i+1;
-    #endif
     }
   }
   max_fd++;
@@ -1557,25 +1528,9 @@ do_select:
       if (L->m[i].rtyp==LINK_CMD)
       {
         l=(si_link)L->m[i].Data();
-        #ifdef HAVE_MPSR
-        if (strcmp(l->m->type,"ssi")!=0)
-        {
-          // for MP links, return here:
-          dd=(MP_Link_pt)l->data;
-          d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-          if(j==d_fd) return i+1;
-        }
-        else
-        {
-          d=(ssiInfo*)l->data;
-          d_fd=d->fd_read;
-          if(j==d_fd) break;
-        }
-        #else
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
         if(j==d_fd) break;
-        #endif
       }
     }
     // only ssi links:

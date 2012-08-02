@@ -833,12 +833,6 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
 
   if (0) 0;
-#ifdef HAVE_MPSR
-  else if (strcmp(type, "MPfile") == 0)
-    s->next = slInitMPFileExtension(ns);
-  else if (strcmp(type, "MPtcp") == 0)
-    s->next = slInitMPTcpExtension(ns);
-#endif
 #ifdef HAVE_DBM
   else if (strcmp(type, "DBM") == 0)
     s->next = slInitDBMExtension(ns);

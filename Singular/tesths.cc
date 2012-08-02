@@ -236,19 +236,6 @@ int main(          /* main entry to Singular */
       //Print("batch: p:%s, h:%s\n",(char*) feOptValue(FE_OPT_MPPORT),(char*) feOptValue(FE_OPT_MPHOST));
       //exit(0);
     }
-    else
-    {
-    #ifdef HAVE_MPSR
-      BatchDoProc batch_do = slInitMPBatchDo();
-      if (batch_do != NULL)
-        return (*batch_do)((char*) feOptValue(FE_OPT_MPPORT),
-                         (char*) feOptValue(FE_OPT_MPHOST));
-      else
-        return 1;
-    #else
-      // assume(0); // commented out as MP was deprecated!!!
-    #endif
-    }
   }
   setjmp(si_start_jmpbuf);
   yyparse();

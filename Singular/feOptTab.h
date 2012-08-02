@@ -139,22 +139,8 @@ struct fe_option feOptSpec[] =
   {"link",           required_argument,   LONG_OPTION_RETURN,
    "LINK",     "Use LINK for connections",                             feOptString,    0,   0},
 
-#ifdef HAVE_MPSR
-  {"MPrsh",           required_argument,   LONG_OPTION_RETURN,
-   "RSH",     "Use RSH for MP connections",                            feOptString,    0,   0},
-#endif
-
   {"ticks-per-sec",     required_argument,  LONG_OPTION_RETURN,
    "TICKS",     "Sets unit of timer to TICKS per second",               feOptInt,    (void*)1,      0},
-
-// undocumented options
-#ifdef HAVE_MPSR
-  {"MPtransp",         required_argument,   LONG_OPTION_RETURN,
-   "TRANSP",    "// Use TRANSP for MP connections",                     feOptString,    0,   0},
-
-  {"MPmode",           required_argument,   LONG_OPTION_RETURN,
-   "MODE",      "// Use MODE for MP connections",                       feOptString,    0,   0},
-#endif
 
 // terminator -- do NOT remove
   { 0, 0, 0, 0, 0, feOptInt, 0, 0}

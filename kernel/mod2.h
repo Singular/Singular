@@ -318,17 +318,6 @@
 /* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
 #define YYDEBUG 1
 
-/* Undefine to disable debugging of MP stuff */
-#ifdef HAVE_MPSR
-#undef HAVE_MPSR
-// #define MPSR_DEBUG
-#endif
-
-#ifdef MPSR_DEBUG
-#undef MPSR_DEBUG
-#endif
-
-
 /* define SPECTRUM_DEBUG and SPECTRUM_PRINT for debugging the spectrum code */
 /* define SPECTRUM_IOSTREAM to use C++ iostream for error messages          */
 

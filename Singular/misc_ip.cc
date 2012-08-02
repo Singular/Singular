@@ -366,11 +366,6 @@ lists primeFactorisation(const number n, const number pBound)
 //#endif /* HAVE_LIBPARSER */
 
 
-/* version strings */
-#ifdef HAVE_MPSR
-#include <MP_Config.h>
-#endif
-
 /*2
 * the renice routine for very large jobs
 * works only on unix machines,
@@ -760,9 +755,6 @@ char * versionString()
 #include <NTL/version.h>
               StringAppend("NTL(%s),",NTL_VERSION);
 #endif
-#ifdef HAVE_MPSR
-              StringAppend("MP(%s),",MP_VERSION);
-#endif
 #if SIZEOF_VOIDP == 8
               StringAppendS("64bit,");
 #else
@@ -1002,10 +994,6 @@ int singular_fstat(int fd, struct stat *buf)
 /*2
 * the global exit routine of Singular
 */
-#ifdef HAVE_MPSR
-void (*MP_Exit_Env_Ptr)()=NULL;
-#endif
-
 extern "C" {
 
 void m2_end(int i)
@@ -1053,9 +1041,6 @@ void m2_end(int i)
         printf("\nhalt %d\n",i);
     }
   }
-  #ifdef HAVE_MPSR
-  if (MP_Exit_Env_Ptr!=NULL) (*MP_Exit_Env_Ptr)();
-  #endif
   exit(i);
 }
 }

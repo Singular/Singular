@@ -67,15 +67,6 @@ SOURCES =    Minor.cc\
    maps_ip.cc\
    minpoly.cc\
    misc_ip.cc\
-   mpsr_Error.cc\
-   mpsr_Get.cc\
-   mpsr_GetMisc.cc\
-   mpsr_GetPoly.cc\
-   mpsr_Put.cc\
-   mpsr_PutPoly.cc\
-   mpsr_Timer.cc\
-   mpsr_Tok.cc\
-   mpsr_sl.cc\
    ndbm.cc\
    newstruct.cc\
    pcv.cc\
@@ -131,12 +122,6 @@ SingularHEADERS =    Cache.h \
    misc_ip.h \
    mmalloc.h \
    omSingularConfig.h \
-   mpsr.h \
-   mpsr_Get.h \
-   mpsr_Put.h \
-   mpsr_Timer.h \
-   mpsr_Tok.h \
-   mpsr_sl.h \
    ndbm.h \
    newstruct.h \
    pcv.h \
@@ -157,8 +142,8 @@ SingularHEADERS =    Cache.h \
    walk.h 
 
 # plural_cmd.inc 
-nodist_libSingular_la_SOURCES = mpsr_Tok.inc iparith.inc
-nodist_libSingular_g_la_SOURCES = mpsr_Tok.inc iparith.inc
+nodist_libSingular_la_SOURCES = iparith.inc
+nodist_libSingular_g_la_SOURCES = iparith.inc
 
 noinst_HEADERS = version.h
 
@@ -363,7 +348,7 @@ test_d_g_LDFLAGS = ${AMLDFLAGS}
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc mpsr_Tok.inc iparith.inc LIB/all.lib plural_cmd.inc \
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc LIB/all.lib plural_cmd.inc \
                 gftables MOD
 
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
@@ -382,10 +367,6 @@ plural_cmd.inc iparith.inc: gentable1
 
 # # fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
 # plural_cmd.inc: iparith.inc
-
-mpsr_Tok.inc: gentable2
-	${abs_builddir}/gentable2
-
 
 
 gftables: ${abs_top_srcdir}/factory/gftables
