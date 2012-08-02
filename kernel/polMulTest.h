@@ -498,7 +498,7 @@ inline poly lp_pp_Mult_mm_v1_a
   uint* dvLast = &(dvec[dvSize]);
 
   poly rt = p_Head(p, r_lm_p);
-  long indexP = p_Totaldegree(p, r_lm_p) * lV + 1;
+  long indexP = p_Totaldegree(p, r_lm_p) * lV;
   indexP += dvec[0];
   for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
     p_SetExp( rt, indexP, 1, r_lm_p );
@@ -539,7 +539,7 @@ inline poly lp_pp_Mult_mm_v2_a
   uint* dvLast = &(dvec[dvSize]);
 
   poly rt = p_Head(p, r_lm_p);
-  long indexP = p_Totaldegree(p, r_lm_p)*lV + 1;
+  long indexP = p_Totaldegree(p, r_lm_p)*lV;
   indexP += dvec[0];
   for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
     p_SetOneBit(rt, r_lm_p->VarOffset[indexP]);
@@ -581,7 +581,7 @@ inline poly lp_pp_Mult_mm_v2_a_with_mDVec
   uint* dvLast = &(mDVec[dvSize]);
 
   poly rt = p_Head(p, r_lm_p);
-  long indexP = p_Totaldegree(p, r_lm_p)*lV + 1;
+  long indexP = p_Totaldegree(p, r_lm_p)*lV;
   indexP += mDVec[0];
   for(dvIt = mDVec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
     p_SetOneBit(rt, r_lm_p->VarOffset[indexP]);
