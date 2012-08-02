@@ -38,6 +38,10 @@ struct newstruct_desc_s
   int            id;   // the type id assigned to this bb
 };
 
+int newstruct_desc_size() 
+{
+  return sizeof(newstruct_desc_s);
+}
 
 char * newstruct_String(blackbox *b, void *d)
 {
@@ -45,6 +49,36 @@ char * newstruct_String(blackbox *b, void *d)
   else
   {
     newstruct_desc ad=(newstruct_desc)(b->data);
+
+    newstruct_proc p=ad->procs;
+    while((p!=NULL)&&(p->t!=STRING_CMD))
+      p=p->next;
+
+    if (p!=NULL)
+    {
+      leftv sl;
+      sleftv tmp;
+      memset(&tmp,0,sizeof(tmp));
+      tmp.rtyp=ad->id;
+      void * newstruct_Copy(blackbox*, void *); //forward declaration
+      tmp.data=(void*)newstruct_Copy(b,d);
+      idrec hh;
+      memset(&hh,0,sizeof(hh));
+      hh.id=Tok2Cmdname(p->t);
+      hh.typ=PROC_CMD;
+      hh.data.pinf=p->p;
+      sl=iiMake_proc(&hh,NULL,&tmp);
+
+      if (sl->Typ() == STRING_CMD)
+      {
+        char *res = omStrDup((char*)sl->Data());
+        sl->CleanUp();
+        return res;
+      }
+      else
+        sl->CleanUp();      
+    }
+
     lists l=(lists)d;
     newstruct_member a=ad->member;
     StringSetS("");
@@ -129,6 +163,36 @@ void * newstruct_Copy(blackbox*, void *d)
   return (void*)lCopy_newstruct(n1);
 }
 
+// Used by newstruct_Assign for overloaded '='
+BOOLEAN newstruct_equal(int op, leftv l, leftv r)
+{
+  blackbox *ll=getBlackboxStuff(op);
+  assume(ll->data != NULL);
+  newstruct_desc nt=(newstruct_desc)ll->data;
+  newstruct_proc p=nt->procs;
+  
+  while( (p!=NULL) && ((p->t!='=')||(p->args!=1)) ) p=p->next;
+
+  if (p!=NULL)
+  {
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(r);
+    leftv sl = iiMake_proc(&hh, NULL, &tmp);
+    if (sl != NULL)
+    {
+      if (sl->Typ() == op) { l->Copy(sl); return FALSE;}
+      else sl->CleanUp();
+    }
+  }
+  return TRUE;
+}
+
 BOOLEAN newstruct_Assign(leftv l, leftv r)
 {
   if (r->Typ()>MAX_TOK)
@@ -137,6 +201,14 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
     if (l->Typ()!=r->Typ())
     {
       newstruct_desc rrn=(newstruct_desc)rr->data;
+
+      if (!rrn)
+      {
+        Werror("custom type %s(%d) cannot be assigned to newstruct %s(%d)",
+               Tok2Cmdname(r->Typ()), r->Typ(), Tok2Cmdname(l->Typ()), l->Typ());
+        return TRUE;
+      }
+
       newstruct_desc rrp=rrn->parent;
       while ((rrp!=NULL)&&(rrp->id!=l->Typ())) rrp=rrp->parent;
       if (rrp!=NULL)
@@ -149,6 +221,12 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         {
           l->rtyp=r->Typ();
         }
+      }
+      else                      // unrelated types - look for custom conversion
+      {
+        sleftv tmp;
+        BOOLEAN newstruct_Op1(int, leftv, leftv);  // forward declaration
+        if (! newstruct_Op1(l->Typ(), &tmp, r))  return newstruct_Assign(l, &tmp);
       }
     }
     if (l->Typ()==r->Typ())
@@ -171,10 +249,50 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
       return FALSE;
     }
   }
+
+  else if(l->Typ() > MAX_TOK)
+  {
+    assume(l->Typ() > MAX_TOK);
+    sleftv tmp;
+    if(!newstruct_equal(l->Typ(), &tmp, r)) return newstruct_Assign(l, &tmp);
+  }
   Werror("assign %s(%d) = %s(%d)",
         Tok2Cmdname(l->Typ()),l->Typ(),Tok2Cmdname(r->Typ()),r->Typ());
   return TRUE;
 }
+
+BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
+{
+  // interpreter: arg is newstruct
+  blackbox *a=getBlackboxStuff(arg->Typ());
+  newstruct_desc nt=(newstruct_desc)a->data;
+  newstruct_proc p=nt->procs;
+
+  while((p!=NULL) &&( (p->t!=op) || (p->args!=1) )) p=p->next;
+
+  if (p!=NULL)
+  {
+    leftv sl;
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.Copy(arg);
+    idrec hh;
+    memset(&hh,0,sizeof(hh));
+    hh.id=Tok2Cmdname(p->t);
+    hh.typ=PROC_CMD;
+    hh.data.pinf=p->p;
+    sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl==NULL) return TRUE;
+    else
+    {
+      res->Copy(sl);
+      return FALSE;
+    }
+  }
+  return blackboxDefaultOp1(op,res,arg);
+}
+
+
 
 BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 {
@@ -279,7 +397,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
     al=(lists)a2->Data();
   }
   newstruct_proc p=nt->procs;
-  while((p!=NULL) &&(p->t=op)&&(p->args!=2)) p=p->next;
+  while((p!=NULL) && ( (p->t!=op) || (p->args!=2) )) p=p->next;
   if (p!=NULL)
   {
     leftv sl;
@@ -322,7 +440,9 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       break;
   }
   newstruct_proc p=nt->procs;
-  while((p!=NULL) &&(p->t=op)&&(p->args!=4)) p=p->next;
+  
+  while((p!=NULL) &&( (p->t!=op) || (p->args!=4) )) p=p->next;
+
   if (p!=NULL)
   {
     leftv sl;
@@ -473,7 +593,7 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->blackbox_Init=newstruct_Init;
   b->blackbox_Copy=newstruct_Copy;
   b->blackbox_Assign=newstruct_Assign;
-  //b->blackbox_Op1=blackboxDefaultOp1;
+  b->blackbox_Op1=newstruct_Op1;
   b->blackbox_Op2=newstruct_Op2;
   //b->blackbox_Op3=blackbox_default_Op3;
   b->blackbox_OpM=newstruct_OpM;
@@ -616,6 +736,10 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   newstruct_desc desc=(newstruct_desc)bb->data;
   newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
   p->next=desc->procs; desc->procs=p;
+
+  idhdl save_ring=currRingHdl;
+  currRingHdl=(idhdl)1; // fake ring detection
+
   if(!IsCmd(func,p->t))
   {
     int t=0;
@@ -627,10 +751,12 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
     else
     {
       Werror(">>%s<< is not a kernel command",func);
+      currRingHdl = save_ring;
       return TRUE;
     }
   }
   p->args=args;
   p->p=pr; pr->ref++;
+  currRingHdl = save_ring;
   return FALSE;
 }

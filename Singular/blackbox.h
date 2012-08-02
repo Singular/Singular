@@ -56,6 +56,9 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);
 /// default procedure blackboxDefaultOp2, to be called as "default:" branch
 BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2);
 
+/// default procedure blackboxDefaultOp3, to be called as "default:" branch
+BOOLEAN blackboxDefaultOp3(int op,leftv l, leftv r1,leftv r2, leftv r3);
+
 /// default procedure blackboxDefaultOpM, to be called as "default:" branch
 BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r);
 

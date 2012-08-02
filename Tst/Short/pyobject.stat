@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1295945736:3120- exported :3-1-2:ix86-Linux:mamawutz:185276
-1 >> tst_memory_1 :: 1295945736:3120- exported :3-1-2:ix86-Linux:mamawutz:1466368
-1 >> tst_memory_2 :: 1295945736:3120- exported :3-1-2:ix86-Linux:mamawutz:1466368
-1 >> tst_timer_1 :: 1295945736:3120- exported :3-1-2:ix86-Linux:mamawutz:11
+1 >> tst_memory_0 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:227368
+1 >> tst_memory_1 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:3239936
+1 >> tst_memory_2 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:3239936
+1 >> tst_timer_1 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:9

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -CS
+#!/usr/bin/perl
 
 #################################################################
 # FILE:    regress.cmd
@@ -7,6 +7,10 @@
 # AUTHOR:  obachman@mathematik.uni-kl.de
 
 use Env;
+
+# equivalent to command line options -CS, whihc is not supported any more
+use open ':std', ':utf8';
+use open IO => ':bytes';
  
 #################################################################
 #
