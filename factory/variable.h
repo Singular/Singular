@@ -77,7 +77,6 @@ Variable rootOf( const CanonicalForm &, char name = '@' );
 inline int level( const Variable & v ) { return v.level(); }
 inline char name( const Variable & v ) { return v.name(); }
 
-void setReduce( const Variable & alpha, bool reduce );
 void setMipo ( const Variable & alpha, const CanonicalForm & mipo);
 CanonicalForm getMipo( const Variable & alpha, const Variable & x );
 bool hasMipo( const Variable & alpha );
@@ -87,6 +86,7 @@ char getDefaultExtName();
 
 int ExtensionLevel();
 
+void setReduce( const Variable & alpha, bool reduce );
 /*ENDPUBLIC*/
 
 // the following functions do not need to be public available
