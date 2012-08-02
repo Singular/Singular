@@ -160,13 +160,7 @@ endif
 #########################################################
 # handle all the generated *.inc
 
-noinst_PROGRAMS = gentable2 gentable1 feOptGen feOptES feOptTS
-
-gentable2_SOURCES = gentable2.cc grammar.h tok.h table.h
-gentable2_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-gentable2_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-gentable2_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-
+noinst_PROGRAMS = gentable1 feOptGen feOptES feOptTS
 
 gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
 gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
