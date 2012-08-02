@@ -516,7 +516,7 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 //  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
 //  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
   NoReturn(res);
 
   if( h == NULL )
@@ -543,7 +543,7 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
     h = h->Next(); assume (h == NULL);
 
-    const ideal newid = ComputeLeadingSyzygyTerms(id, r, attributes);
+    const ideal newid = ComputeLeadingSyzygyTerms(id,  attributes);
     
     res->data = newid; res->rtyp = MODUL_CMD;
     return FALSE;
@@ -568,7 +568,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
   NoReturn(res);
 
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
   NoReturn(res);
 
   if( h == NULL )
@@ -628,7 +628,7 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 //  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
 //  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
   NoReturn(res);
 
   if( h == NULL )
@@ -655,7 +655,7 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 
     h = h->Next(); assume (h == NULL);
 
-    res->data = Compute2LeadingSyzygyTerms(id, r, attributes);
+    res->data = Compute2LeadingSyzygyTerms(id, attributes);
     res->rtyp = MODUL_CMD;
 
     return FALSE;
@@ -679,7 +679,7 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   const char* usage = "`FindReducer(<poly/vector>, <vector/0>, <ideal/module>[,<module>])` expected";
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
 
@@ -749,7 +749,7 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   }
 
   res->rtyp = VECTOR_CMD;
-  res->data = FindReducer(product, syzterm, L, LS, r, attributes);
+  res->data = FindReducer(product, syzterm, L, LS, attributes);
 
   if( __DEBUG__ )
   {
@@ -773,7 +773,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   const char* usage = "`SchreyerSyzygyNF(<vector>, <vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
 
@@ -851,7 +851,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   }
   
   res->rtyp = VECTOR_CMD;
-  res->data = SchreyerSyzygyNF(syz_lead, syz_2, L, T, LS, r, attributes);
+  res->data = SchreyerSyzygyNF(syz_lead, syz_2, L, T, LS, attributes);
 
   if( __DEBUG__ )
   {
@@ -872,13 +872,13 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
 //   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   const char* usage = "`ReduceTerm(<poly>, <poly/vector>, <vector/0>, <ideal/module>, <ideal/module>[,<module>])` expected";
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
 
@@ -969,7 +969,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   }
 
 
-  if (__SYZCHECK__ && syztermCheck != NULL)
+  if (__DEBUG__ && syztermCheck != NULL)
   {
     const int c = p_GetComp(syztermCheck, r) - 1;
     assume( c >= 0 && c < IDELEMS(L) );
@@ -991,7 +991,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   }
 
   res->rtyp = VECTOR_CMD;
-  res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, r, attributes);
+  res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, attributes);
 
 
   if( __DEBUG__ )
@@ -1020,7 +1020,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   const char* usage = "`TraverseTail(<poly>, <poly/vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
 
@@ -1098,7 +1098,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   }
 
   res->rtyp = VECTOR_CMD;
-  res->data = TraverseTail(multiplier, tail, L, T, LS, r, attributes);
+  res->data = TraverseTail(multiplier, tail, L, T, LS, attributes);
 
 
   if( __DEBUG__ )
@@ -1125,7 +1125,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 //   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   const char* usage = "`ComputeSyzygy(<ideal/module>, <ideal/module>])` expected";
-  const ring r = currRing;
+  const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
 
@@ -1162,7 +1162,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
   ideal LL, TT;
 
-  ComputeSyzygy(L, T, LL, TT, r, attributes);
+  ComputeSyzygy(L, T, LL, TT, attributes);
 
   lists l = (lists)omAllocBin(slists_bin); l->Init(2);
 

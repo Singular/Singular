@@ -226,12 +226,11 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 {
   const ideal& id = m_idLeads;
   const ring& r = m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+//  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
 
-
-  //   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
 //   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
 //   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
@@ -341,13 +340,13 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
 {
   const ideal& id = m_idLeads;
   const ring& r = m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+//  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
   
 //   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
 //   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
 //   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
   
 
   // 1. set of components S?
@@ -487,117 +486,6 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
   return newid;
 }
 
-
-CReducerFinder::CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
-    m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
-    { }
-
-
-CReducerFinder::~CReducerFinder()
-{
-  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++ )
-  {
-    const TReducers& v = it->second;
-    for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
-      delete const_cast<CLeadingTerm*>(*vit);
-  }
-}
-                                   
-CReducerFinder::CReducerFinder(const SchreyerSyzygyComputation& data): m_data(data), m_hash()
-{
-
-  const ideal& L = data.m_idLeads;
-  const ring&  R = data.m_rBaseRing;
-//   const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
-// 
-//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
-
-
-  assume( L != NULL );
-  assume( R != NULL );
-  assume( R == currRing );
-
-  for( int k = IDELEMS(L) - 1; k >= 0; k-- )
-  {
-    const poly a = L->m[k]; assume( a != NULL );
-
-    // NOTE: label is k \in 0 ... |L|-1!!!
-    m_hash[p_GetComp(a, R)].push_back( new CLeadingTerm(k, a, R) );
-  }
-}
-
-
-CLCM::CLCM(const SchreyerSyzygyComputation& data): std::vector<bool>(), m_data(data), m_compute(false)
-{
-  const ideal& L = data.m_idLeads;
-  const ring&  R = data.m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
-
-//  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
-
-
-  assume( L != NULL );
-  assume( R != NULL );
-  assume( R == currRing );
-
-  if( __TAILREDSYZ__ && !__HYBRIDNF__ )
-  {
-    const int l = IDELEMS(L);
-
-    resize(l, false);
-
-    const unsigned int N = rVar(R);
-
-    for( int k = l - 1; k >= 0; k-- )
-    {
-      const poly a = L->m[k]; assume( a != NULL );
-
-      for (unsigned int j = N; j > 0; j--)
-        if ( !(*this)[j] )
-          (*this)[j] = (p_GetExp(a, j, R) > 0);
-    }
-
-    m_compute = true;    
-  }
-}
-
-
-bool CLCM::Check(const poly m) const
-{
-  assume( m != NULL );
-  if( m_compute && (m != NULL))
-  {  
-    const ring& R = m_data.m_rBaseRing;
-    const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
-
-  //  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-  //  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-    const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-    const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
-
-    assume( R != NULL );
-    assume( R == currRing ); 
-
-    assume( __TAILREDSYZ__ && !__HYBRIDNF__ );
-    
-    const unsigned int N = rVar(R);
-
-    for (unsigned int j = N; j > 0; j--)
-      if ( (*this)[j] )
-        if(p_GetExp(m, j, R) > 0)
-          return true;
-
-    return false;
-    
-  } else return true;
-}
-
 void SchreyerSyzygyComputation::ComputeSyzygy()
 {
 //  FROM_NAMESPACE(INTERNAL, _ComputeSyzygy(m_idLeads, m_idTails, m_syzLeads, m_syzTails, m_rBaseRing, m_atttributes)); // TODO: just a wrapper for now :/
@@ -610,12 +498,12 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
   ideal& TT = m_syzTails;
   const ring& R = m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+//  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
 
 //  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
 //  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
-  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
 //  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   assume( R == currRing ); // For attributes :-/
@@ -691,10 +579,10 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
 void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTerms)
 {
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+//  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
 
-  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
-  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+//  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   if( bComputeSecondTerms )
   {
@@ -717,159 +605,6 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
 
   (void)( __LEAD2SYZ__ );
 }
-
-poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
-{
-//  return FROM_NAMESPACE(INTERNAL, _FindReducer(product, syzterm, m_idLeads, m_LS, m_rBaseRing, m_atttributes));
-//  poly _FindReducer(poly product, poly syzterm,
-//                     ideal L, ideal LS,
-//                     const ring r,
-//                     const SchreyerSyzygyComputationFlags attributes)
-
-  const ideal& L = m_data.m_idLeads;
-  const ideal& LS = m_data.m_LS;
-  const ring& r = m_data.m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
-
-
-  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
-//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
-
-  assume( product != NULL );
-  assume( L != NULL );
-
-  long c = 0;
-
-  if (syzterm != NULL)
-    c = p_GetComp(syzterm, r) - 1;
-
-  assume( c >= 0 && c < IDELEMS(L) );
-  
-  if (__DEBUG__ && (syzterm != NULL))
-  {
-    const poly m = L->m[c];
-
-    assume( m != NULL ); assume( pNext(m) == NULL );
-
-    poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
-    assume( p_EqualPolys(lm, product, r) );
-
-    //  def @@c = leadcomp(syzterm); int @@r = int(@@c);
-    //  def @@product = leadmonomial(syzterm) * L[@@r];
-
-    p_Delete(&lm, r);    
-  }
-
-  const long comp = p_GetComp(product, r);
-  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
-
-  assume( comp >= 0 );
-
-   // looking for an appropriate diviser p = L[k]...
-#if 1
-  CReducersHash::const_iterator it = m_hash.find(p_GetComp(product, r)); // same module component
-   
-  if( it == m_hash.end() )
-    return NULL;
-
-  const TReducers& reducers = it->second;  
-  
-  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-  {
-     const poly p = (*vit)->m_lt;
-
-     assume( p_GetComp(p, r) == comp );
-     
-     const int k = (*vit)->m_label;
-
-     assume( L->m[k] == p );
-     
-     const unsigned long p_sev = (*vit)->m_sev;
-
-     assume( p_sev == p_GetShortExpVector(p, r) );     
-#else  
-   for( int k = IDELEMS(L)-1; k>= 0; k-- )
-   {
-     const poly p = L->m[k];
-     
-     if ( p_GetComp(p, r) != comp )
-       continue;
-       
-     const unsigned long p_sev = p_GetShortExpVector(p, r); // to be stored in m_hash!!!
-#endif
-     
-     if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
-       continue;     
-
-//     // ... which divides the product, looking for the _1st_ appropriate one!
-//     if( !p_LmDivisibleByNoComp(p, product, r) ) // included inside  p_LmShortDivisibleBy!
-//       continue;
-
-
-    const poly q = p_New(r);
-    pNext(q) = NULL;
-    p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
-    p_SetComp(q, k + 1, r);
-    p_Setm(q, r);
-
-    // cannot allow something like: a*gen(i) - a*gen(i)
-    if (syzterm != NULL && (k == c))
-      if (p_ExpVectorEqual(syzterm, q, r))
-      {
-        if( __DEBUG__ )
-        {
-          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
-          dPrint(syzterm, r, r, 1);
-        }    
-
-        p_LmFree(q, r);
-        continue;
-      }
-
-    // while the complement (the fraction) is not reducible by leading syzygies 
-    if( LS != NULL )
-    {
-      assume( __TAILREDSYZ__ );
-      BOOLEAN ok = TRUE;
-
-      // TODO: FindReducer in LS !!! there should be no divisors!
-      for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
-      {
-        const poly pp = LS->m[kk];
-
-        if( p_LmDivisibleBy(pp, q, r) )
-        {
-
-          if( __DEBUG__ )
-          {
-            Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", kk+1);
-            dPrint(pp, r, r, 1);
-          }    
-
-          ok = FALSE; // q in <LS> :((
-          break;                 
-        }
-      }
-
-      if(!ok)
-      {
-        p_LmFree(q, r);
-        continue;
-      }
-    }
-
-    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
-    return q;
-
-  }
-
-
-  return NULL;
-}
-
 
 poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) const
 {
@@ -949,7 +684,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   const ideal& T = m_idTails;
 //  const ideal& LS = m_LS;
   const ring& r = m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+//  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
 
 //  return FROM_NAMESPACE(INTERNAL, _TraverseTail(multiplier, tail, m_idLeads, m_idTails, m_LS, m_rBaseRing, m_atttributes));
 // poly _TraverseTail(poly multiplier, poly tail, 
@@ -963,7 +698,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 //   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
 //   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   assume( multiplier != NULL );
 
@@ -988,7 +723,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   const ideal& T = m_idTails;
 //  const ideal& LS = m_LS;
   const ring& r = m_rBaseRing;
-  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
+//  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
 
 //  return FROM_NAMESPACE(INTERNAL, _ReduceTerm(multiplier, term4reduction, syztermCheck, m_idLeads, m_idTails, m_LS, m_rBaseRing, m_atttributes));
 // poly _ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck,
@@ -1002,7 +737,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 //   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
 //   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
   assume( multiplier != NULL );
   assume( term4reduction != NULL );
@@ -1059,16 +794,17 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
 #else
     __DEBUG__( (BOOLEAN)atGetInt(rootRingHdl,"DEBUG", FALSE) ),
 #endif
-    __SYZCHECK__( (BOOLEAN)atGetInt(rootRingHdl, "SYZCHECK", __DEBUG__) ),
+//    __SYZCHECK__( (BOOLEAN)atGetInt(rootRingHdl, "SYZCHECK", __DEBUG__) ),
     __LEAD2SYZ__( (BOOLEAN)atGetInt(rootRingHdl, "LEAD2SYZ", 1) ), 
     __TAILREDSYZ__( (BOOLEAN)atGetInt(rootRingHdl, "TAILREDSYZ", 1) ), 
-    __HYBRIDNF__( (BOOLEAN)atGetInt(rootRingHdl, "HYBRIDNF", 0) ) 
+    __HYBRIDNF__( (BOOLEAN)atGetInt(rootRingHdl, "HYBRIDNF", 0) ),
+    m_rBaseRing( rootRingHdl->data.uring )
 {    
   if( __DEBUG__ )
   {
     PrintS("SchreyerSyzygyComputationFlags: \n");
     Print("   DEBUG     : \t%d\n", __DEBUG__);
-    Print("   SYZCHECK  : \t%d\n", __SYZCHECK__);
+//    Print("   SYZCHECK  : \t%d\n", __SYZCHECK__);
     Print("   LEAD2SYZ  : \t%d\n", __LEAD2SYZ__);
     Print("   TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
   }
@@ -1076,11 +812,280 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
   // TODO: just current setting!
   assume( rootRingHdl == currRingHdl );
   assume( rootRingHdl->typ == RING_CMD );
-  assume( rootRingHdl->data.uring == currRing );
+  assume( m_rBaseRing == currRing );
   // move the global ring here inside???
 }
 
    
+
+CReducerFinder::CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
+    m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
+{ }
+
+
+CReducerFinder::~CReducerFinder()
+{
+  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++ )
+  {
+    const TReducers& v = it->second;
+    for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
+      delete const_cast<CLeadingTerm*>(*vit);
+  }
+}
+
+CReducerFinder::CReducerFinder(const SchreyerSyzygyComputation& data):
+    SchreyerSyzygyComputationFlags(data), 
+    m_data(data),
+    m_hash()
+{
+  const ring&  R = m_rBaseRing;
+  assume( data.m_rBaseRing == R );
+  assume( R != NULL );
+//   const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
+// 
+//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
+
+  const ideal& L = data.m_idLeads; assume( L != NULL );
+
+  for( int k = IDELEMS(L) - 1; k >= 0; k-- )
+  {
+    const poly a = L->m[k]; assume( a != NULL );
+
+    // NOTE: label is k \in 0 ... |L|-1!!!
+    m_hash[p_GetComp(a, R)].push_back( new CLeadingTerm(k, a, R) );
+  }
+}
+
+
+poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
+{
+//  return FROM_NAMESPACE(INTERNAL, _FindReducer(product, syzterm, m_idLeads, m_LS, m_rBaseRing, m_atttributes));
+//  poly _FindReducer(poly product, poly syzterm,
+//                     ideal L, ideal LS,
+//                     const ring r,
+//                     const SchreyerSyzygyComputationFlags attributes)
+
+  const ideal& L = m_data.m_idLeads;
+  const ideal& LS = m_data.m_LS;
+  const ring& r = m_rBaseRing;
+//  const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
+
+
+//  const BOOLEAN __DEBUG__      = m_data.__DEBUG__;
+//  const BOOLEAN __SYZCHECK__   = m_data.__SYZCHECK__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//  const BOOLEAN __TAILREDSYZ__ = m_data.__TAILREDSYZ__;
+
+  assume( product != NULL );
+  assume( L != NULL );
+
+  long c = 0;
+
+  if (syzterm != NULL)
+    c = p_GetComp(syzterm, r) - 1;
+
+  assume( c >= 0 && c < IDELEMS(L) );
+
+  if (__DEBUG__ && (syzterm != NULL))
+  {
+    const poly m = L->m[c];
+
+    assume( m != NULL ); assume( pNext(m) == NULL );
+
+    poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
+    assume( p_EqualPolys(lm, product, r) );
+
+    //  def @@c = leadcomp(syzterm); int @@r = int(@@c);
+    //  def @@product = leadmonomial(syzterm) * L[@@r];
+
+    p_Delete(&lm, r);    
+  }
+
+  const long comp = p_GetComp(product, r);
+  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
+
+  assume( comp >= 0 );
+
+   // looking for an appropriate diviser p = L[k]...
+#if 1
+  CReducersHash::const_iterator it = m_hash.find(p_GetComp(product, r)); // same module component
+
+  if( it == m_hash.end() )
+    return NULL;
+
+  const TReducers& reducers = it->second;  
+
+  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+  {
+    const poly p = (*vit)->m_lt;
+
+    assume( p_GetComp(p, r) == comp );
+
+    const int k = (*vit)->m_label;
+
+    assume( L->m[k] == p );
+
+    const unsigned long p_sev = (*vit)->m_sev;
+
+    assume( p_sev == p_GetShortExpVector(p, r) );     
+#else  
+  for( int k = IDELEMS(L)-1; k>= 0; k-- )
+  {
+    const poly p = L->m[k];
+
+    if ( p_GetComp(p, r) != comp )
+      continue;
+
+    const unsigned long p_sev = p_GetShortExpVector(p, r); // to be stored in m_hash!!!
+#endif
+
+    if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
+      continue;     
+
+//     // ... which divides the product, looking for the _1st_ appropriate one!
+//     if( !p_LmDivisibleByNoComp(p, product, r) ) // included inside  p_LmShortDivisibleBy!
+//       continue;
+
+
+    const poly q = p_New(r);
+    pNext(q) = NULL;
+    p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
+    p_SetComp(q, k + 1, r);
+    p_Setm(q, r);
+
+    // cannot allow something like: a*gen(i) - a*gen(i)
+    if (syzterm != NULL && (k == c))
+      if (p_ExpVectorEqual(syzterm, q, r))
+      {
+        if( __DEBUG__ )
+        {
+          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          dPrint(syzterm, r, r, 1);
+        }    
+
+        p_LmFree(q, r);
+        continue;
+      }
+
+    // while the complement (the fraction) is not reducible by leading syzygies 
+    if( LS != NULL )
+    {
+      assume( __TAILREDSYZ__ );
+      BOOLEAN ok = TRUE;
+
+      // TODO: FindReducer in LS !!! there should be no divisors!
+      for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
+      {
+        const poly pp = LS->m[kk];
+
+        if( p_LmDivisibleBy(pp, q, r) )
+        {
+
+          if( __DEBUG__ )
+          {
+            Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", kk+1);
+            dPrint(pp, r, r, 1);
+          }    
+
+          ok = FALSE; // q in <LS> :((
+          break;                 
+        }
+      }
+
+      if(!ok)
+      {
+        p_LmFree(q, r);
+        continue;
+      }
+    }
+
+    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+    return q;
+
+  }
+
+
+  return NULL;
+}
+
+
+
+  CLCM::CLCM(const SchreyerSyzygyComputation& data):
+      SchreyerSyzygyComputationFlags(data), std::vector<bool>(), m_data(data), m_compute(false)
+  {
+
+    const ring&  R = m_rBaseRing;
+    assume( data.m_rBaseRing == R );
+    assume( R != NULL );
+//  const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
+
+//  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//    const BOOLEAN __HYBRIDNF__   = m_data.__HYBRIDNF__;
+//    const BOOLEAN __TAILREDSYZ__ = m_data.__TAILREDSYZ__;
+
+
+    const ideal& L = data.m_idLeads;
+    assume( L != NULL );
+
+    if( __TAILREDSYZ__ && !__HYBRIDNF__ )
+    {
+      const int l = IDELEMS(L);
+
+      resize(l, false);
+
+      const unsigned int N = rVar(R);
+
+      for( int k = l - 1; k >= 0; k-- )
+      {
+        const poly a = L->m[k]; assume( a != NULL );
+
+        for (unsigned int j = N; j > 0; j--)
+          if ( !(*this)[j] )
+            (*this)[j] = (p_GetExp(a, j, R) > 0);
+      }
+
+      m_compute = true;    
+    }
+  }
+
+
+  bool CLCM::Check(const poly m) const
+  {
+    assume( m != NULL );
+    if( m_compute && (m != NULL))
+    {  
+      const ring& R = m_data.m_rBaseRing;
+//    const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
+
+  //  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+  //  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//      const BOOLEAN __HYBRIDNF__   = m_data.__HYBRIDNF__;
+//      const BOOLEAN __TAILREDSYZ__ = m_data.__TAILREDSYZ__;
+
+      assume( R != NULL );
+      assume( R == currRing ); 
+
+      assume( __TAILREDSYZ__ && !__HYBRIDNF__ );
+
+      const unsigned int N = rVar(R);
+
+      for (unsigned int j = N; j > 0; j--)
+        if ( (*this)[j] )
+          if(p_GetExp(m, j, R) > 0)
+            return true;
+
+      return false;
+
+    } else return true;
+  }
+
+
 
 
 END_NAMESPACE               END_NAMESPACE_SINGULARXX
