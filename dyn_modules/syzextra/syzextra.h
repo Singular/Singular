@@ -94,14 +94,14 @@ class SchreyerSyzygyComputation;
 class CLCM: public SchreyerSyzygyComputationFlags, public std::vector<bool>
 {
   public:
-    CLCM(const SchreyerSyzygyComputation& data);
+    CLCM(const ideal& L, const SchreyerSyzygyComputationFlags& flags);
 
     bool Check(const poly m) const;
     
   private:
-    const SchreyerSyzygyComputation& m_data;
-
     bool m_compute;
+
+    const unsigned int m_N; ///< number of ring variables
 };
 
 
@@ -129,17 +129,22 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     typedef std::map< TComponentKey, TReducers> CReducersHash;
     
   public:
-
     /// goes over all leading terms
-    CReducerFinder(const SchreyerSyzygyComputation& data);
+    CReducerFinder(const ideal L, const SchreyerSyzygyComputationFlags& flags);
+
+    void Initialize(const ideal L);
 
     ~CReducerFinder();
 
     // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?    
-    poly FindReducer(const poly product, const poly syzterm) const;
+    poly FindReducer(const poly product, const poly syzterm, const CReducerFinder& checker) const;
+
+    bool IsDivisible(const poly q) const;
+
+    bool IsNonempty() const { return (m_hash.size() > 0); }
 
   private:
-    const SchreyerSyzygyComputation& m_data;
+    ideal m_L; ///< only for debug
 
     CReducersHash m_hash; // can also be replaced with a vector indexed by components
 };
@@ -168,18 +173,19 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         SchreyerSyzygyComputationFlags(setting),
         m_idLeads(idLeads), m_idTails(idTails), 
         m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL),
-        m_lcm(*this), m_div(*this)
+        m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
     }
-
 
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
         m_idLeads(idLeads), m_idTails(idTails), 
-        m_syzLeads(NULL), m_syzTails(NULL), m_LS(syzLeads), 
-        m_lcm(*this), m_div(*this)
+        m_syzLeads(syzLeads), m_syzTails(NULL), m_LS(syzLeads), 
+        m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
+      if( __TAILREDSYZ__ && syzLeads != NULL )
+        m_checker.Initialize(syzLeads);
     }
 
     
@@ -213,7 +219,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
   public:
     /// just for testing via the wrapper below
     inline poly _FindReducer(const poly product, const poly syzterm) const
-        { return m_div.FindReducer(product, syzterm); }  
+        { return m_div.FindReducer(product, syzterm, m_checker); }  
     
   protected:
 
@@ -239,13 +245,16 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// output (syzygy) tails
     ideal m_syzTails;
 
-    /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
-
     /// Bitmask for variables occuring in leading terms
     const CLCM m_lcm;
 
     /// Divisor finder
     const CReducerFinder m_div;
+
+    /// for checking tail-terms and makeing them irreducible (wrt m_LS!)
+    CReducerFinder m_checker;
+
+    /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
 };
 
 

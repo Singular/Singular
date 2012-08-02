@@ -510,9 +510,16 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
   assume( IDELEMS(L) == IDELEMS(T) );
 
-  ComputeLeadingSyzygyTerms( __LEAD2SYZ__ ); // 2 terms OR 1 term!
+  if( m_syzLeads == NULL )
+    ComputeLeadingSyzygyTerms( __LEAD2SYZ__ ); // 2 terms OR 1 term!
+
+  assume( m_syzLeads != NULL );
+
+  if( __TAILREDSYZ__ )
+    assume( m_checker.IsNonempty() );
 
   ideal& LL = m_syzLeads;
+
   
   const int size = IDELEMS(LL);
 
@@ -563,7 +570,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     {
       if( a2 == NULL )
       {
-        aa = p_Mult_mm(aa, L->m[r], R); a2 = m_div.FindReducer(aa, a); 
+        aa = p_Mult_mm(aa, L->m[r], R); a2 = m_div.FindReducer(aa, a, m_checker); 
       }
       assume( a2 != NULL );
 
@@ -599,9 +606,13 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
 //    m_syzLeads = FROM_NAMESPACE(INTERNAL, _ComputeLeadingSyzygyTerms(m_idLeads, m_rBaseRing, m_atttributes));
   
   // NOTE: set m_LS if tails are to be reduced!
+  assume( m_syzLeads!= NULL );
 
-  if (__TAILREDSYZ__)
+  if (__TAILREDSYZ__ && (IDELEMS(m_syzLeads) > 0))
+  {
     m_LS = m_syzLeads;
+    m_checker.Initialize(m_syzLeads);
+  }
 
   (void)( __LEAD2SYZ__ );
 }
@@ -617,7 +628,6 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) cons
 
   const ideal& L = m_idLeads;
   const ideal& T = m_idTails;
-//  const ideal& LS = m_LS;
   const ring& r = m_rBaseRing;
 
 //   const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
@@ -655,7 +665,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) cons
 
   while (spoly != NULL)
   {
-    poly t = m_div.FindReducer(spoly, NULL);
+    poly t = m_div.FindReducer(spoly, NULL, m_checker);
 
     p_LmDelete(&spoly, r);
 
@@ -755,7 +765,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   {
     // NOTE: only LT(term4reduction) should be used in the following:
     poly product = pp_Mult_mm(multiplier, term4reduction, r);
-    s = m_div.FindReducer(product, syztermCheck);
+    s = m_div.FindReducer(product, syztermCheck, m_checker);
     p_Delete(&product, r);
   }
 
@@ -833,56 +843,97 @@ CReducerFinder::~CReducerFinder()
   }
 }
 
-CReducerFinder::CReducerFinder(const SchreyerSyzygyComputation& data):
-    SchreyerSyzygyComputationFlags(data), 
-    m_data(data),
-    m_hash()
+
+void CReducerFinder::Initialize(const ideal L)
 {
-  const ring&  R = m_rBaseRing;
-  assume( data.m_rBaseRing == R );
-  assume( R != NULL );
-//   const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
-// 
-//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+  assume( m_L == NULL || m_L == L );
+  if( m_L == NULL )
+    m_L = L;
 
-
-  const ideal& L = data.m_idLeads; assume( L != NULL );
-
-  for( int k = IDELEMS(L) - 1; k >= 0; k-- )
+  assume( m_L == L );
+  
+  if( L != NULL )
   {
-    const poly a = L->m[k]; assume( a != NULL );
+    const ring& R = m_rBaseRing;
+    assume( R != NULL );
+    
+    for( int k = IDELEMS(L) - 1; k >= 0; k-- )
+    {
+      const poly a = L->m[k]; // assume( a != NULL );
 
-    // NOTE: label is k \in 0 ... |L|-1!!!
-    m_hash[p_GetComp(a, R)].push_back( new CLeadingTerm(k, a, R) );
+      // NOTE: label is k \in 0 ... |L|-1!!!
+      if( a != NULL )
+        m_hash[p_GetComp(a, R)].push_back( new CLeadingTerm(k, a, R) );
+    }
   }
 }
 
-
-poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
+CReducerFinder::CReducerFinder(const ideal L, const SchreyerSyzygyComputationFlags& flags):
+    SchreyerSyzygyComputationFlags(flags),
+    m_L(const_cast<ideal>(L)), // for debug anyway
+    m_hash()
 {
-//  return FROM_NAMESPACE(INTERNAL, _FindReducer(product, syzterm, m_idLeads, m_LS, m_rBaseRing, m_atttributes));
-//  poly _FindReducer(poly product, poly syzterm,
-//                     ideal L, ideal LS,
-//                     const ring r,
-//                     const SchreyerSyzygyComputationFlags attributes)
+  assume( flags.m_rBaseRing == m_rBaseRing );
+  if( L != NULL )
+    Initialize(L);
+}
 
-  const ideal& L = m_data.m_idLeads;
-  const ideal& LS = m_data.m_LS;
+
+bool CReducerFinder::IsDivisible(const poly product) const
+{
   const ring& r = m_rBaseRing;
-//  const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
+  
+  const long comp = p_GetComp(product, r);
+  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
+
+  assume( comp >= 0 );
+
+  CReducersHash::const_iterator it = m_hash.find(comp); // same module component
+
+  if( it == m_hash.end() )
+    return false;
+
+  assume( m_L != NULL );  
+
+  const TReducers& reducers = it->second;
+
+  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+  {
+    const poly p = (*vit)->m_lt;
+
+    assume( p_GetComp(p, r) == comp );
+
+    const int k = (*vit)->m_label;
+
+    assume( m_L->m[k] == p );
+
+    const unsigned long p_sev = (*vit)->m_sev;
+
+    assume( p_sev == p_GetShortExpVector(p, r) );     
+
+    if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
+      continue;
+
+    if( __DEBUG__ )
+    {
+      Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", k+1);
+      dPrint(p, r, r, 1);
+    }
+
+    return true;
+  }
+
+  return false;
+}
 
 
-//  const BOOLEAN __DEBUG__      = m_data.__DEBUG__;
-//  const BOOLEAN __SYZCHECK__   = m_data.__SYZCHECK__;
-//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
-//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-//  const BOOLEAN __TAILREDSYZ__ = m_data.__TAILREDSYZ__;
+poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const CReducerFinder& syz_checker) const
+{
+  const ring& r = m_rBaseRing;
 
   assume( product != NULL );
-  assume( L != NULL );
+
+  const ideal& L = m_L; assume( L != NULL ); // for debug/testing only!
 
   long c = 0;
 
@@ -911,15 +962,32 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
 
   assume( comp >= 0 );
 
+//   for( int k = IDELEMS(L)-1; k>= 0; k-- )
+//   {
+//     const poly p = L->m[k];
+// 
+//     if ( p_GetComp(p, r) != comp )
+//       continue;
+// 
+//     const unsigned long p_sev = p_GetShortExpVector(p, r); // to be stored in m_hash!!!
+  
    // looking for an appropriate diviser p = L[k]...
-#if 1
-  CReducersHash::const_iterator it = m_hash.find(p_GetComp(product, r)); // same module component
+  CReducersHash::const_iterator it = m_hash.find(comp); // same module component
 
   if( it == m_hash.end() )
     return NULL;
 
-  const TReducers& reducers = it->second;  
+  assume( m_L != NULL );
 
+  const TReducers& reducers = it->second;
+
+  const BOOLEAN to_check = __TAILREDSYZ__ && (syz_checker.IsNonempty());
+
+  const poly q = p_New(r); pNext(q) = NULL;
+
+  if( __DEBUG__ )
+    p_SetCoeff0(q, 0, r); // for printing q
+  
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
   {
     const poly p = (*vit)->m_lt;
@@ -933,16 +1001,6 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
     const unsigned long p_sev = (*vit)->m_sev;
 
     assume( p_sev == p_GetShortExpVector(p, r) );     
-#else  
-  for( int k = IDELEMS(L)-1; k>= 0; k-- )
-  {
-    const poly p = L->m[k];
-
-    if ( p_GetComp(p, r) != comp )
-      continue;
-
-    const unsigned long p_sev = p_GetShortExpVector(p, r); // to be stored in m_hash!!!
-#endif
 
     if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
       continue;     
@@ -951,9 +1009,6 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
 //     if( !p_LmDivisibleByNoComp(p, product, r) ) // included inside  p_LmShortDivisibleBy!
 //       continue;
 
-
-    const poly q = p_New(r);
-    pNext(q) = NULL;
     p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
     p_Setm(q, r);
@@ -968,122 +1023,81 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm) const
           dPrint(syzterm, r, r, 1);
         }    
 
-        p_LmFree(q, r);
         continue;
       }
 
     // while the complement (the fraction) is not reducible by leading syzygies 
-    if( LS != NULL )
+    if( to_check && syz_checker.IsDivisible(q) ) 
     {
-      assume( __TAILREDSYZ__ );
-      BOOLEAN ok = TRUE;
-
-      // TODO: FindReducer in LS !!! there should be no divisors!
-      for(int kk = IDELEMS(LS)-1; kk>= 0; kk-- )
+      if( __DEBUG__ )
       {
-        const poly pp = LS->m[kk];
-
-        if( p_LmDivisibleBy(pp, q, r) )
-        {
-
-          if( __DEBUG__ )
-          {
-            Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", kk+1);
-            dPrint(pp, r, r, 1);
-          }    
-
-          ok = FALSE; // q in <LS> :((
-          break;                 
-        }
+        PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
       }
-
-      if(!ok)
-      {
-        p_LmFree(q, r);
-        continue;
-      }
+      
+      continue;
     }
 
     p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
     return q;
-
   }
 
+  p_LmFree(q, r);
 
   return NULL;
 }
 
 
 
-  CLCM::CLCM(const SchreyerSyzygyComputation& data):
-      SchreyerSyzygyComputationFlags(data), std::vector<bool>(), m_data(data), m_compute(false)
+CLCM::CLCM(const ideal& L, const SchreyerSyzygyComputationFlags& flags):
+    SchreyerSyzygyComputationFlags(flags), std::vector<bool>(),
+    m_compute(false), m_N(rVar(flags.m_rBaseRing))
+{
+  const ring& R = m_rBaseRing;
+  assume( flags.m_rBaseRing == R );
+  assume( R != NULL );
+
+  assume( L != NULL );
+
+  if( __TAILREDSYZ__ && !__HYBRIDNF__ && (L != NULL))
   {
+    const int l = IDELEMS(L);
 
-    const ring&  R = m_rBaseRing;
-    assume( data.m_rBaseRing == R );
-    assume( R != NULL );
-//  const SchreyerSyzygyComputationFlags& attributes = data.m_atttributes;
+    assume( l > 0 );
 
-//  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//    const BOOLEAN __HYBRIDNF__   = m_data.__HYBRIDNF__;
-//    const BOOLEAN __TAILREDSYZ__ = m_data.__TAILREDSYZ__;
+    resize(l, false);
 
-
-    const ideal& L = data.m_idLeads;
-    assume( L != NULL );
-
-    if( __TAILREDSYZ__ && !__HYBRIDNF__ )
+    for( int k = l - 1; k >= 0; k-- )
     {
-      const int l = IDELEMS(L);
+      const poly a = L->m[k]; assume( a != NULL );
 
-      resize(l, false);
-
-      const unsigned int N = rVar(R);
-
-      for( int k = l - 1; k >= 0; k-- )
-      {
-        const poly a = L->m[k]; assume( a != NULL );
-
-        for (unsigned int j = N; j > 0; j--)
-          if ( !(*this)[j] )
-            (*this)[j] = (p_GetExp(a, j, R) > 0);
-      }
-
-      m_compute = true;    
+      for (unsigned int j = m_N; j > 0; j--)
+        if ( !(*this)[j] )
+          (*this)[j] = (p_GetExp(a, j, R) > 0);
     }
+
+    m_compute = true;    
   }
+}
 
 
-  bool CLCM::Check(const poly m) const
-  {
-    assume( m != NULL );
-    if( m_compute && (m != NULL))
-    {  
-      const ring& R = m_data.m_rBaseRing;
-//    const SchreyerSyzygyComputationFlags& attributes = m_data.m_atttributes;
+bool CLCM::Check(const poly m) const
+{
+  assume( m != NULL );
+  if( m_compute && (m != NULL))
+  {  
+    const ring& R = m_rBaseRing;
 
-  //  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-  //  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//      const BOOLEAN __HYBRIDNF__   = m_data.__HYBRIDNF__;
-//      const BOOLEAN __TAILREDSYZ__ = m_data.__TAILREDSYZ__;
+    assume( __TAILREDSYZ__ && !__HYBRIDNF__ );
 
-      assume( R != NULL );
-      assume( R == currRing ); 
+    for (unsigned int j = m_N; j > 0; j--)
+      if ( (*this)[j] )
+        if(p_GetExp(m, j, R) > 0)
+          return true;
 
-      assume( __TAILREDSYZ__ && !__HYBRIDNF__ );
+    return false;
 
-      const unsigned int N = rVar(R);
-
-      for (unsigned int j = N; j > 0; j--)
-        if ( (*this)[j] )
-          if(p_GetExp(m, j, R) > 0)
-            return true;
-
-      return false;
-
-    } else return true;
-  }
+  } else return true;
+}
 
 
 

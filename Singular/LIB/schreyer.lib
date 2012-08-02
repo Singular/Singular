@@ -2414,14 +2414,16 @@ proc testAGR()
 
   ring AGR = (101), (a,b,c,d,e,f,g,h), dp; AGR;
   // AGR@101n7d005s010%2) medium: <= 2
-  ideal M = f*h-g*h,e*h-g*h,d*h-g*h,c*h-g*h,b*h-g*h,a*h-g*h,e*g+48*f*g-49*g*h,d*g+5*f*g-6*g*h,c*g+49*f*g-50*g*h,b*g-7*f*g+6*g*h,a*g-50*f*g+49*g*h,e*f-20*f*g+19*g*h,d*f+40*f*g-41*g*h,c*f-12*f*g+11*g*h,b*f+45*f*g-46*g*h,a*f+4*f*g-5*g*h,d*e-f*g,c*e-30*f*g+29*g*h,b*e-39*f*g+38*g*h,a*e+10*f*g-11*g*h,c*d-41*f*g+40*g*h,b*d-23*f*g+22*g*h,a*d-20*f*g+19*g*h,b*c+17*f*g-18*g*h,a*c+6*f*g-7*g*h,a*b+28*f*g-29*g*h,g^2*h-g*h^2,f^2*g-8*f*g^2+7*g*h^2,g*h^4+50*h^5,g^5+41*h^5,f*g^4-18*h^5,f^5+29*h^5,e^5+6*h^5,d^5-23*h^5,c^5-32*h^5,b^5+17*h^5,a^5+17*h^5,h^6;
+  ideal M = 
+f*h-g*h,e*h-g*h,d*h-g*h,c*h-g*h,b*h-g*h,a*h-g*h,e*g+48*f*g-49*g*h,d*g+5*f*g-6*g*h,c*g+49*f*g-50*g*h,b*g-7*f*g+6*g*h,a*g-50*f*g+49*g*h,e*f-20*f*g+19*g*h,d*f+40*f*g-41*g*h,c*f-12*f*g+11*g*h,b*f+45*f*g-46*g*h,a*f+4*f*g-5*g*h,d*e-f*g,c*e-30*f*g+29*g*h,b*e-39*f*g+38*g*h,a*e+10*f*g-11*g*h,c*d-41*f*g+40*g*h,b*d-23*f*g+22*g*h,a*d-20*f*g+19*g*h,b*c+17*f*g-18*g*h,a*c+6*f*g-7*g*h,a*b+28*f*g-29*g*h,g^2*h-g*h^2,f^2*g-8*f*g^2+7*g*h^2,g*h^4+50*h^5,g^5+41*h^5,f*g^4-18*h^5,f^5+29*h^5,e^5+6*h^5,d^5-23*h^5,c^5-32*h^5,
+b^5+17*h^5,a^5+17*h^5,h^6;
   M;
   TestSSresAttribs2tr(M);
 /*
-options:  1 1 0 :  Time:  10
-options:  1 1 1 :  Time:  6
+options:  1 1 0 :  Time:  3/10
+options:  1 1 1 :  Time:  2/6
 lres  Time:  0
-nres  Time:  26
+nres  Time:  25
 sres  Time:  0
 */
   kill AGR;
@@ -2473,8 +2475,8 @@ b^2*c^2*e^2, a*b*c^2*e^2;
   M;
   TestSSresAttribs2tr(M);
 /*
-options:  1 1 0 :  Time:  9/10 (35 without LCM)
-options:  1 1 1 :  Time:  8/25
+options:  1 1 0 :  Time:  5/9/10 (35 without LCM)
+options:  1 1 1 :  Time:  6/8/25
 lres  Time:  5
 nres  Time:  5
 sres  Time:  693
@@ -2552,8 +2554,8 @@ a*c^2*d^2*e^2, b^2*c*d^2*e^2, a*b*c*d^2*e^2;
   M;
   TestSSresAttribs2tr(M);
 /*
-options:  1 1 0 :  Time:  73/92 (316 without LCM)
-options:  1 1 1 :  Time:  43/202
+options:  1 1 0 :  Time:  34/73/92 (316 without LCM)
+options:  1 1 1 :  Time:  35/43/202
 lres  Time:  25
 nres  Time:  20
 sres  Time:  71
