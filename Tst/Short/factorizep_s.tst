@@ -329,6 +329,7 @@ kill r;
 ring r = (2,a),(x,y),dp;
 minpoly = a^2 + a + 1;
 poly f=(a + 1)*x^145*y^84 + (a + 1)*x^205*y^17 + x^32*y^112 + x^92*y^45;
+poly g = x7y11+xy17+(a)*x7y10+(a)*xy16+(a)*x8y8+(a+1)*x8y7+(a)*y12+(a+1)*x8y3+(a+1)*x2y9+(a+1)*y11+x9+xy4;
 list l;
 for (int i= 1; i < 33002; i= i+33)
 {
@@ -339,6 +340,9 @@ for (int i= 1; i < 33002; i= i+33)
     l;
     break;
   }
+  system ("--random", i);
+  l= factorize (g);
+  testfactors (l,g);
 }
 
 ring r = 2,(x,y),dp;
@@ -371,5 +375,13 @@ for (int i= 1; i < 33002; i= i+33)
     break;
   }
 }
+
+// tr. 440
+kill r;
+ring r=7,(x,y),dp;
+poly f = y^5*x^4 - y^2*x^7 - y^3 + x^3;
+list l=factorize(f);
+size (l[1]) < 6;
+testfactors (l,f);
 
 tst_status(1);$

@@ -137,6 +137,7 @@ elimlib_s
 equising_s
 facstd
 factorizep_s
+factorizeQ_s
 factorizeQa_s
 fermat_gcd_1var
 fermat_gcd_2var
