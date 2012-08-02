@@ -137,5 +137,90 @@ killattrib(new_pyobj, 17);         // -> error message
 
 attrib(new_pyobj, "new_attr");     // -> error message
 
+// python list from empty Singular list (bug fixed?)
+pyobject ll_empty = list();
+ll_empty;
+
+// converting to and from intvec
+intvec v0;
+v0;
+pyobject obj0 = v0;
+obj0;
+
+intvec v=(1,2,3);
+pyobject obj = v;
+obj;
+intvec(obj);
+
+intvec(python_eval("[1,2,9999999999]")); // -> error
+intvec(python_eval("[1,2,list()]"));     // -> error
+
+ring r=0,x,lp;
+def rl = ringlist(r);
+
+python_eval("tuple")(list(rl[1..3]));
+
+// interaction with newstruct'ed type
+newstruct("wrapping","pyobject p");
+wrapping wrapped;
+
+pyobject seventeen = 17;
+wrapped.p = seventeen;
+wrapped;
+
+proc unwrap(wrapping arg) { return (arg.p); }
+system("install", "wrapping", "pyobject", unwrap, 1);
+
+pyobject released = wrapped;
+released;
+
+proc wrap(pyobject arg) { wrapping res; res.p = arg; return (res); }
+system("install", "pyobject", "wrapping", wrap, 1);
+
+pyobject nineteen = 19;
+wrapped = nineteen;
+wrapped;
+
+
+// interaction with built-ins
+proc to_poly(pyobject arg) { return (poly(23)); }
+system("install", "pyobject", "poly", to_poly, 1);
+
+pyobject for_poly="4poly";
+poly(for_poly);
+
+proc from_poly(poly arg) { pyobject res = string(arg); return (res); }
+system("install", "pyobject", "=", from_poly, 1);
+
+poly p = x+1;
+for_poly = p;
+for_poly;
+
+
+// interaction with both built-ins and newstructs
+newstruct("another","pyobject p");
+another other;
+other.p = seventeen;
+other;
+
+released = other;  // -> error
+released;
+
+proc from_types(def arg) { 
+  if (typeof(arg) == "poly") { return (from_poly(arg)); }
+  if (typeof(arg) == "another") { return (arg.p); }
+}
+system("install", "pyobject", "=", from_types, 1);
+
+released = other;
+released;
+released = p;
+released;
+
+proc from_ideal(ideal arg) { pyobject res = "(missing)"; return (res); }
+system("install", "pyobject", "=", from_ideal, 1);
+pyobject ported = ringlist(r);
+ported;
+
 tst_status(1);
 $
