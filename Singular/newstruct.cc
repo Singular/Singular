@@ -716,6 +716,7 @@ newstruct_desc newstructChildFromString(const char *parent, const char *s)
 
   return scanNewstructFromString(s,res);
 }
+
 void newstructShow(newstruct_desc d)
 {
   newstruct_member elem;
