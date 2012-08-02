@@ -438,6 +438,7 @@ inline poly lp_pp_Mult_mm_v2
   poly rt = p_Head(p, r_lm_p);
   poly rt_it = rt;
   long deg_rt_it = p_Totaldegree(p, r_lm_p) * lV + 1;
+  long max_deg_rt_it = lV * uptodeg;
   long m_ind_it = 1;
   while(true)
   {
@@ -448,7 +449,7 @@ inline poly lp_pp_Mult_mm_v2
         p_SetOneBit(rt_it, r_lm_p->VarOffset[deg_rt_it+i]);
         deg_rt_it += lV;
         m_ind_it += lV;
-        if(deg_rt_it > uptodeg) break;
+        if(deg_rt_it > max_deg_rt_it) break;
         goto nextblock;
       }
     break; //no more Variables in m
@@ -508,7 +509,7 @@ inline poly lp_pp_Mult_mm_v1_a
   while(p != NULL)
   {
     rt_it = rt_it->next = p_Head(p, r_t_p);
-    indexP = p_Totaldegree(p, r_t_p) * lV + 1;
+    indexP = p_Totaldegree(p, r_t_p) * lV;
     indexP += dvec[0];
     for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
       p_SetExp( rt_it, indexP, 1, r_t_p );
@@ -549,7 +550,7 @@ inline poly lp_pp_Mult_mm_v2_a
   while(p != NULL)
   {
     rt_it = rt_it->next = p_Head(p, r_t_p);
-    indexP = p_Totaldegree(p, r_t_p) * lV + 1;
+    indexP = p_Totaldegree(p, r_t_p) * lV;
     VOffPtr = VOffset + indexP + dvec[0];
     for(dvIt = dvec; dvIt != dvLast; ++dvIt, VOffPtr += *dvIt)
       p_SetOneBit(rt_it, *VOffPtr);
@@ -591,7 +592,7 @@ inline poly lp_pp_Mult_mm_v2_a_with_mDVec
   while(p != NULL)
   {
     rt_it = rt_it->next = p_Head(p, r_t_p);
-    indexP = p_Totaldegree(p, r_t_p) * lV + 1;
+    indexP = p_Totaldegree(p, r_t_p) * lV;
     VOffPtr = VOffset + indexP + mDVec[0];
     for(dvIt = mDVec; dvIt != dvLast; ++dvIt, VOffPtr += *dvIt)
       p_SetOneBit(rt_it, *VOffPtr);
