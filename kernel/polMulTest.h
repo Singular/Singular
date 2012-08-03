@@ -454,8 +454,8 @@ inline poly lp_pp_Mult_mm_v2
         if(deg_rt_it > max_deg_rt_it) break;
         goto nextblock;
       }
-    break; //no more Variables in m
     p_Setm(rt_it, r_lm_p);
+    break; //no more Variables in m
   }
 
   pIter(p);
