@@ -335,7 +335,7 @@ BOOLEAN slDump(si_link l)
     if (res)
       Werror("dump: Error for link of type %s, mode: %s, name: %s",
              l->m->type, l->mode, l->name);
-    slClose(l);
+    if (!SI_LINK_R_OPEN_P(l)) slClose(l); // do not close r/w links
     return res;
   }
   else
