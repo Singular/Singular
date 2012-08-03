@@ -394,6 +394,8 @@ inline poly lp_pp_Mult_mm_v1
         j = j + 1;
       }
 
+    p_Setm(rt_it, r_t_p);
+
     pIter(p);
     rt_it = rt_it->next = p_Head(p, r_t_p);
     if(p == NULL) break;
@@ -453,6 +455,7 @@ inline poly lp_pp_Mult_mm_v2
         goto nextblock;
       }
     break; //no more Variables in m
+    p_Setm(rt_it, r_lm_p);
   }
 
   pIter(p);
@@ -475,6 +478,7 @@ inline poly lp_pp_Mult_mm_v2
         }
       break; //no more Variables in m
     }
+    p_Setm(rt_it, r_t_p);
 
     pIter(p);
   }
@@ -503,6 +507,7 @@ inline poly lp_pp_Mult_mm_v1_a
   indexP += dvec[0];
   for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
     p_SetExp( rt, indexP, 1, r_lm_p );
+  p_Setm(rt, r_lm_p);
 
   poly rt_it = rt;
   pIter(p);
@@ -513,6 +518,7 @@ inline poly lp_pp_Mult_mm_v1_a
     indexP += dvec[0];
     for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
       p_SetExp( rt_it, indexP, 1, r_t_p );
+    p_Setm(rt_it, r_t_p);
     pIter(p);
   }
 
@@ -544,6 +550,7 @@ inline poly lp_pp_Mult_mm_v2_a
   indexP += dvec[0];
   for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
     p_SetOneBit(rt, r_lm_p->VarOffset[indexP]);
+  p_Setm(rt, r_lm_p);
 
   poly rt_it = rt;
   pIter(p);
@@ -554,6 +561,7 @@ inline poly lp_pp_Mult_mm_v2_a
     VOffPtr = VOffset + indexP + dvec[0];
     for(dvIt = dvec; dvIt != dvLast; ++dvIt, VOffPtr += *dvIt)
       p_SetOneBit(rt_it, *VOffPtr);
+    p_Setm(rt_it, r_t_p);
     pIter(p);
   }
 
@@ -586,6 +594,7 @@ inline poly lp_pp_Mult_mm_v2_a_with_mDVec
   indexP += mDVec[0];
   for(dvIt = mDVec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
     p_SetOneBit(rt, r_lm_p->VarOffset[indexP]);
+  p_Setm(rt, r_lm_p);
 
   poly rt_it = rt;
   pIter(p);
@@ -596,6 +605,7 @@ inline poly lp_pp_Mult_mm_v2_a_with_mDVec
     VOffPtr = VOffset + indexP + mDVec[0];
     for(dvIt = mDVec; dvIt != dvLast; ++dvIt, VOffPtr += *dvIt)
       p_SetOneBit(rt_it, *VOffPtr);
+    p_Setm(rt_it, r_t_p);
     pIter(p);
   }
 

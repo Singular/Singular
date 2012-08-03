@@ -2986,6 +2986,11 @@ lists lpMultProfilerR
   poly result;
   lists rtL = (lists) omAlloc(sizeof(slists)); //list to be returned
   rtL->Init(lpMultFunctions.size);
+
+  //For debugging Purposes
+  poly* debugRes = 
+    (poly *) omAlloc(sizeof(poly) * lpMultFunctions.size);
+
   for( int i = 0; i < lpMultFunctions.size; ++i ){
     //list of (timing,result) pairs for the current function:
     lists rtPL = (lists) omAlloc(sizeof(slists));
@@ -3033,6 +3038,9 @@ lists lpMultProfilerR
         rtP->m[1].rtyp = POLY_CMD;
         rtP->m[1].data = (void *) result;
 
+        //For debugging Purposes
+        debugRes[i] = result;
+
         //put this pair into the list from above
         rtPL->m[k].rtyp = LIST_CMD;
         rtPL->m[k].data = (char *) rtP;
@@ -3051,6 +3059,10 @@ lists lpMultProfilerR
     rtL->m[i].rtyp = LIST_CMD;
     rtL->m[i].data = (char *) rtPL;
   }
+
+  //For debugging Purposes
+  omFreeSize
+    ( (ADDRESS)debugRes, (lpMultFunctions.size)*sizeof(poly) );
 
   SetTimerResolution(sResolution);
   return rtL;
