@@ -1,0 +1,1608 @@
+////////////////////////////////////////////////////////////////////////////////
+category = "Commutative Algebra";
+info="
+LIBRARY:  symodstd.lib    Procedures for computing Groebner basis of ideals
+                          being invariant under certain variable permutations.
+
+AUTHOR:   Stefan Steidel, steidel@mathematik.uni-kl.de
+
+OVERVIEW:
+
+   A library for computing the Groebner basis of an ideal in the polynomial
+   ring over the rational numbers, that is invariant under certain permutations
+   of the variables, using the symmetry and modular methods.
+   More precisely let I = <f1,...,fr> be an ideal in Q[x(1),...,x(n)] and
+   sigma a permutation of order k in Sym(n) such that sigma(I) = I.
+   We assume that sigma({f1,...,fr}) = {f1,...,fr}. This can always be obtained
+   by adding sigma(fi) to {f1,...,fr}.
+   To compute a standard basis of I we apply a modification of the modular
+   version of the standard basis algorithm (improving the calculations in
+   positive characteristic). Therefore we only allow primes p such that p-1 is
+   divisible by k. This guarantees the existance of a k-th primitive root of
+   unity in Z/pZ.
+
+PROCEDURES:
+ genSymId(I,sigma);      compute ideal J such that sigma(J) = J and J includes I
+ isSymmetric(I,sigma);   check if I is invariant under permutation sigma
+ primRoot(p,k);          int describing a k-th primitive root of unity in Z/pZ
+ eigenvalues(I,sigma);   list of eigenvalues of generators of I under sigma
+ symmStd(I,sigma);       standard basis of I using invariance of I under sigma
+ syModStd(I,sigma);      SB of I using modular methods and sigma(I) = I
+";
+
+LIB "brnoeth.lib";
+LIB "modstd.lib";
+LIB "parallel.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc mixedTest()
+"USAGE:  mixedTest();
+RETURN:  1 if ordering of basering is mixed, 0 else
+EXAMPLE: example mixedTest(); shows an example
+"
+{
+   int i,p,m;
+   for(i = 1; i <= nvars(basering); i++)
+   {
+      if(var(i) > 1)
+      {
+         p++;
+      }
+      else
+      {
+         m++;
+      }
+   }
+   if((p > 0) && (m > 0)) { return(1); }
+   return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R1 = 0,(x,y,z),dp;
+   mixedTest();
+   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
+   mixedTest();
+   ring R3 = 181,x(1..9),(dp(5),lp(4));
+   mixedTest();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc genSymId(ideal I, intvec sigma)
+"USAGE:  genSymId(I,sigma); I ideal, sigma intvec
+ASSUME:  size(sigma) = nvars(basering =: n
+RETURN:  ideal J such that sigma(J) = J and J includes I
+NOTE:    sigma is a permutation of the variables of the basering, i.e.
+@*       sigma: var(i) ----> var(sigma[i]), 1 <= i <= n.
+EXAMPLE: example genSymId; shows an example
+"
+{
+   if(nvars(basering) != size(sigma))
+   {
+      ERROR("The input is no permutation of the ring-variables!!");
+   }
+
+   int i;
+
+   ideal perm;
+   for(i = 1; i <= size(sigma); i++)
+   {
+      perm[size(perm)+1] = var(sigma[i]);
+   }
+
+   map f = basering, perm;
+   ideal J = I;
+   ideal helpJ = I;
+   for(i = 1; i <= order(sigma) - 1; i++)
+   {
+      helpJ = f(helpJ);
+      J = J, helpJ;
+   }
+
+   return(simplify(simplify(J,4),2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(u,v,w,x,y),dp;
+   intvec pi = 2,3,4,5,1;
+   ideal I = u2v + x3y - w2;
+   genSymId(I,pi);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc isSymmetric(ideal I, intvec sigma)
+"USAGE:  isSymmetric(I,sigma); I ideal, sigma intvec
+ASSUME:  size(sigma) = nvars(basering) =: n
+RETURN:  1, if the set of generators of I is invariant under sigma;
+@*       0, if the set of generators of I is not invariant under sigma
+NOTE:    sigma is a permutation of the variables of the basering, i.e.
+@*       sigma: var(i) ----> var(sigma[i]), 1 <= i <= n.
+EXAMPLE: example isSymmetric; shows an example
+"
+{
+   if(nvars(basering) != size(sigma))
+   {
+      ERROR("The input is no permutation of the ring-variables!!");
+   }
+
+   int i, j;
+
+   list L;
+   for(i = 1; i <= size(I); i++)
+   {
+      L[size(L)+1] = I[i];
+   }
+
+   ideal perm;
+   for(i = 1; i <= size(sigma); i++)
+   {
+      perm[size(perm)+1] = var(sigma[i]);
+   }
+
+   map f = basering, perm;
+   ideal J = f(I);
+
+   poly g;
+   while(size(L) > 0)
+   {
+      j = size(L);
+      g = L[1];
+
+      for(i = 1; i <= size(J); i++)
+      {
+         if(g - J[i] == 0)
+         {
+            L = delete(L, 1);
+            break;
+         }
+      }
+
+      if(j == size(L))
+      {
+         return(0);
+      }
+   }
+
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x(1..5),dp;
+   ideal I = cyclic(5);
+   intvec pi = 2,3,4,5,1;
+   isSymmetric(I,pi);
+   intvec tau = 2,5,1,4,3;
+   isSymmetric(I,tau);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc permute(intvec v, intvec P)
+{
+// permute the intvec v according to the permutation given by P
+
+   int s = size(v);
+   int n = size(P);
+   int i;
+   if(s < n)
+   {
+      for(i = s+1; i <= n; i = i+1)
+      {
+         v[i] = 0;
+      }
+      s = size(v);
+   }
+   intvec auxv = v;
+   for(i = 1; i <= n; i = i+1)
+   {
+      auxv[i] = v[P[i]];
+   }
+
+   return(auxv);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc order(intvec sigma)
+{
+// compute the order of sigma in Sym({1,...,n}) with n := size(sigma)
+
+   int ORD = 1;
+   intvec id = 1..size(sigma);
+   intvec tau = sigma;
+
+   while(tau != id)
+   {
+      tau = permute(tau, sigma);
+      ORD = ORD + 1;
+   }
+
+   return(ORD);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc modExpo(bigint x, bigint a, bigint n)
+{
+// compute x^a mod n
+
+   bigint z = 1;
+
+   while(a != 0)
+   {
+      while((a mod 2) == 0)
+      {
+         a = a div 2;
+         x = x^2 mod n;
+      }
+
+      a = a - 1;
+      z = (z*x) mod n;
+   }
+
+   return(z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc primRoot(int p, int k)
+"USAGE:  primRoot(p,k); p,k integers
+ASSUME:  p is a prime and k divides p-1.
+RETURN:  int: a k-th primitive root of unity in Z/pZ
+EXAMPLE: example primRoot; shows an example
+"
+{
+   if(k == 2)
+   {
+      return(-1);
+   }
+
+   if(p == 0)
+   {
+      return(0);
+   }
+
+   int i, j;
+
+   if(((p-1) mod k) != 0)
+   {
+      ERROR("There is no "+string(k)+"-th primitive root of unity "
+             +"in Z/"+string(p)+"Z.");
+      return(0);
+   }
+
+   list PF = primefactors(p-1)[1];
+
+   bigint a;
+
+   for(i = 2; i <= p-1; i++)
+   {
+      a = i;
+
+      for(j = 1; j <= size(PF); j++)
+      {
+         if(modExpo(a, (p-1) div PF[j], p) == 1)
+         {
+            break;
+         }
+      }
+
+      if(j == size(PF)+1)
+      {
+         a = modExpo(a, (p-1) div k, p);
+
+         string str = "int xi = "+string(a);
+         execute(str);
+
+         return(xi);
+      }
+   }
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   primRoot(181,10);
+   ring R = 2147482801, x, lp;
+   number a = primRoot(2147482801,5);
+   a;
+   a^2;
+   a^3;
+   a^4;
+   a^5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc permMat(intvec sigma, list #)
+{
+// compute an intmat such that i-th row describes sigma^i
+
+   int i;
+   int n = size(sigma);
+
+   if(size(#) == 0)
+   {
+      int ORD = order(sigma);
+   }
+   else
+   {
+      int ORD = #[1];
+   }
+
+   intmat P[ORD][n];
+   intvec sigmai = sigma;
+   for(i = 1; i <= ORD; i++)
+   {
+      P[i,1..n] = sigmai;
+      sigmai = permute(sigmai, sigma);
+   }
+
+   return(P);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc genTransId(intvec sigma, list #)
+{
+// list L of two ideals such that
+// - L[1] describes the transformation and
+// - L[2] describes the retransformation (inverse mapping).
+// ORD is the order of sigma in Sym({1,...,n}) with n := size(sigma) and
+// sigma: {1,...,n} ---> {1,...,n}: sigma(j) = sigma[j]. Since sigma is a
+// permutation of variables it induces an automorphism phi of the
+// basering, more precisely a linear variable transformation which is
+// generated by this procedure. In terms it holds:
+//
+//             phi : basering  --------->  basering
+//                    var(i)     |---->     L[1][i]
+//                    L[2][i]    <----|     var(i)
+
+   int n = nvars(basering);
+
+   if(n != size(sigma))
+   {
+      ERROR("The input is no permutation of the ring-variables!!");
+   }
+
+   int i, j, k;
+
+   if(size(#) == 0)
+   {
+      int CHAR = char(basering);
+      int ORD = order(sigma);
+
+      if((((CHAR - 1) mod ORD) != 0) && (CHAR > 0))
+      {
+         ERROR("Basering of characteristic "+string(CHAR)+" has no "
+                +string(ORD)+"-th primitive root of unity!!");
+      }
+
+      if((CHAR == 0) && (ORD > 2))
+      {
+         "========================================
+          ========================================";
+         "If basering really has a "+string(ORD)+"-th "
+          +"primitive root of unity then insert it as input!!";
+         "========================================
+          ========================================";
+         return(list());
+      }
+      else
+      {
+         int xi = primRoot(CHAR, ORD);
+         number a = xi;
+      }
+   }
+   else
+   {
+      int ORD = #[1];
+      number a = #[2];
+   }
+
+   intmat PERM = permMat(sigma,ORD);
+
+   ideal TR, RETR;
+   poly s_trans;
+   matrix C;
+
+//-------------- retransformation ideal RETR is generated here -----------------
+   for(i = 1; i <= n; i++)
+   {
+      for(j = 0; j < ORD; j++)
+      {
+         for(k = 1; k <= ORD; k++)
+         {
+            // for each variable var(i):
+            // s_trans^(j) = sum_{k=1}^{ORD} a^(k*j)*sigma^k(var(i))
+            // for j = 0,...,ORD-1
+            s_trans = s_trans + a^(k*j)*var(PERM[k,i]);
+         }
+         RETR = RETR + simplify(s_trans, 1);
+         s_trans = 0;
+      }
+   }
+
+//---------------- transformation ideal TR is generated here -------------------
+   for(i = 1; i <= n; i++)
+   {
+      for(j = 1; j <= size(RETR); j++)
+      {
+         C = coeffs(RETR[j], var(i));
+         if(nrows(C) > 1)
+         {
+            // var(j) = RETR[j] = sum_{i in J} c_ij*var(i), J subset {1,...,n},
+            // and therefore var(i) = (sum_{j} s(j)/c_ij)/#(summands)
+            s_trans = s_trans + var(j)/(C[nrows(C),1]);
+         }
+      }
+
+      TR = TR + s_trans/number(size(s_trans));
+      s_trans = 0;
+   }
+
+   return(list(TR,RETR));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc eigenvalues(ideal I, intvec sigma)
+"USAGE:  eigenvalues(I,sigma); I ideal, sigma intvec
+ASSUME:  size(sigma) = nvars(basering) =: n
+RETURN:  list of eigenvalues of generators of I under permutation sigma
+NOTE:    sigma is a permutation of the variables of the basering, i.e.
+         sigma: var(i) ----> var(sigma[i]), 1 <= i <= n.
+EXAMPLE: example eigenvalues; shows an example
+"
+{
+   int i, j;
+
+   def A = basering;
+   int n = nvars(A);
+
+   poly ev;
+   list EV;
+   poly s, help_var;
+   matrix C1, C2;
+
+   ideal perm;
+   for(i = 1; i <= n; i++)
+   {
+      perm[size(perm)+1] = var(sigma[i]);
+   }
+
+   map f = A, perm;
+
+   for(i = 1; i <= size(I); i++)
+   {
+//-------------- s is the image of I[i] under permutation sigma ----------------
+      s = I[i];
+      s = f(s);
+
+      for(j = 1; j <= n; j++)
+      {
+         C1 = coeffs(I[i], var(j));
+         C2 = coeffs(s, var(j));
+         if(nrows(C1) > 1)
+         {
+            ev = C2[nrows(C2),1]/C1[nrows(C1),1];
+
+//------ Furthermore check that I[i] is eigenvector of permutation sigma. ------
+            if(s == ev*I[i])
+            {
+               break;
+            }
+            else
+            {
+               ERROR("I["+string(i)+"] is no eigenvector "
+                      +"of permutation sigma!!");
+            }
+         }
+      }
+
+      EV[size(EV)+1] = ev;
+   }
+
+   return(EV);
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring R = 11, x(1..5), dp;
+   poly p1 = x(1)+x(2)+x(3)+x(4)+x(5);
+   poly p2 = x(1)+4*x(2)+5*x(3)-2*x(4)+3*x(5);
+   poly p3 = x(1)+5*x(2)+3*x(3)+4*x(4)-2*x(5);
+   poly p4 = x(1)-2*x(2)+4*x(3)+3*x(4)+5*x(5);
+   poly p5 = x(1)+3*x(2)-2*x(3)+5*x(4)+4*x(5);
+   ideal I = p1,p2,p3,p4,p5;
+   intvec tau = 2,3,4,5,1;
+   eigenvalues(I,tau);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc symmStd(ideal I, intvec sigma, list #)
+"USAGE:  symmStd(I,sigma,#); I ideal, sigma intvec
+ASSUME:  size(sigma) = nvars(basering) =: n, basering has an order(sigma)-th
+         primitive root of unity a (if char(basering) > 0) and sigma(I) = I
+RETURN:  ideal, a standard basis of I
+NOTE:    Assuming that the ideal I is invariant under the variable permutation
+         sigma and the basering has an order(sigma)-th primitive root of unity
+         the procedure uses linear transformation of variables in order to
+         improve standard basis computation.
+         If char(basering) = 0 all computations are done in the polynomial ring
+         over the smallest field extension that has an order(sigma)-th primitive
+         root of unity.
+EXAMPLE: example symmStd; shows an example
+"
+{
+   if((nvars(basering) != size(sigma)) || (!isSymmetric(I,sigma)))
+   {
+      ERROR("The input is no permutation of the ring-variables!!");
+   }
+
+   option(redSB);
+
+   def R = basering;
+   int CHAR = char(R);
+   int n = nvars(R);
+
+   int t;
+
+//-------- (1) Compute the order of variable permutation sigma. ----------------
+   int ORD = order(sigma);
+   if((((CHAR - 1) mod ORD) != 0) && (CHAR > 0))
+   {
+      ERROR("Basering of characteristic "+string(CHAR)+" has no "
+             +string(ORD)+"-th primitive root of unity!!");
+   }
+
+//-------- (2) Compute the order(sigma)-th primitive root of unity -------------
+//--------     in basering or move to ring extension.              -------------
+   if((CHAR == 0) && (ORD > 2))
+   {
+      def S = changechar("0,p");
+      setring S;
+      minpoly = rootofUnity(ORD);
+      ideal I = imap(R, I);
+      number a = p;
+   }
+   else
+   {
+      int xi = primRoot(CHAR, ORD);
+      number a = xi;
+   }
+
+//--------- (3) Define the linear transformation of variables with -------------
+//---------     respect to sigma.                                  -------------
+   list L = genTransId(sigma,ORD,a);
+   ideal TR = L[1];
+   ideal RETR = L[2];
+
+//--------- (4) Compute the eigenvalues of the "new" variables of --------------
+//---------     sigma after transformation.                       --------------
+   list EV = eigenvalues(RETR, sigma);
+
+//--------- (5) Transformation of the input-ideal is done here. ----------------
+   map f = basering, TR;
+   t = timer;
+   ideal I_trans = f(I);
+   if(printlevel >= 11) { "Transformation: "+string(timer - t)+" seconds"; }
+
+//--------- (6) Compute a standard basis of the transformed ideal. -------------
+   t = timer;
+   if(size(#) > 0) { ideal sI_trans = std(I_trans, #[1]); }
+   else { ideal sI_trans = std(I_trans); }
+   if(printlevel >= 11) { "1st Groebner basis: "+string(timer - t)+" seconds"; }
+
+//--------- (7) Retransformation is done here. ---------------------------------
+   map g = basering, RETR;
+   t = timer;
+   ideal I_retrans = g(sI_trans);
+   if(printlevel >= 11) { "Reverse Transformation: "+string(timer - t)
+                           +" seconds"; }
+
+//--------- (8) Compute a standard basis of the retransformaed ideal -----------
+//---------     which is then a standard basis of the input-ideal.   -----------
+   t = timer;
+   ideal sI_retrans = std(I_retrans);
+   if(printlevel >= 11) { "2nd Groebner basis: "+string(timer - t)+" seconds"; }
+
+   if((CHAR == 0) && (ORD > 2))
+   {
+      setring R;
+      ideal sI_retrans = fetch(S, sI_retrans);
+      return(sI_retrans);
+   }
+   else
+   {
+      return(sI_retrans);
+   }
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring R = 0, x(1..4), dp;
+   ideal I = cyclic(4);
+   I;
+   intvec pi = 2,3,4,1;
+   ideal sI = symmStd(I,pi);
+   sI;
+
+   ring S = 31, (x,y,z), dp;
+   ideal J;
+   J[1] = xy-y2+xz;
+   J[2] = xy+yz-z2;
+   J[3] = -x2+xz+yz;
+   intvec tau = 3,1,2;
+   ideal sJ = symmStd(J,tau);
+   sJ;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc divPrimeTest(def II, bigint p, int k)
+{
+   if((p - 1) mod k != 0) { return(0); }
+
+   if(typeof(II) == "string")
+   {
+      execute("ideal I = "+II+";");
+   }
+   else
+   {
+      ideal I = II;
+   }
+
+   int i,j;
+   poly f;
+   number cnt;
+   for(i = 1; i <= size(I); i++)
+   {
+      f = cleardenom(I[i]);
+      if(f == 0) { return(0); }
+      cnt = leadcoef(I[i])/leadcoef(f);
+      if((numerator(cnt) mod p) == 0) { return(0); }
+      if((denominator(cnt) mod p) == 0) { return(0); }
+      for(j = size(f); j > 0; j--)
+      {
+         if((leadcoef(f[j]) mod p) == 0) { return(0); }
+      }
+   }
+   return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc divPrimeList(int k, ideal I, int n, list #)
+{
+// the intvec of n greatest primes p <= 2147483647 (resp. n greatest primes
+// < L[size(L)] union with L) such that each (p-1) is divisible by k, and none
+// of these primes divides any coefficient occuring in I
+// --> similar to procedure primeList in modstd.lib
+
+   intvec L;
+   int i,p;
+   int ncores = 1;
+
+//-----------------  Initialize optional parameter ncores  ---------------------
+   if(size(#) > 0)
+   {
+      if(size(#) == 1)
+      {
+         if(typeof(#[1]) == "int")
+         {
+            ncores = #[1];
+            # = list();
+         }
+      }
+      else
+      {
+         ncores = #[2];
+      }
+   }
+
+   if(size(#) == 0)
+   {
+      p = 2147483647;
+      while(!divPrimeTest(I,p,k))
+      {
+         p = prime(p-1);
+         if(p == 2) { ERROR("No more primes."); }
+      }
+      L[1] = p;
+   }
+   else
+   {
+      L = #[1];
+      p = prime(L[size(L)]-1);
+      while(!divPrimeTest(I,p,k))
+      {
+         p = prime(p-1);
+         if(p == 2) { ERROR("No more primes."); }
+      }
+      L[size(L)+1] = p;
+   }
+   if(p == 2) { ERROR("No more primes."); }
+   if(ncores == 1)
+   {
+      for(i = 2; i <= n; i++)
+      {
+         p = prime(p-1);
+         while(!divPrimeTest(I,p,k))
+         {
+            p = prime(p-1);
+            if(p == 2) { ERROR("no more primes"); }
+         }
+         L[size(L)+1] = p;
+      }
+   }
+   else
+   {
+      int neededSize = size(L)+n-1;;
+      list parallelResults;
+      list arguments;
+      int neededPrimes = neededSize-size(L);
+      while(neededPrimes > 0)
+      {
+         arguments = list();
+         for(i = ((neededPrimes div ncores)+1-(neededPrimes%ncores == 0))
+            *ncores; i > 0; i--)
+         {
+            p = prime(p-1);
+            if(p == 2) { ERROR("no more primes"); }
+            arguments[i] = list("I", p, k);
+         }
+         parallelResults = parallelWaitAll("divPrimeTest", arguments,
+            list(list(list(ncores))));
+         for(i = size(arguments); i > 0; i--)
+         {
+            if(parallelResults[i])
+            {
+               L[size(L)+1] = arguments[i][2];
+            }
+         }
+         neededPrimes = neededSize-size(L);
+      }
+      if(size(L) > neededSize)
+      {
+         L = L[1..neededSize];
+      }
+   }
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),dp;
+   ideal I = 2147483647x+y, z-181;
+   intvec L = divPrimeList(4,I,10,10);
+   size(L);
+   L[1];
+   L[size(L)];
+   L = divPrimeList(4,I,5,L,5);
+   size(L);
+   L[size(L)];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc spTestSB(ideal I, ideal J, list L, intvec sigma, int variant, list #)
+"USAGE:  spTestSB(I,J,L,sigma,variant,#); I,J ideals, L intvec of primes,
+                                          sigma intvec, variant integer
+RETURN:  1 (resp. 0) if for a randomly chosen prime p, that is not in L and
+         divisible by the order of sigma, J mod p is (resp. is not) a standard
+         basis of I mod p
+EXAMPLE: example spTestSB; shows an example
+"
+{
+   int i,j,k,p;
+   int ORD = order(sigma);
+   def R = basering;
+   list r = ringlist(R);
+
+   while(!j)
+   {
+      j = 1;
+      while(((p - 1) mod ORD) != 0)
+      {
+         p = prime(random(1000000000,2134567879));
+         if(p == 2){ ERROR("no more primes"); }
+      }
+      for(i = 1; i <= size(L); i++)
+      {
+         if(p == L[i]){ j = 0; break }
+      }
+      if(j)
+      {
+         for(i = 1; i <= ncols(I); i++)
+         {
+            for(k = 2; k <= size(I[i]); k++)
+            {
+               if((denominator(leadcoef(I[i][k])) mod p) == 0){ j = 0; break; }
+            }
+            if(!j){ break; }
+         }
+      }
+      if(j)
+      {
+         if(!primeTest(I,p)) { j = 0; }
+      }
+   }
+   r[1] = p;
+   def @R = ring(r);
+   setring @R;
+   ideal I = imap(R,I);
+   ideal J = imap(R,J);
+   attrib(J,"isSB",1);
+
+   int t = timer;
+   j = 1;
+   if(isIncluded(I,J) == 0){ j = 0; }
+
+   if(printlevel >= 11)
+   {
+      "isIncluded(I,J) takes "+string(timer - t)+" seconds";
+      "j = "+string(j);
+   }
+
+   t = timer;
+   if(j)
+   {
+      if(size(#) > 0)
+      {
+         ideal K = smpStd(I,sigma,p,variant,#[1])[1];
+      }
+      else
+      {
+         ideal K = smpStd(I,sigma,p,variant)[1];
+      }
+      t = timer;
+      if(isIncluded(J,K) == 0){ j = 0; }
+
+      if(printlevel >= 11)
+      {
+         "isIncluded(J,K) takes "+string(timer - t)+" seconds";
+         "j = "+string(j);
+      }
+   }
+   setring R;
+   return(j);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   intvec L = 2,3,5;
+   ring r = 0,(x,y,z),dp;
+   ideal I = x+1,y+1;
+   intvec sigma = 2,1,3;
+   ideal J = x+1,y;
+   spTestSB(I,J,L,sigma,2);
+   spTestSB(J,I,L,sigma,2);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc smpStd(ideal I, intvec sigma, int p, int variant, list #)
+"USAGE:  smpStd(I,sigma,p,#); I ideal, sigma intvec, p integer, variant integer
+ASSUME:  If size(#) > 0, then #[1] is an intvec describing the Hilbert series.
+RETURN:  ideal - a standard basis of I mod p, integer - p
+NOTE:    The procedure computes a standard basis of the ideal I modulo p and
+         fetches the result to the basering. If size(#) > 0 the Hilbert driven
+         standard basis computation symmStd(.,.,#[1]) is used in symmStd.
+         The standard basis computation modulo p does also vary depending on the
+         integer variant, namely
+@*       - variant = 1: symmStd(.,.,#[1]) resp. symmStd,
+@*       - variant = 2: symmStd,
+@*       - variant = 3: homog. - symmStd(.,.,#[1]) resp. symmStd - dehomog.,
+@*       - variant = 4: fglm.
+EXAMPLE: example smpStd; shows an example
+"
+{
+   def R0 = basering;
+   list rl = ringlist(R0);
+   rl[1] = p;
+   def @r = ring(rl);
+   setring @r;
+   ideal i = fetch(R0,I);
+
+   option(redSB);
+
+   if(variant == 1)
+   {
+      if(size(#) > 0)
+      {
+         i = symmStd(i, sigma, #[1]);
+      }
+      else
+      {
+         i = symmStd(i, sigma);
+      }
+   }
+
+   if(variant == 2)
+   {
+      i = symmStd(i, sigma);
+   }
+
+   if(variant == 3)
+   {
+      list rl = ringlist(@r);
+      int nvar@r = nvars(@r);
+
+      int k;
+      intvec w;
+      for(k = 1; k <= nvar@r; k++)
+      {
+         w[k] = deg(var(k));
+      }
+      w[nvar@r + 1] = 1;
+
+      rl[2][nvar@r + 1] = "homvar";
+      rl[3][2][2] = w;
+
+      def HomR = ring(rl);
+      setring HomR;
+      ideal i = imap(@r, i);
+      i = homog(i, homvar);
+      intvec tau = sigma, size(sigma)+1;
+
+      if(size(#) > 0)
+      {
+         if(w == 1)
+         {
+            i = symmStd(i, tau, #[1]);
+         }
+         else
+         {
+            i = symmStd(i, tau, #[1], w);
+         }
+      }
+      else
+      {
+         i = symmStd(i, tau);
+      }
+
+      i = subst(i, homvar, 1);
+      i = simplify(i, 34);
+
+      setring @r;
+      i = imap(HomR, i);
+      i = interred(i);
+      kill HomR;
+   }
+
+   if(variant == 4)
+   {
+      def R1 = changeord("dp");
+      setring R1;
+      ideal i = fetch(@r,i);
+      i = symmStd(i, sigma);
+      setring @r;
+      i = fglm(R1,i);
+   }
+
+   setring R0;
+   return(list(fetch(@r,i),p));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r1 = 0, x(1..4), dp;
+   ideal I = cyclic(4);
+   intvec sigma = 2,3,4,1;
+   int p = 181;
+   list P = smpStd(I,sigma,p,2);
+   P;
+
+   ring r2 = 0, x(1..5), lp;
+   ideal I = cyclic(5);
+   intvec tau = 2,3,4,5,1;
+   int q = 31981;
+   list Q = smpStd(I,tau,q,4);
+   Q;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc syModStd(ideal I, intvec sigma, list #)
+"USAGE:  syModStd(I,sigma); I ideal, sigma intvec
+ASSUME:  size(sigma) = nvars(basering) and sigma(I) = I. If size(#) > 0, then
+         # contains either 1, 2 or 4 integers such that
+@*       - #[1] is the number of available processors for the computation,
+@*       - #[2] is an optional parameter for the exactness of the computation,
+                if #[2] = 1, the procedure computes a standard basis for sure,
+@*       - #[3] is the number of primes until the first lifting,
+@*       - #[4] is the constant number of primes between two liftings until
+           the computation stops.
+RETURN:  ideal, a standard basis of I if no warning appears;
+NOTE:    The procedure computes a standard basis of the ideal I (over the
+         rational numbers) by using modular methods and the fact that I is
+         invariant under the variable permutation sigma.
+         By default the procedure computes a standard basis of I for sure, but
+         if the optional parameter #[2] = 0, it computes a standard basis of I
+         with high probability.
+         The procedure distinguishes between different variants for the standard
+         basis computation in positive characteristic depending on the ordering
+         of the basering, the parameter #[2] and if the ideal I is homogeneous.
+@*       - variant = 1, if I is homogeneous,
+@*       - variant = 2, if I is not homogeneous, 1-block-ordering,
+@*       - variant = 3, if I is not homogeneous, complicated ordering (lp or
+                        > 1 block),
+@*       - variant = 4, if I is not homogeneous, ordering lp, dim(I) = 0.
+EXAMPLE: example syModStd; shows an example
+"
+{
+   if((nvars(basering) != size(sigma)) || (!isSymmetric(I,sigma)))
+   {
+      ERROR("The input is no permutation of the ring-variables!!");
+   }
+
+   int TT = timer;
+   int RT = rtimer;
+
+   def R0 = basering;
+   list rl = ringlist(R0);
+   if((npars(R0) > 0) || (rl[1] > 0))
+   {
+      ERROR("Characteristic of basering should be zero, basering should
+             have no parameters.");
+   }
+
+   int index = 1;
+   int i,k,c;
+   int j = 1;
+   int pTest, sizeTest;
+   int en = 2134567879;
+   int an = 1000000000;
+   bigint N;
+   int ORD = order(sigma);
+
+//--------------------  Initialize optional parameters  ------------------------
+   if(size(#) > 0)
+   {
+      if(size(#) == 1)
+      {
+         int n1 = #[1];
+         int exactness = 1;
+         if(n1 >= 10)
+         {
+            int n2 = n1 + 1;
+            int n3 = n1;
+         }
+         else
+         {
+            int n2 = 10;
+            int n3 = 10;
+         }
+      }
+      if(size(#) == 2)
+      {
+         int n1 = #[1];
+         int exactness = #[2];
+         if(n1 >= 10)
+         {
+            int n2 = n1 + 1;
+            int n3 = n1;
+         }
+         else
+         {
+            int n2 = 10;
+            int n3 = 10;
+         }
+      }
+      if(size(#) == 4)
+      {
+         int n1 = #[1];
+         int exactness = #[2];
+         if(n1 >= #[3])
+         {
+            int n2 = n1 + 1;
+         }
+         else
+         {
+            int n2 = #[3];
+         }
+         if(n1 >= #[4])
+         {
+            int n3 = n1;
+         }
+         else
+         {
+            int n3 = #[4];
+         }
+      }
+   }
+   else
+   {
+      int n1 = 1;
+      int exactness = 1;
+      int n2 = 10;
+      int n3 = 10;
+   }
+
+   if(printlevel >= 10)
+   {
+      "n1 = "+string(n1)+", n2 = "+string(n2)+", n3 = "+string(n3)
+       +", exactness = "+string(exactness);
+   }
+
+//-------------------------- Save current options ------------------------------
+   intvec opt = option(get);
+
+   option(redSB);
+
+//--------------------  Initialize the list of primes  -------------------------
+   int tt = timer;
+   int rt = rtimer;
+   intvec L = divPrimeList(ORD,I,n2,n1);
+   if(printlevel >= 10)
+   {
+      "CPU-time for divPrimeList: "+string(timer-tt)+" seconds.";
+      "Real-time for divPrimeList: "+string(rtimer-rt)+" seconds.";
+   }
+
+//---------------------  Decide which variant to take  -------------------------
+   int variant;
+   int h = homog(I);
+
+   tt = timer;
+   rt = rtimer;
+
+   if(!mixedTest())
+   {
+      if(h)
+      {
+         variant = 1;
+         if(printlevel >= 10) { "variant = 1"; }
+
+         rl[1] = L[5];
+         def @r = ring(rl);
+         setring @r;
+         def @s = changeord("dp");
+         setring @s;
+         ideal I = std(fetch(R0,I));
+         intvec hi = hilb(I,1);
+         setring R0;
+         kill @r,@s;
+      }
+      else
+      {
+         string ordstr_R0 = ordstr(R0);
+         int neg = 1 - attrib(R0,"global");
+
+         if((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg)
+         {
+            variant = 2;
+            if(printlevel >= 10) { "variant = 2"; }
+         }
+         else
+         {
+            string order;
+            if(system("nblocks") <= 2)
+            {
+               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp")
+                                       + find(ordstr_R0, "rp") <= 0)
+               {
+                  order = "simple";
+               }
+            }
+
+            if((order == "simple") || (size(rl) > 4))
+            {
+               variant = 2;
+               if(printlevel >= 10) { "variant = 2"; }
+            }
+            else
+            {
+               rl[1] = L[5];
+               def @r = ring(rl);
+               setring @r;
+
+               def @s = changeord("dp");
+               setring @s;
+               ideal I = std(fetch(R0,I));
+               if(dim(I) == 0)
+               {
+                  variant = 4;
+                  if(printlevel >= 10) { "variant = 4"; }
+               }
+               else
+               {
+                  variant = 3;
+                  if(printlevel >= 10) { "variant = 3"; }
+
+                  int nvar@r = nvars(@r);
+                  intvec w;
+                  for(i = 1; i <= nvar@r; i++)
+                  {
+                     w[i] = deg(var(i));
+                  }
+                  w[nvar@r + 1] = 1;
+
+                  list hiRi = hilbRing(fetch(R0,I),w);
+                  intvec W = hiRi[2];
+                  @s = hiRi[1];
+                  setring @s;
+                  intvec tau = sigma, size(sigma)+1;
+
+                  Id(1) = symmStd(Id(1),tau);
+                  intvec hi = hilb(Id(1), 1, W);
+               }
+
+               setring R0;
+               kill @r,@s;
+            }
+         }
+      }
+   }
+   else
+   {
+      if(exactness == 1) { return(groebner(I)); }
+      if(h)
+      {
+         variant = 1;
+         if(printlevel >= 10) { "variant = 1"; }
+         rl[1] = L[5];
+         def @r = ring(rl);
+         setring @r;
+         def @s = changeord("dp");
+         setring @s;
+         ideal I = std(fetch(R0,I));
+         intvec hi = hilb(I,1);
+         setring R0;
+         kill @r,@s;
+      }
+      else
+      {
+         string ordstr_R0 = ordstr(R0);
+         int neg = 1 - attrib(R0,"global");
+
+         if((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg)
+         {
+            variant = 2;
+            if(printlevel >= 10) { "variant = 2"; }
+         }
+         else
+         {
+            string order;
+            if(system("nblocks") <= 2)
+            {
+               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp")
+                                       + find(ordstr_R0, "rp") <= 0)
+               {
+                  order = "simple";
+               }
+            }
+
+            if((order == "simple") || (size(rl) > 4))
+            {
+               variant = 2;
+               if(printlevel >= 10) { "variant = 2"; }
+            }
+            else
+            {
+               variant = 3;
+               if(printlevel >= 10) { "variant = 3"; }
+
+               rl[1] = L[5];
+               def @r = ring(rl);
+               setring @r;
+               int nvar@r = nvars(@r);
+               intvec w;
+               for(i = 1; i <= nvar@r; i++)
+               {
+                  w[i] = deg(var(i));
+               }
+               w[nvar@r + 1] = 1;
+
+               list hiRi = hilbRing(fetch(R0,I),w);
+               intvec W = hiRi[2];
+               def @s = hiRi[1];
+               setring @s;
+               intvec tau = sigma, size(sigma)+1;
+
+               Id(1) = symmStd(Id(1),tau);
+               intvec hi = hilb(Id(1), 1, W);
+
+               setring R0;
+               kill @r,@s;
+            }
+         }
+      }
+   }
+
+   list P,T1,T2,T3,LL;
+
+   ideal J,K,H;
+
+//-----  If there is more than one processor available, we parallelize the  ----
+//-----  main standard basis computations in positive characteristic        ----
+
+   if(n1 > 1)
+   {
+      ideal I_for_fork = I;
+      export(I_for_fork);           // I available for each link
+
+//-----  Create n1 links l(1),...,l(n1), open all of them and compute  ---------
+//-----  standard basis for the primes L[2],...,L[n1 + 1].             ---------
+
+      for(i = 1; i <= n1; i++)
+      {
+         //link l(i) = "MPtcp:fork";
+         link l(i) = "ssi:fork";
+         open(l(i));
+         if((variant == 1) || (variant == 3))
+         {
+            write(l(i), quote(smpStd(I_for_fork, eval(sigma), eval(L[i + 1]),
+                                                 eval(variant), eval(hi))));
+         }
+         if((variant == 2) || (variant == 4))
+         {
+            write(l(i), quote(smpStd(I_for_fork, eval(sigma), eval(L[i + 1]),
+                                                 eval(variant))));
+         }
+      }
+
+      int t = timer;
+      if((variant == 1) || (variant == 3))
+      {
+         P = smpStd(I_for_fork, sigma, L[1], variant, hi);
+      }
+      if((variant == 2) || (variant == 4))
+      {
+         P = smpStd(I_for_fork, sigma, L[1], variant);
+      }
+      t = timer - t;
+      if(t > 60) { t = 60; }
+      int i_sleep = system("sh", "sleep "+string(t));
+      T1[1] = P[1];
+      T2[1] = bigint(P[2]);
+      index++;
+
+      j = j + n1 + 1;
+   }
+
+//--------------  Main standard basis computations in positive  ----------------
+//----------------------  characteristic start here  ---------------------------
+
+   list arguments_farey, results_farey;
+
+   while(1)
+   {
+      tt = timer; rt = rtimer;
+
+      if(printlevel >= 10) { "size(L) = "+string(size(L)); }
+
+      if(n1 > 1)
+      {
+         while(j <= size(L) + 1)
+         {
+            for(i = 1; i <= n1; i++)
+            {
+               //--- ask if link l(i) is ready otherwise sleep for t seconds ---
+               if(status(l(i), "read", "ready"))
+               {
+                  //--- read the result from l(i) ---
+                  P = read(l(i));
+                  T1[index] = P[1];
+                  T2[index] = bigint(P[2]);
+                  index++;
+
+                  if(j <= size(L))
+                  {
+                     if((variant == 1) || (variant == 3))
+                     {
+                        write(l(i), quote(smpStd(I_for_fork, eval(sigma),
+                                        eval(L[j]), eval(variant), eval(hi))));
+                        j++;
+                     }
+                     if((variant == 2) || (variant == 4))
+                     {
+                        write(l(i), quote(smpStd(I_for_fork, eval(sigma),
+                                        eval(L[j]), eval(variant))));
+                        j++;
+                     }
+                  }
+                  else
+                  {
+                     k++;
+                     close(l(i));
+                  }
+               }
+            }
+            //--- k describes the number of closed links ---
+            if(k == n1)
+            {
+               j++;
+            }
+            i_sleep = system("sh", "sleep "+string(t));
+         }
+      }
+      else
+      {
+         while(j <= size(L))
+         {
+            if((variant == 1) || (variant == 3))
+            {
+               P = smpStd(I, sigma, L[j], variant, hi);
+            }
+            if((variant == 2) || (variant == 4))
+            {
+               P = smpStd(I, sigma, L[j], variant);
+            }
+
+            T1[index] = P[1];
+            T2[index] = bigint(P[2]);
+            index++;
+            j++;
+         }
+      }
+
+      if(printlevel >= 10)
+      {
+         "CPU-time for computing list is "+string(timer - tt)+" seconds.";
+         "Real-time for computing list is "+string(rtimer - rt)+" seconds.";
+      }
+
+//------------------------  Delete unlucky primes  -----------------------------
+//-------------  unlucky if and only if the leading ideal is wrong  ------------
+
+      LL = deleteUnluckyPrimes(T1,T2,h);
+      T1 = LL[1];
+      T2 = LL[2];
+
+//-------------------  Now all leading ideals are the same  --------------------
+//-------------------  Lift results to basering via farey  ---------------------
+
+      tt = timer; rt = rtimer;
+      N = T2[1];
+      for(i = 2; i <= size(T2); i++) { N = N*T2[i]; }
+      H = chinrem(T1,T2);
+      if(n1 == 1)
+      {
+         J = farey(H,N);
+      }
+      else
+      {
+         for(i = ncols(H); i > 0; i--)
+         {
+            arguments_farey[i] = list(ideal(H[i]), N);
+         }
+         results_farey = parallelWaitAll("farey", arguments_farey,
+                                         list(list(list(n1))));
+         for(i = ncols(H); i > 0; i--)
+         {
+            J[i] = results_farey[i][1];
+         }
+      }
+      if(printlevel >= 10)
+      {
+         "CPU-time for lifting-process is "+string(timer - tt)+" seconds.";
+         "Real-time for lifting-process is "+string(rtimer - rt)+" seconds.";
+      }
+
+//----------------  Test if we already have a standard basis of I --------------
+
+      tt = timer; rt = rtimer;
+      if((variant == 1) || (variant == 3))
+      {
+         pTest = spTestSB(I,J,L,sigma,variant,hi);
+      }
+      if((variant == 2) || (variant == 4))
+      {
+         pTest = spTestSB(I,J,L,sigma,variant);
+      }
+
+      if(printlevel >= 10)
+      {
+         "CPU-time for pTest is "+string(timer - tt)+" seconds.";
+         "Real-time for pTest is "+string(rtimer - rt)+" seconds.";
+      }
+
+      if(pTest)
+      {
+         if(printlevel >= 10)
+         {
+            "CPU-time for computation without final tests is "
+            +string(timer - TT)+" seconds.";
+            "Real-time for computation without final tests is "
+            +string(rtimer - RT)+" seconds.";
+         }
+
+         attrib(J,"isSB",1);
+
+         if(exactness == 0)
+         {
+            option(set, opt);
+            if(n1 > 1) { kill I_for_fork; }
+            return(J);
+         }
+
+         if(exactness == 1)
+         {
+            tt = timer; rt = rtimer;
+            sizeTest = 1 - isIncluded(I,J,n1);
+
+            if(printlevel >= 10)
+            {
+               "CPU-time for checking if I subset <G> is "
+               +string(timer - tt)+" seconds.";
+               "Real-time for checking if I subset <G> is "
+               +string(rtimer - rt)+" seconds.";
+            }
+
+            if(sizeTest == 0)
+            {
+               tt = timer; rt = rtimer;
+               K = std(J);
+
+               if(printlevel >= 10)
+               {
+                  "CPU-time for last std-computation is "
+                  +string(timer - tt)+" seconds.";
+                  "Real-time for last std-computation is "
+                  +string(rtimer - rt)+" seconds.";
+               }
+
+               if(size(reduce(K,J)) == 0)
+               {
+                  option(set, opt);
+                  if(n1 > 1) { kill I_for_fork; }
+                  return(J);
+               }
+            }
+         }
+      }
+
+//--------------  We do not already have a standard basis of I  ----------------
+//-----------  Therefore do the main computation for more primes  --------------
+
+      T1 = H;
+      T2 = N;
+      index = 2;
+
+      j = size(L) + 1;
+      tt = timer; rt = rtimer;
+      L = divPrimeList(ORD,I,n3,L,n1);
+      if(printlevel >= 10)
+      {
+         "CPU-time for divPrimeList: "+string(timer-tt)+" seconds.";
+         "Real-time for divPrimeList: "+string(rtimer-rt)+" seconds.";
+      }
+
+      if(n1 > 1)
+      {
+         for(i = 1; i <= n1; i++)
+         {
+            open(l(i));
+            if((variant == 1) || (variant == 3))
+            {
+               write(l(i), quote(smpStd(I_for_fork, eval(sigma), eval(L[j+i-1]),
+                                                    eval(variant), eval(hi))));
+            }
+            if((variant == 2) || (variant == 4))
+            {
+               write(l(i), quote(smpStd(I_for_fork, eval(sigma), eval(L[j+i-1]),
+                                                    eval(variant))));
+            }
+         }
+         j = j + n1;
+         k = 0;
+      }
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R1 = 0, (x,y,z), dp;
+   ideal I;
+   I[1] = -2xyz4+xz5+xz;
+   I[2] = -2xyz4+yz5+yz;
+   intvec sigma = 2,1,3;
+   ideal sI = syModStd(I,sigma);
+   sI;
+
+   ring R2 = 0, x(1..4), dp;
+   ideal I = cyclic(4);
+   I;
+   intvec pi = 2,3,4,1;
+   ideal sJ1 = syModStd(I,pi,1);
+   ideal sJ2 = syModStd(I,pi,1,0);
+   size(reduce(sJ1,sJ2));
+   size(reduce(sJ2,sJ1));
+}
