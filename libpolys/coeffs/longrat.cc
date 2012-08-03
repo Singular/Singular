@@ -2659,6 +2659,7 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     }
   } while (numberCollectionEnumerator.MoveNext() ); 
  
+  cand=nlCopy(cand,cf);
   // part 2: compute gcd(cand,all coeffs)
   numberCollectionEnumerator.Reset();
   do
@@ -2682,14 +2683,71 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
  
 }
 
-static void nlClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
+static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == ID);
-  // all coeffs are given by integers!!!
+  // all coeffs are given by integers after returning from this routine
 
-  c = n_Init(1, cf);
-  assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
+  // part 1, collect product of all denominators /gcds
+  number cand,cand1;
+  cand=ALLOC_RNUMBER();
+  #if defined(LDEBUG)
+  cand->debug=123456;
+  #endif
+  cand->s=3;
+
+  int s=0;
+  mpz_t tmp;
+  mpz_init(tmp);
+  numberCollectionEnumerator.Reset();
+  do
+  {
+    if (!(SR_HDL(cand1)&SR_INT))
+    {
+      nlNormalize(numberCollectionEnumerator.Current(),cf);
+      cand1= numberCollectionEnumerator.Current();
+      if ((!(SR_HDL(cand1)&SR_INT)) // not a short int
+      && (cand1->s==1))             // and is rational
+      {
+        if (s==0) // first denom, we meet
+        {
+          mpz_init_set(cand->z,cand1->n); 
+          s=1; 
+        }
+        else // we have already something
+        {
+          mpz_gcd(tmp,cand->z,cand1->n);
+          if (mpz_cmp_si(tmp,1)!=0)
+          {
+            mpz_div(cand->z,cand->z,tmp);
+          }
+          mpz_mul(cand->z,cand->z,cand1->n);
+        }
+      }
+    }
+  } while (numberCollectionEnumerator.MoveNext() ); 
+
+  if (s==0) // nothing to do, all coeffs are already integers
+  {
+    mpz_clear(tmp);
+    nlDelete(&cand,cf); 
+    c=nlInit(1,cf); 
+    return;
+  }
+  cand=nlShort3(cand);
+ 
+  // part2: all coeffs = all coeffs * cand
+  c=cand;
+  numberCollectionEnumerator.Reset();
+  do
+  {
+    number t=nlMult(numberCollectionEnumerator.Current(),cand,cf);
+    nlDelete(&numberCollectionEnumerator.Current(),cf);
+    nlNormalize(t,cf);
+    numberCollectionEnumerator.Current()=t;
+  } while (numberCollectionEnumerator.MoveNext() ); 
+ 
 }
 
 BOOLEAN nlInitChar(coeffs r, void*)
