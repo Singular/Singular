@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+
 // FACTORY - Includes
 #include <factory.h>
 // Factor - Includes
@@ -17,7 +17,7 @@
 // some CC's need this:
 #include "alg_factor.h"
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 #ifdef ALGFACTORDEBUG
 #  define DEBUGOUTPUT
@@ -79,7 +79,8 @@ void IntGenerator::next()
 
 // replacement for factory's broken psr
 static CanonicalForm
-mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
+mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x )
+{
   CanonicalForm r=rr, v=vv, l, test, lu, lv, t, retvalue;
   int dr, dv, d,n=0;
 
@@ -103,7 +104,8 @@ mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
 
 // replacement for factory's broken resultant
 static CanonicalForm
-resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v ){
+resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v )
+{
   bool on_rational = isOn(SW_RATIONAL);
   On(SW_RATIONAL);
   CanonicalForm cd = bCommonDen( f );
@@ -112,7 +114,7 @@ resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v 
   CanonicalForm gz = g * cd;
   if (!on_rational)  Off(SW_RATIONAL);
 
-return resultant(fz,gz,v);
+  return resultant(fz,gz,v);
 }
 
 // sqr-free routine for algebraic extensions
@@ -132,7 +134,8 @@ return resultant(fz,gz,v);
 static void
 sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
            CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
-           CanonicalForm & R){
+           CanonicalForm & R)
+{
   Variable y=PPalpha.mvar(),vf=f.mvar();
   CanonicalForm temp, Palpha=PPalpha, t;
   int sqfreetest=0;
@@ -146,7 +149,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
   // Norm, resultante taken with respect to y
-  while ( !sqfreetest ){
+  while ( !sqfreetest )
+  {
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
@@ -159,7 +163,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
-    else{
+    else
+    {
       DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
       // Look at SqrFreeTest!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
@@ -168,10 +173,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       Variable X;
       if (getAlgVar(R,X))
       {
-        if (R.isUnivariate())
           testlist=factorize( R, X );
-        else
-          testlist= Factorize(R, X, 0);
       }
       else
         testlist= Factorize(R);
@@ -182,7 +184,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
       DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
-    if ( ! sqfreetest ){
+    if ( ! sqfreetest )
+    {
       myrandom.next();
       DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
       if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
@@ -197,7 +200,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
 static void
 sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
            AlgExtGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
-           CanonicalForm & R){
+           CanonicalForm & R)
+{
   Variable y=PPalpha.mvar(),vf=f.mvar();
   CanonicalForm temp, Palpha=PPalpha, t;
   int sqfreetest=0;
@@ -211,7 +215,8 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
   // Norm, resultante taken with respect to y
-  while ( !sqfreetest ){
+  while ( !sqfreetest )
+  {
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
@@ -224,7 +229,8 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
-    else{
+    else
+    {
       DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
       // Look at SqrFreeTest!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
@@ -233,10 +239,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       Variable X;
       if (getAlgVar(R,X))
       {
-        if (R.isUnivariate())
           testlist=factorize( R, X );
-        else
-          testlist= Factorize(R, X, 0);
       }
       else
         testlist= Factorize(R);
@@ -247,7 +250,8 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
       DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
-    if ( ! sqfreetest ){
+    if ( ! sqfreetest )
+    {
       myrandom.next();
       DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
       if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
@@ -263,11 +267,12 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
 static void
 sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
            const Variable & Extension, CanonicalForm & s,  CanonicalForm & g,
-           CanonicalForm & R){
-
+           CanonicalForm & R)
+{
   DEBOUTLN(CERR, "sqrf_norm:      f= ", f);
   DEBOUTLN(CERR, "sqrf_norm: Palpha= ", PPalpha);
-  if ( getCharacteristic() == 0 ) {
+  if ( getCharacteristic() == 0 )
+  {
     IntGenerator myrandom;
     DEBOUTMSG(CERR, "sqrf_norm: no extension, char=0");
     sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
@@ -277,12 +282,14 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(CERR, "sqrf_norm:      g= ", g);
     DEBOUTLN(CERR, "sqrf_norm:      R= ", R);
   }
-  else if ( degree(Extension) > 0 ){ // working over Extensions
+  else if ( degree(Extension) > 0 ) // working over Extensions
+  {
     DEBOUTLN(CERR, "sqrf_norm: degree of extension is ", degree(Extension));
     AlgExtGenerator myrandom(Extension);
     sqrf_agnorm_sub(f,PPalpha, myrandom, s,g,R);
   }
-  else{
+  else
+  {
     FFGenerator myrandom;
     DEBOUTMSG(CERR, "sqrf_norm: degree of extension is 0");
     sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
@@ -295,11 +302,14 @@ Var_is_in_AS(const Varlist & uord, const CFList & Astar){
   CanonicalForm elem;
   Variable x;
 
-  for ( VarlistIterator i=uord; i.hasItem(); i++){
+  for ( VarlistIterator i=uord; i.hasItem(); i++)
+  {
     x=i.getItem();
-    for ( CFListIterator j=Astar; j.hasItem(); j++ ){
+    for ( CFListIterator j=Astar; j.hasItem(); j++ )
+    {
       elem= j.getItem();
-      if ( degree(elem,x) > 0 ){ // x actually occures in Astar
+      if ( degree(elem,x) > 0 ) // x actually occures in Astar
+      {
         output.append(x);
         break;
       }
@@ -311,12 +321,14 @@ Var_is_in_AS(const Varlist & uord, const CFList & Astar){
 // Look if Minimalpolynomials in Astar define seperable Extensions
 // Must be a power of p: i.e. y^{p^e}-x
 static int
-inseperable(const CFList & Astar){
+inseperable(const CFList & Astar)
+{
   CanonicalForm elem;
   int Counter= 1;
 
   if ( Astar.length() == 0 ) return 0;
-  for ( CFListIterator i=Astar; i.hasItem(); i++){
+  for ( CFListIterator i=Astar; i.hasItem(); i++)
+  {
     elem= i.getItem();
     if ( elem.deriv() == elem.genZero() ) return Counter;
     else Counter += 1;
@@ -326,13 +338,14 @@ inseperable(const CFList & Astar){
 
 // calculate gcd of f and g in char=0
 static CanonicalForm
-gcd0( CanonicalForm f, CanonicalForm g ){
+gcd0( CanonicalForm f, CanonicalForm g )
+{
   int charac= getCharacteristic();
   int save=isOn(SW_RATIONAL);
   setCharacteristic(0); Off(SW_RATIONAL);
   CanonicalForm ff= mapinto(f), gg= mapinto(g);
   CanonicalForm result= gcd(ff,gg);
-  setCharacteristic(charac); 
+  setCharacteristic(charac);
   if (save) On(SW_RATIONAL);
   return mapinto(result);
 }
@@ -343,7 +356,8 @@ gcd0( CanonicalForm f, CanonicalForm g ){
 // minimal polynomial. Then the minpoly f_i remains irrd. over q^k and we
 // have enough elements to plug in.
 static int
-getextension( IntList & degreelist, int n){
+getextension( IntList & degreelist, int n)
+{
   int charac= getCharacteristic();
   setCharacteristic(0); // need it for k !
   int k=1, m=1, length=degreelist.length();
@@ -542,7 +556,8 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
 }
 
 static CFFList
-endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
+endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord )
+{
   CanonicalForm F=f, g, q,r;
   CFFList Output;
   CFList One, Two, asnew, as=AS;
@@ -550,11 +565,14 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
   VarlistIterator j;
   Variable vg;
 
-  for (i=as; i.hasItem(); i++){
+  for (i=as; i.hasItem(); i++)
+  {
     g= i.getItem();
-    if (g.deriv() == 0 ){
+    if (g.deriv() == 0 )
+    {
       DEBOUTLN(CERR, "Inseperable extension detected: ", g);
-      for (j=uord; j.hasItem(); j++){
+      for (j=uord; j.hasItem(); j++)
+      {
         if ( degree(g,j.getItem()) > 0 ) vg= j.getItem();
       }
       // Now we have the highest transzendental in vg;
@@ -567,8 +585,10 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
       One.insert(gg); Two.insert(g+gg);
       // Now transform all remaining polys in as:
       int x=0;
-      for (ii=i; ii.hasItem(); ii++){
-        if ( x != 0 ){
+      for (ii=i; ii.hasItem(); ii++)
+      {
+        if ( x != 0 )
+	{
           divrem(ii.getItem(), gg, q,r);
 //          CERR << ii.getItem() << " divided by " << gg << "\n";
           DEBOUTLN(CERR, "q= ", q); DEBOUTLN(CERR, "r= ", r);
@@ -594,10 +614,12 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
   DEBOUTLN(CERR, "Two= ", Two);
 
   // Transform back:
-  for ( CFFListIterator k=factorlist; k.hasItem(); k++){
+  for ( CFFListIterator k=factorlist; k.hasItem(); k++)
+  {
     CanonicalForm factor= k.getItem().factor();
     ii=One;
-    for (i=Two; i.hasItem(); i++){
+    for (i=Two; i.hasItem(); i++)
+    {
       DEBOUTLN(CERR, "Mapping ", i.getItem());
       DEBOUTLN(CERR, "     to ", ii.getItem());
       DEBOUTLN(CERR, "     in ", factor);
@@ -617,7 +639,8 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
 // 2) for char=p we distinguish 3 cases:
 //           no transcendentals, seperable and inseperable extensions
 CFFList
-newfactoras( const CanonicalForm & f, const CFList & as, int &success){
+newfactoras( const CanonicalForm & f, const CFList & as, int &success)
+{
   Variable vf=f.mvar();
   CFListIterator i;
   CFFListIterator jj;
@@ -750,16 +773,19 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success){
 }
 
 CFFList
-newcfactor(const CanonicalForm & f, const CFList & as, int & success ){
+newcfactor(const CanonicalForm & f, const CFList & as, int & success )
+{
   Off(SW_RATIONAL);
-  CFFList Output, output, Factors=Factorize(f); On(SW_RATIONAL);
+  CFFList Output, output, Factors=Factorize(f);
+  On(SW_RATIONAL);
   Factors.removeFirst();
 
   if ( as.length() == 0 ){ success=1; return Factors;}
   if ( cls(f) <= cls(as.getLast()) ) { success=1; return Factors;}
 
   success=1;
-  for ( CFFListIterator i=Factors; i.hasItem(); i++ ){
+  for ( CFFListIterator i=Factors; i.hasItem(); i++ )
+  {
     output=newfactoras(i.getItem().factor(),as, success);
     for ( CFFListIterator j=output; j.hasItem(); j++)
       Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));

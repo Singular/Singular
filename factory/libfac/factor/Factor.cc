@@ -26,7 +26,7 @@ static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathema
 #include "Factor.h"
 
 #include "alg_factor.h"
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 void out_cff(CFFList &L);
 
 
@@ -51,6 +51,7 @@ TIMING_DEFINE_PRINT(truefactor_time)
 * before calling factorize(f,alpha)
 * ( in factorize, alpha.level() must be < 0 )
 */
+static
 CFFList factorize2 ( const CanonicalForm & f,
                      const Variable & alpha, const CanonicalForm & mipo )
 {
@@ -60,19 +61,17 @@ CFFList factorize2 ( const CanonicalForm & f,
   }
   else
   {
-    bool repl=(f.mvar() != alpha);
     //out_cf("f2 - factor:",f,"\n");
     //out_cf("f2 - ext:",alpha,"\n");
     //out_cf("f2 - mipo:",mipo,"\n");
     Variable X=rootOf(mipo);
     CanonicalForm F=f;
-    if (repl) F=replacevar(f,alpha,X);
+    F=replacevar(f,alpha,X);
     //out_cf("call - factor:",F,"\n");
     //out_cf("call - ext:",X,"\n");
     //out_cf("call - mipo:",getMipo(X,'A'),"\n");
     CFFList L=factorize(F,X);
     CFFListIterator i=L;
-    if (repl)
     {
       CFFList Outputlist;
       for(;i.hasItem(); i++ )
@@ -81,9 +80,9 @@ CFFList factorize2 ( const CanonicalForm & f,
         replacevar(i.getItem().factor(),X,alpha),
         i.getItem().exp()));
       }
+      //out_cff(Outputlist);
       return Outputlist;
     }
-    else return L;
   }
 }
 ///////////////////////////////////////////////////////////////
@@ -392,14 +391,8 @@ specialize_agvariable( CanonicalForm & f, int deg, SFormList & Substitutionlist,
 CanonicalForm
 generate_mipo( int degree_of_Extension , const Variable & Extension ){
   FFRandom gen;
-  if ( degree(Extension) > 0 ) GFRandom gen;
-  else {
-    if ( degree(Extension) == 0 ) FFRandom gen;
-    else
-    {
-      factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
-    }
-  }
+  if (degree (Extension) < 0)
+    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
   return find_irreducible( degree_of_Extension, gen, Variable(1) );
 }
 
@@ -464,7 +457,8 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
 }
 
 static int
-specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList & Substitutionlist, int i,int j){
+specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList & Substitutionlist, int i,int j)
+{
   Variable minpoly= Extension;
   int ok,extended= degree(Extension), working_over_extension;
 
@@ -473,12 +467,24 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
   else                    { working_over_extension = 0; extended = 1; }
   // First try:
   ok = try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
-  while ( ! ok ){ // we have to extend!
+  while ( ! ok ) // we have to extend!
+  {
+    SFormList origS=Substitutionlist;
     extended+= 1;
-    if ( ! working_over_extension ){
-      minpoly= rootOf(generate_mipo( extended,Extension ));
+    if ( ! working_over_extension )
+    {
+      if (!hasMipo(Extension))
+        minpoly= rootOf (generate_mipo (extended, Extension));
+      else
+      {
+        setReduce (Extension, false);
+        setMipo (minpoly, generate_mipo ( extended, Extension));
+        setReduce (Extension, true);
+      }
       Extension= minpoly;
       ok= try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
+      if (!ok)
+        Substitutionlist=origS;
     }
     else
     {
@@ -803,12 +809,7 @@ int find_mvar(const CanonicalForm &f);
 CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 {
   //out_cf("Factorize ",F,"\n");
-  CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
-  ListIterator<CFFactor> i,j;
-  CanonicalForm g=1,unit=1,r=1;
-  Variable minpoly; // dummy
-  int exp;
-  CFMap m;
+  CFFList Outputlist;
 
   // INTERRUPTHANDLER
   if ( interrupt_handle() ) return CFFList() ;
@@ -830,6 +831,12 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
     TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
     return Outputlist;
   }
+  CFFList SqrFreeList,Intermediatelist,Outputlist2;
+  ListIterator<CFFactor> i,j;
+  CanonicalForm g=1,unit=1,r=1;
+  Variable minpoly; // dummy
+  int exp;
+  CFMap m;
   TIMING_START(factorize_time);
   // search an "optimal" main variavble
   int mv=F.level();

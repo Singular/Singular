@@ -47,7 +47,7 @@ libfac_include_HEADERS   = libfac.h
 
 EXTRA_DIST = factor/class.cc \
       factor/test.cc test.cc testcs.cc header.tpl \
-      tests charset/tests bin \
+      charset/tests bin \
       ChangeLog 00README 
 
 
