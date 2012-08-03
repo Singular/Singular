@@ -6102,9 +6102,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       if (extension)
       {
         CFList source, dest;
-        ExtensionInfo info2= ExtensionInfo (beta, alpha, delta, gamma, k,
-                             info.getGFName(), info.isInExtension());
-        appendMapDown (factors, A, info2, source, dest);
+        appendMapDown (factors, A, info, source, dest);
       }
       else
         factors.append (A);
