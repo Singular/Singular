@@ -731,31 +731,37 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 
         int pc[2];
         int cp[2];
+        SSI_BLOCK_CHLD;
         pipe(pc);
         pipe(cp);
         pid_t pid=fork();
+        SSI_UNBLOCK_CHLD;
         if (pid==0) /*fork: child*/
         {
           link_list hh=(link_list)ssiToBeClosed->next;
           /* we know: l is the first entry in ssiToBeClosed-list */
           while(hh!=NULL)
           {
+            SI_LINK_SET_CLOSE_P(hh->l);
             ssiInfo *dd=(ssiInfo*)hh->l->data;
+            SSI_BLOCK_CHLD;
             s_close(dd->f_read);
             fclose(dd->f_write);
+            SSI_UNBLOCK_CHLD;
             if (dd->r!=NULL) rKill(dd->r);
             omFreeSize((ADDRESS)dd,(sizeof *dd));
             hh->l->data=NULL;
-            SI_LINK_SET_CLOSE_P(hh->l);
             link_list nn=(link_list)hh->next;
             omFree(hh);
             hh=nn;
           }
           ssiToBeClosed->next=NULL;
+          SSI_BLOCK_CHLD;
           close(pc[1]); close(cp[0]);
+          d->f_write=fdopen(cp[1],"w");
+          SSI_UNBLOCK_CHLD;
           d->f_read=s_open(pc[0]);
           d->fd_read=pc[0];
-          d->f_write=fdopen(cp[1],"w");
           d->fd_write=cp[1];
           l->data=d;
           omFree(l->mode);
@@ -787,10 +793,12 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         else if (pid>0) /*fork: parent*/
         {
           d->pid=pid;
+          SSI_BLOCK_CHLD;
           close(pc[0]); close(cp[1]);
+          d->f_write=fdopen(pc[1],"w");
+          SSI_UNBLOCK_CHLD;
           d->f_read=s_open(cp[0]);
           d->fd_read=cp[0];
-          d->f_write=fdopen(pc[1],"w");
           d->fd_write=pc[1];
           SI_LINK_SET_RW_OPEN_P(l);
           d->send_quit_at_exit=1;
@@ -937,11 +945,15 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         d->fd_read = newsockfd;
         d->fd_write = newsockfd;
         d->f_read = s_open(newsockfd);
+        SSI_BLOCK_CHLD;
         d->f_write = fdopen(newsockfd, "w");
+        close(sockfd);
+        SSI_UNBLOCK_CHLD;
         SI_LINK_SET_RW_OPEN_P(l);
         d->send_quit_at_exit=1;
-        close(sockfd);
+        SSI_BLOCK_CHLD;
         fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
+        SSI_UNBLOCK_CHLD;
       }
       // ----------------------------------------------------------------------
       else if(strcmp(mode,"connect")==0)
@@ -1003,18 +1015,24 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
             mode="w";
           }
         }
+        SSI_BLOCK_CHLD;
         outfile=myfopen(filename,mode);
+        SSI_UNBLOCK_CHLD;
         if (outfile!=NULL)
         {
           if (strcmp(l->mode,"r")==0)
           {
+            SSI_BLOCK_CHLD;
             fclose(outfile);
             d->f_read=s_open_by_name(filename);
+            SSI_UNBLOCK_CHLD;
           }
           else
           {
+            SSI_BLOCK_CHLD;
             d->f_write = outfile;
             fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
+            SSI_UNBLOCK_CHLD;
           }
         }
         else
@@ -1042,7 +1060,9 @@ BOOLEAN ssiClose(si_link l)
       if (d->r!=NULL) rKill(d->r);
       if (d->send_quit_at_exit)
       {
+        SSI_BLOCK_CHLD;
         fputs("99\n",d->f_write);fflush(d->f_write);
+        SSI_UNBLOCK_CHLD;
       }
       if (d->pid!=0)
       {
@@ -1840,7 +1860,7 @@ static BOOLEAN DumpSsiIdhdl(si_link l, idhdl h)
   sleftv tmp;
   memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=COMMAND;
-  tmp.data=D; 
+  tmp.data=D;
 
   if (type_id == PACKAGE_CMD)
   {
