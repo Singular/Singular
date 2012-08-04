@@ -90,9 +90,9 @@ LDFLAGSG	= -L@prefix@/kernel -L../kernel -lkernel_g @LD_DYN_FLAGS1@ @LDFLAGS@
 LDFLAGSP	= -L@prefix@/kernel -L../kernel -lkernel_p @LD_DYN_FLAGS1@ @LDFLAGS@ 
 else
 ## -L/usr/local/lib -L@prefix@/modules/python --> PySingular
-LDFLAGS		= -L@prefix@/kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python 
-LDFLAGSG	= -L@prefix@/kernel -L/bin -lkernel_g @LDFLAGS@ 
-LDFLAGSP	= -L@prefix@/kernel -L/bin -lkernel_p @LDFLAGS@ 
+LDFLAGS		= -L@prefix@/kernel -L../kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python 
+LDFLAGSG	= -L@prefix@/kernel -L../kernel -L/bin -lkernel_g @LDFLAGS@ 
+LDFLAGSP	= -L@prefix@/kernel -L../kernel -L/bin -lkernel_p @LDFLAGS@ 
 endif
 LD_DYN_FLAGS1	= @LD_DYN_FLAGS1@
 LD_DYN_FLAGS2	= @LD_DYN_FLAGS2@
