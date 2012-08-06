@@ -2991,10 +2991,6 @@ lists lpMultProfilerR
   //(I know it's ugly and so am I.)
   osize = GetOrderMapping( currRing, &omap );
 
-  PrintLn();
-  for(int i = 0; i < osize; ++i)
-    Print("Variable Index: %d Order Index: %d\n", i, omap[i]);
-
   //For debugging Purposes
   poly* debugRes = 
     (poly *) omAlloc(sizeof(poly) * lpMultFunctions.size);
