@@ -20,6 +20,14 @@
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
+// NTL::negate conflict on some machines with std::negate (trac 437)
+// - do not know why: std::negate should not be known here
+// test for include of funtional (SunCC, GCC)
+#if defined(__STD_FUNCTIONAL__) || defined(_GLIBCXX_FUNCTIONAL)
+#define NTL_negate NTL::negate
+#else
+#define NTL_negate negate
+#endif
 #endif
 
 //{{{ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
@@ -211,12 +219,12 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
             ZZ NTLc= convertFacCF2NTLZZ (c);
             bool lessZero= (sign (NTLc) == -1);
             if (lessZero)
-              negate (NTLc, NTLc);
+              NTL_negate (NTLc, NTLc);
             ZZ NTLnum, NTLden;
             if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
             {
               if (lessZero)
-                negate (NTLnum, NTLnum);
+                NTL_negate (NTLnum, NTLnum);
               CanonicalForm num= convertNTLZZX2CF (to_ZZX (NTLnum), Variable (1));
               CanonicalForm den= convertNTLZZX2CF (to_ZZX (NTLden), Variable (1));
               On (SW_RATIONAL);
