@@ -2477,7 +2477,7 @@ division  operator.  @xref{Miscellaneous oddities}, for the difference
 between the division operators @code{/} and @code{div}.
 @item @code{%}
 @cindex %
-modulo operator (@code{mod} is an alias to @code{%})
+modulo operator (@code{mod} is an alias to @code{%}): result is always non-negative
 @item @code{^} or @code{**}
 @cindex ^
 @cindex **
