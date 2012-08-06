@@ -2987,6 +2987,14 @@ lists lpMultProfilerR
   lists rtL = (lists) omAlloc(sizeof(slists)); //list to be returned
   rtL->Init(lpMultFunctions.size);
 
+  //omap, osize are global variables 
+  //(I know it's ugly and so am I.)
+  osize = GetOrderMapping( currRing, &omap );
+
+  PrintLn();
+  for(int i = 0; i < osize; ++i)
+    Print("Variable Index: %d Order Index: %d\n", i, omap[i]);
+
   //For debugging Purposes
   poly* debugRes = 
     (poly *) omAlloc(sizeof(poly) * lpMultFunctions.size);
@@ -3066,6 +3074,8 @@ lists lpMultProfilerR
 
   SetTimerResolution(sResolution);
   return rtL;
+
+  omFreeSize( (ADDRESS)omap, (currRing->N+1) * sizeof(int) );
 }
 
 /*2

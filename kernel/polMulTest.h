@@ -2,8 +2,20 @@
 #include <kernel/polys.h>
 #include <kernel/shiftgb.h>
 
+
 poly p_LPshift(poly p, int sh, int uptodeg, int lV,const ring r);
 poly p_Shrink(poly p, int lV, const ring r);
+
+inline void printExp
+  (long unsigned int* exp, int numberOf16BitParts);
+
+int osize;
+int* omap;
+/* Creates a Mapping: i -> pos, where i is an index of a
+ * variable in a block of the letterplace polynomial and pos the
+ * position of the order Field for the block. Does yet not work
+ * properly; May only work for dp-Orderings... TODO!           */
+inline int* GetOrderMapping( ring r );
 
 inline poly pp_Mult_mm_normal
   ( poly p, const ring r_lm_p, const ring r_t_p,
@@ -20,12 +32,27 @@ inline poly lp_pp_Mult_mm_v0
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_pp_Mult_mm_v0_a
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 inline poly lp_pp_Mult_mm_v1
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
 inline poly lp_pp_Mult_mm_v1_a
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v1_b
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v1_c
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
@@ -45,6 +72,21 @@ inline poly lp_pp_Mult_mm_v2_a_with_mDVec
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_pp_Mult_mm_v2_c
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v2_a_with_mDVec_neu
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v3
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 struct letterplace_multiplication_functions
 {
   poly (*pp_Mult_mm[8])
@@ -54,7 +96,17 @@ struct letterplace_multiplication_functions
    
 }; 
 
-struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
+//struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
+struct letterplace_multiplication_functions lpMultFunctions = { 
+  { &pp_Mult_mm_normal, 
+    &lp_pp_Mult_mm_shift_n_shrink, 
+    &lp_pp_Mult_mm_v0, 
+    &lp_pp_Mult_mm_v0_a, 
+    &lp_pp_Mult_mm_v1_a, 
+    &lp_pp_Mult_mm_v1_c, 
+    &lp_pp_Mult_mm_v2_c, 
+    &lp_pp_Mult_mm_v2_a_with_mDVec_neu }, 8 
+};
 
 /*
 struct letterplace_multiplication_functions lpMultFunctions = 
@@ -264,6 +316,58 @@ inline poly lp_mm_Mult_pp_v1
 }
 #endif
 
+inline void printExp
+  (long unsigned int* exp, int numberOf16BitParts)
+{
+  int i = 1;
+  int j, k;
+  long unsigned int bitmask;
+  while(1)
+  {
+    bitmask = 1;
+    bitmask = bitmask << (8 * sizeof(long) - 1);
+    for(k = 0; k < sizeof(long)/2; ++k, ++i)
+    {
+      if(i > numberOf16BitParts){ PrintLn(); return; }
+      for(j = 0; j < 16; ++j)
+      {
+        if(bitmask & *exp) PrintS("1");
+        else PrintS("0");
+        bitmask >>= 1;
+      }
+      PrintS(" ");
+    }
+    PrintLn();
+    if(i > numberOf16BitParts){ PrintLn(); return; }
+    ++exp;
+  }
+}
+
+/* Creates a Mapping: i -> pos, where i is an index of a
+ * variable in a block of the letterplace polynomial and pos the
+ * position of the order Field for the block. Does yet not work
+ * properly; May only work for dp-Orderings... TODO!           
+ * Returns Mapping in oindex and size as return value.
+ * oindex has to be freed with omFreeSize. TODO: Care for ring!*/
+inline int GetOrderMapping( ring r, int** oindex )
+{
+  *oindex = (int *) omAlloc( (r->N+1) * sizeof(int) );
+
+  for(int i = 1; i < r->OrdSize; ++i)
+  {
+    sro_ord* o=&(r->typ[i]);
+    assume(o->ord_typ == ro_dp);
+    int a,e;
+    a=o->data.dp.start;
+    e=o->data.dp.end;
+    for(int i=a;i<=e;i++) (*oindex)[i] = o->data.dp.place;
+  }
+
+  (*oindex)[0] = currRing->pOrdIndex;
+
+  return r->N+1;
+}
+
 inline long max(long a, long b)
 { return a > b ? a : b; }
 
@@ -369,6 +473,61 @@ inline poly lp_pp_Mult_mm_v0
 // for non-homog, non-shifted letterplace poly-/monomials
 // m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
 // output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v0_a
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+  //BOCO TODO: Care for Rings and free the allocated space !!!
+
+  //BOCO: TODO: to calculate the total degree of a polynomial
+  //each time, we need it seems to be inefficient; if we would
+  //store it for each monmial, and if we would update it for
+  //each time we multiply, we would have fast access to it!!!
+  long degM = p_Totaldegree(m, r_m);
+
+  //BOCO: Not to nice: Who frees the space at the end?
+  static int N = currRing->N;
+  static int* exp_m_double = 
+    (int*) omAlloc0( 2*(N+1) * sizeof(int) );
+  static int* exp_m = exp_m_double+N+1;
+  if(N != currRing->N)
+  {
+    omFreeSize( (ADDRESS)exp_m_double, 2*(N+1) * sizeof(int) );
+    N = currRing->N;
+    exp_m_double = (int*) omAlloc0( 2*(N+1) * sizeof(int) );
+    exp_m = exp_m_double+N+1;
+  }
+
+  p_GetExpV(m, exp_m, currRing);
+  spolyrec rt;
+  poly rt_it = &rt;
+
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Init(currRing);
+
+    p_SetCoeff
+      ( rt_it, n_Copy(p_GetCoeff(p, currRing), currRing), currRing );
+
+    long degP = p_Totaldegree(p, currRing);
+    p_SetExpV( rt_it, exp_m-degP*lV, currRing );
+     
+    p_ExpVectorAdd(rt_it, p, currRing);
+
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, currRing);
+  return p_Mult_nn(rt.next, coeffM, currRing, currRing);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
 inline poly lp_pp_Mult_mm_v1
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
@@ -415,6 +574,7 @@ inline bool p_GetOneBit(const poly p, const int VarOffset)
     ((p->exp[(VarOffset & 0xffffff)] >> (VarOffset >> 24)) & 1);
 }
 
+//Does not work properly (Why? -> TODO)
 inline void p_SetOneBit(const poly p, const int VarOffset)
 {
   p->exp[(VarOffset & 0xffffff)] |= (1 << (VarOffset >> 24));
@@ -454,7 +614,7 @@ inline poly lp_pp_Mult_mm_v2
         if(deg_rt_it > max_deg_rt_it) break;
         goto nextblock;
       }
-    p_Setm(rt_it, r_lm_p);
+    //p_Setm(rt_it, r_lm_p);
     break; //no more Variables in m
   }
 
@@ -478,7 +638,7 @@ inline poly lp_pp_Mult_mm_v2
         }
       break; //no more Variables in m
     }
-    p_Setm(rt_it, r_t_p);
+    //p_Setm(rt_it, r_t_p);
 
     pIter(p);
   }
@@ -520,6 +680,86 @@ inline poly lp_pp_Mult_mm_v1_a
       p_SetExp( rt_it, indexP, 1, r_t_p );
     p_Setm(rt_it, r_t_p);
     pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v1_b
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+  uint* dvec, * dvIt;
+  dvSize = ShiftDVec::CreateDVec(m, r_m, dvec);
+  uint* dvLast = &(dvec[dvSize]);
+
+  poly rt = p_Head(p, r_lm_p);
+  long indexP = p_Totaldegree(p, r_lm_p) * lV;
+  indexP += dvec[0];
+  for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
+    p_SetExp( rt, indexP, 1, r_lm_p );
+  //p_Setm(rt, r_lm_p);
+
+  poly rt_it = rt;
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    indexP = p_Totaldegree(p, r_t_p) * lV;
+    indexP += dvec[0];
+    for(dvIt = dvec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
+      p_SetExp( rt_it, indexP, 1, r_t_p );
+    //p_Setm(rt_it, r_t_p);
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v1_c
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+  //BOCO: TODO: to calculate the total degree of a polynomial
+  //each time, we need it seems to be inefficient; if we would
+  //store it for each monmial, and if we would update it for
+  //each time we multiply, we would have fast access to it!!!
+  long degM = p_Totaldegree(m, r_m);
+
+  poly rt = p_Head(p, r_lm_p);
+  poly rt_it = rt;
+  long indexP = p_Totaldegree(p, r_lm_p) * lV + 1;
+  while(1)
+  {
+    for(long i = 1, j = 0; j < degM; ++i, ++indexP)
+      if( p_GetExp(m, i, r_m) )
+      {
+        p_SetExp( rt_it, indexP, 1, r_t_p);
+        rt_it->exp[omap[indexP]] = 1;
+        j = j + 1;
+      }
+    rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+    pIter(p);
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    if(p == NULL) break;
+    indexP = p_Totaldegree(p, r_t_p) * lV + 1;
   }
 
   number coeffM = p_GetCoeff(m, r_m);
@@ -611,6 +851,181 @@ inline poly lp_pp_Mult_mm_v2_a_with_mDVec
 
   number coeffM = p_GetCoeff(m, r_m);
   return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v2_c
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+  //BOCO: TODO: to calculate the total degree of a polynomial
+  //each time, we need it seems to be inefficient; if we would
+  //store it for each monmial, and if we would update it for
+  //each time we multiply, we would have fast access to it!!!
+  //long degM = p_Totaldegree(m, r_m);
+
+  poly rt = p_Head(p, r_lm_p);
+  poly rt_it = rt;
+  long deg_rt_it = p_Totaldegree(p, r_lm_p) * lV + 1;
+  long max_deg_rt_it = lV * uptodeg;
+  long m_ind_it = 1;
+
+  {
+    nextblock: ;
+    for(int j = m_ind_it, i = 0; i < lV; ++i, ++j)
+      if( p_GetExp(m, j, r_m) )
+      {
+        p_SetExp(rt_it, deg_rt_it+i, 1, r_lm_p);
+        rt_it->exp[omap[deg_rt_it+i]] = 1;
+        deg_rt_it += lV;
+        m_ind_it += lV;
+        if(deg_rt_it > max_deg_rt_it) break;
+        goto nextblock;
+      }
+  }
+  rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    deg_rt_it = p_Totaldegree(p, r_t_p) * lV + 1;
+    long m_ind_it = 1;
+
+    {
+      nextblock2: ;
+      for(int i = 0, j = m_ind_it; i < lV; ++j, ++i)
+        if( p_GetExp(m, j, r_m) )
+        {
+          p_SetExp(rt_it, deg_rt_it+i, 1, r_t_p);
+          rt_it->exp[omap[deg_rt_it+i]] = 1;
+          deg_rt_it += lV;
+          m_ind_it += lV;
+          if(deg_rt_it > max_deg_rt_it) break;
+          goto nextblock2;
+        }
+    }
+    rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v2_a_with_mDVec_neu
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL || mDVec == NULL ) return NULL;
+
+  int numVars = r_t_p->N;
+  int* VOffset = r_t_p->VarOffset;
+  int* VOffPtr = VOffset;
+
+  uint* dvIt;
+  uint* dvLast = &(mDVec[dvSize]);
+
+  poly rt = p_Head(p, r_lm_p);
+  long indexP = p_Totaldegree(p, r_lm_p)*lV;
+  indexP += mDVec[0];
+  for(dvIt = mDVec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
+  {
+    p_SetExp(rt, indexP, 1, r_lm_p);
+    rt->exp[omap[indexP]] = 1;
+  }
+  rt->exp[omap[0]] += m->exp[omap[0]];
+
+  poly rt_it = rt;
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    indexP = p_Totaldegree(p, r_t_p) * lV;
+    indexP += mDVec[0];
+    for(dvIt = mDVec; dvIt != dvLast; ++dvIt, indexP += *dvIt)
+    {
+      p_SetExp(rt_it, indexP, 1, r_t_p);
+      rt_it->exp[omap[indexP]] = 1;
+    }
+    rt_it->exp[omap[0]] += m->exp[omap[0]];
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+// BOCO: WARNING: This function is likely to fail if ordering is
+// not dp... (-> TODO)
+// BOCO: Does it work with the tail ring? Likely not... (TODO:
+// get to know more Theory)
+// BOCO: TODO/WARNING: May only work for certain word sizes and
+// partitions...
+inline poly lp_pp_Mult_mm_v3
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+  //BOCO: TODO: Care for Rings etc.!!!
+  //BOCO: TODO: A lot... (other word sizes, partitions...)
+
+  long degM = p_Totaldegree(m, currRing);
+
+  spolyrec rt;
+  poly rt_it = &rt;
+
+  while(p != NULL)
+  {
+    //PrintLn();
+
+    rt_it = rt_it->next = p_Head(p, currRing);
+    //printExp(rt_it->exp, 4*8);
+    //printExp(m->exp, 4*8);
+    long degP = p_Totaldegree(p, currRing);
+
+    //Print("degP: %d\n", degP);
+    //Print("degM: %d\n", degP);
+
+    int sizeP = (2 + degP * (lV+2)) * (sizeof(long)/2);
+    int sizeM = degM * (lV+2) * (sizeof(long)/2);
+    int startM = sizeof(long);
+
+    //Print("sizeP: %d\n", sizeP);
+    //Print("sizeM: %d\n", sizeM);
+
+    //memcpy(rt_it->exp + sizeP, m->exp + startM, sizeM);
+    //for(int i = 0; i < degP)
+    rt_it->exp[0] *= 2;
+    for(int i = 1; i <= 4; ++i)
+      rt_it->exp[i+4] = m->exp[i];
+
+    //printExp(rt_it->exp, 4*9);
+
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt.next, coeffM, r_lm_p, r_t_p);
 }
 
 #if 0
