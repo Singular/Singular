@@ -393,11 +393,6 @@ struct sValCmd2 dArith2[]=
 ,{D(jjOP_IV_I),   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMOD_N),     '%',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDIVMOD_I),  INTMOD_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMOD_BI),    INTMOD_CMD,     BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   INTMOD_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjOP_IV_I),   INTMOD_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMOD_N),     INTMOD_CMD,     NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPOWER_I),   '^',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPOWER_BI),   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPOWER_N),   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -958,7 +953,7 @@ cmdnames cmds[] =
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
   { "minor",       0, MINOR_CMD ,         CMD_M},
   { "minres",      0, MINRES_CMD ,        CMD_1},
-  { "mod",         0, INTMOD_CMD ,        MULDIV_OP},
+  { "mod",         0, '%' ,               MULDIV_OP},
   { "module",      0, MODUL_CMD ,         RING_DECL_LIST},
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},

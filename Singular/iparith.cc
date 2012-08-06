@@ -270,8 +270,7 @@ static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
     case '*': (*aa) *= bb; break;
     case '/':
     case INTDIV_CMD: (*aa) /= bb; break;
-    case '%':
-    case INTMOD_CMD: (*aa) %= bb; break;
+    case '%': (*aa) %= bb; break;
   }
   res->data=(char *)aa;
   return FALSE;
@@ -1112,10 +1111,8 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
   int r=0;
   switch (iiOp)
   {
-    case INTMOD_CMD:
-        r=c;            break;
     case '%':
-        r= (a % b);     break;
+        r=c;            break;
     case INTDIV_CMD:
         r=((a-c) /b);   break;
     case '/':
