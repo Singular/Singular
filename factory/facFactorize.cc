@@ -38,6 +38,8 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
   Variable x= Variable (1);
 
   bool found= false;
+  bool allZero= true;
+  bool foundZero= false;
   CanonicalForm deriv_x, gcd_deriv;
   CFListIterator iter;
   do
@@ -48,6 +50,18 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       eval.insert (eval.getFirst()( E [i], i));
       result.append (E[i]);
+      if (!E[i].isZero())
+        allZero= false;
+      else
+        foundZero= true;
+      if (!allZero && foundZero)
+      {
+        result= CFList();
+        eval= CFList();
+        bad= true;
+        foundZero= false;
+        break;
+      }
       if (degree (eval.getFirst(), i - 1) != degree (F, i - 1))
       {
         result= CFList();
