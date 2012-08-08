@@ -847,6 +847,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       if (oldAeval[i].getFirst().level() == w.level())
       {
         CFArray tmp= copy (oldAeval[i]);
+        oldAeval[i]= biFactors; 
+        for (CFListIterator iter= oldAeval[i]; iter.hasItem(); iter++)
+          iter.getItem()= swapvar (iter.getItem(), w, y);
         for (int ii= 0; ii < tmp.size(); ii++)
           tmp[ii]= swapvar (tmp[ii], w, y);
         CFArray tmp2= CFArray (tmp.size());
