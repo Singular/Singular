@@ -1908,7 +1908,27 @@ CFList conv (const CFArray & A)
   return result;
 }
 
+
 void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
+                       const CFList& uniFactors, const CFList& evaluation
+                      )
+{
+  CFListIterator iter;
+  CFList LCs;
+  for (int j= 0; j < A.level() - 2; j++)
+  {
+    if (!Aeval[j].isEmpty())
+    {
+      LCs= CFList();
+      for (iter= Aeval[j]; iter.hasItem(); iter++)
+        LCs.append (LC (iter.getItem(), 1));
+      //normalize (LCs);
+      Aeval[j]= LCs;
+    }
+  }
+}
+
+void sortByUniFactors (CFList*& Aeval, int AevalLength,
                        const CFList& uniFactors, const CFList& evaluation
                       )
 {
@@ -1919,11 +1939,11 @@ void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
   CFList LCs, buf;
   CFArray l;
   int pos, index;
-  for (int j= 0; j < A.level() - 2; j++)
+  for (int j= 0; j < AevalLength; j++)
   {
     if (!Aeval[j].isEmpty())
     {
-      i= A.level();
+      i= evaluation.length() + 1;
       for (iter= evaluation; iter.hasItem(); iter++, i--)
       {
         if (i == Aeval[j].getFirst().level())
@@ -1952,11 +1972,6 @@ void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
       Aeval [j]= buf;
 
       buf= buildUniFactors (Aeval[j], evalPoint, v);
-      LCs= CFList();
-      for (iter= Aeval[j]; iter.hasItem(); iter++)
-        LCs.append (LC (iter.getItem(), 1));
-      //normalize (LCs);
-      Aeval[j]= LCs;
     }
   }
 }

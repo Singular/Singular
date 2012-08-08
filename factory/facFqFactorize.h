@@ -604,6 +604,16 @@ buildUniFactors (const CFList& biFactors,       ///< [in] a list of polys
                  const Variable& y              ///< [in] some variable
                 );
 
+
+/// sort bivariate factors in Aeval such that their corresponding univariate
+/// factors coincide with uniFactors
+void sortByUniFactors (CFList*& Aeval,          ///< [in,out] array of bivariate
+                                                ///< factors
+                       int AevalLength,         ///< [in] length of Aeval
+                       const CFList& uniFactors,///< [in] univariate factors
+                       const CFList& evaluation ///< [in] evaluation point
+                      );
+
 /// extract leading coefficients wrt Variable(1) from bivariate factors obtained
 /// from factorizations of A wrt different second variables
 void
