@@ -1057,26 +1057,28 @@ BOOLEAN ssiClose(si_link l)
     ssiInfo *d = (ssiInfo *)l->data;
     if (d!=NULL)
     {
-      if (d->r!=NULL) rKill(d->r);
       if (d->send_quit_at_exit)
       {
         SSI_BLOCK_CHLD;
-        fputs("99\n",d->f_write);fflush(d->f_write);
+        fputs("99\n",d->f_write);
+        fflush(d->f_write);
         SSI_UNBLOCK_CHLD;
       }
-      if (d->pid!=0)
+      if (d->r!=NULL) rKill(d->r);
+      if ((d->pid!=0)
+      && (waitpid(d->pid,NULL,WNOHANG)==0))
       {
         struct timespec t;
         t.tv_sec=0;
-        t.tv_nsec=100000000; // <=100 ms
+        t.tv_nsec=50000000; // <=50 ms
         int r=nanosleep(&t,NULL);
-        if(waitpid(d->pid,NULL,WNOHANG)==0)
+        if((r==0) && (waitpid(d->pid,NULL,WNOHANG)==0))
         {
           kill(d->pid,15);
           t.tv_sec=0;
-          t.tv_nsec=10000000; // <=100 ms
+          t.tv_nsec=10000000; // <=10 ms
           r=nanosleep(&t,NULL);
-          if(waitpid(d->pid,NULL,WNOHANG)==0)
+          if((r==0)&&(waitpid(d->pid,NULL,WNOHANG)==0))
           {
             kill(d->pid,9); // just to be sure
             waitpid(d->pid,NULL,0);
@@ -1812,30 +1814,40 @@ void sig_chld_hdl(int sig)
   pid_t kidpid;
   int status;
 
-  while ((kidpid = waitpid(-1, &status, WNOHANG)) > 0)
+  loop
   {
-     //printf("Child %ld terminated\n", kidpid);
-     link_list hh=ssiToBeClosed;
-     while(hh!=NULL)
-     {
-       if((hh->l!=NULL) && (hh->l->m->Open==ssiOpen))
-       {
-          ssiInfo *d = (ssiInfo *)hh->l->data;
-          if(d->pid==kidpid)
+    kidpid = waitpid(-1, &status, WNOHANG);
+    if (kidpid==-1)
+    {
+      /* continue on interruption (EINTR): */
+      if (errno == EINTR) continue;
+      /* break on anything else (EINVAL or ECHILD according to manpage): */
+      break;
+    }
+    else if (kidpid==0) break; /* no more children to process, so break */
+
+    //printf("Child %ld terminated\n", kidpid);
+    link_list hh=ssiToBeClosed;
+    while(hh!=NULL)
+    {
+      if((hh->l!=NULL) && (hh->l->m->Open==ssiOpen))
+      {
+        ssiInfo *d = (ssiInfo *)hh->l->data;
+        if(d->pid==kidpid)
+        {
+          if(ssiToBeClosed_inactive)
           {
-            if(ssiToBeClosed_inactive)
-            {
-              ssiToBeClosed_inactive=FALSE;
-              slClose(hh->l);
-              ssiToBeClosed_inactive=TRUE;
-              break;
-            }
-            else break;
+            ssiToBeClosed_inactive=FALSE;
+            slClose(hh->l);
+            ssiToBeClosed_inactive=TRUE;
+            break;
           }
-          else hh=(link_list)hh->next;
-       }
-       else hh=(link_list)hh->next;
-     }
+          else break;
+        }
+        else hh=(link_list)hh->next;
+      }
+      else hh=(link_list)hh->next;
+    }
   }
 }
 
