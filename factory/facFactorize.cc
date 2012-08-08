@@ -899,8 +899,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   CanonicalForm hh= Lc (Aeval.getFirst());
 
-  for (CFListIterator i= Aeval; i.hasItem(); i++)
-    i.getItem() /= hh;
+  for (iter= Aeval; iter.hasItem(); iter++)
+    iter.getItem() /= hh;
 
   A /= hh;
 
@@ -936,11 +936,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   for (iter= biFactors; iter.hasItem(); iter++)
     iter.getItem()= iter.getItem () (y + evaluation.getLast(), y);
 
-  for (int i= 0; i < A.level() - 2; i++)
-  {
-    if (i != A.level() - 3)
-      leadingCoeffs2[i]= CFList();
-  }
+  for (int i= 0; i < A.level() - 3; i++)
+    leadingCoeffs2[i]= CFList();
   for (iter= leadingCoeffs2[A.level() - 3]; iter.hasItem(); iter++)
   {
     iter.getItem()= shift2Zero (iter.getItem(), list, evaluation);
