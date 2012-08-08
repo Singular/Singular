@@ -904,31 +904,60 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A /= hh;
 
-  if (size (A)/getNumVars (A) < 500 &&
-      LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+  CFList bufFactors= CFList();
+  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
                                 factors))
   {
-    int check= factors.length();
-    factors= recoverFactors (A, factors);
+    int check= biFactors.length();
+    int * index= new int [factors.length()];
+    CFList oldFactors= factors;
+    factors= recoverFactors (A, factors, index);
 
     if (check == factors.length())
     {
-
       if (w.level() != 1)
       {
-        for (CFListIterator iter= factors; iter.hasItem(); iter++)
+        for (iter= factors; iter.hasItem(); iter++)
           iter.getItem()= swapvar (iter.getItem(), w, y);
       }
 
       appendSwapDecompress (factors, contentAFactors, N, 0, 0, x);
       normalize (factors);
+      delete [] index;
       delete [] Aeval2;
       return factors;
     }
+    else if (factors.length() > 0)
+    {
+      int oneCount= 0;
+      CFList l;
+      for (int i= 0; i < check; i++)
+      {
+        if (index[i] == 1)
+        {
+          iter=biFactors;
+          for (int j=1; j <= i-oneCount; j++)
+            iter++;
+          iter.remove (1);
+          for (int j= 0; j < A.level() -2; j++)
+          {
+            l= leadingCoeffs2[j];
+            iter= l;
+            for (int k=1; k <= i-oneCount; k++)
+              iter++;
+            iter.remove (1);
+            leadingCoeffs2[j]=l;
+          }
+          oneCount++;
+        }
+      }
+      bufFactors= factors;
+      factors= CFList();
+    }
     else
       factors= CFList();
+    delete [] index;
   }
-
 
   //shifting to zero
   A= shift2Zero (A, Aeval, evaluation);
@@ -1011,6 +1040,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     factors= recoverFactors (A, factors, evaluation);
     if (check != factors.length())
       noOneToOne= true;
+    else
+      factors= Union (factors, bufFactors);
   }
   if (noOneToOne)
   {
