@@ -1117,18 +1117,15 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  int bb=ABS(b);
-  int c=a%bb;
-  if(c<0) c+=bb;
+  int c=a%b;
   int r=0;
   switch (iiOp)
   {
     case '%':
         r=c;            break;
+    case '/':
     case INTDIV_CMD:
         r=((a-c) /b);   break;
-    case '/':
-        r= (a / b);     break;
   }
   res->data=(void *)((long)r);
   return FALSE;
