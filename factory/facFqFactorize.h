@@ -567,7 +567,18 @@ CFList recoverFactors (const CanonicalForm& F, ///< [in] some poly F
 CFList recoverFactors (const CanonicalForm& F,  ///< [in] some poly F
                        const CFList& factors,   ///< [in] some list of
                                                 ///< factor candidates
-                       const CFList& evaluation
+                       const CFList& evaluation ///< [in] evaluation point
+                      );
+
+/// checks if factors divide F, if so F is divided by this factor and the factor
+/// is divided by its content wrt. Variable(1) and the entry in index at the
+/// position of the factor is set to 1, otherwise the entry in index is set to 0
+///
+/// @return returns factors of F
+CFList recoverFactors (CanonicalForm& F,     ///< [in,out] some poly F
+                       const CFList& factors,///< [in] some list of
+                                             ///< factor candidates
+                       int* index            ///< [in] position of real factors
                       );
 
 /// refine a bivariate factorization of A with l factors to one with
