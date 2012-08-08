@@ -2720,7 +2720,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
           mpz_gcd(tmp,cand->z,cand1->n);
           if (mpz_cmp_si(tmp,1)!=0)
           {
-            mpz_div(cand->z,cand->z,tmp);
+            mpz_divexact(cand->z,cand->z,tmp);
           }
           mpz_mul(cand->z,cand->z,cand1->n);
         }
@@ -2731,7 +2731,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   if (s==0) // nothing to do, all coeffs are already integers
   {
     mpz_clear(tmp);
-    nlDelete(&cand,cf); 
+    FREE_RNUMBER(cand); 
     c=nlInit(1,cf); 
     return;
   }
