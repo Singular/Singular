@@ -2079,6 +2079,34 @@ CFList recoverFactors (const CanonicalForm& F, const CFList& factors,
   return result;
 }
 
+CFList recoverFactors (CanonicalForm& F, const CFList& factors, int* index)
+{
+  CFList result;
+  CanonicalForm tmp, tmp2;
+  CanonicalForm G= F;
+  int j= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, j++)
+  {
+    if (i.getItem().isZero())
+    {
+      index[j]= 0;
+      continue;
+    }
+    tmp= i.getItem();
+    if (fdivides (tmp, G, tmp2))
+    {
+      G= tmp2;
+      tmp /=content (tmp, 1);
+      result.append (tmp);
+      index[j]= 1;
+    }
+    else
+      index[j]= 0;
+  }
+  F= G;
+  return result;
+}
+
 CFList
 extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
                                 const ExtensionInfo& info)
