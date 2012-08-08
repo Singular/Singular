@@ -182,7 +182,7 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
 
   CanonicalForm test= evalSqrfPartF.getFirst() (evalPoint[0], 2);
 
-  if (degree (test) != degree (sqrfPartF, 1))
+  if (degree (test) != degree (sqrfPartF, 1) || test.inCoeffDomain())
     return 0;
 
   CFFList sqrfFactors;
@@ -323,7 +323,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   CFArray buf= CFArray (evaluation.length());
   CFArray swap= CFArray (evaluation.length());
   CFListIterator iter= evaluation;
-  CanonicalForm vars=getVars (LCF);
+  CanonicalForm vars=getVars (LCF)*Variable (2);
   for (int i= evaluation.length() +1; i > 1; i--, iter++)
   {
     buf[i-2]=iter.getItem();
@@ -374,7 +374,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         evalPoint= CFArray (evaluation.length() - 1);
         for (int k= 0; k < evaluation.length()-1; k++)
         {
-          if (k+1 != lev)
+          if (N (Variable (k+1)).level() != y.level())
             evalPoint[k]= buf[k+1];
           else
             evalPoint[k]= buf[0];
