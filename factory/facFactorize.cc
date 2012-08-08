@@ -793,6 +793,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
 
+  sortByUniFactors (Aeval2, A.level() - 2, uniFactors, evaluation);
+
   CFList * oldAeval= new CFList [A.level() - 2];
   for (int i= 0; i < A.level() - 2; i++)
     oldAeval[i]= Aeval2[i];
