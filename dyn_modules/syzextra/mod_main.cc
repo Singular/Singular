@@ -248,6 +248,24 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
     return TRUE;
   }
 
+  if( h->Typ() == NUMBER_CMD)
+  {
+    number n = (number)h->Data(); 
+
+    const ring r = currRing;
+
+#ifdef LDEBUG
+    r->cf->cfDBTest(n,__FILE__,__LINE__,r->cf);
+#endif
+
+    StringSetS("");
+    n_Write(n, r->cf);
+    PrintS(StringEndS());
+    PrintLn();
+
+    return FALSE;
+  }
+  
   if( h->Typ() == RING_CMD)
   {
     const ring r = (const ring)h->Data();
