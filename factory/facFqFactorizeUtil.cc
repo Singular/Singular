@@ -155,4 +155,9 @@ CanonicalForm reverseShift (const CanonicalForm& F, const CFList& evaluation, in
   return result;
 }
 
+bool isOnlyLeadingCoeff (const CanonicalForm& F)
+{
+  return (F-LC (F,1)*power (Variable(1),degree (F,1))).isZero();
+}
+
 

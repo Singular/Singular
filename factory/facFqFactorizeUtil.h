@@ -119,6 +119,12 @@ CanonicalForm reverseShift (const CanonicalForm& F,  ///< [in] a compressed poly
                                                      ///< the evaluation starts
                            );
 
+/// check if @F consists of more than just the leading coeff wrt. Variable (1)
+///
+/// @return as described above
+bool isOnlyLeadingCoeff (const CanonicalForm& F ///< [in] some poly
+                        );
+
 #endif
 /* FAC_FQ_FACTORIZE_UTIL_H */
 
