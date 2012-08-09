@@ -186,8 +186,8 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
 void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)
 {
   assume( r != NULL );
-  assume( !(nCoeff_is_Q(r) || nCoeff_is_transExt(r)) );
-  assume( nCoeff_is_Ring(r) || nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || (getCoeffType(r)==n_algExt) );
+  assume( !(nCoeff_is_Q(r) || nCoeff_is_transExt(r) || nCoeff_is_algExt(r)) );
+  assume( nCoeff_is_Ring(r) || nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) );
 
   d = n_Init(1, r);
 }

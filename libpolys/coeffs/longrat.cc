@@ -2690,7 +2690,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   // all coeffs are given by integers after returning from this routine
 
   // part 1, collect product of all denominators /gcds
-  number cand,cand1;
+  number cand; 
   cand=ALLOC_RNUMBER();
   #if defined(LDEBUG)
   cand->debug=123456;
@@ -2703,10 +2703,11 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   numberCollectionEnumerator.Reset();
   do
   {
+    number& cand1 = numberCollectionEnumerator.Current();
+    nlNormalize(cand1, cf);
+    
     if (!(SR_HDL(cand1)&SR_INT))
     {
-      nlNormalize(numberCollectionEnumerator.Current(),cf);
-      cand1= numberCollectionEnumerator.Current();
       if ((!(SR_HDL(cand1)&SR_INT)) // not a short int
       && (cand1->s==1))             // and is rational
       {
@@ -2738,14 +2739,12 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   cand=nlShort3(cand);
  
   // part2: all coeffs = all coeffs * cand
-  c=cand;
+  c = cand;
   numberCollectionEnumerator.Reset();
   do
   {
-    number t=nlMult(numberCollectionEnumerator.Current(),cand,cf);
-    nlDelete(&numberCollectionEnumerator.Current(),cf);
-    nlNormalize(t,cf);
-    numberCollectionEnumerator.Current()=t;
+    number &n = numberCollectionEnumerator.Current();
+    n_InpMult(n, cand, cf);
   } while (numberCollectionEnumerator.MoveNext() ); 
  
 }
