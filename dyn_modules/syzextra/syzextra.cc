@@ -515,9 +515,6 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
   assume( m_syzLeads != NULL );
 
-  if( __TAILREDSYZ__ )
-    assume( m_checker.IsNonempty() );
-
   ideal& LL = m_syzLeads;
 
   
@@ -533,20 +530,30 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   {
     const poly a = LL->m[k]; assume( a != NULL );
 
-    const int r = p_GetComp(a, R) - 1; 
-
-    assume( r >= 0 && r < IDELEMS(T) );
-    assume( r >= 0 && r < IDELEMS(L) );
-
-    poly aa = leadmonom(a, R); assume( aa != NULL); // :(    
-
     poly a2 = pNext(a);    
 
     // Splitting 2-terms Leading syzygy module
     if( a2 != NULL )
+      pNext(a) = NULL;
+
+    if( __IGNORETAILS__ )
     {
-      TT->m[k] = a2; pNext(a) = NULL;
+      TT->m[k] = NULL;
+
+      if( a2 != NULL )
+        p_Delete(&a2, R);
+
+      continue;
     }
+    
+    TT->m[k] = a2;
+
+    const int r = p_GetComp(a, R) - 1; 
+
+    assume( r >= 0 && r < IDELEMS(T) );
+    assume( r >= 0 && r < IDELEMS(L) );          
+
+    poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
     if( ! __HYBRIDNF__ )
     {
@@ -578,6 +585,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
       p_Delete(&a2, R);
     }
+
     p_Delete(&aa, R);    
   }
 
@@ -590,6 +598,8 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
 
 //  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
+  assume( m_syzLeads == NULL );
 
   if( bComputeSecondTerms )
   {
@@ -608,13 +618,12 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
   // NOTE: set m_LS if tails are to be reduced!
   assume( m_syzLeads!= NULL );
 
-  if (__TAILREDSYZ__ && (IDELEMS(m_syzLeads) > 0))
+  if (__TAILREDSYZ__ && (IDELEMS(m_syzLeads) > 0) && !__IGNORETAILS__)
   {
     m_LS = m_syzLeads;
     m_checker.Initialize(m_syzLeads);
+    assume( m_checker.IsNonempty() ); // TODO: this always fails... BUG????
   }
-
-  (void)( __LEAD2SYZ__ );
 }
 
 poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) const
@@ -625,6 +634,8 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) cons
 //                       const ring r,
 //                       const SchreyerSyzygyComputationFlags attributes)
 // {
+
+  assume( !__IGNORETAILS__ );
 
   const ideal& L = m_idLeads;
   const ideal& T = m_idTails;
@@ -690,6 +701,8 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(poly syz_lead, poly syz_2) cons
 
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 {
+  assume( !__IGNORETAILS__ );
+
   const ideal& L = m_idLeads;
   const ideal& T = m_idTails;
 //  const ideal& LS = m_LS;
@@ -729,6 +742,8 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
 poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const
 {
+  assume( !__IGNORETAILS__ );
+
   const ideal& L = m_idLeads;
   const ideal& T = m_idTails;
 //  const ideal& LS = m_LS;
@@ -808,15 +823,18 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     __LEAD2SYZ__( (BOOLEAN)atGetInt(rootRingHdl, "LEAD2SYZ", 1) ), 
     __TAILREDSYZ__( (BOOLEAN)atGetInt(rootRingHdl, "TAILREDSYZ", 1) ), 
     __HYBRIDNF__( (BOOLEAN)atGetInt(rootRingHdl, "HYBRIDNF", 0) ),
+    __IGNORETAILS__( (BOOLEAN)atGetInt(rootRingHdl, "IGNORETAILS", 0) ),
     m_rBaseRing( rootRingHdl->data.uring )
 {    
   if( __DEBUG__ )
   {
     PrintS("SchreyerSyzygyComputationFlags: \n");
-    Print("   DEBUG     : \t%d\n", __DEBUG__);
+    Print("        DEBUG: \t%d\n", __DEBUG__);
 //    Print("   SYZCHECK  : \t%d\n", __SYZCHECK__);
-    Print("   LEAD2SYZ  : \t%d\n", __LEAD2SYZ__);
+    Print("     LEAD2SYZ: \t%d\n", __LEAD2SYZ__);
     Print("   TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
+    Print("  IGNORETAILS: \t%d\n", __IGNORETAILS__);
+    
   }
 
   // TODO: just current setting!
@@ -981,7 +999,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 
   const TReducers& reducers = it->second;
 
-  const BOOLEAN to_check = __TAILREDSYZ__ && (syz_checker.IsNonempty());
+  const BOOLEAN to_check = (syz_checker.IsNonempty()); // __TAILREDSYZ__ && 
 
   const poly q = p_New(r); pNext(q) = NULL;
 

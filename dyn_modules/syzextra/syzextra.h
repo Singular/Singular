@@ -59,21 +59,23 @@ void Sort_c_ds(const ideal id, const ring r);
 
 
 /// Computation attribute storage
-struct SchreyerSyzygyComputationFlags
+class SchreyerSyzygyComputationFlags
 {
-  SchreyerSyzygyComputationFlags(idhdl rootRingHdl);
-  SchreyerSyzygyComputationFlags(const SchreyerSyzygyComputationFlags& attr):
-      __DEBUG__(attr.__DEBUG__),
-//      __SYZCHECK__(attr.__SYZCHECK__),
-      __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
-      __HYBRIDNF__(attr.__HYBRIDNF__),  m_rBaseRing(attr.m_rBaseRing)
-  {}
-      
+  public: 
+    SchreyerSyzygyComputationFlags(idhdl rootRingHdl);
+
+    SchreyerSyzygyComputationFlags(const SchreyerSyzygyComputationFlags& attr):
+        __DEBUG__(attr.__DEBUG__),
+  //      __SYZCHECK__(attr.__SYZCHECK__),
+        __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
+        __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
+        m_rBaseRing(attr.m_rBaseRing)
+    {}   
 
   /// output all the intermediate states
   const bool __DEBUG__; // DebugOutput;
 
-//  const bool __SYZCHECK__; // CheckSyzygyProperty: never tested here...
+  //  const bool __SYZCHECK__; // CheckSyzygyProperty: never tested here...
 
   /// ?
   const bool __LEAD2SYZ__; // TwoLeadingSyzygyTerms;
@@ -84,6 +86,10 @@ struct SchreyerSyzygyComputationFlags
   /// Use the usual NF's S-poly reduction while dropping lower order terms
   const bool __HYBRIDNF__; // UseHybridNF
 
+
+  /// ignore tails and compute the pure Schreyer frame
+  const bool __IGNORETAILS__; // @IGNORETAILS
+  
   /// global base ring
   const ring m_rBaseRing;
 
@@ -141,7 +147,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     bool IsDivisible(const poly q) const;
 
-    bool IsNonempty() const { return (m_hash.size() > 0); }
+    bool IsNonempty() const { return !m_hash.empty(); }
 
   private:
     ideal m_L; ///< only for debug
