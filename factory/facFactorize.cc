@@ -434,9 +434,19 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
 
   bufFactors= factors;
+
+  CFMap MM, NN;
+  dummy [0]= sqrfPartF;
+  dummy [1]= 1;
+  compress (dummy, MM, NN);
+  sqrfPartF= MM (sqrfPartF);
+  CanonicalForm varsSqrfPartF= getVars (sqrfPartF);
+  for (CFListIterator iter= factors; iter.hasItem(); iter++)
+    iter.getItem()= MM (iter.getItem());
+
   CFList evaluation2;
-  for (int i= 0; i < F.level()-1; i++)
-    evaluation2.insert (evalPoint[i]);
+  for (int i= 2; i <= varsSqrfPartF.level(); i++)
+    evaluation2.insert (evalPoint[NN (Variable (i)).level()-2]);
 
   CFList interMedResult;
   CanonicalForm oldSqrfPartF= sqrfPartF;
@@ -529,6 +539,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     factors= CFList (oldSqrfPartF/contF);
     interMedResult= recoverFactors (oldSqrfPartF, factors);
   }
+
+  for (CFListIterator iter= interMedResult; iter.hasItem(); iter++)
+    iter.getItem()= NN (iter.getItem());
 
   CFList result;
   CFFListIterator k;
