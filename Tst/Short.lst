@@ -190,7 +190,7 @@ Short/normal.tst
 Short/pAddManyVarsManyL_s.tst
 Short/pAddManyVars_s.tst
 Short/pAdd_s.tst
-Short/parallel_s.tst
+;;;;;;;;;;;;;;;;;;; Short/parallel_s.tst
 Short/paraplan_s.tst
 Short/pMultManyVarsManyL_s.tst
 Short/pMultManyVars_s.tst
