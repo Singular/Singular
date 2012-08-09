@@ -799,8 +799,10 @@ dnl
 if test "$ac_cv_singuname" != ix86-Win; then
 AC_CHECK_LIB(m, atof)
 fi
-AC_CHECK_LIB(nsl)
-AC_CHECK_LIB(socket)
+AC_CHECK_LIB(nsl,gethostbyname)
+AC_CHECK_LIB(socket,accept)
+AC_CHECK_LIB(rt,sem_open)
+
 SAVE_LIBS=${LIBS}
 LIBS=
 
@@ -1436,11 +1438,6 @@ elif  test "${with_libfac}" = yes; then
   fi
 else
   AC_MSG_RESULT(no)
-fi
-
-AC_CHECK_LIB(rt)
-if test "$ac_cv_lib_rt" = yes; then
-  NEED_LIBS="${NEED_LIBS} -lrt"
 fi
 
 NEED_LIBSG="${NEED_LIBS} -lpthread"
