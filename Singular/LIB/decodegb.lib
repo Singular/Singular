@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: decodegb.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -273,8 +273,9 @@ example
 // slightly modified mod function
 static proc mod_ (int n, int m)
 {
-  if (n mod m==0) {return(m);}
-  if (n mod m!=0) {return(n mod m);}
+  n=n mod m;
+  if (n<=0){ return(n+m);}
+  return(n);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
