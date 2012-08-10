@@ -28,17 +28,17 @@ public:
   resMatrixBase() : istate(notInit), totDeg(0) {}
   virtual ~resMatrixBase() {}
 
-  virtual const ideal getMatrix() { return NULL; }
-  virtual const ideal getSubMatrix() { return NULL; }
+  virtual ideal getMatrix() { return NULL; }
+  virtual ideal getSubMatrix() { return NULL; }
 
-  virtual const poly getUDet( const number* evpoint ) { return NULL; }
+  virtual poly getUDet( const number* evpoint ) { return NULL; }
 
-  virtual const number getDetAt( const number* evpoint ) { return NULL; }
-  virtual const number getSubDet() { return NULL; }
+  virtual number getDetAt( const number* evpoint ) { return NULL; }
+  virtual number getSubDet() { return NULL; }
 
-  virtual const long getDetDeg() const { return totDeg; }
+  virtual long getDetDeg() { return totDeg; }
 
-  virtual const IStateType initState() const { return istate; }
+  virtual IStateType initState() const { return istate; }
 
 protected:
   IStateType istate;

@@ -3211,8 +3211,7 @@ static void rSetDegStuff(ring r)
   r->pLDeg = (r->OrdSgn == 1 ? pLDegb : pLDeg0);
 
   /*======== ordering type is (am,_) ==================*/
-  if ((order[0]==ringorder_am)
-  )
+  if (order[0]==ringorder_am)
   {
     r->MixedOrder = FALSE;
     for(int ii=block0[0];ii<=block1[0];ii++)
@@ -4406,9 +4405,9 @@ void rGetSComps(int** currComponents, long** currShiftedComponents, int *length,
 //
 ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 {
-  if ( (r->order[0] == ringorder_s) ) return r;
+  if ( r->order[0] == ringorder_s ) return r;
 
-  if ( (r->order[0] == ringorder_IS) )
+  if ( r->order[0] == ringorder_IS )
   {
 #ifndef NDEBUG
     WarnS("rAssure_SyzComp: input ring has an IS-ordering!");

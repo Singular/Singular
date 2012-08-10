@@ -14,6 +14,13 @@
 #include <math.h>
 #include <string.h>
 
+// Ungetestet
+static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
+static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
+                      int ready, int all);
+
+
+
 //#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
 bigintmat * bigintmat::transpose()

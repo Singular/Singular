@@ -193,12 +193,6 @@ int getShorter (int * a, int l, int j, int cols, int rows);
 int findLongest(int * a, int length);
 int intArrSum(int * a, int length);
 
-
-// Ungetestet
-static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
-static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
-                      int ready, int all);
-
 class intvec;
 intvec * bim2iv(bigintmat * b);
 bigintmat * iv2bim(intvec * b, const coeffs C);

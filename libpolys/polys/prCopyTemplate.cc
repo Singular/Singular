@@ -29,4 +29,5 @@ static poly PR_NAME
   PR_SORT_POLY(dest, r_dest, r_src);
   p_Test(dest, r_dest);
   return dest;
+  (void)(r_src);
 }

@@ -75,7 +75,7 @@ public:
   ~resMatrixSparse();
 
   // public interface according to base class resMatrixBase
-  const ideal getMatrix();
+  ideal getMatrix();
 
   /** Fills in resMat[][] with evpoint[] and gets determinant
    * uRPos[i][1]: row of matrix
@@ -83,9 +83,9 @@ public:
    *  uRPos[i][2..idelem]: col of u(1) .. u(n)
    *  i= 1 .. numSet0
    */
-  const number getDetAt( const number* evpoint );
+  number getDetAt( const number* evpoint );
 
-  const poly getUDet( const number* evpoint );
+  poly getUDet( const number* evpoint );
 
 private:
   resMatrixSparse( const resMatrixSparse & );
@@ -178,7 +178,7 @@ public:
    ~pointSet();
 
   // pointSet.points[i] equals pointSet[i]
-  inline const onePointP operator[] ( const int index );
+  inline onePointP operator[] ( const int index );
 
   /** Adds a point to pointSet, copy vert[0,...,dim] ot point[num+1][0,...,dim].
    * Returns false, iff additional memory was allocated ( i.e. num >= max )
@@ -439,7 +439,7 @@ pointSet::~pointSet()
   omFreeSize( (void *) points, (max+1) * sizeof(onePointP) );
 }
 
-inline const onePointP pointSet::operator[] ( const int index_i )
+inline onePointP pointSet::operator[] ( const int index_i )
 {
   assume( index_i > 0 && index_i <= num );
   return points[index_i];
@@ -1736,7 +1736,7 @@ resMatrixSparse::~resMatrixSparse()
   idDelete( &rmat );
 }
 
-const ideal resMatrixSparse::getMatrix()
+ideal resMatrixSparse::getMatrix()
 {
   int i,j,cp;
   poly pp,phelp,piter,pgls;
@@ -1797,7 +1797,7 @@ const ideal resMatrixSparse::getMatrix()
 //    uRPos[i][idelem+1]: col of u(0)
 //    uRPos[i][2..idelem]: col of u(1) .. u(n)
 //    i= 1 .. numSet0
-const number resMatrixSparse::getDetAt( const number* evpoint )
+number resMatrixSparse::getDetAt( const number* evpoint )
 {
   int i,cp;
   poly pp,phelp,piter;
@@ -1857,7 +1857,7 @@ const number resMatrixSparse::getDetAt( const number* evpoint )
 //    uRPos[i][idelem+1]: col of u(0)
 //    uRPos[i][2..idelem]: col of u(1) .. u(n)
 //    i= 1 .. numSet0
-const poly resMatrixSparse::getUDet( const number* evpoint )
+poly resMatrixSparse::getUDet( const number* evpoint )
 {
   int i,cp;
   poly pp,phelp,piter;
@@ -1946,22 +1946,22 @@ public:
   resVector *getMVector( const int i );
 
   /** Returns the matrix M in an usable presentation */
-  const ideal getMatrix();
+  ideal getMatrix();
 
   /** Returns the submatrix M' of M in an usable presentation */
-  const ideal getSubMatrix();
+  ideal getSubMatrix();
 
   /** Evaluate the determinant of the matrix M at the point evpoint
    * where the ui's are replaced by the components of evpoint.
    * Uses singclap_det from factory.
    */
-  const number getDetAt( const number* evpoint );
+  number getDetAt( const number* evpoint );
 
   /** Evaluates the determinant of the submatrix M'.
    * Since the matrix is numerically, no evaluation point is needed.
    * Uses singclap_det from factory.
    */
-  const number getSubDet();
+  number getSubDet();
 
 private:
   /** deactivated copy constructor */
@@ -2470,7 +2470,7 @@ resVector *resMatrixDense::getMVector(const int i)
   return &resVectorList[i];
 }
 
-const ideal resMatrixDense::getMatrix()
+ideal resMatrixDense::getMatrix()
 {
   int i,j;
 
@@ -2520,7 +2520,7 @@ const ideal resMatrixDense::getMatrix()
   return resmod;
 }
 
-const ideal resMatrixDense::getSubMatrix()
+ideal resMatrixDense::getSubMatrix()
 {
   int k,i,j,l;
   resVector *vecp;
@@ -2551,7 +2551,7 @@ const ideal resMatrixDense::getSubMatrix()
   return resmod;
 }
 
-const number resMatrixDense::getDetAt( const number* evpoint )
+number resMatrixDense::getDetAt( const number* evpoint )
 {
   int k,i;
 
@@ -2596,7 +2596,7 @@ const number resMatrixDense::getDetAt( const number* evpoint )
   return( numres );
 }
 
-const number resMatrixDense::getSubDet()
+number resMatrixDense::getSubDet()
 {
   int k,i,j,l;
   resVector *vecp;

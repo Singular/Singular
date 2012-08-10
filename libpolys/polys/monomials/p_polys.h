@@ -963,8 +963,8 @@ static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
-    int lp, lq;
-    poly spNoether;
+    int lp, lq = 0;
+    poly spNoether = NULL;
     return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
   }
 #endif

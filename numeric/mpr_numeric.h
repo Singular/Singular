@@ -159,7 +159,7 @@ public:
   void solve_all();
   void arrange();
 
-  const bool success() { return found_roots; }
+  bool success() { return found_roots; }
 
 private:
   rootArranger( const rootArranger & );
