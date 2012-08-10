@@ -743,7 +743,8 @@ number nlIntDiv (number a, number b, const coeffs r)
     }
     long aa=SR_TO_INT(a);
     long bb=SR_TO_INT(b);
-    return INT_TO_SR((aa-(aa%bb))/bb);
+    //return INT_TO_SR((aa-(aa%bb))/bb);
+    return INT_TO_SR(aa/bb);
   }
   if (SR_HDL(a) & SR_INT)
   {
@@ -802,12 +803,45 @@ number nlIntMod (number a, number b, const coeffs r)
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
+    //return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
+    if ((long)a>0L)
+    {
+      if ((long)b>0L)
+        return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
+      else
+        return INT_TO_SR(SR_TO_INT(a)%(-SR_TO_INT(b)));
+    }
+    else
+    {
+      if ((long)b>0L)
+      {
+        long i=(-SR_TO_INT(a))%SR_TO_INT(b);
+        if ( i != 0L ) i = (SR_TO_INT(b))-i;
+        return INT_TO_SR(i);
+      }
+      else
+      {
+        long i=(-SR_TO_INT(a))%(-SR_TO_INT(b));
+        if ( i != 0L ) i = (-SR_TO_INT(b))-i;
+        return INT_TO_SR(i);
+      }
+    }
   }
   if (SR_HDL(a) & SR_INT)
   {
+    /* a is a small and b is a large int: -> a or (a+b) or (a-b) */
+    if ((long)a<0L)
+    {
+      if (mpz_isNeg(b->z))
+        return nlSub(a,b,r);
+      /*else*/
+        return nlAdd(a,b,r);
+    }
+    /*else*/
+      return a;
+
     /* a is a small and b is a large int: -> a */
-    return a;
+    //return a;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
