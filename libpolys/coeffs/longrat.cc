@@ -2652,10 +2652,12 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   int s1,s;
   s=2147483647; // max. int
   numberCollectionEnumerator.Reset();
+  int lc_is_pos=nlGreaterZero(numberCollectionEnumerator.Current(),cf);
   do
   {
     cand1= numberCollectionEnumerator.Current();
     if (SR_HDL(cand1)&SR_INT) { cand=cand1;break;}
+    assume(cand1->s==3); // all coeffs should be integers
     s1=mpz_size1(cand1->z);
     if (s>s1)
     {
@@ -2670,13 +2672,27 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   do
   {
     nlNormalize(numberCollectionEnumerator.Current(),cf);
-    cand1= nlGcd(cand,numberCollectionEnumerator.Current(),cf);
-    nlDelete(&cand,cf);
+    nlInpGcd(cand,numberCollectionEnumerator.Current(),cf);
     cand=cand1;
-    if(nlIsOne(cand,cf)) { c=cand; return; }
+    if(nlIsOne(cand,cf))
+    {
+      c=cand;
+      if(!lc_is_pos)
+      {
+        // make the leading coeff positive
+        c=nlNeg(c,cf);
+        numberCollectionEnumerator.Reset();
+        do
+        {
+          numberCollectionEnumerator.Current()=nlNeg(numberCollectionEnumerator.Current(),cf);
+        } while (numberCollectionEnumerator.MoveNext() );
+      }
+      return;
+    }
   } while (numberCollectionEnumerator.MoveNext() );
 
   // part3: all coeffs = all coeffs / cand
+  if (!lc_is_pos) cand=nlNeg(cand,cf);
   c=cand;
   numberCollectionEnumerator.Reset();
   do
@@ -2706,6 +2722,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   mpz_t tmp;
   mpz_init(tmp);
   numberCollectionEnumerator.Reset();
+  int lc_is_pos=nlGreaterZero(numberCollectionEnumerator.Current(),cf);
   do
   {
     number& cand1 = numberCollectionEnumerator.Current();
@@ -2738,7 +2755,18 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   {
     mpz_clear(tmp);
     FREE_RNUMBER(cand);
-    c=nlInit(1,cf);
+    if (lc_is_pos)
+      c=nlInit(1,cf);
+    else
+    {
+      // make the leading coeff positive
+      c=nlInit(-1,cf);
+      numberCollectionEnumerator.Reset();
+      do
+      {
+        numberCollectionEnumerator.Current()=nlNeg(numberCollectionEnumerator.Current(),cf);
+      } while (numberCollectionEnumerator.MoveNext() );
+    }
     return;
   }
   cand=nlShort3(cand);
