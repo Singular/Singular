@@ -918,6 +918,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A /= hh;
 
+  CFListIterator iter2;
   CFList bufFactors= CFList();
   if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
                                 factors))
@@ -973,7 +974,6 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       factors= oldFactors;
       CanonicalForm cont;
       CFList contents, LCs;
-      CFListIterator iter2;
       int index=1;
       bool foundTrueMultiplier= false;
       for (iter= factors; iter.hasItem(); iter++, index++)
@@ -1198,25 +1198,24 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   bool noOneToOne= false;
 
   CFList commonDenominators;
-  for (CFListIterator iter=biFactors; iter.hasItem(); iter++)
+  for (iter=biFactors; iter.hasItem(); iter++)
     commonDenominators.append (bCommonDen (iter.getItem()));
   CanonicalForm tmp1, tmp2, tmp3=1;
-  CFListIterator iter1, iter2;
   for (int i= 0; i < A.level() - 2; i++)
   {
     iter2= commonDenominators;
-    for (iter1= leadingCoeffs2[i]; iter1.hasItem(); iter1++, iter2++)
+    for (iter= leadingCoeffs2[i]; iter.hasItem(); iter++, iter2++)
     {
-      tmp1= bCommonDen (iter1.getItem());
+      tmp1= bCommonDen (iter.getItem());
       Off (SW_RATIONAL);
       iter2.getItem()= lcm (iter2.getItem(), tmp1);
       On (SW_RATIONAL);
     }
   }
   tmp1= prod (commonDenominators);
-  for (iter1= Aeval; iter1.hasItem(); iter1++)
+  for (iter= Aeval; iter.hasItem(); iter++)
   {
-    tmp2= bCommonDen (iter1.getItem());
+    tmp2= bCommonDen (iter.getItem());
     Off (SW_RATIONAL);
     tmp3= lcm (tmp2,tmp3);
     On (SW_RATIONAL);
@@ -1224,17 +1223,17 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   CanonicalForm multiplier;
   multiplier= tmp3/tmp1;
   iter2= commonDenominators;
-  for (iter1=biFactors; iter1.hasItem(); iter1++, iter2++)
-    iter1.getItem() *= iter2.getItem()*multiplier;
+  for (iter=biFactors; iter.hasItem(); iter++, iter2++)
+    iter.getItem() *= iter2.getItem()*multiplier;
 
-  for (iter1= Aeval; iter1.hasItem(); iter1++)
-    iter1.getItem() *= tmp3*power (multiplier, biFactors.length() - 1);
+  for (iter= Aeval; iter.hasItem(); iter++)
+    iter.getItem() *= tmp3*power (multiplier, biFactors.length() - 1);
 
   for (int i= 0; i < A.level() - 2; i++)
   {
     iter2= commonDenominators;
-    for (iter1= leadingCoeffs2[i]; iter1.hasItem(); iter1++, iter2++)
-      iter1.getItem() *= iter2.getItem()*multiplier;
+    for (iter= leadingCoeffs2[i]; iter.hasItem(); iter++, iter2++)
+      iter.getItem() *= iter2.getItem()*multiplier;
   }
 
 
