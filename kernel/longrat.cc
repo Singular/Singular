@@ -752,41 +752,14 @@ number nlIntMod (number a, number b)
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    if ((long)a>0L)
-    {
-      if ((long)b>0L)
-        return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
-      else
-        return INT_TO_SR(SR_TO_INT(a)%(-SR_TO_INT(b)));
-    }
-    else
-    {
-      if ((long)b>0L)
-      {
-        long i=(-SR_TO_INT(a))%SR_TO_INT(b);
-        if ( i != 0L ) i = (SR_TO_INT(b))-i;
-        return INT_TO_SR(i);
-      }
-      else
-      {
-        long i=(-SR_TO_INT(a))%(-SR_TO_INT(b));
-        if ( i != 0L ) i = (-SR_TO_INT(b))-i;
-        return INT_TO_SR(i);
-      }
-    }
+    LONG bb=SR_TO_INT(b);
+    LONG c=SR_TO_INT(a)%bb;
+    return INT_TO_SR(c);
   }
   if (SR_HDL(a) & SR_INT)
   {
-    /* a is a small and b is a large int: -> a or (a+b) or (a-b) */
-    if ((long)a<0L)
-    {
-      if (mpz_isNeg(b->z))
-        return nlSub(a,b);
-      /*else*/
-        return nlAdd(a,b);
-    }
-    /*else*/
-      return a;
+    /* a is a small and b is a large int: -> a */
+    return a;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
@@ -2461,6 +2434,39 @@ number nlFarey(number nN, number nP, const ring)
   mpz_clear(N);
   mpz_clear(P);
   return z;
+}
+number nlExtGcd(number a, number b, number &s, number &t)
+{
+  mpz_t aa,bb;
+  s=ALLOC_RNUMBER();
+  mpz_init(s->z); s->s=3;
+  t=ALLOC_RNUMBER();
+  mpz_init(t->z); t->s=3;
+  number g=ALLOC_RNUMBER();
+  mpz_init(g->z); g->s=3;
+  if (SR_HDL(a) & SR_INT)
+  {
+    mpz_init_set_si(aa,SR_TO_INT(a));
+  }
+  else
+  {
+    mpz_init_set(aa,a->z);
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    mpz_init_set_si(bb,SR_TO_INT(b));
+  }
+  else
+  {
+    mpz_init_set(bb,b->z);
+  }
+  mpz_gcdext(g->z,s->z,t->z,aa,bb);
+  mpz_clear(aa);
+  mpz_clear(bb);
+  s=nlShort3(s);
+  t=nlShort3(t);
+  g=nlShort3(g);
+  return g;
 }
 #if 0
 number nlMod(number a, number b)

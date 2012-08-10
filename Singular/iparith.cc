@@ -1105,18 +1105,15 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  int bb=ABS(b);
-  int c=a%bb;
-  if(c<0) c+=bb;
+  int c=a%b;
   int r=0;
   switch (iiOp)
   {
     case '%':
         r=c;            break;
+    case '/':
     case INTDIV_CMD:
         r=((a-c) /b);   break;
-    case '/':
-        r= (a / b);     break;
   }
   res->data=(void *)((long)r);
   return FALSE;
@@ -1611,7 +1608,7 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
     q[i]=nlInit((*p)[i], NULL);
     x[i]=nlInit((*c)[i], NULL);
   }
-  number n=nlChineseRemainder(x,q,rl,NULL);
+  number n=nlChineseRemainderSym(x,q,rl,TRUE,NULL);
   for(i=rl-1;i>=0;i--)
   {
     nlDelete(&(q[i]),NULL);
@@ -1697,25 +1694,56 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   poly r=NULL,h;
   ideal result;
   ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
+  number *xx=NULL;
   int i;
   int return_type=c->m[0].Typ();
   if ((return_type!=IDEAL_CMD)
   && (return_type!=MODUL_CMD)
   && (return_type!=MATRIX_CMD))
   {
-    WerrorS("ideal/module/matrix expected");
-    omFree(x); // delete c
-    return TRUE;
-  }
-  for(i=rl-1;i>=0;i--)
-  {
-    if (c->m[i].Typ()!=return_type)
+    if((return_type!=BIGINT_CMD)&&(return_type!=INT_CMD))
     {
-      Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
+      WerrorS("ideal/module/matrix expected");
       omFree(x); // delete c
       return TRUE;
     }
-    x[i]=((ideal)c->m[i].Data());
+    else
+      return_type=BIGINT_CMD;
+  }
+  if (return_type!=BIGINT_CMD)
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (c->m[i].Typ()!=return_type)
+      {
+        Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
+        omFree(x); // delete c
+        return TRUE;
+      }
+      x[i]=((ideal)c->m[i].Data());
+    }
+  }
+  else
+  {
+    xx=(number *)omAlloc(rl*sizeof(number));
+    for(i=rl-1;i>=0;i--)
+    {
+      if (c->m[i].Typ()==INT_CMD)
+      {
+        xx[i]=nlInit(((int)c->m[i].Data()),NULL);
+      }
+      else if (c->m[i].Typ()==BIGINT_CMD)
+      {
+        xx[i]=((number)c->m[i].Data());
+      }
+      else
+      {
+        Werror("bigint expected at pos %d",i+1);
+        omFree(x); // delete c
+        omFree(xx); // delete c
+        return TRUE;
+      }
+    }
   }
   number *q=(number *)omAlloc(rl*sizeof(number));
   if (p!=NULL)
@@ -1750,13 +1778,22 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
       }
     }
   }
-  result=idChineseRemainder(x,q,rl);
+  if (return_type==BIGINT_CMD)
+  {
+    number n=nlChineseRemainderSym(xx,q,rl,FALSE,NULL);
+    res->data=(char *)n;
+  }
+  else
+  {
+    result=idChineseRemainder(x,q,rl);
+    // deletes also x
+    res->data=(char *)result;
+  }
   for(i=rl-1;i>=0;i--)
   {
     n_Delete(&(q[i]),currRing);
   }
   omFree(q);
-  res->data=(char *)result;
   res->rtyp=return_type;
   return FALSE;
 }
@@ -1989,6 +2026,20 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)(long)p0;
   L->m[1].rtyp=INT_CMD;   L->m[1].data=(void *)(long)a;
   L->m[2].rtyp=INT_CMD;   L->m[2].data=(void *)(long)b;
+  res->rtyp=LIST_CMD;
+  res->data=(char *)L;
+  return FALSE;
+}
+static BOOLEAN jjEXTGCD_BI(leftv res, leftv u, leftv v)
+{
+  number uu=(number)u->Data();number vv=(number)v->Data();
+  lists L=(lists)omAllocBin(slists_bin);
+  number a,b;
+  number p0=nlExtGcd(uu,vv,a,b);
+  L->Init(3);
+  L->m[0].rtyp=BIGINT_CMD;   L->m[0].data=(void *)p0;
+  L->m[1].rtyp=BIGINT_CMD;   L->m[1].data=(void *)a;
+  L->m[2].rtyp=BIGINT_CMD;   L->m[2].data=(void *)b;
   res->rtyp=LIST_CMD;
   res->data=(char *)L;
   return FALSE;

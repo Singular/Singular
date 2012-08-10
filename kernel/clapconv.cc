@@ -502,7 +502,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
   }
 }
 
-number   nlChineseRemainder(number *x, number *q,int rl, const ring)
+number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const ring)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
 #ifdef HAVE_FACTORY
@@ -517,21 +517,28 @@ number   nlChineseRemainder(number *x, number *q,int rl, const ring)
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);
   number n=convFactoryNSingN(xnew,NULL);
-  number p=convFactoryNSingN(qnew,NULL);
-  number p2=nlIntDiv(p,nlInit(2, NULL));
-  if (nlGreater(n,p2))
+  if (sym)
   {
-     number n2=nlSub(n,p);
-     nlDelete(&n,NULL);
-     n=n2;
+    number p=convFactoryNSingN(qnew,NULL);
+    number p2=nlIntDiv(p,nlInit(2, NULL));
+    if (nlGreater(n,p2))
+    {
+       number n2=nlSub(n,p);
+       nlDelete(&n,NULL);
+       n=n2;
+    }
+    nlDelete(&p2,NULL);
+    nlDelete(&p,NULL);
   }
-  nlDelete(&p,NULL);
-  nlDelete(&p2,NULL);
   return n;
 #else
   WerrorS("not implemented");
   return nlInit(0);
 #endif
+}
+number   nlChineseRemainder(number *x, number *q,int rl, const ring r)
+{
+  return nlChineseRemainderSym(x,q,rl,TRUE,r);
 }
 
 CanonicalForm
