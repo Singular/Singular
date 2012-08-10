@@ -864,7 +864,7 @@ number nlDiv (number a, number b, const coeffs r)
     long i=SR_TO_INT(a);
     long j=SR_TO_INT(b);
     if ((i==-POW_2_28) && (j== -1L))
-    {  
+    {
       FREE_RNUMBER(u);
       return nlRInit(POW_2_28);
     }
@@ -1256,7 +1256,7 @@ number nlModP(number q, const coeffs Q, const coeffs Zp)
   const unsigned long PP = p;
 
   // numerator modulo char. should fit into int
-  number z = n_Init( static_cast<int>(mpz_fdiv_ui(q->z, PP)), Zp );  
+  number z = n_Init( static_cast<int>(mpz_fdiv_ui(q->z, PP)), Zp );
 
   // denominator != 1?
   if (q->s!=3)
@@ -2439,7 +2439,7 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r)
 static void nlMPZ(mpz_t m, number &n, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-   
+
   nlTest(n, r);
   nlNormalize(n, r);
   if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
@@ -2453,7 +2453,7 @@ static number nlInitMPZ(mpz_t m, const coeffs)
   mpz_init_set(z->z, m);
   mpz_init_set_ui(z->n, 1);
   z->s = 3;
-  return z;   
+  return z;
 }
 
 
@@ -2628,8 +2628,8 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
       cand=cand1;
       s=s1;
     }
-  } while (numberCollectionEnumerator.MoveNext() ); 
- 
+  } while (numberCollectionEnumerator.MoveNext() );
+
   cand=nlCopy(cand,cf);
   // part 2: compute gcd(cand,all coeffs)
   numberCollectionEnumerator.Reset();
@@ -2640,8 +2640,8 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     nlDelete(&cand,cf);
     cand=cand1;
     if(nlIsOne(cand,cf)) { c=cand; return; }
-  } while (numberCollectionEnumerator.MoveNext() ); 
- 
+  } while (numberCollectionEnumerator.MoveNext() );
+
   // part3: all coeffs = all coeffs / cand
   c=cand;
   numberCollectionEnumerator.Reset();
@@ -2650,8 +2650,8 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     number t=nlIntDiv(numberCollectionEnumerator.Current(),cand,cf);
     nlDelete(&numberCollectionEnumerator.Current(),cf);
     numberCollectionEnumerator.Current()=t;
-  } while (numberCollectionEnumerator.MoveNext() ); 
- 
+  } while (numberCollectionEnumerator.MoveNext() );
+
 }
 
 static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
@@ -2661,7 +2661,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   // all coeffs are given by integers after returning from this routine
 
   // part 1, collect product of all denominators /gcds
-  number cand; 
+  number cand;
   cand=ALLOC_RNUMBER();
   #if defined(LDEBUG)
   cand->debug=123456;
@@ -2675,17 +2675,17 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   do
   {
     number& cand1 = numberCollectionEnumerator.Current();
-    nlNormalize(cand1, cf);
-    
+
     if (!(SR_HDL(cand1)&SR_INT))
     {
+      nlNormalize(cand1, cf);
       if ((!(SR_HDL(cand1)&SR_INT)) // not a short int
       && (cand1->s==1))             // and is rational
       {
         if (s==0) // first denom, we meet
         {
-          mpz_init_set(cand->z,cand1->n); 
-          s=1; 
+          mpz_init_set(cand->z,cand1->n);
+          s=1;
         }
         else // we have already something
         {
@@ -2698,26 +2698,31 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
         }
       }
     }
-  } while (numberCollectionEnumerator.MoveNext() ); 
+  } while (numberCollectionEnumerator.MoveNext() );
 
   if (s==0) // nothing to do, all coeffs are already integers
   {
     mpz_clear(tmp);
-    FREE_RNUMBER(cand); 
-    c=nlInit(1,cf); 
+    FREE_RNUMBER(cand);
+    c=nlInit(1,cf);
     return;
   }
   cand=nlShort3(cand);
- 
+
   // part2: all coeffs = all coeffs * cand
-  c = cand;
+  // make the lead coeff positive
   numberCollectionEnumerator.Reset();
+  if (!nlGreaterZero(numberCollectionEnumerator.Current(),cf))
+  {
+    cand=nlNeg(cand,cf);
+  }
+  c = cand;
   do
   {
     number &n = numberCollectionEnumerator.Current();
     n_InpMult(n, cand, cf);
-  } while (numberCollectionEnumerator.MoveNext() ); 
- 
+  } while (numberCollectionEnumerator.MoveNext() );
+
 }
 
 BOOLEAN nlInitChar(coeffs r, void*)
@@ -2731,7 +2736,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
 
   r->cfInitMPZ = nlInitMPZ;
   r->cfMPZ  = nlMPZ;
-   
+
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
@@ -2742,7 +2747,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
-   
+
   r->cfChineseRemainder=nlChineseRemainder;
   r->cfFarey=nlFarey;
   #ifdef HAVE_RINGS
@@ -2780,7 +2785,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
 
   r->cfClearContent = nlClearContent;
   r->cfClearDenominators = nlClearDenominators;
-  
+
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=nlDBTest;
