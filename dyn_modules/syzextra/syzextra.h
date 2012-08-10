@@ -149,6 +149,10 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     bool IsNonempty() const { return !m_hash.empty(); }
 
+#ifndef NDEBUG
+    void DebugPrint() const;
+#endif
+    
   private:
     ideal m_L; ///< only for debug
 
@@ -190,7 +194,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_syzLeads(syzLeads), m_syzTails(NULL), m_LS(syzLeads), 
         m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
-      if( __TAILREDSYZ__ && syzLeads != NULL )
+      if( __TAILREDSYZ__ && !__IGNORETAILS__ && syzLeads != NULL )
         m_checker.Initialize(syzLeads);
     }
 

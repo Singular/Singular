@@ -618,10 +618,21 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
   // NOTE: set m_LS if tails are to be reduced!
   assume( m_syzLeads!= NULL );
 
-  if (__TAILREDSYZ__ && (IDELEMS(m_syzLeads) > 0) && !__IGNORETAILS__)
+  if (__TAILREDSYZ__ && !__IGNORETAILS__ && (IDELEMS(m_syzLeads) > 0) && !((IDELEMS(m_syzLeads) == 1) && (m_syzLeads->m[0] == NULL)))
   {
     m_LS = m_syzLeads;
     m_checker.Initialize(m_syzLeads);
+#ifndef NDEBUG    
+    if( __DEBUG__ )
+    {
+      const ring& r = m_rBaseRing;
+      PrintS("SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms: \n");
+      PrintS("m_syzLeads: \n");
+      dPrint(m_syzLeads, r, r, 1);
+      PrintS("m_checker.Initialize(m_syzLeads) => \n");
+      m_checker.DebugPrint();
+    }
+#endif
     assume( m_checker.IsNonempty() ); // TODO: this always fails... BUG????
   }
 }
@@ -943,6 +954,37 @@ bool CReducerFinder::IsDivisible(const poly product) const
 
   return false;
 }
+
+
+#ifndef NDEBUG
+void CReducerFinder::DebugPrint() const
+{
+  const ring& r = m_rBaseRing;
+
+  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
+  {
+    Print("Hash Key: %d, Values: \n", it->first);
+    const TReducers& reducers = it->second;
+
+    for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+    {
+      const poly p = (*vit)->m_lt;
+
+      assume( p_GetComp(p, r) == it->first );
+
+      const int k = (*vit)->m_label;
+
+      assume( m_L->m[k] == p );
+
+      const unsigned long p_sev = (*vit)->m_sev;
+
+      assume( p_sev == p_GetShortExpVector(p, r) );
+
+      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %dl\n", p_sev);      
+    }
+  }
+}
+#endif
 
 
 poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const CReducerFinder& syz_checker) const
