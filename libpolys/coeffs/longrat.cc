@@ -2673,7 +2673,6 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   {
     nlNormalize(numberCollectionEnumerator.Current(),cf);
     nlInpGcd(cand,numberCollectionEnumerator.Current(),cf);
-    cand=cand1;
     if(nlIsOne(cand,cf))
     {
       c=cand;
