@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: paraplanecurves.lib 14461 2011-12-14 11:00:17Z motsak $";
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
@@ -25,7 +25,7 @@ closure of C[x] in C(x,y) using the  normalization algorithm from
 @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the
 library, also van Hoeij's algorithm for computing the integral basis will
 be available. @*
-From the integral basis, the adjoint ideal is obtained by linear algebra.
+>From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -254,7 +254,7 @@ and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the normalization algorithm from @ref{normal_lib}:
 see @ref{integralbasis_lib}. In a future edition of the library, also van Hoeij's
 algorithm for computing the integral basis will be available. @*
-From the integral basis, the adjoint ideal is obtained by linear algebra.
+>From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -485,7 +485,7 @@ transcendental and y as algebraic and computes an integral basis in C(x)[y] of
 the integral closure of C[x] in C(x,y) using the normalization algorithm
 from @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the library,
 also van Hoeij's algorithm for computing the integral basis will be available.@*
-From the integral basis, the adjoint ideal is obtained by linear algebra.
+>From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -1940,6 +1940,38 @@ RETURN:  returns the middle of the three numbers |ab|, |bc|, and |ca|.
 
 
 ///////////////////////////////////////////////////////////////////////////////
+static proc aMod(bigint a, bigint b)
+"USAGE:  aMod(a,b); a, b bigint
+RETURN:  r bigint
+THEORY:  The asymmetric residue r of the division with remainder a mod b.
+"
+{
+  bigint c = a mod b;
+  if (c<0)
+  {
+    return(c+b);
+  }
+return(c);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc aDiv(bigint a, bigint b)
+"USAGE:  aDiv(a,b); a, b bigint
+RETURN:  q bigint
+THEORY:  Quotient with remainder q = a div b with asymmetric residue.
+"
+{
+  bigint q = a div b;
+  if ((a mod b)<0)
+  {
+    return(q-1);
+  }
+return(q);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
 static proc polyModP(poly q, bigint p)
 "USAGE:  polyModP(q, p); q poly, p bigint
 RETURN:  takes each coefficient of q modulo p and returns the resulting poly
@@ -2014,7 +2046,7 @@ KEYWORDS: Cantor-Zassenhaus algorithm.
       q = q - 1;
       b = inverseModP(bigint(leadcoef(q)), p);
       q = q - lead(q);
-      root = (bigint(q) * b) mod p;
+      root = aMod((bigint(q) * b),p);
       if (((root * root - r) mod p) != 0) { root = 0; }
     }
   }
@@ -2034,7 +2066,7 @@ THEORY:  This uses Euclid's extended gcd algorithm.
 {
   list L = extendedEuclid(r, p);
   if (L[1] != 1) { "ERROR: GCD of", r, "and", p, "should be 1."; }
-  L[2] = L[2] mod p;
+  L[2] = aMod(L[2],p);
   return (L[2]);
 }
 
@@ -2082,7 +2114,7 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
     // 2.1):
     for (i = 1; i <= size(L[1]); i++)
     {
-      roots = insert(roots, rootModP(r mod L[1][i], L[1][i]), size(roots));
+      roots = insert(roots, rootModP(aMod(r,L[1][i]), L[1][i]), size(roots));
     }
 
     // 2.2):
@@ -2094,9 +2126,9 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
       {
         c = bigint(roots[i]); l = pPower;
         temp = r - c * c; l = bigint(2) * c * l; c = temp;
-        c = c div pPower; l = l div pPower;
-        c = c mod L[1][i]; l = l mod L[1][i];
-        c = (c * bigint(inverseModP(l, L[1][i]))) mod L[1][i];
+        c = aDiv(c,pPower); l = aDiv(l,pPower);
+        c = aMod(c,L[1][i]); l = aMod(l,L[1][i]);
+        c = aMod((c * bigint(inverseModP(l, L[1][i]))), L[1][i]);
         c = bigint(roots[i]) + c * pPower;
         pPower = pPower * L[1][i]; roots[i] = c;
       }
@@ -2113,7 +2145,7 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
       }
       mm = insert(mm, z, size(mm));
     }
-    return (chineseRemainder(roots, mm) mod m);
+    return (aMod(chineseRemainder(roots, mm) , m));
   }
 }
 
@@ -2133,7 +2165,7 @@ KEYWORDS: Chinese remainder.
   for (i = 2; i <= size(mm); i++) { M = M * bigint(mm[i]); }
   for (i = 1; i <= size(mm); i++)
   {
-    N = M div mm[i];
+    N = aDiv(M,mm[i]);
     l = extendedEuclid(mm[i], N);
     x = x + rr[i]*l[3]*N;
   }
@@ -2208,7 +2240,7 @@ RETURN:  with poly p = var(1)^2 + b1 * var(2)^2 + c1 * var(3)^2, the method
        the map mm, accordingly */
     cc = c; if (cc <= 0) { cc = -cc; }
     R1 = squareRoot(-a*b, cc, 0);
-    r1 = (R1 * inverseModP(a, cc)) mod cc;
+    r1 = aMod((R1 * inverseModP(a, cc)), cc);
     if (r1*bigint(2) > cc) { r1 = r1 - cc; }
     Q = (a*r1*r1 + b)/c;
     if (Q == 0)
@@ -2271,11 +2303,11 @@ KEYWORDS: extended Euclidean algorithm.
   list l = 0; bigint temp;
   if (a == 0)         { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; } }
   if (b == 0)         { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; } }
-  if ((a mod b) == 0) { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; } }
-  if ((b mod a) == 0) { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; } }
+  if (aMod(a , b) == 0) { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; } }
+  if (aMod(b , a) == 0) { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; } }
   if (size(l) > 1) { return (l); }
 
-  temp = a mod b;
+  temp = aMod(a , b);
   l = extendedEuclid(b, temp);
   temp = (a - temp) / b;
   temp = bigint(l[2]) - temp * bigint(l[3]);
@@ -2291,7 +2323,7 @@ returns the Legendre symbol (r/p), that is
  0 if r is a multiple of p
 "
 {
-  bigint rr = r mod p;
+  bigint rr = aMod(r , p);
   if (rr == 0) { return (0) }
   if (rr == 1) { return (1) }
   /* now, p must be at least 3 */
@@ -2300,9 +2332,9 @@ returns the Legendre symbol (r/p), that is
   bigint power = rr;
   while (e > 0)
   {
-    if ((e mod 2) == 1) { result = (result * power) mod p; }
+    if ((e mod 2) == 1) { result = aMod((result * power), p); }
     e = e / bigint(2);
-    power = (power * power) mod p;
+    power = aMod((power * power), p);
   }
   if (result > 1) { result = result - p; /* should be -1 */ }
   return (result);
