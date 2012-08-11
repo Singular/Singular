@@ -1730,11 +1730,11 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       if (c->m[i].Typ()==INT_CMD)
       {
-        xx[i]=nlInit(((int)c->m[i].Data()),NULL);
+        xx[i]=nlInit(((int)(long)c->m[i].Data()),NULL);
       }
       else if (c->m[i].Typ()==BIGINT_CMD)
       {
-        xx[i]=((number)c->m[i].Data());
+        xx[i]=(number)c->m[i].Data();
       }
       else
       {
