@@ -507,6 +507,7 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const r
 {
 #ifdef HAVE_FACTORY
   setCharacteristic( 0 ); // only in char 0
+  Off(SW_RATIONAL);
   CFArray X(rl), Q(rl);
   int i;
   for(i=rl-1;i>=0;i--)

@@ -1608,7 +1608,7 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
     q[i]=nlInit((*p)[i], NULL);
     x[i]=nlInit((*c)[i], NULL);
   }
-  number n=nlChineseRemainderSym(x,q,rl,TRUE,NULL);
+  number n=nlChineseRemainderSym(x,q,rl,FALSE,NULL);
   for(i=rl-1;i>=0;i--)
   {
     nlDelete(&(q[i]),NULL);
@@ -1685,7 +1685,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  lists c=(lists)u->CopyD(); // list of ideal
+  lists c=(lists)u->CopyD(); // list of ideal or bigint/int
   lists pl=NULL;
   intvec *p=NULL;
   if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
@@ -1759,28 +1759,42 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       if (pl->m[i].Typ()==INT_CMD)
       {
-        q[i]=n_Init((int)(long)pl->m[i].Data(),currRing);
+        if (return_type==BIGINT_CMD)
+          q[i]=nlInit((int)(long)pl->m[i].Data(),currRing);
+        else
+          q[i]=n_Init((int)(long)pl->m[i].Data(),currRing);
       }
       else if (pl->m[i].Typ()==BIGINT_CMD)
       {
-        q[i]=nInit_bigint((number)(pl->m[i].Data()));
+        if (return_type==BIGINT_CMD)
+          q[i]=nlCopy((number)(pl->m[i].Data()));
+        else
+          q[i]=nInit_bigint((number)(pl->m[i].Data()));
       }
       else
       {
         Werror("bigint expected at pos %d",i+1);
+        if (return_type==BIGINT_CMD)
+        for(i++;i<rl;i++)
+        {
+          nlDelete(&(q[i]),currRing);
+        }
+        else
         for(i++;i<rl;i++)
         {
           n_Delete(&(q[i]),currRing);
         }
+
         omFree(x); // delete c
         omFree(q); // delete pl
+        if (xx!=NULL) omFree(xx); // delete c
         return TRUE;
       }
     }
   }
   if (return_type==BIGINT_CMD)
   {
-    number n=nlChineseRemainderSym(xx,q,rl,FALSE,NULL);
+    number n=nlChineseRemainder(xx,q,rl,NULL);
     res->data=(char *)n;
   }
   else
@@ -1789,6 +1803,12 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     // deletes also x
     res->data=(char *)result;
   }
+  if (return_type==BIGINT_CMD)
+  for(i=rl-1;i>=0;i--)
+  {
+    nlDelete(&(q[i]),NULL);
+  }
+  else
   for(i=rl-1;i>=0;i--)
   {
     n_Delete(&(q[i]),currRing);
@@ -2306,7 +2326,7 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 //}
 
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
-{ 
+{
   number n1 = (number) u->CopyD();
   number n2 = (number) v->CopyD();
   CanonicalForm C1 = convSingNFactoryN (n1,NULL);

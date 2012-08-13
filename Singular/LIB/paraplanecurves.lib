@@ -2145,7 +2145,7 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
       }
       mm = insert(mm, z, size(mm));
     }
-    return (aMod(chineseRemainder(roots, mm) , m));
+    return (aMod(chinrem(roots, mm) , m));
   }
 }
 
