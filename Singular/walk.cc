@@ -1548,6 +1548,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   mpz_init(t_null);
 
   mpz_t ggt;
+  mpz_init(ggt);
 
   int tn0, tn1, tz1, ncmp, gcd_tmp, ntmp;
   intvec* diff_weight = MivSub(target_weight, curr_weight);
@@ -1705,7 +1706,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
 #endif
 
     if(j==0)
-      mpz_init_set(ggt, sntz);
+      mpz_set(ggt, sntz);
     else
       if(mpz_cmp_si(ggt,1) != 0)
         mpz_gcd(ggt, ggt, sntz);
@@ -1752,6 +1753,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
 
  FINISH:
 
+   mpz_clear(ggt);
    mpz_clear(t_zaehler);
    mpz_clear(t_nenner);
    mpz_clear(sntz);
