@@ -32,21 +32,6 @@
 #include "attrib.h"
 
 
-class sleftv_shallow {
-  typedef sleftv_shallow self;
-public:
-  sleftv_shallow(sleftv& data): m_data(data) { }
-  sleftv_shallow(const self& rhs): m_data(rhs.m_data) {}
-
-  ~sleftv_shallow() { }// do not need the clean up, do not own
-  
-  leftv operator->() { return *this; }
-  operator leftv() { return &m_data; }
-
-private:
-  sleftv m_data; 
-};
-class ListElementRefData;
 /** @class CountedRefData
  * This class stores a reference counter as well as a Singular interpreter object.
  *
@@ -55,7 +40,55 @@ class ListElementRefData;
 class CountedRefData {
  typedef CountedRefData self;
 
-  /// Forbit copy construction
+public:
+  class access {
+    typedef access self; 
+
+  public:
+    access(CountedRefData* data): 
+      m_data(NULL), m_owns(true) { init(&data->m_data, data->m_ring);  }
+
+
+    access(leftv data):
+      m_data(data), m_owns(is_ref(data)) {
+      if(m_owns) 
+        init((CountedRefData*)(data->Data()));
+    }
+
+    access(const self& rhs):
+      m_data(rhs.m_data), m_owns(rhs.m_owns) {
+
+      if (m_owns){
+        m_data = (leftv)omAlloc0(sizeof(sleftv)); 
+        if(rhs.m_data != NULL) memcpy(m_data, rhs.m_data, sizeof(sleftv));
+      }
+    }
+  
+    ~access() {  if (m_owns)  omFree(m_data);  }
+  
+    leftv operator->() { return *this; }
+    operator leftv() {  return m_data;  }
+
+  private:
+
+    void init(CountedRefData* all) { init(&(all->m_data), all->m_ring); }
+
+    void init(leftv data, ring ringdata) {
+      m_data = (leftv)omAlloc0(sizeof(sleftv));
+      if (RingDependend(data->Typ()) && (ringdata != currRing)) {
+        Werror("Can only use references from current ring.");
+        return;
+      }
+      memcpy(m_data, data, sizeof(sleftv));
+      data->next = NULL;
+    }
+    leftv m_data;
+    bool m_owns;
+  };
+
+
+
+  /// Forbit copy construction and normal assignment
   CountedRefData(const self&);
   self& operator=(const self&);
 
@@ -64,7 +97,12 @@ public:
   typedef unsigned long count_type;
 
   /// Construct reference for Singular object
-  CountedRefData(leftv data): m_data(*data), m_count(1) {
+  CountedRefData(leftv data): m_data(*data), m_count(1), m_ring(NULL) {
+
+    if (RingDependend(data->Typ())  && (currRing != NULL) ) {
+      m_ring = currRing;
+      ++m_ring->ref;
+    }
     if (data->e) {
       m_data.e = (Subexpr)omAlloc0Bin(sSubexpr_bin);
       memcpy(m_data.e, data->e, sizeof(*m_data.e));
@@ -72,17 +110,14 @@ public:
   }
 
   /// Destructor
-  ~CountedRefData()  { if(m_data.e) omFree(m_data.e); };
-
-  sleftv_shallow get() {
-    return sleftv_shallow(m_data);
+  ~CountedRefData()  {
+    assume(m_count == 0);
+    if(m_data.e) omFree(m_data.e);
+    if (m_ring) --m_ring->ref;
   }
 
-  static BOOLEAN construct(leftv res, leftv arg) {
-    return extract(res, (is_ref(arg)? (self*)arg->Data(): new self(arg)), id());
-  }
 
-  static BOOLEAN extract(leftv res, void* data, int op)
+  static BOOLEAN set_to(leftv res, void* data, int op)
   {
     if (res->rtyp == IDHDL) {
       IDDATA((idhdl)res->data) = (char *)data;
@@ -94,20 +129,10 @@ public:
     }
     return (op == NONE? TRUE: FALSE);
   }
-  /// @name Forward operations
-  //@{
-  BOOLEAN operator()(int op, leftv result, leftv arg){
-      return iiExprArith2(result, get(), op,
-                        (is_ref(arg)? cast(arg).get(): arg));
-    
-  }
+  static BOOLEAN none(leftv result) { return set_to(result, NULL, NONE); }
 
-  BOOLEAN operator()(int op, leftv result, leftv arg1, leftv arg2) {
-    return iiExprArith3(result, op, get(), 
-                        (is_ref(arg1)? cast(arg1).get(): arg1),
-                        (is_ref(arg2)? cast(arg2).get(): arg2));
-  }
-  //@}
+
+
 
   /// Set Singular type identitfier 
   static void set_id(id_type new_id) {  access_id() = new_id;  }
@@ -115,23 +140,34 @@ public:
   /// Get Singular type identitfier 
   static id_type id() { return access_id(); }
 
-  /// Extract Singular interpreter object
-  static self& cast(leftv value, leftv next=NULL) {
-    assume((value != NULL) && is_ref(value));
-    return cast((void*)value->Data(), next);
+  static void* copy(self* ptr) {
+    if (ptr) ptr->reclaim();
+    return ptr;
   }
 
-  /// Extract reference from Singular interpreter object data
-  static self& cast(void* data, leftv next=NULL) {
-    assume(data != NULL);
-    self* result = static_cast<CountedRefData*>(data);
-    result->m_data.next=next;   /// @todo resolve refs in tail
-    return *result;
+
+  static void destroy(self* ptr) {
+    if(ptr && !ptr->release())
+      delete ptr;
+  }
+
+  static BOOLEAN assign(leftv result, leftv arg) {
+    // Case: replace assignment behind reference
+    if (result->Data() != NULL)
+      return iiAssign(access(result), arg);
+
+    // Case: new reference
+    if(arg->rtyp == IDHDL)
+      return set_to(result, (is_ref(arg)? (self*)copy(static_cast<self*>(arg->Data())):
+                             new self(arg)), id());
+      
+    Werror("Can only take reference from identifier");
+    return none(result);
   }
 
   /// Check for being reference in Singular interpreter object
   static BOOLEAN is_ref(leftv arg) { return (arg->Typ() == id()); }
-
+private:
   /// @name Reference counter management
   //@{
   count_type reclaim() { return ++m_count; }
@@ -152,6 +188,8 @@ private:
 
   /// Singular object
   sleftv m_data;
+
+  ring m_ring;
 };
 
 
@@ -164,36 +202,27 @@ void* countedref_Init(blackbox*)
 /// blackbox support - convert to string representation
 void countedref_Print(blackbox *b, void* ptr)
 {
-  CountedRefData::cast(ptr).get()->Print();
+  if (ptr != NULL)
+    CountedRefData::access(static_cast<CountedRefData*>(ptr))->Print();
 }
 
 /// blackbox support - convert to string representation
 char* countedref_String(blackbox *b, void* ptr)
 {
-  CountedRefData::cast(ptr).get()->String();
+  if (ptr != NULL) 
+    return CountedRefData::access(static_cast<CountedRefData*>(ptr))->String();
 }
 
 /// blackbox support - copy element
 void* countedref_Copy(blackbox*b, void* ptr)
 { 
-  CountedRefData::cast(ptr).reclaim();
-  return ptr;
+  return CountedRefData::copy(static_cast<CountedRefData*>(ptr));
 }
 
 /// blackbox support - assign element
 BOOLEAN countedref_Assign(leftv l, leftv r)
 {
-  if (l->Data() == NULL)        // Case: new reference
-  {
-    if(r->rtyp != IDHDL) {
-      Werror("Can only take reference from identifier");
-      return CountedRefData::extract(l, NULL, NONE);
-    }
-    return CountedRefData::construct(l, r);
-  }
-
-  // Case: replace assignment behind reference
-  return iiAssign(CountedRefData::cast(l).get(), r);
+  return CountedRefData::assign(l, r);
 }
                                                                      
 
@@ -201,38 +230,37 @@ BOOLEAN countedref_Assign(leftv l, leftv r)
 BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 {
   if(op == TYPEOF_CMD)
-    return CountedRefData::extract(res, omStrDup("reference"), STRING_CMD);
+    return CountedRefData::set_to(res, omStrDup("reference"), STRING_CMD);
 
-  return iiExprArith1(res, CountedRefData::cast(head).get(), op);
+  typedef CountedRefData::access access;
+  return iiExprArith1(res, access(head), op);
 }
 
 /// blackbox support - binary operations
 BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 {
-  return CountedRefData::cast(head)(op, res, arg);
+  typedef CountedRefData::access access;
+  return iiExprArith2(res, access(head), op, access(arg));
 }
 
 /// blackbox support - ternary operations
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
-   return CountedRefData::cast(head)(op, res, arg1, arg2);
+  typedef CountedRefData::access access;
+  return iiExprArith3(res, op, access(head), access(arg1), access(arg2));
 }
 
 
 /// blackbox support - n-ary operations
 BOOLEAN countedref_OpM(int op, leftv res, leftv args)
 {
-  return iiExprArithM(res, CountedRefData::cast(args, args->next).get(), op);
+  return iiExprArithM(res, CountedRefData::access(args), op);
 }
 
 /// blackbox support - destruction
 void countedref_destroy(blackbox *b, void* ptr)
 {
-  if (ptr) {
-    CountedRefData* pRef = static_cast<CountedRefData*>(ptr);
-    if(!pRef->release())
-      delete pRef;
-  }
+  CountedRefData::destroy(static_cast<CountedRefData*>(ptr));
 }
 
 void countedref_init() 
