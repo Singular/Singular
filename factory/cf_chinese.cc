@@ -20,10 +20,13 @@
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
-// NTL::negate conflict on some machines with std::negate (trac 437)
+// NTL::negate conflicts with std::negate (trac 437)
+// on sunos/gcc 3.3/3.4 NTL::negate yields an error
+// on other OS/other gcc: NTL::negate may be required
 // - do not know why: std::negate should not be known here
-// test for include of funtional (SunCC, GCC)
-#if defined(__STD_FUNCTIONAL__) || defined(_GLIBCXX_FUNCTIONAL)
+// test for GCC version
+//
+#if !defined(__GNUC__) || (__GNUC__ > 3)
 #define NTL_negate NTL::negate
 #else
 #define NTL_negate negate
