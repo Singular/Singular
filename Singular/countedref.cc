@@ -32,86 +32,28 @@
 #include "attrib.h"
 
 
-class CountedRef {
-  typedef CountedRef self;
+class CountedRefEnv {
+  typedef CountedRefEnv self;
 
-public:
-  typedef int id_type;
 
-  /// Set Singular type identitfier
-  CountedRef(blackbox& bbx) {  
-    CountedRefAccess_id() = setBlackboxStuff(&bbx, "reference");
-  }
-  CountedRef() { }
-
-  /// Get Singular type identitfier
-  static id_type id() { return CountedRefAccess_id(); }
-
-  /// Check for being reference in Singular interpreter object
-  static BOOLEAN is_ref(leftv arg) { return (arg->Typ() == id()); }
-private:
-  /// Access identifier (one per class)
-  static id_type& CountedRefAccess_id() {
-    static id_type g_id = 0;
-    return g_id;
-  }
 
 };
-/** @class CountedRefData
- * This class stores a reference counter as well as a Singular interpreter object.
- *
- * It also stores the Singular token number, once per type.
- **/
-class CountedRefData: public CountedRef {
-  typedef CountedRefData self;
 
-  /// Forbit copy construction and normal assignment
-  CountedRefData(const self&);
-  self& operator=(const self&);
+class RefCounter {
+  typedef RefCounter self;
 
-public:
+  /// Name numerical type for enumbering
   typedef unsigned long count_type;
 
-  /// Construct reference for Singular object
-  CountedRefData(leftv data): m_data(*data), m_count(0), m_ring(NULL) {
+public:
+  /// Default Constructor
+  RefCounter(): m_count(0) {}
 
-    if (RingDependend(data->Typ())  && (currRing != NULL) ) {
-      m_ring = currRing;
-      ++m_ring->ref;
-    }
-    if (data->e) {
-      m_data.e = (Subexpr)omAlloc0Bin(sSubexpr_bin);
-      memcpy(m_data.e, data->e, sizeof(*m_data.e));
-    }
-  }
+  /// Copying resets the counter
+  RefCounter(const self& rhs): m_count(0) {}
 
   /// Destructor
-  ~CountedRefData()  {
-    assume(m_count == 0);
-    if (m_data.e) omFree(m_data.e);
-    if (m_ring) --m_ring->ref;
-  }
-
-
-  static BOOLEAN set_to(leftv res, void* data, int op)
-  {
-    if (res->rtyp == IDHDL) {
-      IDDATA((idhdl)res->data) = (char *)data;
-      IDTYP((idhdl)res->data)  = op;
-    }
-    else {
-      res->data = (void *)data;
-      res->rtyp = op;
-    }
-    return (op == NONE? TRUE: FALSE);
-  }
-
-  static BOOLEAN construct(leftv result, leftv arg) {
-    self* pRef(is_ref(arg)? static_cast<self*>(arg->Data()): new self(arg));
-    pRef->reclaim();
-
-    return set_to(result, pRef, id());
-  }
+  ~RefCounter() { assume(m_count == 0); }
 
   /// @name Reference counter management
   //@{
@@ -120,118 +62,186 @@ public:
   count_type count() const { return m_count; }
   //@}
 
-  leftv get () { 
-    leftv result = (leftv)omAlloc0(sizeof(sleftv));
-    get(*result);
-    return result;
+private:
+  /// Number of references
+  count_type m_count;
+};
+
+class LeftvShallow {
+  typedef LeftvShallow self;
+
+public:
+  LeftvShallow(leftv data): m_data(*data) {  copy(&m_data.e, data->e); }
+  LeftvShallow(const self& rhs): m_data(rhs.m_data) { copy(&m_data.e, rhs.m_data.e); }
+
+  ~LeftvShallow() {  kill(m_data.e); }
+
+  BOOLEAN get(leftv result) {
+    leftv next = result->next;
+    result->next = NULL;
+    result->CleanUp();
+    memcpy(result, &m_data, sizeof(m_data));
+    copy(&result->e, m_data.e);
+    result->next = next;
+    return FALSE;
   }
 
-  void get(sleftv& result) {
+  /// Read-only access to object
+  const leftv operator->() { return &m_data; }
+
+private:
+  static void copy(Subexpr* result, Subexpr rhs) {
+    for (Subexpr* current = result; rhs != NULL; 
+         current = &(*current)->next, rhs = rhs->next)
+      *current = (Subexpr)memcpy(omAlloc0Bin(sSubexpr_bin), rhs, sizeof(*rhs));
+  }
+
+  static void kill(Subexpr rhs) {
+    for (Subexpr next; rhs!=NULL; rhs = next, next = rhs->next) {
+      next = rhs->next;
+      omFree(rhs);
+    }
+  }
+  sleftv m_data;
+};
+
+/** @class CountedRefData
+ * This class stores a reference counter as well as a Singular interpreter object.
+ *
+ * It also stores the Singular token number, once per type.
+ **/
+class CountedRefData:
+  public RefCounter {
+  typedef CountedRefData self;
+  typedef RefCounter base;
+
+  /// Forbit copy construction and normal assignment
+  CountedRefData(const self&);
+  self& operator=(const self&);
+
+public:
+  /// Construct reference for Singular object
+  CountedRefData(leftv data): base(), m_data(data), m_ring(NULL) {
+    if (RingDependend(data->Typ())  && (currRing != NULL) ) {
+      m_ring = currRing;
+      ++m_ring->ref;
+    }
+
+  }
+
+  static idhdl* id_root;
+
+  /// Destructor
+  ~CountedRefData()  { }
+
+  BOOLEAN get(leftv result) {
     if (m_ring && (m_ring != currRing)) {
       Werror("Can only use references from current ring.");
-      return;
+      return TRUE;
     }
-    leftv next = result.next;
-    memcpy(&result, &m_data, sizeof(sleftv));
-    result.next = next;
+    // dereferencing only makes sense, if something else points here, too.
+    assume(count() > 1);
+    return m_data.get(result);
+  }
+
+  LeftvShallow get() {
+    if (m_ring && (m_ring != currRing))
+      Werror("Can only use references from current ring.");
+  
+    return LeftvShallow(m_data);
   }
 
 private:
-  /// Reference counter
-  count_type m_count;
 
   /// Singular object
-  sleftv m_data;
+  LeftvShallow m_data;
 
   /// Store ring for ring-dependent objects
   ring m_ring;
 };
 
-class CountedRefAccessBase {
-  typedef CountedRefAccessBase self;
-
- public:
-  CountedRefAccessBase(leftv data):
-    m_data(data) {}
-
-  CountedRefAccessBase(const self& rhs):
-    m_data(rhs.m_data) {}
-
-  ~CountedRefAccessBase() {}
-
-  leftv operator->() { return *this; }
-  operator leftv() {  return m_data;  }
-
- protected:
-   leftv m_data;
- };
-
-
- class CountedRefAccess:
-   public CountedRefAccessBase {
-    typedef CountedRefAccess self;
-    typedef CountedRefAccessBase base;
-
-  public:
-    CountedRefAccess(CountedRefData* data):
-      m_owns(true), base(data->get())  { }
-
-
-    CountedRefAccess(leftv data):
-      m_owns(CountedRef::is_ref(data)), base(data) {
-      if (m_owns) m_data = static_cast<CountedRefData*>(data->Data())->get();
-    }
-
-    CountedRefAccess(const self& rhs):
-      m_owns(rhs.m_owns), base(rhs) {
-
-      if (m_owns){
-        m_data = (leftv)omAlloc0(sizeof(sleftv));
-        if(rhs.m_data != NULL) memcpy(m_data, rhs.m_data, sizeof(sleftv));
-      }
-    }
-
-    ~CountedRefAccess() {  if (m_owns) omFree(m_data);  }
-
-  private:
-    bool m_owns;
-};
-
-class CountedRefCast:
-  public CountedRefAccessBase {
-    typedef CountedRefCast self;
-    typedef CountedRefAccessBase base;
-  public:
-    CountedRefCast(void* data):
-      base(static_cast<CountedRefData*>(data)->get()) { }
-
-    CountedRefCast(leftv data):
-      base(static_cast<CountedRefData*>(data->Data())->get()) { }
-
-    CountedRefCast(const self& rhs):
-      base((leftv)omAlloc0(sizeof(sleftv))) {
-      memcpy(m_data, rhs.m_data, sizeof(sleftv));
-    }
-
-    ~CountedRefCast() {  omFree(m_data);  }
-};
-
 /// blackbox support - initialization
+/// @note deals as marker for compatible references, too.
 void* countedref_Init(blackbox*)
 {
   return NULL;
 }
 
+class CountedRef {
+  typedef CountedRef self;
+
+public:
+  /// name type for identifiers
+  typedef int id_type;
+
+  /// Name type for handling reference data
+  typedef CountedRefData data_type;
+
+  /// Check whether argument is already a reference type
+  static BOOLEAN is_ref(int typ) {
+    return ((typ > MAX_TOK) &&
+           (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
+  }
+
+  /// Construct reference data object from 
+  static BOOLEAN construct(leftv result, leftv arg) {
+    data_type* data = (result->Typ() == arg->Typ()? 
+                       static_cast<data_type*>(arg->Data()): new data_type(arg));
+    data->reclaim();
+    if (result->rtyp == IDHDL)
+      IDDATA((idhdl)result->data) = (char *)data;
+    else
+      result->data = (void *)data;
+    return (data == NULL? TRUE: FALSE);
+  }
+
+  /// Kills the link to the referenced object
+  static void destruct(data_type* data) {
+    if(data && !data->release()) {
+      delete data;
+    }
+  }
+
+  /// Get the actual object
+  /// @note It may change leftv. It is common practice, so we are fine with it.
+  static BOOLEAN dereference(leftv arg) {
+    assume((arg != NULL) && is_ref(arg->Typ()));
+    do {
+      assume(arg->Data() != NULL);
+      data_type* data = static_cast<data_type*>(arg->Data());
+      if(data->get(arg)) return TRUE;
+    } while (is_ref(arg->Typ()));
+    return resolve_tail(arg);
+  }
+
+  /// If necessary dereference.
+  /// @note The may change leftv. It is common practice, so we are fine with it.
+  static BOOLEAN resolve(leftv arg) {
+    assume(arg != NULL);
+    while (is_ref(arg->Typ())) { if(dereference(arg)) return TRUE; };
+    return resolve_tail(arg);
+  }
+
+private:
+  /// Dereference (is needed) subsequent objects of sequences
+  static BOOLEAN resolve_tail(leftv arg) {
+    for(leftv next = arg->next; next != NULL; next = next->next)
+      if(resolve(next))
+        return TRUE;
+    return FALSE;
+  }
+};
+
 /// blackbox support - convert to string representation
 void countedref_Print(blackbox *b, void* ptr)
 {
-  if (ptr != NULL) CountedRefCast(ptr)->Print();
+  if (ptr != NULL) static_cast<CountedRefData*>(ptr)->get()->Print();
 }
 
 /// blackbox support - convert to string representation
 char* countedref_String(blackbox *b, void* ptr)
 {
-  if (ptr != NULL) return CountedRefCast(ptr)->String();
+  if (ptr != NULL) return static_cast<CountedRefData*>(ptr)->get()->String();
 }
 
 /// blackbox support - copy element
@@ -245,70 +255,101 @@ void* countedref_Copy(blackbox*b, void* ptr)
 BOOLEAN countedref_Assign(leftv result, leftv arg)
 {
   // Case: replace assignment behind reference
-  if (result->Data() != NULL)
-    return iiAssign(CountedRefCast(result), CountedRefAccess(arg));
+  if (result->Data() != NULL) 
+    return CountedRef::dereference(result) || CountedRef::resolve(arg) ||
+      iiAssign(result, arg);
   
   // Case: new reference
   if(arg->rtyp == IDHDL) 
-    return CountedRefData::construct(result, arg);
+    return CountedRef::construct(result, arg);
   
   Werror("Can only take reference from identifier");
-  return CountedRefData::set_to(result, NULL, NONE);
+  return FALSE;
 }
                                                                      
-
 /// blackbox support - unary operations
 BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 {
   if(op == TYPEOF_CMD)
-    return CountedRefData::set_to(res, omStrDup("reference"), STRING_CMD);
+    return blackboxDefaultOp1(op, res, head);
 
-  CountedRefCast value(head);
-  if (op == DEF_CMD){
-    res->rtyp = value->Typ();
-    return iiAssign(res, value);
-  }
-  return iiExprArith1(res, value, op);
+  return CountedRef::dereference(head) || 
+    iiExprArith1(res, head, (op == DEF_CMD? head->Typ(): op));
 }
 
 /// blackbox support - binary operations
 BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 {
-  return iiExprArith2(res, CountedRefCast(head), op, CountedRefAccess(arg));
+  return CountedRef::dereference(head) || CountedRef::resolve(arg) ||
+    iiExprArith2(res, head, op, arg);
 }
 
 /// blackbox support - ternary operations
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
-  return iiExprArith3(res, op, CountedRefCast(head), 
-                      CountedRefAccess(arg1), CountedRefAccess(arg2));
+  return CountedRef::dereference(head) || 
+    CountedRef::resolve(arg1) || CountedRef::resolve(arg2) ||
+    iiExprArith3(res, op, head, arg1, arg2);
 }
 
 
 /// blackbox support - n-ary operations
 BOOLEAN countedref_OpM(int op, leftv res, leftv args)
 {
-  CountedRefCast value(args);
-  value->next = args->next;
-  for(leftv current = args->next; current != NULL; current = current->next) {
-    if(CountedRef::is_ref(current)) {
-      CountedRefData* pRef = static_cast<CountedRefData*>(current->Data());
-      pRef->get(*current);
-      pRef->release();
-      assume(pRef->count() > 0);
-    }  
-  }
-  args->next = NULL;
-
-  return iiExprArithM(res, value, op);
+  return CountedRef::dereference(args) || iiExprArithM(res, args, op);
 }
 
 /// blackbox support - destruction
 void countedref_destroy(blackbox *b, void* ptr)
 {
-  CountedRefData* pRef = static_cast<CountedRefData*>(ptr);
-  if(ptr && !pRef->release())
-    delete pRef;
+  CountedRef::destruct(static_cast<CountedRefData*>(ptr));
+}
+
+
+/// blackbox support - assign element
+BOOLEAN countedref_AssignShared(leftv result, leftv arg)
+{
+  // Case: replace assignment behind reference
+  if (result->Data() != NULL)
+    return CountedRef::dereference(result) || CountedRef::resolve(arg) ||
+      iiAssign(result, arg);
+  
+  
+  if(CountedRef::resolve(arg))
+    return TRUE;
+
+  char* name=(char*)omAlloc0(512);
+  static unsigned long counter = 0;
+  do {
+    sprintf(name, "_shareddata_%s_%s_%d\0", result->Name(), arg->Name(), ++counter);
+  }
+  while(ggetid(name));
+  idhdl handle = enterid(name, 0, arg->Typ(), &IDROOT, FALSE);
+  omFree(name);
+  if (handle==NULL) {
+    Werror("Initializing shared failed");
+    return TRUE;
+  }
+  
+  IDDATA(handle) = (char*)arg->CopyD();
+  arg->data = handle;
+  arg->rtyp = IDHDL;
+  
+  return CountedRef::construct(result, arg);
+}
+
+/// blackbox support - destruction
+void countedref_destroyShared(blackbox *b, void* ptr)
+{
+  CountedRefData* data = static_cast<CountedRefData*>(ptr);
+
+  if(data && !data->release()) {
+    leftv tmp = (leftv) omAlloc0(sizeof(*tmp));
+    data->get(tmp);
+    killid(IDID((idhdl)(tmp->data)), &IDROOT);
+    delete data;
+  }
+
 }
 
 void countedref_init() 
@@ -325,7 +366,13 @@ void countedref_init()
   bbx->blackbox_Op3     = countedref_Op3;
   bbx->blackbox_OpM     = countedref_OpM;
   bbx->data             = omAlloc0(newstruct_desc_size());
-  CountedRef init(*bbx);
+  setBlackboxStuff(bbx, "reference");
+
+  blackbox *bbxshared = 
+    (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
+  bbxshared->blackbox_Assign  = countedref_AssignShared;
+  bbxshared->blackbox_destroy = countedref_destroyShared;
+  setBlackboxStuff(bbxshared, "shared");
 }
 
 #ifdef HAVE_DYNAMIC_COUNTEDREF
