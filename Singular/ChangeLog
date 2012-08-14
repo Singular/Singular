@@ -1,7 +1,8 @@
 Changes since 3-1-5
 - fixed factorization
 - extgcd, chinrem extended
-- change paraplancures.lib
+- changed paraplancures.lib,
+          aksaka.lib,atkins.lib,crypto.lib (int/number div/mod/%)
 
 2012-07-12 
 Release 3-1-5

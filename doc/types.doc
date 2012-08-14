@@ -150,6 +150,7 @@ See
 @cindex *
 @cindex /
 @cindex ^
+@cindex %
 
 @c remark: the following table should have style @asis, since the
 @c   commas below should not by set in style @code.
@@ -162,8 +163,8 @@ negation or subtraction
 multiplication
 @item @code{div}
 integer division (omitting the remainder >= 0)
-@item @code{mod}
-integer modulo (the remainder of the division @code{div}), always non-negative
+@item @code{mod}, @code{%}
+integer modulo (the remainder of the division @code{div})
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
@@ -787,7 +788,7 @@ an identifier of type int
 a function returning int
 @item
 an expression involving ints and the arithmetic operations
-@code{+}, @code{-}, @code{*}, @code{div}, @code{/},
+@code{+}, @code{-}, @code{*}, @code{div} (@code{/}),
 @code{%} (@code{mod}), or @code{^}
 @item a boolean expression
 @item
@@ -870,14 +871,10 @@ addition
 negation or subtraction
 @item @code{*}
 multiplication
-@item @code{/}
+@item @code{div}, @code{/}
 integer division (omitting the remainder), rounding toward 0
-@item @code{div}
-integer division (omitting the remainder >= 0)
-@item @code{%}
-integer modulo (the remainder of the division @code{/})
-@item @code{mod}
-integer modulo (the remainder of the division @code{div}), always non-negative
+@item @code{%}, @code{mod}
+integer modulo (the remainder of the division
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
