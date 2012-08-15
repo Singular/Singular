@@ -545,42 +545,6 @@ evaluationWRTDifferentSecondVars (
                     const CanonicalForm& A   ///<[in] some poly
                                  );
 
-/// evaluate F successively n-2 at 0
-///
-/// @return returns a list of successive evaluations of F, ending with F
-CFList evaluateAtZero (const CanonicalForm& F ///< [in] some poly
-                      );
-
-/// divides factors by their content wrt. Variable(1) and checks if these polys
-/// divide F
-///
-/// @return returns factors of F
-CFList recoverFactors (const CanonicalForm& F, ///< [in] some poly F
-                       const CFList& factors   ///< [in] some list of
-                                               ///< factor candidates
-                      );
-
-/// divides factors shifted by evaluation by their content wrt. Variable(1) and 
-/// checks if these polys divide F
-///
-/// @return returns factors of F
-CFList recoverFactors (const CanonicalForm& F,  ///< [in] some poly F
-                       const CFList& factors,   ///< [in] some list of
-                                                ///< factor candidates
-                       const CFList& evaluation ///< [in] evaluation point
-                      );
-
-/// checks if factors divide F, if so F is divided by this factor and the factor
-/// is divided by its content wrt. Variable(1) and the entry in index at the
-/// position of the factor is set to 1, otherwise the entry in index is set to 0
-///
-/// @return returns factors of F
-CFList recoverFactors (CanonicalForm& F,     ///< [in,out] some poly F
-                       const CFList& factors,///< [in] some list of
-                                             ///< factor candidates
-                       int* index            ///< [in] position of real factors
-                      );
-
 /// refine a bivariate factorization of A with l factors to one with
 /// minFactorsLength
 void
@@ -673,25 +637,6 @@ gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
               CFFList& factors2  ///< [in,out] list of factors, returns gcd free
                                  ///< factors
              );
-
-/// evaluate @a F at @a evaluation
-///
-/// @return @a evaluateAtEval returns a list containing the successive 
-/// evaluations of @a F, last entry is @a F again
-CFList
-evaluateAtEval (const CanonicalForm& F,   ///<[in] some poly
-                const CFArray& evaluation ///<[in] some evaluation point
-               );
-
-/// evaluate @a F at @a evaluation
-///
-/// @return @a evaluateAtEval returns a list containing the successive
-/// evaluations of @a F starting at level @a l, last entry is @a F again
-CFList
-evaluateAtEval (const CanonicalForm& F,  ///<[in] some poly
-                const CFList& evaluation,///<[in] some evaluation point
-                int l                    ///<[in] level to start at
-               );
 
 #endif
 
