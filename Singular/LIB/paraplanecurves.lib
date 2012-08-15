@@ -25,7 +25,7 @@ closure of C[x] in C(x,y) using the  normalization algorithm from
 @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the
 library, also van Hoeij's algorithm for computing the integral basis will
 be available. @*
->From the integral basis, the adjoint ideal is obtained by linear algebra.
+From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -254,7 +254,7 @@ and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the normalization algorithm from @ref{normal_lib}:
 see @ref{integralbasis_lib}. In a future edition of the library, also van Hoeij's
 algorithm for computing the integral basis will be available. @*
->From the integral basis, the adjoint ideal is obtained by linear algebra.
+From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -485,7 +485,7 @@ transcendental and y as algebraic and computes an integral basis in C(x)[y] of
 the integral closure of C[x] in C(x,y) using the normalization algorithm
 from @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the library,
 also van Hoeij's algorithm for computing the integral basis will be available.@*
->From the integral basis, the adjoint ideal is obtained by linear algebra.
+From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
