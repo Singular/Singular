@@ -411,7 +411,17 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           CFList result;
           result.append (LCF);
           for (int j= 1; j <= factors.length(); j++)
-            result.append (LCF);
+            result.append (1);
+          result= distributeContent (result, differentSecondVarLCs, length);
+          if (!result.getFirst().inCoeffDomain())
+          {
+            CFListIterator iter= result;
+            CanonicalForm tmp= iter.getItem();
+            iter++;
+            for (; iter.hasItem(); iter++)
+              iter.getItem() *= tmp;
+          }
+
           y= Variable (1);
           delete [] bufSqrfFactors;
           return result;
