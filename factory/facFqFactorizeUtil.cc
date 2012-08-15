@@ -246,6 +246,8 @@ CFList recoverFactors (const CanonicalForm& F, const CFList& factors)
       result.append (tmp);
     }
   }
+  if (result.length() + 1 == factors.length())
+    result.append (G/content (G,1));
   return result;
 }
 
@@ -265,6 +267,8 @@ CFList recoverFactors (const CanonicalForm& F, const CFList& factors,
       result.append (tmp);
     }
   }
+  if (result.length() + 1 == factors.length())
+    result.append (G/content (G,1));
   return result;
 }
 
@@ -292,6 +296,12 @@ CFList recoverFactors (CanonicalForm& F, const CFList& factors, int* index)
     else
       index[j]= 0;
   }
-  F= G;
+  if (result.length() + 1 == factors.length())
+  {
+    result.append (G/content (G,1));
+    F= G/content (G,1);
+  }
+  else
+    F= G;
   return result;
 }
