@@ -2604,6 +2604,40 @@ number nlFarey(number nN, number nP, const coeffs r)
   return z;
 }
 
+number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
+{
+  mpz_t aa,bb;
+  *s=ALLOC_RNUMBER();
+  mpz_init((*s)->z); (*s)->s=3;
+  (*t)=ALLOC_RNUMBER();
+  mpz_init((*t)->z); (*t)->s=3;
+  number g=ALLOC_RNUMBER();
+  mpz_init(g->z); g->s=3;
+  if (SR_HDL(a) & SR_INT)
+  {
+    mpz_init_set_si(aa,SR_TO_INT(a));
+  }
+  else
+  {
+    mpz_init_set(aa,a->z);
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    mpz_init_set_si(bb,SR_TO_INT(b));
+  }
+  else
+  {
+    mpz_init_set(bb,b->z);
+  }
+  mpz_gcdext(g->z,(*s)->z,(*t)->z,aa,bb);
+  mpz_clear(aa);
+  mpz_clear(bb);
+  (*s)=nlShort3((*s));
+  (*t)=nlShort3((*t));
+  g=nlShort3(g);
+  return g;
+}
+
 void    nlCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
   PrintS("//   characteristic : 0\n");
@@ -2815,7 +2849,6 @@ BOOLEAN nlInitChar(coeffs r, void*)
   //r->cfDivComp = NULL; // only for ring stuff
   //r->cfIsUnit = NULL; // only for ring stuff
   //r->cfGetUnit = NULL; // only for ring stuff
-  //r->cfExtGcd = NULL; // only for ring stuff
   //r->cfDivBy = NULL; // only for ring stuff
   #endif
   r->cfNeg   = nlNeg;
@@ -2836,6 +2869,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
   r->cfGcd  = nlGcd;
+  r->cfExtGcd = nlExtGcd; // only for ring stuff and Z
   r->cfLcm  = nlLcm;
   r->cfDelete= nlDelete;
   r->cfSetMap = nlSetMap;

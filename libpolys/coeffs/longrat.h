@@ -64,6 +64,7 @@ number   nlInit2gmp (mpz_t i, mpz_t j);
 // void nlMPZ(mpz_t m, number &n, const coeffs r);
 
 number   nlGcd(number a, number b, const coeffs r);
+number nlExtGcd(number a, number b, number *s, number *t, const coeffs);
 number   nlLcm(number a, number b, const coeffs r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b, const coeffs r);
 BOOLEAN  nlIsMOne(number a, const coeffs r);

@@ -142,7 +142,6 @@ struct n_Procs_s
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
    number  (*cfGetUnit)(number a,const coeffs r);
-   number  (*cfExtGcd)(number a, number b, number *s, number *t,const coeffs r);
 #endif
 
    /// changes argument  inline: a:= -a
@@ -180,6 +179,7 @@ struct n_Procs_s
    number  (*cfGetDenom)(number &n, const coeffs r);
    number  (*cfGetNumerator)(number &n, const coeffs r);
    number  (*cfGcd)(number a, number b, const coeffs r);
+   number  (*cfExtGcd)(number a, number b, number *s, number *t,const coeffs r);
    number  (*cfLcm)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);

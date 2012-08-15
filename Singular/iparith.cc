@@ -1974,6 +1974,20 @@ static BOOLEAN jjERROR(leftv, leftv u)
   inerror=3;
   return TRUE;
 }
+static BOOLEAN jjEXTGCD_BI(leftv res, leftv u, leftv v)
+{
+  number uu=(number)u->Data();number vv=(number)v->Data();
+  lists L=(lists)omAllocBin(slists_bin);
+  number a,b;
+  number p0=n_ExtGcd(uu,vv,&a,&b,coeffs_BIGINT);
+  L->Init(3);
+  L->m[0].rtyp=BIGINT_CMD;   L->m[0].data=(void *)p0;
+  L->m[1].rtyp=BIGINT_CMD;   L->m[1].data=(void *)a;
+  L->m[2].rtyp=BIGINT_CMD;   L->m[2].data=(void *)b;
+  res->rtyp=LIST_CMD;
+  res->data=(char *)L;
+  return FALSE;
+}
 static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 {
   int uu=(int)(long)u->Data();int vv=(int)(long)v->Data();
