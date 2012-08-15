@@ -1768,13 +1768,15 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
   CanonicalForm tmp;
   CFList tmp2;
   CFListIterator iter;
+  bool preserveDegree= true;
+  int j;
   for (int i= A.level(); i > 2; i--)
   {
     tmp= A;
     tmp2= CFList();
     iter= evaluation;
-    bool preserveDegree= true;
-    for (int j= A.level(); j > 1; j--, iter++)
+    preserveDegree= true;
+    for (j= A.level(); j > 1; j--, iter++)
     {
       if (j == i)
         continue;
@@ -2525,7 +2527,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   int minFactorsLength;
   bool irred= false;
-  factorizationWRTDifferentSecondVars (A, Aeval2, info, minFactorsLength, irred);
+  factorizationWRTDifferentSecondVars (A, Aeval2, info, minFactorsLength,irred);
 
   if (irred)
   {
@@ -2561,7 +2563,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     if (!zeroOccured)
     {
-      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation, minFactorsLength);
+      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation,
+                                minFactorsLength);
       if (factors.length() == biFactors.length())
       {
         if (extension)
@@ -2791,7 +2794,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     i++;
 
     for (; i.hasItem(); i++)
-      lift= tmax (lift, degree (i.getItem(), 2) + degree (LC (i.getItem(), 1)) + 1);
+      lift= tmax (lift,
+                  degree (i.getItem(), 2) + degree (LC (i.getItem(), 1)) + 1);
 
     lift= tmax (degree (Aeval.getFirst() , 2) + 1, lift);
 
