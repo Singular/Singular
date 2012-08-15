@@ -161,4 +161,30 @@ bool isOnlyLeadingCoeff (const CanonicalForm& F)
   return (F-LC (F,1)*power (Variable(1),degree (F,1))).isZero();
 }
 
+/// like getVars but including multiplicities
+CanonicalForm myGetVars (const CanonicalForm& F)
+{
+  CanonicalForm result= 1;
+  int deg;
+  for (int i= 1; i <= F.level(); i++)
+  {
+    if ((deg= degree (F, i)) > 0)
+      result *= power (Variable (i), deg);
+  }
+  return result;
+}
+
+int compareByNumberOfVars (const CFFactor& F, const CFFactor& G)
+{
+  return getNumVars (F.factor()) < getNumVars (G.factor());
+}
+
+CFFList
+sortCFFListByNumOfVars (CFFList& F)
+{
+    F.sort (compareByNumberOfVars);
+    CFFList result= F;
+    return result;
+}
+
 
