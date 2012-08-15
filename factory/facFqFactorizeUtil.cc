@@ -14,6 +14,7 @@
 
 #include "canonicalform.h"
 #include "cf_map.h"
+#include "cf_algorithm.h"
 
 static inline
 void appendSwap (CFList& factors1, const CFList& factors2, const int
@@ -187,4 +188,111 @@ sortCFFListByNumOfVars (CFFList& F)
     return result;
 }
 
+CFList evaluateAtZero (const CanonicalForm& F)
+{
+  CFList result;
+  CanonicalForm buf= F;
+  result.insert (buf);
+  for (int i= F.level(); i > 2; i--)
+  {
+    buf= buf (0, i);
+    result.insert (buf);
+  }
+  return result;
+}
 
+CFList evaluateAtEval (const CanonicalForm& F, const CFArray& eval)
+{
+  CFList result;
+  CanonicalForm buf= F;
+  result.insert (buf);
+  int k= eval.size();
+  for (int i= 1; i < k; i++)
+  {
+    buf= buf (eval[i], i + 2);
+    result.insert (buf);
+  }
+  return result;
+}
+
+CFList evaluateAtEval (const CanonicalForm& F, const CFList& evaluation, int l)
+{
+  CFList result;
+  CanonicalForm buf= F;
+  result.insert (buf);
+  int k= evaluation.length() + l - 1;
+  CFListIterator j= evaluation;
+  for (int i= k; j.hasItem() && i > l; i--, j++)
+  {
+    if (F.level() < i)
+      continue;
+    buf= buf (j.getItem(), i);
+    result.insert (buf);
+  }
+  return result;
+}
+
+
+CFList recoverFactors (const CanonicalForm& F, const CFList& factors)
+{
+  CFList result;
+  CanonicalForm tmp, tmp2;
+  CanonicalForm G= F;
+  for (CFListIterator i= factors; i.hasItem(); i++)
+  {
+    tmp= i.getItem()/content (i.getItem(), 1);
+    if (fdivides (tmp, G, tmp2))
+    {
+      G= tmp2;
+      result.append (tmp);
+    }
+  }
+  return result;
+}
+
+CFList recoverFactors (const CanonicalForm& F, const CFList& factors,
+                       const CFList& evaluation)
+{
+  CFList result;
+  CanonicalForm tmp, tmp2;
+  CanonicalForm G= F;
+  for (CFListIterator i= factors; i.hasItem(); i++)
+  {
+    tmp= reverseShift (i.getItem(), evaluation, 2);
+    tmp /= content (tmp, 1);
+    if (fdivides (tmp, G, tmp2))
+    {
+      G= tmp2;
+      result.append (tmp);
+    }
+  }
+  return result;
+}
+
+CFList recoverFactors (CanonicalForm& F, const CFList& factors, int* index)
+{
+  CFList result;
+  CanonicalForm tmp, tmp2;
+  CanonicalForm G= F;
+  int j= 0;
+  for (CFListIterator i= factors; i.hasItem(); i++, j++)
+  {
+    if (i.getItem().isZero())
+    {
+      index[j]= 0;
+      continue;
+    }
+    tmp= i.getItem();
+    if (fdivides (tmp, G, tmp2))
+    {
+      G= tmp2;
+      tmp /=content (tmp, 1);
+      result.append (tmp);
+      index[j]= 1;
+    }
+    else
+      index[j]= 0;
+  }
+  F= G;
+  return result;
+}
