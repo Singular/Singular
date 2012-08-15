@@ -1,3 +1,11 @@
+#ifndef POLYMAKE_CONVERSION_H
+#define POLYMAKE_CONVERSION_H
+
+#include <kernel/mod2.h>
+#include <Singular/mod2.h>
+
+#ifdef HAVE_FANS
+
 #include <gmpxx.h>
 
 #include <polymake/Main.h>
@@ -6,26 +14,11 @@
 #include <polymake/Integer.h>
 #include <polymake/Set.h>
 #include <polymake/common/lattice_tools.h>
-// #include <polymake/perl/macros.h>
-// #include <polymake/IncidenceMatrix.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include <kernel/mod2.h>
-/* #include <kernel/structs.h> */
-/* #include <kernel/febase.h> */
 #include <kernel/intvec.h>
-
-/* #include <callgfanlib/bbcone.h> */
-/* #include <callgfanlib/bbfan.h> */
-/* #include <callgfanlib/bbpolytope.h> */
-
-/* #include <Singular/blackbox.h> */
-/* #include <Singular/ipshell.h> */
-/* #include <Singular/subexpr.h> */
-/* #include <Singular/tok.h> */
-
 
 /* Functions for converting Integers, Rationals and their Matrices 
    in between C++, gfan, polymake and singular */
@@ -67,3 +60,6 @@ gfan::ZFan* PmFan2ZFan (polymake::perl::Object* pf);
 polymake::perl::Object* ZCone2PmCone (gfan::ZCone* zc);
 polymake::perl::Object* ZPolytope2PmPolytope (gfan::ZCone* zc);
 polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf);
+
+#endif
+#endif

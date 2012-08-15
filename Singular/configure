@@ -8730,7 +8730,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking gfanlib" >&5
 $as_echo_n "checking gfanlib... " >&6; }
-if test "$enable_gfanlib" = yes; then
+if test "$enable_gfanlib" = yes -o "$enable_polymake" = yes; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   $as_echo "#define HAVE_FANS 1" >>confdefs.h
