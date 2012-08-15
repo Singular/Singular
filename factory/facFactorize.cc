@@ -902,6 +902,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   }
 
   CanonicalForm LCmultiplier= leadingCoeffs.getFirst();
+  bool LCmultiplierIsConst= LCmultiplier.inCoeffDomain();
   leadingCoeffs.removeFirst();
 
   //prepare leading coefficients
@@ -920,7 +921,11 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   A /= hh;
 
   CFListIterator iter2;
+  CFList bufLeadingCoeffs2= leadingCoeffs2[A.level()-3];
+  bufBiFactors= biFactors;
+  bufA= A;
   CFList bufFactors= CFList();
+  bool LCheuristic= false;
   if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
                                 factors))
   {
@@ -972,6 +977,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     }
     else if (!LCmultiplier.inCoeffDomain() && factors.length() == 0)
     {
+      LCheuristic= true;
       factors= oldFactors;
       CanonicalForm cont;
       CFList contents, LCs;
@@ -1070,7 +1076,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                 iter.getItem()= 1;
                 break;
               }
-              else //factor is consists of just leading coeff
+              else //factor consists of just leading coeff
               {
                 CanonicalForm vars=getVars (iter.getItem());
                 CanonicalForm factor;
@@ -1083,7 +1089,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                   xx= oldAeval[i].getFirst().mvar();
                   factor= LC (getItem (oldAeval[i], index),1);
                   if ((factor.inCoeffDomain() && degree (vars,xx) > 0) ||
-                      (degree (factor,xx) > 0 && degree (vars,xx) < 0)) //scan for bivariate factors with leading coeff that does not contain variables which occur in LCmultiplier
+                      (degree (factor,xx) > 0 && degree (vars,xx) <= 0)) //scan for bivariate factors with leading coeff that does not contain variables which occur in LCmultiplier
                   {
                     oneVariableNotInCommon= true;
                     break;
@@ -1168,6 +1174,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     delete [] index;
   }
 
+tryAgainWithoutHeu:
   //shifting to zero
   A= shift2Zero (A, Aeval, evaluation);
 
@@ -1253,6 +1260,17 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   }
   if (noOneToOne)
   {
+    if (!LCmultiplierIsConst && LCheuristic)
+    {
+      A= bufA;
+      biFactors= bufBiFactors;
+      leadingCoeffs2[A.level()-3]= bufLeadingCoeffs2;
+      delete [] liftBounds;
+      LCheuristic= false;
+      goto tryAgainWithoutHeu;
+      //something probably went wrong in the heuristic
+    }
+
     A= shift2Zero (oldA, Aeval, evaluation);
     biFactors= oldBiFactors;
     for (iter= biFactors; iter.hasItem(); iter++)
