@@ -125,6 +125,14 @@ CanonicalForm reverseShift (const CanonicalForm& F,  ///< [in] a compressed poly
 bool isOnlyLeadingCoeff (const CanonicalForm& F ///< [in] some poly
                         );
 
+/// sort CFFList by the number variables in a factor
+CFFList sortCFFListByNumOfVars (CFFList & F ///< [in,out] a list of factors
+                               );
+
+/// like getVars but each variable x occuring in @F is raised to x^degree (F,x)
+CanonicalForm myGetVars (const CanonicalForm& F ///< [in] a polynomial
+                        );
+
 #endif
 /* FAC_FQ_FACTORIZE_UTIL_H */
 
