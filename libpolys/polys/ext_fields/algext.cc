@@ -393,9 +393,13 @@ number naDiv(number a, number b, const coeffs cf)
   if (b == NULL) WerrorS(nDivBy0);
   if (a == NULL) return NULL;
   poly bInverse = (poly)naInvers(b, cf);
-  poly aDivB = p_Mult_q(p_Copy((poly)a, naRing), bInverse, naRing);
-  definiteReduce(aDivB, naMinpoly, cf);
-  return (number)aDivB;
+  if(bInverse != NULL) // b is non-zero divisor!
+  {
+    poly aDivB = p_Mult_q(p_Copy((poly)a, naRing), bInverse, naRing);
+    definiteReduce(aDivB, naMinpoly, cf);
+    return (number)aDivB;
+  }
+  return NULL;
 }
 
 /* 0^0 = 0;
@@ -654,13 +658,23 @@ number naInvers(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL) WerrorS(nDivBy0);
+  
   poly aFactor = NULL; poly mFactor = NULL;
   poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
+  
   naTest((number)theGcd); naTest((number)aFactor); naTest((number)mFactor);
-  /* the gcd must be 1 since naMinpoly is irreducible and a != NULL: */
-  assume(naIsOne((number)theGcd, cf));
-  p_Delete(&theGcd, naRing);
   p_Delete(&mFactor, naRing);
+  
+  //  /* the gcd must be 1 since naMinpoly is irreducible and a != NULL: */
+  //  assume(naIsOne((number)theGcd, cf)); 
+
+  if( !naIsOne((number)theGcd, cf) )
+  {  
+    WerrorS("zero divisor found - your minpoly is not irreducible");
+    p_Delete(&aFactor, naRing); aFactor = NULL;
+  }
+  p_Delete(&theGcd, naRing);
+
   return (number)(aFactor);
 }
 
