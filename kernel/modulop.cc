@@ -62,10 +62,9 @@ number npMult (number a,number b)
 */
 number npInit (int i, const ring r)
 {
-  long ii=i;
   long p=(long)ABS(r->ch);
-  while (ii <  0L)             ii += p;
-  while ((ii>1L) && (ii >= p)) ii -= p;
+  long ii=i%p;
+  if (ii <  0L)             ii += p;
   return (number)ii;
 }
 
