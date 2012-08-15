@@ -83,10 +83,9 @@ number npMult (number a,number b, const coeffs r)
 */
 number npInit (long i, const coeffs r)
 {
-  long ii=i;
-  while (ii <  0L)                         ii += (long)r->ch;
-  while ((ii>1L) && (ii >= ((long)r->ch))) ii -= (long)r->ch;
-  
+  long ii=i % (long)r->ch;
+  if (ii <  0L)                         ii += (long)r->ch;
+
   number c = (number)ii;
   assume( n_Test(c, r) );
   return c;
