@@ -8447,6 +8447,8 @@ int IsCmd(const char *n, int & tok)
 }
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 {
+  // user defined types are not in the pre-computed table:
+  if (op>MAX_TOK) return 0;
   int a=0;
   int e=len;
   int p=len/2;
@@ -8459,6 +8461,7 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
   }
   while ( a <= e);
 
+  // catch missing a cmd;
   assume(0);
   return 0;
 }
