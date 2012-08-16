@@ -36,6 +36,13 @@ template class ListIterator<MapPair>;
 template class Matrix<CanonicalForm>;
 template class SubMatrix<CanonicalForm>;
 template class Array<REvaluation>;
+// libfac:
+template class List<Variable>;
+template class ListIterator<Variable> ;
+
+template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
+template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
+
 //}}}
 
 //{{{ explicit template function instantiations

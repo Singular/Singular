@@ -3,11 +3,11 @@
 ////////////////////////////////////////////////////////////
 
 
-#include <templates/ftmpl_array.cc>
-#include <templates/ftmpl_factor.cc>
-#include <templates/ftmpl_list.cc>
-#include <templates/ftmpl_functions.h>
-#include <templates/ftmpl_matrix.cc>
+//#include <templates/ftmpl_array.cc>
+//#include <templates/ftmpl_factor.cc>
+#include <templates/ftmpl_list.h>
+//#include <templates/ftmpl_functions.h>
+//#include <templates/ftmpl_matrix.cc>
 
 #include <factory.h>
 
@@ -70,11 +70,6 @@ template OSTREAM & operator << ( OSTREAM &, const List<IntList> & );
 // for charsets:
 template class List<CFList>;
 template class ListIterator<CFList>;
-template class List<Variable>;
-template class ListIterator<Variable> ;
-
-template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
-template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
 #ifndef NOSTREAMIO
 template OSTREAM & operator << ( OSTREAM &, const List<CFList> & );
