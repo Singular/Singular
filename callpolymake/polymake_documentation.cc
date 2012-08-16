@@ -4,6 +4,7 @@
 #include <callgfanlib/bbfan.h>
 #include <callgfanlib/bbpolytope.h>
 
+#include <Singular/mod2.h>
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>

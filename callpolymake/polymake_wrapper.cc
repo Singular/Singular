@@ -5,12 +5,10 @@
 #include <callgfanlib/bbfan.h>
 #include <callgfanlib/bbpolytope.h>
 
+#include <Singular/mod2.h>
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
-
-using namespace polymake;
-
 
 polymake::Main* init_polymake=NULL;
 
@@ -1353,7 +1351,7 @@ polymake::Matrix<polymake::Integer> verticesOf(const polymake::perl::Object* p,
   polymake::Matrix<polymake::Integer> allrays = p->give("VERTICES");
   polymake::Matrix<polymake::Integer> wantedrays;
   bool ok = true;
-  for(Entire<Set<Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
+  for(polymake::Entire<polymake::Set<polymake::Integer> >::const_iterator i=polymake::entire(*s); !i.at_end(); i++)
   {
     wantedrays = wantedrays / allrays.row(PmInteger2Int(*i,ok));
   }

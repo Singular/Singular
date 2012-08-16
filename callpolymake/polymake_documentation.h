@@ -1,3 +1,11 @@
+#ifndef POLYMAKE_DOCUMENTATION_H
+#define POLYMAKE_DOCUMENTATION_H
+
+#include <kernel/mod2.h>
+#include <Singular/mod2.h>
+
+#ifdef HAVE_FANS
+
 #include <polymake_conversion.h>
 
 #include <callgfanlib/bbcone.h>
@@ -12,3 +20,6 @@
 #include <string>
 
 void init_polymake_help();
+
+#endif
+#endif
