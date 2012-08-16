@@ -350,7 +350,7 @@ hdrtempldep :=	$(hdrtemplsrc:.template=.d)
 distsrc :=	\
 		$(distfactorysrc) $(distmemmansrc) \
 		$(addprefix templates/,$(templatesrc)) \
-		readcf.cc ftmpl_inst.cc \
+		readcf.cc \
 		gengftables.cc gengftables-conway.cc test_install.cc
 
 # all the C/C++ include files in the distribution
@@ -446,11 +446,6 @@ libcfmem.a:	$(memmanobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
-ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
-		$(addprefix templates/,$(templatesrc)) \
-		$(addprefix templates/,$(templateincl))
-		$(CXX) -c $< $(TMPLCXXFLAGS) -o $@
-
 # note that this is a non-source file which is distributed!
 $(srcdir)/readcf.cc: readcf.y
 		@./bin/gen-readcf "${BISON}"
@@ -495,7 +490,7 @@ doxyclean:
 gengftables.o:	gengftables-conway.cc conftest factory.h gf_tabutil.h
 		$(CXX) -c $< $(TESTCXXFLAGS) -o $@
 
-gengftables:	gengftables.o libcf.a libcfmem.a ftmpl_inst.o
+gengftables:	gengftables.o libcf.a libcfmem.a
 		$(CXX) $^ $(TESTLDFLAGS) -o $@
 
 gftables:	gengftables
@@ -516,13 +511,8 @@ gftables:	gengftables
 test_install.o: test_install.cc factory.h
 		$(CXX) -c $< $(TESTCXXFLAGS) -I- -I${prefix} -I$(includedir) -o $@
 
-# the same we do for ftmpl_inst.o which for this reason is named
-# iftmpl_inst.o
-iftmpl_inst.o: factory.h
-		$(CXX) -c $(templatedir)/ftmpl_inst.cc $(TMPLCXXFLAGS) -I- -I${prefix} -I$(includedir) -o $@
-
 # link installation test program
-test_install:	test_install.o iftmpl_inst.o
+test_install:	test_install.o
 		$(CXX) $^ -L$(libdir) -lcf -lcfmem $(TESTLDFLAGS) -o $@
 
 installtest:	test_install
