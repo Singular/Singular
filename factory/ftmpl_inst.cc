@@ -37,8 +37,17 @@ template class Matrix<CanonicalForm>;
 template class SubMatrix<CanonicalForm>;
 template class Array<REvaluation>;
 // libfac:
+template class Array<int>;
+template class Array<Variable>;
 template class List<Variable>;
 template class ListIterator<Variable> ;
+template class List<int>;
+template class ListIterator<int>;
+template class List< List<int> >;
+template class ListIterator< List<int> >;
+template class List< List<CanonicalForm> >;
+template class ListIterator< List<CanonicalForm> >;
+
 
 template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
 template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );

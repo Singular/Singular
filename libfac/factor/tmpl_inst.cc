@@ -6,6 +6,7 @@
 //#include <templates/ftmpl_array.cc>
 //#include <templates/ftmpl_factor.cc>
 #include <templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_list.cc>
 //#include <templates/ftmpl_functions.h>
 //#include <templates/ftmpl_matrix.cc>
 
@@ -48,9 +49,6 @@ template CanonicalForm prod ( const Array<CanonicalForm>& );
 // place here your own template stuff, not instantiated by factory
 #include "tmpl_inst.h"
 #include "class.cc"
-
-template class List<int>;
-template class ListIterator<int>;
 
 template class List<IntList>;
 template class ListIterator<IntList>;
