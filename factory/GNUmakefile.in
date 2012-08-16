@@ -541,6 +541,9 @@ installcf:	cf
 		$(INSTALL_DATA) factory.h $(includedir)/factory.h
 		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
 		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
+		for file in $(templateincl); do \
+		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir)/$$file; \
+		done
 # we run `ranlib' another time for SUN machines
 		$(RANLIB) $(libdir)/$(libfactory)
 
@@ -574,6 +577,9 @@ installgftables:
 uninstall:	$(uninstalltargets)
 
 uninstallcf:
+		-for file in $(templateincl); do \
+		   rm -f $(templatedir)/$$file; \
+		done
 		-rm -f $(includedir)/factoryconf.h
 		-rm -f $(includedir)/factory.h
 		-rm -f $(libdir)/$(libfactory)

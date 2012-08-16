@@ -32,9 +32,6 @@
 #include <kernel/fglm.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
-// assumes, that NOSTREAMIO is set in factoryconf.h, which is included
-// by templates/list.h.
-#include <templates/ftmpl_list.h>
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define PROT2(msg,arg)
