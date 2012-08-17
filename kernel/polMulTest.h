@@ -37,6 +37,11 @@ inline poly lp_pp_Mult_mm_v0_a
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_pp_Mult_mm_v0_b
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 inline poly lp_pp_Mult_mm_v1
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
@@ -94,7 +99,7 @@ inline poly lp_pp_Mult_mm_v3
 
 
 
-inline poly lp_mm_Mult_pp_normal
+inline poly mm_Mult_pp_normal
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
@@ -122,7 +127,7 @@ inline poly lp_mm_Mult_pp_direct3
 
 struct letterplace_multiplication_functions
 {
-  poly (*pp_Mult_mm[8])
+  poly (*pp_Mult_mm[9])
     ( poly, const ring, const ring, poly, const ring, 
       int uptodeg, int lV, uint* mDVec, uint dvSize   );
   int size;
@@ -136,44 +141,44 @@ struct letterplace_multiplication_functions lpMultFunctions = {
     &lp_pp_Mult_mm_shift_n_shrink, 
     &lp_pp_Mult_mm_v0, 
     &lp_pp_Mult_mm_v0_a, 
+    &lp_pp_Mult_mm_v0_b, 
     &lp_pp_Mult_mm_v1_a, 
     &lp_pp_Mult_mm_v1_c, 
     &lp_pp_Mult_mm_v2_c, 
     &lp_pp_Mult_mm_v2_a_with_mDVec_neu
-  }, 8
+  }, 9
 };
 #endif
 
 #if 0 //m * p testing case
 struct letterplace_multiplication_functions lpMultFunctions = { 
-  { &lp_mm_Mult_pp_normal,
+  { &mm_Mult_pp_normal,
     &lp_mm_Mult_pp_shift,
     &lp_mm_Mult_pp_direct,
-    &lp_mm_Mult_pp_direct2,
-    &lp_mm_Mult_pp_direct3
-  }, 5
+    &lp_mm_Mult_pp_direct2
+  }, 4
 };
 #endif
 
 //Winners for p*m:
+//
+//Winners in the dp-optimized Group:
 //lp_pp_Mult_mm_v2_a_with_mDVec_neu
 //lp_pp_Mult_mm_v2_c
 //
+//Winner of the slower ones:
+//lp_pp_Mult_mm_v1_a (with the use of the dvec of m)
+//
+//Winner of the slower ones, which does not use m's dvec
+//lp_pp_Mult_mm_v0_a
+//
 //Winners for m*p
+//
+//Winner in the dp-optimized Group:
 //lp_mm_Mult_pp_direct
+//
+//Winner of the slower ones:
 
-
-/*
-struct letterplace_multiplication_functions lpMultFunctions = 
-{ { &pp_Mult_mm_normal, 
-    &lp_pp_Mult_mm_shift_n_shrink, 
-    &lp_pp_Mult_mm_v0, 
-    &lp_pp_Mult_mm_v1, 
-    &lp_pp_Mult_mm_v2, 
-    &lp_pp_Mult_mm_v1_a, 
-    &lp_pp_Mult_mm_v2_a, 
-    &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
-*/
 
 //Note to me: How to use lists
 #if 2>3
@@ -561,6 +566,66 @@ inline poly lp_pp_Mult_mm_v0_a
 
   number coeffM = p_GetCoeff(m, currRing);
   return p_Mult_nn(rt.next, coeffM, currRing, currRing);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v0_b
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+
+  poly rt = p_Head(p, r_lm_p);
+  poly rt_it = rt;
+  long deg_rt_it = p_Totaldegree(p, r_lm_p) * lV + 1;
+  long max_deg_rt_it = lV * uptodeg;
+  long m_ind_it = 1;
+
+  {
+    nextblock: ;
+    for(int j = m_ind_it, i = 0; i < lV; ++i, ++j)
+      if( p_GetExp(m, j, r_m) )
+      {
+        p_SetExp(rt_it, deg_rt_it+i, 1, r_lm_p);
+        deg_rt_it += lV;
+        m_ind_it += lV;
+        if(deg_rt_it > max_deg_rt_it) break;
+        goto nextblock;
+      }
+  }
+  p_Setm(rt_it, r_lm_p);
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    deg_rt_it = p_Totaldegree(p, r_t_p) * lV + 1;
+    long m_ind_it = 1;
+
+    {
+      nextblock2: ;
+      for(int i = 0, j = m_ind_it; i < lV; ++j, ++i)
+        if( p_GetExp(m, j, r_m) )
+        {
+          p_SetExp(rt_it, deg_rt_it+i, 1, r_t_p);
+          deg_rt_it += lV;
+          m_ind_it += lV;
+          if(deg_rt_it > max_deg_rt_it) break;
+          goto nextblock2;
+        }
+    }
+
+    p_Setm(rt_it, r_t_p);
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
 }
 
 // returns Copy(m)*Copy(p), does neither destroy p nor m Version
@@ -1122,7 +1187,7 @@ PINLINE2 poly lp_pp_Mult_pp_v1
 // for non-homog, non-shifted letterplace poly-/monomials
 // m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
 // output will have lm in r_lm_p and tail in r_t_p
-inline poly lp_mm_Mult_pp_normal
+inline poly mm_Mult_pp_normal
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec = NULL, uint dvSize = 0          )
