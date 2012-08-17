@@ -122,14 +122,14 @@ inline poly lp_mm_Mult_pp_direct3
 
 struct letterplace_multiplication_functions
 {
-  poly (*pp_Mult_mm[5])
+  poly (*pp_Mult_mm[8])
     ( poly, const ring, const ring, poly, const ring, 
       int uptodeg, int lV, uint* mDVec, uint dvSize   );
   int size;
    
 }; 
 
-#if 0 //p * m testing case
+#if 1 //p * m testing case
 //struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &pp_Mult_mm_normal, 
@@ -144,6 +144,7 @@ struct letterplace_multiplication_functions lpMultFunctions = {
 };
 #endif
 
+#if 0 //m * p testing case
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &lp_mm_Mult_pp_normal,
     &lp_mm_Mult_pp_shift,
@@ -152,12 +153,14 @@ struct letterplace_multiplication_functions lpMultFunctions = {
     &lp_mm_Mult_pp_direct3
   }, 5
 };
+#endif
 
 //Winners for p*m:
 //lp_pp_Mult_mm_v2_a_with_mDVec_neu
 //lp_pp_Mult_mm_v2_c
 //
 //Winners for m*p
+//lp_mm_Mult_pp_direct
 
 
 /*
@@ -1167,6 +1170,8 @@ inline poly lp_mm_Mult_pp_direct
   //TODO: 
   //- We could use the DVec of the lm of p for a little
   //  improvement.
+  //- if we have the totaldegree of m (the size of the dvec),
+  //  then we can also improve this a little bit.
   //- As usual we have yet to care for rings.
  
   if( p == NULL || m == NULL ) return NULL;
@@ -1326,6 +1331,7 @@ inline poly lp_mm_Mult_pp_direct2
 // for non-homog, non-shifted letterplace poly-/monomials
 // m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
 // output will have lm in r_lm_p and tail in r_t_p
+// This one does not work!!!
 inline poly lp_mm_Mult_pp_direct3
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
