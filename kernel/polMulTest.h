@@ -132,7 +132,7 @@ inline poly lp_mm_Mult_pp_direct3
 
 struct letterplace_multiplication_functions
 {
-  poly (*pp_Mult_mm[9])
+  poly (*pp_Mult_mm[5])
     ( poly, const ring, const ring, poly, const ring, 
       int uptodeg, int lV, uint* mDVec, uint dvSize   );
   int size;
@@ -162,7 +162,7 @@ struct letterplace_multiplication_functions lpMultFunctions = {
     &lp_mm_Mult_pp_slow,
     &lp_mm_Mult_pp_direct,
     &lp_mm_Mult_pp_direct2
-  }, 4
+  }, 5
 };
 #endif
 
@@ -178,12 +178,13 @@ struct letterplace_multiplication_functions lpMultFunctions = {
 //Winner of the slower ones, which does not use m's dvec
 //lp_pp_Mult_mm_v0_b
 //
-//Winners for m*p
+//Winners for m*p (no use of dvecs so far)
 //
 //Winner in the dp-optimized Group:
 //lp_mm_Mult_pp_direct
 //
 //Winner of the slower ones:
+//lp_mm_Mult_pp_slow
 
 
 //Note to me: How to use lists

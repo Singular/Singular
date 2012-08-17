@@ -1,3 +1,5 @@
+lp_ExpSum(qm->exp, q->exp, m_e, length);
+
 #if 0  
 /* BOCO: original comment and header from                      *
  * libpolys/polys/templates/p_Minus_mm_Mult_qq__T.cc           */
