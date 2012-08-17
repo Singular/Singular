@@ -109,16 +109,22 @@ inline poly lp_mm_Mult_pp_direct
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_mm_Mult_pp_direct2
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 
 struct letterplace_multiplication_functions
 {
-  poly (*pp_Mult_mm[11])
+  poly (*pp_Mult_mm[4])
     ( poly, const ring, const ring, poly, const ring, 
       int uptodeg, int lV, uint* mDVec, uint dvSize   );
   int size;
    
 }; 
 
+#if 0 //p * m testing case
 //struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &pp_Mult_mm_normal, 
@@ -128,11 +134,17 @@ struct letterplace_multiplication_functions lpMultFunctions = {
     &lp_pp_Mult_mm_v1_a, 
     &lp_pp_Mult_mm_v1_c, 
     &lp_pp_Mult_mm_v2_c, 
-    &lp_pp_Mult_mm_v2_a_with_mDVec_neu,
-    &lp_mm_Mult_pp_normal,
+    &lp_pp_Mult_mm_v2_a_with_mDVec_neu
+  }, 8
+};
+#endif
+
+struct letterplace_multiplication_functions lpMultFunctions = { 
+  { &lp_mm_Mult_pp_normal,
     &lp_mm_Mult_pp_shift,
-    &lp_mm_Mult_pp_direct
-  }, 11
+    &lp_mm_Mult_pp_direct,
+    &lp_mm_Mult_pp_direct2
+  }, 4
 };
 
 //Winners for p*m:
@@ -1155,7 +1167,8 @@ inline poly lp_mm_Mult_pp_direct
 
   poly rt = p_Head(m, r_lm_p);  //Problem 1: r_m == r_lm_p ???
   poly rt_it = rt;
-  long deg_rt_it = p_Totaldegree(m, r_m) * lV + 1;
+  long deg_rt_it0 = p_Totaldegree(m, r_m) * lV + 1;
+  long deg_rt_it = deg_rt_it0;
   long max_deg_rt_it = lV * uptodeg;
   long m_ind_it = 1;
 
@@ -1182,8 +1195,9 @@ inline poly lp_mm_Mult_pp_direct
   while(p != NULL)
   {
     rt_it = rt_it->next = p_Head(m, r_t_p); //Problem 2: ...
-    deg_rt_it = p_Totaldegree(m, r_m) * lV + 1;
-    long m_ind_it = 1;
+
+    m_ind_it = 1;
+    deg_rt_it = deg_rt_it0;
 
     {
       nextblock2: ;
@@ -1195,6 +1209,98 @@ inline poly lp_mm_Mult_pp_direct
           deg_rt_it += lV;
           m_ind_it += lV;
           if(deg_rt_it > max_deg_rt_it) break;
+          goto nextblock2;
+        }
+    }
+    rt_it->exp[omap[0]] += p->exp[omap[0]];
+
+    rt_it->next = NULL;
+    number coeffP = p_GetCoeff(p, r_t_p);
+    rt_it = p_Mult_nn(rt_it, coeffP, r_t_p, r_t_p);
+
+    pIter(p);
+  }
+
+  rt_it->next = NULL;
+  return rt;
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_mm_Mult_pp_direct2
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  //TODO: 
+  //- We could use the DVec of the lm of p for a little
+  //  improvement.
+  //- As usual we have yet to care for rings, 
+  //  see Problem 1 and Problem 2 below.
+  //  UPDATE: I think the algorithm needed for the bba is a bit
+  //  different - I will have to rewrite everything. So this is
+  //  just some test function, which will only work, if all
+  //  Rings are the same.
+
+  //We begin with multiplying m * lm(p) (to be more exact we
+  //should say: multiplying m with an apropriate shift of lm(p))
+ 
+  if( p == NULL || m == NULL ) return NULL;
+
+  poly rt = p_Head(m, r_lm_p);  //Problem 1: r_m == r_lm_p ???
+  poly rt_it = rt;
+
+  //This is the first index in p in the current block
+  long m_ind_it = 1;
+
+  //This is the first index of m after the last used block in m
+  long deg_rt_it0 = p_Totaldegree(m, r_m) * lV + 1;
+  long deg_rt_it = deg_rt_it0;
+  long degP = p_Totaldegree(p, r_lm_p);
+  {
+    nextblock: ;
+    for(int j = m_ind_it, i = 0; i < lV; ++i, ++j)
+      if( p_GetExp(p, j, r_lm_p) )
+      { //Found the exponent in this block!
+        p_SetExp(rt_it, deg_rt_it+i, 1, r_lm_p);
+        rt_it->exp[omap[deg_rt_it+i]] = 1; //ord field of block
+        deg_rt_it += lV; //only one exponent in each block
+        m_ind_it += lV; //so we can jump to the next block
+        if(!--degP) break; //no more variables in p
+        goto nextblock;
+      }
+  }
+
+  //Multiply with the coefficient of p
+  rt_it->next = NULL;
+  number coeffP = p_GetCoeff(p, r_lm_p);
+  rt_it = p_Mult_nn(rt_it, coeffP, r_lm_p, r_t_p);
+
+  //We still have to update the global ord field:
+  rt_it->exp[omap[0]] += p->exp[omap[0]];
+
+  //Now we will multiply m * tail(p) in the same manner
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(m, r_t_p); //Problem 2: ...
+
+    m_ind_it = 1;
+    deg_rt_it = deg_rt_it0;
+    degP = p_Totaldegree(p, r_t_p);
+    {
+      nextblock2: ;
+      for(int i = 0, j = m_ind_it; i < lV; ++j, ++i)
+        if( p_GetExp(p, j, r_t_p) )
+        {
+          p_SetExp(rt_it, deg_rt_it+i, 1, r_t_p);
+          rt_it->exp[omap[deg_rt_it+i]] = 1;
+          deg_rt_it += lV;
+          m_ind_it += lV;
+          if(!--degP) break;
           goto nextblock2;
         }
     }
