@@ -109,6 +109,11 @@ inline poly lp_mm_Mult_pp_shift
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_mm_Mult_pp_slow
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 inline poly lp_mm_Mult_pp_direct
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
@@ -134,7 +139,7 @@ struct letterplace_multiplication_functions
    
 }; 
 
-#if 1 //p * m testing case
+#if 0 //p * m testing case
 //struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &pp_Mult_mm_normal, 
@@ -150,10 +155,11 @@ struct letterplace_multiplication_functions lpMultFunctions = {
 };
 #endif
 
-#if 0 //m * p testing case
+#if 1 //m * p testing case
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &mm_Mult_pp_normal,
     &lp_mm_Mult_pp_shift,
+    &lp_mm_Mult_pp_slow,
     &lp_mm_Mult_pp_direct,
     &lp_mm_Mult_pp_direct2
   }, 4
@@ -170,7 +176,7 @@ struct letterplace_multiplication_functions lpMultFunctions = {
 //lp_pp_Mult_mm_v1_a (with the use of the dvec of m)
 //
 //Winner of the slower ones, which does not use m's dvec
-//lp_pp_Mult_mm_v0_a
+//lp_pp_Mult_mm_v0_b
 //
 //Winners for m*p
 //
@@ -1221,6 +1227,71 @@ inline poly lp_mm_Mult_pp_shift
   p_Delete(&pTemp, currRing);
 
   return res;
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_mm_Mult_pp_slow
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+
+  poly rt = p_Head(m, r_m);
+  poly rt_it = rt;
+  long deg_rt_it = p_Totaldegree(m, r_m) * lV + 1;
+  long max_deg_rt_it = lV * uptodeg;
+  long m_ind_it = 1;
+
+  {
+    nextblock: ;
+    for(int j = m_ind_it, i = 0; i < lV; ++i, ++j)
+      if( p_GetExp(p, j, r_lm_p) )
+      {
+        p_SetExp(rt_it, deg_rt_it+i, 1, r_m);
+        deg_rt_it += lV;
+        m_ind_it += lV;
+        if(deg_rt_it > max_deg_rt_it) break;
+        goto nextblock;
+      }
+  }
+  p_Setm(rt_it, r_m);
+  rt_it->next = NULL;
+  number coeffP = p_GetCoeff(p, r_lm_p);
+  rt_it = p_Mult_nn(rt_it, coeffP, r_lm_p, r_t_p);
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(m, r_m);
+    deg_rt_it = p_Totaldegree(m, r_m) * lV + 1;
+    long m_ind_it = 1;
+
+    {
+      nextblock2: ;
+      for(int i = 0, j = m_ind_it; i < lV; ++j, ++i)
+        if( p_GetExp(p, j, r_t_p) )
+        {
+          p_SetExp(rt_it, deg_rt_it+i, 1, r_m);
+          deg_rt_it += lV;
+          m_ind_it += lV;
+          if(deg_rt_it > max_deg_rt_it) break;
+          goto nextblock2;
+        }
+    }
+
+    p_Setm(rt_it, r_m);
+    rt_it->next = NULL;
+    number coeffP = p_GetCoeff(p, r_lm_p);
+    rt_it = p_Mult_nn(rt_it, coeffP, r_lm_p, r_t_p);
+    pIter(p);
+  }
+
+  return rt;
 }
 
 // returns Copy(m)*Copy(p), does neither destroy p nor m Version
