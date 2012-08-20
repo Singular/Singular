@@ -62,6 +62,8 @@ static inline
 CanonicalForm
 listGCD (const CFList& L)
 {
+  if (L.length() == 0)
+    return 0;
   if (L.length() == 1)
     return L.getFirst();
   if (L.length() == 2)
