@@ -82,6 +82,21 @@ inline poly lp_pp_Mult_mm_v2_c
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_pp_Mult_mm_v2_d
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v2_e
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
+inline poly lp_pp_Mult_mm_v2_f
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 inline poly lp_pp_Mult_mm_v2_a_with_mDVec_neu
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
@@ -132,14 +147,14 @@ inline poly lp_mm_Mult_pp_direct3
 
 struct letterplace_multiplication_functions
 {
-  poly (*pp_Mult_mm[5])
+  poly (*pp_Mult_mm[11])
     ( poly, const ring, const ring, poly, const ring, 
       int uptodeg, int lV, uint* mDVec, uint dvSize   );
   int size;
    
 }; 
 
-#if 0 //p * m testing case
+#if 1 //p * m testing case
 //struct letterplace_multiplication_functions lpMultFunctions = { { &pp_Mult_mm_normal, &lp_pp_Mult_mm_shift_n_shrink, &lp_pp_Mult_mm_v0, &lp_pp_Mult_mm_v1, &lp_pp_Mult_mm_v2, &lp_pp_Mult_mm_v1_a, &lp_pp_Mult_mm_v2_a, &lp_pp_Mult_mm_v2_a_with_mDVec }, 8, };
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &pp_Mult_mm_normal, 
@@ -150,12 +165,14 @@ struct letterplace_multiplication_functions lpMultFunctions = {
     &lp_pp_Mult_mm_v1_a, 
     &lp_pp_Mult_mm_v1_c, 
     &lp_pp_Mult_mm_v2_c, 
+    &lp_pp_Mult_mm_v2_e, 
+    &lp_pp_Mult_mm_v2_f, 
     &lp_pp_Mult_mm_v2_a_with_mDVec_neu
-  }, 9
+  }, 11
 };
 #endif
 
-#if 1 //m * p testing case
+#if 0 //m * p testing case
 struct letterplace_multiplication_functions lpMultFunctions = { 
   { &mm_Mult_pp_normal,
     &lp_mm_Mult_pp_shift,
@@ -429,6 +446,44 @@ inline int GetOrderMapping( ring r, int** oindex )
 
 inline long max(long a, long b)
 { return a > b ? a : b; }
+
+#if 0
+//This was loosely derived from p_Head; It will return the
+//total degree of lm(p) and return a copy of p in q. The ring of
+//q can be different from the ring of p (At least I hope so).
+//After this function you may have to invoke p_Setm.
+static inline poly p_CpyExp
+  (poly p, poly* q, const ring r_p, const ring r_q)
+{
+  if (p == NULL) return NULL;
+  p_LmCheckPolyRing1(p, r_p);
+  omTypeAllocBin(poly, *q, r->PolyBin);
+  p_SetRingOfLm(*q, r_q);
+  pNext(*q) = NULL;
+
+  //This represents the first index in the currently considered
+  //block in q and p.
+  long it = 1;
+  
+  {
+    nextblock: ;
+    //We will loop, until we found an empty block, or until we
+    //considered all variables
+    for(long i = 0; i < lV; ++i)
+      if( p_GetExp(p, it+i, r_p) )
+      {
+        p_SetExp(*q, it+i, 1, r_q);
+        it += lV;
+        if(it > r->N) return it - lV + i; //looped through all vars
+        goto nextblock;
+        
+      }
+  }
+
+  p_SetCoeff( *q, n_Copy(p_GetCoeff(p, r_p), r_p), r_q );
+  return np;
+}
+#endif
 
 // returns Copy(m)*Copy(p), does neither destroy p nor m Version
 // for non-homog, non-shifted letterplace poly-/monomials
@@ -1012,6 +1067,206 @@ inline poly lp_pp_Mult_mm_v2_c
 
   number coeffM = p_GetCoeff(m, r_m);
   return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v2_d
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+
+  poly rt = p_Head(p, r_lm_p);
+  poly rt_it = rt;
+  long deg_rt_it = p_Totaldegree(p, r_lm_p) * lV + 1;
+  long max_deg_rt_it = lV * uptodeg;
+  long m_ind_it = 1;
+
+  {
+    nextblock: ;
+    for(int j = m_ind_it, i = 0; i < lV; ++i, ++j)
+      if( p_GetExp(m, j, r_m) )
+      {
+        p_SetExp(rt_it, deg_rt_it+i, 1, r_lm_p);
+        rt_it->exp[omap[deg_rt_it+i]] = 1;
+        deg_rt_it += lV;
+        m_ind_it += lV;
+        if(deg_rt_it > max_deg_rt_it) break;
+        goto nextblock;
+      }
+  }
+  rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    deg_rt_it = p_Totaldegree(p, r_t_p) * lV + 1;
+    long m_ind_it = 1;
+
+    {
+      nextblock2: ;
+      for(int i = 0, j = m_ind_it; i < lV; ++j, ++i)
+        if( p_GetExp(m, j, r_m) )
+        {
+          p_SetExp(rt_it, deg_rt_it+i, 1, r_t_p);
+          rt_it->exp[omap[deg_rt_it+i]] = 1;
+          deg_rt_it += lV;
+          m_ind_it += lV;
+          if(deg_rt_it > max_deg_rt_it) break;
+          goto nextblock2;
+        }
+    }
+    rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
+}
+
+void p_ExpSum_dp
+  (poly rt, poly p, poly q, int lV, ring r)
+{
+  //This represents the first index in the currently considered
+  //block in exprt.
+  long index_rt = 1;
+  
+  //This represents the first index in the currently considered
+  //block in p.exp or q.exp respectively.
+  long index_exp = 1; //first we will iterate through exp1
+  {
+    nextblock: ;
+    //We will loop, until we found an empty block, or until we
+    //considered all variables
+    for(long i = 0; i < lV; ++i)
+      if( p_GetExp(p, index_exp+i, r) )
+      {
+        p_SetExp(rt, index_rt+i, 1, r);
+        rt->exp[omap[index_rt+i]] = 1;
+        index_rt += lV; //We found a nonzero exponent, thus
+        index_exp += lV; //we can move on to the next block
+        if(index_rt > r->N) 
+        { 
+          rt->exp[omap[0]] = p->exp[omap[0]];
+          return;  //looped through all vars
+        }
+        goto nextblock;
+      }
+  }
+
+  index_exp = 1; //Now we will iterate through exp2
+  {
+    nextblock2: ;
+    for(long i = 0; i < lV; ++i)
+      if( p_GetExp(q, index_exp+i, r) )
+      {
+        p_SetExp(rt, index_rt+i, 1, r);
+        rt->exp[omap[index_rt+i]] = 1;
+        index_rt += lV;
+        index_exp += lV;
+        if(index_rt > r->N) break;
+        goto nextblock2;
+      }
+  }
+
+  rt->exp[omap[0]] = 
+    p->exp[omap[0]] + q->exp[omap[0]];
+
+  return; //BOCO: could also return Totaldeg(p+q) ...
+}
+
+inline poly lp_pp_Mult_mm_v2_e
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+
+  poly rt = p_Init(r_lm_p);
+  p_ExpSum_dp(rt, p, m, lV, r_m);
+  p_SetCoeff
+    ( rt, n_Copy(p_GetCoeff(p, r_lm_p), r_lm_p), r_lm_p );
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt = rt->next = p_Init(r_t_p);
+    p_ExpSum_dp(rt, p, m, lV, r_m);
+    p_SetCoeff
+      ( rt, n_Copy(p_GetCoeff(p, r_t_p), r_t_p), r_t_p );
+    pIter(p);
+  }
+
+  rt->next = NULL;
+  //Or better do that above...
+  return p_Mult_nn
+    (rt, p_GetCoeff(m, r_m), r_lm_p, r_t_p);
+}
+
+void p_ExpSum_dp_f
+  (poly rt, poly p, poly q, int lV, ring r)
+{
+  int i, j;
+  for(i=1, j=0; i <= r->N && j < lV; ++i, ++j)
+  {
+    if( p_GetExp(p, i, r) )
+    {
+      p_SetExp(rt, i, 1, r);
+      rt->exp[omap[i]] = 1;
+    }
+    else
+      p_SetExp(rt, i, 0, r);
+  }
+
+  for(int k = 1; i <= r->N; ++i, ++k)
+  {
+    if( p_GetExp(q, k, r) )
+    {
+      p_SetExp(rt, i, 1, r);
+      rt->exp[omap[i]] = 1;
+    }
+    else
+      p_SetExp(rt, i, 0, r);
+  }
+}
+
+inline poly lp_pp_Mult_mm_v2_f
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+
+  poly rt = p_Init(r_lm_p);
+  p_ExpSum_dp_f(rt, p, m, lV, r_m);
+  p_SetRingOfLm(rt, r_m);
+  p_SetCoeff
+    ( rt, n_Copy(p_GetCoeff(p, r_lm_p), r_lm_p), r_lm_p );
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt = rt->next = p_Init(r_t_p);
+    p_ExpSum_dp_f(rt, p, m, lV, r_m);
+    p_SetRingOfLm(rt, r_m);
+    p_SetCoeff
+      ( rt, n_Copy(p_GetCoeff(p, r_t_p), r_t_p), r_t_p );
+    pIter(p);
+  }
+
+  rt->next = NULL;
+  //Or better do that above...
+  return p_Mult_nn
+    (rt, p_GetCoeff(m, r_m), r_lm_p, r_t_p);
 }
 
 // returns Copy(m)*Copy(p), does neither destroy p nor m Version
