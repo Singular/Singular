@@ -1009,7 +1009,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
               continue;
             iter2.getItem() /= LCmultiplier;
           }
-          A /= power (LCmultiplier, biFactors.length() -1);
+          A= oldA;
           leadingCoeffs= leadingCoeffs2[A.level()-3];
           for (int i= A.level()-3; i > -1; i--)
             leadingCoeffs2[i]= CFList();
