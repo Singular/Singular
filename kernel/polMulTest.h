@@ -1191,6 +1191,7 @@ inline poly lp_pp_Mult_mm_v2_e
 
 
   poly rt = p_Init(r_lm_p);
+  poly rt_it = rt;
   p_ExpSum_dp(rt, p, m, lV, r_m);
   p_SetCoeff
     ( rt, n_Copy(p_GetCoeff(p, r_lm_p), r_lm_p), r_lm_p );
@@ -1198,14 +1199,14 @@ inline poly lp_pp_Mult_mm_v2_e
   pIter(p);
   while(p != NULL)
   {
-    rt = rt->next = p_Init(r_t_p);
-    p_ExpSum_dp(rt, p, m, lV, r_m);
+    rt_it = rt_it->next = p_Init(r_t_p);
+    p_ExpSum_dp(rt_it, p, m, lV, r_m);
     p_SetCoeff
-      ( rt, n_Copy(p_GetCoeff(p, r_t_p), r_t_p), r_t_p );
+      ( rt_it, n_Copy(p_GetCoeff(p, r_t_p), r_t_p), r_t_p );
     pIter(p);
   }
 
-  rt->next = NULL;
+  rt_it->next = NULL;
   //Or better do that above...
   return p_Mult_nn
     (rt, p_GetCoeff(m, r_m), r_lm_p, r_t_p);
@@ -1221,6 +1222,7 @@ void p_ExpSum_dp_f
     {
       p_SetExp(rt, i, 1, r);
       rt->exp[omap[i]] = 1;
+      j = 0;
     }
     else
       p_SetExp(rt, i, 0, r);
@@ -1246,20 +1248,22 @@ inline poly lp_pp_Mult_mm_v2_f
   if( p == NULL || m == NULL ) return NULL;
 
 
-  poly rt = p_Init(r_lm_p);
+  poly rt = p_New(r_lm_p);
   p_ExpSum_dp_f(rt, p, m, lV, r_m);
   p_SetRingOfLm(rt, r_m);
   p_SetCoeff
     ( rt, n_Copy(p_GetCoeff(p, r_lm_p), r_lm_p), r_lm_p );
 
+  poly rt_it = rt;
+
   pIter(p);
   while(p != NULL)
   {
-    rt = rt->next = p_Init(r_t_p);
-    p_ExpSum_dp_f(rt, p, m, lV, r_m);
-    p_SetRingOfLm(rt, r_m);
+    rt_it = rt_it->next = p_Init(r_t_p);
+    p_ExpSum_dp_f(rt_it, p, m, lV, r_m);
+    p_SetRingOfLm(rt_it, r_m);
     p_SetCoeff
-      ( rt, n_Copy(p_GetCoeff(p, r_t_p), r_t_p), r_t_p );
+      ( rt_it, n_Copy(p_GetCoeff(p, r_t_p), r_t_p), r_t_p );
     pIter(p);
   }
 
