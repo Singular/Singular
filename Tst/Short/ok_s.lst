@@ -84,6 +84,7 @@ bug_quotient
 bug_radcon
 bug_reduce
 bug_rp
+bug_ring_quot
 bug_tr132
 bug_tr134
 bug_tr158
