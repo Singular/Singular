@@ -3622,7 +3622,7 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
   const int iCompH = pGetComp(h);
 
 #ifdef HAVE_RINGS
-  if (rField_is_Ring())
+  if (rField_is_Ring(currRing))
   {
     for (j=0; j<=k; j++)
     {
