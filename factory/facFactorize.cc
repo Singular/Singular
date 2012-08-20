@@ -1053,7 +1053,6 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
               A /= LCmultiplier;
               foundMultiplier= true;
               iter.getItem()= 1;
-              break;
             }
           }
         }
@@ -1065,7 +1064,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
           iter2= factors;
           for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
           {
-            if (!(iter.getItem().isOne()) &&
+            if (!iter.getItem().isOne() &&
                 fdivides (iter.getItem(), LCmultiplier))
             {
               if (!isOnlyLeadingCoeff (iter2.getItem())) // factor is more than just leading coeff
@@ -1084,28 +1083,23 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                 A /= iter.getItem();
                 LCmultiplier /= iter.getItem();
                 iter.getItem()= 1;
-                break;
               }
               else //factor consists of just leading coeff
               {
-                CanonicalForm vars=getVars (iter.getItem());
-                CanonicalForm factor;
-                Variable xx;
-                bool oneVariableNotInCommon= false;
-                for (int i= 0; i < A.level()-2; i++)
+                Variable xx= Variable (2);
+                CanonicalForm vars;
+                vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
+                                          xx));
+                for (int i= 0; i < A.level() -2; i++)
                 {
                   if (oldAeval[i].isEmpty())
                     continue;
                   xx= oldAeval[i].getFirst().mvar();
-                  factor= LC (getItem (oldAeval[i], index),1);
-                  if ((factor.inCoeffDomain() && degree (vars,xx) > 0) ||
-                      (degree (factor,xx) > 0 && degree (vars,xx) <= 0)) //scan for bivariate factors with leading coeff that does not contain variables which occur in LCmultiplier
-                  {
-                    oneVariableNotInCommon= true;
-                    break;
-                  }
+                  vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
+                                             xx));
                 }
-                if (oneVariableNotInCommon)
+                if (myGetVars(content(getItem(leadingCoeffs2[A.level()-3],index),1))
+                    /myGetVars (LCmultiplier) == vars)
                 {
                   int index2= 1;
                   for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem();
@@ -1113,38 +1107,13 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                   {
                     if (index2 == index)
                     {
-                      iter2.getItem() /= iter.getItem();
+                      iter2.getItem() /= LCmultiplier;
                       foundMultiplier= true;
                       break;
                     }
                   }
-                  A /= iter.getItem();
-                  LCmultiplier /= iter.getItem();
+                  A /= LCmultiplier;
                   iter.getItem()= 1;
-                  break;
-                }
-              }
-            }
-          }
-          // wipe out the last LCmultiplier
-          if (foundMultiplier)
-          {
-            index= 1;
-            for (iter= contents; iter.hasItem(); iter++, index++)
-            {
-              if (!iter.getItem().isOne() &&
-                  fdivides (LCmultiplier, iter.getItem()))
-              {
-                int index2= 1;
-                for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem();
-                     iter2++, index2++)
-                {
-                  if (index2 == index)
-                  {
-                    iter2.getItem() /= LCmultiplier;
-                    A /= LCmultiplier;
-                    iter.getItem() /= LCmultiplier;
-                  }
                 }
               }
             }
