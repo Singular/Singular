@@ -933,6 +933,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   CFList bufLeadingCoeffs2= leadingCoeffs2[A.level()-3];
   bufBiFactors= biFactors;
   bufA= A;
+  CanonicalForm bufLCmultiplier= LCmultiplier;
   CFList bufFactors= CFList();
   bool LCheuristic= false;
   if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
@@ -1177,6 +1178,14 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         A /= hh;
       }
       factors= CFList();
+      if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[A.level()-3])))
+      {
+        LCheuristic= false;
+        A= bufA;
+        biFactors= bufBiFactors;
+        leadingCoeffs2[A.level()-3]= bufLeadingCoeffs2;
+        LCmultiplier= bufLCmultiplier;
+      }
     }
     else
       factors= CFList();
