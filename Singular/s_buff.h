@@ -19,7 +19,7 @@ s_buff s_open_by_name(const char *n);
 int    s_close(s_buff &f);
 
 int s_getc(s_buff F);
-int s_ungetc(int c, s_buff F);
+void s_ungetc(int c, s_buff F);
 
 int s_readint(s_buff F);
 int s_readbytes(char *buff,int len, s_buff F);

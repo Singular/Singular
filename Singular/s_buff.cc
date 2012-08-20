@@ -104,14 +104,13 @@ int s_isready(s_buff F)
   return 1;
 }
 
-int s_ungetc(int c, s_buff F)
+void s_ungetc(int c, s_buff F)
 {
   if (F==NULL)
   {
     printf("link closed");
-    return 0;
   }
-  if (F->bp>=0)
+  else if (F->bp>=0)
   {
     F->buff[F->bp]=c;
     F->bp--;
