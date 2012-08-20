@@ -28,8 +28,8 @@
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
 #include <misc/intvec.h>
-#include <Singular/ssiLink.h>
-#include <Singular/pipeLink.h>
+#include <Singular/links/ssiLink.h>
+#include <Singular/links/pipeLink.h>
 
 // #ifdef HAVE_DBM
 // #ifdef ix86_Win

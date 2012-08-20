@@ -10,7 +10,7 @@
 #include <misc/auxiliary.h>
 #include <kernel/structs.h>
 
-#include <Singular/sing_dbm.h>
+#include <Singular/links/sing_dbm.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 

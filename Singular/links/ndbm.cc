@@ -50,7 +50,7 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memmove(b,a,c)
 #endif /* not HAVE_BCOPY */
-#include <Singular/ndbm.h>
+#include <Singular/links/ndbm.h>
 
 #define BYTESIZ 8
 #undef setbit

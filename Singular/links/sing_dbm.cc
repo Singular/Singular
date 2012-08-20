@@ -25,7 +25,7 @@
 #include <omalloc/omalloc.h>
 #  include <Singular/ipid.h>
 #  include <Singular/silink.h>
-#  include <Singular/sing_dbm.h>
+#  include <Singular/links/sing_dbm.h>
 
 // #ifdef ix86_Win
 // #  define USE_GDBM

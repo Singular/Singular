@@ -42,7 +42,7 @@
 #include <Singular/cntrlc.h>
 #include <Singular/lists.h>
 #include <Singular/blackbox.h>
-#include <Singular/ssiLink.h>
+#include <Singular/links/ssiLink.h>
 
 struct snumber_dummy
 {

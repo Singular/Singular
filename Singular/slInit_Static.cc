@@ -17,9 +17,9 @@
 #ifdef HAVE_DBM
 
 # ifndef USE_GDBM
-#   include <Singular/dbm_sl.h>
+#   include <Singular/links/dbm_sl.h>
 # else
-#   include <Singular/sing_dbm.h>
+#   include <Singular/links/sing_dbm.h>
 #endif
 
 si_link_extension slInitDBMExtension(si_link_extension s)

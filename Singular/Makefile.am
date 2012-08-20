@@ -67,17 +67,17 @@ SOURCES =    Minor.cc\
    maps_ip.cc\
    minpoly.cc\
    misc_ip.cc\
-   ndbm.cc\
+   links/ndbm.cc\
    newstruct.cc\
    pcv.cc\
-   pipeLink.cc\
+   links/pipeLink.cc\
    scanner.cc\
    sdb.cc\
-   silink.cc\
-   sing_dbm.cc\
+   links/silink.cc\
+   links/sing_dbm.cc\
    sing_win.cc\
    slInit_Static.cc\
-   ssiLink.cc\
+   links/ssiLink.cc\
    subexpr.cc\
    walk.cc\
    walk_ip.cc\
@@ -98,7 +98,7 @@ SingularHEADERS =    Cache.h \
    bigintm.h \
    blackbox.h \
    cntrlc.h \
-   dbm_sl.h \
+   links/dbm_sl.h \
    distrib.h \
    eigenval_ip.h \
    feOpt.h feOptTab.h fehelp.h \
@@ -122,18 +122,18 @@ SingularHEADERS =    Cache.h \
    misc_ip.h \
    mmalloc.h \
    omSingularConfig.h \
-   ndbm.h \
+   links/ndbm.h \
    newstruct.h \
    pcv.h \
-   pipeLink.h \
+   links/pipeLink.h \
    pyobject_setup.h \
    run.h \
    sdb.h \
    silink.h \
-   sing_dbm.h \
+   links/sing_dbm.h \
    sing_win.h \
    slInit.h \
-   ssiLink.h \
+   links/ssiLink.h \
    static.h \
    stype.h \
    subexpr.h \

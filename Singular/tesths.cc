@@ -36,7 +36,7 @@
 #include "distrib.h"
 #include "version.h"
 #include "slInit.h"
-#include "ssiLink.h"
+#include  <Singular/links/ssiLink.h>
 #include "bigintm.h"
 #include "mmalloc.h"
 #include "tok.h"
