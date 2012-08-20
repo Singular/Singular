@@ -3112,11 +3112,27 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
   int j;
   const int iCompH = pGetComp(h);
 
+#ifdef HAVE_RINGS
+  if (rField_is_Ring())
+  {
+    for (j=0; j<=k; j++)
+    {
+      const int iCompSj = pGetComp(strat->S[j]);
+      if ((iCompH==iCompSj)
+          //|| (0==iCompH) // can only happen,if iCompSj==0
+          || (0==iCompSj))
+      {
+        enterOnePairRing(j,h,ecart,FALSE,strat, atR);
+      }
+    }
+  }
+  else
+#endif  
   for (j=0; j<=k; j++)
   {
     const int iCompSj = pGetComp(strat->S[j]);
     if ((iCompH==iCompSj)
-        || (0==iCompH) // TODO: what about this case???
+        //|| (0==iCompH) // can only happen,if iCompSj==0
         || (0==iCompSj))
     {
       enterOnePairSpecial(j,h,ecart,strat, atR);
