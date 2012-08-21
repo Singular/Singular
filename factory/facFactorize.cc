@@ -701,9 +701,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   CanonicalForm bivarEval;
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
-  int lift, bufLift;
-  CFList* bufAeval2= new CFList [A.level() - 2];
-  CFList* Aeval2= new CFList [A.level() - 2];
+  int lift, bufLift, lengthAeval2= A.level()-2;
+  CFList* bufAeval2= new CFList [lengthAeval2];
+  CFList* Aeval2= new CFList [lengthAeval2];
   int counter;
   int differentSecondVar= 0;
   CanonicalForm bufA;
@@ -753,7 +753,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       evaluation= bufEvaluation;
       biFactors= bufBiFactors;
       lift= bufLift;
-      for (int j= 0; j < A.level() - 2; j++)
+      for (int j= 0; j < lengthAeval2; j++)
         Aeval2 [j]= bufAeval2 [j];
       differentSecondVar= counter;
     }
@@ -767,7 +767,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         evaluation= bufEvaluation;
         biFactors= bufBiFactors;
         lift= bufLift;
-        for (int j= 0; j < A.level() - 2; j++)
+        for (int j= 0; j < lengthAeval2; j++)
           Aeval2 [j]= bufAeval2 [j];
         differentSecondVar= counter;
       }
@@ -801,7 +801,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   else if (biFactors.length() > minFactorsLength)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
 
-  if (differentSecondVar == A.level() - 2 && getNumVars(LC(A,1)) == A.level()-1)
+  if (differentSecondVar == lengthAeval2 && getNumVars(LC(A,1)) == A.level()-1)
   {
     bool zeroOccured= false;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++)
@@ -831,10 +831,10 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
 
-  sortByUniFactors (Aeval2, A.level() - 2, uniFactors, evaluation);
+  sortByUniFactors (Aeval2, lengthAeval2, uniFactors, evaluation);
 
-  CFList * oldAeval= new CFList [A.level() - 2];
-  for (int i= 0; i < A.level() - 2; i++)
+  CFList * oldAeval= new CFList [lengthAeval2];
+  for (int i= 0; i < lengthAeval2; i++)
     oldAeval[i]= Aeval2[i];
 
   getLeadingCoeffs (A, Aeval2, uniFactors, evaluation);
@@ -845,7 +845,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   Variable w;
   CFList leadingCoeffs= precomputeLeadingCoeff (LC (A, 1), biFactorsLCs,
-                                          evaluation, Aeval2, A.level() - 2, w);
+                                          evaluation, Aeval2, lengthAeval2, w);
 
   if (w.level() != 1)
   {
@@ -863,7 +863,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         break;
       }
     }
-    for (i= 0; i < A.level() - 2; i++)
+    for (i= 0; i < lengthAeval2; i++)
     {
       if (oldAeval[i].isEmpty())
         continue;
@@ -916,7 +916,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   leadingCoeffs.removeFirst();
 
   //prepare leading coefficients
-  CFList* leadingCoeffs2= new CFList [A.level() - 2];
+  CFList* leadingCoeffs2= new CFList [lengthAeval2];
   prepareLeadingCoeffs (leadingCoeffs2, A.level(), leadingCoeffs, biFactors,
                         evaluation);
 
@@ -931,13 +931,23 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   A /= hh;
 
   CFListIterator iter2;
-  CFList bufLeadingCoeffs2= leadingCoeffs2[A.level()-3];
+  CFList bufLeadingCoeffs2= leadingCoeffs2[lengthAeval2-1];
   bufBiFactors= biFactors;
   bufA= A;
   CanonicalForm bufLCmultiplier= LCmultiplier;
+  CanonicalForm testVars;
+  if (!LCmultiplierIsConst)
+  {
+    testVars= Variable (2);
+    for (int i= 0; i < lengthAeval2; i++)
+    {
+      if (!oldAeval[i].isEmpty())
+        testVars *= oldAeval[i].getFirst().mvar();
+    }
+  }
   CFList bufFactors= CFList();
   bool LCheuristic= false;
-  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
+  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2[lengthAeval2-1],
                                 factors))
   {
     int check= biFactors.length();
@@ -971,7 +981,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
           for (int j=1; j <= i-oneCount; j++)
             iter++;
           iter.remove (1);
-          for (int j= 0; j < A.level() -2; j++)
+          for (int j= 0; j < lengthAeval2; j++)
           {
             l= leadingCoeffs2[j];
             iter= l;
@@ -986,7 +996,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       bufFactors= factors;
       factors= CFList();
     }
-    else if (!LCmultiplier.inCoeffDomain() && factors.length() == 0)
+    else if (!LCmultiplierIsConst && factors.length() == 0)
     {
       LCheuristic= true;
       factors= oldFactors;
@@ -1003,7 +1013,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         {
           foundTrueMultiplier= true;
           int index2= 1;
-          for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem(); iter2++,
+          for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem(); iter2++,
                                                                     index2++)
           {
             if (index2 == index)
@@ -1011,8 +1021,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
             iter2.getItem() /= LCmultiplier;
           }
           A= oldA;
-          leadingCoeffs= leadingCoeffs2[A.level()-3];
-          for (int i= A.level()-3; i > -1; i--)
+          leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
+          for (int i= lengthAeval2-1; i > -1; i--)
             leadingCoeffs2[i]= CFList();
           prepareLeadingCoeffs (leadingCoeffs2, A.level(), leadingCoeffs,
                                 biFactors, evaluation );
@@ -1042,7 +1052,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                 !isOnlyLeadingCoeff(iter2.getItem())) //content divides LCmultiplier completely and factor consists of more terms than just the leading coeff
             {
               int index2= 1;
-              for (CFListIterator iter3= leadingCoeffs2[A.level()-3];
+              for (CFListIterator iter3= leadingCoeffs2[lengthAeval2-1];
                    iter3.hasItem(); iter3++, index2++)
               {
                 if (index2 == index)
@@ -1071,7 +1081,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
               if (!isOnlyLeadingCoeff (iter2.getItem())) // factor is more than just leading coeff
               {
                 int index2= 1;
-                for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem();
+                for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
                      iter2++, index2++)
                 {
                   if (index2 == index)
@@ -1085,13 +1095,13 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                 LCmultiplier /= iter.getItem();
                 iter.getItem()= 1;
               }
-              else //factor consists of just leading coeff
+              else if (fdivides (getVars (LCmultiplier), testVars))//factor consists of just leading coeff
               {
                 Variable xx= Variable (2);
                 CanonicalForm vars;
                 vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
                                           xx));
-                for (int i= 0; i < A.level() -2; i++)
+                for (int i= 0; i < lengthAeval2; i++)
                 {
                   if (oldAeval[i].isEmpty())
                     continue;
@@ -1099,11 +1109,11 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                   vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
                                              xx));
                 }
-                if (myGetVars(content(getItem(leadingCoeffs2[A.level()-3],index),1))
+                if (myGetVars(content(getItem(leadingCoeffs2[lengthAeval2-1],index),1))
                     /myGetVars (LCmultiplier) == vars)
                 {
                   int index2= 1;
-                  for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem();
+                  for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
                        iter2++, index2++)
                   {
                     if (index2 == index)
@@ -1126,12 +1136,12 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
           if (fdivides (pLCs, LC (oldA,1)) && (LC(oldA,1)/pLCs).inCoeffDomain()) // check if the product of the lead coeffs of the primitive factors equals the lead coeff of the old A
           {
             A= oldA;
-            iter2= leadingCoeffs2[A.level()-3];
+            iter2= leadingCoeffs2[lengthAeval2-1];
             for (iter= contents; iter.hasItem(); iter++, iter2++)
               iter2.getItem() /= iter.getItem();
             foundMultiplier= true;
           }
-          if (!foundMultiplier)
+          if (!foundMultiplier && fdivides (getVars (LCmultiplier), testVars))
           {
             Variable xx;
             CFList vars1;
@@ -1142,7 +1152,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
             xx= Variable (2);
             for (iter= oldBiFactors; iter.hasItem(); iter++)
               vars1.append (power (xx, degree (LC (iter.getItem(),1), xx)));
-            for (int i= 0; i < A.level() -2; i++)
+            for (int i= 0; i < lengthAeval2; i++)
             {
               if (oldAeval[i].isEmpty())
                 continue;
@@ -1153,7 +1163,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
             }
             CanonicalForm tmp;
             iter2= vars1;
-            for (iter= leadingCoeffs2[A.level()-3]; iter.hasItem(); iter++,
+            for (iter= leadingCoeffs2[lengthAeval2-1]; iter.hasItem(); iter++,
                                                                     iter2++)
             {
               tmp= iter.getItem()/LCmultiplier;
@@ -1187,7 +1197,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                         )
                   {
                     int index2= 1;
-                    for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem();
+                    for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
                          iter2++, index2++)
                     {
                       if (index2 == index)
@@ -1231,7 +1241,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                      )
                   {
                     int index2= 1;
-                    for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem();
+                    for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
                          iter2++, index2++)
                     {
                       if (index2 == index)
@@ -1266,8 +1276,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         }
 
         // patch everything together again
-        leadingCoeffs= leadingCoeffs2[A.level()-3];
-        for (int i= A.level()-3; i > -1; i--)
+        leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
+        for (int i= lengthAeval2-1; i > -1; i--)
           leadingCoeffs2[i]= CFList();
         prepareLeadingCoeffs (leadingCoeffs2,A.level(),leadingCoeffs, biFactors,
                               evaluation);
@@ -1281,12 +1291,12 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
         A /= hh;
       }
       factors= CFList();
-      if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[A.level()-3])))
+      if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
       {
         LCheuristic= false;
         A= bufA;
         biFactors= bufBiFactors;
-        leadingCoeffs2[A.level()-3]= bufLeadingCoeffs2;
+        leadingCoeffs2[lengthAeval2-1]= bufLeadingCoeffs2;
         LCmultiplier= bufLCmultiplier;
       }
     }
@@ -1294,7 +1304,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       factors= CFList();
     delete [] index;
   }
-  if (!LCheuristic && !LCmultiplierIsConst && bufFactors.isEmpty())
+  if (!LCheuristic && !LCmultiplierIsConst && bufFactors.isEmpty()
+      && fdivides (getVars (LCmultiplier), testVars))
   {
     int index;
     Variable xx;
@@ -1306,7 +1317,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     xx= Variable (2);
     for (iter= oldBiFactors; iter.hasItem(); iter++)
       vars1.append (power (xx, degree (LC (iter.getItem(),1), xx)));
-    for (int i= 0; i < A.level() -2; i++)
+    for (int i= 0; i < lengthAeval2; i++)
     {
       if (oldAeval[i].isEmpty())
         continue;
@@ -1317,7 +1328,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     }
     CanonicalForm tmp;
     iter2= vars1;
-    for (iter= leadingCoeffs2[A.level()-3]; iter.hasItem(); iter++, iter2++)
+    for (iter= leadingCoeffs2[lengthAeval2-1]; iter.hasItem(); iter++, iter2++)
     {
       tmp= iter.getItem()/LCmultiplier;
       for (int i=1; i <= tmp.level(); i++)
@@ -1347,7 +1358,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
           while (fdivides (myGetVars (ii.getItem().factor()), iter.getItem()))
           {
             int index2= 1;
-            for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem(); iter2++,
+            for (iter2= leadingCoeffs2[lengthAeval2-1];iter2.hasItem();iter2++,
                                                                       index2++)
             {
               if (index2 == index)
@@ -1387,7 +1398,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
           if (!fdivides (myGetVars (ii.getItem().factor()), iter.getItem()))
           {
             int index2= 1;
-            for (iter2= leadingCoeffs2[A.level()-3]; iter2.hasItem(); iter2++,
+            for (iter2= leadingCoeffs2[lengthAeval2-1];iter2.hasItem();iter2++,
                                                                       index2++)
             {
               if (index2 == index)
@@ -1418,8 +1429,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       }
     }
 
-    leadingCoeffs= leadingCoeffs2[A.level()-3];
-    for (int i= A.level()-3; i > -1; i--)
+    leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
+    for (int i= lengthAeval2-1; i > -1; i--)
       leadingCoeffs2[i]= CFList();
     prepareLeadingCoeffs (leadingCoeffs2,A.level(),leadingCoeffs, biFactors,
                           evaluation);
@@ -1440,14 +1451,14 @@ tryAgainWithoutHeu:
   for (iter= biFactors; iter.hasItem(); iter++)
     iter.getItem()= iter.getItem () (y + evaluation.getLast(), y);
 
-  for (int i= 0; i < A.level() - 3; i++)
+  for (int i= 0; i < lengthAeval2-1; i++)
     leadingCoeffs2[i]= CFList();
-  for (iter= leadingCoeffs2[A.level() - 3]; iter.hasItem(); iter++)
+  for (iter= leadingCoeffs2[lengthAeval2-1]; iter.hasItem(); iter++)
   {
     iter.getItem()= shift2Zero (iter.getItem(), list, evaluation);
     for (int i= A.level() - 4; i > -1; i--)
     {
-      if (i + 1 == A.level() - 3)
+      if (i + 1 == lengthAeval2-1)
         leadingCoeffs2[i].append (iter.getItem() (0, i + 4));
       else
         leadingCoeffs2[i].append (leadingCoeffs2[i+1].getLast() (0, i + 4));
@@ -1468,7 +1479,7 @@ tryAgainWithoutHeu:
   for (iter=biFactors; iter.hasItem(); iter++)
     commonDenominators.append (bCommonDen (iter.getItem()));
   CanonicalForm tmp1, tmp2, tmp3=1;
-  for (int i= 0; i < A.level() - 2; i++)
+  for (int i= 0; i < lengthAeval2; i++)
   {
     iter2= commonDenominators;
     for (iter= leadingCoeffs2[i]; iter.hasItem(); iter++, iter2++)
@@ -1496,7 +1507,7 @@ tryAgainWithoutHeu:
   for (iter= Aeval; iter.hasItem(); iter++)
     iter.getItem() *= tmp3*power (multiplier, biFactors.length() - 1);
 
-  for (int i= 0; i < A.level() - 2; i++)
+  for (int i= 0; i < lengthAeval2; i++)
   {
     iter2= commonDenominators;
     for (iter= leadingCoeffs2[i]; iter.hasItem(); iter++, iter2++)
@@ -1523,7 +1534,7 @@ tryAgainWithoutHeu:
     {
       A= bufA;
       biFactors= bufBiFactors;
-      leadingCoeffs2[A.level()-3]= bufLeadingCoeffs2;
+      leadingCoeffs2[lengthAeval2-1]= bufLeadingCoeffs2;
       delete [] liftBounds;
       LCheuristic= false;
       goto tryAgainWithoutHeu;
