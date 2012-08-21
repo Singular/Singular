@@ -1580,11 +1580,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
     bool success= false;
     CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
+    CFList heuResult;
     if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
         LucksWangSparseHeuristic (oldSqrfPartFPowLC,
-                                  oldFactors, 2, leadingCoeffs, factors))
+                                  oldFactors, 2, leadingCoeffs, heuResult))
     {
-      interMedResult= recoverFactors (oldSqrfPartF, factors);
+      interMedResult= recoverFactors (oldSqrfPartF, heuResult);
       if (oldFactors.length() == interMedResult.length())
         success= true;
     }
