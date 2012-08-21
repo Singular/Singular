@@ -339,35 +339,70 @@ public:
   /// Kills the link to the referenced object
   ~CountedRef() { destruct(); }
 
+  /// Replaces argument by a shallow copy of the references data
   BOOLEAN dereference(leftv arg) {
     assume(is_ref(arg));
     return m_data->get(arg) || ((arg->next != NULL) && resolve(arg->next));
   }
 
+  /// Get number of references pointing here, too
+  BOOLEAN count(leftv res) { return construct(res, m_data->count() - 1); }
 
-  /// Get the actual object
-  /// @note It may change leftv. It is common practice, so we are fine with it.
+  /// Get internal indentifier
+  BOOLEAN hash(leftv res) { return construct(res, (long)m_data); }
 
+  /// Check for likewise identifiers
+  BOOLEAN likewise(leftv res, leftv arg) {
+    return resolve(arg) || construct(res, operator*()->data == arg->data); 
+  }
+
+  /// Check for identical reference objects
+  BOOLEAN same(leftv res, leftv arg) { 
+    return construct(res, m_data == arg->Data());
+  }
+
+  /// Get type of references data
+  BOOLEAN type(leftv res) { 
+    return construct(res, Tok2Cmdname(operator*()->Typ()));
+  };
+
+  /// Get (possibly) internal identifier name
+  BOOLEAN name(leftv res) { return construct(res, operator*()->Name()); }
+
+  /// Recover the actual object from Singular interpreter object
   static self cast(void* data) {
     assume(data != NULL);
     return self(static_cast<data_type*>(data));
   }
 
+  /// Recover the actual object from raw Singular data
   static self cast(leftv arg) {
     assume((arg != NULL) && is_ref(arg));
     return self::cast(arg->Data());
   }
 
   /// If necessary dereference.
-  /// @note The may change leftv. It is common practice, so we are fine with it.
   static BOOLEAN resolve(leftv arg) {
     assume(arg != NULL);
     while (is_ref(arg)) { if(CountedRef::cast(arg).dereference(arg)) return TRUE; };
     return (arg->next != NULL) && resolve(arg->next);
   }
 
-  //private:
 protected:
+
+  /// Construct integer value
+  static BOOLEAN construct(leftv res, long data) {
+    res->data = (void*) data;
+    res->rtyp = INT_CMD;
+    return FALSE;
+  }
+
+  /// Construct string
+  static BOOLEAN construct(leftv res, const char* data) {
+    res->data = (void*)omStrDup(data);
+    res->rtyp = STRING_CMD;
+    return FALSE;
+  }
   /// Store pointer to actual data
   data_type* m_data;
 };
@@ -446,6 +481,27 @@ BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 BOOLEAN countedref_OpM(int op, leftv res, leftv args)
 {
   if (args->Data() == NULL) return FALSE;
+
+  if(op == SYSTEM_CMD) {
+    if (args->next) {
+      leftv next = args->next;
+      args->next = NULL;
+      CountedRef obj = CountedRef::cast(args);
+      char* name = (next->Typ() == STRING_CMD? 
+                    (char*) next->Data(): (char*)next->Name());
+      if (strcmp(name, "count") == 0) return obj.count(res);
+      if (strcmp(name, "hash") == 0) return obj.hash(res);
+      if (strcmp(name, "same") == 0) 
+        return (next->next == NULL) ||  obj.same(res, next->next);
+      if ((strcmp(name, "like") == 0) || (strcmp(name, "likewise") == 0))
+        return (next->next == NULL) ||  obj.likewise(res, next->next);
+      if (strcmp(name, "name") == 0) return obj.name(res);
+      if ((strcmp(name, "type") == 0) || (strcmp(name, "typeof") == 0))
+        return obj.type(res);
+      return TRUE;
+    }
+    return TRUE;
+  }
   return CountedRef::cast(args).dereference(args) || iiExprArithM(res, args, op);
 }
 
@@ -499,6 +555,7 @@ private:
     arg->CleanUp();
     arg->data = handle;
     arg->rtyp = IDHDL;
+    arg->name = omStrDup(IDID(handle));
     return arg;
   }
 
