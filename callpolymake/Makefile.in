@@ -3,23 +3,26 @@ PM_INC := $(shell polymake-config --includes)
 PM_CFLAGS := $(shell polymake-config --cflags)
 PM_LIBS := $(shell polymake-config --libs)
 PM_LDFLAGS := $(shell polymake-config --ldflags)
+install_prefix     = @exec_prefix@
+install_bindir  = ${install_prefix}/MOD
 
 all: polymake.so
 
 polymake_conversion.o: polymake_conversion.cc
-	$(CXX) -I. ${PM_INC} ${PM_CFLAGS} ${PM_LDFLAGS} -I../ -o polymake_conversion.o  -c polymake_conversion.cc
+	$(CXX) -I. -DOM_NDEBUG ${PM_INC} ${PM_CFLAGS} ${PM_LDFLAGS} -I../ -o polymake_conversion.o  -c polymake_conversion.cc
 
 polymake_documentation.o: polymake_documentation.cc
-	$(CXX) -I. ${PM_INC} ${PM_CFLAGS} ${PM_LDFLAGS} -I../ -o polymake_documentation.o  -c polymake_documentation.cc
+	$(CXX) -I. -DOM_NDEBUG ${PM_INC} ${PM_CFLAGS} ${PM_LDFLAGS} -I../ -o polymake_documentation.o  -c polymake_documentation.cc
 
 polymake_wrapper.o: polymake_wrapper.cc
-	$(CXX) -I. ${PM_INC} ${PM_CFLAGS} ${PM_LDFLAGS} -I../ -o polymake_wrapper.o -c polymake_wrapper.cc
+	$(CXX) -I. -DOM_NDEBUG ${PM_INC} ${PM_CFLAGS} ${PM_LDFLAGS} -I../ -o polymake_wrapper.o -c polymake_wrapper.cc
 
 polymake.so: polymake_conversion.o polymake_documentation.o polymake_wrapper.o
 	$(CXX) -shared -o polymake.so ${PM_LDFLAGS} ${PM_LDFLAGS} polymake_conversion.o polymake_documentation.o polymake_wrapper.o ${PM_LIBS}
-	cp polymake.so ../Singular/polymake.so
 
-install: polymake.so
+install install-bindist: polymake.so
+	-mkdir ${install_bindir}
+	cp polymake.so ${install_bindir}/.
 
 clean:
 	rm *.so *.o
