@@ -11,7 +11,13 @@
 
 CXXTEMPLFLAGS = ## -fno-implicit-templates
 
-libkernel_LTLIBRARIES = libkernel.la libkernel_g.la
+if WANT_DEBUG
+  LIB_G=libkernel_g.la
+else
+  LIB_G=
+endif
+
+libkernel_LTLIBRARIES = libkernel.la ${LIB_G}
 libkerneldir = $(libdir)/singular
 
 libkernel_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}

@@ -19,7 +19,13 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_
 
 ########################### libSingular* #########################
 
-libSingular_LTLIBRARIES = libSingular.la libSingular_g.la
+if WANT_DEBUG
+  LIB_G=libSingular_g.la
+else
+  LIB_G=
+endif
+
+libSingular_LTLIBRARIES = libSingular.la ${LIB_G}
 libSingulardir = $(libdir)/singular
 
 libSingular_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}  $(WARNCFLAGS)
@@ -181,13 +187,21 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGUL
 
 ########################### Singular* #########################
 
-EXTRA_PROGRAMS = Singulard Singulardg libparse
+if WANT_DEBUG
+  EXTRA_PROGRAMS = Singulard Singulardg libparse
+else
+  EXTRA_PROGRAMS = Singulard libparse
+endif
 
 # the "optional_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
 optional_Singular_programs = 
 
-bin_PROGRAMS = Singular Singularg ESingular TSingular $(optional_Singular_programs)
+if WANT_DEBUG
+  bin_PROGRAMS = Singular Singularg ESingular TSingular $(optional_Singular_programs)
+else
+  bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
+endif
 
 AMLDFLAGS = -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel -L${abs_top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
 
