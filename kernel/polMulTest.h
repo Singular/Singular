@@ -97,6 +97,11 @@ inline poly lp_pp_Mult_mm_v2_f
     poly m, const ring r_m, int uptodeg, int lV, 
     uint* mDVec, uint dvSize );
 
+inline poly lp_pp_Mult_mm_v2_g
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec, uint dvSize );
+
 inline poly lp_pp_Mult_mm_v2_a_with_mDVec_neu
   ( poly p, const ring r_lm_p, const ring r_t_p,
     poly m, const ring r_m, int uptodeg, int lV, 
@@ -166,7 +171,7 @@ struct letterplace_multiplication_functions lpMultFunctions = {
     &lp_pp_Mult_mm_v1_c, 
     &lp_pp_Mult_mm_v2_c, 
     &lp_pp_Mult_mm_v2_e, 
-    &lp_pp_Mult_mm_v2_f, 
+    &lp_pp_Mult_mm_v2_g, 
     &lp_pp_Mult_mm_v2_a_with_mDVec_neu
   }, 11
 };
@@ -1267,10 +1272,73 @@ inline poly lp_pp_Mult_mm_v2_f
     pIter(p);
   }
 
-  rt->next = NULL;
+  rt_it->next = NULL;
   //Or better do that above...
   return p_Mult_nn
     (rt, p_GetCoeff(m, r_m), r_lm_p, r_t_p);
+}
+
+// returns Copy(m)*Copy(p), does neither destroy p nor m Version
+// for non-homog, non-shifted letterplace poly-/monomials
+// m should be from r_m, lm(p) from r_lm_p, tail(p) from r_t_p
+// output will have lm in r_lm_p and tail in r_t_p
+inline poly lp_pp_Mult_mm_v2_g
+  ( poly p, const ring r_lm_p, const ring r_t_p,
+    poly m, const ring r_m, int uptodeg, int lV, 
+    uint* mDVec = NULL, uint dvSize = 0          )
+{
+  if( p == NULL || m == NULL ) return NULL;
+
+
+  poly rt = p_Head(p, r_lm_p);
+  poly rt_it = rt;
+  //long deg_rt_it = p_Totaldegree(p, r_lm_p) * lV + 1;
+  long deg_rt_it = p->exp[omap[0]] * lV + 1;
+  long max_deg_rt_it = lV * uptodeg;
+  long m_ind_it = 1;
+
+  {
+    nextblock: ;
+    for(int j = m_ind_it, i = 0; i < lV; ++i, ++j)
+      if( p_GetExp(m, j, r_m) )
+      {
+        p_SetExp(rt_it, deg_rt_it+i, 1, r_lm_p);
+        rt_it->exp[omap[deg_rt_it+i]] = 1;
+        deg_rt_it += lV;
+        m_ind_it += lV;
+        if(deg_rt_it > max_deg_rt_it) break;
+        goto nextblock;
+      }
+  }
+  rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+  pIter(p);
+  while(p != NULL)
+  {
+    rt_it = rt_it->next = p_Head(p, r_t_p);
+    deg_rt_it = p->exp[omap[0]] * lV + 1;
+    long m_ind_it = 1;
+
+    {
+      nextblock2: ;
+      for(int i = 0, j = m_ind_it; i < lV; ++j, ++i)
+        if( p_GetExp(m, j, r_m) )
+        {
+          p_SetExp(rt_it, deg_rt_it+i, 1, r_t_p);
+          rt_it->exp[omap[deg_rt_it+i]] = 1;
+          deg_rt_it += lV;
+          m_ind_it += lV;
+          if(deg_rt_it > max_deg_rt_it) break;
+          goto nextblock2;
+        }
+    }
+    rt_it->exp[omap[0]] += m->exp[omap[0]];
+
+    pIter(p);
+  }
+
+  number coeffM = p_GetCoeff(m, r_m);
+  return p_Mult_nn(rt, coeffM, r_lm_p, r_t_p);
 }
 
 // returns Copy(m)*Copy(p), does neither destroy p nor m Version
