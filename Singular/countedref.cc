@@ -35,16 +35,45 @@
 class CountedRefEnv {
   typedef CountedRefEnv self;
 
+public:
 
-
-};
-idhdl* getmyroot() {
-  static idhdl myroot = NULL;
-  if (myroot == NULL) {
-    myroot = enterid(" _shared_data_ ", 0, PACKAGE_CMD, &IDROOT, TRUE);
+  static idhdl* locals() {
+    static idhdl myroot = NULL;
+    if (myroot == NULL) {
+      myroot = enterid(" _shared_data_ ", 0, PACKAGE_CMD, &IDROOT, TRUE);
+    }
+    return &myroot;
   }
-  return &myroot;
-}
+
+  static idhdl newid(int typ, void* data) {
+    char* name = (char*)omAlloc0(512);
+    static unsigned int counter = 0;
+    sprintf(name, " :%u:%p:_shared_: ", ++counter, data);
+
+    idhdl* root = locals();
+    assume((*root)->get(name, 0) == NULL); 
+    short ref = (*root)->ref;
+    *root = (*root)->set(name, 0, typ, FALSE);
+    (*root)->ref = ++ref;;
+
+    IDDATA(*root) = (char*) data;
+
+    return *root;
+  } 
+
+  static void erase(idhdl handle) {
+
+    idhdl* root = locals();
+    short ref = (*root)->ref;
+    killhdl2(handle, root, currRing);
+    (*root)->ref = --ref;
+    if(ref > 0) { return;}
+
+    killhdl2(*root, &IDROOT, currRing);
+    (*root) = NULL;
+ }
+};
+
 
 class RefCounter {
   typedef RefCounter self;
@@ -204,7 +233,7 @@ private:
   /// Check whether identifier became invalid
   /// @note Sergio Leone memorial function
   BOOLEAN broken() {
-    if( (m_context == getmyroot()) || (m_context == &currRing->idroot))
+    if( (m_context == CountedRefEnv::locals()) || (m_context == &currRing->idroot))
       return FALSE;                  // the good, 
 
     if (m_data->RingDependend())     // the bad,
@@ -346,14 +375,14 @@ protected:
 /// blackbox support - convert to string representation
 void countedref_Print(blackbox *b, void* ptr)
 {
-  if (ptr == NULL)  return;
-  (*CountedRef::cast(ptr))->Print();
+  if (ptr) (*CountedRef::cast(ptr))->Print();
+  else PrintS("<unassigned reference or shared memory>");
 }
 
 /// blackbox support - convert to string representation
 char* countedref_String(blackbox *b, void* ptr)
 {
-  if (ptr == NULL) return NULL;
+  if (ptr == NULL) return omStrDup(sNoName);
   return (*CountedRef::cast(ptr))->String();
 }
 
@@ -387,6 +416,7 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
 /// blackbox support - unary operations
 BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 {
+  if (head->Data() == NULL) return FALSE;
   if(op == TYPEOF_CMD)
     return blackboxDefaultOp1(op, res, head);
 
@@ -397,7 +427,7 @@ BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 /// blackbox support - binary operations
 BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 {
-
+  if (head->Data() == NULL) return FALSE;
   return CountedRef::cast(head).dereference(head) || CountedRef::resolve(arg) ||
     iiExprArith2(res, head, op, arg);
 }
@@ -405,6 +435,7 @@ BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 /// blackbox support - ternary operations
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
+  if (head->Data() == NULL) return FALSE;
   return  CountedRef::cast(head).dereference(head) || 
     CountedRef::resolve(arg1) || CountedRef::resolve(arg2) ||
     iiExprArith3(res, op, head, arg1, arg2);
@@ -414,6 +445,7 @@ BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 /// blackbox support - n-ary operations
 BOOLEAN countedref_OpM(int op, leftv res, leftv args)
 {
+  if (args->Data() == NULL) return FALSE;
   return CountedRef::cast(args).dereference(args) || iiExprArithM(res, args, op);
 }
 
@@ -430,7 +462,7 @@ class CountedRefShared:
   typedef CountedRef base;
 public:
   /// Construct new reference from Singular data  
-  CountedRefShared(leftv arg):  base(new data_type(wrap(arg), getmyroot())) { }
+  CountedRefShared(leftv arg):  base(new data_type(wrap(arg), CountedRefEnv::locals())) { }
 
 private:
   /// Recover previously constructed shared data
@@ -450,7 +482,7 @@ public:
 
   /// Replace data that reference is pointing to
   self& operator=(leftv rhs) {
-    m_data->set(wrap(rhs), getmyroot());
+    m_data->set(wrap(rhs), CountedRefEnv::locals());
     return *this;
   }
   void destruct() {
@@ -463,36 +495,20 @@ public:
 private:
 
   static leftv wrap(leftv arg) {
-      char* name = (char*)omAlloc0(512);
-      static unsigned int counter = 0;
-      idhdl* myroot=getmyroot();
-      sprintf(name, " :%u:%p:_shared_: ", ++counter, arg->Data());
-      assume((*myroot)->get(name, 0) == NULL); 
-      idhdl handle = (*myroot)->set(name, 0, arg->Typ(), FALSE);
-      ++(*myroot)->ref;
-
-      IDDATA(handle) = (char*) arg->CopyD();
-      arg->CleanUp();
-      arg->data = handle;
-      arg->rtyp = IDHDL;
-      arg->name = name;
-
+    idhdl handle = CountedRefEnv::newid(arg->Typ(), arg->CopyD()); 
+    arg->CleanUp();
+    arg->data = handle;
+    arg->rtyp = IDHDL;
     return arg;
   }
 
  void kill() {
    if (m_data->count() > 1) return;
-
+   
    LeftvShallow data = base::operator*();
-   idhdl* myroot = getmyroot();
-   killhdl2((idhdl)(data->data), myroot, currRing);
+   CountedRefEnv::erase((idhdl)data->data);
    data->data = NULL;
    data->rtyp = NONE;
-   
-   if(--((*myroot)->ref)) {
-     killhdl2(*myroot, &IDROOT, currRing);
-     (*myroot) = NULL;
-   }
  }
 };
 
