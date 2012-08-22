@@ -78,6 +78,9 @@ public:
     static idhdl myroot = NULL;
     if (myroot == NULL) {
       myroot = enterid(" _shared_data_ ", 0, PACKAGE_CMD, &IDROOT, TRUE);
+      IDPACKAGE(myroot) = (package)omAlloc0(sizeof(*basePack));
+      IDPACKAGE(myroot)->idroot = idrec().set(omStrDup("last"), 0, DEF_CMD, FALSE);
+      IDNEXT(IDPACKAGE(myroot)->idroot) = NULL;
     }
     return &myroot;
   }
@@ -87,26 +90,35 @@ public:
     static unsigned int counter = 0;
     sprintf(name, " :%u:%p:_shared_: ", ++counter, data);
 
-    idhdl* root = locals();
-    short ref = ++(*root)->ref;
+    idhdl* root;
 
+    if (RingDependend(typ))
+      root = &currRing->idroot;
+    else {
+      root = &IDPACKAGE(*locals())->idroot;
+      ++(IDPACKAGE(*locals())->ref);
+    }
     assume((*root)->get(name, 0) == NULL); 
-    (*root) = (*root)->set(name, 0, typ, FALSE);
+    (*root) = (*root)->set(omStrDup(name), 0, typ, FALSE);
+
     assume((*root) != NULL);
     IDDATA(*root) = (char*) data;
-    (*root)->ref = ref;
+    ++(IDPACKAGE(*locals())->ref);
 
     return *root;
   } 
 
   static void erase(idhdl handle) {
-
-    idhdl* root = locals();
-    short ref = --((*root)->ref);
+    idhdl* root;
+    if (RingDependend(IDTYP(handle)))
+      root = &currRing->idroot;
+    else {
+      root = &IDPACKAGE(*locals())->idroot;
+      (--IDPACKAGE(*locals())->ref);
+    }
     killhdl2(handle, root, currRing);
-    (*root)->ref = ref;
 
-    if(ref <= 0) {
+    if((IDPACKAGE(*locals())->ref) <= 0) {
       killhdl2(*root, &IDROOT, currRing);
       (*root) = NULL;
     }
