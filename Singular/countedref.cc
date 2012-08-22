@@ -32,11 +32,48 @@
 #include "attrib.h"
 
 
+template <class PtrType, bool NeverNull = false, class CountType = short>
+class CountedRefPtr {
+  typedef CountedRefPtr self;
+
+public:
+  typedef PtrType ptr_type;
+  typedef CountType count_type;
+
+  CountedRefPtr(ptr_type ptr): m_ptr(ptr) { reclaim(); }
+  CountedRefPtr(const self& rhs): m_ptr(rhs.m_ptr) { reclaim(); }
+
+  self& operator=(ptr_type ptr) {
+    kill();
+    m_ptr = ptr;
+    reclaim();
+    return *this;
+  }
+  self& operator=(const self& rhs) { return operator=(rhs.m_ptr); }
+
+  bool operator==(const self& rhs) const { return m_ptr == rhs.m_ptr; }
+  bool operator==(ptr_type ptr) const { return m_ptr == ptr; }
+
+  operator bool() const { return NeverNull || m_ptr; }
+  operator ptr_type() { return m_ptr; }
+  ptr_type operator->() { return *this; }
+
+  count_type count() const { return m_ptr->ref; }
+
+private:
+  void kill() { if (release()) CountedRefPtr_kill(m_ptr); }
+  
+  void reclaim() { if(*this) ++m_ptr->ref; }
+  count_type release() { return (*this? --m_ptr->ref: 0); }
+  ptr_type m_ptr;
+};
+
+
 class CountedRefEnv {
   typedef CountedRefEnv self;
 
 public:
-
+  typedef CountedRefPtr<idhdl*> root_type;
   static idhdl* locals() {
     static idhdl myroot = NULL;
     if (myroot == NULL) {
@@ -51,12 +88,13 @@ public:
     sprintf(name, " :%u:%p:_shared_: ", ++counter, data);
 
     idhdl* root = locals();
-    assume((*root)->get(name, 0) == NULL); 
-    short ref = (*root)->ref;
-    *root = (*root)->set(name, 0, typ, FALSE);
-    (*root)->ref = ++ref;;
+    short ref = ++(*root)->ref;
 
+    assume((*root)->get(name, 0) == NULL); 
+    (*root) = (*root)->set(name, 0, typ, FALSE);
+    assume((*root) != NULL);
     IDDATA(*root) = (char*) data;
+    (*root)->ref = ref;
 
     return *root;
   } 
@@ -64,15 +102,19 @@ public:
   static void erase(idhdl handle) {
 
     idhdl* root = locals();
-    short ref = (*root)->ref;
+    short ref = --((*root)->ref);
     killhdl2(handle, root, currRing);
-    (*root)->ref = --ref;
-    if(ref > 0) { return;}
+    (*root)->ref = ref;
 
-    killhdl2(*root, &IDROOT, currRing);
-    (*root) = NULL;
+    if(ref <= 0) {
+      killhdl2(*root, &IDROOT, currRing);
+      (*root) = NULL;
+    }
  }
 };
+
+
+inline void CountedRefPtr_kill(ring r) { rKill(r); }
 
 
 class RefCounter {
@@ -175,8 +217,13 @@ public:
 
   self& operator=(const self& rhs) { return operator=(rhs.m_data); }
   self& operator=(leftv rhs) {
-    m_data->CleanUp();
-    m_data->Copy(rhs);
+    assume(m_data->rtyp == IDHDL);
+    kill();
+    m_data->e = rhs->e;
+    IDTYP((idhdl)m_data->data) =  rhs->Typ();
+    IDDATA((idhdl)m_data->data) = (char*) rhs->CopyD();
+    rhs->e = NULL;
+    
     return *this;
   }
 };
@@ -194,12 +241,12 @@ class CountedRefData:
 
 public:
   /// Construct reference for Singular object
-  explicit CountedRefData(leftv data, idhdl* ctx = &IDROOT):
-    base(), m_data(data), m_context(ctx) { context(); }
+  explicit CountedRefData(leftv data, BOOLEAN global = TRUE):
+    base(), m_data(data), m_ring(parent(data)), m_global(global) { }
 
   /// Construct deep copy
   CountedRefData(const self& rhs):
-    base(), m_data(rhs.m_data), m_context(rhs.m_context) { }
+    base(), m_data(rhs.m_data), m_ring(rhs.m_ring), m_global(rhs.m_global) { }
   
   /// Destruct
   ~CountedRefData()  { }
@@ -207,15 +254,16 @@ public:
   /// Replace data
   self& operator=(const self& rhs) {
     m_data = rhs.m_data;
-    m_context = rhs.m_context;
+    m_global = rhs.m_global;
+    m_ring = rhs.m_ring;
     return *this;
   }
  
   /// Replace with other Singular data
-  void set(leftv rhs, idhdl* ctx = &IDROOT) {
+  void set(leftv rhs, BOOLEAN global = TRUE) {
     m_data = rhs;
-    m_context = ctx;
-    context();
+    m_global = global;
+    m_ring = parent(rhs);
   }
 
   /// Write (shallow) copy to given handle
@@ -231,41 +279,45 @@ public:
 
 private:
   /// Check whether identifier became invalid
-  /// @note Sergio Leone memorial function
+  /// @note Assume that local identifiers are available
   BOOLEAN broken() {
-    if( (m_context == CountedRefEnv::locals()) || (m_context == &currRing->idroot))
-      return FALSE;                  // the good, 
-
-    if (m_data->RingDependend())     // the bad,
-      return complain("Referenced identifier not available in current ring");
-
-    return (brokenid(m_context) &&   // and the ugly (case)
-            ((m_context == &basePack->idroot) || brokenid())) &&
-      complain("Referenced identifier not found in current context");
+    if (m_ring) {
+      if (m_ring != currRing) 
+        return complain("Referenced identifier not from current ring");    
+      return m_global && brokenid(currRing->idroot) &&
+        complain("Referenced identifier not available in ring anymore");  
+    }
+    return m_global &&
+      brokenid(currPack->idroot) &&
+      ((currPack == basePack) || brokenid(basePack->idroot)) &&
+      complain("Referenced identifier not available in current context");
   }
 
-  /// Determine corresponding context
-  /// @note for ring-dependent object we always store @c currRing's root as marker 
-  void context() { if (m_data->RingDependend()) m_context = &currRing->idroot; }
-
-  /// 
+  /// Raise error message and return @c TRUE
   BOOLEAN complain(const char* text) {
     Werror(text);
     return TRUE;
   }
-  BOOLEAN brokenid(idhdl* root = &basePack->idroot) {
-    idhdl handle = (idhdl) m_data->data;
-    for(idhdl current = *root; current != NULL; current = IDNEXT(current))
-      if (current == handle) return FALSE;
-    return TRUE;
+
+  /// Check a given context for our identifier
+  BOOLEAN brokenid(idhdl context) {
+    return (context == NULL) || 
+      ((context != (idhdl) m_data->data) && brokenid(IDNEXT(context)));
   }
 
+  /// Store ring for ring-dependent objects
+  static ring parent(leftv rhs) { 
+    return (rhs->RingDependend()? currRing: NULL); 
+  }
 
   /// Singular object
   LeftvDeep m_data;
 
   /// Store namespace for ring-dependent objects
-  idhdl* m_context;
+  CountedRefPtr<ring> m_ring;
+
+  /// Marks whether we have to check 
+  bool m_global;
 };
 
 /// blackbox support - initialization
@@ -447,63 +499,50 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
   Werror("Can only take reference from identifier");
   return FALSE;
 }
-                                                                     
+
+BOOLEAN countedref_CheckInit(leftv res, leftv arg)
+{
+  if (arg->Data() != NULL) return FALSE;
+  res->rtyp = NONE;
+  Werror("Noninitialized access");
+  return TRUE;
+}
+                                                                 
 /// blackbox support - unary operations
 BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 {
-  if (head->Data() == NULL) return FALSE;
   if(op == TYPEOF_CMD)
     return blackboxDefaultOp1(op, res, head);
 
+  if (countedref_CheckInit(res, head)) return TRUE;
+
+  if(op == head->Typ()) {
+    res->rtyp = op;
+    return iiAssign(res, head);
+  }
+
   return CountedRef::cast(head).dereference(head) || 
-    iiExprArith1(res, head, (op == DEF_CMD? head->Typ(): op));
+    iiExprArith1(res, head, op == DEF_CMD? head->Typ(): op);
 }
 
 /// blackbox support - binary operations
 BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 {
-  if (head->Data() == NULL) return FALSE;
-  return CountedRef::cast(head).dereference(head) || CountedRef::resolve(arg) ||
+  return countedref_CheckInit(res, head) ||
+    CountedRef::cast(head).dereference(head) || CountedRef::resolve(arg) ||
     iiExprArith2(res, head, op, arg);
 }
 
 /// blackbox support - ternary operations
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
-  if (head->Data() == NULL) return FALSE;
-  return  CountedRef::cast(head).dereference(head) || 
+  return countedref_CheckInit(res, head) ||
+    CountedRef::cast(head).dereference(head) || 
     CountedRef::resolve(arg1) || CountedRef::resolve(arg2) ||
     iiExprArith3(res, op, head, arg1, arg2);
 }
 
 
-/// blackbox support - n-ary operations
-BOOLEAN countedref_OpM(int op, leftv res, leftv args)
-{
-  if (args->Data() == NULL) return FALSE;
-
-  if(op == SYSTEM_CMD) {
-    if (args->next) {
-      leftv next = args->next;
-      args->next = NULL;
-      CountedRef obj = CountedRef::cast(args);
-      char* name = (next->Typ() == STRING_CMD? 
-                    (char*) next->Data(): (char*)next->Name());
-      if (strcmp(name, "count") == 0) return obj.count(res);
-      if (strcmp(name, "hash") == 0) return obj.hash(res);
-      if (strcmp(name, "same") == 0) 
-        return (next->next == NULL) ||  obj.same(res, next->next);
-      if ((strcmp(name, "like") == 0) || (strcmp(name, "likewise") == 0))
-        return (next->next == NULL) ||  obj.likewise(res, next->next);
-      if (strcmp(name, "name") == 0) return obj.name(res);
-      if ((strcmp(name, "type") == 0) || (strcmp(name, "typeof") == 0))
-        return obj.type(res);
-      return TRUE;
-    }
-    return TRUE;
-  }
-  return CountedRef::cast(args).dereference(args) || iiExprArithM(res, args, op);
-}
 
 /// blackbox support - destruction
 void countedref_destroy(blackbox *b, void* ptr)
@@ -518,7 +557,7 @@ class CountedRefShared:
   typedef CountedRef base;
 public:
   /// Construct new reference from Singular data  
-  CountedRefShared(leftv arg):  base(new data_type(wrap(arg), CountedRefEnv::locals())) { }
+  CountedRefShared(leftv arg):  base(new data_type(wrap(arg), FALSE)) { }
 
 private:
   /// Recover previously constructed shared data
@@ -538,7 +577,7 @@ public:
 
   /// Replace data that reference is pointing to
   self& operator=(leftv rhs) {
-    m_data->set(wrap(rhs), CountedRefEnv::locals());
+    m_data->set(rhs, FALSE);
     return *this;
   }
   void destruct() {
@@ -570,6 +609,32 @@ private:
 };
 
 
+/// blackbox support - n-ary operations
+BOOLEAN countedref_OpM(int op, leftv res, leftv args)
+{
+  if (args->Data() == NULL) return FALSE;
+
+  if(op == SYSTEM_CMD) {
+    if (args->next) {
+      leftv next = args->next;
+      args->next = NULL;
+      CountedRef obj = CountedRef::cast(args);
+      char* name = (next->Typ() == STRING_CMD? 
+                    (char*) next->Data(): (char*)next->Name());
+      next = next->next;
+      if (next) {
+        if (strcmp(name, "same") == 0) return obj.same(res, next);
+        if (strncmp(name, "like", 4) == 0) return obj.likewise(res, next);
+      }
+      if (strncmp(name, "count", 5) == 0) return obj.count(res);
+      if (strcmp(name, "hash") == 0) return obj.hash(res);
+      if (strcmp(name, "name") == 0) return obj.name(res);
+      if (strncmp(name, "type", 4) == 0) return obj.type(res);
+    }
+    return TRUE;
+  }
+  return CountedRef::cast(args).dereference(args) || iiExprArithM(res, args, op);
+}
 /// blackbox support - assign element
 BOOLEAN countedref_AssignShared(leftv result, leftv arg)
 {
@@ -580,10 +645,11 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
     return FALSE;
   }
   
-  /// Case: new shared data
+  /// Case: new reference to already shared data
   if (result->Typ() == arg->Typ()) 
     return CountedRefShared::cast(arg).outcast(result);
 
+  /// Case: new shared data
   return CountedRefShared(arg).outcast(result);
 }
 
