@@ -230,25 +230,6 @@ void sigsegv_handler(int sig, sigcontext s)
   exit(0);
 }
 
-/*---------------------------------------------------------------------*/
-/**
- * @brief additional default signal handler
-
-  // some newer Linux version cannot have SIG_IGN for SIGCHLD,
-  // so use this nice routine here:
-  //  SuSe 9.x reports -1 always
-  //  Redhat 9.x/FC x reports sometimes -1
-  // see also: hpux_system
-  // also needed by getrusage (timer etc.)
-
- @param[in] sig
-**/
-/*---------------------------------------------------------------------*/
-void sig_chld_hdl(int sig)
-{
-  waitpid(-1,NULL,WNOHANG);
-}
-
 /*2
 * init signal handlers, linux/i386 version
 */

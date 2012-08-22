@@ -73,6 +73,7 @@ SOURCES =    Minor.cc\
    links/pipeLink.cc\
    scanner.cc\
    sdb.cc\
+   links/s_buff.cc\
    links/silink.cc\
    links/sing_dbm.cc\
    sing_win.cc\
@@ -130,6 +131,7 @@ SingularHEADERS =    Cache.h \
    run.h \
    sdb.h \
    silink.h \
+   links/s_buff.h \
    links/sing_dbm.h \
    sing_win.h \
    slInit.h \
