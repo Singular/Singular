@@ -1438,7 +1438,11 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     if (found)
       result.insert (Lc (LCF));
     else
-      result.append (LCF);
+    {
+      for (CFListIterator i= result; i.hasItem(); i++)
+        i.getItem() *= LCF;
+      result.insert (LCF);
+    }
     return result;
   }
 
@@ -2217,7 +2221,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
     }
     decompress (contentAFactors, N);
-    normalize (contentAFactors);
+    if (!extension)
+      normalize (contentAFactors);
     return contentAFactors;
   }
 
@@ -2266,7 +2271,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         Union (multiFactorize (g, info),
                multiFactorize (gcdDerivZ, info));
         appendSwapDecompress (factorsG, contentAFactors, N, swapLevel, x);
-        normalize (factorsG);
+        if (!extension)
+          normalize (factorsG);
         return factorsG;
       }
       else
@@ -2332,7 +2338,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           Union (multiFactorize (g, info),
                  multiFactorize (A/g, info));
           appendSwapDecompress (factorsG, contentAFactors, N, swapLevel, x);
-          normalize (factorsG);
+          if (!extension)
+            normalize (factorsG);
           delete [] bufAeval2;
           delete [] Aeval2;
           return factorsG;
@@ -2379,7 +2386,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       factors.append (A);
       appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                             swapLevel2, x);
-      normalize (factors);
+      if (!extension)
+        normalize (factors);
       delete [] bufAeval2;
       delete [] Aeval2;
       return factors;
@@ -2434,7 +2442,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     factors.append (A);
     appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                           swapLevel2, x);
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     delete [] Aeval2;
     return factors;
   }
@@ -2467,7 +2476,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
         appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                               swapLevel2, x);
-        normalize (factors);
+        if (!extension)
+          normalize (factors);
         delete [] Aeval2;
         return factors;
       }
@@ -2613,7 +2623,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
       appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                             swapLevel2, x);
-      normalize (factors);
+      if (!extension)
+        normalize (factors);
       delete [] index;
       delete [] Aeval2;
       return factors;
@@ -2958,6 +2969,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   if (!LCheuristic && !LCmultiplierIsConst && bufFactors.isEmpty()
       && fdivides (getVars (LCmultiplier), testVars))
   {
+    LCheuristic= true;
     int index;
     Variable xx;
     CFList vars1;
@@ -3233,7 +3245,8 @@ tryAgainWithoutHeu:
   swap (factors, swapLevel, swapLevel2, x);
   append (factors, contentAFactors);
   decompress (factors, N);
-  normalize (factors);
+  if (!extension)
+    normalize (factors);
 
   delete[] liftBounds;
 
