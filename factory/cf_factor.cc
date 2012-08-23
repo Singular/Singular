@@ -126,7 +126,23 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
   {
     if ( f.isImm() )
     {
-      printf("+%ld",f.intval());
+      if (CFFactory::gettype()==GaloisFieldDomain)
+      {
+         int a= imm2int (f.getval());
+         if ( a == gf_q )
+           printf ("+%d", a);
+         else  if ( a == 0 )
+           printf ("+1");
+         else  if ( a == 1 )
+           printf ("+%c",gf_name);
+         else
+         {
+           printf ("+%c",gf_name);
+           printf ("^%d",a);
+         }
+      }
+      else
+        printf("+%ld",f.intval());
     }
     else
     {
