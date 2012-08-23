@@ -775,7 +775,10 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
             if (bufDegs1.getLength() <= 1)
             {
               if (!buf.inCoeffDomain())
+              {
                 reconstructedFactors.append (buf);
+                F= 1;
+              }
               break;
             }
           }
@@ -876,6 +879,7 @@ extEarlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
               buf= buf (y - eval, y);
               buf /= Lc (buf);
               appendMapDown (reconstructedFactors, buf, info, source, dest);
+              F= 1;
             }
             break;
           }
@@ -5952,7 +5956,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                           false, false, N);
 
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     return factors;
   }
 
@@ -5973,7 +5978,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       append (factorsG, contentAxFactors);
       append (factorsG, contentAyFactors);
       decompress (factorsG, N);
-      normalize (factors);
+      if (!extension)
+        normalize (factorsG);
       return factorsG;
     }
   }
@@ -5993,7 +5999,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       append (factorsG, contentAxFactors);
       append (factorsG, contentAyFactors);
       decompress (factorsG, N);
-      normalize (factors);
+      if (!extension)
+        normalize (factorsG);
       return factorsG;
     }
   }
@@ -6022,7 +6029,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                           swap, false, N);
 
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     return factors;
   }
 
@@ -6127,7 +6135,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                             swap, swap2, N);
 
-      normalize (factors);
+      if (!extension)
+        normalize (factors);
       return factors;
     }
 
@@ -6145,7 +6154,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           reverseSubst (factors, subCheck, x);
           appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                                 swap, swap2, N);
-          normalize (factors);
+          if (!extension)
+            normalize (factors);
           return factors;
         }
       }
@@ -6162,7 +6172,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           reverseSubst (factors, subCheck, y);
           appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                                 swap, swap2, N);
-          normalize (factors);
+          if (!extension)
+            normalize (factors);
           return factors;
         }
       }
@@ -6238,7 +6249,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       factors.append (A);
     appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                             swap, swap2, N);
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     return factors;
   }
 
@@ -6440,7 +6452,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                         swap, swap2, N);
-  normalize (factors);
+  if (!extension)
+    normalize (factors);
 
   return factors;
 }
