@@ -321,7 +321,11 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     if (found)
       result.insert (Lc (LCF));
     else
-      result.append (LCF);
+    {
+      for (CFListIterator i= result; i.hasItem(); i++)
+        i.getItem() *= LCF;
+      result.insert (LCF);
+    }
     return result;
   }
 
@@ -1307,6 +1311,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   if (!LCheuristic && !LCmultiplierIsConst && bufFactors.isEmpty()
       && fdivides (getVars (LCmultiplier), testVars))
   {
+    LCheuristic= true;
     int index;
     Variable xx;
     CFList vars1;
