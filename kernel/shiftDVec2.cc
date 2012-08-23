@@ -1691,6 +1691,7 @@ LObject* ShiftDVec::enterOnePair
 #endif
   {
     #ifdef HAVE_PLURAL //BOCO: this should not be set
+    assume(0) //BOCO: We don't HAVE_PLURAL
     if ( rIsPluralRing(currRing) )
     {
 #if 0 //BOCO: replaced

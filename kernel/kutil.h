@@ -310,6 +310,10 @@ public:
   KINLINE void SetLmTail(poly lm, poly new_p, int length,
                          int use_bucket, ring r, poly last);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
+#ifdef HAVE_SHIFTBBADVEC
+  KINLINE void Tail_Minus_mm_Mult_qq
+    (poly m, poly qq, int lq, poly spNoether, int lV);
+#endif
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists
   KINLINE poly GetP(omBin lmBin = NULL);

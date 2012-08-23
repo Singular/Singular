@@ -7,6 +7,9 @@
 * ABSTRACT - the interpreter related ring operations
 */
 
+//BOCO: Hack TODO: Do this properly
+#define HAVE_SHIFTBBADVEC
+
 /* includes */
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
@@ -330,6 +333,25 @@ struct ip_sring
 #endif
  public:
   operator coeffs() const { return cf; }
+#ifdef HAVE_SHIFTBBADVEC
+  //BOCO: This part is essential for enabling the letterplace
+  //multiplication (especially the inhomogenous multiplication)
+ 
+  /* Use InitOrderMapping, to create a Mapping i -> pos,     *
+   * where i is an index of a variable in a block of the     *
+   * letterplace polynomial and pos the position of the      *
+   * order Field for the block. This may not yet make sense  *
+   * for any other order than dp. Please review              *
+   * InitOrderMapping and InitSDMultiplication in            *
+   * SDMultiplication.cc for more information about this.    */
+  int osize;
+  int* omap;
+
+  /* This is the letterplace replacement for p_MemSum__T.    *
+   * See SDMultiplication.cc for more informations. This     *
+   * pointer should be initialized by InitSDMultiplication   */
+  void (*p_ExpSum)(poly rt, poly p, poly q, ring r, int lV);
+#endif
 };
 
 ////////// DEPRECATED
