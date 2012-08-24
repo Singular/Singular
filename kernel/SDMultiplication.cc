@@ -7,32 +7,6 @@
 //the ..._Mult_...__T functions. Are there other Kandidates for
 //r->p_Procs->..._Mult_... pointers???
 //
-//TODO PRIORITY TODO:
-//review following functions:
-//-> See list of exp vector things
-//
-//SetShortExpVector:  
-//Kommt vor in Sektionen mit HAVE_SHIFTBBA_NONEXISTENT, also
-//nicht kritisch...
-//
-//p_ExpVectorSub
-//kommt in ksReducePoly vor und wird auf geshiftete Polynome
-//angewendet, also sollte es funktionieren
-//
-//p_LmExpVectorAddIsOk
-//kommt in ksReducePoly vor
-//Stellen die das benutzen koennen wahrscheinlich ausgeklammert
-//werden (hoffe ich), da wir uns um den exp bound keine Sorgen
-//machen muessen. (Unsere Exponenten haben hoechstens Groesse 1.)
-//
-//p_ExpVectorAdd
-//Benutzt an der auskommentierten Stelle von
-//p_LmExpVectorAddIsOk - siehe Kommentar dazu
-//
-//p_GetExpDiff
-//
-//p_GetExp/p_SetExp -> see TODO: ksCreateShortSpoly
-//
 //
 //TODO:
 // · Write a decent Header for this file
@@ -62,6 +36,47 @@
 //
 // · All this will never work...
 // · Pray
+//
+//
+//TODO Additional: -> This is now done i hope (more or less)
+//review following functions:
+//-> See list of exp vector things
+//
+//SetShortExpVector:  
+//Wir benutzen momentan den SEV nicht (spaeter vielleicht ???)
+//
+//p_ExpVectorSub
+//kommt in ksReducePoly vor und wird auf geshiftete Polynome
+//angewendet, also sollte es funktionieren
+//
+//p_LmExpVectorAddIsOk
+//kommt in ksReducePoly vor
+//Stellen die das benutzen koennen wahrscheinlich ausgeklammert
+//werden (hoffe ich), da wir uns um den exp bound keine Sorgen
+//machen muessen. (Unsere Exponenten haben hoechstens Groesse 1.)
+//TODO: Kommt noch an so einigen Stellen vor und sollte
+//wahrscheinlich aus dem Code entfernt werden, aber das mache
+//ich vielleicht ein ander Mal -> vielleicht auch erst beim
+//Debugging (z.B. in der kCheckSpolyCreation) -> s. Grischas
+//dritte Liste
+//
+//p_ExpVectorAdd
+//Benutzt an der auskommentierten Stelle von
+//p_LmExpVectorAddIsOk - siehe Kommentar dazu
+//Ich denke hier geht es hauptsaechlich darum herauszufinden, ob
+//der exponent nicht zu gross ist, um ihn speichern zu koennen.
+//Das kann bei uns nicht passieren, da wir nur Exponenten der
+//Groesse maximal 1 haben, aber vielleicht sollte man sich das
+//nochmal genauer anschauen.
+//TODO: Kommt auch noch an anderen Stellen vor, z.B. in der
+//kutil.cc, aber vielleicht funktioniert das dort auch ->
+//spaeter drum kuemmern
+//
+//p_GetExpDiff
+//Adjustment to ksCreateSpoly -- done
+//
+//p_GetExp/p_SetExp
+//Adjustment to ksCreateSpoly -- done
 //
 //Now following: The lists from Grischa
 /*
