@@ -471,8 +471,8 @@ dimension(c2);
 @end table
 @c --------------------------------------
 @node dualCone,equations,dimension,cone related functions
-@subsubsection dual
-@cindex dual
+@subsubsection dualCone
+@cindex dualCone
 
 @table @code
 @item @strong{Syntax:}
@@ -534,7 +534,7 @@ print(E2);
 @c --------------------------------------
 @node facets,linspace,equations,cone related functions
 @subsubsection facets
-@cindex getFacets
+@cindex facets
 
 @table @code
 @item @strong{Syntax:}
