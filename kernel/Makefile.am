@@ -67,7 +67,7 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	gfan.h bbcone.h bbfan.h \
 	preimage.h longrat.h timer.h kInline.h modulop.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
-	linearAlgebra.h page.h \
+	linearAlgebra.h \
 	f5c.h f5data.h f5gb.h f5lists.h
 
 libkernel_includedir  =${includedir}/singular/kernel/

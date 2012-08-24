@@ -340,7 +340,6 @@ lists primeFactorisation(const number n, const number pBound)
 #include <polys/templates/p_Procs.h>
 
 #include <kernel/febase.h>
-#include <kernel/page.h>
 #include <kernel/kstd1.h>
 #include <kernel/timer.h>
 

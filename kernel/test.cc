@@ -153,7 +153,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include "multicnt.h"
 #include "npolygon.h"
 // #include "Number.h" // Too old?
-#include "page.h"
 // #include "Poly.h" // Too old?
 // #include "PowerSeries.h" // Too old?
 
