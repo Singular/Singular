@@ -9,6 +9,7 @@
 //
 //TODO PRIORITY TODO:
 //review following functions:
+//-> See list of exp vector things
 //
 //SetShortExpVector:  
 //Kommt vor in Sektionen mit HAVE_SHIFTBBA_NONEXISTENT, also
@@ -30,8 +31,8 @@
 //
 //p_GetExpDiff
 //
-//If some of them need adjustment: Ask Grischa to look them up;
-//where in the bba are there used?
+//p_GetExp/p_SetExp -> see TODO: ksCreateShortSpoly
+//
 //
 //TODO:
 // · Write a decent Header for this file
@@ -106,6 +107,29 @@ ksReducePoly			1167(redtail)
 				
 ksReducePolyTail		2421(redtailBba)
 				1167(redtail)
+ksCreateShortSpoly
+nc_ksCreateShortSpoly
+*/
+/* List for ExpVector things
+Those in Brackets are not used in our letterplace version of
+the Bba
+
+function		file		line
+
+SetShortExpVector	kspoly.cc	153, 488, 543 (360)
+			kutil.cc	9400 (3118, 5308, 5406)
+			shiftDVec.cc	1336(so close!), 1526, 2289
+			kstd2.cc	319, 336, 399, 473, 539, 639, 687, 777, 842, 945, 1023, 1123, 2795, 3094, 3138
+			tgb.cc		(1867, 1914, 3018, 3065, 4703)
+p_ExpVectorSub		kspoly.cc	99, 115, (227, 306, 322 )
+p_LmExpVectorAddIsOk	kspoly.cc	104, (311)
+			kutil.cc	7936, 7937, 7963, 7964
+p_ExpVectorAdd		kspoly.cc	107, (314)
+			kutil.cc	5866, 5909
+			fast_mult.cc	(449)
+			kstd2.cc	1842, 1852
+p_GetExpDiff		kspoly.cc	607, 659, 697
+			ringgb.cc	(71)
 */
 
 
@@ -1031,6 +1055,8 @@ int ShiftDVec::ksReducePolyTail
 //static void bbb() { int i=0; }
 poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
 #else //replacement
+/* BOCO: see original comment; p2 should be the shifted        *
+ * polynomial.                                                 */
 poly ShiftDVec::ksCreateShortSpoly
   ( poly p1, poly p2, ring tailRing )
 #endif
@@ -1066,12 +1092,22 @@ poly ShiftDVec::ksCreateShortSpoly
   }
 #endif
 
+  //BOCO: p1 = lm(p1) + tail(p1); p2 = lm(p2) * tail(p2)
+  // Calculating (for simplicity: no coefficients in this
+  // comment):
+  // 1.) m2 = q1 * lm(tail(p2))
+  // 2.) m1 = lm(tail(p1)) * q2
+  // where q1 = lm(p1)/ggt(lm(p1), lm(p2)) (ggt is here overlap)
+  //   and q2 = lm(p2)/ggt(lm(p1), lm(p2))
+  // TODO: make 2.) unproblematic
+  int uptodeg = currRing->N/lV;
   if (a1==NULL)
   {
     if(a2!=NULL)
     {
       m2=p_Init(currRing);
 x2:
+#if 0 //BOCO: replaced
       for (i = (currRing->N); i; i--)
       {
         c = p_GetExpDiff(p1, p2,i, currRing);
@@ -1084,6 +1120,35 @@ x2:
           p_SetExp(m2,i,p_GetExp(a2,i,tailRing),currRing);
         }
       }
+#else //replacement
+      for(i = 1; i < currRing->N; i += lV)
+      {
+        for(int j = 0; j < lV; ++j)
+        {
+          if( p_GetExpDiff(p1, p2,i+j, currRing) )
+          {
+            p_SetExp(m2,i+j,1,currRing);
+            goto end_outer_loop;
+          }
+        }
+        break; //ExpDiff was 0 -> q1 calculated
+        :end_outer_loop ;
+      }
+
+      for(int k = 1; i < currRing->N; i += lV, k += lV)
+      {
+        for(int j = 0; j < lV; ++j)
+        {
+          if( p_GetExp(m2,i+j, currRing) )
+          {
+            p_SetExp(m2,i,p_GetExp(a2,k+j,tailRing),currRing);
+            goto end_outer_loop;
+          }
+        }
+        break; //GetExp was 0 -> no more variables in a2
+        :end_outer_loop ;
+      }
+#endif
       if ((c1==c2)||(c2!=0))
       {
         p_SetComp(m2,p_GetComp(a2,tailRing), currRing);
@@ -1124,6 +1189,7 @@ x2:
   {
     m1=p_Init(currRing);
 x1:
+#if 0 //BOCO: replaced (problematic case, see above)
     for (i = (currRing->N); i; i--)
     {
       c = p_GetExpDiff(p2, p1,i,currRing);
@@ -1136,6 +1202,23 @@ x1:
         p_SetExp(m1,i,p_GetExp(a1,i, tailRing), currRing);
       }
     }
+#else
+    for(i = 0; i)
+    int uptodeg = currRing->N/lV;
+    for(; uptodeg; --uptodeg)
+    {
+      :loopstart ;
+      for(i = 0; i < lV; ++i)
+      {
+        if( p_GetExpDiff(p2, p1,i,currRing) )
+        {
+          p_SetExp(m1,i,1,currRing);
+          goto loopstart;
+        }
+      }
+      break;
+    }
+#endif
     if ((c1==c2)||(c1!=0))
     {
       p_SetComp(m1,p_GetComp(a1,tailRing),currRing);
