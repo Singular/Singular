@@ -1100,7 +1100,6 @@ poly ShiftDVec::ksCreateShortSpoly
   // 2.) m1 = lm(tail(p1)) * q2
   // where q1 = lm(p1)/ggt(lm(p1), lm(p2)) (ggt is here overlap)
   //   and q2 = lm(p2)/ggt(lm(p1), lm(p2))
-  // TODO: make 2.) unproblematic
   int uptodeg = currRing->N/lV;
   if (a1==NULL)
   {
@@ -1190,7 +1189,7 @@ x2:
   {
     m1=p_Init(currRing);
 x1:
-#if 0 //BOCO: replaced (problematic case, see above)
+#if 0 //BOCO: replaced
     for (i = (currRing->N); i; i--)
     {
       c = p_GetExpDiff(p2, p1,i,currRing);
@@ -1231,7 +1230,6 @@ x1:
       break;
       :end_outer_loop ;
     }
-
 #endif
     if ((c1==c2)||(c1!=0))
     {
@@ -1259,6 +1257,7 @@ x1:
   m2 = p_Init(currRing);
   loop
   {
+#if 0 //BOCO: replaced
     for (i = (currRing->N); i; i--)
     {
       c = p_GetExpDiff(p1, p2,i,currRing);
@@ -1273,6 +1272,64 @@ x1:
         p_SetExp(m2,i,p_GetExp(a2,i, tailRing), currRing);
       }
     }
+#else //replacement same as above, but doubled
+    for(i = 1; i < currRing->N; i += lV)
+    {
+      for(int j = 0; j < lV; ++j)
+      {
+        if( p_GetExpDiff(p1, p2,i+j, currRing) )
+        {
+          p_SetExp(m2,i+j,1,currRing);
+          goto end_outer_loop;
+        }
+      }
+      break; //ExpDiff was 0 -> q1 calculated
+      :end_outer_loop ;
+    }
+
+    for(int k = 1; i < currRing->N; i += lV, k += lV)
+    {
+      for(int j = 0; j < lV; ++j)
+      {
+        if( p_GetExp(a2,i+j, currRing) )
+        {
+          p_SetExp(m2,i,p_GetExp(a2,k+j,tailRing),currRing);
+          goto end_outer_loop;
+        }
+      }
+      break; //GetExp was 0 -> no more variables in a2
+      :end_outer_loop ;
+    }
+
+
+    for(i = 1; i < currRing->N; i += lV)
+    {
+      for(int j = 0; j < lV; ++j)
+      {
+        if( p_GetExp(a1,i+j, currRing) )
+        {
+          p_SetExp(m1,i,p_GetExp(a1,i+j,tailRing),currRing);
+          goto end_outer_loop;
+        }
+      }
+      break; //GetExp was 0 -> no more variables in a1
+      :end_outer_loop ;
+    }
+
+    for(int k = degP1; i < currRing->N; i += lV, k += lV)
+    {
+      for(int j = 0; j < lV; ++j)
+      {
+        if( p_GetExp(p2, k+j, currRing) )
+        {
+          p_SetExp(m2,i+j,1,currRing);
+          goto end_outer_loop;
+        }
+      }
+      break;
+      :end_outer_loop ;
+    }
+#endif
     if(c1==c2)
     {
       p_SetComp(m1,p_GetComp(a1, tailRing), currRing);
