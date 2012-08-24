@@ -1068,6 +1068,7 @@ poly ShiftDVec::ksCreateShortSpoly
   number t1 = NULL,t2 = NULL;
   int cm,i;
   BOOLEAN equal;
+  int degP1 = p_Totaldegree(p1, currRing); //BOCO: added
 
 #ifdef HAVE_RINGS
   BOOLEAN is_Ring=rField_is_Ring(currRing);
@@ -1139,7 +1140,7 @@ x2:
       {
         for(int j = 0; j < lV; ++j)
         {
-          if( p_GetExp(m2,i+j, currRing) )
+          if( p_GetExp(a2,i+j, currRing) )
           {
             p_SetExp(m2,i,p_GetExp(a2,k+j,tailRing),currRing);
             goto end_outer_loop;
@@ -1203,21 +1204,34 @@ x1:
       }
     }
 #else
-    for(i = 0; i)
-    int uptodeg = currRing->N/lV;
-    for(; uptodeg; --uptodeg)
+    for(i = 1; i < currRing->N; i += lV)
     {
-      :loopstart ;
-      for(i = 0; i < lV; ++i)
+      for(int j = 0; j < lV; ++j)
       {
-        if( p_GetExpDiff(p2, p1,i,currRing) )
+        if( p_GetExp(a1,i+j, currRing) )
         {
-          p_SetExp(m1,i,1,currRing);
-          goto loopstart;
+          p_SetExp(m1,i,p_GetExp(a1,i+j,tailRing),currRing);
+          goto end_outer_loop;
+        }
+      }
+      break; //GetExp was 0 -> no more variables in a1
+      :end_outer_loop ;
+    }
+
+    for(int k = degP1; i < currRing->N; i += lV, k += lV)
+    {
+      for(int j = 0; j < lV; ++j)
+      {
+        if( p_GetExp(p2, k+j, currRing) )
+        {
+          p_SetExp(m2,i+j,1,currRing);
+          goto end_outer_loop;
         }
       }
       break;
+      :end_outer_loop ;
     }
+
 #endif
     if ((c1==c2)||(c1!=0))
     {
