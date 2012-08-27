@@ -1244,12 +1244,17 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
     iter1= l;
     iter1++;
 
-    v= Variable (i + 3);
     tmp= 1;
     for (iter2= differentSecondVarFactors[i]; iter2.hasItem();
          iter2++, iter1++)
     {
-      if (degree (iter2.getItem(),v) == degree (iter1.getItem(),v))
+      if (iter2.getItem().inCoeffDomain())
+      {
+        multiplier.append (1);
+        continue;
+      }
+      v= iter2.getItem().mvar();
+      if (degree (iter2.getItem()) == degree (iter1.getItem(),v))
       {
         multiplier.append (1);
         continue;
