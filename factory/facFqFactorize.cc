@@ -704,6 +704,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   return result;
 }
 
+#define CHAR_THRESHOLD 8
 CFList
 evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
             CFList& list, const bool& GF, bool& fail)
@@ -714,6 +715,11 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
   FFRandom genFF;
   GFRandom genGF;
   int p= getCharacteristic ();
+  if (p < CHAR_THRESHOLD && !GF && alpha.level() == 1) 
+  {
+    fail= true;
+    return CFList();
+  }
   double bound;
   if (alpha != x)
   {
@@ -3305,7 +3311,25 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     CFList factors;
     bool extension= true;
     int p= getCharacteristic();
-    if (p*p < (1<<16)) // pass to GF if possible
+    if (p < 7)
+    {
+      if (p == 2)
+        setCharacteristic (getCharacteristic(), 6, 'Z');
+      else if (p == 3)
+        setCharacteristic (getCharacteristic(), 4, 'Z');
+      else if (p == 5)
+        setCharacteristic (getCharacteristic(), 3, 'Z');
+      ExtensionInfo info= ExtensionInfo (extension);
+      A= A.mapinto();
+      factors= multiFactorize (A, info);
+
+      CanonicalForm mipo= gf_mipo;
+      setCharacteristic (getCharacteristic());
+      Variable vBuf= rootOf (mipo.mapinto());
+      for (CFListIterator j= factors; j.hasItem(); j++)
+        j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
+    }
+    else if (p >= 7 && p*p < (1<<16)) // pass to GF if possible
     {
       setCharacteristic (getCharacteristic(), 2, 'Z');
       ExtensionInfo info= ExtensionInfo (extension);
