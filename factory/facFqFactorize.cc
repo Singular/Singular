@@ -718,12 +718,12 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
   if (alpha != x)
   {
     bound= pow ((double) p, (double) degree (getMipo(alpha)));
-    bound= pow ((double) bound, (double) k);
+    bound *= (double) k;
   }
   else if (GF)
   {
     bound= pow ((double) p, (double) getGFDegree());
-    bound= pow ((double) bound, (double) k);
+    bound *= (double) k;
   }
   else
     bound= pow ((double) p, (double) k);
