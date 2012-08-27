@@ -1049,6 +1049,25 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 }
 
 //**************************************************************************/
+BOOLEAN ssiPrepClose(si_link l)
+{
+  if (l!=NULL)
+  {
+    ssiInfo *d = (ssiInfo *)l->data;
+    if (d!=NULL)
+    {
+      if (d->send_quit_at_exit)
+      {
+        SSI_BLOCK_CHLD;
+        fputs("99\n",d->f_write);
+        fflush(d->f_write);
+        SSI_UNBLOCK_CHLD;
+      }
+    }
+  }
+  return FALSE;
+}
+
 BOOLEAN ssiClose(si_link l)
 {
   if (l!=NULL)

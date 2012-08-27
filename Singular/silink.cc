@@ -215,6 +215,23 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
   return res;
 }
 
+BOOLEAN slPrepClose(si_link l)
+{
+
+  if(! SI_LINK_OPEN_P(l))
+    return FALSE;
+
+  BOOLEAN res = TRUE;
+  if (l->m->PrepClose != NULL)
+  {
+    res = l->m->PrepClose(l);
+    if (res)
+      Werror("close: Error for link of type: %s, mode: %s, name: %s",
+           l->m->type, l->mode, l->name);
+  }
+  return res;
+}
+
 BOOLEAN slClose(si_link l)
 {
 

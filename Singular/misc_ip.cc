@@ -1011,6 +1011,13 @@ void m2_end(int i)
   fe_reset_input_mode();
   if (ssiToBeClosed_inactive)
   {
+    link_list hh=ssiToBeClosed;
+    while(hh!=NULL)
+    {
+      //Print("close %s\n",hh->l->name);
+      slPrepClose(hh->l);
+      hh=(link_list)hh->next;
+    }
     ssiToBeClosed_inactive=FALSE;
 
     idhdl h = currPack->idroot;
@@ -1028,7 +1035,7 @@ void m2_end(int i)
         h = h->next;
       }
     }
-    link_list hh=ssiToBeClosed;
+    hh=ssiToBeClosed;
     while(hh!=NULL)
     {
       //Print("close %s\n",hh->l->name);
