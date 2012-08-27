@@ -35,7 +35,6 @@ static CanonicalForm gcd_univar_flintp (const CanonicalForm &, const CanonicalFo
 #endif
 
 static CanonicalForm cf_content ( const CanonicalForm &, const CanonicalForm & );
-static void cf_prepgcd( const CanonicalForm &, const CanonicalForm &, int &, int &, int & );
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
@@ -696,27 +695,9 @@ int si_factor_reminder=1;
 CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
 {
   CanonicalForm fc, gc, d1;
-  int mp, cc, p1, pe;
-  mp = f.level()+1;
   bool fc_isUnivariate=f.isUnivariate();
   bool gc_isUnivariate=g.isUnivariate();
   bool fc_and_gc_Univariate=fc_isUnivariate && gc_isUnivariate;
-  cf_prepgcd( f, g, cc, p1, pe);
-  if ( cc != 0 )
-  {
-    if ( cc > 0 )
-    {
-      fc = replacevar( f, Variable(cc), Variable(mp) );
-      gc = g;
-    }
-    else
-    {
-      fc = replacevar( g, Variable(-cc), Variable(mp) );
-      gc = f;
-    }
-    return cf_content( fc, gc );
-  }
-// now each appearing variable is in f and g
   fc = f;
   gc = g;
   if ( getCharacteristic() != 0 )
@@ -738,54 +719,14 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     }
     else
     #endif
-    if ( p1 == fc.level() )
-      fc = gcd_poly_p( fc, gc );
-    else
-    {
-      fc = replacevar( fc, Variable(p1), Variable(mp) );
-      gc = replacevar( gc, Variable(p1), Variable(mp) );
-      fc = replacevar( gcd_poly_p( fc, gc ), Variable(mp), Variable(p1) );
-    }
+    fc = gcd_poly_p( fc, gc );
   }
   else if (!fc_and_gc_Univariate)
   {
     if ( isOn( SW_USE_EZGCD ) )
-    {
       fc= ezgcd (fc, gc);
-      /*if ( pe == 1 )
-        fc = ezgcd( fc, gc );
-      else if ( pe > 0 )// no variable at position 1
-      {
-        fc = replacevar( fc, Variable(pe), Variable(1) );
-        gc = replacevar( gc, Variable(pe), Variable(1) );
-        fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
-      else
-      {
-        pe = -pe;
-        fc = swapvar( fc, Variable(pe), Variable(1) );
-        gc = swapvar( gc, Variable(pe), Variable(1) );
-        fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }*/
-    }
-    else if (
-    isOn(SW_USE_CHINREM_GCD)
-    && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
-    )
-    {
-    #if 0
-      if ( p1 == fc.level() )
-        fc = chinrem_gcd( fc, gc );
-      else
-      {
-        fc = replacevar( fc, Variable(p1), Variable(mp) );
-        gc = replacevar( gc, Variable(p1), Variable(mp) );
-        fc = replacevar( chinrem_gcd( fc, gc ), Variable(mp), Variable(p1) );
-      }
-    #else
+    else if (isOn(SW_USE_CHINREM_GCD))
       fc = chinrem_gcd( fc, gc);
-    #endif
-    }
     else
     {
        fc = gcd_poly_0( fc, gc );
@@ -1099,7 +1040,7 @@ gcd_univar_flint0( const CanonicalForm & F, const CanonicalForm & G )
 *    pe is used in "ezgcd" and
 *    p1 in "gcd_poly1"
 */
-static
+/*static
 void optvalues ( const int * df, const int * dg, const int n, int & p1, int &pe )
 {
     int i, o1, oe;
@@ -1129,12 +1070,12 @@ void optvalues ( const int * df, const int * dg, const int n, int & p1, int &pe 
         }
         i--;
     }
-}
+}*/
 
 /*
 *  make some changes of variables, see optvalues
 */
-static void
+/*static void
 cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1, int &pe )
 {
     int i, k, n;
@@ -1181,7 +1122,7 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
 
     delete [] degsf;
     delete [] degsg;
-}
+}*/
 
 
 static CanonicalForm
