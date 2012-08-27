@@ -2850,7 +2850,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
               tmp= iter.getItem()/LCmultiplier;
               for (int i=1; i <= tmp.level(); i++)
               {
-                if (degree (tmp, i) > 0)
+                if (degree(tmp,i) > 0 &&
+                    (degree(iter2.getItem(),i) > degree (tmp,i)))
                   iter2.getItem() /= power (Variable (i), degree (tmp,i));
               }
             }
@@ -3016,7 +3017,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       tmp= iter.getItem()/LCmultiplier;
       for (int i=1; i <= tmp.level(); i++)
       {
-        if (degree (tmp, i) > 0)
+        if (degree (tmp,i) > 0 && (degree (iter2.getItem(),i) > degree (tmp,i)))
           iter2.getItem() /= power (Variable (i), degree (tmp,i));
       }
     }
