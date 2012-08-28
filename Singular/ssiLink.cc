@@ -68,6 +68,7 @@ typedef struct
   int fd_read,fd_write; /* only valid for fork/tcp mode*/
   char level;
   char send_quit_at_exit;
+  char quit_sent;
 
 } ssiInfo;
 
@@ -1063,6 +1064,7 @@ BOOLEAN ssiPrepClose(si_link l)
         fflush(d->f_write);
         SSI_UNBLOCK_CHLD;
       }
+      d->quit_sent=1;
     }
   }
   return FALSE;
@@ -1076,7 +1078,8 @@ BOOLEAN ssiClose(si_link l)
     ssiInfo *d = (ssiInfo *)l->data;
     if (d!=NULL)
     {
-      if (d->send_quit_at_exit)
+      if ((d->send_quit_at_exit)
+      && (d->quit_sent==0))
       {
         SSI_BLOCK_CHLD;
         fputs("99\n",d->f_write);
