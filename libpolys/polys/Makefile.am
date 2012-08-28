@@ -26,7 +26,15 @@ else
   USE_P_PROCS_DYNAMIC_CC =
 endif
 
-libpolys_LTLIBRARIES = libpolys.la libpolys_g.la
+if WANT_DEBUG
+  LIB_G=libpolys_g.la
+  MOD_G=p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
+else
+  LIB_G=
+  MOD_G=
+endif
+
+libpolys_LTLIBRARIES = libpolys.la ${LIB_G}
 libpolysdir = $(libdir)/singular
 
 SOURCES = \
@@ -116,8 +124,7 @@ moduledir = $(bindir)
 #moduledir = $(libexecdir)/singular/MOD/
 
 if ENABLE_P_PROCS_DYNAMIC
-  module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la \
-                     p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
+  module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la ${MOD_G}
 endif
 
 libpolys_includedir=$(includedir)/singular/polys

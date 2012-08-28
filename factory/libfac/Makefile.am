@@ -1,4 +1,10 @@
-noinst_LTLIBRARIES=libfac.la libfac_g.la
+if WANT_DEBUG
+  LIB_G=libfac_g.la
+else
+  LIB_G=
+endif
+
+noinst_LTLIBRARIES=libfac.la ${LIB_G}
 
 CXXTEMPLFLAGS =  ## -fno-implicit-templates
 

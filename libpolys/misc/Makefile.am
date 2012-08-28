@@ -3,7 +3,13 @@ CXXTEMPLFLAGS      =
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
-lib_LTLIBRARIES = libmisc.la libmisc_g.la
+if WANT_DEBUG
+  LIB_G=libmisc_g.la
+else
+  LIB_G=
+endif
+
+lib_LTLIBRARIES = libmisc.la ${LIB_G}
 libmiscdir = $(libdir)/singular
 
 libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}

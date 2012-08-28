@@ -1,6 +1,12 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-libfindexec_LTLIBRARIES = libfindexec.la libfindexec_g.la
+if WANT_DEBUG
+  LIB_G=libfindexec_g.la
+else
+  LIB_G=
+endif
+
+libfindexec_LTLIBRARIES = libfindexec.la ${LIB_G}
 libfindexecdir = $(libdir)/singular
 
 CXXTEMPLFLAGS = 

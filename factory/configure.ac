@@ -90,6 +90,13 @@ AC_ARG_ENABLE(
   ,
   enable_debugoutput=no)
 
+AC_ARG_ENABLE(debug, AS_HELP_STRING([--disable-debug], [do NOT build the debugging version of the libraries]),
+ [if test "x$enableval"  = "xyes"; then
+   ENABLE_DEBUG=yes
+ fi], ENABLE_DEBUG=no)
+
+AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
+
 #
 # - check for CC and CXX but be careful about CFLAGS.
 #

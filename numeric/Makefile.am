@@ -1,4 +1,10 @@
-libnumeric_LTLIBRARIES = libnumeric.la libnumeric_g.la
+if WANT_DEBUG
+  LIB_G=libnumeric_g.la
+else
+  LIB_G=
+endif
+
+libnumeric_LTLIBRARIES = libnumeric.la ${LIB_G}
 libnumericdir = $(libdir)/singular
 
 CXXTEMPLFLAGS =  ## -fno-implicit-templates
