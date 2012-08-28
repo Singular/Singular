@@ -92,7 +92,11 @@ AMLDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_bu
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 
+if WANT_DEBUG
 TESTS = test-s-g test-s-r test-d-g test-d-r 
+else
+TESTS = test-s-r test-d-r 
+endif
 check_PROGRAMS = $(TESTS)
 
 test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}

@@ -294,7 +294,11 @@ all-local:
 ####################################################
 ## Test program
 ##
+if WANT_DEBUG
 TESTS = test-s-g test-s-r test-d-g test-d-r
+else
+TESTS = test-s-r test-d-r
+endif
 check_PROGRAMS = $(TESTS)
 
 AMLDFLAGS =  -L${abs_builddir}

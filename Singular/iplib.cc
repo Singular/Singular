@@ -13,7 +13,6 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
-#include <Singular/static.h>
 #include <Singular/tok.h>
 #include <misc/options.h>
 #include <Singular/ipid.h>

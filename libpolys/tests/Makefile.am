@@ -2,10 +2,17 @@ CXXTEMPLFLAGS = -O0 ##  ## -fno-implicit-templates
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS} 
 
+if WANT_DEBUG
 TESTS = simple_test \
     coeffs_test_s_r coeffs_test_s_g coeffs_test_d_r coeffs_test_d_g \
     polys_test_s_r polys_test_s_g polys_test_d_r polys_test_d_g \
     rings_test_s_r rings_test_s_g rings_test_d_r rings_test_d_g
+else
+TESTS = simple_test \
+    coeffs_test_s_r coeffs_test_d_r \
+    polys_test_s_r polys_test_d_r \
+    rings_test_s_r rings_test_d_r
+endif
 
 check_PROGRAMS = $(TESTS)
 

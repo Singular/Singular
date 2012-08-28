@@ -64,6 +64,10 @@ TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_sr
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular' $(SHELL) -x
 
+if WANT_DEBUG
 TESTS=test_release.sh test_debug.sh
+else
+TESTS=test_release.sh
+endif
 
 EXTRA_DIST = syzextra.tst ederc.tst test.sh $(TESTS)

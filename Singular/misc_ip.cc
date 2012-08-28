@@ -350,7 +350,6 @@ lists primeFactorisation(const number n, const number pBound)
 #include "ipshell.h"
 
 #include "version.h"
-#include "static.h"
 
 #include "fehelp.h"
 

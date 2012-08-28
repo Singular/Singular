@@ -15,7 +15,6 @@
 #include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
-#include "static.h"
 
 /* whether pyobject module is linked statically or dynamically */
 #ifdef HAVE_PYTHON

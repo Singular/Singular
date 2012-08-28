@@ -204,7 +204,6 @@ set(headers lists.h attrib.h
         dbm_sl.h libparse.h
         gms.h pcv.h eigenval_ip.h
         walk.h
-        static.h
         omSingularConfig.h)
 
 add_executable(Singular-static

@@ -142,7 +142,6 @@ SingularHEADERS =    Cache.h \
    sing_win.h \
    slInit.h \
    links/ssiLink.h \
-   static.h \
    stype.h \
    subexpr.h \
    table.h \
@@ -311,7 +310,11 @@ LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibra
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 
+if WANT_DEBUG
 TESTS=test-s-g test-s-r test-d-g test-d-r
+else
+TESTS=test-s-r test-d-r
+endif
 check_PROGRAMS=$(TESTS)
 
 # Static versions

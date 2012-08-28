@@ -11,8 +11,6 @@
 
 #include <omalloc/omalloc.h>
 
-#include "static.h"
-
 // we provide these functions, so that the settings of OM_CHECK
 // and OM_TRACK are used, but only provide them if omalloc is not based
 // on them

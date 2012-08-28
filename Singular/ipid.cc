@@ -9,7 +9,6 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
-#include <Singular/static.h>
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <misc/options.h>

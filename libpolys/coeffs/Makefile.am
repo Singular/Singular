@@ -55,8 +55,11 @@ AMLDFLAGS = -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${top_
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
 
-
+if WANT_DEBUG
 TESTS = test_s_g test_s_r test_d_g test_d_r
+else
+TESTS = test_s_r test_d_r
+endif
 check_PROGRAMS = $(TESTS)
 
 test_s_r_SOURCES = test.cc
