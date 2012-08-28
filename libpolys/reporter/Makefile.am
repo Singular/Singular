@@ -3,7 +3,13 @@ CXXTEMPLFLAGS =
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
-lib_LTLIBRARIES = libreporter.la libreporter_g.la
+if WANT_DEBUG
+  LIB_G=libreporter_g.la
+else
+  LIB_G=
+endif
+
+lib_LTLIBRARIES = libreporter.la ${LIB_G}
 libreporterdir = $(libdir)/singular
 
 libreporter_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}

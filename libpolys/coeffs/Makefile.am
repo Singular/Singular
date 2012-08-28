@@ -3,7 +3,13 @@ CXXTEMPLFLAGS =
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
-lib_LTLIBRARIES = libcoeffs.la libcoeffs_g.la
+if WANT_DEBUG
+  LIB_G=libcoeffs_g.la
+else
+  LIB_G=
+endif
+
+lib_LTLIBRARIES = libcoeffs.la ${LIB_G}
 libcoeffsdir = $(libdir)/singular
 
 libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}

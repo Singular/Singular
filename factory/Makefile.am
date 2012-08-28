@@ -8,7 +8,13 @@ CXXTEMPLFLAGS=
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS}
 
-lib_LTLIBRARIES = libfactory.la libfactory_g.la
+if WANT_DEBUG
+  LIB_G=libfactory_g.la
+else
+  LIB_G=
+endif
+
+lib_LTLIBRARIES = libfactory.la ${LIB_G}
 
 libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
 libfactory_la_LIBADD     = ${abs_builddir}/libfac/libfac.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
