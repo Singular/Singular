@@ -110,21 +110,23 @@ LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
   CFArray A= getEquations (monomsH, termsF);
   CFArray startingSolution= solution;
   CFArray newSolution= CFArray (solution.size());
+  result= CFList();
   do
   {
     evaluate (A, solution, F.level() + 1);
     if (isZero (A))
       break;
     if (!simplify (A, newSolution, F.level() + 1))
-      break;
+    {
+      delete [] stripped2;
+      return 0;
+    }
     if (isZero (newSolution))
       break;
     if (!merge (solution, newSolution))
       break;
   } while (1);
 
-
-  result= CFList();
   if (isEqual (startingSolution, solution))
   {
     delete [] stripped2;
