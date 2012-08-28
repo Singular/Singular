@@ -1457,6 +1457,15 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       i.getItem() /= hh;
 
     A /= hh;
+
+    if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
+    {
+      LCheuristic= false;
+      A= bufA;
+      biFactors= bufBiFactors;
+      leadingCoeffs2[lengthAeval2-1]= bufLeadingCoeffs2;
+      LCmultiplier= bufLCmultiplier;
+    }
   }
 
 tryAgainWithoutHeu:
