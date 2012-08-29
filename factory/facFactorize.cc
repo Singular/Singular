@@ -124,42 +124,31 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
   Variable v;
   CFList factors;
   CanonicalForm LCA= LC (A,1);
-  if (!LCA.inCoeffDomain())
+  for (int j= 0; j < A.level() - 2; j++)
   {
-    for (int j= 0; j < A.level() - 2; j++)
+    if (!Aeval[j].isEmpty())
     {
-      if (!Aeval[j].isEmpty() && (degree (LCA, j+3) > 0))
+      v= Variable (Aeval[j].getFirst().level());
+
+      factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
+      if (factors.getFirst().inCoeffDomain())
+        factors.removeFirst();
+
+      if (minFactorsLength == 0)
+        minFactorsLength= factors.length();
+      else
+        minFactorsLength= tmin (minFactorsLength, factors.length());
+
+      if (factors.length() == 1)
       {
-        v= Variable (Aeval[j].getFirst().level());
-
-        factors= ratBiSqrfFactorize (Aeval[j].getFirst(), w);
-
-        if (factors.getFirst().inCoeffDomain())
-          factors.removeFirst();
-
-        if (minFactorsLength == 0)
-          minFactorsLength= factors.length();
-        else
-          minFactorsLength= tmin (minFactorsLength, factors.length());
-
-        if (factors.length() == 1)
-        {
-          irred= true;
-          return;
-        }
-        sortList (factors, x);
-        Aeval [j]= factors;
+        irred= true;
+        return;
       }
-      else if (!Aeval[j].isEmpty())
-      {
-        Aeval[j]=CFList();
-      }
+      sortList (factors, x);
+      Aeval [j]= factors;
     }
-  }
-  else
-  {
-    for (int j= 0; j < A.level() - 2; j++)
-      Aeval[j]= CFList();
+    else if (!Aeval[j].isEmpty())
+      Aeval[j]=CFList();
   }
 }
 
@@ -735,7 +724,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
     evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
 
-    for (int j= 0; j < A.level() - 1; j++)
+    for (int j= 0; j < lengthAeval2; j++)
     {
       if (!bufAeval2[j].isEmpty())
         counter++;
@@ -814,7 +803,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   else if (biFactors.length() > minFactorsLength)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
 
-  if (differentSecondVar == lengthAeval2 && getNumVars(LC(A,1)) == A.level()-1)
+  if (differentSecondVar == lengthAeval2)
   {
     bool zeroOccured= false;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++)
