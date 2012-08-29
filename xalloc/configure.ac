@@ -4,7 +4,7 @@ AC_CONFIG_SRCDIR(dummy.c)
 AC_CONFIG_AUX_DIR([.])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign subdir-objects -Werror silent-rules -Wno-extra-portability])
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
 
 AC_PROG_MAKE_SET
 AC_PROG_CC
@@ -18,6 +18,8 @@ AC_C_CONST
 AC_C_INLINE
 
 LT_INIT
+
+AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
