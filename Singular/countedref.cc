@@ -31,46 +31,105 @@
 #include "lists.h"
 #include "attrib.h"
 
-
-template <class PtrType, bool NeverNull = false, class CountType = short>
+/** @class CountedRefPtr
+ * This class implements a smart pointer which handles pointer-style access
+ * to a reference-counted structure and destructing the latter after use.
+ *
+ * The template arguments, include the pointer type @c PtrType, and two
+ * integral (bool) properties: use @c isWeak to disallow destruction
+ * and @c NeverNull to assume, that @c PtrType cannot be @c NULL.
+ * Finally, @c CountType allows you to select a typ to represent the internal reference count.
+ *
+ * @note The class of @c PtrType must have an accessible integral attribute @c ref.
+ * For convenience use @c RefCounter as public base.
+ * In addition you must overload @c void CountedRefPtr_kill(PtrType) accordingly.
+ **/
+template <class PtrType, bool isWeak = false, bool NeverNull = false, class CountType = short>
 class CountedRefPtr {
   typedef CountedRefPtr self;
 
 public:
+  //{ @name Name template arguments
   typedef PtrType ptr_type;
   typedef CountType count_type;
+  enum { is_weak = isWeak, never_null = NeverNull };
+  //}
 
-
+  /// Convert from pointer
   CountedRefPtr(ptr_type ptr): m_ptr(ptr) { reclaim(); }
-  CountedRefPtr(const self& rhs): m_ptr(rhs.m_ptr) { reclaim(); }
-  ~CountedRefPtr() { kill(); }
 
+  /// Convert from compatible smart pointer
+  template <bool Never>
+  CountedRefPtr(const CountedRefPtr<ptr_type, !is_weak, Never, count_type>& rhs):
+    m_ptr(rhs.m_ptr) { reclaim(); }
+
+  /// Construct refernce copy
+  CountedRefPtr(const self& rhs):
+    m_ptr(rhs.m_ptr) { reclaim(); }
+
+  /// Unlink one reference
+  ~CountedRefPtr() { release(); }
+
+  //{ @name Replace data behind reference
+  self& operator=(const self& rhs) { return operator=(rhs.m_ptr); }
   self& operator=(ptr_type ptr) {
-    kill();
+    release();
     m_ptr = ptr;
     reclaim();
     return *this;
   }
-  self& operator=(const self& rhs) { return operator=(rhs.m_ptr); }
+  //}
 
+  /// Checking equality 
   bool operator==(const self& rhs) const { return m_ptr == rhs.m_ptr; }
+
+  //{ @name Pointer-style interface
   bool operator==(ptr_type ptr) const { return m_ptr == ptr; }
-
   operator bool() const { return NeverNull || m_ptr; }
+  operator const ptr_type() const { return m_ptr; }
   operator ptr_type() { return m_ptr; }
+  const ptr_type operator->() const { return *this; }
   ptr_type operator->() { return *this; }
+  //}
 
+  //{ @name Reference count interface
   count_type count() const { return (*this? m_ptr->ref: 1); }
+  void reclaim() { if (*this) ++m_ptr->ref; }
+  void release() { 
+    if (*this && (--m_ptr->ref <= 0) && !is_weak)
+      CountedRefPtr_kill(m_ptr); 
+  }
+  //}
 
-///private:
-  void kill() { if (!release()) CountedRefPtr_kill(m_ptr); }
-  
-  void reclaim() { if(*this) ++m_ptr->ref; }
-  count_type release() { return (*this? --m_ptr->ref: 1); }
 private:
+  /// Store actual pointer
   ptr_type m_ptr;
 };
 
+
+/** @class RefCounter
+ * This class implements implements a refernce counter which we can use
+ * as a public base of objects managed by @CountedRefPtr.
+ **/
+class RefCounter {
+
+public:
+  /// Name numerical type for enumbering
+  typedef short count_type;
+
+  /// Allow our smart pointer to access internals
+  template <class, bool, bool, class> friend class CountedRefPtr;
+
+  /// Any Constructor resets the counter
+  RefCounter(...): ref(0) {}
+
+  /// Destructor
+  ~RefCounter() { assume(ref == 0); }
+
+private:
+  /// Number of references
+  count_type ref;  // naming consistent with other classes
+};
 
 class CountedRefEnv {
   typedef CountedRefEnv self;
@@ -110,32 +169,9 @@ public:
 
 };
 
+/// Overloading ring destruction
+inline void CountedRefPtr_kill(ring r) { rKill(r); }
 
-inline void CountedRefPtr_kill(ring r) { }//rKill(r); }
-
-
-class RefCounter {
-  typedef RefCounter self;
-
-  /// Name numerical type for enumbering
-  typedef unsigned long count_type;
-
-public:
-  template <class, bool, class> friend class CountedRefPtr;
-
-  /// Default Constructor
-  RefCounter(): ref(0) {}
-
-  /// Copying resets the counter
-  RefCounter(const self&): ref(0) {}
-
-  /// Destructor
-  ~RefCounter() { assume(ref == 0); }
-
-private:
-  /// Number of references
-  count_type ref;  // naming consistent with other classes
-};
 
 class LeftvShallow {
   typedef LeftvShallow self;
@@ -174,6 +210,7 @@ public:
   }
 
   /// Access to object
+  const leftv operator->() const { return m_data;  }
   leftv operator->() { return m_data;  }
 
 protected:
@@ -248,7 +285,6 @@ public:
   }
 
    leftv access() { return m_data; }
-
 };
 
 /** @class CountedRefData
@@ -278,14 +314,8 @@ public:
 
   /// Replace data
   self& operator=(const self& rhs) {
-   if (m_data->rtyp==IDHDL)
-      m_data = rhs.m_data;
-   else {
-      LeftvShallow sh(rhs.m_data);
-      m_data->Copy(sh.operator->());
-    }
+    m_data = rhs.m_data;
     m_ring = rhs.m_ring;
-
     return *this;
   }
 
@@ -303,7 +333,7 @@ public:
   BOOLEAN get(leftv res) { return broken() || m_data.get(res);  }
 
   /// Extract (shallow) copy of stored data
-  LeftvShallow operator*() { return (broken()? LeftvShallow(): m_data); }
+  LeftvShallow operator*() const { return (broken()? LeftvShallow(): LeftvShallow(m_data)); }
 
 
   BOOLEAN rering() {
@@ -315,7 +345,7 @@ public:
   idhdl* root() { return  (m_ring? &m_ring->idroot: &IDROOT); }
 
   /// Check whether identifier became invalid
-  BOOLEAN broken() {
+  BOOLEAN broken() const {
     if (m_ring) {
       if (m_ring != currRing) 
         return complain("Referenced identifier not from current ring");    
@@ -349,17 +379,17 @@ public:
     return FALSE;
   }
 
-  CountedRefPtr<ring> Ring() { return m_ring; }
+  CountedRefPtr<ring, true> Ring() { return m_ring; }
 
 private:
   /// Raise error message and return @c TRUE
-  BOOLEAN complain(const char* text) {
+  BOOLEAN complain(const char* text) const  {
     Werror(text);
     return TRUE;
   }
 
   /// Check a given context for our identifier
-  BOOLEAN brokenid(idhdl context) {
+  BOOLEAN brokenid(idhdl context) const {
     return (context == NULL) || 
       ((context != (idhdl) m_data->data) && brokenid(IDNEXT(context)));
   }
@@ -373,8 +403,7 @@ protected:
   LeftvDeep m_data;
 
   /// Store namespace for ring-dependent objects
-  //public: 
-  CountedRefPtr<ring> m_ring;//todo
+  CountedRefPtr<ring, true> m_ring;
 };
 
 /// blackbox support - initialization
@@ -437,7 +466,7 @@ public:
   /// Construct reference data object from
   BOOLEAN outcast(leftv result) {
     if (result->rtyp == IDHDL)
-      IDDATA((idhdl)result->data) = (char *)(void*)outcast();
+      IDDATA((idhdl)result->data) = (char *)outcast();
     else
       result->data = (void *)outcast();
     return FALSE;
@@ -448,7 +477,7 @@ public:
   }
 
   /// Kills a link to the referenced object
-  void destruct() { m_data.kill(); }
+  void destruct() { m_data.release(); }
 
   /// Kills the link to the referenced object
   ~CountedRef() { }
@@ -488,13 +517,13 @@ public:
   /// Get (possibly) internal identifier name
   BOOLEAN name(leftv res) { return construct(res, operator*()->Name()); }
 
-  /// Recover the actual object from Singular interpreter object
+  /// Recover the actual object from raw Singular data
   static self cast(void* data) {
     assume(data != NULL);
     return self(static_cast<data_type*>(data));
   }
 
-  /// Recover the actual object from raw Singular data
+  /// Recover the actual object from Singular interpreter object
   static self cast(leftv arg) {
     assume((arg != NULL) && is_ref(arg));
     return self::cast(arg->Data());
@@ -507,9 +536,7 @@ public:
     return (arg->next != NULL) && resolve(arg->next);
   }
 
-  //  leftv access() { return m_data->access(); }
 protected:
-
   /// Construct integer value
   static BOOLEAN construct(leftv res, long data) {
     res->data = (void*) data;
@@ -563,10 +590,7 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
     return CountedRef::cast(arg).outcast(result);
 
   // Case: new reference
-  if (arg->rtyp == IDHDL) 
-    return CountedRef(arg).outcast(result);
-
-  if (arg->rtyp == CountedRefEnv::idx_id()  ) 
+  if ((arg->rtyp == IDHDL) || CountedRef::is_ref(arg))
     return CountedRef(arg).outcast(result);
 
   Werror("Can only take reference from identifier");
@@ -635,7 +659,7 @@ private:
     assume(handle);
     leftv res = (leftv)omAlloc0(sizeof(*res));
     res->data =(void*) handle;
-    res->rtyp =  IDHDL;
+    res->rtyp = IDHDL;
     return res;
   }
 
@@ -687,7 +711,7 @@ void countedref_destroyIndexed(blackbox *b, void* ptr)
   if (ptr) {
     CountedRefPtr<CountedRefDataIndexed*> data =
     static_cast<CountedRefDataIndexed*>(ptr);
-    data.kill();
+    data.release();
   }
 }
 
