@@ -1,4 +1,5 @@
 #include <factory/factory.h>
+#include <findexec/feFopen.h>
 
 int mmInit(void) {
 #ifdef SINGULAR
@@ -13,7 +14,6 @@ dyld: Symbol not found: __Z7feFopenPKcS0_
 Referenced from: ...BUILDDIR/factory/.libs/libfactory_g-3.1.3.dylib
 Expected in: flat namespace
 */
-extern FILE * feFopen ( const char * path, const char * mode);
 const int f = (int)(long)(void*)feFopen;
 return (f ^ f) + 1; 
 #else

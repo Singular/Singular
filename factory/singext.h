@@ -8,7 +8,7 @@
 #include "canonicalform.h"
 #include <factory/cf_gmp.h>
 
-extern FILE * feFopen ( const char * path, const char * mode);
+#include <findexec/feFopen.h>
 
 /*BEGINPUBLIC*/
 
