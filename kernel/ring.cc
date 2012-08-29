@@ -4324,7 +4324,7 @@ void rDebugPrint(ring r)
   else if (r->p_Setm==p_Setm_Dummy) PrintS("p_Setm_Dummy\n");
   else if (r->p_Setm==p_Setm_TotalDegree) PrintS("p_Setm_Totaldegree\n");
   else if (r->p_Setm==p_Setm_WFirstTotalDegree) PrintS("p_Setm_WFirstTotalDegree\n");
-  else Print("%x\n",r->p_Setm);
+  else Print("%lx\n",(long)(r->p_Setm));
 
 }
 

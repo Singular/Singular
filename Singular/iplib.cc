@@ -310,8 +310,8 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
                pi, l );
   #ifndef LIBSINGULAR
   // see below:
-  int save1=(test & ~TEST_RINGDEP_OPTS);
-  int save2=verbose;
+  BITSET save1=(test & ~TEST_RINGDEP_OPTS);
+  BITSET save2=verbose;
   #endif
   BOOLEAN err=yyparse();
   if (sLastPrinted.rtyp!=0)
@@ -321,7 +321,7 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
   #ifndef LIBSINGULAR
   // the access to optionStruct and verboseStruct do not work
   // on x86_64-Linux for pic-code
-  int save11= ( test & ~TEST_RINGDEP_OPTS);
+  BITSET save11= ( test & ~TEST_RINGDEP_OPTS);
   if ((TEST_V_ALLWARN) &&
   (t==BT_proc) &&
   ((save1!=save11)||(save2!=verbose)) &&
