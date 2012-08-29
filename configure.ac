@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR([Singular/tesths.cc])
 AC_CONFIG_HEADER([config.h])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 
 dnl Check if build env is sane
 AM_SANITY_CHECK

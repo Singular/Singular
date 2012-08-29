@@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([config.h misc/auxiliary.h])
 
 AM_MAINTAINER_MODE
-AM_INIT_AUTOMAKE([-Wall foreign subdir-objects silent-rules]) # -Wno-extra-portability -Werror
+AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
