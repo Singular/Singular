@@ -559,8 +559,7 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   if (rIsPluralRing(r))
   {
     int lp, lq;
-    poly spNoether;
-    return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
+    return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, NULL, r);
   }
 #endif
 
