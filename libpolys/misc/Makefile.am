@@ -9,7 +9,7 @@ else
   LIB_G=
 endif
 
-lib_LTLIBRARIES = libmisc.la ${LIB_G}
+libmisc_LTLIBRARIES = libmisc.la ${LIB_G}
 libmiscdir = $(libdir)/singular
 
 libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}

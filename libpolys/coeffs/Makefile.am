@@ -9,7 +9,7 @@ else
   LIB_G=
 endif
 
-lib_LTLIBRARIES = libcoeffs.la ${LIB_G}
+libcoeffs_LTLIBRARIES = libcoeffs.la ${LIB_G}
 libcoeffsdir = $(libdir)/singular
 
 libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}

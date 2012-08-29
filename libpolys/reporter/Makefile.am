@@ -9,7 +9,7 @@ else
   LIB_G=
 endif
 
-lib_LTLIBRARIES = libreporter.la ${LIB_G}
+libreporter_LTLIBRARIES = libreporter.la ${LIB_G}
 libreporterdir = $(libdir)/singular
 
 libreporter_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
