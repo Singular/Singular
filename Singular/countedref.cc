@@ -93,7 +93,7 @@ public:
   //}
 
   //{ @name Reference count interface
-  count_type count() const { return (*this? m_ptr->ref: 1); }
+  count_type count() const { return (*this? m_ptr->ref: 0); }
   void reclaim() { if (*this) ++m_ptr->ref; }
   void release() { 
     if (*this && (--m_ptr->ref <= 0) && !is_weak)
@@ -283,7 +283,7 @@ public:
 
     return *this;
   }
-
+  int Typ() const {return m_data->Typ(); }
    leftv access() { return m_data; }
 };
 
@@ -380,8 +380,9 @@ public:
   }
 
   CountedRefPtr<ring, true> Ring() { return m_ring; }
-
+  int Typ() const {return m_data->Typ(); }
 private:
+
   /// Raise error message and return @c TRUE
   BOOLEAN complain(const char* text) const  {
     Werror(text);
@@ -414,6 +415,7 @@ void* countedref_Init(blackbox*)
 }
 
 
+
 inline void CountedRefPtr_kill(CountedRefData* data) { delete data; }
 
 class CountedRef {
@@ -429,8 +431,10 @@ public:
   /// Check whether argument is already a reference type
   static BOOLEAN is_ref(leftv arg) {
     int typ = arg->Typ();
-    return ((typ > MAX_TOK) &&
-           (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
+    return ((typ==CountedRefEnv::ref_id())  ||(typ==CountedRefEnv::sh_id()) ||
+            (typ==CountedRefEnv::idx_id()) );
+    //    return ((typ > MAX_TOK) &&
+    //            (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
   }
 
   /// Construct new reference from Singular data  
@@ -464,11 +468,11 @@ public:
   LeftvShallow operator*() { return m_data->operator*(); }
 
   /// Construct reference data object from
-  BOOLEAN outcast(leftv result) {
-    if (result->rtyp == IDHDL)
-      IDDATA((idhdl)result->data) = (char *)outcast();
+  BOOLEAN outcast(leftv res) {
+    if (res->rtyp == IDHDL)
+      IDDATA((idhdl)res->data) = (char *)outcast();
     else
-      result->data = (void *)outcast();
+      res->data = (void *)outcast();
     return FALSE;
   }
   data_type* outcast() { 
@@ -517,6 +521,9 @@ public:
   /// Get (possibly) internal identifier name
   BOOLEAN name(leftv res) { return construct(res, operator*()->Name()); }
 
+  /// Check whther argument is not defined yet
+  BOOLEAN undefined(leftv res) { return construct(res, operator*()->Typ() == NONE); }
+
   /// Recover the actual object from raw Singular data
   static self cast(void* data) {
     assume(data != NULL);
@@ -535,7 +542,7 @@ public:
     while (is_ref(arg)) { if(CountedRef::cast(arg).dereference(arg)) return TRUE; };
     return (arg->next != NULL) && resolve(arg->next);
   }
-
+  int Typ() const {return m_data->Typ(); }
 protected:
   /// Construct integer value
   static BOOLEAN construct(leftv res, long data) {
@@ -611,15 +618,16 @@ BOOLEAN countedref_Op1(int op, leftv res, leftv head)
   if(op == TYPEOF_CMD)
     return blackboxDefaultOp1(op, res, head);
 
-  if (countedref_CheckInit(res, head)) return TRUE;
 
-  if(op == head->Typ()) {
-    res->rtyp = op;
+  if (countedref_CheckInit(res, head)) return TRUE;
+ 
+  if ((op == DEF_CMD) || (op == head->Typ())) {
+    res->rtyp = head->Typ();
     return iiAssign(res, head);
   }
 
-  if(op == DEF_CMD) {
-    res->rtyp = DEF_CMD;
+  if(op == LINK_CMD) {
+    res->rtyp =  DEF_CMD;
     return CountedRef::cast(head).dereference(head) || iiAssign(res, head);
   }
 
@@ -747,7 +755,11 @@ public:
   }
 };
 
-
+void* countedref_InitShared(blackbox*)
+{
+  LeftvDeep empty;
+  return CountedRefShared(LeftvShallow(empty).operator->()).outcast();
+}
 
 /// blackbox support - binary operations
 BOOLEAN countedref_Op2Shared(int op, leftv res, leftv head, leftv arg)
@@ -792,25 +804,39 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
       if (strcmp(name, "hash") == 0) return obj.hash(res);
       if (strcmp(name, "name") == 0) return obj.name(res);
       if (strncmp(name, "type", 4) == 0) return obj.type(res);
+      if (strncmp(name, "undef", 5) == 0) return obj.undefined(res);
     }
     return TRUE;
   }
+  if (op == LIST_CMD){
+    res->rtyp=op;
+    return jjLIST_PL(res, args);
+  }
+
   return CountedRef::cast(args).dereference(args) || iiExprArithM(res, args, op);
 }
+
 /// blackbox support - assign element
 BOOLEAN countedref_AssignShared(leftv result, leftv arg)
 {
   /// Case: replace assignment behind reference
-  if ((result->Data()) != NULL) {
+  if ((result->Data() != NULL)  && (CountedRefShared::cast(result).Typ() !=0 )) {
     if (CountedRefShared::resolve(arg)) return TRUE;
     CountedRefShared::cast(result) = arg;
     return FALSE;
   }
   
   /// Case: new reference to already shared data
-  if (result->Typ() == arg->Typ()) 
+  if (result->Typ() == arg->Typ()) {
+    if (result->Data() != NULL) 
+      CountedRefShared::cast(result).destruct();
     return CountedRefShared::cast(arg).outcast(result);
-
+  }  
+  if(CountedRefShared::cast(result).Typ() == 0) {
+    CountedRefShared::cast(result) = arg;
+    return FALSE;
+  }
+    
   /// Case: new shared data
   return CountedRefShared(arg).outcast(result);
 }
@@ -844,8 +870,10 @@ void countedref_init()
   bbxshared->blackbox_Assign  = countedref_AssignShared;
   bbxshared->blackbox_destroy = countedref_destroyShared;
   bbxshared->blackbox_Op2     = countedref_Op2Shared;
+  bbxshared->blackbox_Init    = countedref_InitShared;
   bbxshared->data             = omAlloc0(newstruct_desc_size());
   CountedRefEnv::sh_id()=setBlackboxStuff(bbxshared, "shared");
+
 
   blackbox *bbxindexed = 
     (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
