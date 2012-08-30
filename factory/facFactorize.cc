@@ -691,7 +691,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   A *= bCommonDen (A);
   // check main variable
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
-  int factorNums= 3;
+  int factorNums= 1;
   CanonicalForm bivarEval;
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
