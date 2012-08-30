@@ -1743,13 +1743,15 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
   CFList tmp2;
   CFListIterator iter;
   bool preserveDegree= true;
-  int j;
+  Variable x= Variable (1);
+  int j, degAi, degA1= degree (A,1);
   for (int i= A.level(); i > 2; i--)
   {
     tmp= A;
     tmp2= CFList();
     iter= evaluation;
     preserveDegree= true;
+    degAi= degree (A,i);
     for (j= A.level(); j > 1; j--, iter++)
     {
       if (j == i)
@@ -1758,19 +1760,18 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
       {
         tmp= tmp (iter.getItem(), j);
         tmp2.insert (tmp);
-        if ((degree (tmp, i) != degree (A, i)) ||
-            (degree (tmp, 1) != degree (A, 1)))
-        {
-          preserveDegree= false;
-          break;
-        }
-        if (!content(tmp).inCoeffDomain() || !content(tmp,1).inCoeffDomain())
+        if ((degree (tmp, i) != degAi) ||
+            (degree (tmp, 1) != degA1))
         {
           preserveDegree= false;
           break;
         }
       }
     }
+    if (!content(tmp,1).inCoeffDomain())
+      preserveDegree= false;
+    if (!(gcd (deriv (tmp,x), tmp)).inCoeffDomain())
+      preserveDegree= false;
     if (preserveDegree)
       Aeval [i - 3]= tmp2;
     else
