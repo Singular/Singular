@@ -7,7 +7,7 @@ else
 endif
 
 libfindexec_LTLIBRARIES = libfindexec.la ${LIB_G}
-libfindexecdir = $(libdir)/singular
+libfindexecdir = $(libdir)/
 
 CXXTEMPLFLAGS = 
 ### --no-exceptions ## -fno-implicit-templates
@@ -29,7 +29,7 @@ SOURCES  = omFindExec.c feResource.cc feFopen.cc
 libfindexec_la_SOURCES   = $(SOURCES)
 libfindexec_g_la_SOURCES = $(SOURCES)
 
-libfindexec_includedir  =$(includedir)/singular/findexec/
+libfindexec_includedir  =$(includedir)/findexec/
 
 libfindexec_include_HEADERS = omFindExec.h feResource.h feFopen.h
 
