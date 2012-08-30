@@ -53,9 +53,6 @@
 #ifdef HAVE_SIMPLEIPC
 #include <Singular/simpleipc.h>
 #endif
-//#if (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
-//#define HAVE_PSELECT
-//#endif
 
 #include <Singular/si_signals.h>
 
@@ -1492,13 +1489,8 @@ int slStatusSsiL(lists L, int timeout)
   int max_fd=0; /* 1 + max fd in fd_set */
 
   /* timeout */
-  #ifdef HAVE_PSELECT
-  struct timespec wt;
-  struct timespec *wt_ptr=&wt;
-  #else
   struct timeval wt;
   struct timeval *wt_ptr=&wt;
-  #endif
   int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
   if (timeout== -1)
   {
@@ -1507,11 +1499,7 @@ int slStatusSsiL(lists L, int timeout)
   else
   {
     wt.tv_sec  = timeout / 1000000;
-  #ifdef HAVE_PSELECT
-    wt.tv_nsec = 1000 * (timeout % 1000000);
-  #else
     wt.tv_usec = timeout % 1000000;
-  #endif
   }
 
   /* auxiliary variables */
@@ -1663,11 +1651,7 @@ do_select:
           timeout = si_max(0,
              timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
           wt.tv_sec  = timeout / 1000000;
-          #ifdef HAVE_PSELECT
-          wt.tv_nsec = 1000 * (timeout % 1000000);
-          #else
           wt.tv_usec = (timeout % 1000000);
-          #endif
         }
         goto do_select;
       }
