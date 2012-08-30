@@ -55,6 +55,9 @@ public:
   enum { is_weak = isWeak, never_null = NeverNull };
   //}
 
+  /// Default constructor @note: exisis only if @c NeverNull is false
+  CountedRefPtr(): m_ptr(NULL) {}
+
   /// Convert from pointer
   CountedRefPtr(ptr_type ptr): m_ptr(ptr) { reclaim(); }
 
@@ -106,6 +109,10 @@ private:
   ptr_type m_ptr;
 };
 
+/// Default constructor only implemented if @c NeverNull is false
+//template <class PtrType, bool isWeak,bool val,class CountType>
+//inline CountedRefPtr<PtrType, isWeak, val, CountType>::CountedRefPtr():
+//  m_ptr(NULL) { }
 
 /** @class RefCounter
  * This class implements implements a refernce counter which we can use
@@ -162,11 +169,6 @@ public:
     static int g_sh_id = 0;
     return g_sh_id;
   }
-  static int& idx_id() {
-    static int g_sh_id = 0;
-    return g_sh_id;
-  }
-
 };
 
 /// Overloading ring destruction
@@ -297,20 +299,34 @@ class CountedRefData:
   typedef CountedRefData self;
   typedef RefCounter base;
 
+  /// Subscripted object
+  CountedRefData(idhdl handle, CountedRefPtr<self*> back):
+    base(), m_data(init(handle)), m_ring(back->Ring()), m_back(back) { }
+
 public:
+  /// Construct shared memory empty Singular object
+  explicit CountedRefData():
+    base(), m_data(), m_ring(), m_back() { }
+
   /// Construct reference for Singular object
   explicit CountedRefData(leftv data):
-    base(), m_data(data), m_ring(parent(data)) { }
+    base(), m_data(data), m_ring(parent(data)), m_back() { }
 
   CountedRefData(leftv data, BOOLEAN global, int):
-    base(), m_data(data, global,0), m_ring(parent(data)) { }
+    base(), m_data(data, global,0), m_ring(parent(data)), m_back() { }
 
   /// Construct deep copy
   CountedRefData(const self& rhs):
-    base(), m_data(rhs.m_data), m_ring(rhs.m_ring)  { }
+    base(), m_data(rhs.m_data), m_ring(rhs.m_ring), m_back() { }
   
   /// Destruct
-  ~CountedRefData()  { }
+  ~CountedRefData() { 
+    if (m_back) CountedRefEnv::clearid((idhdl)m_data.access()->data, root());
+   }
+
+  CountedRefPtr<self*> subscripted() {
+    return new self(CountedRefEnv::idify(m_data.access(), root()), this);
+  }
 
   /// Replace data
   self& operator=(const self& rhs) {
@@ -338,7 +354,7 @@ public:
 
   BOOLEAN rering() {
     if (m_ring ^ m_data->RingDependend()) m_ring = (m_ring? NULL: currRing);
-    return FALSE;
+    return (m_back && m_back->rering());
   }
 
   /// Get the current context
@@ -361,14 +377,17 @@ public:
   }
 
   BOOLEAN assign(leftv result, leftv arg) {
+    if (m_data->rtyp!=IDHDL) {
+      set(arg);
+      return FALSE;
+    }
     return get(result) || iiAssign(result, arg) || rering();
   }
 
-  /// @note Enables write-access via identifier
-  idhdl idify() {  return CountedRefEnv::idify(m_data.access(), root());  }
-
-  /// @note Only call, if @c idify had been called before!
-  void clearid() {  CountedRefEnv::clearid((idhdl)m_data.access()->data, root());  }
+  /// @note If we have a callback, our identifier was temporary, so remove it
+  void clear() {  
+    if (m_back) CountedRefEnv::clearid((idhdl)m_data.access()->data, root());
+  }
 
   BOOLEAN retrieve(leftv res) {
     if (res->data == m_data.access()->data)  {
@@ -399,12 +418,24 @@ private:
   static ring parent(leftv rhs) { 
     return (rhs->RingDependend()? currRing: NULL); 
   }
+
+ static leftv init(idhdl handle) {
+    assume(handle);
+    leftv res = (leftv)omAlloc0(sizeof(*res));
+    res->data =(void*) handle;
+    res->rtyp = IDHDL;
+    return res;
+  }
+
 protected:
   /// Singular object
   LeftvDeep m_data;
 
   /// Store namespace for ring-dependent objects
   CountedRefPtr<ring, true> m_ring;
+
+  /// Reference to actual object for indexed structures  
+  CountedRefPtr<self*> m_back;
 };
 
 /// blackbox support - initialization
@@ -431,8 +462,7 @@ public:
   /// Check whether argument is already a reference type
   static BOOLEAN is_ref(leftv arg) {
     int typ = arg->Typ();
-    return ((typ==CountedRefEnv::ref_id())  ||(typ==CountedRefEnv::sh_id()) ||
-            (typ==CountedRefEnv::idx_id()) );
+    return ((typ==CountedRefEnv::ref_id())  ||(typ==CountedRefEnv::sh_id()) );
     //    return ((typ > MAX_TOK) &&
     //            (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
   }
@@ -463,9 +493,15 @@ public:
   BOOLEAN assign(leftv result, leftv arg) { 
     return m_data->assign(result,arg);
   }
-
+  BOOLEAN rering() { return m_data->rering(); }
   /// Extract (shallow) copy of stored data
   LeftvShallow operator*() { return m_data->operator*(); }
+
+  /// Construct reference data object marked by given identifier number
+  BOOLEAN outcast(leftv res, int typ) {
+    res->rtyp = typ;
+    return outcast(res);
+  }
 
   /// Construct reference data object from
   BOOLEAN outcast(leftv res) {
@@ -643,39 +679,6 @@ BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
     iiExprArith2(res, head, op, arg);
 }
 
-class CountedRefDataIndexed:
-  public CountedRefData {
-  typedef CountedRefData base;
-  typedef CountedRefDataIndexed self;
-
-public:
-  CountedRefDataIndexed(idhdl handle, CountedRefPtr<base*> back):
-    base(init(handle)), m_back(back) { 
-    m_ring = back->Ring(); 
-  } 
-
-  CountedRefDataIndexed(const self& rhs): base(rhs), m_back(rhs.m_back) { } 
-
-  ~CountedRefDataIndexed() { clearid();}
-
-  BOOLEAN assign(leftv result, leftv arg) {
-    return base::assign(result, arg) || m_back->rering();
-  }
-
-private:
-  static leftv init(idhdl handle) {
-    assume(handle);
-    leftv res = (leftv)omAlloc0(sizeof(*res));
-    res->data =(void*) handle;
-    res->rtyp = IDHDL;
-    return res;
-  }
-
-  CountedRefPtr<CountedRefData*> m_back;
-};
-inline void CountedRefPtr_kill(CountedRefDataIndexed* data) { delete data; }
-
-
 
 /// blackbox support - ternary operations
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
@@ -687,7 +690,6 @@ BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 }
 
 
-
 /// blackbox support - destruction
 void countedref_destroy(blackbox *b, void* ptr)
 {
@@ -695,42 +697,16 @@ void countedref_destroy(blackbox *b, void* ptr)
 }
 
 
-/// blackbox support - assign element
-BOOLEAN countedref_AssignIndexed(leftv result, leftv arg)
-{
-  // Case: replace assignment behind reference
-  if (result->Data() != NULL) {
-    CountedRefPtr<CountedRefDataIndexed*> indexed =(CountedRefDataIndexed*)(result->Data());
-    return CountedRef::resolve(arg) || indexed->assign(result, arg);
-  }
-  
-  // Case: copy reference
-  if (result->Typ() == arg->Typ())
-    return CountedRef::cast(arg).outcast(result);
-
-  Werror("Cannot generate subscripted shared from plain type. Use shared[i] or shared.attr");
-  return TRUE;
-}
-
-
-/// blackbox support - destruction
-void countedref_destroyIndexed(blackbox *b, void* ptr)
-{
-  if (ptr) {
-    CountedRefPtr<CountedRefDataIndexed*> data =
-    static_cast<CountedRefDataIndexed*>(ptr);
-    data.release();
-  }
-}
-
 class CountedRefShared:
   public CountedRef {
   typedef CountedRefShared self;
   typedef CountedRef base;
 
   CountedRefShared(const base& rhs):  base(rhs) { }
+  CountedRefShared(data_type* rhs):  base(rhs) { }
 
 public:
+  CountedRefShared():  base(new data_type) { }
   CountedRefShared(leftv arg):  base(new data_type(arg, FALSE,0)) { }
 
   /// Construct copy
@@ -750,15 +726,18 @@ public:
   static self cast(leftv arg) { return base::cast(arg); }
   static self cast(void* arg) { return base::cast(arg); }
 
-  CountedRefPtr<CountedRefDataIndexed*> subscripted() {
-    return new CountedRefDataIndexed(m_data->idify(), m_data);
+  self subscripted() {
+    return self(m_data->subscripted());//new CountedRefDataIndexed(m_data->idify(), m_data);
+  }
+
+  BOOLEAN retrieve(leftv res, int typ) { 
+    return (m_data->retrieve(res) && outcast(res, typ));
   }
 };
 
 void* countedref_InitShared(blackbox*)
 {
-  LeftvDeep empty;
-  return CountedRefShared(LeftvShallow(empty).operator->()).outcast();
+  return CountedRefShared().outcast();
 }
 
 /// blackbox support - binary operations
@@ -766,18 +745,11 @@ BOOLEAN countedref_Op2Shared(int op, leftv res, leftv head, leftv arg)
 {
   if  ((op == '[') || (op == '.')) {
     if (countedref_CheckInit(res, head))  return TRUE;
-    CountedRefPtr<CountedRefDataIndexed*> indexed = CountedRefShared::cast(head).subscripted();
-    if(indexed->operator*().get(head)) return TRUE;
- 
-    if (CountedRef::resolve(arg) || iiExprArith2(res, head, op, arg)) return
-      TRUE;
+    CountedRefShared indexed = CountedRefShared::cast(head).subscripted();
 
-    if(indexed->retrieve(res)) {
-      indexed.reclaim();
-      res->rtyp = CountedRefEnv::idx_id();
-      res->data = (void *)indexed;
-    }
-    return FALSE;
+    int typ = head->Typ();
+    return indexed.dereference(head) || CountedRef::resolve(arg) || 
+      iiExprArith2(res, head, op, arg) || indexed.retrieve(res, typ);
   }
 
   return countedref_Op2(op, res, head, arg);
@@ -809,7 +781,7 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
     return TRUE;
   }
   if (op == LIST_CMD){
-    res->rtyp=op;
+    res->rtyp = op;
     return jjLIST_PL(res, args);
   }
 
@@ -822,7 +794,7 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
   /// Case: replace assignment behind reference
   if ((result->Data() != NULL)  && (CountedRefShared::cast(result).Typ() !=0 )) {
     if (CountedRefShared::resolve(arg)) return TRUE;
-    CountedRefShared::cast(result) = arg;
+    return CountedRefShared::cast(result).assign(result, arg);
     return FALSE;
   }
   
@@ -833,7 +805,9 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
     return CountedRefShared::cast(arg).outcast(result);
   }  
   if(CountedRefShared::cast(result).Typ() == 0) {
-    CountedRefShared::cast(result) = arg;
+   // CountedRefShared::cast(result) = arg;
+   return CountedRefShared::cast(result).assign(result, arg);
+
     return FALSE;
   }
     
@@ -873,15 +847,6 @@ void countedref_init()
   bbxshared->blackbox_Init    = countedref_InitShared;
   bbxshared->data             = omAlloc0(newstruct_desc_size());
   CountedRefEnv::sh_id()=setBlackboxStuff(bbxshared, "shared");
-
-
-  blackbox *bbxindexed = 
-    (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
-  bbxindexed->blackbox_destroy = countedref_destroyIndexed;
-  bbxindexed->blackbox_Assign = countedref_AssignIndexed;
-  bbxindexed->data             = omAlloc0(newstruct_desc_size());
-  CountedRefEnv::idx_id()=setBlackboxStuff(bbxindexed, "shared_subexpr");
-
 }
 
 extern "C" { void mod_init() { countedref_init(); } }
