@@ -201,15 +201,6 @@ public:
 
 
 
-  BOOLEAN get(leftv result) {
-    leftv next = result->next;
-    result->next = NULL;
-    result->CleanUp();
-
-    copy(result, m_data);
-    result->next = next;
-    return FALSE;
-  }
 
   /// Access to object
   const leftv operator->() const { return m_data;  }
@@ -248,17 +239,14 @@ protected:
 
 
 class LeftvDeep:
-  public LeftvShallow {
+  protected LeftvShallow {
   typedef LeftvDeep self;
   typedef LeftvShallow base;
 
+  self& operator=(const self&);
 public:
   LeftvDeep(): base() {}
-  LeftvDeep(leftv data): base(data) {
-    if(m_data->rtyp != IDHDL) {
-      m_data->data = data->CopyD();
-    }
-  }
+  LeftvDeep(leftv data): base(data) {  if(!isid()) m_data->data=data->CopyD(); }
 
   LeftvDeep(leftv data,int,int): base() {  m_data->Copy(data);  }
 
@@ -268,25 +256,46 @@ public:
   }
 
   ~LeftvDeep() { m_data->CleanUp(); }
+  operator const base&() { return static_cast<const base&>(*this); }
 
-  self& operator=(const self& rhs) { return operator=(rhs.m_data); }
+  bool like(const self& rhs) const { return m_data->data == rhs.m_data->data; }
+
   self& operator=(leftv rhs) {
-    m_data->e = rhs->e;
-    rhs->e=NULL;
-    if(m_data->rtyp == IDHDL) {
+    if(isid()) {
+      m_data->e = rhs->e;
+      rhs->e = NULL;
       IDTYP((idhdl)m_data->data) =  rhs->Typ();
       IDDATA((idhdl)m_data->data) = (char*) rhs->CopyD();
     }
     else {
       m_data->CleanUp();
-      m_data->rtyp = rhs->Typ();
-      m_data->data =  rhs->CopyD();
+      m_data->Copy(rhs);
     }
-
     return *this;
   }
-  int Typ() const {return m_data->Typ(); }
-   leftv access() { return m_data; }
+
+  leftv access() { return m_data; }
+
+
+  /// Check a given context for our identifier
+  BOOLEAN brokenid(idhdl context) const {
+    assume(isid());
+    return (context == NULL) || 
+      ((context != (idhdl) m_data->data) && brokenid(IDNEXT(context)));
+  }
+  BOOLEAN get(leftv result) {
+    leftv next = result->next;
+    result->next = NULL;
+    result->CleanUp();
+
+    copy(result, m_data);
+    result->next = next;
+    return FALSE;
+  }
+
+  BOOLEAN isid() const { return m_data->rtyp==IDHDL;}
+  BOOLEAN ringed() { return m_data->RingDependend(); }
+  BOOLEAN unassigned() const { return m_data->Typ()==0; }
 };
 
 /** @class CountedRefData
@@ -300,9 +309,15 @@ class CountedRefData:
   typedef RefCounter base;
 
   /// Subscripted object
-  CountedRefData(idhdl handle, CountedRefPtr<self*> back):
-    base(), m_data(init(handle)), m_ring(back->Ring()), m_back(back) { }
+  CountedRefData(leftv wrapped, CountedRefPtr<self*> back):
+    base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {
 
+    assume(wrapped->rtyp == IDHDL);
+    ++((idhdl)m_data.access()->data)->ref;
+  }
+
+  /// Disallow assignment
+  self& operator=(const self&);
 public:
   /// Construct shared memory empty Singular object
   explicit CountedRefData():
@@ -321,39 +336,33 @@ public:
   
   /// Destruct
   ~CountedRefData() { 
-    if (m_back) CountedRefEnv::clearid((idhdl)m_data.access()->data, root());
-   }
-
-  CountedRefPtr<self*> subscripted() {
-    return new self(CountedRefEnv::idify(m_data.access(), root()), this);
+    if (m_back && (--((idhdl)m_data.access()->data)->ref <= 0))  // clear only if we own
+      CountedRefEnv::clearid((idhdl)m_data.access()->data, root());	
   }
 
-  /// Replace data
-  self& operator=(const self& rhs) {
-    m_data = rhs.m_data;
-    m_ring = rhs.m_ring;
-    return *this;
+  CountedRefPtr<self*> subscripted() {
+    if (m_back)
+      return new self(operator*().operator->(), m_back);
+
+    return new self(init(CountedRefEnv::idify(m_data.access(), root())), this);
   }
 
   /// Replace with other Singular data
-  void set(leftv rhs) {
-    if (m_data->rtyp==IDHDL)
-      m_data = rhs;
-   else
-     m_data->Copy(rhs);
-
+  self& operator=(leftv rhs) {
+    m_data = rhs;
     m_ring = parent(rhs);
+    return *this;
   }
 
   /// Write (shallow) copy to given handle
   BOOLEAN get(leftv res) { return broken() || m_data.get(res);  }
 
   /// Extract (shallow) copy of stored data
-  LeftvShallow operator*() const { return (broken()? LeftvShallow(): LeftvShallow(m_data)); }
+  LeftvShallow operator*() const { return (broken()? LeftvShallow(): (const LeftvShallow&)m_data); }
 
 
   BOOLEAN rering() {
-    if (m_ring ^ m_data->RingDependend()) m_ring = (m_ring? NULL: currRing);
+    if (m_ring ^ m_data.ringed()) m_ring = (m_ring? NULL: currRing);
     return (m_back && m_back->rering());
   }
 
@@ -366,27 +375,22 @@ public:
       if (m_ring != currRing) 
         return complain("Referenced identifier not from current ring");    
 
-      return (m_data->rtyp == IDHDL)  && brokenid(currRing->idroot) &&
+      return m_data.isid()  && m_data.brokenid(currRing->idroot) &&
         complain("Referenced identifier not available in ring anymore");  
     }
-
-   if (m_data->rtyp != IDHDL) return FALSE;
-   return brokenid(IDROOT) &&
-     ((currPack == basePack) || brokenid(basePack->idroot)) &&
+    
+    if (!m_data.isid()) return FALSE;
+    return  m_data.brokenid(IDROOT) &&
+     ((currPack == basePack) ||  m_data.brokenid(basePack->idroot)) &&
      complain("Referenced identifier not available in current context");
   }
 
   BOOLEAN assign(leftv result, leftv arg) {
-    if (m_data->rtyp!=IDHDL) {
-      set(arg);
+    if (!m_data.isid()) {
+      (*this) = arg;
       return FALSE;
     }
     return get(result) || iiAssign(result, arg) || rering();
-  }
-
-  /// @note If we have a callback, our identifier was temporary, so remove it
-  void clear() {  
-    if (m_back) CountedRefEnv::clearid((idhdl)m_data.access()->data, root());
   }
 
   BOOLEAN retrieve(leftv res) {
@@ -398,8 +402,7 @@ public:
     return FALSE;
   }
 
-  CountedRefPtr<ring, true> Ring() { return m_ring; }
-  int Typ() const {return m_data->Typ(); }
+  BOOLEAN unassigned() const { return m_data.unassigned(); }
 private:
 
   /// Raise error message and return @c TRUE
@@ -408,11 +411,7 @@ private:
     return TRUE;
   }
 
-  /// Check a given context for our identifier
-  BOOLEAN brokenid(idhdl context) const {
-    return (context == NULL) || 
-      ((context != (idhdl) m_data->data) && brokenid(IDNEXT(context)));
-  }
+
 
   /// Store ring for ring-dependent objects
   static ring parent(leftv rhs) { 
@@ -438,6 +437,10 @@ protected:
   CountedRefPtr<self*> m_back;
 };
 
+/// Supporting smart pointer @c CountedRefPtr
+inline void CountedRefPtr_kill(CountedRefData* data) { delete data; }
+
+
 /// blackbox support - initialization
 /// @note deals as marker for compatible references, too.
 void* countedref_Init(blackbox*)
@@ -445,9 +448,6 @@ void* countedref_Init(blackbox*)
   return NULL;
 }
 
-
-
-inline void CountedRefPtr_kill(CountedRefData* data) { delete data; }
 
 class CountedRef {
   typedef CountedRef self;
@@ -468,7 +468,7 @@ public:
   }
 
   /// Construct new reference from Singular data  
-  CountedRef(leftv arg):  m_data(new data_type(arg)) { }
+  explicit CountedRef(leftv arg):  m_data(new data_type(arg)) { }
 
 protected:
   /// Recover previously constructed reference
@@ -484,16 +484,11 @@ public:
     return *this;
   }
 
-  /// Replace data that reference is pointing to
-  self& operator=(leftv rhs) {
-    m_data->set(rhs);
-    return *this;
-  }
-
   BOOLEAN assign(leftv result, leftv arg) { 
     return m_data->assign(result,arg);
   }
   BOOLEAN rering() { return m_data->rering(); }
+
   /// Extract (shallow) copy of stored data
   LeftvShallow operator*() { return m_data->operator*(); }
 
@@ -559,7 +554,7 @@ public:
 
   /// Check whther argument is not defined yet
   BOOLEAN undefined(leftv res) { return construct(res, operator*()->Typ() == NONE); }
-
+  BOOLEAN unassigned() const { return  m_data->unassigned(); }
   /// Recover the actual object from raw Singular data
   static self cast(void* data) {
     assume(data != NULL);
@@ -578,7 +573,7 @@ public:
     while (is_ref(arg)) { if(CountedRef::cast(arg).dereference(arg)) return TRUE; };
     return (arg->next != NULL) && resolve(arg->next);
   }
-  int Typ() const {return m_data->Typ(); }
+  //  int Typ() const {return m_data->Typ(); }
 protected:
   /// Construct integer value
   static BOOLEAN construct(leftv res, long data) {
@@ -707,7 +702,7 @@ class CountedRefShared:
 
 public:
   CountedRefShared():  base(new data_type) { }
-  CountedRefShared(leftv arg):  base(new data_type(arg, FALSE,0)) { }
+  explicit CountedRefShared(leftv arg):  base(new data_type(arg, FALSE,0)) { }
 
   /// Construct copy
   CountedRefShared(const self& rhs): base(rhs) { }
@@ -718,17 +713,11 @@ public:
     return static_cast<self&>(base::operator=(rhs));
   }
 
-  /// Replace data that reference is pointing to
-  self& operator=(leftv rhs) {
-    return static_cast<self&>(base::operator=(rhs));
-  }
-
   static self cast(leftv arg) { return base::cast(arg); }
   static self cast(void* arg) { return base::cast(arg); }
 
-  self subscripted() {
-    return self(m_data->subscripted());//new CountedRefDataIndexed(m_data->idify(), m_data);
-  }
+  /// Temporarily wrap with identifier for '[' and '.' operation
+  self subscripted() { return self(m_data->subscripted()); }
 
   BOOLEAN retrieve(leftv res, int typ) { 
     return (m_data->retrieve(res) && outcast(res, typ));
@@ -748,7 +737,7 @@ BOOLEAN countedref_Op2Shared(int op, leftv res, leftv head, leftv arg)
     CountedRefShared indexed = CountedRefShared::cast(head).subscripted();
 
     int typ = head->Typ();
-    return indexed.dereference(head) || CountedRef::resolve(arg) || 
+    return indexed.dereference(head) || CountedRefShared::resolve(arg) || 
       iiExprArith2(res, head, op, arg) || indexed.retrieve(res, typ);
   }
 
@@ -792,7 +781,7 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
 BOOLEAN countedref_AssignShared(leftv result, leftv arg)
 {
   /// Case: replace assignment behind reference
-  if ((result->Data() != NULL)  && (CountedRefShared::cast(result).Typ() !=0 )) {
+  if ((result->Data() != NULL)  && !CountedRefShared::cast(result).unassigned()) {
     if (CountedRefShared::resolve(arg)) return TRUE;
     return CountedRefShared::cast(result).assign(result, arg);
     return FALSE;
@@ -804,7 +793,7 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
       CountedRefShared::cast(result).destruct();
     return CountedRefShared::cast(arg).outcast(result);
   }  
-  if(CountedRefShared::cast(result).Typ() == 0) {
+  if(CountedRefShared::cast(result).unassigned()) {
    // CountedRefShared::cast(result) = arg;
    return CountedRefShared::cast(result).assign(result, arg);
 
