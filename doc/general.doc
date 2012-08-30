@@ -2796,6 +2796,8 @@ Possible type casts are:
 @item
 @    @tab to @tab from
 @item
+@    @tab  @code{bigint} @tab  expression @code{int}, @code{number}, @code{poly}
+@item
 @    @tab  @code{ideal} @tab  expression lists of @code{int}, @code{number}, @code{poly}
 @item
 @    @tab  @code{ideal} @tab  @code{int}, @code{matrix}, @code{module}, @code{number}, @code{poly}, @code{vector}
