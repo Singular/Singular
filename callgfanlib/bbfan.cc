@@ -549,7 +549,7 @@ BOOLEAN getCone(leftv res, leftv args)
               bool mm = (bool) m;
               if (d<=zf->getAmbientDimension())
               {
-                if (i<=zf->numberOfConesOfDimension(d,oo,mm))
+                if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
                 {
                   i=i-1;
                   gfan::ZCone zc = zf->getCone(d,i,oo,mm);
