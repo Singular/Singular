@@ -666,6 +666,21 @@ gfan::ZMatrix rays(gfan::ZFan* zf)
   return rays;
 }
 
+BOOLEAN fanFromString(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == STRING_CMD))
+    {
+      std::string fanInString = (char*) u->Data();
+      std::istringstream s(fanInString);
+      gfan::ZFan* zf = new gfan::ZFan(s);
+      res->rtyp = fanID;
+      res->data = (void*) zf;
+      return FALSE;
+    }
+  WerrorS("fanFromString: unexpected parameters");
+  return TRUE;
+}
 
 // BOOLEAN grFan(leftv res, leftv h)
 // {
@@ -745,6 +760,7 @@ void bbfan_setup()
   iiAddCproc("","getCone",FALSE,getCone);
   iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   iiAddCproc("","isPure",FALSE,isPure);
+  iiAddCproc("","fanFromString",FALSE,fanFromString);
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
