@@ -5150,25 +5150,49 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     }
     else
     {
-      int * zeroOne= extractZeroOneVecs (NTLN);
+      int * zeroOne;
+      long numCols, numRows;
+      if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+      {
+        numCols= NTLN.NumCols();
+        numRows= NTLN.NumRows();
+        zeroOne= extractZeroOneVecs (NTLN);
+      }
+      else
+      {
+        numCols= NTLNe.NumCols();
+        numRows= NTLNe.NumRows();
+        zeroOne= extractZeroOneVecs (NTLNe);
+      }
       CFList bufBufUniFactors= bufUniFactors;
       CFListIterator iter, iter2;
       CanonicalForm buf;
       CFList factorsConsidered;
       CanonicalForm tmp;
-      for (int i= 0; i < NTLN.NumCols(); i++)
+      for (int i= 0; i < numCols; i++)
       {
         if (zeroOne [i] == 0)
           continue;
         iter= bufUniFactors;
         buf= 1;
         factorsConsidered= CFList();
-        for (int j= 0; j < NTLN.NumRows(); j++, iter++)
+        for (int j= 0; j < numRows; j++, iter++)
         {
-          if (!IsZero (NTLN (j + 1,i + 1)))
+          if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
           {
-            factorsConsidered.append (iter.getItem());
-            buf *= mod (iter.getItem(), y);
+            if (!IsZero (NTLN (j + 1,i + 1)))
+            {
+              factorsConsidered.append (iter.getItem());
+              buf *= mod (iter.getItem(), y);
+            }
+          }
+          else
+          {
+            if (!IsZero (NTLNe (j + 1,i + 1)))
+            {
+              factorsConsidered.append (iter.getItem());
+              buf *= mod (iter.getItem(), y);
+            }
           }
         }
         buf /= Lc (buf);
