@@ -279,10 +279,20 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
                     {
                       bool oo = (bool) o;
                       bool mm = (bool) m;
-                      int n = zf->numberOfConesOfDimension(d,oo,mm);
-                      res->rtyp = INT_CMD;
-                      res->data = (char*) n;
-                      return FALSE;
+                      int ld = zf->dimensionOfLinealitySpace();
+                      if (d-ld>=0)
+                      {
+                        int n = zf->numberOfConesOfDimension(d,oo,mm);
+                        res->rtyp = INT_CMD;
+                        res->data = (char*) n;
+                        return FALSE;
+                      }
+                      else
+                      {
+                        res->rtyp = INT_CMD;
+                        res->data = (char*) 0;
+                        return FALSE;
+                      }
                     }
                 }
             }
@@ -552,10 +562,19 @@ BOOLEAN getCone(leftv res, leftv args)
                 if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
                 {
                   i=i-1;
-                  gfan::ZCone zc = zf->getCone(d,i,oo,mm);
-                  res->rtyp = coneID;
-                  res->data = (char*)new gfan::ZCone(zc);
-                  return FALSE;
+                  int ld = zf->dimensionOfLinealitySpace();
+                  if (d-ld>=0)
+                  {
+                    gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
+                    res->rtyp = coneID;
+                    res->data = (char*)new gfan::ZCone(zc);
+                    return FALSE;
+                  }
+                  else
+                  {
+                    WerrorS("getCone: invalid index; no cones in this dimension");
+                    return TRUE;
+                  }
                 }
                 else
                 {
