@@ -15,7 +15,6 @@
 
 
 
-
 #include <Singular/mod2.h>
 
 #include <Singular/ipid.h>
@@ -142,7 +141,16 @@ class CountedRefEnv {
   typedef CountedRefEnv self;
 
 public:
-  static idhdl idify(leftv head, idhdl* root) {
+  static leftv idify(leftv head, idhdl* root) {
+    idhdl handle = newid(head, root);
+    leftv res = (leftv)omAlloc0(sizeof(*res));
+    res->data =(void*) handle;
+    res->rtyp = IDHDL;
+    return res;
+  }
+
+  static idhdl newid(leftv head, idhdl* root) {
+
     static unsigned int counter = 0;
     char* name = (char*) omAlloc0(512);
     sprintf(name, " :%u:%p:_shared_: ", ++counter, head->data);
@@ -174,89 +182,92 @@ public:
 /// Overloading ring destruction
 inline void CountedRefPtr_kill(ring r) { rKill(r); }
 
+class LeftvHelper {
+public:
+  template <class Type>
+  static Type* cpy(Type* result, Type* data)  {
+    return (Type*)memcpy(result, data, sizeof(Type));
+  }
+  template <class Type>
+  static Type* cpy(Type* data)  {
+    return cpy((Type*)omAlloc0(sizeof(Type)), data);
+  }
+  template <class Type>
+  static Type* recursivecpy(Type* data)  {
+    if (data == NULL) return data;
+    Type* result = cpy(data);
+    result->next = recursivecpy(data->next);
+    return result;
+  }
+  template <class Type>
+  static Type* shallowcpy(Type* result, Type* data)  {
+    cpy(result, data)->e = recursivecpy(data->e);
+    return result;
+  }
+  template <class Type>
+  static Type* shallowcpy(Type* data)  {
+    return shallowcpy((Type*) omAlloc0(sizeof(Type)), data);
+  }
+  template <class Type>
+  static void recursivekill(Type* current) {
+    if(current == NULL) return;
+    recursivekill(current->next);
+    omFree(current);
+  }
+  static leftv allocate() { return (leftv)omAlloc0(sizeof(sleftv)); }
 
-class LeftvShallow {
+};
+
+class LeftvShallow:
+  public LeftvHelper {
   typedef LeftvShallow self;
   
 public:
   LeftvShallow(): m_data(allocate()) { }
-  LeftvShallow(leftv data): 
-    m_data(allocate()) { init(data); }
-
-  LeftvShallow(const self& rhs):
-    m_data(allocate()) {
-    copy(m_data, rhs.m_data);
-  }
+  LeftvShallow(leftv data): m_data(shallowcpy(data)) { }
+  LeftvShallow(const self& rhs):  m_data(shallowcpy(rhs.m_data)) { }
 
   ~LeftvShallow() {  
-    kill(m_data->e);
+    recursivekill(m_data->e);
     omFree(m_data);
   }
   self& operator=(leftv rhs) {
-    kill(m_data->e);
-    return init(rhs);
+    recursivekill(m_data->e);
+    shallowcpy(m_data, rhs);
+    return *this;
   }
 
   self& operator=(const self& rhs) { return (*this) = rhs.m_data; }
-
-
-
 
   /// Access to object
   const leftv operator->() const { return m_data;  }
   leftv operator->() { return m_data;  }
 
 protected:
-  static leftv allocate() { return (leftv)omAlloc0(sizeof(sleftv)); }
-
-  self& init(leftv data) {
-    memcpy(m_data, data, sizeof(sleftv));
-    data->e = NULL;
-    m_data->next = NULL;
-    return *this;
-  }
-
-  static void copy(leftv result, leftv data)  {
-    memcpy(result, data, sizeof(sleftv));
-    copy(result->e, data->e);
-  }
-
- static void copy(Subexpr& current, Subexpr rhs)  {
-    if (rhs == NULL) return;
-    current = (Subexpr)memcpy(omAlloc0Bin(sSubexpr_bin), rhs, sizeof(*rhs));
-    copy(current->next, rhs->next);
-  }
-
-  static void kill(Subexpr current) {
-    if(current == NULL) return;
-    kill(current->next);
-    omFree(current);
-  }
-
-protected:
   leftv m_data;
 };
 
 
-class LeftvDeep:
-  protected LeftvShallow {
+class LeftvDeep: public LeftvHelper {
   typedef LeftvDeep self;
-  typedef LeftvShallow base;
 
+  /// @name Do not permit copying
+  //@{
   self& operator=(const self&);
+  LeftvDeep(const self&);
+  //@}
+
 public:
-  LeftvDeep(): base() {}
-  LeftvDeep(leftv data): base(data) {  if(!isid()) m_data->data=data->CopyD(); }
-
-  LeftvDeep(leftv data,int,int): base() {  m_data->Copy(data);  }
-
-  LeftvDeep(const self& rhs): base(rhs) {
-    if(m_data->rtyp != IDHDL)
-      m_data->Copy(rhs.m_data);
+  LeftvDeep(): m_data(allocate()) {}
+  LeftvDeep(leftv data): m_data(cpy(data)) { 
+    data->e = NULL;   // occupy subexpression 
+    if(!isid()) m_data->data=data->CopyD(); 
   }
 
+  LeftvDeep(leftv data,int,int): m_data(allocate()) {  m_data->Copy(data);  }
+
   ~LeftvDeep() { m_data->CleanUp(); }
-  operator const base&() { return static_cast<const base&>(*this); }
+  operator LeftvShallow() { return m_data;}
 
   bool like(const self& rhs) const { return m_data->data == rhs.m_data->data; }
 
@@ -288,14 +299,42 @@ public:
     result->next = NULL;
     result->CleanUp();
 
-    copy(result, m_data);
+    shallowcpy(result, m_data);
     result->next = next;
     return FALSE;
   }
 
+  BOOLEAN retrieve(leftv res) {
+    if (res->data == m_data->data)  {
+      if(m_data->e != res->e) recursivekill(m_data->e);
+      cpy(m_data, res);
+      res->Init();
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+
+
   BOOLEAN isid() const { return m_data->rtyp==IDHDL;}
   BOOLEAN ringed() { return m_data->RingDependend(); }
   BOOLEAN unassigned() const { return m_data->Typ()==0; }
+
+  leftv idify(idhdl* root) {
+    leftv res = (isid()? m_data: CountedRefEnv::idify(m_data, root));
+    ++(((idhdl)res->data)->ref);
+    return res;
+  }
+
+
+  void clearid(idhdl* root) {
+    assume(isid());
+    if (--((idhdl)m_data->data)->ref <= 0)  // clear only if we own
+      CountedRefEnv::clearid((idhdl)m_data->data, root);
+  }
+
+private:
+  leftv m_data;
 };
 
 /** @class CountedRefData
@@ -310,14 +349,13 @@ class CountedRefData:
 
   /// Subscripted object
   CountedRefData(leftv wrapped, CountedRefPtr<self*> back):
-    base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {
+    base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {  }
 
-    assume(wrapped->rtyp == IDHDL);
-    ++((idhdl)m_data.access()->data)->ref;
-  }
-
-  /// Disallow assignment
+  /// Disallow copying to avoid inconsistence
+  //@{
   self& operator=(const self&);
+  CountedRefData(const self&);
+  //@}
 public:
   /// Construct shared memory empty Singular object
   explicit CountedRefData():
@@ -330,21 +368,13 @@ public:
   CountedRefData(leftv data, BOOLEAN global, int):
     base(), m_data(data, global,0), m_ring(parent(data)), m_back() { }
 
-  /// Construct deep copy
-  CountedRefData(const self& rhs):
-    base(), m_data(rhs.m_data), m_ring(rhs.m_ring), m_back() { }
-  
   /// Destruct
-  ~CountedRefData() { 
-    if (m_back && (--((idhdl)m_data.access()->data)->ref <= 0))  // clear only if we own
-      CountedRefEnv::clearid((idhdl)m_data.access()->data, root());	
-  }
+  ~CountedRefData() {  if (m_back)  m_data.clearid(root()); }
 
+  /// Generate 
   CountedRefPtr<self*> subscripted() {
-    if (m_back)
-      return new self(operator*().operator->(), m_back);
-
-    return new self(init(CountedRefEnv::idify(m_data.access(), root())), this);
+    return new self(m_data.idify(root()), 
+                    m_back? m_back: CountedRefPtr<self*>(this));
   }
 
   /// Replace with other Singular data
@@ -360,7 +390,7 @@ public:
   /// Extract (shallow) copy of stored data
   LeftvShallow operator*() const { return (broken()? LeftvShallow(): (const LeftvShallow&)m_data); }
 
-
+  /// Determine active ring when ring dependency changes
   BOOLEAN rering() {
     if (m_ring ^ m_data.ringed()) m_ring = (m_ring? NULL: currRing);
     return (m_back && m_back->rering());
@@ -385,6 +415,7 @@ public:
      complain("Referenced identifier not available in current context");
   }
 
+  /// Reassign actual object
   BOOLEAN assign(leftv result, leftv arg) {
     if (!m_data.isid()) {
       (*this) = arg;
@@ -392,38 +423,22 @@ public:
     }
     return get(result) || iiAssign(result, arg) || rering();
   }
+  /// Recover additional information (e.g. subexpression) from likewise object
+  BOOLEAN retrieve(leftv res) { return m_data.retrieve(res); }
 
-  BOOLEAN retrieve(leftv res) {
-    if (res->data == m_data.access()->data)  {
-      memcpy(m_data.access(), res, sizeof(sleftv));
-      res->Init();
-      return TRUE;
-    }
-    return FALSE;
-  }
-
+  /// Check whether data is all-zero 
   BOOLEAN unassigned() const { return m_data.unassigned(); }
-private:
 
+private:
   /// Raise error message and return @c TRUE
   BOOLEAN complain(const char* text) const  {
     Werror(text);
     return TRUE;
   }
 
-
-
   /// Store ring for ring-dependent objects
   static ring parent(leftv rhs) { 
     return (rhs->RingDependend()? currRing: NULL); 
-  }
-
- static leftv init(idhdl handle) {
-    assume(handle);
-    leftv res = (leftv)omAlloc0(sizeof(*res));
-    res->data =(void*) handle;
-    res->rtyp = IDHDL;
-    return res;
   }
 
 protected:
@@ -573,7 +588,7 @@ public:
     while (is_ref(arg)) { if(CountedRef::cast(arg).dereference(arg)) return TRUE; };
     return (arg->next != NULL) && resolve(arg->next);
   }
-  //  int Typ() const {return m_data->Typ(); }
+
 protected:
   /// Construct integer value
   static BOOLEAN construct(leftv res, long data) {
