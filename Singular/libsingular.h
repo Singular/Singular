@@ -30,6 +30,7 @@
 #include <singular/ipshell.h>
 #include <singular/attrib.h>
 #include <singular/options.h>
+#include <singular/silink.h>
 
 void siInit(char *);
 
