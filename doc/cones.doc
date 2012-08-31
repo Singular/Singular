@@ -1412,11 +1412,13 @@ fVector(f);
 
 @table @code
 @item @strong{Syntax:}
-@code{getCone(} fan f, int dimension, int index, int orbit, int maximal @code{)}
+@code{getCone(} fan f, int dimension, int index @code{)}
+@*@code{getCone(} fan f, int dimension, int index, int orbit @code{)}
+@*@code{getCone(} fan f, int dimension, int index, int orbit, int maximal @code{)}
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
-cone (orbit=0) or orbit (orbit=1) of a certain index (ranges from 1 to numberOfConesOfDimension(f,2,0,0)) in a given dimension; if maximal=0, all cones and orbits are considered, if maximal=1, only maximal cones and orbits are considered
+cone (orbit=0) or orbit (orbit=1) of a certain index (ranges from 1 to numberOfConesOfDimension(f,*,*,*)) in a given dimension; if maximal=0, all cones and orbits are considered, if maximal=1, only maximal cones and orbits are considered; the default flags for orbit and maximal is 0.
 @item @strong{Example:}
 @smallexample
 @c example
