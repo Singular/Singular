@@ -542,58 +542,62 @@ BOOLEAN getCone(leftv res, leftv args)
       leftv w=v->next;
       if ((w != NULL) && (w->Typ() == INT_CMD))
       {
+        gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+        int d = (int)(long)v->Data();
+        int i = (int)(long)w->Data();
+        int o = -1;
+        int m = -1;
         leftv x=w->next;
         if ((x != NULL) && (x->Typ() == INT_CMD))
         {
-          leftv y=w->next;
+          o = (int)(long)x->Data();
+          leftv y=x->next;
           if ((y != NULL) && (y->Typ() == INT_CMD))
           {
-            gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-            int d = (int)(long)v->Data();
-            int i = (int)(long)w->Data();
-            int o = (int)(long)x->Data();
-            int m = (int)(long)y->Data();
-            if (((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+            m = (int)(long)y->Data();
+          }
+        }
+        if (o == -1) o = 0;
+        if (m == -1) m = 0;
+        if (((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+        {
+          bool oo = (bool) o;
+          bool mm = (bool) m;
+          if (d<=zf->getAmbientDimension())
+          {
+            if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
             {
-              bool oo = (bool) o;
-              bool mm = (bool) m;
-              if (d<=zf->getAmbientDimension())
+              i=i-1;
+              int ld = zf->dimensionOfLinealitySpace();
+              if (d-ld>=0)
               {
-                if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
-                {
-                  i=i-1;
-                  int ld = zf->dimensionOfLinealitySpace();
-                  if (d-ld>=0)
-                  {
-                    gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
-                    res->rtyp = coneID;
-                    res->data = (char*)new gfan::ZCone(zc);
-                    return FALSE;
-                  }
-                  else
-                  {
-                    WerrorS("getCone: invalid index; no cones in this dimension");
-                    return TRUE;
-                  }
-                }
-                else
-                {
-                  WerrorS("getCone: invalid index");
-                  return TRUE;
-               }
-             }
-             else
-             {
-               WerrorS("getCone: invalid dimension");
-               return TRUE;
+                gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
+                res->rtyp = coneID;
+                res->data = (char*)new gfan::ZCone(zc);
+                return FALSE;
+              }
+              else
+              {
+                WerrorS("getCone: invalid index; no cones in this dimension");
+                return TRUE;
               }
             }
             else
             {
-              WerrorS("getCone: invalid specifier for orbit or maximal");
+              WerrorS("getCone: invalid index");
               return TRUE;
             }
           }
+          else
+          {
+            WerrorS("getCone: invalid dimension");
+            return TRUE;
+          }
+        }
+        else
+        {
+          WerrorS("getCone: invalid specifier for orbit or maximal");
+          return TRUE;
         }
       }
     }
