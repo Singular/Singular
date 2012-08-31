@@ -2834,6 +2834,8 @@ matrix (@pxref{matrix type cast})
 @item
 @   @tab  @code{poly} @tab   @code{int}, @code{number}
 @item
+@    @tab  @code{ring} @tab   @code{list} (the inverse of @code{ringlist})
+@item
 @   @tab  @code{string} @tab   any type (@pxref{string type cast})
 @end multitable
 
