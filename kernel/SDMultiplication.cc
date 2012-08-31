@@ -292,7 +292,7 @@ void ShiftDVec::p_ExpSum_dp
   //This represents the first index in the currently considered
   //block in rt->exp.
   //long index_rt = p_Totaldeg(p, r) * lV + 1;
-  long index_rt = p->exp[omap[0]] * lV + 1;
+  long index_rt = p->exp[r->omap[0]] * lV + 1;
 
   long index_q = 1;
   {
@@ -302,7 +302,7 @@ void ShiftDVec::p_ExpSum_dp
     for(long i = 0; i < lV; ++i)
       if( p_GetExp(q->exp, index_q+i, r) )
       {
-        rt->exp[omap[index_rt+i]] = 1;
+        rt->exp[r->omap[index_rt+i]] = 1;
         p_SetExp(rt->exp, index_rt+i, 1, r);
         index_rt += lV;
         if(index_rt > r->N) break; //looped through all vars
@@ -310,7 +310,7 @@ void ShiftDVec::p_ExpSum_dp
         goto nextblock; //we can move on to the next block
       }
   }
-  rt->exp[omap[0]] += q->exp[omap[0]];
+  rt->exp[r->omap[0]] += q->exp[r->omap[0]];
 
   return;
 }

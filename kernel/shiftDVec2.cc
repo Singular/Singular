@@ -17,9 +17,16 @@
 #include <kernel/kutil2.h> //already included in kutil.h
 #include <kernel/shiftDVec.h>
 
+//now our adapted multiplications for:
+//- ksCreateShortSpoly
+//- etc. ?
+#include <kernel/SDMultiplication.h>
 
-//No debug version at the moment
+
+//No debug version at the moment 
+//TODO: (why did I shut that down?)
 #undef KDEBUG
+
 #undef HAVE_RINGS //We do not have rings
 #undef HAVE_PLURAL //Nope
 
