@@ -285,16 +285,15 @@ public:
     return *this;
   }
 
-  leftv access() { return m_data; }
-
-
   /// Check a given context for our identifier
   BOOLEAN brokenid(idhdl context) const {
     assume(isid());
     return (context == NULL) || 
       ((context != (idhdl) m_data->data) && brokenid(IDNEXT(context)));
   }
-  BOOLEAN get(leftv result) {
+
+  /// Put a shallow copy to given @c leftv
+  BOOLEAN put(leftv result) {
     leftv next = result->next;
     result->next = NULL;
     result->CleanUp();
@@ -304,6 +303,7 @@ public:
     return FALSE;
   }
 
+  /// Get additional data (e.g. subexpression data) from likewise instances
   BOOLEAN retrieve(leftv res) {
     if (res->data == m_data->data)  {
       if(m_data->e != res->e) recursivekill(m_data->e);
@@ -385,7 +385,7 @@ public:
   }
 
   /// Write (shallow) copy to given handle
-  BOOLEAN get(leftv res) { return broken() || m_data.get(res);  }
+  BOOLEAN put(leftv res) { return broken() || m_data.put(res);  }
 
   /// Extract (shallow) copy of stored data
   LeftvShallow operator*() const { return (broken()? LeftvShallow(): (const LeftvShallow&)m_data); }
@@ -421,7 +421,7 @@ public:
       (*this) = arg;
       return FALSE;
     }
-    return get(result) || iiAssign(result, arg) || rering();
+    return put(result) || iiAssign(result, arg) || rering();
   }
   /// Recover additional information (e.g. subexpression) from likewise object
   BOOLEAN retrieve(leftv res) { return m_data.retrieve(res); }
@@ -534,9 +534,8 @@ public:
 
   /// Replaces argument by a shallow copy of the references data
   BOOLEAN dereference(leftv arg) {
-    //    assume(is_ref(arg));
     m_data.reclaim();
-    BOOLEAN b= m_data->get(arg) || ((arg->next != NULL) && resolve(arg->next));
+    BOOLEAN b= m_data->put(arg) || ((arg->next != NULL) && resolve(arg->next));
     m_data.release();
     return b;
   }
