@@ -258,13 +258,14 @@ class LeftvDeep: public LeftvHelper {
   //@}
 
 public:
+  struct copy_tag {};
   LeftvDeep(): m_data(allocate()) {}
   LeftvDeep(leftv data): m_data(cpy(data)) { 
     data->e = NULL;   // occupy subexpression 
     if(!isid()) m_data->data=data->CopyD(); 
   }
 
-  LeftvDeep(leftv data,int,int): m_data(allocate()) {  m_data->Copy(data);  }
+  LeftvDeep(leftv data, copy_tag): m_data(allocate()) {  m_data->Copy(data);  }
 
   ~LeftvDeep() { m_data->CleanUp(); }
   operator LeftvShallow() { return m_data;}
@@ -345,36 +346,46 @@ private:
 class CountedRefData:
   public RefCounter {
   typedef CountedRefData self;
+  typedef CountedRefPtr<self*, false, true> self_ptr;
   typedef RefCounter base;
 
-  /// Subscripted object
-  CountedRefData(leftv wrapped, CountedRefPtr<self*> back):
+  /// Generate object linked to other reference (e.g. for subscripts)
+  CountedRefData(leftv wrapped, self_ptr back):
     base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {  }
 
-  /// Disallow copying to avoid inconsistence
+  /// @name  isallow copying to avoid inconsistence
   //@{
   self& operator=(const self&);
   CountedRefData(const self&);
   //@}
 public:
+  typedef LeftvDeep::copy_tag copy_tag;
+
+  /// Fix smart pointer type to referenced data
+  typedef self_ptr ptr_type;
+
+  /// Fix smart pointer type to ring
+  typedef CountedRefPtr<ring, true> ring_ptr;
+
   /// Construct shared memory empty Singular object
   explicit CountedRefData():
     base(), m_data(), m_ring(), m_back() { }
 
-  /// Construct reference for Singular object
+  /// Reference Singular object
   explicit CountedRefData(leftv data):
     base(), m_data(data), m_ring(parent(data)), m_back() { }
 
-  CountedRefData(leftv data, BOOLEAN global, int):
-    base(), m_data(data, global,0), m_ring(parent(data)), m_back() { }
+  /// Construct reference for Singular object
+  CountedRefData(leftv data, copy_tag do_copy):
+    base(), m_data(data, do_copy), m_ring(parent(data)), m_back() { }
 
   /// Destruct
   ~CountedRefData() {  if (m_back)  m_data.clearid(root()); }
 
   /// Generate 
-  CountedRefPtr<self*> subscripted() {
+  ptr_type subscripted() {
     return new self(m_data.idify(root()), 
-                    m_back? m_back: CountedRefPtr<self*>(this));
+                    m_back? m_back: ptr_type(this));
   }
 
   /// Replace with other Singular data
@@ -446,10 +457,10 @@ protected:
   LeftvDeep m_data;
 
   /// Store namespace for ring-dependent objects
-  CountedRefPtr<ring, true> m_ring;
+  ring_ptr m_ring;
 
   /// Reference to actual object for indexed structures  
-  CountedRefPtr<self*> m_back;
+  ptr_type m_back;
 };
 
 /// Supporting smart pointer @c CountedRefPtr
@@ -471,8 +482,11 @@ public:
   /// name type for identifiers
   typedef int id_type;
 
-  /// Name type for handling reference data
+  /// Name type for handling referenced data
   typedef CountedRefData data_type;
+
+  /// Fix smart pointer type to referenced data
+  typedef data_type::ptr_type data_ptr;
 
   /// Check whether argument is already a reference type
   static BOOLEAN is_ref(leftv arg) {
@@ -482,12 +496,12 @@ public:
     //            (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
   }
 
-  /// Construct new reference from Singular data  
+  /// Reference given Singular data  
   explicit CountedRef(leftv arg):  m_data(new data_type(arg)) { }
 
 protected:
   /// Recover previously constructed reference
-  CountedRef(data_type* arg):  m_data(arg) { assume(arg); }
+  CountedRef(data_ptr arg):  m_data(arg) { assume(arg); }
 
 public:
   /// Construct copy
@@ -502,7 +516,6 @@ public:
   BOOLEAN assign(leftv result, leftv arg) { 
     return m_data->assign(result,arg);
   }
-  BOOLEAN rering() { return m_data->rering(); }
 
   /// Extract (shallow) copy of stored data
   LeftvShallow operator*() { return m_data->operator*(); }
@@ -513,7 +526,7 @@ public:
     return outcast(res);
   }
 
-  /// Construct reference data object from
+  /// Construct reference data object from *this
   BOOLEAN outcast(leftv res) {
     if (res->rtyp == IDHDL)
       IDDATA((idhdl)res->data) = (char *)outcast();
@@ -521,6 +534,8 @@ public:
       res->data = (void *)outcast();
     return FALSE;
   }
+
+  /// Construct raw reference data
   data_type* outcast() { 
     m_data.reclaim();
     return m_data;
@@ -540,13 +555,17 @@ public:
     return b;
   }
 
+  /// Check whether object in valid in current context
   BOOLEAN broken() {return m_data->broken(); }
+
+  /// Check whether (shared) data was initialized but not assigned yet.
+  BOOLEAN unassigned() const { return m_data->unassigned(); }
 
   /// Get number of references pointing here, too
   BOOLEAN count(leftv res) { return construct(res, m_data.count() - 1); }
 
   // Get internal indentifier
-  BOOLEAN hash(leftv res) { return construct(res, (long)(data_type*)m_data); }
+  BOOLEAN enumerate(leftv res) { return construct(res, (long)(data_type*)m_data); }
 
   /// Check for likewise identifiers
   BOOLEAN likewise(leftv res, leftv arg) {
@@ -566,9 +585,6 @@ public:
   /// Get (possibly) internal identifier name
   BOOLEAN name(leftv res) { return construct(res, operator*()->Name()); }
 
-  /// Check whther argument is not defined yet
-  BOOLEAN undefined(leftv res) { return construct(res, operator*()->Typ() == NONE); }
-  BOOLEAN unassigned() const { return  m_data->unassigned(); }
   /// Recover the actual object from raw Singular data
   static self cast(void* data) {
     assume(data != NULL);
@@ -588,7 +604,6 @@ public:
     return (arg->next != NULL) && resolve(arg->next);
   }
 
-protected:
   /// Construct integer value
   static BOOLEAN construct(leftv res, long data) {
     res->data = (void*) data;
@@ -602,9 +617,17 @@ protected:
     res->rtyp = STRING_CMD;
     return FALSE;
   }
+  /// Construct void-style object
+  static BOOLEAN construct(leftv res) {
+    res->data = NULL;
+    res->rtyp = NONE;
+    return FALSE;
+  }
 
+
+protected:
   /// Store pointer to actual data
-  CountedRefPtr<data_type*> m_data;
+  data_ptr m_data;
 };
 
 /// blackbox support - convert to string representation
@@ -711,23 +734,34 @@ class CountedRefShared:
   typedef CountedRefShared self;
   typedef CountedRef base;
 
+  /// Reinterprete @c CountedRef as @c CountedRefShared
   CountedRefShared(const base& rhs):  base(rhs) { }
-  CountedRefShared(data_type* rhs):  base(rhs) { }
+
+  /// Genreate   
+  CountedRefShared(data_ptr rhs):  base(rhs) { }
 
 public:
+  /// Default constructor for initialized, but all-zero, shared data object
   CountedRefShared():  base(new data_type) { }
-  explicit CountedRefShared(leftv arg):  base(new data_type(arg, FALSE,0)) { }
 
-  /// Construct copy
+  /// Construct internal copy of Singular interpreter object
+  explicit CountedRefShared(leftv arg):  base(new data_type(arg, data_type::copy_tag())) { }
+
+  /// Construct new reference to internal data 
   CountedRefShared(const self& rhs): base(rhs) { }
 
+  /// Desctruct 
   ~CountedRefShared() { }
 
+  /// Change reference to shared data 
   self& operator=(const self& rhs) {
     return static_cast<self&>(base::operator=(rhs));
   }
 
+  /// Recovering outcasted @c CountedRefShared object from interpreter object
   static self cast(leftv arg) { return base::cast(arg); }
+
+  /// Recovering outcasted @c CountedRefShared object from raw data
   static self cast(void* arg) { return base::cast(arg); }
 
   /// Temporarily wrap with identifier for '[' and '.' operation
@@ -738,6 +772,7 @@ public:
   }
 };
 
+/// Blackbox support - generate initialized, but all-zero - shared data 
 void* countedref_InitShared(blackbox*)
 {
   return CountedRefShared().outcast();
@@ -767,19 +802,36 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
     if (args->next) {
       leftv next = args->next;
       args->next = NULL;
-      CountedRef obj = CountedRef::cast(args);
+
       char* name = (next->Typ() == STRING_CMD? 
                     (char*) next->Data(): (char*)next->Name());
       next = next->next;
+
+      if (strcmp(name, "help") == 0) {
+        PrintS("system(<ref>, ...): extended functionality for reference/shared data <ref>\n");
+        PrintS("  system(<ref>, count)         - number of references pointing to <ref>\n");
+        PrintS("  system(<ref>, enumerate)     - unique number for identifying <ref>\n");
+        PrintS("  system(<ref>, undefined)     - checks whether <ref> had been assigned\n");
+        PrintS("  system(<ref>, \"help\")        - prints this information message\n");
+        PrintS("  system(<ref>, \"typeof\")      - actual type referenced by <ref>\n");
+        PrintS("  system(<ref1>, same, <ref2>) - tests for identic reference objects\n");
+        return CountedRef::construct(res);
+      }
+      if (strncmp(name, "undef", 5) == 0) {
+	return CountedRef::construct(res, args->Data()? 
+                          (CountedRef::cast(args).unassigned()? 1: 2): 0);
+      }
+
+      CountedRef obj = CountedRef::cast(args);
       if (next) {
         if (strcmp(name, "same") == 0) return obj.same(res, next);
-        if (strncmp(name, "like", 4) == 0) return obj.likewise(res, next);
+        // likewise may be hard to interprete, so we not not document it above
+        if (strncmp(name, "like", 4) == 0) return obj.likewise(res, next);  
       }
       if (strncmp(name, "count", 5) == 0) return obj.count(res);
-      if (strcmp(name, "hash") == 0) return obj.hash(res);
-      if (strcmp(name, "name") == 0) return obj.name(res);
-      if (strncmp(name, "type", 4) == 0) return obj.type(res);
-      if (strncmp(name, "undef", 5) == 0) return obj.undefined(res);
+      if (strncmp(name, "enum", 4) == 0) return obj.enumerate(res);
+      if (strcmp(name, "name") == 0) return obj.name(res); // undecumented
+      if (strncmp(name, "typ", 3) == 0) return obj.type(res);
     }
     return TRUE;
   }
