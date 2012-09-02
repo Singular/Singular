@@ -3,15 +3,17 @@
 /** @file countedref.cc
  *
  * @author Alexander Dreyer
- * @date 2010-12-15
+ * @date 2012-08-15
  *
- * This file defines the @c blackbox operations for the countedref type.
+ * This file defines reference countes interpreter objects and adds the 
+ * @c blackbox operations for high-level types 'reference' and 'shared'.
  *
+ * @note This works was supported by the "Industrial Algebra" project.
+ * 
  * @par Copyright:
- *   (c) 2010 by The Singular Team, see LICENSE file
+ *   (c) 2012 by The Singular Team, see LICENSE file
 **/
 //*****************************************************************************
-
 
 
 
@@ -30,6 +32,9 @@
 #include "lists.h"
 #include "attrib.h"
 
+#include "countedref.h"
+
+#if 0
 /** @class CountedRefPtr
  * This class implements a smart pointer which handles pointer-style access
  * to a reference-counted structure and destructing the latter after use.
@@ -136,7 +141,7 @@ private:
   /// Number of references
   count_type ref;  // naming consistent with other classes
 };
-
+#endif
 class CountedRefEnv {
   typedef CountedRefEnv self;
 
@@ -179,9 +184,9 @@ public:
   }
 };
 
+#if 0
 /// Overloading ring destruction
 inline void CountedRefPtr_kill(ring r) { rKill(r); }
-
 class LeftvHelper {
 public:
   template <class Type>
@@ -337,7 +342,7 @@ public:
 private:
   leftv m_data;
 };
-
+#endif
 /** @class CountedRefData
  * This class stores a reference counter as well as a Singular interpreter object.
  *
