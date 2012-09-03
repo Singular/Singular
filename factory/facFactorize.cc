@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facFqFactorize.cc
+/** @file facFactorize.cc
  *
  * multivariate factorization over Q(a)
  *
