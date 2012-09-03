@@ -715,10 +715,23 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
   FFRandom genFF;
   GFRandom genGF;
   int p= getCharacteristic ();
-  if (p < CHAR_THRESHOLD && !GF && alpha.level() == 1) 
+  if (p < CHAR_THRESHOLD)
   {
-    fail= true;
-    return CFList();
+    if (!GF && alpha.level() == 1)
+    {
+      fail= true;
+      return CFList();
+    }
+    else if (!GF && alpha.level() != 1)
+    {
+      if ((p == 2 && degree (getMipo (alpha)) < 6) ||
+          (p == 3 && degree (getMipo (alpha)) < 4) ||
+          (p == 5 && degree (getMipo (alpha)) < 3))
+      {
+        fail= true;
+        return CFList();
+      }
+    }
   }
   double bound;
   if (alpha != x)
