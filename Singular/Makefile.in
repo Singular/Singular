@@ -229,7 +229,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     MinorInterface.cc \
     bigintm.cc pyobject_setup.cc \
     denom_list.cc \
-    minpoly.cc
+    minpoly.cc countedref.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
@@ -267,7 +267,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 
 HEADERS=lists.h attrib.h \
 	mpsr_Tok.h \
-	ipconv.h newstruct.h \
+	ipconv.h newstruct.h countedref.h \
 	subexpr.h ipid.h \
 	cntrlc.h ipprint.h sdb.h \
 	ipshell.h tok.h \

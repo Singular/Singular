@@ -252,5 +252,7 @@ void countedref_init()
   CountedRefData::set_id(setBlackboxStuff(bbx,"reference"));
 }
 
+#ifdef HAVE_DYNAMIC_COUNTEDREF
 extern "C" { void mod_init() { countedref_init(); } }
+#endif
 

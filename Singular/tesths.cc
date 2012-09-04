@@ -31,6 +31,7 @@
 #include <Singular/ssiLink.h>
 #include <Singular/bigintm.h>
 #include <Singular/pyobject_setup.h>
+#include <Singular/countedref.h>
 #include <omalloc/omalloc.h>
 
 #ifdef HAVE_FANS
@@ -164,6 +165,7 @@ int main(          /* main entry to Singular */
     */
   }
   pyobject_setup();
+  countedref_init();
 #ifdef HAVE_FANS
   bbcone_setup();
   bbpolytope_setup();
