@@ -1,0 +1,272 @@
+@c -*-texinfo-*-
+
+@c ----------------------------------------------------------------------------
+@node  refcounted,,pyobject, Data types
+@section reference and shared
+@cindex reference
+@cindex shared
+@cindex blackbox
+
+The black box data types @code{reference} and @code{shared} in @sc{Singular}
+for concurrently accessing of data from @sc{Singular} object.
+Copying such object will only add an additional handle which allows you
+to define multiple identifers for the same object instance.
+
+You must initialize a @code{reference} using a named identifier
+or a subexpression of the latter:
+
+@smallexample
+@c example initializing references
+int i = 17;
+reference ref = i;
+
+ref;
+ref = 19;
+ref;
+i;             // original handle changed!
+
+kill ref;
+i;             // 'i' stays alive
+
+reference uninitialized;
+uninitialized;   // not initialized
+// error: not a named identifier:
+uninitialized = 17;
+
+// but subexpressions of named identifiers will do 
+list ll = list(3,4,5);
+reference ref = ll[2];
+ref;
+ref = 12;
+ref;
+ll;
+@c example
+@end smallexample
+
+In most cases the value look-up is done automatically, but for some 
+ 
+@smallexample
+@c example automatically dereferencing
+int i = 0;
+reference ref = i;
+
+ref + ref;    // automated 'dereferencing'
+ref + 4;
+4 + ref;
+
+list ll = list(ref, ref, ref, ref, ref, ref, ref);
+string(ll);
+ref = 1;
+string(ll);   // all one now
+
+ll[3] = 0;
+string(ll);   // only third element changed
+
+reference(ll[1]) = 9;
+string(ll);   // all others changed
+
+def(ll[1]) = 11;  // alternative (generic) syntax
+string(ll);
+@c example
+@end smallexample
+
+
+@menu
+* reference declarations::
+* reference expressions::
+* reference and shared operations::
+* reference and shared related functions::
+@end menu
+
+@c ------------------------------
+@node reference declarations, reference expressions, countedref, countedref
+@subsection reference declarations
+@cindex reference declarations
+
+@table @strong
+@item Syntax:
+reference name @code{=} identifier @code{;}
+
+@item Purpose:
+defines a @code{reference} object.
+
+@item Default:
+@code{None}
+
+@item Example:
+@smallexample
+@c example
+  reference empty;
+  empty;
+
+  string str = "Hello World!";
+  reference ref = str;
+  ref;
+  ref = 17;    // cannot change type of 'i'
+  list ll= list(4, 5, 6);
+  reference lref = ll[2];
+  lref;
+  lref = str;  // change list element
+  ll;
+@c example
+@end smallexample
+@end table
+@c ------------------------------
+@node reference expressions, reference operations, reference declarations, countedref
+@subsection reference expressions
+@cindex reference expressions
+
+A reference expression:
+@enumerate
+@item
+any identifier
+@item
+any subexpression of an identifier
+@item
+an identifier of type reference (references the original, too)
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+  int i = 17;
+  reference ref = i;  // new reference
+  ref;
+  reference second = ref;
+  second;
+  second = 9;       // also tied to 'i'
+  i;
+  typeof(ref);
+
+  list ll = list(1, 2, 3);
+  reference lref = ll[1];
+  lref;
+  lref = 12;
+  ll;
+@c example
+@end smallexample
+
+@c ------------------------------
+@node reference operations, reference related functions, reference expressions, countedref
+@subsection reference and shared operations
+@cindex reference operations
+@cindex shared operations
+
+All operations of the underlying objects are forwarded by
+@code{reference} and @code{shared} objects. 
+THis kind of dereferencing is done automatically in most cases:
+
+@*@strong{Example:}
+@smallexample
+@c example
+int i = 2;
+reference two = i;
+shared three = 3;
+
+two * three;
+two ^ three;
+two ** three;
+
+two + two;
+two - two;
+
+ring r = 0, (x,y,z), dp;
+poly p = x + y + z;
+reference ref = p;
+shared zvar =z;
+subst(ref, x,1, y,2, zvar,3);
+@c example
+@end smallexample
+
+
+In some cases @code{reference}s have to be dereferenced explicitely. For
+instance, this is the case for n-ary function calls not starting with 
+a @code{reference} or @code{shared} object. You can use the @code{link}
+operator or a type cast to work around this.
+In contrast, some constructs like left-hand subexpressions prematurely
+evaluate. You can avoid this by using the @code{def} operator or by
+explicitly type casting to @code{reference}.
+
+@smallexample
+@c example
+ring r = 0, (x,y,z), dp;
+poly p = x + y + z;
+shared xsh = x;
+//subst(p, xsh,1, y,2, z,3);        // fails
+subst(p, poly(xsh),1, y,2, z,3);  // good
+subst(p, link(xsh),1, y,2, z,3);  // fine
+
+list ll = list(xsh, xsh, xsh);
+ll[1] = y;      // replaced only first entry
+ll;
+shared(ll[2]) = z;    // replaces the others
+ll;
+def(ll[2]) = x;       // generic alternative
+ll;
+@c example
+@end smallexample
+
+
+
+@c ------------------------------
+@node reference related functions,  , reference operations, reference
+@subsection reference and shared related functions
+@cindex reference related functions
+@cindex shared related functions
+
+@table @code
+@item def
+explicitly type casts to @code{reference} or @code{shared}, respectively. 
+(Note: For the @code{def} declaration, see @ref{def}.)
+
+@*@strong{Example:}
+@smallexample
+@c example
+int i =1;
+reference ref = i;
+shared sh = 17;
+list ll = list(ref, ref, ref, sh, sh);
+ll[1] = 2;      // replace only one entry
+ll;
+def(ll[2]) = 3;      // change the others
+ll;
+def(ll[4]) = 19;     // same here
+ll;
+@c example
+@end smallexample
+
+@item link
+explicitly dereference a @code{reference} or @code{shared} object.
+(Note: For the @code{link} declaration, see @ref{link}.)
+
+@*@strong{Example:}
+@smallexample
+@c example
+ring r = 0, (x,y,z), dp;
+poly p = x + y + z;
+def x_=x;
+reference xref=x_;
+xref;
+subst(p, xref,1, y,2, z,3);        // fails
+subst(p, link(xref),1, y,2, z,3);  // fine
+@c example
+@end smallexample
+
+@item system
+The @code{reference} and @code{shared} objects overload the 
+@code{system} command to gain extended features, see @code{system(ref, "help")}
+for more details.
+(Note: For the general @code{system} command, see @ref{system}.)
+
+@*@strong{Example:}
+@smallexample
+@c example
+int i;
+reference ref = i;
+system(ref, "help");
+@c example
+@end smallexample
+@end table
+
+
+@c ---------------------------------------
