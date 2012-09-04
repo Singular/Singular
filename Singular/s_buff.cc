@@ -40,14 +40,22 @@ s_buff s_open_by_name(const char *n)
   return s_open(fd);
 }
 
-int    s_close(s_buff &F)
+int    s_free(s_buff &F)
 {
   if (F!=NULL)
   {
     omFreeSize(F->buff,S_BUFF_LEN);
-    int r=si_close(F->fd);
     omFreeSize(F,sizeof(*F));
     F=NULL;
+  }
+  return 0;
+}
+
+int    s_close(s_buff &F)
+{
+  if (F!=NULL)
+  {
+    int r=close(F->fd);
     return r;
   }
   return 0;
