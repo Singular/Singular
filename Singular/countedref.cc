@@ -47,7 +47,7 @@ inline void CountedRefPtr_kill(ring r) { rKill(r); }
 
 /** @class CountedRefData
  * This class stores a reference counter as well as a Singular interpreter object.
- * It also take care of the context, e.g. the current ring, indexed object, etc.
+ * It also take care of the context, e.g. the current ring, wrap object, etc.
  **/
 class CountedRefData:
   public RefCounter {
@@ -58,8 +58,8 @@ private:
   typedef RefCounter base;
 
   /// Generate object linked to other reference (e.g. for subscripts)
-  CountedRefData(leftv wrapped, back_ptr back):
-    base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {
+  CountedRefData(leftv wrapid, back_ptr back):
+    base(), m_data(wrapid), m_ring(back->m_ring), m_back(back) {
   }
 
   /// @name Disallow copying to avoid inconsistence
@@ -100,7 +100,7 @@ public:
   }
 
   /// Generate object for indexing
-  ptr_type subscripted() { return new self(m_data.idify(root()), weakref()); }
+  ptr_type wrapid() { return new self(m_data.idify(root()), weakref()); }
 
   /// Gerenate  weak (but managed) reference to @c *this
   back_ptr weakref() {
@@ -150,7 +150,8 @@ public:
   }
 
   /// Reassign actual object
-  BOOLEAN assign(leftv result, leftv arg) {
+  BOOLEAN assign(leftv result, leftv arg) { 
+
     if (!m_data.isid()) {
       (*this) = arg;
       return FALSE;
@@ -182,7 +183,7 @@ protected:
   /// Store namespace for ring-dependent objects
   ring_ptr m_ring;
 
-  /// Reference to actual object for indexed structures  
+  /// Reference to actual object for wrap structures  
   back_ptr m_back;
 };
 
@@ -191,7 +192,6 @@ inline void CountedRefPtr_kill(CountedRefData* data) { delete data; }
 
 
 /// blackbox support - initialization
-/// @note deals as marker for compatible references, too.
 void* countedref_Init(blackbox*)
 {
   return NULL;
@@ -236,7 +236,7 @@ public:
     return *this;
   }
 
-  BOOLEAN assign(leftv result, leftv arg) { 
+  BOOLEAN assign(leftv result, leftv arg) {
     return m_data->assign(result,arg);
   }
 
@@ -316,7 +316,7 @@ public:
 
   /// Recover the actual object from Singular interpreter object
   static self cast(leftv arg) {
-    assume((arg != NULL) && is_ref(arg));
+    assume(arg != NULL); assume(is_ref(arg));
     return self::cast(arg->Data());
   }
 
@@ -346,7 +346,6 @@ public:
     res->rtyp = NONE;
     return FALSE;
   }
-
 
 protected:
   /// Store pointer to actual data
@@ -379,8 +378,8 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
 {
   // Case: replace assignment behind reference
   if (result->Data() != NULL) {
-    return CountedRef::resolve(arg) || 
-      CountedRef::cast(result).assign(result, arg);	
+    CountedRef ref = CountedRef::cast(result);
+    return CountedRef::resolve(arg) || ref.assign(result, arg);	
   }
   
   // Case: copy reference
@@ -409,7 +408,6 @@ BOOLEAN countedref_Op1(int op, leftv res, leftv head)
   if(op == TYPEOF_CMD)
     return blackboxDefaultOp1(op, res, head);
 
-
   if (countedref_CheckInit(res, head)) return TRUE;
  
   if ((op == DEF_CMD) || (op == head->Typ())) {
@@ -417,31 +415,62 @@ BOOLEAN countedref_Op1(int op, leftv res, leftv head)
     return iiAssign(res, head);
   }
 
-  if(op == LINK_CMD) {
-    res->rtyp =  DEF_CMD;
-    return CountedRef::cast(head).dereference(head) || iiAssign(res, head);
-  }
-
-  return CountedRef::cast(head).dereference(head) || iiExprArith1(res, head, op);
+  CountedRef ref = CountedRef::cast(head);
+  return ref.dereference(head) ||
+    iiExprArith1(res, head, op == LINK_CMD? head->Typ(): op);
 }
 
-/// blackbox support - binary operations
+
+
+/// blackbox support - binary operations (resolve seocnd argument)
+static BOOLEAN countedref_Op2_(int op, leftv res, leftv head, leftv arg)
+{
+  if (CountedRef::is_ref(arg)) {
+    CountedRef ref = CountedRef::cast(arg);
+    return ref.dereference(arg) || iiExprArith2(res, head, op, arg);
+  }
+  return  iiExprArith2(res, head, op, arg);
+}
+
 BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 {
-   return countedref_CheckInit(res, head) ||
-    CountedRef::cast(head).dereference(head) ||
-    CountedRef::resolve(arg) ||
-    iiExprArith2(res, head, op, arg);
+  if (countedref_CheckInit(res, head)) return TRUE;
+  if (CountedRef::is_ref(head)) {
+    CountedRef ref = CountedRef::cast(head);
+    return ref.dereference(head) || countedref_Op2_(op, res, head, arg);
+  }
+  return countedref_Op2_(op, res, head, arg);
+}
+
+static BOOLEAN countedref_Op3__(int op, leftv res, leftv head, leftv arg1, leftv arg2)
+{
+
+  if (CountedRef::is_ref(arg2)) {
+    CountedRef ref = CountedRef::cast(arg2);
+    return ref.dereference(arg2) || iiExprArith3(res, op, head, arg1, arg2);
+  }
+  return iiExprArith3(res, op, head, arg1, arg2);
+}
+
+static BOOLEAN countedref_Op3_(int op, leftv res, leftv head, leftv arg1, leftv arg2)
+{
+  if (CountedRef::is_ref(arg1)) {
+    CountedRef ref = CountedRef::cast(arg1);
+    return ref.dereference(arg1) || countedref_Op3__(op, res, head, arg1, arg2);
+  }
+  return countedref_Op3__(op, res, head, arg1, arg2);
 }
 
 
 /// blackbox support - ternary operations
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
-  return countedref_CheckInit(res, head) ||
-    CountedRef::cast(head).dereference(head) || 
-    CountedRef::resolve(arg1) || CountedRef::resolve(arg2) ||
-    iiExprArith3(res, op, head, arg1, arg2);
+  if (countedref_CheckInit(res, head)) return TRUE;
+  if (CountedRef::is_ref(head)) {
+    CountedRef ref = CountedRef::cast(head);
+    return ref.dereference(head) || countedref_Op3_(op, res, head, arg1, arg2);
+  }
+  return countedref_Op3_(op, res, head, arg1, arg2);
 }
 
 
@@ -488,11 +517,12 @@ public:
   static self cast(void* arg) { return base::cast(arg); }
 
   /// Temporarily wrap with identifier for '[' and '.' operation
-  self subscripted() { return self(m_data->subscripted()); }
+  self wrapid() { return self(m_data->wrapid()); }
 
-  ///
+  /// Generate weak reference (may get invalid)
   data_type::back_ptr weakref() { return m_data->weakref(); }
 
+  /// Recover more information (e.g. subexpression data) from computed result
   BOOLEAN retrieve(leftv res, int typ) { 
     return (m_data->retrieve(res) && outcast(res, typ));
   }
@@ -504,19 +534,41 @@ void* countedref_InitShared(blackbox*)
   return CountedRefShared().outcast();
 }
 
+/// Blackbox support - unary operation for shared data
+BOOLEAN countedref_Op1Shared(int op, leftv res, leftv head)
+{
+  if(op == TYPEOF_CMD)
+    return blackboxDefaultOp1(op, res, head);
+
+  if (countedref_CheckInit(res, head)) return TRUE;
+
+  if ((op == DEF_CMD) || (op == head->Typ())) {
+    res->rtyp = head->Typ();
+    return iiAssign(res, head);
+  }
+
+  CountedRefShared ref = CountedRefShared::cast(head);
+  CountedRefShared wrap = ref.wrapid();
+  int typ = head->Typ();
+  return wrap.dereference(head) || 
+    iiExprArith1(res, head, op == LINK_CMD? head->Typ(): op) ||
+    wrap.retrieve(res, typ);
+}
+
+
 /// blackbox support - binary operations
 BOOLEAN countedref_Op2Shared(int op, leftv res, leftv head, leftv arg)
 {
-  if  ((op == '[') || (op == '.')) {
-    if (countedref_CheckInit(res, head))  return TRUE;
-    CountedRefShared indexed = CountedRefShared::cast(head).subscripted();
+  if (countedref_CheckInit(res, head))  return TRUE;
 
+  if (CountedRefShared::is_ref(head)) {
+    CountedRefShared wrap = CountedRefShared::cast(head).wrapid();
     int typ = head->Typ();
-    return indexed.dereference(head) || CountedRefShared::resolve(arg) || 
-      iiExprArith2(res, head, op, arg) || indexed.retrieve(res, typ);
+    return wrap.dereference(head) || countedref_Op2_(op, res, head, arg) ||
+      wrap.retrieve(res, typ);
   }
 
-  return countedref_Op2(op, res, head, arg);
+  return countedref_Op2_(op, res, head, arg);
 }
 
 /// blackbox support - n-ary operations
@@ -565,8 +617,8 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
     res->rtyp = op;
     return jjLIST_PL(res, args);
   }
-
-  return CountedRef::cast(args).dereference(args) || iiExprArithM(res, args, op);
+  CountedRef ref = CountedRef::cast(args);
+  return ref.dereference(args) || iiExprArithM(res, args, op);
 }
 
 /// blackbox support - assign element
@@ -574,9 +626,8 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
 {
   /// Case: replace assignment behind reference
   if ((result->Data() != NULL)  && !CountedRefShared::cast(result).unassigned()) {
-    if (CountedRefShared::resolve(arg)) return TRUE;
-    return CountedRefShared::cast(result).assign(result, arg);
-    return FALSE;
+    CountedRef ref = CountedRef::cast(result);
+    return CountedRef::resolve(arg) || ref.assign(result, arg);	
   }
   
   /// Case: new reference to already shared data
@@ -586,7 +637,6 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
     return CountedRefShared::cast(arg).outcast(result);
   }  
   if(CountedRefShared::cast(result).unassigned()) {
-   // CountedRefShared::cast(result) = arg;
    return CountedRefShared::cast(result).assign(result, arg);
 
     return FALSE;
@@ -648,6 +698,7 @@ void countedref_init()
     (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
   bbxshared->blackbox_Assign  = countedref_AssignShared;
   bbxshared->blackbox_destroy = countedref_destroyShared;
+  bbxshared->blackbox_Op1     = countedref_Op1Shared;
   bbxshared->blackbox_Op2     = countedref_Op2Shared;
   bbxshared->blackbox_Init    = countedref_InitShared;
   bbxshared->data             = omAlloc0(newstruct_desc_size());
