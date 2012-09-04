@@ -159,6 +159,7 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     int i = 1;
     CFFList F;
     Variable v = aa.mvar();
+    CanonicalForm lcinv;
     while ( ! c.degree(v) == 0 )
     {
         y = gcd( w, c ); z = w / y;
@@ -166,7 +167,8 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
         {
           if (isOn (SW_RATIONAL))
           {
-            z /= Lc (z);
+            lcinv= 1/Lc (z);
+            z *= lcinv;
             z *= bCommonDen (z);
           }
           if (lc (z).sign() < 0)
@@ -180,7 +182,8 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     {
       if (isOn (SW_RATIONAL))
       {
-        w /= Lc (w);
+        lcinv= 1/Lc (w);
+        w *= lcinv;
         w *= bCommonDen (w);
       }
       if (lc (w).sign() < 0)
