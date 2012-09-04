@@ -1,6 +1,13 @@
 #! /bin/bash
 
-prefix=@prefix@
+#C="$0"
+#C=`readlink -f "$C"`
+#C=`dirname "$C"`
+#C=`ls -d1 "$C"`
+
+# NOTE: if you moved this config please either use the above or
+# make sure the following variables are up to date
+prefix=@prefix@ 
 exec_prefix=@exec_prefix@
 includedir=@includedir@
 libdir=@libdir@
