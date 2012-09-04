@@ -268,16 +268,24 @@ appendMapDown (CFList& factors, const CanonicalForm& g,
 
 void normalize (CFList& factors)
 {
+  CanonicalForm lcinv;
   for (CFListIterator i= factors; i.hasItem(); i++)
-    i.getItem() /= Lc(i.getItem());
+  {
+    lcinv= 1/Lc (i.getItem());
+    i.getItem() *= lcinv;
+  }
   return;
 }
 
 void normalize (CFFList& factors)
 {
+  CanonicalForm lcinv;
   for (CFFListIterator i= factors; i.hasItem(); i++)
-    i.getItem()= CFFactor (i.getItem().factor()/Lc(i.getItem().factor()),
+  {
+    lcinv= 1/ Lc (i.getItem().factor());
+    i.getItem()= CFFactor (i.getItem().factor()*lcinv,
                            i.getItem().exp());
+  }
   return;
 }
 
