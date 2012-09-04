@@ -925,12 +925,12 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   Aeval= evaluateAtEval (A, evaluation, 2);
 
-  CanonicalForm hh= Lc (Aeval.getFirst());
+  CanonicalForm hh= 1/Lc (Aeval.getFirst());
 
   for (iter= Aeval; iter.hasItem(); iter++)
-    iter.getItem() /= hh;
+    iter.getItem() *= hh;
 
-  A /= hh;
+  A *= hh;
 
   CFListIterator iter2;
   CFList bufLeadingCoeffs2= leadingCoeffs2[lengthAeval2-1];
@@ -1030,12 +1030,12 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                                 biFactors, evaluation );
           Aeval= evaluateAtEval (A, evaluation, 2);
 
-          hh= Lc (Aeval.getFirst());
+          hh= 1/Lc (Aeval.getFirst());
 
           for (iter2= Aeval; iter2.hasItem(); iter2++)
-            iter2.getItem() /= hh;
+            iter2.getItem() *= hh;
 
-          A /= hh;
+          A *= hh;
           break;
         }
         else
@@ -1286,12 +1286,12 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                               evaluation);
         Aeval= evaluateAtEval (A, evaluation, 2);
 
-        hh= Lc (Aeval.getFirst());
+        hh= 1/Lc (Aeval.getFirst());
 
         for (CFListIterator i= Aeval; i.hasItem(); i++)
-          i.getItem() /= hh;
+          i.getItem() *= hh;
 
-        A /= hh;
+        A *= hh;
       }
       factors= CFList();
       if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
@@ -1440,12 +1440,12 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                           evaluation);
     Aeval= evaluateAtEval (A, evaluation, 2);
 
-    hh= Lc (Aeval.getFirst());
+    hh= 1/Lc (Aeval.getFirst());
 
     for (CFListIterator i= Aeval; i.hasItem(); i++)
-      i.getItem() /= hh;
+      i.getItem() *= hh;
 
-    A /= hh;
+    A *= hh;
 
     if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
     {
