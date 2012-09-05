@@ -35,7 +35,7 @@ PURPOSE:  Comprehensive Groebner Systems, Groebner Cover, Canonical Forms,
           algorithm known for this purpose.
 
           D. Kapur, Y. Sun, and D.K. Wang.
-          \"A New Algorithm for Computing Comprehensive Gr?bner Systems\".
+          \"A New Algorithm for Computing Comprehensive Groebner Systems\".
           Proceedings of ISSAC'2010, ACM Press, (2010), 29-36.
 
           cgsdr can be called directly if only a disjoint reduced
@@ -75,7 +75,8 @@ cgsdr(F);          Is the procedure for obtaining a first disjoint,
                    is used in grobcov, but that can be used
                    independently if only the CGS is required.
                    It is a more efficient routine than buildtree
-                   (the own routine that is no more used).
+                   (the own routine that is no more used). It uses
+                   now KSW algorithm.
 
 setglobalrings();  Generates the global rings @R, @P and @PR that are
                    respectively the rings Q[a][x], Q[a], Q[x,a].
@@ -84,18 +85,19 @@ setglobalrings();  Generates the global rings @R, @P and @PR that are
                    the output.
                    If the user want to use some other internal routine,
                    then setglobalrings() is to be called before, as
-                   the rings @R, @P and @RP are needed in most of them.                     globally, and more internal routines can be used, but
-                   These rings are killed by the call to any of the
+                   the rings @R, @P and @RP are needed in most of them.
+                   globally, and more internal routines can be used, but
+                   these rings are killed by the call to any of the
                    basic routines.
 
-pdivi(f,F);        Performs a pseudodivision of a parametric polynomial
+pdivi(f,F);     Performs a pseudodivision of a parametric polynomial
                    by a parametric ideal.
 
 pnormalf(f,E,N);   Reduces a parametric polynomial f over V(E) \ V(N)
                    E is the null ideal and N the non-null ideal
                    over the parameters.
 
-extend(GC);        When the grobcov of an ideal has been computed
+extend(GC); When the grobcov of an ideal has been computed
                    with the default option ('ext',0) and the explicit
                    option ('rep',2) (which is not the default), then
                    one can call extend (GC) (and options) to obtain the
@@ -104,7 +106,7 @@ extend(GC);        When the grobcov of an ideal has been computed
                    the bases are computed, and one can obtain the full
                    representation using extend.
 
-locus2d:           Special routine for determining the locus of points
+locus2d:      Special routine for determining the locus of points
                    of a two dimensional object. Given an ideal J with
                    two parameters (a,b) and so many variables as
                    needed, representing the system determining
@@ -112,7 +114,7 @@ locus2d:           Special routine for determining the locus of points
                    geometrical properties, computing the grobcov of
                    J and applying to it locus2d, determines the locus.
 
-locus2dto:         Transforms the output of locus2d to a string that
+locus2dto:   Transforms the output of locus2d to a string that
                    can be reed from different computational systems.
 
 SEE ALSO: compregb_lib
@@ -133,7 +135,7 @@ LIB "qhmoduli.lib";
 // Final data: 25-10-2011
 // Release 3: (this release, public)
 // Initial data: 1-7-2012
-// Final data:  31-8-2012
+// Final data: 4-9-2012
 // basering Q[a][x];
 
 // ************ Begin of buildtree ******************************
@@ -144,8 +146,8 @@ proc setglobalrings()
 RETURN:   After its call the rings @R=Q[a][x], @P=Q[a], @RP=Q[x,a] are
           defined as global variables.
 NOTE:     It is called internally by the fundamental routines of the
-          library grobcov, cgsdr, gencase1, muligrobcov, mcgs,
-          buildtree, and killed before the output.
+          library grobcov, cgsdr, extend, pdivi, pnormalf, locus2d, locus2dto,
+          and killed before the output.
           The user does not need to call it, except when it is interested
           in using some internal routine of the library that
           uses these rings.
@@ -182,6 +184,9 @@ example
   @R;
   @P;
   @RP;
+ringlist(R);
+ringlist(@P);
+ringlist(@RP);
 }
 
 //*************Auxilliary routines**************
@@ -406,9 +411,9 @@ KEYWORDS: division, reduce
 EXAMPLE:  pdivi; shows an example"
 {
   int te=0;
+  if (defined(@P)==1){te=1;}
+  else{setglobalrings();}
   def R=basering;
-  if (defined(@R)){te=1;}
-  if(te==0){setglobalrings();}
   int i;
   int j;
   poly r=0;
@@ -457,7 +462,7 @@ EXAMPLE:  pdivi; shows an example"
     }
   }
   list res=r,q,mu;
-  if (te==0){kill @R; kill @RP; kill @P;}
+  if(te==0){kill @P; kill @R; kill @RP;}
   return(res);
 }
 example
@@ -631,7 +636,7 @@ proc pnormalf(poly f, ideal E, ideal N)
           N: the non-null conditions
 RETURN:   a reduced polynomial g of f, whose coefficients are reduced
           modulo E and having no factor in N.
-NOTE:     Should be called from ring Q[a][x].
+NOTE: Should be called from ring Q[a][x].
           Ideals E and N must be given by polynomials
           in the parameters.
 KEYWORDS: division, pdivi, reduce
@@ -639,8 +644,8 @@ EXAMPLE:  pnormalf; shows an example"
 {
     def RR=basering;
     int te=0;
-    if (defined(@R)){te=1;}
-    if(te==0){setglobalrings();}
+    if (defined(@P)){te=1;}
+    else{setglobalrings();}
     setring(@RP);
     def fa=imap(RR,f);
     def Ea=imap(RR,E);
@@ -792,6 +797,8 @@ proc mingb(ideal F)
 // reduces each polynomial wrt to V(E) \ V(N)
 proc redgbn(ideal F, ideal E, ideal N)
 {
+  int te=0;
+  if (defined(@P)==1){te=1;}
   ideal G=F;
   ideal H;
   int i;
@@ -802,7 +809,7 @@ proc redgbn(ideal F, ideal E, ideal N)
     G[i]=pnormalf(pdivi(G[i],H)[1],E,N);
     G[i]=primepartZ(G[i]);
   }
-
+  if(te==1){setglobalrings();}
   return(G);
 };
 
@@ -876,6 +883,8 @@ proc ishomog(f)
 // reduces each polynomial wrt to the others
 proc postredgb(ideal F)
 {
+  int te=0;
+  if(defined(@P)==1){te=1;}
   ideal G;
   ideal H;
   int i;
@@ -885,6 +894,7 @@ proc postredgb(ideal F)
     H=delfromideal(F,i);
     G[i]=pdivi(F[i],H)[1];
   }
+  if(te==1){setglobalrings();}
   return(G);
 }
 
@@ -1004,7 +1014,12 @@ proc idbefid(ideal a, ideal b)
       else{if(leadmonom(la+lb)!=lb){return(2);}}
     }
   }
-  if(na<nb){return(1);} else{if(na>nb){return(2);} else{return(0);}}
+  if(na<nb){return(1);}
+  else
+  {
+    if(na>nb){return(2);}
+    else{return(0);}
+  }
 }
 
 proc sortlistideals(list L)
@@ -1064,7 +1079,6 @@ proc Prep(ideal N, ideal M)
 {
   if (N[1]==1)
   {
-    //L0=list(list(ideal(1),list(ideal(1))));
     return(list(list(ideal(1),list(ideal(1)))));
   }
   def RR=basering;
@@ -1132,8 +1146,13 @@ proc PtoCrep(list L)
   return(imap(@P,La));
 }
 
+// input: F a parametric ideal in Q[a][x]
+// output: a rComprehensive Groebner System disjoint and reduced.
+//      It uses Kapur-Sun-Wang algorithm, and with the options
+//      can compute the homogenization before  (('can',0) or ( 'can',1))
+//      and dehomogenize the result.
 proc cgsdr(ideal F, list #)
-"USAGE:   cgsdr(F); To compute a disjoint, reduced CGS.
+"USAGE: cgsdr(F); To compute a disjoint, reduced CGS.
           cgsdr is the starting point of the fundamental routine grobcov.
           Inside grobcov it is used only with options 'can' set to 0,1 and
           not with options ('can',2).
@@ -1146,11 +1165,11 @@ proc cgsdr(ideal F, list #)
           Options:
             "can",0-1-2: The default value is "can",2. In this case no
                 homogenization is done. With option ("can",0) the given
-                basis is homogenized, and with option "can",1 the
+                basis is homogenized, and with option ("can",1) the
                 whole given ideal is homogenized before computing the
                 cgs and dehomogenized after.
-                with option ("can",0) the homogenized ideal is used
-                with option ("can",1) the homogenized basis is used
+                with option ("can",0) the homogenized basis is used
+                with option ("can",1) the homogenized ideal is used
                 with option ("can",2) the given basis is used
             "null",ideal E: The default is ('null',ideal(0)).
             "nonnull",ideal N: The default (nonnull,ideal(1)).
@@ -1163,6 +1182,8 @@ proc cgsdr(ideal F, list #)
                 as difference of varieties.
                 0: the output segments are given in P-representation
                 and the segments grouped by lpp
+                With options ("can",0) and ("can",1) the option ("out",1)
+                is set to ("out,0) because it is not compatible.
           One can give none or whatever of these options.
           With the default options ("can",2,"out",1), only the
           Kapur-Sun-Wang algorithm is computed. This is very effectif
@@ -1185,9 +1206,9 @@ RETURN:   Returns a list T describing a reduced and disjoint
            for each point of the corresponding segment.
 
            The third element of each lpp segment is the lpp of the
-           used ideal in the CGS as a sgtring:
-            with option ("can",0) the homogenized ideal is used
-            with option ("can",1) the homogenized basis is used
+           used ideal in the CGS as a string:
+            with option ("can",0) the homogenized basis is used
+            with option ("can",1) the homogenized ideal is used
             with option ("can",2) the given basis is used
 
           With option ("out",1) (default)
@@ -1198,7 +1219,7 @@ RETURN:   Returns a list T describing a reduced and disjoint
              (E,N,B),..(E,N,B)
            )
            E is the null variety
-           NW is the nonnull variety
+           N is the nonnull variety
            segment = V(E)\V(N)
            B is the reduced Groebner basis
 
@@ -1208,9 +1229,9 @@ NOTE:     The basering R, must be of the form Q[a][x], a=parameters,
 KEYWORDS: CGS, disjoint, reduced, Comprehensive Groebner System
 EXAMPLE:  cgsdr; shows an example"
 {
+  def RR=basering;
   setglobalrings();
   // INITIALIZING OPTIONS
-  def RR=basering;
   int i; int j;
   int can=2;
   int out=1;
@@ -1241,8 +1262,10 @@ EXAMPLE:  cgsdr; shows an example"
       }
     }
   }
+  //if(can==2){out=1;}
   B=F;
   if ((printlevel) and (comment==0)){comment=printlevel;}
+  if((can<2) and (out>0)){"Option out,1 is not compatible with can,0,1"; out=0;}
   // DEFINING OPTIONS
   list LL;
   LL[1]="can";     LL[2]=can;
@@ -1259,13 +1282,15 @@ EXAMPLE:  cgsdr; shows an example"
   if (ish)
   {
     string("The given system is homogneous");
+    can=0;
   }
   // ACTING DEPENDING ON OPTIONS
-  if((can==2) or (ish==1))
+  if(can==2)
   {
     // WITHOUT HOMOHGENIZING
     string("Option of cgsdr: do not homogenize");
-    def GS=cgsbasic(B,LL);
+    def GS=KSW(B,LL);
+    setglobalrings();
   }
   else
   {
@@ -1301,6 +1326,7 @@ EXAMPLE:  cgsdr; shows an example"
     ring H=0,@t,dp;
     def RH=RR+H;
     setring(RH);
+    setglobalrings();
     def BH=imap(RR,B2);
     def LH=imap(RR,LL);
     for (i=1;i<=size(BH);i++)
@@ -1308,7 +1334,8 @@ EXAMPLE:  cgsdr; shows an example"
       BH[i]=homog(BH[i],@t);
     }
     if (comment>=1){string("Homogenized system = "); BH;}
-    def GSH=cgsbasic(BH,LH);
+    def GSH=KSW(BH,LH);
+    setglobalrings();
     // DEHOMOGENIZING THE RESULT
     if(out==0)
     {
@@ -1369,52 +1396,6 @@ example
           x3^4+(4*a3)*x3^3+(6*a2)*x3^2+(4*a1)*x3+(a0),
           x3+(a3);
   cgsdr(F);
-}
-
-// cgsbasic
-// 20/09/2010
-// used by cgsdr
-proc cgsbasic(ideal F, list #)
-{
-  if (defined(@T)==1){kill @T;}
-  list @T;
-  exportto(Top,@T);
-  setglobalrings();
-  int i;
-  ideal B;
-  poly f;
-  def E=ideal(0);
-  def N=ideal(1);
-  int comment=0;
-  int out=1;
-  int can=2;
-  int start=timer;
-  list L=#;
-  for(i=1;i<=size(L) div 2;i++)
-  {
-    if(L[2*i-1]=="null"){E=L[2*i];}
-    else
-    {
-      if(L[2*i-1]=="nonnull"){N=L[2*i];}
-      else
-      {
-        if(L[2*i-1]=="comment"){comment=L[2*i];}
-        else
-        {
-          if(L[2*i-1]=="out"){out=L[2*i];}
-          else
-          {
-            if(L[2*i-1]=="can"){can=L[2*i];}
-          }
-        }
-      }
-    }
-  }
-  if ((printlevel>1) and (comment==0)){comment=printlevel;}
-  B=F;
-  def GS=KSW(B,L);
-  kill @P; kill @RP; kill @R;
-  return(GS);
 }
 
 // input:  internal routine called by cgsdr at the end to group the
@@ -1807,26 +1788,15 @@ proc gcover(ideal F,list #)
   }
   list GS; list GP;
   def RR=basering;
-  int start=timer; int start0=start; int start1=start;
   GS=cgsdr(F,L); // "null",NW[1],"nonnull",NW[2],"cgs",CGS,"comment",comment);
   setglobalrings();
-  start=timer;
+  int start=timer;
   GP=GS;
-//   for(i=1;i<=size(GP);i++)
-//   {
-//     if(size(GP[i][2])>1){GP[i][3]=1;}
-//     else{GP[i][3]=0;}
-//   }
   ideal lppr;
-//   for(i=1;i<=size(GP);i++)
-//   {
-//     GP[i][3]=size(GP[i][2]);
-//   }
   list LL;
   list S;
   poly sp;
   ideal BB;
-  start1=timer;
   for (i=1;i<=size(GP);i++)
   {
     kill LL;
@@ -1835,25 +1805,19 @@ proc gcover(ideal F,list #)
     GPi2=GP[i][2];
     lpph=GP[i][3];
     kill pairspP; list pairspP;
-    //"T_GP[i]="; GP[i];
-    //"T_GPi2="; GPi2;
     for(j=1;j<=size(GPi2);j++)
     {
       pairspP[size(pairspP)+1]=GPi2[j][3];
     }
-    //"T_calling LCUnion";
-    //"T_pairspP="; pairspP;
     LCU=LCUnion(pairspP);
-    //"T_LCU="; LCU;
     kill prep; list prep;
     for(k=1;k<=size(LCU);k++)
     {
       prep[k]=list(LCU[k][2],LCU[k][3]);
-      B=GPi2[LCU[k][1][1]][2]; // ATENCIO he canviat el darrer [1] per [2]
+      B=GPi2[LCU[k][1][1]][2]; // ATENTION last 1 has been changed to [2]
       LCU[k][1]=B;
     }
-    //"T_B="; B;
-    //"T_Deciding if combine is needed";
+    //"Deciding if combine is needed";
     kill BB;
     ideal BB;
     tes=1; m=1;
@@ -1871,7 +1835,7 @@ proc gcover(ideal F,list #)
             if(sp!=0){tes=0;}
           }
           k++;
-        }
+        }        //setglobalrings();
         if(tes)
         {
           BB[m]=LCU[j][1][m];
@@ -1880,8 +1844,7 @@ proc gcover(ideal F,list #)
       }
       if(tes==0){break;}
       m++;
-    }
-    //"T_BB="; BB;
+    }    //"T_BB="; BB;
     crep=PtoCrep(prep);
     if(tes==0)
     {
@@ -1923,10 +1886,10 @@ proc gcover(ideal F,list #)
   }
   if(comment>=1)
   {
-    string("Time in LCUnion + combine = ",timer-start1);
+    string("Time in LCUnion + combine = ",timer-start);
     if(comment>=2){string("lpp=",lpi)};
   }
-  kill @P; kill @RP; kill @R;
+  if(defined(@P)==1){kill @P; kill @RP; kill @R;}
   return(S);
 }
 
@@ -1934,13 +1897,19 @@ proc gcover(ideal F,list #)
 // input:
 //    ideal F: a parametric ideal in Q[a][x], where a are the parameters
 //             and x the variables
-//    list #: (options) list("null",N,"nonnull",W,"can",Method,"cgs",CGS), where
+//    list #: (options) list("null",N,"nonnull",W,"can",0-1,ext",0-1, "rep",0-1-2)
+//            where
 //            N is the null conditions ideal (if desired)
 //            W is the ideal of non-null conditions (if desired)
-//            Method is 1 by default and can be set to 0 if we do not
+//            The value of "can"is 1 by default and can be set to 0 if we do not
 //            need to obtain the canonical GC, but only a GC.
-//            CGS is 1 by default and uses cgsdr. It can be set to 0 to
-//            use the old buildtree instead.
+//            The value of "ext" is 0 by default and so the generic representation
+//             of the bases is given. It can be set to 1, and then the full
+//             representation of the bases is given.
+//            The value of "rep" is 0 by default, and then the segments
+//            are given in canonical P-representation. It can be set to 1
+//            and then they are given in canonical C-representation.
+//            If it is set to 2, then both representations are given.
 // output:
 //    list S: ((lpp,basis,(idp_1,(idp_11,..,idp_1s_1))), ..
 //             (lpp,basis,(idp_r,(idp_r1,..,idp_rs_r))) ) where
@@ -2026,7 +1995,7 @@ RETURN:   The list
           (E,N) representing V(E)\V(N), and the ideals E and N are
           radical and N contains E.
 
-NOTE:     The basering R, must be of the form Q[a][x], a=parameters,
+NOTE: The basering R, must be of the form Q[a][x], a=parameters,
           x=variables, and should be defined previously. The ideal must
           be defined on R.
 KEYWORDS: Groebner cover, parametric ideal, canonical, discussion of
@@ -2037,9 +2006,8 @@ EXAMPLE:  grobcov; shows an example"
   ideal idp; ideal idq; int s; ideal ext; list SS;
   ideal E; ideal N; int canop;  int extop; int repop;
   int comment=0; int m;
-  //int gradorder;
   def RR=basering;
-  setring(RR);
+  setglobalrings();
   list L0=#;
   int out=0;
   L0[size(L0)+1]="res"; L0[size(L0)+1]=ideal(1);
@@ -2095,6 +2063,7 @@ EXAMPLE:  grobcov; shows an example"
   LL[7]="null";    LL[8]=E;
   LL[9]="nonnull"; LL[10]=N;
   LL[11]="ext";    LL[12]=extop;
+  LL[13]="rep";    LL[14]=repop;
   if (comment>=1)
   {
     string("Begin grobcov with options: ",LL);
@@ -2106,11 +2075,50 @@ EXAMPLE:  grobcov; shows an example"
   {
     S=extend(S,LL);
   }
+  else
+  {
+    // NOW representation of the segments by option repop
+    list Si; list nS;
+    if(repop==0)
+    {
+      for(i=1;i<=size(S);i++)
+      {
+        Si=list(S[i][1],S[i][2],S[i][3],S[i][5]);
+        nS[size(nS)+1]=Si;
+      }
+      kill S;
+      def S=nS;
+    }
+    else
+    {
+      if(repop==1)
+      {
+        for(i=1;i<=size(S);i++)
+        {
+          Si=list(S[i][1],S[i][2],S[i][4],S[i][5]);
+          nS[size(nS)+1]=Si;
+        }
+        kill S;
+        def S=nS;
+      }
+      else
+      {
+        for(i=1;i<=size(S);i++)
+        {
+          Si=list(S[i][1],S[i][2],S[i][3],S[i][4],S[i][5]);
+          nS[size(nS)+1]=Si;
+        }
+        kill S;
+        def S=nS;
+      }
+    }
+  }
   if (comment>=1)
   {
     string("Time in grobcov = ", timer-start);
     string("Number of segments of grobcov = ", size(S));
   }
+  if(defined(@P)==1){kill @R; kill @P; kill @RP;}
   return(S);
 }
 example
@@ -2127,10 +2135,10 @@ example
 }
 
 // input. GC the grobcov of an ideal in generic representation of the
-//        bases (option ("ext2,0)
+//        bases computed with option option ("rep",2).
 // output The grobcov in full representation.
 // option ("comment",1) shows the time.
-proc extend(list GC, #);
+proc extend(list GC, list #);
 "USAGE:   extend(GC); When the grobcov of an ideal has been computed
           with the default option ("ext",0) and the explicit option
           ("rep",2) (which is not the default), then one can call
@@ -2186,7 +2194,7 @@ RETURN:   The list
           (E,N) representing V(E)\V(N), and the ideals E and N are
           radical and N contains E.
 
-NOTE:     The basering R, must be of the form Q[a][x], a=parameters,
+NOTE: The basering R, must be of the form Q[a][x], a=parameters,
           x=variables, and should be defined previously. The ideal must
           be defined on R.
 KEYWORDS: Groebner cover, parametric ideal, canonical, discussion of
@@ -2198,8 +2206,16 @@ EXAMPLE:  extend; shows an example"
   ideal idp;
   ideal idq;
   int i; int j; int m; int s;
+  m=0; i=1;
+  while((i<=size(S)) and (m==0))
+  {
+    if(typeof(S[i][2])=="list"){m=1;}
+    i++;
+  }
+  if(m==1){"Warning! grobcov has already extended bases"; return(S);}
+  if(size(GC[1])!=5){"Warning! extend make sense only when grobcov has been called with options 'rep',2,'ext',0"; " "; return();}
   int repop=0;
-  int start1;
+  int start3=timer;
   int comment;
   for(i=1;i<=size(L) div 2;i++)
   {
@@ -2220,8 +2236,7 @@ EXAMPLE:  extend; shows an example"
   for (i=1;i<=size(S);i++)
   {
     m=size(S[i][2]);
-    // "T_S[i]="; S[i];
-    for (j=1;j<=m;j++)
+     for (j=1;j<=m;j++)
     {
       idp=S[i][4][1];
       idq=S[i][4][2];
@@ -2233,7 +2248,6 @@ EXAMPLE:  extend; shows an example"
         if (typeof(ext)=="poly")
         {
           S[i][2][j]=pnormalf(ext,idp,idq);
-          //"T_Polynomial after extend0="; S[i][2][j];
         }
         else
         {
@@ -2256,7 +2270,6 @@ EXAMPLE:  extend; shows an example"
             S[i][2]=SS;
           }
         }
-         //"T_ poly or ideal after extend0="; S[i][2][j];
       }
     }
   }
@@ -2292,7 +2305,7 @@ EXAMPLE:  extend; shows an example"
 
     }
   }
-  if(comment>=1){string("Time in extend = ",timer-start1);}
+  if(comment>=1){string("Time in extend = ",timer-start3);}
   if(te==0){kill @R; kill @RP; kill @P;}
   return(S);
 }
@@ -2513,7 +2526,6 @@ proc extend0(poly f, ideal idp, ideal idq)
   }
   else
   {
-    //int start=timer;
     list cfi;
     list coefs;
     for (i=1;i<=nummonoms;i++)
@@ -2915,7 +2927,7 @@ proc reducemodN(poly f,ideal E)
   def fa=imap(RR,f);
   def Ea=imap(RR,E);
   attrib(Ea,"isSB",1);
-  // //option(redSB);
+  // option(redSB);
   // Ea=std(Ea);
   fa=reduce(fa,Ea);
   setring(RR);
@@ -2952,7 +2964,6 @@ proc radicalmember(poly f,ideal ida)
   idaH[size(idaH)+1]=1-@t*fH;
   option(redSB);
   def G=std(idaH);
-  //"G="; G;
   if (G==1){te=1;} else {te=0;}
   setring(RR);
   return(te);
@@ -3239,7 +3250,6 @@ proc precombinediscussion(L,crep)
   return(vv);
 }
 
-
 // minAssGTZ eliminating denominators
 proc minGTZ(ideal N);
 {
@@ -3253,62 +3263,6 @@ proc minGTZ(ideal N);
     }
   }
   return(L);
-}
-
-// precombint: In a parametric ideal where a homogenization variable is
-// defined, but the given ideal does not use it.
-// input: a parametric ideal F;
-//        a homogenization variable @t
-// output: the homogenized parametric ideal in the variables wrt to the variable @t
-proc precombint(ideal F, poly @t)
-"USAGE:  homogpideal(F,@t); F is a parametric ideal defined in a parametric
-         ideal, where @t is a last variable defined in the ring but not
-         used in F.
-         @t is the homogenization variable
-RETURN:  the homogenized ideal consisting in all the homogenized polynomials of
-         the ideal F, and not only of the basis of F.
-EXAMPLE: homogpideal; shows an example
-"
-{
-  def R=basering;
-  if (defined(@RP)==1){kill @RP;}
-  if (defined(@R)==1){kill @R;}
-  if (defined(@P)==1){kill @P;}
-  setglobalrings();
-  setring(@RP);
-  def FP=imap(R,F);
-  option(redSB);
-  FP=std(FP);
-  setring(R);
-  def FF=imap(@RP,FP);
-  def FH=homog(FF,@t);
-  kill @R;
-  kill @P;
-  kill @RP;
-  return(FH);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ideal S93=p^2-(x^2+y^2),
-          -a*(y)+b*(x+p),
-          -a*y+b*(x-1)+y,
-          (r-1)^2-((x-1)^2+y^2),
-          -m*(y)+n*(x+r-2) +y,
-          -m*y+n*x,
-          (a^2+b^2)-((m-1)^2+n^2);
-  "System S93="; S93; " ";
-  "Consider its homogenized ideal ";
-  def RR=basering;
-  list RRL=ringlist(RR);
-  poly @t;
-  ring H=0,@t,dp;
-  def RH=RR+H;
-  setring(RH);
-  //"ringlist(RH)="; ringlist(RH);
-  ideal S93H=imap(R,S93);
-  ideal FH=homogpideal(S93H,@t);
-  "Homogenized ideal="; FH;
 }
 
 //********************* Begin KapurSunWang *************************
@@ -3377,13 +3331,9 @@ proc MDBasis(ideal G)
 proc primepartZ(poly f);
 {
   def R=basering;
-  setring(@R);
-  def fp=imap(R,f);
-  def cp=content(fp);
-  fp=fp/cp;
-  setring(R);
-  def ff=imap(@R,fp);
-  return(ff);
+  def cp=content(f);
+  def fp=f/cp;
+  return(fp);
 }
 
 // LCMLC
@@ -3420,7 +3370,7 @@ proc LCMLC(ideal H)
 //      )
 //      ,..,
 //      (lpp,
-//       (1,B,((p_1,(p_11,..,p_1k_1)),..,(p_s,(p_s1,..,p_sk_s)))),
+//       (k,B,((p_1,(p_11,..,p_1k_1)),..,(p_s,(p_s1,..,p_sk_s)))),
 //       string(lpp))
 //      )
 //     )
@@ -3429,8 +3379,7 @@ proc LCMLC(ideal H)
 //     ((B,E,N),..,(B,E,N))
 proc KSW(ideal F, list #)
 {
-  int te=1;
-  if(defined(@P)==0){te=0; setglobalrings();}
+  setglobalrings();
   int start=timer;
   ideal E=ideal(0);
   ideal N=ideal(1);
@@ -3440,7 +3389,7 @@ proc KSW(ideal F, list #)
   def L=#;
   if (size(L)>0)
   {
-    for (i=1;i<=size(L) div 2;i++)
+    for (i=1;i<=size(L)/2;i++)
     {
       if (L[2*i-1]=="null"){E=L[2*i];}
       else
@@ -3462,25 +3411,40 @@ proc KSW(ideal F, list #)
   if (comment>0)
   {
     string("Number of segments in KSW (total) = ",size(CG));
-    //"T_CG="; CG;
     string("Time in KSW = ",timer-start);
   }
-  if(comment>1){"CG="; CG;}
   if(out==0)
   {
     CG=KSWtocgsdr(CG);
-     // "T_CG= (abans)"; CG;
     CG=groupKSWsegments(CG);
-     // "T_CG= (despres)"; CG;
     if (comment>0)
     {
       string("Number of lpp segments = ",size(CG));
       string("Time in KSW + group + Prep = ",timer-start);
     }
   }
-  if (te==0){kill @P; kill @R; kill @RP};
+  if(defined(@P)){kill @P; kill @R; kill @RP;}
   return(CG);
 }
+
+// sqf
+// This is for releases of Singular before 3-5-1
+// proc sqf(poly f)
+// {
+//  def RR=basering;
+//  setring(@P);
+//  def ff=imap(RR,f);
+//  def G=sqrfree(ff);
+//  poly fff=1;
+//  int i;
+//  for (i=1;i<=size(G);i++)
+//  {
+//    fff=fff*G[i];
+//  }
+//  setring(RR);
+//   def ffff=imap(@P,fff);
+//   return(ffff);
+// }
 
 // sqf
 proc sqf(poly f)
@@ -3493,6 +3457,7 @@ proc sqf(poly f)
   def ffff=imap(@P,fff);
   return(ffff);
 }
+
 
 
 // KSW0: Kapur-Sun-Wang algorithm for computing a CGS, called by KSW
@@ -3822,13 +3787,14 @@ proc locus2d(list GC)
           locus parametrical system with two parameters (a,b)
           and so many variables as needed, representing the locus
           points (a,b) who verify certain geometrical properties.
-          Possibly some component can be  (p1,(p11,..p1s_1)'Special')
+          Possibly some component can be  (p1,(p11,..p1s_1),'Special')
           These components of the locus correspond to locus curves
           determined by a single or a finite number of points of
           the geometrical construction.
 RETURN:   The two dimensional locus.
 NOTE:     It can only be called after computing the grobcov of the
-          parametrical ideal.
+          parametrical ideal in generic representation ('ext',0),
+          which is the default.
           The basering R, must be of the form Q[a,b][x,y,..].
 KEYWORDS: geometrical locus, locus, loci.
 EXAMPLE:  locus2d; shows an example"
@@ -3939,6 +3905,20 @@ example
 //   string s: The output of locus2d converted to a string readable
 //             by other programs
 proc locus2dto(list L)
+"USAGE:   locus2dto(G);
+          The argument must be the output of locus2d  of a two dimensional
+          locus parametrical system with two parameters (a,b)
+          and so many variables as needed, representing the locus
+          points (a,b) who verify certain geometrical properties.
+          It transforms the output to a string in standard form
+          readable in many languages (Geogebra).
+
+RETURN: The two dimensional locus in string standard form
+NOTE:     It can only be called after computing the locus2d(grobcov(F)) of the
+          parametrical ideal.
+          The basering R, must be of the form Q[a,b][x,y,..].
+KEYWORDS: geometrical locus, locus, loci.
+EXAMPLE:  locus2dto; shows an example"
 {
   int i; int j; int k;
   string s;
@@ -3985,7 +3965,7 @@ example
   def Gp=locus2d(G);
   "locus2d(G)="; Gp;
   def L=locus2dto(Gp); " ";
-  "locus2d(Gp)="; L;
+  "locus2dto(Gp)="; L;
 }
 
 // indepparameters
