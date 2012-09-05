@@ -84,7 +84,7 @@ All functions are to be called with a preceding ``Polymake::''.
 @end menu
 @c --------------------------------------------------------------------------------
 @node boundaryLatticePoints,ehrhartPolynomialCoeff,,polymake_so
-@subsection boundaryLatticePoints
+@subsubsection boundaryLatticePoints
 @cindex boundaryLatticePoints
 @table @code
 @item @strong{Syntax:}
@@ -109,7 +109,7 @@ Polymake::boundaryLatticePoints(q);
 @end table
 @c --------------------------------------------------------------------------------
 @node ehrhartPolynomialCoeff,facetVertexLatticeDistances,boundaryLatticePoints,polymake_so
-@subsection ehrhartPolynomialCoeff
+@subsubsection ehrhartPolynomialCoeff
 @cindex ehrhartPolynomialCoeff
 @table @code
 @item @strong{Syntax:}
@@ -131,7 +131,7 @@ coefficients of the Ehrhart polynomial of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node facetVertexLatticeDistances,facetWidth,ehrhartPolynomialCoeff,polymake_so
-@subsection facetVertexLatticeDistances
+@subsubsection facetVertexLatticeDistances
 @cindex facetVertexLatticeDistances
 @table @code
 @item @strong{Syntax:}
@@ -154,7 +154,7 @@ intmat, which encodes the lattice distances between vertices (columns) and facet
 @end table
 @c --------------------------------------------------------------------------------
 @node facetWidth,facetWidths,facetVertexLatticeDistances,polymake_so
-@subsection facetWidth
+@subsubsection facetWidth
 @cindex facetWidth
 @table @code
 @item @strong{Syntax:}
@@ -176,7 +176,7 @@ maximal integral width going over all facet normals
 @end table
 @c --------------------------------------------------------------------------------
 @node facetWidths,fVector(polymake),facetWidth,polymake_so
-@subsection facetWidths
+@subsubsection facetWidths
 @cindex facetWidths
 @table @code
 @item @strong{Syntax:}
@@ -198,7 +198,7 @@ vector with the integral widths of p with respect to all facet normals
 @end table
 @c --------------------------------------------------------------------------------
 @node fVector(polymake),gorensteinIndex,facetWidths,polymake_so
-@subsection fVector
+@subsubsection fVector
 @cindex fVector(polymake)
 @table @code
 @item @strong{Syntax:}
@@ -223,7 +223,7 @@ and n is the dimension of the ambient space of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node gorensteinIndex,gorensteinVector,fVector(polymake),polymake_so
-@subsection gorensteinIndex
+@subsubsection gorensteinIndex
 @cindex gorensteinIndex
 @table @code
 @item @strong{Syntax:}
@@ -251,7 +251,7 @@ the translation v can be computed via Polymake::gorensteinVector(p).
 @end table
 @c --------------------------------------------------------------------------------
 @node gorensteinVector,hilbertBasis,gorensteinIndex,polymake_so
-@subsection gorensteinVector
+@subsubsection gorensteinVector
 @cindex gorensteinVector
 @table @code
 @item @strong{Syntax:}
@@ -279,7 +279,7 @@ the dilatation n can be computed via Polymake::gorensteinIndex(p).
 @end table
 @c --------------------------------------------------------------------------------
 @node hilbertBasis,hStarVector,gorensteinVector,polymake_so
-@subsection hilbertBasis
+@subsubsection hilbertBasis
 @cindex hilbertBasis
 @table @code
 @item @strong{Syntax:}
@@ -301,7 +301,7 @@ the number of elements in the hilbertBasis can be computed through Polymake::nHi
 @end table
 @c --------------------------------------------------------------------------------
 @node hStarVector,hVector,hilbertBasis,polymake_so
-@subsection hStarVector
+@subsubsection hStarVector
 @cindex hStarVector
 @table @code
 @item @strong{Syntax:}
@@ -321,7 +321,7 @@ the h*-vector of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node hVector,interiorLatticePoints,hStarVector,polymake_so
-@subsection hVector
+@subsubsection hVector
 @cindex hVector
 @table @code
 @item @strong{Syntax:}
@@ -341,7 +341,7 @@ the h-vector of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node interiorLatticePoints,isBounded,hVector,polymake_so
-@subsection interiorLatticePoints
+@subsubsection interiorLatticePoints
 @cindex interiorLatticePoints
 @table @code
 @item @strong{Syntax:}
@@ -364,7 +364,7 @@ intmat, whose rows are the lattice points in the relative interior of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node isBounded,isCanonical,interiorLatticePoints,polymake_so
-@subsection isBounded
+@subsubsection isBounded
 @cindex isBounded
 @table @code
 @item @strong{Syntax:}
@@ -387,7 +387,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isCanonical,isCompressed,isBounded,polymake_so
-@subsection isCanonical
+@subsubsection isCanonical
 @cindex isCanonical
 @table @code
 @item @strong{Syntax:}
@@ -411,7 +411,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isCompressed,isGorenstein,isCanonical,polymake_so
-@subsection isCompressed
+@subsubsection isCompressed
 @cindex isCompressed
 @table @code
 @item @strong{Syntax:}
@@ -434,7 +434,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isGorenstein,isLatticeEmpty,isCompressed,polymake_so
-@subsection isGorenstein
+@subsubsection isGorenstein
 @cindex isGorenstein
 @table @code
 @item @strong{Syntax:}
@@ -457,7 +457,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isLatticeEmpty,isNormal,isGorenstein,polymake_so
-@subsection isLatticeEmpty
+@subsubsection isLatticeEmpty
 @cindex isLatticeEmpty
 @table @code
 @item @strong{Syntax:}
@@ -480,7 +480,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isNormal,isReflexive,isLatticeEmpty,polymake_so
-@subsection isNormal
+@subsubsection isNormal
 @cindex isNormal
 @table @code
 @item @strong{Syntax:}
@@ -500,7 +500,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isReflexive,isSmooth,isNormal,polymake_so
-@subsection isReflexive
+@subsubsection isReflexive
 @cindex isReflexive
 @table @code
 @item @strong{Syntax:}
@@ -523,7 +523,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isSmooth,isTerminal,isReflexive,polymake_so
-@subsection isSmooth
+@subsubsection isSmooth
 @cindex isSmooth
 @table @code
 @item @strong{Syntax:}
@@ -563,7 +563,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isTerminal,isVeryAmple,isSmooth,polymake_so
-@subsection isTerminal
+@subsubsection isTerminal
 @cindex isTerminal
 @table @code
 @item @strong{Syntax:}
@@ -588,7 +588,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node isVeryAmple,latticeCodegree,isTerminal,polymake_so
-@subsection isVeryAmple
+@subsubsection isVeryAmple
 @cindex isVeryAmple
 @table @code
 @item @strong{Syntax:}
@@ -611,7 +611,7 @@ int
 @end table
 @c --------------------------------------------------------------------------------
 @node latticeCodegree,latticeDegree,isVeryAmple,polymake_so
-@subsection latticeCodegree
+@subsubsection latticeCodegree
 @cindex latticeCodegree
 @table @code
 @item @strong{Syntax:}
@@ -634,7 +634,7 @@ getDimension(p)+1-latticeDegree(p), which is the smallest number k such that k*p
 @end table
 @c --------------------------------------------------------------------------------
 @node latticeDegree,latticePoints,latticeCodegree,polymake_so
-@subsection latticeDegree
+@subsubsection latticeDegree
 @cindex latticeDegree
 @table @code
 @item @strong{Syntax:}
@@ -657,7 +657,7 @@ getDimension(p)+1-latticeCodegree(p), which is the degree of the Ehrhart polynom
 @end table
 @c --------------------------------------------------------------------------------
 @node latticePoints,latticeVolume,latticeDegree,polymake_so
-@subsection latticePoints
+@subsubsection latticePoints
 @cindex latticePoints
 @table @code
 @item @strong{Syntax:}
@@ -682,7 +682,7 @@ intmat, whose rows are the lattice points in p.
 @end table
 @c --------------------------------------------------------------------------------
 @node latticeVolume,maximalFace,latticePoints,polymake_so
-@subsection latticeVolume
+@subsubsection latticeVolume
 @cindex latticeVolume
 @table @code
 @item @strong{Syntax:}
@@ -710,7 +710,7 @@ the lattice volume of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node maximalFace,maximalValue,latticeVolume,polymake_so
-@subsection maximalFace
+@subsubsection maximalFace
 @cindex maximalFace
 @table @code
 @item @strong{Syntax:}
@@ -737,7 +737,7 @@ The first coordinate of v corresponds to a shift of the maximal value since p is
 @end table
 @c --------------------------------------------------------------------------------
 @node maximalValue,minimalFace,maximalFace,polymake_so
-@subsection maximalValue
+@subsubsection maximalValue
 @cindex maximalValue
 @table @code
 @item @strong{Syntax:}
@@ -764,7 +764,7 @@ The first coordinate of v corresponds to a shift of the maximal value since p is
 @end table
 @c --------------------------------------------------------------------------------
 @node minimalFace,minimalValue,maximalValue,polymake_so
-@subsection minimalFace
+@subsubsection minimalFace
 @cindex minimalFace
 @table @code
 @item @strong{Syntax:}
@@ -791,7 +791,7 @@ The first coordinate of v corresponds to a shift of the minimal value since p is
 @end table
 @c --------------------------------------------------------------------------------
 @node minimalValue,minkowskiSum,minimalFace,polymake_so
-@subsection minimalValue
+@subsubsection minimalValue
 @cindex minimalValue
 @table @code
 @item @strong{Syntax:}
@@ -818,7 +818,7 @@ The first coordinate of v corresponds to a shift of the minimal value since p is
 @end table
 @c --------------------------------------------------------------------------------
 @node minkowskiSum,nBoundaryLatticePoints,minimalValue,polymake_so
-@subsection minkowskiSum
+@subsubsection minkowskiSum
 @cindex minkowskiSum
 @table @code
 @item @strong{Syntax:}
@@ -848,7 +848,7 @@ The Minkowski sum of two cones is just the cone generated by their union.
 @end table
 @c --------------------------------------------------------------------------------
 @node nBoundaryLatticePoints,nHilbertBasis,minkowskiSum,polymake_so
-@subsection nBoundaryLatticePoints
+@subsubsection nBoundaryLatticePoints
 @cindex nBoundaryLatticePoints
 @table @code
 @item @strong{Syntax:}
@@ -873,7 +873,7 @@ the number of lattice points on the relative boundary of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node nHilbertBasis,nInteriorLatticePoints,nBoundaryLatticePoints,polymake_so
-@subsection nHilbertBasis
+@subsubsection nHilbertBasis
 @cindex nHilbertBasis
 @table @code
 @item @strong{Syntax:}
@@ -896,7 +896,7 @@ the number of elements in the Hilbert basis of the semigroup of lattice points i
 @end table
 @c --------------------------------------------------------------------------------
 @node nInteriorLatticePoints,nLatticePoints,nHilbertBasis,polymake_so
-@subsection nInteriorLatticePoints
+@subsubsection nInteriorLatticePoints
 @cindex nInteriorLatticePoints
 @table @code
 @item @strong{Syntax:}
@@ -921,7 +921,7 @@ the number of lattice points in the relative interior of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node nLatticePoints,normalFan(polymake),nInteriorLatticePoints,polymake_so
-@subsection nLatticePoints
+@subsubsection nLatticePoints
 @cindex nLatticePoints
 @table @code
 @item @strong{Syntax:}
@@ -946,7 +946,7 @@ the number of lattice points in p.
 @end table
 @c --------------------------------------------------------------------------------
 @node normalFan(polymake),visual,nLatticePoints,polymake_so
-@subsection normalFan
+@subsubsection normalFan
 @cindex normalFan
 @table @code
 @item @strong{Syntax:}
@@ -967,7 +967,7 @@ the normal fan of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node visual,,normalFan(polymake),polymake_so
-@subsection visual
+@subsubsection visual
 @cindex visual
 @table @code
 @item @strong{Syntax:}

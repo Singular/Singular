@@ -9,8 +9,10 @@
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
+#include <Singular/lists.h>
 #include <sstream>
 #include <gfanlib/gfanlib.h>
+#include <gfanlib/gfanlib_zfan.h>
 
 #include <callgfanlib/bbfan.h>
 #include <callgfanlib/bbcone.h>
@@ -275,14 +277,24 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
                   int d = (int)(long)v->Data();
                   int o = (int)(long)w->Data();
                   int m = (int)(long)x->Data();
-                  if ((d <= zf->getAmbientDimension()) && ((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+                  if ( (0<=d) && (d <= zf->getAmbientDimension()) && ((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
                     {
                       bool oo = (bool) o;
                       bool mm = (bool) m;
-                      int n = zf->numberOfConesOfDimension(d,oo,mm);
-                      res->rtyp = INT_CMD;
-                      res->data = (char*) n;
-                      return FALSE;
+                      int ld = zf->getLinealityDimension();
+                      if (d-ld>=0)
+                      {
+                        int n = zf->numberOfConesOfDimension(d,oo,mm);
+                        res->rtyp = INT_CMD;
+                        res->data = (void*) n;
+                        return FALSE;
+                      }
+                      else
+                      {
+                        res->rtyp = INT_CMD;
+                        res->data = (char*) 0;
+                        return FALSE;
+                      }
                     }
                 }
             }
@@ -532,49 +544,62 @@ BOOLEAN getCone(leftv res, leftv args)
       leftv w=v->next;
       if ((w != NULL) && (w->Typ() == INT_CMD))
       {
+        gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+        int d = (int)(long)v->Data();
+        int i = (int)(long)w->Data();
+        int o = -1;
+        int m = -1;
         leftv x=w->next;
         if ((x != NULL) && (x->Typ() == INT_CMD))
         {
-          leftv y=w->next;
+          o = (int)(long)x->Data();
+          leftv y=x->next;
           if ((y != NULL) && (y->Typ() == INT_CMD))
           {
-            gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-            int d = (int)(long)v->Data();
-            int i = (int)(long)w->Data();
-            int o = (int)(long)x->Data();
-            int m = (int)(long)y->Data();
-            if (((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+            m = (int)(long)y->Data();
+          }
+        }
+        if (o == -1) o = 0;
+        if (m == -1) m = 0;
+        if (((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+        {
+          bool oo = (bool) o;
+          bool mm = (bool) m;
+          if (0<=d && d<=zf->getAmbientDimension())
+          {
+            if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
             {
-              bool oo = (bool) o;
-              bool mm = (bool) m;
-              if (d<=zf->getAmbientDimension())
+              i=i-1;
+              int ld = zf->getLinealityDimension();
+              if (d-ld>=0)
               {
-                if (i<=zf->numberOfConesOfDimension(d,oo,mm))
-                {
-                  i=i-1;
-                  gfan::ZCone zc = zf->getCone(d,i,oo,mm);
-                  res->rtyp = coneID;
-                  res->data = (char*)new gfan::ZCone(zc);
-                  return FALSE;
-                }
-                else
-                {
-                  WerrorS("getCone: invalid index");
-                  return TRUE;
-               }
-             }
-             else
-             {
-               WerrorS("getCone: invalid dimension");
-               return TRUE;
+                gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
+                res->rtyp = coneID;
+                res->data = (char*)new gfan::ZCone(zc);
+                return FALSE;
+              }
+              else
+              {
+                WerrorS("getCone: invalid dimension; no cones in this dimension");
+                return TRUE;
               }
             }
             else
             {
-              WerrorS("getCone: invalid specifier for orbit or maximal");
+              WerrorS("getCone: invalid index");
               return TRUE;
             }
           }
+          else
+          {
+            WerrorS("getCone: invalid dimension");
+            return TRUE;
+          }
+        }
+        else
+        {
+          WerrorS("getCone: invalid specifier for orbit or maximal");
+          return TRUE;
         }
       }
     }
@@ -582,6 +607,77 @@ BOOLEAN getCone(leftv res, leftv args)
   else
   {
     WerrorS("getCone: unexpected parameters");
+    return TRUE;
+  }
+}
+
+BOOLEAN getCones(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+      int d = (int)(long)v->Data();
+      int o = -1;
+      int m = -1;
+      leftv w=v->next;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+      {
+        o = (int)(long)w->Data();
+        leftv x=w->next;
+        if ((x != NULL) && (x->Typ() == INT_CMD))
+        {
+          m = (int)(long)x->Data();
+        }
+      }
+      if (o == -1) o = 0;
+      if (m == -1) m = 0;
+      if (((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
+      {
+        bool oo = (bool) o;
+        bool mm = (bool) m;
+        if (0<=d && d<=zf->getAmbientDimension())
+        {
+          int ld = zf->getLinealityDimension();
+          if (d-ld>=0)
+          {
+            lists L = (lists)omAllocBin(slists_bin);
+            int n = zf->numberOfConesOfDimension(d,oo,mm);
+            L->Init(n);
+            for (int i=0; i<n; i++)
+            {
+              gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
+              L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(zc);
+            }
+            res->rtyp = LIST_CMD;
+            res->data = (char*) L;
+            return FALSE;
+          }
+          else
+          {
+            WerrorS("getCones: invalid dimension; no cones in this dimension");
+            return TRUE;
+          }
+        }
+        else
+        {
+          WerrorS("getCones: invalid dimension");
+          return TRUE;
+        }
+      }
+      else
+      {
+        WerrorS("getCones: invalid specifier for orbit or maximal");
+        return TRUE;
+      }
+    }
+  }
+  else
+  {
+    WerrorS("getCones: unexpected parameters");
     return TRUE;
   }
 }
@@ -666,6 +762,95 @@ gfan::ZMatrix rays(gfan::ZFan* zf)
   return rays;
 }
 
+BOOLEAN fanFromString(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == STRING_CMD))
+    {
+      std::string fanInString = (char*) u->Data();
+      std::istringstream s(fanInString);
+      gfan::ZFan* zf = new gfan::ZFan(s);
+      res->rtyp = fanID;
+      res->data = (void*) zf;
+      return FALSE;
+    }
+  WerrorS("fanFromString: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN fanViaCones(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    lists L = (lists) u->Data();
+    if (lSize(L)>-1)
+    {
+      if (L->m[0].Typ() != coneID)
+      {
+        WerrorS("fanViaCones: list contains entries of wrong type");
+        return TRUE;
+      }
+      gfan::ZCone* zc = (gfan::ZCone*) L->m[0].Data();
+      gfan::ZFan* zf = new gfan::ZFan(zc->ambientDimension());
+      zf->insert(*zc);
+      for (int i=1; i<=lSize(L); i++)
+      {
+        if (L->m[i].Typ() != coneID)
+        {
+          WerrorS("fanViaCones: entries of wrong type in list");
+          return TRUE;
+        }
+        gfan::ZCone* zc = (gfan::ZCone*) L->m[i].Data();
+        if (zc->ambientDimension() != zf->getAmbientDimension())
+        {
+          WerrorS("fanViaCones: inconsistent ambient dimensions amongst cones in list");
+          return TRUE;
+        }
+        zf->insert(*zc);
+      }
+      res->rtyp = fanID;
+      res->data = (void*) zf;
+      return FALSE;
+    }
+    res->rtyp = fanID;
+    res->data = (void*) new gfan::ZFan(0);
+    return FALSE;
+  }
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+    gfan::ZFan* zf = new gfan::ZFan(zc->ambientDimension());
+    zf->insert(*zc);
+    while (u->next != NULL)
+    {
+      u = u->next;
+      if (u->Typ() != coneID)
+      {
+        WerrorS("fanViaCones: arguments of wrong type");
+        return TRUE;
+      }
+      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+      if (zc->ambientDimension() != zf->getAmbientDimension())
+      {
+        WerrorS("fanViaCones: inconsistent ambient dimensions amongst input cones");
+        return TRUE;
+      }
+      zf->insert(*zc);
+    }
+    res->rtyp = fanID;
+    res->data = (void*) zf;
+    return FALSE;
+  }
+  if (u == NULL)
+  {
+    res->rtyp = fanID;
+    res->data = (void*) new gfan::ZFan(0);
+    return FALSE;
+  }
+  WerrorS("fanViaCones: unexpected parameters");
+  return TRUE;
+}
 
 // BOOLEAN grFan(leftv res, leftv h)
 // {
@@ -743,8 +928,11 @@ void bbfan_setup()
   iiAddCproc("","insertCone",FALSE,insertCone);
   iiAddCproc("","removeCone",FALSE,removeCone);
   iiAddCproc("","getCone",FALSE,getCone);
+  iiAddCproc("","getCones",FALSE,getCones);
   iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   iiAddCproc("","isPure",FALSE,isPure);
+  iiAddCproc("","fanFromString",FALSE,fanFromString);
+  iiAddCproc("","fanViaCones",FALSE,fanViaCones);
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);

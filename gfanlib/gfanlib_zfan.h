@@ -142,7 +142,7 @@ public:
    * Returns the dimension of the lineality space of the fan. Notice that the lineality space of the
    * empty fan is the ambient space.
    */
-  int dimensionOfLinealitySpace();
+  // int getLinealityDimension();
   /**
    * Returns the cone in the collection given by the index. It is a mistake to specify an index which
    * is out of range.
