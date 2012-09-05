@@ -25,7 +25,7 @@
  * to a reference-counted structure and destructing the latter after use.
  *
  * The template arguments, include the pointer type @c PtrType, and two
- * integral (bool) properties: use @c isWeak to disallow destruction
+ * integral (bool) properties: use @c Nondestructive to disallow destruction
  * and @c NeverNull to assume, that @c PtrType cannot be @c NULL.
  * Finally, @c CountType allows you to select a typ to represent the internal reference count.
  *
@@ -33,7 +33,8 @@
  * For convenience use @c RefCounter as public base.
  * In addition you must overload @c void CountedRefPtr_kill(PtrType) accordingly.
  **/
-template <class PtrType, bool isWeak = false, bool NeverNull = false, class CountType = short>
+template <class PtrType, bool Nondestructive = false, bool NeverNull = false,
+          class CountType = short>
 class CountedRefPtr {
   typedef CountedRefPtr self;
 
@@ -41,7 +42,7 @@ public:
   //{ @name Name template arguments
   typedef PtrType ptr_type;
   typedef CountType count_type;
-  enum { is_weak = isWeak, never_null = NeverNull };
+  enum { nondestructive = Nondestructive, never_null = NeverNull };
   //}
 
   /// Default constructor @note: exisis only if @c NeverNull is false
@@ -52,7 +53,7 @@ public:
 
   /// Convert from compatible smart pointer
   template <bool Never>
-  CountedRefPtr(const CountedRefPtr<ptr_type, !is_weak, Never, count_type>& rhs):
+  CountedRefPtr(const CountedRefPtr<ptr_type, !nondestructive, Never, count_type>& rhs):
     m_ptr(rhs.m_ptr) { reclaim(); }
 
   /// Construct refernce copy
@@ -84,14 +85,15 @@ public:
   ptr_type operator->() { return *this; }
   //}
 
-  //{ @name Reference count interface
+  /// @name Reference count interface
+  //@{
   count_type count() const { return (*this? m_ptr->ref: 0); }
   void reclaim() { if (*this) ++m_ptr->ref; }
   void release() { 
-    if (*this && (--m_ptr->ref <= 0) && !is_weak)
+    if (*this && (--m_ptr->ref <= 0) && !nondestructive)
       CountedRefPtr_kill(m_ptr); 
   }
-  //}
+  //@}
 
 private:
   /// Store actual pointer
@@ -126,52 +128,88 @@ private:
   /// Number of references
   count_type ref;  // naming consistent with other classes
 };
-#if 0
-class CountedRefEnv {
-  typedef CountedRefEnv self;
+
+
+template <class PtrType>
+class CountedRefWeakPtr;
+
+template <class PtrType>
+class CountedRefIndirectPtr: 
+  public RefCounter {
+public:
+  friend class CountedRefWeakPtr<PtrType>;
+private:
+  CountedRefIndirectPtr(PtrType ptr): m_ptr(ptr) { }
+  CountedRefIndirectPtr& operator=(PtrType ptr) { m_ptr = ptr; return *this; }
+  PtrType m_ptr;
+};
+
+template <class PtrType> 
+inline void CountedRefPtr_kill(CountedRefIndirectPtr<PtrType>* pval) { delete pval; }
+
+template <class PtrType>
+class CountedRefWeakPtr {
+  typedef CountedRefWeakPtr self;
 
 public:
-  static leftv idify(leftv head, idhdl* root) {
-    idhdl handle = newid(head, root);
-    leftv res = (leftv)omAlloc0(sizeof(*res));
-    res->data =(void*) handle;
-    res->rtyp = IDHDL;
-    return res;
+
+  /// @name Name template arguments
+  //@{ Name template arguments
+  typedef PtrType ptr_type;
+  typedef CountedRefPtr<CountedRefIndirectPtr<ptr_type>*> ptrptr_type;
+  //@}
+
+  /// Construct unassigned weak reference
+  CountedRefWeakPtr(): m_indirect(NULL) { }
+
+  /// Convert from pointer
+  CountedRefWeakPtr(ptr_type ptr): m_indirect(new CountedRefIndirectPtr<ptr_type>(ptr)) { }
+
+  /// Construct copy
+  CountedRefWeakPtr(const self& rhs):  m_indirect(rhs.m_indirect) { }
+
+  /// Unlink one reference (handled by CountedRefPtr)
+  ~CountedRefWeakPtr() { }
+
+  /// Mark weak reference as invalid
+  void invalidate() {  *this = NULL; }
+
+  /// Test whether reference was never used
+  bool unassigned() const { return !m_indirect; }
+
+  /// Pointer-style interface
+  //@{
+  operator bool() const {  return operator->(); }
+  self& operator=(const self& rhs) { 
+    m_indirect = rhs;
+    return *this;
   }
-
-  static idhdl newid(leftv head, idhdl* root) {
-
-    static unsigned int counter = 0;
-    char* name = (char*) omAlloc0(512);
-    sprintf(name, " :%u:%p:_shared_: ", ++counter, head->data);
-    if ((*root) == NULL )
-      enterid(name, 0, head->rtyp, root, TRUE, FALSE);
+  self& operator=(ptr_type ptr) {
+    if (!m_indirect) 
+      m_indirect = new CountedRefIndirectPtr<ptr_type>(ptr);
     else
-      *root = (*root)->set(name, 0, head->rtyp, TRUE);
+      m_indirect->m_ptr = ptr;
+    return *this;
+  }
+  bool operator==(ptr_type ptr) const { 
+    return m_indirect &&(m_indirect->m_ptr == ptr); 
+  }
+  bool operator!=(ptr_type rhs) const { return !operator==(rhs); }
+  const ptr_type operator->() const { return (m_indirect? m_indirect->m_ptr: NULL); }
+  ptr_type operator->() {   return (m_indirect? m_indirect->m_ptr:NULL); }
+  //@}
 
-    IDDATA(*root) = (char*) head->data;
-    return *root;
-  }
-
-  static void clearid(idhdl handle, idhdl* root) {
-    IDDATA(handle)=NULL;
-    IDTYP(handle)=NONE;
-    killhdl2(handle, root, NULL);
-  }
-  static int& ref_id() {
-    static int g_ref_id = 0;
-    return g_ref_id;
-  }
-
-  static int& sh_id() {
-    static int g_sh_id = 0;
-    return g_sh_id;
-  }
+private:
+  ptrptr_type m_indirect;
 };
-#endif
-/// Overloading ring destruction
-inline void CountedRefPtr_kill(ring r) { rKill(r); }
 
+
+
+
+/** @class LeftvHelper
+ * This class implements some recurrent code sniplets to be used with 
+ * @c leftv and @c idhdl.implements a refernce counter which we can use
+ **/
 class LeftvHelper {
 public:
   static leftv idify(leftv head, idhdl* root) {
