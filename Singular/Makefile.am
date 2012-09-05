@@ -49,6 +49,7 @@ SOURCES =    Minor.cc\
    blackbox.cc\
    calcSVD.cc\
    cntrlc.cc\
+   countedref.cc\
    denom_list.cc\
    eigenval_ip.cc\
    extra.cc\
@@ -105,6 +106,7 @@ SingularHEADERS =    Cache.h \
    bigintm.h \
    blackbox.h \
    cntrlc.h \
+   countedref.h \
    links/dbm_sl.h \
    distrib.h \
    eigenval_ip.h \
