@@ -351,23 +351,25 @@ private:
 class CountedRefData:
   public RefCounter {
   typedef CountedRefData self;
-  typedef CountedRefPtr<self*, false, true> self_ptr;
+  typedef CountedRefWeakPtr<self*> back_ptr;
   typedef RefCounter base;
 
   /// Generate object linked to other reference (e.g. for subscripts)
-  CountedRefData(leftv wrapped, self_ptr back):
-    base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {  }
+  CountedRefData(leftv wrapped, back_ptr back):
+    base(), m_data(wrapped), m_ring(back->m_ring), m_back(back) {
+  }
 
-  /// @name  isallow copying to avoid inconsistence
+  /// @name Disallow copying to avoid inconsistence
   //@{
   self& operator=(const self&);
   CountedRefData(const self&);
   //@}
+
 public:
   typedef LeftvDeep::copy_tag copy_tag;
 
   /// Fix smart pointer type to referenced data
-  typedef self_ptr ptr_type;
+  typedef back_ptr::ptr_type ptr_type;
 
   /// Fix smart pointer type to ring
   typedef CountedRefPtr<ring, true> ring_ptr;
@@ -385,14 +387,24 @@ public:
     base(), m_data(data, do_copy), m_ring(parent(data)), m_back() { }
 
   /// Destruct
-  ~CountedRefData() {  if (m_back)  m_data.clearid(root()); }
-
-  /// Generate 
-  ptr_type subscripted() {
-    return new self(m_data.idify(root()), 
-                    m_back? m_back: ptr_type(this));
+  ~CountedRefData() {
+    if (!m_back.unassigned()) {
+      if (m_back == this)
+        m_back.invalidate();
+      else
+        m_data.clearid(root()); 
+    }
   }
 
+  /// Generate object for indexing
+  ptr_type subscripted() { return new self(m_data.idify(root()), weakref()); }
+
+  /// Gerenate  weak (but managed) reference to @c *this
+  back_ptr weakref() {
+    if (m_back.unassigned()) 
+      m_back = this;
+    return m_back;
+  }
   /// Replace with other Singular data
   self& operator=(leftv rhs) {
     m_data = rhs;
@@ -409,7 +421,7 @@ public:
   /// Determine active ring when ring dependency changes
   BOOLEAN rering() {
     if (m_ring ^ m_data.ringed()) m_ring = (m_ring? NULL: currRing);
-    return (m_back && m_back->rering());
+    return (m_back && (m_back != this) && m_back->rering());
   }
 
   /// Get the current context
@@ -417,6 +429,9 @@ public:
 
   /// Check whether identifier became invalid
   BOOLEAN broken() const {
+    if (!m_back.unassigned() && !m_back) 
+      return complain("Back-reference broken");    
+
     if (m_ring) {
       if (m_ring != currRing) 
         return complain("Referenced identifier not from current ring");    
@@ -465,7 +480,7 @@ protected:
   ring_ptr m_ring;
 
   /// Reference to actual object for indexed structures  
-  ptr_type m_back;
+  back_ptr m_back;
 };
 
 /// Supporting smart pointer @c CountedRefPtr
@@ -491,7 +506,7 @@ public:
   typedef CountedRefData data_type;
 
   /// Fix smart pointer type to referenced data
-  typedef data_type::ptr_type data_ptr;
+  typedef CountedRefPtr<CountedRefData*> data_ptr;
 
   /// Check whether argument is already a reference type
   static BOOLEAN is_ref(leftv arg) {
