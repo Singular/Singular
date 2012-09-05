@@ -705,5 +705,7 @@ void countedref_init()
   CountedRefEnv::sh_id()=setBlackboxStuff(bbxshared, "shared");
 }
 
+#ifdef HAVE_DYNAMIC_COUNTEDREF
 extern "C" { void mod_init() { countedref_init(); } }
+#endif
 

@@ -23,7 +23,9 @@
 #include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-
+#include "subexpr.h"
+#include "idrec.h"
+#include "ipid.h"
 /** @class CountedRefPtr
  * This class implements a smart pointer which handles pointer-style access
  * to a reference-counted structure and destructing the latter after use.
