@@ -20,6 +20,10 @@
 #ifndef SINGULAR_COUNTEDREF_H_
 #define SINGULAR_COUNTEDREF_H_
 
+#include <omalloc/omalloc.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+
 /** @class CountedRefPtr
  * This class implements a smart pointer which handles pointer-style access
  * to a reference-counted structure and destructing the latter after use.
@@ -100,11 +104,6 @@ private:
   ptr_type m_ptr;
 };
 
-/// Default constructor only implemented if @c NeverNull is false
-//template <class PtrType, bool isWeak,bool val,class CountType>
-//inline CountedRefPtr<PtrType, isWeak, val, CountType>::CountedRefPtr():
-//  m_ptr(NULL) { }
-
 /** @class RefCounter
  * This class implements implements a refernce counter which we can use
  * as a public base of objects managed by @CountedRefPtr.
@@ -138,9 +137,12 @@ class CountedRefIndirectPtr:
   public RefCounter {
 public:
   friend class CountedRefWeakPtr<PtrType>;
+  ~CountedRefIndirectPtr()  { }
+
 private:
   CountedRefIndirectPtr(PtrType ptr): m_ptr(ptr) { }
   CountedRefIndirectPtr& operator=(PtrType ptr) { m_ptr = ptr; return *this; }
+
   PtrType m_ptr;
 };
 
@@ -176,12 +178,11 @@ public:
 
   /// Test whether reference was never used
   bool unassigned() const { return !m_indirect; }
-
   /// Pointer-style interface
   //@{
   operator bool() const {  return operator->(); }
   self& operator=(const self& rhs) { 
-    m_indirect = rhs;
+    m_indirect = rhs.m_indirect;
     return *this;
   }
   self& operator=(ptr_type ptr) {
@@ -191,18 +192,16 @@ public:
       m_indirect->m_ptr = ptr;
     return *this;
   }
-  bool operator==(ptr_type ptr) const { 
-    return m_indirect &&(m_indirect->m_ptr == ptr); 
+  bool operator==(ptr_type ptr) const {
+    return m_indirect &&(m_indirect->m_ptr == ptr);
   }
   bool operator!=(ptr_type rhs) const { return !operator==(rhs); }
   const ptr_type operator->() const { return (m_indirect? m_indirect->m_ptr: NULL); }
   ptr_type operator->() {   return (m_indirect? m_indirect->m_ptr:NULL); }
   //@}
-
 private:
   ptrptr_type m_indirect;
 };
-
 
 
 
@@ -274,60 +273,102 @@ public:
 
 };
 
+/** @class LeftvShallow
+ * Ths class wraps @c leftv by taking into acount memory allocation, destruction
+ * as well as shallowly copying of a given @c leftv, i.e. we just copy auxiliary
+ * information (like subexpressions), but not the actual data.
+ *
+ * @note This is useful to avoid invalidating @c leftv while operating on th
+ **/
 class LeftvShallow:
   public LeftvHelper {
   typedef LeftvShallow self;
   
 public:
+  /// Just allocate (all-zero) @c leftv
   LeftvShallow(): m_data(allocate()) { }
+  /// Shallow copy the input data
   LeftvShallow(leftv data): m_data(shallowcpy(data)) { }
+  /// Construct (shallow) copy of @c *this
   LeftvShallow(const self& rhs):  m_data(shallowcpy(rhs.m_data)) { }
 
+  /// Destruct
   ~LeftvShallow() {  
     recursivekill(m_data->e);
     omFree(m_data);
   }
+
+  /// Assign shallow copy of the input
   self& operator=(leftv rhs) {
     recursivekill(m_data->e);
     shallowcpy(m_data, rhs);
     return *this;
   }
-
+  /// Assign (shallow) copy of @c *this
   self& operator=(const self& rhs) { return (*this) = rhs.m_data; }
 
-  /// Access to object
+  /// @name Pointer-style access
+  //@{
   const leftv operator->() const { return m_data;  }
   leftv operator->() { return m_data;  }
+  //@]
 
 protected:
+  /// The actual data pointer
   leftv m_data;
 };
 
-
-class LeftvDeep: public LeftvHelper {
+/** @class LeftvDeep
+ * This class wraps @c leftv by taking into acount memory allocation, destruction
+ * as well as deeply copying of a given @c leftv, i.e. we also take over 
+ * ownership of the @c leftv data.
+ *
+ * We have two variants:
+   + LeftvDeep(leftv):           treats referenced identifiers as "the data"
+   + LeftvDeep(leftv, copy_tag): takes care of a full copy of identifier's data
+ *
+ * @note It invalidats @c leftv on input.
+ **/
+class LeftvDeep: 
+  public LeftvHelper {
   typedef LeftvDeep self;
 
-  /// @name Do not permit copying
+  /// @name Do not permit copying (avoid inconsistence)
   //@{
   self& operator=(const self&);
   LeftvDeep(const self&);
   //@}
 
 public:
-  struct copy_tag {};
+  /// Allocate all-zero object by default
   LeftvDeep(): m_data(allocate()) {}
+
+  /// Store a deep copy of the data
+  /// @ note Occupies the provided @c leftv and invalidates the latter
   LeftvDeep(leftv data): m_data(cpy(data)) { 
     data->e = NULL;   // occupy subexpression 
     if(!isid()) m_data->data=data->CopyD(); 
   }
 
+  /// Construct even deeper copy:
+  /// Skip identifier (if any) and take care of the data on our own
+  struct copy_tag {};
   LeftvDeep(leftv data, copy_tag): m_data(allocate()) {  m_data->Copy(data);  }
 
+  /// Really clear data
   ~LeftvDeep() { m_data->CleanUp(); }
-  operator LeftvShallow() { return m_data;}
 
+  /// @name Access via shallow copy to avoid invalidating the stored handle
+  //@{
+  operator LeftvShallow() { return m_data; }
+  LeftvShallow operator*() {return *this; }
+  //@}
+
+  /// Determine whether we point to the same data
   bool like(const self& rhs) const { return m_data->data == rhs.m_data->data; }
 
+  /// Reassign a new deep copy by occupieing another @c leftv
+  /// @note clears @c *this in the first
   self& operator=(leftv rhs) {
     if(isid()) {
       m_data->e = rhs->e;
@@ -372,18 +413,23 @@ public:
   }
 
 
-
+  /// Check for being an identifier
   BOOLEAN isid() const { return m_data->rtyp==IDHDL;}
+  /// Test whether we reference to ring-dependent data
   BOOLEAN ringed() { return m_data->RingDependend(); }
+  /// Check whether (all-zero) initialized data was never assigned.
   BOOLEAN unassigned() const { return m_data->Typ()==0; }
 
+  /// Wrap data by identifier, if not done yet
   leftv idify(idhdl* root) {
     leftv res = (isid()? m_data: LeftvHelper::idify(m_data, root));
     ++(((idhdl)res->data)->ref);
     return res;
   }
 
-
+  /// Erase identifier handles by @c *this
+  /// @note Assumes that we reference an identifier and that we own the latter.
+  /// This is useful to clear the result of a subsequent call of @c idify.
   void clearid(idhdl* root) {
     assume(isid());
     if (--((idhdl)m_data->data)->ref <= 0)  // clear only if we own
@@ -391,6 +437,7 @@ public:
   }
 
 private:
+  /// Store the actual data
   leftv m_data;
 };
 
