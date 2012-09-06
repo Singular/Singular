@@ -643,13 +643,15 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       return G; // G is zero
     if(G.inCoeffDomain())
       return CanonicalForm(1);
-    return G/Lc(G); // return monic G
+    CanonicalForm lcinv= 1/Lc (G);
+    return G*lcinv; // return monic G
   }
   if(G.isZero()) // F is non-zero
   {
     if(F.inCoeffDomain())
       return CanonicalForm(1);
-    return F/Lc(F); // return monic F
+    CanonicalForm lcinv= 1/Lc (F);
+    return F*lcinv; // return monic F
   }
   if(F.inCoeffDomain() || G.inCoeffDomain())
     return CanonicalForm(1);

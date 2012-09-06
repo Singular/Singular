@@ -111,6 +111,7 @@ public:
     int degree ( const Variable & v ) const;
 
     CanonicalForm tailcoeff () const;
+    CanonicalForm tailcoeff ( const Variable & v ) const;
     int taildegree () const;
 
     int level () const;
@@ -293,6 +294,9 @@ taildegree ( const CanonicalForm & f ) { return f.taildegree(); }
 
 inline CanonicalForm
 tailcoeff ( const CanonicalForm & f ) { return f.tailcoeff(); }
+
+inline CanonicalForm
+tailcoeff (const CanonicalForm& f, const Variable& v) { return f.tailcoeff(v); }
 
 inline int
 level ( const CanonicalForm & f ) { return f.level(); }

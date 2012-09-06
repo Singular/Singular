@@ -20,7 +20,7 @@
 #include "cf_gcd_smallp.h"
 #include "facFqFactorize.h"
 
-bool
+int
 LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
                           int level, const CFList& leadingCoeffs, CFList& result)
 {
@@ -65,8 +65,13 @@ LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
 
   delete [] monomsLead;
 
-  CFArray termsF= getTerms (F);
-  sort (termsF);
+  CFArray termsF= getBiTerms (F);
+  if (termsF.size() > 450)
+  {
+    delete [] monoms;
+    return 0;
+  }
+  sort (termsF, level);
 
   CFList tmp;
   CFArray* stripped2= new CFArray [factors.length()];
@@ -79,15 +84,14 @@ LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
 
   CanonicalForm H= prod (tmp);
   CFArray monomsH= getMonoms (H);
-  sort (monomsH);
+  sort (monomsH,F.level());
 
-  groupTogether (termsF, level);
   groupTogether (monomsH, F.level());
 
   if (monomsH.size() != termsF.size())
   {
     delete [] stripped2;
-    return false;
+    return 0;
   }
 
   CFArray strippedH;
@@ -98,11 +102,13 @@ LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
   if (!isEqual (strippedH, strippedF))
   {
     delete [] stripped2;
-    return false;
+    return 0;
   }
 
   CFArray A= getEquations (monomsH, termsF);
+  CFArray startingSolution= solution;
   CFArray newSolution= CFArray (solution.size());
+  result= CFList();
   do
   {
     evaluate (A, solution, F.level() + 1);
@@ -111,22 +117,19 @@ LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
     if (!simplify (A, newSolution, F.level() + 1))
     {
       delete [] stripped2;
-      return false;
+      return 0;
     }
     if (isZero (newSolution))
-    {
-      delete [] stripped2;
-      return false;
-    }
+      break;
     if (!merge (solution, newSolution))
-    {
-      delete [] stripped2;
-      return false;
-    }
+      break;
   } while (1);
 
-
-  result= CFList();
+  if (isEqual (startingSolution, solution))
+  {
+    delete [] stripped2;
+    return 0;
+  }
   CanonicalForm factor;
   num= 0;
   for (i= 0; i < factors.length(); i++)
@@ -134,12 +137,18 @@ LucksWangSparseHeuristic (const CanonicalForm& F, const CFList& factors,
     k= stripped2[i].size();
     factor= 0;
     for (j= 0; j < k; j++, num++)
+    {
+      if (solution [num].isZero())
+        continue;
       factor += solution [num]*stripped2[i][j];
+    }
     result.append (factor);
   }
 
   delete [] stripped2;
-  return true;
+  if (result.length() > 0)
+    return 1;
+  return 0;
 }
 
 CFList
