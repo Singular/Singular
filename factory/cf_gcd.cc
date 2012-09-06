@@ -593,6 +593,13 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
         pi2 = pi2 / bi;
         pi = pi1; pi1 = pi2;
         maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
+        if (!(pi1.isUnivariate()) && (size (pi1)/maxNumVars > 500))
+        {
+            On (SW_USE_FF_MOD_GCD);
+            C *= gcd (oldPi, oldPi1);
+            Off (SW_USE_FF_MOD_GCD);
+            return C;
+        }
         if ( degree( pi1, v ) > 0 )
         {
             delta = degree( pi, v ) - degree( pi1, v );
