@@ -548,10 +548,16 @@ BOOLEAN countedref_Op1Shared(int op, leftv res, leftv head)
   }
 
   CountedRefShared ref = CountedRefShared::cast(head);
+
+  if ((op == LINK_CMD) ) {
+    if (ref.dereference(head)) return TRUE;
+    res->Copy(head);
+    return (res->Typ() == NONE);
+  }
+
   CountedRefShared wrap = ref.wrapid();
   int typ = head->Typ();
-  return wrap.dereference(head) || 
-    iiExprArith1(res, head, op == LINK_CMD? head->Typ(): op) ||
+  return wrap.dereference(head) || iiExprArith1(res, head, op) ||
     wrap.retrieve(res, typ);
 }
 
