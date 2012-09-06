@@ -2226,14 +2226,14 @@ InternalPoly::mulAddTermList ( termList theList, termList aList, const Canonical
 termList
 InternalPoly::reduceTermList ( termList first, termList redterms, termList & last )
 {
-    CanonicalForm coeff = redterms->coeff;
+    CanonicalForm coeff = CanonicalForm (1)/redterms->coeff;
     CanonicalForm newcoeff;
     int newexp;
     int exp = redterms->exp;
     termList dummy;
     while ( first && ( first->exp >= exp ) )
     {
-        newcoeff = first->coeff / coeff;
+        newcoeff = first->coeff * coeff;
         newexp = first->exp - exp;
         dummy = first;
         first = mulAddTermList( first->next, redterms->next, newcoeff, newexp, last, true );

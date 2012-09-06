@@ -817,10 +817,10 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         {
           CFList u, v;
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
+          ppH /= Lc(ppH);
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
           ppCoF= mapDown (ppCoF, prim_elem, im_prim_elem, alpha, u, v);
           ppCoF= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
-          ppH /= Lc(ppH);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
           {

@@ -2194,6 +2194,10 @@ CanonicalForm mulMod (const CanonicalForm& A, const CanonicalForm& B,
   CanonicalForm G= mod (B, M);
   if (F.inCoeffDomain() || G.inCoeffDomain())
     return F*G;
+
+  if (size (F) / MOD.length() < 100 || size (G) / MOD.length() < 100)
+    return mod (F*G, MOD);
+
   Variable y= M.mvar();
   int degF= degree (F, y);
   int degG= degree (G, y);
