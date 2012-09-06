@@ -1091,6 +1091,33 @@ proc setfirst(reference ll, def arg) { ll[1] = arg; }
 setfirst(changeme, 17);
 changeme;
 
+// Checking differenct variants of list conversion
+
+shared shlist = list(1,2,3);
+list thelist = shlist;
+thelist;
+list(shlist);
+link(shlist);
+
+/// Checking that link deeply copies indeed
+kill r, xsh, ll;
+ring r = 0, (x,y,z), dp;
+poly p = x + y + z;
+shared xsh = x;
+
+subst(p, xsh,1, y,2, z,3);        // fails
+subst(p, poly(xsh),1, y,2, z,3);  // good
+subst(p, link(xsh),1, y,2, z,3);  // fine
+subst(p, link(xsh),1, y,2, z,3);  // fine
+subst(p, link(xsh),1, y,2, z,3);  // fine
+
+list ll = list(xsh, xsh, xsh);
+ll[1] = y;      // replaced only first entry
+ll;
+shared(ll[2]) = z;    // replaces the others
+ll;
+def(ll[2]) = x;       // generic alternative
+ll;
 // --------------------------------------------------------
 tst_status(1);$
 

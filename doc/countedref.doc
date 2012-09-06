@@ -309,6 +309,17 @@ ll;
 @c example
 @end smallexample
 
+In particular, explicit dereferencing is useful
+to distinguish between typecasting and nested constructings.
+
+@smallexample
+@c example unwrap list
+shared shl = list(1);
+shl;
+list(shl);  // wraps 'shl' by a list
+link(shl);  // extract the list in 'shl'
+@c example
+@end smallexample
 
 
 @c ------------------------------
