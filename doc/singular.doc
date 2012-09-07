@@ -1004,8 +1004,6 @@ Todos/Issues:
 @section convex geometry
 @cindex convex geometry
 
-this is just a test
-
 @menu
 * polymake_so:: A polymake interface for Singular
 @end menu
