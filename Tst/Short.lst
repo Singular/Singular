@@ -291,3 +291,4 @@ Short/zerodim_9_32003_lp_slimgb.tst
 ;;;; Short/zerored.tst
 Short/ZidealAdd_s.tst
 Short/sba_s.tst
+Short/countedref_s.tst 

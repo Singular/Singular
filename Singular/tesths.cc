@@ -8,7 +8,7 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
-
+#include "countedref.h"
 #include <omalloc/omalloc.h>
 
 #include <misc/auxiliary.h>
@@ -169,7 +169,7 @@ int main(          /* main entry to Singular */
 #ifdef SINGULAR_PYOBJECT_SETUP_H
    pyobject_setup();
 #endif
-
+  countedref_init();
 #ifdef HAVE_FANS
   bbcone_setup();
   bbfan_setup();
