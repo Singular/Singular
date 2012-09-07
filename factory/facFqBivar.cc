@@ -268,6 +268,8 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
     F= 1;
     return CFList();
   }
+  if (F.inCoeffDomain())
+    return CFList();
 
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();
@@ -477,6 +479,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
     F= 1;
     return CFList ();
   }
+  if (F.inCoeffDomain())
+    return CFList();
   if (degs.getLength() <= 1 || factors.length() == 1)
   {
     CFList result= CFList (F);
@@ -491,6 +495,7 @@ factorRecombination (CFList& factors, CanonicalForm& F,
     DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, N) == F " <<
               (mod (b(LC (F, 1)*prodMod (factors, N)),N)/Lc (mod (b(LC (F, 1)*prodMod (factors, N)),N)) == F/Lc(F)));
 #endif
+
   CFList T, S;
 
   CanonicalForm M= N;
@@ -512,13 +517,13 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   TT= copy (factors);
   bool recombination= false;
   CanonicalForm test;
-  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
+  bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) ||
+               getCharacteristic() > 0;
   if (!isRat)
     On (SW_RATIONAL);
   CanonicalForm buf0= mulNTL (buf (0, x), LCBuf);
   if (!isRat)
     Off (SW_RATIONAL);
-  buf0= buf(0,x)*LCBuf;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -583,7 +588,10 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           {
             recombination= true;
             result.append (g);
-            buf= quot;
+            if (b.getp() != 0)
+              buf= quot*bCommonDen (quot);
+            else
+              buf= quot;
             LCBuf= LC (buf, x);
             T= Difference (T, S);
             l -= degree (g);
@@ -702,7 +710,6 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   CFList T= factors;
   CanonicalForm buf= F;
   Variable x= Variable (1);
-  CanonicalForm LCBuf= LC (buf, x);
   CanonicalForm g, quot;
   CanonicalForm M= power (F.mvar(), deg);
   adaptedLiftBound= 0;
@@ -710,6 +717,9 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   bool isRat= (isOn (SW_RATIONAL) && getCharacteristic() == 0) || getCharacteristic() > 0;
   if (!isRat)
     On (SW_RATIONAL);
+  if (b.getp() != 0)
+    buf *= bCommonDen (buf);
+  CanonicalForm LCBuf= LC (buf, x);
   CanonicalForm buf0= mulNTL (buf (0,x), LCBuf);
   CanonicalForm buf1= mulNTL (buf (1,x), LCBuf);
   if (!isRat)
@@ -745,7 +755,10 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           {
             reconstructedFactors.append (g);
             factorsFoundIndex[l]= 1;
-            buf= quot;
+            if (b.getp() != 0)
+              buf= quot*bCommonDen(quot);
+            else
+              buf= quot;
             d -= degree (g);
             LCBuf= LC (buf, x);
             buf0= mulNTL (buf (0,x), LCBuf);
@@ -761,7 +774,11 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
             bufDegs1.refine ();
             if (bufDegs1.getLength() <= 1)
             {
-              reconstructedFactors.append (buf);
+              if (!buf.inCoeffDomain())
+              {
+                reconstructedFactors.append (buf);
+                F= 1;
+              }
               break;
             }
           }
@@ -857,9 +874,13 @@ extEarlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           trueFactor= false;
           if (bufDegs1.getLength() <= 1)
           {
-            buf= buf (y - eval, y);
-            buf /= Lc (buf);
-            appendMapDown (reconstructedFactors, buf, info, source, dest);
+            if (!buf.inCoeffDomain())
+            {
+              buf= buf (y - eval, y);
+              buf /= Lc (buf);
+              appendMapDown (reconstructedFactors, buf, info, source, dest);
+              F= 1;
+            }
             break;
           }
         }
@@ -5129,25 +5150,49 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     }
     else
     {
-      int * zeroOne= extractZeroOneVecs (NTLN);
+      int * zeroOne;
+      long numCols, numRows;
+      if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+      {
+        numCols= NTLN.NumCols();
+        numRows= NTLN.NumRows();
+        zeroOne= extractZeroOneVecs (NTLN);
+      }
+      else
+      {
+        numCols= NTLNe.NumCols();
+        numRows= NTLNe.NumRows();
+        zeroOne= extractZeroOneVecs (NTLNe);
+      }
       CFList bufBufUniFactors= bufUniFactors;
       CFListIterator iter, iter2;
       CanonicalForm buf;
       CFList factorsConsidered;
       CanonicalForm tmp;
-      for (int i= 0; i < NTLN.NumCols(); i++)
+      for (int i= 0; i < numCols; i++)
       {
         if (zeroOne [i] == 0)
           continue;
         iter= bufUniFactors;
         buf= 1;
         factorsConsidered= CFList();
-        for (int j= 0; j < NTLN.NumRows(); j++, iter++)
+        for (int j= 0; j < numRows; j++, iter++)
         {
-          if (!IsZero (NTLN (j + 1,i + 1)))
+          if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
           {
-            factorsConsidered.append (iter.getItem());
-            buf *= mod (iter.getItem(), y);
+            if (!IsZero (NTLN (j + 1,i + 1)))
+            {
+              factorsConsidered.append (iter.getItem());
+              buf *= mod (iter.getItem(), y);
+            }
+          }
+          else
+          {
+            if (!IsZero (NTLNe (j + 1,i + 1)))
+            {
+              factorsConsidered.append (iter.getItem());
+              buf *= mod (iter.getItem(), y);
+            }
           }
         }
         buf /= Lc (buf);
@@ -5935,7 +5980,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                           false, false, N);
 
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     return factors;
   }
 
@@ -5956,7 +6002,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       append (factorsG, contentAxFactors);
       append (factorsG, contentAyFactors);
       decompress (factorsG, N);
-      normalize (factors);
+      if (!extension)
+        normalize (factorsG);
       return factorsG;
     }
   }
@@ -5976,7 +6023,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       append (factorsG, contentAxFactors);
       append (factorsG, contentAyFactors);
       decompress (factorsG, N);
-      normalize (factors);
+      if (!extension)
+        normalize (factorsG);
       return factorsG;
     }
   }
@@ -6005,7 +6053,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                           swap, false, N);
 
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     return factors;
   }
 
@@ -6110,7 +6159,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                             swap, swap2, N);
 
-      normalize (factors);
+      if (!extension)
+        normalize (factors);
       return factors;
     }
 
@@ -6128,7 +6178,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           reverseSubst (factors, subCheck, x);
           appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                                 swap, swap2, N);
-          normalize (factors);
+          if (!extension)
+            normalize (factors);
           return factors;
         }
       }
@@ -6145,7 +6196,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           reverseSubst (factors, subCheck, y);
           appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                                 swap, swap2, N);
-          normalize (factors);
+          if (!extension)
+            normalize (factors);
           return factors;
         }
       }
@@ -6221,7 +6273,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       factors.append (A);
     appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                             swap, swap2, N);
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     return factors;
   }
 
@@ -6423,7 +6476,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                         swap, swap2, N);
-  normalize (factors);
+  if (!extension)
+    normalize (factors);
 
   return factors;
 }

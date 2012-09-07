@@ -19,6 +19,8 @@
 #include "cf_map_ext.h"
 #include "cf_iter.h"
 #include "templates/ftmpl_functions.h"
+#include "cf_algorithm.h"
+#include "cf_map.h"
 
 /// compare polynomials
 inline
@@ -82,14 +84,22 @@ void swap (CFArray& A, int i, int j)
 
 /// quick sort helper function
 inline
-void quickSort (int lo, int hi, CFArray& A)
+void quickSort (int lo, int hi, CFArray& A, int l)
 {
   int i= lo, j= hi;
   CanonicalForm tmp= A[(lo+hi)/2];
   while (i <= j)
   {
-    while (comp (A [i], tmp) < 0 && i < hi) i++;
-    while (comp (tmp, A[j]) < 0 && j > lo) j--;
+    if (l > 0)
+    {
+      while (comp (A [i], tmp, l) < 0 && i < hi) i++;
+      while (comp (tmp, A[j], l) < 0 && j > lo) j--;
+    }
+    else
+    {
+      while (comp (A [i], tmp) < 0 && i < hi) i++;
+      while (comp (tmp, A[j]) < 0 && j > lo) j--;
+    }
     if (i <= j)
     {
       swap (A, i, j);
@@ -97,16 +107,17 @@ void quickSort (int lo, int hi, CFArray& A)
       j--;
     }
   }
-  if (lo < j) quickSort (lo, j, A);
-  if (i < hi) quickSort (i, hi, A);
+  if (lo < j) quickSort (lo, j, A, l);
+  if (i < hi) quickSort (i, hi, A, l);
 }
 
 /// quick sort @a A
 inline
-void sort (CFArray& A)
+void sort (CFArray& A, int l= 0)
 {
-  quickSort (0, A.size() - 1, A);
+  quickSort (0, A.size() - 1, A, l);
 }
+
 
 /// find normalizing factors for @a biFactors and build monic univariate factors
 /// from @a biFactors
@@ -188,6 +199,67 @@ getTerms (const CanonicalForm& F)
   return result;
 }
 
+/// helper function for getBiTerms
+inline CFArray
+getBiTerms_helper (const CanonicalForm& F, const CFMap& M)
+{
+  CFArray buf= CFArray (size (F));
+  int k= 0, level= F.level() - 1;
+  Variable x= F.mvar();
+  Variable y= Variable (F.level() - 1);
+  Variable one= Variable (1);
+  Variable two= Variable (2);
+  CFIterator j;
+  for (CFIterator i= F; i.hasTerms(); i++)
+  {
+    if (i.coeff().level() < level)
+    {
+      buf[k]= M (i.coeff())*power (one,i.exp());
+      k++;
+      continue;
+    }
+    j= i.coeff();
+    for (;j.hasTerms(); j++, k++)
+      buf[k]= power (one,i.exp())*power (two,j.exp())*M (j.coeff());
+  }
+  CFArray result= CFArray (k);
+  for (int i= 0; i < k; i++)
+    result[i]= buf[i];
+  return result;
+}
+
+/// get terms of @a F where F is considered a bivariate poly in Variable(1),
+/// Variable (2)
+inline CFArray
+getBiTerms (const CanonicalForm& F)
+{
+  if (F.inCoeffDomain())
+  {
+    CFArray result= CFArray (1);
+    result [0]= F;
+    return result;
+  }
+  if (F.isUnivariate())
+  {
+    CFArray result= CFArray (size(F));
+    int j= 0;
+    for (CFIterator i= F; i.hasTerms(); i++, j++)
+      result[j]= i.coeff()*power (F.mvar(), i.exp());
+    return result;
+  }
+
+  CanonicalForm G= F;
+
+  CFMap M;
+  M.newpair (Variable (1), F.mvar());
+  M.newpair (Variable (2), Variable (F.level() - 1));
+  G= swapvar (F, Variable (1), F.mvar());
+  G= swapvar (G, Variable (2), Variable (F.level() - 1));
+
+  CFArray result= getBiTerms_helper (G, M);
+  return result;
+}
+
 /// build a poly from entries in @a A
 inline CanonicalForm
 buildPolyFromArray (const CFArray& A)
@@ -198,7 +270,7 @@ buildPolyFromArray (const CFArray& A)
   return result;
 }
 
-/// group together elements in @a A, where entries in @a A are put put together
+/// group together elements in @a A, where entries in @a A are put together
 /// if they coincide up to level @a level
 inline void
 groupTogether (CFArray& A, int level)
@@ -214,6 +286,8 @@ groupTogether (CFArray& A, int level)
       k--;
     }
   }
+  if (A[n].isZero())
+    k--;
   CFArray B= CFArray (k);
   n++;
   k= 0;
@@ -512,7 +586,7 @@ CanonicalForm patch (const CanonicalForm& F1, const CanonicalForm& F2,
 /// sparse heuristic lifting by Wang and Lucks
 ///
 /// @return @a LucksWangSparseHeuristic returns true if it was successful
-bool
+int
 LucksWangSparseHeuristic (const CanonicalForm& F,     ///<[in] polynomial to be
                                                       ///< factored
                           const CFList& factors,      ///<[in] factors of F
