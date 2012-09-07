@@ -2892,6 +2892,25 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        }
        else
   #endif
+
+  /*==== countedref: reference and shared ====*/
+       if (strcmp(sys_cmd, "shared") == 0)
+       {
+         void countedref_shared_load();
+         countedref_shared_load();
+         res->rtyp = NONE;
+         return FALSE;
+       }
+       else if (strcmp(sys_cmd, "reference") == 0)
+       {
+         void countedref_reference_load();
+         countedref_reference_load();
+         res->rtyp = NONE;
+         return FALSE;
+       }
+       else
+
+
   /*==================== DLL =================*/
   #ifdef ix86_Win
   #ifdef HAVE_DL
