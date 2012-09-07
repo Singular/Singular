@@ -25,21 +25,6 @@
 #include "newstruct.h"
 #include "ipshell.h"
 
-class CountedRefEnv {
-  typedef CountedRefEnv self;
-
-public:
-
-  static int& ref_id() {
-    static int g_ref_id = 0;
-    return g_ref_id;
-  }
-
-  static int& sh_id() {
-    static int g_sh_id = 0;
-    return g_sh_id;
-  }
-};
 
 /// Overloading ring destruction
 inline void CountedRefPtr_kill(ring r) { rKill(r); }
@@ -197,6 +182,12 @@ void* countedref_Init(blackbox*)
   return NULL;
 }
 
+/// We use the as a marker of refernce types.
+BOOLEAN countedref_CheckAssign(blackbox *b, leftv L, leftv R)
+{
+  return FALSE;
+}
+
 
 class CountedRef {
   typedef CountedRef self;
@@ -214,9 +205,8 @@ public:
   /// Check whether argument is already a reference type
   static BOOLEAN is_ref(leftv arg) {
     int typ = arg->Typ();
-    return ((typ==CountedRefEnv::ref_id())  ||(typ==CountedRefEnv::sh_id()) );
-    //    return ((typ > MAX_TOK) &&
-    //            (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
+    return ((typ > MAX_TOK) &&
+            (getBlackboxStuff(typ)->blackbox_CheckAssign == countedref_CheckAssign));
   }
 
   /// Reference given Singular data  
@@ -683,6 +673,7 @@ BOOLEAN countedref_deserialize(blackbox **b, void **d, si_link f)
 void countedref_init() 
 {
   blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
+  bbx->blackbox_CheckAssign = countedref_CheckAssign;
   bbx->blackbox_destroy = countedref_destroy;
   bbx->blackbox_String  = countedref_String;
   bbx->blackbox_Print  = countedref_Print;
@@ -696,19 +687,20 @@ void countedref_init()
   bbx->blackbox_serialize   = countedref_serialize;
   bbx->blackbox_deserialize = countedref_deserialize;
   bbx->data             = omAlloc0(newstruct_desc_size());
-  CountedRefEnv::ref_id()=setBlackboxStuff(bbx, "reference");
+  setBlackboxStuff(bbx, "reference");
 
   /// The @c shared type is "inherited" from @c reference.
   /// It just uses another constructor (to make its own copy of the).
   blackbox *bbxshared = 
     (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
+  bbxshared->blackbox_CheckAssign = countedref_CheckAssign;
   bbxshared->blackbox_Assign  = countedref_AssignShared;
   bbxshared->blackbox_destroy = countedref_destroyShared;
   bbxshared->blackbox_Op1     = countedref_Op1Shared;
   bbxshared->blackbox_Op2     = countedref_Op2Shared;
   bbxshared->blackbox_Init    = countedref_InitShared;
   bbxshared->data             = omAlloc0(newstruct_desc_size());
-  CountedRefEnv::sh_id()=setBlackboxStuff(bbxshared, "shared");
+  setBlackboxStuff(bbxshared, "shared");
 }
 
 #ifdef HAVE_DYNAMIC_COUNTEDREF
