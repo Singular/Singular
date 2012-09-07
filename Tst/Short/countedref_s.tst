@@ -3,8 +3,8 @@
 LIB "tst.lib";
 tst_init();
 
-
-
+system("reference");
+system("shared");
 
 
 

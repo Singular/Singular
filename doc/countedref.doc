@@ -2,7 +2,7 @@
 
 @c ----------------------------------------------------------------------------
 @node  countedref,,pyobject, Data types
-@section reference and shared
+@section reference and shared (experimental)
 @cindex reference
 @cindex shared
 @cindex blackbox
@@ -11,6 +11,10 @@ The black box data types @code{reference} and @code{shared} in @sc{Singular}
 allow for concurrently accessing  @sc{Singular} object data.
 Copying such object will only add an additional handle which allows you
 to define multiple identifers for the same object instance.
+
+Both experimental features are hidden by default, please activate them by
+typing @code{system("reference");} or @code{system("shared");}, respectively,
+at the @sc{Singular} prompt.
 
 You must initialize a @code{reference} using a named identifier
 or a subexpression of the latter. The resulting object can be stored to gain

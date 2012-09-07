@@ -670,7 +670,7 @@ BOOLEAN countedref_deserialize(blackbox **b, void **d, si_link f)
   return FALSE;
 }
 
-void countedref_init() 
+void countedref_reference_load()
 {
   blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
   bbx->blackbox_CheckAssign = countedref_CheckAssign;
@@ -688,11 +688,19 @@ void countedref_init()
   bbx->blackbox_deserialize = countedref_deserialize;
   bbx->data             = omAlloc0(newstruct_desc_size());
   setBlackboxStuff(bbx, "reference");
+}
 
-  /// The @c shared type is "inherited" from @c reference.
-  /// It just uses another constructor (to make its own copy of the).
-  blackbox *bbxshared = 
-    (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
+void countedref_shared_load()
+{
+  blackbox *bbxshared = (blackbox*)omAlloc0(sizeof(blackbox));
+  bbxshared->blackbox_String  = countedref_String;
+  bbxshared->blackbox_Print  = countedref_Print;
+  bbxshared->blackbox_Copy    = countedref_Copy;
+  bbxshared->blackbox_Op3     = countedref_Op3;
+  bbxshared->blackbox_OpM     = countedref_OpM;
+  bbxshared->blackbox_serialize   = countedref_serialize;
+  bbxshared->blackbox_deserialize = countedref_deserialize;
+
   bbxshared->blackbox_CheckAssign = countedref_CheckAssign;
   bbxshared->blackbox_Assign  = countedref_AssignShared;
   bbxshared->blackbox_destroy = countedref_destroyShared;
@@ -702,6 +710,7 @@ void countedref_init()
   bbxshared->data             = omAlloc0(newstruct_desc_size());
   setBlackboxStuff(bbxshared, "shared");
 }
+
 
 #ifdef HAVE_DYNAMIC_COUNTEDREF
 extern "C" { void mod_init() { countedref_init(); } }
