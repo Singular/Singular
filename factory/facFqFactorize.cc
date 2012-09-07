@@ -62,6 +62,8 @@ static inline
 CanonicalForm
 listGCD (const CFList& L)
 {
+  if (L.length() == 0)
+    return 0;
   if (L.length() == 1)
     return L.getFirst();
   if (L.length() == 2)
@@ -139,7 +141,7 @@ CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
   {
     while( degsf[i] == 0 ) i++;
     swap[n][0]= i;
-    swap[n][1]= degsf[i];
+    swap[n][1]= size (LC (F,i));
     if (i != n)
       result= swapvar (result, Variable (n), Variable(i));
     n++; i++;
@@ -152,7 +154,7 @@ CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
   {
     for (int j= 1; j < n - i + 1; j++)
     {
-      if (swap[j][1] < swap[j + 1][1])
+      if (swap[j][1] > swap[j + 1][1])
       {
         buf1= swap [j + 1] [0];
         buf2= swap [j + 1] [1];
@@ -702,6 +704,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   return result;
 }
 
+#define CHAR_THRESHOLD 8
 CFList
 evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
             CFList& list, const bool& GF, bool& fail)
@@ -712,16 +715,34 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
   FFRandom genFF;
   GFRandom genGF;
   int p= getCharacteristic ();
+  if (p < CHAR_THRESHOLD)
+  {
+    if (!GF && alpha.level() == 1)
+    {
+      fail= true;
+      return CFList();
+    }
+    else if (!GF && alpha.level() != 1)
+    {
+      if ((p == 2 && degree (getMipo (alpha)) < 6) ||
+          (p == 3 && degree (getMipo (alpha)) < 4) ||
+          (p == 5 && degree (getMipo (alpha)) < 3))
+      {
+        fail= true;
+        return CFList();
+      }
+    }
+  }
   double bound;
   if (alpha != x)
   {
     bound= pow ((double) p, (double) degree (getMipo(alpha)));
-    bound= pow ((double) bound, (double) k);
+    bound *= (double) k;
   }
   else if (GF)
   {
     bound= pow ((double) p, (double) getGFDegree());
-    bound= pow ((double) bound, (double) k);
+    bound *= (double) k;
   }
   else
     bound= pow ((double) p, (double) k);
@@ -1181,7 +1202,7 @@ gcdFreeBasis (CFFList& factors1, CFFList& factors2)
     for (j= factors2; (m < l && j.hasItem()); j++, m++)
     {
       g= gcd (i.getItem().factor(), j.getItem().factor());
-      if (degree (g) > 0)
+      if (degree (g,1) > 0)
       {
         j.getItem()= CFFactor (j.getItem().factor()/g, j.getItem().exp());
         i.getItem()= CFFactor (i.getItem().factor()/g, i.getItem().exp());
@@ -1219,7 +1240,7 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
       else
       {
         CFListIterator iter1= result;
-        for (CFListIterator iter2= differentSecondVarFactors[i]; iter2.hasItem();
+        for (CFListIterator iter2= differentSecondVarFactors[i];iter2.hasItem();
              iter2++, iter1++)
         {
           iter1.getItem() *= iter2.getItem();
@@ -1232,8 +1253,9 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
   }
 
   Variable v;
-  CFListIterator iter1;
+  CFListIterator iter1, iter2;
   CanonicalForm tmp, g;
+  CFList multiplier;
   for (int i= 0; i < length; i++)
   {
     if (differentSecondVarFactors[i].isEmpty())
@@ -1241,77 +1263,44 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
     iter1= l;
     iter1++;
 
-    v= Variable (i + 3);
-    for (CFListIterator iter2= differentSecondVarFactors[i]; iter2.hasItem();
+    tmp= 1;
+    for (iter2= differentSecondVarFactors[i]; iter2.hasItem();
          iter2++, iter1++)
     {
-      if (degree (iter2.getItem(),v) == degree (iter1.getItem(),v))
-        continue;
-      tmp= iter1.getItem();
-      for (int j= tmp.level(); j > 1; j--)
+      if (iter2.getItem().inCoeffDomain())
       {
-        if (j == i + 3)
-          continue;
-        tmp= tmp (0, j);
+        multiplier.append (1);
+        continue;
+      }
+      v= iter2.getItem().mvar();
+      if (degree (iter2.getItem()) == degree (iter1.getItem(),v))
+      {
+        multiplier.append (1);
+        continue;
       }
       g= gcd (iter2.getItem(), content);
-      if (degree (g) > 0)
+      if (!g.inCoeffDomain())
       {
-        if (!tmp.isZero())
-          iter2.getItem() /= tmp;
-        content /= g;
-        iter1.getItem() *= g;
+        tmp *= g;
+        multiplier.append (g);
       }
+      else
+        multiplier.append (1);
     }
+    if (!tmp.isOne() && fdivides (tmp, content))
+    {
+      iter1= l;
+      iter1++;
+      content /= tmp;
+      for (iter2= multiplier; iter2.hasItem(); iter1++, iter2++)
+        iter1.getItem() *= iter2.getItem();
+    }
+    multiplier= CFList();
   }
 
   l.removeFirst();
   l.insert (content);
   return l;
-}
-
-CFList evaluateAtZero (const CanonicalForm& F)
-{
-  CFList result;
-  CanonicalForm buf= F;
-  result.insert (buf);
-  for (int i= F.level(); i > 2; i--)
-  {
-    buf= buf (0, i);
-    result.insert (buf);
-  }
-  return result;
-}
-
-CFList evaluateAtEval (const CanonicalForm& F, const CFArray& eval)
-{
-  CFList result;
-  CanonicalForm buf= F;
-  result.insert (buf);
-  int k= eval.size();
-  for (int i= 1; i < k; i++)
-  {
-    buf= buf (eval[i], i + 2);
-    result.insert (buf);
-  }
-  return result;
-}
-
-CFList evaluateAtEval (const CanonicalForm& F, const CFList& evaluation, int l)
-{
-  CFList result;
-  CanonicalForm buf= F;
-  result.insert (buf);
-  int k= evaluation.length() + l - 1;
-  CFListIterator j= evaluation;
-  for (int i= k; j.hasItem() && i > l; i--, j++)
-  {
-    if (F.level() < i)
-      continue;
-    buf= buf (j.getItem(), i);
-    result.insert (buf);
-  }
-  return result;
 }
 
 int
@@ -1347,7 +1336,7 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
 
   CanonicalForm test= evalSqrfPartF.getFirst() (evalPoint[0], 2);
 
-  if (degree (test) != degree (sqrfPartF, 1))
+  if (degree (test) != degree (sqrfPartF, 1) || test.inCoeffDomain())
     return 0;
 
   CFFList sqrfFactors;
@@ -1431,8 +1420,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     return result;
   }
 
-  CFMap N;
-  CanonicalForm F= compress (LCF, N);
+  CFMap N, M;
+  CFArray dummy= CFArray (2);
+  dummy [0]= LCF;
+  dummy [1]= Variable (2);
+  compress (dummy, M, N);
+  CanonicalForm F= M (LCF);
   if (LCF.isUnivariate())
   {
     CFList result;
@@ -1469,23 +1462,36 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     if (found)
       result.insert (Lc (LCF));
     else
-      result.append (LCF);
+    {
+      for (CFListIterator i= result; i.hasItem(); i++)
+        i.getItem() *= LCF;
+      result.insert (LCF);
+    }
     return result;
   }
 
   CFList factors= LCFFactors;
 
-  CFMap dummy;
   for (CFListIterator i= factors; i.hasItem(); i++)
-    i.getItem()= compress (i.getItem(), dummy);
+    i.getItem()= M (i.getItem());
 
   CanonicalForm sqrfPartF;
   CFFList * bufSqrfFactors= new CFFList [factors.length()];
   CFList evalSqrfPartF, bufFactors;
   CFArray evalPoint= CFArray (evaluation.length() - 1);
+  CFArray buf= CFArray (evaluation.length());
+  CFArray swap= CFArray (evaluation.length());
   CFListIterator iter= evaluation;
-  for (int i= evaluation.length() - 2; i > -1; i--, iter++)
-    evalPoint[i]= iter.getItem();
+  CanonicalForm vars=getVars (LCF)*Variable (2);
+  for (int i= evaluation.length() +1; i > 1; i--, iter++)
+  {
+    buf[i-2]=iter.getItem();
+    if (degree (vars, i) > 0)
+      swap[M(Variable (i)).level()-1]=buf[i-2];
+  }
+  buf= swap;
+  for (int i= 0; i < evaluation.length() - 1; i++)
+    evalPoint[i]= buf[i+1];
 
   int pass= testFactors (F, factors, alpha, sqrfPartF,
                          bufFactors, bufSqrfFactors, evalSqrfPartF, evalPoint);
@@ -1497,17 +1503,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   {
     int lev= 0;
     // LCF is non-constant here
-    for (int i= 1; i <= LCF.level(); i++)
-    {
-      if(degree (LCF, i) > 0)
-      {
-        lev= i - 1;
-        break;
-      }
-    }
     CFList bufBufFactors;
-    CanonicalForm bufF, swap;
-    CFArray buf;
+    CanonicalForm bufF;
     for (int i= 0; i < lSecondVarLCs; i++)
     {
       if (!differentSecondVarLCs [i].isEmpty())
@@ -1519,6 +1516,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           {
             allConstant= false;
             y= Variable (iter.getItem().level());
+            lev= M(y).level();
           }
         }
         if (allConstant)
@@ -1528,25 +1526,16 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         for (iter= bufFactors; iter.hasItem(); iter++)
           iter.getItem()= swapvar (iter.getItem(), x, y);
         bufF= F;
-        z= Variable (y.level() - lev);
+        z= Variable (lev);
         bufF= swapvar (bufF, x, z);
         bufBufFactors= bufFactors;
         evalPoint= CFArray (evaluation.length() - 1);
-        buf= CFArray (evaluation.length());
-        iter= evaluation;
-        int k= evaluation.length() - 1;
-        for (; iter.hasItem(); iter++, k--)
-          buf[k]= iter.getItem();
-        swap= buf[z.level() - 1];
-        buf[z.level() - 1]= buf[0];
-        buf[0]= 0;
-        int l= 0;
-        for (k= 0; k < evaluation.length(); k++)
+        for (int k= 0; k < evaluation.length()-1; k++)
         {
-          if (buf[k].isZero())
-            continue;
-          evalPoint[l]= buf[k];
-          l++;
+          if (N (Variable (k+1)).level() != y.level())
+            evalPoint[k]= buf[k+1];
+          else
+            evalPoint[k]= buf[0];
         }
         pass= testFactors (bufF, bufBufFactors, alpha, sqrfPartF, bufFactors,
                            bufSqrfFactors, evalSqrfPartF, evalPoint);
@@ -1565,8 +1554,17 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         {
           CFList result;
           result.append (LCF);
-          for (int k= 1; k <= factors.length(); k++)
-            result.append (LCF);
+          for (int j= 1; j <= factors.length(); j++)
+            result.append (1);
+          result= distributeContent (result, differentSecondVarLCs, lSecondVarLCs);
+          if (!result.getFirst().inCoeffDomain())
+          {
+            CFListIterator iter= result;
+            CanonicalForm tmp= iter.getItem();
+            iter++;
+            for (; iter.hasItem(); iter++)
+              iter.getItem() *= tmp;
+          }
           y= Variable (1);
           delete [] bufSqrfFactors;
           return result;
@@ -1578,8 +1576,17 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   {
     CFList result;
     result.append (LCF);
-    for (int k= 1; k <= factors.length(); k++)
-      result.append (LCF);
+    for (int j= 1; j <= factors.length(); j++)
+      result.append (1);
+    result= distributeContent (result, differentSecondVarLCs, lSecondVarLCs);
+    if (!result.getFirst().inCoeffDomain())
+    {
+      CFListIterator iter= result;
+      CanonicalForm tmp= iter.getItem();
+      iter++;
+      for (; iter.hasItem(); iter++)
+        iter.getItem() *= tmp;
+    }
     y= Variable (1);
     delete [] bufSqrfFactors;
     return result;
@@ -1588,30 +1595,23 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     factors= bufFactors;
 
   bufFactors= factors;
+
+  CFMap MM, NN;
+  dummy [0]= sqrfPartF;
+  dummy [1]= 1;
+  compress (dummy, MM, NN);
+  sqrfPartF= MM (sqrfPartF);
+  CanonicalForm varsSqrfPartF= getVars (sqrfPartF);
+  for (CFListIterator iter= factors; iter.hasItem(); iter++)
+    iter.getItem()= MM (iter.getItem());
+
   CFList evaluation2;
-  if (y == x)
-    evaluation2= evaluation;
-  else
-  {
-    CanonicalForm tmp;
-    evaluation2= evaluation;
-    int i= evaluation.length() + 1;
-    for (CFListIterator iter= evaluation2; iter.hasItem(); iter++, i--)
-    {
-      if (i == y.level())
-      {
-        tmp= iter.getItem();
-        iter.getItem()= evaluation2.getLast();
-        evaluation2.removeLast();
-        evaluation2.append (tmp);
-        break;
-      }
-    }
-  }
+  for (int i= 2; i <= varsSqrfPartF.level(); i++)
+    evaluation2.insert (evalPoint[NN (Variable (i)).level()-2]);
 
   CFList interMedResult;
   CanonicalForm oldSqrfPartF= sqrfPartF;
-  sqrfPartF= shift2Zero (sqrfPartF, evalSqrfPartF, evaluation2, 1);
+  sqrfPartF= shift2Zero (sqrfPartF, evalSqrfPartF, evaluation2);
   if (factors.length() > 1)
   {
     CanonicalForm LC1= LC (oldSqrfPartF, 1);
@@ -1619,18 +1619,19 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     for (int i= 0; i < factors.length(); i++)
       leadingCoeffs.append (LC1);
 
-    CFList LC1eval= evaluateAtEval (LC1, evaluation2, 1);
+    CFList LC1eval= evaluateAtEval (LC1, evaluation2, 2);
     CFList oldFactors= factors;
     for (CFListIterator i= oldFactors; i.hasItem(); i++)
       i.getItem() *= LC1eval.getFirst()/Lc (i.getItem());
 
     bool success= false;
     CanonicalForm oldSqrfPartFPowLC= oldSqrfPartF*power(LC1,factors.length()-1);
+    CFList heuResult;
     if (size (oldSqrfPartFPowLC)/getNumVars (oldSqrfPartFPowLC) < 500 &&
         LucksWangSparseHeuristic (oldSqrfPartFPowLC,
-                                  oldFactors, 1, leadingCoeffs, factors))
+                                  oldFactors, 2, leadingCoeffs, heuResult))
     {
-      interMedResult= recoverFactors (oldSqrfPartF, factors);
+      interMedResult= recoverFactors (oldSqrfPartF, heuResult);
       if (oldFactors.length() == interMedResult.length())
         success= true;
     }
@@ -1643,10 +1644,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         leadingCoeffs[i]= LC1;
 
       for (CFListIterator i= factors; i.hasItem(); i++)
-      {
-        i.getItem()= i.getItem() (x + evaluation2.getLast(), x);
         i.getItem() *= LC1 (0,2)/Lc (i.getItem());
-      }
       factors.insert (1);
 
       CanonicalForm
@@ -1690,18 +1688,22 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         delete [] liftBounds;
       }
       for (CFListIterator iter= factors; iter.hasItem(); iter++)
-        iter.getItem()= reverseShift (iter.getItem(), evaluation2, 1);
+        iter.getItem()= reverseShift (iter.getItem(), evaluation2);
 
       interMedResult=
-      recoverFactors (reverseShift(evalSqrfPartF.getLast(),evaluation2,1),
+      recoverFactors (reverseShift(evalSqrfPartF.getLast(),evaluation2),
                       factors);
     }
   }
   else
   {
-    factors= CFList (oldSqrfPartF);
+    CanonicalForm contF=content (oldSqrfPartF,1);
+    factors= CFList (oldSqrfPartF/contF);
     interMedResult= recoverFactors (oldSqrfPartF, factors);
   }
+
+  for (CFListIterator iter= interMedResult; iter.hasItem(); iter++)
+    iter.getItem()= NN (iter.getItem());
 
   CFList result;
   CFFListIterator k;
@@ -1771,13 +1773,17 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
   CanonicalForm tmp;
   CFList tmp2;
   CFListIterator iter;
+  bool preserveDegree= true;
+  Variable x= Variable (1);
+  int j, degAi, degA1= degree (A,1);
   for (int i= A.level(); i > 2; i--)
   {
     tmp= A;
     tmp2= CFList();
     iter= evaluation;
-    bool preserveDegree= true;
-    for (int j= A.level(); j > 1; j--, iter++)
+    preserveDegree= true;
+    degAi= degree (A,i);
+    for (j= A.level(); j > 1; j--, iter++)
     {
       if (j == i)
         continue;
@@ -1785,19 +1791,18 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
       {
         tmp= tmp (iter.getItem(), j);
         tmp2.insert (tmp);
-        if ((degree (tmp, i) != degree (A, i)) ||
-            (degree (tmp, 1) != degree (A, 1)))
-        {
-          preserveDegree= false;
-          break;
-        }
-        if (!content(tmp).inCoeffDomain() || !content(tmp,1).inCoeffDomain())
+        if ((degree (tmp, i) != degAi) ||
+            (degree (tmp, 1) != degA1))
         {
           preserveDegree= false;
           break;
         }
       }
     }
+    if (!content(tmp,1).inCoeffDomain())
+      preserveDegree= false;
+    if (!(gcd (deriv (tmp,x), tmp)).inCoeffDomain())
+      preserveDegree= false;
     if (preserveDegree)
       Aeval [i - 3]= tmp2;
     else
@@ -1834,9 +1839,9 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
   TT= copy (factors1);
   while (T.length() >= 2*s && s <= thres)
   {
-    while (nosubset == false) 
+    while (nosubset == false)
     {
-      if (T.length() == s) 
+      if (T.length() == s)
       {
         delete [] v;
         result.append (prod (T));
@@ -1916,7 +1921,35 @@ factorizationWRTDifferentSecondVars (const CanonicalForm& A, CFList*& Aeval,
   }
 }
 
+CFList conv (const CFArray & A)
+{
+  CFList result;
+  for (int i= A.max(); i >= A.min(); i--)
+    result.insert (A[i]);
+  return result;
+}
+
+
 void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
+                       const CFList& uniFactors, const CFList& evaluation
+                      )
+{
+  CFListIterator iter;
+  CFList LCs;
+  for (int j= 0; j < A.level() - 2; j++)
+  {
+    if (!Aeval[j].isEmpty())
+    {
+      LCs= CFList();
+      for (iter= Aeval[j]; iter.hasItem(); iter++)
+        LCs.append (LC (iter.getItem(), 1));
+      //normalize (LCs);
+      Aeval[j]= LCs;
+    }
+  }
+}
+
+void sortByUniFactors (CFList*& Aeval, int AevalLength,
                        const CFList& uniFactors, const CFList& evaluation
                       )
 {
@@ -1924,13 +1957,14 @@ void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
   int i;
   CFListIterator iter, iter2;
   Variable v;
-  CFList l, LCs, buf;
-  int pos;
-  for (int j= 0; j < A.level() - 2; j++)
+  CFList LCs, buf;
+  CFArray l;
+  int pos, index;
+  for (int j= 0; j < AevalLength; j++)
   {
     if (!Aeval[j].isEmpty())
     {
-      i= A.level();
+      i= evaluation.length() + 1;
       for (iter= evaluation; iter.hasItem(); iter++, i--)
       {
         if (i == Aeval[j].getFirst().level())
@@ -1946,21 +1980,19 @@ void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
                                  Aeval[j].length() - uniFactors.length() + 1,
                                  evalPoint, v);
 
-      l= CFList();
       buf= buildUniFactors (Aeval[j], evalPoint, v);
-      for (iter= uniFactors; iter.hasItem(); iter++)
+      l= CFArray (uniFactors.length());
+      index= 1;
+      for (iter= buf; iter.hasItem(); iter++, index++)
       {
-        pos= findItem (buf, iter.getItem());
+        pos= findItem (uniFactors, iter.getItem());
         if (pos)
-          l.append (getItem (Aeval[j], pos));
+          l[pos-1]= getItem (Aeval[j], index);
       }
-      Aeval [j]= l;
+      buf= conv (l);
+      Aeval [j]= buf;
 
-      LCs= CFList();
-      for (iter= Aeval[j]; iter.hasItem(); iter++)
-        LCs.append (LC (iter.getItem(), 1));
-      normalize (LCs);
-      Aeval[j]= LCs;
+      buf= buildUniFactors (Aeval[j], evalPoint, v);
     }
   }
 }
@@ -2042,42 +2074,6 @@ void prepareLeadingCoeffs (CFList*& LCs, int n, const CFList& leadingCoeffs,
     for (j= LCs [i]; j.hasItem(); j++, ii++)
       j.getItem() *= ii.getItem();
   }
-}
-
-CFList recoverFactors (const CanonicalForm& F, const CFList& factors)
-{
-  CFList result;
-  CanonicalForm tmp, tmp2;
-  CanonicalForm G= F;
-  for (CFListIterator i= factors; i.hasItem(); i++)
-  {
-    tmp= i.getItem()/content (i.getItem(), 1);
-    if (fdivides (tmp, G, tmp2))
-    {
-      G= tmp2;
-      result.append (tmp);
-    }
-  }
-  return result;
-}
-
-CFList recoverFactors (const CanonicalForm& F, const CFList& factors,
-                       const CFList& evaluation)
-{
-  CFList result;
-  CanonicalForm tmp, tmp2;
-  CanonicalForm G= F;
-  for (CFListIterator i= factors; i.hasItem(); i++)
-  {
-    tmp= reverseShift (i.getItem(), evaluation);
-    tmp /= content (tmp, 1);
-    if (fdivides (tmp, G, tmp2))
-    {
-      G= tmp2;
-      result.append (tmp);
-    }
-  }
-  return result;
 }
 
 CFList
@@ -2265,7 +2261,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
     }
     decompress (contentAFactors, N);
-    normalize (contentAFactors);
+    if (!extension)
+      normalize (contentAFactors);
     return contentAFactors;
   }
 
@@ -2314,7 +2311,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         Union (multiFactorize (g, info),
                multiFactorize (gcdDerivZ, info));
         appendSwapDecompress (factorsG, contentAFactors, N, swapLevel, x);
-        normalize (factorsG);
+        if (!extension)
+          normalize (factorsG);
         return factorsG;
       }
       else
@@ -2334,14 +2332,14 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   CanonicalForm bivarEval;
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
-  int lift, bufLift;
+  int lift, bufLift, lengthAeval2= A.level()-2;
   double logarithm= (double) ilog2 (totaldegree (A));
   logarithm /= log2exp;
   logarithm= ceil (logarithm);
   if (factorNums < (int) logarithm)
     factorNums= (int) logarithm;
-  CFList* bufAeval2= new CFList [A.level() - 2];
-  CFList* Aeval2= new CFList [A.level() - 2];
+  CFList* bufAeval2= new CFList [lengthAeval2];
+  CFList* Aeval2= new CFList [lengthAeval2];
   int counter;
   int differentSecondVar= 0;
   // several bivariate factorizations
@@ -2380,7 +2378,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           Union (multiFactorize (g, info),
                  multiFactorize (A/g, info));
           appendSwapDecompress (factorsG, contentAFactors, N, swapLevel, x);
-          normalize (factorsG);
+          if (!extension)
+            normalize (factorsG);
           delete [] bufAeval2;
           delete [] Aeval2;
           return factorsG;
@@ -2398,7 +2397,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
 
-    for (int j= 0; j < A.level() - 2; j++)
+    for (int j= 0; j < lengthAeval2; j++)
     {
       if (!bufAeval2[j].isEmpty())
         counter++;
@@ -2427,7 +2426,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       factors.append (A);
       appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                             swapLevel2, x);
-      normalize (factors);
+      if (!extension)
+        normalize (factors);
       delete [] bufAeval2;
       delete [] Aeval2;
       return factors;
@@ -2439,7 +2439,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       evaluation= bufEvaluation;
       biFactors= bufBiFactors;
       lift= bufLift;
-      for (int j= 0; j < A.level() - 2; j++)
+      for (int j= 0; j < lengthAeval2; j++)
         Aeval2 [j]= bufAeval2 [j];
       differentSecondVar= counter;
     }
@@ -2453,7 +2453,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         evaluation= bufEvaluation;
         biFactors= bufBiFactors;
         lift= bufLift;
-        for (int j= 0; j < A.level() - 2; j++)
+        for (int j= 0; j < lengthAeval2; j++)
           Aeval2 [j]= bufAeval2 [j];
         differentSecondVar= counter;
       }
@@ -2470,7 +2470,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   int minFactorsLength;
   bool irred= false;
-  factorizationWRTDifferentSecondVars (A, Aeval2, info, minFactorsLength, irred);
+  factorizationWRTDifferentSecondVars (A, Aeval2, info, minFactorsLength,irred);
 
   if (irred)
   {
@@ -2482,7 +2482,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     factors.append (A);
     appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                           swapLevel2, x);
-    normalize (factors);
+    if (!extension)
+      normalize (factors);
     delete [] Aeval2;
     return factors;
   }
@@ -2493,7 +2494,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
   minFactorsLength= tmin (minFactorsLength, biFactors.length());
 
-  if (differentSecondVar == A.level() - 2)
+  if (differentSecondVar == lengthAeval2)
   {
     bool zeroOccured= false;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++)
@@ -2506,7 +2507,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     if (!zeroOccured)
     {
-      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation, minFactorsLength);
+      factors= sparseHeuristic (A, biFactors, Aeval2, evaluation,
+                                minFactorsLength);
       if (factors.length() == biFactors.length())
       {
         if (extension)
@@ -2514,7 +2516,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
         appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                               swapLevel2, x);
-        normalize (factors);
+        if (!extension)
+          normalize (factors);
         delete [] Aeval2;
         return factors;
       }
@@ -2526,8 +2529,10 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
 
-  CFList * oldAeval= new CFList [A.level() - 2]; //TODO use bufAeval2 for this
-  for (int i= 0; i < A.level() - 2; i++)
+  sortByUniFactors (Aeval2, lengthAeval2, uniFactors, evaluation);
+
+  CFList * oldAeval= new CFList [lengthAeval2]; //TODO use bufAeval2 for this
+  for (int i= 0; i < lengthAeval2; i++)
     oldAeval[i]= Aeval2[i];
 
   getLeadingCoeffs (A, Aeval2, uniFactors, evaluation);
@@ -2538,22 +2543,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   Variable v;
   CFList leadingCoeffs= precomputeLeadingCoeff (LC (A, 1), biFactorsLCs, alpha,
-                                          evaluation, Aeval2, A.level() - 2, v);
+                                          evaluation, Aeval2, lengthAeval2, v);
 
   if (v.level() != 1)
   {
     A= swapvar (A, y, v);
-    for (int i= 0; i < A.level() - 2; i++)
-    {
-      if (oldAeval[i].isEmpty())
-        continue;
-      if (oldAeval[i].getFirst().level() == v.level())
-      {
-        biFactors= CFList();
-        for (CFListIterator iter= oldAeval [i]; iter.hasItem(); iter++)
-          biFactors.append (swapvar (iter.getItem(), v, y));
-      }
-    }
     int i= A.level();
     CanonicalForm evalPoint;
     for (CFListIterator iter= evaluation; iter.hasItem(); iter++, i--)
@@ -2565,6 +2559,31 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         evaluation.removeLast();
         evaluation.append (evalPoint);
         break;
+      }
+    }
+    for (i= 0; i < lengthAeval2; i++)
+    {
+      if (oldAeval[i].isEmpty())
+        continue;
+      if (oldAeval[i].getFirst().level() == v.level())
+      {
+        CFArray tmp= copy (oldAeval[i]);
+        oldAeval[i]= biFactors;
+        for (CFListIterator iter= oldAeval[i]; iter.hasItem(); iter++)
+          iter.getItem()= swapvar (iter.getItem(), v, y);
+        for (int ii= 0; ii < tmp.size(); ii++)
+          tmp[ii]= swapvar (tmp[ii], v, y);
+        CFArray tmp2= CFArray (tmp.size());
+        CanonicalForm buf;
+        for (int ii= 0; ii < tmp.size(); ii++)
+        {
+          buf= tmp[ii] (evaluation.getLast(),y);
+          buf /= Lc (buf);
+          tmp2[findItem (uniFactors, buf)-1]=tmp[ii];
+        }
+        biFactors= CFList();
+        for (int j= 0; j < tmp2.size(); j++)
+          biFactors.append (tmp2[j]);
       }
     }
   }
@@ -2590,64 +2609,569 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
   }
 
+  CanonicalForm LCmultiplier= leadingCoeffs.getFirst();
+  bool LCmultiplierIsConst= LCmultiplier.inCoeffDomain();
   leadingCoeffs.removeFirst();
 
   //prepare leading coefficients
-  CFList* leadingCoeffs2= new CFList [A.level() - 2];
+  CFList* leadingCoeffs2= new CFList [lengthAeval2];
   prepareLeadingCoeffs (leadingCoeffs2, A.level(), leadingCoeffs, biFactors,
                         evaluation);
 
   Aeval= evaluateAtEval (A, evaluation, 2);
-  CanonicalForm hh= Lc (Aeval.getFirst());
+  CanonicalForm hh= 1/Lc (Aeval.getFirst());
   for (iter= Aeval; iter.hasItem(); iter++)
-    iter.getItem() /= hh;
+    iter.getItem() *= hh;
 
-  A /= hh;
+  A *= hh;
 
-  if (size (A)/getNumVars (A) < 500 && 
-      LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2 [A.level() - 3],
-                                factors))
+
+  CFListIterator iter2;
+  CFList bufLeadingCoeffs2= leadingCoeffs2[lengthAeval2-1];
+  bufBiFactors= biFactors;
+  bufA= A;
+  CanonicalForm bufLCmultiplier= LCmultiplier;
+  CanonicalForm testVars;
+  if (!LCmultiplierIsConst)
   {
-    int check= factors.length();
-    factors= recoverFactors (A, factors);
+    testVars= Variable (2);
+    for (int i= 0; i < lengthAeval2; i++)
+    {
+      if (!oldAeval[i].isEmpty())
+        testVars *= oldAeval[i].getFirst().mvar();
+    }
+  }
+  CFList bufFactors= CFList();
+  bool LCheuristic= false;
+  if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2[lengthAeval2-1],
+                                 factors))
+  {
+    int check= biFactors.length();
+    int * index= new int [factors.length()];
+    CFList oldFactors= factors;
+    factors= recoverFactors (A, factors, index);
 
     if (check == factors.length())
     {
       if (extension)
-        factors= extNonMonicFactorRecombination (factors, A, info);
+        factors= extNonMonicFactorRecombination (factors, bufA, info);
 
       if (v.level() != 1)
       {
-        for (CFListIterator iter= factors; iter.hasItem(); iter++)
+        for (iter= factors; iter.hasItem(); iter++)
           iter.getItem()= swapvar (iter.getItem(), v, y);
       }
+
       appendSwapDecompress (factors, contentAFactors, N, swapLevel,
                             swapLevel2, x);
-      normalize (factors);
+      if (!extension)
+        normalize (factors);
+      delete [] index;
       delete [] Aeval2;
       return factors;
     }
+    else if (factors.length() > 0)
+    {
+      int oneCount= 0;
+      CFList l;
+      for (int i= 0; i < check; i++)
+      {
+        if (index[i] == 1)
+        {
+          iter=biFactors;
+          for (int j=1; j <= i-oneCount; j++)
+            iter++;
+          iter.remove (1);
+          for (int j= 0; j < lengthAeval2; j++)
+          {
+            l= leadingCoeffs2[j];
+            iter= l;
+            for (int k=1; k <= i-oneCount; k++)
+              iter++;
+            iter.remove (1);
+            leadingCoeffs2[j]=l;
+          }
+          oneCount++;
+        }
+      }
+      bufFactors= factors;
+      factors= CFList();
+    }
+    else if (!LCmultiplierIsConst && factors.length() == 0)
+    {
+      LCheuristic= true;
+      factors= oldFactors;
+      CanonicalForm cont;
+      CFList contents, LCs;
+      int index=1;
+      bool foundTrueMultiplier= false;
+      for (iter= factors; iter.hasItem(); iter++, index++)
+      {
+        cont= content (iter.getItem(), 1);
+        cont= gcd (cont , LCmultiplier);
+        contents.append (cont);
+        if (cont.inCoeffDomain()) // trivial content->LCmultiplier needs to go there
+        {
+          foundTrueMultiplier= true;
+          int index2= 1;
+          for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem(); iter2++,
+                                                                    index2++)
+          {
+            if (index2 == index)
+              continue;
+            iter2.getItem() /= LCmultiplier;
+          }
+          A= oldA;
+          leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
+          for (int i= lengthAeval2-1; i > -1; i--)
+            leadingCoeffs2[i]= CFList();
+          prepareLeadingCoeffs (leadingCoeffs2, A.level(), leadingCoeffs,
+                                biFactors, evaluation );
+          Aeval= evaluateAtEval (A, evaluation, 2);
+
+          hh= 1/Lc (Aeval.getFirst());
+
+          for (iter2= Aeval; iter2.hasItem(); iter2++)
+            iter2.getItem() *= hh;
+
+          A *= hh;
+          break;
+        }
+        else
+          LCs.append (LC (iter.getItem()/cont, 1));
+      }
+      if (!foundTrueMultiplier)
+      {
+        index= 1;
+        iter2= factors;
+        bool foundMultiplier= false;
+        for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
+        {
+          if (fdivides (iter.getItem(), LCmultiplier))
+          {
+            if ((LCmultiplier/iter.getItem()).inCoeffDomain() &&
+                !isOnlyLeadingCoeff(iter2.getItem())) //content divides LCmultiplier completely and factor consists of more terms than just the leading coeff
+            {
+              int index2= 1;
+              for (CFListIterator iter3= leadingCoeffs2[lengthAeval2-1];
+                   iter3.hasItem(); iter3++, index2++)
+              {
+                if (index2 == index)
+                {
+                  iter3.getItem() /= LCmultiplier;
+                  break;
+                }
+              }
+              A /= LCmultiplier;
+              foundMultiplier= true;
+              iter.getItem()= 1;
+            }
+          }
+        }
+        // coming from above: divide out more LCmultiplier if possible
+        if (foundMultiplier)
+        {
+          foundMultiplier= false;
+          index=1;
+          iter2= factors;
+          for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
+          {
+            if (!iter.getItem().isOne() &&
+                fdivides (iter.getItem(), LCmultiplier))
+            {
+              if (!isOnlyLeadingCoeff (iter2.getItem())) // factor is more than just leading coeff
+              {
+                int index2= 1;
+                for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
+                     iter2++, index2++)
+                {
+                  if (index2 == index)
+                  {
+                    iter2.getItem() /= iter.getItem();
+                    foundMultiplier= true;
+                    break;
+                  }
+                }
+                A /= iter.getItem();
+                LCmultiplier /= iter.getItem();
+                iter.getItem()= 1;
+              }
+              else if (fdivides (getVars (LCmultiplier), testVars))//factor consists of just leading coeff
+              {
+                //TODO maybe use a sqrffree decomposition of LCmultiplier as below
+                Variable xx= Variable (2);
+                CanonicalForm vars;
+                vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
+                                          xx));
+                for (int i= 0; i < lengthAeval2; i++)
+                {
+                  if (oldAeval[i].isEmpty())
+                    continue;
+                  xx= oldAeval[i].getFirst().mvar();
+                  vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
+                                             xx));
+                }
+                if (myGetVars(content(getItem(leadingCoeffs2[lengthAeval2-1],index),1))
+                    /myGetVars (LCmultiplier) == vars)
+                {
+                  int index2= 1;
+                  for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
+                       iter2++, index2++)
+                  {
+                    if (index2 == index)
+                    {
+                      iter2.getItem() /= LCmultiplier;
+                      foundMultiplier= true;
+                      break;
+                    }
+                  }
+                  A /= LCmultiplier;
+                  iter.getItem()= 1;
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+          CanonicalForm pLCs= prod (LCs);
+          if (fdivides (pLCs, LC (oldA,1)) && (LC(oldA,1)/pLCs).inCoeffDomain()) // check if the product of the lead coeffs of the primitive factors equals the lead coeff of the old A
+          {
+            A= oldA;
+            iter2= leadingCoeffs2[lengthAeval2-1];
+            for (iter= contents; iter.hasItem(); iter++, iter2++)
+              iter2.getItem() /= iter.getItem();
+            foundMultiplier= true;
+          }
+          if (!foundMultiplier && fdivides (getVars (LCmultiplier), testVars))
+          {
+            Variable xx;
+            CFList vars1;
+            CFFList sqrfMultiplier= sqrFree (LCmultiplier);
+            if (sqrfMultiplier.getFirst().factor().inCoeffDomain())
+              sqrfMultiplier.removeFirst();
+            sqrfMultiplier= sortCFFListByNumOfVars (sqrfMultiplier);
+            xx= Variable (2);
+            for (iter= oldBiFactors; iter.hasItem(); iter++)
+              vars1.append (power (xx, degree (LC (iter.getItem(),1), xx)));
+            for (int i= 0; i < lengthAeval2; i++)
+            {
+              if (oldAeval[i].isEmpty())
+                continue;
+              xx= oldAeval[i].getFirst().mvar();
+              iter2= vars1;
+              for (iter= oldAeval[i]; iter.hasItem(); iter++, iter2++)
+                iter2.getItem() *= power(xx,degree (LC (iter.getItem(),1), xx));
+            }
+            CanonicalForm tmp;
+            iter2= vars1;
+            for (iter= leadingCoeffs2[lengthAeval2-1]; iter.hasItem(); iter++,
+                                                                    iter2++)
+            {
+              tmp= iter.getItem()/LCmultiplier;
+              for (int i=1; i <= tmp.level(); i++)
+              {
+                if (degree(tmp,i) > 0 &&
+                    (degree(iter2.getItem(),i) > degree (tmp,i)))
+                  iter2.getItem() /= power (Variable (i), degree (tmp,i));
+              }
+            }
+            int multi;
+            for (CFFListIterator ii= sqrfMultiplier; ii.hasItem(); ii++)
+            {
+              multi= 0;
+              for (iter= vars1; iter.hasItem(); iter++)
+              {
+                tmp= iter.getItem();
+                while (fdivides (myGetVars (ii.getItem().factor()), tmp))
+                {
+                  multi++;
+                  tmp /= myGetVars (ii.getItem().factor());
+                }
+              }
+              if (multi == ii.getItem().exp())
+              {
+                index= 1;
+                for (iter= vars1; iter.hasItem(); iter++, index++)
+                {
+                  while (fdivides (myGetVars(ii.getItem().factor()),
+                                   iter.getItem()
+                                  )
+                        )
+                  {
+                    int index2= 1;
+                    for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
+                         iter2++, index2++)
+                    {
+                      if (index2 == index)
+                        continue;
+                      else
+                      {
+                        tmp= ii.getItem().factor();
+                        iter2.getItem() /= tmp;
+                        CFListIterator iter3= evaluation;
+                        for (int jj= A.level(); jj > 2; jj--, iter3++)
+                          tmp= tmp (iter3.getItem(), jj);
+                        if (!tmp.inCoeffDomain())
+                        {
+                          int index3= 1;
+                          for (iter3= biFactors; iter3.hasItem(); iter3++,
+                                                                  index3++)
+                          {
+                            if (index3 == index2)
+                            {
+                              iter3.getItem() /= tmp;
+                              iter3.getItem() /= Lc (iter3.getItem());
+                              break;
+                            }
+                          }
+                        }
+                        A /= ii.getItem().factor();
+                      }
+                    }
+                    iter.getItem() /= getVars (ii.getItem().factor());
+                  }
+                }
+              }
+              else
+              {
+                index= 1;
+                for (iter= vars1; iter.hasItem(); iter++, index++)
+                {
+                  if (!fdivides (myGetVars (ii.getItem().factor()),
+                                 iter.getItem()
+                                )
+                     )
+                  {
+                    int index2= 1;
+                    for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();
+                         iter2++, index2++)
+                    {
+                      if (index2 == index)
+                      {
+                        tmp= power (ii.getItem().factor(), ii.getItem().exp());
+                        iter2.getItem() /= tmp;
+                        A /= tmp;
+                        CFListIterator iter3= evaluation;
+                        for (int jj= A.level(); jj > 2; jj--, iter3++)
+                          tmp= tmp (iter3.getItem(), jj);
+                        if (!tmp.inCoeffDomain())
+                        {
+                          int index3= 1;
+                          for (iter3= biFactors; iter3.hasItem(); iter3++,
+                                                                  index3++)
+                          {
+                            if (index3 == index2)
+                            {
+                              iter3.getItem() /= tmp;
+                              iter3.getItem() /= Lc (iter3.getItem());
+                              break;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // patch everything together again
+        leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
+        for (int i= lengthAeval2-1; i > -1; i--)
+          leadingCoeffs2[i]= CFList();
+        prepareLeadingCoeffs (leadingCoeffs2,A.level(),leadingCoeffs, biFactors,
+                              evaluation);
+        Aeval= evaluateAtEval (A, evaluation, 2);
+
+        hh= 1/Lc (Aeval.getFirst());
+
+        for (CFListIterator i= Aeval; i.hasItem(); i++)
+          i.getItem() *= hh;
+
+        A *= hh;
+      }
+      factors= CFList();
+      if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
+      {
+        LCheuristic= false;
+        A= bufA;
+        biFactors= bufBiFactors;
+        leadingCoeffs2[lengthAeval2-1]= bufLeadingCoeffs2;
+        LCmultiplier= bufLCmultiplier;
+      }
+    }
     else
       factors= CFList();
-    //TODO handle this case
+    delete [] index;
   }
 
+  if (!LCheuristic && !LCmultiplierIsConst && bufFactors.isEmpty()
+      && fdivides (getVars (LCmultiplier), testVars))
+  {
+    LCheuristic= true;
+    int index;
+    Variable xx;
+    CFList vars1;
+    CFFList sqrfMultiplier= sqrFree (LCmultiplier);
+    if (sqrfMultiplier.getFirst().factor().inCoeffDomain())
+      sqrfMultiplier.removeFirst();
+    sqrfMultiplier= sortCFFListByNumOfVars (sqrfMultiplier);
+    xx= Variable (2);
+    for (iter= oldBiFactors; iter.hasItem(); iter++)
+      vars1.append (power (xx, degree (LC (iter.getItem(),1), xx)));
+    for (int i= 0; i < lengthAeval2; i++)
+    {
+      if (oldAeval[i].isEmpty())
+        continue;
+      xx= oldAeval[i].getFirst().mvar();
+      iter2= vars1;
+      for (iter= oldAeval[i]; iter.hasItem(); iter++, iter2++)
+        iter2.getItem() *= power (xx, degree (LC (iter.getItem(),1), xx));
+    }
+    CanonicalForm tmp;
+    iter2= vars1;
+    for (iter= leadingCoeffs2[lengthAeval2-1]; iter.hasItem(); iter++, iter2++)
+    {
+      tmp= iter.getItem()/LCmultiplier;
+      for (int i=1; i <= tmp.level(); i++)
+      {
+        if (degree (tmp,i) > 0 && (degree (iter2.getItem(),i) > degree (tmp,i)))
+          iter2.getItem() /= power (Variable (i), degree (tmp,i));
+      }
+    }
+    int multi;
+    for (CFFListIterator ii= sqrfMultiplier; ii.hasItem(); ii++)
+    {
+      multi= 0;
+      for (iter= vars1; iter.hasItem(); iter++)
+      {
+        tmp= iter.getItem();
+        while (fdivides (myGetVars (ii.getItem().factor()), tmp))
+        {
+          multi++;
+          tmp /= myGetVars (ii.getItem().factor());
+        }
+      }
+      if (multi == ii.getItem().exp())
+      {
+        index= 1;
+        for (iter= vars1; iter.hasItem(); iter++, index++)
+        {
+          while (fdivides (myGetVars (ii.getItem().factor()), iter.getItem()))
+          {
+            int index2= 1;
+            for (iter2= leadingCoeffs2[lengthAeval2-1]; iter2.hasItem();iter2++,
+                                                                      index2++)
+            {
+              if (index2 == index)
+                continue;
+              else
+              {
+                tmp= ii.getItem().factor();
+                iter2.getItem() /= tmp;
+                CFListIterator iter3= evaluation;
+                for (int jj= A.level(); jj > 2; jj--, iter3++)
+                  tmp= tmp (iter3.getItem(), jj);
+                if (!tmp.inCoeffDomain())
+                {
+                  int index3= 1;
+                  for (iter3= biFactors; iter3.hasItem(); iter3++, index3++)
+                  {
+                    if (index3 == index2)
+                    {
+                      iter3.getItem() /= tmp;
+                      iter3.getItem() /= Lc (iter3.getItem());
+                      break;
+                    }
+                  }
+                }
+                A /= ii.getItem().factor();
+              }
+            }
+            iter.getItem() /= getVars (ii.getItem().factor());
+          }
+        }
+      }
+      else
+      {
+        index= 1;
+        for (iter= vars1; iter.hasItem(); iter++, index++)
+        {
+          if (!fdivides (myGetVars (ii.getItem().factor()), iter.getItem()))
+          {
+            int index2= 1;
+            for (iter2= leadingCoeffs2[lengthAeval2-1];iter2.hasItem();iter2++,
+                                                                      index2++)
+            {
+              if (index2 == index)
+              {
+                tmp= power (ii.getItem().factor(), ii.getItem().exp());
+                iter2.getItem() /= tmp;
+                A /= tmp;
+                CFListIterator iter3= evaluation;
+                for (int jj= A.level(); jj > 2; jj--, iter3++)
+                  tmp= tmp (iter3.getItem(), jj);
+                if (!tmp.inCoeffDomain())
+                {
+                  int index3= 1;
+                  for (iter3= biFactors; iter3.hasItem(); iter3++, index3++)
+                  {
+                    if (index3 == index2)
+                    {
+                      iter3.getItem() /= tmp;
+                      iter3.getItem() /= Lc (iter3.getItem());
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
+    for (int i= lengthAeval2-1; i > -1; i--)
+      leadingCoeffs2[i]= CFList();
+    prepareLeadingCoeffs (leadingCoeffs2,A.level(),leadingCoeffs, biFactors,
+                          evaluation);
+    Aeval= evaluateAtEval (A, evaluation, 2);
+
+    hh= 1/Lc (Aeval.getFirst());
+
+    for (CFListIterator i= Aeval; i.hasItem(); i++)
+      i.getItem() *= hh;
+
+    A *= hh;
+
+    if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
+    {
+      LCheuristic= false;
+      A= bufA;
+      biFactors= bufBiFactors;
+      leadingCoeffs2[lengthAeval2-1]= bufLeadingCoeffs2;
+      LCmultiplier= bufLCmultiplier;
+    }
+  }
+
+tryAgainWithoutHeu:
   A= shift2Zero (A, Aeval, evaluation);
 
   for (iter= biFactors; iter.hasItem(); iter++)
     iter.getItem()= iter.getItem () (y + evaluation.getLast(), y);
 
-  for (int i= 0; i < A.level() - 2; i++)
-  {
-    if (i != A.level() - 3)
-      leadingCoeffs2[i]= CFList();
-  }
-  for (iter= leadingCoeffs2[A.level() - 3]; iter.hasItem(); iter++)
+  for (int i= 0; i < lengthAeval2-1; i++)
+    leadingCoeffs2[i]= CFList();
+  for (iter= leadingCoeffs2[lengthAeval2-1]; iter.hasItem(); iter++)
   {
     iter.getItem()= shift2Zero (iter.getItem(), list, evaluation);
     for (int i= A.level() - 4; i > -1; i--)
     {
-      if (i + 1 == A.level() - 3)
+      if (i + 1 == lengthAeval2-1)
         leadingCoeffs2[i].append (iter.getItem() (0, i + 4));
       else
         leadingCoeffs2[i].append (leadingCoeffs2[i+1].getLast() (0, i + 4));
@@ -2673,12 +3197,26 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     factors= recoverFactors (A, factors, evaluation);
     if (check != factors.length())
       noOneToOne= true;
+    else
+      factors= Union (factors, bufFactors);
 
     if (extension && !noOneToOne)
       factors= extNonMonicFactorRecombination (factors, A, info);
   }
   if (noOneToOne)
   {
+
+    if (!LCmultiplierIsConst && LCheuristic)
+    {
+      A= bufA;
+      biFactors= bufBiFactors;
+      leadingCoeffs2[lengthAeval2-1]= bufLeadingCoeffs2;
+      delete [] liftBounds;
+      LCheuristic= false;
+      goto tryAgainWithoutHeu;
+      //something probably went wrong in the heuristic
+    }
+
     A= shift2Zero (oldA, Aeval, evaluation);
     biFactors= oldBiFactors;
     for (iter= biFactors; iter.hasItem(); iter++)
@@ -2690,7 +3228,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     i++;
 
     for (; i.hasItem(); i++)
-      lift= tmax (lift, degree (i.getItem(), 2) + degree (LC (i.getItem(), 1)) + 1);
+      lift= tmax (lift,
+                  degree (i.getItem(), 2) + degree (LC (i.getItem(), 1)) + 1);
 
     lift= tmax (degree (Aeval.getFirst() , 2) + 1, lift);
 
@@ -2757,7 +3296,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   swap (factors, swapLevel, swapLevel2, x);
   append (factors, contentAFactors);
   decompress (factors, N);
-  normalize (factors);
+  if (!extension)
+    normalize (factors);
 
   delete[] liftBounds;
 
@@ -2784,7 +3324,25 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     CFList factors;
     bool extension= true;
     int p= getCharacteristic();
-    if (p*p < (1<<16)) // pass to GF if possible
+    if (p < 7)
+    {
+      if (p == 2)
+        setCharacteristic (getCharacteristic(), 6, 'Z');
+      else if (p == 3)
+        setCharacteristic (getCharacteristic(), 4, 'Z');
+      else if (p == 5)
+        setCharacteristic (getCharacteristic(), 3, 'Z');
+      ExtensionInfo info= ExtensionInfo (extension);
+      A= A.mapinto();
+      factors= multiFactorize (A, info);
+
+      CanonicalForm mipo= gf_mipo;
+      setCharacteristic (getCharacteristic());
+      Variable vBuf= rootOf (mipo.mapinto());
+      for (CFListIterator j= factors; j.hasItem(); j++)
+        j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
+    }
+    else if (p >= 7 && p*p < (1<<16)) // pass to GF if possible
     {
       setCharacteristic (getCharacteristic(), 2, 'Z');
       ExtensionInfo info= ExtensionInfo (extension);

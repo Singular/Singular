@@ -126,7 +126,23 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
   {
     if ( f.isImm() )
     {
-      printf("+%d",f.intval());
+      if (CFFactory::gettype()==GaloisFieldDomain)
+      {
+         int a= imm2int (f.getval());
+         if ( a == gf_q )
+           printf ("+%d", a);
+         else  if ( a == 0 )
+           printf ("+1");
+         else  if ( a == 1 )
+           printf ("+%c",gf_name);
+         else
+         {
+           printf ("+%c",gf_name);
+           printf ("^%d",a);
+         }
+      }
+      else
+        printf("+%ld",f.intval());
     }
     else
     {
@@ -376,8 +392,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
   if ( f.inCoeffDomain() )
         return CFFList( f );
-  int mv=f.level();
-  int org_v=mv;
   //out_cf("factorize:",f,"==================================\n");
   if (! f.isUnivariate() )
   {
@@ -408,22 +422,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         Unhomoglist.append(CFFactor(CanonicalForm(xn),d_xn));
       if(isOn(SW_USE_NTL_SORT)) Unhomoglist.sort(cmpCF);
       return Unhomoglist;
-    }
-    mv=find_mvar(f);
-    if ( getCharacteristic() == 0 )
-    {
-      if (mv!=f.level())
-      {
-        swapvar(f,Variable(mv),f.mvar());
-      }
-    }
-    else
-    {
-      if (mv!=1)
-      {
-        swapvar(f,Variable(mv),Variable(1));
-        org_v=1;
-      }
     }
   }
   CFFList F;
@@ -672,15 +670,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
   }
 
-  if ((mv!=org_v) && (! f.isUnivariate() ))
-  {
-    CFFListIterator J=F;
-    for ( ; J.hasItem(); J++)
-    {
-      swapvar(J.getItem().factor(),Variable(mv),Variable(org_v));
-    }
-    swapvar(f,Variable(mv),Variable(org_v));
-  }
   //out_cff(F);
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;

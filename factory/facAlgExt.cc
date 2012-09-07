@@ -153,12 +153,16 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   CFFList factors;
   CFListIterator j;
 
+  CanonicalForm lcinv;
   for (CFFListIterator i= sqrf; i.hasItem(); i++)
   {
     if (i.getItem().factor().inCoeffDomain()) continue;
     factorsSqrf= AlgExtSqrfFactorize (i.getItem().factor(), alpha);
     for (j= factorsSqrf; j.hasItem(); j++)
-      factors.append (CFFactor (j.getItem()/Lc (j.getItem()), i.getItem().exp()));
+    {
+      lcinv= 1/Lc (j.getItem());
+      factors.append (CFFactor (j.getItem()*lcinv, i.getItem().exp()));
+    }
   }
 
   factors.insert (CFFactor (Lc(F), 1));
