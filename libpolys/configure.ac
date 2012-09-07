@@ -108,13 +108,13 @@ if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
   CXXFLAGS=""
 fi
 
-if test "x$prefix" != xNONE; then
-  PREFIX="$prefix"
-else
-  PREFIX="$ac_default_prefix"
-fi
+#if test "x$prefix" != xNONE; then
+#  PREFIX="$prefix"
+#else
+#  PREFIX="$ac_default_prefix"
+#fi
 
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--disable-debug], [do NOT build the debugging version of the libraries]),
+AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
  [if test "x$enableval"  = "xyes"; then
    ENABLE_DEBUG=yes
  fi], ENABLE_DEBUG=no)
@@ -122,7 +122,7 @@ AC_ARG_ENABLE(debug, AS_HELP_STRING([--disable-debug], [do NOT build the debuggi
 AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
 
 # AC_SUBST(PREFIX)
-AC_DEFINE_UNQUOTED(INSTALL_PREFIX,"$PREFIX",Prefix)
+# AC_DEFINE_UNQUOTED(INSTALL_PREFIX,"$PREFIX",Prefix)
 
 AC_DEFINE([SINGULAR],[1],[SINGULAR])
 AC_DEFINE([DISABLE_GMP_CPP],[1],[DISABLE_GMP_CPP])

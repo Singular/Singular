@@ -57,7 +57,7 @@ LT_INIT
 
 SING_CHECK_PIPE
 
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--disable-debug], [do NOT build the debugging version of the libraries]),
+AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
  [if test "x$enableval"  = "xyes"; then
    ENABLE_DEBUG=yes
  fi], ENABLE_DEBUG=no)
