@@ -2930,15 +2930,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==== countedref: reference and shared ====*/
        if (strcmp(sys_cmd, "shared") == 0)
        {
+       #ifndef SINGULAR_COUNTEDREF_AUTOLOAD
          void countedref_shared_load();
          countedref_shared_load();
+       #endif
          res->rtyp = NONE;
          return FALSE;
        }
        else if (strcmp(sys_cmd, "reference") == 0)
        {
+       #ifndef SINGULAR_COUNTEDREF_AUTOLOAD
          void countedref_reference_load();
          countedref_reference_load();
+       #endif
          res->rtyp = NONE;
          return FALSE;
        }
