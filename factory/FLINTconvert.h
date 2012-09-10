@@ -26,12 +26,12 @@ extern "C"
 #ifndef __GMP_BITS_PER_MP_LIMB
 #define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
 #endif
-#include <fmpz.h>
-#include <fmpq.h>
-#include <fmpz_poly.h>
-#include <fmpz_mod_poly.h>
-#include <fmpq_poly.h>
-#include <nmod_poly.h>
+#include <flint/fmpz.h>
+#include <flint/fmpq.h>
+#include <flint/fmpz_poly.h>
+#include <flint/fmpz_mod_poly.h>
+#include <flint/fmpq_poly.h>
+#include <flint/nmod_poly.h>
 #ifdef __cplusplus
 }
 #endif

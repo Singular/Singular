@@ -35,12 +35,12 @@ extern "C"
 #ifndef __GMP_BITS_PER_MP_LIMB
 #define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
 #endif
-#include <fmpz.h>
-#include <fmpq.h>
-#include <fmpz_poly.h>
-#include <fmpz_mod_poly.h>
-#include <nmod_poly.h>
-#include <fmpq_poly.h>
+#include <flint/fmpz.h>
+#include <flint/fmpq.h>
+#include <flint/fmpz_poly.h>
+#include <flint/fmpz_mod_poly.h>
+#include <flint/nmod_poly.h>
+#include <flint/fmpq_poly.h>
 #ifdef __cplusplus
 }
 #endif
@@ -269,9 +269,9 @@ convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
 
   long i;
 
-  for (i = 0; i < fac->num_factors; i++)
-    result.append (CFFactor (convertnmod_poly_t2FacCF ((nmod_poly_t &)fac->factors[i],x),
-                             fac->exponents[i]));
+  for (i = 0; i < fac->num; i++)
+    result.append (CFFactor (convertnmod_poly_t2FacCF ((nmod_poly_t &)fac->p[i],x),
+                             fac->exp[i]));
   return result;
 }
 
