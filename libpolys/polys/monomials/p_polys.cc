@@ -4071,19 +4071,22 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
 * returns the length of a (numbers of monomials)
 * respect syzComp
 */
-poly p_Last(poly a, int &l, const ring r)
+poly p_Last(const poly p, int &l, const ring r)
 {
-  if (a == NULL)
+  if (p == NULL)
   {
     l = 0;
     return NULL;
   }
   l = 1;
+  poly a = p;
   if (! rIsSyzIndexRing(r))
   {
-    while (pNext(a)!=NULL)
+    poly next = pNext(a);
+    while (next!=NULL)
     {
-      pIter(a);
+      a = next;
+      next = pNext(a);      
       l++;
     }
   }

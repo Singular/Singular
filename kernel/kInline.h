@@ -21,7 +21,6 @@
 #include <misc/options.h>
 
 #include <polys/monomials/p_polys.h>
-#include <polys/templates/p_Procs.h>
 #include <polys/kbuckets.h>
 
 #include <kernel/polys.h>
@@ -310,7 +309,7 @@ KINLINE void sTObject::LmDeleteAndIter()
 KINLINE void sTObject::Mult_nn(number n)
 {
   if (t_p != NULL)
-  {    t_p = tailRing->p_Procs->p_Mult_nn(t_p, n, tailRing);
+  {    t_p = p_Mult_nn(t_p, n, tailRing);
     if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
   }
   else
@@ -582,7 +581,7 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   {
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
-    pNext(_p) = tailRing->p_Procs->p_Mult_nn(pNext(_p), n, tailRing);
+    pNext(_p) = p_Mult_nn(pNext(_p), n, tailRing);
   }
 }
 
@@ -597,11 +596,11 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
   {
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
-    int shorter;
-    pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q,
-                                                      shorter,spNoether,
-                                                      tailRing, last);
-    pLength += lq - shorter;
+
+    pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m, q, pLength, lq, 
+                                    spNoether, last, tailRing );
+//    tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q, shorter,spNoether, tailRing, last);
+//    pLength += lq - shorter;
   }
 }
 

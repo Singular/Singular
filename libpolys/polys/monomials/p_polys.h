@@ -185,6 +185,12 @@ static inline int pLength(poly a)
   return l;
 }
 
+// returns the length of a polynomial (numbers of monomials) and the last mon.
+// respect syzComp
+poly p_Last(const poly a, int &l, const ring r);
+
+/*----------------------------------------------------*/
+
 void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
 
@@ -957,8 +963,55 @@ static inline poly p_Mult_mm(poly p, poly m, const ring r)
     return r->p_Procs->p_Mult_mm(p, m, r);
 }
 
+// like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
+// then result = p-m*q, lp == pLength(result), last == pLast(result)
+static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
+                                 const poly spNoether, poly& last, const ring r)
+{
+  int l; 
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    p = nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
+    last = p_Last(p, l, r);
+    assume( lp == l );
+    assume( lp == pLength(p) );
+    return p;
+  }
+#endif
+
+  int shorter;
+  const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+  lp = (lp + lq) - shorter;
+  assume( last == p_Last(res, l, r) );
+  assume( lp == l );
+  assume( lp == pLength(res) );
+  return res;
+}
+
+
+// like p_Minus_mm_Mult_qq (above) but without last 
+static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
+                                      const poly spNoether, const ring r)
+{
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    p = nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
+    assume( lp == pLength(p) );
+    return p;
+  }
+#endif
+
+  int shorter; poly last;
+  const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+  lp += lq - shorter;
+  assume( lp == pLength(res) );
+  return res;
+}
+
 // return p - m*Copy(q), destroys p; const: p,m
-static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
+static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, const ring r)
 {
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
@@ -974,22 +1027,6 @@ static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last); // !!!
 }
 
-// like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
-// then lp == pLength(p -m*q)
-static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
-                                 poly spNoether, const ring r)
-{
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
-     return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
-#endif
-
-  int shorter;
-  poly last,res;
-  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
-  lp = (lp + lq) - shorter;
-  return res;
-}
 
 // returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
@@ -1924,10 +1961,6 @@ int   p_Var(poly mi, const ring r);
 int   p_LowVar (poly p, const ring r);
 
 /*----------------------------------------------------*/
-// returns the length of a polynomial (numbers of monomials) and the last mon.
-// respect syzComp
-poly p_Last(poly a, int &l, const ring r);
-
 /// shifts components of the vector p by i
 void p_Shift (poly * p,int i, const ring r);
 #endif // P_POLYS_H
