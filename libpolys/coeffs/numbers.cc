@@ -130,9 +130,16 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   // no fractions
   assume(!(  nCoeff_is_Q(r) || nCoeff_is_Q_a(r) ));
   // all coeffs are given by integers!!!
-  assume( nCoeff_is_Ring(r) || nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r) );
 
   numberCollectionEnumerator.Reset();
+
+  if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
+  {
+    c = n_Init(1, r);
+    return;
+  }  
+
+  number &curr = numberCollectionEnumerator.Current();
   
 #ifdef HAVE_RINGS
   /// TODO: move to a separate implementation 
@@ -140,17 +147,20 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   {
     if (nCoeff_has_Units(r))
     {
-      c = n_GetUnit(numberCollectionEnumerator.Current(), r);
+      c = n_GetUnit(curr, r);
       
       if (!n_IsOne(c, r))
       {
         number inv = n_Invers(c, r);
 
-        do
+        n_InpMult(curr, inv, r);
+        
+        while( numberCollectionEnumerator.MoveNext() )
         {
-          n_InpMult(numberCollectionEnumerator.Current(), inv, r);
+          number &n = numberCollectionEnumerator.Current();
+          n_Normalize(n, r); // ?
+          n_InpMult(n, inv, r); // TODO: either this or directly divide!!!?
         }
-        while( numberCollectionEnumerator.MoveNext() );
 
         n_Delete(&inv, r);        
       }      
@@ -161,14 +171,15 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
 #endif
 
   assume(!nCoeff_is_Ring(r));
+  assume(nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r));
 
-  c = numberCollectionEnumerator.Current();
+  c = curr;
   
   n_Normalize(c, r);
 
   if (!n_IsOne(c, r))
   {    
-    numberCollectionEnumerator.Current() = n_Init(1, r); // ???
+    curr = n_Init(1, r); // ???
     
     number inv = n_Invers(c, r);
     
@@ -176,7 +187,7 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
     {
       number &n = numberCollectionEnumerator.Current();
       n_Normalize(n, r); // ?
-      n_InpMult(n, inv, r);
+      n_InpMult(n, inv, r); // TODO: either this or directly divide!!!?
     }
     
     n_Delete(&inv, r);

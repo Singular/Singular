@@ -21,23 +21,22 @@
 
 /** @class IBaseEnumerator
  * 
- * Base enumerator interface for simple iteration over a generic non-empty collection.
+ * Base enumerator interface for simple iteration over a generic collection.
  *
- * Abstract API of enumerators for non-empty enumerable collections of standalone
- * objects. Inspired by IEnumerator from C#. Usage parrten can be as
- * follows:
+ * Abstract API of enumerators for enumerable collections of standalone objects.
+ * Just like IEnumerator from C#. Usage pattern can be as follows:
  *
  * @code
- *   IBaseEnumerator itr = ...;
- *   itr.Reset(); // goes to the first element (must exist)
- *   do
+ *   IBaseEnumerator& itr = ...;
+ *   itr.Reset(); // goes to the "-1" element
+ *   // NOTE: itr is not useable here!
+ *   while( itr.MoveNext() )
  *   {
  *      do something custom with itr...
  *   }
- *   while( itr.MoveNext() )
  * @endcode
  *
- * Note that the first element must exist and available directly after Reset() call.
+ * Note that the Reset() 
  *
  * @sa IEnumerator
  */
@@ -50,9 +49,21 @@ class IBaseEnumerator // IDisposable
     /// false if the enumerator has passed the end of the collection.
     virtual bool MoveNext() = 0;    
 
-    /// Sets the enumerator to its initial position, which is at the first element in the collection.
+    /// Sets the enumerator to its initial position: -1,
+    /// which is before the first element in the collection.
     virtual void Reset() = 0;
-//    virtual ~IEnumerator() {} // TODO: needed?
+
+    virtual ~IBaseEnumerator() {} // TODO: needed?
+
+  private:
+    IBaseEnumerator(const IBaseEnumerator&);
+    void operator=(const IBaseEnumerator&);
+
+  protected:
+    IBaseEnumerator(){}
+
+    /// Current position is inside the collection (not -1 or past the end)
+    virtual bool IsValid() const = 0;
 };
 
 
@@ -77,24 +88,28 @@ class IAccessor // IDisposable
 
     /// Gets the current element in the collection (read only).
     virtual const_reference Current() const = 0;
+
+    virtual ~IAccessor() {} // TODO: needed?
+  
 };
 
 /** @class IEnumerator
  * 
- * Templated enumerator interface for simple iteration over a generic non-empty collection of T's.
+ * Templated enumerator interface for simple iteration over a generic collection of T's.
  *
- * Abstract API of enumerators for non-empty enumerable collections of standalone
- * objects. Inspired by IEnumerator from C#. Usage parrten can be as
+ * Abstract API of enumerators for generic enumerable collections of standalone
+ * objects of type T. Inspired by IEnumerator from C#. Usage parrten can be as
  * follows:
  *
  * @code
- *   IEnumerator<T> itr = ...;
- *   itr.Reset(); // goes to the first element (must exist)
- *   do
+ *   IEnumerator<T>& itr = ...;
+ *   
+ *   itr.Reset(); // goes before the first element, thus no itr.Current() is available here!
+ *   
+ *   while( itr.MoveNext() )
  *   {
  *      use/change itr.Current()...
  *   }
- *   while( itr.MoveNext() )
  * @endcode
  *
  * T is the type of objects to enumerate, available via Current() method

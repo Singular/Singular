@@ -47,7 +47,7 @@ SOURCES = \
         ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} mod_raw.cc \
         ext_fields/algext.cc ext_fields/transext.cc \
 	clapsing.cc clapconv.cc \
-	nc/old.gring.cc
+	nc/old.gring.cc PolyEnumerator.cc
 
 LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
   monomials/p_polys.h monomials/maps.h PolyEnumerator.h  prCopy.h \

@@ -18,47 +18,79 @@
 // include basic definitions
 #include <coeffs/Enumerator.h>
 #include <polys/monomials/monomials.h>
+#include <reporter/reporter.h> // for assume etc.
 
 /** @class CBasePolyEnumerator
  * 
- * Base polynomial enumerator for simple iteration over terms of
- * (non-zero) polynomials.
+ * Base polynomial enumerator for simple iteration over terms of polynomials.
  *
- * Note that the first element must exist directly after Reset() call.
- * Moreover, it doesn't inherit from IAccessor and thus doesn't
- * override Current().
+ * Note that the first element desn't exist directly after Reset() call.
+ * 
+ * The class doesn't inherit from IAccessor and thus doesn't override Current().
  *
  * @sa IBaseEnumerator, @sa CPolyCoeffsEnumerator
  */
 class CBasePolyEnumerator: public virtual IBaseEnumerator
 {
   private:
-    const poly m_poly;
+    const poly m_poly; ///< essentially immutable original iterable object
+    
+    static const spolyrec m_prevposition_struct; ///< tag for "-1" position
 
   protected:
-    poly m_position;
-    
-    inline void Iterate()
+    poly m_position; ///< current position in the iterable object
+
+    virtual bool IsValid() const
     {
-      if( m_position != NULL )
-        pIter( m_position );
-    }    
+      // not -1 or past the end position?
+      return (m_position != NULL) && (m_position != &m_prevposition_struct);
+    }
+    
   public:
-    CBasePolyEnumerator(poly p): m_poly(p), m_position(p) { assume(p != NULL); }
+    CBasePolyEnumerator(poly p):
+        IBaseEnumerator(), m_poly(p), m_position(const_cast<poly>(&m_prevposition_struct))
+    {
+      assume( !IsValid() ); 
+    }
     
     /// Sets the position marker to the leading term.
-    virtual void Reset() { assume(m_poly!= NULL); m_position = m_poly; }
+    virtual void Reset()
+    {
+      m_position = const_cast<poly>(&m_prevposition_struct);
+      assume( !IsValid() ); 
+    }
 
     /// Advances the position to the next term of the polynomial.
     /// returns true if the position marker was successfully advanced to the
-    /// next term;
+    /// next term which can be used;
     /// false if the position marker has passed the end of the
     /// polynomial.
     virtual bool MoveNext()
     {
       assume( m_position != NULL );
-      Iterate();
-      return (m_position != NULL);
+
+      {
+        const poly p_next = pNext(m_position);
+
+        if (p_next != NULL) // not the last term?
+        {
+          m_position = p_next;
+          assume( IsValid() );
+          return true;
+        }
+      }
+      
+      if (m_position == &m_prevposition_struct) // -1 position?
+      {
+        assume( !IsValid() );
+        m_position = m_poly;
+        return (m_position != NULL);
+      }
+
+      // else: past the end (or an empty polynomial)
+      m_position = NULL;
+      assume( !IsValid() );
+      return false;
     }
 };
 
@@ -70,7 +102,7 @@ typedef IEnumerator<number> IPolyCoeffsEnumerator;
 /** @class CPolyCoeffsEnumerator
  * 
  * This is a polynomial enumerator for simple iteration over
- * coefficients of (non-zero) polynomials.
+ * coefficients of polynomials.
  * 
  * It is required to inherit this class from IEnumerator<number> for
  * its use in coeffs and implement IAccessor<number> interface.
@@ -89,14 +121,14 @@ class CPolyCoeffsEnumerator: public CBasePolyEnumerator, public virtual IPolyCoe
     /// Gets the current element in the collection (read and write).
     virtual IPolyCoeffsEnumerator::reference Current()
     {
-      assume( m_position != NULL );
+      assume( IsValid() );
       return pGetCoeff(m_position);      
     }
 
     /// Gets the current element in the collection (read only).
     virtual IPolyCoeffsEnumerator::const_reference Current() const
     {
-      assume( m_position != NULL );
+      assume( IsValid() );
       return pGetCoeff(m_position);
     }
 };
