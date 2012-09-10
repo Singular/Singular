@@ -182,7 +182,8 @@ void* countedref_Init(blackbox*)
   return NULL;
 }
 
-/// We use the as a marker of refernce types.
+/// We use the function pointer as a marker of reference types
+/// for CountedRef::is_ref(leftv), see the latter for details
 BOOLEAN countedref_CheckAssign(blackbox *b, leftv L, leftv R)
 {
   return FALSE;
@@ -203,6 +204,9 @@ public:
   typedef CountedRefPtr<CountedRefData*> data_ptr;
 
   /// Check whether argument is already a reference type
+  /// @note We check for the function pointer @c countedref_CheckAssign here,
+  /// that we (ab-)use as a unique marker. This avoids to check a bunch of
+  /// of runtime-varying @c typ IDs for identifying reference-like types.
   static BOOLEAN is_ref(leftv arg) {
     int typ = arg->Typ();
     return ((typ > MAX_TOK) &&
@@ -711,8 +715,4 @@ void countedref_shared_load()
   setBlackboxStuff(bbxshared, "shared");
 }
 
-
-#ifdef HAVE_DYNAMIC_COUNTEDREF
-extern "C" { void mod_init() { countedref_init(); } }
-#endif
 
