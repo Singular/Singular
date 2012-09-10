@@ -38,7 +38,7 @@ set(GMP_PREFIX /)
 
 set(CMAKE_C_FLAGS "-O2 -fomit-frame-pointer")
 set(CMAKE_CXX_FLAGS "-O2 -fomit-frame-pointer -fno-rtti")
-set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Wno-non-virtual-dtor -Wno-unknown-pragma")
+set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Winline -Wno-non-virtual-dtor -Wno-unknown-pragma")
 
 link_libraries(m)
 set(CMAKE_INSTALL_PREFIX "/usr/local")

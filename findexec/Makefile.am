@@ -17,7 +17,7 @@ libfindexec_g_la_CFLAGS = ${PIPE}
 
 libfindexec_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
 ## --no-rtti 
-libfindexec_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libfindexec_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} 

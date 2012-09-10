@@ -65,10 +65,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -DNDEBUG")
 
 set(CMAKE_C_FLAGS_DEBUG "-O0 -g -Wreturn-type -fno-omit-frame-pointer")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-inline-functions")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -W -Wall -Wextra")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -W -Wall -Wextra -Winline")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wreturn-type -fno-omit-frame-pointer")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-inline-functions")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W -Wall -Wextra -Winline")
 
 set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_DEBUG} -Werror -pedantic")
 set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_DEBUG} -Werror -pedantic")

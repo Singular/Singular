@@ -16,7 +16,7 @@ libreporter_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libreporter_g_la_CFLAGS = ${PIPE}
 
 libreporter_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-libreporter_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libreporter_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
 libreporter_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H

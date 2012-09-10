@@ -34,7 +34,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   message(STATUS "Have compiler: '${CMAKE_CXX_COMPILER_ID}'")
   if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 
-    #set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Wno-non-virtual-dtor")
+    #set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Winline -Wno-non-virtual-dtor")
     set(CMAKE_CXX_FLAGS "-w --no-rtti -pipe ")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-implicit-templates")
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

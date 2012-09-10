@@ -89,7 +89,7 @@ OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtT
 
 omtTest_s_g_SOURCES = $(OMTTESTSSOURCES)
 omtTest_s_g_CPPFLAGS= ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-omtTest_s_g_CFLAGS  = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE}
+omtTest_s_g_CFLAGS  = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE}
 omtTest_s_g_LDADD   = libomalloc_g.la
 omtTest_s_g_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../omalloc -static
 
@@ -108,7 +108,7 @@ omtTest_s_r_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../oma
 
 omtTest_d_g_SOURCES = $(OMTTESTSSOURCES)
 omtTest_d_g_CPPFLAGS= ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-omtTest_d_g_CFLAGS  = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE}
+omtTest_d_g_CFLAGS  = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE}
 omtTest_d_g_LDADD   = libomalloc_g.la
 omtTest_d_g_LDFLAGS = -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/../omalloc
 

@@ -69,7 +69,7 @@ rings_test_d_r_CPPFLAGS = ${RELEASECPPFLAGS}
 
 
 ###  -pedantic
-DEBUGCFLAGS = $(AM_CFLAGS) -g -Wextra -Wall -Wno-long-long ${PIPE}
+DEBUGCFLAGS = $(AM_CFLAGS) -g -Wextra -Winline -Wall -Wno-long-long ${PIPE}
 DEBUGCXXFLAGS = $(AM_CXXFLAGS) ${DEBUGCFLAGS} ${CXXTEMPLFLAGS}
 DEBUGCPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 

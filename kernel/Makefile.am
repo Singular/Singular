@@ -20,12 +20,12 @@ endif
 libkernel_LTLIBRARIES = libkernel.la ${LIB_G}
 libkerneldir = $(libdir)/singular
 
-libkernel_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE}
-libkernel_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
+libkernel_la_CFLAGS   = -O3 -fomit-frame-pointer -Wextra -Winline -Wall -Wno-long-long ${PIPE}
+libkernel_g_la_CFLAGS = -g -Wextra -Winline -Wall -Wno-long-long -pedantic ${PIPE}
 ## -pedantic
 
-libkernel_la_CXXFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-libkernel_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+libkernel_la_CXXFLAGS   = -O3 -fomit-frame-pointer -Wextra -Winline -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+libkernel_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 # -fdiagnostics-show-option 
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)
@@ -102,8 +102,8 @@ check_PROGRAMS = $(TESTS)
 test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 test_s_g_CFLAGS = ${PIPE}
 
-test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-test_s_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Winline -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_s_g_CXXFLAGS = -g -Wextra -Winline -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
 testsources = test.cc
 test_s_r_SOURCES = $(testsources)
@@ -122,8 +122,8 @@ test_s_g_LDFLAGS = -static ${AMLDFLAGS}
 test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 test_d_g_CFLAGS = ${PIPE}
 
-test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
+test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Winline -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+test_d_g_CXXFLAGS = -g -Wextra -Winline -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
 test_d_r_SOURCES = $(testsources)
 test_d_g_SOURCES = $(testsources)

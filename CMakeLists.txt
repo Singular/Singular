@@ -118,7 +118,7 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
   #if (${CMAKE_BUILD_TYPE} MATCHES "Release")
   #endif (${CMAKE_BUILD_TYPE} MATCHES "Release")
 
-  #set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Wno-non-virtual-dtor")
+  #set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Winline -Wno-non-virtual-dtor")
   set(CMAKE_C_FLAGS "-w -pipe ")
   set(CMAKE_CXX_FLAGS "-w  -pipe ") #--no-rtti
   # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-implicit-templates")

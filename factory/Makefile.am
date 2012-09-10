@@ -19,7 +19,7 @@ lib_LTLIBRARIES = libfactory.la ${LIB_G}
 libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
 libfactory_la_LIBADD     = ${abs_builddir}/libfac/libfac.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
-libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
+libfactory_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
 libfactory_g_la_LIBADD   = ${abs_builddir}/libfac/libfac_g.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
 libfactory_g_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
@@ -311,7 +311,7 @@ TESTADDLIB = $(TESTADDLIBDIRS) $(OMALLOC_R_LDADD)
 TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
 
 test_s_g_SOURCES = $(TESTSSOURCES)
-test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
+test_s_g_CFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
 #ftmpl_inst.o
 test_s_g_LDADD = -lfactory_g $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
 
@@ -324,7 +324,7 @@ test_s_r_LDFLAGS = -static ${AMLDFLAGS}
 test_s_g_LDFLAGS = -static ${AMLDFLAGS}
 
 test_d_g_SOURCES = $(TESTSSOURCES)
-test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
+test_d_g_CFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
 #ftmpl_inst.o
 test_d_g_LDADD = -lfactory_g $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
 

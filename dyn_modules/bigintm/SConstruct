@@ -36,7 +36,7 @@ if ARGUMENTS.get('debug', 0):
         LDMODULESUFFIX=".sog",
         SHLIBSUFFIX = ".sog",
         CPPPATH = SING_INCLUDES,
-        CXXFLAGS = "-g -Wextra -Wall -pedantic -Wno-long-long " + CXXTEMPLFLAGS,
+        CXXFLAGS = "-g -Wextra -Winline -Wall -pedantic -Wno-long-long " + CXXTEMPLFLAGS,
         LDMODULEFLAGS = BUNDLETEMPFLAGS,
         LIBS=[])
     Default(syzextra_debug_if)
