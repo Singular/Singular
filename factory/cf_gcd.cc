@@ -306,6 +306,28 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return f;
   }
 #ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+  if (( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
+  &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
+  {
+    nmod_poly_t F1, G1, A, B, R;
+    convertFacCF2nmod_poly_t (F1, f);
+    convertFacCF2nmod_poly_t (G1, g);
+    nmod_poly_init (R, getCharacteristic());
+    nmod_poly_init (A, getCharacteristic());
+    nmod_poly_init (B, getCharacteristic());
+    nmod_poly_xgcd (R, A, B, F1, G1);
+    a= convertnmod_poly_t2FacCF (A, f.mvar());
+    b= convertnmod_poly_t2FacCF (B, f.mvar());
+    CanonicalForm r= convertnmod_poly_t2FacCF (R, f.mvar());
+    nmod_poly_clear (F1);
+    nmod_poly_clear (G1);
+    nmod_poly_clear (A);
+    nmod_poly_clear (B);
+    nmod_poly_clear (R);
+    return r;
+  }
+#else
   if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
@@ -346,6 +368,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return convertNTLzzpX2CF(R,f.mvar());
     #endif
   }
+#endif
 #ifdef HAVE_FLINT
   if (( getCharacteristic() ==0) && (f.level()==g.level())
        && isPurePoly(f) && isPurePoly(g))
