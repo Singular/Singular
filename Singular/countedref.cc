@@ -25,21 +25,6 @@
 #include "newstruct.h"
 #include "ipshell.h"
 
-class CountedRefEnv {
-  typedef CountedRefEnv self;
-
-public:
-
-  static int& ref_id() {
-    static int g_ref_id = 0;
-    return g_ref_id;
-  }
-
-  static int& sh_id() {
-    static int g_sh_id = 0;
-    return g_sh_id;
-  }
-};
 
 /// Overloading ring destruction
 inline void CountedRefPtr_kill(ring r) { rKill(r); }
@@ -197,6 +182,13 @@ void* countedref_Init(blackbox*)
   return NULL;
 }
 
+/// We use the function pointer as a marker of reference types
+/// for CountedRef::is_ref(leftv), see the latter for details
+BOOLEAN countedref_CheckAssign(blackbox *b, leftv L, leftv R)
+{
+  return FALSE;
+}
+
 
 class CountedRef {
   typedef CountedRef self;
@@ -212,11 +204,13 @@ public:
   typedef CountedRefPtr<CountedRefData*> data_ptr;
 
   /// Check whether argument is already a reference type
+  /// @note We check for the function pointer @c countedref_CheckAssign here,
+  /// that we (ab-)use as a unique marker. This avoids to check a bunch of
+  /// of runtime-varying @c typ IDs for identifying reference-like types.
   static BOOLEAN is_ref(leftv arg) {
     int typ = arg->Typ();
-    return ((typ==CountedRefEnv::ref_id())  ||(typ==CountedRefEnv::sh_id()) );
-    //    return ((typ > MAX_TOK) &&
-    //            (getBlackboxStuff(typ)->blackbox_Init == countedref_Init));
+    return ((typ > MAX_TOK) &&
+            (getBlackboxStuff(typ)->blackbox_CheckAssign == countedref_CheckAssign));
   }
 
   /// Reference given Singular data  
@@ -680,9 +674,10 @@ BOOLEAN countedref_deserialize(blackbox **b, void **d, si_link f)
   return FALSE;
 }
 
-void countedref_init() 
+void countedref_reference_load()
 {
   blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
+  bbx->blackbox_CheckAssign = countedref_CheckAssign;
   bbx->blackbox_destroy = countedref_destroy;
   bbx->blackbox_String  = countedref_String;
   bbx->blackbox_Print  = countedref_Print;
@@ -696,22 +691,28 @@ void countedref_init()
   bbx->blackbox_serialize   = countedref_serialize;
   bbx->blackbox_deserialize = countedref_deserialize;
   bbx->data             = omAlloc0(newstruct_desc_size());
-  CountedRefEnv::ref_id()=setBlackboxStuff(bbx, "reference");
+  setBlackboxStuff(bbx, "reference");
+}
 
-  /// The @c shared type is "inherited" from @c reference.
-  /// It just uses another constructor (to make its own copy of the).
-  blackbox *bbxshared = 
-    (blackbox*)memcpy(omAlloc(sizeof(blackbox)), bbx, sizeof(blackbox));
+void countedref_shared_load()
+{
+  blackbox *bbxshared = (blackbox*)omAlloc0(sizeof(blackbox));
+  bbxshared->blackbox_String  = countedref_String;
+  bbxshared->blackbox_Print  = countedref_Print;
+  bbxshared->blackbox_Copy    = countedref_Copy;
+  bbxshared->blackbox_Op3     = countedref_Op3;
+  bbxshared->blackbox_OpM     = countedref_OpM;
+  bbxshared->blackbox_serialize   = countedref_serialize;
+  bbxshared->blackbox_deserialize = countedref_deserialize;
+
+  bbxshared->blackbox_CheckAssign = countedref_CheckAssign;
   bbxshared->blackbox_Assign  = countedref_AssignShared;
   bbxshared->blackbox_destroy = countedref_destroyShared;
   bbxshared->blackbox_Op1     = countedref_Op1Shared;
   bbxshared->blackbox_Op2     = countedref_Op2Shared;
   bbxshared->blackbox_Init    = countedref_InitShared;
   bbxshared->data             = omAlloc0(newstruct_desc_size());
-  CountedRefEnv::sh_id()=setBlackboxStuff(bbxshared, "shared");
+  setBlackboxStuff(bbxshared, "shared");
 }
 
-#ifdef HAVE_DYNAMIC_COUNTEDREF
-extern "C" { void mod_init() { countedref_init(); } }
-#endif
 

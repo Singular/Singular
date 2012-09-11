@@ -60,7 +60,7 @@ BOOLEAN blackbox_default_deserialize(blackbox **b, void **d, si_link f)
 BOOLEAN WrongOp(const char* cmd, int op, leftv bb)
 {
   assume( bb->Typ() > MAX_TOK ); // it IS a blackbox type, right?!
-  
+
   if( op > 127 )
     Werror("'%s' of type %s(%d) for op %s(%d) not implemented",
            cmd,
@@ -107,7 +107,7 @@ BOOLEAN blackbox_default_OpM(int op,leftv res, leftv args)
   return WrongOp("blackbox_OpM", op, args);
 }
 
-BOOLEAN blackbox_default_Check(blackbox *b, void *d)
+BOOLEAN blackbox_default_Check(blackbox *,leftv,leftv)
 {
   return FALSE;
 }
@@ -148,7 +148,7 @@ int setBlackboxStuff(blackbox *bb, const char *n)
     if (bb->blackbox_Op2==NULL)     bb->blackbox_Op2=blackboxDefaultOp2;
     if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackbox_default_Op3;
     if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackbox_default_OpM;
-    if (bb->blackbox_Check==NULL)   bb->blackbox_Check=blackbox_default_Check;
+    if (bb->blackbox_CheckAssign==NULL) bb->blackbox_CheckAssign=blackbox_default_Check;
     if (bb->blackbox_serialize==NULL) bb->blackbox_serialize=blackbox_default_serialize;
     if (bb->blackbox_deserialize==NULL) bb->blackbox_deserialize=blackbox_default_deserialize;
     return where+BLACKBOX_OFFSET;
