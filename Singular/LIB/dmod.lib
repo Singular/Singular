@@ -2446,7 +2446,7 @@ example
 
 
 proc annfsBMI(ideal F, list #)
-"USAGE:  annfsBMI(F [,eng,met]);  F an ideal, eng, met optional ints
+"USAGE:  annfsBMI(F [,eng,met,us]);  F an ideal, eng, met, us optional ints
 RETURN:  ring
 PURPOSE: compute two kinds of Bernstein-Sato ideals, associated to
 @* f = F[1]*..*F[P], with the multivariate algorithm by Briancon and Maisonobe.
@@ -2459,6 +2459,7 @@ NOTE:    activate the output ring with the @code{setring} command. In this ring,
 @*       'On the computation of Bernstein-Sato ideals', 2005) is computed. 
 @*       If 0 < met < P, then the ideal B_P (cf. the paper) is computed. 
 @*       Otherwise, and by default, the ideal B (cf. the paper) is computed.
+@*       If us<>0, then syzygies-driven method is used. 
 @*       If the output ideal happens to be principal, the list of factors
 @*       with their multiplicities is returned instead of the ideal.
 @*       If printlevel=1, progress debug messages will be printed,
@@ -2468,6 +2469,7 @@ EXAMPLE: example annfsBMI; shows examples
 {
   int eng = 0;
   int met = 0;
+  int usesyz = 0;
   if ( size(#)>0 )
   {
     if ( typeof(#[1]) == "int" )
@@ -2481,6 +2483,14 @@ EXAMPLE: example annfsBMI; shows examples
 	met = int(#[2]);
       }
     }
+    if ( size(#)>2 )
+    {
+      if ( typeof(#[3]) == "int" )
+      {
+	usesyz = int(#[3]);
+      }
+    }
+
   }
   // returns a list with a ring and an ideal LD in it
   int ppl = printlevel-voice+2;
@@ -2601,6 +2611,41 @@ EXAMPLE: example annfsBMI; shows examples
     I = I, var(2*P+N+i) + p;
   }
   // -------- the ideal I is ready ----------
+  if (usesyz)
+  {
+    dbprint(ppl,"// -1-1-1 adding syzygy-driven elements to the ideal");
+    // -- form the extended Jacobian matrix; do the comps over K[x]
+    setring save;
+    module JC = module(transpose(jacob(F))); // NxP
+    for (j=1; j<=P; j++)
+    {
+      JC[j] = JC[j] + F[j]*gen(N+j);
+    }
+    //    matrix JAC[N+P][P];
+    dbprint(ppl,"// -1-1-2 computing syzygies of the extended Jacobian matrix over K[_x]");
+    dbprint(ppl-1, matrix(JC));
+    matrix SJ = transpose(syz(transpose(JC))); //or of std(syz)?
+    dbprint(ppl,"// -1-1-3 finished computing syzygies of the ext Jacobian matrix over K[_x]");
+    dbprint(ppl-1, matrix(SJ));
+    setring @R;
+    // add generators: first N comps d_i, then P comps s_j
+    matrix SJ = imap(save, SJ);
+    poly pi;
+    for (i=1; i<=nrows(SJ); i++)
+    {
+      pi = 0;
+      for (j=1; j<=N; j++)
+      {
+	pi = pi + SJ[i,j]*var(2*P+N+j);
+      }
+      for (j=1; j<=P; j++)
+      {
+	pi = pi + SJ[i,N+j]*s(j);
+      }
+      dbprint(ppl-1, "// -1-1-4 adding element:" + string(pi));
+      I = I, pi;
+    }
+  }
   dbprint(ppl,"// -1-2- starting the elimination of "+string(t(1..P))+" in @R");
   dbprint(ppl-1, I);
   ideal J = engine(I,eng);
