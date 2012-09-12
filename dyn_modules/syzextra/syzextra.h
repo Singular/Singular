@@ -111,28 +111,80 @@ class CLCM: public SchreyerSyzygyComputationFlags, public std::vector<bool>
 };
 
 
+class CLeadingTerm
+{
+  public: 
+    CLeadingTerm(unsigned int label,  const poly lt, const ring);
+
+  public:
+
+    const unsigned long m_sev; ///< not short exp. vector
+        // NOTE/TODO: either of the following should be enough:
+    const unsigned int  m_label; ///< index in the main L[] + 1
+    const poly          m_lt; ///< the leading term itself L[label-1]
+
+  public:
+    bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
+    bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
+
+  private:
+    // disable the following:
+    CLeadingTerm();
+    CLeadingTerm(const CLeadingTerm&);
+    void operator=(const CLeadingTerm&);
+};
+
+
+// TODO: needs a specialized variant without a component (hash!)
 class CReducerFinder: public SchreyerSyzygyComputationFlags
 {
   private:
-    class CLeadingTerm
-    {
-      public: 
-        CLeadingTerm(unsigned int id,  const poly p, const ring);
-
-      private:
-        CLeadingTerm();
-
-      public:
-
-        const unsigned long m_sev; ///< not short exp. vector
-        // NOTE/TODO: either of the following should be enough:
-        const unsigned int  m_label; ///< index in the main L[] + 1
-        const poly          m_lt; ///< the leading term itself L[label-1]
-    };
-
     typedef long TComponentKey;
     typedef std::vector<const CLeadingTerm*> TReducers;
     typedef std::map< TComponentKey, TReducers> CReducersHash;
+
+/*
+    /// TODO:
+    class const_iterator: public TReducers::const_iterator
+    {
+      typedef TReducers::const_iterator TBase;
+      private: 
+//        const TReducers& m_reds;
+        const TBase m_the_end;
+
+        const_iterator(TBase start, TBase end):
+            TBase(start), m_the_end(end)
+        { find_proper(); }
+                    
+      public:        
+        inline bool at_end() const { return m_the_end == (*this); }
+
+        inline const_iterator& operator++()
+        {
+          find_next();
+          return *this;
+        }
+        
+        inline const_iterator operator++(int)
+        {
+          const_iterator tmp(*this);
+          find_next();
+          return tmp;
+        }
+
+      protected:
+        bool is_proper() const; // difficult - needs all of CReducerFinder internals!?
+        
+        inline void find_next()
+        {
+          while (!at_end())
+          {
+            static_cast<TBase*>(this)->operator++();
+            if( is_proper() ) break;
+          }
+        }
+    };
+*/
     
   public:
     /// goes over all leading terms
@@ -142,8 +194,9 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     ~CReducerFinder();
 
-    // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?    
-    poly FindReducer(const poly product, const poly syzterm, const CReducerFinder& checker) const;
+    // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
+    poly // const_iterator // TODO: return const_iterator it, s.th: it->m_lt is the needed 
+    FindReducer(const poly product, const poly syzterm, const CReducerFinder& checker) const;
 
     bool IsDivisible(const poly q) const;
 
@@ -159,6 +212,10 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     ideal m_L; ///< only for debug
 
     CReducersHash m_hash; // can also be replaced with a vector indexed by components
+
+  private:
+    CReducerFinder(const CReducerFinder&);
+    void operator=(const CReducerFinder&);
 };
 
 
@@ -179,7 +236,6 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
   friend class CReducerFinder;
   
   public:
-
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
@@ -187,6 +243,11 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL),
         m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
+      if( __TAILREDSYZ__ && !__IGNORETAILS__)
+      {
+        if( idTails != NULL )
+          SetUpTailTerms(idTails);
+      }
     }
 
     /// Construct a global object for given input data (separated into leads & tails)
@@ -196,13 +257,22 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_syzLeads(syzLeads), m_syzTails(NULL), m_LS(syzLeads), 
         m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
-      if( __TAILREDSYZ__ && !__IGNORETAILS__ && syzLeads != NULL )
-        m_checker.Initialize(syzLeads);
+      if( __TAILREDSYZ__ && !__IGNORETAILS__)
+      {
+        if (syzLeads != NULL)
+          m_checker.Initialize(syzLeads);
+        if( idTails != NULL )
+          SetUpTailTerms(idTails);
+      }
     }
 
-    
     /// Destructor should not destruct the resulting m_syzLeads, m_syzTails. 
     ~SchreyerSyzygyComputation(){ CleanUp(); }
+
+    /// Convert the given ideal of tails into the internal representation (with reducers!)
+    void SetUpTailTerms(const ideal idTails);
+    
+    void CleanUp();
 
     /// Read off the results while detaching them from this object
     /// NOTE: no copy!
@@ -232,6 +302,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     // 
     poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
+
     
   public:
     /// just for testing via the wrapper below
@@ -245,9 +316,6 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     /// leading + second terms
     ideal Compute2LeadingSyzygyTerms();
-
-    /// Clean up all the accumulated data
-    void CleanUp() {}
 
   private:
     /// input leading terms
@@ -272,6 +340,27 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     CReducerFinder m_checker;
 
     /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
+
+    /*
+    // need more data here:
+    // (m_idLeads : m_tailterm) = (m, pos, compl), s.th: compl * m_tailterm divides m_idLeads[pos]
+    // but resulting sysygy compl * gen(pos) should not be in 
+    // Idea: extend CReducerFinder??!!
+    struct CTailTerm
+    {
+      const poly m_tailterm;
+      
+      const CReducerFinder m_reducers; // positions are labels (in m_idLeads)...
+      // compl - to be computed if needed? 
+
+      CTailTerm(const poly tt, const CReducerFinder reds): m_tailterm(tt), m_reducers(reds) {}
+    };
+
+    typedef std::vector<const CTailTerm*> TTail;
+    typedef std::vector<TTail> TTailTerms;
+    
+    TTailTerms m_idTailTerms;
+    */
 };
 
 

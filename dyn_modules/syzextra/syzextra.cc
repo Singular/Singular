@@ -221,6 +221,53 @@ void Sort_c_ds(const ideal id, const ring r)
   id->rank = id_RankFreeModule(id, r);
 }
 
+/// Clean up all the accumulated data
+void SchreyerSyzygyComputation::CleanUp()
+{
+  /*
+  for( TTailTerms::const_iterator it = m_idTailTerms.begin(); it != m_idTailTerms.end(); it++ )
+  {
+    const TTail& v = *it;
+    for(TTail::const_iterator vit = v.begin(); vit != v.end(); vit++ )
+      delete const_cast<CTailTerm*>(*vit);
+  }
+  */
+}
+
+
+
+void SchreyerSyzygyComputation::SetUpTailTerms(const ideal idTails)
+{
+  assume( idTails != NULL );
+  assume( idTails->m != NULL );
+/*  
+  m_idTailTerms.resize( IDELEMS(idTails) );
+  
+  for( unsigned int p = IDELEMS(idTails) - 1; p >= 0; p -- )
+  {
+    TTail& v = m_idTailTerms[p];
+    poly t = idTails->m[p];
+    v.resize( pLength(t) );
+
+    unsigned int pp = 0;
+    
+    while( t != NULL )
+    {
+      assume( t != NULL );
+      // TODO: compute L:t!
+//      ideal reducers;      
+//      CReducerFinder m_reducers
+      
+      CTailTerm* d = v[pp] = new CTailTerm();
+      
+      ++pp; pIter(t);
+    }
+  }
+*/
+}
+
+
+
 ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 {
   const ideal& id = m_idLeads;
@@ -850,7 +897,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
 
    
 
-CReducerFinder::CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
+CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
     m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
 { }
 
@@ -900,86 +947,6 @@ CReducerFinder::CReducerFinder(const ideal L, const SchreyerSyzygyComputationFla
     Initialize(L);
 }
 
-
-bool CReducerFinder::IsDivisible(const poly product) const
-{
-  const ring& r = m_rBaseRing;
-  
-  const long comp = p_GetComp(product, r);
-  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
-
-  assume( comp >= 0 );
-
-  CReducersHash::const_iterator it = m_hash.find(comp); // same module component
-
-  if( it == m_hash.end() )
-    return false;
-
-  assume( m_L != NULL );  
-
-  const TReducers& reducers = it->second;
-
-  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-  {
-    const poly p = (*vit)->m_lt;
-
-    assume( p_GetComp(p, r) == comp );
-
-    const int k = (*vit)->m_label;
-
-    assume( m_L->m[k] == p );
-
-    const unsigned long p_sev = (*vit)->m_sev;
-
-    assume( p_sev == p_GetShortExpVector(p, r) );     
-
-    if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
-      continue;
-
-    if( __DEBUG__ )
-    {
-      Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", k+1);
-      dPrint(p, r, r, 1);
-    }
-
-    return true;
-  }
-
-  return false;
-}
-
-
-#ifndef NDEBUG
-void CReducerFinder::DebugPrint() const
-{
-  const ring& r = m_rBaseRing;
-
-  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
-  {
-    Print("Hash Key: %d, Values: \n", it->first);
-    const TReducers& reducers = it->second;
-
-    for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
-    {
-      const poly p = (*vit)->m_lt;
-
-      assume( p_GetComp(p, r) == it->first );
-
-      const int k = (*vit)->m_label;
-
-      assume( m_L->m[k] == p );
-
-      const unsigned long p_sev = (*vit)->m_sev;
-
-      assume( p_sev == p_GetShortExpVector(p, r) );
-
-      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %dl\n", p_sev);      
-    }
-  }
-}
-#endif
-
-
 /// _p_LmDivisibleByNoComp for a | b*c
 static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const poly c, const ring r)
 {
@@ -1026,6 +993,115 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const p
   return TRUE;
 }
 
+bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const
+{
+  const poly p = m_lt;
+
+  assume( p_GetComp(p, r) == p_GetComp(product, r) );
+
+  const int k = m_label;
+
+//  assume( m_L->m[k] == p );
+
+  const unsigned long p_sev = m_sev;
+
+  assume( p_sev == p_GetShortExpVector(p, r) );     
+
+  return p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r);
+
+}
+
+/// as DivisibilityCheck(multiplier * t, ...) for monomial 'm'
+/// and a module term 't'
+bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned long not_sev, const ring r) const
+{
+  const poly p = m_lt;
+
+  assume( p_GetComp(p, r) == p_GetComp(t, r) );
+  assume( p_GetComp(m, r) == 0 );
+
+//  const int k = m_label;
+//  assume( m_L->m[k] == p );
+
+  const unsigned long p_sev = m_sev;
+  assume( p_sev == p_GetShortExpVector(p, r) );     
+
+  if (p_sev & not_sev)
+    return false;
+
+  return _p_LmDivisibleByNoComp(p, m, t, r);
+
+//  return p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r);
+
+}
+
+bool CReducerFinder::IsDivisible(const poly product) const
+{
+  const ring& r = m_rBaseRing;
+  
+  const long comp = p_GetComp(product, r);
+  const unsigned long not_sev = ~p_GetShortExpVector(product, r);
+
+  assume( comp >= 0 );
+
+  CReducersHash::const_iterator it = m_hash.find(comp); // same module component
+
+  if( it == m_hash.end() )
+    return false;
+
+  assume( m_L != NULL );  
+
+  const TReducers& reducers = it->second;
+
+  for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+  {
+    assume( m_L->m[(*vit)->m_label] == (*vit)->m_lt );
+
+    if( (*vit)->DivisibilityCheck(product, not_sev, r) )
+    {
+      if( __DEBUG__ )
+      {
+        Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + (*vit)->m_label);
+        dPrint((*vit)->m_lt, r, r, 1);
+      }
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+#ifndef NDEBUG
+void CReducerFinder::DebugPrint() const
+{
+  const ring& r = m_rBaseRing;
+
+  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
+  {
+    Print("Hash Key: %d, Values: \n", it->first);
+    const TReducers& reducers = it->second;
+
+    for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+    {
+      const poly p = (*vit)->m_lt;
+
+      assume( p_GetComp(p, r) == it->first );
+
+      const int k = (*vit)->m_label;
+
+      assume( m_L->m[k] == p );
+
+      const unsigned long p_sev = (*vit)->m_sev;
+
+      assume( p_sev == p_GetShortExpVector(p, r) );
+
+      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %dl\n", p_sev);      
+    }
+  }
+}
+#endif
 
 poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
                                  const poly syzterm, const CReducerFinder& syz_checker) const
@@ -1099,26 +1175,24 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
   {
+
     const poly p = (*vit)->m_lt;
-
-    assume( p_GetComp(p, r) == comp );
-
     const int k = (*vit)->m_label;
 
     assume( L->m[k] == p );
 
-    const unsigned long p_sev = (*vit)->m_sev;
-
-    assume( p_sev == p_GetShortExpVector(p, r) );     
+//    const unsigned long p_sev = (*vit)->m_sev;
+//    assume( p_sev == p_GetShortExpVector(p, r) );     
 
 //    if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
 //      continue;     
 
-    if (p_sev & not_sev)
+    if( !(*vit)->DivisibilityCheck(multiplier, t, not_sev, r) )
       continue;
-
-    if( !_p_LmDivisibleByNoComp(p, multiplier, t, r) )
-      continue;     
+    
+    
+//    if (p_sev & not_sev) continue;
+//    if( !_p_LmDivisibleByNoComp(p, multiplier, t, r) ) continue;     
 
 
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t        
