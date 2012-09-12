@@ -1,3 +1,4 @@
+/////////////////////////////////////////////////////////////////////////////
 //procedures examples comments
 version="1.00";
 category="Noncommutative";
@@ -34,6 +35,21 @@ LIB "control.lib";
 LIB "nchomolog.lib";
 
 //------------------- auxiliary procedures --------------------------
+
+proc testPurityfiltrationLib()
+{
+example projectiveDimension;
+example purityFiltration;
+example purityTriang;
+example gradeNumber;
+example showgrades;
+example allExtOfLeft;
+example allExtOfRight;
+example doubleExt;
+example allDoubleExt;
+example is_pure;
+example purelist;
+}
 
 static proc iszero (matrix R)
 "USAGE:  iszero(R); R a matrix
