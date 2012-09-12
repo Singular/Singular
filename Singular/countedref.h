@@ -443,8 +443,16 @@ private:
   leftv m_data;
 };
 
-/// Initialize @c blackbox types 'reference' and 'shared'
-void countedref_init();
+/// Initialize @c blackbox types 'reference' and 'shared', or both
+void countedref_reference_load();
+void countedref_shared_load();
+
+inline void
+countedref_init()
+{
+  countedref_reference_load();
+  countedref_shared_load();
+}
 
 
 #endif /*SINGULAR_COUNTEDREF_H_ */

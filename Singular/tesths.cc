@@ -169,7 +169,9 @@ int main(          /* main entry to Singular */
 #ifdef SINGULAR_PYOBJECT_SETUP_H
    pyobject_setup();
 #endif
+#ifdef SI_COUNTEDREF_AUTOLOAD
   countedref_init();
+#endif
 #ifdef HAVE_FANS
   bbcone_setup();
   bbfan_setup();

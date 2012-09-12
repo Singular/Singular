@@ -131,6 +131,16 @@ AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging versi
 
 AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
 
+AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
+[if test "x$enableval" = "xyes"; then
+ENABLE_COUNTEDREF_AUTOLOAD=yes
+fi], ENABLE_COUNTEDREF_AUTOLOAD=no)
+
+if test x"${ENABLE_COUNTEDREF_AUTOLOAD}" == xyes; then
+  AC_DEFINE([SI_COUNTEDREF_AUTOLOAD],1,[Enable autoloading of reference counted types])
+  AC_SUBST(SI_COUNTEDREF_AUTOLOAD)
+fi
+
 AC_CONFIG_SUBDIRS([findexec]) 
 AC_CONFIG_SUBDIRS([omalloc])
 
