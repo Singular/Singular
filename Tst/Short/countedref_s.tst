@@ -1118,6 +1118,53 @@ shared(ll[2]) = z;    // replaces the others
 ll;
 def(ll[2]) = x;       // generic alternative
 ll;
+
+// --------------------------------------------------------
+kill r, ref, ref2;
+ring r;ideal I = maxideal(1);ideal J = I;
+reference ref = I;
+
+attrib(ref, "huhu", 11);
+
+attrib(ref, "huhu");
+attrib(I, "huhu");
+
+attrib(ref, "huhu", 111);
+
+attrib(ref, "huhu");
+attrib(I, "huhu");
+
+
+reference ref2= I;
+attrib(ref2, "huhu");
+
+attrib(ref, "hihi", 12);
+
+attrib(ref, "huhu");
+attrib(I, "huhu");
+attrib(ref, "hihi");
+attrib(I, "hihi");
+
+attrib(ref2, "huhu");
+attrib(ref2, "hihi");
+
+attrib(I, "isSB");
+attrib(ref2, "isSB");
+
+attrib(ref2, "isSB", 0);
+
+attrib(I, "isSB");
+
+
+attrib(ref2, "isSB");
+
+
+
+attrib(I, "isSB", 1);
+attrib(I, "isSB");
+
+attrib(ref2, "isSB");
+
 // --------------------------------------------------------
 tst_status(1);$
 
