@@ -398,6 +398,13 @@ public:
 
     shallowcpy(result, m_data);
     result->next = next;
+
+    /// @note @c attrib should read the attributes of the identifier
+    if (isid()) {
+      result->attribute = ((idhdl)m_data->data)->attribute;
+      result->flag = ((idhdl)m_data->data)->flag;
+
+    }
     return FALSE;
   }
 
