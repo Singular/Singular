@@ -162,6 +162,8 @@
 #undef SI_CPU_IA64
 /* CPU type: x86_64: */
 #undef SI_CPU_X86_64
+/* Autoload reference counted types like reference and shared */
+#undef SI_COUNTEDREF_AUTOLOAD
 /* whether development version of python is available */
 #undef HAVE_PYTHON
 /* whether static development version of python is available */
