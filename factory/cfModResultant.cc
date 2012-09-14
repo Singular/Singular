@@ -25,6 +25,10 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 //TODO arrange by bound= deg (F,xlevel)*deg (G,i)+deg (G,xlevel)*deg (F, i)
 static inline
 void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
@@ -241,6 +245,15 @@ CanonicalForm uniResultant (const CanonicalForm& F, const CanonicalForm& G)
   if (F.isZero() || G.isZero())
     return 0;
 
+#ifdef HAVE_FLINT
+  nmod_poly_t FLINTF, FLINTG;
+  convertFacCF2nmod_poly_t (FLINTF, F);
+  convertFacCF2nmod_poly_t (FLINTG, G);
+  mp_limb_t FLINTresult= nmod_poly_resultant (FLINTF, FLINTG);
+  nmod_poly_clear (FLINTF);
+  nmod_poly_clear (FLINTG);
+  return CanonicalForm ((long) FLINTresult);
+#else
   zz_pBak bak;
   bak.save();
   zz_p::init (getCharacteristic());
@@ -251,6 +264,7 @@ CanonicalForm uniResultant (const CanonicalForm& F, const CanonicalForm& G)
 
   bak.restore();
   return CanonicalForm (to_long (rep (NTLResult)));
+#endif
 #else
   return resultant (F, G, F.mvar());
 #endif
