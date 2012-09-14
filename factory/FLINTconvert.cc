@@ -41,6 +41,8 @@ extern "C"
 #include <flint/fmpz_mod_poly.h>
 #include <flint/nmod_poly.h>
 #include <flint/fmpq_poly.h>
+#include <flint/nmod_mat.h>
+#include <flint/fmpz_mat.h>
 #ifdef __cplusplus
 }
 #endif
@@ -296,6 +298,65 @@ convertFmpz_mod_poly_t2FacCF (fmpz_mod_poly_t poly, const Variable& x,
   CanonicalForm result= convertFmpz_poly_t2FacCF (buf, x);
   fmpz_poly_clear (buf);
   return b (result);
+}
+
+void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, CFMatrix &m)
+{
+  fmpz_mat_init (M, (long) m.rows(), (long) m.columns());
+
+  int i,j;
+  for(i=m.rows();i>0;i--)
+  {
+    for(j=m.columns();j>0;j--)
+    {
+      convertCF2Fmpz (fmpz_mat_entry (M,i-1,j-1), m(i,j));
+    }
+  }
+}
+CFMatrix* convertFmpz_mat_t2FacCFMatrix(fmpz_mat_t m)
+{
+  CFMatrix *res=new CFMatrix(fmpz_mat_nrows (m),fmpz_mat_ncols (m));
+  int i,j;
+  for(i=res->rows();i>0;i--)
+  {
+    for(j=res->columns();j>0;j--)
+    {
+      (*res)(i,j)=convertFmpz2CF(fmpz_mat_entry (m,i-1,j-1));
+    }
+  }
+  return res;
+}
+
+void convertFacCFMatrix2nmod_mat_t (nmod_mat_t M, CFMatrix &m)
+{
+  nmod_mat_init (M, (long) m.rows(), (long) m.columns(), getCharacteristic());
+
+  bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
+  if (save_sym_ff) Off (SW_SYMMETRIC_FF);
+  int i,j;
+  for(i=m.rows();i>0;i--)
+  {
+    for(j=m.columns();j>0;j--)
+    {
+      if(!(m(i,j)).isImm()) printf("convertFacCFMatrix2FLINTmat_zz_p: not imm.\n");
+      nmod_mat_entry (M,i-1,j-1)= (m(i,j)).intval();
+    }
+  }
+  if (save_sym_ff) On (SW_SYMMETRIC_FF);
+}
+
+CFMatrix* convertNmod_mat_t2FacCFMatrix(nmod_mat_t m)
+{
+  CFMatrix *res=new CFMatrix(nmod_mat_nrows (m), nmod_mat_ncols (m));
+  int i,j;
+  for(i=res->rows();i>0;i--)
+  {
+    for(j=res->columns();j>0;j--)
+    {
+      (*res)(i,j)=CanonicalForm((long) nmod_mat_entry (m, i-1, j-1));
+    }
+  }
+  return res;
 }
 
 #endif
