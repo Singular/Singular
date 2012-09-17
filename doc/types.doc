@@ -56,6 +56,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * vector::
 * User defined types::
 * pyobject::
+* countedref::
 * cone::
 * fan::
 * polytope::
@@ -4782,10 +4783,13 @@ The user_type has to be given as a string.
 @end ifset
 
 @ifclear withpython
-@node  pyobject,,polytope, Data types
+@node  pyobject,countedref,polytope, Data types
 @section pyobject
 @cindex pyobject
 @cindex blackbox
 
 This version of Singular does not support pyobject.
 @end ifclear
+@c ------------------------------
+@include countedref.tex
+@c ------------------------------
