@@ -4,6 +4,7 @@ Changes since 3-1-5
 - changed paraplancures.lib,
           aksaka.lib,atkins.lib,crypto.lib (int/number div/mod/%)
 - changed grobcov.lib
+- added system("refrence"); and system('shared")
 
 2012-07-12 
 Release 3-1-5
