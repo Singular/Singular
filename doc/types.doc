@@ -55,11 +55,11 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * string::
 * vector::
 * User defined types::
-* pyobject::
-* countedref::
 * cone::
 * fan::
 * polytope::
+* pyobject::
+* countedref::
 @end menu
 
 @c ---------------------------------------
