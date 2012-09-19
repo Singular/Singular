@@ -5,11 +5,11 @@
  * @author Alexander Dreyer
  * @date 2012-08-15
  *
- * This file defines reference countes interpreter objects and adds the 
+ * This file defines reference countes interpreter objects and adds the
  * @c blackbox operations for high-level types 'reference' and 'shared'.
  *
  * @note This works was supported by the "Industrial Algebra" project.
- * 
+ *
  * @par Copyright:
  *   (c) 2012 by The Singular Team, see LICENSE file
 **/
@@ -80,7 +80,7 @@ public:
       if (m_back == this)
         m_back.invalidate();
       else
-        m_data.clearid(root()); 
+        m_data.clearid(root());
     }
   }
 
@@ -89,7 +89,7 @@ public:
 
   /// Gerenate  weak (but managed) reference to @c *this
   back_ptr weakref() {
-    if (m_back.unassigned()) 
+    if (m_back.unassigned())
       m_back = this;
     return m_back;
   }
@@ -117,17 +117,17 @@ public:
 
   /// Check whether identifier became invalid
   BOOLEAN broken() const {
-    if (!m_back.unassigned() && !m_back) 
-      return complain("Back-reference broken");    
+    if (!m_back.unassigned() && !m_back)
+      return complain("Back-reference broken");
 
     if (m_ring) {
-      if (m_ring != currRing) 
-        return complain("Referenced identifier not from current ring");    
+      if (m_ring != currRing)
+        return complain("Referenced identifier not from current ring");
 
       return m_data.isid()  && m_data.brokenid(currRing->idroot) &&
-        complain("Referenced identifier not available in ring anymore");  
+        complain("Referenced identifier not available in ring anymore");
     }
-    
+
     if (!m_data.isid()) return FALSE;
     return  m_data.brokenid(IDROOT) &&
      ((currPack == basePack) ||  m_data.brokenid(basePack->idroot)) &&
@@ -135,7 +135,7 @@ public:
   }
 
   /// Reassign actual object
-  BOOLEAN assign(leftv result, leftv arg) { 
+  BOOLEAN assign(leftv result, leftv arg) {
 
     if (!m_data.isid()) {
       (*this) = arg;
@@ -146,19 +146,21 @@ public:
   /// Recover additional information (e.g. subexpression) from likewise object
   BOOLEAN retrieve(leftv res) { return m_data.retrieve(res); }
 
-  /// Check whether data is all-zero 
+  /// Check whether data is all-zero
   BOOLEAN unassigned() const { return m_data.unassigned(); }
 
 private:
   /// Raise error message and return @c TRUE
-  BOOLEAN complain(const char* text) const  {
-    Werror(text);
+  BOOLEAN complain(const char* text) const
+  {
+    WerrorS(text);
     return TRUE;
   }
 
   /// Store ring for ring-dependent objects
-  static ring parent(leftv rhs) { 
-    return (rhs->RingDependend()? currRing: NULL); 
+  static ring parent(leftv rhs)
+  {
+    return (rhs->RingDependend()? currRing: NULL);
   }
 
 protected:
@@ -168,7 +170,7 @@ protected:
   /// Store namespace for ring-dependent objects
   ring_ptr m_ring;
 
-  /// Reference to actual object for wrap structures  
+  /// Reference to actual object for wrap structures
   back_ptr m_back;
 };
 
@@ -213,7 +215,7 @@ public:
             (getBlackboxStuff(typ)->blackbox_CheckAssign == countedref_CheckAssign));
   }
 
-  /// Reference given Singular data  
+  /// Reference given Singular data
   explicit CountedRef(leftv arg):  m_data(new data_type(arg)) { }
 
 protected:
@@ -253,7 +255,7 @@ public:
   }
 
   /// Construct raw reference data
-  data_type* outcast() { 
+  data_type* outcast() {
     m_data.reclaim();
     return m_data;
   }
@@ -286,16 +288,16 @@ public:
 
   /// Check for likewise identifiers
   BOOLEAN likewise(leftv res, leftv arg) {
-    return resolve(arg) || construct(res, operator*()->data == arg->data); 
+    return resolve(arg) || construct(res, operator*()->data == arg->data);
   }
 
   /// Check for identical reference objects
-  BOOLEAN same(leftv res, leftv arg) { 
+  BOOLEAN same(leftv res, leftv arg) {
     return construct(res, m_data == arg->Data());
   }
 
   /// Get type of references data
-  BOOLEAN type(leftv res) { 
+  BOOLEAN type(leftv res) {
     return construct(res, Tok2Cmdname(operator*()->Typ()));
   };
 
@@ -362,7 +364,7 @@ char* countedref_String(blackbox *b, void* ptr)
 
 /// blackbox support - copy element
 void* countedref_Copy(blackbox*b, void* ptr)
-{ 
+{
   if (ptr) return CountedRef::cast(ptr).outcast();
   return NULL;
 }
@@ -373,9 +375,9 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
   // Case: replace assignment behind reference
   if (result->Data() != NULL) {
     CountedRef ref = CountedRef::cast(result);
-    return CountedRef::resolve(arg) || ref.assign(result, arg);	
+    return CountedRef::resolve(arg) || ref.assign(result, arg);
   }
-  
+
   // Case: copy reference
   if (result->Typ() == arg->Typ())
     return CountedRef::cast(arg).outcast(result);
@@ -384,7 +386,7 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
   if ((arg->rtyp == IDHDL) || CountedRef::is_ref(arg))
     return CountedRef(arg).outcast(result);
 
-  Werror("Can only take reference from identifier");
+  WerrorS("Can only take reference from identifier");
   return TRUE;
 }
 
@@ -392,10 +394,10 @@ BOOLEAN countedref_CheckInit(leftv res, leftv arg)
 {
   if (arg->Data() != NULL) return FALSE;
   res->rtyp = NONE;
-  Werror("Noninitialized access");
+  WerrorS("Noninitialized access");
   return TRUE;
 }
-                                                                 
+
 /// blackbox support - unary operations
 BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 {
@@ -403,8 +405,9 @@ BOOLEAN countedref_Op1(int op, leftv res, leftv head)
     return blackboxDefaultOp1(op, res, head);
 
   if (countedref_CheckInit(res, head)) return TRUE;
- 
-  if ((op == DEF_CMD) || (op == head->Typ())) {
+
+  if ((op == DEF_CMD) || (op == head->Typ()))
+  {
     res->rtyp = head->Typ();
     return iiAssign(res, head);
   }
@@ -419,7 +422,8 @@ BOOLEAN countedref_Op1(int op, leftv res, leftv head)
 /// blackbox support - binary operations (resolve seocnd argument)
 static BOOLEAN countedref_Op2_(int op, leftv res, leftv head, leftv arg)
 {
-  if (CountedRef::is_ref(arg)) {
+  if (CountedRef::is_ref(arg))
+  {
     CountedRef ref = CountedRef::cast(arg);
     return ref.dereference(arg) || iiExprArith2(res, head, op, arg);
   }
@@ -429,7 +433,8 @@ static BOOLEAN countedref_Op2_(int op, leftv res, leftv head, leftv arg)
 BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 {
   if (countedref_CheckInit(res, head)) return TRUE;
-  if (CountedRef::is_ref(head)) {
+  if (CountedRef::is_ref(head))
+  {
     CountedRef ref = CountedRef::cast(head);
     return ref.dereference(head) || countedref_Op2_(op, res, head, arg);
   }
@@ -439,7 +444,8 @@ BOOLEAN countedref_Op2(int op, leftv res, leftv head, leftv arg)
 static BOOLEAN countedref_Op3__(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
 
-  if (CountedRef::is_ref(arg2)) {
+  if (CountedRef::is_ref(arg2))
+  {
     CountedRef ref = CountedRef::cast(arg2);
     return ref.dereference(arg2) || iiExprArith3(res, op, head, arg1, arg2);
   }
@@ -448,7 +454,8 @@ static BOOLEAN countedref_Op3__(int op, leftv res, leftv head, leftv arg1, leftv
 
 static BOOLEAN countedref_Op3_(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
-  if (CountedRef::is_ref(arg1)) {
+  if (CountedRef::is_ref(arg1))
+  {
     CountedRef ref = CountedRef::cast(arg1);
     return ref.dereference(arg1) || countedref_Op3__(op, res, head, arg1, arg2);
   }
@@ -460,7 +467,8 @@ static BOOLEAN countedref_Op3_(int op, leftv res, leftv head, leftv arg1, leftv 
 BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 {
   if (countedref_CheckInit(res, head)) return TRUE;
-  if (CountedRef::is_ref(head)) {
+  if (CountedRef::is_ref(head))
+  {
     CountedRef ref = CountedRef::cast(head);
     return ref.dereference(head) || countedref_Op3_(op, res, head, arg1, arg2);
   }
@@ -476,7 +484,8 @@ void countedref_destroy(blackbox *b, void* ptr)
 
 
 class CountedRefShared:
-  public CountedRef {
+  public CountedRef
+  {
   typedef CountedRefShared self;
   typedef CountedRef base;
 
@@ -493,13 +502,13 @@ public:
   /// Construct internal copy of Singular interpreter object
   explicit CountedRefShared(leftv arg):  base(new data_type(arg, data_type::copy_tag())) { }
 
-  /// Construct new reference to internal data 
+  /// Construct new reference to internal data
   CountedRefShared(const self& rhs): base(rhs) { }
 
-  /// Desctruct 
+  /// Desctruct
   ~CountedRefShared() { }
 
-  /// Change reference to shared data 
+  /// Change reference to shared data
   self& operator=(const self& rhs) {
     return static_cast<self&>(base::operator=(rhs));
   }
@@ -517,12 +526,13 @@ public:
   data_type::back_ptr weakref() { return m_data->weakref(); }
 
   /// Recover more information (e.g. subexpression data) from computed result
-  BOOLEAN retrieve(leftv res, int typ) { 
+  BOOLEAN retrieve(leftv res, int typ)
+  {
     return (m_data->retrieve(res) && outcast(res, typ));
   }
 };
 
-/// Blackbox support - generate initialized, but all-zero - shared data 
+/// Blackbox support - generate initialized, but all-zero - shared data
 void* countedref_InitShared(blackbox*)
 {
   return CountedRefShared().outcast();
@@ -536,14 +546,16 @@ BOOLEAN countedref_Op1Shared(int op, leftv res, leftv head)
 
   if (countedref_CheckInit(res, head)) return TRUE;
 
-  if ((op == DEF_CMD) || (op == head->Typ())) {
+  if ((op == DEF_CMD) || (op == head->Typ()))
+  {
     res->rtyp = head->Typ();
     return iiAssign(res, head);
   }
 
   CountedRefShared ref = CountedRefShared::cast(head);
 
-  if ((op == LINK_CMD) ) {
+  if ((op == LINK_CMD) )
+  {
     if (ref.dereference(head)) return TRUE;
     res->Copy(head);
     return (res->Typ() == NONE);
@@ -561,7 +573,8 @@ BOOLEAN countedref_Op2Shared(int op, leftv res, leftv head, leftv arg)
 {
   if (countedref_CheckInit(res, head))  return TRUE;
 
-  if (CountedRefShared::is_ref(head)) {
+  if (CountedRefShared::is_ref(head))
+  {
     CountedRefShared wrap = CountedRefShared::cast(head).wrapid();
     int typ = head->Typ();
     return wrap.dereference(head) || countedref_Op2_(op, res, head, arg) ||
@@ -576,16 +589,19 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
 {
   if (args->Data() == NULL) return FALSE;
 
-  if(op == SYSTEM_CMD) {
-    if (args->next) {
+  if(op == SYSTEM_CMD)
+  {
+    if (args->next)
+    {
       leftv next = args->next;
       args->next = NULL;
 
-      char* name = (next->Typ() == STRING_CMD? 
+      char* name = (next->Typ() == STRING_CMD?
                     (char*) next->Data(): (char*)next->Name());
       next = next->next;
 
-      if (strcmp(name, "help") == 0) {
+      if (strcmp(name, "help") == 0)
+      {
         PrintS("system(<ref>, ...): extended functionality for reference/shared data <ref>\n");
         PrintS("  system(<ref>, count)         - number of references pointing to <ref>\n");
         PrintS("  system(<ref>, enumerate)     - unique number for identifying <ref>\n");
@@ -595,16 +611,18 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
         PrintS("  system(<ref1>, same, <ref2>) - tests for identic reference objects\n");
         return CountedRef::construct(res);
       }
-      if (strncmp(name, "undef", 5) == 0) {
-	return CountedRef::construct(res, args->Data()? 
+      if (strncmp(name, "undef", 5) == 0)
+      {
+        return CountedRef::construct(res, args->Data()?
                           (CountedRef::cast(args).unassigned()? 1: 2): 0);
       }
 
       CountedRef obj = CountedRef::cast(args);
-      if (next) {
+      if (next)
+      {
         if (strcmp(name, "same") == 0) return obj.same(res, next);
         // likewise may be hard to interprete, so we not not document it above
-        if (strncmp(name, "like", 4) == 0) return obj.likewise(res, next);  
+        if (strncmp(name, "like", 4) == 0) return obj.likewise(res, next);
       }
       if (strncmp(name, "count", 5) == 0) return obj.count(res);
       if (strncmp(name, "enum", 4) == 0) return obj.enumerate(res);
@@ -613,7 +631,8 @@ BOOLEAN countedref_OpM(int op, leftv res, leftv args)
     }
     return TRUE;
   }
-  if (op == LIST_CMD){
+  if (op == LIST_CMD)
+  {
     res->rtyp = op;
     return jjLIST_PL(res, args);
   }
@@ -627,21 +646,21 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
   /// Case: replace assignment behind reference
   if ((result->Data() != NULL)  && !CountedRefShared::cast(result).unassigned()) {
     CountedRef ref = CountedRef::cast(result);
-    return CountedRef::resolve(arg) || ref.assign(result, arg);	
+    return CountedRef::resolve(arg) || ref.assign(result, arg);
   }
-  
+
   /// Case: new reference to already shared data
-  if (result->Typ() == arg->Typ()) {
-    if (result->Data() != NULL) 
+  if (result->Typ() == arg->Typ())
+  {
+    if (result->Data() != NULL)
       CountedRefShared::cast(result).destruct();
     return CountedRefShared::cast(arg).outcast(result);
-  }  
-  if(CountedRefShared::cast(result).unassigned()) {
-   return CountedRefShared::cast(result).assign(result, arg);
-
-    return FALSE;
   }
-    
+  if(CountedRefShared::cast(result).unassigned())
+  {
+    return CountedRefShared::cast(result).assign(result, arg);
+  }
+
   /// Case: new shared data
   return CountedRefShared(arg).outcast(result);
 }
