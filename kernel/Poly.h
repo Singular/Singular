@@ -348,7 +348,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
 
   PolyBase(const char* c, ring r=currRing):ptr(new PolyImpl((poly)NULL,r)){
     //p_Read takes no const so do
-    char* cp=(char*) omalloc((strlen(c)+1)*sizeof(char));
+    char* cp=(char*) omAlloc((strlen(c)+1)*sizeof(char));
     strcpy(cp,c);
     p_Read(cp,ptr->p,r);
     omfree(cp);

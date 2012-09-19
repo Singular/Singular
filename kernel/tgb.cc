@@ -1107,8 +1107,8 @@ static void move_backward_in_S (int old_pos, int new_pos, kStrategy strat)
 static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
 {
   ideal I = c->S;
-  int *cans = (int *) omalloc (c->n * sizeof (int));
-  int *connected = (int *) omalloc (c->n * sizeof (int));
+  int *cans = (int *) omAlloc (c->n * sizeof (int));
+  int *connected = (int *) omAlloc (c->n * sizeof (int));
   cans[0] = to;
   int cans_length = 1;
   connected[0] = from;
@@ -1500,7 +1500,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   }
   c->tmp_pair_lm[i] = pOne_Special (c->r);
 
-  c->tmp_spn[i] = (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
+  c->tmp_spn[i] = (sorted_pair_node *) omAlloc (sizeof (sorted_pair_node));
 
   c->lengths[i] = pLength (h);
 
@@ -1527,7 +1527,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
 
 #else
   if(i > 0)
-    c->states[i] = (char *) omalloc (i * sizeof (char));
+    c->states[i] = (char *) omAlloc (i * sizeof (char));
   else
     c->states[i] = NULL;
 #endif
@@ -1648,7 +1648,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       //    if (short_s)
       //    {
       assume (spc <= j);
-      sorted_pair_node *s = c->tmp_spn[spc];    //(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      sorted_pair_node *s = c->tmp_spn[spc];    //(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
       s->i = si_max (i, j);
       s->j = si_min (i, j);
       assume (s->j == j);
@@ -1736,10 +1736,10 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       assume (_p_GetComp (c->S->m[nodes[lower]->i], c->r) ==
               _p_GetComp (c->S->m[nodes[lower]->j], c->r));
       nodes_final[spc_final] =
-        (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
+        (sorted_pair_node *) omAlloc (sizeof (sorted_pair_node));
 
       *(nodes_final[spc_final++]) = *(nodes[lower]);
-      //c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      //c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
       nodes[lower] = NULL;
       for(lower = lower + 1; lower <= upper; lower++)
       {
@@ -1792,7 +1792,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
         m_iLastAltVar - m_iFirstAltVar + 1;     // should be enough
       // TODO: but we may also use got = gcd({m}_{m\in f}))!
 
-      poly *array_arg = (poly *) omalloc (N * sizeof (poly));   // !
+      poly *array_arg = (poly *) omAlloc (N * sizeof (poly));   // !
       int j = 0;
 
 
@@ -2133,7 +2133,7 @@ linalg_step_modp (poly * p, poly * p_out, int &pn, poly * terms, int tn,
   const number_type zero = 0;   //npInit(0);
   int array_size = pn * tn;
   number_type *number_array =
-    (number_type *) omalloc (pn * tn * sizeof (number_type));
+    (number_type *) omAlloc (pn * tn * sizeof (number_type));
   int i;
   for(i = 0; i < array_size; i++)
   {
@@ -2230,7 +2230,7 @@ void NoroCache::evaluateRows ()
 {
   //after that can evaluate placeholders
   int i;
-  buffer = (number *) omalloc (nIrreducibleMonomials * sizeof (number));
+  buffer = (number *) omAlloc (nIrreducibleMonomials * sizeof (number));
   for(i = 0; i < root.branches_len; i++)
   {
     evaluateRows (1, root.branches[i]);
@@ -2288,7 +2288,7 @@ void NoroCache::evaluateRows (int level, NoroCacheNode * node)
       row->end = idx + 1;
       assume (row->end > row->begin);
       int len = row->end - row->begin;
-      row->array = (number *) omalloc ((len) * sizeof (number));
+      row->array = (number *) omAlloc ((len) * sizeof (number));
       memcpy (row->array, a + row->begin, len * sizeof (number));
 #else
       assume (dn->value_len == pLength (dn->value_poly));
@@ -2636,9 +2636,9 @@ std::vector < NoroPlaceHolder > noro_red (poly p, int &len, NoroCache * cache,
 #ifndef NORO_CACHE
 void noro_step (poly * p, int &pn, slimgb_alg * c)
 {
-  poly *reduced = (poly *) omalloc (pn * sizeof (poly));
+  poly *reduced = (poly *) omAlloc (pn * sizeof (poly));
   int j;
-  int *reduced_len = (int *) omalloc (pn * sizeof (int));
+  int *reduced_len = (int *) omAlloc (pn * sizeof (int));
   int reduced_c = 0;
   //if (TEST_OPT_PROT)
   //  PrintS("reduced system:\n");
@@ -2677,7 +2677,7 @@ void noro_step (poly * p, int &pn, slimgb_alg * c)
   {
     reduced_sum += reduced_len[j];
   }
-  poly *terms = (poly *) omalloc (reduced_sum * sizeof (poly));
+  poly *terms = (poly *) omAlloc (reduced_sum * sizeof (poly));
   int tc = 0;
   for(j = 0; j < reduced_c; j++)
   {
@@ -2736,7 +2736,7 @@ static void go_on (slimgb_alg * c)
   if((use_noro) || (c->use_noro_last_block))
     max_pairs = bundle_size_noro;
 #endif
-  poly *p = (poly *) omalloc ((max_pairs + 1) * sizeof (poly)); //nullterminated
+  poly *p = (poly *) omAlloc ((max_pairs + 1) * sizeof (poly)); //nullterminated
 
   int curr_deg = -1;
   while(i < max_pairs)
@@ -2864,7 +2864,7 @@ static void go_on (slimgb_alg * c)
        } */
   }
 #endif
-  red_object *buf = (red_object *) omalloc (i * sizeof (red_object));
+  red_object *buf = (red_object *) omAlloc (i * sizeof (red_object));
   for(j = 0; j < i; j++)
   {
     p_Test (p[j], c->r);
@@ -3147,12 +3147,12 @@ void slimgb_alg::introduceDelayedPairs (poly * pa, int s)
   if(s == 0)
     return;
   sorted_pair_node **si_array =
-    (sorted_pair_node **) omalloc (s * sizeof (sorted_pair_node *));
+    (sorted_pair_node **) omAlloc (s * sizeof (sorted_pair_node *));
 
   for(int i = 0; i < s; i++)
   {
     sorted_pair_node *si =
-      (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
+      (sorted_pair_node *) omAlloc (sizeof (sorted_pair_node));
     si->i = -1;
     si->j = -2;
     poly p = pa[i];
@@ -3243,7 +3243,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
   max_pairs = 5 * IDELEMS (I);
 
   apairs =
-    (sorted_pair_node **) omalloc (sizeof (sorted_pair_node *) * max_pairs);
+    (sorted_pair_node **) omAlloc (sizeof (sorted_pair_node *) * max_pairs);
   pair_top = -1;
 
   int n = IDELEMS (I);
@@ -3252,13 +3252,13 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
 
   i = 0;
   this->n = 0;
-  T_deg = (int *) omalloc (n * sizeof (int));
+  T_deg = (int *) omAlloc (n * sizeof (int));
   if(eliminationProblem)
-    T_deg_full = (int *) omalloc (n * sizeof (int));
+    T_deg_full = (int *) omAlloc (n * sizeof (int));
   else
     T_deg_full = NULL;
-  tmp_pair_lm = (poly *) omalloc (n * sizeof (poly));
-  tmp_spn = (sorted_pair_node **) omalloc (n * sizeof (sorted_pair_node *));
+  tmp_pair_lm = (poly *) omAlloc (n * sizeof (poly));
+  tmp_spn = (sorted_pair_node **) omAlloc (n * sizeof (sorted_pair_node *));
   lm_bin = omGetSpecBin (POLYSIZE + (r->ExpL_Size) * sizeof (long));
 #ifdef HEAD_BIN
   HeadBin = omGetSpecBin (POLYSIZE + (currRing->ExpL_Size) * sizeof (long));
@@ -3267,17 +3267,17 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
 #ifndef HAVE_BOOST
 #ifdef USE_STDVECBOOL
 #else
-  h = omalloc (n * sizeof (char *));
+  h = omAlloc (n * sizeof (char *));
 
   states = (char **) h;
 #endif
 #endif
-  h = omalloc (n * sizeof (int));
+  h = omAlloc (n * sizeof (int));
   lengths = (int *) h;
-  weighted_lengths = (wlen_type *) omalloc (n * sizeof (wlen_type));
-  gcd_of_terms = (poly *) omalloc (n * sizeof (poly));
+  weighted_lengths = (wlen_type *) omAlloc (n * sizeof (wlen_type));
+  gcd_of_terms = (poly *) omAlloc (n * sizeof (poly));
 
-  short_Exps = (long *) omalloc (n * sizeof (long));
+  short_Exps = (long *) omAlloc (n * sizeof (long));
   if(F4_mode)
     S = idInit (n, I->rank);
   else
@@ -3322,7 +3322,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
        for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
        {
        //     add_to_basis(I->m[i],-1,-1,c);
-       si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+       si=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
        si->i=-1;
        si->j=-2;
        si->expected_length=pQuality(I->m[i],this,pLength(I->m[i]));
@@ -3371,7 +3371,7 @@ slimgb_alg::~slimgb_alg ()
 
   if(!(completed))
   {
-    poly *add = (poly *) omalloc ((pair_top + 2) * sizeof (poly));
+    poly *add = (poly *) omAlloc ((pair_top + 2) * sizeof (poly));
     int piter;
     int pos = 0;
     for(piter = 0; piter <= pair_top; piter++)
@@ -3633,7 +3633,7 @@ do_t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode, int deg_pos)
 
   qsort (I->m, IDELEMS (I), sizeof (poly), poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
-  //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
+  //slimgb_alg* c=(slimgb_alg*) omAlloc(sizeof(slimgb_alg));
   //int syz_comp=arg_I->rank;
   slimgb_alg *c = new slimgb_alg (I, syz_comp, F4_mode, deg_pos);
 
@@ -4676,7 +4676,7 @@ static void sort_region_down (red_object * los, int l, int u, slimgb_alg * c)
 //assume that los is ordered ascending by leading term, all non zero
 static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
 {
-  poly *delay = (poly *) omalloc (losl * sizeof (poly));
+  poly *delay = (poly *) omAlloc (losl * sizeof (poly));
   int delay_s = 0;
   //initialize;
   assume (c->strat->sl >= 0);
@@ -4706,7 +4706,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
        && (lies_in_last_dp_block (los[curr_pos].p, c)))
     {
       int pn_noro = curr_pos + 1;
-      poly *p_noro = (poly *) omalloc (pn_noro * sizeof (poly));
+      poly *p_noro = (poly *) omAlloc (pn_noro * sizeof (poly));
       for(i = 0; i < pn_noro; i++)
       {
         int dummy_len;
@@ -4826,7 +4826,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
   }
 
   //sorted_pair_node** pairs=(sorted_pair_node**)
-  //  omalloc(delay_s*sizeof(sorted_pair_node*));
+  //  omAlloc(delay_s*sizeof(sorted_pair_node*));
   c->introduceDelayedPairs (delay, delay_s);
   /*
      for(i=0;i<delay_s;i++)
@@ -4834,7 +4834,7 @@ static void multi_reduction (red_object * los, int &losl, slimgb_alg * c)
      poly p=delay[i];
      //if (rPar(c->r)==0)
      simplify_poly(p,c->r);
-     sorted_pair_node* si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+     sorted_pair_node* si=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
      si->i=-1;
      si->j=-1;
      if (!rField_is_Zp(c->r))
