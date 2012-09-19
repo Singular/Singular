@@ -152,7 +152,7 @@ public:
 private:
   /// Raise error message and return @c TRUE
   BOOLEAN complain(const char* text) const  {
-    Werror(text);
+    WerrorS(text);
     return TRUE;
   }
 
@@ -384,7 +384,7 @@ BOOLEAN countedref_Assign(leftv result, leftv arg)
   if ((arg->rtyp == IDHDL) || CountedRef::is_ref(arg))
     return CountedRef(arg).outcast(result);
 
-  Werror("Can only take reference from identifier");
+  WerrorS("Can only take reference from identifier");
   return TRUE;
 }
 
@@ -392,7 +392,7 @@ BOOLEAN countedref_CheckInit(leftv res, leftv arg)
 {
   if (arg->Data() != NULL) return FALSE;
   res->rtyp = NONE;
-  Werror("Noninitialized access");
+  WerrorS("Noninitialized access");
   return TRUE;
 }
                                                                  
