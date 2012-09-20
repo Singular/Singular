@@ -260,7 +260,7 @@ InternalCF *
 CFFactory::poly ( const Variable & v, int exp )
 {
     if ( v.level() == LEVELBASE )
-        return CFFactory::basic( 1 );
+        return CFFactory::basic( 1L );
     else
         return new InternalPoly( v, exp, 1 );
 }

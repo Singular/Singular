@@ -27,7 +27,7 @@
 #define TRANSEXT_PRIVATES
 #include <polys/ext_fields/transext.h>
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r );
 
@@ -104,7 +104,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     result += term;
     pIter( p );
   }
-  return result;
+ return result;
 }
 
 int convFactoryISingI( const CanonicalForm & f)

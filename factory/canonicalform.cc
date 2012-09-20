@@ -1795,7 +1795,7 @@ operator >> ( ISTREAM & is, CanonicalForm & cf )
 CanonicalForm
 CanonicalForm::genCoeff( int type, int i )
 {
-    return CanonicalForm( CFFactory::basic( type, i ) );
+    return CanonicalForm( CFFactory::basic( type, (long)i ) );
 }
 
 CanonicalForm
