@@ -264,7 +264,6 @@ int redEcart (LObject* h,kStrategy strat)
 
     // now we finally can reduce
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
-    h->last=NULL;
     strat->fromT=FALSE;
 
     // are we done ???

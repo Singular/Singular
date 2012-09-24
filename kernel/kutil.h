@@ -191,7 +191,6 @@ public:
                  lm(pi) in currRing, tail(pi) in tailring -*/
 
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  poly last;   // pLast(p) during reductions
   kBucket_pt bucket;
   int   i_r1, i_r2;
 
@@ -213,7 +212,7 @@ public:
   // preparation for reduction if not spoly
   KINLINE void PrepareRed(BOOLEAN use_bucket);
   KINLINE void SetLmTail(poly lm, poly new_p, int length,
-                         int use_bucket, ring r, poly last);
+                         int use_bucket, ring r);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists

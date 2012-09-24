@@ -250,7 +250,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       L->pLength++;
       bucket = L->bucket;
       L->bucket = NULL;
-      L->last = NULL;
     }
 
     if (!fromNext && p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
@@ -266,7 +265,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     {
       if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
-        L->last = p1;
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
         {
@@ -304,7 +302,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         if (L->t_p != NULL) pNext(L->t_p) = NULL;
         L->pLength = 0;
         L->bucket = bucket;
-        L->last = NULL;
       }
       else
         kBucketDestroy(&bucket);
@@ -366,7 +363,6 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       L->length = 1;
       //if (L->pLength > 0)
       L->pLength = 1;
-      if (L->last != NULL) L->last = p;
       L->max = NULL;
 
       if (L->t_p != NULL && pNext(L->t_p) != NULL)
@@ -763,11 +759,6 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     {
       return dReportError("L[%d] wrong sev: has %o, specified to have %o",
                           lpos, p_GetShortExpVector(p, r), L->sev);
-    }
-    if (lpos > 0 && L->last != NULL && pLast(p) != L->last)
-    {
-      return dReportError("L[%d] last wrong: has %p specified to have %p",
-                          lpos, pLast(p), L->last);
     }
   }
   if (L->p1 == NULL)
@@ -5058,7 +5049,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat,
 //        leading monomials are smaller than the leading monomial of the
 //        critical pair. In this situation we can discard the critical pair
 //        completely.
-BOOLEAN arriRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat, int start=0)
+BOOLEAN arriRewCriterion(poly sig, unsigned long /*not_sevSig*/, kStrategy strat, int start=0)
 {
   //printf("Arri Rewritten Criterion\n");
   while (strat->Ll > 0 && pLmEqual(strat->L[strat->Ll].sig,strat->P.sig))
@@ -5271,7 +5262,6 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   all_done:
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->pLength = 0;
   }
   strat->kHEdgeFound = save_HE;
@@ -5371,7 +5361,6 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
 
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->length = 0;
   }
 
@@ -5478,7 +5467,6 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
 
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->length = 0;
   }
 
@@ -5794,7 +5782,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 
 void initSLSba (ideal F, ideal Q,kStrategy strat)
 {
-  int   i,j,pos, ctr=0, ps=0;
+  int   i,pos;
   if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else i=setmaxT;
   strat->ecartS =   initec(i);
@@ -6877,7 +6865,6 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
 */
 void enterSSba (LObject p,int atS,kStrategy strat, int atR)
 {
-  int i;
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
@@ -8790,7 +8777,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
 /*1
 * put the pairs (sh \dot s[i],p)  into the set B, ecart=ecart(p)
 */
-void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
+void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int /*atR*/, int uptodeg, int lV)
 {
   /* p comes from strat->P.p, that is LObject with LM in currRing and Tail in tailRing */
 
@@ -8866,7 +8853,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 * put the pairs (sh \dot qq,p)  into the set B, ecart=ecart(p)
 * despite the name, not only self shifts
 */
-void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
+void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int /*atR*/, int uptodeg, int lV)
 {
 
   /* format: p,qq are in LObject form: lm in CR, tail in TR */
@@ -8897,7 +8884,7 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
     }
 #endif
 
-  poly q, s;
+  poly q;
 
   if (strat->interred_flag) return; // ?
 
@@ -8931,7 +8918,7 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 /*2
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i]
 */
-void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS, int uptodeg, int lV)
+void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS, int /*uptodeg*/, int lV)
 {
 
   /* Format: q and p are like strat->P.p, so lm in CR, tail in TR */
@@ -9451,7 +9438,6 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->length = 0;
   }
   L->Normalize(); // HANNES: should have a test

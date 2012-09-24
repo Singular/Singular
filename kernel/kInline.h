@@ -545,12 +545,11 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
       pNext(tp) = NULL;
       if (p != NULL) pNext(p) = NULL;
       pLength = 0;
-      last = NULL;
     }
   }
 }
 
-KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring _tailRing, poly _last)
+KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring _tailRing)
 {
 
   Set(lm, _tailRing);
@@ -560,15 +559,12 @@ KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_buc
     kBucketInit(bucket, p_tail, p_Length);
     pNext(lm) = NULL;
     pLength = 0;
-    last = NULL;
   }
   else
   {
     pNext(lm) = p_tail;
     pLength = p_Length + 1;
-    last = _last;
   }
-
 }
 
 KINLINE void sLObject::Tail_Mult_nn(number n)
@@ -717,7 +713,6 @@ sLObject::ShallowCopyDelete(ring new_tailRing,
   sTObject::ShallowCopyDelete(new_tailRing,
                               new_tailRing->PolyBin,p_shallow_copy_delete,
                               FALSE);
-  last = NULL;
 }
 
 KINLINE void sLObject::SetShortExpVector()
@@ -746,12 +741,10 @@ KINLINE void sLObject::Copy()
     if (p != NULL) pNext(p) = NULL;
   }
   TObject::Copy();
-  last = NULL;
 }
 
 KINLINE poly sLObject::CopyGetP()
 {
-  last = NULL;
   if (bucket != NULL)
   {
     int i = kBucketCanonicalize(bucket);
@@ -788,18 +781,16 @@ KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
 {
   if (! deg_last || bucket != NULL) return sLObject::pLDeg();
 
-  if (last == NULL || pLength == 0)
-    last = pLast(GetLmTailRing(), pLength);
-#ifdef HAVE_ASSUME
   long ldeg;
   ldeg = tailRing->pLDeg(GetLmTailRing(), &length, tailRing);
+#ifdef HAVE_ASSUME
+  if ( pLength == 0)
+    p_Last(GetLmTailRing(), pLength, tailRing);
   assume ( pLength == length || rIsSyzIndexRing(currRing));
-  assume (ldeg == tailRing->pFDeg(last,tailRing));
-  return ldeg;
 #else
-  length = pLength;
-  return tailRing->pFDeg(last, tailRing);
+  pLength=length;
 #endif
+  return ldeg;
 }
 
 KINLINE long sLObject::SetDegStuffReturnLDeg()
@@ -1172,7 +1163,7 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 
 // dummy function for function pointer strat->rewCrit being usable in all
 // possible choices for criteria
-KINLINE BOOLEAN arriRewDummy(poly sig, unsigned long not_sevSig, kStrategy strat, int start=0)
+KINLINE BOOLEAN arriRewDummy(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy /*strat*/, int start=0)
 {
   return FALSE;
 }
