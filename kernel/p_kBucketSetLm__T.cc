@@ -122,55 +122,57 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
   poly p=NULL;
-  while(p==NULL){
-      int found=-1000;
-       for (int i = 1; i<=bucket->buckets_used; i++)
+  while(p==NULL)
+  {
+    int found=-1000;
+    for (int i = 1; i<=bucket->buckets_used; i++)
+    {
+      if (bucket->buckets[i] != NULL)
+      {
+        if (p == NULL)
         {
-          if (bucket->buckets[i] != NULL)
-          {
-            if (p == NULL)
-            {
-                p=bucket->buckets[i];
-                found=i;
-                continue;
-            }
-            assume(p != NULL);
-            p_MemCmp(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Continue, goto Greater, goto Continue);
-            //assume(p_LmCmp(bucket->buckets[i],p,r)==1);
-          Greater:
-            //if (p_LmCmp(bucket->buckets[i],p,r)!=1) continue;
-            found=i;
-            p=bucket->buckets[i];
-          Continue:;
-          }
+          p=bucket->buckets[i];
+          found=i;
+          continue;
         }
-      if (found<0) return;
-      assume(p==bucket->buckets[found]);
-      assume(p!=NULL);
+        assume(p != NULL);
+        p_MemCmp(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Continue, goto Greater, goto Continue);
+        //assume(p_LmCmp(bucket->buckets[i],p,r)==1);
+        Greater:
+        //if (p_LmCmp(bucket->buckets[i],p,r)!=1) continue;
+        found=i;
+        p=bucket->buckets[i];
+        Continue:;
+      }
+    }
+    if (found<0) return;
+    assume(p==bucket->buckets[found]);
+    assume(p!=NULL);
 
-      p=kBucketExtractLmOfBucket(bucket, found);
-      assume(p!=NULL);
-      p_Test(p,r);
-      poly copy=p_LmInit(p, r);
+    p=kBucketExtractLmOfBucket(bucket, found);
+    assume(p!=NULL);
+    p_Test(p,r);
+    poly copy=p_LmInit(p, r);
 
-      for (int i = found+1; i<=bucket->buckets_used; i++)
+    for (int i = found+1; i<=bucket->buckets_used; i++)
+    {
+      if (bucket->buckets[i] != NULL)
+      {
+        if(p_LmEqual(bucket->buckets[i], copy,r))
         {
-          if (bucket->buckets[i] != NULL)
-          {
-            if(p_LmEqual(bucket->buckets[i], copy,r)){
-                poly q=kBucketExtractLmOfBucket(bucket,i);
-                assume(p!=q);
-                p=p_Add_q(p, q,r);
-                assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
-            }
-          }
+          poly q=kBucketExtractLmOfBucket(bucket,i);
+          assume(p!=q);
+          p=p_Add_q(p, q,r);
+          assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
         }
-        p_Delete(&copy, r);
+      }
+    }
+    p_Delete(&copy, r);
   }
   bucket->buckets[0] = lt;
   bucket->buckets_length[0] = 1;
 
   kBucketAdjustBucketsUsed(bucket);
   kbTest(bucket);
-  }
+}
 #endif
