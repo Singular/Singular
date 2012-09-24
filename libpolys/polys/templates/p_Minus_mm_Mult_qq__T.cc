@@ -16,7 +16,7 @@
  * Const:    m, q
  *
  ***************************************************************/
-LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r, poly &last)
+LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r)
 {
   p_Test(p, r);
   p_Test(q, r);
@@ -133,21 +133,19 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   if (q == NULL) // append rest of p to result
   {
     pNext(a) = p;
-    if (p == NULL) last = a;
   }
   else  // append (- m*q) to result
   {
     pSetCoeff0(m, tneg);
-    last = a;
     if (spNoether != NULL)
     {
       int ll = 0;
-      pNext(a) = r->p_Procs->pp_Mult_mm_Noether(q, m, spNoether, ll, r, last);
+      pNext(a) = r->p_Procs->pp_Mult_mm_Noether(q, m, spNoether, ll, r);
       shorter += ll;
     }
     else
     {
-      pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r, last);
+      pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r);
 #ifdef HAVE_RINGS
       if (! rField_is_Domain(r))
       {

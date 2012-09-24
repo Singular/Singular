@@ -463,7 +463,7 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
 }
 
 // return new poly = pPoly * pMonom; preserve pPoly and pMonom.
-poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly &)
+poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing)
 {
   assume( rIsSCA(rRing) );
 

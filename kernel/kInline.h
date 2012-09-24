@@ -598,7 +598,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
     assume(_p != NULL);
 
     pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m, q, pLength, lq, 
-                                    spNoether, last, tailRing );
+                                    spNoether, tailRing );
 //    tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q, shorter,spNoether, tailRing, last);
 //    pLength += lq - shorter;
   }

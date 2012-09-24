@@ -949,8 +949,7 @@ static inline poly pp_Mult_mm(poly p, poly m, const ring r)
     return pp_Mult_nn(p, pGetCoeff(m), r);
   else
   {
-    poly last;
-    return r->p_Procs->pp_Mult_mm(p, m, r, last);
+    return r->p_Procs->pp_Mult_mm(p, m, r);
   }
 }
 
@@ -963,34 +962,6 @@ static inline poly p_Mult_mm(poly p, poly m, const ring r)
     return r->p_Procs->p_Mult_mm(p, m, r);
 }
 
-// like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
-// then result = p-m*q, lp == pLength(result), last == pLast(result)
-static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
-                                 const poly spNoether, poly& last, const ring r)
-{
-  int l; 
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
-  {
-    p = nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
-    last = p_Last(p, l, r);
-    assume( lp == l );
-    assume( lp == pLength(p) );
-    return p;
-  }
-#endif
-
-  int shorter;
-  const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
-  lp = (lp + lq) - shorter;
-  assume( last == p_Last(res, l, r) );
-  assume( lp == l );
-  assume( lp == pLength(res) );
-  return res;
-}
-
-
-// like p_Minus_mm_Mult_qq (above) but without last 
 static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
                                       const poly spNoether, const ring r)
 {
@@ -1003,8 +974,8 @@ static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &l
   }
 #endif
 
-  int shorter; poly last;
-  const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+  int shorter;
+  const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r);
   lp += lq - shorter;
   assume( lp == pLength(res) );
   return res;
@@ -1022,9 +993,8 @@ static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, const 
 #endif
 
   int shorter;
-  poly last;
 
-  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last); // !!!
+  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
 }
 
 
@@ -1105,7 +1075,6 @@ static inline poly p_Mult_q(poly p, poly q, const ring r)
 // returns p*q, does neither destroy p nor q
 static inline poly pp_Mult_qq(poly p, poly q, const ring r)
 {
-  poly last;
   if (p == NULL || q == NULL) return NULL;
 
   if (pNext(p) == NULL)
@@ -1114,12 +1083,12 @@ static inline poly pp_Mult_qq(poly p, poly q, const ring r)
     if (rIsPluralRing(r))
       return nc_mm_Mult_pp(p, q, r);
 #endif
-    return r->p_Procs->pp_Mult_mm(q, p, r, last);
+    return r->p_Procs->pp_Mult_mm(q, p, r);
   }
 
   if (pNext(q) == NULL)
   {
-    return r->p_Procs->pp_Mult_mm(p, q, r, last);
+    return r->p_Procs->pp_Mult_mm(p, q, r);
   }
 
   poly qq = q;
@@ -1149,13 +1118,13 @@ static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
 #endif
 
 // this should be implemented more efficiently
-  poly res, last;
+  poly res;
   int shorter;
   number n_old = pGetCoeff(m);
   number n_neg = n_Copy(n_old, r->cf);
   n_neg = n_Neg(n_neg, r->cf);
   pSetCoeff0(m, n_neg);
-  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
   lp = (lp + lq) - shorter;
   pSetCoeff0(m, n_old);
   n_Delete(&n_neg, r->cf);

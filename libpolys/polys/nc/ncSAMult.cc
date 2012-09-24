@@ -50,7 +50,7 @@ namespace
 {
 
 // poly functions defined in p_Procs: ;
-static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
+static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r)
 {
   if( (p == NULL) || (m == NULL) )
     return NULL;

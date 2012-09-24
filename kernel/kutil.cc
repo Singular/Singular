@@ -1785,9 +1785,9 @@ void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ
   pWrite(m2);
 #endif
   // get multiplied signatures for testing
-  pSigMult = currRing->p_Procs->pp_Mult_mm(pSigMult,m1,currRing,last);
+  pSigMult = currRing->p_Procs->pp_Mult_mm(pSigMult,m1,currRing);
   pSigMultNegSev = ~p_GetShortExpVector(pSigMult,currRing);
-  sSigMult = currRing->p_Procs->pp_Mult_mm(sSigMult,m2,currRing,last);
+  sSigMult = currRing->p_Procs->pp_Mult_mm(sSigMult,m2,currRing);
   sSigMultNegSev = ~p_GetShortExpVector(sSigMult,currRing);
   
   pDelete (&m1);
@@ -6020,7 +6020,7 @@ void initSyzRules (kStrategy strat)
           q               = p_Neg (q, currRing);
           p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
           strat->syz[ctr] = p_Add_q (strat->syz[ctr], q, currRing);
-#ifdef DEBUGF5 || DEBUGF51
+#if defined(DEBUGF5) || defined(DEBUGF51)
           pWrite(strat->syz[ctr]);
 #endif
           strat->sevSyz[ctr] = p_GetShortExpVector(strat->syz[ctr],currRing);

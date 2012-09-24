@@ -698,7 +698,6 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   assume(*l <= 0 || pLength(p) == *l);
   int i, l1;
   poly p1 = p;
-  poly last;
   ring r = bucket->bucket_ring;
 
   if (*l <= 0)
@@ -752,11 +751,12 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     if (spNoether != NULL)
     {
       l1 = -1;
-      p1 = r->p_Procs->pp_Mult_mm_Noether(p1, m, spNoether, l1, r, last);
+      p1 = r->p_Procs->pp_Mult_mm_Noether(p1, m, spNoether, l1, r);
       i = pLogLength(l1);
     }
-    else {
-      p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
+    else
+    {
+      p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
 #ifdef HAVE_RINGS
       if (rField_is_Ring(r) && !(rField_is_Domain(r)))
       {
@@ -803,7 +803,6 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   assume(l <= 0 || pLength(p) == l);
   int i, l1;
   poly p1 = p;
-  poly last;
   ring r = bucket->bucket_ring;
 
   if (m == NULL || p == NULL) return;
@@ -891,7 +890,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     //p_SetCoeff0(n, swap_n, r);
     //p_GetCoeff0(n, swap_n,r);
     #endif
-    p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
+    p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
     #ifdef USE_COEF_BUCKETS
     //m may not be changed
     p_SetCoeff(m,n_Copy(n,r),r);

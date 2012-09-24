@@ -433,7 +433,7 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
 }
 
 /* poly functions defined in p_Procs : */
-poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly &last)
+poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r)
 {
   return( gnc_p_Mult_mm_Common(p_Copy(p,r), m, 1, r) );
 }

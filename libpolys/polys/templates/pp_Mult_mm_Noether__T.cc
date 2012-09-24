@@ -16,7 +16,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, int &ll, const ring ri, poly &last)
+LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, int &ll, const ring ri)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
@@ -24,7 +24,6 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, i
   if (p == NULL)
   {
     ll = 0;
-    last = NULL;
     return NULL;
   }
   spolyrec rp;
@@ -63,8 +62,6 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, i
   else
     ll = pLength(p);
 
-  if (q != &rp)
-    last = q;
   pNext(q) = NULL;
 
   p_Test(pNext(&rp), ri);
