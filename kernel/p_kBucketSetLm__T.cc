@@ -128,7 +128,6 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
         {
           if (bucket->buckets[i] != NULL)
           {
-           
             if (p == NULL)
             {
                 p=bucket->buckets[i];
@@ -145,20 +144,17 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
           Continue:;
           }
         }
-      
-      
       if (found<0) return;
       assume(p==bucket->buckets[found]);
       assume(p!=NULL);
-      
+
       p=kBucketExtractLmOfBucket(bucket, found);
       assume(p!=NULL);
       p_Test(p,r);
       poly copy=p_LmInit(p, r);
-      
+
       for (int i = found+1; i<=bucket->buckets_used; i++)
         {
-          
           if (bucket->buckets[i] != NULL)
           {
             if(p_LmEqual(bucket->buckets[i], copy,r)){
@@ -167,18 +163,10 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
                 p=p_Add_q(p, q,r);
                 assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
             }
-            
-    
-            
           }
         }
         p_Delete(&copy, r);
   }
- 
-  //assume(bucket->buckets[j] != NULL);
-  assume(pLength(p)==1);
-  lt = p;
-  
   bucket->buckets[0] = lt;
   bucket->buckets_length[0] = 1;
 

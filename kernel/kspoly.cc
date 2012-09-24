@@ -177,7 +177,6 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   kTest_L(Pair);
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
-  poly last;
   Pair->tailRing = tailRing;
 
   assume(p1 != NULL);
@@ -236,16 +235,16 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   if (spNoether != NULL)
   {
     l2 = -1;
-    a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing,last);
+    a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing);
     assume(l2 == pLength(a2));
   }
   else
-    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
+    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
 #ifdef HAVE_RINGS
   if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
 #endif
 
-  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing, last);
+  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
 
   // get m2*a2 - m1*a1
   Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);

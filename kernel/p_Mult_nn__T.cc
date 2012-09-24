@@ -48,8 +48,8 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
         p_LmDelete(&q, r);
       }
       else
-      { 
-        p_LmDelete(&p, r); 
+      {
+        p_LmDelete(&p, r);
         pNext(old) = p;
       }
     }

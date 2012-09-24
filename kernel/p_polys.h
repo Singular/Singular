@@ -12,6 +12,7 @@
 #define P_POLYS_H
 
 #include <kernel/structs.h>
+#include <kernel/ring.h>
 #include <kernel/polys-impl.h>
 /*
  Some general remarks:
@@ -342,8 +343,10 @@ inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRing);}
  *
  ***************************************************************/
 PINLINE0 int       pLength(poly a);
-PINLINE0 poly      pLast(poly a, int &length);
-inline   poly      pLast(poly a) { int l; return pLast(a, l);}
+PINLINE0 poly      p_Last(poly a, int &length, const ring r);
+inline   poly      pLast(poly a, int &l) { return p_Last(a, l, currRing);}
+inline   poly      pLast(poly a) { int l; return p_Last(a, l, currRing);}
+inline   poly      p_Last(poly a, const ring r) { int l; return p_Last(a, l,r);}
 PINLINE0 poly pReverse(poly p);
 
 

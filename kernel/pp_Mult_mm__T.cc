@@ -14,13 +14,12 @@
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
+LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
   if (p == NULL)
   {
-    last = NULL;      
     return NULL;
   }
   spolyrec rp;
@@ -55,7 +54,6 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
     p = pNext(p);
   }
   while (p != NULL);
-  last = q;
   pNext(q) = NULL;
 
   p_Test(pNext(&rp), ri);

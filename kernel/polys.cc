@@ -968,7 +968,7 @@ int pSize(poly p)
 * returns the length of a (numbers of monomials)
 * respect syzComp
 */
-poly pLast(poly a, int &l)
+poly p_Last(poly a, int &l, const ring r)
 {
   if (a == NULL)
   {
@@ -976,7 +976,7 @@ poly pLast(poly a, int &l)
     return NULL;
   }
   l = 1;
-  if (! rIsSyzIndexRing(currRing))
+  if (! rIsSyzIndexRing(r))
   {
     while (pNext(a)!=NULL)
     {
@@ -986,11 +986,11 @@ poly pLast(poly a, int &l)
   }
   else
   {
-    int curr_limit = rGetCurrSyzLimit(currRing);
+    int curr_limit = rGetCurrSyzLimit(r);
     poly pp = a;
     while ((a=pNext(a))!=NULL)
     {
-      if (pGetComp(a)<=curr_limit/*syzComp*/)
+      if (p_GetComp(a,r)<=curr_limit/*syzComp*/)
         l++;
       else break;
       pp = a;

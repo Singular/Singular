@@ -714,7 +714,6 @@ int redHoney (LObject* h, kStrategy strat)
         if(at <= strat->Ll)
           /*- h will not become the next element to reduce -*/
         {
-          h->last=NULL;
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
@@ -779,7 +778,6 @@ int redHoney (LObject* h, kStrategy strat)
       if (at <= strat->Ll)
       {
         int dummy=strat->sl;
-        h->last=NULL;
         if (kFindDivisibleByInS(strat, &dummy, h) < 0)
           return 1;
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
@@ -801,7 +799,6 @@ int redHoney (LObject* h, kStrategy strat)
           //Print("OVERFLOW in redHoney d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
           h->GetP();
           at = strat->posInL(strat->L,strat->Ll,h,strat);
-          h->last=NULL;
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           h->Clear();
           return -1;

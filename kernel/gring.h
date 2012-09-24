@@ -58,7 +58,7 @@ bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
 // for p_Minus_mm_Mult_qq in pInline2.h
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
-                                    const int, const poly, const ring r);
+                                    const poly, const ring r);
 
 // // for p_Plus_mm_Mult_qq in pInline2.h
 // returns p + m*q destroys p, const: q, m

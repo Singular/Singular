@@ -239,7 +239,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       L->pLength++;
       bucket = L->bucket;
       L->bucket = NULL;
-      L->last = NULL;
     }
 
     if (!fromNext && p_Cmp(p,strat->kNoetherTail(), L->tailRing) == -1)
@@ -255,7 +254,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     {
       if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
-        L->last = p1;
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
         {
@@ -293,7 +291,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         if (L->t_p != NULL) pNext(L->t_p) = NULL;
         L->pLength = 0;
         L->bucket = bucket;
-        L->last = NULL;
       }
       else
         kBucketDestroy(&bucket);
@@ -355,7 +352,6 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       L->length = 1;
       //if (L->pLength > 0)
       L->pLength = 1;
-      if (L->last != NULL) L->last = p;
       L->max = NULL;
 
       if (L->t_p != NULL && pNext(L->t_p) != NULL)
@@ -752,11 +748,6 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     {
       return dReportError("L[%d] wrong sev: has %o, specified to have %o",
                           lpos, p_GetShortExpVector(p, r), L->sev);
-    }
-    if (lpos > 0 && L->last != NULL && pLast(p) != L->last)
-    {
-      return dReportError("L[%d] last wrong: has %p specified to have %p",
-                          lpos, pLast(p), L->last);
     }
   }
   if (L->p1 == NULL)
@@ -4518,7 +4509,6 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   all_done:
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->pLength = 0;
   }
   strat->kHEdgeFound = save_HE;
@@ -4618,7 +4608,6 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
 
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->length = 0;
   }
 
@@ -4725,7 +4714,6 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
 
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->length = 0;
   }
 
@@ -7687,7 +7675,6 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 
   if (strat->redTailChange)
   {
-    L->last = NULL;
     L->length = 0;
   }
   L->Normalize(); // HANNES: should have a test
