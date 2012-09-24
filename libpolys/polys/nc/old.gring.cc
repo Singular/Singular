@@ -194,16 +194,19 @@ poly p_Lcm(const poly a, const poly b, const ring r)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
-                                    const int, const poly, const ring r)
+poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &shorter,
+                                    const poly, const ring r)
 {
   poly mc  = p_Neg( p_Copy(m, r), r );
   poly mmc = nc_mm_Mult_pp( mc, q, r );
   p_Delete(&mc, r);
 
+  int org_p=pLength(p);
+  int org_q=pLength(q);
+
   p = p_Add_q(p, mmc, r);
 
-  lp = pLength(p); // ring independent!
+  shorter = pLength(p)-org_p-org_q; // ring independent!
 
   return(p);
 }
@@ -3178,10 +3181,7 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   // "commutative"
   p_Procs->p_Mult_mm  = rGR->p_Procs->p_Mult_mm  = gnc_p_Mult_mm;
   p_Procs->pp_Mult_mm = rGR->p_Procs->pp_Mult_mm = gnc_pp_Mult_mm;
-  p_Procs->p_Minus_mm_Mult_qq = rGR->p_Procs->p_Minus_mm_Mult_qq = NULL;
-  // gnc_p_Minus_mm_Mult_qq_ign; // should not be used!!!???
-
-
+  p_Procs->p_Minus_mm_Mult_qq = rGR->p_Procs->p_Minus_mm_Mult_qq = nc_p_Minus_mm_Mult_qq;
 
   // non-commutaitve multiplication by monomial from the left
   rGR->GetNC()->p_Procs.mm_Mult_p   = gnc_mm_Mult_p;

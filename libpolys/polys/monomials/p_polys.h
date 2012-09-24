@@ -965,15 +965,6 @@ static inline poly p_Mult_mm(poly p, poly m, const ring r)
 static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq,
                                       const poly spNoether, const ring r)
 {
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
-  {
-    p = nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
-    assume( lp == pLength(p) );
-    return p;
-  }
-#endif
-
   int shorter;
   const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r);
   lp += lq - shorter;
@@ -984,14 +975,6 @@ static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &l
 // return p - m*Copy(q), destroys p; const: p,m
 static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, const ring r)
 {
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
-  {
-    int lp, lq = 0;
-    return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, NULL, r);
-  }
-#endif
-
   int shorter;
 
   return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
