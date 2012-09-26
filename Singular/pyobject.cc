@@ -274,9 +274,9 @@ protected:
 private:
   BOOLEAN none_to(leftv result) const
   {
-    Py_XDECREF(m_ptr);
     result->data = NULL;
     result->rtyp = NONE;
+    Py_XDECREF(m_ptr);
     return FALSE;
   }
 
@@ -503,6 +503,7 @@ char* pyobject_String(blackbox *b, void* ptr)
 /// blackbox support - copy element
 void* pyobject_Copy(blackbox*b, void* ptr)
 { 
+    assume(ptr);
     Py_XINCREF(ptr);
     return ptr;
 }
@@ -510,9 +511,9 @@ void* pyobject_Copy(blackbox*b, void* ptr)
 /// blackbox support - assign element
 BOOLEAN pyobject_Assign(leftv l, leftv r)
 {
-  Py_XDECREF(l->Data());
   PyObject* result = PythonCastDynamic(r);
   Py_XINCREF(result);
+  Py_XDECREF(l->Data());
 
   if (l->rtyp == IDHDL)
     IDDATA((idhdl)l->data) = (char *)result;

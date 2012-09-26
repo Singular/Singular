@@ -1,0 +1,1385 @@
+///////////////////////////////////////////////////////////////////
+version="$Id: polybori.lib 0 1 $";
+category="Miscellaneous";
+
+// summary description of the library
+
+info="
+LIBRARY:   polybori.lib A Singular Library Interface for PolyBoRi
+AUTHORS:   Maximilian Kammermeier: Max0791@gmx.de
+           Susanne Scherer: sscherer90@yahoo.de
+
+SEE ALSO:  Libraries, pyobject, newstruct
+
+
+@*
+
+OVERVIEW:  A library for using PolyBoRi in the Singular interface, with
+procedures that convert structures (polynomials, rings, ideals) in both
+directions. Therefore, it is possible to compute boolean groebner basis
+via boolean_std. Polynomials can be converted to zero-supressed decision
+diagrams (zdd) and vice versa.
+
+For usability it defines the PolyBoRi types bideal, bpoly, and bring 
+which are equivalent to Singular's ideal, poly, and ring, as well as
+bset which corresponds to the zdd introduced here. 
+
+REFERENCES:
+See http://polybori.sf.net for details about PolyBoRi.
+
+PROCEDURES:
+  boolean_std(bideal);                            Singular ideal of boolean groebner basis of I
+
+  // Procedures from Singular to PolyBoRi
+
+  boolean_poly_ring(ring);                       convert ring
+  boolean_constant(int[, bring]);                convert constant
+  boolean_poly(poly[, int, bring])               convert polynomial
+  direct_boolean_poly(poly[, bring]);            convert polynomial direct
+  recursive_boolean_poly(poly[, bring]);         convert polynomial recursively
+  boolean_ideal(ideal[, bring]);                 convert ideal
+  boolean_set(zdd[, bring]);                     convert zdd
+
+  // Procedures from PolyBoRi to Singular
+
+  from_boolean_constant(bpoly);                  convert boolean constant
+  from_boolean_poly(bpoly[, int]);               convert boolean polynomial
+  direct_from_boolean_poly(bpoly);               convert boolean polynomial direct
+  recursive_from_boolean_poly(bpoly);            convert boolean polynomial recursively
+  from_boolean_ideal(bpoly);                     convert ideal
+  from_boolean_set(bpoly);                       convert zdd [BooleSet]
+
+  // Miscellaneous
+
+  bvar(i);                                       return i-th Boolean variable 
+  poly2zdd(poly);                                return zdd of a given polynomial
+  zdd2poly(zdd);                                 return polynomial representation of a given zdd
+  disp_zdd(zdd);                                 return string with a visualization of a given
+
+KEYWORDS: library, polybori.lib; polybori; polybori.lib; library; pyobject; newstruct; zdd
+
+";
+
+///////////////////////////////////////////////////////////////////////
+// initialization of datatypes and constant structures
+
+static proc mod_init()
+"USAGE: mod_init()
+RETURN: none
+NOTE: load PolyBoRi and introduce the structures zdd and bpoly
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+"
+{
+  if (typeof(zdd_one)=="?unknown type?")
+  {
+    python_import("polybori");
+
+ // install new types
+
+    newstruct("zdd","int idx,def thenBranch,def elseBranch");
+    newstruct("bpoly","pyobject boolpoly");
+    newstruct("bideal","pyobject pylist");
+    newstruct("bring", "pyobject pyring");
+    newstruct("bset", "pyobject pyset");
+
+ // install type operations
+
+    system("install", "zdd",      "==",      zdd_check,2);
+    system("install", "bpoly",    "==",      bpoly_check,2);
+    system("install", "bpoly",    "*",       bpoly_mult,2);
+    system("install", "bpoly",    "+",       bpoly_add,2);
+    system("install", "zdd",      "print",   print_zdd, 1);
+    system("install", "bpoly",    "print",   print_bpoly,1);
+    system("install", "bideal",   "print",   print_bideal,1);
+    system("install", "bideal",   "size",    size_bideal,1);
+    system("install", "bpoly",    "lead",     lead_bpoly, 1);
+    system("install", "bpoly",    "leadmonom",lead_monom_bpoly, 1);
+    system("install", "bpoly",    "leadcoef", lead_coef_bpoly, 1);
+    system("install", "bideal",   "[",        op_getitem, 2);
+    system("install", "bideal",   "+",        bideal_add, 2);
+    system("install", "bideal",   "std",      boolean_std, 4);
+
+ // install type conversions
+
+//    implemented typecasts (both directions)
+//    SINGULAR             BOOLEAN OBJECTS
+//    ring                 bring
+//    poly                 bpoly
+//    zdd                  bset
+//    ideal                bideal
+//
+// furthermore, it is possible to switch between poly <-> zdd and bpoly <-> bset
+
+    system("install", "bring",    "=",        ring2bring, 1);
+    system("install", "bring",    "nvars",    nvars_bring, 1);
+
+    system("install", "pyobject", "poly",     from_boolean_poly, 1);
+    system("install", "pyobject", "size",     size_pyobject, 1);
+
+    system("install", "pyobject", "bideal",   pyobject2bideal,1);
+    system("install", "bideal",   "pyobject", bideal2pyobject,1);
+
+    system("install", "bideal",   "ideal",    bideal2ideal, 4);
+    system("install", "bideal",   "=",        type2bideal, 1);
+
+
+
+    system("install", "zdd",      "poly",     zdd2poly, 1);
+    system("install", "zdd",      "=",        poly2zdd, 1);
+
+    system("install", "zdd",      "pyobject", boolean_set, 1);
+    system("install", "pyobject", "zdd",      from_boolean_set, 1);
+
+    system("install", "bset",     "zdd",      bset2zdd, 1);
+    system("install", "zdd",      "bset",     zdd2bset, 1);
+
+    system("install", "bpoly",    "bset",     bpoly2bset, 1);
+    system("install", "bset",     "bpoly",    bset2bpoly, 1);
+
+    system("install", "pyobject", "bpoly",    pyobject2bpoly,1);
+    system("install", "bpoly",    "pyobject", bpoly2pyobject,1);
+
+    system("install", "bpoly",     "poly",    bpoly2poly,1);
+    system("install", "bpoly",     "bideal",  bpoly2bideal,1);
+    system("install", "bpoly",     "=",       poly2bpoly,1);
+
+
+
+ // initialize constant zdds
+
+    zdd zdd_one;
+    zdd_one.idx=0;
+    zdd_one.thenBranch=int(1);
+    zdd_one.elseBranch=int(0);
+    zdd zdd_zero;
+    zdd_zero.idx=0;
+    zdd_zero.thenBranch=int(0);
+    zdd_zero.elseBranch=int(0);
+    export(zdd_one);
+    export(zdd_zero); 
+    
+    python_run("def if_then_else_idx(idx,b,c): return b.set().change(idx).union(c)");
+    python_run("_SINGULAR_RINGS = dict()");
+    python_run("_SINGULAR_RINGS_ACCESSED = 0");
+    python_run("def _SINGULAR_DECACHE_RING(arg): val = arg(); return 0 if val is None else val");
+  }
+}
+
+///////////////////////////////////////////////////////////////////////
+// computes the leading term of a bpoly
+
+proc lead_bpoly(bpoly pp)
+{
+  pyobject zero=0;
+  bpoly zero2;
+  zero2.boolpoly=zero;
+  if (pp==zero2)
+  {
+    return(0);
+  }
+  else
+  {
+    pyobject ppb=pp.boolpoly."lead"();
+    return(ppb);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////
+// computes the leading monomial of a bpoly
+
+proc lead_monom_bpoly(bpoly pp)
+{
+  if (pp.boolpoly == 0) {  return(0); }
+
+  pyobject ppb=pp.boolpoly."lead"();
+  return(ppb);
+}
+
+///////////////////////////////////////////////////////////////////////
+// computes the leading coefficient of a bpoly
+
+proc lead_coef_bpoly(bpoly pp)
+{
+  if (int(pp.is_zero())) {  return(0); }
+  return(1);
+}
+
+///////////////////////////////////////////////////////////////////////
+// converts a Singular ring into a Boolean ring
+
+proc ring2bring(r)
+{
+  bring rb;
+  rb.pyring = boolean_poly_ring(r);
+  return(rb);
+}
+///////////////////////////////////////////////////////////////////////
+// Generate an ideal from one constructor
+proc bpoly2bideal(bpoly bp)
+{
+  pyobject obj = list(bp);
+  bideal bI = obj;
+  return (bI);
+}
+
+///////////////////////////////////////////////////////////////////////
+// get number of variables of a Boolean ring
+
+proc nvars_bring(bring rb)
+{
+  return (int(rb.pyring.n_variables()));
+}
+
+///////////////////////////////////////////////////////////////////////
+// get variable of Boolean ring corresponding to current basering
+
+proc bvar(int i)
+"USAGE: bvar(i); int i
+RETURN: i-th variable of Boolean ring corresponding to current basering
+SEE ALSO: boolean_poly_ring, var
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example bvar; shows an example"
+{
+  bpoly res = var(i);
+  return (res);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 2,(x,y,z),Dp;
+  bvar(1); // -> x
+}
+
+///////////////////////////////////////////////////////////////////////
+// Internal functions for caching converted ring
+///////////////////////////////////////////////////////////////////////
+
+
+// Mark cache as accessed and clear garbage every 100 accesses
+static proc bring_mark_cache(list #)
+{ 
+  if (int(python_eval("_SINGULAR_RINGS_ACCESSED >= 100"))) {
+    python_run("_SINGULAR_RINGS_ACCESSED = 0");
+    def erased = python_eval("[_k for (_k,_v) in _SINGULAR_RINGS.items() if _v() is None]");
+    erased = python_eval("(lambda _keys: [_SINGULAR_RINGS.pop(_k) for _k in _keys])")(erased);
+  }
+  python_run("_SINGULAR_RINGS_ACCESSED += 1");
+}
+
+// look up whether we cached this conversion before
+static proc bring_from_cache(r)
+{ 
+  bring_mark_cache();
+  def result1 = python_eval("_SINGULAR_RINGS.get('" + string(r) + "', (lambda: None))");
+  def result = python_eval("_SINGULAR_DECACHE_RING")(result1);
+  return (result);
+}
+
+// insert computed result into cache
+static proc bring_to_cache(r, pyobject newring)
+{
+  def value = WeakRingRef(newring);
+  python_eval("_SINGULAR_RINGS")."__setitem__"(string(r), value);
+}
+
+///////////////////////////////////////////////////////////////////////
+// converts a Singular ring into a python ring
+
+proc boolean_poly_ring(r)
+{
+  def cached = bring_from_cache(r);
+  if (int(cached != int(0))) { return (cached); }
+
+  def rl = ringlist(r);
+  list blocks;
+  string ordering;
+  pyobject orders = python_eval("dict(lp=OrderCode.lp)");
+  if (size(rl[3]) >2)
+  {
+    orders.update(python_eval("dict(Dp=OrderCode.block_dlex)"));
+  }
+  else
+  {
+    orders.update(python_eval("dict(Dp=OrderCode.dlex)"));
+  }
+
+  int i;
+  int counter=0;
+  for (i=1; i<=size(ringlist(r)[3]); i++)
+  {
+    if (rl[3][i][1]<>"C")
+    {
+      ordering=rl[3][i][1];
+      if (counter) { blocks = blocks + list(counter) };
+      counter = counter + size(rl[3][i][2]);
+    }
+  }
+  if(int(orders.has_key(ordering)==0))
+  {
+     "// Warning: Unsupported ordering, using 'lp`!";
+  }
+
+  def result = Ring(nvars(r), orders.get(ordering, 0), rl[2], blocks);
+  bring_to_cache(r, result);
+  return (result);
+}
+
+///////////////////////////////////////////////////////////////////////
+// returns ith entry of a bideal
+
+proc op_getitem(bideal arg, def idx)
+{
+  if (typeof(idx) == "int") { return (arg.pylist[idx-1]); }
+
+  bideal res = (python_eval("lambda ll, idx: [ll[i] for i in idx]")(arg.pylist, idx-1));
+  return (res);
+}
+
+///////////////////////////////////////////////////////////////////////
+// concatenate generators of bideals
+
+proc bideal_add(bideal arg1, bideal arg2)
+{
+  pyobject tmp = python_eval("lambda x, y: list(sorted(set(x).union(set(y))))");
+  bideal res = tmp(arg1.pylist,arg2.pylist);
+  return (res);
+}
+
+///////////////////////////////////////////////////////////////////////
+// checks the equality of two bpolys
+
+proc bpoly_check(bpoly pb1, pb2)
+{
+  return(pb1.boolpoly==pb2.boolpoly);
+}
+
+///////////////////////////////////////////////////////////////////////
+// computes the multiplication of two bpolys
+
+proc bpoly_mult(bpoly pb1, pb2)
+{
+  bpoly bpol;
+  bpol.boolpoly=pb1.boolpoly*pb2.boolpoly;
+  return(bpol);
+}
+
+///////////////////////////////////////////////////////////////////////
+// computes the addition of two bpolys
+
+proc bpoly_add(bpoly pb1, bpoly pb2)
+{
+  bpoly bpol;
+  bpol.boolpoly=pb1.boolpoly+pb2.boolpoly;
+  return(bpol);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert bpoly to pyobject
+
+proc bpoly2pyobject(bpoly pb)
+{
+  return(pb.boolpoly);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert bideal to pyobject
+
+proc bideal2pyobject(bideal Ib)
+{
+  return(Ib.pylist);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert poly to bpoly
+
+proc poly2bpoly(poly p)
+{
+  bpoly bpol;
+  bpol.boolpoly=boolean_poly(p);
+  return(bpol);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert zdd to bset
+
+proc zdd2bset(zdd ss)
+{
+  bset bs;
+  bs.pyset=boolean_set(ss);
+  return(bs);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert bpoly to bset
+
+proc bpoly2bset(bpoly ss)
+{
+  bset bs;
+  bs.pyset=ss.boolpoly.set();
+  return(bs);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert bset to zdd
+
+proc bset2zdd(bset ss)
+{
+  zdd bs;
+  bs=from_boolean_set(ss.pyset);
+  return(bs);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert bset to bpoly
+
+proc bset2bpoly(bset ss)
+{
+  bpoly pb;
+  pb.boolpoly=python_eval("Polynomial")(ss.pyset);
+  return(pb);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert type (ideal or list) to bideal
+
+proc type2bideal(def I)
+{
+  if (typeof(I) == "ideal") { return (boolean_ideal(I)); }
+
+  bideal bid;
+  pyobject pylist;
+
+  if (typeof(I) == "list")
+  {
+    pylist = python_eval("list()");
+    int i; int nlen=size(I); bpoly elt;
+    for (i=1; i <= nlen; i++) {
+      elt = I[i];
+      pylist.append(pyobject(elt)); 
+    }
+  }
+  else { pylist = I; }
+  bid.pylist = pylist;
+  return (bid);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert bpoly to poly
+
+proc bpoly2poly(bpoly pb)
+{
+  poly h=poly(pb.boolpoly);
+  return(h);
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// convert bideal to ideal
+
+proc bideal2ideal(bideal Ib)
+{
+  ideal I;
+  I=from_boolean_ideal(Ib);
+  return(I);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert pyobject to bpoly
+
+proc pyobject2bpoly(pyobject pb)
+{
+  bpoly bpol;
+  bpol.boolpoly=pb;
+  return(bpol);
+}
+
+///////////////////////////////////////////////////////////////////////
+// convert pyobject to bideal
+
+proc pyobject2bideal(pyobject Ib)
+{
+  bideal bid;
+  bid.pylist=Ib;
+  return(bid);
+}
+
+///////////////////////////////////////////////////////////////////////
+// print bpoly
+
+proc print_bpoly(bpoly pb)
+{
+  pb.boolpoly;
+}
+
+///////////////////////////////////////////////////////////////////////
+// print bideal
+
+proc print_bideal(bideal Ib)
+{
+  int nlen = size(Ib);
+  for (int i = 1; i <= nlen; i++)
+  {
+    "_[" + string(i)+"] = " + string(Ib[i]);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////
+// get size of pyobject
+
+proc size_pyobject(pyobject obj)
+{
+  return (int(python_eval("len")(obj)));
+}
+
+///////////////////////////////////////////////////////////////////////
+// get size of bideal
+
+proc size_bideal(bideal Ib)
+{
+  return (size(Ib.pylist));
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// print zdd
+
+proc print_zdd(zdd ss)
+{
+  "zdd: ";
+  disp_zdd(ss);
+}
+
+///////////////////////////////////////////////////////////////////////
+// check equality
+
+proc zdd_check(zdd zdd1,zdd zdd2)
+"USAGE: zdd_check(zdd1,zdd2); zdd zdd1, zdd zdd2
+RETURN: 0 or 1 "
+{
+  if (zdd1.idx != zdd2.idx) { return (int(0)); }
+
+  if (zdd1.idx == 0) {  return (int(zdd1.thenBranch == zdd2.thenBranch)); }
+
+  return (zdd_check(zdd1.thenBranch,zdd2.thenBranch)*zdd_check(zdd1.elseBranch,zdd2.elseBranch));
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc boolean_set(zdd ss,list #)
+"USAGE: boolean_set(ss[, rb]); ss zdd, rb boolean ring
+RETURN: default: boolean set ss in the representation of a Polybori boolean set 
+in the ring rb==boolean_poly_ring(basering); optional input: boolean ring rb
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example boolean_set; shows an example"
+{
+  pyobject rb;
+  rb=check_additional_ring(#);
+  pyobject newthen,newelse,unbek,outp;
+  if (ss.idx==0)
+  {
+    if (zdd_check(ss,zdd_one)==1) { return (boolean_constant(1,rb)); }
+    return (boolean_constant(0,rb));
+  }
+  newthen=(boolean_set(ss.thenBranch,rb));
+  newelse=(boolean_set(ss.elseBranch,rb));
+  outp=if_then_else_idx(ss.idx-1,newthen,newelse);
+  return (outp);
+}
+
+example
+{ "EXAMPLE:"; echo=2;
+  ring rs=0,(x,y,z),Dp;
+  poly ps=(x+1)*(y+1)*(z+1);
+  zdd fz=ps;
+  boolean_set(fz);
+
+  poly g=x*y*z+1;
+  zdd gz=g;
+  boolean_set(gz);
+
+  ring R=0,(x(1..4)),Dp;
+  def Rb=boolean_poly_ring(R);
+  poly h=(x(1)+1)*(x(2)+1)*(x(3)+1)*(x(4)+1);
+  zdd hz=h;
+  boolean_set(hz);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc from_boolean_set(def s)
+"USAGE: from_boolean_set(sb); sb boolean set
+RETURN: Boolean set sb in the representation of a zdd
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example from_boolean_set; shows an example"
+{
+  bpoly bp = s;
+  pyobject sb = bp;
+  def rb=boolean_poly_ring(basering);
+  zdd result;
+  def nav=sb.navigation();
+  int ind=int(nav.value());
+  def navout_then=nav.then_branch();
+  def navout_else=nav.else_branch();
+  def pb=Polynomial(sb);
+
+  if (int(nav.constant()))
+  {
+    if (pb==1) { return(zdd_one); }
+    return(zdd_zero);
+  }
+
+  result.idx=ind+1;
+  pyobject one=1;
+  def substpoly=one*rb.variable(ind);
+
+  if (int(navout_then.constant()))
+  {
+      result.thenBranch=zdd_one;
+  }
+  else
+  {
+    result.thenBranch=from_boolean_set(BooleSet(navout_then,rb));
+  }
+  if (int(navout_else.constant()))
+  {
+    if (subst(from_boolean_poly(pb),from_boolean_poly(substpoly),0)==1)
+    {
+      result.elseBranch=zdd_one;
+    }
+    else
+    {
+      result.elseBranch=zdd_zero;
+    }
+  }
+  else
+  {
+    result.elseBranch=from_boolean_set(BooleSet(navout_else,rb));
+  }
+  return(result);
+}
+
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),Dp;
+  poly f=(x+1)*(y+1)*(z+1);
+  bpoly fb=f;
+  bset fs=fb;
+  from_boolean_set(fs);
+
+  poly g=x*y*z+1;
+  bpoly gb=g;
+  bset gs=gb;
+  from_boolean_set(gs);
+
+  ring R=0,(x(1..4)),Dp;
+  poly h=(x(1)+1)*(x(2)+1)*(x(3)+1)*(x(4)+1);
+  pyobject hb=boolean_poly(h);
+  def hs=hb.set();
+  from_boolean_set(hs);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc direct_from_boolean_poly(def p)
+"USAGE:   from_boolean_poly(pb); pb boolean polynomial
+RETURN:   polynomial in Singular
+SEE ALSO: from_boolean_ideal, boolean_ideal, boolean_poly, boolean_poly_ring,
+boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE:  example from_boolean_poly; shows an example"
+{
+  pyobject pb = p;
+  poly result = 0;
+  def terms = python_eval("list")(pb.terms());
+  int nlen = size(terms);
+  for (int i = 0; i < nlen; i++) 
+  {
+    result=from_boolean_poly_update(result,terms[i]);
+  }
+  return (result);
+}
+
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),Dp;
+  pyobject rb=boolean_poly_ring(r);
+  poly f=x^2+2*y^3+3*z^3;
+  bpoly pp=f;
+  direct_from_boolean_poly(pp);
+
+  poly g=0;
+  bpoly pp=g;
+  direct_from_boolean_poly(pp);
+}
+
+///////////////////////////////////////////////////////////////////////
+// one iteration in direct_from_boolean_poly
+
+static proc from_boolean_poly_update(poly ps, pyobject pb)
+"USAGE: from_boolean_poly_update(ps,pb); ps polynomial, pb boolean polynomial,
+RETURN: update of the Singular polynomial in from_boolean_poly in one iteration
+SEE ALSO: from_boolean_poly
+{
+  pyobject current = pb."variables"();
+  pyobject vars = python_eval("list")(current);
+  int j, index;
+  poly term = 1;
+  pyobject currentvar;
+  int tlen = size(vars);
+  for (j = 0; j < tlen; j++) 
+  {
+    currentvar = vars[j];
+    index = int(currentvar.index());
+    term = term * var(index+1);
+  }
+  return(ps + term);
+}
+
+///////////////////////////////////////////////////////////////////////
+// return 1, iff int is 1 modulo 2 and 0 else
+
+static proc coeff_check(int const)
+"USAGE: coeff_check(const); const int
+RETURN: 1 iff the coefficient equals 1 modulo 2 and 0 else
+NOTE: helps to handle leading coefficients of rings in arbitrary characteristic
+SEE ALSO: recursive_boolean_poly, boolean_poly
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example coeff_check; shows an example"
+{
+  if (char(basering)==2) { return (const); }
+
+  return ((const%2)*(const%2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R1=5,x(1..4),lp;
+  poly f=3*x(1)+x(2)^2;
+  coeff_check(int(leadcoef(f)));
+}
+
+///////////////////////////////////////////////////////////////////////
+
+static proc check_additional_ring(list #)
+"USAGE: check_additional_ring(#);
+NOTE: Help function to check whether an additional ring exists and if it is a 
+bring or a ring in python."
+{
+  pyobject rb;
+  bring rbhelp;
+  if (size(#)==0)
+  {
+    rb=boolean_poly_ring(basering);
+  }
+  else
+  {
+    if (typeof(#[1])=="bring")
+    {
+      rbhelp=#[1];
+      rb=rbhelp.pyring;
+    }
+    else
+    {
+      rb=#[1];
+    }
+  }
+  return(rb);
+}
+///////////////////////////////////////////////////////////////////////
+
+proc boolean_constant(int const, list #)
+"USAGE: boolean_constant(const[, rb]); const constant and rb boolean ring
+RETURN: default: constant const in the representation of the boolean ring 
+rb==boolean_poly_ring(basering); optional input: rb=boolean ring rb
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example boolean_constant; shows an example"
+{
+  pyobject rb = check_additional_ring(#);
+  if (coeff_check(const)==0) { return (rb.zero()); }
+
+  return (rb.one());
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=7,(x,y),Dp;
+  pyobject rb=boolean_poly_ring(r);
+  boolean_constant(int(3));
+  typeof(boolean_constant(int(3)));
+  boolean_constant(int(0));
+  typeof(boolean_constant(int(0)));
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc boolean_poly(poly ps, list #)
+"USAGE: boolean_poly(ps[, dir, rb]); ps polynomial, dir integer zero or one, rb
+boolean ring
+RETURN: default: polynomial ps in the representation of the boolean ring 
+rb==boolean_poly_ring(basering); optional input: boolean ring rb
+NOTE: via the optional input dir, one can choose the computation method (either
+direct[dir==0] or recursive[dir==1]). default: recursive
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example boolean_poly; shows an example"
+{
+  if (size(#)==0)
+  {
+    return(recursive_boolean_poly(ps));
+  }
+  if (size(#)==1)
+  {
+    if (typeof(#[1])=="int")
+    {
+      if (#[1]==0) { return(direct_boolean_poly(ps)); }
+
+      return(recursive_boolean_poly(ps));
+    }
+    return(direct_boolean_poly(ps,#[1]));
+  }
+  if (#[1]==0) { return(direct_boolean_poly(ps,#[2])); }
+
+  return(recursive_boolean_poly(ps,#[2]));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,x(1..5),Dp;
+  poly f=x(2)*(x(3)-x(1))+x(4)*x(5);
+  bring rb=r;
+  boolean_poly(f);
+  boolean_poly(f,0);
+  boolean_poly(f,0,boolean_poly_ring(r));
+  boolean_poly(f,0,rb);
+
+
+  poly g=0;
+  boolean_poly(g);
+
+  poly g=1;
+  boolean_poly(g);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc from_boolean_poly(def p, list #)
+"USAGE: from_boolean_poly(ps[, dir]); ps polynomial, dir integer zero or one
+RETURN: default: polynomial ps in the representation of the boolean ring
+NOTE: via the optional input dir, one can choose the computation method (either
+direct[dir==0] or recursive[dir==1]). default: direct
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example from_boolean_poly; shows an example"
+{
+  pyobject pb = pyobject(p);
+
+  if (size(#)==0) { return(direct_from_boolean_poly(pb)); }
+  if (#[1]==0) { return(direct_from_boolean_poly(pb)); }
+
+  return(recursive_from_boolean_poly(pb));
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),Dp;
+  def rb=boolean_poly_ring(r);
+  poly f=x^2+2*y+5*z^4;
+  bpoly pp=f;
+  from_boolean_poly(pp);
+  from_boolean_poly(pp,1);
+ 
+  ring r2=5,(x,y,z),Dp;
+  def rb2=boolean_poly_ring(r2);  
+  poly f2=x+y+z;
+  bpoly pp2=f2;
+  from_boolean_poly(pp);
+  from_boolean_poly(pp,1);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc direct_boolean_poly(poly ps, list #)
+"USAGE: boolean_poly(ps[, rb]); ps polynomial, rb boolean ring
+RETURN: default: polynomial ps in the representation of the boolean ring 
+rb==boolean_poly_ring(basering); optional input: boolean ring rb
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example boolean_poly; shows an example"
+{
+  pyobject resultbool,rb;
+  rb=check_additional_ring(#);
+
+  int nmax= size(ps);
+  resultbool = Polynomial(rb.zero());
+  for (int i = 1; i <= nmax; i++)
+  {
+    if ( coeff_check(int(leadcoef(ps[i]))) == 1 )
+    {
+      resultbool=boolean_poly_update(resultbool,ps[i],rb);
+    }
+  }
+  return (resultbool);
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r0=2,x(1..4),lp;
+  bring rb=r0;
+  poly f=x(1)^2+2*x(2)*(x(3))-x(4)^3;
+  direct_boolean_poly(f);
+  direct_boolean_poly(f,rb);
+
+  ring r1=0,x,Dp;
+  poly f=x3+2x+1;
+  direct_boolean_poly(f);
+
+  ring r2=32003,(x,y,z),Dp;
+  poly f=xyz+20*x^2*y-3*xz+15;
+  direct_boolean_poly(f);
+}
+
+///////////////////////////////////////////////////////////////////////
+// one iteration in direct_boolean_poly
+
+static proc boolean_poly_update(def pb, poly ps, pyobject rb)
+"USAGE: boolean_poly_update(pb,ps,rb); pb boolean polynomial, ps polynomial, 
+rb boolean ring
+RETURN: update of the boolean polynomial in boolean_poly in one iteration
+SEE ALSO: boolean_poly
+{
+  intvec current = leadexp(ps);
+  int j;
+  pyobject term, var_rb;
+  term = python_eval("Monomial")(rb);
+  for (j = 1; j <= size(current); j=j+1)
+  {
+    var_rb = rb.variable(j-1);
+    if (current[j] > 0) { term = term * var_rb; }
+  }
+  return (pb + term);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc recursive_boolean_poly(poly ps, list #)
+"USAGE: boolean_poly(ps[, rb]); ps polynomial, rb boolean ring
+RETURN: default: polynomial ps in the representation of the boolean ring 
+rb==boolean_poly_ring(basering); optional input: rb boolean ring
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example recursive_boolean_poly; shows an example"
+{
+  pyobject rb;
+  if (size(#)==0)
+  {
+    #[1]=boolean_poly_ring(basering);
+    #[2]=0;
+  }
+  if (size(#)==1)
+  {
+    #[2]=0;
+  }
+  rb=check_additional_ring(#[1]);
+  if (#[2]==int(rb.n_variables()))
+  {
+    return (boolean_constant(int(leadcoef(ps)),rb));
+  }
+  else
+  {
+    def xsu=var(#[2]+1);
+    poly p0=subst(ps,xsu,0);
+    poly p1=subst(ps-p0,xsu,1);
+    def ahelp=recursive_boolean_poly(p1,rb,#[2]+1);
+    def bhelp=recursive_boolean_poly(p0,rb,#[2]+1);
+    return (rb.variable(#[2])*ahelp+bhelp);
+  }
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r0=2,x(1..4),lp;
+  poly f=x(1)^2+2*x(2)*(x(3))-x(4)^3;
+  recursive_boolean_poly(f);
+
+  ring r1=0,x,Dp;
+  poly f=x3+2x+1;
+  recursive_boolean_poly(f);
+
+  ring r2=32003,(x,y,z),Dp;
+  def br2=boolean_poly_ring(r2);
+  bring bbr2=r2;
+  poly f=xyz+20*x^2*y-3*xz+15;
+  recursive_boolean_poly(f,br2);
+  recursive_boolean_poly(f,bbr2);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc boolean_ideal(ideal Is, list #)
+"USAGE: boolean_ideal(Is[, rb]); Is Ideal, rb boolean ring
+RETURN: default: ideal Is in the representation of the boolean ring 
+rb==boolean_poly_ring(basering); optional input: rb boolean ring
+SEE ALSO: boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example boolean_ideal; shows an example"
+{
+  pyobject rb;
+  rb=check_additional_ring(#);
+  int len=size(Is);
+  pyobject Ib = python_eval("list()");
+  for (int i=1; i<=len; i++)
+  {
+    Ib.append(boolean_poly(Is[i],rb));
+  }
+  bideal res;
+  res.pylist = Ib;
+
+  return(res);
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r0=2,x(1..4),lp;
+  poly f1=x(1)^2+2*x(2)*(x(3))-x(4)^3;
+  poly f2=x(1)^2-x(3)*x(1);
+  poly f3=x(2)+5-2*x(1);
+  poly f4=x(1)*x(2)-x(3);
+  ideal I=f1,f2,f3,f4;
+  boolean_ideal(I);
+
+  ring r1=0,x,Dp;
+  poly f1=x3+2*x+1;
+  poly f2=x10-x5+2x;
+  poly f3=19;
+  ideal I=f1,f2,f3;
+  boolean_ideal(I);
+
+  ring r2=32003,(x,y,z),Dp;
+  bring bbr2=r2;
+  poly f1=xyz+20*x^2*y-3*xz+15;
+  poly f2=32002*xy+z2;
+  poly f3=19;
+  ideal I=f1,f2,f3;
+  boolean_ideal(I);
+  boolean_ideal(I,bbr2);
+}
+
+////////////////////////////////////////////////////////////////
+
+proc from_boolean_ideal(bideal I)
+"USAGE: from_boolean_ideal(I); I boolean ideal
+RETURN: ideal in Singular
+SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, boolean_std, 
+boolean_poly_ring
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example from_boolean_ideal; shows an example"
+{
+  ideal res;
+  int i;
+  int nlen = size(I);
+  for (i = 1; i <= nlen; i++) 
+  {
+    res[i] = from_boolean_poly(I[i]);
+  }
+  return (res);
+}
+
+example
+{ "EXAMPLE:"; echo=2;
+  ring rs=0,(x,y,z),Dp;
+  def rb3=boolean_poly_ring(rs);
+  poly f1=x+y;
+  poly f2=x+z;
+  bpoly pp =f1;
+  bpoly p = f2;
+  bideal Ib;
+  list K=(p,pp);
+  Ib=K;
+  from_boolean_ideal(Ib);
+  
+  ring rs2=5,(x,y,z),Dp;
+  def rb4=boolean_poly_ring(rs2);
+  poly p1=x+y;
+  poly p2=x+z;
+  poly p3=y+z;
+  bpoly p = p1;
+  bpoly pp = p2;
+  bpoly ppp = p3;
+  bideal Ib;
+  list K=(p,pp,ppp);
+  Ib=K;
+  from_boolean_ideal(Ib);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc boolean_std(bideal Is)
+"USAGE: boolean_std(Is); Is ideal
+RETURN: Singular ideal of the boolean groebner basis of Is
+SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, from_boolean_ideal,
+boolean_poly_ring
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example boolean_std; shows an example"
+{
+  pyobject Ib = Is;
+
+  def redIb=groebner_basis(Ib);
+  bideal result = redIb;
+  return(result);
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r0=2,x(1..4),lp;
+  poly f1=x(1)^2+2*x(2)*(x(3))-x(4)^3;
+  poly f2=x(1)^2-x(3)*x(1);
+  poly f3=x(2)+5-2*x(1);
+  poly f4=x(1)*x(2)-x(3);
+  ideal I=f1,f2,f3,f4;
+
+  boolean_std(I);        // implicitely add x(i)^2-x(i)
+
+  bideal bI=I;           // alternative syntax
+  bideal res = std(bI);  // Continue PolyBoRi computations
+  std(res[1..2]);
+
+  ring r1=0,x,Dp;
+  poly f1=x3+2*x+1;
+  poly f2=x10-x5+2x;
+  poly f3=19;
+  ideal I=f1,f2,f3;
+  boolean_std(I);
+
+  ring r2=32003,(x,y,z),Dp;
+  poly f1=xz+y+20*x^2*y;
+  poly f2=32002*xy+xz2+y;
+  ideal I=f1,f2;
+  boolean_std(I);
+
+  ring r2=32003,(x,y,z),Dp;
+  poly f1=xyz+20*x^2*y-3*xz+15;
+  poly f2=32002*xy+z2;
+  poly f3=19*x5y;
+  ideal I=f1,f2,f3;
+  boolean_std(I);
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+proc from_boolean_constant(def p)
+"USAGE: from_boolean_constant(pb); pb pyobject
+RETURN: constant polynomial
+SEE ALSO: boolean_ideal, boolean_std
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example from_boolean_constant; shows an example"
+{
+  pyobject pb = p;
+  if (pb==0) { return (poly(0)); }
+
+  return (poly(1)); 
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring rs=0,(x,y,z),Dp;
+  def rsb=boolean_poly_ring(rs);
+  poly f=(x+y)*x+z;
+  bpoly pp=f;
+  from_boolean_constant(0);
+  from_boolean_constant(1);
+  from_boolean_constant(pp);
+}
+
+///////////////////////////////////////////////////////////////////////
+
+proc recursive_from_boolean_poly(def p)
+"USAGE: recursive_from_boolean_poly(pb); pb boolean polynomial
+RETURN: polynomial in Singular
+SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, from_boolean_ideal, 
+boolean_poly_ring
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example recursive_from_boolean_poly; shows an example"
+{
+  pyobject pb = p;
+
+  if (pb==0) { return(0); }
+  if (pb==1) { return(1); }
+  
+  int idx = int(pb.navigation().value());
+  def p0=Polynomial(pb.set().subset0(idx));
+  def p1 = Polynomial(pb.set().subset1(idx));
+
+  return (var(idx+1)*recursive_from_boolean_poly(p1)+recursive_from_boolean_poly(p0));
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring rs=0,(x,y,z),Dp;
+  def rsb=boolean_poly_ring(rs);
+  poly f=(x+y)*x+z;
+  bpoly pp=f;
+  recursive_from_boolean_poly(pp);
+
+  ring rs2=2,(x,y,z),Dp;
+  def rsb2=boolean_poly_ring(rs2);
+  poly f2=(x+y)*x+x;
+  bpoly pp2=f2;
+  recursive_from_boolean_poly(pp);
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+proc poly2zdd(poly ps)
+"USAGE: poly2zdd(poly ps); polynomial ps
+RETURN: polynomial ps in zdd representation
+SEE ALSO: boolean_poly, from_boolean_set
+KEYWORDS: PolyBoRi, zero-supressed decision diagram
+EXAMPLE: example poly2zdd; shows an example"
+{
+  pyobject pp=boolean_poly(ps);
+  pyobject pset = pp.set();
+  zdd result = from_boolean_set(pset);
+  return(result);
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,x(1..5),Dp;
+  poly f=(x(1)+1)*(x(2)+1)*(x(3)+1)*x(4)*x(5);
+  poly2zdd(f);
+
+  poly g=x(3);
+  poly2zdd(g);
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+proc zdd2poly(zdd ss)
+"USAGE: zdd2poly(ss); zero-supressed decision diagram ss
+RETURN: zdd ss in polynomial representation
+SEE ALSO:from_boolean_poly, boolean_set
+KEYWORDS: PolyBoRi, Boolean Groebner Basis
+EXAMPLE: example poly2zdd; shows an example"
+{
+  def ps=boolean_set(ss);
+  return(from_boolean_poly(Polynomial(ps)));
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,x(1..5),Dp;
+  poly f=(x(1)+1)*(x(2)+1)*(x(3)+1)*x(4)*x(5);
+  zdd2poly(poly2zdd(f));
+
+  poly g=x(3);
+  zdd2poly(poly2zdd(g));
+
+  poly g=0;
+  zdd2poly(poly2zdd(0));
+
+  poly g=1;
+  zdd2poly(poly2zdd(01));
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+proc disp_zdd(zdd ss, list #)
+"USAGE: disp_zdd(ss); zero-supressed decision diagram ss
+RETURN: string containing visualization of ss
+NOTE: the resulting string is the visualization of the polynomial that corresponds
+to ss, but with a additional structure that comes from the zdd. Every reached else-
+Branch induces a new line in the string.
+SEE ALSO:zdd2poly, poly2zdd
+KEYWORDS: Polybori, Boolean Groebner Basis
+EXAMPLE: example disp_zdd; shows an example"
+{
+  int dist,i;
+  string str,space;
+  if (size(#)==0)
+  {
+    dist=1;
+    str=" ";
+  }
+  else
+  {
+    dist=#[1];
+    str=#[2];
+  }
+  for (i=1;i<=dist+3;i++)
+  {
+    space=space+" ";
+  }
+  if (ss.idx==0)
+  {
+    if (size(space)>5)
+    {
+      return(str);
+    }
+    else 
+    {
+      if (ss==zdd_one)
+      {
+        return (1);
+      }
+      else
+      {
+      return (0);
+      }
+    }
+  }
+  else
+  {
+    str=str,"x",string(ss.idx);
+    if (ss.thenBranch.idx!=0)
+    {
+      str=str,"(";
+      str=disp_zdd(ss.thenBranch,dist+3,str);
+      str=str,")";
+    }
+    if ((ss.elseBranch.idx!=0)||(ss.elseBranch==zdd_one))
+    {
+      if (ss.elseBranch==zdd_one)
+      {
+        str=str+"+1";
+      }
+      else
+      {
+        str=str,"+"+newline+space;
+        str=disp_zdd(ss.elseBranch,dist+3,str);
+      }
+    }
+    return(str);
+  }
+}
+
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r1=0,(x,y,z),Dp;
+  poly f1=xyz+xy+xz+yz+y+z+x+1;
+  zdd s1=f1;
+  disp_zdd(s1);
+
+  ring r2=0,x(1..6),Dp;
+  poly f2=x(1)+x(2)+x(3)+x(5)^2+x(6);
+  zdd s2=f2;
+  disp_zdd(s2);
+
+  ring r4=0,x(1..6),Dp;
+  poly f2=x(1)+1;
+  zdd s2=f2;
+  disp_zdd(s2);
+
+  ring r2=0,x(1..6),Dp;
+  poly f2=x(1)*x(2)*(x(3)-x(5)^2*x(6))+3*x(4)*x(5)-3;
+  zdd s2=f2;
+  disp_zdd(s2);
+
+  poly f4=0;
+  zdd s4=f4;
+  disp_zdd(s4);
+
+  poly f5=1;
+  zdd s5=f5;
+  disp_zdd(s5);
+}
