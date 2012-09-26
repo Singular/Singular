@@ -518,7 +518,10 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
     bufF -= Up;
   }
 
-  q= newtonDiv (bufF, G, xToLOldL);
+  if (l-oldL > 0)
+    q= newtonDiv (bufF, G, xToLOldL);
+  else
+    q= 0;
   q *= xToOldL;
   q += oldQ;
 
