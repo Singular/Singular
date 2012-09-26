@@ -1,5 +1,5 @@
 //
-version="$Id: oldpolymake.lib 15070 2012-07-04 19:00:06Z motsak $";
+version="$Id: oldpolymake.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="Tropical Geometry";
 info="
 LIBRARY:   oldpolymake.lib  Computations with polytopes and fans,
@@ -93,7 +93,7 @@ LIB "random.lib";
 /// PROCEDURES USING POLYMAKE
 /////////////////////////////////////////////////////////////////////////////
 
-proc polymakePolytope (intmat polytope,list #)
+proc polymakePolytope (intmat polytop,list #)
 "USAGE:  polymakePolytope(polytope[,#]);   polytope list, # string
 ASSUME:  each row of polytope gives the coordinates of a lattice point of a
          polytope with their affine coordinates as given by the output of
@@ -157,7 +157,7 @@ POINTS
     string dateiname="polytope";
   }
   // create the lattice point list for polymake
-  sp=sp+intmatToPolymake(polytope,"points");
+  sp=sp+intmatToPolymake(polytop,"points");
   // initialise dateiname.polymake and compute the vertices
   write(":w /tmp/"+dateiname+".polymake",sp);
   system("sh","cd /tmp; polymake "+dateiname+".polymake VERTICES > "+dateiname+".output");
@@ -221,7 +221,7 @@ POINTS
   }
   else
   {
-    intmat neq[1][ncols(polytope)+1];
+    intmat neq[1][ncols(polytop)+1];
   }
   // delete the tmp-files, if polymakekeeptmpfiles is not set
   if (defined(polymakekeeptmpfiles)==0)
@@ -304,7 +304,7 @@ EXAMPLE: example newtonPolytopeP;   shows an example"
     #[1]="newtonPolytope";
   }
   // call polymakePolytope with exponents
-  return(polymakePolytopeP(exponents,#));
+  return(polymakePolytope(exponents,#));
 }
 example
 {
