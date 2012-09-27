@@ -14,23 +14,67 @@ SEE ALSO:  Libraries, pyobject, newstruct
 
 @*
 
-OVERVIEW:  A library for using PolyBoRi in the Singular interface, with
+OVERVIEW:  A library for using @sc{PolyBoRi} in the @sc{Singular} interface, with
 procedures that convert structures (polynomials, rings, ideals) in both
 directions. Therefore, it is possible to compute boolean groebner basis
-via boolean_std. Polynomials can be converted to zero-supressed decision
+via @ref{boolean_std}. Polynomials can be converted to zero-supressed decision
 diagrams (zdd) and vice versa.
 
-For usability it defines the PolyBoRi types bideal, bpoly, and bring 
-which are equivalent to Singular's ideal, poly, and ring, as well as
-bset which corresponds to the zdd introduced here. 
+For usability it defines the @sc{PolyBoRi} types @code{bideal}, @code{bpoly},
+and @code{bring} which are equivalent to Singular's @code{ideal}, @code{poly},
+and @code{ring}, as well as @code{bset} which corresponds to the type @code{zdd}
+introduced here. In addition @code{bvar(i)} constructs the Boolean variable corresponding
+to @code{var(i)} from current @code{ring};
+
+For convenience, the corresponding types can be converted explictely or implicitely 
+while assigning.
+Also several @sc{Singular} operators were overloaded: @code{bring} comes with @code{nvars},
+@code{bpoly} implements @code{lead}, @code{leadmonom} and @code{leadcoef}.
+Objects of this type  may be added and multiplied, too. 
+Finally, @code{bideal} yields @code{std} and @code{size} as well as addition and element access.
+
+
+Hence, by using these types @sc{PolyBoRi} functionality
+can be carried out seamlessly in @sc{Singular}:
+
+@code{> LIB \"polybori.lib\";} @*
+@code{> ring r0=2,x(1..4),lp;} @*
+@code{> def x=bvar; // enforce Boolean variables} @*
+
+@code{> bpoly f1=x(1)+x(4);} @*
+@code{> bpoly f2=x(1)+x(3)*x(1);} @*
+@code{> bideal bI=list(f1,f2);} @*
+
+@code{> std(bI);} @*
+@code{_[1] = x(1) + x(4)} @*
+@code{_[2] = x(3)*x(4) + x(4)} @*
+
+
+NOTE: For using this library @sc{Singular}'s @code{python} interface must be available
+ on your system. 
+ Please @code{./configure --with-python} when building @sc{Singular} for this purpose.
+
+ There are prebuilt binary packages for @sc{PolyBoRi} available
+ from @uref{http://polybori.sf.net/}.
+ 
+ For building your own @sc{PolyBoRi} please ensure that you have @code{scons} and a
+ development version of the boost libaries installed on you system.
+ Then you may execute the following commands in a @code{bash}-style shell
+ to build @sc{PolyBoRi} available to @code{python}:
+
+@code{POLYBORIDIR=/tmp/path/to/custom/polybori} @*
+@code{wget http://downloads.sf.net/project/polybori/polybori/0.8.2/polybori-0.8.2.tar.gz} @*
+@code{tar -xvzf polybori-0.8.2.tar.gz} @*
+@code{cd polybori-0.8.2} @*
+@code{scons install PREFIX=$POLYBORIDIR PYINSTALLPREFIX=$POLYBORIDIR/python} @*
+@code{export PYTHONPATH=$POLYBORIDIR/python:$PYTHONPATH} @*
+
 
 REFERENCES:
-See http://polybori.sf.net for details about PolyBoRi.
+See @uref{http://polybori.sf.net} for details about @sc{PolyBoRi}.
 
 PROCEDURES:
   boolean_std(bideal);                            Singular ideal of boolean groebner basis of I
-
-  // Procedures from Singular to PolyBoRi
 
   boolean_poly_ring(ring);                       convert ring
   boolean_constant(int[, bring]);                convert constant
@@ -40,16 +84,14 @@ PROCEDURES:
   boolean_ideal(ideal[, bring]);                 convert ideal
   boolean_set(zdd[, bring]);                     convert zdd
 
-  // Procedures from PolyBoRi to Singular
 
   from_boolean_constant(bpoly);                  convert boolean constant
   from_boolean_poly(bpoly[, int]);               convert boolean polynomial
   direct_from_boolean_poly(bpoly);               convert boolean polynomial direct
   recursive_from_boolean_poly(bpoly);            convert boolean polynomial recursively
-  from_boolean_ideal(bpoly);                     convert ideal
-  from_boolean_set(bpoly);                       convert zdd [BooleSet]
+  from_boolean_ideal(bpoly);                     convert to ideal
+  from_boolean_set(bset);                        convert to zdd
 
-  // Miscellaneous
 
   bvar(i);                                       return i-th Boolean variable 
   poly2zdd(poly);                                return zdd of a given polynomial
