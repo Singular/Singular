@@ -255,9 +255,9 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   A.r = rCopy(currRing->cf->extRing); // Copy  ground field!
   ideal q = idInit(1,1);
 
-  assume( DEN((fractionObject *)(p)) == NULL ); // minpoly must be a poly...!?
+  assume( DEN((fraction)(p)) == NULL ); // minpoly must be a fraction with poly numerator...!!
 
-  q->m[0] = NUM((fractionObject *)p);
+  q->m[0] = NUM((fraction)p);
   A.r->qideal = q;
 
 #if 0
@@ -268,7 +268,16 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   p_Write( A.i->m[0], A.r );
 #endif
 
-  NUM((fractionObject *)p) = NULL; n_Delete(&p, currRing->cf);
+  // :( 
+//  NUM((fractionObject *)p) = NULL; // makes 0/ NULL fraction - which should not happen!
+//  n_Delete(&p, currRing->cf); // doesn't expect 0/ NULL :(
+  if(true)
+  {
+    extern omBin fractionObjectBin;
+    NUM((fractionObject *)p) = NULL; // not necessary, but still...
+    omFreeBin((ADDRESS)p, fractionObjectBin);
+  }
+
 
   coeffs new_cf = nInitChar(n_algExt, &A);
 
