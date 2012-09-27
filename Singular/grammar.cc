@@ -797,9 +797,9 @@ static const yytype_uint16 yyrline[] =
     1074,  1075,  1084,  1085,  1091,  1097,  1099,  1101,  1111,  1110,
     1118,  1123,  1130,  1138,  1150,  1166,  1185,  1189,  1193,  1198,
     1202,  1206,  1210,  1214,  1219,  1225,  1231,  1237,  1243,  1249,
-    1255,  1267,  1274,  1278,  1315,  1325,  1338,  1338,  1341,  1413,
-    1417,  1446,  1459,  1476,  1485,  1490,  1498,  1510,  1529,  1540,
-    1560,  1584,  1590,  1602,  1609
+    1255,  1267,  1274,  1278,  1315,  1325,  1331,  1331,  1334,  1406,
+    1410,  1439,  1452,  1469,  1478,  1483,  1491,  1503,  1522,  1533,
+    1553,  1577,  1583,  1595,  1602
 };
 #endif
 
@@ -3704,21 +3704,14 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 1326 "grammar.y"
     {
-            if (((yyvsp[(1) - (2)].i)!=LIB_CMD)||(iiLibCmd((yyvsp[(2) - (2)].name),TRUE,TRUE,TRUE)))
-            //if ($1==LIB_CMD)
-            //{
-            //  sleftv tmp;
-            //  if(iiExprArith1(&tmp,&$2,LIB_CMD)) YYERROR;
-            //}
-            //else
-                YYERROR;
+            if (((yyvsp[(1) - (2)].i)!=LIB_CMD)|| (jjLOAD((yyvsp[(2) - (2)].name),TRUE))) YYERROR;
           ;}
     break;
 
   case 148:
 
 /* Line 1464 of yacc.c  */
-#line 1342 "grammar.y"
+#line 1335 "grammar.y"
     {
             if (((yyvsp[(1) - (2)].i)==KEEPRING_CMD) && (myynest==0))
                MYYERROR("only inside a proc allowed");
@@ -3792,7 +3785,7 @@ yyreduce:
   case 149:
 
 /* Line 1464 of yacc.c  */
-#line 1414 "grammar.y"
+#line 1407 "grammar.y"
     {
             type_cmd(&((yyvsp[(2) - (2)].lv)));
           ;}
@@ -3801,7 +3794,7 @@ yyreduce:
   case 150:
 
 /* Line 1464 of yacc.c  */
-#line 1418 "grammar.y"
+#line 1411 "grammar.y"
     {
             //Print("typ is %d, rtyp:%d\n",$1.Typ(),$1.rtyp);
             #ifdef SIQ
@@ -3829,7 +3822,7 @@ yyreduce:
   case 151:
 
 /* Line 1464 of yacc.c  */
-#line 1447 "grammar.y"
+#line 1440 "grammar.y"
     {
             int i; TESTSETINT((yyvsp[(3) - (5)].lv),i);
             if (i!=0)
@@ -3847,7 +3840,7 @@ yyreduce:
   case 152:
 
 /* Line 1464 of yacc.c  */
-#line 1460 "grammar.y"
+#line 1453 "grammar.y"
     {
             if (currentVoice->ifsw==1)
             {
@@ -3869,7 +3862,7 @@ yyreduce:
   case 153:
 
 /* Line 1464 of yacc.c  */
-#line 1477 "grammar.y"
+#line 1470 "grammar.y"
     {
             int i; TESTSETINT((yyvsp[(3) - (5)].lv),i);
             if (i)
@@ -3883,7 +3876,7 @@ yyreduce:
   case 154:
 
 /* Line 1464 of yacc.c  */
-#line 1486 "grammar.y"
+#line 1479 "grammar.y"
     {
             if (exitBuffer(BT_break)) YYERROR;
             currentVoice->ifsw=0;
@@ -3893,7 +3886,7 @@ yyreduce:
   case 155:
 
 /* Line 1464 of yacc.c  */
-#line 1491 "grammar.y"
+#line 1484 "grammar.y"
     {
             if (contBuffer(BT_break)) YYERROR;
             currentVoice->ifsw=0;
@@ -3903,7 +3896,7 @@ yyreduce:
   case 156:
 
 /* Line 1464 of yacc.c  */
-#line 1499 "grammar.y"
+#line 1492 "grammar.y"
     {
             /* -> if(!$2) break; $3; continue;*/
             char * s = (char *)omAlloc( strlen((yyvsp[(2) - (3)].name)) + strlen((yyvsp[(3) - (3)].name)) + 36);
@@ -3917,7 +3910,7 @@ yyreduce:
   case 157:
 
 /* Line 1464 of yacc.c  */
-#line 1511 "grammar.y"
+#line 1504 "grammar.y"
     {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
@@ -3938,7 +3931,7 @@ yyreduce:
   case 158:
 
 /* Line 1464 of yacc.c  */
-#line 1530 "grammar.y"
+#line 1523 "grammar.y"
     {
             procinfov pi;
             idhdl h = enterid((yyvsp[(2) - (3)].name),myynest,PROC_CMD,&IDROOT,TRUE);
@@ -3954,7 +3947,7 @@ yyreduce:
   case 159:
 
 /* Line 1464 of yacc.c  */
-#line 1541 "grammar.y"
+#line 1534 "grammar.y"
     {
             idhdl h = enterid((yyvsp[(1) - (3)].name),myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
@@ -3979,7 +3972,7 @@ yyreduce:
   case 160:
 
 /* Line 1464 of yacc.c  */
-#line 1561 "grammar.y"
+#line 1554 "grammar.y"
     {
             omFree((ADDRESS)(yyvsp[(3) - (4)].name));
             idhdl h = enterid((yyvsp[(1) - (4)].name),myynest,PROC_CMD,&IDROOT,TRUE);
@@ -4005,7 +3998,7 @@ yyreduce:
   case 161:
 
 /* Line 1464 of yacc.c  */
-#line 1585 "grammar.y"
+#line 1578 "grammar.y"
     {
             // decl. of type proc p(int i)
             if ((yyvsp[(1) - (2)].i)==PARAMETER)  { if (iiParameter(&(yyvsp[(2) - (2)].lv))) YYERROR; }
@@ -4016,7 +4009,7 @@ yyreduce:
   case 162:
 
 /* Line 1464 of yacc.c  */
-#line 1591 "grammar.y"
+#line 1584 "grammar.y"
     {
             // decl. of type proc p(i)
             sleftv tmp_expr;
@@ -4030,7 +4023,7 @@ yyreduce:
   case 163:
 
 /* Line 1464 of yacc.c  */
-#line 1603 "grammar.y"
+#line 1596 "grammar.y"
     {
             if(iiRETURNEXPR==NULL) YYERROR;
             iiRETURNEXPR[myynest].Copy(&(yyvsp[(3) - (4)].lv));
@@ -4042,7 +4035,7 @@ yyreduce:
   case 164:
 
 /* Line 1464 of yacc.c  */
-#line 1610 "grammar.y"
+#line 1603 "grammar.y"
     {
             if ((yyvsp[(1) - (3)].i)==RETURN)
             {
@@ -4057,7 +4050,7 @@ yyreduce:
 
 
 /* Line 1464 of yacc.c  */
-#line 4061 "grammar.cc"
+#line 4054 "grammar.cc"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

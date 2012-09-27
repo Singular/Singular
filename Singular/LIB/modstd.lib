@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib 15072 2012-07-06 10:00:06Z motsak $";
+version="$Id: modstd.lib 15103 2012-07-11 10:00:13Z motsak $";
 category = "Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner basis of ideals
@@ -1430,19 +1430,19 @@ EXAMPLE: example modHenselStd; shows an example
    while(1)
    {
       i++;
-      G1 = ideal(1/(p^i) * sum(F*PrevZ,(-1)*PrevG));
+      G1 = ideal(1/(p^i) * sum_id(F*PrevZ,(-1)*PrevG));
       setring S;
       G1 = imap(R,G1);
       G2 = reduce(G1,Gp);
-      G3 = sum(G1,(-1)*G2);
+      G3 = sum_id(G1,(-1)*G2);
       M = lift(Gp,G3);
       Z2 = (-1)*Z*M;
 
       setring R;
       G2 = imap(S,G2);
       Z2 = imap(S,Z2);
-      PrevG = sum(PrevG, module(p^i*G2));
-      PrevZ = sum(PrevZ, multiply(poly(p^i),Z2));
+      PrevG = sum_id(PrevG, module(p^i*G2));
+      PrevZ = sum_id(PrevZ, multiply(poly(p^i),Z2));
       testG1 = farey(ideal(PrevG),p^(i+1));
       attrib(testG1,"isSB",1);
       if(size(reduce(testG1,testG)) == 0)
@@ -1474,7 +1474,7 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc sum(list #)
+static proc sum_id(list #)
 {
    if(typeof(#[1])=="ideal")
    {
