@@ -62,12 +62,13 @@ NOTE: For using this library @sc{Singular}'s @code{python} interface must be ava
  Then you may execute the following commands in a @code{bash}-style shell
  to build @sc{PolyBoRi} available to @code{python}:
 
-@code{POLYBORIDIR=/tmp/path/to/custom/polybori} @*
-@code{wget http://downloads.sf.net/project/polybori/polybori/0.8.2/polybori-0.8.2.tar.gz} @*
+@code{PBDIR=/path/to/custom/polybori} @*
+@code{wget http://downloads.sf.net/project/polybori/polybori/\\}@*
+@code{0.8.2/polybori-0.8.2.tar.gz} @*
 @code{tar -xvzf polybori-0.8.2.tar.gz} @*
 @code{cd polybori-0.8.2} @*
-@code{scons install PREFIX=$POLYBORIDIR PYINSTALLPREFIX=$POLYBORIDIR/python} @*
-@code{export PYTHONPATH=$POLYBORIDIR/python:$PYTHONPATH} @*
+@code{scons install PREFIX=$PBDIR PYINSTALLPREFIX=$PBDIR/python} @*
+@code{export PYTHONPATH=$PBDIR/python:$PYTHONPATH} @*
 
 
 REFERENCES:
