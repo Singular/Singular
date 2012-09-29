@@ -1324,14 +1324,7 @@ ringcmd:
 scriptcmd:
          SYSVAR stringexpr
           {
-            if (($1!=LIB_CMD)||(iiLibCmd($2,TRUE,TRUE,TRUE)))
-            //if ($1==LIB_CMD)
-            //{
-            //  sleftv tmp;
-            //  if(iiExprArith1(&tmp,&$2,LIB_CMD)) YYERROR;
-            //}
-            //else
-                YYERROR;
+            if (($1!=LIB_CMD)|| (jjLOAD($2,TRUE))) YYERROR;
           }
         ;
 
