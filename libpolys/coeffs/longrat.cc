@@ -266,8 +266,13 @@ CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/
     if ( n->s == 3 )
     {
       mpz_t dummy;
-      mpz_init_set( dummy,n->z );
-      term = make_cf( dummy );
+      long lz=mpz_get_si(n->z);
+      if (mpz_cmp_si(n->z,lz)==0) term=lz;
+      else
+      {
+        mpz_init_set( dummy,n->z );
+        term = make_cf( dummy );
+      }
     }
     else
     {
@@ -286,6 +291,13 @@ number nlConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 {
   if (n.isImm())
   {
+    long lz=n.intval();
+    int iz=(int)lz;
+    if ((long)iz==lz)
+    {
+      return nlInit(n.intval(),r);
+    }
+    else  return nlRInit(lz);
     return nlInit(n.intval(),r);
   }
   else

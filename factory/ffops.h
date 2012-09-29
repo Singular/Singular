@@ -36,7 +36,27 @@ inline int ff_norm ( const int a )
 #endif
 }
 
+inline long ff_norm ( const long a )
+{
+    long n = a % ff_prime;
+#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+    n += (n >> 31) & ff_prime;
+    return n;
+#else
+    if (n < 0) n += ff_prime;
+    return n;
+#endif
+}
+
 inline int ff_symmetric( const int a )
+{
+    if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+        return ( a > ff_halfprime ) ? a - ff_prime : a;
+    else
+        return a;
+}
+
+inline long ff_symmetric( const long a )
 {
     if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
         return ( a > ff_halfprime ) ? a - ff_prime : a;
