@@ -5,6 +5,7 @@ Changes since 3-1-5
           aksaka.lib,atkins.lib,crypto.lib (int/number div/mod/%)
 - changed grobcov.lib
 - added system("refrence"); and system('shared")
+- primefactors() changed: result and algorithm
 
 2012-07-12 
 Release 3-1-5

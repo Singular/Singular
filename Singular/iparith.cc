@@ -3223,13 +3223,12 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 #endif
 static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
 {
-  number n1; number n2; number temp; int i;
+  number n1; int i;
 
   if ((u->Typ() == BIGINT_CMD) ||
      ((u->Typ() == NUMBER_CMD) && rField_is_Q()))
   {
-    temp = (number)u->Data();
-    n1 = nlCopy(temp);
+    n1 = (number)u->CopyD();
   }
   else if (u->Typ() == INT_CMD)
   {
@@ -3238,29 +3237,13 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   }
   else
   {
-    WerrorS("wrong type: expected int, bigint, or number as 1st argument");
     return TRUE;
   }
 
-  if ((v->Typ() == BIGINT_CMD) ||
-     ((v->Typ() == NUMBER_CMD) && rField_is_Q()))
-  {
-    temp = (number)v->Data();
-    n2 = nlCopy(temp);
-  }
-  else if (v->Typ() == INT_CMD)
-  {
-    i = (int)(long)v->Data();
-    n2 = nlInit(i, NULL);
-  }
-  else
-  {
-    WerrorS("wrong type: expected int, bigint, or number as 2nd argument");
-    return TRUE;
-  }
+  i = (int)(long)v->Data();
 
-  lists l = primeFactorisation(n1, n2);
-  nlDelete(&n1, NULL); nlDelete(&n2, NULL);
+  lists l = primeFactorisation(n1, i);
+  nlDelete(&n1, NULL);
   res->data = (char*)l;
   return FALSE;
 }

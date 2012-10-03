@@ -73,13 +73,14 @@ void setListEntry_ui(lists L, int index, unsigned long ui)
 /* Factoring with Pollard's rho method. stolen from GMP/demos */
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
-void factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multiplicities,int &index)
+int factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multiplicities,int &index, unsigned long bound)
 {
   mpz_t q, r;
   unsigned long int f;
   int ai;
   unsigned *addv = add;
   unsigned int failures;
+  int bound_not_reached=1;
 
   mpz_init (q);
   mpz_init (r);
@@ -125,19 +126,24 @@ void factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multi
   failures = 0;
   f = 7;
   ai = 0;
-  unsigned last_f=0;
+  unsigned long last_f=0;
   while (mpz_cmp_ui (t, 1) != 0)
   {
     mpz_tdiv_qr_ui (q, r, t, f);
     if (mpz_cmp_ui (r, 0) != 0)
     {
       f += addv[ai];
-      if (mpz_cmp_ui (q, f) < 0)
+      if (mpz_cmp_ui (t, f) < 0)
         break;
       ai = (ai + 1) & 7;
       failures++;
       if (failures > limit)
         break;
+      if ((bound!=0) && (f>bound))
+      {
+        bound_not_reached=0;
+        break;
+      }
     }
     else
     {
@@ -158,9 +164,11 @@ void factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multi
   }
 
   mpz_clears (q, r, NULL);
+  //printf("bound=%d,f=%d,failures=%d, reached=%d\n",bound,f,failures,bound_not_reached);
+  return bound_not_reached;
 }
 
-void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists primes, int * multiplicities,int &index)
+void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, int * multiplicities,int &index)
 {
   mpz_t x, x1, y, P;
   mpz_t t1, t2;
@@ -183,18 +191,9 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists p
     {
       do
       {
-        if (p != 0)
-        {
-          mpz_powm_ui (x, x, p, n);
-          mpz_add_ui (x, x, a);
-        }
-        else
-        {
-          mpz_mul (t1, x, x);
-          mpz_mod (x, t1, n);
-          mpz_add_ui (x, x, a);
-        }
-
+        mpz_mul (t1, x, x);
+        mpz_mod (x, t1, n);
+        mpz_add_ui (x, x, a);
         mpz_sub (t1, x1, x);
         mpz_mul (t2, P, t1);
         mpz_mod (P, t2, n);
@@ -218,17 +217,9 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists p
       l = 2 * l;
       for (i = 0; i < k; i++)
       {
-        if (p != 0)
-        {
-          mpz_powm_ui (x, x, p, n);
-          mpz_add_ui (x, x, a);
-        }
-        else
-        {
-          mpz_mul (t1, x, x);
-          mpz_mod (x, t1, n);
-          mpz_add_ui (x, x, a);
-        }
+        mpz_mul (t1, x, x);
+        mpz_mod (x, t1, n);
+        mpz_add_ui (x, x, a);
       }
       mpz_set (y, x);
     }
@@ -236,16 +227,9 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists p
   factor_found:
     do
     {
-      if (p != 0)
-      {
-        mpz_powm_ui (y, y, p, n); mpz_add_ui (y, y, a);
-      }
-      else
-      {
-        mpz_mul (t1, y, y);
-        mpz_mod (y, t1, n);
-        mpz_add_ui (y, y, a);
-      }
+      mpz_mul (t1, y, y);
+      mpz_mod (y, t1, n);
+      mpz_add_ui (y, y, a);
       mpz_sub (t1, x1, y);
       mpz_gcd (t1, t1, n);
     }
@@ -263,7 +247,7 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists p
       }
       while (a == 0);
 
-      factor_using_pollard_rho (t1, a, p, primes,multiplicities,index);
+      factor_using_pollard_rho (t1, a, primes,multiplicities,index);
     }
     else
     {
@@ -293,6 +277,7 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists p
         setListEntry(primes, index, n);
         multiplicities[index++] = 1;
       }
+      mpz_set_ui(n,1);
       break;
     }
   }
@@ -300,7 +285,7 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, unsigned long p,lists p
   mpz_clears (P,t2,t1,x1,x,y,last_f,NULL);
 }
 
-void factor (mpz_t t,lists primes,int *multiplicities,int &index)
+void factor (mpz_t t,lists primes,int *multiplicities,int &index,unsigned long bound)
 {
   unsigned int division_limit;
 
@@ -314,34 +299,30 @@ void factor (mpz_t t,lists primes,int *multiplicities,int &index)
   else
     division_limit = division_limit * division_limit;
 
-  factor_using_division (t, division_limit,primes,multiplicities,index);
-
-  if (mpz_cmp_ui (t, 1) != 0)
+  if (factor_using_division (t, division_limit,primes,multiplicities,index,bound))
   {
-    //if (flag_verbose > 0)
-    //{
-    //  printf ("[is number prime?] ");
-    //  fflush (stdout);
-    //}
-    if (mpz_probab_prime_p (t, 10))
+    if (mpz_cmp_ui (t, 1) != 0)
     {
-      setListEntry(primes, index, t);
-      multiplicities[index++] = 1;
+      if (mpz_probab_prime_p (t, 10))
+      {
+        setListEntry(primes, index, t);
+        multiplicities[index++] = 1;
+	mpz_set_ui(t,1);
+      }
+      else
+        factor_using_pollard_rho (t, 1L, primes,multiplicities,index);
     }
-    else
-      factor_using_pollard_rho (t, 1L, 0,primes,multiplicities,index);
   }
-  mpz_set_ui(t,1);
 }
 /* n and pBound are assumed to be bigint numbers */
-lists primeFactorisation(const number n, const number pBound)
+lists primeFactorisation(const number n, const int pBound)
 {
   int i;
   int index=0;
   mpz_t nn; number2mpz(n, nn);
   lists primes = (lists)omAllocBin(slists_bin); primes->Init(1000);
   int* multiplicities = (int*)omAlloc0(1000*sizeof(int));
-  int positive=1; int probTest = 0;
+  int positive=1;
 
   if (!nlIsZero(n))
   {
@@ -350,7 +331,7 @@ lists primeFactorisation(const number n, const number pBound)
       positive=-1;
       mpz_neg(nn,nn);
     }
-    factor(nn,primes,multiplicities,index);
+    factor(nn,primes,multiplicities,index,pBound);
   }
 
   lists primesL = (lists)omAllocBin(slists_bin);
@@ -373,12 +354,12 @@ lists primeFactorisation(const number n, const number pBound)
   delete[] multiplicities;
 
   lists L=(lists)omAllocBin(slists_bin);
-  L->Init(4);
+  L->Init(3);
   if (positive==-1) mpz_neg(nn,nn);
   L->m[0].rtyp = LIST_CMD; L->m[0].data = (void*)primesL;
   L->m[1].rtyp = LIST_CMD; L->m[1].data = (void*)multiplicitiesL;
   setListEntry(L, 2, nn);
-  L->m[3].rtyp =  INT_CMD; L->m[3].data = (void*)probTest;
+
   mpz_clear(nn);
 
   return L;
