@@ -69,11 +69,10 @@ void setListEntry_ui(lists L, int index, unsigned long ui)
   }
 }
 
-
 /* Factoring with Pollard's rho method. stolen from GMP/demos */
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
-int factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multiplicities,int &index, unsigned long bound)
+static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multiplicities,int &index, unsigned long bound)
 {
   mpz_t q, r;
   unsigned long int f;
@@ -168,7 +167,7 @@ int factor_using_division (mpz_t t, unsigned int limit,lists primes, int *multip
   return bound_not_reached;
 }
 
-void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, int * multiplicities,int &index)
+static void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, int * multiplicities,int &index)
 {
   mpz_t x, x1, y, P;
   mpz_t t1, t2;
@@ -285,7 +284,7 @@ void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, int * mul
   mpz_clears (P,t2,t1,x1,x,y,last_f,NULL);
 }
 
-void factor (mpz_t t,lists primes,int *multiplicities,int &index,unsigned long bound)
+static void factor_gmp (mpz_t t,lists primes,int *multiplicities,int &index,unsigned long bound)
 {
   unsigned int division_limit;
 
@@ -307,7 +306,7 @@ void factor (mpz_t t,lists primes,int *multiplicities,int &index,unsigned long b
       {
         setListEntry(primes, index, t);
         multiplicities[index++] = 1;
-	mpz_set_ui(t,1);
+        mpz_set_ui(t,1);
       }
       else
         factor_using_pollard_rho (t, 1L, primes,multiplicities,index);
@@ -331,7 +330,7 @@ lists primeFactorisation(const number n, const int pBound)
       positive=-1;
       mpz_neg(nn,nn);
     }
-    factor(nn,primes,multiplicities,index,pBound);
+    factor_gmp(nn,primes,multiplicities,index,pBound);
   }
 
   lists primesL = (lists)omAllocBin(slists_bin);
@@ -351,7 +350,7 @@ lists primeFactorisation(const number n, const int pBound)
     multiplicitiesL->m[i].rtyp = INT_CMD;
     multiplicitiesL->m[i].data = (void*)multiplicities[i];
   }
-  delete[] multiplicities;
+  omFree(multiplicities);
 
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
