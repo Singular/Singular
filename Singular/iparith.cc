@@ -3151,13 +3151,12 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 #endif
 static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
 {
-  number n1; number n2; number temp; int i;
+  number n1; int i;
 
   if ((u->Typ() == BIGINT_CMD) ||
      ((u->Typ() == NUMBER_CMD) && rField_is_Q(currRing)))
   {
-    temp = (number)u->Data();
-    n1 = n_Copy(temp,coeffs_BIGINT);
+    n1 = (number)u->CopyD();
   }
   else if (u->Typ() == INT_CMD)
   {
@@ -3166,29 +3165,13 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   }
   else
   {
-    WerrorS("wrong type: expected int, bigint, or number as 1st argument");
     return TRUE;
   }
 
-  if ((v->Typ() == BIGINT_CMD) ||
-     ((v->Typ() == NUMBER_CMD) && rField_is_Q(currRing)))
-  {
-    temp = (number)v->Data();
-    n2 = n_Copy(temp,coeffs_BIGINT);
-  }
-  else if (v->Typ() == INT_CMD)
-  {
-    i = (int)(long)v->Data();
-    n2 = n_Init(i, coeffs_BIGINT);
-  }
-  else
-  {
-    WerrorS("wrong type: expected int, bigint, or number as 2nd argument");
-    return TRUE;
-  }
+  i = (int)(long)v->Data();
 
-  lists l = primeFactorisation(n1, n2);
-  n_Delete(&n1, coeffs_BIGINT); n_Delete(&n2, coeffs_BIGINT);
+  lists l = primeFactorisation(n1, i);
+  n_Delete(&n1, coeffs_BIGINT);
   res->data = (char*)l;
   return FALSE;
 }
