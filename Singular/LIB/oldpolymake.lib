@@ -31,7 +31,7 @@ NOTE:
 @*   Note, though, that the procedures concerned with planar polygons are
      independent of both, polymake and topcom.
 
-PROCEDURES USING POLYMAKE:
+PROCEDURES:
   polymakePolytope()   computes the vertices of a polytope using polymake
   newtonPolytopeP()     computes the Newton polytope of a polynomial
   newtonPolytopeLP()   computes the lattice points of the Newton polytope
@@ -40,14 +40,11 @@ PROCEDURES USING POLYMAKE:
   intmatToPolymake()   transforms an integer matrix into polymake format
   polymakeToIntmat()   transforms polymake output into an integer matrix
 
-PROCEDURES USING TOPCOM:
   triangulations()     computes all triangulations of a marked polytope
   secondaryPolytope()  computes the secondary polytope of a marked polytope
 
-PROCEDURES USING POLYMAKE AND TOPCOM:
   secondaryFan()       computes the secondary fan of a marked polytope
 
-PROCEDURES CONCERNED WITH PLANAR POLYGONS:
   cycleLength()      computes the cycleLength of cycle
   splitPolygon()     splits a marked polygon into vertices, facets, interior points
   eta()              computes the eta-vector of a triangulation
@@ -58,7 +55,6 @@ PROCEDURES CONCERNED WITH PLANAR POLYGONS:
   ellipticNF()       computes the normal form of an elliptic polygon
   ellipticNFDB()     displays the 16 normal forms of elliptic polygons
 
-AUXILARY PROCEDURES:
   polymakeKeepTmpFiles()  determines if the files created in /tmp should be kept
 
 KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
