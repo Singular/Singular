@@ -40,7 +40,6 @@ require 5.0;
 
 # Homepage:
 $T2H_HOMEPAGE = <<EOT;
-http://www.mathematik.uni-kl.de/~obachman/Texi2html
 EOT
 
 # Authors:  
@@ -1521,7 +1520,6 @@ package Getopt::MySimple;
 
 # --------------------------------------------------------------------------
 # Locally modified by obachman (Display type instead of env, order by cmp)
-# $Id$
 
 # use strict;
 # no strict 'refs';

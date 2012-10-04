@@ -80,18 +80,19 @@ on them. Moreover, it is impossible to introduce parameters which do not commute
 
 @item *-multiplication  BR_PLURAL_BR
 @itemize
-
+@item
 in the non-commutative case, the correct multiplication of @code{y} by
  @code{x} must be written as @code{y*x}.
-@* Both expressions @code{yx} and @code{xy} are equal, since they are
+@item
+Both expressions @code{yx} and @code{xy} are equal, since they are
 interpreted as commutative expressions. See example in @ref{poly expressions BR_PLURAL_BR}.
-@* Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted.
-
+@item
+Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted.
 @end itemize
 
 @item   @code{ideal} BR_PLURAL_BR
 @itemize
-
+@item
 Unless stated otherwise, an @code{ideal} as understood by @sc{Plural}, is a list of generators
 of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
  @* For a @strong{two-sided ideal} @code{T}, use command @ref{twostd} in order to compute
@@ -101,9 +102,11 @@ the two-sided Groebner basis of @code{T}.
 
 @item @code{module} BR_PLURAL_BR
 @itemize
+@item
 Unless stated otherwise, a @code{module} as understood by @sc{Plural}, is
 @strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank)
-@* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details).
+@item
+@strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details).
 @end itemize
 
 @c @item ordering BR_PLURAL_BR
@@ -118,10 +121,7 @@ Unless stated otherwise, a @code{module} as understood by @sc{Plural}, is
 @c @end itemize
 
 @item @code{qring} BR_PLURAL_BR
-
-@itemize
 In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring BR_PLURAL_BR}).
-@end itemize
 @end table
 
 @c ----------------------------------------------------------------------------
