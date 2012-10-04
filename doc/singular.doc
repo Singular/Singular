@@ -12,6 +12,11 @@
 @c ------------------------
 @c %**end of header
 @c ------------------------
+@dircategory mathematics
+@direntry
+* Singular: (singular.hlp).           The CAS Singular.
+@end direntry
+
 
 @c --------------------- general settings --------------------
 @iftex
