@@ -22,7 +22,6 @@ PROCEDURES:
  noetherNormal(id);     noether normalization of ideal id
  mapIsFinite(R,phi,I);  query for finiteness of map phi:R --> basering/I
 
-AUXILIARY PROCEDURES:
  finitenessTest(i,z);   find variables which occur as pure power in lead(i)
  nonZeroEntry(id);      list describing non-zero entries of an identifier
 ";
