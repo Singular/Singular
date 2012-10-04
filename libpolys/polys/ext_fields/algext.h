@@ -48,5 +48,20 @@ BOOLEAN  naInitChar(coeffs cf, void* infoStruct);
 /// if m == var(i)/1 => return i, 
 int naIsParam(number, const coeffs);
 
+struct  spolyrec;
+typedef struct spolyrec    polyrec;
+typedef polyrec *          poly;
+
+/// assumes that p and q are univariate polynomials in r,
+///   mentioning the same variable;
+///   assumes a global monomial ordering in r;
+///   assumes that not both p and q are NULL;
+///   returns the gcd of p and q;
+///   moreover, afterwards pFactor and qFactor contain appropriate
+///   factors such that gcd(p, q) = p * pFactor + q * qFactor;
+///   leaves p and q unmodified
+poly      p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r);
+
+
 #endif
 /* ALGEXT_H */
