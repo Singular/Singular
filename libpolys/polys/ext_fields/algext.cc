@@ -43,14 +43,18 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
+#include <polys/PolyEnumerator.h>
+
 #ifdef HAVE_FACTORY
-#include <polys/clapconv.h>
 #include <factory/factory.h>
+#include <polys/clapconv.h>
+#include <polys/clapsing.h>
 #endif
 
-#include "ext_fields/algext.h"
+   
+#include <polys/ext_fields/algext.h>
 #define TRANSEXT_PRIVATES 1
-#include "ext_fields/transext.h"
+#include <polys/ext_fields/transext.h>
 
 #ifdef LDEBUG
 #define naTest(a) naDBTest(a,__FILE__,__LINE__,cf)
@@ -102,7 +106,7 @@ number   naGcd(number a, number b, const coeffs cf);
 int      naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf, BOOLEAN details);
-number   naIntDiv(number a, number b, const coeffs cf);
+//number   naIntDiv(number a, number b, const coeffs cf);
 const char * naRead(const char *s, number *a, const coeffs cf);
 
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
@@ -651,7 +655,9 @@ number naGcd(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   if ((a == NULL) && (b == NULL)) WerrorS(nDivBy0);
-  return (number)p_Gcd((poly)a, (poly)b, naRing);
+  const ring R = naRing;
+  return (number) singclap_gcd(p_Copy((poly)a, R), p_Copy((poly)b, R), R);
+//  return (number)p_Gcd((poly)a, (poly)b, naRing);
 }
 
 number naInvers(number a, const coeffs cf)
@@ -659,8 +665,13 @@ number naInvers(number a, const coeffs cf)
   naTest(a);
   if (a == NULL) WerrorS(nDivBy0);
   
-  poly aFactor = NULL; poly mFactor = NULL;
-  poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
+  poly aFactor = NULL; poly mFactor = NULL; poly theGcd = NULL;
+// singclap_extgcd!
+  const BOOLEAN ret = singclap_extgcd ((poly)a, naMinpoly, theGcd, aFactor, mFactor, naRing);
+
+  assume( !ret );
+
+//  if( ret ) theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
   
   naTest((number)theGcd); naTest((number)aFactor); naTest((number)mFactor);
   p_Delete(&mFactor, naRing);
@@ -844,37 +855,226 @@ int naIsParam(number m, const coeffs cf)
   return p_Var( (poly)m, R );
 }
 
-static void naClearContent(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& c, const coeffs cf)
+
+static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == ID);
-  assume(nCoeff_is_Q_a(cf)); // only over Q[a]/m(a), while the default impl. is used over Zp[a]/m(a) !
-  // all coeffs are given by integers!!!
+  assume(nCoeff_is_Q_algext(cf)); // only over (Q[a]/m(a)), while the default impl. is used over Zp[a]/m(a) !
 
-  c = n_Init(1, cf);
-  assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
+  const ring   R = cf->extRing;
+  assume(R != NULL);
+  const coeffs Q = R->cf; 
+  assume(Q != NULL); 
+  assume(nCoeff_is_Q(Q));  
 
-//   numberCollectionEnumerator.Reset();
-// 
-//   c = numberCollectionEnumerator.Current();
-// 
-//   n_Normalize(c, r);
-// 
-//   if (!n_IsOne(c, r))
-//   {    
-//     numberCollectionEnumerator.Current() = n_Init(1, r); // ???
-// 
-//     number inv = n_Invers(c, r);
-// 
-//     while( numberCollectionEnumerator.MoveNext() )
-//     {
-//       number &n = numberCollectionEnumerator.Current();
-//       n_Normalize(n, r); // ?
-//       n_InpMult(n, inv, r);
-//     }
-// 
-//     n_Delete(&inv, r);
-//   }
+  numberCollectionEnumerator.Reset();
+
+  if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
+  {
+    c = n_Init(1, cf);
+    return;
+  }
+
+  naTest(numberCollectionEnumerator.Current());
+
+  // part 1, find a small candidate for gcd
+  int s1; int s=2147483647; // max. int
+
+  const BOOLEAN lc_is_pos=naGreaterZero(numberCollectionEnumerator.Current(),cf);
+
+  int normalcount = 0;
+  
+  poly cand1, cand;
+  
+  do
+  {
+    number& n = numberCollectionEnumerator.Current();
+    naNormalize(n, cf); ++normalcount;
+
+    naTest(n);
+    
+    cand1 = (poly)n;
+
+    s1 = p_Deg(cand1, R); // naSize?
+    if (s>s1)
+    {
+      cand = cand1;
+      s = s1;
+    }
+  } while (numberCollectionEnumerator.MoveNext() );
+
+//  assume( nlGreaterZero(cand,cf) ); // cand may be a negative integer!
+
+  cand = p_Copy(cand, R);
+  // part 2: compute gcd(cand,all coeffs)
+
+  numberCollectionEnumerator.Reset();
+
+  int length = 0;
+  while (numberCollectionEnumerator.MoveNext() )
+  {
+    number& n = numberCollectionEnumerator.Current();
+    ++length;
+    
+    if( (--normalcount) <= 0)
+      naNormalize(n, cf);
+    
+    naTest(n);
+
+//    p_InpGcd(cand, (poly)n, R);
+    
+    cand = singclap_gcd(cand, p_Copy((poly)n, R), R);
+
+//    cand1 = p_Gcd(cand,(poly)n, R); p_Delete(&cand, R); cand = cand1;
+    
+    assume( naGreaterZero((number)cand, cf) ); // ???
+/*
+    if(p_IsConstant(cand,R))
+    {
+      c = cand;
+
+      if(!lc_is_pos)
+      {
+        // make the leading coeff positive
+        c = nlNeg(c, cf);
+        numberCollectionEnumerator.Reset();
+
+        while (numberCollectionEnumerator.MoveNext() )
+        {
+          number& nn = numberCollectionEnumerator.Current();
+          nn = nlNeg(nn, cf);
+        }
+      }
+      return;
+    }
+*/
+    
+  } 
+
+  // part3: all coeffs = all coeffs / cand
+  if (!lc_is_pos)
+    cand = p_Neg(cand, R);
+
+  c = (number)cand; naTest(c);  
+
+  poly cInverse = (poly)naInvers(c, cf);
+  assume(cInverse != NULL); // c is non-zero divisor!?
+
+  
+  numberCollectionEnumerator.Reset();
+
+
+  while (numberCollectionEnumerator.MoveNext() )
+  {
+    number& n = numberCollectionEnumerator.Current();
+
+    assume( length > 0 );
+
+    if( --length > 0 )
+    {
+      assume( cInverse != NULL );
+      n = (number) p_Mult_q(p_Copy(cInverse, R), (poly)n, R);
+    }
+    else
+    {
+      n = (number) p_Mult_q(cInverse, (poly)n, R);
+      cInverse = NULL;
+      assume(length == 0);
+    }
+    
+    definiteReduce((poly &)n, naMinpoly, cf);    
+  }
+  
+  assume(length == 0);
+  assume(cInverse == NULL); //   p_Delete(&cInverse, R);
+
+  // Quick and dirty fix for constant content clearing... !?
+  CRecursivePolyCoeffsEnumerator<NAConverter> itr(numberCollectionEnumerator); // recursively treat the numbers as polys!
+
+  number cc;
+
+  extern void nlClearContentNoPositiveLead(ICoeffsEnumerator&, number&, const coeffs);
+
+  nlClearContentNoPositiveLead(itr, cc, Q); // TODO: get rid of (-LC) normalization!? 
+
+  // over alg. ext. of Q // takes over the input number
+  c = (number) p_Mult_nn( (poly)c, cc, R); 
+//      p_Mult_q(p_NSet(cc, R), , R);
+
+  n_Delete(&cc, Q);
+
+  // TODO: the above is not enough! need GCD's of polynomial coeffs...!
+/*
+  // old and wrong part of p_Content
+    if (rField_is_Q_a(r) && !CLEARENUMERATORS) // should not be used anymore if CLEARENUMERATORS is 1
+    {
+      // we only need special handling for alg. ext.
+      if (getCoeffType(r->cf)==n_algExt)
+      {
+        number hzz = n_Init(1, r->cf->extRing->cf);
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          poly c_n_n=(poly)pGetCoeff(p);
+          poly c_n=c_n_n;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=n_Lcm(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
+            n_Delete(&hzz,r->cf->extRing->cf);
+            hzz=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+        // hzz contains the 1/lcm of all denominators in c_n_n
+        h=n_Invers(hzz,r->cf->extRing->cf);
+        n_Delete(&hzz,r->cf->extRing->cf);
+        n_Normalize(h,r->cf->extRing->cf);
+        if(!n_IsOne(h,r->cf->extRing->cf))
+        {
+          p=ph;
+          while (p!=NULL)
+          { // each monom: coeff in Q_a
+            poly c_n=(poly)pGetCoeff(p);
+            while (c_n!=NULL)
+            { // each monom: coeff in Q
+              d=n_Mult(h,pGetCoeff(c_n),r->cf->extRing->cf);
+              n_Normalize(d,r->cf->extRing->cf);
+              n_Delete(&pGetCoeff(c_n),r->cf->extRing->cf);
+              pGetCoeff(c_n)=d;
+              pIter(c_n);
+            }
+            pIter(p);
+          }
+        }
+        n_Delete(&h,r->cf->extRing->cf);
+      }
+    }
+*/  
+
+  
+//  c = n_Init(1, cf); assume(FALSE); // TODO: NOT YET IMPLEMENTED!!!
+}
+
+
+static void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
+{
+  assume(cf != NULL);
+  assume(getCoeffType(cf) == ID);
+  assume(nCoeff_is_Q_algext(cf)); // only over (Q[a]/m(a)), while the default impl. is used over Zp[a]/m(a) !
+
+  assume(cf->extRing != NULL);
+  const coeffs Q = cf->extRing->cf; 
+  assume(Q != NULL); 
+  assume(nCoeff_is_Q(Q));  
+  number n;
+  CRecursivePolyCoeffsEnumerator<NAConverter> itr(numberCollectionEnumerator); // recursively treat the numbers as polys!
+
+  extern void nlClearDenominatorsNoPositiveLead(ICoeffsEnumerator&, number&, const coeffs);
+
+  nlClearDenominatorsNoPositiveLead(itr, n, Q); // this should probably be fine...
+  c = (number)p_NSet(n, cf->extRing); // over alg. ext. of Q // takes over the input number
 }
 
 
@@ -950,7 +1150,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
-  cf->cfIntDiv       = naDiv;
+  cf->cfIntDiv       = naDiv; // ???
 #ifdef HAVE_FACTORY
   cf->convFactoryNSingN=naConvFactoryNSingN;
   cf->convSingNFactoryN=naConvSingNFactoryN;
@@ -962,7 +1162,10 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfParameter = naParameter;
 
   if( nCoeff_is_Q(R->cf) )
+  {
     cf->cfClearContent = naClearContent;
+    cf->cfClearDenominators = naClearDenominators;
+  }
   
   return FALSE;
 }

@@ -32,22 +32,34 @@
  */
 class CBasePolyEnumerator: public virtual IBaseEnumerator
 {
+  template <class T>
+  friend class CRecursivePolyCoeffsEnumerator;
   private:
-    const poly m_poly; ///< essentially immutable original iterable object
+    poly m_poly; ///< essentially immutable original iterable object
     
     static const spolyrec m_prevposition_struct; ///< tag for "-1" position
 
   protected:
     poly m_position; ///< current position in the iterable object
 
+  public:
     virtual bool IsValid() const
     {
       // not -1 or past the end position?
       return (m_position != NULL) && (m_position != &m_prevposition_struct);
     }
-    
-  public:
-    CBasePolyEnumerator(poly p):
+
+
+    /// Reset this polynomial Enumerator with a different input polynomial
+    void Reset(poly p)
+    {
+      m_poly = p;
+      m_position = const_cast<poly>(&m_prevposition_struct);
+      assume( !IsValid() ); 
+    }
+
+    /// This enumerator is an empty polynomial by default
+    CBasePolyEnumerator(poly p = NULL):
         IBaseEnumerator(), m_poly(p), m_position(const_cast<poly>(&m_prevposition_struct))
     {
       assume( !IsValid() ); 
@@ -59,6 +71,7 @@ class CBasePolyEnumerator: public virtual IBaseEnumerator
       m_position = const_cast<poly>(&m_prevposition_struct);
       assume( !IsValid() ); 
     }
+
 
     /// Advances the position to the next term of the polynomial.
     /// returns true if the position marker was successfully advanced to the
@@ -116,7 +129,7 @@ typedef IEnumerator<number> IPolyCoeffsEnumerator;
 class CPolyCoeffsEnumerator: public CBasePolyEnumerator, public virtual IPolyCoeffsEnumerator
 {
   public:
-    CPolyCoeffsEnumerator(poly p): CBasePolyEnumerator(p) { assume(p != NULL); }
+    CPolyCoeffsEnumerator(poly p): CBasePolyEnumerator(p) {}
     
     /// Gets the current element in the collection (read and write).
     virtual IPolyCoeffsEnumerator::reference Current()
@@ -132,6 +145,80 @@ class CPolyCoeffsEnumerator: public CBasePolyEnumerator, public virtual IPolyCoe
       return pGetCoeff(m_position);
     }
 };
+
+
+struct NAConverter
+{
+  static inline poly convert(const number& n)
+  {
+    // suitable for alg. ext. numbers that are just polys actually
+    return (poly)n;
+  }
+};
+
+/// go into polynomials over an alg. extension recursively
+template <class ConverterPolicy>
+class CRecursivePolyCoeffsEnumerator: public IPolyCoeffsEnumerator
+{
+  private:
+    IPolyCoeffsEnumerator& m_global_enumerator; ///< iterates the input polynomial
+    CBasePolyEnumerator m_local_enumerator; ///< iterates the current coeff. of m_global_enumerator
+
+  protected:
+    virtual bool IsValid() const
+    {
+      return m_global_enumerator.IsValid() &&  m_local_enumerator.IsValid();
+    }    
+    
+  public:
+   
+    /// NOTE: carefull: don't destruct the input enumerator before doing it with this one...
+    /// this also changes the original IPolyCoeffsEnumerator& itr!
+    CRecursivePolyCoeffsEnumerator(IPolyCoeffsEnumerator& itr): m_global_enumerator(itr), m_local_enumerator(NULL) {}
+
+    virtual bool MoveNext()
+    {
+      if( m_local_enumerator.MoveNext() )
+        return true;
+
+      if( !m_global_enumerator.MoveNext() ) // at the end of the main input polynomial?
+        return false;
+
+      // TODO: make the following changeable (metaprogramming: use policy?),
+      // leave the following as default option...
+      poly p = ConverterPolicy::convert(m_global_enumerator.Current()); // Assumes that these numbers are just polynomials!
+      assume( p != NULL );
+
+      // the followig actually needs CPolyCoeffsEnumerator
+      m_local_enumerator.Reset( p ); // -1 position in p :: to be skipped now!
+
+      if( m_local_enumerator.MoveNext() ) // should be true
+        return true;
+
+      assume( FALSE ); return MoveNext(); // this should not happen as p should be non-zero, but just in case...
+    }
+    
+    virtual void Reset()
+    {
+      m_global_enumerator.Reset();
+      m_local_enumerator.Reset(NULL);
+    }
+
+    /// Gets the current element in the collection (read and write).
+    virtual IPolyCoeffsEnumerator::reference Current()
+    {
+      assume( IsValid() );
+      return pGetCoeff(m_local_enumerator.m_position);
+    }
+
+    /// Gets the current element in the collection (read only).
+    virtual IPolyCoeffsEnumerator::const_reference Current() const
+    {
+      assume( IsValid() );
+      return pGetCoeff(m_local_enumerator.m_position);
+    }
+};
+
 
 #endif 
 /* #ifndef POLYENUMERATOR_H */

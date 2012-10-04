@@ -22,14 +22,13 @@
 //#include <polys/clapconv.h>
 //#include <kernel/longtrans.h>
 
-/* destroys f and g */
+/// destroys f and g
 poly singclap_gcd ( poly f, poly g, const ring r );
 
-/*
+
 // commented out!
-napoly singclap_alglcm ( napoly f, napoly g );
-void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
-*/
+// poly singclap_alglcm ( poly f, poly g, const ring r );
+// void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
 
 poly singclap_resultant ( poly f, poly g , poly x, const ring r);
 

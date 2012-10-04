@@ -128,7 +128,7 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   assume(r != NULL);
 
   // no fractions
-  assume(!(  nCoeff_is_Q(r) || nCoeff_is_Q_a(r) ));
+  assume(!(  nCoeff_is_Q(r) ));
   // all coeffs are given by integers!!!
 
   numberCollectionEnumerator.Reset();
@@ -171,27 +171,30 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
 #endif
 
   assume(!nCoeff_is_Ring(r));
-  assume(nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r));
+  assume(nCoeff_is_Zp(r) || nCoeff_is_numeric(r) || nCoeff_is_GF(r) || nCoeff_is_Zp_a(r) || nCoeff_is_Q_algext(r));
 
-  c = curr;
-  
-  n_Normalize(c, r);
+  n_Normalize(curr, r); // Q: good/bad/ugly??
 
-  if (!n_IsOne(c, r))
-  {    
+  if (!n_IsOne(curr, r))
+  {
+    number t = curr; // takes over the curr! note: not a reference!!!
+
     curr = n_Init(1, r); // ???
     
-    number inv = n_Invers(c, r);
+    number inv = n_Invers(t, r);
     
     while( numberCollectionEnumerator.MoveNext() )
     {
       number &n = numberCollectionEnumerator.Current();
-      n_Normalize(n, r); // ?
       n_InpMult(n, inv, r); // TODO: either this or directly divide!!!?
+//      n_Normalize(n, r); // ?
     }
     
     n_Delete(&inv, r);
-  }
+
+    c = t;
+  } else
+    c = n_Copy(curr, r); // c == 1 and nothing else to do...
 }
 
 void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)

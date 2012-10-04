@@ -258,7 +258,8 @@ poly pSubstPar(poly p, int par, poly image)
     memset(v,0,sizeof(sleftv));
 
     number d = n_GetDenom(p_GetCoeff(p, currRing), currRing);
-    if (!n_IsOne (d, currRing->cf)) WarnS("ignoring denominators of coefficients...");
+    if (!n_IsOne (d, currRing->cf))
+      WarnS("ignoring denominators of coefficients...");
     n_Delete(&d, currRing);
 
     number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing); 

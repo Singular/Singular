@@ -2022,22 +2022,31 @@ static number p_InitContent(poly ph, const ring r);
 
 void p_Content(poly ph, const ring r)
 {
+  assume( ph != NULL );
+
+  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+
+
 #if CLEARENUMERATORS
-  if( (ph != NULL) && nCoeff_is_Q(r->cf) )
+  if( 0 )
   {
+      // experimentall (recursive enumerator treatment) of alg. Ext!
     CPolyCoeffsEnumerator itr(ph);
     n_ClearContent(itr, r->cf);
 
-    assume( n_GreaterZero(pGetCoeff(ph),r->cf) );
-    
+    p_Test(ph, r); n_Test(pGetCoeff(ph), C);
+    assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+
+      // if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
     return;
   }
 #endif
-
+  
+  
 #ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
-    if ((ph!=NULL) && rField_has_Units(r))
+    if (rField_has_Units(r))
     {
       number k = n_GetUnit(pGetCoeff(ph),r->cf);
       if (!n_IsOne(k,r->cf))
@@ -2052,7 +2061,8 @@ void p_Content(poly ph, const ring r)
           p_SetCoeff(h, n_Mult(pGetCoeff(h), k,r->cf),r);
           pIter(h);
         }
-        assume( n_GreaterZero(pGetCoeff(ph),r->cf) );
+//        assume( n_GreaterZero(pGetCoeff(ph),r->cf) );
+//        if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
       }
       n_Delete(&k,r->cf);
     }
@@ -2069,19 +2079,25 @@ void p_Content(poly ph, const ring r)
   }
   else
   {
+    assume( pNext(ph) != NULL );
 #if CLEARENUMERATORS
-    if( (ph != NULL) && nCoeff_is_Q(r->cf) )
+    if( nCoeff_is_Q(r->cf) || nCoeff_is_Q_a(r->cf) )
     {
+      // experimentall (recursive enumerator treatment) of alg. Ext!
       CPolyCoeffsEnumerator itr(ph);
       n_ClearContent(itr, r->cf);
-      assume( n_GreaterZero(pGetCoeff(ph),r->cf) );
+
+      p_Test(ph, r); n_Test(pGetCoeff(ph), C);
+      assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+      
+      // if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
       return;
     }
 #endif
     
     n_Normalize(pGetCoeff(ph),r->cf);
     if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
-    if (rField_is_Q(r))
+    if (rField_is_Q(r)) // should not be used anymore if CLEARENUMERATORS is 1
     {
       h=p_InitContent(ph,r);
       p=ph;
@@ -2131,7 +2147,7 @@ void p_Content(poly ph, const ring r)
 //      if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
 //    }
 #endif
-    if (rField_is_Q_a(r))
+    if (rField_is_Q_a(r)) 
     {
       // we only need special handling for alg. ext.
       if (getCoeffType(r->cf)==n_algExt)
@@ -2451,23 +2467,30 @@ void p_Content(poly ph, const ring r)
 /* cleardenom suff                                                           */
 poly p_Cleardenom(poly ph, const ring r)
 {
-  const coeffs C = r->cf;
+  if( ph == NULL )
+    return NULL;
+
+  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+  
+#if CLEARENUMERATORS
+  if( 0 )
+  {
+    CPolyCoeffsEnumerator itr(ph);
+
+    n_ClearDenominators(itr, C);
+
+    n_ClearContent(itr, C); // divide out the content
+
+    p_Test(ph, r); n_Test(pGetCoeff(ph), C);
+    assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+//    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
+
+    return ph;
+  }
+#endif
 
   poly start=ph;
 
-#if CLEARENUMERATORS
-  if( (ph != NULL) && nCoeff_is_Q(C) )
-  {
-    CPolyCoeffsEnumerator itr(ph);
-    n_ClearDenominators(itr, C);
-    n_ClearContent(itr, C); // divide out the content
-
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
-    
-    return start;
-  }
-#endif
-  
   number d, h;
   poly p;
 
@@ -2476,6 +2499,7 @@ poly p_Cleardenom(poly ph, const ring r)
   {
     p_Content(ph,r);
     assume( n_GreaterZero(pGetCoeff(ph),C) );
+    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     return start;
   }
 #endif
@@ -2483,6 +2507,7 @@ poly p_Cleardenom(poly ph, const ring r)
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
     assume( n_GreaterZero(pGetCoeff(ph),C) );
+    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     return start;
   }
   p = ph;
@@ -2506,18 +2531,25 @@ poly p_Cleardenom(poly ph, const ring r)
       p_SetCoeff(p,n_Init(1,r->cf),r);
 
     assume( n_GreaterZero(pGetCoeff(ph),C) );
+    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     
     return start;
   }
 
+  assume(pNext(p)!=NULL);
+
 #if CLEARENUMERATORS
-  if( (ph != NULL) && nCoeff_is_Q(C) )
+  if( nCoeff_is_Q(C) || nCoeff_is_Q_a(C) )
   {
     CPolyCoeffsEnumerator itr(ph);
+
     n_ClearDenominators(itr, C);
+
     n_ClearContent(itr, C); // divide out the content
 
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
+    p_Test(ph, r); n_Test(pGetCoeff(ph), C);
+    assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+//    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     
     return start;
   }
@@ -2616,6 +2648,7 @@ poly p_Cleardenom(poly ph, const ring r)
   }
 
   assume( n_GreaterZero(pGetCoeff(ph),C) );
+  if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
   
   return start;
 }
@@ -2624,18 +2657,16 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
 {
   const coeffs C = r->cf;
   number d, h;
-  poly p;
 
-  p = ph;
+  assume( ph != NULL );
 
-  assume(ph != NULL);
-
-
+  poly p = ph;
 
 #if CLEARENUMERATORS
-  if( (ph != NULL) && nCoeff_is_Q(C) )
+  if( 0 )
   {
     CPolyCoeffsEnumerator itr(ph);
+
     n_ClearDenominators(itr, d, C); // multiply with common denom. d
     n_ClearContent(itr, h, C); // divide by the content h 
 
@@ -2644,26 +2675,44 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     n_Delete(&d, C);
     n_Delete(&h, C);
 
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
-    
+    n_Test(c, C);
+
+    p_Test(ph, r); n_Test(pGetCoeff(ph), C);
+    assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+/*
+    if(!n_GreaterZero(pGetCoeff(ph),C))
+    {
+      ph = p_Neg(ph,r);
+      c = n_Neg(c, C);
+    }
+*/
     return;
   }
 #endif
   
-  if(pNext(p)==NULL)
+  
+  if( pNext(p) == NULL )
   {
     c=n_Invers(pGetCoeff(p), C);
     p_SetCoeff(p, n_Init(1, C), r);
 
     assume( n_GreaterZero(pGetCoeff(ph),C) );
+    if(!n_GreaterZero(pGetCoeff(ph),C))
+    {
+      ph = p_Neg(ph,r);
+      c = n_Neg(c, C);
+    }
     
     return;
   }
 
+  assume( pNext(p) != NULL );
+  
 #if CLEARENUMERATORS
-  if( (ph != NULL) && nCoeff_is_Q(C) )
+  if( nCoeff_is_Q(C) || nCoeff_is_Q_a(C) )
   {
     CPolyCoeffsEnumerator itr(ph);
+    
     n_ClearDenominators(itr, d, C); // multiply with common denom. d
     n_ClearContent(itr, h, C); // divide by the content h 
 
@@ -2672,8 +2721,17 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     n_Delete(&d, C);
     n_Delete(&h, C);
 
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
-    
+    n_Test(c, C);
+
+    p_Test(ph, r); n_Test(pGetCoeff(ph), C);
+    assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+/*
+    if(!n_GreaterZero(pGetCoeff(ph),C))
+    {
+      ph = p_Neg(ph,r);
+      c = n_Neg(c, C);
+    }
+*/
     return;
   }
 #endif
@@ -2765,6 +2823,12 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
   }
 
   assume( n_GreaterZero(pGetCoeff(ph),C) );
+  if(!n_GreaterZero(pGetCoeff(ph),C))
+  {
+    ph = p_Neg(ph,r);
+    c = n_Neg(c, C);
+  }
+  
 }
 
 number p_GetAllDenom(poly ph, const ring r)

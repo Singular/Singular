@@ -773,8 +773,11 @@ static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
 static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
 {
   assume(r != NULL);
-  return ((!nCoeff_is_Ring(r)) && (n_GetChar(r) == 0) && nCoeff_is_Extension(r));
+  return ((n_GetChar(r) == 0) && nCoeff_is_Extension(r));
 }
+
+
+
 
 static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_long_R; }
@@ -797,6 +800,10 @@ static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 /// TRUE iff r represents an algebraic extension field
 static inline BOOLEAN nCoeff_is_algExt(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_algExt); }
+
+/// is it an alg. ext. of Q?
+static inline BOOLEAN nCoeff_is_Q_algext(const coeffs r)
+{ assume(r != NULL); return ((n_GetChar(r) == 0) && nCoeff_is_algExt(r)); }
 
 /// TRUE iff r represents a transcendental extension field
 static inline BOOLEAN nCoeff_is_transExt(const coeffs r)

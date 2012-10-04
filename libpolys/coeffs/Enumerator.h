@@ -53,17 +53,19 @@ class IBaseEnumerator // IDisposable
     /// which is before the first element in the collection.
     virtual void Reset() = 0;
 
-    virtual ~IBaseEnumerator() {} // TODO: needed?
-
+    /// Current position is inside the collection (not -1 or past the end)
+    virtual bool IsValid() const = 0;
+   
   private:
+    /// disable copy constructor and assigment operator
     IBaseEnumerator(const IBaseEnumerator&);
     void operator=(const IBaseEnumerator&);
 
   protected:
     IBaseEnumerator(){}
+    ~IBaseEnumerator() {} // TODO: needed?
 
-    /// Current position is inside the collection (not -1 or past the end)
-    virtual bool IsValid() const = 0;
+
 };
 
 
@@ -89,7 +91,9 @@ class IAccessor // IDisposable
     /// Gets the current element in the collection (read only).
     virtual const_reference Current() const = 0;
 
-    virtual ~IAccessor() {} // TODO: needed?
+ protected:
+    IAccessor(){}   
+    ~IAccessor() {} // TODO: needed?
   
 };
 
