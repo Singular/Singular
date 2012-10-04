@@ -1816,7 +1816,10 @@ const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
 poly      p_Divide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
 poly      p_Div_nn(poly p, const number n, const ring r);
-void      p_Lcm(poly a, poly b, poly m, const ring r);
+
+// returns the LCM of the head terms of a and b in *m
+void p_Lcm(const poly a, const poly b, poly m, const ring r);
+
 poly      p_Diff(poly a, int k, const ring r);
 poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);
 int       p_Weight(int c, const ring r);
