@@ -162,7 +162,8 @@ static int factor_using_division (mpz_t t, unsigned int limit,lists primes, int 
     }
   }
 
-  mpz_clears (q, r, NULL);
+  mpz_clear (q);
+  mpz_clear (r);
   //printf("bound=%d,f=%d,failures=%d, reached=%d\n",bound,f,failures,bound_not_reached);
   return bound_not_reached;
 }
@@ -281,7 +282,13 @@ static void factor_using_pollard_rho (mpz_t n, unsigned long a, lists primes, in
     }
   }
 
-  mpz_clears (P,t2,t1,x1,x,y,last_f,NULL);
+  mpz_clear (P);
+  mpz_clear (t2);
+  mpz_clear (t1);
+  mpz_clear (x1);
+  mpz_clear (x);
+  mpz_clear (y);
+  mpz_clear (last_f);
 }
 
 static void factor_gmp (mpz_t t,lists primes,int *multiplicities,int &index,unsigned long bound)
@@ -339,9 +346,10 @@ lists primeFactorisation(const number n, const int pBound)
   {
     primesL->m[i].rtyp = primes->m[i].rtyp;
     primesL->m[i].data = primes->m[i].data;
+    primes->m[i].rtyp=0;
+    primes->m[i].data=NULL;
   }
-  omFreeSize((ADDRESS)primes->m, (primes->nr + 1) * sizeof(sleftv));
-  omFreeBin((ADDRESS)primes, slists_bin);
+  primes->Clean(NULL);
 
   lists multiplicitiesL = (lists)omAllocBin(slists_bin);
   multiplicitiesL->Init(index);
