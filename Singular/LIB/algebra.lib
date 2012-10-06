@@ -2,7 +2,7 @@
 //help for finitenessTest and mapIsFinite edited
 //new proc  nonZeroEntry(id), used to fix a bug in proc finitenessTest
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: algebra.lib 14661 2012-03-05 11:00:14Z motsak $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -328,7 +328,7 @@ RETURN:
               K[y(1),...,y(m)] ---> basering,  y(i) --> fi.
 @end format
 NOTE:    Three different algorithms are used depending on c = 1,2,3.
-         If c is not given or c=0, a heuristically best method is choosen.
+         If c is not given or c=0, a heuristically best method is chosen.
          The basering may be a quotient ring.
          To access to the ring l[2] and see ker you must give the ring a name,
          e.g. def S=l[2]; setring S; ker;
@@ -531,7 +531,7 @@ RETURN:
            ideal 'ker', depending only on the y(i), the kernel of the given map
 @end format
 NOTE:    Three differnt algorithms are used depending on c = 1,2,3.
-         If c is not given or c=0, a heuristically best method is choosen.
+         If c is not given or c=0, a heuristically best method is chosen.
          The basering may be a quotient ring. However, if the preimage ring is
          a quotient ring, say pr = P/I, consider phi as a map from P and then
          the algorithm returns 1 if the kernel of phi is 0 mod I.
@@ -798,9 +798,10 @@ NOTE:    Designed for characteristic 0.It works also in char k > 0 if it
 EXAMPLE: example noetherNormal; shows an example
 "
 {
-   if ( deg(i[1]) <= 0)
+   i=simplify(i,2);
+   if ( i== 0)
    {
-     list l = ideal(0),i;
+     list l = maxideal(1),maxideal(1);
      return( l );
    }
    int p;
@@ -820,10 +821,10 @@ EXAMPLE: example noetherNormal; shows an example
    list j = mstd(i);
    i = j[2];
    int d = dim(j[1]);
-   if ( d == 0)
+   if ( d <= 0)
    {
      setring r;
-     list l = ideal(0),maxideal(1);
+     list l = maxideal(1),ideal(0);
      return( l );
    }
    // ------------------------ change of ordering ---------------------------
