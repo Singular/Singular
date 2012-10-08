@@ -294,7 +294,9 @@ void sleftv::CleanUp(ring r)
   if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL) && (rtyp!=ALIAS_CMD))
   {
     //::Print("free %x (%s)\n",name,name);
-    omFreeBinAddr((ADDRESS)name);
+    //omFreeBinAddr((ADDRESS)name);
+    omFree((ADDRESS)name); /* here, a name (monomial) may really be larger
+                              then 1000 chars => not a BinAddr */
   }
   //name=NULL;
   //flag=0;
@@ -1427,7 +1429,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         goto id_found;
       }
     }
@@ -1454,7 +1456,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /* 5. existing identifier, global */
     if (h!=NULL)
     {
-      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);
+      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
       goto id_found;
     }
     /* 6. local ring: number/poly */
@@ -1473,7 +1475,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           // in this case we may have monomials equal to 0 in p_Read
           v->name = id;
           #else
-          omFreeBinAddr((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
           #endif
         }
         else if (pIsConstant(p))
@@ -1511,7 +1513,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           // in this case we may have monomials equal to 0 in p_Read
           v->name = id;
           #else
-          omFreeBinAddr((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
           #endif
         }
         else
@@ -1537,7 +1539,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id);
+        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         h=currRingHdl;
         goto id_found;
       }
@@ -1547,7 +1549,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       h=basePack->idroot->get(id,myynest);
       if (h!=NULL)
       {
-        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         v->req_packhdl=basePack;
         goto id_found;
       }

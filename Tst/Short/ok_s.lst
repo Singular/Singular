@@ -69,6 +69,7 @@ bug_division
 bug_factorize
 bug_hilbstd
 bug_homog
+bug_idlen
 bug_interpol
 bug_mres
 bug_napMultT
