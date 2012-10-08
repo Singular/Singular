@@ -238,6 +238,9 @@ BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
 #endif
 */
+/* ================================================================== */
+void paPrint(const char *n,package p);
+/* ================================================================== */
 
 
 #endif

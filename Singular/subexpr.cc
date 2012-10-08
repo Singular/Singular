@@ -114,10 +114,13 @@ void sleftv::Print(leftv store, int spaces)
       {
         case UNKNOWN:
         case DEF_CMD:
-        case PACKAGE_CMD:
           PrintNSpaces(spaces);
           PrintS("`");PrintS(n);PrintS("`");
           break;
+        case PACKAGE_CMD:
+	  PrintNSpaces(spaces);
+	  paPrint(n,(package)d);
+	  break;
         case NONE:
           return;
         case INTVEC_CMD:
@@ -468,7 +471,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case MAP_CMD:
     {
       map m=(map)d;
-      omFree((ADDRESS)m->preimage);
+      omFreeBinAddr((ADDRESS)m->preimage);
       m->preimage=NULL;
       /* no break: continue as IDEAL*/
     }
@@ -902,7 +905,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
             sprintf(ns, "link(\"%s\")", s);
-            omFree(s);
+            omFreeBinAddr(s);
             omCheckAddr(ns);
             return ns;
           }
@@ -1365,7 +1368,12 @@ BOOLEAN assumeStdFlag(leftv h)
   if (!hasFlag(h,FLAG_STD))
   {
     if (!TEST_VERB_NSB)
-      Warn("%s is no standard basis",h->Name());
+    {
+      if (TEST_V_ALLWARN)
+        Warn("%s is no standard basis in >>%s<<",h->Name(),my_yylinebuf);
+      else
+        Warn("%s is no standard basis",h->Name());
+    }
     return FALSE;
   }
   return TRUE;
@@ -1419,7 +1427,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       {
         if (currRingHdl!=NULL)
         {
-          if (id!=IDID(currRingHdl)) omFree((ADDRESS)id);
+          if (id!=IDID(currRingHdl)) omFreeBinAddr((ADDRESS)id);
           h=currRingHdl;
           goto id_found;
         }
@@ -1433,7 +1441,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       {
         if (currPackHdl!=NULL)
         {
-          omFree((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id);
           h=currPackHdl;
           goto id_found;
         }
@@ -1452,7 +1460,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        if (id!=IDID(h)) omFree((ADDRESS)id);
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         goto id_found;
       }
     }
@@ -1479,7 +1487,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /* 5. existing identifier, global */
     if (h!=NULL)
     {
-      if (id!=IDID(h)) omFree((ADDRESS)id);
+      if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id);  /*assume strlen(id) <1000 */
       goto id_found;
     }
     /* 6. local ring: number/poly */
@@ -1498,7 +1506,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           // in this case we may have monomials equal to 0 in p_Read
           v->name = id;
           #else
-          omFree((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id);
           #endif
         }
         else if (pIsConstant(p))
@@ -1536,7 +1544,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           // in this case we may have monomials equal to 0 in p_Read
           v->name = id;
           #else
-          omFree((ADDRESS)id);
+          omFreeBinAddr((ADDRESS)id);
           #endif
         }
         else
@@ -1562,7 +1570,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) omFree((ADDRESS)id);
+        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen
+(id) <1000 */
         h=currRingHdl;
         goto id_found;
       }
@@ -1572,7 +1581,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       h=basePack->idroot->get(id,myynest);
       if (h!=NULL)
       {
-        if (id!=IDID(h)) omFree((ADDRESS)id);
+        if (id!=IDID(h)) omFreeBinAddr((ADDRESS)id); /*assume strlen(id) <1000 */
         v->req_packhdl=basePack;
         goto id_found;
       }
@@ -1585,7 +1594,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   /* 9: _ */
   if (strcmp(id,"_")==0)
   {
-    omFree((ADDRESS)id);
+    omFreeBinAddr((ADDRESS)id);
     v->Copy(&sLastPrinted);
   }
   else

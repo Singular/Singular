@@ -5711,3 +5711,19 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
   jjINT_S_TO_ID(n,e,res);
   return FALSE;
 }
+
+void paPrint(const char *n,package p)
+{
+  Print("%s (",n);
+  switch (p->language)
+  {
+    case LANG_SINGULAR: PrintS("S"); break;
+    case LANG_C:        PrintS("C"); break;
+    case LANG_TOP:      PrintS("T"); break;
+    case LANG_NONE:     PrintS("N"); break;
+    default:            PrintS("U");
+  }
+  if(p->libname!=NULL)
+  Print(",%s", p->libname);
+  PrintS(")");
+}
