@@ -971,6 +971,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         si_close(sockfd);
         SI_LINK_SET_RW_OPEN_P(l);
         d->send_quit_at_exit=1;
+        link_list newlink=(link_list)omAlloc(sizeof(link_struct));
+        newlink->u=u;
+        newlink->l=l;
+        newlink->next=(void *)ssiToBeClosed;
+        ssiToBeClosed=newlink;
         fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
       }
       // ----------------------------------------------------------------------
