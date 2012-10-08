@@ -6,6 +6,8 @@
 
 #include <coeffs/coeffs.h>
 
+#include <polys/PolyEnumerator.h>
+
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 // #include <kernel/longrat.h>
@@ -44,6 +46,99 @@ static inline void NoReturn(leftv& res)
   res->rtyp = NONE;
   res->data = NULL;
 }
+
+/// wrapper around n_ClearContent
+static BOOLEAN _ClearContent(leftv res, leftv h)
+{
+  NoReturn(res);
+
+  const char *usage = "'ClearContent' needs a (non-zero!) poly or vector argument...";
+  
+  if( h == NULL )
+  {
+    WarnS(usage);
+    return TRUE;
+  }
+
+  assume( h != NULL );
+
+  if( !( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD) )
+  {
+    WarnS(usage);
+    return TRUE;
+  }
+
+  assume (h->Next() == NULL);
+  
+  poly ph = reinterpret_cast<poly>(h->Data());
+  
+  if( ph == NULL )
+  {
+    WarnS(usage);
+    return TRUE;
+  }
+  
+  const ring r =  currRing;
+  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+
+  number n;
+
+  // experimentall (recursive enumerator treatment) of alg. ext
+  CPolyCoeffsEnumerator itr(ph);
+  n_ClearContent(itr, n, C);
+
+  res->data = n;
+  res->rtyp = NUMBER_CMD;
+
+  return FALSE;
+}
+
+/// wrapper around n_ClearDenominators
+static BOOLEAN _ClearDenominators(leftv res, leftv h)
+{
+  NoReturn(res);
+
+  const char *usage = "'ClearDenominators' needs a (non-zero!) poly or vector argument...";
+
+  if( h == NULL )
+  {
+    WarnS(usage);
+    return TRUE;
+  }
+
+  assume( h != NULL );
+
+  if( !( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD) )
+  {
+    WarnS(usage);
+    return TRUE;
+  }
+
+  assume (h->Next() == NULL);
+
+  poly ph = reinterpret_cast<poly>(h->Data());
+
+  if( ph == NULL )
+  {
+    WarnS(usage);
+    return TRUE;
+  }
+
+  const ring r =  currRing;
+  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+
+  number n;
+
+  // experimentall (recursive enumerator treatment) of alg. ext.
+  CPolyCoeffsEnumerator itr(ph);
+  n_ClearDenominators(itr, n, C);
+
+  res->data = n;
+  res->rtyp = NUMBER_CMD;
+
+  return FALSE;
+}
+
 
 /// try to get an optional (simple) integer argument out of h
 /// or return the default value
@@ -850,6 +945,9 @@ int mod_init(SModulFunctions* psModulFunctions)
 #define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
 // #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
   #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
+  ADD(psModulFunctions, currPack->libname, "ClearContent", FALSE, _ClearContent);
+  ADD(psModulFunctions, currPack->libname, "ClearDenominators", FALSE, _ClearDenominators);
+
   ADD(psModulFunctions, currPack->libname, "DetailedPrint", FALSE, DetailedPrint);
   ADD(psModulFunctions, currPack->libname, "leadmonomial", FALSE, leadmonom);
   ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);

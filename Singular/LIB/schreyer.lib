@@ -1403,6 +1403,9 @@ static proc loadme()
       {
         listvar(Syzextra);
       }
+
+      exportto(Top, Syzextra::ClearContent);
+      exportto(Top, Syzextra::ClearDenominators);
       
 //      export Syzextra;
 
@@ -1438,6 +1441,9 @@ static proc loadme()
         listvar(Syzextra_g);
       }
       
+      exportto(Top, Syzextra_g::ClearContent);
+      exportto(Top, Syzextra_g::ClearDenominators);
+
 //      export Syzextra_g;
 //      exportto(Schreyer, Syzextra_g::noop);
       exportto(Schreyer, Syzextra_g::DetailedPrint);
