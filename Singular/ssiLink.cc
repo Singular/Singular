@@ -1003,7 +1003,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->f_write=fdopen(sockfd,"w");
           d->fd_write=sockfd;
           SI_LINK_SET_RW_OPEN_P(l);
-          d->send_quit_at_exit=1;
           omFree(host);
         }
         else
