@@ -6,6 +6,7 @@ Changes since 3-1-5
 - changed grobcov.lib
 - added system("refrence"); and system('shared")
 - primefactors() changed: result and algorithm
+- new library: classifyceq_lib
 
 2012-07-12 
 Release 3-1-5
