@@ -465,7 +465,7 @@ ideal ShiftDVec::bba
         }
       }
       // create the real one
-      ShiftDVec::ksCreateSpoly
+      SD::ksCreateSpoly
         ( &(strat->P), NULL, strat->use_buckets,
            strat->tailRing, m1, m2, strat->R, strat->lV );
     }
@@ -1172,8 +1172,8 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       With->pLength=0;
       strat->redTailChange=TRUE;
 
-      if ( ksReducePolyTail
-             (L, With, h, strat->kNoetherTail()), strat->lV )
+      if ( SD::ksReducePolyTail
+             (L, With, h, strat->kNoetherTail(), strat->lV) )
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -1473,7 +1473,7 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
           strat->uptodeg, strat->lV, strat, currRing );
     }
     ShiftDVec::ksReducePoly
-      (h, &(strat->T[ii]), NULL, NULL, strat, strat->lV);
+      (h, &(strat->T[ii]), strat->lV, NULL, NULL, strat);
     h->dvec = NULL;
 
     //BOCO: why did i change it to that?:
@@ -1707,7 +1707,8 @@ poly ShiftDVec::redBba
           strat->uptodeg, strat->lV, strat, currRing);
       loGriToFile("p_LPshiftT poly in redBba ", 0,1024);
       LObject tTemp(pTemp);
-      ksReducePoly(h,&tTemp,strat->kNoetherTail(), strat->lV);
+      ShiftDVec::ksReducePoly
+        (h,&tTemp, strat->lV, strat->kNoetherTail());
 
       /* BOCO: this was copied from redFirstShrink
        * i only additionally test for strat->homog - why wasn't
@@ -2428,7 +2429,7 @@ poly ShiftDVec::redtailBba
        * does an exp bound still make sense?
        */
       assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
-      if ( ksReducePolyTail(L, With, &Ln, strat->lV) )
+      if ( SD::ksReducePolyTail(L, With, &Ln, strat->lV) )
       {
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)

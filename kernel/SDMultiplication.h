@@ -1,33 +1,39 @@
+#ifndef SDMULTIPLICATION_H
+#define SDMULTIPLICATION_H
+
+#include <kutil.h> //INCLUDE Magic
+
 namespace ShiftDVec
 {
-  int ShiftDVec::InitOrderMapping( ring r );
-  void ShiftDVec::InitSDMultiplication( ring r );
+  int InitOrderMapping( ring r );
+  void InitSDMultiplication( ring r );
 
-  void ShiftDVec::p_ExpSum_slow
+  void p_ExpSum_slow
     (poly rt, poly p, poly q, ring r, int lV);
-  void ShiftDVec::p_ExpSum_dp
+  void p_ExpSum_dp
     (poly rt, poly p, poly q, ring r, int lV);
 
-  poly ShiftDVec::pp_Mult_mm__T
+  poly pp_Mult_mm__T
     (poly p, const poly m, const ring ri, poly &last, int lV);
-  poly ShiftDVec::pp_Mult_mm_Noether__T
+  poly pp_Mult_mm_Noether__T
     ( poly p, const poly m, const poly spNoether, 
       int &ll, const ring ri, poly &last, int lV  );
-  poly ShiftDVec::p_Minus_mm_Mult_qq__T
+  poly p_Minus_mm_Mult_qq__T
     ( poly p, poly m, poly q, int& Shorter, 
       const poly spNoether, const ring r, poly &last, int lV );
 
-  void ShiftDVec::ksCreateSpoly
+  void ksCreateSpoly
     ( LObject* Pair, poly spNoether, int use_buckets, 
       ring tailRing, poly m1, poly m2,  TObject** R, int lV );
-  int ShiftDVec::ksReducePoly
+  int ksReducePoly
     ( LObject* PR, TObject* PW, 
-      poly spNoether, number *coef, kStrategy strat );
-  int ShiftDVec::ksReducePolyTail
+      int lV, poly spNoether = NULL, 
+      number *coef = NULL, kStrategy strat = NULL );
+  int ksReducePolyTail
     ( LObject* PR, TObject* PW, 
       poly Current, poly spNoether, int lV );
-  int ShiftDVec::ksReducePolyTail
+  int ksReducePolyTail
     ( LObject* PR, TObject* PW, LObject* Red, int lV );
-  poly ShiftDVec::ksCreateShortSpoly
-    ( poly p1, poly p2, ring tailRing );
+  poly ksCreateShortSpoly( poly p1, poly p2, ring tailRing );
 }
+#endif

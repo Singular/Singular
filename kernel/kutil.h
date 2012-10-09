@@ -309,7 +309,8 @@ public:
   KINLINE void PrepareRed(BOOLEAN use_bucket);
   KINLINE void SetLmTail(poly lm, poly new_p, int length,
                          int use_bucket, ring r, poly last);
-  KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
+  KINLINE void Tail_Minus_mm_Mult_qq
+    (poly m, poly qq, int lq, poly spNoether);
 #ifdef HAVE_SHIFTBBADVEC
   KINLINE void Tail_Minus_mm_Mult_qq
     (poly m, poly qq, int lq, poly spNoether, int lV);

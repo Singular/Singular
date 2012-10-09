@@ -147,6 +147,14 @@ p_GetExpDiff		kspoly.cc	607, 659, 697
 			ringgb.cc	(71)
 */
 
+#include <kutil.h>  //because of include order
+#include <SDMultiplication.h>
+
+//for p_MemCopy_LengthGeneral
+#include <libpolys/polys/templates/p_MemCopy.h>
+
+#include <polys/monomials/p_polys.h>
+
 
 
 /* Part 1: General Tools - especially for dp case and the like */
@@ -190,7 +198,7 @@ void ShiftDVec::InitSDMultiplication( ring r )
 {
   for(int i = 1; i < r->OrdSize; ++i)
   {
-    if( (r->typ[i]) != ro_dp )
+    if( r->typ[i].ord_typ != ro_dp )
     {
       r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
       return;
@@ -235,7 +243,7 @@ void ShiftDVec::p_ExpSum_slow
 
   //This represents the first index in the currently considered
   //block in rt->exp.
-  long index_rt = p_Totaldeg(p, r) * lV + 1;
+  long index_rt = p_Totaldegree(p, r) * lV + 1;
 
   long index_q = 1;
   {
@@ -243,9 +251,9 @@ void ShiftDVec::p_ExpSum_slow
     //We will loop, until we found an empty block, or until we
     //considered all variables
     for(long i = 0; i < lV; ++i)
-      if( p_GetExp(q->exp, index_q+i, r) )
+      if( p_GetExp(q, index_q+i, r) )
       {
-        p_SetExp(rt->exp, index_rt+i, 1, r);
+        p_SetExp(rt, index_rt+i, 1, r);
         index_rt += lV;
         if(index_rt > r->N) break; //looped through all vars
         index_q += lV; //We found a nonzero exponent, thus
@@ -291,7 +299,7 @@ void ShiftDVec::p_ExpSum_dp
 
   //This represents the first index in the currently considered
   //block in rt->exp.
-  //long index_rt = p_Totaldeg(p, r) * lV + 1;
+  //long index_rt = p_Totaldegree(p, r) * lV + 1;
   long index_rt = p->exp[r->omap[0]] * lV + 1;
 
   long index_q = 1;
@@ -300,10 +308,10 @@ void ShiftDVec::p_ExpSum_dp
     //We will loop, until we found an empty block, or until we
     //considered all variables
     for(long i = 0; i < lV; ++i)
-      if( p_GetExp(q->exp, index_q+i, r) )
+      if( p_GetExp(q, index_q+i, r) )
       {
         rt->exp[r->omap[index_rt+i]] = 1;
-        p_SetExp(rt->exp, index_rt+i, 1, r);
+        p_SetExp(rt, index_rt+i, 1, r);
         index_rt += lV;
         if(index_rt > r->N) break; //looped through all vars
         index_q += lV; //We found a nonzero exponent, thus
@@ -829,7 +837,7 @@ int ksReducePoly(LObject* PR,
                  kStrategy strat)
 #else
 int ShiftDVec::ksReducePoly
-  ( LObject* PR, TObject* PW, 
+  ( LObject* PR, TObject* PW, int lV,
     poly spNoether, number *coef, kStrategy strat )
 #endif
 {
@@ -942,7 +950,7 @@ int ShiftDVec::ksReducePoly
 #else //replacement
   //defined in kInline.h
   PR->Tail_Minus_mm_Mult_qq
-    (lm, t2, PW->GetpLength() - 1, spNoether, strat->lV);
+    (lm, t2, PW->GetpLength() - 1, spNoether, lV);
 #endif
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();

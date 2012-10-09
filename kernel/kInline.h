@@ -30,6 +30,9 @@
 //BOCO: added - defines HAVE_SHIFTBBADVEC
 #include <kernel/kutil.h>
 
+//BOCO: our adapted multiplication
+#include <kernel/SDMultiplication.h>
+
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN
@@ -630,8 +633,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq
                                                       shorter,spNoether,
                                                       tailRing, last);
 #else //BOCO: replacement
-    pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq
-    pNext(_p) = p_Minus_mm_Mult_qq__T
+    pNext(_p) = ShiftDVec::p_Minus_mm_Mult_qq__T
       ( pNext(_p), m, q, shorter,spNoether, tailRing, last, lV);
 #endif
     pLength += lq - shorter;
