@@ -638,6 +638,35 @@ gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
                                  ///< factors
              );
 
+/// computes a list l of length length(LCFFactors)+1 of polynomials such that
+/// prod (l)=LCF, note that the first entry of l may be non constant. Intended
+/// to be used to precompute coefficients of a polynomial f from its bivariate 
+/// factorizations.
+///
+/// @return see above
+CFList
+precomputeLeadingCoeff (const CanonicalForm& LCF,       ///<[in] a multivariate
+                                                        ///< poly
+                        const CFList& LCFFactors,       ///<[in] a list of
+                                                        ///< univariate factors
+                                                        ///< of LCF of level 2
+                        const Variable& alpha,          ///<[in] algebraic var.
+                        const CFList& evaluation,       ///<[in] an evaluation
+                                                        ///< point having
+                                                        ///< lSecondVarLCs+1
+                                                        ///< components
+                        CFList* & differentSecondVarLCs,///<[in] LCs of factors
+                                                        ///< of f wrt different
+                                                        ///< second variables
+                        int lSecondVarLCs,              ///<[in] length of the
+                                                        ///< above
+                        Variable& y                     ///<[in,out] if y.level()
+                                                        ///< is not 1 on output
+                                                        ///< the second variable
+                                                        ///< has been changed to
+                                                        ///< y
+                       );
+
 #endif
 
 #endif
