@@ -924,6 +924,7 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
+* classifyceq_lib:: simple hypersurface singularities in charateristic p > 0
 * ffsolve_lib:: multivariate equation solving over finite fields
 * findifs_lib:: Tools for the finite difference schemes
 * finitediff_lib:: finite difference schemes for linear differential equations
@@ -937,7 +938,12 @@ Comments should be send to the author of the library directly.
 * symodstd_lib:: Groebner bases for symmetric ideals
 @end menu
 @c ----------------------------------------------------------
-@node ffsolve_lib, findifs_lib, , Experimental libraries
+@node classifyceq_lib,ffsolve_lib, , Experimental libraries
+@subsection classifyceq_lib
+
+@c lib classifyceq.lib
+@c ----------------------------------------------------------
+@node ffsolve_lib, findifs_lib, classifyceq_lib, Experimental libraries
 @subsection ffsolve_lib
 
 @c lib ffsolve.lib
