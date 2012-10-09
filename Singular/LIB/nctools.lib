@@ -1669,7 +1669,8 @@ example
   print(embedMat(N,3,4));
 }
 
-proc moduloSlim (matrix A, matrix B)
+//proc moduloSlim (matrix A, matrix B)
+proc moduloSlim (module A, module B)
 "USAGE:  moduloSlim(A,B); A,B module/matrix/ideal
 RETURN:  module
 PURPOSE: compute @code{modulo} with slimgb as engine
@@ -1711,7 +1712,7 @@ EXAMPLE: example moduloSlim; shows an example
 //     C = C, B[i];
 //   }
   C = C[2..ncols(C)];
-  print(C);
+//  print(C);
   matrix D = slimgb(C);
   module E; int k;
   // TODO: why only first row? need smth like rA rows...
