@@ -1326,7 +1326,11 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
   }
 
   CanonicalForm F= G;
-  CFFList sqrfFactorization= squarefreeFactorization (F, alpha);
+  CFFList sqrfFactorization;
+  if (getCharacteristic() > 0)
+    sqrfFactorization= squarefreeFactorization (F, alpha);
+  else
+    sqrfFactorization= sqrFree (F);
 
   sqrfPartF= 1;
   for (CFFListIterator i= sqrfFactorization; i.hasItem(); i++)
@@ -1347,7 +1351,10 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
   for (CFListIterator i= factors; i.hasItem(); i++, k++)
   {
     tmp= 1;
-    sqrfFactors= squarefreeFactorization (i.getItem(), alpha);
+    if (getCharacteristic() > 0)
+      sqrfFactors= squarefreeFactorization (i.getItem(), alpha);
+    else
+      sqrfFactors= sqrFree (i.getItem());
 
     for (iter= sqrfFactors; iter.hasItem(); iter++)
     {
