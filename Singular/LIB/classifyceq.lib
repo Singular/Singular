@@ -3,7 +3,7 @@ version  = "$Id$";
 category="Singularities";
 
 info="
-LIBRARY:  classifyCeq.lib                 simple hypersurface singularities in charateristic p > 0
+LIBRARY:  classifyCeq.lib                 simple hypersurface singularities in characteristic p > 0
 AUTHORS:  Deeba Afzal                     deebafzal@gmail.com
           Faira Kanwal Janjua             fairakanwaljanjua@gmail.com
 
@@ -25,7 +25,7 @@ LIB "primdec.lib";
 LIB "ring.lib";
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 proc classifyCeq(poly f)
-"USAGE":  classifyCeq(f);  f poly
+"USAGE:  classifyCeq(f);  f poly
 RETURN: string including the Tjurina number of f and its type in the classification of Greuel and Kroening
 EXAMPLE: example classifyCeq;  shows an example
 "
@@ -37,15 +37,15 @@ EXAMPLE: example classifyCeq;  shows an example
    string re;
    if(char(basering)==0)
    {
-       re=(string(classify(f)));
+     re=(string(classify(f)));
    }
    if(char(basering)!=2)
    {
-         re=classifyCeq1(f);
+     re=classifyCeq1(f);
    }
-    if(char(basering)==2)
+   if(char(basering)==2)
    {
-          re=classifyCeq2(f);
+     re=classifyCeq2(f);
    }
    setring R;
    return(re);
