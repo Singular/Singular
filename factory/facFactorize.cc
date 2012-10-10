@@ -232,7 +232,6 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   // check main variable
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
   int factorNums= 1;
-  CanonicalForm bivarEval;
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
   int lift, bufLift, lengthAeval2= A.level()-2;
@@ -251,8 +250,6 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     bufEvaluation= evalPoints (bufA, bufAeval, E);
     E.nextpoint();
     evalPoly= 0;
-
-    bivarEval= bufEvaluation.getLast();
 
     evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
 
