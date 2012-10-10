@@ -1,11 +1,11 @@
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 version  = "$Id$";
 category="Singularities";
 
 info="
-LIBRARY:  classifyCeq.lib                 simple hypersurface singularities in characteristic p > 0
-AUTHORS:  Deeba Afzal                     deebafzal@gmail.com
-          Faira Kanwal Janjua             fairakanwaljanjua@gmail.com
+LIBRARY:  classifyCeq.lib       simple hypersurface singularities in characteristic p > 0
+AUTHORS:  Deeba Afzal           deebafzal@gmail.com
+          Faira Kanwal Janjua   fairakanwaljanjua@gmail.com
 
 OVERVIEW:
    A library for classifying the simple singularities with respect to contact equivalence in charateristic p > 0 .
@@ -13,7 +13,8 @@ OVERVIEW:
    Kroening [1] with respect to contact equivalence. The classifier we use has been proposed in [2].
 
 REFERENCES:
-[1] Greuel, G.-M.; Kroening, H.: Simple singularities in positive characteristic. Math.Z. 203, 339-354 (1990).
+[1] Greuel, G.-M.; Kroening, H.: Simple singularities in positive characteristic.
+    Math.Z. 203, 339-354 (1990).
 [2] Afzal,D.;Binyamin,M.A.;Janjua,F.K.: On the classification of simple singularities in positive characteristic.
 
 PROCEDURES:
