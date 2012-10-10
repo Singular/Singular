@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib 15100 2012-07-10 17:00:10Z motsak $";
+version="$Id: ring.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -28,39 +28,30 @@ LIB "general.lib";
 LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changechar (string c, list #)
-"USAGE:   changechar(c[,r]);  c=string, r=ring
+proc changechar (list @L, list #)
+"USAGE:   changechar(c[,r]);  c=list, r=ring
 RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
-         charstr(r) to c.
-NOTE:    Works for qrings if map from old_char to new_char is implemented.
-         This proc uses 'execute' or calls a procedure using 'execute'.
+         ringlist(r)[1] to c.
 EXAMPLE: example changechar; shows an example
 "
 {
+   def save_ring=basering;
    if( size(#)==0 ) { def @r=basering; }
    if(( size(#)==1 ) and (typeof(#[1])=="ring")) { def @r=#[1]; }
    setring @r;
-   ideal i = ideal(@r); int @q = size(i);
-   if( @q!=0 )
-      { string @s = "Rnew1"; }
-   else
-      { string @s = "Rnew"; }
-   string @newring = @s+"=("+c+"),("+varstr(@r)+"),("+ordstr(@r)+");";
-   execute("ring "+@newring);
-   if( @q!=0 )
-   {
-      map phi = @r,maxideal(1);
-      ideal i = phi(i);
-      attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      qring Rnew=i;
-   }
+   list rl=ringlist(@r);
+   if(defined(@L)!=voice) { def @L=fetch(save_ring,@L); }
+   if (size(@L)==1) { rl[1]=@L[1];} else { rl[1]=@L;}
+   def Rnew=ring(rl);
+   setring save_ring;
    return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
+   ring rr=2,A,dp;
    ring r=0,(x,y,u,v),(dp(2),ds);
-   def R=changechar("2,A"); R;"";
-   def R1=changechar("32003",R); setring R1; R1;
+   def R=changechar(ringlist(rr)); R;"";
+   def R1=changechar(32003,R); setring R1; R1;
    kill R,R1;
 }
 ///////////////////////////////////////////////////////////////////////////////

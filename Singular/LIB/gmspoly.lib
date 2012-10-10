@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib 13866 2011-02-18 13:15:02Z hannes $";
+version="$Id: gmspoly.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="Singularities";
 
 info="
@@ -93,8 +93,11 @@ EXAMPLE:  example isTame; shows examples
   int d=vdim(std(jacob(f)));
   def @X=basering;
   int n=nvars(@X);
-  def @WX=changechar("(0,w(1.."+string(n)+"))");
+  ring ext_ring=0,(w(1..n)),dp;
+  setring @X;
+  def @WX=changechar(ringlist(ext_ring));
   setring @WX;
+  kill ext_ring;
   ideal J=jacob(imap(@X,f));
   int i;
   for(i=1;i<=n;i++)

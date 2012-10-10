@@ -527,8 +527,12 @@ EXAMPLE: example symmStd; shows an example
 //--------     in basering or move to ring extension.              -------------
    if((CHAR == 0) && (ORD > 2))
    {
-      def S = changechar("0,p");
+      def save_ring=basering;
+      ring ext_ring=0,p,lp;
+      def S = changechar(ringlist(ext_ring),save_ring);
       setring S;
+      kill ext_ring;
+      kill save_ring;
       minpoly = rootofUnity(ORD);
       ideal I = imap(R, I);
       number a = p;
