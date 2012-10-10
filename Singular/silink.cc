@@ -767,17 +767,20 @@ static int DumpRhs(FILE *fd, idhdl h)
   else  if (type_id == PROC_CMD)
   {
     procinfov pi = IDPROC(h);
-    if (pi->language == LANG_SINGULAR) {
+    if (pi->language == LANG_SINGULAR)
+    {
       if( pi->data.s.body==NULL) iiGetLibProcBuffer(pi);
       char *pstr = pi->data.s.body, c;
       fputc('"', fd);
-      while (*pstr != '\0') {
+      while (*pstr != '\0')
+      {
         if (*pstr == '"' || *pstr == '\\') fputc('\\', fd);
         fputc(*pstr, fd);
         pstr++;
       }
       fputc('"', fd);
-    } else fputs("(null)", fd);
+    }
+    else fputs("(null)", fd);
   }
   else
   {
@@ -785,7 +788,10 @@ static int DumpRhs(FILE *fd, idhdl h)
 
     if (rhs == NULL) return EOF;
 
-    if (type_id == INTVEC_CMD) fprintf(fd, "intvec(");
+    BOOLEAN need_klammer=FALSE;
+    if (type_id == INTVEC_CMD) { fprintf(fd, "intvec(");need_klammer=TRUE; }
+    else if (type_id == IDEAL_CMD) { fprintf(fd, "ideal(");need_klammer=TRUE; }
+    else if (type_id == MODUL_CMD) { fprintf(fd, "module(");need_klammer=TRUE; }
 
     if (fprintf(fd, "%s", rhs) == EOF) return EOF;
     omFree(rhs);
@@ -798,7 +804,7 @@ static int DumpRhs(FILE *fd, idhdl h)
       rhs = StringAppendS("");
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
     }
-    else if (type_id == INTVEC_CMD) fprintf(fd, ")");
+    else if (need_klammer) fprintf(fd, ")");
   }
   return 1;
 }
