@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 version  = "$Id$";
 category="Singularities";
 
@@ -8,15 +8,12 @@ AUTHORS:  Deeba Afzal                     deebafzal@gmail.com
           Faira Kanwal Janjua             fairakanwaljanjua@gmail.com
 
 OVERVIEW:
-   A library for classifying the simple singularities with respect to
-   contact equivalence in charateristic p > 0 .
-   Simple hypersurface singularities in charateristic p > 0 were classified
-   by Greuel and Kroening [1] with respect to contact equivalence.
-   The classifier we use has been proposed in [2].
+   A library for classifying the simple singularities with respect to contact equivalence in charateristic p > 0 .
+   Simple hypersurface singularities in charateristic p > 0 were classified by Greuel and
+   Kroening [1] with respect to contact equivalence. The classifier we use has been proposed in [2].
 
 REFERENCES:
-[1] Greuel, G.-M.; Kroening, H.: Simple singularities in positive characteristic.
-    Math.Z. 203, 339-354 (1990).
+[1] Greuel, G.-M.; Kroening, H.: Simple singularities in positive characteristic. Math.Z. 203, 339-354 (1990).
 [2] Afzal,D.;Binyamin,M.A.;Janjua,F.K.: On the classification of simple singularities in positive characteristic.
 
 PROCEDURES:
@@ -28,9 +25,8 @@ LIB "primdec.lib";
 LIB "ring.lib";
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 proc classifyCeq(poly f)
-"USAGE:  classifyCeq(f);  f poly
-RETURN: string including the Tjurina number of f and its type
-        in the classification of Greuel and Kroening
+"USAGE":  classifyCeq(f);  f poly
+RETURN: string including the Tjurina number of f and its type in the classification of Greuel and Kroening
 EXAMPLE: example classifyCeq;  shows an example
 "
 {
@@ -343,33 +339,38 @@ The tjurina number is "+string(m)+".");
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc GDsplitting(poly f)
-{      // input poly f=jet(f,2)+ord>=3
-       // output  ring S=char(basering),(x,y),ds;  having f belongs to (x,y)^3
+{      // the result of the splitting lemma (myMorsesplitting) in a special ring of 2 variables
+       // input a poly f of order >=2
+       // output  ring S=char(basering),(x,y),ds;  and a poly f in <x,y>^3 in S with the following properties:
+       // f + a sum of squares of further variables is contact equivalentt to the input polynomial
        def R=basering;
        intvec t;
        int b,i;
        b=tjurina(f);
        f=myMorsesplitting(f,b);
        t=forv(findVar(f));
-      ring S=char(basering),(x,y),ds;
-      ideal M;
-      M[t[1]]=var(1);
-      M[t[2]]=var(2);
-      i=1;
-      if((i!=t[1])&&(i!=t[2]))
-      {
+       ring S=char(basering),(x,y),ds;
+       ideal M;
+       M[t[1]]=var(1);
+       M[t[2]]=var(2);
+       i=1;
+       if((i!=t[1])&&(i!=t[2]))
+       {
          M[i]=0;
-      }
-      map phi=R,M;
-      poly f=phi(f);
-      export(f);
-      setring(R);
-      return(S);
+       }
+       map phi=R,M;
+       poly f=phi(f);
+       export(f);
+       setring(R);
+       return(S);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc myMorsesplitting(poly f,int b)
 {
+   // splitting lemma
    // input  poly f=f(x(1),...,x(n))      jet(f,2)!=0
+   // output a polynomial in 2 variables of order >=3 such that a sum of squares of the remaining variables plus this
+   // polynomial is contact equivalent to the input polynomial
    intvec w;
    f=simplify(jet(f,b),1);
    while(jet(f,2)!=0)
@@ -391,15 +392,14 @@ example
  "EXAMPLE:"; echo=2;
   ring R=3,(x,y,z,u,v),ds;
   poly f=x2+x3z+u2+v2+z3+y11;
- myMorsesplitting(f,30);
+  myMorsesplitting(f,30);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc findlead(poly f)
 
 {
-
-//  input poly f=x(i)^2+h      or   poly f=x(i)*x(j)+h  , h of order >=2
-//  output intvec w   w[1]=i,w[2]=i   or  w[1]=i ,w[2]=j
+  //  input poly f=x(i)^2+h      or   poly f=x(i)*x(j)+h  , h of order >=2
+  //  output intvec w   w[1]=i,w[2]=i   or  w[1]=i ,w[2]=j
   intvec v=leadexp(f);
   int i,k,n;
   intvec w;
@@ -431,8 +431,8 @@ example
 static proc splitting_one(poly p, int i, int b)
 {
 // assumes that p=x_i^2+h, no x_i^2 in h, h of order >=2
-// returns q(x_1,...x_i-1,x_i+1,...,x_n) such that x_i^2 +q is right equivalent to p mod
-// <x_1,...,x_n>^b
+// returns q(x_1,??x_i-1,x_i+1,...,x_n) such that x_i^2 +q is right equivalent to p mod
+// <x_1,??,x_n>^b
 
    if(b<2){b=2;}
    def R=basering;
@@ -456,9 +456,9 @@ example
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc splitting_two(poly p, int i, int j, int b)
 {
-// assumes that p=x_i*x_j+h, no x_i^2, no in h, h of order >=2
-// returns q(x_1,...x_i-1,x_i+1,...,x_j-1,x_j+1,...,x_n) such that x_i*x_j +q is right equivalent to p mod
-// <x_1,...,x_n>^b
+// assumes that p=x_i*x_j+h, no x_i^2 in h, h of order >=2
+// returns q(x_1,???,x_i-1,x_i+1,...,x_j-1,x_j+1,...,x_n) such that x_i*x_j +q is right equivalent to p mod
+// <x_1,??,x_n>^b
 
    if(b<2){b=2;}
    def R=basering;
@@ -482,7 +482,7 @@ poly f=uv+t2+u4s+u11+v7+s9+w8;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc quickSubst(poly h, poly r, int i, int b)
 {
-//=== assume h, r is in Q[x_1,...,x_n], computes jet(h(x_i=r),b)
+   //=== assume h, r is in Q[x_1,...,x_n], computes jet(h(x_i=r),b)
    h=jet(h,b);
    r=jet(r,b);
    matrix M=coef(h,var(i));
@@ -511,7 +511,7 @@ static proc quickSubst(poly h, poly r, int i, int b)
 static proc findVar(poly p)
 {
    //  input poly f
-   //  output intvec v  (0,1)-vector v[i]=0 if f is not depending on var(i) and v[j]=1 if f is depending onvar(j)
+   //  output intvec v   v[i]=0 if f is not depending on var(i) and v[j]=1 if f is depending on var(j)
     intvec v;
     int i,n;
      n=nvars(basering);
@@ -538,10 +538,10 @@ example
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc forv(intvec v)
 {
-
+       //returns the places of v which are different from zero
        intvec w;
-        int i,j;
-        j=1;
+       int i,j;
+       j=1;
        for(i=1;i<=nvars(basering);i++)
        {
             if(v[i]!=0)
@@ -553,11 +553,11 @@ static proc forv(intvec v)
         return(w);
 }
 
-////////////////////////////////////////////////////// char p = 2 ////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////// char p=2 ////////////////////////////////////////////////////////////////////////////
 static proc classifyCeq2(poly p)
 //====Classification of hypersurface singularities in Characteristic p=2.
 {
-        //    input    poly p
+       //    input    poly p
        //    output   The normal form to which f is contact equvalent or the function is not simple.
        def R=basering;
        int t=tjurina(p);
@@ -631,8 +631,9 @@ example
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc SPILPRO(poly p,int B)
 {
-    //input a polynomial and a bound
-    //output a polynomial
+    //Splitting lemma in characteristic 2
+    //input a polynomial f and a bound B
+    //output a polynomial q, the result of the splitting lemma applied to f up to the order B
   int i,j;
   def R=basering;
   int n=nvars(R);
@@ -1131,7 +1132,7 @@ static proc whichSUR(poly f)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc findSUR(poly f)//D2m,r
-//====Number of blowup required in order either to get the difference equal to 4 or the trujeena is less than 6.
+//====Number of blowup required in order either to get the difference equal to 4 or the Tjurina number is less than 6.
 {
 
      int a, r,b;
@@ -1193,8 +1194,9 @@ static proc findRSUR(poly f)//D2m+1,r
 static proc BlowUpO(poly f)
 //====Gives the procedure of Blowing up ingeneral
 {
-   //=== input f smooth or isolated simple singularity at zero
-   //=== output var(1) or poly with isolated singularity at zero
+   //=== input f smooth or isolated singularity at zero
+   //=== output var(1) or poly with isolated singularity at zero, the transformation
+   //=== of the singularity of the blowing up to zero
     def R=basering;
    def S=changeord("ds");
    setring S;
@@ -1282,7 +1284,7 @@ static proc BlowUpO(poly f)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc lengthBL(poly f)
-//====Return the list of tjurina numbers of each blowing up before it becomes smooth.
+//====Return the list of Tjurina numbers of each blowing up in the resolution before it becomes smooth.
 {
     list L;
     int i=1;
@@ -1483,7 +1485,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc whichtru(poly f)
-//====Gives the information that we do successive blowups and the last singularaty before becoming smmoth has trujeena
+//====Gives the information that we do successive blowups and the last singularaty before becoming smmoth has Tjurina
 //====number 1 if not than returns 0.(returns either a singularaty or smooth surve)============
 {
    int d=tjurina(f);
@@ -1563,8 +1565,8 @@ static proc findRD(poly p)
 static proc splitting_SQUA(poly p, int b)
  {
          // assumes that p=x_i^2+h, h of order >=3
-         // returns q(x_1,...,x_n) such that x_i^2 +q is right equivalent to p mod
-          // <x_1,...,x_n>^b and x_i is only linear in q
+         // returns q(x_1,??,x_n) such that x_i^2 +q is right equivalent to p mod
+          // <x_1,??,x_n>^b and x_i is only linear in q
             def R=basering; int n=nvars(R);
             ideal M=maxideal(1);
             int j;
@@ -1592,8 +1594,8 @@ static proc splitting_SQUA(poly p, int b)
 static proc splitting_two2(poly p, int i, int j, int b)
 {
      // assumes that p=x_i*x_j+h, no x_i^2, no in h, h of order >=2
-     // returns q(x_1,...x_i-1,x_i+1,...,x_j-1,x_j+1,...,x_n) such that x_i*x_j +q is right equivalent to p mod
-     // <x_1,...,x_n>^b
+     // returns q(x_1,??x_i-1,x_i+1,...,x_j-1,x_j+1,...,x_n) such that x_i*x_j +q is right equivalent to p mod
+     // <x_1,??,x_n>^b
       if(b<2){b=2;}
       def R=basering;
       poly q=jet((p-var(i)*var(j))/var(i),b);
@@ -1666,8 +1668,8 @@ static proc FindPRO(poly f)
 static proc FindSQUA(poly f)
 {
       //input the polynomial
-      // output is a list T where T[1]=the first variable which appear as a square in the quadraic form.
-      //                          T[2]= the number of square appearing in the quadraic form.
+      // output is a list T where T[1]=the first variable which appears as a square in the quadraic part of f.
+      //                          T[2]= the number of squares appearing in the quadraic part of f.
   def R=basering;
   int n=nvars(R);
   int i,j,k;
@@ -1678,7 +1680,7 @@ static proc FindSQUA(poly f)
        {
            if(leadmonom(f[j])==var(i)^2)
            {
-             k++;
+                k++;
                 T[1]=i;
                 T[2]=k;
                 return(T);
@@ -1690,6 +1692,9 @@ static proc FindSQUA(poly f)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc findVAR(poly f)
 {
+     //input: a poly f
+     //output a list L=v,k v an intvec, v[i]=0, if depends on var(i), v[i]=1 else
+     //k is the number of variables occurring in f
      intvec v;
      int i,k;int n=nvars(basering);
      list L;
@@ -1712,7 +1717,7 @@ static proc findVAR(poly f)
 static proc redvar2(poly p)
 {
        //input  a polynomial depending on x_i_1,...,x_i_k
-       //output a new ring with reduced number of variables.
+       //output a new ring with k variables containing the polynomial
    def R=basering;
    int n=nvars(R);
    list N=findVAR(p);
@@ -1759,8 +1764,9 @@ static proc redvar2(poly p)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc inverseUnit(poly q,int b)
 {
+   //input a polynomial q with non-zero constant part
+   //output the inverse of q up to order b as a power series
    number c=leadcoef(q);
-
    q=q/c;
    int i;
    poly u=1;
@@ -1776,8 +1782,9 @@ static proc inverseUnit(poly q,int b)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static proc splittingLchar2(poly f)
 {
-   //input: any f
-   //output: the transformed f such that jet(f,2) is in normal form
+   //the quadratic part of the splitting lemma in characteristic 2
+   //input: poly f
+   //output: a polynomial right equivalent to the input polynomial such that the quadratic part is in normal form
    poly p=jet(f,2);
    if(p==0){return(f);}
    if(!homog(p)){return(jet(f,1));}
@@ -1897,7 +1904,7 @@ static proc splittingLchar2(poly f)
       p=jet(f,2);
       if(leadmonom(p)==var(i)^2)
       {
-         f=phi(f);
+                                            f=phi(f);
          p=jet(f,2);
          ma=maxideal(1);
          ma[i]=p/var(j)-var(j);
@@ -2008,7 +2015,8 @@ poly q=a*p;
 poly j=phi(q);
 classifyCeq(j);
 
-ring r=2,(x,y,z,t,w,u,v,e),Ds;ideal I=x+y+z+t+w,y+z+t+w,e,v,u,t,w,z;
+ring r=2,(x,y,z,t,w,u,v,e),Ds;
+ideal I=x+y+z+t+w,y+z+t+w,e,v,u,t,w,z;
 map si=r,I;
 
 poly p=xy+zt+wu+v2+e81;
