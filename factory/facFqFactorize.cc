@@ -2336,7 +2336,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   int swapLevel2= 0;
   int level;
   int factorNums= 3;
-  CanonicalForm bivarEval;
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
   int lift, bufLift, lengthAeval2= A.level()-2;
@@ -2399,8 +2398,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else if (fail && (i > 0))
       break;
-
-    bivarEval= bufEvaluation.getLast();
 
     evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
 
