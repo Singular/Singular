@@ -866,7 +866,7 @@ END_NAMESPACE
 
 SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl):
 #ifndef NDEBUG
-    __DEBUG__( (BOOLEAN)atGetInt(rootRingHdl,"DEBUG", TRUE) ),
+     __DEBUG__( (BOOLEAN)atGetInt(rootRingHdl,"DEBUG", FALSE) ),
 #else
     __DEBUG__( (BOOLEAN)atGetInt(rootRingHdl,"DEBUG", FALSE) ),
 #endif

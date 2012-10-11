@@ -560,7 +560,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
 
-  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+  const BOOLEAN __DEBUG__      = FALSE; // attributes.__DEBUG__;
 //  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
 //  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
 //  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
