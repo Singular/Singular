@@ -37,6 +37,17 @@
 TIMING_DEFINE_PRINT(fac_fq_bi_factorizer)
 TIMING_DEFINE_PRINT(fac_fq_hensel_lift)
 TIMING_DEFINE_PRINT(fac_fq_factor_recombination)
+TIMING_DEFINE_PRINT(fac_fq_shift_to_zero)
+TIMING_DEFINE_PRINT(fac_fq_precompute_leadcoeff)
+TIMING_DEFINE_PRINT(fac_fq_evaluation)
+TIMING_DEFINE_PRINT(fac_fq_recover_factors)
+TIMING_DEFINE_PRINT(fac_fq_preprocess_and_content)
+TIMING_DEFINE_PRINT(fac_fq_bifactor_total)
+TIMING_DEFINE_PRINT(fac_fq_luckswang)
+TIMING_DEFINE_PRINT(fac_fq_lcheuristic)
+TIMING_DEFINE_PRINT(fac_fq_content)
+TIMING_DEFINE_PRINT(fac_fq_check_mainvar)
+TIMING_DEFINE_PRINT(fac_fq_compress)
 
 static inline
 CanonicalForm
@@ -2210,9 +2221,12 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   if (F.inCoeffDomain())
     return CFList (F);
 
+  TIMING_START (fac_fq_preprocess_and_content);
   // compress and find main Variable
   CFMap N;
+  TIMING_START (fac_fq_compress)
   CanonicalForm A= myCompress (F, N);
+  TIMING_END_AND_PRINT (fac_fq_compress, "time to compress poly over Fq: ")
 
   A /= Lc (A); // make monic
 
@@ -2246,9 +2260,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   Variable y= Variable (2);
 
   // remove content
+  TIMING_START (fac_fq_content);
   CFList contentAi;
   CanonicalForm lcmCont= lcmContent (A, contentAi);
   A /= lcmCont;
+  TIMING_END_AND_PRINT (fac_fq_content, "time to extract content over Fq: ");
 
   // trivial after content removal
   CFList contentAFactors;
@@ -2274,7 +2290,9 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
 
   // factorize content
+  TIMING_START (fac_fq_content);
   contentAFactors= multiFactorize (lcmCont, info);
+  TIMING_END_AND_PRINT (fac_fq_content, "time to factor content over Fq: ");
 
   // univariate after content removal
   CFList factors;
@@ -2287,6 +2305,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
 
   // check main variable
+  TIMING_START (fac_fq_check_mainvar);
   int swapLevel= 0;
   CanonicalForm derivZ;
   CanonicalForm gcdDerivZ;
@@ -2329,7 +2348,10 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
     }
   }
-
+  TIMING_END_AND_PRINT (fac_fq_check_mainvar,
+                        "time to check main var over Fq: ");
+  TIMING_END_AND_PRINT (fac_fq_preprocess_and_content,
+                       "time to preprocess poly and extract content over Fq: ");
 
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
   bool fail= false;
@@ -2349,12 +2371,16 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   int counter;
   int differentSecondVar= 0;
   // several bivariate factorizations
+  TIMING_START (fac_fq_bifactor_total);
   for (int i= 0; i < factorNums; i++)
   {
     counter= 0;
     bufA= A;
     bufAeval= CFList();
+    TIMING_START (fac_fq_evaluation);
     bufEvaluation= evalPoints (bufA, bufAeval, alpha, list, GF, fail);
+    TIMING_END_AND_PRINT (fac_fq_evaluation,
+                          "time to find evaluation point over Fq: ");
     evalPoly= 0;
 
     if (fail && (i == 0))
@@ -2399,7 +2425,10 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     else if (fail && (i > 0))
       break;
 
+    TIMING_START (fac_fq_evaluation);
     evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
+    TIMING_END_AND_PRINT (fac_fq_evaluation,
+                          "time for evaluation wrt diff second vars over Fq: ");
 
     for (int j= 0; j < lengthAeval2; j++)
     {
@@ -2474,8 +2503,13 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   int minFactorsLength;
   bool irred= false;
+  TIMING_START (fac_fq_bi_factorizer);
   factorizationWRTDifferentSecondVars (A, Aeval2, info, minFactorsLength,irred);
+  TIMING_END_AND_PRINT (fac_fq_bi_factorizer,
+             "time for bivariate factorization wrt diff second vars over Fq: ");
 
+  TIMING_END_AND_PRINT (fac_fq_bifactor_total,
+                        "total time for eval and bivar factors over Fq: ");
   if (irred)
   {
     if (extension)
@@ -2546,6 +2580,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     biFactorsLCs.append (LC (i.getItem(), 1));
 
   Variable v;
+  TIMING_START (fac_fq_precompute_leadcoeff);
   CFList leadingCoeffs= precomputeLeadingCoeff (LC (A, 1), biFactorsLCs, alpha,
                                           evaluation, Aeval2, lengthAeval2, v);
 
@@ -2645,6 +2680,10 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         testVars *= oldAeval[i].getFirst().mvar();
     }
   }
+  TIMING_END_AND_PRINT(fac_fq_precompute_leadcoeff,
+                       "time to precompute LC over Fq: ");
+
+  TIMING_START (fac_fq_luckswang);
   CFList bufFactors= CFList();
   bool LCheuristic= false;
   if (LucksWangSparseHeuristic (A, biFactors, 2, leadingCoeffs2[lengthAeval2-1],
@@ -2672,6 +2711,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         normalize (factors);
       delete [] index;
       delete [] Aeval2;
+      TIMING_END_AND_PRINT (fac_fq_luckswang,
+                            "time for successful LucksWang over Fq: ");
       return factors;
     }
     else if (factors.length() > 0)
@@ -3011,7 +3052,9 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       factors= CFList();
     delete [] index;
   }
+  TIMING_END_AND_PRINT (fac_fq_luckswang, "time for LucksWang over Fq: ");
 
+  TIMING_START (fac_fq_lcheuristic);
   if (!LCheuristic && !LCmultiplierIsConst && bufFactors.isEmpty()
       && fdivides (getVars (LCmultiplier), testVars))
   {
@@ -3161,8 +3204,10 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       LCmultiplier= bufLCmultiplier;
     }
   }
+  TIMING_END_AND_PRINT (fac_fq_lcheuristic, "time for Lc heuristic over Fq: ");
 
 tryAgainWithoutHeu:
+  TIMING_START (fac_fq_shift_to_zero);
   A= shift2Zero (A, Aeval, evaluation);
 
   for (iter= biFactors; iter.hasItem(); iter++)
@@ -3181,6 +3226,8 @@ tryAgainWithoutHeu:
         leadingCoeffs2[i].append (leadingCoeffs2[i+1].getLast() (0, i + 4));
     }
   }
+  TIMING_END_AND_PRINT (fac_fq_shift_to_zero,
+                        "time to shift evaluation point to zero: ");
 
   CFArray Pi;
   CFList diophant;
@@ -3191,14 +3238,20 @@ tryAgainWithoutHeu:
 
   Aeval.removeFirst();
   bool noOneToOne= false;
+  TIMING_START (fac_fq_hensel_lift);
   factors= nonMonicHenselLift (Aeval, biFactors, leadingCoeffs2, diophant,
                                Pi, liftBounds, liftBoundsLength, noOneToOne);
+  TIMING_END_AND_PRINT (fac_fq_hensel_lift,
+                        "time for non monic hensel lifting over Fq: ");
 
   if (!noOneToOne)
   {
     int check= factors.length();
     A= oldA;
+    TIMING_START (fac_fq_recover_factors);
     factors= recoverFactors (A, factors, evaluation);
+    TIMING_END_AND_PRINT (fac_fq_recover_factors,
+                          "time to recover factors over Fq: ");
     if (check != factors.length())
       noOneToOne= true;
     else
@@ -3257,7 +3310,8 @@ tryAgainWithoutHeu:
     liftedFactors= henselLiftAndEarly
                    (A, MOD, liftBounds, earlySuccess, earlyFactors,
                     Aeval, biFactors, evaluation, info);
-    TIMING_END_AND_PRINT (fac_fq_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_hensel_lift,
+                          "time for hensel lifting over Fq: ");
 
     if (!extension)
     {

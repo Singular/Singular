@@ -26,6 +26,8 @@
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_bi_hensel_lift)
 TIMING_DEFINE_PRINT(fac_bi_factor_recombination)
+TIMING_DEFINE_PRINT(fac_bi_evaluation)
+TIMING_DEFINE_PRINT(fac_bi_shift_to_zero)
 
 // bound on coeffs of f (cf. Musser: Multivariate Polynomial Factorization,
 //                          Gelfond: Transcendental and Algebraic Numbers)
@@ -332,20 +334,24 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   for (int i= 0; i < factorNums; i++)
   {
     bufAeval= A;
+    TIMING_START (fac_bi_evaluation);
     bufAeval= evalPoint (A, bufEvaluation);
+    TIMING_END_AND_PRINT (fac_bi_evaluation, "time for eval point over Q: ");
 
     bufAeval2= buf;
+    TIMING_START (fac_bi_evaluation);
     bufAeval2= evalPoint (buf, bufEvaluation2);
+    TIMING_END_AND_PRINT (fac_bi_evaluation,
+                          "time for eval point over Q in y: ");
 
     // univariate factorization
     TIMING_START (fac_uni_factorizer);
-
     if (extension)
       bufUniFactors= conv (factorize (bufAeval, v));
     else
       bufUniFactors= conv (factorize (bufAeval, true));
     TIMING_END_AND_PRINT (fac_uni_factorizer,
-                          "time for univariate factorization: ");
+                          "time for univariate factorization over Q: ");
     DEBOUTLN (cerr, "prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors) == bufAeval));
 
@@ -355,7 +361,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     else
       bufUniFactors2= conv (factorize (bufAeval2, true));
     TIMING_END_AND_PRINT (fac_uni_factorizer,
-                          "time for univariate factorization in y: ");
+                          "time for univariate factorization in y over Q: ");
     DEBOUTLN (cerr, "prod (bufuniFactors2)== bufAeval2 " <<
               (prod (bufUniFactors2) == bufAeval2));
 
@@ -542,7 +548,8 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   uniFactors= henselLiftAndEarly
               (A, earlySuccess, earlyFactors, degs, liftBound,
                uniFactors, dummy, evaluation, b);
-  TIMING_END_AND_PRINT (fac_bi_hensel_lift, "time for hensel lifting: ");
+  TIMING_END_AND_PRINT (fac_bi_hensel_lift,
+                        "time for bivariate hensel lifting over Q: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
   CanonicalForm MODl= power (y, liftBound);
@@ -561,8 +568,11 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   A *= bCommonDen (A);
   Off (SW_RATIONAL);
 
+  TIMING_START (fac_bi_factor_recombination);
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                 uniFactors.length()/2, b);
+  TIMING_END_AND_PRINT (fac_bi_factor_recombination,
+                        "time for bivariate factor recombination over Q: ");
 
   On (SW_RATIONAL);
 

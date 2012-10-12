@@ -15,6 +15,7 @@
 #define FAC_FQ_FACTORIZE_H
 
 #include <config.h>
+#include "timing.h"
 
 #include "facFqBivar.h"
 #include "DegreePattern.h"
@@ -24,6 +25,9 @@
 #include "facFqBivarUtil.h"
 
 #ifdef HAVE_NTL
+
+TIMING_DEFINE_PRINT (fac_fq_squarefree)
+TIMING_DEFINE_PRINT (fac_fq_factor_squarefree)
 
 /// Factorization over a finite field
 ///
@@ -150,14 +154,20 @@ CFFList FpFactorize (const CanonicalForm& G,///< [in] a multivariate poly
   ExtensionInfo info= ExtensionInfo (false);
   Variable a= Variable (1);
   CanonicalForm LcF= Lc (F);
+  TIMING_START (fac_fq_squarefree);
   CFFList sqrf= FpSqrf (F, false);
+  TIMING_END_AND_PRINT (fac_fq_squarefree,
+                        "time for squarefree factorization over Fq: ");
   CFFList result;
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_factor_squarefree);
     bufResult= multiFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_factor_squarefree,
+                          "time to factorize sqrfree factor over Fq: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
@@ -227,14 +237,20 @@ CFFList FqFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
 
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CanonicalForm LcF= Lc (F);
+  TIMING_START (fac_fq_squarefree);
   CFFList sqrf= FqSqrf (F, alpha, false);
+  TIMING_END_AND_PRINT (fac_fq_squarefree,
+                        "time for squarefree factorization over Fq: ");
   CFFList result;
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_factor_squarefree);
     bufResult= multiFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_factor_squarefree,
+                          "time to factorize sqrfree factor over Fq: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
