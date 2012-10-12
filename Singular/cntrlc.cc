@@ -384,6 +384,10 @@ void sigint_handler(int sig)
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
   #endif /* HAVE_FEREAD */
+  char default_opt=' ';
+  if ((feOptSpec[FE_OPT_CNTRLC].value!=NULL)
+      && ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
+  { default_opt=((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0]; }
   loop
   {
     int cnt=0;
@@ -393,10 +397,9 @@ void sigint_handler(int sig)
     {
       c = 'q';
     }
-    else if ((feOptSpec[FE_OPT_CNTRLC].value!=NULL)
-    && ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
+    else if (default_opt!=' ')
     {
-      c = ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0];
+      c = default_opt;
     }
     else
     {
@@ -437,7 +440,7 @@ void sigint_handler(int sig)
       case 'a':
                 siCntrlc++;
       case 'c':
-                if (feGetOptValue(FE_OPT_EMACS) == NULL && !(((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0]))
+                if ((feGetOptValue(FE_OPT_EMACS) == NULL) && (default_opt!=' '))
                 {
                   /* Read until a newline or EOF */
                   while (c != EOF && c != '\n') c = fgetc(stdin);
