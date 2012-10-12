@@ -40,37 +40,37 @@
 
 #if defined(WINNT) && ! defined(__GNUC__)
 
-#define TIMING_START(t) { clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
-  timing_ ## t ## _start = clock();
+#define TIMING_START(t) timing_ ## t ## _start = clock();
 #define TIMING_END(t) timing_ ## t ## _end = clock(); \
-timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start; }
+timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start;
 #define TIMING_END_AND_PRINT(t, msg) times( &timing_ ## t ## _end ); \
   fprintf( stderr, "%s%.2f sec\n", msg, \
 	   float( timing_ ## t ## _end - timing_ ## t ## _start ) / HZ ); \
-  timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start; }
-#define TIMING_DEFINE_PRINT(t) clock_t timing_ ## t ## _time; \
-void timing_print_ ## t ( char * msg ) { \
+  timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start;
+#define TIMING_DEFINE_PRINT(t) static clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
+static clock_t timing_ ## t ## _time; \
+static void timing_print_ ## t ( char * msg ) { \
   fprintf( stderr, "%s%.2f sec\n", msg, float(timing_ ## t ## _time) / HZ ); \
 } \
-void timing_reset_ ## t () { \
+static void timing_reset_ ## t () { \
   timing_ ## t ## _time = 0; \
 }
 
 #else /* ! WINNT */
 
-#define TIMING_START(t) { struct tms timing_ ## t ## _start, timing_ ## t ## _end; \
-  times( &timing_ ## t ## _start );
+#define TIMING_START(t) times( &timing_ ## t ## _start );
 #define TIMING_END(t) times( &timing_ ## t ## _end ); \
-  timing_ ## t ## _time += timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime; }
+  timing_ ## t ## _time += timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime;
 #define TIMING_END_AND_PRINT(t, msg) times( &timing_ ## t ## _end ); \
   fprintf( stderr, "%s%.2f sec\n", msg, \
 	   float( timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime ) / HZ ); \
-  timing_ ## t ## _time += timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime; }
-#define TIMING_DEFINE_PRINT(t) long timing_ ## t ## _time; \
-void timing_print_ ## t ( char * msg ) { \
+  timing_ ## t ## _time += timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime;
+#define TIMING_DEFINE_PRINT(t) static struct tms timing_ ## t ## _start, timing_ ## t ## _end; \
+static long timing_ ## t ## _time; \
+static void timing_print_ ## t ( char * msg ) { \
   fprintf( stderr, "%s%.2f sec\n", msg, float(timing_ ## t ## _time) / HZ ); \
 } \
-void timing_reset_ ## t () { \
+static void timing_reset_ ## t () { \
   timing_ ## t ## _time = 0; \
 }
 #endif /* ! WINNT */
