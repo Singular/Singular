@@ -2742,10 +2742,15 @@ ideal kInterRed (ideal F, ideal Q)
     res=kInterRedBba(FF,NULL,need_retry);
     idDelete(&FF);
     null=idInit(1,1);
-    res1=kNF(null,Q,res);
+    if (need_retry) 
+      res1=kNF(null,Q,res,0,KSTD_NF_LAZY); 
+    else 
+      res1=kNF(null,Q,res); 
     idDelete(&res);
     res=res1;
+    need_retry=1;
   }
+  if (idElem(res)<=1) need_retry=0;
   while (need_retry && (counter>0))
   {
     #ifdef KDEBUG
@@ -2756,13 +2761,18 @@ ideal kInterRed (ideal F, ideal Q)
     counter -= (new_elems >= elems);
     elems = new_elems;
     idDelete(&res);
+    if (idElem(res1)<=1) need_retry=0;
     if ((Q!=NULL) && (TEST_OPT_REDSB))
     {
-      res=kNF(null,Q,res1);
+      if (need_retry)
+        res=kNF(null,Q,res1,0,KSTD_NF_LAZY);
+      else
+        res=kNF(null,Q,res1);
       idDelete(&res1);
     }
     else
       res = res1;
+    if (idElem(res)<=1) need_retry=0;
   }
   if (null!=NULL) idDelete(&null);
   test=save;
