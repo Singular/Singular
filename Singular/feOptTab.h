@@ -110,6 +110,8 @@ struct fe_option feOptSpec[] =
   {"browser",           required_argument,  LONG_OPTION_RETURN,
    "BROWSER",  "Display help in BROWSER (see help.cnf)",       feOptString, 0,   0},
 
+  {"cntrlc",           optional_argument,   LONG_OPTION_RETURN,
+   "CHAR",     "Automatic answer for CTRL-C prompt",                   feOptString, 0,   0},
 #ifndef ESINGULAR
   {"emacs",             no_argument,        LONG_OPTION_RETURN,
    0,          "Set defaults for running within emacs",                feOptBool,    0,      0},

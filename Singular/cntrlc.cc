@@ -372,23 +372,32 @@ void init_signals()
 }
 #endif
 
-
 /*2
 * signal handler for SIGINT
 */
+int sigint_handler_cnt=0;
 void sigint_handler(int sig)
 {
   mflush();
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
   #endif /* HAVE_FEREAD */
+  char default_opt=' ';
+  if ((feOptSpec[FE_OPT_CNTRLC].value!=NULL)
+      && ((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0])
+  { default_opt=((char*)(feOptSpec[FE_OPT_CNTRLC].value))[0]; }
   loop
   {
     int cnt=0;
     int c;
-    if(singular_in_batchmode)
+
+    if (singular_in_batchmode)
     {
       c = 'q';
+    }
+    else if (default_opt!=' ')
+    {
+      c = default_opt;
     }
     else
     {
@@ -396,7 +405,7 @@ void sigint_handler(int sig)
         Tok2Cmdname(iiOp),my_yylinebuf);
       if (feGetOptValue(FE_OPT_EMACS) == NULL)
       {
-        fputs("abort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
+        fputs("abort after this command(a), abort immediately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
         c = fgetc(stdin);
       }
       else
@@ -407,17 +416,33 @@ void sigint_handler(int sig)
 
     switch(c)
     {
-      case 'q':
+      case 'q': case EOF:
                 m2_end(2);
       case 'r':
-                longjmp(si_start_jmpbuf,1);
+                if (sigint_handler_cnt<3)
+                {
+                  sigint_handler_cnt++;
+                  fputs("** Warning: Singular should be restarted as soon as possible **\n",stderr);
+                  fflush(stderr);
+                  longjmp(si_start_jmpbuf,1);
+                }
+                else
+                {
+                  fputs("** tried too often, try another possibility **\n",stderr);
+                  fflush(stderr);
+                }
+                break;
       case 'b':
                 VoiceBackTrack();
                 break;
       case 'a':
                 siCntrlc++;
       case 'c':
-                if (feGetOptValue(FE_OPT_EMACS) == NULL) fgetc(stdin);
+                if ((feGetOptValue(FE_OPT_EMACS) == NULL) && (default_opt!=' '))
+                {
+                  /* Read until a newline or EOF */
+                  while (c != EOF && c != '\n') c = fgetc(stdin);
+                }
                 si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
                 return;
                 //siCntrlc ++;
