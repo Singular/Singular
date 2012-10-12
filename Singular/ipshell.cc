@@ -2089,7 +2089,7 @@ static void rRenameVars(ring R)
   }
 }
 
-ring rCompose(const lists  L)
+ring rCompose(const lists  L, const BOOLEAN check_comp)
 {
   if ((L->nr!=3)
 #ifdef HAVE_PLURAL
@@ -2309,6 +2309,28 @@ ring rCompose(const lists  L)
         goto rCompose_err;
       }
     }
+    if (check_comp)
+    {
+      BOOLEAN comp_order=FALSE;
+      int jj;
+      for(jj=0;jj<n;jj++)
+      {
+        if ((R->order[jj]==ringorder_c) ||
+            (R->order[jj]==ringorder_C)) { comp_order=TRUE; break; }
+      }
+      if (!comp_order)
+      {
+        R->order=(int*)omRealloc0Size(R->order,n*sizeof(int),(n+1)*sizeof(int));
+        R->block0=(int*)omRealloc0Size(R->block0,n*sizeof(int),(n+1)*sizeof(int));
+        R->block1=(int*)omRealloc0Size(R->block1,n*sizeof(int),(n+1)*sizeof(int));
+        R->wvhdl=(int**)omRealloc0Size(R->wvhdl,n*sizeof(int_ptr),(n+1)*sizeof(int_ptr));
+        R->order[n-1]=ringorder_C;
+        R->block0[n-1]=0;
+        R->block1[n-1]=0;
+        R->wvhdl[n-1]=NULL;
+        n++;
+      }
+    }
   }
   else
   {
@@ -2357,7 +2379,7 @@ ring rCompose(const lists  L)
       }
       if (is_gf_char==-1)
       {
-        R->algring=rCompose((lists)L->m[0].Data());
+        R->algring=rCompose((lists)L->m[0].Data(),FALSE);
         if (R->algring==NULL)
         {
           WerrorS("could not create rational function coefficient field");
@@ -2421,7 +2443,8 @@ ring rCompose(const lists  L)
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
     {
-      if (R->ch!=currRing->ch)
+      //if (R->ch!=currRing->ch)
+      if(1)
       {
       #if 0
             WerrorS("coefficient fields must be equal if q-ideal !=0");
@@ -4559,6 +4582,7 @@ void rSetHdl(idhdl h)
     memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
+  #ifndef NDEBUG
   // test for valid "currRing":
   if ((rg!=NULL) && (rg->idroot==NULL))
   {
@@ -4566,10 +4590,11 @@ void rSetHdl(idhdl h)
     rg=rAssure_HasComp(rg);
     if (old!=rg)
     {
-      rKill(old);
-      IDRING(h)=rg;
+      rKill(rg);
+      WarnS("ring without order for components found");
     }
   }
+  #endif
    /*------------ change the global ring -----------------------*/
   rChangeCurrRing(rg);
   currRingHdl = h;

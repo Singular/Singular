@@ -462,7 +462,7 @@ int64 * rGetWeightVec(ring r);
 void rSetWeightVec(ring r, int64 *wv);
 
 lists rDecompose(const ring r);
-ring rCompose(const lists  L);
+ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 /////////////////////////////
 // Auxillary functions
 //

@@ -4731,14 +4731,14 @@ ring rAssure_HasComp(ring r)
 {
   int last_block;
   int i=0;
-  do
+  loop
   {
      if (r->order[i] == ringorder_c ||
         r->order[i] == ringorder_C) return r;
      if (r->order[i] == 0)
         break;
      i++;
-  } while (1);
+  }
   //WarnS("re-creating ring with comps");
   last_block=i-1;
 
