@@ -43,6 +43,11 @@
 
 TIMING_DEFINE_PRINT(gcd_recursion)
 TIMING_DEFINE_PRINT(newton_interpolation)
+TIMING_DEFINE_PRINT(termination_test)
+TIMING_DEFINE_PRINT(ez_p_compress)
+TIMING_DEFINE_PRINT(ez_p_hensel_lift)
+TIMING_DEFINE_PRINT(ez_p_eval)
+TIMING_DEFINE_PRINT(ez_p_content)
 
 bool
 terminationTest (const CanonicalForm& F, const CanonicalForm& G,
@@ -795,6 +800,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     //termination test
     if ((uni_lcoeff (H) == gcdlcAlcB) || (G_m == H))
     {
+      TIMING_START (termination_test);
       if (gcdlcAlcB.isOne())
         cH= 1;
       else
@@ -829,6 +835,8 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           }
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
+          TIMING_END_AND_PRINT (termination_test,
+                                "time for successful termination test Fq: ");
           return N(gcdcAcB*ppH);
         }
       }
@@ -844,9 +852,13 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           ppCoG= decompress (ppCoG, MM, V);
         }
         coF= N ((cA/gcdcAcB)*ppCoF);
-        coG= N ((cB/gcdcAcB)*ppCoG);;
+        coG= N ((cB/gcdcAcB)*ppCoG);
+        TIMING_END_AND_PRINT (termination_test,
+                              "time for successful termination test Fq: ");
         return N(gcdcAcB*ppH);
       }
+      TIMING_END_AND_PRINT (termination_test,
+                            "time for unsuccessful termination test Fq: ");
     }
 
     G_m= H;
@@ -1235,6 +1247,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     //termination test
     if ((uni_lcoeff (H) == gcdlcAlcB) || (G_m == H))
     {
+      TIMING_START (termination_test);
       if (gcdlcAlcB.isOne())
         cH= 1;
       else
@@ -1268,6 +1281,8 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
           setCharacteristic (p, k, gf_name_buf);
+          TIMING_END_AND_PRINT (termination_test,
+                                "time for successful termination GF: ");
           return N(gcdcAcB*ppH);
         }
       }
@@ -1286,9 +1301,13 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
           }
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
+          TIMING_END_AND_PRINT (termination_test,
+                                "time for successful termination GF: ");
           return N(gcdcAcB*ppH);
         }
       }
+      TIMING_END_AND_PRINT (termination_test,
+                            "time for unsuccessful termination GF: ");
     }
 
     G_m= H;
@@ -1742,6 +1761,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     //termination test
     if ((uni_lcoeff (H) == gcdlcAlcB) || (G_m == H))
     {
+      TIMING_START (termination_test);
       if (gcdlcAlcB.isOne())
         cH= 1;
       else
@@ -1767,8 +1787,12 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
         }
         coF= N ((cA/gcdcAcB)*ppCoF);
         coG= N ((cB/gcdcAcB)*ppCoG);
+        TIMING_END_AND_PRINT (termination_test,
+                              "time for successful termination Fp: ");
         return N(gcdcAcB*ppH);
       }
+      TIMING_END_AND_PRINT (termination_test,
+                            "time for unsuccessful termination Fp: ");
     }
 
     G_m= H;
@@ -4446,16 +4470,20 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 
   CFMap M,N;
   int smallestDegLev;
+  TIMING_START (ez_p_compress)
   int best_level= compress4EZGCD (F, G, M, N, smallestDegLev);
 
   if (best_level == 0) return G.genOne();
 
   F= M (F);
   G= M (G);
+  TIMING_END_AND_PRINT (ez_p_compress, "time for compression in EZ_P: ")
 
+  TIMING_START (ez_p_content)
   f = content( F, x ); g = content( G, x );
   d = gcd( f, g );
   F /= f; G /= g;
+  TIMING_END_AND_PRINT (ez_p_content, "time to extract content in EZ_P: ")
 
   if( F.isUnivariate() && G.isUnivariate() )
   {
@@ -4594,6 +4622,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   int goodPointCount= 0;
   while( !gcdfound )
   {
+    TIMING_START (ez_p_eval);
     if( !findeval_P( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count, o,
          maxeval/maxNumVars, t ))
     { // too many eval. used --> try another method
@@ -4616,6 +4645,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
       return N (d*result);
     }
+    TIMING_END_AND_PRINT (ez_p_eval, "time for eval point search in EZ_P1: ");
     delta = degree( Db );
     if( delta == 0 )
     {
@@ -4628,6 +4658,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     while( true )
     {
       bt = b;
+      TIMING_START (ez_p_eval);
       if( !findeval_P(F,G,Fbt,Gbt,Dbt, bt, delta, degF, degG, maxeval, count, o,
            maxeval/maxNumVars, t ))
       { // too many eval. used --> try another method
@@ -4650,6 +4681,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
         return N (d*result);
       }
+      TIMING_END_AND_PRINT (ez_p_eval, "time for eval point search in EZ_P2: ");
       int dd = degree( Dbt );
       if( dd == 0 )
       {
@@ -4803,7 +4835,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*GCD_small_p (F,G));
       }
 
+      TIMING_START (ez_p_hensel_lift);
       gcdfound= Hensel_P (B*lcD, DD, b, lcDD);
+      TIMING_END_AND_PRINT (ez_p_hensel_lift, "time for Hensel lift in EZ_P: ");
 
       if (gcdfound == -1)
       {
@@ -4829,12 +4863,15 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 
       if (gcdfound == 1)
       {
+        TIMING_START (termination_test);
         contcand= content (DD[2], Variable (1));
         cand = DD[2] / contcand;
         if (B_is_F)
           gcdfound = fdivides( cand, G ) && cand*(DD[1]/(lcD/contcand)) == F;
         else
           gcdfound = fdivides( cand, F ) && cand*(DD[1]/(lcD/contcand)) == G;
+        TIMING_END_AND_PRINT (termination_test,
+                              "time for termination test EZ_P: ");
 
         if (passToGF && gcdfound)
         {
