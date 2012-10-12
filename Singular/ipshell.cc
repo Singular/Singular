@@ -2129,7 +2129,7 @@ static void rRenameVars(ring R)
   }
 }
 
-ring rCompose(const lists  L)
+ring rCompose(const lists  L, const BOOLEAN check_comp)
 {
   if ((L->nr!=3)
 #ifdef HAVE_PLURAL
@@ -2207,7 +2207,7 @@ ring rCompose(const lists  L)
 
       if( R->cf == NULL )
       {
-        ring extRing = rCompose((lists)L->m[0].Data());
+        ring extRing = rCompose((lists)L->m[0].Data(),FALSE);
 
         if (extRing==NULL)
         {
@@ -2448,6 +2448,28 @@ ring rCompose(const lists  L)
       {
         Werror("ordering incomplete: size (%d) should be %d",R->block1[j],R->N);
         goto rCompose_err;
+      }
+    }
+    if (check_comp)
+    {
+      BOOLEAN comp_order=FALSE;
+      int jj;
+      for(jj=0;jj<n;jj++)
+      {
+        if ((R->order[jj]==ringorder_c) ||
+            (R->order[jj]==ringorder_C)) { comp_order=TRUE; break; }
+      }
+      if (!comp_order)
+      {
+        R->order=(int*)omRealloc0Size(R->order,n*sizeof(int),(n+1)*sizeof(int));
+        R->block0=(int*)omRealloc0Size(R->block0,n*sizeof(int),(n+1)*sizeof(int));
+        R->block1=(int*)omRealloc0Size(R->block1,n*sizeof(int),(n+1)*sizeof(int));
+        R->wvhdl=(int**)omRealloc0Size(R->wvhdl,n*sizeof(int_ptr),(n+1)*sizeof(int_ptr));
+        R->order[n-1]=ringorder_C;
+        R->block0[n-1]=0;
+        R->block1[n-1]=0;
+        R->wvhdl[n-1]=NULL;
+        n++;
       }
     }
   }

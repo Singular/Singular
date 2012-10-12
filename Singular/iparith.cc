@@ -80,7 +80,8 @@
 
 #include <polys/coeffrings.h>
 
-lists rDecompose(const ring r); ring rCompose(const lists  L);
+lists rDecompose(const ring r);
+ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
