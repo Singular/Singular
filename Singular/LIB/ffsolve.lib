@@ -718,15 +718,12 @@ static proc linearReduce(ideal I, list mons)
   list monomials = imap(original_ring, monomials);
   ideal I = imap(original_ring, I);
   ideal C;
-  string weights = "wp(";
-  for(i=1; i<=nvars(original_ring); i++){
-    weights = weights+string(1)+",";
-  }
+  intvec weights=1:nvars(original_ring);
+
   for(i=1; i<= number_of_monomials; i++){
     C[i] = monomials[i] - @y(i);
-    weights = weights+string(deg(monomials[i])+1)+",";
+    weights = weights,deg(monomials[i])+1;
   }
-  weights[size(weights)]=")";
   ideal linear_eqs = I;
   for(i=1; i<=ncols(C); i++){
     linear_eqs = reduce(linear_eqs, C[i]);
@@ -741,7 +738,7 @@ static proc linearReduce(ideal I, list mons)
   ideal I = imap(ring_for_var_change, linear_eqs);
   ideal lin_sol = solvelinearpart(I);
   string new_ordstr = weights+",C";
-  def ring_for_back_change = changeord( new_ordstr, ring_for_var_change);
+  def ring_for_back_change = changeord( list(list("wp",weigths),list("C",0:1)), ring_for_var_change);
 
   setring ring_for_back_change;
   if( prime_field == 0){

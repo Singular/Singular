@@ -56,42 +56,33 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changeord (string o, list #)
-"USAGE:   changeord(newordstr[,r]);  newordstr=string, r=ring/qring
+proc changeord (list @o, list #)
+"USAGE:   changeord(neword[,r]);  newordstr=list, r=ring/qring
 RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
-         ordstr(r) to newordstr. If, say, newordstr=(\"R\",\"wp(2,3),dp\") and
-         if the ring r exists and has >=3 variables, the ring R will be
+         order(r) to neword.
+         If, say, neword=list(list(\"wp\",intvec(2,3)),list(list(\"dp\",1:(n-2))));
+         and if the ring r exists and has n variables, the ring R will be
          equipped with the monomial ordering wp(2,3),dp.
-NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example changeord; shows an example
 "
 {
+   def save_ring=basering;
    if( size(#)==0 ) { def @r=basering; }
    if( size(#)==1 ) { def @r=#[1]; }
    setring @r;
-   ideal i = ideal(@r); int @q = size(i);
-   if( @q!=0 )
-      { string @s = "Rnew1"; }
-   else
-      { string @s = "Rnew"; }
-   string @newring = @s+"=("+charstr(@r)+"),("+varstr(@r)+"),("+o+");";
-   execute("ring "+@newring);
-   if( @q!=0 )
-   {
-      map phi = @r,maxideal(1);
-      ideal i = phi(i);
-      attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      qring Rnew=i;
-   }
+   list rl=ringlist(@r);
+   rl[3]=@o;
+   def Rnew=ring(rl);
+   setring save_ring;
    return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,u,v),(dp(2),ds);
-   def R=changeord("wp(2,3),dp"); R; "";
+   def R=changeord(list(list("wp",intvec(2,3)),list("dp",1:2))); R; "";
    ideal i = x^2,y^2-u^3,v;
    qring Q = std(i);
-   def Q'=changeord("lp",Q); setring Q'; Q';
+   def Q'=changeord(list(list("lp",nvars(Q))),Q); setring Q'; Q';
    kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////

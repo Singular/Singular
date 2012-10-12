@@ -5111,7 +5111,7 @@ EXAMPLE: example primdecGTZ; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5195,7 +5195,7 @@ EXAMPLE: example absPrimdecGTZ; shows an example
 // hence prepare to go back to an appropriate new ring
       def r=basering;
       ideal max_of_r=maxideal(1);
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       def I=imap(r,I);
       def S=absPrimdecGTZ(I);
@@ -5355,7 +5355,7 @@ EXAMPLE: example primdecSY; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5431,7 +5431,7 @@ EXAMPLE: example minAssGTZ; shows an example
   // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5534,7 +5534,7 @@ EXAMPLE: example minAssChar; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5618,7 +5618,7 @@ EXAMPLE: example radical; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // compute radical and go back

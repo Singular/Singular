@@ -253,7 +253,7 @@ EXAMPLE: example jungresolve; shows an example.
     if(defined(R)){kill R;}
     def R3 = nor[i];
     setring R3;
-    def R = changeord("dp");
+    def R = changeord(list(list("dp",1:nvars(basering))));
     setring R;
     ideal QIdeal = imap(R3,QIdeal);
     ideal BMap = imap(R3,BMap);

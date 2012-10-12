@@ -1019,7 +1019,8 @@ EXAMPLE: example tangentcone; shows an example
   if (size(#) !=0) { n= #[1]; }
   if( n==0 )
   {
-     def @newr@=changeord("ds"); setring @newr@;
+     def @newr@=changeord(list(list("ds",1:nvars(basering))));
+     setring @newr@;
      ideal @id = imap(bas,id);
      @id = std(@id);
      setring bas;

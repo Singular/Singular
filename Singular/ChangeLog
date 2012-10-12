@@ -7,7 +7,7 @@ Changes since 3-1-5
 - added system("refrence"); and system('shared")
 - primefactors() changed: result and algorithm
 - new library: classifyceq_lib
-- changed ring.lib: changechar
+- changed ring.lib: changechar, chnageord
 - fixed: dump (list of ideals into ascii files)
 
 2012-07-12 

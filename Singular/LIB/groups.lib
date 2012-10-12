@@ -686,7 +686,7 @@ static proc changeOrdTest(ideal I)
 {
    def R=basering;
    if(deg(I[1])==0){return(I);}
-   def RR=changeord("dp");
+   def RR=changeord(list(list("dp",1:nvars(basering))));
    setring RR;
    ideal I=imap(R,I);
    ideal K=timeStd(I,5);

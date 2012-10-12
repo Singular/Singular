@@ -2171,7 +2171,7 @@ EXAMPLE: example genus; shows an example
    def R0=basering;
    if(char(basering)>0)
    {
-     def R1=changeord("dp");
+     def R1=changeord(list(list("dp",1:nvars(basering))));
      setring R1;
      ideal I=imap(R0,I);
      I=radical(I);

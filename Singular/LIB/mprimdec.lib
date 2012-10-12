@@ -467,7 +467,7 @@ EXAMPLE: example zeroMod; shows an example
   // the ordering is changed to lex
   ////////////////////////////////////////////////////////////////
   def BAS = basering;
-  def @R=changeord("lp");
+  def @R=changeord(list(list("lp",1:nvars(basering))));
   setring @R;
   module @N=fetch(BAS,@N);
   int nVar=nvars(@R);
@@ -1173,7 +1173,7 @@ EXAMPLE: example preComp; shows an example
 "
 {
   def BAS=basering;
-  def @R=changeord("C,lp");
+  def @R=changeord(list(list("C",0:1),list("lp",1:nvars(basering))));
   setring @R;
   module @N=std(imap(BAS,@N));
   ideal ann; module check, @M; int @k;
@@ -1734,7 +1734,7 @@ EXAMPLE: example zeroMod; shows an example
   // the ordering is changed to lex
   ////////////////////////////////////////////////////////////////
   def BAS = basering;
-  def @R=changeord("C,lp");
+  def @R=changeord(list(list("C",0:1),list("lp",1:nvars(basering))));
   setring @R;
   module @N=std(imap(BAS,@N));
   module @M=imap(BAS,@M);

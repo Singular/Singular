@@ -32,7 +32,7 @@ EXAMPLE: example classifyCeq;  shows an example
 "
 {
    def R=basering;
-   def S=changeord("ds");
+   def S=changeord(list(list("ds",1:nvars(basering))));
    setring S;
    poly f=imap(R,f);
    string re;
@@ -63,13 +63,13 @@ static proc blowupone(poly f)
    //=== input f smooth or isolated simple singularity at zero
    //=== output var(1) or poly with isolated singularity at zero
    def R=basering;
-   def S=changeord("ds");
+   def S=changeord(list(list("ds",1:nvars(basering))));
    setring S;
    int n=nvars(basering);
    int i;
    poly f=imap(R,f);
    if(deg(lead(f))<=1){setring R;return(var(1));}
-   def T=changeord("lp");
+   def T=changeord(list(list("lp",1:nvars(basering))));
    setring T;
    map phi;
    ideal mphi, sing;
@@ -1199,14 +1199,14 @@ static proc BlowUpO(poly f)
    //=== output var(1) or poly with isolated singularity at zero, the transformation
    //=== of the singularity of the blowing up to zero
     def R=basering;
-   def S=changeord("ds");
+   def S=changeord(list(list("ds",1:nvars(basering))));
    setring S;
    int n=nvars(basering);
    int i,t,c,d,e,j,k;
    poly f=imap(R,f);
    if(deg(lead(f))<=1){setring R;return(var(1));}
    poly p;
-   def T=changeord("lp");
+   def T=changeord(list(list("lp",1:nvars(basering))));
    setring T;
    list L;
    map phi,psi;
@@ -1790,7 +1790,7 @@ static proc splittingLchar2(poly f)
    if(p==0){return(f);}
    if(!homog(p)){return(jet(f,1));}
    def R=basering;
-   def S=changeord("lp");
+   def S=changeord(list(list("lp",1:nvars(basering))));
    setring S;
    ideal ma=maxideal(1);
    number a;

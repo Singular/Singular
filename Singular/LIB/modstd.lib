@@ -694,7 +694,7 @@ EXAMPLE: example modpStd; shows an example
 
    if(variant == 4)
    {
-      def R1 = changeord("dp");
+      def R1 = changeord(list(list("dp",1:nvars(basering))));
       setring R1;
       ideal i = fetch(@r,i);
       i = std(i);
@@ -869,7 +869,7 @@ EXAMPLE: example modStd; shows an example
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
-         def @s = changeord("dp");
+         def @s = changeord(list(list("dp",1:nvars(basering))));
          setring @s;
          ideal I = std(fetch(R0,I));
          intvec hi = hilb(I,1);
@@ -909,7 +909,7 @@ EXAMPLE: example modStd; shows an example
                def @r = ring(rl);
                setring @r;
 
-               def @s = changeord("dp");
+               def @s = changeord(list(list("dp",1:nvars(basering))));
                setring @s;
                ideal I = std(fetch(R0,I));
                if(dim(I) == 0)
@@ -955,7 +955,7 @@ EXAMPLE: example modStd; shows an example
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
-         def @s = changeord("dp");
+         def @s = changeord(list(list("dp",1:nvars(basering))));
          setring @s;
          ideal I = std(fetch(R0,I));
          intvec hi = hilb(I,1);

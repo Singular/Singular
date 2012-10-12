@@ -1047,7 +1047,8 @@ EXAMPLE: example AssEHV; shows an example"
             {
               //...homogenize K w.r.t. t,...
               if(printlevel > 2){"Input not homogeneous; must homogenize.";}
-              changeord("homoR","dp");
+              def homoR=changeord(list(list("dp",1:nvars(basering))));
+	      setring homoR;
               ideal homoJ = fetch(base,K);
               homoJ = groebner(homoJ);
               execute("ring newR = (" + charstr(base) + "),(x(1..n),t),dp;");

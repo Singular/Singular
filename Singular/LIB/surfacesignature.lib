@@ -401,7 +401,7 @@ static proc signatureSpec(int N, poly f)
 //=== in terms of the spectral pairs of f
 {
    def R = basering;
-   def Rds = changeord("ds");
+   def Rds = changeord(list(list("ds",1:nvars(basering))));
    setring Rds;
    poly f = imap(R,f);
    list L = sppairs(f);

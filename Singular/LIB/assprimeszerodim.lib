@@ -646,7 +646,7 @@ static proc specialAlgDepGTZ(poly p, ideal I)
    execute("ring Rhelp = "+charstr(R)+",T,dp;");
    setring R;
    map phi = Rhelp,p;
-   def Rlp = changeord("dp("+string(nvars(R)-1)+"),dp(1)");
+   def Rlp = changeord(list(list("dp",1:(nvars(R)-1)),list("dp",1:1)));
    setring Rlp;
    poly p = imap(R,p);
    ideal K = maxideal(1);
