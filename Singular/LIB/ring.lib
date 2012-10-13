@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib 15103 2012-07-11 10:00:13Z motsak $";
+version="$Id: ring.lib 15322 2012-10-12 12:00:07Z motsak $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
 
 PROCEDURES:
- changechar(\"R\",c[,r]); make a copy R of basering [ring r] with new char c
- changeord(\"R\",o[,r]);  make a copy R of basering [ring r] with new ord o
- changevar(\"R\",v[,r]);  make a copy R of basering [ring r] with new vars v
+ changechar(c[,r]); make a copy of basering [ring r] with new char c
+ changeord(o[,r]);  make a copy of basering [ring r] with new ord o
+ changevar(v[,r]);  make a copy of basering [ring r] with new vars v
  defring(\"R\",c,n,v,o);  define a ring R in specified char c, n vars v, ord o
  defrings(n[,p]);         define ring Sn in n vars, char 32003 [p], ord ds
  defringp(n[,p]);         define ring Pn in n vars, char 32003 [p], ord dp
@@ -16,10 +16,10 @@ PROCEDURES:
  imapall(R[,str]);        imap all objects of ring R to basering
  mapall(R,i[,str]);       map all objects of ring R via ideal i to basering
  ord_test(R);             test wether ordering of R is global, local or mixed
- ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
+ ringtensor(s,t,..);      create ring, tensor product of rings s,t,...
  ringweights(r);          intvec of weights of ring variables of ring r
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
- rootofUnity(n);         the minimal polynomial for the n-th primitive root of unity
+ rootofUnity(n);          the minimal polynomial for the n-th primitive root of unity
              (parameters in square brackets [] are optional)
 ";
 
@@ -407,7 +407,7 @@ NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
          1st, 2nd, ... variable of the basering.
          The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
-CAUTION: fetchall does not work inside a procedure.
+CAUTION: fetchall does not work for locally defined names.
          It does not work if R contains a map.
 SEE ALSO: imapall
 EXAMPLE: example fetchall; shows an example
@@ -416,7 +416,7 @@ EXAMPLE: example fetchall; shows an example
    list @L@=names(R);
    int @ii@; string @s@;
    if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
-   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-1 )
+   for( @ii@=size(@L@); @ii@>0; @ii@-- )
    {
       execute("def "+@L@[@ii@]+@s@+"=fetch(R,`@L@[@ii@]`);");
       execute("export "+@L@[@ii@]+@s@+";");
@@ -453,7 +453,7 @@ NOTE:    As imap, this procedure maps the variables of R to the variables with
          the same name in the basering, the other variables are mapped to 0.
          The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
-CAUTION: imapall does not work inside a procedure
+CAUTION: imapall does not work for locally defined names.
          It does not work if R contains a map
 SEE ALSO: fetchall
 EXAMPLE: example imapall; shows an example
@@ -462,7 +462,7 @@ EXAMPLE: example imapall; shows an example
    list @L@=names(R);
    int @ii@; string @s@;
    if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
-   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-1 )
+   for( @ii@=size(@L@); @ii@>0; @ii@-- )
    {
          execute("def "+@L@[@ii@]+@s@+"=imap(R,`@L@[@ii@]`);");
          execute("export "+@L@[@ii@]+@s@+";");
@@ -502,14 +502,14 @@ NOTE:    This procedure has the same effect as defining a map, say psi, by
          mapall may be combined with copyring to change vars for all objects.
          The 3rd argument is useful in order to avoid conflicts of names, the
          empty string is allowed.
-CAUTION: mapall does not work inside a procedure.
+CAUTION: mapall does not work for locally defined names.
 EXAMPLE: example mapall; shows an example
 "
 {
    list @L@=names(R); map @psi@ = R,i;
    int @ii@; string @s@;
    if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
-   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-1 )
+   for( @ii@=size(@L@); @ii@>0; @ii@-- )
    {
       execute("def "+@L@[@ii@]+@s@+"=@psi@(`@L@[@ii@]`);");
       execute("export "+@L@[@ii@]+@s@+";");
