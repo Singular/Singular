@@ -73,10 +73,11 @@ char * newstruct_String(blackbox *b, void *d)
       {
         char *res = omStrDup((char*)sl->Data());
         sl->CleanUp();
+        iiRETURNEXPR.Init();
         return res;
       }
-      else
-        sl->CleanUp();      
+      sl->CleanUp();
+      iiRETURNEXPR.Init();
     }
 
     lists l=(lists)d;
@@ -170,7 +171,7 @@ BOOLEAN newstruct_equal(int op, leftv l, leftv r)
   assume(ll->data != NULL);
   newstruct_desc nt=(newstruct_desc)ll->data;
   newstruct_proc p=nt->procs;
-  
+
   while( (p!=NULL) && ((p->t!='=')||(p->args!=1)) ) p=p->next;
 
   if (p!=NULL)
@@ -186,8 +187,14 @@ BOOLEAN newstruct_equal(int op, leftv l, leftv r)
     leftv sl = iiMake_proc(&hh, NULL, &tmp);
     if (sl != NULL)
     {
-      if (sl->Typ() == op) { l->Copy(sl); return FALSE;}
-      else sl->CleanUp();
+      if (sl->Typ() == op)
+      {
+        l->Copy(sl);
+        iiRETURNEXPR.Init();
+        return FALSE;
+      }
+      sl->CleanUp();
+      iiRETURNEXPR.Init();
     }
   }
   return TRUE;
@@ -286,6 +293,7 @@ BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
     else
     {
       res->Copy(sl);
+      iiRETURNEXPR.Init();
       return FALSE;
     }
   }
@@ -416,6 +424,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
     else
     {
       res->Copy(sl);
+      iiRETURNEXPR.Init();
       return FALSE;
     }
   }
@@ -459,6 +468,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
     else
     {
       res->Copy(sl);
+      iiRETURNEXPR.Init();
       return FALSE;
     }
   }
@@ -593,6 +603,8 @@ void newstruct_Print(blackbox *b,void *d)
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sl=iiMake_proc(&hh,NULL,&tmp);
+    if (sl!=NULL) sl->CleanUp();
+    iiRETURNEXPR.Init();
   }
   else
     blackbox_default_Print(b,d);

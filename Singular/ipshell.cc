@@ -392,17 +392,17 @@ void killlocals(int v)
 
   if (iiRETURNEXPR_len > myynest)
   {
-    int t=iiRETURNEXPR[myynest].Typ();
-    if ((/*iiRETURNEXPR[myynest].Typ()*/ t==RING_CMD)
-    || (/*iiRETURNEXPR[myynest].Typ()*/ t==QRING_CMD))
+    int t=iiRETURNEXPR.Typ();
+    if ((/*iiRETURNEXPR.Typ()*/ t==RING_CMD)
+    || (/*iiRETURNEXPR.Typ()*/ t==QRING_CMD))
     {
-      leftv h=&iiRETURNEXPR[myynest];
+      leftv h=&iiRETURNEXPR;
       if (((ring)h->data)->idroot!=NULL)
         killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
     }
-    else if (/*iiRETURNEXPR[myynest].Typ()*/ t==LIST_CMD)
+    else if (/*iiRETURNEXPR.Typ()*/ t==LIST_CMD)
     {
-      leftv h=&iiRETURNEXPR[myynest];
+      leftv h=&iiRETURNEXPR;
       changed |=killlocals_list(v,(lists)h->data);
     }
   }
@@ -2146,10 +2146,8 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   // 4: C
   // 5: D
 
-  ring R = (ring) omAlloc0Bin(sip_sring_bin); // why
+  ring R = (ring) omAlloc0Bin(sip_sring_bin);
 
-
-  //assume( R->cf == NULL );
 
   // ------------------------------------------------------------------
   // 0: char:
@@ -2485,8 +2483,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   rComplete(R);
 
 #ifdef HAVE_RINGS
-  // This was a BUG IN SINGULAR: There is no HABE_RINGS!!!
-
 // currently, coefficients which are ring elements require a global ordering:
   if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
@@ -5583,10 +5579,10 @@ void rKill(ring r)
       {
         sLastPrinted.CleanUp();
       }
-      if ((myynest>0) && (iiRETURNEXPR[myynest].RingDependend()))
+      if ((myynest>0) && (iiRETURNEXPR.RingDependend()))
       {
         WerrorS("return value depends on local ring variable (export missing ?)");
-        iiRETURNEXPR[myynest].CleanUp();
+        iiRETURNEXPR.CleanUp();
       }
       currRing=NULL;
       currRingHdl=NULL;

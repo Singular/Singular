@@ -1604,8 +1604,7 @@ parametercmd:
 returncmd:
         RETURN '(' exprlist ')'
           {
-            if(iiRETURNEXPR==NULL) YYERROR;
-            iiRETURNEXPR[myynest].Copy(&$3);
+            iiRETURNEXPR.Copy(&$3);
             $3.CleanUp();
             if (exitBuffer(BT_proc)) YYERROR;
           }
@@ -1613,9 +1612,8 @@ returncmd:
           {
             if ($1==RETURN)
             {
-              if(iiRETURNEXPR==NULL) YYERROR;
-              iiRETURNEXPR[myynest].Init();
-              iiRETURNEXPR[myynest].rtyp=NONE;
+              iiRETURNEXPR.Init();
+              iiRETURNEXPR.rtyp=NONE;
               if (exitBuffer(BT_proc)) YYERROR;
             }
           }

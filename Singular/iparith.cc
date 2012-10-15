@@ -1587,6 +1587,7 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   {
     memcpy(res,sl,sizeof(sleftv));
   }
+  iiRETURNEXPR.Init();
   return FALSE;
 }
 static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
