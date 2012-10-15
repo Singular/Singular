@@ -737,8 +737,7 @@ static proc linearReduce(ideal I, list mons)
 
   ideal I = imap(ring_for_var_change, linear_eqs);
   ideal lin_sol = solvelinearpart(I);
-  string new_ordstr = weights+",C";
-  def ring_for_back_change = changeord( list(list("wp",weigths),list("C",0:1)), ring_for_var_change);
+  def ring_for_back_change = changeord( list(list("wp",weights),list("C",0:1)), ring_for_var_change);
 
   setring ring_for_back_change;
   if( prime_field == 0){
