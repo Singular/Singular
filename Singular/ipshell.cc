@@ -4569,10 +4569,12 @@ void rSetHdl(idhdl h)
 //   Print(" new ring:%s (l:%d)\n",IDID(h),IDLEV(h));
     rg = IDRING(h);
     if (rg==NULL) return; //id <>NULL, ring==NULL
+    #ifndef NDEBUG
     omCheckAddrSize((ADDRESS)h,sizeof(idrec));
     if (IDID(h))  // OB: ????
       omCheckAddr((ADDRESS)IDID(h));
     rTest(rg);
+    #endif
   }
 
   // clean up history

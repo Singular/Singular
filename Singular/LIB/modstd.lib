@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib 15103 2012-07-11 10:00:13Z motsak $";
+version="$Id: modstd.lib 15322 2012-10-12 12:00:07Z motsak $";
 category = "Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner basis of ideals
@@ -414,7 +414,7 @@ RETURN:  the intvec of n greatest primes <= 2147483647 (resp. n greatest primes
          < L[size(L)] union with L) such that none of these primes divides any
          coefficient occuring in I
 NOTE:    The number of cores to use can be defined by ncores, default is 1.
-EXAMPLE: example primList; shows an example
+EXAMPLE: example primeList; shows an example
 "
 {
    intvec L;
