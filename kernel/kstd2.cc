@@ -14,6 +14,9 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
+#include <kernel/polMulTest.h>
+#include <Singular/lists.h>
+#include <kernel/timer.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -2866,6 +2869,204 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
     //bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
   idSkipZeroes(RS);
   return(RS);
+}
+
+poly lpMult
+  ( poly p, poly m, int uptodeg, int lV )
+{
+#if 0
+  //Seem to work
+  lp_pp_Mult_mm_v2_a
+  lp_pp_Mult_mm_v1_a
+  lp_pp_Mult_mm_v2
+  lp_pp_Mult_mm_v1
+#else
+  //Yet to test
+  return lp_pp_Mult_mm_v0
+#endif
+    ( p, currRing, currRing, m, currRing, uptodeg, lV );
+}
+
+namespace ShiftDVec
+{ uint CreateDVec(poly p, ring r, uint*& dvec); }
+
+/* L is a list of Pairs. Each Pair is a list, containing a
+ * polynomial as first entry and a monomial as second entry.
+ * lpMultProfiler will successively start each multiplication
+ * function in lpMultFunctions on each entry of L. For each
+ * function f in lpMultFunctions it will create a list K_f
+ * containing the functions name as first entry and as many
+ * pairs as the input list had pairs.  Each of these pairs
+ * consists of the time in milliseconds, the function used to
+ * calculate the result and the result. If the input list was
+ * formatted correctly, a list, containing each K_f for each
+ * function f in lpMultFunctions will be returned, otherwise an
+ * empty list will be returned and an error message will be
+ * printed. 
+ * If n > 1 holds, each multiplication will be repeated n times
+ * and the average computing time will be stored into the pair.
+ */
+lists lpMultProfiler
+  ( lists L, int uptodeg, int lV, int n )
+{
+  lists Pair;
+  int time;
+  poly result;
+  lists rtL = (lists) omAlloc(sizeof(slists)); //list to be returned
+  rtL->Init(lpMultFunctions.size);
+  for( int i = 0; i < lpMultFunctions.size; ++i ){
+    //list of (timing,result) pairs for the current function:
+    lists rtPL = (lists) omAlloc(sizeof(slists));
+    rtPL->Init(L->nr+1);
+    for( int k = 0; k <= L->nr; ++k )
+    {
+      Pair = (lists) L->m[k].data;
+      if( L->m[k].rtyp == LIST_CMD &&
+          Pair->nr >= 1 && Pair->m[0].rtyp == POLY_CMD &&
+          Pair->m[1].rtyp == POLY_CMD                     )
+      {
+        poly p = (poly) Pair->m[0].data;
+        poly m = (poly) Pair->m[1].data;
+
+        //create timing and get multiplication result
+        initTimer();
+        startTimer();
+        for( int j = 1; j < n; ++j )
+        {
+          result = lpMultFunctions.pp_Mult_mm[i]
+            ( p, currRing, currRing, m, currRing, 
+              uptodeg, lV, NULL, 0                );
+          p_Delete(&(result->next), currRing);
+          p_LmFree(result, currRing);
+        }
+        result = lpMultFunctions.pp_Mult_mm[i]
+          ( p, currRing, currRing, m, currRing, 
+            uptodeg, lV, NULL, 0                );
+        time = getTimer();
+
+        //store timing and result into a new pair
+        lists rtP = (lists) omAlloc(sizeof(slists));
+        rtP->Init(2);
+        rtP->m[0].rtyp = INT_CMD;
+        rtP->m[0].data = (void *) (long)time;
+        rtP->m[1].rtyp = POLY_CMD;
+        rtP->m[1].data = (void *) result;
+
+        //put this pair into the list from above
+        rtPL->m[k].rtyp = LIST_CMD;
+        rtPL->m[k].data = (char *) rtP;
+      }
+      else
+      {
+        Print("Incorrectly formatted Pair at Position %d\n", k);
+        Print("Aborting.\n");
+        return NULL;
+      }
+    }
+
+    //store the results (the list of pairs)
+    rtL->m[i].rtyp = LIST_CMD;
+    rtL->m[i].data = (char *) rtPL;
+  }
+
+  return rtL;
+}
+
+lists lpMultProfilerR
+  ( lists L, int uptodeg, int lV, int n, int resolution )
+{
+  double sResolution = GetTimerResolution();
+  lists Pair;
+  int time;
+  poly result;
+  lists rtL = (lists) omAlloc(sizeof(slists)); //list to be returned
+  rtL->Init(lpMultFunctions.size);
+
+  //omap, osize are global variables 
+  //(I know it's ugly and so am I.)
+  osize = GetOrderMapping( currRing, &omap );
+
+  //For debugging Purposes
+  poly* debugRes = 
+    (poly *) omAlloc(sizeof(poly) * lpMultFunctions.size);
+
+  for( int i = 0; i < lpMultFunctions.size; ++i ){
+    //list of (timing,result) pairs for the current function:
+    lists rtPL = (lists) omAlloc(sizeof(slists));
+    rtPL->Init(L->nr+1);
+    for( int k = 0; k <= L->nr; ++k )
+    {
+      Pair = (lists) L->m[k].data;
+      if( L->m[k].rtyp == LIST_CMD &&
+          Pair->nr >= 1 && Pair->m[0].rtyp == POLY_CMD &&
+          Pair->m[1].rtyp == POLY_CMD                     )
+      {
+        poly p = (poly) Pair->m[0].data;
+        poly m = (poly) Pair->m[1].data;
+        uint* mDVec;
+        uint  mDVsize = 
+          ShiftDVec::CreateDVec(m, currRing, mDVec);
+
+        //create timing and get multiplication result
+        initRTimer();
+        SetTimerResolution(resolution);
+        startRTimer();
+        if(n > 1)
+        {
+          startRTimer();
+          for( int j = 1; j < n; ++j )
+          {
+            result = lpMultFunctions.pp_Mult_mm[i]
+              ( p, currRing, currRing, m, currRing, 
+                uptodeg, lV, mDVec, mDVsize         );
+            p_Delete(&(result->next), currRing);
+            p_LmFree(result, currRing);
+          }
+        }
+        else startRTimer();
+        result = lpMultFunctions.pp_Mult_mm[i]
+          ( p, currRing, currRing, m, currRing, 
+            uptodeg, lV, mDVec, mDVsize         );
+        time = getRTimer();
+
+        //store timing and result into a new pair
+        lists rtP = (lists) omAlloc(sizeof(slists));
+        rtP->Init(2);
+        rtP->m[0].rtyp = INT_CMD;
+        rtP->m[0].data = (void *) (long)time;
+        rtP->m[1].rtyp = POLY_CMD;
+        rtP->m[1].data = (void *) result;
+
+        //For debugging Purposes
+        debugRes[i] = result;
+
+        //put this pair into the list from above
+        rtPL->m[k].rtyp = LIST_CMD;
+        rtPL->m[k].data = (char *) rtP;
+        omFreeSize( (ADDRESS)mDVec, (mDVsize) * sizeof(uint) );
+      }
+      else
+      {
+        Print("Incorrectly formatted Pair at Position %d\n", k);
+        Print("Aborting.\n");
+        SetTimerResolution(sResolution);
+        return NULL;
+      }
+    }
+
+    //store the results (the list of pairs)
+    rtL->m[i].rtyp = LIST_CMD;
+    rtL->m[i].data = (char *) rtPL;
+  }
+
+  //For debugging Purposes
+  omFreeSize
+    ( (ADDRESS)debugRes, (lpMultFunctions.size)*sizeof(poly) );
+
+  SetTimerResolution(sResolution);
+  return rtL;
+
+  omFreeSize( (ADDRESS)omap, (currRing->N+1) * sizeof(int) );
 }
 
 /*2

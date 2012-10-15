@@ -774,8 +774,17 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     if (i < 0)
       return dReportError("L[%d].p1 not in T",lpos);
     i = kFindInT(L->p2, T, tlength);
+#ifdef HAVE_SHIFTBBADVEC //BOCO: small modification
+    if (i < 0 && !ShiftDVec::lpDVCase)
+    {
+      //BOCO: We have to improve kFindInT, as we might hav a
+      //shift here
+      return dReportError("L[%d].p2 not in T",lpos);
+    }
+#else //original
     if (i < 0)
       return dReportError("L[%d].p2 not in T",lpos);
+#endif
   }
   return TRUE;
 }

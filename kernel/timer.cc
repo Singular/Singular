@@ -23,6 +23,16 @@ void SetTimerResolution(int res)
   timer_resolution = (double) res;
 }
 
+void SetTimerResolution(double res)
+{
+  timer_resolution = res;
+}
+
+double GetTimerResolution()
+{
+  return timer_resolution;
+}
+
 void SetMinDisplayTime(double mtime)
 {
   mintime = mtime;

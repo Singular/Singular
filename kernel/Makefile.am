@@ -38,6 +38,7 @@ SOURCES = polys.cc febase.cc feread.cc \
     ideals.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
+    kutil2.cc shiftDVec.cc shiftDVec2.cc \
     nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
     fast_maps.cc \
@@ -64,7 +65,8 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	febase.h \
 	walkProc.h walkMain.h walkSupport.h\
 	kstdfac.h kmatrix.h\
-	kutil.h \
+	kutil.h kutil2.h \
+	shiftDVec.h \
 	khstd.h kstd1.h \
 	fglm.h fglmgauss.h fglmvec.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
