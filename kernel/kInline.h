@@ -28,6 +28,9 @@
 //BOCO: added - defines HAVE_SHIFTBBADVEC
 #include <kernel/kutil.h>
 
+//BOCO: our adapted multiplication
+#include <kernel/SDMultiplication.h>
+
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN
@@ -603,6 +606,36 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
 //    pLength += lq - shorter;
   }
 }
+
+#ifdef HAVE_SHIFTBBADVEC
+KINLINE void sLObject::Tail_Minus_mm_Mult_qq
+  ( poly m, poly q, int lq, poly spNoether, int lV )
+{
+  if (bucket != NULL)
+  {
+    //BOCO: WARNING/TODO
+    //We do not yet consider buckets, but we want to do it some
+    //time. Up to then we have to shut buckets down or they will
+    //make Singular explode !!!
+    kBucket_Minus_m_Mult_p(bucket, m, q, &lq, spNoether);
+  }
+  else
+  {
+    poly _p = (t_p != NULL ? t_p : p);
+    assume(_p != NULL);
+    int shorter;
+#if 0 //BOCO: replaced
+    pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q,
+                                                      shorter,spNoether,
+                                                      tailRing, last);
+#else //BOCO: replacement
+    pNext(_p) = ShiftDVec::p_Minus_mm_Mult_qq__T
+      ( pNext(_p), m, q, shorter,spNoether, tailRing, last, lV);
+#endif
+    pLength += lq - shorter;
+  }
+}
+#endif
 
 KINLINE void sLObject::LmDeleteAndIter()
 {

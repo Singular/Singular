@@ -17,9 +17,16 @@
 #include <kernel/kutil2.h> //already included in kutil.h
 #include <kernel/shiftDVec.h>
 
+//now our adapted multiplications for:
+//- ksCreateShortSpoly
+//- etc. ?
+#include <kernel/SDMultiplication.h>
 
-//No debug version at the moment
+
+//No debug version at the moment 
+//TODO: (why did I shut that down?)
 #undef KDEBUG
+
 #undef HAVE_RINGS //We do not have rings
 #undef HAVE_PLURAL //Nope
 
@@ -1691,6 +1698,7 @@ LObject* ShiftDVec::enterOnePair
 #endif
   {
     #ifdef HAVE_PLURAL //BOCO: this should not be set
+    assume(0) //BOCO: We don't HAVE_PLURAL
     if ( rIsPluralRing(currRing) )
     {
 #if 0 //BOCO: replaced
@@ -1766,7 +1774,8 @@ LObject* ShiftDVec::enterOnePair
 #if 0 //BOCO: replaced
       Lp.p = ksCreateShortSpoly(strat->S[i], p, strat->tailRing);
 #else //BOCO: replacement
-      Lp.p = ksCreateShortSpoly(p1, p2, strat->tailRing);
+      Lp.p = ShiftDVec::ksCreateShortSpoly
+        (p1, p2, strat->tailRing);
 #endif
 
 #if 0 //BOCO: deleted

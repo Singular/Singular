@@ -1,4 +1,4 @@
-// define to enable tailRings
+// define to enable tailRings (TODO: do this properly)
 #define HAVE_TAIL_RING
 
 //Needed because fo include order; should rather be included in
@@ -21,6 +21,13 @@
 #include <kernel/kutil.h>
 #include <kernel/kutil2.h> //already included in kutil.h
 #include <kernel/shiftDVec.h>
+
+//now our adapted multiplications for:
+//- ksCreateSpoly
+//- ksReducePoly
+//- ksReducePolyTail
+//- etc. ?
+#include <kernel/SDMultiplication.h>
 
 //No debug version at the moment
 //#undef KDEBUG
@@ -458,8 +465,9 @@ ideal ShiftDVec::bba
         }
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
+      SD::ksCreateSpoly
+        ( &(strat->P), NULL, strat->use_buckets,
+           strat->tailRing, m1, m2, strat->R, strat->lV );
     }
     else if (strat->P.p1 == NULL)
     {
@@ -1164,7 +1172,8 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       With->pLength=0;
       strat->redTailChange=TRUE;
 
-      if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
+      if ( SD::ksReducePolyTail
+             (L, With, h, strat->kNoetherTail(), strat->lV) )
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -1463,7 +1472,8 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
         ( p_tmp, shift, 
           strat->uptodeg, strat->lV, strat, currRing );
     }
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+    ShiftDVec::ksReducePoly
+      (h, &(strat->T[ii]), strat->lV, NULL, NULL, strat);
     h->dvec = NULL;
 
     //BOCO: why did i change it to that?:
@@ -1697,7 +1707,8 @@ poly ShiftDVec::redBba
           strat->uptodeg, strat->lV, strat, currRing);
       loGriToFile("p_LPshiftT poly in redBba ", 0,1024);
       LObject tTemp(pTemp);
-      ksReducePoly(h,&tTemp,strat->kNoetherTail());
+      ShiftDVec::ksReducePoly
+        (h,&tTemp, strat->lV, strat->kNoetherTail());
 
       /* BOCO: this was copied from redFirstShrink
        * i only additionally test for strat->homog - why wasn't
@@ -2418,7 +2429,7 @@ poly ShiftDVec::redtailBba
        * does an exp bound still make sense?
        */
       assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
-      if (ksReducePolyTail(L, With, &Ln))
+      if ( SD::ksReducePolyTail(L, With, &Ln, strat->lV) )
       {
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)

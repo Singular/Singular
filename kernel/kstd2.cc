@@ -322,7 +322,7 @@ int redRing (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
 
-    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
+    ::ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
 
     if (h->GetLmTailRing() == NULL)
     {
@@ -450,7 +450,7 @@ int redHomog (LObject* h,kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+    ::ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -753,7 +753,7 @@ int redLazy (LObject* h,kStrategy strat)
     }
 #endif
 
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+    ::ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -923,7 +923,7 @@ int redHoney (LObject* h, kStrategy strat)
     assume(strat->fromT == FALSE);
 
     number coef;
-    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),&coef,strat);
+    ::ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),&coef,strat);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -3107,7 +3107,7 @@ int redFirstShift (LObject* h,kStrategy strat)
       strat->T[j].wrp();
     }
 #endif
-    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
+    ::ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
     if (!h->IsNull())
     {
       poly qq=p_Shrink(h->GetTP(),strat->lV,strat->tailRing);
