@@ -1411,6 +1411,56 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else
   #endif /*SHIFTBBA*/
   #endif /*PLURAL*/
+  /*==== Test if template functions for Letterplace work ====*/
+      if (strcmp(sys_cmd, "TTestLPDV") == 0)
+      {
+        //Expect as Input: poly p, poly q, int uptodeg, int lV
+        //Will return NULL at the moment (may once return some
+        //poly)
+
+        poly p,q;
+        //the polynomials are expected to have shift 0 and to be
+        //correctly formatted letterplace element - especially
+        //they musn't have gaps or exponents greater than 1 .
+        //We will not check for errerneous input!!!
+        //m is expected to be a monomial
+
+        int uptodeg, lVblock;
+        //for p and m totaldeg(p) + totaldeg(m) < uptodeg should
+        //hold.  We will not check for errerneous input!!!
+
+        if ((h!=NULL) && (h->Typ()==POLY_CMD))
+        {
+          p=(poly)h->Data();
+          h=h->next;
+        } else return TRUE;
+        if ((h!=NULL) && (h->Typ()==POLY_CMD))
+        {
+          q=(poly)h->Data();
+          h=h->next;
+        } else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          uptodeg=(int)((long)(h->Data()));
+          h=h->next;
+        } else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          lVblock=(int)((long)(h->Data()));
+        } else return TRUE;
+
+        res->data = TemplateTestLPDV(p, q, uptodeg, lVblock);
+        res->rtyp = POLY_CMD;
+
+#if 0
+        if (res->data == NULL)
+        {
+          /* that is there were input errors */
+          //BOCO: yes... ? -> TODO: check for input errors
+        }
+#endif
+        return FALSE;
+      }
   /*==================== walk stuff =================*/
   #ifdef HAVE_WALK
   #ifdef OWNW

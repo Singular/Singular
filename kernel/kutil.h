@@ -784,3 +784,7 @@ extern  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
 extern  int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 #endif
+
+
+//LPDV Template Test
+poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );
