@@ -1774,8 +1774,7 @@ LObject* ShiftDVec::enterOnePair
 #if 0 //BOCO: replaced
       Lp.p = ksCreateShortSpoly(strat->S[i], p, strat->tailRing);
 #else //BOCO: replacement
-      Lp.p = ShiftDVec::ksCreateShortSpoly
-        (p1, p2, strat->tailRing);
+      Lp.p = ksCreateShortSpoly(p1, p2, strat->tailRing);
 #endif
 
 #if 0 //BOCO: deleted

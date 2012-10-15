@@ -1,8 +1,9 @@
 #ifndef SDMULTIPLICATION_H
 #define SDMULTIPLICATION_H
 
-#include <kutil.h> //INCLUDE Magic
+#include <kernel/kutil.h> //INCLUDE Magic
 
+#if 0 //Everything commented out - have to work on it
 namespace ShiftDVec
 {
   int InitOrderMapping( ring r );
@@ -36,4 +37,5 @@ namespace ShiftDVec
     ( LObject* PR, TObject* PW, LObject* Red, int lV );
   poly ksCreateShortSpoly( poly p1, poly p2, ring tailRing );
 }
+#endif
 #endif

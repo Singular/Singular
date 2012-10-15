@@ -607,6 +607,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
   }
 }
 
+#if 0
 #ifdef HAVE_SHIFTBBADVEC
 KINLINE void sLObject::Tail_Minus_mm_Mult_qq
   ( poly m, poly q, int lq, poly spNoether, int lV )
@@ -635,6 +636,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq
     pLength += lq - shorter;
   }
 }
+#endif
 #endif
 
 KINLINE void sLObject::LmDeleteAndIter()
