@@ -3243,3 +3243,11 @@ void initBbaShift(ideal F,kStrategy strat)
 //  }
 }
 #endif
+
+//ShiftDVec Template test function
+#include <polys/templates/p_Procs.h>
+poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV )
+{
+  currRing->p_Procs->LPDV__pp_Mult_mm();
+  return pCopy(p);
+}

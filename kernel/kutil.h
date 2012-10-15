@@ -917,3 +917,7 @@ lists lpMultProfilerR
   ( lists L, int uptodeg, int lV, int n, int resolution );
 
 #endif
+
+
+//LPDV Template Test
+poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );

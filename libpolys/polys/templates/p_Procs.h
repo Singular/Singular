@@ -37,6 +37,7 @@ typedef poly (*pp_Mult_Coeff_mm_DivSelectMult_Proc_Ptr)
 
 typedef poly (*p_Merge_q_Proc_Ptr)(poly p, poly q, const ring r);
 typedef void (*p_kBucketSetLm_Proc_Ptr)(kBucket_pt bucket);
+typedef void (*LPDV__pp_Mult_mm_Proc_Ptr)();
 
 typedef struct p_Procs_s
 {
@@ -55,6 +56,7 @@ typedef struct p_Procs_s
   pp_Mult_Coeff_mm_DivSelectMult_Proc_Ptr   pp_Mult_Coeff_mm_DivSelectMult;
   p_Merge_q_Proc_Ptr                    p_Merge_q;
   p_kBucketSetLm_Proc_Ptr               p_kBucketSetLm;
+  LPDV__pp_Mult_mm_Proc_Ptr             LPDV__pp_Mult_mm;
 } pProcs_s;
 
 
