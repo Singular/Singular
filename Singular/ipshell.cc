@@ -373,17 +373,17 @@ void killlocals(int v)
 
   if (iiRETURNEXPR_len > myynest)
   {
-    int t=iiRETURNEXPR[myynest].Typ();
-    if ((/*iiRETURNEXPR[myynest].Typ()*/ t==RING_CMD)
-    || (/*iiRETURNEXPR[myynest].Typ()*/ t==QRING_CMD))
+    int t=iiRETURNEXPR.Typ();
+    if ((/*iiRETURNEXPR.Typ()*/ t==RING_CMD)
+    || (/*iiRETURNEXPR.Typ()*/ t==QRING_CMD))
     {
-      leftv h=&iiRETURNEXPR[myynest];
+      leftv h=&iiRETURNEXPR;
       if (((ring)h->data)->idroot!=NULL)
         killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
     }
-    else if (/*iiRETURNEXPR[myynest].Typ()*/ t==LIST_CMD)
+    else if (/*iiRETURNEXPR.Typ()*/ t==LIST_CMD)
     {
-      leftv h=&iiRETURNEXPR[myynest];
+      leftv h=&iiRETURNEXPR;
       changed |=killlocals_list(v,(lists)h->data);
     }
   }
@@ -892,8 +892,9 @@ BOOLEAN jjBETTI(leftv res, leftv u)
   memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=INT_CMD;
   tmp.data=(void *)1;
-  if ((u->Typ()==IDEAL_CMD)
-  || (u->Typ()==MODUL_CMD))
+  int t=u->Typ();
+  if ((/*u->Typ()*/ t==IDEAL_CMD)
+  || (/*u->Typ()*/ t==MODUL_CMD))
     return jjBETTI2_ID(res,u,&tmp);
   else
     return jjBETTI2(res,u,&tmp);
@@ -5410,10 +5411,10 @@ void rKill(ring r)
       {
         sLastPrinted.CleanUp();
       }
-      if ((myynest>0) && (iiRETURNEXPR[myynest].RingDependend()))
+      if ((myynest>0) && (iiRETURNEXPR.RingDependend()))
       {
         WerrorS("return value depends on local ring variable (export missing ?)");
-        iiRETURNEXPR[myynest].CleanUp();
+        iiRETURNEXPR.CleanUp();
       }
       currRing=NULL;
       currRingHdl=NULL;

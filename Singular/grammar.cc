@@ -4025,8 +4025,7 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 1596 "grammar.y"
     {
-            if(iiRETURNEXPR==NULL) YYERROR;
-            iiRETURNEXPR[myynest].Copy(&(yyvsp[(3) - (4)].lv));
+            iiRETURNEXPR.Copy(&(yyvsp[(3) - (4)].lv));
             (yyvsp[(3) - (4)].lv).CleanUp();
             if (exitBuffer(BT_proc)) YYERROR;
           ;}
@@ -4039,9 +4038,8 @@ yyreduce:
     {
             if ((yyvsp[(1) - (3)].i)==RETURN)
             {
-              if(iiRETURNEXPR==NULL) YYERROR;
-              iiRETURNEXPR[myynest].Init();
-              iiRETURNEXPR[myynest].rtyp=NONE;
+              iiRETURNEXPR.Init();
+              iiRETURNEXPR.rtyp=NONE;
               if (exitBuffer(BT_proc)) YYERROR;
             }
           ;}

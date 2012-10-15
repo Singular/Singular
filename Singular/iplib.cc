@@ -436,7 +436,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
 #ifdef USE_IILOCALRING
 ring    *iiLocalRing;
 #endif
-sleftv  *iiRETURNEXPR;
+sleftv  iiRETURNEXPR;
 int     iiRETURNEXPR_len=0;
 
 #ifdef RDEBUG
@@ -473,11 +473,6 @@ static void iiCheckNest()
 {
   if (myynest >= iiRETURNEXPR_len-1)
   {
-    iiRETURNEXPR=(sleftv *)omreallocSize(iiRETURNEXPR,
-                                   iiRETURNEXPR_len*sizeof(sleftv),
-                                   (iiRETURNEXPR_len+16)*sizeof(sleftv));
-    omMarkAsStaticAddr(iiRETURNEXPR);
-    memset(&(iiRETURNEXPR[iiRETURNEXPR_len]),0,16*sizeof(sleftv));
 #ifdef USE_IILOCALRING
     iiLocalRing=(ring *)omreallocSize(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),
@@ -502,7 +497,6 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
   iiLocalRing[myynest]=currRing;
   //Print("currRing(%d):%s(%x) in %s\n",myynest,IDID(currRingHdl),currRing,IDID(pn));
 #endif
-  iiRETURNEXPR[myynest+1].Init();
   procstack->push(pi->procname);
   if ((traceit&TRACE_SHOW_PROC)
   || (pi->trace_flag&TRACE_SHOW_PROC))
@@ -541,7 +535,7 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
     case LANG_C:
                  leftv res = (leftv)omAlloc0Bin(sleftv_bin);
                  err = (pi->data.o.function)(res, sl);
-                 iiRETURNEXPR[myynest+1].Copy(res);
+                 iiRETURNEXPR.Copy(res);
                  omFreeBin((ADDRESS)res,  sleftv_bin);
                  break;
   }
@@ -559,8 +553,8 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
 #endif
   if (err)
   {
-    iiRETURNEXPR[myynest+1].CleanUp();
-    //iiRETURNEXPR[myynest+1].Init(); //done by CleanUp
+    iiRETURNEXPR.CleanUp();
+    //iiRETURNEXPR.Init(); //done by CleanUp
   }
 #ifdef USE_IILOCALRING
 #if 0
@@ -570,10 +564,10 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
   {
     if (currRing!=NULL)
     {
-      if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
-        && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
-      || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
-        && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
+      if (((iiRETURNEXPR.Typ()>BEGIN_RING)
+        && (iiRETURNEXPR.Typ()<END_RING))
+      || ((iiRETURNEXPR.Typ()==LIST_CMD)
+        && (lRingDependend((lists)iiRETURNEXPR.Data()))))
       {
         //idhdl hn;
         const char *n;
@@ -588,7 +582,7 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
         if (nh!=NULL)          n=nh->id;
         else                   n="none";
         Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
-        iiRETURNEXPR[myynest+1].CleanUp();
+        iiRETURNEXPR.CleanUp();
         err=TRUE;
       }
     }
@@ -613,10 +607,10 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
     //if (currRingHdl!=NULL)
     //Print(" curr:%s\n",IDID(currRingHdl));
     //Print("pr:%x, curr: %x\n",procstack->cRing,currRing);
-    if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
-      && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
-    || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
-      && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
+    if (((iiRETURNEXPR.Typ()>BEGIN_RING)
+      && (iiRETURNEXPR.Typ()<END_RING))
+    || ((iiRETURNEXPR.Typ()==LIST_CMD)
+      && (lRingDependend((lists)iiRETURNEXPR.Data()))))
     {
       //idhdl hn;
       char *n;
@@ -641,7 +635,7 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
       if (currRing==NULL)
       {
         Werror("ring change during procedure call: %s -> %s",o,n);
-        iiRETURNEXPR[myynest+1].CleanUp();
+        iiRETURNEXPR.CleanUp();
         err=TRUE;
       }
     }
@@ -663,7 +657,7 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
   procstack->pop();
   if (err)
     return NULL;
-  return &iiRETURNEXPR[myynest+1];
+  return &iiRETURNEXPR;
 }
 
 /*2
@@ -686,7 +680,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     printf("entering example (level %d)\n",myynest);
   }
   myynest++;
-  iiRETURNEXPR[myynest].Init();
 
   err=iiAllStart(pi,example,BT_example,(pi != NULL ? pi->data.s.example_lineno: 0));
 
