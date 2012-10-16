@@ -8541,12 +8541,15 @@ void kDebugPrint(kStrategy strat)
     else if (currRing->pFDeg==p_Deg) PrintS("p_Deg");
     else if (currRing->pFDeg==kHomModDeg) PrintS("kHomModDeg");
     else if (currRing->pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
+    else if (currRing->pFDeg==p_WTotaldegree) PrintS("p_WTotaldegree");
     else Print("? (%lx)", (long)currRing->pFDeg);
     PrintLn();
     Print(" syzring:%d, syzComp(strat):%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
-
+    #ifndef NDEBUG
+    rDebugPrint(currRing);
+    #endif
 }
 
 
