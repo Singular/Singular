@@ -3233,7 +3233,6 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int an = 0;
   int en = length;
   int cmp_int = pOrdSgn;
-  int pc=pGetComp(p);
   if ((currRing->MixedOrder)
 #ifdef HAVE_PLURAL
   && (currRing->real_var_start==0)
@@ -6769,6 +6768,7 @@ void kDebugPrint(kStrategy strat)
     else if (pFDeg==kHomModDeg) PrintS("kHomModDeg");
     else if (pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
     else if (pFDeg==kModDeg) PrintS("kModDeg");
+    else if (pFDeg==pWTotaldegree) PrintS("pWTotaldegree");
     else Print("? (%lx)", (long)pFDeg);
   PrintS(" / currRing->FDeg: ");
     if (currRing->pFDeg==p_Totaldegree) PrintS("p_Totaldegree");
@@ -6777,12 +6777,15 @@ void kDebugPrint(kStrategy strat)
     else if (currRing->pFDeg==kHomModDeg) PrintS("kHomModDeg");
     else if (currRing->pFDeg==totaldegreeWecart) PrintS("totaldegreeWecart");
     else if (currRing->pFDeg==kModDeg) PrintS("kModDeg");
+    else if (currRing->pFDeg==pWTotaldegree) PrintS("pWTotaldegree");
     else Print("? (%lx)", (long)currRing->pFDeg);
     PrintLn();
   Print(" syzring:%d, syzComb:%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
-
+    #ifndef NDEBUG
+    rDebugPrint(currRing);
+    #endif
 }
 
 
