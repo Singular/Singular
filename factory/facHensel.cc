@@ -541,6 +541,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
     setReduce (alpha, true);
   }
 
+  setReduce (alpha, false);
   for (k= 0; k < factors.length(); k++)
   {
     if (!mipoHasDen)
@@ -551,6 +552,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       bufFactors [k]= replacevar (bufFactors[k], alpha, beta);
     }
   }
+  setReduce (alpha, true);
   setCharacteristic(0);
 
   CFListIterator j= L;
@@ -588,7 +590,9 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       i.getItem()= replacevar (i.getItem(), alpha, gamma);
   }
   setCharacteristic (p);
+  setReduce (alpha, false);
   recResult= mapinto (recResult);
+  setReduce (alpha, true);
   if (mipoHasDen)
   {
     for (CFListIterator i= recResult; i.hasItem(); i++)
@@ -603,7 +607,15 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   {
     coeffE= div (e, modulus);
     setCharacteristic (p);
+    if (mipoHasDen)
+      setReduce (gamma, false);
+    else
+      setReduce (alpha, false);
     coeffE= coeffE.mapinto();
+    if (mipoHasDen)
+      setReduce (gamma, true);
+    else
+      setReduce (alpha, true);
     if (mipoHasDen)
       coeffE= replacevar (coeffE, gamma, beta);
     setCharacteristic (0);
@@ -616,14 +628,18 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
+        setReduce (alpha, false);
         g= mulNTL (coeffE, j.getItem());
         g= modNTL (g, bufFactors[ii]);
+        setReduce (alpha, true);
         setCharacteristic (0);
         if (mipoHasDen)
         {
+          setReduce (beta, false);
           k.getItem() += replacevar (g.mapinto()*modulus, beta, gamma);
           e -= mulNTL (replacevar (g.mapinto(), beta, gamma)*modulus,
                                    l.getItem(), b);
+          setReduce (beta, true);
         }
         else
         {
