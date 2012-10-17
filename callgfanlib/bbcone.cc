@@ -37,11 +37,11 @@ number integerToNumber(const gfan::Integer &I)
 bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
 {
   int d=zv.size();
-  bigintmat* bim = new bigintmat(d,1);
+  bigintmat* bim = new bigintmat(1,d);
   for(int i=1;i<=d;i++)
   {
     number temp = integerToNumber(zv[i-1]); 
-    bim->set(i,1,temp);
+    bim->set(1,i,temp);
     nlDelete(&temp,NULL);
   }
   return bim;
@@ -89,10 +89,10 @@ gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim)
 
 gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
 {
-  gfan::ZVector* zv=new gfan::ZVector(bim.rows());
-  for(int j=0; j<bim.rows(); j++)
+  gfan::ZVector* zv=new gfan::ZVector(bim.cols());
+  for(int j=0; j<bim.cols(); j++)
   {
-    number temp = BIMATELEM(bim, j+1, 1);
+    number temp = BIMATELEM(bim, 1, j+1);
     gfan::Integer* gi = numberToInteger(temp);
     (*zv)[j] = *gi;
     nlDelete(&temp,NULL);
@@ -1375,6 +1375,7 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       }
       else
         iv = (bigintmat*)v->Data();
+      
       gfan::ZVector* zv = bigintmatToZVector(iv);
       int d1 = zc->ambientDimension();
       int d2 = zv->size();
@@ -1384,9 +1385,9 @@ BOOLEAN containsInSupport(leftv res, leftv args)
                " dimensions %d and %d", d1, d2);
         return TRUE;
       }
-      bool b = (zc->contains(*zv) ? 1 : 0);
+      int b = (zc->contains(*zv) ? 1 : 0);
       res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
+      res->data = (char*) b;
 
       delete zv;
       if (v->Typ() == INTMAT_CMD)
