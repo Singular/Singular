@@ -405,7 +405,7 @@ number ssiReadBigInt(ssiInfo *d)
    }
 }
 
-number ssiReadQNumber(ssiInfo *d)
+static number ssiReadQNumber(ssiInfo *d)
 {
   int sub_type=-1;
   sub_type=s_readint(d->f_read);
