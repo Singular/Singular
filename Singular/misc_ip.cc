@@ -741,7 +741,7 @@ char * showOption()
     {
       for (i=0; optionStruct[i].setval!=0; i++)
       {
-        if (optionStruct[i].setval & test)
+        if (optionStruct[i].setval & tmp)
         {
           StringAppend(" %s",optionStruct[i].name);
           tmp &=optionStruct[i].resetval;

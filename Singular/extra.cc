@@ -413,24 +413,24 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             TEST_FOR("readline")
           #endif
           #ifdef TEST_MAC_ORDER
-            TEST_FOR("MAC_ORDER");
+            TEST_FOR("MAC_ORDER")
           #endif
           // unconditional since 3-1-0-6
-            TEST_FOR("Namespaces");
+            TEST_FOR("Namespaces")
           #ifdef HAVE_DYNAMIC_LOADING
-            TEST_FOR("DynamicLoading");
+            TEST_FOR("DynamicLoading")
           #endif
           #ifdef HAVE_EIGENVAL
-            TEST_FOR("eigenval");
+            TEST_FOR("eigenval")
           #endif
           #ifdef HAVE_GMS
-            TEST_FOR("gms");
+            TEST_FOR("gms")
           #endif
           #ifdef OM_NDEBUG
-            TEST_FOR("om_ndebug");
+            TEST_FOR("om_ndebug")
           #endif
           #ifdef NDEBUG
-            TEST_FOR("ndebug");
+            TEST_FOR("ndebug")
           #endif
             ;
           return FALSE;

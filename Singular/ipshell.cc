@@ -406,9 +406,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
   idhdl h,start;
   BOOLEAN all = typ<0;
   BOOLEAN really_all=FALSE;
-  BOOLEAN do_packages=FALSE;
 
-  if ( typ == -1 ) do_packages=TRUE;
   if ( typ==0 )
   {
     if (strcmp(what,"all")==0)

@@ -2553,14 +2553,12 @@ static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
-  BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   ideal m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,
                    hasFlag(u,FLAG_STD));
   if (m==NULL) return TRUE;
   res->data = (char *)idModule2formatedMatrix(m,ul,vl);
-  test=save_test;
   return FALSE;
 }
 static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
@@ -6402,7 +6400,6 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 {
   if (w->rtyp!=IDHDL) return TRUE;
-  BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   ideal m
@@ -6410,7 +6407,6 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
   if (m==NULL) return TRUE;
   res->data = (char *)idModule2formatedMatrix(m,ul,vl);
-  test=save_test;
   return FALSE;
 }
 static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
@@ -7628,7 +7624,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   {
     i0=idInit(1,i1->rank);
     i0->m[0]=(poly)v->Data();
-    BOOLEAN cleanup_i0=TRUE;
+    cleanup_i0=TRUE;
   }
   else if (r==IDEAL_CMD)/* IDEAL */
   {

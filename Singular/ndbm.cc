@@ -56,7 +56,6 @@ static  int getbit(register DBM *db);
 static  void setbit(register DBM *db);
 static  datum makdatum(char buf[PBLKSIZ], int n);
 static  int finddatum(char buf[PBLKSIZ], datum item);
-static  long hashinc(register DBM *db, long hash);
 static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
@@ -442,23 +441,6 @@ static  long hltab[64]
         01736635071L,06243505026L,03637211610L,01756474365L,
         04723077174L,03642763134L,05750130273L,03655541561L,
 };
-
-static long hashinc(register DBM *db, long hash)
-{
-  long bit;
-
-  hash &= db->dbm_hmask;
-  bit = db->dbm_hmask+1;
-  for (;;)
-  {
-    bit >>= 1;
-    if (bit == 0)
-      return (0L);
-    if ((hash & bit) == 0)
-      return (hash | bit);
-    hash &= ~bit;
-  }
-}
 
 static long dcalchash(datum item)
 {

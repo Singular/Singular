@@ -1346,10 +1346,8 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
     else
     #endif
     {
-      BITSET save=test;
       test &= ~Sy_bit(OPT_INTSTRATEGY);
       p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
-      test=save;
     }
   }
   /*- release temp data------------------------------- -*/
@@ -1402,7 +1400,6 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),si_max(q->rank,F->rank));
-  BITSET save=test;
   test &= ~Sy_bit(OPT_INTSTRATEGY);
   for (i=IDELEMS(q)-1; i>=0; i--)
   {
@@ -1430,7 +1427,6 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
-  test=save;
   omfree(strat->sevS);
   omfree(strat->ecartS);
   omfree(strat->T);
