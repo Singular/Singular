@@ -36,6 +36,7 @@
 #include <kernel/longrat.h>
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>
+#include <kernel/bigintmat.h>
 #include <kernel/options.h>
 #include <kernel/timer.h>
 #include <Singular/subexpr.h>
@@ -57,7 +58,7 @@
 //#define HAVE_PSELECT
 //#endif
 
-#define SSI_VERSION 4
+#define SSI_VERSION 5
 
 typedef struct
 {
@@ -349,6 +350,18 @@ void ssiWriteIntmat(ssiInfo *d,intvec * v)
   SSI_UNBLOCK_CHLD;
 }
 
+void ssiWriteBigintmat(ssiInfo *d,bigintmat * v)
+{
+  SSI_BLOCK_CHLD;
+  fprintf(d->f_write,"%d %d ",v->rows(),v->cols());
+  int i;
+  for(i=0;i<v->length();i++)
+  {
+    ssiWriteBigInt(d,(*v)[i]);
+  }
+  SSI_UNBLOCK_CHLD;
+}
+
 char *ssiReadString(ssiInfo *d)
 {
   char *buf;
@@ -392,14 +405,12 @@ number ssiReadBigInt(ssiInfo *d)
    }
 }
 
-number ssiReadNumber(ssiInfo *d)
+number ssiReadQNumber(ssiInfo *d)
 {
-  if (rField_is_Q(d->r))
+  int sub_type=-1;
+  sub_type=s_readint(d->f_read);
+  switch(sub_type)
   {
-     int sub_type=-1;
-     sub_type=s_readint(d->f_read);
-     switch(sub_type)
-     {
      case 0:
      case 1:
        {// read mpz_t, mpz_t
@@ -444,7 +455,14 @@ number ssiReadNumber(ssiInfo *d)
 
      default: Werror("error in reading number: invalid subtype %d",sub_type);
               return NULL;
-     }
+  }
+  return NULL;
+}
+number ssiReadNumber(ssiInfo *d)
+{
+  if (rField_is_Q(d->r))
+  {
+     return ssiReadQNumber(d);
   }
   else if (rField_is_Zp(d->r))
   {
@@ -666,6 +684,18 @@ intvec* ssiReadIntmat(ssiInfo *d)
   for(int i=0;i<r*c;i++)
   {
     (*v)[i]=s_readint(d->f_read);
+  }
+  return v;
+}
+bigintmat* ssiReadBigintmat(ssiInfo *d)
+{
+  int r,c;
+  r=s_readint(d->f_read);
+  c=s_readint(d->f_read);
+  bigintmat *v=new bigintmat(r,c);
+  for(int i=0;i<r*c;i++)
+  {
+    (*v)[i]=ssiReadBigInt(d);
   }
   return v;
 }
@@ -1224,6 +1254,9 @@ leftv ssiRead1(si_link l)
     case 18: res->rtyp=INTMAT_CMD;
              res->data=ssiReadIntmat(d);
              break;
+    case 19: res->rtyp=BIGINTMAT_CMD;
+             res->data=ssiReadBigintmat(d);
+	     break;
     case 20: ssiReadBlackbox(res,l);
              break;
     // ------------
@@ -1353,6 +1386,10 @@ BOOLEAN ssiWrite(si_link l, leftv data)
           case INTMAT_CMD:
                    fputs("18 ",d->f_write);
                    ssiWriteIntmat(d,(intvec *)dd);
+                   break;
+          case BIGINTMAT_CMD:
+                   fputs("19 ",d->f_write);
+                   ssiWriteBigintmat(d,(bigintmat *)dd);
                    break;
           default:
             if (tt>MAX_TOK)
@@ -2003,6 +2040,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 16 nothing
 // 17 intvec <len> ...
 // 18 intmat
+// 19 bigintmat <r> <c> ...
 //
 // 20 blackbox <name> ...
 //
