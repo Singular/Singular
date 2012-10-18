@@ -236,8 +236,13 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
             }
           }
           else
-#endif
+            result += power( x, i.exp() ) * Farey(c,q);
+#else
+          if (c.inZ())
             result += power( x, i.exp() ) * Farey_n(c,q);
+          else
+            result += power( x, i.exp() ) * Farey(c,q);
+#endif
         }
         else
           result += power( x, i.exp() ) * Farey(c,q);
