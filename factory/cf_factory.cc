@@ -24,7 +24,7 @@ CFFactory::settype ( int type )
 }
 
 InternalCF *
-CFFactory::basic ( int value )
+CFFactory::basic ( long value )
 {
     if ( currenttype == IntegerDomain )
         if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
@@ -49,7 +49,7 @@ CFFactory::basic ( int value )
 }
 
 InternalCF *
-CFFactory::basic ( int type, int value )
+CFFactory::basic ( int type, long value )
 {
     if ( type == IntegerDomain )
         if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
@@ -203,7 +203,7 @@ CFFactory::basic ( int type, const char * const str )
 }
 
 InternalCF *
-CFFactory::basic ( int type, int value, bool nonimm )
+CFFactory::basic ( int type, long value, bool nonimm )
 {
     if ( nonimm )
         if ( type == IntegerDomain )
@@ -230,7 +230,7 @@ CFFactory::basic ( const mpz_ptr num )
 }
 
 InternalCF *
-CFFactory::rational ( int num, int den )
+CFFactory::rational ( long num, long den )
 {
     InternalRational * res = new InternalRational( num, den );
     return res->normalize_myself();

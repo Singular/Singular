@@ -28,6 +28,22 @@ static int intgcd( int a, int b )
     return a;
 }
 
+static long intgcd( long a, long b )
+{
+    if ( a < 0 ) a = -a;
+    if ( b < 0 ) b = -b;
+
+    long c;
+
+    while ( b != 0 )
+    {
+        c = a % b;
+        a = b;
+        b = c;
+    }
+    return a;
+}
+
 
 InternalRational::InternalRational()
 {
@@ -52,6 +68,36 @@ InternalRational::InternalRational( const int n, const int d )
     else
     {
         int g = intgcd( n, d );
+        if ( d < 0 )
+        {
+          mpz_init_set_si( _num, -n / g );
+          mpz_init_set_si( _den, -d / g );
+        }
+        else
+        {
+          mpz_init_set_si( _num, n / g );
+          mpz_init_set_si( _den, d / g );
+        }
+    }
+}
+
+InternalRational::InternalRational( const long i )
+{
+    mpz_init_set_si( _num, i );
+    mpz_init_set_si( _den, 1 );
+}
+
+InternalRational::InternalRational( const long n, const long d )
+{
+    ASSERT( d != 0, "divide by zero" );
+    if ( n == 0 )
+    {
+        mpz_init_set_si( _num, 0 );
+        mpz_init_set_si( _den, 1 );
+    }
+    else
+    {
+        long g = intgcd( n, d );
         if ( d < 0 )
         {
           mpz_init_set_si( _num, -n / g );
@@ -377,7 +423,7 @@ InternalCF* InternalRational::dividesame( InternalCF * c )
     if ( this == c )
     {
         if ( deleteObject() ) delete this;
-        return CFFactory::basic( 1 );
+        return CFFactory::basic( 1L );
     }
     else
     {
@@ -448,14 +494,14 @@ InternalCF* InternalRational::modulosame( InternalCF * c )
 InternalCF* InternalRational::modsame( InternalCF * )
 {
     if ( deleteObject() ) delete this;
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 
 void InternalRational::divremsame( InternalCF * c, InternalCF*& quot, InternalCF*& rem )
 {
     quot = copyObject();
     quot = quot->dividesame( c );
-    rem = CFFactory::basic( 0 );
+    rem = CFFactory::basic( 0L );
 }
 
 bool InternalRational::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF*& rem )
@@ -527,7 +573,7 @@ InternalCF* InternalRational::addcoeff( InternalCF* c )
     mpz_t n, d;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         if ( cc == 0 )
             return this;
         else
@@ -564,7 +610,7 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
     mpz_t n, d;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         if ( cc == 0 )
         {
             if ( negate )
@@ -621,11 +667,11 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
     mpz_t n, d, g;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         if ( cc == 0 )
         {
             if ( deleteObject() ) delete this;
-            return CFFactory::basic( 0 );
+            return CFFactory::basic( 0L );
         }
         mpz_init_set_si( n, cc );
     }
@@ -674,13 +720,13 @@ InternalCF* InternalRational::dividecoeff( InternalCF* c, bool invert )
     mpz_t n, d, g;
     if ( ::is_imm( c ) )
     {
-        int cc = imm2int( c );
+        long cc = imm2int( c );
         ASSERT( c != 0 || invert, "divide by zero" );
         if ( cc == 0 )
         {
             // => invert
             if ( deleteObject() ) delete this;
-            return CFFactory::basic( 0 );
+            return CFFactory::basic( 0L );
         }
         if ( invert )
         {
@@ -763,14 +809,14 @@ InternalCF* InternalRational::modcoeff( InternalCF* c, bool invert )
     ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "integer expected" );
     ASSERT( invert || ! ::is_imm( c ) || imm2int( c ) != 0, "divide by zero" );
     if ( deleteObject() ) delete this;
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 
 void InternalRational::divremcoeff( InternalCF* c, InternalCF*& quot, InternalCF*& rem, bool invert )
 {
     quot = copyObject();
     quot = quot->dividecoeff( c, invert );
-    rem = CFFactory::basic( 0 );
+    rem = CFFactory::basic( 0L );
 }
 
 bool InternalRational::divremcoefft( InternalCF* c, InternalCF*& quot, InternalCF*& rem, bool invert )
@@ -850,10 +896,12 @@ InternalCF * InternalRational::normalize_myself()
 }
 
 
-int InternalRational::intval() const
+long InternalRational::intval() const
 {
+
     ASSERT( mpz_cmp_si( _den, 1 ) == 0, "illegal operation" );
-    return (int)mpz_get_si( _num );
+    return mpz_get_si( _num );
+
 }
 
 //{{{ int InternalRational::sign () const

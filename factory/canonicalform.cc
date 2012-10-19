@@ -216,7 +216,7 @@ CanonicalForm::isHomogeneous() const
 //}}}
 
 //{{{ conversion functions
-int
+long
 CanonicalForm::intval() const
 {
     if ( is_imm( value ) )
@@ -1302,17 +1302,17 @@ CanonicalForm::sqrt () const
 {
     if ( is_imm( value ) ) {
         ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
-        int n = imm2int( value );
+        long n = imm2int( value );
         ASSERT( n >= 0, "arg to sqrt() less than zero" );
         if ( n == 0 || n == 1 )
             return CanonicalForm( n );
         else {
-            int x, y = n;
+            long x, y = n;
             do {
                 x = y;
                 // the intermediate result may not fit into an
                 // integer, but the result does
-                y = (unsigned int)(x + n/x)/2;
+                y = (unsigned long)(x + n/x)/2;
             } while ( y < x );
             return CanonicalForm( x );
         }
@@ -1339,7 +1339,7 @@ CanonicalForm::ilog2 () const
     if ( is_imm( value ) )
     {
         ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
-        int a = imm2int( value );
+        long a = imm2int( value );
         ASSERT( a > 0, "arg to ilog2() less or equal zero" );
         int n = -1;
         while ( a > 0 )
@@ -1583,15 +1583,15 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
         {
             // calculate gcd using standard integer
             // arithmetic
-            int fInt = imm2int( f.value );
-            int gInt = imm2int( g.value );
+            long fInt = imm2int( f.value );
+            long gInt = imm2int( g.value );
 
             if ( fInt < 0 ) fInt = -fInt;
             if ( gInt < 0 ) gInt = -gInt;
             // swap fInt and gInt
             if ( gInt > fInt )
             {
-                int swap = gInt;
+                long swap = gInt;
                 gInt = fInt;
                 fInt = swap;
             }
@@ -1600,7 +1600,7 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
             while ( gInt )
             {
                 // calculate (fInt, gInt) = (gInt, fInt%gInt)
-                int r = fInt % gInt;
+                long r = fInt % gInt;
                 fInt = gInt;
                 gInt = r;
             }
@@ -1657,8 +1657,8 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
         else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
             // calculate extended gcd using standard integer
             // arithmetic
-            int fInt = imm2int( f.value );
-            int gInt = imm2int( g.value );
+            long fInt = imm2int( f.value );
+            long gInt = imm2int( g.value );
 
             // to avoid any system dpendencies with `%', we work
             // with positive numbers only.  To a pity, we have to
@@ -1667,13 +1667,13 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
             if ( gInt < 0 ) gInt = -gInt;
             // swap fInt and gInt
             if ( gInt > fInt ) {
-                int swap = gInt;
+                long swap = gInt;
                 gInt = fInt;
                 fInt = swap;
             }
 
-            int u = 1; int v = 0;
-            int uNext = 0; int vNext = 1;
+            long u = 1; long v = 0;
+            long uNext = 0; long vNext = 1;
 
             // at any step, we have:
             // fInt_0 * u + gInt_0 * v = fInt
@@ -1681,10 +1681,10 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
             // where fInt_0 and gInt_0 denote the values of fint
             // and gInt, resp., at the beginning
             while ( gInt ) {
-                int r = fInt % gInt;
-                int q = fInt / gInt;
-                int uSwap = u - q * uNext;
-                int vSwap = v - q * vNext;
+                long r = fInt % gInt;
+                long q = fInt / gInt;
+                long uSwap = u - q * uNext;
+                long vSwap = v - q * vNext;
 
                 // update variables
                 fInt = gInt;
@@ -1694,8 +1694,8 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
             }
 
             // now, assign to a and b
-            int fTest = imm2int( f.value );
-            int gTest = imm2int( g.value );
+            long fTest = imm2int( f.value );
+            long gTest = imm2int( g.value );
             if ( gTest > fTest ) {
                 a = v; b = u;
             } else {
@@ -1803,11 +1803,11 @@ CanonicalForm::genZero() const
 {
     int what = is_imm( value );
     if ( what == FFMARK )
-        return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 0 ) );
+        return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 0L ) );
     else  if ( what == GFMARK )
-        return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 0 ) );
+        return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 0L ) );
     else  if ( what )
-        return CanonicalForm( CFFactory::basic( IntegerDomain, 0 ) );
+        return CanonicalForm( CFFactory::basic( IntegerDomain, 0L ) );
     else
         return CanonicalForm( value->genZero() );
 }
@@ -1817,11 +1817,11 @@ CanonicalForm::genOne() const
 {
     int what = is_imm( value );
     if ( what == FFMARK )
-        return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 1 ) );
+        return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 1L ) );
     else  if ( what == GFMARK )
-        return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 1 ) );
+        return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 1L ) );
     else  if ( what )
-        return CanonicalForm( CFFactory::basic( IntegerDomain, 1 ) );
+        return CanonicalForm( CFFactory::basic( IntegerDomain, 1L ) );
     else
         return CanonicalForm( value->genOne() );
 }

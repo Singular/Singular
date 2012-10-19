@@ -7,7 +7,7 @@
   // first factor is a constant.
   poly g = (y4+x8)*(x2+y2);
   factorize(g);
-  // The same in charcteristic 2:
+  // The same in characteristic 2:
   ring r =2,(x,y),dp;
   poly g = (y4+x8)*(x2+y2);
   factorize(g);

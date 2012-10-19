@@ -39,6 +39,8 @@ public:
     }
     InternalRational( const int i );
     InternalRational( const int n, const int d );
+    InternalRational( const long i );
+    InternalRational( const long n, const long d );
     InternalRational( const char * str );
     InternalRational( const mpz_ptr );
     InternalRational( const mpz_ptr , const mpz_ptr );
@@ -89,7 +91,7 @@ public:
     InternalCF * bextgcdsame ( InternalCF *, CanonicalForm &, CanonicalForm & );
     InternalCF * bextgcdcoeff ( InternalCF *, CanonicalForm &, CanonicalForm & );
 
-    int intval() const;
+    long intval() const;
 
     int sign() const;
 

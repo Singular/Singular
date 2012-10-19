@@ -242,7 +242,7 @@ InternalCF* InternalPrimePower::divsame( InternalCF * c )
 {
     if ( c == this ) {
         if ( deleteObject() ) delete this;
-        return CFFactory::basic( 1 );
+        return CFFactory::basic( 1L );
     }
     if ( getRefCount() > 1 ) {
         decRefCount();
@@ -275,22 +275,22 @@ InternalCF *
 InternalPrimePower::modulosame ( InternalCF * )
 {
     if ( deleteObject() ) delete this;
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 
 InternalCF *
 InternalPrimePower::modsame ( InternalCF * )
 {
     if ( deleteObject() ) delete this;
-    return CFFactory::basic( 0 );
+    return CFFactory::basic( 0L );
 }
 
 void
 InternalPrimePower::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
 {
     if ( c == this ) {
-        quot = CFFactory::basic( 1 );
-        rem = CFFactory::basic( 0 );
+        quot = CFFactory::basic( 1L );
+        rem = CFFactory::basic( 0L );
     }
     else {
         mpz_t dummy, a, b;
@@ -303,7 +303,7 @@ InternalPrimePower::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF
         mpz_mul( b, b, thempi );
         mpz_mod( b, b, primepow );
         quot = new InternalPrimePower( b );
-        rem = CFFactory::basic( 0 );
+        rem = CFFactory::basic( 0L );
     }
 }
 
@@ -393,10 +393,10 @@ InternalPrimePower::divremcoefft ( InternalCF *, InternalCF * &, InternalCF * &,
     return true;
 }
 
-int
+long
 InternalPrimePower::intval () const
 {
-  return (int)mpz_get_si( thempi );
+  return mpz_get_si( thempi );
 }
 
 int

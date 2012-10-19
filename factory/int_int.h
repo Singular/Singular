@@ -64,6 +64,7 @@ public:
         ASSERT( 0, "ups there is something wrong in your code" );
     }
     InternalInteger( const int i );
+    InternalInteger( const long i );
     InternalInteger( const char * str, const int base=10 );
     InternalInteger( const mpz_ptr );
     ~InternalInteger();
@@ -110,7 +111,7 @@ public:
     InternalCF * bextgcdsame ( InternalCF *, CanonicalForm &, CanonicalForm & );
     InternalCF * bextgcdcoeff ( InternalCF *, CanonicalForm &, CanonicalForm & );
 
-    int intval() const;
+    long intval() const;
 
     int intmod( int p ) const;
 
