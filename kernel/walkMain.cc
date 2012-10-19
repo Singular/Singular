@@ -69,7 +69,6 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
   WalkState state=WalkOk;
   /* OLDRING **************************************************** */
   ideal nextG;
-  BITSET optionState;
 
   if (currwOnBorder64(G,currw64))
   {
@@ -112,10 +111,11 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
 
     nextG=(ideal)resMat;
 
-    optionState=test;
-    test|=Sy_bit(OPT_REDSB);
+    BITSET save1,save2;
+    SI_SAVE_OPT(save1,save2);
+    si_opt_1|=Sy_bit(OPT_REDSB);
     nextG = idInterRed(nextG);
-    test=optionState;
+    SI_RESTORE_OPT(save1,save2);
   }
   else
   {
@@ -144,9 +144,9 @@ WalkState firstWalkStep64(ideal & G,int64vec* currw64, ring destRing){
 //idInterRed, mStd, idCopy, idrMoveR
 ///////////////////////////////////////////////////////////////////
 
-WalkState walkStep64(ideal & G,int64vec* currw64, int step){
+WalkState walkStep64(ideal & G,int64vec* currw64, int step)
+{
   WalkState state=WalkOk;
-  BITSET optionState;
 
 /* OLDRING ****************************************************** */
   ideal Gw=init64(G,currw64);
@@ -195,10 +195,11 @@ WalkState walkStep64(ideal & G,int64vec* currw64, int step){
 
   nextG=(ideal)resMat;
 
-  optionState=test;
-  test|=Sy_bit(OPT_REDSB);
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
+  si_opt_1|=Sy_bit(OPT_REDSB);
   nextG = idInterRed(nextG);
-  test=optionState;
+  SI_RESTORE_OPT(save1,save2);
 
   G=nextG;
   return(state);
@@ -218,18 +219,19 @@ WalkState walkStep64(ideal & G,int64vec* currw64, int step){
 ///////////////////////////////////////////////////////////////////
 
 WalkState walk64(ideal I,int64vec* currw64,ring destRing,
-int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB){
-
+int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB)
+{
   //some initializations
   WalkState state=WalkOk;
-  BITSET optionState;
-  test|=Sy_bit(OPT_REDTAIL);
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
+
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
   overflow_error=FALSE;
   int step=0;
   ideal G=I;
 
-  optionState=test;
-  test|=Sy_bit(OPT_REDSB);
+  si_opt_1|=Sy_bit(OPT_REDSB);
   if(!sourceIsSB)
   {
     ideal GG=idStd(G);
@@ -237,25 +239,26 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB){
   }
   else
     G=idInterRed(G);
-  test=optionState;
+  SI_RESTORE_OPT(save1,save2);
 
   ideal nextG;
   state=firstWalkStep64(G,currw64,destRing);
   nextG=G;
 
-  if(overflow_error){
-      state=WalkOverFlowError;
+  if(overflow_error)
+  {
+    state=WalkOverFlowError;
     return(state);
-    }
+  }
 
-   int64 nexttvec0,nexttvec1;
-   //int64vec* nexttvec64=nextt64(nextG,currw64,destVec64);
-   nextt64(nextG,currw64,destVec64,nexttvec0,nexttvec1);
+  int64 nexttvec0,nexttvec1;
+  //int64vec* nexttvec64=nextt64(nextG,currw64,destVec64);
+  nextt64(nextG,currw64,destVec64,nexttvec0,nexttvec1);
 
   //while(0<t<=1) ( t=((*nexttvec64)[0])/((*nexttvec64)[1]) )
   //while( (*nexttvec64)[0]<=(*nexttvec64)[1] ) {
-  while (nexttvec0<=nexttvec1 ) {
-
+  while (nexttvec0<=nexttvec1 )
+  {
     step=step+1;
 
     //int64vec *tt=nextw64(currw64,destVec64,nexttvec64);
@@ -270,9 +273,8 @@ int64vec* destVec64,ideal  & destIdeal,BOOLEAN sourceIsSB){
     state=walkStep64(nextG,currw64,step);
     //uppdates nextG if all is OK
 
-    if(overflow_error){
+    if(overflow_error)
       return(WalkOverFlowError);
-    }
 
     //delete nexttvec64;
     //nexttvec64=nextt64(nextG,currw64,destVec64);
@@ -352,11 +354,13 @@ BOOLEAN unperturbedStartVectorStrategy){
 //mpMult, idInterRed, idStd, idCopy, idrMoveR,currwOnBorder64
 ///////////////////////////////////////////////////////////////////
 
-WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing){
+WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing)
+{
   WalkState state=WalkOk;
   /* OLDRING **************************************************** */
   ideal nextG;
-  BITSET optionState;
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
 
   if (currwOnBorder64(G,currw64))
   {
@@ -370,14 +374,13 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing){
     ideal newGw=idrMoveR(Gw, oldRing,rnew);
 
       //turn off bucket representation of polynomials and on redSB
-    optionState=test;
-    //test|=Sy_bit(OPT_NOT_BUCKETS);
-    test|=Sy_bit(OPT_REDSB);
+    //si_opt_1|=Sy_bit(OPT_NOT_BUCKETS);
+    si_opt_1|=Sy_bit(OPT_REDSB);
 
     ideal newStdGw=idStd(newGw);
 
-   //turn on bucket representation of polynomials and off redSB
-   test=optionState;
+    //turn on bucket representation of polynomials and off redSB
+    SI_RESTORE_OPT(save1,save2);
 
     matrix L=matIdLift(newGw,newStdGw);
     idDelete(&newStdGw);
@@ -393,10 +396,9 @@ WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing){
 
     nextG=(ideal)resMat;
 
-    optionState=test;
-    test|=Sy_bit(OPT_REDSB);
+    si_opt_1|=Sy_bit(OPT_REDSB);
     nextG = idInterRed(nextG);
-    test=optionState;
+    SI_RESTORE_OPT(save1,save2);
   }
   else
   {
@@ -435,7 +437,8 @@ WalkState fractalRec64(ideal  & G,int64vec* currw64, intvec* destMat,
 if (TEST_OPT_PROT)
 {  PrintS("fractal walk, weights");currw64->show();PrintLn(); }
 WalkState state=WalkOk;
-BITSET optionState=test;
+BITSET save1,save2;
+SI_SAVE_OPT(save1,save2);
 
 //1
 int64vec* w=(currw64);
@@ -529,9 +532,9 @@ while(1){
 
       newGw=idrMoveR(GwCp,oldRing,newring);
 
-      test|=Sy_bit(OPT_REDSB);
+      si_opt_1|=Sy_bit(OPT_REDSB);
       newStdGw=idStd(newGw); //computes new reduced GB of Gw
-      test=optionState;
+      SI_RESTORE_OPT(save1,save2);
     }
     else
     {
@@ -566,9 +569,9 @@ while(1){
     //no poly with more than two terms or after
     //fractalRec64(Gw,level+1) has returned
 
-    //test|=Sy_bit(OPT_NOT_BUCKETS);
+    //si_opt_1|=Sy_bit(OPT_NOT_BUCKETS);
     matrix L=matIdLift(newGw,newStdGw);
-    test=optionState;
+    SI_RESTORE_OPT(save1,save2);
 
     newG=idrMoveR(GCp,oldRing,currRing);
     matrix MG=(matrix)newG;
@@ -580,9 +583,9 @@ while(1){
 
 //9
 
-    test|=Sy_bit(OPT_REDSB);
+    si_opt_1|=Sy_bit(OPT_REDSB);
     G=idInterRed(G);
-    test=optionState;
+    SI_RESTORE_OPT(save1,save2);
 
     old_w=iv64Copy(w);
     if(level==1) step=step+1;
@@ -614,11 +617,12 @@ BOOLEAN unperturbedStartVectorStrategy)
 
   overflow_error=FALSE; //global
   WalkState state=WalkOk;
-  test|=Sy_bit(OPT_REDTAIL);
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
+
+  si_opt_1|= (Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
   ideal G;
 
-  BITSET optionState=test;
-  test|=Sy_bit(OPT_REDSB);
   if(!sourceIsSB)
   {
     G=idStd(sourceIdeal);
@@ -629,7 +633,7 @@ BOOLEAN unperturbedStartVectorStrategy)
     G=idInterRed(idCopy(sourceIdeal));
   }
 
-  test=optionState; //switches REDSB off
+  SI_RESTORE_OPT(save1,save2); //switches REDSB off
 
   //matrices for the orders of the rings
   intvec *destMat=int64VecToIntVec(rGetGlobalOrderMatrix(destRing));

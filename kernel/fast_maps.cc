@@ -66,7 +66,7 @@ static unsigned long maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_
   poly* max_map_monomials = (poly*) omAlloc(IDELEMS(map_id)*sizeof(poly));
   poly max_pi_i, max_map_i;
 
-  int i, j;
+  int i;
   for (i=0; i<IDELEMS(map_id); i++)
   {
     max_map_monomials[i] = p_GetMaxExpP(map_id->m[i], map_r);

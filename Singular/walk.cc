@@ -122,6 +122,7 @@ inline static int* initS_2_R (int maxnr)
   return (int*)omAlloc0(maxnr*sizeof(int));
 }
 
+#if 0 /*unused*/
 /*2
 *construct the set s from F u {P}
 */
@@ -272,6 +273,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
   }
 #endif
 }
+#endif
 
 /*2
 *interreduces F
@@ -350,6 +352,7 @@ static ideal kInterRedCC(ideal F, ideal Q)
   return shdl;
 }
 
+#if 0 /*unused*/
 static void TimeString(clock_t tinput, clock_t tostd, clock_t tif,clock_t tstd,
                        clock_t tlf,clock_t tred, clock_t tnw, int step)
 {
@@ -387,7 +390,9 @@ static void TimeString(clock_t tinput, clock_t tostd, clock_t tif,clock_t tstd,
         step, ostd, totm, mostd,mif,mstd,mlf,mred,mnw,mxif,mxstd,mxlf,mxred,mxnw,tot,res,
         ((((double) xtextra)/1000000)/totm)*100);
 }
+#endif
 
+#if 0 /*unused*/
 static void TimeStringFractal(clock_t tinput, clock_t tostd, clock_t tif,clock_t tstd,
                        clock_t textra, clock_t tlf,clock_t tred, clock_t tnw)
 {
@@ -414,6 +419,7 @@ static void TimeStringFractal(clock_t tinput, clock_t tostd, clock_t tif,clock_t
   Print("\n// &%.2f &%.2f&%.2f &%.2f &%.2f &%.2f &%.2f &%.2f &%.2f&%.2f&%.2f\\ \\ ",
         ostd,totm,mostd,mif,mstd,mextra,mlf,mred,mnw,tot,res);
 }
+#endif
 
 static void idString(ideal L, const char* st)
 {
@@ -426,6 +432,7 @@ static void idString(ideal L, const char* st)
   Print(" %s;", pString(L->m[nL-1]));
 }
 
+#if 0 /*unused*/
 static void headidString(ideal L, char* st)
 {
   int i, nL = IDELEMS(L);
@@ -436,7 +443,9 @@ static void headidString(ideal L, char* st)
 
   Print(" %s;", pString(pHead(L->m[nL-1])));
 }
+#endif
 
+#if 0 /*unused*/
 static void idElements(ideal L, char* st)
 {
   int i, nL = IDELEMS(L);
@@ -466,7 +475,7 @@ static void idElements(ideal L, char* st)
   }
   omFree(K);
 }
-
+#endif
 
 
 static void ivString(intvec* iv, const char* ch)
@@ -480,6 +489,7 @@ static void ivString(intvec* iv, const char* ch)
   Print("%d;", (*iv)[nV]);
 }
 
+#if 0 /*unused*/
 static void MivString(intvec* iva, intvec* ivb, intvec* ivc)
 {
   int nV = iva->length()-1;
@@ -497,7 +507,7 @@ static void MivString(intvec* iva, intvec* ivb, intvec* ivc)
     Print("%d, ", (*ivc)[i]);
   Print("%d)", (*ivc)[nV]);
 }
-
+#endif
 
 // returns gcd of integers a and b
 static inline long gcd(const long a, const long b)
@@ -533,6 +543,7 @@ static void cancel(mpz_t zaehler, mpz_t nenner)
   mpz_clear(g);
 }
 
+#if 0 /*unused*/
 /* 23.07.03 */
 static int isVectorNeg(intvec* omega)
 {
@@ -544,6 +555,7 @@ static int isVectorNeg(intvec* omega)
 
   return 0;
 }
+#endif
 
 /********************************************************************
  * compute a weight degree of a monomial p w.r.t. a weight_vector   *
@@ -825,10 +837,11 @@ int M3ivSame(intvec* temp, intvec* u , intvec* v)
 /* compute a Groebner basis of an ideal */
 static ideal MstdCC(ideal G)
 {
-  int save_test=test;
-  test|=(Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
+  si_opt_1|=(Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
   ideal G1 = kStd(G, NULL, testHomog, NULL);
-  test=save_test;
+  SI_RESTORE_OPT(save1,save2);
 
   idSkipZeroes(G1);
   return G1;
@@ -838,10 +851,11 @@ static ideal MstdCC(ideal G)
 /* compute a Groebner basis of a homogenoues ideal */
 static ideal MstdhomCC(ideal G)
 {
-  int save_test=test;
-  test|=(Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
+  BITSET save1,save2;
+  SI_SAVE_OPT(save1,save2);
+  si_opt_1|=(Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
   ideal G1 = kStd(G, NULL, isHomog, NULL);
-  test=save_test;
+  SI_RESTORE_OPT(save1,save2);
 
   idSkipZeroes(G1);
   return G1;
@@ -888,6 +902,7 @@ intvec* Mivlp(int nR)
 }
 
 /**** 28.10.02  print the max total degree and the max coefficient of G***/
+#if 0 /*unused*/
 static void checkComplexity(ideal G, char* cG)
 {
   int nV = currRing->N;
@@ -923,7 +938,7 @@ static void checkComplexity(ideal G, char* cG)
   Print(" which consists of %d digits", (int)strlen(pStr));
   PrintLn();
 }
-
+#endif
 
 
 /*****************************************************************************
@@ -1231,6 +1246,7 @@ intvec* MivWeightOrderdp(intvec* ivstart)
   return(ivM);
 }
 
+#if 0 /*unused*/
 static intvec* MatrixOrderdp(int nV)
 {
   int i;
@@ -1244,6 +1260,7 @@ static intvec* MatrixOrderdp(int nV)
 
   return(ivM);
 }
+#endif
 
 intvec* MivUnit(int nV)
 {
@@ -1463,6 +1480,7 @@ static ideal MLifttwoIdeal(ideal Gw, ideal M, ideal G)
 }
 
 
+#if 0 /*unused*/
 static void checkidealCC(ideal G, char* Ch)
 {
   int i,nmon=0,ntmp;
@@ -1484,7 +1502,9 @@ static void checkidealCC(ideal G, char* Ch)
   Print("//** %s besitzt %d Monome.", Ch, nmon);
   PrintLn();
 }
+#endif
 
+#if 0 /*unused*/
 static void HeadidString(ideal L, char* st)
 {
   int i, nL = IDELEMS(L)-1;
@@ -1495,6 +1515,7 @@ static void HeadidString(ideal L, char* st)
 
   Print(" %s;\n", pString(pHead(L->m[nL])));
 }
+#endif
 
 static inline int MivComp(intvec* iva, intvec* ivb)
 {
@@ -2103,6 +2124,7 @@ static void DefRingParlp(void)
   rChangeCurrRing(r);
 }
 
+#if 0 /*unused*/
 /* check wheather one or more components of a vector are zero */
 static int isNolVector(intvec* hilb)
 {
@@ -2113,6 +2135,7 @@ static int isNolVector(intvec* hilb)
 
   return 0;
 }
+#endif
 
 
 /******************************  Februar 2002  ****************************
@@ -2458,6 +2481,7 @@ static inline int test_G_GB_walk(ideal H0, ideal H1)
   return 1;
 }
 
+#if 0 /*unused*/
 /* 19.11.01 */
 /* find the maximal total degree of polynomials in G */
 static int Trandegreebound(ideal G)
@@ -2477,6 +2501,7 @@ static int Trandegreebound(ideal G)
   delete ivUnit;
   return result;
 }
+#endif
 
 /* perturb the weight vector iva w.r.t. the ideal G.
    the monomial order of the current ring is the w_1 weight lex. order.
@@ -2485,6 +2510,7 @@ static int Trandegreebound(ideal G)
    d := (2*maxdeg*maxdeg + (nV+1)*maxdeg)*m;
 */
 
+#if 0 /*unused*/
 //GMP
 static intvec* TranPertVector(ideal G, intvec* iva)
 {
@@ -2611,9 +2637,11 @@ static intvec* TranPertVector(ideal G, intvec* iva)
   omFree(ivtmp);
   return repr_vector;
 }
+#endif
 
 
 
+#if 0 /*unused*/
 static intvec* TranPertVector_lp(ideal G)
 {
   BOOLEAN nError = Overflow_Error;
@@ -2701,8 +2729,10 @@ static intvec* TranPertVector_lp(ideal G)
   omFree(ivres);
   return repr_vector;
 }
+#endif
 
 
+#if 0 /*unused*/
 //GMP
 static intvec* RepresentationMatrix_Dp(ideal G, intvec* M)
 {
@@ -2788,6 +2818,7 @@ static intvec* RepresentationMatrix_Dp(ideal G, intvec* M)
   omFree(ivres);
   return repvector;
 }
+#endif
 
 
 
@@ -2803,6 +2834,7 @@ static intvec* RepresentationMatrix_Dp(ideal G, intvec* M)
 */
 
 // 19 Juni 2003
+#if 0 /* unused*/
 static int testnegintvec(intvec* v)
 {
   int n = v->length();
@@ -2813,6 +2845,7 @@ static int testnegintvec(intvec* v)
   }
   return(0);
 }
+#endif
 
 
 /* 7 Februar 2002 */

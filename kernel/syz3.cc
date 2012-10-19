@@ -88,6 +88,7 @@ static BOOLEAN syIsRegular(ideal old_ideal,ideal new_ideal,int deg)
 /*3
 * shows the resolution stored in syzstr->orderedRes
 */
+#if 0 /* unused*/
 static void syShowRes(syStrategy syzstr)
 {
   int i=0;
@@ -102,6 +103,7 @@ static void syShowRes(syStrategy syzstr)
     i++;
   }
 }
+#endif
  
 /*3
 * produces the next subresolution for a regular extension
@@ -600,6 +602,7 @@ static BOOLEAN syRedSyzPair(syStrategy syzstr,int index,int* g_l,int* orp_l)
 * the tailreduction for generators (which includes the correction of
 * the corresponding representation)
 */
+#if 0 /*unused*/
 static void syRedTailSyzPair(SObject tso,syStrategy syzstr,int index,
             int * gen_length,int* orp_l,int * tored_l,int * syzred_l)
 {
@@ -636,6 +639,7 @@ static void syRedTailSyzPair(SObject tso,syStrategy syzstr,int index,
   assume(pLength(tso.syz)==syz_l);
   assume(pLength(tso.p)==*tored_l);
 }
+#endif
  
 /*3
 * the reduction of a pair in the 0-th module
@@ -1177,9 +1181,8 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
   assume (tso.lcm!=NULL);
   int ng_place=IDELEMS(new_generators);
   int i,j;
-  number coefgcd,n;
+  number n;
   poly p;
-  BOOLEAN deleteP=FALSE;
 #ifdef EXPERIMENT1
   poly syzp;
 #endif
@@ -1366,7 +1369,7 @@ static BOOLEAN reducePairsHIndex(SSet resPairs,int l_pairs,syStrategy syzstr,
        resolvente totake)
 {
   if (resPairs[0].lcm==NULL) return FALSE;
-  int i=0,j;
+  int i=0;
   poly deg_soc;
  
   if (TEST_OPT_PROT)
@@ -1449,7 +1452,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
                 crit_comp);
       if (next_p!=NULL)
       {
-        if (pGetComp(next_p)<=crit_comp)
+        if (pGetComp(next_p)<=(unsigned)crit_comp)
         {
           pDelete(&next_p);
           //if (TEST_OPT_PROT) Print("u(%d)",index);
@@ -1674,9 +1677,7 @@ static ideal kosz_ext(ideal new_generators,ideal new_repr,syStrategy syzstr,
 static ideal syAppendSyz(ideal new_generators, syStrategy syzstr,int index,int crit_comp,
                          resolvente totake)
 {
-  int i,j,newIdeal;
-  intvec * w;
-  poly p;
+  int i,j;
   ideal result;
   int rk_new_gens = id_RankFreeModule(new_generators,currRing);
   if (syzstr->res[index]==NULL)
@@ -1751,12 +1752,11 @@ idPrint(new_repr);
 */
 syStrategy syKosz(ideal arg,int * length)
 {
-  int i,j,jj,k=0,index=0,rk_arg,actual_syzcomp,next_syz=0;
+  int i,j,jj,k=0,index=0,rk_arg,next_syz=0;
   int crit_comp,t_comp,next_deg,old_tl;
   ideal temp=NULL,old_ideal,old_repr;
-  ring origR = currRing,actR;
-  poly p,next_gen;
-  tHomog hom=isNotHomog;
+  ring origR = currRing;
+  poly next_gen;
   BOOLEAN isRegular;
  
   discard_pairs = 0;

@@ -561,8 +561,8 @@ BOOLEAN setOption(leftv res, leftv v)
     if(strcmp(n,"get")==0)
     {
       intvec *w=new intvec(2);
-      (*w)[0]=test;
-      (*w)[1]=verbose;
+      (*w)[0]=si_opt_1;
+      (*w)[1]=si_opt_2;
       res->rtyp=INTVEC_CMD;
       res->data=(void *)w;
       goto okay;
@@ -574,8 +574,8 @@ BOOLEAN setOption(leftv res, leftv v)
       {
         v=v->next;
         intvec *w=(intvec*)v->Data();
-        test=(*w)[0];
-        verbose=(*w)[1];
+        si_opt_1=(*w)[0];
+        si_opt_2=(*w)[1];
 #if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
@@ -583,7 +583,7 @@ BOOLEAN setOption(leftv res, leftv v)
         && !rField_is_Ring(currRing)
 #endif
         ) {
-          test &=~Sy_bit(OPT_INTSTRATEGY);
+          si_opt_1 &=~Sy_bit(OPT_INTSTRATEGY);
         }
 #endif
         goto okay;
@@ -591,8 +591,8 @@ BOOLEAN setOption(leftv res, leftv v)
     }
     if(strcmp(n,"none")==0)
     {
-      test=0;
-      verbose=0;
+      si_opt_1=0;
+      si_opt_2=0;
       goto okay;
     }
     for (i=0; (i==0) || (optionStruct[i-1].setval!=0); i++)
@@ -601,10 +601,10 @@ BOOLEAN setOption(leftv res, leftv v)
       {
         if (optionStruct[i].setval & validOpts)
         {
-          test |= optionStruct[i].setval;
+          si_opt_1 |= optionStruct[i].setval;
           // optOldStd disables redthrough
           if (optionStruct[i].setval == Sy_bit(OPT_OLDSTD))
-            test &= ~Sy_bit(OPT_REDTHROUGH);
+            si_opt_1 &= ~Sy_bit(OPT_REDTHROUGH);
         }
         else
           Warn("cannot set option");
@@ -625,7 +625,7 @@ BOOLEAN setOption(leftv res, leftv v)
       {
         if (optionStruct[i].setval & validOpts)
         {
-          test &= optionStruct[i].resetval;
+          si_opt_1 &= optionStruct[i].resetval;
         }
         else
           Warn("cannot clear option");
@@ -636,7 +636,7 @@ BOOLEAN setOption(leftv res, leftv v)
     {
       if (strcmp(n,verboseStruct[i].name)==0)
       {
-        verbose |= verboseStruct[i].setval;
+        si_opt_2 |= verboseStruct[i].setval;
         #ifdef YYDEBUG
         #if YYDEBUG
         /*debugging the bison grammar --> grammar.cc*/
@@ -650,7 +650,7 @@ BOOLEAN setOption(leftv res, leftv v)
       else if ((strncmp(n,"no",2)==0)
       && (strcmp(n+2,verboseStruct[i].name)==0))
       {
-        verbose &= verboseStruct[i].resetval;
+        si_opt_2 &= verboseStruct[i].resetval;
         #ifdef YYDEBUG
         #if YYDEBUG
         /*debugging the bison grammar --> grammar.cc*/
@@ -665,7 +665,7 @@ BOOLEAN setOption(leftv res, leftv v)
     Werror("unknown option `%s`",n);
   okay:
     if (currRing != NULL)
-      currRing->options = test & TEST_RINGDEP_OPTS;
+      currRing->options = si_opt_1 & TEST_RINGDEP_OPTS;
     omFree((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);
@@ -686,14 +686,14 @@ char * showOption()
   BITSET tmp;
 
   StringSetS("//options:");
-  if ((test!=0)||(verbose!=0))
+  if ((si_opt_1!=0)||(si_opt_2!=0))
   {
-    tmp=test;
+    tmp=si_opt_1;
     if(tmp)
     {
       for (i=0; optionStruct[i].setval!=0; i++)
       {
-        if (optionStruct[i].setval & test)
+        if (optionStruct[i].setval & tmp)
         {
           StringAppend(" %s",optionStruct[i].name);
           tmp &=optionStruct[i].resetval;
@@ -704,7 +704,7 @@ char * showOption()
         if (tmp & Sy_bit(i)) StringAppend(" %d",i);
       }
     }
-    tmp=verbose;
+    tmp=si_opt_2;
     if (tmp)
     {
       for (i=0; verboseStruct[i].setval!=0; i++)
@@ -722,8 +722,7 @@ char * showOption()
     }
     return omStrDup(StringAppendS(""));
   }
-  else
-    return omStrDup(StringAppendS(" none"));
+  return omStrDup(StringAppendS(" none"));
 }
 
 char * versionString()
@@ -1143,10 +1142,11 @@ void siInit(char *name)
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {
-    int vv=verbose;
-    verbose &= ~Sy_bit(V_LOAD_LIB);
+    BITSET save1,save2;
+    SI_SAVE_OPT(save1,save2);
+    si_opt_2 &= ~Sy_bit(V_LOAD_LIB);
     iiLibCmd(omStrDup("standard.lib"), TRUE,TRUE,TRUE);
-    verbose=vv;
+    SI_RESTORE_OPT(save1,save2);
   }
   errorreported = 0;
 }

@@ -218,9 +218,9 @@ static const char* feOptAction(feOptIndex opt)
 
       case FE_OPT_QUIET:
         if (feOptSpec[FE_OPT_QUIET].value)
-          verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
+          si_opt_2 &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
         else
-          verbose |= Sy_bit(V_LOAD_LIB)|Sy_bit(0);
+          si_opt_2 |= Sy_bit(V_LOAD_LIB)|Sy_bit(0);
         return NULL;
 
       case FE_OPT_NO_TTY:

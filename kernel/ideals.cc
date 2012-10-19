@@ -130,81 +130,6 @@ ideal idMinBase (ideal h1)
 }
 
 
-/*3
-*multiplies p with t (!cas) or  (t-1)
-*the index of t is:1, so we have to shift all variables
-*p is NOT in the actual ring, it has no t
-*/
-static poly pMultWithT (poly p,BOOLEAN cas)
-{
-  /*qp is the working pointer in p*/
-  /*result is the result, qresult is the working pointer*/
-  /*pp is p in the actual ring(shifted), qpp the working pointer*/
-  poly result,qp,pp;
-  poly qresult=NULL;
-  poly qpp=NULL;
-  int  i,j,lex;
-  number n;
-
-  pp = NULL;
-  result = NULL;
-  qp = p;
-  while (qp != NULL)
-  {
-    i = 0;
-    if (result == NULL)
-    {/*first monomial*/
-      result = pInit();
-      qresult = result;
-    }
-    else
-    {
-      qresult->next = pInit();
-      pIter(qresult);
-    }
-    for (j=(currRing->N)-1; j>0; j--)
-    {
-      lex = pGetExp(qp,j);
-      pSetExp(qresult,j+1,lex);/*copy all variables*/
-    }
-    lex = pGetComp(qp);
-    pSetComp(qresult,lex);
-    n=nCopy(pGetCoeff(qp));
-    pSetCoeff0(qresult,n);
-    qresult->next = NULL;
-    pSetm(qresult);
-    /*qresult is now qp brought into the actual ring*/
-    if (cas)
-    { /*case: mult with t-1*/
-      pSetExp(qresult,1,0);
-      pSetm(qresult);
-      if (pp == NULL)
-      { /*first monomial*/
-        pp = pCopy(qresult);
-        qpp = pp;
-      }
-      else
-      {
-        qpp->next = pCopy(qresult);
-        pIter(qpp);
-      }
-      pGetCoeff(qpp)=nNeg(pGetCoeff(qpp));
-      /*now qpp contains -1*qp*/
-    }
-    pSetExp(qresult,1,1);/*this is mult. by t*/
-    pSetm(qresult);
-    pIter(qp);
-  }
-  /*
-  *now p is processed:
-  *result contains t*p
-  * if cas: pp contains -1*p (in the new ring)
-  */
-  if (cas)  qresult->next = pp;
-  /*  else      qresult->next = NULL;*/
-  return result;
-}
-
 /*2
 *initialized a field with r numbers between beg and end for the
 *procedure idNextChoise
@@ -849,11 +774,12 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
     return idInit(1,h1->rank);
   }
 
-  BITSET save_verbose=verbose;
+  BITSET save2;
+  SI_SAVE_OPT2(save2);
 
   k=si_max(1,(int)id_RankFreeModule(h1,currRing));
 
-  if ((k==1) && (!lift3)) verbose |=Sy_bit(V_IDLIFT);
+  if ((k==1) && (!lift3)) si_opt_2 |=Sy_bit(V_IDLIFT);
 
   ring orig_ring = currRing;
   ring syz_ring = rAssure_SyzComp(orig_ring,TRUE);  rChangeCurrRing(syz_ring);
@@ -973,7 +899,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
   }
 
   if (syz_ring!=orig_ring) rDelete(syz_ring);
-  verbose = save_verbose;
+  SI_RESTORE_OPT2(save2);
   return s_h3;
 }
 
@@ -1373,7 +1299,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
       h4->m[i] = h4->m[i+1];
     }
     h4->m[IDELEMS(h4)-1] = p;
-    test |= Sy_bit(OPT_SB_1);
+    si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
   return h4;
@@ -1396,7 +1322,8 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
       res = idFreeModule(h1->rank);
     return res;
   }
-  BITSET old_test=test;
+  BITSET old_test1;
+  SI_SAVE_OPT1(old_test1);
   int i, kmax;
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
@@ -1430,7 +1357,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   {
     s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,kmax-1);
   }
-  test = old_test;
+  SI_RESTORE_OPT1(old_test1);
   #if 0
   // only together with the above debug stuff
   idSkipZeroes(s_h3);
@@ -1671,13 +1598,14 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   // compute kStd
 #if 1
   //rWrite(tmpR);PrintLn();
-  BITSET save=test;
-  //test |=1;
+  //BITSET save1;
+  //SI_SAVE_OPT1(save1);
+  //si_opt_1 |=1;
   //Print("h: %d gen, rk=%d\n",IDELEMS(h),h->rank);
   //extern char * showOption();
   //Print("%s\n",showOption());
   hh = kStd(h,NULL,hom,&w,hilb);
-  test=save;
+  //SI_RESTORE_OPT1(save1);
   idDelete(&h);
 #else
   extern ideal kGroebner(ideal F, ideal Q);
@@ -2193,7 +2121,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   for (i=0;i<IDELEMS(s_temp1);i++)
   {
     if ((s_temp1->m[i]!=NULL)
-    && (pGetComp(s_temp1->m[i])<=length))
+    && (((int)pGetComp(s_temp1->m[i]))<=length))
     {
       p_Delete(&(s_temp1->m[i]),currRing);
     }

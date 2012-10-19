@@ -590,6 +590,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
   }
   else
   {
+    if (lq<=0) lq= ::pLength(q);
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
 

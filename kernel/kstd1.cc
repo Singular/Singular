@@ -1233,11 +1233,12 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int reduc = 0;
   int red_result = 1;
   int hilbeledeg=1,hilbcount=0;
-  int save_test=test;
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
   if (currRing->MixedOrder)
   {
-    test &= ~Sy_bit(OPT_REDSB);
-    test &= ~Sy_bit(OPT_REDTAIL);
+    si_opt_1 &= ~Sy_bit(OPT_REDSB);
+    si_opt_1 &= ~Sy_bit(OPT_REDTAIL);
   }
 
   strat->update = TRUE;
@@ -1454,7 +1455,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //    }
 //  }
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
-  test=save_test;
+  SI_RESTORE_OPT1(save1);
   idTest(strat->Shdl);
   return (strat->Shdl);
 }
@@ -1474,7 +1475,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   int   j;
   int   o;
   LObject   h;
-  BITSET save_test=test;
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
 
   //if ((idIs0(F))&&(Q==NULL))
   //  return pCopy(q); /*F=0*/
@@ -1482,8 +1484,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = (currRing->ppNoether) != NULL;
   strat->kNoether    = pCopy((currRing->ppNoether));
-  test|=Sy_bit(OPT_REDTAIL);
-  test&=~Sy_bit(OPT_INTSTRATEGY);
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
+  si_opt_1&=~Sy_bit(OPT_INTSTRATEGY);
   if (TEST_OPT_STAIRCASEBOUND
   && (! TEST_V_DEG_STOP)
   && (0<Kstd1_deg)
@@ -1582,7 +1584,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 //    }
 //  }
   idDelete(&strat->Shdl);
-  test=save_test;
+  SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
   return p;
 }
@@ -1603,7 +1605,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   int   o;
   LObject   h;
   ideal res;
-  BITSET save_test=test;
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
 
   //if (idIs0(q)) return idInit(IDELEMS(q),si_max(q->rank,F->rank));
   //if ((idIs0(F))&&(Q==NULL))
@@ -1612,7 +1615,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = (currRing->ppNoether) != NULL;
   strat->kNoether=pCopy((currRing->ppNoether));
-  test|=Sy_bit(OPT_REDTAIL);
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
   if (TEST_OPT_STAIRCASEBOUND
   && (0<Kstd1_deg)
   && ((!strat->kHEdgeFound)
@@ -1721,7 +1724,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 //    }
 //  }
   idDelete(&strat->Shdl);
-  test=save_test;
+  SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
   return res;
 }
@@ -2243,7 +2246,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   {
     Kstd1_deg=Kstd1_OldDeg;
     if (!oldDegBound)
-      test &= ~Sy_bit(OPT_DEGBOUND);
+      si_opt_1 &= ~Sy_bit(OPT_DEGBOUND);
   }
   else
   {
@@ -2718,11 +2721,12 @@ ideal kInterRed (ideal F, ideal Q)
 
     //return kInterRedOld(F,Q);
 
-  BITSET save=test;
-  //test|=Sy_bit(OPT_NOT_SUGAR);
-  test|=Sy_bit(OPT_REDTHROUGH);
-  //test&= ~Sy_bit(OPT_REDTAIL);
-  //test&= ~Sy_bit(OPT_REDSB);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
+  //si_opt_1|=Sy_bit(OPT_NOT_SUGAR);
+  si_opt_1|=Sy_bit(OPT_REDTHROUGH);
+  //si_opt_1&= ~Sy_bit(OPT_REDTAIL);
+  //si_opt_1&= ~Sy_bit(OPT_REDSB);
   //extern char * showOption() ;
   //Print("%s\n",showOption());
 
@@ -2775,7 +2779,7 @@ ideal kInterRed (ideal F, ideal Q)
     if (idElem(res)<=1) need_retry=0;
   }
   if (null!=NULL) idDelete(&null);
-  test=save;
+  SI_RESTORE_OPT1(save1);
   idSkipZeroes(res);
   return res;
 }

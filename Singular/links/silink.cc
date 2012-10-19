@@ -235,7 +235,6 @@ BOOLEAN slClose(si_link l)
 
 leftv slRead(si_link l, leftv a)
 {
-  char *mode;
   leftv v = NULL;
   if( ! SI_LINK_R_OPEN_P(l)) // open r ?
   {
@@ -380,7 +379,7 @@ BOOLEAN slGetDump(si_link l)
 
 
 /* =============== ASCII ============================================= */
-BOOLEAN slOpenAscii(si_link l, short flag, leftv h)
+BOOLEAN slOpenAscii(si_link l, short flag, leftv)
 {
   const char *mode;
   if (flag & SI_LINK_OPEN)
@@ -545,7 +544,7 @@ BOOLEAN slDumpAscii(si_link l)
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
   if (currRingHdl != rh) rSetHdl(rh);
-  fprintf(fd, "option(set, intvec(%d, %d));\n", test, verbose);
+  fprintf(fd, "option(set, intvec(%d, %d));\n", si_opt_1, si_opt_2);
   fprintf(fd, "RETURN();\n");
   fflush(fd);
 
@@ -664,7 +663,6 @@ static const char* GetIdString(idhdl h)
       {
         lists l = IDLIST(h);
         int i, nl = l->nr + 1;
-        char *name;
 
         for (i=0; i<nl; i++)
           if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
@@ -739,7 +737,7 @@ static int DumpRhs(FILE *fd, idhdl h)
   }
   else  if (type_id == STRING_CMD)
   {
-    char *pstr = IDSTRING(h), c;
+    char *pstr = IDSTRING(h);
     fputc('"', fd);
     while (*pstr != '\0')
     {
@@ -752,17 +750,20 @@ static int DumpRhs(FILE *fd, idhdl h)
   else  if (type_id == PROC_CMD)
   {
     procinfov pi = IDPROC(h);
-    if (pi->language == LANG_SINGULAR) {
+    if (pi->language == LANG_SINGULAR)
+    {
       if( pi->data.s.body==NULL) iiGetLibProcBuffer(pi);
-      char *pstr = pi->data.s.body, c;
+      char *pstr = pi->data.s.body;
       fputc('"', fd);
-      while (*pstr != '\0') {
+      while (*pstr != '\0')
+      {
         if (*pstr == '"' || *pstr == '\\') fputc('\\', fd);
         fputc(*pstr, fd);
         pstr++;
       }
       fputc('"', fd);
-    } else fputs("(null)", fd);
+    }
+    else fputs("(null)", fd);
   }
   else
   {

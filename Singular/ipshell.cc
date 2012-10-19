@@ -425,9 +425,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
   idhdl h,start;
   BOOLEAN all = typ<0;
   BOOLEAN really_all=FALSE;
-  BOOLEAN do_packages=FALSE;
 
-  if ( typ == -1 ) do_packages=TRUE;
   if ( typ==0 )
   {
     if (strcmp(what,"all")==0)
@@ -507,11 +505,11 @@ void test_cmd(int i)
     ii= -i;
     if (ii < 32)
     {
-      test &= ~Sy_bit(ii);
+      si_opt_1 &= ~Sy_bit(ii);
     }
     else if (ii < 64)
     {
-      verbose &= ~Sy_bit(ii-32);
+      si_opt_2 &= ~Sy_bit(ii-32);
     }
     else
       WerrorS("out of bounds\n");
@@ -522,15 +520,15 @@ void test_cmd(int i)
     if (Sy_bit(ii) & kOptions)
     {
       Warn("Gerhard, use the option command");
-      test |= Sy_bit(ii);
+      si_opt_1 |= Sy_bit(ii);
     }
     else if (Sy_bit(ii) & validOpts)
-      test |= Sy_bit(ii);
+      si_opt_1 |= Sy_bit(ii);
   }
   else if (i<64)
   {
     ii=i-32;
-    verbose |= Sy_bit(ii);
+    si_opt_2 |= Sy_bit(ii);
   }
   else
     WerrorS("out of bounds\n");
@@ -2529,14 +2527,12 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
              rField_is_Zp_a(currRing, rInternalChar(orig_ring)))) )
           {
             par_perm_size=rPar(orig_ring);
-            BITSET save_test=test;
 
 //            if ((orig_ring->minpoly != NULL) || (orig_ring->qideal != NULL))
 //              naSetChar(rInternalChar(orig_ring),orig_ring);
 //            else ntSetChar(rInternalChar(orig_ring),orig_ring);
 
             nSetChar(currRing->cf);
-            test=save_test;
           }
           else
           {
@@ -5054,7 +5050,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
-  BOOLEAN ffChar=FALSE;
+  //BOOLEAN ffChar=FALSE;
 
   /* ch -------------------------------------------------------*/
   // get ch of ground field
@@ -5250,9 +5246,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
   else
   {
-    sleftv* p = pn;
     Werror("Wrong or unknown ground field specification");
 #ifndef NDEBUG
+    sleftv* p = pn;
     while (p != NULL)
     {
       Print( "pn[%p]: type: %d [%s]: %p, name: %s", (void*)p, p->Typ(), Tok2Cmdname(p->Typ()), p->Data(), (p->name == NULL? "NULL" : p->name) );

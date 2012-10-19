@@ -2030,14 +2030,14 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 //#define KSTD_NF_NONORM 4
   // only global: avoid normalization, return a multiply of NF
   poly   p;
-  int   i;
 
   //if ((idIs0(F))&&(Q==NULL))
   //  return pCopy(q); /*F=0*/
   //strat->ak = idRankFreeModule(F);
   /*- creating temp data structures------------------- -*/
-  BITSET save_test=test;
-  test|=Sy_bit(OPT_REDTAIL);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
   strat->enterS = enterSBba;
@@ -2070,10 +2070,8 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
     else
     #endif
     {
-      BITSET save=test;
-      test &= ~Sy_bit(OPT_INTSTRATEGY);
+      si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
       p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
-      test=save;
     }
   }
   /*- release temp data------------------------------- -*/
@@ -2087,7 +2085,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   omfree(strat->B);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
-  test=save_test;
+  SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
   return p;
 }
@@ -2112,8 +2110,9 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   //  return idCopy(q); /*F=0*/
   //strat->ak = idRankFreeModule(F);
   /*- creating temp data structures------------------- -*/
-  BITSET save_test=test;
-  test|=Sy_bit(OPT_REDTAIL);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
+  si_opt_1|=Sy_bit(OPT_REDTAIL);
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
   strat->enterS = enterSBba;
@@ -2126,8 +2125,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),si_max(q->rank,F->rank));
-  BITSET save=test;
-  test &= ~Sy_bit(OPT_INTSTRATEGY);
+  si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
   for (i=IDELEMS(q)-1; i>=0; i--)
   {
     if (q->m[i]!=NULL)
@@ -2154,7 +2152,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
-  test=save;
+  SI_RESTORE_OPT1(save1);
   omfree(strat->sevS);
   omfree(strat->ecartS);
   omfree(strat->T);
@@ -2165,7 +2163,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   omfree(strat->B);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
-  test=save_test;
+  SI_RESTORE_OPT1(save1);
   if (TEST_OPT_PROT) PrintLn();
   return res;
 }
@@ -2183,7 +2181,6 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
           intvec *w,intvec *hilb )
 {
   int Ll_old, red_result = 1;
-  BOOLEAN withT = FALSE;
   int pos  = 0;
   hilbeledeg=1;
   hilbcount=0;
@@ -3000,8 +2997,6 @@ int redFirstShift (LObject* h,kStrategy strat)
 
 void initBbaShift(ideal F,kStrategy strat)
 {
-  int i;
-//  idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba; /* remains as is, we change enterT! */
 
@@ -3034,7 +3029,7 @@ void initBbaShift(ideal F,kStrategy strat)
 //    pRestoreDegProcs(currRing,totaldegreeWecart, maxdegreeWecart);
 //    if (TEST_OPT_PROT)
 //    {
-//      for(i=1; i<=(currRing->N); i++)
+//      for(int i=1; i<=rVar(currRing); i++)
 //        Print(" %d",ecartWeights[i]);
 //      PrintLn();
 //      mflush();

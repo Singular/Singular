@@ -658,10 +658,9 @@ static inline BOOLEAN rMinpolyIsNULL(const ring r)
 
   if( ret )
   {
-    const ring R = C->extRing;
-    assume( R != NULL );
+    assume( (C->extRing) != NULL );
     BOOLEAN idIs0 (ideal h);
-    assume( !idIs0(R->qideal) );
+    assume((!((C->extRing)->qideal==NULL)) && (!idIs0((C->extRing)->qideal)));
   }
 
   // TODO: this leads to test fails (due to rDecompose?)

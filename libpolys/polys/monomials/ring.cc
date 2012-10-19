@@ -3429,8 +3429,8 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
   r->pLexOrder=r->LexOrder;
   if (complete)
   {
-    test &= ~ TEST_RINGDEP_OPTS;
-    test |= r->options;
+    si_opt_1 &= ~ TEST_RINGDEP_OPTS;
+    si_opt_1 |= r->options;
   }
 }
 

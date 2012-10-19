@@ -2489,14 +2489,12 @@ static BOOLEAN jjKoszul_Id(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
 {
-  BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   ideal m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,
                    hasFlag(u,FLAG_STD));
   if (m==NULL) return TRUE;
   res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
-  test=save_test;
   return FALSE;
 }
 static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
@@ -3415,12 +3413,13 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
         hom=isHomog;
       }
     }
-    BITSET save_test=test;
-    test|=Sy_bit(OPT_SB_1);
+    BITSET save1;
+    SI_SAVE_OPT1(save1);
+    si_opt_1|=Sy_bit(OPT_SB_1);
     /* ii0 appears to be the position of the first element of il that
        does not belong to the old SB ideal */
     result=kStd(i1,currQuotient,hom,&w,NULL,0,ii0);
-    test=save_test;
+    SI_RESTORE_OPT1(save1);
     idDelete(&i1);
     idSkipZeroes(result);
     if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
@@ -6412,7 +6411,6 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 {
   if (w->rtyp!=IDHDL) return TRUE;
-  BITSET save_test=test;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
   ideal m
@@ -6420,7 +6418,6 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
              FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
   if (m==NULL) return TRUE;
   res->data = (char *)id_Module2formatedMatrix(m,ul,vl,currRing);
-  test=save_test;
   return FALSE;
 }
 static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
@@ -7236,13 +7233,14 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     int save_d=Kstd1_deg;
     Kstd1_deg=(int)(long)u3->Data();
     kModW=(intvec *)u4->Data();
-    BITSET save=verbose;
-    verbose|=Sy_bit(V_DEG_STOP);
+    BITSET save2;
+    SI_SAVE_OPT2(save2);
+    si_opt_2|=Sy_bit(V_DEG_STOP);
     u2->next=NULL;
     BOOLEAN r=jjCALL2ARG(res,u);
     kModW=NULL;
     Kstd1_deg=save_d;
-    verbose=save;
+    SI_RESTORE_OPT2(save2);
     u->next->next=u3;
     return r;
   }
@@ -7650,7 +7648,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   {
     i0=idInit(1,i1->rank);
     i0->m[0]=(poly)v->Data();
-    BOOLEAN cleanup_i0=TRUE;
+    cleanup_i0=TRUE;
   }
   else if (r==IDEAL_CMD)/* IDEAL */
   {
@@ -7684,8 +7682,9 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
       hom=isHomog;
     }
   }
-  BITSET save_test=test;
-  test|=Sy_bit(OPT_SB_1);
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
+  si_opt_1|=Sy_bit(OPT_SB_1);
   result=kStd(i1,
               currQuotient,
               hom,
@@ -7694,7 +7693,7 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
               0,                    // syzComp, whatever it is...
               IDELEMS(i1)-ii0,      // new ideal
               vw);                  // weights of vars
-  test=save_test;
+  SI_RESTORE_OPT1(save1);
   idDelete(&i1);
   idSkipZeroes(result);
   res->data = (char *)result;

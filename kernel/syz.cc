@@ -292,7 +292,7 @@ static void syDeleteAbove1(ideal up, int k)
 */
 static void syMinStep1(resolvente res, int length)
 {
-  int i,j,k,l,index=0;
+  int i,j,k,index=0;
   poly p;
   ideal deg0=NULL,reddeg0=NULL;
   intvec *have_del=NULL,*to_del=NULL;
@@ -330,9 +330,9 @@ static void syMinStep1(resolvente res, int length)
           while (k<IDELEMS(res[index]))
           {
             p = res[index]->m[k];
-            while ((p!=NULL) && ((!pLmIsConstantComp(p)) || (pGetComp(p)!=j)))
+            while ((p!=NULL) && ((!pLmIsConstantComp(p)) || (pGetComp(p)!=(unsigned)j)))
               pIter(p);
-            if ((p!=NULL) && (pLmIsConstantComp(p)) && (pGetComp(p)==j)) break;
+            if ((p!=NULL) && (pLmIsConstantComp(p)) && (pGetComp(p)==(unsigned)j)) break;
             k++;
           }
           if (k>=IDELEMS(res[index]))
@@ -393,6 +393,8 @@ void syMinimizeResolvente(resolvente res, int length, int first)
 resolvente syResolvente(ideal arg, int maxlength, int * length,
                         intvec *** weights, BOOLEAN minim)
 {
+  BITSET save1;
+  SI_SAVE_OPT1(save1);
   resolvente res;
   resolvente newres;
   tHomog hom=isNotHomog;
@@ -529,7 +531,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     if ((currQuotient==NULL)&&(syzIndex==0)&& (!TEST_OPT_DEGBOUND))
     {
       res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,setRegularity,&Kstd1_deg);
-      if ((!TEST_OPT_NOTREGULARITY) && (Kstd1_deg>0)) test |= Sy_bit(OPT_DEGBOUND);
+      if ((!TEST_OPT_NOTREGULARITY) && (Kstd1_deg>0)) si_opt_1 |= Sy_bit(OPT_DEGBOUND);
     }
     else
     {
@@ -590,7 +592,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
   Kstd1_deg=Kstd1_OldDeg;
   if (!oldDegBound)
-    test &= ~Sy_bit(OPT_DEGBOUND);
+    si_opt_1 &= ~Sy_bit(OPT_DEGBOUND);
 
   for (i=1; i<=syzIndex; i++)
   {
@@ -612,6 +614,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     }
     rDelete(syz_ring);
   }
+  SI_RESTORE_OPT1(save1);
   return res;
 }
 
@@ -644,7 +647,6 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
   }
 #endif
 
-  int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
   if ((w!=NULL) && (!idTestHomModule(arg,currQuotient,w))) // is this right in SCA case???
@@ -722,8 +724,7 @@ static poly sypCopyConstant(poly inp)
 }
 int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
 {
-  int i, j, k, ModComp,subFromRank=0, lu;
-  poly p, q, qq, Unit1, Unit2;
+  int i, j, k, subFromRank=0;
   ideal temp;
 
   if (idIs0(id)) return 0;
@@ -740,7 +741,6 @@ int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     return 0;
   }
   j = 0;
-  p = NULL;
   while ((j<i) && (temp->m[j]==NULL)) j++;
   while (j<i)
   {
@@ -776,7 +776,7 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
     for (i=degrees->length();i>0;i--)
       deg[i-1] = (*degrees)[i-1]-rsmin;
   }
-  int dummy=syDetect(id,index,homog,deg,tocan);
+  syDetect(id,index,homog,deg,tocan);
   for (i=tocancel->length();i>0;i--)
     (*tocancel)[i-1] = tocan[i-1];
   if (homog)
@@ -864,7 +864,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     {
       if (res[i]->m[j]!=NULL)
       {
-        if ((pGetComp(res[i]->m[j])>l)
+        if ((pGetComp(res[i]->m[j])>(unsigned)l)
         || ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL)))
         {
           WerrorS("input not a resolvent");
@@ -916,7 +916,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   }
   else
     memset(temp2,0,l*sizeof(int));
-  int dummy = syDetect(res[0],0,TRUE,temp2,tocancel);
+  syDetect(res[0],0,TRUE,temp2,tocancel);
   if (weights!=NULL) p_SetModDeg(NULL, currRing);
   if (tomin)
   {
@@ -956,7 +956,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       if ((i<length-1) && (res[i+1]!=NULL))
       {
         memset(tocancel,0,(rows+1)*sizeof(int));
-        dummy = syDetect(res[i+1],i+1,TRUE,temp2,tocancel);
+        syDetect(res[i+1],i+1,TRUE,temp2,tocancel);
         for (j=0;j<rows;j++)
         {
           //(*result)[i+1+j*cols] -= tocancel[j];

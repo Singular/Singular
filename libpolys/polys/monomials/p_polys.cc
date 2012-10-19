@@ -245,11 +245,11 @@ void p_Setm_General(poly p, const ring r)
           const short place = o->data.syz.place;
           const int limit = o->data.syz.limit;
 
-          if (c > limit)
+          if (c > (unsigned long)limit)
             p->exp[place] = o->data.syz.curr_index;
           else if (c > 0)
           {
-            assume( (1 <= c) && (c <= limit) );
+            assume( (1 <= c) && (c <= (unsigned long)limit) );
             p->exp[place]= o->data.syz.syz_index[c];
           }
           else
@@ -529,7 +529,6 @@ long p_WTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i, k;
-  int pIS = 0;
   long j =0;
 
   // iterate through each block:
@@ -1913,12 +1912,13 @@ void p_Content(poly ph, const ring r)
 {
   assume( ph != NULL );
 
-  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+  assume( r != NULL ); assume( r->cf != NULL ); 
 
 
 #if CLEARENUMERATORS
   if( 0 )
   {
+    const coeffs C = r->cf;
       // experimentall (recursive enumerator treatment) of alg. Ext!
     CPolyCoeffsEnumerator itr(ph);
     n_ClearContent(itr, r->cf);
@@ -1976,8 +1976,8 @@ void p_Content(poly ph, const ring r)
       CPolyCoeffsEnumerator itr(ph);
       n_ClearContent(itr, r->cf);
 
-      p_Test(ph, r); n_Test(pGetCoeff(ph), C);
-      assume(n_GreaterZero(pGetCoeff(ph), C)); // ??
+      p_Test(ph, r); n_Test(pGetCoeff(ph), r->cf);
+      assume(n_GreaterZero(pGetCoeff(ph), r->cf)); // ??
       
       // if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
       return;

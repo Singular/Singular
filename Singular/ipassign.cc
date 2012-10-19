@@ -91,18 +91,18 @@ static BOOLEAN jjMAXDEG(leftv, leftv a)
 {
   Kstd1_deg=(int)((long)(a->Data()));
   if (Kstd1_deg!=0)
-    test |=Sy_bit(OPT_DEGBOUND);
+    si_opt_1 |=Sy_bit(OPT_DEGBOUND);
   else
-    test &=(~Sy_bit(OPT_DEGBOUND));
+    si_opt_1 &=(~Sy_bit(OPT_DEGBOUND));
   return FALSE;
 }
-static BOOLEAN jjMAXMULT(leftv res, leftv a)
+static BOOLEAN jjMAXMULT(leftv, leftv a)
 {
   Kstd1_mu=(int)((long)(a->Data()));
   if (Kstd1_mu!=0)
-    test |=Sy_bit(OPT_MULTBOUND);
+    si_opt_1 |=Sy_bit(OPT_MULTBOUND);
   else
-    test &=(~Sy_bit(OPT_MULTBOUND));
+    si_opt_1 &=(~Sy_bit(OPT_MULTBOUND));
   return FALSE;
 }
 static BOOLEAN jjTRACE(leftv, leftv a)
@@ -380,7 +380,7 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
   }
   return FALSE;
 }
-static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
 {
   number p=(number)a->CopyD(NUMBER_CMD);
   if (res->data!=NULL) nDelete((number *)&res->data);
@@ -429,7 +429,7 @@ static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
+static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr)
 {
   syStrategy r=(syStrategy)a->CopyD(RESOLUTION_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
@@ -440,7 +440,7 @@ static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
   //jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
+static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr)
 {
   lists l=(lists)a->CopyD(LIST_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
@@ -564,7 +564,7 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
   }
   return FALSE;
 }
-static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr)
 {
   extern procinfo *iiInitSingularProcinfo(procinfo *pi, const char *libname,
                                           const char *procname, int line,
@@ -584,7 +584,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr)
 {
   //if ((res->data==NULL) || (res->Typ()==a->Typ()))
   {
@@ -607,14 +607,14 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
   }
 #endif
 }
-static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) delete ((bigintmat *)res->data);
   res->data=(void *)a->CopyD(BIGINTMAT_CMD);
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   res->data=(void *)a->CopyD(MATRIX_CMD);
@@ -632,14 +632,14 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
   if (TEST_V_QRING && (currQuotient!=NULL)&& (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingId(res);
   return FALSE;
 }
-static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) syKillComputation((syStrategy)res->data);
   res->data=(void *)a->CopyD(RESOLUTION_CMD);
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
@@ -654,7 +654,7 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
   }
   return FALSE;
 }
-static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   matrix m=(matrix)a->CopyD(MATRIX_CMD);
@@ -666,7 +666,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
   if (TEST_V_QRING && (currQuotient!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
-static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr)
 {
   si_link l=(si_link)res->data;
 
@@ -690,7 +690,7 @@ static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
   return TRUE;
 }
 // assign map -> map
-static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL)
   {
@@ -703,7 +703,7 @@ static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr e)
   return FALSE;
 }
 // assign ideal -> map
-static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr)
 {
   map f=(map)res->data;
   char *rn=f->preimage; // save the old/already assigned preimage ring name
@@ -811,7 +811,7 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr)
 {
   res->data=(void *)a->CopyD(PACKAGE_CMD);
   jiAssignAttr(res,a);
@@ -1879,7 +1879,7 @@ void jjNormalizeQRingP(leftv I)
     setFlag(I,FLAG_QRING);
   }
 }
-BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
+BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)
 {
   //Print("importfrom %s::%s ->.\n",v->Name(),u->Name() );
   assume(u->Typ()==PACKAGE_CMD);

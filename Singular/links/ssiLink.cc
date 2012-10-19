@@ -242,7 +242,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   SSI_UNBLOCK_CHLD;
 }
 
-void ssiWritePoly(ssiInfo *d, int typ, poly p)
+void ssiWritePoly(ssiInfo *d, poly p)
 {
   SSI_BLOCK_CHLD;
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
@@ -266,8 +266,8 @@ void ssiWritePoly(ssiInfo *d, int typ, poly p)
 
 void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
 {
-   // syntax: 7 # of elements <poly 1> <poly2>.....
-   // syntax: 8 <rows> <cols> <poly 1> <poly2>.....
+   // syntax ideal/module: 7 # of elements <poly 1> <poly2>.....
+   // syntax matrix: 8 <rows> <cols> <poly 1> <poly2>.....
    matrix M=(matrix)I;
    SSI_BLOCK_CHLD;
    if (typ==MATRIX_CMD)
@@ -277,13 +277,10 @@ void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
     SSI_UNBLOCK_CHLD;
 
    int i;
-   int tt;
-   if (typ==MODUL_CMD) tt=VECTOR_CMD;
-   else                tt=POLY_CMD;
 
    for(i=0;i<IDELEMS(I);i++)
    {
-     ssiWritePoly(d,tt,I->m[i]);
+     ssiWritePoly(d,I->m[i]);
    }
 }
 void ssiWriteCommand(si_link l, command D)
@@ -515,8 +512,6 @@ poly ssiReadPoly(ssiInfo *D)
   n=ssiReadInt(D->f_read);
   //Print("poly: terms:%d\n",n);
   poly p;
-  int j;
-  j=0;
   poly ret=NULL;
   poly prev=NULL;
   for(l=0;l<n;l++) // read n terms
@@ -943,7 +938,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 	SSI_UNBLOCK_CHLD;
         SI_LINK_SET_RW_OPEN_P(l);
         d->send_quit_at_exit=1;
-        fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
+        fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,si_opt_1,si_opt_2);
       }
       // ----------------------------------------------------------------------
       else if(strcmp(mode,"connect")==0)
@@ -1020,7 +1015,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           else
           {
             d->f_write = outfile;
-            fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
+            fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,si_opt_1,si_opt_2);
           }
         }
         else
@@ -1209,8 +1204,8 @@ leftv ssiRead1(si_link l)
                 if (TEST_OPT_DEBUG)
                   Print("// opening ssi-%d, MAX_TOK=%d\n",n98_v,n98_m);
                 #endif
-                test=n98_o1;
-                verbose=n98_o2;
+                si_opt_1=n98_o1;
+                si_opt_2=n98_o2;
                 return ssiRead1(l);
              }
     case 99: ssiClose(l); m2_end(0);
@@ -1279,7 +1274,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         }
                         if(tt==POLY_CMD) fputs("6 ",d->f_write);
                         else             fputs("9 ",d->f_write);
-                        ssiWritePoly(d,tt,(poly)dd);
+                        ssiWritePoly(d,(poly)dd);
                         break;
           case IDEAL_CMD:
           case MODUL_CMD:
@@ -1795,7 +1790,7 @@ si_link ssiCommandLink()
  @param[in] sig
 **/
 /*---------------------------------------------------------------------*/
-void sig_chld_hdl(int sig)
+void sig_chld_hdl(int)
 {
   pid_t kidpid;
   int status;
