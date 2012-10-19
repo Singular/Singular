@@ -89,6 +89,8 @@ HTML_MANUAL_PREFIX = sing
 HTML_TUTOR_PREFIX  = tut
 HTML_MANUAL_TOP    = index.htm
 HTML_TUTOR_TOP     = tutor.htm
+#
+PYOBJECT_TEX       = pyobject.tex
 ##
 ## End configuration dependend stuff
 #################################################################
