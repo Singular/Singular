@@ -642,14 +642,15 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
       //      TEST_OPT_REDSB
       //      TEST_OPT_REDTAIL
     assume( r == currRing );
-    BITSET _save_test = test;
-    test |= (Sy_bit(OPT_REDTAIL) | Sy_bit(OPT_REDSB));
+  
+    BITSET _save_test; SI_SAVE_OPT1(_save_test);
+    SI_RESTORE_OPT1(Sy_bit(OPT_REDTAIL) | Sy_bit(OPT_REDSB) | _save_test);
 
     intvec* w=new intvec(IDELEMS(newid));
     ideal tmp = kStd(newid, currQuotient, isHomog, &w);
     delete w;
 
-    test = _save_test;
+    SI_RESTORE_OPT1(_save_test)
 
     id_Delete(&newid, r);
     newid = tmp;
