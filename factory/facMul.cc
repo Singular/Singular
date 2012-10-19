@@ -403,7 +403,14 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       if (b.getp() != 0)
       {
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
-        ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
+        CanonicalForm mipo= getMipo (alpha);
+        bool is_rat= isOn (SW_RATIONAL);
+        if (!is_rat)
+          On (SW_RATIONAL);
+        mipo *=bCommonDen (mipo);
+        if (!is_rat)
+          Off (SW_RATIONAL);
+        ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (mipo));
         ZZ_pE::init (NTLmipo);
         ZZ_pEX NTLg= convertFacCF2NTLZZ_pEX (G, NTLmipo);
         ZZ_pEX NTLf= convertFacCF2NTLZZ_pEX (F, NTLmipo);

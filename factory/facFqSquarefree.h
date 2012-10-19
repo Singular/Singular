@@ -17,6 +17,7 @@
 #include "cf_assert.h"
 #include "cf_factory.h"
 #include "fac_sqrfree.h"
+#include "cf_factory.h"
 
 /// squarefree factorization over a finite field
 /// @a return a list of squarefree factors with multiplicity
