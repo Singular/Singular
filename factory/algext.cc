@@ -547,13 +547,13 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
       if(fail)
         return;
       m *= (x - alpha);
-      if(gnew == gm) // gnew did not change
+      if((firstLC(gnew) == gamma) || (gnew == gm)) // gnew did not change
       {
-        cf = tryvcontent(gm, Variable(2), M, fail);
+        cf = tryvcontent(gnew, Variable(2), M, fail);
         if(fail)
           return;
         divides = true;
-        g_image= gm;
+        g_image= gnew;
         g_image.tryDiv (cf, M, fail);
         if(fail)
           return;
@@ -691,7 +691,6 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     }
   }
   // here: a is the biggest alg. var in f and g AND some of f,g is in extension
-  // (in the sequel b is used to swap alg/poly vars)
   setReduce(a,false); // do not reduce expressions modulo mipo
   tmp = getMipo(a);
   M = tmp * bCommonDen(tmp);
@@ -702,7 +701,6 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   if(i > mv)
     mv = i;
   // here: mv is level of the largest variable in f, g
-  b = Variable(mv+1);
   bound = new int[mv+1]; // 'bound' could be indexed from 0 to mv, but we will only use from 1 to mv
   other = new int[mv+1];
   for(int i=1; i<=mv; i++) // initialize 'bound', 'other' with zeros
@@ -749,7 +747,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
 
     if(isEqual(bound, other, 1, mv)) // equal
     {
-      chineseRemainder( D, q, replacevar( mapinto(Dp), a, b ), p, tmp, newq );
+      chineseRemainder( D, q, mapinto(Dp), p, tmp, newq );
       // tmp = Dp mod p
       // tmp = D mod q
       // newq = p*q
@@ -757,7 +755,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       if( D != tmp )
         D = tmp;
       On( SW_RATIONAL );
-      tmp = replacevar( Farey( D, q ), b, a ); // Farey and switch back to alg var
+      tmp = Farey( D, q ); // Farey
+      tmp *= bCommonDen (tmp);
       setReduce(a,true); // reduce expressions modulo mipo
       On( SW_RATIONAL ); // needed by fdivides
       if (test != tmp)
@@ -779,7 +778,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       continue;
     // here: isLess(other, bound, 1, mv) ) ==> all previous primes unlucky
     q = p;
-    D = replacevar( mapinto(Dp), a, b ); // shortcut CRA // shortcut CRA
+    D = mapinto(Dp); // shortcut CRA // shortcut CRA
     for(int i=1; i<=mv; i++) // tighten bound
       bound[i] = other[i];
   }
