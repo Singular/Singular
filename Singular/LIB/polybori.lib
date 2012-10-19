@@ -14,13 +14,13 @@ SEE ALSO:  Libraries, pyobject, User defined types
 
 @*
 
-OVERVIEW:  A library for using @sc{PolyBoRi} in the @sc{Singular} interface, with
+OVERVIEW:  A library for using @code{PolyBoRi} in the SINGULAR interface, with
 procedures that convert structures (polynomials, rings, ideals) in both
 directions. Therefore, it is possible to compute boolean groebner basis
 via @ref{boolean_std}. Polynomials can be converted to zero-supressed decision
 diagrams (zdd) and vice versa.
 
-For usability it defines the @sc{PolyBoRi} types @code{bideal}, @code{bpoly},
+For usability it defines the @code{PolyBoRi} types @code{bideal}, @code{bpoly},
 and @code{bring} which are equivalent to Singular's @code{ideal}, @code{poly},
 and @code{ring}, as well as @code{bset} which corresponds to the type @code{zdd}
 introduced here. In addition @code{bvar(i)} constructs the Boolean variable corresponding
@@ -28,14 +28,14 @@ to @code{var(i)} from current @code{ring};
 
 For convenience, the corresponding types can be converted explictely or implicitely 
 while assigning.
-Also several @sc{Singular} operators were overloaded: @code{bring} comes with @code{nvars},
+Also several SINGULAR operators were overloaded: @code{bring} comes with @code{nvars},
 @code{bpoly} implements @code{lead}, @code{leadmonom} and @code{leadcoef}.
 Objects of this type  may be added and multiplied, too. 
 Finally, @code{bideal} yields @code{std} and @code{size} as well as addition and element access.
 
 
-Hence, by using these types @sc{PolyBoRi} functionality
-can be carried out seamlessly in @sc{Singular}:
+Hence, by using these types @code{PolyBoRi} functionality
+can be carried out seamlessly in SINGULAR:
 
 @code{> LIB \"polybori.lib\";} @*
 @code{> ring r0=2,x(1..4),lp;} @*
@@ -50,17 +50,17 @@ can be carried out seamlessly in @sc{Singular}:
 @code{_[2] = x(3)*x(4) + x(4)} @*
 
 
-NOTE: For using this library @sc{Singular}'s @code{python} interface must be available
+NOTE: For using this library SINGULAR's @code{python} interface must be available
  on your system. 
- Please @code{./configure --with-python} when building @sc{Singular} for this purpose.
+ Please @code{./configure --with-python} when building SINGULAR for this purpose.
 
- There are prebuilt binary packages for @sc{PolyBoRi} available
- from @uref{http://polybori.sf.net/}.
+ There are prebuilt binary packages for @code{PolyBoRi} available
+ from @code{http://polybori.sf.net/}.
  
- For building your own @sc{PolyBoRi} please ensure that you have @code{scons} and a
+ For building your own @code{PolyBoRi} please ensure that you have @code{scons} and a
  development version of the boost libaries installed on you system.
  Then you may execute the following commands in a @code{bash}-style shell
- to build @sc{PolyBoRi} available to @code{python}:
+ to build @code{PolyBoRi} available to @code{python}:
 
 @code{PBDIR=/path/to/custom/polybori} @*
 @code{wget http://downloads.sf.net/project/polybori/polybori/\\}@*
@@ -72,7 +72,7 @@ NOTE: For using this library @sc{Singular}'s @code{python} interface must be ava
 
 
 REFERENCES:
-See @uref{http://polybori.sf.net} for details about @sc{PolyBoRi}.
+See @code{http://polybori.sf.net} for details about @code{PolyBoRi}.
 
 PROCEDURES:
   boolean_std(bideal);                            Singular ideal of boolean groebner basis of I
