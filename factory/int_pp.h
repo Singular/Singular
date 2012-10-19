@@ -87,7 +87,7 @@ public:
     void divremcoeff( InternalCF*, InternalCF*&, InternalCF*&, bool );
     bool divremcoefft( InternalCF*, InternalCF*&, InternalCF*&, bool );
 
-    int intval() const;
+    long intval() const;
 
     int intmod( int p ) const;
 

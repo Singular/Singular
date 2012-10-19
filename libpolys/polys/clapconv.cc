@@ -244,7 +244,16 @@ CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
 static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 {
   if ( f.isImm() )
-    return n_Init( f.intval(), r->cf->extRing->cf);
+  {
+    long longf=f.intval();
+    int intf=(int) longf;
+    if((long)intf==longf)
+    {
+      assume (r->cf->extRing != NULL);
+      return n_Init(f.intval(),r->cf->extRing->cf);
+    }
+    else return nlRInit( longf );
+  }
   else
   {
     number z=ALLOC_RNUMBER();

@@ -57,7 +57,7 @@ public:
     virtual bool isZero() const;
     virtual bool isOne() const;
     virtual bool isUnivariate() const { return false; }
-    virtual int intval() const;
+    virtual long intval() const;
     virtual int intmod( int ) const { return 0; }
     virtual int sign() const PVIRT_INT("sign");
 
