@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-version="$Id: polybori.lib 0 1 $";
+version="$Id$";
 category="Miscellaneous";
 
 // summary description of the library
@@ -9,7 +9,7 @@ LIBRARY:   polybori.lib A Singular Library Interface for PolyBoRi
 AUTHORS:   Maximilian Kammermeier: Max0791@gmx.de
            Susanne Scherer: sscherer90@yahoo.de
 
-SEE ALSO:  Libraries, pyobject, newstruct
+SEE ALSO:  Libraries, pyobject, User defined types
 
 
 @*
@@ -284,8 +284,8 @@ SEE ALSO: boolean_poly_ring, var
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
 EXAMPLE: example bvar; shows an example"
 {
-  bpoly res = var(i);
-  return (res);
+  bpoly re = var(i);
+  return (re);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -374,8 +374,8 @@ proc op_getitem(bideal arg, def idx)
 {
   if (typeof(idx) == "int") { return (arg.pylist[idx-1]); }
 
-  bideal res = (python_eval("lambda ll, idx: [ll[i] for i in idx]")(arg.pylist, idx-1));
-  return (res);
+  bideal re = (python_eval("lambda ll, idx: [ll[i] for i in idx]")(arg.pylist, idx-1));
+  return (re);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -384,8 +384,8 @@ proc op_getitem(bideal arg, def idx)
 proc bideal_add(bideal arg1, bideal arg2)
 {
   pyobject tmp = python_eval("lambda x, y: list(sorted(set(x).union(set(y))))");
-  bideal res = tmp(arg1.pylist,arg2.pylist);
-  return (res);
+  bideal re = tmp(arg1.pylist,arg2.pylist);
+  return (re);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1075,10 +1075,10 @@ EXAMPLE: example boolean_ideal; shows an example"
   {
     Ib.append(boolean_poly(Is[i],rb));
   }
-  bideal res;
-  res.pylist = Ib;
+  bideal re;
+  re.pylist = Ib;
 
-  return(res);
+  return(re);
 }
 
 example
@@ -1118,14 +1118,14 @@ boolean_poly_ring
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
 EXAMPLE: example from_boolean_ideal; shows an example"
 {
-  ideal res;
+  ideal re;
   int i;
   int nlen = size(I);
   for (i = 1; i <= nlen; i++) 
   {
-    res[i] = from_boolean_poly(I[i]);
+    re[i] = from_boolean_poly(I[i]);
   }
-  return (res);
+  return (re);
 }
 
 example
@@ -1184,8 +1184,8 @@ example
   boolean_std(I);        // implicitely add x(i)^2-x(i)
 
   bideal bI=I;           // alternative syntax
-  bideal res = std(bI);  // Continue PolyBoRi computations
-  std(res[1..2]);
+  bideal re = std(bI);  // Continue PolyBoRi computations
+  std(re[1..2]);
 
   ring r1=0,x,Dp;
   poly f1=x3+2*x+1;

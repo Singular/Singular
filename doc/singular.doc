@@ -903,12 +903,19 @@ but not for serious computations.
 
 @menu
 * phindex_lib::
+* polybori_lib::
 @end menu
 @c ----------------------------------------------------------
-@node phindex_lib,,, Miscellaneous libraries
+@node phindex_lib,polybori_lib,, Miscellaneous libraries
 @subsection phindex_lib
 
 @c lib phindex.lib
+
+@c ----------------------------------------------------------
+@node polybori_lib,,phindex_lib, Miscellaneous libraries
+@subsection polybori_lib
+
+@c lib polybori.lib
 
 @c ----------------------------------------------------------------------------
 @node Experimental libraries,,Miscellaneous libraries, SINGULAR libraries
