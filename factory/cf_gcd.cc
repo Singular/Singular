@@ -572,12 +572,24 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     }
     Variable v = f.mvar();
     Hi = power( LC( pi1, v ), delta );
+    int maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
+
+    if (!(pi.isUnivariate() && pi1.isUnivariate()))
+    {
+      if (size (Hi)*size (pi)/(maxNumVars*3) > 500) //maybe this needs more tuning
+      {
+        On (SW_USE_FF_MOD_GCD);
+        C *= gcd (pi, pi1);
+        Off (SW_USE_FF_MOD_GCD);
+        return C;
+      }
+    }
+
     if ( (delta+1) % 2 )
         bi = 1;
     else
         bi = -1;
-    int maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
-    CanonicalForm oldPi= pi, oldPi1= pi1;
+    CanonicalForm oldPi= pi, oldPi1= pi1, powHi;
     while ( degree( pi1, v ) > 0 )
     {
         if (!(pi.isUnivariate() && pi1.isUnivariate()))
@@ -604,11 +616,22 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
         if ( degree( pi1, v ) > 0 )
         {
             delta = degree( pi, v ) - degree( pi1, v );
+            powHi= power (Hi, delta-1);
             if ( (delta+1) % 2 )
-                bi = LC( pi, v ) * power( Hi, delta );
+                bi = LC( pi, v ) * powHi*Hi;
             else
-                bi = -LC( pi, v ) * power( Hi, delta );
-            Hi = power( LC( pi1, v ), delta ) / power( Hi, delta-1 );
+                bi = -LC( pi, v ) * powHi*Hi;
+            Hi = power( LC( pi1, v ), delta ) / powHi;
+            if (!(pi.isUnivariate() && pi1.isUnivariate()))
+            {
+              if (size (Hi)*size (pi)/(maxNumVars*3) > 500) //maybe this needs more tuning
+              {
+                On (SW_USE_FF_MOD_GCD);
+                C *= gcd (oldPi, oldPi1);
+                Off (SW_USE_FF_MOD_GCD);
+                return C;
+              }
+            }
         }
     }
     if ( degree( pi1, v ) == 0 )
