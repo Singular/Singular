@@ -762,6 +762,45 @@ gfan::ZMatrix rays(gfan::ZFan* zf)
   return rays;
 }
 
+BOOLEAN numberOfConesWithVector(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
+    {
+      leftv w=v->next;
+      gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+      bigintmat* v0 = (bigintmat*) v->Data();
+      gfan::ZVector* v1 = bigintmatToZVector(*v0); 
+      int ambientDim = zf->getAmbientDimension();
+      if (ambientDim != v0->cols())
+      {
+        WerrorS("numberOfConesWithVector: mismatching dimensions");
+        return TRUE;
+      }
+      int count = 0;
+      for (int i=0; i<zf->numberOfConesOfDimension(ambientDim, 0, 0); i++)
+      {
+        gfan::ZCone zc = zf->getCone(ambientDim, i, 0, 0);
+        if (zc.contains(*v1))
+        {
+          count = count +1;
+          if (count > 1) 
+            break;
+        }
+      }
+      delete v1;
+      res->rtyp = INT_CMD;
+      res->data = (void*) count;
+      return FALSE;
+    }
+  }
+  WerrorS("numberOfConesWithVector: unexpected parameters");
+  return TRUE;
+}
+
 BOOLEAN fanFromString(leftv res, leftv args)
 {
   leftv u=args;
@@ -933,6 +972,7 @@ void bbfan_setup()
   iiAddCproc("","isPure",FALSE,isPure);
   iiAddCproc("","fanFromString",FALSE,fanFromString);
   iiAddCproc("","fanViaCones",FALSE,fanViaCones);
+  iiAddCproc("","numberOfConesWithVector",FALSE,numberOfConesWithVector);
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
