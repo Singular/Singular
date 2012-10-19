@@ -4839,26 +4839,34 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       gcdfound= Hensel_P (B*lcD, DD, b, lcDD);
       TIMING_END_AND_PRINT (ez_p_hensel_lift, "time for Hensel lift in EZ_P: ");
 
-      if (gcdfound == -1)
+      if (gcdfound == -1) //things became dense
       {
-        Off (SW_USE_EZGCD_P);
-        result= gcd (F,G);
-        On (SW_USE_EZGCD_P);
-        if (passToGF)
+        if (algExtension)
         {
-          CanonicalForm mipo= gf_mipo;
-          setCharacteristic (p);
-          Variable alpha= rootOf (mipo.mapinto());
-          result= GF2FalphaRep (result, alpha);
+          result= GCD_Fp_extension (F, G, a);
+          if (extOfExt)
+            result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+          return N (d*result);
         }
-        if (k > 1)
+        if (CFFactory::gettype() == GaloisFieldDomain)
         {
-          result= GFMapDown (result, k);
-          setCharacteristic (p, k, gf_name);
+          result= GCD_GF (F, G);
+          if (passToGF)
+          {
+            CanonicalForm mipo= gf_mipo;
+            setCharacteristic (p);
+            Variable alpha= rootOf (mipo.mapinto());
+            result= GF2FalphaRep (result, alpha);
+          }
+          if (k > 1)
+          {
+            result= GFMapDown (result, k);
+            setCharacteristic (p, k, gf_name);
+          }
+          return N (d*result);
         }
-        if (extOfExt)
-          result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
-        return N (d*result);
+        else
+          return N (d*GCD_small_p (F,G));
       }
 
       if (gcdfound == 1)
