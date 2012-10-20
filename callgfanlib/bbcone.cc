@@ -10,6 +10,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
+#include <Singular/lists.h>
 #include <Singular/subexpr.h>
 #include <sstream>
 
@@ -37,11 +38,11 @@ number integerToNumber(const gfan::Integer &I)
 bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
 {
   int d=zv.size();
-  bigintmat* bim = new bigintmat(d,1);
+  bigintmat* bim = new bigintmat(1,d);
   for(int i=1;i<=d;i++)
   {
     number temp = integerToNumber(zv[i-1]); 
-    bim->set(i,1,temp);
+    bim->set(1,i,temp);
     nlDelete(&temp,NULL);
   }
   return bim;
@@ -89,10 +90,10 @@ gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim)
 
 gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
 {
-  gfan::ZVector* zv=new gfan::ZVector(bim.rows());
-  for(int j=0; j<bim.rows(); j++)
+  gfan::ZVector* zv=new gfan::ZVector(bim.cols());
+  for(int j=0; j<bim.cols(); j++)
   {
-    number temp = BIMATELEM(bim, j+1, 1);
+    number temp = BIMATELEM(bim, 1, j+1);
     gfan::Integer* gi = numberToInteger(temp);
     (*zv)[j] = *gi;
     nlDelete(&temp,NULL);
@@ -1375,6 +1376,7 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       }
       else
         iv = (bigintmat*)v->Data();
+      
       gfan::ZVector* zv = bigintmatToZVector(iv);
       int d1 = zc->ambientDimension();
       int d2 = zv->size();
@@ -1384,9 +1386,9 @@ BOOLEAN containsInSupport(leftv res, leftv args)
                " dimensions %d and %d", d1, d2);
         return TRUE;
       }
-      bool b = (zc->contains(*zv) ? 1 : 0);
+      int b = (zc->contains(*zv) ? 1 : 0);
       res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
+      res->data = (char*) b;
 
       delete zv;
       if (v->Typ() == INTMAT_CMD)
@@ -1490,6 +1492,42 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
+BOOLEAN containsCone(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      lists l = (lists) u->Data();
+      gfan::ZCone* zc = (gfan::ZCone*) v->Data();
+      zc->canonicalize();
+      int b = 0;
+      for (int i=0; i<=lSize(l); i++)
+      {
+        if (l->m[i].Typ() != coneID)
+        {
+          WerrorS("containsCone: entries of wrong type in list");
+          return TRUE;
+        }
+        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
+        ll->canonicalize();
+        if (!((*ll) != (*zc)))
+        {
+          b = 1;
+          break;
+        }
+      }
+      res->rtyp = INT_CMD;
+      res->data = (char*) b;
+      return FALSE;
+    }
+  }
+  WerrorS("containsCone: unexpected parameters");
+  return TRUE;
+}
+
 void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1545,6 +1583,9 @@ void bbcone_setup()
   iiAddCproc("","quotientLatticeBasis",FALSE,quotientLatticeBasis);
   iiAddCproc("","semigroupGenerator",FALSE,semigroupGenerator);
   iiAddCproc("","uniquePoint",FALSE,uniquePoint);
+
+  iiAddCproc("","listContainsCone",FALSE,containsCone);
+
   // iiAddCproc("","faceContaining",FALSE,faceContaining);
   coneID=setBlackboxStuff(b,"cone");
 }

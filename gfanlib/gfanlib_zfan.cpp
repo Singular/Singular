@@ -202,7 +202,11 @@ namespace gfan
   }
   ZFan::ZFan(ZFan const& f):
     complex(0),
-    coneCollection(0)
+    coneCollection(0),
+    cones(f.table(0,0)),
+    maximalCones(f.table(0,1)),
+    coneOrbits(f.table(1,0)),
+    maximalConeOrbits(f.table(1,1))
   {
     if(f.coneCollection)
       {
