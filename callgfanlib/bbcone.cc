@@ -10,6 +10,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
+#include <Singular/lists.h>
 #include <Singular/subexpr.h>
 #include <sstream>
 
@@ -1491,6 +1492,42 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
+BOOLEAN containsCone(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == coneID))
+    {
+      lists l = (lists) u->Data();
+      gfan::ZCone* zc = (gfan::ZCone*) v->Data();
+      zc->canonicalize();
+      int b = 0;
+      for (int i=0; i<=lSize(l); i++)
+      {
+        if (l->m[i].Typ() != coneID)
+        {
+          WerrorS("containsCone: entries of wrong type in list");
+          return TRUE;
+        }
+        gfan::ZCone* ll = (gfan::ZCone*) l->m[i].Data();
+        ll->canonicalize();
+        if (!((*ll) != (*zc)))
+        {
+          b = 1;
+          break;
+        }
+      }
+      res->rtyp = INT_CMD;
+      res->data = (char*) b;
+      return FALSE;
+    }
+  }
+  WerrorS("containsCone: unexpected parameters");
+  return TRUE;
+}
+
 void bbcone_setup()
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1546,6 +1583,9 @@ void bbcone_setup()
   iiAddCproc("","quotientLatticeBasis",FALSE,quotientLatticeBasis);
   iiAddCproc("","semigroupGenerator",FALSE,semigroupGenerator);
   iiAddCproc("","uniquePoint",FALSE,uniquePoint);
+
+  iiAddCproc("","listContainsCone",FALSE,containsCone);
+
   // iiAddCproc("","faceContaining",FALSE,faceContaining);
   coneID=setBlackboxStuff(b,"cone");
 }
