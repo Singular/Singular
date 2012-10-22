@@ -12,22 +12,6 @@
 #include "cf_factory.h"
 #include "gmpext.h"
 
-static int intgcd( int a, int b )
-{
-    if ( a < 0 ) a = -a;
-    if ( b < 0 ) b = -b;
-
-    int c;
-
-    while ( b != 0 )
-    {
-        c = a % b;
-        a = b;
-        b = c;
-    }
-    return a;
-}
-
 static long intgcd( long a, long b )
 {
     if ( a < 0 ) a = -a;
@@ -67,11 +51,11 @@ InternalRational::InternalRational( const int n, const int d )
     }
     else
     {
-        int g = intgcd( n, d );
+        long g = intgcd( (long)n, (long)d );
         if ( d < 0 )
         {
-          mpz_init_set_si( _num, -n / g );
-          mpz_init_set_si( _den, -d / g );
+          mpz_init_set_si( _num, -((long)n) / g );
+          mpz_init_set_si( _den, -((long)d) / g );
         }
         else
         {
