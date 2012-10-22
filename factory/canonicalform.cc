@@ -1791,13 +1791,7 @@ operator >> ( ISTREAM & is, CanonicalForm & cf )
 #endif /* NOSTREAMIO */
 //}}}
 
-//{{{ genCoeff(), genOne(), genZero()
-CanonicalForm
-CanonicalForm::genCoeff( int type, int i )
-{
-    return CanonicalForm( CFFactory::basic( type, (long)i ) );
-}
-
+//{{{ genOne(), genZero()
 CanonicalForm
 CanonicalForm::genZero() const
 {

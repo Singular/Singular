@@ -172,7 +172,6 @@ public:
 #endif /* NOSTREAMIO */
 
     // obsolete methods
-    static CanonicalForm genCoeff( int what, int i = 0 );
     CanonicalForm genZero() const;
     CanonicalForm genOne() const;
 
