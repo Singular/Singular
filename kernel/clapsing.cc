@@ -171,7 +171,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
       eg=pGetExp_Var(g,i);
       CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
       res= convFactoryPSingTrP( resultant( F, G, X ) );
-      if ((nf!=NULL)&&(!nIsOne(nf))&&(!nIsZero(nf)))
+      if ((nf!=NULL)&&(!nIsOne(nf)))
       {
         number n=nInvers(nf);
         while(eg>0)
@@ -182,7 +182,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
         nDelete(&n);
       }
       nDelete(&nf);
-      if ((ng!=NULL)&&(!nIsOne(ng))&&(!nIsZero(ng)))
+      if ((ng!=NULL)&&(!nIsOne(ng)))
       {
         number n=nInvers(ng);
         while(ef>0)
