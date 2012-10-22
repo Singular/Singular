@@ -2711,7 +2711,6 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     }
   }
 
-  assume( n_GreaterZero(pGetCoeff(ph),C) );
   if(!n_GreaterZero(pGetCoeff(ph),C))
   {
     ph = p_Neg(ph,r);
