@@ -904,12 +904,15 @@ int newMainVariableSearch (CanonicalForm& A, CFList& Aeval, CFList&
 CanonicalForm lcmContent (const CanonicalForm& A, CFList& contentAi)
 {
   int i= A.level();
-  contentAi.append (myContent (A, i));
-  contentAi.append (myContent (A, i - 1));
+  CanonicalForm buf= A;
+  contentAi.append (content (buf, i));
+  buf /= contentAi.getLast();
+  contentAi.append (content (buf, i - 1));
   CanonicalForm result= lcm (contentAi.getFirst(), contentAi.getLast());
   for (i= i - 2; i > 0; i--)
   {
-    contentAi.append (content (A, i));
+    contentAi.append (content (buf, i));
+    buf /= contentAi.getLast();
     result= lcm (result, contentAi.getLast());
   }
   return result;
