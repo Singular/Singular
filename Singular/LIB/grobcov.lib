@@ -1275,20 +1275,20 @@ EXAMPLE:  cgsdr; shows an example"
   LL[9]="nonnull"; LL[10]=N;
   if(comment>=1)
   {
-    string("Begin cgsdr with options: ",LL);
+    "Begin cgsdr with options: "+string(LL);
   }
   int ish;
   for (i=1;i<=size(B);i++){ish=ishomog(B[i]); if(ish==0){break;};}
   if (ish)
   {
-    string("The given system is homogneous");
+    "The given system is homogneous";
     can=0;
   }
   // ACTING DEPENDING ON OPTIONS
   if(can==2)
   {
     // WITHOUT HOMOHGENIZING
-    string("Option of cgsdr: do not homogenize");
+    "Option of cgsdr: do not homogenize";
     def GS=KSW(B,LL);
     setglobalrings();
   }
@@ -1297,7 +1297,7 @@ EXAMPLE:  cgsdr; shows an example"
     if(can==1)
     {
       // COMPUTING THE HOMOGOENIZED IDEAL
-      string("Homogenizing the whole ideal: option can=1");
+      if(comment>0){"Homogenizing the whole ideal: option can=1"; }
       list RRL=ringlist(RR);
       RRL[3][1][1]="dp";
       def Pa=ring(RRL[1]);
@@ -1318,7 +1318,7 @@ EXAMPLE:  cgsdr; shows an example"
     }
     else
     { // (can=0)
-      string("Homogenizing the basis: option can=0");
+      if(comment>0){"Homogenizing the basis: option can=0";}
       def B2=B;
     }
     // COMPUTING HOMOGENIZED CGS
@@ -1333,7 +1333,7 @@ EXAMPLE:  cgsdr; shows an example"
     {
       BH[i]=homog(BH[i],@t);
     }
-    if (comment>=1){string("Homogenized system = "); BH;}
+    if (comment>=1){"Homogenized system = "; BH;}
     def GSH=KSW(BH,LH);
     setglobalrings();
     // DEHOMOGENIZING THE RESULT
@@ -1713,7 +1713,7 @@ proc addpartfine(list H, list C0)
     Q1=nQ1;
   }
   setring(RR);
-  //if(used>0){string("addpartfine was ", used, " times used");}
+  //if(used>0){"addpartfine was ", used, " times used";}
   return(imap(@P,Q1));
 }
 
@@ -1886,8 +1886,8 @@ proc gcover(ideal F,list #)
   }
   if(comment>=1)
   {
-    string("Time in LCUnion + combine = ",timer-start);
-    if(comment>=2){string("lpp=",lpi)};
+    "Time in LCUnion + combine = ",timer-start;
+    if(comment>=2){"lpp=",lpi};
   }
   if(defined(@P)==1){kill @P; kill @RP; kill @R;}
   return(S);
@@ -2048,7 +2048,7 @@ EXAMPLE:  grobcov; shows an example"
   }
   if(not((canop==0) or (canop==1)))
   {
-    string("Option can = ",canop," is not supported. It is changed to can = 1");
+    "Option can = ",canop," is not supported. It is changed to can = 1";
     canop=1;
   }
   for(i=1;i<=size(L0) div 2;i++)
@@ -2066,7 +2066,7 @@ EXAMPLE:  grobcov; shows an example"
   LL[13]="rep";    LL[14]=repop;
   if (comment>=1)
   {
-    string("Begin grobcov with options: ",LL);
+    "Begin grobcov with options: ",string(LL);
   }
   kill S;
   def S=gcover(F,LL);
@@ -2115,8 +2115,8 @@ EXAMPLE:  grobcov; shows an example"
   }
   if (comment>=1)
   {
-    string("Time in grobcov = ", timer-start);
-    string("Number of segments of grobcov = ", size(S));
+    "Time in grobcov = ", timer-start;
+    "Number of segments of grobcov = ", size(S);
   }
   if(defined(@P)==1){kill @R; kill @P; kill @RP;}
   return(S);
@@ -2305,7 +2305,7 @@ EXAMPLE:  extend; shows an example"
 
     }
   }
-  if(comment>=1){string("Time in extend = ",timer-start3);}
+  if(comment>=1){"Time in extend = ",timer-start3;}
   if(te==0){kill @R; kill @RP; kill @P;}
   return(S);
 }
@@ -3406,12 +3406,12 @@ proc KSW(ideal F, list #)
       }
     }
   }
-  if (comment>0){string("Begin KSW with null = ",E," nonnull = ",N);}
+  if (comment>0){"Begin KSW with null = ",string(E)," nonnull = ",string(N);}
   def CG=KSW0(F,E,N,comment);
   if (comment>0)
   {
-    string("Number of segments in KSW (total) = ",size(CG));
-    string("Time in KSW = ",timer-start);
+    "Number of segments in KSW (total) = ",size(CG);
+    "Time in KSW = ",timer-start;
   }
   if(out==0)
   {
@@ -3419,8 +3419,8 @@ proc KSW(ideal F, list #)
     CG=groupKSWsegments(CG);
     if (comment>0)
     {
-      string("Number of lpp segments = ",size(CG));
-      string("Time in KSW + group + Prep = ",timer-start);
+      "Number of lpp segments = ",size(CG);
+      "Time in KSW + group + Prep = ",timer-start;
     }
   }
   if(defined(@P)){kill @P; kill @R; kill @RP;}
