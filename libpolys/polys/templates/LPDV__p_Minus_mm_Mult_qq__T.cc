@@ -2,11 +2,18 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    p_Minus_mm_Mult_qq__Template.cc
- *  Purpose: template for p_Minus_m_Mult_q
- *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
+ *  File:    LPDV__p_Minus_mm_Mult_qq__Template.cc
+ *  Purpose: template for LPDV__p_Minus_mm_Mult_qq
+ *  Author:  obachman (Olaf Bachmann) (small Additions from
+ *           gribo for the Letterplace DVec case)
+ *  Created: 10/2012
+ *  TODO:    This should somehow be merged (if possible) with
+ *           p_Minus_mm_Mult_qq__T (see TODO below), since we
+ *           only need one of theses functions: either
+ *           p_Minus_mm_Mult_qq or LPDV__p_Minus_mm_Mult_qq
  *******************************************************************/
+
+#define HAVE_SHIFTBBADVEC
 
 /***************************************************************
  *
@@ -16,7 +23,9 @@
  * Const:    m, q
  *
  ***************************************************************/
-LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r)
+LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
+  ( poly p, poly m, poly q, 
+    int& Shorter, const poly spNoether, const ring r )
 {
   p_Test(p, r);
   p_Test(q, r);
@@ -56,13 +65,22 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   p_AllocBin(qm, bin, r);
   SumTop:
 #ifdef HAVE_SHIFTBBADVEC 
-  //SHIFTBBADVEC case: need other Parameters
-  p_ExpSum__T(qm, q, m, r);
+  /*BOCO: Notes for SHIFTBBADVEC case
+   *NOTE 1: We need other Parameters
+   *NOTE 2: ShiftDVec::p_ExpSum is a pointer which has to be 
+   *      choosen appropriately according to the term ordering 
+   *      used. At the moment I'm writing this, there are two 
+   *      possibilities:
+   *      ShiftDVec::p_ExpSum_slow and
+   *      ShiftDVec::p_ExpSum_dp
+   *TODO: How can we merge that? For the Letterplace case we
+   *      don't need the original p_Minus_mm_Mult_qq !
+   */
+  ShiftDVec::p_ExpSum(qm, q, m, r);
 #else
   p_MemSum__T(qm->exp, q->exp, m_e, length);
-#fi
-
   p_MemAddAdjust__T(qm, r);
+#fi
 
   CmpTop:
   // compare qm = m*q and p w.r.t. monomial ordering
@@ -146,12 +164,22 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
     if (spNoether != NULL)
     {
       int ll = 0;
+#ifdef HAVE_SHIFTBBADVEC 
+      //BOCO: TODO: These two functions should also be merged
+      pNext(a) = r->p_Procs->LPDV__pp_Mult_mm_Noether
+                              (q, m, spNoether, ll, r);
+#else
       pNext(a) = r->p_Procs->pp_Mult_mm_Noether(q, m, spNoether, ll, r);
+#fi
       shorter += ll;
     }
     else
     {
+#ifdef HAVE_SHIFTBBADVEC 
+      pNext(a) = r->p_Procs->LPDV__pp_Mult_mm(q, m, r);
+#else
       pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r);
+#fi
 #ifdef HAVE_RINGS
       if (! rField_is_Domain(r))
       {

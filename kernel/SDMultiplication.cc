@@ -150,11 +150,7 @@ p_GetExpDiff		kspoly.cc	607, 659, 697
 #include <kutil.h>  //because of include order
 #include <SDMultiplication.h>
 
-//for p_MemCopy_LengthGeneral
-#include <libpolys/polys/templates/p_MemCopy.h>
-
 #include <polys/monomials/p_polys.h>
-
 
 
 /* Part 1: General Tools - especially for dp case and the like */
@@ -237,9 +233,11 @@ long ShiftDVec::_GetExp(long* exp, ring r, const int v)
  * to on in p->exp . rt has to be allocated (for example with  *
  * p_AllocBin?).                                               */
 void ShiftDVec::p_ExpSum_slow
-  (poly rt, poly p, poly q, ring r, int lV)
+  (poly rt, poly p, poly q, ring r)
 {
   p_MemCopy_LengthGeneral(rt->exp, p->exp, r->ExpL_Size);
+
+  int lV = r->isLPring.
 
   //This represents the first index in the currently considered
   //block in rt->exp.
@@ -272,34 +270,14 @@ void ShiftDVec::p_ExpSum_slow
  * to on in p->exp . rt has to be allocated (for example with  *
  * p_AllocBin?).                                               */
 void ShiftDVec::p_ExpSum_dp
-  (poly rt, poly p, poly q, ring r, int lV)
+  (poly rt, poly p, poly q, ring r)
 {
-  /* Du Gedicht                                              *
-   *                                                         *
-   * Wie gabst du in Wenigem,                                *
-   * mir dich meiner Seele hin,                              *
-   * gleichsam einem tiefen Fluss,                           *
-   * welcher dunkel sich ergiesst.                           * 
-   *                                                         *
-   * Und in seinem Wasserbette,                              *
-   * hunderte an einer Kette,                                *
-   * Perlenkiese in sich traegt,                             *
-   * ihren sich'ren Wert erwaegt.                            *
-   *                                                         *
-   * Ueberschaubar war die Laenge,                           *
-   * dennoch sprachst du eine Menge                          *
-   * kleiner Universen aus.                                  *
-   *                                                         *
-   * Und in diesem Wortgedraenge                             *
-   * und mit glitzerndem Gehaenge                            *
-   * kamst du furchtbar hoch hinaus.                         * 
-   *                                                         *
-   * Bo                                                      */
   p_MemCopy_LengthGeneral(rt->exp, p->exp, r->ExpL_Size);
 
   //This represents the first index in the currently considered
   //block in rt->exp.
   //long index_rt = p_Totaldegree(p, r) * lV + 1;
+  int lV = r->isLPring.
   long index_rt = p->exp[r->omap[0]] * lV + 1;
 
   long index_q = 1;
@@ -322,6 +300,12 @@ void ShiftDVec::p_ExpSum_dp
 
   return;
 }
+
+#if NOT_WORKING
+
+//for p_MemCopy_LengthGeneral
+#include <libpolys/polys/templates/p_MemCopy.h>
+
 
 
 
@@ -1501,3 +1485,5 @@ x1:
     }
   }
 }
+
+#endif
