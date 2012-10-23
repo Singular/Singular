@@ -26,7 +26,7 @@
 LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
   ( poly p, poly m, poly q, 
     int& Shorter, const poly spNoether, const ring r )
-{
+{;
   p_Test(p, r);
   p_Test(q, r);
   p_LmTest(m, r);
@@ -76,7 +76,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
    *TODO: How can we merge that? For the Letterplace case we
    *      don't need the original p_Minus_mm_Mult_qq !
    */
-  ShiftDVec::p_ExpSum(qm, q, m, r);
+  r->p_ExpSum(qm, q, m, r);
 #else
   p_MemSum__T(qm->exp, q->exp, m_e, length);
   p_MemAddAdjust__T(qm, r);

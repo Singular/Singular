@@ -350,7 +350,7 @@ struct ip_sring
   /* This is the letterplace replacement for p_MemSum__T.    *
    * See SDMultiplication.cc for more informations. This     *
    * pointer should be initialized by InitSDMultiplication   */
-  void (*p_ExpSum)(poly rt, poly p, poly q, ring r, int lV);
+  void (*p_ExpSum)(poly rt, poly p, poly q, ring r);
 #endif
 };
 

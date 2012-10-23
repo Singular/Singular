@@ -190,7 +190,7 @@ int ShiftDVec::InitOrderMapping( ring r )
 /* Initializes the letterplace multiplication. See also        *
  * InitOrderMapping. Do not forget to free r->omap as soon, as *
  * it will no longer be used.                                  */
-void ShiftDVec::InitSDMultiplication( ring r )
+void ShiftDVec::InitSDMultiplication( ring r, ring tailRing )
 {
   for(int i = 1; i < r->OrdSize; ++i)
   {
@@ -201,7 +201,17 @@ void ShiftDVec::InitSDMultiplication( ring r )
     }
   }
 
+  //BOCO: TODO: QUESTION: 
+  //Do we have to reset that after the bba?
+  r->p_Procs->pp_Mult_mm
+    tailRing->p_Procs->LPDV__pp_Mult_mm;
+  r->p_Procs->pp_Mult_mm_Noether =
+    tailRing->p_Procs->LPDV__pp_Mult_mm_Noether;
+  r->p_Procs->p_Minus_mm_Mult_qq =
+    tailRing->p_Procs->LPDV__p_Minus_mm_Mult_qq;
+
   r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
+
   InitOrderMapping(r);
 }
 
@@ -301,8 +311,10 @@ void ShiftDVec::p_ExpSum_dp
   return;
 }
 
-#if NOT_WORKING
 
+
+//The following is currently not working/used
+#if 0
 //for p_MemCopy_LengthGeneral
 #include <libpolys/polys/templates/p_MemCopy.h>
 
@@ -646,8 +658,6 @@ poly ShiftDVec::p_Minus_mm_Mult_qq__T
 
 
 
-/* Part 4: adjustment of the bba functions which make use of   *
- * one of the functions from Part 3                            */
 
 
 

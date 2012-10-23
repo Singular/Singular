@@ -3,16 +3,18 @@
 
 #include <kernel/kutil.h> //INCLUDE Magic
 
-#if 0 //Everything commented out - have to work on it
 namespace ShiftDVec
 {
+  void p_ExpSum_slow
+    (poly rt, poly p, poly q, ring r);
+  void p_ExpSum_dp
+    (poly rt, poly p, poly q, ring r);
+  void (*p_ExpSum) (poly rt, poly p, poly q, ring r);
+
   int InitOrderMapping( ring r );
   void InitSDMultiplication( ring r );
 
-  void p_ExpSum_slow
-    (poly rt, poly p, poly q, ring r, int lV);
-  void p_ExpSum_dp
-    (poly rt, poly p, poly q, ring r, int lV);
+#if 0 //The following is currently not working/used
 
   poly pp_Mult_mm__T
     (poly p, const poly m, const ring ri, poly &last, int lV);
@@ -36,6 +38,6 @@ namespace ShiftDVec
   int ksReducePolyTail
     ( LObject* PR, TObject* PW, LObject* Red, int lV );
   poly ksCreateShortSpoly( poly p1, poly p2, ring tailRing );
-}
 #endif
+}
 #endif

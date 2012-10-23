@@ -48,7 +48,7 @@ LINKAGE poly LPDV__pp_Mult_mm_Noether__T
     p_AllocBin(r, bin, ri);
 
 #ifdef HAVE_SHIFTBBADVEC
-    ShiftDVec::p_ExpSum(r, p, m, ri);
+    ri->p_ExpSum(r, p, m, ri);
 #else
     p_MemSum__T(r->exp, p->exp, m_e, length);
     p_MemAddAdjust__T(r, ri);

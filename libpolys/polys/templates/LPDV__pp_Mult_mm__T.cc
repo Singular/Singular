@@ -52,7 +52,7 @@ LINKAGE poly LPDV__pp_Mult_mm__T
       pSetCoeff0(q, tmp);
 
 #ifdef HAVE_SHIFTBBADVEC //BOCO: only change for LPDV in this file
-      ShiftDVec::p_ExpSum(q, p, m, ri);
+      ri->p_ExpSum(q, p, m, ri);
 #else
       p_MemSum__T(q->exp, p->exp, m_e, length);
       p_MemAddAdjust__T(q, ri);
