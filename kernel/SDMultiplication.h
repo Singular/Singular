@@ -9,7 +9,7 @@ namespace ShiftDVec
     (poly rt, poly p, poly q, ring r);
   void p_ExpSum_dp
     (poly rt, poly p, poly q, ring r);
-  void (*p_ExpSum) (poly rt, poly p, poly q, ring r);
+  //void (*p_ExpSum) (poly rt, poly p, poly q, ring r);
 
   int InitOrderMapping( ring r );
   void InitSDMultiplication( ring r );

@@ -3248,6 +3248,5 @@ void initBbaShift(ideal F,kStrategy strat)
 #include <polys/templates/p_Procs.h>
 poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV )
 {
-  currRing->p_Procs->LPDV__pp_Mult_mm();
-  return pCopy(p);
+  return currRing->p_Procs->LPDV__pp_Mult_mm(p, q, currRing);
 }

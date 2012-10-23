@@ -48,11 +48,12 @@ LINKAGE poly LPDV__pp_Mult_mm_Noether__T
     p_AllocBin(r, bin, ri);
 
 #ifdef HAVE_SHIFTBBADVEC
+    p_MemCopy__T(r->exp, p->exp, length);
     ri->p_ExpSum(r, p, m, ri);
 #else
     p_MemSum__T(r->exp, p->exp, m_e, length);
-    p_MemAddAdjust__T(r, ri);
-#fi
+    p_MemAddAdjust__T(r, ri); //BOCO: Do we need this?
+#endif
 
     p_MemCmp__T(r->exp, spNoether_exp, length, ordsgn, goto Continue, goto Continue, goto Break);
 

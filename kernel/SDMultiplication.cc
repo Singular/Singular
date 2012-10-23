@@ -190,7 +190,7 @@ int ShiftDVec::InitOrderMapping( ring r )
 /* Initializes the letterplace multiplication. See also        *
  * InitOrderMapping. Do not forget to free r->omap as soon, as *
  * it will no longer be used.                                  */
-void ShiftDVec::InitSDMultiplication( ring r, ring tailRing )
+void ShiftDVec::InitSDMultiplication( ring r )
 {
   for(int i = 1; i < r->OrdSize; ++i)
   {
@@ -203,12 +203,12 @@ void ShiftDVec::InitSDMultiplication( ring r, ring tailRing )
 
   //BOCO: TODO: QUESTION: 
   //Do we have to reset that after the bba?
-  r->p_Procs->pp_Mult_mm
-    tailRing->p_Procs->LPDV__pp_Mult_mm;
+  r->p_Procs->pp_Mult_mm =
+    r->p_Procs->LPDV__pp_Mult_mm;
   r->p_Procs->pp_Mult_mm_Noether =
-    tailRing->p_Procs->LPDV__pp_Mult_mm_Noether;
+    r->p_Procs->LPDV__pp_Mult_mm_Noether;
   r->p_Procs->p_Minus_mm_Mult_qq =
-    tailRing->p_Procs->LPDV__p_Minus_mm_Mult_qq;
+    r->p_Procs->LPDV__p_Minus_mm_Mult_qq;
 
   r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
 
@@ -245,9 +245,7 @@ long ShiftDVec::_GetExp(long* exp, ring r, const int v)
 void ShiftDVec::p_ExpSum_slow
   (poly rt, poly p, poly q, ring r)
 {
-  p_MemCopy_LengthGeneral(rt->exp, p->exp, r->ExpL_Size);
-
-  int lV = r->isLPring.
+  int lV = r->isLPring;
 
   //This represents the first index in the currently considered
   //block in rt->exp.
@@ -282,12 +280,10 @@ void ShiftDVec::p_ExpSum_slow
 void ShiftDVec::p_ExpSum_dp
   (poly rt, poly p, poly q, ring r)
 {
-  p_MemCopy_LengthGeneral(rt->exp, p->exp, r->ExpL_Size);
-
   //This represents the first index in the currently considered
   //block in rt->exp.
   //long index_rt = p_Totaldegree(p, r) * lV + 1;
-  int lV = r->isLPring.
+  int lV = r->isLPring;
   long index_rt = p->exp[r->omap[0]] * lV + 1;
 
   long index_q = 1;

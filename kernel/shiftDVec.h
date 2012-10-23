@@ -1,5 +1,8 @@
 #include <mod2.h>
 
+#ifndef SHIFTDVEC_H
+#define SHIFTDVEC_H
+
 namespace ShiftDVec
 {
   ideal freegbdvc
@@ -94,3 +97,5 @@ namespace ShiftDVec
   void DeBoGriTestGM
     (TSet tset, int k, TObject* H, int uptodeg, int lVblock);
 }
+
+#endif

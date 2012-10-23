@@ -55,12 +55,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   AllocTop:
   p_AllocBin(qm, bin, r);
   SumTop:
-#ifdef HAVE_SHIFTBBADVEC 
-  //SHIFTBBADVEC case: need other Parameters
-  p_ExpSum__T(qm, q, m, r);
-#else
   p_MemSum__T(qm->exp, q->exp, m_e, length);
-#fi
 
   p_MemAddAdjust__T(qm, r);
 

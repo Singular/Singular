@@ -404,7 +404,7 @@ ideal ShiftDVec::bba
 #endif
 
 ShiftDVec::InitSDMultiplication(strat->tailRing);
-ShiftDVec::InitSDMultiplication(strat->currRing);
+ShiftDVec::InitSDMultiplication(currRing);
 
 #ifdef KDEBUG
   //kDebugPrint(strat);

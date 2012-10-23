@@ -76,11 +76,12 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
    *TODO: How can we merge that? For the Letterplace case we
    *      don't need the original p_Minus_mm_Mult_qq !
    */
+  p_MemCopy__T(qm->exp, q->exp, length); //BOCO: will that be defined correctly?
   r->p_ExpSum(qm, q, m, r);
 #else
   p_MemSum__T(qm->exp, q->exp, m_e, length);
   p_MemAddAdjust__T(qm, r);
-#fi
+#endif
 
   CmpTop:
   // compare qm = m*q and p w.r.t. monomial ordering
@@ -170,7 +171,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
                               (q, m, spNoether, ll, r);
 #else
       pNext(a) = r->p_Procs->pp_Mult_mm_Noether(q, m, spNoether, ll, r);
-#fi
+#endif
       shorter += ll;
     }
     else
@@ -179,7 +180,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
       pNext(a) = r->p_Procs->LPDV__pp_Mult_mm(q, m, r);
 #else
       pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r);
-#fi
+#endif
 #ifdef HAVE_RINGS
       if (! rField_is_Domain(r))
       {
