@@ -199,6 +199,7 @@ typedef enum p_Proc
   p_kBucketSetLm_Proc,
   LPDV__pp_Mult_mm_Proc,
   LPDV__pp_Mult_mm_Noether_Proc,
+  LPDV__p_Minus_mm_Mult_qq_Proc,
   p_Unknown_Proc
 } p_Proc;
 
@@ -294,6 +295,7 @@ static inline const char* p_ProcEnum_2_String(p_Proc proc)
       case p_kBucketSetLm_Proc: return "p_kBucketSetLm_Proc";
       case LPDV__pp_Mult_mm_Proc: return "LPDV__pp_Mult_mm_Proc";
       case LPDV__pp_Mult_mm_Noether_Proc: return "LPDV__pp_Mult_mm_Noether_Proc";
+      case LPDV__p_Minus_mm_Mult_qq_Proc: return "LPDV__p_Minus_mm_Mult_qq_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";     
   }
   return "NoProc_2_String";
@@ -638,6 +640,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Add_q_Proc:
       case p_Minus_mm_Mult_qq_Proc:
       case pp_Mult_mm_Noether_Proc:
+      case LPDV__p_Minus_mm_Mult_qq_Proc:
       case p_kBucketSetLm_Proc:
         return index(field, length, ord);
 
@@ -690,6 +693,7 @@ do                                                                      \
   SetProc(p_kBucketSetLm, field, length, ord);                          \
   SetProc(LPDV__pp_Mult_mm, field, length, OrdGeneral);                 \
   SetProc(LPDV__pp_Mult_mm_Noether, field, length, OrdGeneral);         \
+  SetProc(LPDV__p_Minus_mm_Mult_qq, field, length, ord);                \
 }                                                                       \
 while (0)
 
