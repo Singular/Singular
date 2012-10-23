@@ -403,6 +403,8 @@ ideal ShiftDVec::bba
   }
 #endif
 
+ShiftDVec::InitSDMultiplication(strat->tailRing);
+ShiftDVec::InitSDMultiplication(strat->currRing);
 
 #ifdef KDEBUG
   //kDebugPrint(strat);
@@ -1184,9 +1186,9 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
         else
           return NULL;
       }
-#if 0 //original code (replaced)
+#if 1 //original code (replaced)
       hn = pNext(h);
-#else //replacement
+#else //replacement shrink not needed so rereplaced @GRICO
       if (pNext(h) != NULL && !strat->homog ){
         hn=p_Shrink(pNext(h),strat->lV,strat->tailRing);
       }
@@ -1714,12 +1716,15 @@ poly ShiftDVec::redBba
        * that done in redFirstShrink
        * some other time, i should review redBbaShift
        */
+      /*
+      *GRICO: this is the old shrink process
+      *which should be no longer needed, so h will not be changed
       if (!h->IsNull() && !strat->homog ){
         poly qq=p_Shrink(h->GetTP(),strat->lV,strat->tailRing);
         h->p=NULL;
         h->t_p=qq;
         if (qq!=NULL) h->GetP(strat->lmBin);
-      }
+      }*/
 
       h->freeDVec(); //BOCO: after reduction lm has changed
       if(shift > 0)
@@ -2454,13 +2459,16 @@ poly ShiftDVec::redtailBba
        * seems unused...?
        * I hope, this fits right in here, but i am not shure.
        */
-      if (!Ln.IsNull() && !strat->homog ){
+      /*GRICO: this is the old shrink process
+      *which should be no longer needed, so h will not be changed
+       if (!Ln.IsNull() && !strat->homog ){
         poly qq=p_Shrink(Ln.GetTP(),strat->lV,strat->tailRing);
         Ln.p=NULL;
         Ln.t_p=qq;
         if (qq!=NULL) Ln.GetP(strat->lmBin);
       }
-
+      */
+     
       if (Ln.IsNull()){
         assume(Ln.p == NULL);
         goto all_done;
