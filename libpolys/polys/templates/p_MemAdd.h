@@ -385,4 +385,86 @@ do                                                  \
 }                                                   \
 while (0)
 
+
+
+#if 0
+//BOCO: Added for SHIFT DVEC case p_ExpSum functions
+
+
+
+/* BOCO: This is our letterplace replacement for p_MemSum__T.  *
+ * This function will return rt->exp = p->exp + s * q->exp,    *
+ * where s is a shift in size of the number of exponents equal *
+ * to on in p->exp . rt has to be allocated (for example with  *
+ * p_AllocBin?).                                               */
+void LPDV__p_ExpSum_slow
+  (poly rt, poly p, poly q, ring r)
+{
+  p_MemCopy_LengthGeneral(rt->exp, p->exp, r->ExpL_Size);
+
+  int lV = r->isLPring.
+
+  //This represents the first index in the currently considered
+  //block in rt->exp.
+  long index_rt = p_Totaldegree(p, r) * lV + 1;
+
+  long index_q = 1;
+  {
+    nextblock: ;
+    //We will loop, until we found an empty block, or until we
+    //considered all variables
+    for(long i = 0; i < lV; ++i)
+      if( p_GetExp(q, index_q+i, r) )
+      {
+        p_SetExp(rt, index_rt+i, 1, r);
+        index_rt += lV;
+        if(index_rt > r->N) break; //looped through all vars
+        index_q += lV; //We found a nonzero exponent, thus
+        goto nextblock; //we can move on to the next block
+      }
+  }
+
+  p_Setm(rt,r);  //TODO: Maybe this is not yet nescessary
+  return;
+}
+
+/* BOCO: This is our letterplace replacement for p_MemSum__T,  *
+ * in case we have a dp-ordering on our blocks.                *
+ * This function will return rt->exp = p->exp + s * q->exp,    *
+ * where s is a shift in size of the number of exponents equal *
+ * to on in p->exp . rt has to be allocated (for example with  *
+ * p_AllocBin?).                                               */
+void LPDV__p_ExpSum_dp
+  (poly rt, poly p, poly q, ring r)
+{
+  p_MemCopy_LengthGeneral(rt->exp, p->exp, r->ExpL_Size);
+
+  //This represents the first index in the currently considered
+  //block in rt->exp.
+  //long index_rt = p_Totaldegree(p, r) * lV + 1;
+  int lV = r->isLPring.
+  long index_rt = p->exp[r->omap[0]] * lV + 1;
+
+  long index_q = 1;
+  {
+    nextblock: ;
+    //We will loop, until we found an empty block, or until we
+    //considered all variables
+    for(long i = 0; i < lV; ++i)
+      if( p_GetExp(q, index_q+i, r) )
+      {
+        rt->exp[r->omap[index_rt+i]] = 1;
+        p_SetExp(rt, index_rt+i, 1, r);
+        index_rt += lV;
+        if(index_rt > r->N) break; //looped through all vars
+        index_q += lV; //We found a nonzero exponent, thus
+        goto nextblock; //we can move on to the next block
+      }
+  }
+  rt->exp[r->omap[0]] += q->exp[r->omap[0]];
+
+  return;
+}
+#endif
+
 #endif /* P_MEM_ADD_H */

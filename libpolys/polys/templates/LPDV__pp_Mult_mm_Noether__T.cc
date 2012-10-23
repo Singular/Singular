@@ -7,68 +7,73 @@
  *  Author:  obachman (Olaf Bachmann) (small Additions from
  *           gribo for the Letterplace DVec case)
  *  Created: 10/2012
- *  TODO:    See LPDV__p_Minus_mm_Mult_qq__Template.cc
  *******************************************************************/
 
 #define HAVE_SHIFTBBADVEC
 
 /***************************************************************
  *
- *   Returns:  p*m
+ *   Returns:  p*m, ll
+ *   ll == pLength(p*m) , if on input ll < 0
+ *   pLength(p) - pLength(p*m), if on input ll >= 0
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly LPDV__pp_Mult_mm__T
- ( poly p, const poly m, const ring ri )
+LINKAGE poly LPDV__pp_Mult_mm_Noether__T
+  ( poly p, const poly m, 
+    const poly spNoether, int &ll, const ring ri )
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
+  assume(spNoether != NULL);
   if (p == NULL)
   {
+    ll = 0;
     return NULL;
   }
   spolyrec rp;
-#ifdef HAVE_ZERODIVISORS
-  rp.next = NULL;
-#endif
-  poly q = &rp;
+  poly q = &rp, r;
+  const unsigned long *spNoether_exp = spNoether->exp;
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
+  DECLARE_ORDSGN(const long* ordsgn = ri->ordsgn);
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero__T(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
-  number tmp;
+  int l = 0;
 
   do
   {
-    tmp = n_Mult__T(ln, pGetCoeff(p), ri);
-#ifdef HAVE_ZERODIVISORS
-    if (! n_IsZero__T(tmp, ri))
-    {
-#endif
-      p_AllocBin( pNext(q), bin, ri);
-      q = pNext(q);
-      pSetCoeff0(q, tmp);
+    p_AllocBin(r, bin, ri);
 
-#ifdef HAVE_SHIFTBBADVEC //BOCO: only change for LPDV in this file
-      ShiftDVec::p_ExpSum(q, p, m, ri);
+#ifdef HAVE_SHIFTBBADVEC
+    ShiftDVec::p_ExpSum(r, p, m, ri);
 #else
-      p_MemSum__T(q->exp, p->exp, m_e, length);
-      p_MemAddAdjust__T(q, ri);
+    p_MemSum__T(r->exp, p->exp, m_e, length);
+    p_MemAddAdjust__T(r, ri);
 #fi
 
-#ifdef HAVE_ZERODIVISORS
-    }
-    else n_Delete__T(&tmp, ri);
-#endif
-    p = pNext(p);
-  }
-  while (p != NULL);
+    p_MemCmp__T(r->exp, spNoether_exp, length, ordsgn, goto Continue, goto Continue, goto Break);
+
+    Break:
+    p_FreeBinAddr(r, ri);
+    break;
+
+    Continue:
+    l++;
+    q = pNext(q) = r;
+    pSetCoeff0(q, n_Mult__T(ln, pGetCoeff(p), ri));
+    pIter(p);
+  } while (p != NULL);
+
+  if (ll < 0)
+    ll = l;
+  else
+    ll = pLength(p);
+
   pNext(q) = NULL;
 
   p_Test(pNext(&rp), ri);
   return pNext(&rp);
 }
-
-
