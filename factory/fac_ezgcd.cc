@@ -14,6 +14,7 @@
 
 #include "config.h"
 
+#include "timing.h"
 #include "cf_assert.h"
 #include "debug.h"
 
@@ -29,6 +30,13 @@
 #include "facHensel.h"
 
 #ifdef HAVE_NTL
+
+TIMING_DEFINE_PRINT(ez_eval)
+TIMING_DEFINE_PRINT(ez_compress)
+TIMING_DEFINE_PRINT(ez_hensel_lift)
+TIMING_DEFINE_PRINT(ez_content)
+TIMING_DEFINE_PRINT(ez_termination)
+
 static
 int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                     CFMap & N, int& both_non_zero)
@@ -431,6 +439,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   if (!isRat)
     Off (SW_RATIONAL);
 
+  TIMING_START (ez_compress)
   CFMap M,N;
   int smallestDegLev;
   int best_level= compress4EZGCD (F, G, M, N, smallestDegLev);
@@ -443,15 +452,18 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 
   F= M (F);
   G= M (G);
+  TIMING_END_AND_PRINT (ez_compress, "time for compression in EZ: ")
 
   DEBINCLEVEL( cerr, "ezgcd" );
   DEBOUTLN( cerr, "FF = " << FF );
   DEBOUTLN( cerr, "GG = " << GG );
+  TIMING_START (ez_content)
   f = content( F, x ); g = content( G, x ); d = gcd( f, g );
   d /= icontent (d);
   DEBOUTLN( cerr, "f = " << f );
   DEBOUTLN( cerr, "g = " << g );
   F /= f; G /= g;
+  TIMING_END_AND_PRINT (ez_content, "time to extract content in EZ: ")
   if ( F.isUnivariate() && G.isUnivariate() )
   {
     DEBDECLEVEL( cerr, "ezgcd" );
@@ -499,6 +511,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     DEBOUTLN( cerr, "search for evaluation, delta = " << delta );
     DEBOUTLN( cerr, "F = " << F );
     DEBOUTLN( cerr, "G = " << G );
+    TIMING_START (ez_eval)
     if (!findeval( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count,
                    o, 25, l))
     {
@@ -511,6 +524,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
       result /= icontent (result);
       return N (d*result);
     }
+    TIMING_END_AND_PRINT (ez_eval, "time to find eval point in EZ1: ")
     DEBOUTLN( cerr, "found evaluation b = " << b );
     DEBOUTLN( cerr, "F(b) = " << Fb );
     DEBOUTLN( cerr, "G(b) = " << Gb );
@@ -529,6 +543,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     while ( 1 ) 
     {
       bt = b;
+      TIMING_START (ez_eval)
       if (!findeval( F, G, Fbt, Gbt, Dbt, bt, delta, degF, degG, maxeval, count,
                      o, 25,l ))
       {
@@ -541,6 +556,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         result /= icontent (result);
         return N (d*result);
       }
+      TIMING_END_AND_PRINT (ez_eval, "time to find eval point in EZ2: ")
       int dd=degree( Dbt );
       if ( dd /*degree( Dbt )*/ == 0 )
       {
@@ -635,7 +651,9 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
       DEBOUTLN( cerr, "(hensel) b(B) = " << b(B) );
       DEBOUTLN( cerr, "(hensel) DD   = " << DD );
       DEBOUTLN( cerr, "(hensel) lcDD = " << lcDD );
+      TIMING_START (ez_hensel_lift)
       gcdfound= Hensel (B*lcD, DD, b, lcDD);
+      TIMING_END_AND_PRINT (ez_hensel_lift, "time to hensel lift in EZ: ")
       DEBOUTLN( cerr, "(hensel finished) DD   = " << DD );
 
       if (gcdfound == -1)
@@ -652,12 +670,15 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 
       if (gcdfound)
       {
+        TIMING_START (ez_termination)
         contcand= content (DD[2], Variable (1));
         cand = DD[2] / contcand;
         if (B_is_F)
           gcdfound = fdivides( cand, G ) && cand*(DD[1]/(lcD/contcand)) == F;
         else
           gcdfound = fdivides( cand, F ) && cand*(DD[1]/(lcD/contcand)) == G;
+        TIMING_END_AND_PRINT (ez_termination,
+                              "time for termination test in EZ: ")
       }
       /// ---> A8 (gcdfound)
     }

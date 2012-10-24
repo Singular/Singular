@@ -13,10 +13,14 @@
 #ifndef FAC_FACTORIZE_H
 #define FAC_FACTORIZE_H
 
-// #include "config.h"
+#include "config.h"
+#include "timing.h"
 
 #include "facBivar.h"
 #include "facFqBivarUtil.h"
+
+TIMING_DEFINE_PRINT (fac_squarefree)
+TIMING_DEFINE_PRINT (fac_factor_squarefree)
 
 /// Factorization over Q (a)
 ///
@@ -119,10 +123,18 @@ ratFactorize (const CanonicalForm& G,          ///<[in] a multivariate poly
     F *= bCommonDen (F);
 
   CFFList result;
+  TIMING_START (fac_squarefree);
   CFFList sqrfFactors= sqrFree (F);
+  TIMING_END_AND_PRINT (fac_squarefree,
+                        "time for squarefree factorization over Q: ");
+
+  CFList tmp;
   for (CFFListIterator i= sqrfFactors; i.hasItem(); i++)
   {
-    CFList tmp= ratSqrfFactorize (i.getItem().factor(), v);
+    TIMING_START (fac_factor_squarefree);
+    tmp= ratSqrfFactorize (i.getItem().factor(), v);
+    TIMING_END_AND_PRINT (fac_factor_squarefree,
+                          "time to factorize sqrfree factor over Q: ");
     for (CFListIterator j= tmp; j.hasItem(); j++)
     {
       if (j.getItem().inCoeffDomain()) continue;
