@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: pointid.lib 14980 2012-06-01 11:00:06Z motsak $";
+version="$Id: pointid.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="Commutative algebra";
 info="
 LIBRARY:  pointid.lib     Procedures for computing a factorized lex GB of
@@ -195,17 +195,14 @@ EXAMPLE: example nonMonomials; shows an example
     }
     else
     {
-      W = list();
       Z = list();
       for(i = 2; i <= s-1; i++)
       {
         if((leadexp(N[i])[m+1] == d) && (coeffs(N[i],var(m+1))[nrows(coeffs(N[i],var(m+1))),1] < var(m+1)))
         {
-          W[size(W)+1] = A[i];
           Z[size(Z)+1] = A[i][1..m];
         }
       }
-      W[size(W)+1] = A[s];
       Z[size(Z)+1] = A[s][1..m];
 
       my = nonMonomials(Z)[size(Z)];
