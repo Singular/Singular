@@ -1032,7 +1032,10 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 tryAgainWithoutHeu:
   //shifting to zero
   TIMING_START (fac_shift_to_zero);
+  CanonicalForm denA= bCommonDen (A);
+  A *= denA;
   A= shift2Zero (A, Aeval, evaluation);
+  A /= denA;
 
   for (iter= biFactors; iter.hasItem(); iter++)
     iter.getItem()= iter.getItem () (y + evaluation.getLast(), y);
@@ -1082,7 +1085,7 @@ tryAgainWithoutHeu:
   tmp1= prod (commonDenominators);
   for (iter= Aeval; iter.hasItem(); iter++)
   {
-    tmp2= bCommonDen (iter.getItem());
+    tmp2= bCommonDen (iter.getItem()/denA);
     Off (SW_RATIONAL);
     tmp3= lcm (tmp2,tmp3);
     On (SW_RATIONAL);
@@ -1094,7 +1097,7 @@ tryAgainWithoutHeu:
     iter.getItem() *= iter2.getItem()*multiplier;
 
   for (iter= Aeval; iter.hasItem(); iter++)
-    iter.getItem() *= tmp3*power (multiplier, biFactors.length() - 1);
+    iter.getItem() *= tmp3*power (multiplier, biFactors.length() - 1)/denA;
 
   for (int i= 0; i < lengthAeval2; i++)
   {
