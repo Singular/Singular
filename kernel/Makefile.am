@@ -9,7 +9,7 @@
 #STATIC_LDFLAGS	= -static
 
 
-CXXTEMPLFLAGS = ## -fno-implicit-templates
+CXXTEMPLFLAGS =-ftrapv ## -fno-implicit-templates
 
 if WANT_DEBUG
   LIB_G=libkernel_g.la

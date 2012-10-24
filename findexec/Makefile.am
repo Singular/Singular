@@ -9,7 +9,7 @@ endif
 libfindexec_LTLIBRARIES = libfindexec.la ${LIB_G}
 libfindexecdir = $(libdir)/
 
-CXXTEMPLFLAGS = 
+CXXTEMPLFLAGS =-ftrapv 
 ### --no-exceptions ## -fno-implicit-templates
 
 libfindexec_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}

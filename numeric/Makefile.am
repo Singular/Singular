@@ -7,7 +7,7 @@ endif
 libnumeric_LTLIBRARIES = libnumeric.la ${LIB_G}
 libnumericdir = $(libdir)/singular
 
-CXXTEMPLFLAGS =  ## -fno-implicit-templates
+CXXTEMPLFLAGS =-ftrapv  ## -fno-implicit-templates
 
 libnumeric_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libnumeric_g_la_CFLAGS = ${PIPE}

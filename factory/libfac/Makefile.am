@@ -6,7 +6,7 @@ endif
 
 noinst_LTLIBRARIES=libfac.la ${LIB_G}
 
-CXXTEMPLFLAGS =  ## -fno-implicit-templates
+CXXTEMPLFLAGS =-ftrapv  ## -fno-implicit-templates
 
 libfac_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libfac_g_la_CFLAGS = ${PIPE}

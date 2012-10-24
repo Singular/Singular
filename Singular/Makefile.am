@@ -13,7 +13,7 @@ NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer $(WARNCFLAGS)
 NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer $(WARNCFLAGS)
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
-CXXTEMPLFLAGS = ## -fno-implicit-templates
+CXXTEMPLFLAGS =-ftrapv ## -fno-implicit-templates
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS)
 

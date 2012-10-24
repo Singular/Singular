@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 PACKAGES=include/factory libfac
 SUBDIRS=$(PACKAGES)
 
-CXXTEMPLFLAGS=
+CXXTEMPLFLAGS=-ftrapv 
 ## -fno-implicit-templates
 
 AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS}

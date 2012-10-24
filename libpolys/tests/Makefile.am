@@ -1,4 +1,4 @@
-CXXTEMPLFLAGS = -O0 ##  ## -fno-implicit-templates
+CXXTEMPLFLAGS =-ftrapv ## -O0 ## -fno-implicit-templates
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS} 
 
