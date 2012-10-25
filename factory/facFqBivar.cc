@@ -45,6 +45,8 @@
 TIMING_DEFINE_PRINT(fac_fq_uni_factorizer)
 TIMING_DEFINE_PRINT(fac_fq_bi_hensel_lift)
 TIMING_DEFINE_PRINT(fac_fq_bi_factor_recombination)
+TIMING_DEFINE_PRINT(fac_fq_bi_evaluation)
+TIMING_DEFINE_PRINT(fac_fq_bi_shift_to_zero)
 
 CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M, const modpk& b)
 {
@@ -6081,7 +6083,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   for (int i= 0; i < factorNums; i++)
   {
     bufAeval= A;
+    TIMING_START (fac_fq_bi_evaluation);
     bufEvaluation= evalPoint (A, bufAeval, alpha, list, GF, fail);
+    TIMING_END_AND_PRINT (fac_fq_bi_evaluation, "time to find eval point: ");
     if (!derivXZero && !fail2 && !symmetric)
     {
       if (i == 0)
@@ -6090,7 +6094,10 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         symmetric= (A/Lc (A) == buf/Lc (buf));
       }
       bufAeval2= buf;
+      TIMING_START (fac_fq_bi_evaluation);
       bufEvaluation2= evalPoint (buf, bufAeval2, alpha, list2, GF, fail2);
+      TIMING_END_AND_PRINT (fac_fq_bi_evaluation,
+                            "time to find eval point wrt y: ");
     }
     // first try to change main variable if there is no valid evaluation point
     if (fail && (i == 0))
@@ -6131,7 +6138,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     TIMING_START (fac_fq_uni_factorizer);
     bufUniFactors= uniFactorizer (bufAeval, alpha, GF);
     TIMING_END_AND_PRINT (fac_fq_uni_factorizer,
-                          "time for univariate factorization: ");
+                          "time for univariate factorization over Fq: ");
     DEBOUTLN (cerr, "Lc (bufAeval)*prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors)*Lc (bufAeval) == bufAeval));
 
@@ -6140,7 +6147,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       TIMING_START (fac_fq_uni_factorizer);
       bufUniFactors2= uniFactorizer (bufAeval2, alpha, GF);
       TIMING_END_AND_PRINT (fac_fq_uni_factorizer,
-                            "time for univariate factorization in y: ");
+                            "time for univariate factorization in y over Fq: ");
       DEBOUTLN (cerr, "Lc (bufAeval2)*prod (bufUniFactors2)== bufAeval2 " <<
                 (prod (bufUniFactors2)*Lc (bufAeval2) == bufAeval2));
     }
@@ -6290,7 +6297,10 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       minBound= tmin (minBound, bounds[i]);
   }
 
+  TIMING_START (fac_fq_bi_shift_to_zero);
   A= A (y + evaluation, y);
+  TIMING_END_AND_PRINT (fac_fq_bi_shift_to_zero,
+                        "time to shift eval to zero: ");
 
   int degMipo= 1;
   if (extension && alpha.level() != 1 && k==1)
@@ -6306,17 +6316,21 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift,
+                          "time for bivariate hensel lifting over Fq: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);
 
+    TIMING_START (fac_fq_bi_factor_recombination);
     if (extension)
       factors= extFactorRecombination (uniFactors, A, MODl, info, degs,
                                        evaluation, 1, uniFactors.length()/2);
     else
       factors= factorRecombination (uniFactors, A, MODl, degs, 1,
                                     uniFactors.length()/2);
+    TIMING_END_AND_PRINT (fac_fq_bi_factor_recombination,
+                          "time for naive bivariate factor recombi over Fq: ");
 
     if (earlySuccess)
       factors= Union (earlyFactors, factors);
@@ -6345,7 +6359,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                                symmetric, evaluation);
       factors= Union (lll, factors);
     }
-    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift,
+                          "time to bivar lift and LLL recombi over Fq: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
   }
   else
@@ -6356,18 +6371,23 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
-    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift, "time for hensel lifting: ");
+    TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift,
+                          "time for bivar hensel lifting over Fq: ");
     DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
     CanonicalForm MODl= power (y, liftBound);
     if (!extension)
     {
+      TIMING_START (fac_fq_bi_factor_recombination);
       factors= factorRecombination (uniFactors, A, MODl, degs, 1, 3);
+      TIMING_END_AND_PRINT (fac_fq_bi_factor_recombination,
+                            "time for small subset naive recombi over Fq: ");
 
       int oldUniFactorsLength= uniFactors.length();
       if (degree (A) > 0)
       {
         CFList tmp;
+        TIMING_START (fac_fq_bi_hensel_lift);
         if (alpha.level() == 1)
           tmp= increasePrecision (A, uniFactors, 0, uniFactors.length(), 1,
                                   liftBound
@@ -6383,6 +6403,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                     alpha, liftBound
                                    );
         }
+        TIMING_END_AND_PRINT (fac_fq_bi_hensel_lift,
+                              "time to increase precision: ");
         factors= Union (factors, tmp);
         if (tmp.length() == 0 || (tmp.length() > 0 && uniFactors.length() != 0
                                   && uniFactors.length() != oldUniFactorsLength)

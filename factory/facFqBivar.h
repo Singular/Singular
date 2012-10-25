@@ -16,6 +16,7 @@
 
 #include <config.h>
 
+#include "timing.h"
 #include "assert.h"
 
 #include "facFqBivarUtil.h"
@@ -26,6 +27,9 @@
 #include "cf_map.h"
 #include "cfNewtonPolygon.h"
 #include "fac_util.h"
+
+TIMING_DEFINE_PRINT(fac_fq_bi_sqrf)
+TIMING_DEFINE_PRINT(fac_fq_bi_factor_sqrf)
 
 static const double log2exp= 1.442695041;
 
@@ -273,13 +277,19 @@ FpBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   vec_ZZ S;
   F= compress (F, M, S);
 
+  TIMING_START (fac_fq_bi_sqrf);
   CFFList sqrf= FpSqrf (F, false);
+  TIMING_END_AND_PRINT (fac_fq_bi_sqrf,
+                       "time for bivariate sqrf factors over Fp: ");
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_bi_factor_sqrf);
     bufResult= biFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_bi_factor_sqrf,
+                          "time to factor bivariate sqrf factors over Fp: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (N (decompress (i.getItem(), M, S)),
                                iter.getItem().exp()));
@@ -374,13 +384,19 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   vec_ZZ S;
   F= compress (F, M, S);
 
+  TIMING_START (fac_fq_bi_sqrf);
   CFFList sqrf= FqSqrf (F, alpha, false);
+  TIMING_END_AND_PRINT (fac_fq_bi_sqrf,
+                       "time for bivariate sqrf factors over Fq: ");
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_bi_factor_sqrf);
     bufResult= biFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_bi_factor_sqrf,
+                          "time to factor bivariate sqrf factors over Fq: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (N (decompress (i.getItem(), M, S)),
                                iter.getItem().exp()));
@@ -476,13 +492,19 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   vec_ZZ S;
   F= compress (F, M, S);
 
+  TIMING_START (fac_fq_bi_sqrf);
   CFFList sqrf= GFSqrf (F, false);
+  TIMING_END_AND_PRINT (fac_fq_bi_sqrf,
+                       "time for bivariate sqrf factors over GF: ");
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_bi_factor_sqrf);
     bufResult= biFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_bi_factor_sqrf,
+                          "time to factor bivariate sqrf factors over GF: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (N (decompress (i.getItem(), M, S)),
                                iter.getItem().exp()));

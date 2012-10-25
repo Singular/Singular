@@ -28,6 +28,13 @@
 #include "cfModResultant.h"
 #include "fac_sqrfree.h"
 
+TIMING_DEFINE_PRINT(fac_alg_resultant)
+TIMING_DEFINE_PRINT(fac_alg_norm)
+TIMING_DEFINE_PRINT(fac_alg_factor_norm)
+TIMING_DEFINE_PRINT(fac_alg_gcd)
+TIMING_DEFINE_PRINT(fac_alg_sqrf)
+TIMING_DEFINE_PRINT(fac_alg_factor_sqrf)
+
 // squarefree part of F
 CanonicalForm
 uniSqrfPart (const CanonicalForm& F)
@@ -52,10 +59,12 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
   int degg= degree (g);
   int degmipo= degree (mipo);
   CanonicalForm norm;
+  TIMING_START (fac_alg_resultant);
   if (degg >= 8 || degmipo >= 8)
     norm= resultantZ (g, mipo, x);
   else
     norm= resultant (g, mipo, x);
+  TIMING_END_AND_PRINT (fac_alg_resultant, "time to compute resultant0: ");
 
   i= 0;
   int k;
@@ -71,19 +80,23 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
       {
         g= F (y - i*alpha, y);
         g *= bCommonDen (g);
+        TIMING_START (fac_alg_resultant);
         if (degg >= 8 || degmipo >= 8)
           norm= resultantZ (g (x, alpha), mipo, x);
         else
           norm= resultant (g (x, alpha), mipo, x);
+        TIMING_END_AND_PRINT (fac_alg_resultant,"time to compute resultant1: ");
       }
       else
       {
         g= F (y + i*alpha, y);
         g *= bCommonDen (g);
+        TIMING_START (fac_alg_resultant);
         if (degg >= 8 || degmipo >= 8)
           norm= resultantZ (g (x, alpha), mipo, x);
         else
           norm= resultant (g (x, alpha), mipo, x);
+        TIMING_END_AND_PRINT (fac_alg_resultant,"time to compute resultant2: ");
       }
       if (degree (gcd (deriv (norm, y), norm)) <= 0)
       {
@@ -107,9 +120,13 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   On (SW_RATIONAL);
   CanonicalForm f= F*bCommonDen (F);
   int shift;
+  TIMING_START (fac_alg_norm);
   CanonicalForm norm= sqrfNorm (f, alpha, shift);
+  TIMING_END_AND_PRINT (fac_alg_norm, "time to compute sqrf norm: ");
   ASSERT (degree (norm, alpha) <= 0, "wrong norm computed");
+  TIMING_START (fac_alg_factor_norm);
   CFFList normFactors= factorize (norm);
+  TIMING_END_AND_PRINT (fac_alg_factor_norm, "time to factor norm: ");
   CFList factors;
   if (normFactors.length() <= 2)
   {
@@ -124,11 +141,13 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   for (CFFListIterator i= normFactors; i.hasItem(); i++)
   {
     ASSERT (i.getItem().exp() == 1, "norm not squarefree");
+    TIMING_START (fac_alg_gcd);
     if (shift == 0)
       factor= gcd (buf, i.getItem().factor());
     else
       factor= gcd (buf, i.getItem().factor() (f.mvar() + shift*alpha, f.mvar()));
     buf /= factor;
+    TIMING_END_AND_PRINT (fac_alg_gcd, "time to recover factors: ");
     factors.append (factor);
   }
   ASSERT (degree (buf) <= 0, "incomplete factorization");
@@ -148,7 +167,9 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
 
   bool save_rat=!isOn (SW_RATIONAL);
   On (SW_RATIONAL);
+  TIMING_START (fac_alg_sqrf);
   CFFList sqrf= sqrFreeZ (F);
+  TIMING_END_AND_PRINT (fac_alg_sqrf, "time for sqrf factors in Q(a)[x]: ");
   CFList factorsSqrf;
   CFFList factors;
   CFListIterator j;
@@ -157,7 +178,10 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   for (CFFListIterator i= sqrf; i.hasItem(); i++)
   {
     if (i.getItem().factor().inCoeffDomain()) continue;
+    TIMING_START (fac_alg_factor_sqrf);
     factorsSqrf= AlgExtSqrfFactorize (i.getItem().factor(), alpha);
+    TIMING_END_AND_PRINT (fac_alg_factor_sqrf,
+                          "time to factor sqrf factors in Q(a)[x]: ");
     for (j= factorsSqrf; j.hasItem(); j++)
     {
       lcinv= 1/Lc (j.getItem());
