@@ -2,6 +2,7 @@
 
 #include <config.h>
 
+#include "timing.h"
 #include "assert.h"
 #include "debug.h"
 
@@ -571,12 +572,24 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     }
     Variable v = f.mvar();
     Hi = power( LC( pi1, v ), delta );
+    int maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
+
+    if (!(pi.isUnivariate() && pi1.isUnivariate()))
+    {
+      if (size (Hi)*size (pi)/(maxNumVars*3) > 500) //maybe this needs more tuning
+      {
+        On (SW_USE_FF_MOD_GCD);
+        C *= gcd (pi, pi1);
+        Off (SW_USE_FF_MOD_GCD);
+        return C;
+      }
+    }
+
     if ( (delta+1) % 2 )
         bi = 1;
     else
         bi = -1;
-    int maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
-    CanonicalForm oldPi= pi, oldPi1= pi1;
+    CanonicalForm oldPi= pi, oldPi1= pi1, powHi;
     while ( degree( pi1, v ) > 0 )
     {
         if (!(pi.isUnivariate() && pi1.isUnivariate()))
@@ -603,11 +616,22 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
         if ( degree( pi1, v ) > 0 )
         {
             delta = degree( pi, v ) - degree( pi1, v );
+            powHi= power (Hi, delta-1);
             if ( (delta+1) % 2 )
-                bi = LC( pi, v ) * power( Hi, delta );
+                bi = LC( pi, v ) * powHi*Hi;
             else
-                bi = -LC( pi, v ) * power( Hi, delta );
-            Hi = power( LC( pi1, v ), delta ) / power( Hi, delta-1 );
+                bi = -LC( pi, v ) * powHi*Hi;
+            Hi = power( LC( pi1, v ), delta ) / powHi;
+            if (!(pi.isUnivariate() && pi1.isUnivariate()))
+            {
+              if (size (Hi)*size (pi)/(maxNumVars*3) > 500) //maybe this needs more tuning
+              {
+                On (SW_USE_FF_MOD_GCD);
+                C *= gcd (oldPi, oldPi1);
+                Off (SW_USE_FF_MOD_GCD);
+                return C;
+              }
+            }
         }
     }
     if ( degree( pi1, v ) == 0 )
@@ -1155,6 +1179,10 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
     return result;
 }
 
+TIMING_DEFINE_PRINT(chinrem_termination)
+TIMING_DEFINE_PRINT(chinrem_recursion)
+TIMING_DEFINE_PRINT(chinrem_reconstruction)
+
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   CanonicalForm f, g, cl, q(0), Dp, newD, D, newq;
@@ -1222,6 +1250,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     setCharacteristic( p );
     fp= mapinto (f);
     gp= mapinto (g);
+    TIMING_START (chinrem_recursion)
 #ifdef HAVE_NTL
     if (size (fp)/maxNumVars > 500 && size (gp)/maxNumVars > 500)
       Dp = GCD_small_p (fp, gp, cofp, cogp);
@@ -1236,6 +1265,8 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     cofp= fp/Dp;
     cogp= gp/Dp;
 #endif
+    TIMING_END_AND_PRINT (chinrem_recursion,
+                          "time for gcd mod p in modular gcd: ");
     Dp /=Dp.lc();
     cofp /= lc (cofp);
     cogp /= lc (cogp);
@@ -1286,9 +1317,12 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     if ( i >= 0 )
     {
+      TIMING_START (chinrem_reconstruction);
       Dn= Farey(D,q);
       cofn= Farey(cof,q);
       cogn= Farey(cog,q);
+      TIMING_END_AND_PRINT (chinrem_reconstruction,
+                           "time for rational reconstruction in modular gcd: ");
       int is_rat= isOn (SW_RATIONAL);
       On (SW_RATIONAL);
       cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
@@ -1302,12 +1336,17 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       else
         equal= true;
       //Dn /=vcontent(Dn,Variable(1));
+      TIMING_START (chinrem_termination);
       if ((terminationTest (f,g, cofn, cogn, Dn)) ||
           ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
       {
+        TIMING_END_AND_PRINT (chinrem_termination,
+                            "time for successful termination in modular gcd: ");
         //printf(" -> success\n");
         return Dn*gcdcfcg;
       }
+      TIMING_END_AND_PRINT (chinrem_termination,
+                          "time for unsuccessful termination in modular gcd: ");
       equal= false;
       //else: try more primes
     }

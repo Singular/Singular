@@ -16,6 +16,7 @@
 #include <config.h>
 
 #include "assert.h"
+#include "timing.h"
 
 #include "facFqBivarUtil.h"
 #include "DegreePattern.h"
@@ -26,6 +27,8 @@
 #include "algext.h"
 
 #ifdef HAVE_NTL
+TIMING_DEFINE_PRINT(fac_bi_sqrf)
+TIMING_DEFINE_PRINT(fac_bi_factor_sqrf)
 
 /// @return @a biFactorize returns a list of factors of F. If F is not monic
 ///         its leading coefficient is not outputted.
@@ -195,10 +198,16 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
   mat_ZZ M;
   vec_ZZ S;
   F= compress (F, M, S);
+  TIMING_START (fac_bi_sqrf);
   CFFList sqrfFactors= sqrFree (F);
+  TIMING_END_AND_PRINT (fac_bi_sqrf,
+                       "time for bivariate sqrf factors over Q: ");
   for (CFFListIterator i= sqrfFactors; i.hasItem(); i++)
   {
+    TIMING_START (fac_bi_factor_sqrf);
     CFList tmp= ratBiSqrfFactorize (i.getItem().factor(), v);
+    TIMING_END_AND_PRINT (fac_bi_factor_sqrf,
+                          "time to factor bivariate sqrf factors over Q: ");
     for (CFListIterator j= tmp; j.hasItem(); j++)
     {
       if (j.getItem().inCoeffDomain()) continue;

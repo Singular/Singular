@@ -878,12 +878,9 @@ bool irreducibilityTest (const CanonicalForm& F)
         tmp= gcd (tmp, newtonPolyg[2][1]);
         if (isRat)
           On (SW_RATIONAL);
-        if (tmp == 1)
-        {
-          for (int i= 0; i < sizeOfNewtonPolygon; i++)
-            delete [] newtonPolyg [i];
-          delete [] newtonPolyg;
-        }
+        for (int i= 0; i < sizeOfNewtonPolygon; i++)
+          delete [] newtonPolyg [i];
+        delete [] newtonPolyg;
         return (tmp==1);
       }
     }
