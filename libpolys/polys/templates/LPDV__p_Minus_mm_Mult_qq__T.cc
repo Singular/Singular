@@ -54,7 +54,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
-  const unsigned long* m_e = m->exp;
+  //const unsigned long* m_e = m->exp; //BOCO: unused in LPDV
   omBin bin = r->PolyBin;
 
   if (p == NULL) goto Finish;           // return tneg*q if (p == NULL)

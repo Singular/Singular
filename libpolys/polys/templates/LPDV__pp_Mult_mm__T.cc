@@ -35,7 +35,7 @@ LINKAGE poly LPDV__pp_Mult_mm__T
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
-  const unsigned long* m_e = m->exp;
+  //const unsigned long* m_e = m->exp; //BOCO: unused
   pAssume(!n_IsZero__T(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   number tmp;
