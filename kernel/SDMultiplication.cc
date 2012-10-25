@@ -313,8 +313,8 @@ void ShiftDVec::p_ExpSum_dp
 
 
 
-/* Part 2: replacements for Various functions which invoke some *
- * of the multiplications functions .                           */
+/* Part 2: adjustments of various functions which invoke some *
+ * of the multiplications functions .                         */
 
 
 
