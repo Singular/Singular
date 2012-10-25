@@ -192,7 +192,7 @@ int ShiftDVec::InitOrderMapping( ring r )
  * it will no longer be used.                                  */
 void ShiftDVec::InitSDMultiplication( ring r )
 {
-  r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
+  r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
 
   for(int i = 1; i < r->OrdSize; ++i)
   {
