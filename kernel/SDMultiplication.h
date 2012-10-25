@@ -25,16 +25,6 @@ namespace ShiftDVec
                    poly m1, poly m2, TObject** R)
 
 #if 0 //The following is currently not working/used
-
-  poly pp_Mult_mm__T
-    (poly p, const poly m, const ring ri, poly &last, int lV);
-  poly pp_Mult_mm_Noether__T
-    ( poly p, const poly m, const poly spNoether, 
-      int &ll, const ring ri, poly &last, int lV  );
-  poly p_Minus_mm_Mult_qq__T
-    ( poly p, poly m, poly q, int& Shorter, 
-      const poly spNoether, const ring r, poly &last, int lV );
-
   void ksCreateSpoly
     ( LObject* Pair, poly spNoether, int use_buckets, 
       ring tailRing, poly m1, poly m2,  TObject** R, int lV );
