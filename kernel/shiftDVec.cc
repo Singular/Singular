@@ -1463,8 +1463,9 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
     }
 #else
 
-    poly p_tmp = strat->T[ii].p;
-    poly p_t_tmp = strat->T[ii].t_p;
+    TObject tmp; //save the unshifted poly
+    poly tmp.p = strat->T[ii].p;
+    poly tmp.t_p = strat->T[ii].t_p;
     if(shift > 0)
     {
       strat->T[ii].t_p = p_LPshiftT
@@ -1474,7 +1475,7 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
         ( p_tmp, shift, 
           strat->uptodeg, strat->lV, strat, currRing );
     }
-    ksReducePoly(h, &(strat->T[ii]) );
+    SD::ksReducePoly(h, &tmp, &(strat->T[ii]) );
     h->dvec = NULL;
 
     //BOCO: why did i change it to that?:
@@ -1504,8 +1505,8 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
         pDelete(&strat->T[ii].p);
       }
 
-      strat->T[ii].p = p_tmp;
-      strat->T[ii].t_p = p_t_tmp;
+      strat->T[ii].p = tmp.p;
+      strat->T[ii].t_p = tmp.t_p;
     }
 #endif
 #endif
@@ -1707,9 +1708,9 @@ poly ShiftDVec::redBba
         ( strat->S[j], shift, 
           strat->uptodeg, strat->lV, strat, currRing);
       loGriToFile("p_LPshiftT poly in redBba ", 0,1024);
-      LObject tTemp(pTemp);
-      ksReducePoly
-        (h,&tTemp, strat->kNoetherTail());
+      TObject tTemp(pTemp);
+      TObject noShift(strat->S[j]);
+      SD::ksReducePoly(h, &noShift, &tTemp, strat->kNoetherTail());
 
       /* BOCO: this was copied from redFirstShrink
        * i only additionally test for strat->homog - why wasn't

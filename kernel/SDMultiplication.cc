@@ -313,6 +313,10 @@ void ShiftDVec::p_ExpSum_dp
 
 
 
+/* Part 2: replacements for Various functions which invoke some *
+ * of the multiplications functions .                           */
+
+
 //The following is currently not working/used
 #if 0
 //for p_MemCopy_LengthGeneral
