@@ -14,7 +14,8 @@
 #ifndef FAC_FQ_FACTORIZE_H
 #define FAC_FQ_FACTORIZE_H
 
-// #include "config.h"
+#include "config.h"
+#include "timing.h"
 
 #include "facFqBivar.h"
 #include "DegreePattern.h"
@@ -22,6 +23,10 @@
 #include "cf_util.h"
 #include "facFqSquarefree.h"
 #include "facFqBivarUtil.h"
+
+
+TIMING_DEFINE_PRINT (fac_fq_squarefree)
+TIMING_DEFINE_PRINT (fac_fq_factor_squarefree)
 
 /// Factorization over a finite field
 ///
@@ -149,14 +154,20 @@ CFFList FpFactorize (const CanonicalForm& G,///< [in] a multivariate poly
   ExtensionInfo info= ExtensionInfo (false);
   Variable a= Variable (1);
   CanonicalForm LcF= Lc (F);
+  TIMING_START (fac_fq_squarefree);
   CFFList sqrf= FpSqrf (F, false);
+  TIMING_END_AND_PRINT (fac_fq_squarefree,
+                        "time for squarefree factorization over Fq: ");
   CFFList result;
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_factor_squarefree);
     bufResult= multiFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_factor_squarefree,
+                          "time to factorize sqrfree factor over Fq: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
@@ -226,14 +237,20 @@ CFFList FqFactorize (const CanonicalForm& G, ///< [in] a multivariate poly
 
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CanonicalForm LcF= Lc (F);
+  TIMING_START (fac_fq_squarefree);
   CFFList sqrf= FqSqrf (F, alpha, false);
+  TIMING_END_AND_PRINT (fac_fq_squarefree,
+                        "time for squarefree factorization over Fq: ");
   CFFList result;
   CFList bufResult;
   sqrf.removeFirst();
   CFListIterator i;
   for (CFFListIterator iter= sqrf; iter.hasItem(); iter++)
   {
+    TIMING_START (fac_fq_factor_squarefree);
     bufResult= multiFactorize (iter.getItem().factor(), info);
+    TIMING_END_AND_PRINT (fac_fq_factor_squarefree,
+                          "time to factorize sqrfree factor over Fq: ");
     for (i= bufResult; i.hasItem(); i++)
       result.append (CFFactor (i.getItem(), iter.getItem().exp()));
   }
@@ -638,6 +655,35 @@ gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
               CFFList& factors2  ///< [in,out] list of factors, returns gcd free
                                  ///< factors
              );
+
+/// computes a list l of length length(LCFFactors)+1 of polynomials such that
+/// prod (l)=LCF, note that the first entry of l may be non constant. Intended
+/// to be used to precompute coefficients of a polynomial f from its bivariate 
+/// factorizations.
+///
+/// @return see above
+CFList
+precomputeLeadingCoeff (const CanonicalForm& LCF,       ///<[in] a multivariate
+                                                        ///< poly
+                        const CFList& LCFFactors,       ///<[in] a list of
+                                                        ///< univariate factors
+                                                        ///< of LCF of level 2
+                        const Variable& alpha,          ///<[in] algebraic var.
+                        const CFList& evaluation,       ///<[in] an evaluation
+                                                        ///< point having
+                                                        ///< lSecondVarLCs+1
+                                                        ///< components
+                        CFList* & differentSecondVarLCs,///<[in] LCs of factors
+                                                        ///< of f wrt different
+                                                        ///< second variables
+                        int lSecondVarLCs,              ///<[in] length of the
+                                                        ///< above
+                        Variable& y                     ///<[in,out] if y.level()
+                                                        ///< is not 1 on output
+                                                        ///< the second variable
+                                                        ///< has been changed to
+                                                        ///< y
+                       );
 
 #endif
 /* FAC_FQ_FACTORIZE_H */
