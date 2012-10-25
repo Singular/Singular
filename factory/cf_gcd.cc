@@ -423,8 +423,8 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       b=convertNTLZZX2CF(B,f.mvar())*gc;
       CanonicalForm rr=convertZZ2CF(RR);
       ASSERT (!rr.isZero(), "NTL:XGCD failed");
-      r*=rr;
-      if ( r.sign() < 0 ) { r= -r; a= -a; b= -b; }
+      a /= rr;
+      b /= rr;
       return r;
     }
   }
