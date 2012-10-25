@@ -190,8 +190,12 @@ int ShiftDVec::InitOrderMapping( ring r )
 /* Initializes the letterplace multiplication. See also        *
  * InitOrderMapping. Do not forget to free r->omap as soon, as *
  * it will no longer be used.                                  */
-void ShiftDVec::InitSDMultiplication( ring r )
+void ShiftDVec::InitSDMultiplication( ring r, kStrategy strat )
 {
+  r->isLPring = strat->lV; 
+  //BOCO: this should have already been set by
+  //makeLetterplaceRing, but it isnt :(
+
   r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
 
   for(int i = 1; i < r->OrdSize; ++i)
