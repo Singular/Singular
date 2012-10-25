@@ -192,6 +192,8 @@ int ShiftDVec::InitOrderMapping( ring r )
  * it will no longer be used.                                  */
 void ShiftDVec::InitSDMultiplication( ring r )
 {
+  r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
+
   for(int i = 1; i < r->OrdSize; ++i)
   {
     if( r->typ[i].ord_typ != ro_dp )
@@ -209,8 +211,6 @@ void ShiftDVec::InitSDMultiplication( ring r )
     r->p_Procs->LPDV__pp_Mult_mm_Noether;
   r->p_Procs->p_Minus_mm_Mult_qq =
     r->p_Procs->LPDV__p_Minus_mm_Mult_qq;
-
-  r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
 
   InitOrderMapping(r);
 }
