@@ -13,6 +13,16 @@ namespace ShiftDVec
 
   int InitOrderMapping( ring r );
   void InitSDMultiplication( ring r, kStrategy strat );
+ 
+  int ksReducePoly(LObject* PR,
+                 TObject* UPW,
+                 TObject* SPW,
+                 poly spNoether,
+                 number *coef,
+                 kStrategy strat)
+  void ksCreateSpoly(LObject* Pair,   poly spNoether,
+                   int use_buckets, ring tailRing,
+                   poly m1, poly m2, TObject** R)
 
 #if 0 //The following is currently not working/used
 
