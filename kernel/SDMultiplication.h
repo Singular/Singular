@@ -12,7 +12,7 @@ namespace ShiftDVec
   //void (*p_ExpSum) (poly rt, poly p, poly q, ring r);
 
   int InitOrderMapping( ring r );
-  void InitSDMultiplication( ring r );
+  void InitSDMultiplication( ring r, kStrategy strat );
 
 #if 0 //The following is currently not working/used
 

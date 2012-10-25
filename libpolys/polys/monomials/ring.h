@@ -269,6 +269,12 @@ struct ip_sring
 
 #ifdef HAVE_SHIFTBBA
   short          isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+  /* BOCO: Warning: this seems not to be set properly when a
+   * letterplace ring is instanciated, instead it seems always
+   * to be 0, especially for letterplace rings.  I will init it
+   * in ShiftDVec::bba to strat->lV and use it there, so please
+   * do not remove this.
+   */
 #endif
 
   BOOLEAN   VectorOut;
