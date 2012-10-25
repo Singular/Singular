@@ -36,6 +36,7 @@ BorelCheck(ideal,r)       checks whether the given ideal is Borel
 JMS6(list, list, list, int)  computes authomatically all the J-marked scheme
 ";
 LIB "Constrlib.lib";
+LIB "JMSConst.lib";
 ////////////////////////////////////////////////////////////////////
 proc BorelCheck(ideal Borid,r)
 "USAGE:    BorelCheck(Borid,r); Borid ideal, r ring
@@ -813,7 +814,7 @@ int i;
 //order the different degrees
 for(i=1; i<=size(V); i++)
    {
-    L[i]=StartOrdina(V[i], G);
+    L[i]=StartOrderingV(V[i], G);
    }
 //print("finito ordine");
 //multiply and reduce
@@ -1141,54 +1142,55 @@ This procedure performs automatically the whole construction
 of the J-marked scheme.
 EXAMPLE:  example JMS6; shows an example"
 {
-list Jms;
-if(BorelCheck(Borid,r))
+  list Jms;
+  if(BorelCheck(Borid,r))
   {
-   if(size(Borid)==1)
-     { Jms=list();}
-  else{
-    //print("Input is OK");
-    attrib(Borid,"isSB",1);
-    list B=RaggruppaBorel(Borid);
-    list NumN;
-    list N;
-    int i;
-    int d;
-    for(i=1;i<=size(B);i++)
-       {
+    if(size(Borid)==1)
+    { Jms=list();}
+    else
+    {
+      //print("Input is OK");
+      attrib(Borid,"isSB",1);
+      list B=RaggruppaBorel(Borid);
+      list NumN;
+      list N;
+      int i;
+      int d;
+      for(i=1;i<=size(B);i++)
+      {
         d=deg(B[i][1]);
         N[i]=kbase(Borid,d);
         NumN[i]=size(N[i]);
-       }
-int qc=NewQuanteC(B, NumN);
-//Now I must define the NEW RING,
-//putting the c parameters inside.
-list L=ringlist(r);
-list L2;
-L2[1]=L[1];
-L2[2]=list();
-for(i=qc;i>=1;i--)
-    {
-     L2[2][i]="c("+string(i)+")";
-    }
-L2[3]=list(list("rp",qc));
-L2[4]=L[4];
-L[1]=L2;
-def K=ring(L);
-setring(K);
-def Borid=imap(r,Borid);
-def N=imap(r,N);
-def B=imap(r,B);
-//NumN contains only scalars so I do not imap it
-int j;
-list Q;
-int s;
-list M;
-jmp pp;
-for(i=1;i<=size(B);i++)
-    {
-      Q[i]=list();
-     for(j=1;j<=size(B[i]);j++)
+      }
+      int qc=NewQuanteC(B, NumN);
+      //Now I must define the NEW RING,
+      //putting the c parameters inside.
+      list L=ringlist(r);
+      list L2;
+      L2[1]=L[1];
+      L2[2]=list();
+      for(i=qc;i>=1;i--)
+      {
+        L2[2][i]="c("+string(i)+")";
+      }
+      L2[3]=list(list("rp",qc));
+      L2[4]=L[4];
+      L[1]=L2;
+      def K=ring(L);
+      setring(K);
+      def Borid=imap(r,Borid);
+      def N=imap(r,N);
+      def B=imap(r,B);
+      //NumN contains only scalars so I do not imap it
+      int j;
+      list Q;
+      int s;
+      list M;
+      jmp pp;
+      for(i=1;i<=size(B);i++)
+      {
+        Q[i]=list();
+        for(j=1;j<=size(B[i]);j++)
         {
           M=AttaccaC6(N[i],s);
           pp.h=B[i][j];
@@ -1197,32 +1199,32 @@ for(i=1;i<=size(B);i++)
           s=s+M[2];
           //print(s);
         }
+      }
+      list P=FormaInput6(Q);
+      list EK,D= PolysEK6(P);
+      int massimo=Max(D);
+      //list V=VConst5(P, massimo);
+      //pause();
+      list V=Costruttore6(P,massimo,r);
+      list W=FinalVm6(V,P,K);
+      //print("I V ridotti in ordine sono");
+      //print(W);
+      //list
+      Jms=JMS2(W,EK,D,P,K);
+      keepring K;
     }
-list P=FormaInput6(Q);
-list EK,D= PolysEK6(P);
-     int massimo=Max(D);
-//list V=VConst5(P, massimo);
-//pause();
-list V=Costruttore6(P,massimo,r);
-list W=FinalVm6(V,P,K);
-//print("I V ridotti in ordine sono");
-//print(W);
-//list
-Jms=JMS2(W,EK,D,P,K);
-keepring K;
-}
   }
-else
-   {
-    print("WRONG IDEAL IN INPUT");
-    print("It is NOT BOREL");
-   }
-return(Jms);
+  else
+  {
+    "WRONG IDEAL IN INPUT";
+    "It is NOT BOREL";
+  }
+  return(Jms);
 }
 example
 { "EXAMPLE:"; echo = 1;
  ring r=0, (x,y,z),rp;
  ideal Borid=y^2*z,y*z^2,z^3,y^5;
-JMS6(Borid,r);
+ JMS6(Borid,r);
 }
 ////////////////////////////////////////////////////////////////////

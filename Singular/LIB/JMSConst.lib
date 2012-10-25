@@ -627,7 +627,7 @@ OrderV(VConst(G2F,4,r)[1],G2F,list());
 }
 ////////////////////////////////////////////////////////////////////
 proc StartOrderingV(list V,list G)
-"USAGE:   StartOrdina(V,G); V list, G list
+"USAGE:   StartOrderingV(V,G); V list, G list
 RETURN:   list: R
 NOTE:     Input Vm,G. This procedure uses OrderV to get
 the ordered polynomials as in [BCLR].
