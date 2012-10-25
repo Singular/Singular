@@ -196,7 +196,7 @@ void ShiftDVec::InitSDMultiplication( ring r, kStrategy strat )
   //BOCO: this should have already been set by
   //makeLetterplaceRing, but it isnt :(
 
-  r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
+  r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
 
   for(int i = 1; i < r->OrdSize; ++i)
   {
@@ -310,6 +310,261 @@ void ShiftDVec::p_ExpSum_dp
 
   return;
 }
+
+
+/***************************************************************
+ *
+ * Reduces PR with SPW
+ * Assumes PR != NULL, SPW != NULL, Lm(SPW) divides Lm(PR)
+ * SPW is the shifted UPW
+ *
+ ***************************************************************/
+int ksReducePoly(LObject* PR,
+                 TObject* UPW,
+                 TObject* SPW,
+                 poly spNoether,
+                 number *coef,
+                 kStrategy strat)
+{
+#ifdef KDEBUG
+  red_count++;
+#ifdef TEST_OPT_DEBUG_RED
+  if (TEST_OPT_DEBUG)
+  {
+    Print("Red %d:", red_count); PR->wrp(); Print(" with:");
+    PW->wrp();
+  }
+#endif
+#endif
+  int ret = 0;
+  ring tailRing = PR->tailRing;
+  kTest_L(PR);
+  kTest_T(PW);
+  poly p1 = PR->GetLmTailRing();   // p2 | p1
+  poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
+  poly t2 = pNext(UPW->GetLmTailRing()), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
+  assume(p1 != NULL && p2 != NULL);// Attention, we have rings and there LC(p2) and LC(p1) are special
+  p_CheckPolyRing(p1, tailRing);
+  p_CheckPolyRing(p2, tailRing);
+
+  pAssume1(p2 != NULL && p1 != NULL &&
+           p_DivisibleBy(p2,  p1, tailRing));
+
+  pAssume1(p_GetComp(p1, tailRing) == p_GetComp(p2, tailRing) ||
+           (p_GetComp(p2, tailRing) == 0 &&
+            p_MaxComp(pNext(p2),tailRing) == 0));
+
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    // for the time being: we know currRing==strat->tailRing
+    // no exp-bound checking needed 
+    // (only needed if exp-bound(tailring)<exp-b(currRing))
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,coef);
+    else
+    {
+      poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
+      assume(_p != NULL);
+      nc_PolyPolyRed(_p, p2,coef, currRing);
+      if (PR->t_p!=NULL) PR->t_p=_p; else PR->p=_p;
+      PR->pLength=0; // usually not used, GetpLength re-computes it if needed
+    }
+    return 0;
+  }
+#endif
+  if (t2==NULL)           // Divisor is just one term, therefore it will
+  {                       // just cancel the leading term
+    PR->LmDeleteAndIter();
+    if (coef != NULL) *coef = n_Init(1, tailRing);
+    return 0;
+  }
+
+  p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+
+  if (tailRing != currRing)
+  {
+    // check that reduction does not violate exp bound
+    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    {
+      // undo changes of lm
+      p_ExpVectorAdd(lm, p2, tailRing);
+      if (strat == NULL) return 2;
+      if (! kStratChangeTailRing(strat, PR, PW)) return -1;
+      tailRing = strat->tailRing;
+      p1 = PR->GetLmTailRing();
+      p2 = PW->GetLmTailRing();
+      t2 = pNext(UPW->GetLmTailRing());
+      lm = p1;
+      p_ExpVectorSub(lm, p2, tailRing);
+      ret = 1;
+    }
+  }
+
+  // take care of coef buisness
+  if (! n_IsOne(pGetCoeff(p2), tailRing))
+  {
+    number bn = pGetCoeff(lm);
+    number an = pGetCoeff(p2);
+    int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
+    p_SetCoeff(lm, bn, tailRing);
+    if ((ct == 0) || (ct == 2))
+      PR->Tail_Mult_nn(an);
+    if (coef != NULL) *coef = an;
+    else n_Delete(&an, tailRing);
+  }
+ else
+  {
+    if (coef != NULL) *coef = n_Init(1, tailRing);
+  }
+
+
+  // and finally,
+  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
+  PR->LmDeleteAndIter();
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if ( (currRing->isLPring) && (!strat->homog) )
+  {
+    // assume? h->p in currRing
+    PR->GetP();
+    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
+    PR->Clear(); // does the right things
+    PR->p = qq;
+    PR->t_p = NULL;
+    PR->SetShortExpVector();
+  }
+#endif
+
+#if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
+  if (TEST_OPT_DEBUG)
+  {
+    Print(" to: "); PR->wrp(); Print("\n");
+  }
+#endif
+  return ret;
+}
+
+
+/***************************************************************
+ *
+ * Creates S-Poly of p1 and p2
+ *
+ *
+ ***************************************************************/
+void ksCreateSpoly(LObject* Pair,   poly spNoether,
+                   int use_buckets, ring tailRing,
+                   poly m1, poly m2, TObject** R)
+{
+#ifdef KDEBUG
+  create_count++;
+#endif
+  kTest_L(Pair);
+  poly p1 = Pair->p1;
+  poly p2 = Pair->p2;
+  Pair->tailRing = tailRing;
+
+  assume(p1 != NULL);
+  assume(p2 != NULL);
+  assume(tailRing != NULL);
+
+  poly a1 = pNext(p1), a2 = strat->R[Pair.i_r2]->p;
+  number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
+  int co=0, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
+
+  int l1=0, l2=0;
+
+  if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
+  {
+    if (p_GetComp(p1, currRing)==0)
+    {
+      co=1;
+      p_SetCompP(p1,p_GetComp(p2, currRing), currRing, tailRing);
+    }
+    else
+    {
+      co=2;
+      p_SetCompP(p2, p_GetComp(p1, currRing), currRing, tailRing);
+    }
+  }
+  // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+  //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
+  if (m1 == NULL)
+    k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
+
+  pSetCoeff0(m1, lc2);
+  pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
+
+  if (R != NULL)
+  {
+    if (Pair->i_r1 == -1)
+    {
+      l1 = pLength(p1) - 1;
+    }
+    else
+    {
+      l1 = (R[Pair->i_r1])->GetpLength() - 1;
+    }
+    if (Pair->i_r2 == -1)
+    {
+      l2 = pLength(p2) - 1;
+    }
+    else
+    {
+      l2 = (R[Pair->i_r2])->GetpLength() - 1;
+    }
+  }
+
+  // get m2 * a2
+  if (spNoether != NULL)
+  {
+    l2 = -1;
+    a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing);
+    assume(l2 == pLength(a2));
+  }
+  else
+    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+#ifdef HAVE_RINGS
+  if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
+#endif
+
+  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
+  // get m2*a2 - m1*a1
+  Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
+
+  // Clean-up time
+  Pair->LmDeleteAndIter();
+  p_LmDelete(m1, tailRing);
+
+  if (co != 0)
+  {
+    if (co==1)
+    {
+      p_SetCompP(p1,0, currRing, tailRing);
+    }
+    else
+    {
+      p_SetCompP(p2,0, currRing, tailRing);
+    }
+  }
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if (currRing->isLPring)
+  {
+    // assume? h->p in currRing
+    Pair->GetP();
+    poly qq = p_Shrink(Pair->p, currRing->isLPring, currRing);
+    Pair->Clear(); // does the right things
+    Pair->p = qq;
+    Pair->t_p = NULL;
+    Pair->SetShortExpVector();
+  }
+#endif
+
+}
+
 
 
 
@@ -706,7 +961,7 @@ void ShiftDVec::ksCreateSpoly
   assume(p2 != NULL);
   assume(tailRing != NULL);
 
-  poly a1 = pNext(p1), a2 = pNext(p2);
+  poly a1 = pNext(p1), a2 = strat->R[Pair.i_r2]->p;
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int co=0, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
 
