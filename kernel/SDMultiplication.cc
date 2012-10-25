@@ -196,7 +196,7 @@ void ShiftDVec::InitSDMultiplication( ring r, kStrategy strat )
   //BOCO: this should have already been set by
   //makeLetterplaceRing, but it isnt :(
 
-  r->p_ExpSum = &ShiftDVec::p_ExpSum_dp;
+  r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
 
   for(int i = 1; i < r->OrdSize; ++i)
   {
