@@ -1028,7 +1028,7 @@ BOOLEAN setLinearForms(leftv res, leftv args)
       if (v->Typ() == INTVEC_CMD)
       {
         intvec* mat0 = (intvec*) v->Data();
-        mat = iv2bim(mat0);
+        mat = iv2bim(mat0)->transpose();
       }
       else
         mat = (bigintmat*) v->Data();
@@ -1292,7 +1292,7 @@ BOOLEAN coneLink(leftv res, leftv args)
       if (v->Typ() == INTVEC_CMD)
       {
         intvec* iv0 = (intvec*) v->Data();
-        iv = iv2bim(iv0);
+        iv = iv2bim(iv0)->transpose();
       }
       else
         iv = (bigintmat*)v->Data();
@@ -1372,7 +1372,7 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       if (v->Typ() == INTVEC_CMD)
       {
         intvec* iv0 = (intvec*) v->Data();
-        iv = iv2bim(iv0);
+        iv = iv2bim(iv0)->transpose();
       }
       else
         iv = (bigintmat*)v->Data();
@@ -1413,7 +1413,7 @@ BOOLEAN containsRelatively(leftv res, leftv args)
       if (v->Typ() == INTVEC_CMD)
       {
         intvec* iv0 = (intvec*) v->Data();
-        iv = iv2bim(iv0);
+        iv = iv2bim(iv0)->transpose();
       }
       else
         iv = (bigintmat*)v->Data();
