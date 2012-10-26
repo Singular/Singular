@@ -805,7 +805,7 @@ void updateL(kStrategy strat)
           kStratChangeTailRing(strat);
         }
         /* create the real one */
-        ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE,
+        ::ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE,
                       strat->tailRing, m1, m2, strat->R);
 
         strat->L[j].SetLmCurrRing();
@@ -864,7 +864,7 @@ void updateLHC(kStrategy strat)
           kStratChangeTailRing(strat);
         }
         /* create the real one */
-        ksCreateSpoly(&(strat->L[i]), strat->kNoetherTail(), FALSE,
+        ::ksCreateSpoly(&(strat->L[i]), strat->kNoetherTail(), FALSE,
                       strat->tailRing, m1, m2, strat->R);
         if (! strat->L[i].IsNull())
         {
@@ -1336,7 +1336,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         kStratChangeTailRing(strat);
       }
       /* create the real one */
-      ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets,
+      ::ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
       if (!strat->use_buckets)
         strat->P.SetLength(strat->length_pLength);

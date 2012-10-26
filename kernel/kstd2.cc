@@ -1271,7 +1271,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+      ::ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
     }
     else if (strat->P.p1 == NULL)
@@ -1655,7 +1655,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+      ::ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
 
     }
@@ -2285,7 +2285,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
         }
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+      ::ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
           strat->tailRing, m1, m2, strat->R);
     }
     else if (strat->P.p1 == NULL)
@@ -2581,7 +2581,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
         kStratChangeTailRing(strat);
       }
       // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+      ::ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
     }
     else if (strat->P.p1 == NULL)

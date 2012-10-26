@@ -5091,7 +5091,7 @@ BOOLEAN arriRewCriterion(poly sig, unsigned long /*not_sevSig*/, kStrategy strat
       }
     }
     // create the real one
-    ksCreateSpoly(&(strat->L[strat->Ll]), NULL, strat->use_buckets,
+    ::ksCreateSpoly(&(strat->L[strat->Ll]), NULL, strat->use_buckets,
                   strat->tailRing, m1, m2, strat->R);
     if (strat->P.GetLmCurrRing() == NULL)
     {
