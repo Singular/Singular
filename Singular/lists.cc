@@ -24,7 +24,7 @@ omBin slists_bin = omGetSpecBin(sizeof(slists));
 int lSize(lists L)
 {
   int n=L->nr;
-  while ((n>=0)&&(L->m[n].rtyp==DEF_CMD)) n--;
+   while ((n>=0)&&((L->m[n].rtyp==DEF_CMD)||(L->m[n].rtyp==0))) n--;
   return n;
 }
 
