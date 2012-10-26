@@ -6,13 +6,13 @@ info="
 LIBRARY:   JMSConst.lib  A library for Singular which constructs J-Marked Schemes.
 AUTHOR:    Michela Ceria, email: michela.ceria@unito.it
 
-SEE ALSO:  JMBTest.lib
+SEE ALSO:  JMBTest_lib
 
 KEYWORDS:  J-marked schemes, Borel ideals
 
 OVERVIEW:
 The library performs the J-marked computation, as described in [BCLR].
-As in Constrlib8.lib we construct the V polynomials and we reduce the EK
+As in JMBTest.lib we construct the V polynomials and we reduce the EK
 polynomials w.r.t. them, putting the coefficients as results.
 
 
@@ -31,6 +31,7 @@ Journal of Symbolic Computation
 
 
 
+SEE ALSO: JMSConst_lib
 PROCEDURES:
 BorelCheck(ideal,r)       checks whether the given ideal is Borel
 JMarkedScheme(list, list, list, int)  computes authomatically all the J-marked scheme

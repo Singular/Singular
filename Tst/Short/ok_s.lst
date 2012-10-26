@@ -185,6 +185,7 @@ intersect_s
 invar
 invarlib
 janet
+jmbtest
 latex
 lift_s
 liftstd_s

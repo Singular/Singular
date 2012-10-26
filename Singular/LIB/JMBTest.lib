@@ -5,8 +5,10 @@ category="Algebraic Geometry";
 info="
 LIBRARY:   JMBTest.lib  A library for Singular which performs JM basis test.
 AUTHOR:    Michela Ceria, email: michela.ceria@unito.it
-SEE ALSO:  standard_lib, Libraries
-KEYWORDS:  library
+
+SEE ALSO:  JMSConst_lib
+KEYWORDS:  J-marked schemes
+
 OVERVIEW:
 The library performs the J-marked basis test, as described in [CR], [BCLR].
 Such a test is performed via the criterion explained in [BCLR],
