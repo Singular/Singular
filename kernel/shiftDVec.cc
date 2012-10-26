@@ -467,7 +467,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
         }
       }
       // create the real one
-      ksCreateSpoly
+      ShiftDVec::ksCreateSpoly
         ( &(strat->P), NULL, strat->use_buckets,
            strat->tailRing, m1, m2, strat->R );
     }
