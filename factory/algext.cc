@@ -30,6 +30,10 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 TIMING_DEFINE_PRINT(alg_content_p)
 TIMING_DEFINE_PRINT(alg_content)
 TIMING_DEFINE_PRINT(alg_compress)
@@ -636,6 +640,20 @@ myicontent ( const CanonicalForm & f, const CanonicalForm & c )
               (f.inBaseDomain() && c.inCoeffDomain()))
     {
       if (c.isZero()) return abs (f);
+#ifdef HAVE_FLINT
+      fmpz_poly_t FLINTf, FLINTc;
+      convertFacCF2Fmpz_poly_t (FLINTf, f);
+      convertFacCF2Fmpz_poly_t (FLINTc, c);
+      fmpz_poly_gcd (FLINTc, FLINTc, FLINTf);
+      CanonicalForm result;
+      if (f.inCoeffDomain())
+        result= convertFmpz_poly_t2FacCF (FLINTc, f.mvar());
+      else
+        result= convertFmpz_poly_t2FacCF (FLINTc, c.mvar());
+      fmpz_poly_clear (FLINTc);
+      fmpz_poly_clear (FLINTf);
+      return result;
+#else
       ZZX NTLf= convertFacCF2NTLZZX (f);
       ZZX NTLc= convertFacCF2NTLZZX (c);
       NTLc= GCD (NTLc, NTLf);
@@ -643,6 +661,7 @@ myicontent ( const CanonicalForm & f, const CanonicalForm & c )
         return convertNTLZZX2CF(NTLc,f.mvar());
       else
         return convertNTLZZX2CF(NTLc,c.mvar());
+#endif
     }
     else
     {

@@ -40,6 +40,10 @@
 #include <NTLconvert.h>
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 #include "cf_gcd_smallp.h"
 
 TIMING_DEFINE_PRINT(gcd_recursion)
@@ -1980,12 +1984,25 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   int j= 1;
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
+#ifdef HAVE_FLINT
+  nmod_mat_t FLINTN;
+  convertFacCFMatrix2nmod_mat_t (FLINTN, *N);
+  long* dummy= new long [M.rows()];
+  for (int i= 0; i < M.rows(); i++)
+    dummy[i]= 0;
+  long rk= nmod_mat_rref (dummy, FLINTN);
+
+  N= convertNmod_mat_t2FacCFMatrix (FLINTN);
+  nmod_mat_clear (FLINTN);
+  delete dummy;
+#else
   int p= getCharacteristic ();
   zz_p::init (p);
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
 
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
+#endif
 
   L= CFArray (M.rows());
   for (int i= 0; i < M.rows(); i++)
@@ -2041,17 +2058,36 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   int j= 1;
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
+
+#ifdef HAVE_FLINT
+  nmod_mat_t FLINTN;
+  convertFacCFMatrix2nmod_mat_t (FLINTN, *N);
+  long* dummy= new long [M.rows()];
+  for (int i= 0; i < M.rows(); i++)
+    dummy[i]= 0;
+  long rk= nmod_mat_rref (dummy, FLINTN);
+#else
   int p= getCharacteristic ();
   zz_p::init (p);
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
+#endif
   if (rk != M.columns())
   {
+#ifdef HAVE_FLINT
+    nmod_mat_clear (FLINTN);
+    delete dummy;
+#endif
     delete N;
     return CFArray();
   }
+#ifdef HAVE_FLINT
+  N= convertNmod_mat_t2FacCFMatrix (FLINTN);
+  nmod_mat_clear (FLINTN);
+  delete dummy;
+#else
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
-
+#endif
   CFArray A= readOffSolution (*N, rk);
 
   delete N;

@@ -1279,6 +1279,25 @@ long isReduced (const mat_zz_p& M)
   return 1;
 }
 
+#ifdef HAVE_FLINT
+long isReduced (const nmod_mat_t M)
+{
+  long i, j, nonZero;
+  for (i = 1; i <= nmod_mat_nrows(M); i++)
+  {
+    nonZero= 0;
+    for (j = 1; j <= nmod_mat_ncols (M); j++)
+    {
+      if (!(nmod_mat_entry (M, i-1, j-1)==0))
+        nonZero++;
+    }
+    if (nonZero != 1)
+      return 0;
+  }
+  return 1;
+}
+#endif
+
 long isReduced (const mat_zz_pE& M)
 {
   long i, j, nonZero;
@@ -1319,6 +1338,32 @@ int * extractZeroOneVecs (const mat_zz_p& M)
   }
   return result;
 }
+
+#ifdef HAVE_FLINT
+int * extractZeroOneVecs (const nmod_mat_t M)
+{
+  long i, j;
+  bool nonZeroOne= false;
+  int * result= new int [nmod_mat_ncols (M)];
+  for (i = 0; i < nmod_mat_ncols (M); i++)
+  {
+    for (j = 0; j < nmod_mat_nrows (M); j++)
+    {
+      if (!((nmod_mat_entry (M, j, i) == 1) || (nmod_mat_entry (M, j,i) == 0)))
+      {
+        nonZeroOne= true;
+        break;
+      }
+    }
+    if (!nonZeroOne)
+      result [i]= 1;
+    else
+      result [i]= 0;
+    nonZeroOne= false;
+  }
+  return result;
+}
+#endif
 
 int * extractZeroOneVecs (const mat_zz_pE& M)
 {
@@ -1497,6 +1542,85 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     }
   }
 }
+
+#ifdef HAVE_FLINT
+void
+reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
+                   factors, const int liftBound, int& factorsFound, int*&
+                   factorsFoundIndex, nmod_mat_t N, bool beenInThres
+                  )
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+  CanonicalForm yToL= power (y, liftBound);
+  if (factors.length() == 2)
+  {
+    CanonicalForm tmp1, tmp2, tmp3;
+    tmp1= factors.getFirst();
+    tmp2= factors.getLast();
+    tmp1 *= LC (F, x);
+    tmp1= mod (tmp1, yToL);
+    tmp1 /= content (tmp1, x);
+    tmp2 *= LC (F, x);
+    tmp2= mod (tmp2, yToL);
+    tmp2 /= content (tmp2, x);
+    tmp3 = tmp1*tmp2;
+    if (tmp3/Lc (tmp3) == F/Lc (F))
+    {
+      factorsFound++;
+      F= 1;
+      reconstructedFactors.append (tmp1);
+      reconstructedFactors.append (tmp2);
+      return;
+    }
+  }
+  CanonicalForm quot, buf;
+  CFListIterator iter;
+  for (long i= 0; i < nmod_mat_ncols (N); i++)
+  {
+    if (factorsFoundIndex [i] == 1)
+      continue;
+    iter= factors;
+    if (beenInThres)
+    {
+      int count= 0;
+      while (count < i)
+      {
+        count++;
+        iter++;
+      }
+      buf= iter.getItem();
+    }
+    else
+    {
+      buf= 1;
+      for (long j= 0; j < nmod_mat_nrows (N); j++, iter++)
+      {
+        if (!(nmod_mat_entry (N, j, i) == 0))
+          buf= mulMod2 (buf, iter.getItem(), yToL);
+      }
+    }
+    buf *= LC (F, x);
+    buf= mod (buf, yToL);
+    buf /= content (buf, x);
+    if (fdivides (buf, F, quot))
+    {
+      factorsFoundIndex[i]= 1;
+      factorsFound++;
+      F= quot;
+      F /= Lc (F);
+      reconstructedFactors.append (buf);
+    }
+    if (degree (F) <= 0)
+      return;
+    if (factorsFound + 1 == nmod_mat_ncols (N))
+    {
+      reconstructedFactors.append (F);
+      return;
+    }
+  }
+}
+#endif
 
 CFList
 reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
@@ -1679,6 +1803,87 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
   return result;
 }
 
+#ifdef HAVE_FLINT
+CFList
+extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
+                   precision, const nmod_mat_t N, const ExtensionInfo& info,
+                   const CanonicalForm& evaluation
+                  )
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+  Variable alpha= info.getAlpha();
+  Variable beta= info.getBeta();
+  int k= info.getGFDegree();
+  CanonicalForm gamma= info.getGamma();
+  CanonicalForm delta= info.getDelta();
+  CanonicalForm F= G;
+  CanonicalForm yToL= power (y, precision);
+  CFList result;
+  CFList bufFactors= factors;
+  CFList factorsConsidered;
+  CanonicalForm buf2, quot, buf;
+  CFListIterator iter;
+  for (long i= 0; i < nmod_mat_ncols(N); i++)
+  {
+    if (zeroOneVecs [i] == 0)
+      continue;
+    iter= factors;
+    buf= 1;
+    factorsConsidered= CFList();
+    for (long j= 0; j < nmod_mat_ncols(N); j++, iter++)
+    {
+      if (!(nmod_mat_entry (N, j, i) == 0))
+      {
+        factorsConsidered.append (iter.getItem());
+        buf= mulMod2 (buf, iter.getItem(), yToL);
+      }
+    }
+    buf *= LC (F, x);
+    buf= mod (buf, yToL);
+    buf /= content (buf, x);
+    buf2= buf (y-evaluation, y);
+    if (!k && beta == x)
+    {
+      if (degree (buf2, alpha) < 1)
+      {
+        if (fdivides (buf, F, quot))
+        {
+          F= quot;
+          F /= Lc (F);
+          result.append (buf2);
+          bufFactors= Difference (bufFactors, factorsConsidered);
+        }
+      }
+    }
+    else
+    {
+      CFList source, dest;
+
+      if (!isInExtension (buf2, gamma, k, delta, source, dest))
+      {
+        if (fdivides (buf, F, quot))
+        {
+          F= quot;
+          F /= Lc (F);
+          result.append (buf2);
+          bufFactors= Difference (bufFactors, factorsConsidered);
+        }
+      }
+    }
+    if (degree (F) <= 0)
+    {
+      G= F;
+      factors= bufFactors;
+      return result;
+    }
+  }
+  G= F;
+  factors= bufFactors;
+  return result;
+}
+#endif
+
 CFList
 reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
                 int precision, const mat_zz_p& N)
@@ -1728,6 +1933,58 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   factors= bufFactors;
   return result;
 }
+
+#ifdef HAVE_FLINT
+CFList
+reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
+                int precision, const nmod_mat_t N)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+  CanonicalForm F= G;
+  CanonicalForm yToL= power (y, precision);
+  CanonicalForm quot, buf;
+  CFList result;
+  CFList bufFactors= factors;
+  CFList factorsConsidered;
+  CFListIterator iter;
+  for (long i= 0; i < nmod_mat_ncols (N); i++)
+  {
+    if (zeroOneVecs [i] == 0)
+      continue;
+    iter= factors;
+    buf= 1;
+    factorsConsidered= CFList();
+    for (long j= 0; j < nmod_mat_nrows (N); j++, iter++)
+    {
+      if (!(nmod_mat_entry (N, j, i) == 0))
+      {
+        factorsConsidered.append (iter.getItem());
+        buf= mulMod2 (buf, iter.getItem(), yToL);
+      }
+    }
+    buf *= LC (F, x);
+    buf= mod (buf, yToL);
+    buf /= content (buf, x);
+    if (fdivides (buf, F, quot))
+    {
+      F= quot;
+      F /= Lc (F);
+      result.append (buf);
+      bufFactors= Difference (bufFactors, factorsConsidered);
+    }
+    if (degree (F) <= 0)
+    {
+      G= F;
+      factors= bufFactors;
+      return result;
+    }
+  }
+  G= F;
+  factors= bufFactors;
+  return result;
+}
+#endif
 
 void
 extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
@@ -1857,6 +2114,136 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
   }
 }
 
+#ifdef HAVE_FLINT
+void
+extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
+                      CFList& factors, const int liftBound, int& factorsFound,
+                      int*& factorsFoundIndex, nmod_mat_t N, bool beenInThres,
+                      const ExtensionInfo& info, const CanonicalForm& evaluation
+                     )
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+  Variable alpha= info.getAlpha();
+  Variable beta= info.getBeta();
+  int k= info.getGFDegree();
+  CanonicalForm gamma= info.getGamma();
+  CanonicalForm delta= info.getDelta();
+  CanonicalForm yToL= power (y, liftBound);
+  CFList source, dest;
+  if (factors.length() == 2)
+  {
+    CanonicalForm tmp1, tmp2, tmp3;
+    tmp1= factors.getFirst();
+    tmp2= factors.getLast();
+    tmp1 *= LC (F, x);
+    tmp1= mod (tmp1, yToL);
+    tmp1 /= content (tmp1, x);
+    tmp2 *= LC (F, x);
+    tmp2= mod (tmp2, yToL);
+    tmp2 /= content (tmp2, x);
+    tmp3 = tmp1*tmp2;
+    if (tmp3/Lc (tmp3) == F/Lc (F))
+    {
+      tmp1= tmp1 (y - evaluation, y);
+      tmp2= tmp2 (y - evaluation, y);
+      if (!k && beta == x && degree (tmp2, alpha) < 1 &&
+          degree (tmp1, alpha) < 1)
+      {
+        factorsFound++;
+        F= 1;
+        tmp1= mapDown (tmp1, info, source, dest);
+        tmp2= mapDown (tmp2, info, source, dest);
+        reconstructedFactors.append (tmp1);
+        reconstructedFactors.append (tmp2);
+        return;
+      }
+      else if (!isInExtension (tmp2, gamma, k, delta, source, dest) &&
+               !isInExtension (tmp1, gamma, k, delta, source, dest))
+      {
+        factorsFound++;
+        F= 1;
+        tmp1= mapDown (tmp1, info, source, dest);
+        tmp2= mapDown (tmp2, info, source, dest);
+        reconstructedFactors.append (tmp1);
+        reconstructedFactors.append (tmp2);
+        return;
+      }
+    }
+  }
+  CanonicalForm quot, buf, buf2;
+  CFListIterator iter;
+  for (long i= 0; i < nmod_mat_ncols (N); i++)
+  {
+    if (factorsFoundIndex [i] == 1)
+      continue;
+    iter= factors;
+    if (beenInThres)
+    {
+      int count= 0;
+      while (count < i)
+      {
+        count++;
+        iter++;
+      }
+      buf= iter.getItem();
+    }
+    else
+    {
+      buf= 1;
+      for (long j= 0; j < nmod_mat_nrows (N); j++, iter++)
+      {
+        if (!(nmod_mat_entry (N, j, i) == 0))
+          buf= mulMod2 (buf, iter.getItem(), yToL);
+      }
+    }
+    buf *= LC (F, x);
+    buf= mod (buf, yToL);
+    buf /= content (buf, x);
+    buf2= buf (y - evaluation, y);
+    if (!k && beta == x)
+    {
+      if (degree (buf2, alpha) < 1)
+      {
+        if (fdivides (buf, F, quot))
+        {
+          factorsFoundIndex[i]= 1;
+          factorsFound++;
+          F= quot;
+          F /= Lc (F);
+          buf2= mapDown (buf2, info, source, dest);
+          reconstructedFactors.append (buf2);
+        }
+      }
+    }
+    else
+    {
+      if (!isInExtension (buf2, gamma, k, delta, source, dest))
+      {
+        if (fdivides (buf, F, quot))
+        {
+          factorsFoundIndex[i]= 1;
+          factorsFound++;
+          F= quot;
+          F /= Lc (F);
+          buf2= mapDown (buf2, info, source, dest);
+          reconstructedFactors.append (buf2);
+        }
+      }
+    }
+    if (degree (F) <= 0)
+      return;
+    if (factorsFound + 1 == nmod_mat_nrows (N))
+    {
+      CanonicalForm tmp= F (y - evaluation, y);
+      tmp= mapDown (tmp, info, source, dest);
+      reconstructedFactors.append (tmp);
+      return;
+    }
+  }
+}
+#endif
+
 //over Fp
 int
 liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
@@ -1964,6 +2351,129 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   delete [] A;
   return l;
 }
+
+#ifdef HAVE_FLINT
+int
+liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
+                       start, int liftBound, int minBound, CFList& factors,
+                       nmod_mat_t FLINTN, CFList& diophant, CFMatrix& M,CFArray&
+                       Pi, CFArray& bufQ, bool& irreducible
+                      )
+{
+  CanonicalForm LCF= LC (F, 1);
+  CFArray *A= new CFArray [factors.length() - 1];
+  bool wasInBounds= false;
+  bool hitBound= false;
+  int l= (minBound+1)*2;
+  int stepSize= 2;
+  int oldL= l/2;
+  bool reduced= false;
+  long rank;
+  nmod_mat_t FLINTK, FLINTC, null;
+  CFMatrix C;
+  CFArray buf;
+  CFListIterator j;
+  CanonicalForm truncF;
+  Variable y= F.mvar();
+  while (l <= liftBound)
+  {
+    if (start)
+    {
+      henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
+      start= 0;
+    }
+    else
+    {
+      if (wasInBounds)
+        henselLiftResume12 (F, factors, oldL, l, Pi, diophant, M);
+      else
+        henselLift12 (F, factors, l, Pi, diophant, M);
+    }
+
+    factors.insert (LCF);
+    j= factors;
+    j++;
+
+    truncF= mod (F, power (y, l));
+    for (int i= 0; i < factors.length() - 1; i++, j++)
+    {
+      if (!wasInBounds)
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
+      else
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
+    }
+
+    for (int i= 0; i < sizeBounds; i++)
+    {
+      if (bounds [i] + 1 <= l/2)
+      {
+        wasInBounds= true;
+        int k= tmin (bounds [i] + 1, l/2);
+        C= CFMatrix (l - k, factors.length() - 1);
+        for (int ii= 0; ii < factors.length() - 1; ii++)
+        {
+          if (A[ii].size() - 1 >= i)
+          {
+            buf= getCoeffs (A[ii] [i], k);
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
+        }
+
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+        if (nmod_mat_ncols (FLINTN) == 1)
+        {
+          irreducible= true;
+          break;
+        }
+        if (isReduced (FLINTN) && l > (minBound+1)*2)
+        {
+          reduced= true;
+          break;
+        }
+      }
+    }
+
+    if (irreducible)
+      break;
+    if (reduced)
+      break;
+    oldL= l;
+    l += stepSize;
+    stepSize *= 2;
+    if (l > liftBound)
+    {
+      if (!hitBound)
+      {
+        l= liftBound;
+        hitBound= true;
+      }
+      else
+        break;
+    }
+  }
+  delete [] A;
+  return l;
+}
+#endif
 
 //over field extension
 int
@@ -2144,6 +2654,206 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   return l;
 }
 
+/*#ifdef HAVE_FLINT
+//over field extension
+int
+extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
+                          int liftBound, int minBound, int start, CFList&
+                          factors, nmod_mat_t FLINTN, CFList& diophant,
+                          CFMatrix& M, CFArray& Pi, CFArray& bufQ, bool&
+                          irreducible, const CanonicalForm& evaluation, const
+                          ExtensionInfo& info, CFList& source, CFList& dest
+                         )
+{
+  bool GF= (CFFactory::gettype()==GaloisFieldDomain);
+  CanonicalForm LCF= LC (F, 1);
+  CFArray *A= new CFArray [factors.length() - 1];
+  bool wasInBounds= false;
+  bool hitBound= false;
+  int degMipo;
+  Variable alpha;
+  alpha= info.getAlpha();
+  degMipo= degree (getMipo (alpha));
+
+  Variable gamma= info.getBeta();
+  CanonicalForm primElemAlpha= info.getGamma();
+  CanonicalForm imPrimElemAlpha= info.getDelta();
+
+  int stepSize= 2;
+  int l= ((minBound+1)/degMipo+1)*2;
+  l= tmax (l, 2);
+  if (start > l)
+    l= start;
+  int oldL= l/2;
+  bool reduced= false;
+  Variable y= F.mvar();
+  Variable x= Variable (1);
+  CanonicalForm powX, imBasis, truncF;
+  CFMatrix Mat, C;
+  CFArray buf;
+  CFIterator iter;
+  long rank;
+  nmod_mat_t FLINTMat, FLINTMatInv, FLINTC, FLINTK, null;
+  CFListIterator j;
+  while (l <= liftBound)
+  {
+    if (start)
+    {
+      henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
+      start= 0;
+    }
+    else
+    {
+      if (wasInBounds)
+        henselLiftResume12 (F, factors, oldL, l, Pi, diophant, M);
+      else
+        henselLift12 (F, factors, l, Pi, diophant, M);
+    }
+
+    factors.insert (LCF);
+
+    if (GF)
+      setCharacteristic (getCharacteristic());
+
+    powX= power (y-gamma, l);
+    Mat= CFMatrix (l*degMipo, l*degMipo);
+    for (int i= 0; i < l*degMipo; i++)
+    {
+      imBasis= mod (power (y, i), powX);
+      imBasis= imBasis (power (y, degMipo), y);
+      imBasis= imBasis (y, gamma);
+      iter= imBasis;
+      for (; iter.hasTerms(); iter++)
+        Mat (iter.exp()+ 1, i+1)= iter.coeff();
+    }
+
+    convertFacCFMatrix2nmod_mat_t (FLINTMat, Mat);
+    nmod_mat_init (FLINTMatInv, nmod_mat_nrows (FLINTMat),
+                   nmod_mat_nrows (FLINTMat), getCharacteristic());
+    nmod_mat_inv (FLINTMatInv, FLINTMat);
+
+    if (GF)
+      setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
+
+    j= factors;
+    j++;
+
+    truncF= mod (F, power (y, l));
+    for (int i= 0; i < factors.length() - 1; i++, j++)
+    {
+      if (!wasInBounds)
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, bufQ[i]);
+      else
+        A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
+                                     bufQ[i]);
+    }
+
+    for (int i= 0; i < sizeBounds; i++)
+    {
+      if (bounds [i] + 1 <= (l/2)*degMipo)
+      {
+        wasInBounds= true;
+        int k= tmin (bounds [i] + 1, (l/2)*degMipo);
+        C= CFMatrix (l*degMipo - k, factors.length() - 1);
+
+        for (int ii= 0; ii < factors.length() - 1; ii++)
+        {
+          if (A[ii].size() - 1 >= i)
+          {
+            if (GF)
+            {
+              A [ii] [i]= A [ii] [i] (y-evaluation, y);
+              setCharacteristic (getCharacteristic());
+              A[ii] [i]= GF2FalphaRep (A[ii] [i], alpha);
+              if (alpha != gamma)
+                A [ii] [i]= mapDown (A[ii] [i], imPrimElemAlpha, primElemAlpha,
+                                     gamma, source, dest
+                                    );
+              buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, FLINTMatInv); //TODO
+            }
+            else
+            {
+              A [ii] [i]= A [ii] [i] (y-evaluation, y);
+              if (alpha != gamma)
+                A[ii] [i]= mapDown (A[ii] [i], imPrimElemAlpha, primElemAlpha,
+                                    gamma, source, dest
+                                   );
+              buf= getCoeffs (A[ii] [i], k, l, degMipo, gamma, 0, FLINTMatInv); //TODO
+            }
+            writeInMatrix (C, buf, ii + 1, 0);
+          }
+          if (GF)
+            setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
+        }
+
+        if (GF)
+          setCharacteristic(getCharacteristic());
+
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+
+        if (GF)
+          setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
+
+        if (nmod_mat_ncols (FLINTN) == 1)
+        {
+          irreducible= true;
+          break;
+        }
+        if (isReduced (FLINTN))
+        {
+          reduced= true;
+          break;
+        }
+      }
+    }
+
+    nmod_mat_clear (FLINTMat);
+    nmod_mat_clear (FLINTMatInv);
+
+    if (nmod_mat_ncols (FLINTN) == 1)
+    {
+      irreducible= true;
+      break;
+    }
+    if (reduced)
+      break;
+    oldL= l;
+    l += stepSize;
+    stepSize *= 2;
+    if (l > liftBound)
+    {
+      if (!hitBound)
+      {
+        l= liftBound;
+        hitBound= true;
+      }
+      else
+        break;
+    }
+  }
+  delete [] A;
+  return l;
+}
+#endif*/
+
 // over Fq
 int
 liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
@@ -2262,6 +2972,15 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   return l;
 }
 
+#ifdef HAVE_FLINT
+int
+liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
+                            int start, int liftBound, int minBound, CFList&
+                            factors, nmod_mat_t FLINTN, CFList& diophant,
+                            CFMatrix& M, CFArray& Pi, CFArray& bufQ, bool&
+                            irreducible, const Variable& alpha
+                           )
+#else
 int
 liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
                             int start, int liftBound, int minBound, CFList&
@@ -2269,6 +2988,7 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
                             M, CFArray& Pi, CFArray& bufQ, bool& irreducible,
                             const Variable& alpha
                            )
+#endif
 {
   CanonicalForm LCF= LC (F, 1);
   CFArray *A= new CFArray [factors.length() - 1];
@@ -2282,7 +3002,12 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   Variable y= F.mvar();
   CanonicalForm truncF;
   while (l <= liftBound)
@@ -2335,19 +3060,49 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
           }
         }
 
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
 
+#ifdef HAVE_FLINT
+        if (nmod_mat_nrows (FLINTN) == 1)
+#else
         if (NTLN.NumCols() == 1)
+#endif
         {
           irreducible= true;
           break;
         }
+#ifdef HAVE_FLINT
+        if (isReduced (FLINTN) && l > (minBound+1)*2)
+#else
         if (isReduced (NTLN) && l > (minBound+1)*2)
+#endif
         {
           reduced= true;
           break;
@@ -2355,7 +3110,11 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
       }
     }
 
+#ifdef HAVE_FLINT
+    if (nmod_mat_ncols (FLINTN) == 1)
+#else
     if (NTLN.NumCols() == 1)
+#endif
     {
       irreducible= true;
       break;
@@ -2397,8 +3156,15 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
+#ifdef HAVE_FLINT
+  nmod_mat_t FLINTN;
+  nmod_mat_init (FLINTN,factors.length(),factors.length(), getCharacteristic());
+  for (long i=factors.length()-1; i >= 0; i--)
+    nmod_mat_entry (FLINTN, i, i)= 1;
+#else
   mat_zz_p NTLN;
   ident (NTLN, factors.length());
+#endif
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -2413,7 +3179,12 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   Variable y= F.mvar();
   CanonicalForm truncF;
   while (l <= precision)
@@ -2447,14 +3218,42 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
             writeInMatrix (C, buf, ii + 1, 0);
           }
         }
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
+#ifdef HAVE_FLINT
+        if (nmod_mat_ncols (FLINTN) == 1)
+        {
+          nmod_mat_clear (FLINTN);
+#else
         if (NTLN.NumCols() == 1)
         {
+#endif
           delete [] A;
           delete [] bounds;
           CanonicalForm G= F;
@@ -2464,21 +3263,39 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
       }
     }
 
+#ifdef HAVE_FLINT
+    if (nmod_mat_ncols (FLINTN) < oldNumCols - factorsFound)
+    {
+      if (isReduced (FLINTN))
+      {
+        int * factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+        for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
     if (NTLN.NumCols() < oldNumCols - factorsFound)
     {
       if (isReduced (NTLN))
       {
         int * factorsFoundIndex= new int [NTLN.NumCols()];
         for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
           factorsFoundIndex[i]= 0;
         int factorsFound2= 0;
         CFList result;
         CanonicalForm bufF= F;
+#ifdef HAVE_FLINT
+        reconstructionTry (result, bufF, factors, degree (F) + 1, factorsFound2,
+                           factorsFoundIndex, FLINTN, false
+                          );
+        if (result.length() == nmod_mat_ncols (FLINTN))
+        {
+          nmod_mat_clear (FLINTN);
+#else
         reconstructionTry (result, bufF, factors, degree (F) + 1, factorsFound2,
                            factorsFoundIndex, NTLN, false
                           );
         if (result.length() == NTLN.NumCols())
         {
+#endif
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
@@ -2490,8 +3307,14 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
       else if (l == precision)
       {
         CanonicalForm bufF= F;
+#ifdef HAVE_FLINT
+        int * zeroOne= extractZeroOneVecs (FLINTN);
+        CFList result= reconstruction (bufF,factors,zeroOne,precision,FLINTN);
+        nmod_mat_clear (FLINTN);
+#else
         int * zeroOne= extractZeroOneVecs (NTLN);
         CFList result= reconstruction (bufF, factors, zeroOne, precision, NTLN);
+#endif
         F= bufF;
         delete [] zeroOne;
         delete [] A;
@@ -2513,6 +3336,9 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         break;
     }
   }
+#ifdef HAVE_FLINT
+  nmod_mat_clear (FLINTN);
+#endif
   delete [] bounds;
   delete [] A;
   return CFList();
@@ -3002,8 +3828,15 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
   int extensionDeg= degree (getMipo (alpha));
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
+#ifdef HAVE_FLINT
+  nmod_mat_t FLINTN;
+  nmod_mat_init (FLINTN,factors.length(),factors.length(), getCharacteristic());
+  for (long i=factors.length()-1; i >= 0; i--)
+    nmod_mat_entry (FLINTN, i, i)= 1;
+#else
   mat_zz_p NTLN;
   ident (NTLN, factors.length());
+#endif
   int minBound= bounds[0];
   for (int i= 1; i < d; i++)
   {
@@ -3017,7 +3850,12 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
   bool hitBound= false;
   CFListIterator j;
   CFMatrix C;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   CFArray buf;
   Variable y= F.mvar();
   CanonicalForm truncF;
@@ -3052,14 +3890,42 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
             writeInMatrix (C, buf, ii + 1, 0);
           }
         }
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
+#ifdef HAVE_FLINT
+        if (nmod_mat_ncols (FLINTN) == 1)
+        {
+          nmod_mat_clear (FLINTN);
+#else
         if (NTLN.NumCols() == 1)
         {
+#endif
           delete [] A;
           delete [] bounds;
           CanonicalForm G= F;
@@ -3069,21 +3935,39 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
       }
     }
 
+#ifdef HAVE_FLINT
+    if (nmod_mat_ncols (FLINTN) < oldNumCols - factorsFound)
+    {
+      if (isReduced (FLINTN))
+      {
+        int * factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+        for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
     if (NTLN.NumCols() < oldNumCols - factorsFound)
     {
       if (isReduced (NTLN))
       {
         int * factorsFoundIndex= new int [NTLN.NumCols()];
         for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
           factorsFoundIndex[i]= 0;
         int factorsFound2= 0;
         CFList result;
         CanonicalForm bufF= F;
+#ifdef HAVE_FLINT
+        reconstructionTry (result, bufF, factors, degree (F) + 1, factorsFound2,
+                           factorsFoundIndex, FLINTN, false
+                          );
+        if (result.length() == nmod_mat_ncols (FLINTN))
+        {
+          nmod_mat_clear (FLINTN);
+#else
         reconstructionTry (result, bufF, factors, degree (F) + 1, factorsFound2,
                            factorsFoundIndex, NTLN, false
                           );
         if (result.length() == NTLN.NumCols())
         {
+#endif
           delete [] factorsFoundIndex;
           delete [] A;
           delete [] bounds;
@@ -3095,8 +3979,14 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
       else if (l == precision)
       {
         CanonicalForm bufF= F;
+#ifdef HAVE_FLINT
+        int * zeroOne= extractZeroOneVecs (FLINTN);
+        CFList result= reconstruction (bufF,factors,zeroOne,precision,FLINTN);
+        nmod_mat_clear (FLINTN);
+#else
         int * zeroOne= extractZeroOneVecs (NTLN);
         CFList result= reconstruction (bufF, factors, zeroOne, precision, NTLN);
+#endif
         F= bufF;
         delete [] zeroOne;
         delete [] A;
@@ -3118,30 +4008,56 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         break;
     }
   }
+#ifdef HAVE_FLINT
+  nmod_mat_clear (FLINTN);
+#endif
   delete [] bounds;
   delete [] A;
   return CFList();
 }
 
+#ifdef HAVE_FLINT
+CFList
+increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
+                   l, int d, int* bounds, CFArray& bufQ, nmod_mat_t FLINTN
+                  )
+#else
 CFList
 increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
                    l, int d, int* bounds, CFArray& bufQ, mat_zz_p& NTLN
                   )
+#endif
 {
   CFList result= CFList();
   CFArray * A= new CFArray [factors.length()];
   int oldL2= oldL/2;
   bool hitBound= false;
+#ifdef HAVE_FLINT
+  if (nmod_mat_nrows (FLINTN) != factors.length()) //refined factors
+  {
+    nmod_mat_clear (FLINTN);
+    nmod_mat_init(FLINTN,factors.length(),factors.length(),getCharacteristic());
+    for (long i=factors.length()-1; i >= 0; i--)
+      nmod_mat_entry (FLINTN, i, i)= 1;
+    bufQ= CFArray (factors.length());
+  }
+#else
   if (NTLN.NumRows() != factors.length()) //refined factors
   {
     ident (NTLN, factors.length());
     bufQ= CFArray (factors.length());
   }
+#endif
   bool useOldQs= false;
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   CanonicalForm bufF, truncF;
   CFList bufUniFactors;
   Variable y= F.mvar();
@@ -3177,29 +4093,67 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
             writeInMatrix (C, buf, ii + 1, 0);
           }
         }
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
+#ifdef HAVE_FLINT
+        if (nmod_mat_ncols (FLINTN) == 1)
+#else
         if (NTLN.NumCols() == 1)
+#endif
         {
           delete [] A;
           return CFList (F);
         }
       }
     }
+#ifdef HAVE_FLINT
+    if (nmod_mat_ncols (FLINTN) == 1)
+#else
     if (NTLN.NumCols() == 1)
+#endif
     {
       delete [] A;
       return CFList (F);
     }
     int * zeroOneVecs;
+#ifdef HAVE_FLINT
+    zeroOneVecs= extractZeroOneVecs (FLINTN);
+#else
     zeroOneVecs= extractZeroOneVecs (NTLN);
+#endif
     bufF= F;
     bufUniFactors= factors;
+#ifdef HAVE_FLINT
+    result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, FLINTN);
+#else
     result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, NTLN);
+#endif
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < oldL && result.length() > 0)
     {
@@ -3500,11 +4454,19 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
   return result;
 }
 
+#ifdef HAVE_FLINT
+CFList
+increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
+                        int d, int* bounds, CFArray& bufQ, nmod_mat_t FLINTN,
+                        const Variable& alpha
+                       )
+#else
 CFList
 increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
                         int d, int* bounds, CFArray& bufQ, mat_zz_p& NTLN,
                         const Variable& alpha
                        )
+#endif
 {
   CFList result= CFList();
   CFArray * A= new CFArray [factors.length()];
@@ -3512,12 +4474,27 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
   int oldL2= oldL/2;
   bool hitBound= false;
   bool useOldQs= false;
+#ifdef HAVE_FLINT
+  if (nmod_mat_nrows (FLINTN) != factors.length()) //refined factors
+  {
+    nmod_mat_clear (FLINTN);
+    nmod_mat_init(FLINTN,factors.length(),factors.length(),getCharacteristic());
+    for (long i=factors.length()-1; i >= 0; i--)
+      nmod_mat_entry (FLINTN, i, i)= 1;
+  }
+#else
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+#endif
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   CanonicalForm bufF, truncF;
   CFList bufUniFactors;
   Variable y= F.mvar();
@@ -3553,13 +4530,39 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
             writeInMatrix (C, buf, ii + 1, 0);
           }
         }
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
+#ifdef HAVE_FLINT
+        if (nmod_mat_ncols (FLINTN) == 1)
+#else
         if (NTLN.NumCols() == 1)
+#endif
         {
           delete [] A;
           return CFList (F);
@@ -3568,11 +4571,19 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
     }
 
     int * zeroOneVecs;
+#ifdef HAVE_FLINT
+    zeroOneVecs= extractZeroOneVecs (FLINTN);
+#else
     zeroOneVecs= extractZeroOneVecs (NTLN);
+#endif
 
     bufF= F;
     bufUniFactors= factors;
+#ifdef HAVE_FLINT
+    result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, FLINTN);
+#else
     result= reconstruction (bufF, bufUniFactors, zeroOneVecs, oldL, NTLN);
+#endif
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < l && result.length() > 0)
     {
@@ -3600,12 +4611,21 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
   return result;
 }
 
+#ifdef HAVE_FLINT
+CFList
+furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
+                                    factors, int l, int liftBound, int d, int*
+                                    bounds, nmod_mat_t FLINTN, CFList& diophant,
+                                    CFMatrix& M, CFArray& Pi, CFArray& bufQ
+                                   )
+#else
 CFList
 furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
                                     factors, int l, int liftBound, int d, int*
                                     bounds, mat_zz_p& NTLN, CFList& diophant,
                                     CFMatrix& M, CFArray& Pi, CFArray& bufQ
                                    )
+#endif
 {
   CanonicalForm LCF= LC (F, 1);
   CFList result;
@@ -3617,12 +4637,27 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   int oldL= l;
   int stepSize= 8; //TODO choose better step size?
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l), 2);
+#ifdef HAVE_FLINT
+  if (nmod_mat_nrows (FLINTN) != factors.length()) //refined factors
+  {
+    nmod_mat_clear (FLINTN);
+    nmod_mat_init(FLINTN,factors.length(),factors.length(),getCharacteristic());
+    for (long i=factors.length()-1; i >= 0; i--)
+      nmod_mat_entry (FLINTN, i, i)= 1;
+  }
+#else
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+#endif
   CFListIterator j;
   CFMatrix C;
   CFArray buf;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   CanonicalForm bufF, truncF;
   Variable y= F.mvar();
   while (l <= liftBound)
@@ -3658,13 +4693,39 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
             writeInMatrix (C, buf, ii + 1, 0);
           }
         }
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
+#ifdef HAVE_FLINT
+        if (nmod_mat_ncols (FLINTN) == 1)
+#else
         if (NTLN.NumCols() == 1)
+#endif
         {
           irreducible= true;
           break;
@@ -3672,15 +4733,27 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
       }
     }
 
+#ifdef HAVE_FLINT
+    if (nmod_mat_ncols (FLINTN) == 1)
+#else
     if (NTLN.NumCols() == 1)
+#endif
     {
       irreducible= true;
       break;
     }
 
+#ifdef HAVE_FLINT
+    int * zeroOneVecs= extractZeroOneVecs (FLINTN);
+#else
     int * zeroOneVecs= extractZeroOneVecs (NTLN);
+#endif
     bufF= F;
+#ifdef HAVE_FLINT
+    result= reconstruction (bufF, bufFactors, zeroOneVecs, l, FLINTN);
+#else
     result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
+#endif
     delete [] zeroOneVecs;
     if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
     {
@@ -3690,13 +4763,35 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
       return result;
     }
 
+#ifdef HAVE_FLINT
+    if (isReduced (FLINTN))
+#else
     if (isReduced (NTLN))
+#endif
     {
       int factorsFound= 0;
       bufF= F;
+#ifdef HAVE_FLINT
+      int* factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+      for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
       int* factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
         factorsFoundIndex[i]= 0;
+#ifdef HAVE_FLINT
+      if (l < liftBound)
+        reconstructionTry (result, bufF, bufFactors, l, factorsFound,
+                           factorsFoundIndex, FLINTN, false
+                          );
+      else
+        reconstructionTry (result, bufF, bufFactors, degree (bufF) + 1 +
+                           degree (LCF), factorsFound, factorsFoundIndex,
+                           FLINTN, false
+                          );
+
+      if (nmod_mat_ncols (FLINTN) == result.length())
+#else
       if (l < liftBound)
         reconstructionTry (result, bufF, bufFactors, l, factorsFound,
                            factorsFoundIndex, NTLN, false
@@ -3708,6 +4803,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
                           );
 
       if (NTLN.NumCols() == result.length())
+#endif
       {
         delete [] A;
         delete [] factorsFoundIndex;
@@ -4079,6 +5175,15 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
   return CFList();
 }
 
+#ifdef HAVE_FLINT
+CFList
+furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
+                                         l, int liftBound, int d, int* bounds,
+                                         nmod_mat_t FLINTN, CFList& diophant,
+                                         CFMatrix& M, CFArray& Pi, CFArray& bufQ,
+                                         const Variable& alpha
+                                        )
+#else
 CFList
 furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
                                          l, int liftBound, int d, int* bounds,
@@ -4086,6 +5191,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
                                          CFMatrix& M, CFArray& Pi, CFArray& bufQ,
                                          const Variable& alpha
                                         )
+#endif
 {
   CanonicalForm LCF= LC (F, 1);
   CFList result;
@@ -4098,11 +5204,26 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   int oldL= l;
   int stepSize= 8; //TODO choose better step size?
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l), 2);
+#ifdef HAVE_FLINT
+  if (nmod_mat_nrows (FLINTN) != factors.length()) //refined factors
+  {
+    nmod_mat_clear (FLINTN);
+    nmod_mat_init(FLINTN,factors.length(),factors.length(),getCharacteristic());
+    for (long i=factors.length()-1; i >= 0; i--)
+      nmod_mat_entry (FLINTN, i, i)= 1;
+  }
+#else
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
+#endif
   CFListIterator j;
   CFMatrix C;
+#ifdef HAVE_FLINT
+  long rank;
+  nmod_mat_t FLINTC, FLINTK, null;
+#else
   mat_zz_p* NTLC, NTLK;
+#endif
   CanonicalForm bufF, truncF;
   Variable y= F.mvar();
   while (l <= liftBound)
@@ -4137,28 +5258,66 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
             writeInMatrix (C, buf, ii + 1, 0);
           }
         }
+#ifdef HAVE_FLINT
+        convertFacCFMatrix2nmod_mat_t (FLINTC, C);
+        nmod_mat_init (FLINTK, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTN),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTK, FLINTC, FLINTN);
+        nmod_mat_init (null, nmod_mat_ncols (FLINTK), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        rank= nmod_mat_nullspace (null, FLINTK);
+        nmod_mat_clear (FLINTK);
+        nmod_mat_window_init (FLINTK, null, 0, 0, nmod_mat_nrows(null), rank);
+        nmod_mat_clear (FLINTC);
+        nmod_mat_init_set (FLINTC, FLINTN);
+        nmod_mat_clear (FLINTN);
+        nmod_mat_init (FLINTN, nmod_mat_nrows (FLINTC), nmod_mat_ncols (FLINTK),
+                       getCharacteristic());
+        nmod_mat_mul (FLINTN, FLINTC, FLINTK); //no aliasing allowed!!
+
+        nmod_mat_clear (FLINTC);
+        nmod_mat_window_clear (FLINTK);
+        nmod_mat_clear (null);
+#else
         NTLC= convertFacCFMatrix2NTLmat_zz_p(C);
         NTLK= (*NTLC)*NTLN;
         transpose (NTLK, NTLK);
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+#endif
+#ifdef HAVE_FLINT
+        if (nmod_mat_ncols (FLINTN) == 1)
+#else
         if (NTLN.NumCols() == 1)
+#endif
         {
           irreducible= true;
           break;
         }
       }
     }
+#ifdef HAVE_FLINT
+    if (nmod_mat_ncols (FLINTN) == 1)
+#else
     if (NTLN.NumCols() == 1)
+#endif
     {
       irreducible= true;
       break;
     }
 
+#ifdef HAVE_FLINT
+    int * zeroOneVecs= extractZeroOneVecs (FLINTN);
+#else
     int * zeroOneVecs= extractZeroOneVecs (NTLN);
+#endif
     CanonicalForm bufF= F;
+#ifdef HAVE_FLINT
+    result= reconstruction (bufF, bufFactors, zeroOneVecs, l, FLINTN);
+#else
     result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN);
+#endif
     delete [] zeroOneVecs;
     if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
     {
@@ -4168,13 +5327,34 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
       return result;
     }
 
+#ifdef HAVE_FLINT
+    if (isReduced (FLINTN))
+#else
     if (isReduced (NTLN))
+#endif
     {
       int factorsFound= 0;
       bufF= F;
+#ifdef HAVE_FLINT
+      int* factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+      for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
       int* factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
         factorsFoundIndex[i]= 0;
+#ifdef HAVE_FLINT
+      if (l < degree (bufF) + 1 + degree (LCF))
+        reconstructionTry (result, bufF, bufFactors, l, factorsFound,
+                           factorsFoundIndex, FLINTN, false
+                          );
+      else
+        reconstructionTry (result, bufF, bufFactors, degree (bufF) + 1 +
+                           degree (LCF), factorsFound, factorsFoundIndex,
+                           FLINTN, false
+                          );
+      if (nmod_mat_ncols (FLINTN) == result.length())
+#else
       if (l < degree (bufF) + 1 + degree (LCF))
         reconstructionTry (result, bufF, bufFactors, l, factorsFound,
                            factorsFoundIndex, NTLN, false
@@ -4185,6 +5365,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
                            NTLN, false
                           );
       if (NTLN.NumCols() == result.length())
+#endif
       {
         delete [] A;
         delete [] factorsFoundIndex;
@@ -4247,6 +5428,38 @@ refineAndRestartLift (const CanonicalForm& F, const mat_zz_p& NTLN, int
   henselLift12 (F, factors, l, Pi, diophant, M);
 }
 
+#ifdef HAVE_FLINT
+void
+refineAndRestartLift (const CanonicalForm& F, const nmod_mat_t FLINTN, int
+                      liftBound, int l, CFList& factors, CFMatrix& M, CFArray&
+                      Pi, CFList& diophant
+                     )
+{
+  CFList bufFactors;
+  Variable y= Variable (2);
+  CanonicalForm LCF= LC (F, 1);
+  CFListIterator iter;
+  CanonicalForm buf;
+  for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+  {
+    iter= factors;
+    buf= 1;
+    for (long j= 0; j < nmod_mat_nrows (FLINTN); j++, iter++)
+    {
+      if (!(nmod_mat_entry (FLINTN,j,i) == 0))
+        buf= mulNTL (buf, mod (iter.getItem(), y));
+    }
+    bufFactors.append (buf);
+  }
+  factors= bufFactors;
+  M= CFMatrix (liftBound, factors.length());
+  Pi= CFArray();
+  diophant= CFList();
+  factors.insert (LCF);
+  henselLift12 (F, factors, l, Pi, diophant, M);
+}
+#endif
+
 void
 refineAndRestartLift (const CanonicalForm& F, const mat_zz_pE& NTLN, int
                       liftBound, int l, CFList& factors, CFMatrix& M, CFArray&
@@ -4277,6 +5490,15 @@ refineAndRestartLift (const CanonicalForm& F, const mat_zz_pE& NTLN, int
   henselLift12 (F, factors, l, Pi, diophant, M);
 }
 
+#ifdef HAVE_FLINT
+CFList
+earlyReconstructionAndLifting (const CanonicalForm& F, const nmod_mat_t N,
+                               CanonicalForm& bufF, CFList& factors, int& l,
+                               int& factorsFound, bool beenInThres, CFMatrix& M,
+                               CFArray& Pi, CFList& diophant, bool symmetric,
+                               const CanonicalForm& evaluation
+                              )
+#else
 CFList
 earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                CanonicalForm& bufF, CFList& factors, int& l,
@@ -4284,6 +5506,7 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
                                CFArray& Pi, CFList& diophant, bool symmetric,
                                const CanonicalForm& evaluation
                               )
+#endif
 {
   int sizeOfLiftPre;
   int * liftPre= getLiftPrecisions (F, sizeOfLiftPre, degree (LC (F, 1), 2));
@@ -4293,9 +5516,16 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
   CanonicalForm LCF= LC (F, 1);
   CFList result;
   int smallFactorDeg= tmin (11, liftPre [sizeOfLiftPre- 1] + 1);
+#ifdef HAVE_FLINT
+  nmod_mat_t FLINTN;
+  nmod_mat_init_set (FLINTN, N);
+  int * factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+  for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
   mat_zz_p NTLN= N;
   int * factorsFoundIndex= new int [NTLN.NumCols()];
   for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
     factorsFoundIndex [i]= 0;
 
   if (degree (F) + 1 > smallFactorDeg)
@@ -4306,11 +5536,20 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
       henselLiftResume12 (F, factors, l, smallFactorDeg, Pi, diophant, M);
       l= smallFactorDeg;
     }
+#ifdef HAVE_FLINT
+    reconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
+                       factorsFoundIndex, FLINTN, beenInThres
+                      );
+    if (result.length() == nmod_mat_ncols (FLINTN))
+    {
+      nmod_mat_clear (FLINTN);
+#else
     reconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                        factorsFoundIndex, NTLN, beenInThres
                       );
     if (result.length() == NTLN.NumCols())
     {
+#endif
       delete [] liftPre;
       delete [] factorsFoundIndex;
       return result;
@@ -4335,11 +5574,20 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
         if (i != 0)
           continue;
       }
+#ifdef HAVE_FLINT
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, FLINTN, beenInThres
+                        );
+      if (result.length() == nmod_mat_ncols (FLINTN))
+      {
+        nmod_mat_clear (FLINTN);
+#else
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, NTLN, beenInThres
                         );
       if (result.length() == NTLN.NumCols())
       {
+#endif
         delete [] liftPre;
         delete [] factorsFoundIndex;
         return result;
@@ -4390,6 +5638,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
           check1= swapvar (check1, x, y);
           if (check1/Lc (check1) == check2/Lc (check2))
           {
+#ifdef HAVE_FLINT
+            nmod_mat_clear (FLINTN);
+#endif
             result.append (gg);
             result.append (hh);
             delete [] liftPre;
@@ -4404,11 +5655,20 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
         if (i < 5)
           continue;
       }
+#ifdef HAVE_FLINT
+      reconstructionTry (result, bufF, factors, l, factorsFound,
+                         factorsFoundIndex, FLINTN, beenInThres
+                        );
+      if (result.length() == nmod_mat_ncols (FLINTN))
+      {
+        nmod_mat_clear (FLINTN);
+#else
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, NTLN, beenInThres
                         );
       if (result.length() == NTLN.NumCols())
       {
+#endif
         delete [] liftPre;
         delete [] factorsFoundIndex;
         return result;
@@ -4417,6 +5677,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
     }
   }
 
+#ifdef HAVE_FLINT
+  nmod_mat_clear (FLINTN);
+#endif
   delete [] liftPre;
   delete [] factorsFoundIndex;
   return result;
@@ -4891,8 +6154,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   bufUniFactors.insert (LCF);
   int l= 1;
 
+#ifdef HAVE_FLINT
+  nmod_mat_t FLINTN;
+#else
   zz_p::init (getCharacteristic());
   mat_zz_p NTLN;
+#endif
+
   if (alpha.level() != 1)
   {
     zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
@@ -4900,11 +6168,27 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   }
   mat_zz_pE NTLNe;
   if (alpha.level() == 1)
+  {
+#ifdef HAVE_FLINT
+    nmod_mat_init (FLINTN, bufUniFactors.length()-1, bufUniFactors.length()-1, getCharacteristic());
+    for (long i= bufUniFactors.length()-2; i >= 0; i--)
+      nmod_mat_entry (FLINTN, i, i)= 1;
+#else
     ident (NTLN, bufUniFactors.length() - 1);
+#endif
+  }
   else
   {
     if (reduceFq2Fp)
+#ifdef HAVE_FLINT
+    {
+      nmod_mat_init (FLINTN, bufUniFactors.length()-1, bufUniFactors.length()-1, getCharacteristic());
+      for (long i= bufUniFactors.length()-2; i >= 0; i--)
+        nmod_mat_entry (FLINTN, i, i)= 1;
+    }
+#else
       ident (NTLN, bufUniFactors.length() - 1);
+#endif
     else
       ident (NTLNe, bufUniFactors.length() - 1);
   }
@@ -4917,14 +6201,22 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     int start= 0;
     if (alpha.level() == 1)
       oldL= liftAndComputeLattice (F, bounds, d, start, liftBound, minBound,
+#ifdef HAVE_FLINT
+                                   bufUniFactors, FLINTN, diophant, M, Pi, bufQ,
+#else
                                    bufUniFactors, NTLN, diophant, M, Pi, bufQ,
+#endif
                                    irreducible
                                   );
     else
     {
       if (reduceFq2Fp)
         oldL= liftAndComputeLatticeFq2Fp (F, bounds, d, start, liftBound,
+#ifdef HAVE_FLINT
+                                          minBound, bufUniFactors, FLINTN,
+#else
                                           minBound, bufUniFactors, NTLN,
+#endif
                                           diophant, M, Pi, bufQ, irreducible,
                                           alpha
                                          );
@@ -4938,16 +6230,26 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   else
   {
     if (alpha.level() == 1)
+    {
       oldL= liftAndComputeLattice (F, bounds, d, minBound + 1, liftBound,
+#ifdef HAVE_FLINT
+                                   minBound, bufUniFactors, FLINTN, diophant, M,
+#else
                                    minBound, bufUniFactors, NTLN, diophant, M,
+#endif
                                    Pi, bufQ, irreducible
                                   );
+    }
     else
     {
       if (reduceFq2Fp)
         oldL= liftAndComputeLatticeFq2Fp (F, bounds, d, minBound + 1,
                                           liftBound, minBound, bufUniFactors,
+#ifdef HAVE_FLINT
+                                          FLINTN, diophant, M, Pi, bufQ,
+#else
                                           NTLN, diophant, M, Pi, bufQ,
+#endif
                                           irreducible, alpha
                                          );
       else
@@ -4961,6 +6263,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   bufUniFactors.removeFirst();
   if (oldL > liftBound)
   {
+#ifdef HAVE_FLINT
+    nmod_mat_clear (FLINTN);
+#endif
     delete [] bounds;
     return Union (smallFactors,
                   factorRecombination (bufUniFactors, F,
@@ -4973,6 +6278,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   l= oldL;
   if (irreducible)
   {
+#ifdef HAVE_FLINT
+    nmod_mat_clear (FLINTN);
+#endif
     delete [] bounds;
     return Union (CFList (F), smallFactors);
   }
@@ -4985,8 +6293,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     int * factorsFoundIndex;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
+#ifdef HAVE_FLINT
+      factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+      for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
       factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
         factorsFoundIndex[i]= 0;
     }
     else
@@ -4999,7 +6312,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     CanonicalForm bufF= F;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
       reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
+#ifdef HAVE_FLINT
+                         factorsFound, factorsFoundIndex, FLINTN, false
+#else
                          factorsFound, factorsFoundIndex, NTLN, false
+#endif
                         );
     else
         reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
@@ -5007,8 +6324,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
                           );
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
+#ifdef HAVE_FLINT
+      if (result.length() == nmod_mat_ncols (FLINTN))
+      {
+        nmod_mat_clear (FLINTN);
+#else
       if (result.length() == NTLN.NumCols())
       {
+#endif
         delete [] factorsFoundIndex;
         delete [] bounds;
         return Union (result, smallFactors);
@@ -5018,6 +6341,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (result.length() == NTLNe.NumCols())
       {
+#ifdef HAVE_FLINT
+        nmod_mat_clear (FLINTN);
+#endif
         delete [] factorsFoundIndex;
         delete [] bounds;
         return Union (result, smallFactors);
@@ -5030,8 +6356,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     int * factorsFoundIndex;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
+#ifdef HAVE_FLINT
+      factorsFoundIndex= new int [nmod_mat_ncols (FLINTN)];
+      for (long i= 0; i < nmod_mat_ncols (FLINTN); i++)
+#else
       factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
+#endif
         factorsFoundIndex[i]= 0;
     }
     else
@@ -5044,7 +6375,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     int factorsFound= 0;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
       reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
+#ifdef HAVE_FLINT
+                         (LCF), factorsFound, factorsFoundIndex, FLINTN, false
+#else
                          (LCF), factorsFound, factorsFoundIndex, NTLN, false
+#endif
                         );
     else
       reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
@@ -5052,8 +6387,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
                         );
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
+#ifdef HAVE_FLINT
+      if (result.length() == nmod_mat_ncols(FLINTN))
+      {
+        nmod_mat_clear (FLINTN);
+#else
       if (result.length() == NTLN.NumCols())
       {
+#endif
         delete [] factorsFoundIndex;
         delete [] bounds;
         return Union (result, smallFactors);
@@ -5063,6 +6404,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (result.length() == NTLNe.NumCols())
       {
+#ifdef HAVE_FLINT
+        nmod_mat_clear (FLINTN);
+#endif
         delete [] factorsFoundIndex;
         delete [] bounds;
         return Union (result, smallFactors);
@@ -5078,9 +6422,15 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   {
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
+#ifdef HAVE_FLINT
+      if (nmod_mat_ncols (FLINTN) < bufUniFactors.length())
+      {
+        refineAndRestartLift (F, FLINTN, liftBound, l, bufUniFactors, M, Pi,
+#else
       if (NTLN.NumCols() < bufUniFactors.length())
       {
         refineAndRestartLift (F, NTLN, liftBound, l, bufUniFactors, M, Pi,
+#endif
                               diophant
                              );
         beenInThres= true;
@@ -5102,13 +6452,23 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   int factorsFound= 0;
   if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
   {
+#ifdef HAVE_FLINT
+    result= earlyReconstructionAndLifting (F, FLINTN, bufF, bufUniFactors, l,
+#else
     result= earlyReconstructionAndLifting (F, NTLN, bufF, bufUniFactors, l,
+#endif
                                            factorsFound, beenInThres, M, Pi,
                                            diophant, symmetric, evaluation
                                           );
 
+#ifdef HAVE_FLINT
+    if (result.length() == nmod_mat_ncols (FLINTN))
+    {
+      nmod_mat_clear (FLINTN);
+#else
     if (result.length() == NTLN.NumCols())
     {
+#endif
       delete [] bounds;
       return Union (result, smallFactors);
     }
@@ -5122,6 +6482,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
     if (result.length() == NTLNe.NumCols())
     {
+#ifdef HAVE_FLINT
+      nmod_mat_clear (FLINTN);
+#endif
       delete [] bounds;
       return Union (result, smallFactors);
     }
@@ -5156,9 +6519,15 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       long numCols, numRows;
       if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
       {
+#ifdef HAVE_FLINT
+        numCols= nmod_mat_ncols (FLINTN);
+        numRows= nmod_mat_nrows (FLINTN);
+        zeroOne= extractZeroOneVecs (FLINTN);
+#else
         numCols= NTLN.NumCols();
         numRows= NTLN.NumRows();
         zeroOne= extractZeroOneVecs (NTLN);
+#endif
       }
       else
       {
@@ -5182,7 +6551,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
         {
           if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
           {
+#ifdef HAVE_FLINT
+            if (!(nmod_mat_entry (FLINTN, j,i) == 0))
+#else
             if (!IsZero (NTLN (j + 1,i + 1)))
+#endif
             {
               factorsConsidered.append (iter.getItem());
               buf *= mod (iter.getItem(), y);
@@ -5219,7 +6592,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
     if (alpha.level() == 1)
     {
+#ifdef HAVE_FLINT
+      oldNumCols= nmod_mat_ncols (FLINTN);
+#else
       oldNumCols= NTLN.NumCols();
+#endif
       resultBufF= increasePrecision (bufF, bufUniFactors, factorsFound,
                                      oldNumCols, oldL, l
                                     );
@@ -5228,7 +6605,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (reduceFq2Fp)
       {
+#ifdef HAVE_FLINT
+        oldNumCols= nmod_mat_ncols (FLINTN);
+#else
         oldNumCols= NTLN.NumCols();
+#endif
 
         resultBufF= increasePrecisionFq2Fp (bufF, bufUniFactors, factorsFound,
                                             oldNumCols, oldL, alpha, l
@@ -5246,6 +6627,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
     if (bufUniFactors.isEmpty() || degree (bufF) <= 0)
     {
+#ifdef HAVE_FLINT
+      nmod_mat_clear (FLINTN);
+#endif
       delete [] bounds;
       result= Union (resultBufF, result);
       return Union (result, smallFactors);
@@ -5262,9 +6646,15 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     degs.refine();
     if (degs.getLength() == 1 || bufUniFactors.length() == 1)
     {
+#ifdef HAVE_FLINT
+      nmod_mat_clear (FLINTN);
+#endif
       result.append (bufF);
       return result;
     }
+#ifdef HAVE_FLINT
+    nmod_mat_clear (FLINTN);
+#endif
     return Union (result, henselLiftAndLatticeRecombi (bufF, bufUniFactors,
                                                        alpha, degs, symmetric,
                                                        evaluation
@@ -5277,7 +6667,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     if (alpha.level() == 1)
     {
         result=increasePrecision (F, bufUniFactors, oldL, l, d, bounds, bufQ,
+#ifdef HAVE_FLINT
+                                  FLINTN
+#else
                                   NTLN
+#endif
                                  );
     }
     else
@@ -5285,7 +6679,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       if (reduceFq2Fp)
       {
           result=increasePrecisionFq2Fp (F, bufUniFactors, oldL, l, d, bounds,
+#ifdef HAVE_FLINT
+                                         bufQ, FLINTN, alpha
+#else
                                          bufQ, NTLN, alpha
+#endif
                                         );
       }
       else
@@ -5297,8 +6695,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     }
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
+#ifdef HAVE_FLINT
+      if (result.length()== nmod_mat_ncols (FLINTN))
+      {
+        nmod_mat_clear (FLINTN);
+#else
       if (result.length()== NTLN.NumCols())
       {
+#endif
         delete [] bounds;
         result= Union (result, smallFactors);
         return result;
@@ -5308,6 +6712,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (result.length()== NTLNe.NumCols())
       {
+#ifdef HAVE_FLINT
+        nmod_mat_clear (FLINTN);
+#endif
         delete [] bounds;
         result= Union (result, smallFactors);
         return result;
@@ -5318,7 +6725,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (alpha.level() == 1)
         result= furtherLiftingAndIncreasePrecision (F,bufUniFactors, l,
+#ifdef HAVE_FLINT
+                                                    liftBound,d,bounds,FLINTN,
+#else
                                                     liftBound, d, bounds, NTLN,
+#endif
                                                     diophant, M, Pi, bufQ
                                                    );
       else
@@ -5326,7 +6737,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
         if (reduceFq2Fp)
           result= furtherLiftingAndIncreasePrecisionFq2Fp (F,bufUniFactors, l,
                                                            liftBound, d, bounds,
+#ifdef HAVE_FLINT
+                                                           FLINTN, diophant, M,
+#else
                                                            NTLN, diophant, M,
+#endif
                                                            Pi, bufQ, alpha
                                                           );
         else
@@ -5339,8 +6754,14 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
       if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
       {
+#ifdef HAVE_FLINT
+        if (result.length() == nmod_mat_ncols (FLINTN))
+        {
+          nmod_mat_clear (FLINTN);
+#else
         if (result.length() == NTLN.NumCols())
         {
+#endif
           delete [] bounds;
           result= Union (result, smallFactors);
           return result;
@@ -5350,6 +6771,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       {
         if (result.length() == NTLNe.NumCols())
         {
+#ifdef HAVE_FLINT
+          nmod_mat_clear (FLINTN);
+#endif
           delete [] bounds;
           result= Union (result, smallFactors);
           return result;
@@ -5366,6 +6790,9 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
   delete [] bounds;
   bounds= computeBounds (F, d, isIrreducible);
+#ifdef HAVE_FLINT
+  nmod_mat_clear (FLINTN);
+#endif
   if (isIrreducible)
   {
     delete [] bounds;
