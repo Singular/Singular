@@ -2332,6 +2332,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+
 ac_config_headers="$ac_config_headers config.h"
 
 ac_aux_dir=
@@ -4764,9 +4765,7 @@ fi
 #AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
 #AC_CACHE_VAL(ac_cv_shift,
 #  [ LDFLAGS="-L$explicit_libdir $LDFLAGS"
-#	AC_TRY_RUN(
-#      [ int main() { if (-2 >> 1 == -1) return(0); else return(1); } ],
-#      ac_cv_shift=yes, ac_cv_shift=no, ac_cv_shift=yes) ])
+#	AC_RUN_IFELSE([AC_LANG_SOURCE([[#       int main() { if (-2 >> 1 == -1) return(0); else return(1); } ]])],[#      ac_cv_shift=yes],[ac_cv_shift=no],[ac_cv_shift=yes]) ])
 #if test "x$ac_cv_shift" = xyes; then
 #  AC_MSG_RESULT(yes)
 #else
@@ -4858,10 +4857,10 @@ fi
 
 for FLINT_HOME in ${FLINT_HOME_PATH}
  do
-if test -r "$FLINT_HOME/include/fmpz.h"; then
+if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 	if test "x$FLINT_HOME" != "x/usr"; then
-		FLINT_CFLAGS="-I${FLINT_HOME}/include"
+		FLINT_CFLAGS="-I${FLINT_HOME}/include/flint"
 		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lmpir"
 	else
 		FLINT_CFLAGS=
@@ -5110,7 +5109,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 # cross-compiling ?!
-#AC_C_CROSS
+#
 #if test "x$cross_compiling" = xyes; then
 #  AC_MSG_WARN([you better specify a cache file to get the values for
 #                    cross-compiling right (e.g., call \`configure
