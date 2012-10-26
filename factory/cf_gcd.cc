@@ -25,8 +25,10 @@
 #include <NTL/ZZX.h>
 #include "NTLconvert.h"
 bool isPurePoly(const CanonicalForm & );
+#ifndef HAVE_FLINT
 static CanonicalForm gcd_univar_ntl0( const CanonicalForm &, const CanonicalForm & );
 static CanonicalForm gcd_univar_ntlp( const CanonicalForm &, const CanonicalForm & );
+#endif
 #endif
 
 #ifdef HAVE_FLINT
@@ -306,6 +308,28 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return f;
   }
 #ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+  if (( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
+  &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
+  {
+    nmod_poly_t F1, G1, A, B, R;
+    convertFacCF2nmod_poly_t (F1, f);
+    convertFacCF2nmod_poly_t (G1, g);
+    nmod_poly_init (R, getCharacteristic());
+    nmod_poly_init (A, getCharacteristic());
+    nmod_poly_init (B, getCharacteristic());
+    nmod_poly_xgcd (R, A, B, F1, G1);
+    a= convertnmod_poly_t2FacCF (A, f.mvar());
+    b= convertnmod_poly_t2FacCF (B, f.mvar());
+    CanonicalForm r= convertnmod_poly_t2FacCF (R, f.mvar());
+    nmod_poly_clear (F1);
+    nmod_poly_clear (G1);
+    nmod_poly_clear (A);
+    nmod_poly_clear (B);
+    nmod_poly_clear (R);
+    return r;
+  }
+#else
   if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
@@ -346,6 +370,30 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return convertNTLzzpX2CF(R,f.mvar());
     #endif
   }
+#endif
+#ifdef HAVE_FLINT
+  if (( getCharacteristic() ==0) && (f.level()==g.level())
+       && isPurePoly(f) && isPurePoly(g))
+  {
+    fmpq_poly_t F1, G1;
+    convertFacCF2Fmpq_poly_t (F1, f);
+    convertFacCF2Fmpq_poly_t (G1, g);
+    fmpq_poly_t R, A, B;
+    fmpq_poly_init (R);
+    fmpq_poly_init (A);
+    fmpq_poly_init (B);
+    fmpq_poly_xgcd (R, A, B, F1, G1);
+    a= convertFmpq_poly_t2FacCF (A, f.mvar());
+    b= convertFmpq_poly_t2FacCF (B, f.mvar());
+    CanonicalForm r= convertFmpq_poly_t2FacCF (R, f.mvar());
+    fmpq_poly_clear (F1);
+    fmpq_poly_clear (G1);
+    fmpq_poly_clear (A);
+    fmpq_poly_clear (B);
+    fmpq_poly_clear (R);
+    return r;
+  }
+#else
   if (isOn(SW_USE_NTL_GCD_0) && ( getCharacteristic() ==0)
   && (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
@@ -377,11 +425,12 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       b=convertNTLZZX2CF(B,f.mvar())*gc;
       CanonicalForm rr=convertZZ2CF(RR);
       ASSERT (!rr.isZero(), "NTL:XGCD failed");
-      r*=rr;
-      if ( r.sign() < 0 ) { r= -r; a= -a; b= -b; }
+      a /= rr;
+      b /= rr;
       return r;
     }
   }
+#endif
 #endif
   // may contain bug in the co-factors, see track 107
   CanonicalForm contf = content( f );
@@ -668,15 +717,15 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
     C = gcd( Ci, Ci1 );
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
-/*#ifdef HAVE_FLINT
+#ifdef HAVE_FLINT
         if (isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_flint0(pi, pi1 ) * C;
-#else*/
+#else
 #ifdef HAVE_NTL
         if ( isOn(SW_USE_NTL_GCD_0) && isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_ntl0(pi, pi1 ) * C;
 #endif
-//#endif
+#endif
         return gcd_poly_univar0( pi, pi1, true ) * C;
     }
     else if ( gcd_test_one( pi1, pi, true ) )
@@ -992,7 +1041,7 @@ lcm ( const CanonicalForm & f, const CanonicalForm & g )
 //}}}
 
 #ifdef HAVE_NTL
-
+#ifndef HAVE_FLINT
 static CanonicalForm
 gcd_univar_ntl0( const CanonicalForm & F, const CanonicalForm & G )
 {
@@ -1034,7 +1083,7 @@ gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
   return  convertNTLzzpX2CF(R,F.mvar());
   #endif
 }
-
+#endif
 #endif
 
 #ifdef HAVE_FLINT
