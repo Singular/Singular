@@ -63,10 +63,10 @@ fi
 
 for FLINT_HOME in ${FLINT_HOME_PATH} 
  do	
-if test -r "$FLINT_HOME/include/fmpz.h"; then
+if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 	if test "x$FLINT_HOME" != "x/usr"; then
-		FLINT_CFLAGS="-I${FLINT_HOME}/include"
+		FLINT_CFLAGS="-I${FLINT_HOME}/include/flint"
 		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lmpir"
 	else
 		FLINT_CFLAGS=

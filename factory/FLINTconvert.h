@@ -27,12 +27,14 @@ extern "C"
 #ifndef __GMP_BITS_PER_MP_LIMB
 #define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
 #endif
-#include <fmpz.h>
-#include <fmpq.h>
-#include <fmpz_poly.h>
-#include <fmpz_mod_poly.h>
-#include <fmpq_poly.h>
-#include <nmod_poly.h>
+#include <flint/fmpz.h>
+#include <flint/fmpq.h>
+#include <flint/fmpz_poly.h>
+#include <flint/fmpz_mod_poly.h>
+#include <flint/fmpq_poly.h>
+#include <flint/nmod_poly.h>
+#include <flint/nmod_mat.h>
+#include <flint/fmpz_mat.h>
 #ifdef __cplusplus
 }
 #endif
@@ -129,6 +131,24 @@ convertFmpz_mod_poly_t2FacCF (
                           const modpk& b        ///< [in] coeff bound to map
                                                 ///< coeffs in (-p/2,p/2)
                              );
+
+/// conversion of a factory matrix over Z to a fmpz_mat_t
+void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, ///<[in,out] fmpz_mat_t
+                                    CFMatrix &m   ///<[in] matrix over Z
+                                   );
+
+/// conversion of a FLINT matrix over Z to a factory matrix
+CFMatrix* convertFmpz_mat_t2FacCFMatrix(fmpz_mat_t m ///<[in] fmpz_mat_t
+                                       );
+
+/// conversion of a factory matrix over Z/p to a nmod_mat_t
+void convertFacCFMatrix2nmod_mat_t (nmod_mat_t M, ///<[in,out] nmod_mat_t
+                                    CFMatrix &m   ///<[in] matrix over Z/p
+                                   );
+
+/// conversion of a FLINT matrix over Z/p to a factory matrix
+CFMatrix* convertNmod_mat_t2FacCFMatrix(nmod_mat_t m ///<[in] nmod_mat_t
+                                       );
 
 #endif
 #endif
