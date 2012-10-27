@@ -939,6 +939,7 @@ Comments should be send to the author of the library directly.
 * locnormal_lib:: Normalization of affine domains using local methods
 * modnormal_lib:: Normalization of affine domains using modular methods
 * multigrading_lib:: Multigradings and related computations
+* numerAlg_lib::  Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
 * parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
@@ -990,7 +991,7 @@ Issues:
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,numerDecom_lib,modnormal_lib, Experimental libraries
+@node multigrading_lib,numerAlg_lib,modnormal_lib, Experimental libraries
 @subsection multigrading_lib
 
 Todos/Issues:
@@ -1000,7 +1001,19 @@ Todos/Issues:
 
 @c lib multigrading.lib
 @c ----------------------------------------------------------
-@node numerDecom_lib,parallel_lib,multigrading_lib, Experimental libraries
+@node numerAlg_lib,numerDecom_lib,multigrading_lib, Experimental libraries
+@subsection numerAlg_lib
+
+Todos/Issues:
+@itemize
+@item does not follow the naming convention
+@item syntax errors in examples
+@item no test suite
+@end itemize
+
+@c lib numerAlg.lib no_ex
+@c ----------------------------------------------------------
+@node numerDecom_lib,parallel_lib,numerAlg_lib, Experimental libraries
 @subsection numerDecom_lib
 
 Todos/Issues:
