@@ -594,7 +594,7 @@ int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW,
   TObject SWith(SPW, Lp == Save);
   TObject UWith(UPW, Lp == Save);
 
-  pAssume(!pHaveCommonMonoms(Red.p, With.p));
+  pAssume(!pHaveCommonMonoms(Red.p, SWith.p));
   ret = ShiftDVec::ksReducePoly(&Red, &UWith, &SWith, spNoether, &coef, strat);
 
   if (!ret)
@@ -613,7 +613,8 @@ int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW,
       pNext(PR->t_p) = pNext(Current);
   }
   if (Lp == Save)
-    With.Delete();
+   SWith.Delete();
+   UWith.Delete();
 
   // the following is commented out: shrinking
 #ifdef HAVE_SHIFTBBA_NONEXISTENT

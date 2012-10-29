@@ -27,9 +27,9 @@ namespace ShiftDVec
                    int use_buckets, ring tailRing,
                    poly m1, poly m2, TObject** R);
 
-  int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, 
-                                  TObject* SPW, poly Current, 
-                                  poly spNoether, kStrategy strat);
+  int ksReducePolyTail(LObject* PR, TObject* UPW, 
+                                  TObject* SPW, poly Current = NULL, 
+                                  poly spNoether = NULL, kStrategy strat = NULL);
 
 
 

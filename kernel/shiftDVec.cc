@@ -1174,8 +1174,8 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       With->pLength=0;
       strat->redTailChange=TRUE;
 
-      if ( ksReducePolyTail
-             (L, WithTmp, With, h, strat->kNoetherTail()) )
+      if ( ShiftDVec::ksReducePolyTail
+             (L, WithTmp, With, h, strat->kNoetherTail()), strat )
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -2335,8 +2335,8 @@ poly ShiftDVec::redtailBba
         if(shift != 0)
         //Our divisor is a shift (and thus not in T or S)
         {
-          p_tmp = With->p;
-          t_p_tmp = With->t_p;
+          poly p_tmp = With->p;
+          poly t_p_tmp = With->t_p;
           With->t_p = p_LPshiftT
             ( t_p_tmp, shift, strat->uptodeg, strat->lV, 
               strat, strat->tailRing                     );
@@ -2435,7 +2435,7 @@ poly ShiftDVec::redtailBba
        * does an exp bound still make sense?
        */
       assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
-      if ( ksReducePolyTail(L, uTmp, With, &Ln) )
+      if ( ShiftDVec::ksReducePolyTail(L, &uTmp, With, With->p, Ln.p, strat ))
       {
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
