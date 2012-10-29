@@ -1464,15 +1464,15 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
 #else
 
     TObject tmp; //save the unshifted poly
-    poly tmp.p = strat->T[ii].p;
-    poly tmp.t_p = strat->T[ii].t_p;
+    tmp.p = strat->T[ii].p;
+    tmp.t_p = strat->T[ii].t_p;
     if(shift > 0)
     {
       strat->T[ii].t_p = p_LPshiftT
-        ( p_t_tmp, shift, 
+        ( tmp.t_p, shift, 
           strat->uptodeg, strat->lV, strat, strat->tailRing );
       strat->T[ii].p = p_LPshiftT
-        ( p_tmp, shift, 
+        ( tmp.p, shift, 
           strat->uptodeg, strat->lV, strat, currRing );
     }
     SD::ksReducePoly(h, &tmp, &(strat->T[ii]) );
