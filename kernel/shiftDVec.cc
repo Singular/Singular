@@ -1175,7 +1175,7 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       strat->redTailChange=TRUE;
 
       if ( ksReducePolyTail
-             (L, With, h, strat->kNoetherTail()) )
+             (L, WithTmp, With, h, strat->kNoetherTail()) )
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -2283,8 +2283,9 @@ poly ShiftDVec::redtailBba
   //BOCO: TODO: remove all these tests
   assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000); 
 
-  poly t_p_tmp = NULL;
-  poly p_tmp = NULL;
+  TObject uTmp;
+  uTmp.t_p = NULL;
+  uTmp.p = NULL;
   static int deBoGriCnt2 = 0; //TODO: remove
   while(!Ln.IsNull())
   {
@@ -2392,13 +2393,13 @@ poly ShiftDVec::redtailBba
 //          With->t_p = p_LPshiftT
 //            ( WithTmp->t_p, shift, strat->uptodeg, strat->lV, 
 //              strat, strat->tailRing                          );
-          p_tmp = With->p;
-          t_p_tmp = With->t_p;
+          uTmp.p = With->p;
+          uTmp.t_p = With->p;
           With->t_p = p_LPshiftT
-            ( t_p_tmp, shift, strat->uptodeg, strat->lV, 
+            ( uTmp.t_p, shift, strat->uptodeg, strat->lV, 
               strat, strat->tailRing                     );
           With->p = ::p_mLPshift
-            ( p_tmp, shift, strat->uptodeg, strat->lV, 
+            ( uTmp.p, shift, strat->uptodeg, strat->lV, 
               currRing                                 );
           if(With->t_p) With->p->next = With->t_p->next;
           loGriToFile("p_LPshiftT in redtailBba ", 0,1024,(void*)With->t_p);
@@ -2434,7 +2435,7 @@ poly ShiftDVec::redtailBba
        * does an exp bound still make sense?
        */
       assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
-      if ( ksReducePolyTail(L, With, &Ln) )
+      if ( ksReducePolyTail(L, uTmp, With, &Ln) )
       {
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
@@ -2485,7 +2486,7 @@ poly ShiftDVec::redtailBba
           ( "pDelete of With->t_p in redTailBba",
             0,1024,(void*) With->t_p              );
         pDelete(&(With->t_p)); 
-        With->t_p = t_p_tmp; 
+        With->t_p = uTmp.t_p; 
         if(With->p)
         {
           loGriToFile
@@ -2493,7 +2494,7 @@ poly ShiftDVec::redtailBba
               0,1024,(void*) With->p              );
           pLmFree(&(With->p)); 
         }
-        With->p = p_tmp; 
+        With->p = uTmp.p; 
         shift = 0;
       }
       assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
@@ -2541,7 +2542,7 @@ poly ShiftDVec::redtailBba
       ( "pDelete of With->t_p in redTailBba",
         0,1024,(void*) With->t_p              );
     pDelete(&(With->t_p)); 
-    With->t_p = t_p_tmp; 
+    With->t_p = uTmp.t_p; 
     if(With->p)
     {
       loGriToFile
@@ -2549,7 +2550,7 @@ poly ShiftDVec::redtailBba
           0,1024,(void*) With->p              );
       pLmFree(&(With->p)); 
     }
-    With->p = p_tmp; 
+    With->p = uTmp.p; 
     shift = 0;
   }
 #endif
