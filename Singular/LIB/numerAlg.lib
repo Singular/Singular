@@ -4,13 +4,13 @@ category="Algebraic Geometry";
 info="
 LIBRARY:  NumerAlg.lib    Numerical Algebraic Algorithm
 OVERVIEW:
-        The library contains procedures to 
+        The library contains procedures to
         test the inclusion, the equality of two ideals defined by polynomial systems,
         compute the degree of a pure i-dimensional component of an algebraic variety
          defined by a polynomial system,
         compute the local dimension of an algebraic variety defined by a polynomial
          system at a point computed as an approximate value. The use of the library
-         requires to install Bertini (www.nd.edu~sommese/bertini/thedownload).
+         requires to install Bertini (http://www.nd.edu/~sommese/bertini).
 
 AUTHOR: Shawki AlRashed, rashed@mathematik.uni-kl.de; sh.shawki@yahoo.de
 PROCEDURES:
@@ -31,7 +31,7 @@ LIB "numerDecom.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc Degree(ideal I,int i)
 "USAGE:  Degree(ideal I,int i); I ideal,  i positive integer
-RETURN:  the degree of the pure i-dimensional component of the algebraic 
+RETURN:  the degree of the pure i-dimensional component of the algebraic
           variety defined by I
 EXAMPLE: example Degree; shows an example
 "
@@ -288,7 +288,7 @@ proc NumLocalDim(ideal J, list w, int e)
 "USAGE:  NumLocalDim(ideal J, list w, int e); J ideal,
            w list of an approximate value of a point v in the algebraic variety defined by J,
                e integer
-RETURN: the local dimension of the algebraic variety defined by J at v 
+RETURN: the local dimension of the algebraic variety defined by J at v
 EXAMPLE: example NumLocalDim; shows an example
 "
 {
@@ -341,7 +341,7 @@ EXAMPLE: example NumLocalDim; shows an example
    for(j=1;j<=n;j++)
    {
     p=subst(p,var(j),w[j]);
-   } 
+   }
    JJ[i]=II[i]-p;
   }
   for(j=1;j<=n;j++)
@@ -387,7 +387,7 @@ EXAMPLE: example NumLocalDim; shows an example
     for(j=1;j<=n;j++)
     {
      p=subst(p,var(j),rw[j]+I*iw[j]);
-    } 
+    }
     JJ[i]=II[i]-p;
    }
    HH=LL,JJ,pi;
@@ -456,7 +456,7 @@ EXAMPLE: example NumLocalDim; shows an example
       }
       else
       {
-       def SS=Singular2betini1(W(ii));
+       def SS=Singular2bertini(W(ii));
        execute("ring D=(complex,e,I),("+varstr(S)+",s,gamma),dp;");
        string nonsin;
        ideal H,L;

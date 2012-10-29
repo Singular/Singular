@@ -1028,7 +1028,7 @@ Todos/Issues:
 
 Todos/Issues:
 @itemize
-@item does not follow the naming convention/typos in names
+@item does not follow the naming convention
 @item syntax errors in examples
 @item no test suite
 @end itemize
