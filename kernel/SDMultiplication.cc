@@ -575,7 +575,8 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
 }
 
 
-int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW, poly Current, poly spNoether)
+int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW, 
+                                poly Current, poly spNoether, kStrategy strat)
 {
   BOOLEAN ret;
   number coef;
@@ -590,10 +591,11 @@ int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW, poly Cu
   assume(PR->bucket == NULL);
 
   LObject Red(pNext(Current), PR->tailRing);
-  TObject With(SPW, Lp == Save);
+  TObject SWith(SPW, Lp == Save);
+  TObject UWith(UPW, Lp == Save);
 
   pAssume(!pHaveCommonMonoms(Red.p, With.p));
-  ret = ShiftDVec::ksReducePoly(&Red, &With, spNoether, &coef);
+  ret = ShiftDVec::ksReducePoly(&Red, &UWith, &SWith, spNoether, &coef, strat);
 
   if (!ret)
   {

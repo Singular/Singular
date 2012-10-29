@@ -27,6 +27,13 @@ namespace ShiftDVec
                    int use_buckets, ring tailRing,
                    poly m1, poly m2, TObject** R);
 
+  int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, 
+                                  TObject* SPW, poly Current, 
+                                  poly spNoether, kStrategy strat);
+
+
+
+
 #if 0 //The following is currently not working/used
   void ksCreateSpoly
     ( LObject* Pair, poly spNoether, int use_buckets, 
