@@ -40,6 +40,10 @@
 @item new library: locnormal.lib: Normalization of affine domains using local methods (@nref{locnormal_lib})
 @item new library: modnormal.lib: Normalization of affine domains using modular methods (@nref{modnormal_lib})
 @item new library: realizationMatroids.lib: Deciding Relative Realizability for Tropical Fan Curves in 2-Dimensional Matroidal Fans (@nref{realizationMatroids_lib})
+@item new library: numerAlg.lib:  Numerical Algebraic Algorithm (@nref{numerAlg_lib})
+@item new library: numerDecom.lib:  Bertini interface (@nref{numerDecom_lib})
+@item new library: JMSConst.lib:  constructing J-Marked Schemes (@nref{JMSConst_lib})
+@item new library: JMBTest.lib:  performs JM basis test (@nref{JMBTest_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries

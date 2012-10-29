@@ -937,6 +937,8 @@ Comments should be send to the author of the library directly.
 * finitediff_lib:: finite difference schemes for linear differential equations
 * lll_lib:: Integral LLL-Algorithm
 * locnormal_lib:: Normalization of affine domains using local methods
+* JMBTest_lib:: performs J-Marked basis test
+* JMSConst_lib::  constructing J-Marked Schemes
 * modnormal_lib:: Normalization of affine domains using modular methods
 * multigrading_lib:: Multigradings and related computations
 * numerAlg_lib::  Numerical Algebraic Algorithms
@@ -983,11 +985,19 @@ Issues:
 @subsection lll_lib
 @c lib lll.lib
 @c ----------------------------------------------------------
-@node locnormal_lib, modnormal_lib, lll_lib, Experimental libraries
+@node locnormal_lib, JMBTest_lib, lll_lib, Experimental libraries
 @subsection locnormal_lib
 @c lib locnormal.lib
 @c ----------------------------------------------------------
-@node modnormal_lib, multigrading_lib, locnormal_lib, Experimental libraries
+@node JMBTest_lib, JMSConst_lib, locnormal_lib, Experimental libraries
+@subsection JMBTest_lib
+@c lib JMBTest.lib
+@c ----------------------------------------------------------
+@node JMSConst_lib, modnormal_lib, JMBTest_lib, Experimental libraries
+@subsection JMSConst_lib
+@c lib JMSConst.lib
+@c ----------------------------------------------------------
+@node modnormal_lib, multigrading_lib, JMSConst_lib, Experimental libraries
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ----------------------------------------------------------
