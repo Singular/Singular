@@ -30,10 +30,10 @@ const long FFMARK = 2;
 const long GFMARK = 3;
 
 #if SIZEOF_LONG == 4
-const long MINIMMEDIATE = -268435454; // -2^28-2
+const long MINIMMEDIATE = -268435454; // -2^28+2
 const long MAXIMMEDIATE = 268435454;  // 2^28-2
 #else
-const long MINIMMEDIATE = -(1L<<60)+2L; // -2^60-2
+const long MINIMMEDIATE = -(1L<<60)+2L; // -2^60+2
 const long MAXIMMEDIATE = (1L<<60)-2L;  // 2^60-2
 #endif
 #if defined(WINNT) && ! defined(__GNUC__)
@@ -293,23 +293,38 @@ imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
     long a = imm2int( lhs );
     long b = imm2int( rhs );
-    INT64 result = (INT64)a * (INT64)b;
+    int sa= 1;
+    unsigned INT64 aa, bb;
+    if (a < 0)
+    {
+      sa= -1;
+      aa= (unsigned INT64) (-a);
+    }
+    else
+      aa= (unsigned INT64) a;
+    if (b < 0)
+    {
+      sa= -sa;
+      bb= (unsigned INT64) (-b);
+    }
+    else
+      bb= (unsigned INT64) b;
+    unsigned INT64 result = aa*bb;
     #if SIZEOF_LONG == 4
-    if ((result>(INT64)MAXIMMEDIATE)||(result<(INT64)MINIMMEDIATE))
+    if (result>(unsigned INT64)MAXIMMEDIATE)
     {
         InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );
     }
     #else
-    if ( ( a!=0L ) && ((result/a!=b)
-      ||(result>MAXIMMEDIATE)||(result<MINIMMEDIATE) ) )
+    if ( ( a!=0L ) && ((result/aa!=bb) || (result>(unsigned INT64) MAXIMMEDIATE) ))
     {
         InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );
     }
     #endif
     else
-        return int2imm( result );
+      return int2imm( sa*result );
 }
 
 inline InternalCF * imm_mul_p ( const InternalCF * const lhs, const InternalCF * const rhs )
