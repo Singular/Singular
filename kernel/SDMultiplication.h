@@ -14,12 +14,15 @@ namespace ShiftDVec
   int InitOrderMapping( ring r );
   void InitSDMultiplication( ring r, kStrategy strat );
  
+  extern int red_count;
+  extern int create_count;
+
   int ksReducePoly(LObject* PR,
                  TObject* UPW,
                  TObject* SPW,
-                 poly spNoether,
-                 number *coef,
-                 kStrategy strat);
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
   void ksCreateSpoly(LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
                    poly m1, poly m2, TObject** R);

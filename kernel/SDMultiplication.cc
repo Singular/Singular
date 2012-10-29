@@ -318,6 +318,9 @@ void ShiftDVec::p_ExpSum_dp
 
 
 
+int ShiftDVec::red_count = 0; //count of reductions
+int ShiftDVec::create_count = 0;  //count of spoly creations
+
 /***************************************************************
  *
  * Reduces PR with SPW
@@ -345,9 +348,9 @@ int ShiftDVec::ksReducePoly(LObject* PR,
   int ret = 0;
   ring tailRing = PR->tailRing;
   kTest_L(PR);
-  kTest_T(PW);
+  kTest_T(SPW);
   poly p1 = PR->GetLmTailRing();   // p2 | p1
-  poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
+  poly p2 = SPW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
   poly t2 = pNext(UPW->GetLmTailRing()), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
   assume(p1 != NULL && p2 != NULL);// Attention, we have rings and there LC(p2) and LC(p1) are special
   p_CheckPolyRing(p1, tailRing);
@@ -390,15 +393,15 @@ int ShiftDVec::ksReducePoly(LObject* PR,
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (SPW->max != NULL && !p_LmExpVectorAddIsOk(lm, SPW->max, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
       if (strat == NULL) return 2;
-      if (! kStratChangeTailRing(strat, PR, PW)) return -1;
+      if (! kStratChangeTailRing(strat, PR, SPW)) return -1;
       tailRing = strat->tailRing;
       p1 = PR->GetLmTailRing();
-      p2 = PW->GetLmTailRing();
+      p2 = SPW->GetLmTailRing();
       t2 = pNext(UPW->GetLmTailRing());
       lm = p1;
       p_ExpVectorSub(lm, p2, tailRing);
@@ -424,9 +427,10 @@ int ShiftDVec::ksReducePoly(LObject* PR,
   }
 
 
-  // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
-  assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
+  // and finally 
+  // BOCO: TODO: Do we have to say UPW->GetLength() ?
+  PR->Tail_Minus_mm_Mult_qq(lm, t2, SPW->GetpLength() - 1, spNoether);
+  assume(SPW->GetpLength() == pLength(SPW->p != NULL ? SPW->p : SPW->t_p));
   PR->LmDeleteAndIter();
 
   // the following is commented out: shrinking
@@ -474,7 +478,7 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
   assume(p2 != NULL);
   assume(tailRing != NULL);
 
-  poly a1 = pNext(p1), a2 = strat->R[Pair.i_r2]->p;
+  poly a1 = pNext(p1), a2 = R[Pair->i_r2]->p;
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int co=0, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
 
