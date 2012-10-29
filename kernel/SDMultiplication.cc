@@ -569,3 +569,60 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
 #endif
 
 }
+
+
+int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW, poly Current, poly spNoether)
+{
+  BOOLEAN ret;
+  number coef;
+  poly Lp =     PR->GetLmCurrRing();
+  poly Save =   SPW->GetLmCurrRing();
+
+  kTest_L(PR);
+  kTest_T(SPW);
+  pAssume(pIsMonomOf(Lp, Current));
+
+  assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
+  assume(PR->bucket == NULL);
+
+  LObject Red(pNext(Current), PR->tailRing);
+  TObject With(SPW, Lp == Save);
+
+  pAssume(!pHaveCommonMonoms(Red.p, With.p));
+  ret = ShiftDVec::ksReducePoly(&Red, &With, spNoether, &coef);
+
+  if (!ret)
+  {
+    if (! n_IsOne(coef, currRing))
+    {
+      pNext(Current) = NULL;
+      if (Current == PR->p && PR->t_p != NULL)
+        pNext(PR->t_p) = NULL;
+      PR->Mult_nn(coef);
+    }
+
+    n_Delete(&coef, currRing);
+    pNext(Current) = Red.GetLmTailRing();
+    if (Current == PR->p && PR->t_p != NULL)
+      pNext(PR->t_p) = pNext(Current);
+  }
+  if (Lp == Save)
+    With.Delete();
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if (currRing->isLPring)
+  {
+    // assume? h->p in currRing
+    PR->GetP();
+    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
+    PR->Clear(); // does the right things
+    PR->p = qq;
+    PR->t_p = NULL;
+    PR->SetShortExpVector();
+  }
+#endif
+
+  return ret;
+}
+
