@@ -478,7 +478,7 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
   assume(p2 != NULL);
   assume(tailRing != NULL);
 
-  poly a1 = pNext(p1), a2 = R[Pair->i_r2]->p;
+  poly a1 = pNext(p1), a2 = pNext(R[Pair->i_r2]->p);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int co=0, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
 
