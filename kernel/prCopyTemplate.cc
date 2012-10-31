@@ -9,6 +9,7 @@
 static poly PR_NAME
 (poly &src, ring r_src, ring r_dest)
 {
+  if (src==NULL) return NULL;
   spolyrec dest_s;
   poly dest = &dest_s;
   poly tmp;

@@ -1929,10 +1929,6 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    ring origR = currRing;
-    ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
-    rComplete(tempR);
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
     if ((i != -1) && (nIsUnit(pGetCoeff(vid->m[i]))))
@@ -1940,17 +1936,23 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
       res->data = (char *)-1;
       return FALSE;
     }
-    rChangeCurrRing(tempR);
-    ideal vv = idrCopyR(vid, origR, currRing);
-    ideal ww = idrCopyR((ideal)w->Data(), origR, currRing);
+    //ring origR = currRing;
+    //ring tempR = rCopy(origR);
+    //tempR->ringtype = 0; tempR->ch = 0;
+    //rComplete(tempR);
+    //rChangeCurrRing(tempR);
+    //ideal vv = idrCopyR(vid, origR, currRing);
+    ideal vv = idHead(vid);
+    //ideal ww = idrCopyR((ideal)w->Data(), origR, currRing);
+    ideal ww = idHead((ideal)w->Data());
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
     long d = (long)scDimInt(vv, ww);
-    if (rField_is_Ring_Z(origR) && (i == -1)) d++;
+    if (rField_is_Ring_Z(currRing) && (i == -1)) d++;
     res->data = (char *)d;
     idDelete(&vv); idDelete(&ww);
-    rChangeCurrRing(origR);
-    rDelete(tempR);
+    //rChangeCurrRing(origR);
+    //rDelete(tempR);
     return FALSE;
   }
 #endif
@@ -3947,10 +3949,10 @@ static BOOLEAN jjDIM(leftv res, leftv v)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    ring origR = currRing;
-    ring tempR = rCopy(origR);
-    tempR->ringtype = 0; tempR->ch = 0;
-    rComplete(tempR);
+    //ring origR = currRing;
+    //ring tempR = rCopy(origR);
+    //tempR->ringtype = 0; tempR->ch = 0;
+    //rComplete(tempR);
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
     if ((i != -1) && (nIsUnit(pGetCoeff(vid->m[i]))))
@@ -3958,16 +3960,17 @@ static BOOLEAN jjDIM(leftv res, leftv v)
       res->data = (char *)-1;
       return FALSE;
     }
-    rChangeCurrRing(tempR);
-    ideal vv = idrCopyR(vid, origR, currRing);
+    //rChangeCurrRing(tempR);
+    //ideal vv = idrCopyR(vid, origR, currRing);
+    ideal vv = idHead(vid);
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
     long d = (long)scDimInt(vv, currQuotient);
-    if (rField_is_Ring_Z(origR) && (i == -1)) d++;
+    if (rField_is_Ring_Z(currRing) && (i == -1)) d++;
     res->data = (char *)d;
     idDelete(&vv);
-    rChangeCurrRing(origR);
-    rDelete(tempR);
+    //rChangeCurrRing(origR);
+    //rDelete(tempR);
     return FALSE;
   }
 #endif
