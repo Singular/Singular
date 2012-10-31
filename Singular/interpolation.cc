@@ -79,63 +79,63 @@ typedef mpq_t *q_coordinates;
 typedef mpz_t *int_coordinates;
 typedef bool *coord_exist_table;
 
-int final_base_dim;    // dimension of the quotient space, known from the beginning
-int last_solve_column;  // last non-zero column in "solve" part of matrix, used for speed up
-int n_points;  // modp_number of ideals (points)
-int *multiplicity;  // multiplicities of points
-int variables;  // modp_number of variables
-int max_coord;  // maximal possible coordinate product used during Evaluation
-bool only_modp;  // perform only one modp computations
+static int final_base_dim;    // dimension of the quotient space, known from the beginning
+static int last_solve_column;  // last non-zero column in "solve" part of matrix, used for speed up
+static int n_points;  // modp_number of ideals (points)
+static int *multiplicity;  // multiplicities of points
+static int variables;  // modp_number of variables
+static int max_coord;  // maximal possible coordinate product used during Evaluation
+static bool only_modp;  // perform only one modp computations
 
-modp_coordinates *modp_points; // coordinates of points for modp problem - used by Evaluate (this is also initial data for only modp)
-q_coordinates *q_points; // coordinates of points for rational data (not used for modp)
-int_coordinates *int_points; // coordinates of points for integer data - used to check generators (not used for modp)
-coord_exist_table *coord_exist; // checks whether all coordinates has been initialized
-mon_list_entry *check_list; // monomials to be checked in next stages
-coordinates *points; // power products of coordinates of points used in modp cycles
-condition_type *condition_list; // conditions stored in an array
-mon_list_entry *lt_list; // leading terms found so far
-mon_list_entry *base_list; // standard monomials found so far
-row_list_entry *row_list; // rows of the matrix (both parts)
-modp_number *my_row; // one special row to perform operations
-modp_number *my_solve_row; // one special row to find the linear dependence ("solve" part)
-mono_type *column_name; // monomials assigned to columns in solve_row
+static modp_coordinates *modp_points; // coordinates of points for modp problem - used by Evaluate (this is also initial data for only modp)
+static q_coordinates *q_points; // coordinates of points for rational data (not used for modp)
+static int_coordinates *int_points; // coordinates of points for integer data - used to check generators (not used for modp)
+static coord_exist_table *coord_exist; // checks whether all coordinates has been initialized
+static mon_list_entry *check_list; // monomials to be checked in next stages
+static coordinates *points; // power products of coordinates of points used in modp cycles
+static condition_type *condition_list; // conditions stored in an array
+static mon_list_entry *lt_list; // leading terms found so far
+static mon_list_entry *base_list; // standard monomials found so far
+static row_list_entry *row_list; // rows of the matrix (both parts)
+static modp_number *my_row; // one special row to perform operations
+static modp_number *my_solve_row; // one special row to find the linear dependence ("solve" part)
+static mono_type *column_name; // monomials assigned to columns in solve_row
 
-int n_results;  // modp_number of performed modp computations (not discarded)
-modp_number modp_denom; // denominator of mod p computations
-modp_result_entry *modp_result; // list of results for various mod p calculations (used for modp - first result is the desired one)
-modp_result_entry *cur_result; // pointer to current result (as before)
-modp_number *congr; // primes used in computations (chinese remainder theorem) (not used for modp)
-modp_number *in_gamma; // inverts used in chinese remainder theorem (not used for modp)
-mpz_t bigcongr; // result, in fact, is given in mod bigcongr (not used for modp)
+static int n_results;  // modp_number of performed modp computations (not discarded)
+static modp_number modp_denom; // denominator of mod p computations
+static modp_result_entry *modp_result; // list of results for various mod p calculations (used for modp - first result is the desired one)
+static modp_result_entry *cur_result; // pointer to current result (as before)
+static modp_number *congr; // primes used in computations (chinese remainder theorem) (not used for modp)
+static modp_number *in_gamma; // inverts used in chinese remainder theorem (not used for modp)
+static mpz_t bigcongr; // result, in fact, is given in mod bigcongr (not used for modp)
 
-mpz_t *polycoef; // polynomial integercoefficients (not used for modp)
-mono_type *polyexp; // polynomial exponents
+static mpz_t *polycoef; // polynomial integercoefficients (not used for modp)
+static mono_type *polyexp; // polynomial exponents
 
 struct gen_list_struct {mpz_t *polycoef;
                         mono_type *polyexp;
                         struct gen_list_struct *next;};
 typedef struct gen_list_struct gen_list_entry;
 
-gen_list_entry *gen_list=NULL; // list of resulting generators - output data (integer version)
+static gen_list_entry *gen_list=NULL; // list of resulting generators - output data (integer version)
 
-int generic_n_generators; // modp_number of generators - should be the same for all modp comp (not used for modp)
-mono_type *generic_column_name; // monomials assigned to columns in solve_row - should be the same for all modp comp (!!! used for modp)
-mon_list_entry *generic_lt=NULL; // leading terms for ordered generators - should be the same for all modp comp (not used for modp)
-int good_primes; // modp_number of good primes so far;
-int bad_primes; // modp_number of bad primes so far;
-mpz_t common_denom; // common denominator used to force points coordinates to Z (not used for modp)
-bool denom_divisible; // common denominator is divisible by p (not used for modp)
+static int generic_n_generators; // modp_number of generators - should be the same for all modp comp (not used for modp)
+static mono_type *generic_column_name; // monomials assigned to columns in solve_row - should be the same for all modp comp (!!! used for modp)
+static mon_list_entry *generic_lt=NULL; // leading terms for ordered generators - should be the same for all modp comp (not used for modp)
+static int good_primes; // modp_number of good primes so far;
+static int bad_primes; // modp_number of bad primes so far;
+static mpz_t common_denom; // common denominator used to force points coordinates to Z (not used for modp)
+static bool denom_divisible; // common denominator is divisible by p (not used for modp)
 
-poly comparizon_p1;  //polynomials used to do comparizons by Singular
-poly comparizon_p2;
+static poly comparizon_p1;  //polynomials used to do comparizons by Singular
+static poly comparizon_p2;
 
-modp_number *modp_Reverse; // reverses in mod p
+static modp_number *modp_Reverse; // reverses in mod p
 
-bool protocol; // true to show the protocol
+static bool protocol; // true to show the protocol
 
 #ifdef checksize
-int maximal_size=0;
+static int maximal_size=0;
 #endif
 
 #if 0  /* only for debuggig*/
@@ -217,7 +217,7 @@ void Info ()
 }
 #endif
 
-modp_number OneInverse(modp_number a,modp_number p) // computes inverse of d mod p without using tables
+static modp_number OneInverse(modp_number a,modp_number p) // computes inverse of d mod p without using tables
 {
    long  u, v, u0, u1, u2, q, r;
    u1=1; u2=0;
@@ -246,7 +246,7 @@ modp_number OneInverse(modp_number a,modp_number p) // computes inverse of d mod
    return (modp_number)u1;
 }
 
-int CalcBaseDim () // returns the maximal (expected) dimension of quotient space
+static int CalcBaseDim () // returns the maximal (expected) dimension of quotient space
 {
     int c;
     int i,j;
@@ -265,7 +265,7 @@ int CalcBaseDim () // returns the maximal (expected) dimension of quotient space
     return s;
 }
 
-bool EqualMon (mono_type m1, mono_type m2)  // compares two monomials, true if equal, false otherwise
+static bool EqualMon (mono_type m1, mono_type m2)  // compares two monomials, true if equal, false otherwise
 {
      int i;
      for (i=0;i<variables;i++)
@@ -273,7 +273,7 @@ bool EqualMon (mono_type m1, mono_type m2)  // compares two monomials, true if e
      return true;
 }
 
-exponent MonDegree (mono_type mon)  // computes the degree of a monomial
+static exponent MonDegree (mono_type mon)  // computes the degree of a monomial
 {
      exponent v=0;
      int i;
@@ -281,7 +281,7 @@ exponent MonDegree (mono_type mon)  // computes the degree of a monomial
      return v;
 }
 
-bool Greater (mono_type m1, mono_type m2) // true if m1 > m2, false otherwise. uses Singular comparing function
+static bool Greater (mono_type m1, mono_type m2) // true if m1 > m2, false otherwise. uses Singular comparing function
 {
      for (int j = variables; j; j--)
      {
@@ -294,7 +294,7 @@ bool Greater (mono_type m1, mono_type m2) // true if m1 > m2, false otherwise. u
      return res;
 }
 
-mon_list_entry* MonListAdd (mon_list_entry *list, mono_type mon)  // adds one entry to the list of monomials structure
+static mon_list_entry* MonListAdd (mon_list_entry *list, mono_type mon)  // adds one entry to the list of monomials structure
 {
      mon_list_entry *curptr=list;
      mon_list_entry *prevptr=NULL;
@@ -319,7 +319,7 @@ mon_list_entry* MonListAdd (mon_list_entry *list, mono_type mon)  // adds one en
      }
 }
 
-mono_type MonListElement (mon_list_entry *list, int n)  // returns ith element from list of monomials - no error checking!
+static mono_type MonListElement (mon_list_entry *list, int n)  // returns ith element from list of monomials - no error checking!
 {
      mon_list_entry *cur=list;
      int i;
@@ -327,16 +327,16 @@ mono_type MonListElement (mon_list_entry *list, int n)  // returns ith element f
      return cur->mon;
 }
 
-mono_type ZeroMonomial ()  // allocates memory for new monomial with all enries equal 0
+static mono_type ZeroMonomial ()  // allocates memory for new monomial with all enries equal 0
 {
      mono_type m;
      m=(exponent*)omAlloc0(sizeof(exponent)*variables);
      return m;
 }
 
-void GeneralInit ()  // general initialization
+static void GeneralInit ()  // general initialization
 {
-     int i,j,k;
+     int i,j;
      points=(coordinates*)omAlloc(sizeof(coordinates)*n_points);
      for (i=0;i<n_points;i++)
      {
@@ -395,9 +395,9 @@ void GeneralInit ()  // general initialization
      comparizon_p2=pOne();
 }
 
-void InitProcData ()  // initialization for procedures which do computations mod p
+static void InitProcData ()  // initialization for procedures which do computations mod p
 {
-     int i,j;
+     int i;
      check_list=MonListAdd (check_list,ZeroMonomial ());
      my_row=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
      my_solve_row=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
@@ -431,7 +431,7 @@ void InitProcData ()  // initialization for procedures which do computations mod
      omFree(gen_table);
 }
 
-mon_list_entry* FreeMonList (mon_list_entry *list)  // destroys a list of monomials, returns NULL pointer
+static mon_list_entry* FreeMonList (mon_list_entry *list)  // destroys a list of monomials, returns NULL pointer
 {
      mon_list_entry *ptr;
      mon_list_entry *pptr;
@@ -445,9 +445,9 @@ mon_list_entry* FreeMonList (mon_list_entry *list)  // destroys a list of monomi
      return NULL;
 }
 
-void GeneralDone ()  // to be called before exit to free memory
+static void GeneralDone ()  // to be called before exit to free memory
 {
-     int i,j,k;
+     int i,j;
      for (i=0;i<n_points;i++)
      {
          for (j=0;j<variables;j++)
@@ -496,7 +496,7 @@ void GeneralDone ()  // to be called before exit to free memory
      pDelete(&comparizon_p2);
 }
 
-void FreeProcData ()  // to be called after one modp computation to free memory
+static void FreeProcData ()  // to be called after one modp computation to free memory
 {
      int i;
      row_list_entry *ptr;
@@ -523,7 +523,7 @@ void FreeProcData ()  // to be called after one modp computation to free memory
      omFree(modp_Reverse);
 }
 
-void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  // evaluates monomial on condition (modp)
+static void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  // evaluates monomial on condition (modp)
 {
     int i;
     *ev=0;
@@ -546,7 +546,7 @@ void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  // evalu
     omFree(mn);
 }
 
-void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluates monomial on condition for integer numbers
+static void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluates monomial on condition for integer numbers
 {
     int i;
     mpz_set_si(ev,0);
@@ -573,7 +573,7 @@ void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluate
     mpz_clear(mon_conv);
 }
 
-void ProduceRow(mono_type mon)  // produces a row for monomial - first part is an evaluated part, second 0 to obtain the coefs of dependence
+static void ProduceRow(mono_type mon)  // produces a row for monomial - first part is an evaluated part, second 0 to obtain the coefs of dependence
 {
      modp_number *row;
      condition_type *con;
@@ -594,7 +594,7 @@ void ProduceRow(mono_type mon)  // produces a row for monomial - first part is a
      }
 }
 
-void IntegerPoints ()  // produces integer points from rationals by scaling the coordinate system
+static void IntegerPoints ()  // produces integer points from rationals by scaling the coordinate system
 {
      int i,j;
      mpz_set_si(common_denom,1); // this is common scaling factor
@@ -622,9 +622,8 @@ void IntegerPoints ()  // produces integer points from rationals by scaling the 
      mpq_clear(denom_q);
 }
 
-void int_PrepareProducts ()  // prepares coordinates of points and products for modp case (from integer coefs)
+static void int_PrepareProducts ()  // prepares coordinates of points and products for modp case (from integer coefs)
 {
-     bool ok=true;
      int i,j,k;
      mpz_t big_myp;
      mpz_init(big_myp);
@@ -647,7 +646,7 @@ void int_PrepareProducts ()  // prepares coordinates of points and products for 
      mpz_clear(big_myp);
 }
 
-void modp_PrepareProducts () // prepares products for modp computation from modp data
+static void modp_PrepareProducts () // prepares products for modp computation from modp data
 {
      int i,j,k;
      for (i=0;i<n_points;i++)
@@ -661,7 +660,7 @@ void modp_PrepareProducts () // prepares products for modp computation from modp
      }
 }
 
-void MakeConditions ()  // prepares a list of conditions from list of multiplicities
+static void MakeConditions ()  // prepares a list of conditions from list of multiplicities
 {
      condition_type *con;
      int n,i,k;
@@ -692,7 +691,7 @@ void MakeConditions ()  // prepares a list of conditions from list of multiplici
      omFree(mon);
 }
 
-void ReduceRow ()  // reduces my_row by previous rows, does the same for solve row
+static void ReduceRow ()  // reduces my_row by previous rows, does the same for solve row
 {
      if (row_list==NULL) return ;
      row_list_entry *row_ptr;
@@ -768,7 +767,7 @@ void ReduceRow ()  // reduces my_row by previous rows, does the same for solve r
      }
 }
 
-bool RowIsZero () // check whether a row is zero
+static bool RowIsZero () // check whether a row is zero
 {
      bool zero=1;
      int i;
@@ -782,7 +781,7 @@ bool RowIsZero () // check whether a row is zero
      return zero;
 }
 
-bool DivisibleMon (mono_type m1, mono_type m2) // checks whether m1 is divisible by m2
+static bool DivisibleMon (mono_type m1, mono_type m2) // checks whether m1 is divisible by m2
 {
      int i;
      for (i=0;i<variables;i++)
@@ -790,7 +789,7 @@ bool DivisibleMon (mono_type m1, mono_type m2) // checks whether m1 is divisible
      return true;
 }
 
-void ReduceCheckListByMon (mono_type m)  // from check_list monomials divisible by m are thrown out
+static void ReduceCheckListByMon (mono_type m)  // from check_list monomials divisible by m are thrown out
 {
      mon_list_entry *c_ptr;
      mon_list_entry *p_ptr;
@@ -818,7 +817,7 @@ void ReduceCheckListByMon (mono_type m)  // from check_list monomials divisible 
      }
 }
 
-void TakeNextMonomial (mono_type mon)  // reads first monomial from check_list, then it is deleted
+static void TakeNextMonomial (mono_type mon)  // reads first monomial from check_list, then it is deleted
 {
      mon_list_entry *n_check_list;
      if (check_list!=NULL)
@@ -831,7 +830,7 @@ void TakeNextMonomial (mono_type mon)  // reads first monomial from check_list, 
      }
 }
 
-void UpdateCheckList (mono_type m) // adds all monomials which are "next" to m (divisible by m and degree +1)
+static void UpdateCheckList (mono_type m) // adds all monomials which are "next" to m (divisible by m and degree +1)
 {
      int i;
      for (i=0;i<variables;i++)
@@ -842,7 +841,7 @@ void UpdateCheckList (mono_type m) // adds all monomials which are "next" to m (
      }
 }
 
-void ReduceCheckListByLTs ()  // deletes all monomials from check_list which are divisible by one of the leading terms
+static void ReduceCheckListByLTs ()  // deletes all monomials from check_list which are divisible by one of the leading terms
 {
      mon_list_entry *ptr;
      ptr=lt_list;
@@ -853,7 +852,7 @@ void ReduceCheckListByLTs ()  // deletes all monomials from check_list which are
      }
 }
 
-void RowListAdd (int first_col, mono_type mon) // puts a row into matrix
+static void RowListAdd (int first_col, mono_type mon) // puts a row into matrix
 {
      row_list_entry *ptr;
      row_list_entry *pptr;
@@ -880,7 +879,7 @@ void RowListAdd (int first_col, mono_type mon) // puts a row into matrix
 }
 
 
-void PrepareRow (mono_type mon) // prepares a row and puts it into matrix
+static void PrepareRow (mono_type mon) // prepares a row and puts it into matrix
 {
      modp_number *row;
      int first_col=-1;
@@ -933,10 +932,9 @@ void PrepareRow (mono_type mon) // prepares a row and puts it into matrix
      RowListAdd (first_col, mon);
 }
 
-void NewResultEntry ()  // creates an entry for new modp result
+static void NewResultEntry ()  // creates an entry for new modp result
 {
     modp_result_entry *temp;
-    int i;
     temp=(modp_result_entry*)omAlloc0(sizeof(modp_result_entry));
     if (cur_result==NULL)
     {
@@ -956,7 +954,7 @@ void NewResultEntry ()  // creates an entry for new modp result
     n_results++;
 }
 
-void FreeResultEntry (modp_result_entry *e) // destroys the result entry, without worrying about where it is
+static void FreeResultEntry (modp_result_entry *e) // destroys the result entry, without worrying about where it is
 {
      generator_entry *cur_gen;
      generator_entry *next_gen;
@@ -973,9 +971,8 @@ void FreeResultEntry (modp_result_entry *e) // destroys the result entry, withou
 }
 
 
-void NewGenerator (mono_type mon)  // new generator in modp comp found, shoul be stored on the list
+static void NewGenerator (mono_type mon)  // new generator in modp comp found, shoul be stored on the list
 {
-     int i;
      generator_entry *cur_ptr;
      generator_entry *prev_ptr;
      generator_entry *temp;
@@ -998,7 +995,7 @@ void NewGenerator (mono_type mon)  // new generator in modp comp found, shoul be
      cur_result->n_generators++;
 }
 
-void MultGenerators () // before reconstructing, all denominators must be cancelled
+static void MultGenerators () // before reconstructing, all denominators must be cancelled
 {
 #ifndef integerstrategy
      int i;
@@ -1036,7 +1033,7 @@ void PresentGenerator (int i)  // only for debuging, writes a generator in its f
 }
 #endif
 
-modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
+static modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
 {
 #ifdef HAVE_FACTORY
     myp_index--;
@@ -1046,7 +1043,7 @@ modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
 #endif
 }
 
-void PrepareChinese (int n) // initialization for CRA
+static void PrepareChinese (int n) // initialization for CRA
 {
      int i,k;
      modp_result_entry *cur_ptr;
@@ -1073,14 +1070,14 @@ void PrepareChinese (int n) // initialization for CRA
      for (k=1;k<n;k++) mpz_mul_ui(bigcongr,bigcongr,congr[k]);
 }
 
-void CloseChinese (int n) // after CRA
+static void CloseChinese () // after CRA
 {
      omFree(in_gamma);
      omFree(congr);
      mpz_clear(bigcongr);
 }
 
-void ClearGCD () // divides polynomials in basis by gcd of coefficients
+static void ClearGCD () // divides polynomials in basis by gcd of coefficients
 {
      bool first_gcd=true;
      int i;
@@ -1103,9 +1100,8 @@ void ClearGCD () // divides polynomials in basis by gcd of coefficients
      mpz_clear(g);
 }
 
-void ReconstructGenerator (int ngen,int n,bool show) // recostruction of generator from various modp comp
+static void ReconstructGenerator (int ngen,int n) // recostruction of generator from various modp comp
 {
-     int size;
      int i,j,k;
      int coef;
      char *str=NULL;
@@ -1169,7 +1165,7 @@ void ReconstructGenerator (int ngen,int n,bool show) // recostruction of generat
      mpz_clear(nsol);
 }
 
-void Discard ()  // some unlucky prime occures
+static void Discard ()  // some unlucky prime occures
 {
      modp_result_entry *temp;
 #ifdef writemsg
@@ -1219,13 +1215,13 @@ void Discard ()  // some unlucky prime occures
      }
 }
 
-void modp_SetColumnNames ()  // used by modp - sets column names, the old table will be destroyed
+static void modp_SetColumnNames ()  // used by modp - sets column names, the old table will be destroyed
 {
     int i;
     for (i=0;i<final_base_dim;i++) memcpy(generic_column_name[i],column_name[i],sizeof(exponent)*variables);
 }
 
-void CheckColumnSequence () // checks if scheme of computations is as generic one
+static void CheckColumnSequence () // checks if scheme of computations is as generic one
 {
      int i;
      if (cur_result->n_generators!=generic_n_generators)
@@ -1301,9 +1297,9 @@ void WriteGenerator () // writes generator (only for debugging)
 }
 #endif
 
-bool CheckGenerator () // evaluates generator to check whether it is good
+static bool CheckGenerator () // evaluates generator to check whether it is good
 {
-     mpz_t val,sum,temp;
+     mpz_t val,sum;
      int con,i;
      mpz_init(val);
      mpz_init(sum);
@@ -1328,7 +1324,7 @@ bool CheckGenerator () // evaluates generator to check whether it is good
     return true;
 }
 
-void ClearGenList ()
+static void ClearGenList ()
 {
      gen_list_entry *temp;
      int i;
@@ -1347,7 +1343,7 @@ void ClearGenList ()
       }
 }
 
-void UpdateGenList ()
+static void UpdateGenList ()
 {
      gen_list_entry *temp,*prev;
      int i,j;
@@ -1408,7 +1404,7 @@ void ShowGenList ()
 #endif
 
 
-void modp_Main ()
+static void modp_Main ()
 {
      mono_type cur_mon;
      cur_mon= ZeroMonomial ();
@@ -1465,7 +1461,7 @@ void modp_Main ()
         omFree(cur_mon);
 }
 
-void ResolveCoeff (mpq_t c, number m)
+static void ResolveCoeff (mpq_t c, number m)
 {
      if ((long)m & SR_INT)
      {
@@ -1665,7 +1661,7 @@ ideal interpolation(lists L, intvec *v)
            correct_gen=true;
            for (i=0;i<generic_n_generators;i++)
            {
-               ReconstructGenerator (i,modp_cycles,false);
+               ReconstructGenerator (i,modp_cycles);
                correct_gen=CheckGenerator ();
                if (!correct_gen)
                {
@@ -1685,7 +1681,7 @@ ideal interpolation(lists L, intvec *v)
 #ifdef checksize
            Print("maximal size of output: %d, precision bound: %d.\n",maximalsize,mpz_sizeinbase(bigcongr,10));
 #endif
-           CloseChinese (modp_cycles);
+           CloseChinese ();
            modp_cycles=modp_cycles+10;
         }
         else
