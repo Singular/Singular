@@ -9,6 +9,7 @@
 static poly PR_NAME
 (poly &src, ring r_src, ring r_dest)
 {
+  if (src==NULL) return NULL;
   spolyrec dest_s;
   poly dest = &dest_s;
   poly tmp;
@@ -29,5 +30,4 @@ static poly PR_NAME
   PR_SORT_POLY(dest, r_dest, r_src);
   p_Test(dest, r_dest);
   return dest;
-  (void)(r_src);
 }

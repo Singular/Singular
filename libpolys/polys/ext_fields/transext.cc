@@ -157,13 +157,13 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 
   const poly num = NUM(t);
   assume(num != NULL);   /**< t != 0 ==> numerator(t) != 0 */
-  assume( p_Test(num, ntRing) );
+  assume( _p_Test(num, ntRing,1) );
 
   const poly den = DEN(t);
 
   if (den != NULL) // !DENIS1(f)
   {
-    assume( p_Test(den, ntRing) );
+    assume( _p_Test(den, ntRing,1) );
 
     if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntRing->cf)))
     {

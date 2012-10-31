@@ -143,6 +143,7 @@ static inline ideal
 idrCopy(ideal id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
   if (id == NULL) return NULL;
+  assume(src_r->cf==dest_r->cf);
   poly p;
   ideal res = idInit(IDELEMS(id), id->rank);
   int i;
@@ -158,6 +159,7 @@ idrCopy(ideal id, ring src_r, ring dest_r, prCopyProc_t prproc)
 
 ideal idrCopyR(ideal id, ring src_r, ring dest_r)
 {
+  assume(src_r->cf==dest_r->cf);
   ideal res;
   prCopyProc_t prproc;
   if (rField_has_simple_Alloc(dest_r))
@@ -170,6 +172,7 @@ ideal idrCopyR(ideal id, ring src_r, ring dest_r)
 
 ideal idrCopyR_NoSort(ideal id, ring src_r, ring dest_r)
 {
+  assume(src_r->cf==dest_r->cf);
   ideal res;
   prCopyProc_t prproc;
   if (rField_has_simple_Alloc(dest_r))
@@ -197,6 +200,7 @@ ideal idrShallowCopyR_NoSort(ideal id, ring src_r, ring dest_r)
 static inline ideal
 idrMove(ideal &id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
+  assume(src_r->cf==dest_r->cf);
   if (id == NULL) return NULL;
   ideal res = id;
 
@@ -209,6 +213,7 @@ idrMove(ideal &id, ring src_r, ring dest_r, prCopyProc_t prproc)
 
 ideal idrMoveR(ideal &id, ring src_r, ring dest_r)
 {
+  assume(src_r->cf==dest_r->cf);
   prCopyProc_t prproc;
   ideal res;
   if (rField_has_simple_Alloc(dest_r))
@@ -221,6 +226,7 @@ ideal idrMoveR(ideal &id, ring src_r, ring dest_r)
 
 ideal idrMoveR_NoSort(ideal &id, ring src_r, ring dest_r)
 {
+  assume(src_r->cf==dest_r->cf);
   prCopyProc_t prproc;
   ideal res;
   if (rField_has_simple_Alloc(dest_r))
