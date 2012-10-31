@@ -16,7 +16,7 @@ libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libmisc_g_la_CFLAGS = ${PIPE}
 
 libmisc_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-libmisc_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libmisc_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
 libmisc_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG

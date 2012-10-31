@@ -12,7 +12,7 @@ libfac_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libfac_g_la_CFLAGS = ${PIPE}
 
 libfac_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-libfac_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libfac_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${builddir} -I${srcdir}/.. -I${builddir}/.. -I${srcdir}/../include  -I${builddir}/../include -I${srcdir}/factor  -I${builddir}/factor -I${srcdir}/charset -I${builddir}/charset ${GMP_CFLAGS} ${NTL_CFLAGS}

@@ -16,7 +16,7 @@ libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libcoeffs_g_la_CFLAGS = ${PIPE}
 
 libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-libcoeffs_g_la_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libcoeffs_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
 libcoeffs_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
@@ -86,11 +86,11 @@ test_d_g_CFLAGS = ${PIPE}
 
 test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} 
 # -fimplicit-templates
-test_s_g_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+test_s_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fimplicit-templates
 # -fdiagnostics-show-option 
 test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} 
-test_d_g_CXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 
 
 

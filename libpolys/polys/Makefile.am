@@ -1,6 +1,6 @@
 CXXTEMPLFLAGS	=  ## -fno-implicit-templates
 
-DEBUGCXXFLAGS = -g -Wextra -Winline -Wall -pedantic -Wno-long-long
+DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 
 NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
 NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer 
