@@ -616,7 +616,6 @@ restart:
 }
 int IsPrime(int p)  /* brute force !!!! */
 {
-  int i,j;
   if      (p == 0)    return 0;
   else if (p == 1)    return 1/*1*/;
   else if ((p == 2)||(p==3))    return p;
@@ -2455,7 +2454,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
         int *par_perm=NULL;
         int par_perm_size=0;
         nMapFunc nMap;
-        BOOLEAN bo;
 
         if ((nMap=nSetMap(orig_ring))==NULL)
         {
@@ -3039,7 +3037,7 @@ void    list_error( semicState state )
 
 spectrumState   spectrumCompute( poly h,lists *L,int fast )
 {
-  int i,j;
+  int i;
 
   #ifdef SPECTRUM_DEBUG
   #ifdef SPECTRUM_PRINT
@@ -3777,8 +3775,6 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
     int     n  = 0;          // number of different spectral numbers
     int     z  = 0;          // number of spectral number equal to smax
 
-    int     k = 0;
-
     while( (*node)!=(spectrumPolyNode*)NULL &&
            ( fast==0 || (*node)->weight<=smax ) )
     {
@@ -4153,7 +4149,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   int ldummy;
   int deg= pLDeg( gls, &ldummy, currRing );
   //  int deg= pDeg( gls );
-  int len= pLength( gls );
   int i,vpos=0;
   poly piter;
   lists elist;
@@ -4213,7 +4208,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   roots->solver( howclean );
 
   int elem= roots->getAnzRoots();
-  char *out;
   char *dummy;
   int j;
 
@@ -4411,9 +4405,8 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   else howclean= (int)(long)v->Data();
 
   uResultant::resMatType mtype= determineMType( imtype );
-  int i,c,count;
+  int i,count;
   lists listofroots= NULL;
-  lists emptylist;
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
 
@@ -4514,7 +4507,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
 // from mpr_numeric.cc
 lists rootArranger::listOfRoots( const unsigned int oprec )
 {
-  int i,j,tr;
+  int i,j;
   int count= roots[0]->getAnzRoots(); // number of roots
   int elem= roots[0]->getAnzElems();  // number of koordinates per root
 
@@ -4561,7 +4554,6 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 // from ring.cc
 void rSetHdl(idhdl h)
 {
-  int i;
   ring rg = NULL;
   if (h!=NULL)
   {
@@ -4926,14 +4918,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
-  idhdl tmp = NULL;
   BOOLEAN ffChar=FALSE;
-  int typ = 1;
 
   /* ch -------------------------------------------------------*/
   // get ch of ground field
-  int numberOfAllocatedBlocks;
-
   if (pn->Typ()==INT_CMD)
   {
     ch=(int)(long)pn->Data();
@@ -5026,8 +5014,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
   pn=pn->next;
 
-  int l, last;
-  sleftv * sl;
   /*every entry in the new ring is initialized to 0*/
 
   /* characteristic -----------------------------------------------*/
@@ -5193,7 +5179,7 @@ ring rSubring(ring org_ring, sleftv* rv)
 {
   ring R = rCopy0(org_ring);
   int *perm=(int *)omAlloc0((org_ring->N+1)*sizeof(int));
-  int last = 0, o=0, n = rBlocks(org_ring), i=0, typ = 1, j;
+  int n = rBlocks(org_ring), i=0, j;
 
   /* names and number of variables-------------------------------------*/
   {
@@ -5363,9 +5349,7 @@ void rKill(ring r)
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
     }
-    int i=1;
     int j;
-    int *pi=r->order;
 #ifdef USE_IILOCALRING
     for (j=0;j<iiRETURNEXPR_len;j++)
     {

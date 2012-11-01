@@ -1707,7 +1707,6 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
   else                    p=(intvec*)v->Data();
   int rl=c->nr+1;
-  poly r=NULL,h;
   ideal result;
   ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
   number *xx=NULL;
@@ -2976,9 +2975,7 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(v);
   ideal ui=(ideal)u->Data();
-  idTest(ui);
   ideal vi=(ideal)v->Data();
-  idTest(vi);
   res->data = (char *)kNF(vi,currQuotient,ui);
   return FALSE;
 }
@@ -3108,7 +3105,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     WerrorS("length for res must not be negative");
     return TRUE;
   }
-  int l=0;
   //resolvente r;
   syStrategy r;
   intvec *weights=NULL;
@@ -4480,8 +4476,6 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
     WerrorS("matrix must be constant");
     return TRUE;
   }
-  int rr = mat->rows();
-  int cc = mat->cols();
   matrix pMat;
   matrix lMat;
   matrix uMat;
@@ -4500,7 +4494,6 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
-  long d;
   switch(((int)(long)v->Data()))
   {
   case 0:
@@ -4749,7 +4742,6 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
 {
   char *s= (char *)v->Data();
   int i = 1;
-  int l = strlen(s);
   for(i=0; i<sArithBase.nCmdUsed; i++)
   {
     //Print("test %d, >>%s<<, tab:>>%s<<\n",i,s,sArithBase.sCmds[i].name);
@@ -4830,7 +4822,6 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     return TRUE;
   }
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
-  tHomog hom=testHomog;
   ideal u_id=(ideal)u->Data();
   if (w!=NULL)
   {
@@ -4842,7 +4833,6 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     else
     {
       w=ivCopy(w);
-      hom=isHomog;
     }
   }
 
@@ -8543,7 +8533,6 @@ static int _gentable_sort_cmds( const void *a, const void *b )
 /*---------------------------------------------------------------------*/
 int iiInitArithmetic()
 {
-  int i;
   //printf("iiInitArithmetic()\n");
   memset(&sArithBase, 0, sizeof(sArithBase));
   iiInitCmdName();

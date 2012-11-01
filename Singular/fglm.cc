@@ -276,11 +276,9 @@ fglmProc( leftv result, leftv first, leftv second )
     FglmState state = FglmOk;
 
     idhdl destRingHdl = currRingHdl;
-    ring destRing = currRing;
     ideal destIdeal = NULL;
     idhdl sourceRingHdl = (idhdl)first->data;
     rSetHdl( sourceRingHdl );
-    ring sourceRing = currRing;
 
     int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
     state= fglmConsistency( sourceRingHdl, destRingHdl, vperm );

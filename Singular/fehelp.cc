@@ -962,7 +962,6 @@ static void heWinHelp(heEntry hentry, int br)
 static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
-  char url[MAXPATHLEN];
   const char *p=heHelpBrowsers[br].action;
   if (p==NULL) {PrintS("no action ?\n"); return;}
   memset(sys,0,MAX_SYSCMD_LEN);

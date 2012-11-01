@@ -3933,7 +3933,6 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 1523 "grammar.y"
     {
-            procinfov pi;
             idhdl h = enterid((yyvsp[(2) - (3)].name),myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL) {omFree((ADDRESS)(yyvsp[(2) - (3)].name));omFree((ADDRESS)(yyvsp[(3) - (3)].name)); YYERROR;}
             iiInitSingularProcinfo(IDPROC(h),"", (yyvsp[(2) - (3)].name), 0, 0);
@@ -3959,7 +3958,6 @@ yyreduce:
             }
             char *args=iiProcArgs((yyvsp[(2) - (3)].name),FALSE);
             omFree((ADDRESS)(yyvsp[(2) - (3)].name));
-            procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", (yyvsp[(1) - (3)].name), 0, 0);
             IDPROC(h)->data.s.body = (char *)omAlloc(strlen((yyvsp[(3) - (3)].name))+strlen(args)+14);;
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,(yyvsp[(3) - (3)].name));
@@ -3985,7 +3983,6 @@ yyreduce:
             }
             char *args=iiProcArgs((yyvsp[(2) - (4)].name),FALSE);
             omFree((ADDRESS)(yyvsp[(2) - (4)].name));
-            procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", (yyvsp[(1) - (4)].name), 0, 0);
             omFree((ADDRESS)(yyvsp[(1) - (4)].name));
             IDPROC(h)->data.s.body = (char *)omAlloc(strlen((yyvsp[(4) - (4)].name))+strlen(args)+14);;

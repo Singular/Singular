@@ -251,7 +251,6 @@ BOOLEAN slClose(si_link l)
 
 leftv slRead(si_link l, leftv a)
 {
-  char *mode;
   leftv v = NULL;
   if( ! SI_LINK_R_OPEN_P(l)) // open r ?
   {
@@ -679,7 +678,6 @@ static const char* GetIdString(idhdl h)
       {
         lists l = IDLIST(h);
         int i, nl = l->nr + 1;
-        char *name;
 
         for (i=0; i<nl; i++)
           if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
@@ -754,7 +752,7 @@ static int DumpRhs(FILE *fd, idhdl h)
   }
   else  if (type_id == STRING_CMD)
   {
-    char *pstr = IDSTRING(h), c;
+    char *pstr = IDSTRING(h);
     fputc('"', fd);
     while (*pstr != '\0')
     {
@@ -770,7 +768,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     if (pi->language == LANG_SINGULAR)
     {
       if( pi->data.s.body==NULL) iiGetLibProcBuffer(pi);
-      char *pstr = pi->data.s.body, c;
+      char *pstr = pi->data.s.body;
       fputc('"', fd);
       while (*pstr != '\0')
       {
@@ -853,7 +851,7 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   s->next = NULL;
   si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
 
-  if (0) 0;
+  if (0) 0; // dummy
 #ifdef HAVE_MPSR
   else if (strcmp(type, "MPfile") == 0)
     s->next = slInitMPFileExtension(ns);

@@ -203,10 +203,12 @@ int lcm(unsigned long* l, unsigned long* a, unsigned long* b, unsigned long p, i
 // on 32bit and 64bit machines
 static inline unsigned long multMod(unsigned long a, unsigned long b, unsigned long p)
 {
+#ifndef ULONG64
 #if SIZEOF_LONG == 4
 #define ULONG64 (unsigned long long)
 #else
 #define ULONG64 (unsigned long)
+#endif
 #endif
   return (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 p));
 }

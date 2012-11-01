@@ -2613,7 +2613,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
         {
-          int i=0;
           if (h->next!=NULL)
           {
             if (h->next->Typ()!=POLY_CMD)
@@ -2635,7 +2634,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
         {
-          int i=0;
           if (h->next!=NULL)
           {
             if (h->next->Typ()!=POLY_CMD)
@@ -3029,7 +3027,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== minor =================*/
       if (strcmp(sys_cmd, "minor")==0)
       {
-        ring r = currRing;
         matrix a = (matrix) h->Data();
         h = h->next;
         int ar = (int)(long) h->Data();
@@ -3304,7 +3301,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (strcmp(sys_cmd, "ratVar") == 0)
       {
         int start,end;
-        int is;
         if ((h!=NULL) && (h->Typ()==POLY_CMD))
         {
           start=pIsPurePower((poly)h->Data());
@@ -3409,7 +3405,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== t-rep-GB ==================================*/
       if (strcmp(sys_cmd, "unifastmult")==0)
       {
-        ring r = currRing;
         poly f = (poly)h->Data();
         h=h->next;
         poly g=(poly)h->Data();
@@ -3420,7 +3415,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
       if (strcmp(sys_cmd, "multifastmult")==0)
       {
-        ring r = currRing;
         poly f = (poly)h->Data();
         h=h->next;
         poly g=(poly)h->Data();
@@ -3449,7 +3443,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
       if (strcmp(sys_cmd, "normalpower")==0)
       {
-        ring r = currRing;
         poly f = (poly)h->Data();
         h=h->next;
         int n=(int)((long)h->Data());

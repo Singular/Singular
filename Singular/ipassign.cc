@@ -761,7 +761,6 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   }
 
   int i=0;
-  BOOLEAN nok=FALSE;
 
   if (lt==DEF_CMD)
   {
@@ -1290,8 +1289,6 @@ static BOOLEAN jiA_STRING_L(leftv l,leftv r)
   /*e.g. s[2..3]="12" */
   /*the case s=t[1..4] is handled in iiAssign,
   * the case s[2..3]=t[3..4] is handled in iiAssgn_rec*/
-  int ll=l->listLength();
-  int rl=r->listLength();
   BOOLEAN nok=FALSE;
   sleftv t;
   leftv h,l1=l;
