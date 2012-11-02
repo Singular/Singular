@@ -40,7 +40,7 @@ AC_PROG_INSTALL
 AC_FUNC_MALLOC
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h sys/stat.h sys/types.h])
-AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
+AC_CHECK_FUNCS(readlink getcwd getwd getpwnam setenv putenv)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

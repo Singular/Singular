@@ -7,6 +7,10 @@
 
 #include "config.h"
 
+#if defined(HAVE_PWD_H) && defined(HAVE_GETPWNAM)
+#include <pwd.h>
+#endif
+
 //#include <reporter/reporter.h>
 
 #include "feFopen.h"
@@ -69,7 +73,11 @@ FILE * feFopen(const char *path, const char *mode, char *where,
       dir_sep = strchr(longpath, DIR_SEP);
       if (dir_sep==NULL)
       {
-        Werror(" illegal ~ in filename >>%s<<",longpath);
+        char buf[256];
+        strcpy(buf,"illegal ~ in filename >>");
+        strncat(buf,longpath,235);
+        strcat(buf,"<<");
+        WerrorS(buf);
         return NULL;
       }
       *dir_sep = '\0';
