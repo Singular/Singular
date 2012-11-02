@@ -249,10 +249,11 @@ static proc Sstep()
   {
     "Sstep::NextInput: ";
     M;
-    @V;
+    deg(M[1..ncols(M)]); // no use of @W :(?
     @RANK;   
     DetailedPrint(MRES);
-    attrib(MRES, "isHomog");
+    attrib(MRES, "isHomog"); @W;
+    deg(MRES[1..ncols(MRES)]);
   }
 
   
@@ -272,11 +273,12 @@ static proc Sstep()
 //  K;
 
   module N = separateSyzGB(K, @RANK)[2]; // 1^st syz. module: vectors which start in lower part (comp >= @RANK)
-  attrib(N, "isHomog", @V);
 
 // "N_0: "; N; DetailedPrint(N, 10);
-  
-  N = std(N); // TODO: fix "wrong weights"!!!?
+
+//  basering; print(@V); type(N); 
+//  attrib(N, "isHomog", @V);  // TODO: fix "wrong weights"!!!? deg is wrong :(((
+  N = std(N);
   attrib(N, "isHomog", @V);
 
 //  N;
