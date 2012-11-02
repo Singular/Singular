@@ -2373,7 +2373,7 @@ LINLINE number nlMult (number a, number b, const coeffs R)
   if (b==INT_TO_SR(0)) return INT_TO_SR(0);
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    LONG r=(SR_HDL(a)-1L)*(SR_HDL(b)>>1);
+    LONG r=(LONG)((unsigned LONG)(SR_HDL(a)-1L))*((unsigned LONG)(SR_HDL(b)>>1));
     if ((r/(SR_HDL(b)>>1))==(SR_HDL(a)-1L))
     {
       number u=((number) ((r>>1)+SR_INT));
