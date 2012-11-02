@@ -868,10 +868,10 @@ static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
 {
   int a=(int)(long)u->Data();
   int b=(int)(long)v->Data();
-  int c=a * b;
-  if ((b!=0) && (c/b !=a))
+  int64 c=(int64)a * (int64)b;
+  if ((c>INT_MAX)||(c<INT_MIN))
     WarnS("int overflow(*), result may be wrong");
-  res->data = (char *)((long)c);
+  res->data = (char *)((long)((int)c));
   if ((u->Next()!=NULL) || (v->Next()!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
