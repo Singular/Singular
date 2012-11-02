@@ -522,6 +522,7 @@ static void ivReduce(intvec *imat, int rpiv, int colpos,
 
   for (j=all;j>ready;j--)
   {
+    ivRowContent(imat, j, colpos+1);
     ce = IMATELEM(*imat,j,colpos);
     if (ce!=0)
     {
