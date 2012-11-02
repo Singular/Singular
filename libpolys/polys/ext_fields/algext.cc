@@ -555,6 +555,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
   {
     if (exp >= 0) *b = NULL;
     else          WerrorS(nDivBy0);
+    return;
   }
   else if (exp ==  0) { *b = naInit(1, cf); return; }
   else if (exp ==  1) { *b = naCopy(a, cf); return; }
