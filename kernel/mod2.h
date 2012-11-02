@@ -372,11 +372,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-// routine which is used to report the error
-// returns 0
+/* routine which is used to report the error/
+* returns 0 */
 extern int dReportError(const char* fmt, ...);
-// within a debugger, set a breakpoint on dErrorBreak
-// which is called after the error has been reported
+/* within a debugger, set a breakpoint on dErrorBreak
+* which is called after the error has been reported */
 extern void dErrorBreak();
 #ifdef __cplusplus
 }

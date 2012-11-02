@@ -11,10 +11,10 @@
 
 #include <omalloc/omalloc.h>
 
-// we provide these functions, so that the settings of OM_CHECK
-// and OM_TRACK are used, but only provide them if omalloc is not based
-// on them
-// already provided in libomalloc
+/* we provide these functions, so that the settings of OM_CHECK
+* and OM_TRACK are used, but only provide them if omalloc is not based
+* on them
+* already provided in libomalloc */
 #if !defined(OMALLOC_USES_MALLOC) && !defined(X_OMALLOC)
 
 /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
@@ -22,8 +22,8 @@
 /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
 /* do not rely on the default in Singular as libsingular may be different */
 
-// define this so that all addr allocated there are marked 
-// as static, i.e. not metioned by omPrintUsedAddr
+/* define this so that all addr allocated there are marked 
+* as static, i.e. not metioned by omPrintUsedAddr*/
 #define OM_MALLOC_MARK_AS_STATIC
 #define strdup_ strdup__
 #include <omalloc/omalloc.c> /// UGLY!!!!!!!!!!!!!!!!
