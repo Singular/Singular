@@ -4462,7 +4462,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
     muiproots= ures->specializeInU( true, smv );
 
 #ifdef mprDEBUG_PROT
-  c= iproots[0]->getAnzElems();
+  int c= iproots[0]->getAnzElems();
   for (i=0; i < c; i++) pWrite(iproots[i]->getPoly());
   c= muiproots[0]->getAnzElems();
   for (i=0; i < c; i++) pWrite(muiproots[i]->getPoly());
