@@ -968,7 +968,7 @@ static inline poly p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &l
   int shorter;
   const poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r);
   lp += lq - shorter;
-  assume( lp == pLength(res) );
+//  assume( lp == pLength(res) );
   return res;
 }
 
