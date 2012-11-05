@@ -4507,7 +4507,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       return N (d*GCD_small_p (F, G));
   }
 
-  if( gcd_test_one( F, G, false ) )
+  int dummy= 0;
+  if( gcd_test_one( F, G, false, dummy ) )
   {
     return N (d);
   }
