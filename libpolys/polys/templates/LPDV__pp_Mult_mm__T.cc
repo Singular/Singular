@@ -54,10 +54,12 @@ LINKAGE poly LPDV__pp_Mult_mm__T
 #ifdef HAVE_SHIFTBBADVEC //BOCO: only change for LPDV in this file
       p_MemCopy__T(q->exp, p->exp, length);
       ri->p_ExpSum(q, p, m, ri);
+      p_MemAddAdjust__T(q, ri);
 #else
       p_MemSum__T(q->exp, p->exp, m_e, length);
       p_MemAddAdjust__T(q, ri);
 #endif
+      int temp_delete_this = 23456;
 
 #ifdef HAVE_ZERODIVISORS
     }

@@ -5079,7 +5079,7 @@ BOOLEAN arriRewCriterion(poly sig, unsigned long /*not_sevSig*/, kStrategy strat
 
     // check that spoly creation is ok
     while (strat->tailRing != currRing &&
-          !kCheckSpolyCreation(&(strat->L[strat->Ll]), strat, m1, m2))
+          !::kCheckSpolyCreation(&(strat->L[strat->Ll]), strat, m1, m2))
     {
       assume(m1 == NULL && m2 == NULL);
       // if not, change to a ring where exponents are at least

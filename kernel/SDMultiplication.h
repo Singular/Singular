@@ -17,37 +17,25 @@ namespace ShiftDVec
   extern int red_count;
   extern int create_count;
 
-  int ksReducePoly(LObject* PR,
-                 TObject* UPW,
-                 TObject* SPW,
-                 poly spNoether = NULL,
-                 number *coef = NULL,
-                 kStrategy strat = NULL);
-  void ksCreateSpoly(LObject* Pair,   poly spNoether,
-                   int use_buckets, ring tailRing,
-                   poly m1, poly m2, TObject** R);
+  int ksReducePoly
+    ( LObject* PR, TObject* UPW, TObject* SPW,
+      poly spNoether = NULL, 
+      number *coef = NULL, kStrategy strat = NULL );
 
-  int ksReducePolyTail(LObject* PR, TObject* UPW, 
-                                  TObject* SPW, poly Current = NULL, 
-                                  poly spNoether = NULL, kStrategy strat = NULL);
-
-
-
-
-#if 0 //The following is currently not working/used
   void ksCreateSpoly
     ( LObject* Pair, poly spNoether, int use_buckets, 
-      ring tailRing, poly m1, poly m2,  TObject** R, int lV );
-  int ksReducePoly
-    ( LObject* PR, TObject* PW, 
-      int lV, poly spNoether = NULL, 
-      number *coef = NULL, kStrategy strat = NULL );
+      ring tailRing, poly m1, poly m2, TObject** R    );
+
   int ksReducePolyTail
-    ( LObject* PR, TObject* PW, 
-      poly Current, poly spNoether, int lV );
-  int ksReducePolyTail
-    ( LObject* PR, TObject* PW, LObject* Red, int lV );
-  poly ksCreateShortSpoly( poly p1, poly p2, ring tailRing );
-#endif
+    ( LObject* PR, TObject* UPW, TObject* SPW, 
+      poly Current = NULL, 
+      poly spNoether = NULL, kStrategy strat = NULL );
+
+  BOOLEAN kCheckSpolyCreation
+    ( LObject *L, kStrategy strat, poly &m1, poly &m2 );
+
+  BOOLEAN k_GetLeadTerms
+    ( const poly p1, const poly p2, 
+      const ring p_r, poly &m1, poly &m2, const ring m_r );
 }
 #endif

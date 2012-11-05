@@ -1259,7 +1259,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // check that spoly creation is ok
       while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+             !::kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
@@ -1643,7 +1643,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // check that spoly creation is ok
       while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+             !::kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
@@ -2273,7 +2273,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
       // check that spoly creation is ok
       while (strat->tailRing != currRing &&
-          !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+          !::kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
@@ -2573,7 +2573,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 
       // check that spoly creation is ok
       while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+             !::kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least

@@ -454,8 +454,16 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       poly m1 = NULL, m2 = NULL;
 
       // check that spoly creation is ok
-      while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+      // BOCO: TODO: check if this check does the right thing
+      // for letterplace rings (and if we need it -> didn't we
+      // check for degree violations before entering the Pair
+      // into the pair set???); BOCO: now we have a slightly
+      // adapted version, but the question, if we need it at
+      // all, is yet to be answered
+      while 
+        ( strat->tailRing != currRing &&
+          !ShiftDVec::kCheckSpolyCreation
+            (&(strat->P), strat, m1, m2)  )
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least

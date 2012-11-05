@@ -1,6 +1,53 @@
 //This file contains the implementations for monomial/polynomial
 //multiplications for letterplace.
 //
+//COMMENTS:
+// - Our multiplications functions do need unshifted
+//   polynomials. We store our Pairs as (unshifted, shifted). In
+//   the homogenous case, the multiplication was simpler and
+//   could work with the shifts, after moving to the
+//   inhomogenous version, we had to make many changes to the
+//   multiplication templates (libpolys/polys/templates). Now
+//   these functions always need two unshifted polynomials. This
+//   resulted in some adaptions, which resulted in other
+//   adaptions to functions, which do not nescessarily multiply
+//   polynomials (see e.g kCheckSpolyCreation). One Question
+//   remains (so let me put a TODO marker here): Shalls we still
+//   store the polys (shifted, unshifted) ? Maybe is suffices to
+//   store the lm of the second poly shifted (as a reference).
+//   Might be more efficient. I know, I am a good story
+//   teller..., but that should be all.
+//
+//TEMPORARY List:
+//  k_GetLeadTerms - where is it used
+//    1.) in ksCreateSpoly - adapted
+//           in updateL
+//              in enterSMora
+//                 in initMora
+//                    in mora und kNF1 - I don't think we use them
+//           in updateLHC
+//              in enterSMora and mora - see above
+//           in mora - see above
+//           in arriRewCriterion
+//              in kSba - Signature Based bba ? don't need it
+//           in bba - adapted
+//           in f5c - sounds funny
+//           in bbaShift - Viktors problem
+//           in sba - ours is the bba !
+//    2.) in enterOnePairSig
+//           in initenterpairsSig - I don't think we use that
+//    3.) in kCheckSpolyCreation - adapted
+//           in updateL and updateLHC and mora - see above
+//           in bba - adapted
+//           in arriRewCriterion - see above
+//    4.) in plain_spoly
+//           in ringNF - I don't think we use that
+//           and in testGB - I don't think we use that
+//
+//TODO First:
+//The comments below have to be updated: This file was underwent
+//heavy changes.
+//
 //WARNING/TODO:
 //I do not know, if the ideas in this file will always work. I
 //do not yet know, if it was right to assume, that we always use
@@ -500,7 +547,7 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
   // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
   //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
   if (m1 == NULL)
-    k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
+    ShiftDVec::k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
 
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
@@ -633,3 +680,131 @@ int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW,
   return ret;
 }
 
+
+/* Part 3: others...                                          */
+
+
+/***************************************************************
+ *
+ * Routines related for ring changes during std computations
+ *
+ ***************************************************************/
+BOOLEAN ShiftDVec::kCheckSpolyCreation
+  ( LObject *L, kStrategy strat, poly &m1, poly &m2 )
+{
+  if (strat->overflow) return FALSE;
+  assume(L->p1 != NULL && L->p2 != NULL);
+  // shift changes: from 0 to -1
+  assume(L->i_r1 >= -1 && L->i_r1 <= strat->tl);
+  assume(L->i_r2 >= -1 && L->i_r2 <= strat->tl);
+  assume(strat->tailRing != currRing);
+
+  //BOCO: only Change: using our k_GetLeadTerms adaption
+  if (! ShiftDVec::k_GetLeadTerms(L->p1, L->p2, currRing, m1, m2, strat->tailRing))
+    return FALSE;
+  // shift changes: extra case inserted
+  if ((L->i_r1 == -1) || (L->i_r2 == -1) )
+  {
+    return TRUE;
+  }
+  poly p1_max = (strat->R[L->i_r1])->max;
+  poly p2_max = (strat->R[L->i_r2])->max;
+
+  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
+      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
+  {
+    p_LmFree(m1, strat->tailRing);
+    p_LmFree(m2, strat->tailRing);
+    m1 = NULL;
+    m2 = NULL;
+    return FALSE;
+  }
+  return TRUE;
+}
+
+
+/***************************************************************
+ *
+ * Lcm business
+ *
+ ***************************************************************/
+// get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+//     m2 = LCM(LM(p1), LM(p2))/LM(p2)
+//BOCO: In the letterplace case p2 is shifted, but we need m1 to
+//be unshifted for ksCreateSpoly, thus, we had to change this
+BOOLEAN ShiftDVec::k_GetLeadTerms
+  ( const poly p1, const poly p2, 
+    const ring p_r, poly &m1, poly &m2, const ring m_r )
+{
+  int lV = p_r->isLPring;
+
+  p_LmCheckPolyRing(p1, p_r);
+  p_LmCheckPolyRing(p2, p_r);
+
+  int i;
+  long x;
+  m1 = p_Init(m_r);
+  m2 = p_Init(m_r);
+
+#if 0 //BOCO: original code - replaced
+  for (i = p_r->N; i; i--)
+  {
+    x = p_GetExpDiff(p1, p2, i, p_r);
+    if (x > 0)
+    {
+      if (x > (long) m_r->bitmask) goto false_return;
+      p_SetExp(m2,i,x, m_r);
+      p_SetExp(m1,i,0, m_r);
+    }
+    else
+    {
+      if (-x > (long) m_r->bitmask) goto false_return;
+      p_SetExp(m1,i,-x, m_r);
+      p_SetExp(m2,i,0, m_r);
+    }
+  }
+#else //BOCO: replacement
+  //BOCO: small warning: polys should correspond to a 
+  //non-center overlap - otherwise the loops may not complete
+
+  long j = 0;
+
+  { nextblock_m2: ; //this is a loop
+    for(long i = 0; i < lV; ++i, ++j)
+      if( (x = p_GetExpDiff(p1, p2, j, p_r)) > 0 )
+      {
+        if (x > (long) m_r->bitmask) goto false_return;
+        p_SetExp(m2, j, 1, m_r);
+        j = j + (lV - j % lV); //We found a nonzero exponent,
+        goto nextblock_m2; //thus we can move to the next block
+      }
+    //Found one complete block with zero exponet diff -> overlap
+  }
+
+  //Part in which LCM Parts meet...
+  //(This could be the beginning of a long story or
+  // friendship, etc. ...)
+  while( !p_GetExpDiff(p1, p2, j, p_r) ) ++j;
+
+  { nextblock_m1: ; //this is a loop
+    for(;j < p_r->N; ++j)
+      if( (x = p_GetExpDiff(p2, p1, j, p_r)) > 0 )
+      {
+        if (x > (long) m_r->bitmask) goto false_return;
+        p_SetExp(m1, j, 1, m_r);
+        j = j + (lV - j % lV); //We found a nonzero exponent,
+        goto nextblock_m1; //thus we can move on to the next block
+      }
+  }
+#endif
+
+  p_Setm(m1, m_r);
+  p_Setm(m2, m_r);
+  return TRUE;
+
+  false_return:
+  p_LmFree(m1, m_r);
+  p_LmFree(m2, m_r);
+  m1 = m2 = NULL;
+  return FALSE;
+}

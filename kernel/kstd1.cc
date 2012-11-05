@@ -797,7 +797,7 @@ void updateL(kStrategy strat)
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok
         while (strat->tailRing != currRing &&
-               !kCheckSpolyCreation(&(strat->L[j]), strat, m1, m2))
+               !::kCheckSpolyCreation(&(strat->L[j]), strat, m1, m2))
         {
           assume(m1 == NULL && m2 == NULL);
           // if not, change to a ring where exponents are at least
@@ -856,7 +856,7 @@ void updateLHC(kStrategy strat)
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok
         while (strat->tailRing != currRing &&
-               !kCheckSpolyCreation(&(strat->L[i]), strat, m1, m2))
+               !::kCheckSpolyCreation(&(strat->L[i]), strat, m1, m2))
         {
           assume(m1 == NULL && m2 == NULL);
           // if not, change to a ring where exponents are at least
@@ -1329,7 +1329,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       poly m1 = NULL, m2 = NULL;
       // check that spoly creation is ok
       while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+             !::kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are large enough
