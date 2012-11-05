@@ -4523,7 +4523,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   if (p < 50 && CFFactory::gettype() != GaloisFieldDomain && !algExtension)
   {
     if (p == 2)
-      setCharacteristic (2, 6, 'Z');
+      setCharacteristic (2, 12, 'Z');
     else if (p == 3)
       setCharacteristic (3, 4, 'Z');
     else if (p == 5 || p == 7)
