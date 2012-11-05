@@ -44,8 +44,9 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 CanonicalForm chinrem_gcd(const CanonicalForm & FF,const CanonicalForm & GG);
 
 bool
-gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
+gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d )
 {
+    d= 0;
     int count = 0;
     // assume polys have same level;
 
@@ -217,17 +218,11 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
       eval2= e (G);
     }
 
-    if ( eval1.taildegree() > 0 && eval2.taildegree() > 0 )
-    {
-        if (passToGF)
-          setCharacteristic (p);
-        if (k > 1)
-          setCharacteristic (p, k, gf_name);
-        return false;
-    }
-
     CanonicalForm c= gcd (eval1, eval2);
-    bool result= c.degree() < 1;
+    d= c.degree();
+    bool result= d < 1;
+    if (d < 0)
+      d= 0;
 
     if (passToGF)
       setCharacteristic (p);
@@ -619,9 +614,10 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     Ci = content( pi ); Ci1 = content( pi1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
     C = gcd( Ci, Ci1 );
+    int d= 0;
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
     {
-        if ( gcd_test_one( pi1, pi, true ) )
+        if ( gcd_test_one( pi1, pi, true, d ) )
         {
           C=abs(C);
           //out_cf("GCD:",C,"\n");
@@ -738,6 +734,7 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
     Ci = content( pi ); Ci1 = content( pi1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
     C = gcd( Ci, Ci1 );
+    int d= 0;
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
 #ifdef HAVE_FLINT
@@ -751,7 +748,7 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
 #endif
         return gcd_poly_univar0( pi, pi1, true ) * C;
     }
-    else if ( gcd_test_one( pi1, pi, true ) )
+    else if ( gcd_test_one( pi1, pi, true, d ) )
       return C;
     Variable v = f.mvar();
     Hi = power( LC( pi1, v ), delta );
