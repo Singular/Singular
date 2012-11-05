@@ -775,7 +775,7 @@ static proc SSinit(def M)
     attrib(S, "HYBRIDNF", attrib(SSinit, "HYBRIDNF") );
   } else
   { 
-    attrib(S, "HYBRIDNF", 0);
+    attrib(S, "HYBRIDNF", 2);
   }
   
   attrib(S, "DEBUG", @DEBUG);
@@ -1593,49 +1593,27 @@ proc SSComputeSyzygy(def L, def T)
     "T: "; T;
   } 
 
-  option(prot); 
+//  option(prot); 
   rtimer, "***TIME for ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
   list @res=ComputeSyzygy(L,T);
   rtimer, "***TIME for ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-  option(noprot); // TODO: restore!
+//  option(noprot); // TODO: restore!
 
 
   module @LL = @res[1]; module @TT = @res[2];
 
   if( @KERCHECK )
   {
-    if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
-    {
-      int @SYZCHECK = attrib(basering, "SYZCHECK");
-    } else
-    {
-      int @SYZCHECK = @DEBUG;
-    }
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+    int @LEAD2SYZ = attrib(basering, "LEAD2SYZ");
+    int @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
+    int @HYBRIDNF = attrib(basering, "HYBRIDNF");
+    int @IGNORETAILS = attrib(basering, "IGNORETAILS");
 
-    int @LEAD2SYZ = 1;
-    if( typeof( attrib(basering, "LEAD2SYZ") ) == "int" )
+    int @SYZNUMBER = attrib(basering,"SYZNUMBER");
+    if( @HYBRIDNF == 2 )
     {
-      @LEAD2SYZ = attrib(basering, "LEAD2SYZ");
-    }
-
-    int @TAILREDSYZ = 1;
-    if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
-    {
-      @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
-    }
-
-    int @HYBRIDNF = 0;
-    if( typeof( attrib(basering, "HYBRIDNF") ) == "int" )
-    {
-      @HYBRIDNF = attrib(basering, "HYBRIDNF");
-    }
-
-    if( typeof( attrib(basering, "IGNORETAILS") ) == "int" )
-    {
-      int @IGNORETAILS = attrib(basering, "IGNORETAILS");
-    } else
-    {
-      int @IGNORETAILS = 0; 
+      if( @SYZNUMBER < 3 ){ @HYBRIDNF = 1; } else { @HYBRIDNF = 0; }
     }
     
     module LL;
@@ -1675,7 +1653,7 @@ proc SSComputeSyzygy(def L, def T)
           c = leadcomp(a); r = int(c); aa = leadmonomial(a);
           
           // NF reduction:
-          if( !@HYBRIDNF ) // Traverse approach:
+          if( @HYBRIDNF == 0 ) // Traverse approach:
           {        
             @tail = SSTraverseTail(aa, T[r], L, T, LS);
 
@@ -2041,6 +2019,7 @@ EXAMPLE: example SSres; shows an example
   {
     ERROR("Sorry: need an ideal or a module for input");
   }
+
   "KERCHECK: ", attrib(SSinit, "KERCHECK");
   "SYZCHECK: ", attrib(SSinit, "SYZCHECK");
   "DEBUG: ", attrib(SSinit, "DEBUG");
@@ -2439,7 +2418,7 @@ proc TestSSres(def I)
     ";HYBRIDNF:"  +string(attrib(SSinit,"HYBRIDNF")) + "}"
   );
   option(redSB); option(redTail);  
-  rtimer=0;def R=SSres(I,0);@m=rtimer;setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
+  timer=0;rtimer=0;def R=SSres(I,0);@m=rtimer;setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
   kill S, RR; setring save; kill R;
@@ -2455,7 +2434,7 @@ proc TestSres(def I)
   "minres + betti(,1)"
   );
   option(redSB); option(redTail);
-  rtimer=0;def R=Sres(I,0);@m=rtimer;setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
+  timer=0;rtimer=0;def R=Sres(I,0);@m=rtimer;setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
   SCheck(R);
   StopAddResTest(RR, S, @t,@m);  
   kill S, RR; setring save; kill R;
@@ -2467,7 +2446,7 @@ proc Testsres(def M)
   int @t,@m;
   StartAddResTest("sres", "no minres + betti(,1)");
   option(redSB);option(redTail);
-  rtimer=0;def RR=sres(groebner(M),0);@m=rtimer;def S=betti(RR,1);@t=rtimer;
+  timer=0;rtimer=0;def RR=sres(groebner(M),0);@m=rtimer;def S=betti(RR,1);@t=rtimer;
   StopAddResTest(RR, S, @t,@m); kill S, RR;
 }
 
@@ -2476,12 +2455,12 @@ proc Testlres(def M)
   int @t,@m; 
   StartAddResTest("lres", "no minres + betti(,1)");
   option(redSB);option(redTail);
-  rtimer=0;def RR=lres(M,0);@m=rtimer;def S=betti(RR,1);@t=rtimer;
+  timer=0;rtimer=0;def RR=lres(M,0);@m=rtimer;def S=betti(RR,1);@t=rtimer;
   StopAddResTest(RR, S, @t,@m); kill S, RR;
 
   StartAddResTest("lres", "minres + betti()");
   option(redSB);option(redTail);
-  rtimer=0;def RR=lres(M,0);@m=rtimer;def S=betti(minres(RR));@t=rtimer;
+  timer=0;rtimer=0;def RR=lres(M,0);@m=rtimer;def S=betti(minres(RR));@t=rtimer;
   StopAddResTest(RR, S, @t,@m);
   kill S, RR;
 }
@@ -2493,7 +2472,7 @@ proc Testnres(def M)
   StartAddResTest("nres", "no minres + betti(,1)");
   
   option(redSB); option(redTail); 
-  rtimer=0;def RR=nres(M,0);@m=rtimer;def S=betti(RR,1);@t=rtimer;
+  timer=0;rtimer=0;def RR=nres(M,0);@m=rtimer;def S=betti(RR,1);@t=rtimer;
   
   StopAddResTest(RR, S, @t,@m); kill S, RR;
 }
@@ -2516,8 +2495,10 @@ proc TestSSresAttribs(def M, list #)
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
+  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSres(M);
+  
   attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
   
 
   // the following 2 setups are bad for AGR@101n3d002s004%1:(((
@@ -2535,9 +2516,11 @@ proc TestSSresAttribs2tr(def M, list #)
   
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSres(M);
 
   attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
   attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSres(M);
 
   
   Testlres(M);  

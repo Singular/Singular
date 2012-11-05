@@ -68,26 +68,30 @@ struct SchreyerSyzygyComputationFlags
   //      __SYZCHECK__(attr.__SYZCHECK__),
         __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
-        m_rBaseRing(attr.m_rBaseRing)
+        __SYZNUMBER__(attr.__SYZNUMBER__), m_rBaseRing(attr.m_rBaseRing)
     {}   
 
   /// output all the intermediate states
-  const bool __DEBUG__; // DebugOutput;
+  const int __DEBUG__; // DebugOutput;
 
   //  const bool __SYZCHECK__; // CheckSyzygyProperty: never tested here...
 
   /// ?
-  const bool __LEAD2SYZ__; // TwoLeadingSyzygyTerms;
+  const int __LEAD2SYZ__; // TwoLeadingSyzygyTerms;
 
   /// Reduce syzygy tails wrt the leading syzygy terms
-  const bool __TAILREDSYZ__; // TailReducedSyzygies;
+  const int __TAILREDSYZ__; // TailReducedSyzygies;
 
   /// Use the usual NF's S-poly reduction while dropping lower order terms
-  const bool __HYBRIDNF__; // UseHybridNF
+  /// 2 means - smart selection!
+  const int __HYBRIDNF__; // UseHybridNF
 
 
   /// ignore tails and compute the pure Schreyer frame
-  const bool __IGNORETAILS__; // @IGNORETAILS
+  const int __IGNORETAILS__; // @IGNORETAILS
+
+  /// Syzygy level (within a resolution)
+  const int __SYZNUMBER__; 
   
   /// global base ring
   const ring m_rBaseRing;
@@ -160,7 +164,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     inline bool IsNonempty() const { return !m_hash.empty(); }
 
     /// is the term to be "preprocessed" as lower order term or lead to only reducible syzygies...
-    bool PreProcessTerm(const poly t, CReducerFinder& syzChecker) const;
+    int PreProcessTerm(const poly t, CReducerFinder& syzChecker) const;
 
     poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
     

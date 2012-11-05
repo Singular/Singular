@@ -245,91 +245,88 @@ void SchreyerSyzygyComputation::CleanUp()
 
 
 
-bool CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) const
+int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) const
 {
-   assume( t != NULL );
-   
-   if( __DEBUG__ && __TAILREDSYZ__ )
-     assume( !IsDivisible(t) ); // each input term should NOT be in <L>
-   
-   const ring r = m_rBaseRing;
+  assume( t != NULL );
 
-   
-   if( __TAILREDSYZ__ )
-     if( p_LmIsConstant(t, r) ) // most basic case of baing coprime with L, whatever that is...
-       return true; // TODO: prove this...?
-   
-//   return false; // appears to be fine
+  if( __DEBUG__ && __TAILREDSYZ__ )
+    assume( !IsDivisible(t) ); // each input term should NOT be in <L>
 
-   const long comp = p_GetComp(t, r);
-   
-   CReducersHash::const_iterator itr = m_hash.find(comp);
-   
-   if ( itr == m_hash.end() ) 
-     return true; // no such leading component!!!
-   
-  const bool bIdealCase = (comp == 0); 	 
+  const ring r = m_rBaseRing;
+
+
+  if( __TAILREDSYZ__ )
+    if( p_LmIsConstant(t, r) ) // most basic case of baing coprime with L, whatever that is...
+      return 1; // TODO: prove this...?
+
+  //   return false; // appears to be fine
+
+  const long comp = p_GetComp(t, r);
+
+  CReducersHash::const_iterator itr = m_hash.find(comp);
+
+  if ( itr == m_hash.end() ) 
+    return 2; // no such leading component!!!
+
+  const bool bIdealCase = (comp == 0);    
   const bool bSyzCheck = syzChecker.IsNonempty(); // need to check even in ideal case????? proof?  "&& !bIdealCase"
-   
-//   return false;
-   if( __TAILREDSYZ__ && (bIdealCase || bSyzCheck) )
-   {
-   const TReducers& v = itr->second;
-   const int N = rVar(r);
-   // TODO: extract exps of t beforehand?!
-   bool coprime = true;
-   for(TReducers::const_iterator vit = v.begin(); (vit != v.end()) && coprime; ++vit )
-   {
-     assume( m_L->m[(*vit)->m_label] == (*vit)->m_lt );
-      
-     const poly p = (*vit)->m_lt;
-      
-     assume( p_GetComp(p, r) == comp ); 
-      
+
+  if( __TAILREDSYZ__ && (bIdealCase || bSyzCheck) )
+  {
+    const TReducers& v = itr->second;
+    const int N = rVar(r);
+    // TODO: extract exps of t beforehand?!
+    bool coprime = true;
+    for(TReducers::const_iterator vit = v.begin(); (vit != v.end()) && coprime; ++vit )
+    {
+      assume( m_L->m[(*vit)->m_label] == (*vit)->m_lt );
+
+      const poly p = (*vit)->m_lt;
+
+      assume( p_GetComp(p, r) == comp ); 
+
       // TODO: check if coprime with Leads... if __TAILREDSYZ__ !
-     for( int var = N; var > 0; --var )
-       if( (p_GetExp(p, var, r) != 0) && (p_GetExp(t, var, r) != 0) )
-       {	     
-	       if( __DEBUG__ || 0)
-		 {	       
-		    PrintS("CReducerFinder::PreProcessTerm, 't' is NOT co-prime with the following leading term: \n");
-		    dPrint(p, r, r, 1);
-		 }
-	       coprime = false; // t not coprime with p!
-	       break;
-       }
-      
-     if( bSyzCheck && coprime )
-     {
-	poly ss = p_LmInit(t, r);
+      for( int var = N; var > 0; --var )
+        if( (p_GetExp(p, var, r) != 0) && (p_GetExp(t, var, r) != 0) )
+        {       
+          if( __DEBUG__ || 0)
+          {         
+            PrintS("CReducerFinder::PreProcessTerm, 't' is NOT co-prime with the following leading term: \n");
+            dPrint(p, r, r, 1);
+          }
+          coprime = false; // t not coprime with p!
+          break;
+        }
+
+      if( bSyzCheck && coprime )
+      {
+        poly ss = p_LmInit(t, r);
         p_SetCoeff0(ss, n_Init(1, r), r); // for delete & printout only!...
         p_SetComp(ss, (*vit)->m_label + 1, r); // coeff?
-	p_Setm(ss, r);
-	
-	coprime = ( syzChecker.IsDivisible(ss) );
+        p_Setm(ss, r);
 
-	if( __DEBUG__ && !coprime)
-	  {	       
-	     PrintS("CReducerFinder::PreProcessTerm, 't' is co-prime with p but may lead to NOT divisible syz.term: \n");
-	     dPrint(ss, r, r, 1);
-	  }
-	
-	p_LmDelete(&ss, r); // deletes coeff as well???
-     }
-      
-   }
-      
-   if( __DEBUG__ && coprime )
-     PrintS("CReducerFinder::PreProcessTerm, the following 't' is 'co-prime' with all of leading terms! \n");
-      
-   return coprime; // t was coprime with all of leading terms!!! 
-      
-   }
-//   return true; // delete the term
-   
-   return false;
+        coprime = ( syzChecker.IsDivisible(ss) );
 
+        if( __DEBUG__ && !coprime)
+        {         
+          PrintS("CReducerFinder::PreProcessTerm, 't' is co-prime with p but may lead to NOT divisible syz.term: \n");
+          dPrint(ss, r, r, 1);
+        }
 
+        p_LmDelete(&ss, r); // deletes coeff as well???
+      }
+
+    }
+
+    if( __DEBUG__ && coprime )
+      PrintS("CReducerFinder::PreProcessTerm, the following 't' is 'co-prime' with all of leading terms! \n");
+
+    return coprime? 3: 0; // t was coprime with all of leading terms!!! 
+
+  }
+  //   return true; // delete the term
+
+  return 0;
 }
   
    
@@ -340,43 +337,44 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
   assume( idTails->m != NULL );
   const ring r = m_rBaseRing;
 
-   if( __DEBUG__ || 0)
-   {
-     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Tails: \n");
-     dPrint(idTails, r, r, 0);
-   }
-   
-  unsigned long pp = 0; // count preprocessed terms...
+  if( __DEBUG__ || 0)
+  {
+    PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Tails: \n");
+    dPrint(idTails, r, r, 0);
+  }
+
+  unsigned long pp[4] = {0,0,0,0}; // count preprocessed terms...
 
   for( int p = IDELEMS(idTails) - 1; p >= 0; --p )
     for( poly* tt = &(idTails->m[p]); (*tt) != NULL;  )
-       {   
-	  const poly t = *tt; 
-       if( m_div.PreProcessTerm(t, m_checker) )
-       {
-	  if( __DEBUG__ || 0)
-	  {	       
-	    PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): PP the following TT: \n");
-	    dPrint(t, r, r, 1);
-	  }
-	  ++pp;
-	    
-         (*tt) = p_LmDeleteAndNext(t, r); // delete the lead and next...
-       }   
-       else 
-         tt = &pNext(t); // go next?
-  
-       }
+    {   
+      const poly t = *tt;
+      const int k = m_div.PreProcessTerm(t, m_checker); // 0..3
+      assume( 0 <= k && k <= 3 );
+      pp[k]++;
+      if( k )
+      {
+        if( __DEBUG__)
+        {         
+          Print("SchreyerSyzygyComputation::SetUpTailTerms(): PP (%d) the following TT: \n", k);
+          dPrint(t, r, r, 1);
+        }
 
-   if( TEST_OPT_PROT || 1)
-     Print("**!!** SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing has eliminated %u terms!\n", pp);
-   
+        (*tt) = p_LmDeleteAndNext(t, r); // delete the lead and next...
+      }   
+      else 
+        tt = &pNext(t); // go next?
 
-   if( __DEBUG__ || 0)
-   {
-     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Preprocessed Tails: \n");
-     dPrint(idTails, r, r, 0);
-   }
+    }
+
+  if( TEST_OPT_PROT || 1)
+    Print("      **!!**      SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing(): X: {c: %lu, C: %lu, P: %lu} + %lu\n", pp[1], pp[2], pp[3], pp[0]);
+
+  if( __DEBUG__ || 0)
+  {
+    PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Preprocessed Tails: \n");
+    dPrint(idTails, r, r, 0);
+  }
 }
 /*  
   m_idTailTerms.resize( IDELEMS(idTails) );
@@ -709,7 +707,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 {
   assume( m_idLeads != NULL );
   assume( m_idTails != NULL );
-  
+
   const ideal& L = m_idLeads;
   const ideal& T = m_idTails;
 
@@ -721,85 +719,57 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
   if( m_syzLeads == NULL )
   {   
-    if( TEST_OPT_PROT && 1)
+    if( TEST_OPT_PROT || 1)
     {
-/*       initTimer();
-       initRTimer();
-       startTimer();
-       startRTimer();*/
-   
-      t = getTimer();
-      r = getRTimer();
-      Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", getRTimer(), t, r);
+      t = getTimer(); r = getRTimer();
+      Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
     }
-     
     ComputeLeadingSyzygyTerms( __LEAD2SYZ__ && !__IGNORETAILS__ ); // 2 terms OR 1 term!
-    if( TEST_OPT_PROT && 1)
+    if( TEST_OPT_PROT || 1)
     {
-      t = getTimer() - t;
-      r = getRTimer() - r;
-	  
-      Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", getRTimer(), t, r);
+      t = getTimer() - t; r = getRTimer() - r;
+      Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
     }
-     
+
   }
-     
 
   assume( m_syzLeads != NULL );
-
   ideal& LL = m_syzLeads;
-
-  
   const int size = IDELEMS(LL);
 
   TT = idInit(size, 0);
 
   if( size == 1 && LL->m[0] == NULL )
     return;
-   
+
+  // use hybrid method?
+  const bool method = (__HYBRIDNF__ == 1) || (__HYBRIDNF__ == 2 && __SYZNUMBER__ < 3);
+
   if(  !__IGNORETAILS__)
   {
     if( T != NULL )
     {
+      if( TEST_OPT_PROT || 1 )
+      {
+        t = getTimer(); r = getRTimer();
+        Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
+      }
 
-       if( TEST_OPT_PROT && 1 )
-	 {
-//       initTimer();
-//       initRTimer();
-//       startTimer();
-//       startRTimer();  
-   
-	    t = getTimer();
-	    r = getRTimer();
-	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", getRTimer(), t, r);
-	 }
+      SetUpTailTerms();
 
-       SetUpTailTerms();
-       
-       if( TEST_OPT_PROT && 1)
-       {
-	  t = getTimer() - t;
-	  r = getRTimer()  - r;
-	  
-	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", getRTimer(), t, r);
-       }
-       
-  
-
+      if( TEST_OPT_PROT || 1)
+      {
+        t = getTimer() - t; r = getRTimer() - r;
+        Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
+      }
     }     
   }
 
-       if( TEST_OPT_PROT && 1)
-	 {
-//       initTimer();
-//       initRTimer();
-//       startTimer();
-//       startRTimer();  
-   
-	    t = getTimer();
-	    r = getRTimer();
-	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", getRTimer(), t, r);
-	 }
+  if( TEST_OPT_PROT || 1)
+  {
+    t = getTimer(); r = getRTimer();
+    Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
+  }
 
   for( int k = size - 1; k >= 0; k-- )
   {
@@ -822,28 +792,20 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
       continue;
     }
-    
-//    TT->m[k] = a2;
 
-    if( ! __HYBRIDNF__ )
-    {
-      TT->m[k] = TraverseNF(a, a2);
-    } else
-    {
+    //    TT->m[k] = a2;
+
+    if( method )
       TT->m[k] = SchreyerSyzygyNF(a, a2);
-    }
-
+    else
+      TT->m[k] = TraverseNF(a, a2);
   }
-   
-       if( TEST_OPT_PROT && 1)
-       {
-	  t = getTimer() - t;
-	  r = getRTimer();  - r;
-	  
-	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", getRTimer(), t, r);
-       }
 
-    
+  if( TEST_OPT_PROT || 1)
+  {
+    t = getTimer() - t; r = getRTimer() - r;
+    Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
+  }
 
   TT->rank = id_RankFreeModule(TT, R);  
 }
@@ -1080,15 +1042,16 @@ END_NAMESPACE
 
 SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl):
 #ifndef NDEBUG
-     __DEBUG__( (BOOLEAN)atGetInt(rootRingHdl,"DEBUG", FALSE) ),
+     __DEBUG__( atGetInt(rootRingHdl,"DEBUG", 0) ),
 #else
-    __DEBUG__( (BOOLEAN)atGetInt(rootRingHdl,"DEBUG", FALSE) ),
+    __DEBUG__( atGetInt(rootRingHdl,"DEBUG", 0) ),
 #endif
 //    __SYZCHECK__( (BOOLEAN)atGetInt(rootRingHdl, "SYZCHECK", __DEBUG__) ),
-    __LEAD2SYZ__( (BOOLEAN)atGetInt(rootRingHdl, "LEAD2SYZ", 1) ), 
-    __TAILREDSYZ__( (BOOLEAN)atGetInt(rootRingHdl, "TAILREDSYZ", 1) ), 
-    __HYBRIDNF__( (BOOLEAN)atGetInt(rootRingHdl, "HYBRIDNF", 0) ),
-    __IGNORETAILS__( (BOOLEAN)atGetInt(rootRingHdl, "IGNORETAILS", 0) ),
+    __LEAD2SYZ__( atGetInt(rootRingHdl, "LEAD2SYZ", 1) ), 
+    __TAILREDSYZ__( atGetInt(rootRingHdl, "TAILREDSYZ", 1) ), 
+    __HYBRIDNF__( atGetInt(rootRingHdl, "HYBRIDNF", 2) ),
+    __IGNORETAILS__( atGetInt(rootRingHdl, "IGNORETAILS", 0) ),
+    __SYZNUMBER__( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
     m_rBaseRing( rootRingHdl->data.uring )
 {    
   if( __DEBUG__ )
@@ -1488,7 +1451,7 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
         ++m_current;
       else 
         m_active = true;
-	 
+   
       
       // looking for the next good entry
       for( ; m_current != m_finish; ++m_current )
