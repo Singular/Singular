@@ -762,6 +762,23 @@ gfan::ZMatrix rays(gfan::ZFan* zf)
   return rays;
 }
 
+int numberOfConesWithVector(gfan::ZFan* zf, gfan::ZVector* v)
+{
+  int count = 0;
+  int ambientDim = zf->getAmbientDimension();
+  for (int i=0; i<zf->numberOfConesOfDimension(ambientDim, 0, 0); i++)
+  {
+    gfan::ZCone zc = zf->getCone(ambientDim, i, 0, 0);
+    if (zc.contains(*v))
+    {
+      count = count +1;
+      if (count > 1) 
+        return count;
+    }
+  }
+  return count;
+}
+
 BOOLEAN numberOfConesWithVector(leftv res, leftv args)
 {
   leftv u=args;
@@ -770,27 +787,16 @@ BOOLEAN numberOfConesWithVector(leftv res, leftv args)
     leftv v=u->next;
     if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
     {
-      leftv w=v->next;
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       bigintmat* v0 = (bigintmat*) v->Data();
-      gfan::ZVector* v1 = bigintmatToZVector(*v0); 
       int ambientDim = zf->getAmbientDimension();
       if (ambientDim != v0->cols())
       {
         WerrorS("numberOfConesWithVector: mismatching dimensions");
         return TRUE;
       }
-      int count = 0;
-      for (int i=0; i<zf->numberOfConesOfDimension(ambientDim, 0, 0); i++)
-      {
-        gfan::ZCone zc = zf->getCone(ambientDim, i, 0, 0);
-        if (zc.contains(*v1))
-        {
-          count = count +1;
-          if (count > 1) 
-            break;
-        }
-      }
+      gfan::ZVector* v1 = bigintmatToZVector(*v0); 
+      int count = numberOfConesWithVector(zf, v1);
       delete v1;
       res->rtyp = INT_CMD;
       res->data = (void*) count;
@@ -891,6 +897,307 @@ BOOLEAN fanViaCones(leftv res, leftv args)
   return TRUE;
 }
 
+static gfan::ZCone subcone(const lists cones, const gfan::ZVector point)
+{
+  gfan::ZCone sigma = gfan::ZCone(gfan::ZMatrix(1,point.size()), gfan::ZMatrix(1,point.size()));
+  gfan::ZCone* zc;
+  for (int i=0; i<=lSize(cones); i++)
+  {
+    zc = (gfan::ZCone*) cones->m[i].Data();
+    if (zc->contains(point))
+      sigma = gfan::intersection(sigma,*zc);
+  }
+  return(sigma);
+}
+
+static gfan::ZVector randomPoint(const gfan::ZCone &zc)
+{
+  gfan::ZMatrix rays = zc.extremeRays();
+  gfan::ZVector rp = gfan::ZVector(zc.ambientDimension());
+  for (int i=0; i<rays.getHeight(); i++)
+  {
+    rp = rp + siRand() * rays[i];
+  }
+  return rp;
+}
+
+static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &bound)
+{
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  lists L = (lists) omAllocBin(slists_bin);
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
+  L->Init(r);
+
+  int index = -1;
+  /* next we iterate over each of the r facets, build the respective cone and add it to the list */
+  /* this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations; 
+  newEquations.appendRow(inequalities[0]);
+
+  gfan::ZCone* eta = new gfan::ZCone(newInequalities,newEquations,3);
+
+  gfan::ZVector v = eta->getRelativeInteriorPoint();
+  if (bound.containsRelatively(v))
+  {    
+    index++;
+    L->m[index].rtyp = coneID; 
+    L->m[index].data = (void*) eta;
+  }
+  
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
+  {
+    newInequalities = inequalities.submatrix(0,0,i,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    eta = new gfan::ZCone(newInequalities,newEquations,3);
+
+    v = eta->getRelativeInteriorPoint();
+    if (bound.containsRelatively(v))
+    {    
+      index++;
+      L->m[index].rtyp = coneID; 
+      L->m[index].data = (void*) eta;
+    }
+  }
+  
+  /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r-1]);
+  eta = new gfan::ZCone(newInequalities,newEquations,3);
+
+  v = eta->getRelativeInteriorPoint();
+  if (bound.containsRelatively(v))
+  {    
+    index++;
+    L->m[index].rtyp = coneID; 
+    L->m[index].data = (void*) eta;
+  }
+
+  if (index==-1)
+  {
+    L->m[0].rtyp = INT_CMD;
+    L->m[0].data = (void*) (int) 0;
+    return L;
+  }
+  if (index!=L->nr)
+  {
+    L->m=(leftv)omRealloc(L->m,(index+1)*sizeof(sleftv));
+    L->nr=index;
+  }
+  return L;
+}
+
+/***
+ * delete last entry of ul and append all entries of vl
+ **/
+static lists deleteLastAndConcatLists(lists ul, lists vl)
+{
+  int ur = ul->nr;
+  int vr = vl->nr;
+
+  lists l = (lists) omAllocBin(slists_bin);
+  l->Init(ur+vr+1);
+  
+  if (ur > 0)
+  {
+    for(int i=0; i<ur; i++)
+    {
+      l->m[i].rtyp=ul->m[i].rtyp;
+      l->m[i].data=ul->m[i].data;
+    }
+    for(int i=0; i<=vr; i++)
+    {
+      l->m[i+ur].rtyp=vl->m[i].rtyp;
+      l->m[i+ur].data=vl->m[i].data;
+    }
+    if (ul->m != NULL)
+    {
+      ul->m[ur].CleanUp();
+      omFreeSize((ADDRESS)ul->m,(ur+1)*sizeof(sleftv));
+    }
+    omFreeBin((ADDRESS)ul, slists_bin);
+    if (vl->m != NULL)
+      omFreeSize((ADDRESS)vl->m,(vr+1)*sizeof(sleftv));
+    omFreeBin((ADDRESS)vl, slists_bin);
+  }
+  else
+  {
+    for(int i=0; i<=vr; i++)
+    {
+      l->m[i].rtyp=vl->m[i].rtyp;
+      l->m[i].data=vl->m[i].data;
+    }
+    ul->Clean();
+    if (vl->m != NULL)
+      omFreeSize((ADDRESS)vl->m,(vr+1)*sizeof(sleftv));
+    omFreeBin((ADDRESS)vl, slists_bin);
+  }
+  return l; 
+}
+
+BOOLEAN refineCones(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == LIST_CMD))
+  {
+    leftv v=u->next;
+    if ((u != NULL) && (v->Typ() == BIGINTMAT_CMD))
+    {
+      lists cones = (lists) u->Data();
+      bigintmat* bim = (bigintmat*) v->Data();
+      bim = bim->transpose();
+      gfan::ZMatrix* zm = bigintmatToZMatrix(bim);
+      gfan::ZCone support = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
+      delete zm;
+
+      // randomly compute a first full-dimensional cone
+      gfan::ZCone lambda; gfan::ZVector point;
+      do
+      {
+        point = randomPoint(support);
+        lambda = subcone(cones, point);
+      }
+      while (lambda.dimension() < lambda.ambientDimension());
+
+      // insert cone into fan and compute a list of facets to traverse
+      gfan::ZFan* Sigma = new gfan::ZFan(lambda.ambientDimension());
+      Sigma->insert(lambda);
+      lists facets0 = listOfInteriorFacets(lambda, support);
+      if (facets0->m[0].rtyp == INT_CMD)
+      {
+        res->rtyp = fanID;
+        res->data = (void*) Sigma;
+        return FALSE;
+      }
+      int mu = 1000;
+
+      gfan::ZCone* eta; gfan::ZVector facetNormal, interiorPoint;
+      while (facets0->nr > -1)
+      {
+        /* extract a facet to traverse and delete it from the list */ 
+        eta = (gfan::ZCone*) facets0->m[lSize(facets0)].Data();
+        interiorPoint = eta->getRelativeInteriorPoint();
+
+        /* check whether eta needs to be traversed */
+        std::cout << "facets left to check: " << lSize(facets0) << std::endl;
+        if (numberOfConesWithVector(Sigma, &interiorPoint) > 1)
+        {
+          eta = NULL;
+          facets0->m[lSize(facets0)].CleanUp();
+          if (facets0->nr == 0)
+          {
+            facets0->Clean();
+            break;
+          }
+          facets0->m = (leftv)omRealloc(facets0->m,(facets0->nr)*sizeof(sleftv));
+          facets0->nr = facets0->nr - 1;
+        }
+        else
+        {
+          facetNormal = (eta->getImpliedEquations())[0]; // impliedEquations consist only of one row
+
+          /* construct a point, which lies on the other side of the facet, yet still in the support */
+          point = mu * interiorPoint - facetNormal;
+          while (!support.containsRelatively(point))
+          {
+            mu = mu * 10;
+            point = mu * interiorPoint - facetNormal;
+            if (mu > 100000)
+              return TRUE;
+          }
+
+          /* make sure that the cone around the point is maximal and contains eta */
+          lambda = subcone(cones,point);
+
+          while ((lambda.dimension() < lambda.ambientDimension()) && !(lambda.contains(interiorPoint)))
+          {
+            mu = mu * 10;
+            point = mu * interiorPoint - facetNormal;
+            lambda = subcone(cones,point);
+          }
+
+          /* insert cone into Sigma, create a new list of facets */
+          Sigma->insert(lambda);
+
+          lists newFacets = listOfInteriorFacets(lambda, support);
+          if (newFacets->m[0].rtyp == INT_CMD)
+          {
+            facets0 = deleteLastAndConcatLists(facets0, newFacets);
+          }
+          else
+          {
+            /* delete last entry of old list, append the new list to the old, delete new list, */
+            facets0 = deleteLastAndConcatLists(facets0, newFacets);
+          }
+
+          eta = NULL;
+        }
+      }
+      res->rtyp = fanID;
+      res->data = (void*) Sigma;
+      return FALSE;
+    }
+  }
+  WerrorS("refineCones: unexpected parameters");
+  return TRUE;
+}
+
+lists listOfFacets(const gfan::ZCone &zc)
+{
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  lists L = (lists)omAllocBin(slists_bin);
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
+  L->Init(r);
+  
+  /* next we iterate over each of the r facets, build the respective cone and add it to the list */
+  /* this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations; 
+  newEquations.appendRow(inequalities[0]);
+  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+  
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
+  {
+    newInequalities = inequalities.submatrix(0,0,i-1,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+  }
+  
+    /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r]);
+  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+
+  return L;
+}
+
+BOOLEAN listOfFacets(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+    lists L = listOfFacets(*zc);
+    res->rtyp = LIST_CMD;
+    res->data = (char*) L;
+    return FALSE;
+  }
+  WerrorS("listOfFacets: unexpected parameters");
+  return TRUE;
+}
+
 // BOOLEAN grFan(leftv res, leftv h)
 // {
 //   /*======== GFAN ==============*/
@@ -976,6 +1283,7 @@ void bbfan_setup()
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
+  iiAddCproc("","refineCones",FALSE,refineCones);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
