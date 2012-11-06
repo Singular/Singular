@@ -318,7 +318,9 @@ void ShiftDVec::p_ExpSum_slow
       }
   }
 
-  p_Setm(rt,r);  //TODO: Maybe this is not yet nescessary
+  //TODO: Maybe should be done later to reduce overhead
+  p_Setm(rt,r);
+
   return;
 }
 
@@ -741,7 +743,9 @@ BOOLEAN ShiftDVec::k_GetLeadTerms
   p_LmCheckPolyRing(p1, p_r);
   p_LmCheckPolyRing(p2, p_r);
 
+#if 0 //BOCO: original code - replaced
   int i;
+#endif
   long x;
   m1 = p_Init(m_r);
   m2 = p_Init(m_r);
@@ -767,7 +771,8 @@ BOOLEAN ShiftDVec::k_GetLeadTerms
   //BOCO: small warning: polys should correspond to a 
   //non-center overlap - otherwise the loops may not complete
 
-  long j = 0;
+  long j = 1;
+  long exp_in_blocks_before;
 
   { nextblock_m2: ; //this is a loop
     for(long i = 0; i < lV; ++i, ++j)
@@ -775,7 +780,7 @@ BOOLEAN ShiftDVec::k_GetLeadTerms
       {
         if (x > (long) m_r->bitmask) goto false_return;
         p_SetExp(m2, j, 1, m_r);
-        j = j + (lV - j % lV); //We found a nonzero exponent,
+        j = j + (lV - (j-1) % lV); //We found a nonzero exponent,
         goto nextblock_m2; //thus we can move to the next block
       }
     //Found one complete block with zero exponet diff -> overlap
@@ -785,16 +790,20 @@ BOOLEAN ShiftDVec::k_GetLeadTerms
   //(This could be the beginning of a long story or
   // friendship, etc. ...)
   while( !p_GetExpDiff(p1, p2, j, p_r) ) ++j;
+  exp_in_blocks_before = (((j-1) / lV) * lV);
 
   { nextblock_m1: ; //this is a loop
-    for(;j < p_r->N; ++j)
+    for(long i = 0; i < lV && j <= p_r->N; ++j, ++i)
       if( (x = p_GetExpDiff(p2, p1, j, p_r)) > 0 )
       {
         if (x > (long) m_r->bitmask) goto false_return;
-        p_SetExp(m1, j, 1, m_r);
-        j = j + (lV - j % lV); //We found a nonzero exponent,
+        p_SetExp(m1, j - exp_in_blocks_before, 1, m_r);
+        j = j + (lV - (j-1) % lV); //We found a nonzero exponent,
         goto nextblock_m1; //thus we can move on to the next block
       }
+    /* Either Found one complete block with zero exponet diff,
+     * then we are at the end of the polys, or we looped through
+     * (all variables (reached p_r->N) */
   }
 #endif
 

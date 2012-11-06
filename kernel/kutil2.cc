@@ -1065,6 +1065,16 @@ void ShiftDVec::debugPrintDegViolation
 #endif
 
 #if DEBOGRI > 0
+bool ShiftDVec::lmHasZeroShift(poly p, ring p_lm_ring, int lV)
+{
+  for(int i = 1; i <= lV; ++i)
+    if( p_GetExp(p,i,p_lm_ring) ) return true;
+
+  return false;
+}
+#endif
+
+#if DEBOGRI > 0
 bool ShiftDVec::deBoGriPrint
   ( const char* description, uint flag, bool assume, int indent )
 {

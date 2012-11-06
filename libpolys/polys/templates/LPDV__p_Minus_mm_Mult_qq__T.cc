@@ -76,8 +76,8 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
    *TODO: How can we merge that? For the Letterplace case we
    *      don't need the original p_Minus_mm_Mult_qq !
    */
-  p_MemCopy__T(qm->exp, q->exp, length); //BOCO: will that be defined correctly?
-  r->p_ExpSum(qm, q, m, r);
+  p_MemCopy__T(qm->exp, m->exp, length); //BOCO: will that be defined correctly?
+  r->p_ExpSum(qm, m, q, r);
 #else
   p_MemSum__T(qm->exp, q->exp, m_e, length);
   p_MemAddAdjust__T(qm, r);

@@ -161,6 +161,9 @@ namespace ShiftDVec
       const char* logfile = "logri.log", 
       bool assume = false, int indent = 0            );
 
+  bool lmHasZeroShift(poly p, ring p_lm_ring, int lV);
+
+
 #ifdef HAVE_DEBOGRITEST
   void deBoGriTTest(kStrategy strat);
 #endif
@@ -252,6 +255,8 @@ class ShiftDVec::DeBoGri
 #define deBoGriInitCounter() ((void) 0)
 #define deBoGriPrintCounter(x2, x3) ((void) 0)
 #define deBoGriIncCounter() ((void) 0)
+#define lmHasZeroShift(...) ((void) 0)
+
 
 #endif //#if DEBOGRI > 0
 

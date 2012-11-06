@@ -459,7 +459,8 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       // check for degree violations before entering the Pair
       // into the pair set???); BOCO: now we have a slightly
       // adapted version, but the question, if we need it at
-      // all, is yet to be answered
+      // all, is yet to be answered; Partial answer: We need it
+      // at least for getting m1 and m2
       while 
         ( strat->tailRing != currRing &&
           !ShiftDVec::kCheckSpolyCreation
@@ -474,6 +475,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
           break;
         }
       }
+
       // create the real one
       ShiftDVec::ksCreateSpoly
         ( &(strat->P), NULL, strat->use_buckets,
