@@ -82,7 +82,6 @@ gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim)
       number temp = BIMATELEM(bim, i+1, j+1);
       gfan::Integer* gi = numberToInteger(temp);
       (*zm)[i][j] = *gi;
-      nlDelete(&temp,NULL);
       delete gi;
     }
   return zm;
