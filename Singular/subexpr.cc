@@ -105,8 +105,7 @@ void sleftv::Print(leftv store, int spaces)
     const char *n=Name();
     char *s;
     void *d=Data();
-    if (errorreported)
-      return;
+    if (errorreported) return;
     if ((store!=NULL)&&(store!=this))
       store->CleanUp();
 
@@ -700,9 +699,6 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
   if (!errorreported)
   {
     char *s;
-    const char *n;
-    if (name!=NULL) n=name;
-    else n=sNoName;
     int t=Typ();
     switch (t /*Typ()*/)
     {
