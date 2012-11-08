@@ -493,6 +493,10 @@ Do not display warning messages.
 @cindex --no-out
 Suppress display of all output.
 
+@item @code{--no-shell}
+@cindex --no-shell
+Disallow using shell escape commands.
+
 @item @code{-t}, @code{--no-tty}
 @cindex --no-tty
 Do not redefine the characteristics of the terminal.  This option should be

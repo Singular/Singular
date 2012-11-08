@@ -335,6 +335,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
+      if (feOptValue(FE_OPT_NO_SHELL)) {
+       WerrorS("not allowed");
+       return TRUE;
+       }
       res->rtyp=INT_CMD;
       if (h==NULL) res->data = (void *)(long) system("sh");
       else if (h->Typ()==STRING_CMD)

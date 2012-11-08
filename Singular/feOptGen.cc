@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: Implementation of option buisness
+* ABSTRACT: Implementation of option business
 */
 
 #include <string.h>
