@@ -28,6 +28,7 @@
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
+#include "feOpt.h"
 
 #ifdef HAVE_DYNAMIC_LOADING
 #include <polys/mod_raw.h>
@@ -151,6 +152,7 @@ void *idrecDataInit(int t)
     }
     //the types with the standard init: set the struct to zero
     case LINK_CMD:
+      if (feOptValue(FE_OPT_NO_SHELL)) Werror("not allowed");
       return (void*) omAlloc0Bin(sip_link_bin);
     case RING_CMD:
       return (void*) omAlloc0Bin(sip_sring_bin);
