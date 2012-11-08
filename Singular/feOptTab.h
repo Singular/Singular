@@ -130,7 +130,7 @@ struct fe_option feOptSpec[] =
    0,          "Suppress all output",                                  feOptBool,    0,      0},
 
   {"no-shell",          no_argument,        LONG_OPTION_RETURN,
-   0,          "Disallow using shell escape commands",                 feOptBool,    0,      0},
+   0,          "Disallow using shell escape commands (including links)", feOptBool,  0,      0},
 
   {"min-time",          required_argument,  LONG_OPTION_RETURN,
   "SECS",     "Do not display times smaller than SECS (in seconds)",   feOptString, (void*) "0.5",  0},
