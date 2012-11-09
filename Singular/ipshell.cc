@@ -5043,7 +5043,7 @@ const short MAX_SHORT = 32767; // (1 << (sizeof(short)*8)) - 1;
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
 #ifdef HAVE_RINGS
-  unsigned int ringtype = 0;
+  //unsigned int ringtype = 0;
   int_number modBase = NULL;
   unsigned int modExponent = 1;
 #endif
@@ -5211,19 +5211,19 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       {
         /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
-        ringtype = 1;       // Use Z/2^ch
+        //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
       }
       else
       {
-        ringtype = 3;
-        cf=nInitChar(n_Zn,(void*)(long)modBase);
+        //ringtype = 3;
+        cf=nInitChar(n_Zpn,(void*)(long)modBase);
       }
     }
     // just a module m > 1
     else if (cf == NULL)
     {
-      ringtype = 2;
+      //ringtype = 2;
       const int ch = mpz_get_ui(modBase);
       cf=nInitChar(n_Zn,(void*)(long)ch);
     }
@@ -5285,13 +5285,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   assume( R != NULL );
 
   R->cf = cf;
-
-#ifdef HAVE_RINGS
-  // the following should have beed set already into cf, right?!
-//  R->cf->ringtype = ringtype;
-//  R->cf->modBase = modBase;
-//  R->cf->modExponent = modExponent;
-#endif
 
   /* names and number of variables-------------------------------------*/
   {

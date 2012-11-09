@@ -39,7 +39,7 @@ void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
-  return (n==n_Zn) && (mpz_cmp(r->modNumber,(mpz_ptr)parameter)==0);
+  return (n==n_Zn) && (mpz_cmp_ui(r->modNumber,(long)parameter)==0);
 }
 
 
