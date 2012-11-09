@@ -534,25 +534,17 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   setCharacteristic (p);
   Variable beta;
   Off (SW_RATIONAL);
-  if (mipoHasDen)
-  {
-    setReduce (alpha, false);
-    modMipo= modMipo.mapinto();
-    modMipo /= lc (modMipo);
-    beta= rootOf (modMipo);
-    setReduce (alpha, true);
-  }
+  setReduce (alpha, false);
+  modMipo= modMipo.mapinto();
+  modMipo /= lc (modMipo);
+  beta= rootOf (modMipo);
+  setReduce (alpha, true);
 
   setReduce (alpha, false);
   for (k= 0; k < factors.length(); k++)
   {
-    if (!mipoHasDen)
-      bufFactors [k]= bufFactors[k].mapinto();
-    else
-    {
-      bufFactors [k]= bufFactors[k].mapinto();
-      bufFactors [k]= replacevar (bufFactors[k], alpha, beta);
-    }
+    bufFactors [k]= bufFactors[k].mapinto();
+    bufFactors [k]= replacevar (bufFactors[k], alpha, beta);
   }
   setReduce (alpha, true);
   setCharacteristic(0);
@@ -595,11 +587,9 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   setReduce (alpha, false);
   recResult= mapinto (recResult);
   setReduce (alpha, true);
-  if (mipoHasDen)
-  {
-    for (CFListIterator i= recResult; i.hasItem(); i++)
-      i.getItem()= replacevar (i.getItem(), alpha, beta);
-  }
+
+  for (CFListIterator i= recResult; i.hasItem(); i++)
+    i.getItem()= replacevar (i.getItem(), alpha, beta);
 
   setCharacteristic (0);
   CanonicalForm g;
@@ -620,6 +610,8 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       setReduce (alpha, true);
     if (mipoHasDen)
       coeffE= replacevar (coeffE, gamma, beta);
+    else
+      coeffE= replacevar (coeffE, alpha, beta);
     setCharacteristic (0);
     if (!coeffE.isZero())
     {
@@ -630,23 +622,22 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
-        setReduce (alpha, false);
         g= mulNTL (coeffE, j.getItem());
         g= modNTL (g, bufFactors[ii]);
-        setReduce (alpha, true);
         setCharacteristic (0);
         if (mipoHasDen)
         {
           setReduce (beta, false);
           k.getItem() += replacevar (g.mapinto()*modulus, beta, gamma);
           e -= mulNTL (replacevar (g.mapinto(), beta, gamma)*modulus,
-                                   l.getItem(), b);
+                       l.getItem(), b);
           setReduce (beta, true);
         }
         else
         {
-          k.getItem() += g.mapinto()*modulus;
-          e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+          k.getItem() += replacevar (g.mapinto()*modulus, beta, alpha);
+          e -= mulNTL (replacevar (g.mapinto()*modulus, beta, alpha),
+                       l.getItem(), b);
         }
         e= b(e);
       }
