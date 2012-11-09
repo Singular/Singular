@@ -41,17 +41,9 @@ static inline void malloc_free( void * ptr )
 #include <omalloc/omalloc.h>
 #endif
 
-#ifndef MAKE_DISTRIBUTION
-// dummy procedure for setting a breakpoint
-// within the debugger
-void dErrorBreak()
-{}
-#endif
 
-#ifdef __cplusplus
 extern "C" 
 {
-#endif
 
 int dReportError(const char* fmt, ...)
 {
@@ -135,16 +127,13 @@ int dReportError(const char* fmt, ...)
   return 0;
 }
 
-
-
-#ifdef __cplusplus
 }
-#endif
 
 #endif
   
-
-
-  
-  
-  
+#ifndef MAKE_DISTRIBUTION
+// dummy procedure for setting a breakpoint
+// within the debugger
+void dErrorBreak()
+{}
+#endif
