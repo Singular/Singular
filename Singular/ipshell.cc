@@ -5032,8 +5032,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #endif
      )
   {
-    int l = 0;
-
     if (((ch!=0) && (ch<2))
     #ifndef NV_OPS
     || (ch > 32003)
@@ -5046,6 +5044,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     // load fftable, if necessary
     if (pn!=NULL)
     {
+      int l = 0;
       while ((ch!=fftable[l]) && (fftable[l])) l++;
       if (fftable[l]==0) ch = IsPrime(ch);
       else
