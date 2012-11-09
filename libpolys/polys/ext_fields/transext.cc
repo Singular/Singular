@@ -527,23 +527,27 @@ number ntInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs 
 
 number ntInit(long i, const coeffs cf)
 {
-  if (i == 0) return NULL;
-  else
+  if (i != 0)
   {
-    fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-    NUM(result) = p_ISet(i, ntRing);
-    //DEN(result) = NULL; // done by omAlloc0Bin
-    //COM(result) = 0; // done by omAlloc0Bin
-    ntTest((number)result);
-    return (number)result;
+    poly p=p_ISet(i, ntRing);
+    if (p!=NULL)
+    {
+      fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+      NUM(result) = p;
+      //DEN(result) = NULL; // done by omAlloc0Bin
+      //COM(result) = 0; // done by omAlloc0Bin
+      ntTest((number)result);
+      return (number)result;
+    }
   }
+  return NULL;
 }
 
 
 /// takes over p!
 number ntInit(poly p, const coeffs cf)
 {
-  if (p == 0) return NULL;
+  if (p == NULL) return NULL;
 
     number g;
     // TODO/NOTE: the following should not be necessary (due to
