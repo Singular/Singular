@@ -152,7 +152,7 @@ void *idrecDataInit(int t)
     }
     //the types with the standard init: set the struct to zero
     case LINK_CMD:
-      if (feOptValue(FE_OPT_NO_SHELL)) Werror("not allowed");
+      if (feOptValue(FE_OPT_NO_SHELL)) Werror("link data type is disallowed in restricted mode");
       return (void*) omAlloc0Bin(sip_link_bin);
     case RING_CMD:
       return (void*) omAlloc0Bin(sip_sring_bin);

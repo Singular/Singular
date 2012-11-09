@@ -336,7 +336,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if(strcmp(sys_cmd,"sh")==0)
     {
       if (feOptValue(FE_OPT_NO_SHELL)) {
-       WerrorS("not allowed");
+       WerrorS("shell execution is disallowed in restricted mode");
        return TRUE;
        }
       res->rtyp=INT_CMD;
