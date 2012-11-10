@@ -1238,7 +1238,16 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
 
 void ntNormalize (number &a, const coeffs cf)
 {
-  definiteGcdCancellation(a, cf, FALSE);
+  if ((a!=NULL)&&(DEN(a)!=NULL))
+  {
+    definiteGcdCancellation(a, cf, FALSE);
+    if ((DEN(a)!=NULL)
+    &&(!n_GreaterZero(pGetCoeff(DEN(a)),ntRing->cf)))
+    {
+      NUM(a)=p_Neg(NUM(a),ntRing);
+      DEN(a)=p_Neg(DEN(a),ntRing);
+    }
+  }
   ntTest(a); // !!!!
 }
 
