@@ -1281,7 +1281,7 @@ EXAMPLE:  cgsdr; shows an example"
   for (i=1;i<=size(B);i++){ish=ishomog(B[i]); if(ish==0){break;};}
   if (ish)
   {
-     if(comment>0){"The given system is homogneous"};
+     if(comment>0){"The given system is homogneous";}
     can=0;
   }
   // ACTING DEPENDING ON OPTIONS
