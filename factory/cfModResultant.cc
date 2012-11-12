@@ -10,8 +10,10 @@
  **/
 /*****************************************************************************/
 
+#include <config.h>
 
 #include "assert.h"
+#include "timing.h"
 
 #include "cfModResultant.h"
 #include "cf_primes.h"
@@ -27,6 +29,8 @@
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
 #endif
+
+TIMING_DEFINE_PRINT(fac_resultant_p)
 
 //TODO arrange by bound= deg (F,xlevel)*deg (G,i)+deg (G,xlevel)*deg (F, i)
 static inline
@@ -325,6 +329,9 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
   else if (degBx == 0)
     return power (B, degAx);
 
+  if (A.isUnivariate() && B.isUnivariate() && A.level() == B.level())
+    return uniResultant (A, B);
+
   CanonicalForm F= A;
   CanonicalForm G= B;
 
@@ -335,9 +342,6 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
   G= M (G);
 
   Variable y= Variable (2);
-
-  if (F.isUnivariate() && G.isUnivariate() && F.level() == G.level())
-    return N(uniResultant (F, G));
 
   int i= -1;
   CanonicalForm GEval, FEval, recResult, H;
@@ -361,6 +365,8 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
 
     if (H == modResult)
       equalCount++;
+    else
+      equalCount= 0;
 
     count++;
     if (count > bound || (prob && equalCount == 2))
@@ -471,6 +477,9 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
   CanonicalForm l= lc (F)*lc(G);
   CanonicalForm resultModP, q (0), newResult, newQ;
   CanonicalForm result;
+  int equalCount= 0;
+  CanonicalForm test, newTest;
+  int count= 0;
   do
   {
     p = cf_getBigPrime( i );
@@ -485,10 +494,13 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
 
     setCharacteristic (p);
 
+    TIMING_START (fac_resultant_p);
     resultModP= resultantFp (mapinto (F), mapinto (G), X, prob);
+    TIMING_END_AND_PRINT (fac_resultant_p, "time to compute resultant mod p: ");
 
     setCharacteristic (0);
 
+    count++;
     if ( q.isZero() )
     {
       result= mapinto(resultModP);
@@ -499,9 +511,17 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
       chineseRemainder( result, q, mapinto (resultModP), p, newResult, newQ );
       q= newQ;
       result= newResult;
-      if (newQ > bound)
+      test= symmetricRemainder (result,q);
+      if (test != newTest)
       {
-        result= symmetricRemainder (result, q);
+        newTest= test;
+        equalCount= 0;
+      }
+      else
+        equalCount++;
+      if (newQ > bound || (prob && equalCount == 2))
+      {
+        result= test;
         break;
       }
     }
