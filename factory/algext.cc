@@ -25,6 +25,7 @@
 #include "algext.h"
 #include "cf_map.h"
 #include "cf_generator.h"
+#include "facMul.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -820,6 +821,32 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       else
         equal= true; // modular image did not add any new information
       TIMING_START (alg_termination)
+#ifdef HAVE_FLINT
+      if (equal && tmp.isUnivariate() && f.isUnivariate() && g.isUnivariate()
+          && f.level() == tmp.level() && tmp.level() == g.level())
+      {
+        CanonicalForm Q, R, sf, sg, stmp;
+        Variable x= Variable (1);
+        sf= swapvar (f, f.mvar(), x);
+        sg= swapvar (g, f.mvar(), x);
+        stmp= swapvar (tmp, f.mvar(), x);
+        newtonDivrem (sf, stmp, Q, R);
+        if (R.isZero())
+        {
+          newtonDivrem (sg, stmp, Q, R);
+          if (R.isZero())
+          {
+            Off (SW_RATIONAL);
+            setReduce (a,true);
+            if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
+            TIMING_END_AND_PRINT (alg_termination,
+                                 "time for successful termination test in alg gcd: ")
+            return tmp*gcdcfcg;
+          }
+        }
+      }
+      else
+#endif
       if(equal && fdivides( tmp, f ) && fdivides( tmp, g )) // trial division
       {
         Off( SW_RATIONAL );
