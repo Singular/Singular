@@ -138,6 +138,7 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   CanonicalForm buf;
   buf= f;
   CanonicalForm factor;
+  int count= 0;
   for (CFFListIterator i= normFactors; i.hasItem(); i++)
   {
     ASSERT (i.getItem().exp() == 1, "norm not squarefree");
@@ -149,6 +150,13 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
     buf /= factor;
     TIMING_END_AND_PRINT (fac_alg_gcd, "time to recover factors: ");
     factors.append (factor);
+    count++;
+    if (normFactors.length() - 1 == count)
+    {
+      factors.append (buf);
+      buf= 1;
+      break;
+    }
   }
   ASSERT (degree (buf) <= 0, "incomplete factorization");
   if (save_rat) Off(SW_RATIONAL);
