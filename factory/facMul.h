@@ -154,6 +154,18 @@ prodMod (const CFList& L, ///< [in] contains multivariate, compressed
                           ///< polynomials
          const CFList& M  ///< [in] contains only powers of Variables
         );
+
+#ifdef HAVE_FLINT
+/// division with remainder of univariate polynomials over Q and Q(a) using
+/// Newton inversion, satisfying F=G*Q+R, deg(R) < deg(G)
+void
+newtonDivrem (const CanonicalForm& F, ///<[in] univariate poly
+              const CanonicalForm& G, ///<[in] univariate poly
+              CanonicalForm& Q,       ///<[in, out] quotient
+              CanonicalForm& R        ///<[in, out] remainder
+             );
+#endif
+
 #endif
 /* FAC_MUL_H */
 
