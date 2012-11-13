@@ -2911,7 +2911,6 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
   if (!nIsOne(pGetCoeff(h)))
   {
     int j;
-    BOOLEAN new_pair=FALSE;
 
     for (j=0; j<=k; j++)
     {
@@ -2920,10 +2919,7 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
 //         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
       if ( iCompH == pGetComp(strat->S[j]) )
       {
-        {
-          if (enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR))
-            new_pair=TRUE;
-        }
+        enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR);
       }
     }
   }
