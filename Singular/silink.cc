@@ -893,7 +893,7 @@ void slStandardInit()
   si_link_root=(si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
   si_link_root->Open=slOpenAscii;
   si_link_root->Close=slCloseAscii;
-  si_link_root->Kill=slCloseAscii;
+  si_link_root->Kill=NULL;
   si_link_root->Read=slReadAscii;
   si_link_root->Read2=slReadAscii2;
   si_link_root->Write=slWriteAscii;

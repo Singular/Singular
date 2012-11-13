@@ -29,7 +29,7 @@ si_link_extension slInitMPFileExtension(si_link_extension s)
   mpsr_Init();
   s->Open=slOpenMPFile;
   s->Close=slCloseMP;
-  s->Kill=slCloseMP;
+  s->Kill=NULL;
   s->Read=slReadMP;
   s->Dump=slDumpMP;
   s->GetDump=slGetDumpMP;

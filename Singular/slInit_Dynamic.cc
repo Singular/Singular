@@ -52,13 +52,13 @@ si_link_extension slInitMPFileExtension(si_link_extension s)
 
   s->Open = (slOpenProc) dynl_sym_warn(handle, "slOpenMPFile");
   s->Close = (slCloseProc) dynl_sym_warn(handle, "slCloseMP");
-  s->Kill = (slKillProc) s->Close;
+  s->Kill = NULL;
   s->Read = (slReadProc) dynl_sym_warn(handle, "slReadMP");
   s->Dump = (slDumpProc) dynl_sym_warn(handle, "slDumpMP");
   s->GetDump = (slGetDumpProc) dynl_sym_warn(handle, "slGetDumpMP");
   s->Write = (slWriteProc) dynl_sym_warn(handle, "slWriteMP");
   s->Status = (slStatusProc) dynl_sym_warn(handle, "slStatusMP");
-  if (s->Open == NULL || s->Close == NULL || s->Kill == NULL ||
+  if (s->Open == NULL || s->Close == NULL || 
       s->Read == NULL || s->Dump == NULL || s->GetDump == NULL ||
       s->Write == NULL || s->Status == NULL)
     return NULL;
@@ -120,12 +120,12 @@ si_link_extension slInitDBMExtension(si_link_extension s)
 
   s->Open=(slOpenProc)dynl_sym_warn(handle, "dbOpen");
   s->Close=(slCloseProc)dynl_sym_warn(handle, "dbClose");
-  s->Kill=(slKillProc)dynl_sym_warn(handle, "dbClose");
+  s->Kill=NULL;
   s->Read=(slReadProc)dynl_sym_warn(handle, "dbRead1");
   s->Read2=(slRead2Proc)dynl_sym_warn(handle, "dbRead2");
   s->Write=(slWriteProc)dynl_sym_warn(handle, "dbWrite");
 
-  if (s->Open == NULL || s->Close == NULL || s->Kill == NULL ||
+  if (s->Open == NULL || s->Close == NULL || 
       s->Read == NULL || s->Read2 == NULL)
     return NULL;
 
