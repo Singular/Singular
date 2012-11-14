@@ -34,6 +34,7 @@ TIMING_DEFINE_PRINT(fac_alg_factor_norm)
 TIMING_DEFINE_PRINT(fac_alg_gcd)
 TIMING_DEFINE_PRINT(fac_alg_sqrf)
 TIMING_DEFINE_PRINT(fac_alg_factor_sqrf)
+TIMING_DEFINE_PRINT(fac_alg_time_shift)
 
 // squarefree part of F
 CanonicalForm
@@ -125,7 +126,11 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   TIMING_END_AND_PRINT (fac_alg_norm, "time to compute sqrf norm: ");
   ASSERT (degree (norm, alpha) <= 0, "wrong norm computed");
   TIMING_START (fac_alg_factor_norm);
+  bool save_sort= !isOn (SW_USE_NTL_SORT);
+  On (SW_USE_NTL_SORT);
   CFFList normFactors= factorize (norm);
+  if (save_sort)
+    Off (SW_USE_NTL_SORT);
   TIMING_END_AND_PRINT (fac_alg_factor_norm, "time to factor norm: ");
   CFList factors;
   if (normFactors.length() <= 2)
@@ -135,25 +140,51 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   }
 
   normFactors.removeFirst();
+  CFFListIterator i= normFactors;
   CanonicalForm buf;
-  buf= f;
+  bool shiftBuf= false;
+  if (!(normFactors.length() == 2 && degree (i.getItem().factor()) <= degree (f)))
+  {
+    TIMING_START (fac_alg_time_shift);
+    if (shift != 0)
+      buf= f (f.mvar() - shift*alpha, f.mvar());
+    else
+      buf= f;
+    shiftBuf= true;
+    TIMING_END_AND_PRINT (fac_alg_time_shift, "time to shift: ");
+  }
+  else
+    buf= f;
   CanonicalForm factor;
   int count= 0;
-  for (CFFListIterator i= normFactors; i.hasItem(); i++)
+  for (; i.hasItem(); i++)
   {
     ASSERT (i.getItem().exp() == 1, "norm not squarefree");
     TIMING_START (fac_alg_gcd);
-    if (shift == 0)
+    if (shiftBuf)
       factor= gcd (buf, i.getItem().factor());
     else
-      factor= gcd (buf, i.getItem().factor() (f.mvar() + shift*alpha, f.mvar()));
+    {
+      if (shift == 0)
+        factor= gcd (buf, i.getItem().factor());
+      else
+        factor= gcd (buf, i.getItem().factor() (f.mvar() + shift*alpha, f.mvar()));
+    }
     buf /= factor;
+    if (shiftBuf)
+    {
+      if (shift != 0)
+        factor= factor (f.mvar() + shift*alpha, f.mvar());
+    }
     TIMING_END_AND_PRINT (fac_alg_gcd, "time to recover factors: ");
     factors.append (factor);
     count++;
     if (normFactors.length() - 1 == count)
     {
-      factors.append (buf);
+      if (shiftBuf)
+        factors.append (buf (f.mvar() + shift*alpha, f.mvar()));
+      else
+        factors.append (buf);
       buf= 1;
       break;
     }
