@@ -656,8 +656,10 @@ select( const ListCFList & ppi, int length, ListCFList & ppi1, ListCFList & ppi2
   {
     elem = i.getItem();
     if ( ! elem.isEmpty() )
+    {
       if ( length <= elem.length() ){ ppi2.append(elem); }
       else { ppi1.append(elem); }
+    }
   }
 }
 
