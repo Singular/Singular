@@ -1936,8 +1936,7 @@ CFList conv (const CFArray & A)
 }
 
 
-void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval,
-                       const CFList& uniFactors, const CFList& evaluation
+void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval
                       )
 {
   CFListIterator iter;
@@ -2561,7 +2560,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   for (int i= 0; i < lengthAeval2; i++)
     oldAeval[i]= Aeval2[i];
 
-  getLeadingCoeffs (A, Aeval2, uniFactors, evaluation);
+  getLeadingCoeffs (A, Aeval2);
 
   CFList biFactorsLCs;
   for (CFListIterator i= biFactors; i.hasItem(); i++)
