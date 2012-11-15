@@ -42,6 +42,7 @@ myminus( const CFFList & Inputlist, const CFFactor & TheFactor){
   return Outputlist;
 }
 
+/* unused functions:
 static CFFList
 myDifference(const CFFList & Inputlist1,const CFFList & Inputlist2){
   CFFList Outputlist=Inputlist1;
@@ -64,7 +65,7 @@ isquasilinear( const CFList & as ){
       if ( degree(i.getItem()) > 1 ) return 0;
   }
 return 1;
-}
+}*/
 
 #ifdef CHARSETNADEBUG
 #  define DEBUGOUTPUT
