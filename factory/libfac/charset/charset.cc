@@ -514,7 +514,7 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
     //    else{ as.append(elem) ; }
   }
   //  CERR << "ind= " << ind << "\n";
-  if ( (ind == 1) ) //&& ( as.length() > 1) )
+  if ( ind == 1 ) //&& ( as.length() > 1) )
   {
     if ( irreducible(AS) )
     { // as quasilinear? => irreducible!
