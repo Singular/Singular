@@ -1585,7 +1585,7 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   }
   else
   {
-    memcpy(res,sl,sizeof(sleftv));
+    memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
   }
   iiRETURNEXPR.Init();
   return FALSE;
