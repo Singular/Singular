@@ -365,7 +365,6 @@ CanonicalForm firstLC(const CanonicalForm & f);
 static CanonicalForm trycontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm tryvcontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, bool & fail );
-static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, CanonicalForm & result, bool & divides, bool & fail );
 
 static inline CanonicalForm
 tryNewtonInterp (const CanonicalForm alpha, const CanonicalForm u,
@@ -1043,58 +1042,6 @@ static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalFor
     return result;
   }
   return abs( f );
-}
-
-
-static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, CanonicalForm & result, bool & divides, bool & fail )
-{ // M "univariate" monic polynomial
-  // f, g polynomials with coeffs modulo M.
-  // if f is divisible by g, 'divides' is set to 1 and 'result' == f/g mod M coefficientwise.
-  // 'fail' is set to 1, iff a zero divisor is encountered.
-  // divides==1 implies fail==0
-  // required: getReduce(M.mvar())==0
-  if(g.inBaseDomain())
-  {
-    result = f/g;
-    divides = true;
-    return;
-  }
-  if(g.inCoeffDomain())
-  {
-    tryInvert(g,M,result,fail);
-    if(fail)
-      return;
-    result = reduce(f*result, M);
-    divides = true;
-    return;
-  }
-  // here: g NOT inCoeffDomain
-  Variable x = g.mvar();
-  if(f.degree(x) < g.degree(x))
-  {
-    divides = false;
-    return;
-  }
-  // here: f.degree(x) > 0 and f.degree(x) >= g.degree(x)
-  CanonicalForm F = f;
-  CanonicalForm q, leadG = LC(g);
-  result = 0;
-  while(!F.isZero())
-  {
-    tryDivide(F.LC(x),leadG,M,q,divides,fail);
-    if(fail || !divides)
-      return;
-    if(F.degree(x)<g.degree(x))
-    {
-      divides = false;
-      return;
-    }
-    q *= power(x,F.degree(x)-g.degree(x));
-    result += q;
-    F = reduce(F-q*g, M);
-  }
-  result = reduce(result, M);
-  divides = true;
 }
 
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
