@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
+/*static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";*/
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 
