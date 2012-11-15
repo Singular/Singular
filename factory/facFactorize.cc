@@ -399,7 +399,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   for (int i= 0; i < lengthAeval2; i++)
     oldAeval[i]= Aeval2[i];
 
-  getLeadingCoeffs (A, Aeval2, uniFactors, evaluation);
+  getLeadingCoeffs (A, Aeval2);
 
   CFList biFactorsLCs;
   for (CFListIterator i= biFactors; i.hasItem(); i++)
