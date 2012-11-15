@@ -462,10 +462,10 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 }
 //}}}
 
-//{{{ static CanonicalForm balance ( const CanonicalForm & f, const CanonicalForm & q )
+//{{{ static CanonicalForm balance_p ( const CanonicalForm & f, const CanonicalForm & q )
 //{{{ docu
 //
-// balance() - map f from positive to symmetric representation
+// balance_p() - map f from positive to symmetric representation
 //   mod q.
 //
 // This makes sense for univariate polynomials over Z only.
@@ -475,6 +475,29 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 //
 //}}}
 static CanonicalForm
+balance_p ( const CanonicalForm & f, const CanonicalForm & q )
+{
+    Variable x = f.mvar();
+    CanonicalForm result = 0, qh = q / 2;
+    CanonicalForm c;
+    CFIterator i;
+    for ( i = f; i.hasTerms(); i++ )
+    {
+        c = i.coeff();
+        if ( c.inCoeffDomain())
+        {
+          if ( c > qh )
+            result += power( x, i.exp() ) * (c - q);
+          else
+            result += power( x, i.exp() ) * c;
+        }
+        else
+          result += power( x, i.exp() ) * balance_p(c,q);
+    }
+    return result;
+}
+
+/*static CanonicalForm
 balance ( const CanonicalForm & f, const CanonicalForm & q )
 {
     Variable x = f.mvar();
@@ -489,7 +512,7 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
             result += power( x, i.exp() ) * c;
     }
     return result;
-}
+}*/
 //}}}
 
 static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
@@ -565,7 +588,7 @@ static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalF
     if ( i >= 0 )
     {
       // now balance D mod q
-      D = pp( balance( D, q ) );
+      D = pp( balance_p( D, q ) );
       if ( fdivides( D, f ) && fdivides( D, g ) )
         return D * c;
       else
@@ -1203,30 +1226,6 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
     delete [] degsf;
     delete [] degsg;
 }*/
-
-
-static CanonicalForm
-balance_p ( const CanonicalForm & f, const CanonicalForm & q )
-{
-    Variable x = f.mvar();
-    CanonicalForm result = 0, qh = q / 2;
-    CanonicalForm c;
-    CFIterator i;
-    for ( i = f; i.hasTerms(); i++ )
-    {
-        c = i.coeff();
-        if ( c.inCoeffDomain())
-        {
-          if ( c > qh )
-            result += power( x, i.exp() ) * (c - q);
-          else
-            result += power( x, i.exp() ) * c;
-        }
-        else
-          result += power( x, i.exp() ) * balance_p(c,q);
-    }
-    return result;
-}
 
 TIMING_DEFINE_PRINT(chinrem_termination)
 TIMING_DEFINE_PRINT(chinrem_recursion)
