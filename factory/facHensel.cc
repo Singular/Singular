@@ -27,6 +27,7 @@
 #include "cf_algorithm.h"
 #include "cf_primes.h"
 #include "facBivar.h"
+#include "facNTLzzpEXGCD.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
@@ -97,19 +98,43 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
     i++;
   buf1= bufFactors.getFirst();
   buf2= i.getItem();
+#ifdef HAVE_NTL
+  Variable x= Variable (1);
+  zz_p::init (getCharacteristic());
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
+  zz_pE::init (NTLMipo);
+  zz_pEX NTLbuf1, NTLbuf2, NTLbuf3, NTLS, NTLT;
+  NTLbuf1= convertFacCF2NTLzz_pEX (buf1, NTLMipo);
+  NTLbuf2= convertFacCF2NTLzz_pEX (buf2, NTLMipo);
+  tryNTLXGCD (NTLbuf3, NTLS, NTLT, NTLbuf1, NTLbuf2, fail);
+  if (fail)
+    return;
+  S= convertNTLzz_pEX2CF (NTLS, x, M.mvar());
+  T= convertNTLzz_pEX2CF (NTLT, x, M.mvar());
+#else
   tryExtgcd (buf1, buf2, M, buf3, S, T, fail);
   if (fail)
     return;
+#endif
   result.append (S);
   result.append (T);
   if (i.hasItem())
     i++;
   for (; i.hasItem(); i++)
   {
+#ifdef HAVE_NTL
+    NTLbuf1= convertFacCF2NTLzz_pEX (i.getItem(), NTLMipo);
+    tryNTLXGCD (NTLbuf3, NTLS, NTLT, NTLbuf3, NTLbuf1, fail);
+    if (fail)
+      return;
+    S= convertNTLzz_pEX2CF (NTLS, x, M.mvar());
+    T= convertNTLzz_pEX2CF (NTLT, x, M.mvar());
+#else
     buf1= i.getItem();
     tryExtgcd (buf3, buf1, M, buf3, S, T, fail);
     if (fail)
       return;
+#endif
     CFListIterator k= factors;
     for (CFListIterator j= result; j.hasItem(); j++, k++)
     {
