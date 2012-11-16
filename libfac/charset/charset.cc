@@ -235,6 +235,7 @@ contract( const ListCFList & cs){
         jitem=j.getItem();
         if ( ! same( iitem, jitem ) )
           if ( ! member(jitem, mem))
+          {
             if ( contractsub(iitem, jitem) ){
               ts.append(jitem); mem.append(jitem);
             }
@@ -242,6 +243,7 @@ contract( const ListCFList & cs){
               if ( contractsub(jitem, iitem) ){
                 ts.append(iitem);
               }
+          }
       }
   }
   return Minus(cs,ts);
