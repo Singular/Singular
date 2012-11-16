@@ -26,6 +26,7 @@
 #include "cf_map.h"
 #include "cf_generator.h"
 #include "facMul.h"
+#include "facNTLzzpEXGCD.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -462,13 +463,32 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   if(g.level() > mv)
     mv = g.level();
   // here: mv is level of the largest variable in f, g
+  Variable v1= Variable (1);
+#ifdef HAVE_NTL
+  Variable v= M.mvar();
+  zz_p::init (getCharacteristic());
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
+  zz_pE::init (NTLMipo);
+  zz_pEX NTLResult;
+  zz_pEX NTLF;
+  zz_pEX NTLG;
+#endif
   if(mv == 1) // f,g univariate
   {
     TIMING_START (alg_euclid_p)
+#ifdef HAVE_NTL
+    NTLF= convertFacCF2NTLzz_pEX (f, NTLMipo);
+    NTLG= convertFacCF2NTLzz_pEX (g, NTLMipo);
+    tryNTLGCD (NTLResult, NTLF, NTLG, fail);
+    if (fail)
+      return;
+    result= convertNTLzz_pEX2CF (NTLResult, f.mvar(), v);
+#else
     tryEuclid(f,g,M,result,fail);
-    TIMING_END_AND_PRINT (alg_euclid_p, "time for euclidean alg mod p: ")
     if(fail)
       return;
+#endif
+    TIMING_END_AND_PRINT (alg_euclid_p, "time for euclidean alg mod p: ")
     result= NN (reduce (result, M)); // do not forget to map back
     return;
   }
@@ -481,9 +501,18 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   if(fail)
     return;
   CanonicalForm c;
+#ifdef HAVE_NTL
+  NTLF= convertFacCF2NTLzz_pEX (cf, NTLMipo);
+  NTLG= convertFacCF2NTLzz_pEX (cg, NTLMipo);
+  tryNTLGCD (NTLResult, NTLF, NTLG, fail);
+  if (fail)
+    return;
+  c= convertNTLzz_pEX2CF (NTLResult, v1, v);
+#else
   tryEuclid(cf,cg,M,c,fail);
   if(fail)
     return;
+#endif
   // f /= cf
   f.tryDiv (cf, M, fail);
   if(fail)
@@ -517,10 +546,19 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   N = leadDeg(g, N);
   CanonicalForm gamma;
   TIMING_START (alg_euclid_p)
+#ifdef HAVE_NTL
+  NTLF= convertFacCF2NTLzz_pEX (firstLC (f), NTLMipo);
+  NTLG= convertFacCF2NTLzz_pEX (firstLC (g), NTLMipo);
+  tryNTLGCD (NTLResult, NTLF, NTLG, fail);
+  if (fail)
+    return;
+  gamma= convertNTLzz_pEX2CF (NTLResult, v1, v);
+#else
   tryEuclid( firstLC(f), firstLC(g), M, gamma, fail );
-  TIMING_END_AND_PRINT (alg_euclid_p, "time for gcd of lcs in alg mod p: ")
   if(fail)
     return;
+#endif
+  TIMING_END_AND_PRINT (alg_euclid_p, "time for gcd of lcs in alg mod p: ")
   for(int i=2; i<=mv; i++) // entries at i=0,1 not visited
     if(N[i] < L[i])
       L[i] = N[i];
