@@ -2349,6 +2349,14 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
     }
   }
   delete [] A;
+  if (!wasInBounds)
+  {
+    if (start)
+      henselLiftResume12 (F, factors, start, degree (F) + 1, Pi, diophant, M);
+    else
+      henselLift12 (F, factors, degree (F) + 1, Pi, diophant, M);
+    factors.insert (LCF);
+  }
   return l;
 }
 
@@ -2471,6 +2479,14 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
     }
   }
   delete [] A;
+  if (!wasInBounds)
+  {
+    if (start)
+      henselLiftResume12 (F, factors, start, degree (F) + 1, Pi, diophant, M);
+    else
+      henselLift12 (F, factors, degree (F) + 1, Pi, diophant, M);
+    factors.insert (LCF);
+  }
   return l;
 }
 #endif
@@ -2651,6 +2667,14 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     }
   }
   delete [] A;
+  if (!wasInBounds)
+  {
+    if (start)
+      henselLiftResume12 (F, factors, start, degree (F) + 1, Pi, diophant, M);
+    else
+      henselLift12 (F, factors, degree (F) + 1, Pi, diophant, M);
+    factors.insert (LCF);
+  }
   return l;
 }
 
@@ -2850,6 +2874,14 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     }
   }
   delete [] A;
+  if (!wasInBounds)
+  {
+    if (start)
+      henselLiftResume12 (F, factors, start, degree (F) + 1, Pi, diophant, M);
+    else
+      henselLift12 (F, factors, degree (F) + 1, Pi, diophant, M);
+    factors.insert (LCF);
+  }
   return l;
 }
 #endif*/
@@ -2969,6 +3001,14 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     }
   }
   delete [] A;
+  if (!wasInBounds)
+  {
+    if (start)
+      henselLiftResume12 (F, factors, start, degree (F) + 1, Pi, diophant, M);
+    else
+      henselLift12 (F, factors, degree (F) + 1, Pi, diophant, M);
+    factors.insert (LCF);
+  }
   return l;
 }
 
@@ -3136,6 +3176,14 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
     }
   }
   delete [] A;
+  if (!wasInBounds)
+  {
+    if (start)
+      henselLiftResume12 (F, factors, start, degree (F) + 1, Pi, diophant, M);
+    else
+      henselLift12 (F, factors, degree (F) + 1, Pi, diophant, M);
+    factors.insert (LCF);
+  }
   return l;
 }
 
@@ -6269,7 +6317,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     delete [] bounds;
     return Union (smallFactors,
                   factorRecombination (bufUniFactors, F,
-                                       power (y, degree (F) + 1 + degree (LCF)),
+                                       power (y, degree (F) + 1),
                                        degs, 1, bufUniFactors.length()/2
                                       )
                  );
