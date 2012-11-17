@@ -937,14 +937,35 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
   gfan::ZMatrix newEquations = equations; 
   newEquations.appendRow(inequalities[0]);
 
-  gfan::ZCone* eta = new gfan::ZCone(newInequalities,newEquations,3);
+  gfan::ZCone* eta = new gfan::ZCone(newInequalities,newEquations);
+  eta->canonicalize();
+  gfan::ZVector* v = new gfan::ZVector(eta->getRelativeInteriorPoint());
+  gfan::ZVector* w = new gfan::ZVector(inequalities[0]);
 
-  gfan::ZVector v = eta->getRelativeInteriorPoint();
-  if (bound.containsRelatively(v))
-  {    
+  if (bound.containsRelatively(*v))
+  {
+    // std::cout << "interior facet: " << std::endl;
+    // std::cout << eta->getInequalities() << std::endl;
+    // std::cout << eta->getEquations() << std::endl;
     index++;
-    L->m[index].rtyp = coneID; 
-    L->m[index].data = (void*) eta;
+    lists l = (lists) omAllocBin(slists_bin);
+    l->Init(3);
+    l->m[0].rtyp = coneID; 
+    l->m[0].data = (void*) eta;
+    l->m[1].rtyp = coneID; 
+    l->m[1].data = (void*) v;
+    l->m[2].rtyp = coneID; 
+    l->m[2].data = (void*) w;
+    // std::cout << "storing interiorPoint: " << *v << std::endl;
+    L->m[index].rtyp = LIST_CMD; 
+    L->m[index].data = (void*) l;
+    // l->nr = -1; l->m = NULL;
+    eta = NULL;
+    v = NULL;
+  }
+  else
+  {
+    delete eta, v;
   }
   
   /* these are the cases i=1,...,r-2 */
@@ -954,14 +975,36 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
     newInequalities.append(inequalities.submatrix(i+1,0,r,c));
     newEquations = equations;
     newEquations.appendRow(inequalities[i]);
-    eta = new gfan::ZCone(newInequalities,newEquations,3);
-
-    v = eta->getRelativeInteriorPoint();
-    if (bound.containsRelatively(v))
+    eta = new gfan::ZCone(newInequalities,newEquations);
+    eta->canonicalize();
+    v = new gfan::ZVector(eta->getRelativeInteriorPoint());
+    // v = new gfan::ZVector(eta->getUniquePoint());
+    w = new gfan::ZVector(inequalities[i]);
+    if (bound.containsRelatively(*v))
     {    
+      // std::cout << "contained in relative interior" << std::endl;
+      // std::cout << "interior facet: " << std::endl;
+      // std::cout << eta->getInequalities() << std::endl;
+      // std::cout << eta->getEquations() << std::endl;
       index++;
-      L->m[index].rtyp = coneID; 
-      L->m[index].data = (void*) eta;
+      lists l = (lists) omAllocBin(slists_bin);
+      l->Init(3);
+      l->m[0].rtyp = coneID; 
+      l->m[0].data = (void*) eta;
+      l->m[1].rtyp = coneID; 
+      l->m[1].data = (void*) v;
+      l->m[2].rtyp = coneID; 
+      l->m[2].data = (void*) w;
+      // std::cout << "storing interiorPoint: " << *v << std::endl;
+      L->m[index].rtyp = LIST_CMD; 
+      L->m[index].data = (void*) l;
+      // l->nr = -1; l->m = NULL;
+      eta = NULL;
+      v = NULL;
+    }
+    else
+    {
+      delete eta, v, w;
     }
   }
   
@@ -969,76 +1012,298 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
   newInequalities = inequalities.submatrix(0,0,r-1,c);
   newEquations = equations;
   newEquations.appendRow(inequalities[r-1]);
-  eta = new gfan::ZCone(newInequalities,newEquations,3);
+  eta = new gfan::ZCone(newInequalities,newEquations);
+  eta->canonicalize();
 
-  v = eta->getRelativeInteriorPoint();
-  if (bound.containsRelatively(v))
+  v = new gfan::ZVector(eta->getRelativeInteriorPoint());
+  // v = new gfan::ZVector(eta->getUniquePoint());
+  w = new gfan::ZVector(inequalities[r-1]);
+  if (bound.containsRelatively(*v))
   {    
+    // std::cout << "interior facet: " << std::endl;
+    // std::cout << eta->getInequalities() << std::endl;
+    // std::cout << eta->getEquations() << std::endl;
+    // std::cout << "contained in relative interior" << std::endl;
     index++;
-    L->m[index].rtyp = coneID; 
-    L->m[index].data = (void*) eta;
+    lists l = (lists) omAllocBin(slists_bin);
+    l->Init(3);
+    l->m[0].rtyp = coneID; 
+    l->m[0].data = (void*) eta;
+    l->m[1].rtyp = coneID; 
+    l->m[1].data = (void*) v;
+    l->m[2].rtyp = coneID; 
+    l->m[2].data = (void*) w;
+    // std::cout << "storing interiorPoint: " << *v << std::endl;
+    L->m[index].rtyp = LIST_CMD; 
+    L->m[index].data = (void*) l;
+    // l->nr = -1; l->m = NULL;
+    eta = NULL;
+    v = NULL;
+  }
+  else
+  {
+    delete eta, v;
   }
 
   if (index==-1)
   {
-    L->m[0].rtyp = INT_CMD;
-    L->m[0].data = (void*) (int) 0;
+    L->m[0].rtyp = INT_CMD;         // when there are no interior facets
+    L->m[0].data = (void*) (int) 0; // we just write an integer as zeroth entry
     return L;
   }
   if (index!=L->nr)
   {
-    L->m=(leftv)omRealloc(L->m,(index+1)*sizeof(sleftv));
-    L->nr=index;
+    L->m = (leftv)omRealloc(L->m,(index+1)*sizeof(sleftv));
+    L->nr = index;
   }
   return L;
 }
 
 /***
- * delete last entry of ul and append all entries of vl
+ * delete the i-th entry of ul
  **/
-static lists deleteLastAndConcatLists(lists ul, lists vl)
+static void deleteEntry(lists ul, int i)
+{
+  lists cache = (lists) ul->m[i].Data();
+  gfan::ZVector* v = (gfan::ZVector*) cache->m[1].Data();
+  delete v;
+  cache->m[1].rtyp = 0;
+  cache->m[1].data = NULL;
+  gfan::ZVector* w = (gfan::ZVector*) cache->m[2].Data();
+  delete w;
+  cache->m[2].rtyp = 0;
+  cache->m[2].data = NULL;
+  cache->nr = 0;
+  cache = NULL;
+
+  ul->m[i].CleanUp();
+}
+
+static void swap(intvec* v, int i, int j)
+{
+  int k = (*v)[j];
+  (*v)[j] = (*v)[i];
+  (*v)[i] = k;
+}
+
+static void gnomeSort(intvec* v)
+{
+  int i=1;
+  while (i<v->length())
+  {
+    if ((*v)[i-1] <= (*v)[i])
+      ++i;
+    else
+    {
+      swap(v,i-1,i);
+ 
+      if (i > 1)
+        --i;
+    }
+  }
+}
+
+static int findLastUsableEntry(lists ul, int start)
+{
+  int i = start;
+  while (ul->m[i].data == NULL)
+  {
+    --i;
+  }
+  return i;
+}
+
+/***
+ * Here, ul and vl ar lists of lists of facets and their relative interior point.
+ * The list ul might be empty sometimes, however vl always contains at least one element.
+ * This functions appends vl to ul with the following constraint:
+ * Should a facet in vl already exist in ul, then both are to be deleted.
+ * The merged list will be stored in ul.
+ **/
+static void mergeListsOfFacets(lists ul, lists vl)
 {
   int ur = ul->nr;
   int vr = vl->nr;
+  // std::cout << "ul->nr: " << ur << std::endl;
+  // std::cout << "vl->nr: " << vr << std::endl;
 
-  lists l = (lists) omAllocBin(slists_bin);
-  l->Init(ur+vr+1);
-  
-  if (ur > 0)
+  /***
+   * First we cover the trivial cases with ul being empty
+   * Here we can delete ul entirely and make it point to the content of vl
+   * vl can be set to MULL.
+   **/
+  if (ur == -1)
   {
-    for(int i=0; i<ur; i++)
-    {
-      l->m[i].rtyp=ul->m[i].rtyp;
-      l->m[i].data=ul->m[i].data;
-    }
-    for(int i=0; i<=vr; i++)
-    {
-      l->m[i+ur].rtyp=vl->m[i].rtyp;
-      l->m[i+ur].data=vl->m[i].data;
-    }
-    if (ul->m != NULL)
-    {
-      ul->m[ur].CleanUp();
-      omFreeSize((ADDRESS)ul->m,(ur+1)*sizeof(sleftv));
-    }
-    omFreeBin((ADDRESS)ul, slists_bin);
-    if (vl->m != NULL)
-      omFreeSize((ADDRESS)vl->m,(vr+1)*sizeof(sleftv));
-    omFreeBin((ADDRESS)vl, slists_bin);
+    ul->Clean();
+    ul = vl;
+    vl = NULL;
   }
   else
   {
-    for(int i=0; i<=vr; i++)
+    /***
+     * We will know go through all vectors q in vl and compare them to all vectors p in ul.
+     * If p and q coincide, we will delete q and p right away.
+     * If q does not coincide with any p, we will mark it as to be preserved.
+     * Two intvecs will keep track of entries in ul that have been deleted 
+     * and all entries of vl that must be preserved.
+     * countUl and countVl keep track of the number of elements to be deleted or preserved.
+     * The reason why we count j up and i down is because the first entry of vl
+     * tends to be equal the last entry of ul, due to the way vl and ul are created.
+     **/ 
+    intvec* entriesOfUlToBeFilled = new intvec(vr+1);
+    intvec* entriesOfVlToBePreserved = new intvec(vr+1);
+    int countUl = 0;
+    int countVl = 0;
+
+    gfan::ZVector* q = NULL;
+    gfan::ZVector* p = NULL;
+    bool toBePreserved = 1;
+    lists cache0;
+    lists cache1;
+    for (int j=0; j<=vr; j++)
     {
-      l->m[i].rtyp=vl->m[i].rtyp;
-      l->m[i].data=vl->m[i].data;
+      toBePreserved = 1;
+      cache0 = (lists) vl->m[j].Data();
+      q = (gfan::ZVector*) cache0->m[1].Data();
+      // std::cout << "checking for: " << *q << std::endl;
+      for (int i=ur; i>=0; i--)
+      {
+        if (ul->m[i].data != NULL) // in case that entry of ul was deleted earlier
+        {
+          cache1 = (lists) ul->m[i].Data();
+          p = (gfan::ZVector*) cache1->m[1].Data();
+          // std::cout << "checking: " << *p << std::endl;
+          if ((*q) == (*p))
+          {
+            // std::cout << "                          duplicate: " << *q << std::endl;
+            // std::cout << "deleting vl entry " << j << " and ul entry " << i << std::endl;
+            deleteEntry(vl,j);
+            deleteEntry(ul,i);
+            // std::cout << "writing index " << i << " in entry " << countUl << " of toBeFilled" 
+            //           << std::endl;
+            (*entriesOfUlToBeFilled)[countUl] = i;
+            countUl++; 
+            toBePreserved = 0; 
+            break;
+          }
+          cache1 = NULL;
+        }
+      }
+      if (toBePreserved)
+      {
+        // std::cout << "new facet: " << *q << std::endl;
+        // std::cout << "preserving vl entry " << j << std::endl;
+        (*entriesOfVlToBePreserved)[countVl] = j;
+        countVl++;
+      }
+      cache0 = NULL;
     }
-    ul->Clean();
-    if (vl->m != NULL)
-      omFreeSize((ADDRESS)vl->m,(vr+1)*sizeof(sleftv));
-    omFreeBin((ADDRESS)vl, slists_bin);
+ 
+    /***
+     * In case the resulting merged list is empty,
+     * we are finished now.
+     **/
+    if (ur+1-countUl+countVl == 0)
+    {
+      vl->nr = -1;
+      vl->Clean();
+      ul->nr = -1;
+      ul->Clean();
+      ul = NULL;
+      return;
+    }
+
+    /***
+     * We fill the holes in ul, the algorithm works as follows:
+     * - repeat the following until it breaks or all holes are fixed:
+     *   - determine the first empty entry to be filled
+     *   - determine the last usable entry
+     *   - if firstEmptyEntry < lastUsableEntry, fill
+     *   - else break
+     * (If it breaks that means that the remaining empty slots need not to be filled)
+     * Note that entriesOfUlToBeFilled is unordered.
+     **/
+    entriesOfUlToBeFilled->resize(countUl);
+    gnomeSort(entriesOfUlToBeFilled);
+    int i = 0;
+    int firstEmptyEntry = (*entriesOfUlToBeFilled)[i];
+    int lastUsableEntry = findLastUsableEntry(ul,ur); 
+    while (1)
+    {
+      if (firstEmptyEntry < lastUsableEntry)
+      {
+        // std::cout << "filling ul entry " << firstEmptyEntry << " with ul entry " << lastUsableEntry 
+        //           << std::endl;
+        ul->m[firstEmptyEntry] = ul->m[lastUsableEntry];
+        ul->m[lastUsableEntry].rtyp = 0;
+        ul->m[lastUsableEntry].data = NULL; 
+        lastUsableEntry = findLastUsableEntry(ul,lastUsableEntry);
+      }
+      else
+        break;
+
+      if (i < countUl-1)
+      {
+        ++i; firstEmptyEntry = (*entriesOfUlToBeFilled)[i];
+      }
+      else
+        break;
+    }
+ 
+    /***
+     * We resize ul accordingly
+     * and append the to be preserved entries of vl to it.
+     **/
+    int k;
+    // std::cout << "resizing ul to: " << ur+1-countUl+countVl << std::endl;
+    ul->m = (leftv) omRealloc0(ul->m, (ur+1-countUl+countVl)*sizeof(sleftv));  
+    ul->nr = ur-countUl+countVl;
+    for (int j=0; j<countVl; j++)
+    {
+      k = (*entriesOfVlToBePreserved)[j];
+      // std::cout << "writing vl entry " << k << " into ul entry: " << lastUsableEntry+j+1 << std::endl;
+      ul->m[lastUsableEntry+j+1] = vl->m[k];
+      vl->m[k].rtyp = 0;
+      vl->m[k].data = NULL;
+
+      // cache0 = (lists) ul->m[lastEntry+1].Data();
+      // gfan::ZCone* eta = (gfan::ZVector*) cache0->m[0].Data();
+      // std::cout << "new facet: " << std::endl;
+      // std::cout << eta->getInequalities() << std::endl;
+    }
+
+    /***
+     * Now we delete of vl which is empty by now,
+     * because its elements have either been deleted or moved to ul.
+     **/
+    vl->nr = -1;
+    vl->Clean();
+    
+    delete entriesOfUlToBeFilled, entriesOfVlToBePreserved;
   }
-  return l; 
+}
+
+/***
+ * delete last entry of ul
+ **/
+static void deleteLast(lists ul)
+{
+  int ur = ul->nr;
+  
+  lists cache = (lists) ul->m[ur].Data();
+  gfan::ZVector* v = (gfan::ZVector*) cache->m[1].Data();
+  delete v;
+  cache->m[1].rtyp = 0;
+  cache->m[1].data = NULL;
+  cache->nr = 0;
+  cache = NULL;
+
+  ul->m[ur].CleanUp();
+  ul->nr = ur-1;
+  if (ur > 0)
+    ul->m = (leftv) omRealloc(ul->m, ur*sizeof(sleftv));
+  else
+    ul->m = NULL;
 }
 
 BOOLEAN refineCones(leftv res, leftv args)
@@ -1056,89 +1321,107 @@ BOOLEAN refineCones(leftv res, leftv args)
       gfan::ZCone support = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
       delete zm;
 
-      // randomly compute a first full-dimensional cone
+      /***
+       * Randomly compute a first full-dimensional cone and insert it into the fan.
+       * Compute a list of facets and relative interior points.
+       * The relative interior points are unique, assuming the cone is stored in canonical form,
+       * which is the case in our algorithm, as we supply no redundant inequalities.
+       * Hence we can decide whether a facet need to be traversed by crosschecking
+       * its relative interior point with this list.
+       **/
       gfan::ZCone lambda; gfan::ZVector point;
+      // std::cout << "starting to compute initial cone!" << std::endl;
       do
       {
+        // std::cout << "computing randomPoint!" << std::endl;
         point = randomPoint(support);
+        // std::cout << "randomPoint: " << point << std::endl;
+        // std::cout << "computing subcone!" << std::endl;
         lambda = subcone(cones, point);
       }
       while (lambda.dimension() < lambda.ambientDimension());
 
-      // insert cone into fan and compute a list of facets to traverse
+      // std::cout << "initial cone: " << std::endl;
+      // std::cout << lambda.getFacets() << std::endl;
+      lambda.canonicalize();
       gfan::ZFan* Sigma = new gfan::ZFan(lambda.ambientDimension());
       Sigma->insert(lambda);
-      lists facets0 = listOfInteriorFacets(lambda, support);
-      if (facets0->m[0].rtyp == INT_CMD)
+      lists interiorFacets = listOfInteriorFacets(lambda, support);
+      if (interiorFacets->m[0].rtyp == INT_CMD)
       {
         res->rtyp = fanID;
         res->data = (void*) Sigma;
         return FALSE;
       }
-      int mu = 1000;
+      int mu = 1000; int iterationNumber = 1;
 
-      gfan::ZCone* eta; gfan::ZVector facetNormal, interiorPoint;
-      while (facets0->nr > -1)
+      gfan::ZCone* eta; gfan::ZVector* interiorPoint; gfan::ZVector* facetNormal;
+      while (interiorFacets->nr > -1)
       {
-        /* extract a facet to traverse and delete it from the list */ 
-        eta = (gfan::ZCone*) facets0->m[lSize(facets0)].Data();
-        interiorPoint = eta->getRelativeInteriorPoint();
+        std::cout << "cones found: " << iterationNumber++ << std::endl;
+        // if (iterationNumber == 26)
+        //   return TRUE;
+        // std::cout << "facets left to check: " << interiorFacets->nr + 1 << std::endl;
+        /***
+         * Extract a facet to traverse and its relative interior point.
+         **/
+        lists cache = (lists) interiorFacets->m[interiorFacets->nr].Data();
+        eta = (gfan::ZCone*) cache->m[0].Data();
+        interiorPoint = (gfan::ZVector*) cache->m[1].Data();
+        facetNormal = (gfan::ZVector*) cache->m[2].Data(); 
+        // std::cout << "going over facet with interiorPoint: " << *interiorPoint << std::endl;
+        // std::cout << "and with facetNormal: " << *facetNormal << std::endl;
+        // std::cout << "going over facet: " << std::endl;
+        // std::cout << eta->getFacets() << std::endl;
+        // std::cout << eta->getEquations() << std::endl;
 
-        /* check whether eta needs to be traversed */
-        std::cout << "facets left to check: " << lSize(facets0) << std::endl;
-        if (numberOfConesWithVector(Sigma, &interiorPoint) > 1)
+        /***
+         * construct a point, which lies on the other side of the facet. 
+         * make sure it lies in the known support of our fan
+         * and that the cone around the point is maximal, containing eta.
+         **/
+        point = mu * (*interiorPoint) - (*facetNormal);
+        while (!support.containsRelatively(point))
         {
-          eta = NULL;
-          facets0->m[lSize(facets0)].CleanUp();
-          if (facets0->nr == 0)
-          {
-            facets0->Clean();
-            break;
-          }
-          facets0->m = (leftv)omRealloc(facets0->m,(facets0->nr)*sizeof(sleftv));
-          facets0->nr = facets0->nr - 1;
+          mu = mu * 10;
+          point = mu * (*interiorPoint) - (*facetNormal);
+        }
+
+        lambda = subcone(cones,point);
+        while ((lambda.dimension() < lambda.ambientDimension()) && !(lambda.contains(*interiorPoint)))
+        {
+          mu = mu * 10;
+          point = mu * (*interiorPoint) - (*facetNormal);
+          lambda = subcone(cones,point);
+        }
+
+        // std::cout << "maximal cone: " << std::endl;
+        // std::cout << lambda.getFacets() << std::endl;
+        /*** 
+         * insert lambda into Sigma, and create a list of facets of lambda. 
+         * merge the two lists of facets
+         **/
+        lambda.canonicalize();
+        Sigma->insert(lambda);
+        lists newFacets = listOfInteriorFacets(lambda, support);
+        if (newFacets->m[0].rtyp == INT_CMD)  
+        { // this means there are no facets and points to be added.
+          // we delete newFacets alltogether and the last entry of interiorFacets
+          newFacets->Clean();
+          deleteLast(interiorFacets);
         }
         else
-        {
-          facetNormal = (eta->getImpliedEquations())[0]; // impliedEquations consist only of one row
+          mergeListsOfFacets(interiorFacets, newFacets);
 
-          /* construct a point, which lies on the other side of the facet, yet still in the support */
-          point = mu * interiorPoint - facetNormal;
-          while (!support.containsRelatively(point))
-          {
-            mu = mu * 10;
-            point = mu * interiorPoint - facetNormal;
-            if (mu > 100000)
-              return TRUE;
-          }
+        if (interiorFacets == NULL)
+          break;
 
-          /* make sure that the cone around the point is maximal and contains eta */
-          lambda = subcone(cones,point);
-
-          while ((lambda.dimension() < lambda.ambientDimension()) && !(lambda.contains(interiorPoint)))
-          {
-            mu = mu * 10;
-            point = mu * interiorPoint - facetNormal;
-            lambda = subcone(cones,point);
-          }
-
-          /* insert cone into Sigma, create a new list of facets */
-          Sigma->insert(lambda);
-
-          lists newFacets = listOfInteriorFacets(lambda, support);
-          if (newFacets->m[0].rtyp == INT_CMD)
-          {
-            facets0 = deleteLastAndConcatLists(facets0, newFacets);
-          }
-          else
-          {
-            /* delete last entry of old list, append the new list to the old, delete new list, */
-            facets0 = deleteLastAndConcatLists(facets0, newFacets);
-          }
-
-          eta = NULL;
-        }
+        eta = NULL;
+        interiorPoint = NULL;
+        facetNormal = NULL;
+        cache = NULL;
       }
+      std::cout << "cones found: " << iterationNumber++ << std::endl;
       res->rtyp = fanID;
       res->data = (void*) Sigma;
       return FALSE;
@@ -1162,7 +1445,7 @@ lists listOfFacets(const gfan::ZCone &zc)
   gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
   gfan::ZMatrix newEquations = equations; 
   newEquations.appendRow(inequalities[0]);
-  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations);
   
   /* these are the cases i=1,...,r-2 */
   for (int i=1; i<r-1; i++)
@@ -1171,14 +1454,14 @@ lists listOfFacets(const gfan::ZCone &zc)
     newInequalities.append(inequalities.submatrix(i+1,0,r,c));
     newEquations = equations;
     newEquations.appendRow(inequalities[i]);
-    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations);
   }
   
     /* this is the i=r-1 case */
   newInequalities = inequalities.submatrix(0,0,r-1,c);
   newEquations = equations;
   newEquations.appendRow(inequalities[r]);
-  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations);
 
   return L;
 }
