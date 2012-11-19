@@ -257,15 +257,16 @@ CanonicalForm uniResultant (const CanonicalForm& F, const CanonicalForm& G)
   nmod_poly_clear (FLINTG);
   return CanonicalForm ((long) FLINTresult);
 #else
-  zz_pBak bak;
-  bak.save();
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLF= convertFacCF2NTLzzpX (F);
   zz_pX NTLG= convertFacCF2NTLzzpX (G);
 
   zz_p NTLResult= resultant (NTLF, NTLG);
 
-  bak.restore();
   return CanonicalForm (to_long (rep (NTLResult)));
 #endif
 #else

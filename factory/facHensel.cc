@@ -36,7 +36,11 @@
 static
 CFList productsNTL (const CFList& factors, const CanonicalForm& M)
 {
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
   zz_pE::init (NTLMipo);
   zz_pEX prod;
@@ -100,7 +104,11 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
   buf2= i.getItem();
 #ifdef HAVE_NTL
   Variable x= Variable (1);
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
   zz_pE::init (NTLMipo);
   zz_pEX NTLbuf1, NTLbuf2, NTLbuf3, NTLS, NTLT;

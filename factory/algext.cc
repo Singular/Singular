@@ -466,7 +466,11 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   Variable v1= Variable (1);
 #ifdef HAVE_NTL
   Variable v= M.mvar();
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
   zz_pE::init (NTLMipo);
   zz_pEX NTLResult;

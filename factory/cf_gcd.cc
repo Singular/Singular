@@ -112,7 +112,11 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       CanonicalForm primElem, imPrimElem;
       if (p == 2 && d < 6)
       {
-        zz_p::init (p);
+        if (fac_NTL_char != 2)
+        {
+          fac_NTL_char= 2;
+          zz_p::init (p);
+        }
         bool primFail= false;
         Variable vBuf;
         primElem= primitiveElement (v, vBuf, primFail);
@@ -136,7 +140,11 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       }
       else if ((p == 3 && d < 4) || ((p == 5 || p == 7) && d < 3))
       {
-        zz_p::init (p);
+        if (fac_NTL_char != p)
+        {
+          fac_NTL_char= p;
+          zz_p::init (p);
+        }
         bool primFail= false;
         Variable vBuf;
         primElem= primitiveElement (v, vBuf, primFail);
