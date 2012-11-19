@@ -154,7 +154,11 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   ASSERT (A.isUnivariate(),
           "univariate polynomial expected or constant expected");
   CFFList factorsA;
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   if (GF)
   {
     int k= getGFDegree();
@@ -672,7 +676,11 @@ factorRecombination (CFList& factors, CanonicalForm& F,
 
 Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 {
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLIrredpoly;
   int i=1, m= 2;
   // extension of F_p needed
@@ -3554,7 +3562,11 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
 
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   mat_zz_p NTLN;
   ident (NTLN, factors.length());
   int minBound= bounds[0];
@@ -3747,7 +3759,11 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
   }
   CFArray * A= new CFArray [factors.length()];
   CFArray bufQ= CFArray (factors.length());
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
   zz_pE::init (NTLMipo);
   mat_zz_pE NTLN;
@@ -6205,7 +6221,11 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 #ifdef HAVE_FLINT
   nmod_mat_t FLINTN;
 #else
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   mat_zz_p NTLN;
 #endif
 
@@ -7075,7 +7095,11 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   bufUniFactors.insert (LCF);
   int l= 1;
 
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLMipo;
   mat_zz_p NTLN;
 
