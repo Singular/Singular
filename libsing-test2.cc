@@ -65,16 +65,16 @@ main()
     arg.rtyp=IDEAL_CMD;
     arg.data=(void *)I;
     // call primdecGTZ
-    leftv res=iiMake_proc(primdecGTZ,NULL,&arg);
-    if (res==NULL)
+    BOOLEAN res=iiMake_proc(primdecGTZ,NULL,&arg);
+    if (res)
     { printf("primdecGTZ returned an error\n"); errorreported = 0; }
     else
     {
-      printf("primdecGTZ returned type %d; %s\n",res->Typ(),Tok2Cmdname(res->Typ()));
+      printf("primdecGTZ returned type %d; %s\n",iiRETURNEXPR.Typ(),Tok2Cmdname(iiRETURNEXPR.Typ()));
       // if it is a list, get the parts:
-      if (res->Typ()==LIST_CMD)
+      if (iiRETURNEXPR.Typ()==LIST_CMD)
       {
-        lists L=(lists)res->Data();
+        lists L=(lists)iiRETURNEXPR.Data();
 	printf("returned list consists of %d elements\n",L->nr+1);
 	for(int i=0;i<=L->nr;i++)
 	{

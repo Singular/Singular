@@ -176,7 +176,7 @@ BOOLEAN iiAlias(leftv p);
 /* ================================================================== */
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
-sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl);
+BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl);
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);

@@ -482,7 +482,7 @@ static void iiCheckNest()
     iiRETURNEXPR_len+=16;
   }
 }
-sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
+BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
 {
   int err;
   procinfov pi = IDPROC(pn);
@@ -490,7 +490,7 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
   {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
            pi->libname, pi->procname);
-    return NULL;
+    return TRUE;
   }
   iiCheckNest();
 #ifdef USE_IILOCALRING
@@ -656,8 +656,8 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
   }
   procstack->pop();
   if (err)
-    return NULL;
-  return &iiRETURNEXPR;
+    return TRUE;
+  return FALSE;
 }
 
 /*2

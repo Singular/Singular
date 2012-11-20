@@ -1614,11 +1614,9 @@ int sleftv::Eval()
         nok=d->arg2.Eval();
         if(!nok)
         {
-          leftv r=iiMake_proc(h,req_packhdl,&d->arg2);
-          if (r!=NULL)
-            memcpy(this,r,sizeof(sleftv));
-          else
-            nok=TRUE;
+          nok=iiMake_proc(h,req_packhdl,&d->arg2);
+          if (!nok)
+            memcpy(this,&iiRETURNEXPR,sizeof(sleftv));
         }
       }
       else nok=TRUE;
