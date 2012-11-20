@@ -598,11 +598,9 @@ void sortByUniFactors (CFList*& Aeval,          ///< [in,out] array of bivariate
 /// from factorizations of A wrt different second variables
 void
 getLeadingCoeffs (const CanonicalForm& A,  ///< [in] some poly
-                  CFList*& Aeval,          ///< [in,out] array of bivariate
+                  CFList*& Aeval           ///< [in,out] array of bivariate
                                            ///< factors, returns the leading
                                            ///< coefficients of these factors
-                  const CFList& uniFactors,///< [in] univariate factors of A
-                  const CFList& evaluation ///< [in] evaluation point
                  );
 
 /// normalize precomputed leading coefficients such that leading coefficients

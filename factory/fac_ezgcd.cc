@@ -491,7 +491,8 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     return N (d*result);
   }
 
-  if ( gcd_test_one( F, G, false ) )
+  int dummy= 0;
+  if ( gcd_test_one( F, G, false, dummy ) )
   {
     DEBDECLEVEL( cerr, "ezgcd" );
     if (!isRat)

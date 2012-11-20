@@ -13,7 +13,7 @@
 extern int nfCharQ;
 extern int nfM1;
 extern int nfMinPoly[];
-extern short nfPlus1Table[];
+extern unsigned short * nfPlus1Table;
 
 // used to open the GF(q) tables from Singular
 extern FILE * feFopen ( const char * path, const char * mode, char *where = 0, int useWerror = 0, int path_only = 0);

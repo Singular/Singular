@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
+/*static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";*/
 ///////////////////////////////////////////////////////////////////////////////
 #include <string.h>
 // FACTORY - Includes

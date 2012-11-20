@@ -408,7 +408,11 @@ randomElement (const CanonicalForm & F, const Variable & alpha, CFList & list,
 static inline
 Variable chooseExtension (const Variable & alpha)
 {
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLIrredpoly;
   int i, m;
   // extension of F_p needed
@@ -434,7 +438,11 @@ static inline
 void choose_extension (const int& d, const int& num_vars, Variable& beta)
 {
   int p= getCharacteristic();
-  zz_p::init (p);
+  if (p != fac_NTL_char)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTLirredpoly;
   //TODO: replace d by max_{i} (deg_x{i}(f))
   int i= (int) (log ((double) ipower (d + 1, num_vars))/log ((double) p));
@@ -1327,7 +1335,11 @@ CanonicalForm
 randomIrredpoly (int i, const Variable & x)
 {
   int p= getCharacteristic();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTLirredpoly;
   CanonicalForm CFirredpoly;
   BuildIrred (NTLirredpoly, i + 1);
@@ -1980,7 +1992,11 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
 
@@ -2009,7 +2025,11 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
   zz_pE::init (NTLMipo);
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
@@ -2041,7 +2061,11 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
   if (rk != M.columns())
@@ -2071,7 +2095,11 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   for (int i= 0; i < L.size(); i++, j++)
     (*N) (j, M.columns() + 1)= L[i];
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
   zz_pE::init (NTLMipo);
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
@@ -4507,7 +4535,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       return N (d*GCD_small_p (F, G));
   }
 
-  if( gcd_test_one( F, G, false ) )
+  int dummy= 0;
+  if( gcd_test_one( F, G, false, dummy ) )
   {
     return N (d);
   }
@@ -4522,7 +4551,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   if (p < 50 && CFFactory::gettype() != GaloisFieldDomain && !algExtension)
   {
     if (p == 2)
-      setCharacteristic (2, 6, 'Z');
+      setCharacteristic (2, 12, 'Z');
     else if (p == 3)
       setCharacteristic (3, 4, 'Z');
     else if (p == 5 || p == 7)
@@ -4553,7 +4582,11 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     Variable v2;
     if (p == 2 && d < 6)
     {
-      zz_p::init (p);
+      if (fac_NTL_char != p)
+      {
+        fac_NTL_char= p;
+        zz_p::init (p);
+      }
       bool primFail= false;
       Variable vBuf;
       primElem= primitiveElement (a, vBuf, primFail);
@@ -4577,7 +4610,11 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     else if ((p == 3 && d < 4) || ((p == 5 || p == 7) && d < 3))
     {
-      zz_p::init (p);
+      if (fac_NTL_char != p)
+      {
+        fac_NTL_char= p;
+        zz_p::init (p);
+      }
       bool primFail= false;
       Variable vBuf;
       primElem= primitiveElement (a, vBuf, primFail);
