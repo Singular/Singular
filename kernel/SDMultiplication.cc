@@ -18,7 +18,14 @@
 //   Might be more efficient. I know, I am a good story
 //   teller..., but that should be all.
 //
-//TEMPORARY List:
+//Where in this file are the Multiplications functions invoked?
+//r->p_Procs->pp_Mult_mm : ShiftDVec::ksCreateSpoly
+//r->p_Procs->pp_Mult_mm_Noether : ShiftDVec::ksCreateSpoly
+//Pair->Tail_Minus_mm_Mult_qq : 
+//  ShiftDVec::ksReducePoly, ShiftDVec::ksCreateSpoly
+//
+//
+//TEMPORARY List (This should be done - still here for reference):
 //  k_GetLeadTerms - where is it used
 //    1.) in ksCreateSpoly - adapted
 //           in updateL
@@ -577,23 +584,24 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
   // get m2 * a2
   if (spNoether != NULL)
   {
-    l2 = -1;
-    a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing);
-    assume(l2 == pLength(a2));
+    l1 = -1;
+    a1 = tailRing->p_Procs->pp_Mult_mm_Noether(a1, m1, spNoether, l1, tailRing);
+    assume(l1 == pLength(a1));
   }
   else
-    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing);
+    a1 = tailRing->p_Procs->pp_Mult_mm(a1, m1, tailRing);
 #ifdef HAVE_RINGS
-  if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
+  if (!(rField_is_Domain(currRing))) l1 = pLength(a1);
 #endif
 
-  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
-  // get m2*a2 - m1*a1
-  Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
+  //BOCO: TODO: adding m1 to a1 : unnecessary -> change that
+  Pair->SetLmTail(m1, a1, l1, use_buckets, tailRing);
+  // get m1*a1 - a2*m2
+  Pair->Tail_Minus_mm_Mult_qq(m2, a2, l2, spNoether);
 
   // Clean-up time
   Pair->LmDeleteAndIter();
-  p_LmDelete(m1, tailRing);
+  p_LmDelete(m2, tailRing);
 
   if (co != 0)
   {
@@ -623,9 +631,10 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
 
 }
 
-
-int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW, 
-                                poly Current, poly spNoether, kStrategy strat)
+//BOCO: used in redtail
+int ShiftDVec::ksReducePolyTail
+  ( LObject* PR, TObject* UPW, TObject* SPW, 
+    poly Current, poly spNoether, kStrategy strat )
 {
   BOOLEAN ret;
   number coef;
@@ -679,6 +688,40 @@ int ShiftDVec::ksReducePolyTail(LObject* PR, TObject* UPW, TObject* SPW,
   }
 #endif
 
+  return ret;
+}
+
+//BOCO: used in redtailBba (kutil.cc)
+#if 0  // original header from kInline.h
+KINLINE int ksReducePolyTail
+  (LObject* PR, TObject* PW, LObject* Red)
+#else  //replacement
+int ShiftDVec::ksReducePolyTail
+#endif
+  ( LObject* PR, TObject* UPW, TObject* SPW, LObject* Red )
+{
+  BOOLEAN ret;
+  number coef;
+
+
+  assume(PR->GetLmCurrRing() != UPW->GetLmCurrRing());
+  Red->HeadNormalize();
+#if 0 //original
+  ret = ksReducePoly(Red, PW, NULL, &coef);
+#else //replacement
+  ret = 
+    ShiftDVec::ksReducePoly(Red, UPW, SPW, NULL, &coef);
+#endif
+
+  if (!ret)
+  {
+    if (! n_IsOne(coef, currRing->cf))
+    {
+      PR->Mult_nn(coef);
+      // HANNES: mark for Normalize
+    }
+    n_Delete(&coef, currRing->cf);
+  }
   return ret;
 }
 

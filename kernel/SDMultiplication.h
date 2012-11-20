@@ -31,6 +31,9 @@ namespace ShiftDVec
       poly Current = NULL, 
       poly spNoether = NULL, kStrategy strat = NULL );
 
+  int ksReducePolyTail
+    ( LObject* PR, TObject* UPW, TObject* SPW, LObject* Red );
+
   BOOLEAN kCheckSpolyCreation
     ( LObject *L, kStrategy strat, poly &m1, poly &m2 );
 

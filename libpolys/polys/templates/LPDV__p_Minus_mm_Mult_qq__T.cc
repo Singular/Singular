@@ -75,6 +75,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
    *      ShiftDVec::p_ExpSum_dp
    *TODO: How can we merge that? For the Letterplace case we
    *      don't need the original p_Minus_mm_Mult_qq !
+   *      But we need a mm_Mult_qq, see below!
    */
   p_MemCopy__T(qm->exp, m->exp, length); //BOCO: will that be defined correctly?
   r->p_ExpSum(qm, m, q, r);
@@ -177,7 +178,9 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
     else
     {
 #ifdef HAVE_SHIFTBBADVEC 
-      pNext(a) = r->p_Procs->LPDV__pp_Mult_mm(q, m, r);
+      //BOCO: trouble, Trouble, TROUBLE: We need mm_Mult_pp in
+      //the noncommutative version! Correct that!!!!
+      pNext(a) = r->p_Procs->LPDV__pp_Mult_mm(m, q, r);
 #else
       pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r);
 #endif

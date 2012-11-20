@@ -1184,8 +1184,12 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       With->pLength=0;
       strat->redTailChange=TRUE;
 
+#if 0 //BOCO: original
+      if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
+#else //Replacement
       if ( ShiftDVec::ksReducePolyTail
              (L, WithTmp, With, h, strat->kNoetherTail()), strat )
+#endif
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -2342,16 +2346,16 @@ poly ShiftDVec::redtailBba
         assume(shift < UINT_MAX);
         With = &(strat->T[j]);
 #if 1 //BOCO: added code
+        uTmp.p = With->p;
+        uTmp.t_p = With->p;
         if(shift != 0)
         //Our divisor is a shift (and thus not in T or S)
         {
-          poly p_tmp = With->p;
-          poly t_p_tmp = With->t_p;
           With->t_p = p_LPshiftT
-            ( t_p_tmp, shift, strat->uptodeg, strat->lV, 
+            ( uTmp.t_p, shift, strat->uptodeg, strat->lV, 
               strat, strat->tailRing                     );
           With->p = ::p_mLPshift
-            ( p_tmp, shift, strat->uptodeg, strat->lV, 
+            ( uTmp.p, shift, strat->uptodeg, strat->lV, 
               currRing                                 );
           if(With->t_p) With->p->next = With->t_p->next;
           loGriToFile("p_LPshiftT in redtailBba ", 0,1024,(void*)With->t_p);
@@ -2396,6 +2400,8 @@ poly ShiftDVec::redtailBba
           (With->GetDVec(), With->GetDVsize(),"DVec: ",256);
         deBoGriPrint( shift, "Shift needed: ", 256 );
 
+        uTmp.p = With->p;
+        uTmp.t_p = With->p;
         if(shift != 0)
         //Our divisor is a shift (and thus not in T or S)
         {
@@ -2403,8 +2409,6 @@ poly ShiftDVec::redtailBba
 //          With->t_p = p_LPshiftT
 //            ( WithTmp->t_p, shift, strat->uptodeg, strat->lV, 
 //              strat, strat->tailRing                          );
-          uTmp.p = With->p;
-          uTmp.t_p = With->p;
           With->t_p = p_LPshiftT
             ( uTmp.t_p, shift, strat->uptodeg, strat->lV, 
               strat, strat->tailRing                     );
@@ -2445,7 +2449,8 @@ poly ShiftDVec::redtailBba
        * does an exp bound still make sense?
        */
       assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
-      if ( ShiftDVec::ksReducePolyTail(L, &uTmp, With, With->p, Ln.p, strat ))
+
+      if ( ShiftDVec::ksReducePolyTail(L, &uTmp, With, &Ln ) )
       {
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
