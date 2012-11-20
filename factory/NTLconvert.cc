@@ -124,7 +124,7 @@ zz_pX convertFacCF2NTLzzpX(CanonicalForm f)
     NTLcurrentExp=i.exp();
 
     CanonicalForm c=i.coeff();
-    if (!c.isImm()) c.mapinto(); //c%= getCharacteristic();
+    if (!c.isImm()) c=c.mapinto(); //c%= getCharacteristic();
     if (!c.isImm())
     {  //This case will never happen if the characteristic is in fact a prime
        // number, since all coefficients are represented as immediates

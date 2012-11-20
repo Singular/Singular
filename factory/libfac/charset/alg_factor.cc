@@ -77,31 +77,6 @@ void IntGenerator::next()
     current++;
 }
 
-// replacement for factory's broken psr
-static CanonicalForm
-mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x )
-{
-  CanonicalForm r=rr, v=vv, l, test, lu, lv, t, retvalue;
-  int dr, dv, d,n=0;
-
-
-  dr = degree( r, x );
-  dv = degree( v, x );
-  if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
-  else { l = 1; }
-  d= dr-dv+1;
-  while ( ( dv <= dr  ) && ( r != r.genZero()) ){
-    test = power(x,dr-dv)*v*LC(r,x);
-    if ( dr == 0 ) { r= CanonicalForm(0); }
-    else { r= r - LC(r,x)*power(x,dr); }
-    r= l*r -test;
-    dr= degree(r,x);
-    n+=1;
-  }
-  r= power(l, d-n)*r;
-  return r;
-}
-
 // replacement for factory's broken resultant
 static CanonicalForm
 resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v )

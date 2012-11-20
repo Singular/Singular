@@ -82,6 +82,7 @@ SOURCES = \
 		facHensel.cc \
 		facIrredTest.cc \
 		facMul.cc \
+		facNTLzzpEXGCD.cc \
 		facSparseHensel.cc \
 		ffops.cc \
 		FLINTconvert.cc \
@@ -161,6 +162,7 @@ factory_headers = \
 		facHensel.h \
 		facIrredTest.h \
 		facMul.h \
+		facNTLzzpEXGCD.h \
 		facSparseHensel.h \
 		ffops.h \
 		FLINTconvert.h \

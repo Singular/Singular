@@ -400,7 +400,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   for (int i= 0; i < lengthAeval2; i++)
     oldAeval[i]= Aeval2[i];
 
-  getLeadingCoeffs (A, Aeval2, uniFactors, evaluation);
+  getLeadingCoeffs (A, Aeval2);
 
   CFList biFactorsLCs;
   for (CFListIterator i= biFactors; i.hasItem(); i++)
@@ -621,19 +621,34 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
             if ((LCmultiplier/iter.getItem()).inCoeffDomain() &&
                 !isOnlyLeadingCoeff(iter2.getItem())) //content divides LCmultiplier completely and factor consists of more terms than just the leading coeff
             {
-              int index2= 1;
-              for (CFListIterator iter3= leadingCoeffs2[lengthAeval2-1];
-                   iter3.hasItem(); iter3++, index2++)
+              Variable xx= Variable (2);
+              CanonicalForm vars;
+              vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
+                                        xx));
+              for (int i= 0; i < lengthAeval2; i++)
               {
-                if (index2 == index)
-                {
-                  iter3.getItem() /= LCmultiplier;
-                  break;
-                }
+                if (oldAeval[i].isEmpty())
+                  continue;
+                xx= oldAeval[i].getFirst().mvar();
+                vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
+                                           xx));
               }
-              A /= LCmultiplier;
-              foundMultiplier= true;
-              iter.getItem()= 1;
+              if (vars.level() <= 2)
+              {
+                int index2= 1;
+                for (CFListIterator iter3= leadingCoeffs2[lengthAeval2-1];
+                     iter3.hasItem(); iter3++, index2++)
+                {
+                  if (index2 == index)
+                  {
+                    iter3.getItem() /= LCmultiplier;
+                    break;
+                  }
+                }
+                A /= LCmultiplier;
+                foundMultiplier= true;
+                iter.getItem()= 1;
+              }
             }
           }
         }

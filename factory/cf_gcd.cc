@@ -44,8 +44,9 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 CanonicalForm chinrem_gcd(const CanonicalForm & FF,const CanonicalForm & GG);
 
 bool
-gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
+gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d )
 {
+    d= 0;
     int count = 0;
     // assume polys have same level;
 
@@ -113,7 +114,11 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
       CanonicalForm primElem, imPrimElem;
       if (p == 2 && d < 6)
       {
-        zz_p::init (p);
+        if (fac_NTL_char != 2)
+        {
+          fac_NTL_char= 2;
+          zz_p::init (p);
+        }
         bool primFail= false;
         Variable vBuf;
         primElem= primitiveElement (v, vBuf, primFail);
@@ -137,7 +142,11 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
       }
       else if ((p == 3 && d < 4) || ((p == 5 || p == 7) && d < 3))
       {
-        zz_p::init (p);
+        if (fac_NTL_char != p)
+        {
+          fac_NTL_char= p;
+          zz_p::init (p);
+        }
         bool primFail= false;
         Variable vBuf;
         primElem= primitiveElement (v, vBuf, primFail);
@@ -217,17 +226,11 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
       eval2= e (G);
     }
 
-    if ( eval1.taildegree() > 0 && eval2.taildegree() > 0 )
-    {
-        if (passToGF)
-          setCharacteristic (p);
-        if (k > 1)
-          setCharacteristic (p, k, gf_name);
-        return false;
-    }
-
     CanonicalForm c= gcd (eval1, eval2);
-    bool result= c.degree() < 1;
+    d= c.degree();
+    bool result= d < 1;
+    if (d < 0)
+      d= 0;
 
     if (passToGF)
       setCharacteristic (p);
@@ -462,10 +465,10 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 }
 //}}}
 
-//{{{ static CanonicalForm balance ( const CanonicalForm & f, const CanonicalForm & q )
+//{{{ static CanonicalForm balance_p ( const CanonicalForm & f, const CanonicalForm & q )
 //{{{ docu
 //
-// balance() - map f from positive to symmetric representation
+// balance_p() - map f from positive to symmetric representation
 //   mod q.
 //
 // This makes sense for univariate polynomials over Z only.
@@ -475,6 +478,29 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 //
 //}}}
 static CanonicalForm
+balance_p ( const CanonicalForm & f, const CanonicalForm & q )
+{
+    Variable x = f.mvar();
+    CanonicalForm result = 0, qh = q / 2;
+    CanonicalForm c;
+    CFIterator i;
+    for ( i = f; i.hasTerms(); i++ )
+    {
+        c = i.coeff();
+        if ( c.inCoeffDomain())
+        {
+          if ( c > qh )
+            result += power( x, i.exp() ) * (c - q);
+          else
+            result += power( x, i.exp() ) * c;
+        }
+        else
+          result += power( x, i.exp() ) * balance_p(c,q);
+    }
+    return result;
+}
+
+/*static CanonicalForm
 balance ( const CanonicalForm & f, const CanonicalForm & q )
 {
     Variable x = f.mvar();
@@ -489,7 +515,7 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
             result += power( x, i.exp() ) * c;
     }
     return result;
-}
+}*/
 //}}}
 
 static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
@@ -565,7 +591,7 @@ static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalF
     if ( i >= 0 )
     {
       // now balance D mod q
-      D = pp( balance( D, q ) );
+      D = pp( balance_p( D, q ) );
       if ( fdivides( D, f ) && fdivides( D, g ) )
         return D * c;
       else
@@ -596,9 +622,10 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     Ci = content( pi ); Ci1 = content( pi1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
     C = gcd( Ci, Ci1 );
+    int d= 0;
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
     {
-        if ( gcd_test_one( pi1, pi, true ) )
+        if ( gcd_test_one( pi1, pi, true, d ) )
         {
           C=abs(C);
           //out_cf("GCD:",C,"\n");
@@ -715,6 +742,7 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
     Ci = content( pi ); Ci1 = content( pi1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
     C = gcd( Ci, Ci1 );
+    int d= 0;
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
 #ifdef HAVE_FLINT
@@ -728,7 +756,7 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
 #endif
         return gcd_poly_univar0( pi, pi1, true ) * C;
     }
-    else if ( gcd_test_one( pi1, pi, true ) )
+    else if ( gcd_test_one( pi1, pi, true, d ) )
       return C;
     Variable v = f.mvar();
     Hi = power( LC( pi1, v ), delta );
@@ -1203,30 +1231,6 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
     delete [] degsf;
     delete [] degsg;
 }*/
-
-
-static CanonicalForm
-balance_p ( const CanonicalForm & f, const CanonicalForm & q )
-{
-    Variable x = f.mvar();
-    CanonicalForm result = 0, qh = q / 2;
-    CanonicalForm c;
-    CFIterator i;
-    for ( i = f; i.hasTerms(); i++ )
-    {
-        c = i.coeff();
-        if ( c.inCoeffDomain())
-        {
-          if ( c > qh )
-            result += power( x, i.exp() ) * (c - q);
-          else
-            result += power( x, i.exp() ) * c;
-        }
-        else
-          result += power( x, i.exp() ) * balance_p(c,q);
-    }
-    return result;
-}
 
 TIMING_DEFINE_PRINT(chinrem_termination)
 TIMING_DEFINE_PRINT(chinrem_recursion)
