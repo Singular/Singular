@@ -501,7 +501,11 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     return F*G;
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   Variable alpha;
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
@@ -617,7 +621,11 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   Variable alpha;
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
@@ -762,7 +770,11 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   Variable alpha;
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
@@ -2072,7 +2084,11 @@ mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
     int degBy= degree (B, 2);
     int d1= degAx + degBx + 1;
     int d2= tmax (degAy, degBy);
-    zz_p::init (getCharacteristic());
+    if (fac_NTL_char != getCharacteristic())
+    {
+      fac_NTL_char= getCharacteristic();
+      zz_p::init (getCharacteristic());
+    }
     zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
     zz_pE::init (NTLMipo);
 
@@ -2832,7 +2848,11 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
   }
   if (p > 0)
   {
-    zz_p::init (p);
+    if (fac_NTL_char != p)
+    {
+      fac_NTL_char= p;
+      zz_p::init (p);
+    }
     Variable alpha;
     if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
     {

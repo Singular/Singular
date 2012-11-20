@@ -53,7 +53,7 @@ CanonicalForm crossprod ( const CFArray & a, const CFArray & b );
 
 /*ENDPUBLIC*/
 
-bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap );
+bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d );
 
 CanonicalForm ezgcd ( const CanonicalForm & f, const CanonicalForm & g );
 

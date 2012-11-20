@@ -25,6 +25,8 @@
 #include "algext.h"
 #include "cf_map.h"
 #include "cf_generator.h"
+#include "facMul.h"
+#include "facNTLzzpEXGCD.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -364,7 +366,6 @@ CanonicalForm firstLC(const CanonicalForm & f);
 static CanonicalForm trycontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm tryvcontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, bool & fail );
-static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, CanonicalForm & result, bool & divides, bool & fail );
 
 static inline CanonicalForm
 tryNewtonInterp (const CanonicalForm alpha, const CanonicalForm u,
@@ -462,13 +463,36 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   if(g.level() > mv)
     mv = g.level();
   // here: mv is level of the largest variable in f, g
+  Variable v1= Variable (1);
+#ifdef HAVE_NTL
+  Variable v= M.mvar();
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (M);
+  zz_pE::init (NTLMipo);
+  zz_pEX NTLResult;
+  zz_pEX NTLF;
+  zz_pEX NTLG;
+#endif
   if(mv == 1) // f,g univariate
   {
     TIMING_START (alg_euclid_p)
+#ifdef HAVE_NTL
+    NTLF= convertFacCF2NTLzz_pEX (f, NTLMipo);
+    NTLG= convertFacCF2NTLzz_pEX (g, NTLMipo);
+    tryNTLGCD (NTLResult, NTLF, NTLG, fail);
+    if (fail)
+      return;
+    result= convertNTLzz_pEX2CF (NTLResult, f.mvar(), v);
+#else
     tryEuclid(f,g,M,result,fail);
-    TIMING_END_AND_PRINT (alg_euclid_p, "time for euclidean alg mod p: ")
     if(fail)
       return;
+#endif
+    TIMING_END_AND_PRINT (alg_euclid_p, "time for euclidean alg mod p: ")
     result= NN (reduce (result, M)); // do not forget to map back
     return;
   }
@@ -481,9 +505,18 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   if(fail)
     return;
   CanonicalForm c;
+#ifdef HAVE_NTL
+  NTLF= convertFacCF2NTLzz_pEX (cf, NTLMipo);
+  NTLG= convertFacCF2NTLzz_pEX (cg, NTLMipo);
+  tryNTLGCD (NTLResult, NTLF, NTLG, fail);
+  if (fail)
+    return;
+  c= convertNTLzz_pEX2CF (NTLResult, v1, v);
+#else
   tryEuclid(cf,cg,M,c,fail);
   if(fail)
     return;
+#endif
   // f /= cf
   f.tryDiv (cf, M, fail);
   if(fail)
@@ -517,10 +550,19 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   N = leadDeg(g, N);
   CanonicalForm gamma;
   TIMING_START (alg_euclid_p)
+#ifdef HAVE_NTL
+  NTLF= convertFacCF2NTLzz_pEX (firstLC (f), NTLMipo);
+  NTLG= convertFacCF2NTLzz_pEX (firstLC (g), NTLMipo);
+  tryNTLGCD (NTLResult, NTLF, NTLG, fail);
+  if (fail)
+    return;
+  gamma= convertNTLzz_pEX2CF (NTLResult, v1, v);
+#else
   tryEuclid( firstLC(f), firstLC(g), M, gamma, fail );
-  TIMING_END_AND_PRINT (alg_euclid_p, "time for gcd of lcs in alg mod p: ")
   if(fail)
     return;
+#endif
+  TIMING_END_AND_PRINT (alg_euclid_p, "time for gcd of lcs in alg mod p: ")
   for(int i=2; i<=mv; i++) // entries at i=0,1 not visited
     if(N[i] < L[i])
       L[i] = N[i];
@@ -821,6 +863,32 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       else
         equal= true; // modular image did not add any new information
       TIMING_START (alg_termination)
+#ifdef HAVE_FLINT
+      if (equal && tmp.isUnivariate() && f.isUnivariate() && g.isUnivariate()
+          && f.level() == tmp.level() && tmp.level() == g.level())
+      {
+        CanonicalForm Q, R, sf, sg, stmp;
+        Variable x= Variable (1);
+        sf= swapvar (f, f.mvar(), x);
+        sg= swapvar (g, f.mvar(), x);
+        stmp= swapvar (tmp, f.mvar(), x);
+        newtonDivrem (sf, stmp, Q, R);
+        if (R.isZero())
+        {
+          newtonDivrem (sg, stmp, Q, R);
+          if (R.isZero())
+          {
+            Off (SW_RATIONAL);
+            setReduce (a,true);
+            if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
+            TIMING_END_AND_PRINT (alg_termination,
+                                 "time for successful termination test in alg gcd: ")
+            return tmp*gcdcfcg;
+          }
+        }
+      }
+      else
+#endif
       if(equal && fdivides( tmp, f ) && fdivides( tmp, g )) // trial division
       {
         Off( SW_RATIONAL );
@@ -1016,58 +1084,6 @@ static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalFor
     return result;
   }
   return abs( f );
-}
-
-
-static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, CanonicalForm & result, bool & divides, bool & fail )
-{ // M "univariate" monic polynomial
-  // f, g polynomials with coeffs modulo M.
-  // if f is divisible by g, 'divides' is set to 1 and 'result' == f/g mod M coefficientwise.
-  // 'fail' is set to 1, iff a zero divisor is encountered.
-  // divides==1 implies fail==0
-  // required: getReduce(M.mvar())==0
-  if(g.inBaseDomain())
-  {
-    result = f/g;
-    divides = true;
-    return;
-  }
-  if(g.inCoeffDomain())
-  {
-    tryInvert(g,M,result,fail);
-    if(fail)
-      return;
-    result = reduce(f*result, M);
-    divides = true;
-    return;
-  }
-  // here: g NOT inCoeffDomain
-  Variable x = g.mvar();
-  if(f.degree(x) < g.degree(x))
-  {
-    divides = false;
-    return;
-  }
-  // here: f.degree(x) > 0 and f.degree(x) >= g.degree(x)
-  CanonicalForm F = f;
-  CanonicalForm q, leadG = LC(g);
-  result = 0;
-  while(!F.isZero())
-  {
-    tryDivide(F.LC(x),leadG,M,q,divides,fail);
-    if(fail || !divides)
-      return;
-    if(F.degree(x)<g.degree(x))
-    {
-      divides = false;
-      return;
-    }
-    q *= power(x,F.degree(x)-g.degree(x));
-    result += q;
-    F = reduce(F-q*g, M);
-  }
-  result = reduce(result, M);
-  divides = true;
 }
 
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
