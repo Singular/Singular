@@ -1556,19 +1556,20 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   Subexpr e;
   int typ;
   BOOLEAN t=FALSE;
+  idhdl tmp_proc=NULL;
   if ((u->rtyp!=IDHDL)||(u->e!=NULL))
   {
-    idrec tmp_proc;
-    tmp_proc.id="_auto";
-    tmp_proc.typ=PROC_CMD;
-    tmp_proc.data.pinf=(procinfo *)u->Data();
-    tmp_proc.ref=1;
-    d=u->data; u->data=(void *)&tmp_proc;
+    tmp_proc=(idhdl)omAlloc0(sizeof(idrec));
+    tmp_proc->id="_auto";
+    tmp_proc->typ=PROC_CMD;
+    tmp_proc->data.pinf=(procinfo *)u->Data();
+    tmp_proc->ref=1;
+    d=u->data; u->data=(void *)tmp_proc;
     e=u->e; u->e=NULL;
     t=TRUE;
     typ=u->rtyp; u->rtyp=IDHDL;
   }
-  leftv sl;
+  BOOLEAN sl;
   if (u->req_packhdl==currPack)
     sl = iiMake_proc((idhdl)u->data,NULL,v);
   else
@@ -1578,15 +1579,10 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
     u->rtyp=typ;
     u->data=d;
     u->e=e;
+    omFreeSize(tmp_proc,sizeof(idrec));
   }
-  if (sl==NULL)
-  {
-    return TRUE;
-  }
-  else
-  {
-    memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
-  }
+  if (sl) return TRUE;
+  memcpy(res,&iiRETURNEXPR,sizeof(sleftv));
   iiRETURNEXPR.Init();
   return FALSE;
 }

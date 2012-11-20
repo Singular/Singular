@@ -56,7 +56,7 @@ char * newstruct_String(blackbox *b, void *d)
 
     if (p!=NULL)
     {
-      leftv sl;
+      BOOLEAN sl;
       sleftv tmp;
       memset(&tmp,0,sizeof(tmp));
       tmp.rtyp=ad->id;
@@ -69,14 +69,14 @@ char * newstruct_String(blackbox *b, void *d)
       hh.data.pinf=p->p;
       sl=iiMake_proc(&hh,NULL,&tmp);
 
-      if (sl->Typ() == STRING_CMD)
+      if (sl&& (iiRETURNEXPR.Typ() == STRING_CMD))
       {
-        char *res = omStrDup((char*)sl->Data());
-        sl->CleanUp();
+        char *res = omStrDup((char*)iiRETURNEXPR.Data());
+        iiRETURNEXPR.CleanUp();
         iiRETURNEXPR.Init();
         return res;
       }
-      sl->CleanUp();
+      iiRETURNEXPR.CleanUp();
       iiRETURNEXPR.Init();
     }
 
@@ -176,6 +176,7 @@ BOOLEAN newstruct_equal(int op, leftv l, leftv r)
 
   if (p!=NULL)
   {
+    BOOLEAN sl;
     idrec hh;
     memset(&hh,0,sizeof(hh));
     hh.id=Tok2Cmdname(p->t);
@@ -184,16 +185,16 @@ BOOLEAN newstruct_equal(int op, leftv l, leftv r)
     sleftv tmp;
     memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(r);
-    leftv sl = iiMake_proc(&hh, NULL, &tmp);
-    if (sl != NULL)
+    sl = iiMake_proc(&hh, NULL, &tmp);
+    if (!sl)
     {
-      if (sl->Typ() == op)
+      if (iiRETURNEXPR.Typ() == op)
       {
-        l->Copy(sl);
+        l->Copy(&iiRETURNEXPR);
         iiRETURNEXPR.Init();
         return FALSE;
       }
-      sl->CleanUp();
+      iiRETURNEXPR.CleanUp();
       iiRETURNEXPR.Init();
     }
   }
@@ -257,7 +258,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
     }
   }
 
-  else if(l->Typ() > MAX_TOK)
+  else
   {
     assume(l->Typ() > MAX_TOK);
     sleftv tmp;
@@ -279,7 +280,7 @@ BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
 
   if (p!=NULL)
   {
-    leftv sl;
+    BOOLEAN sl;
     sleftv tmp;
     memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(arg);
@@ -289,10 +290,10 @@ BOOLEAN newstruct_Op1(int op, leftv res, leftv arg)
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sl=iiMake_proc(&hh,NULL,&tmp);
-    if (sl==NULL) return TRUE;
+    if (sl) return TRUE;
     else
     {
-      res->Copy(sl);
+      res->Copy(&iiRETURNEXPR);
       iiRETURNEXPR.Init();
       return FALSE;
     }
@@ -408,7 +409,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
   while((p!=NULL) && ( (p->t!=op) || (p->args!=2) )) p=p->next;
   if (p!=NULL)
   {
-    leftv sl;
+    BOOLEAN sl;
     sleftv tmp;
     memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(a1);
@@ -420,10 +421,10 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sl=iiMake_proc(&hh,NULL,&tmp);
-    if (sl==NULL) return TRUE;
+    if (sl) return TRUE;
     else
     {
-      res->Copy(sl);
+      res->Copy(&iiRETURNEXPR);
       iiRETURNEXPR.Init();
       return FALSE;
     }
@@ -454,7 +455,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
 
   if (p!=NULL)
   {
-    leftv sl;
+    BOOLEAN sl;
     sleftv tmp;
     memset(&tmp,0,sizeof(sleftv));
     tmp.Copy(args);
@@ -464,10 +465,10 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sl=iiMake_proc(&hh,NULL,&tmp);
-    if (sl==NULL) return TRUE;
+    if (sl) return TRUE;
     else
     {
-      res->Copy(sl);
+      res->Copy(&iiRETURNEXPR);
       iiRETURNEXPR.Init();
       return FALSE;
     }
@@ -592,7 +593,7 @@ void newstruct_Print(blackbox *b,void *d)
     p=p->next;
   if (p!=NULL)
   {
-    leftv sl;
+    BOOLEAN sl;
     sleftv tmp;
     memset(&tmp,0,sizeof(tmp));
     tmp.rtyp=dd->id;
@@ -603,7 +604,7 @@ void newstruct_Print(blackbox *b,void *d)
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sl=iiMake_proc(&hh,NULL,&tmp);
-    if (sl!=NULL) sl->CleanUp();
+    if (!sl) iiRETURNEXPR.CleanUp();
     iiRETURNEXPR.Init();
   }
   else
@@ -744,7 +745,6 @@ newstruct_desc newstructChildFromString(const char *parent, const char *s)
 
   return scanNewstructFromString(s,res);
 }
-
 void newstructShow(newstruct_desc d)
 {
   newstruct_member elem;
