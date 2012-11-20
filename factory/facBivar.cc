@@ -356,6 +356,21 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     DEBOUTLN (cerr, "prod (bufUniFactors)== bufAeval " <<
               (prod (bufUniFactors) == bufAeval));
 
+    if (bufUniFactors.getFirst().inCoeffDomain())
+      bufUniFactors.removeFirst();
+
+    if (bufUniFactors.length() == 1)
+    {
+      factors.append (A);
+
+      appendSwapDecompress (factors, conv (contentAxFactors),
+                            conv (contentAyFactors), swap, swap2, N);
+
+      if (isOn (SW_RATIONAL))
+        normalize (factors);
+      return factors;
+    }
+
     TIMING_START (fac_uni_factorizer);
     if (extension)
       bufUniFactors2= conv (factorize (bufAeval2, v));
@@ -366,11 +381,9 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     DEBOUTLN (cerr, "prod (bufuniFactors2)== bufAeval2 " <<
               (prod (bufUniFactors2) == bufAeval2));
 
-    if (bufUniFactors.getFirst().inCoeffDomain())
-      bufUniFactors.removeFirst();
     if (bufUniFactors2.getFirst().inCoeffDomain())
       bufUniFactors2.removeFirst();
-    if (bufUniFactors.length() == 1 || bufUniFactors2.length() == 1)
+    if (bufUniFactors2.length() == 1)
     {
       factors.append (A);
 

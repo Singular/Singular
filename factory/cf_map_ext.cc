@@ -66,7 +66,11 @@ static inline
 CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
 {
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTL_mipo= convertFacCF2NTLzzpX (getMipo (beta));
   zz_pE::init (NTL_mipo);
   zz_pEX NTL_alpha_mipo= convertFacCF2NTLzz_pEX (getMipo(alpha), NTL_mipo);
@@ -324,7 +328,11 @@ primitiveElement (const Variable& alpha, Variable& beta, bool fail)
   CanonicalForm mipo= getMipo (alpha);
   int d= degree (mipo);
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTL_mipo;
   CanonicalForm mipo2;
   primitive= false;
@@ -377,7 +385,11 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
   {
     CanonicalForm primElemMipo= findMinPoly (primElem, alpha);
     int p= getCharacteristic ();
-    zz_p::init (p);
+    if (fac_NTL_char != p)
+    {
+      fac_NTL_char= p;
+      zz_p::init (p);
+    }
     zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (beta));
     zz_pE::init (NTLMipo);
     zz_pEX NTLPrimElemMipo= convertFacCF2NTLzz_pEX (primElemMipo, NTLMipo);
@@ -398,7 +410,11 @@ map (const CanonicalForm& primElem, const Variable& alpha,
     order++;
   }
   int p= getCharacteristic ();
-  zz_p::init (p);
+  if (fac_NTL_char != p)
+  {
+    fac_NTL_char= p;
+    zz_p::init (p);
+  }
   zz_pX NTL_mipo= convertFacCF2NTLzzpX (getMipo (beta));
   zz_pE::init (NTL_mipo);
   zz_pEX NTL_alpha_mipo= convertFacCF2NTLzz_pEX (getMipo(alpha), NTL_mipo);
@@ -421,7 +437,11 @@ findMinPoly (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate() && F.mvar()==alpha,"expected element of F_p(alpha)");
 
-  zz_p::init (getCharacteristic());
+  if (fac_NTL_char != getCharacteristic())
+  {
+    fac_NTL_char= getCharacteristic();
+    zz_p::init (getCharacteristic());
+  }
   zz_pX NTLF= convertFacCF2NTLzzpX (F);
   int d= degree (getMipo (alpha));
 
