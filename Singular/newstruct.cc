@@ -68,7 +68,7 @@ char * newstruct_String(blackbox *b, void *d)
       hh.data.pinf=p->p;
       sl=iiMake_proc(&hh,NULL,&tmp);
 
-      if (sl&& (iiRETURNEXPR.Typ() == STRING_CMD))
+      if ((!sl)&& (iiRETURNEXPR.Typ() == STRING_CMD))
       {
         char *res = omStrDup((char*)iiRETURNEXPR.Data());
         iiRETURNEXPR.CleanUp();
