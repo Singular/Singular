@@ -31,6 +31,10 @@
 #include <polys/monomials/ring.h>
 #include <polys/simpleideals.h>
 
+#include <polys/kbuckets.h> // for kBucket*
+#include <polys/nc/summator.h> // for CPolynomialSummator
+#include <polys/operations/p_Mult_q.h> // for MIN_LENGTH_BUCKET
+
 #include <kernel/kstd1.h>
 #include <kernel/polys.h>
 #include <kernel/syz.h>
@@ -681,6 +685,8 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
   assume( r >= 0 && r < IDELEMS(L) );
 
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
+
+  
   poly t = TraverseTail(aa, r);
 
   if( a2 != NULL )
@@ -902,26 +908,36 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   int  c = p_GetComp(syz_lead, r) - 1;
 
   assume( c >= 0 && c < IDELEMS(T) );
+  kBucket_pt bucket = kBucketCreate(r); kbTest(bucket);
 
+//  kBucketInit(bucket, NULL, 0); // not needed!?
+      
   poly p = leadmonom(syz_lead, r); // :(  
-  poly spoly = pp_Mult_qq(p, T->m[c], r);
+//  poly spoly = pp_Mult_qq(p, T->m[c], r);  
+  kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], pLength(T->m[c])); // TODO: store length of tails separately!?
+  kbTest(bucket);  
   p_Delete(&p, r);
-
 
   c = p_GetComp(syz_2, r) - 1;
   assume( c >= 0 && c < IDELEMS(T) );
 
   p = leadmonom(syz_2, r); // :(
-  spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
+//  spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
+  kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], pLength(T->m[c]));
+  kbTest(bucket);
   p_Delete(&p, r);
 
-  poly tail = syz_2; // TODO: use bucket!?
+  // TODO: use bucket!?
+  const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(spoly) < MIN_LENGTH_BUCKET);
+  CPolynomialSummator tail(r, bUsePolynomial);
+  tail.AddAndDelete(syz_2, 1);  
 
-  while (spoly != NULL)
-  {
-    poly t = m_div.FindReducer(spoly, NULL, m_checker);
-
-    p_LmDelete(&spoly, r);
+ 
+  kbTest(bucket);
+  for( poly spoly = kBucketExtractLm(bucket); spoly != NULL; p_LmDelete(&spoly, r), spoly = kBucketExtractLm(bucket))
+  {    
+    kbTest(bucket);
+    poly t = m_div.FindReducer(spoly, NULL, m_checker);    
 
     if( t != NULL )
     {
@@ -930,14 +946,21 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
       assume( c >= 0 && c < IDELEMS(T) );
 
-      spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
+      kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], pLength(T->m[c]));  
+//      spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
 
       p_Delete(&p, r);
 
-      tail = p_Add_q(tail, t, r);
-    }    
+      tail.AddAndDelete(t, 1);  
+    } // otherwise discard that leading term altogether!
+    kbTest(bucket);
   }
 
+  // now bucket must be empty!
+  kbTest(bucket);
+  assume( kBucketClear(bucket) == NULL );
+  kBucketDestroy(&bucket); // TODO: reuse the bucket!!!
+      
   return tail;
 }
 
@@ -969,13 +992,19 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   assume( L != NULL );
   assume( T != NULL );
 
-  poly s = NULL;
 
   if( (!__TAILREDSYZ__) || m_lcm.Check(multiplier) )
+  {
+    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
+    CPolynomialSummator sum(r, bUsePolynomial);
+//    poly s = NULL;
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
-      s = p_Add_q(s, ReduceTerm(multiplier, p, NULL), r);  
+      sum += ReduceTerm(multiplier, p, NULL);
+    return sum;
+  }
 
-  return s;
+  return NULL;
+
 }
 
 
