@@ -70,13 +70,12 @@ char * newstruct_String(blackbox *b, void *d)
 
       if ((!sl)&& (iiRETURNEXPR.Typ() == STRING_CMD))
       {
-        char *res = omStrDup((char*)iiRETURNEXPR.Data());
+        char *res = omStrDup((char*)iiRETURNEXPR.CopyD());
         iiRETURNEXPR.CleanUp();
         iiRETURNEXPR.Init();
         return res;
       }
-      else
-        iiRETURNEXPR.CleanUp();
+      iiRETURNEXPR.CleanUp();
       iiRETURNEXPR.Init();
     }
 
