@@ -11,10 +11,11 @@
 //#include <kernel/mod2.h>
 
 #include <polys/sbuckets.h>
+
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
 //#include <kernel/p_Procs.h>
-#include <polys/monomials//p_polys.h>
+#include <polys/monomials/p_polys.h>
 
 
 

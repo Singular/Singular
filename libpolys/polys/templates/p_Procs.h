@@ -10,8 +10,13 @@
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
-#include <polys/monomials/ring.h>
+
+// #include <polys/monomials/ring.h>
 // #include <polys/structs.h>
+#include <omalloc/omalloc.h>
+
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
 
 /*------------- p_Proc stuff ----------------------*/
 typedef poly (*p_Copy_Proc_Ptr)(poly p, const ring r);
@@ -20,8 +25,7 @@ typedef poly (*p_ShallowCopyDelete_Proc_Ptr)(poly p, const ring r, omBin dest_bi
 typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);
-typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, const poly m,
-                                    const ring r);
+typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);
 typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, const poly m,
                                             const poly spNoether, int &ll,
                                             const ring r);

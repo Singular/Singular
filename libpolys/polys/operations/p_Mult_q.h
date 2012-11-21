@@ -14,6 +14,8 @@
 
 #include <misc/auxiliary.h>
 
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+
 // #include "config.h"
 // #include <polys/structs.h>
 

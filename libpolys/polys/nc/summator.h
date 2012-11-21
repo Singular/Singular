@@ -4,28 +4,41 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-// #include <summator.h> // for CPolynomialSummator class
+// #include <polys/nc/summator.h> // for CPolynomialSummator class
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#define HAVE_SUMMATOR 1
 
+#ifdef HAVE_SUMMATOR
+
+// struct snumber; typedef struct snumber *   number;
+
+class  sBucket; typedef sBucket* sBucket_pt;
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+
+
+class  kBucket; typedef kBucket* kBucket_pt;
+
+// TODO: redesign into templates with no extra run-time cost!!!
+// TODO: make several out of CPolynomialSummator with similar (?) usage
+// pattern/interface!!!
 
 // //////////////////////////////////////////////////////////////////////// //
-// CPolynomialSummator: unifies bucket and polynomial summation as the
-// later is brocken in buckets :(
-#ifdef HAVE_PLURAL
+/// CPolynomialSummator: unifies bucket and polynomial summation as the
+/// later is brocken in buckets :(
 class CPolynomialSummator
 {
   private:
-    ring m_basering;
-    bool m_bUsePolynomial;
+    const ring& m_basering;
+    const bool m_bUsePolynomial;
     union
     {
       sBucket_pt m_bucket;
+//      kBucket_pt m_kbucket; 
       poly       m_poly;
     } m_temp;
   public:
-    CPolynomialSummator(ring rBaseRing, bool bUsePolynomial = false);
+    CPolynomialSummator(const ring& rBaseRing, bool bUsePolynomial = false);
 //    CPolynomialSummator(ring rBaseRing, poly pInitialSum, int iLength = 0, bool bUsePolynomial = false);
     ~CPolynomialSummator();
 
@@ -48,13 +61,12 @@ class CPolynomialSummator
 
     /// Copy constructor
     CPolynomialSummator(const CPolynomialSummator&);
-
   private:
 
     /// no assignment operator yet
     CPolynomialSummator& operator= (const CPolynomialSummator&);
 };
 
-#endif
+#endif // ifdef HAVE_SUMMATOR
 #endif // ifndef  SUMMATOR_H
 

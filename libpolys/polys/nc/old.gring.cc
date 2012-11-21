@@ -22,42 +22,41 @@
 #ifdef HAVE_PLURAL
 
 # define PLURAL_INTERNAL_DECLARATIONS
-#include "nc/nc.h"
-#include "nc/sca.h"
-#include "nc/gb_hack.h"
+#include "nc.h"
+#include "sca.h"
+#include "gb_hack.h"
 
-#include "monomials/ring.h"
+#include <polys/monomials/ring.h>
    
 #include <coeffs/numbers.h>
-#include "coeffrings.h"
+#include <polys/coeffrings.h>
 
 // #include <polys/febase.h>
 #include <misc/options.h>
 
-#include "monomials/ring.h"
-#include "monomials/p_polys.h"
+#include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
 
-#include "simpleideals.h"
-#include "matpol.h"
+#include <polys/simpleideals.h>
+#include <polys/matpol.h>
 
-#include "kbuckets.h"
-#include "sbuckets.h"
+#include <polys/kbuckets.h>
+#include <polys/sbuckets.h>
 
 // #include <polys/kstd1.h>
-#include "prCopy.h"
+#include <polys/prCopy.h>
 
-#include "operations/p_Mult_q.h"
+#include <polys/operations/p_Mult_q.h>
 // dirty tricks:
-#include "templates/p_MemAdd.h"
+#include <polys/templates/p_MemAdd.h>
 
 // #include <polys/pInline1.h>
 
 
+#include "summator.h"
 
-#include "nc/summator.h"
-
-#include "nc/ncSAMult.h" // for CMultiplier etc classes
-#include "nc/ncSAFormula.h" // for CFormulaPowerMultiplier and enum Enum_ncSAType
+#include "ncSAMult.h" // for CMultiplier etc classes
+#include "ncSAFormula.h" // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 // #ifdef HAVE_RATGRING
 // #include <polys/ratgring.h>

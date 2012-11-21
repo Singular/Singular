@@ -3,8 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-#include <polys/monomials/ring.h>
-#include <polys/templates/p_Procs.h>
 
 //#define HAVE_COEF_BUCKETS
 
@@ -14,6 +12,12 @@
 
 // define to not really use the bucket feature
 // #define HAVE_PSEUDO_BUCKETS
+class  kBucket; typedef kBucket* kBucket_pt;
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+
+#include <polys/monomials/ring.h> // for ring->p_Procs->p_kBucketSetLm!
+#include <polys/templates/p_Procs.h> // for p_kBucketSetLm_Proc_Ptr
 
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
@@ -36,6 +40,7 @@ void kBucketInit(kBucket_pt bucket, poly p, int length);
 // Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
 void kBucketClear(kBucket_pt bucket, poly *p, int *length);
+
 inline poly kBucketClear(kBucket_pt bucket)
 {
   int dummy;
@@ -123,7 +128,7 @@ kBucket_ExtractLarger_Add_q(kBucket_pt bucket, poly append, poly q, int *lq)
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Bpoly == Bpoly - m*p; where m is a monom
-/// Does not destroy p and m
+/// Does not destroy p and m (TODO: rename into kBucket_Minus_mm_Mult_pp!?)
 /// assume (*l <= 0 || pLength(p) == *l)
 void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNother = NULL);
@@ -199,18 +204,28 @@ inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 // Gets leading monom of bucket, does NOT change Bpoly!!!!!
 // Returned monom is READ ONLY, i.e. no manipulations are allowed !!!!
 //
+inline poly kBucketGetLm(kBucket_pt bucket, p_kBucketSetLm_Proc_Ptr _p_kBucketSetLm)
+{
+#ifdef   HAVE_COEF_BUCKETS
+  assume(bucket->coef[0]==NULL);
+#endif
+
+  poly& lead = bucket->buckets[0];
+  
+  if (lead == NULL)
+    _p_kBucketSetLm(bucket);
+
+#ifdef  HAVE_COEF_BUCKETS
+  assume(bucket->coef[0]==NULL);
+#endif
+  
+  return lead;
+}
+
 inline poly kBucketGetLm(kBucket_pt bucket)
 {
-  #ifdef   HAVE_COEF_BUCKETS
-  assume(bucket->coef[0]==NULL);
-  #endif
-  if (bucket->buckets[0] == NULL)
-    bucket->bucket_ring->p_Procs->p_kBucketSetLm(bucket);
-  #ifdef  HAVE_COEF_BUCKETS
-  assume(bucket->coef[0]==NULL);
-  #endif
-  return bucket->buckets[0];
-}
+  return kBucketGetLm(bucket, bucket->bucket_ring->p_Procs->p_kBucketSetLm); // TODO: needs ring :(
+}   
 
 inline poly kBucketExtractLm(kBucket_pt bucket)
 {
