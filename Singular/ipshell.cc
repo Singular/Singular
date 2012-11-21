@@ -5260,7 +5260,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
 //  pn=pn->next;
 
-  int l;
   /*every entry in the new ring is initialized to 0*/
 
   /* characteristic -----------------------------------------------*/
@@ -5273,8 +5272,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
   */
-  l = 0;
-
   if (cf==NULL)
   {
     const int ch=32003;
