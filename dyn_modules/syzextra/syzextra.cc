@@ -293,11 +293,13 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
       for( int var = N; var > 0; --var )
         if( (p_GetExp(p, var, r) != 0) && (p_GetExp(t, var, r) != 0) )
         {       
+#ifndef NDEBUG
           if( __DEBUG__ || 0)
           {         
             PrintS("CReducerFinder::PreProcessTerm, 't' is NOT co-prime with the following leading term: \n");
             dPrint(p, r, r, 1);
           }
+#endif	   
           coprime = false; // t not coprime with p!
           break;
         }
@@ -311,20 +313,24 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
 
         coprime = ( syzChecker.IsDivisible(ss) );
 
+#ifndef NDEBUG
         if( __DEBUG__ && !coprime)
         {         
           PrintS("CReducerFinder::PreProcessTerm, 't' is co-prime with p but may lead to NOT divisible syz.term: \n");
           dPrint(ss, r, r, 1);
         }
-
+#endif
+	 
         p_LmDelete(&ss, r); // deletes coeff as well???
       }
 
     }
 
+#ifndef NDEBUG
     if( __DEBUG__ && coprime )
       PrintS("CReducerFinder::PreProcessTerm, the following 't' is 'co-prime' with all of leading terms! \n");
-
+#endif
+     
     return coprime? 3: 0; // t was coprime with all of leading terms!!! 
 
   }
@@ -341,6 +347,7 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
   assume( idTails->m != NULL );
   const ring r = m_rBaseRing;
 
+#ifndef NDEBUG
   if( __DEBUG__ || 0)
   {
     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Tails: \n");
@@ -348,6 +355,7 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
   }
 
   unsigned long pp[4] = {0,0,0,0}; // count preprocessed terms...
+#endif
 
   for( int p = IDELEMS(idTails) - 1; p >= 0; --p )
     for( poly* tt = &(idTails->m[p]); (*tt) != NULL;  )
@@ -355,14 +363,20 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
       const poly t = *tt;
       const int k = m_div.PreProcessTerm(t, m_checker); // 0..3
       assume( 0 <= k && k <= 3 );
+
+#ifndef NDEBUG
       pp[k]++;
+#endif
+       
       if( k )
       {
+#ifndef NDEBUG
         if( __DEBUG__)
         {         
           Print("SchreyerSyzygyComputation::SetUpTailTerms(): PP (%d) the following TT: \n", k);
           dPrint(t, r, r, 1);
         }
+#endif
 
         (*tt) = p_LmDeleteAndNext(t, r); // delete the lead and next...
       }   
@@ -371,14 +385,19 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
 
     }
 
+#ifndef NDEBUG
   if( TEST_OPT_PROT || 1)
     Print("      **!!**      SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing(): X: {c: %lu, C: %lu, P: %lu} + %lu\n", pp[1], pp[2], pp[3], pp[0]);
-
+#endif
+   
+#ifndef NDEBUG
   if( __DEBUG__ || 0)
   {
     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Preprocessed Tails: \n");
     dPrint(idTails, r, r, 0);
   }
+#endif
+   
 }
 /*  
   m_idTailTerms.resize( IDELEMS(idTails) );
@@ -721,22 +740,28 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   const ring& R = m_rBaseRing;
 
   assume( IDELEMS(L) == IDELEMS(T) );
+#ifndef NDEBUG
   int t, r; 
-
+#endif
+   
   if( m_syzLeads == NULL )
   {   
+#ifndef NDEBUG
     if( TEST_OPT_PROT || 1)
     {
       t = getTimer(); r = getRTimer();
       Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
     }
+#endif     
     ComputeLeadingSyzygyTerms( __LEAD2SYZ__ && !__IGNORETAILS__ ); // 2 terms OR 1 term!
+#ifndef NDEBUG
     if( TEST_OPT_PROT || 1)
     {
       t = getTimer() - t; r = getRTimer() - r;
       Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
     }
-
+#endif
+     
   }
 
   assume( m_syzLeads != NULL );
@@ -755,28 +780,33 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   {
     if( T != NULL )
     {
+#ifndef NDEBUG
       if( TEST_OPT_PROT || 1 )
       {
         t = getTimer(); r = getRTimer();
         Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
       }
-
+#endif
+       
       SetUpTailTerms();
-
+#ifndef NDEBUG
       if( TEST_OPT_PROT || 1)
       {
         t = getTimer() - t; r = getRTimer() - r;
         Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
       }
+#endif
     }     
   }
 
+#ifndef NDEBUG
   if( TEST_OPT_PROT || 1)
   {
     t = getTimer(); r = getRTimer();
     Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
   }
-
+#endif
+   
   for( int k = size - 1; k >= 0; k-- )
   {
     const poly a = LL->m[k]; assume( a != NULL );
@@ -807,11 +837,13 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
       TT->m[k] = TraverseNF(a, a2);
   }
 
+#ifndef NDEBUG
   if( TEST_OPT_PROT || 1)
   {
     t = getTimer() - t; r = getRTimer() - r;
     Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
   }
+#endif   
 
   TT->rank = id_RankFreeModule(TT, R);  
 }
@@ -1083,6 +1115,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     __SYZNUMBER__( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
     m_rBaseRing( rootRingHdl->data.uring )
 {    
+#ifndef NDEBUG
   if( __DEBUG__ )
   {
     PrintS("SchreyerSyzygyComputationFlags: \n");
@@ -1091,9 +1124,9 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     Print("     LEAD2SYZ: \t%d\n", __LEAD2SYZ__);
     Print("   TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
     Print("  IGNORETAILS: \t%d\n", __IGNORETAILS__);
-    
   }
-
+#endif
+   
   // TODO: just current setting!
   assume( rootRingHdl == currRingHdl );
   assume( rootRingHdl->typ == RING_CMD );
@@ -1316,12 +1349,13 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
 
         if( Current().DivisibilityCheck(m_product, m_not_sev, m_rBaseRing) )
         {
+#ifndef NDEBUG
           if( __DEBUG__ )
           {
             Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().m_label);
             dPrint(Current().m_lt, m_rBaseRing, m_rBaseRing, 1);
           }
-
+#endif
 //          m_active = true;
           return true;
         }
@@ -1407,7 +1441,7 @@ void CReducerFinder::DebugPrint() const
 
       assume( p_sev == p_GetShortExpVector(p, r) );
 
-      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %dl\n", p_sev);      
+      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %dl\n", p_sev);
     }
   }
 }
@@ -1489,12 +1523,13 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
 
         if( Current().DivisibilityCheck(m_multiplier, m_term, m_not_sev, m_rBaseRing) )
         {
+#ifndef NDEBUG
           if( __DEBUG__ )
           {
             Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().m_label);
             dPrint(Current().m_lt, m_rBaseRing, m_rBaseRing, 1);
           }
-
+#endif
 //          m_active = true;
           return true;
           
@@ -1573,23 +1608,25 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     if (syzterm != NULL && (k == c))
       if (p_ExpVectorEqual(syzterm, q, r))
       {
+#ifndef NDEBUG
         if( __DEBUG__ )
         {
           Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
           dPrint(syzterm, r, r, 1);
         }    
-
+#endif
         continue;
       }
 
     // while the complement (the fraction) is not reducible by leading syzygies 
     if( to_check && syz_checker.IsDivisible(q) ) 
     {
+#ifndef NDEBUG
       if( __DEBUG__ )
       {
         PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
       }
-
+#endif
       continue;
     }
 
@@ -1746,23 +1783,25 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
     if (syzterm != NULL && (k == c))
       if (p_ExpVectorEqual(syzterm, q, r))
       {
+#ifndef NDEBUG
         if( __DEBUG__ )
         {
           Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
           dPrint(syzterm, r, r, 1);
         }    
-
+#endif
         continue;
       }
 
     // while the complement (the fraction) is not reducible by leading syzygies 
     if( to_check && syz_checker.IsDivisible(q) ) 
     {
+#ifndef NDEBUG
       if( __DEBUG__ )
       {
         PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
       }
-
+#endif
       continue;
     }
 
