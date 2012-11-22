@@ -94,13 +94,13 @@ static inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, 
     p_Test(pMonomMM, rRing);
 #endif
 
-    const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
-    const unsigned int iLastAltVar  = scaLastAltVar(rRing);
+    const short iFirstAltVar = scaFirstAltVar(rRing);
+    const short iLastAltVar  = scaLastAltVar(rRing);
 
     register unsigned int tpower = 0;
     register unsigned int cpower = 0;
 
-    for( register unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
+    for( register short j = iLastAltVar; j >= iFirstAltVar; j-- )
     {
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
@@ -332,7 +332,7 @@ static inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring 
 // returns: result =  x_i * lt(pMonom),
 // preserves pMonom. may return NULL!
 // if result != NULL => next(result) = NULL, lt(result) = x_i * lt(pMonom)
-static inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
+static inline poly sca_xi_Mult_mm(short i, const poly pMonom, const ring rRing)
 {
 #ifdef PDEBUG
     p_Test(pMonom, rRing);
@@ -344,11 +344,11 @@ static inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring 
     if( p_GetExp(pMonom, i, rRing) != 0 ) // => result is zero!
       return NULL;
 
-    const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
+    const short iFirstAltVar = scaFirstAltVar(rRing);
 
     register unsigned int cpower = 0;
 
-    for( register unsigned int j = iFirstAltVar; j < i ; j++ )
+    for( register short j = iFirstAltVar; j < i ; j++ )
       cpower ^= p_GetExp(pMonom, j, rRing);
 
 #ifdef PDEBUG
@@ -529,7 +529,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing)
 //-----------------------------------------------------------------------------------//
 
 // return x_i * pPoly; preserve pPoly.
-static inline poly sca_xi_Mult_pp(unsigned int i, const poly pPoly, const ring rRing)
+static inline poly sca_xi_Mult_pp(short i, const poly pPoly, const ring rRing)
 {
   assume( rIsSCA(rRing) );
 
@@ -1212,10 +1212,10 @@ bool sca_Force(ring rGR, int b, int e)
 }
 
 // return x_i * pPoly; preserve pPoly.
-poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
+poly sca_pp_Mult_xi_pp(short i, const poly pPoly, const ring rRing)
 {
   assume(1 <= i);
-  assume(i <= (unsigned int)rRing->N);
+  assume(i <= rVar(rRing));
 
   if(rIsSCA(rRing))
     return sca_xi_Mult_pp(i, pPoly, rRing);
@@ -1449,12 +1449,12 @@ intvec *ivGetSCAYVarWeights(const ring r)
 // reduce term lt(m) modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar:
 // either create a copy of m or return NULL
 static inline poly m_KillSquares(const poly m,
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
+  const short iFirstAltVar, const short iLastAltVar,
   const ring r)
 {
 #ifdef PDEBUG
   p_Test(m, r);
-  assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
+  assume( (iFirstAltVar >= 1) && (iLastAltVar <= rVar(r)) && (iFirstAltVar <= iLastAltVar) );
 
 #if 0
   Print("m_KillSquares, m = "); // !
@@ -1464,7 +1464,7 @@ static inline poly m_KillSquares(const poly m,
 
   assume( m != NULL );
 
-  for(unsigned int k = iFirstAltVar; k <= iLastAltVar; k++)
+  for(short k = iFirstAltVar; k <= iLastAltVar; k++)
     if( p_GetExp(m, k, r) > 1 )
       return NULL;
 
@@ -1475,7 +1475,7 @@ static inline poly m_KillSquares(const poly m,
 // reduce polynomial p modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
 // returns a new poly!
 poly p_KillSquares(const poly p,
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
+  const short iFirstAltVar, const short iLastAltVar,
   const ring r)
 {
 #ifdef PDEBUG
@@ -1530,12 +1530,12 @@ poly p_KillSquares(const poly p,
 // reduces ideal id modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
 // returns the reduced ideal or zero ideal.
 ideal id_KillSquares(const ideal id,
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
+  const short iFirstAltVar, const short iLastAltVar,
   const ring r, const bool bSkipZeroes)
 {
   if (id == NULL) return id; // zero ideal
 
-  assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
+  assume( (iFirstAltVar >= 1) && (iLastAltVar <= rVar(r)) && (iFirstAltVar <= iLastAltVar) );
 
   const int iSize = IDELEMS(id);
 
@@ -1547,7 +1547,7 @@ ideal id_KillSquares(const ideal id,
    PrintS("<id_KillSquares>\n");
   {
     PrintS("ideal id: \n");
-    for (int i = 0; i < IDELEMS(id); i++)
+    for (unsigned int i = 0; i < IDELEMS(id); i++)
     {
       Print("; id[%d] = ", i+1);
       p_Write(id->m[i], r);

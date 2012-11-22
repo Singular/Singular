@@ -15,14 +15,14 @@ inline ideal SCAQuotient(const ring r)
 
 
 
-static inline unsigned int scaFirstAltVar(ring r)
+static inline short scaFirstAltVar(ring r)
 {
   assume(rIsSCA(r));
 
   return (r->GetNC()->FirstAltVar());
 }
 
-static inline unsigned int scaLastAltVar(ring r)
+static inline short scaLastAltVar(ring r)
 {
   assume(rIsSCA(r));
 
@@ -31,14 +31,14 @@ static inline unsigned int scaLastAltVar(ring r)
 
 
 // The following inlines are just helpers for setup functions.
-static inline void scaFirstAltVar(ring r, int n)
+static inline void scaFirstAltVar(ring r, short n)
 {
   assume(rIsSCA(r));
 
   r->GetNC()->FirstAltVar() = n;
 }
 
-static inline void scaLastAltVar(ring r, int n)
+static inline void scaLastAltVar(ring r, short n)
 {
   assume(rIsSCA(r));
 
@@ -53,7 +53,7 @@ static inline void scaLastAltVar(ring r, int n)
 
 // this is not a basic operation... but it for efficiency we did it specially for SCA:
 // return x_i * pPoly; preserve pPoly.
-poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing);
+poly sca_pp_Mult_xi_pp(short i, const poly pPoly, const ring rRing);
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -133,7 +133,7 @@ static inline bool id_IsSCAHomogeneous(const ideal id,
 
 // reduce polynomial p modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
 poly p_KillSquares(const poly p,
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
+  const short iFirstAltVar, const short iLastAltVar,
   const ring r);
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ poly p_KillSquares(const poly p,
 // optional argument bSkipZeroes allow skipping of zero entries, by
 // default - no skipping!
 ideal id_KillSquares(const ideal id,
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
+  const short iFirstAltVar, const short iLastAltVar,
   const ring r, const bool bSkipZeroes = false);
 
 // for benchmarking
