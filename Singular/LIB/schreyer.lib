@@ -2419,6 +2419,8 @@ proc TestSSres(def I)
     ",TAILREDSYZ:"+string(attrib(SSinit,"TAILREDSYZ")) +
     ",HYBRIDNF:"  +string(attrib(SSinit,"HYBRIDNF"));
 
+  int @PROFILE = attrib(SSinit, "PROFILE");
+  if(@PROFILE){ string @prof = "SSres_" + @save_res_desc + "_" + name + ".prof"; }
 
   StartAddResTest(
    "SSres",
@@ -2426,7 +2428,9 @@ proc TestSSres(def I)
   );
   
   option(redSB); option(redTail);
+  if(@PROFILE){ProfilerStart(@prof);}
   timer=0;rtimer=0;def R=SSres(I,0);@m=rtimer;
+  if(@PROFILE){ProfilerStop();}
   setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
@@ -2555,6 +2559,7 @@ proc testSimple(list #)
   attrib(SSinit, "DEBUG", (DEBUG > 0)); 
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 1); 
+  attrib(SSinit, "PROFILE", 0);
 
   ring r; r; ideal M = maxideal(1); 
 //  M;
@@ -2601,6 +2606,7 @@ proc testAGR(list #)
   attrib(SSinit, "DEBUG", 0); 
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 0); 
+  attrib(SSinit, "PROFILE", 1); 
  
 //  option(prot);
 
@@ -2792,6 +2798,7 @@ proc testAGRhard(list #)
   attrib(SSinit, "DEBUG", 0); 
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 0); 
+  attrib(SSinit, "PROFILE", 1); 
  
 //  option(prot);
   ring AGR = (101), (a,b,c,d,e,f), dp; AGR;
