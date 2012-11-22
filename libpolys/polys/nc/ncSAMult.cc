@@ -270,7 +270,7 @@ BOOLEAN ncInitSpecialPairMultiplication(ring r)
   PrintLn();
 #endif
   
-  if(!rIsPluralRing(r));
+  if(!rIsPluralRing(r))// ; // :(((
     return TRUE;
   
   if(rIsSCA(r))

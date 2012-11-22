@@ -3107,7 +3107,7 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
   poly p,q;
   short DefMTsize=7;
   int IsNonComm=0;
-  int tmpIsSkewConstant;
+//  bool tmpIsSkewConstant = false;
 
   for(i=1; i<r->N; i++)
   {
@@ -3153,12 +3153,12 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
     }
     if (IsNonComm==0)
     {
-      ncRingType(r, nc_skew); /* TODO: check whether it is commutative */
-      r->GetNC()->IsSkewConstant=tmpIsSkewConstant;
-    }
+      ncRingType(r, nc_skew); // TODO: check whether it is commutative
+      r->GetNC()->IsSkewConstant = 0; // true; //tmpIsSkewConstant; //  BUG???
+    } else
+       assume( FALSE );
   }
-  r->GetNC()->COM=COM;
-  
+  r->GetNC()->COM=COM;  
 
   nc_p_ProcsSet(r, r->p_Procs);
 
