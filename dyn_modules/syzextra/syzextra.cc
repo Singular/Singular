@@ -32,7 +32,8 @@
 #include <polys/simpleideals.h>
 
 #include <polys/kbuckets.h> // for kBucket*
-#include <polys/nc/summator.h> // for CPolynomialSummator
+#include <polys/sbuckets.h> // for sBucket*
+//#include <polys/nc/summator.h> // for CPolynomialSummator
 #include <polys/operations/p_Mult_q.h> // for MIN_LENGTH_BUCKET
 
 #include <kernel/kstd1.h>
@@ -236,7 +237,19 @@ void SchreyerSyzygyComputation::CleanUp()
 {
   extern void id_Delete (ideal*, const ring);
    
- id_Delete(const_cast<ideal*>(&m_idTails), m_rBaseRing); // TODO!!!   
+  id_Delete(const_cast<ideal*>(&m_idTails), m_rBaseRing); // TODO!!!
+
+  if( m_sum_bucket != NULL )
+  {
+    sBucketDestroy(&m_sum_bucket);
+    m_sum_bucket = NULL;
+  }
+
+  if( m_spoly_bucket != NULL )
+  {
+    kBucketDestroy(&m_spoly_bucket);
+    m_spoly_bucket = NULL;
+  }  
 }
   /*
   for( TTailTerms::const_iterator it = m_idTailTerms.begin(); it != m_idTailTerms.end(); it++ )
@@ -739,6 +752,13 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   ideal& TT = m_syzTails;
   const ring& R = m_rBaseRing;
 
+  if( m_sum_bucket == NULL )
+    m_sum_bucket = sBucketCreate(R);
+
+  if( m_spoly_bucket == NULL )
+    m_spoly_bucket = kBucketCreate(R);
+
+
   assume( IDELEMS(L) == IDELEMS(T) );
 #ifndef NDEBUG
   int t, r; 
@@ -940,30 +960,32 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   int  c = p_GetComp(syz_lead, r) - 1;
 
   assume( c >= 0 && c < IDELEMS(T) );
-  kBucket_pt bucket = kBucketCreate(r); kbTest(bucket);
+  sBucket_pt& tail   = m_sum_bucket; assume( tail != NULL );
+  kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL ); kbTest(bucket);
+
 
 //  kBucketInit(bucket, NULL, 0); // not needed!?
       
   poly p = leadmonom(syz_lead, r); // :(  
 //  poly spoly = pp_Mult_qq(p, T->m[c], r);  
-  kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], pLength(T->m[c])); // TODO: store length of tails separately!?
-  kbTest(bucket);  
+  kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], 0); // TODO: store pLength(T->m[c]) separately!? 
   p_Delete(&p, r);
+  
+  kbTest(bucket);  
 
   c = p_GetComp(syz_2, r) - 1;
   assume( c >= 0 && c < IDELEMS(T) );
 
   p = leadmonom(syz_2, r); // :(
 //  spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
-  kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], pLength(T->m[c]));
+  kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], 0); // pLength(T->m[c])?!
   kbTest(bucket);
   p_Delete(&p, r);
 
   // TODO: use bucket!?
-  const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(spoly) < MIN_LENGTH_BUCKET);
-  CPolynomialSummator tail(r, bUsePolynomial);
-  tail.AddAndDelete(syz_2, 1);  
-
+//  const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(spoly) < MIN_LENGTH_BUCKET);
+//  CPolynomialSummator tail(r, bUsePolynomial);                       
+  sBucket_Add_p(tail, syz_2, 1); // tail.AddAndDelete(syz_2, 1);  
  
   kbTest(bucket);
   for( poly spoly = kBucketExtractLm(bucket); spoly != NULL; p_LmDelete(&spoly, r), spoly = kBucketExtractLm(bucket))
@@ -978,12 +1000,12 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
       assume( c >= 0 && c < IDELEMS(T) );
 
-      kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], pLength(T->m[c]));  
+      kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], 0); // pLength(T->m[c])?
 //      spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
 
       p_Delete(&p, r);
 
-      tail.AddAndDelete(t, 1);  
+      sBucket_Add_p(tail, t, 1); // tail.AddAndDelete(t, 1);
     } // otherwise discard that leading term altogether!
     kbTest(bucket);
   }
@@ -991,9 +1013,12 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   // now bucket must be empty!
   kbTest(bucket);
   assume( kBucketClear(bucket) == NULL );
-  kBucketDestroy(&bucket); // TODO: reuse the bucket!!!
-      
-  return tail;
+
+  poly result; int len;
+  sBucketClearAdd(tail, &result, &len); // TODO: use Merge with sBucket???
+  assume( pLength(result) == len );
+     
+  return result;
 }
 
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) const
@@ -1027,12 +1052,30 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
   if( (!__TAILREDSYZ__) || m_lcm.Check(multiplier) )
   {
-    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
-    CPolynomialSummator sum(r, bUsePolynomial);
+//    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
+    sBucket_pt& sum   = m_sum_bucket; assume( sum != NULL );
+    poly s; int len;
+    
+//    CPolynomialSummator sum(r, bUsePolynomial);
 //    poly s = NULL;
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
-      sum += ReduceTerm(multiplier, p, NULL);
-    return sum;
+    {
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      const poly rt = ReduceTerm(multiplier, p, NULL); // TODO: also return/store length?
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      
+      const int lp = pLength(rt);
+      if( rt != NULL && lp != 0 )
+        sBucket_Add_p(sum, rt, lp); 
+    }
+
+    sBucketClearAdd(sum, &s, &len);
+    assume( pLength(s) == len );
+    return s;
   }
 
   return NULL;

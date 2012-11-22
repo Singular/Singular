@@ -327,6 +327,13 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
    
 /// TODO: look into m_idTailTerms!!!!!!!!!!!!!!!!!!!!!!!! map? heaps???
+    // NOTE/TODO: the following globally shared buckets violate reentrance - they should rather belong to TLS!
+    
+    /// used for simple summing up 
+    mutable sBucket_pt m_sum_bucket;
+    
+    /// for S-Polynomial reductions
+    mutable kBucket_pt m_spoly_bucket;
 };
 
 
