@@ -214,7 +214,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
 }
 
 
-CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring r): m_BaseRing(r), m_NVars(r->N)
+CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring r): m_NVars(r->N), m_BaseRing(r)
 {
 #if OUTPUT  
   Print("CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring)!");

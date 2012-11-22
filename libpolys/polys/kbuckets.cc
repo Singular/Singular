@@ -1124,9 +1124,9 @@ number kBucketPolyRed(kBucket_pt bucket,
   l1--;
 
   assume(l1==pLength(a1));
+#if 0
   BOOLEAN backuped=FALSE;
   number coef;
-  #if 0
   //@Viktor, don't ignore coefficients on monomials
   if(l1==1) {
 
@@ -1142,12 +1142,15 @@ number kBucketPolyRed(kBucket_pt bucket,
     //deletes coef as side effect
     //}
   }
-  #endif
+#endif
 
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
+#if 0
   if (backuped)
     p_SetCoeff0(a1,coef,r);
+#endif
+
   p_LmDelete(&lm, r);
   if (reset_vec) p_SetCompP(a1, 0, r);
   kbTest(bucket);

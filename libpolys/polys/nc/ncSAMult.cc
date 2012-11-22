@@ -882,7 +882,7 @@ poly CPowerMultiplier::MultiplyME(const poly pMonom, const CExponent expRight)
     e = p_GetExp(pMonom, --v, r);
 
   // TODO: review this!
-  if( (v == j) )
+  if( v == j )
   {
     poly p = p_Head(pMonom, r);    
     p_SetExp(p, v, e + n, r);

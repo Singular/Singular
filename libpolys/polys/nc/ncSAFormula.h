@@ -37,8 +37,8 @@ class CFormulaPowerMultiplier
     
 
   public:
-    inline const int NVars() const { return m_NVars; }
-    inline const ring GetBasering() const { return m_BaseRing; }
+    inline int NVars() const { return m_NVars; }
+    inline ring GetBasering() const { return m_BaseRing; }
 
     CFormulaPowerMultiplier(ring r);
     virtual ~CFormulaPowerMultiplier();

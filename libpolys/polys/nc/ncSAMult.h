@@ -37,7 +37,7 @@ class CMultiplier
     CMultiplier(ring rBaseRing): m_basering(rBaseRing), m_NVars(rBaseRing->N) {};
     virtual ~CMultiplier() {};
 
-    const ring GetBasering() const { return m_basering; };
+    inline ring GetBasering() const { return m_basering; };
     inline int NVars() const { return m_NVars; }
 
 
