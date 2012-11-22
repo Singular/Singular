@@ -336,9 +336,17 @@ int main( int, char *argv[] )
     printf("datetime not found\n");
   else
   {
-    leftv res=iiMake_proc(datetime,NULL,NULL);
-    if (res==NULL) { printf("datetime return an error\n"); errorreported = 0; }
-    else           printf("datetime returned type %d, >>%s<<\n",res->Typ(),(char *)res->Data());
+    const BOOLEAN res=iiMake_proc(datetime,NULL,NULL);
+    if (res)
+    {
+      printf("iiMake_proc: datetime return an error\n");
+      errorreported = 0;
+    }
+    else
+    {
+      printf("iiMake_proc: datetime returned type %d, >>%s<<\n", iiRETURNEXPR.Typ(), (char *)iiRETURNEXPR.Data());
+      iiRETURNEXPR.CleanUp(); // calls Init afterwards 
+    }    
   }
 
   // changing a ring for the interpreter
