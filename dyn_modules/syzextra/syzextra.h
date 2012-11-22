@@ -22,18 +22,15 @@
 // include basic definitions
 #include "singularxx_defs.h"
 
-struct  spolyrec;
-typedef struct spolyrec    polyrec;
-typedef polyrec *          poly;
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
 
-struct ip_sring;
-typedef struct ip_sring *         ring;
+struct sip_sideal; typedef struct sip_sideal *       ideal;
+class idrec; typedef idrec *   idhdl;
 
-struct sip_sideal;
-typedef struct sip_sideal *       ideal;
+class sBucket; typedef sBucket* sBucket_pt;
+class kBucket; typedef kBucket* kBucket_pt;
 
-class idrec;
-typedef idrec *   idhdl;
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
@@ -205,8 +202,10 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
         m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
-        m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL),
-        m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
+        m_syzLeads(NULL), m_syzTails(NULL),
+        m_LS(NULL), m_lcm(m_idLeads, setting), 
+        m_div(m_idLeads, setting), m_checker(NULL, setting),
+        m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
     }
 
@@ -214,8 +213,10 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
         m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
-        m_syzLeads(syzLeads), m_syzTails(NULL), m_LS(syzLeads), 
-        m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
+        m_syzLeads(syzLeads), m_syzTails(NULL),
+        m_LS(syzLeads), m_lcm(m_idLeads, setting), 
+        m_div(m_idLeads, setting), m_checker(NULL, setting),
+        m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
       if( __TAILREDSYZ__ && !__IGNORETAILS__)
       {
@@ -290,6 +291,9 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     /// output (syzygy) tails
     ideal m_syzTails;
+    
+    /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
+
 
     /// Bitmask for variables occuring in leading terms
     const CLCM m_lcm;
@@ -299,8 +303,6 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     /// for checking tail-terms and makeing them irreducible (wrt m_LS!)
     CReducerFinder m_checker;
-
-    /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
 
     /*
     // need more data here:

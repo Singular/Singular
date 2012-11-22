@@ -253,7 +253,7 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
 {
   assume( t != NULL );
 
-  if( __DEBUG__ && __TAILREDSYZ__ )
+  if( __DEBUG__ & __TAILREDSYZ__ )
     assume( !IsDivisible(t) ); // each input term should NOT be in <L>
 
   const ring r = m_rBaseRing;
@@ -294,7 +294,7 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
         if( (p_GetExp(p, var, r) != 0) && (p_GetExp(t, var, r) != 0) )
         {       
 #ifndef NDEBUG
-          if( __DEBUG__ || 0)
+          if( __DEBUG__ | 0)
           {         
             PrintS("CReducerFinder::PreProcessTerm, 't' is NOT co-prime with the following leading term: \n");
             dPrint(p, r, r, 1);
@@ -348,7 +348,7 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
   const ring r = m_rBaseRing;
 
 #ifndef NDEBUG
-  if( __DEBUG__ || 0)
+  if( __DEBUG__ | 0)
   {
     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Tails: \n");
     dPrint(idTails, r, r, 0);
@@ -386,12 +386,12 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
     }
 
 #ifndef NDEBUG
-  if( TEST_OPT_PROT || 1)
+  if( TEST_OPT_PROT | 1)
     Print("      **!!**      SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing(): X: {c: %lu, C: %lu, P: %lu} + %lu\n", pp[1], pp[2], pp[3], pp[0]);
 #endif
    
 #ifndef NDEBUG
-  if( __DEBUG__ || 0)
+  if( __DEBUG__ | 0)
   {
     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Preprocessed Tails: \n");
     dPrint(idTails, r, r, 0);
@@ -747,7 +747,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   if( m_syzLeads == NULL )
   {   
 #ifndef NDEBUG
-    if( TEST_OPT_PROT || 1)
+    if( TEST_OPT_PROT | 1)
     {
       t = getTimer(); r = getRTimer();
       Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
@@ -755,7 +755,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 #endif     
     ComputeLeadingSyzygyTerms( __LEAD2SYZ__ && !__IGNORETAILS__ ); // 2 terms OR 1 term!
 #ifndef NDEBUG
-    if( TEST_OPT_PROT || 1)
+    if( TEST_OPT_PROT | 1)
     {
       t = getTimer() - t; r = getRTimer() - r;
       Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
@@ -781,7 +781,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     if( T != NULL )
     {
 #ifndef NDEBUG
-      if( TEST_OPT_PROT || 1 )
+      if( TEST_OPT_PROT | 1 )
       {
         t = getTimer(); r = getRTimer();
         Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
@@ -790,7 +790,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
        
       SetUpTailTerms();
 #ifndef NDEBUG
-      if( TEST_OPT_PROT || 1)
+      if( TEST_OPT_PROT | 1)
       {
         t = getTimer() - t; r = getRTimer() - r;
         Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
@@ -800,7 +800,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   }
 
 #ifndef NDEBUG
-  if( TEST_OPT_PROT || 1)
+  if( TEST_OPT_PROT | 1)
   {
     t = getTimer(); r = getRTimer();
     Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
@@ -838,7 +838,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   }
 
 #ifndef NDEBUG
-  if( TEST_OPT_PROT || 1)
+  if( TEST_OPT_PROT | 1)
   {
     t = getTimer() - t; r = getRTimer() - r;
     Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
@@ -1283,7 +1283,7 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
     const CReducerFinder& m_reds;
     const poly m_product;
     const unsigned long m_not_sev;
-    const unsigned long m_comp;
+    const long m_comp;
 
     CReducerFinder::CReducersHash::const_iterator m_itr;
     CReducerFinder::TReducers::const_iterator m_current, m_finish;
@@ -1424,7 +1424,7 @@ void CReducerFinder::DebugPrint() const
 
   for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
   {
-    Print("Hash Key: %d, Values: \n", it->first);
+    Print("Hash Key: %ld, Values: \n", it->first);
     const TReducers& reducers = it->second;
 
     for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
@@ -1441,7 +1441,7 @@ void CReducerFinder::DebugPrint() const
 
       assume( p_sev == p_GetShortExpVector(p, r) );
 
-      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %dl\n", p_sev);
+      Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %ld\n", p_sev);
     }
   }
 }
@@ -1454,7 +1454,7 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
     const CReducerFinder& m_reds;
     const poly m_multiplier, m_term;
     const unsigned long m_not_sev;
-    const unsigned long m_comp;
+    const long m_comp;
 
     CReducerFinder::CReducersHash::const_iterator m_itr;
     CReducerFinder::TReducers::const_iterator m_current, m_finish;
