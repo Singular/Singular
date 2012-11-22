@@ -35,7 +35,8 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
 
 
-AMLDFLAGS	= -release ${PACKAGE_VERSION}
+AMLDFLAGS = ${GOOGLE_PERFTOOL_LDFLAGS} -release ${PACKAGE_VERSION} 
+
 # -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel \
 # -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 

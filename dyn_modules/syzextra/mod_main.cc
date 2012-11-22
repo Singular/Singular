@@ -31,9 +31,10 @@
 #include "DebugPrint.h"
 #include "myNF.h"
 
-#ifdef HAVE_GOOGLE_PROFILER
+
+#if GOOGLE_PROFILE_ENABLED 
 #include <google/profiler.h>
-#endif // HAVE_GOOGLE_PROFILER  
+#endif // #if GOOGLE_PROFILE_ENABLED 
 
 
 #include <stdio.h>
@@ -176,7 +177,7 @@ static BOOLEAN noop(leftv __res, leftv /*__v*/)
 static BOOLEAN _ProfilerStart(leftv __res, leftv h)
 {
   NoReturn(__res);
-#ifdef HAVE_GOOGLE_PROFILER
+#if GOOGLE_PROFILE_ENABLED
   if( h!= NULL && h->Typ() == STRING_CMD )
   {
     const char* name = (char*)(h->Data());
@@ -185,21 +186,21 @@ static BOOLEAN _ProfilerStart(leftv __res, leftv h)
   } else
     WerrorS("ProfilerStart requires a string [name] argument"); 
 #else
-  WarnS("Sorry no google profiler support (undefined HAVE_GOOGLE_PROFILER)...");
+  WarnS("Sorry no google profiler support (GOOGLE_PROFILE_ENABLE!=1)...");
 //  return TRUE; // ?
-#endif // #ifdef HAVE_GOOGLE_PROFILER
+#endif // #if GOOGLE_PROFILE_ENABLED
   return FALSE;
   (void)h;
 }
 static BOOLEAN _ProfilerStop(leftv __res, leftv /*__v*/)
 {
   NoReturn(__res);
-#ifdef HAVE_GOOGLE_PROFILER
+#if GOOGLE_PROFILE_ENABLED
   ProfilerStop();
 #else
-  WarnS("Sorry no google profiler support (undefined HAVE_GOOGLE_PROFILER)...");
+  WarnS("Sorry no google profiler support (GOOGLE_PROFILE_ENABLED!=1)...");
 //  return TRUE; // ?
-#endif // #ifdef HAVE_GOOGLE_PROFILER
+#endif // #if GOOGLE_PROFILE_ENABLED
   return FALSE;
 }
 
