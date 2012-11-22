@@ -4204,10 +4204,10 @@ void rDebugPrint(ring r)
       pFDeg_CASE(p_WTotaldegree); else
       pFDeg_CASE(p_Deg); else
 #undef pFDeg_CASE
-      Print("(%p)", (void*)(r->pFDeg)); // default case
+      Print("(%p)", r->pFDeg); // default case
 
     PrintLn();
-    Print("pLDeg   : (%p)", (void*)(r->pLDeg));
+    Print("pLDeg   : (%p)", r->pLDeg);
     PrintLn();
   }
   Print("pSetm:");
@@ -4219,7 +4219,7 @@ void rDebugPrint(ring r)
   else if (r->p_Setm==p_Setm_Dummy) PrintS("p_Setm_Dummy\n");
   else if (r->p_Setm==p_Setm_TotalDegree) PrintS("p_Setm_Totaldegree\n");
   else if (r->p_Setm==p_Setm_WFirstTotalDegree) PrintS("p_Setm_WFirstTotalDegree\n");
-  else Print("%x\n",r->p_Setm);
+  else Print("%p\n",r->p_Setm);
 }
 
 void p_DebugPrint(poly p, const ring r)

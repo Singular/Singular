@@ -5962,7 +5962,7 @@ void initSyzRules (kStrategy strat)
     strat->syz        = (poly *)omAlloc(ps*sizeof(poly));
     strat->syzl       = strat->syzmax = ps;
     strat->syzidxmax  = comp;
-#ifdef DEBUGF5 || DEBUGF51
+#if defined(DEBUGF5) || defined(DEBUGF51)
     printf("------------- GENERATING SYZ RULES NEW ---------------\n");
 #endif
     i = 1; 
@@ -8103,14 +8103,14 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
     {
       return r;
     }
-      ring res = rCopy0(r, FALSE, TRUE);
-      for (int i=1; i<n-1; i++)
-      {
-        res->order[i] = res->order[i-1];
-        res->block0[i] = res->block0[i-1];
-        res->block1[i] = res->block1[i-1];
-        res->wvhdl[i] = res->wvhdl[i-1];
-      }
+    ring res = rCopy0(r, FALSE, TRUE);
+    for (int i=1; i<n-1; i++)
+    {
+      res->order[i] = res->order[i-1];
+      res->block0[i] = res->block0[i-1];
+      res->block1[i] = res->block1[i-1];
+      res->wvhdl[i] = res->wvhdl[i-1];
+    }
 
     // new 1st block
     res->order[0]   = ringorder_C; // Prefix
@@ -8136,9 +8136,10 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
       }
     }
 #endif
-  strat->tailRing = res;
-  return (res);
+    strat->tailRing = res;
+    return (res);
   }
+  
   // not incremental => use Schreyer order
   // this is done by a trick when initializing the signatures
   // in initSLSba():
@@ -8147,6 +8148,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
   // Schreyer order w.r.t. the underlying monomial order.
   // => we do not need to change the underlying polynomial ring at all!
 
+  // UPDATE/NOTE/TODO: use induced Schreyer ordering 'IS'!!!!????
 
   /*
   else
@@ -8243,6 +8245,9 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
     return res;
   }
   */
+  
+  assume(FALSE);
+  return(NULL);
 }
 
 skStrategy::skStrategy()

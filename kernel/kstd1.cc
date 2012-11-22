@@ -2155,8 +2155,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     temp_w=new intvec((strat->ak)+1);
     w = &temp_w;
   }
-  if ((h==testHomog)
-  )
+  if (h==testHomog)
   {
     if (strat->ak == 0)
     {

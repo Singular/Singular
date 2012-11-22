@@ -24,7 +24,7 @@ class CCacheHash
   public:
     CCacheHash(ring r): m_basering(r), m_NVars(r->N){};
 
-    const ring GetBasering() const { return m_basering; };
+    ring GetBasering() const { return m_basering; };
     inline int NVars() const { return m_NVars; }
     
     virtual ~CCacheHash(){};

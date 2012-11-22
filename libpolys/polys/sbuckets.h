@@ -73,11 +73,13 @@ inline void sBucketDestroyAdd(sBucket_pt bucket, poly *p, int *length)
 void sBucketDeleteAndDestroy(sBucket_pt *bucket_pt);
 
 //////////////////////////////////////////////////////////////////////////
-///
+
 /// Merges p into Spoly: assumes Bpoly and p have no common monoms
-///
+/// destroys p!
 void sBucket_Merge_p(sBucket_pt bucket, poly p, int lp);
-// adds poly p to bucket
+
+/// adds poly p to bucket
+/// destroys p!
 void sBucket_Add_p(sBucket_pt bucket, poly p, int lp);
 
 

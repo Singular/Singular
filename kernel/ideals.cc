@@ -750,7 +750,8 @@ ideal idXXX (ideal  h1, int k)
 */
 ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 {
-  int   i, j, k, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
+  int  i, j, t, inputIsIdeal=id_RankFreeModule(h1,currRing);
+  long k;
   poly  p=NULL, q;
   intvec *w=NULL;
 
@@ -777,7 +778,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
   BITSET save2;
   SI_SAVE_OPT2(save2);
 
-  k=si_max(1,(int)id_RankFreeModule(h1,currRing));
+  k=si_max((long)1,id_RankFreeModule(h1,currRing));
 
   if ((k==1) && (!lift3)) si_opt_2 |=Sy_bit(V_IDLIFT);
 

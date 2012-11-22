@@ -904,7 +904,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     strat->LazyPass=2;
   strat->LazyDegree = 1;
   strat->ak = id_RankFreeModule(F,currRing);
-  if ((h==testHomog))
+  if (h==testHomog)
   {
     if (strat->ak==0)
     {

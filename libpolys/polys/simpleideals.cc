@@ -719,22 +719,19 @@ long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
 {
   if (s!=NULL)
   {
-    int  j=0;
+    long  j=0;
 
     if (rRing_has_Comp(tailRing) && rRing_has_Comp(lmRing))
     {
-      int  l=IDELEMS(s);
       poly *p=s->m;
-      int  k;
-      for (; l != 0; l--)
+      for (unsigned int l=IDELEMS(s); l != 0; --l, ++p)
       {
         if (*p!=NULL)
         {
           pp_Test(*p, lmRing, tailRing);
-          k = p_MaxComp(*p, lmRing, tailRing);
+          const long k = p_MaxComp(*p, lmRing, tailRing);
           if (k>j) j = k;
         }
-        p++;
       }
     }
     return j;
@@ -1205,7 +1202,7 @@ ideal id_Matrix2Module(matrix mat, const ring R)
 matrix id_Module2Matrix(ideal mod, const ring R)
 {
   matrix result = mpNew(mod->rank,IDELEMS(mod));
-  long i,cp;
+  long i; long cp;
   poly p,h;
 
   for(i=0;i<IDELEMS(mod);i++)
