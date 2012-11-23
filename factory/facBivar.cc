@@ -101,21 +101,14 @@ coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo )
         M += degs[i];
         K *= degs[i] + 1;
     }
-    K /= power (CanonicalForm (2), k);
-    K= K.sqrt()+1;
+    K /= power (CanonicalForm (2), k/2);
     K *= power (CanonicalForm (2), M);
     int N= degree (mipo);
     CanonicalForm b;
     b= 2*power (maxNorm (f), N)*power (maxNorm (mipo), 4*N)*K*
-       power (CanonicalForm (2), N)*(CanonicalForm (M+1).sqrt()+1)*
-       power (CanonicalForm (N+1).sqrt()+1, 7*N);
+       power (CanonicalForm (2), N)*
+       power (CanonicalForm (N+1), 4*N);
     b /= power (abs (lc (mipo)), N);
-
-    ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
-    ZZX NTLLcf= convertFacCF2NTLZZX (Lc (f));
-    ZZ NTLf= resultant (NTLmipo, NTLLcf);
-    ZZ NTLD= discriminant (NTLmipo);
-    b /= abs (convertZZ2CF (NTLf))*abs (convertZZ2CF (NTLD));
 
     CanonicalForm B = p;
     k = 1;
