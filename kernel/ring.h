@@ -408,16 +408,16 @@ BOOLEAN rHasSimpleLexOrder(const ring r);
 //{ return (r->OrdSgn==-1); }
 #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
 #define rHasLocalOrMixedOrdering_currRing() (pOrdSgn==-1)
-BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
+BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r =currRing);
 
 /// return TRUE if p_SetComp requires p_Setm
-BOOLEAN rOrd_SetCompRequiresSetm(ring r);
-rOrderType_t    rGetOrderType(ring r);
+BOOLEAN rOrd_SetCompRequiresSetm(const ring r);
+rOrderType_t    rGetOrderType(const ring r);
 
 /// returns TRUE if var(i) belongs to p-block
-BOOLEAN rIsPolyVar(int i, ring r = currRing);
+BOOLEAN rIsPolyVar(int i, const ring r = currRing);
 
-static inline BOOLEAN rOrd_is_Comp_dp(ring r)
+static inline BOOLEAN rOrd_is_Comp_dp(const ring r)
 {
   return ((r->order[0] == ringorder_c || r->order[0] == ringorder_C) &&
           r->order[1] == ringorder_dp &&

@@ -1898,7 +1898,7 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   return TRUE;
 }
 
-rOrderType_t rGetOrderType(ring r)
+rOrderType_t rGetOrderType(const ring r)
 {
   // check for simple ordering
   if (rHasSimpleOrder(r))
@@ -2016,7 +2016,7 @@ BOOLEAN rOrder_is_WeightedOrdering(rRingOrder_t order)
   }
 }
 
-BOOLEAN rHasSimpleOrderAA(ring r)
+BOOLEAN rHasSimpleOrderAA(const ring r)
 {
   if (r->order[0] == ringorder_unspec) return TRUE;
   int blocks = rBlocks(r) - 1;
@@ -2047,7 +2047,7 @@ BOOLEAN rHasSimpleOrderAA(ring r)
 }
 
 // return TRUE if p_SetComp requires p_Setm
-BOOLEAN rOrd_SetCompRequiresSetm(ring r)
+BOOLEAN rOrd_SetCompRequiresSetm(const ring r)
 {
   if (r->typ != NULL)
   {
@@ -2061,15 +2061,28 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
   return FALSE;
 }
 
+BOOLEAN rHasModuleOrder(const ring r)
+{
+  int i=0;
+  loop
+  {
+    if ((r->order[i]==ringorder_c)
+    || (r->order[i]==ringorder_C))
+      return TRUE;
+    if (r->order[i]==0) return FALSE;
+    i++;
+  }
+  return FALSE; /*never reached */
+}
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
-BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
+BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
 {
   // Hmm.... what about Syz orderings?
   return (rVar(r) > 1 &&
           ((rHasSimpleOrder(r) &&
            (rOrder_is_DegOrdering((rRingOrder_t)r->order[0]) ||
             rOrder_is_DegOrdering(( rRingOrder_t)r->order[1]))) ||
-           (rHasSimpleOrderAA(r) &&
+           (rHasSimpleOrderAA(r) && rHasModuleOrder(r) &&
             (rOrder_is_DegOrdering((rRingOrder_t)r->order[1]) ||
              rOrder_is_DegOrdering((rRingOrder_t)r->order[2])))));
 }
@@ -2084,7 +2097,7 @@ BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r =currRing)
            rOrder_is_WeightedOrdering(( rRingOrder_t)r->order[1])));
 }
 
-BOOLEAN rIsPolyVar(int v, ring r)
+BOOLEAN rIsPolyVar(int v, const ring r)
 {
   int  i=0;
   while(r->order[i]!=0)
