@@ -15,6 +15,8 @@
 
 #include <omalloc.h>
 
+#if OM_PROVIDE_MALLOC > 0
+
 #ifdef OM_MALLOC_MARK_AS_STATIC
 #define OM_MARK_AS_STATIC(addr) omMarkAsStaticAddr(addr)
 #else
@@ -122,4 +124,5 @@ void* reallocSize(void* old_addr, size_t old_size, size_t new_size)
     return malloc(new_size);
   }
 }
+#endif
 #endif
