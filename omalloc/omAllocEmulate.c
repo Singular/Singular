@@ -9,6 +9,8 @@
 
 #include <omalloc/omMalloc.h>
 
+#ifdef OM_EMULATE_OMALLOC
+
 void* omEmulateAlloc0(size_t size)
 {
   void* addr = OM_MALLOC_MALLOC(size);
@@ -38,3 +40,4 @@ void* omEmulateRealloc0(void* o_addr, size_t n_size)
 #endif
   return addr;
 }
+#endif
