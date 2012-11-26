@@ -960,6 +960,13 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   int  c = p_GetComp(syz_lead, r) - 1;
 
   assume( c >= 0 && c < IDELEMS(T) );
+
+  if( m_sum_bucket == NULL )
+    m_sum_bucket = sBucketCreate(r);
+
+  if( m_spoly_bucket == NULL )
+    m_spoly_bucket = kBucketCreate(r);
+
   sBucket_pt& tail   = m_sum_bucket; assume( tail != NULL );
   kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL ); kbTest(bucket);
 
@@ -1053,6 +1060,9 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   if( (!__TAILREDSYZ__) || m_lcm.Check(multiplier) )
   {
 //    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
+    if( m_sum_bucket == NULL )
+      m_sum_bucket = sBucketCreate(r);
+
     sBucket_pt& sum   = m_sum_bucket; assume( sum != NULL );
     poly s; int len;
     
