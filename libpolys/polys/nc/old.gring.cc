@@ -47,8 +47,6 @@
 #include <polys/prCopy.h>
 
 #include <polys/operations/p_Mult_q.h>
-// dirty tricks:
-#include <polys/templates/p_MemAdd.h>
 
 // #include <polys/pInline1.h>
 
@@ -464,7 +462,6 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
   int i,j;
   int iF,jG,iG;
   int rN=r->N;
-  int ExpSize=(((rN+1)*sizeof(int)+sizeof(long)-1)/sizeof(long))*sizeof(long);
 
   int *F=(int *)omAlloc0((rN+1)*sizeof(int));
   int *G=(int *)omAlloc0((rN+1)*sizeof(int));
@@ -473,7 +470,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
   // pExpVectorCopy(F,F0);
   memcpy(G, G0,(rN+1)*sizeof(int));
   //  pExpVectorCopy(G,G0);
-  F[0]=0; /* important for p_MemAdd */
+  F[0]=0; 
   G[0]=0;
 
   iF=rN;
@@ -497,10 +494,9 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
   if (iF<=jG)
     /* i.e. no mixed exp_num , MERGE case */
   {
-    p_MemAdd_LengthGeneral(F, G, ExpSize/sizeof(long));
+    { for(int ii=rN;ii>0;ii--) F[ii]+=G[ii]; }
     p_SetExpV(out,F,r);
     p_Setm(out,r);
-    //    omFreeSize((ADDRESS)F,ExpSize);
     freeT(F,rN);
     freeT(G,rN);
     return(out);
@@ -559,11 +555,10 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
       }
       cff=totcff;
     }
-    p_MemAdd_LengthGeneral(F, G, ExpSize/sizeof(long));
+    { for(int ii=rN;ii>0;ii--) F[ii]+=G[ii]; }
     p_SetExpV(out,F,r);
     p_Setm(out,r);
     p_SetCoeff(out,cff,r);
-    //    p_MemAdd_NegWeightAdjust(p, r); ??? do we need this?
     freeT(F,rN);
     freeT(G,rN);
     return(out);
