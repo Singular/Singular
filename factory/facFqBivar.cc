@@ -590,6 +590,14 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           if (!isRat)
             On (SW_RATIONAL);
           g /= content (g, x);
+          if (!isRat)
+          {
+            On (SW_RATIONAL);
+            g *= bCommonDen (g);
+            Off (SW_RATIONAL);
+            g /= icontent (g);
+            On (SW_RATIONAL);
+          }
           if (fdivides (g, buf, quot))
           {
             recombination= true;
@@ -761,6 +769,14 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           if (!isRat)
             On (SW_RATIONAL);
           g /= content (g, x);
+          if (!isRat)
+          {
+            On (SW_RATIONAL);
+            g *= bCommonDen (g);
+            Off (SW_RATIONAL);
+            g /= icontent (g);
+            On (SW_RATIONAL);
+          }
           if (fdivides (g, buf, quot))
           {
             reconstructedFactors.append (g);
