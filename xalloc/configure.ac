@@ -1,5 +1,6 @@
 AC_INIT([xalloc], [3.1.2.sw])
 AC_CONFIG_SRCDIR(dummy.c)
+AC_CONFIG_MACRO_DIR([../m4])
 
 AC_CONFIG_AUX_DIR([.])
 
