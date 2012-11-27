@@ -449,12 +449,14 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
   CanonicalForm g;
   CanonicalForm modulus= p;
   int d= b.getk();
+  modpk b2;
   for (int i= 1; i < d; i++)
   {
     coeffE= div (e, modulus);
     setCharacteristic (p);
     coeffE= coeffE.mapinto();
     setCharacteristic (0);
+    b2= modpk (p, d - i);
     if (!coeffE.isZero())
     {
       CFListIterator k= result;
@@ -464,11 +466,12 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
-        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (coeffE, bufFactors[ii]);
+        g= mulNTL (g, j.getItem());
         g= modNTL (g, bufFactors[ii]);
         setCharacteristic (0);
         k.getItem() += g.mapinto()*modulus;
-        e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+        e -= mulNTL (g.mapinto(), b2 (l.getItem()), b2)*modulus;
         e= b(e);
       }
     }
@@ -628,6 +631,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   CanonicalForm g;
   CanonicalForm modulus= p;
   int d= b.getk();
+  modpk b2;
   for (int i= 1; i < d; i++)
   {
     coeffE= div (e, modulus);
@@ -646,6 +650,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
     else
       coeffE= replacevar (coeffE, alpha, beta);
     setCharacteristic (0);
+    b2= modpk (p, d - i);
     if (!coeffE.isZero())
     {
       CFListIterator k= result;
@@ -655,22 +660,25 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
-        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (coeffE, bufFactors[ii]);
+        g= mulNTL (g, j.getItem());
         g= modNTL (g, bufFactors[ii]);
         setCharacteristic (0);
         if (mipoHasDen)
         {
           setReduce (beta, false);
           k.getItem() += replacevar (g.mapinto()*modulus, beta, gamma);
-          e -= mulNTL (replacevar (g.mapinto(), beta, gamma)*modulus,
-                       l.getItem(), b);
+          e -= mulNTL (replacevar (g.mapinto(), beta, gamma),
+                       b2 (l.getItem()), b2)*modulus;
           setReduce (beta, true);
         }
         else
         {
+          setReduce (beta, false);
           k.getItem() += replacevar (g.mapinto()*modulus, beta, alpha);
-          e -= mulNTL (replacevar (g.mapinto()*modulus, beta, alpha),
-                       l.getItem(), b);
+          e -= mulNTL (replacevar (g.mapinto(), beta, alpha),
+                       b2 (l.getItem()), b2)*modulus;
+          setReduce (beta, true);
         }
         e= b(e);
       }
