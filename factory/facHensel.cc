@@ -447,12 +447,14 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
   CanonicalForm g;
   CanonicalForm modulus= p;
   int d= b.getk();
+  modpk b2;
   for (int i= 1; i < d; i++)
   {
     coeffE= div (e, modulus);
     setCharacteristic (p);
     coeffE= coeffE.mapinto();
     setCharacteristic (0);
+    b2= modpk (p, d - i);
     if (!coeffE.isZero())
     {
       CFListIterator k= result;
@@ -462,11 +464,12 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
-        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (coeffE, bufFactors[ii]);
+        g= mulNTL (g, j.getItem());
         g= modNTL (g, bufFactors[ii]);
         setCharacteristic (0);
         k.getItem() += g.mapinto()*modulus;
-        e -= mulNTL (g.mapinto()*modulus, l.getItem(), b);
+        e -= mulNTL (g.mapinto(), b2 (l.getItem()), b2)*modulus;
         e= b(e);
       }
     }
@@ -626,6 +629,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   CanonicalForm g;
   CanonicalForm modulus= p;
   int d= b.getk();
+  modpk b2;
   for (int i= 1; i < d; i++)
   {
     coeffE= div (e, modulus);
@@ -644,6 +648,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
     else
       coeffE= replacevar (coeffE, alpha, beta);
     setCharacteristic (0);
+    b2= modpk (p, d - i);
     if (!coeffE.isZero())
     {
       CFListIterator k= result;
@@ -653,22 +658,25 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       for (; j.hasItem(); j++, k++, l++, ii++)
       {
         setCharacteristic (p);
-        g= mulNTL (coeffE, j.getItem());
+        g= modNTL (coeffE, bufFactors[ii]);
+        g= mulNTL (g, j.getItem());
         g= modNTL (g, bufFactors[ii]);
         setCharacteristic (0);
         if (mipoHasDen)
         {
           setReduce (beta, false);
           k.getItem() += replacevar (g.mapinto()*modulus, beta, gamma);
-          e -= mulNTL (replacevar (g.mapinto(), beta, gamma)*modulus,
-                       l.getItem(), b);
+          e -= mulNTL (replacevar (g.mapinto(), beta, gamma),
+                       b2 (l.getItem()), b2)*modulus;
           setReduce (beta, true);
         }
         else
         {
+          setReduce (beta, false);
           k.getItem() += replacevar (g.mapinto()*modulus, beta, alpha);
-          e -= mulNTL (replacevar (g.mapinto()*modulus, beta, alpha),
-                       l.getItem(), b);
+          e -= mulNTL (replacevar (g.mapinto(), beta, alpha),
+                       b2 (l.getItem()), b2)*modulus;
+          setReduce (beta, true);
         }
         e= b(e);
       }
@@ -678,6 +686,117 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
       break;
   }
 
+  return result;
+}
+
+CFList
+diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
+               const CFList& factors, modpk& b, const Variable& alpha)
+{
+  bool fail= false;
+  CFList recResult;
+  CanonicalForm modMipo, mipo;
+  //here SW_RATIONAL is off
+  On (SW_RATIONAL);
+  mipo= getMipo (alpha);
+  bool mipoHasDen= false;
+  if (!bCommonDen (mipo).isOne())
+  {
+    mipo *= bCommonDen (mipo);
+    mipoHasDen= true;
+  }
+  Off (SW_RATIONAL);
+  int p= b.getp();
+  setCharacteristic (p);
+  setReduce (alpha, false);
+  while (1)
+  {
+    setCharacteristic (p);
+    modMipo= mapinto (mipo);
+    modMipo /= lc (modMipo);
+    tryDiophantine (recResult, mapinto (F), mapinto (factors), modMipo, fail);
+    if (fail)
+    {
+      int i= 0;
+      while (cf_getBigPrime (i) < p)
+        i++;
+      findGoodPrime (F, i);
+      findGoodPrime (G, i);
+      p=cf_getBigPrime(i);
+      b = coeffBound( G, p, mipo );
+      modpk bb= coeffBound (F, p, mipo );
+      if (bb.getk() > b.getk() ) b=bb;
+      fail= false;
+    }
+    else
+      break;
+  }
+  setReduce (alpha, true);
+  setCharacteristic (0);
+
+  Variable gamma= alpha;
+  CanonicalForm den;
+  if (mipoHasDen)
+  {
+    On (SW_RATIONAL);
+    modMipo= getMipo (alpha);
+    den= bCommonDen (modMipo);
+    modMipo *= den;
+    Off (SW_RATIONAL);
+    setReduce (alpha, false);
+    gamma= rootOf (b (modMipo*b.inverse (den)));
+    setReduce (alpha, true);
+  }
+
+  Variable x= Variable (1);
+  CanonicalForm buf1, buf2, buf3, S;
+  CFList bufFactors= factors;
+  CFListIterator i= bufFactors;
+  if (mipoHasDen)
+  {
+    for (; i.hasItem(); i++)
+      i.getItem()= replacevar (i.getItem(), alpha, gamma);
+  }
+  i= bufFactors;
+  CFList result;
+  if (i.hasItem())
+    i++;
+  buf1= 0;
+  CanonicalForm Freplaced;
+  if (mipoHasDen)
+  {
+    Freplaced= replacevar (F, alpha, gamma);
+    buf2= divNTL (Freplaced, replacevar (i.getItem(), alpha, gamma), b);
+  }
+  else
+    buf2= divNTL (F, i.getItem(), b);
+  ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
+  ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (gamma)));
+  ZZ_pE::init (NTLmipo);
+  ZZ_pEX NTLS, NTLT, NTLbuf3;
+  ZZ_pEX NTLbuf1= convertFacCF2NTLZZ_pEX (buf1, NTLmipo);
+  ZZ_pEX NTLbuf2= convertFacCF2NTLZZ_pEX (buf2, NTLmipo);
+  XGCD (NTLbuf3, NTLS, NTLT, NTLbuf1, NTLbuf2);
+  result.append (b (convertNTLZZ_pEX2CF (NTLS, x, gamma)));
+  result.append (b (convertNTLZZ_pEX2CF (NTLT, x, gamma)));
+  if (i.hasItem())
+    i++;
+  for (; i.hasItem(); i++)
+  {
+    if (mipoHasDen)
+      buf1= divNTL (Freplaced, i.getItem(), b);
+    else
+      buf1= divNTL (F, i.getItem(), b);
+    XGCD (NTLbuf3, NTLS, NTLT, NTLbuf3, convertFacCF2NTLZZ_pEX (buf1, NTLmipo));
+    CFListIterator k= bufFactors;
+    S= convertNTLZZ_pEX2CF (NTLS, x, gamma);
+    for (CFListIterator j= result; j.hasItem(); j++, k++)
+    {
+      j.getItem()= mulNTL (j.getItem(), S, b);
+      j.getItem()= modNTL (j.getItem(), k.getItem(), b);
+    }
+    result.append (b (convertNTLZZ_pEX2CF (NTLT, x, gamma)));
+  }
   return result;
 }
 
@@ -695,7 +814,7 @@ diophantine (const CanonicalForm& F, const CanonicalForm& G,
     {
       if (b.getp() != 0)
       {
-        CFList result= diophantineHenselQa (F, G, factors, b, v);
+        CFList result= diophantineQa (F, G, factors, b, v);
         return result;
       }
       CFList result= modularDiophant (F, factors, getMipo (v));
