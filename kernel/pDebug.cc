@@ -87,40 +87,50 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     }
     else
     #endif
+    #ifndef X_OMALLOC
     {
       pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==r->PolyBin->sizeW,p,r);
       return TRUE;
     }
     return FALSE;
+    #endif
   }
   return TRUE;
 }
 
 BOOLEAN p_CheckIsFromRing(poly p, ring r)
 {
+  #ifndef X_OMALLOC
   while (p!=NULL)
   {
     pFalseReturn(p_LmCheckIsFromRing(p, r));
     pIter(p);
   }
+  #endif
   return TRUE;
 }
 
 BOOLEAN p_CheckPolyRing(poly p, ring r)
 {
+  #ifndef X_OMALLOC
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  #endif
   return p_CheckIsFromRing(p, r);
 }
 
 BOOLEAN p_LmCheckPolyRing(poly p, ring r)
 {
+  #ifndef X_OMALLOC
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  #endif
   pAssumeReturn(p != NULL);
   return p_LmCheckIsFromRing(p, r);
 }
 BOOLEAN p_CheckRing(ring r)
 {
+  #ifndef X_OMALLOC
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  #endif
   return TRUE;
 }
 
