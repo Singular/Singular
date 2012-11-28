@@ -6458,16 +6458,16 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     CanonicalForm bufF= F;
     int factorsFound= 0;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
-      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
+      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
 #ifdef HAVE_FLINT
-                         (LCF), factorsFound, factorsFoundIndex, FLINTN, false
+                         factorsFound, factorsFoundIndex, FLINTN, false
 #else
-                         (LCF), factorsFound, factorsFoundIndex, NTLN, false
+                         factorsFound, factorsFoundIndex, NTLN, false
 #endif
                         );
     else
-      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
-                         (LCF), factorsFound, factorsFoundIndex, NTLNe, false
+      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
+                         factorsFound, factorsFoundIndex, NTLNe, false
                         );
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
@@ -6894,7 +6894,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   if (minBound > 16 || result.length() == 0)
   {
     result= Union (result, smallFactors);
-    CanonicalForm MODl= power (y, degree (F) + 1 + degree (LC (F, 1)));
+    CanonicalForm MODl= power (y, degree (F) + 1);
     delete [] bounds;
     return Union (result, factorRecombination (bufUniFactors, F, MODl, degs, 1,
                                                bufUniFactors.length()/2
@@ -7147,7 +7147,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
     delete [] bounds;
     return Union (smallFactors, extFactorRecombination
                                 (bufUniFactors, F,
-                                 power (y, degree (F) + 1 + degree (LCF)),info,
+                                 power (y, degree (F) + 1),info,
                                  degs, evaluation, 1, bufUniFactors.length()/2
                                 )
                  );
@@ -7200,8 +7200,8 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
     CanonicalForm bufF= F;
     int factorsFound= 0;
 
-    extReconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
-                          (LCF), factorsFound, factorsFoundIndex, NTLN, false,
+    extReconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
+                          factorsFound, factorsFoundIndex, NTLN, false,
                           info, evaluation
                          );
 
@@ -7396,7 +7396,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   if (minBound > 16 || result.length() == 0)
   {
     result= Union (result, smallFactors);
-    CanonicalForm MODl= power (y, degree (F) + 1 + degree (LC (F, 1)));
+    CanonicalForm MODl= power (y, degree (F) + 1);
     delete [] bounds;
     return Union (result, extFactorRecombination (bufUniFactors, F, MODl, info,
                                                   degs, evaluation, 1,
