@@ -36,11 +36,6 @@ void* calloc(size_t nmemb, size_t size)
   return addr;
 }
 
-void free(void* addr)
-{
-  omfree(addr);
-}
-
 void* valloc(size_t size)
 {
   fprintf(stderr, "omalloc Warning: valloc not yet implemented\n");
@@ -105,6 +100,11 @@ void* malloc(size_t size)
   omTypeAllocAligned(void*, addr, size);
   OM_MARK_AS_STATIC(addr);
   return addr;
+}
+
+void free(void* addr)
+{
+  omfree(addr);
 }
 
 void freeSize(void* addr, size_t size)
