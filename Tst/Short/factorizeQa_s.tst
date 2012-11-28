@@ -53,6 +53,11 @@ poly f2 = 2294919476402860800*x^8+(2294919476402860800*w)*x^7*y+(229491947640286
 
 factorize (f1*f2);
 
+ring rw =(0,w),(x,y),dp;
+minpoly = w4-w3+2w2+w+1;
+poly f = x15-y15-15*x13+15*y13+90*x11-90*y11-275*x9+275*y9+450*x7-450*y7-378*x5+378*y5+140*x3-140*y3-15*x+15*y;
+factorize(f);
+
 kill r;
 ring r= (0,a),(x,y,z,s),dp;
 minpoly= a2+1;
