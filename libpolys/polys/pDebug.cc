@@ -85,11 +85,13 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     }
     else
     #endif
+    #ifndef X_OMALLOC
     {
       _pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==omSizeWOfBin(r->PolyBin),p,r);
       return TRUE;
     }
     return FALSE;
+    #endif
   }
   return TRUE;
 }
@@ -106,19 +108,25 @@ BOOLEAN p_CheckIsFromRing(poly p, ring r)
 
 BOOLEAN p_CheckPolyRing(poly p, ring r)
 {
+  #ifndef X_OMALLOC
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  #endif
   return p_CheckIsFromRing(p, r);
 }
 
 BOOLEAN p_LmCheckPolyRing(poly p, ring r)
 {
+  #ifndef X_OMALLOC
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  #endif
   pAssumeReturn(p != NULL);
   return p_LmCheckIsFromRing(p, r);
 }
 BOOLEAN p_CheckRing(ring r)
 {
+  #ifndef X_OMALLOC
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  #endif
   return TRUE;
 }
 
@@ -208,9 +216,11 @@ BOOLEAN _p_Test(poly p, ring r, int level)
   poly p_prev = NULL;
 
   #ifndef OM_NDEBUG
+  #ifndef X_OMALLOC
   // check addr with level+1 so as to check bin/page of addr
   _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (omSizeWOfBin(r->PolyBin))*SIZEOF_LONG, level+1)
                         == omError_NoError, "memory error",p,r);
+  #endif
   #endif
 
   pFalseReturn(p_CheckRing(r));
@@ -228,9 +238,11 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     // ring check
     pFalseReturn(p_LmCheckIsFromRing(p, r));
     #ifndef OM_NDEBUG
+    #ifndef X_OMALLOC
     // omAddr check
     _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (omSizeWOfBin(r->PolyBin))*SIZEOF_LONG, 1)
                      == omError_NoError, "memory error",p,r);
+    #endif
     #endif
     // number/coef check
     _pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r->cf) >= 2), "NULL coef",p,r);
