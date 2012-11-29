@@ -311,7 +311,8 @@ public:
 
   /// @name Pointer-style access
   //@{
-  const leftv operator->() const { return m_data;  }
+  /*const*/ leftv operator->() const { return m_data;  }
+  /*^ warning: 'const' type qualifier on return type has no effect!!! */
   leftv operator->() { return m_data;  }
   //@]
 

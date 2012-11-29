@@ -11,7 +11,7 @@
 #include <polys/monomials/p_polys.h>
 //#include "tgb_internal.h"
 
-struct slimgb_alg;
+class slimgb_alg;
 
 class tgb_matrix{
  private:

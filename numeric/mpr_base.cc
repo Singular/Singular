@@ -1927,7 +1927,7 @@ poly resMatrixSparse::getUDet( const number* evpoint )
 
 //-> dense resultant matrix
 //
-class resVector;
+struct resVector;
 
 /* dense resultant matrix */
 class resMatrixDense : virtual public resMatrixBase
