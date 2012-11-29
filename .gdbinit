@@ -1,6 +1,6 @@
 break dErrorBreak
 break dReportError
-
+break omReportError
 
 
 ### http://sourceware.org/gdb/onlinedocs/gdb/Define.html#Define
