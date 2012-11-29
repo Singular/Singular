@@ -15,6 +15,8 @@
 
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
+#include <polys/simpleideals.h>
+
 // #include <kernel/longrat.h>
 #include <kernel/GBEngine/kstd1.h>
 
@@ -388,7 +390,7 @@ if ((s)->v != NULL) \
     PRINT_RESOLUTION(syzstr, minres);
     PRINT_RESOLUTION(syzstr, fullres);
 
-    assume (id_RankFreeModule (syzstr->res[1], rr) == syzstr->res[1]->rank);
+//    assume (id_RankFreeModule (syzstr->res[1], rr) == syzstr->res[1]->rank);
 
     PRINT_RESOLUTION(syzstr, res);
     PRINT_RESOLUTION(syzstr, orderedRes);
@@ -1112,6 +1114,145 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
 }
 
 
+static BOOLEAN _ComputeResolution(leftv res, leftv h)
+{
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+   
+  const char* usage = "`ComputeResolution(<ideal/module>[,int])` expected";
+  const ring r = attributes.m_rBaseRing;
+
+  NoReturn(res);
+
+  // input
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  ideal M = (ideal)(h->CopyD()); // copy for resolution...!???
+  int size = IDELEMS(M);
+
+  assume( size >= 0 );
+
+  h = h->Next();
+
+  // lead
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+  
+  ideal L = (ideal)(h->CopyD()); // no copy!
+  assume( IDELEMS(L) == size );
+  
+  h = h->Next();
+
+  // tail
+  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  {
+    WerrorS(usage);
+    return TRUE;    
+  }
+
+  ideal T = (ideal)(h->CopyD()); // no copy!
+  assume( IDELEMS(T) == size );
+  
+  h = h->Next();
+
+  // length..?
+  long length = 0;
+  
+  if ((h!=NULL) && (h->Typ()==INT_CMD))
+  {
+    length = (long)(h->Data());
+    h = h->Next();
+  }
+  
+  assume( h == NULL );
+
+  if( length <= 0 )
+    length = 1 + rVar(r);  
+
+  if( __DEBUG__ )
+  {
+    PrintS("ComputeResolution(M, length)::Input: \n");
+    Print( "starting length: %ld\n", length);
+    PrintS("M: \n"); dPrint(M, r, r, 0);
+    PrintS("L=LEAD(M): \n"); dPrint(L, r, r, 1);
+    PrintS("T=TAIL(M): \n"); dPrint(T, r, r, 0);
+  }
+
+
+  syStrategy _res=(syStrategy)omAlloc0(sizeof(ssyStrategy));
+  
+//  class ssyStrategy; typedef ssyStrategy * syStrategy;
+//  typedef ideal *            resolvente;
+
+  _res->length = length + 1; // index + 1;
+  _res->fullres = (resolvente)omAlloc0((_res->length)*sizeof(ideal));
+  int index = 0;
+  _res->fullres[index++] = M;
+
+  while( (!idIs0(L)) && (index < length))
+  {
+    ideal LL, TT;  
+    ComputeSyzygy(L, T, LL, TT, attributes);
+
+    if( __DEBUG__ )
+    {
+      Print("ComputeResolution()::Separated Syzygy[%d]: \n", index);
+      PrintS("LL: \n"); dPrint(LL, r, r, 1);
+      PrintS("TT: \n"); dPrint(TT, r, r, 2);
+    }
+    size = IDELEMS(LL);
+
+    assume( size == IDELEMS(TT) );
+    
+    id_Delete(&L, r); id_Delete(&T, r);
+
+    L = LL; T = TT;
+    
+    // id_Add(T, L, r);
+    M = idInit(size, 0);
+    for( int i = size-1; i >= 0; i-- )
+    {
+      M->m[i] = p_Add_q(p_Copy(T->m[i], r), p_Copy(L->m[i], r), r); // TODO: :(((
+    }
+    M->rank = id_RankFreeModule(M, r);
+    
+    if( __DEBUG__ )
+    {
+      Print("ComputeResolution()::Restored Syzygy[%d]: \n", index);
+      PrintS("M = LL + TT: \n"); dPrint(M, r, r, 0);
+    }
+  
+    _res->fullres[index++] = M; // ???
+  }
+
+  id_Delete(&L, r); id_Delete(&T, r);
+  
+  res->data = _res;
+  res->rtyp = RESOLUTION_CMD;
+
+  if( __DEBUG__ )
+  {
+    Print("ComputeResolution::Output (index: %d): ", index);
+//    class sleftv; typedef sleftv * leftv;
+    sleftv _h;
+    DetailedPrint(&_h, res);
+  }
+
+//  omFreeSize(_res, sizeof(ssyStrategy));
+  
+  return FALSE;
+
+}
+
+
 /// module (LL, TT) = SSComputeSyzygy(L, T);
 /// Compute Syz(L ++ T) = N = LL ++ TT
 // proc SSComputeSyzygy(def L, def T)
@@ -1125,7 +1266,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 //   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
 //   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
 
-  const char* usage = "`ComputeSyzygy(<ideal/module>, <ideal/module>])` expected";
+  const char* usage = "`ComputeSyzygy(<ideal/module>, <ideal/module>)` expected";
   const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
@@ -1825,8 +1966,9 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
     
   ADD(psModulFunctions, currPack->libname, "SchreyerSyzygyNF", FALSE, _SchreyerSyzygyNF);
   ADD(psModulFunctions, currPack->libname, "ComputeSyzygy", FALSE, _ComputeSyzygy);
-  
-  //  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
+
+  ADD(psModulFunctions, currPack->libname, "ComputeResolution", FALSE, _ComputeResolution);
+//  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
 
   //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
 

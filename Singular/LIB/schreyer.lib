@@ -2152,6 +2152,8 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
       exportto(Schreyer, Syzextra::ComputeSyzygy);
+
+      exportto(Schreyer, Syzextra::ComputeResolution);      
     }
 /*
     else
@@ -2204,6 +2206,8 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra_g::SchreyerSyzygyNF);
       exportto(Schreyer, Syzextra_g::ComputeSyzygy);
+
+      exportto(Schreyer, Syzextra_g::ComputeResolution);      
     }
 */
 
@@ -2273,7 +2277,7 @@ example
   
   int i, j; 
   int f = 0;
-  def m;
+  def m, mm;
   
   for (i = size(@save_res_list); i > 0; i--)
   {
@@ -2286,18 +2290,35 @@ example
     
     for (j = i-1; j > 0; j--)
     {
-      if( m != @save_res_list[j][4] )
+      mm = @save_res_list[j][4];
+      if( (nrows(m) != nrows(mm)) || (ncols(m) != ncols(mm)) )
       {
-        "ERROR: Betti[j: ", j, "] != Betti[i: ", i, "]:"; 
-	"j: ", j;
-	print( @save_res_list[j][4], "betti");
-	print(@save_res_list[j]);
+        "ERROR: SIZE(Betti[j: ", j, "]) != SIZE(Betti[i: ", i, "]):"; 
+        "j: ", j;
+        print( @save_res_list[j][4], "betti");
+        print(@save_res_list[j]);
 	
-	"i: ", i;
-	print( @save_res_list[i][4], "betti");
-	print(@save_res_list[i]);
+        "i: ", i;
+        print( @save_res_list[i][4], "betti");
+        print(@save_res_list[i]);
 
         f = 1;
+
+      } else
+      {
+        if( m != mm )
+        {
+          "ERROR: Betti[j: ", j, "] != Betti[i: ", i, "]:"; 
+          "j: ", j;
+          print( @save_res_list[j][4], "betti");
+          print(@save_res_list[j]);
+
+          "i: ", i;
+          print( @save_res_list[i][4], "betti");
+          print(@save_res_list[i]);
+
+          f = 1;
+        };
       };
   
     };
@@ -2432,6 +2453,36 @@ proc TestSSres(def I)
   timer=0;rtimer=0;def R=SSres(I,0);@m=rtimer;
   if(@PROFILE){ProfilerStop();}
   setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
+  DetailedPrint(RR,0);
+  SCheck(R);
+  StopAddResTest(RR, S, @t,@m); 
+  kill S, RR; setring save; kill R;
+}
+
+proc TestSSSres(def I)
+{
+  def save = basering;
+  int @t,@m,r,rr,i;
+  string name = 
+    "LEAD2SYZ:"  +string(attrib(SSinit,"LEAD2SYZ")) +
+    ",TAILREDSYZ:"+string(attrib(SSinit,"TAILREDSYZ")) +
+    ",HYBRIDNF:"  +string(attrib(SSinit,"HYBRIDNF"));
+
+  int @PROFILE = attrib(SSinit, "PROFILE");
+  if(@PROFILE){ string @prof = "SSSres_" + @save_res_desc + "_" + name + ".prof"; }
+
+  StartAddResTest(
+   "SSSres",
+   "minres + betti(,1) + mods: {" + name + "}"
+  );
+  
+  option(redSB); option(redTail);
+  if(@PROFILE){ProfilerStart(@prof);}
+  timer=0;rtimer=0;def R=SSinit(I);setring R;def RR=ComputeResolution(RES[2], LRES[2], TRES[2], 0);
+@m=rtimer;
+  if(@PROFILE){ProfilerStop();}
+RR=minres(RR);def S=betti(RR,1);@t=rtimer;
+//  DetailedPrint(RR,0);  print(RR);  print(S, "betti");
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
   kill S, RR; setring save; kill R;
@@ -2508,8 +2559,10 @@ proc TestSSresAttribs(def M, list #)
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+
+
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
   
 
@@ -2526,13 +2579,13 @@ proc TestSSresAttribs2tr(def M, list #)
 {
   StartResTesting(#);
   
-  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
-//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
-//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
   
   Testlres(M);  
