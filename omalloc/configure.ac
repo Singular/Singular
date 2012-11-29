@@ -14,6 +14,8 @@ AC_CONFIG_HEADER(omConfig.h)
 
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+
 
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([omConfig.h],[],[omConfig.h])

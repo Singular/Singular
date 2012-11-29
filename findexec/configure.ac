@@ -7,6 +7,8 @@ AC_CONFIG_HEADER([config.h])
 
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
