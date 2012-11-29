@@ -1,12 +1,15 @@
 #ifndef MINOR_H
 #define MINOR_H
 
-#include <assert.h>
+// #include <assert.h>
 #include <string>
 
-#include <kernel/polys.h>
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
 
-using namespace std;
+struct sip_sideal; typedef struct sip_sideal *       ideal;
+
+// using namespace std;
 
 /*! \class MinorKey
     \brief Class MinorKey can be used for representing keys in a cache for
@@ -390,7 +393,7 @@ class MinorKey
      * @return a printable version of the given instance as instance of class
      * string
      */
-     string toString () const;
+   std::string toString () const;
 
      /**
      * A method for printing a string representation of the given MinorKey to
@@ -682,7 +685,7 @@ class MinorValue
     * @return a printable version of the given instance as instance of class
     *         string
     */
-    virtual string toString () const;
+   virtual std::string toString () const;
     
     /**
     * A method for printing a string representation of the given MinorValue
@@ -770,7 +773,7 @@ class IntMinorValue : public MinorValue
     * @return a printable version of the given instance as instance of class
     * string
     */
-    string toString () const;
+   std::string toString () const;
 };
 
 /*! \class PolyMinorValue
@@ -857,7 +860,7 @@ class PolyMinorValue : public MinorValue
     * @return a printable version of the given instance as instance of class
     * string
     */
-    string toString () const;
+   std::string toString () const;
 };
 
 #endif
