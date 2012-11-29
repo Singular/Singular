@@ -21,13 +21,13 @@
 
 // #define ULONG_MAX (~0UL) // ??
 #ifndef ULONG_MAX
-#define ULONG_MAX (~0L)
+#define ULONG_MAX (~0UL)
 #endif
 
 // TODO: fixing the following BUG (!?) leads to wrong ring::bitmask
 // #if ~0UL != 4294967295UL
 #ifndef LONG_MAX
-#if ~0UL == 4294967295UL
+#if ULONG_MAX != 4294967295UL
 #define LONG_MAX 9223372036854775807L
 #else
 #define LONG_MAX 2147483647L
