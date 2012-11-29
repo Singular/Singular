@@ -502,16 +502,21 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
     //middle product style computation of [G*oldQ]^{l}_{oldL}
     CanonicalForm G3= div (G, xToOldL);
     CanonicalForm Up= mulMod2 (G3, oldQ, xToLOldL);
-    CanonicalForm xToOldL2= power (x, oldL/2);
+    CanonicalForm xToOldL2= power (x, (oldL+1)/2);
     CanonicalForm G2= mod (G, xToOldL);
     CanonicalForm G1= div (G2, xToOldL2);
     CanonicalForm G0= mod (G2, xToOldL2);
     CanonicalForm oldQ1= div (oldQ, xToOldL2);
     CanonicalForm oldQ0= mod (oldQ, xToOldL2);
-    CanonicalForm Mid= mulMod2 (G1, oldQ1, xToLOldL);
+    CanonicalForm Mid;
+    if (oldL % 2 == 1)
+      Mid= mulMod2 (G1, oldQ1*x, xToLOldL);
+    else
+      Mid= mulMod2 (G1, oldQ1, xToLOldL);
     //computation of Low might be faster using a real middle product?
     CanonicalForm Low= mulMod2 (G0, oldQ1, xToOldL)+mulMod2 (G1, oldQ0, xToOldL);
-    Low= div (Low, xToOldL2);
+    Low= div (Low, power (x, oldL/2));
+    Low= mod (Low, xToLOldL);
     Up += Mid + Low;
     bufF= div (F, xToOldL);
     bufF -= Up;
