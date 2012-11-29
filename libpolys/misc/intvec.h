@@ -22,11 +22,12 @@ private:
 public:
 
   inline intvec(int l = 1)
-    {
-      v = (int *)omAlloc0(sizeof(int)*l);
-      row = l;
-      col = 1;
-    }
+  {
+    assume(l > 0);
+    v = (int *)omAlloc0(sizeof(int)*l);
+    row = l;
+    col = 1;
+  }
   intvec(int s, int e);
   intvec(int r, int c, int init);
   intvec(const intvec* iv)
@@ -34,6 +35,8 @@ public:
     assume( iv != NULL );
     row = iv->rows();
     col = iv->cols();
+    assume(row > 0);
+    assume(col > 0);
     if (row*col>0)
     {
       v   = (int *)omAlloc(sizeof(int)*row*col);
@@ -110,6 +113,7 @@ public:
     return m;
   }
 #if 0
+  // TODO: no omalloc Bin (de-)/allocation?
   void* operator new ( size_t size )
   {
     void* addr;
