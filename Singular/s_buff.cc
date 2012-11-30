@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>

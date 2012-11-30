@@ -18,7 +18,9 @@ poly pShallowCopyDelete_General(poly s_p, ring s_r, ring d_r, omBin d_bin)
   p_CheckPolyRing(s_p, s_r);
   p_CheckRing(d_r);
   assume(d_bin != NULL);
+  #ifndef X_OMALLOC
   assume(d_bin == d_r->PolyBin || d_bin->sizeW == d_r->PolyBin->sizeW);
+  #endif
   assume(s_r->N == d_r->N);
 
   spolyrec dp;
