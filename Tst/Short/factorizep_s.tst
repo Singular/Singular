@@ -384,4 +384,99 @@ list l=factorize(f);
 size (l[1]) < 6;
 testfactors (l,f);
 
+
+kill r;
+ring r=2,(x,y),dp;
+poly f= (x^6*y+x^4*y^2+x^5+x^2*y^2+x^2*y+y^2+x)*(x^6*y^2+y^7+x^3*y^3+x^4+y);
+list l= factorize (f);
+testfactors (l, f);
+
+f= (x^3*y^2+y^3+x^2+1)*(x^2*y^6+x^4*y^2+y^4+y^3+x*y+x+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^3*y^4+y^3+x+1)*(x*y^7+y^6+x^2*y^2+x^3+x*y+y);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^4*y^3+x^2*y^4+x^5+x*y^2+1)*(x^2*y^6+x*y^5+x*y^4+x^2*y^2+x^2*y+y);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^5+x*y^2+y)*(x^4*y^2+x^3+x*y+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^2*y^3+y^3+x^2+x)*(x^7+x^5*y+x^2*y^3+y^3+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^3*y+x*y+1)*(x^5*y+x*y^4+x^2*y^2+y^2+y+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^4*y^2+x^3*y+x*y+1)*(x*y^5+y^5+x^2*y+x*y+x+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+
+f= (y^6+x^5+y^3+x)*(x^2*y^3+y^4+y);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x*y^3+x*y^2+1)*(x^3*y^3+x^4*y+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^4*y^2+x^3*y^2+x*y+1)*(x^6+y^5);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^5*y+x^2*y^3+x*y^3+x^2+y+1)*(x*y^5+x^2);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^2*y^3+x*y^2+x+1)*(x^5+x*y^2+x*y+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^6+x*y^2+x^2+y)*(y^5+x^3*y+y+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (y^6+x*y^4+y^4+y^3+1)*(y^6+x^5+x^2*y^2+x^2*y+x*y+1);
+l= factorize (f);
+testfactors (l, f);
+
+
+f= (x^5+y^3+x)*(x*y^5+x^3*y+x^2+y);
+l= factorize (f);
+testfactors (l, f);
+
+
+f=x^2*y^5+x^4*y^2+x^2*y^4+x^4*y+x^3*y^2+x*y^4+x^2*y^2+y^3+x^2+x*y+x+1;
+l= factorize (f);
+testfactors (l,f);
+
+
+kill r;
+// from P. Zimmermann via libsingular-devel
+ring r = 2,(y,t),dp;
+poly f = y*t^8 + y^5*t^2 + y*t^6 + t^7 + y^6 + y^5*t + y^2*t^4 + y^2*t^2 +
+y^2*t + t^3 + y^2 + t^2;
+def l=factorize (f);
+testfactors (l, f);
 tst_status(1);$
