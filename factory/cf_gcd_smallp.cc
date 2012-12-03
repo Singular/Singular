@@ -1999,14 +1999,10 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
 #ifdef HAVE_FLINT
   nmod_mat_t FLINTN;
   convertFacCFMatrix2nmod_mat_t (FLINTN, *N);
-  long* dummy= new long [M.rows()];
-  for (int i= 0; i < M.rows(); i++)
-    dummy[i]= 0;
-  long rk= nmod_mat_rref (dummy, FLINTN);
+  long rk= nmod_mat_rref (FLINTN);
 
   N= convertNmod_mat_t2FacCFMatrix (FLINTN);
   nmod_mat_clear (FLINTN);
-  delete dummy;
 #else
   int p= getCharacteristic ();
   if (fac_NTL_char != p)
@@ -2082,10 +2078,7 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
 #ifdef HAVE_FLINT
   nmod_mat_t FLINTN;
   convertFacCFMatrix2nmod_mat_t (FLINTN, *N);
-  long* dummy= new long [M.rows()];
-  for (int i= 0; i < M.rows(); i++)
-    dummy[i]= 0;
-  long rk= nmod_mat_rref (dummy, FLINTN);
+  long rk= nmod_mat_rref (FLINTN);
 #else
   int p= getCharacteristic ();
   if (fac_NTL_char != p)
@@ -2100,7 +2093,6 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   {
 #ifdef HAVE_FLINT
     nmod_mat_clear (FLINTN);
-    delete dummy;
 #endif
     delete N;
     return CFArray();
@@ -2108,7 +2100,6 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
 #ifdef HAVE_FLINT
   N= convertNmod_mat_t2FacCFMatrix (FLINTN);
   nmod_mat_clear (FLINTN);
-  delete dummy;
 #else
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
 #endif
