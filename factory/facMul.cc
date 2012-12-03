@@ -2748,13 +2748,6 @@ void divrem2 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     divrem (A, B, Q, R);
     return;
   }
-  if (!(B.level() == 1 && B.isUnivariate()) &&
-      (A.level() == 1 && A.isUnivariate()))
-  {
-    Q= 0;
-    R= A;
-    return;
-  }
 
   Variable x= Variable (1);
   int degB= degree (B, x);
