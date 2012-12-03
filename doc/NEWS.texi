@@ -19,7 +19,32 @@
 @end macro
 @end ifset
 
-@heading News for version @value{VERSION}
+@c @heading News for version @value{VERSION}
+@heading News for version 3-1-6
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
+@item new library: ffsolve.lib:  solving over Z/p (@nref{ffsolve_lib})
+@item new library: numerAlg.lib:  Numerical Algebraic Algorithm (@nref{numerAlg_lib})
+@item new library: numerDecom.lib:  Bertini interface (@nref{numerDecom_lib})
+@item new library: JMSConst.lib:  constructing J-Marked Schemes (@nref{JMSConst_lib})
+@item new library: JMBTest.lib:  performs JM basis test (@nref{JMBTest_lib})
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item
+imprived grobcov.lib (@nref{grobcov_lib})
+@end itemize
+
+@heading Internal Changes
+@itemize @bullet
+@item
+several bug fixes in factorization code
+@end itemize
+@heading --------------------------------------------------------------------
+@heading Older versions:
+@heading News for version 3-1-5
 
 @heading New data types
 @itemize @bullet
@@ -40,10 +65,6 @@
 @item new library: locnormal.lib: Normalization of affine domains using local methods (@nref{locnormal_lib})
 @item new library: modnormal.lib: Normalization of affine domains using modular methods (@nref{modnormal_lib})
 @item new library: realizationMatroids.lib: Deciding Relative Realizability for Tropical Fan Curves in 2-Dimensional Matroidal Fans (@nref{realizationMatroids_lib})
-@item new library: numerAlg.lib:  Numerical Algebraic Algorithm (@nref{numerAlg_lib})
-@item new library: numerDecom.lib:  Bertini interface (@nref{numerDecom_lib})
-@item new library: JMSConst.lib:  constructing J-Marked Schemes (@nref{JMSConst_lib})
-@item new library: JMBTest.lib:  performs JM basis test (@nref{JMBTest_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
@@ -67,8 +88,8 @@ factorization code for extension fields improved
 @item
 set the reaction to Cntrl-C (see @nref{Command line options}).
 @end itemize
-@heading --------------------------------------------------------------------
-@heading Older versions:
+
+@c ---------------------------------------------------------------------------
 @heading News for version 3-1-4
 
 @heading New data types
