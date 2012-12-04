@@ -160,7 +160,6 @@ typedef short BOOLEAN;
 #endif
 // #endif
 
-static const int MAX_INT_LEN= 11;
 typedef void* ADDRESS;
 
 #define loop for(;;)
