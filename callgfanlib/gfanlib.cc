@@ -3,6 +3,7 @@
 #include <callgfanlib/bbcone.h>
 #include <callgfanlib/bbfan.h>
 #include <callgfanlib/bbpolytope.h>
+#include <callgfanlib/gitfan.h>
 
 template class gfan::Vector<gfan::Integer>;
 template class gfan::Vector<gfan::Rational>;
@@ -14,5 +15,6 @@ extern "C" int mod_init(void* gfanlibsingular)
   bbcone_setup();
   bbfan_setup();
   bbpolytope_setup();
+  gitfan_setup();
 }
 #endif

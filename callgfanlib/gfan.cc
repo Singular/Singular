@@ -4188,7 +4188,7 @@ lists lprepareResult(gcone *gc, const int n)
                 lists l=(lists)omAllocBin(slists_bin);
                 l->Init(6);
                 l->m[0].rtyp=INT_CMD;
-                l->m[0].data=(void*)gcAct->getUCN();
+                l->m[0].data=(void*)(long)gcAct->getUCN();
                 l->m[1].rtyp=IDEAL_CMD;
                 /*The following is necessary for leaves in the tree of cones
                 * Since we don't use them in the computation and gcBasis is
@@ -4226,7 +4226,7 @@ lists lprepareResult(gcone *gc, const int n)
                 l->m[4].rtyp=INTVEC_CMD/*RING_CMD*/;
                 l->m[4].data=(void*)(gcAct->getIntPoint/*BaseRing*/());
                 l->m[5].rtyp=INT_CMD;
-                l->m[5].data=(void*)gcAct->getPredUCN();
+                l->m[5].data=(void*)(long)gcAct->getPredUCN();
                 res->m[ii].data=(void*)l;
                 gcAct = gcAct->next;
         }

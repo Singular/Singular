@@ -83,7 +83,7 @@ BOOLEAN bbpolytope_Assign(leftv l, leftv r)
  
   if (l->rtyp==IDHDL)
   {
-    IDDATA((idhdl)l->data)=(char *)newZc;
+    IDDATA((idhdl)l->data) = (char*) newZc;
   }
   else
   {
@@ -111,7 +111,7 @@ void bbpolytope_destroy(blackbox *b, void *d)
   }
 }
 
-void * bbpolytope_Copy(blackbox*b, void *d)
+void* bbpolytope_Copy(blackbox*b, void *d)
 {       
   gfan::ZCone* zc = (gfan::ZCone*)d;
   gfan::ZCone* newZc = new gfan::ZCone(*zc);
@@ -137,7 +137,7 @@ static BOOLEAN ppCONERAYS1(leftv res, leftv v)
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
   res->rtyp = polytopeID;
-  res->data = (char *)zc;
+  res->data = (void*) zc;
 
   delete zm;
   if (v->Typ() == INTMAT_CMD)
@@ -177,7 +177,7 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
   *zc = gfan::ZCone::givenByRays(*zm,gfan::ZMatrix(0, zm->getWidth()));
   //k should be passed on to zc; not available yet
   res->rtyp = polytopeID;
-  res->data = (char *)zc;
+  res->data = (void*) zc;
 
   delete zm;
   if (v->Typ() == INTMAT_CMD)
@@ -219,7 +219,7 @@ static BOOLEAN ppCONENORMALS1(leftv res, leftv v)
   if (v->Typ() == INTMAT_CMD)
     delete ineq;
   res->rtyp = polytopeID;
-  res->data = (char *)zc;
+  res->data = (void*) zc;
   return FALSE;
 }
 
@@ -262,7 +262,7 @@ static BOOLEAN ppCONENORMALS2(leftv res, leftv u, leftv v)
     delete eq;
 
   res->rtyp = polytopeID;
-  res->data = (char *)zc;
+  res->data = (void*) zc;
   return FALSE;
 }
 
@@ -313,7 +313,7 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
     delete eq;
 
   res->rtyp = polytopeID;
-  res->data = (char *)zc;
+  res->data = (void*) zc;
   return FALSE;
 }
 
@@ -405,7 +405,7 @@ BOOLEAN newtonPolytope(leftv res, leftv args)
     gfan::ZCone* zc = new gfan::ZCone();
     *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
     res->rtyp = polytopeID;
-    res->data = (char*) zc;
+    res->data = (void*) zc;
     return FALSE;
   }
   WerrorS("newtonPolytope: unexpected parameters");
@@ -429,7 +429,7 @@ BOOLEAN scalePolytope(leftv res, leftv args)
       gfan::ZCone* zq = new gfan::ZCone();
       *zq = gfan::ZCone::givenByRays(zm,gfan::ZMatrix(0, zm.getWidth()));
       res->rtyp = polytopeID;
-      res->data = (char*) zq;
+      res->data = (void*) zq;
       return FALSE;
     }
   }
@@ -445,7 +445,7 @@ BOOLEAN dualPolytope(leftv res, leftv args)
     gfan::ZCone* zp = (gfan::ZCone*) u->Data();
     gfan::ZCone* zq = new gfan::ZCone(zp->dualCone());
     res->rtyp = polytopeID;
-    res->data = (char*) zq;
+    res->data = (void*) zq;
     return FALSE;
   }
   WerrorS("dualPolytope: unexpected parameters");
