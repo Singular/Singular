@@ -14,20 +14,36 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
+  //#include <misc/auxiliary.h>
+  //#include "newstruct.h"
+
+#include <Python.h>
+
+#include <Singular/ipid.h>
+#include <Singular/blackbox.h>
+#include <Singular/lists.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/newstruct.h>
+
+
 #include <misc/auxiliary.h>
-#include "newstruct.h"
 
 #include <omalloc/omalloc.h>
 
 #include <kernel/febase.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 
 #include "subexpr.h"
 #include "lists.h"
 #include "ipid.h"
 #include "blackbox.h"
+#include "ipshell.h"
 
-#include <Python.h>
+
+
+
+  //#include <Python.h>
 // #include <iterator>             // std::distance
 // #include <stdio.h>
 
@@ -586,7 +602,7 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   if (!lhs(op, rhs1, rhs2).assign_to(res))
     return FALSE;
 
-  return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
+  return blackbox_default_Op3(op, res, arg1, arg2, arg3);
 }
 
 
@@ -686,8 +702,8 @@ void sync_contexts()
 
 
 // forward declaration
-int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
-               BOOLEAN(*func)(leftv res, leftv v));
+//int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+//               BOOLEAN(*func)(leftv res, leftv v));
 
 #define ADD_C_PROC(name) iiAddCproc("", (char*)#name, FALSE, name);
 

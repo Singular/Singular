@@ -36,3 +36,4 @@ EXTRA_DIST = autogen.sh emacs
 
 
 bin_SCRIPTS = libsingular-config
+

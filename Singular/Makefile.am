@@ -389,3 +389,19 @@ gftables: ${abs_top_srcdir}/factory/gftables
 
 MOD: ${abs_top_builddir}/libpolys/polys/.libs
 	ln -snf ${abs_top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD
+
+
+if PYTHON_USE
+   PACKAGES=pyobject
+   moduledir = $(bindir)
+   module_LTLIBRARIES=pyobject.so
+   pyobject_so_SOURCES = pyobject.cc
+   pyobject_so_LIBADD =  libSingular.la -lnumeric -lkernel -lpolys  -lcoeffs \
+  -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) \
+$(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+
+
+   pyobject_so_CPPFLAGS  = ${AM_CPPFLAGS} @PYTHON_CSPEC@ ${Singular_LDADD} ${AMLDFLAGS}
+   pyobject_so_LDFLAGS = ${AMLDFLAGS}  -module -avoid-version @PYTHON_LSPEC@ \
+ -DHUHUHUHUHU ${pyobject_so_LIBADD}
+endif
