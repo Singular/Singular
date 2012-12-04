@@ -402,6 +402,6 @@ $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
 
    pyobject_so_CPPFLAGS  = ${AM_CPPFLAGS} @PYTHON_CSPEC@ ${Singular_LDADD} ${AMLDFLAGS}
-   pyobject_so_LDFLAGS = ${AMLDFLAGS}  -module -avoid-version @PYTHON_LSPEC@ \
+   pyobject_so_LDFLAGS = ${AMLDFLAGS}  -shared -module -avoid-version @PYTHON_LSPEC@ \
  -DHUHUHUHUHU ${pyobject_so_LIBADD}
 endif
