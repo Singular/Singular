@@ -24,6 +24,7 @@
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
+@item new library: classifyceq.lib:  simple hypersurface singularities in characteristic p (@nref{classifyceq_lib})
 @item new library: ffsolve.lib:  solving over Z/p (@nref{ffsolve_lib})
 @item new library: numerAlg.lib:  Numerical Algebraic Algorithm (@nref{numerAlg_lib})
 @item new library: numerDecom.lib:  Bertini interface (@nref{numerDecom_lib})
@@ -37,10 +38,19 @@
 imprived grobcov.lib (@nref{grobcov_lib})
 @end itemize
 
+@heading Changed @sc{Singular} commands
+@itemize @bullet
+@item extgcd: (@nref{extgcd}): extended: for @code{bigint}
+@item chinrem: (@nref{chinrem}): extended: for @code{bigint}
+@item primefactors: (@nref{primefactors}): changed result list and algorithm
+@end itemize
+
 @heading Internal Changes
 @itemize @bullet
 @item
 several bug fixes in factorization code
+@item
+polymake/gfan interface extended
 @end itemize
 @heading --------------------------------------------------------------------
 @heading Older versions:
