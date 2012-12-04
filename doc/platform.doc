@@ -88,30 +88,54 @@ from our FTP site
 
 Do not use the Finder for the installation!
 
-After inserting the CD, open a terminal (under /Applications/Utilities) and
-type the following commands (you need an Admin Account):
-@*   sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-ppcMac-darwin.tar.gz
-@*   sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-share.tar.gz
-@*   sudo ln -sf /usr/local/Singular/3-0-3/ppcMac-darwin/Singular /usr/local/bin/Singular-3-0-3
-@*The first two commands unpack the tar.gz files and copy the Singular
-files (binaries and documentation, libs, etc) to /usr/local/Singular/3-0-3.
+You need the following two archives:
+@table @code
+@item a:
+Singular-@value{VERSION}-share.tar.gz
+contains architecture independent data like documentation and libraries.
+@item b:
+Singular-@value{VERSION}-ix86Mac-darwin.tar.gz
+contains architecture dependent executables, like the @sc{Singular}
+program.
+@end table
 
-The final command creates a link in /usr/local/bin so that you can just type
-Singular-3-0-3
-to run @sc{Singular} in any terminal.
+You can obtain these (and other) archives from
+@display
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/UNIX/}.
+@end display
+
+@enumerate
+@item
+Within a terminal, change to the directory in which you wish to install
+@sc{Singular} (usually wherever you install 3rd-party software), for example:
+@smallexample
+cd /usr/local
+or
+mkdir install;cd install
+(you do not need root privileges in this case)
+@end smallexample
+
+@item
+Unpack the archives:
+@smallexample
+gzip -dc <path_to>/Singular-@value{VERSION}-ix86Mac-darwin.tar.gz | tar -pxf -
+gzip -dc <path_to>/Singular-@value{VERSION}-share.tar.gz | tar -pxf -
+@end smallexample
+@item
+add Singular to a directory within your path:
+@smallexample
+sudo ln -s `pwd`/Singular/@value{VERSION}/ix86Mac-darwin/Singular  /usr/local/bin/Singular
+sudo ln -s `pwd`/Singular/@value{VERSION}/ix86Mac-darwin/ESingular  /usr/local/bin/ESingular
+@end smallexample
+@end enumerate
 
 
-(The expert might wish to read the INSTALL_unix.html file in the UNIX
-directory for alternatives).
-
-Installation via fink
+@strong{Installation via fink (recommended)}
 
 Fink is a well-known package format for Mac OS X.
 (see http://fink.sf.net)
 
 There are two packages: singular-doc and singular.
-
-They are available for 10.3 and 10.4 (in fink called 10.4-transitional).
 
 If you have fink installed, choose one of the two possibilities:
 
@@ -122,7 +146,7 @@ If you have fink installed, choose one of the two possibilities:
      @*@code{fink install singular singular-doc}
 
 @item
-using the Fink Commander:
+alternatively, using the Fink Commander:
 
    @itemize
    @item
