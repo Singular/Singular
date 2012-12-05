@@ -298,24 +298,10 @@ void naDelete(number * a, const coeffs cf)
 BOOLEAN naEqual(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
-
   /// simple tests
-  if (a == b) return TRUE;
-  if ((a == NULL) && (b != NULL)) return FALSE;
-  if ((b == NULL) && (a != NULL)) return FALSE;
-
-  /// deg test
-  int aDeg = 0;
-  if (a != NULL) aDeg = p_Totaldegree((poly)a, naRing);
-  int bDeg = 0;
-  if (b != NULL) bDeg = p_Totaldegree((poly)b, naRing);
-  if (aDeg != bDeg) return FALSE;
-
-  /// subtraction test
-  number c = naSub(a, b, cf);
-  BOOLEAN result = naIsZero(c, cf);
-  naDelete(&c, cf);
-  return result;
+  if (a == NULL) return (b == NULL);
+  if (b == NULL) return (a == NULL);
+  return p_EqualPolys((poly)a,(poly)b,naRing);
 }
 
 number naCopy(number a, const coeffs cf)
@@ -515,10 +501,10 @@ number naSub(number a, number b, const coeffs cf)
 number naMult(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
-  if (a == NULL) return NULL;
-  if (b == NULL) return NULL;
+  if ((a == NULL)||(b == NULL)) return NULL;
   poly aTimesB = p_Mult_q(p_Copy((poly)a, naRing),
                           p_Copy((poly)b, naRing), naRing);
+  p_Normalize(aTimesB,naRing);
   definiteReduce(aTimesB, naMinpoly, cf);
   return (number)aTimesB;
 }

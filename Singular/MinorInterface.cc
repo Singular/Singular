@@ -1,16 +1,20 @@
-// include before anything to avoid clashes with stdio.h included elsewhere
-#include <cstdio>
+#include "config.h"
+#include <kernel/mod2.h>
 
-#include <MinorInterface.h>
-#include <MinorProcessor.h>
+// include before anything to avoid clashes with stdio.h included elsewhere
+// #include <cstdio>
+
+#include "MinorInterface.h"
+#include "MinorProcessor.h"
+
+#include <polys/simpleideals.h>
 
 #include <kernel/polys.h>
 #include <kernel/structs.h>
-
-#include "config.h"
-#include <kernel/mod2.h>
-#include <kernel/ideals.h>
 #include <kernel/kstd1.h>
+#include <kernel/ideals.h>
+
+using namespace std;
 
 bool currRingIsOverIntegralDomain ()
 {
@@ -171,7 +175,7 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
     theMinor = mp.getNextMinor(algorithm, i);
 #if (defined COUNT_AND_PRINT_OPERATIONS) && (COUNT_AND_PRINT_OPERATIONS > 1)
     qqq++;
-    printf("after %d", qqq);
+    Print("after %d", qqq);
     printCounters ("-th minor", false);
 #endif
     f = theMinor.getResult();
@@ -400,7 +404,7 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
     theMinor = mp.getNextMinor(cch, i);
 #if (defined COUNT_AND_PRINT_OPERATIONS) && (COUNT_AND_PRINT_OPERATIONS > 1)
     qqq++;
-    printf("after %d", qqq);
+    Print("after %d", qqq);
     printCounters ("-th minor", false);
 #endif
     f = theMinor.getResult();

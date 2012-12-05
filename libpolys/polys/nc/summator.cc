@@ -32,7 +32,7 @@
 
 
 CPolynomialSummator::CPolynomialSummator(const ring& rBaseRing, bool bUsePolynomial):
-    m_bUsePolynomial(bUsePolynomial), m_basering(rBaseRing)
+    m_basering(rBaseRing), m_bUsePolynomial(bUsePolynomial)
 {
 #ifdef RDEBUG
   rTest(rBaseRing);
@@ -182,7 +182,8 @@ void CPolynomialSummator::Add(poly pSummand)
 
 
 
-CPolynomialSummator::CPolynomialSummator(const CPolynomialSummator& b): m_bUsePolynomial(b.m_bUsePolynomial), m_basering(b.m_basering)
+CPolynomialSummator::CPolynomialSummator(const CPolynomialSummator& b):
+    m_basering(b.m_basering), m_bUsePolynomial(b.m_bUsePolynomial)
 {
 //  try{
     if(m_bUsePolynomial)

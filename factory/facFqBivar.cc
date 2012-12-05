@@ -411,7 +411,9 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
                 delete [] v;
                 if (recombination)
                 {
-                  appendTestMapDown (result, buf (y - eval, y), info, source,
+                  buf= buf (y-eval,y);
+                  buf /= Lc (buf);
+                  appendTestMapDown (result, buf, info, source,
                                       dest);
                   F= 1;
                   return result;
@@ -438,7 +440,9 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
       delete [] v;
       if (recombination)
       {
-        appendTestMapDown (result, buf (y - eval, y), info, source, dest);
+        buf= buf (y-eval,y);
+        buf /= Lc (buf);
+        appendTestMapDown (result, buf, info, source, dest);
         F= 1;
         return result;
       }
@@ -590,6 +594,14 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           if (!isRat)
             On (SW_RATIONAL);
           g /= content (g, x);
+          if (!isRat)
+          {
+            On (SW_RATIONAL);
+            g *= bCommonDen (g);
+            Off (SW_RATIONAL);
+            g /= icontent (g);
+            On (SW_RATIONAL);
+          }
           if (fdivides (g, buf, quot))
           {
             recombination= true;
@@ -761,6 +773,14 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           if (!isRat)
             On (SW_RATIONAL);
           g /= content (g, x);
+          if (!isRat)
+          {
+            On (SW_RATIONAL);
+            g *= bCommonDen (g);
+            Off (SW_RATIONAL);
+            g /= icontent (g);
+            On (SW_RATIONAL);
+          }
           if (fdivides (g, buf, quot))
           {
             reconstructedFactors.append (g);
@@ -1771,6 +1791,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y-evaluation, y);
+    buf2 /= Lc (buf2);
     if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
@@ -1851,6 +1872,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y-evaluation, y);
+    buf2 /= Lc (buf2);
     if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
@@ -2026,6 +2048,8 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     {
       tmp1= tmp1 (y - evaluation, y);
       tmp2= tmp2 (y - evaluation, y);
+      tmp1 /= Lc (tmp1);
+      tmp2 /= Lc (tmp2);
       if (!k && beta == x && degree (tmp2, alpha) < 1 &&
           degree (tmp1, alpha) < 1)
       {
@@ -2080,6 +2104,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y - evaluation, y);
+    buf2 /= Lc (buf2);
     if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
@@ -2155,6 +2180,8 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     {
       tmp1= tmp1 (y - evaluation, y);
       tmp2= tmp2 (y - evaluation, y);
+      tmp1 /= Lc (tmp1);
+      tmp2 /= Lc (tmp2);
       if (!k && beta == x && degree (tmp2, alpha) < 1 &&
           degree (tmp1, alpha) < 1)
       {
@@ -2209,6 +2236,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     buf= mod (buf, yToL);
     buf /= content (buf, x);
     buf2= buf (y - evaluation, y);
+    buf2 /= Lc (buf2);
     if (!k && beta == x)
     {
       if (degree (buf2, alpha) < 1)
@@ -3555,9 +3583,12 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
   if (isIrreducible)
   {
     delete [] bounds;
-    CanonicalForm G= F;
+    Variable y= Variable (2);
+    CanonicalForm tmp= F (y - evaluation, y);
+    CFList source, dest;
+    tmp= mapDown (tmp, info, source, dest);
     F= 1;
-    return CFList (G);
+    return CFList (tmp);
   }
 
   CFArray * A= new CFArray [factors.length()];
@@ -5662,11 +5693,11 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
   else
   {
     i= 1;
-    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+    while (((degree (F,y)/4)*i+1) + 4 <= smallFactorDeg)
       i++;
     while (i < 5)
     {
-      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*i+4);
+      dummy= tmin (degree (F,y)+1, ((degree (F,y)/4)+1)*i+4);
       if (l < dummy)
       {
         factors.insert (LCF);
@@ -5821,11 +5852,11 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
   else
   {
     i= 1;
-    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+    while ((degree (F,y)/4+1)*i + 4 <= smallFactorDeg)
       i++;
     while (i < 5)
     {
-      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*i+4);
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4+1)*i+4);
       if (l < dummy)
       {
         factors.insert (LCF);
@@ -5969,11 +6000,11 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
   else
   {
     i= 1;
-    while ((degree (F,y)/4)*i + 4 <= smallFactorDeg)
+    while ((degree (F,y)/4+1)*i + 4 <= smallFactorDeg)
       i++;
     while (i < 5)
     {
-      dummy= tmin (degree (F,y)+1, (degree (F,y)/4)*i+4);
+      dummy= tmin (degree (F,y)+1, (degree (F,y)/4+1)*i+4);
       if (l < dummy)
       {
         factors.insert (LCF);
@@ -6442,16 +6473,16 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     CanonicalForm bufF= F;
     int factorsFound= 0;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
-      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
+      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
 #ifdef HAVE_FLINT
-                         (LCF), factorsFound, factorsFoundIndex, FLINTN, false
+                         factorsFound, factorsFoundIndex, FLINTN, false
 #else
-                         (LCF), factorsFound, factorsFoundIndex, NTLN, false
+                         factorsFound, factorsFoundIndex, NTLN, false
 #endif
                         );
     else
-      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
-                         (LCF), factorsFound, factorsFoundIndex, NTLNe, false
+      reconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
+                         factorsFound, factorsFoundIndex, NTLNe, false
                         );
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
@@ -6878,7 +6909,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   if (minBound > 16 || result.length() == 0)
   {
     result= Union (result, smallFactors);
-    CanonicalForm MODl= power (y, degree (F) + 1 + degree (LC (F, 1)));
+    CanonicalForm MODl= power (y, degree (F) + 1);
     delete [] bounds;
     return Union (result, factorRecombination (bufUniFactors, F, MODl, degs, 1,
                                                bufUniFactors.length()/2
@@ -7131,7 +7162,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
     delete [] bounds;
     return Union (smallFactors, extFactorRecombination
                                 (bufUniFactors, F,
-                                 power (y, degree (F) + 1 + degree (LCF)),info,
+                                 power (y, degree (F) + 1),info,
                                  degs, evaluation, 1, bufUniFactors.length()/2
                                 )
                  );
@@ -7184,8 +7215,8 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
     CanonicalForm bufF= F;
     int factorsFound= 0;
 
-    extReconstructionTry (result, bufF, bufUniFactors, degree (F) + 1 + degree
-                          (LCF), factorsFound, factorsFoundIndex, NTLN, false,
+    extReconstructionTry (result, bufF, bufUniFactors, degree (F) + 1,
+                          factorsFound, factorsFoundIndex, NTLN, false,
                           info, evaluation
                          );
 
@@ -7313,7 +7344,10 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
     result= Union (result, smallFactors);
     if (degs.getLength() == 1 || bufUniFactors.length() == 1)
     {
-      result.append (bufF);
+      CFList source, dest;
+      CanonicalForm tmp= bufF (y - evaluation, y);
+      tmp= mapDown (tmp, info, source, dest);
+      result.append (tmp);
       return result;
     }
     return Union (result, extHenselLiftAndLatticeRecombi (bufF, bufUniFactors,
@@ -7380,7 +7414,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   if (minBound > 16 || result.length() == 0)
   {
     result= Union (result, smallFactors);
-    CanonicalForm MODl= power (y, degree (F) + 1 + degree (LC (F, 1)));
+    CanonicalForm MODl= power (y, degree (F) + 1);
     delete [] bounds;
     return Union (result, extFactorRecombination (bufUniFactors, F, MODl, info,
                                                   degs, evaluation, 1,
@@ -7670,7 +7704,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       return factors;
     }
 
-    if (i == 0)
+    if (i == 0 && !extension)
     {
       if (subCheck1 > 0)
       {

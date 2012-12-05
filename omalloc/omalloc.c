@@ -20,6 +20,8 @@
 #define OM_MARK_AS_STATIC(addr) ((void)0)
 #endif
 
+#if OM_PROVIDE_MALLOC > 0
+
 void* calloc(size_t nmemb, size_t size)
 {
   void* addr;
@@ -28,16 +30,6 @@ void* calloc(size_t nmemb, size_t size)
 
   size = size*nmemb;
   omTypeAlloc0Aligned(void*, addr, size);
-  OM_MARK_AS_STATIC(addr);
-  return addr;
-}
-
-void* malloc(size_t size)
-{
-  void* addr;
-  if (size == 0) size = 1;
-
-  omTypeAllocAligned(void*, addr, size);
   OM_MARK_AS_STATIC(addr);
   return addr;
 }
@@ -101,6 +93,18 @@ char* strdup_(const char* addr)
   return NULL;
 }
 #endif
+#endif
+
+void* malloc(size_t size)
+{
+  void* addr;
+  if (size == 0) size = 1;
+
+  omTypeAllocAligned(void*, addr, size);
+  OM_MARK_AS_STATIC(addr);
+  return addr;
+}
+
 void freeSize(void* addr, size_t size)
 {
   if (addr) omFreeSize(addr, size);

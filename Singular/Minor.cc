@@ -1,12 +1,13 @@
-#include <iostream>
-
 #include "config.h"
 #include <kernel/mod2.h>
+
+#include "Minor.h"
+
 #include <kernel/structs.h>
 #include <kernel/polys.h>
-#include <Minor.h>
 #include <kernel/febase.h>
 
+using namespace std;
 
 void MinorKey::reset()
 {                     
@@ -113,7 +114,7 @@ MinorKey::~MinorKey()
 
 void MinorKey::print() const
 {
-  cout << this->toString();
+  PrintS(this->toString().c_str());
 }
 
 int MinorKey::getAbsoluteRowIndex(const int i) const
@@ -144,7 +145,7 @@ int MinorKey::getAbsoluteRowIndex(const int i) const
     }
   }
   /* We should never reach this line of code. */
-  assert(false);
+  assume(false);
 }
 
 int MinorKey::getAbsoluteColumnIndex(const int i) const
@@ -175,7 +176,7 @@ int MinorKey::getAbsoluteColumnIndex(const int i) const
     }
   }
   /* We should never reach this line of code. */
-  assert(false);
+  assume(false);
 }
 
 void MinorKey::getAbsoluteRowIndices(int* const target) const
@@ -197,7 +198,6 @@ void MinorKey::getAbsoluteRowIndices(int* const target) const
       exponent++;
     }
   }
-  return;
 }
 
 void MinorKey::getAbsoluteColumnIndices(int* const target) const
@@ -219,7 +219,6 @@ void MinorKey::getAbsoluteColumnIndices(int* const target) const
       exponent++;
     }
   }
-  return;
 }
 
 int MinorKey::getRelativeRowIndex(const int i) const
@@ -250,7 +249,7 @@ int MinorKey::getRelativeRowIndex(const int i) const
     }
   }
   /* We should never reach this line of code. */
-  assert(false);
+  assume(false);
 }
 
 int MinorKey::getRelativeColumnIndex(const int i) const
@@ -281,7 +280,7 @@ int MinorKey::getRelativeColumnIndex(const int i) const
     }
   }
   /* We should never reach this line of code. */
-  assert(false);
+  assume(false);
 }
 
 unsigned int MinorKey::getRowKey(const int blockIndex) const
@@ -438,7 +437,7 @@ int MinorKey::compare (const MinorKey& that) const
    this method should never be called */
 bool MinorKey::operator==(const MinorKey& mk) const
 {
-  assert(false);
+  assume(false);
   return this->compare(mk) == 0;
 }
 
@@ -446,7 +445,7 @@ bool MinorKey::operator==(const MinorKey& mk) const
    this method should never be called */
 bool MinorKey::operator<(const MinorKey& mk) const
 {
-  assert(false);
+  assume(false);
   return this->compare(mk) == -1;
 }
 
@@ -832,7 +831,7 @@ int MinorValue::g_rankingStrategy = -1;
 
 int MinorValue::getWeight () const
 {
-  assert(false);  /* must be overridden in derived classes */
+  assume(false);  /* must be overridden in derived classes */
   return 0;
 }
 
@@ -840,13 +839,13 @@ int MinorValue::getWeight () const
    this method should never be called */
 bool MinorValue::operator==(const MinorValue& mv) const
 {
-  assert(false);
+  assume(false);
   return (this == &mv);  /* compare addresses of both objects */
 }
 
 string MinorValue::toString () const
 {
-  assert(false);  /* must be overridden in derived classes */
+  assume(false);  /* must be overridden in derived classes */
   return "";
 }
 
@@ -854,7 +853,7 @@ string MinorValue::toString () const
    this method should never be called */
 bool MinorValue::operator<(const MinorValue& mv) const
 {
-  assert(false);
+  assume(false);
   return (this < &mv);  /* compare addresses of both objects */
 }
 
@@ -895,7 +894,7 @@ int MinorValue::getAccumulatedAdditions() const
 
 void MinorValue::print() const
 {
-  cout << this->toString();
+  PrintS(this->toString().c_str());
 }
 
 

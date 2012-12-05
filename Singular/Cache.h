@@ -3,9 +3,9 @@
 
 #include <string>
 #include <list>
-#include <assert.h>
 
-using namespace std;
+// #include <assert.h>
+// using namespace std;
 
 /*! \class Cache
     \brief Class Cache is a template-implementation of a cache with
@@ -74,7 +74,7 @@ template<class KeyClass, class ValueClass> class Cache
      * <c>key(_rank(j)) --> value(_rank(j))</c> will be cached at least
      * as long as the pair <c>key(_rank(i)) -->  value(_rank(i))</c>.
      */
-     list<int> _rank;
+   std::list<int> _rank;
   
      /**
      * _key is sorted in ascending order, i.e.,
@@ -82,7 +82,7 @@ template<class KeyClass, class ValueClass> class Cache
      * where the right-hand side comparator "<" needs to be implemented
      * in KeyClass.
      */
-     list<KeyClass> _key;
+     std::list<KeyClass> _key;
   
      /**
      *  _value captures the actual objects of interest;<br>
@@ -90,12 +90,12 @@ template<class KeyClass, class ValueClass> class Cache
      * by calling Cache::getValue (const KeyClass&) const with the
      * argument \c _key[i]).
      */
-     list<ValueClass> _value;
+     std::list<ValueClass> _value;
      
      /**
      * container for the weights of all cached values
      */
-     list<int> _weights;
+     std::list<int> _weights;
   
      /**
      * a pointer to some element of _key;
@@ -103,7 +103,7 @@ template<class KeyClass, class ValueClass> class Cache
      * unmodified but which alter _itKey can still be declared as
      * const, as the user would expect for these methods.
      */
-     mutable typename list<KeyClass>::const_iterator _itKey;
+     mutable typename std::list<KeyClass>::const_iterator _itKey;
      
      /**
      * a pointer to some element of _value;
@@ -111,7 +111,7 @@ template<class KeyClass, class ValueClass> class Cache
      * unmodified but which alter _itValue can still be declared as
      * const, as the user would expect for these methods.
      */
-     mutable typename list<ValueClass>::const_iterator _itValue;
+     mutable typename std::list<ValueClass>::const_iterator _itValue;
   
      /**
      * for storing the momentary weight of the given cache;<br>
@@ -313,7 +313,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @return a printable version of the given instance as instance of class
      *         string
      */
-     string toString () const;
+   std::string toString () const;
   
      /**
      * A method for printing a string representation of the given cache to
@@ -323,7 +323,7 @@ template<class KeyClass, class ValueClass> class Cache
      void print () const;
 };
 
-#include <CacheImplementation.h>
+#include "CacheImplementation.h"
 
 #endif
 /* CACHE_H */

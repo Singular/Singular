@@ -1,12 +1,18 @@
-#include <MinorProcessor.h>
-
 #include "config.h"
 #include <kernel/mod2.h>
+
+#include "MinorProcessor.h"
+
+#include <polys/kbuckets.h>
+
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
-#include <polys/kbuckets.h>
+
+#include <kernel/ideals.h>
+
+using namespace std;
 
 #ifdef COUNT_AND_PRINT_OPERATIONS
 long addsPoly        = 0;    /* for the number of additions of two polynomials */
@@ -212,7 +218,7 @@ string MinorProcessor::toString () const
 int MinorProcessor::IOverJ(const int i, const int j)
 {
   /* This is a non-recursive implementation. */
-  assert( (i >= 0) && (j >= 0) && (i >= j));
+  assume( (i >= 0) && (j >= 0) && (i >= j));
   if (j == 0 || i == j) return 1;
   int result = 1;
   for (int k = i - j + 1; k <= i; k++) result *= k;
@@ -226,7 +232,7 @@ int MinorProcessor::IOverJ(const int i, const int j)
 int MinorProcessor::Faculty(const int i)
 {
   /* This is a non-recursive implementation. */
-  assert(i >= 0);
+  assume(i >= 0);
   int result = 1;
   for (int j = 1; j <= i; j++) result *= j;
   // Now, result = 1 * 2 * ... * i = i!
@@ -443,7 +449,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
      const int characteristic,
      const ideal& iSB)
 {
-  assert(k > 0); /* k is the minor's dimension; the minor must be at least
+  assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
   /* The method works by recursion, and using Lapace's Theorem along the
      row/column with the most zeros. */
@@ -560,7 +566,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
      const int characteristic,
      const ideal& iSB)
 {
-  assert(k > 0); /* k is the minor's dimension; the minor must be at least
+  assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
   int *theRows=new int[k]; mk.getAbsoluteRowIndices(theRows);
   int *theColumns=new int[k]; mk.getAbsoluteColumnIndices(theColumns);
@@ -651,7 +657,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
      Cache<MinorKey, IntMinorValue>& cch,
      const int characteristic, const ideal& iSB)
 {
-  assert(k > 0); /* k is the minor's dimension; the minor must be at least
+  assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
   /* The method works by recursion, and using Lapace's Theorem along
      the row/column with the most zeros. */
@@ -943,7 +949,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
                                                           const MinorKey& mk,
                                                           const ideal& iSB)
 {
-  assert(k > 0); /* k is the minor's dimension; the minor must be at least
+  assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
   /* The method works by recursion, and using Lapace's Theorem along the
      row/column with the most zeros. */
@@ -1080,7 +1086,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
      Cache<MinorKey, PolyMinorValue>& cch,
      const ideal& iSB)
 {
-  assert(k > 0); /* k is the minor's dimension; the minor must be at least
+  assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
   /* The method works by recursion, and using Lapace's Theorem along
      the row/column with the most zeros. */
@@ -1383,7 +1389,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
                                                           const MinorKey& mk,
                                                           const ideal& iSB)
 {
-  assert(k > 0); /* k is the minor's dimension; the minor must be at least
+  assume(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
   int *theRows=new int[k]; mk.getAbsoluteRowIndices(theRows);
   int *theColumns=new int[k]; mk.getAbsoluteColumnIndices(theColumns);

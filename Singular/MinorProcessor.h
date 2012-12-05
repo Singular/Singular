@@ -1,9 +1,15 @@
 #ifndef MINOR_PROCESSOR_H
 #define MINOR_PROCESSOR_H
 
-#include <Cache.h>
-#include <Minor.h>
-#include <assert.h>
+#include "Cache.h"
+#include "Minor.h"
+
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+
+struct sip_sideal; typedef struct sip_sideal *       ideal;
+
+// #include <assert.h>
 #include <string>
 
 /* write "##define COUNT_AND_PRINT_OPERATIONS x" if you want
@@ -278,7 +284,7 @@ class MinorProcessor
     * @return a printable version of the given instance as instance of class
     * string
     */
-    virtual string toString () const;
+   virtual std::string toString () const;
 
     /**
     * A method for printing a string representation of the given
@@ -545,7 +551,7 @@ class IntMinorProcessor : public MinorProcessor
     * @return a printable version of the given instance as instance of class
     *         string
     */
-    string toString () const;
+   std::string toString () const;
 };
 
 /*! \class PolyMinorProcessor
@@ -759,7 +765,7 @@ class PolyMinorProcessor : public MinorProcessor
     * @return a printable version of the given instance as instance of class
     *         string
     */
-    string toString () const;
+   std::string toString () const;
 };
 
 #endif

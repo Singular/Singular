@@ -230,7 +230,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
         return FALSE;
       }
 
-      Werror("bigintm_Op2: Op: '==': Sorry unsupported 2nd argument-type: '%d' in", Tok2Cmdname(a2->Typ()));
+      Werror("bigintm_Op2: Op: '==': Sorry unsupported 2nd argument-type: '%s' in", Tok2Cmdname(a2->Typ()));
       WrongOp("bigintm_Op2", op, a1);
       return TRUE;
     }

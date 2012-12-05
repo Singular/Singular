@@ -53,7 +53,7 @@ public:
     friend fglmVector operator * ( const fglmVector & v, const number n );
     friend fglmVector operator * ( const number n, const fglmVector & v );
 
-    const number getconstelem( int i ) const;
+    number getconstelem( int i ) const;
     number & getelem( int i );
     void setelem( int i, number & n );
 

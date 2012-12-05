@@ -554,7 +554,7 @@ BOOLEAN countedref_Op1Shared(int op, leftv res, leftv head)
 
   CountedRefShared ref = CountedRefShared::cast(head);
 
-  if ((op == LINK_CMD) )
+  if (op == LINK_CMD)
   {
     if (ref.dereference(head)) return TRUE;
     res->Copy(head);

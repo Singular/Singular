@@ -132,7 +132,7 @@ public:
     fglmASSERT (0 < i && i <= N, "getelem: wrong index");
     return elems[i - 1];
   }
-  const number getconstelem (int i) const
+  number getconstelem (int i) const
   {
     fglmASSERT (0 < i && i <= N, "getconstelem: wrong index");
     return elems[i - 1];
@@ -439,7 +439,7 @@ number & fglmVector::getelem (int i)
   return rep->getelem (i);
 }
 
-const number fglmVector::getconstelem (int i) const
+number fglmVector::getconstelem (int i) const
 {
   return rep->getconstelem (i);
 }

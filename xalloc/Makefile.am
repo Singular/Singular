@@ -7,6 +7,7 @@ else
 endif
 
 lib_LTLIBRARIES=libomalloc.la ${LIB_G}
+lib_LIBRARIES=libomalloc.a
 ## libomallocdir = $(libdir)/
 
 libomalloc_includedir=$(includedir)/omalloc

@@ -2,8 +2,12 @@
 #define MINOR_INTERFACE_H
 
 
-#include <polys/simpleideals.h>
-#include <kernel/polys.h>
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+
+struct sip_sideal; typedef struct sip_sideal *       ideal;
+
+class ip_smatrix; typedef ip_smatrix *       matrix;
 
 /* all computations are module char, if char <> 0;
    if additionally, an ideal i != NULL is given, then computations are
