@@ -87,6 +87,7 @@ SOURCES =    Minor.cc\
    slInit_Static.cc\
    links/ssiLink.cc\
    subexpr.cc\
+   pyobject_setup.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
@@ -394,14 +395,14 @@ MOD: ${abs_top_builddir}/libpolys/polys/.libs
 if PYTHON_USE
    PACKAGES=pyobject
    moduledir = $(bindir)
-   module_LTLIBRARIES=pyobject.so
-   pyobject_so_SOURCES = pyobject.cc
-   pyobject_so_LIBADD =  libSingular.la -lnumeric -lkernel -lpolys  -lcoeffs \
+   module_LTLIBRARIES=pyobject.la
+   pyobject_la_SOURCES = pyobject.cc
+   pyobject_la_LIBADD =  libSingular.la -lnumeric -lkernel -lpolys  -lcoeffs \
   -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) \
 $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
 
-   pyobject_so_CPPFLAGS  = ${AM_CPPFLAGS} @PYTHON_CSPEC@ ${Singular_LDADD} ${AMLDFLAGS}
-   pyobject_so_LDFLAGS = ${AMLDFLAGS}  -shared -module -avoid-version @PYTHON_LSPEC@ \
- -DHUHUHUHUHU ${pyobject_so_LIBADD}
+   pyobject_la_CPPFLAGS  = ${AM_CPPFLAGS} @PYTHON_CSPEC@ ${Singular_LDADD} ${AMLDFLAGS}
+   pyobject_la_LDFLAGS = ${AMLDFLAGS} -export-dynamic  -shared -module -avoid-version @PYTHON_LSPEC@ \
+ -DHUHUHUHUHU ${pyobject_la_LIBADD}
 endif
