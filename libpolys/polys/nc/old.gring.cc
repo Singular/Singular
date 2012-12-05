@@ -2926,7 +2926,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
           return TRUE;
         }
 
-        if (!n_Equal(pN, qN, curr)) tmpIsSkewConstant = false;
+        if (!n_Equal(pN, qN, curr->cf)) tmpIsSkewConstant = false;
       }
 
     if( bCopyInput )

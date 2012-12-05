@@ -1517,6 +1517,7 @@ poly      p_PolyDiv(poly &p, const poly divisor, const BOOLEAN needResult, const
     /* determine t = LT(p) / LT(divisor) */
     poly t = p_ISet(1, r);
     number c = n_Div(p_GetCoeff(p, r), divisorLC, r->cf);
+    n_Normalize(c,r->cf);
     p_SetCoeff(t, c, r);
     int e = p_GetExp(p, 1, r) - divisorLE;
     p_SetExp(t, 1, e, r);
@@ -3916,7 +3917,7 @@ BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r)
   {
     if (! p_LmEqual(p1, p2,r))
       return FALSE;
-    if (! n_Equal(p_GetCoeff(p1,r), p_GetCoeff(p2,r),r ))
+    if (! n_Equal(p_GetCoeff(p1,r), p_GetCoeff(p2,r),r->cf ))
       return FALSE;
     pIter(p1);
     pIter(p2);
@@ -4001,7 +4002,7 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
         n_Delete(&n, r);
         return FALSE;
     }
-    if (!n_Equal(p_GetCoeff(p1, r), nn = n_Mult(p_GetCoeff(p2, r),n, r), r))
+    if (!n_Equal(p_GetCoeff(p1, r), nn = n_Mult(p_GetCoeff(p2, r),n, r->cf), r->cf))
     {
       n_Delete(&n, r);
       n_Delete(&nn, r);
