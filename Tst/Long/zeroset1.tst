@@ -19,7 +19,6 @@ LIB "tst.lib";
 LIB "zeroset.lib";         
 
 tst_init();
-tst_ignore("CVS ID $Id$"); 
  
 
 

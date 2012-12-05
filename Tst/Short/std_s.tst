@@ -1,5 +1,3 @@
-// $Id$
-
 // std_s.tst -- long tests for std
 // uses rcyclic examples from ISSAC'98 paper
 

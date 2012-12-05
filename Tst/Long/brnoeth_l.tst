@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id$");
 
 // tst_status();
 

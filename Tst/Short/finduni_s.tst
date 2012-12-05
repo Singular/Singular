@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // finduni_s.tst - short tests for finduni
 //
@@ -7,7 +5,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id$");
 
 option(redSB);
 

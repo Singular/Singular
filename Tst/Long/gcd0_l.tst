@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // gcd0_l.tst - long tests for gcd calculations in Z.
 //
@@ -18,7 +16,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id$");
 
 //
 // - ring r1=0,u,dp.

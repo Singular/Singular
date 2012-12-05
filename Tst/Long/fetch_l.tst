@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID: $Id$");
 
 proc generate_ring_str(int n, string r_name, string ostring)
 {

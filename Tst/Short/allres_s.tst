@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id$");
 
 ring an=32003,(w,x,y,z),(dp,C);
 ideal i=

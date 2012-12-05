@@ -2,7 +2,6 @@ LIB "tst.lib";
 LIB "graphics.lib";
 
 tst_init(); 
-tst_ignore("CVS ID $Id$");
  
  // test staircase
 

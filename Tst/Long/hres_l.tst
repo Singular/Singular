@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: hres_l.tst,v 1.2 1998/07/01 10:10:49 obachman
 Exp $");
 option(prot);
 ring r=32003,(y,t,x,z,w),dp;

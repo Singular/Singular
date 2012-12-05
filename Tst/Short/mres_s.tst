@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id$");
 
 proc tst_test_mres(ideal i)
 {

@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // fglm_s.tst - long tests for fglm 
 //              fglm: cassou-mod1, lamm1 in char 0
@@ -8,7 +6,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id$");
 
 option(redSB);
 

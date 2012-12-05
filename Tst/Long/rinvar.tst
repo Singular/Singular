@@ -14,7 +14,6 @@ LIB "tst.lib";
 LIB "rinvar.lib";        
 
 tst_init();
-tst_ignore("CVS ID $Id$"); 
  
 
 // example 1
