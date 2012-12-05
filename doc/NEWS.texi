@@ -35,7 +35,7 @@
 @heading Changed @sc{Singular} libraries
 @itemize @bullet
 @item
-imprived grobcov.lib (@nref{grobcov_lib})
+improved grobcov.lib (@nref{grobcov_lib})
 @end itemize
 
 @heading Changed @sc{Singular} commands
