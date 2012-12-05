@@ -1116,6 +1116,8 @@ void siInit(char *name)
 
     type = nRegister(n_transExt, ntInitChar);
     assume(type == n_transExt);
+     
+    (void)type;
   }
 #endif
 
