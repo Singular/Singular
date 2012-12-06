@@ -6363,7 +6363,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   if (oldL > liftBound)
   {
 #ifdef HAVE_FLINT
-    nmod_mat_clear (FLINTN);
+    if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+      nmod_mat_clear (FLINTN);
 #endif
     delete [] bounds;
     return Union (smallFactors,
@@ -6378,7 +6379,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   if (irreducible)
   {
 #ifdef HAVE_FLINT
-    nmod_mat_clear (FLINTN);
+    if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+      nmod_mat_clear (FLINTN);
 #endif
     delete [] bounds;
     return Union (CFList (F), smallFactors);
@@ -6426,7 +6428,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 #ifdef HAVE_FLINT
       if (result.length() == nmod_mat_ncols (FLINTN))
       {
-        nmod_mat_clear (FLINTN);
+        if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+          nmod_mat_clear (FLINTN);
 #else
       if (result.length() == NTLN.NumCols())
       {
@@ -6440,9 +6443,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (result.length() == NTLNe.NumCols())
       {
-#ifdef HAVE_FLINT
-        nmod_mat_clear (FLINTN);
-#endif
         delete [] factorsFoundIndex;
         delete [] bounds;
         return Union (result, smallFactors);
@@ -6503,9 +6503,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (result.length() == NTLNe.NumCols())
       {
-#ifdef HAVE_FLINT
-        nmod_mat_clear (FLINTN);
-#endif
         delete [] factorsFoundIndex;
         delete [] bounds;
         return Union (result, smallFactors);
@@ -6581,9 +6578,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
     if (result.length() == NTLNe.NumCols())
     {
-#ifdef HAVE_FLINT
-      nmod_mat_clear (FLINTN);
-#endif
       delete [] bounds;
       return Union (result, smallFactors);
     }
@@ -6727,7 +6721,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     if (bufUniFactors.isEmpty() || degree (bufF) <= 0)
     {
 #ifdef HAVE_FLINT
-      nmod_mat_clear (FLINTN);
+      if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+        nmod_mat_clear (FLINTN);
 #endif
       delete [] bounds;
       result= Union (resultBufF, result);
@@ -6746,13 +6741,15 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     if (degs.getLength() == 1 || bufUniFactors.length() == 1)
     {
 #ifdef HAVE_FLINT
-      nmod_mat_clear (FLINTN);
+      if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+        nmod_mat_clear (FLINTN);
 #endif
       result.append (bufF);
       return result;
     }
 #ifdef HAVE_FLINT
-    nmod_mat_clear (FLINTN);
+    if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+      nmod_mat_clear (FLINTN);
 #endif
     return Union (result, henselLiftAndLatticeRecombi (bufF, bufUniFactors,
                                                        alpha, degs, symmetric,
@@ -6811,9 +6808,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (result.length()== NTLNe.NumCols())
       {
-#ifdef HAVE_FLINT
-        nmod_mat_clear (FLINTN);
-#endif
         delete [] bounds;
         result= Union (result, smallFactors);
         return result;
@@ -6870,9 +6864,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       {
         if (result.length() == NTLNe.NumCols())
         {
-#ifdef HAVE_FLINT
-          nmod_mat_clear (FLINTN);
-#endif
           delete [] bounds;
           result= Union (result, smallFactors);
           return result;
@@ -6890,7 +6881,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   delete [] bounds;
   bounds= computeBounds (F, d, isIrreducible);
 #ifdef HAVE_FLINT
-  nmod_mat_clear (FLINTN);
+  if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
+    nmod_mat_clear (FLINTN);
 #endif
   if (isIrreducible)
   {
