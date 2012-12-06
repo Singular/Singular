@@ -1238,7 +1238,7 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
 
 void ntNormalize (number &a, const coeffs cf)
 {
-  if ((a!=NULL)&&(DEN(a)!=NULL))
+  if ((a!=NULL))
   {
     definiteGcdCancellation(a, cf, FALSE);
     if ((DEN(a)!=NULL)
@@ -1861,11 +1861,11 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
     ntNormalize(n, cf);
 
-    fraction f = (fraction)n;
+    fraction f = (fraction)ntGetDenom (n, cf);
 
     assume( f != NULL );
 
-    const poly den = DEN(f);
+    const poly den = NUM(f);
 
     if( den == NULL ) // ?? / 1 ?
       continue;
@@ -1878,6 +1878,11 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       // NOTE: maybe it's better to make the product and clearcontent afterwards!?
       // TODO: move the following to factory?
       poly gcd = singclap_gcd(p_Copy(cand, R), p_Copy(den, R), R); // gcd(cand, den) is monic no mater leading coeffs! :((((
+      if (nCoeff_is_Q (Q))
+      {
+        number LcGcd= n_Gcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);
+        gcd = p_Mult_nn(gcd, LcGcd, R);
+      }
 //      assume( n_IsOne(pGetCoeff(gcd), Q) ); // TODO: this may be wrong...
       cand = p_Mult_q(cand, p_Copy(den, R), R); // cand *= den
       const poly t = singclap_pdivide( cand, gcd, R ); // cand' * den / gcd(cand', den)
