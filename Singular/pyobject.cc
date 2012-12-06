@@ -713,7 +713,12 @@ blackbox* pyobject_blackbox(int& tok) {
 
 
 
-void pyobject_init() 
+#define PYOBJECT_ADD_C_PROC(name) \
+  add_C_proc(currPack->libname, (char*)#name, FALSE, name);
+
+typedef  BOOLEAN (*func_type)(leftv, leftv);
+void pyobject_init(int (*add_C_proc)(const char*, const char*, BOOLEAN,
+				     func_type) )
 {
   int tok = -1;
   blackbox* bbx = pyobject_blackbox(tok);
@@ -731,20 +736,19 @@ void pyobject_init()
     bbx->data             = omAlloc0(newstruct_desc_size());
     
     PythonInterpreter::init(tok);
-  }
-}
-
-#define PYOBJECT_ADD_C_PROC(name) \
-  psModulFunctions->iiAddCproc(currPack->libname, (char*)#name, FALSE, name);
-
-extern "C" { 
-  void mod_init(SModulFunctions* psModulFunctions)
-  { 
-    pyobject_init(); 
 
     PYOBJECT_ADD_C_PROC(python_import);
     PYOBJECT_ADD_C_PROC(python_eval);
-    PYOBJECT_ADD_C_PROC(python_run);   
+    PYOBJECT_ADD_C_PROC(python_run); 
   }
 }
 #undef PYOBJECT_ADD_C_PROC
+
+#ifndef EMBED_PYTHON
+extern "C" { 
+  void mod_init(SModulFunctions* psModulFunctions)
+  { 
+    pyobject_init(psModulFunctions->iiAddCproc); 
+  }
+}
+#endif
