@@ -103,7 +103,7 @@ gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
 char* toString(gfan::ZMatrix const &zm)
 {
   bigintmat* bim = zMatrixToBigintmat(zm);
-  char* s = bim->String();
+  char* s = bim->StringAsPrinted();
   delete bim;
   return s;
 }
