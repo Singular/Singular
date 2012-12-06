@@ -15,6 +15,8 @@
 #include <Singular/mod2.h>
 #include <kernel/febase.h>
 #include "static.h"
+#include <Singular/blackbox.h>
+#include <Singular/ipshell.h>
 
 /* whether pyobject module is linked statically or dynamically */
 #ifdef HAVE_PYTHON
@@ -39,15 +41,29 @@ void pyobject_setup() { pyobject_init(); }
 
 # elif defined(HAVE_DYNAMIC_PYOBJECT) // Case: pyobject is dynamic module (prefered variant)
 
-// forward declaration for Singular/iplib.cc
-void* binary_module_function(const char* lib, const char* func); 
-void pyobject_setup()
+
+/// blackbox support - initialization via autoloading
+void* pyobject_autoload(blackbox* bbx)
 {
-  void* fktn = binary_module_function("pyobject", "mod_init");
-  if (fktn) (* reinterpret_cast<void (*)()>(fktn) )();
-  else Werror("python related functions are not available");
+  if (jjLOAD("pyobject.so", TRUE)) return NULL;
+
+  return bbx->blackbox_Init(bbx);
 }
 
+void pyobject_default_destroy(blackbox  *b, void *d)
+{
+  Werror("Python-based functionality not available!");
+}
+
+// Setting up an empty blackbox type, which can be filled with pyobject
+void pyobject_setup() 
+{
+  blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
+  bbx->blackbox_Init = pyobject_autoload;
+  bbx->blackbox_destroy = pyobject_default_destroy;
+  setBlackboxStuff(bbx, "pyobject");
+}
+ 
 #else                // Case: no python
 void pyobject_setup() { }
 

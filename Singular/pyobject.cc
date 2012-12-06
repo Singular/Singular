@@ -51,7 +51,7 @@ public:
 
   /// Initialize unique (singleton) python interpreter instance, 
   /// and set Singular type identifier
-  static void init(id_type num ) { instance().m_id = num; }
+  static void init(id_type num) { instance().m_id = num; }
 
   /// Get Singular type identitfier 
   static id_type id() { return instance().m_id; }
@@ -689,34 +689,48 @@ void sync_contexts()
   PyRun_SimpleString("del  _SINGULAR_NEW");
 }
 
-
-// forward declaration
-int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
-               BOOLEAN(*func)(leftv res, leftv v));
-
-#define ADD_C_PROC(name) iiAddCproc("", #name, FALSE, name);
+blackbox* pyobject_blackbox(int& tok) {
+  if(blackboxIsCmd("pyobject", tok) != ROOT_DECL) 
+  {
+    tok = setBlackboxStuff((blackbox*)omAlloc0(sizeof(blackbox)), 
+			   "pyobject");
+  }
+  return getBlackboxStuff(tok);
+}
 
 
 void pyobject_init() 
 {
-  blackbox *b = (blackbox*)omAlloc0(sizeof(blackbox));
-  b->blackbox_destroy = pyobject_destroy;
-  b->blackbox_String  = pyobject_String;
-  b->blackbox_Init    = pyobject_Init;
-  b->blackbox_Copy    = pyobject_Copy;
-  b->blackbox_Assign  = pyobject_Assign;
-  b->blackbox_Op1     = pyobject_Op1;
-  b->blackbox_Op2     = pyobject_Op2;
-  b->blackbox_Op3     = pyobject_Op3;
-  b->blackbox_OpM     = pyobject_OpM;
-  b->data             = omAlloc0(newstruct_desc_size());
-
-  PythonInterpreter::init(setBlackboxStuff(b,"pyobject"));
-
-  ADD_C_PROC(python_import);
-  ADD_C_PROC(python_eval);
-  ADD_C_PROC(python_run);
+  int tok = -1;
+  blackbox* bbx = pyobject_blackbox(tok);
+  if (bbx->blackbox_Init != pyobject_Init) 
+  {
+    bbx->blackbox_destroy = pyobject_destroy;
+    bbx->blackbox_String  = pyobject_String;
+    bbx->blackbox_Init    = pyobject_Init;
+    bbx->blackbox_Copy    = pyobject_Copy;
+    bbx->blackbox_Assign  = pyobject_Assign;
+    bbx->blackbox_Op1     = pyobject_Op1;
+    bbx->blackbox_Op2     = pyobject_Op2;
+    bbx->blackbox_Op3     = pyobject_Op3;
+    bbx->blackbox_OpM     = pyobject_OpM;
+    bbx->data             = omAlloc0(newstruct_desc_size());
+    
+    PythonInterpreter::init(tok);
+  }
 }
 
-extern "C" { void mod_init() { pyobject_init(); } }
+#define PYOBJECT_ADD_C_PROC(name) \
+  psModulFunctions->iiAddCproc(currPack->libname, (char*)#name, FALSE, name);
 
+extern "C" { 
+  void mod_init(SModulFunctions* psModulFunctions)
+  { 
+    pyobject_init(); 
+
+    PYOBJECT_ADD_C_PROC(python_import);
+    PYOBJECT_ADD_C_PROC(python_eval);
+    PYOBJECT_ADD_C_PROC(python_run);   
+  }
+}
+#undef PYOBJECT_ADD_C_PROC
