@@ -393,16 +393,16 @@ MOD: ${abs_top_builddir}/libpolys/polys/.libs
 
 
 if PYTHON_USE
-   PACKAGES=pyobject
    moduledir = $(bindir)
-   module_LTLIBRARIES=pyobject.la
+   module_LTLIBRARIES = pyobject.la
    pyobject_la_SOURCES = pyobject.cc
-   pyobject_la_LIBADD =  libSingular.la -lnumeric -lkernel -lpolys  -lcoeffs \
-  -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) \
-$(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
+   pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
+   pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
 
-   pyobject_la_CPPFLAGS  = ${AM_CPPFLAGS} @PYTHON_CSPEC@ ${Singular_LDADD} ${AMLDFLAGS}
-   pyobject_la_LDFLAGS = ${AMLDFLAGS} -export-dynamic  -shared -module -avoid-version @PYTHON_LSPEC@ \
- -DHUHUHUHUHU ${pyobject_la_LIBADD}
+   pyobject_la_CXXFLAGS   = ${NODEBUGCXXFLAGS} @PYTHON_CSPEC@ 
+   pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@ 
+
+   pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version \
+     ${AMLDFLAGS} @PYTHON_LSPEC@ 
 endif
