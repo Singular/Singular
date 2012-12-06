@@ -764,7 +764,7 @@ extern "C"
 #endif
 
 #ifndef MAKE_DISTRIBUTION
-const char *singular_date=__DATE__ " " __TIME__;
+const char *singular_date = "";
 #endif
 
 char * versionString(/*const bool bShowDetails = false*/ )
