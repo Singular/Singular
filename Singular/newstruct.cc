@@ -200,6 +200,26 @@ BOOLEAN newstruct_equal(int op, leftv l, leftv r)
   return TRUE;
 }
 
+void lClean_newstruct(lists l)
+{
+  if (l->nr>=0)
+  {
+    int i;
+    ring r=NULL;
+    for(i=l->nr;i>=0;i--)
+    {
+      if ((i>0) && (l->m[i-1].rtyp==RING_CMD))
+        r=(ring)(l->m[i-1].data);
+      else
+        r=NULL;
+      l->m[i].CleanUp(r);
+    }
+    omFreeSize((ADDRESS)l->m, (l->nr+1)*sizeof(sleftv));
+    l->nr=-1;
+  }
+  omFreeBin((ADDRESS)l,slists_bin);
+}
+
 BOOLEAN newstruct_Assign(leftv l, leftv r)
 {
   if (r->Typ()>MAX_TOK)
@@ -241,7 +261,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
       if (l->Data()!=NULL)
       {
         lists n1=(lists)l->Data();
-        n1->Clean(); n1=NULL;
+        lClean_newstruct(n1);
       }
       lists n2=(lists)r->Data();
       n2=lCopy_newstruct(n2);
@@ -473,26 +493,6 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
     }
   }
   return blackboxDefaultOpM(op,res,args);
-}
-
-void lClean_newstruct(lists l)
-{
-  if (l->nr>=0)
-  {
-    int i;
-    ring r=NULL;
-    for(i=l->nr;i>=0;i--)
-    {
-      if ((i>0) && (l->m[i-1].rtyp==RING_CMD))
-        r=(ring)(l->m[i-1].data);
-      else
-        r=NULL;
-      l->m[i].CleanUp(r);
-    }
-    omFreeSize((ADDRESS)l->m, (l->nr+1)*sizeof(sleftv));
-    l->nr=-1;
-  }
-  omFreeBin((ADDRESS)l,slists_bin);
 }
 
 void newstruct_destroy(blackbox *b, void *d)
