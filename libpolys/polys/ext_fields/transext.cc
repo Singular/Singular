@@ -1882,7 +1882,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       {
         number LcGcd= n_Gcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);
         gcd = p_Mult_nn(gcd, LcGcd, R);
-        n_Delete(LcGcd,Q);
+        n_Delete(&LcGcd,Q);
       }
 //      assume( n_IsOne(pGetCoeff(gcd), Q) ); // TODO: this may be wrong...
       cand = p_Mult_q(cand, p_Copy(den, R), R); // cand *= den
