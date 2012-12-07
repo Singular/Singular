@@ -50,7 +50,7 @@ else
   USE_FACTORY =
 endif
 
-AMLDFLAGS = -L${abs_top_builddir}/coeffs -L${abs_top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${abs_top_builddir}/../findexec
+AMLDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../findexec
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 

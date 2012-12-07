@@ -207,7 +207,7 @@ else
   bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 endif
 
-AMLDFLAGS = -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel -L${abs_top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
+AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
 
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 Singularg_CFLAGS = -g ${PIPE}
@@ -221,8 +221,8 @@ nodist_Singularg_SOURCES =  libSingular_g.la
 Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h 
 
-Singular_LDADD = libSingular.la ${abs_top_builddir}/numeric/libnumeric.la ${abs_top_builddir}/kernel/libkernel.la ${abs_top_builddir}/libpolys/polys/libpolys.la -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-Singularg_LDADD = libSingular_g.la ${abs_top_builddir}/numeric/libnumeric_g.la ${abs_top_builddir}/kernel/libkernel_g.la ${abs_top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+Singular_LDADD = libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la ${top_builddir}/libpolys/polys/libpolys.la -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+Singularg_LDADD = libSingular_g.la ${top_builddir}/numeric/libnumeric_g.la ${top_builddir}/kernel/libkernel_g.la ${top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
@@ -310,8 +310,8 @@ LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibra
 
 ########################### TEST #########################
 
-TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
+TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/Singular/LIB:${top_srcdir}/Singular/LIB:${top_builddir}/libpolys/polys/.libs:${top_builddir}/factory/gftables'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${top_builddir}'
 
 if WANT_DEBUG
 TESTS=test-s-g test-s-r test-d-g test-d-r
@@ -370,27 +370,26 @@ BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc LIB/all.lib plural
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
 feOpt.inc: feOptGen
-	${abs_builddir}/feOptGen
+	${builddir}/feOptGen
 
 feOptES.inc: feOptES
-	${abs_builddir}/feOptES
+	${builddir}/feOptES
 
 feOptTS.inc: feOptTS
-	${abs_builddir}/feOptTS
+	${builddir}/feOptTS
 
 plural_cmd.inc iparith.inc: gentable1
-	${abs_builddir}/gentable1
+	${builddir}/gentable1
 
 # # fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
 # plural_cmd.inc: iparith.inc
 
 
-gftables: ${abs_top_srcdir}/factory/gftables
-	ln -snf ${abs_top_srcdir}/factory/gftables ${abs_builddir}/gftables
+gftables: ${top_srcdir}/factory/gftables
+	ln -snf ${top_srcdir}/factory/gftables ${builddir}/gftables
 
-MOD: ${abs_top_builddir}/libpolys/polys/.libs
-	ln -snf ${abs_top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD
-
+MOD: ${top_builddir}/libpolys/polys/.libs
+	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
 
 if PYTHON_USE
    moduledir = $(bindir)/MOD

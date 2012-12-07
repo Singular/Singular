@@ -30,8 +30,8 @@ $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
 
 AMLDFLAGS	= 
-# -L${abs_top_builddir}/Singular -L${abs_top_builddir}/numeric -L${abs_top_builddir}/kernel \
-# -L${abs_top_builddir}/libpolys/polys $(USE_FACTORY) -L${abs_top_builddir}/omalloc -L${abs_top_builddir}/findexec
+# -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel \
+# -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
 
 
 SOURCES = mod_main.cc bigintm.cc bigintm.h

@@ -8,7 +8,9 @@
 #ifndef _MYLIMITS_H
 #define _MYLIMITS_H
 
+/* Maximum/minimum value an `signed int' (in Singular interpreter) can hold. */
+const int MAX_INT_VAL = 0x7fffffff;
+const int MAX_INT_LEN = 11;
 #include <limits.h>
-#define MAX_INT_VAL 0x7fffffff
 
 #endif /* _MYLIMITS_H */

@@ -1846,7 +1846,7 @@ binomial& binomial::flip_variable(const short& i)
   // Now flip the variable.
 
   exponent_vector[i]*=-1;
-
+  return *this;
 }
 
 ////////////////////////// output /////////////////////////////////////////

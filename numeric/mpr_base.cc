@@ -726,7 +726,7 @@ poly monomAt( poly p, int i )
 {
   assume( i > 0 );
   poly iter= p;
-  for ( int j= 1; (j < i) && (iter!=NULL); j++ ) iter= pIter(iter);
+  for ( int j= 1; (j < i) && (iter!=NULL); j++ ) pIter(iter);
   return iter;
 }
 //<-

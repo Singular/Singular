@@ -2462,6 +2462,7 @@ matrix nc_PrintMat(int a, int b, ring r, int metric)
   int size=r->GetNC()->MTsize[UPMATELEM(i,j,rN)];
   matrix M = r->GetNC()->MT[UPMATELEM(i,j,rN)];
   /*  return(M); */
+/*
   int sizeofres;
   if (metric==0)
   {
@@ -2471,6 +2472,7 @@ matrix nc_PrintMat(int a, int b, ring r, int metric)
   {
     sizeofres=sizeof(number);
   }
+*/
   matrix res=mpNew(size,size);
   int s;
   int t;
