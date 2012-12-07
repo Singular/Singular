@@ -2544,20 +2544,30 @@ number nlFarey(number nN, number nP, const coeffs r)
     mpz_add(tmp,tmp,tmp);
     if (mpz_cmp(tmp,P)<0)
     {
-       // return N/B
-       z=ALLOC_RNUMBER();
-       #ifdef LDEBUG
-       z->debug=123456;
-       #endif
        if (mpz_isNeg(B))
        {
          mpz_neg(B,B);
          mpz_neg(N,N);
        }
-       mpz_init_set(z->z,N);
-       mpz_init_set(z->n,B);
-       z->s = 0;
-       nlNormalize(z,r);
+       // check for gcd(N,B)==1
+       mpz_gcd(tmp,N,B);
+       if (mpz_cmp_ui(tmp,1)==0)
+       {
+         // return N/B
+         z=ALLOC_RNUMBER();
+         #ifdef LDEBUG
+         z->debug=123456;
+         #endif
+         mpz_init_set(z->z,N);
+         mpz_init_set(z->n,B);
+         z->s = 0;
+         nlNormalize(z,r);
+       }
+       else
+       {
+         // return nN (the input) instead of "fail"
+         z=nlCopy(nN,r);
+       }
        break;
     }
     //mpz_mod(D,E,N);
