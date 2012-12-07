@@ -198,8 +198,11 @@ typedef enum p_Proc
   p_Merge_q_Proc,
   p_kBucketSetLm_Proc,
   LPDV__pp_Mult_mm_Proc,
+  LPDV__mm_Mult_pp_Proc,
+  LPDV__mml_Mult_pp_Mult_mmr_Proc,
   LPDV__pp_Mult_mm_Noether_Proc,
   LPDV__p_Minus_mm_Mult_qq_Proc,
+  LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc,
   p_Unknown_Proc
 } p_Proc;
 
@@ -287,15 +290,15 @@ static inline const char* p_ProcEnum_2_String(p_Proc proc)
       case pp_Mult_mm_Noether_Proc: return "pp_Mult_mm_Noether_Proc";
       case p_Mult_mm_Proc: return "p_Mult_mm_Proc";
       case p_Add_q_Proc: return "p_Add_q_Proc";
-      case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
       case p_Neg_Proc: return "p_Neg_Proc";
       case pp_Mult_Coeff_mm_DivSelect_Proc: return "pp_Mult_Coeff_mm_DivSelect_Proc";
       case pp_Mult_Coeff_mm_DivSelectMult_Proc: return "pp_Mult_Coeff_mm_DivSelectMult_Proc";
       case p_Merge_q_Proc: return "p_Merge_q_Proc";
       case p_kBucketSetLm_Proc: return "p_kBucketSetLm_Proc";
       case LPDV__pp_Mult_mm_Proc: return "LPDV__pp_Mult_mm_Proc";
+      case LPDV__mm_Mult_pp_Proc: return "LPDV__mm_Mult_pp_Proc";
+      case LPDV__mml_Mult_pp_Mult_mmr_Proc: return "LPDV__mml_Mult_pp_Mult_mmr_Proc";
       case LPDV__pp_Mult_mm_Noether_Proc: return "LPDV__pp_Mult_mm_Noether_Proc";
-      case LPDV__p_Minus_mm_Mult_qq_Proc: return "LPDV__p_Minus_mm_Mult_qq_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";     
   }
   return "NoProc_2_String";
@@ -315,6 +318,8 @@ static inline int p_ProcDependsOn_Ord(p_Proc proc)
   {
       case p_Add_q_Proc:
       case p_Minus_mm_Mult_qq_Proc:
+      case LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc:
+      case LPDV__p_Minus_mm_Mult_qq_Proc:
       case pp_Mult_mm_Noether_Proc:
       case p_kBucketSetLm_Proc:
       case p_Merge_q_Proc:
@@ -630,6 +635,8 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Copy_Proc:
       case pp_Mult_mm_Proc:
       case LPDV__pp_Mult_mm_Proc:
+      case LPDV__mm_Mult_pp_Proc:
+      case LPDV__mml_Mult_pp_Mult_mmr_Proc:
       case LPDV__pp_Mult_mm_Noether_Proc:
       case p_Mult_mm_Proc:
       case pp_Mult_nn_Proc:
@@ -641,6 +648,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Minus_mm_Mult_qq_Proc:
       case pp_Mult_mm_Noether_Proc:
       case LPDV__p_Minus_mm_Mult_qq_Proc:
+      case LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc:
       case p_kBucketSetLm_Proc:
         return index(field, length, ord);
 
@@ -692,8 +700,11 @@ do                                                                      \
   SetProc(p_Merge_q, FieldGeneral, length, ord);                        \
   SetProc(p_kBucketSetLm, field, length, ord);                          \
   SetProc(LPDV__pp_Mult_mm, field, length, OrdGeneral);                 \
+  SetProc(LPDV__mm_Mult_pp, field, length, OrdGeneral);                 \
+  SetProc(LPDV__mml_Mult_pp_Mult_mmr, field, length, OrdGeneral);       \
   SetProc(LPDV__pp_Mult_mm_Noether, field, length, OrdGeneral);         \
   SetProc(LPDV__p_Minus_mm_Mult_qq, field, length, ord);                \
+  SetProc(LPDV__p_Minus_mml_Mult_qq_Mult_mmr, field, length, ord);      \
 }                                                                       \
 while (0)
 

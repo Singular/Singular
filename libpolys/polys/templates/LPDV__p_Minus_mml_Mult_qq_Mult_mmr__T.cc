@@ -2,52 +2,55 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    LPDV__p_Minus_mm_Mult_qq__Template.cc
+ *  File:    LPDV__p_Minus_mml_Mult_qq_Mult_mmr__T.cc
  *  Purpose: template for LPDV__p_Minus_mm_Mult_qq
- *  Author:  obachman (Olaf Bachmann) (small Additions from
- *           gribo for the Letterplace DVec case)
- *  Created: 10/2012
- *  TODO:    This should somehow be merged (if possible) with
- *           p_Minus_mm_Mult_qq__T (see TODO below), since we
- *           only need one of theses functions: either
- *           p_Minus_mm_Mult_qq or LPDV__p_Minus_mm_Mult_qq
+ *  Author:  obachman (Olaf Bachmann) (the original, this one
+ *           also: Bo)
+ *  Created: 11/2012
+ *  TODO:    A lot maybe, or not, see other LPDV* templates.
  *******************************************************************/
 
 #define HAVE_SHIFTBBADVEC
 
 /***************************************************************
  *
- * Returns:  p - m*q
- *           Shorter, where Shorter == Length(p) + Length(q) - Length(p - m*q);
+ * Returns:  p - ml*q*mr
+ *           Shorter, where 
+ *           Shorter == Length(p) + Length(q) - Length(p - ml*q*mr);
  * Destroys: p
- * Const:    m, q
+ * Const:    ml, q, mr
+ *
+ * BOCO:
+ * ml has to have the right coefficient; we do not consider the
+ * coefficient of mr (if it has one, it will not be used)
  *
  ***************************************************************/
-LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
-  ( poly p, poly m, poly q, 
+LINKAGE poly LPDV__p_Minus_mml_Mult_qq_Mult_mmr__T
+  ( poly p, poly ml, poly q, poly mr,
     int& Shorter, const poly spNoether, const ring r )
 {
   p_Test(p, r);
   p_Test(q, r);
-  p_LmTest(m, r);
+  p_LmTest(ml, r);
+  p_LmTest(mr, r);
 
 #if PDEBUG > 0
   int l_debug = pLength(p) + pLength(q);
 #endif
 
   Shorter = 0;
-  // we are done if q == NULL || m == NULL
-  if (q == NULL || m == NULL) return p;
+  // we are done if q == NULL || (mr == NULL && ml == NULL)
+  if (q == NULL || (mr == NULL && ml == NULL) ) return p;
 
   spolyrec rp;
   poly a = &rp,                    // collects the result
-    qm = NULL;                     // stores q*m
+  qm = NULL;                       // stores ml*q*mr
 
 
-  number tm = pGetCoeff(m),           // coefficient of m
-    tneg = n_Neg__T(n_Copy__T(tm, r), r),    // - (coefficient of m)
-    tb,                            // used for tm*coeff(a1)
-    tc;                            // used as intermediate number
+  number tm = pGetCoeff(ml),           // coefficient of ml
+  tneg = n_Neg__T(n_Copy__T(tm, r), r),    // - (coefficient of ml)
+  tb,                            // used for tm*coeff(a1)
+  tc;                            // used as intermediate number
 
 
   int shorter = 0;
@@ -59,7 +62,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
 
   if (p == NULL) goto Finish;           // return tneg*q if (p == NULL)
 
-  pAssume(p_GetComp(q, r) == 0 || p_GetComp(m, r) == 0);
+  pAssume(p_GetComp(q, r) == 0 || p_GetComp(ml, r) == 0);
 
   AllocTop:
   p_AllocBin(qm, bin, r);
@@ -77,8 +80,9 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
    *      don't need the original p_Minus_mm_Mult_qq !
    *      But we need a mm_Mult_qq, see below!
    */
-  p_MemCopy__T(qm->exp, m->exp, length); //BOCO: will that be defined correctly?
-  r->p_ExpSum(qm, m, q, r);
+  p_MemCopy__T(qm->exp, ml->exp, length); //BOCO: will that be defined correctly?
+  r->p_ExpSum(qm, ml, q, r);
+  r->p_ExpSum(qm, qm, mr, r);
 #else
   p_MemSum__T(qm->exp, q->exp, m_e, length);
   p_MemAddAdjust__T(qm, r);
@@ -160,32 +164,21 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
   {
     pNext(a) = p;
   }
-  else  // append (- m*q) to result
+  else  // append (-ml*q*mr) to result
   {
-    pSetCoeff0(m, tneg);
+    pSetCoeff0(ml, tneg);
     if (spNoether != NULL)
     {
-      int ll = 0;
 #ifdef HAVE_SHIFTBBADVEC 
-      //BOCO: TODO: WARNING: ERROR: SOS: trouble, Trouble,
-      //TROUBLE: We need mm_Mult_pp in the noncommutative
-      //version!  Correct that!!!!
-      //BOCO: TODO: These two functions should also be merged
-      pNext(a) = r->p_Procs->LPDV__pp_Mult_mm_Noether
-                              (m, q, spNoether, ll, r);
-#else
-      pNext(a) = r->p_Procs->pp_Mult_mm_Noether(q, m, spNoether, ll, r);
+      assume(0); 
+      //Didn't consider that case yet - what does this Noether
+      //case do anyway?
 #endif
-      shorter += ll;
     }
     else
     {
-#ifdef HAVE_SHIFTBBADVEC 
-      //BOCO: we need mm_Mult_pp in the LPDV-Version
-      pNext(a) = r->p_Procs->LPDV__mm_Mult_pp(m, q, r);
-#else
-      pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r);
-#endif
+      pNext(a) = 
+        r->p_Procs->LPDV__mml_Mult_pp_Mult_mmr(ml, q, mr, r);
 #ifdef HAVE_RINGS
       if (! rField_is_Domain(r))
       {
@@ -193,7 +186,7 @@ LINKAGE poly LPDV__p_Minus_mm_Mult_qq__T
       }
 #endif
     }
-    pSetCoeff0(m, tm);
+    pSetCoeff0(ml, tm);
   }
 
   n_Delete__T(&tneg, r);

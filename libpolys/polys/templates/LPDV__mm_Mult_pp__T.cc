@@ -2,11 +2,12 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    LPDV__pp_Mult_mm__Template.cc
- *  Purpose: template for LPDV__pp_Mult_mm
- *  Author:  obachman (Olaf Bachmann) (small Additions from
- *           gribo for the Letterplace DVec case)
- *  Created: 10/2012
+ *  File:    LPDV__mm_Mult_pp__Template.cc
+ *  Purpose: template for LPDV__mm_Mult_pp
+ *  Author:  obachman (Olaf Bachmann) (original: pp_Mult_mm)
+ *           (small Additions from gribo for the Letterplace
+ *            DVec case)
+ *  Created: 11/2012
  *  TODO:    See LPDV__p_Minus_mm_Mult_qq__Template.cc
  *******************************************************************/
 
@@ -14,16 +15,16 @@
 
 /***************************************************************
  *
- *   Returns:  p*m
+ *   Returns:  m*p
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly LPDV__pp_Mult_mm__T
- ( poly p, const poly m, const ring ri )
+LINKAGE poly LPDV__mm_Mult_pp__T
+  ( const poly m, poly p, const ring ri )
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
-  if (p == NULL)
+  if (p == NULL) //BOCO: Why no check for m == NULL ?
   {
     return NULL;
   }
@@ -35,7 +36,6 @@ LINKAGE poly LPDV__pp_Mult_mm__T
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
-  //const unsigned long* m_e = m->exp; //BOCO: unused
   pAssume(!n_IsZero__T(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   number tmp;
@@ -52,8 +52,12 @@ LINKAGE poly LPDV__pp_Mult_mm__T
       pSetCoeff0(q, tmp);
 
 #ifdef HAVE_SHIFTBBADVEC //BOCO: only change for LPDV in this file
-      p_MemCopy__T(q->exp, p->exp, length);
-      ri->p_ExpSum(q, p, m, ri);
+
+      //BOCO: difference one to pp_Mult_mm: m->exp inst. of p->exp
+      p_MemCopy__T(q->exp, m->exp, length);
+
+      //BOCO: main difference to pp_Mult_mm here, swapped p,m
+      ri->p_ExpSum(q, m, p, ri);
       p_MemAddAdjust__T(q, ri);
 #else
       p_MemSum__T(q->exp, p->exp, m_e, length);

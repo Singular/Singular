@@ -36,6 +36,7 @@
 //512 : debugging Creation of DVecs
 //1024 : Debugging memory corruption
 //2048 : debugging redTail related things
+//4096 : debugging the multiplication
 #ifdef KDEBUG
 #define DEBOGRI 1
 #endif
@@ -147,6 +148,14 @@ namespace ShiftDVec
   bool deBoGriPrint
     ( const poly p, const char* description, 
       uint flag, bool assume = false, int indent = -1 );
+  bool deBoGriPrint
+    ( const poly p, const char* description, uint flag,
+      const ring lmRing, const ring tlRing = NULL,
+      bool assume = false, int indent = -1              );
+  bool deBoGriPrint
+    ( const TObject* P, const char* description, uint flag,
+      const ring lmRing, const ring tlRing,
+      bool assume = false, int indent = -1                 );
   bool deBoGriPrint
     ( const uint* dvec, uint size, 
       const char* description, 

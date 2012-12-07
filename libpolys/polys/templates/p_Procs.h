@@ -29,6 +29,9 @@ typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
 typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q,
                                             int &shorter, const poly spNoether,
                                             const ring r);
+typedef poly (*LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc_Ptr)
+  ( poly p, poly ml, poly q, poly mr, 
+    int &shorter, const poly spNoether, const ring r);
 typedef poly (*p_Neg_Proc_Ptr)(poly p, const ring r);
 typedef poly (*pp_Mult_Coeff_mm_DivSelect_Proc_Ptr)(poly p, const poly m,
                                                     int &shorter,const ring r);
@@ -38,6 +41,10 @@ typedef poly (*pp_Mult_Coeff_mm_DivSelectMult_Proc_Ptr)
 typedef poly (*p_Merge_q_Proc_Ptr)(poly p, poly q, const ring r);
 typedef void (*p_kBucketSetLm_Proc_Ptr)(kBucket_pt bucket);
 typedef poly (*LPDV__pp_Mult_mm_Proc_Ptr)(poly p, const poly m,
+                                          const ring r);
+typedef poly (*LPDV__mml_Mult_pp_Mult_mmr_Proc_Ptr)
+          (const poly ml, poly p, const poly mr, const ring r);
+typedef poly (*LPDV__mm_Mult_pp_Proc_Ptr)(poly m, const poly p,
                                           const ring r);
 typedef poly (*LPDV__pp_Mult_mm_Noether_Proc_Ptr)(poly p, const poly m,
                                              const poly spNoether, int &ll,
@@ -64,8 +71,11 @@ typedef struct p_Procs_s
   p_Merge_q_Proc_Ptr                    p_Merge_q;
   p_kBucketSetLm_Proc_Ptr               p_kBucketSetLm;
   LPDV__pp_Mult_mm_Proc_Ptr             LPDV__pp_Mult_mm;
+  LPDV__mm_Mult_pp_Proc_Ptr             LPDV__mm_Mult_pp;
+  LPDV__mml_Mult_pp_Mult_mmr_Proc_Ptr   LPDV__mml_Mult_pp_Mult_mmr;
   LPDV__pp_Mult_mm_Noether_Proc_Ptr     LPDV__pp_Mult_mm_Noether;   
   LPDV__p_Minus_mm_Mult_qq_Proc_Ptr     LPDV__p_Minus_mm_Mult_qq;
+  LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc_Ptr     LPDV__p_Minus_mml_Mult_qq_Mult_mmr;
 } pProcs_s;
 
 

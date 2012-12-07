@@ -389,6 +389,10 @@ while (0)
 
 #if 0
 //BOCO: Added for SHIFT DVEC case p_ExpSum functions
+//BOCO: Note: Does not work like this -> now a pointer, not a
+//template; look into SDMultiplication.cc . This here might be
+//out of date. I only leave it, because i hope someone once will
+//have an idea, how to make it better.
 
 
 

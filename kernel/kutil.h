@@ -310,11 +310,9 @@ public:
                          int use_bucket, ring r);
   KINLINE void Tail_Minus_mm_Mult_qq
     (poly m, poly qq, int lq, poly spNoether);
-#if 0
 #ifdef HAVE_SHIFTBBADVEC
-  KINLINE void Tail_Minus_mm_Mult_qq
-    (poly m, poly qq, int lq, poly spNoether, int lV);
-#endif
+  KINLINE void Tail_Minus_mml_Mult_qq_Mult_mmr
+    (poly mml, poly q, poly mmr, int lq, poly spNoether);
 #endif
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists

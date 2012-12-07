@@ -105,6 +105,10 @@ static void* GetGeneralProc(p_Proc proc)
         return cast_A_to_vptr(pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral);
       case LPDV__pp_Mult_mm_Proc:
         return cast_A_to_vptr(LPDV__pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral);
+      case LPDV__mml_Mult_pp_Mult_mmr_Proc:
+        return cast_A_to_vptr(LPDV__mml_Mult_pp_Mult_mmr__FieldGeneral_LengthGeneral_OrdGeneral);
+      case LPDV__mm_Mult_pp_Proc:
+        return cast_A_to_vptr(LPDV__mm_Mult_pp__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_mm_Noether_Proc:
         return cast_A_to_vptr(pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral);
       case LPDV__pp_Mult_mm_Noether_Proc:
@@ -117,6 +121,8 @@ static void* GetGeneralProc(p_Proc proc)
         return cast_A_to_vptr(p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral);
       case LPDV__p_Minus_mm_Mult_qq_Proc:
         return cast_A_to_vptr(LPDV__p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral);
+      case LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc:
+        return cast_A_to_vptr(LPDV__p_Minus_mml_Mult_qq_Mult_mmr__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Neg_Proc:
         return cast_A_to_vptr(p_Neg__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_Coeff_mm_DivSelect_Proc:
@@ -155,6 +161,10 @@ static const char* GetGeneralProcName(p_Proc proc)
         return "pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral";
       case LPDV__pp_Mult_mm_Proc:
         return "LPDV__pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral";
+      case LPDV__mml_Mult_pp_Mult_mmr_Proc:
+        return "LPDV__mml_Mult_pp_Mult_mmr__FieldGeneral_LengthGeneral_OrdGeneral";
+      case LPDV__mm_Mult_pp_Proc:
+        return "LPDV__mm_Mult_pp__FieldGeneral_LengthGeneral_OrdGeneral";
       case pp_Mult_mm_Noether_Proc:
         return "pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral";
       case LPDV__pp_Mult_mm_Noether_Proc:
@@ -167,6 +177,8 @@ static const char* GetGeneralProcName(p_Proc proc)
         return "p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral";
       case LPDV__p_Minus_mm_Mult_qq_Proc:
         return "LPDV__p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral";
+      case LPDV__p_Minus_mml_Mult_qq_Mult_mmr_Proc:
+        return "LPDV__p_Minus_mml_Mult_qq_Mult_mmr__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_Neg_Proc:
         return "p_Neg__FieldGeneral_LengthGeneral_OrdGeneral";
       case pp_Mult_Coeff_mm_DivSelect_Proc:

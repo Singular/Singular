@@ -1107,6 +1107,44 @@ bool ShiftDVec::deBoGriPrint
 
 #if DEBOGRI > 0
 bool ShiftDVec::deBoGriPrint
+  ( const poly p, const char* description, uint flag, 
+    const ring lmRing, const ring tlRing, 
+    bool assume, int indent )
+{
+  if(indent < 0){ indent = ShiftDVec::indent; }
+  if( ShiftDVec::deBoGri & flag && 
+      !assume && !ShiftDVec::isSilenced )
+  {
+    for(int i = indent; i; --i) PrintS(" ");
+    PrintS(description); 
+    if(tlRing == NULL) p_Write(p, lmRing, lmRing);
+    else p_Write(p, lmRing, tlRing);
+  }
+  return assume;
+}
+#endif
+
+#if DEBOGRI > 0
+bool ShiftDVec::deBoGriPrint
+  ( const TObject* P, const char* description, uint flag, 
+    const ring lmRing, const ring tlRing, 
+    bool assume, int indent )
+{
+  if(indent < 0){ indent = ShiftDVec::indent; }
+  if( ShiftDVec::deBoGri & flag && 
+      !assume && !ShiftDVec::isSilenced )
+  {
+    for(int i = indent; i; --i) PrintS(" ");
+    PrintS(description); 
+    if(P->p != NULL){ p_Write(P->p, lmRing, tlRing); }
+    else { p_Write(P->t_p, tlRing, tlRing ); }
+  }
+  return assume;
+}
+#endif
+
+#if DEBOGRI > 0
+bool ShiftDVec::deBoGriPrint
   ( const poly p, int shift, kStrategy strat,
     const char* description, uint flag, bool assume, int indent )
 {

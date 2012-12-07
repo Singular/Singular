@@ -2,8 +2,8 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    LPDV__pp_Mult_mm__Template.cc
- *  Purpose: template for LPDV__pp_Mult_mm
+ *  File:    LPDV__mml_Mult_pp_Mult_mmr__T.cc
+ *  Purpose: template for LPDV__mml_Mult_pp_Mult_mmr__T
  *  Author:  obachman (Olaf Bachmann) (small Additions from
  *           gribo for the Letterplace DVec case)
  *  Created: 10/2012
@@ -14,15 +14,20 @@
 
 /***************************************************************
  *
- *   Returns:  p*m
- *   Const:    p, m
+ *   Returns:  ml*p*mr
+ *   Const:    ml, p, mr
+ *
+ *   BOCO:
+ *   ml has to have the right coefficient; we do not consider
+ *   the coefficient of mr (if it has one, it will not be used)
  *
  ***************************************************************/
-LINKAGE poly LPDV__pp_Mult_mm__T
- ( poly p, const poly m, const ring ri )
+LINKAGE poly LPDV__mml_Mult_pp_Mult_mmr__T
+ ( const poly ml, poly p, const poly mr, const ring ri )
 {
   p_Test(p, ri);
-  p_LmTest(m, ri);
+  p_LmTest(ml, ri);
+  p_LmTest(mr, ri);
   if (p == NULL)
   {
     return NULL;
@@ -32,17 +37,17 @@ LINKAGE poly LPDV__pp_Mult_mm__T
   rp.next = NULL;
 #endif
   poly q = &rp;
-  number ln = pGetCoeff(m);
+  number lnl = pGetCoeff(ml);
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   //const unsigned long* m_e = m->exp; //BOCO: unused
-  pAssume(!n_IsZero__T(ln,ri));
+  pAssume(!n_IsZero__T(lnl,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   number tmp;
 
   do
   {
-    tmp = n_Mult__T(ln, pGetCoeff(p), ri);
+    tmp = n_Mult__T(lnl, pGetCoeff(p), ri);
 #ifdef HAVE_ZERODIVISORS
     if (! n_IsZero__T(tmp, ri))
     {
@@ -51,14 +56,10 @@ LINKAGE poly LPDV__pp_Mult_mm__T
       q = pNext(q);
       pSetCoeff0(q, tmp);
 
-#ifdef HAVE_SHIFTBBADVEC //BOCO: only change for LPDV in this file
-      p_MemCopy__T(q->exp, p->exp, length);
-      ri->p_ExpSum(q, p, m, ri);
+      p_MemCopy__T(q->exp, ml->exp, length);
+      ri->p_ExpSum(q, ml, p, ri);
+      ri->p_ExpSum(q, q, mr, ri);
       p_MemAddAdjust__T(q, ri);
-#else
-      p_MemSum__T(q->exp, p->exp, m_e, length);
-      p_MemAddAdjust__T(q, ri);
-#endif
 
 #ifdef HAVE_ZERODIVISORS
     }

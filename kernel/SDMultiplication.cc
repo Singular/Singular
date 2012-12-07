@@ -134,31 +134,31 @@
 //
 //Now following: The lists from Grischa
 /*
- Occurences of multiplication
- 
- 
- kspoly.cc:
- 
- procedure          mult-command             	line
- 
- ksReducePoly          
-                    Tail_Minus_mm_Mult_qq     	139
-                    
- ksReducePolySig 
-                    pp_Mult_qq     		236
-                    Tail_Minus_mm_Mult_qq       346
-                    
- ksCreateSpoly
-                    pp_Mult_mm_Noether	        448
-                    pp_Mult_mm		        452
-                    Tail_Minus_mm_Mult_qq       460
-                    
- ksReducePolyTail   
-                    uses ksReducePoly	      	512
-                    Mult_nn			521
-                    
- ksCreateShortSpoly
-		    nMult			582, 583, 588, 594, 773, 774, 804, 809, 817, 826,
+Occurences of multiplication
+
+
+kspoly.cc:
+
+procedure          mult-command             	line
+
+ksReducePoly          
+                  Tail_Minus_mm_Mult_qq     	139
+                  
+ksReducePolySig 
+                  pp_Mult_qq     		236
+                  Tail_Minus_mm_Mult_qq       346
+                  
+ksCreateSpoly
+                  pp_Mult_mm_Noether	        448
+                  pp_Mult_mm		        452
+                  Tail_Minus_mm_Mult_qq       460
+                  
+ksReducePolyTail   
+                  uses ksReducePoly	      	512
+                  Mult_nn			521
+                  
+ksCreateShortSpoly
+                  nMult			582, 583, 588, 594, 773, 774, 804, 809, 817, 826,
 */
 /*
 call in shiftDVec.cc of the procedures above:
@@ -168,14 +168,14 @@ procedure 			line
 ksCreateSpoly			461(bba)
 
 ksReducePoly			1167(redtail)
-				1416(redHomog)
-				1427(redHomog)
-				1466(redHomog)
-				1700(redBba)
-				2421(redtailBba)
-				
+                              1416(redHomog)
+                              1427(redHomog)
+                              1466(redHomog)
+                              1700(redBba)
+                              2421(redtailBba)
+                              
 ksReducePolyTail		2421(redtailBba)
-				1167(redtail)
+                              1167(redtail)
 ksCreateShortSpoly
 nc_ksCreateShortSpoly
 */
@@ -186,19 +186,19 @@ the Bba
 function		file		line
 
 SetShortExpVector	kspoly.cc	153, 488, 543 (360)
-			kutil.cc	9400 (3118, 5308, 5406)
-			shiftDVec.cc	1336(so close!), 1526, 2289
-			kstd2.cc	319, 336, 399, 473, 539, 639, 687, 777, 842, 945, 1023, 1123, 2795, 3094, 3138
-			tgb.cc		(1867, 1914, 3018, 3065, 4703)
+                      kutil.cc	9400 (3118, 5308, 5406)
+                      shiftDVec.cc	1336(so close!), 1526, 2289
+                      kstd2.cc	319, 336, 399, 473, 539, 639, 687, 777, 842, 945, 1023, 1123, 2795, 3094, 3138
+                      tgb.cc		(1867, 1914, 3018, 3065, 4703)
 p_ExpVectorSub		kspoly.cc	99, 115, (227, 306, 322 )
 p_LmExpVectorAddIsOk	kspoly.cc	104, (311)
-			kutil.cc	7936, 7937, 7963, 7964
+                      kutil.cc	7936, 7937, 7963, 7964
 p_ExpVectorAdd		kspoly.cc	107, (314)
-			kutil.cc	5866, 5909
-			fast_mult.cc	(449)
-			kstd2.cc	1842, 1852
+                      kutil.cc	5866, 5909
+                      fast_mult.cc	(449)
+                      kstd2.cc	1842, 1852
 p_GetExpDiff		kspoly.cc	607, 659, 697
-			ringgb.cc	(71)
+                      ringgb.cc	(71)
 */
 
 #include <kutil.h>  //because of include order
@@ -212,165 +212,249 @@ p_GetExpDiff		kspoly.cc	607, 659, 697
 
 
 /* Creates a Mapping: i -> pos, where i is an index of a       *
- * variable in a block of the letterplace polynomial and pos   *
- * the position of the order Field for the block. May not yet  *
- * work for other orderings than dp. The Mapping is stored to  *
- * r->omap, the size of the mapping to r->osize. omap[0] has a *
- * special meaning: it is the glocal order Field, thus the     *
- * totaldegree in the dp-Case.                                 * 
- * TODO: This has to be adapted to other orderings. And the    *
- * comment should be rewritten to be more understandable and   *
- * more accurate.                                              */
+* variable in a block of the letterplace polynomial and pos   *
+* the position of the order Field for the block. May not yet  *
+* work for other orderings than dp. The Mapping is stored to  *
+* r->omap, the size of the mapping to r->osize. omap[0] has a *
+* special meaning: it is the glocal order Field, thus the     *
+* totaldegree in the dp-Case.                                 * 
+* TODO: This has to be adapted to other orderings. And the    *
+* comment should be rewritten to be more understandable and   *
+* more accurate.                                              */
 int ShiftDVec::InitOrderMapping( ring r )
 {
-  r->omap = (int *) omAlloc( (r->N+1) * sizeof(int) );
+r->omap = (int *) omAlloc( (r->N+1) * sizeof(int) );
 
-  for(int i = 1; i < r->OrdSize; ++i)
-  {
-    sro_ord* o=&(r->typ[i]);
-    assume(o->ord_typ == ro_dp); //see comment above
-    int a,e;
-    a=o->data.dp.start;
-    e=o->data.dp.end;
-    for(int i=a;i<=e;i++) (r->omap)[i] = o->data.dp.place;
-  }
+for(int i = 1; i < r->OrdSize; ++i)
+{
+  sro_ord* o=&(r->typ[i]);
+  assume(o->ord_typ == ro_dp); //see comment above
+  int a,e;
+  a=o->data.dp.start;
+  e=o->data.dp.end;
+  for(int i=a;i<=e;i++) (r->omap)[i] = o->data.dp.place;
+}
 
-  (r->omap)[0] = currRing->pOrdIndex;
+(r->omap)[0] = currRing->pOrdIndex;
 
-  //BOCO TODO: This is a bit redundant...
-  return r->osize = r->N+1;
+//BOCO TODO: This is a bit redundant...
+return r->osize = r->N+1;
 }
 
 /* Initializes the letterplace multiplication. See also        *
- * InitOrderMapping. Do not forget to free r->omap as soon, as *
- * it will no longer be used.                                  */
+* InitOrderMapping. Do not forget to free r->omap as soon, as *
+* it will no longer be used.                                  */
 void ShiftDVec::InitSDMultiplication( ring r, kStrategy strat )
 {
-  r->isLPring = strat->lV; 
-  //BOCO: this should have already been set by
-  //makeLetterplaceRing, but it isnt :(
+r->isLPring = strat->lV; 
+//BOCO: this should have already been set by
+//makeLetterplaceRing, but it isnt :(
 
-  r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
+r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
 
-  for(int i = 1; i < r->OrdSize; ++i)
+for(int i = 1; i < r->OrdSize; ++i)
+{
+  if( r->typ[i].ord_typ != ro_dp )
   {
-    if( r->typ[i].ord_typ != ro_dp )
-    {
-      r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
-      return;
-    }
+    r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
+    return;
   }
+}
 
-  //BOCO: TODO: QUESTION: 
-  //Do we have to reset that after the bba?
-  r->p_Procs->pp_Mult_mm =
-    r->p_Procs->LPDV__pp_Mult_mm;
-  r->p_Procs->pp_Mult_mm_Noether =
-    r->p_Procs->LPDV__pp_Mult_mm_Noether;
-  r->p_Procs->p_Minus_mm_Mult_qq =
-    r->p_Procs->LPDV__p_Minus_mm_Mult_qq;
+//BOCO: TODO: QUESTION: 
+//Should we reset that after the bba?
+r->p_Procs->pp_Mult_mm =
+  r->p_Procs->LPDV__pp_Mult_mm;
+r->p_Procs->pp_Mult_mm_Noether =
+  r->p_Procs->LPDV__pp_Mult_mm_Noether;
+r->p_Procs->p_Minus_mm_Mult_qq =
+  r->p_Procs->LPDV__p_Minus_mm_Mult_qq;
 
-  InitOrderMapping(r);
+InitOrderMapping(r);
 }
 
 #if 0 //Not used at the moment
 //BOCO: Get the vth exponent in exp (derived from p_GetExp)
 long ShiftDVec::_GetExp(long* exp, ring r, const int v)
 {
-  pAssume2(v>0 && v <= r->N);
-  pAssume2(r->VarOffset[v] != -1);
+pAssume2(v>0 && v <= r->N);
+pAssume2(r->VarOffset[v] != -1);
 
-  int pos  =(r->VarOffset[v] & 0xffffff);
-  int hbyte= (r->VarOffset[v] >> 24); // the highest byte
-  int bitpos = hbyte & 0x3f; // last 6 bits
-  long bitmask = BitMask(r->bitmask, hbyte >> 6);
+int pos  =(r->VarOffset[v] & 0xffffff);
+int hbyte= (r->VarOffset[v] >> 24); // the highest byte
+int bitpos = hbyte & 0x3f; // last 6 bits
+long bitmask = BitMask(r->bitmask, hbyte >> 6);
 
-  return (exp[pos] >> bitpos) & bitmask;
+return (exp[pos] >> bitpos) & bitmask;
 }
 #endif
 
 
 
 /* Part 2: replacements for p_MemSum__T .                      */
+/* And other helper functions (mainly for ksReduce...)         */
 
 
 
-/* BOCO: This is our letterplace replacement for p_MemSum__T.  *
- * This function will return rt->exp = p->exp + s * q->exp,    *
- * where s is a shift in size of the number of exponents equal *
- * to on in p->exp . rt has to be allocated (for example with  *
- * p_AllocBin?).                                               */
+/* BOCO: This is our letterplace replacement for p_MemSum__T. *
+* This function will return rt->exp = p->exp + s * q->exp,    *
+* where s is a shift in size of the number of exponents equal *
+* to on in p->exp . rt has to be allocated (for example with  *
+* p_AllocBin?).                                               */
 void ShiftDVec::p_ExpSum_slow
-  (poly rt, poly p, poly q, ring r)
+(poly rt, poly p, poly q, ring r)
 {
-  int lV = r->isLPring;
+int lV = r->isLPring;
 
-  //This represents the first index in the currently considered
-  //block in rt->exp.
-  long index_rt = p_Totaldegree(p, r) * lV + 1;
+//This represents the first index in the currently considered
+//block in rt->exp.
+long index_rt = p_Totaldegree(p, r) * lV + 1;
 
-  long index_q = 1;
-  {
-    nextblock: ;
-    //We will loop, until we found an empty block, or until we
-    //considered all variables
-    for(long i = 0; i < lV; ++i)
-      if( p_GetExp(q, index_q+i, r) )
-      {
-        p_SetExp(rt, index_rt+i, 1, r);
-        index_rt += lV;
-        if(index_rt > r->N) break; //looped through all vars
-        index_q += lV; //We found a nonzero exponent, thus
-        goto nextblock; //we can move on to the next block
-      }
-  }
+long index_q = 1;
+{
+  nextblock: ;
+  //We will loop, until we found an empty block, or until we
+  //considered all variables
+  for(long i = 0; i < lV; ++i)
+    if( p_GetExp(q, index_q+i, r) )
+    {
+      p_SetExp(rt, index_rt+i, 1, r);
+      index_rt += lV;
+      if(index_rt > r->N) break; //looped through all vars
+      index_q += lV; //We found a nonzero exponent, thus
+      goto nextblock; //we can move on to the next block
+    }
+}
 
-  //TODO: Maybe should be done later to reduce overhead
-  p_Setm(rt,r);
+//TODO: Maybe should be done later to reduce overhead
+p_Setm(rt,r);
 
-  return;
+return;
 }
 
 /* BOCO: This is our letterplace replacement for p_MemSum__T,  *
  * in case we have a dp-ordering on our blocks.                *
  * This function will return rt->exp = p->exp + s * q->exp,    *
  * where s is a shift in size of the number of exponents equal *
- * to on in p->exp . rt has to be allocated (for example with  *
+ * to on in p->exp . rt has to be a copy of p.                 *
  * p_AllocBin?).                                               */
 void ShiftDVec::p_ExpSum_dp
-  (poly rt, poly p, poly q, ring r)
+(poly rt, poly p, poly q, ring r)
 {
-  //This represents the first index in the currently considered
-  //block in rt->exp.
-  //long index_rt = p_Totaldegree(p, r) * lV + 1;
-  int lV = r->isLPring;
-  long index_rt = p->exp[r->omap[0]] * lV + 1;
+//This represents the first index in the currently considered
+//block in rt->exp.
+//long index_rt = p_Totaldegree(p, r) * lV + 1;
+int lV = r->isLPring;
+long index_rt = p->exp[r->omap[0]] * lV + 1;
 
-  long index_q = 1;
+long index_q = 1;
+{
+  nextblock: ;
+  //We will loop, until we found an empty block, or until we
+  //considered all variables
+  for(long i = 0; i < lV; ++i)
+    if( p_GetExp(q, index_q+i, r) )
+    {
+      rt->exp[r->omap[index_rt+i]] = 1;
+      p_SetExp(rt, index_rt+i, 1, r);
+      index_rt += lV;
+      if(index_rt > r->N) break; //looped through all vars
+      index_q += lV; //We found a nonzero exponent, thus
+      goto nextblock; //we can move on to the next block
+    }
+}
+rt->exp[r->omap[0]] += q->exp[r->omap[0]];
+
+return;
+}
+
+//p will become ml and vice versa (Thus p is modified!)
+//ml will be a new poly
+void ShiftDVec::get_division_cofactors
+  ( poly p, poly divides_p, 
+    int divides_p_shift, poly* ml, poly* mr, ring r )
+//BOCO: Notes to myself
+//- Assumes divides_p is shifted correctly
+//- may be (speed) improvable, but I don't think that matters to
+//  much - i at least hope so...
+{
+  int lV = r->isLPring;
+  p_ExpVectorSub(p, divides_p, r);
+  long index_p = 
+    (divides_p->exp[r->omap[0]] + divides_p_shift) * lV + 1;
+  *mr = p_Init(r);
+  long index_mr = 1;
   {
     nextblock: ;
     //We will loop, until we found an empty block, or until we
     //considered all variables
-    for(long i = 0; i < lV; ++i)
-      if( p_GetExp(q, index_q+i, r) )
+    for(int i = 0; i < lV; ++i)
+      if( p_GetExp(p, index_p+i, r) )
       {
-        rt->exp[r->omap[index_rt+i]] = 1;
-        p_SetExp(rt, index_rt+i, 1, r);
-        index_rt += lV;
-        if(index_rt > r->N) break; //looped through all vars
-        index_q += lV; //We found a nonzero exponent, thus
+        (*mr)->exp[r->omap[index_mr+i]] = 1;
+        p_SetExp(*mr, index_mr+i, 1, r);
+
+        // p shall become ml, so substract the exponent
+        p->exp[r->omap[index_p+i]] = 0;
+        p_SetExp(p, index_p+i, 0, r);
+
+        index_p += lV;
+        if(index_p > r->N) break; //looped through all vars
+        index_mr += lV; //We found a nonzero exponent, thus
         goto nextblock; //we can move on to the next block
       }
-  }
-  rt->exp[r->omap[0]] += q->exp[r->omap[0]];
+    }
 
-  return;
+  *ml = p;
+}
+
+//BOCO:
+//This function does what it seems to do, or not.
+//We should store shift whereever possible to avoid use of this
+//function. Maybe there is a better heuristik than starting
+//testing from the beginning - but I get off the point...
+int ShiftDVec::get_shift_of(poly p, ring r)
+{
+  int lV = r->isLPring;
+  long deg_p = p->exp[r->omap[0]] * lV;
+
+  //TODO: Is it ok, to define the shift of a poly equal to zero
+  //as zero ? :
+  if(deg_p == 0) return 0;
+
+  long index_p = 0;
+
+  //find the polynomial
+  { //this is a loop
+    nexttry: ;
+    index_p += deg_p;
+    assume(index_p <= r->N);
+    for(int i = 0; i < lV; ++i)
+      if( p_GetExp(p, index_p-i, r) )
+        goto endloop; //found the poly
+    goto nexttry; //poly not yet found
+
+    endloop: ;
+  }
+
+  //find the first empty block of the polynomial 
+  //(could be improved or merged with the loop above)
+  { //this is a loop
+    nexttry2: ;
+
+    index_p -= lV;
+    if(index_p == 0) return 0; //first block nonempty => shift=0
+    for(int i = 0; i < lV; ++i)
+      if( p_GetExp(p, index_p-i, r) )
+        goto nexttry2; //block not empty
+
+    return index_p/lV; //found empty block, calculate shift
+  }
 }
 
 
-
-/* Part 2: adjustments of various functions which invoke some *
- * of the multiplications functions .                         */
+/* Part 2: adjustments of various functions which invoke some */
+/* of the multiplications functions .                         */
 
 
 
@@ -378,19 +462,28 @@ int ShiftDVec::red_count = 0; //count of reductions
 int ShiftDVec::create_count = 0;  //count of spoly creations
 
 /***************************************************************
- *
- * Reduces PR with SPW
- * Assumes PR != NULL, SPW != NULL, Lm(SPW) divides Lm(PR)
- * SPW is the shifted UPW
- *
- ***************************************************************/
+*
+* Reduces PR with SPW
+* Assumes PR != NULL, SPW != NULL, Lm(SPW) divides Lm(PR)
+* SPW is the shifted UPW
+*
+***************************************************************/
 int ShiftDVec::ksReducePoly(LObject* PR,
-                 TObject* UPW,
-                 TObject* SPW,
-                 poly spNoether,
-                 number *coef,
-                 kStrategy strat)
+               TObject* UPW,
+               TObject* SPW,
+               poly spNoether,
+               number *coef,
+               kStrategy strat)
 {
+  initDeBoGri
+  ( ShiftDVec::indent, 
+      "Entering ksReducePoly", "Leaving ksReducePoly", 4096 );
+  deBoGriPrint
+    (PR, "PReduce: ", 4096, currRing, PR->tailRing);
+  deBoGriPrint
+    (UPW, "unshifted PWith: ", 4096, currRing, PR->tailRing); 
+  deBoGriPrint
+    (SPW, "  shifted PWith: ", 4096, currRing, PR->tailRing);
 #ifdef KDEBUG
   red_count++;
 #ifdef TEST_OPT_DEBUG_RED
@@ -404,7 +497,7 @@ int ShiftDVec::ksReducePoly(LObject* PR,
   int ret = 0;
   ring tailRing = PR->tailRing;
   kTest_L(PR);
-  kTest_T(SPW);
+  kTest_T(UPW);
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = SPW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
   poly t2 = pNext(UPW->GetLmTailRing()), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
@@ -444,15 +537,38 @@ int ShiftDVec::ksReducePoly(LObject* PR,
     return 0;
   }
 
+#if 0  //BOCO: For LP we need a left and a right cofactor
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
+#else
+  poly mr;
+  int shift_of_p2 = ShiftDVec::get_shift_of(p2, tailRing);
+  //BOCO:
+  //lm: lm of poly which shall be reduced
+  //    will become left cofactor
+  //p2: divisor of lm
+  //mr: will become right cofactor
+  ShiftDVec::get_division_cofactors
+    (lm, p2, shift_of_p2, &lm, &mr, tailRing);
+#endif
 
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
+    // BOCO: TODO: think about it!
     while (SPW->max != NULL && !p_LmExpVectorAddIsOk(lm, SPW->max, tailRing))
     {
+      //BOCO: hopefully this loop is not executed very often...
+      //otherwise: have to build a method called
+      //unget_division_cofactors...
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
+      poly mr_shifted = p_mLPshift
+        ( mr, shift_of_p2 + p2->exp[tailRing->omap[0]],
+          strat->uptodeg, tailRing->isLPring, tailRing );
+      p_Delete(&mr, tailRing);
+      p_ExpVectorAdd(lm, mr_shifted, tailRing);
+      p_Delete(&mr_shifted, tailRing);
+
       if (strat == NULL) return 2;
       if (! kStratChangeTailRing(strat, PR, SPW)) return -1;
       tailRing = strat->tailRing;
@@ -460,7 +576,8 @@ int ShiftDVec::ksReducePoly(LObject* PR,
       p2 = SPW->GetLmTailRing();
       t2 = pNext(UPW->GetLmTailRing());
       lm = p1;
-      p_ExpVectorSub(lm, p2, tailRing);
+      ShiftDVec::get_division_cofactors
+        (lm, p2, shift_of_p2, &lm, &mr, tailRing);
       ret = 1;
     }
   }
@@ -485,7 +602,19 @@ int ShiftDVec::ksReducePoly(LObject* PR,
 
   // and finally 
   // BOCO: TODO: Do we have to say UPW->GetLength() ?
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, SPW->GetpLength() - 1, spNoether);
+  // (so what does GetLength() return...)
+  // BOCO: TODO Memory: Which polys have to deleted afterwards
+  // or before? head of t2? mr? else ? ... care for that!!!
+#if 0 //BOCO: replaced because of two sided multiplication for LP
+  PR->Tail_Minus_mm_Mult_qq
+    (lm, t2, SPW->GetpLength() - 1, spNoether);
+#else
+  //BOCO: the following could lead to unwanted side effects, but
+  //I want to get rid of dPolyErrors p_LmTest in debug version
+  assume( p_SetCoeff(mr, nInit(1), tailRing) );
+  PR->Tail_Minus_mml_Mult_qq_Mult_mmr
+    (lm, t2, mr, SPW->GetpLength() - 1, spNoether);
+#endif
   assume(SPW->GetpLength() == pLength(SPW->p != NULL ? SPW->p : SPW->t_p));
   PR->LmDeleteAndIter();
 
@@ -509,6 +638,9 @@ int ShiftDVec::ksReducePoly(LObject* PR,
     Print(" to: "); PR->wrp(); Print("\n");
   }
 #endif
+  deBoGriPrint("", 4096); deBoGriPrint("Reduced Poly: ", 4096); 
+  deBoGriPrint
+    (PR->t_p, "PR->t_p: ", 4096, tailRing, tailRing);
   return ret;
 }
 
@@ -522,6 +654,14 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
                    poly m1, poly m2, TObject** R)
 {
+  initDeBoGri
+    ( ShiftDVec::indent, 
+      "Entering ksCreateSpoly", "Leaving ksCreateSpoly", 4096 );
+  deBoGriPrint(m1, "m1: ", 4096, tailRing); 
+  deBoGriPrint(m2, "m2: ", 4096, tailRing);
+  deBoGriPrint(Pair->p1, "Pair->p1: ", 4096, currRing, tailRing);
+  deBoGriPrint(Pair->p2, "Pair->p2: ", 4096, currRing, tailRing);
+
 #ifdef KDEBUG
   create_count++;
 #endif
@@ -596,7 +736,7 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   //BOCO: TODO: adding m1 to a1 : unnecessary -> change that
   Pair->SetLmTail(m1, a1, l1, use_buckets, tailRing);
-  // get m1*a1 - a2*m2
+  // get a1*m1 - m2*a2
   Pair->Tail_Minus_mm_Mult_qq(m2, a2, l2, spNoether);
 
   // Clean-up time
@@ -629,6 +769,9 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
   }
 #endif
 
+  deBoGriPrint("", 4096);
+  deBoGriPrint("New Polynomial:", 4096);
+  deBoGriPrint(Pair->t_p, "Pair->t_p: ", 4096, tailRing);
 }
 
 //BOCO: used in redtail
@@ -642,7 +785,7 @@ int ShiftDVec::ksReducePolyTail
   poly Save =   SPW->GetLmCurrRing();
 
   kTest_L(PR);
-  kTest_T(SPW);
+  kTest_T(UPW);
   pAssume(pIsMonomOf(Lp, Current));
 
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);

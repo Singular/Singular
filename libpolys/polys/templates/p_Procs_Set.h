@@ -170,6 +170,8 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   CheckProc(pp_Mult_mm);
   CheckProc(p_Mult_mm);
   CheckProc(p_Minus_mm_Mult_qq);
+  CheckProc(LPDV__p_Minus_mm_Mult_qq);
+  CheckProc(LPDV__p_Minus_mml_Mult_qq_Mult_mmr);
   CheckProc(pp_Mult_mm_Noether);
   CheckProc(p_Add_q);
   CheckProc(p_Neg);

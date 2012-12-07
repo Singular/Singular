@@ -11,6 +11,11 @@ namespace ShiftDVec
     (poly rt, poly p, poly q, ring r);
   //void (*p_ExpSum) (poly rt, poly p, poly q, ring r);
 
+  int get_shift_of(poly p, ring r);
+  void get_division_cofactors
+    ( poly p, poly divides_p, 
+      int divides_p_shift, poly* ml, poly* mr, ring r );
+
   int InitOrderMapping( ring r );
   void InitSDMultiplication( ring r, kStrategy strat );
  

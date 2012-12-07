@@ -586,8 +586,8 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   }
 }
 
-KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
-                                             poly spNoether)
+KINLINE void sLObject::Tail_Minus_mm_Mult_qq
+  (poly m, poly q, int lq, poly spNoether)
 {
   if (bucket != NULL)
   {
@@ -599,6 +599,9 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
     assume(_p != NULL);
 
     int lp=pLength-1;
+    //BOCO: Memory leak?: Where do we delete _p
+    //(we only keep pNext(_p))
+    //TODO: find that out
     pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m, q, lp, lq, 
                                     spNoether, tailRing );
     pLength=lp+1;
@@ -606,6 +609,30 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
 //    pLength += lq - shorter;
   }
 }
+
+#ifdef HAVE_SHIFTBBADVEC
+//adapted version of sLObject::Tail_Minus_mm_Mult_qq; merged
+//with p_Minus_mm_Mult_qq from polys/pInline2.h
+KINLINE void sLObject::Tail_Minus_mml_Mult_qq_Mult_mmr
+  ( poly mml, poly q, poly mmr, int lq, poly spNoether )
+{
+  assume(bucket == NULL);
+
+  poly _p = (t_p != NULL ? t_p : p);
+  assume(_p != NULL);
+
+  int lp=pLength-1;
+  int shorter;
+  //poly last;
+  //BOCO: Memory leak?: Where do we delete _p 
+  //(we only keep pNext(_p))
+  //TODO: find that out
+  pNext(_p) = 
+    tailRing->p_Procs->LPDV__p_Minus_mml_Mult_qq_Mult_mmr
+      (pNext(_p), mml, q, mmr, shorter, spNoether, tailRing);
+  pLength = (lp + lq) - shorter + 1;
+}
+#endif
 
 #if 0
 #ifdef HAVE_SHIFTBBADVEC

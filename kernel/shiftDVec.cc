@@ -320,6 +320,10 @@ ideal ShiftDVec::bba
   (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   namespace SD = ShiftDVec;
+
+  initDeBoGri
+    ( ShiftDVec::indent, "Entering bba", "Leaving bba", 4096 );
+
 #endif
 #ifdef KDEBUG
   bba_count++;
@@ -476,10 +480,12 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
         }
       }
 
+      deBoGriPrint("In bba before ksCreateSpoly", 4096);
       // create the real one
       ShiftDVec::ksCreateSpoly
         ( &(strat->P), NULL, strat->use_buckets,
            strat->tailRing, m1, m2, strat->R );
+      deBoGriPrint("In bba after ksCreateSpoly", 4096);
     }
     else if (strat->P.p1 == NULL)
     {
@@ -1179,6 +1185,7 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
           //BOCO: Is that right?:
           With_s.p = With->p;
         }
+        With->tailRing = WithTmp->tailRing; //BOCO: added...
 #endif
       With->length=0;
       With->pLength=0;
@@ -1489,6 +1496,7 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
         ( tmp.p, shift, 
           strat->uptodeg, strat->lV, strat, currRing );
     }
+    tmp.tailRing = strat->T[ii].tailRing; //BOCO: added...
     SD::ksReducePoly(h, &tmp, &(strat->T[ii]) );
     h->dvec = NULL;
 
@@ -1724,6 +1732,9 @@ poly ShiftDVec::redBba
       loGriToFile("p_LPshiftT poly in redBba ", 0,1024);
       TObject tTemp(pTemp);
       TObject noShift(strat->S[j]);
+
+      //BOCO: hope that is ok... is it nescessary?...
+      tTemp.tailRing = noShift.tailRing = strat->tailRing;
       SD::ksReducePoly(h, &noShift, &tTemp, strat->kNoetherTail());
 
       /* BOCO: this was copied from redFirstShrink
@@ -2401,7 +2412,7 @@ poly ShiftDVec::redtailBba
         deBoGriPrint( shift, "Shift needed: ", 256 );
 
         uTmp.p = With->p;
-        uTmp.t_p = With->p;
+        uTmp.t_p = With->t_p;
         if(shift != 0)
         //Our divisor is a shift (and thus not in T or S)
         {
@@ -2425,6 +2436,7 @@ poly ShiftDVec::redtailBba
           With_s.p = With->p;
           With_s.freeDVec();
         }
+        uTmp.tailRing = With->tailRing; //BOCO: added...
 #endif
       }
       cnt--;
