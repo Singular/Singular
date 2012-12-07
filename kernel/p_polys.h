@@ -54,7 +54,7 @@
  ***************************************************************/
 // next
 #define pNext(p)            ((p)->next)
-#define pIter(p)            ((p) = (p)->next)
+#define pIter(p)            (void)((p) = (p)->next)
 
 // coeff
 #define pGetCoeff(p)        ((p)->coef)
