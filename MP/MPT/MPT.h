@@ -18,22 +18,22 @@
  * Declare all names of types that we use
  * 
  ***************************************************************/
-struct MPT_Tree_t;
+typedef struct MPT_Tree_t MPT_Tree_t;
 typedef MPT_Tree_t * MPT_Tree_pt;
 
-struct MPT_Node_t;
+typedef struct MPT_Node_t MPT_Node_t;
 typedef MPT_Node_t * MPT_Node_pt;
 
-struct MPT_Annot_t;
+typedef struct MPT_Annot_t MPT_Annot_t;
 typedef MPT_Annot_t * MPT_Annot_pt;
 
 typedef void * MPT_Arg_t;
 typedef MPT_Arg_t * MPT_Arg_pt;
 
-struct MPT_Union_t;
+typedef struct MPT_Union_t MPT_Union_t;
 typedef MPT_Union_t * MPT_Union_pt;
 
-struct MPT_DynArgs_t;
+typedef struct MPT_DynArgs_t MPT_DynArgs_t;
 typedef MPT_DynArgs_t * MPT_DynArgs_pt;
 
 typedef void * MPT_ExternalData_t;
@@ -293,6 +293,7 @@ MPT_Status_t MPT_PutApReal(MP_Link_pt link, MPT_Arg_t arg);
  * From MPT_Misc.c
  * 
  ***************************************************************/
+#ifdef __cplusplus
 inline MP_Boolean_t MPT_IsNode(MPT_Node_pt node,
                                MP_NodeType_t type,
                                MP_DictTag_t dict)
@@ -318,6 +319,7 @@ inline MP_Boolean_t MPT_IsNode(MPT_Node_pt node,
   return (node->type == type && node->dict == dict &&
            MP_COMMON_T(node->nvalue) == cvalue && node->numchild == nc);
 }
+#endif
 
 inline MPT_Annot_pt MPT_Annot(MPT_Node_pt node, MP_DictTag_t dict,
                               MP_AnnotType_t atype)
