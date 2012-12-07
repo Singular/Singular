@@ -393,7 +393,7 @@ MOD: ${abs_top_builddir}/libpolys/polys/.libs
 
 
 if PYTHON_USE
-   moduledir = $(bindir)
+   moduledir = $(bindir)/MOD
    module_LTLIBRARIES = pyobject.la
    pyobject_la_SOURCES = pyobject.cc
 
