@@ -571,10 +571,11 @@ void p_Content(poly ph, const ring r)
     }
     nDelete(&h);
 #ifdef HAVE_FACTORY
-    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    if ( rField_is_Extension() ) /* Q[a],Q(a),Zp[a],Z/p(a) */
     {
       singclap_divide_content(ph);
-      if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+      lnumber zb = (lnumber)pGetCoeff(ph);
+      if(!n_GreaterZero(pGetCoeff(zb->z),currRing->algring)) ph = pNeg(ph);
     }
 #endif
     if (rField_is_Q_a(r))

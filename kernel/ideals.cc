@@ -135,7 +135,6 @@ void id_Delete (ideal * h, ring r)
       j--;
       poly pp=(*h)->m[j];
       if (pp!=NULL) p_Delete(&pp, r);
-      (*h)->m[j]=NULL;
     }
     while (j>0);
     omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
