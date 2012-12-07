@@ -17,7 +17,7 @@
 
 // #include <coeffs/longrat.h>
 #include "matpol.h"
- 
+
 #include "monomials/p_polys.h"
 #include "weight.h"
 #include "sbuckets.h"
@@ -120,7 +120,9 @@ void id_Delete (ideal * h, ring r)
   {
     do
     {
-      p_Delete(&((*h)->m[--j]), r);
+      j--;
+      poly pp=((*h)->m[j]);
+      if (pp!=NULL) p_Delete(&pp, r);
     }
     while (j>0);
     omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
@@ -261,7 +263,7 @@ void id_DelMultiples(ideal id, const ring r)
           }
 #else
           if (p_ComparePolys(id->m[i], id->m[j],r)) p_Delete(&id->m[j],r);
-#endif    
+#endif
         }
       }
     }
@@ -363,7 +365,7 @@ void id_DelDiv(ideal id, const ring r)
           }
 #ifdef HAVE_RINGS
           }
-#endif    
+#endif
         }
       }
     }
