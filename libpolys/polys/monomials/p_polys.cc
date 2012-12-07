@@ -1907,7 +1907,7 @@ poly p_Power(poly p, int i, const ring r)
 
 static number p_InitContent(poly ph, const ring r);
 
-#define CLEARENUMERATORS 0
+#define CLEARENUMERATORS 1
 
 void p_Content(poly ph, const ring r)
 {
