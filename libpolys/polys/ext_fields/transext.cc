@@ -1133,7 +1133,16 @@ void definiteGcdCancellation(number a, const coeffs cf,
        gcd is 1, we may have produced fractional coefficients in NUM(f),
        DEN(f), or both, due to previous arithmetics. The next call will
        remove those nested fractions, in case there are any. */
-    if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
+    if (nCoeff_is_Zp(ntCoeffs) && p_IsConstant (DEN (f), ntRing))
+    {
+      NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
+      //poly newNum= singclap_pdivide (NUM(f), DEN (f), ntRing);
+      //p_Delete(&NUM (f), ntRing);
+      //NUM (f)= newNum;
+      p_Delete(&DEN (f), ntRing);
+      DEN (f) = NULL;
+      COM (f) = 0;
+    } else if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
   }
   else
   { /* We divide both NUM(f) and DEN(f) by the gcd which is known
