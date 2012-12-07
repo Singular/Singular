@@ -205,7 +205,6 @@ extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos=-1);
 
 /*============= proc =======================*/
-static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport = FALSE);
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
 static Subexpr jjMakeSub(leftv e);
 
@@ -2507,13 +2506,13 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLOAD2(leftv res, leftv, leftv v)
 {
-  return jjLOAD(res, v,TRUE);
+  return jjLOAD((char*)v->Data(),TRUE);
 }
 static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
 {
   char * s=(char *)u->Data();
   if(strcmp(s, "with")==0)
-    return jjLOAD(res, v, TRUE);
+    return jjLOAD((char*)v->Data(), TRUE);
   WerrorS("invalid second argument");
   WerrorS("load(\"libname\" [,\"with\"]);");
   return TRUE;
@@ -4374,7 +4373,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
 }
 static BOOLEAN jjLOAD1(leftv res, leftv v)
 {
-  return jjLOAD(res, v,FALSE);
+  return jjLOAD((char*)v->Data(),FALSE);
 }
 static BOOLEAN jjLISTRING(leftv res, leftv v)
 {
@@ -5150,9 +5149,9 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
   Lforks->Clean();
   return FALSE;
 }
-static BOOLEAN jjLOAD(leftv, leftv v, BOOLEAN autoexport)
+
+BOOLEAN jjLOAD(char *s, BOOLEAN autoexport)
 {
-  char * s=(char *)v->CopyD();
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
 #ifdef HAVE_DYNAMIC_LOADING
@@ -5205,17 +5204,6 @@ static BOOLEAN jjLOAD(leftv, leftv v, BOOLEAN autoexport)
 #endif /* HAVE_DYNAMIC_LOADING */
   }
   return TRUE;
-}
-
-BOOLEAN jjLOADLIB(const char* libname, BOOLEAN autoexport)
-{
-  leftv v =  (leftv)omAlloc0Bin(sleftv_bin);
-  v->data = (char*)libname;
-  v->rtyp = STRING_CMD;
-  BOOLEAN res = jjLOAD(NULL, v, autoexport); 
-  omFreeBin(v, sleftv_bin);
-
-  return res;
 }
 
 #ifdef INIT_BUG
