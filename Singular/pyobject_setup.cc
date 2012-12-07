@@ -15,41 +15,55 @@
 #include "config.h"
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
+#include <Singular/blackbox.h>
+#include <Singular/ipshell.h>
 
 /* whether pyobject module is linked statically or dynamically */
+
+#ifdef EMBED_PYTHON // Case: we include the pyobject interface in the binary
+
 #ifdef HAVE_PYTHON
-
-  #if defined(HAVE_STATIC) 
-    #ifdef HAVE_STATIC_PYTHON
-      #define HAVE_STATIC_PYOBJECT
-    #endif
-  #else
-    #ifdef EMBED_PYTHON
-      #define HAVE_STATIC_PYOBJECT
-    #else
-      #define HAVE_DYNAMIC_PYOBJECT
-    #endif
-  #endif 
-#endif
-
-# ifdef HAVE_STATIC_PYOBJECT // Case: link pyobject interface statically
 #include "pyobject.cc"
-void pyobject_setup() { pyobject_init(); }
-
-
-# elif defined(HAVE_DYNAMIC_PYOBJECT) // Case: pyobject is dynamic module (prefered variant)
-
-// forward declaration for Singular/iplib.cc
-void* binary_module_function(const char* lib, const char* func); 
-void pyobject_setup()
+static BOOLEAN pyobject_load()
 {
-  void* fktn = binary_module_function("pyobject", "mod_init");
-  if (fktn) (* reinterpret_cast<void (*)()>(fktn) )();
-  else Werror("python related functions are not available");
+   pyobject_init(iiAddCproc);
+   return FALSE;
 }
 
-#else                // Case: no python
-void pyobject_setup() { }
+#else // Forced embedding, but no (development version of) python available!
+static BOOLEAN pyobject_load() { return TRUE; } 
+#endif
 
-#endif  // HAVE_PYTHON
+
+# else // Case: pyobject may be loaded from a dynamic module (prefered variant)
+// Note: we do not need python at compile time.
+static BOOLEAN pyobject_load()
+{
+  BOOLEAN jjLOADLIB(const char* libname, BOOLEAN autoexport);
+  return jjLOADLIB("pyobject.so", TRUE);
+}
+#endif
+
+
+
+/// blackbox support - initialization via autoloading
+void* pyobject_autoload(blackbox* bbx)
+{
+  if (pyobject_load()) return NULL;
+  return bbx->blackbox_Init(bbx);
+}
+
+void pyobject_default_destroy(blackbox  *b, void *d)
+{
+  Werror("Python-based functionality not available!");
+}
+
+// Setting up an empty blackbox type, which can be filled with pyobject
+void pyobject_setup() 
+{
+  blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
+  bbx->blackbox_Init = pyobject_autoload;
+  bbx->blackbox_destroy = pyobject_default_destroy;
+  setBlackboxStuff(bbx, "pyobject");
+}
 

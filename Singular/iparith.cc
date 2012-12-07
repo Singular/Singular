@@ -5207,6 +5207,17 @@ static BOOLEAN jjLOAD(leftv, leftv v, BOOLEAN autoexport)
   return TRUE;
 }
 
+BOOLEAN jjLOADLIB(const char* libname, BOOLEAN autoexport)
+{
+  leftv v =  (leftv)omAlloc0Bin(sleftv_bin);
+  v->data = (char*)libname;
+  v->rtyp = STRING_CMD;
+  BOOLEAN res = jjLOAD(NULL, v, autoexport); 
+  omFreeBin(v, sleftv_bin);
+
+  return res;
+}
+
 #ifdef INIT_BUG
 #define XS(A) -((short)A)
 #define jjstrlen       (proc1)1

@@ -87,6 +87,7 @@ SOURCES =    Minor.cc\
    slInit_Static.cc\
    links/ssiLink.cc\
    subexpr.cc\
+   pyobject_setup.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
@@ -389,3 +390,18 @@ gftables: ${top_srcdir}/factory/gftables
 
 MOD: ${top_builddir}/libpolys/polys/.libs
 	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
+
+if PYTHON_USE
+   moduledir = $(bindir)/MOD
+   module_LTLIBRARIES = pyobject.la
+   pyobject_la_SOURCES = pyobject.cc
+
+   pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
+   pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
+
+   pyobject_la_CXXFLAGS   = ${NODEBUGCXXFLAGS} @PYTHON_CSPEC@ 
+   pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@ 
+
+   pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version \
+     ${AMLDFLAGS} @PYTHON_LSPEC@ 
+endif

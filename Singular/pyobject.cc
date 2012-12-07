@@ -14,20 +14,36 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
+  //#include <misc/auxiliary.h>
+  //#include "newstruct.h"
+
+#include <Python.h>
+
+#include <Singular/ipid.h>
+#include <Singular/blackbox.h>
+#include <Singular/lists.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/newstruct.h>
+
+
 #include <misc/auxiliary.h>
-#include "newstruct.h"
 
 #include <omalloc/omalloc.h>
 
 #include <kernel/febase.h>
-#include <kernel/intvec.h>
+#include <misc/intvec.h>
 
 #include "subexpr.h"
 #include "lists.h"
 #include "ipid.h"
 #include "blackbox.h"
+#include "ipshell.h"
 
-#include <Python.h>
+
+
+
+  //#include <Python.h>
 // #include <iterator>             // std::distance
 // #include <stdio.h>
 
@@ -47,7 +63,7 @@ public:
 
   /// Initialize unique (singleton) python interpreter instance, 
   /// and set Singular type identifier
-  static void init(id_type num ) { instance().m_id = num; }
+  static void init(id_type num) { instance().m_id = num; }
 
   /// Get Singular type identitfier 
   static id_type id() { return instance().m_id; }
@@ -586,7 +602,7 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   if (!lhs(op, rhs1, rhs2).assign_to(res))
     return FALSE;
 
-  return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
+  return blackbox_default_Op3(op, res, arg1, arg2, arg3);
 }
 
 
@@ -685,33 +701,54 @@ void sync_contexts()
 }
 
 
-// forward declaration
-int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
-               BOOLEAN(*func)(leftv res, leftv v));
 
-#define ADD_C_PROC(name) iiAddCproc("", (char*)#name, FALSE, name);
-
-
-void pyobject_init() 
-{
-  blackbox *b = (blackbox*)omAlloc0(sizeof(blackbox));
-  b->blackbox_destroy = pyobject_destroy;
-  b->blackbox_String  = pyobject_String;
-  b->blackbox_Init    = pyobject_Init;
-  b->blackbox_Copy    = pyobject_Copy;
-  b->blackbox_Assign  = pyobject_Assign;
-  b->blackbox_Op1     = pyobject_Op1;
-  b->blackbox_Op2     = pyobject_Op2;
-  b->blackbox_Op3     = pyobject_Op3;
-  b->blackbox_OpM     = pyobject_OpM;
-  b->data             = omAlloc0(newstruct_desc_size());
-
-  PythonInterpreter::init(setBlackboxStuff(b,"pyobject"));
-
-  ADD_C_PROC(python_import);
-  ADD_C_PROC(python_eval);
-  ADD_C_PROC(python_run);
+blackbox* pyobject_blackbox(int& tok) {
+  if(blackboxIsCmd("pyobject", tok) != ROOT_DECL) 
+  {
+    tok = setBlackboxStuff((blackbox*)omAlloc0(sizeof(blackbox)), 
+			   "pyobject");
+  }
+  return getBlackboxStuff(tok);
 }
 
-extern "C" { void mod_init() { pyobject_init(); } }
 
+
+#define PYOBJECT_ADD_C_PROC(name) \
+  add_C_proc(currPack->libname, (char*)#name, FALSE, name);
+
+typedef  BOOLEAN (*func_type)(leftv, leftv);
+void pyobject_init(int (*add_C_proc)(const char*, const char*, BOOLEAN,
+				     func_type) )
+{
+  int tok = -1;
+  blackbox* bbx = pyobject_blackbox(tok);
+  if (bbx->blackbox_Init != pyobject_Init) 
+  {
+    bbx->blackbox_destroy = pyobject_destroy;
+    bbx->blackbox_String  = pyobject_String;
+    bbx->blackbox_Init    = pyobject_Init;
+    bbx->blackbox_Copy    = pyobject_Copy;
+    bbx->blackbox_Assign  = pyobject_Assign;
+    bbx->blackbox_Op1     = pyobject_Op1;
+    bbx->blackbox_Op2     = pyobject_Op2;
+    bbx->blackbox_Op3     = pyobject_Op3;
+    bbx->blackbox_OpM     = pyobject_OpM;
+    bbx->data             = omAlloc0(newstruct_desc_size());
+    
+    PythonInterpreter::init(tok);
+
+    PYOBJECT_ADD_C_PROC(python_import);
+    PYOBJECT_ADD_C_PROC(python_eval);
+    PYOBJECT_ADD_C_PROC(python_run); 
+  }
+}
+#undef PYOBJECT_ADD_C_PROC
+
+#ifndef EMBED_PYTHON
+extern "C" { 
+  void mod_init(SModulFunctions* psModulFunctions)
+  { 
+    pyobject_init(psModulFunctions->iiAddCproc); 
+  }
+}
+#endif
