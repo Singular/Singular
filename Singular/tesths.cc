@@ -42,7 +42,7 @@
 #include "tok.h"
 #include "fegetopt.h"
 
-// #include "pyobject_setup.h"
+#include "pyobject_setup.h"
 
 #include <unistd.h>
 #include <string.h>
