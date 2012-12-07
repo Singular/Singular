@@ -61,6 +61,14 @@ typedef void * ADDRESS;
   // #ifdef HAVE_MULT_MOD
   // #define HAVE_DIV_MOD
   // #endif
+#elif defined(SI_CPU_ARM6L)
+  // the following settings seems to be better on arm processors
+  // testet on: Raspberry Pi
+  //#define HAVE_GENERIC_ADD
+  #define HAVE_MULT_MOD
+  #ifdef HAVE_MULT_MOD
+  #define HAVE_DIV_MOD
+  #endif
 #endif
 
 #if SIZEOF_LONG == 4

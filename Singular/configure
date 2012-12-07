@@ -2732,6 +2732,14 @@ if test "$ac_cv_singcpuname" = ppc; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
 $as_echo "SI_CPU_PPC" >&6; }
 fi
+if test "$ac_cv_singcpuname" = arm6l; then
+  $as_echo "#define SI_CPU_ARM6L 1" >>confdefs.h
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM6L" >&5
+$as_echo "SI_CPU_ARM6L" >&6; }
+fi
+
 
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 

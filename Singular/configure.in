@@ -478,6 +478,11 @@ if test "$ac_cv_singcpuname" = ppc; then
   AC_SUBST(SI_CPU_PPC)
   AC_MSG_RESULT(SI_CPU_PPC)
 fi
+if test "$ac_cv_singcpuname" = armv6l; then
+  AC_DEFINE(SI_CPU_ARM6L)
+  AC_SUBST(SI_CPU_ARM6L)
+  AC_MSG_RESULT(SI_CPU_ARM6L)
+fi
 
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
