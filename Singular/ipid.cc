@@ -191,7 +191,7 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
   IDID(h)   = s;
   IDTYP(h)  = t;
   IDLEV(h)  = level;
-  IDNEXT(h) = this;
+  BOOLEAN at_start=(this==IDROOT);
   h->id_i=iiS2I(s);
   if (init)
   {
@@ -218,6 +218,8 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
       IDPACKAGE(h)->loaded = FALSE;
     }
   }
+  if (at_start) IDNEXT(h) = IDROOT;
+  else          IDNEXT(h) = this;
   // --------------------------------------------------------
   return  h;
 }
