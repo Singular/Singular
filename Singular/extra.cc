@@ -3179,9 +3179,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (rIsSCA(r))
         {
           if(strcmp(sys_cmd, "AltVarStart") == 0)
-            res->data = (void*)scaFirstAltVar(r);
+            res->data = (void*)(long)scaFirstAltVar(r);
           else
-            res->data = (void*)scaLastAltVar(r);
+            res->data = (void*)(long)scaLastAltVar(r);
           return FALSE;
         }
 
