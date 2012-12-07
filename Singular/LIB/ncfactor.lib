@@ -25,9 +25,8 @@ PROCEDURES:
   facFirstShift(h);          factorization in the first shift algebra
   homogfacFirstQWeyl(h);     [-1,1]-homogeneous factorization in the first Q-Weyl algebra
   homogfacFirstQWeyl_all(h); [-1,1] homogeneous factorization(complete) in the first Q-Weyl algebra
+  tst_ncfactor();            Runs the examples of all contained not static functions. Test thing.
 ";
-
-//  tst_ncfactor();            Runs the examples of all contained not static functions. Test thing.
 
 LIB "general.lib";
 LIB "nctools.lib";
@@ -35,7 +34,6 @@ LIB "involut.lib";
 LIB "freegb.lib"; // for isVar
 LIB "crypto.lib"; //for introot
 LIB "matrix.lib"; //for submatrix
-//LIB "solve.lib"; //right now not needed
 LIB "poly.lib"; //for content
 
 proc tst_ncfactor()

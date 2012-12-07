@@ -40,7 +40,7 @@ bitrinity(M);  computes the trinity of M: Groebner basis, lift matrix and bisyzy
 liftenvelope(M,g); computes the coefficients of an element g concerning the generators of a bimodule M in the enveloping algebra
 CompDecomp(p); returns an ideal which contains the component decomposition of a polynomial p in the enveloping algebra regarding the right side of the tensors
 isPureTensor(p); checks whether an element p in A^{env} is a pure tensor
-isTwoSided(I);   checks whether the generators of an ideal I of the enveloping algebra are two-sided
+isTwoSidedGB(I);   checks whether an ideal I is two-sided Groebner basis
 
 SEE ALSO: ncalg_lib, nctools_lib
 
@@ -60,7 +60,7 @@ proc testbimoduleslib()
   example bitrinity;
   example liftenvelope;
   example isPureTensor;
-  example isTwoSided;
+  example isTwoSidedGB;
   "SECONDARY BIMODULES PROCEDURES:";
   example enveltrinity;
   example CompDecomp;  
