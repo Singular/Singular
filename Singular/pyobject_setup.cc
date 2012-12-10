@@ -39,8 +39,7 @@ static BOOLEAN pyobject_load() { return TRUE; }
 // Note: we do not need python at compile time.
 static BOOLEAN pyobject_load()
 {
-  BOOLEAN jjLOADLIB(const char* libname, BOOLEAN autoexport);
-  return jjLOADLIB("pyobject.so", TRUE);
+  return jjLOAD("pyobject.so", TRUE);
 }
 #endif
 

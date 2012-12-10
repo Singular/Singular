@@ -67,6 +67,8 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
    if yes, writes filename of lib into where and returns TRUE,
    if  no, returns FALSE
 */
+/// load lib/module given in v
+BOOLEAN jjLOAD(char *s, BOOLEAN autoexport = FALSE);
 BOOLEAN iiLocateLib(const char* lib, char* where);
 leftv   iiMap(map theMap, const char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
