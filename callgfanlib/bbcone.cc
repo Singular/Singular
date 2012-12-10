@@ -1014,7 +1014,8 @@ gfan::ZVector randomPoint(const gfan::ZCone* zc)
   gfan::ZVector rp = gfan::ZVector(zc->ambientDimension());
   for (int i=0; i<rays.getHeight(); i++)
   {
-    rp = rp + siRand() * rays[i];
+    int n = siRand();
+    rp = rp + n * rays[i];
   }
   return rp;
 }
@@ -1511,22 +1512,6 @@ BOOLEAN canonicalizeCone(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN canonicalizeTest(leftv res, leftv args)
-{
-  leftv u = args;
-  gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-  leftv v = u->next;
-  int n = (int)(long)v->Data();
-  for (int i=1; i<=n; i++)
-  {
-    std::cout << i << std::endl;
-    gfan::ZCone* zd = new gfan::ZCone(*zc);
-    zd->canonicalize();
-    delete zd;
-  }
-  return FALSE;
-}
-
 BOOLEAN containsCone(leftv res, leftv args)
 {
   leftv u=args;
@@ -1579,7 +1564,6 @@ void bbcone_setup()
   iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
   iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
 
-  // iiAddCproc("","canonicalizeTest",FALSE,canonicalizeTest);
   // iiAddCproc("","makePolytope",FALSE,coneToPolytope);
   iiAddCproc("","ambientDimension",FALSE,ambientDimension);
   iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);

@@ -211,177 +211,140 @@ static int findLastUsableEntry(lists ul, int start)
 
 /***
  * Here, ul and vl ar lists of lists of facets and their relative interior point.
- * The list ul might be empty sometimes, however vl always contains at least one element.
+ * The lists ul and vl always contain at least one element.
  * This functions appends vl to ul with the following constraint:
  * Should a facet in vl already exist in ul, then both are to be deleted.
  * The merged list will be stored in ul.
  **/
-static void mergeListsOfFacets(lists ul, lists vl)
+static void mergeListsOfFacets(lists &ul, lists &vl)
 {
   int ur = ul->nr;
   int vr = vl->nr;
 
   /***
-   * First we cover the trivial cases with ul being empty
-   * Here we can delete ul entirely and make it point to the content of vl
-   * vl can be set to MULL.
-   **/
-  if (ur == -1)
+   * We will know go through all vectors q in vl and compare them to all vectors p in ul.
+   * If p and q coincide, we will delete q and p right away.
+   * If q does not coincide with any p, we will mark it as to be preserved.
+   * Two intvecs will keep track of entries in ul that have been deleted 
+   * and all entries of vl that must be preserved.
+   * countUl and countVl keep track of the number of elements to be deleted or preserved.
+   * The reason why we count j up and i down is because the first entry of vl
+   * tends to be equal the last entry of ul, due to the way vl and ul are created.
+   **/ 
+  intvec* entriesOfUlToBeFilled = new intvec(vr+1);
+  intvec* entriesOfVlToBePreserved = new intvec(vr+1);
+  int countUl = 0;
+  int countVl = 0;
+  
+  gfan::ZVector* q = NULL;
+  gfan::ZVector* p = NULL;
+  bool toBePreserved = 1;
+  lists cache0;
+  lists cache1;
+  for (int j=0; j<=vr; j++)
   {
-    ul->Clean();
-    ul = vl;
-    vl = NULL;
-  }
-  else
-  {
-    /***
-     * We will know go through all vectors q in vl and compare them to all vectors p in ul.
-     * If p and q coincide, we will delete q and p right away.
-     * If q does not coincide with any p, we will mark it as to be preserved.
-     * Two intvecs will keep track of entries in ul that have been deleted 
-     * and all entries of vl that must be preserved.
-     * countUl and countVl keep track of the number of elements to be deleted or preserved.
-     * The reason why we count j up and i down is because the first entry of vl
-     * tends to be equal the last entry of ul, due to the way vl and ul are created.
-     **/ 
-    intvec* entriesOfUlToBeFilled = new intvec(vr+1);
-    intvec* entriesOfVlToBePreserved = new intvec(vr+1);
-    int countUl = 0;
-    int countVl = 0;
-
-    gfan::ZVector* q = NULL;
-    gfan::ZVector* p = NULL;
-    bool toBePreserved = 1;
-    lists cache0;
-    lists cache1;
-    for (int j=0; j<=vr; j++)
+    toBePreserved = 1;
+    cache0 = (lists) vl->m[j].Data();
+    q = (gfan::ZVector*) cache0->m[1].Data();
+    for (int i=ur; i>=0; i--)
     {
-      toBePreserved = 1;
-      cache0 = (lists) vl->m[j].Data();
-      q = (gfan::ZVector*) cache0->m[1].Data();
-      for (int i=ur; i>=0; i--)
+      if (ul->m[i].data != NULL) // in case that entry of ul was deleted earlier
       {
-        if (ul->m[i].data != NULL) // in case that entry of ul was deleted earlier
+        cache1 = (lists) ul->m[i].Data();
+        p = (gfan::ZVector*) cache1->m[1].Data();
+        if ((*q) == (*p))
         {
-          cache1 = (lists) ul->m[i].Data();
-          p = (gfan::ZVector*) cache1->m[1].Data();
-          if ((*q) == (*p))
-          {
-            deleteEntry(vl,j);
-            deleteEntry(ul,i);
-            (*entriesOfUlToBeFilled)[countUl] = i;
-            countUl++; 
-            toBePreserved = 0; 
-            break;
-          }
-          cache1 = NULL;
+          deleteEntry(vl,j);
+          deleteEntry(ul,i);
+          (*entriesOfUlToBeFilled)[countUl] = i;
+          countUl++; 
+          toBePreserved = 0; 
+          break;
         }
+        cache1 = NULL;
       }
-      if (toBePreserved)
-      {
-        (*entriesOfVlToBePreserved)[countVl] = j;
-        countVl++;
-      }
-      cache0 = NULL;
     }
- 
-    /***
-     * In case the resulting merged list is empty,
-     * we are finished now.
-     **/
-    if (ur+1-countUl+countVl == 0)
+    if (toBePreserved)
     {
-      vl->nr = -1;
-      vl->Clean();
-      ul->nr = -1;
-      ul->Clean();
-      ul = NULL;
-      return;
+      (*entriesOfVlToBePreserved)[countVl] = j;
+      countVl++;
     }
-
-    /***
-     * We fill the holes in ul, the algorithm works as follows:
-     * - repeat the following until it breaks or all holes are fixed:
-     *   - determine the first empty entry to be filled
-     *   - determine the last usable entry
-     *   - if firstEmptyEntry < lastUsableEntry, fill
-     *   - else break
-     * (If it breaks that means that the remaining empty slots need not to be filled)
-     * Note that entriesOfUlToBeFilled is unordered.
-     **/
-    entriesOfUlToBeFilled->resize(countUl);
-    gnomeSort(entriesOfUlToBeFilled);
-    int i = 0;
-    int firstEmptyEntry = (*entriesOfUlToBeFilled)[i];
-    int lastUsableEntry = findLastUsableEntry(ul,ur); 
-    while (1)
-    {
-      if (firstEmptyEntry < lastUsableEntry)
-      {
-        ul->m[firstEmptyEntry] = ul->m[lastUsableEntry];
-        ul->m[lastUsableEntry].rtyp = 0;
-        ul->m[lastUsableEntry].data = NULL; 
-        lastUsableEntry = findLastUsableEntry(ul,lastUsableEntry);
-      }
-      else
-        break;
-
-      if (i < countUl-1)
-      {
-        ++i; firstEmptyEntry = (*entriesOfUlToBeFilled)[i];
-      }
-      else
-        break;
-    }
- 
-    /***
-     * We resize ul accordingly
-     * and append the to be preserved entries of vl to it.
-     **/
-    int k;
-    ul->m = (leftv) omRealloc0(ul->m, (ur+1-countUl+countVl)*sizeof(sleftv));  
-    ul->nr = ur-countUl+countVl;
-    for (int j=0; j<countVl; j++)
-    {
-      k = (*entriesOfVlToBePreserved)[j];
-      ul->m[lastUsableEntry+j+1] = vl->m[k];
-      vl->m[k].rtyp = 0;
-      vl->m[k].data = NULL;
-    }
-
-    /***
-     * Now we delete of vl which is empty by now,
-     * because its elements have either been deleted or moved to ul.
-     **/
+    cache0 = NULL;
+  }
+  
+  /***
+   * In case the resulting merged list is empty,
+   * we are finished now.
+   **/
+  if (ur+1-countUl+countVl == 0)
+  {
     vl->nr = -1;
     vl->Clean();
-    
-    delete entriesOfUlToBeFilled, entriesOfVlToBePreserved;
+    ul->nr = -1;
+    ul->Clean();
+    ul = NULL;
+    return;
   }
-}
-
-/***
- * delete last entry of ul
- **/
-// static void deleteLast(lists ul)
-// {
-//   int ur = ul->nr;
   
-//   lists cache = (lists) ul->m[ur].Data();
-//   gfan::ZVector* v = (gfan::ZVector*) cache->m[1].Data();
-//   delete v;
-//   cache->m[1].rtyp = 0;
-//   cache->m[1].data = NULL;
-//   cache->nr = 0;
-//   cache = NULL;
-
-//   ul->m[ur].CleanUp();
-//   ul->nr = ur-1;
-//   if (ur > 0)
-//     ul->m = (leftv) omRealloc(ul->m, ur*sizeof(sleftv));
-//   else
-//     ul->m = NULL;
-// }
+  /***
+   * We fill the holes in ul, the algorithm works as follows:
+   * - repeat the following until it breaks or all holes are fixed:
+   *   - determine the first empty entry to be filled
+   *   - determine the last usable entry
+   *   - if firstEmptyEntry < lastUsableEntry, fill
+   *   - else break
+   * (If it breaks that means that the remaining empty slots need not to be filled)
+   * Note that entriesOfUlToBeFilled is unordered.
+   **/
+  entriesOfUlToBeFilled->resize(countUl);
+  gnomeSort(entriesOfUlToBeFilled);
+  int i = 0;
+  int firstEmptyEntry = (*entriesOfUlToBeFilled)[i];
+  int lastUsableEntry = findLastUsableEntry(ul,ur); 
+  while (1)
+  {
+    if (firstEmptyEntry < lastUsableEntry)
+    {
+      ul->m[firstEmptyEntry] = ul->m[lastUsableEntry];
+      ul->m[lastUsableEntry].rtyp = 0;
+      ul->m[lastUsableEntry].data = NULL; 
+      lastUsableEntry = findLastUsableEntry(ul,lastUsableEntry);
+    }
+    else
+      break;
+    
+    if (i < countUl-1)
+    {
+      ++i; firstEmptyEntry = (*entriesOfUlToBeFilled)[i];
+    }
+    else
+      break;
+  }
+  
+  /***
+   * We resize ul accordingly
+   * and append the to be preserved entries of vl to it.
+   **/
+  int k;
+  ul->m = (leftv) omRealloc0(ul->m, (ur+1-countUl+countVl)*sizeof(sleftv));  
+  ul->nr = ur-countUl+countVl;
+  for (int j=0; j<countVl; j++)
+  {
+    k = (*entriesOfVlToBePreserved)[j];
+    ul->m[lastUsableEntry+j+1] = vl->m[k];
+    vl->m[k].rtyp = 0;
+    vl->m[k].data = NULL;
+  }
+  
+  /***
+   * Now we delete of vl which is empty by now,
+   * because its elements have either been deleted or moved to ul.
+   **/
+  vl->nr = -1;
+  vl->Clean();
+  
+  delete entriesOfUlToBeFilled, entriesOfVlToBePreserved;
+}
 
 BOOLEAN refineCones(leftv res, leftv args)
 {
@@ -395,7 +358,8 @@ BOOLEAN refineCones(leftv res, leftv args)
       bigintmat* bim0 = (bigintmat*) v->Data();
       bigintmat* bim1 = bim0->transpose();
       gfan::ZMatrix* zm = bigintmatToZMatrix(bim1);
-      gfan::ZCone* support = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
+      gfan::ZCone* support = new gfan::ZCone;
+      *support = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
       delete bim1, zm;
 
       /***
@@ -465,13 +429,6 @@ BOOLEAN refineCones(leftv res, leftv args)
         lambda.canonicalize();
         Sigma->insert(lambda);
         lists newFacets = listOfInteriorFacets(lambda, *support);
-        // if (newFacets->m[0].rtyp == INT_CMD)  
-        // { // this means there are no facets and points to be added.
-        //   // we delete newFacets alltogether and the last entry of interiorFacets
-        //   newFacets->Clean();
-        //   deleteLast(interiorFacets);
-        // }
-        // else
         mergeListsOfFacets(interiorFacets, newFacets);
 
         if (interiorFacets == NULL)
