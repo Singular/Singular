@@ -481,7 +481,7 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 CFList
 factorRecombination (CFList& factors, CanonicalForm& F,
                      const CanonicalForm& N, DegreePattern& degs, int s,
-                     int thres, const modpk& b
+                     int thres, const modpk& b, const CanonicalForm& den
                     )
 {
   if (factors.length() == 0)
@@ -514,7 +514,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
   CFList result;
   Variable y= Variable (2);
   Variable x= Variable (1);
-  CanonicalForm LCBuf= LC (F, x);
+  CanonicalForm denom= den, denQuot;
+  CanonicalForm LCBuf= LC (F, x)*denom;
   CanonicalForm g, quot, buf= F;
   int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
@@ -597,6 +598,8 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           if (!isRat)
           {
             On (SW_RATIONAL);
+            if (!Lc (g).inBaseDomain())
+              g /= Lc (g);
             g *= bCommonDen (g);
             Off (SW_RATIONAL);
             g /= icontent (g);
@@ -604,13 +607,20 @@ factorRecombination (CFList& factors, CanonicalForm& F,
           }
           if (fdivides (g, buf, quot))
           {
+            denom *= abs (lc (g));
             recombination= true;
             result.append (g);
             if (b.getp() != 0)
-              buf= quot*bCommonDen (quot);
+            {
+              denQuot= bCommonDen (quot);
+              buf= quot*denQuot;
+              Off (SW_RATIONAL);
+              denom /= gcd (denom, denQuot);
+              On (SW_RATIONAL);
+            }
             else
               buf= quot;
-            LCBuf= LC (buf, x);
+            LCBuf= LC (buf, x)*denom;
             T= Difference (T, S);
             l -= degree (g);
             M= power (y, l);
@@ -725,7 +735,7 @@ void
 earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
                       factors, int& adaptedLiftBound, int*& factorsFoundIndex,
                       DegreePattern& degs, bool& success, int deg,
-                      const modpk& b)
+                      const modpk& b, CanonicalForm& den)
 {
   DegreePattern bufDegs1= degs;
   DegreePattern bufDegs2;
@@ -741,12 +751,13 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
     On (SW_RATIONAL);
   if (b.getp() != 0)
     buf *= bCommonDen (buf);
-  CanonicalForm LCBuf= LC (buf, x);
+  CanonicalForm LCBuf= LC (buf, x)*den;
   CanonicalForm buf0= mulNTL (buf (0,x), LCBuf);
   CanonicalForm buf1= mulNTL (buf (1,x), LCBuf);
   if (!isRat)
     Off (SW_RATIONAL);
   CanonicalForm test0, test1;
+  CanonicalForm denQuot;
 
   for (CFListIterator i= factors; i.hasItem(); i++, l++)
   {
@@ -776,6 +787,8 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           if (!isRat)
           {
             On (SW_RATIONAL);
+            if (!Lc (g).inBaseDomain())
+              g /= Lc (g);
             g *= bCommonDen (g);
             Off (SW_RATIONAL);
             g /= icontent (g);
@@ -783,14 +796,21 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
           }
           if (fdivides (g, buf, quot))
           {
+            den *= abs (lc (g));
             reconstructedFactors.append (g);
             factorsFoundIndex[l]= 1;
             if (b.getp() != 0)
-              buf= quot*bCommonDen(quot);
+            {
+              denQuot= bCommonDen (quot);
+              buf= quot*denQuot;
+              Off (SW_RATIONAL);
+              den /= gcd (den, denQuot);
+              On (SW_RATIONAL);
+            }
             else
               buf= quot;
             d -= degree (g);
-            LCBuf= LC (buf, x);
+            LCBuf= LC (buf, x)*den;
             buf0= mulNTL (buf (0,x), LCBuf);
             buf1= mulNTL (buf (1,x), LCBuf);
             if (!isRat)
@@ -826,6 +846,16 @@ earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
   }
   if (bufDegs1.getLength() <= 1)
     degs= bufDegs1;
+}
+
+void
+earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
+                      factors, int& adaptedLiftBound, int*& factorsFoundIndex,
+                      DegreePattern& degs, bool& success, int deg,
+                      const modpk& b)
+{
+  CanonicalForm den= 1;
+  earlyFactorDetection (reconstructedFactors, F, factors, adaptedLiftBound, factorsFoundIndex, degs, success, deg,b, den);
 }
 
 void
@@ -1001,7 +1031,7 @@ CFList
 henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     earlyFactors, DegreePattern& degs, int& liftBound,
                     const CFList& uniFactors, const ExtensionInfo& info,
-                    const CanonicalForm& eval, modpk& b)
+                    const CanonicalForm& eval,modpk& b, CanonicalForm& den)
 {
   Variable alpha= info.getAlpha();
   Variable beta= info.getBeta();
@@ -1017,7 +1047,22 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   CFArray Pi;
   CFList diophant;
   CFList bufUniFactors= uniFactors;
+  On (SW_RATIONAL);
   CanonicalForm bufA= A;
+  if (!Lc (A).inBaseDomain())
+  {
+    bufA /= Lc (A);
+    CanonicalForm denBufA= bCommonDen (bufA);
+    bufA *= denBufA;
+    Off (SW_RATIONAL);
+    den /= gcd (den, denBufA);
+  }
+  else
+  {
+    bufA= A;
+    Off (SW_RATIONAL);
+    den /= gcd (den, Lc (A));
+  }
   CanonicalForm lcA0= 0;
   bool mipoHasDen= false;
   if (getCharacteristic() == 0 && b.getp() != 0)
@@ -1081,11 +1126,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       if (v==alpha)
         earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                               factorsFoundIndex, degs, earlySuccess,
-                              smallFactorDeg, b);
+                              smallFactorDeg, b, den);
       else
         earlyFactorDetection(earlyFactors, bufA, bufBufUniFactors, newLiftBound,
                              factorsFoundIndex, degs, earlySuccess,
-                             smallFactorDeg, b);
+                             smallFactorDeg, b, den);
     }
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
@@ -1110,11 +1155,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
           if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[sizeOfLiftPre-1] + 1, b);
+                                liftPre[sizeOfLiftPre-1] + 1, b, den);
           else
           earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[sizeOfLiftPre-1] + 1, b);
+                                liftPre[sizeOfLiftPre-1] + 1, b, den);
         }
         else
           extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
@@ -1144,11 +1189,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
           if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[i-1] + 1, b);
+                                liftPre[i-1] + 1, b, den);
           else
           earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
                                 factorsFoundIndex, degs, earlySuccess,
-                                liftPre[i-1] + 1, b);
+                                liftPre[i-1] + 1, b, den);
         }
         else
           extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
@@ -1187,11 +1232,11 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       if (v==alpha)
       earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg, b);
+                            smallFactorDeg, b, den);
       else
       earlyFactorDetection (earlyFactors, bufA, bufBufUniFactors, newLiftBound,
                             factorsFoundIndex, degs, earlySuccess,
-                            smallFactorDeg, b);
+                            smallFactorDeg, b, den);
     }
     else
       extEarlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
@@ -1216,10 +1261,12 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
       {
         if (v==alpha)
         earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                              factorsFoundIndex, degs, earlySuccess, dummy, b);
+                              factorsFoundIndex, degs, earlySuccess, dummy, b,
+                              den);
         else
         earlyFactorDetection (earlyFactors, bufA,bufBufUniFactors, newLiftBound,
-                              factorsFoundIndex, degs, earlySuccess, dummy, b);
+                              factorsFoundIndex, degs, earlySuccess, dummy, b,
+                              den);
       }
       else
         extEarlyFactorDetection (earlyFactors, bufA,bufUniFactors, newLiftBound,
@@ -1244,10 +1291,12 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
         {
           if (v==alpha)
           earlyFactorDetection (earlyFactors, bufA, bufUniFactors, newLiftBound,
-                                factorsFoundIndex, degs, earlySuccess, dummy,b);
+                                factorsFoundIndex, degs, earlySuccess, dummy,b,
+                                den);
           else
           earlyFactorDetection (earlyFactors,bufA,bufBufUniFactors,newLiftBound,
-                                factorsFoundIndex, degs, earlySuccess, dummy,b);
+                                factorsFoundIndex, degs, earlySuccess, dummy,b,
+                                den);
         }
         else
           extEarlyFactorDetection (earlyFactors,bufA,bufUniFactors,newLiftBound,
@@ -1286,8 +1335,9 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                     const CanonicalForm& eval)
 {
   modpk dummy= modpk();
+  CanonicalForm den= 1;
   return henselLiftAndEarly (A, earlySuccess, earlyFactors, degs, liftBound,
-                             uniFactors, info, eval, dummy);
+                             uniFactors, info, eval, dummy, den);
 }
 
 long isReduced (const mat_zz_p& M)

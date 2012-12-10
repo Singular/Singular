@@ -497,6 +497,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
   modpk b= modpk();
   bool mipoHasDen= false;
+  CanonicalForm den= 1;
   if (!extension)
   {
     Off (SW_RATIONAL);
@@ -517,6 +518,14 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   else
   {
     A /= Lc (Aeval);
+    mipoHasDen= !bCommonDen(mipo).isOne();
+    mipo *= bCommonDen (mipo);
+    ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
+    ZZX NTLLcf= convertFacCF2NTLZZX (Lc (A*bCommonDen (A)));
+    ZZ NTLf= resultant (NTLmipo, NTLLcf);
+    ZZ NTLD= discriminant (NTLmipo);
+    den= abs (convertZZ2CF (NTLD*NTLf));
+
     // make factors elements of Z(a)[x] disable for modularDiophant
     CanonicalForm multiplier= 1;
     for (CFListIterator i= uniFactors; i.hasItem(); i++)
@@ -527,12 +536,9 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     A *= multiplier;
     A *= bCommonDen (A);
 
-    mipoHasDen= !bCommonDen(mipo).isOne();
-    mipo *= bCommonDen (mipo);
     Off (SW_RATIONAL);
     int i= 0;
-    ZZX NTLmipo= convertFacCF2NTLZZX (mipo);
-    CanonicalForm discMipo= convertZZ2CF (discriminant (NTLmipo));
+    CanonicalForm discMipo= convertZZ2CF (NTLD);
     findGoodPrime (F*discMipo,i);
     findGoodPrime (Aeval*discMipo,i);
     findGoodPrime (A*discMipo,i);
@@ -553,7 +559,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   TIMING_START (fac_bi_hensel_lift);
   uniFactors= henselLiftAndEarly
               (A, earlySuccess, earlyFactors, degs, liftBound,
-               uniFactors, dummy, evaluation, b);
+               uniFactors, dummy, evaluation, b, den);
   TIMING_END_AND_PRINT (fac_bi_hensel_lift,
                         "time for bivariate hensel lifting over Q: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
@@ -576,7 +582,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
 
   TIMING_START (fac_bi_factor_recombination);
   factors= factorRecombination (uniFactors, A, MODl, degs, 1,
-                                uniFactors.length()/2, b);
+                                uniFactors.length()/2, b, den);
   TIMING_END_AND_PRINT (fac_bi_factor_recombination,
                         "time for bivariate factor recombination over Q: ");
 
