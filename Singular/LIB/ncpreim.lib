@@ -8,22 +8,22 @@ Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
 
 OVERVIEW:
-In G-algebras, elimination of variables is more involved than in the 
+In G-algebras, elimination of variables is more involved than in the
 commutative case.
-One, not every subset of variables generates an algebra, which is again a 
+One, not every subset of variables generates an algebra, which is again a
 G-algebra.
-Two, even if the subset of variables in question generates an admissible 
-subalgebra, there might be no admissible elimination ordering, i.e. an 
+Two, even if the subset of variables in question generates an admissible
+subalgebra, there might be no admissible elimination ordering, i.e. an
 elimination ordering which also satisfies the ordering condition for G-algebras.
 
-The difference between the procedure eliminateNC provided in this library and 
-the procedure eliminate (plural) from the kernel is that eliminateNC will 
-always find an admissible elimination if such one exists. Moreover, the use of 
+The difference between the procedure eliminateNC provided in this library and
+the procedure eliminate (plural) from the kernel is that eliminateNC will
+always find an admissible elimination if such one exists. Moreover, the use of
 slimgb for performing Groebner basis computations is possible.
 
-As an application of the theory of elimination, the procedure preimageNC is 
-provided, which computes the preimage of an ideal under a homomorphism 
-f: A -> B between G-algebras A and B. In contrast to the kernel procedure 
+As an application of the theory of elimination, the procedure preimageNC is
+provided, which computes the preimage of an ideal under a homomorphism
+f: A -> B between G-algebras A and B. In contrast to the kernel procedure
 preimage (plural), the assumption that A is commutative is not required.
 
 
@@ -42,14 +42,13 @@ References:
 PROCEDURES:
 admissibleSub(v)          checks whether subalgebra is admissible
 isUpperTriangular(M[,k])  checks whether matrix is (strictly) upper triangular
-appendWeight2Ord(w)       appends weight to ordering  
+appendWeight2Ord(w)       appends weight to ordering
 elimWeight(v)             computes elimination weight
 eliminateNC(I,v,eng)      elimination in G-algebras
 preimageNC(A,f,J[,P,eng]) preimage of ideals under homomorphisms of G-algebras
 
 
-KEYWORDS: 
-preimage; elimination
+KEYWORDS: preimage; elimination
 
 SEE ALSO: eliminate_lib, preimage (plural)
 ";
@@ -105,12 +104,12 @@ proc admissibleSub (intvec v)
 "
 USAGE:    admissibleSub(v);  v intvec
 ASSUME:   The entries of v are in the range 1..nvars(basering).
-RETURN:   int, 1 if the variables indexed by the entries of v form an 
+RETURN:   int, 1 if the variables indexed by the entries of v form an
           admissible subalgebra, 0 otherwise
 EXAMPLE:  example admissibleSub; shows examples
 "
 {
-  v = checkIntvec(v);  
+  v = checkIntvec(v);
   int i,j;
   list RL = ringlist(basering);
   if (size(RL) == 4)
@@ -163,7 +162,7 @@ example
 proc isUpperTriangular(matrix M, list #)
 "
 USAGE:    isUpperTriangular(M[,k]);  M a matrix, k an optional int
-RETURN:   int, 1 if the given matrix is upper triangular, 
+RETURN:   int, 1 if the given matrix is upper triangular,
           0 otherwise.
 NOTE:     If k<>0 is given, it is checked whether M is strictly upper
           triangular.
@@ -200,7 +199,7 @@ example
   LIB "nctools.lib";
   LIB "qhmoduli.lib";
   ring r = 0,x,dp;
-  matrix M[2][3] = 
+  matrix M[2][3] =
     0,1,2,
     0,0,3;
   isUpperTriangular(M);
@@ -217,7 +216,7 @@ USAGE:    appendWeight2Ord(w);  w an intvec
 RETURN:   ring, the basering equipped with the ordering (a(w),<), where < is
           the ordering of the basering.
 EXAMPLE:  example orderingCond; shows examples
-" 
+"
 {
   list RL = ringlist(basering);
   RL[3] = insert(RL[3],list("a",w),0);
@@ -269,7 +268,7 @@ NOTE:     Purpose of this proc: check if all entries of v are in the range
 
 /*
 // this is the same as Gweights@nctools.lib
-// 
+//
 // proc orderingCondition (matrix D)
 // "
 // USAGE:    orderingCondition(D);  D a matrix
@@ -277,7 +276,7 @@ NOTE:     Purpose of this proc: check if all entries of v are in the range
 // RETURN:   intvec, say w, such that the ordering (a(w),<), where < is
 //           any global ordering, satisfies the ordering condition for
 //           all G-algebras induced by D.
-// NOTE:     If no such ordering exists, the zero intvec is returned.      
+// NOTE:     If no such ordering exists, the zero intvec is returned.
 // REMARK:   Reference: (BGL)
 // EXAMPLE:  example orderingCondition; shows examples
 // "
@@ -302,7 +301,7 @@ NOTE:     Purpose of this proc: check if all entries of v are in the range
 //   matrix D[4][4];
 //   D[1,2] = 3*a;  D[1,4] = 3*x^2;  D[2,3] = -x;
 //   D[2,4] = d;    D[3,4] = 1;
-//   // To create a G-algebra, the ordering condition implies 
+//   // To create a G-algebra, the ordering condition implies
 //   // that x^2<a*d must hold (see D[1,4]), which is not fulfilled:
 //   x^2 < a*d;
 //   // Hence, we look for an appropriate weight vector
@@ -327,10 +326,10 @@ RETURN:   intvec, say w, such that the ordering (a(w),<), where < is
           any admissible global ordering, is an elimination ordering
           for the subalgebra generated by the variables indexed by the
           entries of the given intvec.
-NOTE:     If no such ordering exists, the zero intvec is returned.      
+NOTE:     If no such ordering exists, the zero intvec is returned.
 REMARK:   Reference: (BGL), (GML)
 EXAMPLE:  example orderingCond; shows examples
-" 
+"
 {
   list RL = ringlist(basering);
   if (size(RL)==4)
@@ -395,25 +394,25 @@ example
 //       else
 //       {
 //         V1[rowV1+1,1] = 1; // 1-xi <= 0
-//         V1[rowV1+1,i+1] = -1; 
+//         V1[rowV1+1,i+1] = -1;
 //         rowV1++;
 //       }
 //     }
 //     else
 //     {
 //       V1[i,1] = 1; // 1-xi <= 0
-//       V1[i,i+1] = -1; 
-//     }  
+//       V1[i,i+1] = -1;
+//     }
 //     for (j=i+1; j<=n; j++)
 //     {
 //       if (deg(D[i,j])>0)
 //       {
 //         M2 = newtonDiag(D[i,j]);
-//  	for (k=1; k<=nrows(M2); k++)
-//  	{
-//  	  M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
+//          for (k=1; k<=nrows(M2); k++)
+//          {
+//            M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
 //           M2[k,j] = M2[k,j] - 1;
-//  	}
+//          }
 //         oldM = M;
 //         M = intmat(M,nrows(M)+nrows(M2),n);
 //         M = oldM,M2;
@@ -452,7 +451,7 @@ example
 // //   write(":w simplex_test_mat.sing",A);
 //   // TODO ^^^
 //   print(A);
-// //  list L = simplex(A,m,n,0,m-n+nrows(V1),n-nrows(V1));  
+// //  list L = simplex(A,m,n,0,m-n+nrows(V1),n-nrows(V1));
 //   "// n:     " + string(n);
 //   "// m:     " + string(m);
 //   "// rowV1: " + string(rowV1);
@@ -515,26 +514,26 @@ static proc orderingConditionEngine (matrix D, intvec v, int elimweight)
       else
       {
         V1[rowV1+1,1] = 1; // 1-xi <= 0
-        V1[rowV1+1,i+1] = -1; 
+        V1[rowV1+1,i+1] = -1;
         rowV1++;
       }
     }
     else
     {
       V1[i,1] = 1; // 1-xi <= 0
-      V1[i,i+1] = -1; 
+      V1[i,i+1] = -1;
       rowV1++;
-    }  
+    }
     for (j=i+1; j<=n; j++)
     {
       if (deg(D[i,j])>0)
       {
         M2 = newtonDiag(D[i,j]);
- 	for (k=1; k<=nrows(M2); k++)
- 	{
- 	  M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
+         for (k=1; k<=nrows(M2); k++)
+         {
+           M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
           M2[k,j] = M2[k,j] - 1;
- 	}
+         }
         oldM = M;
         M = intmat(M,nrows(M)+nrows(M2),n);
         M = oldM,M2;
@@ -624,26 +623,26 @@ static proc NEWorderingConditionEngine (matrix D, intvec v, int elimweight)
       else
       {
         V1[rowV1+1,1] = 1; // 1-xi <= 0
-        V1[rowV1+1,i+1] = -1; 
+        V1[rowV1+1,i+1] = -1;
         rowV1++;
       }
     }
     else
     {
       V1[i,1] = 1; // 1-xi <= 0
-      V1[i,i+1] = -1; 
+      V1[i,i+1] = -1;
       rowV1++;
-    }  
+    }
     for (j=i+1; j<=n; j++)
     {
       if (deg(D[i,j])>0)
       {
         M2 = newtonDiag(D[i,j]);
- 	for (k=1; k<=nrows(M2); k++)
- 	{
- 	  M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
+         for (k=1; k<=nrows(M2); k++)
+         {
+           M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
           M2[k,j] = M2[k,j] - 1;
- 	}
+         }
         oldM = M;
         M = intmat(M,nrows(M)+nrows(M2),n);
         M = oldM,M2;
@@ -680,7 +679,7 @@ static proc NEWorderingConditionEngine (matrix D, intvec v, int elimweight)
 //   "// n:     " + string(n);
 //   "// m:     " + string(m);
 //   "// rowV1: " + string(rowV1);
-//   "// rowV2: " + string(rowV2);  
+//   "// rowV2: " + string(rowV2);
   list L = simplex(A,m,n,m-rowV1-rowV2,rowV1,rowV2);
   int se = L[2];
   if (se==-2)
@@ -848,7 +847,7 @@ EXAMPLE:  example extendedTensor; shows examples
 
 proc preimageNC (list #)
 "
-USAGE:    preimageNC(A,f,J[,P,eng]);  A ring, f map or ideal, J ideal, 
+USAGE:    preimageNC(A,f,J[,P,eng]);  A ring, f map or ideal, J ideal,
                                       P optional string, eng optional int
 ASSUME:   f defines a map from A to the basering.
 RETURN:   nothing, instead exports an object 'preim' of type ideal to ring A,
@@ -907,15 +906,15 @@ EXAMPLE:  example preimageNC; shows examples
     {
       if (#[4]<>"")
       {
-	str = #[4];
+        str = #[4];
       }
     }
     if (size(#)>4)
     {
       if (typeof(#[5])=="int")
       {
-	eng = #[5];
-      }      
+        eng = #[5];
+      }
     }
   }
   setring B;
@@ -948,7 +947,7 @@ EXAMPLE:  example preimageNC; shows examples
   J = nselect(J,v);
   attrib(J,"isSB",1);
   setring A;
-  dbprint(ppl,"// Writing output to specified ring under the name '" 
+  dbprint(ppl,"// Writing output to specified ring under the name '"
           + str + "'.");
   str = "ideal " + str + " = imap(E,J); export(" + str + ");";
   execute(str);
@@ -1000,7 +999,7 @@ static proc ex2 ()
   ideal tau = x,-x*D^2,2*x*D;
   def E = extendedTensor(U,tau);
   setring E; E;
-  elimWeight(4..5); 
+  elimWeight(4..5);
   // zero, since there is no elimination ordering for x,D in E
 }
 

@@ -40,7 +40,7 @@ Guide: with this library, it is possible
 PROCEDURES:
 ratstd(I, n); compute Groebner basis and dimensions in Ore localization of the basering
 
-Support: SpezialForschungsBereich F1301 of the Austrian FWF and 
+Support: SpezialForschungsBereich F1301 of the Austrian FWF and
 Transnational Access Program of RISC Linz, Austria
 
 SEE ALSO: jacobson_lib

@@ -7,16 +7,16 @@ AUTHORS: Ann Christina Foldenauer,    Christina.Foldenauer@rwth-aachen.de
 @*       Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
 OVERVIEW:
-@* The main purpose of this library is the handling of bimodules 
-@* which will help e.g. to determine weak normal forms of representation matrices 
+@* The main purpose of this library is the handling of bimodules
+@* which will help e.g. to determine weak normal forms of representation matrices
 @* and total divisors within non-commutative, non-simple G-algebras.
-@* We will use modules homomorphisms between a G-algebra and its enveloping algebra 
-@* in order to work left Groebner basis theory on bimodules. 
-@* Assume we have defined a (non-commutative) G-algebra A over the field K, and an (A,A)-bimodule M. 
+@* We will use modules homomorphisms between a G-algebra and its enveloping algebra
+@* in order to work left Groebner basis theory on bimodules.
+@* Assume we have defined a (non-commutative) G-algebra A over the field K, and an (A,A)-bimodule M.
 @* Instead of working with M over A, we define the enveloping algebra A^{env} = A otimes_K A^{opp}
-@* (this can be done with command envelope(A)) and embed M into A^{env} via imap(). 
-@* Thus we obtain the left A^{env}-module M otimes 1 in A^{env}. 
-@* This has a lot of advantages, because left module theory has much more commands 
+@* (this can be done with command envelope(A)) and embed M into A^{env} via imap().
+@* Thus we obtain the left A^{env}-module M otimes 1 in A^{env}.
+@* This has a lot of advantages, because left module theory has much more commands
 @* that are already implemented in SINGULAR:PLURAL. Two important procedures that we can use are std()
 @* which computes the left Groebner basis, and NF() which computes the left normal form.
 @* With the help of this method we are also able to determine the set of bisyzygies of a bimodule.
@@ -27,14 +27,14 @@ OVERVIEW:
 
 REFERENCES:
 @* The procedure bistd() is the implementation of an algorithm M. del Socorro Garcia Roman presented in [1](page 66-78).
-@* [1] Maria del Socorro Garcia Roman, Effective methods in Algebras with PBW bases: 
+@* [1] Maria del Socorro Garcia Roman, Effective methods in Algebras with PBW bases:
 @* G-algebras and Yang-Baxter Algebras, Ph.D. thesis, Universidad de La Laguna, 2005.
-@* [2] Viktor Levandovskyy, Non-commutative Computer Algebra for polynomial Algebras: 
+@* [2] Viktor Levandovskyy, Non-commutative Computer Algebra for polynomial Algebras:
 @* Groebner Bases, Applications and Implementations, Ph.D. thesis, Kaiserlautern, 2005.
 @* [3] N. Jacobson, The theory of rings, AMS, 1943.
 @* [4] P. M. Cohn, Free Rings and their Relations, Academic Press Inc. (London) Ltd., 1971.
 
-PROCEDURES: 
+PROCEDURES:
 bistd(M);      computes the two-sided Groebner bases of an ideal or module
 bitrinity(M);  computes the trinity of M: Groebner basis, lift matrix and bisyzygies
 liftenvelope(M,g); computes the coefficients of an element g concerning the generators of a bimodule M in the enveloping algebra
@@ -44,7 +44,7 @@ isTwoSidedGB(I);   checks whether an ideal I is two-sided Groebner basis
 
 SEE ALSO: ncalg_lib, nctools_lib
 
-KEYWORDS: bimodules, bisyzygies, bitrinity, lift, enveloping algebra, pure tensor, 
+KEYWORDS: bimodules, bisyzygies, bitrinity, lift, enveloping algebra, pure tensor,
 total divisors, two-sided, two-sided Groebner basis, tensor
 
 ";
@@ -63,13 +63,13 @@ proc testbimoduleslib()
   example isTwoSidedGB;
   "SECONDARY BIMODULES PROCEDURES:";
   example enveltrinity;
-  example CompDecomp;  
+  example CompDecomp;
 }
 
 proc bistdIdeal (ideal M)
 "does bistd directly for ideals
 "
-{  
+{
   intvec optionsave = option(get);
   option(redSB);
   option(redTail);
@@ -78,9 +78,9 @@ proc bistdIdeal (ideal M)
   setring saveenv;
   ideal M = imap(save, M);
   int i; int n = nvars(save);
-  ideal K; 
+  ideal K;
   for (i=1; i <= n; i++)
-  { 
+  {
     K[i] = var(i)-var(2*n-i+1);
   }
   M = M+K;
@@ -92,28 +92,28 @@ proc bistdIdeal (ideal M)
   {
     L = delete(L,6);
     L = delete(L,5);}
-  def Scom = ring(L);   
-  setring Scom; 
+  def Scom = ring(L);
+  setring Scom;
   ideal P;
   for (i= 1; i <= n; i++)
-  { 
-    P[i] = var(i); 
+  {
+    P[i] = var(i);
     P[2*n-i+1] = var(i);
   }
   map Pi = saveenv, P;
   ideal N = Pi(M) ;
   setring save;
   ideal MM = fetch(Scom,N);
-  return(MM); 
+  return(MM);
 }
 example
-{ "EXAMPLE:"; echo = 2; 
+{ "EXAMPLE:"; echo = 2;
   ring w = 0,(x,s),Dp;
   def W=nc_algebra(1,s); // 1st shift algebra
   setring W;
   ideal I1 = s^3-x^2*s;
   print(matrix(bistd(I1))); // compare with twostd:
-  print(matrix(twostd(I1))); 
+  print(matrix(twostd(I1)));
   ideal I2 = I1, x*s;
   print(matrix(bistd(I2))); // compare with twostd:
   print(matrix(twostd(I2)));
@@ -125,10 +125,10 @@ RETURN: ideal or module (same type as the argument)
 PURPOSE: Computes the two-sided Groebner basis of an ideal/module with the help the enveloping algebra of the basering, alternative to twostd() for ideals.
 EXAMPLE: example bistd; shows examples
 "
-{  
+{
   // VL: added simplify
   // commented out: Additionally you should use simplify(N,2+4+8) on the output N = bistd(M), where M denotes to the ideal/module in the argument.
-  // NOTE: option(redSB), option(redTail) are used by the procedure. 
+  // NOTE: option(redSB), option(redTail) are used by the procedure.
   //    intvec optionsave = option(get);
   //      option(redSB);
   //      option(redTail);
@@ -138,9 +138,9 @@ EXAMPLE: example bistd; shows examples
   setring saveenv;
   module M = imap(save, M);
   int i; int n = nvars(save);
-  module B; 
+  module B;
   for (i=1; i <= n; i++)
-  { 
+  {
     B[i] = var(i) - var(2*n-i+1);
   }
   module K ; int j;int m = 1;
@@ -158,30 +158,30 @@ EXAMPLE: example bistd; shows examples
   list L = ringlist(save);
   if (size(ringlist(save)) > 4)
   {L = delete(L,6);L = delete(L,5);}
-  def Scom = ring(L);   
-  setring Scom; 
+  def Scom = ring(L);
+  setring Scom;
   ideal P;
   for (i= 1; i <= n; i++)
-  { 
-    P[i] = var(i) ; 
-    P[2*n-i+1] = var(i); 
+  {
+    P[i] = var(i) ;
+    P[2*n-i+1] = var(i);
   }
   map Pi = saveenv, P;
   module N = Pi(M) ;
   setring save;
   module MM = fetch(Scom,N);
-  if (nrows(MM)==1) 
+  if (nrows(MM)==1)
   {
     //i.e. MM is an ideal indeed
-    ideal @M = ideal(MM); 
-    kill MM; 
+    ideal @M = ideal(MM);
+    kill MM;
     ideal MM = @M;
   }
   MM = simplify(MM,2+4+8);
-  return(MM); 
-}   
+  return(MM);
+}
 example
-{ "EXAMPLE:"; echo = 2; 
+{ "EXAMPLE:"; echo = 2;
   ring w = 0,(x,s),Dp;
   def W=nc_algebra(1,s); // 1st shift algebra
   setring W;
@@ -194,74 +194,74 @@ example
 proc enveltrinityIdeal(ideal f)
 " enveltrinity for an ideal directly"
 {
-  // AUXILIARY PROCEDURES: Uses Zersubcols(matrix N, int l). 
+  // AUXILIARY PROCEDURES: Uses Zersubcols(matrix N, int l).
   intvec optionsave = option(get);
   def save = basering ;
   option(redSB);
   int i; int n = nvars(save);
   def saveenv = envelope(save);
   setring saveenv;
-  def R = makeModElimRing(saveenv); setring R;    
-  ideal K; 
+  def R = makeModElimRing(saveenv); setring R;
+  ideal K;
   for (i=1; i <= n; i++)
-  { K[i] = var(i)-var(2*n-i+1);} 
-  K = std(K);    
-  ideal f = imap(save, f);    
+  { K[i] = var(i)-var(2*n-i+1);}
+  K = std(K);
+  ideal f = imap(save, f);
   // now we compute the trinity (GB,Liftmatrix,Syzygy)
-  // can do it with f but F=NF(f,kr), so the ideals are the same in R env                     
+  // can do it with f but F=NF(f,kr), so the ideals are the same in R env
   ideal I = f, K;   // ideal I = F, K;
   int l = ncols(I);
   int j = ncols(f);
-  matrix M[j+1][l];  
+  matrix M[j+1][l];
   for (i = 1; i<= l;i++)
-  { 
+  {
     M[1,i] = I[i];
   }
   for (i=1; i <= j;i++)
-  { 
+  {
     M[i+1,i] = 1;
   }
   matrix N = std(M);
   option(set,optionsave);
   int m = ncols(N);
-  intvec sypos; 
+  intvec sypos;
   for (i=1; i <= m; i++)
-  { 
+  {
     if (N[1,i] == 0)
-    { 
+    {
       sypos = sypos,i;
     }
   }
   intvec Nrows = 2..(j+1);
   matrix BS = submat(N,Nrows,sypos); // e.g. for each column (b_1,...,b_j) you get 0 = sum_i (b_i*f_i)
-  module BSy = BS; 
+  module BSy = BS;
   setring saveenv;
   ideal K = imap(R,K);
   module BS = imap(R,BSy);
   matrix N = imap(R,N);
   kill R;
   export K; export BS; export N;
-  return(saveenv);    
+  return(saveenv);
 }
 
 static proc Zersubcols(matrix N, int l)
-{  
-  if (nrows(N) <= l) 
+{
+  if (nrows(N) <= l)
   {
-    string f = "Inputinteger ist zu gross. Muss kleiner sein als die Anzahl der Zeilen von der Inputmatrix."; return(f); 
+    string f = "Inputinteger ist zu gross. Muss kleiner sein als die Anzahl der Zeilen von der Inputmatrix."; return(f);
   }
-  else 
+  else
   {
-    matrix O[l][1]; int m = ncols(N);  
+    matrix O[l][1]; int m = ncols(N);
     matrix H = submat(N,1..l,1..m);
     int i;
     intvec s;
     intvec c;
     for(i=1; i<= m;i++)
-    { 
+    {
       if(H[i] != O[1]) {c = c,i;}
       else {s = s,i;}
-    } 
+    }
     list L = s,c;
     return(L);
   }
@@ -271,18 +271,18 @@ proc enveltrinity(module M)
 "USAGE: enveltrinity(M); M is (two-sided) ideal/module
 RETURN: ring, the enveloping algebra of the basering with objects K, N, BS in it.
 PURPOSE: compute two-sided Groebner basis, module of bisyzygies and the bitransformation matrix of M.
-THEORY: Assume R is a G-algebra generated by x_1, \dots x_k. Let psi_s be the epimorphism of left R (X) R^{opp} modules: 
+THEORY: Assume R is a G-algebra generated by x_1, \dots x_k. Let psi_s be the epimorphism of left R (X) R^{opp} modules:
 @*  psi_s (s (X)_K t) = smt := (s_1 m t_1, ... , s_s m t_s) = (\psi(s_1 (X) t_1) , ... , psi(s_s (X) t_s)) in R^s
 @* additionally we define for a given bimodule M = < f_1, ... , f_r > the matrix M' := [F, I_r], [K, 0]
-@* where I_r refers to the identity matrix in Mat(r,R), K is a matrix which columns are the generators of the kernel of psi_s. 
-@* These have the form (x_i-X_i)e_j for j in {1,...,s}, i in {1,...,k}. 
+@* where I_r refers to the identity matrix in Mat(r,R), K is a matrix which columns are the generators of the kernel of psi_s.
+@* These have the form (x_i-X_i)e_j for j in {1,...,s}, i in {1,...,k}.
 @* The matrix F = (f_1 ... f_r), where the f_i's are the generators of M and 0 is the matrix with only entries that are zero.
-@* Enveltrinity() calculates the kernel K of psi_s and left normal form N of the matrix M' which also yields the bisyzygies of M 
+@* Enveltrinity() calculates the kernel K of psi_s and left normal form N of the matrix M' which also yields the bisyzygies of M
 @* and a coefficient matrix as submatrix of N which we need in the procedures bitrinity() and liftenevelope().
 
-NOTE: In the output, 
-@* ideal/module K is the kernel of psi_s above 
-@* matrix N is the left Groebner basis of the matrix M' 
+NOTE: In the output,
+@* ideal/module K is the kernel of psi_s above
+@* matrix N is the left Groebner basis of the matrix M'
 @* module BS corresponds to the set of bisyzygies of M.
 @* To get K,N or BS, use @code{def G = enveltrinity(M); setring G; K; N; BS;}.
 EXAMPLE: example enveltrinity; shows examples
@@ -296,43 +296,43 @@ EXAMPLE: example enveltrinity; shows examples
   def saveenv = envelope(save);
   setring saveenv;
   def R = makeModElimRing(saveenv); setring R;
-  module B; 
+  module B;
   for (i=1; i <= n; i++)
   { B[i] = var(i) - var(2*n-i+1);}
   module K ; int t;int g = 1;
   for (i=1; i <= n; i++)
-  { 
+  {
     for(t=1;t<=ROW;t++)
     {
       K[g]= B[i][1,1]*gen(t);g++;
     }
   }
-  K = std(K); 
+  K = std(K);
   module M = imap(save,M);
   module I = M,K;
   int l = ncols(I);
   int j = ncols(M);
-    
-  matrix NN[j+ROW][l];  
+
+  matrix NN[j+ROW][l];
   for (t=1; t <= ROW; t++)
   {
     for (i = 1; i<= l;i++)
     { NN[t,i] = I[t,i];}
   }
   for (i=ROW+1; i <= j+ROW;i++)
-  { NN[i,i-ROW] = 1;}     
+  { NN[i,i-ROW] = 1;}
   // now we compute the trinity (GB,Liftmatrix,Syzygy)
-  // can do it with f but F=NF(f,kr), so the ideals are the same in R env  
-  matrix N = std(NN);  
+  // can do it with f but F=NF(f,kr), so the ideals are the same in R env
+  matrix N = std(NN);
   option(set,optionsave);
   intvec sypos = Zersubcols(N,ROW)[1];
   sypos = sypos[2..nrows(sypos)];
   intvec Nrows = (ROW+1)..(j+ROW);
   matrix BS = submat(N,Nrows,sypos);  // e.g. for each column (b_1,...,b_j) you get 0 = sum_i (b_i*f_i)
-  module BSy = BS;   
+  module BSy = BS;
   setring saveenv;
   matrix N = imap(R,N); module BS = imap(R,BSy);
-  module K = imap(R,K); 
+  module K = imap(R,K);
   if (nrows(K)==1)
   {
     // i.e. K is an ideal
@@ -341,19 +341,19 @@ EXAMPLE: example enveltrinity; shows examples
     ideal K = @K;
   }
   kill R;
-  export K; 
+  export K;
   export BS;
   export N;
   return(saveenv);
 }
 example
-{"EXAMPLE"; echo = 2; 
+{"EXAMPLE"; echo = 2;
   ring r = 0,(x,s),dp;
-  def R = nc_algebra(1,s); setring R; 
-  poly f = x*s + s^2; 
+  def R = nc_algebra(1,s); setring R;
+  poly f = x*s + s^2;
   ideal I = f;
   def G = enveltrinity(I);
-  setring G; 
+  setring G;
   print(matrix(K)); // kernel of psi_s
   print(BS); // module of bisyzygies
   print(N); // bitransformation matrix
@@ -372,20 +372,20 @@ proc bitrinityIdeal(ideal f)
   def R = makeModElimRing(A); setring R;
   ideal K = imap(A,K); K = std(K);
   option(set,optionsave);
-  matrix N = imap(A,N);  
-  int m = ncols(N);    
+  matrix N = imap(A,N);
+  int m = ncols(N);
   //decomposition of N: Liftmatrix, Bisyzygymatrix:
   intvec cfpos;
   for (i=1; i <= m; i++)
-  { if (N[1,i] != 0)  
+  { if (N[1,i] != 0)
     {cfpos = cfpos,i;}
-  }     
+  }
   cfpos = cfpos[2..nrows(cfpos)];
-  matrix C = submat(N,1..(j+1),cfpos);    
-  module Coef;      
-  for(i=1;i<=ncols(C);i++) 
+  matrix C = submat(N,1..(j+1),cfpos);
+  module Coef;
+  for(i=1;i<=ncols(C);i++)
   {
-    poly p = NF(C[1,i],K); 
+    poly p = NF(C[1,i],K);
     if( (p != 0) && (p == C[1,i]))
     {  Coef = Coef,C[i];}
   }
@@ -394,8 +394,8 @@ proc bitrinityIdeal(ideal f)
   module CC = Coe;      //e.g. i-th column is (a_i1,...,a_ij) (see top)
   setring A;
   matrix Coeff = imap(R,CC); matrix Bisyz = BS;// e.g. for each column (b_1,...,b_j) you get 0 = sum_i (b_i*f_i)
-  kill R;      
-  list L = Coeff,Bisyz; 
+  kill R;
+  list L = Coeff,Bisyz;
   // output is a Coefficient-Matrix Co and a Bisyzygy-Matriy BS such that (g1,...,gk) = (f1,...,fj)*Submat(Coeff,2..nrows(Coeff),1..ncols(Coeff)) and (0,...,0) = (f1,...,fj)*BiSyz
   export L;
   return(A);
@@ -404,25 +404,25 @@ proc bitrinityIdeal(ideal f)
 proc bitrinity(module M)
 "USAGE: bitrinity(M); M is (two-sided) ideal/module
 RETURN: ring, the enveloping algebra of the basering, with objects in it.
-additionally it exports a list L = Coeff, Bisyz. 
-THEORY: 
-Let  psi_s be the epimorphism of left R (X) R^{opp} modules: 
+additionally it exports a list L = Coeff, Bisyz.
+THEORY:
+Let  psi_s be the epimorphism of left R (X) R^{opp} modules:
 @*  psi_s(s (X)_K t) = smt := (s_1 m t_1, ... , s_s m t_s) = (\psi(s_1 (X) t_1) , \dots , psi(s_s (X) t_s)) in R^s.
-@* Then psi_s(A) := (psi_s(a_{ij})) for every matrix A in Mat(n x m, R)$. 
-@* For a two-sided ideal I = < f_1, ... , f_j> with Groebner basis G = {g_1, ... , g_k} in R, Coeff is the Coefficient-Matrix and 
-BiSyz a bisyzygy matrix. 
+@* Then psi_s(A) := (psi_s(a_{ij})) for every matrix A in Mat(n x m, R)$.
+@* For a two-sided ideal I = < f_1, ... , f_j> with Groebner basis G = {g_1, ... , g_k} in R, Coeff is the Coefficient-Matrix and
+BiSyz a bisyzygy matrix.
 @* Let C be the submatrix of Coeff, where C is Coeff without the first row. Then
-(g_1,...,g_k) = psi_s(C^T * (f_1 ... f_j)^T) and (0,...,0) = psi_s(BiSyz^T * (f_1 ... f_j)^T). 
-@* The first row of Coeff (G_1 ... G_n)$ corresponds to the image of the Groebner basis of I: 
+(g_1,...,g_k) = psi_s(C^T * (f_1 ... f_j)^T) and (0,...,0) = psi_s(BiSyz^T * (f_1 ... f_j)^T).
+@* The first row of Coeff (G_1 ... G_n)$ corresponds to the image of the Groebner basis of I:
 psi_s((G_1 ... G_n)) = G = {g_1 ... g_k }.
-@* For a (R,R)-bimodule M with Groebner basis G = {g_1, ... , g_k} in R^r, Coeff is the coefficient matrix and 
-BiSyz a bisyzygy matrix. 
+@* For a (R,R)-bimodule M with Groebner basis G = {g_1, ... , g_k} in R^r, Coeff is the coefficient matrix and
+BiSyz a bisyzygy matrix.
 @* Let C be the submatrix of Coeff, where C is Coeff without the first r rows. Then
 (g_1 ... g_k) = psi_s(C^T * (f_1 ... f_j)^T) and (0 ... 0) = psi_s(BiSyz^T * (f_1 ... f_j)^T).
-@* The first r rows of Coeff = (G_1 ... G_n) (Here G_i denotes to the i-th column of the first r rows) corresponds to the image of the 
+@* The first r rows of Coeff = (G_1 ... G_n) (Here G_i denotes to the i-th column of the first r rows) corresponds to the image of the
 Groebner basis of M: psi_s((G_1 ... G_n)) = G = {g_1 ... g_k}.
 PURPOSE: This procedure returns a coefficient matrix in the enveloping algebra of the basering R, that gives implicitly the two-sided Groebner basis of a (R,R)-bimodule M
-and the coefficients that produce the Groebner basis with the help of the originally used generators of M. Additionally it calculates the bisyzygies of M as left-module of the enveloping algebra of R. 
+and the coefficients that produce the Groebner basis with the help of the originally used generators of M. Additionally it calculates the bisyzygies of M as left-module of the enveloping algebra of R.
 AUXILIARY PROCEDURES: Uses the procedure enveltrinity().
 NOTE: To get list L = Coeff, BiSyz, we set: def G = bitrinity(); setring G; L; or $L[1]; L[2];.
 EXAMPLE: example bitrinity; shows examples
@@ -438,18 +438,18 @@ EXAMPLE: example bitrinity; shows examples
   def R = makeModElimRing(A); setring R;
   module K = imap(A,K); K = std(K);
   option(set,optionsave);
-  matrix N = imap(A,N);   
-  int m = ncols(N);    
-  //decomposition of N: Liftmatrix, Bisyzygymatrix:    
+  matrix N = imap(A,N);
+  int m = ncols(N);
+  //decomposition of N: Liftmatrix, Bisyzygymatrix:
   intvec cfpos = Zersubcols(N,ROW)[2];
   cfpos = cfpos[2..nrows(cfpos)];
   matrix C1 = submat(N,1..nrows(N),cfpos);
   matrix C2 = submat(N,1..ROW,cfpos);
-  module Coef; matrix O[ROW][1];  
+  module Coef; matrix O[ROW][1];
   module p;
-  for(i=1;i<=ncols(C2);i++) 
+  for(i=1;i<=ncols(C2);i++)
   {
-    p = NF(C2[i],K); 
+    p = NF(C2[i],K);
     if( (p[1] != O[1]) && (p[1] == C2[i]))
     {  Coef = Coef,C1[i];}
   }
@@ -458,7 +458,7 @@ EXAMPLE: example bitrinity; shows examples
   module CC = Coe;
   setring A;
   matrix Coeff = imap(R,CC); matrix Bisyz = BS;
-  kill R; 
+  kill R;
   list L = Coeff,Bisyz;
   export L;
   return(A);
@@ -473,14 +473,14 @@ example
   def G = bitrinity(I);
   setring G;
   print(L[1]); // Coeff
-//the first row shows the Groebnerbasis of I consists of  
+//the first row shows the Groebnerbasis of I consists of
 // psi_s(SX) = xs , phi(S^2) = s^2:
 // remember phi(a (X) b - c (X) d) = psi_s(a (X) b) - phi(c (X) d) := ab - cd in R.
-// psi_s((-s+S+1)*(x*s + s^2)) = psi_s(-xs2-s3+xsS+xs+s2S) 
-// = -xs^2-s^3+xs^2+xs+s^3 = xs 
+// psi_s((-s+S+1)*(x*s + s^2)) = psi_s(-xs2-s3+xsS+xs+s2S)
+// = -xs^2-s^3+xs^2+xs+s^3 = xs
 // psi_s((s-S)*(x*s + s^2)) = psi_s(xs2+s3-xsS-s2S+s2) = s^2
   print(L[2]);  //Bisyzygies
-// e.g. psi_s((x2-2sS+s-X2+2S2+2X+S-1)(x*s + s^2)) 
+// e.g. psi_s((x2-2sS+s-X2+2S2+2X+S-1)(x*s + s^2))
 // = psi_s(x3s+x2s2-2xs2S+xs2-2s3S+s3-xsX2+2xsS2+2xsX+xsS-xs-s2X2+2s2S2+2s2X-s2S)
 // = x^3s+x^2s^2-2xs^3+xs^2-2s^4+s^3-xsx^2+2xs^3+2xsx+xs^2-xs-s^2x^2+2s^4+2s^2x-s^3
 // = 0 in R
@@ -489,16 +489,16 @@ example
 proc liftenvelope(module I,poly g)
 "USAGE: liftenvelope(M,g); M ideal/module, g poly
 RETURN: ring, the enveloping algebra of the basering R.
-Given a two-sided ideal M in R and a polynomial g in R this procedure returns the enveloping algebra of R. 
-Additionally it exports a list l = C, B; where B is the left Groebner basis of the left-syzygies of M \otimes 1 and C is a vector of coefficients in the enveloping algebra 
+Given a two-sided ideal M in R and a polynomial g in R this procedure returns the enveloping algebra of R.
+Additionally it exports a list l = C, B; where B is the left Groebner basis of the left-syzygies of M \otimes 1 and C is a vector of coefficients in the enveloping algebra
 of R such that psi_s(C^T *(f_1 \dots f_n)) = g.
-@* psi_s is an epimorphism of left R (X) R^{opp} modules: 
+@* psi_s is an epimorphism of left R (X) R^{opp} modules:
 @*  psi_s (s (X)_K t) = smt := (s_1 m t_1, ... , s_s m t_s) = (\psi(s_1 (X) t_1) , \dots , psi(s_s (X) t_s)) in R^s.
-@* Then psi_s(A) := (psi_s(a_{ij})) for every matrix A in Mat(n x m, R)$. 
+@* Then psi_s(A) := (psi_s(a_{ij})) for every matrix A in Mat(n x m, R)$.
 ASSUME: The second component has to be an element of the first component.
-PURPOSE: This procedure is used for computing total divisors. Let {f_1, ..., f_n} be the generators of the first component and let the second component be called g. Then 
-the returned list l = C, B = (b_1, ..., b_n); defines an affine set A = C + sum_i a_i b_i with (a_1,..,a_n) in the enveloping algebra of the basering R such that 
-psi_s(a^T * (f_1 ... f_n)) = g for all a in A. For certain rings R, we csn find pure tensors within this set A, 
+PURPOSE: This procedure is used for computing total divisors. Let {f_1, ..., f_n} be the generators of the first component and let the second component be called g. Then
+the returned list l = C, B = (b_1, ..., b_n); defines an affine set A = C + sum_i a_i b_i with (a_1,..,a_n) in the enveloping algebra of the basering R such that
+psi_s(a^T * (f_1 ... f_n)) = g for all a in A. For certain rings R, we csn find pure tensors within this set A,
 and if we do, liftenvelope() helps us to decide whether f is a total divisor of g.
 NOTE: To get list l = C, B. we set: def G = liftenvelope(); setring G; l; or l[1]; l[2];.
 EXAMPLE: example liftenvelope; shows examples
@@ -514,17 +514,17 @@ EXAMPLE: example liftenvelope; shows examples
     int i;
     def R = makeModElimRing(A); setring R;
     module N = imap(A,N); N = std(N);
-    intvec Nrows = 2..(j+1);  
+    intvec Nrows = 2..(j+1);
     module g = imap(save,g);
     matrix G[nrows(N)][1];
-    for (i=2;i<=m;i++) 
-    { 
+    for (i=2;i<=m;i++)
+    {
       G[1,1] = g;
       G[i,1]=0;
     }
     module NFG = (-1)*NF(G,N);
     module C = submat(NFG,2..nrows(N),1);
-    
+
     setring A;
     module C = imap(R,C);
     kill R;
@@ -532,8 +532,8 @@ EXAMPLE: example liftenvelope; shows examples
     option(set,optionsave);
     list l = C,B; // transpose(C)*(f1,...,fn) = g
     export l;
-    return(A); 
-} 
+    return(A);
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring r = 0,(x,s),dp;
@@ -550,33 +550,33 @@ example
   // We get : 2s+SX + ( sX - 2s -SX) = sX  - a pure tensor!!!!
 }
 
-static proc twoComp(poly q) 
+static proc twoComp(poly q)
 "USAGE: twoComp(g); g poly
 NOTE: This procedure only works if the basering is an enveloping algebra A^{env} of a (non-commutative) ring A. Thus also the polynomial in the argument has to be in A^{env}.
 RETURN: Returns the second half of the leading exponent of a polynomial p in A^{env}:
 @* lm(p) = c x1^a1 x2^a2 ... xn^an (X) xn^bn * x(n-1)^b(n-1) * ... * x1^b1
 such that lex(p) = [a1,..,an,bn,...,b1]. Then the procedure returns [bn,...,b1] (of lex(p)!).
 "
-{      
-      if (q == 0) {return(q);}      
+{
+      if (q == 0) {return(q);}
       def saveenv = basering;
-      int n = nvars(saveenv); int k = n div 2; 
+      int n = nvars(saveenv); int k = n div 2;
       intvec v = leadexp(q);
       intvec w = v[k+1..2*k];
       return(w);
 }
 
-static proc firstComp(poly q) 
+static proc firstComp(poly q)
 "USAGE: firstComp(g); g poly
 NOTE: This procedure only works if the basering is an enveloping algebra A^{env} of a (non-commutative) ring A. Thus also the polynomial in the argument has to be in A^{env}.
 RETURN: Returns the first half of the leading exponent of a polynomial p in A^{env}:
 @* lm(p) = c x1^a1 x2^a2 ... xn^an (X) xn^bn * x(n-1)^b(n-1) * ... * x1^b1
 such that lex(p) = [a1,..,an,bn,...,b1]. Then the procedure returns [a1,...,an] (of lex(p)!).
 "
-{     
-      if (q == 0) {return(q);}     
+{
+      if (q == 0) {return(q);}
       def saveenv = basering;
-      int n = nvars(saveenv); int k = n div 2; 
+      int n = nvars(saveenv); int k = n div 2;
       intvec v = leadexp(q);
       intvec w = v[1..k];
       return(w);
@@ -594,23 +594,23 @@ EXAMPLE: example CompDecomp; shows examples
 {
       poly s = p;
       ideal Q;
-      int j = 0; poly t; poly w; 
+      int j = 0; poly t; poly w;
       while (s!= 0)
       {
-	t = lead(s); 
-	w = s-t;
-	s = s-t; 
-	j++; 
-	Q[j] = t;
-	while(w !=0)
-	{
-	  if (twoComp(w) == twoComp(t))
-	  {
-	    Q[j] = Q[j]+lead(w); 
-	    s = s-lead(w);
-	  }
-	  w = w-lead(w);
-	}
+        t = lead(s);
+        w = s-t;
+        s = s-t;
+        j++;
+        Q[j] = t;
+        while(w !=0)
+        {
+          if (twoComp(w) == twoComp(t))
+          {
+            Q[j] = Q[j]+lead(w);
+            s = s-lead(w);
+          }
+          w = w-lead(w);
+        }
       }
       return(Q);
 }
@@ -633,12 +633,12 @@ proc getOneComp(poly p)
 NOTE: This procedure only works if the basering is an enveloping algebra A^{env} of a (non-commutative) ring A. Thus also the polynomial in the argument has to be in A^{env}.
 ASSUME: The given polynomial has to be of the form sum_i a_i \otimes b = (sum_i a_i) (X) b.
 RETURN: Returns a polynomial in A^{env}, which is the sum of the left-side (of the tensor summands) of all terms of the argument.
-@* Let A be a G-algebra. For a given polynomial p in A^{env} of the form p = sum_i a_i (X) b = (sum_i a_i) (X) b this procedure returns 
+@* Let A be a G-algebra. For a given polynomial p in A^{env} of the form p = sum_i a_i (X) b = (sum_i a_i) (X) b this procedure returns
 g = (\sum_i a_i) (X) 1  written sum_i a_i in A^{env}.
 PURPOSE: This is an auxiliary procedure for isPureTensor().
 EXAMPLE: example getOneComp; shows examples
 "
-{   
+{
     ideal I;
     int i; int m = size(p);poly f;
     if (size(p) == 0) {f = 1; return(f);}
@@ -646,7 +646,7 @@ EXAMPLE: example getOneComp; shows examples
          { I[i] = leadcoef(p[i])*monomial(firstComp(p[i]));}
     f = sum(I);
     return(f);
- }   
+ }
 example
 {
   "EXAMPLE:"; echo = 2;
@@ -654,7 +654,7 @@ example
   def R = nc_algebra(1,s); setring R; //1st shift algebra
   def Re = envelope(R); setring Re; //basering is now R^{env} = R (X) R^{opp}
   poly f = 5*x*s*S+x^2*S+s*S+3*x*S;  // f = (x2+5xs+3x+s)*S
-  getOneComp(f);  
+  getOneComp(f);
 }
 
 proc isPureTensor(poly g)
@@ -668,23 +668,23 @@ EXAMPLE: example isPureTensor; shows examples
   ideal I = CompDecomp(g);
   ideal U;int i; int k = ncols(I);
   for (i = 1 ; i <= k; i++)
-  { 
+  {
     U[i] = getOneComp(I[i]);
-  }    
+  }
   poly q = normalize(U[1]);
   for (i=2; i<= k;i++)
-  { 
-    if ( U[i] != leadcoef(U[i])*q) 
+  {
+    if ( U[i] != leadcoef(U[i])*q)
     {
       return(0);
     }
   }
   def saveenv = basering;
-  int n = nvars(saveenv); int l = n div 2; 
+  int n = nvars(saveenv); int l = n div 2;
   ideal P; intvec d = 0:l;
-  intvec vv;       
+  intvec vv;
   for (i=1;i<=k;i++)
-  { 
+  {
     vv= d,twoComp(I[i]);
     P[i] = leadcoef(U[i])*monomial(vv);
   }
@@ -701,14 +701,14 @@ example
   poly p = x*(x*s)*x + s^2*x; p;
   // p is of the form q(X)1, a pure tensor indeed:
   isPureTensor(p);
-  // v = transpose( x3s+x2s+xs2+2s2  1 ) i.e. p = x3s+x2s+xs2+2s2 (X) 1 
+  // v = transpose( x3s+x2s+xs2+2s2  1 ) i.e. p = x3s+x2s+xs2+2s2 (X) 1
   poly g = S*X+ x*s*X+ S^2*x;
   g;
   isPureTensor(g); // indeed g is not a pure tensor
   poly d = x*X+s*X+x*S*X+s*S*X;d;
   isPureTensor(d); // d is a pure tensor indeed
-  // v = transpose( x+s  S*X+X ) i.e. d = x+s (X) s*x+x 
-  // remember that * denotes to the opposite mulitiplication s*x = xs in R.   
+  // v = transpose( x+s  S*X+X ) i.e. d = x+s (X) s*x+x
+  // remember that * denotes to the opposite mulitiplication s*x = xs in R.
 }
 
 proc isTwoSidedGB(ideal I)
@@ -718,9 +718,9 @@ NOTE: This procedure should only be used for non-commutative rings, as every ele
 PURPOSE: Auxiliary procedure for diagonal forms. Let R be a non-commutative ring (e.g. G-algebra), and p in R, this program checks whether p is two-sided i.e. Rp = pR.
 EXAMPLE: example isTwoSidedGB; shows examples
 "
-{ 
+{
   int i; int n = nvars(basering);
-  ideal J; 
+  ideal J;
   // determine whether I is a left Groebner basis
   if (attrib(I,"isSB") == 1)
   {
@@ -747,16 +747,16 @@ EXAMPLE: example isTwoSidedGB; shows examples
     {
       if (I[i] != J[i])
       {
-	option(set,optionsave);
-	return(int(0));
+        option(set,optionsave);
+        return(int(0));
       }
     }
   }
   //  I = simplify(I,1+2+4+8);
   // now, we check whether J is right complete
   for(i = 1; i <= n; i++)
-  { 
-    if ( simplify( NF(J*var(i),J), 2) != 0 ) 
+  {
+    if ( simplify( NF(J*var(i),J), 2) != 0 )
     {
       return(int(0));
     }
@@ -770,6 +770,6 @@ example
   def R = nc_algebra(1,s); setring R; //1st shift algebra
   ideal I = s^2, x*s, s^2 + 3*x*s;
   isTwoSidedGB(I); // I is two-sided
-  ideal J = s^2+x; 
+  ideal J = s^2+x;
   isTwoSidedGB(J); // J is not two-sided; twostd(J) = s,x;
 }

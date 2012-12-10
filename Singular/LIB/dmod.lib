@@ -2455,11 +2455,11 @@ NOTE:    activate the output ring with the @code{setring} command. In this ring,
 @*       - the list or ideal BS is a Bernstein-Sato ideal of a polynomial f = F[1]*..*F[P].
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If met <0, the B-Sigma ideal (cf. Castro and Ucha, 
-@*       'On the computation of Bernstein-Sato ideals', 2005) is computed. 
-@*       If 0 < met < P, then the ideal B_P (cf. the paper) is computed. 
+@*       If met <0, the B-Sigma ideal (cf. Castro and Ucha,
+@*       'On the computation of Bernstein-Sato ideals', 2005) is computed.
+@*       If 0 < met < P, then the ideal B_P (cf. the paper) is computed.
 @*       Otherwise, and by default, the ideal B (cf. the paper) is computed.
-@*       If us<>0, then syzygies-driven method is used. 
+@*       If us<>0, then syzygies-driven method is used.
 @*       If the output ideal happens to be principal, the list of factors
 @*       with their multiplicities is returned instead of the ideal.
 @*       If printlevel=1, progress debug messages will be printed,
@@ -2480,14 +2480,14 @@ EXAMPLE: example annfsBMI; shows examples
     {
       if ( typeof(#[2]) == "int" )
       {
-	met = int(#[2]);
+        met = int(#[2]);
       }
     }
     if ( size(#)>2 )
     {
       if ( typeof(#[3]) == "int" )
       {
-	usesyz = int(#[3]);
+        usesyz = int(#[3]);
       }
     }
 
@@ -2498,8 +2498,8 @@ EXAMPLE: example annfsBMI; shows examples
   def save = basering;
   int N = nvars(basering);
   //if F has some generators which are zero, int P = ncols(I);
-  int P = size(F);  
-  if (P < ncols(F)) 
+  int P = size(F);
+  if (P < ncols(F))
   {
     F = simplify(F,2);
   }
@@ -2636,11 +2636,11 @@ EXAMPLE: example annfsBMI; shows examples
       pi = 0;
       for (j=1; j<=N; j++)
       {
-	pi = pi + SJ[i,j]*var(2*P+N+j);
+        pi = pi + SJ[i,j]*var(2*P+N+j);
       }
       for (j=1; j<=P; j++)
       {
-	pi = pi + SJ[i,N+j]*s(j);
+        pi = pi + SJ[i,N+j]*s(j);
       }
       dbprint(ppl-1, "// -1-1-4 adding element:" + string(pi));
       I = I, pi;
@@ -2731,7 +2731,7 @@ EXAMPLE: example annfsBMI; shows examples
   }
   if ( (met>0) && (met<=ncols(F) ) )
   {
-	/* compute the ideal B_met */
+  /* compute the ideal B_met */
   //j=2;         // for example
   //K = K,F[j];  // to compute Bj (see "On the computation of Bernstein-Sato ideals"; Castro, Ucha)
     dbprint(ppl,"// -2-1-1 computing the ideal B_i from Castro-Ucha");
@@ -2739,7 +2739,7 @@ EXAMPLE: example annfsBMI; shows examples
   }
   if ( ( met == 0) || (met > ncols(F) ) )
   {
-    // that is met ==0 or met> ncols(F)    
+    // that is met ==0 or met> ncols(F)
     /* compute the ideal B */
     poly f=1;
     for (j=1; j<=P; j++)
@@ -2867,10 +2867,10 @@ example
   def Sigma = annfsBMI(F,0,-1); setring Sigma;
   print(matrix(lead(LD))); // compact form of leading
   //  monomials from the annihilator
-  BS; // Bernstein-Sato B-Sigma ideal: it is principal, 
+  BS; // Bernstein-Sato B-Sigma ideal: it is principal,
   // so factors and multiplicities are returned
-  // *3* and now, let us compute B-i ideal 
-  setring r; 
+  // *3* and now, let us compute B-i ideal
+  setring r;
   def Bi = annfsBMI(F,0,3); // that is F[3]=x+y is taken
   setring Bi;
   print(matrix(lead(LD)));   // compact form of leading

@@ -1,45 +1,46 @@
 /////////////////////////////////////////////////////////////////////////////
 //procedures examples comments
-version="1.00";
+version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY: purityfiltration.lib     Algorithms for computing a purity filtration of a given module
 
-AUTHORS: Christian Schilli,	christian.schilli@rwth-aachen.de
-@* 	 Viktor Levandovskyy,   levandov@math.rwth-aachen.de
+AUTHORS: Christian Schilli,        christian.schilli@rwth-aachen.de
+@*          Viktor Levandovskyy,   levandov@math.rwth-aachen.de
 
 
-THEORY: Purity is a notion with several meanings. In our context it is equidimensionality
+OVERVIEW:
+Purity is a notion with several meanings. In our context it is equidimensionality
 @* of a module (that is all M is pure iff any nonzero submodule of N has the same dimension as N).
 @* Notably, one should define purity with respect to a given dimension function. In the context
 @* of this library the corresponding function is the homological grade number j_A(M) of a module M over
-@* an K-algebra A. j_A(M) is the minimal integer k, such that Ext^k_A(M,A) != 0.  
+@* an K-algebra A. j_A(M) is the minimal integer k, such that Ext^k_A(M,A) != 0.
 
-REFERENCES: [AQ] Alban Quadrat: Grade filtration of linear functional systems, INRIA Report 7769 (2010), to appear in Acta Applicanda Mathematica. 
+REFERENCES: [AQ] Alban Quadrat: Grade filtration of linear functional systems, INRIA Report 7769 (2010), to appear in Acta Applicanda Mathematica.
 @* [B93] Jan-Erik Bjoerk: Analytic D-modules and applications, Kluwer Acad. Publ., 1993.
-@* [MB10] Mohamed Barakat: Purity Filtration and the Fine Structure of Autonomy. Proc. MTNS, 2010. 
+@* [MB10] Mohamed Barakat: Purity Filtration and the Fine Structure of Autonomy. Proc. MTNS, 2010.
 
 PROCEDURES:
-projectiveDimension(matrix T,int i);	compute a shortest resolution of coker(T) and its projective dimension
-purityFiltration(matrix R);            	compute the purity filtration of coker(R)
-purityTriang(matrix R)			compute a triangular blockmatrix T, such that coker(R) isomorphic to coker(T)
-gradeNumber(matrix R);	      		gives the grade number of the module coker(R)
-showgrades(list T);           		gives all grade numbers of the modules represented by the elements of T
-allExtOfLeft(matrix R);	      		computes all right ext-modules ext^i(M,D) of a left module M=coker(R) over the ring D
-allExtOfRight(matrix R);	      	computes all left ext-modules ext^i(M,D) of a right module M=coker(R) over the ring D
-doubleExt(matrix R, int i); 		computes the left module ext^i(ext^i(M,D),D) over the ring D, M=coker(R)
-allDoubleExt(matrix R);	      		computes all double ext modules ext^i(ext^j(M,D),D) of the left module coker(R) over the ring D
-is_pure(matrix R);	      		checks whether the module coker(R) is pure
-purelist(list T);	      		checks whether all the modules represented by the elements of T are pure
+projectiveDimension(matrix T,int i);        compute a shortest resolution of coker(T) and its projective dimension
+purityFiltration(matrix R);                    compute the purity filtration of coker(R)
+purityTriang(matrix R)                        compute a triangular blockmatrix T, such that coker(R) isomorphic to coker(T)
+gradeNumber(matrix R);                              gives the grade number of the module coker(R)
+showgrades(list T);                           gives all grade numbers of the modules represented by the elements of T
+allExtOfLeft(matrix R);                              computes all right ext-modules ext^i(M,D) of a left module M=coker(R) over the ring D
+allExtOfRight(matrix R);                      computes all left ext-modules ext^i(M,D) of a right module M=coker(R) over the ring D
+doubleExt(matrix R, int i);                 computes the left module ext^i(ext^i(M,D),D) over the ring D, M=coker(R)
+allDoubleExt(matrix R);                              computes all double ext modules ext^i(ext^j(M,D),D) of the left module coker(R) over the ring D
+is_pure(matrix R);                              checks whether the module coker(R) is pure
+purelist(list T);                              checks whether all the modules represented by the elements of T are pure
 
 KEYWORDS: D-module; ext-module; filtration; projective dimension; resolution; purity;
 ";
 
-LIB "nctools.lib";  
+LIB "nctools.lib";
 LIB "matrix.lib";
 LIB "poly.lib";
 LIB "general.lib";
-LIB "control.lib";    
+LIB "control.lib";
 LIB "nchomolog.lib";
 
 //------------------- auxiliary procedures --------------------------
@@ -61,25 +62,25 @@ example purelist;
 
 static proc iszero (matrix R)
 "USAGE:  iszero(R); R a matrix
-RETURN:  int, 1, if R is zero, 
-@*     	 or 0, if it's not
+RETURN:  int, 1, if R is zero,
+@*              or 0, if it's not
 PURPOSE: checks, if the matrix R is zero or not
 "
-{ 
+{
   ideal i=R;
   i=std(i);
-  if (i==0) 
+  if (i==0)
   {
     return (1);
   }
   return (0);
 }
 
-proc lsyz (matrix R) 
+proc lsyz (matrix R)
 "USAGE:  lsyz(R), R a matrix
-RETURN:	 matrix, a left syzygy of R
+RETURN:         matrix, a left syzygy of R
 PURPOSE: computes the left syzygy module of the module, generated by the rows of R, i.e.
-@*	 a matrix X with X*R=0 
+@*         a matrix X with X*R=0
 "
 {
   matrix L=transpose(syz(transpose(R)));
@@ -88,16 +89,16 @@ PURPOSE: computes the left syzygy module of the module, generated by the rows of
 
 proc rsyz (matrix R)
 "USAGE:  rsyz(R), R a matrix
-RETURN:	 matrix, a rightsyzygy of R
+RETURN:         matrix, a rightsyzygy of R
 PURPOSE: computes the right syzygy module of the module, generated by the rows of R, i.e.
-@*	 a matrix X with R*X=0 
+@*         a matrix X with R*X=0
 EXAMPLE: example rsyz; shows example
 "
 {
   def save = basering;            // with respect to non-commutative rings,
   def saveop = opposite(save);    // we have to switch to the oppose ring for a rightsyzygy
   setring saveop;
-  matrix Rop = oppose(save,R); 
+  matrix Rop = oppose(save,R);
   matrix Bop = syz(Rop);
   setring save;
   matrix B =oppose(saveop,Bop);
@@ -117,36 +118,36 @@ example
 
 static proc rinv (matrix R)
 "USAGE:  rinv(R), R a matrix
-RETURN:	 matrix, a right inverse of R
+RETURN:         matrix, a right inverse of R
 PURPOSE: computes a right inverse matrix of R, if it exists
-@*	 if not, it returns the zero matrix 
+@*         if not, it returns the zero matrix
 "
-{ 
+{
   return(rightInverse(R));
 }
 
 static proc linv (matrix R)
 "USAGE:  linv(R), R a matrix
-RETURN:	 matrix, a left inverse of R
+RETURN:         matrix, a left inverse of R
 PURPOSE: computes a left inverse matrix of R, if it exists
-@*	 if not, it returns the zero matrix
+@*         if not, it returns the zero matrix
 "
-{  
+{
   return (leftInverse(R));
 }
 
 proc rlift(matrix M, matrix N)
-"USAGE:  rlift(M,N), M and N matrices, so that the module, generated by the columns of N 
-@*	 is a submodule of the one, generated by the columns of M
-RETURN:	 matrix, a right lift of N in M
-PURPOSE: computes a right lift matrix X of N in M, 
-@*	 i.e. N=M*X
+"USAGE:  rlift(M,N), M and N matrices, so that the module, generated by the columns of N
+@*         is a submodule of the one, generated by the columns of M
+RETURN:         matrix, a right lift of N in M
+PURPOSE: computes a right lift matrix X of N in M,
+@*         i.e. N=M*X
 "
 {
-  def save = basering;           // with respect to non-commutative rings, 
+  def save = basering;           // with respect to non-commutative rings,
   def saveop = opposite(save);   // we have to change the ring for a rightlift
   setring saveop;
-  matrix Mop = oppose(save,M); 
+  matrix Mop = oppose(save,M);
   matrix Nop = oppose(save,N);
   matrix Bop = lift(Mop,Nop);
   setring save;
@@ -156,11 +157,11 @@ PURPOSE: computes a right lift matrix X of N in M,
 }
 
 proc llift(matrix M, matrix N)
-"USAGE:  llift(M,N), M and N matrices, so that the module, generated by the rows of N 
-@*	 is a submodule of the one, generated by the rows of M
-RETURN:	 matrix, a left lift of N in M
-PURPOSE: computes a left lift matrix X of N in M, 
-@*	 i.e. N=X*M
+"USAGE:  llift(M,N), M and N matrices, so that the module, generated by the rows of N
+@*         is a submodule of the one, generated by the rows of M
+RETURN:         matrix, a left lift of N in M
+PURPOSE: computes a left lift matrix X of N in M,
+@*         i.e. N=X*M
 "
 {
   matrix X=transpose(lift(transpose(M),transpose(N)));
@@ -169,7 +170,7 @@ PURPOSE: computes a left lift matrix X of N in M,
 
 static proc concatz(matrix M, matrix N)
 "USAGE:  concatz(M,N), M and N matrices
-RETURN:	 matrix
+RETURN:         matrix
 PURPOSE: adds the rows of N under the rows of M, i.e. build the matrix (M^Tr,N^Tr)^Tr
 "
 {
@@ -181,14 +182,14 @@ PURPOSE: adds the rows of N under the rows of M, i.e. build the matrix (M^Tr,N^T
 
 proc purityFiltration(matrix R)
 "USAGE:  purityFiltration(S), S matrix with entries of an Auslander regular ring D
-RETURN:	 a list T of two lists, purity filtration of the module M=D^q/D^p(S^t)
-PURPOSE: the first list T[1] gives a filtration {M_i} of M,  
-@*	 where the i-th entry of T[1] gives the representation matrix of M_(i-1).
-@*	 the second list T[2] gives representations of the factor Modules,
-@*	 i.e. T[2][i] gives the repr. matrix for M_(i-1)/M_i
+RETURN:         a list T of two lists, purity filtration of the module M=D^q/D^p(S^t)
+PURPOSE: the first list T[1] gives a filtration {M_i} of M,
+@*         where the i-th entry of T[1] gives the representation matrix of M_(i-1).
+@*         the second list T[2] gives representations of the factor Modules,
+@*         i.e. T[2][i] gives the repr. matrix for M_(i-1)/M_i
 EXAMPLE: example purityFiltration; shows example
 "
-{ 
+{
   int i,j;
   list re=projectiveDimension(R,0);
   list T=re[1];
@@ -215,7 +216,7 @@ EXAMPLE: example purityFiltration; shows example
     kill I;
     for (j=1; j<=i-1; j++)
     {
-      ehm[i-j]=rlift(reres[i][i-j+1],ehm[i-j+1]*reres[i-1][i-j+1]);  
+      ehm[i-j]=rlift(reres[i][i-j+1],ehm[i-j+1]*reres[i-1][i-j+1]);
     }
     F[i]=ehm;
     kill ehm;
@@ -245,7 +246,7 @@ EXAMPLE: example purityFiltration; shows example
     zw[2]=lsyz(zw[1]);
     Rss[i]=llift(zw[1],reres[i][2]);
     Rs[i]=zw;
-    kill zw;  
+    kill zw;
   }
   list Fs;
   for(i=2;i<=di;i++)
@@ -256,7 +257,7 @@ EXAMPLE: example purityFiltration; shows example
   K[1]=transpose(R);
   U[1]=Rs[1][1];
   for(i=2;i<=di;i++)
-  { 
+  {
     K[i]=transpose(std(transpose(concatz(Rss[i-1], Rs[i-1][2]))));
     U[i]=transpose(std(transpose(concatz(concatz(Fs[i],Rss[i-1]),Rs[i-1][2]))));
   }
@@ -287,11 +288,11 @@ example
 
 proc purityTriang(matrix R)
 "USAGE:  purityTriang(S), S matrix with entries of an Auslander regular ring D
-RETURN:	 a matrix T 
+RETURN:         a matrix T
 PURPOSE: compute a triangular block matrix T, such that M=D^p/D^q(S^t) is isomorphic to M'=D^p'/D^q(T^t)
 EXAMPLE: example purityTriang; shows example
 "
-{ 
+{
   int i,j;
   list re=projectiveDimension(R,0);
   list T=re[1];
@@ -318,7 +319,7 @@ EXAMPLE: example purityTriang; shows example
     kill I;
     for (j=1; j<=i-1; j++)
     {
-      ehm[i-j]=rlift(reres[i][i-j+1],ehm[i-j+1]*reres[i-1][i-j+1]);  
+      ehm[i-j]=rlift(reres[i][i-j+1],ehm[i-j+1]*reres[i-1][i-j+1]);
     }
     F[i]=ehm;
     kill ehm;
@@ -332,7 +333,7 @@ EXAMPLE: example purityTriang; shows example
     zw[2]=lsyz(zw[1]);
     Rss[i]=llift(zw[1],reres[i][2]);
     Rs[i]=zw;
-    kill zw;  
+    kill zw;
   }
   list Fs;
   for(i=2;i<=di;i++)
@@ -341,12 +342,12 @@ EXAMPLE: example purityTriang; shows example
   }
 
 
-  int sp; list spnr;                                        
+  int sp; list spnr;
   spnr[1]=ncols(Rs[1][1]);
   for (i=2;i<=di;i++)
     {
       spnr[i]=ncols(Fs[i]);
-    } 
+    }
   spnr[di+1]=ncols(Rss[di]);
   sp=sum(spnr);
 
@@ -356,22 +357,22 @@ EXAMPLE: example purityTriang; shows example
   sumh=ncols(Rs[1][1]);
   kill E;
 
-  for(i=2;i<=di;i++) 
-  { 
-    matrix A; 
+  for(i=2;i<=di;i++)
+  {
+    matrix A;
     matrix B[1][sumh];
     matrix E[nrows(Fs[i])][nrows(Fs[i])]; E=E-1;
 
     A=Fs[i];
     if (i>2)
     {
-      if (iszero(Rss[i-1])==0) 
-      { 
+      if (iszero(Rss[i-1])==0)
+      {
         A=concatz(A,Rss[i-1]);
       }
     }
-    if (iszero(Rs[i-1][2])==0) 
-    { 
+    if (iszero(Rs[i-1][2])==0)
+    {
       A=concatz(A,Rs[i-1][2]);
     }
     A=concat(B,A,E);
@@ -380,10 +381,10 @@ EXAMPLE: example purityTriang; shows example
     kill A,B,E;
   }
 
-  
+
   matrix hi,his;
   matrix N[1][sumh];
-  
+
   if (iszero(Rss[di])==0)
   {
     hi=concat(N,Rss[di]);
@@ -393,25 +394,25 @@ EXAMPLE: example purityTriang; shows example
   {
     his=concat(N,Rs[di][2]);
     if (iszero(hi)==1)
-    { 
+    {
       hi=his;
     }
     if (iszero(hi)==0)
-    { 
+    {
     hi=concatz(hi,his);
     }
   }
-  
+
   kill his;
-  
+
   matrix ges=Z[1];
   for (i=2;i<=di;i++)
-  { 
-    ges = concatz(ges,Z[i]); 
-  }          
-  
-  if (iszero(hi)==0) 
-  { 
+  {
+    ges = concatz(ges,Z[i]);
+  }
+
+  if (iszero(hi)==0)
+  {
     ges=concatz(ges,hi);
   }
 return (ges);
@@ -432,9 +433,9 @@ example
 
 proc gradeNumber(matrix R)
 "USAGE:  gradeNumber(R), R matrix, representing M=D^p/D^q(R^t) over a ring D
-RETURN:	 int, grade number of M
+RETURN:         int, grade number of M
 PURPOSE: computes the grade number of M, i.e. the first i, with ext^i(M,D) !=0
-@*	 returns -1 if M=0
+@*         returns -1 if M=0
 EXAMPLE: example gradeNumber; shows examples
 "
 {
@@ -442,15 +443,15 @@ EXAMPLE: example gradeNumber; shows examples
   if (is_zero(transpose(M))==1)
   {
     return (-1);
-  } 
+  }
   list ext = allExtOfLeft(transpose(M));
   int i=1;
   matrix L=ext[i];
   while (is_zero(transpose(L))==1)
-  { 
+  {
     i=i+1;
     L=ext[i];
-  }  
+  }
   return (i-1);
 }
 example
@@ -478,15 +479,15 @@ example
 }
 
 proc allExtOfLeft(matrix Ps)
-"USAGE:  allExtOfLeft(M), 
-RETURN:	 list, entries are ext-modules
+"USAGE:  allExtOfLeft(M),
+RETURN:         list, entries are ext-modules
 ASSUME: M presents a left module of finite left projective dimension n
 PURPOSE: For a left module presented by M over the basering D,
-@*  	 compute a list T, whose entry T[i+1] is a matrix, presenting the right module Ext^i_D(M,D) for i=0..n
+@*           compute a list T, whose entry T[i+1] is a matrix, presenting the right module Ext^i_D(M,D) for i=0..n
 EXAMPLE: example allExtOfLeft; shows example
 "
-{ 
-  // old doc: ... T[i] gives the repr. matrix of ext^(i-1)(M,D), i=1,.., n+1 
+{
+  // old doc: ... T[i] gives the repr. matrix of ext^(i-1)(M,D), i=1,.., n+1
   list ext, Phi;
   ext[1]=ncHom_R(Ps);
   Phi = mres(Ps,0);
@@ -531,10 +532,10 @@ example
 
 proc allExtOfRight(matrix Ps)
 "USAGE:  allExtOfRight(R), R matrix representing the right Module M=D^q/RD^p over a ring D
-@*  	 M module with finite right projective dimension n
-RETURN:	 list, entries are ext-modules
+@*           M module with finite right projective dimension n
+RETURN:         list, entries are ext-modules
 PURPOSE: computes a list T, which entries are representations of the left modules ext^i(M,D)
-@*	 T[i] gives the repr. matrix of ext^(i-1)(M,D), i=1,..,n+1
+@*         T[i] gives the repr. matrix of ext^(i-1)(M,D), i=1,..,n+1
 EXAMPLE: example allExtOfRight; shows example
 "
 {
@@ -584,11 +585,11 @@ example
 
 static proc rightreso(matrix T)
 "USAGE:  rightreso(T), T matrix representing the right module M=D*/TD*
-RETURN:	 list L, a right resolution of M
+RETURN:         list L, a right resolution of M
 PURPOSE: computes a right resolution of M, using mres
-@*	 the i-th entry of L gives the (i-1)th right syzygy module of M
+@*         the i-th entry of L gives the (i-1)th right syzygy module of M
 "
-{   
+{
   int j;
   matrix M=transpose(T);
   list res;
@@ -605,7 +606,7 @@ PURPOSE: computes a right resolution of M, using mres
     setring save;
     res[j]=transpose(oppose(saveop,zw));
     setring saveop;
-    kill zw;   
+    kill zw;
   }
   setring save;
   kill saveop;
@@ -614,7 +615,7 @@ PURPOSE: computes a right resolution of M, using mres
 
 proc showgrades(list T)
 "USAGE:  showgrades(T), T list, which includes representation matrices of modules
-RETURN:	 list, gradenumbers of the entries in T
+RETURN:         list, gradenumbers of the entries in T
 PURPOSE: computes a list L with L[i]=gradenumber(M), M=D^p/D^qT[i]
 EXAMPLE: example showgrades; shows example
 "
@@ -645,8 +646,8 @@ example
 
 proc doubleExt(matrix R, int i)
 "USAGE:  doubleExt(R,i), R matrix representing the left Module M=D^p/D^q(R^t) over a ring D
-@*	 int i, less or equal the left projective dimension of M
-RETURN:	 matrix P, representing the double ext module
+@*         int i, less or equal the left projective dimension of M
+RETURN:         matrix P, representing the double ext module
 PURPOSE: computes a matrix P, which represents the left module ext^i(ext^i(M,D))
 EXAMPLE: example doubleExt; shows example
 "
@@ -674,9 +675,9 @@ example
 
 proc allDoubleExt(matrix R)
 "USAGE:  allDoubleExt(R), R matrix representing the left Module M=D^p/D^q(R^t) over a ring D
-RETURN:	 list T, double indexed, which include all double-ext modules
+RETURN:         list T, double indexed, which include all double-ext modules
 PURPOSE: computes all double ext-modules
-@*	 T[i][j] gives a representation matrix of ext^(j-1)(ext(i-1)(M,D))
+@*         T[i][j] gives a representation matrix of ext^(j-1)(ext(i-1)(M,D))
 EXAMPLE: example allDoubleExt; shows example
 "
 {
@@ -704,12 +705,12 @@ example
   d1,-d1,-2*d1,0;
   list T=allDoubleExt(transpose(R));
   // left projective dimension of M=coker(R) is 3
-  // ext^i(ext^0(M,D)), i=0,1,2,3  
+  // ext^i(ext^0(M,D)), i=0,1,2,3
   print(T[1][1]);
   print(T[1][2]);
   print(T[1][3]);
   print(T[1][4]);
-  // ext^i(ext^1(M,D)), i=0,1,2,3  
+  // ext^i(ext^1(M,D)), i=0,1,2,3
   print(T[2][1]);
   print(T[2][2]);
   print(T[2][3]);
@@ -728,10 +729,10 @@ example
 
 proc is_pure(matrix R)
 "USAGE:  is_pure(R), R representing the module M=D^p/D^q(R^t)
-RETURN:	 int, 0 or 1
+RETURN:         int, 0 or 1
 PURPOSE: checks pureness of M.
-@*	 returns 1, if M is pure, or 0, if it's not
-@*	 remark: if M is zero, is_pure returns 1
+@*         returns 1, if M is pure, or 0, if it's not
+@*         remark: if M is zero, is_pure returns 1
 EXAMPLE: example is_pure; shows example
 "
 {
@@ -740,16 +741,16 @@ EXAMPLE: example is_pure; shows example
   int di=projectiveDimension(transpose(M),0)[2];
   int i=0;
   while(i<=di)
-  { 
+  {
     if (i!=gr)
     {
       if (  is_zero( doubleExt(transpose(M),i) ) == 0 )
-      { 
+      {
         return (0);
       }
-    } 
+    }
     i=i+1;
-  }  
+  }
   return (1);
 }
 example
@@ -773,10 +774,10 @@ example
 }
 
 proc purelist(list T)
-"USAGE:  purelist(T), T list, in which the i-th entry R=T[i] represents M=D^p/D^q(R^t) 
-RETURN:	 list M, entries of M are 0 or 1
+"USAGE:  purelist(T), T list, in which the i-th entry R=T[i] represents M=D^p/D^q(R^t)
+RETURN:         list M, entries of M are 0 or 1
 PURPOSE: if T[i] is pure, M[i] is 1, else M[i] is 0
-EXAMPLE: example purelist; shows example	 
+EXAMPLE: example purelist; shows example
 "
 {
   int i;
@@ -810,8 +811,8 @@ proc projectiveDimension(matrix T, list #)
 @*       int i, with i=0 or i=1, j a natural number
 RETURN:  list T, a projective resolution of M and its projective dimension
 PURPOSE: if i=0 (and by default), T[1] gives a shortest left resolution of M=D^p/D^q(R^t) and T[2] the left projective dimension of M
-@*	 if i=1, T[1] gives a shortest right resolution of M=D^p/RD^q and T[2] the right projective dimension of M
-@* 	 in both cases T[1][j] is the (j-1)-th syzygy module of M
+@*         if i=1, T[1] gives a shortest right resolution of M=D^p/RD^q and T[2] the right projective dimension of M
+@*          in both cases T[1][j] is the (j-1)-th syzygy module of M
 NOTE: The algorithm is due to A. Quadrat, D. Robertz, Computation of bases of free modules over the Weyl algebras, J.Symb.Comp. 42, 2007.
 EXAMPLE: example projectiveDimension; shows examples
 "
@@ -820,8 +821,8 @@ EXAMPLE: example projectiveDimension; shows examples
   if (size(#) >0)
   {
     i = int(#[1]);
-    if ( (i!=0) and (i!=1) ) 
-    { 
+    if ( (i!=0) and (i!=1) )
+    {
       printf("Unaccepted second argument. Use 0 to get a left resolution, 1 for a right one.");
     }
   }
@@ -846,7 +847,7 @@ EXAMPLE: example projectiveDimension; shows examples
       setring save;
       res[j]=transpose(oppose(saveop,zw));
       setring saveop;
-      kill zw;   
+      kill zw;
     }
     setring save;
     list Y;
@@ -867,7 +868,7 @@ example
   z,-6*x,-2*y-5*x,-1,
   0,y-x,y-x,0,
   y,-x,-y-x,0,
-  x,-x,-2*x,0;  
+  x,-x,-2*x,0;
   // compute a left resolution of M=D^4/D^6*R
   list T=projectiveDimension(transpose(R),0);
   // so we have the left projective dimension
@@ -891,7 +892,7 @@ example
   T[2];
   list T1=projectiveDimension(R,1);
   // both modules have the same projective dimension, but different resolutions, because D is non-commutative
-  print(T[1][1]); 
+  print(T[1][1]);
   // not the same as
   print(transpose(T1[1][1]));
 }
@@ -900,17 +901,17 @@ static proc prodim(matrix M)
 "USAGE:  prodim(R), R matrix representing the Modul M=coker(R)
 RETURN:  list T, a left projective resolution of M and its left projective dimension
 PURPOSE: T[1] gives a shortest left resolution of M and T[2] the left projective dimension of M
-@*	 it is T[1][j] the (j-1)-th syzygy module of M
+@*         it is T[1][j] the (j-1)-th syzygy module of M
 "
-{ 
+{
   matrix T=transpose(M);
   list R,zw;
   R[1]=T;
-  if (rinv(R[1])==0) 
+  if (rinv(R[1])==0)
   {
     R[2]=transpose(std(transpose(lsyz(R[1]))));
   }
-  else 
+  else
   {
     matrix S[1][ncols(T)];
     R[1]=S;
@@ -924,16 +925,16 @@ PURPOSE: T[1] gives a shortest left resolution of M and T[2] the left projective
     zw[2]=1;
     return (zw);
   }
-  int i=1; 
+  int i=1;
   matrix N;
   while (iszero(R[i+1])==0)
-  { 
+  {
     i=i+1;
     N=rinv(R[i]);
     if (iszero(N)==0)
-    { 
+    {
       if (i==2)
-      { 
+      {
         R[i-1]=concat(R[i-1],N);
         matrix K[1][nrows(R[1])];
         R[2]=K;
@@ -949,12 +950,12 @@ PURPOSE: T[1] gives a shortest left resolution of M and T[2] the left projective
         R[i]=0;
         zw[1]=R;
         zw[2]=i-1;
-        return(zw); 
-      }             
+        return(zw);
+      }
     }
     R[i+1]=transpose(std(transpose(lsyz(R[i]))));
   }
   zw[1]=R;
   zw[2]=i;
-  return (zw);  
+  return (zw);
 }
