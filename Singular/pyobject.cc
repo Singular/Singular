@@ -700,7 +700,7 @@ blackbox* pyobject_blackbox(int& tok) {
 
 
 #define PYOBJECT_ADD_C_PROC(name) \
-  add_C_proc(currPack->libname, (char*)#name, FALSE, name);
+  add_C_proc((currPack->libname? currPack->libname: ""), (char*)#name, FALSE, name);
 
 typedef  BOOLEAN (*func_type)(leftv, leftv);
 void pyobject_init(int (*add_C_proc)(const char*, const char*, BOOLEAN,
