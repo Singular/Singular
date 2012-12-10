@@ -3052,6 +3052,7 @@ EXAMPLE: example charVariety; shows examples
   list L = RL[3];
   L = insert(L,list("a",uv));
   RL[3] = L;
+  // TODO printlevel
   def Ra = ring(RL);
   setring Ra;
   dbprint(ppl,"// Starting Groebner basis computation...");
@@ -3066,7 +3067,7 @@ EXAMPLE: example charVariety; shows examples
   setring newR;
   ideal charVar = imap(Ra,I);
   charVar = inForm(charVar,uv);
-  charVar = groebner(charVar);
+  // charVar = groebner(charVar);
   export(charVar);
   setring save;
   return(newR);
@@ -3083,7 +3084,7 @@ example
   def CA = charVariety(LD);
   setring CA; CA; // commutative ring
   charVar;
-  dim(charVar);   // hence I is holonomic
+  dim(std(charVar));   // hence I is holonomic
 }
 
 proc charInfo(ideal I)
