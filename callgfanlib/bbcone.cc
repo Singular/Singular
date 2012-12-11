@@ -339,7 +339,8 @@ static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
   gfan::ZMatrix* zm1 = bigintmatToZMatrix(ineq);
   gfan::ZMatrix* zm2 = bigintmatToZMatrix(eq);
   gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
-  delete zm1, zm2;
+  delete zm1;
+  delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete ineq;
   if (v->Typ() == INTMAT_CMD)
@@ -388,7 +389,8 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   gfan::ZMatrix* zm1 = bigintmatToZMatrix(ineq);
   gfan::ZMatrix* zm2 = bigintmatToZMatrix(eq);
   gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
-  delete zm1, zm2;
+  delete zm1;
+  delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete ineq;
   if (v->Typ() == INTMAT_CMD)
@@ -485,7 +487,8 @@ static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
   res->rtyp = coneID;
   res->data = (void*) zc;
 
-  delete zm1, zm2;
+  delete zm1;
+  delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete rays;
   if (v->Typ() == INTMAT_CMD)
@@ -543,7 +546,8 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
   res->rtyp = coneID;
   res->data = (void*) zc;
 
-  delete zm1, zm2;
+  delete zm1; 
+  delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete rays;
   if (v->Typ() == INTMAT_CMD)
