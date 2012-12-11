@@ -75,7 +75,8 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
   }
   else
   {
-    delete eta, v;
+    delete eta;
+    delete v;
   }
   
   /* these are the cases i=1,...,r-2 */
@@ -107,7 +108,9 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
     }
     else
     {
-      delete eta, v, w;
+      delete eta;
+      delete v;
+      delete w;
     }
   }
   
@@ -138,7 +141,8 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
   }
   else
   {
-    delete eta, v;
+    delete eta;
+    delete v;
   }
 
   if (index==-1)
@@ -271,7 +275,7 @@ static void mergeListsOfFacets(lists &ul, lists &vl)
     }
     cache0 = NULL;
   }
-  
+
   /***
    * In case the resulting merged list is empty,
    * we are finished now.
@@ -283,6 +287,8 @@ static void mergeListsOfFacets(lists &ul, lists &vl)
     ul->nr = -1;
     ul->Clean();
     ul = NULL;
+    delete entriesOfUlToBeFilled; 
+    delete entriesOfVlToBePreserved;
     return;
   }
   
@@ -343,7 +349,9 @@ static void mergeListsOfFacets(lists &ul, lists &vl)
   vl->nr = -1;
   vl->Clean();
   
-  delete entriesOfUlToBeFilled, entriesOfVlToBePreserved;
+  delete entriesOfUlToBeFilled;
+  delete entriesOfVlToBePreserved;
+  return;
 }
 
 BOOLEAN refineCones(leftv res, leftv args)
@@ -360,7 +368,8 @@ BOOLEAN refineCones(leftv res, leftv args)
       gfan::ZMatrix* zm = bigintmatToZMatrix(bim1);
       gfan::ZCone* support = new gfan::ZCone;
       *support = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
-      delete bim1, zm;
+      delete bim1;
+      delete zm;
 
       /***
        * Randomly compute a first full-dimensional cone and insert it into the fan.

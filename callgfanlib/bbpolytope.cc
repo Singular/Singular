@@ -255,7 +255,8 @@ static BOOLEAN ppCONENORMALS2(leftv res, leftv u, leftv v)
   gfan::ZMatrix* zm1 = bigintmatToZMatrix(ineq);
   gfan::ZMatrix* zm2 = bigintmatToZMatrix(eq);
   gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2);
-  delete zm1, zm2;
+  delete zm1;
+  delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete ineq;
   if (v->Typ() == INTMAT_CMD)
@@ -306,7 +307,8 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   gfan::ZMatrix* zm1 = bigintmatToZMatrix(ineq);
   gfan::ZMatrix* zm2 = bigintmatToZMatrix(eq);
   gfan::ZCone* zc = new gfan::ZCone(*zm1, *zm2, k);
-  delete zm1, zm2;
+  delete zm1;
+  delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete ineq;
   if (v->Typ() == INTMAT_CMD)
