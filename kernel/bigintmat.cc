@@ -312,6 +312,82 @@ char* bigintmat::String()
   return StringAppendS("");
 }
 
+char* bigintmat::StringAsPrinted()
+{
+  if ((col==0) || (row==0))
+    return 0;
+  int * colwid = getwid(80);
+  if (colwid == NULL)
+  {
+    WerrorS("not enough space to print bigintmat");
+    WerrorS("try string(...) for a unformatted output");
+    return 0;
+  }
+  char * ps;
+  int slength = 0;
+  for (int j=0; j<col; j++)
+    slength += colwid[j]*row;
+  slength += 2*(col-1)*row+2*row-1;
+  ps = (char*) omAlloc0(sizeof(char)*(slength));
+  int pos = 0;
+  for (int i=0; i<col*row; i++)
+  {
+    StringSetS("");
+    nlWrite(v[i], NULL);
+    char * temp = StringAppendS("");
+    char * ts = omStrDup(temp);
+    int nl = strlen(ts);
+    int cj = i%col;
+    if (nl > colwid[cj])
+    {
+      StringSetS("");
+      int ci = floor(i/col);
+      StringAppend("[%d,%d]", ci+1, cj+1);
+      char *tmp = StringAppendS("");
+      char * ph = omStrDup(tmp);
+      int phl = strlen(ph);
+      if (phl > colwid[cj])
+      {
+        for (int j=0; j<colwid[cj]; j++)
+          ps[pos+j] = '*';
+      }
+      else
+      {
+        for (int j=0; j<colwid[cj]-phl; j++)
+          ps[pos+j] = ' ';
+        for (int j=0; j<phl; j++)
+          ps[pos+colwid[cj]-phl+j] = ph[j];
+      }
+      omFree(ph);
+    }
+    else  // Mit Leerzeichen auffüllen und zahl reinschreiben
+    {
+      for (int j=0; j<colwid[cj]-nl; j++)
+        ps[pos+j] = ' ';
+      for (int j=0; j<nl; j++)
+        ps[pos+colwid[cj]-nl+j] = ts[j];
+    }
+    // ", " oder "\n" einfügen
+    if ((i+1)%col == 0)
+    {
+      if (i != col*row-1)
+      {
+        ps[pos+colwid[cj]] = ',';
+        ps[pos+colwid[cj]+1] = '\n';
+        pos += colwid[cj]+2;
+      }
+    }
+    else
+    {
+      ps[pos+colwid[cj]] = ',';
+      ps[pos+colwid[cj]+1] = ' ';
+      pos += colwid[cj]+2;
+    }
+    omFree(ts);
+  }
+  return ps;
+}
+
 int intArrSum(int * a, int length)
 {
   int sum = 0;
@@ -404,13 +480,14 @@ void bigintmat::pprint(int maxwid)
     if (colwid == NULL)
     {
       WerrorS("not enough space to print bigintmat");
+      WerrorS("try string(...) for a unformatted output");
       return;
     }
     char * ps;
     int slength = 0;
     for (int j=0; j<col; j++)
       slength += colwid[j]*row;
-    slength += 2*(col-1)*row+row;
+    slength += 2*(col-1)*row+2*row;
     ps = (char*) omAlloc0(sizeof(char)*(slength));
     int pos = 0;
     for (int i=0; i<col*row; i++)
@@ -455,8 +532,9 @@ void bigintmat::pprint(int maxwid)
       {
         if (i != col*row-1)
         {
-          ps[pos+colwid[cj]] = '\n';
-          pos += colwid[cj]+1;
+          ps[pos+colwid[cj]] = ',';
+          ps[pos+colwid[cj]+1] = '\n';
+          pos += colwid[cj]+2;
         }
       }
       else

@@ -15,6 +15,9 @@ bbfan.o: bbfan.cc
 bbpolytope.o: bbpolytope.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o bbpolytope.o -c bbpolytope.cc
 
+gitfan.o: gitfan.cc
+	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gitfan.o -c gitfan.cc
+
 gfanlib.o: gfanlib.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gfanlib.o -c gfanlib.cc
 
@@ -22,10 +25,10 @@ gfan.o: gfan.cc
 	$(CXX) ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o gfan.o -c gfan.cc
 
 gfanlib.so:
-	$(CXX) -shared -o gfanlib.so bbcone.o bbfan.o bbpolytope.o gfanlib.o gfan.o ../gfanlib/*.o -L/usr/local/lib -lcddgmp -lgmpxx 
+	$(CXX) -shared -o gfanlib.so bbcone.o bbfan.o bbpolytope.o gitfan.o gfanlib.o gfan.o ../gfanlib/*.o -L/usr/local/lib -lcddgmp -lgmpxx 
 	cp gfanlib.so ../Singular/gfanlib.so
 
-libcallgfan.a: bbcone.o bbfan.o bbpolytope.o  gfanlib.o gfan.o
+libcallgfan.a: bbcone.o bbfan.o bbpolytope.o gitfan.o gfanlib.o gfan.o
 	ar cr $@ $^
 
 install: libcallgfan.a

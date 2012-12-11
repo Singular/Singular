@@ -20,9 +20,9 @@
 
 int fanID;
 
-void *bbfan_Init(blackbox *b)
+void* bbfan_Init(blackbox *b)
 {
-  return (void*)(new gfan::ZFan(0));
+  return (void*) new gfan::ZFan(0);
 }
 
 void bbfan_destroy(blackbox *b, void *d)
@@ -34,7 +34,7 @@ void bbfan_destroy(blackbox *b, void *d)
   }
 }
 
-char * bbfan_String(blackbox *b, void *d)
+char* bbfan_String(blackbox *b, void *d)
 {
   if (d==NULL) return omStrDup("invalid object");
   else
@@ -45,7 +45,7 @@ char * bbfan_String(blackbox *b, void *d)
   }
 }
 
-void * bbfan_Copy(blackbox*b, void *d)
+void* bbfan_Copy(blackbox*b, void *d)
 {
   gfan::ZFan* zf = (gfan::ZFan*)d;
   gfan::ZFan* newZf = new gfan::ZFan(*zf);
@@ -59,7 +59,7 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
   {
     if (l->Data()!=NULL)
     {
-      gfan::ZFan* zd = (gfan::ZFan*)l->Data();
+      gfan::ZFan* zd = (gfan::ZFan*) l->Data();
       delete zd;
     }
     newZf = new gfan::ZFan(0);
@@ -68,15 +68,15 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
   {
     if (l->Data()!=NULL)
     {
-      gfan::ZFan* zd = (gfan::ZFan*)l->Data();
+      gfan::ZFan* zd = (gfan::ZFan*) l->Data();
       delete zd;
     }
-    gfan::ZFan* zf = (gfan::ZFan*)r->Data();
+    gfan::ZFan* zf = (gfan::ZFan*) r->Data();
     newZf = new gfan::ZFan(*zf);
   }
   else if (r->Typ()==INT_CMD)
   {
-    int ambientDim = (int)(long)r->Data();
+    int ambientDim = (int) (long) r->Data();
     if (ambientDim < 0)
     {
       Werror("expected an int >= 0, but got %d", ambientDim);
@@ -84,7 +84,7 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
     }
     if (l->Data()!=NULL)
     {
-      gfan::ZFan* zd = (gfan::ZFan*)l->Data();
+      gfan::ZFan* zd = (gfan::ZFan*) l->Data();
       delete zd;
     }
     newZf = new gfan::ZFan(ambientDim);
@@ -97,11 +97,11 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
 
   if (l->rtyp==IDHDL)
   {
-    IDDATA((idhdl)l->data)=(char *)newZf;
+    IDDATA((idhdl)l->data) = (char*) newZf;
   }
   else
   {
-    l->data=(void *)newZf;
+    l->data = (void*) newZf;
   }
   return FALSE;
 }
@@ -111,22 +111,22 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
    bigintmat; 0 otherwise */
 static gfan::IntMatrix permutationIntMatrix(const bigintmat* iv)
 {
-        int cc = iv->cols();
-        int rr = iv->rows();
-        bigintmat* ivCopy = new bigintmat(rr, cc);
-        for (int r = 1; r <= rr; r++)
-          for (int c = 1; c <= cc; c++)
-	  {
-	    number temp1 = nlInit(1,NULL);
-	    number temp2 = nlSub(IMATELEM(*iv, r, c),temp1);
-	    ivCopy->set(r,c,temp2);
-	    nlDelete(&temp1,NULL); 
-	    nlDelete(&temp2,NULL);
-	  }
-        gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
-        gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(*zm));
-        delete zm;
-        return *im;
+  int cc = iv->cols();
+  int rr = iv->rows();
+  bigintmat* ivCopy = new bigintmat(rr, cc);
+  for (int r = 1; r <= rr; r++)
+    for (int c = 1; c <= cc; c++)
+    {
+      number temp1 = nlInit(1,NULL);
+      number temp2 = nlSub(IMATELEM(*iv, r, c),temp1);
+      ivCopy->set(r,c,temp2);
+      nlDelete(&temp1,NULL); 
+      nlDelete(&temp2,NULL);
+    }
+  gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
+  gfan::IntMatrix im = gfan::IntMatrix(gfan::ZToIntMatrix(*zm));
+  delete zm;
+  return im;
 }
 static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
 {
@@ -137,7 +137,7 @@ static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
     return TRUE;
   }
   res->rtyp = fanID;
-  res->data = (char*)(new gfan::ZFan(ambientDim));
+  res->data = (void*)(new gfan::ZFan(ambientDim));
   return FALSE;
 }
 
@@ -154,7 +154,7 @@ static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
   gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
   sg.computeClosure(im);
   res->rtyp = fanID;
-  res->data = (char*)(new gfan::ZFan(sg));
+  res->data = (void*)(new gfan::ZFan(sg));
   return FALSE;
 }
 
@@ -164,7 +164,7 @@ BOOLEAN emptyFan(leftv res, leftv args)
   if (u == NULL)
   {
     res->rtyp = fanID;
-    res->data = (void*)(new gfan::ZFan(0));
+    res->data = (void*) new gfan::ZFan(0);
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == INT_CMD))
@@ -189,7 +189,7 @@ static BOOLEAN jjFANFULL_I(leftv res, leftv v)
   }
   gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(ambientDim));
   res->rtyp = fanID;
-  res->data = (char*)zf;
+  res->data = (void*) zf;
   return FALSE;
 }
 static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
@@ -206,35 +206,23 @@ static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
   sg.computeClosure(im);
   gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(sg));
   res->rtyp = fanID;
-  res->data = (char*)zf;
+  res->data = (void*) zf;
   return FALSE;
 }
 
 BOOLEAN fullFan(leftv res, leftv args)
 {
-  /*  {
-    gfan::ZFan f(2);
-    std::cout<<f.toString();
-    f.insert(gfan::ZCone::positiveOrthant(2));
-    std::cout<<f.toString();
-    }*/
-
-
   leftv u = args;
   if (u == NULL)
   {
     res->rtyp = fanID;
-    res->data = (void*)(new gfan::ZFan(0));
+    res->data = (void*) new gfan::ZFan(0);
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == INT_CMD))
-  {
     if (u->next == NULL) return jjFANFULL_I(res, u);
-  }
   if ((u != NULL) && (u->Typ() == BIGINTMAT_CMD))
-  {
     if (u->next == NULL) return jjFANFULL_IM(res, u);
-  }
   WerrorS("fullFan: unexpected parameters");
   return TRUE;
 }
@@ -263,43 +251,45 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
     {
-      leftv v=u->next;
-      if ((v != NULL) && (v->Typ() == INT_CMD))
+      leftv w=v->next;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+      {
+        leftv x=w->next;
+        if ((x != NULL) && (x->Typ() == INT_CMD))
         {
-          leftv w=v->next;
-          if ((w != NULL) && (w->Typ() == INT_CMD))
+          gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+          int d = (int)(long)v->Data();
+          int o = (int)(long)w->Data();
+          int m = (int)(long)x->Data();
+          if ( (0<=d) && (d <= zf->getAmbientDimension()) 
+                      && ((o == 0) || (o == 1)) 
+                      && ((m == 0) || (m == 1)))
+          {
+            bool oo = (bool) o;
+            bool mm = (bool) m;
+            int ld = zf->getLinealityDimension();
+            if (d-ld>=0)
             {
-              leftv x=w->next;
-              if ((x != NULL) && (x->Typ() == INT_CMD))
-                {
-                  gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-                  int d = (int)(long)v->Data();
-                  int o = (int)(long)w->Data();
-                  int m = (int)(long)x->Data();
-                  if ( (0<=d) && (d <= zf->getAmbientDimension()) && ((o == 0) || (o == 1)) && ((m == 0) || (m == 1)))
-                    {
-                      bool oo = (bool) o;
-                      bool mm = (bool) m;
-                      int ld = zf->getLinealityDimension();
-                      if (d-ld>=0)
-                      {
-                        int n = zf->numberOfConesOfDimension(d,oo,mm);
-                        res->rtyp = INT_CMD;
-                        res->data = (void*) n;
-                        return FALSE;
-                      }
-                      else
-                      {
-                        res->rtyp = INT_CMD;
-                        res->data = (char*) 0;
-                        return FALSE;
-                      }
-                    }
-                }
+              int n = zf->numberOfConesOfDimension(d,oo,mm);
+              res->rtyp = INT_CMD;
+              res->data = (void*) (long) n;
+              return FALSE;
             }
+            else
+            {
+              res->rtyp = INT_CMD;
+              res->data = (void*) (long) 0;
+              return FALSE;
+            }
+          }
         }
+      }
     }
+  }
   WerrorS("numberOfConesOfDimension: unexpected parameters");
   return TRUE;
 }
@@ -317,7 +307,7 @@ BOOLEAN ncones(leftv res, leftv args)
         { n = n + zf->numberOfConesOfDimension(i,0,0); }
 
       res->rtyp = INT_CMD;
-      res->data = (char*) n;
+      res->data = (void*) (long) n;
       return FALSE;
     }
   else
@@ -339,7 +329,7 @@ BOOLEAN nmaxcones(leftv res, leftv args)
         { n = n + zf->numberOfConesOfDimension(d,0,1); }
 
       res->rtyp = INT_CMD;
-      res->data = (char*) n;
+      res->data = (void*) (long) n;
       return FALSE;
     }
   else
@@ -349,7 +339,7 @@ BOOLEAN nmaxcones(leftv res, leftv args)
     }
 }
 
-bool iscompatible(gfan::ZFan* zf, gfan::ZCone* zc)
+bool isCompatible(gfan::ZFan* zf, gfan::ZCone* zc)
 {
   bool b = (zf->getAmbientDimension() == zc->ambientDimension());
   if(b)
@@ -378,13 +368,12 @@ BOOLEAN isCompatible(leftv res, leftv args)
     {
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
-      bool b = iscompatible(zf,zc);
-      int bb = (int) b;
+      int b = isCompatible(zf,zc);
       res->rtyp = INT_CMD;
-      res->data = (char*) bb;
+      res->data = (void*) (long) b;
       return FALSE;
-      }
     }
+  }
   WerrorS("isCompatible: unexpected parameters");
   return TRUE;
 }
@@ -408,7 +397,7 @@ BOOLEAN insertCone(leftv res, leftv args)
 
       if (n != 0)
       {
-        if (!iscompatible(zf,zc))
+        if (!isCompatible(zf,zc))
         {          
           WerrorS("insertCone: cone and fan not compatible");
           return TRUE;
@@ -418,7 +407,7 @@ BOOLEAN insertCone(leftv res, leftv args)
       zf->insert(*zc);
       res->rtyp = NONE;
       res->data = NULL;
-      IDDATA((idhdl)u->data)=(char *)zf;
+      IDDATA((idhdl)u->data) = (char*) zf;
       return FALSE;
     }
   }
@@ -431,24 +420,22 @@ BOOLEAN insertCone(leftv res, leftv args)
 
 bool containsInCollection(gfan::ZFan* zf, gfan::ZCone* zc)
 {
-  if((zf->getAmbientDimension() == zc->ambientDimension()))
+  gfan::ZVector zv=zc->getRelativeInteriorPoint();
+  for (int d=0; d<=zf->getAmbientDimension(); d++)
   {
-    gfan::ZVector zv=zc->getRelativeInteriorPoint();
-    for (int d=0; d<=zf->getAmbientDimension(); d++)
+    for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
     {
-      for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
+      gfan::ZCone zd = zf->getCone(d,i,0,1);
+      zd.canonicalize();
+      if (zd.containsRelatively(zv))
       {
-        gfan::ZCone zd = zf->getCone(d,i,0,1);
-        zd.canonicalize();
-        if (zd.containsRelatively(zv))
-        {
-          gfan::ZCone temp = *zc;
-          temp.canonicalize();
-          return (!(zd != temp));
-        }
+        gfan::ZCone temp = *zc;
+        temp.canonicalize();
+        return (!(zd != temp));
       }
     }
   }
+  return 0;
 }
 
 BOOLEAN containsInCollection(leftv res, leftv args)
@@ -461,9 +448,14 @@ BOOLEAN containsInCollection(leftv res, leftv args)
     {
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) containsInCollection(zf,zc);
-      return FALSE;
+      if((zf->getAmbientDimension() == zc->ambientDimension()))
+      {
+        res->rtyp = INT_CMD;
+        res->data = (void*) (long) (int) containsInCollection(zf,zc);
+        return FALSE;
+      }
+      WerrorS("containsInCollection: mismatching ambient dimensions");
+      return TRUE;
     }
   }
   // if ((u != NULL) && (u->Typ() == coneID))
@@ -474,7 +466,7 @@ BOOLEAN containsInCollection(leftv res, leftv args)
   //     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   //     gfan::ZCone* zd = (gfan::ZCone*)v->Data();
   //     res->rtyp = INT_CMD;
-  //     res->data = (char*) (int) hasFace(zc,zd);
+  //     res->data = (void*) (int) hasFace(zc,zd);
   //     return FALSE;
   //   }
   // }
@@ -525,7 +517,7 @@ BOOLEAN removeCone(leftv res, leftv args)
       zf->remove(*zc);
       res->rtyp = NONE;
       res->data = NULL;
-      IDDATA((idhdl)u->data)=(char *)zf;
+      IDDATA((idhdl)u->data) = (char*) zf;
       return FALSE;
     }
   }
@@ -575,7 +567,7 @@ BOOLEAN getCone(leftv res, leftv args)
               {
                 gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
                 res->rtyp = coneID;
-                res->data = (char*)new gfan::ZCone(zc);
+                res->data = (void*)new gfan::ZCone(zc);
                 return FALSE;
               }
               else
@@ -653,7 +645,7 @@ BOOLEAN getCones(leftv res, leftv args)
               L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(zc);
             }
             res->rtyp = LIST_CMD;
-            res->data = (char*) L;
+            res->data = (void*) L;
             return FALSE;
           }
           else
@@ -682,27 +674,10 @@ BOOLEAN getCones(leftv res, leftv args)
   }
 }
 
-BOOLEAN isSimplicial(leftv res, leftv args)
+int isSimplicial(gfan::ZFan* zf)
 {
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == fanID))
-  {
-    gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-    bool b=zf->isSimplicial();
-    res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
-    return FALSE;
-  }
-  if ((u != NULL) && (u->Typ() == coneID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
-      int b = isSimplicial(zc);
-      res->rtyp = INT_CMD;
-      res->data = (char*) b;
-      return FALSE;
-    }
-  WerrorS("isSimplicial: unexpected parameters");
-  return TRUE;
+  int i = zf->isSimplicial() ? 1 : 0;
+  return i;
 }
 
 BOOLEAN isPure(leftv res, leftv args)
@@ -711,9 +686,9 @@ BOOLEAN isPure(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == fanID))
   {
     gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-    bool b=zf->isPure();
+    int b = zf->isPure();
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (void*) (long) b;
     return FALSE;
   }
   WerrorS("isPure: unexpected parameters");
@@ -724,13 +699,13 @@ BOOLEAN isComplete(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-      bool b=zf->isComplete();
-      res->rtyp = INT_CMD;
-      res->data = (char*) (int) b;
-      return FALSE;
-    }
+  {
+    gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+    int b = zf->isComplete();
+    res->rtyp = INT_CMD;
+    res->data = (void*) (long) b;
+    return FALSE;
+  }
   WerrorS("isComplete: unexpected parameters");
   return TRUE;
 }
@@ -739,13 +714,13 @@ BOOLEAN fVector(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-      gfan::ZVector zv=zf->getFVector();
-      res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) zVectorToBigintmat(zv);
-      return FALSE;
-    }
+  {
+    gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+    gfan::ZVector zv=zf->getFVector();
+    res->rtyp = BIGINTMAT_CMD;
+    res->data = (void*) zVectorToBigintmat(zv);
+    return FALSE;
+  }
   WerrorS("fVector: unexpected parameters");
   return TRUE;
 }
@@ -799,7 +774,7 @@ BOOLEAN numberOfConesWithVector(leftv res, leftv args)
       int count = numberOfConesWithVector(zf, v1);
       delete v1;
       res->rtyp = INT_CMD;
-      res->data = (void*) count;
+      res->data = (void*) (long) count;
       return FALSE;
     }
   }
@@ -897,257 +872,6 @@ BOOLEAN fanViaCones(leftv res, leftv args)
   return TRUE;
 }
 
-static gfan::ZCone subcone(const lists cones, const gfan::ZVector point)
-{
-  gfan::ZCone sigma = gfan::ZCone(gfan::ZMatrix(1,point.size()), gfan::ZMatrix(1,point.size()));
-  gfan::ZCone* zc;
-  for (int i=0; i<=lSize(cones); i++)
-  {
-    zc = (gfan::ZCone*) cones->m[i].Data();
-    if (zc->contains(point))
-      sigma = gfan::intersection(sigma,*zc);
-  }
-  return(sigma);
-}
-
-static gfan::ZVector randomPoint(const gfan::ZCone &zc)
-{
-  gfan::ZMatrix rays = zc.extremeRays();
-  gfan::ZVector rp = gfan::ZVector(zc.ambientDimension());
-  for (int i=0; i<rays.getHeight(); i++)
-  {
-    rp = rp + siRand() * rays[i];
-  }
-  return rp;
-}
-
-static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &bound)
-{
-  gfan::ZMatrix inequalities = zc.getFacets();
-  gfan::ZMatrix equations = zc.getImpliedEquations();
-  lists L = (lists) omAllocBin(slists_bin);
-  int r = inequalities.getHeight();
-  int c = inequalities.getWidth();
-  L->Init(r);
-
-  int index = -1;
-  /* next we iterate over each of the r facets, build the respective cone and add it to the list */
-  /* this is the i=0 case */
-  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
-  gfan::ZMatrix newEquations = equations; 
-  newEquations.appendRow(inequalities[0]);
-
-  gfan::ZCone* eta = new gfan::ZCone(newInequalities,newEquations,3);
-
-  gfan::ZVector v = eta->getRelativeInteriorPoint();
-  if (bound.containsRelatively(v))
-  {    
-    index++;
-    L->m[index].rtyp = coneID; 
-    L->m[index].data = (void*) eta;
-  }
-  
-  /* these are the cases i=1,...,r-2 */
-  for (int i=1; i<r-1; i++)
-  {
-    newInequalities = inequalities.submatrix(0,0,i,c);
-    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
-    newEquations = equations;
-    newEquations.appendRow(inequalities[i]);
-    eta = new gfan::ZCone(newInequalities,newEquations,3);
-
-    v = eta->getRelativeInteriorPoint();
-    if (bound.containsRelatively(v))
-    {    
-      index++;
-      L->m[index].rtyp = coneID; 
-      L->m[index].data = (void*) eta;
-    }
-  }
-  
-  /* this is the i=r-1 case */
-  newInequalities = inequalities.submatrix(0,0,r-1,c);
-  newEquations = equations;
-  newEquations.appendRow(inequalities[r-1]);
-  eta = new gfan::ZCone(newInequalities,newEquations,3);
-
-  v = eta->getRelativeInteriorPoint();
-  if (bound.containsRelatively(v))
-  {    
-    index++;
-    L->m[index].rtyp = coneID; 
-    L->m[index].data = (void*) eta;
-  }
-
-  if (index==-1)
-  {
-    L->m[0].rtyp = INT_CMD;
-    L->m[0].data = (void*) (int) 0;
-    return L;
-  }
-  if (index!=L->nr)
-  {
-    L->m=(leftv)omRealloc(L->m,(index+1)*sizeof(sleftv));
-    L->nr=index;
-  }
-  return L;
-}
-
-/***
- * delete last entry of ul and append all entries of vl
- **/
-static lists deleteLastAndConcatLists(lists ul, lists vl)
-{
-  int ur = ul->nr;
-  int vr = vl->nr;
-
-  lists l = (lists) omAllocBin(slists_bin);
-  l->Init(ur+vr+1);
-  
-  if (ur > 0)
-  {
-    for(int i=0; i<ur; i++)
-    {
-      l->m[i].rtyp=ul->m[i].rtyp;
-      l->m[i].data=ul->m[i].data;
-    }
-    for(int i=0; i<=vr; i++)
-    {
-      l->m[i+ur].rtyp=vl->m[i].rtyp;
-      l->m[i+ur].data=vl->m[i].data;
-    }
-    if (ul->m != NULL)
-    {
-      ul->m[ur].CleanUp();
-      omFreeSize((ADDRESS)ul->m,(ur+1)*sizeof(sleftv));
-    }
-    omFreeBin((ADDRESS)ul, slists_bin);
-    if (vl->m != NULL)
-      omFreeSize((ADDRESS)vl->m,(vr+1)*sizeof(sleftv));
-    omFreeBin((ADDRESS)vl, slists_bin);
-  }
-  else
-  {
-    for(int i=0; i<=vr; i++)
-    {
-      l->m[i].rtyp=vl->m[i].rtyp;
-      l->m[i].data=vl->m[i].data;
-    }
-    ul->Clean();
-    if (vl->m != NULL)
-      omFreeSize((ADDRESS)vl->m,(vr+1)*sizeof(sleftv));
-    omFreeBin((ADDRESS)vl, slists_bin);
-  }
-  return l; 
-}
-
-BOOLEAN refineCones(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == LIST_CMD))
-  {
-    leftv v=u->next;
-    if ((u != NULL) && (v->Typ() == BIGINTMAT_CMD))
-    {
-      lists cones = (lists) u->Data();
-      bigintmat* bim = (bigintmat*) v->Data();
-      bim = bim->transpose();
-      gfan::ZMatrix* zm = bigintmatToZMatrix(bim);
-      gfan::ZCone support = gfan::ZCone::givenByRays(*zm, gfan::ZMatrix(0, zm->getWidth()));
-      delete zm;
-
-      // randomly compute a first full-dimensional cone
-      gfan::ZCone lambda; gfan::ZVector point;
-      do
-      {
-        point = randomPoint(support);
-        lambda = subcone(cones, point);
-      }
-      while (lambda.dimension() < lambda.ambientDimension());
-
-      // insert cone into fan and compute a list of facets to traverse
-      gfan::ZFan* Sigma = new gfan::ZFan(lambda.ambientDimension());
-      Sigma->insert(lambda);
-      lists facets0 = listOfInteriorFacets(lambda, support);
-      if (facets0->m[0].rtyp == INT_CMD)
-      {
-        res->rtyp = fanID;
-        res->data = (void*) Sigma;
-        return FALSE;
-      }
-      int mu = 1000;
-
-      gfan::ZCone* eta; gfan::ZVector facetNormal, interiorPoint;
-      while (facets0->nr > -1)
-      {
-        /* extract a facet to traverse and delete it from the list */ 
-        eta = (gfan::ZCone*) facets0->m[lSize(facets0)].Data();
-        interiorPoint = eta->getRelativeInteriorPoint();
-
-        /* check whether eta needs to be traversed */
-        std::cout << "facets left to check: " << lSize(facets0) << std::endl;
-        if (numberOfConesWithVector(Sigma, &interiorPoint) > 1)
-        {
-          eta = NULL;
-          facets0->m[lSize(facets0)].CleanUp();
-          if (facets0->nr == 0)
-          {
-            facets0->Clean();
-            break;
-          }
-          facets0->m = (leftv)omRealloc(facets0->m,(facets0->nr)*sizeof(sleftv));
-          facets0->nr = facets0->nr - 1;
-        }
-        else
-        {
-          facetNormal = (eta->getImpliedEquations())[0]; // impliedEquations consist only of one row
-
-          /* construct a point, which lies on the other side of the facet, yet still in the support */
-          point = mu * interiorPoint - facetNormal;
-          while (!support.containsRelatively(point))
-          {
-            mu = mu * 10;
-            point = mu * interiorPoint - facetNormal;
-            if (mu > 100000)
-              return TRUE;
-          }
-
-          /* make sure that the cone around the point is maximal and contains eta */
-          lambda = subcone(cones,point);
-
-          while ((lambda.dimension() < lambda.ambientDimension()) && !(lambda.contains(interiorPoint)))
-          {
-            mu = mu * 10;
-            point = mu * interiorPoint - facetNormal;
-            lambda = subcone(cones,point);
-          }
-
-          /* insert cone into Sigma, create a new list of facets */
-          Sigma->insert(lambda);
-
-          lists newFacets = listOfInteriorFacets(lambda, support);
-          if (newFacets->m[0].rtyp == INT_CMD)
-          {
-            facets0 = deleteLastAndConcatLists(facets0, newFacets);
-          }
-          else
-          {
-            /* delete last entry of old list, append the new list to the old, delete new list, */
-            facets0 = deleteLastAndConcatLists(facets0, newFacets);
-          }
-
-          eta = NULL;
-        }
-      }
-      res->rtyp = fanID;
-      res->data = (void*) Sigma;
-      return FALSE;
-    }
-  }
-  WerrorS("refineCones: unexpected parameters");
-  return TRUE;
-}
-
 lists listOfFacets(const gfan::ZCone &zc)
 {
   gfan::ZMatrix inequalities = zc.getFacets();
@@ -1162,7 +886,7 @@ lists listOfFacets(const gfan::ZCone &zc)
   gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
   gfan::ZMatrix newEquations = equations; 
   newEquations.appendRow(inequalities[0]);
-  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations);
   
   /* these are the cases i=1,...,r-2 */
   for (int i=1; i<r-1; i++)
@@ -1171,14 +895,14 @@ lists listOfFacets(const gfan::ZCone &zc)
     newInequalities.append(inequalities.submatrix(i+1,0,r,c));
     newEquations = equations;
     newEquations.appendRow(inequalities[i]);
-    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations);
   }
   
-    /* this is the i=r-1 case */
+  /* this is the i=r-1 case */
   newInequalities = inequalities.submatrix(0,0,r-1,c);
   newEquations = equations;
   newEquations.appendRow(inequalities[r]);
-  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations,3);
+  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations);
 
   return L;
 }
@@ -1191,7 +915,7 @@ BOOLEAN listOfFacets(leftv res, leftv args)
     gfan::ZCone* zc = (gfan::ZCone*) u->Data();
     lists L = listOfFacets(*zc);
     res->rtyp = LIST_CMD;
-    res->data = (char*) L;
+    res->data = (void*) L;
     return FALSE;
   }
   WerrorS("listOfFacets: unexpected parameters");
@@ -1219,7 +943,7 @@ BOOLEAN listOfFacets(leftv res, leftv args)
 //         #define USE_ZFAN
 //     #endif
 //     #ifndef USE_ZFAN
-//     res->rtyp=LIST_CMD; //res->rtyp=coneID; res->data(char*)zcone;
+//     res->rtyp=LIST_CMD; //res->rtyp=coneID; res->data(void*)zcone;
 //     res->data=(lists) grfan(I,heuristic,FALSE);
 //     #else
 //     res->rtyp=fanID;
@@ -1266,6 +990,7 @@ void bbfan_setup()
   // iiAddCproc("","getCodimension",FALSE,getDimension);
   // iiAddCproc("","getDimension",FALSE,getDimension);
   // iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
+  // iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   /********************************************************/
   iiAddCproc("","isCompatible",FALSE,isCompatible);
   iiAddCproc("","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
@@ -1275,7 +1000,6 @@ void bbfan_setup()
   iiAddCproc("","removeCone",FALSE,removeCone);
   iiAddCproc("","getCone",FALSE,getCone);
   iiAddCproc("","getCones",FALSE,getCones);
-  iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   iiAddCproc("","isPure",FALSE,isPure);
   iiAddCproc("","fanFromString",FALSE,fanFromString);
   iiAddCproc("","fanViaCones",FALSE,fanViaCones);
@@ -1283,7 +1007,6 @@ void bbfan_setup()
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);
-  iiAddCproc("","refineCones",FALSE,refineCones);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
