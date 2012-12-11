@@ -695,6 +695,10 @@ BOOLEAN countedref_deserialize(blackbox **b, void **d, si_link f)
 
 void countedref_reference_load()
 {
+  int tok;
+  if (blackboxIsCmd("reference", tok) == ROOT_DECL)
+    return;
+
   blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
   bbx->blackbox_CheckAssign = countedref_CheckAssign;
   bbx->blackbox_destroy = countedref_destroy;
@@ -715,6 +719,10 @@ void countedref_reference_load()
 
 void countedref_shared_load()
 {
+  int tok;
+  if (blackboxIsCmd("shared", tok) == ROOT_DECL)
+    return;
+
   blackbox *bbxshared = (blackbox*)omAlloc0(sizeof(blackbox));
   bbxshared->blackbox_String  = countedref_String;
   bbxshared->blackbox_Print  = countedref_Print;
