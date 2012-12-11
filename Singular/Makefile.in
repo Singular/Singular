@@ -30,7 +30,7 @@ PYTHON_LIBS = @PYTHON_STATIC_LIBS@
 else
 PYTHON_LIBS = @PYTHON_EMBED_LIBS@
 ifeq (${HAVE_PYTHON},1)
-PYOBJECT_MODULE = pyobject.${MODULE_SUFFIX}
+PYOBJECT_MODULE = MOD/pyobject.${MODULE_SUFFIX}
 endif 
 
 endif
@@ -487,8 +487,9 @@ dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
 
 # dynamic module for python bject support
-pyobject.${MODULE_SUFFIX}: pyobject.dl_o
+MOD/pyobject.${MODULE_SUFFIX}: pyobject.dl_o
 	@echo "build dynamic module pyobject..."
+	$(MKINSTALLDIRS) $(srcdir)/MOD 
 	$(CXX) $^ ${PYTHON_MODULE_LDFLAGS} ${SLDFLAGS} ${PYTHON_MODULE_LIBS} ${LD_LIBC} -o $@
 
 src: scanner.cc grammar.h grammar.cc libparse.cc
@@ -554,9 +555,13 @@ install-nolns: all installbin-nolns installslib-nolns
 
 installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
+	${MKINSTALLDIRS} ${bindir}/MOD
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
 	-for file in *.so; do \
 	  ${INSTALL_PROGRAM} $$file ${bindir}; \
+	done
+	-for file in MOD/*.so; do \
+	  ${INSTALL_PROGRAM} $$file ${bindir}/MOD; \
 	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${bindir}
