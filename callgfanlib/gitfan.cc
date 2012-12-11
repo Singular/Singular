@@ -20,7 +20,7 @@
 #include <callgfanlib/bbfan.h>
 
 
-static gfan::ZCone subcone(const lists cones, const gfan::ZVector point)
+static gfan::ZCone subcone(const lists &cones, const gfan::ZVector &point)
 {
   gfan::ZCone sigma = gfan::ZCone(gfan::ZMatrix(1,point.size()), gfan::ZMatrix(1,point.size()));
   gfan::ZCone* zc;
@@ -77,6 +77,7 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
   {
     delete eta;
     delete v;
+    delete w;
   }
   
   /* these are the cases i=1,...,r-2 */
@@ -143,6 +144,7 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
   {
     delete eta;
     delete v;
+    delete w;
   }
 
   if (index==-1)
@@ -162,7 +164,7 @@ static lists listOfInteriorFacets(const gfan::ZCone &zc, const gfan::ZCone &boun
 /***
  * delete the i-th entry of ul
  **/
-static void deleteEntry(lists ul, int i)
+static void deleteEntry(lists &ul, int i)
 {
   lists cache = (lists) ul->m[i].Data();
   gfan::ZVector* v = (gfan::ZVector*) cache->m[1].Data();
@@ -173,8 +175,6 @@ static void deleteEntry(lists ul, int i)
   delete w;
   cache->m[2].rtyp = 0;
   cache->m[2].data = NULL;
-  cache->nr = 0;
-  cache = NULL;
 
   ul->m[i].CleanUp();
 }
@@ -203,7 +203,7 @@ static void gnomeSort(intvec* v)
   }
 }
 
-static int findLastUsableEntry(lists ul, int start)
+static int findLastUsableEntry(lists &ul, int start)
 {
   int i = start;
   while (ul->m[i].data == NULL && i>-1)
@@ -218,7 +218,7 @@ static int findLastUsableEntry(lists ul, int start)
  * The lists ul and vl always contain at least one element.
  * This functions appends vl to ul with the following constraint:
  * Should a facet in vl already exist in ul, then both are to be deleted.
- * The merged list will be stored in ul.
+ * The merged list will be stored in ul and vl will be deleted.
  **/
 static void mergeListsOfFacets(lists &ul, lists &vl)
 {
@@ -346,7 +346,6 @@ static void mergeListsOfFacets(lists &ul, lists &vl)
    * Now we delete of vl which is empty by now,
    * because its elements have either been deleted or moved to ul.
    **/
-  vl->nr = -1;
   vl->Clean();
   
   delete entriesOfUlToBeFilled;
@@ -390,6 +389,8 @@ BOOLEAN refineCones(leftv res, leftv args)
       lambda.canonicalize();
       gfan::ZFan* Sigma = new gfan::ZFan(lambda.ambientDimension());
       Sigma->insert(lambda);
+      int iterationNumber = 1;
+      std::cout << "cones found: " << iterationNumber++ << std::endl;
       lists interiorFacets = listOfInteriorFacets(lambda, *support);
       if (interiorFacets->m[0].rtyp == INT_CMD)
       {
@@ -397,7 +398,7 @@ BOOLEAN refineCones(leftv res, leftv args)
         res->data = (void*) Sigma;
         return FALSE;
       }
-      int mu = 1000; int iterationNumber = 1;
+      int mu = 1000; 
 
       gfan::ZCone* eta; gfan::ZVector* interiorPoint; gfan::ZVector* facetNormal;
       while (interiorFacets->nr > -1)
