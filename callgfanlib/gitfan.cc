@@ -202,7 +202,7 @@ static void gnomeSort(intvec* v)
 static int findLastUsableEntry(lists ul, int start)
 {
   int i = start;
-  while (ul->m[i].data == NULL)
+  while (ul->m[i].data == NULL && i>-1)
   {
     --i;
   }
