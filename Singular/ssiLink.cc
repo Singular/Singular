@@ -765,6 +765,12 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         pid_t pid=fork();
         if (pid==0) /*fork: child*/
         {
+          /* block SIGINT */
+          sigset_t sigint;
+          sigemptyset(&sigint);
+          sigaddset(&sigint, SIGINT);
+          sigprocmask(SIG_BLOCK, &sigint, NULL);
+
           link_list hh=(link_list)ssiToBeClosed->next;
           /* we know: l is the first entry in ssiToBeClosed-list */
           while(hh!=NULL)
