@@ -93,7 +93,7 @@
 #include "silink.h"
 #include "walk.h"
 #include <Singular/newstruct.h>
-
+#include <Singular/pyobject_setup.h>
 
 
 #ifdef HAVE_RINGS
@@ -2946,6 +2946,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        }
        else
 
+  /*==== pyobject (or pyobject*, like pyobject.so) force loading python ===*/
+       if (strncmp(sys_cmd, "pyobject", 8) == 0)
+       {
+         res->rtyp = NONE;
+         return pyobject_ensure();
+       }
+       else
 
   /*==================== DLL =================*/
   #ifdef ix86_Win

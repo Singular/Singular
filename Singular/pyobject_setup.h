@@ -16,6 +16,10 @@
 #ifndef SINGULAR_PYOBJECT_SETUP_H
 #define SINGULAR_PYOBJECT_SETUP_H
 
+/// initialize blackbox support for @c pyobject; functionilty os autoloaded on demand 
 void pyobject_setup();
+
+/// force leading of pyobject functionality
+BOOLEAN pyobject_ensure();
 
 #endif
