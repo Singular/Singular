@@ -38,6 +38,7 @@
 #include <callgfanlib/bbcone.h>
 #include <callgfanlib/bbpolytope.h>
 #include <callgfanlib/bbfan.h>
+#include <callgfanlib/gitfan.h>
 #endif
 
 #ifdef HAVE_FACTORY
@@ -171,6 +172,7 @@ int main(          /* main entry to Singular */
   bbcone_setup();
   bbpolytope_setup();
   bbfan_setup();
+  gitfan_setup();
 #endif /* HAVE_FANS */
   errorreported = 0;
 

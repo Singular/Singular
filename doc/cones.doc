@@ -161,44 +161,74 @@ c;
 @cindex cone related functions
 
 @menu
+* ambientDimension::
 * canonicalizeCone::
+* codimension::
 * coneLink::
 * containsAsFace::
 * containsInSupport::
 * containsPositiveVector::
 * containsRelatively::
-* ambientDimension::
-* codimension::
+* convexHull::
+* convexIntersection::
 * dimension::
 * dualCone::
 * equations::
 * facets::
-* linspace::
+* generatorsOfLinealitySpace::
 * generatorsOfSpan::
+* getLinearForms::
 * getMultiplicity::
-* span::
 * inequalities::
+* isFullSpace::
+* isOrigin::
+* isSimplicial::
 * linealityDimension::
 * linealitySpace::
-* linearForms::
 * negatedCone::
 * quotientLatticeBasis::
+* randomPoint::
 * rays::
 * relativeInteriorPoint::
 * semigroupGenerator::
-* uniquePoint::
-* convexHull::
-* convexIntersection::
-* isFullSpace::
-* isOrigin::
-* isPure::
-* isSimplicial::
 * setLinearForms::
 * setMultiplicity::
+* span::
+* uniquePoint::
 @end menu
 
 @c --------------------------------------
-@node canonicalizeCone,coneLink,,cone related functions
+@node ambientDimension,canonicalizeCone,,cone related functions
+@subsubsection ambientDimension
+@cindex ambientDimension
+
+@table @code
+@item @strong{Syntax:}
+@code{ambientDimension(} cone c @code{)}
+@*@code{ambientDimension(} fan f @code{)}
+@*@code{ambientDimension(} polytope p @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+ambient dimension of the cone;
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaPoints(M1);
+ambientDimension(c1);
+intmat M2[2][3]=
+1,0,0,
+0,1,0;
+cone c2=coneViaPoints(M2);
+ambientDimension(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node canonicalizeCone,codimension,ambientDimension,cone related functions
 @subsubsection canonicalizeCone
 @cindex canonicalizeCone
 
@@ -227,6 +257,34 @@ intmat M[11][3]=
 cone c=coneViaInequalities(M);
 c;
 canonicalizeCone(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node codimension,coneLink,canonicalizeCone,cone related functions
+@subsubsection codimension
+@cindex codimension
+
+@table @code
+@item @strong{Syntax:}
+@code{codimension(} cone c @code{)}
+@code{codimension(} fan f @code{)}
+@code{codimension(} polytope c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+codimension of the cone;
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[1][2]=
+1,0;
+cone c1=coneViaPoints(M1);
+codimension(c1);
+intmat M2[1][2]=
+0,0;
+cone c2=coneViaPoints(M2);
+codimension(c2);
 @c example
 @end smallexample
 @end table
@@ -358,7 +416,7 @@ containsPositiveVector(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node containsRelatively,ambientDimension,containsPositiveVector,cone related functions
+@node containsRelatively,convexHull,containsPositiveVector,cone related functions
 @subsubsection containsRelatively
 @cindex containsRelatively
 
@@ -384,19 +442,20 @@ containsRelatively(c,p2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node ambientDimension,codimension,containsRelatively,cone related functions
-@subsubsection ambientDimension
-@cindex ambientDimension
+@node convexHull,convexIntersection,containsRelatively,cone related functions
+@subsubsection convexHull
+@cindex convexHull
 
 @table @code
 @item @strong{Syntax:}
-@code{ambientDimension(} cone c @code{)}
-@*@code{ambientDimension(} fan f @code{)}
-@*@code{ambientDimension(} polytope p @code{)}
+@code{convexHull(} cone c1, cone c2 @code{)}
+@*@code{convexHull(} cone c1, polytope p1 @code{)}
+@*@code{convexHull(} polytope p1, cone c1 @code{)}
+@*@code{convexHull(} polytope p1, polytope p2 @code{)}
 @item @strong{Type:}
-int
+cone if both input arguments are cones, else polytope
 @item @strong{Purpose:}
-ambient dimension of the cone;
+the hull of the two objects
 @item @strong{Example:}
 @smallexample
 @c example
@@ -404,45 +463,70 @@ intmat M1[2][2]=
 1,0,
 0,1;
 cone c1=coneViaPoints(M1);
-ambientDimension(c1);
-intmat M2[2][3]=
-1,0,0,
-0,1,0;
+intmat M2[2][2]=
+1,1,
+1,-1;
 cone c2=coneViaPoints(M2);
-ambientDimension(c2);
+intmat M3[2][2]=
+1,0,
+0,-1;
+cone c3=coneViaPoints(M3);
+cone c12=convexHull(c1,c2);
+c12;
+print(rays(c12));
+cone c23=convexHull(c2,c3);
+c23;
+print(rays(c23));
+cone c13=convexHull(c1,c3);
+c13;
+print(rays(c13));
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node codimension,dimension,ambientDimension,cone related functions
-@subsubsection codimension
-@cindex codimension
+@node convexIntersection,dimension,convexHull,cone related functions
+@subsubsection convexIntersection
+@cindex convexIntersection
 
 @table @code
 @item @strong{Syntax:}
-@code{codimension(} cone c @code{)}
-@code{codimension(} fan f @code{)}
-@code{codimension(} polytope c @code{)}
+@code{convexIntersection(} cone c1, cone c2 @code{)}
+@*@code{convexIntersection(} cone c1, polytope p1 @code{)}
+@*@code{convexIntersection(} polytope p1, cone c1 @code{)}
+@*@code{convexIntersection(} polytope p1, polytope p2 @code{)}
 @item @strong{Type:}
-int
+cone if both input arguments are cones, else polytope
 @item @strong{Purpose:}
-codimension of the cone;
+the intersection of the two objects
 @item @strong{Example:}
 @smallexample
 @c example
-intmat M1[1][2]=
-1,0;
+intmat M1[2][2]=
+1,0,
+0,1;
 cone c1=coneViaPoints(M1);
-codimension(c1);
-intmat M2[1][2]=
-0,0;
+intmat M2[2][2]=
+1,1,
+1,-1;
 cone c2=coneViaPoints(M2);
-codimension(c2);
+intmat M3[2][2]=
+1,0,
+0,-1;
+cone c3=coneViaPoints(M3);
+cone c12=convexIntersection(c1,c2);
+c12;
+print(rays(c12));
+cone c23=convexIntersection(c2,c3);
+c23;
+print(rays(c23));
+cone c13=convexIntersection(c1,c3);
+c13;
+print(rays(c13));
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node dimension,dualCone,codimension,cone related functions
+@node dimension,dualCone,convexIntersection,cone related functions
 @subsubsection dimension
 @cindex dimension
 
@@ -532,7 +616,7 @@ print(E2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node facets,linspace,equations,cone related functions
+@node facets,generatorsOfLinealitySpace,equations,cone related functions
 @subsubsection facets
 @cindex facets
 
@@ -563,13 +647,13 @@ print(F2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node linspace,generatorsOfSpan,facets,cone related functions
-@subsubsection linspace
-@cindex linspace
+@node generatorsOfLinealitySpace,generatorsOfSpan,facets,cone related functions
+@subsubsection generatorsOfLinealitySpace
+@cindex generatorsOfLinealitySpace
 
 @table @code
 @item @strong{Syntax:}
-@code{linspace(} cone c @code{)}
+@code{generatorsOfLinealitySpace(} cone c @code{)}
 @item @strong{Type:}
 bigintmat
 @item @strong{Purpose:}
@@ -584,13 +668,13 @@ intmat M[5][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaPoints(M);
-bigintmat L=linspace(c);
+bigintmat L=generatorsOfLinealitySpace(c);
 print(L);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------
-@node generatorsOfSpan,getMultiplicity,linspace,cone related functions
+@node generatorsOfSpan,getLinearForms,generatorsOfLinealitySpace,cone related functions
 @subsubsection generatorsOfSpan
 @cindex generatorsOfSpan
 
@@ -615,7 +699,34 @@ print(S);
 @end smallexample
 @end table
 @c --------------------------------------
-@node getMultiplicity,span,generatorsOfSpan,cone related functions
+@node getLinearForms,getMultiplicity,generatorsOfSpan,cone related functions
+@subsubsection getLinearForms
+@cindex getLinearForms
+
+@table @code
+@item @strong{Syntax:}
+@code{getLinearForms(} cone c @code{)}
+@*@code{getLinearForms(} polytope p @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+linear forms of the cone (can be set by setLinearForms); returns empty intmat if not set
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][3]=
+-1,0,0,
+0,-1,0;
+cone c=coneViaPoints(M);
+getLinearForms(c);
+intvec v=1,1,1;
+setLinearForms(c,v);
+getLinearForms(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node getMultiplicity,inequalities,getLinearForms,cone related functions
 @subsubsection getMultiplicity
 @cindex getMultiplicity
 
@@ -641,32 +752,7 @@ getMultiplicity(c);
 @end smallexample
 @end table
 @c --------------------------------------
-@node span,inequalities,getMultiplicity,cone related functions
-@subsubsection span
-@cindex span
-
-@table @code
-@item @strong{Syntax:}
-@code{span(} cone c @code{)}
-@item @strong{Type:}
-bigintmat
-@item @strong{Purpose:}
-generating vectors of the orthogonal complement of the span of the cone
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[3][5]=
-1,0,0,0,0,
-0,1,0,0,0,
-0,0,1,0,0;
-cone c=coneViaPoints(M);
-bigintmat I=span(c);
-print(I);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node inequalities,linealityDimension,span,cone related functions
+@node inequalities,isFullSpace,getMultiplicity,cone related functions
 @subsubsection inequalities
 @cindex inequalities
 
@@ -695,344 +781,7 @@ print(I2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node linealityDimension,linealitySpace,inequalities,cone related functions
-@subsubsection linealityDimension
-@cindex linealityDimension
-
-@table @code
-@item @strong{Syntax:}
-@code{linealityDimension(} cone c @code{)}
-@code{linealityDimension(} fan c @code{)}
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-dimension of the lineality space of the cone
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[3][3]=
-1,0,0,
-0,1,0,
-0,0,1;
-cone c1=coneViaPoints(M1);
-linealityDimension(c1);
-intmat M2[4][3]=
-1,0,0,
-0,1,0,
-0,0,1,
--1,0,0;
-cone c2=coneViaPoints(M2);
-linealityDimension(c2);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node linealitySpace,linearForms,linealityDimension,cone related functions
-@subsubsection linealitySpace
-@cindex linealitySpace
-
-@table @code
-@item @strong{Syntax:}
-@code{linealitySpace(} cone c @code{)}
-@item @strong{Type:}
-cone
-@item @strong{Purpose:}
-the lineality space of the cone as a new cone
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[3][3]=
-1,0,0,
-0,1,0,
-0,0,1;
-cone c1=coneViaPoints(M1);
-cone l1=linealitySpace(c1);
-l1;
-intmat M2[4][3]=
-1,0,0,
-0,1,0,
-0,0,1,
--1,0,0;
-cone c2=coneViaPoints(M2);
-cone l2=linealitySpace(c2);
-l2;
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node linearForms,negatedCone,linealitySpace,cone related functions
-@subsubsection linearForms
-@cindex linearForms
-
-@table @code
-@item @strong{Syntax:}
-@code{linearForms(} cone c @code{)}
-@*@code{linearForms(} polytope p @code{)}
-@item @strong{Type:}
-intvec
-@item @strong{Purpose:}
-linear forms of the cone (can be set by setLinearForms); returns empty intmat if not set
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[2][3]=
--1,0,0,
-0,-1,0;
-cone c=coneViaPoints(M);
-linearForms(c);
-intvec v=1,1,1;
-setLinearForms(c,v);
-linearForms(c);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node negatedCone,quotientLatticeBasis,linearForms,cone related functions
-@subsubsection negatedCone
-@cindex negatedCone
-
-@table @code
-@item @strong{Syntax:}
-@code{negatedCone(} cone c @code{)}
-@item @strong{Type:}
-cone
-@item @strong{Purpose:}
-the negated (or negative) of the cone
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[2][2]=
-1,0,
-0,1;
-cone c=coneViaPoints(M);
-cone cn=negatedCone(c);
-cn;
-print(rays(cn));
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node quotientLatticeBasis,rays,negatedCone,cone related functions
-@subsubsection quotientLatticeBasis
-@cindex quotientLatticeBasis
-
-@table @code
-@item @strong{Syntax:}
-@code{quotientLatticeBasis(} cone c @code{)}
-@item @strong{Type:}
-bigintmat%
-@item @strong{Purpose:}
-quotient of Z^n intersected with the span of the cone with Z^n intersected with its lineality space
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[3][2]=
-1,0,
-0,1,
--1,0;
-cone c=coneViaPoints(M);
-bigintmat Q=quotientLatticeBasis(c);
-print(Q);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node rays,relativeInteriorPoint,quotientLatticeBasis,cone related functions
-@subsubsection rays
-@cindex rays
-
-@table @code
-@item @strong{Syntax:}
-@code{rays(} cone c @code{)}
-@item @strong{Type:}
-bigintmat
-@item @strong{Purpose:}
-rays of the cone outside the lineality space, rays inside the lineality space will be ignored
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[2][2]=
-1,0,
-0,1;
-cone c1=coneViaPoints(M1);
-bigintmat R1=rays(c1);
-print(R1);
-intmat M2[3][2]=
-1,0,
-0,1,
--1,0;
-cone c2=coneViaPoints(M2);
-bigintmat R2=rays(c2);
-print(R2);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node relativeInteriorPoint,semigroupGenerator,rays,cone related functions
-@subsubsection relativeInteriorPoint
-@cindex relativeInteriorPoint
-
-@table @code
-@item @strong{Syntax:}
-@code{relativeInteriorPoint(} cone c @code{)}
-@item @strong{Type:}
-intvec
-@item @strong{Purpose:}
-point in the relative interior of the cone
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[2][2]=
-1,0,
-0,1;
-cone c1=coneViaPoints(M1);
-relativeInteriorPoint(c1);
-intmat M2[2][2]=
-1,0,
-1,1;
-cone c2=coneViaPoints(M2);
-relativeInteriorPoint(c2);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node semigroupGenerator,uniquePoint,relativeInteriorPoint,cone related functions
-@subsubsection semigroupGenerator
-@cindex semigroupGenerator
-
-@table @code
-@item @strong{Syntax:}
-@code{semigroupGenerator(} cone c @code{)}
-@item @strong{Type:}
-intvec
-@item @strong{Purpose:}
-if dimension(c)=linealityDimension(c)+1, then the quotient lattice of Z^n intersected with the span and Z^n intersected with the lineality space is Z^1 and the class of the cone is a semigroup. returns a generator of that semigroup. (like quotientLatticeBasis(cone c), but as intvec)
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M[3][2]=
-1,0,
-0,1,
--1,0;
-cone c=coneViaPoints(M);
-semigroupGenerator(c);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node uniquePoint,convexHull,semigroupGenerator,cone related functions
-@subsubsection uniquePoint
-@cindex uniquePoint
-
-@table @code
-@item @strong{Syntax:}
-@code{uniquePoint(} cone c @code{)}
-@item @strong{Type:}
-intvec
-@item @strong{Purpose:}
-special-purpose interior point which supports recognition of symmetries among non-intersecting cones (used in implementation of fans)
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[2][2]=
-1,0,
-0,1;
-cone c1=coneViaPoints(M1);
-uniquePoint(c1);
-intmat M2[2][2]=
-1,0,
-1,1;
-cone c2=coneViaPoints(M2);
-uniquePoint(c2);
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node convexHull,convexIntersection,uniquePoint,cone related functions
-@subsubsection convexHull
-@cindex convexHull
-
-@table @code
-@item @strong{Syntax:}
-@code{convexHull(} cone c1, cone c2 @code{)}
-@*@code{convexHull(} cone c1, polytope p1 @code{)}
-@*@code{convexHull(} polytope p1, cone c1 @code{)}
-@*@code{convexHull(} polytope p1, polytope p2 @code{)}
-@item @strong{Type:}
-cone if both input arguments are cones, else polytope
-@item @strong{Purpose:}
-the hull of the two objects
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[2][2]=
-1,0,
-0,1;
-cone c1=coneViaPoints(M1);
-intmat M2[2][2]=
-1,1,
-1,-1;
-cone c2=coneViaPoints(M2);
-intmat M3[2][2]=
-1,0,
-0,-1;
-cone c3=coneViaPoints(M3);
-cone c12=convexHull(c1,c2);
-c12;
-print(rays(c12));
-cone c23=convexHull(c2,c3);
-c23;
-print(rays(c23));
-cone c13=convexHull(c1,c3);
-c13;
-print(rays(c13));
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node convexIntersection,isFullSpace,convexHull,cone related functions
-@subsubsection convexIntersection
-@cindex convexIntersection
-
-@table @code
-@item @strong{Syntax:}
-@code{convexIntersection(} cone c1, cone c2 @code{)}
-@*@code{convexIntersection(} cone c1, polytope p1 @code{)}
-@*@code{convexIntersection(} polytope p1, cone c1 @code{)}
-@*@code{convexIntersection(} polytope p1, polytope p2 @code{)}
-@item @strong{Type:}
-cone if both input arguments are cones, else polytope
-@item @strong{Purpose:}
-the intersection of the two objects
-@item @strong{Example:}
-@smallexample
-@c example
-intmat M1[2][2]=
-1,0,
-0,1;
-cone c1=coneViaPoints(M1);
-intmat M2[2][2]=
-1,1,
-1,-1;
-cone c2=coneViaPoints(M2);
-intmat M3[2][2]=
-1,0,
-0,-1;
-cone c3=coneViaPoints(M3);
-cone c12=convexIntersection(c1,c2);
-c12;
-print(rays(c12));
-cone c23=convexIntersection(c2,c3);
-c23;
-print(rays(c23));
-cone c13=convexIntersection(c1,c3);
-c13;
-print(rays(c13));
-@c example
-@end smallexample
-@end table
-@c --------------------------------------
-@node isFullSpace,isOrigin,convexIntersection,cone related functions
+@node isFullSpace,isOrigin,inequalities,cone related functions
 @subsubsection isFullSpace
 @cindex isFullSpace
 
@@ -1096,7 +845,7 @@ isOrigin(c3);
 @end smallexample
 @end table
 @c --------------------------------------
-@node isSimplicial,setLinearForms,isOrigin,cone related functions
+@node isSimplicial,linealityDimension,isOrigin,cone related functions
 @subsubsection isSimplicial
 @cindex isSimplicial
 
@@ -1146,7 +895,230 @@ isSimplicial(f);
 @end smallexample
 @end table
 @c --------------------------------------
-@node setLinearForms,setMultiplicity,isSimplicial,cone related functions
+@node linealityDimension,linealitySpace,isSimplicial,cone related functions
+@subsubsection linealityDimension
+@cindex linealityDimension
+
+@table @code
+@item @strong{Syntax:}
+@code{linealityDimension(} cone c @code{)}
+@code{linealityDimension(} fan c @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+dimension of the lineality space of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaPoints(M1);
+linealityDimension(c1);
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0;
+cone c2=coneViaPoints(M2);
+linealityDimension(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node linealitySpace,negatedCone,linealityDimension,cone related functions
+@subsubsection linealitySpace
+@cindex linealitySpace
+
+@table @code
+@item @strong{Syntax:}
+@code{linealitySpace(} cone c @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the lineality space of the cone as a new cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[3][3]=
+1,0,0,
+0,1,0,
+0,0,1;
+cone c1=coneViaPoints(M1);
+cone l1=linealitySpace(c1);
+l1;
+intmat M2[4][3]=
+1,0,0,
+0,1,0,
+0,0,1,
+-1,0,0;
+cone c2=coneViaPoints(M2);
+cone l2=linealitySpace(c2);
+l2;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node negatedCone,quotientLatticeBasis,linealitySpace,cone related functions
+@subsubsection negatedCone
+@cindex negatedCone
+
+@table @code
+@item @strong{Syntax:}
+@code{negatedCone(} cone c @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the negated (or negative) of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[2][2]=
+1,0,
+0,1;
+cone c=coneViaPoints(M);
+cone cn=negatedCone(c);
+cn;
+print(rays(cn));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node quotientLatticeBasis,randomPoint,negatedCone,cone related functions
+@subsubsection quotientLatticeBasis
+@cindex quotientLatticeBasis
+
+@table @code
+@item @strong{Syntax:}
+@code{quotientLatticeBasis(} cone c @code{)}
+@item @strong{Type:}
+bigintmat
+@item @strong{Purpose:}
+quotient of Z^n intersected with the span of the cone with Z^n intersected with its lineality space
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaPoints(M);
+bigintmat Q=quotientLatticeBasis(c);
+print(Q);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node randomPoint,rays,quotientLatticeBasis,cone related functions
+@subsubsection randomPoint
+@cindex randomPoint
+
+@table @code
+@item @strong{Syntax:}
+@code{randomPoint(} cone c @code{)}
+@item @strong{Type:}
+bigintmat
+@item @strong{Purpose:}
+random point in the relative interior in c
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaPoints(M);
+bigintmat Q=randomPoint(c);
+print(Q);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node rays,relativeInteriorPoint,randomPoint,cone related functions
+@subsubsection rays
+@cindex rays
+
+@table @code
+@item @strong{Syntax:}
+@code{rays(} cone c @code{)}
+@item @strong{Type:}
+bigintmat
+@item @strong{Purpose:}
+rays of the cone outside the lineality space, rays inside the lineality space will be ignored
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaPoints(M1);
+bigintmat R1=rays(c1);
+print(R1);
+intmat M2[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c2=coneViaPoints(M2);
+bigintmat R2=rays(c2);
+print(R2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node relativeInteriorPoint,semigroupGenerator,rays,cone related functions
+@subsubsection relativeInteriorPoint
+@cindex relativeInteriorPoint
+
+@table @code
+@item @strong{Syntax:}
+@code{relativeInteriorPoint(} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+point in the relative interior of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaPoints(M1);
+relativeInteriorPoint(c1);
+intmat M2[2][2]=
+1,0,
+1,1;
+cone c2=coneViaPoints(M2);
+relativeInteriorPoint(c2);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node semigroupGenerator,setLinearForms,relativeInteriorPoint,cone related functions
+@subsubsection semigroupGenerator
+@cindex semigroupGenerator
+
+@table @code
+@item @strong{Syntax:}
+@code{semigroupGenerator(} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+if dimension(c)=linealityDimension(c)+1, then the quotient lattice of Z^n intersected with the span and Z^n intersected with the lineality space is Z^1 and the class of the cone is a semigroup. returns a generator of that semigroup. (like quotientLatticeBasis(cone c), but as intvec)
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][2]=
+1,0,
+0,1,
+-1,0;
+cone c=coneViaPoints(M);
+semigroupGenerator(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node setLinearForms,setMultiplicity,semigroupGenerator,cone related functions
 @subsubsection setLinearForms
 @cindex setLinearForms
 
@@ -1172,7 +1144,7 @@ linearForms(c);
 @end smallexample
 @end table
 @c --------------------------------------
-@node setMultiplicity,,setLinearForms,cone related functions
+@node setMultiplicity,span,setLinearForms,cone related functions
 @subsubsection setMultiplicity
 @cindex setMultiplicity
 
@@ -1193,6 +1165,59 @@ cone c=coneViaPoints(M);
 getMultiplicity(c);
 setMultiplicity(c,3);
 getMultiplicity(c);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node span,uniquePoint,setMultiplicity,cone related functions
+@subsubsection span
+@cindex span
+
+@table @code
+@item @strong{Syntax:}
+@code{span(} cone c @code{)}
+@item @strong{Type:}
+bigintmat
+@item @strong{Purpose:}
+generating vectors of the orthogonal complement of the span of the cone
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M[3][5]=
+1,0,0,0,0,
+0,1,0,0,0,
+0,0,1,0,0;
+cone c=coneViaPoints(M);
+bigintmat I=span(c);
+print(I);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------
+@node uniquePoint,,span,cone related functions
+@subsubsection uniquePoint
+@cindex uniquePoint
+
+@table @code
+@item @strong{Syntax:}
+@code{uniquePoint(} cone c @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+special-purpose interior point which supports recognition of symmetries among non-intersecting cones (used in implementation of fans)
+@item @strong{Example:}
+@smallexample
+@c example
+intmat M1[2][2]=
+1,0,
+0,1;
+cone c1=coneViaPoints(M1);
+uniquePoint(c1);
+intmat M2[2][2]=
+1,0,
+1,1;
+cone c2=coneViaPoints(M2);
+uniquePoint(c2);
 @c example
 @end smallexample
 @end table

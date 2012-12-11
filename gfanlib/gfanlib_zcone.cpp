@@ -732,6 +732,8 @@ std::ostream &operator<<(std::ostream &f, ZCone const &c)
 
 
 ZCone::ZCone(int ambientDimension):
+  inequalities(ZMatrix(0,ambientDimension)),
+  equations(ZMatrix(0,ambientDimension)),
   n(ambientDimension),
   state(1),
   preassumptions(PCP_impliedEquationsKnown|PCP_facetsKnown),
