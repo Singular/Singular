@@ -17,6 +17,7 @@
 #include "static.h"
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
+#include <Singular/grammar.h>
 
 /* whether pyobject module is linked statically or dynamically */
 
@@ -48,8 +49,8 @@ static BOOLEAN pyobject_load()
 /// blackbox support - initialization via autoloading
 void* pyobject_autoload(blackbox* bbx)
 {
-  if (pyobject_load()) return NULL;
-  return bbx->blackbox_Init(bbx);
+  assume(bbx != NULL);
+  return (pyobject_load()? NULL: bbx->blackbox_Init(bbx));
 }
 
 void pyobject_default_destroy(blackbox  *b, void *d)
@@ -65,4 +66,16 @@ void pyobject_setup()
   bbx->blackbox_destroy = pyobject_default_destroy;
   setBlackboxStuff(bbx, "pyobject");
 }
+
+/// Explicitely load, if not loaded already
+BOOLEAN pyobject_ensure() {
+
+  int tok = -1;
+  blackbox* bbx = (blackboxIsCmd("pyobject", tok) == ROOT_DECL?
+                   getBlackboxStuff(tok): (blackbox*)NULL);
+  if (bbx == NULL) return TRUE;
+  return (bbx->blackbox_Init == pyobject_autoload?  pyobject_load(): FALSE);  
+}
+
+
 

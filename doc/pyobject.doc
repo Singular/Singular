@@ -14,6 +14,11 @@ Together with some basic operations and funtions, pyobject instances
 access @code{python} functionality from within @sc{Singular} and store
 the results for re-use:
 
+Note that this feature is automatically loaded on demand when initializing
+an object of type @code{pyobject}. For accessing @code{pyobject}-related
+functions before using any @code{python} object, please type
+@code{system("pyobject");} at the @sc{Singular} prompt.
+
 @smallexample
 @c example error
 pyobject pystr = "Hello";
@@ -228,6 +233,7 @@ deletes an attribute from a pyobject (see @ref{killattrib})
 @*@strong{Example:}
 @smallexample
 @c example
+system("pyobject");
 python_run("def new_pyobj(): pass");
 attrib(new_pyobj, "new_attr", "something");
 attrib(new_pyobj, "new_attr");
@@ -271,6 +277,7 @@ as pyobject.
 @item @strong{Example:}
 @smallexample
 @c example
+  system("pyobject");
   python_eval("17 + 4");
   typeof(_);
   list ll = python_eval("range(10)");
@@ -292,6 +299,7 @@ Imports python module (given as a string) in the @sc{Singular} context.
 @item @strong{Example:}
 @smallexample
 @c example
+  system("pyobject");
   python_import("os");
   name;                         // e. g. 'posix'
   sep;                          // pathname separator
@@ -315,6 +323,7 @@ and syncs the contexts afterwards.
 @item @strong{Example:}
 @smallexample
 @c example
+  system("pyobject");
   python_run("def newfunc(*args): return list(args)");
   newfunc(1, 2, 3);          // newfunc also known to SINGULAR now
 
