@@ -289,7 +289,7 @@ codimension(c2);
 @end smallexample
 @end table
 @c --------------------------------------
-@node coneLink,containsAsFace,canonicalizeCone,cone related functions
+@node coneLink,containsAsFace,codimension,cone related functions
 @subsubsection coneLink
 @cindex coneLink
 
