@@ -1136,10 +1136,10 @@ intmat M[2][3]=
 -1,0,0,
 0,-1,0;
 cone c=coneViaPoints(M);
-linearForms(c);
+getLinearForms(c);
 intvec v=1,1,1;
 setLinearForms(c,v);
-linearForms(c);
+getLinearForms(c);
 @c example
 @end smallexample
 @end table
@@ -1860,7 +1860,7 @@ See also @ref{ambientDimension},
 @ref{equations},
 @ref{facets},
 @ref{inequalities},
-@ref{linearForms},
+@ref{getLinearForms},
 @ref{getMultiplicity},
 @ref{setLinearForms},
 @ref{setMultiplicity}.
