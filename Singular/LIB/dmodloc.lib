@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+//
 version="$Id$";
 category="Noncommutative";
 info="
@@ -9,26 +9,63 @@ Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
 
 OVERVIEW:
-TODO
+Let I be a left ideal I in the n-th polynomial Weyl algebra D=K[x]<d> and
+let f be a polynomial in K[x].
+
+If D/I is a holonomic module over D, it is known that the localization of D/I
+at f is also holonomic. The procedure Dlocalization computes an ideal J in D
+such that this localization is isomorphic to D/J as D-modules.
+
+If one regards I as an ideal in the rational Weyl algebra as above, K(x)<d>*I,
+and intersects with K[x]<d>, the result is called the Weyl closure of I.
+The procedures WeylClosure (if I has finite holonomic rank) and WeylClosure1
+(if I is in the first Weyl algebra) can be used for computations.
+
+As an application of the Weyl closure, the procedure annRatSyz computes a
+holonomic part of the annihilator of a rational function by computing certain
+syzygies. The full annihilator can be obtained by taking the Weyl closure of
+the result.
+
+If one regards the left ideal I as system of linear PDEs, one can find its
+polynomial solutions with polSol (if I is holonomic) or polSolFiniteRank
+(if I is of finite holonomic rank). Rational solutions can be obtained
+with ratSol.
+
+The procedure bfctBound computes a possible multiple of the b-function for
+f^s*u at a generic root of f. Here, u stands for [1] in D/I.
+
+This library also offers the procedures holonomicRank and DsingularLocus to
+compute the holonomic rank and the singular locus of the D-module D/I.
 
 
 References:
 @* (OT)  Oaku, Takayama: 'Algorithms for D-modules',
          Journal of Pure and Applied Algebra, 1998
-@* (OTT) Oaku, Tajayama, Tsai: 'Polynomial and rational solutions of holonomic
+@* (OTT) Oaku, Takayama, Tsai: 'Polynomial and rational solutions of holonomic 
          systems', Journal of Pure and Applied Algebra, 2001
 @* (OTW) Oaku, Takayama, Walther: 'A Localization Algorithm for D-modules',
          Journal of Symbolic Computation, 2000
-@* (Tsa) Tsai: 'Algorithms for algebraic analysis', PhD thesis, 1996
+@* (Tsa) Tsai: 'Algorithms for algebraic analysis', PhD thesis, 2000
 
 
 PROCEDURES:
+
+holonomicRank(I);  computes the holonomic rank of I 
+DsingularLocus(I); computes the singular locus of a D-module
+Dlocalization(I,f[,k,e]);  computes the localization of a D-module
+WeylClosure1(L);   computes the Weyl closure of operator in first Weyl algebra
+WeylClosure(I);    computes the Weyl closure of an ideal in the Weyl algebra
+polSol(I[,w,m]);   computes basis of polynomial solutions to the given system
+polSolFiniteRank(I[,w]); computes basis of polynomial solutions to given system
+ratSol(I);         computes basis of rational solutions to the given system
+bfctBound(I,f[,primdec]); computes multiple of b-function for f^s*u
+annRatSyz(f,g[,db,eng]);  computes part of annihilator of rational function g/f
 
 dmodGeneralAssumptionCheck();   check general assumptions
 safeVarName(s);    finds an untaken name to use for a new variable
 extendWeyl(S);     extends basering (Weyl algebra) by given vars
 polyVars(f,v);     checks whether f contains only variables indexed by v
-monsInIdeal(I);    computes all monomials appearing in generators of ideal
+monomialInIdeal(I);    computes all monomials appearing in generators of ideal
 vars2pars(v);      converts variables specified by v into parameters
 killTerms(p,k);    delete all terms of p containing var(k)
 minIntRoot2(L);    finds minimal integer root in a list of roots
@@ -40,41 +77,32 @@ addRat(v,w);       adds rational functions
 multRat(v,w);      multiplies rational functions
 diffRat(v,j);      derives rational function
 commRing();        deletes non-commutative relations from ring
-
-holonomicRank(I);  computes the holonomic rank of I
-DsingularLocus(I); computes the singular locus of a D-module
 rightNFWeyl(id,k); computes right NF wrt. right ideal (var(k)) in Weyl algebra
-Dlocalization(I,f[,k,e]);  computes the localization of a D-module
-WeylClosure1(L);   computes the Weyl closure of operator in first Weyl algebra
-WeylClosure(I);    computes the Weyl closure of an ideal in the Weyl algebra
-polSol(I[,w,m]);   computes basis of polynomial solutions to the given system
-polSolFiniteRank(I[,w]); computes basis of polynomial solutions to given system
-ratSol(I);         computes basis of rational solutions to the given system
-bfctBound (I,f[,primdec]); computes multiple of b-function for f^s*u
-annRatSyz(f,g[,db,eng]);  computes part of annihilator of rational function g/f
 
 
-KEYWORDS: D-module; holonomic rank; singular locus of D-module; D-localization;
-localization of D-module; characteristic variety;
+KEYWORDS: 
+D-module; 
+holonomic rank; singular locus of D-module; 
+D-localization; localization of D-module; characteristic variety;
 Weyl closure;
 polynomial solutions; rational solutions;
-annihilator of rational function
+annihilator of rational function;
 
 SEE ALSO: bfun_lib, dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
 ";
 
+
 /*
 CHANGELOG:
-
-
+12.11.12: bugfixes, updated docu
 */
+
 
 LIB "bfun.lib";    // for pIntersect etc
 LIB "dmodapp.lib"; // for GBWeight, charVariety etc
 LIB "nctools.lib"; // for Weyl, isWeyl etc
 // TODO uncomment this once chern.lib is ready
 // LIB "chern.lib";   // for orderedPartition
-LIB "intprog.lib";
 
 
 // testing for consistency of the library /////////////////////////////////////
@@ -84,8 +112,8 @@ proc testdmodloc()
   example safeVarName;
   example extendWeyl;
   example polyVars;
-  example monsInIdeal;
-  example vars2pars;
+  example monomialInIdeal;
+  example vas2pars;
   example killTerms;
   example minIntRoot2;
   example maxIntRoot;
@@ -122,7 +150,7 @@ NOTE:     This procedure checks the following conditions on the basering R
 @*         - R is not a qring,
 @*         - for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
              holds, i.e. the sequence of variables is given by
-             x(1),...,x(n),D(1),...,D(n), where D(i) is the differential
+             x(1),...,x(n),D(1),...,D(n), where D(i) is the differential 
              operator belonging to x(i).
 EXAMPLE:  example dmodGeneralAssumptionCheck; shows examples
 "
@@ -317,11 +345,11 @@ example
 }
 
 
-proc monsInIdeal (ideal I)
+proc monomialInIdeal (ideal I)
 "
-USAGE:    monsInIdeal(I);  I ideal
+USAGE:    monomialInIdeal(I);  I ideal
 RETURN:   ideal consisting of all monomials appearing in generators of ideal
-EXAMLPE:  example monsInIdeal; shows examples
+EXAMLPE:  example monomialInIdeal; shows examples
 "
 {
   // returns ideal consisting of all monomials appearing in generators of ideal
@@ -346,7 +374,7 @@ example
   "EXAMPLE"; echo=2;
   ring r = 0,(x,y),dp;
   ideal I = x2+5x3y7, x-x2-6xy;
-  monInIdeal(I);
+  monomialInIdeal(I);
 }
 
 
@@ -428,6 +456,7 @@ example
   setring RR;
   RR;
 }
+
 
 proc killTerms (poly p, int k)
 "
@@ -564,8 +593,8 @@ proc dmodAction (def id, poly f, list #)
 "
 USAGE:    dmodAction(id,f[,v]);  id ideal or poly, f poly, v optional intvec
 ASSUME:   If v is not given, the basering is the n-th Weyl algebra W over a
-          field of characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+          field of characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
           Otherwise, v is assumed to specify positions of variables, which form
@@ -671,8 +700,8 @@ proc dmodActionRat(def id, vector w)
 "
 USAGE:    dmodActionRat(id,w);  id ideal or poly, f vector
 ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+          characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Further, assume that w has exactly two components, second one not 0,
@@ -698,7 +727,7 @@ EXAMPLE:  example dmodActionRat; shows examples
   ideal I = imap(save,id);
   vector w = imap(save,w);
   int i,j,k,l;
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   int sid = ncols(I);
   intvec v;
   poly P;
@@ -748,7 +777,8 @@ example
   f = 2*x*y; g = x^2 - y^3;
   def B = annRat(f,g); setring B;
   poly f = imap(r,f); poly g = imap(r,g);
-  dmodActionRat(LD,f,g); // hence LD is indeed the annihilator of f/g
+  vector v = [f,g];
+  dmodActionRat(LD,v); // hence LD is indeed the annihilator of f/g
 }
 
 
@@ -833,6 +863,7 @@ example
   simplifyRat(v) - [x-1,1];
 }
 
+
 proc addRat (vector I, vector J)
 "
 USAGE:    addRat(v,w);  v,w vectors
@@ -881,6 +912,7 @@ example
   multRat(v,w);
   multRat(v,w) - [1,1];
 }
+
 
 proc diffRat (vector I, int j)
 "
@@ -940,6 +972,7 @@ example
   setring r2; r2;
 }
 
+
 // TODO remove this proc once chern.lib is ready
 static proc orderedPartition(int n, list #)
 "
@@ -947,7 +980,7 @@ USUAGE:  orderedPartition(n,a); n,a positive ints
          orderedPartition(n,w); n positive int, w positive intvec
 RETURN:  list of intvecs
 PURPOSE: Computes all partitions of n of length a, if the second
-         argument is an int, or computes all weighted partitions
+         argument is an int, or computes all weighted partitions 
          w.r.t. w of n of length size(w) if the second argument
          is an intvec.
          In both cases, zero parts are included.
@@ -1008,10 +1041,10 @@ EXAMPLE: example orderedPartition; shows an example
   else
   {
     M = weightKB(ideal(0),n,w); // all monomials of total weighted degree n
-  }
-  list L;
+  }  
+  list L; 
   int i;
-  for (i = 1; i <= ncols(M); i++) {L = insert(L,leadexp(M[i]));}
+  for (i = 1; i <= ncols(M); i++) {L = insert(L,leadexp(M[i]));} 
   // the leadexp corresponds to a partition
   if (baseringdef) // sets the old ring as basering again
   {
@@ -1041,7 +1074,7 @@ ASSUME:   The basering is the n-th Weyl algebra over a field of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i)
           is the differential operator belonging to x(i).
 RETURN:   int, the holonomic rank of I
-REMARKS:  The holonomic rank of I is defined to be the K(x(1..n))-dimension of
+REMARKS:  The holonomic rank of I is defined to be the K(x(1..n))-dimension of 
           I regarded as ideal in the rational Weyl algebra K(x(1..n))<D(1..n)>.
           If this dimension is not finite, -1 is returned.
 NOTE:     If e<>0, @code{std} is used for Groebner basis computations,
@@ -1305,7 +1338,7 @@ EXAMPLE: example Dlocalization; shows examples
   }
   int i,j;
   def save = basering;
-  int n = nvars(save)/2;
+  int n = nvars(save) div 2;
   def Dv = extendWeyl(safeVarName("v"));
   setring Dv;
   poly f = imap(save,f);
@@ -1402,12 +1435,12 @@ EXAMPLE: example Dlocalization; shows examples
   }
   if (outList<>0)
   {
-    return(list(I,-(l0+2)));
+    return(list(I,l0+2));
   }
   else
   {
     return(I);
-  }
+  }  
 }
 example
 {
@@ -1542,7 +1575,7 @@ NOTE:     If printlevel=1, progress debug messages will be printed,
 SEE ALSO: WeylClosure
 EXAMPLE:  example WeylClosure1; shows examples
 "
-{
+{    
   dmodGeneralAssumptionCheck(); // assumption check
   int ppl = printlevel - voice + 2;
   def save = basering;
@@ -1560,7 +1593,7 @@ EXAMPLE:  example WeylClosure1; shows examples
   }
   ideal facp = factorize(g,1); // g is squarefree, constants aren't interesting
   dbprint(ppl-1,
-        "// squarefree part of highest coefficient w.r.t. order filtration:");
+          "// squarefree part of highest coefficient w.r.t. order filtration:");
   dbprint(ppl-1, "// " + string(facp));
   setring save;
   p = imap(@R,p);
@@ -1629,7 +1662,7 @@ EXAMPLE:  example WeylClosure1; shows examples
   intvec maxroots,testroots;
   int sq = size(Q);
   string strQ = "ideal Q = " + string(Q) + ";";
-  // TODO do it without string workaround when issue with maps from
+  // TODO do it without string workaround when issue with maps from 
   //   transcendental to algebraic extension fields is fixed
   int j,maxr;
   // 2-1 get max int root of lowest nonzero entry of Q in algebraic extension
@@ -1659,7 +1692,7 @@ EXAMPLE:  example WeylClosure1; shows examples
         break;
       }
     }
-    maxroots[i] = d[j]; // d[j] = r_k
+    maxroots[i] = d[j]; // d[j] = r_k 
     list LR = bFactor(Q[j]);
     LR = intRoots(LR);
     if (LR[2]<>0:size(LR[2])) // there are integral roots
@@ -1721,9 +1754,9 @@ example
 proc WeylClosure (ideal I)
 "
 USAGE:    WeylClosure(I);  I an ideal
-ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+ASSUME:   The basering is the n-th Weyl algebra W over a field of 
+          characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that the holonomic rank of W/I is finite.
@@ -1752,7 +1785,7 @@ EXAMPLE:  example WeylClosure; shows examples
   sl = simplify(sl,2);
   dbprint(ppl  ,"// ...done.");
   dbprint(ppl-1,"// " + string(sl));
-  if (sl[1] == 0) // should never get here
+  if (sl[1] == 0) // can never get here
   {
     ERROR("Can't find polynomial in K[x] vanishing on singular locus.");
   }
@@ -1795,9 +1828,9 @@ example
 proc polSol (ideal I, list #)
 "
 USAGE:    polSol(I[,w,m]);  I ideal, w optional intvec, m optional int
-ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+ASSUME:   The basering is the n-th Weyl algebra W over a field of 
+          characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
@@ -1816,10 +1849,6 @@ EXAMPLE:  example polSol; shows examples
 "
 {
   dmodGeneralAssumptionCheck();
-  if (!isHolonomic(I))
-  {
-    ERROR("Ideal is not holonomic. Try polSolFiniteRank.");
-  }
   int ppl = printlevel - voice + 2;
   int mr,mrgiven;
   def save = basering;
@@ -1847,6 +1876,10 @@ EXAMPLE:  example polSol; shows examples
   list L;
   if (!mrgiven)
   {
+    if (!isHolonomic(I))
+    {
+      ERROR("Ideal is not holonomic. Try polSolFiniteRank.");
+    }
     dbprint(ppl,"// Computing b-function...");
     L = bfctIdeal(I,w);
     dbprint(ppl,"// ...done.");
@@ -1885,7 +1918,7 @@ EXAMPLE:  example polSol; shows examples
   // Step 3: determine values of @c(i) by equating coefficients
   ideal I = imap(save,I);
   I = dmodAction(I,f,1..n);
-  ideal M = monsInIdeal(I);
+  ideal M = monomialInIdeal(I);
   matrix CC = coeffs(I,M);
   int j;
   ideal C;
@@ -1924,17 +1957,32 @@ example
     (x-y)*Dx*Dy+2*Dx-3*Dy;
   intvec w = -1,-1;
   polSol(I,w);
-//   w = -5,-7;
-//   polSol(I,w); // bug in weightKB
+}
+
+
+static proc ex_polSol()
+{  ring r = 0,(x,y,Dx,Dy),dp;
+  def W = Weyl();
+  setring W;
+  poly tx,ty = x*Dx, y*Dy;
+  ideal I =      // Appel F1 with parameters (2,-3,-2,5)
+    tx*(tx+ty+4)-x*(tx+ty+2)*(tx-3),
+    ty*(tx+ty+4)-y*(tx+ty+2)*(ty-2),
+    (x-y)*Dx*Dy+2*Dx-3*Dy;
+  intvec w = -5,-7;
+  // the following gives a bug
+  polSol(I,w);
+  // this is due to a bug in weightKB, see ticket #339
+  // http://www.singular.uni-kl.de:8002/trac/ticket/339
 }
 
 
 proc polSolFiniteRank (ideal I, list #)
 "
 USAGE:    polSolFiniteRank(I[,w]);  I ideal, w optional intvec
-ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+ASSUME:   The basering is the n-th Weyl algebra W over a field of 
+          characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is of finite holonomic rank.
@@ -2067,7 +2115,7 @@ static proc twistedIdeal(ideal I, poly f, intvec k, ideal F)
   if (select1(I,intvec((n+1)..2*n))[1] <> 0)
   {
     // should never get here
-    ERROR("Something's wrong. Please inform the author."); // TODO
+    ERROR("Something's wrong. Please inform the author.");
   }
   setring save;
   ideal mm = maxideal(1);
@@ -2120,9 +2168,9 @@ example
 proc ratSol (ideal I)
 "
 USAGE:    ratSol(I);  I ideal
-ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+ASSUME:   The basering is the n-th Weyl algebra W over a field of 
+          characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
@@ -2198,7 +2246,7 @@ EXAMPLE:  example ratSol; shows examples
       else
       {
         FF[1] = FF[1]*F[i]^(k[i]);
-      }
+      }      
     }
   }
   vector v = FF[1]*gen(1) + FF[2]*gen(2);
@@ -2207,14 +2255,20 @@ EXAMPLE:  example ratSol; shows examples
   ideal twI = twistedIdeal(I,f,k,F);
   intvec w = -1:n;
   dbprint(ppl,"// computing polynomial solutions of twisted system...");
-  //  ideal P = polSol(twI,w);
-  ideal P = polSolFiniteRank(twI,w); // TODO
+  if (isHolonomic(twI))
+  {
+    ideal P = polSol(twI,w);
+  }
+  else
+  {
+    ideal P = polSolFiniteRank(twI,w);
+  }
   module M;
   vector vv;
   for (i=1; i<=ncols(P); i++)
   {
     vv = P[i]*gen(1) + 1*gen(2);
-    M[i] = multRat(v,vv); // TODO use static version
+    M[i] = multRat(v,vv);
   }
   dbprint(ppl,"// ...done");
   return (M);
@@ -2230,24 +2284,29 @@ example
     tx*(tx+ty)-x*(tx+ty+3)*(tx-1),
     ty*(tx+ty)-y*(tx+ty+3)*(ty+1);
   module M = ratSol(I);
-  print(M); //TODO comment on output
+  // We obtain a basis of the rational solutions to I represented by a
+  // module / matrix with two rows.
+  // Each column of the matrix represents a rational function, where
+  // the first row correspond to the enumerator and the second row to
+  // the denominator.
+  print(M); 
 }
 
 
 proc bfctBound (ideal I, poly f, list #)
 "
 USAGE:    bfctBound (I,f[,primdec]);  I ideal, f poly, primdec optional string
-ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
+ASSUME:   The basering is the n-th Weyl algebra W over a field of 
+          characteristic 0 and for all 1<=i<=n the identity 
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
 RETURN:   list of roots (of type ideal) and multiplicities (of type intvec) of
-          a multiple of the b-function for f^s*u at a generic root of f.
+          a multiple of the b-function for f^s*u at a generic root of f. 
           Here, u stands for [1] in D/I.
 REMARKS:  Reference: (OTT), Algorithm 3.4
-NOTE:     This procedure requires to compute a primary decomposition in a
+NOTE:     This procedure requires to compute a primary decomposition in a 
           commutative ring. The optional string primdec can be used to specify
           the algorithm to do so. It may either be 'GTZ' (Gianni, Trager,
           Zacharias) or 'SY' (Shimoyama, Yokoyama). By default, 'GTZ' is used.
@@ -2258,7 +2317,7 @@ EXAMPLE:  example bfctBound; shows examples
 "
 {
   dmodGeneralAssumptionCheck();
-  finKx;
+  finKx(f);
   if (!isHolonomic(I))
   {
     ERROR("Ideal is not holonomic.");
@@ -2334,30 +2393,26 @@ EXAMPLE:  example bfctBound; shows examples
   attrib(S,"isSB",1);
   dbprint(ppl  ,"// Computing Euler representation...");
   // I = NF(I,S);
-  intvec wt = 1,(0:(2*n+2));
-  intvec wDt = 0:(2*n+3); wDt[n+2] = 1;
   int d;
+  intvec ww = 0:(2*2+2); ww[1] = -1; ww[n+2] = 1;
   for (i=1; i<=size(I); i++)
   {
-    d = deg(I[i],wDt);
-    if (d <> 0)
+    d = deg(I[i],ww);
+    if (d>0)
     {
       I[i] = var(1)^d*I[i];
     }
-    else
+    if (d<0)
     {
-      d = deg(I[i],wt);
-      if (d <> 0)
-      {
-        I[i] = var(n+2)^d*I[i];
-      }
+      d = -d;
+      I[i] = var(n+2)^d*I[i];
     }
   }
   I = NF(I,S); // now there are no t,Dt in I, only s
   dbprint(ppl  ,"// ...done.");
   I = subst(I,var(2*n+3),-var(2*n+3)-1);
   ring Ks = 0,s,dp;
-  def Ws = W + Ks;
+  def Ws = save + Ks;
   setring Ws;
   ideal I = imap(Wts,I);
   kill Wts;
@@ -2382,7 +2437,8 @@ EXAMPLE:  example bfctBound; shows examples
   def Kxs = ring(RL);
   setring Kxs;
   ideal J = imap(Ws,J);
-  dbprint(ppl  ,"// Computing primary decomposition with engine " + primdec + "...");
+  dbprint(ppl  ,"// Computing primary decomposition with engine " 
+          + primdec + "...");
   if (primdec == "GTZ")
   {
     list P = primdecGTZ(J);
@@ -2398,7 +2454,8 @@ EXAMPLE:  example bfctBound; shows examples
   vector v;
   for (i=1; i<=size(P); i++)
   {
-    dbprint(ppl  ,"// Considering primary component " + string(i) + " of " + string(size(P)) + "...");
+    dbprint(ppl  ,"// Considering primary component " + string(i) 
+            + " of " + string(size(P)) + "...");
     dbprint(ppl  ,"//   Intersecting with K[x] and computing radical...");
     GP = std(P[i][1]);
     Qix = eliminate(GP,var(n+1)); // subset K[x]
@@ -2420,7 +2477,7 @@ EXAMPLE:  example bfctBound; shows examples
   list bb = bFactor(f);
   setring save;
   list bb = imap(Kxs,bb);
-          return(bb);
+  return(bb);
 }
 example
 {
@@ -2437,6 +2494,7 @@ example
   poly f = x-1;
   bfctBound(I,f);
 }
+
 
 //TODO check f/g or g/f, check Weyl closure of result
 proc annRatSyz (poly f, poly g, list #)
@@ -2556,7 +2614,6 @@ EXAMPLE:  example annRatSyz; shows examples
           setring R;
           Rnd[size(Rnd)+1] = RJ;
           pnew = lcm(pnew,RJ[2]);
-
         }
         else // already have DJ in Dnd
         {
@@ -2620,326 +2677,5 @@ example
   LD; // the full annihilator
   ideal BLD = imap(B,LD);
   NF(LD,std(BLD));
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-// automatic elimination in G-algebras ////////////////////////////////////////
-
-
-
-static proc annExp ()
-{
-  LIB "dmodloc.lib";
-  // ann( exp(1/f) )
-  ring r = 0,(x,y,Dx,Dy),dp;
-  def W = Weyl();
-  setring W;
-  poly f = x^2-y^3;
-  // f^2*D(i)-diff(f,var(i)) in ann(exp(1/f))
-  ideal I = f^2*Dx + 2*x, f^2*Dy - 3*y^2;
-  gkdim(I);
-  holonomicRank(I);
-  ideal J = WeylClosure(I);
-  NF(J,std(I));
-  //////////////////////////////////////////////
-  poly g = x^4 + y^5 +  x*y^4; // reiffen(4,5)
-  ideal Ig = g^2*Dx + diff(g,x), g^2*Dy + diff(g,y);
-  holonomicRank(Ig);
-  ideal Jg = WeylClosure(Ig);
-  ideal J = std(Jg);
-  NF(Jg,std(Ig));
-  poly p = diff(g,x)*Dy-diff(g,y)*Dx;
-  //////////////////////////////////////////////
-  ring r = 0,(x,y,z,Dx,Dy,Dz),dp;
-  def W = Weyl();
-  setring W;
-  poly f = x^3-y^2*z^2;
-  ideal J = f^2*Dx+3*x^2, f^2*Dy-2*y*z^2, f^2*Dz-2*y^2*z;
-  holonomicRank(J);
-  ideal WC = WeylClosure(J);
-  ring E = 0
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-// Hilbert ////////////////////////////////////////////////////////////////////
-
-proc ncHilb (list #)
-{
-  // TODO same header as for hilb()
-  ideal I;
-  intvec w;
-  int IDef,n,nDef,wDef;
-  if (size(#)>0)
-  {
-    if (typeof(#[1])=="ideal")
-    {
-      I = #[1];
-      IDef = 1;
-    }
-    else
-    {
-      if (typeof(#[1])=="intvec")
-      {
-        w = #[1];
-        wDef = 1;
-      }
-    }
-    if (size(#)>1)
-    {
-      if (typeof(#[2])=="int" || typeof(#[2])=="number")
-      {
-        n = int(#[2]);
-        nDef = 1;
-      }
-      if (size(#)>2)
-      {
-        if (typeof(#[3])=="intvec" && !wDef)
-        {
-          w = #[2];
-          wDef = 1;
-        }
-      }
-    }
-  }
-  intvec v;
-  def save = basering;
-  def r = commRing();
-  if (!Idef && wDef)
-  {
-    setring r;
-    v = hilb(w);
-    setring save;
-  }
-  if (Idef)
-  {
-    I = std(I);            // TODO what about slimgb?
-    I = normalize(lead(I));
-    setring r;
-    ideal I = imap(save,I);
-    attrib(I,"isSB",1);    // I is monomial
-    if (nDef)
-    {
-      if (wDef)
-      {
-        v = hilb(I,n,v);
-      }
-      else
-      {
-        v = hilb(I,n);
-      }
-    }
-    else
-    {
-      hilb(I);             // no return value, just prints on screen
-      setring save;
-      return();
-    }
-  }
-  setring save;
-  return(v);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-proc towardsInvIn (ideal I)
-{
-  def save = basering;
-  int n = nvars(save) div 2;
-  int sI = ncols(I);
-  int d,i,j,k;
-  ideal J,K;
-  J = I;
-  string str;
-  def newR = basering;
-  for (i=1; i<=sI; i++)
-  {
-    d = deg(I[i]);
-    for (j=0; j<d; j++)
-    {
-      setring save;
-      K = kbase(std(I[i]),j);
-      setring newR;
-      K = imap(save,K);
-      list RL = ringlist(newR);
-      list L = RL[2];
-      for (k=1; k<=size(K); k++)
-      {
-        str = "c(" + string(i) + ")(" + string(j) +")(" + string(k) +")";
-        L = insert(L,str,size(L));
-      }
-      RL[2] = L;
-      L = RL[3];
-      list LL = list("dp",intvec(1:(size(RL[2]))));
-      if ( (i==1) && (j==0) )
-      {
-        L = insert(L,LL,size(L)-1);
-      }
-      else
-      {
-        L[size(L)-1] = LL;
-      }
-      RL[3] = L;
-      def oldR = basering;
-      setring oldR;
-      kill newR,L,LL;
-      def newR = ring(RL);
-      setring newR;
-      ideal I = imap(oldR,I);
-      ideal J = imap(oldR,J);
-      ideal K = imap(oldR,K);
-      kill oldR;
-      poly p;
-      for (k=1; k<=size(K); k++)
-      {
-        p = p + c(i)(j)(k)*K[k];
-      }
-      J[i] = J[i] + p;
-    }
-  }
-  export(J);
-  setring save;
-  return(newR);
-}
-example
-{
-  LIB "dmod.lib";
-  ring r = 0,(x,y,Dx,Dy),dp;
-  ideal I = x*Dx,Dy;
-  ideal I = 2*x*Dx+3*y*Dy,Dy;
-  def D2 = Weyl();
-  setring D2;
-  ideal I = 3*x^2*Dy+2*y*Dx,2*x*Dx+3*y*Dy+6;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-proc leadHomog (def id)
-{
-  // id ideal or poly
-  // return highest homogeneous part wrt to standard filtration
-  string inp = typeof(id);
-  ideal I;
-  if ( (inp=="poly") || (inp=="ideal") )
-  {
-    I = id;
-  }
-  else
-  {
-    ERROR("Input must be of type poly or ideal.");
-  }
-  int i,d;
-  for (i=1; i<=ncols(I); i++)
-  {
-    d = deg(I[i]);
-    I[i] = jet(id,d) - jet(id,d-1);
-  }
-  if (inp=="poly")
-  {
-    return(I[1]);
-  }
-  else
-  {
-    return(I);
-  }
-}
-
-
-proc associatedGradedRing ()
-{
-  // returns associated graded ring of basering wrt to degree filtration
-  // if basering is G-algebra, result is correct iff nc relations are quadratic
-  // otherwise??
-  def save = basering;
-  list RL = ringlist(save);
-  if (size(RL)<5)
-  {
-    return(save);
-  }
-  matrix D = RL[6];
-  int n = nvars(save);
-  int d,i,j;
-  for (i=1; i<=n; i++)
-  {
-    for (j=i; j<=n; j++) // D is upper triangular matrix
-    {
-      d = deg(D[i,j]);
-      if (d<=2)
-      {
-        D[i,j] = 0;
-      }
-      else
-      {
-        D[i,j] = leadHomog(D[i,j]);
-      }
-    }
-  }
-  RL[6] = D;
-  if ( (simplify(ideal(RL[5]),2+4)==1) && (simplify(ideal(D),2+4)==0) )
-  {
-    return(commRing());  // associated graded algebra is commutative
-  }
-  def gr = ring(RL);
-  return(gr);
-}
-
-proc Rees ()
-{
-  // returns Rees algebra associated to basering wrt to degree filtration
-  // if basering is G-algebra, result is correct iff nc relations are quadratic
-  // otherwise??
-  def save = basering;
-  list RL = ringlist(save);
-  int n = nvars(save);
-  list L = RL[2];
-  L = insert(L,"T",n); // TODO
-  RL[2] = L;
-  if (size(RL)>4)
-  {
-    matrix C = RL[5];
-    matrix D = RL[6];
-    RL = RL[1..4];
-    def @r = ring(RL);
-  }
-  else
-  {
-    def @r = ring(RL);
-    return(@r);
-  }
-  setring @r;
-  matrix C = imap(save,C);
-  matrix @C[n+1][1] = 1:n,0;
-  C = concat(C,@C);
-  matrix D = imap(save,D);
-  matrix @D[n+1][1];
-  D = concat(D,@D);
-  D = homog(D,var(n+1));
-  int i,j,d;
-  for (i=1; i<=n; i++)
-  {
-    for (j=i; j<=n; j++) // D is upper triangular matrix
-    {
-      d = deg(D[i,j]);
-      if (d>2)
-      {
-        ERROR ("Expected non-commutative relations of degree at most 2.");
-      }
-      if (d<2)
-      {
-        D[i,j] = D[i,j]*var(n+1)^(2-d);
-      }
-    }
-  }
-  def r = nc_algebra(C,D);
-  setring save;
-  return(r);
 }
 
