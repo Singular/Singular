@@ -114,6 +114,10 @@ SEE ALSO: boolean_ideal, boolean_std
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
 "
 {
+  if (typeof(Pyobject)!="package")
+  {
+    LIB("pyobject.so");
+  }
   if (typeof(zdd_one)=="?unknown type?")
   {
     python_import("polybori");
