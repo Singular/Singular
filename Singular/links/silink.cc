@@ -30,6 +30,7 @@
 #include <misc/intvec.h>
 #include <Singular/links/ssiLink.h>
 #include <Singular/links/pipeLink.h>
+#include "feOpt.h"
 
 // #ifdef HAVE_DBM
 // #ifdef ix86_Win
@@ -195,6 +196,8 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
   {
 
     if (l->m == NULL) slInit(l, ((char*)""));
+
+    if (feOptValue(FE_OPT_NO_SHELL)) {WerrorS("no links allowed");return TRUE;}
 
     const char *c="_";;
     if (h!=NULL) c=h->Name();

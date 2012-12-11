@@ -67,6 +67,9 @@ Do not display warning messages
 \fB\-\-no\-out\fR
 Suppress all output
 .TP
+\fB\-\-no\-shell\fR
+Restricted mode: Prohibit shell escape commands and links
+.TP
 \fB\-\-min\-time\fR=\fISECS\fR
 Do not display times smaller than SECS (in seconds)
 .TP
