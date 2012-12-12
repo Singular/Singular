@@ -56,7 +56,7 @@ void convertCF2Fmpz (fmpz_t result, const CanonicalForm& f)
   else
   {
     mpz_t gmp_val;
-    gmp_val[0]= *getmpi(f.getval());
+    f.mpzval(gmp_val);
     fmpz_set_mpz (result, gmp_val);
     mpz_clear (gmp_val);
   }
