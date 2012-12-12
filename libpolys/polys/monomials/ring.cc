@@ -1432,7 +1432,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->pLDegOrig=NULL;
   //memset: res->p_Setm=NULL;
   //memset: res->cf=NULL;
-  res->options=r->options;
 
 /*
   if (r->extRing!=NULL)
@@ -1576,7 +1575,6 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   //memset: res->pLDegOrig=NULL;
   //memset: res->p_Setm=NULL;
   //memset: res->cf=NULL;
-  res->options=r->options;
 
 /*
   if (r->extRing!=NULL)
