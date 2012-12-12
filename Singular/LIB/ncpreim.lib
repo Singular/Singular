@@ -50,7 +50,7 @@ extendedTensor(A,I);       tensor product of rings with additional relations
 preimageNC(A,f,J[,P,eng]); preimage of ideals under homomorphisms of G-algebras
 
 
-KEYWORDS: 
+KEYWORDS:
 preimage; elimination
 
 SEE ALSO: eliminate_lib, preimage (plural)
@@ -289,7 +289,7 @@ NOTE:     Purpose of this proc: check if all entries of v are in the range
 //   matrix D[4][4];
 //   D[1,2] = 3*a;  D[1,4] = 3*x^2;  D[2,3] = -x;
 //   D[2,4] = d;    D[3,4] = 1;
-//   // To create a G-algebra, the ordering condition implies 
+//   // To create a G-algebra, the ordering condition implies
 //   // that x^2<a*d must hold (see D[1,4]), which is not fulfilled:
 //   x^2 < a*d;
 //   // Hence, we look for an appropriate weight vector
@@ -438,7 +438,7 @@ static proc orderingConditionEngine (matrix D, intvec v, int elimweight)
   matrix A = imap(r,A);
   dbprint(ppl,"// Calling simplex...");
   dbprint(ppl-1,"// with the matrix " + print(A));
-  dbprint(ppl-1,"// and parameters " 
+  dbprint(ppl-1,"// and parameters "
           + string(intvec(m,n,m-rowV1-rowV2,rowV1,rowV2)));
   list L = simplex(A,m,n,m-rowV1-rowV2,rowV1,rowV2);
   int se = L[2];

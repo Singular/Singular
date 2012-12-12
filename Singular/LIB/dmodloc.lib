@@ -41,7 +41,7 @@ compute the holonomic rank and the singular locus of the D-module D/I.
 References:
 @* (OT)  Oaku, Takayama: 'Algorithms for D-modules',
          Journal of Pure and Applied Algebra, 1998
-@* (OTT) Oaku, Takayama, Tsai: 'Polynomial and rational solutions of holonomic 
+@* (OTT) Oaku, Takayama, Tsai: 'Polynomial and rational solutions of holonomic
          systems', Journal of Pure and Applied Algebra, 2001
 @* (OTW) Oaku, Takayama, Walther: 'A Localization Algorithm for D-modules',
          Journal of Symbolic Computation, 2000
@@ -50,7 +50,7 @@ References:
 
 PROCEDURES:
 
-holonomicRank(I);  computes the holonomic rank of I 
+holonomicRank(I);  computes the holonomic rank of I
 DsingularLocus(I); computes the singular locus of a D-module
 Dlocalization(I,f[,k,e]);  computes the localization of a D-module
 WeylClosure1(L);   computes the Weyl closure of operator in first Weyl algebra
@@ -80,9 +80,9 @@ commRing();        deletes non-commutative relations from ring
 rightNFWeyl(id,k); computes right NF wrt right ideal (var(k)) in Weyl algebra
 
 
-KEYWORDS: 
-D-module; 
-holonomic rank; singular locus of D-module; 
+KEYWORDS:
+D-module;
+holonomic rank; singular locus of D-module;
 D-localization; localization of D-module; characteristic variety;
 Weyl closure;
 polynomial solutions; rational solutions;
@@ -150,7 +150,7 @@ NOTE:     This procedure checks the following conditions on the basering R
 @*         - R is not a qring,
 @*         - for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
              holds, i.e. the sequence of variables is given by
-             x(1),...,x(n),D(1),...,D(n), where D(i) is the differential 
+             x(1),...,x(n),D(1),...,D(n), where D(i) is the differential
              operator belonging to x(i).
 EXAMPLE:  example dmodGeneralAssumptionCheck; shows examples
 "
@@ -593,8 +593,8 @@ proc dmodAction (def id, poly f, list #)
 "
 USAGE:    dmodAction(id,f[,v]);  id ideal or poly, f poly, v optional intvec
 ASSUME:   If v is not given, the basering is the n-th Weyl algebra W over a
-          field of characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+          field of characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
           Otherwise, v is assumed to specify positions of variables, which form
@@ -700,8 +700,8 @@ proc dmodActionRat(def id, vector w)
 "
 USAGE:    dmodActionRat(id,w);  id ideal or poly, f vector
 ASSUME:   The basering is the n-th Weyl algebra W over a field of
-          characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+          characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Further, assume that w has exactly two components, second one not 0,
@@ -1041,8 +1041,8 @@ EXAMPLE: example orderedPartition; shows an example
   else
   {
     M = weightKB(ideal(0),n,w); // all monomials of total weighted degree n
-  }  
-  list L; 
+  }
+  list L;
   int i;
   for (i = 1; i <= ncols(M); i++) {L = insert(L,leadexp(M[i]));}
   // the leadexp corresponds to a partition
@@ -1575,7 +1575,7 @@ NOTE:     If printlevel=1, progress debug messages will be printed,
 SEE ALSO: WeylClosure
 EXAMPLE:  example WeylClosure1; shows examples
 "
-{    
+{
   dmodGeneralAssumptionCheck(); // assumption check
   int ppl = printlevel - voice + 2;
   def save = basering;
@@ -1692,7 +1692,7 @@ EXAMPLE:  example WeylClosure1; shows examples
         break;
       }
     }
-    maxroots[i] = d[j]; // d[j] = r_k 
+    maxroots[i] = d[j]; // d[j] = r_k
     list LR = bFactor(Q[j]);
     LR = intRoots(LR);
     if (LR[2]<>0:size(LR[2])) // there are integral roots
@@ -1754,9 +1754,9 @@ example
 proc WeylClosure (ideal I)
 "
 USAGE:    WeylClosure(I);  I an ideal
-ASSUME:   The basering is the n-th Weyl algebra W over a field of 
-          characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+ASSUME:   The basering is the n-th Weyl algebra W over a field of
+          characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that the holonomic rank of W/I is finite.
@@ -1828,9 +1828,9 @@ example
 proc polSol (ideal I, list #)
 "
 USAGE:    polSol(I[,w,m]);  I ideal, w optional intvec, m optional int
-ASSUME:   The basering is the n-th Weyl algebra W over a field of 
-          characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+ASSUME:   The basering is the n-th Weyl algebra W over a field of
+          characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
@@ -1980,9 +1980,9 @@ static proc ex_polSol()
 proc polSolFiniteRank (ideal I, list #)
 "
 USAGE:    polSolFiniteRank(I[,w]);  I ideal, w optional intvec
-ASSUME:   The basering is the n-th Weyl algebra W over a field of 
-          characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+ASSUME:   The basering is the n-th Weyl algebra W over a field of
+          characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is of finite holonomic rank.
@@ -2168,9 +2168,9 @@ example
 proc ratSol (ideal I)
 "
 USAGE:    ratSol(I);  I ideal
-ASSUME:   The basering is the n-th Weyl algebra W over a field of 
-          characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+ASSUME:   The basering is the n-th Weyl algebra W over a field of
+          characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
@@ -2289,16 +2289,16 @@ example
   // Each column of the matrix represents a rational function, where
   // the first row correspond to the enumerator and the second row to
   // the denominator.
-  print(M); 
+  print(M);
 }
 
 
 proc bfctBound (ideal I, poly f, list #)
 "
 USAGE:    bfctBound (I,f[,primdec]);  I ideal, f poly, primdec optional string
-ASSUME:   The basering is the n-th Weyl algebra W over a field of 
-          characteristic 0 and for all 1<=i<=n the identity 
-          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of 
+ASSUME:   The basering is the n-th Weyl algebra W over a field of
+          characteristic 0 and for all 1<=i<=n the identity
+          var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
@@ -2437,7 +2437,7 @@ EXAMPLE:  example bfctBound; shows examples
   def Kxs = ring(RL);
   setring Kxs;
   ideal J = imap(Ws,J);
-  dbprint(ppl  ,"// Computing primary decomposition with engine " 
+  dbprint(ppl  ,"// Computing primary decomposition with engine "
           + primdec + "...");
   if (primdec == "GTZ")
   {
@@ -2454,7 +2454,7 @@ EXAMPLE:  example bfctBound; shows examples
   vector v;
   for (i=1; i<=size(P); i++)
   {
-    dbprint(ppl  ,"// Considering primary component " + string(i) 
+    dbprint(ppl  ,"// Considering primary component " + string(i)
             + " of " + string(size(P)) + "...");
     dbprint(ppl  ,"//   Intersecting with K[x] and computing radical...");
     GP = std(P[i][1]);
