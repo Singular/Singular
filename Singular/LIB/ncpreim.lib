@@ -93,7 +93,7 @@ proc admissibleSub (intvec v)
 "
 USAGE:    admissibleSub(v);  v intvec
 ASSUME:   The entries of v are in the range 1..nvars(basering).
-RETURN:   int, 1 if the variables indexed by the entries of v form an 
+RETURN:   int, 1 if the variables indexed by the entries of v form an
           admissible subalgebra, 0 otherwise
 EXAMPLE:  example admissibleSub; shows examples
 "
@@ -151,7 +151,7 @@ example
 proc isUpperTriangular(matrix M, list #)
 "
 USAGE:    isUpperTriangular(M[,k]);  M a matrix, k an optional int
-RETURN:   int, 1 if the given matrix is upper triangular, 
+RETURN:   int, 1 if the given matrix is upper triangular,
           0 otherwise.
 NOTE:     If k<>0 is given, it is checked whether M is strictly upper
           triangular.
@@ -187,7 +187,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,x,dp;
-  matrix M[2][3] = 
+  matrix M[2][3] =
     0,1,2,
     0,0,3;
   isUpperTriangular(M);
@@ -256,7 +256,7 @@ NOTE:     Purpose of this proc: check if all entries of v are in the range
 
 /*
 // this is the same as Gweights@nctools.lib
-// 
+//
 // proc orderingCondition (matrix D)
 // "
 // USAGE:    orderingCondition(D);  D a matrix
@@ -627,7 +627,7 @@ example
 
 proc preimageNC (list #)
 "
-USAGE:    preimageNC(A,f,J[,P,eng]);  A ring, f map or ideal, J ideal, 
+USAGE:    preimageNC(A,f,J[,P,eng]);  A ring, f map or ideal, J ideal,
                                       P optional string, eng optional int
 ASSUME:   f defines a map from A to the basering.
 RETURN:   nothing, instead exports an object 'preim' of type ideal to ring A,
@@ -727,7 +727,7 @@ EXAMPLE:  example preimageNC; shows examples
   J = nselect(J,v);
   attrib(J,"isSB",1);
   setring A;
-  dbprint(ppl,"// Writing output to specified ring under the name '" 
+  dbprint(ppl,"// Writing output to specified ring under the name '"
           + str + "'.");
   str = "ideal " + str + " = imap(E,J); export(" + str + ");";
   execute(str);
@@ -778,7 +778,7 @@ static proc ex2 ()
   ideal tau = x,-x*D^2,2*x*D;
   def E = extendedTensor(U,tau);
   setring E; E;
-  elimWeight(4..5); 
+  elimWeight(4..5);
   // zero, since there is no elimination ordering for x,D in E
 }
 

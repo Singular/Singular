@@ -980,7 +980,7 @@ USUAGE:  orderedPartition(n,a); n,a positive ints
          orderedPartition(n,w); n positive int, w positive intvec
 RETURN:  list of intvecs
 PURPOSE: Computes all partitions of n of length a, if the second
-         argument is an int, or computes all weighted partitions 
+         argument is an int, or computes all weighted partitions
          w.r.t. w of n of length size(w) if the second argument
          is an intvec.
          In both cases, zero parts are included.
@@ -1044,7 +1044,7 @@ EXAMPLE: example orderedPartition; shows an example
   }  
   list L; 
   int i;
-  for (i = 1; i <= ncols(M); i++) {L = insert(L,leadexp(M[i]));} 
+  for (i = 1; i <= ncols(M); i++) {L = insert(L,leadexp(M[i]));}
   // the leadexp corresponds to a partition
   if (baseringdef) // sets the old ring as basering again
   {
@@ -1074,7 +1074,7 @@ ASSUME:   The basering is the n-th Weyl algebra over a field of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i)
           is the differential operator belonging to x(i).
 RETURN:   int, the holonomic rank of I
-REMARKS:  The holonomic rank of I is defined to be the K(x(1..n))-dimension of 
+REMARKS:  The holonomic rank of I is defined to be the K(x(1..n))-dimension of
           I regarded as ideal in the rational Weyl algebra K(x(1..n))<D(1..n)>.
           If this dimension is not finite, -1 is returned.
 NOTE:     If e<>0, @code{std} is used for Groebner basis computations,
@@ -1440,7 +1440,7 @@ EXAMPLE: example Dlocalization; shows examples
   else
   {
     return(I);
-  }  
+  }
 }
 example
 {
@@ -1662,7 +1662,7 @@ EXAMPLE:  example WeylClosure1; shows examples
   intvec maxroots,testroots;
   int sq = size(Q);
   string strQ = "ideal Q = " + string(Q) + ";";
-  // TODO do it without string workaround when issue with maps from 
+  // TODO do it without string workaround when issue with maps from
   //   transcendental to algebraic extension fields is fixed
   int j,maxr;
   // 2-1 get max int root of lowest nonzero entry of Q in algebraic extension
@@ -2246,7 +2246,7 @@ EXAMPLE:  example ratSol; shows examples
       else
       {
         FF[1] = FF[1]*F[i]^(k[i]);
-      }      
+      }
     }
   }
   vector v = FF[1]*gen(1) + FF[2]*gen(2);
@@ -2303,10 +2303,10 @@ ASSUME:   The basering is the n-th Weyl algebra W over a field of
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
 RETURN:   list of roots (of type ideal) and multiplicities (of type intvec) of
-          a multiple of the b-function for f^s*u at a generic root of f. 
+          a multiple of the b-function for f^s*u at a generic root of f.
           Here, u stands for [1] in D/I.
 REMARKS:  Reference: (OTT), Algorithm 3.4
-NOTE:     This procedure requires to compute a primary decomposition in a 
+NOTE:     This procedure requires to compute a primary decomposition in a
           commutative ring. The optional string primdec can be used to specify
           the algorithm to do so. It may either be 'GTZ' (Gianni, Trager,
           Zacharias) or 'SY' (Shimoyama, Yokoyama). By default, 'GTZ' is used.
