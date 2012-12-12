@@ -676,7 +676,7 @@ ZZ convertFacCF2NTLZZ(const CanonicalForm f)
     mpz_t gmp_val;
     char* stringtemp;
 
-    gmp_val[0]=*getmpi(f.getval());
+    f.mpzval (gmp_val);
     int l=mpz_sizeinbase(gmp_val,10)+2;
     stringtemp=(char*)Alloc(l);
     stringtemp=mpz_get_str(stringtemp,10,gmp_val);
