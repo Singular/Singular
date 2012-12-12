@@ -16,7 +16,6 @@
 #include <misc_ip.h>
 #include <blackbox.h>
 #include <newstruct.h>
-#include <pyobject_setup.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -2910,14 +2909,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        #endif
          res->rtyp = NONE;
          return FALSE;
-       }
-       else
-
-  /*==== pyobject (or pyobject*, like pyobject.so) force loading python ===*/
-       if (strncmp(sys_cmd, "pyobject", 8) == 0)
-       {
-         res->rtyp = NONE;
-         return pyobject_ensure();
        }
        else
 
