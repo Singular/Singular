@@ -1,5 +1,4 @@
 break dErrorBreak
-break dReportError
 break omReportError
 
 
@@ -21,5 +20,3 @@ define pp
   end
 end
      
-run
-backtrace

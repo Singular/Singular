@@ -78,7 +78,7 @@ triagmatrix.tst
 univariate.tst
 univarpoly.tst
 vdim_BR_PLURAL_BR.tst
-;; waitall.tst
+; waitall.tst
 bigint_expressions.tst
 boolean_operations.tst
 breakpoint.tst
@@ -315,7 +315,6 @@ diag.tst
 diagInvariants.tst
 dimMon.tst
 divisor.tst
-dump.tst
 elimlinearpart.tst
 elimRing.tst
 equalJinI.tst
@@ -348,7 +347,6 @@ Long_coefficients.tst
 matrix_type_cast.tst
 Max.tst
 maxabs.tst
-minMult.tst
 Miscellaneous_oddities_4.tst
 nameof.tst
 _names.tst
@@ -388,7 +386,7 @@ triangL_solve.tst
 triangM_solve.tst
 truncate.tst
 varNum.tst
-;; waitfirst.tst
+; waitfirst.tst
 absFactorize.tst
 absValue.tst
 Ann.tst
@@ -414,7 +412,6 @@ ERROR.tst
 exteriorBasis.tst
 gcdN.tst
 genericmat.tst
-getdump.tst
 GKdim.tst
 hessenberg.tst
 Identifier_resolution_1.tst
