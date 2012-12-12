@@ -1653,7 +1653,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->pLDegOrig=NULL;
   //memset: res->p_Setm=NULL;
   //memset: res->cf=NULL;
-  res->options=r->options;
   #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;
   #endif
