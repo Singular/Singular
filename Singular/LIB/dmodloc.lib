@@ -80,13 +80,11 @@ commRing();        deletes non-commutative relations from ring
 rightNFWeyl(id,k); computes right NF wrt right ideal (var(k)) in Weyl algebra
 
 
-KEYWORDS:
-D-module;
-holonomic rank; singular locus of D-module;
+KEYWORDS: D-module; holonomic rank; singular locus of D-module;
 D-localization; localization of D-module; characteristic variety;
-Weyl closure;
-polynomial solutions; rational solutions;
+Weyl closure; polynomial solutions; rational solutions;
 annihilator of rational function;
+
 
 SEE ALSO: bfun_lib, dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
 ";

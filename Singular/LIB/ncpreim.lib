@@ -50,8 +50,8 @@ extendedTensor(A,I);       tensor product of rings with additional relations
 preimageNC(A,f,J[,P,eng]); preimage of ideals under homomorphisms of G-algebras
 
 
-KEYWORDS:
-preimage; elimination
+KEYWORDS: preimage; elimination
+
 
 SEE ALSO: eliminate_lib, preimage (plural)
 ";
