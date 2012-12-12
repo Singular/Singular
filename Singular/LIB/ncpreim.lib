@@ -42,7 +42,7 @@ References:
 
 PROCEDURES:
 admissibleSub(v);          checks whether subalgebra is admissible
-isUpperTriangular(M,k)  ;  checks whether matrix is (strictly) upper triangular
+isUpperTriangular(M,k);    checks whether matrix is (strictly) upper triangular
 appendWeight2Ord(w);       appends weight to ordering
 elimWeight(v);             computes elimination weight
 eliminateNC(I,v,eng);      elimination in G-algebras
@@ -66,9 +66,24 @@ LIB "dmodloc.lib"; // for commRing
 
 /*
 CHANGELOG
-
-
+11.12.12: docu, typos, fixed variable names in extendedTensor,
+ moved commRing to dmodloc.lib
+12.12.12: typos
 */
+
+
+// -- Testing for consistency of the library ---------------
+
+static proc testncpreimlib()
+{
+  example admissibleSub;
+  example isUpperTriangular;
+  example appendWeight2Ord;
+  example elimWeight;
+  example eliminateNC;
+  example extendedTensor;
+  example preimageNC;
+}
 
 
 // -- Tools ------------------------------------------------

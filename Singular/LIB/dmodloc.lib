@@ -62,7 +62,7 @@ bfctBound(I,f[,primdec]); computes multiple of b-function for f^s*u
 annRatSyz(f,g[,db,eng]);  computes part of annihilator of rational function g/f
 
 dmodGeneralAssumptionCheck();   check general assumptions
-safeVarName(s);    finds an untaken name to use for a new variable
+safeVarName(s);    finds a free name to use for a new variable
 extendWeyl(S);     extends basering (Weyl algebra) by given vars
 polyVars(f,v);     checks whether f contains only variables indexed by v
 monomialInIdeal(I);    computes all monomials appearing in generators of ideal
@@ -77,7 +77,7 @@ addRat(v,w);       adds rational functions
 multRat(v,w);      multiplies rational functions
 diffRat(v,j);      derives rational function
 commRing();        deletes non-commutative relations from ring
-rightNFWeyl(id,k); computes right NF wrt. right ideal (var(k)) in Weyl algebra
+rightNFWeyl(id,k); computes right NF wrt right ideal (var(k)) in Weyl algebra
 
 
 KEYWORDS: 
@@ -106,14 +106,14 @@ LIB "nctools.lib"; // for Weyl, isWeyl etc
 
 
 // testing for consistency of the library /////////////////////////////////////
-proc testdmodloc()
+static proc testdmodloc()
 {
   example dmodGeneralAssumptionCheck;
   example safeVarName;
   example extendWeyl;
   example polyVars;
   example monomialInIdeal;
-  example vas2pars;
+  example vars2pars;
   example killTerms;
   example minIntRoot2;
   example maxIntRoot;
