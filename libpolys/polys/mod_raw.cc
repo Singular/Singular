@@ -33,7 +33,11 @@
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #define BYTES_TO_CHECK 7
 
-char* si_bultin_libs[]={ "huhu.so", NULL };
+#define SI_BUILTIN_LIBSTR(name) (char*) #name ".so",
+
+char* si_bultin_libs[]={ SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)  NULL };
+
+#undef SI_BUILTIN_LIBSTR 
 
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
