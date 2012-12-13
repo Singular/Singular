@@ -19,6 +19,7 @@
 
 #include "cf_defs.h"
 #include "variable.h"
+#include "cf_gmp.h"
 #include "templates/ftmpl_list.h"
 #include "templates/ftmpl_array.h"
 #include "templates/ftmpl_factor.h"
@@ -79,6 +80,7 @@ public:
 
     CanonicalForm deepCopy() const;
 
+    void mpzval(mpz_t val) const;
     // predicates
     CF_NO_INLINE bool isOne() const;
     CF_NO_INLINE bool isZero() const;
