@@ -282,3 +282,10 @@ mpz_ptr getmpi ( InternalCF * value, bool symmetric )
         mpz_init_set( dummy, InternalPrimePower::MPI( value ) );
     return dummy;
 }
+
+void getmpi ( InternalCF * value, mpz_t mpi)
+{
+    ASSERT( ! is_imm( value ) && (value->levelcoeff() == IntegerDomain ), "illegal operation" );
+    mpz_init_set (mpi, ((InternalInteger*)value)->thempi);
+}
+

@@ -68,6 +68,13 @@ CanonicalForm::deepCopy() const
     else
         return CanonicalForm( value->deepCopyObject() );
 }
+
+void
+CanonicalForm::mpzval(mpz_t val) const
+{
+    ASSERT (!is_imm (value) && value->levelcoeff() == IntegerDomain, "non-immediate integer expected");
+    getmpi (value, val);
+}
 //}}}
 
 //{{{ predicates

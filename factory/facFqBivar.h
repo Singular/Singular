@@ -584,18 +584,19 @@ extFactorRecombination (
 /// @sa extFactorRecombination(), earlyFactorDetectection()
 CFList
 factorRecombination (
-                CFList& factors,       ///< [in,out] list of lifted factors
-                                       ///< that are monic wrt Variable (1)
-                CanonicalForm& F,      ///< [in,out] poly to be factored
-                const CanonicalForm& M,///< [in] Variable (2)^liftBound
-                DegreePattern& degs,   ///< [in] degree pattern
-                int s,                 ///< [in] algorithm starts checking
-                                       ///< subsets of size s
-                int thres,             ///< [in] threshold for the size of
-                                       ///< subsets which are checked, for a
-                                       ///< full factor recombination choose
-                                       ///< thres= factors.length()/2
-                const modpk& b=modpk() ///< [in] coeff bound
+            CFList& factors,            ///< [in,out] list of lifted factors
+                                        ///< that are monic wrt Variable (1)
+            CanonicalForm& F,           ///< [in,out] poly to be factored
+            const CanonicalForm& M,     ///< [in] Variable (2)^liftBound
+            DegreePattern& degs,        ///< [in] degree pattern
+            int s,                      ///< [in] algorithm starts checking
+                                        ///< subsets of size s
+            int thres,                  ///< [in] threshold for the size of
+                                        ///< subsets which are checked, for a
+                                        ///< full factor recombination choose
+                                        ///< thres= factors.length()/2
+            const modpk& b=modpk(),     ///< [in] coeff bound
+            const CanonicalForm& den= 1 ///< [in] bound on the den if over Q (a)
                     );
 
 /// chooses a field extension.
@@ -689,7 +690,8 @@ henselLiftAndEarly (
         const CFList& uniFactors,  ///< [in] univariate factors
         const ExtensionInfo& info, ///< [in] information about extension
         const CanonicalForm& eval, ///< [in] evaluation point
-        modpk& b                   ///< [in] coeff bound
+        modpk& b,                  ///< [in] coeff bound
+        CanonicalForm& den         ///< [in] bound on the den if over Q(a)
                   );
 
 /// hensel Lifting and early factor detection
