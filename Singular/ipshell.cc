@@ -5143,7 +5143,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     assume( float_len <= float_len2 );
 
-    if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH) )
+    if (!complex_flag)
+      complex_flag= pn->next != NULL;
+    if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH))
        cf=nInitChar(n_R, NULL);
     else // longR or longC?
     {
