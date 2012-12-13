@@ -12,6 +12,12 @@ ideal currQuotient = NULL;
 
 void rChangeCurrRing(ring r)
 {
+  #if 0
+  if ((currRing!=NULL)&&(currRing!=r))
+  {
+    currRing->options=si_opt_1 & TEST_RINGDEP_OPTS;
+  }
+  #endif
   if( r != NULL )
   {
     rTest(r);    
@@ -25,7 +31,8 @@ void rChangeCurrRing(ring r)
     //------------ global variables related to polys
     p_SetGlobals(r);
     //------------ global variables related to factory -----------------
-  } else
+  }
+  else
   {
     currRing = NULL;
     currQuotient = NULL;

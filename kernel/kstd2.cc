@@ -1163,6 +1163,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = FALSE;
+  BITSET save;
+  SI_SAVE_OPT1(save);
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
@@ -1465,6 +1467,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //    }
 //  }
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
+  SI_RESTORE_OPT1(save);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
 #ifdef KDEBUG
