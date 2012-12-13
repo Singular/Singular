@@ -1,9 +1,10 @@
-//
+//////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="Noncommutative";
 info="
-LIBRARY: ncpreim.lib    Non-commutative elimination and preimage computation
+LIBRARY: ncpreim.lib    Non-commutative elimination and preimage computations
 AUTHORS: Daniel Andres, daniel.andres@math.rwth-aachen.de
+
 Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
 
@@ -14,12 +15,13 @@ One, not every subset of variables generates an algebra, which is again a
 G-algebra.
 Two, even if the subset of variables in question generates an admissible
 subalgebra, there might be no admissible elimination ordering, i.e. an
-elimination ordering which also satisfies the ordering condition for G-algebras.
+elimination ordering which also satisfies the ordering condition for
+G-algebras.
 
 The difference between the procedure eliminateNC provided in this library and
 the procedure eliminate (plural) from the kernel is that eliminateNC will
-always find an admissible elimination if such one exists. Moreover, the use of
-slimgb for performing Groebner basis computations is possible.
+always find an admissible elimination if such one exists. Moreover, the use
+of slimgb for performing Groebner basis computations is possible.
 
 As an application of the theory of elimination, the procedure preimageNC is
 provided, which computes the preimage of an ideal under a homomorphism
@@ -38,66 +40,53 @@ References:
          subalgebras', ISSAC'06, 212-219, ACM, 2006.
 
 
-
 PROCEDURES:
-admissibleSub(v)          checks whether subalgebra is admissible
-isUpperTriangular(M[,k])  checks whether matrix is (strictly) upper triangular
-appendWeight2Ord(w)       appends weight to ordering
-elimWeight(v)             computes elimination weight
-eliminateNC(I,v,eng)      elimination in G-algebras
-preimageNC(A,f,J[,P,eng]) preimage of ideals under homomorphisms of G-algebras
+admissibleSub(v);          checks whether subalgebra is admissible
+isUpperTriangular(M,k);    checks whether matrix is (strictly) upper triangular
+appendWeight2Ord(w);       appends weight to ordering
+elimWeight(v);             computes elimination weight
+eliminateNC(I,v,eng);      elimination in G-algebras
+extendedTensor(A,I);       tensor product of rings with additional relations
+preimageNC(A,f,J[,P,eng]); preimage of ideals under homomorphisms of G-algebras
 
 
 KEYWORDS: preimage; elimination
+
 
 SEE ALSO: eliminate_lib, preimage (plural)
 ";
 
 
 LIB "elim.lib";    // for nselect
-LIB "nctools.lib";
+LIB "nctools.lib"; // for makeWeyl etc.
 LIB "dmodapp.lib"; // for sortIntvec
+LIB "ncalg.lib";   // for makeUgl
+LIB "dmodloc.lib"; // for commRing
+
 
 /*
-TODO
- - remove commRing as it will be included in dmodloc.lib
- - treat special case A=B in preimageNC and extendedTensor, resp.
- - treat case that A and B have same varnames
- - orderingConditionEngine or NEWorderingConditionEngine??
- - create test suite
+CHANGELOG
+11.12.12: docu, typos, fixed variable names in extendedTensor,
+ moved commRing to dmodloc.lib
+12.12.12: typos
 */
 
 
+// -- Testing for consistency of the library ---------------
+
+static proc testncpreimlib()
+{
+  example admissibleSub;
+  example isUpperTriangular;
+  example appendWeight2Ord;
+  example elimWeight;
+  example eliminateNC;
+  example extendedTensor;
+  example preimageNC;
+}
+
+
 // -- Tools ------------------------------------------------
-
-
-proc commRing ()
-"
-USAGE:    commRing();
-RETURN:   ring, basering without non-commutative relations
-EXAMPLE:  example commRing; shows examples
-"
-{
-  list RL = ringlist(basering);
-  if (size(RL)<=4)
-  {
-    return(basering);
-  }
-  RL = RL[1..4];
-  def r = ring(RL);
-  return(r)
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  def W = makeWeyl(3);
-  setring W; W;
-  def W2 = commRing();
-  setring W2; W2;
-  ring r = 0,(x,y),dp;
-  def r2 = commRing(); // same as r
-  setring r2; r2;
-}
 
 
 proc admissibleSub (intvec v)
@@ -196,8 +185,7 @@ EXAMPLE:  example isUpperTriangular; shows examples
 }
 example
 {
-  LIB "nctools.lib";
-  LIB "qhmoduli.lib";
+  "EXAMPLE:"; echo = 2;
   ring r = 0,x,dp;
   matrix M[2][3] =
     0,1,2,
@@ -215,7 +203,7 @@ proc appendWeight2Ord (intvec w)
 USAGE:    appendWeight2Ord(w);  w an intvec
 RETURN:   ring, the basering equipped with the ordering (a(w),<), where < is
           the ordering of the basering.
-EXAMPLE:  example orderingCond; shows examples
+EXAMPLE:  example appendWeight2Ord; shows examples
 "
 {
   list RL = ringlist(basering);
@@ -236,7 +224,7 @@ example
   def A = nc_algebra(1,D);
   setring A; A;
   w = 2,1,1,1;
-  def B = appendWeight2Ord(w); // for a non-commutative ring
+  def B = appendWeight2Ord(w);  // for a non-commutative ring
   setring B; B;
 }
 
@@ -328,7 +316,7 @@ RETURN:   intvec, say w, such that the ordering (a(w),<), where < is
           entries of the given intvec.
 NOTE:     If no such ordering exists, the zero intvec is returned.
 REMARK:   Reference: (BGL), (GML)
-EXAMPLE:  example orderingCond; shows examples
+EXAMPLE:  example elimWeight; shows examples
 "
 {
   list RL = ringlist(basering);
@@ -360,132 +348,11 @@ example
 }
 
 
-// static proc OLDorderingConditionEngine (matrix D, intvec v, int elimWeight)
-// {
-//   // algorithm from (BGL) and (GML), respectively
-//   // solving an LPP via simplex
-//   // matrix D  is strictly upper triangular
-//   "// v: " + string(v);
-//   def save = basering;
-//   int n = nvars(save);
-//   ideal EV = maxideal(1);
-//   EV = EV[v]; // also assumption check for v
-//   attrib(EV,"isSB",1);
-//   ideal NEV = maxideal(1);
-//   NEV = NF(NEV,EV);
-//   intmat V1[n-size(NEV)][n+1];
-//   if (elimWeight)
-//   {
-//     intmat V2[size(NEV)][n+1];
-//   }
-//   int rowV1,rowV2;
-//   intmat M[1][n];
-//   intmat M2,oldM;
-//   int i,j,k;
-//   for (i=1; i<=n; i++)
-//   {
-//     if (elimWeight)
-//     {
-//       if (NEV[i]<>0)
-//       {
-//         V2[rowV2+1,i+1] = 1; // xj == 0
-//         rowV2++;
-//       }
-//       else
-//       {
-//         V1[rowV1+1,1] = 1; // 1-xi <= 0
-//         V1[rowV1+1,i+1] = -1;
-//         rowV1++;
-//       }
-//     }
-//     else
-//     {
-//       V1[i,1] = 1; // 1-xi <= 0
-//       V1[i,i+1] = -1;
-//     }
-//     for (j=i+1; j<=n; j++)
-//     {
-//       if (deg(D[i,j])>0)
-//       {
-//         M2 = newtonDiag(D[i,j]);
-//          for (k=1; k<=nrows(M2); k++)
-//          {
-//            M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
-//           M2[k,j] = M2[k,j] - 1;
-//          }
-//         oldM = M;
-//         M = intmat(M,nrows(M)+nrows(M2),n);
-//         M = oldM,M2;
-//       }
-//     }
-//   }
-//   intvec eq = 0,(-1:n);
-//   ring r = 0,x,dp; // to avoid problems with pars or char>0
-//   matrix A = transpose(concat(matrix(eq),matrix(transpose(V1))));
-//   module MM = module(transpose(matrix(M)));
-//   MM = simplify(MM,2+4);
-//   if (MM[1]<>0)
-//   {
-//     if (elimWeight)
-//     {
-//       MM = 0,transpose(MM);
-//     }
-//     else
-//     {
-//       MM = module(matrix(1:ncols(MM)))[1],transpose(MM);
-//     }
-//     A = transpose(concat(transpose(A),transpose(MM)));
-//   }
-//   if (elimWeight)
-//   {
-//     A = transpose(concat(transpose(A),matrix(transpose(V2))));
-//   }
-//   int m = nrows(A)-1;
-//   ring realr = (real,10),x,lp;
-//   matrix A = imap(r,A);
-//   // TODO vvv
-// //   export(realr);
-// //   export(A);
-// //   write(":w simplex_test_rows.sing",nrows(A));
-// //   write(":w simplex_test_cols.sing",ncols(A));
-// //   write(":w simplex_test_mat.sing",A);
-//   // TODO ^^^
-//   print(A);
-// //  list L = simplex(A,m,n,0,m-n+nrows(V1),n-nrows(V1));
-//   "// n:     " + string(n);
-//   "// m:     " + string(m);
-//   "// rowV1: " + string(rowV1);
-//   "// rowV2: " + string(rowV2);
-//   list L = simplex(A,m,n,0,m-rowV2,rowV2);
-// //  L; //TODO
-//   int se = L[2];
-//   if (se==-2)
-//   {
-//     ERROR("simplex yielded an error. Please inform the authors.");
-//   }
-//   intvec w = 0:n;
-//   if (se==0)
-//   {
-//     matrix S = L[1];
-//     intvec s = L[3];
-//     for (i=2; i<=nrows(S); i++)
-//     {
-//       if (s[i-1]<=n)
-//       {
-//         w[s[i-1]] = int(S[i,1]);
-//       }
-//     }
-//   }
-//   setring save;
-//   return(w);
-// }
-
-
 static proc orderingConditionEngine (matrix D, intvec v, int elimweight)
 {
   // algorithm from (BGL) and (GML), respectively
   // solving an LPP via simplex
-  int ppl = printlevel - voice + 2;
+  int ppl = printlevel - voice + 1;
   def save = basering;
   int n = nvars(save);
   ideal EV = maxideal(1);
@@ -529,11 +396,11 @@ static proc orderingConditionEngine (matrix D, intvec v, int elimweight)
       if (deg(D[i,j])>0)
       {
         M2 = newtonDiag(D[i,j]);
-         for (k=1; k<=nrows(M2); k++)
-         {
-           M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
+        for (k=1; k<=nrows(M2); k++)
+        {
+          M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
           M2[k,j] = M2[k,j] - 1;
-         }
+        }
         oldM = M;
         M = intmat(M,nrows(M)+nrows(M2),n);
         M = oldM,M2;
@@ -556,8 +423,12 @@ static proc orderingConditionEngine (matrix D, intvec v, int elimweight)
       MM = module(matrix(1:ncols(MM)))[1],transpose(MM);
     }
     A = transpose(concat(matrix(eq),transpose(-MM)));
-    A = transpose(concat(transpose(A),matrix(transpose(V1))));
   }
+  else
+  {
+    A = transpose(eq);
+  }
+  A = transpose(concat(transpose(A),matrix(transpose(V1))));
   if (elimweight)
   {
     A = transpose(concat(transpose(A),matrix(transpose(V2))));
@@ -567,119 +438,8 @@ static proc orderingConditionEngine (matrix D, intvec v, int elimweight)
   matrix A = imap(r,A);
   dbprint(ppl,"// Calling simplex...");
   dbprint(ppl-1,"// with the matrix " + print(A));
-  list L = simplex(A,m,n,m-rowV1-rowV2,rowV1,rowV2);
-  int se = L[2];
-  if (se==-2)
-  {
-    ERROR("simplex yielded an error. Please inform the authors.");
-  }
-  intvec w = 0:n;
-  if (se==0)
-  {
-    matrix S = L[1];
-    intvec s = L[3];
-    for (i=2; i<=nrows(S); i++)
-    {
-      if (s[i-1]<=n)
-      {
-        w[s[i-1]] = int(S[i,1]);
-      }
-    }
-  }
-  setring save;
-  return(w);
-}
-
-
-static proc NEWorderingConditionEngine (matrix D, intvec v, int elimweight)
-{
-  // algorithm from (BGL) and (GML), respectively
-  // solving an LPP via simplex
-  def save = basering;
-  int n = nvars(save);
-  ideal EV = maxideal(1);
-  EV = EV[v]; // also assumption check for v
-  attrib(EV,"isSB",1);
-  ideal NEV = maxideal(1);
-  NEV = NF(NEV,EV);
-  intmat V1[n-size(NEV)][n+1];
-  if (elimweight)
-  {
-    intmat V2[size(NEV)][n+1];
-  }
-  int rowV1,rowV2;
-  intmat M[1][n];
-  intmat M2,oldM;
-  int i,j,k;
-  for (i=1; i<=n; i++)
-  {
-    if (elimweight)
-    {
-      if (NEV[i]<>0)
-      {
-        V2[rowV2+1,i+1] = 1; // xj == 0
-        rowV2++;
-      }
-      else
-      {
-        V1[rowV1+1,1] = 1; // 1-xi <= 0
-        V1[rowV1+1,i+1] = -1;
-        rowV1++;
-      }
-    }
-    else
-    {
-      V1[i,1] = 1; // 1-xi <= 0
-      V1[i,i+1] = -1;
-      rowV1++;
-    }
-    for (j=i+1; j<=n; j++)
-    {
-      if (deg(D[i,j])>0)
-      {
-        M2 = newtonDiag(D[i,j]);
-         for (k=1; k<=nrows(M2); k++)
-         {
-           M2[k,i] = M2[k,i] - 1; // <beta,x> >= 0
-          M2[k,j] = M2[k,j] - 1;
-         }
-        oldM = M;
-        M = intmat(M,nrows(M)+nrows(M2),n);
-        M = oldM,M2;
-      }
-    }
-  }
-  intvec eq = 0,(-1:n);
-  ring r = 0,x,dp; // to avoid problems with pars or char>0
-  module MM = module(transpose(matrix(M)));
-  MM = simplify(MM,2+4);
-  matrix A;
-  if (MM[1]<>0)
-  {
-    if (elimweight)
-    {
-      MM = 0,transpose(MM);
-    }
-    else
-    {
-      MM = module(matrix(1:ncols(MM)))[1],transpose(MM);
-    }
-    A = transpose(concat(matrix(eq),transpose(-MM)));
-    A = transpose(concat(transpose(A),matrix(transpose(V1))));
-  }
-  if (elimweight)
-  {
-    A = transpose(concat(transpose(A),matrix(transpose(V2))));
-  }
-  int m = nrows(A)-1;
-  ring realr = (real,10),x,lp;
-  matrix A = imap(r,A);
-  // print(A);
-//  list L = simplex(A,m,n,0,m-n+nrows(V1),n-nrows(V1));
-//   "// n:     " + string(n);
-//   "// m:     " + string(m);
-//   "// rowV1: " + string(rowV1);
-//   "// rowV2: " + string(rowV2);
+  dbprint(ppl-1,"// and parameters "
+          + string(intvec(m,n,m-rowV1-rowV2,rowV1,rowV2)));
   list L = simplex(A,m,n,m-rowV1-rowV2,rowV1,rowV2);
   int se = L[2];
   if (se==-2)
@@ -785,8 +545,7 @@ example
 
 // -- Preimages ------------------------------------------------
 
-
-// TODO what if A==B??
+// TODO A or B commutative
 proc extendedTensor(def A, ideal I)
 "
 USAGE:    extendedTensor(A,I);  A ring, I ideal
@@ -804,15 +563,24 @@ EXAMPLE:  example extendedTensor; shows examples
   def B = basering;
   setring A;
   int nA = nvars(A);
+  string varA = "," + charstr(A) + "," + varstr(A) + ",";
   setring B;
   int nB = nvars(B);
   list RL = ringlist(B);
   list L = RL[2];
+  string vB;
   int i,j;
-//   for (i=1; i<=nB; i++)
-//   {
-//     L[i] = "@"+L[i]; // TODO safeVarName business
-//   }
+  for (i=1; i<=nB; i++)
+  {
+    vB = "," + L[i] + ",";
+    while (find(varA,vB)<>0)
+    {
+      vB[1] = "@";
+      vB = "," + vB;
+    }
+    vB = vB[2..size(vB)-1];
+    L[i] = vB;
+  }
   RL[2] = L;
   def @B = ring(RL);
   kill L,RL;
@@ -843,6 +611,18 @@ EXAMPLE:  example extendedTensor; shows examples
   setring B;
   return(EE);
 }
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def A = makeWeyl(2);
+  setring A; A;
+  def B = makeUgl(2);
+  setring B; B;
+  ideal I = var(1)*var(3), var(1)*var(4), var(2)*var(3), var(2)*var(4);
+  I;
+  def C = extendedTensor(A,I);
+  setring C; C;
+}
 
 
 proc preimageNC (list #)
@@ -860,7 +640,7 @@ NOTE:     If P is given and not equal to the empty string, the preimage is
 @*        If printlevel=1, progress debug messages will be printed,
           if printlevel>=2, all the debug messages will be printed.
 REMARK:   Reference: (Lev)
-SEE ALSO: preimage(plural)
+SEE ALSO: preimage (plural)
 EXAMPLE:  example preimageNC; shows examples
 "
 {
@@ -957,7 +737,6 @@ EXAMPLE:  example preimageNC; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  LIB "ncalg.lib";
   def A = makeUgl(3); setring A; A; // universal enveloping algebra of gl_3
   ring r3 = 0,(x,y,z,Dx,Dy,Dz),dp;
   def B = Weyl(); setring B; B;     // third Weyl algebra
@@ -1019,4 +798,3 @@ static proc ex3 ()
   setring A;
   preim;
 }
-
