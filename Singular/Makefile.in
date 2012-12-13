@@ -19,6 +19,7 @@ HAVE_PLURAL             = @PLURAL@
 ## Python related stuff
 ##
 HAVE_PYTHON             = @HAVE_PYTHON_VALUE@
+EMBED_PYTHON		= @EMBED_PYTHON_VALUE@
 PYTHON_CPPFLAGS		= @PYTHON_CPPFLAGS@
 PYTHON_MODULE_LIBS 	= @PYTHON_LDFLAGS@ @PYTHON_EXTRA_LIBS@
 PYTHON_MODULE_LDFLAGS   = @PYTHON_MODULE_FLAGS@ @PYTHON_EXTRA_LDFLAGS@
@@ -29,7 +30,7 @@ ifdef LD_STATIC
 PYTHON_LIBS = @PYTHON_STATIC_LIBS@
 else
 PYTHON_LIBS = @PYTHON_EMBED_LIBS@
-ifeq (${HAVE_PYTHON},1)
+ifeq (${HAVE_PYTHON}${EMBED_PYTHON},1)
 PYOBJECT_MODULE = MOD/pyobject.${MODULE_SUFFIX}
 endif 
 
@@ -50,6 +51,13 @@ includedir	= @includedir@
 slibdir		= ${prefix}/LIB
 install_bindir  = ${install_prefix}/${SINGUNAME}
 install_slibdir = ${install_prefix}/LIB
+ifeq (${PYOBJECT_MODULE},)
+bindir_mod	= 
+install_bindir_mod = 
+else
+bindir_mod	= ${bindir}/MOD
+install_bindir_mod = ${install_bindir}/MOD
+endif
 
 ##
 ## various programs
@@ -554,8 +562,7 @@ install_all: install
 install-nolns: all installbin-nolns installslib-nolns
 
 installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
-	${MKINSTALLDIRS} ${bindir}
-	${MKINSTALLDIRS} ${bindir}/MOD
+	${MKINSTALLDIRS} ${bindir} ${bindir_mod}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
 	-for file in *.so; do \
 	  ${INSTALL_PROGRAM} $$file ${bindir}; \
@@ -571,10 +578,13 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
 
 installbin-nolns: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
-	${MKINSTALLDIRS} ${bindir}
+	${MKINSTALLDIRS} ${bindir} ${bindir_mod}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
 	-for file in *.so; do \
 	  ${INSTALL_PROGRAM} $$file ${bindir}; \
+	done
+	-for file in MOD/*.so; do \
+	  ${INSTALL_PROGRAM} $$file ${bindir}/MOD; \
 	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
@@ -610,7 +620,8 @@ uninstall: uninstallbin
 uninstallbin:
 	rm -f ${bindir}/Singular${EXEC_EXT} 
 	rm -f ${SINGULAR}
-	-rmdir ${bindir}
+	rm -f ${bindir}/MOD/*.so
+	-rmdir ${bindir} ${bindir_mod}
 
 ##
 ## clean targest
@@ -618,6 +629,7 @@ uninstallbin:
 mostlyclean: 
 	-rm -f Singular Singular-static Singularg Singularp libparse feOpt*.inc
 	-rm -f *.o *.og core *.op *.so* *.dl_o*
+	-rm -rf MOD
 	-rm -f ESingular* TSingular*
 
 clean: mostlyclean
@@ -654,9 +666,10 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	sleep 1
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
-	${MKINSTALLDIRS} ${install_bindir} 
+	${MKINSTALLDIRS} ${install_bindir} ${install_bindir_mod}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${install_bindir}/Singular
 	-${INSTALL_PROGRAM} *.so ${install_bindir}
+	-${INSTALL_PROGRAM} MOD/*.so ${install_bindir}/MOD
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
 	${INSTALL_PROGRAM} surfex ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h

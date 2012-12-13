@@ -38,4 +38,18 @@ const char * dynl_error();
 #endif
 
 #endif /* HAVE_DL */
+
+
+#ifdef EMBED_PYTHON
+#define SI_BUILTIN_PYOBJECT(add) add(pyobject)
+#else
+#define SI_BUILTIN_PYOBJECT(add) 
+#endif
+
+/// Use @c add(name) to add built-in library to macro
+#define SI_FOREACH_BUILTIN(add)\
+  add(huhu)\
+  SI_BUILTIN_PYOBJECT(add)
+
+
 #endif /* MOD_RAW_H */
