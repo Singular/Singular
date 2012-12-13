@@ -400,7 +400,7 @@ public:
 private:
   std::size_t size(leftv iter, std::size_t distance = 0) const 
   {
-    if (iter) { do { ++distance; } while(iter = iter->next); }; 
+    if (iter) { do { ++distance; } while((iter = iter->next)); }; 
     return distance;
   }
   
@@ -450,7 +450,7 @@ BOOLEAN python_run(leftv result, leftv arg)
   PyRun_SimpleString(reinterpret_cast<const char*>(arg->Data()));
   sync_contexts();
 
-  Py_XINCREF(Py_None);
+  Py_INCREF(Py_None);
   return PythonCastStatic<>(Py_None).assign_to(result);
 }
 
@@ -483,14 +483,14 @@ BOOLEAN python_import(leftv result, leftv value) {
   from_module_import_all(reinterpret_cast<const char*>(value->Data()));
   sync_contexts();
 
-  Py_XINCREF(Py_None);
+  Py_INCREF(Py_None);
   return PythonCastStatic<>(Py_None).assign_to(result);
 }
 
 /// blackbox support - initialization
 void* pyobject_Init(blackbox*)
 {
-  Py_XINCREF(Py_None);
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -700,11 +700,10 @@ blackbox* pyobject_blackbox(int& tok) {
 
 
 #define PYOBJECT_ADD_C_PROC(name) \
-  add_C_proc((currPack->libname? currPack->libname: ""), (char*)#name, FALSE, name);
+  psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),\
+     (char*)#name, FALSE, name);
 
-typedef  BOOLEAN (*func_type)(leftv, leftv);
-void pyobject_init(int (*add_C_proc)(const char*, const char*, BOOLEAN,
-				     func_type) )
+int pyobject_mod_init(SModulFunctions* psModulFunctions)
 {
   int tok = -1;
   blackbox* bbx = pyobject_blackbox(tok);
@@ -719,7 +718,7 @@ void pyobject_init(int (*add_C_proc)(const char*, const char*, BOOLEAN,
     bbx->blackbox_Op2     = pyobject_Op2;
     bbx->blackbox_Op3     = pyobject_Op3;
     bbx->blackbox_OpM     = pyobject_OpM;
-    bbx->data             = omAlloc0(newstruct_desc_size());
+    bbx->data             = (void*)omAlloc0(newstruct_desc_size());
     
     PythonInterpreter::init(tok);
 
@@ -727,14 +726,15 @@ void pyobject_init(int (*add_C_proc)(const char*, const char*, BOOLEAN,
     PYOBJECT_ADD_C_PROC(python_eval);
     PYOBJECT_ADD_C_PROC(python_run); 
   }
+  return 0;
 }
 #undef PYOBJECT_ADD_C_PROC
 
 #ifndef EMBED_PYTHON
 extern "C" { 
-  void mod_init(SModulFunctions* psModulFunctions)
+  int mod_init(SModulFunctions* psModulFunctions)
   { 
-    pyobject_init(psModulFunctions->iiAddCproc); 
+    return pyobject_mod_init(psModulFunctions); 
   }
 }
 #endif

@@ -17,39 +17,22 @@
 #include "static.h"
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
+#include <Singular/grammar.h>
 
-/* whether pyobject module is linked statically or dynamically */
-
-#ifdef EMBED_PYTHON // Case: we include the pyobject interface in the binary
-
-#ifdef HAVE_PYTHON
+#ifdef EMBED_PYTHON
 #include "pyobject.cc"
-static BOOLEAN pyobject_load()
-{
-   pyobject_init(iiAddCproc);
-   return FALSE;
-}
-
-#else // Forced embedding, but no (development version of) python available!
-static BOOLEAN pyobject_load() { return TRUE; } 
 #endif
 
-
-# else // Case: pyobject may be loaded from a dynamic module (prefered variant)
-// Note: we do not need python at compile time.
 static BOOLEAN pyobject_load()
 {
   return jjLOAD("pyobject.so", TRUE);
 }
-#endif
-
-
 
 /// blackbox support - initialization via autoloading
 void* pyobject_autoload(blackbox* bbx)
 {
-  if (pyobject_load()) return NULL;
-  return bbx->blackbox_Init(bbx);
+  assume(bbx != NULL);
+  return (pyobject_load()? NULL: bbx->blackbox_Init(bbx));
 }
 
 void pyobject_default_destroy(blackbox  *b, void *d)
@@ -65,4 +48,16 @@ void pyobject_setup()
   bbx->blackbox_destroy = pyobject_default_destroy;
   setBlackboxStuff(bbx, "pyobject");
 }
+
+/// Explicitely load, if not loaded already
+BOOLEAN pyobject_ensure() {
+
+  int tok = -1;
+  blackbox* bbx = (blackboxIsCmd("pyobject", tok) == ROOT_DECL?
+                   getBlackboxStuff(tok): (blackbox*)NULL);
+  if (bbx == NULL) return TRUE;
+  return (bbx->blackbox_Init == pyobject_autoload?  pyobject_load(): FALSE);  
+}
+
+
 

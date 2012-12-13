@@ -2912,7 +2912,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        }
        else
 
-
   /*==================== DLL =================*/
   #ifdef ix86_Win
   #ifdef HAVE_DL

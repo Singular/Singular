@@ -727,6 +727,25 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
+int huhu_mod_init(SModulFunctions*){ return 0; }
+
+#define SI_GET_BUILTIN_MOD_INIT(name) \
+  int name##_mod_init(SModulFunctions*); \
+  if (strcmp(libname, #name ".so") == 0) {  return name##_mod_init; }
+
+
+SModulFunc_t
+iiGetBuiltinModInit(char* libname)
+{
+  SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
+
+  return NULL;
+}
+
+
+#undef SI_GET_BUILTIN_MOD_INIT
+
+
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 BOOLEAN iiTryLoadLib(leftv v, const char *id)
 {
@@ -736,7 +755,6 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
   const char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
   int i = 0;
   lib_types LT;
-
   for(i=0; suffix[i] != NULL; i++)
   {
     sprintf(libname, "%s%s", id, suffix[i]);
@@ -754,7 +772,7 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
       #endif
       else if (LT==LT_BUILTIN)
       {
-        LoadResult=load_builtin(s,FALSE,(SModulFunc_t)NULL);
+        LoadResult=load_builtin(s,FALSE, iiGetBuiltinModInit(s));
       }
       if(!LoadResult )
       {
@@ -1149,7 +1167,7 @@ BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
     else            sModulFunctions.iiAddCproc = iiAddCproc;
     (*init)(&sModulFunctions);
   }
-  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", newlib);
+  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded (builtin) %s \n", newlib);
   currPack->loaded=1;
   currPack=s;
 
