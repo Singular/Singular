@@ -34,5 +34,6 @@ public:
 };
 
 mpz_ptr getmpi ( InternalCF * value, bool symmetric = true );
+void getmpi ( InternalCF * value, mpz_t mpi);
 
 #endif /* ! INCL_CF_FACTORY_H */
