@@ -7,8 +7,8 @@ poly f=x4y+xy4;
 factorize(f);
 //
 ring R3=(2,a),(x,y),lp;
-poly g=x2+xy+y2;
 minpoly=a2+a+1;
+poly g=x2+xy+y2;
 factorize(g);
 g=g+y3;
 factorize(g);
