@@ -53,7 +53,7 @@ preimageNC(A,f,J[,P,eng]); preimage of ideals under homomorphisms of G-algebras
 KEYWORDS: preimage; elimination
 
 
-SEE ALSO: eliminate_lib, preimage (plural)
+SEE ALSO: elim_lib, preimage (plural)
 ";
 
 

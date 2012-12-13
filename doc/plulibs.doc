@@ -35,6 +35,12 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * nctools_lib::  General tools for noncommutative algebras
 * perron_lib::  Method of Perron to compute algebraic dependence
 * qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
+* purityfiltration_lib:: purity filtration of a given module
+* nchomolog_lib:: Noncommutative Homological Algebra
+* ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
+* bimodules_lib:: Tools for handling bimodules
+* dmodloc_lib:: Localization of algebraic D-modules
+* ncpreim_lib:: Non-commutative elimination and preimage computation
 @end menu
 
 @c as @c lib generates parts of sections, but we need subsections:
@@ -97,9 +103,33 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @section perron_lib
 @c lib perron.lib
 @c ---------------------------------------------------------
-@node qmatrix_lib,  , perron_lib, Non-commutative libraries
+@node qmatrix_lib, purityfiltration_lib , perron_lib, Non-commutative libraries
 @section qmatrix_lib
 @c lib qmatrix.lib
+@c ----------------------------------------------------------
+@node purityfiltration_lib, nchomolog_lib, qmatrix_lib, Non-commutative libraries
+@section purityfiltration_lib
+@c lib purityfiltration.lib
+@c ----------------------------------------------------------
+@node nchomolog_lib, ratgb_lib, purityfiltration_lib, Non-commutative libraries
+@section nchomolog_lib
+@c lib nchomolog.lib
+@c ----------------------------------------------------------
+@node ratgb_lib, bimodules_lib, nchomolog_lib, Non-commutative libraries
+@section ratgb_lib
+@c lib ratgb.lib
+@c ----------------------------------------------------------
+@node bimodules_lib, dmodloc_lib, ratgb_lib, Non-commutative libraries
+@section bimodules_lib
+@c lib bimodules.lib
+@c ----------------------------------------------------------
+@node dmodloc_lib, ncpreim_lib, bimodules_lib, Non-commutative libraries
+@section dmodloc_lib
+@c lib dmodloc.lib
+@c ----------------------------------------------------------
+@node ncpreim_lib, , dmodloc_lib, Non-commutative libraries
+@section ncpreim_lib
+@c lib ncpreim.lib
 @c ----------------------------------------------------------
 @raisesections
 

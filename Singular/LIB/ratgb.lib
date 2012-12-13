@@ -9,7 +9,7 @@ OVERVIEW:
 Theory: Let A be an operator algebra with @code{R = K[x1,.,xN]} as subring.
 The operators are usually denoted by @code{d1,..,dM}.
 
-Assume, that A is a @code{G}-algebra, then the set @code{S=R-{0}} is multiplicatively
+Assume, that A is a @code{G}-algebra, then the set @code{S=R-0} is multiplicatively
 closed Ore set in A.
 That is, for any s in S and a in A, there exist t in S and b in A, such that @code{sa=bt}.
 In other words, one can transform any left fraction into a right fraction.

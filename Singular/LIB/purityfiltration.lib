@@ -33,7 +33,7 @@ allDoubleExt(matrix R);                              computes all double ext mod
 is_pure(matrix R);                              checks whether the module coker(R) is pure
 purelist(list T);                              checks whether all the modules represented by the elements of T are pure
 
-KEYWORDS: D-module; ext-module; filtration; projective dimension; resolution; purity;
+KEYWORDS: D-module; ext-module; filtration; projective dimension; resolution; purity
 ";
 
 LIB "nctools.lib";
