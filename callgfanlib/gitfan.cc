@@ -39,8 +39,8 @@ namespace gitfan
     gfan::ZCone c = f.eta;
     gfan::ZVector v = f.interiorPoint;
     gfan::ZVector w = f.facetNormal;
-    assume(c.ambientDimension() == v.getWidth());
-    assume(c.ambientDimension() == w.getWidth());
+    assume(c.ambientDimension() == v.size());
+    assume(c.ambientDimension() == w.size());
     assume(c.contains(v));
     assume(!c.contains(w));
 #endif
@@ -52,8 +52,8 @@ namespace gitfan
     facetNormal(w)
   {
 #ifndef NDEBUG
-    assume(c.ambientDimension() == v.getWidth());
-    assume(c.ambientDimension() == w.getWidth());
+    assume(c.ambientDimension() == v.size());
+    assume(c.ambientDimension() == w.size());
     assume(c.contains(v));
     assume(!c.contains(w));
 #endif
@@ -65,8 +65,8 @@ namespace gitfan
     gfan::ZCone c = this->eta;
     gfan::ZVector v = this->interiorPoint;
     gfan::ZVector w = this->facetNormal;
-    assume(c.ambientDimension() == v.getWidth());
-    assume(c.ambientDimension() == w.getWidth());
+    assume(c.ambientDimension() == v.size());
+    assume(c.ambientDimension() == w.size());
     assume(c.contains(v));
     assume(!c.contains(w));
 #endif
@@ -106,6 +106,12 @@ static gitfan::facets interiorFacets(const gfan::ZCone &zc, const gfan::ZCone &b
   int r = inequalities.getHeight();
   int c = inequalities.getWidth();
   gitfan::facets F;
+  if (r*c == 0) 
+    /***
+     * this is the trivial case where either we are in a zerodimensional ambient space,
+     * or the cone has no facets.
+     **/
+    return F;
 
   int index = 0;
   /* next we iterate over each of the r facets, build the respective cone and add it to the list */
