@@ -27,11 +27,32 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
         AC_MSG_CHECKING(for --with-python)
         AC_ARG_WITH(
             python,
-            AS_HELP_STRING([--with-python@<:@=PYTHON@:>@],
+            AS_HELP_STRING([--with-python@<:@=@<:@embed,@:>@PYTHON@:>@],
                 [absolute path name of Python executable]
             ),
             [],[withval="yes"]
         ) 
+        py_save_ifs="$IFS"; IFS="${IFS}$PATH_SEPARATOR,"
+        for elt in $withval; do
+          IFS="$py_save_ifs"
+          case $elt in
+            embed|embedding)
+              si_try_embed=true
+            ;;
+            static|dynamic|shared|module)
+            ;;
+            *)
+            si_withval=$elt
+          esac 
+        done
+        IFS="$py_save_ifs"
+        if test x"$si_withval" = x""
+        then
+           withval="yes"
+        else
+	   withval="$si_withval"
+        fi
+
         AC_MSG_RESULT($withval)
         if test "$withval" = "no"
         then
@@ -58,16 +79,28 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
             else 
                 AX_PYTHON_VERSION_CHECK([$1],
                                         [ ax_python_use=true
+                                          si_embed_python=$si_try_embed
                                           AC_MSG_RESULT(yes)
                                           AX_PYTHON_PREFIX( )
                                           AX_PYTHON_LSPEC( )
                                           AX_PYTHON_CSPEC( )
                                         ],
-                                        [ax_python_use=false; AC_MSG_RESULT([too old, skipping python interface!])]
+                                        [ax_python_use=false
+                                         AC_MSG_RESULT([too old, skipping python interface!])]
                 )
             fi
         fi   
         AM_CONDITIONAL(PYTHON_USE, test x"$ax_python_use" = x"true")
+        AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$si_embed_python" = x"true")
+
+        if  test x"$si_embed_python" = x"true"
+        then 
+          AC_DEFINE(EMBED_PYTHON,1,integrate python)
+          AC_SUBST(EMBED_PYOBJECT_CFLAGS,"\${PYTHON_CSPEC}")
+          AC_SUBST(EMBED_PYOBJECT_LDFLAGS,"\${PYTHON_LSPEC}")
+        fi
+
+	AM_CONDITIONAL(PYTHON_MODULE, test x"$si_embed_python" != x"true")
     fi
 
 ])

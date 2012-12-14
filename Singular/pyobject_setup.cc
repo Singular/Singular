@@ -18,32 +18,14 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 
-/* whether pyobject module is linked statically or dynamically */
-
-#ifdef EMBED_PYTHON // Case: we include the pyobject interface in the binary
-
-#ifdef HAVE_PYTHON
+#ifdef EMBED_PYTHON
 #include "pyobject.cc"
-static BOOLEAN pyobject_load()
-{
-   pyobject_init(iiAddCproc);
-   return FALSE;
-}
-
-#else // Forced embedding, but no (development version of) python available!
-static BOOLEAN pyobject_load() { return TRUE; } 
 #endif
 
-
-# else // Case: pyobject may be loaded from a dynamic module (prefered variant)
-// Note: we do not need python at compile time.
 static BOOLEAN pyobject_load()
 {
   return jjLOAD("pyobject.so", TRUE);
 }
-#endif
-
-
 
 /// blackbox support - initialization via autoloading
 void* pyobject_autoload(blackbox* bbx)

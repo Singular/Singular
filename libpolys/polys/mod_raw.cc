@@ -4,7 +4,8 @@
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
- * Provides: dynl_open()
+ * Provides: dynl_check_opened()
+ *           dynl_open()
  *           dynl_sym()
  *           dynl_error()
  *           dynl_close()
@@ -33,6 +34,12 @@
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #define BYTES_TO_CHECK 7
 
+#define SI_BUILTIN_LIBSTR(name) (char*) #name ".so",
+
+char* si_bultin_libs[]={ SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)  NULL };
+
+#undef SI_BUILTIN_LIBSTR 
+
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
   const unsigned char mach_o[]={0xfe,0xed,0xfa,0xce,0};
@@ -41,6 +48,16 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   const unsigned char mach_o64[]={0xfe,0xed,0xfa,0xcf,0};
   const unsigned char mach_O64[]={0xcf,0xfa,0xed,0xfe,0};
    
+  int i=0;
+  while(si_bultin_libs[i]!=NULL)
+  {
+    if (strcmp(newlib,si_bultin_libs[i])==0)
+    {
+      if(libnamebuf!=NULL) strcpy(libnamebuf,newlib);
+      return LT_BUILTIN;
+    }
+    i++;
+  }
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
@@ -92,7 +109,8 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     //newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
-   
+
+
   if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
   {
     LT = LT_HPUX;
@@ -206,7 +224,11 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(ix86Mac_darwin)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(x86_64Mac_darwin)
 #define HAVE_ELF_SYSTEM
 #endif
 
@@ -219,6 +241,13 @@ extern "C" {
 #define DL_IMPLEMENTED
 
 static void* kernel_handle = NULL;
+int dynl_check_opened(
+  char *filename    /* I: filename to check */
+  )
+{
+  return dlopen(filename,RTLD_NOW|RTLD_NOLOAD) != NULL;
+}
+
 void *dynl_open(
   char *filename    /* I: filename to load */
   )
@@ -264,6 +293,18 @@ const char *dynl_error()
 
 typedef char *((*func_ptr) ());
 
+int dynl_check_opened(    /* NOTE: untested */
+  char *filename    /* I: filename to check */
+  )
+{
+  struct shl_descriptor *desc;
+  for (int idx = 0; shl_get(idx, &desc) != -1; ++idx)
+  {
+    if (strcmp(filename, desc->filename) == 0) return TRUE;
+  }
+  return FALSE;
+}
+
 void *dynl_open(char *filename)
 {
   shl_t           handle = shl_load(filename, BIND_DEFERRED, 0);
@@ -306,6 +347,11 @@ const char *dynl_error()
  * SECTION generic: dynamic madules not available
  *****************************************************************************/
 #ifndef DL_IMPLEMENTED
+
+int dynl_check_opened(char *filename)
+{
+  return FALSE;
+}
 
 void *dynl_open(char *filename)
 {

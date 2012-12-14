@@ -5154,6 +5154,7 @@ BOOLEAN jjLOAD(char *s, BOOLEAN autoexport)
 {
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
+
 #ifdef HAVE_DYNAMIC_LOADING
   extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN autoexport);
 #endif /* HAVE_DYNAMIC_LOADING */
@@ -5193,6 +5194,9 @@ BOOLEAN jjLOAD(char *s, BOOLEAN autoexport)
         IDPACKAGE(pl)->loaded=(!bo);
         return bo;
       }
+      case LT_BUILTIN:
+        SModulFunc_t iiGetBuiltinModInit(char*);
+        return load_builtin(s,autoexport, iiGetBuiltinModInit(s));
       case LT_MACH_O:
       case LT_ELF:
       case LT_HPUX:
