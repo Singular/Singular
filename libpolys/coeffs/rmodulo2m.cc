@@ -50,6 +50,8 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
+  r->modBase = (int_number) omAlloc(sizeof(mpz_t));
+  mpz_init_set_si (r->modBase, 2L);
   r->ringtype = 1;
 
   /* next cast may yield an overflow as mod2mMask is an unsigned long */
@@ -648,11 +650,13 @@ void nr2mSetExp(int m, coeffs r)
   {
     /* we want mod2mMask to be the bit pattern
        '111..1' consisting of m one's: */
+    r->modExponent= m;
     r->mod2mMask = 1;
     for (int i = 1; i < m; i++) r->mod2mMask = (r->mod2mMask << 1) + 1;
   }
   else
   {
+    r->modExponent= 2;
     /* code unexpectedly called with m = 1; we continue with m = 2: */
     r->mod2mMask = 3; /* i.e., '11' in binary representation */
   }
