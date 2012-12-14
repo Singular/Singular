@@ -52,6 +52,6 @@ void    nrzSetExp(int c, coeffs r);
 void    nrzInitExp(int c, coeffs r);
 void    nrzDelete(number *a, const coeffs r);
 
-number nrzMapQ(number from);
+number nrzMapQ(number from, const coeffs src, const coeffs dst);
 #endif
 #endif

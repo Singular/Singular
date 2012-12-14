@@ -53,6 +53,7 @@ BOOLEAN nr2mDBTest      (number a, const char *f, const int l, const coeffs r);
 void    nr2mSetExp(int c, const coeffs r);
 void    nr2mInitExp(int c, const coeffs r);
 
+number nr2mMapQ(number from, const coeffs src, const coeffs dst);
 
 static inline number nr2mMultM(number a, number b, const coeffs r)
 {
@@ -75,6 +76,7 @@ static inline number nr2mSubM(number a, number b, const coeffs r)
 
 #define nr2mNegM(A,r) (number)((r->mod2mMask - (NATNUMBER)(A) + 1) & r->mod2mMask)
 #define nr2mEqualM(A,B)  ((A)==(B))
+
 
 #endif
 #endif

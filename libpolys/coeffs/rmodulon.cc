@@ -98,6 +98,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfName        = ndName;
   r->cfCoeffWrite  = nrnCoeffWrite;
   r->nCoeffIsEqual = nrnCoeffsEqual;
+  r->cfInit_bigint = nrnMapQ;
+
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
@@ -482,12 +484,12 @@ number nrnMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   return (number)erg;
 }
 
-number nrnMapQ(number from, const coeffs src, const coeffs /*dst*/)
+number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   nlGMP(from, (number)erg, src);
-  mpz_mod(erg, erg, src->modNumber);
+  mpz_mod(erg, erg, dst->modNumber);
   return (number)erg;
 }
 

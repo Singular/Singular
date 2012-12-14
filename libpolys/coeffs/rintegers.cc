@@ -402,6 +402,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfGetUnit = nrzGetUnit; // only for ring stuff
   r->cfExtGcd = nrzExtGcd; // only for ring stuff
   r->cfDivBy = nrzDivBy; // only for ring stuff
+  r->cfInit_bigint = nrzMapQ;
   //#endif
   r->cfNeg   = nrzNeg;
   r->cfInvers= nrzInvers;

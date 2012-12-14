@@ -89,6 +89,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfExtGcd      = nr2mExtGcd;
   r->cfName        = ndName;
   r->cfCoeffWrite  = nr2mCoeffWrite;
+  r->cfInit_bigint = nr2mMapQ;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
 #endif
@@ -558,14 +559,14 @@ number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
   return (number)nr2mMult((number)i, (number)j, dst);
 }
 
-number nr2mMapQ(number from, const coeffs /*src*/, const coeffs dst)
+number nr2mMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   int_number k = (int_number)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(k, dst->mod2mMask);
 
-  nlGMP(from, (number)erg, dst);
+  nlGMP(from, (number)erg, src);
   mpz_and(erg, erg, k);
   number res = (number)mpz_get_ui(erg);
 
