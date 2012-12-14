@@ -56,6 +56,7 @@
 #include <polys/ext_fields/algext.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/longrat.h>
+#include <coeffs/rmodulon.h>
 
 #include <numeric/mpr_base.h>
 #include <numeric/mpr_numeric.h>
@@ -5215,19 +5216,27 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
+        //TODO free modBase -> will be set inside nInitChar
       }
       else
       {
         //ringtype = 3;
-        cf=nInitChar(n_Zpn,(void*)(long)modBase);
+        ZnmInfo info;
+        info.base= modBase;
+        info.exp= modExponent;
+        cf=nInitChar(n_Znm,(void*) &info); //exponent is missing
+        //TODO free modBase -> will be set inside nInitChar
       }
     }
     // just a module m > 1
     else if (cf == NULL)
     {
       //ringtype = 2;
-      const int ch = mpz_get_ui(modBase);
-      cf=nInitChar(n_Zn,(void*)(long)ch);
+      ZnmInfo info;
+      info.base= modBase;
+      info.exp= modExponent;
+      cf=nInitChar(n_Zn,(void*) &info);
+        //TODO free modBase -> will be set inside nInitChar
     }
     assume( cf != NULL );
   }
