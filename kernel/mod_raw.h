@@ -1,3 +1,4 @@
+
 #ifndef MOD_RAW_H
 #define MOD_RAW_H
 /****************************************
@@ -6,7 +7,8 @@
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
- * Provides: dynl_open()
+ * Provides: dynl_check_opened()
+ *           dynl_open()
  *           dynl_sym()
  *           dynl_error()
  *           dunl_close()
@@ -25,6 +27,7 @@ void* dynl_sym_warn(void* handle, const char* proc, const char* msg = NULL );
 #ifdef __cplusplus
 extern "C" {
 #endif
+int          dynl_check_opened(char* filename);
 void *       dynl_open(char *filename);
 // if handle == DYNL_KERNEL_HANDLE, then symbol is searched for
 // in kernel of program
@@ -46,7 +49,8 @@ const char * dynl_error();
 #define SI_BUILTIN_PYOBJECT(add) 
 #endif
 
-/// Use @c add(name) to add built-in library to macro
+/// Data for @c type_of_LIB to determine built-in modules,
+/// use @c add(name) to add built-in library to macro
 #define SI_FOREACH_BUILTIN(add)\
   add(huhu)\
   SI_BUILTIN_PYOBJECT(add)

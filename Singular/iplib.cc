@@ -1104,6 +1104,10 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
       goto load_modules_end;
     }
   }
+  if (dynl_check_opened(FullName)) {
+    if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded", fullname);
+    return FALSE;
+  }
   if((IDPACKAGE(pl)->handle=dynl_open(FullName))==(void *)NULL)
   {
     Werror("dynl_open failed:%s", dynl_error());
@@ -1148,13 +1152,18 @@ BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
   char *plib = iiConvName(newlib);
 
   pl = IDROOT->get(plib,0);
-  if (pl==NULL)
+  if (pl!=NULL)
   {
-    pl = enterid( plib,0, PACKAGE_CMD, &IDROOT,
-                  TRUE );
-    IDPACKAGE(pl)->language = LANG_C;
-    IDPACKAGE(pl)->libname=omStrDup(newlib);
+    if (BVERBOSE(V_LOAD_LIB)) Warn( "(builtin) %s already loaded", newlib);
+    omFree(plib);
+    return FALSE;
   }
+
+  pl = enterid( plib,0, PACKAGE_CMD, &IDROOT,
+                TRUE );
+  IDPACKAGE(pl)->language = LANG_C;
+  IDPACKAGE(pl)->libname=omStrDup(newlib);
+
   IDPACKAGE(pl)->handle=(void *)NULL;
   SModulFunctions sModulFunctions;
 

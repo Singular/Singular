@@ -4,7 +4,8 @@
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
- * Provides: dynl_open()
+ * Provides: dynl_check_opened()
+ *           dynl_open()
  *           dynl_sym()
  *           dynl_error()
  *           dynl_close()
@@ -207,6 +208,13 @@ extern "C" {
 #include <dlfcn.h>
 
 static void* kernel_handle = NULL;
+int dynl_check_opened(
+  char *filename    /* I: filename to check */
+  )
+{
+  return dlopen(filename,RTLD_NOW|RTLD_NOLOAD) != NULL;
+}
+
 void *dynl_open(
   char *filename    /* I: filename to load */
   )
@@ -250,6 +258,18 @@ const char *dynl_error()
 #include <dl.h>
 
 typedef char *((*func_ptr) ());
+
+int dynl_check_opened(    /* NOTE: untested */
+  char *filename    /* I: filename to check */
+  )
+{
+  struct shl_descriptor *desc;
+  for (int idx = 0; shl_get(idx, &desc) != -1; ++idx)
+  {
+    if (strcmp(filename, desc->filename) == 0) return TRUE;
+  }
+  return FALSE;
+}
 
 void *dynl_open(char *filename)
 {
@@ -314,6 +334,11 @@ const char *dynl_error()
  * SECTION generic: dynamic madules not available
  *****************************************************************************/
 #ifdef DL_NOT_IMPLEMEMENTED
+
+int dynl_check_opened(char *filename)
+{
+  return FALSE;
+}
 
 void *dynl_open(char *filename)
 {
