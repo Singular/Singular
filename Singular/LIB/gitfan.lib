@@ -135,7 +135,7 @@ example
 
 ////////////////////////////////////////////////////
 
-static proc afacesPart(ideal a, int d, int start, int end, int r){
+proc afacesPart(ideal a, int d, int start, int end, int r){
   intvec gam0;
   int i;
   list AF;
