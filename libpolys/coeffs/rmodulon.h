@@ -14,6 +14,8 @@
 #define NATNUMBER unsigned long
 #endif
 
+typedef struct { int_number base; NATNUMBER exp; } ZnmInfo;
+
 BOOLEAN nrnInitChar    (coeffs r, void*);
 number  nrnCopy        (number a, const coeffs r);
 int     nrnSize        (number a, const coeffs r);
@@ -49,8 +51,8 @@ void     nrnCoeffWrite (const coeffs r, BOOLEAN details);
 #ifdef LDEBUG
 BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
-void    nrnSetExp(int c, const coeffs r);
-void    nrnInitExp(int c, const coeffs r);
+void    nrnSetExp(unsigned long c, const coeffs r);
+void    nrnInitExp(unsigned long c, const coeffs r);
 
 #endif
 #endif
