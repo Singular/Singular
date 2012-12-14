@@ -5141,7 +5141,7 @@ n_coeffType rFieldType(ring r)
   #ifdef HAVE_RINGS
    if (rField_is_Ring_Z(r)) return n_Z;
    if (rField_is_Ring_ModN(r)) return n_Zn;
-   if (rField_is_Ring_PtoM(r)) return n_Zpn;
+   if (rField_is_Ring_PtoM(r)) return n_Znm;
    if (rField_is_Ring_2toM(r)) return  n_Z2m;
   #endif
 

@@ -53,7 +53,7 @@ namespace
       CASE(n_long_C);
       CASE(n_Z);
       CASE(n_Zn);
-      CASE(n_Zpn);
+      CASE(n_Znm);
       CASE(n_Z2m);
       CASE(n_CF);
       default: return o << "Unknown type: [" << (const unsigned long) type << "]";
