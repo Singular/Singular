@@ -1,37 +1,31 @@
 ////////////////////////////////////////////////////////////////////
-version = "(v0.1, 2012-10-19)";
-category = "Algebraic Geometry";
-info = "
+version="$Id: gitfan.lib";
+category="Algebraic Geometry";
+info="
 LIBRARY:  gitfan.lib       Compute GIT-fans.
 
 AUTHORS:  Janko Boehm      boehm@mathematik.uni-kl.de
 @*        Simon Keicher    keicher@mail.mathematik.uni-tuebingen.de
 @*        Yue Ren          ren@mathematik.uni-kl.de
 
-
 OVERVIEW:
-
 This library computes GIT-fans, torus orbits and GKZ-fans.
-It uses the package 'gfanlib' by Anders N. Jensen 
+It uses the package 'gfanlib' by Anders N. Jensen
 and some algorithms have been outsourced to C++ to improve the performance.
 Check https://github.com/skeicher/gitfan_singular for updates.
 
+KEYWORDS: library; gitfan; GIT; geometric invariant theory; quotients
 
 PROCEDURES:
-
-afaces(ideal)                    Returns a list of intvecs that correspond to all a-faces.
-gitCone(ideal,bigintmat,
-          bigintmat)             Returns the GIT-cone around the given weight vector w.
-gitFan(ideal,bigintmat)          Returns the GIT-fan of the H-action defined by Q on V(a).
-gkzFan(bigintmat)                Returns the GKZ-fan of the matrix Q.
-proc isAface(ideal,intvec)       Checks whether intvec corresponds to an ideal-face.
-orbitCones(ideal,bigintmat)      Returns the list of all projected a-faces.
-
-KEYWORDS: library, gitfan, GIT, geometric invariant theory, quotients
+afaces(ideal);                      Returns a list of intvecs that correspond to all a-faces
+gitCone(ideal,bigintmat,bigintmat); Returns the GIT-cone around the given weight vector w
+gitFan(ideal,bigintmat);            Returns the GIT-fan of the H-action defined by Q on V(a)
+gkzFan(bigintmat);                  Returns the GKZ-fan of the matrix Q
+isAface(ideal,intvec);              Checks whether intvec corresponds to an ideal-face
+orbitCones(ideal,bigintmat);        Returns the list of all projected a-faces
 ";
 
 LIB "parallel.lib"; // for parallelWaitAll
-
 
 ////////////////////////////////////////////////////
 
@@ -54,18 +48,6 @@ static proc int2face(int n, int r)
   v = v[1..size(v)-1];
   return(v);
 }
-example
-{
-  echo = 2;
-  int n = 5;
-  int r = 4;
-  int2face(n, r);
-
-  n = 1;
-  r = 1;
-  int2face(n,r);
-}
-
 
 /////////////////////////////////
 
@@ -153,7 +135,7 @@ example
 
 ////////////////////////////////////////////////////
 
-proc afacesPart(ideal a, int d, int start, int end, int r){
+static proc afacesPart(ideal a, int d, int start, int end, int r){
   intvec gam0;
   int i;
   list AF;
@@ -178,7 +160,7 @@ proc afacesPart(ideal a, int d, int start, int end, int r){
 ////////////////////////////////////////////////////
 
 proc afaces(ideal a, list #)
-"USAGE:  afaces(a, b, c); a: ideal, d: int, ncores: int
+"USAGE:  afaces(a, b, c); a: ideal, d: int, c: int
 PURPOSE: Returns a list of all a-faces (represented by intvecs).
          Moreover, it is possible to specify a dimensional bound b,
          upon which only cones of that dimension and above are returned.
@@ -188,9 +170,9 @@ RETURN:  a list of intvecs
 EXAMPLE: example afaces; shows an example
 "
 {
-  int d = 1; 
+  int d = 1;
   int ncores = 1;
-  
+
   if ((size(#) > 0) and (typeof(#[1]) == "int")){
     d = #[1];
   }
@@ -560,28 +542,6 @@ static proc simplicialToricOrbitCones(bigintmat Q){
   }
 
   return(OC);
-}
-example
-{
-  echo = 2;
-  bigintmat Q[3][4] =
-  1,0,1,0,
-  0,1,0,1,
-  0,0,1,1;
-
-  list OC = simplicialToricOrbitCones(Q);
-  print(OC);
-
-  bigintmat Q[5][15] =
-    1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,
-    0,1,0,0,0,1,0,0,0,1,1,1,0,0,0,
-    0,0,1,0,0,0,1,0,0,1,0,0,1,1,0,
-    0,0,0,1,0,0,0,1,0,0,1,0,1,0,1,
-    0,0,0,0,1,0,0,0,1,0,0,1,0,1,1;
-
-  list OC = simplicialToricOrbitCones(Q);
-  print(size(OC));
-
 }
 
 /////////////////////////////////////
