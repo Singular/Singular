@@ -26,4 +26,3 @@ install install-bindist: polymake.so
 
 clean:
 	rm *.so *.o
-	rm ../Singular/gfanlib.so

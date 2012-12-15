@@ -25,6 +25,7 @@
 @heading New @sc{Singular} libraries
 @itemize @bullet
 @item new library: classifyceq.lib:  simple hypersurface singularities in characteristic p (@nref{classifyceq_lib})
+@item new library: divisors.lib:  divisors and P-divisors (@nref{divisors_lib})
 @item new library: ffsolve.lib:  solving over Z/p (@nref{ffsolve_lib})
 @item new library: numerAlg.lib:  Numerical Algebraic Algorithm (@nref{numerAlg_lib})
 @item new library: numerDecom.lib:  Bertini interface (@nref{numerDecom_lib})
