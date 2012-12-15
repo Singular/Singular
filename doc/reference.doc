@@ -7072,6 +7072,7 @@ poly, vector, ideal or module (corresponding to the first argument)
 @item @strong{Purpose:}
 substitutes one or more ring variable(s)/parameter variable(s) by (a) polynomial(s). Note that in the case of more than one substitution pair,
 the substitutions will be performed sequentially and not simultaneously. The below examples illustrate this behaviour.
+@*Note, that the coefficients must be polynomial when substituting a parameter.
 @item @strong{Example:}
 @smallexample
 @c example
