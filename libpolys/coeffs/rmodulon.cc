@@ -50,8 +50,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 {
   assume( (getCoeffType(r) == ID) || (getCoeffType (r) == ID2) );
   ZnmInfo * info= (ZnmInfo *) p;
-  r->modBase = (int_number) omAllocBin (gmp_nrz_bin);
-  mpz_init_set (r->modBase, info->base);
+  r->modBase= info->base;
 
   nrnInitExp (info->exp, r);
 

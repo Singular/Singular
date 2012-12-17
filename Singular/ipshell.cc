@@ -2079,6 +2079,7 @@ void rComposeRing(lists L, ring R)
       /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
       R->cf=nInitChar(n_Z2m,(void*)(long)modExponent);       // Use Z/2^ch
+      omFreeSize (modBase, sizeof(mpz_t));
     }
     else
     {
@@ -5224,7 +5225,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
-        //TODO free modBase -> will be set inside nInitChar
+        omFreeSize (modBase, sizeof (mpz_t));
       }
       else
       {
@@ -5233,7 +5234,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         info.base= modBase;
         info.exp= modExponent;
         cf=nInitChar(n_Znm,(void*) &info); //exponent is missing
-        //TODO free modBase -> will be set inside nInitChar
       }
     }
     // just a module m > 1
@@ -5244,7 +5244,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       info.base= modBase;
       info.exp= modExponent;
       cf=nInitChar(n_Zn,(void*) &info);
-        //TODO free modBase -> will be set inside nInitChar
     }
     assume( cf != NULL );
   }
