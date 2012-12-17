@@ -116,7 +116,7 @@ static BOOLEAN bbpolytope_Op2(int op, leftv res, leftv i1, leftv i2)
         zq->canonicalize();
         bool b = !((*zp)!=(*zq));
         res->rtyp = INT_CMD;
-        res->data = (char*) (int) b;
+        res->data = (char*) (long) b;
         return FALSE;
       }
       return blackboxDefaultOp2(op,res,i1,i2);
@@ -211,7 +211,7 @@ BOOLEAN PMisLatticePolytope(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isLatticePolytope: unexpected parameters");
@@ -238,7 +238,7 @@ BOOLEAN PMisBounded(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isBounded: unexpected parameters");
@@ -265,7 +265,7 @@ BOOLEAN PMisReflexive(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isReflexive: unexpected parameters");
@@ -292,7 +292,7 @@ BOOLEAN PMisGorenstein(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isGorenstein: unexpected parameters");
@@ -336,7 +336,7 @@ BOOLEAN PMgorensteinIndex(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) gi;
+    res->data = (char*) (long) gi;
     return FALSE;
   }
   WerrorS("gorensteinIndex: unexpected parameters");
@@ -407,7 +407,7 @@ BOOLEAN PMisCanonical(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isCanonical: unexpected parameters");
@@ -434,7 +434,7 @@ BOOLEAN PMisTerminal(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isTerminal: unexpected parameters");
@@ -461,7 +461,7 @@ BOOLEAN PMisLatticeEmpty(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isLatticeEmpty: unexpected parameters");
@@ -495,7 +495,7 @@ BOOLEAN PMlatticeVolume(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) lv;
+    res->data = (char*) (long) lv;
     return FALSE;
   }
   WerrorS("latticeVolume: unexpected parameters");
@@ -529,7 +529,7 @@ BOOLEAN PMlatticeDegree(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) ld;
+    res->data = (char*) (long) ld;
     return FALSE;
   }
   WerrorS("latticeDegree: unexpected parameters");
@@ -563,7 +563,7 @@ BOOLEAN PMlatticeCodegree(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) lc;
+    res->data = (char*) (long) lc;
     return FALSE;
   }
   WerrorS("latticeCodegree: unexpected parameters");
@@ -726,7 +726,7 @@ BOOLEAN PMisNormal(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isNormal: unexpected parameters");
@@ -794,7 +794,7 @@ BOOLEAN PMfacetWidth(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) fw;
+    res->data = (char*) (long) fw;
     return FALSE;
   }
   WerrorS("facetWidth: unexpected parameters");
@@ -855,7 +855,7 @@ BOOLEAN PMisCompressed(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isCompressed: unexpected parameters");
@@ -882,7 +882,7 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == polytopeID))
@@ -901,7 +901,7 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   if ((u != NULL) && (u->Typ() == fanID))
@@ -920,7 +920,7 @@ BOOLEAN PMisSmooth(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isSmooth: unexpected parameters");
@@ -947,7 +947,7 @@ BOOLEAN PMisVeryAmple(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) (int) b;
+    res->data = (char*) (long) b;
     return FALSE;
   }
   WerrorS("isVeryAmple: unexpected parameters");
@@ -1015,7 +1015,7 @@ BOOLEAN PMnLatticePoints(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) n;
+    res->data = (char*) (long) n;
     return FALSE;
   }
   WerrorS("nLatticePoints: unexpected parameters");
@@ -1083,7 +1083,7 @@ BOOLEAN PMnInteriorLatticePoints(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) n;
+    res->data = (char*) (long) n;
     return FALSE;
   }
   WerrorS("nInteriorLatticePoints: unexpected parameters");
@@ -1151,7 +1151,7 @@ BOOLEAN PMnBoundaryLatticePoints(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) n;
+    res->data = (char*) (long) n;
     return FALSE;
   }
   WerrorS("nBoundaryLatticePoints: unexpected parameters");
@@ -1219,7 +1219,7 @@ BOOLEAN PMnHilbertBasis(leftv res, leftv args)
       return TRUE;
     }
     res->rtyp = INT_CMD;
-    res->data = (char*) n;
+    res->data = (char*) (long) n;
     return FALSE;
   }
   WerrorS("nHilbertBasis: unexpected parameters");
@@ -1485,7 +1485,7 @@ BOOLEAN PMmaximalValue(leftv res, leftv args)
           return TRUE;
         }
         res->rtyp = INT_CMD;
-        res->data = (char*) m;
+        res->data = (char*) (long) m;
         return FALSE;
       }
     }
@@ -1532,7 +1532,7 @@ BOOLEAN PMminimalValue(leftv res, leftv args)
           return TRUE;
         }
         res->rtyp = INT_CMD;
-        res->data = (char*) m;
+        res->data = (char*) (long) m;
         return FALSE;
       }
     }
