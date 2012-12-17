@@ -52,6 +52,8 @@ improved grobcov.lib (@nref{grobcov_lib})
 several bug fixes in factorization code
 @item
 polymake/gfan interface extended
+@item
+interface to @code{iiMake_proc} changed
 @end itemize
 @heading --------------------------------------------------------------------
 @heading Older versions:
