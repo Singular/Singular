@@ -5,12 +5,10 @@ info="
 LIBRARY:  divisors.lib      Divisors and P-Divisors
 
 AUTHORS:  Janko Boehm       boehm@mathematik.uni-kl.de
-          Lars Kastner      kastner@math.fu-berlin.de
-          Benjamin Lorenz   blorenz@math.uni-frankfurt.de
-          Hans Schoenemann  hannes@mathematik.uni-kl.de
-          Yue Ren           ren@mathematik.uni-kl.de
-
-@*
+@*        Lars Kastner      kastner@math.fu-berlin.de
+@*        Benjamin Lorenz   blorenz@math.uni-frankfurt.de
+@*        Hans Schoenemann  hannes@mathematik.uni-kl.de
+@*        Yue Ren           ren@mathematik.uni-kl.de
 
 OVERVIEW:
 
@@ -78,10 +76,10 @@ newstruct("pdivisor","list summands, cone tail");
 
 system("install","divisor","print",divisor_print,1);
 system("install","divisor","+",divisorplus,2);
-system("install","divisor","*",multdivisor,2);
+system("install","divisor","*",proxymultdivisor,2);
 system("install","formaldivisor","print",formaldivisor_print,1);
 system("install","formaldivisor","+",formaldivisorplus,2);
-system("install","formaldivisor","*",multformaldivisor,2);
+system("install","formaldivisor","*",proxymultformaldivisor,2);
 system("install","pdivisor","+",pdivisorplus,2);
 }
 
@@ -215,6 +213,17 @@ A;
 divisor D = multdivisor(4,A);
 D;
 A*4;
+}
+
+
+/***
+ * For operator overloading, which needs a procedure which takes a divisor first
+ * and integer second.
+ **/
+proc proxymultdivisor(divisor A, int n)
+{
+if (n<0) {return(multdivisor(-n,negativedivisor(A)));}
+return(makeDivisor(interred((A.num)^n),interred((A.den)^n)));
 }
 
 
@@ -603,6 +612,24 @@ divisor B = makeDivisor(ideal(x,y),ideal(1));
 formaldivisor fE= makeFormalDivisor(list(list(-5,A),list(2,B)));
 fE*2;
 }
+
+
+/***
+ * For operator overloading, which needs a procedure which takes a divisor first
+ * and integer second.
+ **/
+proc proxymultformaldivisor(formaldivisor A, int n)
+{
+formaldivisor B;
+list L=A.summands;
+int i;
+for (i=1;i<=size(L);i++){
+  L[i][1]=n*L[i][1];
+}
+B.summands=L;
+return(B);
+}
+
 
 
 proc negativeformaldivisor(formaldivisor A)
