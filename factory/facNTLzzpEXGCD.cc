@@ -92,6 +92,11 @@ but users of versions 4.0 or later should adhere to the terms of the GNU GPL.
 #endif
 
 #ifdef HAVE_NTL
+#if !defined(__GNUC__) || (__GNUC__ > 3)
+#define NTL_negate NTL::negate
+#else
+#define NTL_negate negate
+#endif
 
 long InvModStatus (zz_pE& x, const zz_pE& a)
 {
@@ -151,7 +156,7 @@ void tryPlainRem(zz_pEX& r, const zz_pEX& a, const zz_pEX& b, vec_zz_pX& x,
       conv(t, xp[i+db]);
       if (!LCIsOne)
 	 mul(t, t, LCInv);
-      NTL::negate(t, t);
+      NTL_negate(t, t);
 
       for (j = db-1; j >= 0; j--) {
 	 mul(s, rep(t), rep(bp[j]));
@@ -225,7 +230,7 @@ void tryPlainDivRem(zz_pEX& q, zz_pEX& r, const zz_pEX& a, const zz_pEX& b,
       if (!LCIsOne)
 	 mul(t, t, LCInv);
       qp[i] = t;
-      NTL::negate(t, t);
+      NTL_negate(t, t);
 
       for (j = db-1; j >= 0; j--) {
 	 mul(s, rep(t), rep(bp[j]));
