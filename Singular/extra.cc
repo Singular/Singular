@@ -2950,14 +2950,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        }
        else
 
-  /*==== pyobject (or pyobject*, like pyobject.so) force loading python ===*/
-       if (strncmp(sys_cmd, "pyobject", 8) == 0)
-       {
-         res->rtyp = NONE;
-         return pyobject_ensure();
-       }
-       else
-
   /*==================== DLL =================*/
   #ifdef ix86_Win
   #ifdef HAVE_DL
