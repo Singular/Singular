@@ -19,8 +19,7 @@
 @end macro
 @end ifset
 
-@c @heading News for version @value{VERSION}
-@heading News for version 3-1-6
+@heading News for version @value{VERSION}
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
