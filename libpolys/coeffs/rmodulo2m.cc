@@ -29,7 +29,8 @@ extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  Print("//   Z/2^%lu\n", r->modExponent);
+  PrintS("//   coeff. ring is : ");
+  Print("Z/2^%lu\n", r->modExponent);
 }
 
 BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
@@ -50,7 +51,12 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
+  r->modBase = (int_number) omAllocBin (gmp_nrz_bin);
+  mpz_init_set_si (r->modBase, 2L);
   r->ringtype = 1;
+  r->modNumber= (int_number) omAllocBin (gmp_nrz_bin);
+  mpz_init (r->modNumber);
+  mpz_pow_ui (r->modNumber, r->modBase, r->modExponent);
 
   /* next cast may yield an overflow as mod2mMask is an unsigned long */
   r->ch = (int)r->mod2mMask + 1;
@@ -87,6 +93,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfExtGcd      = nr2mExtGcd;
   r->cfName        = ndName;
   r->cfCoeffWrite  = nr2mCoeffWrite;
+  r->cfInit_bigint = nr2mMapQ;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
 #endif
@@ -556,14 +563,14 @@ number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
   return (number)nr2mMult((number)i, (number)j, dst);
 }
 
-number nr2mMapQ(number from, const coeffs /*src*/, const coeffs dst)
+number nr2mMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   int_number k = (int_number)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(k, dst->mod2mMask);
 
-  nlGMP(from, (number)erg, dst);
+  nlGMP(from, (number)erg, src);
   mpz_and(erg, erg, k);
   number res = (number)mpz_get_ui(erg);
 
@@ -620,20 +627,8 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
   }
   if (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
   {
-    // Computing the n of Z/n
-    int_number modul = (int_number)omAllocBin(gmp_nrz_bin);
-    mpz_init_set(modul, src->modNumber);
-    int_number twoToTheK = (int_number)omAllocBin(gmp_nrz_bin);
-    mpz_init_set_ui(twoToTheK, src->mod2mMask);
-    mpz_add_ui(twoToTheK, twoToTheK, 1);
-    if (mpz_divisible_p(modul, twoToTheK))
-    {
-      mpz_clear(modul);     omFree((void *)modul);
-      mpz_clear(twoToTheK); omFree((void *)twoToTheK);
+    if (mpz_divisible_2exp_p(src->modNumber,dst->modExponent))
       return nr2mMapGMP;
-    }
-    mpz_clear(modul);     omFree((void *) modul);
-    mpz_clear(twoToTheK); omFree((void *)twoToTheK);
   }
   return NULL;      // default
 }
@@ -648,11 +643,13 @@ void nr2mSetExp(int m, coeffs r)
   {
     /* we want mod2mMask to be the bit pattern
        '111..1' consisting of m one's: */
+    r->modExponent= m;
     r->mod2mMask = 1;
     for (int i = 1; i < m; i++) r->mod2mMask = (r->mod2mMask << 1) + 1;
   }
   else
   {
+    r->modExponent= 2;
     /* code unexpectedly called with m = 1; we continue with m = 2: */
     r->mod2mMask = 3; /* i.e., '11' in binary representation */
   }

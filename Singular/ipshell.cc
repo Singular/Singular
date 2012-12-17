@@ -56,6 +56,7 @@
 #include <polys/ext_fields/algext.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/longrat.h>
+#include <coeffs/rmodulon.h>
 
 #include <numeric/mpr_base.h>
 #include <numeric/mpr_numeric.h>
@@ -2016,11 +2017,14 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   // 0: string: integer
   // no further entries --> Z
-  R->cf->modBase = (int_number) omAlloc(sizeof(mpz_t));
+  int_number modBase = NULL;
+  unsigned int modExponent = 1;
+
+  modBase = (int_number) omAlloc(sizeof(mpz_t));
   if (L->nr == 0)
   {
-    mpz_init_set_ui(R->cf->modBase,0);
-    R->cf->modExponent = 1;
+    mpz_init_set_ui(modBase,0);
+    modExponent = 1;
   }
   // ----------------------------------------
   // 1:
@@ -2028,67 +2032,73 @@ void rComposeRing(lists L, ring R)
   {
     if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of numbers");
     lists LL=(lists)L->m[1].data;
-    mpz_init(R->cf->modBase);
     if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
-      number modBase = (number) LL->m[0].data;
-      nlGMP(modBase, (number) R->cf->modBase, R->cf);
-      LL->m[0].data = (void *)modBase;
+      number tmp= (number) LL->m[0].data;
+      n_MPZ (modBase, tmp, coeffs_BIGINT);
     }
-    else if ((LL->nr >= 0) && LL->m[0].rtyp == INT_CMD)
+    else if (LL->nr >= 0 && LL->m[0].rtyp == INT_CMD)
     {
-      mpz_set_ui(R->cf->modBase,(unsigned long) LL->m[0].data);
+      mpz_init_set_ui(modBase,(unsigned long) LL->m[0].data);
     }
     else
     {
-      mpz_set_ui(R->cf->modBase,0);
+      mpz_init_set_ui(modBase,0);
     }
     if (LL->nr >= 1)
     {
-      R->cf->modExponent = (unsigned long) LL->m[1].data;
+      modExponent = (unsigned long) LL->m[1].data;
     }
     else
     {
-      R->cf->modExponent = 1;
+      modExponent = 1;
     }
   }
   // ----------------------------------------
-  if ((mpz_cmp_ui(R->cf->modBase, 1) == 0) && (mpz_cmp_ui(R->cf->modBase, 0) < 0))
+  if ((mpz_cmp_ui(modBase, 1) == 0) && (mpz_cmp_ui(modBase, 0) < 0))
   {
     Werror("Wrong ground ring specification (module is 1)");
     return;
   }
-  if (R->cf->modExponent < 1)
+  if (modExponent < 1)
   {
     Werror("Wrong ground ring specification (exponent smaller than 1");
     return;
   }
   // module is 0 ---> integers
-  if (mpz_cmp_ui(R->cf->modBase, 0) == 0)
+  if (mpz_cmp_ui(modBase, 0) == 0)
   {
-    R->cf->ch = 0;
-    R->cf->ringtype = 4;
+    R->cf=nInitChar(n_Z,NULL);
   }
   // we have an exponent
-  else if (R->cf->modExponent > 1)
+  else if (modExponent > 1)
   {
-    R->cf->ch = R->cf->modExponent;
-    if ((mpz_cmp_ui(R->cf->modBase, 2) == 0) && (R->cf->modExponent <= 8*sizeof(NATNUMBER)))
+    //R->cf->ch = R->cf->modExponent;
+    if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
     {
       /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
-      R->cf->ringtype = 1;       // Use Z/2^ch
+      R->cf=nInitChar(n_Z2m,(void*)(long)modExponent);       // Use Z/2^ch
+      omFreeSize (modBase, sizeof(mpz_t));
     }
     else
     {
-      R->cf->ringtype = 3;
+      //ringtype 3
+      ZnmInfo info;
+      info.base= modBase;
+      info.exp= modExponent;
+      R->cf=nInitChar(n_Znm,(void*) &info);
     }
   }
   // just a module m > 1
   else
   {
-    R->cf->ringtype = 2;
-    R->cf->ch = mpz_get_ui(R->cf->modBase);
+    //ringtype = 2;
+    //const int ch = mpz_get_ui(modBase);
+    ZnmInfo info;
+    info.base= modBase;
+    info.exp= modExponent;
+    R->cf=nInitChar(n_Zn,(void*) &info);
   }
 }
 #endif
@@ -5215,19 +5225,25 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
+        omFreeSize (modBase, sizeof (mpz_t));
       }
       else
       {
         //ringtype = 3;
-        cf=nInitChar(n_Zpn,(void*)(long)modBase);
+        ZnmInfo info;
+        info.base= modBase;
+        info.exp= modExponent;
+        cf=nInitChar(n_Znm,(void*) &info); //exponent is missing
       }
     }
     // just a module m > 1
     else if (cf == NULL)
     {
       //ringtype = 2;
-      const int ch = mpz_get_ui(modBase);
-      cf=nInitChar(n_Zn,(void*)(long)ch);
+      ZnmInfo info;
+      info.base= modBase;
+      info.exp= modExponent;
+      cf=nInitChar(n_Zn,(void*) &info);
     }
     assume( cf != NULL );
   }

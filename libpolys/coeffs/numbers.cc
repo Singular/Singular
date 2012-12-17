@@ -288,12 +288,12 @@ cfInitCharProc nInitCharTableDefault[]=
  #ifdef HAVE_RINGS
  nrzInitChar,  /* n_Z */
  nrnInitChar,  /* n_Zn */
- NULL,         /* n_Zpn */
+ nrnInitChar,  /* n_Znm */
  nr2mInitChar, /* n_Z2m */
  #else
  NULL,         /* n_Z */
  NULL,         /* n_Zn */
- NULL,         /* n_Zpn */
+ NULL,         /* n_Znm */
  NULL,         /* n_Z2m */
  #endif
  NULL	/* n_CF */

@@ -377,7 +377,7 @@ const char * nrzRead (const char *s, number *a, const coeffs)
 
 void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
-  PrintS("//   characteristic : 0 (Integers)\n");
+  PrintS("//   coeff. ring is : Integers\n");
 }
 
 
@@ -402,6 +402,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfGetUnit = nrzGetUnit; // only for ring stuff
   r->cfExtGcd = nrzExtGcd; // only for ring stuff
   r->cfDivBy = nrzDivBy; // only for ring stuff
+  r->cfInit_bigint = nrzMapQ;
   //#endif
   r->cfNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
