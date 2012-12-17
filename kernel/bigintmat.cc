@@ -420,7 +420,7 @@ int getShorter (int * a, int l, int j, int cols, int rows)
     int index = cols*i+j;
     if ((a[index] > sndlong) && (a[index] < l))
     {
-      int min = floor(log10(cols))+floor(log10(rows))+5;
+      int min = (int)(floor(log10(cols))+floor(log10(rows)))+5;
       if ((a[index] < min) && (min < l))
         sndlong = min;
       else
@@ -429,7 +429,7 @@ int getShorter (int * a, int l, int j, int cols, int rows)
   }
   if (sndlong == 0)
   {
-    int min = floor(log10(cols))+floor(log10(rows))+5;
+    int min = (int)(floor(log10(cols))+floor(log10(rows)))+5;
     if (min < l)
       sndlong = min;
     else
