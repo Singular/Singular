@@ -50,9 +50,12 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
-  r->modBase = (int_number) omAlloc(sizeof(mpz_t));
+  r->modBase = (int_number) omAllocBin (gmp_nrz_bin);
   mpz_init_set_si (r->modBase, 2L);
   r->ringtype = 1;
+  r->modNumber= (int_number) omAllocBin (gmp_nrz_bin);
+  mpz_init (r->modNumber);
+  mpz_pow_ui (r->modNumber, r->modBase, r->modExponent);
 
   /* next cast may yield an overflow as mod2mMask is an unsigned long */
   r->ch = (int)r->mod2mMask + 1;

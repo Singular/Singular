@@ -50,7 +50,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 {
   assume( (getCoeffType(r) == ID) || (getCoeffType (r) == ID2) );
   ZnmInfo * info= (ZnmInfo *) p;
-  r->modBase = (int_number) omAlloc(sizeof(mpz_t));
+  r->modBase = (int_number) omAllocBin (gmp_nrz_bin);
   mpz_init_set (r->modBase, info->base);
 
   nrnInitExp (info->exp, r);
@@ -577,14 +577,9 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
 void nrnSetExp(unsigned long m, coeffs r)
 {
   /* clean up former stuff */
-  //if (r->modBase   != NULL) mpz_clear(r->modBase);
   if (r->modNumber != NULL) mpz_clear(r->modNumber);
 
   r->modExponent= m;
-  /* this is Z/m = Z/(m^1), hence set modBase = m, modExponent = 1: */
-  //r->modBase = (int_number)omAllocBin(gmp_nrz_bin);
-  //mpz_init(r->modBase);
-  //mpz_set_ui(r->modBase, (unsigned long)m);
   r->modNumber = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init_set (r->modNumber, r->modBase);
   mpz_pow_ui (r->modNumber, r->modNumber, m);
