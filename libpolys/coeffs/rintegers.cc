@@ -377,7 +377,7 @@ const char * nrzRead (const char *s, number *a, const coeffs)
 
 void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
-  PrintS("//   characteristic : 0 (Integers)\n");
+  PrintS("//   coeff. ring is : Integers\n");
 }
 
 
