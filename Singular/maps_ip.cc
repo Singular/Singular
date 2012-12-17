@@ -232,20 +232,29 @@ poly pSubstPar(poly p, int par, poly image)
     tmpW.rtyp=POLY_CMD;
     lnumber n=(lnumber)pGetCoeff(p);
     tmpW.data=n->z;
-    if (n->n!=NULL) WarnS("ignoring denominators of coefficients...");
-    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->algring,NULL,NULL,0,nMap))
+    if (n->n!=NULL)
     {
-      WerrorS("map failed");
+      WerrorS("denominators of coefficients must be 1 for subst");
       v->data=NULL;
+      break;
     }
-    pp=pHead(p);
-    //PrintS("map:");pWrite(pp);
-    pSetCoeff(pp,nInit(1));
-    //PrintS("->");pWrite((poly)(v->data));
-    poly ppp=pMult((poly)(v->data),pp);
-    //PrintS("->");pWrite(ppp);
-    res=pAdd(res,ppp);
-    pIter(p);
+    else
+    {
+      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->algring,NULL,NULL,0,nMap))
+      {
+        WerrorS("map failed");
+        v->data=NULL;
+	break;
+      }
+      pp=pHead(p);
+      //PrintS("map:");pWrite(pp);
+      pSetCoeff(pp,nInit(1));
+      //PrintS("->");pWrite((poly)(v->data));
+      poly ppp=pMult((poly)(v->data),pp);
+      //PrintS("->");pWrite(ppp);
+      res=pAdd(res,ppp);
+      pIter(p);
+    }
   }
   idDelete((ideal *)(&theMap));
   omFreeBin((ADDRESS)v, sleftv_bin);
