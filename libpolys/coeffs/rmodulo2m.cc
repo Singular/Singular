@@ -626,20 +626,8 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
   }
   if (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
   {
-    // Computing the n of Z/n
-    int_number modul = (int_number)omAllocBin(gmp_nrz_bin);
-    mpz_init_set(modul, src->modNumber);
-    int_number twoToTheK = (int_number)omAllocBin(gmp_nrz_bin);
-    mpz_init_set_ui(twoToTheK, src->mod2mMask);
-    mpz_add_ui(twoToTheK, twoToTheK, 1);
-    if (mpz_divisible_p(modul, twoToTheK))
-    {
-      mpz_clear(modul);     omFree((void *)modul);
-      mpz_clear(twoToTheK); omFree((void *)twoToTheK);
+    if (mpz_divisible_2exp_p(src->modNumber,dst->modExponent))
       return nr2mMapGMP;
-    }
-    mpz_clear(modul);     omFree((void *) modul);
-    mpz_clear(twoToTheK); omFree((void *)twoToTheK);
   }
   return NULL;      // default
 }
