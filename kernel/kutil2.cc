@@ -529,20 +529,29 @@ uint ShiftDVec::divisibleBy
   if(dvSize1 < dvSize2) return UINT_MAX;
   if(!dvSize2) return UINT_MAX-1;
 
- loGriToFile("omAlloc0 for tmpVec in divBy ",dvSize1*sizeof(uint),1024);
+  loGriToFile("omAlloc0 for tmpVec in divBy ",dvSize1*sizeof(uint),1024);
   uint * tmpVec = (uint *)omAlloc0(dvSize1*sizeof(uint));
   memcpy((void*)tmpVec,(void*)dvec1,dvSize1*sizeof(uint));
 
   //overflow can not happen since dvSize1 <= dvSize2
   uint maxSh = dvSize1 - dvSize2;
   size_t cmpLen = dvSize2 * sizeof(uint);
-  for(int shift=0; shift <= maxSh; ++shift){
-    if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen)){
+  int shift=0;
+  for(; shift < maxSh; ++shift)
+  {
+    if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen))
+    {
       loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",dvSize1*sizeof(uint),1024);
       omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
       return shift;
     }
     tmpVec[shift+1] = tmpVec[shift] + tmpVec[shift+1] - numVars;
+  }
+  if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen))
+  {
+    loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",dvSize1*sizeof(uint),1024);
+    omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
+    return shift;
   }
   loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",dvSize1*sizeof(uint),1024);
   omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);

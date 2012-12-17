@@ -144,7 +144,10 @@ void ShiftDVec::clearS
   /* BOCO: maybe dvec and TObject already exist
    * -> we should improve that! */
 
-  if ( !SD::p_LmShortDivisibleBy(H,p_sev, &T, ~ strat->sevS[*at], currRing) ) return;
+  uint shift = SD::p_LmShortDivisibleBy
+            (&T,p_sev, H, ~ strat->sevS[*at], currRing);
+  assume(shift != UINT_MAX-1);
+  if ( shift > UINT_MAX-2 ) return;
 #endif
   deleteInS((*at),strat);
   (*at)--;

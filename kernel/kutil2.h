@@ -347,7 +347,7 @@ public:
     (const ShiftDVec::sTObject& t);
 
   uint divisibleBy( ShiftDVec::sTObject * T, 
-                    int numVars                    )
+                    int numVars              )
   { SetDVecIfNULL(); T->SetDVecIfNULL();
     return ShiftDVec::divisibleBy
       (dvec, dvSize, T->dvec, T->dvSize, numVars); }

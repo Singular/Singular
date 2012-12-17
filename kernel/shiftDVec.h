@@ -21,12 +21,12 @@ namespace ShiftDVec
   poly redtail(poly p, int pos, kStrategy strat);
   int redHomog (LObject* h,kStrategy strat);
   uint p_LmShortDivisibleBy
-    (const TObject* t1, unsigned long sev_t1, const TObject* t2, 
-     unsigned long not_sev_t2, const ring r                     );
+    ( TObject* t1, unsigned long sev_t1, TObject* t2, 
+      unsigned long not_sev_t2, const ring r          );
   uint p_LmDivisibleBy
     (TObject * t1, TObject * t2, const ring r, int lV);
   static inline uint _p_LmDivisibleByNoComp
-    (TObject * t1,TObject * t2, const ring r, int lV);
+    (TObject * t1, TObject * t2, const ring r, int lV);
   int kFindDivisibleByInT
     ( const TSet& T, const unsigned long* sevT, LObject* L, 
       uint& shift, kStrategy strat, const int start=0       );

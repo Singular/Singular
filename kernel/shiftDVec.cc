@@ -1788,8 +1788,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy
     unsigned long not_sev_b, const ring r )
 #else //BOCO: replacement
 uint ShiftDVec::p_LmShortDivisibleBy
-  (const TObject* t1, unsigned long sev_t1, const TObject* t2,
-   unsigned long not_sev_t2, const ring r                     )
+  ( TObject* t1, unsigned long sev_t1, TObject* t2,
+    unsigned long not_sev_t2, const ring r          )
 #endif
 {
 #if 0 //BOCO: original code (replaced)
@@ -1816,7 +1816,7 @@ uint ShiftDVec::p_LmShortDivisibleBy
   }
 #endif //#if (HAVE_SEV > 0)
 
-  return p_LmDivisibleBy(t1->p, t2->p, r);
+  return ShiftDVec::p_LmDivisibleBy(t1, t2, r, r->isLPring);
 
 /*BOCO: We do have no debug version at the moment
  * original code:
@@ -1885,7 +1885,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp
   ( poly a, poly b, const ring r )
 #else //BOCO: replacement
 static inline uint ShiftDVec::_p_LmDivisibleByNoComp
-  (TObject * t1,TObject * t2, const ring r, int lV)
+  (TObject * t1, TObject * t2, const ring r, int lV)
 #endif
 {
 #if 0 //BOCO: original code (deleted)
@@ -2067,7 +2067,6 @@ int ShiftDVec::kFindDivisibleByInT
        * divides first arg, we check if first arg is divisibly
        * by second arg! */
       //TObject tTemp(T[j].t_p);
-      T[j].SetDVecIfNULL(p, r);
       shift = p_LmDivisibleBy(L, &T[j], r, strat->lV);
       if ( shift < UINT_MAX && 
 #if (HAVE_SEV > 3) //BOCO: comments/uncomments sev
