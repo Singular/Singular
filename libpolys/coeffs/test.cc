@@ -338,14 +338,14 @@ int main( int, char *argv[] )
 #ifdef HAVE_RINGS
   type = n_Zn;
 
-  ZnmInfo * Znmparam= new ZnmInfo;
-  Znmparam->base= (mpz_ptr) omAlloc (sizeof (mpz_t));
-  mpz_init_set_ui (Znmparam->base, 3);
-  Znmparam->exp= 1;
+  ZnmInfo Znmparam;
+  Znmparam.base= (mpz_ptr) omAlloc (sizeof (mpz_t));
+  mpz_init_set_ui (Znmparam.base, 3);
+  Znmparam.exp= 1;
 
-  if( Test(type, (void*) Znmparam) )
+  if( Test(type, (void*) &Znmparam) )
     c ++;
-  delete Znmparam;
+
 #endif
 
   type = n_long_C;

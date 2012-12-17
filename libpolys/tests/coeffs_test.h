@@ -447,13 +447,12 @@ class CoeffsTestSuite : public CxxTest::TestSuite
 #ifdef HAVE_RINGS
      n_coeffType type = n_Zn;
 
-     ZnmInfo * Znmparam= new ZnmInfo;
-     Znmparam->base= (mpz_ptr) omAlloc (sizeof (mpz_t));
-     mpz_init_set_ui (Znmparam->base, 3);
-     Znmparam->exp= 1;
+     ZnmInfo Znmparam;
+     Znmparam.base= (mpz_ptr) omAlloc (sizeof (mpz_t));
+     mpz_init_set_ui (Znmparam.base, 3);
+     Znmparam.exp= 1;
 
-     TS_ASSERT( Test(type, (void*) Znmparam) );
-     delete Znmparam;
+     TS_ASSERT( Test(type, (void*) &Znmparam) );
 #endif
    }
 
