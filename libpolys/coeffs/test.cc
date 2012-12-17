@@ -338,9 +338,14 @@ int main( int, char *argv[] )
 #ifdef HAVE_RINGS
   type = n_Zn;
 
-  if( Test(type, (void*) 3) )
-    c ++;
+  ZnmInfo * Znmparam= new ZnmInfo;
+  Znmparam->base= (mpz_ptr) omAlloc (sizeof (mpz_t));
+  mpz_init_set_ui (Znmparam->base, 3);
+  Znmparam->exp= 1;
 
+  if( Test(type, (void*) Znmparam) )
+    c ++;
+  delete Znmparam;
 #endif
 
   type = n_long_C;
@@ -357,14 +362,6 @@ int main( int, char *argv[] )
     c ++;
 #endif
 
-
-#ifdef HAVE_RINGS
-  type = n_Zn;
-
-  if( Test(type, (void*) 3) )
-    c ++;
-#endif
-  
   // polynomial rings needed for: n_algExt, n_transExt !
   
   return c;
