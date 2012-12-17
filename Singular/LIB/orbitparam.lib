@@ -1,0 +1,351 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Algebraic Geometry";
+info="
+LIBRARY:  orbitparam.lib   Parametrizing unipotent orbits
+
+AUTHORS:  J. Boehm, boehm at mathematik.uni-kl.de @*
+          S. Papadakis, papadak at math.ist.utl.pt @*
+
+OVERVIEW:
+
+This library implements the theorem of Chevalley-Rosenlicht as stated in Theorem 3.1.4 of [Corwin, Greenleaf].
+Given a set of strictly upper triangular n x n matrices L_1,...,L_c which generate
+a Lie algebra as a vector space, and a vector v of size n, the
+function @code{parametrizeOrbit} constructs a parametrization of the orbit of v under
+the action of exp(<L_1,...,L_c>).
+
+To compute exp of the Lie algebra elements corresponding
+to the parameters we require that the characteristic of the base field is zero or larger than n.
+
+By determining the parameters from bottom to top
+this allows you to find an element in the orbit with (at least) as many zeros as the dimension of the
+orbit.
+
+Note: Theorem 3.1.4 of [Corwin, Greenleaf] uses strictly lower triangular matrices.
+
+REFERENCES:
+
+Laurence Corwin, Frederick P. Greenleaf: Representations of Nilpotent Lie Groups and their Applications: Volume 1, Part 1, Basic Theory and Examples, Cambridge University Press (2004).
+
+PROCEDURES:
+
+tangentGens(list,matrix);         Returns elements in the Lie algebra, which form a basis of the tangent space of the parametrization.
+matrixExp(matrix);                Matrix exp for nilpotent matrices.
+matrixLog(matrix);                Matrix log for unipotent matrices.
+parametrizeOrbit(list,matrix);    Returns parametrization of the orbit.
+maxZeros(list,matrix);            Determine an element in the orbit with the maximum number of zeroes.
+
+KEYWORDS: nilpotent Lie algebras; unipotent groups; orbit; parametrization; Chevalley-Rosenlicht theorem
+";
+
+LIB "general.lib";
+LIB "matrix.lib";
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+proc tangentGens(list L, matrix v)
+"USAGE:  tangentGens(L,v); L list, v matrix.
+ASSUME:  L is a list of strictly upper triangular n x n matrices of same size.
+         The vector space <L> genererated by the elements of L should be closed
+         under the Lie bracket.
+
+         v is matrix of constants of size n x 1.
+
+RETURN:  list, with four entries
+@*       - first entry is the dimension of the orbit of under the action of exp(<L>)
+@*       - second entry is a list generators of the tangent space of the orbit of v at v
+           under the action of exp(<L>). If the characteristic p of the ground field is positive, then n has to be smaller than p. The generators are elements of <L>.
+@*       - third entry is the list of matrices with the coefficient to obtain the generators
+           as a linear combination of the elements of L
+@*       - fourth entry is list of integers with entries in v which can be made zero by the
+           action of exp(<L>)
+
+THEORY:  We apply the theorem of Chevalley-Rosenlicht.
+
+KEYWORDS: Lie algebra; orbit; Chevalley-Rosenlicht theorem
+
+EXAMPLE: example tangentGens; shows an example
+
+"
+{
+list T;
+list M;
+int i;
+int s;
+int t;
+list Z;
+int d=size(L);
+int n=nrows(v);
+  if (d<1){ERROR("expected nonempty list of generators");}
+  if (n<>nrows(L[1])){ERROR("vector should be same dimension as size of matrix");}
+  matrix A= L[1]*v;
+  for ( i=2; i <= d; i++ )
+  {
+    A=concat(A,L[i]*v);
+  }
+  matrix B;
+  for ( i=n-1; i >=1; i=i-1 )
+  {
+    B=submat(A,i..n,1..d);
+    matrix E[n-i+1][1];
+    E[1,1]=1;
+    list LU=ludecomp(B);
+    list Q=lusolve(LU[1],LU[2],LU[3],E);
+    if (Q[1]<>0){
+       s++;
+       T[s]=Q[2];
+       matrix C = Q[2][1,1]*L[1];
+       for ( t=2; t <= d; t++ )
+       {
+          C=C+Q[2][t,1]*L[t];
+       }
+       M[s]=C;
+       Z[s]=i;
+       kill C;
+    }
+    kill E,LU,Q;
+  }
+return(list(s,M,T,Z));
+}
+
+example
+{ "EXAMPLE:";
+  ring R = 0,(x),dp;
+  matrix L1[3][3] = 0,1,0, 0,0,0, 0,0,0;
+  matrix L2[3][3] = 0,0,1, 0,0,0, 0,0,0;
+  matrix L3[3][3] = 0,1,1, 0,0,1, 0,0,0;
+  list L = L1,L2,L3;
+  matrix v[3][1] = 1,2,3;
+  tangentGens(L,v);
+}
+
+
+proc matrixExp(matrix A)
+"USAGE:  matrixExp(A); A matrix.
+ASSUME:  A is a nilpotent n x n matrix.
+         If the characteristic p of the ground field is positive, then n has to be
+         smaller than p.
+
+RETURN:  matrix, exp(A)
+
+THEORY:  We compute the power series, which terminates since A is nilpotent.
+
+KEYWORDS: Exp for matrices
+
+EXAMPLE: example matrixExp; shows an example
+
+"
+{
+int i;
+int n = nrows(A);
+if (n<>ncols(A)){
+   ERROR("expected square matrix");
+}
+matrix Z[n][n];
+matrix B[n][n];
+B=B+1;
+matrix D[n][n];
+D=D+1;
+number j=1;
+for (i=1; i <= n; i++ )
+  {
+      j=j*i;
+      D=D*A;
+      if (D==Z){break;}
+      B=B+(1/j)*D;
+  }
+return(B);}
+example
+{ "EXAMPLE:";
+  ring R = 0,(x),dp;
+  matrix A[4][4] = 0,0,1,0, 0,0,1,0, 0,0,0,0;
+  matrixExp(A);
+}
+
+
+proc matrixLog(matrix A)
+"USAGE:  matrixLog(A); A matrix.
+ASSUME:  A-E is a nilpotent n x n matrix.
+         If the characteristic p of the ground field is positive, then n has to be
+         smaller than p.
+
+RETURN:  matrix, log(A)
+
+THEORY:  We compute the power series, which terminates since A-E is nilpotent.
+
+KEYWORDS: Log for matrices
+
+EXAMPLE: example matrixLog; shows an example
+
+"
+{
+int i;
+int n = nrows(A);
+if (n<>ncols(A)){
+   ERROR("expected square matrix");
+}
+matrix Z[n][n];
+matrix B[n][n];
+matrix D[n][n];
+matrix N[n][n]= A-1;
+D=D+1;
+number j;
+for (i=1; i <= n; i++ )
+  {
+      j=j+1;
+      D=D*N;
+      if (D==Z){break;}
+      B=B+(1/j)*(-1)^(i+1)*D;
+  }
+return(B);}
+example
+{ "EXAMPLE:";
+  ring R = 0,(s,t),dp;
+  matrix A[3][3] = 1,s,st/2, 0,1,t, 0,0,1;
+  matrixLog(A);
+}
+
+
+
+proc parametrizeOrbit(list L, matrix v)
+"USAGE:  parametrizeOrbit(L,v); L list, v matrix.
+ASSUME:  L is a list of strictly upper triangular n x n matrices of same size.
+         The vector space <L> genererated by the elements of L should be closed
+         under the Lie bracket.
+@*       v is matrix of constants of size n x 1.
+@*       The basering has at least size(L) variables. However we will only use
+         tangentGens(L,v)[1] many of them.
+
+RETURN:  list, with four entries
+@*       - int, dimension of the orbit
+@*       - matrix A over the basering giving a parametrization of the orbit of v under the action of exp(<L>).
+@*       - list of integers, with the (row)-indices of entries which can be deleted by the action
+@*       - the variables of the parametrization to solve for
+
+THEORY:  We apply the theorem of Chevalley-Rosenlicht. First we determine tangent space generators,
+         then apply @code{matrixExp} to the generators, and finally take the product
+         to obtain the parametrization.
+
+KEYWORDS: Lie group; orbit; parametrization
+
+EXAMPLE: example parametrizeOrbit; shows an example
+"
+{
+list T = tangentGens(L,v);
+list T2 = T[2];
+int i;
+int d=size(L);
+list vL;
+if (nvars(basering)<d)
+{
+   ERROR("expected basering with at least generators many variables");
+}
+for (i=1; i <= size(T2); i++ )
+  {
+    v = matrixExp(T2[size(T2)-i+1]*var(size(T2)-i+1))*v;
+    vL[i]=var(i);
+  }
+return(list(T[1],v,T[4],vL));
+}
+
+example
+{ "EXAMPLE:";
+  ring R = 0,(t(1..3)),dp;
+  matrix L1[3][3] = 0,1,0, 0,0,0, 0,0,0;
+  matrix L2[3][3] = 0,0,1, 0,0,0, 0,0,0;
+  matrix L3[3][3] = 0,1,1, 0,0,1, 0,0,0;
+  list L = L1,L2,L3;
+  matrix v[3][1] = 1,2,3;
+  parametrizeOrbit(L,v);
+
+  ring R1 = 0,(t(1..2)),dp;
+  matrix L1[4][4] = 0,1,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0;
+  matrix L2[4][4] = 0,0,1,0, 0,0,0,1, 0,0,0,0, 0,0,0,0;
+  list L = L1,L2;
+  matrix v[4][1] = 1,2,3,4;
+  parametrizeOrbit(L,v);
+}
+
+
+proc maxZeros(list L, matrix v)
+"USAGE:  maxZeros(L,v); L list, v matrix.
+ASSUME:  L is a list of strictly upper triangular n x n matrices of same size.
+         The vector space <L> genererated by the elements of L should be closed
+         under the Lie bracket.
+
+         v is matrix of constants of size n x 1.
+
+         The basering has at least size(L) variables. However we will only use
+         tangentGens(L,v)[1] many of them.
+
+RETURN:  matrix of constants over the basering giving an element in the orbit of v
+         under the action of exp(<L>)  with (at least) as many zeros as the dimension of the
+         orbit.
+
+THEORY:  We apply @code{parametrizeOrbit} to obtain a parametrization of the orbit
+         according to the theorem of Chevalley-Rosenlicht. By determining the parameters from bottom to top
+         we find an element in the orbit with (at least) as many zeros as the dimension of the
+         orbit.
+
+KEYWORDS: Lie group; orbit; maximum number of zeroes
+
+EXAMPLE: example parametrizeOrbit; shows an example
+"
+{
+  int d = size(L);
+  def Roriginal = basering;
+  list rl = ringlist(Roriginal);
+  int k;
+  for(k = 1; k <= d; k++)
+     {
+        rl[2][k] = "x("+string(k)+")";
+     }
+  rl[3]= list(list("dp",1:(d)),list("C",0));
+  def R = ring(rl);
+  setring R;
+  list L = fetch(Roriginal,L);
+  matrix v = fetch(Roriginal,v);
+  list P = parametrizeOrbit(L,v);
+  matrix p = P[2];
+  int n = P[1];
+  list idx = P[3];
+  list va = P[4];
+  poly equ,rhs;
+  number de;
+  list parval;
+  for(k = 1; k <= n; k++)
+     {
+        equ = p[idx[k],1];
+        rhs=-number(subst(equ,va[k],0));
+        de = number(diff (equ, va[k]));
+        parval[k] = rhs/de;
+        p = subst(p,va[k],rhs/de);
+     }
+  setring(Roriginal);
+  matrix p=fetch(R,p);
+  return(p);
+}
+
+example
+{ "EXAMPLE:";
+  ring R = 0,(x),dp;
+  matrix L1[3][3] = 0,1,0, 0,0,0, 0,0,0;
+  matrix L2[3][3] = 0,0,1, 0,0,0, 0,0,0;
+  matrix L3[3][3] = 0,1,1, 0,0,1, 0,0,0;
+  list L = L1,L2,L3;
+  matrix v[3][1] = 1,2,3;
+  maxZeros(L,v);
+
+  ring R1 = 0,(x),dp;
+  matrix L1[4][4] = 0,1,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0;
+  matrix L2[4][4] = 0,0,1,0, 0,0,0,1, 0,0,0,0, 0,0,0,0;
+  list L = L1,L2;
+  matrix v[4][1] = 1,2,3,4;
+  maxZeros(L,v);
+}
+
+
