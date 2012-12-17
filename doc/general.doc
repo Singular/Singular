@@ -1169,7 +1169,7 @@ and change the text used as replacement for folded sections.
 
 For doing this, you also might
 find handy the function @code{customize-face-at-point},
-which let's you customize the face at the current position of
+which lets you customize the face at the current position of
 point. This function is automatically defined if you run
 @code{ESingular}). Otherwise, you should add its definition (see below)
 to your personal @code{.emacs} file.
