@@ -419,7 +419,7 @@ static inline BOOLEAN rField_is_Ring_ModN(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return ( getCoeffType(r->cf) == n_Zn && nCoeff_is_Ring_ModN(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring_PtoM(const ring r)
-{ assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Zpn && nCoeff_is_Ring_PtoM(r->cf) ); }
+{ assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Znm && nCoeff_is_Ring_PtoM(r->cf) ); }
 
 static inline BOOLEAN rField_is_Ring_Z(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return (getCoeffType(r->cf) == n_Z && nCoeff_is_Ring_Z(r->cf) ); }

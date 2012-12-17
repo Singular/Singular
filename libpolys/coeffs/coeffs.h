@@ -36,7 +36,7 @@ enum n_coeffType
   n_long_C, /**< complex (GMP) numbers */
   n_Z, /**< only used if HAVE_RINGS is defined: ? */
   n_Zn, /**< only used if HAVE_RINGS is defined: ? */
-  n_Zpn, /**< only used if HAVE_RINGS is defined: does no longer exist? */
+  n_Znm, /**< only used if HAVE_RINGS is defined: ? */
   n_Z2m, /**< only used if HAVE_RINGS is defined: ? */
   n_CF /**< ? */
 };

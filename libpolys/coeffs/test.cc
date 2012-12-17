@@ -170,7 +170,7 @@ namespace
       CASE(n_long_C);
       CASE(n_Z);
       CASE(n_Zn);
-      CASE(n_Zpn);
+      CASE(n_Znm);
       CASE(n_Z2m);
       CASE(n_CF);
       default: return o << "Unknown type: [" << (const unsigned long) type << "]";  
@@ -338,7 +338,12 @@ int main( int, char *argv[] )
 #ifdef HAVE_RINGS
   type = n_Zn;
 
-  if( Test(type, (void*) 3) )
+  ZnmInfo Znmparam;
+  Znmparam.base= (mpz_ptr) omAlloc (sizeof (mpz_t));
+  mpz_init_set_ui (Znmparam.base, 3);
+  Znmparam.exp= 1;
+
+  if( Test(type, (void*) &Znmparam) )
     c ++;
 
 #endif
@@ -357,14 +362,6 @@ int main( int, char *argv[] )
     c ++;
 #endif
 
-
-#ifdef HAVE_RINGS
-  type = n_Zn;
-
-  if( Test(type, (void*) 3) )
-    c ++;
-#endif
-  
   // polynomial rings needed for: n_algExt, n_transExt !
   
   return c;

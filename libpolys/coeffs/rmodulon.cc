@@ -24,6 +24,7 @@
 
 /// Our Type!
 static const n_coeffType ID = n_Zn;
+static const n_coeffType ID2 = n_Znm;
 
 extern omBin gmp_nrz_bin;
 
@@ -31,8 +32,9 @@ void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   long l = (long)mpz_sizeinbase(r->modBase, 10) + 2;
   char* s = (char*) omAlloc(l);
-  if (nCoeff_is_Ring_ModN(r)) Print("//  Z/%s\n", s);
-  else if (nCoeff_is_Ring_PtoM(r)) Print("//  Z/%s^%lu\n", s, r->modExponent);
+  s= mpz_get_str (s, 10, r->modBase);
+  if (nCoeff_is_Ring_ModN(r)) Print("//   coeff. ring is : Z/%s\n", s);
+  else if (nCoeff_is_Ring_PtoM(r)) Print("//   coeff. ring is : Z/%s^%lu\n", s, r->modExponent);
   omFreeSize((ADDRESS)s, l);
 }
 
@@ -46,10 +48,16 @@ static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
 {
-  assume( getCoeffType(r) == ID );
-  nrnInitExp((int)(long)(p), r);
-  r->ringtype = 2;
+  assume( (getCoeffType(r) == ID) || (getCoeffType (r) == ID2) );
+  ZnmInfo * info= (ZnmInfo *) p;
+  r->modBase= info->base;
 
+  nrnInitExp (info->exp, r);
+
+  if (info->exp > 1)
+    r->ringtype= 3;
+  else
+    r->ringtype= 2;
   /* next computation may yield wrong characteristic as r->modNumber
      is a GMP number */
   r->ch = mpz_get_ui(r->modNumber);
@@ -89,6 +97,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfName        = ndName;
   r->cfCoeffWrite  = nrnCoeffWrite;
   r->nCoeffIsEqual = nrnCoeffsEqual;
+  r->cfInit_bigint = nrnMapQ;
+
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
@@ -473,12 +483,12 @@ number nrnMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   return (number)erg;
 }
 
-number nrnMapQ(number from, const coeffs src, const coeffs /*dst*/)
+number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   nlGMP(from, (number)erg, src);
-  mpz_mod(erg, erg, src->modNumber);
+  mpz_mod(erg, erg, dst->modNumber);
   return (number)erg;
 }
 
@@ -563,28 +573,24 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nrnSetExp(int m, coeffs r)
+void nrnSetExp(unsigned long m, coeffs r)
 {
   /* clean up former stuff */
-  if (r->modBase   != NULL) mpz_clear(r->modBase);
   if (r->modNumber != NULL) mpz_clear(r->modNumber);
 
-  /* this is Z/m = Z/(m^1), hence set modBase = m, modExponent = 1: */
-  r->modBase = (int_number)omAllocBin(gmp_nrz_bin);
-  mpz_init(r->modBase);
-  mpz_set_ui(r->modBase, (unsigned long)m);
-  r->modExponent = 1;
+  r->modExponent= m;
   r->modNumber = (int_number)omAllocBin(gmp_nrz_bin);
-  mpz_init(r->modNumber);
-  mpz_set(r->modNumber, r->modBase);
-  /* mpz_pow_ui(r->modNumber, r->modNumber, r->modExponent); */
+  mpz_init_set (r->modNumber, r->modBase);
+  mpz_pow_ui (r->modNumber, r->modNumber, m);
 }
 
-/* We expect this ring to be Z/m for some m > 2 which is not a prime. */
-void nrnInitExp(int m, coeffs r)
+/* We expect this ring to be Z/n^m for some m > 0 and for some n > 2 which is not a prime. */
+void nrnInitExp(unsigned long m, coeffs r)
 {
-  if (m <= 2) WarnS("nrnInitExp failed (m in Z/m too small)");
   nrnSetExp(m, r);
+  assume (r->modNumber != NULL);
+  if (mpz_cmp_ui(r->modNumber,2) <= 0)
+    WarnS("nrnInitExp failed (m in Z/m too small)");
 }
 
 #ifdef LDEBUG
