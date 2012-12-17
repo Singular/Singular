@@ -47,5 +47,7 @@ SLIB1 = classifyceq.lib divisors.lib decomp.lib ffsolve.lib findifs.lib finitedi
 
 PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
-	ncfactor.lib nctools.lib  perron.lib  qmatrix.lib
+	ncfactor.lib nctools.lib  perron.lib  qmatrix.lib \
+	purityfiltration.lib nchomolog.lib ratgb.lib bimodules.lib \
+	dmodloc.lib ncpreim.lib
 
