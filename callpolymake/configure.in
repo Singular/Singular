@@ -6,7 +6,8 @@ AC_CHECK_PROG([PMCONFIG],[polymake-config],[1],[0])
 if test $PMCONFIG = "1"; then
   AC_MSG_CHECKING([whether polymake is up-to-date])
   SUPPORTEDPOLYMAKEVERSION="2.12"
-  if test `polymake-config --version` = $SUPPORTEDPOLYMAKEVERSION; then                                          
+  CURRENTPOLYMAKEVERSION=`polymake-config --version | sed 's/\(.*\)../\1/'`
+  if test $CURRENTPOLYMAKEVERSION > $SUPPORTEDPOLYMAKEVERSION; then
     AC_MSG_RESULT([yes])
     OUTPUT_MAKEFILES="${OUTPUT_MAKEFILES} Makefile"
   else

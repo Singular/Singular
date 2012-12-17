@@ -765,7 +765,7 @@ EXAMPLE: example evaluatePDivisor; shows an example
 formaldivisor vD;
 list L = D.summands;
 cone C = D.tail;
-cone dC = dual(C);
+cone dC = dualCone(C);
 list vL;
 int i;
 intvec vv = 0,v;
