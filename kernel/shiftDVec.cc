@@ -2357,7 +2357,8 @@ poly ShiftDVec::redtailBba
         With = &(strat->T[j]);
 #if 1 //BOCO: added code
         uTmp.p = With->p;
-        uTmp.t_p = With->p;
+        uTmp.t_p = With->t_p;
+        uTmp.tailRing = With->tailRing; //BOCO:may not need that
         if(shift != 0)
         //Our divisor is a shift (and thus not in T or S)
         {

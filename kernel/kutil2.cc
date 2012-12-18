@@ -64,8 +64,6 @@ uint ShiftDVec::CreateDVec
    * representation of the letterplace monomial lm(p)   
    * "it" is a pointer to the next free entry in our distance
    * vector                                                   
-   * TODO: Do that by getting the exponent vector (see mail from
-   * H. Schoenemann)
    */
   for(int j=1, i=1, l=0; l < dvSize; ++i)
     if(p_GetExp(p,i,r)){*it=j;++it;j=1;++l;} else{++j;}
