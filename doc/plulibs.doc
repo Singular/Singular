@@ -115,15 +115,17 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @section nchomolog_lib
 @c lib nchomolog.lib
 @c ----------------------------------------------------------
-@node ratgb_lib, bimodules_lib, nchomolog_lib, Non-commutative libraries
+@c @node ratgb_lib, bimodules_lib, nchomolog_lib, Non-commutative libraries
+@node ratgb_lib, dmodloc_lib, nchomolog_lib, Non-commutative libraries
 @section ratgb_lib
 @c lib ratgb.lib
 @c ----------------------------------------------------------
-@node bimodules_lib, dmodloc_lib, ratgb_lib, Non-commutative libraries
-@section bimodules_lib
-@c lib bimodules.lib
+@c @node bimodules_lib, dmodloc_lib, ratgb_lib, Non-commutative libraries
+@c @section bimodules_lib
+@c @c lib bimodules.lib
 @c ----------------------------------------------------------
-@node dmodloc_lib, ncpreim_lib, bimodules_lib, Non-commutative libraries
+@c @node dmodloc_lib, ncpreim_lib, bimodules_lib, Non-commutative libraries
+@node dmodloc_lib, ncpreim_lib, ratgb_lib, Non-commutative libraries
 @section dmodloc_lib
 @c lib dmodloc.lib
 @c ----------------------------------------------------------
