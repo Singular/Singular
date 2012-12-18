@@ -3,58 +3,59 @@ version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY: dmodloc.lib     Localization of algebraic D-modules and applications
-AUTHORS: Daniel Andres,  daniel.andres@math.rwth-aachen.de
+AUTHOR:  Daniel Andres,  daniel.andres@math.rwth-aachen.de
 
-Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
+Support: DFG Graduiertenkolleg 1632 `Experimentelle und konstruktive Algebra'
 
 
 OVERVIEW:
-Let I be a left ideal I in the n-th polynomial Weyl algebra D=K[x]<d> and
+Let I be a left ideal in the n-th polynomial Weyl algebra D=K[x]<d> and
 let f be a polynomial in K[x].
 
 If D/I is a holonomic module over D, it is known that the localization of D/I
-at f is also holonomic. The procedure Dlocalization computes an ideal J in D
-such that this localization is isomorphic to D/J as D-modules.
+at f is also holonomic. The procedure @code{Dlocalization} computes an ideal
+J in D such that this localization is isomorphic to D/J as D-modules.
 
 If one regards I as an ideal in the rational Weyl algebra as above, K(x)<d>*I,
 and intersects with K[x]<d>, the result is called the Weyl closure of I.
-The procedures WeylClosure (if I has finite holonomic rank) and WeylClosure1
-(if I is in the first Weyl algebra) can be used for computations.
+The procedures @code{WeylClosure} (if I has finite holonomic rank) and
+@code{WeylClosure1} (if I is in the first Weyl algebra) can be used for
+computations.
 
-As an application of the Weyl closure, the procedure annRatSyz computes a
-holonomic part of the annihilator of a rational function by computing certain
+As an application of the Weyl closure, the procedure @code{annRatSyz} computes
+a holonomic part of the annihilator of a rational function by computing certain
 syzygies. The full annihilator can be obtained by taking the Weyl closure of
 the result.
 
 If one regards the left ideal I as system of linear PDEs, one can find its
-polynomial solutions with polSol (if I is holonomic) or polSolFiniteRank
-(if I is of finite holonomic rank). Rational solutions can be obtained
-with ratSol.
+polynomial solutions with @code{polSol} (if I is holonomic) or
+@code{polSolFiniteRank} (if I is of finite holonomic rank). Rational solutions
+can be obtained with @code{ratSol}.
 
-The procedure bfctBound computes a possible multiple of the b-function for
-f^s*u at a generic root of f. Here, u stands for [1] in D/I.
+The procedure @code{bfctBound} computes a possible multiple of the b-function
+for f^s*u at a generic root of f. Here, u stands for [1] in D/I.
 
-This library also offers the procedures holonomicRank and DsingularLocus to
-compute the holonomic rank and the singular locus of the D-module D/I.
+This library also offers the procedures @code{holonomicRank} and
+@code{DsingularLocus} to compute the holonomic rank and the singular locus
+of the D-module D/I.
 
 
-References:
-@* (OT)  Oaku, Takayama: 'Algorithms for D-modules',
-         Journal of Pure and Applied Algebra, 1998
-@* (OTT) Oaku, Takayama, Tsai: 'Polynomial and rational solutions of holonomic
-         systems', Journal of Pure and Applied Algebra, 2001
-@* (OTW) Oaku, Takayama, Walther: 'A Localization Algorithm for D-modules',
-         Journal of Symbolic Computation, 2000
-@* (Tsa) Tsai: 'Algorithms for algebraic analysis', PhD thesis, 2000
+REFERENCES:
+   (OT)  T. Oaku, N. Takayama: `Algorithms for D-modules',
+         Journal of Pure and Applied Algebra, 1998.
+@* (OTT) T. Oaku, N. Takayama, H. Tsai: `Polynomial and rational solutions
+         of holonomic systems', Journal of Pure and Applied Algebra, 2001.
+@* (OTW) T. Oaku, N. Takayama, U. Walther: `A Localization Algorithm for
+         D-modules', Journal of Symbolic Computation, 2000.
+@* (Tsa) H. Tsai: `Algorithms for algebraic analysis', PhD thesis, 2000.
 
 
 PROCEDURES:
-
+Dlocalization(I,f[,k,e]);  computes the localization of a D-module
+WeylClosure(I);    computes the Weyl closure of an ideal in the Weyl algebra
+WeylClosure1(L);   computes the Weyl closure of operator in first Weyl algebra
 holonomicRank(I);  computes the holonomic rank of I
 DsingularLocus(I); computes the singular locus of a D-module
-Dlocalization(I,f[,k,e]);  computes the localization of a D-module
-WeylClosure1(L);   computes the Weyl closure of operator in first Weyl algebra
-WeylClosure(I);    computes the Weyl closure of an ideal in the Weyl algebra
 polSol(I[,w,m]);   computes basis of polynomial solutions to the given system
 polSolFiniteRank(I[,w]); computes basis of polynomial solutions to given system
 ratSol(I);         computes basis of rational solutions to the given system
@@ -67,7 +68,6 @@ extendWeyl(S);     extends basering (Weyl algebra) by given vars
 polyVars(f,v);     checks whether f contains only variables indexed by v
 monomialInIdeal(I);    computes all monomials appearing in generators of ideal
 vars2pars(v);      converts variables specified by v into parameters
-killTerms(p,k);    delete all terms of p containing var(k)
 minIntRoot2(L);    finds minimal integer root in a list of roots
 maxIntRoot(L);     finds maximal integer root in a list of roots
 dmodAction(id,f[,v]);  computes the natural action of a D-module on K[x]
@@ -93,6 +93,7 @@ SEE ALSO: bfun_lib, dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
 /*
 CHANGELOG:
 12.11.12: bugfixes, updated docu
+17.12.12: updated docu, removed redundant procedure killTerms
 */
 
 
@@ -104,6 +105,7 @@ LIB "nctools.lib"; // for Weyl, isWeyl etc
 
 
 // testing for consistency of the library /////////////////////////////////////
+
 static proc testdmodloc()
 {
   example dmodGeneralAssumptionCheck;
@@ -112,7 +114,6 @@ static proc testdmodloc()
   example polyVars;
   example monomialInIdeal;
   example vars2pars;
-  example killTerms;
   example minIntRoot2;
   example maxIntRoot;
   example dmodAction;
@@ -190,7 +191,7 @@ proc safeVarName (string s)
 "
 USAGE:    safeVarName(s);  s string
 RETURN:   string, returns s if s is not the name of a par/var of basering
-          and '@' + s otherwise
+          and `@' + s otherwise
 EXAMPLE:  example safeVarName; shows examples
 "
 {
@@ -453,42 +454,6 @@ example
   def RR = vars2pars(v);
   setring RR;
   RR;
-}
-
-
-proc killTerms (poly p, int k)
-"
-USAGE:    killTerms(p,k);  p poly, k int
-RETURN:   poly, p minus all terms containing the k-th variable
-NOTE:     No Groebner basis computations are used.
-EXAMPLE:  example killTerms; shows examples
-"
-{
-  if ( (k<0) || (k>nvars(basering)) )
-  {
-    ERROR("Given int is out of range");
-  }
-  int j;
-  poly q;
-  intvec v;
-  for (j=1; j<=size(p); j++)
-  {
-    v = leadexp(p[j]);
-    if (v[k]==0)
-    {
-      q = q + p[j];
-    }
-  }
-  return(q);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),dp;
-  poly p = 8xyz + 7xy + 6xz + 5yz + 4x + 3y + 2z + 1;
-  killTerms(p,1);
-  killTerms(p,2);
-  killTerms(p,3);
 }
 
 
@@ -956,7 +921,7 @@ EXAMPLE:  example commRing; shows examples
   }
   RL = RL[1..4];
   def r = ring(RL);
-  return(r)
+  return(r);
 }
 example
 {
@@ -1073,8 +1038,9 @@ ASSUME:   The basering is the n-th Weyl algebra over a field of
           is the differential operator belonging to x(i).
 RETURN:   int, the holonomic rank of I
 REMARKS:  The holonomic rank of I is defined to be the K(x(1..n))-dimension of
-          I regarded as ideal in the rational Weyl algebra K(x(1..n))<D(1..n)>.
-          If this dimension is not finite, -1 is returned.
+          the module W/WI, where W is the rational Weyl algebra
+          K(x(1..n))<D(1..n)>.
+          If this dimension is infinite, -1 is returned.
 NOTE:     If e<>0, @code{std} is used for Groebner basis computations,
           otherwise (and by default) @code{slimgb} is used.
 @*        If printlevel=1, progress debug messages will be printed,
@@ -1133,7 +1099,7 @@ ASSUME:   The basering is the n-th Weyl algebra over a field of
           var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the sequence of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i)
           is the differential operator belonging to x(i).
-RETURN:   ideal, the singular locus of the D-module D/I
+RETURN:   ideal, describing the singular locus of the D-module D/I
 NOTE:     If printlevel>=1, progress debug messages will be printed,
           if printlevel>=2, all the debug messages will be printed
 EXAMPLE:  example DsingularLocus; shows examples
@@ -1262,7 +1228,7 @@ EXAMPLE:  example rightNFWeyl; shows examples.
   }
   for (j=1; j<=ncols(I); j++)
   {
-    I[j] = killTerms(I[j],i);
+    I[j] = subst(I[j],var(i),0);
   }
   setring save;
   I = imap(W,I);
@@ -1307,7 +1273,9 @@ RETURN:   ideal or list, computes an ideal J such that D/J is isomorphic
           If k<>0, a list consisting of J and an integer m is returned,
           such that f^m represents the natural map from D/I to D/J.
           Otherwise (and by default), only the ideal J is returned.
-REMARKS:  Reference: (OTW)
+REMARKS:  It is known that a localization at f of a holonomic D-module is
+          again a holonomic D-module.
+@*        Reference: (OTW)
 NOTE:     If e<>0, @code{std} is used for Groebner basis computations,
           otherwise (and by default) @code{slimgb} is used.
 @*        If printlevel=1, progress debug messages will be printed,
@@ -1566,7 +1534,7 @@ ASSUME:   The basering is the first Weyl algebra D=K<x,d|dx=xd+1> over a field
 RETURN:   ideal, the Weyl closure of the principal left ideal generated by L
 REMARKS:  The Weyl closure of a left ideal I in the Weyl algebra D is defined
           to be the intersection of I regarded as left ideal in the rational
-          Weyl algebra K(x)<d> with D.
+          Weyl algebra K(x)<d> with the polynomial Weyl algebra D.
 @*        Reference: (Tsa), Algorithm 1.2.4
 NOTE:     If printlevel=1, progress debug messages will be printed,
           if printlevel>=2, all the debug messages will be printed.
@@ -1761,7 +1729,7 @@ ASSUME:   The basering is the n-th Weyl algebra W over a field of
 RETURN:   ideal, the Weyl closure of I
 REMARKS:  The Weyl closure of a left ideal I in the Weyl algebra W is defined to
           be the intersection of I regarded as left ideal in the rational Weyl
-          algebra K(x(1..n))<D(1..n)> with W.
+          algebra K(x(1..n))<D(1..n)> with the polynomial Weyl algebra W.
 @*        Reference: (Tsa), Algorithm 2.2.4
 NOTE:     If printlevel=1, progress debug messages will be printed,
           if printlevel>=2, all the debug messages will be printed.
@@ -1832,7 +1800,8 @@ ASSUME:   The basering is the n-th Weyl algebra W over a field of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
-RETURN:   ideal, a basis of the polynomial solutions to the given system
+RETURN:   ideal, a basis of the polynomial solutions to the given system of
+          linear PDEs with polynomial coefficients, encoded via I
 REMARKS:  If w is given, w should consist of n strictly negative entries.
           Otherwise and by default, w is set to -1:n.
           In this case, w is used as weight vector for the computation of a
@@ -1984,7 +1953,8 @@ ASSUME:   The basering is the n-th Weyl algebra W over a field of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is of finite holonomic rank.
-RETURN:   ideal, a basis of the polynomial solutions to the given system
+RETURN:   ideal, a basis of the polynomial solutions to the given system of
+          linear PDEs with polynomial coefficients, encoded via I
 REMARKS:  If w is given, w should consist of n strictly negative entries.
           Otherwise and by default, w is set to -1:n.
           In this case, w is used as weight vector for the computation of a
@@ -2172,7 +2142,8 @@ ASSUME:   The basering is the n-th Weyl algebra W over a field of
           variables is given by x(1),...,x(n),D(1),...,D(n), where D(i) is the
           differential operator belonging to x(i).
 @*        Moreover, assume that I is holonomic.
-RETURN:   module, a basis of the rational solutions to the given system.
+RETURN:   module, a basis of the rational solutions to the given system of
+          linear PDEs with polynomial coefficients, encoded via I
           Note that each entry has two components, the first one standing for
           the enumerator, the second one for the denominator.
 REMARKS:  Reference: (OTT), Algorithm 3.10
@@ -2306,8 +2277,8 @@ RETURN:   list of roots (of type ideal) and multiplicities (of type intvec) of
 REMARKS:  Reference: (OTT), Algorithm 3.4
 NOTE:     This procedure requires to compute a primary decomposition in a
           commutative ring. The optional string primdec can be used to specify
-          the algorithm to do so. It may either be 'GTZ' (Gianni, Trager,
-          Zacharias) or 'SY' (Shimoyama, Yokoyama). By default, 'GTZ' is used.
+          the algorithm to do so. It may either be `GTZ' (Gianni, Trager,
+          Zacharias) or `SY' (Shimoyama, Yokoyama). By default, `GTZ' is used.
 @*        If printlevel=1, progress debug messages will be printed,
           if printlevel>=2, all the debug messages will be printed.
 SEE ALSO: bernstein, bfct, bfctAnn
@@ -2334,8 +2305,8 @@ EXAMPLE:  example bfctBound; shows examples
       {
         if ( (#[1]<>"GTZ") && (#[1]<>"gtz") && (#[1]<>"Gtz") )
         {
-          print("// Warning: optional string may either be 'GTZ' or 'SY',");
-          print("//          proceeding with 'GTZ'.");
+          print("// Warning: optional string may either be `GTZ' or `SY',");
+          print("//          proceeding with `GTZ'.");
           primdec = "GTZ";
         }
       }
@@ -2498,15 +2469,15 @@ example
 proc annRatSyz (poly f, poly g, list #)
 "
 USAGE:    annRatSyz(f,g[,db,eng]);  f, g polynomials, db,eng optional integers
-ASSUME:   The Basering is commutative and over a field of characteristic 0.
-RETURN:   ring (a Weyl algebra) containing an ideal 'LD', which is (part of)
+ASSUME:   The basering is commutative and over a field of characteristic 0.
+RETURN:   ring (a Weyl algebra) containing an ideal `LD', which is (part of)
           the annihilator of the rational function g/f in the corresponding
           Weyl algebra
 REMARKS:  This procedure uses the computation of certain syzygies.
           One can obtain the full annihilator by computing the Weyl closure of
           the ideal LD.
 NOTE:     Activate the output ring with the @code{setring} command.
-          In the output ring, the ideal 'LD' (in Groebner basis) is (part of)
+          In the output ring, the ideal `LD' (in Groebner basis) is (part of)
           the annihilator of g/f.
 @*        If db>0 is given, operators of order up to db are considered,
           otherwise, and by default, a minimal holonomic solution is computed.

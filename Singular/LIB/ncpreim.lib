@@ -3,9 +3,9 @@ version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY: ncpreim.lib    Non-commutative elimination and preimage computations
-AUTHORS: Daniel Andres, daniel.andres@math.rwth-aachen.de
+AUTHOR:  Daniel Andres, daniel.andres@math.rwth-aachen.de
 
-Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
+Support: DFG Graduiertenkolleg 1632 `Experimentelle und konstruktive Algebra'
 
 
 OVERVIEW:
@@ -18,36 +18,37 @@ subalgebra, there might be no admissible elimination ordering, i.e. an
 elimination ordering which also satisfies the ordering condition for
 G-algebras.
 
-The difference between the procedure eliminateNC provided in this library and
-the procedure eliminate (plural) from the kernel is that eliminateNC will
-always find an admissible elimination if such one exists. Moreover, the use
-of slimgb for performing Groebner basis computations is possible.
+The difference between the procedure @code{eliminateNC} provided in this
+library and the procedure @code{eliminate (plural)} from the kernel is that
+eliminateNC will always find an admissible elimination if such one exists.
+Moreover, the use of @code{slimgb} for performing Groebner basis computations
+is possible.
 
-As an application of the theory of elimination, the procedure preimageNC is
-provided, which computes the preimage of an ideal under a homomorphism
+As an application of the theory of elimination, the procedure @code{preimageNC}
+is provided, which computes the preimage of an ideal under a homomorphism
 f: A -> B between G-algebras A and B. In contrast to the kernel procedure
-preimage (plural), the assumption that A is commutative is not required.
+@code{preimage (plural)}, the assumption that A is commutative is not required.
 
 
-References:
-@* (BGL) J.L. Bueso, J. Gomez-Torrecillas, F.J. Lobillo:
-         'Re-filtering and exactness of the Gelfand-Kirillov dimension',
+REFERENCES:
+   (BGL) J.L. Bueso, J. Gomez-Torrecillas, F.J. Lobillo:
+         `Re-filtering and exactness of the Gelfand-Kirillov dimension',
          Bull. Sci. math. 125, 8, 689-715, 2001.
 @* (GML) J.I. Garcia Garcia, J. Garcia Miranda, F.J. Lobillo:
-         'Elimination orderings and localization in PBW algebras',
+         `Elimination orderings and localization in PBW algebras',
          Linear Algebra and its Applications 430(8-9), 2133-2148, 2009.
-@* (Lev) Viktor Levandovskyy: 'Intersection of ideals with non-commutative
+@* (Lev) V. Levandovskyy: `Intersection of ideals with non-commutative
          subalgebras', ISSAC'06, 212-219, ACM, 2006.
 
 
 PROCEDURES:
+eliminateNC(I,v,eng);      elimination in G-algebras
+preimageNC(A,f,J[,P,eng]); preimage of ideals under homomorphisms of G-algebras
 admissibleSub(v);          checks whether subalgebra is admissible
 isUpperTriangular(M,k);    checks whether matrix is (strictly) upper triangular
 appendWeight2Ord(w);       appends weight to ordering
 elimWeight(v);             computes elimination weight
-eliminateNC(I,v,eng);      elimination in G-algebras
 extendedTensor(A,I);       tensor product of rings with additional relations
-preimageNC(A,f,J[,P,eng]); preimage of ideals under homomorphisms of G-algebras
 
 
 KEYWORDS: preimage; elimination
@@ -69,6 +70,7 @@ CHANGELOG
 11.12.12: docu, typos, fixed variable names in extendedTensor,
  moved commRing to dmodloc.lib
 12.12.12: typos
+17.12.12: docu
 */
 
 
@@ -630,11 +632,11 @@ proc preimageNC (list #)
 USAGE:    preimageNC(A,f,J[,P,eng]);  A ring, f map or ideal, J ideal,
                                       P optional string, eng optional int
 ASSUME:   f defines a map from A to the basering.
-RETURN:   nothing, instead exports an object 'preim' of type ideal to ring A,
+RETURN:   nothing, instead exports an object `preim' of type ideal to ring A,
           being the preimage of J under f.
 NOTE:     If P is given and not equal to the empty string, the preimage is
           exported to A under the name specified by P.
-          Otherwise (and by default), P is set to 'preim'.
+          Otherwise (and by default), P is set to `preim'.
 @*        If eng<>0, @code{std} is used for Groebner basis computations,
           otherwise (and by default) @code{slimgb} is used.
 @*        If printlevel=1, progress debug messages will be printed,
@@ -727,7 +729,7 @@ EXAMPLE:  example preimageNC; shows examples
   J = nselect(J,v);
   attrib(J,"isSB",1);
   setring A;
-  dbprint(ppl,"// Writing output to specified ring under the name '"
+  dbprint(ppl,"// Writing output to specified ring under the name `"
           + str + "'.");
   str = "ideal " + str + " = imap(E,J); export(" + str + ");";
   execute(str);
