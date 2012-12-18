@@ -42,31 +42,42 @@ follow these steps.
           gcc 4.x: beginnig with Singular-3-0-0-4, for some architectures
                    beginning with Singular-3-0-2: for all architectures
 
-       5.  optional: if you want to change Singular/grammar.y:
-            bison (version >= 1.2.2)
+       5.   optional: if you want to change Singular/grammar.y:
+          bison (version >= 1.2.2)
             (bison (GNU Bison) 1.75 seems not to work)
             (version 1.75 is supported in Singular 2-0-4a and newer)
             
             Remark: 
-              bison 1.875 on solaris produces code which gcc does not accept
+            bison 1.875 on solaris produces code which gcc does not accept
 
-       6.    optional: if you want to change Singular/scanner.l
-             or modules/modgen/scanner.l:
-             flex (version >=2.4, <=2.5.4)
+       6.   optional: if you want to change Singular/scanner.l
+          or modules/modgen/scanner.l:
+          flex (version >=2.4, <=2.5.4)
 
        7.   perl (version >=5)
 
        8.   library gmp (version >=3.1.1)
-            (version 4.x.x is supported in Singular 2-0-4 and newer)
+          (version 4.x.x is supported in Singular 2-0-4 and newer)
 
        9.   library libncurses or libtermcap or libcurses
 
       10.   (optional) library libreadline
-            (required on linux glibc systems)
+          (required on linux glibc systems)
 
       11.   (optional, required to build the documentation:)
           latex2html, tex, texi2html, texinfo
           (your latex2html should produce gif files, not png files)
+
+      12.   (optional, required to build gfanlib and its interface,
+          required for handling convex objects in Singular in general)
+          cddlib with GMP support. you can download a patched cddlib 
+          based on the latest Gentoo patch, supporting shared libraries
+          and building the GMP version by default, from:
+          http://www.mathematik.uni-kl.de/~ren/cddlib-patched.tbz2
+          install it by running "./configure" and "make install".
+
+      13.   (optional, required to build the polymake interface)
+          polymake version 2.12 or higher
 
   2. (optional, required for MP:)
      make sure that you can log in to your computer via rsh/remsh or
@@ -92,6 +103,10 @@ follow these steps.
      not to report something unknown, but to recognize the machine
 
   7. run ./configure
+     or run "./configure --enable-gfanlib" in order to build Singular with 
+     Gfanlib, i.e. Singular with support for convex objects.
+     or run "./configure --enable-polymake" in order to build Singular with 
+     Polymake interface. Gfanlib will be automatically installed as well.
      (try ./configure -help, ./omalloc/configure -help, ./MP/configure
      -help, ./factory/configure -help, ./Singular/configure -help for a
      list of all options of configure)
