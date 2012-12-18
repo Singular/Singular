@@ -80,6 +80,7 @@
 #ifdef HAVE_PLURAL
   #include <kernel/gring.h>
   #include <kernel/sca.h>
+// bits 0,1 for PLURAL
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
   #define COMM_PLURAL      2
@@ -92,7 +93,9 @@
 #endif /* HAVE_PLURAL */
 
 #ifdef HAVE_RINGS
+// bit 2 for RING-CF
   #define RING_MASK        4
+// bit 3 for zerodivisors
   #define ZERODIVISOR_MASK 8
 #else
   #define RING_MASK        0
@@ -102,6 +105,13 @@
 #define NO_RING          0
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
+#define NO_PLURAL        0
+#define ALLOW_PLURAL     1
+#define COMM_PLURAL      2
+#define  PLURAL_MASK     3
+
+// bit 4 for warning, if used at toplevel
+#define WARN_RING        16
 
 static BOOLEAN check_valid(const int p, const int op);
 
@@ -8802,6 +8812,10 @@ static BOOLEAN check_valid(const int p, const int op)
       return TRUE;
     }
     /* else ALLOW_ZERODIVISOR */
+    else if(((p & WARN_RING)==WARN_RING)&&(myynest==0))
+    {
+      WarnS("considering the image in Q[...]");
+    }
   }
   #endif
   return FALSE;

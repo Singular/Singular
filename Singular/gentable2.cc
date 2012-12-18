@@ -16,15 +16,22 @@
 #include <Singular/tok.h>
 #include <Singular/grammar.h>
 
-  #define ALLOW_PLURAL     1
-  #define NO_PLURAL        0
-  #define COMM_PLURAL      2
-  #define  PLURAL_MASK     3
+// bits 0,1 for PLURAL
+#define NO_PLURAL        0
+#define ALLOW_PLURAL     1
+#define COMM_PLURAL      2
+#define  PLURAL_MASK     3
 
+// bit 2 for RING-CF
 #define ALLOW_RING       4
 #define NO_RING          0
+
+// bit 3 for zerodivisors
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
+
+// bit 4 for warning, if used at toplevel
+#define WARN_RING        16
 
 /*=============== types =====================*/
 struct _scmdnames
