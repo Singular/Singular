@@ -557,9 +557,9 @@ fi
 if test $PMCONFIG = "1"; then
   echo $ac_n "checking whether polymake is up-to-date""... $ac_c" 1>&6
 echo "configure:560: checking whether polymake is up-to-date" >&5
-  SUPPORTEDPOLYMAKEVERSION="2.12"
-  CURRENTPOLYMAKEVERSION=`polymake-config --version | sed 's/\(.*\)../\1/'`
-  if test $CURRENTPOLYMAKEVERSION < $SUPPORTEDPOLYMAKEVERSION; then
+  SUPPORTEDPOLYMAKEVERSION="212"
+  CURRENTPOLYMAKEVERSION=`polymake-config --version | cut -c -4 -| sed s'/\.//'`
+  if test $CURRENTPOLYMAKEVERSION -ge $SUPPORTEDPOLYMAKEVERSION; then
     echo "$ac_t""yes" 1>&6
     OUTPUT_MAKEFILES="${OUTPUT_MAKEFILES} Makefile"
   else
