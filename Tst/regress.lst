@@ -29,7 +29,7 @@ Manual/Names_2.tst
 Manual/vandermonde.tst
 Manual/binomials2intmat.tst
 Manual/cardGroup.tst
-Manual/changechar.tst
+; Manual/changechar.tst
 Manual/char_series.tst
 Manual/cleardenom.tst
 Manual/dim.tst
@@ -93,7 +93,7 @@ Manual/breakpoint.tst
 Manual/cantoradd.tst
 Manual/Center.tst
 Manual/chaincrit.tst
-Manual/changeord.tst
+; Manual/changeord.tst
 Manual/changevar.tst
 Manual/closetex.tst
 Manual/coeffs_1.tst
@@ -228,7 +228,7 @@ Manual/dsum.tst
 Manual/eigenvals.tst
 Manual/elimpartanyr.tst
 Manual/ellipticRandomPoint.tst
-Manual/Example_of_a_procedure_definition_in_a_library:.tst
+; Manual/Example_of_a_procedure_definition_in_a_library:.tst
 Manual/fetch.tst
 Manual/freemodule.tst
 Manual/gauss_col.tst
@@ -514,7 +514,7 @@ Manual/diag_test.tst
 Manual/dual_code.tst
 Manual/elimpart.tst
 Manual/encode.tst
-Manual/Example_of_an_interactive_procedure_definition_and_its_execution:.tst
+; Manual/Example_of_an_interactive_procedure_definition_and_its_execution:.tst
 Manual/extgcd.tst
 Manual/facstd.tst
 Manual/Factorization.tst
@@ -690,7 +690,7 @@ Manual/texfactorize.tst
 Manual/Tor.tst
 Manual/U_D_O.tst
 Manual/view.tst
-Manual/watchdog.tst
+; Manual/watchdog.tst
 Manual/weierstrDiv.tst
 Manual/writeNmzPaths.tst
 Manual/ademRelations.tst
@@ -1220,7 +1220,7 @@ Manual/lst2str.tst
 Manual/makeLetterplaceRing.tst
 Manual/makeUso11.tst
 Manual/number_pi.tst
-Manual/pnormalform.tst
+; Manual/pnormalform.tst
 Manual/primary_char0.tst
 Manual/restrictionModule.tst
 Manual/smith.tst
@@ -1370,7 +1370,7 @@ Manual/algebraicDependence.tst
 Manual/facGBIdeal.tst
 Manual/jungfib.tst
 Manual/BrillNoether.tst
-Manual/grobcov.tst
+; Manual/grobcov.tst
 Manual/nrRootsProbab.tst
 Manual/esIdeal.tst
 Manual/extcurve.tst
@@ -1379,8 +1379,8 @@ Manual/normal.tst
 Manual/BINresol.tst
 Manual/operatorBM.tst
 Manual/decodeRandom.tst
-Manual/buildtreetoMaple.tst
-Manual/cgsdr.tst
+; Manual/buildtreetoMaple.tst
+; Manual/cgsdr.tst
 Manual/decode.tst
 Manual/Eresol.tst
 Manual/multiDegBasis.tst
@@ -1398,7 +1398,7 @@ Manual/prepSV.tst
 Manual/cgs.tst
 Manual/sysBin.tst
 Manual/makeUe8.tst
-Manual/cgsdrold.tst
+; Manual/cgsdrold.tst
 Manual/euler.tst
 Manual/realzero.tst
 Manual/Solving_systems_of_polynomial_equations.tst
@@ -1418,13 +1418,13 @@ Manual/paraConic.tst
 Manual/irred_secondary_char0.tst
 Manual/jungnormal.tst
 Manual/deRhamCohom.tst
-Manual/gencase1.tst
+; Manual/gencase1.tst
 Manual/deRhamCohomIdeal.tst
 Manual/realrad.tst
 Manual/abstractR.tst
 Manual/jungresolve.tst
 Manual/discrepancy.tst
-Manual/cantreetoMaple.tst
+; Manual/cantreetoMaple.tst
 Manual/perron.tst
 Manual/homogfacFirstQWeyl_all.tst
 Manual/homogfacFirstQWeyl.tst
@@ -1444,13 +1444,13 @@ Manual/timeStd.tst
 Manual/assPrimes.tst
 Manual/facFirstShift.tst
 Manual/spectralNeg.tst
-Manual/grobcovold.tst
+; Manual/grobcovold.tst
 Manual/SannfsBFCT.tst
 Old/aa.tst
 Old/agnes.tst
 Old/alex1.tst
 Old/alex2.tst
-Old/algmap.tst
+; Old/algmap.tst
 Old/algnorm.tst
 Old/barei.tst
 Old/betti.tst

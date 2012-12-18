@@ -27,10 +27,13 @@ hnoether_l
 homtest
 hres_l
 intdet_l
+jmsconst
 king_3_colors_l
+locnormal
 lres_l
 makedbm_l
 minor_l
+modnormal
 modulo_l
 monodromy_l
 monomial_l
@@ -66,6 +69,7 @@ solve_l
 sres_l
 surfacesignature
 std_l
+symodstd
 triang_l
 tst_l
 zeroset1

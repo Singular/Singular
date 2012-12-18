@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init();
+LIB "tst.lib"; tst_init(); tst_ignore("This is pdfTeX"); tst_ignore("Babel");
 LIB "latex.lib";
 ring r;
 ideal I = maxideal(7);

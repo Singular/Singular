@@ -121,8 +121,8 @@ def F = factorize(I[1],1); F;
 //->   F[1]=z3-2
 //->   F[2]=z2+1
 ring R1 = (0,a), (x,y), lp;
-map phi = R,x,y,a;  
-minpoly = number(phi(F)[2]); 
+map phi = R,x,y,a;
+number n = number(phi(F)[2]); minpoly = n; kill phi; map phi = R,x,y,a;
 ideal Iz = phi(I);              // substitute a for z   
 Iz = simplify(Iz,2); Iz;        // remove zero generators
 //->   Iz[1]=y2
@@ -134,8 +134,8 @@ def Fzy = factorize(Izy[1],1); Fzy;
 //->   Fzy[1]=x-2
 //->   Fzy[2]=x+1
 ring R2 = (0,b), (x,y), lp;
-map phi = R,x,y,b;  
-minpoly = number(phi(F)[1]); 
+map phi = R,x,y,b;
+number n = number(phi(F)[1]); minpoly = n; kill phi; map phi = R,x,y,b;
 ideal Iz = phi(I);              // substitute a for z   
 Iz = simplify(Iz,2); Iz;        // remove zero generators    
 //->   Iz[1]=y2+(b2+1)
@@ -151,8 +151,8 @@ def L = primitive(E); L;
 //->   L[3]=c
 ring R3 = (0,c), x, lp;
 def L = imap(S,L);
-map phi = R, x, L[3], L[2];  
-minpoly = number(L[1]); 
+map phi = R, x, L[3], L[2];
+number n = number(L[1]); kill phi, L; minpoly = n; def L = imap(S,L); map phi = R, x, L[3], L[2];
 ideal Izy = simplify(phi(I),2); Izy;
 //->   Izy[1]=x2+(2c-1)*x+(c2-c-2)
 def Fzy = factorize(Izy[1],1);  Fzy;

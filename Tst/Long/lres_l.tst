@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id$");
 ring r=32003,(y,t,x,z,w),dp;
 ideal i=6*t^5*x^3*z^4+5*x^5*z^7+4*t^4*y*z^3*w^4,
 5*t^3*x^2*y^7*z^4+5*t^6*x*y^3*z^3*w^3+4*t^5*x^5*y*w^5,

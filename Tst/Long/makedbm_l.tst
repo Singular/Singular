@@ -2,7 +2,6 @@ LIB "tst.lib";
 LIB "makedbm.lib";
 
 tst_init();
-tst_ignore("CVS: $Id$");
 
 // ===============================================
 int i;

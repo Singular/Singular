@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // indet_s.tst - short tests for integer determinant.
 //
@@ -9,7 +7,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id$");
 
 ring r=0,x,dp;
 

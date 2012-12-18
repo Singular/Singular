@@ -1165,6 +1165,23 @@ attrib(I, "isSB");
 
 attrib(ref2, "isSB");
 
+shared shval= I;
+// Ensure reloading does not damage something
+system("reference"); 
+system("shared");
+reference refTwo = ref2;
+shared shval2 = shval;
+refTwo;
+shval2[1] == shval[1];
+kill refTwo, shval2;
+system("reference"); 
+system("shared");
+reference refTwo = ref2;
+shared shval2 = shval;
+refTwo;
+shval2[1] == shval[1];
+kill refTwo, shval2;
+
 // --------------------------------------------------------
 tst_status(1);$
 

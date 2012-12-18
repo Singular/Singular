@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init();
+LIB "tst.lib"; tst_init(); tst_ignore("4ti2");
 LIB "sing4ti2.lib";
 ring r=0,(x,y,z),dp;
 matrix M[2][3]=0,1,2,2,1,0;

@@ -4,7 +4,12 @@ intmat m[3][4] = 9,2,4,5,2,5,-2,4,-6,10,-1,2,7;
 opentex("exp001");
 texobj("exp001","An intmat:  ",m);
 closetex("exp001");
+tst_ignore("pdfTeX");
+tst_ignore("Babel");
+tst_ignore("LaTeX");
+tst_ignore("pdftex");
+tst_ignore("latex");
 tex("exp001");
-xdvi("exp001");
+// xdvi("exp001");
 system("sh","rm exp001.*");
 tst_status(1);$

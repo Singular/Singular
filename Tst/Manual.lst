@@ -20,7 +20,7 @@ Manual/Names_2.tst
 Manual/vandermonde.tst
 Manual/binomials2intmat.tst
 Manual/cardGroup.tst
-Manual/changechar.tst
+; Manual/changechar.tst
 Manual/char_series.tst
 Manual/cleardenom.tst
 Manual/dim.tst
@@ -82,7 +82,7 @@ Manual/breakpoint.tst
 Manual/cantoradd.tst
 Manual/Center.tst
 Manual/chaincrit.tst
-Manual/changeord.tst
+; Manual/changeord.tst
 Manual/changevar.tst
 Manual/closetex.tst
 Manual/coeffs_1.tst
@@ -1200,7 +1200,7 @@ Manual/lst2str.tst
 Manual/makeLetterplaceRing.tst
 Manual/makeUso11.tst
 Manual/number_pi.tst
-Manual/pnormalform.tst
+; Manual/pnormalform.tst
 Manual/primary_char0.tst
 Manual/restrictionModule.tst
 Manual/smith.tst
@@ -1345,7 +1345,7 @@ Manual/algebraicDependence.tst
 Manual/facGBIdeal.tst
 Manual/jungfib.tst
 Manual/BrillNoether.tst
-Manual/grobcov.tst
+; Manual/grobcov.tst
 Manual/nrRootsProbab.tst
 Manual/esIdeal.tst
 Manual/extcurve.tst
@@ -1354,8 +1354,8 @@ Manual/normal.tst
 Manual/BINresol.tst
 Manual/operatorBM.tst
 Manual/decodeRandom.tst
-Manual/buildtreetoMaple.tst
-Manual/cgsdr.tst
+; Manual/buildtreetoMaple.tst
+; Manual/cgsdr.tst
 Manual/decode.tst
 Manual/Eresol.tst
 Manual/norTest.tst
@@ -1372,7 +1372,7 @@ Manual/prepSV.tst
 Manual/cgs.tst
 Manual/sysBin.tst
 Manual/makeUe8.tst
-Manual/cgsdrold.tst
+; Manual/cgsdrold.tst
 Manual/euler.tst
 Manual/realzero.tst
 Manual/Solving_systems_of_polynomial_equations.tst
@@ -1392,13 +1392,13 @@ Manual/paraConic.tst
 Manual/irred_secondary_char0.tst
 Manual/jungnormal.tst
 Manual/deRhamCohom.tst
-Manual/gencase1.tst
+; Manual/gencase1.tst
 Manual/deRhamCohomIdeal.tst
 Manual/realrad.tst
 Manual/abstractR.tst
 Manual/jungresolve.tst
 Manual/discrepancy.tst
-Manual/cantreetoMaple.tst
+; Manual/cantreetoMaple.tst
 Manual/perron.tst
 Manual/homogfacFirstQWeyl_all.tst
 Manual/homogfacFirstQWeyl.tst
@@ -1442,4 +1442,4 @@ Manual/multiDegBasis.tst
 ; output is system HW -dependent!
 ;;; Manual/timeStd.tst ; doesn't seem to work :(((((((
 ; the following example outputs timings :(((
-Manual/grobcovold.tst
+; Manual/grobcovold.tst

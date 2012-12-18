@@ -1,7 +1,6 @@
 LIB "tst.lib";
 
 tst_init();
-tst_ignore("CVS: $Id$");
 
 "==============================================";
 " DBM link tests ";

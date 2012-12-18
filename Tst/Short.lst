@@ -292,3 +292,20 @@ Short/zerodim_9_32003_lp_slimgb.tst
 Short/ZidealAdd_s.tst
 Short/sba_s.tst
 Short/countedref_s.tst 
+;;;; new tests from master
+Short/alias.tst
+Short/bug_charseries2.tst
+Short/bug_idlen.tst
+Short/bug_newstruct2.tst
+Short/bug_ring_quot.tst
+Short/bug_tr329.tst
+;;; Short/divisors_s.tst ; no uu!?
+Short/jmbtest.tst
+Short/ncfactor_example2_7FromMaster_s.tst
+Short/ncfactor_koepfShift_s.tst
+Short/ncfactor_koepf_s.tst
+Short/ncfactor_tsai_s.tst
+Short/polybori_s.tst
+Short/realizationMatroids.tst
+
+

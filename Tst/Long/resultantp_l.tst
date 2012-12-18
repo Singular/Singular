@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // resultantp_l.tst - long tests for resultant calculations mod p.
 //
@@ -17,7 +15,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id$");
 
 //
 // - ring r1=32003,x,dp.

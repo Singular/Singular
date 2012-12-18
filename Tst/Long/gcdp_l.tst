@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // gcdp_l.tst - long tests for gcd calculations mod p.
 //
@@ -16,7 +14,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id$");
 
 //
 // - functions.

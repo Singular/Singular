@@ -14,8 +14,8 @@ ideal j=primitive(i);
 factorize(j[1]);
 ring r1=(0,a),x,lp;
 map phi=r,x,a;
-string s=string(phi(j)[1]);
-execute("minpoly="+s+";");
+string s=string(phi(j)[1]); 
+kill phi; execute("minpoly="+s+";"); map phi=r,x,a;
 ideal v=phi(j)[1],phi(j)[2]^2-2,phi(j)[3]^2-3;
 v;
 if (size(v)>0)

@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // fglm_s.tst - short tests for fglm and stdfglm
 //              fglm: reco1, omdi, cyclic5 in char 32003 and 0
@@ -9,7 +7,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id$");
 
 option(redSB);
 

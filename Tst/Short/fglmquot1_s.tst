@@ -1,5 +1,3 @@
-// $Id$
-
 //
 // fglmquot1_s.tst - short tests for fglmquot command
 //
@@ -7,7 +5,6 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id$");
 
 option(redSB);
 

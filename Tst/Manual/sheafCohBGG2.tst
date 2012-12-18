@@ -1,7 +1,7 @@
-LIB "tst.lib"; tst_init();
+LIB "tst.lib"; tst_init(); tst_ignore("Time:");
 LIB "sheafcoh.lib";
 int pl = printlevel;
-int l,h, t;
+int l,h;
 //-------------------------------------------
 // cohomology of structure sheaf on P^4:
 //-------------------------------------------
@@ -10,17 +10,17 @@ module M= getStructureSheaf(); // OO_P^4
 l = -12; h = 12; // range of twists: l..h
 printlevel = 0;
 //////////////////////////////////////////////
-t = timer;
+timer = 0;
 def A = sheafCoh(M, l, h); // global Ext method:
-"Time: ", timer - t;
+tst_ignore("Time: " + string(timer));
 //////////////////////////////////////////////
-t = timer;
+timer = 0;
 A = sheafCohBGG(M, l, h);  // BGG method (without optimization):
-"Time: ", timer - t;
+tst_ignore("Time: " + string(timer));
 //////////////////////////////////////////////
-t = timer;
+timer = 0;
 A = sheafCohBGG2(M, l, h); // BGG method (with optimization)
-"Time: ", timer - t;
+tst_ignore("Time: " + string(timer));
 //////////////////////////////////////////////
 printlevel = pl;
 kill A, r;
@@ -32,17 +32,17 @@ module M = getCotangentialBundle();
 l = -12; h = 11; // range of twists: l..h
 //////////////////////////////////////////////
 printlevel = 0;
-t = timer;
+timer = 0;
 def B = sheafCoh(M, l, h); // global Ext method:
-"Time: ", timer - t;
+tst_ignore("Time: " + string(timer));
 //////////////////////////////////////////////
-t = timer;
+timer = 0;
 B = sheafCohBGG(M, l, h);  // BGG method (without optimization):
-"Time: ", timer - t;
+tst_ignore("Time: " + string(timer));
 //////////////////////////////////////////////
-t = timer;
+timer = 0;
 B = sheafCohBGG2(M, l, h); // BGG method (with optimization)
-"Time: ", timer - t;
+tst_ignore("Time: " + string(timer));
 //////////////////////////////////////////////
 printlevel = pl;
 tst_status(1);$
