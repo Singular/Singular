@@ -26,10 +26,12 @@
 @item new library: classifyceq.lib:  simple hypersurface singularities in characteristic p (@nref{classifyceq_lib})
 @item new library: divisors.lib:  divisors and P-divisors (@nref{divisors_lib})
 @item new library: ffsolve.lib:  solving over Z/p (@nref{ffsolve_lib})
+@item new library: gitfan.lib: compute GIT-fans  (@nref{gitfan_lib})
 @item new library: numerAlg.lib:  Numerical Algebraic Algorithm (@nref{numerAlg_lib})
 @item new library: numerDecom.lib:  Bertini interface (@nref{numerDecom_lib})
 @item new library: JMSConst.lib:  constructing J-Marked Schemes (@nref{JMSConst_lib})
 @item new library: JMBTest.lib:  performs JM basis test (@nref{JMBTest_lib})
+@item new library: orbitparam.lib:  parametrizing unipotent orbits (@nref{orbitparam_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries

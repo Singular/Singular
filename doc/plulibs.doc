@@ -38,7 +38,6 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * purityfiltration_lib:: purity filtration of a given module
 * nchomolog_lib:: Noncommutative Homological Algebra
 * ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
-* bimodules_lib:: Tools for handling bimodules
 * dmodloc_lib:: Localization of algebraic D-modules
 * ncpreim_lib:: Non-commutative elimination and preimage computation
 @end menu
