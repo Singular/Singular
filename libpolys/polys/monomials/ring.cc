@@ -3831,7 +3831,6 @@ BOOLEAN rComplete(ring r, int force)
   // p_Procs: call AFTER NegWeightL
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_ProcsSet(r, r->p_Procs);
-  p_SetGlobals(r);
   return FALSE;
 }
 
