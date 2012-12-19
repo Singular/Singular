@@ -1067,9 +1067,19 @@ Todos/Issues:
 @subsection realizationMatroids_lib
 @c lib realizationMatroids.lib
 @c ----------------------------------------------------------
-@node symodstd_lib,,realizationMatroids_lib, Experimental libraries
+@node symodstd_lib,derham_lib,realizationMatroids_lib, Experimental libraries
 @subsection symodstd_lib
 @c lib symodstd.lib
+
+@c ----------------------------------------------------------
+@node derham_lib,,symodstd_lib, Experimental libraries
+@subsection derham_lib
+
+Remark: this libray needs the upcoming version 4 of Singular.
+Please contact the authors or the Singular team if you like
+to try it.
+
+@c lib derham.lib no_ex
 
 @c ----------------------------------------------------------
 @node convex geometry, , , SINGULAR libraries

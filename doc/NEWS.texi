@@ -32,6 +32,7 @@
 @item new library: JMSConst.lib:  constructing J-Marked Schemes (@nref{JMSConst_lib})
 @item new library: JMBTest.lib:  performs JM basis test (@nref{JMBTest_lib})
 @item new library: orbitparam.lib:  parametrizing unipotent orbits (@nref{orbitparam_lib})
+@item library for Dingular 4: derham.lib:  Computation of deRham cohomology (@nref{derham_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
