@@ -1007,15 +1007,15 @@ Issues:
 @subsection JMBTest_lib
 @c lib JMBTest.lib
 @c ----------------------------------------------------------
-@node JMSConst_lib, orbitparm_lib, JMBTest_lib, Experimental libraries
+@node JMSConst_lib, orbitparam_lib, JMBTest_lib, Experimental libraries
 @subsection JMSConst_lib
 @c lib JMSConst.lib
 @c ----------------------------------------------------------
-@node orbitparm_lib, modnormal_lib, JMSConst_lib, Experimental libraries
-@subsection orbitparm_lib
-@c lib orbitparm.lib
+@node orbitparam_lib, modnormal_lib, JMSConst_lib, Experimental libraries
+@subsection orbitparam_lib
+@c lib orbitparam.lib
 @c ----------------------------------------------------------
-@node modnormal_lib, multigrading_lib, orbitparm_lib, Experimental libraries
+@node modnormal_lib, multigrading_lib, orbitparam_lib, Experimental libraries
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ----------------------------------------------------------
