@@ -1,0 +1,18 @@
+Changes since 3-1-5
+- fixed factorization
+- extgcd, chinrem extended
+- changed paraplancures.lib,
+          aksaka.lib,atkins.lib,crypto.lib (int/number div/mod/%)
+- changed grobcov.lib
+- added system("refrence"); and system('shared")
+- primefactors() changed: result and algorithm
+- new library: classifyceq.lib
+- changed ring.lib: changechar, chnageord
+- fixed: dump (list of ideals into ascii files)
+- new libs: numerAlg.lib, numerDecom.lib
+- new libs: JMBTest.lib, JMSConst.lib
+
+2012-07-12 
+Release 3-1-5
+
+
