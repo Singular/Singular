@@ -19,7 +19,7 @@ int     nrnSize        (number a);
 void    nrnDelete      (number *a, const ring r);
 BOOLEAN nrnGreaterZero (number k);
 number  nrnMult        (number a, number b);
-number  nrnInit        (int i, const ring r);
+number  nrnInit        (long i, const ring r);
 int     nrnInt         (number &n, const ring r);
 number  nrnAdd         (number a, number b);
 number  nrnSub         (number a, number b);

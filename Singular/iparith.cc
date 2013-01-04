@@ -4484,13 +4484,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   switch(((int)(long)v->Data()))
   {
   case 0:
-    res->data=(char *)nlInitUlong(om_Info.UsedBytes);
+    res->data=(char *)nlInit(om_Info.UsedBytes,NULL);
     break;
   case 1:
-    res->data = (char *)nlInitUlong(om_Info.CurrentBytesSystem);
+    res->data = (char *)nlInit(om_Info.CurrentBytesSystem,NULL);
     break;
   case 2:
-    res->data = (char *)nlInitUlong(om_Info.MaxBytesSystem);
+    res->data = (char *)nlInit(om_Info.MaxBytesSystem,NULL);
     break;
   default:
     omPrintStats(stdout);

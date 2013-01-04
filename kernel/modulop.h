@@ -26,7 +26,7 @@ extern long npMapPrime;
 
 BOOLEAN npGreaterZero (number k);
 number  npMult        (number a, number b);
-number  npInit        (int i, const ring r);
+number  npInit        (long i, const ring r);
 int     npInt         (number &n, const ring r);
 number  npAdd         (number a, number b);
 number  npSub         (number a, number b);

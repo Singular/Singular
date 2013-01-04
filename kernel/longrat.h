@@ -44,7 +44,7 @@ struct snumber
 #endif // DO_LINLINE
 
 LINLINE BOOLEAN  nlEqual(number a, number b);
-LINLINE number   nlInit(int i, const ring r);
+LINLINE number   nlInit(long i, const ring r);
 LINLINE number nlInitgmp (mpz_t i);
 number nlRInit (long i);
 LINLINE BOOLEAN  nlIsOne(number a);
@@ -113,7 +113,6 @@ LINLINE void nlInpMult(number &a, number b, ring r);
 
 number nlFarey(number nP, number nN, const ring);
 number nlExtGcd(number a, number b, number &s, number &t);
-number nlInitUlong(unsigned long d);
 
 #ifdef LDEBUG
 #define nlTest(a) nlDBTest(a,__FILE__,__LINE__)

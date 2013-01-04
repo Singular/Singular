@@ -46,7 +46,7 @@ number nrMult (number a,number b)
 /*2
 * create a number from int
 */
-number nrInit (int i, const ring R)
+number nrInit (long i, const ring R)
 {
   float r = (float)i;
   return nf(nf(r).F()).N();

@@ -33,7 +33,7 @@ extern ring nacRing;
 
 void naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
-number  naInit(int i, const ring r);                /* z := i */
+number  naInit(long i, const ring r);               /* z := i */
 number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */
 int     naSize(number n);                           /* size desc. */

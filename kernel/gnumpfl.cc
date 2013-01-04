@@ -79,7 +79,7 @@ nMapFunc ngfSetMap(const ring src, const ring dst)
 /*2
 * n := i
 */
-number ngfInit (int i, const ring r)
+number ngfInit (long i, const ring r)
 {
   gmp_float* n= new gmp_float( (double)i );
   return (number)n;

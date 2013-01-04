@@ -751,18 +751,18 @@ void omPrintBinStats(FILE* fd)
   fprintf(fd, "      \t      \t%d\t%d\t%d\n", pages, free_blocks, used_blocks);
 }
 
-static  int omGetUsedBytesOfBin(omBin bin)
+static long omGetUsedBytesOfBin(omBin bin)
 {
   int pages = 0, used_blocks = 0, free_blocks = 0;
   omGetTotalBinStat(bin, &pages, &used_blocks, &free_blocks);
-  return used_blocks*bin->sizeW*SIZEOF_LONG;
+  return ((long)used_blocks)*((long)bin->sizeW)*SIZEOF_LONG;
 }
 
-size_t omGetUsedBinBytes()
+long omGetUsedBinBytes()
 {
   int i = OM_MAX_BIN_INDEX;
   omSpecBin s_bin = om_SpecBin;
-  size_t used = 0;
+  long used = 0;
   omBin sticky;
 
   for (; i>=0; i--)

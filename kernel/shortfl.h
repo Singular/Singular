@@ -10,7 +10,7 @@
 
 BOOLEAN nrGreaterZero (number k);
 number  nrMult        (number a, number b);
-number  nrInit        (int i, const ring r);
+number  nrInit        (long i, const ring r);
 int     nrInt         (number &n, const ring r);
 number  nrAdd         (number a, number b);
 number  nrSub         (number a, number b);

@@ -104,9 +104,9 @@ number   ngcPar(int i)
 /*2
 * n := i
 */
-number ngcInit (int i, const ring r)
+number ngcInit (long i, const ring r)
 {
-  gmp_complex* n= new gmp_complex( (long)i, (long)0 );
+  gmp_complex* n= new gmp_complex( i, (long)0 );
   return (number)n;
 }
 

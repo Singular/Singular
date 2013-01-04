@@ -18,7 +18,7 @@ int     nrzSize        (number a);
 void    nrzDelete      (number *a, const ring r);
 BOOLEAN nrzGreaterZero (number k);
 number  nrzMult        (number a, number b);
-number  nrzInit        (int i, const ring r);
+number  nrzInit        (long i, const ring r);
 int     nrzInt         (number &n, const ring r);
 number  nrzAdd         (number a, number b);
 number  nrzSub         (number a, number b);

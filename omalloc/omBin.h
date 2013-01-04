@@ -14,8 +14,8 @@ omBin _omGetSpecBin(size_t size, int align, int track);
 
 #define omUnGetSpecBin(bin_ptr) _omUnGetSpecBin(bin_ptr, 0)
 #define omDeleteSpecBin(bin_ptr) _omUnGetSpecBin(bin_ptr, 1)
-void  _omUnGetSpecBin(omBin *bin, int force);
-size_t omGetUsedBinBytes();
+void _omUnGetSpecBin(omBin *bin, int force);
+long omGetUsedBinBytes();
 
 omBin omGetStickyBinOfBin(omBin bin);
 void omMergeStickyBinIntoBin(omBin sticky_bin, omBin into_bin);

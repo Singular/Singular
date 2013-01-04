@@ -156,13 +156,13 @@ number nfMult (number a,number b)
 /*2
 * int -> number
 */
-number nfInit (int i, const ring r)
+number nfInit (long i, const ring r)
 {
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
   if (i==0) return (number)(long)nfCharQ;
-  while (i <  0)    i += nfCharP;
-  while (i >= nfCharP) i -= nfCharP;
+  i= i% (long)nfCharP;
+  if (i <  0)    i += (long)nfCharP;
   if (i==0) return (number)(long)nfCharQ;
   unsigned short c=0;
   while (i>1)

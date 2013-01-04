@@ -127,14 +127,13 @@ void nr2mPower (number a, int i, number * result)
 /*
  * create a number from int
  */
-number nr2mInit (int i, const ring r)
+number nr2mInit (long i, const ring r)
 {
-  if (i == 0) return (number)(NATNUMBER)i;
+  if (i == 0) return NULL;
 
-  long ii = i;
   NATNUMBER j = (NATNUMBER)1;
-  if (ii < 0) { j = currRing->nr2mModul; ii = -ii; }
-  NATNUMBER k = (NATNUMBER)ii;
+  if (i < 0) { j = currRing->nr2mModul; i = -i; }
+  NATNUMBER k = (NATNUMBER)i;
   k = k & currRing->nr2mModul;
   /* now we have: from = j * k mod 2^m */
   return (number)nr2mMult((number)j, (number)k);

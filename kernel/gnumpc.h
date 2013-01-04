@@ -14,7 +14,7 @@ BOOLEAN  ngcEqual(number a, number b);
 BOOLEAN  ngcIsOne(number a);
 BOOLEAN  ngcIsMOne(number a);
 BOOLEAN  ngcIsZero(number za);
-number   ngcInit(int i, const ring r);
+number   ngcInit(long i, const ring r);
 int      ngcInt(number &n, const ring r);
 number   ngcNeg(number za);
 number   ngcInvers(number a);

@@ -16,7 +16,7 @@ extern NATNUMBER nr2mModul; /* for storing 2^m - 1, i.e., the
 number  nr2mCopy        (number a);
 BOOLEAN nr2mGreaterZero (number k);
 number  nr2mMult        (number a, number b);
-number  nr2mInit        (int i, const ring r);
+number  nr2mInit        (long i, const ring r);
 int     nr2mInt         (number &n, const ring r);
 number  nr2mAdd         (number a, number b);
 number  nr2mSub         (number a, number b);

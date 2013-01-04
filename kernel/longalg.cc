@@ -55,7 +55,7 @@ static numberfunc
                 nacMult, nacSub, nacAdd, nacDiv, nacIntDiv;
 static number   (*nacGcd)(number a, number b, const ring r);
 static number   (*nacLcm)(number a, number b, const ring r);
-static number   (*nacInit)(int i, const ring r);
+static number   (*nacInit)(long i, const ring r);
 static int      (*nacInt)(number &n, const ring r);
 static void     (*nacDelete)(number *a, const ring r);
 #undef n_Delete
@@ -897,7 +897,7 @@ napoly napTailred (napoly q)
 /*2
 *  z:= i
 */
-number naInit(int i, const ring r)
+number naInit(long i, const ring r)
 {
   if (i!=0)
   {

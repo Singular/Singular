@@ -27,7 +27,7 @@ unsigned long nrnExponent = 0;
 /*
  * create a number from int
  */
-number nrnInit (int i, const ring r)
+number nrnInit (long i, const ring r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);

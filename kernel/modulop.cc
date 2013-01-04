@@ -60,7 +60,7 @@ number npMult (number a,number b)
 /*2
 * create a number from int
 */
-number npInit (int i, const ring r)
+number npInit (long i, const ring r)
 {
   long p=(long)ABS(r->ch);
   long ii=i%p;
