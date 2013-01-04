@@ -2663,7 +2663,7 @@ number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 #endif
 }
 
-void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
+static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == ID);
@@ -2756,100 +2756,7 @@ void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   }
 }
 
-void nlClearContentNoPositiveLead(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
-{
-  assume(cf != NULL);
-  assume(getCoeffType(cf) == ID);
-
-  numberCollectionEnumerator.Reset();
-
-  if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
-  {
-    c = n_Init(1, cf);
-    return;
-  }
-
-  // all coeffs are given by integers!!!
-
-  // part 1, find a small candidate for gcd
-  number cand1,cand;
-  int s1,s;
-  s=2147483647; // max. int
-
-  const BOOLEAN lc_is_pos = TRUE; // nlGreaterZero(numberCollectionEnumerator.Current(),cf);
-
-  int normalcount = 0;
-  do
-  {
-    number& n = numberCollectionEnumerator.Current();
-    nlNormalize(n, cf); ++normalcount;
-    cand1 = n;
-
-    if (SR_HDL(cand1)&SR_INT) { cand=cand1; break; }
-    assume(cand1->s==3); // all coeffs should be integers // ==0?!! after printing 
-    s1=mpz_size1(cand1->z);
-    if (s>s1)
-    {
-      cand=cand1;
-      s=s1;
-    }
-  } while (numberCollectionEnumerator.MoveNext() );
-
-//  assume( nlGreaterZero(cand,cf) ); // cand may be a negative integer!
-
-  cand=nlCopy(cand,cf);
-  // part 2: compute gcd(cand,all coeffs)
-
-  numberCollectionEnumerator.Reset();
-
-  while (numberCollectionEnumerator.MoveNext() )
-  {
-    number& n = numberCollectionEnumerator.Current();
-
-    if( (--normalcount) <= 0)
-      nlNormalize(n, cf);
-
-    nlInpGcd(cand, n, cf);
-
-    assume( nlGreaterZero(cand,cf) );
-
-    if(nlIsOne(cand,cf))
-    {
-      c = cand;
-
-      if(!lc_is_pos)
-      {
-        // make the leading coeff positive
-        c = nlNeg(c, cf);
-        numberCollectionEnumerator.Reset();
-
-        while (numberCollectionEnumerator.MoveNext() )
-        {
-          number& nn = numberCollectionEnumerator.Current();
-          nn = nlNeg(nn, cf);
-        }
-      }
-      return;
-    }
-  } 
-
-  // part3: all coeffs = all coeffs / cand
-  if (!lc_is_pos)
-    cand = nlNeg(cand,cf);
-
-  c = cand;
-  numberCollectionEnumerator.Reset();
-
-  while (numberCollectionEnumerator.MoveNext() )
-  {
-    number& n = numberCollectionEnumerator.Current();
-    number t=nlIntDiv(n, cand, cf); // simple integer exact division, no ratios to remain
-    nlDelete(&n, cf);
-    n = t;
-  }
-}
-
-void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
+static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
   assume(getCoeffType(cf) == ID);
@@ -2936,100 +2843,6 @@ void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& 
   
   c = cand;
   
-  while (numberCollectionEnumerator.MoveNext() )
-  {
-    number &n = numberCollectionEnumerator.Current();
-    n_InpMult(n, cand, cf);
-  }
-
-}
-
-
-void nlClearDenominatorsNoPositiveLead(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
-{
-  assume(cf != NULL);
-  assume(getCoeffType(cf) == ID);
-
-  numberCollectionEnumerator.Reset();
-
-  if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
-  {
-    c = n_Init(1, cf);
-    return;
-  }
-
-  // all coeffs are given by integers after returning from this routine
-
-  // part 1, collect product of all denominators /gcds
-  number cand;
-  cand=ALLOC_RNUMBER();
-#if defined(LDEBUG)
-  cand->debug=123456;
-#endif
-  cand->s=3;
-
-  int s=0;
-
-  const BOOLEAN lc_is_pos = TRUE; // nlGreaterZero(numberCollectionEnumerator.Current(),cf);
-
-  do
-  {
-    number& cand1 = numberCollectionEnumerator.Current();
-
-    if (!(SR_HDL(cand1)&SR_INT))
-    {
-      nlNormalize(cand1, cf);
-      if ((!(SR_HDL(cand1)&SR_INT)) // not a short int
-          && (cand1->s==1))             // and is a normalised rational
-      {
-        if (s==0) // first denom, we meet
-        {
-          mpz_init_set(cand->z, cand1->n); // cand->z = cand1->n
-          s=1;
-        }
-        else // we have already something
-        {
-          mpz_lcm(cand->z, cand->z, cand1->n);
-        }
-      }
-    }
-  }
-  while (numberCollectionEnumerator.MoveNext() );
-
-
-  if (s==0) // nothing to do, all coeffs are already integers
-  {
-//    mpz_clear(tmp);
-    FREE_RNUMBER(cand);
-    if (lc_is_pos)
-      c=nlInit(1,cf);
-    else
-    {
-      // make the leading coeff positive
-      c=nlInit(-1,cf);
-
-      // TODO: incorporate the following into the loop below?
-      numberCollectionEnumerator.Reset();
-      while (numberCollectionEnumerator.MoveNext() )
-      {
-        number& n = numberCollectionEnumerator.Current();
-        n = nlNeg(n, cf);
-      } 
-    }
-    return;
-  }
-
-  cand = nlShort3(cand);
-
-  // part2: all coeffs = all coeffs * cand
-  // make the lead coeff positive
-  numberCollectionEnumerator.Reset();
-
-  if (!lc_is_pos)
-    cand = nlNeg(cand, cf);
-
-  c = cand;
-
   while (numberCollectionEnumerator.MoveNext() )
   {
     number &n = numberCollectionEnumerator.Current();

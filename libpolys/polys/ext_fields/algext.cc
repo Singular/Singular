@@ -1113,9 +1113,7 @@ static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 
   number cc;
 
-  extern void nlClearContentNoPositiveLead(ICoeffsEnumerator&, number&, const coeffs);
-
-  nlClearContentNoPositiveLead(itr, cc, Q); // TODO: get rid of (-LC) normalization!? 
+  n_ClearContent(itr, cc, Q); // TODO: get rid of (-LC) normalization!? 
 
   // over alg. ext. of Q // takes over the input number
   c = (number) p_Mult_nn( (poly)c, cc, R); 
@@ -1189,10 +1187,7 @@ static void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   assume(nCoeff_is_Q(Q));  
   number n;
   CRecursivePolyCoeffsEnumerator<NAConverter> itr(numberCollectionEnumerator); // recursively treat the numbers as polys!
-
-  extern void nlClearDenominatorsNoPositiveLead(ICoeffsEnumerator&, number&, const coeffs);
-
-  nlClearDenominatorsNoPositiveLead(itr, n, Q); // this should probably be fine...
+  n_ClearDenominators(itr, n, Q); // this should probably be fine...
   c = (number)p_NSet(n, cf->extRing); // over alg. ext. of Q // takes over the input number
 }
 

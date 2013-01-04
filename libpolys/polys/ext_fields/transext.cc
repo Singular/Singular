@@ -100,13 +100,6 @@ static const n_coeffType ID = n_transExt;
 #define ntCoeffs cf->extRing->cf
 
 
-extern void nlClearContent(ICoeffsEnumerator&, number&, const coeffs);
-extern void nlClearContentNoPositiveLead(ICoeffsEnumerator&, number&, const coeffs);
-
-//extern void nlClearDenominators(ICoeffsEnumerator&, number&, const coeffs);
-//extern void nlClearDenominatorsNoPositiveLead(ICoeffsEnumerator&, number&, const coeffs);
-
-
 omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
 
 /// forward declarations
@@ -314,7 +307,6 @@ number ntGetNumerator(number &a, const coeffs cf)
 
 
     n_ClearDenominators(itr, g, ntRing->cf);
-//    nlClearDenominators(itr, g, ntRing->cf);
 
     if( !n_GreaterZero(g, ntRing->cf) )
     {
@@ -401,8 +393,6 @@ number ntGetDenom(number &a, const coeffs cf)
   CPolyCoeffsEnumerator itr(NUM(f));
 
   n_ClearDenominators(itr, g, ntRing->cf); // may return -1 :(((
-//    nlClearDenominators(itr, g, ntRing->cf);
-
 
   if( !n_GreaterZero(g, ntRing->cf) )
   {
@@ -555,7 +545,6 @@ number ntInit(poly p, const coeffs cf)
     CPolyCoeffsEnumerator itr(p);
 
     n_ClearDenominators(itr, g, ntRing->cf);
-//    nlClearDenominators(itr, g, ntRing->cf);
 
     if( !n_GreaterZero(g, ntRing->cf) )
     {
@@ -1824,8 +1813,7 @@ static void ntClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   CRecursivePolyCoeffsEnumerator<NTNumConverter> itr(numberCollectionEnumerator); // recursively treat the NUM(numbers) as polys!
   number cc;
 
-//  nlClearContentNoPositiveLead(itr, cc, Q); // TODO: get rid of (-LC) normalization!?
-  nlClearContent(itr, cc, Q);
+  n_ClearContent(itr, cc, Q);
   number g = ntInit(p_NSet(cc, R), cf);
 
   if( cand != NULL )
