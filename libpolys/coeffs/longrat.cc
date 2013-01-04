@@ -872,14 +872,14 @@ number nlDiv (number a, number b, const coeffs r)
 // ---------- short / short ------------------------------------
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    long i=SR_TO_INT(a);
-    long j=SR_TO_INT(b);
+    LONG i=SR_TO_INT(a);
+    LONG j=SR_TO_INT(b);
     if ((i==-POW_2_28) && (j== -1L))
     {
       FREE_RNUMBER(u);
       return nlRInit(POW_2_28);
     }
-    long r=i%j;
+    LONG r=i%j;
     if (r==0)
     {
       FREE_RNUMBER(u); // omFreeBin((void *)u, rnumber_bin);
@@ -2315,7 +2315,7 @@ LINLINE number nlNeg (number a, const coeffs R)
   nlTest(a, R);
   if(SR_HDL(a) &SR_INT)
   {
-    int r=SR_TO_INT(a);
+    LONG r=SR_TO_INT(a);
     if (r==(-(POW_2_28))) a=nlRInit(POW_2_28);
     else               a=INT_TO_SR(-r);
     return a;
