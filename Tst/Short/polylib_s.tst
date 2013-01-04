@@ -36,9 +36,9 @@ killall();
 example content;
 killall();
 
-example numerator;
+// example numerator; // core function in SW
 
-example denominator;
+// example denominator; // core function in SW
 
 example mod2id;
 

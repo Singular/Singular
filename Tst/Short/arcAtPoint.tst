@@ -1,4 +1,4 @@
-LIB "arcAtPoint.lib";
+LIB "arcpoint.lib"; // TODO: update test result!
 LIB "tst.lib";
 tst_init();
 ring R=0,(x,y,z),dp;
