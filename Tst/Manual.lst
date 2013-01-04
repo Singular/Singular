@@ -1433,10 +1433,10 @@ Manual/SannfsBFCT.tst
 ; Manual/watchdog.tst ; needs MP!
 ; the following contains timings
 Manual/markov4ti2.tst
-; Manual/tex.tst ; Latex!
+; ; Manual/tex.tst ; Latex!
 ; Manual/timer.tst ; HW-dependent!
-; Manual/rmx.tst ; depends on LaTeX
-; Manual/xdvi.tst ; Latex!
+; ; Manual/rmx.tst ; depends on LaTeX
+; ; Manual/xdvi.tst ; Latex!
 ; following contains a 4ti2 timings!
 Manual/multiDegBasis.tst
 ; output is system HW -dependent!

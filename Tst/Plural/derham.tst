@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
+LIB "tst.lib"; tst_init(); option(notWarnSB); /* tst_ignore("// ** _ is no standard basis"); */
 LIB "derham.lib";
 
 //----------------------------------------

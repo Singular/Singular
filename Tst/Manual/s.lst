@@ -1297,7 +1297,7 @@ Blowupcenter.tst
 changeDenominator.tst
 hnexpansion.tst
 sysCRHTMindist.tst
-tex.tst
+; tex.tst
 bfctIdeal.tst
 computemcm.tst
 cupproduct.tst
@@ -1325,9 +1325,9 @@ tau_es2.tst
 Classification_of_hypersurface_singularities.tst
 constructblwup.tst
 nrRootsDeterm.tst
-rmx.tst
+; rmx.tst
 slim_Groebner_bases.tst
-xdvi.tst
+; xdvi.tst
 endvfilt.tst
 genoutput.tst
 lpNF.tst

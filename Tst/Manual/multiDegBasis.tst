@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init(); tst_ignore("4ti2");
+LIB "tst.lib"; tst_init(); /* tst_ignore("4ti2"); */
 LIB "multigrading.lib";
 ring R = 0, (x, y), dp;
 intmat g1[2][2]=1,0,0,1;

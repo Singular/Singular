@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init(); tst_ignore("Time:");
+LIB "tst.lib"; tst_init(); /* tst_ignore("Time:"); */
 LIB "sheafcoh.lib";
 int pl = printlevel;
 int l,h;

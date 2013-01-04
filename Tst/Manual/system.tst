@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init(); tst_ignore("// --cntrlc"); tst_ignore("// --cpus"); tst_ignore("// --MP"); 
+LIB "tst.lib"; tst_init(); tst_ignore("// --cntrlc"); tst_ignore("// --cpus"); tst_ignore("// --MP");
 // report value of all options
 system("--");
 // set minimal display time to 0.02 seconds

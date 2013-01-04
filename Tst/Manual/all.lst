@@ -1201,7 +1201,7 @@ ringweights.tst
 rmNmzFiles.tst
 rm_unitcol.tst
 rm_unitrow.tst
-rmx.tst
+; rmx.tst
 rncAntiCanonicalMap.tst
 rncItProjEven.tst
 rncItProjOdd.tst
@@ -1371,7 +1371,7 @@ testNCfac.tst
 testParametrization.tst
 testPointConic.tst
 testPrimary.tst
-tex.tst
+; tex.tst
 texcoef.tst
 texfactorize.tst
 texmap.tst
@@ -1452,7 +1452,7 @@ writeNmzData.tst
 writeNmzPaths.tst
 wurzel.tst
 xchange.tst
-xdvi.tst
+; xdvi.tst
 zeroMod.tst
 zeroOpt.tst
 zeroRadical.tst

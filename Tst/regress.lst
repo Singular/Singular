@@ -135,7 +135,7 @@ Manual/showrecursive.tst
 Manual/sort.tst
 Manual/sprintf.tst
 Manual/std.tst
-Manual/system.tst
+; Manual/system.tst
 Manual/texproc.tst
 Manual/timeFactorize.tst
 Manual/tolessvars.tst
@@ -1304,7 +1304,7 @@ Manual/Blowupcenter.tst
 Manual/changeDenominator.tst
 Manual/hnexpansion.tst
 Manual/sysCRHTMindist.tst
-Manual/tex.tst
+; Manual/tex.tst
 Manual/bfctIdeal.tst
 Manual/computemcm.tst
 Manual/cupproduct.tst
@@ -1332,9 +1332,9 @@ Manual/tau_es2.tst
 Manual/Classification_of_hypersurface_singularities.tst
 Manual/constructblwup.tst
 Manual/nrRootsDeterm.tst
-Manual/rmx.tst
+; Manual/rmx.tst
 Manual/slim_Groebner_bases.tst
-Manual/xdvi.tst
+; Manual/xdvi.tst
 Manual/endvfilt.tst
 Manual/genoutput.tst
 Manual/lpNF.tst

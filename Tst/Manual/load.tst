@@ -1,5 +1,5 @@
-LIB "tst.lib"; tst_init();
-  option(loadLib);   // show loading of libraries;
+LIB "tst.lib"; tst_init(); /* tst_ignore("// ** loaded"); */
+  option(noloadLib);   // show loading of libraries;
                      // standard.lib is loaded
   listvar(package);
                      // the names of the procedures of inout.lib
