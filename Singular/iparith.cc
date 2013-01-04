@@ -4439,31 +4439,6 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   res->data=(char *)r;
   return FALSE;
 }
-#if SIZEOF_LONG == 8
-static number jjLONG2N(long d)
-{
-  int i=(int)d;
-  if ((long)i == d)
-  {
-    return nlInit(i, NULL);
-  }
-  else
-  {
-#if !defined(OM_NDEBUG) && !defined(NDEBUG)
-    omCheckBin(rnumber_bin);
-#endif
-    number z=(number)omAllocBin(rnumber_bin);
-    #if defined(LDEBUG)
-    z->debug=123456;
-    #endif
-    z->s=3;
-    mpz_init_set_si(z->z,d);
-    return z;
-  }
-}
-#else
-#define jjLONG2N(D) nlInit((int)D, NULL)
-#endif
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
   /* call method jjPFAC2 with second argument = 0 (meaning that no
@@ -4509,13 +4484,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   switch(((int)(long)v->Data()))
   {
   case 0:
-    res->data=(char *)jjLONG2N(om_Info.UsedBytes);
+    res->data=(char *)nlInitUlong(om_Info.UsedBytes);
     break;
   case 1:
-    res->data = (char *)jjLONG2N(om_Info.CurrentBytesSystem);
+    res->data = (char *)nlInitUlong(om_Info.CurrentBytesSystem);
     break;
   case 2:
-    res->data = (char *)jjLONG2N(om_Info.MaxBytesSystem);
+    res->data = (char *)nlInitUlong(om_Info.MaxBytesSystem);
     break;
   default:
     omPrintStats(stdout);
@@ -4524,8 +4499,6 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     res->data = (char *)0;
     res->rtyp = NONE;
   }
-  return FALSE;
-  res->data = (char *)0;
   return FALSE;
 }
 //static BOOLEAN jjMONITOR1(leftv res, leftv v)

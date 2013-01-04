@@ -2468,6 +2468,20 @@ number nlExtGcd(number a, number b, number &s, number &t)
   g=nlShort3(g);
   return g;
 }
+number nlInitUlong(unsigned long d)
+{
+#if !defined(OM_NDEBUG) && !defined(NDEBUG)
+  omCheckBin(rnumber_bin);
+#endif
+  number z=(number)omAllocBin(rnumber_bin);
+  #if defined(LDEBUG)
+  z->debug=123456;
+  #endif
+  z->s=3;
+  mpz_init_set_ui(z->z,d);
+  z=nlShort3(z);
+  return z;
+}
 #if 0
 number nlMod(number a, number b)
 {

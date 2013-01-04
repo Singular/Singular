@@ -113,6 +113,7 @@ LINLINE void nlInpMult(number &a, number b, ring r);
 
 number nlFarey(number nP, number nN, const ring);
 number nlExtGcd(number a, number b, number &s, number &t);
+number nlInitUlong(unsigned long d);
 
 #ifdef LDEBUG
 #define nlTest(a) nlDBTest(a,__FILE__,__LINE__)
