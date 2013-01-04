@@ -815,6 +815,7 @@ number nlDiv (number a, number b)
   {
     long i=SR_TO_INT(a);
     long j=SR_TO_INT(b);
+    if (j==1L) return a;
     if ((i==-POW_2_28) && (j== -1L))
     {
       FREE_RNUMBER(u);
@@ -826,8 +827,8 @@ number nlDiv (number a, number b)
       FREE_RNUMBER(u);
       return INT_TO_SR(i/j);
     }
-    mpz_init_set_si(u->z,(long)i);
-    mpz_init_set_si(u->n,(long)j);
+    mpz_init_set_si(u->z,i);
+    mpz_init_set_si(u->n,j);
   }
   else
   {
@@ -2056,14 +2057,14 @@ number nlRInit (long i)
 /*2
 * z := i/j
 */
-number nlInit2 (int i, int j)
+number nlInit2 (long i, long j)
 {
   number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  mpz_init_set_si(z->z,(long)i);
-  mpz_init_set_si(z->n,(long)j);
+  mpz_init_set_si(z->z,i);
+  mpz_init_set_si(z->n,j);
   z->s = 0;
   nlNormalize(z);
   return z;
@@ -2198,7 +2199,7 @@ LINLINE number nlNeg (number a)
   nlTest(a);
   if(SR_HDL(a) &SR_INT)
   {
-    int r=SR_TO_INT(a);
+    long r=SR_TO_INT(a);
     if (r==(-(POW_2_28))) a=nlRInit(POW_2_28);
     else               a=INT_TO_SR(-r);
     return a;

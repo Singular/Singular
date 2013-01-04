@@ -56,7 +56,7 @@ LINLINE number   nlAdd(number la, number li);
 LINLINE number   nlSub(number la, number li);
 LINLINE number   nlMult(number a, number b);
 
-number   nlInit2 (int i, int j);
+number   nlInit2 (long i, long j);
 number   nlInit2gmp (mpz_t i, mpz_t j);
 number   nlGcd(number a, number b, const ring r);
 number   nlLcm(number a, number b, const ring r);   /*special routine !*/
