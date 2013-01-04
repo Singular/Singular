@@ -10,7 +10,7 @@
 #include <kernel/longrat.h>
 
 // 64 bit version:
-#if SIZE_OF_LONG == 8
+#if SIZEOF_LONG == 8
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define LONG long
