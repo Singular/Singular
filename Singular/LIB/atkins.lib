@@ -116,7 +116,7 @@ EXAMPLE:example disc; shows an example
     for(a=int(intPart(B/4))+1;a<=k;a++)
     {
       D=-4*a+B;
-      if((D<0)&&((D mod 4)!=2)&&((D mod 4)!=3)&&(absValue(D)<4*N)&&(newTest(L,D)==1))
+      if((D<0)&&((D mod 4)!=-2)&&((D mod 4)!=-1)&&(absValue(D)<4*N)&&(newTest(L,D)==1))
       {
         L[size(L)+1]=D;
       }
@@ -161,7 +161,7 @@ EXAMPLE:example Cornacchia; shows an example
        x(0)=squareRoot(-d,p);   // (2)[Compute square root]
        if((p/2>=x(0))||(p<=x(0)))
        {
-           x(0)=-x(0) mod p;
+           x(0)=-x(0) mod p+p;
        }
        a=p;
        b=x(0);
@@ -202,7 +202,7 @@ ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4p
 EXAMPLE:example CornacchiaModified; shows an example
 "
 {
-  if((D>=0)||((D mod 4)==2)||((D mod 4)==3)||(absValue(D)>=4*p))
+  if((D>=0)||((D mod 4)==-2)||((D mod 4)==-1)||(absValue(D)>=4*p))
   {                                  // (0)[Test if assumptions well-defined]
     return(0);
     // ERROR("Parameters wrong selected!");
@@ -233,7 +233,7 @@ EXAMPLE:example CornacchiaModified; shows an example
       else
       {
         x(0)=squareRoot(D,p);        // (3)[Compute square root]
-        if((x(0) mod 2)!=(D mod 2))
+        if((x(0) mod 2)!=(-(D mod 2))) // D is <0
         {
           x(0)=p-x(0);
         }
@@ -247,14 +247,15 @@ EXAMPLE:example CornacchiaModified; shows an example
           b=r;
         }
         c=(4*p-b^2)/absValue(D);     // (5)[Test solution]
-        if((((4*p-b^2) mod absValue(D))!=0)||(c!=intRoot(c)^2))
+        number root_c=intRoot(c);
+        if((((4*p-b^2) mod absValue(D))!=0)||(c!=root_c^2))
         {
           return(-1);
           // ERROR("The Diophantine equation has no solution!");
         }
         else
         {
-          list L=b,intRoot(c);
+          list L=b,root_c;
           return(L);
         }
       }
@@ -293,7 +294,7 @@ EXAMPLE:example pFactor1; shows an example
     k=k*w;
   }
   number a=random(2,2147483629);
-  number d=gcdN(powerN(a,k,n)-1,n);
+  number d=gcd(powerN(a,k,n)-1,n);
   if((d>1)&&(d<n)){return(d);}
   return(n);
 }
@@ -796,9 +797,9 @@ EXAMPLE:example Atkin; shows an example
 {
   if(N==1)           {return(-1);} // (0)[Test if assumptions well-defined]
   if((N==2)||(N==3)) {return(1);}
-  if(gcdN(N,6)!=1)
+  if(gcd(N,6)!=1)
   {
-    if(printlevel>=1) {"gcd(N,6) = "+string(gcdN(N,6));pause();"";}
+    if(printlevel>=1) {"gcd(N,6) = "+string(gcd(N,6));pause();"";}
     return(-1);
   }
   else

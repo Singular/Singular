@@ -9,10 +9,10 @@ OVERVIEW:
 Theory: Let A be an operator algebra with @code{R = K[x1,.,xN]} as subring.
 The operators are usually denoted by @code{d1,..,dM}.
 
-Assume, that A is a @code{G}-algebra, then the set @code{S=R-{0}} is multiplicatively
+Assume, that A is a @code{G}-algebra, then the set @code{S=R-0} is multiplicatively
 closed Ore set in A.
 That is, for any s in S and a in A, there exist t in S and b in A, such that @code{sa=bt}.
-In other words, one can transform any left fraction into the right fraction.
+In other words, one can transform any left fraction into a right fraction.
 The algebra @code{A_S} is called an Ore localization of A with respect to S.
 
 This library provides Groebner basis procedure for A_S, performing polynomial (that is
@@ -22,9 +22,9 @@ bases over such Ore localizations.
 
 Assumptions: in order to treat such localizations constructively, some care need to be taken.
 We will assume that the variables @code{x1,...,xN} from above (which will become invertible
-in the localization) come as the first block in the basering.
+in the localization) come as the first block among the variables of the basering.
 Moreover, the ordering on the basering must be an antiblock ordering, that is its
-matrix form has the left upper @code{NxN} block zero. Here is a recipy to create such
+matrix form has the left upper @code{NxN} block zero. Here is a recipe to create such
 an ordering easily: use 'a(w)' definitions of the ordering N times with intvecs @code{w_i}
 of the following form: @code{w_i} has first N components zero. The rest entries need to
 be positive and such, that @code{w1,..,wN} are linearly independent (see an example below).

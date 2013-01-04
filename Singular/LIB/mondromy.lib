@@ -225,7 +225,8 @@ EXAMPLE: example detadj; shows an example.
     else
     {
       def br=basering;
-      def pr=changeord("dp"); setring pr;
+      def pr=changeord(list(list("dp",1:nvars(basering))));
+      setring pr;
       matrix U=fetch(br,U);
       poly detU=fetch(br,detU);
 

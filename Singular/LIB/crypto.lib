@@ -108,6 +108,7 @@ EXAMPLE:example exgcdN; shows an example
 {
   number x=a mod n;
   if(x==0){return(list(0,1,n))}
+  if (x<0) { x=x+n;}
   list l=exgcdN(n,x);
   return(list(l[2],l[1]-(a-x)*l[2]/n,l[3]))
 }
@@ -182,7 +183,7 @@ RETURN: m^d mod n
 EXAMPLE:example powerN; shows an example
 "
 {
-   if(d==0){return(1)}
+   if(d==0){return(1);}
    int i;
    if(n==0)
    {
@@ -194,7 +195,12 @@ EXAMPLE:example powerN; shows an example
    }
    for(i=12;i>=2;i--)
    {
-      if((d mod i)==0){return(powerN(m,d/i,n)^i mod n);}
+      if((d mod i)==0)
+      {
+        number rr=powerN(m,d/i,n)^i mod n;
+        if (rr<0) { rr=rr+n;}
+        return(rr);
+      }
    }
    return(m*powerN(m,d-1,n) mod n);
 }
@@ -347,7 +353,14 @@ RETURN: the integral part of a rational number
 EXAMPLE:example intPart; shows an example
 "
 {
-   return((numerator(x)-(numerator(x) mod denominator(x)))/denominator(x));
+  if (x>=0)
+  {
+    return((numerator(x)-(numerator(x) mod denominator(x)))/denominator(x));
+  }
+  else
+  {
+    return((numerator(x)-(numerator(x) mod denominator(x)+denominator(x)))/denominator(x));
+  }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -366,8 +379,12 @@ EXAMPLE:example intRoot; shows an example
    number s=(x+1)^2;
    while(((m>t)&&(m>s))||((m<t)&&(m<s)))
    {
-      x=intPart(x/2+m/(2*x));  //Newton step
-      t=x^2;
+      if (x==0) { t=0; }
+      else
+      {
+        x=intPart(x/2+m/(2*x));  //Newton step
+        t=x^2;
+      }
       if(t>m)
       {
          s=(x-1)^2;
@@ -396,6 +413,7 @@ EXAMPLE:example squareRoot; shows an example
 {
    if(p==2){return(a);}
    if((a mod p)==0){return(0);}
+   if (a<0) { a=a+p; }
    if(powerN(a,p-1,p)!=1)
    {
       "p is not prime";
@@ -627,9 +645,12 @@ EXAMPLE:example rho; shows an example
 
    number a=(t*u/d) mod (p-1);
 
+   number pn=powerN(b,a,p);
+   if (pn<0) { pn=pn+p;}
    while(powerN(b,a,p)!=y)
    {
       a=(a+(p-1)/d) mod (p-1);
+      if (a<0) { a=a+p-1; }
    }
    return(a);
 }
@@ -712,14 +733,18 @@ EXAMPLE:example SolowayStrassen; shows an example
    if((n==2)||(n==3)){return(1);}
    if((n mod 2)==0){return(0);}
 
-   number a;
+   number a,pn,jn;
    int i;
    while(i<k)
    {
       i++;
       a=random(2,2147483629) mod n; if(a==0){a=3;}
-      if(gcdN(a,n)!=1){return(0);}
-      if(powerN(a,(n-1)/2,n)!=(Jacobi(a,n) mod n)){return(0);}
+      if(gcd(a,n)!=1){return(0);}
+      pn=powerN(a,(n-1)/2,n);
+      if (pn<0) { pn=pn+n;}
+      jn=Jacobi(a,n) mod n;
+      if (jn<0) { jn=jn+n;}
+      if(pn!=jn){return(0);}
    }
    return(1);
 }
@@ -803,7 +828,7 @@ EXAMPLE:example PocklingtonLehmer; shows an example
       {
          a=a+1;
          if(powerN(a,N-1,N)!=1){return("not prime");}
-         g=gcdN(powerN(a,(N-1)/PA[i],N),N);
+         g=gcd(powerN(a,(N-1)/PA[i],N),N);
          if(g==1)
          {
            re[size(re)+1]=list(PA[i],a);
@@ -883,7 +908,7 @@ EXAMPLE:example PollardRho; shows an example
           x=powerN(x,2,n); x=(x+a) mod n;
           y=powerN(y,2,n); y=(y+a) mod n;
           y=powerN(y,2,n); y=(y+a) mod n;
-          d=gcdN(x-y,n);
+          d=gcd(x-y,n);
           if(d>1)
           {
              re[size(re)+1]=d;
@@ -899,7 +924,6 @@ EXAMPLE:example PollardRho; shows an example
              n=1;
           }
        }
-
     }
     if(allFactors)      //want to obtain all prime factors
     {
@@ -956,7 +980,7 @@ EXAMPLE:example pFactor; shows an example
       k=k*w;
    }
    number a=random(2,2147483629);
-   number d=gcdN(powerN(a,k,n)-1,n);
+   number d=gcd(powerN(a,k,n)-1,n);
    if((d>1)&&(d<n)){return(d);}
    return(n);
 }
@@ -1092,7 +1116,7 @@ EXAMPLE:example quadraticSieve; shows an example
       {
          y=y*B[l]^(v[l] div 2) mod n;
       }
-      d=gcdN(x-y,n);
+      d=gcd(x-y,n);
       if((d>1)&&(d<n)){return(d);}
    }
    return("no divisor found");
@@ -1140,8 +1164,8 @@ EXAMPLE:example ellipticAdd; shows an example
    int i;
    for(i=1;i<=3;i++)
    {
-      P[i]=P[i] mod N;
-      Q[i]=Q[i] mod N;
+      P[i]=P[i] mod N; if (P[i]<0) { P[i]=P[i]+N:}
+      Q[i]=Q[i] mod N; if (Q[i]<0) { Q[i]=Q[i]+N;}
    }
    list Resu;
    Resu[1]=number(0);
@@ -1151,7 +1175,7 @@ EXAMPLE:example ellipticAdd; shows an example
    Error[1]=0;
    //test for ellictic curve
    number D=4*a^3+27*b^2;
-   number g=gcdN(D,N);
+   number g=gcd(D,N);
    if(g==N){return(Error);}
    if(g!=1)
    {
@@ -1209,7 +1233,9 @@ EXAMPLE:example ellipticAdd; shows an example
       L=(Q[2]-P[2])*I[1] mod N;
    }
    Resu[1]=(L^2-P[1]-Q[1]) mod N;
+   if (Resu[1]<0) { Resu[1]=Resu[1]+N; }
    Resu[2]=(L*(P[1]-Resu[1])-P[2]) mod N;
+   if (Resu[2]<0) { Resu[2]=Resu[2]+N; }
    Resu[3]=number(1);
    return(Resu);
 }
@@ -1295,7 +1321,7 @@ EXAMPLE:example ellipticRandomCurve; shows an example
      number b=random(1,2147483647) mod N;
      //test for ellictic curve
      number D=4*a^3+27*b^4; //the constant term is b^2
-     number g=gcdN(D,N);
+     number g=gcd(D,N);
      if(g<N){return(list(a,b,g));}
    }
    ERROR("no random curve found");
@@ -1462,7 +1488,7 @@ EXAMPLE:example ShanksMestre; shows an example
          j=0;
          while(j<m)
          {
-            j=j+1;
+            j++;
             if((Q[1]==B[j][1])&&(Q[2]==B[j][2])&&(Q[3]==B[j][3]))
             {
 
@@ -1473,7 +1499,7 @@ EXAMPLE:example ShanksMestre; shows an example
                {
                   if(K[size(K)][2]!=K[size(K)-1][2])
                   {
-                     d=gcdN(K[size(K)][2],K[size(K)-1][2]);
+                     d=gcd(K[size(K)][2],K[size(K)-1][2]);
                      if(ellipticMult(q,a,b,K[size(K)],d)[3]==0)
                      {
                        K[size(K)][2]=K[size(K)-1][2];
@@ -1529,7 +1555,7 @@ EXAMPLE:example Schoof; shows an example
    int pr=printlevel;
 //test for ellictic curve
    number D=4*a^3+27*b^2;
-   number G=gcdN(D,N);
+   number G=gcd(D,N);
    if(G==N){ERROR("not an elliptic curve");}
    if(G!=1){ERROR("not a prime");}
 
@@ -1938,6 +1964,7 @@ EXAMPLE:example ECPP; shows an example
    while(1)
    {
       P=ellipticRandomPoint(N,L[1],L[2]);  //a random point on C
+      "P=",P;
       if(ellipticMult(N,L[1],L[2],P,m)[3]!=0){"N is not prime";return(-5);}
       if(ellipticMult(N,L[1],L[2],P,u)[3]!=0)
       {

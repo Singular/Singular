@@ -10,7 +10,7 @@ This library provides tools to do several computations in parallel. They
 are aimed at ordinary Singular users as well as authors of Singular
 libraries.
 @* Even without this library, it is possible to do execute self-defined
-Singular commands in parallel using @ref{links}, but the handling of
+Singular commands in parallel using @ref{link}, but the handling of
 such links can be quite tedious. With the pocedures described below,
 this can be done by one-line commands.
 @* There are many parallel 'skeletons' (i.e. ways in which parallel

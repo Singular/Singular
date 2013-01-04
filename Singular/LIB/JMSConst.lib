@@ -1,0 +1,1393 @@
+////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Algebraic Geometry";
+// summary description of the library
+info="
+LIBRARY:   JMSConst.lib  A library for Singular which constructs J-Marked Schemes.
+AUTHOR:    Michela Ceria, email: michela.ceria@unito.it
+
+SEE ALSO:  JMBTest_lib
+
+KEYWORDS:  J-marked schemes, Borel ideals
+
+OVERVIEW:
+The library performs the J-marked computation, as described in [BCLR].
+As in JMBTest.lib we construct the V polynomials and we reduce the EK
+polynomials w.r.t. them, putting the coefficients as results.
+
+
+The algorithm terminates only if the ordering is rp.
+Anyway, the number of reduction steps is bounded.
+
+REFERENCES:
+[CR] Francesca Cioffi, Margherita Roggero,Flat Families by Strongly
+Stable Ideals and a Generalization of Groebner Bases,
+J. Symbolic Comput. 46,  1070-1084, (2011).@*
+[BCLR] Cristina Bertone, Francesca Cioffi, Paolo Lella,
+Margherita Roggero, Upgraded methods for the effective
+computation of marked schemes on a strongly stable ideal,
+Journal of Symbolic Computation
+(2012), http://dx.doi.org/10.1016/j.jsc.2012.07.006 @*
+
+
+
+SEE ALSO: JMSConst_lib
+PROCEDURES:
+BorelCheck(ideal,r)       checks whether the given ideal is Borel
+JMarkedScheme(list, list, list, int)  computes authomatically all the J-marked scheme
+";
+LIB "all.lib";
+////////////////////////////////////////////////////////////////////
+proc BorelCheck(ideal Borid,r)
+"USAGE:    BorelCheck(Borid,r); Borid ideal, r ring
+RETURN:   int: d
+NOTE:     Input must be a monomial ideal.
+The procedure checks whether the Borel moves produce elements belonging to Borid.
+EXAMPLE:  example QuanteC; shows an example"
+{
+int n= nvars(r);
+int b=1;
+int i=1;
+int k;
+intvec v;
+int j;
+int u;
+//b =bool. b=1 true; b=0 false
+//we suppose true!
+//i=counter on the elements of Borid
+int s= size(Borid);
+while(b && i<=s)
+      {
+        v=leadexp(Borid[i]);
+        j=1;
+        u=size(v);
+        while(b && j<=u)
+             {
+               if(v[j]!=0)
+                 {
+                   k=j+1;
+                  while(b && k<=n)
+                       {
+                         b=(reduce(Borid[i]*var(k)/var(j),std(Borid))==0);
+                         k++;
+                        }
+                 }
+              j++;
+             }
+      i++;
+      }
+return(b);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z),rp;
+ ideal Borid=y^2*z,y*z^2,z^3,y^5;
+BorelCheck(Borid,r);
+}
+////////////////////////////////////////////////////////////////////
+proc ArrangeBorel(ideal Borid)
+"USAGE:    ArrangeBorel(Borid); Borid ideal
+RETURN:   list: Input
+NOTE:     Input must be a monomial ideal, increasingly ordered by degree.
+The procedure groups the monomials in a list of lists as needed to compute J-marked scheme.
+// It also returns a list containing the size of every sublist generated.
+EXAMPLE:  example ArrangeBorel; shows an example"
+{
+list Input;
+int j=1;
+//list numero=1;
+Input[1]=list(Borid[1]);
+for(int i=2; i<=size(Borid); i++)
+   {
+     if(deg(Borid[i])!=deg(Borid[i-1]))
+        {
+         j++;
+         Input[j]=list();
+        // numero[j]=0;
+        }
+Input[j]=insert(Input[j],Borid[i],size(Input[j]));
+//numero[j]=numero[j]+1;
+   }
+return(Input);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z),rp;
+ ideal Borid=y^2*z,y*z^2,z^3,y^5;
+ArrangeBorel(Borid);
+}
+////////////////////////////////////////////////////////////////////
+proc NumNewVar(list B, list NumN)
+"USAGE:    NumNewVar(B,NumN); B list, NumN list
+RETURN:   int: d
+NOTE: B is the grouped Borel, while NumN is a list containing the cardinalities of the obtained groups.
+EXAMPLE:  example NumNewVar; shows an example"
+{
+int d;
+int j;
+int i;
+for(i=1; i<=size(B); i++)
+   {
+     d=d+size(B[i])*NumN[i];
+    }
+return(d);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z),rp;
+ ideal Borid=y^2*z,y*z^2,z^3,y^5;
+list B= ArrangeBorel(Borid);
+list NumN=7,8;
+NumNewVar(B,NumN);
+}
+////////////////////////////////////////////////////////////////////
+proc NewTails(ideal NI, int s)
+"USAGE:    NewTails(NI,s); NI ideal, s int
+RETURN:   list: M
+NOTE:     The procedure construct the tails of the required unknown J-marked polynomials.
+EXAMPLE:  example NewTails; shows an example"
+{
+ poly p=0;
+for(int i=1; i<=size(NI); i++)//Loop on the Groebner escalier
+   {
+    p=p+NI[i]*c(i+s); //multiply by c's
+   }
+int u=size(NI);
+list M=p,u;
+return(M);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=(0,c(1..7)), (x,y,z),rp;
+ ideal NI=x^2,x*y,y^2,z^2;
+ NewTails(NI,3);
+}
+////////////////////////////////////////////////////////////////////
+proc ArrangeTails(list Q)
+"USAGE:    ArrangeTails(Q); Q list
+RETURN:   list: Q
+NOTE:     Constructs the final list of J-marked polynomials.
+EXAMPLE:  example FormaInput; shows an example"
+{
+jmp m=Q[1][1];
+jmp M=Q[size(Q)][1];
+int minimo=deg(m.h);
+int massimo=deg(M.h);
+//print(minimo);
+//print(massimo);
+int i=2;
+jmp qi;
+while(i<=size(Q))
+     {
+       //print("entro nel ciclo");
+       //print(i);
+       qi=Q[i][1];
+       if(deg(qi.h)!=minimo+1)
+         {
+          //print("qui riempire");
+          //print(i);
+          Q=insert(Q,list(),i-1);//Insert empty list for all intermediate degree between the minimum and the maximum, not having polynomials.
+          //print(Q);
+         }
+       minimo=minimo+1;
+       i=i+1;
+       //print("ora ho");
+       //print(minimo);
+       //print(i);
+     }
+return(Q);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0, (x,y,z),rp;
+ ideal Borid=y^2*z,y*z^2,z^3,y^5;
+attrib(Borid,"isSB",1);
+    list B=ArrangeBorel(Borid);
+    list NumN;
+    list N;
+    int i;
+    int d;
+    for(i=1;i<=size(B);i++)
+       {
+        d=deg(B[i][1]);
+        N[i]=kbase(Borid,d);
+        NumN[i]=size(N[i]);
+       }
+int qc=NumNewVar(B, NumN);
+//Now I must define the NEW RING, putting the c parameters inside.
+list L=ringlist(r);
+list L2;
+L2[1]=L[1];
+L2[2]=list();
+for(i=qc;i>=1;i--)
+    {
+     L2[2][i]="c("+string(i)+")";
+    }
+L2[3]=list(list("rp",qc));
+L2[4]=L[4];
+L[1]=L2;
+def K=ring(L);
+setring(K);
+def Borid=imap(r,Borid);
+def N=imap(r,N);
+def B=imap(r,B);
+//NumN contains only scalars so I do not imap it
+int j;
+list Q;
+int s;
+list M;
+jmp pp;
+for(i=1;i<=size(B);i++)
+    {
+      Q[i]=list();
+     for(j=1;j<=size(B[i]);j++)
+        {
+          M=NewTails(N[i],s);
+          pp.h=B[i][j];
+          pp.t=M[1];
+          Q[i][j]=pp;
+          s=s+M[2];
+          //print(s);
+        }
+    }
+list P=ArrangeTails(Q);
+int ll;
+int uu;
+jmp Pp;
+for(ll=1; ll<=size(P);ll++)
+   {
+    for(uu=1;uu<=size(P[ll]);uu++)
+       {Pp=P[ll][uu]; Pp.h; Pp.t;}
+   }
+}
+////////////////////////////////////////////////////////////////////
+proc mod_init()
+"USAGE:     mod_init();
+RETURN:   struct: jmp
+EXAMPLE:  example  mod_init; shows an example"
+{
+newstruct("jmp", "poly h, poly t");
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  mod_init();
+}
+////////////////////////////////////////////////////////////////////
+proc Terns(list G, int c)
+"USAGE:    Terns(G,c); G list, c int
+RETURN:   list: T
+NOTE:     Input is a list of J-marked  polynomials
+(arranged by degree) and an integer.
+EXAMPLE:  example Terns; shows an example"
+{
+list T=list();
+int z;
+ for(int k=1; k<=size(G[c]);k=k+1)
+    {
+//Loop on G[c] making positions of polynomials in G[c]
+      z=size(T);
+      T=insert(T,list(1,c,k) ,size(T));
+    }
+return(T);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+Terns(G2F, 1);
+Terns(G2F, 2);
+}
+////////////////////////////////////////////////////////////////////
+proc VConst(list G, int c)
+"USAGE:    VConst(G, c); G list, c int
+RETURN:   list: V
+NOTES: this procedure computes the Vm polynomials following the
+algorithm in [CR],but it only keeps in memory the monomials by
+which the G's must be multplied and their positions.
+EXAMPLE:  example VConst; shows an example"
+{
+jmp f=G[1][1];
+int aJ=deg(f.h);
+// minimal degree of polynomials in G
+//print(aJ);
+list V=list();
+V[1]=Terns(G,1);
+// V[1]=G[1] (keeping in memory only [head, position])
+//print(c-aJ+1);
+int i;
+int j;
+int m;
+list OO;
+jmp p;
+  for(m=2; m<=c-aJ+1; m=m+1)
+  {
+     //print("entro nel form");
+     if(m>size(G))
+        {V[m]=list();
+//If we have not G[m] we insert a list()
+        //print("vuota prima");
+        }
+     else
+        {V[m]=Terns(G,m);
+        //print("piena prima");
+        }
+     for(i=1; i<nvars(basering)+1; i=i+1)
+        {
+          //print("entrata fori");
+          //print(i);
+          for(j=1; j<=size(V[m-1]); j=j+1)
+             {
+                   p=G[V[m-1][j][2]][V[m-1][j][3]];
+                  //print(p.h);
+                  //print(p.t);
+                  //print(var(i));
+                  //print(Minimus(V[m-1][j][1]*p.h));
+               if(var(i)<=Minimus(variables(V[m-1][j][1]*p.h)))
+                  {
+//Can I multiply by the current variable?
+                    //print("minoremin");
+                    //print("fin qui ci sono");
+                     //print(V[m-1][j][1]);
+                     OO=list(var(i)*V[m-1][j][1],V[m-1][j][2],V[m-1][j][3]);
+                    V[m]=insert(V[m], OO ,size(V[m]));
+                  }
+             }
+        }
+  }
+return (V);}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+VConst(G2F,4,basering);}
+////////////////////////////////////////////////////////////////////
+proc Minimus(ideal L)
+"USAGE:    Minimus(L); G list, c int
+RETURN:   list: V
+NOTES: it returns the minimal variable generating the ideal L;
+input must be an ideal generated by variables.
+EXAMPLE:  example Minimus; shows an example"
+{
+poly min=L[1];
+int i;
+for(i=2;i<=size(L); i++)
+  {
+    if(L[i]<min){min=L[i];}
+  }
+return(min);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+ideal I=y,x,z;
+Minimus(I);
+}
+////////////////////////////////////////////////////////////////////
+proc Maximus(ideal L)
+"USAGE:    Maximus(L); G list, c int
+RETURN:   list: V
+NOTES: it returns the maximal variable generating the ideal L
+input must be an ideal generated by variables.
+EXAMPLE:  example Maximus; shows an example"
+{
+poly max=L[1];
+int i;
+for(i=2;i<=size(L); i++)
+  {
+    if(L[i]>max){max=L[i];}
+  }
+return(max);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+ideal I=y,x,z;
+Maximus(I);
+}
+////////////////////////////////////////////////////////////////////
+proc GPolyMin(jmp P, jmp Q)
+"USAGE:    GPolyMin(P,Q); P jmp, Q jmp
+RETURN:   int: d
+EXAMPLE:  example GPolyMin; shows an example"
+{
+  int d=1;
+//-1=lower, 0=equal, 1=higher
+//At the beginning suppose Q is higher
+  if(deg(P.h)<deg(Q.h))
+     {
+//Compare degrees;
+      d=-1;
+      //print("Per Grado");
+     }
+  if(deg(P.h)==deg(Q.h))
+     {
+      if(P.h==Q.h)
+         {
+          if(P.t==Q.t)
+              {
+//head=tail
+               d=0;
+               //print("Uguali");
+              }
+         }
+     else
+        {
+//print(Minimus(variables(P.h/gcdMon(P.h,Q.h))));
+//print(Minimus(variables(Q.h/gcdMon(P.h,Q.h))));
+          if(Minimus(variables(P.h/gcdMon(P.h,Q.h)))<Minimus(variables(Q.h/gcdMon(P.h,Q.h))))
+             {
+             d=-1;
+            //print("Per Indice");
+             }
+        }
+     }
+ return(d);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+ jmp p1;
+p1.h=poly(1);
+p1.t=poly(1);
+jmp p2;
+p2.h=x^2;
+p2.t=poly(0);
+jmp p3;
+p3.h=x;
+p3.t=poly(0);
+ GPolyMin(p1,p2);
+ GPolyMin(p2, p3);
+GPolyMin(p2,p2);
+}
+////////////////////////////////////////////////////////////////////
+proc TernComparer(list A, list B, list G)
+"USAGE:    TernComparer(A,B,C); A list, B list, G list
+RETURN:   int: d
+NOTE:     A and B are terns, while G is the given list of
+J-marked polynomials.
+EXAMPLE:  example TernComparer; shows an example"
+{
+int d=-1;
+//Start: A<B
+if(A[1]==B[1])
+  {
+   if(A[2]==B[2]&& A[3]==B[3])
+     {
+      //print("Uguali");
+      d=0;
+     }
+   else
+     {
+jmp g1=G[A[2]][A[3]];
+jmp g2=G[B[2]][B[3]];
+       if(GPolyMin(g1, g2)==1)
+          {
+            //print("Maggiore per il G");
+            d=1;
+          }
+     }
+  }
+else
+  {
+    if(A[1]>B[1])
+      {
+//the ordering MUST be rp
+        //print("Maggiore per Lex");
+        d=1;
+      }
+  }
+return(d);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+TernComparer([1,1,1],[x,1,1],G2F);
+}
+////////////////////////////////////////////////////////////////////
+proc MinimalV(list V, list G)
+"USAGE:    Minimal(V,G); V list, G list
+RETURN:   int: R
+NOTE:     Input=list(terns), G.
+EXAMPLE:  example MinimalV; shows an example"
+{
+//Minimal element for a given degree
+list R=list();
+list MIN=V[1];
+int h=1;
+int i;
+for(i=2; i<=size(V); i++)
+    {
+//I consider the first as minimum
+//If I find something smaller I change minimum
+     if(TernComparer(V[i],MIN,G)<=0)
+       {
+        MIN=V[i];
+        h=i;
+       }
+    }
+//Return: [minimum,position of the minimum]
+R=MIN,h;
+return(R);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+MinimalV(VConst(G2F,4,basering)[1],G2F);
+}
+////////////////////////////////////////////////////////////////////
+proc OrderV(list V,list G,list R)
+"USAGE:   Ordinare(V,G,R); V list, G list, R list
+RETURN:   list: R
+NOTE:     Input: Vm,G,emptylist
+EXAMPLE:  example Ordinare; shows an example"
+{
+//Order V[m]
+//R  will contain results but at the beginning it is empty
+list M=list();
+if(size(V)==1)
+  {
+    R=insert(R,V[1],size(R));
+  }
+else
+  {
+   M=MinimalV(V,G);
+   R=insert(R,M[1],size(R));
+   V=delete(V,M[2]);
+//recursive call
+   R=OrderV(V,G,R);
+  }
+return(R);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+OrderV(VConst(G2F,4,r)[1],G2F,list());
+}
+////////////////////////////////////////////////////////////////////
+proc StartOrderingV(list V,list G)
+"USAGE:   StartOrderingV(V,G); V list, G list
+RETURN:   list: R
+NOTE:     Input Vm,G. This procedure uses OrderV to get
+the ordered polynomials as in [BCLR].
+EXAMPLE:  example StartOrderingV; shows an example"
+{
+ return(OrderV(V,G, list()));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+StartOrderingV(VConst(G2F,4,basering)[1],G2F);
+}
+////////////////////////////////////////////////////////////////////
+proc MultiplyJmP(list L, list G)
+"USAGE:    MultiplyJmP(L,G); L list, G list
+RETURN:   jmp: K
+NOTE:     Input: a 3-ple,G. It performs the product associated
+to the 3-uple.
+EXAMPLE:  example MultiplyJmP; shows an example"
+{
+jmp g=G[L[2]][L[3]];
+jmp K;
+K.h=L[1]*g.h;
+K.t=L[1]*g.t;
+ return(K);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+ list P=x^2,1,1;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+MultiplyJmP(P,G2F);
+}
+////////////////////////////////////////////////////////////////////
+//proc JmpIdeal(list V,r)
+//"USAGE:    JmpIdeal(V); V list
+//RETURN:   ideal: I
+//NOTES: this procedure takes a list of Vm's of a certain degree
+//and construct their ideal, multiplying the head by the weighted
+//variable t.
+//EXAMPLE:  example JmpIdeal; shows an example"
+//{
+//ideal I=0;
+//int i;
+//if (size(V)!=0)
+ // {
+//   list M=list();
+//jmp g;
+//   for(i=1; i<= size(V); i++)
+//       {
+//         g=V[i];
+//         g.h=(g.h)*t;
+//         M[i]=g.h+g.t;
+//       }
+//   I=M[1..size(M)];
+//attrib(I,"isSB",1);
+//  }
+//return(I);
+//}
+//example
+//{ "EXAMPLE:"; echo = 2;
+// ring r=0, (x,y,z,t), rp;
+//jmp r1;
+//r1.h=z^3;
+//r1.t=poly(0);
+//jmp r2;
+//r2.h=z^2*y;
+//r2.t=poly(0);
+//jmp r3;
+//r3.h=z*y^2 ;
+//r3.t=-x^2*y;
+//jmp r4;
+//r4.h=y^5;
+//r4.t=poly(0);
+//list G2F=list(list(r1,r2,r3),list(r4));
+//JmpIdeal(VConst(G2F,6,r)[1],r);
+//}
+////////////////////////////////////////////////////////////////////
+proc NewWeight(int n)
+"USAGE:    NewWeight(n); n int
+RETURN:   intvec: u
+EXAMPLE:  example NewWeight; shows an example"
+{
+intvec u=0;
+u[n]=1;
+return(u);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ NewWeight(3);
+}
+////////////////////////////////////////////////////////////////////
+proc FinalVm(list V1 , list G1 , r)
+"USAGE:     FinalVm(V1, G1, r);  V1 list,  G1 list , r
+RETURN:   intvec: u
+EXAMPLE:  example FinalVm; shows an example"
+{
+//multiply and reduce, degree by degree
+intvec u=NewWeight(nvars(r)+1);
+list L=ringlist(r);
+L[2]=insert(L[2],"t",size(L[2]));
+//print(L[2]);
+list ordlist="a",u;
+L[3]=insert(L[3],ordlist,0);
+def H=ring(L);
+//print(V1);
+//print(G1);
+list M=list();
+jmp p;
+list N;
+poly q;
+poly s;
+int i;
+int j;
+for(i=1; i<=size(G1); i++)
+   {
+           N=list();
+           for(j=1; j<=size(G1[i]); j++)
+              {
+                p=G1[i][j];
+                q=p.h;
+                s=p.t;
+                N[j]=list(q,s);
+               }
+           M[i]=N;
+    }
+//print("M is");
+//print(M);
+p.h=poly(0);
+p.t=poly(0);
+setring H;
+list R=list();
+list S=list();
+//print("anello definito");
+def V=imap(r,V1);
+//def G=imap(r,G1);
+//print(V);
+def MM=imap(r,M);
+list G=list();
+list N=list();
+for(i=1; i<=size(MM); i++)
+   {
+           for(j=1; j<=size(MM[i]); j++)
+              {
+                p.h=MM[i][j][1];
+                p.t=MM[i][j][2];
+                N[j]=p;
+               }
+           G[i]=N;
+    }
+ideal I=0;
+jmp LL;
+jmp UU;
+//print("pronta x ridurre");
+ for(i=1; i<=size(V);i++)
+    {
+//print("sono a V di");
+//print(i);
+       R[i]=list();
+       S[i]=list();
+       I=0;
+              attrib(I,"isSB",1);
+       for(j=1;j<=size(V[i]); j++)
+          {
+//print(j);
+//print("esimo elem");
+            LL=MultiplyJmP(V[i][j],G);
+              LL.t=reduce(t*LL.t,I);
+//I only reduce the tail
+//print(LL.t);
+              LL.t=subst(LL.t,t,1);
+              S[i]=insert(S[i],LL,size(S[i]));
+              LL.h=t*LL.h;
+            R[i]=insert(R[i],LL,size(R[i]));
+             UU=R[i][j];
+              I=I+ideal(UU.h+UU.t);
+              attrib(I,"isSB",1);
+          }
+    }
+//print("ho ridotto");
+list M=list();
+poly q;
+poly s;
+for(i=1; i<=size(S); i++)
+   {
+           N=list();
+           for(j=1; j<=size(S[i]); j++)
+              {
+                p=S[i][j];
+                q=p.h;
+                s=p.t;
+                N[j]=list(q,s);
+               }
+           M[i]=N;
+    }
+p.h=poly(0);
+p.t=poly(0);
+setring r;
+def MM=imap(H,M);
+list MMM=list();
+for(i=1; i<=size(MM); i++)
+   {
+           N=list();
+           for(j=1; j<=size(MM[i]); j++)
+              {
+                p.h=MM[i][j][1];
+                p.t=MM[i][j][2];
+                N[j]=p;
+               }
+           MMM[i]=N;
+    }
+return(MMM);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+ FinalVm(VConst(G2F,6,r) , G2F, r);
+}
+////////////////////////////////////////////////////////////////////
+proc VmConstructor(list G, int c,r)
+"USAGE:     VmConstructor(G,c); G list, c int
+RETURN:   list: R
+NOTE:     At the end separated by degree.
+EXAMPLE:  example VmConstructor; shows an example"
+{
+list V=list();
+V= VConst(G,c);
+//print("VConst");
+//V non ordered
+list L=list();
+list R=list();
+int i;
+// head, position
+//order the different degrees
+for(i=1; i<=size(V); i++)
+   {
+    L[i]=StartOrderingV(V[i], G);
+   }
+//print("finito ordine");
+//multiply and reduce
+//print("Ordinare");
+//R=FinalVm(L, G, r);
+//print("FinalVm");
+return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2 ;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+ VmConstructor(G2F,6,r);
+}
+////////////////////////////////////////////////////////////////////
+proc EKCouples(jmp A, jmp B)
+"USAGE:    CoppiaEK(A,B); A list, B list
+RETURN:   list: L
+NOTE:     At the end the monomials involved by EK.
+EXAMPLE:  example EKCouples; shows an example"
+{
+poly E;
+list L=0,0;
+string s=varstr(basering);
+list VVV=varstr(basering);
+//L will contain results
+poly h=Minimus(variables(A.h));
+//print(h);
+int l=findvars(h,1)[2][1];
+if(l!=nvars(basering))
+ {
+//print("vero");
+//print(l);
+  for(int j=l+1;j<=nvars(basering); j++)
+   {
+    //print("entrata");
+    //print(var(j));
+    E=var(j)*A.h/B.h;
+//Candidate for * product
+    //print(E);
+    if(E!=0)
+      {
+        //print("primo if passato");
+        if(Minimus(variables(B.h))>=Maximus(variables(E)))
+           {
+//Does it work with * ?
+            //print("secondo if passato");
+            L[1]=j;
+            L[2]=E;
+            break;
+           }
+      }
+   }
+  }
+return (L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp A;
+A.h=y*z^2;
+A.t=poly(0);
+jmp B;
+B.h=y^2*z;
+B.t=poly(0);
+EKCouples(A,B);
+EKCouples(B,A);
+}
+////////////////////////////////////////////////////////////////////
+proc EKPolynomials(list G)
+"USAGE:    EKPolynomials(G); G list
+RETURN:   list: EK, list: D
+NOTE:     At the end EK polynomials and their degrees
+
+EXAMPLE:  example EKPolynomials; shows an example"
+{
+list D=list();
+list C=list();
+list N=0,0;
+list EK=list();
+int i;
+int j;
+int k;
+int l;
+jmp p;
+for(i=1; i<=size(G); i++)
+   {
+     for(j=1; j<=size(G[i]); j++)
+        {
+         for(k=1; k<=size(G); k++)
+             {
+               for(l=1; l<=size(G[k]); l++)
+                  {
+                     if(i!=k||j!=l)
+                       {
+//Loop on polynomials
+                        C=EKCouples(G[i][j], G[k][l]);
+//print("coppia");
+                        if(C[2]!=0)
+                          {
+                           C=insert(C,list(i,j,k,l),size(C));
+                           EK=insert(EK,C,size(EK));
+                           p=G[k][l];
+                           D=insert(D,deg(C[2]*p.h),size(D));
+                          }
+                       }
+                  }
+             }
+        }
+   }
+//Double Return
+return(EK, D);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+EKPolynomials(G2F);
+}
+////////////////////////////////////////////////////////////////////
+proc MultEKPolys(list EK, list G)
+"USAGE:    MultEKPolys(G); G list
+RETURN:   list: p
+NOTE:     At the end I obtain the EK polynomials and
+their degrees.
+EXAMPLE:  example MultEKPolys; shows an example"
+{
+jmp u;
+u=G[EK[3][1]][EK[3][2]];
+//print("u");
+jmp q;
+q=G[EK[3][3]][EK[3][4]];
+return(var(EK[1])*(u.h+u.t)-EK[2]*(q.h+q.t));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z), rp;
+jmp r1;
+r1.h=z^3;
+r1.t=poly(0);
+jmp r2;
+r2.h=z^2*y;
+r2.t=poly(0);
+jmp r3;
+r3.h=z*y^2;
+r3.t=-x^2*y;
+jmp r4;
+r4.h=y^5;
+r4.t=poly(0);
+list G2F=list(list(r1,r2,r3),list(r4));
+list EK,D=EKPolynomials(G2F);
+MultEKPolys(EK[2],G2F);
+}
+////////////////////////////////////////////////////////////////////
+proc SchemeEq(list W, list EK,list D,list Q,r)
+"USAGE:    SchemeEq(W,EK,D,Q,r);  W list, EK list, D list, Q list, r ring
+RETURN:    int: i
+NOTE:
+This procedure performs the reduction of EK-polynomials, obtaining
+the J-marked scheme.
+EXAMPLE:  example SchemeEq; shows an example"
+{
+list Jms=list();
+//ideal I;
+list M=list();
+jmp mini;
+mini=W[1][1];
+int minimo=deg(mini.h);
+//multiply variables
+poly pd=poly(1);
+for(int i=1;i<=nvars(r);i++)
+{pd=pd*var(i);}
+//CHANGE RING
+intvec u=NewWeight(nvars(r)+1);
+list L=ringlist(r);
+L[2]=insert(L[2],"t",size(L[2]));
+//print(L[2]);
+list ordlist="a",u;
+L[3]=insert(L[3],ordlist,0);
+def H=ring(L);
+//list
+M=list();
+jmp pu;
+list N;
+poly q;
+poly s;
+i=0;
+int j;
+for(i=1; i<=size(Q); i++)
+   {
+           N=list();
+           for(j=1; j<=size(Q[i]); j++)
+              {
+                pu=Q[i][j];
+                q=pu.h;
+                s=pu.t;
+                N[j]=list(q,s);
+               }
+           M[i]=N;
+    }
+list O;
+pu.h=poly(0);
+pu.t=poly(0);
+for(i=1; i<=size(W); i++)
+   {
+           N=list();
+           for(j=1; j<=size(W[i]); j++)
+              {
+                pu=W[i][j];
+                q=pu.h;
+                s=pu.t;
+                N[j]=list(q,s);
+               }
+           O[i]=N;
+    }
+pu.h=poly(0);
+pu.t=poly(0);
+setring H;
+list R=list();
+list S=list();
+//print("anello definito");
+def EK=imap(r,EK);
+def MM=imap(r,M);
+def OO=imap(r,O);
+def pd=imap(r,pd);
+list G=list();
+list N=list();
+for(i=1; i<=size(MM); i++)
+   {
+           for(j=1; j<=size(MM[i]); j++)
+              {
+                pu.h=MM[i][j][1];
+                pu.t=MM[i][j][2];
+                N[j]=pu;
+               }
+           G[i]=N;
+    }
+list V;
+for(i=1; i<=size(OO); i++)
+   {
+           for(j=1; j<=size(OO[i]); j++)
+              {
+                pu.h=OO[i][j][1];
+                pu.t=OO[i][j][2];
+                N[j]=pu;
+               }
+           V[i]=N;
+    }
+//print(V);
+//print(G);
+matrix C;
+list COEFF;
+poly p=0;
+poly q=0;
+ideal I;
+list M;
+i=0;
+jmp g;
+int k;
+for(j=1; j<=size(EK);j++)
+      {
+       //print("arrivo");
+       //print(j);
+       p=MultEKPolys(EK[j],G);
+       //ideal
+        I=0;
+       if (size(V[D[j]-minimo+1])!=0)
+           {
+            M=list();
+          //  jmp g;
+       for(i=1; i<= size(V[D[j]-minimo+1]); i++)
+           {
+            g=V[D[j]-minimo+1][i];
+            g.h=(g.h)*t;
+            M[i]=g.h+g.t;
+          }
+      I=M[1..size(M)];
+     attrib(I,"isSB",1);
+//print(I);
+  }
+//print(I);
+q=reduce(t*p,I);
+q=subst(q,t,1);
+       C=coef(q,pd);
+       COEFF=C[2,1..ncols(C)];
+       for(k=1;k<=size(COEFF);k++)
+          {
+            if(COEFF[k]!=0)
+           { Jms=insert(Jms,COEFF[k],size(Jms));}
+          }
+      }
+setring r;
+def Jms=imap(H,Jms);
+return(Jms);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z),rp;
+ ideal Borid=y^2*z,y*z^2,z^3,y^5;
+attrib(Borid,"isSB",1);
+    list B=ArrangeBorel(Borid);
+    list NumN;
+    list N;
+    int i;
+    int d;
+    for(i=1;i<=size(B);i++)
+       {
+        d=deg(B[i][1]);
+        N[i]=kbase(Borid,d);
+        NumN[i]=size(N[i]);
+       }
+int qc=NumNewVar(B, NumN);
+//Now I must define the NEW RING,
+//putting the c parameters inside.
+list L=ringlist(r);
+list L2;
+L2[1]=L[1];
+L2[2]=list();
+for(i=qc;i>=1;i--)
+    {
+     L2[2][i]="c("+string(i)+")";
+    }
+L2[3]=list(list("rp",qc));
+L2[4]=L[4];
+L[1]=L2;
+if(defined(K)){kill K;}
+def K=ring(L);
+export K;
+setring(K);
+def Borid=imap(r,Borid);
+def N=imap(r,N);
+def B=imap(r,B);
+//NumN contains only scalars so I do not imap it
+int j;
+list Q;
+int s;
+list M;
+jmp pp;
+for(i=1;i<=size(B);i++)
+    {
+      Q[i]=list();
+     for(j=1;j<=size(B[i]);j++)
+        {
+          M=NewTails(N[i],s);
+          pp.h=B[i][j];
+          pp.t=M[1];
+          Q[i][j]=pp;
+          s=s+M[2];
+          //print(s);
+        }
+    }
+list P=ArrangeTails(Q);
+list EK,D= EKPolynomials(P);
+     int massimo=Max(D);
+//list V=VConst(P, massimo);
+//pause();
+list V=VmConstructor(P,massimo,r);
+list W=FinalVm(V,P,K);
+//print("I V ridotti in ordine sono");
+//print(W);
+list Jms=SchemeEq(W,EK,D,P,K);
+Jms;}
+
+//////////////////////////////////////////////////////////////////////
+proc JMarkedScheme(ideal Borid,r)
+"USAGE:    JMarkedScheme(Borid, r);  Borid ideal, r ring
+RETURN:    list: Jms
+NOTE:
+This procedure performs automatically the whole construction
+of the J-marked scheme.
+EXAMPLE:  example JMarkedScheme; shows an example"
+{
+list Jms;
+if(BorelCheck(Borid,r))
+  {
+   if(size(Borid)==1)
+     { Jms=list();}
+  else{
+    //print("Input is OK");
+    attrib(Borid,"isSB",1);
+    list B=ArrangeBorel(Borid);
+    list NumN;
+    list N;
+    int i;
+    int d;
+    for(i=1;i<=size(B);i++)
+       {
+        d=deg(B[i][1]);
+        N[i]=kbase(Borid,d);
+        NumN[i]=size(N[i]);
+       }
+int qc=NumNewVar(B, NumN);
+if(qc==0)
+{Jms=list(0);}
+else
+ {
+//Now I must define the NEW RING,
+//putting the c parameters inside.
+list L=ringlist(r);
+list L2;
+L2[1]=L[1];
+L2[2]=list();
+for(i=qc;i>=1;i--)
+    {
+     L2[2][i]="c("+string(i)+")";
+    }
+L2[3]=list(list("rp",qc));
+L2[4]=L[4];
+L[1]=L2;
+if(defined(K)){kill K;}
+def K=ring(L);
+export K;
+setring(K);
+def Borid=imap(r,Borid);
+def N=imap(r,N);
+def B=imap(r,B);
+//NumN contains only scalars so I do not imap it
+int j;
+list Q;
+int s;
+list M;
+jmp pp;
+for(i=1;i<=size(B);i++)
+    {
+      Q[i]=list();
+     for(j=1;j<=size(B[i]);j++)
+        {
+          M=NewTails(N[i],s);
+          pp.h=B[i][j];
+          pp.t=M[1];
+          Q[i][j]=pp;
+          s=s+M[2];
+          //print(s);
+        }
+    }
+list P=ArrangeTails(Q);
+list EK,D= EKPolynomials(P);
+     int massimo=Max(D);
+//list V=VConst(P, massimo);
+//pause();
+list V=VmConstructor(P,massimo,r);
+list W=FinalVm(V,P,K);
+//print("I V ridotti in ordine sono");
+//print(W);
+//list
+Jms=SchemeEq(W,EK,D,P,K);
+keepring K;}
+}
+  }
+else
+   {
+    print("WRONG IDEAL IN INPUT");
+    print("It is NOT BOREL");
+   }
+return(Jms);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y,z),rp;
+ ideal Borid=y^2*z,y*z^2,z^3,y^5;
+JMarkedScheme(Borid,r);
+}
+////////////////////////////////////////////////////////////////////

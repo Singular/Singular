@@ -47,7 +47,7 @@ static proc const_mat(matrix A)
   int i;
   int n=ncols(A);
   def BR=basering;
-  def @R=changeord("dp,c",BR);
+  def @R=changeord(list(list("dp",1:nvars(basering)),list("c",0:1)));
   setring @R;
   matrix A=fetch(BR,A);
   for(i=1;i<=n;i=i+1){
@@ -156,7 +156,8 @@ EXAMPLE:  example inverse; shows an example
    {
      u=1;
      string mp = string(minpoly);
-     def @R=changeord("C,dp", R); setring @R;
+     def @R=changeord(list(list("C",0:1),list("dp",1:nvars(basering))));
+     setring @R;
      if (mp != string(minpoly)) 
      {
        execute("minpoly = " + mp + ";");
@@ -554,7 +555,6 @@ EXAMPLE: example charpoly_B; shows an example"
   int n     = nrows(A);
   poly X    = 0;
   def BR    = basering;
-  string mp = string(minpoly);
 
   if(ncols(A) != n){
     "// input is not a square matrix";
@@ -583,17 +583,11 @@ EXAMPLE: example charpoly_B; shows an example"
   }
 
   //var cannot be in A
-  s="Wp(";
-  for( i=1; i<=nvars(BR); i++ ){
-    if(i!=j){ s=s+"0";}
-    else{ s=s+"1";}
-    if( i<nvars(BR)) {s=s+",";}
-  }
-  s=s+")";
+  intvec is=0:nvars(BR);
+  is[j]=1;
 
-  def @R=changeord(s);
+  def @R=changeord(list(list("Wp",is)));
   setring @R;
-  execute("minpoly="+mp+";");
   matrix A = imap(BR,A);
   for(i=1; i<=n; i++){
     if(deg(lead(A)[i])>=1){

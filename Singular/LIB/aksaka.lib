@@ -324,7 +324,7 @@ EXAMPLE:example ask; shows an example
   M2=intPart(M^2);                // 3 und 4 integriert
   r=2;
 
-  if(gcdN(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
+  if(gcd(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
                     // Schritt 3 des ASK-Alg.
   {
     if(printlevel>=1){"Zahl r gefunden mit r|n";"r=";r;pause();}
@@ -357,7 +357,7 @@ EXAMPLE:example ask; shows an example
         return(e);
       }
       r=r+1;
-      if(gcdN(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
+      if(gcd(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
                          //wird aufgrund von Schritt 3 des ASK-Alg. fuer
                          //jeden Kandidaten r getestet
       {

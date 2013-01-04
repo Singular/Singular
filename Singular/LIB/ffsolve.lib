@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="$Id: ffsolve.lib f0fdb24 2012-04-23 12:50:26 UTC$";
+version="$Id$";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: ffsolve.lib        multivariate equation solving over finite fields
@@ -20,7 +20,6 @@ LIB "general.lib";
 LIB "ring.lib";
 LIB "standard.lib";
 LIB "matrix.lib";
-LIB "arcpoint.lib"; //stattdessen das, wo auch varstr vorkommt
 
 ////////////////////////////////////////////////////////////////////
 proc ffsolve(ideal equations, list #)
@@ -320,7 +319,7 @@ ASSUME:         basering is a finite field of type (p^n,a)
   list results, slvbl, linsol, ctrl, new_sols, varinfo;
   ideal I, linear_solution, unsolved_part, univar_part, multivar_part, unsolved_vars;
   intvec unsolved_var_nums;
-  list new_vars;
+  string new_vars;
   // check assumptions
   if(npars(basering)>1){
     ERROR("Basering must have at most one parameter");
@@ -388,11 +387,7 @@ ASSUME:         basering is a finite field of type (p^n,a)
       unsolved_var_nums = varinfo[4];
       number_new_vars = ncols(unsolved_vars);
 
-      list new_vars;
-      for(int i = number_new_vars; i>=1; i--)
-      {
-        new_vars[i]=  "@y("+string(i)+")";
-      }
+      new_vars = "@y(1.."+string(number_new_vars)+")";
       def R_new = changevar(new_vars, original_ring);
       setring R_new;
       if( !prime_coeff_field ){
@@ -587,12 +582,9 @@ ASSUME:         basering is a finite field of type (p^n,a)
   I_subs = ideal(matrix(IX_power_var,1,nv)*M_C_sol);
 
   setring original_ring;
-//  string var_str = varstr(original_ring)+",@X,@y";
-  list l1 = varlist(original_ring);
-  list l2 = "@X", "@Y";
-  list var_list = l1+l2;
+  string var_str = varstr(original_ring)+",@X,@y";
   string minpoly_str = "minpoly="+string(minpoly)+";";
-  def ring_for_substitution = Ring::changevar(var_list, original_ring);
+  def ring_for_substitution = Ring::changevar(var_str, original_ring);
 
   setring ring_for_substitution;
   execute(minpoly_str);
@@ -714,13 +706,10 @@ static proc linearReduce(ideal I, list mons)
     string minpolystr = "minpoly="
     +get_minpoly_str(size(original_ring),parstr(original_ring,1))+";" ;
   }
-  list old_vars = varlist(original_ring);
-  list new_vars;
-  for(int i = 1; i<=number_of_monomials; i++){
-    new_vars = insert(new_vars, "@y("+string(i)+")", i-1);
-  }
+  string old_vars = varstr(original_ring);
+  string new_vars = "@y(1.."+string( number_of_monomials )+")";
 
-  def ring_for_var_change = changevar( old_vars+new_vars, original_ring);
+  def ring_for_var_change = changevar( old_vars+","+new_vars, original_ring);
   setring ring_for_var_change;
   if( prime_field == 0){
     execute(minpolystr);
@@ -729,15 +718,12 @@ static proc linearReduce(ideal I, list mons)
   list monomials = imap(original_ring, monomials);
   ideal I = imap(original_ring, I);
   ideal C;
-  string weights = "wp(";
-  for(i=1; i<=nvars(original_ring); i++){
-    weights = weights+string(1)+",";
-  }
+  intvec weights=1:nvars(original_ring);
+
   for(i=1; i<= number_of_monomials; i++){
     C[i] = monomials[i] - @y(i);
-    weights = weights+string(deg(monomials[i])+1)+",";
+    weights = weights,deg(monomials[i])+1;
   }
-  weights[size(weights)]=")";
   ideal linear_eqs = I;
   for(i=1; i<=ncols(C); i++){
     linear_eqs = reduce(linear_eqs, C[i]);
@@ -751,8 +737,7 @@ static proc linearReduce(ideal I, list mons)
 
   ideal I = imap(ring_for_var_change, linear_eqs);
   ideal lin_sol = solvelinearpart(I);
-  string new_ordstr = weights+",C";
-  def ring_for_back_change = changeord( new_ordstr, ring_for_var_change);
+  def ring_for_back_change = changeord( list(list("wp",weights),list("C",0:1)), ring_for_var_change);
 
   setring ring_for_back_change;
   if( prime_field == 0){
@@ -871,11 +856,8 @@ static proc clonering(list #)
   }else{
     int newvars = nvars(original_ring);
   }
-  list newvarlist;
-  for(int i = 1; i<=newvars; i++){
-    newvarlist = insert(newvarlist, "v("+string(i)+")", i-1);
-  }
-  def newring = changevar(newvarlist, original_ring);
+  string newvarstr = "v(1.."+string(newvars)+")";
+  def newring = changevar(newvarstr, original_ring);
   setring newring;
   if( prime_field ){
     execute(minpolystr);

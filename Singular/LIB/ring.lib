@@ -5,9 +5,9 @@ info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
 
 PROCEDURES:
- changechar(\"R\",c[,r]); make a copy R of basering [ring r] with new char c
- changeord(\"R\",o[,r]);  make a copy R of basering [ring r] with new ord o
- changevar(\"R\",v[,r]);  make a copy R of basering [ring r] with new vars v
+ changechar(c[,r]); make a copy of basering [ring r] with new char c
+ changeord(o[,r]);  make a copy of basering [ring r] with new ord o
+ changevar(v[,r]);  make a copy of basering [ring r] with new vars v
  defring(\"R\",c,n,v,o);  define a ring R in specified char c, n vars v, ord o
  defrings(n[,p]);         define ring Sn in n vars, char 32003 [p], ord ds
  defringp(n[,p]);         define ring Pn in n vars, char 32003 [p], ord dp
@@ -16,10 +16,10 @@ PROCEDURES:
  imapall(R[,str]);        imap all objects of ring R to basering
  mapall(R,i[,str]);       map all objects of ring R via ideal i to basering
  ord_test(R);             test wether ordering of R is global, local or mixed
- ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
+ ringtensor(s,t,..);      create ring, tensor product of rings s,t,...
  ringweights(r);          intvec of weights of ring variables of ring r
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
- rootofUnity(n);         the minimal polynomial for the n-th primitive root of unity
+ rootofUnity(n);          the minimal polynomial for the n-th primitive root of unity
              (parameters in square brackets [] are optional)
 ";
 
@@ -28,79 +28,61 @@ LIB "general.lib";
 LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changechar (string c, list #)
-"USAGE:   changechar(c[,r]);  c=string, r=ring
+proc changechar (list @L, list #)
+"USAGE:   changechar(c[,r]);  c=list, r=ring
 RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
-         charstr(r) to c.
-NOTE:    Works for qrings if map from old_char to new_char is implemented.
-         This proc uses 'execute' or calls a procedure using 'execute'.
+         ringlist(r)[1] to c.
 EXAMPLE: example changechar; shows an example
 "
 {
+   def save_ring=basering;
    if( size(#)==0 ) { def @r=basering; }
    if(( size(#)==1 ) and (typeof(#[1])=="ring")) { def @r=#[1]; }
    setring @r;
-   ideal i = ideal(@r); int @q = size(i);
-   if( @q!=0 )
-      { string @s = "Rnew1"; }
-   else
-      { string @s = "Rnew"; }
-   string @newring = @s+"=("+c+"),("+varstr(@r)+"),("+ordstr(@r)+");";
-   execute("ring "+@newring);
-   if( @q!=0 )
-   {
-      map phi = @r,maxideal(1);
-      ideal i = phi(i);
-      attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      qring Rnew=i;
-   }
+   list rl=ringlist(@r);
+   if(defined(@L)!=voice) { def @L=fetch(save_ring,@L); }
+   if (size(@L)==1) { rl[1]=@L[1];} else { rl[1]=@L;}
+   def Rnew=ring(rl);
+   setring save_ring;
    return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
+   ring rr=2,A,dp;
    ring r=0,(x,y,u,v),(dp(2),ds);
-   def R=changechar("2,A"); R;"";
-   def R1=changechar("32003",R); setring R1; R1;
+   def R=changechar(ringlist(rr)); R;"";
+   def R1=changechar(32003,R); setring R1; R1;
    kill R,R1;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changeord (string o, list #)
-"USAGE:   changeord(newordstr[,r]);  newordstr=string, r=ring/qring
+proc changeord (list @o, list #)
+"USAGE:   changeord(neword[,r]);  newordstr=list, r=ring/qring
 RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
-         ordstr(r) to newordstr. If, say, newordstr=(\"R\",\"wp(2,3),dp\") and
-         if the ring r exists and has >=3 variables, the ring R will be
+         order(r) to neword.
+         If, say, neword=list(list(\"wp\",intvec(2,3)),list(list(\"dp\",1:(n-2))));
+         and if the ring r exists and has n variables, the ring R will be
          equipped with the monomial ordering wp(2,3),dp.
-NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example changeord; shows an example
 "
 {
+   def save_ring=basering;
    if( size(#)==0 ) { def @r=basering; }
    if( size(#)==1 ) { def @r=#[1]; }
    setring @r;
-   ideal i = ideal(@r); int @q = size(i);
-   if( @q!=0 )
-      { string @s = "Rnew1"; }
-   else
-      { string @s = "Rnew"; }
-   string @newring = @s+"=("+charstr(@r)+"),("+varstr(@r)+"),("+o+");";
-   execute("ring "+@newring);
-   if( @q!=0 )
-   {
-      map phi = @r,maxideal(1);
-      ideal i = phi(i);
-      attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      qring Rnew=i;
-   }
+   list rl=ringlist(@r);
+   rl[3]=@o;
+   def Rnew=ring(rl);
+   setring save_ring;
    return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,u,v),(dp(2),ds);
-   def R=changeord("wp(2,3),dp"); R; "";
+   def R=changeord(list(list("wp",intvec(2,3)),list("dp",1:2))); R; "";
    ideal i = x^2,y^2-u^3,v;
    qring Q = std(i);
-   def Q'=changeord("lp",Q); setring Q'; Q';
+   def Q'=changeord(list(list("lp",nvars(Q))),Q); setring Q'; Q';
    kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -425,7 +407,7 @@ NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
          1st, 2nd, ... variable of the basering.
          The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
-CAUTION: fetchall does not work inside a procedure.
+CAUTION: fetchall does not work for locally defined names.
          It does not work if R contains a map.
 SEE ALSO: imapall
 EXAMPLE: example fetchall; shows an example
@@ -434,7 +416,7 @@ EXAMPLE: example fetchall; shows an example
    list @L@=names(R);
    int @ii@; string @s@;
    if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
-   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-1 )
+   for( @ii@=size(@L@); @ii@>0; @ii@-- )
    {
       execute("def "+@L@[@ii@]+@s@+"=fetch(R,`@L@[@ii@]`);");
       execute("export "+@L@[@ii@]+@s@+";");
@@ -471,7 +453,7 @@ NOTE:    As imap, this procedure maps the variables of R to the variables with
          the same name in the basering, the other variables are mapped to 0.
          The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
-CAUTION: imapall does not work inside a procedure
+CAUTION: imapall does not work for locally defined names.
          It does not work if R contains a map
 SEE ALSO: fetchall
 EXAMPLE: example imapall; shows an example
@@ -480,7 +462,7 @@ EXAMPLE: example imapall; shows an example
    list @L@=names(R);
    int @ii@; string @s@;
    if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
-   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-1 )
+   for( @ii@=size(@L@); @ii@>0; @ii@-- )
    {
          execute("def "+@L@[@ii@]+@s@+"=imap(R,`@L@[@ii@]`);");
          execute("export "+@L@[@ii@]+@s@+";");
@@ -520,14 +502,14 @@ NOTE:    This procedure has the same effect as defining a map, say psi, by
          mapall may be combined with copyring to change vars for all objects.
          The 3rd argument is useful in order to avoid conflicts of names, the
          empty string is allowed.
-CAUTION: mapall does not work inside a procedure.
+CAUTION: mapall does not work for locally defined names.
 EXAMPLE: example mapall; shows an example
 "
 {
    list @L@=names(R); map @psi@ = R,i;
    int @ii@; string @s@;
    if( size(#) > 0 ) { @s@=@s@+"_"+#[1]; }
-   for( @ii@=size(@L@); @ii@>0; @ii@=@ii@-1 )
+   for( @ii@=size(@L@); @ii@>0; @ii@-- )
    {
       execute("def "+@L@[@ii@]+@s@+"=@psi@(`@L@[@ii@]`);");
       execute("export "+@L@[@ii@]+@s@+";");
@@ -563,6 +545,7 @@ proc ord_test (r)
 "USAGE:   ord_test(r);  r ring/qring
 RETURN:  int 1 (resp. -1, resp. 0) if ordering of r is global (resp. local,
          resp. mixed)
+SEE ALSO: attrib
 EXAMPLE: example ord_test; shows an example
 "
 {

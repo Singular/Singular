@@ -6,7 +6,9 @@ LIBRARY: gkdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
 AUTHORS: Lobillo, F.J.,     jlobillo@ugr.es
 @*         Rabelo, C.,        crabelo@ugr.es
 
-SUPPORT: 'Metodos algebraicos y efectivos en grupos cuanticos', BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
+Support: 'Metodos algebraicos y efectivos en grupos cuanticos', BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
+
+NOTE: The built-in command @code{dim}, executed for a module in @plural, computes the Gelfand-Kirillov dimension.
 
 PROCEDURES:
   GKdim(M);        Gelfand-Kirillov dimension computation of the factor-module, whose presentation is given by the matrix M.

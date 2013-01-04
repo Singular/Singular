@@ -287,37 +287,10 @@ EXAMPLE: example factor; shows an example
   intvec @v,@w;
   int @j,@k,@n;
 
-  if(deg(p)<=1)
-  {
-    @i=ideal(p);
-    @v=1;
-    @l[1]=@i;
-    @l[2]=@v;
-    return(@l);
-  }
-  if (size(p)==1)
-  {
-    @w=leadexp(p);
-    for(@j=1;@j<=nvars(basering);@j++)
-    {
-      if(@w[@j]!=0)
-      {
-        @k++;
-        @v[@k]=@w[@j];
-        @i=@i+ideal(var(@j));
-      }
-    }
-    @l[1]=@i;
-    @l[2]=@v;
-    return(@l);
-  }
-  //  @l=factorize(p,2);
   @l=factorize(p);
-  // if(npars(basering)>0)
-  // {
     for(@j=1;@j<=size(@l[1]);@j++)
     {
-      if(deg(@l[1][@j])==0)
+      if(leadcoef(@l[1][@j])==@l[1][@j])
       {
         @n++;
       }
@@ -336,7 +309,7 @@ EXAMPLE: example factor; shows an example
         int pleh;
         for(@j=1;@j<=size(@l[1]);@j++)
         {
-          if(deg(@l[1][@j])!=0)
+          if(leadcoef(@l[1][@j])!=@l[1][@j])
           {
             @k++;
             @i=@i+ideal(@l[1][@j]);
@@ -3000,6 +2973,7 @@ EXAMPLE: example decomp; shows an example
       setring @P;
       primary=imap(gnir,primary);
     }
+    option(set,op);
     return(primary);
   }
 
@@ -4111,15 +4085,19 @@ static proc min_ass_prim_charsets (ideal PS, int cho)
   {
     ERROR("<int> must be 0 or 1");
   }
+  intvec saveopt=option(get);
   option(notWarnSB);
+  list L;
   if(cho==0)
   {
-    return(min_ass_prim_charsets0(PS));
+    L=min_ass_prim_charsets0(PS);
   }
   else
   {
-     return(min_ass_prim_charsets1(PS));
+    L=min_ass_prim_charsets1(PS);
   }
+  option(set,saveopt);
+  return(L);
 }
 ///////////////////////////////////////////////////////
 // min_ass_prim_charsets0
@@ -4356,7 +4334,6 @@ static proc prim_dec(ideal I, int choose)
   {
     ERROR("ERROR: <int> must be 0 or 1 or 2 or 3");
   }
-  option(notWarnSB);
   ideal H=1; // The intersection of the primary components
   list U;    // the leaves of the decomposition tree, i.e.,
              // pairs consisting of a primary component of I
@@ -4388,6 +4365,8 @@ static proc prim_dec(ideal I, int choose)
   {
     return(list());
   }
+  intvec save=option(get);
+  option(notWarnSB);
   int ncolsSI=ncols(SI);
   int ncolsH=1;
   W[1]=list(I,1,0,poly(1),ideal(0),list()); // The root of the tree
@@ -4464,6 +4443,7 @@ static proc prim_dec(ideal I, int choose)
         }
         if(check==0) // H==I => U is a primary decomposition
         {
+	  option(set,save);
           return(U);
         }
       }
@@ -4506,7 +4486,6 @@ static proc prim_dec(ideal I, int choose)
                          // the "minimal divisor" of the seperator
                          // as computed by the procedure minsat,
                          // SRest=standard basis of remaining component
-
       }
       //check
       for(i=size(QQ);i>=1;i--)
@@ -4548,6 +4527,7 @@ static proc prim_dec(ideal I, int choose)
       }
     }
   }
+  option(set,save);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -5131,7 +5111,7 @@ EXAMPLE: example primdecGTZ; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5215,7 +5195,7 @@ EXAMPLE: example absPrimdecGTZ; shows an example
 // hence prepare to go back to an appropriate new ring
       def r=basering;
       ideal max_of_r=maxideal(1);
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       def I=imap(r,I);
       def S=absPrimdecGTZ(I);
@@ -5375,7 +5355,7 @@ EXAMPLE: example primdecSY; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5451,7 +5431,7 @@ EXAMPLE: example minAssGTZ; shows an example
   // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5554,7 +5534,7 @@ EXAMPLE: example minAssChar; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // decompose and go back
@@ -5638,7 +5618,7 @@ EXAMPLE: example radical; shows an example
 // algorithms only work in global case!
 // pass to appropriate global ring
       def r=basering;
-      def s=changeord("dp");
+      def s=changeord(list(list("dp",1:nvars(basering))));
       setring s;
       ideal i=imap(r,i);
 // compute radical and go back

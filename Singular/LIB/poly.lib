@@ -70,9 +70,10 @@ EXAMPLE: example hilbPoly; shows an example
    int n=1;
    for(i=2;i<=s-1;i++){n=n*i;}
    p=n*p;
-   for(i=1;i<=s;i++)
+   hp[s]=int(leadcoef(p));
+   for(i=2;i<=size(p);i++)
    {
-      hp[i]=int(leadcoef(p[s-i+1]));
+      hp[leadexp(p[i])+1]=int(leadcoef(p[i]));
    }
    setring R;
    return(hp);

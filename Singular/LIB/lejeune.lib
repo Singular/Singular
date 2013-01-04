@@ -382,14 +382,14 @@ static proc ringchange (int i)
           #(variables of basering)*i new variables"
 
 {
-  def R=changevar(""+varstr(basering)+",t,"+variables(nvars(basering),i)+"");
+  def R=changevar(""+varstr(basering)+",t,"+variables_list(nvars(basering),i)+"");
   return(R);
 }
 
 
 //////////////////////////////////////////////////////////////////////
-static proc variables (int k,int i)
-"USAGE:   variables(k,i); k,i integer
+static proc variables_list (int k,int i)
+"USAGE:   variables_list(k,i); k,i integer
  RETURN:  string of the names of the additional variables
  NOTE:    called from ringchange, we use this procedure to obtain
           a convenient shape of the ring created in ringchange"

@@ -1,0 +1,862 @@
+////////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category = "Commutative Algebra";
+info="
+LIBRARY:  divisors.lib      Divisors and P-Divisors
+
+AUTHORS:  Janko Boehm       boehm@mathematik.uni-kl.de
+@*        Lars Kastner      kastner@math.fu-berlin.de
+@*        Benjamin Lorenz   blorenz@math.uni-frankfurt.de
+@*        Hans Schoenemann  hannes@mathematik.uni-kl.de
+@*        Yue Ren           ren@mathematik.uni-kl.de
+
+OVERVIEW:
+
+We implement a class divisor on an algebraic variety and methods
+for computing with them. Divisors are represented by tuples of ideals
+defining the positive and the negative part. In particular, we implement the group
+structure on divisors, computing global sections and testing linear
+equivalence.
+
+In addition to this we provide a class formaldivisor which implements
+integer formal sums of divisors (not necessarily prime). A formal divisor
+can be evaluated to a divisor, and a divisor can be decomposed into
+a formal sum.
+
+Finally we provide a class pdivisor which implements polyhedral formal sums of
+divisors (P-divisors) where the coefficients are assumed to be polyhedra with fixed tail cone.
+There is a function to evaluate a P-divisor on a vector in the dual of the tail cone. The
+result will be a formal divisor.
+
+
+REFERENCES:
+
+For the class divisor we closely follow Macaulay2's tutorial on divisors.
+
+
+PROCEDURES:
+
+makeDivisor(ideal,ideal)                        create a divisor
+divisorplus(divisor,divisor)                    add two divisors
+multdivisor(int,divisor)                        multiply a divisor by an interger
+negativedivisor(divisor)                        compute the negative of the divisor
+normalForm(divisor)                             normal form of a divisor
+isEqualDivisor(divisor,divisor)                 test whether two divisors are equal
+globalSections(divisor)                         compute the global sections of a divisor
+degreeDivisor(divisor)                          degree of a divisor
+linearlyEquivalent(divisor,divisor)             test whether two divisors a linearly equivalent
+effective(divisor)                              compute an effective divisor
+                                                linearly equivalent to a divisor
+
+makeFormalDivisor(list)                         make a formal integer sum of divisors
+evaluateFormalDivisor(formaldivisor)            evalutate a formal sum of divisors to a divisor
+formaldivisorplus(formaldivisor,formaldivisor)  add two formal divisors
+negativeformaldivisor(formaldivisor)            compute the negative of the formal divisor
+multformaldivisor(int,formaldivisor)            multiply a formal divisor by an interger
+degreeFormalDivisor(formaldivisor)              degree of a formal divisor
+
+makePDivisor(List)                              make a formal polyhedral sum of divisors
+evaluatePDivisor(pdivisor,intvec)               evaluate a polyhedral divisor
+                                                to an integer formal divisor
+pdivisorplus(pdivisor,pdivisor)                 add two polyhedral divisors
+
+
+";
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+LIB "primdec.lib";
+
+proc mod_init()
+{
+newstruct("divisor","ideal den,ideal num");
+newstruct("formaldivisor","list summands");
+newstruct("pdivisor","list summands, cone tail");
+
+system("install","divisor","print",divisor_print,1);
+system("install","divisor","+",divisorplus,2);
+system("install","divisor","*",proxymultdivisor,2);
+system("install","formaldivisor","print",formaldivisor_print,1);
+system("install","formaldivisor","+",formaldivisorplus,2);
+system("install","formaldivisor","*",proxymultformaldivisor,2);
+system("install","pdivisor","+",pdivisorplus,2);
+}
+
+
+
+proc divisor_print(divisor D)
+"USAGE:  divisor_print(D); D; D = divisor. @*
+ASSUME:  D is a divisor.
+RETURN:  Will print D.
+KEYWORDS: divisors
+EXAMPLE: example divisor_print; shows an example
+"
+{
+"("+string(D.num)+") - ("+string(D.den)+")";
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor P = makeDivisor(ideal(x,z),ideal(1));
+P;
+}
+
+
+proc formaldivisor_print(formaldivisor fD)
+"USAGE:  formaldivisor_print(D); D; D = formaldivisor. @*
+ASSUME:  fD is a formaldivisor.
+RETURN:  Will print fD.
+KEYWORDS: divisors
+EXAMPLE: example formaldivisor_print; shows an example
+"
+{
+  int i; string s; list L=fD.summands;
+  list cd; int c; divisor d;
+  string linebreak =
+"
+";
+  for (i=1; i<=size(L); i++)
+  {
+    cd=L[i]; c=cd[1]; d=cd[2];
+    if (i>1 && c>=0) { s = s + "+"; }
+    s = s + string(c)+"*( ("+string(d.num)+") - ("+string(d.den)+") )";
+    if (i!=size(L)) { s = s + linebreak; }
+  }
+  s;
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor P = makeDivisor(ideal(x,z),ideal(1));
+P;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// divisors as numerator and denomiator ideals
+
+proc makeDivisor(ideal I, ideal J)
+"USAGE:  makeDivisor(I ,J); I = ideal, J = ideal. @*
+ASSUME:  I and J are ideals in a qring Q of a smooth irreducible variety X
+         such that any ideal in Q satisfies the S2 condition.
+RETURN:  a divisor on X
+THEORY:  The procedure will eliminate all components which are not of codimension 1.
+         The S2 condition requires that every proper nonzero principal ideal
+         has pure codimension 1.
+KEYWORDS: divisors
+EXAMPLE: example makeDivisor; shows an example
+"
+{
+divisor C;
+C.num = purify1(I);
+C.den = purify1(J);
+return(C);
+}
+
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor P = makeDivisor(ideal(x,z),ideal(1));
+}
+
+
+proc divisorplus(divisor A, divisor B)
+"USAGE:  divisorplus(A ,B); A + B; A = divisor, B = divisor. @*
+ASSUME:  A and B are divisors on X.
+RETURN:  a divisor on X
+THEORY:  The procedure will compute the product of the numerator
+         and denominator ideals, respectively.
+KEYWORDS: divisors
+EXAMPLE: example divisorplus; shows an example
+"
+{
+return(makeDivisor(interred(A.num*B.num),interred(A.den*B.den)));
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+A+B;
+}
+
+
+proc multdivisor(int n, divisor A)
+"USAGE:  multdivisor(n ,A); A*n; n = integer, A = divisor.@*
+ASSUME:  n is an integer and A is a divisor on X.
+RETURN:  a divisor on X
+THEORY:  The procedure will compute the n-th power of the numerator
+         and denominator ideals, respectively.
+KEYWORDS: divisors
+EXAMPLE: example multdivisor; shows an example
+"
+{
+if (n<0) {return(multdivisor(-n,negativedivisor(A)));}
+return(makeDivisor(interred((A.num)^n),interred((A.den)^n)));
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+A;
+divisor D = multdivisor(4,A);
+D;
+A*4;
+}
+
+
+/***
+ * For operator overloading, which needs a procedure which takes a divisor first
+ * and integer second.
+ **/
+proc proxymultdivisor(divisor A, int n)
+{
+if (n<0) {return(multdivisor(-n,negativedivisor(A)));}
+return(makeDivisor(interred((A.num)^n),interred((A.den)^n)));
+}
+
+
+proc negativedivisor(divisor A)
+"USAGE:  negativedivisor(A); A*(-1); A = divisor.@*
+ASSUME:  A is a divisor on X.
+RETURN:  a divisor on X
+THEORY:  The procedure will interchange the numerator and denominator ideals.
+KEYWORDS: divisors
+EXAMPLE: example negativedivisor; shows an example
+"
+{
+divisor B;
+B.num=A.den;
+B.den=A.num;
+return(B);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+A;
+divisor D = negativedivisor(A);
+D;
+}
+
+
+proc normalForm(divisor A)
+"USAGE:  normalForm(A); A = divisor.@*
+ASSUME:  A is a divisor on X.
+RETURN:  different representative of the same divisor on X
+THEORY:  The procedure will cancel common components of numerator and denominator.
+KEYWORDS: divisors
+EXAMPLE: example normalForm; shows an example
+"
+{
+divisor B;
+B.num=quotient(A.num,A.den);
+B.den=quotient(A.den,A.num);
+return(B);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+divisor D = (A+B)+multdivisor(-1,B);
+D;
+normalForm(D);
+}
+
+
+
+
+static proc isEqualIdeal(ideal A,ideal B){
+return((size(NF(A,std(B)))==0) && (size(NF(B,std(A)))==0));
+}
+
+
+proc isEqualDivisor(divisor A,divisor B)
+"USAGE:  isEqualDivisor(A,B); A = divisor, B = divisor.@*
+ASSUME:  A and B are divisors on X.
+RETURN:  int 0 or 1, checks equality of A and B.
+THEORY:  The procedure will compute the normal forms of A and B and compare.
+KEYWORDS: divisors
+EXAMPLE: example isEqualDivisor; shows an example
+"
+{
+A=normalForm(A);
+B=normalForm(B);
+return((isEqualIdeal(A.num,B.num)) && (isEqualIdeal(A.den,B.den)));
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+divisor D = (A+B)+multdivisor(-1,B);
+isEqualDivisor(A,D);
+}
+
+
+static proc purify1(ideal I)
+{
+I = simplify(I,2);
+if (I[1]==0){ERROR("expected a non-zero ideal");}
+ideal f = I[1];
+return(minbase(quotient(f,quotient(f,I))));
+}
+
+
+static proc basis(ideal I,int d)
+{
+I=simplify(jet(intersect(I,maxideal(d)),d),2);
+return(I)}
+
+//basis(ideal(x,y^3),2);
+
+
+proc globalSections(divisor D)
+"USAGE:  globalSections(A); A = divisor.@*
+ASSUME:  A is a divisor on X.
+RETURN:  a list with a basis of the space of global sections of D.
+THEORY:  We assume that the qring of X satisfies the S2-condition. We compute sat((f*J) : I) /f
+         where D = (I)-(J).
+KEYWORDS: divisors
+EXAMPLE: example globalSections; shows an example
+"
+{
+poly f =(simplify(D.num,2))[1];
+ideal LD = basis(purify1(quotient(f*D.den,D.num)),deg(f));
+list L = simplify(LD,2),f;
+return(L);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor P = makeDivisor(ideal(x,z),ideal(1));
+divisor D = multdivisor(4,P);
+globalSections(D);
+}
+
+
+static proc sectionIdeal(poly f, poly g, divisor D){
+return(purify1(quotient(quotient(f*D.num,g), D.den)));
+}
+
+proc degreeDivisor(divisor A)
+"USAGE:  degreeDivisor(A); A = divisor.@*
+ASSUME:  A is a divisor on X.
+RETURN:  The degree of A.
+THEORY:  We compute difference of the degrees of the numerator and denominator ideals.
+KEYWORDS: divisors
+EXAMPLE: example degreeDivisor; shows an example
+"
+{
+  return( deg(std(A.num))-deg(std(A.den)));
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor P = makeDivisor(ideal(x,z),ideal(1));
+degreeDivisor(P);
+}
+
+proc linearlyEquivalent(divisor A, divisor B)
+"USAGE:  linearlyEquivalent(A,B); A = divisor, B = divisor.@*
+ASSUME:  A and B are divisors on X.
+RETURN:  list if A and B a linearly equivalent and int 0 otherwise.
+THEORY:  Checks whether A-B is principle. If yes, returns a list L=(f,g) where
+         A - B = (f/g).
+KEYWORDS: divisors
+EXAMPLE: example linearlyEquivalent; shows an example
+"
+{
+divisor F = normalForm(divisorplus(A,negativedivisor(B)));
+list LB = globalSections(F);
+if (size(LB[1])!=1) {return(0);}
+ideal V = sectionIdeal(LB[1][1,1],LB[2],F);
+if (isEqualIdeal(V,ideal(1))==1) {return(list(LB[1][1,1],LB[2]));}
+return(0);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+linearlyEquivalent(A,B);
+linearlyEquivalent(multdivisor(2,A),multdivisor(2,B));
+}
+
+
+proc effective(divisor A)
+"USAGE:  effective(A); A = divisor.@*
+ASSUME:  A is a divisor on X which is linearly equivalent to an effective divisor.
+RETURN:  divisor on X.
+THEORY:  We compute an effective divisor linearly equivalent to A.
+KEYWORDS: divisors
+EXAMPLE: example effective; shows an example
+"
+{
+list LB = globalSections(A);
+if (size(LB[1])==0) {ERROR("the divisor is not linearly equivalent to an effective divisor");}
+ideal V = sectionIdeal(LB[1][1,1],LB[2],A);
+return(makeDivisor(V,ideal(1)));
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+divisor D = divisorplus(multdivisor(2,B),negativedivisor(A));
+effective(D);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// formal sums of divisors
+
+proc makeFormalDivisor(list L)
+"USAGE:  makeFormalDivisor(L); L = list.@*
+ASSUME:  L is a list of tuples of an integer and a divisor.
+RETURN:  a formal divisor on X
+THEORY:  Represents an integer formal sum of divisors.
+KEYWORDS: divisors
+EXAMPLE: example makeFormalDivisor; shows an example
+"
+{
+formaldivisor C;
+C.summands = L;
+return(C);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+makeFormalDivisor(list(list(-5,A),list(2,B)));
+}
+
+
+proc evaluateFormalDivisor(formaldivisor D)
+"USAGE:  evaluateFormalDivisor(D); D = formal divisor.@*
+ASSUME:  D is a formal divisor on X.
+RETURN:  a divisor on X
+THEORY:  Will evaluate the formal sum.
+KEYWORDS: divisors
+EXAMPLE: example evaluateFormalDivisor; shows an example
+"
+{
+list L = D.summands;
+if (size(L)==0) {return(makeDivisor(ideal(1),ideal(1)));}
+int i;
+divisor E = multdivisor(L[1][1],L[1][2]);
+  for ( i=2; i <= size(L); i++ )
+  {
+    E = divisorplus(E, multdivisor(L[i][1],L[i][2]));
+  }
+return(E);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+formaldivisor fE= makeFormalDivisor(list(list(-5,A),list(2,B)));
+evaluateFormalDivisor(fE);
+}
+
+
+
+static proc position(divisor I,list L){
+int i;
+for (i=1; i <=size(L); i++){
+   if (isEqualDivisor(I,L[i][2])==1) {return(i);}
+}
+return(0);}
+
+
+proc formaldivisorplus(formaldivisor A, formaldivisor B)
+"USAGE:  formaldivisorplus(A ,B); A + B; A = formaldivisor, B = formaldivisor. @*
+ASSUME:  A and B are formal divisors on X.
+RETURN:  a formal divisor on X
+THEORY:  The procedure will add the formal sums.
+KEYWORDS: divisors
+EXAMPLE: example formaldivisorplus; shows an example
+"
+{
+formaldivisor C;
+int i,p;
+int j=1;
+list L;
+list LA=A.summands;
+list LB=B.summands;
+for (i=1; i<=size(LA);i++){
+   p=position(LA[i][2],L);
+   if (p==0) {
+        L[j]=list();
+        L[j][2]=LA[i][2];
+        L[j][1]=LA[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=L[p][1]+LA[i][1];
+   };
+}
+for (i=1; i<=size(LB);i++){
+   p=position(LB[i][2],L);
+   if (p==0) {
+        L[j]=list();
+        L[j][2]=LB[i][2];
+        L[j][1]=LB[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=L[p][1]+LB[i][1];
+   };
+}
+//C.summands = (A.summands)+(B.summands);
+return(L);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+divisor C = makeDivisor(ideal(x-z,y),ideal(1));
+formaldivisor fE= makeFormalDivisor(list(list(-5,A),list(2,B)));
+formaldivisor fE2= makeFormalDivisor(list(list(-5,A),list(2,C)));
+formaldivisorplus(fE,fE2);
+}
+
+
+proc degreeFormalDivisor(formaldivisor A)
+"USAGE:  degreeFormalDivisor(A); A = formaldivisor.@*
+ASSUME:  A is a formaldivisor on X.
+RETURN:  The degree of A.
+THEORY:  We compute degrees of the summands and return the weighted sum.
+KEYWORDS: divisors
+EXAMPLE: example degreeFormalDivisor; shows an example
+"
+{
+int i,s;
+list L = A.summands;
+for (i=1;i<=size(L);i++){
+    s=s+L[i][1]*degreeDivisor(L[i][2]);
+}
+return(s);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+formaldivisor fE= makeFormalDivisor(list(list(-5,A),list(2,B)));
+degreeFormalDivisor(fE);
+}
+
+
+proc multformaldivisor(int n,formaldivisor A)
+"USAGE:  multformaldivisor(n ,A); A*n; n = integer, A = formaldivisor.@*
+ASSUME:  n is an integer and A is a formal divisor on X.
+RETURN:  a formal divisor on X
+THEORY:  The procedure will multiply the formal sum with n.
+KEYWORDS: divisors
+EXAMPLE: example multformaldivisor; shows an example
+"
+{
+formaldivisor B;
+list L=A.summands;
+int i;
+for (i=1;i<=size(L);i++){
+  L[i][1]=n*L[i][1];
+}
+B.summands=L;
+return(B);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+formaldivisor fE= makeFormalDivisor(list(list(-5,A),list(2,B)));
+fE*2;
+}
+
+
+/***
+ * For operator overloading, which needs a procedure which takes a divisor first
+ * and integer second.
+ **/
+proc proxymultformaldivisor(formaldivisor A, int n)
+{
+formaldivisor B;
+list L=A.summands;
+int i;
+for (i=1;i<=size(L);i++){
+  L[i][1]=n*L[i][1];
+}
+B.summands=L;
+return(B);
+}
+
+
+
+proc negativeformaldivisor(formaldivisor A)
+"USAGE:  negativeformaldivisor(A); A = formaldivisor.@*
+ASSUME:  A is a formaldivisor on X.
+RETURN:  a formal divisor on X
+THEORY:  The procedure will change the signs of the coefficients.
+KEYWORDS: divisors
+EXAMPLE: example negativeformaldivisor; shows an example
+"
+{
+formaldivisor B;
+list L=A.summands;
+int i;
+for (i=1;i<=size(L);i++){
+  L[i][1]=-L[i][1];
+}
+B.summands=L;
+return(B);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+formaldivisor fE= makeFormalDivisor(list(list(-5,A),list(2,B)));
+negativeformaldivisor(fE);
+}
+
+
+static proc primDecDivisor(divisor D)
+"decompose a divisor into a formal divisor of primary divisors"
+{
+formaldivisor E;
+ideal I = D.num;
+ideal J = D.den;
+list L;
+int i;
+int j = 1;
+list LI = primdecGTZ(I);
+for (i=1;i<=size(LI);i++){
+   LI[i][2];
+   L[j]=list(1,makeDivisor(LI[i][1],ideal(1)));
+   j=j+1;
+};
+list LJ = primdecGTZ(J);
+for (i=1;i<=size(LJ);i++){
+   LJ[i][2];
+   L[j]=list(-1,makeDivisor(LJ[i][1],ideal(1)));
+   j=j+1;
+};
+E.summands=L;
+return(E);}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// P-divisors
+
+proc makePDivisor(list L)
+"USAGE:  makePDivisor(L); L = list.@*
+ASSUME:  L is a list of tuples of a integral polyhedron and a divisor such that
+         all polyhedra have the same tail cone.
+RETURN:  a pdivisor on X
+THEORY:  Represents an polyhedral formal sum of divisors.
+KEYWORDS: divisors, polyhedra
+EXAMPLE: example makePDivisor; shows an example
+"
+{
+pdivisor P;
+list CP = decomposePolyhedron(L[1][1]);
+P.tail = CP[1];
+list LP;
+LP[1]=list(CP[2],L[1][2]);
+int i;
+for (i=2; i<=size(L);i++){
+   CP = decomposePolyhedron(L[i][1]);
+   if (!(CP[1]==P.tail)) {ERROR("All P-coefficients should have the same tail cone");}
+   LP[i]=list(CP[2],L[i][2]);
+}
+P.summands = LP;
+return(P);
+}
+example
+{ "EXAMPLE:";
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+intmat M[4][4]= 1,4,0,0,
+                1,0,3,0,
+                0,0,0,2,
+                1,1,1,1;
+polytope PP = polytopeViaPoints(M);
+makePDivisor(list(list(PP,A),list(PP,B)));
+}
+
+static proc decomposePolyhedron(polytope P){
+intmat rays = vertices(P);
+intmat rays2 = rays;
+int i,j;
+for (i=1; i<=nrows(rays);i++){
+   if (rays[i,1]==1) {
+      for (j=1; j<=ncols(rays);j++){
+         rays[i,j]=0;
+      }
+   } else {
+      for (j=1; j<=ncols(rays);j++){
+         rays2[i,j]=0;
+      }
+   }
+}
+cone C = coneViaPoints(rays);
+polytope C2 = polytopeViaPoints(rays2);
+return(list(C,C2));
+}
+
+
+proc evaluatePDivisor(pdivisor D,intvec v)
+"USAGE:  evaluatePDivisor(D,v); D = pdivisor, v = intvec.@*
+ASSUME:  D is a polyhedral divisor on X and v is a point in the dual of the
+         tailcone of the coefficients.
+RETURN:  a formal divisor on X
+THEORY:  Will evaluate the polyhedral sum to an integer formal sum.
+KEYWORDS: divisors, polyhedra
+EXAMPLE: example evaluatePDivisor; shows an example
+"
+{
+formaldivisor vD;
+list L = D.summands;
+cone C = D.tail;
+cone dC = dualCone(C);
+list vL;
+int i;
+intvec vv = 0,v;
+if (!(containsInSupport(dC,vv)))
+  {ERROR("the linear form given should be in the dual tail cone");}
+for (i=1; i<=size(L);i++){
+        vL[i]=list();
+        vL[i][2]=L[i][2];
+  vL[i][1]=Polymake::minimalValue(L[i][1],vv);
+}
+vD.summands = vL;
+return(vD);}
+example
+{ "EXAMPLE:";
+LIB("polymake.so");
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+intmat M[4][4]= 1,4,0,0,
+                1,0,3,0,
+                0,0,0,2,
+                1,1,1,1;
+polytope PP = polytopeViaPoints(M);
+pdivisor pD = makePDivisor(list(list(PP,A),list(PP,B)));
+intvec v=1,1,1;
+evaluatePDivisor(pD,v);
+}
+
+
+
+
+
+proc pdivisorplus(pdivisor A, pdivisor B)
+"USAGE:  pdivisorplus(A ,B); A + B; A = pdivisor, B = pdivisor. @*
+ASSUME:  A and B are polyhedral divisors on X.
+RETURN:  a pdivisor on X
+THEORY:  The procedure will add the polyhedral formal sums by doing Minkowski sums.
+KEYWORDS: divisors, polyhedra
+EXAMPLE: example pdivisorplus; shows an example
+"
+{
+pdivisor C;
+int i,p;
+int j=1;
+if (!(A.tail==B.tail)) {ERROR("tail cones should be equal");}
+list L;
+list LA=A.summands;
+list LB=B.summands;
+for (i=1; i<=size(LA);i++){
+   p=position(LA[i][2],L);
+   if (p==0) {
+        L[j]=list();
+        L[j][2]=LA[i][2];
+        L[j][1]=LA[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=Polymake::minkowskiSum(L[p][1],LA[i][1]);
+   };
+}
+for (i=1; i<=size(LB);i++){
+   p=position(LB[i][2],L);
+   if (p==0) {
+        L[j]=list();
+        L[j][2]=LB[i][2];
+        L[j][1]=LB[i][1];
+        j=j+1;
+   } else {
+        L[p][1]=Polymake::minkowskiSum(L[p][1],LB[i][1]);
+   };
+}
+C.summands = L;
+C.tail = A.tail;
+return(C);
+}
+example
+{ "EXAMPLE:";
+LIB("polymake.so");
+ring r=31991,(x,y,z),dp;
+ideal I = y^2*z - x*(x-z)*(x+3*z);
+qring Q = std(I);
+divisor A = makeDivisor(ideal(x,z),ideal(1));
+divisor B = makeDivisor(ideal(x,y),ideal(1));
+intmat M[4][4]= 1,4,0,0,
+                1,0,3,0,
+                0,0,0,2,
+                1,1,1,1;
+polytope PP = polytopeViaPoints(M);
+pdivisor pD = makePDivisor(list(list(PP,A),list(PP,B)));
+pdivisorplus(pD,pD);
+}
+
+

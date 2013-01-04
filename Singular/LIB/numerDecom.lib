@@ -8,7 +8,7 @@ OVERVIEW:
       numerical irreducible decomposition, and
       numerical primary decomposition of an algebraic variety defined by a
       polynomial system. The use of the library requires to install Bertini
-           (www.nd.edu~sommese/bertini/thedownload).
+           (http://www.nd.edu/~sommese/bertini).
 AUTHOR: Shawki AlRashed, rashed@mathematik.uni-kl.de; sh.shawki@yahoo.de
 
 PROCEDURES:
@@ -17,7 +17,7 @@ PROCEDURES:
 
  UseBertini(ideal H,string sv); use Bertini to compute the solutions of the homotopy function
 
- Singular2betini1(list L); adopt the list to be a read file in Bertini as a start solution set
+ Singular2bertini(list L); adopt the list to be a read file in Bertini as a start solution set
 
  bertini2Singular(string snp, int q); adopt the file of solutions of the homotopy function to be a list in SINGULAR
 
@@ -103,11 +103,11 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Singular2betini1(list L)
-"USAGE:   Singular2betini1(list L);L a list
+proc Singular2bertini(list L)
+"USAGE:   Singular2bertini(list L);L a list
 RETURN:  text file called start
 NOTE:    adopting the list L to be as a start solution of the homptopy function in Bertini
-EXAMPLE: Singular2betini1;shows an example
+EXAMPLE: Singular2bertini;shows an example
 "
 {
  write("start",string(size(L)));
@@ -132,7 +132,7 @@ example
 { "EXAMPLE:";echo = 2;
    ring r=(complex,16,I),(x,y,z),dp;
    list L=list(1,2,3),list(4,5,6+I*2);
-   def D=Singular2betini1(L);
+   def D=Singular2bertini(L);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc UseBertini(ideal H,string sv)
@@ -167,7 +167,7 @@ EXAMPLE:  example Use;shows an example
  write(l,"variable "+sv+";");
   sff="function";
  if(ph!=1)
- { 
+ {
   for( ii=1;ii<=ph-1;ii++)
   {
    sff=sff+" f"+string(ii)+",";
@@ -177,7 +177,7 @@ EXAMPLE:  example Use;shows an example
  else
  {
   sff=sff+" f"+string(1)+",";
- } 
+ }
  write(l,sff);
  write(l,"pathvariable t;");
  write(l,"parameter s;");
@@ -290,7 +290,7 @@ proc   WitSupSet(ideal I)
 "USAGE:  WitSupSet(ideal I);I ideal
 RETURN:  list of Witness point Super Sets W(i) for i=1,...,dim(V(I)),
           L list of generic linear polynomials and N(0) list of a polynomial system of the same number of
-          polynomials and unknowns. // if W(i) = x, then V(I) has no component of dimension i 
+          polynomials and unknowns. // if W(i) = x, then V(I) has no component of dimension i
 EXAMPLE: example WitSupSet;shows an example
 "
 {
@@ -473,7 +473,7 @@ EXAMPLE: example WitSupSet;shows an example
     int nv(0..dd-1);
     if(size(W(dd))<size(Y))
     {
-     def SB(dd)=Singular2betini1(V(dd));
+     def SB(dd)=Singular2bertini(V(dd));
     }
     for( q=dd;q>=n-rn+1;q--)
     {
@@ -570,7 +570,7 @@ EXAMPLE: example WitSupSet;shows an example
        {
         if(nv(q-1)!=0)
         {
-         def SB(qq-1)=Singular2betini1(V(q-1));
+         def SB(qq-1)=Singular2bertini(V(q-1));
         }
         else
         {
@@ -724,7 +724,7 @@ EXAMPLE: example ReJunkUseHomo;shows an example
   H[kk+zi]=s*gamma*L[kk]+(1-s)*LL[kk];
  }
  list W=imap(S,W);
- def SB1=Singular2betini1(W);
+ def SB1=Singular2bertini(W);
  sv=varstr(S);
  def Q=UseBertini(H,sv);
  system("sh","rm start");
@@ -875,7 +875,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc JuReZeroDim(ideal J,list w, int d);
-"USAGE:  JuReZeroDim(ideal J,list w, int d);J ideal, 
+"USAGE:  JuReZeroDim(ideal J,list w, int d);J ideal,
          w list of a point in V(J), d dimension of V(J)
 RETURN:  t=1 if w on a positive-dimensional component of V(I),
          i.e w is not isolated point in V(J)
@@ -1278,7 +1278,7 @@ EXAMPLE: example ZSR1;shows an example
  list VV;
  list W=imap(S,W);
  VV[1]=W;
- def SB1=Singular2betini1(VV);
+ def SB1=Singular2bertini(VV);
  execute("ring R=(complex,16,I),("+varstr(S)+",gamma,s),dp;");
  ideal I=imap(S,I);
  zi=size(I);
@@ -1997,7 +1997,7 @@ EXAMPLE:  example defl; shows an example
  ideal I=imap(S,I);
  vector v=[x(1..zc)];
  ideal DI=I,TT(d)*v;
- export(DI); 
+ export(DI);
  export(I);
  setring S;
  return(DR);
@@ -2014,8 +2014,8 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 static proc     NIDofDI(ideal I)
-"USAGE:  NIDofDI(ideal I);  I ideal 
-RETURN:  numerical irreducible decomposition of I 
+"USAGE:  NIDofDI(ideal I);  I ideal
+RETURN:  numerical irreducible decomposition of I
 EXAMPLE: NIDofDI; shows an example
 "
 {
@@ -2139,7 +2139,7 @@ example
    list DD=NIDofDI(I);
    def D(0)=DD[1];
    setring D(0);
-   w(1);          // w(1)= x, i.e. no components 
+   w(1);          // w(1)= x, i.e. no components
    def D(1)=DD[2];
    setring D(1);
    w(1);

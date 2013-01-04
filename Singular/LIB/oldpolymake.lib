@@ -2,8 +2,8 @@
 version="$Id$";
 category="Tropical Geometry";
 info="
-LIBRARY:   polymake.lib    Computations with polytopes and fans,
-                           interface to polymake and TOPCOM
+LIBRARY:   oldpolymake.lib  Computations with polytopes and fans,
+                            interface to polymake and TOPCOM
 AUTHOR:    Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
 WARNING:
@@ -31,23 +31,20 @@ NOTE:
 @*   Note, though, that the procedures concerned with planar polygons are
      independent of both, polymake and topcom.
 
-PROCEDURES USING POLYMAKE:
+PROCEDURES:
   polymakePolytope()   computes the vertices of a polytope using polymake
-  newtonPolytope()     computes the Newton polytope of a polynomial
+  newtonPolytopeP()     computes the Newton polytope of a polynomial
   newtonPolytopeLP()   computes the lattice points of the Newton polytope
   normalFan()          computes the normal fan of a polytope
   groebnerFan()        computes the Groebner fan of a polynomial
   intmatToPolymake()   transforms an integer matrix into polymake format
   polymakeToIntmat()   transforms polymake output into an integer matrix
 
-PROCEDURES USING TOPCOM:
   triangulations()     computes all triangulations of a marked polytope
   secondaryPolytope()  computes the secondary polytope of a marked polytope
 
-PROCEDURES USING POLYMAKE AND TOPCOM:
   secondaryFan()       computes the secondary fan of a marked polytope
 
-PROCEDURES CONCERNED WITH PLANAR POLYGONS:
   cycleLength()      computes the cycleLength of cycle
   splitPolygon()     splits a marked polygon into vertices, facets, interior points
   eta()              computes the eta-vector of a triangulation
@@ -58,7 +55,6 @@ PROCEDURES CONCERNED WITH PLANAR POLYGONS:
   ellipticNF()       computes the normal form of an elliptic polygon
   ellipticNFDB()     displays the 16 normal forms of elliptic polygons
 
-AUXILARY PROCEDURES:
   polymakeKeepTmpFiles()  determines if the files created in /tmp should be kept
 
 KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
@@ -93,7 +89,7 @@ LIB "random.lib";
 /// PROCEDURES USING POLYMAKE
 /////////////////////////////////////////////////////////////////////////////
 
-proc polymakePolytope (intmat polytope,list #)
+proc polymakePolytope (intmat polytop,list #)
 "USAGE:  polymakePolytope(polytope[,#]);   polytope list, # string
 ASSUME:  each row of polytope gives the coordinates of a lattice point of a
          polytope with their affine coordinates as given by the output of
@@ -157,7 +153,7 @@ POINTS
     string dateiname="polytope";
   }
   // create the lattice point list for polymake
-  sp=sp+intmatToPolymake(polytope,"points");
+  sp=sp+intmatToPolymake(polytop,"points");
   // initialise dateiname.polymake and compute the vertices
   write(":w /tmp/"+dateiname+".polymake",sp);
   system("sh","cd /tmp; polymake "+dateiname+".polymake VERTICES > "+dateiname+".output");
@@ -221,7 +217,7 @@ POINTS
   }
   else
   {
-    intmat neq[1][ncols(polytope)+1];
+    intmat neq[1][ncols(polytop)+1];
   }
   // delete the tmp-files, if polymakekeeptmpfiles is not set
   if (defined(polymakekeeptmpfiles)==0)
@@ -255,8 +251,8 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc newtonPolytope (poly f,list #)
-"USAGE: newtonPolytope(f[,#]);  f poly, # string
+proc newtonPolytopeP (poly f,list #)
+"USAGE: newtonPolytopeP(f[,#]);  f poly, # string
 RETURN: list L with four entries
 @*            L[1] : an integer matrix whose rows are the coordinates of vertices
                      of the Newton polytope of f
@@ -286,7 +282,7 @@ NOTE: -  if we replace the first column of L[4] by zeros, i.e. if we move
 @*    -  it is possible to give as an optional second argument a string
          which then will be used instead of 'newtonPolytope' in the name of
          the polymake output file
-EXAMPLE: example newtonPolytope;   shows an example"
+EXAMPLE: example newtonPolytopeP;   shows an example"
 {
   int i,j;
   // compute the list of exponent vectors of the polynomial,
@@ -314,7 +310,7 @@ example
    matrix M[4][1]=1,x,y,z;
    poly f=y3+x2+xy+2xz+yz+z2+1;
    // the Newton polytope of f is
-   list np=newtonPolytope(f);
+   list np=newtonPolytopeP(f);
    // the vertices of the Newton polytope are:
    np[1];
    // its dimension is
@@ -326,7 +322,7 @@ example
    //////////////////////////
    f=x2-y3;
    // the Newton polytope of f is
-   np=newtonPolytope(f);
+   np=newtonPolytopeP(f);
    // the vertices of the Newton polytope are:
    np[1];
    // its dimension is
@@ -535,7 +531,7 @@ example
    matrix M[4][1]=1,x,y,z;
    poly f=y3+x2+xy+2xz+yz+z2+1;
    // the Newton polytope of f is
-   list np=newtonPolytope(f);
+   list np=newtonPolytopeP(f);
    // the Groebner fan of f, i.e. the normal fan of the Newton polytope
    list gf=normalFan(np[1],np[4],np[3],1,"x,y,z");
    // the number of cones in the Groebner fan of f is:

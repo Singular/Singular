@@ -24,6 +24,8 @@ PROCEDURES:
  getSmallest(J);     computes the polynomial of smallest degree of J
  getOneVar(J, vari); computes a polynomial of J in the variable vari
  changeDenominator(U1, c1, c2, I); computes ideal U2 such that 1/c1*U1=1/c2*U2
+
+SEE ALSO: locnormal_lib;modnormal_lib
 ";
 
 LIB "general.lib";
@@ -244,7 +246,7 @@ EXAMPLE: example normal; shows an example
 // If the ordering is global, but not dp, and useRing = 0, we also change to
 // dp ordering.
 
-  int isGlobal = ord_test(basering);      // Checks if the original ring has
+  int isGlobal = attrib(basering,"global");// Checks if the original ring has
                                           // global ordering.
 
   def origR = basering;   // origR is the original ring
@@ -377,11 +379,11 @@ EXAMPLE: example normal; shows an example
       for(j = 1; j <= size(norComp); j++)
       {
         newR = norComp[j][3];
-	if(!defined(savebasering)) { def savebasering;}
+        if(!defined(savebasering)) { def savebasering;}
         savebasering=basering;
         setring newR; // must be in a compatible ring to newR
                       // as ringlist may produce ring-dep. stuff
-	if(!defined(newRList)) { list newRList;}
+        if(!defined(newRList)) { list newRList;}
         newRList = ringlist(newR);
         setring savebasering;
         U = norComp[j][1];
@@ -2169,7 +2171,7 @@ EXAMPLE: example genus; shows an example
    def R0=basering;
    if(char(basering)>0)
    {
-     def R1=changeord("dp");
+     def R1=changeord(list(list("dp",1:nvars(basering))));
      setring R1;
      ideal I=imap(R0,I);
      I=radical(I);
@@ -3538,7 +3540,7 @@ EXAMPLE: example normalP; shows an example
 
    y = printlevel-voice+2;
 
-   if ( ord_test(basering) != 1)
+   if ( attrib(basering,"global") != 1)
    {
      "";
      "// Not implemented for this ordering,";
@@ -4160,7 +4162,8 @@ static proc computeRing(ideal J, ideal I, list #)
     {
       ff = NF(f[ii]*f[jj],std(0));     // this makes lift much faster
       // For non-global orderings, we have to take care of the units.
-      if(ord_test(basering) != 1){
+      if(attrib(basering,"global") != 1)
+      {
         A = lift(pf, ff, u);
         Quad = Quad,ideal(newT[jj-1]*newT[ii-1] * u[1, 1]- T*A);
       }
@@ -4275,7 +4278,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   int step = 0;                       // Number of steps. (for debugging)
   int dbg = printlevel - voice + 2;   // dbg = printlevel (default: dbg = 0)
   int i;                              // counter
-  int isGlobal = ord_test(basering);
+  int isGlobal = attrib(basering,"global");
 
   poly c;                     // The common denominator.
 
@@ -4321,7 +4324,17 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
 
     // If a given conductor ideal is given, we use it.
     // If a given test ideal is given, we don't need to compute the jacobian
-    ideal J = minor(jacob(IMin), nvars(basering) - d, I);
+
+    // reduction mod I in 'minor' is not working for local orderings!
+    if(attrib(basering,"global"))
+    {
+      ideal J = minor(jacob(IMin), nvars(basering) - d, I);
+    }
+    else
+    {
+      ideal J = minor(jacob(IMin), nvars(basering) - d);
+      J = reduce(J, groebner(I));
+    }
     J = groebner(J);
   }
   else
@@ -4559,7 +4572,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
   int dbg = printlevel - voice + 2;   // dbg = printlevel (default: dbg = 0)
   int i;                              // counter
   int isNormal = 0;                   // check for exiting the loop
-  int isGlobal = ord_test(basering);
+  int isGlobal = attrib(basering,"global");
   int delt;
 
   def R = basering;
@@ -4928,7 +4941,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
   if(dbg > 1){"The relations are"; norid;}
 
   // ---------------- setting the ring to work in  --------------------------
-  int isGlobal = ord_test(origEre);      // Checks if the original ring has
+  int isGlobal = attrib(origEre,"global");      // Checks if the original ring has
                                          // global ordering.
   if(isGlobal != 1)
   {
@@ -5574,7 +5587,7 @@ EXAMPLE: example normalC; shows an example
    if (nvar <= 2)
    { decomp = 3; }    // Compute minimal associated primes if nvar <= 2
 
-   if ( ord_test(basering) != 1 )
+   if ( attrib(basering,"global") != 1 )
    {
      "";
      "// Not implemented for this ordering,";
@@ -7283,4 +7296,3 @@ genus(i);             //sollte 0+0-2+1= -1 sein
 genus(i,1);           //beides ist korrekt in Singular
 
 */
-

@@ -2,7 +2,7 @@
 //help for finitenessTest and mapIsFinite edited
 //new proc  nonZeroEntry(id), used to fix a bug in proc finitenessTest
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib 14661 2012-03-05 11:00:14Z motsak $";
+version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -22,7 +22,6 @@ PROCEDURES:
  noetherNormal(id);     noether normalization of ideal id
  mapIsFinite(R,phi,I);  query for finiteness of map phi:R --> basering/I
 
-AUXILIARY PROCEDURES:
  finitenessTest(i,z);   find variables which occur as pure power in lead(i)
  nonZeroEntry(id);      list describing non-zero entries of an identifier
 ";
@@ -815,7 +814,7 @@ EXAMPLE: example noetherNormal; shows an example
    // ------------------------ change of ordering ---------------------------
    //a procedure from ring.lib changing the order to dp creating a new
    //basering @R in order to compute the dimension d of i
-   def @R=changeord("dp");
+   def @R=changeord(list(list("dp",1:nvars(basering))));
    setring @R;
    ideal i = imap(r,i);
    list j = mstd(i);
@@ -829,8 +828,7 @@ EXAMPLE: example noetherNormal; shows an example
    }
    // ------------------------ change of ordering ---------------------------
    //Now change the order to (dp(n-d),lp) creating a new basering @S
-   string s ="dp("+string(n-d)+"),lp";
-   def @S=changeord(s);
+   def @S=changeord(list(list("dp",1:(n-d)),list("lp",1:d)));
    setring @S;
    ideal m;
 

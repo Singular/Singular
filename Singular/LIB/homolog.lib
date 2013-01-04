@@ -232,7 +232,7 @@ ASSUME:  all Ext's  are of finite dimension
 RETURN:  - if called with 5 arguments: matrix of the associated linear map
          Ext^p (tensor) Ext^q --> Ext^(p+q),  i.e. the columns of <matrix>
          present the coordinates of the cup products (b_i & c_j) with respect
-         to a kbase of Ext^p+q  (b_i resp. c_j are the choosen bases of Ext^p,
+         to a kbase of Ext^p+q  (b_i resp. c_j are the chosen bases of Ext^p,
          resp. Ext^q).@*
          - if called with 6 arguments: list L,
 @format

@@ -36,39 +36,6 @@ LIB "parallel.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc mixedTest()
-"USAGE:  mixedTest();
-RETURN:  1 if ordering of basering is mixed, 0 else
-EXAMPLE: example mixedTest(); shows an example
-"
-{
-   int i,p,m;
-   for(i = 1; i <= nvars(basering); i++)
-   {
-      if(var(i) > 1)
-      {
-         p++;
-      }
-      else
-      {
-         m++;
-      }
-   }
-   if((p > 0) && (m > 0)) { return(1); }
-   return(0);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R1 = 0,(x,y,z),dp;
-   mixedTest();
-   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
-   mixedTest();
-   ring R3 = 181,x(1..9),(dp(5),lp(4));
-   mixedTest();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 proc genSymId(ideal I, intvec sigma)
 "USAGE:  genSymId(I,sigma); I ideal, sigma intvec
 ASSUME:  size(sigma) = nvars(basering =: n
@@ -560,8 +527,12 @@ EXAMPLE: example symmStd; shows an example
 //--------     in basering or move to ring extension.              -------------
    if((CHAR == 0) && (ORD > 2))
    {
-      def S = changechar("0,p");
+      def save_ring=basering;
+      ring ext_ring=0,p,lp;
+      def S = changechar(ringlist(ext_ring),save_ring);
       setring S;
+      kill ext_ring;
+      kill save_ring;
       minpoly = rootofUnity(ORD);
       ideal I = imap(R, I);
       number a = p;
@@ -970,7 +941,7 @@ EXAMPLE: example smpStd; shows an example
 
    if(variant == 4)
    {
-      def R1 = changeord("dp");
+      def R1 = changeord(list(list("dp",1:nvars(basering))));
       setring R1;
       ideal i = fetch(@r,i);
       i = symmStd(i, sigma);
@@ -1154,7 +1125,7 @@ EXAMPLE: example syModStd; shows an example
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
-         def @s = changeord("dp");
+         def @s = changeord(list(list("dp",1:nvars(basering))));
          setring @s;
          ideal I = std(fetch(R0,I));
          intvec hi = hilb(I,1);
@@ -1194,7 +1165,7 @@ EXAMPLE: example syModStd; shows an example
                def @r = ring(rl);
                setring @r;
 
-               def @s = changeord("dp");
+               def @s = changeord(list(list("dp",1:nvars(basering))));
                setring @s;
                ideal I = std(fetch(R0,I));
                if(dim(I) == 0)
@@ -1241,7 +1212,7 @@ EXAMPLE: example syModStd; shows an example
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
-         def @s = changeord("dp");
+         def @s = changeord(list(list("dp",1:nvars(basering))));
          setring @s;
          ideal I = std(fetch(R0,I));
          intvec hi = hilb(I,1);

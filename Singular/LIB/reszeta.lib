@@ -30,6 +30,8 @@ collectDiv(L[,iv])   identify exceptional divisors in different charts
 prepEmbDiv(L[,b])    prepare list of divisors (including components
                      of strict transform, embedded case)
 abstractR(L)         pass from embedded to non-embedded resolution
+computeV(re,DL)      multiplicities of divisors in pullback of volume form
+computeN(re,DL)      multiplicities of divisors in total transform of resolution
 ";
 LIB "resolve.lib";
 LIB "solve.lib";
@@ -165,8 +167,16 @@ static proc ordE(ideal J,ideal E,ideal W)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc computeV(list re, list DL)
-"Internal procedure - no help and no example available
+proc computeV(list re, list DL)
+"USAGE:   computeV(L,DL);
+           L = list of rings
+          DL = divisor list
+ASSUME:   L has structure of output of resolve
+          DL has structure of output of prepEmbDiv
+RETURN:   intvec,
+          i-th entry is multiplicity of i-th divisor in
+          pullback of volume form
+EXAMPLE:  example computeV;  shows an example
 "
 {
 //--- computes for every divisor E_i its multiplicity + 1 in pi^*(w)
@@ -209,13 +219,13 @@ static proc computeV(list re, list DL)
    return(v);
 }
 example
-{"EXAMPLE:";
-   echo = 2;
-   ring R=0,(x,y,z),dp;
-   ideal I=(x-y)*(x-z)*(y-z)-z4;
-   list re=resolve(I,1);
-   intvec v=computeV(re);
-   v;
+{"EXAMPLE:"; echo = 2;
+  ring R=0,(x,y,z),dp;
+  ideal I=(x-y)*(x-z)*(y-z)-z4;
+  list re=resolve(I,1);
+  list iden=prepEmbDiv(re);
+  intvec v=computeV(re, iden);
+  v;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,8 +379,15 @@ static proc computeH(ideal h,list re,list DL)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-static proc computeN(list re,list DL)
-"Internal procedure - no help and no example available
+proc computeN(list re,list DL)
+"USAGE:   computeN(L,DL);
+          L = list of rings
+          DL = divisor list
+ASSUME:   L has structure of output of resolve
+          DL has structure of output of prepEmbDiv
+RETURN:   intvec, i-th entry is multiplicity of i-th divisor
+          in total transform under resolution
+EXAMPLE:  example computeN;
 "
 {
 //--- computes for every (Q-irred.) divisor E_i its multiplicity in f \circ pi
@@ -419,7 +436,8 @@ example
    ring R=0,(x,y,z),dp;
    ideal I=(x-y)*(x-z)*(y-z)-z4;
    list re=resolve(I,1);
-   intvec v=computeN(re);
+   list iden=prepEmbDiv(re);
+   intvec v=computeN(re,iden);
    v;
 }
 //////////////////////////////////////////////////////////////////////////////

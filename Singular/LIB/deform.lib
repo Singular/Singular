@@ -879,9 +879,8 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
   int @r = nrows(A);
   int @c = ncols(A);
   int i,j;
-  string ord_str = "wp("+string(w_vec)+")";
   def br = basering;
-  def nr=changeord(ord_str);
+  def nr=changeord(list(list("wp",w_vec)));
   setring nr;
   matrix A    = imap(br,A);
   intmat degA[@r][@c];
@@ -945,8 +944,7 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    A  = concat(Fo,A);
    A  = transpose(A);
    def br = basering;
-   string o_str = "wp("+string(d_vec)+")";
-   def nr=changeord(o_str);
+   def nr=changeord(list(list("wp",d_vec)));
    setring nr;
    module A = fetch(br,A);
    intvec dv;

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paraplanecurves.lib 14461 2011-12-14 11:00:17Z motsak $";
+version="$Id$";
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
@@ -25,7 +25,7 @@ closure of C[x] in C(x,y) using the  normalization algorithm from
 @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the
 library, also van Hoeij's algorithm for computing the integral basis will
 be available. @*
->From the integral basis, the adjoint ideal is obtained by linear algebra.
+From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -254,7 +254,7 @@ and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the normalization algorithm from @ref{normal_lib}:
 see @ref{integralbasis_lib}. In a future edition of the library, also van Hoeij's
 algorithm for computing the integral basis will be available. @*
->From the integral basis, the adjoint ideal is obtained by linear algebra.
+From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -485,7 +485,7 @@ transcendental and y as algebraic and computes an integral basis in C(x)[y] of
 the integral closure of C[x] in C(x,y) using the normalization algorithm
 from @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the library,
 also van Hoeij's algorithm for computing the integral basis will be available.@*
->From the integral basis, the adjoint ideal is obtained by linear algebra.
+From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
@@ -2064,8 +2064,8 @@ RETURN:  returns the inverse of r in Z/p represented by an element in
 THEORY:  This uses Euclid's extended gcd algorithm.
 "
 {
-  list L = extendedEuclid(r, p);
-  if (L[1] != 1) { "ERROR: GCD of", r, "and", p, "should be 1."; }
+  list L = extgcd(r, p);
+  if (L[1] != 1) { ERROR("GCD of", r, "and", p, "should be 1."); }
   L[2] = aMod(L[2],p);
   return (L[2]);
 }
@@ -2145,7 +2145,7 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
       }
       mm = insert(mm, z, size(mm));
     }
-    return (aMod(chineseRemainder(roots, mm) , m));
+    return (aMod(chinrem(roots, mm) , m));
   }
 }
 
@@ -2166,7 +2166,7 @@ KEYWORDS: Chinese remainder.
   for (i = 1; i <= size(mm); i++)
   {
     N = aDiv(M,mm[i]);
-    l = extendedEuclid(mm[i], N);
+    l = extgcd(mm[i], N);
     x = x + rr[i]*l[3]*N;
   }
   return (x);

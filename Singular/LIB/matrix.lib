@@ -543,7 +543,8 @@ EXAMPLE: example gauss_col; shows an example
 //------------------------ change ordering if necessary ----------------------
    if( ordstr(R) != ("C,dp("+string(nvars(R))+")") )
    {
-     def @R=changeord("C,dp",R); setring @R; u=1;
+     def @R=changeord(list(list("C",0:1),list("dp",1:nvars(R))),R);
+     setring @R; u=1;
      execute("minpoly="+mp+";");
      matrix A = imap(R,A);
      module M = A;
@@ -918,7 +919,7 @@ EXAMPLE: example linear_relations; shows an example.
 "
 { int n = ncols(M);
   def BaseR = basering;
-  def br = changeord("dp",basering);
+  def br = changeord(list(list("dp",1:nvars(basering))));
   setring br;
   module M = imap(BaseR,M);
   ideal vars = maxideal(1);

@@ -1,0 +1,2092 @@
+/////////////////////////////////////////////////////////////////////////////////
+version  = "$Id$";
+category="Singularities";
+
+info="
+LIBRARY:  classifyCeq.lib       simple hypersurface singularities in characteristic p > 0
+AUTHORS:  Deeba Afzal           deebafzal@gmail.com
+          Faira Kanwal Janjua   fairakanwaljanjua@gmail.com
+
+OVERVIEW:
+   A library for classifying the simple singularities with respect to contact equivalence in charateristic p > 0 .
+   Simple hypersurface singularities in charateristic p > 0 were classified by Greuel and
+   Kroening [1] with respect to contact equivalence. The classifier we use has been proposed in [2].
+
+REFERENCES:
+[1] Greuel, G.-M.; Kroening, H.: Simple singularities in positive characteristic.
+    Math.Z. 203, 339-354 (1990).
+[2] Afzal,D.;Binyamin,M.A.;Janjua,F.K.: On the classification of simple singularities in positive characteristic.
+
+PROCEDURES:
+  classifyCeq(f);     simple hypersurface singularities in charateristic p > 0
+";
+LIB "sing.lib";
+LIB "classify.lib";
+LIB "primdec.lib";
+LIB "ring.lib";
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+proc classifyCeq(poly f)
+"USAGE:  classifyCeq(f);  f poly
+RETURN: string including the Tjurina number of f and its type in the classification of Greuel and Kroening
+EXAMPLE: example classifyCeq;  shows an example
+"
+{
+   def R=basering;
+   def S=changeord(list(list("ds",1:nvars(basering))));
+   setring S;
+   poly f=imap(R,f);
+   string re;
+   if(char(basering)==0)
+   {
+     re=(string(classify(f)));
+   }
+   if(char(basering)!=2)
+   {
+     re=classifyCeq1(f);
+   }
+   if(char(basering)==2)
+   {
+     re=classifyCeq2(f);
+   }
+   setring R;
+   return(re);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=3,(x,y,z,u,v,w),ds;
+   classifyCeq(-x2+xy+y2+xz-yz-z2+w2+u3+v4);
+}
+///////////////////////////////////////////////////////////  char p > 2 //////////////////////////////////////////
+static proc blowupone(poly f)
+{
+   //=== input f smooth or isolated simple singularity at zero
+   //=== output var(1) or poly with isolated singularity at zero
+   def R=basering;
+   def S=changeord(list(list("ds",1:nvars(basering))));
+   setring S;
+   int n=nvars(basering);
+   int i;
+   poly f=imap(R,f);
+   if(deg(lead(f))<=1){setring R;return(var(1));}
+   def T=changeord(list(list("lp",1:nvars(basering))));
+   setring T;
+   map phi;
+   ideal mphi, sing;
+   poly p,q;
+   //===========  blow up =======================================================
+   for(i=1;i<=n;i++)
+   {
+      mphi=var(i)*maxideal(1);
+      mphi[i]=var(i);
+      phi=S,mphi;
+       p=phi(f);
+      q=p/var(i);
+      while(size(p)==size(q))
+      {
+         p=q;
+         q=q/var(i);
+      }
+      //===============  p is the strict transform var(i) exceptional divisor ====
+       //=============== analysis of singularities ================================
+      sing=jacob(p),p,var(i);
+      sing=radical(sing);
+      option(redSB);
+      sing=std(sing);
+      sing=simplify(sing,1);
+       if(size(sing)>1)
+      {
+         if(size(sing)!=n){ERROR("not simple");}
+         ideal mpsi=std(maxideal(1));
+         for(i=1;i<=n;i++){mpsi[i]=var(i)-sing[n-i+1][2];}
+         map psi=T,mpsi;
+         p=psi(p);
+         setring R;
+         poly p=imap(T,p);
+         return(p);
+      }
+    }
+   setring R;
+   return(var(1));
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ static proc classifyCeq1(poly f)
+//====Classify Simple hypersurface singularities when charateristic p!=2
+{
+      // char!=2
+      //====input poly f
+      //====output  The function defines ......not an isolated singularity or  not a simple singularity  and tjurina
+      //          of the singularity or a simple singularity ,tjurina of the singularity and type of the singularity.
+      def R=basering;
+      int d;
+      int m=tjurina(f);
+
+           if(m==-1)
+           {
+                 return("The given function defines not an isolated singularity" );
+
+           }
+           poly g;
+           int c;
+           c=corank(f);
+           if(c<=1)
+           {
+
+               if(c==0)
+               {
+                  return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+A[1]:"+string(var(1))+"^2+"+string(var(2))+"^2");
+               }
+
+               if(c==1)
+
+              {
+                  poly w=blowupone(f);
+                  int n=tjurina(w);
+
+                 int b=m-n;
+                 if(b<=2)
+                 {
+                   return( "The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+A["+string(m)+"]:"+string(var(1))+"^2+"+string(var(2))+"^"+string(m+1)+"");
+                 }
+                 else
+                 {
+
+                    return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+A["+string(m-1)+"]:"+string(var(1))+"^2+"+string(var(2))+"^"+string(m)+"");
+                 }
+
+   }
+}
+           if(c==2)
+           {
+                 g=jet(f,3);
+                 if(g==0)
+                 {
+                    return( "The given function defines not a simple singularity.
+The tjurina number is "+string(m)+".");
+                 }
+                 if(g!=0)
+                 {
+
+                       def S=GDsplitting(f);
+                       setring S;
+
+
+                      poly g=jet(f,3);
+                         if(g==0)
+                         {
+                             setring(R);
+                            return("The given function defines not a simple singularity.
+The tjurina number is "+string(m)+".");
+                          }
+                      list L=factorize(g);
+                      if(size(L[1])==2)
+                      {
+                              ideal M=var(1),var(2)^2;
+                              ideal N=std(M^3);
+                               poly h=reduce(f,N);
+                                if(h==0)
+                                {
+                                   return(" The given function defines not a simple singularity
+The tjurina number is "+string(m)+".");
+                                }
+                                if(h!=0)
+                                {
+                                       if((char(R)!=3)&&(char(R)!=5))
+                                        {
+                                             setring R;
+                                             if(m==6)
+                                             {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[6]:"+string(var(1))+"^3+"+string(var(2))+"^4");
+                                             }
+                                             if(m==7)
+                                             {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[7]:"+string(var(1))+"^3+"+string(var(1))+"*"+string(var(2))+"^3");
+                                             }
+                                             if(m==8)
+                                             {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[8]:"+string(var(1))+"^3+"+string(var(2))+"^5");
+                                             }
+                                        }
+                                        if(char(R)==5)
+                                        {
+                                            setring R;
+                                            if(m==6)
+                                            {
+                                               return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[6]:"+string(var(1))+"^3+"+string(var(2))+"^4");
+                                            }
+                                            if(m==7)
+                                            {
+                                               return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[7]:"+string(var(1))+"^3+"+string(var(1))+"*"+string(var(2))+"^3");
+                                            }
+                                            if(m==10)
+                                            {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[8]:"+string(var(1))+"^3+"+string(var(2))+"^5");
+                                             }
+                                             if(m==8)
+                                             {
+                                                return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^1[8]:"+string(var(1))+"^3+"+string(var(2))+"^5+"+string(var(1))+"*"+string(var(2))+"^4");
+                                             }
+                                        }
+                                        if(char(R)==3)
+                                        {
+                                             poly p=blowupone(f);
+                                             int e=(std(jacob(p)+ideal(p))==1);
+                                             setring R;
+                                             if((m==7)&&e)
+                                             {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^1[6]:"+string(var(1))+"^3+"+string(var(2))+"^4+"+string(var(1))+"^2*"+string(var(2))+"^2");
+                                             }
+                                             if((m==7)&&!e)
+                                             {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^1[7]:"+string(var(1))+"^3+"+string(var(1))+"*"+string(var(2))+"^3+"+string(var(1))+"^2*"+string(var(2))+"^2");
+                                             }
+                                             if(m==8)
+                                             {
+
+                                                return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^2[8]:"+string(var(1))+"^3+"+string(var(2))+"^5+"+string(var(1))+"^2*"+string(var(2))+"^2");
+                                             }
+                                             if(m==10)
+                                             {
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^1[8]:"+string(var(1))+"^3+"+string(var(2))+"^5+"+string(var(1))+"^2*"+string(var(2))+"^3");
+                                             }
+                                            if((m==9)&&e)
+                                            {
+
+                                                return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[6]:"+string(var(1))+"^3+"+string(var(2))+"^4");
+                                            }
+                                            if((m==9)&&!e)
+                                            {
+
+                                                 return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[7]:"+string(var(1))+"^3+"+string(var(1))+"*"+string(var(2))+"^3");
+                                            }
+                                           if(m==12)
+                                           {
+
+                                                return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+E^0[8]:"+string(var(1))+"^3+"+string(var(2))+"^5");
+                                           }
+
+                                       }
+                                       else
+                                       {
+                                             return( "The given function defines not a simple singularity");
+                                       }
+
+                                   }
+
+                   }
+
+                   if(size(L[1])==3)
+                   {
+                           setring R;
+                           return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+D["+string(m)+"]:"+string(var(1))+"^2*"+string(var(2))+"+"+string(var(2))+"^"+string(m-1)+"");
+                   }
+                    if(size(L[1])==4)
+                   {
+                                         setring R;
+                                        return("The given function defines a simple singularity.
+The tjurina number is "+string(m)+".
+D[4]:"+string(var(1))+"^2*"+string(var(2))+"+"+string(var(1))+"^3");
+                   }
+          }
+     }
+  if(c>=3)
+  {
+     return( "The given function defines not a simple singularity.
+The tjurina number is "+string(m)+".");
+  }
+
+}                    // ends classifyCeq1
+ example
+{
+"EXAMPLE:"; echo=2;
+  ring R=5,(x,y),ds;
+  classifyCeq1(x2y+y22);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc GDsplitting(poly f)
+{      // the result of the splitting lemma (myMorsesplitting) in a special ring of 2 variables
+       // input a poly f of order >=2
+       // output  ring S=char(basering),(x,y),ds;  and a poly f in <x,y>^3 in S with the following properties:
+       // f + a sum of squares of further variables is contact equivalentt to the input polynomial
+       def R=basering;
+       intvec t;
+       int b,i;
+       b=tjurina(f);
+       f=myMorsesplitting(f,b);
+       t=forv(findVar(f));
+       ring S=char(basering),(x,y),ds;
+       ideal M;
+       M[t[1]]=var(1);
+       M[t[2]]=var(2);
+       i=1;
+       if((i!=t[1])&&(i!=t[2]))
+       {
+         M[i]=0;
+       }
+       map phi=R,M;
+       poly f=phi(f);
+       export(f);
+       setring(R);
+       return(S);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc myMorsesplitting(poly f,int b)
+{
+   // splitting lemma
+   // input  poly f=f(x(1),...,x(n))      jet(f,2)!=0
+   // output a polynomial in 2 variables of order >=3 such that a sum of squares of the remaining variables plus this
+   // polynomial is contact equivalent to the input polynomial
+   intvec w;
+   f=simplify(jet(f,b),1);
+   while(jet(f,2)!=0)
+   {
+      w=findlead(f);
+      if(w[1]==w[2])
+      {
+             f=splitting_one(f,w[1],b);
+      }
+      else
+      {
+             f=splitting_two(f,w[1],w[2],b);
+      }
+    }
+    return(f);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+  ring R=3,(x,y,z,u,v),ds;
+  poly f=x2+x3z+u2+v2+z3+y11;
+  myMorsesplitting(f,30);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findlead(poly f)
+
+{
+  //  input poly f=x(i)^2+h      or   poly f=x(i)*x(j)+h  , h of order >=2
+  //  output intvec w   w[1]=i,w[2]=i   or  w[1]=i ,w[2]=j
+  intvec v=leadexp(f);
+  int i,k,n;
+  intvec w;
+  n=nvars(basering);
+  for(i=1;i<=n;i++)
+  {
+      if(v[i]==2)
+      {
+          w[1]=i;
+          w[2]=i;
+          break;
+      }
+     if(v[i]==1)
+      {
+          k++;
+          w[k]=i;
+      }
+  }
+  return(w);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+  ring R=3,(x,y,z,u,v),ds;
+  poly f=x2+x3z+u2+v2+z3+y11;
+  findlead(f);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc splitting_one(poly p, int i, int b)
+{
+// assumes that p=x_i^2+h, no x_i^2 in h, h of order >=2
+// returns q(x_1,??x_i-1,x_i+1,...,x_n) such that x_i^2 +q is right equivalent to p mod
+// <x_1,??,x_n>^b
+
+   if(b<2){b=2;}
+   def R=basering;
+   ideal M=maxideal(1);
+   map phi;
+   poly q=jet((p-var(i)^2)/var(i),b);
+   while(q!=0)
+   {
+      p=quickSubst(p,var(i)-1/2*q,i,b);
+      q=jet((p-var(i)^2)/var(i),b);
+   }
+   return(simplify(jet(p,b)-var(i)^2,1));                           //make the leading coefficient 1
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ ring R=3,(x,y,z,u,v),ds;
+ poly f=x2+y3+z4+xy3+u2+v2;
+ splitting_one(f,1,18);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc splitting_two(poly p, int i, int j, int b)
+{
+// assumes that p=x_i*x_j+h, no x_i^2 in h, h of order >=2
+// returns q(x_1,???,x_i-1,x_i+1,...,x_j-1,x_j+1,...,x_n) such that x_i*x_j +q is right equivalent to p mod
+// <x_1,??,x_n>^b
+
+   if(b<2){b=2;}
+   def R=basering;
+   ideal M=maxideal(1);
+   map phi;
+   poly q=jet((p-var(i)*var(j))/var(i),b);
+   while(q!=0)
+   {
+      p=quickSubst(p,var(j)-q,j,b);
+      q=jet((p-var(i)*var(j))/var(i),b);
+   }
+   return(simplify(substitute(jet(p,b),var(j),0),1));              //make the leading coefficient 1
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+ring R=5,(u,v,w,s,t),ds;
+poly f=uv+t2+u4s+u11+v7+s9+w8;
+ splitting_two(f,1,2,128);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc quickSubst(poly h, poly r, int i, int b)
+{
+   //=== assume h, r is in Q[x_1,...,x_n], computes jet(h(x_i=r),b)
+   h=jet(h,b);
+   r=jet(r,b);
+   matrix M=coef(h,var(i));
+   poly q = 1;
+   int j,k,d;
+   intvec v;
+   d=deg(M[1,1]);
+   v[d+1]=1;
+   for(k = 2; k <= ncols(M); k++)
+   {
+        v[deg(M[1,k])+1]=1;
+   }
+   h=0;
+   for(k=1;k<=d+1;k++)
+   {
+      if(v[k]==1)
+      {
+         h=h+jet(q*M[2,ncols(M)-j],b);
+         j++;
+      }
+      q=jet(q*r,b);
+   }
+   return(h);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findVar(poly p)
+{
+   //  input poly f
+   //  output intvec v   v[i]=0 if f is not depending on var(i) and v[j]=1 if f is depending on var(j)
+    intvec v;
+    int i,n;
+     n=nvars(basering);
+    for(i=1;i<=n;i++)
+    {
+           if(subst(p,var(i),0)==p)
+           {
+               v[i]=0;
+           }
+           else
+           {
+                v[i]=1;
+           }
+    }
+    return(v);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+  ring R=3,(x,y,z,u,v),ds;
+  poly f=y3+u5;
+  findlead(f);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc forv(intvec v)
+{
+       //returns the places of v which are different from zero
+       intvec w;
+       int i,j;
+       j=1;
+       for(i=1;i<=nvars(basering);i++)
+       {
+            if(v[i]!=0)
+            {
+               w[j]=i;
+                j++;
+            }
+        }
+        return(w);
+}
+
+/////////////////////////////////////////// char p=2 ////////////////////////////////////////////////////////////////////////////
+static proc classifyCeq2(poly p)
+//====Classification of hypersurface singularities in Characteristic p=2.
+{
+       //    input    poly p
+       //    output   The normal form to which f is contact equvalent or the function is not simple.
+       def R=basering;
+       int t=tjurina(p);
+       list T;
+       if(t==-1)
+       {
+          return("The given function defines not an isolated singularity");
+       }
+        int b=t+1;
+       p=SPILPRO(p,b);
+       list L=findVAR(p);
+       if(L[2]>=4)
+       {
+
+           return("The given function defines not a simple singularity.
+The Tjurina Number is "+string(t)+". ");
+       }
+       if(L[2]==1)
+       {
+          def S=redvar2(p);
+           setring S;
+
+          string a="The given function defines an isolated Singularity.
+The Tjurina number is "+string(t)+".
+A_"+string(leadexp(p)[1]-1)+":xy+z"+string(leadexp(p)[1])+".";
+          setring R;
+          return(a);
+       }
+
+       if(jet(p,2)==0)
+       {
+           if(L[2]==3)
+           {
+              return("The given function defines not a simple singularity.
+The Tjurina Number is "+string(t)+". ");
+
+           }
+           def S=redvar2(p);
+           setring S;
+           string a=curCeq2(p);
+           setring R;
+           return(a);
+       }
+       else
+       {
+         if(L[2]==3)
+         {
+             int B=t div 2+1;
+             p=splitting_SQUA(p,B);
+             def S=redvar2(p);
+             setring S;
+             string a=surCeq2(p);
+             setring R;
+             return(a);
+         }
+           p=splitting_SQUA(p,b);
+           def S=redvar2(p);
+           setring S;
+           string a=curCeq2(p);
+           setring R;
+           return(a);
+      }
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+    ring r=2,(x,y,z,w,t,v),ds;
+    poly f=xy+zw+t5+v3;
+    classifyCeq2(f);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc SPILPRO(poly p,int B)
+{
+    //Splitting lemma in characteristic 2
+    //input a polynomial f and a bound B
+    //output a polynomial q, the result of the splitting lemma applied to f up to the order B
+  int i,j;
+  def R=basering;
+  int n=nvars(R);
+  poly q=splittingLchar2(p);
+  list T=FindPRO(q);
+
+  while(size(T)!=0)
+  {
+     i=T[1]; j=T[2];
+     q=splitting_two2(q,i,j,B);
+
+     T=FindPRO(q);
+  }
+  return(q);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc surCeq2(poly f)
+//====Classification of Surface Singularaties in case when p=2
+{
+        //===input a funation defined in the ring whose Characteristic is 2.
+        //===output is a Normal Form to which Given function is contact equivalent or function is not simple.
+        def R=basering;
+        int n=nvars(R);
+        list L;
+        int k=tjurina(f);
+        if(k==-1)
+        {
+           return("The given function defines not an isolated singularity.");
+        }
+        return(surEsing(f));
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=2,(x,y,z),Ds;
+   surCeq(xy+y2+yz+x2y+xy2+xyz+z21+xz21);
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc surEsing(poly f)
+//====Classifcation of Ek singularities.
+{
+     //===input: A function which is an isolated singularity.
+     //===output: Normal form to which given function is contact equivalent.
+     list M;
+     def R=basering;
+     f=formf(f);
+     poly p=jet(f,2);
+     int k=tjurina(f);
+
+     list L=factorize(p);
+     poly g=subst(f,leadmonom(L[1][2]),0);
+     poly j=jet(g,3)-jet(g,2);
+     poly C=f-g;
+     C=C/leadmonom(L[1][2]);
+     poly h=subst(C,leadmonom(L[1][2]),0);
+     h=jet(h,2);
+     poly h1=j+h*leadmonom(L[1][2]);
+
+     if(h!=0)
+     {
+            list P=factorize(h1);
+            list N=factorize(j);
+
+            if((size(P[1])==2)&&(size(P[2])==2)&&(P[2][2]==1)&&(N[2][2]==3))
+            {
+                if(k==6)
+                {
+
+                   return(" The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[6]:z2+x3+y2z+xyz.");
+
+                }
+                if(k==8)
+                 {
+                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[6]:z2+x3+y2z.");
+
+                }
+            }
+            if(((size(P[1])==4)&&(size(P[2])==4))||((size(N[1])==4)&&(size(N[2])==4)))
+            {
+                if(k==8)
+                {
+                   return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D[4]:z2+x2y+xy2.");
+                }
+                if(k==6)
+                {
+                   return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^1[4]:z2+x2y+xy2+xyz.");
+
+                 }
+            }
+            if((size(P[1])<=3)&&(size(P[2])<=3))
+            {
+
+                    if(k==6)
+                    {
+                        return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^1[5]:z2+x2y+y2z+xyz.");
+                    }
+                    if(k==8)
+                    {
+
+                           if(size(lengthBL(f))==4)
+                           {
+                                 return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^3[7]:z2+x3+xy3+xyz.");
+
+                           }
+                            else
+                           {
+                                if(size(lengthBL(f))==5)
+                                {
+
+                                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^4[8]:z2+x3+y5+xyz.");
+                                }
+                                else
+                                {
+                                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0[5]:z2+x2y+y2z.");
+
+                                 }
+                            }
+
+                       }
+
+               }
+               list Q=factorize(j);
+               if((size(Q[1])==3)&&(size(Q[2])==3))
+               {
+
+                      return(surDsing(f));
+               }
+               else
+               {
+                        if(k==10)
+                        {
+                             if(size(lengthBL(f))==4)
+                             {
+                                return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^2[7]:z2+x3+xy3+y3z.");
+
+                             }
+                             if(size(lengthBL(f))==5)
+                             {
+                                return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^3[8]:z2+x3+y5+y3z.");
+
+                             }
+                        }
+                        if(k==12)
+                        {
+
+                             if(size(lengthBL(f))==4)
+                             {
+                                   return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[7]:z2+x3+xy3+xy3z.");
+
+                              }
+                              if(size(lengthBL(f))==5)
+                              {
+                                   return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^2[8]:z2+x3+y5+xy2z.");
+
+                              }
+                         }
+                         if(k==14)
+                         {
+
+                              if(size(lengthBL(f))==4)
+                              {
+                                     retrun("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[7]:z2+x3+xy3.");
+
+                              }
+                              if(size(lengthBL(f))==5)
+                              {
+                                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[8]:z2+x3+y5+xy3z.");
+                              }
+                          }
+                          if(k==16)
+                          {
+                               return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[8]:z2+x3+y5.");
+                          }
+                  }
+     }
+     if(h==0)
+     {
+            list P=factorize(j);
+            if((size(P[1])==2)&&(size(P[2])==2)&&((P[2][2])==1))
+            {
+               if(k==6)
+               {
+                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[6]:z2+x3+y2z+xyz.");
+               }
+               if(k==8)
+               {
+                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[6]:z2+x3+y2z.");
+
+               }
+            }
+            if((size(P[1])==4)&&(size(P[2])==4))
+            {
+               if(k==8)
+               {
+                   return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0[4]:z2+x2y+xy2.");
+
+               }
+               if(k==6)
+               {
+                   return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^1[4]:z2+x2y+xy2+xyz.");
+
+               }
+            }
+
+            if((size(P[1])==3)&&(size(P[2])==3))
+            {
+                if(((P[2][2])==1)&&((P[2][3])==1))
+                {
+                      if(k==6)
+                      {
+                           return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^1[5]:z2+x2y+y2z+xyz.");
+                      }
+                      if(k==8)
+                      {
+                          if(size(lengthBL(f))==4)
+                          {
+                              return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^3[7]:z2+x3+xy3+xyz.");
+                          }
+                          else
+                          {
+                                if(size(lengthBL(f))==5)
+                                {
+                                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^4[8]:z2+x3+y5+xyz.");
+
+                                 }
+                                 else
+                                 {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0[5]:z2+x2y+y2z.");
+
+                                 }
+                            }
+                        }
+                   }
+
+              }
+
+              if((size(P[1])==2)&&((P[2][2])==3))
+              {
+                         if(k==10)
+                         {
+                              if(size(lengthBL(f))==4)
+                              {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^2[7]:z2+x3+xy3+y3z.");
+
+                              }
+                              if(size(lengthBL(f))==5)
+                              {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^3[8]:z2+x3+y5+y3z.");
+
+                               }
+                          }
+                          if(k==12)
+                          {
+
+                               if(size(lengthBL(f))==4)
+                               {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[7]:z2+x3+xy3+xy3z.");
+
+                                }
+                                if(size(lengthBL(f))==5)
+                                {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^2[8]:z2+x3+y5+xy2z.");
+
+                                 }
+                           }
+                           if(k==14)
+                           {
+
+                                if(size(lengthBL(f))==4)
+                                {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[7]:z2+x3+xy3.");
+
+                                }
+                                if(size(lengthBL(f))==5)
+                                {
+                                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[8]:z2+x3+y5+xy3z.");
+
+                                }
+                           }
+                           if(k==16)
+                           {
+                                return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[8]:z2+x3+y5.");
+
+                           }
+               }
+               return(surDsing(f));
+      }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc surDsing(poly f)
+//====Classification of Dk singularaties========================
+
+{
+      //===input: A function which is an isolated singularity.
+      //===output: Normal form to which given function is contact equivalent.
+
+     def R=basering;
+     int n=nvars(R);
+     f=formf(f);
+     int k=tjurina(f);
+
+     list M=factorize(jet(f,2));
+
+     poly g=subst(f,leadmonom(M[1][2]),0);
+     poly j=jet(g,3);
+     if(j==0)
+     {
+
+       return("The given function defines not a simple singularity.
+The Tjurina Number is "+string(k)+".");
+
+     }
+     list P=factorize(j);
+     if((size(P[1])==4)&&(size(P[2])==4))
+     {
+           if(k==8)
+           {
+
+              return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0 [4]:z2+x2y+xy2.");
+
+           }
+           if(k==6)
+           {
+               return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^1 [4]:z2+x2y+xy2+xyz.");
+
+           }
+     }
+     if((size(P[1])==3)&&(size(P[2])==3))
+     {
+
+         poly q=BlowUpO(f);
+
+         if((tjurina(f)-tjurina(q))==4)
+         {
+               list Q=whichSUR(f);
+
+               j=subst(Q[2],leadmonom(M[1][2]),0);
+               poly j1=jet(j,3);
+               list L=factorize(j1);
+
+               if((size(L[1])==4)&&(size(L[2])==4))
+               {
+                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0 ["+string(tjurina(f) div 2)+"]:z2+x2y+xy"+string(tjurina(f) div 4)+". ");
+
+               }
+               if((size(L[1])==3)&&(size(L[2])==3))
+               {
+                    return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0 ["+string((tjurina(f) div 2)+1)+"]:z2+x2y+y"+string(tjurina(f) div 4)+"z.");
+
+               }
+          }
+          if((tjurina(f)-tjurina(q))==2)
+          {
+
+               list Q=whichSUR(f);
+               if(Q[1]==8){Q[2]=BlowUpO(Q[2]);}
+               j=subst(Q[2],leadmonom(M[1][2]),0);
+               poly j1=jet(j,3);
+
+               list L=factorize(j1);
+               if((size(L[1])==4)&&(size(L[2])==4))
+               {
+                  return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^"+string(findSUR(f))+" ["+string((tjurina(f)+2*findSUR(f)) div 2)+"]:z2+x2y+xy^"+string((tjurina(f)+2*findSUR(f)) div 4)+"+ xy"+string(((tjurina(f)+2*findSUR(f)) div 4)-findSUR(f))+" z.");
+
+               }
+               if((size(L[1])==3)&&(size(L[2])==3))
+               {
+               return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^"+string(findRSUR(f))+" ["+string(((tjurina(f)+2*findRSUR(f)) div 2)+1)+"]:z2+x2y+y"+string((tjurina(f)+2*findRSUR(f)) div 4)+"z+xy"+string(((tjurina(f)+2*findRSUR(f)) div 4)-findRSUR(f))+"z.");
+
+               }
+          }
+     }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc formf(poly f)
+//=====Transform jet(f,2) in to the polynomial var(3)^2.
+//=====This is the case when We are in Dk and Ek surface singularaties.
+{
+
+        poly j=jet(f,2);
+        list L=factorize(j);
+        def r=basering;
+        if(leadmonom(L[1][2])==var(1))
+        {
+            f=subst(f,var(1),L[1][2]);
+            map phi=r,var(3),var(2),var(1);
+            return(phi(f));
+
+        }
+        if(leadmonom(L[1][2])==var(2))
+        {
+            f=subst(f,var(2),L[1][2]);
+             map phi=r,var(1),var(3),var(2);
+                return(phi(f));
+
+        }
+        if(leadmonom(L[1][2])==var(3))
+        {
+             return(f);
+        }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc whichSUR(poly f)
+//====This procedure is required to separate the Surface Case D_2m from D_2m+1 as discribes in [2].
+{
+   int d=tjurina(f);
+   list L;
+   while(1)
+   {
+       f=BlowUpO(f);
+       d=tjurina(f);
+
+       if((d==6)||(d==8))
+       {
+         L[1]=d;
+         L[2]=f;
+
+         return(L);
+       }
+   }
+   return(d);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findSUR(poly f)//D2m,r
+//====Number of blowup required in order either to get the difference equal to 4 or the Tjurina number is less than 6.
+{
+
+     int a, r,b;
+     while(1)
+     {
+         r++;
+         a=tjurina(f);
+         if(a<=1)
+         {
+            return(r);
+         }
+         f=BlowUpO(f);
+         b=tjurina(f);
+         if((a-b)==4)
+         {
+              if(b==2)
+              {
+                return(r);
+              }
+              return(r-1);
+         }
+         if(b<6)
+         {
+             return(r-1);
+         }
+
+      }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findRSUR(poly f)//D2m+1,r
+//====Calculate the number of blow ups required by a polynomial in order to get the difference 4.
+{
+
+    int a, r,b;
+    while(1)
+    {
+       r++;
+       a=tjurina(f);
+
+       if(a==2)
+       {
+           return(r);
+       }
+
+       f=BlowUpO(f);
+       b=tjurina(f);
+
+       if((a-b)==4)
+       {
+           return(r-1);
+       }
+       if(b<6)
+       {
+            return(r);
+       }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc BlowUpO(poly f)
+//====Gives the procedure of Blowing up ingeneral
+{
+   //=== input f smooth or isolated singularity at zero
+   //=== output var(1) or poly with isolated singularity at zero, the transformation
+   //=== of the singularity of the blowing up to zero
+    def R=basering;
+   def S=changeord(list(list("ds",1:nvars(basering))));
+   setring S;
+   int n=nvars(basering);
+   int i,t,c,d,e,j,k;
+   poly f=imap(R,f);
+   if(deg(lead(f))<=1){setring R;return(var(1));}
+   poly p;
+   def T=changeord(list(list("lp",1:nvars(basering))));
+   setring T;
+   list L;
+   map phi,psi;
+   ideal mphi, mpsi,sing;
+   poly p,q,m,l;
+   poly h=var(1);
+   //===========  blow up=======================================================
+   for(i=1;i<=n;i++)
+   {
+      mphi=var(i)*maxideal(1);
+      mphi[i]=var(i);
+      phi=S,mphi;
+       p=phi(f);
+      q=p/var(i);
+      while(size(p)==size(q))
+      {
+         p=q;
+         q=q/var(i);
+      }
+      //===============  p is the strict transform var(i) exceptional divisor ====
+       //=============== analysis of singularities ================================
+      sing=jacob(p),p,var(i);
+      sing=radical(sing);
+      option(redSB);
+      sing=std(sing);
+      if(dim(sing)>0){ERROR("not simple");}
+      sing=std(simplify(sing,1));
+      if(dim(sing)==0)
+      {
+        if(vdim(sing)==1)
+            {
+                  mpsi=std(maxideal(1));
+                  for(k=1;k<=n;k++){mpsi[k]=var(k)-sing[n-k+1][2];}
+                  psi=T,mpsi;
+                  p=psi(p);
+            }
+            else
+            {     //this can only happen in case of a D-singularity
+                   L=minAssGTZ(sing);
+                   d=0;
+                   for(j=1;j<=size(L);j++)
+                   {
+                       sing=std(L[j]);
+                       sing=std(simplify(sing,1));
+                       if(vdim(sing)!=1){ERROR("something is wrong in blowUpO");}
+                       mpsi=std(maxideal(1));
+                       for(k=1;k<=n;k++){mpsi[k]=var(k)-sing[n-k+1][2];}
+                       psi=T,mpsi;
+                       m=psi(p);
+                       setring S;
+                       p=imap(T,m);
+                       e=tjurina(p);
+                       setring T;
+                       if(e>d)
+                       {
+                            d=e;
+                            l=m;
+                       }
+                    }
+                   p=l;
+            }
+            setring S;
+            p=imap(T,p);
+            c=tjurina(p);
+            setring T;
+            if(c>t)
+            {
+                 t=c;
+                 h=p;
+            }
+         }
+       }
+     setring R;
+     poly h=imap(T,h);
+     return(h);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc lengthBL(poly f)
+//====Return the list of Tjurina numbers of each blowing up in the resolution before it becomes smooth.
+{
+    list L;
+    int i=1;
+    int d=tjurina(f);
+    while(d>=2)
+    {
+        f=BlowUpO(f);
+         L[i]=d;
+        d=tjurina(f);
+
+         i=i+1;
+    }
+    return(L);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc curCeq2(poly f)
+//====Classification of Curves in Case when p=2.
+{
+
+     int c;
+     int k;
+     number m,a,b;
+     ideal I;
+     int d;
+     k=tjurina(f);
+     if(k==-1)
+     {
+           return("The given function defines not an isolated singularity");
+
+     }
+     if(deg(lead(f))==2)
+     {
+          poly f1=jet(f,2);
+          list T=factorize(f1);
+          if(size(T[1])==3)
+          {
+              return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+A1:x2+xy.");
+
+          }
+          if(size(T[1])==2)
+          {
+                poly g=BlowUpO(f);
+                if((tjurina(f)-tjurina(g))==4)
+                {
+                      return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+A["+string(k div 2)+"]:x2+y "+string(tjurina(f) div 2+1)+". where r=0. ");
+                }
+                else
+                {
+                     d=whichtru(f);
+                    if(d==1)
+                    {
+                         if((k mod 4)==0)
+                         {
+
+                            return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+A["+string(2*(tjurina(f) div 2)-1)+"]:x2+xy"+string(tjurina(f) div 2)+".");
+                         }
+                         else
+                         {
+                            return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+A["+string((2*(tjurina(f)+1) div 2)-1)+"]:x2+xy"+string((tjurina(f)+1) div 2)+".");
+
+                         }
+                    }
+                    if(d==0)
+                    {
+                        if((findR(f) mod 2)==0)
+                        {
+                           return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+A^"+string(findR(f))+" ["+string(2*((tjurina(f)+2*findR(f)) div 4))+"]:x2+y"+string(((tjurina(f)+2*findR(f)) div 2)+1)+"+xy"+string(((tjurina(f)+2*findR(f)) div 2)-findR(f))+".");
+                        }
+                        if((findR(f) mod 2)!=0)
+                        {
+                           return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+A^"+string(findR(f))+" ["+string(2*(((tjurina(f)+1)+2*findR(f)) div 4))+"]:x2+y"+string((((tjurina(f)+1)+2*findR(f)) div 2)+1)+"+xy"+string((((tjurina(f)+1)+2*findR(f)) div 2)-findR(f))+".");
+
+                        }
+                     }
+
+                 }
+
+           }
+
+       }
+       if(deg(lead(f))==3)
+       {
+           if(jet(f,3)==0)
+           {return("The given function defines not a simple Singularity.
+             The Tjurina number is "+string(tjurina(f))+".")}
+           poly f1=jet(f,3);
+           list L=factorize(f1);
+           if(size(L[1])==4)
+           {
+              return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D[4]:x2y+xy2.");
+
+            }
+            if(size(L[1])==3)
+            {
+                poly g=BlowUpO(f);
+                if((tjurina(f)-tjurina(g))==8)
+                {
+                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^0["+string((tjurina(f) div 2)+1)+"]:x2y+y"+string(tjurina(f) div 2)+". where m="+string(tjurina(f)/4)+".");
+
+                 }
+                 else
+                 {
+                      if(whichtru(f)==1)
+                      {
+                         return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D["+string(tjurina(f))+"]:x2y+xy"+string(tjurina(f) div 2)+". ");
+                       }
+                       if(whichtru(f)==0)
+                       {
+                             if((findRD(f) mod 2)==0)
+                             {
+                            return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^"+string(findRD(f))+"["+string(2*((tjurina(f) div 2+findRD(f)) div 2)+1)+"]:x2y+y"+string((tjurina(f) div 2+findRD(f)))+"+xy"+string((tjurina(f) div 2+findRD(f))-findRD(f))+" where even r="+string(findRD(f))+".");
+                              }
+                              else
+                              {
+                               return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+D^"+string(findRD(f))+"["+string(2*(((tjurina(f)+1) div 2+findRD(f)) div 2)+1)+"]:x2y+y"+string(((tjurina(f)+1) div 2+findRD(f)))+"+xy"+string(((tjurina(f)+1) div 2+findRD(f))-findRD(f))+",odd r="+string(findRD(f))+".");
+                               }
+                         }
+                 }
+             }
+             a=leadcoef(f);
+             b=leadcoef(f-lead(f));
+             f=subst(f,var(1),1/a*(var(1)-a*b*var(2)));
+             I=var(1),var(2)^2;
+             I=std(I^3);
+             if(reduce(f,I)!=0)
+             {
+                if(k==6)
+                 {
+                     return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^1[6]:x3+y4+xy3.");
+
+                 }
+                 if(k==7)
+                 {
+                      return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E[7]:x3+xy3.");
+                  }
+                  if(k==8)
+                  {
+                       poly t=BlowUpO(f);
+                       if(tjurina(t)==0)
+                       {
+                           return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E^0[6]:x3+y4.");
+                       }
+                        else
+                       {
+                           return("The given function defines an isolated Singularity.
+The Tjurina number is "+string(tjurina(f))+".
+E[8]:x3+y5.");
+                        }
+                   }
+               }
+               else
+               {return("The given function defines not a simple singularity.
+                        The Tjurina number is "+string(tjurina(f))+".");}
+      }
+
+      if(deg(lead(f))>3)
+      {
+
+          return("The given function defines not a simple singularity.
+                  The Tjurina number is "+string(tjurina(f))+".");
+
+      }
+}
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring R=2,(x,y),Ds;
+   curCeq2(x3+x2y+xy2+y3+xy3+y4);
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc whichtru(poly f)
+//====Gives the information that we do successive blowups and the last singularaty before becoming smmoth has Tjurina
+//====number 1 if not than returns 0.(returns either a singularaty or smooth surve)============
+{
+   int d=tjurina(f);
+   while(1)
+   {
+       f=BlowUpO(f);
+       d=tjurina(f);
+       if(d==1)
+       {
+         return(d);
+       }
+       if(d==0)
+       {
+          return(d);
+       }
+   }
+  return(d);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findR(poly f)
+//====Find the number of blowups required by polynomial such that
+//====difference between two consecutive blowups become 4
+//====this procedure find the value of r in case of Ak singularaties as in [1].
+{
+    int a, r,b;
+    while(1)
+    {
+        r++;
+        a=tjurina(f);
+        if(a<=1)
+        {
+            return(-1);
+        }
+        f=BlowUpO(f);
+
+        b=tjurina(f);
+
+        if((a-b)==4)
+        {
+            return(r-1);
+        }
+     }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findRD(poly p)
+//=====Find the number of blowups required by polynomial such
+//=====that difference between two consecutive blowups become 4
+//=====this procedure find the value of r in case of Dk singularaties as in [1].
+{
+
+   int k=tjurina(p);
+   poly q=BlowUpO(p);
+   int t=tjurina(q);
+   int r;
+
+   if((k mod 4)==0)
+   {
+      r=findR(BlowUpO(p))+2;
+      return(r);
+   }
+   if((k mod 4 !=0)&&(t mod 4==0))
+   {
+     if(t!=0)
+     {
+        r=findR(BlowUpO(p))+1;
+       return(r);
+     }
+   }
+   if((k mod 2)==0)
+   {
+      r=findR(BlowUpO(p))+2;
+      return(r);
+   }
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc splitting_SQUA(poly p, int b)
+ {
+         // assumes that p=x_i^2+h, h of order >=3
+         // returns q(x_1,??,x_n) such that x_i^2 +q is right equivalent to p mod
+          // <x_1,??,x_n>^b and x_i is only linear in q
+            def R=basering; int n=nvars(R);
+            ideal M=maxideal(1);
+            int j;
+             map phi;
+             p=jet(p,b);
+             p=simplify(p,1);
+             list T=FindSQUA(p);
+             int i=T[1];
+             poly q=p/var(i)^2;
+             while(q!=1)
+             {
+                for(j=1;j<=n;j++)
+                {
+                   M[j]=var(j)*q;
+                }
+                phi=R,M;
+                p=phi(p);
+                p=p*inverseUnit(q,b);
+                p=jet(p,b);
+                q=p/var(i)^2;
+             }
+             return(p);
+ }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc splitting_two2(poly p, int i, int j, int b)
+{
+     // assumes that p=x_i*x_j+h, no x_i^2, no in h, h of order >=2
+     // returns q(x_1,??x_i-1,x_i+1,...,x_j-1,x_j+1,...,x_n) such that x_i*x_j +q is right equivalent to p mod
+     // <x_1,??,x_n>^b
+      if(b<2){b=2;}
+      def R=basering;
+      poly q=jet((p-var(i)*var(j))/var(i),b);
+      while(q!=0)
+      {
+         p=quickSubst2(p,var(j)-q,j,b);
+         q=jet((p-var(i)*var(j))/var(i),b);
+      }
+      return(simplify(substitute(jet(p,b),var(j),0),1));              //make the leading coefficient 1
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc quickSubst2(poly h, poly r, int i, int b)
+{
+    //=== assume h, r is in Q[x_1,...,x_n], computes jet(h(x_i=r),b)
+     h=jet(h,b);
+     r=jet(r,b);
+     matrix M=coef(h,var(i));
+     poly q = 1;
+     int j,k,d;
+     intvec v;
+     d=deg(M[1,1]);
+     v[d+1]=1;
+     for(k = 2; k <= ncols(M); k++)
+     {
+         v[deg(M[1,k])+1]=1;
+     }
+     h=0;
+     for(k=1;k<=d+1;k++)
+     {
+        if(v[k]==1)
+        {
+            h=h+jet(q*M[2,ncols(M)-j],b);
+            j++;
+        }
+        q=jet(q*r,b);
+      }
+   return(h);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc FindPRO(poly f)
+{
+        //input the polynomial
+      // output is a list T where T[1]=the first variable which appear as product in the quadraic form.
+      //                          T[2]=the second variable which appear as product with the var(T[1]) in the quadraic form.
+  def R=basering;
+  int n=nvars(R);
+  int i,j,k;
+  list T;
+  for(i=1;i<=n;i++)
+  {
+     for(k=i+1;k<=n;k++)
+     {
+         for(j=1;j<=size(f);j++)
+         {
+             if(leadmonom(f[j])==var(i)*var(k))
+             {
+
+                T[1]=i;
+                T[2]=k;
+                return(T);
+             }
+         }
+     }
+
+  }
+   return(T);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc FindSQUA(poly f)
+{
+      //input the polynomial
+      // output is a list T where T[1]=the first variable which appears as a square in the quadraic part of f.
+      //                          T[2]= the number of squares appearing in the quadraic part of f.
+  def R=basering;
+  int n=nvars(R);
+  int i,j,k;
+  list T;
+  for(i=1;i<=n;i++)
+  {
+       for(j=1;j<=size(f);j++)
+       {
+           if(leadmonom(f[j])==var(i)^2)
+           {
+                k++;
+                T[1]=i;
+                T[2]=k;
+                return(T);
+            }
+       }
+   }
+   return(T);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc findVAR(poly f)
+{
+     //input: a poly f
+     //output a list L=v,k v an intvec, v[i]=0, if depends on var(i), v[i]=1 else
+     //k is the number of variables occurring in f
+     intvec v;
+     int i,k;int n=nvars(basering);
+     list L;
+     for(i=1;i<=n;i++)
+     {
+        if(f==subst(f,var(i),0))
+        {
+           v[i]=1;
+        }
+        else
+        {
+           v[i]=0;
+           k++;
+        }
+     }
+     L=v,k;
+     return(L);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc redvar2(poly p)
+{
+       //input  a polynomial depending on x_i_1,...,x_i_k
+       //output a new ring with k variables containing the polynomial
+   def R=basering;
+   int n=nvars(R);
+   list N=findVAR(p);
+   int m=N[2];
+   intvec v=N[1];
+   int l;
+   int i;
+   if(n==m)
+   {
+
+        def S=R;
+        if(defined(h))
+        {
+           kill h;
+        }
+        poly h;
+        export h;
+
+   }
+   else
+   {
+      def S=defring("2",m,"u","ds");
+      setring S;
+      ideal M;
+      for(i=1;i<=n;i++)
+      {
+           if(v[i]==1)
+           {
+              M[i]=0;
+           }
+           else
+           {
+              l++;
+              M[i]=var(l);
+           }
+       }
+       map phi=R,M;
+       poly p=phi(p);
+       export p;
+       setring R;
+    }
+    return(S);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc inverseUnit(poly q,int b)
+{
+   //input a polynomial q with non-zero constant part
+   //output the inverse of q up to order b as a power series
+   number c=leadcoef(q);
+   q=q/c;
+   int i;
+   poly u=1;
+   poly a=q-1;
+   poly s=-a;
+   for(i=1;i<=b;i++)
+   {
+      u=u+s;
+      s=s*a;
+   }
+   return(u/c);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc splittingLchar2(poly f)
+{
+   //the quadratic part of the splitting lemma in characteristic 2
+   //input: poly f
+   //output: a polynomial right equivalent to the input polynomial such that the quadratic part is in normal form
+   poly p=jet(f,2);
+   if(p==0){return(f);}
+   if(!homog(p)){return(jet(f,1));}
+   def R=basering;
+   def S=changeord(list(list("lp",1:nvars(basering))));
+   setring S;
+   ideal ma=maxideal(1);
+   number a;
+   int c=ringlist(S)[1][1];
+   poly f=imap(R,f);
+   poly p=imap(R,p);
+   poly h,q;
+   intvec v=leadexp(p);
+   int i,j,k;
+   intvec w;
+   for(k=1;k<=size(v);k++)
+   {
+      if(v[k]!=0){w[size(w)+1]=k;}
+   }
+   i=w[2];
+   if(size(w)==3){j=w[3];}
+   if(j>0)
+   {
+      a=1/leadcoef(p);
+      ma[j]=a*(var(j)+(p-lead(p))/var(i));
+      map phi=S,ma;
+      p=phi(p);
+      f=phi(f);
+      q=(p-lead(p))/var(j);
+      ma=maxideal(1);
+      ma[i]=var(i)+q;
+      phi=S,ma;
+      f=phi(f);
+      h=splittingLchar2(f-var(i)*var(j));
+      if(jet(h,2)==0)
+     {
+         setring R;
+         f=imap(S,f);
+         return(f);
+      }
+      v=leadexp(h);
+      for(k=1;k<=size(v);k++)
+      {
+         if(v[k]!=0){break;}
+      }
+      if(v[k]==2)
+      {
+         ma=maxideal(1);
+         ma[i]=var(j);
+         ma[j]=var(k);
+         ma[k]=var(i);
+         phi=S,ma;
+         h=phi(h);
+         f=h+var(j)*var(k);
+      }
+      else
+      {
+         f=h+var(i)*var(j);
+      }
+      setring R;
+      f=imap(S,f);
+      return(f);
+   }
+
+   a= leadcoef(p)^(c div 2);
+   ma[i]=1/a*var(i);
+   map phi=S,ma;
+   p=phi(p);
+   f=phi(f);
+   q=p/var(i);
+   if(size(q)==1)
+  {
+      if(p==var(i)^2)
+      {
+         setring R;
+         f=imap(S,f);
+         return(f);
+      }
+      h=splittingLchar2(f-var(i)^2);
+      p=jet(h,2);
+      v=leadexp(p);
+      h=h+var(i)^2;
+
+      for(k=1;k<=size(v);k++)
+      {
+         if(v[k]!=0){j=k;break;}
+      }
+      if(v[j]==2)
+      {
+         ma=maxideal(1);
+         ma[i]=var(i)+var(j);
+         phi=S,ma;
+         h=phi(h);
+         h=splittingLchar2(h);
+      }
+      setring R;
+      f=imap(S,h);
+      return(f);
+   }
+   else
+   {
+      q=q-lead(q);
+      v=leadexp(q);
+      for(k=1;k<=size(v);k++)
+      {
+         if(v[k]!=0){j=k;break;}
+      }
+      ma=maxideal(1);
+      ma[j]=1/leadcoef(q)*(var(j)+q-lead(q));
+      phi=S,ma;
+      f=phi(f);
+      ma=maxideal(1);
+      ma[j]=var(i);
+      ma[i]=var(j);
+      phi=S,ma;
+      f=phi(f);
+      p=jet(f,2);
+      if(leadmonom(p)==var(i)^2)
+      {
+                                            f=phi(f);
+         p=jet(f,2);
+         ma=maxideal(1);
+         ma[i]=p/var(j)-var(j);
+         phi=S,ma;
+         f=phi(f);
+         h=splittingLchar2(f-var(i)^2-var(i)*var(j)-var(j)^2);
+         p=jet(h,2);
+
+         f=var(i)^2+var(i)*var(j)+var(j)^2+h;
+         if(p!=0)
+         {
+            v=leadexp(p);
+            for(k=1;k<=size(v);k++)
+            {
+               if(v[k]!=0){break;}
+            }
+            if(v[k]==2)
+            {
+               ma=maxideal(1);
+               ma[k]=var(i)+var(k);
+               phi=S,ma;
+               f=phi(f);
+               setring R;
+               f=imap(S,f);
+               return(splittingLchar2(f));
+            }
+            setring R;
+            f=imap(S,f);
+            return(f);
+         }
+         else                     //we return (x_i)^2+x_i*x_j+(x_j)^2 since we need a field extension
+         {                        //to transform it to x_i*x_j
+            setring R;
+            f=imap(S,f);
+            return(f);
+         }
+      }
+      setring R;
+      f=imap(S,f);
+      return(splittingLchar2(f));
+   }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+===============================   Examples for characteristic 2 ==========================================
+ring r=2,(x,y,z,w,t,v),ds;
+poly p=xy+zw+t5+v3;
+classifyCeq(p);
+
+map phi=r,v,t,w,z,y,x;
+poly c=1+x+y+z;
+poly q=c*p;
+q=phi(q);
+q=zw+tv+x3+zw2+zwt+zwv+wtv+t2v+tv2+x3w+x3t+x3v+y5+y5w+y5t+y5v;
+classifyCeq(q);
+
+poly p=ztv+x3+zw2+zwt+zwv+wtv+tv2+tv2+x3w+x3t+x3v+xy3+xy3w+xy3v;
+classifyCeq(p);
+
+poly p=zw+tv+x3+zw2+zwt+wtv+t2v+tv2+x3w+x3t+x3v+y4+y4w+y4t+y4v;
+classifyCeq(p);//E^0[6]
+
+poly p=zw+tv+x3+zw2+zwt+zwv+wtv+t2v+tv2+x3w+x3t+x3v+xy3+y4+xy3w+xy3t+xy3v+y4w+y4t+y4v;
+classifyCeq(p);//E^1[6]
+
+poly p=y2+zw+tv+y2w+y2t+y2v+zw2+zwt+zwv+wtv+t2v+tv2+x11+x11w+x11t+x11v;
+classifyCeq(p);//A[10] r=0;
+
+poly p=zw+tv+xy2+zw2+zwv+zwt+wtv+t2v+tv2+xy2w+xy2t+xy2v+x14y+x14yw+x14yt+x14yv+x26+x26w+x26t+x26v;
+classifyCeq(p);
+
+ring r=2,(x,y,z,t,w,u,v),Ds;
+ideal I=z+t,x+t+w,v,y,u,t,w+z;
+det(jacob(I));
+map phi=r,I;
+poly a=1+x+u+v;
+poly p=xy+zt+wu+v19;
+poly q=a*p;
+poly j=phi(q);
+classifyCeq(j);
+classifyCeq(p);
+
+poly p=x2+yz+tw+u3+v2x;
+classifyCeq(p);
+
+poly q=a*p;
+poly j=phi(q);
+classifyCeq(j);
+
+poly p=xy+zw+t2+u2v+v19u;
+classifyCeq(p);
+
+poly q=a*p;
+poly j=phi(q);
+classifyCeq(j);
+
+poly p=xy+zw+t2+u2v+v5t+uvt;
+classifyCeq(p);
+
+poly q=a*p;
+poly j=phi(q);
+classifyCeq(j);
+
+poly p=xy+zw+t2+u2v+v5u+uvt;
+classifyCeq(p);
+
+poly q=a*p;
+poly j=phi(q);
+classifyCeq(j);
+
+ring r=2,(x,y,z,t,w,u,v,e),Ds;
+ideal I=x+y+z+t+w,y+z+t+w,e,v,u,t,w,z;
+map si=r,I;
+
+poly p=xy+zt+wu+v2+e81;
+poly j=si(p);
+classifyCeq(j);
+
+poly p=xy+zt+wu+v2+e81+e^(80-12)*v;
+classifyCeq(p);
+poly j=si(p);
+classifyCeq(j);
+
+poly p=xy+zt+wu+v2e+e60+e31v;
+classifyCeq(p);
+
+poly p=xy+zt+wu+v2e+e60+e59v;
+poly j=si(p);
+classifyCeq(j);
+===============================   Examples for characteristic > 2 ========================================
+ring R=3,(x,y,z,u,v,w,s,t),ds;
+ideal M=maxideal(1);
+M[3]=x-y+z+u+w-s+t;
+poly f=u3+v4+u2v2+x2+y2+z2+s2+t2+w2;
+classifyCeq(f);
+
+map phi=R,M;
+f=phi(f);
+classifyCeq(f);
+
+f=u2+y32+s2+t2+v2+x2+z2+w2;
+classifyCeq(f);
+
+map phi=R,M;
+f=phi(f);
+classifyCeq(f);
+
+
+f=v2w+w61+x2+y2+z2+t2+z2+s2+u2;
+classifyCeq(f);
+
+f=phi(f);
+classifyCeq(f);
+
+f=u2+v2+w2+s2+t2-x2y+xy2+z6+y11+xy11+x14+z53;  // f is of corank=3
+classifyCeq(f);
+
+f=x3+y4+xy5+s2+t2;
+classifyCeq(f);
+
+f=u3+v5+u2v2+x2+y2+z2+t2+s2+w2;
+classifyCeq(f);
+
+ideal M=maxideal(1);
+M[2]=x+y+2s+t;
+map phi=R,M;
+f=phi(f);
+classifyCeq(f);
+
+ring R=3,(u,v,w,s,t),ds;
+poly f=w2s+s21+u2+v2+t2;
+classifyCeq(f);
+
+ideal M=maxideal(1);
+M[3]=u+2v+w+2t+2s;
+map phi=R,M;
+f=phi(f);
+classifyCeq(f);
+
+ring R=5,(x,y,z,u,v,w,s,t),dp;
+poly f=v2w+w61+x2+y2+z2+t2+z2+s2+u2;
+classifyCeq(f);
+
+*/

@@ -2630,7 +2630,8 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
   {
     whomog[j+1]=w[j]+M;
   }
-  execute("ring WEIGHTRING=("+charstr(basering)+"),("+varstr(basering)+"),(wp("+string(whomog)+"));");
+  intmat O=weightVectorToOrderMatrix(whomog);
+  execute("ring WEIGHTRING=("+charstr(basering)+"),("+varstr(basering)+"),(M("+string(O)+"));");
   // map i to the new ring and compute a GB of i, then dehomogenise i,
   // so that we can be sure, that the
   // initial forms of the generators generate the initial ideal
@@ -2673,7 +2674,8 @@ NOTE:        the initialForm consists of the terms with MAXIMAL weighted order w
 EXAMPLE:     example initialForm;   shows an example"
 {
   def BASERING=basering;
-  execute("ring INITIALRING=("+charstr(BASERING)+"),("+varstr(basering)+"),wp("+string(w)+");");
+  intmat O=weightVectorToOrderMatrix(w);
+  execute("ring INITIALRING=("+charstr(BASERING)+"),("+varstr(basering)+"),M("+string(O)+");");
   poly f=imap(BASERING,f);
   int GRAD=deg(f);
   poly initialf=lead(f);
@@ -2698,6 +2700,41 @@ example
 
 /////////////////////////////////////////////////////////////////////////
 
+proc weightVectorToOrderMatrix (intvec w)
+"USAGE:      weightVectorToOrderMatrix(w); w intvec
+ASSUME:      w not zero vector
+RETURN:      intmat, an order matrix yielding a weighted degree ordering
+NOTE:        returns matrix of full rank with first row equal to m
+EXAMPLE:     example weightVectorToOrderMatrix;   shows an example"
+{
+  intmat O[size(w)][size(w)]; O[1,1..size(w)]=w;
+  for (int j=size(w);j>=1;j--)
+  {
+    if (w[j]<>0)  // find the last non-zero component of w
+    {
+      int r=2;
+      for (int k=1;k<=size(w);k++)
+      {           // fill the order matrix O with unit vectors
+        if(k<>j)  // except the unit vector of the non-zero component
+        {
+          intvec u; u[size(w)]=0; u[k]=1;
+          O[r,1..size(w)]=u; r=r+1;
+        }
+      }
+      return(O);
+    }
+  }
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   intvec v=2,3,0,0;
+   weightVectorToOrderMatrix(v);
+}
+
+/////////////////////////////////////////////////////////////////////////
+
 proc initialIdeal (ideal i, intvec w)
 "USAGE:      initialIdeal(i,w); i ideal, w intvec
 ASSUME:      i is an ideal in Q[x_1,...,x_n] and w=(w_1,...,w_n)
@@ -2706,7 +2743,8 @@ NOTE:        the initialIdeal consists of the terms with MAXIMAL weighted order 
 EXAMPLE:     example initialIdeal;   shows an example"
 {
   def BASERING=basering;
-  execute("ring INITIALRING=("+charstr(BASERING)+"),("+varstr(basering)+"),wp("+string(w)+");");
+  intmat O=weightVectorToOrderMatrix(w);
+  execute("ring INITIALRING=("+charstr(BASERING)+"),("+varstr(basering)+"),M("+string(O)+");");
   ideal i=imap(BASERING,i);
   i=std(i);
   ideal ini;

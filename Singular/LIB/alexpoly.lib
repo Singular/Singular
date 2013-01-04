@@ -1745,7 +1745,7 @@ NOTE:     This procedure is only for internal use; it is called by resgraph.
   // End of the smooth case
   int initial_tm=0;                  // total multipl. of the endpoint of Puiseux chain P_i-1
   int g=size(charexp);
-  list es=divsequence(charexp[2],charexp[1]);   // keeps the lenghts of the Puiseuxchainparts s_i,j
+  list es=divsequence(charexp[2],charexp[1]);   // keeps the lengths of the Puiseuxchainparts s_i,j
   intvec divseq=es[1];
   int r=es[2];
   int initial=0;
