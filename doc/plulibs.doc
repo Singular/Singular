@@ -108,28 +108,34 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @c ----------------------------------------------------------
 @node purityfiltration_lib, nchomolog_lib, qmatrix_lib, Non-commutative libraries
 @section purityfiltration_lib
+Status: experimental
 @c lib purityfiltration.lib
 @c ----------------------------------------------------------
 @node nchomolog_lib, ratgb_lib, purityfiltration_lib, Non-commutative libraries
 @section nchomolog_lib
+Status: experimental
 @c lib nchomolog.lib
 @c ----------------------------------------------------------
 @c @node ratgb_lib, bimodules_lib, nchomolog_lib, Non-commutative libraries
 @node ratgb_lib, dmodloc_lib, nchomolog_lib, Non-commutative libraries
 @section ratgb_lib
+Status: experimental
 @c lib ratgb.lib
 @c ----------------------------------------------------------
 @c @node bimodules_lib, dmodloc_lib, ratgb_lib, Non-commutative libraries
 @c @section bimodules_lib
+@c Status: experimental
 @c @c lib bimodules.lib
 @c ----------------------------------------------------------
 @c @node dmodloc_lib, ncpreim_lib, bimodules_lib, Non-commutative libraries
 @node dmodloc_lib, ncpreim_lib, ratgb_lib, Non-commutative libraries
 @section dmodloc_lib
+Status: experimental
 @c lib dmodloc.lib
 @c ----------------------------------------------------------
 @node ncpreim_lib, , dmodloc_lib, Non-commutative libraries
 @section ncpreim_lib
+Status: experimental
 @c lib ncpreim.lib
 @c ----------------------------------------------------------
 @raisesections

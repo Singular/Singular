@@ -32,6 +32,11 @@
 @item new library: JMSConst.lib:  constructing J-Marked Schemes (@nref{JMSConst_lib})
 @item new library: JMBTest.lib:  performs JM basis test (@nref{JMBTest_lib})
 @item new library: orbitparam.lib:  parametrizing unipotent orbits (@nref{orbitparam_lib})
+@item new librart: purityfiltration.lib: computing a purity filtration (@nref{purityfiltration_lib})
+@item new librart: nchomolog.lib: Noncommutative Homological Algebra (@nref{nchomolog_lib})
+@item new librart: ratgb.lib: Groebner bases in Ore localizations (@nref{ratgb_lib})
+@item new librart: dmodloc.lib: Localization of algebraic D-module (@nref{dmodloc_lib})
+@item new librart: ncpreim.lib: Non-commutative elimination and preimage (@nref{ncpreim_lib})
 @item library for Dingular 4: derham.lib:  Computation of deRham cohomology (@nref{derham_lib})
 @end itemize
 

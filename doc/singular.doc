@@ -950,6 +950,7 @@ Comments should be send to the author of the library directly.
 * realclassify_lib:: Classification of real singularities
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * symodstd_lib:: Groebner bases for symmetric ideals
+* derham_lib:: Computation of deRham cohomology (Singular 4)
 @end menu
 @c ----------------------------------------------------------
 @node classifyceq_lib,divisors_lib, , Experimental libraries
