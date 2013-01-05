@@ -61,7 +61,8 @@
 #define SSI_VERSION 5
 
 // 64 bit version:
-#if SIZEOF_LONG == 8
+//#if SIZEOF_LONG == 8
+#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define LONG long
@@ -443,11 +444,11 @@ static number ssiReadQNumber(ssiInfo *d)
      case 4:
        {
          LONG dd=s_readlong(d->f_read);
-	 #if SIZEOF_LONG == 8
+	 //#if SIZEOF_LONG == 8
          return INT_TO_SR(dd);
-	 #else
-	 return nlInit(dd,NULL);
-	 #endif
+	 //#else
+	 //return nlInit(dd,NULL);
+	 //#endif
        }
      case 5:
      case 6:
