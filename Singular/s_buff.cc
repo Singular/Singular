@@ -146,6 +146,34 @@ int s_readint(s_buff F)
   return r*neg;
 }
 
+long s_readlong(s_buff F)
+{
+  if (F==NULL)
+  {
+    printf("link closed");
+    return 0;
+  }
+  char c;
+  long neg=1;
+  long r=0;
+  //int digit=0;
+  do
+  {
+    c=s_getc(F);
+  } while((!F->is_eof) && (c<=' '));
+  if (c=='-') { neg=-1; c=s_getc(F); }
+  while(isdigit(c))
+  {
+    //digit++;
+    r=r*10+(c-'0');
+    c=s_getc(F);
+  }
+  s_ungetc(c,F);
+  //if (digit==0) { printf("unknown char %c(%d)\n",c,c); /*debug*/
+  //                printf("buffer:%s\np=%d,e=%d\n",F->buff,F->bp,F->end);fflush(stdout); } /*debug*/
+  return r*neg;
+}
+
 int s_readbytes(char *buff,int len, s_buff F)
 {
   if (F==NULL)

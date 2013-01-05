@@ -22,6 +22,7 @@ int s_getc(s_buff F);
 void s_ungetc(int c, s_buff F);
 
 int s_readint(s_buff F);
+long s_readlong(s_buff F);
 int s_readbytes(char *buff,int len, s_buff F);
 void s_readmpz(s_buff F, mpz_ptr a);
 void s_readmpz_base(s_buff F, mpz_ptr a, int base);

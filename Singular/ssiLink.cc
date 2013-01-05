@@ -60,6 +60,17 @@
 
 #define SSI_VERSION 5
 
+// 64 bit version:
+#if SIZEOF_LONG == 8
+#define MAX_NUM_SIZE 60
+#define POW_2_28 (1L<<60)
+#define LONG long
+#else
+// 32 bit version:
+#define MAX_NUM_SIZE 28
+#define POW_2_28 (1L<<28)
+#define LONG int
+#endif
 typedef struct
 {
   s_buff f_read;
@@ -106,7 +117,7 @@ void ssiWriteInt(ssiInfo *d,const int i)
 void ssiWriteString(ssiInfo *d,const char *s)
 {
   SSI_BLOCK_CHLD;
-  fprintf(d->f_write,"%d %s ",strlen(s),s);
+  fprintf(d->f_write,"%d %s ",(int)strlen(s),s);
   SSI_UNBLOCK_CHLD;
   //if (d->f_debug!=NULL) fprintf(d->f_debug,"stringi: %d \"%s\" ",strlen(s),s);
 }
@@ -156,7 +167,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   {
     if(SR_HDL(n) & SR_INT)
     {
-      fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
+      fprintf(d->f_write,"4 %ld ",((LONG)SR_TO_INT(n)));
       //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
     }
     else if (n->s<2)
@@ -196,7 +207,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   int i;
   for(i=0;i<r->N;i++)
   {
-    fprintf(d->f_write,"%d %s ",strlen(r->names[i]),r->names[i]);
+    fprintf(d->f_write,"%d %s ",(int)strlen(r->names[i]),r->names[i]);
   }
   /* number of orderings:*/
   i=0;
@@ -431,9 +442,12 @@ static number ssiReadQNumber(ssiInfo *d)
        }
      case 4:
        {
-         int dd;
-         dd=s_readint(d->f_read);
+         LONG dd=s_readlong(d->f_read);
+	 #if SIZEOF_LONG == 8
          return INT_TO_SR(dd);
+	 #else
+	 return nlInit(dd,NULL);
+	 #endif
        }
      case 5:
      case 6:
