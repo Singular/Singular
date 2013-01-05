@@ -95,7 +95,7 @@ int idPosConstant(ideal id)
   int k;
   for (k = IDELEMS(id)-1; k>=0; k--)
   {
-    if (p_LmIsConstantComp(id->m[k], currRing) == TRUE)
+    if ((id->m[k]!=NULL) && p_LmIsConstantComp(id->m[k], currRing))
       return k;
   }
   return -1;
