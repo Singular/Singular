@@ -2065,7 +2065,7 @@ THEORY:  This uses Euclid's extended gcd algorithm.
 "
 {
   list L = extgcd(r, p);
-  if (L[1] != 1) { "ERROR: GCD of", r, "and", p, "should be 1."; }
+  if (L[1] != 1) { ERROR("GCD of", r, "and", p, "should be 1."); }
   L[2] = aMod(L[2],p);
   return (L[2]);
 }
