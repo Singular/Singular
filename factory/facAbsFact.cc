@@ -8,7 +8,7 @@
  **/
 /*****************************************************************************/
 
-#include "fac_absfact.h"
+#include "facAbsFact.h"
 #include "cf_reval.h"
 #include "cf_primes.h"
 #include "cf_algorithm.h"
