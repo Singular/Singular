@@ -22,7 +22,9 @@
 #endif
 
 #ifdef HAVE_FLINT
+#ifdef HAVE_NTL
 
+//TODO optimize choice of p -> choose p as large as possible (better than small p since factorization mod p does not require field extension, also less lifting)
 int choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval)
 {
   REvaluation E1 (1, 1, IntRandom (25));
@@ -79,7 +81,7 @@ int choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval)
   return 0;
 }
 
-CFList absFactorize (const CanonicalForm& G)
+CFFList absFactorize (const CanonicalForm& G)
 {
   //F is assumed to be bivariate, irreducible over Q, primitive wrt x and y, compressed
 
@@ -122,8 +124,6 @@ CFList absFactorize (const CanonicalForm& G)
   CanonicalForm smallestFactorEval= smallestFactor (eval[0].mapinto(),1);
   setCharacteristic (0);
   CanonicalForm F1= F(eval[0],1);
-  setCharacteristic (p);
-  setCharacteristic (0);
   int s= tdegF/minTdeg + 1;
   CanonicalForm bound= power (maxNorm (F1), 2*(s-1));
   bound *= power (CanonicalForm (s),s-1);
@@ -189,7 +189,7 @@ CFList absFactorize (const CanonicalForm& G)
   ZZ det;
 
   transpose (NTLM, NTLM);
-  long r=LLL (det, NTLM, 1L, 1L);
+  long r=LLL (det, NTLM, 1L, 1L); //use floating point LLL ?
   transpose (NTLM, NTLM);
   M= *convertNTLmat_ZZ2FacCFMatrix (NTLM);
 
@@ -200,10 +200,12 @@ CFList absFactorize (const CanonicalForm& G)
 
   CFFList mipoFactors= factorize (mipo);
   mipoFactors.removeFirst();
+  //TODO check if mipoFactors has length 1 and multiplicity 1 - if not choose a new point!
   On (SW_RATIONAL);
   Variable alpha= rootOf (mipo);
   CFFList QaFactors= factorize (F1, alpha);
 
+  QaFactors.append (CFFactor (mipo, 1)); //last factor is the minimal polynomial that defines the extension
   fmpz_poly_clear (v[0]);
   fmpz_poly_clear (v[1]);
   fmpz_poly_clear (w[0]);
@@ -212,8 +214,9 @@ CFList absFactorize (const CanonicalForm& G)
   delete [] w;
   delete [] link;
   fmpz_poly_factor_clear (liftedFactors);
-  return CFList();
+  return QaFactors;
 }
+#endif
 #endif
 
 

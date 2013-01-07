@@ -18,7 +18,7 @@
 
 /*BEGINPUBLIC*/
 
-CFList absFactorize (const CanonicalForm& F);
+CFFList absFactorize (const CanonicalForm& F);
 
 /*ENDPUBLIC*/
 
