@@ -1,10 +1,10 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file cfModResultant.h
+/** @file facAbsFact.h
  *
- * modular resultant algorithm as described by G.E. Collins in "The Calculation
- * of multivariate polynomial resultants"
+ * bivariate absolute factorization over Q described in "Modular Las Vegas
+ * Algorithms for Polynomial Absolute Factorization" by Bertone, Chèze, Galligo
  *
  * @author Martin Lee
  *

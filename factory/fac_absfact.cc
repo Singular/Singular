@@ -1,10 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facMul.cc
- *
- * This file implements functions for fast multiplication and division with
- * remainder
+/** @file facAbsFact.cc
  *
  * @author Martin Lee
  *
