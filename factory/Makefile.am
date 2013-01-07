@@ -61,6 +61,7 @@ SOURCES = \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
+		facAbsFact.cc \
 		facAlgExt.cc \
 		facBivar.cc \
 		fac_berlekamp.cc \
@@ -143,6 +144,7 @@ factory_headers = \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \
+		facAbsFact.h \
 		facAlgExt.h \
 		facBivar.h \
 		fac_berlekamp.h \

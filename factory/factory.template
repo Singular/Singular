@@ -104,4 +104,7 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "facIrredTest.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "fac_absfact.h"
+
 #endif /* ! INCL_FACTORY_H */

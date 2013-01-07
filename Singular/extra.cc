@@ -3699,6 +3699,22 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
+  #ifdef HAVE_FLINT
+  /*================= absolute factorization ======================*/
+      if (strcmp (sys_cmd, "absFact") == 0)
+      {
+        if (h!=NULL && (h->Typ()== POLY_CMD))
+        {
+          CanonicalForm F= convSingPFactoryP((poly)(h->Data()));
+          CFList factors= absFactorize (F);
+          res->rtyp= INT_CMD;
+          res->data= (void*) 1;
+          return FALSE;
+        }
+        else return TRUE;
+      }
+      else
+  #endif
   #endif
   #ifdef ix86_Win
   /*==================== Python Singular =================*/
