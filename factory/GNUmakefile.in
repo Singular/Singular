@@ -160,7 +160,7 @@ basefactorysrc := \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
-		fac_absfact.cc \
+		facAbsFact.cc \
 		facAlgExt.cc \
 		facBivar.cc \
 		fac_berlekamp.cc \
@@ -247,7 +247,7 @@ basefactoryincl := \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \
-		fac_absfact.h \
+		facAbsFact.h \
 		facAlgExt.h \
 		facBivar.h \
 		fac_berlekamp.h \
