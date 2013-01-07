@@ -1191,6 +1191,13 @@ static void naClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   c = (number)p_NSet(n, cf->extRing); // over alg. ext. of Q // takes over the input number
 }
 
+void naKillChar(coeffs cf)
+{
+   if ((--cf->extRing->ref) == 0)
+     rDelete(cf->extRing);
+}
+
+
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
@@ -1256,6 +1263,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfImPart       = naImPart;
   cf->cfCoeffWrite   = naCoeffWrite;
   cf->cfNormalize    = naNormalize;
+  cf->cfKillChar     = naKillChar;
 #ifdef LDEBUG
   cf->cfDBTest       = naDBTest;
 #endif
