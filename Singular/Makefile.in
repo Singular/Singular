@@ -611,7 +611,7 @@ install-libsingular: libsingular installslib-nolns
 	  ${INSTALL_PROGRAM}  $$file ${libdir}; \
 	done
 	${INSTALL_PROGRAM} libsingular.h ${includedir}
-	for file in subexpr.h tok.h grammar.h ipid.h lists.h ipshell.h attrib.h silink.h table.h; do \
+	for file in sing_dbm.h subexpr.h tok.h grammar.h ipid.h lists.h ipshell.h attrib.h silink.h table.h; do \
 	sed -e "s:<kernel/:<singular/:" < $$file |sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" >${includedir}/singular/$$file ;\
 	done
 
