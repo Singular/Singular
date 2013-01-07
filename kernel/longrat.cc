@@ -2124,9 +2124,16 @@ LINLINE BOOLEAN nlEqual (number a, number b)
 LINLINE number nlInit (long i, const ring r)
 {
   number n;
-  LONG ii=(LONG)i;
-  if ( ((ii << 3) >> 3) == ii ) n=INT_TO_SR(ii);
-  else                          n=nlRInit(ii);
+  if ((i>=POW_2_28)||(i< -POW_2_28))
+  {
+     n=nlRInit(i);
+     n=nlShort3(n);
+  }
+  else
+  {
+    LONG ii=(LONG)i;
+    n=INT_TO_SR(ii);
+  }
   nlTest(n);
   return n;
 }

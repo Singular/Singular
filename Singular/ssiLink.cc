@@ -168,7 +168,22 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   {
     if(SR_HDL(n) & SR_INT)
     {
+      #if SIZEOF_LONG == 4
       fprintf(d->f_write,"4 %ld ",((LONG)SR_TO_INT(n)));
+      #else
+      long nn=SR_TO_INT(n);
+      if ((nn<POW_2_28)||(nn>= -POW_2_28))
+        fprintf(d->f_write,"4 %ld ",((LONG)nn));
+      else
+      {
+        mpz_t tmp;
+	mpz_init_set_si(tmp,nn);
+        fputs("8 ",d->f_write);
+        mpz_out_str (d->f_write,32, tmp);
+        fputc(' ',d->f_write);
+	mpz_clear(tmp);
+      }
+      #endif
       //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
     }
     else if (n->s<2)
