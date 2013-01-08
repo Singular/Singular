@@ -53,7 +53,6 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
 
   r->modBase = (int_number) omAllocBin (gmp_nrz_bin);
   mpz_init_set_si (r->modBase, 2L);
-  r->ringtype = 1;
   r->modNumber= (int_number) omAllocBin (gmp_nrz_bin);
   mpz_init (r->modNumber);
   mpz_pow_ui (r->modNumber, r->modBase, r->modExponent);

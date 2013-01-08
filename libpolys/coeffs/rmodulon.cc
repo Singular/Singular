@@ -54,10 +54,6 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 
   nrnInitExp (info->exp, r);
 
-  if (info->exp > 1)
-    r->ringtype= 3;
-  else
-    r->ringtype= 2;
   /* next computation may yield wrong characteristic as r->modNumber
      is a GMP number */
   r->ch = mpz_get_ui(r->modNumber);
@@ -507,7 +503,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
   if (nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src) ||
       nCoeff_is_Ring_2toM(src) || nCoeff_is_Zp(src))
   {
-    if (   (src->ringtype > 0)
+    if (   (!nCoeff_is_Zp(src))
         && (mpz_cmp(src->modBase, dst->modBase) == 0)
         && (src->modExponent == dst->modExponent)) return nrnMapGMP;
     else
