@@ -13,7 +13,7 @@
 @heading Installation preliminaries
 
 This is the final distribution of @sc{Singular} as MPW tool.
-Newer versions of @sc{Singular} will only be available for MacOS X (which is handled like other @sc{Unix}-systems).
+Newer versions of @sc{Singular} will only be available for Mac OS X (which is handled like other @sc{Unix}-systems).
 To install @sc{Singular} on a Macintosh (PPC only), you need the file @code{Singular-2-0-2-ppc-MPW.sea.hqx} resp. @code{Singular-2-0-2-ppc-MPW.hqx} which you can obtain by public ftp from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
 Furthermore, you need MacOS version >= 8.5 with an installed MPW shell. 
 This version works also without Carbon.
@@ -21,10 +21,10 @@ This version works also without Carbon.
 @include register.texi
 
 
-@heading Installing @sc{Singular} on MacOS X
+@heading Installing @sc{Singular} on Mac OS X
 
 Please see @uref{INSTALL_unix.html}. 
-In contrast to other Unix systems, under MacOS X, @sc{Singular} is only available as a shell command and there is no Emacs interface.
+In contrast to other Unix systems, under Mac OS X, @sc{Singular} is only available as a shell command and there is no Emacs interface.
 Enter @code{Singular} in a terminal under Aqua to run @sc{Singular}.
 Alternatively, you may choose @code{Terminal} as the application to open the file @code{Singular} with and put it into the dock.
 

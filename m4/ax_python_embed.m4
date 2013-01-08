@@ -300,7 +300,7 @@ else:
     # for Frameworks which could have side-effects on
     # other included Frameworks.  However, it is necessary
     # where someone has installed more than one frameworked
-    # Python.  Frameworks are really only used in MacOSX.
+    # Python.  Frameworks are really only used in Mac OS X.
     strLibFW = dictConfig.get("PYTHONFRAMEWORKPREFIX")
     if strLibFW and (strLibFW != ""):
         strLinkSpec += " -F%s" % (strLibFW)

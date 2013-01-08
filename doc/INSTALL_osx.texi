@@ -7,19 +7,19 @@
 @end ifclear
 
 @ifclear singularmanual
-@majorheading Installation instructions for @sc{Singular} on a Macintosh (MacOS X)
+@majorheading Installation instructions for @sc{Singular} on a Macintosh (Mac OS X)
 
 
 @heading Installation preliminaries
 
-To install @sc{Singular} on a Macintosh, you need the file @code{Singular-<version>-ppcMac-darwin.tar.gz} resp. @code{Singular-<version>-share.tar.gz} which you can obtain by public ftp from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}. Furthermore, you need MacOSX version >= 10.2. 
+To install @sc{Singular} on a Macintosh, you need the file @code{Singular-<version>-ppcMac-darwin.tar.gz} resp. @code{Singular-<version>-share.tar.gz} which you can obtain by public ftp from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}. Furthermore, you need Mac OSX version >= 10.2. 
 
 @include register.texi
 
-@heading Installing @sc{Singular} on MacOS X
+@heading Installing @sc{Singular} on Mac OS X
 
 Please see @uref{INSTALL_unix.html}. Full functionality of @sc{Singular} requires the presence of the X-window
-environment. In the absense of X under MacOS X, @sc{Singular} is only available as a shell command, that is
+environment. In the absense of X under Mac OS X, @sc{Singular} is only available as a shell command, that is
 there are no @code{TSingular} and @code{ESingular}. @sc{Singular} can only be used by typing @code{Singular}
 in a terminal under Aqua. Alternatively, you may choose @code{Terminal} as the application to open the file @code{Singular} with and put it into the dock. The last step is easier under 10.3 (Panther), because the binaries already
 have this property.
