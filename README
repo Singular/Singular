@@ -8,7 +8,7 @@ detailed overview of SINGULAR, see
      `http://www.singular.uni-kl.de/Overview/'
 
 So far, there are only versions for Linux, HPUX, SunOS, IRIX, AIX,
-FreeBSD 4.x/5.x, MacOS X, and Windows 95/98/NT/2K/XP.
+FreeBSD 4.x/5.x, Mac OS X, and Windows 95/98/NT/2K/XP.
 
 Version 2-0-2 was the last version for MacOS 9.
 
@@ -172,7 +172,7 @@ Notes for specific platforms
        rebaseall
      before trying anything else
 
-   - MacOS X:
+   - Mac OS X:
      you need a file values.h where MP can find it (we copied one from
      Linux)
      ./configure -with-malloc=system
