@@ -422,8 +422,8 @@ BOOLEAN pComparePolys(poly p1,poly p2);
 
 #else // ! PDEBUG
 
-#define pTest(p)        ((void)0)
-#define pLmTest(p)      ((void)0)
+#define pTest(p)        do {} while (0)
+#define pLmTest(p)      do {} while (0)
 #endif
 
 #endif // POLYS_H
