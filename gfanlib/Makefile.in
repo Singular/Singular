@@ -34,7 +34,7 @@ RANLIB 		= @RANLIB@
 PIPE		= -pipe
 CFLAGS		= -fpic @CFLAGS@ ${PIPE}
 CXXFLAGS	= -fpic @CXXFLAGS@ ${PIPE}
-#CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
+#CXXTEMPLFLAGS	= -fno-implicit-templates -fno-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir}
 DEFS		= -DGMPRATIONAL
 

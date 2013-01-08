@@ -4442,10 +4442,10 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-  # check whether gcc accepts --no-rtti
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gcc accepts --no-rtti" >&5
-$as_echo_n "checking whether gcc accepts --no-rtti... " >&6; }
-  CXXFLAGS="${CXXFLAGS} --no-rtti"
+  # check whether gcc accepts -fno-rtti
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gcc accepts -fno-rtti" >&5
+$as_echo_n "checking whether gcc accepts -fno-rtti... " >&6; }
+  CXXFLAGS="${CXXFLAGS} -fno-rtti"
   if ${ac_cv_cxx_have_rtti+:} false; then :
   $as_echo_n "(cached) " >&6
 else
@@ -4475,14 +4475,14 @@ $as_echo "${ac_cv_cxx_have_rtti}" >&6; }
   if test "${ac_cv_cxx_have_rtti}" != yes; then
     CXXFLAGS="$temp_flags"
   else
-    CXXFLAGS="${temp_flags} --no-rtti"
+    CXXFLAGS="${temp_flags} -fno-rtti"
     temp_flags="${CXXFLAGS}"
   fi
 
-# check whether gcc accepts --no-exceptions
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gcc accepts --no-exceptions" >&5
-$as_echo_n "checking whether gcc accepts --no-exceptions... " >&6; }
-  CXXFLAGS="${CXXFLAGS} --no-exceptions"
+# check whether gcc accepts -fno-exceptions
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gcc accepts -fno-exceptions" >&5
+$as_echo_n "checking whether gcc accepts -fno-exceptions... " >&6; }
+  CXXFLAGS="${CXXFLAGS} -fno-exceptions"
   if ${ac_cv_cxx_have_exceptions+:} false; then :
   $as_echo_n "(cached) " >&6
 else
@@ -4558,7 +4558,7 @@ $as_echo "${ac_cv_cxx_have_exceptions}" >&6; }
   if test "${ac_cv_cxx_have_exceptions}" != yes; then
     CXXFLAGS="$temp_flags"
   else
-    CXXFLAGS="${temp_flags} --no-exceptions"
+    CXXFLAGS="${temp_flags} -fno-exceptions"
     temp_flags="${CXXFLAGS}"
   fi
 
@@ -4650,12 +4650,12 @@ if test "${GXX}" = yes; then
   fi
   temp_flags="${CXXFLAGS}"
   if test "${ac_cv_cxx_have_rtti}" = yes; then
-    CXXFLAGS="${temp_flags} --no-rtti"
+    CXXFLAGS="${temp_flags} -fno-rtti"
   fi
   temp_flags="${CXXFLAGS}"
   CXXTEMPLFLAGS="-fno-implicit-templates"
   if test "${ac_cv_cxx_have_exceptions}" = yes; then
-    CXXTEMPLFLAGS="${CXXTEMPLFLAGS} --no-exceptions"
+    CXXTEMPLFLAGS="${CXXTEMPLFLAGS} -fno-exceptions"
   fi
   if test "$ac_cv_is_aix" = yes; then
     CXXNOOPTFLAGS="-w"
