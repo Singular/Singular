@@ -3509,14 +3509,14 @@ void print_version(lp_modes mode, char *p)
 }
 
 #ifdef STANDALONE_PARSER
-main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
   lib_style_types lib_style;
   main_init(argc, argv);
   if(yyin == NULL)
   {
     fprintf(stderr, "No library found to parse.\n");
-    exit(1);
+    return 1;
   }
   if (! (texinfo_out || category_out))
   {
@@ -3538,7 +3538,7 @@ main( int argc, char *argv[] )
   else if(pi!=NULL) printpi(pi);
   if (texinfo_out)
     printf("1;");
-  exit(0);
+  return 0;
 }
 
 #endif /* STANDALONE_PARSER */
