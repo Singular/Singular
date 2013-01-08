@@ -35,15 +35,15 @@ class gmp_float
 public:
   gmp_float( const int v = 0 )
   {
-    mpf_init_set_d( t, (double) v );
+    mpf_init_set_si( t, (long) v );
   }
   gmp_float( const long v )
   {
-    mpf_init_set_d( t, (double) v );
+    mpf_init_set_si( t,  v );
   }
   gmp_float( const mprfloat v ) // double
   {
-    mpf_init_set_d( t, (double) v );
+    mpf_init_set_d( t, v );
   }
   gmp_float( const mpf_t v )
   {
@@ -76,12 +76,12 @@ public:
   };
   inline gmp_float & operator = ( const mprfloat a )
   {
-    mpf_set_d( t, (double) a );
+    mpf_set_d( t,  a );
     return *this;
   };
   inline gmp_float & operator = ( const long a )
   {
-    mpf_set_d( t, (double) a );
+    mpf_set_si( t, a );
     return *this;
   };
 
