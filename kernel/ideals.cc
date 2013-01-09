@@ -466,13 +466,7 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
 */
 static int tCompare(const poly a, const poly b)
 {
-  if (b == NULL)
-  {
-    if (a == NULL) return(0);
-
-    return(1);
-  }
-
+  if (b == NULL) return(a != NULL);
   if (a == NULL) return(-1);
 
   /* a != NULL && b != NULL */
@@ -538,7 +532,7 @@ void idDelEquals(ideal id)
   int i = 0;
   for (int j = 1; j < idsize; j++)
   {
-    if (pEqualPolys(id_sort[i].p, id_sort[j].p))
+    if (id_sort[i].p != NULL && pEqualPolys(id_sort[i].p, id_sort[j].p))
     {
       index_i = id_sort[i].index;
       index_j = id_sort[j].index;
@@ -551,9 +545,7 @@ void idDelEquals(ideal id)
         index = index_i;
         i = j;
       }
-      if (id->m[index] != NULL) {
-        pDelete(&id->m[index]);
-      }
+      pDelete(&id->m[index]);
     }
     else
     {
