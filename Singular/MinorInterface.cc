@@ -531,7 +531,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
     if (k != 0) /* this means, not all minors are requested */   l = true;
     else
     { /* k == 0, i.e., all minors are requested */
-      int minorCount = 1;
+      long minorCount = 1;
       for (int i = rowCount - minorSize + 1; i <= rowCount; i++)
         minorCount = minorCount * i;
       for (int i = 2; i <= minorSize; i++) minorCount = minorCount / i;
