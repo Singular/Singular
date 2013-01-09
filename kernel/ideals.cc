@@ -285,30 +285,6 @@ void idDelMultiples(ideal id)
   }
 }
 
-/*2
-* ideal id = (id[i])
-* if id[i] = id[j] then id[j] is deleted for j > i
-*/
-void idDelEquals(ideal id)
-{
-  int i, j;
-  int k = IDELEMS(id)-1;
-  for (i=k; i>=0; i--)
-  {
-    if (id->m[i]!=NULL)
-    {
-      for (j=k; j>i; j--)
-      {
-        if ((id->m[j]!=NULL)
-        && (pEqualPolys(id->m[i], id->m[j])))
-        {
-          pDelete(&id->m[j]);
-        }
-      }
-    }
-  }
-}
-
 //
 // Delete id[j], if Lm(j) == Lm(i) and both LC(j), LC(i) are units and j > i
 //
@@ -483,6 +459,108 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
   else if (pGetExp(a,l)>pGetExp(b,l))
     return 1;
   return -1;
+}
+
+/*
+* compare the leading terms of a and b
+*/
+static int tCompare(const poly a, const poly b)
+{
+  if (b == NULL)
+  {
+    if (a == NULL) return(0);
+
+    return(1);
+  }
+
+  if (a == NULL) return(-1);
+
+  /* a != NULL && b != NULL */
+  int r = pLmCmp(a, b);
+  if (r != 0) return(r);
+  number h = nSub(pGetCoeff(a), pGetCoeff(b));
+  r = -1 + nIsZero(h) + 2*nGreaterZero(h);   /* -1: <, 0:==, 1: > */
+  nDelete(&h);
+  return(r);
+}
+
+/*
+* compare a and b (rev-lex on terms)
+*/
+static int pCompare(const poly a, const poly b)
+{
+  int r = tCompare(a, b);
+  if (r != 0) return(r);
+
+  poly aa = a;
+  poly bb = b;
+  while (r == 0 && aa != NULL && bb != NULL)
+  {
+    pIter(aa);
+    pIter(bb);
+    r = tCompare(aa, bb);
+  }
+  return(r);
+}
+
+typedef struct
+{
+  poly p;
+  int index;
+} poly_sort;
+
+int pCompare_qsort(const void *a, const void *b)
+{
+  int res = pCompare(((poly_sort *)a)->p, ((poly_sort *)b)->p);
+  return(res);
+}
+
+void idSort_qsort(poly_sort *id_sort, int idsize)
+{
+  qsort(id_sort, idsize, sizeof(poly_sort), pCompare_qsort);
+}
+
+/*2
+* ideal id = (id[i])
+* if id[i] = id[j] then id[j] is deleted for j > i
+*/
+void idDelEquals(ideal id)
+{
+  int idsize = IDELEMS(id);
+  poly_sort *id_sort = (poly_sort *)omAlloc0(idsize*sizeof(poly_sort));
+  for (int i = 0; i < idsize; i++)
+  {
+    id_sort[i].p = id->m[i];
+    id_sort[i].index = i;
+  }
+  idSort_qsort(id_sort, idsize);
+  int index, index_i, index_j;
+  int i = 0;
+  for (int j = 1; j < idsize; j++)
+  {
+    if (pEqualPolys(id_sort[i].p, id_sort[j].p))
+    {
+      index_i = id_sort[i].index;
+      index_j = id_sort[j].index;
+      if (index_j > index_i)
+      {
+        index = index_j;
+      }
+      else
+      {
+        index = index_i;
+        i = j;
+      }
+      if (id->m[index] != NULL) {
+        pDelete(&id->m[index]);
+      }
+    }
+    else
+    {
+      i = j;
+    }
+  }
+  omFreeSize((ADDRESS)(id_sort), idsize*sizeof(poly_sort));
 }
 
 /*2
