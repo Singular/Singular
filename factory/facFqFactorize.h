@@ -681,6 +681,9 @@ precomputeLeadingCoeff (const CanonicalForm& LCF,       ///<[in] a multivariate
                                                         ///< y
                        );
 
+void changeSecondVariable (CanonicalForm& A, CFList& biFactors, CFList& evaluation, CFList*& oldAeval, int lengthAeval2, const CFList& uniFactors, const Variable& w);
+void distributeLCmultiplier (CanonicalForm& A, CFList& leadingCoeffs, CFList& biFactors, const CFList& evaluation, const CanonicalForm& LCmultipler);
+
 #endif
 
 #endif
