@@ -30,6 +30,7 @@
 #include <kernel/ideals.h>
 #include <kernel/prCopy.h>
 #include <kernel/gring.h>
+#include <kernel/polys.h>
 
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
@@ -201,6 +202,20 @@ void idSkipZeroes (ideal ide)
     pEnlargeSet(&(ide->m),IDELEMS(ide),j+1-IDELEMS(ide));
     IDELEMS(ide) = j+1;
   }
+}
+
+/*2
+* keeps the first k (>= 1) entries of the given ideal
+* (Note that the kept polynomials may be zero.)
+*/
+void idKeepFirstK(ideal id, const int k)
+{
+  for (int i = IDELEMS(id)-1; i >= k; i--)
+  {
+    if (id->m[i] != NULL) pDelete(&id->m[i]);
+  }
+  pEnlargeSet(&(id->m), IDELEMS(id), k-IDELEMS(id));
+  IDELEMS(id) = k;
 }
 
 /*2

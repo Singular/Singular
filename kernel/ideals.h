@@ -46,6 +46,7 @@ extern omBin sip_sideal_bin;
 
 /*- creates an ideal -*/
 ideal idInit (int size, int rank=1);
+void idKeepFirstK(ideal ide, const int k);
 ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
