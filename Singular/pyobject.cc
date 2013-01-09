@@ -17,7 +17,7 @@
   //#include <misc/auxiliary.h>
   //#include "newstruct.h"
 
-#include <Python.h>
+#ifdef HAVE_PYTHON
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -39,11 +39,10 @@
 #include "ipid.h"
 #include "blackbox.h"
 #include "ipshell.h"
+#include "newstruct.h"
 
+#include <Python.h>
 
-
-
-  //#include <Python.h>
 // #include <iterator>             // std::distance
 // #include <stdio.h>
 
@@ -752,3 +751,5 @@ extern "C" {
   }
 }
 #endif
+
+#endif /* HAVE_PYTHON */

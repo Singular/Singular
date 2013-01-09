@@ -90,8 +90,6 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                 )
             fi
         fi   
-        AM_CONDITIONAL(PYTHON_USE, test x"$ax_python_use" = x"true")
-        AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$si_embed_python" = x"true")
 
         if  test x"$si_embed_python" = x"true"
         then 
@@ -99,9 +97,15 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
           AC_SUBST(EMBED_PYOBJECT_CFLAGS,"\${PYTHON_CSPEC}")
           AC_SUBST(EMBED_PYOBJECT_LDFLAGS,"\${PYTHON_LSPEC}")
         fi
-
-	AM_CONDITIONAL(PYTHON_MODULE, test x"$si_embed_python" != x"true")
+	if test x"$ax_python_use" = x"true" 
+	then 
+          AC_DEFINE(HAVE_PYTHON,1,[compile python-related stuff])
+        fi
     fi
+    
+    AM_CONDITIONAL(PYTHON_USE, test x"$ax_python_use" = x"true")
+    AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$si_embed_python" = x"true")
+    AM_CONDITIONAL(PYTHON_MODULE, test x"$si_embed_python" != x"true")
 
 ])
 
