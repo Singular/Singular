@@ -1156,6 +1156,8 @@ void siInit(char *name)
 #ifndef __OPTIMIZE__
     om_Opts.ErrorHook = dErrorBreak;
 #endif
+#else
+    om_Opts.Keep = 0;
 #endif
     omInitInfo();
 #ifdef OM_SING_KEEP
