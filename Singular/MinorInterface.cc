@@ -180,13 +180,10 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
 
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
-  ideal jjj;
-  if (collectedMinors == 0) jjj = idInit(1, 1);
-  else                      jjj = idCopyFirstK(iii, collectedMinors);
-  idDelete(&iii);
+  idKeepFirstK(iii, collectedMinors);
   delete[] myColumnIndices;
   delete[] myRowIndices;
-  return jjj;
+  return(iii);
 }
 
 ideal getMinorIdeal_toBeDone (const matrix mat, const int minorSize,
@@ -531,7 +528,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
     if (k != 0) /* this means, not all minors are requested */   l = true;
     else
     { /* k == 0, i.e., all minors are requested */
-      int minorCount = 1;
+      long minorCount = 1;
       for (int i = rowCount - minorSize + 1; i <= rowCount; i++)
         minorCount = minorCount * i;
       for (int i = 2; i <= minorSize; i++) minorCount = minorCount / i;
