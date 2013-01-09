@@ -23,6 +23,8 @@ inline ideal idCopyFirstK (const ideal ide, const int k, ring R = currRing)
   return id_CopyFirstK(ide, k, R);
 }
 
+void idKeepFirstK(ideal ide, const int k);
+
 /// delete an ideal
 inline void idDelete (ideal* h, ring r = currRing)
 { 

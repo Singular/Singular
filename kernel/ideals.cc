@@ -2558,5 +2558,15 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
 }
 */
 
-
+/// keeps the first k (>= 1) entries of the given ideal
+/// (Note that the kept polynomials may be zero.)
+void idKeepFirstK(ideal id, const int k)
+{
+     for (int i = IDELEMS(id)-1; i >= k; i--)
+     {
+	if (id->m[i] != NULL) pDelete(&id->m[i]);
+     }
+     pEnlargeSet(&(id->m), IDELEMS(id), k-IDELEMS(id));
+     IDELEMS(id) = k;
+}
 
