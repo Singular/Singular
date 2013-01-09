@@ -4,6 +4,7 @@
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
 
+#include <stddef.h>
 #if defined(__cplusplus) && defined(__GNUC__)
 extern "C" {
 #undef __cplusplus

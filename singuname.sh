@@ -198,7 +198,7 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
-# Darwin/MacOS X ##############################################
+# Darwin/Mac OS X ##############################################
 elif (echo $uname_m | $egrep "Power Macintosh" > $devnull)
 then
     prefix="ppcMac"

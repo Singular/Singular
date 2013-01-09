@@ -1,5 +1,6 @@
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
+#include <stddef.h>
 #ifdef HAVE_FACTORY
 #  include <factory/cf_gmp.h>
 #else

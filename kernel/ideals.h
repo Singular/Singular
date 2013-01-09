@@ -85,8 +85,8 @@ void idDBTest(ideal h1, int level, const char *f,const int l);
 #define idTest(A) idDBTest(A, PDEBUG, __FILE__,__LINE__)
 #define idPrint(id) idShow(id)
 #else
-#define idTest(A)  (TRUE)
-#define idPrint(A) ((void)0)
+#define idTest(A)  do {} while (0)
+#define idPrint(A) do {} while (0)
 #endif
 
 ideal id_Copy (ideal h1,const ring r);

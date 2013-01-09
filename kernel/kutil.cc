@@ -6669,7 +6669,7 @@ char *  showOption();
 
 void kDebugPrint(kStrategy strat)
 {
-  extern long maxdegreeWecart(poly p,int *l, ring r = currRing); /*weight.h*/
+  extern long maxdegreeWecart(poly p,int *l, ring r); /*weight.h*/
   PrintS("red: ");
     if (strat->red==redFirst) PrintS("redFirst\n");
     else if (strat->red==redHoney) PrintS("redHoney\n");

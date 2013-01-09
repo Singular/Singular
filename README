@@ -8,7 +8,7 @@ detailed overview of SINGULAR, see
      `http://www.singular.uni-kl.de/Overview/'
 
 So far, there are only versions for Linux, HPUX, SunOS, IRIX, AIX,
-FreeBSD 4.x/5.x, MacOS X, and Windows 95/98/NT/2K/XP.
+FreeBSD 4.x/5.x, Mac OS X, and Windows 95/98/NT/2K/XP.
 
 Version 2-0-2 was the last version for MacOS 9.
 
@@ -33,7 +33,7 @@ follow these steps.
 
        2.   autoconf
 
-       3.   gnu-make
+       3.   GNU make
 
        4.   gcc, g++ (version 2.95.3 preferred,   but gcc version 2.7.2
           to 2.95.4, egcs 1.0.3 and 1.1.2 should work,   gcc 2.96 does
@@ -113,17 +113,17 @@ follow these steps.
 
      BEWARE: some of the option are for testing only,
      they will usually not work in general:
-     --with-Plural,--with-plural (you need a Singuilar version > 2.1.2 for this)
+     --with-Plural,--with-plural (you need a Singular version > 2.1.2 for this)
        (standard since  version 3-0-0)
      --with-sgroup (you need the sgroup programs for this)
      --with-smallgmp (not maintained), removed in 3-0-0
-     --with-namespaces (you need a Singuilar version > 2.1.x for this)
+     --with-namespaces (you need a Singular version > 2.1.x for this)
        (standard since  version 3-0-0)
      
 
   8. make install (resp. gmake install - the make program must be
-     GNU-Make) the make process will (hopefully) build:
-       1.   omalloc: the memry management routines (required)
+     GNU Make) the make process will (hopefully) build:
+       1.   omalloc: the memory management routines (required)
 
        2.   MP: Multi-Protocoll (optional)
 
@@ -172,7 +172,7 @@ Notes for specific platforms
        rebaseall
      before trying anything else
 
-   - MacOS X:
+   - Mac OS X:
      you need a file values.h where MP can find it (we copied one from
      Linux)
      ./configure -with-malloc=system
