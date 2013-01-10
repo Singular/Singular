@@ -278,7 +278,7 @@ AC_ARG_ENABLE(Singular, \
 AC_ARG_ENABLE(IntegerProgramming, \
  [    IntegerProgramming   IntegerProgramming])
 AC_ARG_ENABLE(countedref, \
- [    countedref           Enable autoloading of reference counted types]),
+ [    countedref           Enable autoloading of reference counted types])
 AC_ARG_ENABLE(Plural, \
  [    Plural               Plural])
 AC_ARG_ENABLE(Texinfo, \

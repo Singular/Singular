@@ -2191,7 +2191,7 @@ if test "${enable_countedref+set}" = set; then
   enableval="$enable_countedref"
   :
 fi
-,
+
 # Check whether --enable-Plural or --disable-Plural was given.
 if test "${enable_Plural+set}" = set; then
   enableval="$enable_Plural"
