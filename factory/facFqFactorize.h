@@ -607,9 +607,11 @@ getLeadingCoeffs (const CanonicalForm& A,  ///< [in] some poly
 
 /// normalize precomputed leading coefficients such that leading coefficients
 /// evaluated at @a evaluation in K^(n-2) equal the leading coeffs wrt 
-/// Variable(1) of bivariate factors
+/// Variable(1) of bivariate factors and change @a A and @a Aeval accordingly
 void
-prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out] 
+prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out]
+                      CanonicalForm& A,           ///<[in,out]
+                      CFList& Aeval,              ///<[in,out]
                       int n,                      ///<[in] level of poly to be
                                                   ///< factored
                       const CFList& leadingCoeffs,///<[in] precomputed leading

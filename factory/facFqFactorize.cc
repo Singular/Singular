@@ -2198,8 +2198,10 @@ void refineBiFactors (const CanonicalForm& A, CFList& biFactors,
   }
 }
 
-void prepareLeadingCoeffs (CFList*& LCs, int n, const CFList& leadingCoeffs,
-                           const CFList& biFactors, const CFList& evaluation)
+void
+prepareLeadingCoeffs (CFList*& LCs, CanonicalForm& A, CFList& Aeval, int n,
+                      const CFList& leadingCoeffs, const CFList& biFactors,
+                      const CFList& evaluation)
 {
   CFList l= leadingCoeffs;
   LCs [n-3]= l;
@@ -2224,6 +2226,15 @@ void prepareLeadingCoeffs (CFList*& LCs, int n, const CFList& leadingCoeffs,
     for (j= LCs [i]; j.hasItem(); j++, ii++)
       j.getItem() *= ii.getItem();
   }
+
+  Aeval= evaluateAtEval (A, evaluation, 2);
+
+  CanonicalForm hh= 1/Lc (Aeval.getFirst());
+
+  for (iter= Aeval; iter.hasItem(); iter++)
+    iter.getItem() *= hh;
+
+  A *= hh;
 }
 
 CFList
@@ -2926,19 +2937,10 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   //prepare leading coefficients
   CFList* leadingCoeffs2= new CFList [lengthAeval2];
-  prepareLeadingCoeffs (leadingCoeffs2, A.level(), leadingCoeffs, biFactors,
+  prepareLeadingCoeffs (leadingCoeffs2, A, Aeval, A.level(), leadingCoeffs, biFactors,
                         evaluation);
 
-  CFListIterator iter;
-  Aeval= evaluateAtEval (A, evaluation, 2);
-  CanonicalForm hh= 1/Lc (Aeval.getFirst());
-  for (iter= Aeval; iter.hasItem(); iter++)
-    iter.getItem() *= hh;
-
-  A *= hh;
-
-
-  CFListIterator iter2;
+  CFListIterator iter2, iter;
   CFList bufLeadingCoeffs2= leadingCoeffs2[lengthAeval2-1];
   bufBiFactors= biFactors;
   bufA= A;
@@ -3043,16 +3045,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
           for (int i= lengthAeval2-1; i > -1; i--)
             leadingCoeffs2[i]= CFList();
-          prepareLeadingCoeffs (leadingCoeffs2, A.level(), leadingCoeffs,
-                                biFactors, evaluation );
-          Aeval= evaluateAtEval (A, evaluation, 2);
-
-          hh= 1/Lc (Aeval.getFirst());
-
-          for (iter2= Aeval; iter2.hasItem(); iter2++)
-            iter2.getItem() *= hh;
-
-          A *= hh;
+          prepareLeadingCoeffs (leadingCoeffs2, A, Aeval, A.level(),
+                                leadingCoeffs, biFactors, evaluation);
           break;
         }
         else
@@ -3187,16 +3181,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
         for (int i= lengthAeval2-1; i > -1; i--)
           leadingCoeffs2[i]= CFList();
-        prepareLeadingCoeffs (leadingCoeffs2,A.level(),leadingCoeffs, biFactors,
-                              evaluation);
-        Aeval= evaluateAtEval (A, evaluation, 2);
-
-        hh= 1/Lc (Aeval.getFirst());
-
-        for (CFListIterator i= Aeval; i.hasItem(); i++)
-          i.getItem() *= hh;
-
-        A *= hh;
+        prepareLeadingCoeffs (leadingCoeffs2, A, Aeval, A.level(),leadingCoeffs,
+                              biFactors, evaluation);
       }
       factors= CFList();
       if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
@@ -3225,16 +3211,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     leadingCoeffs= leadingCoeffs2[lengthAeval2-1];
     for (int i= lengthAeval2-1; i > -1; i--)
       leadingCoeffs2[i]= CFList();
-    prepareLeadingCoeffs (leadingCoeffs2,A.level(),leadingCoeffs, biFactors,
-                          evaluation);
-    Aeval= evaluateAtEval (A, evaluation, 2);
-
-    hh= 1/Lc (Aeval.getFirst());
-
-    for (CFListIterator i= Aeval; i.hasItem(); i++)
-      i.getItem() *= hh;
-
-    A *= hh;
+    prepareLeadingCoeffs (leadingCoeffs2, A, Aeval, A.level(),leadingCoeffs,
+                          biFactors, evaluation);
 
     if (!fdivides (LC (oldA,1),prod (leadingCoeffs2[lengthAeval2-1])))
     {
