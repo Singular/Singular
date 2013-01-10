@@ -78,11 +78,11 @@ namespace
     StringSetS("");
     n_Write(a, r);
 
-    const char* s = StringAppendS("");
+    std::stringstream ss; 
+    {
+      char* s = StringEndS();  ss << s; omFree(s); 
+    }
 
-    std::stringstream ss;  ss << s;
-
-    StringSetS("");
     return ss.str();
 
   }
@@ -135,8 +135,9 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
 
       StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
       feStringAppendResources(0);
-      PrintS(StringAppendS("\n"));
-
+       
+      { char* s = StringEndS(); PrintS(s); omFree(s); }
+       
       return true;
     }
 

@@ -42,16 +42,11 @@ void Print(/*const*/ number a, const coeffs r, BOOLEAN eoln = TRUE)
   StringSetS("");
   n_Write(a, r);
 
-  char* s = NULL; 
 
   if( eoln ) 
-    s = StringAppend("\n");
-  else
-    s = StringAppend("");
+    PrintLn();
 
-  PrintS(s);
-
-  // free s?
+  { char* s = StringEndS(); PrintS(s); omFree(s); }
 }
 
 
@@ -262,8 +257,9 @@ int main( int, char *argv[] )
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
-  PrintS(StringAppendS("\n"));
+  PrintLn();
 
+  { char* s = StringEndS(); PrintS(s); omFree(s); }
 
   int c = 0;
   

@@ -615,8 +615,10 @@ int main( int, char *argv[] )
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
-  PrintS(StringAppendS("\n"));
 
+  PrintLn();
+  { char* s = StringEndS(); PrintS(s); omFree(s); }
+   
   TestGBEngine();
   TestSimpleRingArithmetcs();
 

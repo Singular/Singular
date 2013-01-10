@@ -79,11 +79,11 @@ namespace
     StringSetS("");
     p_Write(a, r);
 
-    const char* s = StringAppendS("");
-
-    std::stringstream ss;  ss << s;
-
-    StringSetS("");
+    std::stringstream ss; 
+    {
+      char* s = StringEndS();  ss << s; omFree(s); 
+    }
+     
     return ss.str();
   }
 
