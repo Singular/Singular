@@ -73,8 +73,8 @@ static void ipPrint_MA0(matrix m, const char *name)
     /* convert all polys to string */
     i=MATCOLS(m)*MATROWS(m)-1;
     ss=pString(m->m[i]);
-    if ((int)strlen(ss)>colmax) s[i]=NULL;
-    else                        s[i]=omStrDup(ss);
+    if ((int)strlen(ss)>colmax) { s[i]=NULL; omFree(ss); }
+    else                        s[i]=ss;
     for(i--;i>=0;i--)
     {
       StringSetS("");
