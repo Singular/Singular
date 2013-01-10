@@ -2579,7 +2579,7 @@ LCHeuristic2 (const CanonicalForm& LCmultiplier, const CFList& factors,
   for (CFListIterator iter= factors; iter.hasItem(); iter++, index++)
   {
     cont= content (iter.getItem(), 1);
-    cont= gcd (cont , LCmultiplier);
+    cont= gcd (cont, LCmultiplier);
     contents.append (cont);
     if (cont.inCoeffDomain()) // trivial content->LCmultiplier needs to go there
     {

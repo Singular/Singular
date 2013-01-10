@@ -734,38 +734,60 @@ LCHeuristicCheck (const CFList& LCs,        ///<[in] leading coeffs computed
                   bool& foundTrueMultiplier ///<[in,out] success?
                  );
 
+/// heuristic to distribute @a LCmultiplier onto factors based on the contents
+/// of @a factors. @a factors are assumed to come from LucksWangSparseHeuristic.
+/// If not successful @a contents will contain the content of each element of @a
+/// factors and @a LCs will contain the LC of each element of @a factors divided
+/// by its content
 void
-LCHeuristic2 (const CanonicalForm& LCmultiplier,
-              const CFList& factors,
-              CFList& leadingCoeffs,
-              CFList& contents,
-              CFList& LCs,
-              bool& foundTrueMultiplier
+LCHeuristic2 (const CanonicalForm& LCmultiplier,///<[in] divisor of LC (A,1)
+              const CFList& factors,            ///<[in] result of
+                                                ///< LucksWangSparseHeuristic
+              CFList& leadingCoeffs,            ///<[in,out] leading coeffs
+              CFList& contents,                 ///<[in,out] content of factors
+              CFList& LCs,                      ///<[in,out] LC of factors
+                                                ///< divided by content of
+                                                ///< factors
+              bool& foundTrueMultiplier         ///<[in,out] success?
              );
 
+/// heuristic to remove @a LCmultiplier from a factor based on the contents
+/// of @a factors. @a factors are assumed to come from LucksWangSparseHeuristic.
 void
-LCHeuristic3 (const CanonicalForm& LCmultiplier,
-              const CFList& factors,
-              const CFList& oldBiFactors,
-              const CFList& contents,
-              const CFList* oldAeval,
-              CanonicalForm& A,
-              CFList*& leadingCoeffs,
-              int lengthAeval,
-              bool& foundMultiplier
+LCHeuristic3 (const CanonicalForm& LCmultiplier,///<[in] divisor of LC (A,1)
+              const CFList& factors,            ///<[in] result of
+                                                ///< LucksWangSparseHeuristic
+              const CFList& oldBiFactors,       ///<[in] bivariate factors
+                                                ///< without LCmultiplier
+                                                ///< distributed on them
+              const CFList& contents,           ///<[in] content of factors
+              const CFList* oldAeval,           ///<[in] bivariate factors wrt.
+                                                ///< different second vars
+              CanonicalForm& A,                 ///<[in,out] poly
+              CFList*& leadingCoeffs,           ///<[in,out] leading coeffs
+              int lengthAeval,                  ///<[in] length of oldAeval
+              bool& foundMultiplier             ///<[in,out] success?
              );
 
+/// heuristic to remove factors of @a LCmultiplier from @a factors.
+/// More precisely checks if elements of @a contents divide @a LCmultiplier.
+/// Assumes LCHeuristic3 is run before it and was successful.
 void
-LCHeuristic4 (const CFList& oldBiFactors,
-              const CFList* oldAeval,
-              const CFList& contents,
-              const CFList& factors,
-              const CanonicalForm& testVars,
-              int lengthAeval,
-              CFList*& leadingCoeffs,
-              CanonicalForm& A,
-              CanonicalForm& LCmultiplier,
-              bool& foundMultiplier
+LCHeuristic4 (const CFList& oldBiFactors,   ///<[in] bivariate factors
+                                            ///< without LCmultiplier
+                                            ///< distributed on them
+              const CFList* oldAeval,       ///<[in] bivariate factors wrt.
+                                            ///< different second vars
+              const CFList& contents,       ///<[in] content of factors
+              const CFList& factors,        ///<[in] result of
+                                            ///< LucksWangSparseHeuristic
+              const CanonicalForm& testVars,///<[in] product of second vars that
+                                            ///< occur among oldAeval
+              int lengthAeval,              ///<[in] length of oldAeval
+              CFList*& leadingCoeffs,       ///<[in,out] leading coeffs
+              CanonicalForm& A,             ///<[in,out] poly
+              CanonicalForm& LCmultiplier,  ///<[in,out] divisor of LC (A,1)
+              bool& foundMultiplier         ///<[in] success?
              );
 
 #endif
