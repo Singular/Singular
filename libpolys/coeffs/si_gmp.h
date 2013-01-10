@@ -1,6 +1,7 @@
 #ifndef COEFFS_SI_GMP_H
 #define COEFFS_SI_GMP_H
 
+#include <stddef.h>
 
 #ifdef HAVE_FACTORY
 // just assume that factory have been built (cplusplus.h!)
