@@ -411,7 +411,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
                                           evaluation, Aeval2, lengthAeval2, w);
 
   if (w.level() != 1)
-    changeSecondVariable (A, biFactors, evaluation, oldAeval, lengthAeval2, uniFactors, w);
+    changeSecondVariable (A, biFactors, evaluation, oldAeval, lengthAeval2,
+                          uniFactors, w);
 
   CanonicalForm oldA= A;
   CFList oldBiFactors= biFactors;
@@ -505,7 +506,8 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       factors= oldFactors;
       CFList contents, LCs;
       bool foundTrueMultiplier= false;
-      LCHeuristic3 (LCmultiplier, factors, leadingCoeffs2[lengthAeval2-1], contents, LCs, foundTrueMultiplier);
+      LCHeuristic2 (LCmultiplier, factors, leadingCoeffs2[lengthAeval2-1],
+                    contents, LCs, foundTrueMultiplier);
       if (foundTrueMultiplier)
       {
           A= oldA;
@@ -518,17 +520,20 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       else
       {
         bool foundMultiplier= false;
-        LCHeuristic4 (LCmultiplier, factors, oldBiFactors, contents, oldAeval, A, leadingCoeffs2, lengthAeval2, foundMultiplier);
+        LCHeuristic3 (LCmultiplier, factors, oldBiFactors, contents, oldAeval,
+                      A, leadingCoeffs2, lengthAeval2, foundMultiplier);
         // coming from above: divide out more LCmultiplier if possible
         if (foundMultiplier)
         {
           foundMultiplier= false;
-          LCHeuristic5 (oldBiFactors, oldAeval, contents, factors, testVars, lengthAeval2, leadingCoeffs2, A, LCmultiplier, foundMultiplier);
+          LCHeuristic4 (oldBiFactors, oldAeval, contents, factors, testVars,
+                        lengthAeval2, leadingCoeffs2, A, LCmultiplier,
+                        foundMultiplier);
         }
         else
         {
-          LCHeuristic2 (LCs, contents, A, oldA, leadingCoeffs2[lengthAeval2-1],
-                        foundMultiplier);
+          LCHeuristicCheck (LCs, contents, A, oldA,
+                            leadingCoeffs2[lengthAeval2-1], foundMultiplier);
           if (!foundMultiplier && fdivides (getVars (LCmultiplier), testVars))
           {
             LCHeuristic (A, LCmultiplier, biFactors, leadingCoeffs2, oldAeval,

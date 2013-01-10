@@ -707,26 +707,66 @@ distributeLCmultiplier (CanonicalForm& A,               ///<[in,out] some poly
                         const CanonicalForm& LCmultipler///<[in] multiplier
                        );
 
+/// heuristic to distribute @a LCmultiplier onto factors based on the variables
+/// that occur in @a LCmultiplier and in the leading coeffs of bivariate factors
 void
-LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
-             CFList& biFactors, CFList*& leadingCoeffs, const CFList* oldAeval,
-             int lengthAeval, const CFList& evaluation,
-             const CFList& oldBiFactors);
+LCHeuristic (CanonicalForm& A,                 ///<[in,out] a poly
+             const CanonicalForm& LCmultiplier,///<[in,out] divisor of LC (A,1)
+             CFList& biFactors,                ///<[in,out] bivariate factors
+             CFList*& leadingCoeffs,           ///<[in,out] leading coeffs
+             const CFList* oldAeval,           ///<[in] bivariate factors wrt.
+                                               ///< different second vars
+             int lengthAeval,                  ///<[in] length of oldAeval
+             const CFList& evaluation,         ///<[in] evaluation point
+             const CFList& oldBiFactors        ///<[in] bivariate factors
+                                               ///< without LCmultiplier
+                                               ///< distributed on them
+            );
+
+/// checks if prod(LCs)==LC (oldA,1) and if so divides elements of leadingCoeffs
+/// by elements in contents, sets A to oldA and sets foundTrueMultiplier to true
+void
+LCHeuristicCheck (const CFList& LCs,        ///<[in] leading coeffs computed
+                  const CFList& contents,   ///<[in] content of factors
+                  CanonicalForm& A,         ///<[in,out] oldA*LCmultiplier^m
+                  const CanonicalForm& oldA,///<[in] some poly
+                  CFList& leadingCoeffs,    ///<[in,out] leading coefficients
+                  bool& foundTrueMultiplier ///<[in,out] success?
+                 );
 
 void
-LCHeuristic2 (const CFList& LCs, const CFList& contents, CanonicalForm& A,
-              const CanonicalForm& oldA, CFList& leadingCoeffs,
-              bool& foundTrueMultiplier);
+LCHeuristic2 (const CanonicalForm& LCmultiplier,
+              const CFList& factors,
+              CFList& leadingCoeffs,
+              CFList& contents,
+              CFList& LCs,
+              bool& foundTrueMultiplier
+             );
 
 void
-LCHeuristic3 (const CanonicalForm& LCmultiplier, const CFList& factors, CFList& leadingCoeffs, CFList& contents, CFList& LCs, bool& foundTrueMultiplier);
+LCHeuristic3 (const CanonicalForm& LCmultiplier,
+              const CFList& factors,
+              const CFList& oldBiFactors,
+              const CFList& contents,
+              const CFList* oldAeval,
+              CanonicalForm& A,
+              CFList*& leadingCoeffs,
+              int lengthAeval,
+              bool& foundMultiplier
+             );
 
 void
-LCHeuristic4 (const CanonicalForm& LCmultiplier, const CFList& factors, const CFList& oldBiFactors,
-              const CFList& contents, const CFList* oldAeval, CanonicalForm& A, CFList*& leadingCoeffs, int lengthAeval, bool& foundMultiplier);
-
-void
-LCHeuristic5 (const CFList& oldBiFactors, const CFList* oldAeval, const CFList& contents, const CFList& factors, const CanonicalForm& testVars, int lengthAeval, CFList*& leadingCoeffs, CanonicalForm& A, CanonicalForm& LCmultiplier, bool& foundMultiplier);
+LCHeuristic4 (const CFList& oldBiFactors,
+              const CFList* oldAeval,
+              const CFList& contents,
+              const CFList& factors,
+              const CanonicalForm& testVars,
+              int lengthAeval,
+              CFList*& leadingCoeffs,
+              CanonicalForm& A,
+              CanonicalForm& LCmultiplier,
+              bool& foundMultiplier
+             );
 
 #endif
 

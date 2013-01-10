@@ -2553,9 +2553,9 @@ LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
 }
 
 void
-LCHeuristic2 (const CFList& LCs, const CFList& contents, CanonicalForm& A,
-              const CanonicalForm& oldA, CFList& leadingCoeffs,
-              bool& foundTrueMultiplier)
+LCHeuristicCheck (const CFList& LCs, const CFList& contents, CanonicalForm& A,
+                  const CanonicalForm& oldA, CFList& leadingCoeffs,
+                  bool& foundTrueMultiplier)
 {
   CanonicalForm pLCs= prod (LCs);
   if (fdivides (pLCs, LC (oldA,1)) && (LC(oldA,1)/pLCs).inCoeffDomain()) // check if the product of the lead coeffs of the primitive factors equals the lead coeff of the old A
@@ -2569,7 +2569,9 @@ LCHeuristic2 (const CFList& LCs, const CFList& contents, CanonicalForm& A,
 }
 
 void
-LCHeuristic3 (const CanonicalForm& LCmultiplier, const CFList& factors, CFList& leadingCoeffs, CFList& contents, CFList& LCs, bool& foundTrueMultiplier)
+LCHeuristic2 (const CanonicalForm& LCmultiplier, const CFList& factors,
+              CFList& leadingCoeffs, CFList& contents, CFList& LCs,
+              bool& foundTrueMultiplier)
 {
   CanonicalForm cont;
   int index= 1;
@@ -2597,112 +2599,118 @@ LCHeuristic3 (const CanonicalForm& LCmultiplier, const CFList& factors, CFList& 
 }
 
 void
-LCHeuristic4 (const CanonicalForm& LCmultiplier, const CFList& factors, const CFList& oldBiFactors,
-              const CFList& contents, const CFList* oldAeval, CanonicalForm& A, CFList*& leadingCoeffs, int lengthAeval, bool& foundMultiplier)
+LCHeuristic3 (const CanonicalForm& LCmultiplier, const CFList& factors,
+              const CFList& oldBiFactors, const CFList& contents,
+              const CFList* oldAeval, CanonicalForm& A, CFList*& leadingCoeffs,
+              int lengthAeval, bool& foundMultiplier)
 {
-        int index= 1;
-        CFListIterator iter, iter2= factors;
-        for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
+  int index= 1;
+  CFListIterator iter, iter2= factors;
+  for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
+  {
+    if (fdivides (iter.getItem(), LCmultiplier))
+    {
+      if ((LCmultiplier/iter.getItem()).inCoeffDomain() &&
+          !isOnlyLeadingCoeff(iter2.getItem())) //content divides LCmultiplier completely and factor consists of more terms than just the leading coeff
+      {
+        Variable xx= Variable (2);
+        CanonicalForm vars;
+        vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
+                                  xx));
+        for (int i= 0; i < lengthAeval; i++)
         {
-          if (fdivides (iter.getItem(), LCmultiplier))
+          if (oldAeval[i].isEmpty())
+            continue;
+          xx= oldAeval[i].getFirst().mvar();
+          vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
+                                      xx));
+        }
+        if (vars.level() <= 2)
+        {
+          int index2= 1;
+          for (CFListIterator iter3= leadingCoeffs[lengthAeval-1];
+                iter3.hasItem(); iter3++, index2++)
           {
-            if ((LCmultiplier/iter.getItem()).inCoeffDomain() &&
-                !isOnlyLeadingCoeff(iter2.getItem())) //content divides LCmultiplier completely and factor consists of more terms than just the leading coeff
+            if (index2 == index)
             {
-              Variable xx= Variable (2);
-              CanonicalForm vars;
-              vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
-                                        xx));
-              for (int i= 0; i < lengthAeval; i++)
-              {
-                if (oldAeval[i].isEmpty())
-                  continue;
-                xx= oldAeval[i].getFirst().mvar();
-                vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
-                                           xx));
-              }
-              if (vars.level() <= 2)
-              {
-                int index2= 1;
-                for (CFListIterator iter3= leadingCoeffs[lengthAeval-1];
-                     iter3.hasItem(); iter3++, index2++)
-                {
-                  if (index2 == index)
-                  {
-                    iter3.getItem() /= LCmultiplier;
-                    break;
-                  }
-                }
-                A /= LCmultiplier;
-                foundMultiplier= true;
-                iter.getItem()= 1;
-              }
+              iter3.getItem() /= LCmultiplier;
+              break;
             }
           }
+          A /= LCmultiplier;
+          foundMultiplier= true;
+          iter.getItem()= 1;
         }
+      }
+    }
+  }
 }
 
 void
-LCHeuristic5 (const CFList& oldBiFactors, const CFList* oldAeval, const CFList& contents, const CFList& factors, const CanonicalForm& testVars, int lengthAeval, CFList*& leadingCoeffs, CanonicalForm& A, CanonicalForm& LCmultiplier, bool& foundMultiplier)
+LCHeuristic4 (const CFList& oldBiFactors, const CFList* oldAeval,
+              const CFList& contents, const CFList& factors,
+              const CanonicalForm& testVars, int lengthAeval,
+              CFList*& leadingCoeffs, CanonicalForm& A,
+              CanonicalForm& LCmultiplier, bool& foundMultiplier)
 {
-          int index=1;
-          CFListIterator iter, iter2= factors;
-          for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
+  int index=1;
+  CFListIterator iter, iter2= factors;
+  for (iter= contents; iter.hasItem(); iter++, iter2++, index++)
+  {
+    if (!iter.getItem().isOne() &&
+        fdivides (iter.getItem(), LCmultiplier))
+    {
+      if (!isOnlyLeadingCoeff (iter2.getItem())) // factor is more than just leading coeff
+      {
+        int index2= 1;
+        for (iter2= leadingCoeffs[lengthAeval-1]; iter2.hasItem();
+              iter2++, index2++)
+        {
+          if (index2 == index)
           {
-            if (!iter.getItem().isOne() &&
-                fdivides (iter.getItem(), LCmultiplier))
+            iter2.getItem() /= iter.getItem();
+            foundMultiplier= true;
+            break;
+          }
+        }
+        A /= iter.getItem();
+        LCmultiplier /= iter.getItem();
+        iter.getItem()= 1;
+      }
+      else if (fdivides (getVars (LCmultiplier), testVars))//factor consists of just leading coeff
+      {
+        Variable xx= Variable (2);
+        CanonicalForm vars;
+        vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
+                                  xx));
+        for (int i= 0; i < lengthAeval; i++)
+        {
+          if (oldAeval[i].isEmpty())
+            continue;
+          xx= oldAeval[i].getFirst().mvar();
+          vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
+                                      xx));
+        }
+        if (myGetVars(content(getItem(leadingCoeffs[lengthAeval-1],index),1))
+            /myGetVars (LCmultiplier) == vars)
+        {
+          int index2= 1;
+          for (iter2= leadingCoeffs[lengthAeval-1]; iter2.hasItem();
+                iter2++, index2++)
+          {
+            if (index2 == index)
             {
-              if (!isOnlyLeadingCoeff (iter2.getItem())) // factor is more than just leading coeff
-              {
-                int index2= 1;
-                for (iter2= leadingCoeffs[lengthAeval-1]; iter2.hasItem();
-                     iter2++, index2++)
-                {
-                  if (index2 == index)
-                  {
-                    iter2.getItem() /= iter.getItem();
-                    foundMultiplier= true;
-                    break;
-                  }
-                }
-                A /= iter.getItem();
-                LCmultiplier /= iter.getItem();
-                iter.getItem()= 1;
-              }
-              else if (fdivides (getVars (LCmultiplier), testVars))//factor consists of just leading coeff
-              {
-                Variable xx= Variable (2);
-                CanonicalForm vars;
-                vars= power (xx, degree (LC (getItem(oldBiFactors, index),1),
-                                          xx));
-                for (int i= 0; i < lengthAeval; i++)
-                {
-                  if (oldAeval[i].isEmpty())
-                    continue;
-                  xx= oldAeval[i].getFirst().mvar();
-                  vars *= power (xx, degree (LC (getItem(oldAeval[i], index),1),
-                                             xx));
-                }
-                if (myGetVars(content(getItem(leadingCoeffs[lengthAeval-1],index),1))
-                    /myGetVars (LCmultiplier) == vars)
-                {
-                  int index2= 1;
-                  for (iter2= leadingCoeffs[lengthAeval-1]; iter2.hasItem();
-                       iter2++, index2++)
-                  {
-                    if (index2 == index)
-                    {
-                      iter2.getItem() /= LCmultiplier;
-                      foundMultiplier= true;
-                      break;
-                    }
-                  }
-                  A /= LCmultiplier;
-                  iter.getItem()= 1;
-                }
-              }
+              iter2.getItem() /= LCmultiplier;
+              foundMultiplier= true;
+              break;
             }
           }
+          A /= LCmultiplier;
+          iter.getItem()= 1;
+        }
+      }
+    }
+  }
 }
 
 CFList
@@ -3079,7 +3087,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                           evaluation, Aeval2, lengthAeval2, v);
 
   if (v.level() != 1)
-    changeSecondVariable (A, biFactors, evaluation, oldAeval, lengthAeval2, uniFactors, v);
+    changeSecondVariable (A, biFactors, evaluation, oldAeval, lengthAeval2,
+                          uniFactors, v);
 
   CanonicalForm oldA= A;
   CFList oldBiFactors= biFactors;
@@ -3093,8 +3102,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   //prepare leading coefficients
   CFList* leadingCoeffs2= new CFList [lengthAeval2];
-  prepareLeadingCoeffs (leadingCoeffs2, A, Aeval, A.level(), leadingCoeffs, biFactors,
-                        evaluation);
+  prepareLeadingCoeffs (leadingCoeffs2, A, Aeval, A.level(), leadingCoeffs,
+                        biFactors, evaluation);
 
   CFListIterator iter;
   CFList bufLeadingCoeffs2= leadingCoeffs2[lengthAeval2-1];
@@ -3178,7 +3187,8 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       factors= oldFactors;
       CFList contents, LCs;
       bool foundTrueMultiplier= false;
-      LCHeuristic3 (LCmultiplier, factors, leadingCoeffs2[lengthAeval2-1], contents, LCs, foundTrueMultiplier);
+      LCHeuristic2 (LCmultiplier, factors, leadingCoeffs2[lengthAeval2-1],
+                    contents, LCs, foundTrueMultiplier);
       if (foundTrueMultiplier)
       {
           A= oldA;
@@ -3191,18 +3201,21 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       else
       {
         bool foundMultiplier= false;
-        LCHeuristic4 (LCmultiplier, factors, oldBiFactors, contents, oldAeval, A, leadingCoeffs2, lengthAeval2, foundMultiplier);
+        LCHeuristic3 (LCmultiplier, factors, oldBiFactors, contents, oldAeval,
+                      A, leadingCoeffs2, lengthAeval2, foundMultiplier);
 
         // coming from above: divide out more LCmultiplier if possible
         if (foundMultiplier)
         {
           foundMultiplier= false;
-          LCHeuristic5 (oldBiFactors, oldAeval, contents, factors, testVars, lengthAeval2, leadingCoeffs2, A, LCmultiplier, foundMultiplier);
+          LCHeuristic4 (oldBiFactors, oldAeval, contents, factors, testVars,
+                        lengthAeval2, leadingCoeffs2, A, LCmultiplier,
+                        foundMultiplier);
         }
         else
         {
-          LCHeuristic2 (LCs, contents, A, oldA, leadingCoeffs2[lengthAeval2-1],
-                        foundMultiplier);
+          LCHeuristicCheck (LCs, contents, A, oldA,
+                            leadingCoeffs2[lengthAeval2-1], foundMultiplier);
           if (!foundMultiplier && fdivides (getVars (LCmultiplier), testVars))
           {
             LCHeuristic (A, LCmultiplier, biFactors, leadingCoeffs2, oldAeval,
