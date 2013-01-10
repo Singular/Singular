@@ -685,11 +685,29 @@ precomputeLeadingCoeff (const CanonicalForm& LCF,       ///<[in] a multivariate
                                                         ///< y
                        );
 
+/// changes the second variable to be @a w and updates all relevant data
 void
-changeSecondVariable (CanonicalForm& A, CFList& biFactors, CFList& evaluation, CFList*& oldAeval, int lengthAeval2, const CFList& uniFactors, const Variable& w);
+changeSecondVariable (CanonicalForm& A,        ///<[in,out] a multivariate poly
+                      CFList& biFactors,       ///<[in,out] bivariate factors
+                      CFList& evaluation,      ///<[in,out] evaluation point
+                      CFList*& oldAeval,       ///<[in,out] old bivariate factors
+                                               ///< wrt. different second vars
+                      int lengthAeval2,        ///<[in] length of oldAeval
+                      const CFList& uniFactors,///<[in] univariate factors
+                      const Variable& w        ///<[in] some variable
+                     );
 
+/// distributes a divisor LCmultiplier of LC(A,1) on the bivariate factors and
+/// the precomputed leading coefficients
 void
-distributeLCmultiplier (CanonicalForm& A, CFList& leadingCoeffs, CFList& biFactors, const CFList& evaluation, const CanonicalForm& LCmultipler);
+distributeLCmultiplier (CanonicalForm& A,               ///<[in,out] some poly
+                        CFList& leadingCoeffs,          ///<[in,out] leading
+                                                        ///< coefficients
+                        CFList& biFactors,              ///<[in,out] bivariate
+                                                        ///< factors
+                        const CFList& evaluation,       ///<[in] eval. point
+                        const CanonicalForm& LCmultipler///<[in] multiplier
+                       );
 
 void
 LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
