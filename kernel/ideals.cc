@@ -214,6 +214,7 @@ void idKeepFirstK(ideal id, const int k)
   {
     if (id->m[i] != NULL) pDelete(&id->m[i]);
   }
+  if (k==0) k=1; /* ideals must have at least one element(0)*/
   pEnlargeSet(&(id->m), IDELEMS(id), k-IDELEMS(id));
   IDELEMS(id) = k;
 }
