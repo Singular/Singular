@@ -85,7 +85,8 @@ void p_String0(poly p, ring lmRing, ring tailRing)
 {
   if (p == NULL)
   {
-    return StringAppendS("0");
+    StringAppendS("0");
+    return;
   }
   if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
   {
@@ -137,7 +138,9 @@ char* p_String(poly p, ring lmRing, ring tailRing)
 */
 void p_Write0(poly p, ring lmRing, ring tailRing)
 {
-  PrintS(p_String(p, lmRing, tailRing));
+  char *s=p_String(p, lmRing, tailRing);
+  PrintS(s);
+  omFree(s);
 }
 
 /*2
