@@ -720,14 +720,15 @@ char * showOption()
         if (tmp & Sy_bit(i)) StringAppend(" %d",i+32);
       }
     }
-    return omStrDup(StringAppendS(""));
+    return StringEndS();
   }
-  return omStrDup(StringAppendS(" none"));
+  StringAppendS(" none");
+  return StringEndS();
 }
 
 char * versionString()
 {
-  char* str = StringSetS("");
+  StringSetS("");
   StringAppend("Singular for %s version %s (%d-%s)  %s\nwith\n",
                S_UNAME, S_VERSION1, SINGULAR_VERSION,
                feVersionId,singular_date);
@@ -841,7 +842,7 @@ char * versionString()
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");
-              return str;
+              return StringEndS();
 }
 
 #ifdef PDEBUG

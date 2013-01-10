@@ -969,7 +969,8 @@ void    nfCoeffWrite  (const coeffs r, BOOLEAN details)
   {
     StringSetS("//   minpoly        : ");
     nfShowMipo(r);
-    PrintS(StringAppendS("\n"));
+    StringAppendS("\n");
+    char *s=StringEndS(); PrintS(s); omFree(s);
   }
   else PrintS("//   minpoly        : ...\n"); 
 }

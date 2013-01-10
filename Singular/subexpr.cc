@@ -766,16 +766,16 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             nWrite(n);
             nDelete(&n);
           }
-          s = StringAppendS((char*) (typed ? ")" : ""));
-          return omStrDup(s);
+          StringAppendS((char*) (typed ? ")" : ""));
+          return StringEndS();
 
         case BIGINT_CMD:
           {
           StringSetS((char*) (typed ? "bigint(" : ""));
           number nl=(number)d;
           n_Write(nl,coeffs_BIGINT);
-          s = StringAppendS((char*) (typed ? ")" : ""));
-          return omStrDup(s);
+          StringAppendS((char*) (typed ? ")" : ""));
+          return StringEndS();
           }
 
         case MATRIX_CMD:

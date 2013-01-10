@@ -272,7 +272,7 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 
 // let's inline those, so that we can call them from the debugger
 inline char*   pString(poly p)    {return p_String(p, currRing, currRing);}
-inline char*   pString0(poly p)   {return p_String0(p, currRing, currRing);}
+inline void    pString0(poly p)   {p_String0(p, currRing, currRing);}
 inline void    pWrite(poly p)     {p_Write(p, currRing, currRing);}
 inline void    pWrite0(poly p)    {p_Write0(p, currRing, currRing);}
 inline void    wrp(poly p)        {p_wrp(p, currRing, currRing);}

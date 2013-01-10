@@ -35,7 +35,7 @@ static char * bigintm_String(blackbox *b, void *d)
    {
      StringSetS("");
      number n=(number)d; n_Write(n, coeffs_BIGINT); d=(void*)n;
-     return omStrDup(StringAppendS(""));
+     return StringEndS();
     }
 }
 static void * bigintm_Copy(blackbox*b, void *d)

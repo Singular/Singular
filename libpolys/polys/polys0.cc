@@ -95,7 +95,7 @@ static void writemon(poly p, int ko, const ring r)
 }
 
 /// if possible print p in a short way...
-char* p_String0Short(const poly p, ring lmRing, ring tailRing)
+void p_String0Short(const poly p, ring lmRing, ring tailRing)
 {
   // NOTE: the following (non-thread-safe!) UGLYNESS
   // (changing naRing->ShortOut for a while) is due to Hans!
@@ -107,16 +107,14 @@ char* p_String0Short(const poly p, ring lmRing, ring tailRing)
   lmRing->ShortOut = rCanShortOut(lmRing);
   tailRing->ShortOut = rCanShortOut(tailRing);
   
-  char* res = p_String0(p, lmRing, tailRing);
+  p_String0(p, lmRing, tailRing);
 
   lmRing->ShortOut = bLMShortOut;
   tailRing->ShortOut = bTAILShortOut;
-
-  return res;
 }
 
 /// print p in a long way...
-char* p_String0Long(const poly p, ring lmRing, ring tailRing)
+void p_String0Long(const poly p, ring lmRing, ring tailRing)
 {
   // NOTE: the following (non-thread-safe!) UGLYNESS
   // (changing naRing->ShortOut for a while) is due to Hans!
@@ -128,20 +126,19 @@ char* p_String0Long(const poly p, ring lmRing, ring tailRing)
   lmRing->ShortOut = FALSE;
   tailRing->ShortOut = FALSE;
 
-  char* res = p_String0(p, lmRing, tailRing);
+  p_String0(p, lmRing, tailRing);
 
   lmRing->ShortOut = bLMShortOut;
   tailRing->ShortOut = bTAILShortOut;
-
-  return res;
 }
 
 
-char* p_String0(poly p, ring lmRing, ring tailRing)
+void p_String0(poly p, ring lmRing, ring tailRing)
 {
   if (p == NULL)
   {
-    return StringAppendS("0");
+    StringAppendS("0");
+    return;
   }
   if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
   {
@@ -155,7 +152,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
       writemon(p,0, tailRing);
       p = pNext(p);
     }
-    return StringAppendS("");
+    return;
   }
 
   long k = 1;
@@ -179,13 +176,14 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     StringAppendS(",");
     k++;
   }
-  return StringAppendS("]");
+  StringAppendS("]");
 }
 
 char* p_String(poly p, ring lmRing, ring tailRing)
 {
   StringSetS("");
-  return p_String0(p, lmRing, tailRing);
+  p_String0(p, lmRing, tailRing);
+  return StringEndS();
 }
 
 /*2

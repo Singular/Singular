@@ -240,8 +240,12 @@ static const char* feOptAction(feOptIndex opt)
         return NULL;
 
       case FE_OPT_VERSION:
-        printf("%s",versionString());
+        {
+	char *s=versionString();
+        printf("%s",s);
+	omFree(s);
         return NULL;
+	}
 
       case FE_OPT_ECHO:
         si_echo = (int) ((long)(feOptSpec[FE_OPT_ECHO].value));

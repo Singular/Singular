@@ -588,7 +588,7 @@ char * rOrdStr(ring r)
       StringAppend("(%d)", s);
     }
 
-    if (l==nblocks) return omStrDup(StringAppendS(""));
+    if (l==nblocks) return StringEndS();
     StringAppendS(",");
   }
 }

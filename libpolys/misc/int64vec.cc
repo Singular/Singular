@@ -88,7 +88,7 @@ char * int64vec::iv64String(int not_mat, int /*mat*/, int spaces, int dim)
       }
     }
   }
-  return StringAppendS("");
+  return StringEndS();
 }
 
 char * int64vec::String(int dim)

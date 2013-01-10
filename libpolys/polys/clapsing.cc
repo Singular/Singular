@@ -1371,7 +1371,7 @@ char* singclap_neworder ( ideal I, const ring r)
       if (done) StringAppendS(",");
     }
   }
-  char * s=omStrDup(StringAppendS(""));
+  char * s=StringEndS();
   if (s[strlen(s)-1]==',') s[strlen(s)-1]='\0';
   return s;
 }

@@ -34,8 +34,13 @@
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
-static long feBufferLength=INITIAL_PRINT_BUFFER;
-static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
+static long feBufferLength=0;
+static char * feBuffer=NULL;
+static long feBufferLength_save[8];
+static char * feBuffer_save[8];
+static int feBuffer_cnt=0;
+static char * feBufferStart_save[8];
+
 
 char *  feErrors=NULL;
 int     feErrorsLen=0;
@@ -51,7 +56,7 @@ FILE*   feProtFile;
 
 static char * feBufferStart;
   /* only used in StringSet(S)/StringAppend(S)*/
-char * StringAppend(const char *fmt, ...)
+void StringAppend(const char *fmt, ...)
 {
   va_list ap;
   char *s = feBufferStart; /*feBuffer + strlen(feBuffer);*/
@@ -95,10 +100,9 @@ char * StringAppend(const char *fmt, ...)
 #endif
   omCheckAddrSize(feBuffer, feBufferLength);
   va_end(ap);
-  return feBuffer;
 }
 
-char * StringAppendS(const char *st)
+void StringAppendS(const char *st)
 {
   if (*st!='\0')
   {
@@ -117,23 +121,42 @@ char * StringAppendS(const char *st)
     strcat(feBufferStart, st);
     feBufferStart +=l;
   }
-  return feBuffer;
 }
 
-char * StringSetS(const char *st)
+void StringSetS(const char *st)
 {
+  feBuffer_save[feBuffer_cnt]=feBuffer;
+  feBuffer=(char*)omAlloc0(INITIAL_PRINT_BUFFER);
+  feBufferLength_save[feBuffer_cnt]=feBufferLength;
+  feBufferLength=INITIAL_PRINT_BUFFER;
+  feBufferStart_save[feBuffer_cnt]=feBufferStart;
+  feBufferStart=feBuffer;
+  feBuffer_cnt++;
   int l;
   long more;
   if ((l=strlen(st))>feBufferLength)
   {
     more = ((l + (4*1024-1))/(4*1024))*(4*1024);
-    feBuffer=(char *)omReallocSize((void *)feBuffer,feBufferLength,
+    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
                                                      more);
     feBufferLength=more;
   }
   strcpy(feBuffer,st);
   feBufferStart=feBuffer+l;
-  return feBuffer;
+}
+
+char * StringEndS()
+{
+  char *r=feBuffer;
+  feBuffer_cnt--;
+  feBuffer=feBuffer_save[feBuffer_cnt];
+  feBufferLength=feBufferLength_save[feBuffer_cnt];
+  feBufferStart=feBufferStart_save[feBuffer_cnt];
+  if (strlen(r)<1024)
+  {
+    char *s=omStrDup(r); omFree(r); r=s;
+  }
+  return r;
 }
 
 #ifdef HAVE_TCL

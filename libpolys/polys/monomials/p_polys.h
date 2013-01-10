@@ -337,17 +337,17 @@ void      pEnlargeSet(poly**p, int length, int increment);
  *
  ***************************************************************/
 /// print p according to ShortOut in lmRing & tailRing
-char*     p_String0(poly p, ring lmRing, ring tailRing);
+void      p_String0(poly p, ring lmRing, ring tailRing);
 char*     p_String(poly p, ring lmRing, ring tailRing);
 void      p_Write(poly p, ring lmRing, ring tailRing);
 void      p_Write0(poly p, ring lmRing, ring tailRing);
 void      p_wrp(poly p, ring lmRing, ring tailRing);
 
 /// print p in a short way, if possible
-char* p_String0Short(const poly p, ring lmRing, ring tailRing);
+void  p_String0Short(const poly p, ring lmRing, ring tailRing);
 
 /// print p in a long way
-char* p_String0Long(const poly p, ring lmRing, ring tailRing);
+void   p_String0Long(const poly p, ring lmRing, ring tailRing);
 
 
 /***************************************************************
@@ -1153,9 +1153,9 @@ static inline char*     p_String(poly p, ring p_ring)
 {
   return p_String(p, p_ring, p_ring);
 }
-static inline char*     p_String0(poly p, ring p_ring)
+static inline void     p_String0(poly p, ring p_ring)
 {
-  return p_String0(p, p_ring, p_ring);
+  p_String0(p, p_ring, p_ring);
 }
 static inline void      p_Write(poly p, ring p_ring)
 {

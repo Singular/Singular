@@ -86,7 +86,7 @@ char * newstruct_String(blackbox *b, void *d)
     loop
     {
       StringAppendS(a->name);
-      char *tmp=omStrDup(StringAppendS("="));
+      StringAppendS("=");
       if ((!RingDependend(a->typ))
       || ((l->m[a->pos-1].data==(void *)currRing)
          && (currRing!=NULL)))
@@ -97,9 +97,7 @@ char * newstruct_String(blackbox *b, void *d)
         }
         else
         {
-          StringSetS("");
           char *tmp2=omStrDup(l->m[a->pos].String());
-          StringSetS(tmp);
           if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
           {
             StringAppend("<%s>",Tok2Cmdname(l->m[a->pos].rtyp));
@@ -109,13 +107,12 @@ char * newstruct_String(blackbox *b, void *d)
         }
       }
       else StringAppendS("??");
-      omFree(tmp);
       if (a->next==NULL) break;
       StringAppendS("\n");
       if(errorreported) break;
       a=a->next;
     }
-    return omStrDup(StringAppendS(""));
+    return StringEndS();
   }
 }
 lists lCopy_newstruct(lists L)

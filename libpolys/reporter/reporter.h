@@ -56,10 +56,11 @@ void    PrintS(const char* s);
 }
 /* the C++-part: */
 
-char *  StringAppend(const char *fmt, ...);
-char *  StringAppendS(const char *s);
-char *  StringSetS(const char* s);
-void    Warn(const char *fmt, ...);
+void  StringAppend(const char *fmt, ...);
+void  StringAppendS(const char *s);
+void  StringSetS(const char* s);
+char * StringEndS();
+void  Warn(const char *fmt, ...);
 
 const char *  eati(const char *s, int *i);
 

@@ -370,7 +370,7 @@ char* bigintmat::String()
   if ((i+1)%col == 0)
   StringAppendS("\n");
   }   */
-  return StringAppendS("");
+  return StringEndS();
 }
 
 int intArrSum(int * a, int length)
@@ -437,11 +437,12 @@ int * bigintmat::getwid(int maxwid)
     {
       StringSetS("");
       n_Write(v[col*i+j], basecoeffs());
-      char * tmp = StringAppendS("");
+      char * tmp = StringEndS();
       const int _nl = strlen(tmp);
       wv[col*i+j] = _nl;
       if (_nl > cwv[j])
         cwv[j]=_nl;
+      omFree(tmp);
     }
   }
 
@@ -478,8 +479,7 @@ void bigintmat::pprint(int maxwid)
     {
       StringSetS("");
       n_Write(v[i], basecoeffs());
-      char * temp = StringAppendS("");
-      char * ts = omStrDup(temp);
+      char * ts = StringEndS();
       const int _nl = strlen(ts);
       int cj = i%col;
       if (_nl > colwid[cj])
@@ -487,8 +487,7 @@ void bigintmat::pprint(int maxwid)
         StringSetS("");
         int ci = floor(i/col);
         StringAppend("[%d,%d]", ci+1, cj+1);
-        char *tmp = StringAppendS("");
-        char * ph = omStrDup(tmp);
+        char * ph = StringEndS();
         int phl = strlen(ph);
         if (phl > colwid[cj])
         {

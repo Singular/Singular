@@ -143,7 +143,7 @@ void feHelp(char *str)
     }
 #endif
 
-    char* matches = StringSetS("");
+    StringSetS("");
     int found = heReKey2Entry(idxfile, str, &hentry);
 
     // Try to match with str*
@@ -184,8 +184,10 @@ void feHelp(char *str)
     else
       Warn("No help for topic '%s'", str);
     Warn("Try one of");
+    char *matches=StringEndS();
     PrintS(matches);
-    PrintS("\n");
+    PrintLn();
+    omFree(matches);
     return;
   }
 
@@ -845,7 +847,7 @@ static void heBrowserHelp(heEntry hentry)
     //  Warn("Using URL '%s'.", feResource('u', 0));
     //}
     Warn("Use 'system(\"--browser\", <browser>);' to change browser,");
-    char* browsers = StringSetS("where <browser> can be: ");
+    StringSetS("where <browser> can be: ");
     int i = 0;
     i = 0;
     while (heHelpBrowsers[i].browser != NULL)
@@ -854,12 +856,14 @@ static void heBrowserHelp(heEntry hentry)
         StringAppend("\"%s\", ", heHelpBrowsers[i].browser);
       i++;
     }
+    char *browsers=StringEndS();
     if (browsers[strlen(browsers)-2] == ',')
     {
       browsers[strlen(browsers)-2] = '.';
       browsers[strlen(browsers)-1] = '\0';
     }
     WarnS(browsers);
+    omFree(browsers);
   }
 
   heCurrentHelpBrowser->help_proc(hentry, heCurrentHelpBrowserIndex);

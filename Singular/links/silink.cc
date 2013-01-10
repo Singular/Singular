@@ -784,8 +784,9 @@ static int DumpRhs(FILE *fd, idhdl h)
     {
       StringSetS("");
       p_Write(IDRING(h)->cf->extRing->qideal->m[0],IDRING(h)->cf->extRing);
-      rhs = StringAppendS("");
-      if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
+      rhs = StringEndS();
+      if (fprintf(fd, "; minpoly = %s", rhs) == EOF) { omFree(rhs); return EOF;}
+      omFree(rhs);
     }
     else if (type_id == INTVEC_CMD) fprintf(fd, ")");
   }

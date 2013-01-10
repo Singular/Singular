@@ -113,7 +113,7 @@ char * intvec::ivString(int not_mat,int spaces, int dim) const
       }
     }
   }
-  return StringAppendS("");
+  return StringEndS();
 }
 
 void intvec::resize(int new_length)
