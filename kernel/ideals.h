@@ -57,8 +57,8 @@ static inline int idSize(const ideal id)
 #define idTest(A) id_DBTest(A, PDEBUG, __FILE__,__LINE__,currRing)
 #define idPrint(id) idShow(id, currRing, currRing)
 #else
-#define idTest(A)  ((void)(TRUE))
-#define idPrint(A) ((void)0)
+#define idTest(A)  do {} while (0)
+#define idPrint(A) do {} while (0)
 #endif
 
 ideal id_Copy (ideal h1, const ring r);

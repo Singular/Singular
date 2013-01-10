@@ -46,7 +46,7 @@ BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, const ring r_1,
 BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, const ring r);
 #define pDivAssume  pAssume
 #else
-#define pDivAssume(x)   ((void)0)
+#define pDivAssume(x)   do {} while (0)
 #endif
 
 #if !defined(NO_PINLINE1) || defined(PINLINE1_CC)

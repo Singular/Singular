@@ -242,7 +242,7 @@ poly kNF2Length (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   //  for (i=strat->sl;i>=0;i--)
   //    pNorm(strat->S[i]);
   //}
-  kTest(strat);
+  assume(kTest(strat));
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
 
   if (BVERBOSE(23)) kDebugPrint(strat);

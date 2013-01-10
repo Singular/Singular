@@ -1526,7 +1526,7 @@ while (YYID (0))
 	      (Loc).first_line, (Loc).first_column,	\
 	      (Loc).last_line,  (Loc).last_column)
 # else
-#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+#  define YY_LOCATION_PRINT(File, Loc) do {} while (0)
 # endif
 #endif
 

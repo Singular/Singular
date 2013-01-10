@@ -84,7 +84,7 @@ int64vec * iv64Sub(int64vec * a, int64vec * b);
 #ifdef MDEBUG
 #define iv64Test(v) v->iv64TEST()
 #else
-#define iv64Test(v)   ((void)0)
+#define iv64Test(v)   do {} while (0)
 #endif
 
 #endif

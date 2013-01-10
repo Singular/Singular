@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 #ifdef NDEBUG
-#define ASSERT(ignore1,ignore2)((void)0)
+#define ASSERT(ignore1,ignore2)do {} while (0)
 #else
 #define ASSERT(expression,message) \
 ((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__)))

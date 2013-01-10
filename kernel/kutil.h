@@ -494,7 +494,7 @@ void messageStat (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
 void messageSets (kStrategy strat);
 #else
-#define messageSets(s)  ((void) 0)
+#define messageSets(s)  do {} while (0)
 #endif
 
 void initEcartNormal (LObject* h);
@@ -599,11 +599,11 @@ BOOLEAN kTest_T(TObject* T, ring tailRing = NULL, int tpos = -1, char TN = '?');
 // test set strat->SevS
 BOOLEAN kTest_S(kStrategy strat);
 #else
-#define kTest(A)        ((void)0)
-#define kTest_TS(A)     ((void)0)
-#define kTest_T(T)      ((void)0)
-#define kTest_S(T)      ((void)0)
-#define kTest_L(T)      ((void)0)
+#define kTest(A)        (TRUE)
+#define kTest_TS(A)     (TRUE)
+#define kTest_T(T)      (TRUE)
+#define kTest_S(T)      (TRUE)
+#define kTest_L(T)      (TRUE)
 #endif
 
 

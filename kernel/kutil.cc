@@ -239,7 +239,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
 {
   if (strat->kHEdgeFound)
   {
-    kTest_L(L);
+    assume(kTest_L(L));
     poly p1;
     poly p = L->GetLmTailRing();
     int l = 1;
@@ -306,7 +306,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
       else
         kBucketDestroy(&bucket);
     }
-    kTest_L(L);
+    assume(kTest_L(L));
   }
 }
 
@@ -5362,7 +5362,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  assume(kTest_L(L));
   return L->GetLmCurrRing();
 }
 
@@ -5468,7 +5468,7 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  assume(kTest_L(L));
   return L->GetLmCurrRing();
 }
 #endif
@@ -6701,12 +6701,12 @@ void updateS(BOOLEAN toT,kStrategy strat)
             strat->sevS[i] = h.sev;
           }
           pLmDelete(&redSi);
-          kTest(strat);
+          assume(kTest(strat));
         }
         i++;
       }
 #ifdef KDEBUG
-      kTest(strat);
+      assume(kTest(strat));
 #endif
       if (any_change) reorderS(&suc,strat);
       else { suc=-1; break; }
@@ -6747,7 +6747,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
     if (suc!= -1) updateS(toT,strat);
   }
 #ifdef KDEBUG
-  kTest(strat);
+  assume(kTest(strat));
 #endif
 }
 
@@ -7064,7 +7064,7 @@ void enterT(LObject p, kStrategy strat, int atT)
   strat->T[atT].i_r = strat->tl;
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
-  kTest_T(&(strat->T[atT]));
+  assume(kTest_T(&(strat->T[atT])));
 }
 
 /*2
@@ -7991,7 +7991,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
 
   if (TEST_OPT_PROT)
     Print("[%lu:%d", (unsigned long) new_tailRing->bitmask, new_tailRing->ExpL_Size);
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
   assume(new_tailRing != strat->tailRing);
   pShallowCopyDeleteProc p_shallow_copy_delete
     = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
@@ -8056,7 +8056,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     strat->t_kNoether=k_LmInit_currRing_2_tailRing(strat->kNoether,
                                                    new_tailRing);
   }
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
   if (TEST_OPT_PROT)
     PrintS("]");
   return TRUE;
@@ -9445,7 +9445,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
     L->length = 0;
   }
   L->Normalize(); // HANNES: should have a test
-  kTest_L(L);
+  assume(kTest_L(L));
   return L->GetLmCurrRing();
 }
 #endif

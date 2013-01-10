@@ -4240,7 +4240,7 @@ unsigned long p_GetShortExpVector(poly p, const ring r)
 #undef p_Delete__T
 #define p_Delete__T p_ShallowDelete
 #undef n_Delete__T
-#define n_Delete__T(n, r) ((void)0)
+#define n_Delete__T(n, r) do {} while (0)
 
 #include <polys/templates/p_Delete__T.cc>
 

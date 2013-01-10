@@ -11,7 +11,7 @@
 void omInitGetBackTrace();
 int omGetBackTrace(void** bt, int start, int max);
 #else
-#define omInitGetBackTrace() ((void)0)
+#define omInitGetBackTrace() do {} while (0)
 #define omGetBackTrace(bt, s, max) (0)
 #endif
 

@@ -149,20 +149,20 @@ while (0)
 #define p_SetRingOfLm(p, r) omSetCustomOfAddr(p, r)
 //void p_SetRingOfLeftv(leftv l, ring r);
 #else
-#define p_SetRingOfLm(p, r) ((void)0)
-//#define p_SetRingOfLeftv(l, r) ((void)0)
+#define p_SetRingOfLm(p, r) do {} while (0)
+//#define p_SetRingOfLeftv(l, r) do {} while (0)
 #endif
 
 #else // ! defined(PDEBUG)
-#define pFalseReturn(cond)           ((void)0)
-#define pAssume(cond)                ((void)0)
-#define pPolyAssume(cond)            ((void)0)
-#define _pPolyAssume(cond, p,r)      ((void)0)
-#define pAssumeReturn(cond)          ((void)0)
-#define pPolyAssumeReturn(cond)      ((void)0)
-#define _pPolyAssumeReturn(cond,p,r) ((void)0)
-#define p_SetRingOfLm(p, r)          ((void)0)
-//#define p_SetRingOfLeftv(l, r)       ((void)0)
+#define pFalseReturn(cond)           do {} while (0)
+#define pAssume(cond)                do {} while (0)
+#define pPolyAssume(cond)            do {} while (0)
+#define _pPolyAssume(cond, p,r)      do {} while (0)
+#define pAssumeReturn(cond)          do {} while (0)
+#define pPolyAssumeReturn(cond)      do {} while (0)
+#define _pPolyAssumeReturn(cond,p,r) do {} while (0)
+#define p_SetRingOfLm(p, r)          do {} while (0)
+//#define p_SetRingOfLeftv(l, r)       do {} while (0)
 #endif // defined(PDEBUG)
 
 #if PDEBUG >= 1
@@ -176,15 +176,15 @@ while (0)
 #define p_CheckRing1        p_CheckRing
 #define pIfThen1          pIfThen
 #else
-#define pAssume1(cond)               ((void)0)
-#define pPolyAssume1(cond)           ((void)0)
-#define _pPolyAssume1(cond,p,r)      ((void)0)
-#define pAssumeReturn1(cond)         ((void)0)
-#define pPolyAssumeReturn1(cond)     ((void)0)
-#define _pPolyAssumeReturn1(cond,p,r)((void)0)
-#define p_LmCheckPolyRing1(p,r)       ((void)0)
-#define p_CheckRing1(r)             ((void)0)
-#define pIfThen1(cond, check)     ((void)0)
+#define pAssume1(cond)               do {} while (0)
+#define pPolyAssume1(cond)           do {} while (0)
+#define _pPolyAssume1(cond,p,r)      do {} while (0)
+#define pAssumeReturn1(cond)         do {} while (0)
+#define pPolyAssumeReturn1(cond)     do {} while (0)
+#define _pPolyAssumeReturn1(cond,p,r)do {} while (0)
+#define p_LmCheckPolyRing1(p,r)       do {} while (0)
+#define p_CheckRing1(r)             do {} while (0)
+#define pIfThen1(cond, check)     do {} while (0)
 #endif // PDEBUG >= 1
 
 #if PDEBUG >= 2
@@ -198,15 +198,15 @@ while (0)
 #define p_CheckRing2        p_CheckRing
 #define pIfThen2          pIfThen
 #else
-#define pAssume2(cond)               ((void)0)
-#define pPolyAssume2(cond)           ((void)0)
-#define _pPolyAssume2(cond,p,r)      ((void)0)
-#define pAssumeReturn2(cond)         ((void)0)
-#define pPolyAssumeReturn2(cond)     ((void)0)
-#define _pPolyAssumeReturn2(cond,p,r)((void)0)
-#define p_LmCheckPolyRing2(p,r)       ((void)0)
-#define p_CheckRing2(r)             ((void)0)
-#define pIfThen2(cond, check)     ((void)0)
+#define pAssume2(cond)               do {} while (0)
+#define pPolyAssume2(cond)           do {} while (0)
+#define _pPolyAssume2(cond,p,r)      do {} while (0)
+#define pAssumeReturn2(cond)         do {} while (0)
+#define pPolyAssumeReturn2(cond)     do {} while (0)
+#define _pPolyAssumeReturn2(cond,p,r)do {} while (0)
+#define p_LmCheckPolyRing2(p,r)       do {} while (0)
+#define p_CheckRing2(r)             do {} while (0)
+#define pIfThen2(cond, check)     do {} while (0)
 #endif // PDEBUG >= 2
 
 /***************************************************************

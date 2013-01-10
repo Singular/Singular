@@ -588,8 +588,8 @@ extern void dErrorBreak();
 #endif
 
 #ifndef HAVE_ASSUME
-#define assume(x) ((void) 0)
-#define r_assume(x) ((void) 0)
+#define assume(x) do {} while (0)
+#define r_assume(x) do {} while (0)
 #else /* ! HAVE_ASSUME */
 
 #define assume_violation(s,f,l) \
@@ -1229,8 +1229,8 @@ extern void dErrorBreak();
 #endif
 
 #ifndef HAVE_ASSUME
-#define assume(x) ((void) 0)
-#define r_assume(x) ((void) 0)
+#define assume(x) do {} while (0)
+#define r_assume(x) do {} while (0)
 #else /* ! HAVE_ASSUME */
 
 #define assume_violation(s,f,l) \

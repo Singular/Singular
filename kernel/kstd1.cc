@@ -135,8 +135,8 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 {
   int ret;
 #if KDEBUG > 0
-  kTest_L(h);
-  kTest_T(with);
+  assume(kTest_L(h));
+  assume(kTest_T(with));
 #endif
   // Hmmm ... why do we do this -- polys from T should already be normalized
   if (!TEST_OPT_INTSTRATEGY)
@@ -838,7 +838,7 @@ void updateL(kStrategy strat)
 void updateLHC(kStrategy strat)
 {
   int i = 0;
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
   while (i <= strat->Ll)
   {
     if (pNext(strat->L[i].p) == strat->tail)
@@ -883,12 +883,12 @@ void updateLHC(kStrategy strat)
     else
     {
 #ifdef KDEBUG
-      kTest_L(&(strat->L[i]), strat->tailRing, TRUE, i, strat->T, strat->tl);
+      assume(kTest_L(&(strat->L[i]), strat->tailRing, TRUE, i, strat->T, strat->tl));
 #endif
       i++;
     }
   }
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 }
 
 /*2
@@ -922,7 +922,7 @@ void firstUpdate(kStrategy strat)
 {
   if (strat->update)
   {
-    kTest_TS(strat);
+    assume(kTest_TS(strat));
     strat->update = (strat->tl == -1);
     //if (TEST_OPT_WEIGHTM)
     //{
@@ -960,7 +960,7 @@ void firstUpdate(kStrategy strat)
     strat->posInT = posInT2;
     reorderT(strat);
   }
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 }
 
 /*2
@@ -1269,7 +1269,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     updateL(strat);
     reorderL(strat);
   }
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
   strat->use_buckets = kMoraUseBucket(strat);
   /*- compute-------------------------------------------*/
 
@@ -1424,7 +1424,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       }
     }
-    kTest_TS(strat);
+    assume(kTest_TS(strat));
   }
   /*- complete reduction of the standard basis------------------------ -*/
   if (TEST_OPT_REDSB) completeReduce(strat);
@@ -1547,7 +1547,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- compute------------------------------------------- -*/
   p = pCopy(q);
   deleteHC(&p,&o,&j,strat);
-  kTest(strat);
+  assume(kTest(strat));
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
   if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
@@ -2522,7 +2522,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);

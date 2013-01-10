@@ -78,7 +78,7 @@ extern int om_CallErrorHook;
  ******************************************************************/
 #ifndef HAVE_OM_ASSUME
 
-#define omAssume(x) ((void) 0)
+#define omAssume(x) do {} while (0)
 
 #else /* ! HAVE_OM_ASSUME */
 

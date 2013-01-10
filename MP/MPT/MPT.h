@@ -218,7 +218,7 @@ extern void MPT_Assume(MP_Boolean_t value);
 #else
 #define MPT_SetError(error) MPT_errno = (error)
 #define MPT_ClearError()    MPT_errno = MPT_Success
-#define MPT_Assume(x) ((void)0)
+#define MPT_Assume(x) do {} while (0)
 #endif
 
 /*************************************************************** 

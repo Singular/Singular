@@ -8,7 +8,7 @@ do                                              \
 }                                               \
 while (0)
 #else
-#define PR_DELETE_MONOM(src, r_src) ((void)0)
+#define PR_DELETE_MONOM(src, r_src) do {} while (0)
 #endif
 
 #undef PR_INIT_EVECTOR_COPY
@@ -17,7 +17,7 @@ while (0)
 #if PR_RING_EQUAL > 0
 #undef PR_NO_SORT
 #define PR_NO_SORT 1
-#define PR_INIT_EVECTOR_COPY(r_src, r_dest) ((void)0)
+#define PR_INIT_EVECTOR_COPY(r_src, r_dest) do {} while (0)
 #define PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
   omMemcpyW(dest->exp, src->exp, dest_r->ExpL_Size)
 #define PR_ALLOC_MONOM(r) p_New(r) 
@@ -35,7 +35,7 @@ while (0)
 #undef PR_NUMBER_SIMPLE_NAME
 #if PR_NUMBER_SIMPLE > 0
 #define PR_NCOPY(n, r) n
-#define PR_NDELETE(n, r) ((void)0)
+#define PR_NDELETE(n, r) do {} while (0)
 #define PR_NUMBER_SIMPLE_NAME NSimple
 #else
 #define PR_NCOPY(n, r) n_Copy(n,r->cf)
@@ -45,7 +45,7 @@ while (0)
 
 #undef PR_SORT_POLY
 #if PR_NO_SORT > 0
-#define PR_SORT_POLY(p, d_r, s_r) ((void)0)
+#define PR_SORT_POLY(p, d_r, s_r) do {} while (0)
 #else
 #define PR_SORT_POLY(p, d_r, s_r) p = p_SortMerge(p, d_r, d_r->OrdSgn == s_r->OrdSgn)
 #endif

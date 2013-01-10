@@ -21,13 +21,13 @@
 #endif
 
 #if defined(OM_NDEBUG)
-#define omMarkAsStaticAddr(addr)    ((void)0)
-#define omMarkMemoryAsStatic()      ((void)0)
-#define omUnMarkAsStaticAddr()      ((void)0)
-#define omUnMarkMemoryAsStatic()    ((void)0)
-#define omFreeKeptAddr()            ((void)0)
-#define omPrintUsedAddrs(fd,m)      ((void)0)
-#define omPrintUsedTrackAddrs(fd,m) ((void)0)
+#define omMarkAsStaticAddr(addr)    do {} while (0)
+#define omMarkMemoryAsStatic()      do {} while (0)
+#define omUnMarkAsStaticAddr()      do {} while (0)
+#define omUnMarkMemoryAsStatic()    do {} while (0)
+#define omFreeKeptAddr()            do {} while (0)
+#define omPrintUsedAddrs(fd,m)      do {} while (0)
+#define omPrintUsedTrackAddrs(fd,m) do {} while (0)
 #else
 #define OM_FBIN     1           /* size_bin is bin */
 #define OM_FSIZE    2           /* size_bin is size */
@@ -68,9 +68,9 @@ void omUnMarkMemoryAsStatic();
 
 #ifdef OM_TRACK_CUSTOM
 #ifdef OM_NDEBUG
-#define omSetCustomOfAddr(addr,value) ((void)0)
+#define omSetCustomOfAddr(addr,value) do {} while (0)
 #define omGetCustomOfAddr(addr) ((void*)0)
-#define omSetCustomOfTrackAddr(addr,value) ((void)0)
+#define omSetCustomOfTrackAddr(addr,value) do {} while (0)
 #define omGetCustomOfTrackAddr(addr) ((void*)0)
 #else
 void omSetCustomOfTrackAddr(void* addr, void* value);
@@ -189,7 +189,7 @@ do                                                                            \
   omAddrCheckReturnError(cond, omError_MemoryCorrupted)
 
 #else
-#define omFreeKeptAddrFromBin(bin) ((void)0)
+#define omFreeKeptAddrFromBin(bin) do {} while (0)
 #endif /* ! OM_NDEBUG */
 /*ENDPRIVATE*/
 

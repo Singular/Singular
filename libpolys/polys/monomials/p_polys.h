@@ -153,16 +153,16 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 
 #define pIsMonomOf(p, q)        (TRUE)
 #define pHaveCommonMonoms(p, q) (TRUE)
-#define p_LmCheckIsFromRing(p,r)  ((void)0)
-#define p_LmCheckPolyRing(p,r)    ((void)0)
-#define p_CheckIsFromRing(p,r)  ((void)0)
-#define p_CheckPolyRing(p,r)    ((void)0)
-#define p_CheckRing(r)          ((void)0)
-#define P_CheckIf(cond, check)  ((void)0)
+#define p_LmCheckIsFromRing(p,r)  do {} while (0)
+#define p_LmCheckPolyRing(p,r)    do {} while (0)
+#define p_CheckIsFromRing(p,r)  do {} while (0)
+#define p_CheckPolyRing(p,r)    do {} while (0)
+#define p_CheckRing(r)          do {} while (0)
+#define P_CheckIf(cond, check)  do {} while (0)
 
-#define p_Test(p,r)     ((void) 1)
-#define p_LmTest(p,r)   ((void) 1)
-#define pp_Test(p, lmRing, tailRing) ((void) 1)
+#define p_Test(p,r)     do {} while (0)
+#define p_LmTest(p,r)   do {} while (0)
+#define pp_Test(p, lmRing, tailRing) do {} while (0)
 
 #endif
 
@@ -1191,7 +1191,7 @@ while(0)
 
 #endif
 
-#define pDivAssume(x)   ((void)0)
+#define pDivAssume(x)   do {} while (0)
 
 
 

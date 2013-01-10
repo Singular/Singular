@@ -477,7 +477,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 
 #undef HAVE_TAIL_RING
 
@@ -803,7 +803,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 //    memset(&(strat->P), 0, sizeof(strat->P));
 #endif
 
-    kTest_TS(strat); // even of T is not used!
+    assume(kTest_TS(strat)); // even of T is not used!
 
 //     Print("\n$\n");
 
@@ -968,7 +968,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #endif
   strat->use_buckets = kMoraUseBucket(strat);
 
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 
 
   int olddeg = 0;
@@ -1202,7 +1202,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       }
     }
 #endif
-    kTest_TS(strat);
+    assume(kTest_TS(strat));
   }
   // - complete reduction of the standard basis------------------------ -
   if (TEST_OPT_REDSB) completeReduce(strat);

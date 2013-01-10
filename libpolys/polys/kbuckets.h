@@ -156,7 +156,7 @@ void kBucketShallowCopyDelete(kBucket_pt bucket,
 #ifdef KDEBUG
 BOOLEAN kbTest(kBucket_pt bucket);
 #else
-#define kbTest(bucket)  ((void)0)
+#define kbTest(bucket)  do {} while (0)
 #endif
 
 //////////////////////////////////////////////////////////////////////////

@@ -67,14 +67,14 @@ int _omPrintCurrentBackTrace(FILE* fd , OM_FLR_DECL);
 /*ENDPRIVATE*/
 
 #else /* OM_NDEBUG */
-#define omPrintRetInfo(i, max, fd, fmt) ((void)0)
-#define omBackTrace_2_RetInfo(bt, i, m) ((void)0)
-#define omInitRet_2_Info(a)             ((void)0)
-#define omPrintBackTrace(bt,max,fd)     ((void)0)
-#define omPrintCurrentBackTrace(fd)     ((void)0)
-#define omPrintCurrentBackTraceMax(fd,max) ((void)0)
-#define omFilterRetInfo_i(info,max,i)   ((void)0)
-#define omFilterRetInfo(info, max, cond)((void)0)
+#define omPrintRetInfo(i, max, fd, fmt) do {} while (0)
+#define omBackTrace_2_RetInfo(bt, i, m) do {} while (0)
+#define omInitRet_2_Info(a)             do {} while (0)
+#define omPrintBackTrace(bt,max,fd)     do {} while (0)
+#define omPrintCurrentBackTrace(fd)     do {} while (0)
+#define omPrintCurrentBackTraceMax(fd,max) do {} while (0)
+#define omFilterRetInfo_i(info,max,i)   do {} while (0)
+#define omFilterRetInfo(info, max, cond)do {} while (0)
 #endif /* ! OM_NDEBUG */
 
 #endif /* OM_RET_2_INFO_H */

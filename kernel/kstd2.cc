@@ -1185,7 +1185,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 
 #ifdef KDEBUG
 #if MYTEST
@@ -1410,7 +1410,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif /* KDEBUG */
-    kTest_TS(strat);
+    assume(kTest_TS(strat));
   }
 #ifdef KDEBUG
 #if MYTEST
@@ -1540,7 +1540,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 
 #ifdef KDEBUG
 #if MYTEST
@@ -1925,7 +1925,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif /* KDEBUG */
-    kTest_TS(strat);
+    assume(kTest_TS(strat));
   }
 #ifdef KDEBUG
 #if MYTEST
@@ -2057,7 +2057,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   //  for (i=strat->sl;i>=0;i--)
   //    pNorm(strat->S[i]);
   //}
-  kTest(strat);
+  assume(kTest(strat));
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
   int max_ind;
@@ -2525,7 +2525,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   //    withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  kTest_TS(strat);
+  assume(kTest_TS(strat));
 
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);
@@ -2763,7 +2763,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif
-    kTest_TS(strat);
+    assume(kTest_TS(strat));
   }
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);

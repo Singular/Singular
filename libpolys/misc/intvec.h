@@ -152,7 +152,7 @@ inline void ivTest(intvec * v)
   v->ivTEST();
 }
 #else
-#define ivTest(v) ((void)0)
+#define ivTest(v) do {} while (0)
 #endif
 
 #undef INLINE_THIS

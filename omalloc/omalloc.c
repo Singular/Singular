@@ -17,7 +17,7 @@
 #ifdef OM_MALLOC_MARK_AS_STATIC
 #define OM_MARK_AS_STATIC(addr) omMarkAsStaticAddr(addr)
 #else
-#define OM_MARK_AS_STATIC(addr) ((void)0)
+#define OM_MARK_AS_STATIC(addr) do {} while (0)
 #endif
 
 #if OM_PROVIDE_MALLOC > 0

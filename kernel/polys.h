@@ -379,8 +379,8 @@ static inline poly pLast(poly a) { int l; return pLast(a, l); }
 
 #else // ! PDEBUG
 
-#define pTest(p)        ((void)0)
-#define pLmTest(p)      ((void)0)
+#define pTest(p)        do {} while (0)
+#define pLmTest(p)      do {} while (0)
 #endif
 
 #endif // POLYS_H

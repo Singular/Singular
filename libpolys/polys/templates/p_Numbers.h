@@ -61,7 +61,7 @@ static inline void n_InpAdd_RingGeneral(number &n1, number n2, const ring r)
 
 #include <coeffs/modulop.h>
 #define n_Copy_FieldZp(n, r)        n
-#define n_Delete_FieldZp(n, r)      ((void)0)
+#define n_Delete_FieldZp(n, r)      do {} while (0)
 #define n_Mult_FieldZp(n1, n2, r)   npMultM(n1,n2, r->cf)
 #define n_Add_FieldZp(n1, n2, r)    npAddM(n1, n2, r->cf)
 #define n_IsZero_FieldZp(n, r)      npIsZeroM(n, r->cf)

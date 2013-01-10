@@ -160,7 +160,7 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r);
 #define nlTest(a, r) nlDBTest(a,__FILE__,__LINE__, r)
 BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 #else
-#define nlTest(a, r) ((void)0)
+#define nlTest(a, r) do {} while (0)
 #endif
 
 #endif

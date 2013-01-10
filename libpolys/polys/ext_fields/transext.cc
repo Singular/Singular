@@ -83,7 +83,7 @@ static inline BOOLEAN p_IsOne(const poly p, const ring R)
 #define ntTest(a) assume(ntDBTest(a,__FILE__,__LINE__,cf))
 BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
 #else
-#define ntTest(a) ((void)(TRUE))
+#define ntTest(a) do {} while (0)
 #endif
 
 /// Our own type!

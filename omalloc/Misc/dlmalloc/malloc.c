@@ -286,7 +286,7 @@ extern "C" {
 #if DEBUG 
 #include <assert.h>
 #else
-#define assert(x) ((void)0)
+#define assert(x) do {} while (0)
 #endif
 
 

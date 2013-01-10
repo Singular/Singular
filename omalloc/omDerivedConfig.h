@@ -135,7 +135,7 @@
 #define OM_FLR_DECL OM_FL_DECL
 #define OM_FLR_VAL  OM_FL_VAL
 #define OM_FLR      OM_FL
-#define OM_R_DEF    ((void)0)
+#define OM_R_DEF    do {} while (0)
 #define OM_FLR_ARG(f,l,r)   f,l
 #endif
 

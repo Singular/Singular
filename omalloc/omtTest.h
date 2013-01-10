@@ -43,8 +43,8 @@ void TestFree(omMemCell cell);
   printf(format, ## args)
 #define myfflush(what) fflush(what)
 #else
-#define myprintf(format, args...) ((void) 0)
-#define myfflush(what)            ((void) 0)
+#define myprintf(format, args...) do {} while (0)
+#define myfflush(what)            do {} while (0)
 #endif
 
 #define IS_STICKY_BIN(spec) (spec & 1)
@@ -121,7 +121,7 @@ void omtTestDebug(omMemCell cell);
 void TestAddrContent(void* addr, unsigned long value, size_t size);
 void TestAddrContentEqual(void* s1, void* s2, size_t size);
 #else
-#define omtTestDebug(cell)               ((void)0)
-#define TestAddrContent(a,v,s)          ((void)0)
-#define TestAddrContentEqual(s1, s2, s) ((void)0)
+#define omtTestDebug(cell)               do {} while (0)
+#define TestAddrContent(a,v,s)          do {} while (0)
+#define TestAddrContentEqual(s1, s2, s) do {} while (0)
 #endif

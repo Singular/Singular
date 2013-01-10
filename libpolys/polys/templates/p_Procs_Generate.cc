@@ -150,8 +150,8 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   printf("#undef p_MemAddAdjust__T\n");
   if (length != LengthGeneral)
   {
-    printf("#define DECLARE_LENGTH(what) ((void)0)\n");
-    printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
+    printf("#define DECLARE_LENGTH(what) do {} while (0)\n");
+    printf("#define p_MemAddAdjust__T(p, r) do {} while (0)\n");
   }
   else
   {
@@ -159,13 +159,13 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     if (proc != pp_Mult_Coeff_mm_DivSelectMult_Proc)
       printf("#define p_MemAddAdjust__T(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
     else
-      printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
+      printf("#define p_MemAddAdjust__T(p, r) do {} while (0)\n");
   }
 
   // define DECLARE_ORDSGN
   printf("#undef DECLARE_ORDSGN\n");
   if (ord != OrdGeneral)
-    printf("#define DECLARE_ORDSGN(what) ((void)0)\n");
+    printf("#define DECLARE_ORDSGN(what) do {} while (0)\n");
   else
     printf("#define DECLARE_ORDSGN(what) what\n");
 
@@ -175,7 +175,7 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     printf("#undef p_MemCmp_Bitmask_2\n");
     if (length != LengthGeneral)
     {
-      printf("#define DECLARE_LENGTH_2(what) ((void)0)\n");
+      printf("#define DECLARE_LENGTH_2(what) do {} while (0)\n");
       if (length < LengthTwo)
         printf("#define p_MemCmp_Bitmask_2 p_MemCmp_Bitmask_%s\n", p_LengthEnum_2_String((p_Length) ((int) length + 2)));
       else
@@ -189,7 +189,7 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
 
 
     printf("#undef p_MemAddAdjust__T\n");
-    printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
+    printf("#define p_MemAddAdjust__T(p, r) do {} while (0)\n");
   }
 
   printf("#undef %s__T\n#define %s__T %s\n", s_what, s_what, s_full_proc_name);
