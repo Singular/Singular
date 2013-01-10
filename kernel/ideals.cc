@@ -10,7 +10,6 @@
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>
-#include <misc/auxiliary.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -2561,12 +2560,13 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
 /// (Note that the kept polynomials may be zero.)
 void idKeepFirstK(ideal id, const int k)
 {
-     for (int i = IDELEMS(id)-1; i >= k; i--)
-     {
-	if (id->m[i] != NULL) pDelete(&id->m[i]);
-     }
-     pEnlargeSet(&(id->m), IDELEMS(id), k-IDELEMS(id));
-     IDELEMS(id) = k;
+   for (int i = IDELEMS(id)-1; i >= k; i--)
+   {
+      if (id->m[i] != NULL) pDelete(&id->m[i]);
+   }
+   if (k==0) k=1; /* ideals must have at least one element(0)*/
+   pEnlargeSet(&(id->m), IDELEMS(id), k-IDELEMS(id));
+   IDELEMS(id) = k;
 }
 
 /*
