@@ -12,13 +12,12 @@ endif
 
 CXXTEMPLFLAGS	= ${PIPE} 
 ## -fno-implicit-templates
-## --no-exceptions
 
 DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
 
 NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer ${PIPE} 
-NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer ${CXXTEMPLFLAGS} 
-##  --no-rtti ?
+NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer ${CXXTEMPLFLAGS} -fno-rtti -fno-exceptions
+
 NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
 # -DHAVE_CONFIG_H??

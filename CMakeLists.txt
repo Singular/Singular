@@ -120,12 +120,12 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 
   #set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Winline -Wno-non-virtual-dtor")
   set(CMAKE_C_FLAGS "-w -pipe ")
-  set(CMAKE_CXX_FLAGS "-w  -pipe ") #--no-rtti
+  set(CMAKE_CXX_FLAGS "-w  -pipe ") #-fno-rtti
   # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-implicit-templates")
   # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
   set(CMAKE_C_FLAGS_RELEASE "-O3 -fomit-frame-pointer")
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 --no-rtti -fomit-frame-pointer")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fno-rtti -fomit-frame-pointer")
 
   #set(CMAKE_C_FLAGS_RELEASE "-O2 -fomit-frame-pointer -DNDEBUG ")
   #set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fomit-frame-pointer -DNDEBUG -DOM_NDEBUG")

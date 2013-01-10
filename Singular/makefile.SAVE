@@ -52,8 +52,8 @@ PYTHON_LIBS   =
 
 PIPE		= -pipe
 CFLAGS		= -O3 -Wall -fomit-frame-pointer ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
-CXXFLAGS	= -O3 -Wall -fomit-frame-pointer --no-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
-CXXTEMPLFLAGS	=  --no-exceptions ## -fno-implicit-templates
+CXXFLAGS	= -O3 -Wall -fomit-frame-pointer -fno-rtti ${PIPE} ${LIBPOLYS_CFLAGS} ${PYTHON_CFLAGS}
+CXXTEMPLFLAGS	=  -fno-exceptions ## -fno-implicit-templates
 CPPFLAGS	= -I${srcdir} -I..  -I${includedir} ${LIBPOLYS_INCLUDES}  ${PYTHON_INCLUDES}
 DEFSNL		= -DNDEBUG -DOM_NDEBUG
 DEFS		= ${DEFSNL} -DLIBSINGULAR

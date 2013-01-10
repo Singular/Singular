@@ -74,7 +74,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
   if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 
     #set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Winline -Wno-non-virtual-dtor")
-    set(CMAKE_CXX_FLAGS "-w --no-rtti -pipe ")
+    set(CMAKE_CXX_FLAGS "-w -fno-rtti -pipe ")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-implicit-templates")
     #add_definitions(-DNDEBUG -DOM_NDEBUG -Dx86_64_Linux -DHAVE_CONFIG_H)
 

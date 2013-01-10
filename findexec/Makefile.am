@@ -10,13 +10,12 @@ libfindexec_LTLIBRARIES = libfindexec.la ${LIB_G}
 libfindexecdir = $(libdir)/
 
 CXXTEMPLFLAGS =-ftrapv 
-### --no-exceptions ## -fno-implicit-templates
+### -fno-implicit-templates
 
 libfindexec_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libfindexec_g_la_CFLAGS = ${PIPE}
 
-libfindexec_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-## --no-rtti 
+libfindexec_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} -fno-exceptions -fno-rtti
 libfindexec_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

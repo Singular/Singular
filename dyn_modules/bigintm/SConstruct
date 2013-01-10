@@ -17,7 +17,7 @@ SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
 
 #env.SharedObject(target = 'mod_main.o', source = 'mod_main.cc')
 
-CXXTEMPLFLAGS = "-fno-implicit-templates --no-exceptions"
+CXXTEMPLFLAGS = "-fno-implicit-templates -fno-exceptions"
 
 if env ['PLATFORM'] == "darwin":
     MACOSXMODULEFLAGS = '-twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup'
@@ -49,7 +49,7 @@ else:
         SHLIBSUFFIX = ".so",
         CPPPATH = SING_INCLUDES,
         CPPDEFINES = ["NDEBUG", "OM_NDEBUG"],
-        CXXFLAGS = "-O3 -fomit-frame-pointer --no-rtti " + CXXTEMPLFLAGS,
+        CXXFLAGS = "-O3 -fomit-frame-pointer -fno-rtti " + CXXTEMPLFLAGS,
         CCFLAGS="-O3 -fomit-frame-pointer ",
         LDMODULEFLAGS = BUNDLETEMPFLAGS,
         LIBS=[])

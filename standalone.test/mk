@@ -13,7 +13,7 @@ NAME="test"
 P="." 
 # /mnt/DATA/GITHUB/w/GAP/libsing/spielwiese/TARGET/bin"
 
-LIBPOLYSCFLAGS="`sh $P/libsingular-config --cflagsg` -g -Wextra -Winline -Wall -Wno-long-long  -O0 --no-exceptions"
+LIBPOLYSCFLAGS="`sh $P/libsingular-config --cflagsg` -g -Wextra -Winline -Wall -Wno-long-long  -O0 -fno-exceptions"
 LIBPOLYSLIBS=`sh $P/libsingular-config --libsg`
 LIBPOLYSPREFIX="`sh $P/libsingular-config --prefix`"
 
@@ -25,7 +25,7 @@ CMD="g++ $LIBPOLYSCFLAGS -c $NAME.cc "
 echo "executing '$CMD':"
 $CMD
 # -rdynamic 
-CMD="g++ -static -g -Wextra -Winline -Wall -Wno-long-long -O0 --no-exceptions $NAME.o -o $NAME $LIBPOLYSLIBS" 
+CMD="g++ -static -g -Wextra -Winline -Wall -Wno-long-long -O0 -fno-exceptions $NAME.o -o $NAME $LIBPOLYSLIBS" 
 echo "executing '$CMD':"
 $CMD
 
