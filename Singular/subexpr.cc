@@ -739,10 +739,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ps = pString((poly) d);
             s = (char*) omAlloc(strlen(ps) + 10);
             sprintf(s,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
+	    omFree(ps);
             return s;
           }
           else
-            return omStrDup(pString((poly)d));
+            return pString((poly)d);
 
         case NUMBER_CMD:
           StringSetS((char*) (typed ? "number(" : ""));
