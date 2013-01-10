@@ -733,9 +733,9 @@ PINLINE2 char*     p_String(poly p, ring p_ring)
 {
   return p_String(p, p_ring, p_ring);
 }
-PINLINE2 char*     p_String0(poly p, ring p_ring)
+PINLINE2 void     p_String0(poly p, ring p_ring)
 {
-  return p_String0(p, p_ring, p_ring);
+  p_String0(p, p_ring, p_ring);
 }
 PINLINE2 void      p_Write(poly p, ring p_ring)
 {

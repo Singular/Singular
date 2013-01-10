@@ -309,7 +309,7 @@ char* bigintmat::String()
       if ((i+1)%col == 0)
         StringAppendS("\n");
     }   */
-  return StringAppendS("");
+  return StringEndS();
 }
 
 char* bigintmat::StringAsPrinted()
@@ -334,8 +334,7 @@ char* bigintmat::StringAsPrinted()
   {
     StringSetS("");
     nlWrite(v[i], NULL);
-    char * temp = StringAppendS("");
-    char * ts = omStrDup(temp);
+    char * ts = StringEndS();
     int nl = strlen(ts);
     int cj = i%col;
     if (nl > colwid[cj])
@@ -343,8 +342,7 @@ char* bigintmat::StringAsPrinted()
       StringSetS("");
       int ci = floor(i/col);
       StringAppend("[%d,%d]", ci+1, cj+1);
-      char *tmp = StringAppendS("");
-      char * ph = omStrDup(tmp);
+      char *ph = StringEndS();
       int phl = strlen(ph);
       if (phl > colwid[cj])
       {
@@ -451,8 +449,7 @@ int * bigintmat::getwid(int maxwid)
     {
       StringSetS("");
       nlWrite(v[col*i+j], NULL);
-      char * tmp = StringAppendS("");
-      char * ts = omStrDup(tmp);
+      char * ts = StringEndS();
       int nl = strlen(ts);
       wv[col*i+j] = nl;
       if (nl > cwv[j])
@@ -494,8 +491,7 @@ void bigintmat::pprint(int maxwid)
     {
       StringSetS("");
       nlWrite(v[i], NULL);
-      char * temp = StringAppendS("");
-      char * ts = omStrDup(temp);
+      char * ts = StringEndS();
       int nl = strlen(ts);
       int cj = i%col;
       if (nl > colwid[cj])
@@ -503,8 +499,7 @@ void bigintmat::pprint(int maxwid)
         StringSetS("");
         int ci = floor(i/col);
         StringAppend("[%d,%d]", ci+1, cj+1);
-        char *tmp = StringAppendS("");
-        char * ph = omStrDup(tmp);
+        char *ph = StringEndS();
         int phl = strlen(ph);
         if (phl > colwid[cj])
         {

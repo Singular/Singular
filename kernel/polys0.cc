@@ -81,7 +81,7 @@ static void writemon(poly p, int ko, ring r)
   }
 }
 
-char* p_String0(poly p, ring lmRing, ring tailRing)
+void p_String0(poly p, ring lmRing, ring tailRing)
 {
   if (p == NULL)
   {
@@ -98,7 +98,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
       writemon(p,0, tailRing);
       p = pNext(p);
     }
-    return StringAppendS("");
+    return;
   }
 
   long k = 1;
@@ -122,13 +122,14 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     StringAppendS(",");
     k++;
   }
-  return StringAppendS("]");
+  StringAppendS("]");
 }
 
 char* p_String(poly p, ring lmRing, ring tailRing)
 {
   StringSetS("");
-  return p_String0(p, lmRing, tailRing);
+  p_String0(p, lmRing, tailRing);
+  return StringEndS();
 }
 
 /*2

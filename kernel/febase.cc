@@ -37,8 +37,11 @@ char fe_promptstr[] ="  ";
 // minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
 // this is an upper limit for the size of monomials/numbers read via the interpreter
 #define MAX_FILE_BUFFER 4*4096
-static long feBufferLength=INITIAL_PRINT_BUFFER;
-static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
+static long feBufferLength=0;
+static char * feBuffer=NULL;
+static long feBufferLength_save[8];
+static char * feBuffer_save[8];
+static int feBuffer_cnt=0;
 
 int     si_echo = 0;
 int     printlevel = 0;
@@ -788,8 +791,9 @@ FILE * feFopen(const char *path, const char *mode, char *where,
 }
 
 static char * feBufferStart;
+static char * feBufferStart_save[8];
   /* only used in StringSet(S)/StringAppend(S)*/
-char * StringAppend(const char *fmt, ...)
+void StringAppend(const char *fmt, ...)
 {
   va_list ap;
   char *s = feBufferStart; /*feBuffer + strlen(feBuffer);*/
@@ -831,10 +835,9 @@ char * StringAppend(const char *fmt, ...)
 #endif
   omCheckAddrSize(feBuffer, feBufferLength);
   va_end(ap);
-  return feBuffer;
 }
 
-char * StringAppendS(const char *st)
+void StringAppendS(const char *st)
 {
   if (*st!='\0')
   {
@@ -853,11 +856,31 @@ char * StringAppendS(const char *st)
     strcat(feBufferStart, st);
     feBufferStart +=l;
   }
-  return feBuffer;
 }
 
-char * StringSetS(const char *st)
+char * StringEndS()
 {
+  char *r=feBuffer;
+  feBuffer_cnt--;
+  feBuffer=feBuffer_save[feBuffer_cnt];
+  feBufferLength=feBufferLength_save[feBuffer_cnt];
+  feBufferStart=feBufferStart_save[feBuffer_cnt];
+  if (strlen(r)<1024)
+  {
+    char *s=omStrDup(r); omFree(r); r=s;
+  }
+  return r;
+}
+
+void StringSetS(const char *st)
+{
+  feBuffer_save[feBuffer_cnt]=feBuffer;
+  feBuffer=(char*)omAlloc0(INITIAL_PRINT_BUFFER);
+  feBufferLength_save[feBuffer_cnt]=feBufferLength;
+  feBufferLength=INITIAL_PRINT_BUFFER;
+  feBufferStart_save[feBuffer_cnt]=feBufferStart;
+  feBufferStart=feBuffer;
+  feBuffer_cnt++;
   int l;
   long more;
   if ((l=strlen(st))>feBufferLength)
@@ -869,7 +892,6 @@ char * StringSetS(const char *st)
   }
   strcpy(feBuffer,st);
   feBufferStart=feBuffer+l;
-  return feBuffer;
 }
 
 extern "C" {

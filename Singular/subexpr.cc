@@ -746,16 +746,16 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             nWrite(n);
             nDelete(&n);
           }
-          s = StringAppendS((char*) (typed ? ")" : ""));
-          return omStrDup(s);
+          StringAppendS((char*) (typed ? ")" : ""));
+          return StringEndS();
 
         case BIGINT_CMD:
           {
           StringSetS((char*) (typed ? "bigint(" : ""));
           number nl=(number)d;
           nlWrite(nl,NULL);
-          s = StringAppendS((char*) (typed ? ")" : ""));
-          return omStrDup(s);
+          StringAppendS((char*) (typed ? ")" : ""));
+          return StringEndS();
           }
 
         case MATRIX_CMD:
@@ -820,10 +820,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ns = (char*) omAlloc0(strlen(s) + 40);
             sprintf(ns, "bigintmat(bigintvec(%s),%d,%d)", s, bim->rows(), bim->cols());
             omCheckAddr(ns);
+            omFree(s);
             return ns;
           }
           else
-            return omStrDup(s);
+            return s;
         } 
         case RING_CMD:
         case QRING_CMD:

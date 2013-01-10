@@ -281,9 +281,10 @@ void feStringAppendBrowsers(int warn = -1);
 FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
                 int useWerror=FALSE, int path_only=FALSE);
 
-char *  StringAppend(const char *fmt, ...);
-char *  StringAppendS(const char *s);
-char *  StringSetS(const char* s);
+void  StringAppend(const char *fmt, ...);
+void  StringAppendS(const char *s);
+void  StringSetS(const char* s);
+char *  StringEndS();
 const  char * VoiceName();
 void    VoiceBackTrack();
 void    Warn(const char *fmt, ...);

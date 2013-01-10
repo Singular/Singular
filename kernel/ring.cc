@@ -264,7 +264,8 @@ void rWrite(ring r)
     if (r==currRing)
     {
       StringSetS("//   minpoly        : ");
-      nfShowMipo();PrintS(StringAppendS("\n"));
+      nfShowMipo();StringAppendS("\n");
+      char *s=StringEndS(); PrintS(s); omFree(s);
     }
   }
 #ifdef HAVE_RINGS
@@ -316,7 +317,9 @@ void rWrite(ring r)
       }
       else if (r==currRing)
       {
-        StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
+        StringSetS(""); nWrite(r->minpoly); 
+        StringAppendS("\n");
+        char *s=StringEndS(); PrintS(s); omFree(s);
       }
       else
       {
@@ -621,7 +624,11 @@ char * rOrdStr(ring r)
       StringAppend("(%d)", s);
     }
 
-    if (l==nblocks) return omStrDup(StringAppendS(""));
+    if (l==nblocks) 
+    {
+      StringAppendS("");
+      return StringEndS();
+    }
     StringAppendS(",");
   }
 }

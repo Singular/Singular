@@ -505,7 +505,9 @@ void tgb_matrix::print()
     {
       StringSetS("");
       n_Write(n[i][j],currRing);
-      PrintS(StringAppendS(""));
+      char *s=StringEndS();
+      PrintS(s);
+      omFree(s);
       PrintS("\t");
     }
     PrintS(")\n");
@@ -704,7 +706,9 @@ void tgb_sparse_matrix::print()
       StringSetS("");
       number n=get(i,j);
       n_Write(n,currRing);
-      PrintS(StringAppendS(""));
+      char *s=StringEndS();
+      PrintS(s);
+      omFree(s);
       PrintS("\t");
     }
     PrintS(")\n");

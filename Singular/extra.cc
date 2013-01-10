@@ -443,9 +443,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (strcmp(sys_cmd,"browsers")==0)
       {
         res->rtyp = STRING_CMD;
-        char* b = StringSetS("");
+        StringSetS("");
         feStringAppendBrowsers(0);
-        res->data = omStrDup(b);
+        res->data = StringEndS();
         return FALSE;
       }
       else

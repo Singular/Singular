@@ -1933,17 +1933,18 @@ char * iiStringMatrix(matrix im, int dim,char ch)
   int i,ii = MATROWS(im);
   int j,jj = MATCOLS(im);
   poly *pp = im->m;
-  char *s=StringSetS("");
+  StringSetS("");
 
   for (i=0; i<ii; i++)
   {
     for (j=0; j<jj; j++)
     {
       pString0(*pp++);
-      s=StringAppend("%c",ch);
-      if (dim > 1) s = StringAppendS("\n");
+      StringAppend("%c",ch);
+      if (dim > 1) StringAppendS("\n");
     }
   }
+  char *s=StringEndS();
   s[strlen(s)- (dim > 1 ? 2 : 1)]='\0';
   return s;
 }

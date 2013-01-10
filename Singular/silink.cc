@@ -799,8 +799,9 @@ static int DumpRhs(FILE *fd, idhdl h)
     {
       StringSetS("");
       nWrite(IDRING(h)->minpoly);
-      rhs = StringAppendS("");
+      rhs = StringEndS();
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
+      omFree(rhs);
     }
     else if (need_klammer) fprintf(fd, ")");
   }

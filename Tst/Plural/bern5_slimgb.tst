@@ -1,11 +1,8 @@
-// $Id$
-
 LIB "tst.lib";
 
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id$");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);

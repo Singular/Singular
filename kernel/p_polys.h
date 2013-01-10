@@ -356,13 +356,13 @@ PINLINE0 poly pReverse(poly p);
  *
  ***************************************************************/
 char*     p_String(poly p, ring lmRing, ring tailRing);
-char*     p_String0(poly p, ring lmRing, ring tailRing);
+void      p_String0(poly p, ring lmRing, ring tailRing);
 void      p_Write(poly p, ring lmRing, ring tailRing);
 void      p_Write0(poly p, ring lmRing, ring tailRing);
 void      p_wrp(poly p, ring lmRing, ring tailRing);
 
 PINLINE2 char*     p_String(poly p, ring p_ring);
-PINLINE2 char*     p_String0(poly p, ring p_ring);
+PINLINE2 void      p_String0(poly p, ring p_ring);
 PINLINE2 void      p_Write(poly p, ring p_ring);
 PINLINE2 void      p_Write0(poly p, ring p_ring);
 PINLINE2 void      p_wrp(poly p, ring p_ring);
