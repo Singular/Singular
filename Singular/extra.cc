@@ -388,7 +388,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (h==NULL)
       {
         res->rtyp=STRING_CMD;
-        res->data=(void *)omStrDup(versionString());
+        res->data=(void *)versionString();
         return FALSE;
       }
       else if (h->Typ()==STRING_CMD)
