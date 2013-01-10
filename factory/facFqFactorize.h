@@ -683,13 +683,32 @@ precomputeLeadingCoeff (const CanonicalForm& LCF,       ///<[in] a multivariate
                                                         ///< y
                        );
 
-void changeSecondVariable (CanonicalForm& A, CFList& biFactors, CFList& evaluation, CFList*& oldAeval, int lengthAeval2, const CFList& uniFactors, const Variable& w);
-void distributeLCmultiplier (CanonicalForm& A, CFList& leadingCoeffs, CFList& biFactors, const CFList& evaluation, const CanonicalForm& LCmultipler);
+void
+changeSecondVariable (CanonicalForm& A, CFList& biFactors, CFList& evaluation, CFList*& oldAeval, int lengthAeval2, const CFList& uniFactors, const Variable& w);
+
+void
+distributeLCmultiplier (CanonicalForm& A, CFList& leadingCoeffs, CFList& biFactors, const CFList& evaluation, const CanonicalForm& LCmultipler);
+
 void
 LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
              CFList& biFactors, CFList*& leadingCoeffs, const CFList* oldAeval,
              int lengthAeval, const CFList& evaluation,
              const CFList& oldBiFactors);
+
+void
+LCHeuristic2 (const CFList& LCs, const CFList& contents, CanonicalForm& A,
+              const CanonicalForm& oldA, CFList& leadingCoeffs,
+              bool& foundTrueMultiplier);
+
+void
+LCHeuristic3 (const CanonicalForm& LCmultiplier, const CFList& factors, CFList& leadingCoeffs, CFList& contents, CFList& LCs, bool& foundTrueMultiplier);
+
+void
+LCHeuristic4 (const CanonicalForm& LCmultiplier, const CFList& factors, const CFList& oldBiFactors,
+              const CFList& contents, const CFList* oldAeval, CanonicalForm& A, CFList*& leadingCoeffs, int lengthAeval, bool& foundMultiplier);
+
+void
+LCHeuristic5 (const CFList& oldBiFactors, const CFList* oldAeval, const CFList& contents, const CFList& factors, const CanonicalForm& testVars, int lengthAeval, CFList*& leadingCoeffs, CanonicalForm& A, CanonicalForm& LCmultiplier, bool& foundMultiplier);
 
 #endif
 
