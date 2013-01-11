@@ -135,13 +135,30 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 /*---------------------------------------------------------------------*/
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
 {
+#if 0
   si_hdl_typ retval=signal (sig, (si_hdl_typ)signal_handler);
   if (retval == SIG_ERR)
   {
      fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
   }
 #ifdef HAVE_SIGINTERRUPT
-  siginterrupt(sig, 1);
+  siginterrupt(sig, 0); 
+  /*system calls will be restarted if interrupted by  the  specified
+   * signal sig.  This is the default behavior in Linux.
+   */
+#endif
+#else
+  struct sigaction new_action,old_action;
+     
+  /* Set up the structure to specify the new action. */
+  new_action.sa_handler = signal_handler;
+  if (sig==SIGINT)
+    sigemptyset (&new_action.sa_mask);
+  else
+    new_action.sa_flags = SA_RESTART;
+     
+  sigaction (sig, &new_action, &old_action);
+  si_hdl_typ retval=(si_hdl_typ)old_action.sa_handler;
 #endif
   return retval;
 }                               /* si_set_signal */
