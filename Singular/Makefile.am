@@ -207,6 +207,8 @@ else
   bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 endif
 
+Singular Singularg ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
+
 AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
 
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
@@ -297,16 +299,17 @@ include ${srcdir}/singular-libs
 
 singularlibrarydir = ${datadir}/singular
 singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
-nobase_dist_singularlibrary_DATA = LIB/all.lib LIB/tst.lib LIB/help.cnf ${singularlibrary}
+nobase_dist_singularlibrary_DATA = LIB/tst.lib LIB/help.cnf ${singularlibrary}
 EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs LIB/help.cnf
 
 # ${nobase_dist_singularlibrary_DATA}
 
-LIB/all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
-	$(MKDIR_P) LIB
-	${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
+singularalllibrarydir = ${datadir}/singular/LIB
+singularalllibrary = all.lib
+nobase_dist_singularalllibrary_DATA = all.lib
 
-# [ -d ${builddir}/LIB ] || ( $(MKDIR_P) LIB ; cp ${srcdir}/LIB/*.lib ${builddir}/LIB/ )
+all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
+	${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
 
 ########################### TEST #########################
 
@@ -364,11 +367,14 @@ test_d_g_LDFLAGS = ${AMLDFLAGS}
 #########################################################
 
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc LIB/all.lib plural_cmd.inc \
-                gftables MOD
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib plural_cmd.inc \
+                gftables MOD 
 
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
+clean-local:
+	[ -L ${abs_builddir}/LIB ] && unlink ${abs_builddir}/LIB
+		  
 feOpt.inc: feOptGen
 	${builddir}/feOptGen
 
@@ -387,6 +393,9 @@ plural_cmd.inc iparith.inc: gentable1
 
 gftables: ${top_srcdir}/factory/gftables
 	ln -snf ${top_srcdir}/factory/gftables ${builddir}/gftables
+
+${abs_builddir}/LIB: ${srcdir}/LIB
+	ln -sn ${abs_srcdir}/LIB ${abs_builddir}/
 
 MOD: ${top_builddir}/libpolys/polys/.libs
 	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD

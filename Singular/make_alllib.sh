@@ -1,10 +1,16 @@
 #!/bin/sh
-cp $1 LIB/all.lib.n
-chmod u+rw LIB/all.lib.n
+#C="$1"
+#C=`readlink -f "$C"`
+#C=`dirname "$C"`
+#C=`ls -d1 "$C"`
+
+cp $1 all.lib.n
+chmod u+rw all.lib.n
 shift
 for i in $*
 do
-	echo "LIB \"$i\";" >>LIB/all.lib.n
+	echo "LIB \"$i\";" >> all.lib.n
 done
-chmod u-w LIB/all.lib.n
-mv -f LIB/all.lib.n LIB/all.lib
+#	[ ! -e "$i" ] && (cp -nv "$C/$i" .)
+chmod u-w all.lib.n
+mv -f all.lib.n all.lib
