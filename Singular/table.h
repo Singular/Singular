@@ -201,6 +201,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjNVARS),      NVARS_CMD,       INT_CMD,        RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjNVARS),      NVARS_CMD,       INT_CMD,        QRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjOpenClose),  OPEN_CMD,        NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1MANY),  OPTION_CMD,      NONE,           DEF_CMD       , ALLOW_PLURAL |ALLOW_RING} /*libsing*/
 ,{D(jjORD),        ORD_CMD,         INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjORD),        ORD_CMD,         INT_CMD,        VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjrOrdStr),    ORDSTR_CMD,      XS(STRING_CMD), RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
