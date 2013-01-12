@@ -522,6 +522,7 @@ struct sip_sring
   ideal      minideal;
   int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
   char **    names;  /* array of variable names, rInit */
+  void *     ext_ref; /* libsing GAP object */
 
   // what follows below here should be set by rComplete, _only_
   long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
