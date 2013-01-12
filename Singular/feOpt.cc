@@ -402,7 +402,6 @@ static const char* feOptAction(feOptIndex opt)
 	char *s=versionString();
         printf("%s",s);
 	omFree(s);
-	omFree(s);
         return NULL;
       }
 
