@@ -240,8 +240,8 @@ struct ip_sring
   omBin    PolyBin; /* Bin from where monoms are allocated */
   intvec * pModW;   /* std: module weights */
   poly      ppNoether; /*  variables, set by procedures from hecke/kstd1:
-
                             the highest monomial below pHEdge */
+  void * ext_ref;   /* libsing GAP object */
 // #ifdef HAVE_RINGS
 //   unsigned int  cf->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
 //   int_number    cf->modBase; /* Z/(ringflag^cf->modExponent)=Z/cf->modNumber*/
