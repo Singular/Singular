@@ -3210,6 +3210,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
   nc_new->IsSkewConstant = (IsSkewConstant?1:0);
 
+  r->ext_ref=NULL; /* we created a new ring */
+
   // Setup new NC structure!!!
   if (r->GetNC() != NULL)
     nc_rKill(r);
