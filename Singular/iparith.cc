@@ -519,13 +519,13 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
     {
       rc=(e==0);
     }
-    else if (b==1)
+    else if ((e==0)||(b==1))
     {
-      rc=b;
+      rc=1;
     }
     else if (b== -1)
     {
-      if (e&1) rc=-b;
+      if (e&1) rc= -b;
       else     rc=b;
     }
     else
