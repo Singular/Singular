@@ -3052,6 +3052,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
   r->GetNC() = nc_new;
 
+  r->ext_ref=NULL;
+
 //  if( currRing != save )
 //    rChangeCurrRing(save);
 
