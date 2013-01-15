@@ -383,8 +383,9 @@ void ShiftDVec::get_division_cofactors
   long index_p = 
     (divides_p->exp[r->omap[0]] + divides_p_shift) * lV + 1;
   *mr = p_Init(r);
+  if(index_p > r->N) {*ml = p; return; }
   long index_mr = 1;
-  {
+  { //this is a loop
     nextblock: ;
     //We will loop, until we found an empty block, or until we
     //considered all variables

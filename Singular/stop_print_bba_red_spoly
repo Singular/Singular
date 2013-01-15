@@ -1,0 +1,71 @@
+#set logging dbgid1.txt
+#set confirm off
+#set non-stop on
+#set target-async 1
+
+break ShiftDVec::bba
+commands
+  silent
+  set logging overwrite on
+  set logging on
+  printf "begin logging\n"
+  set logging off
+  set logging overwrite off
+  set $counter=0
+  set $max_counter=10000
+  continue
+end
+
+
+# the following two definitions and the break are to be seen
+# together
+define finrh
+  if $counter < $max_counter
+    set logging file "devnull.txt"
+    set logging redirect on
+    set logging on
+    finish
+    set logging off
+    set logging redirect off
+  end
+end
+
+define hook-finrh
+  if $counter < $max_counter
+    continue
+  end
+end
+
+define hookpost-finrh
+  set logging file gdb.txt
+  set logging redirect on
+  set logging on
+  set $counter = $counter + 1
+  printf "Poly Nr %d after redHomog\n", $counter
+  printf "%s\n", \
+    p_String(strat->P.t_p, strat->tailRing, strat->tailRing)
+  set logging redirect off
+  set logging off
+  set logging file "devnull.txt"
+  if $counter < $max_counter
+    continue
+  end
+end
+
+break ShiftDVec::redHomog
+commands
+  silent
+  set logging file gdb.txt
+  set logging redirect on
+  set logging on
+  #printf "%s\n", p_String(strat->P.p, currRing, strat->tailRing)
+  set $counter = $counter + 1
+  printf "Poly Nr %d at start of redHomog\n", $counter
+  printf "%s\n", \
+    p_String(h->t_p, strat->tailRing, strat->tailRing)
+  set logging redirect off
+  set logging off
+  set logging file "devnull.txt"
+  finrh
+  # execution continues in the hook defined above
+end

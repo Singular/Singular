@@ -522,8 +522,8 @@ uint ShiftDVec::divisibleBy
       "Entering divisibleBy", "Leaving divisibleBy", 256 );
   deBoGriPrint(dvec1, dvSize1, "dvec1: ", 256);
   deBoGriPrint(dvec2, dvSize2, "dvec2: ", 256);
-  assume(dvSize2 > 0);
-  assume(dvSize1 > 0);
+  //assume(dvSize2 > 0);
+  //assume(dvSize1 > 0);
   if(dvSize1 < dvSize2) return UINT_MAX;
   if(!dvSize2) return UINT_MAX-1;
 
@@ -699,10 +699,11 @@ uint ShiftDVec::findRightOverlaps
     int numVars, int maxDeg, uint ** overlaps )
 {
   t1->SetDVecIfNULL(); t2->SetDVecIfNULL();
-  assume(t1->dvSize > 0 && t2->dvSize > 0);
+  //assume(t1->dvSize > 0 && t2->dvSize > 0);
   //TODO: t1->dvSize-1 should be sufficient because we dont want
   //central overlaps
   *overlaps = (uint*)omAlloc0((t1->dvSize+1)*sizeof(uint));
+  if(t1->dvSize == 0 || t2->dvSize == 0) return 0;
   loGriToFile
     ("omAlloc0 for overlaps in findRightOverlaps ",
      (t1->dvSize+1)*sizeof(uint), 1024, (void*) (*overlaps) );
