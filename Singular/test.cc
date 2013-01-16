@@ -226,7 +226,7 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include "links/ssiLink.h"
 #include "stype.h"
 #include "subexpr.h"
-#include "table.h"
+//#include "table.h" // dummy
 #include "tok.h"
 #include "utils.h"
 #include "walk.h"

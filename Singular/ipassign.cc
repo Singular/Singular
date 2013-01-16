@@ -268,7 +268,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   p_Write( A.i->m[0], A.r );
 #endif
 
-  // :( 
+  // :(
 //  NUM((fractionObject *)p) = NULL; // makes 0/ NULL fraction - which should not happen!
 //  n_Delete(&p, currRing->cf); // doesn't expect 0/ NULL :(
   if(true)
@@ -819,7 +819,8 @@ static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr)
 }
 /*=================== table =================*/
 #define IPASSIGN
-#define D(A) A
+#define D(A)     A
+#define NULL_VAL NULL
 #include "table.h"
 /*=================== operations ============================*/
 /*2
