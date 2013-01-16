@@ -266,7 +266,8 @@ static void * iiL2R(void * data)
 // automatic conversions:
 //
 #define IPCONV
-#define D(A) A
+#define D(A)     A
+#define NULL_VAL NULL
 #include <Singular/table.h>
 /*2
 * try to convert 'input' of type 'inputType' to 'output' of type 'outputType'

@@ -7682,7 +7682,8 @@ static Subexpr jjMakeSub(leftv e)
   r->start =(int)(long)e->Data();
   return r;
 }
-#define D(A) (A)
+#define D(A)     (A)
+#define NULL_VAL NULL
 #define IPARITH
 #include "table.h"
 

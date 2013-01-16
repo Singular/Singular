@@ -288,7 +288,7 @@ struct sValCmd1 dArith1[]=
 ,{D(loNewtonP),    NEWTONPOLY_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWAIT1ST1),   WAIT1ST_CMD,     INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWAITALL1),   WAITALL_CMD,     INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{NULL,             0,               0,              0             , NO_PLURAL |NO_RING}
+,{NULL_VAL,        0,               0,              0             , NO_PLURAL |NO_RING}
 };
 /*=================== operations with 2 arg.: table =================*/
 struct sValCmd2 dArith2[]=
@@ -669,7 +669,7 @@ struct sValCmd2 dArith2[]=
 ,{D(jjWAIT1ST2),  WAIT1ST_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWAITALL2),  WAITALL_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_PLURAL |ALLOW_RING}
-,{NULL,           0,              0,              0,          0, NO_PLURAL |NO_RING}
+,{NULL_VAL,       0,              0,              0,          0, NO_PLURAL |NO_RING}
 };
 /*=================== operations with 3 args.: table =================*/
 struct sValCmd3 dArith3[]=
@@ -772,7 +772,7 @@ struct sValCmd3 dArith3[]=
 ,{D(jjSUBST_Id_N),     SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   NUMBER_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(nuLagSolve),       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
 ,{D(nuVanderSys),      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  , NO_PLURAL |NO_RING}
-,{NULL,                0,          0,          0,          0,          0        , NO_PLURAL |NO_RING}
+,{NULL_VAL,            0,          0,          0,          0,          0        , NO_PLURAL |NO_RING}
 };
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any), -2: any >0, .. */
@@ -833,7 +833,7 @@ struct sValCmdM dArithM[]=
 ,{D(jjSTD_HILB_WP), STD_CMD,       IDEAL_CMD,           4      , NO_PLURAL |NO_RING}
 ,{D(jjQRDS),      QRDS_CMD,        LIST_CMD,            4      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjFactModD_M),FMD_CMD,         LIST_CMD,           -2      , ALLOW_PLURAL |ALLOW_RING}
-,{NULL,           0,               0,                   0      , NO_PLURAL |NO_RING}
+,{NULL_VAL,       0,               0,                   0      , NO_PLURAL |NO_RING}
 };
 #ifdef GENTABLE
 // this table MUST be order alphabetically by its first entry:
@@ -1208,7 +1208,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }
 ,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
-,{NULL,         0,              0 }
+,{NULL_VAL,        0,              0 }
 };
 struct sValAssign_sys dAssign_sys[]=
 {
@@ -1224,6 +1224,6 @@ struct sValAssign_sys dAssign_sys[]=
 ,{D(jjSHORTOUT),   VSHORTOUT,      INT_CMD }
 ,{D(jjMINPOLY),    VMINPOLY,       NUMBER_CMD }
 ,{D(jjNOETHER),    VNOETHER,       POLY_CMD }
-,{NULL,         0,              0 }
+,{NULL_VAL,        0,              0 }
 };
 #endif

@@ -730,7 +730,8 @@ static BOOLEAN jiA_DEF(leftv res, leftv a, Subexpr e)
 }
 /*=================== table =================*/
 #define IPASSIGN
-#define D(A) A
+#define D(A)     A
+#define NULL_VAL NULL
 #include <Singular/table.h>
 /*=================== operations ============================*/
 /*2
