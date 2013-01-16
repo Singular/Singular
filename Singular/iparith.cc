@@ -521,12 +521,12 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
     }
     else if ((e==0)||(b==1))
     {
-      rc=1;
+      rc= 1;
     }
     else if (b== -1)
     {
-      if (e&1) rc= -b;
-      else     rc=b;
+      if (e&1) rc= -1;
+      else     rc= 1;
     }
     else
     {
@@ -542,6 +542,10 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
       }
       if (overflow)
         WarnS("int overflow(^), result may be wrong");
+    }
+    if ((b!=0) && ((e==0)||(b==1)))
+    {
+      if (rc!=1) Print("b=%d, e=%d, rc=%d\n",b,e,rc);
     }
     res->data = (char *)((long)rc);
     if (u!=NULL) return jjOP_REST(res,u,v);
