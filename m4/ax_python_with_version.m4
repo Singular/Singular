@@ -104,8 +104,8 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
     fi
     
     AM_CONDITIONAL(PYTHON_USE, test x"$ax_python_use" = x"true")
-    AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$si_embed_python" = x"true")
-    AM_CONDITIONAL(PYTHON_MODULE, test x"$si_embed_python" != x"true")
+    AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$ax_python_use$si_embed_python" = x"truetrue")
+    AM_CONDITIONAL(PYTHON_MODULE, test x"$ax_python_use" = x"true" -a x"$si_embed_python" != x"true" )
 
 ])
 
