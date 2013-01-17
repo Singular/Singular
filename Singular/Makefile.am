@@ -412,7 +412,6 @@ if PYTHON_MODULE
 module_LTLIBRARIES += pyobject.la
 pyobject_la_SOURCES += pyobject.cc
 endif
-pyobject_la_SOURCES = pyobject.cc
 pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
 pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
 
