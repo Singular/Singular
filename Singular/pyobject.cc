@@ -17,7 +17,6 @@
   //#include <misc/auxiliary.h>
   //#include "newstruct.h"
 
-#ifdef HAVE_PYTHON
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -751,5 +750,3 @@ extern "C" {
   }
 }
 #endif
-
-#endif /* HAVE_PYTHON */
