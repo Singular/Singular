@@ -373,8 +373,10 @@ BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib plural_cmd
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
 clean-local:
-	[ -L ${abs_builddir}/LIB ] && unlink ${abs_builddir}/LIB
-		  
+	if [ "${abs_builddir}" != "${abs_srcdir}" ]; then \
+	  [ -L ${abs_builddir}/LIB ] && unlink ${abs_builddir}/LIB; \
+	fi
+
 feOpt.inc: feOptGen
 	${builddir}/feOptGen
 
@@ -395,7 +397,9 @@ gftables: ${top_srcdir}/factory/gftables
 	ln -snf ${top_srcdir}/factory/gftables ${builddir}/gftables
 
 ${abs_builddir}/LIB: ${srcdir}/LIB
-	ln -sn ${abs_srcdir}/LIB ${abs_builddir}/
+	if [ "${abs_builddir}" != "${abs_srcdir}" ]; then \
+	  ln -sn ${abs_srcdir}/LIB ${abs_builddir}/; \
+	fi
 
 MOD: ${top_builddir}/libpolys/polys/.libs
 	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
