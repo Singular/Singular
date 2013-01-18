@@ -607,20 +607,22 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
 {
   ntTest(a);
   ntTest(b);
-  number aNumCoeff = NULL; int aNumDeg = 0;
-  number bNumCoeff = NULL; int bNumDeg = 0;
+  number aNumCoeff = NULL; int aNumDeg = -1;
+  number bNumCoeff = NULL; int bNumDeg = -1;
   if (!IS0(a))
   {
     fraction fa = (fraction)a;
     aNumDeg = p_Totaldegree(NUM(fa), ntRing);
     aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
   }
+  else return !(ntGreaterZero (b,cf));
   if (!IS0(b))
   {
     fraction fb = (fraction)b;
     bNumDeg = p_Totaldegree(NUM(fb), ntRing);
     bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
   }
+  else return ntGreaterZero(a,cf);
   if (aNumDeg > bNumDeg) return TRUE;
   if (aNumDeg < bNumDeg) return FALSE;
   return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
