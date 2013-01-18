@@ -32,12 +32,13 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
             ),
             [],[withval="yes"]
         ) 
+        si_try_embed="no"
         py_save_ifs="$IFS"; IFS="${IFS}$PATH_SEPARATOR,"
         for elt in $withval; do
           IFS="$py_save_ifs"
           case $elt in
             embed|embedding)
-              si_try_embed=true
+              si_try_embed="yes"
             ;;
             static|dynamic|shared|module)
             ;;
@@ -63,9 +64,9 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                 # "yes" was specified, but we don't have a path
                 # for the executable.
                 # So, let's search the PATH Environment Variable.
-                AC_PATH_PROG(
+                AC_PATH_PROGS(
                     [PYTHON],
-                    python,
+                    [python2 python],
                     [],
                     $2
                 )
@@ -78,20 +79,28 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                 AC_MSG_RESULT([no path to python found, skipping python interface!])
             else 
                 AX_PYTHON_VERSION_CHECK([$1],
-                                        [ ax_python_use=true
-                                          si_embed_python=$si_try_embed
-                                          AC_MSG_RESULT(yes)
-                                          AX_PYTHON_PREFIX( )
-                                          AX_PYTHON_LSPEC( )
-                                          AX_PYTHON_CSPEC( )
-                                        ],
-                                        [ax_python_use=false
-                                         AC_MSG_RESULT([too old, skipping python interface!])]
+                  [ AC_MSG_RESULT(yes)
+                    AX_PYTHON_VERSION_CHECK([3],
+                    [ ax_python_use=false
+                      AC_MSG_RESULT([too recent, skipping python interface!])
+                    ],
+                    [ ax_python_use=true
+                      si_embed_python=$si_try_embed
+                      AC_MSG_RESULT([no (ok)])
+                      AC_MSG_CHECKING(embedding python interface module)
+                      AC_MSG_RESULT($si_try_embed)
+                      AX_PYTHON_PREFIX( )
+                      AX_PYTHON_LSPEC( )
+                      AX_PYTHON_CSPEC( )
+                    ])
+                  ],
+                  [ ax_python_use=false
+                    AC_MSG_RESULT([too old, skipping python interface!])]
                 )
             fi
         fi   
 
-        if  test x"$si_embed_python" = x"true"
+        if  test x"$si_embed_python" = x"yes"
         then 
           AC_DEFINE(EMBED_PYTHON,1,integrate python)
           AC_SUBST(EMBED_PYOBJECT_CFLAGS,"\${PYTHON_CSPEC}")
@@ -104,8 +113,8 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
     fi
     
     AM_CONDITIONAL(PYTHON_USE, test x"$ax_python_use" = x"true")
-    AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$ax_python_use$si_embed_python" = x"truetrue")
-    AM_CONDITIONAL(PYTHON_MODULE, test x"$ax_python_use" = x"true" -a x"$si_embed_python" != x"true" )
+    AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$ax_python_use$si_embed_python" = x"trueyes")
+    AM_CONDITIONAL(PYTHON_MODULE, test x"$ax_python_use" = x"true" -a x"$si_embed_python" != x"yes" )
 
 ])
 
