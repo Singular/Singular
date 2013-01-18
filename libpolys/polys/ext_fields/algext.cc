@@ -413,7 +413,7 @@ BOOLEAN naGreater(number a, number b, const coeffs cf)
   int bDeg = p_Totaldegree((poly)b, naRing);
   if (aDeg>bDeg) return TRUE;
   if (aDeg<bDeg) return FALSE;
-  return n_Greater(pGetCoeff((poly)a),pGetCoeff((poly)b),cf);
+  return n_Greater(pGetCoeff((poly)a),pGetCoeff((poly)b),naCoeffs);
 }
 
 /* TRUE iff a != 0 and (LC(a) > 0 or deg(a) > 0) */
