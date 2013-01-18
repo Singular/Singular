@@ -93,7 +93,7 @@ typedef struct
 struct n_Procs_s
 {
    coeffs next;
-   unsigned int ringtype;  /* =0 => coefficient field,
+   /*unsigned int ringtype;   =0 => coefficient field,
                              !=0 => coeffs from one of the rings:
                               =1 => Z/2^mZ
                               =2 => Z/nZ, n not a prime
@@ -608,26 +608,26 @@ static inline void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)
 
 // Tests:
 static inline BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
-{ assume(r != NULL); return (r->ringtype == 1); }
+{ assume(r != NULL); return (getCoeffType(r)==n_Z2m); }
 
 static inline BOOLEAN nCoeff_is_Ring_ModN(const coeffs r)
-{ assume(r != NULL); return (r->ringtype == 2); }
+{ assume(r != NULL); return (getCoeffType(r)==n_Zn); }
 
 static inline BOOLEAN nCoeff_is_Ring_PtoM(const coeffs r)
-{ assume(r != NULL); return (r->ringtype == 3); }
+{ assume(r != NULL); return (getCoeffType(r)==n_Znm); }
 
 static inline BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
-{ assume(r != NULL); return (r->ringtype == 4); }
+{ assume(r != NULL); return (getCoeffType(r)==n_Z); }
 
 static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
-{ assume(r != NULL); return (r->ringtype != 0); }
+{ assume(r != NULL); return ((getCoeffType(r)==n_Z) || (getCoeffType(r)==n_Z2m) || (getCoeffType(r)==n_Zn) || (getCoeffType(r)==n_Znm)); }
 
 /// returns TRUE, if r is not a field and r has no zero divisors (i.e is a domain)
 static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 {
   assume(r != NULL); 
 #ifdef HAVE_RINGS
-  return (r->ringtype == 4 || r->ringtype == 0);
+  return (getCoeffType(r)==n_Z || ((getCoeffType(r)!=n_Z2m) && (getCoeffType(r)!=n_Zn) && (getCoeffType(r)!=n_Znm)));
 #else
   return TRUE;
 #endif
@@ -706,7 +706,7 @@ static inline number  n_ImPart(number i, const coeffs cf)
 
 /// returns TRUE, if r is not a field and r has non-trivial units
 static inline BOOLEAN nCoeff_has_Units(const coeffs r)
-{ assume(r != NULL); return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
+{ assume(r != NULL); return ((getCoeffType(r)==n_Zn) || (getCoeffType(r)==n_Z2m) || (getCoeffType(r)==n_Znm)); }
 
 static inline BOOLEAN nCoeff_is_Zp(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Zp; }

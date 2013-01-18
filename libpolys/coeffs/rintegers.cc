@@ -429,7 +429,6 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
 
   r->nNULL = 0;
   r->ch = 0;
-  r->ringtype = 4;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
   return FALSE;
