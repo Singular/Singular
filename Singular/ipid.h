@@ -97,6 +97,7 @@ void  killid(const char * a, idhdl * i);
 void killhdl(idhdl h, package prooti=currPack);
 void  killhdl2(idhdl h, idhdl * ih, ring r);
 lists ipNameList(idhdl root);
+lists ipNameListLev(idhdl root, int lev);
 void  ipMoveId(idhdl h);
 BOOLEAN checkPackage(package pack);
 idhdl packFindHdl(package r);
