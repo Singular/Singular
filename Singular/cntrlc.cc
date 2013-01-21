@@ -586,16 +586,25 @@ static void stack_trace_sigchld (int signum)
 #endif /* unix */
 
 /*2
-* init signal handlers, linux/i386 version
+* init signal handlers
 */
 void init_signals()
 {
-/*4 signal handler: linux*/
+  #ifdef SIGSEGV
   si_set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler);
+  #endif
+  #ifdef SIGBUS
   si_set_signal(SIGBUS, (si_hdl_typ)sigsegv_handler);
+  #endif
+  #ifdef SIGFPE
   si_set_signal(SIGFPE, (si_hdl_typ)sigsegv_handler);
+  #endif
+  #ifdef SIGILL
   si_set_signal(SIGILL, (si_hdl_typ)sigsegv_handler);
+  #endif
+  #ifdef SIGIOT
   si_set_signal(SIGIOT, (si_hdl_typ)sigsegv_handler);
+  #endif
   si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
   si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
   si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
