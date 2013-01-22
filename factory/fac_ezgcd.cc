@@ -295,8 +295,18 @@ int Hensel (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   LCs [2]= MM (LeadCoeffs [2]);
 
   CFList evaluation;
+  long termEstimate= size (U);
   for (int i= A.min(); i <= A.max(); i++)
+  {
+    if (!A[i].isZero())
+    {
+      termEstimate *= degree (U,i)*2;
+      termEstimate /= 3;
+    }
     evaluation.append (A [i]);
+  }
+  if (termEstimate/getNumVars(U) > 500)
+    return -1;
   CFList UEval;
   CanonicalForm shiftedU= myShift2Zero (U, UEval, evaluation);
 
@@ -424,7 +434,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
   int degF, degG, delta, t, count, maxeval;
   REvaluation bt;
-  bool gcdfound = false;
+  int gcdfound = 0;
   Variable x = Variable(1);
   count= 0;
   maxeval= 200;
