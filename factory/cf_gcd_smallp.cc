@@ -32,6 +32,7 @@
 #include "cf_iter.h"
 #include "cfNewtonPolygon.h"
 #include "cf_algorithm.h"
+#include "cf_primes.h"
 
 // iinline helper functions:
 #include "cf_map_ext.h"
@@ -4955,7 +4956,12 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*result);
         }
         else
-          return N (d*GCD_small_p (F,G));
+        {
+          if (p >= cf_getBigPrime(0))
+            return N (d*sparseGCDFp (F,G));
+          else
+            return N (d*GCD_small_p (F,G));
+        }
       }
 
       if (gcdfound == 1)
