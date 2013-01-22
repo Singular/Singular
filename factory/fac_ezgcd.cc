@@ -479,7 +479,19 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     DEBDECLEVEL( cerr, "ezgcd" );
     if(F.mvar()==G.mvar())
       d*=gcd(F,G);
+    else
+      return N (d);
     return N (d);
+  }
+  if ( F.isUnivariate())
+  {
+    g= content (G,G.mvar());
+    return N(d*gcd(F,g));
+  }
+  if ( G.isUnivariate())
+  {
+    f= content (F,F.mvar());
+    return N(d*gcd(G,f));
   }
 
   int maxNumVars= tmax (getNumVars (F), getNumVars (G));
