@@ -374,7 +374,7 @@ CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
 clean-local:
 	if [ "${abs_builddir}" != "${abs_srcdir}" ]; then \
-	  [ -L ${abs_builddir}/LIB ] && unlink ${abs_builddir}/LIB; \
+	  if [ -L ${abs_builddir}/LIB ]; then unlink ${abs_builddir}/LIB; fi \
 	fi
 
 feOpt.inc: feOptGen
@@ -398,7 +398,7 @@ gftables: ${top_srcdir}/factory/gftables
 
 ${abs_builddir}/LIB: ${srcdir}/LIB
 	if [ "${abs_builddir}" != "${abs_srcdir}" ]; then \
-	  ln -sn ${abs_srcdir}/LIB ${abs_builddir}/; \
+	  ln -snf ${abs_srcdir}/LIB ${abs_builddir}/; \
 	fi
 
 MOD: ${top_builddir}/libpolys/polys/.libs
