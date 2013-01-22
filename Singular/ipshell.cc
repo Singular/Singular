@@ -152,7 +152,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
   if(fullname) sprintf(buf2, "%s::%s", "", IDID(h));
   else sprintf(buf2, "%s", IDID(h));
 
-  Print("%s%-20.20s [%d]  ",s,buf2,IDLEV(h));
+  Print("%s%-30.30s [%d]  ",s,buf2,IDLEV(h));
   if (h == currRingHdl) PrintS("*");
   PrintS(Tok2Cmdname((int)IDTYP(h)));
 
