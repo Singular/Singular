@@ -4598,7 +4598,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     G= GFMapUp (G, k);
     maxeval= tmin (2*ipower (p, getGFDegree()), maxNumEval);
   }
-  else if (p < 50 && algExtension && !CFFactory::gettype() == GaloisFieldDomain)
+  else if (p < 50 && algExtension && CFFactory::gettype() != GaloisFieldDomain)
   {
     int d= degree (getMipo (a));
     oldA= a;
