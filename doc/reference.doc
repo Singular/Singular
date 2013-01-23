@@ -5504,7 +5504,8 @@ See
 @cindex primefactors
 @table @code
 @item @strong{Syntax:}
-@code{primefactors (} int/bigint/number_expression @code{, [} int/bigint/number_expression @code{] )}
+@code{primefactors (} int/bigint/number_expression @code{)}
+@*@code{primefactors (} int/bigint/number_expression @code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
@@ -5513,23 +5514,18 @@ prime factors
 @*When called with int(s)/bigint(s), no ring needs to be active.
 @*When called with numbers these are assumed to be integers in a polynomial
 ring over Q.
-@*The method finds all prime factors of an integer n. When some positive bound
-b is given then it is expected to be at least 2. In this case, the
-implementation finds only all prime factors <= b. Then, there may remain a
-non-factored portion n' of n arising by dividing out all found prime factors.
-Moreover, in case n is negative or zero, n' will contain the sign or be zero,
-respectively.
+@*The method finds all prime factors of an integer n.
+n' will contain the sign, be zero, or the rest (when a bound is given) respectively. The returned list contains the following information: 
 The returned list contains the following information:
 @*L[1][i] = i-th prime factor (in ascending order),
 @*L[2][i] = multiplicity of L[1][i],
-@*L[3] = n',
-@*L[4] = 1 if probabilistic test says that |n'| is a prime, 0 otherwise.
+@*L[3] = n'
 @item @strong{Example:}
 @smallexample
 @c example
   bigint n = bigint(7)^12 * bigint(37)^6 * 121;
   primefactors(n);
-  primefactors(n, 15); /* only prime factors <= 15 */
+  primefactors(n,25);
 @c example
 @end smallexample
 @end table
