@@ -3905,7 +3905,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     if (!find (l, random_element))
       l.append (random_element);
 
-    if ((getCharacteristic() > 3 && size (skeleton) < 100))
+    if ((getCharacteristic() > 3 && size (skeleton) < 200))
     {
       CFArray Monoms;
       CFArray* coeffMonoms= NULL;
@@ -4120,6 +4120,8 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 
       } while (1); //end of second do
     }
+    else
+      return N(gcdcAcB*GCD_small_p (ppA, ppB));
   } while (1); //end of first do
 }
 
