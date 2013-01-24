@@ -27,6 +27,7 @@
 #include <Singular/version.h>
 #include <Singular/silink.h>
 #include <Singular/ssiLink.h>
+#include <Singular/si_signals.h>
 
 /* undef, if you don't want GDB to come up on error */
 

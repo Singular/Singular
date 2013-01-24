@@ -417,7 +417,7 @@ LINKAGE BOOLEAN slCloseMP(si_link l)
       (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
   {
     SentQuitMsg(l);
-    //wait(NULL);
+    //si_wait(NULL);
   }
   MP_CloseLink((MP_Link_pt) l->data);
 #ifdef HPUX_9
