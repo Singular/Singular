@@ -78,6 +78,7 @@
 #include <kernel/timer.h>
 
 #include <polys/coeffrings.h>
+#include <Singular/si_signals.h>
 
 lists rDecompose(const ring r);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
@@ -7650,7 +7651,7 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
     int i_s = (int) v->next->next->next->Data();
     if (i_s > 0)
     {
-      sleep((is - 1)/1000000 + 1);
+      si_sleep((is - 1)/1000000 + 1);
       jjSTATUS3(res, v, v->next, v->next->next);
     }
   }

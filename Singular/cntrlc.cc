@@ -25,6 +25,11 @@
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
+//#include <Singular/feOpt.h>
+//#include <Singular/version.h>
+//#include <Singular/silink.h>
+//#include <Singular/ssiLink.h>
+#include <Singular/si_signals.h>
 
 #include "tok.h"
 #include "ipshell.h"
