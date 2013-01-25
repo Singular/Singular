@@ -31,6 +31,7 @@
 #include "facHensel.h"
 #include "cfNewtonPolygon.h"
 #include "cf_algorithm.h"
+#include "cf_primes.h"
 
 // iinline helper functions:
 #include "cf_map_ext.h"
@@ -3874,7 +3875,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     if (!find (l, random_element))
       l.append (random_element);
 
-    if ((getCharacteristic() > 3 && size (skeleton) < 100))
+    if ((getCharacteristic() > 3 && size (skeleton) < 200))
     {
       CFArray Monoms;
       CFArray* coeffMonoms= NULL;
@@ -4089,6 +4090,8 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 
       } while (1); //end of second do
     }
+    else
+      return N(gcdcAcB*GCD_small_p (ppA, ppB));
   } while (1); //end of first do
 }
 
@@ -4350,8 +4353,18 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   LCs [2]= MM (LeadCoeffs [2]);
 
   CFList evaluation;
+  long termEstimate= size (U);
   for (int i= A.min(); i <= A.max(); i++)
+  {
+    if (!A[i].isZero())
+    {
+      termEstimate *= degree (U,i)*2;
+      termEstimate /= 3;
+    }
     evaluation.append (A [i]);
+  }
+  if (termEstimate/getNumVars(U) > 500)
+    return -1;
   CFList UEval;
   CanonicalForm shiftedU= myShift2Zero (U, UEval, evaluation);
 
@@ -4517,7 +4530,19 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   {
     if( F.mvar() == G.mvar() )
       d *= gcd( F, G );
+    else
+      return N (d);
     return N (d);
+  }
+  if ( F.isUnivariate())
+  {
+    g= content (G,G.mvar());
+    return N(d*gcd(F,g));
+  }
+  if ( G.isUnivariate())
+  {
+    f= content (F,F.mvar());
+    return N(d*gcd(G,f));
   }
 
   int maxNumVars= tmax (getNumVars (F), getNumVars (G));
@@ -4575,7 +4600,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     G= GFMapUp (G, k);
     maxeval= tmin (2*ipower (p, getGFDegree()), maxNumEval);
   }
-  else if (p < 50 && algExtension && !CFFactory::gettype() == GaloisFieldDomain)
+  else if (p < 50 && algExtension && CFFactory::gettype() != GaloisFieldDomain)
   {
     int d= degree (getMipo (a));
     oldA= a;
@@ -4903,7 +4928,12 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*result);
         }
         else
-          return N (d*GCD_small_p (F,G));
+        {
+          if (p >= cf_getBigPrime(0))
+            return N (d*sparseGCDFp (F,G));
+          else
+            return N (d*GCD_small_p (F,G));
+        }
       }
 
       if (gcdfound == 1)
