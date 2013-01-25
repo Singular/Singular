@@ -994,6 +994,7 @@ static proc coefZ(ideal I)
    int h=1;
    int i,e;
    ideal K=1;
+   attrib(I,"isSB",1);
    list L=coefPrimeZ(I);
    if(size(L)==0){return(list(I,1));}
    int d=1;
