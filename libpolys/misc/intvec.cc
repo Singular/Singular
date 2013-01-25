@@ -7,6 +7,7 @@
 #ifndef INTVEC_CC
 #define INTVEC_CC
 
+
 #include "config.h"
 #include <misc/auxiliary.h>
 
@@ -14,6 +15,9 @@
 #include <misc/intvec.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
+
+#pragma GCC push_options
+#pragma GCC optimize ("wrapv") 
 
 /*0 implementation*/
 
@@ -802,5 +806,7 @@ static void ivContent(intvec *w)
   for (i=w->rows()-1;i>=0;i--)
     (*w)[i] /= tgcd;
 }
+
+#pragma GCC pop_options
 
 #endif

@@ -1,5 +1,4 @@
-CXXTEMPLFLAGS      =-ftrapv  
-## -fno-implicit-templates
+CXXTEMPLFLAGS      =-ftrapv -fno-implicit-templates
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
@@ -12,6 +11,7 @@ endif
 libmisc_LTLIBRARIES = libmisc.la ${LIB_G}
 libmiscdir = $(libdir)/singular
 
+
 libmisc_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 libmisc_g_la_CFLAGS = ${PIPE}
 
@@ -22,7 +22,14 @@ libmisc_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXT
 libmisc_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 libmisc_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-SOURCES  = intvec.cc int64vec.cc options.c
+
+noinst_LTLIBRARIES = libintvec.la libintvec_g.la
+
+libmisc_la_LIBADD = libintvec.la
+libmisc_g_la_LIBADD = libintvec_g.la
+
+
+SOURCES  = int64vec.cc options.c
 libmisc_la_SOURCES   = $(SOURCES)
 libmisc_g_la_SOURCES = $(SOURCES)
 
@@ -35,5 +42,13 @@ nodist_libmisc_la_SOURCES   = auxiliary.h
 nodist_libmisc_g_la_SOURCES = auxiliary.h 
 
 
+libintvec_la_SOURCES = intvec.cc 
+libintvec_g_la_SOURCES = ${libintvec_la_SOURCES}
 
+
+libintvec_la_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} -fwrapv -fno-implicit-templates
+libintvec_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} -fwrapv -fno-implicit-templates
+
+libintvec_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+libintvec_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
