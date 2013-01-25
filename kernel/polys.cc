@@ -800,14 +800,14 @@ poly pSubst(poly p, int n, poly e)
 #endif
 
   int exponent,i;
-  poly h, res, m;
+  poly h, m;
   int *me,*ee;
   number nu,nu1;
 
   me=(int *)omAlloc((pVariables+1)*sizeof(int));
   ee=(int *)omAlloc((pVariables+1)*sizeof(int));
   if (e!=NULL) pGetExpV(e,ee);
-  res=NULL;
+  sBucket_pt result_bucket=sBucketCreate(currRing);
   h=p;
   while (h!=NULL)
   {
@@ -820,19 +820,21 @@ poly pSubst(poly p, int n, poly e)
       for(i=pVariables;i>0;i--)
         me[i]+=exponent*ee[i];
       pSetExpV(m,me);
-      if (e!=NULL)
+      if (e!=NULL)/*&&(!nIsOne(pGetCoeff(e))*/
       {
         nPower(pGetCoeff(e),exponent,&nu);
         nu1=nMult(pGetCoeff(m),nu);
         nDelete(&nu);
         pSetCoeff(m,nu1);
       }
-      res=pAdd(res,m);
+      sBucket_Add_p(result_bucket,m,1);
     }
     pLmDelete(&h);
   }
   omFreeSize((ADDRESS)me,(pVariables+1)*sizeof(int));
   omFreeSize((ADDRESS)ee,(pVariables+1)*sizeof(int));
+  poly res;int dummy;
+  sBucketDestroyAdd(result_bucket,&res,&dummy);
   return res;
 }
 
