@@ -80,38 +80,70 @@ poly maEvalVariable(poly p, int v,int pExp,matrix s)
     }
     res=pCopy(p0/*MATELEM(s,v,pExp)*/);
   }
-  else //if ((p->next!=NULL)&&(p->next->next==NULL))
+  else
   {
     res=pPower(pCopy(p),pExp);
   }
   return res;
 }
 
+/// multiply q by p1^pExp, p1 is a monomial
+static inline void maEvalVariableByMon(poly q,poly p1,int pExp)
+{
+  do
+  {
+    int i;
+    #if 1
+    for(i=pVariables;i>0;i--)
+    {
+      int e=pGetExp(q,i);
+      pSetExp(q,i,e+pGetExp(p1,i)*pExp);
+    }
+    pSetm(q);
+    #else
+    for(i=pExp;i>0;i--)
+      p_ExpVectorAdd(q,p1,currRing);
+    #endif
+    pIter(q);
+  } while(q!=NULL);
+}
+
 static poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s, nMapFunc nMap)
 {
-    poly q=pNSet(nMap(pGetCoeff(p)));
+  poly q=pNSet(nMap(pGetCoeff(p)));
 
-    int i;
-    for(i=1;i<=preimage_r->N; i++)
+  bool is_plural= rIsPluralRing(currRing);
+
+  int i;
+  for(i=1;i<=preimage_r->N; i++)
+  {
+    int pExp=p_GetExp( p,i,preimage_r);
+    if (pExp != 0)
     {
-      int pExp=p_GetExp( p,i,preimage_r);
-      if (pExp != 0)
+      if (theMap->m[i-1]!=NULL)
       {
-        if (theMap->m[i-1]!=NULL)
+        poly p1=theMap->m[i-1];
+        if (is_plural
+        || (pNext(p1)!=NULL)
+        || (!nIsOne(pGetCoeff(p1))))
         {
-          poly p1=theMap->m[i-1];
           poly pp=maEvalVariable(p1,i,pExp,s);
           q = pMult(q,pp);
         }
         else
         {
-          pDelete(&q);
-          break;
+          maEvalVariableByMon(q,p1,pExp);
         }
       }
+      else
+      {
+        pDelete(&q);
+        break;
+      }
     }
-    int modulComp = p_GetComp( p,preimage_r);
-    if (q!=NULL) pSetCompP(q,modulComp);
+  }
+  int modulComp = p_GetComp( p,preimage_r);
+  if (q!=NULL) pSetCompP(q,modulComp);
   return q;
 }
 
@@ -132,9 +164,8 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap,matrix s)
 //  }
   if (p!=NULL)
   {
-    int l = pLength(p)-1;
+    int l = pLength(p);
     poly* monoms;
-    if (l>0)
     {
       monoms = (poly*) omAlloc(l*sizeof(poly));
 
@@ -144,14 +175,16 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap,matrix s)
         pIter(p);
       }
     }
-    result=maEvalMonom(theMap,p,preimage_r,s, nMap);
     if (l>0)
     {
+      sBucket_pt result_bucket=sBucketCreate(currRing);
       for(i = l-1; i>=0; i--)
       {
-        result=pAdd(result, monoms[i]);
+        sBucket_Add_p(result_bucket,monoms[i],pLength(monoms[i]));
       }
       omFreeSize((ADDRESS)monoms,l*sizeof(poly));
+      int dummy;
+      sBucketDestroyAdd(result_bucket,&result,&dummy);
     }
     if (currRing->minpoly!=NULL) result=pMinPolyNormalize(result);
   }
@@ -204,14 +237,14 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(theImageRing))
   {
-    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm)) 
+    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm))
     {
       Werror("Sorry, not yet implemented for noncomm. rings");
       return NULL;
     }
   }
 #endif
-  
+
   int i,j;
   poly p,pp,q;
   ideal temp1;
