@@ -84,14 +84,21 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                     [ ax_python_use=false
                       AC_MSG_RESULT([too recent, skipping python interface!])
                     ],
-                    [ ax_python_use=true
-                      si_embed_python=$si_try_embed
-                      AC_MSG_RESULT([no (ok)])
-                      AC_MSG_CHECKING(embedding python interface module)
-                      AC_MSG_RESULT($si_try_embed)
-                      AX_PYTHON_PREFIX( )
-                      AX_PYTHON_LSPEC( )
-                      AX_PYTHON_CSPEC( )
+                    [ AC_MSG_RESULT([no (ok)])
+                      ax_python_version=`$PYTHON -c "import sys; print '.'.join(sys.version.split('.')[[:2]])"`
+                      AC_CHECK_LIB([python${ax_python_version}],[main], [
+                          ax_python_use=true
+                          si_embed_python=$si_try_embed
+                          AC_MSG_CHECKING(embedding python interface module)
+                          AC_MSG_RESULT($si_try_embed)
+                          AX_PYTHON_PREFIX( )
+                          AX_PYTHON_LSPEC( )
+                          AX_PYTHON_CSPEC( )
+                        ],
+                        [ ax_python_use=false
+                          AC_MSG_RESULT([Cannot link to python, skipping python interface!])
+                        ]
+                      )
                     ])
                   ],
                   [ ax_python_use=false
