@@ -1899,22 +1899,25 @@ backonmygrind:
       {
         if (degree (F, j+3) > 0)
         {
-          differentSecondVarLCs2[j - level - 1]= differentSecondVarLCs[j];
-          i= differentSecondVarLCs2[j-level - 1];
-          iter=result;
-          iter++;
-          for (;iter.hasItem(); iter++, i++)
+          if (!differentSecondVarLCs[j].isEmpty())
           {
-            swap= iter.getItem();
-            if (degree (swap, j+3) > 0)
+            differentSecondVarLCs2[j - level - 1]= differentSecondVarLCs[j];
+            i= differentSecondVarLCs2[j-level - 1];
+            iter=result;
+            iter++;
+            for (;iter.hasItem(); iter++, i++)
             {
-              int count= evaluation.length()+1;
-              for (CFListIterator iter2= evaluation2; iter2.hasItem(); iter2++, count--)
+              swap= iter.getItem();
+              if (degree (swap, j+3) > 0)
               {
-                if (count != j+3)
-                  swap= swap (iter2.getItem(), count);
+                int count= evaluation.length()+1;
+                for (CFListIterator iter2= evaluation2; iter2.hasItem(); iter2++, count--)
+                {
+                  if (count != j+3)
+                    swap= swap (iter2.getItem(), count);
+                }
+                i.getItem() /= swap;
               }
-              i.getItem() /= swap;
             }
           }
         }
