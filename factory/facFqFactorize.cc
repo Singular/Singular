@@ -1207,12 +1207,12 @@ gcdFreeBasis (CFFList& factors1, CFFList& factors2)
   CanonicalForm g;
   int k= factors1.length();
   int l= factors2.length();
-  int n= 1;
+  int n= 0;
   int m;
   CFFListIterator j;
   for (CFFListIterator i= factors1; (n < k && i.hasItem()); i++, n++)
   {
-    m= 1;
+    m= 0;
     for (j= factors2; (m < l && j.hasItem()); j++, m++)
     {
       g= gcd (i.getItem().factor(), j.getItem().factor());
