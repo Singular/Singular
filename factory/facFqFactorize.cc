@@ -1323,21 +1323,6 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
              CFFList*& bufSqrfFactors, CFList& evalSqrfPartF,
              const CFArray& evalPoint)
 {
-  CanonicalForm tmp;
-  CFListIterator j;
-  for (CFListIterator i= uniFactors; i.hasItem(); i++)
-  {
-    tmp= i.getItem();
-    if (i.hasItem())
-      i++;
-    else
-      break;
-    for (j= i; j.hasItem(); j++)
-    {
-      if (tmp == j.getItem())
-        return 0;
-    }
-  }
 
   CanonicalForm F= G;
   CFFList sqrfFactorization;
@@ -1358,6 +1343,7 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
     return 0;
 
   CFFList sqrfFactors;
+  CanonicalForm tmp;
   CFList tmp2;
   int k= 0;
   factors= uniFactors;
