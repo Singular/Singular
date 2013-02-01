@@ -2196,6 +2196,7 @@ void sortByUniFactors (CFList*& Aeval, int AevalLength,
   CFList LCs, buf;
   CFArray l;
   int pos, index;
+  bool leaveLoop=false;
   for (int j= 0; j < AevalLength; j++)
   {
     if (!Aeval[j].isEmpty())
@@ -2203,9 +2204,18 @@ void sortByUniFactors (CFList*& Aeval, int AevalLength,
       i= evaluation.length() + 1;
       for (iter= evaluation; iter.hasItem(); iter++, i--)
       {
-        if (i == Aeval[j].getFirst().level())
+        for (iter2= Aeval[j]; iter2.hasItem(); iter2++)
         {
-          evalPoint= iter.getItem();
+          if (i == iter2.getItem().level())
+          {
+            evalPoint= iter.getItem();
+            leaveLoop= true;
+            break;
+          }
+        }
+        if (leaveLoop)
+        {
+          leaveLoop= false;
           break;
         }
       }
@@ -2252,12 +2262,13 @@ void refineBiFactors (const CanonicalForm& A, CFList& biFactors,
                       CFList* const& Aeval, const CFList& evaluation,
                       int minFactorsLength)
 {
-  CFListIterator iter;
+  CFListIterator iter, iter2;
   CanonicalForm evalPoint;
   int i;
   Variable v;
   Variable y= Variable (2);
   CFList list;
+  bool leaveLoop= false;
   for (int j= 0; j < A.level() - 2; j++)
   {
     if (Aeval[j].length() == minFactorsLength)
@@ -2266,9 +2277,18 @@ void refineBiFactors (const CanonicalForm& A, CFList& biFactors,
 
       for (iter= evaluation; iter.hasItem(); iter++, i--)
       {
-        if (i == Aeval[j].getFirst().level())
+        for (iter2= Aeval[j]; iter2.hasItem(); iter2++)
         {
-          evalPoint= iter.getItem();
+          if (i == iter2.getItem().level())
+          {
+            evalPoint= iter.getItem();
+            leaveLoop= true;
+            break;
+          }
+        }
+        if (leaveLoop)
+        {
+          leaveLoop= false;
           break;
         }
       }
