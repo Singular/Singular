@@ -1991,6 +1991,7 @@ backonmygrind:
         }
         for (CFListIterator iter= result; iter.hasItem(); iter++)
           out_cf ("result am Ende= ", iter.getItem(), "\n");
+        delete [] differentSecondVarLCs2;
       }
     }
   }
