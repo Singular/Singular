@@ -1709,7 +1709,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       if (sqrfPartF.level() > 2)
       {
         int* liftBounds= new int [sqrfPartF.level() - 1];
-        liftBounds [0]= liftBound;
         bool noOneToOne= false;
         CFList *leadingCoeffs2= new CFList [sqrfPartF.level()-2];
         LC1= LC (evalSqrfPartF.getLast(), 1);
@@ -1726,7 +1725,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         sqrfPartF *= power (LC1, factors.length()-1);
 
         int liftBoundsLength= sqrfPartF.level() - 1;
-        for (int i= 1; i < liftBoundsLength; i++)
+        for (int i= 0; i < liftBoundsLength; i++)
           liftBounds [i]= degree (sqrfPartF, i + 2) + 1;
         evalSqrfPartF= evaluateAtZero (sqrfPartF);
         evalSqrfPartF.removeFirst();
