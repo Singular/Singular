@@ -1884,7 +1884,7 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
     else if (degPi > 0)
       uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1]);
     else if (degBuf > 0)
-      uIZeroJ= mulNTL (Pi[l - 1], buf[1]);
+      uIZeroJ= mulNTL (Pi[l - 1], buf[l+1]);
     else
       uIZeroJ= 0;
 
@@ -2267,7 +2267,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
     else if (degPi > 0)
       uIZeroJ= mulMod (uIZeroJ, bufFactors[l + 1], MOD);
     else if (degBuf > 0)
-      uIZeroJ= mulMod (Pi[l - 1], buf[1], MOD);
+      uIZeroJ= mulMod (Pi[l - 1], buf[l + 1], MOD);
     else
       uIZeroJ= 0;
 
