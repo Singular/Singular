@@ -1853,7 +1853,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       level= y.level() - 2;
     printf ("y.level()= %d\n", y.level());
     printf ("lSecondVarLCs= %d\n", lSecondVarLCs);
-backonmygrind:
     if (lSecondVarLCs - level > 0)
     {
       CFList evaluation2= evaluation;
@@ -1873,8 +1872,11 @@ backonmygrind:
       CFList newLCs= differentSecondVarLCs[level];
       if (newLCs.isEmpty())
       {
-        level=level+1;
-        goto backonmygrind;
+        if (degree (F, level+3) > 0)
+        {
+          delete [] bufSqrfFactors;
+          return result; //TODO handle this case
+        }
       }
       i= newLCs; //kann leer sein!?
       CFListIterator iter= result;
