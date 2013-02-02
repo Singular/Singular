@@ -3158,7 +3158,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           {
             Variable xx;
             CFList vars1;
-            CFFList sqrfMultiplier= factorize (LCmultiplier); //sqrFree (LCmultiplier);
+            CFFList sqrfMultiplier= sqrFree (LCmultiplier);
             if (sqrfMultiplier.getFirst().factor().inCoeffDomain())
               sqrfMultiplier.removeFirst();
             sqrfMultiplier= sortCFFListByNumOfVars (sqrfMultiplier);
@@ -3328,7 +3328,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     int index;
     Variable xx;
     CFList vars1;
-    CFFList sqrfMultiplier= factorize (LCmultiplier); //sqrFree (LCmultiplier);
+    CFFList sqrfMultiplier= sqrFree (LCmultiplier);
     if (sqrfMultiplier.getFirst().factor().inCoeffDomain())
       sqrfMultiplier.removeFirst();
     sqrfMultiplier= sortCFFListByNumOfVars (sqrfMultiplier);
