@@ -462,6 +462,10 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     CanonicalForm tmp= power (leadingCoeffs.getFirst(), biFactors.length() - 1);
     A *= tmp;
     tmp= leadingCoeffs.getFirst();
+    iter= leadingCoeffs;
+    iter++;
+    for (;iter.hasItem(); iter++)
+      iter.getItem() *= tmp;
     iter= evaluation;
     for (int i= A.level(); i > 2; i--, iter++)
       tmp= tmp (iter.getItem(), i);
