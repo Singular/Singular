@@ -1850,7 +1850,19 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     F= result.getFirst();
     int level= 0;
     if (foundDifferent)
+    {
       level= y.level() - 2;
+      for (int i= y.level(); i > 1; i--)
+      {
+        if (degree (F,i) > 0)
+        {
+          if (y.level() == 3)
+            level= 0;
+          else
+            level= i-3;
+        }
+      }
+    }
     printf ("y.level()= %d\n", y.level());
     printf ("lSecondVarLCs= %d\n", lSecondVarLCs);
 lcretry:
