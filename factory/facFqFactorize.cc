@@ -50,9 +50,6 @@ TIMING_DEFINE_PRINT(fac_fq_check_mainvar)
 TIMING_DEFINE_PRINT(fac_fq_compress)
 
 
-void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
-void out_cff(CFFList &L);
-
 static inline
 CanonicalForm
 listGCD (const CFList& L);
@@ -1327,9 +1324,6 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
              CFFList*& bufSqrfFactors, CFList& evalSqrfPartF,
              const CFArray& evalPoint)
 {
-  for (int i= 0; i < evalPoint.size(); i++)
-    out_cf ("evalPoint= ", evalPoint[i], "\n");
-
   CanonicalForm F= G;
   CFFList sqrfFactorization;
   if (getCharacteristic() > 0)
@@ -1345,8 +1339,6 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
 
   CanonicalForm test= evalSqrfPartF.getFirst() (evalPoint[0], 2);
 
-  out_cf ("test= ", test, "\n");
-  out_cf ("sqrfPartF= ", sqrfPartF, "\n");
   if (degree (test) != degree (sqrfPartF, 1) || test.inCoeffDomain())
     return 0;
 
@@ -1388,7 +1380,6 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
     {
       for (iter= bufSqrfFactors [i]; iter.hasItem(); iter++)
       {
-        out_cf ("bufSqrfFactors[0]= ", iter.getItem().factor(), "\n");
         if (iter.getItem().factor().inCoeffDomain())
           continue;
         iter.getItem()= CFFactor (iter.getItem().factor()/
@@ -1399,7 +1390,6 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
     }
     else
     {
-      printf ("i= %d\n", i);
       for (iter= bufSqrfFactors [i]; iter.hasItem(); iter++)
       {
         if (iter.getItem().factor().inCoeffDomain())
@@ -1407,7 +1397,6 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
         iter.getItem()= CFFactor (iter.getItem().factor()/
                                   Lc (iter.getItem().factor()),
                                   iter.getItem().exp());
-        out_cf ("bufSqrfFactors[i]= ", iter.getItem().factor(), "\n");
         if (!find (factors, iter.getItem().factor()))
           factors.append (iter.getItem().factor());
       }
@@ -1415,9 +1404,7 @@ testFactors (const CanonicalForm& G, const CFList& uniFactors,
   }
 
   test= prod (factors);
-  out_cf ("test= ", test, "\n");
   tmp= evalSqrfPartF.getFirst() (evalPoint[0],2);
-  out_cf ("tmp= ", tmp, "\n");
   if (test/Lc (test) != tmp/Lc (tmp))
     return 0;
   else
@@ -1431,27 +1418,12 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
                         Variable& y
                        )
 {
-  out_cf ("LCF= ", LCF, "\n");
-  printf ("LCFFactors.length()= %d\n", LCFFactors.length());
-  for (CFListIterator iter= evaluation; iter.hasItem(); iter++)
-    out_cf ("evaluation= ", iter.getItem(), "\n");
-  for (CFListIterator iter= LCFFactors; iter.hasItem(); iter++)
-    out_cf ("LCFFactors= ", iter.getItem(), "\n");
-
-  for (int j= 0; j < lSecondVarLCs; j++)
-  {
-    printf ("differentSecondVar= ");
-    for (CFListIterator iter= differentSecondVarLCs[j]; iter.hasItem(); iter++)
-      out_cf ("", iter.getItem(), " ");
-    printf ("\n");
-  }
   y= Variable (1);
   if (LCF.inCoeffDomain())
   {
     CFList result;
     for (int i= 1; i <= LCFFactors.length() + 1; i++)
       result.append (1);
-      printf ("exit00\n");
     return result;
   }
 
@@ -1497,12 +1469,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     if (found)
       result.insert (Lc (LCF));
     else
-    {
-      //for (CFListIterator i= result; i.hasItem(); i++)
-        //result.append (1);
       result.insert (LCF);
-    }
-      printf ("exit0\n");
+
     return result;
   }
 
@@ -1527,11 +1495,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
   }
   buf= swap;
   for (int i= 0; i < evaluation.length() - 1; i++)
-  {
-    out_cf ("buf[i]= ", buf[i], "\n");
     evalPoint[i]= buf[i+1];
-  }
-  out_cf ("buf[i]= ", buf[evaluation.length()-1], "\n");
+
   int pass= testFactors (F, factors, alpha, sqrfPartF,
                          bufFactors, bufSqrfFactors, evalSqrfPartF, evalPoint);
 
@@ -1569,8 +1534,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         bufF= swapvar (bufF, x, z);
         bufBufFactors= bufFactors;
         evalPoint= CFArray (evaluation.length() - 1);
-        out_cf ("x= ", x, "\n");
-        out_cf ("z= ", z, "\n");
         for (int k= 1; k < evaluation.length(); k++)
         {
           if (N (Variable (k+1)).level() != y.level())
@@ -1578,12 +1541,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           else
             evalPoint[k-1]= buf[0];
         }
-        printf ("swap war nötig\n");
-        for (int jj= 0; jj < evalPoint.size(); jj++)
-          out_cf ("evalPoint= ", evalPoint[jj], "\n");
         pass= testFactors (bufF, bufBufFactors, alpha, sqrfPartF, bufFactors,
                            bufSqrfFactors, evalSqrfPartF, evalPoint);
-        //pass= false;
         if (pass)
         {
           foundDifferent= true;
@@ -1602,17 +1561,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           for (int j= 1; j <= factors.length(); j++)
             result.append (1);
           result= distributeContent (result, differentSecondVarLCs, lSecondVarLCs);
-          printf ("this exit\n");
           y= Variable (1);
-          /*if (!result.getFirst().inCoeffDomain())
-          {
-            CFListIterator iter= result;
-            CanonicalForm tmp= iter.getItem();
-            iter++;
-            for (; iter.hasItem(); iter++)
-              iter.getItem() *= tmp;
-          }
-          y= Variable (1);*/
           delete [] bufSqrfFactors;
           return result;
         }
@@ -1626,15 +1575,6 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
     for (int j= 1; j <= factors.length(); j++)
       result.append (1);
     result= distributeContent (result, differentSecondVarLCs, lSecondVarLCs);
-    printf ("no that exit\n");
-    /*if (!result.getFirst().inCoeffDomain())
-    {
-      CFListIterator iter= result;
-      CanonicalForm tmp= iter.getItem();
-      iter++;
-      for (; iter.hasItem(); iter++)
-        iter.getItem() *= tmp;
-    }*/
     y= Variable (1);
     delete [] bufSqrfFactors;
     return result;
@@ -1785,67 +1725,20 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
   result.insert (N (F));
 
-  out_cf ("result.getFirst()= ", result.getFirst(), "\n");
-  out_cf ("content (result.getFirst())= ", content (result.getFirst()), "\n");
-  printf ("foundDifferent= %d\n", foundDifferent);
-    for (int i= 0; i < lSecondVarLCs; i++)
-    {
-      printf ("differentSecondVarLCs ");
-      for (CFListIterator pp= differentSecondVarLCs[i]; pp.hasItem(); pp++)
-        out_cf ("", pp.getItem(), " ");
-      printf ("\n");
-    }
-      for (CFListIterator pp= LCFFactors; pp.hasItem(); pp++)
-        out_cf ("LCFactors", pp.getItem(), "\n");
-  printf ("y.level()= %d\n", y.level());
-  printf ("x.level()= %d\n", x.level());
-  printf ("z.level()= %d\n", z.level());
-
   result= distributeContent (result, differentSecondVarLCs, lSecondVarLCs);
-
-        for (CFListIterator iter= result; iter.hasItem(); iter++)
-          out_cf ("result bis kurz vor schluß= ", iter.getItem(), "\n");
 
   if (!result.getFirst().inCoeffDomain())
   {
+    // prepare input for recursion
     if (foundDifferent)
     {
       for (CFListIterator i= result; i.hasItem(); i++)
         i.getItem()= swapvar (i.getItem(), Variable (2), y);
-      CFList l= differentSecondVarLCs [j]; //nasty
+      CFList l= differentSecondVarLCs [j];
       for (CFListIterator i= l; i.hasItem(); i++)
         i.getItem()= swapvar (i.getItem(), y, z);
       differentSecondVarLCs [j]= l;
     }
-    printf ("not the whole leading coeff\n");
-    out_cf ("result.getFirst()= ", result.getFirst(), "\n");
-    out_cf ("y= ", y, "\n");
-    out_cf ("LCF= ", LCF, "\n");
-    for (int i= 0; i < lSecondVarLCs; i++)
-    {
-      printf ("differentSecondVarLCs ");
-      for (CFListIterator pp= differentSecondVarLCs[i]; pp.hasItem(); pp++)
-        out_cf ("", pp.getItem(), " ");
-      printf ("\n");
-    }
-    CFListIterator i; //= result;
-    CanonicalForm tmp;
-    /*if (foundDifferent)
-      i.getItem()= swapvar (i.getItem(), Variable (2), y);
-
-    tmp= i.getItem();
-
-    i++;
-    for (; i.hasItem(); i++)
-    {
-      out_cf ("lc= ", i.getItem(), "\n");
-      if (foundDifferent)
-        i.getItem()= swapvar (i.getItem(), Variable (2), y); //*tmp;
-    }*/
-    for (i=evaluation; i.hasItem(); i++)
-      out_cf ("eval= ", i.getItem(), "\n");
-    for (int jj= 0; jj < evalPoint.size(); jj++)
-      out_cf ("evalPoint= ", evalPoint[jj], "\n");
 
     F= result.getFirst();
     int level= 0;
@@ -1863,14 +1756,13 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
         }
       }
     }
-    printf ("y.level()= %d\n", y.level());
-    printf ("lSecondVarLCs= %d\n", lSecondVarLCs);
 lcretry:
     if (lSecondVarLCs - level > 0)
     {
       CFList evaluation2= evaluation;
       int j= lSecondVarLCs+2;
       CanonicalForm swap;
+      CFListIterator i;
       for (i= evaluation2; i.hasItem(); i++, j--)
       {
         if (j==y.level())
@@ -1893,7 +1785,7 @@ lcretry:
         level=level+1;
         goto lcretry;
       }
-      i= newLCs; //kann leer sein!?
+      i= newLCs;
       CFListIterator iter= result;
       iter++;
       for (;iter.hasItem(); iter++, i++)
@@ -1902,7 +1794,8 @@ lcretry:
         if (degree (swap, level+3) > 0)
         {
           int count= evaluation.length()+1;
-          for (CFListIterator iter2= evaluation2; iter2.hasItem(); iter2++, count--)
+          for (CFListIterator iter2= evaluation2; iter2.hasItem(); iter2++,
+                                                                    count--)
           {
             if (count != level+3)
               swap= swap (iter2.getItem(), count);
@@ -1927,7 +1820,8 @@ lcretry:
               if (degree (swap, j+3) > 0)
               {
                 int count= evaluation.length()+1;
-                for (CFListIterator iter2= evaluation2; iter2.hasItem(); iter2++, count--)
+                for (CFListIterator iter2= evaluation2; iter2.hasItem();iter2++,
+                                                                        count--)
                 {
                   if (count != j+3)
                     swap= swap (iter2.getItem(), count);
@@ -1942,35 +1836,23 @@ lcretry:
       for (int j= 0; j < level+1; j++)
         evaluation2.removeLast();
       Variable dummyvar= Variable (1);
-      for (i= evaluation2; i.hasItem(); i++)
-        out_cf ("evaluation2= ", i.getItem(), "\n");
-      for (i= newLCs; i.hasItem(); i++)
-        out_cf ("newLCs= ", i.getItem(), "\n");
 
-      //// test
       CanonicalForm newLCF= result.getFirst();
       newLCF=swapvar (newLCF, Variable (2), Variable (level+3));
       for (i=newLCs; i.hasItem(); i++)
         i.getItem()= swapvar (i.getItem(), Variable (2), Variable (level+3));
-      for (int j= 0; j < lSecondVarLCs-level-1;j++)
+      for (int j= 1; j < lSecondVarLCs-level;j++)
       {
-        for (i= differentSecondVarLCs2[j]; i.hasItem(); i++)
-          i.getItem()= swapvar (i.getItem(), Variable (2+j+1), Variable (level+3+j+1));
-        newLCF= swapvar (newLCF, Variable (2+j+1), Variable (level+3+j+1));
+        for (i= differentSecondVarLCs2[j-1]; i.hasItem(); i++)
+          i.getItem()= swapvar (i.getItem(), Variable (2+j),
+                                             Variable (level+3+j));
+        newLCF= swapvar (newLCF, Variable (2+j), Variable (level+3+j));
       }
-      ////
-      for (int j= 0; j < lSecondVarLCs-level-1; j++)
-      {
-        printf ("differentSecondVarLCs2\n");
-        for (i= differentSecondVarLCs2[j]; i.hasItem(); i++)
-          out_cf ("", i.getItem(), " ");
-        printf ("\n");
-      }
-      for (i= newLCs; i.hasItem(); i++)
-        out_cf ("newLCs= ", i.getItem(), "\n");
-      out_cf ("newLCF= ", newLCF, "\n");
-      printf ("before recursion\n");
-      CFList recursiveResult= precomputeLeadingCoeff(newLCF, newLCs, alpha, evaluation2, differentSecondVarLCs2, lSecondVarLCs - level - 1, dummyvar);
+
+      CFList recursiveResult=
+      precomputeLeadingCoeff (newLCF, newLCs, alpha, evaluation2,
+                              differentSecondVarLCs2, lSecondVarLCs - level - 1,
+                              dummyvar);
 
       if (dummyvar.level() != 1)
       {
@@ -1980,34 +1862,26 @@ lcretry:
       for (i= recursiveResult; i.hasItem(); i++)
       {
         for (int j= lSecondVarLCs-level-1; j > 0; j--)
-          i.getItem()=swapvar (i.getItem(), Variable (2+j), Variable (level+3+j));
+          i.getItem()=swapvar (i.getItem(), Variable (2+j),
+                                      Variable (level+3+j));
         i.getItem()= swapvar (i.getItem(), Variable (2), Variable (level+3));
       }
 
-      out_cf ("recursiveResult.getFirst()= ", recursiveResult.getFirst(), "\n");
       if (recursiveResult.getFirst() == result.getFirst())
       {
-        /*i= result;
-        i++;
-        for (; i.hasItem(); i++)
-          i.getItem() *= tmp;*/
         delete [] bufSqrfFactors;
         delete [] differentSecondVarLCs2;
         return result;
       }
       else
       {
-        CFListIterator iter=recursiveResult;
+        iter=recursiveResult;
         i= result;
         i.getItem()= iter.getItem();
         i++;
         iter++;
         for (; i.hasItem(); i++, iter++)
-        {
           i.getItem() *= iter.getItem();
-        }
-        for (CFListIterator iter= result; iter.hasItem(); iter++)
-          out_cf ("result am Ende= ", iter.getItem(), "\n");
         delete [] differentSecondVarLCs2;
       }
     }
@@ -2519,9 +2393,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   CFList contentAi;
   CanonicalForm lcmCont= lcmContent (A, contentAi);
   A /= lcmCont;
-  out_cf ("lcmCont= ", lcmCont, "\n");
-  for (int i= 1; i <= A.level(); i++)
-    out_cf ("LC= ", LC (A,i), "\n");
   TIMING_END_AND_PRINT (fac_fq_content, "time to extract content over Fq: ");
 
   // trivial after content removal
@@ -2911,7 +2782,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
 
   CanonicalForm LCmultiplier= leadingCoeffs.getFirst();
-  out_cf ("LCmultiplier= ", LCmultiplier, "\n");
   bool LCmultiplierIsConst= LCmultiplier.inCoeffDomain();
   leadingCoeffs.removeFirst();
 
@@ -3486,8 +3356,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
 tryAgainWithoutHeu:
   TIMING_START (fac_fq_shift_to_zero);
-  out_cf ("LC (A,1)= ", LC (A,1), "\n");
-  out_cf ("LC (oldA,1)= ", LC (oldA,1), "\n");
   A= shift2Zero (A, Aeval, evaluation);
 
   for (iter= biFactors; iter.hasItem(); iter++)
@@ -3542,7 +3410,6 @@ tryAgainWithoutHeu:
   }
   if (noOneToOne)
   {
-    printf ("noOneToOne\n");
     if (!LCmultiplierIsConst && LCheuristic)
     {
       A= bufA;
