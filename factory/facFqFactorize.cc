@@ -1853,6 +1853,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
       level= y.level() - 2;
     printf ("y.level()= %d\n", y.level());
     printf ("lSecondVarLCs= %d\n", lSecondVarLCs);
+lcretry:
     if (lSecondVarLCs - level > 0)
     {
       CFList evaluation2= evaluation;
@@ -1877,6 +1878,8 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
           delete [] bufSqrfFactors;
           return result; //TODO handle this case
         }
+        level=level+1;
+        goto lcretry;
       }
       i= newLCs; //kann leer sein!?
       CFListIterator iter= result;
