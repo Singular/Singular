@@ -23,16 +23,16 @@ blackbox* getBlackboxStuff(const int t)
 
 void blackbox_default_destroy(blackbox  *b, void *d)
 {
-  Werror("missing blackbox_destroy");
+  WerrorS("missing blackbox_destroy");
 }
 char *blackbox_default_String(blackbox *b,void *d)
 {
-  Werror("missing blackbox_String");
+  WerrorS("missing blackbox_String");
   return omStrDup("");
 }
 void *blackbox_default_Copy(blackbox *b,void *d)
 {
-  Werror("missing blackbox_Copy");
+  WerrorS("missing blackbox_Copy");
   return NULL;
 }
 void blackbox_default_Print(blackbox *b,void *d)
@@ -103,6 +103,25 @@ BOOLEAN blackbox_default_OpM(int op,leftv res, leftv args)
   {
     res->rtyp=LIST_CMD;
     return jjLIST_PL(res,args);
+  }
+  else if(op==STRING_CMD)
+  {
+    blackbox *b=getBlackboxStuff(args->Typ());
+    res->data=b->blackbox_String(b,args->Data());
+    res->rtyp=STRING_CMD;
+    args=args->next;
+    if(args!=NULL)
+    {
+      sleftv res2;
+      int ret=iiExprArithM(&res2,args,op);
+      if (ret) return TRUE;
+      char *s2=(char*)omAlloc(strlen((char*)res->data)+strlen((char*)res2.data)+1);
+      sprintf(s2,"%s%s",(char*)res->data,(char*)res2.data);
+      omFree(res2.data);
+      omFree(res->data);
+      res->data=s2;
+    }
+    return FALSE;
   }
   return WrongOp("blackbox_OpM", op, args);
 }
