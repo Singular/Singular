@@ -60,6 +60,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <ctype.h>
 #include <new>
 #include <gmp.h>
@@ -240,7 +241,11 @@ mpz_t **llln_proc_entrada (int *F, int *C) /* Inputs */
   int tamano=100;
 
   aux=new char[tamano];
-  fscanf (stdin, "%i, %i\n", &numF, &numC);
+  int res = EOF;
+  do 
+  {
+    res = fscanf (stdin, "%i, %i\n", &numF, &numC);
+  } while( (res == EOF) and (errno == EINTR));
   base = new (mpz_t *)[numF+1];
   for (i = 1; i <= numF; i++) {
     base[i] = new mpz_t[numC+1];

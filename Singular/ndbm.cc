@@ -367,7 +367,7 @@ static void setbit(register DBM *db)
   {
     db->dbm_dirbno = b;
     (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, L_SET);
-    if (read(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
+    if (si_read(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
       memset(db->dbm_dirbuf, 0, DBLKSIZ);
   }
   db->dbm_dirbuf[i] |= 1<<n;

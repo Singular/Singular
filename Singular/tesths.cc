@@ -50,6 +50,7 @@
 #include <Singular/simpleipc.h>
 #endif
 
+#include <Singular/si_signals.h>
 
 extern int siInit(char *);
 
@@ -159,7 +160,7 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_SDB
     sdb_flags = 0;
 #endif
-    dup2(1,2);
+    si_dup2(1,2);
     /* alternative:
     *    memcpy(stderr,stdout,sizeof(FILE));
     */

@@ -970,7 +970,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         listen(sockfd,1);
         char* cli_host = (char*)omAlloc(256);
         char* path = (char*)omAlloc(1024);
-        int r = sscanf(l->name,"%255[^:]:%s",cli_host,path);
+        int r = si_sscanf(l->name,"%255[^:]:%s",cli_host,path);
         if(r == 0)
         {
           WerrorS("ERROR: no host specified");
@@ -1027,7 +1027,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         struct sockaddr_in serv_addr;
         struct hostent *server;
 
-        sscanf(l->name,"%255[^:]:%d",host,&portno);
+        si_sscanf(l->name,"%255[^:]:%d",host,&portno);
         //Print("connect to host %s, port %d\n",host,portno);mflush();
         if (portno!=0)
         {

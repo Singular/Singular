@@ -7529,6 +7529,9 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
     int i_s = (int)(long) v->next->next->next->Data();
     if (i_s > 0)
     {
+      // Note: usleep might be interrupted, but assuming that the
+      // exact time is not important, we do not care about this.
+      // usleep is deprecated anyway
       usleep((int)(long) v->next->next->next->Data());
       jjSTATUS3(res, v, v->next, v->next->next);
     }

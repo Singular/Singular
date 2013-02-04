@@ -136,7 +136,7 @@ void sdb_edit(procinfo *pi)
       {
         PrintS("cannot get the procedure body\n");
         fclose(fp);
-        unlink(filename);
+        si_unlink(filename);
         omFree(filename);
         return;
       }
@@ -188,7 +188,7 @@ void sdb_edit(procinfo *pi)
       fclose(fp);
     }
   }
-  unlink(filename);
+  si_unlink(filename);
   omFree(filename);
 }
 
