@@ -489,7 +489,7 @@ void singclap_divide_content ( poly f, const ring r )
         //#ifdef LDEBUG
         //number cn=(number)c;
         //StringSetS(""); nWrite(nt); StringAppend(" ==> ");
-        //nWrite(cn);PrintS(StringAppend("\n"));
+        //nWrite(cn);PrintS(StringEndS("\n"));
         //#endif
       }
     }

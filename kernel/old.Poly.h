@@ -378,7 +378,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   /*  void print(){
      StringSetS("");
      write();
-     PrintS(StringAppendS(""));
+     PrintS(StringEndS(""));
      }*/
   virtual ~PolyBase(){}
   PolyBase(poly p, ring r):ptr(new PolyImpl(p_Copy(p,r),r)){

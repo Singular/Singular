@@ -130,7 +130,7 @@ int main( int, char *argv[] )
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
-  PrintS(StringAppendS("\n"));
+  PrintS(StringEndS("\n"));
   // longrat
   if( simple(n_Q) )
     PrintS("Q: Test Passed!");
