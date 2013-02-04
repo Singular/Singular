@@ -3,7 +3,7 @@
 *****************************************/
 /*
 * ABSTRACT: wrappijng signal-interuptable system calls
-* AUTHOR: Alexander Dreyer, The PolyBoRi Team
+* AUTHOR: Alexander Dreyer, The PolyBoRi Team, 2013
 */
 
 #include <signal.h>
@@ -21,7 +21,7 @@
 #ifndef SINGULAR_SI_SIGNALS_H
 #define SINGULAR_SI_SIGNALS_H
 
-#define SI_EINTR_SAVE_FUNC(return_type, func, decl, args)	\
+#define SI_EINTR_SAVE_FUNC(return_type, func, decl, args) \
 inline return_type si_##func decl        \
 {                                        \
   int res = -1;	                         \
@@ -73,20 +73,28 @@ SI_EINTR_SAVE_FUNC(int, open, (const char *pathname, int flags),
 
 SI_EINTR_SAVE_FUNC(int, open, (const char *pathname, int flags, mode_t mode),
                    (pathname, flags, mode))
-
 SI_EINTR_SAVE_FUNC(int, close, (int fd), (fd))
 
 SI_EINTR_SAVE_FUNC(int, accept,
                    (int sockfd, struct sockaddr *addr, socklen_t *addrlen),
                    (sockfd, addr, addrlen))
-                   
+
 SI_EINTR_SAVE_FUNC(int, connect,
                    (int sockfd, const struct sockaddr *addr, socklen_t addrlen),
                    (sockfd, addr, addrlen))
 
-SI_EINTR_SAVE_FUNC(int, nanosleep,
-                   (const struct timespec *req, struct timespec *rem),
-                   (req, rem))
+/// @note: We respect that the user may explictely deactivate the
+/// restart feature by setting the second argumetn to NULL.
+inline int
+si_nanosleep(const struct timespec *req, struct timespec *rem) {
+
+  int res = -1;
+  do
+  {
+    res = nanosleep(req, rem);
+  } while((rem != NULL) && (res < 0) && (errno == EINTR));
+  return res;   
+}
 
 inline unsigned int si_sleep(unsigned int seconds)
 {
@@ -100,14 +108,6 @@ inline unsigned int si_sleep(unsigned int seconds)
 // still todo: read,write,open   in ./omalloc/Misc/dlmalloc
 /// TODO: wrap and replace the following system calls: from man 7 signal
 /// ???fread, fwrite, fopen, fdopen, popen, fclose
-
-
-/// 
-/// regardless of the use of SA_RESTART: 
-///
-///   nanosleep(2), and usleep(3).
-/// sleep(3)
-
 
 
 
