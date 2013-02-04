@@ -1158,12 +1158,13 @@ void siInit(char *name)
 #ifndef OM_NDEBUG
 #ifndef __OPTIMIZE__
     om_Opts.ErrorHook = dErrorBreak;
+#else
+    om_Opts.Keep = 0; /* !OM_NDEBUG, __OPTIMIZE__*/
 #endif
+#else
+    om_Opts.Keep = 0; /* OM_NDEBUG */
 #endif
     omInitInfo();
-#ifdef OM_SING_KEEP
-    om_Opts.Keep = OM_SING_KEEP;
-#endif
 
 // interpreter tables etc.: -----------------------------------------------
 #ifdef INIT_BUG
