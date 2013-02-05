@@ -913,7 +913,7 @@ static void iiRunInit(package p)
   }
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
+BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
   extern FILE *yylpin;

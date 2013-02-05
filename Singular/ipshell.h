@@ -90,7 +90,7 @@ void    iiDebug();
 BOOLEAN iiCheckRing(int i);
 poly    iiHighCorner(ideal i, int ak);
 char *  iiConvName(const char *libname);
-BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
+BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, char *newlib,
                          idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
 
 // converts a resolution into a list of modules
