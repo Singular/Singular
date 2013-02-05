@@ -539,14 +539,14 @@ public:
   SparseRow<number_type>(int n)
   {
     len=n;
-    idx_array=(int*) omalloc(n*sizeof(int));
-    coef_array=(number_type*) omalloc(n*sizeof(number_type));
+    idx_array=(int*) omAlloc(n*sizeof(int));
+    coef_array=(number_type*) omAlloc(n*sizeof(number_type));
   }
   SparseRow<number_type>(int n, const number_type* source)
   {
     len=n;
     idx_array=NULL;
-    coef_array=(number_type*) omalloc(n*sizeof(number_type));
+    coef_array=(number_type*) omAlloc(n*sizeof(number_type));
     memcpy(coef_array,source,n*sizeof(number_type));
   }
   ~SparseRow<number_type>()
@@ -685,7 +685,7 @@ public:
     if (tempBufferSize<size)
     {
       tempBufferSize=2*size;
-      omfree(tempBuffer);
+      omFree(tempBuffer);
       tempBuffer=omAlloc(tempBufferSize);
     }
   }
@@ -713,7 +713,7 @@ public:
 #ifdef NORO_RED_ARRAY_RESERVER
     omfree(recursionPolyBuffer);
 #endif
-   omfree(tempBuffer);
+   omFree(tempBuffer);
   }
 
   int nIrreducibleMonomials;
@@ -1647,9 +1647,10 @@ public:
     this->nrows=p.nrows;
     lastReducibleIndices=(int*) omalloc(nrows*sizeof(int));
     nonZeroUntil=0;
-    while(nonZeroUntil<nrows){
-      if (startIndices[nonZeroUntil]<ncols){
-
+    while(nonZeroUntil<nrows)
+    {
+      if (startIndices[nonZeroUntil]<ncols)
+      {
         nonZeroUntil++;
       }
       else break;
@@ -1758,22 +1759,20 @@ template <class number_type > void simplest_gauss_modp(number_type* a, int nrows
 template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("Input rows %d\n",pn);
   int j;
-  if (TEST_OPT_PROT){
+  if (TEST_OPT_PROT)
+  {
     Print("Input rows %d\n",pn);
   }
 
   NoroCache<number_type> cache;
 
-  SparseRow<number_type> ** srows=(SparseRow<number_type>**) omalloc(pn*sizeof(SparseRow<number_type>*));
+  SparseRow<number_type> ** srows=(SparseRow<number_type>**) omAlloc(pn*sizeof(SparseRow<number_type>*));
   int non_zeros=0;
-  for(j=0;j<pn;j++){
-
+  for(j=0;j<pn;j++)
+  {
     poly h=p[j];
     int h_len=pLength(h);
-
     //number coef;
-
-
     srows[non_zeros]=noro_red_to_non_poly_t<number_type>(h,h_len,&cache,c);
     if (srows[non_zeros]!=NULL) non_zeros++;
   }
@@ -1783,20 +1782,21 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("historic irred Mon%d\n",cache.nIrreducibleMonomials);
   int n=irr_nodes.size();//cache.countIrreducibleMonomials();
   cache.nIrreducibleMonomials=n;
-  if (TEST_OPT_PROT){
+  if (TEST_OPT_PROT)
+  {
     Print("Irred Mon:%d\n",n);
     Print("red Mon:%d\n",cache.nReducibleMonomials);
   }
   TermNoroDataNode<number_type>* term_nodes=(TermNoroDataNode<number_type>*) omalloc(n*sizeof(TermNoroDataNode<number_type>));
 
-  for(j=0;j<n;j++){
+  for(j=0;j<n;j++)
+  {
     assume(irr_nodes[j]!=NULL);
     assume(irr_nodes[j]->value_len==NoroCache<number_type>::backLinkCode);
     term_nodes[j].t=irr_nodes[j]->value_poly;
     assume(term_nodes[j].t!=NULL);
     term_nodes[j].node=irr_nodes[j];
   }
-
 
   qsort(term_nodes,n,sizeof(TermNoroDataNode<number_type>),term_nodes_sort_crit<number_type>);
   poly* terms=(poly*) omalloc(n*sizeof(poly));
@@ -1812,8 +1812,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   //if (TEST_OPT_PROT)
   //  Print("Evaluate Rows \n");
   pn=non_zeros;
-  number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
-  memset(number_array,0,sizeof(number_type)*n*pn);
+  number_type* number_array=(number_type*) omalloc0(n*pn*sizeof(number_type));
 
   for(j=0;j<pn;j++)
   {

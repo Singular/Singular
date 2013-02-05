@@ -911,7 +911,7 @@ BOOLEAN good_has_t_rep (int i, int j, slimgb_alg * c)
     if(i_con[n] == j)
     {
       now_t_rep (i, j, c);
-      omfree (i_con);
+      omFree (i_con);
       return TRUE;
     }
   }
@@ -1119,8 +1119,8 @@ static void move_backward_in_S (int old_pos, int new_pos, kStrategy strat)
 static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
 {
   ideal I = c->S;
-  int *cans = (int *) omalloc (c->n * sizeof (int));
-  int *connected = (int *) omalloc (c->n * sizeof (int));
+  int *cans = (int *) omAlloc (c->n * sizeof (int));
+  int *connected = (int *) omAlloc (c->n * sizeof (int));
   cans[0] = to;
   int cans_length = 1;
   connected[0] = from;
@@ -1157,7 +1157,7 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
             {
               connected[connected_length] = -1;
             }
-            omfree (cans);
+            omFree (cans);
             return connected;
           }
         }
@@ -1203,7 +1203,7 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
             {
               connected[connected_length] = -1;
             }
-            omfree (cans);
+            omFree (cans);
             return connected;
           }
           break;
@@ -1248,7 +1248,7 @@ static void replace_pair (int &i, int &j, slimgb_alg * c)
     if(i_con[n] == j)
     {
       now_t_rep (i, j, c);
-      omfree (i_con);
+      omFree (i_con);
       p_Delete (&lm, c->r);
       return;
     }
@@ -1512,7 +1512,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   }
   c->tmp_pair_lm[i] = pOne_Special (c->r);
 
-  c->tmp_spn[i] = (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
+  c->tmp_spn[i] = (sorted_pair_node *) omAlloc (sizeof (sorted_pair_node));
 
   c->lengths[i] = pLength (h);
 
@@ -1539,7 +1539,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
 
 #else
   if(i > 0)
-    c->states[i] = (char *) omalloc (i * sizeof (char));
+    c->states[i] = (char *) omAlloc (i * sizeof (char));
   else
     c->states[i] = NULL;
 #endif
@@ -1748,7 +1748,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       assume (__p_GetComp (c->S->m[nodes[lower]->i], c->r) ==
               __p_GetComp (c->S->m[nodes[lower]->j], c->r));
       nodes_final[spc_final] =
-        (sorted_pair_node *) omalloc (sizeof (sorted_pair_node));
+        (sorted_pair_node *) omAlloc (sizeof (sorted_pair_node));
 
       *(nodes_final[spc_final++]) = *(nodes[lower]);
       //c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
@@ -1767,7 +1767,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   //  Print("i:%d,spc_final:%d",i,spc_final);
 
   assume (spc_final <= spc);
-  omfree (nodes);
+  omFree (nodes);
   nodes = NULL;
 
   add_to_reductors (c, h, c->lengths[c->n - 1], ecart, TRUE);
@@ -1822,7 +1822,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
 
       c->introduceDelayedPairs (array_arg, j);
 
-      omfree (array_arg);       // !!!
+      omFree (array_arg);       // !!!
     }
 //     PrintS("Saturation - done!!!\n");
   }
@@ -1839,7 +1839,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       spn_merge (c->apairs, c->pair_top + 1, nodes_final, spc_final, c);
     c->pair_top += spc_final;
     clean_top_of_pair_list (c);
-    omfree (nodes_final);
+    omFree (nodes_final);
     return NULL;
   }
   {
@@ -2214,7 +2214,7 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   {
     memmove (big_sbuf + partsum, sbuf[j],
              ibuf[j] * sizeof (sorted_pair_node *));
-    omfree (sbuf[j]);
+    omFree (sbuf[j]);
     partsum += ibuf[j];
   }
 
@@ -2222,7 +2222,7 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   c->apairs = spn_merge (c->apairs, c->pair_top + 1, big_sbuf, sum, c);
   c->pair_top += sum;
   clean_top_of_pair_list (c);
-  omfree (big_sbuf);
+  omFree (big_sbuf);
   omfree (sbuf);
   omfree (ibuf);
   //omfree(buf);
@@ -2242,12 +2242,12 @@ void NoroCache::evaluateRows ()
 {
   //after that can evaluate placeholders
   int i;
-  buffer = (number *) omalloc (nIrreducibleMonomials * sizeof (number));
+  buffer = (number *) omAlloc (nIrreducibleMonomials * sizeof (number));
   for(i = 0; i < root.branches_len; i++)
   {
     evaluateRows (1, root.branches[i]);
   }
-  omfree (buffer);
+  omFree (buffer);
   buffer = NULL;
 }
 
