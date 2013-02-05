@@ -357,8 +357,8 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c)
 #endif
     row++;
   }
-  omfree(area);
-  omfree(row_cache);
+  omFree(area);
+  omFree(row_cache);
 }
 
 void simple_gauss2(tgb_matrix* mat)
@@ -636,7 +636,7 @@ void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros)
   for(i=0;i<columns;i++)
     if((free_non_zeros)||(!(nIsZero(n[row][i]))))
       nDelete(&(n[row][i]));
-  omfree(n[row]);
+  omFree(n[row]);
   n[row]=NULL;
 }
 

@@ -899,7 +899,7 @@ BOOLEAN good_has_t_rep (int i, int j, slimgb_alg * c)
     if(i_con[n] == j)
     {
       now_t_rep (i, j, c);
-      omfree (i_con);
+      omFree (i_con);
       return TRUE;
     }
   }
@@ -1145,7 +1145,7 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
             {
               connected[connected_length] = -1;
             }
-            omfree (cans);
+            omFree (cans);
             return connected;
           }
         }
@@ -1191,7 +1191,7 @@ static int *make_connections (int from, int to, poly bound, slimgb_alg * c)
             {
               connected[connected_length] = -1;
             }
-            omfree (cans);
+            omFree (cans);
             return connected;
           }
           break;
@@ -1236,7 +1236,7 @@ static void replace_pair (int &i, int &j, slimgb_alg * c)
     if(i_con[n] == j)
     {
       now_t_rep (i, j, c);
-      omfree (i_con);
+      omFree (i_con);
       p_Delete (&lm, c->r);
       return;
     }
@@ -1755,7 +1755,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   //  Print("i:%d,spc_final:%d",i,spc_final);
 
   assume (spc_final <= spc);
-  omfree (nodes);
+  omFree (nodes);
   nodes = NULL;
 
   add_to_reductors (c, h, c->lengths[c->n - 1], ecart, TRUE);
@@ -1810,7 +1810,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
 
       c->introduceDelayedPairs (array_arg, j);
 
-      omfree (array_arg);       // !!!
+      omFree (array_arg);       // !!!
     }
 //     PrintS("Saturation - done!!!\n");
   }
@@ -1827,7 +1827,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       spn_merge (c->apairs, c->pair_top + 1, nodes_final, spc_final, c);
     c->pair_top += spc_final;
     clean_top_of_pair_list (c);
-    omfree (nodes_final);
+    omFree (nodes_final);
     return NULL;
   }
   {
@@ -2202,7 +2202,7 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   {
     memmove (big_sbuf + partsum, sbuf[j],
              ibuf[j] * sizeof (sorted_pair_node *));
-    omfree (sbuf[j]);
+    omFree (sbuf[j]);
     partsum += ibuf[j];
   }
 
@@ -2210,7 +2210,7 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   c->apairs = spn_merge (c->apairs, c->pair_top + 1, big_sbuf, sum, c);
   c->pair_top += sum;
   clean_top_of_pair_list (c);
-  omfree (big_sbuf);
+  omFree (big_sbuf);
   omfree (sbuf);
   omfree (ibuf);
   //omfree(buf);
@@ -2235,7 +2235,7 @@ void NoroCache::evaluateRows ()
   {
     evaluateRows (1, root.branches[i]);
   }
-  omfree (buffer);
+  omFree (buffer);
   buffer = NULL;
 }
 

@@ -707,7 +707,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         }
         else name_err=1;
         if(name_err)
-        { Werror("'%s' is an inavlid package name",u->name);return TRUE;}
+        { Werror("'%s' is an invalid package name",u->name);return TRUE;}
         // and now, after the loading: use next case !!! no break !!!
       }
       case PACKAGE_CMD:

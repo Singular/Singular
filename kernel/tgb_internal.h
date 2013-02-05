@@ -687,7 +687,7 @@ public:
     if (tempBufferSize<size)
     {
       tempBufferSize=2*size;
-      omfree(tempBuffer);
+      omFree(tempBuffer);
       tempBuffer=omAlloc(tempBufferSize);
     }
   }
@@ -715,7 +715,7 @@ public:
 #ifdef NORO_RED_ARRAY_RESERVER
     omfree(recursionPolyBuffer);
 #endif
-   omfree(tempBuffer);
+   omFree(tempBuffer);
   }
 
   int nIrreducibleMonomials;
@@ -1762,7 +1762,8 @@ template <class number_type > void simplest_gauss_modp(number_type* a, int nrows
 template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("Input rows %d\n",pn);
   int j;
-  if (TEST_OPT_PROT){
+  if (TEST_OPT_PROT)
+  {
     Print("Input rows %d\n",pn);
   }
 
@@ -1770,14 +1771,11 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
 
   SparseRow<number_type> ** srows=(SparseRow<number_type>**) omAlloc(pn*sizeof(SparseRow<number_type>*));
   int non_zeros=0;
-  for(j=0;j<pn;j++){
-
+  for(j=0;j<pn;j++)
+  {
     poly h=p[j];
     int h_len=pLength(h);
-
     //number coef;
-
-
     srows[non_zeros]=noro_red_to_non_poly_t<number_type>(h,h_len,&cache,c);
     if (srows[non_zeros]!=NULL) non_zeros++;
   }
