@@ -686,14 +686,30 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
   switch(u->Typ())
   {
       case 0:
-        Print("%s of type 'ANY'. Trying load.\n", v->name);
-        if(iiTryLoadLib(u, u->name))
+      {
+        int name_err=0;
+        if(isupper(u->name[0]))
         {
-          Werror("'%s' no such package", u->name);
-          return TRUE;
+          const char *c=u->name+1;
+          while((*c!='\0')&&(islower(*c))) c++;
+          if (*c!='\0')
+            name_err=1;
+          else
+          {
+            Print("%s of type 'ANY'. Trying load.\n", u->name);
+            if(iiTryLoadLib(u, u->name))
+            {
+              Werror("'%s' no such package", u->name);
+              return TRUE;
+            }
+            syMake(u,u->name,NULL);
+          }
         }
-        syMake(u,u->name,NULL);
-        // else: use next case !!! no break !!!
+        else name_err=1;
+        if(name_err)
+        { Werror("'%s' is an invalid package name",u->name);return TRUE;}
+        // and now, after the loading: use next case !!! no break !!!
+      }
       case PACKAGE_CMD:
         packhdl = (idhdl)u->data;
         if((!IDPACKAGE(packhdl)->loaded)
