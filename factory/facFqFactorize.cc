@@ -1788,6 +1788,7 @@ lcretry:
       i= newLCs;
       CFListIterator iter= result;
       iter++;
+      CanonicalForm quot;
       for (;iter.hasItem(); iter++, i++)
       {
         swap= iter.getItem();
@@ -1800,7 +1801,8 @@ lcretry:
             if (count != level+3)
               swap= swap (iter2.getItem(), count);
           }
-          i.getItem() /= swap;
+          if (fdivides (swap, i.getItem(), quot))
+            i.getItem()= quot;
         }
       }
       CFList * differentSecondVarLCs2= new CFList [lSecondVarLCs - level - 1];
@@ -1826,7 +1828,8 @@ lcretry:
                   if (count != j+3)
                     swap= swap (iter2.getItem(), count);
                 }
-                i.getItem() /= swap;
+                if (fdivides (swap, i.getItem(), quot))
+                  i.getItem()= quot;
               }
             }
           }
