@@ -1351,14 +1351,14 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
     }
   }
   /*- release temp data------------------------------- -*/
-  omfree(strat->sevS);
-  omfree(strat->ecartS);
-  omfree(strat->T);
-  omfree(strat->sevT);
-  omfree(strat->R);
+  assume(strat->L==NULL); /* strat->L unused */
+  assume(strat->B==NULL); /* strat->B unused */
+  omFree(strat->sevS);
+  omFree(strat->ecartS);
+  assume(strat->T==NULL);//omfree(strat->T);
+  assume(strat->sevT==NULL);//omfree(strat->sevT);
+  assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
-  omfree(strat->L);
-  omfree(strat->B);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
   test=save_test;
@@ -1427,14 +1427,14 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
-  omfree(strat->sevS);
-  omfree(strat->ecartS);
-  omfree(strat->T);
-  omfree(strat->sevT);
-  omfree(strat->R);
+  assume(strat->L==NULL); /* strat->L unused */
+  assume(strat->B==NULL); /* strat->B unused */
+  omFree(strat->sevS);
+  omFree(strat->ecartS);
+  assume(strat->T==NULL);//omfree(strat->T);
+  assume(strat->sevT==NULL);//omfree(strat->sevT);
+  assume(strat->R==NULL);//omfree(strat->R);
   omfree(strat->S_2_R);
-  omfree(strat->L);
-  omfree(strat->B);
   omfree(strat->fromQ);
   idDelete(&strat->Shdl);
   test=save_test;

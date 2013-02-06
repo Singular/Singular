@@ -667,7 +667,7 @@ void paCleanUp(package pack)
 #endif /* HAVE_DYNAMIC_LOADING */
     }
 #endif /* HAVE_STATIC */
-    omfree((ADDRESS)pack->libname);
+    omFree((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;
   }

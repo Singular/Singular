@@ -770,7 +770,7 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
       pDelete(&MATELEM(m,k,l));
     }
   }
-  omfreeSize((ADDRESS)m->m,MATROWS(m)*MATCOLS(m)*sizeof(poly));
+  omFreeSize((ADDRESS)m->m,MATROWS(m)*MATCOLS(m)*sizeof(poly));
   /* allocate monoms in the right size r x MATROWS(c)*/
   m->m=(polyset)omAlloc0(r*MATROWS(c)*sizeof(poly));
   MATROWS(m)=r;

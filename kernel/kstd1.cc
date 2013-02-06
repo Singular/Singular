@@ -1511,13 +1511,15 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   }
   /*- release temp data------------------------------- -*/
   cleanT(strat);
+  assume(strat->L==NULL); /*strat->L unsed */
+  assume(strat->B==NULL); /*strat->B unused */
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
-  omfree(strat->sevT);
-  omfree(strat->S_2_R);
-  omfree(strat->R);
+  omFree(strat->sevT);
+  omFree(strat->S_2_R);
+  omFree(strat->R);
 
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
@@ -1650,13 +1652,15 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
+  assume(strat->L==NULL); /*strat->L unsed */
+  assume(strat->B==NULL); /*strat->B unused */
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
-  omfree(strat->sevT);
-  omfree(strat->S_2_R);
-  omfree(strat->R);
+  omFree(strat->sevT);
+  omFree(strat->S_2_R);
+  omFree(strat->R);
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
