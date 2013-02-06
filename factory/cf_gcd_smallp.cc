@@ -4356,7 +4356,7 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   long termEstimate= size (U);
   for (int i= A.min(); i <= A.max(); i++)
   {
-    if (!A[i].isZero())
+    if (!A[i].isZero() && (getCharacteristic() > degree (U,i))) //TODO find a good estimate for getCharacteristic() <= degree (U,i)
     {
       termEstimate *= degree (U,i)*2;
       termEstimate /= 3;
