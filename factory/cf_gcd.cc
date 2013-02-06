@@ -619,7 +619,9 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     {
         pi = g; pi1 = f; delta = -delta;
     }
+    On (SW_USE_EZGCD_P);
     Ci = content( pi ); Ci1 = content( pi1 );
+    Off (SW_USE_EZGCD_P);
     pi1 = pi1 / Ci1; pi = pi / Ci;
     C = gcd( Ci, Ci1 );
     int d= 0;
