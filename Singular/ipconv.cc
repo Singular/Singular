@@ -287,7 +287,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
   else if (outputType==ANY_TYPE)
   {
     output->rtyp=ANY_TYPE;
-    output->data=(char *)input->Typ();
+    output->data=(char *)(long)input->Typ();
     /* the name of the object:*/
     if (input->e==NULL)
     {
