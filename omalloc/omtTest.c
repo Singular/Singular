@@ -1,4 +1,10 @@
 #include <omalloc/omtTest.h>
+#include <errno.h>
+
+#ifndef SI_OMALLOC_SSCANF
+#define SI_OMALLOC_SSCANF(...) \
+while((sscanf(__VA_ARGS__ ) == EOF) && (errno == EINTR))
+#endif
 
 #if CHECK_LEVEL > 0
 #define OM_CHECK CHECK_LEVEL
@@ -355,12 +361,12 @@ int main(int argc, char* argv[])
   omInitInfo();
   om_Opts.PagesPerRegion = PAGES_PER_REGION;
 
-  if (argc > 1) sscanf(argv[1], "%d", &error_test);
-  if (argc > 2) sscanf(argv[2], "%d", &seed);
+  if (argc > 1) SI_OMALLOC_SSCANF(argv[1], "%d", &error_test);
+  if (argc > 2) SI_OMALLOC_SSCANF(argv[2], "%d", &seed);
   srandom(seed);
 
-  if (argc > 3) sscanf(argv[3], "%d", &n);
-  if (argc > 4) sscanf(argv[4], "%d", &decr);
+  if (argc > 3) SI_OMALLOC_SSCANF(argv[3], "%d", &n);
+  if (argc > 4) SI_OMALLOC_SSCANF(argv[4], "%d", &decr);
 
   if (decr < 2) decr = 2;
   printf("seed == %d\n", seed);
