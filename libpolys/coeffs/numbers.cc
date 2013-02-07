@@ -318,6 +318,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->type=t;
 
     // default entries (different from NULL) for some routines:
+    n->nCoeffIsEqual = ndCoeffIsEqual;
     n->cfSize = ndSize;
     n->cfGetDenom= ndGetDenom;
     n->cfGetNumerator= ndGetNumerator;
