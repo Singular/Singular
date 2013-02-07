@@ -9,14 +9,18 @@
 #include <locals.h>
 //#include <varargs.h>
 #include <stdarg.h>
+#include <errno.h>
 
 int MYsscanf(const char *s, const char *fmt,...)
 {
   va_list args;
-  int ret = 0;
+  int ret = EOF;
 
   va_start (args, fmt, s);
-  ret = vsscanf (s, fmt, args);
+  do
+  {
+    ret = vsscanf (s, fmt, args);
+  } while((ret == EOF) && (errno == EINTR));
   va_end (args);
   return 0;
 }
@@ -33,7 +37,11 @@ BOOLEAN IOsscanf(leftv res, leftv h)
 
   Print("sscanf(%s,%s,<va_list>)\n\n", input, format);
   //sscanf(input, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10);
-  sscanf(input, format, &args);
+  int res = EOF;
+  do
+  {
+    res = sscanf(input, format, &args);
+  } while((res == EOF) && (errno == EINTR)):
   Print("test 3\n");
   Print("sscanf(%s,%s,<va_list>)\n", input, format);
   //Print("sscanf(%s,%s,%s[%d])\n", input, format, (char *)a1, (int)a2);
