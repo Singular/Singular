@@ -2399,6 +2399,7 @@ poly id_GCD(poly f, poly g, const ring r)
 #endif
 #endif
 
+#ifdef HAVE_FACTORY
 /*2
 * xx,q: arrays of length 0..rl-1
 * xx[i]: SB mod q[i]
@@ -2406,7 +2407,6 @@ poly id_GCD(poly f, poly g, const ring r)
 * assume: q[i]!=0
 * destroys xx
 */
-#ifdef HAVE_FACTORY
 ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
@@ -2414,53 +2414,24 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
   result->nrows=xx[0]->nrows; // for lifting matrices
   result->ncols=xx[0]->ncols; // for lifting matrices
   int i,j;
-  poly r,h,hh,res_p;
   number *x=(number *)omAlloc(rl*sizeof(number));
+  poly *p=(poly *)omAlloc(rl*sizeof(poly));
   for(i=cnt-1;i>=0;i--)
   {
-    res_p=NULL;
-    loop
+    for(j=rl-1;j>=0;j--)
     {
-      r=NULL;
-      for(j=rl-1;j>=0;j--)
-      {
-        h=xx[j]->m[i];
-        if ((h!=NULL)
-        &&((r==NULL)||(p_LmCmp(r,h,R)==-1)))
-          r=h;
-      }
-      if (r==NULL) break;
-      h=p_Head(r,R);
-      for(j=rl-1;j>=0;j--)
-      {
-        hh=xx[j]->m[i];
-        if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
-        {
-          x[j]=pGetCoeff(hh);
-          hh=p_LmFreeAndNext(hh,R);
-          xx[j]->m[i]=hh;
-        }
-        else
-          x[j]=n_Init(0, R->cf);
-      }
-      number n=n_ChineseRemainder(x,q,rl,R->cf);
-      for(j=rl-1;j>=0;j--)
-      {
-        x[j]=NULL; // nlInit(0...) takes no memory
-      }
-      if (n_IsZero(n,R->cf)) p_Delete(&h,R);
-      else
-      {
-        p_SetCoeff(h,n,R);
-        //Print("new mon:");pWrite(h);
-        res_p=p_Add_q(res_p,h,R);
-      }
+      p[j]=xx[j]->m[i];
     }
-    result->m[i]=res_p;
+    result->m[i]=p_ChineseRemainder(p,x,q,rl,R);
+    for(j=rl-1;j>=0;j--)
+    {
+      xx[j]->m[i]=p[j];
+    }
   }
-  omFree(x);
+  omFreeSize(p,rl*sizeof(poly));
+  omFreeSize(x,rl*sizeof(number));
   for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]),R);
-  omFree(xx);
+  omFreeSize(xx,rl*sizeof(ideal));
   return result;
 }
 #endif
@@ -2560,28 +2531,7 @@ ideal id_Farey(ideal x, number N, const ring r)
   int i;
   for(i=cnt-1;i>=0;i--)
   {
-    poly h=p_Copy(x->m[i],r);
-    result->m[i]=h;
-    while(h!=NULL)
-    {
-      number c=pGetCoeff(h);
-      pSetCoeff0(h,n_Farey(c,N,r->cf));
-      n_Delete(&c,r->cf);
-      pIter(h);
-    }
-    while((result->m[i]!=NULL)&&(n_IsZero(pGetCoeff(result->m[i]),r->cf)))
-    {
-      p_LmDelete(&(result->m[i]),r);
-    }
-    h=result->m[i];
-    while((h!=NULL) && (pNext(h)!=NULL))
-    {
-      if(n_IsZero(pGetCoeff(pNext(h)),r->cf))
-      {
-        p_LmDelete(&pNext(h),r);
-      }
-      else pIter(h);
-    }
+    result->m[i]=p_Farey(x->m[i],N,r);
   }
   return result;
 }

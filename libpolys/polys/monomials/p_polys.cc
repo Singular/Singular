@@ -58,6 +58,91 @@
 #include "clapsing.h"
 #endif
 
+/*
+ * lift ideal with coeffs over Z (mod N) to Q via Farey
+ */
+poly p_Farey(poly p, number N, const ring r)
+{
+  poly h=p_Copy(p,r);
+  poly hh=h;
+  while(h!=NULL)
+  {
+    number c=pGetCoeff(h);
+    pSetCoeff0(h,n_Farey(c,N,r->cf));
+    n_Delete(&c,r->cf);
+    pIter(h);
+  }
+  while((hh!=NULL)&&(n_IsZero(pGetCoeff(hh),r->cf)))
+  {
+    p_LmDelete(&hh,r);
+  }
+  h=hh;
+  while((h!=NULL) && (pNext(h)!=NULL))
+  {
+    if(n_IsZero(pGetCoeff(pNext(h)),r->cf))
+    {
+      p_LmDelete(&pNext(h),r);
+    }
+    else pIter(h);
+  }
+  return hh;
+}
+/*2
+* xx,q: arrays of length 0..rl-1
+* xx[i]: SB mod q[i]
+* assume: char=0
+* assume: q[i]!=0
+* destroys xx
+*/
+poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
+{
+  poly r,h,hh;
+  int j;
+  poly  res_p=NULL;
+  loop
+  {
+    /* search the lead term */
+    r=NULL;
+    for(j=rl-1;j>=0;j--)
+    {
+      h=xx[j];
+      if ((h!=NULL)
+      &&((r==NULL)||(p_LmCmp(r,h,R)==-1)))
+        r=h;
+    }
+    /* nothing found -> return */
+    if (r==NULL) break;
+    /* create the monomial in h */
+    h=p_Head(r,R);
+    /* collect the coeffs in x[..]*/
+    for(j=rl-1;j>=0;j--)
+    {
+      hh=xx[j];
+      if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
+      {
+        x[j]=pGetCoeff(hh);
+        hh=p_LmFreeAndNext(hh,R);
+        xx[j]=hh;
+      }
+      else
+        x[j]=n_Init(0, R);
+    }
+    number n=n_ChineseRemainder(x,q,rl,R->cf);
+    for(j=rl-1;j>=0;j--)
+    {
+      x[j]=NULL; // nlInit(0...) takes no memory
+    }
+    if (n_IsZero(n,R)) p_Delete(&h,R);
+    else
+    {
+      p_SetCoeff(h,n,R);
+      //Print("new mon:");pWrite(h);
+      pNext(h)=res_p;
+      res_p=h; // building res_p in reverse order!
+    }
+  }
+  return pReverse(res_p);
+}
 /***************************************************************
  *
  * Completing what needs to be set for the monomial

@@ -35,6 +35,15 @@
 #include <polys/nc/nc.h>
 #endif
 
+poly p_Farey(poly p, number N, const ring r);
+/*
+* xx,q: arrays of length 0..rl-1
+* xx[i]: SB mod q[i]
+* assume: char=0
+* assume: q[i]!=0
+* destroys xx
+*/
+poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R);
 /***************************************************************
  *
  * Divisiblity tests, args must be != NULL, except for
