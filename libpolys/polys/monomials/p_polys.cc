@@ -137,11 +137,10 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     {
       p_SetCoeff(h,n,R);
       //Print("new mon:");pWrite(h);
-      pNext(h)=res_p;
-      res_p=h; // building res_p in reverse order!
+      res_p=p_Add_q(res_p,h,R);
     }
   }
-  return pReverse(res_p);
+  return res_p;
 }
 /***************************************************************
  *
