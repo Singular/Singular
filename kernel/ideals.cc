@@ -3064,6 +3064,7 @@ void idCompactify(ideal id)
   }
   else
   {
+    if (IDELEMS(id)>10) idDelEquals(id);
     idDelMultiples(id);
   }
   idSkipZeroes(id);
@@ -4230,10 +4231,11 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     {
       p_SetCoeff(h,n,R);
       //Print("new mon:");pWrite(h);
-      res_p=p_Add_q(res_p,h,R);
+      pNext(h)=res_p;
+      res_p=h; // building res_p in reverse order!
     }
   }
-  return res_p;
+  return pReverse(res_p);
 }
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
@@ -4259,7 +4261,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
   omFreeSize(p,rl*sizeof(poly));
   omFreeSize(x,rl*sizeof(number));
   for(i=rl-1;i>=0;i--) idDelete(&(xx[i]));
-  omFree(xx);
+  omFreeSize(xx,rl*sizeof(ideal));
   return result;
 }
 #endif
