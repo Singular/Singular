@@ -4212,7 +4212,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     for(j=rl-1;j>=0;j--)
     {
       hh=xx[j];
-      if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
+      if ((hh!=NULL) && (p_LmCmp(h,hh,R)==0))
       {
         x[j]=pGetCoeff(hh);
         hh=p_LmFreeAndNext(hh,R);
@@ -4226,12 +4226,13 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     {
       x[j]=NULL; // nlInit(0...) takes no memory
     }
-    if (n_IsZero(n,R)) p_Delete(&h,R);
+    assume(pNext(h)==NULL);
+    if (n_IsZero(n,R)) p_LmDelete(&h,R);
     else
     {
-      p_SetCoeff(h,n,R);
       //Print("new mon:");pWrite(h);
-      #if 0
+      p_SetCoeff(h,n,R);
+      #if 1
       pNext(h)=res_p;
       res_p=h; // building res_p in reverse order!
       #else
@@ -4239,11 +4240,11 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
       #endif
     }
   }
-  #if 0
-  return pReverse(res_p);
-  #else
-  return res_p;
+  #if 1
+  res_p=pReverse(res_p);
+  pTest(res_p);
   #endif
+  return res_p;
 }
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
