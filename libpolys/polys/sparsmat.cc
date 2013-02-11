@@ -1665,14 +1665,13 @@ void sm_PolyDiv(poly a, poly b, const ring R)
 //disable that, as it fails with coef buckets
 //#define X_MAS
 #ifdef X_MAS
-
-/*
-*  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
-*/
+// Note: the following in not addapted to SW :(
+/* 
+///  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
 poly smMultDiv(poly a, poly b, const poly c)
 {
   poly pa, e, res, r;
-  BOOLEAN lead;\
+  BOOLEAN lead;
   int la, lb, lr;
 
   if ((c == NULL) || pLmIsConstantComp(c))
@@ -1802,7 +1801,7 @@ poly smMultDiv(poly a, poly b, const poly c)
   pLmFree(e);
   return res;
 }
-
+*/
 #else
 
 /*

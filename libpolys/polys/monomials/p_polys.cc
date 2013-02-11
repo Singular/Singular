@@ -142,7 +142,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     }
   }
   res_p=pReverse(res_p);
-  pTest(res_p);
+  p_Test(res_p, R);
   return res_p;
 }
 /***************************************************************
