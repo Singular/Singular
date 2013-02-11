@@ -2861,7 +2861,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
   bool fail= false;
   int swapLevel2= 0;
-  int level;
+  //int level;
   int factorNums= 3;
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
@@ -2890,23 +2890,23 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     if (fail && (i == 0))
     {
-      if (!swapLevel)
+      /*if (!swapLevel) //uncomment to reenable search for new main variable
         level= 2;
       else
-        level= swapLevel + 1;
+        level= swapLevel + 1;*/
 
-      CanonicalForm g;
-      swapLevel2= newMainVariableSearch (A, Aeval, evaluation, alpha, level, g);
+      //CanonicalForm g;
+      //swapLevel2= newMainVariableSearch (A, Aeval, evaluation, alpha, level, g);
 
-      if (!swapLevel2) // need to pass to an extension
-      {
+      /*if (!swapLevel2) // need to pass to an extension
+      {*/
         factors= extFactorize (A, info);
         appendSwapDecompress (factors, contentAFactors, N, swapLevel, x);
         normalize (factors);
         delete [] bufAeval2;
         delete [] Aeval2;
         return factors;
-      }
+      /*}
       else
       {
         if (swapLevel2 == -1)
@@ -2925,7 +2925,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         bufAeval= Aeval;
         bufA= A;
         bufEvaluation= evaluation;
-      }
+      }*/ //end uncomment
     }
     else if (fail && (i > 0))
       break;
