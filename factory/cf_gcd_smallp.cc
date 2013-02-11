@@ -1209,7 +1209,11 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (d0 == 0)
     {
       if (inextension)
+      {
+        ppA= GFMapDown (ppA, k);
+        ppB= GFMapDown (ppB, k);
         setCharacteristic (p, k, gf_name_buf);
+      }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
@@ -1262,11 +1266,10 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       else
         cH= uni_content (H);
       ppH= H/cH;
+      ppH /= Lc (ppH);
       CanonicalForm lcppH= gcdlcAlcB/cH;
-      CanonicalForm ccoF= lcA/lcppH;
-      ccoF /= Lc (ccoF);
-      CanonicalForm ccoG= lcB/lcppH;
-      ccoG /= Lc (ccoG);
+      CanonicalForm ccoF= lcppH/Lc (lcppH);
+      CanonicalForm ccoG= lcppH/Lc (lcppH);
       ppCoF= coF/ccoF;
       ppCoG= coG/ccoG;
       if (inextension)
