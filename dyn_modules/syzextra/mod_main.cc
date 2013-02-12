@@ -936,6 +936,25 @@ static BOOLEAN _p_Content(leftv res, leftv h)
   return false;
 }
 
+static BOOLEAN _m2_end(leftv res, leftv h)
+{
+  int ret = 0;
+  
+  if ( (h!=NULL) && (h->Typ()!=INT_CMD) )
+  {
+    WerrorS("`m2_end([<int>])` expected");
+    return TRUE;
+  }
+  ret = (int)(long)(h->Data());
+
+  m2_end( ret );
+
+  NoReturn(res);
+  return FALSE;
+}
+
+   
+
 END_NAMESPACE
 
 extern "C"
@@ -971,6 +990,7 @@ int mod_init(SModulFunctions* psModulFunctions)
 
   ADD(psModulFunctions, currPack->libname, "p_Content", FALSE, _p_Content);
 
+  ADD(psModulFunctions, currPack->libname, "m2_end", FALSE, _m2_end);
   //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
 #undef ADD  
   return 0;

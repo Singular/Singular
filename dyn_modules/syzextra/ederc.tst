@@ -134,5 +134,6 @@ yz3*gen(3)-x2t2*gen(3)+x2y*gen(4)-z2t*gen(4);
 DetailedPrint(_);
 // x2y*gen(4)+yz3*gen(3)-z2t*gen(4)-x2t2*gen(3)
 
-$$$
+exit;
+
 

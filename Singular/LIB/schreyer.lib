@@ -1428,6 +1428,8 @@ static proc loadme()
 //      exportto(Schreyer, Syzextra::p_Content);
 
       exportto(Schreyer, Syzextra::Tail);
+
+      exportto(Schreyer, Syzextra::m2_end);
     }
     else
     {
@@ -1465,6 +1467,8 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra_g::Tail);
       
+      
+      exportto(Schreyer, Syzextra_g::m2_end);
     }
 
     exportto(Top, DetailedPrint);

@@ -43,5 +43,6 @@ leadrawexp(v);
 
 def l = res(I, 0); DetailedPrint(l);
 
-$$$
+exit;
+
 

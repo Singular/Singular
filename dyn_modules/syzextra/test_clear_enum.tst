@@ -60,8 +60,8 @@ proc TestClearContent(def i, number c, def o)
   } else
   {
     basering;
-    ERROR("[TestClearContent -- FAILED]");
-    $
+    "ERROR: [TestClearContent -- FAILED]";
+    m2_end(666);    
   }
   ""; 
 }
@@ -105,8 +105,8 @@ proc TestClearDenominators(def i, number c, def o)
   } else
   {
     basering;
-    ERROR("[TestClearDenominators -- FAILED]");
-    $
+    "ERROR: [TestClearDenominators -- FAILED]";
+    m2_end(666);    
   }
   ""; 
 }
@@ -370,8 +370,6 @@ ring R = (0,a), (x, y, z, u, v), (a(1, 2, 0, 0, 0), ws(1, 2, 3, 4, 5), C);
 
 TestClearRingX(x);
 
-// $
-
 minpoly = a2 + 1;
 
 R;
@@ -430,5 +428,6 @@ cleardenom(_);
 
 
 
-$$$
+exit;
+
 
