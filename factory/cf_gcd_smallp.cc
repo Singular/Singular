@@ -815,11 +815,10 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       else
         cH= uni_content (H);
       ppH= H/cH;
+      ppH /= Lc (ppH);
       CanonicalForm lcppH= gcdlcAlcB/cH;
-      CanonicalForm ccoF= lcA/lcppH;
-      ccoF /= Lc (ccoF);
-      CanonicalForm ccoG= lcB/lcppH;
-      ccoG /= Lc (ccoG);
+      CanonicalForm ccoF= lcppH/Lc (lcppH);
+      CanonicalForm ccoG= lcppH/Lc (lcppH);
       ppCoF= coF/ccoF;
       ppCoG= coG/ccoG;
       if (inextension)
@@ -831,10 +830,9 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         {
           CFList u, v;
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-          ppH /= Lc(ppH);
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
           ppCoF= mapDown (ppCoF, prim_elem, im_prim_elem, alpha, u, v);
-          ppCoF= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
+          ppCoG= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
           {
@@ -1209,7 +1207,11 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (d0 == 0)
     {
       if (inextension)
+      {
+        ppA= GFMapDown (ppA, k);
+        ppB= GFMapDown (ppB, k);
         setCharacteristic (p, k, gf_name_buf);
+      }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
@@ -1262,11 +1264,10 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       else
         cH= uni_content (H);
       ppH= H/cH;
+      ppH /= Lc (ppH);
       CanonicalForm lcppH= gcdlcAlcB/cH;
-      CanonicalForm ccoF= lcA/lcppH;
-      ccoF /= Lc (ccoF);
-      CanonicalForm ccoG= lcB/lcppH;
-      ccoG /= Lc (ccoG);
+      CanonicalForm ccoF= lcppH/Lc (lcppH);
+      CanonicalForm ccoG= lcppH/Lc (lcppH);
       ppCoF= coF/ccoF;
       ppCoG= coG/ccoG;
       if (inextension)
@@ -1619,7 +1620,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_START (gcd_recursion);
       G_random_element=
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
-                        coF_random_element, coG_random_element, alpha,
+                        coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -4356,7 +4357,7 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   long termEstimate= size (U);
   for (int i= A.min(); i <= A.max(); i++)
   {
-    if (!A[i].isZero())
+    if (!A[i].isZero() && (getCharacteristic() > degree (U,i))) //TODO find a good estimate for getCharacteristic() <= degree (U,i)
     {
       termEstimate *= degree (U,i)*2;
       termEstimate /= 3;
