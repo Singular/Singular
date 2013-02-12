@@ -184,18 +184,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                     );
                     break;
     case PACKAGE_CMD:
-                    PrintS(" (");
-                    switch (IDPACKAGE(h)->language)
-                    {
-                        case LANG_SINGULAR: PrintS("S"); break;
-                        case LANG_C:        PrintS("C"); break;
-                        case LANG_TOP:      PrintS("T"); break;
-                        case LANG_NONE:     PrintS("N"); break;
-                        default:            PrintS("U");
-                    }
-                    if(IDPACKAGE(h)->libname!=NULL)
-                      Print(",%s", IDPACKAGE(h)->libname);
-                    PrintS(")");
+                    paPrint(IDID(h),IDPACKAGE(h));
                     break;
     case PROC_CMD: if((IDPROC(h)->libname!=NULL)
                    && (strlen(IDPROC(h)->libname)>0))
