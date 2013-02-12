@@ -31,6 +31,16 @@
 #include "DebugPrint.h"
 #include "myNF.h"
 
+#ifdef HAVE_GOOGLE_PROFILER
+#include <google/profiler.h>
+#endif // HAVE_GOOGLE_PROFILER  
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
 extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
 // extern ring rCurrRingAssure_SyzComp();
 extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
@@ -157,12 +167,41 @@ static int getOptionalInteger(const leftv& h, const int _n)
   return (_n);  
 }
 
-BOOLEAN noop(leftv __res, leftv /*__v*/)
+static BOOLEAN noop(leftv __res, leftv /*__v*/)
 {
   NoReturn(__res);
   return FALSE;
 }
 
+static BOOLEAN _ProfilerStart(leftv __res, leftv h)
+{
+  NoReturn(__res);
+#ifdef HAVE_GOOGLE_PROFILER
+  if( h!= NULL && h->Typ() == STRING_CMD )
+  {
+    const char* name = (char*)(h->Data());
+    assume( name != NULL );   
+    ProfilerStart(name);
+  } else
+    WerrorS("ProfilerStart requires a string [name] argument"); 
+#else
+  WarnS("Sorry no google profiler support (undefined HAVE_GOOGLE_PROFILER)...");
+//  return TRUE; // ?
+#endif // #ifdef HAVE_GOOGLE_PROFILER
+  return FALSE;
+  (void)h;
+}
+static BOOLEAN _ProfilerStop(leftv __res, leftv /*__v*/)
+{
+  NoReturn(__res);
+#ifdef HAVE_GOOGLE_PROFILER
+  ProfilerStop();
+#else
+  WarnS("Sorry no google profiler support (undefined HAVE_GOOGLE_PROFILER)...");
+//  return TRUE; // ?
+#endif // #ifdef HAVE_GOOGLE_PROFILER
+  return FALSE;
+}
 
 static inline number jjLONG2N(long d)
 {
@@ -975,16 +1014,16 @@ int mod_init(SModulFunctions* psModulFunctions)
 
   ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
 
-
   ADD(psModulFunctions, currPack->libname, "ISUpdateComponents", FALSE, ISUpdateComponents);
   ADD(psModulFunctions, currPack->libname, "SetInducedReferrence", FALSE, SetInducedReferrence);
   ADD(psModulFunctions, currPack->libname, "GetInducedData", FALSE, GetInducedData);
   ADD(psModulFunctions, currPack->libname, "SetSyzComp", FALSE, SetSyzComp);
   ADD(psModulFunctions, currPack->libname, "MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
   ADD(psModulFunctions, currPack->libname, "MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
+
+  ADD(psModulFunctions, currPack->libname, "ProfilerStart", FALSE, _ProfilerStart); ADD(psModulFunctions, currPack->libname, "ProfilerStop",  FALSE, _ProfilerStop );
   
   ADD(psModulFunctions, currPack->libname, "noop", FALSE, noop);
- 
   ADD(psModulFunctions, currPack->libname, "idPrepare", FALSE, idPrepare);
   ADD(psModulFunctions, currPack->libname, "reduce_syz", FALSE, reduce_syz);
 

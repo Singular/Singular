@@ -1427,6 +1427,8 @@ static proc loadme()
 //      exportto(Schreyer, Syzextra::reduce_syz);
 //      exportto(Schreyer, Syzextra::p_Content);
 
+      exportto(Schreyer, Syzextra::ProfilerStart); exportto(Schreyer, Syzextra::ProfilerStop);
+
       exportto(Schreyer, Syzextra::Tail);
 
       exportto(Schreyer, Syzextra::m2_end);
@@ -1464,6 +1466,8 @@ static proc loadme()
       exportto(Schreyer, Syzextra_g::idPrepare);
 //      exportto(Schreyer, Syzextra_g::reduce_syz);
 //      exportto(Schreyer, Syzextra_g::p_Content);
+
+      exportto(Schreyer, Syzextra_g::ProfilerStart); exportto(Schreyer, Syzextra_g::ProfilerStop);
 
       exportto(Schreyer, Syzextra_g::Tail);
       
