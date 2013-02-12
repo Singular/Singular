@@ -29,12 +29,14 @@
 
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
+#include <polys/simpleideals.h>
 
 #include <kernel/kstd1.h>
 #include <kernel/polys.h>
 #include <kernel/syz.h>
 #include <kernel/ideals.h>
 
+#include <kernel/timer.h>
 
 
 #include <Singular/tok.h>
@@ -151,7 +153,7 @@ END_NAMESPACE
 
 /// return a new term: leading coeff * leading monomial of p
 /// with 0 leading component!
-poly leadmonom(const poly p, const ring r)
+poly leadmonom(const poly p, const ring r, const bool bSetZeroComp)
 {
   poly m = NULL;
 
@@ -163,13 +165,17 @@ poly leadmonom(const poly p, const ring r)
     m = p_LmInit(p, r);
     p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
 
-    p_SetComp(m, 0, r);
+    if( bSetZeroComp )
+      p_SetComp(m, 0, r);
     p_Setm(m, r);
 
-    assume( p_GetComp(m, r) == 0 );
+   
     assume( m != NULL );
     assume( pNext(m) == NULL );
     assume( p_LmTest(m, r) );
+   
+    if( bSetZeroComp )
+      assume( p_GetComp(m, r) == 0 );
   }
 
   return m;
@@ -224,6 +230,10 @@ void Sort_c_ds(const ideal id, const ring r)
 /// Clean up all the accumulated data
 void SchreyerSyzygyComputation::CleanUp()
 {
+  extern void id_Delete (ideal*, const ring);
+   
+ id_Delete(const_cast<ideal*>(&m_idTails), m_rBaseRing); // TODO!!!   
+}
   /*
   for( TTailTerms::const_iterator it = m_idTailTerms.begin(); it != m_idTailTerms.end(); it++ )
   {
@@ -232,14 +242,142 @@ void SchreyerSyzygyComputation::CleanUp()
       delete const_cast<CTailTerm*>(*vit);
   }
   */
-}
 
 
 
-void SchreyerSyzygyComputation::SetUpTailTerms(const ideal idTails)
+bool CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) const
 {
+   assume( t != NULL );
+   
+   if( __DEBUG__ && __TAILREDSYZ__ )
+     assume( !IsDivisible(t) ); // each input term should NOT be in <L>
+   
+   const ring r = m_rBaseRing;
+
+   
+   if( __TAILREDSYZ__ )
+     if( p_LmIsConstant(t, r) ) // most basic case of baing coprime with L, whatever that is...
+       return true; // TODO: prove this...?
+   
+//   return false; // appears to be fine
+
+   const long comp = p_GetComp(t, r);
+   
+   CReducersHash::const_iterator itr = m_hash.find(comp);
+   
+   if ( itr == m_hash.end() ) 
+     return true; // no such leading component!!!
+   
+  const bool bIdealCase = (comp == 0); 	 
+  const bool bSyzCheck = syzChecker.IsNonempty(); // need to check even in ideal case????? proof?  "&& !bIdealCase"
+   
+//   return false;
+   if( __TAILREDSYZ__ && (bIdealCase || bSyzCheck) )
+   {
+   const TReducers& v = itr->second;
+   const int N = rVar(r);
+   // TODO: extract exps of t beforehand?!
+   bool coprime = true;
+   for(TReducers::const_iterator vit = v.begin(); (vit != v.end()) && coprime; ++vit )
+   {
+     assume( m_L->m[(*vit)->m_label] == (*vit)->m_lt );
+      
+     const poly p = (*vit)->m_lt;
+      
+     assume( p_GetComp(p, r) == comp ); 
+      
+      // TODO: check if coprime with Leads... if __TAILREDSYZ__ !
+     for( int var = N; var > 0; --var )
+       if( (p_GetExp(p, var, r) != 0) && (p_GetExp(t, var, r) != 0) )
+       {	     
+	       if( __DEBUG__ || 0)
+		 {	       
+		    PrintS("CReducerFinder::PreProcessTerm, 't' is NOT co-prime with the following leading term: \n");
+		    dPrint(p, r, r, 1);
+		 }
+	       coprime = false; // t not coprime with p!
+	       break;
+       }
+      
+     if( bSyzCheck && coprime )
+     {
+	poly ss = p_LmInit(t, r);
+        p_SetCoeff0(ss, n_Init(1, r), r); // for delete & printout only!...
+        p_SetComp(ss, (*vit)->m_label + 1, r); // coeff?
+	p_Setm(ss, r);
+	
+	coprime = ( syzChecker.IsDivisible(ss) );
+
+	if( __DEBUG__ && !coprime)
+	  {	       
+	     PrintS("CReducerFinder::PreProcessTerm, 't' is co-prime with p but may lead to NOT divisible syz.term: \n");
+	     dPrint(ss, r, r, 1);
+	  }
+	
+	p_LmDelete(&ss, r); // deletes coeff as well???
+     }
+      
+   }
+      
+   if( __DEBUG__ && coprime )
+     PrintS("CReducerFinder::PreProcessTerm, the following 't' is 'co-prime' with all of leading terms! \n");
+      
+   return coprime; // t was coprime with all of leading terms!!! 
+      
+   }
+//   return true; // delete the term
+   
+   return false;
+
+
+}
+  
+   
+void SchreyerSyzygyComputation::SetUpTailTerms()
+{
+  const ideal idTails = m_idTails; 
   assume( idTails != NULL );
   assume( idTails->m != NULL );
+  const ring r = m_rBaseRing;
+
+   if( __DEBUG__ || 0)
+   {
+     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Tails: \n");
+     dPrint(idTails, r, r, 0);
+   }
+   
+  unsigned long pp = 0; // count preprocessed terms...
+
+  for( int p = IDELEMS(idTails) - 1; p >= 0; --p )
+    for( poly* tt = &(idTails->m[p]); (*tt) != NULL;  )
+       {   
+	  const poly t = *tt; 
+       if( m_div.PreProcessTerm(t, m_checker) )
+       {
+	  if( __DEBUG__ || 0)
+	  {	       
+	    PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): PP the following TT: \n");
+	    dPrint(t, r, r, 1);
+	  }
+	  ++pp;
+	    
+         (*tt) = p_LmDeleteAndNext(t, r); // delete the lead and next...
+       }   
+       else 
+         tt = &pNext(t); // go next?
+  
+       }
+
+   if( TEST_OPT_PROT || 1)
+     Print("**!!** SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing has eliminated %u terms!\n", pp);
+   
+
+   if( __DEBUG__ || 0)
+   {
+     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Preprocessed Tails: \n");
+     dPrint(idTails, r, r, 0);
+   }
+}
 /*  
   m_idTailTerms.resize( IDELEMS(idTails) );
   
@@ -264,7 +402,6 @@ void SchreyerSyzygyComputation::SetUpTailTerms(const ideal idTails)
     }
   }
 */
-}
 
 
 
@@ -567,7 +704,6 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 }
 
 
-
 void SchreyerSyzygyComputation::ComputeSyzygy()
 {
   assume( m_idLeads != NULL );
@@ -580,9 +716,33 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   const ring& R = m_rBaseRing;
 
   assume( IDELEMS(L) == IDELEMS(T) );
+  int t, r; 
 
   if( m_syzLeads == NULL )
+  {   
+    if( TEST_OPT_PROT && 1)
+    {
+/*       initTimer();
+       initRTimer();
+       startTimer();
+       startRTimer();*/
+   
+      t = getTimer();
+      r = getRTimer();
+      Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", getRTimer(), t, r);
+    }
+     
     ComputeLeadingSyzygyTerms( __LEAD2SYZ__ && !__IGNORETAILS__ ); // 2 terms OR 1 term!
+    if( TEST_OPT_PROT && 1)
+    {
+      t = getTimer() - t;
+      r = getRTimer() - r;
+	  
+      Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", getRTimer(), t, r);
+    }
+     
+  }
+     
 
   assume( m_syzLeads != NULL );
 
@@ -595,7 +755,50 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
   if( size == 1 && LL->m[0] == NULL )
     return;
+   
+  if(  !__IGNORETAILS__)
+  {
+    if( T != NULL )
+    {
 
+       if( TEST_OPT_PROT && 1 )
+	 {
+//       initTimer();
+//       initRTimer();
+//       startTimer();
+//       startRTimer();  
+   
+	    t = getTimer();
+	    r = getRTimer();
+	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", getRTimer(), t, r);
+	 }
+
+       SetUpTailTerms();
+       
+       if( TEST_OPT_PROT && 1)
+       {
+	  t = getTimer() - t;
+	  r = getRTimer()  - r;
+	  
+	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", getRTimer(), t, r);
+       }
+       
+  
+
+    }     
+  }
+
+       if( TEST_OPT_PROT && 1)
+	 {
+//       initTimer();
+//       initRTimer();
+//       startTimer();
+//       startRTimer();  
+   
+	    t = getTimer();
+	    r = getRTimer();
+	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", getRTimer(), t, r);
+	 }
 
   for( int k = size - 1; k >= 0; k-- )
   {
@@ -630,8 +833,18 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     }
 
   }
+   
+       if( TEST_OPT_PROT && 1)
+       {
+	  t = getTimer() - t;
+	  r = getRTimer();  - r;
+	  
+	  Print("%d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", getRTimer(), t, r);
+       }
 
-  TT->rank = id_RankFreeModule(TT, R);
+    
+
+  TT->rank = id_RankFreeModule(TT, R);  
 }
 
 void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTerms)
@@ -771,7 +984,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   assume(m_idTails !=  NULL && m_idTails->m != NULL);
   assume( tail >= 0 && tail < IDELEMS(m_idTails) );
 
-  const poly t = m_idTails->m[tail];
+  const poly t = m_idTails->m[tail]; // !!!
 
   if(t != NULL)
     return TraverseTail(multiplier, t);
@@ -1334,7 +1547,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 
     poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
 
-    poly pr = p_Mult_q( p_LmInit(multiplier, r), p_LmInit(t, r), r);
+    poly pr = p_Mult_q( leadmonom(multiplier, r, false), leadmonom(t, r, false), r);
     
     assume( p_EqualPolys(lm, pr, r) );
 
@@ -1393,16 +1606,8 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     
     return q;
   }
-
-  p_LmFree(q, r);
-
-  return NULL;
-
    
-  
-   
-   
-#if 0
+/*
   const long comp = p_GetComp(t, r); assume( comp >= 0 );
   const unsigned long not_sev = ~p_GetShortExpVector(multiplier, t, r); // !
 
@@ -1483,16 +1688,22 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     
     return q;
   }
+*/ 
 
   p_LmFree(q, r);
 
   return NULL;
-#endif
+  
 }
 
 
 poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const CReducerFinder& syz_checker) const
 {
+  CDivisorEnumerator itr(*this, product);
+  if( !itr.Reset() )
+    return NULL;
+
+
   const ring& r = m_rBaseRing;
 
   assume( product != NULL );
@@ -1521,6 +1732,55 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
     p_Delete(&lm, r);    
   }
 
+
+  const BOOLEAN to_check = (syz_checker.IsNonempty()); // __TAILREDSYZ__ && 
+
+  const poly q = p_New(r); pNext(q) = NULL;
+
+  if( __DEBUG__ )
+    p_SetCoeff0(q, 0, r); // for printing q
+
+  while( itr.MoveNext() )
+  {
+    const poly p = itr.Current().m_lt;
+    const int k  = itr.Current().m_label;
+     
+    p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
+    p_SetComp(q, k + 1, r);
+    p_Setm(q, r);
+
+    // cannot allow something like: a*gen(i) - a*gen(i)
+    if (syzterm != NULL && (k == c))
+      if (p_ExpVectorEqual(syzterm, q, r))
+      {
+        if( __DEBUG__ )
+        {
+          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          dPrint(syzterm, r, r, 1);
+        }    
+
+        continue;
+      }
+
+    // while the complement (the fraction) is not reducible by leading syzygies 
+    if( to_check && syz_checker.IsDivisible(q) ) 
+    {
+      if( __DEBUG__ )
+      {
+        PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
+      }
+
+      continue;
+    }
+
+    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+   
+    return q;
+  }
+   
+   
+   
+/*   
   const long comp = p_GetComp(product, r);
   const unsigned long not_sev = ~p_GetShortExpVector(product, r);
 
@@ -1604,6 +1864,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
     p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
     return q;
   }
+*/
 
   p_LmFree(q, r);
 

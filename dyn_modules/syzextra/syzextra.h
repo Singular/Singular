@@ -37,7 +37,7 @@ typedef idrec *   idhdl;
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
-poly leadmonom(const poly p, const ring r);
+poly leadmonom(const poly p, const ring r, const bool bSetZeroComp = true);
 
 /// return the tail of a given polynomial or vector
 /// returns NULL if input is NULL, otherwise
@@ -59,9 +59,8 @@ void Sort_c_ds(const ideal id, const ring r);
 
 
 /// Computation attribute storage
-class SchreyerSyzygyComputationFlags
+struct SchreyerSyzygyComputationFlags
 {
-  public: 
     SchreyerSyzygyComputationFlags(idhdl rootRingHdl);
 
     SchreyerSyzygyComputationFlags(const SchreyerSyzygyComputationFlags& attr):
@@ -92,7 +91,6 @@ class SchreyerSyzygyComputationFlags
   
   /// global base ring
   const ring m_rBaseRing;
-
 };
 
 class SchreyerSyzygyComputation;
@@ -159,7 +157,10 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     bool IsDivisible(const poly q) const;
 
-    bool IsNonempty() const { return !m_hash.empty(); }
+    inline bool IsNonempty() const { return !m_hash.empty(); }
+
+    /// is the term to be "preprocessed" as lower order term or lead to only reducible syzygies...
+    bool PreProcessTerm(const poly t, CReducerFinder& syzChecker) const;
 
     poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
     
@@ -177,6 +178,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     void operator=(const CReducerFinder&);
 };
 
+extern ideal id_Copy (const ideal, const ring);
 
 
 /** @class SchreyerSyzygyComputation syzextra.h
@@ -198,21 +200,16 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
-        m_idLeads(idLeads), m_idTails(idTails), 
+        m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
         m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL),
         m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
-      if( __TAILREDSYZ__ && !__IGNORETAILS__)
-      {
-        if( idTails != NULL )
-          SetUpTailTerms(idTails);
-      }
     }
 
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
-        m_idLeads(idLeads), m_idTails(idTails), 
+        m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
         m_syzLeads(syzLeads), m_syzTails(NULL), m_LS(syzLeads), 
         m_lcm(m_idLeads, setting), m_div(m_idLeads, setting), m_checker(NULL, setting)
     {
@@ -220,19 +217,18 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
       {
         if (syzLeads != NULL)
           m_checker.Initialize(syzLeads);
-        if( idTails != NULL )
-          SetUpTailTerms(idTails);
+//        if( idTails != NULL )
+//          SetUpTailTerms();
       }
     }
 
     /// Destructor should not destruct the resulting m_syzLeads, m_syzTails. 
-    ~SchreyerSyzygyComputation(){ CleanUp(); }
+    ~SchreyerSyzygyComputation(){ CleanUp(); } 
 
     /// Convert the given ideal of tails into the internal representation (with reducers!)
-    void SetUpTailTerms(const ideal idTails);
+    /// Preprocess m_idTails as well...?
+    void SetUpTailTerms();
     
-    void CleanUp();
-
     /// Read off the results while detaching them from this object
     /// NOTE: no copy!
     inline void ReadOffResult(ideal& syzL, ideal& syzT)
@@ -267,8 +263,10 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// just for testing via the wrapper below
     inline poly _FindReducer(const poly product, const poly syzterm) const
         { return m_div.FindReducer(product, syzterm, m_checker); }  
-    
+ private:
+    void CleanUp();
   protected:
+
 
     /// just leading terms
     ideal Compute1LeadingSyzygyTerms();
@@ -320,6 +318,9 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     
     TTailTerms m_idTailTerms;
     */
+
+   
+/// TODO: look into m_idTailTerms!!!!!!!!!!!!!!!!!!!!!!!! map? heaps???
 };
 
 
