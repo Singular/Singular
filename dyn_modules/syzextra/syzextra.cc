@@ -1018,7 +1018,7 @@ bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned 
   const poly p = m_lt;
 
   assume( p_GetComp(p, r) == p_GetComp(t, r) );
-  assume( p_GetComp(m, r) == 0 );
+// assume( p_GetComp(m, r) == 0 );
 
 //  const int k = m_label;
 //  assume( m_L->m[k] == p );
@@ -1035,8 +1035,111 @@ bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned 
 
 }
 
+
+
+/// TODO:
+class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
+{
+  private: 
+    const CReducerFinder& m_reds;
+    const poly m_product;
+    const unsigned long m_not_sev;
+    const unsigned long m_comp;
+
+    CReducerFinder::CReducersHash::const_iterator m_itr;
+    CReducerFinder::TReducers::const_iterator m_current, m_finish;
+
+    bool m_active;
+
+  public:
+    CDivisorEnumerator(const CReducerFinder& self, const poly product):
+        SchreyerSyzygyComputationFlags(self),
+        m_reds(self),
+        m_product(product),
+        m_not_sev(~p_GetShortExpVector(product, m_rBaseRing)),
+        m_comp(p_GetComp(product, m_rBaseRing)),
+        m_itr(), m_current(), m_finish(),
+        m_active(false)
+    {
+      assume( m_comp >= 0 );
+      assume( m_reds.m_L != NULL );  
+    }
+
+    inline bool Reset()
+    {
+      m_active = false;
+      
+      m_itr = m_reds.m_hash.find(m_comp);
+
+      if( m_itr == m_reds.m_hash.end() )
+        return false;
+
+      assume( m_itr->first == m_comp );
+
+      m_current = (m_itr->second).begin();
+      m_finish = (m_itr->second).end();
+
+      if (m_current == m_finish)
+        return false;
+
+//      m_active = true;
+      return true;      
+    }
+
+    const CLeadingTerm& Current() const
+    {
+      assume( m_active );
+      assume( m_current != m_finish );
+
+      return *(*m_current);
+    }
+ 
+    inline bool MoveNext()
+    {
+      assume( m_current != m_finish );
+
+      if( m_active )
+        ++m_current;
+      else
+        m_active = true; // for Current()
+      
+      // looking for the next good entry
+      for( ; m_current != m_finish; ++m_current )
+      {
+        assume( m_reds.m_L->m[Current().m_label] == Current().m_lt );
+
+        if( Current().DivisibilityCheck(m_product, m_not_sev, m_rBaseRing) )
+        {
+          if( __DEBUG__ )
+          {
+            Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().m_label);
+            dPrint(Current().m_lt, m_rBaseRing, m_rBaseRing, 1);
+          }
+
+//          m_active = true;
+          return true;
+        }
+      }
+
+      // the end... :(
+      assume( m_current == m_finish );
+      
+      m_active = false;
+      return false;
+    }
+};
+
+
+
 bool CReducerFinder::IsDivisible(const poly product) const
 {
+  CDivisorEnumerator itr(*this, product);
+  if( !itr.Reset() )
+    return false;
+
+  return itr.MoveNext();
+  
+/*  
   const ring& r = m_rBaseRing;
   
   const long comp = p_GetComp(product, r);
@@ -1046,10 +1149,10 @@ bool CReducerFinder::IsDivisible(const poly product) const
 
   CReducersHash::const_iterator it = m_hash.find(comp); // same module component
 
+  assume( m_L != NULL );  
+
   if( it == m_hash.end() )
     return false;
-
-  assume( m_L != NULL );  
 
   const TReducers& reducers = it->second;
 
@@ -1070,6 +1173,7 @@ bool CReducerFinder::IsDivisible(const poly product) const
   }
 
   return false;
+*/  
 }
 
 
@@ -1103,11 +1207,111 @@ void CReducerFinder::DebugPrint() const
 }
 #endif
 
-poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
-                                 const poly syzterm, const CReducerFinder& syz_checker) const
+/// TODO:
+class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
 {
-  // don't case about the module component of multiplier (as it may be
-  // the syzygy term)
+  private: 
+    const CReducerFinder& m_reds;
+    const poly m_multiplier, m_term;
+    const unsigned long m_not_sev;
+    const unsigned long m_comp;
+
+    CReducerFinder::CReducersHash::const_iterator m_itr;
+    CReducerFinder::TReducers::const_iterator m_current, m_finish;
+
+    bool m_active;
+
+  public:
+    CDivisorEnumerator2(const CReducerFinder& self, const poly m, const poly t):
+        SchreyerSyzygyComputationFlags(self),
+        m_reds(self),
+        m_multiplier(m), m_term(t),
+        m_not_sev(~p_GetShortExpVector(m, t, m_rBaseRing)),
+        m_comp(p_GetComp(t, m_rBaseRing)),
+        m_itr(), m_current(), m_finish(),
+        m_active(false)
+    {
+      assume( m_comp >= 0 );
+      assume( m_reds.m_L != NULL );  
+      assume( m_multiplier != NULL ); 
+      assume( m_term != NULL );
+//      assume( p_GetComp(m_multiplier, m_rBaseRing) == 0 );
+    }
+
+    inline bool Reset()
+    {
+      m_active = false;
+      
+      m_itr = m_reds.m_hash.find(m_comp);
+
+      if( m_itr == m_reds.m_hash.end() )
+        return false;
+
+      assume( m_itr->first == m_comp );
+
+      m_current = (m_itr->second).begin();
+      m_finish = (m_itr->second).end();
+
+      if (m_current == m_finish)
+        return false;
+
+      return true;      
+    }
+
+    const CLeadingTerm& Current() const
+    {
+      assume( m_active );
+      assume( m_current != m_finish );
+
+      return *(*m_current);
+    }
+ 
+    inline bool MoveNext()
+    {
+      assume( m_current != m_finish );
+
+      if( m_active )
+        ++m_current;
+      else 
+        m_active = true;
+	 
+      
+      // looking for the next good entry
+      for( ; m_current != m_finish; ++m_current )
+      {
+        assume( m_reds.m_L->m[Current().m_label] == Current().m_lt );
+
+        if( Current().DivisibilityCheck(m_multiplier, m_term, m_not_sev, m_rBaseRing) )
+        {
+          if( __DEBUG__ )
+          {
+            Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().m_label);
+            dPrint(Current().m_lt, m_rBaseRing, m_rBaseRing, 1);
+          }
+
+//          m_active = true;
+          return true;
+          
+        }
+      }
+
+      // the end... :(
+      assume( m_current == m_finish );
+      
+      m_active = false;
+      return false;
+    }
+};
+   
+poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
+                                 const poly syzterm,
+                                 const CReducerFinder& syz_checker) const
+{
+  CDivisorEnumerator2 itr(*this, multiplier, t);
+  if( !itr.Reset() )
+    return NULL;
+
+  // don't care about the module component of multiplier (as it may be the syzygy term)
   // product = multiplier * t?
   const ring& r = m_rBaseRing;
 
@@ -1140,12 +1344,67 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     p_Delete(&lm, r);    
     p_Delete(&pr, r);    
   }
+   
+  const BOOLEAN to_check = (syz_checker.IsNonempty()); // __TAILREDSYZ__ && 
 
-  const long comp = p_GetComp(t, r);
+  const poly q = p_New(r); pNext(q) = NULL;
+
+  if( __DEBUG__ )
+    p_SetCoeff0(q, 0, r); // for printing q
+
+  while( itr.MoveNext() )
+  {
+    const poly p = itr.Current().m_lt;
+    const int k  = itr.Current().m_label;
+     
+    p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t // TODO: do it once?
+    p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
+    
+    p_SetComp(q, k + 1, r);
+    p_Setm(q, r);
+
+    // cannot allow something like: a*gen(i) - a*gen(i)
+    if (syzterm != NULL && (k == c))
+      if (p_ExpVectorEqual(syzterm, q, r))
+      {
+        if( __DEBUG__ )
+        {
+          Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
+          dPrint(syzterm, r, r, 1);
+        }    
+
+        continue;
+      }
+
+    // while the complement (the fraction) is not reducible by leading syzygies 
+    if( to_check && syz_checker.IsDivisible(q) ) 
+    {
+      if( __DEBUG__ )
+      {
+        PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
+      }
+
+      continue;
+    }
+
+    number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
+    p_SetCoeff0(q, n_Neg( n_Div(n, p_GetCoeff(p, r), r), r), r);
+    n_Delete(&n, r);
+    
+    return q;
+  }
+
+  p_LmFree(q, r);
+
+  return NULL;
+
+   
   
+   
+   
+#if 0
+  const long comp = p_GetComp(t, r); assume( comp >= 0 );
   const unsigned long not_sev = ~p_GetShortExpVector(multiplier, t, r); // !
-
-  assume( comp >= 0 );
 
 //   for( int k = IDELEMS(L)-1; k>= 0; k-- )
 //   {
@@ -1165,13 +1424,6 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
   assume( m_L != NULL );
 
   const TReducers& reducers = it->second;
-
-  const BOOLEAN to_check = (syz_checker.IsNonempty()); // __TAILREDSYZ__ && 
-
-  const poly q = p_New(r); pNext(q) = NULL;
-
-  if( __DEBUG__ )
-    p_SetCoeff0(q, 0, r); // for printing q
 
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
   {
@@ -1235,6 +1487,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
   p_LmFree(q, r);
 
   return NULL;
+#endif
 }
 
 

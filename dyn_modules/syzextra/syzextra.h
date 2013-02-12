@@ -138,54 +138,13 @@ class CLeadingTerm
 // TODO: needs a specialized variant without a component (hash!)
 class CReducerFinder: public SchreyerSyzygyComputationFlags
 {
+  friend class CDivisorEnumerator;
+  friend class CDivisorEnumerator2;
   private:
     typedef long TComponentKey;
     typedef std::vector<const CLeadingTerm*> TReducers;
     typedef std::map< TComponentKey, TReducers> CReducersHash;
 
-/*
-    /// TODO:
-    class const_iterator: public TReducers::const_iterator
-    {
-      typedef TReducers::const_iterator TBase;
-      private: 
-//        const TReducers& m_reds;
-        const TBase m_the_end;
-
-        const_iterator(TBase start, TBase end):
-            TBase(start), m_the_end(end)
-        { find_proper(); }
-                    
-      public:        
-        inline bool at_end() const { return m_the_end == (*this); }
-
-        inline const_iterator& operator++()
-        {
-          find_next();
-          return *this;
-        }
-        
-        inline const_iterator operator++(int)
-        {
-          const_iterator tmp(*this);
-          find_next();
-          return tmp;
-        }
-
-      protected:
-        bool is_proper() const; // difficult - needs all of CReducerFinder internals!?
-        
-        inline void find_next()
-        {
-          while (!at_end())
-          {
-            static_cast<TBase*>(this)->operator++();
-            if( is_proper() ) break;
-          }
-        }
-    };
-*/
-    
   public:
     /// goes over all leading terms
     CReducerFinder(const ideal L, const SchreyerSyzygyComputationFlags& flags);
