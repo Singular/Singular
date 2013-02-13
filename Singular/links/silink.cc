@@ -774,7 +774,10 @@ static int DumpRhs(FILE *fd, idhdl h)
 
     if (rhs == NULL) return EOF;
 
-    if (type_id == INTVEC_CMD) fprintf(fd, "intvec(");
+    BOOLEAN need_klammer=FALSE;
+    if (type_id == INTVEC_CMD) { fprintf(fd, "intvec(");need_klammer=TRUE; }
+    else if (type_id == IDEAL_CMD) { fprintf(fd, "ideal(");need_klammer=TRUE; }
+    else if (type_id == MODUL_CMD) { fprintf(fd, "module(");need_klammer=TRUE; }
 
     if (fprintf(fd, "%s", rhs) == EOF) return EOF;
     omFree(rhs);
@@ -788,7 +791,7 @@ static int DumpRhs(FILE *fd, idhdl h)
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) { omFree(rhs); return EOF;}
       omFree(rhs);
     }
-    else if (type_id == INTVEC_CMD) fprintf(fd, ")");
+    else if (need_klammer) fprintf(fd, ")");
   }
   return 1;
 }
