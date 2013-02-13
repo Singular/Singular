@@ -1,12 +1,12 @@
 ACLOCAL_AMFLAGS = -I m4
 
 if ENABLE_FACTORY
-  USE_FACTORY = factory 
+  USE_FACTORY = factory
 else
   USE_FACTORY =
 endif
- 
-PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming dyn_modules
+
+PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming dyn_modules gfanlib
 
 SUBDIRS=$(PACKAGES)
 
