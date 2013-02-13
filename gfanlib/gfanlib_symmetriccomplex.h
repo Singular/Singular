@@ -80,6 +80,7 @@ namespace gfan{
   void insert(Cone const &c);
   int getMaxDim()const;
   int getMinDim()const;
+  int getLinDim()const;
   bool isMaximal(Cone const &c)const;
   bool isPure()const;
   ZVector fvector(bool boundedPart=false)const;
