@@ -113,7 +113,7 @@ void StringAppendS(const char *st)
     if ((more=ll+2+(l=strlen(st)))>feBufferLength)
     {
       more = ((more + (8*1024-1))/(8*1024))*(8*1024);
-      feBuffer=(char *)omReallocSize((void *)feBuffer,feBufferLength,
+      feBuffer=(char *)omreallocSize((void *)feBuffer,feBufferLength,
                                                        more);
       feBufferLength=more;
       feBufferStart=feBuffer+ll;
