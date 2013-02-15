@@ -7,4 +7,4 @@
 
 "$SINGULAR_EXECUTABLE" -teq "$srcdir/syzextra.tst" || exit 1
 
-"$SINGULAR_EXECUTABLE" -tec 'LIB "schreyer.lib"; testSimple(0); $' || exit 1
+"$SINGULAR_EXECUTABLE" -tec 'LIB "schreyer.lib"; /*testSimple(0);*/ $' || exit 1
