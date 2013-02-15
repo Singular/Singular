@@ -1206,8 +1206,10 @@ BOOLEAN iiAlias(leftv p)
   h->next=NULL;
   if (h->rtyp!=IDHDL)
   {
-    WerrorS("identifier required");
-    return TRUE;
+    BOOLEAN res=iiAssign(p,h);
+    h->CleanUp();
+    omFreeBin((ADDRESS)h, sleftv_bin);
+    return res;
   }
   if (h->Typ()!=p->Typ())
   {
