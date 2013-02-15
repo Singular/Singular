@@ -13,7 +13,7 @@
 #ifndef FAC_BIVAR_H
 #define FAC_BIVAR_H
 
-#include "config.h"
+// #include "config.h"
 
 #include "cf_assert.h"
 #include "timing.h"

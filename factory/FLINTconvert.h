@@ -14,7 +14,7 @@
 #ifndef FLINT_CONVERT_H
 #define FLINT_CONVERT_H
 
-#include <config.h>
+// #include "config.h"
 #include "canonicalform.h"
 #include "fac_util.h"
 

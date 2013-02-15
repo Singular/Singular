@@ -88,7 +88,7 @@ but users of versions 4.0 or later should adhere to the terms of the GNU GPL.
 #ifndef FAC_NTL_ZZ_PEX_GCD_H
 #define FAC_NTL_ZZ_PEX_GCD_H
 
-#include <config.h>
+// #include "config.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
