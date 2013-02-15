@@ -232,6 +232,10 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
+#if (defined(__APPLE__) && defined(__MACH__)) && (!defined(HAVE_ELF_SYSTEM))
+#define HAVE_ELF_SYSTEM
+#endif
+
 #if defined(SunOS_5)
 #define HAVE_ELF_SYSTEM
 #endif
