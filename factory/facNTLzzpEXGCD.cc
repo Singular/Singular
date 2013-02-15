@@ -83,7 +83,7 @@ but users of versions 4.0 or later should adhere to the terms of the GNU GPL.
 **/
 
 
-#include <config.h>
+#include "config.h"
 
 #include "facNTLzzpEXGCD.h"
 
