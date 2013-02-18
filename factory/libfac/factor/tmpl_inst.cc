@@ -12,18 +12,15 @@
 #include "cf_assert.h"
 #include "cf_reval.h"
 
-#include "templates/ftmpl_array.cc"
-#include "templates/ftmpl_factor.cc"
+//#include "templates/ftmpl_array.cc"
+//#include "templates/ftmpl_factor.cc"
 #include "templates/ftmpl_list.cc"
-#include "templates/ftmpl_functions.h"
-#include "templates/ftmpl_matrix.cc"
+//#include "templates/ftmpl_functions.h"
+//#include "templates/ftmpl_matrix.cc"
 
 // place here your own template stuff, not instantiated by factory
 #include <libfac/factor/tmpl_inst.h>
 #include <libfac/factor/class.cc>
-
-template class List<int>;
-template class ListIterator<int>;
 
 template class List<IntList>;
 template class ListIterator<IntList>;
@@ -40,11 +37,6 @@ template OSTREAM & operator << ( OSTREAM &, const List<IntList> & );
 // for charsets:
 template class List<CFList>;
 template class ListIterator<CFList>;
-template class List<Variable>;
-template class ListIterator<Variable> ;
-
-template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
-template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
 #ifndef NOSTREAMIO
 template OSTREAM & operator << ( OSTREAM &, const List<CFList> & );
