@@ -917,40 +917,22 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
   if (degBuf0 > 0 && degBuf1 > 0)
     M (j + 1, 1)= mulNTL (bufFactors[0] [j], bufFactors[1] [j], b);
   CanonicalForm uIZeroJ;
-  if (j == 1)
-  {
-    if (degBuf0 > 0 && degBuf1 > 0)
-      uIZeroJ= mulNTL ((bufFactors[0] [0] + bufFactors[0] [j]),
-                  (bufFactors[1] [0] + buf[1]), b) - M(1, 1) - M(j + 1, 1);
-    else if (degBuf0 > 0)
-      uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1], b);
-    else if (degBuf1 > 0)
-      uIZeroJ= mulNTL (bufFactors[0], buf[1], b);
-    else
-      uIZeroJ= 0;
-    if (b.getp() != 0)
-      uIZeroJ= b (uIZeroJ);
-    Pi [0] += xToJ*uIZeroJ;
-    if (b.getp() != 0)
-      Pi [0]= b (Pi[0]);
-  }
+
+  if (degBuf0 > 0 && degBuf1 > 0)
+    uIZeroJ= mulNTL ((bufFactors[0] [0] + bufFactors[0] [j]),
+                    (bufFactors[1] [0] + buf[1]), b) - M(1, 1) - M(j + 1, 1);
+  else if (degBuf0 > 0)
+    uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1], b);
+  else if (degBuf1 > 0)
+    uIZeroJ= mulNTL (bufFactors[0], buf[1], b);
   else
-  {
-    if (degBuf0 > 0 && degBuf1 > 0)
-      uIZeroJ= mulNTL ((bufFactors[0] [0] + bufFactors[0] [j]),
-                  (bufFactors[1] [0] + buf[1]), b) - M(1, 1) - M(j + 1, 1);
-    else if (degBuf0 > 0)
-      uIZeroJ= mulNTL (bufFactors[0] [j], bufFactors[1], b);
-    else if (degBuf1 > 0)
-      uIZeroJ= mulNTL (bufFactors[0], buf[1], b);
-    else
-      uIZeroJ= 0;
-    if (b.getp() != 0)
-      uIZeroJ= b (uIZeroJ);
-    Pi [0] += xToJ*uIZeroJ;
-    if (b.getp() != 0)
-      Pi [0]= b (Pi[0]);
-  }
+    uIZeroJ= 0;
+  if (b.getp() != 0)
+    uIZeroJ= b (uIZeroJ);
+  Pi [0] += xToJ*uIZeroJ;
+  if (b.getp() != 0)
+    Pi [0]= b (Pi[0]);
+
   CFArray tmp= CFArray (factors.length() - 1);
   for (k= 0; k < factors.length() - 1; k++)
     tmp[k]= 0;
@@ -1444,32 +1426,17 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   if (degBuf0 > 0 && degBuf1 > 0)
     M (j + 1, 1)= mulMod (bufFactors[0] [j], bufFactors[1] [j], MOD);
   CanonicalForm uIZeroJ;
-  if (j == 1)
-  {
-    if (degBuf0 > 0 && degBuf1 > 0)
-      uIZeroJ= mulMod ((bufFactors[0] [0] + bufFactors[0] [j]),
+
+  if (degBuf0 > 0 && degBuf1 > 0)
+    uIZeroJ= mulMod ((bufFactors[0] [0] + bufFactors[0] [j]),
                   (bufFactors[1] [0] + buf[1]), MOD) - M(1, 1) - M(j + 1, 1);
-    else if (degBuf0 > 0)
-      uIZeroJ= mulMod (bufFactors[0] [j], bufFactors[1], MOD);
-    else if (degBuf1 > 0)
-      uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
-    else
-      uIZeroJ= 0;
-    Pi [0] += xToJ*uIZeroJ;
-  }
+  else if (degBuf0 > 0)
+    uIZeroJ= mulMod (bufFactors[0] [j], bufFactors[1], MOD);
+  else if (degBuf1 > 0)
+    uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
   else
-  {
-    if (degBuf0 > 0 && degBuf1 > 0)
-      uIZeroJ= mulMod ((bufFactors[0] [0] + bufFactors[0] [j]),
-                  (bufFactors[1] [0] + buf[1]), MOD) - M(1, 1) - M(j + 1, 1);
-    else if (degBuf0 > 0)
-      uIZeroJ= mulMod (bufFactors[0] [j], bufFactors[1], MOD);
-    else if (degBuf1 > 0)
-      uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
-    else
-      uIZeroJ= 0;
-    Pi [0] += xToJ*uIZeroJ;
-  }
+    uIZeroJ= 0;
+  Pi [0] += xToJ*uIZeroJ;
 
   CFArray tmp= CFArray (factors.length() - 1);
   for (k= 0; k < factors.length() - 1; k++)
@@ -1886,7 +1853,7 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
     else if (degPi > 0)
       uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1]);
     else if (degBuf > 0)
-      uIZeroJ= mulNTL (Pi[l - 1], buf[1]);
+      uIZeroJ= mulNTL (Pi[l - 1], buf[l+1]);
     else
       uIZeroJ= 0;
 
@@ -2269,7 +2236,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
     else if (degPi > 0)
       uIZeroJ= mulMod (uIZeroJ, bufFactors[l + 1], MOD);
     else if (degBuf > 0)
-      uIZeroJ= mulMod (Pi[l - 1], buf[1], MOD);
+      uIZeroJ= mulMod (Pi[l - 1], buf[l + 1], MOD);
     else
       uIZeroJ= 0;
 

@@ -606,9 +606,11 @@ static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalF
 static CanonicalForm
 gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
 {
+    if (f.inCoeffDomain() || g.inCoeffDomain()) //zero case should be caught by gcd
+      return 1;
     CanonicalForm pi, pi1;
     CanonicalForm C, Ci, Ci1, Hi, bi, pi2;
-    bool bpure;
+    bool bpure, ezgcdon= isOn (SW_USE_EZGCD_P);
     int delta = degree( f ) - degree( g );
 
     if ( delta >= 0 )
@@ -619,8 +621,28 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     {
         pi = g; pi1 = f; delta = -delta;
     }
-    Ci = content( pi ); Ci1 = content( pi1 );
-    pi1 = pi1 / Ci1; pi = pi / Ci;
+    if (pi.isUnivariate())
+      Ci= 1;
+    else
+    {
+      if (!ezgcdon)
+        On (SW_USE_EZGCD_P);
+      Ci = content( pi );
+      if (!ezgcdon)
+        Off (SW_USE_EZGCD_P);
+      pi = pi / Ci;
+    }
+    if (pi1.isUnivariate())
+      Ci1= 1;
+    else
+    {
+      if (!ezgcdon)
+        On (SW_USE_EZGCD_P);
+      Ci1 = content( pi1 );
+      if (!ezgcdon)
+        Off (SW_USE_EZGCD_P);
+      pi1 = pi1 / Ci1;
+    }
     C = gcd( Ci, Ci1 );
     int d= 0;
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
@@ -682,7 +704,7 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
         pi2 = pi2 / bi;
         pi = pi1; pi1 = pi2;
         maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
-        if (!(pi1.isUnivariate()) && (size (pi1)/maxNumVars > 500))
+        if (!pi1.isUnivariate() && (size (pi1)/maxNumVars > 500))
         {
             On (SW_USE_FF_MOD_GCD);
             C *= gcd (oldPi, oldPi1);
@@ -700,7 +722,7 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
             Hi = power( LC( pi1, v ), delta ) / powHi;
             if (!(pi.isUnivariate() && pi1.isUnivariate()))
             {
-              if (size (Hi)*size (pi)/(maxNumVars*3) > 500) //maybe this needs more tuning
+              if (size (Hi)*size (pi)/(maxNumVars*3) > 1500) //maybe this needs more tuning
               {
                 On (SW_USE_FF_MOD_GCD);
                 C *= gcd (oldPi, oldPi1);
@@ -716,7 +738,17 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
       //out_cf("GCD:",C,"\n");
       return C;
     }
-    pi /= content( pi );
+    if (!pi.isUnivariate())
+    {
+      if (!ezgcdon)
+        On (SW_USE_EZGCD_P);
+      Ci= gcd (LC (oldPi,v), LC (oldPi1,v));
+      pi /= LC (pi,v)/Ci;
+      Ci= content (pi);
+      pi /= Ci;
+      if (!ezgcdon)
+        Off (SW_USE_EZGCD_P);
+    }
     if ( bpure )
         pi /= pi.lc();
     C=abs(C*pi);
