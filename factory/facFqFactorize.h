@@ -607,9 +607,11 @@ getLeadingCoeffs (const CanonicalForm& A,  ///< [in] some poly
 
 /// normalize precomputed leading coefficients such that leading coefficients
 /// evaluated at @a evaluation in K^(n-2) equal the leading coeffs wrt 
-/// Variable(1) of bivariate factors
+/// Variable(1) of bivariate factors and change @a A and @a Aeval accordingly
 void
-prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out] 
+prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out]
+                      CanonicalForm& A,           ///<[in,out]
+                      CFList& Aeval,              ///<[in,out]
                       int n,                      ///<[in] level of poly to be
                                                   ///< factored
                       const CFList& leadingCoeffs,///<[in] precomputed leading
@@ -682,6 +684,113 @@ precomputeLeadingCoeff (const CanonicalForm& LCF,       ///<[in] a multivariate
                                                         ///< has been changed to
                                                         ///< y
                        );
+
+/// changes the second variable to be @a w and updates all relevant data
+void
+changeSecondVariable (CanonicalForm& A,        ///<[in,out] a multivariate poly
+                      CFList& biFactors,       ///<[in,out] bivariate factors
+                      CFList& evaluation,      ///<[in,out] evaluation point
+                      CFList*& oldAeval,       ///<[in,out] old bivariate factors
+                                               ///< wrt. different second vars
+                      int lengthAeval2,        ///<[in] length of oldAeval
+                      const CFList& uniFactors,///<[in] univariate factors
+                      const Variable& w        ///<[in] some variable
+                     );
+
+/// distributes a divisor LCmultiplier of LC(A,1) on the bivariate factors and
+/// the precomputed leading coefficients
+void
+distributeLCmultiplier (CanonicalForm& A,               ///<[in,out] some poly
+                        CFList& leadingCoeffs,          ///<[in,out] leading
+                                                        ///< coefficients
+                        CFList& biFactors,              ///<[in,out] bivariate
+                                                        ///< factors
+                        const CFList& evaluation,       ///<[in] eval. point
+                        const CanonicalForm& LCmultipler///<[in] multiplier
+                       );
+
+/// heuristic to distribute @a LCmultiplier onto factors based on the variables
+/// that occur in @a LCmultiplier and in the leading coeffs of bivariate factors
+void
+LCHeuristic (CanonicalForm& A,                 ///<[in,out] a poly
+             const CanonicalForm& LCmultiplier,///<[in,out] divisor of LC (A,1)
+             CFList& biFactors,                ///<[in,out] bivariate factors
+             CFList*& leadingCoeffs,           ///<[in,out] leading coeffs
+             const CFList* oldAeval,           ///<[in] bivariate factors wrt.
+                                               ///< different second vars
+             int lengthAeval,                  ///<[in] length of oldAeval
+             const CFList& evaluation,         ///<[in] evaluation point
+             const CFList& oldBiFactors        ///<[in] bivariate factors
+                                               ///< without LCmultiplier
+                                               ///< distributed on them
+            );
+
+/// checks if prod(LCs)==LC (oldA,1) and if so divides elements of leadingCoeffs
+/// by elements in contents, sets A to oldA and sets foundTrueMultiplier to true
+void
+LCHeuristicCheck (const CFList& LCs,        ///<[in] leading coeffs computed
+                  const CFList& contents,   ///<[in] content of factors
+                  CanonicalForm& A,         ///<[in,out] oldA*LCmultiplier^m
+                  const CanonicalForm& oldA,///<[in] some poly
+                  CFList& leadingCoeffs,    ///<[in,out] leading coefficients
+                  bool& foundTrueMultiplier ///<[in,out] success?
+                 );
+
+/// heuristic to distribute @a LCmultiplier onto factors based on the contents
+/// of @a factors. @a factors are assumed to come from LucksWangSparseHeuristic.
+/// If not successful @a contents will contain the content of each element of @a
+/// factors and @a LCs will contain the LC of each element of @a factors divided
+/// by its content
+void
+LCHeuristic2 (const CanonicalForm& LCmultiplier,///<[in] divisor of LC (A,1)
+              const CFList& factors,            ///<[in] result of
+                                                ///< LucksWangSparseHeuristic
+              CFList& leadingCoeffs,            ///<[in,out] leading coeffs
+              CFList& contents,                 ///<[in,out] content of factors
+              CFList& LCs,                      ///<[in,out] LC of factors
+                                                ///< divided by content of
+                                                ///< factors
+              bool& foundTrueMultiplier         ///<[in,out] success?
+             );
+
+/// heuristic to remove @a LCmultiplier from a factor based on the contents
+/// of @a factors. @a factors are assumed to come from LucksWangSparseHeuristic.
+void
+LCHeuristic3 (const CanonicalForm& LCmultiplier,///<[in] divisor of LC (A,1)
+              const CFList& factors,            ///<[in] result of
+                                                ///< LucksWangSparseHeuristic
+              const CFList& oldBiFactors,       ///<[in] bivariate factors
+                                                ///< without LCmultiplier
+                                                ///< distributed on them
+              const CFList& contents,           ///<[in] content of factors
+              const CFList* oldAeval,           ///<[in] bivariate factors wrt.
+                                                ///< different second vars
+              CanonicalForm& A,                 ///<[in,out] poly
+              CFList*& leadingCoeffs,           ///<[in,out] leading coeffs
+              int lengthAeval,                  ///<[in] length of oldAeval
+              bool& foundMultiplier             ///<[in,out] success?
+             );
+
+/// heuristic to remove factors of @a LCmultiplier from @a factors.
+/// More precisely checks if elements of @a contents divide @a LCmultiplier.
+/// Assumes LCHeuristic3 is run before it and was successful.
+void
+LCHeuristic4 (const CFList& oldBiFactors,   ///<[in] bivariate factors
+                                            ///< without LCmultiplier
+                                            ///< distributed on them
+              const CFList* oldAeval,       ///<[in] bivariate factors wrt.
+                                            ///< different second vars
+              const CFList& contents,       ///<[in] content of factors
+              const CFList& factors,        ///<[in] result of
+                                            ///< LucksWangSparseHeuristic
+              const CanonicalForm& testVars,///<[in] product of second vars that
+                                            ///< occur among oldAeval
+              int lengthAeval,              ///<[in] length of oldAeval
+              CFList*& leadingCoeffs,       ///<[in,out] leading coeffs
+              CanonicalForm& A,             ///<[in,out] poly
+              CanonicalForm& LCmultiplier,  ///<[in,out] divisor of LC (A,1)
+              bool& foundMultiplier         ///<[in] success?
+             );
 
 #endif
 /* FAC_FQ_FACTORIZE_H */

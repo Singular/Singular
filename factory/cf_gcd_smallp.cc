@@ -32,6 +32,7 @@
 #include "cf_iter.h"
 #include "cfNewtonPolygon.h"
 #include "cf_algorithm.h"
+#include "cf_primes.h"
 
 // iinline helper functions:
 #include "cf_map_ext.h"
@@ -819,11 +820,10 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       else
         cH= uni_content (H);
       ppH= H/cH;
+      ppH /= Lc (ppH);
       CanonicalForm lcppH= gcdlcAlcB/cH;
-      CanonicalForm ccoF= lcA/lcppH;
-      ccoF /= Lc (ccoF);
-      CanonicalForm ccoG= lcB/lcppH;
-      ccoG /= Lc (ccoG);
+      CanonicalForm ccoF= lcppH/Lc (lcppH);
+      CanonicalForm ccoG= lcppH/Lc (lcppH);
       ppCoF= coF/ccoF;
       ppCoG= coG/ccoG;
       if (inextension)
@@ -835,10 +835,9 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         {
           CFList u, v;
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-          ppH /= Lc(ppH);
           ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
           ppCoF= mapDown (ppCoF, prim_elem, im_prim_elem, alpha, u, v);
-          ppCoF= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
+          ppCoG= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           if (compressConvexDense)
           {
@@ -1213,7 +1212,11 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     if (d0 == 0)
     {
       if (inextension)
+      {
+        ppA= GFMapDown (ppA, k);
+        ppB= GFMapDown (ppB, k);
         setCharacteristic (p, k, gf_name_buf);
+      }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
@@ -1266,11 +1269,10 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       else
         cH= uni_content (H);
       ppH= H/cH;
+      ppH /= Lc (ppH);
       CanonicalForm lcppH= gcdlcAlcB/cH;
-      CanonicalForm ccoF= lcA/lcppH;
-      ccoF /= Lc (ccoF);
-      CanonicalForm ccoG= lcB/lcppH;
-      ccoG /= Lc (ccoG);
+      CanonicalForm ccoF= lcppH/Lc (lcppH);
+      CanonicalForm ccoG= lcppH/Lc (lcppH);
       ppCoF= coF/ccoF;
       ppCoG= coG/ccoG;
       if (inextension)
@@ -1623,7 +1625,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_START (gcd_recursion);
       G_random_element=
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
-                        coF_random_element, coG_random_element, alpha,
+                        coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
@@ -3904,7 +3906,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     if (!find (l, random_element))
       l.append (random_element);
 
-    if ((getCharacteristic() > 3 && size (skeleton) < 100))
+    if ((getCharacteristic() > 3 && size (skeleton) < 200))
     {
       CFArray Monoms;
       CFArray* coeffMonoms= NULL;
@@ -4119,6 +4121,8 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 
       } while (1); //end of second do
     }
+    else
+      return N(gcdcAcB*GCD_small_p (ppA, ppB));
   } while (1); //end of first do
 }
 
@@ -4380,8 +4384,18 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   LCs [2]= MM (LeadCoeffs [2]);
 
   CFList evaluation;
+  long termEstimate= size (U);
   for (int i= A.min(); i <= A.max(); i++)
+  {
+    if (!A[i].isZero() && (getCharacteristic() > degree (U,i))) //TODO find a good estimate for getCharacteristic() <= degree (U,i)
+    {
+      termEstimate *= degree (U,i)*2;
+      termEstimate /= 3;
+    }
     evaluation.append (A [i]);
+  }
+  if (termEstimate/getNumVars(U) > 500)
+    return -1;
   CFList UEval;
   CanonicalForm shiftedU= myShift2Zero (U, UEval, evaluation);
 
@@ -4547,7 +4561,19 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   {
     if( F.mvar() == G.mvar() )
       d *= gcd( F, G );
+    else
+      return N (d);
     return N (d);
+  }
+  if ( F.isUnivariate())
+  {
+    g= content (G,G.mvar());
+    return N(d*gcd(F,g));
+  }
+  if ( G.isUnivariate())
+  {
+    f= content (F,F.mvar());
+    return N(d*gcd(G,f));
   }
 
   int maxNumVars= tmax (getNumVars (F), getNumVars (G));
@@ -4933,7 +4959,12 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*result);
         }
         else
-          return N (d*GCD_small_p (F,G));
+        {
+          if (p >= cf_getBigPrime(0))
+            return N (d*sparseGCDFp (F,G));
+          else
+            return N (d*GCD_small_p (F,G));
+        }
       }
 
       if (gcdfound == 1)
