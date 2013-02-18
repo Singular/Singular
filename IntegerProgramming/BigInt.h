@@ -11,6 +11,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <string.h>
+#include <stddef.h>
 #include <gmp.h>
 
 class BigInt
