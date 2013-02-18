@@ -200,7 +200,7 @@ struct n_Procs_s
 
    /// chinese remainder
    /// returns X with X mod q[i]=x[i], i=0..rl-1
-   number  (*cfChineseRemainder)(number *x, number *q,int rl, const coeffs);
+   number  (*cfChineseRemainder)(number *x, number *q,int rl, BOOLEAN sym,const coeffs);
 
    /// degree for coeffcients: -1 for 0, 0 for "constants", ...
    int (*cfParDeg)(number x,const coeffs r);
@@ -653,9 +653,9 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
   return !n_IsZero(b, r);
 }
 
-static inline number n_ChineseRemainder(number *a, number *b, int rl, const coeffs r)
+static inline number n_ChineseRemainderSym(number *a, number *b, int rl, BOOLEAN sym,const coeffs r)
 {
-  assume(r != NULL); assume(r->cfChineseRemainder != NULL); return r->cfChineseRemainder(a,b,rl,r);
+  assume(r != NULL); assume(r->cfChineseRemainder != NULL); return r->cfChineseRemainder(a,b,rl,sym,r);
 }
 
 static inline number n_Farey(number a, number b, const coeffs r)

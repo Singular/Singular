@@ -721,7 +721,6 @@ number nlIntDiv (number a, number b, const coeffs r)
     }
     long aa=SR_TO_INT(a);
     long bb=SR_TO_INT(b);
-    //return INT_TO_SR((aa-(aa%bb))/bb);
     return INT_TO_SR(aa/bb);
   }
   if (SR_HDL(a) & SR_INT)
@@ -759,10 +758,10 @@ number nlIntDiv (number a, number b, const coeffs r)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    FREE_RNUMBER(bb); // omFreeBin((void *)bb, rnumber_bin);
+    FREE_RNUMBER(bb);
   }
   u=nlShort3(u);
-  nlTest(u, r);
+  nlTest(u,r);
   return u;
 }
 
@@ -781,45 +780,14 @@ number nlIntMod (number a, number b, const coeffs r)
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    //return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
-    if ((long)a>0L)
-    {
-      if ((long)b>0L)
-        return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
-      else
-        return INT_TO_SR(SR_TO_INT(a)%(-SR_TO_INT(b)));
-    }
-    else
-    {
-      if ((long)b>0L)
-      {
-        long i=(-SR_TO_INT(a))%SR_TO_INT(b);
-        if ( i != 0L ) i = (SR_TO_INT(b))-i;
-        return INT_TO_SR(i);
-      }
-      else
-      {
-        long i=(-SR_TO_INT(a))%(-SR_TO_INT(b));
-        if ( i != 0L ) i = (-SR_TO_INT(b))-i;
-        return INT_TO_SR(i);
-      }
-    }
+    LONG bb=SR_TO_INT(b);
+    LONG c=SR_TO_INT(a)%bb;
+    return INT_TO_SR(c);
   }
   if (SR_HDL(a) & SR_INT)
   {
-    /* a is a small and b is a large int: -> a or (a+b) or (a-b) */
-    if ((long)a<0L)
-    {
-      if (mpz_isNeg(b->z))
-        return nlSub(a,b,r);
-      /*else*/
-        return nlAdd(a,b,r);
-    }
-    /*else*/
-      return a;
-
     /* a is a small and b is a large int: -> a */
-    //return a;
+    return a;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
@@ -840,7 +808,7 @@ number nlIntMod (number a, number b, const coeffs r)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    FREE_RNUMBER(bb); // omFreeBin((void *)bb, rnumber_bin);
+    FREE_RNUMBER(bb);
   }
   if (mpz_isNeg(u->z))
   {
@@ -850,7 +818,7 @@ number nlIntMod (number a, number b, const coeffs r)
       mpz_add(u->z,u->z,b->z);
   }
   u=nlShort3(u);
-  nlTest(u, r);
+  nlTest(u,r);
   return u;
 }
 
@@ -2631,36 +2599,44 @@ void    nlCoeffWrite  (const coeffs, BOOLEAN /*details*/)
   PrintS("//   characteristic : 0\n");
 }
 
-number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
+number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const coeffs CF)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
 #ifdef HAVE_FACTORY
   setCharacteristic( 0 ); // only in char 0
+  Off(SW_RATIONAL);
   CFArray X(rl), Q(rl);
   int i;
   for(i=rl-1;i>=0;i--)
   {
-    X[i]=C->convSingNFactoryN(x[i],FALSE,C); // may be larger MAX_INT
-    Q[i]=C->convSingNFactoryN(q[i],FALSE,C); // may be larger MAX_INT
+    X[i]=CF->convSingNFactoryN(x[i],FALSE,CF); // may be larger MAX_INT
+    Q[i]=CF->convSingNFactoryN(q[i],FALSE,CF); // may be larger MAX_INT
   }
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);
-  number n=C->convFactoryNSingN(xnew,C);
-  number p=C->convFactoryNSingN(qnew,C);
-  number p2=nlIntDiv(p,nlInit(2, C),C);
-  if (nlGreater(n,p2,C))
+  number n=CF->convFactoryNSingN(xnew,CF);
+  if (sym)
   {
-     number n2=nlSub(n,p,C);
-     nlDelete(&n,C);
-     n=n2;
+    number p=CF->convFactoryNSingN(qnew,CF);
+    number p2=nlIntDiv(p,nlInit(2, CF),CF);
+    if (nlGreater(n,p2,CF))
+    {
+       number n2=nlSub(n,p,CF);
+       nlDelete(&n,CF);
+       n=n2;
+    }
+    nlDelete(&p2,CF);
+    nlDelete(&p,CF);
   }
-  nlDelete(&p,C);
-  nlDelete(&p2,C);
   return n;
 #else
   WerrorS("not implemented");
-  return nlInit(0, C);
+  return nlInit(0,CF);
 #endif
+}
+number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
+{
+  return nlChineseRemainderSym(x,q,rl,TRUE,C);
 }
 
 static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
@@ -2874,7 +2850,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfSize  = nlSize;
   r->cfInt  = nlInt;
 
-  r->cfChineseRemainder=nlChineseRemainder;
+  r->cfChineseRemainder=nlChineseRemainderSym;
   r->cfFarey=nlFarey;
   #ifdef HAVE_RINGS
   //r->cfDivComp = NULL; // only for ring stuff

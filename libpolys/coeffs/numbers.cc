@@ -76,7 +76,7 @@ number ndFarey(number,number,const coeffs r)
   Werror("farey not implemented for (c=%d)",getCoeffType(r));
   return NULL;
 }
-number ndChineseRemainder(number *,number *,int,const coeffs r)
+number ndChineseRemainder(number *,number *,int,BOOLEAN,const coeffs r)
 {
   Werror("ChineseRemainder not implemented for (c=%d)",getCoeffType(r));
   return n_Init(0,r); 

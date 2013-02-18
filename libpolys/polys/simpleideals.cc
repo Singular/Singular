@@ -1767,3 +1767,31 @@ ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing)
 
   return(idResult);
 }
+
+ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
+{
+  int cnt=IDELEMS(xx[0])*xx[0]->nrows;
+  ideal result=idInit(cnt,xx[0]->rank);
+  result->nrows=xx[0]->nrows; // for lifting matrices
+  result->ncols=xx[0]->ncols; // for lifting matrices
+  int i,j;
+  number *x=(number *)omAlloc(rl*sizeof(number));
+  poly *p=(poly *)omAlloc(rl*sizeof(poly));
+  for(i=cnt-1;i>=0;i--)
+  {
+    for(j=rl-1;j>=0;j--)
+    {
+      p[j]=xx[j]->m[i];
+    }
+    result->m[i]=p_ChineseRemainder(p,x,q,rl,r);
+    for(j=rl-1;j>=0;j--)
+    {
+      xx[j]->m[i]=p[j];
+    }
+  }
+  omFreeSize(p,rl*sizeof(poly));
+  omFreeSize(x,rl*sizeof(number));
+  for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]),r);
+  omFreeSize(xx,rl*sizeof(ideal));
+  return result;
+}

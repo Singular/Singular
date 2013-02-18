@@ -1642,7 +1642,7 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
     q[i]=n_Init((*p)[i], coeffs_BIGINT);
     x[i]=n_Init((*c)[i], coeffs_BIGINT);
   }
-  number n=n_ChineseRemainder(x,q,rl,coeffs_BIGINT);
+  number n=n_ChineseRemainderSym(x,q,rl,FALSE,coeffs_BIGINT);
   for(i=rl-1;i>=0;i--)
   {
     n_Delete(&(q[i]),coeffs_BIGINT);
@@ -1719,7 +1719,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  lists c=(lists)u->CopyD(); // list of ideal
+  lists c=(lists)u->CopyD(); // list of ideal or bigint/int
   lists pl=NULL;
   intvec *p=NULL;
   if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
@@ -1815,17 +1815,19 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
         else
         for(i++;i<rl;i++)
         {
-          n_Delete(&(q[i]),currRing->cf);
+          n_Delete(&(q[i]),currRing);
         }
+
         omFree(x); // delete c
         omFree(q); // delete pl
+        if (xx!=NULL) omFree(xx); // delete c
         return TRUE;
       }
     }
   }
   if (return_type==BIGINT_CMD)
   {
-    number n=n_ChineseRemainder(xx,q,rl,coeffs_BIGINT);
+    number n=n_ChineseRemainderSym(xx,q,rl,TRUE,coeffs_BIGINT);
     res->data=(char *)n;
   }
   else
@@ -1842,7 +1844,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   else
   for(i=rl-1;i>=0;i--)
   {
-    n_Delete(&(q[i]),currRing->cf);
+    n_Delete(&(q[i]),currRing);
   }
   omFree(q);
   res->rtyp=return_type;
