@@ -5103,13 +5103,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else // (0/p, a, b, ..., z)
       {
-        assume( (ch == 0) || (ch==IsPrime(ch)) );
-
-//         if ((pars > 1) && (ffChar))
-//         {
-//           WerrorS("too many parameters");
-//           goto rInitError;
-//         }
+	if ((ch!=0) && (ch!=IsPrime(ch))) 
+	{
+	  WerrorS("too many parameters");
+	  goto rInitError;
+	}
 
         char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
 
