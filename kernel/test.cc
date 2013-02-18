@@ -104,7 +104,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include "ratgring.h"
 #include "shiftgb.h"
 // #include "mmalloc.h" // move to Singular!?
-#include "gfan.h"
 
 #include "kutil.h"
 
@@ -127,8 +126,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include "f5gb.h"
 #include "f5lists.h"
 ////////#include "F5cLists.h"
-
-#include "gfan.h"
 
 
 #include "GMPrat.h"
@@ -618,7 +615,7 @@ int main( int, char *argv[] )
 
   PrintLn();
   { char* s = StringEndS(); PrintS(s); omFree(s); }
-   
+
   TestGBEngine();
   TestSimpleRingArithmetcs();
 

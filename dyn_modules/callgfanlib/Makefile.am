@@ -1,8 +1,13 @@
-moduledir = $(bindir)/MOD
+moduledir = $(libexecdir)/singular/MOD
 
 if HAVE_GFANLIB
 if ENABLE_P_PROCS_DYNAMIC
-  module_LTLIBRARIES=gfanlib.la gfanlib_g.la
+  module_LTLIBRARIES=gfanlib.la
+
+if WANT_DEBUG
+  module_LTLIBRARIES+=gfanlib_g.la
+endif
+  
 endif
 endif
 
@@ -24,7 +29,7 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 -I${top_srcdir}/factory/include -I${top_builddir}/factory/include \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
-AMLDFLAGS	=  -L${top_builddir}/gfanlib -lgfan
+#AMLDFLAGS	=  -L${abs_top_builddir}/gfanlib/
 # -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel \
 # -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
 
@@ -41,6 +46,9 @@ gfanlib_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 
 gfanlib_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
 gfanlib_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+
+gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la
+gfanlib_g_la_LIBADD = ${gfanlib_la_LIBADD}
 
 if ENABLE_P_PROCS_DYNAMIC
   P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -shared -module

@@ -1,12 +1,12 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
+if HAVE_GFANLIB
+  libgfan_LTLIBRARIES=libgfan.la
 if WANT_DEBUG
-  LIB_G=libgfan_g.la
-else
-  LIB_G=
+  libgfan_LTLIBRARIES+=libgfan_g.la
+endif
 endif
 
-libgfan_LTLIBRARIES = libgfan.la ${LIB_G}
 libgfandir = $(libdir)/
 
 CXXTEMPLFLAGS =-ftrapv

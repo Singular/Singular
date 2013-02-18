@@ -24,29 +24,41 @@ LT_INIT
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([gmp.h])
+
+LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+SING_CHECK_GFANLIB
+
+# AC_CHECK_HEADERS([gmp.h])
+# if test "$ac_cv_header_gmp_h" == no
+# then
+#	AC_MSG_WARN([Error, gmp.h is missing!])
+#	exit 1
+# fi
 AC_CHECK_HEADERS([setoper.h])
+if test "$ac_cv_header_setoper_h" == no 
+then
+	AC_MSG_WARN([Error, setoper.h is missing!])
+fi
+
 AC_CHECK_HEADERS([cdd.h],,,
 [
 # include <setoper.h>
 ])
 
-if test "$ac_cv_header_gmp_h" == no
-then
-	AC_MSG_WARN([Error, gmp.h is missing!])
-	exit 1
-fi
-
 if test "$ac_cv_header_cdd_h" == no
 then
 	AC_MSG_WARN([Error, cdd.h is missing!])
-	exit 1
 fi
 
-if test "$ac_cv_header_setoper_h" == no
+if test "x$ENABLE_GFANLIB" = xyes; then
+if test "$ac_cv_header_setoper_h" == no 
 then
-	AC_MSG_WARN([Error, setoper.h is missing!])
 	exit 1
+fi
+if test "$ac_cv_header_cdd_h" == no
+then
+	exit 1
+fi
 fi
 
 # Checks for typedefs, structures, and compiler characteristics.

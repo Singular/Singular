@@ -1,18 +1,16 @@
 ACLOCAL_AMFLAGS = -I m4
 
+USE_FACTORY =
 if ENABLE_FACTORY
-  USE_FACTORY = factory
-else
-  USE_FACTORY =
+  USE_FACTORY += factory
 endif
 
-PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming dyn_modules gfanlib
+PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming gfanlib dyn_modules 
 
-SUBDIRS=$(PACKAGES)
-
+SUBDIRS =$(PACKAGES)
 TESTDIRS=$(PACKAGES)
 
-
+ 
 emacsdir=$(datadir)/singular/emacs
 
 EMACS = \
@@ -23,7 +21,7 @@ EMACS = \
     emacs/singular.xpm  emacs/.emacs-general  emacs/.emacs-singular
 
 #++ hlp-cmpl.el lib-cmpl.el ex-cmpl.el cmd-cmpl.el ??
-#-- emacs/BUGS     emacs/cmpl.pl     emacs/ESingular.emacs21     emacs/lib.pl     emacs/Makefile.in     emacs/singular.el.decl 
+#-- emacs/BUGS     emacs/cmpl.pl     emacs/ESingular.emacs21     emacs/lib.pl     emacs/Makefile.in     emacs/singular.el.decl
 
 dist_emacs_DATA = $(EMACS)
 
@@ -33,8 +31,7 @@ dist_emacs_DATA = $(EMACS)
 #	[ -d ${builddir}/emacs ] || ln -s ${srcdir}/emacs ${builddir}
 
 
-EXTRA_DIST = autogen.sh $(EMACS)
-
+EXTRA_DIST = autogen.sh $(EMACS) 
 
 bin_SCRIPTS = libsingular-config
 

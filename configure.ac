@@ -156,18 +156,17 @@ if test "x$ENABLE_FACTORY" = xyes; then
 fi
 
 AC_CONFIG_SUBDIRS([libpolys])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])
-AC_CONFIG_FILES([IntegerProgramming/Makefile])
 AC_CONFIG_FILES([dyn_modules/Makefile])
 AC_CONFIG_FILES([dyn_modules/bigintm/Makefile])
 AC_CONFIG_FILES([dyn_modules/syzextra/Makefile])
-if test "x$ENABLE_GFANLIB" = xyes; then
- AC_CONFIG_SUBDIRS([gfanlib])
- AC_CONFIG_FILES([dyn_modules/callgfanlib/Makefile])
-fi
+AC_CONFIG_FILES([dyn_modules/callgfanlib/Makefile])
+AC_CONFIG_FILES([IntegerProgramming/Makefile])
 AC_CONFIG_FILES([libsingular-config])
+AC_CONFIG_SUBDIRS([gfanlib])
 
 AC_OUTPUT
