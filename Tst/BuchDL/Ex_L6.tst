@@ -122,7 +122,7 @@ def F = factorize(I[1],1); F;
 //->   F[2]=z2+1
 ring R1 = (0,a), (x,y), lp;
 map phi = R,x,y,a;
-number n = number(phi(F)[2]); minpoly = n; kill phi; map phi = R,x,y,a;
+number n = number(phi(F)[2]); minpoly = n; if(defined(phi)){kill phi;} map phi = R,x,y,a;
 ideal Iz = phi(I);              // substitute a for z   
 Iz = simplify(Iz,2); Iz;        // remove zero generators
 //->   Iz[1]=y2
@@ -135,7 +135,7 @@ def Fzy = factorize(Izy[1],1); Fzy;
 //->   Fzy[2]=x+1
 ring R2 = (0,b), (x,y), lp;
 map phi = R,x,y,b;
-number n = number(phi(F)[1]); minpoly = n; kill phi; map phi = R,x,y,b;
+number n = number(phi(F)[1]); minpoly = n; if(defined(phi)){kill phi;} map phi = R,x,y,b;
 ideal Iz = phi(I);              // substitute a for z   
 Iz = simplify(Iz,2); Iz;        // remove zero generators    
 //->   Iz[1]=y2+(b2+1)
