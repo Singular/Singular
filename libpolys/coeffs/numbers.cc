@@ -44,7 +44,7 @@
 
 
 //static int characteristic = 0;
-extern int IsPrime(int p);
+//extern int IsPrime(int p);
 
 n_Procs_s *cf_root=NULL;
 
