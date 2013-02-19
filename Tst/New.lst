@@ -20,4 +20,4 @@ New/ignoring_denominators_of_coefficients.tst
 New/syz_cleardenom.tst
 New/sat_cleardenom.tst
 New/quotient_cleardenom.tst
-
+New/testParametrization_2.tst
