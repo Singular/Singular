@@ -242,6 +242,7 @@ Short/sres_s.tst
 Short/std_s.tst
 ;MP Short/stratify.tst
 Short/string.tst
+Short/symodstd.tst
 Short/test_c_dp.tst
 Short/triang_s.tst
 ; Short/tropical.tst ;; too long ?
