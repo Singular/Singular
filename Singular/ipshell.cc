@@ -5290,8 +5290,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   if (cf==NULL)
   {
     const int ch=32003;
-    Warn("Invalid ground field specification: using the default field: Z_{%d}", ch);
+    Werror("Invalid ground field specification");
     cf=nInitChar(n_Zp, (void*)(long)ch);
+    goto rInitError;
   }
 
   assume( R != NULL );
@@ -5326,7 +5327,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   if (rComplete(R,1))
     goto rInitError;
 
-#ifdef HABE_RINGS
+#ifdef HAVE_RINGS
 // currently, coefficients which are ring elements require a global ordering:
   if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
