@@ -20,9 +20,10 @@ the experimental @sc{Letterplace} extension of @sc{Singular}.
 
 For further details, please, refer to the papers 
 
-[LL09]:  Roberto La Scala and Viktor Levandovskyy, "Letterplace ideals and non-commutative Groebner bases", Journal of Symbolic Computation, Volume 44, Issue 10, October 2009, Pages 1374-1393. 
+[LL09]:  Roberto La Scala and Viktor Levandovskyy, "Letterplace ideals and non-commutative Groebner bases", Journal of Symbolic Computation, Volume 44, Issue 10, October 2009, Pages 1374-1393, see @url{http://dx.doi.org/10.1016/j.jsc.2009.03.002}.  
 
-[LL10]: Roberto La Scala and Viktor Levandovskyy, "Skew polynomial rings, Groebner bases and the letterplace embedding of the free associative algebra", @url{http://arxiv.org/abs/1009.4152}.
+[LL13]: Roberto La Scala and Viktor Levandovskyy, "Skew polynomial rings, Groebner bases and the letterplace embedding of the free associative algebra", 
+Journal of Symbolic Computation, Volume 48, Issue 1, January 2013, Pages 1374-1393, see @url{http://dx.doi.org/10.1016/j.jsc.2012.05.003} and also @url{http://arxiv.org/abs/1009.4152}.
 
 All algebras are assumed to be associative @math{K}-algebras for some field @math{K}.
 
