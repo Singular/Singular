@@ -17,3 +17,5 @@ New/trans_ext_poly_read.tst
 New/trans_ext_std.tst
 New/print_param_poly_short.tst
 New/ignoring_denominators_of_coefficients.tst
+New/syz_cleardenom.tst
+
