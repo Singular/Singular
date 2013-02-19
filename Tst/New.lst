@@ -21,3 +21,4 @@ New/syz_cleardenom.tst
 New/sat_cleardenom.tst
 New/quotient_cleardenom.tst
 New/testParametrization_2.tst
+New/imap_minimal.tst
