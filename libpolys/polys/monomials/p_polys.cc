@@ -3535,11 +3535,11 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   PrintS("\nDestination Ring: \n");
   rWrite(dst);
 
-  Print("\nOldPar: %d\n", OldPar);
+  /*Print("\nOldPar: %d\n", OldPar);
   for( int i = 1; i <= OldPar; i++ )
   {
     Print("par(%d) -> par/var (%d)\n", i, par_perm[i-1]);
-  }
+  }*/
 #endif
   if( z == NULL )
      return NULL;
@@ -3592,7 +3592,14 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
 
   assume( nMap != NULL );
 
-  poly qq = p_PermPoly(zz, par_perm - 1, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
+  poly qq;
+  if (rPar (srcExtRing) || (!rPar (srcExtRing) && !rPar ()))
+  {
+    assume (par_perm != NULL);
+    qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
+  }
+  else
+    qq = p_PermPoly(zz, par_perm, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
 //       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
 
 //  assume( FALSE );  WarnS("longalg missing 2");
@@ -3628,10 +3635,22 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     {
       qq = p_Init(dst);
       assume( nMap != NULL );
+      //PrintS("p in other branch: ");
+      //p_Write (p, oldRing); PrintLn();
+
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
 
+      assume (n_Test (n,dst->cf));
+
       if ( nCoeff_is_algExt(dst->cf) )
+      {
+
+      //PrintS("n: ");
+      //p_Write ((poly) n, dst->cf->extRing); PrintLn();
         n_Normalize(n, dst->cf);
+      //PrintS("n nach normalize: ");
+      //p_Write ((poly)n, dst->cf->extRing); PrintLn();
+      }
 
       p_GetCoeff(qq, dst) = n;// Note: n can be a ZERO!!!
       // coef may be zero:
@@ -3648,7 +3667,16 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       p_Test(aq, dst);
 
       if ( nCoeff_is_algExt(dst->cf) )
+      {
+      //PrintS("p: ");
+      //p_Write (p, oldRing); PrintLn();
+      //PrintS("aq for normalize: ");
+      //p_Write (aq, dst);PrintLn();
         p_Normalize(aq,dst);
+      //PrintS("aq after normalize: ");
+      //p_Write (aq, dst);PrintLn();
+      }
+
 
       if (aq == NULL)
         p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!

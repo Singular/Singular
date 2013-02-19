@@ -920,10 +920,13 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
 }
 #endif
 
-number naCopyExt(number a, const coeffs src, const coeffs)
+number naCopyExt(number a, const coeffs src, const coeffs dst)
 {
   fraction fa=(fraction)a;
-  return (number)p_Copy(NUM(fa),src->extRing);
+  poly p = p_Copy(NUM(fa),src->extRing);
+  assume( rSamePolyRep(src->extRing, dst->extRing) );
+  definiteReduce(p, dst->extRing->qideal->m[0], dst);
+  return (number)p;
 }
 
 /* assumes that src = Q, dst = Z/p(a) */
@@ -994,8 +997,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
-    if (strcmp(rRingVar(0, src->extRing),
-               rRingVar(0, dst->extRing)) == 0)
+    if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0, src->extRing), rRingVar(0, dst->extRing)) == 0))
     {
       if (src->type==n_algExt)
          return ndCopyMap; // naCopyMap;         /// Q(a)   --> Q(a)
@@ -1008,7 +1010,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
-    if (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0)
+    if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0))
     {
       if (src->type==n_algExt)
         return ndCopyMap; // naCopyMap;          /// Z/p(a) --> Z/p(a)
