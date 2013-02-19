@@ -3187,6 +3187,7 @@ int uResultant::nextPrime( const int i )
 {
   int init=i;
   int ii=i+2;
+  extern int IsPrime(int p); // from Singular/ipshell.{h,cc}
   int j= IsPrime( ii );
   while ( j <= init )
   {
