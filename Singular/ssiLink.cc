@@ -541,7 +541,7 @@ ring ssiReadRing(ssiInfo *d)
         wvhdl[i]=(int*)omAlloc((block1[i]-block0[i]+1)*sizeof(int));
         int ii;
         for(ii=block0[i];ii<=block1[i];ii++)
-          wvhdl[i][ii-block0[i]]-s_readint(d->f_read);
+          wvhdl[i][ii-block0[i]]=s_readint(d->f_read);
       }
       break;
 
