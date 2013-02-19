@@ -608,12 +608,19 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
   ntTest(a);
   ntTest(b);
   number aNumCoeff = NULL; int aNumDeg = -1;
+  number aDenCoeff = NULL; int aDenDeg = -1;
   number bNumCoeff = NULL; int bNumDeg = -1;
+  number bDenCoeff = NULL; int bDenDeg = -1;
   if (!IS0(a))
   {
     fraction fa = (fraction)a;
     aNumDeg = p_Totaldegree(NUM(fa), ntRing);
     aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
+    if (DEN(fa)!=NULL)
+    {
+      aDenDeg = p_Totaldegree(DEN(fa), ntRing);
+      aDenCoeff=p_GetCoeff(DEN(fa),ntRing);
+    }
   }
   else return !(ntGreaterZero (b,cf));
   if (!IS0(b))
@@ -621,11 +628,25 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
     fraction fb = (fraction)b;
     bNumDeg = p_Totaldegree(NUM(fb), ntRing);
     bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
+    if (DEN(fb)!=NULL)
+    {
+      bDenDeg = p_Totaldegree(DEN(fb), ntRing);
+      bDenCoeff=p_GetCoeff(DEN(fb),ntRing);
+    }
   }
   else return ntGreaterZero(a,cf);
-  if (aNumDeg > bNumDeg) return TRUE;
-  if (aNumDeg < bNumDeg) return FALSE;
-  return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
+  if (aNumDeg-aDenDeg > bNumDeg-bDenDeg) return TRUE;
+  if (aNumDeg-aDenDeg < bNumDeg-bDenDeg) return FALSE;
+  number aa;
+  number bb;
+  if (bDenCoeff==NULL) aa=n_Copy(aNumCoeff,ntRing->cf);
+  else                 aa=n_Mult(aNumCoeff,bDenCoeff,ntRing->cf);
+  if (aDenCoeff==NULL) bb=n_Copy(bNumCoeff,ntRing->cf);
+  else                 bb=n_Mult(bNumCoeff,aDenCoeff,ntRing->cf);
+  BOOLEAN rr= n_Greater(aa, bb, ntCoeffs);
+  n_Delete(&aa,ntRing->cf);
+  n_Delete(&bb,ntRing->cf);
+  return rr;
 }
 
 /* this method will only consider the numerator of a, without cancelling
