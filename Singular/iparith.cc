@@ -62,10 +62,9 @@
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 #ifdef HAVE_FACTORY
+#  include <factory/factory.h>
 #  include <polys/clapsing.h>
 #  include <kernel/kstdfac.h>
-#endif /* HAVE_FACTORY */
-#ifdef HAVE_FACTORY
 #  include <kernel/fglm.h>
 #  include <Singular/fglm.h>
 #endif /* HAVE_FACTORY */
@@ -2350,6 +2349,17 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
 {
+#ifdef HAVE_FACTORY
+  number n1 = (number) u->CopyD();
+  number n2 = (number) v->CopyD();
+  CanonicalForm C1, C2;
+  C1 = coeffs_BIGINT->convSingNFactoryN (n1,TRUE,coeffs_BIGINT);
+  C2 = coeffs_BIGINT->convSingNFactoryN (n2,TRUE,coeffs_BIGINT);
+  CanonicalForm G = gcd (C1,C2);
+  number g = coeffs_BIGINT->convFactoryNSingN (G,coeffs_BIGINT);
+  res->data = g;
+  return FALSE;
+#else
   number a=(number) u->Data();
   number b=(number) v->Data();
   if (n_IsZero(a,coeffs_BIGINT))
@@ -2363,6 +2373,7 @@ static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
     else res->data=(char *)n_Gcd(a, b, coeffs_BIGINT);
   }
   return FALSE;
+#endif
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
 {
