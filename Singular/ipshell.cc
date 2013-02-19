@@ -5046,7 +5046,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       int l = 0;
       while ((ch!=fftable[l]) && (fftable[l])) l++;
-      if (fftable[l]==0) ch = IsPrime(ch);
+      if (fftable[l]==0)
+      {
+        Werror("illegal GF-table size %d\n   ? Invalid ground field specification",ch);
+	goto rInitError;
+      }
       else
       {
         char *m[1]={(char *)sNoName};
