@@ -132,6 +132,7 @@ enum {
   RESULTANT_CMD,
   RINGLIST_CMD,
   ROWS_CMD,
+  SBA_CMD, /* dummy for sw-migration */
   SIMPLEX_CMD,
   SLIM_GB_CMD,
   SQR_FREE_CMD,
