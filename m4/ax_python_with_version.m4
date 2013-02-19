@@ -25,9 +25,10 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
     if test -z "$PYTHON"
     then
         AC_MSG_CHECKING(for --with-python)
-        AC_ARG_WITH(
+# @<:@=@<:@embed,@:>@PYTHON@:>@
+          AC_ARG_WITH(
             python,
-            AS_HELP_STRING([--with-python@<:@=@<:@embed,@:>@PYTHON@:>@],
+            AS_HELP_STRING([--with-python],
                 [absolute path name of Python executable]
             ),
             [],[withval="yes"]
