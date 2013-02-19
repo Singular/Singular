@@ -9,6 +9,7 @@
 *.la
 .libs
 doc/
+AUTOGEN_generated_stuff
 MOD
 libsingular-config
 factory/readcf.cc
