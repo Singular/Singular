@@ -5078,6 +5078,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       if (ch!=0)
       {
+        if (ch<2)
+        {
+          Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
+          ch=32003;
+        }
         ch=IsPrime(ch);
         cf = nInitChar(n_Zp, (void*)(long)ch);
       }
