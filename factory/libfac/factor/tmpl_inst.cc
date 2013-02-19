@@ -22,8 +22,8 @@
 #include <libfac/factor/tmpl_inst.h>
 #include <libfac/factor/class.cc>
 
-template class List<IntList>;
-template class ListIterator<IntList>;
+//template class List<IntList>;
+//template class ListIterator<IntList>;
 
 template class Substitution<CanonicalForm>;
 template class List<SForm>;
@@ -35,8 +35,8 @@ template OSTREAM & operator << ( OSTREAM &, const List<IntList> & );
 #endif
 
 // for charsets:
-template class List<CFList>;
-template class ListIterator<CFList>;
+//template class List<CFList>;
+//template class ListIterator<CFList>;
 
 #ifndef NOSTREAMIO
 template OSTREAM & operator << ( OSTREAM &, const List<CFList> & );
