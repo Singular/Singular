@@ -14,7 +14,7 @@ TESTDIRS=$(PACKAGES)
 
 
 emacsdir=$(datadir)/emacs
-dist_emacs_DATA =  emacs/BUGS \
+EMACS = emacs/BUGS \
     emacs/ChangeLog \
     emacs/cmpl.pl \
     emacs/COPYING \
@@ -26,13 +26,15 @@ dist_emacs_DATA =  emacs/BUGS \
     emacs/singular.el.decl \
     emacs/singular.xpm
 
+dist_emacs_DATA = $(EMACS)
+
 # emacs/test.sing
 # TODO: remove this!
 #all-local:
 #	[ -d ${builddir}/emacs ] || ln -s ${srcdir}/emacs ${builddir}
 
 
-EXTRA_DIST = autogen.sh emacs
+EXTRA_DIST = autogen.sh $(EMACS)
 
 
 bin_SCRIPTS = libsingular-config
