@@ -36,12 +36,12 @@ si_link_extension slInitDBMExtension(si_link_extension s)
 
   s->Open=(slOpenProc)dynl_sym_warn(handle, "dbOpen");
   s->Close=(slCloseProc)dynl_sym_warn(handle, "dbClose");
-  s->Kill=(slKillProc)dynl_sym_warn(handle, "dbClose");
+  s->Kill=NULL;
   s->Read=(slReadProc)dynl_sym_warn(handle, "dbRead1");
   s->Read2=(slRead2Proc)dynl_sym_warn(handle, "dbRead2");
   s->Write=(slWriteProc)dynl_sym_warn(handle, "dbWrite");
 
-  if (s->Open == NULL || s->Close == NULL || s->Kill == NULL ||
+  if (s->Open == NULL || s->Close == NULL || 
       s->Read == NULL || s->Read2 == NULL)
     return NULL;
 

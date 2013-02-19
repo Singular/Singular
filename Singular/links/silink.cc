@@ -219,6 +219,23 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
   return res;
 }
 
+BOOLEAN slPrepClose(si_link l)
+{
+
+  if(! SI_LINK_OPEN_P(l))
+    return FALSE;
+
+  BOOLEAN res = TRUE;
+  if (l->m->PrepClose != NULL)
+  {
+    res = l->m->PrepClose(l);
+    if (res)
+      Werror("close: Error for link of type: %s, mode: %s, name: %s",
+           l->m->type, l->mode, l->name);
+  }
+  return res;
+}
+
 BOOLEAN slClose(si_link l)
 {
 
@@ -338,7 +355,6 @@ BOOLEAN slDump(si_link l)
     if (res)
       Werror("dump: Error for link of type %s, mode: %s, name: %s",
              l->m->type, l->mode, l->name);
-
     if (!SI_LINK_R_OPEN_P(l)) slClose(l); // do not close r/w links
     return res;
   }
@@ -382,7 +398,7 @@ BOOLEAN slGetDump(si_link l)
 
 
 /* =============== ASCII ============================================= */
-BOOLEAN slOpenAscii(si_link l, short flag, leftv)
+BOOLEAN slOpenAscii(si_link l, short flag, leftv h)
 {
   const char *mode;
   if (flag & SI_LINK_OPEN)
@@ -840,7 +856,7 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   s->next = NULL;
   si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
 
-  if (0) 0;
+  if (0) 0; // dummy
 #ifdef HAVE_DBM
   else if (strcmp(type, "DBM") == 0)
     s->next = slInitDBMExtension(ns);
@@ -876,7 +892,7 @@ void slStandardInit()
   si_link_root=(si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
   si_link_root->Open=slOpenAscii;
   si_link_root->Close=slCloseAscii;
-  si_link_root->Kill=slCloseAscii;
+  si_link_root->Kill=NULL;
   si_link_root->Read=slReadAscii;
   si_link_root->Read2=slReadAscii2;
   si_link_root->Write=slWriteAscii;

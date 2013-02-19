@@ -22,6 +22,7 @@ typedef ip_link *          si_link;
 typedef BOOLEAN    (*slOpenProc)(si_link l, short flag, leftv h);
 typedef BOOLEAN    (*slWriteProc)(si_link l, leftv lv);
 typedef BOOLEAN    (*slCloseProc)(si_link l);
+typedef BOOLEAN    (*slPrepCloseProc)(si_link l);
 typedef BOOLEAN    (*slKillProc)(si_link l);
 typedef leftv      (*slReadProc)(si_link l);
 typedef leftv      (*slRead2Proc)(si_link l, leftv a);
@@ -34,6 +35,7 @@ struct s_si_link_extension
   si_link_extension next;
   slOpenProc       Open;
   slCloseProc      Close;
+  slPrepCloseProc  PrepClose;
   slKillProc       Kill;
   slReadProc       Read;
   slRead2Proc      Read2;
@@ -75,6 +77,7 @@ struct sip_link
 
 BOOLEAN slOpen(si_link l, short flag, leftv h);
 BOOLEAN slClose(si_link l);
+BOOLEAN slPrepClose(si_link l);
 leftv   slRead(si_link l,leftv a=NULL);
 BOOLEAN slWrite(si_link l, leftv v);
 BOOLEAN slDump(si_link l);
@@ -92,7 +95,6 @@ inline si_link slCopy(si_link l)
 }
 
 #include <omalloc/omalloc.h>
-
 inline char* slString(si_link l)
 {
   if (l->name != NULL)
@@ -121,4 +123,5 @@ typedef struct
 typedef link_struct* link_list;
 
 extern link_list ssiToBeClosed;
+extern BOOLEAN ssiToBeClosed_inactive;
 #endif // SILINK_H

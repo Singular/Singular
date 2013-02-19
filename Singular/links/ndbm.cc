@@ -290,9 +290,7 @@ datum dbm_nextkey(register DBM *db)
         db->dbm_flags |= _DBM_IOERR;
 #endif
     }
-    short tmp;
-    memcpy(&tmp, db->dbm_pagbuf, sizeof(short));
-    if (tmp != 0)
+    if (((short *)db->dbm_pagbuf)[0] != 0)
     {
       item = makdatum(db->dbm_pagbuf, db->dbm_keyptr);
       if (item.dptr != NULL)
@@ -429,7 +427,7 @@ static  int hitab[16]
  = {    61, 57, 53, 49, 45, 41, 37, 33,
         29, 25, 21, 17, 13,  9,  5,  1,
 };
-static unsigned  long hltab[64]
+static  long hltab[64]
  = {
         06100151277L,06106161736L,06452611562L,05001724107L,
         02614772546L,04120731531L,04665262210L,07347467531L,
@@ -453,8 +451,8 @@ static long dcalchash(datum item)
 {
   register int s, c, j;
   register char *cp;
-  register unsigned long hashl;
-  register unsigned int hashi;
+  register long hashl;
+  register int hashi;
 
   hashl = 0;
   hashi = 0;
@@ -468,7 +466,7 @@ static long dcalchash(datum item)
       c >>= 4;
     }
   }
-  return (long)(hashl);
+  return (hashl);
 }
 
 /*

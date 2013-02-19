@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -20,7 +21,7 @@
 
 //typedef struct s_buff_s * s_buff;
 
-#define S_BUFF_LEN 8192
+#define S_BUFF_LEN 4096
 
 sigset_t ssi_sigmask; // set in ssiLink.cc
 sigset_t ssi_oldmask; // set in ssiLink.cc
@@ -51,18 +52,6 @@ int    s_close(s_buff &F)
   if (F!=NULL)
   {
     SSI_BLOCK_CHLD;
-      #ifdef TEST_SBUFF
-      printf("%d bytes read, %d read op.\n",F->len[10],F->len[0]);
-      if (F->len[1]>0) printf("%d read op with <16 bytes\n",F->len[1]);
-      if (F->len[2]>0) printf("%d read op with <32 bytes\n",F->len[2]);
-      if (F->len[3]>0) printf("%d read op with <54 bytes\n",F->len[3]);
-      if (F->len[4]>0) printf("%d read op with <128 bytes\n",F->len[4]);
-      if (F->len[5]>0) printf("%d read op with <256 bytes\n",F->len[5]);
-      if (F->len[6]>0) printf("%d read op with <512 bytes\n",F->len[6]);
-      if (F->len[7]>0) printf("%d read op with <1024 bytes\n",F->len[7]);
-      if (F->len[8]>0) printf("%d read op with <2048 bytes\n",F->len[8]);
-      if (F->len[9]>0) printf("%d read op with >=2048 bytes\n",F->len[9]);
-      #endif
     omFreeSize(F->buff,S_BUFF_LEN);
     int r=close(F->fd);
     omFreeSize(F,sizeof(*F));
@@ -95,19 +84,6 @@ int s_getc(s_buff F)
     {
       F->end=r-1;
       F->bp=0;
-      #ifdef TEST_SBUFF
-      F->len[0]++;
-      if (r<16) F->len[1]++;
-      else if (r<32) F->len[2]++;
-      else if (r<64) F->len[3]++;
-      else if (r<128) F->len[4]++;
-      else if (r<256) F->len[5]++;
-      else if (r<512) F->len[6]++;
-      else if (r<1024) F->len[7]++;
-      else if (r<2048) F->len[8]++;
-      else  F->len[9]++;
-      F->len[10]+=r;
-      #endif
       return F->buff[0];
     }
   }
@@ -134,9 +110,8 @@ void s_ungetc(int c, s_buff F)
   if (F==NULL)
   {
     printf("link closed");
-    return;
   }
-  if (F->bp>=0)
+  else if (F->bp>=0)
   {
     F->buff[F->bp]=c;
     F->bp--;
@@ -153,6 +128,34 @@ int s_readint(s_buff F)
   char c;
   int neg=1;
   int r=0;
+  //int digit=0;
+  do
+  {
+    c=s_getc(F);
+  } while((!F->is_eof) && (c<=' '));
+  if (c=='-') { neg=-1; c=s_getc(F); }
+  while(isdigit(c))
+  {
+    //digit++;
+    r=r*10+(c-'0');
+    c=s_getc(F);
+  }
+  s_ungetc(c,F);
+  //if (digit==0) { printf("unknown char %c(%d)\n",c,c); /*debug*/
+  //                printf("buffer:%s\np=%d,e=%d\n",F->buff,F->bp,F->end);fflush(stdout); } /*debug*/
+  return r*neg;
+}
+
+long s_readlong(s_buff F)
+{
+  if (F==NULL)
+  {
+    printf("link closed");
+    return 0;
+  }
+  char c;
+  long neg=1;
+  long r=0;
   //int digit=0;
   do
   {
@@ -253,7 +256,6 @@ void s_readmpz_base(s_buff F, mpz_ptr a, int base)
   }
   if (neg==-1) mpz_neg(a,a);
 }
-
 int s_iseof(s_buff F)
 {
   if (F!=NULL) return F->is_eof;

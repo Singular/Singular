@@ -3,8 +3,6 @@
 
 #include<signal.h>
 
-//#define TEST_SBUFF
-
 struct s_buff_s
 {
     char * buff; // buffer
@@ -12,9 +10,6 @@ struct s_buff_s
     int bp;      // current pos. in buff (of the last read char)
     int end;     // last position in buff
     int is_eof;
-    #ifdef TEST_SBUFF
-    int len[11];
-    #endif
 };
 
 typedef struct s_buff_s * s_buff;
@@ -27,6 +22,7 @@ int s_getc(s_buff F);
 void s_ungetc(int c, s_buff F);
 
 int s_readint(s_buff F);
+long s_readlong(s_buff F);
 int s_readbytes(char *buff,int len, s_buff F);
 void s_readmpz(s_buff F, mpz_ptr a);
 void s_readmpz_base(s_buff F, mpz_ptr a, int base);
