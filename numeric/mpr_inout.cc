@@ -104,7 +104,7 @@ void mprPrintError( mprState state, const char * name )
 
 //-> mprState mprIdealCheck()
 mprState mprIdealCheck( const ideal theIdeal,
-                        const char * name,
+                        const char * /*name*/,
                         uResultant::resMatType mtype,
                         BOOLEAN rmatrix )
 {

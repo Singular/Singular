@@ -236,7 +236,11 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
 * set of generators;
 * only for tests
 */
+#ifdef NDEBUG
+static void syTestPairs(SSet resPairs,int length,ideal /*old_generators*/)
+#else
 static void syTestPairs(SSet resPairs,int length,ideal old_generators)
+#endif
 {
   int i=0;
  
@@ -1048,9 +1052,9 @@ static poly normalize(poly next_p,ideal add_generators, syStrategy syzstr,
 /*3
 * updates the pairs inthe higher modules
 */
-static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
-       int index,ideal add_generators,ideal add_repr,ideal new_generators,
-       ideal new_repr,int crit_comp,int* first_new)
+static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy /*syzstr*/,
+       int index,ideal add_generators,ideal /*add_repr*/,ideal /*new_generators*/,
+       ideal /*new_repr*/,int /*crit_comp*/,int* first_new)
 {
   int i=*first_new,l=*l_pairs,j,ll,j1,add_idel=IDELEMS(add_generators);
   ideal pairs=idInit(add_idel,add_generators->rank);
@@ -1172,10 +1176,17 @@ PrintLn();
 /*3
 * reduction of a single pair in the higher moduls
 */
+#ifdef SHOW_PROT
 static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp, 
             syStrategy syzstr,int index,ideal add_generators, ideal add_repr,
             ideal new_generators, ideal new_repr,int * next_place_add,int ** g_l,
             poly deg_soc)
+#else
+static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp, 
+            syStrategy syzstr,int /*index*/,ideal add_generators, ideal add_repr,
+            ideal new_generators, ideal new_repr,int * next_place_add,int ** g_l,
+            poly deg_soc)
+#endif
 {
   SObject tso = resPairs[itso];
   assume (tso.lcm!=NULL);
@@ -1400,7 +1411,7 @@ static BOOLEAN reducePairsHIndex(SSet resPairs,int l_pairs,syStrategy syzstr,
 * new_generators and new_repr (which are empty) stores the result of the 
 * reduction which is normalized afterwards
 */
-static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
+static void procedeNextGenerators(ideal temp_generators,ideal /*temp_repr*/,
       ideal new_generators, ideal new_repr, ideal add_generators,
       ideal add_repr, syStrategy syzstr,int index, int crit_comp,
       resolvente totake)
@@ -1532,7 +1543,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
 * of former generators (old_generators);
 */
 static ideal normalizeOldPart(ideal new_generators,ideal new_repr,
-                      syStrategy syzstr,int index,int crit_comp)
+                      syStrategy syzstr,int index,int /*crit_comp*/)
 {
   ideal old_generators= syzstr->res[index];
   ideal old_repr= syzstr->orderedRes[index];

@@ -1693,7 +1693,7 @@ number ntConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
   ntTest((number)result);
   return (number)result;
 }
-CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
+CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs cf )
 {
   ntTest(n);
   if (IS0(n)) return CanonicalForm(0);

@@ -300,7 +300,7 @@ void NFL(Poly *p, TreeM *F)
   pTest(p->root);
 }
 
-int ValidatePoly(Poly *x, TreeM *F)
+int ValidatePoly(Poly *x, TreeM */*F*/)
 {
   Poly /*f,*/*g;
   // int g1,f1;

@@ -1097,20 +1097,20 @@ static void heWinHelp(heEntry hentry)
 }
 #endif
 
-static BOOLEAN heDummyInit(int warn, int br)
+static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)
 {
   return TRUE;
 }
-static void heDummyHelp(heEntry hentry, int br)
+static void heDummyHelp(heEntry /*hentry*/, int /*br*/)
 {
   Werror("No functioning help browser available.");
 }
 
-static BOOLEAN heEmacsInit(int warn, int br)
+static BOOLEAN heEmacsInit(int /*warn*/, int /*br*/)
 {
   return TRUE;
 }
-static void heEmacsHelp(heEntry hentry, int br)
+static void heEmacsHelp(heEntry hentry, int /*br*/)
 {
   WarnS("Your help command could not be executed. Use");
   Warn("C-h C-s %s",
@@ -1119,7 +1119,7 @@ static void heEmacsHelp(heEntry hentry, int br)
   Warn("information on Singular running under Emacs, type C-h m.");
 }
 static int singular_manual(char *str);
-static void heBuiltinHelp(heEntry hentry, int br)
+static void heBuiltinHelp(heEntry hentry, int /*br*/)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->node) != '\0' ?
                        hentry->node : "Top");

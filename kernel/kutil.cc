@@ -1730,7 +1730,11 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 * NOTE: here we need to add the signature-based criteria
 */
 
+#ifdef DEBUGF5
 void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+#else
+void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+#endif
 {
   assume(i<=strat->sl);
   if (strat->interred_flag) return;
@@ -2337,7 +2341,7 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
 */
-void chainCritSig (poly p,int ecart,kStrategy strat)
+void chainCritSig (poly p,int /*ecart*/,kStrategy strat)
 {
   int i,j,l;
   kMergeBintoLSba(strat);
@@ -4469,7 +4473,7 @@ int posInL0 (const LSet set, const int length,
 * to the signature order
 */
 int posInLSig (const LSet set, const int length,
-            LObject* p,const kStrategy strat)
+               LObject* p,const kStrategy /*strat*/)
 {
 if (length<0) return 0;
 if (pLmCmp(set[length].sig,p->sig)== currRing->OrdSgn)
@@ -4498,8 +4502,8 @@ loop
 * critical pairs to strat->L only behind all other critical pairs which are
 * still in strat->L!
 */
-int posInLF5C (const LSet set, const int length,
-            LObject* p,const kStrategy strat)
+int posInLF5C (const LSet /*set*/, const int /*length*/,
+               LObject* /*p*/,const kStrategy strat)
 {
   return strat->Ll+1;
 }
@@ -5045,7 +5049,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat,
 //        leading monomials are smaller than the leading monomial of the
 //        critical pair. In this situation we can discard the critical pair
 //        completely.
-BOOLEAN arriRewCriterion(poly sig, unsigned long /*not_sevSig*/, kStrategy strat, int start=0)
+BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy strat, int /*start=0*/)
 {
   //printf("Arri Rewritten Criterion\n");
   while (strat->Ll > 0 && pLmEqual(strat->L[strat->Ll].sig,strat->P.sig))
@@ -8089,7 +8093,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   kStratChangeTailRing(strat, NULL, NULL, e);
 }
 
-ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
+ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 {
   int n = rBlocks(r); // Including trailing zero!
   // if incremental => use (C,monomial order from r)

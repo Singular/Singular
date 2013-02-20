@@ -374,7 +374,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Under development!!!
-ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*hilb*/, kStrategy strat, const ring _currRing)
+ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec * /*hilb*/, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);
@@ -866,7 +866,11 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 // sca mora...
 
 // returns TRUE if mora should use buckets, false otherwise
+#ifdef MORA_USE_BUCKETS
 static BOOLEAN kMoraUseBucket(kStrategy strat)
+#else
+static BOOLEAN kMoraUseBucket(kStrategy)
+#endif
 {
 #ifdef MORA_USE_BUCKETS
   if (TEST_OPT_NOT_BUCKETS)
@@ -897,7 +901,7 @@ static int sca_mora_loop_count;
 #endif
 
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
-ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat, const ring _currRing)
+ideal sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);

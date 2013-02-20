@@ -1369,7 +1369,7 @@ void piShowProcList()
 //}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_LIBPARSER
-void libstack::push(char *p, char *libn)
+void libstack::push(char */*p*/, char *libn)
 {
   libstackv lp;
   if( !iiGetLibStatus(libn))
@@ -1390,7 +1390,7 @@ void libstack::push(char *p, char *libn)
   }
 }
 
-libstackv libstack::pop(char *p)
+libstackv libstack::pop(char */*p*/)
 {
   libstackv ls = this;
   //omFree((ADDRESS)ls->libname);

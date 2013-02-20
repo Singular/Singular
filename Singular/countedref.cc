@@ -186,7 +186,7 @@ void* countedref_Init(blackbox*)
 
 /// We use the function pointer as a marker of reference types
 /// for CountedRef::is_ref(leftv), see the latter for details
-BOOLEAN countedref_CheckAssign(blackbox *b, leftv L, leftv R)
+BOOLEAN countedref_CheckAssign(blackbox */*b*/, leftv /*L*/, leftv /*R*/)
 {
   return FALSE;
 }
@@ -349,21 +349,21 @@ protected:
 };
 
 /// blackbox support - convert to string representation
-void countedref_Print(blackbox *b, void* ptr)
+void countedref_Print(blackbox */*b*/, void* ptr)
 {
   if (ptr) (*CountedRef::cast(ptr))->Print();
   else PrintS("<unassigned reference or shared memory>");
 }
 
 /// blackbox support - convert to string representation
-char* countedref_String(blackbox *b, void* ptr)
+char* countedref_String(blackbox */*b*/, void* ptr)
 {
   if (ptr == NULL) return omStrDup(sNoName);
   return (*CountedRef::cast(ptr))->String();
 }
 
 /// blackbox support - copy element
-void* countedref_Copy(blackbox*b, void* ptr)
+void* countedref_Copy(blackbox*/*b*/, void* ptr)
 {
   if (ptr) return CountedRef::cast(ptr).outcast();
   return NULL;
@@ -477,7 +477,7 @@ BOOLEAN countedref_Op3(int op, leftv res, leftv head, leftv arg1, leftv arg2)
 
 
 /// blackbox support - destruction
-void countedref_destroy(blackbox *b, void* ptr)
+void countedref_destroy(blackbox */*b*/, void* ptr)
 {
   if (ptr) CountedRef::cast(ptr).destruct();
 }
@@ -666,13 +666,13 @@ BOOLEAN countedref_AssignShared(leftv result, leftv arg)
 }
 
 /// blackbox support - destruction
-void countedref_destroyShared(blackbox *b, void* ptr)
+void countedref_destroyShared(blackbox */*b*/, void* ptr)
 {
   if (ptr) CountedRefShared::cast(ptr).destruct();
 }
 
 
-BOOLEAN countedref_serialize(blackbox *b, void *d, si_link f)
+BOOLEAN countedref_serialize(blackbox */*b*/, void *d, si_link f)
 {
   sleftv l;
   memset(&l,0,sizeof(l));
@@ -684,7 +684,7 @@ BOOLEAN countedref_serialize(blackbox *b, void *d, si_link f)
   return FALSE;
 }
 
-BOOLEAN countedref_deserialize(blackbox **b, void **d, si_link f)
+BOOLEAN countedref_deserialize(blackbox **/*b*/, void **d, si_link f)
 {
   // rtyp must be set correctly (to the blackbox id) by routine calling
   leftv data=f->m->Read(f);

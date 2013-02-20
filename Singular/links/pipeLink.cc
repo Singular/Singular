@@ -37,7 +37,7 @@ typedef struct
 } pipeInfo;
 
 //**************************************************************************/
-BOOLEAN pipeOpen(si_link l, short flag, leftv u)
+BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
 {
   pipeInfo *d=(pipeInfo*)omAlloc0(sizeof(pipeInfo));
   if (flag & SI_LINK_OPEN)

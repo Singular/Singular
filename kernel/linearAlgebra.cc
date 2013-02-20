@@ -1080,7 +1080,7 @@ void mpTrafo(
 
 /* helper for qrDoubleShift */
 bool qrDS(
-       const int n,
+       const int /*n*/,
        matrix* queue,
        int& queueL,
        number* eigenValues,

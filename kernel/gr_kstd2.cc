@@ -967,7 +967,11 @@ static int nc_redBest (LObject*  h,kStrategy strat)
 
 #endif
 
+#ifdef HAVE_RATGRING
 void nc_gr_initBba(ideal F, kStrategy strat)
+#else
+void nc_gr_initBba(ideal, kStrategy strat)
+#endif
 {
   assume(rIsPluralRing(currRing));
 

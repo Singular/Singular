@@ -1040,7 +1040,7 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
     strat->kHEdgeFound = TRUE;
 }
 
-void initBba(ideal F,kStrategy strat)
+void initBba(ideal /*F*/,kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;

@@ -406,7 +406,7 @@ static void feShowPrompt(void)
 /*2
 * print echo (si_echo or TRACE), set my_yylinebuf
 */
-static int fePrintEcho(char *anf, char *b)
+static int fePrintEcho(char *anf, char */*b*/)
 {
   char *ss=strrchr(anf,'\n');
   int len_s;

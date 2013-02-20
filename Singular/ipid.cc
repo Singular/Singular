@@ -459,7 +459,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   omFreeBin((ADDRESS)h, idrec_bin);
 }
 
-idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
+idhdl ggetid(const char *n, BOOLEAN /*local*/, idhdl *packhdl)
 {
   idhdl h = IDROOT->get(n,myynest);
   idhdl h2=NULL;

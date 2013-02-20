@@ -861,7 +861,7 @@ static void syPrintResolution(resolvente res,int start,int length)
 #endif
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
-                                BOOLEAN isMonomial, BOOLEAN notReplace)
+                                BOOLEAN isMonomial, BOOLEAN /*notReplace*/)
 {
   ideal mW=NULL;
   int i,syzIndex = 0,j=0;

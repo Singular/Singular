@@ -29,7 +29,7 @@ static int bigintm_type_id = -1;
 #endif
 
 #ifdef HAVE_BIGINTM
-static char * bigintm_String(blackbox *b, void *d)
+static char * bigintm_String(blackbox */*b*/, void *d)
 { if (d==NULL) return omStrDup("oo");
    else
    {
@@ -38,7 +38,7 @@ static char * bigintm_String(blackbox *b, void *d)
      return StringEndS();
     }
 }
-static void * bigintm_Copy(blackbox*b, void *d)
+static void * bigintm_Copy(blackbox*/*b*/, void *d)
 {  number n=(number)d; return n_Copy(n, coeffs_BIGINT); }
 
 static BOOLEAN bigintm_Assign(leftv l, leftv r)
@@ -286,7 +286,7 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
   return blackbox_default_OpM(op, res, args);
 }
 
-static void bigintm_destroy(blackbox *b, void *d)
+static void bigintm_destroy(blackbox */*b*/, void *d)
 {
   if (d!=NULL)
   {

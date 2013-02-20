@@ -202,8 +202,8 @@ bool MinorProcessor::setNextKeys(const int k)
   }
 }
 
-bool MinorProcessor::isEntryZero (const int absoluteRowIndex,
-                                  const int absoluteColumnIndex) const
+bool MinorProcessor::isEntryZero (const int /*absoluteRowIndex*/,
+                                  const int /*absoluteColumnIndex*/) const
 {
   assume(false);
   return false;

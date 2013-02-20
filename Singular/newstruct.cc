@@ -493,7 +493,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
   return blackbox_default_OpM(op,res,args);
 }
 
-void newstruct_destroy(blackbox *b, void *d)
+void newstruct_destroy(blackbox */*b*/, void *d)
 {
   if (d!=NULL)
   {
@@ -517,7 +517,7 @@ void *newstruct_Init(blackbox *b)
   return l;
 }
 
-BOOLEAN newstruct_CheckAssign(blackbox *b, leftv L, leftv R)
+BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
 {
   int lt=L->Typ();
   int rt=R->Typ();
@@ -569,7 +569,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   return FALSE;
 }
 
-BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
+BOOLEAN newstruct_deserialize(blackbox **/*b*/, void **d, si_link f)
 {
   // newstruct is serialiazed as a list,
   // just read a list and take data,

@@ -134,7 +134,7 @@ void maPoly_Out(mapoly mpoly, ring src_r, ring dest_r)
 static omBin mapolyBin = omGetSpecBin(sizeof(mapoly_s));
 static omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
 
-mapoly maMonomial_Create(poly p, ring r_p, sBucket_pt bucket)
+mapoly maMonomial_Create(poly p, ring /*r_p*/, sBucket_pt bucket)
 {
   mapoly mp = (mapoly) omAlloc0Bin(mapolyBin);
   //p_wrp(p,r_p);printf(" (%x) created\n",mp);
@@ -319,7 +319,7 @@ static void maMap_KillRings(ring map_r, ring image_r, ring src_r, ring dest_r)
 *F  misc  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  misc  stuff
 */
 
-ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
+ideal maIdeal_2_Ideal(maideal m_id, ring /*dest_r*/)
 {
   ideal res = idInit(m_id->n, 1);
   int l;

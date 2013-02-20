@@ -170,7 +170,7 @@ int ksReducePoly(LObject* PR,
  ***************************************************************/
 int ksReducePolySig(LObject* PR,
                  TObject* PW,
-                 long idx,
+                 long /*idx*/,
                  poly spNoether,
                  number *coef,
                  kStrategy strat)

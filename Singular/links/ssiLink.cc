@@ -283,7 +283,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   SSI_UNBLOCK_CHLD;
 }
 
-void ssiWritePoly(ssiInfo *d, int typ, poly p)
+void ssiWritePoly(ssiInfo *d, int /*typ*/, poly p)
 {
   SSI_BLOCK_CHLD;
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
@@ -1911,7 +1911,7 @@ si_link ssiCommandLink()
  @param[in] sig
 **/
 /*---------------------------------------------------------------------*/
-void sig_chld_hdl(int sig)
+void sig_chld_hdl(int /*sig*/)
 {
   pid_t kidpid;
   int status;

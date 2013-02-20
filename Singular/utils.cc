@@ -107,7 +107,7 @@ void main_init(int argc, char *argv[])
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-void main_result(char *libname)
+void main_result(char */*libname*/)
 {
   if(!found_info)    printf("*** No info-string found!\n");
   if(!found_version) printf("*** No version-string found!\n");

@@ -124,7 +124,7 @@ void mac_destroy(mac_poly p)
   }
 }
 
-void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c)
+void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* /*c*/)
 {
   int col, row;
   int* row_cache=(int*) omAlloc(mat->get_rows()*sizeof(int));
