@@ -419,11 +419,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
 
   /* read out the enumerator */
   mpz_ptr z=GET_NOM(from);
-  if(mpz_size1(z)>4)
-  {
-    WerrorS("float overflow");
-    return nf(0.0).N();
-  }
+  int i = mpz_size1(z);
   mpf_t e;
   mpf_init(e);
   mpf_set_z(e,z);
@@ -431,6 +427,11 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   /* if number was an integer, we are done*/
   if(IS_INT(from))
   {
+    if(i>4)
+    {
+      WerrorS("float overflow");
+      return nf(0.0).N();
+    }
     double basis;
     signed long int exp;
     basis = mpf_get_d_2exp(&exp, e);
@@ -441,7 +442,8 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
 
   /* else read out the denominator */
   mpz_ptr n = GET_DENOM(from);
-  if(mpz_size1(n)>4)
+  int j = mpz_size1(n);
+  if(j-i>4)
   {
     WerrorS("float overflow");
     mpf_clear(e);
@@ -465,6 +467,121 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   mpf_clear(q);
   return nf(f).N();
 }
+
+// old version:
+// number nrMapQ(number from, const coeffs aRing, const coeffs r)
+// {
+// /* in longrat.h
+// #define SR_INT    1
+// #define mpz_size1(A) (ABS((A)->_mp_size))
+// */
+// #define SR_HDL(A) ((long)(A))
+// #define mpz_isNeg(A) ((A)->_mp_size<0)
+// #define mpz_limb_size(A) ((A)->_mp_size)
+// #define mpz_limb_d(A) ((A)->_mp_d)
+// #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
+// #define IS_INT(A) ((A)->s==3)
+// #define IS_IMM(A) (SR_HDL(A)&SR_INT)
+// #define GET_NOM(A) ((A)->z)
+// #define GET_DENOM(A) ((A)->n)
+// #define MPZ_INIT mpz_init
+// #define MPZ_CLEAR mpz_clear
+
+//   assume( getCoeffType(r) == ID );
+//   assume( getCoeffType(aRing) == n_Q );
+
+//   mpz_t h;
+//   mpz_ptr g,z,n;
+//   int i,j,t,s;
+//   float ba,rr,rn,y;
+
+//   if (IS_IMM(from))
+//     return nf((float)nlInt(from,NULL /* dummy for nlInt*/)).N();
+//   z=GET_NOM(from);
+//   s=0X10000;
+//   ba=(float)s;
+//   ba*=ba;
+//   rr=0.0;
+//   i=mpz_size1(z);
+//   if(IS_INT(from))
+//   {
+//     if(i>4)
+//     {
+//       WerrorS("float overflow");
+//       return nf(rr).N();
+//     }
+//     i--;
+//     rr=(float)mpz_limb_d(z)[i];
+//     while(i>0)
+//     {
+//       i--;
+//       y=(float)mpz_limb_d(z)[i];
+//       rr=rr*ba+y;
+//     }
+//     if(mpz_isNeg(z))
+//       rr=-rr;
+//     return nf(rr).N();
+//   }
+//   n=GET_DENOM(from);
+//   j=s=mpz_limb_size(n);
+//   if(j>i)
+//   {
+//     g=n; n=z; z=g;
+//     t=j; j=i; i=t;
+//   }
+//   t=i-j;
+//   if(t>4)
+//   {
+//     if(j==s)
+//       WerrorS("float overflow");
+//     return nf(rr).N();
+//   }
+//   if(t>1)
+//   {
+//     g=h;
+//     MPZ_INIT(g);
+//     MPZ_DIV(g,z,n);
+//     t=mpz_size1(g);
+//     if(t>4)
+//     {
+//       MPZ_CLEAR(g);
+//       if(j==s)
+//         WerrorS("float overflow");
+//       return nf(rr).N();
+//     }
+//     t--;
+//     rr=(float)mpz_limb_d(g)[t];
+//     while(t)
+//     {
+//       t--;
+//       y=(float)mpz_limb_d(g)[t];
+//       rr=rr*ba+y;
+//     }
+//     MPZ_CLEAR(g);
+//     if(j!=s)
+//       rr=1.0/rr;
+//     if(mpz_isNeg(z))
+//       rr=-rr;
+//     return nf(rr).N();
+//   }
+//   rn=(float)mpz_limb_d(n)[j-1];
+//   rr=(float)mpz_limb_d(z)[i-1];
+//   if(j>1)
+//   {
+//     rn=rn*ba+(float)mpz_limb_d(n)[j-2];
+//     rr=rr*ba+(float)mpz_limb_d(z)[i-2];
+//     i--;
+//   }
+//   if(t!=0)
+//     rr=rr*ba+(float)mpz_limb_d(z)[i-2];
+//   if(j==s)
+//     rr=rr/rn;
+//   else
+//     rr=rn/rr;
+//   if(mpz_isNeg(z))
+//     rr=-rr;
+//   return nf(rr).N();
+// }
 
 nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 {
