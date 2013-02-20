@@ -812,7 +812,7 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
         return NULL;
     }
   }
-  if (nCoeff_is_Zp(src,src->m_nfCharP))
+  if (nCoeff_is_Zp(src,dst->m_nfCharP))
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
