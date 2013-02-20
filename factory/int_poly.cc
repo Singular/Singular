@@ -51,7 +51,7 @@ InternalPoly::InternalPoly( const Variable & v, const int e, const CanonicalForm
     lastTerm = firstTerm;
 }
 
-InternalPoly::InternalPoly( const InternalPoly& )
+InternalPoly::InternalPoly( const InternalPoly& ):InternalCF()
 {
     ASSERT( 0, "ups there is something wrong in your code" );
 };
@@ -1078,7 +1078,7 @@ InternalPoly::addcoeff( InternalCF* cc )
             }
             else
             {
-                last->next = new term( 0, c, 0 );
+                last->next = new term( 0, c, 0L );
                 last = last->next;
             }
             return new InternalPoly( first, last, var );
@@ -1308,7 +1308,7 @@ InternalPoly::tryDividecoeff( InternalCF* cc, bool invert, const CanonicalForm& 
             delete this;
           else
             decRefCount(); 
-          return dummy; //is equal to CFFactory::basic (0) in this case
+          return dummy; //is equal to CFFactory::basic ( 0L ) in this case
         }
         if (is_imm(dummy))
         {
