@@ -47,7 +47,7 @@ public:
     InternalRational( const mpz_ptr , const mpz_ptr );
     ~InternalRational();
     InternalCF* deepCopyObject() const;
-    const char * const classname() const { return "InternalRational"; }
+    const char * classname() const { return "InternalRational"; }
 #ifndef NOSTREAMIO
     void print( OSTREAM&, char* );
 #endif /* NOSTREAMIO */

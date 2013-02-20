@@ -44,7 +44,7 @@ public:
     InternalPrimePower( const mpz_ptr );
     ~InternalPrimePower();
     InternalCF* deepCopyObject() const;
-    const char * const classname() const { return "InternalPrimePower"; }
+    const char * classname() const { return "InternalPrimePower"; }
 #ifndef NOSTREAMIO
     void print( OSTREAM&, char* );
 #endif /* NOSTREAMIO */
