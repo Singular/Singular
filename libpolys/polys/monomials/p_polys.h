@@ -1773,8 +1773,16 @@ static inline BOOLEAN p_IsConstantComp(const poly p, const ring r)
 
 static inline BOOLEAN p_IsConstant(const poly p, const ring r)
 {
+  assume( p_Test(p, r) );
   if (p == NULL) return TRUE;
   return (pNext(p)==NULL) && p_LmIsConstant(p, r);
+}
+
+/// either poly(1)  or gen(k)?!
+static inline BOOLEAN p_IsOne(const poly p, const ring R)
+{
+  assume( p_Test(p, R) );
+  return (p_IsConstant(p, R) && n_IsOne(p_GetCoeff(p, R), R->cf));
 }
 
 static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r)

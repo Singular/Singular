@@ -66,13 +66,6 @@
 #define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
 #define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
 
-
-static inline BOOLEAN p_IsOne(const poly p, const ring R)
-{
-  assume( p_Test(p, R) );
-  return (p_IsConstant(p, R) && n_IsOne(p_GetCoeff(p, R), R->cf));
-}
-
 /// TRUE iff num. represents 1
 #define NUMIS1(f) (p_IsOne(NUM(f), cf->extRing))
 
