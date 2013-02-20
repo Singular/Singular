@@ -5289,9 +5289,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   */
   if (cf==NULL)
   {
-    const int ch=32003;
     Werror("Invalid ground field specification");
-    cf=nInitChar(n_Zp, (void*)(long)ch);
     goto rInitError;
   }
 
