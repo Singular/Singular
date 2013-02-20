@@ -86,12 +86,13 @@ SOURCES =    Minor.cc\
    sing_win.cc\
    slInit_Static.cc\
    links/ssiLink.cc\
+   links/semaphore.c\
    subexpr.cc\
    pyobject_setup.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
-   fereadl.c mmstd.c claptmpl.cc
+   fereadl.c mmstd.c claptmpl.cc 
 
 #   slInit_Dynamic.cc
 
@@ -145,6 +146,7 @@ SingularHEADERS =    Cache.h \
    sing_win.h \
    slInit.h \
    links/ssiLink.h \
+   links/simpleipc.h \
    stype.h \
    subexpr.h \
    table.h \
@@ -300,7 +302,8 @@ include ${srcdir}/singular-libs
 singularlibrarydir = ${datadir}/singular
 singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%)
 nobase_dist_singularlibrary_DATA = LIB/tst.lib LIB/help.cnf ${singularlibrary}
-EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs LIB/help.cnf
+EXTRA_DIST = make_alllib.sh LIB/all.lib.tmpl singular-libs \
+             LIB/help.cnf links/slInit_Dynamic.cc
 
 # ${nobase_dist_singularlibrary_DATA}
 
