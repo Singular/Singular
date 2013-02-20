@@ -938,7 +938,7 @@ static void idPrepareStd(ideal s_temp, int k)
 ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
              BOOLEAN isSB, BOOLEAN divide, matrix *unit)
 {
-  int lsmod =id_RankFreeModule(submod,currRing), i, j, k;
+  int lsmod =id_RankFreeModule(submod,currRing), j, k;
   int comps_to_add=0;
   poly p;
 

@@ -845,7 +845,7 @@ BOOLEAN kTest_S(kStrategy strat)
 BOOLEAN kTest_TS(kStrategy strat)
 {
   int i, j;
-  BOOLEAN ret = TRUE;
+  // BOOLEAN ret = TRUE;
   kFalseReturn(kTest(strat));
 
   // test strat->R, strat->T[i].i_r
@@ -1739,7 +1739,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ
   poly m1 = NULL,m2 = NULL; // we need the multipliers for the s-polynomial to compute
               // the corresponding signatures for criteria checks
   LObject  Lp;
-  poly last;
+  // poly last;
   poly pSigMult = p_Copy(pSig,currRing);
   poly sSigMult = p_Copy(strat->sig[i],currRing);
   unsigned long pSigMultNegSev,sSigMultNegSev;
@@ -8827,7 +8827,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 
   int j;
 
-  poly q, s;
+  poly q/*, s*/;
 
   // for the 0th shift: insert the orig. pair
   enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, 0, i, uptodeg, lV);

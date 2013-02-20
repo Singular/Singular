@@ -217,7 +217,7 @@ poly kNF2Length (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 //#define KSTD_NF_NONORM 4
   // only global: avoid normalization, return a multiply of NF
   poly   p;
-  int   i;
+  // int   i;
 
   //if ((idIs0(F))&&(Q==NULL))
   //  return pCopy(q); /*F=0*/

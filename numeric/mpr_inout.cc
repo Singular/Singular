@@ -109,7 +109,7 @@ mprState mprIdealCheck( const ideal theIdeal,
                         BOOLEAN rmatrix )
 {
   mprState state = mprOk;
-  int power;
+  // int power;
   int k;
 
   int numOfVars= mtype == uResultant::denseResMat?(currRing->N)-1:(currRing->N);

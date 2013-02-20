@@ -160,7 +160,7 @@ static void copyL (kStrategy o,kStrategy n)
 
 kStrategy kStratCopy(kStrategy o)
 {
-  int i;
+  // int i;
   assume(kTest_TS(o));
   kStrategy s=new skStrategy;
   s->next=NULL;

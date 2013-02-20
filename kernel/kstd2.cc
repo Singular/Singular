@@ -196,7 +196,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   int k_ind2 = 0;
   int a_ind2 = ind2(a);
 
-  NATNUMBER k = 1;
+  // NATNUMBER k = 1;
   // of interest is only k_ind2, special routine for improvement ... TODO OLIVER
   for (int i = 1; i <= leadRing->N; i++)
   {
@@ -302,11 +302,11 @@ int redRing (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
-  int at,i;
+  int at/*,i*/;
   long d;
   int j = 0;
   int pass = 0;
-  poly zeroPoly = NULL;
+  // poly zeroPoly = NULL;
 
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();

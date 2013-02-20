@@ -288,7 +288,7 @@ void ssiWritePoly(ssiInfo *d, int typ, poly p)
   SSI_BLOCK_CHLD;
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
   SSI_UNBLOCK_CHLD;
-  int i;
+  int j;
 
   while(p!=NULL)
   {
@@ -297,7 +297,7 @@ void ssiWritePoly(ssiInfo *d, int typ, poly p)
     SSI_BLOCK_CHLD;
     fprintf(d->f_write,"%ld ",p_GetComp(p,d->r));//component
 
-    for(int j=1;j<=rVar(d->r);j++)
+    for(j=1;j<=rVar(d->r);j++)
     {
       fprintf(d->f_write,"%ld ",p_GetExp(p,j,d->r ));//x^j
     }
@@ -415,8 +415,8 @@ char *ssiReadString(ssiInfo *d)
   int l;
   l=s_readint(d->f_read);
   buf=(char*)omAlloc0(l+1);
-  int c =s_getc(d->f_read); /* skip ' '*/
-  int ll=s_readbytes(buf,l,d->f_read);
+  /*int c =*/ (void) s_getc(d->f_read); /* skip ' '*/
+  /*int ll=*/ (void) s_readbytes(buf,l,d->f_read);
   //if (ll!=l) printf("want %d, got %d bytes\n",l,ll);
   buf[l]='\0';
   return buf;
@@ -527,7 +527,7 @@ number ssiReadNumber(ssiInfo *d)
 ring ssiReadRing(ssiInfo *d)
 {
 /* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
-  int ch, N,i,l;
+  int ch, N,i/*,l*/;
   char **names;
   ch=s_readint(d->f_read);
   N=s_readint(d->f_read);
@@ -747,7 +747,7 @@ bigintmat* ssiReadBigintmat(ssiInfo *d)
 void ssiReadBlackbox(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  int throwaway=s_readint(d->f_read);
+  /*int throwaway=*/ (void) s_readint(d->f_read);
   char *name=ssiReadString(d);
   int tok;
   blackboxIsCmd(name,tok);
@@ -890,7 +890,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       {
         int sockfd, newsockfd, portno, clilen;
         struct sockaddr_in serv_addr, cli_addr;
-        int n;
+        // int n;
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if(sockfd < 0)
         {
@@ -951,7 +951,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       {
         int sockfd, newsockfd, portno, clilen;
         struct sockaddr_in serv_addr, cli_addr;
-        int n;
+        // int n;
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if(sockfd < 0)
         {
@@ -1033,7 +1033,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       else if(strcmp(mode,"connect")==0)
       {
         char* host = (char*)omAlloc(256);
-        int sockfd, portno, n;
+        int sockfd, portno/*, n*/;
         struct sockaddr_in serv_addr;
         struct hostent *server;
 
@@ -1484,7 +1484,7 @@ const char* slStatusSsi(si_link l, const char* request)
   ||(strcmp(l->mode,"connect")==0))
   && (strcmp(request, "read") == 0))
   {
-    fd_set  mask, fdmask;
+    fd_set  mask/*, fdmask*/;
     struct timeval wt;
     if (s_isready(d->f_read)) return "ready";
     loop
@@ -1809,7 +1809,7 @@ int ssiReservePort(int clients)
     return 0;
   }
   int portno;
-  int n;
+  // int n;
   ssiReserved_sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if(ssiReserved_sockfd < 0)
   {

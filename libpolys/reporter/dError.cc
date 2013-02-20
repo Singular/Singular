@@ -49,7 +49,7 @@ int dReportError(const char* fmt, ...)
 {
 #ifdef HAVE_EXECINFO_H
 #define SIZE 50
-  void *buffer[SIZE+1]; int i, j, k, ret, status; char **ptr; char *demangledName; char *s; char *ss;
+  void *buffer[SIZE+1]; int ret; 
 #endif
 
   va_list ap;
@@ -72,9 +72,13 @@ int dReportError(const char* fmt, ...)
 #ifndef HAVE_GCC_ABI_DEMANGLE
   backtrace_symbols_fd(buffer, ret, STDERR_FILENO); // execinfo.h
 #else
-  ptr = backtrace_symbols( buffer, ret ); // execinfo.h
+  char **ptr = backtrace_symbols( buffer, ret ); // execinfo.h
 
-  for (i = 0; i < ret; i++)
+  int status;
+  char *demangledName;
+  char *s; 
+  char *ss;
+  for (int i = 0; i < ret; i++)
   {
     status = -1;
 

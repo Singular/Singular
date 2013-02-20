@@ -242,7 +242,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
   if (s==NULL) return NULL;
   idhdl h;
   s=omStrDup(s);
-  idhdl *save_root=root;
+  // idhdl *save_root=root;
   if (t==PACKAGE_CMD)
   {
     if (root!=&(basePack->idroot))

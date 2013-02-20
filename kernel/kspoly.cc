@@ -393,7 +393,8 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   poly a1 = pNext(p1), a2 = pNext(p2);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
-  int co=0, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf); // gcd and zero divisors
+  int co=0/*, ct = ksCheckCoeff(&lc1, &lc2, currRing->cf)*/; // gcd and zero divisors
+  (void) ksCheckCoeff(&lc1, &lc2, currRing->cf);
 
   int l1=0, l2=0;
 

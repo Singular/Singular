@@ -971,7 +971,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 {
   assume(rIsPluralRing(currRing));
 
-  int i;
+  // int i;
 //  idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
@@ -1069,11 +1069,11 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   assume(currRing->OrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
 
-  intvec *w=NULL;
-  intvec *hilb=NULL;
+  // intvec *w=NULL;
+  // intvec *hilb=NULL;
   int   olddeg,reduc;
   int red_result=1;
-  int hilbeledeg=1,hilbcount=0,minimcnt=0;
+  int /*hilbeledeg=1,*/hilbcount=0/*,minimcnt=0*/;
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   // initHilbCrit(F,Q,&hilb,strat);

@@ -45,13 +45,13 @@ static BOOLEAN bigintm_Assign(leftv l, leftv r)
 {
   assume( l->Typ() == bigintm_type_id );
   
-  blackbox *ll=getBlackboxStuff(l->Typ());
+  // blackbox *ll=getBlackboxStuff(l->Typ());
   
   if (r->Typ()>MAX_TOK)
   {
     if (bigintm_type_id == r->Typ())
     {
-      blackbox *rr=getBlackboxStuff(r->Typ());
+      // blackbox *rr=getBlackboxStuff(r->Typ());
       
       if (l->Data()!=NULL) { number n1=(number)l->Data(); n_Delete(&n1,coeffs_BIGINT); }
       number n2=(number)r->CopyD();
@@ -125,7 +125,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
   // interpreter: a1 is ist bigintm
   assume( a1->Typ() == bigintm_type_id );
   
-  blackbox *a=getBlackboxStuff(a1->Typ());
+  // blackbox *a=getBlackboxStuff(a1->Typ());
   number n1=(number)a1->Data(); 
   switch(op)
   {

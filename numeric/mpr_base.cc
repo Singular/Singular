@@ -1738,7 +1738,7 @@ resMatrixSparse::~resMatrixSparse()
 
 ideal resMatrixSparse::getMatrix()
 {
-  int i,j,cp;
+  int i,/*j,*/cp;
   poly pp,phelp,piter,pgls;
 
   // copy original sparse res matrix

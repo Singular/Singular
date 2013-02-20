@@ -353,7 +353,7 @@ void maPoly_GetLength(mapoly mp, int &length)
 ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 {
   ring src_r, dest_r;
-  ideal dest_id, res_id;
+  ideal dest_id/*, res_id*/;
   int length = 0;
   BOOLEAN no_sort;
 

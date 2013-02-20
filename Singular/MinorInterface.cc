@@ -99,7 +99,7 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
 
   /* containers for all upcoming results: */
   IntMinorValue theMinor;
-  int value = 0;
+  // int value = 0;
   int collectedMinors = 0;
   int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
 
@@ -322,7 +322,7 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
 
   /* containers for all upcoming results: */
   IntMinorValue theMinor;
-  int value = 0;
+  // int value = 0;
   int collectedMinors = 0;
   int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
 

@@ -32,10 +32,10 @@
 
 
 //------GLOBALS-------
-static int m_s,v_s,vectorized,VarN1,offset;
+static int /*m_s,v_s,vectorized,VarN1,*/offset;
 static jList *T,*Q;
 static TreeM *G;
-static Poly *phD;
+// static Poly *phD;
 static NodeM *FreeNodes;
 static int degree_compatible;
 static int (*ListGreatMove)(jList *,jList *,poly);
@@ -192,7 +192,7 @@ void PNF(Poly *p, TreeM *F)
 void NFL(Poly *p, TreeM *F)
 {
   Poly *f;
-  int g1,f1,gg;
+  // int g1,f1,gg;
 
   if ((f=is_div_(F,p->lead))==NULL) return;
 
@@ -245,7 +245,7 @@ void NFL(Poly *p, TreeM *F)
   }
 
   //if (TEST_OPT_PROT) { PrintS("R"); mflush(); }
-  int old_size, count;
+  int /*old_size, */count;
   count=0;
   while(f && p->root)
   {
@@ -302,8 +302,8 @@ void NFL(Poly *p, TreeM *F)
 
 int ValidatePoly(Poly *x, TreeM *F)
 {
-  Poly *f,*g;
-  int g1,f1;
+  Poly /*f,*/*g;
+  // int g1,f1;
 
   if (x->root) return 1;
 
@@ -970,7 +970,7 @@ void Initialization(char *Ord)
   Define(&G);
 }
 
-static Poly *h,*f;
+static Poly *h/*,*f*/;
 
 void insert_in_G(Poly *x)
 {
@@ -997,7 +997,7 @@ void Q2TG()
 
 int ComputeBasis(jList *_lT,jList *_lQ)
 {
-  int gb_l,i,ret_value=1;
+  // int gb_l,i,ret_value=1;
 
   T=_lT; Q=_lQ;
 

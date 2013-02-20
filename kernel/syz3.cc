@@ -111,7 +111,7 @@ static void syShowRes(syStrategy syzstr)
 static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
             ideal old_repr,int old_tl, poly next_generator,resolvente totake)
 {
-  int index=syzstr->length-1,i,j,start,start_ttk,new_tl;
+  int index=syzstr->length-1,i,j,start,start_ttk/*,new_tl*/;
   poly gen=pCopy(next_generator),p;
   poly neg_gen=pCopy(next_generator);
   ideal current_ideal,current_repr;
@@ -655,7 +655,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
   int og_idel=IDELEMS(old_generators),ng_place=IDELEMS(new_generators);
   int toReplace=0;
   int i,j,syz_l;
-  number coefgcd,n;
+  number /*coefgcd,*/n;
   polyset ogm=old_generators->m;
   poly p;
   BOOLEAN deleteP=FALSE;
@@ -940,7 +940,7 @@ static BOOLEAN redPairs(SSet resPairs,int l_pairs, ideal syzygies,
   int i,j,actdeg=resPairs[0].order;
   int * ogm_l=(int*)omAlloc0(IDELEMS(syzstr->res[index])*sizeof(int));
   int * orp_l=(int*)omAlloc0(IDELEMS(syzstr->orderedRes[index])*sizeof(int));
-  int t1=IDELEMS(syzstr->res[index]),t2=IDELEMS(syzstr->orderedRes[index]);
+  // int t1=IDELEMS(syzstr->res[index]),t2=IDELEMS(syzstr->orderedRes[index]);
  
   for (j=IDELEMS(syzstr->res[index])-1;j>=0;j--) 
   {
@@ -1752,7 +1752,7 @@ idPrint(new_repr);
 */
 syStrategy syKosz(ideal arg,int * length)
 {
-  int i,j,jj,k=0,index=0,rk_arg,next_syz=0;
+  int i,j,jj,k=0,index=0,rk_arg/*,next_syz=0*/;
   int crit_comp,t_comp,next_deg,old_tl;
   ideal temp=NULL,old_ideal,old_repr;
   ring origR = currRing;

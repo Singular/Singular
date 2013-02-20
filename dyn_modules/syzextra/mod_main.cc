@@ -818,7 +818,7 @@ static BOOLEAN ISUpdateComponents(leftv res, leftv h)
 /// NF using length
 static BOOLEAN reduce_syz(leftv res, leftv h)
 {
-  const ring r = currRing;
+  // const ring r = currRing;
 
   if ( !( (h!=NULL) && (h->Typ()==VECTOR_CMD || h->Typ()==POLY_CMD) ) )
   {

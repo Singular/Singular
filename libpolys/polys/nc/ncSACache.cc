@@ -26,10 +26,12 @@
 #define OUTPUT 0
 #endif
 
+#if OUTPUT
 namespace 
 {
   static const char* m_Typenames[2] = {"lookup", "store"};
 }
+#endif
 
 #include <coeffs/numbers.h>
 #include "coeffrings.h"

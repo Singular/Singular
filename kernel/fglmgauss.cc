@@ -72,11 +72,10 @@ gaussReducer::gaussReducer( int dimen )
 
 gaussReducer::~gaussReducer()
 {
-    int k;
-
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] elems;
 #else
+    int k;
     for ( k= size; k > 0; k-- )
         elems[k].~gaussElem();
     omFreeSize( (ADDRESS)elems, (max+1)*sizeof( gaussElem ) );
@@ -158,7 +157,7 @@ void
 gaussReducer::store()
 {
     // fglmASSERT( size < max );
-    number fac;
+    // number fac;
     // find the pivot-element in v:
 
     size++;

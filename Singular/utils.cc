@@ -157,8 +157,8 @@ static void PrintOut(FILE *fd, int pos_start, int pos_end)
 
 void printpi(procinfov pi)
 {
-  char *buf, name[256];
-  int len1, len2;
+  // char *buf, name[256];
+  // int len1, len2;
   /* pi->libname is badly broken -- use file, instead */
   FILE *fp = fopen( lib_file, "rb");
 

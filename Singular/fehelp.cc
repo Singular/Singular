@@ -979,7 +979,7 @@ static void heWinHelp(heEntry hentry, int br)
 static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
-  char url[MAXPATHLEN];
+  // char url[MAXPATHLEN];
   const char *p=heHelpBrowsers[br].action;
   if (p==NULL) {PrintS("no action ?\n"); return;}
   memset(sys,0,MAX_SYSCMD_LEN);
@@ -1062,7 +1062,7 @@ static void heGenHelp(heEntry hentry, int br)
     }
   }
   Print("running `%s`\n",sys);
-  int dummy=system(sys);
+  /*int dummy=*/ (void) system(sys);
 }
 
 #ifdef ix86_Win
@@ -1218,7 +1218,7 @@ static int singular_manual(char *str)
 
   while(!feof(index))
   {
-    char* dummy=fgets(buffer, BUF_LEN, index); /* */
+    // char* dummy=fgets(buffer, BUF_LEN, index); /* */
     (void)sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset);
     for(p=Index; *p; p++) *p = tolow(*p);/* */
     (void)strcat(Index, " ");

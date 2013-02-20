@@ -172,11 +172,11 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   polyset F=arg->m,*Shdl=&(result->m);
   if (Fl==0) return result;
 
-  int i,j,l,k,totalToRed,ecartToRed,kk,kkk;
+  int i,j,l,k,totalToRed,ecartToRed,kk;
   int bestEcart,totalmax,rkF,Sl=0,smax,tmax,tl;
   int *ecartS, *ecartT, *totalS,
     *totalT=NULL, *temp=NULL;
-  polyset pairs,S,T,ST,oldF;
+  polyset pairs,S,T,ST/*,oldF*/;
   poly p,q,toRed;
   BOOLEAN notFound = FALSE;
   intvec * newmodcomp = new intvec(Fl+2);
@@ -341,7 +341,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
           while ((l<tl) && (notFound))
 #else
           l = (**modcomp)[pGetComp(toRed)];
-          kkk = (**modcomp)[pGetComp(toRed)+1];
+          int kkk = (**modcomp)[pGetComp(toRed)+1];
           while ((l<kkk) && (notFound))
 #endif
           {
@@ -509,11 +509,11 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
   ideal result=idInit(16,Fl);
   int i,j,l,k,kkk,rkF,Sl=0,syComponentOrder=currRing->ComponentOrder;
-  int fstart,wend,lini,ltR,gencQ=0;
+  int /*fstart,*/wend,lini,ltR,gencQ=0;
   intvec *newmodcomp;
   int *Flength;
   polyset pairs,F=arg->m,*Shdl=&(result->m);
-  poly p,q,toRed,syz,lastmonom,multWith;
+  poly /*p,*/q,toRed,syz,lastmonom,multWith;
   BOOLEAN isNotReduced=TRUE;
 
 //#define WRITE_BUCKETS
@@ -576,7 +576,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
         if (k<Fl)
         {
           number an=nCopy(pGetCoeff(F[k])),bn=nCopy(pGetCoeff(F[j]));
-          int ct = ksCheckCoeff(&an, &bn, currRing->cf);
+          /*int ct =*/ (void) ksCheckCoeff(&an, &bn, currRing->cf);
           syz = pCopy(pairs[k]);
           //syz->coef = nCopy(F[k]->coef);
           syz->coef = an;
@@ -866,7 +866,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   ideal mW=NULL;
   int i,syzIndex = 0,j=0;
   intvec * modcomp=NULL,*w=NULL;
-  int ** wv=NULL;
+  // int ** wv=NULL;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
   ring origR = currRing;
   ring syRing = NULL;
@@ -1016,7 +1016,7 @@ syStrategy sySchreyer(ideal arg, int maxlength)
   resolvente fr = sySchreyerResolvente(arg,maxlength,&(rl));
   if (fr==NULL) return NULL;
 
-  int typ0;
+  // int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
   result->length=rl;
   result->fullres = (resolvente)omAlloc0((rl /*result->length*/+1)*sizeof(ideal));

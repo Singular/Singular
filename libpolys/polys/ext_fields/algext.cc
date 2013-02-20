@@ -971,7 +971,7 @@ number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
 number naMap0P(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
-  int p = rChar(dst->extRing);
+  // int p = rChar(dst->extRing);
 
   number q = nlModP(a, src, dst->extRing->cf);
 

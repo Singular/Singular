@@ -1538,7 +1538,7 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
 {
   assume( n_Test(a, src) );
   if (n_IsZero(a, src)) return NULL;
-  int p = rChar(dst->extRing);
+  // int p = rChar(dst->extRing);
   number q = nlModP(a, src, dst->extRing->cf);
 
   if (n_IsZero(q, dst->extRing->cf))

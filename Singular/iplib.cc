@@ -278,7 +278,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
       return NULL; // example part does not exist
     // load example
     fseek(fp, pi->data.s.example_start, SEEK_SET);
-    char *dummy=fgets(buf, sizeof(buf), fp); // skip line with "example"
+    /*char *dummy=*/ (void) fgets(buf, sizeof(buf), fp); // skip line with "example"
     procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);
@@ -754,9 +754,9 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
   char *libname = (char *)omAlloc(strlen(id)+5);
   const char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
   int i = 0;
-  FILE *fp;
-  package pack;
-  idhdl packhdl;
+  // FILE *fp;
+  // package pack;
+  // idhdl packhdl;
   lib_types LT;
   for(i=0; suffix[i] != NULL; i++)
   {
@@ -827,14 +827,14 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
 {
   char libnamebuf[128];
-  procinfov pi;
-  idhdl h;
+  // procinfov pi;
+  // idhdl h;
   idhdl pl;
-  idhdl hl;
-  long pos = 0L;
+  // idhdl hl;
+  // long pos = 0L;
   char *plib = iiConvName(newlib);
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
-  int lines = 1;
+  // int lines = 1;
   BOOLEAN LoadResult = TRUE;
 
   if (fp==NULL)
@@ -905,7 +905,7 @@ static void iiRunInit(package p)
   {
     int save=yylineno;
     myynest++;
-    procinfo *pi=(procinfo*)IDDATA(h);
+    // procinfo *pi=(procinfo*)IDDATA(h);
     //PrintS("mod_init found\n");
     iiMake_proc(h,p,NULL);
     myynest--;
@@ -1177,11 +1177,11 @@ BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
   typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
-  SModulFunc_t fktn;
+  // SModulFunc_t fktn;
   idhdl pl;
   char *plib = iiConvName(newlib);
-  BOOLEAN RET=TRUE;
-  int token;
+  // BOOLEAN RET=TRUE;
+  // int token;
 
   pl = IDROOT->get(plib,0);
   if (pl!=NULL)
