@@ -934,7 +934,9 @@ number nlDiv (number a, number b, const coeffs r)
 void nlPower (number x,int exp,number * u, const coeffs r)
 {
   *u = INT_TO_SR(0); // 0^e, e!=0
-  if (!nlIsZero(x,r))
+  if (exp==0)
+    *u= INT_TO_SR(1);
+  else if (!nlIsZero(x,r))
   {
     nlTest(x, r);
     number aa=NULL;
@@ -972,8 +974,6 @@ void nlPower (number x,int exp,number * u, const coeffs r)
       FREE_RNUMBER(aa);
     }
   }
-  else if (exp==0)
-    *u = INT_TO_SR(1); // 0^0
 #ifdef LDEBUG
   if (exp<0) Print("nlPower: neg. exp. %d\n",exp);
   nlTest(*u, r);
