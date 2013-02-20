@@ -12,6 +12,7 @@
 #include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/ring.h>
+#include <kernel/longrat.h>
 #include <kernel/ffields.h>
 
 int nfCharQ=0;  /* the number of elemts: q*/
@@ -741,4 +742,24 @@ nMapFunc nfSetMap(const ring src, const ring dst)
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
   return NULL;     /* default */
+}
+
+// Map q \in QQ \to Zp
+// src = Q, dst = GF
+number nfInit_bigint(number q)
+{
+  // embedded long within q => only long numerator has to be converted
+  // to int (modulo char.)
+  if (SR_HDL(q) & SR_INT)
+  {
+    long i = SR_TO_INT(q);
+    return nfInit( static_cast<int>( i ),currRing );
+  }
+
+  const unsigned long PP = nfCharP;
+
+  // numerator modulo char. should fit into int
+  number z = nfInit( static_cast<int>(mpz_fdiv_ui(q->z, PP)),currRing);
+
+  return z;
 }

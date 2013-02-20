@@ -12,6 +12,7 @@
 BOOLEAN nfGreaterZero (number k);
 number  nfMult        (number a, number b);
 number  nfInit        (long i, const ring r);
+number  nfInit_bigint (number q);
 number  nfPar         (int i);
 int     nfParDeg      (number n);
 int     nfInt         (number &n, const ring r);

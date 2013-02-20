@@ -178,7 +178,7 @@ void nSetChar(ring r)
   else if (rField_is_GF(r))
   {
     nfSetChar(c,r->parameter);
-    nInit_bigint=ndReturn0; // not impl.
+    nInit_bigint=nfInit_bigint;
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
