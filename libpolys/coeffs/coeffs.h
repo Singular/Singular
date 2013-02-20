@@ -712,7 +712,7 @@ static inline BOOLEAN nCoeff_is_Zp(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Zp; }
 
 static inline BOOLEAN nCoeff_is_Zp(const coeffs r, int p)
-{ assume(r != NULL); return (getCoeffType(r)  && (r->ch == p)); }
+{ assume(r != NULL); return ((getCoeffType(r)==n_Zp) && (r->ch == p)); }
 
 static inline BOOLEAN nCoeff_is_Q(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Q; }
