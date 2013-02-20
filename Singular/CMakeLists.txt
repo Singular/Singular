@@ -81,7 +81,7 @@ singular_generate_incfile(feoptsts_target FEOPTSTS_FILE_INC
 ###
 
 # C++ sources which are used if no parts of the kernel are dynamically linked
-set(static_sources slInit_Static.cc)
+set(static_sources links/slInit_Static.cc)
 
 set(_iparith_inc_srcs  iparith.cc tesths.cc tok.h mpsr_Tok.cc mod2.h)
 add_executable(gentable ${_iparith_inc_srcs} claptmpl.cc ${static_sources})
@@ -139,7 +139,7 @@ set(cxxsources ${GRAMMAR_CPP}  ${SCANNER_CPP} attrib.cc
 )
 
 # C++ sources which are used if part of the kernel are dynamically linked
-set(dl_kernel_sources slInit_Dynamic.cc )
+set(dl_kernel_sources links/slInit_Dynamic.cc )
 
 # C++ sources which are used for dynamic libraries if part of the kernel is
 # dynamically linked
@@ -196,7 +196,7 @@ set(headers lists.h attrib.h
         subexpr.h ipid.h
         cntrlc.h ipprint.h sdb.h
         ipshell.h tok.h
-        silink.h
+        links/silink.h
         sing_dbm.h maps_ip.h interpolation.h
         mpsr.h mpsr_sl.h
         mpsr_Get.h janet.h

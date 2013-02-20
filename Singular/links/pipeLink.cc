@@ -23,7 +23,7 @@
 #include "ipid.h"
 #include <omalloc/omalloc.h>
 #include "subexpr.h"
-#include "silink.h"
+#include "links/silink.h"
 #include "lists.h"
 #include "pipeLink.h"
 

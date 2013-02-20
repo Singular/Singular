@@ -31,7 +31,7 @@
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 #include <kernel/stairc.h>
 #include <polys/weight.h>
 #include <kernel/semic.h>

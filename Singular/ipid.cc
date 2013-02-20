@@ -25,7 +25,7 @@
 #include <polys/matpol.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>

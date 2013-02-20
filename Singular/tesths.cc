@@ -29,13 +29,13 @@
 
 #include "ipshell.h"
 #include "cntrlc.h"
-#include "silink.h"
+#include "links/silink.h"
 #include "ipid.h"
 #include "sdb.h"
 #include "feOpt.h"
 #include "distrib.h"
 #include "version.h"
-#include "slInit.h"
+#include "links/slInit.h"
 #include  <Singular/links/ssiLink.h>
 #include "bigintm.h"
 #include "mmalloc.h"

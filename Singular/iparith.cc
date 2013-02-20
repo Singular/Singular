@@ -49,7 +49,7 @@
 #include <Singular/ipconv.h>
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 #include <polys/sparsmat.h>
 #include <kernel/units.h>
 #include <Singular/janet.h>

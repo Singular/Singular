@@ -24,7 +24,7 @@
 #  include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #  include <Singular/ipid.h>
-#  include <Singular/silink.h>
+#  include <Singular/links/silink.h>
 #  include <Singular/links/sing_dbm.h>
 
 // #ifdef ix86_Win

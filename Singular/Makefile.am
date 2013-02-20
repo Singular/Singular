@@ -84,7 +84,7 @@ SOURCES =    Minor.cc\
    links/silink.cc\
    links/sing_dbm.cc\
    sing_win.cc\
-   slInit_Static.cc\
+   links/slInit_Static.cc\
    links/ssiLink.cc\
    links/semaphore.c\
    subexpr.cc\
@@ -94,7 +94,7 @@ SOURCES =    Minor.cc\
    wrapper.cc\
    fereadl.c mmstd.c claptmpl.cc 
 
-#   slInit_Dynamic.cc
+#   links/slInit_Dynamic.cc
 
 libSingular_la_SOURCES   = $(SOURCES) feOpt.inc
 libSingular_g_la_SOURCES = $(SOURCES) feOpt.inc
@@ -140,11 +140,11 @@ SingularHEADERS =    Cache.h \
    pyobject_setup.h \
    run.h \
    sdb.h \
-   silink.h \
+   links/silink.h \
    links/s_buff.h \
    links/sing_dbm.h \
    sing_win.h \
-   slInit.h \
+   links/slInit.h \
    links/ssiLink.h \
    links/simpleipc.h \
    stype.h \

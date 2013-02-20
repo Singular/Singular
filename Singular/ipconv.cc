@@ -26,7 +26,7 @@
 #include <coeffs/rintegers.h>
 #endif
 #include <polys/matpol.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <polys/monomials/ring.h>

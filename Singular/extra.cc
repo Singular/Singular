@@ -90,7 +90,7 @@
 
 #include "attrib.h"
 
-#include "silink.h"
+#include "links/silink.h"
 #include "walk.h"
 #include <Singular/newstruct.h>
 #include <Singular/pyobject_setup.h>

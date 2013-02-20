@@ -8,7 +8,7 @@
 #include <kernel/febase.h>
 
 #include <Singular/lists.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 
 void removeBlackboxStuff(const int rt);
 

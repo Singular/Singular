@@ -10,8 +10,8 @@
 
 #include "config.h"
 #include <kernel/mod2.h>
-#include <Singular/silink.h>
-#include <Singular/slInit.h>
+#include <Singular/links/silink.h>
+#include <Singular/links/slInit.h>
 #include <polys/mod_raw.h>
 
 #ifdef HAVE_DL

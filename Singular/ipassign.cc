@@ -51,7 +51,7 @@
 #include "lists.h"
 #include "ipconv.h"
 #include "attrib.h"
-#include "silink.h"
+#include "links/silink.h"
 #include "ipshell.h"
 #include "blackbox.h"
 

@@ -43,7 +43,7 @@
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
 #include <Singular/blackbox.h>

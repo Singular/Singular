@@ -11,8 +11,8 @@
 #include "config.h"
 #include <kernel/mod2.h>
 
-#include <Singular/silink.h>
-#include <Singular/slInit.h>
+#include <Singular/links/silink.h>
+#include <Singular/links/slInit.h>
 
 #ifdef HAVE_DBM
 

@@ -29,7 +29,7 @@
 #include "misc_ip.h"
 #include "ipid.h"
 #include "feOpt.h"
-#include "silink.h"
+#include "links/silink.h"
 
 // the following 2 inline functions are just convenience shortcuts for Frank's code:
 static inline void number2mpz(number n, mpz_t m){ n_MPZ(m, n, coeffs_BIGINT); }

@@ -20,7 +20,7 @@
 #include <kernel/febase.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipid.h>
-#include <Singular/silink.h>
+#include <Singular/links/silink.h>
 #include <Singular/ipshell.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
@@ -832,7 +832,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 
 /*------------Initialization at Start-up time------------------------*/
 
-#include <Singular/slInit.h>
+#include <Singular/links/slInit.h>
 
 static si_link_extension slTypeInit(si_link_extension s, const char* type)
 {

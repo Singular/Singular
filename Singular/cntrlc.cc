@@ -31,7 +31,7 @@ void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
 #include "cntrlc.h"
 #include "feOpt.h"
 #include "version.h"
-#include "silink.h"
+#include "links/silink.h"
 
 /* undef, if you don't want GDB to come up on error */
 
