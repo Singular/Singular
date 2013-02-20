@@ -20,7 +20,7 @@ static char * bigintm_String(blackbox *b, void *d)
    {
      StringSetS("");
      number n=(number)d; nlWrite(n,NULL); d=(void*)n;
-     return omStrDup(StringEndS(""));
+     return StringEndS();
     }
 }
 static void * bigintm_Copy(blackbox*b, void *d)

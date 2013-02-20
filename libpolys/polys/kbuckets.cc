@@ -1083,8 +1083,8 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (! n_IsOne(pGetCoeff(p1),r->cf))
   {
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
-//StringSetS("##### an = "); nWrite(an); PrintS(StringEndS("\n"));
-//StringSetS("##### bn = "); nWrite(bn); PrintS(StringEndS("\n"));
+//StringSetS("##### an = "); nWrite(an); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
+//StringSetS("##### bn = "); nWrite(bn); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
     /* ksCheckCoeff: divide out gcd from an and bn: */
     int ct = ksCheckCoeff(&an, &bn,r->cf);
     /* the previous command returns ct=0 or ct=2 iff an!=1

@@ -2108,7 +2108,7 @@ void p_Content(poly ph, const ring r)
         //{
         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
         //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
-        //  nWrite(tmp);Print(StringEndS("\n"));
+        //  nWrite(tmp);Print(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
         //}
         //nDelete(&tmp);
         d = n_IntDiv(pGetCoeff(p),h,r->cf);
@@ -2421,7 +2421,7 @@ void p_Content(poly ph, const ring r)
         //{
         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
         //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
-        //  nWrite(tmp);Print(StringEndS("\n"));
+        //  nWrite(tmp);Print(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
         //}
         //nDelete(&tmp);
         d = n_IntDiv(pGetCoeff(p),h,r->cf);

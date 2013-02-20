@@ -300,7 +300,7 @@ void   rWrite(ring r, BOOLEAN details)
 //       }
 //       else
 //       {
-//         StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringEndS("\n"));
+//         StringSetS(""); n_Write(r->cf->minpoly, r); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
 //       }
 //       //if (r->qideal!=NULL)
 //       //{
