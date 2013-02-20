@@ -920,12 +920,15 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
 }
 #endif
 
-number naCopyExt(number a, const coeffs src, const coeffs dst)
+number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
 {
+  assume (nCoeff_is_transExt (src));
+  assume (nCoeff_is_algExt (dst));
   fraction fa=(fraction)a;
-  poly p = p_Copy(NUM(fa),src->extRing);
   assume( rSamePolyRep(src->extRing, dst->extRing) );
+  poly p = p_Copy(NUM(fa),src->extRing);
   definiteReduce(p, dst->extRing->qideal->m[0], dst);
+  assume (p_Test (p, dst->extRing));
   return (number)p;
 }
 
@@ -1002,7 +1005,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
       if (src->type==n_algExt)
          return ndCopyMap; // naCopyMap;         /// Q(a)   --> Q(a)
       else
-         return naCopyExt;
+         return naCopyTrans2AlgExt;
     }
     else
       return NULL;                               /// Q(b)   --> Q(a)
@@ -1015,7 +1018,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
       if (src->type==n_algExt)
         return ndCopyMap; // naCopyMap;          /// Z/p(a) --> Z/p(a)
       else
-         return naCopyExt;
+         return naCopyTrans2AlgExt;
     }
     else
       return NULL;                               /// Z/p(b) --> Z/p(a)

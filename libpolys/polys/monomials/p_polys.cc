@@ -3593,13 +3593,22 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   assume( nMap != NULL );
 
   poly qq;
-  if (rPar (srcExtRing) || (!rPar (srcExtRing) && !rPar ()))
+
+  if ((par_perm == NULL) && (rPar(dst) != 0 && rVar (srcExtRing) > 0))
   {
-    assume (par_perm != NULL);
-    qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
+    int* perm;
+    perm=(int *)omAlloc0((rVar(srcExtRing)+1)*sizeof(int));
+    perm[0]= 0;
+    for(int i=si_min(rVar(srcExtRing),rPar(dst));i>0;i--)
+      perm[i]=-i;
+    qq = p_PermPoly(zz, perm, srcExtRing, dst, nMap, NULL, rVar(srcExtRing)-1);
+    omFreeSize ((ADDRESS)perm, (rVar(srcExtRing)+1)*sizeof(int));
   }
   else
-    qq = p_PermPoly(zz, par_perm, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
+    qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar (srcExtRing)-1);
+
+  assume (p_Test (qq, dst));
+
 //       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
 
 //  assume( FALSE );  WarnS("longalg missing 2");
@@ -3635,22 +3644,13 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     {
       qq = p_Init(dst);
       assume( nMap != NULL );
-      //PrintS("p in other branch: ");
-      //p_Write (p, oldRing); PrintLn();
 
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
 
       assume (n_Test (n,dst->cf));
 
       if ( nCoeff_is_algExt(dst->cf) )
-      {
-
-      //PrintS("n: ");
-      //p_Write ((poly) n, dst->cf->extRing); PrintLn();
         n_Normalize(n, dst->cf);
-      //PrintS("n nach normalize: ");
-      //p_Write ((poly)n, dst->cf->extRing); PrintLn();
-      }
 
       p_GetCoeff(qq, dst) = n;// Note: n can be a ZERO!!!
       // coef may be zero:
@@ -3667,16 +3667,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       p_Test(aq, dst);
 
       if ( nCoeff_is_algExt(dst->cf) )
-      {
-      //PrintS("p: ");
-      //p_Write (p, oldRing); PrintLn();
-      //PrintS("aq for normalize: ");
-      //p_Write (aq, dst);PrintLn();
         p_Normalize(aq,dst);
-      //PrintS("aq after normalize: ");
-      //p_Write (aq, dst);PrintLn();
-      }
-
 
       if (aq == NULL)
         p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
@@ -3776,7 +3767,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
           }
         }
       }
-      if ( mapped_to_par && nCoeff_is_algExt(dst->cf) )
+      if ( mapped_to_par && qq!= NULL && nCoeff_is_algExt(dst->cf) )
       {
         number n = p_GetCoeff(qq, dst);
         n_Normalize(n, dst->cf);
