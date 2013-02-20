@@ -660,7 +660,9 @@ void nfReadTable(const int c, const coeffs r)
   
   if (fftable[i]==0)
   {
-    Werror("illegal GF-table size: %d", c);
+#ifndef NDEBUG
+    Warn("illegal GF-table size: %d", c);
+#endif
     return;
   }
 
@@ -928,7 +930,9 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   if(p->GFChar > (2<<15))
   {
-    Werror("illegal characteristic");
+#ifndef NDEBUG
+    Warn("illegal characteristic");
+#endif
     return TRUE;
   }
 
@@ -936,7 +940,9 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   if( (p->GFDegree * check) > sixteenlog2 )
   {
-    Werror("Sorry: illegal size: %u ^ %u", p->GFChar, p->GFDegree );
+#ifndef NDEBUG
+    Warn("Sorry: illegal size: %u ^ %u", p->GFChar, p->GFDegree );
+#endif
     return TRUE;
   }
 
@@ -946,7 +952,9 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   
   if( r->m_nfPlus1Table == NULL )
   {
-    Werror("Sorry: cannot init lookup table!");
+#ifndef NDEBUG
+    Warn("Sorry: cannot init lookup table!");
+#endif
     return TRUE;
   }
   
