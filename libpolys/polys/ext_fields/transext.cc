@@ -849,8 +849,16 @@ number ntDiv(number a, number b, const coeffs cf)
 
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(result) = g;
+  if (!n_GreaterZero(pGetCoeff(f),ntRing->cf))
+  {
+    g=p_Neg(g,ntRing);
+    f=p_Neg(f,ntRing);
+    NUM(result) = g;
+  }
   if (!p_IsConstant(f,ntRing) || !n_IsOne(pGetCoeff(f),ntRing->cf))
+  {
     DEN(result) = f;
+  }
   COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
 //  ntTest((number)result);

@@ -2483,7 +2483,6 @@ poly p_Cleardenom(poly ph, const ring r)
 
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
     return start;
   }
