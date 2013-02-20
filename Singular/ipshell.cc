@@ -5009,7 +5009,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #endif
   else
   {
-    Werror("Wrong ground field specification");
+    Werror("Wrong or unknown ground field specification");
     goto rInitError;
   }
   pn=pn->next;
@@ -5050,7 +5050,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       {
         if (ch!=IsPrime(ch))
         {
-          Werror("illegal GF-table size %d\n   ? Invalid ground field specification",ch);
+          WerrorS("Invalid ground field specification");
           goto rInitError;
         }
       }
