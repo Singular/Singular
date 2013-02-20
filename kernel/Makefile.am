@@ -1,4 +1,5 @@
-# ACLOCAL_AMFLAGS = -I ${top_srcdir}/m4
+ACLOCAL_AMFLAGS = -I ../m4
+# TODO: use ${top_srcdir} instead of .. in the above?
 
 # PIPE = -pipe
 # ???
