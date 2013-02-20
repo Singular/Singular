@@ -233,8 +233,11 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 */
 poly pSubstPar(poly p, int par, poly image)
 {
+  assume( nCoeff_is_transExt(currRing->cf) ); // nCoeff_is_Extension???
+  const ring R = currRing->cf->extRing;
+
   ideal theMapI = idInit(rPar(currRing),1);
-  nMapFunc nMap = n_SetMap(currRing->cf->extRing->cf, currRing->cf);
+  nMapFunc nMap = n_SetMap(R->cf, currRing->cf);
 
   int i;
   for(i = rPar(currRing);i>0;i--)
@@ -244,7 +247,7 @@ poly pSubstPar(poly p, int par, poly image)
     else
       theMapI->m[i-1] = p_Copy(image, currRing);
   }
-  
+
 
   map theMap=(map)theMapI;
   theMap->preimage=NULL;
@@ -258,17 +261,26 @@ poly pSubstPar(poly p, int par, poly image)
     memset(v,0,sizeof(sleftv));
 
     number d = n_GetDenom(p_GetCoeff(p, currRing), currRing);
-    if (!n_IsOne (d, currRing->cf))
-      WarnS("ignoring denominators of coefficients...");
-    n_Delete(&d, currRing);
+    assume( p_Test((poly)NUM(d), R) );
 
-    number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing); 
+    if ( n_IsOne (d, currRing->cf) )
+    {	  
+      n_Delete(&d, currRing); d = NULL;
+    }     
+    else if (!p_IsConstant((poly)NUM(d), R))
+    {   
+      WarnS("ignoring denominators of coefficients...");
+      n_Delete(&d, currRing); d = NULL;
+    }	  
+
+    number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
+    assume( p_Test((poly)NUM(num), R) );
 
     memset(&tmpW,0,sizeof(sleftv));
     tmpW.rtyp = POLY_CMD;
     tmpW.data = NUM (num); // a copy of this poly will be used
-      
-    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->cf->extRing,NULL,NULL,0,nMap))
+
+    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,R,NULL,NULL,0,nMap))
     {
       WerrorS("map failed");
       v->data=NULL;
@@ -278,7 +290,13 @@ poly pSubstPar(poly p, int par, poly image)
     //TODO check for memory leaks
     poly pp = pHead(p);
     //PrintS("map:");pWrite(pp);
-    pSetCoeff(pp, nInit(1));
+    if( d != NULL )
+    {
+      pSetCoeff(pp, n_Invers(d, currRing->cf));
+      n_Delete(&d, currRing); // d = NULL;
+    } else
+      pSetCoeff(pp, nInit(1));
+
     //PrintS("->");pWrite((poly)(v->data));
     poly ppp = pMult((poly)(v->data),pp);
     //PrintS("->");pWrite(ppp);
