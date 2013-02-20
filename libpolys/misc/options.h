@@ -7,11 +7,11 @@
  * ABSTRACT: macros for global options
  */
 
-/*the general set of std-options : test */
-/*the general set of verbose-options : verbose */
+/*the general set of std-options : si_opt_1(test) */
+/*the general set of verbose-options : si_opt_2(verbose) */
 #ifdef __cplusplus
-extern "C" unsigned si_opt_1;
-extern "C" unsigned si_opt_2;
+extern "C" unsigned si_opt_1; //< NOTE: Original option variable name: test
+extern "C" unsigned si_opt_2; //< NOTE: Original option variable name: verbose
 #else
 extern unsigned si_opt_1;
 extern unsigned si_opt_2;
