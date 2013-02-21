@@ -508,7 +508,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   int Fl=IDELEMS(arg);
   while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
   ideal result=idInit(16,Fl);
-  int i,j,l,k,kkk,rkF,Sl=0,syComponentOrder=currRing->ComponentOrder;
+  int i,j,l,k,kkk,/*rkF,*/Sl=0,syComponentOrder=currRing->ComponentOrder;
   int /*fstart,*/wend,lini,ltR,gencQ=0;
   intvec *newmodcomp;
   int *Flength;
@@ -535,7 +535,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
     gencQ = IDELEMS(currQuotient);
     pairs=(polyset)omAlloc0((Fl+gencQ)*sizeof(poly));
   }
-  rkF=id_RankFreeModule(arg,currRing);
+  // rkF=id_RankFreeModule(arg,currRing);
   Flength = (int*)omAlloc0(Fl*sizeof(int));
   for(j=0;j<Fl;j++)
   {

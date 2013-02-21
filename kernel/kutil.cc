@@ -394,7 +394,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 */
 void HEckeTest (poly pp,kStrategy strat)
 {
-  int   j,k,p;
+  int   j,/*k,*/p;
 
   strat->kHEdgeFound=FALSE;
   if (currRing->pLexOrder || currRing->MixedOrder)
@@ -409,7 +409,7 @@ void HEckeTest (poly pp,kStrategy strat)
     //if (pGetComp(pp) < strat->ak) /* ak is the number of the last component */
     //  return FALSE;
   }
-  k = 0;
+  // k = 0;
   p=pIsPurePower(pp);
   if (p!=0) strat->NotUsedAxis[p] = FALSE;
   /*- the leading term of pp is a power of the p-th variable -*/
@@ -634,7 +634,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   r_assume(strat_tailRing == tailRing);
 
   poly p = T->p;
-  ring r = currRing;
+  // ring r = currRing;
 
   if (T->p == NULL && T->t_p == NULL && i >= 0)
     return dReportError("%c[%d].poly is NULL", TN, i);
@@ -650,13 +650,13 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
       const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
       if (msg != NULL)
         return dReportError("%c[%d] %s", TN, i, msg);
-      r = T->tailRing;
+      // r = T->tailRing;
       p = T->t_p;
     }
     if (T->p == NULL)
     {
       p = T->t_p;
-      r = T->tailRing;
+      // r = T->tailRing;
     }
     if (T->t_p != NULL && i >= 0 && TN == 'T')
     {

@@ -61,11 +61,11 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
-  int ret;
+  // int ret;
   lib_types LT=LT_NONE;
 
   FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
-  ret = stat(libnamebuf, &sb);
+  /*ret =*/ (void) stat(libnamebuf, &sb);
 
   if (fp==NULL)
   {

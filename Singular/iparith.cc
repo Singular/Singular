@@ -4848,7 +4848,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     return TRUE;
   }
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
-  tHomog hom=testHomog;
+  // tHomog hom=testHomog;
   ideal u_id=(ideal)u->Data();
   if (w!=NULL)
   {
@@ -4860,7 +4860,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     else
     {
       w=ivCopy(w);
-      hom=isHomog;
+      // hom=isHomog;
     }
   }
 

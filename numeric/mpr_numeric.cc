@@ -115,11 +115,11 @@ void vandermonde::init()
 poly vandermonde::numvec2poly( const number * q )
 {
   int j;
-  long i,c,sum;
+  long i,/*c,*/sum;
 
   poly pnew,pit=NULL;
 
-  c=0;
+  // c=0;
   sum=0;
 
   int *exp= (int *) omAlloc( (n+1) * sizeof(int) );

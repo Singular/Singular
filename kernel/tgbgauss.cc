@@ -224,10 +224,11 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* /*c*/)
       for(i=found_in_row+1;i<=max_in_area;i++)
       {
         assume(mat->min_col_not_zero_in_row(i)>=col);
-        int first;
         assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
-        first=row_cache[i];
+#ifndef NDEBUG
+        int first=row_cache[i];
         assume(first!=matcol);
+#endif
         //      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
         int nz;
         if((row_cache[i]==col)&&((nz=nSize(mat->get(i,col))*mat->non_zero_entries(i))<act_l))
@@ -259,10 +260,11 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* /*c*/)
       int col_area_index=col/bundle_size;
       assume(col_area_index<=max_area_index);
       assume(mat->min_col_not_zero_in_row(i)>=col);
-      int first;
       assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
-      first=row_cache[i];
+#ifndef NDEBUG
+      int first=row_cache[i];
       assume(first!=matcol);
+#endif
       if(row_cache[i]==col)
       {
 

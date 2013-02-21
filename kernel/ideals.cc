@@ -1645,11 +1645,11 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 */
 poly idMinor(matrix a, int ar, unsigned long which, ideal R)
 {
-  int     i,j,k,size;
+  int     i,j/*,k,size*/;
   unsigned long curr;
   int *rowchoise,*colchoise;
   BOOLEAN rowch,colch;
-  ideal result;
+  // ideal result;
   matrix tmp;
   poly p,q;
 
@@ -1658,11 +1658,11 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
 
   rowchoise=(int *)omAlloc(ar*sizeof(int));
   colchoise=(int *)omAlloc(ar*sizeof(int));
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
-  result=idInit(size,1);
+  // if ((i>512) || (j>512) || (i*j >512)) size=512;
+  // else size=i*j;
+  // result=idInit(size,1);
   tmp=mpNew(ar,ar);
-  k = 0; /* the index in result*/
+  // k = 0; /* the index in result*/
   curr = 0; /* index of current minor */
   idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
   while (!rowch)
@@ -1713,7 +1713,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
 */
 ideal idMinors(matrix a, int ar, ideal R)
 {
-  int     i,j,k,size;
+  int     i,j,/*k,*/size;
   int *rowchoise,*colchoise;
   BOOLEAN rowch,colch;
   ideal result;
@@ -1729,7 +1729,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   else size=i*j;
   result=idInit(size,1);
   tmp=mpNew(ar,ar);
-  k = 0; /* the index in result*/
+  // k = 0; /* the index in result*/
   idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
   while (!rowch)
   {

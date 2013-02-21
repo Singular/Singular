@@ -520,7 +520,7 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
 {
   int i=IDELEMS(red)-1,num_mon,num_tail;
   poly h,hn;
-  BOOLEAN dummy;
+  // BOOLEAN dummy;
  
   while ((i>0) && (red->m[i-1]==NULL)) i--;
   i--;
@@ -533,7 +533,7 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
     while (hn!=NULL)
     {
       kBucketInit(syzstr->syz_bucket,hn,num_tail);
-      dummy = syRedSyz(syzstr->syz_bucket,red,crit_comp,gen_length);
+      /*dummy =*/ (void) syRedSyz(syzstr->syz_bucket,red,crit_comp,gen_length);
       kBucketClear(syzstr->syz_bucket,&hn,&num_tail);
       pNext(h) = hn;
       if ((hn==NULL) || (pGetComp(hn)<=crit_comp))
@@ -551,7 +551,7 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
       while (hn!=NULL)
       {
         kBucketInit(syzstr->syz_bucket,hn,num_tail);
-        dummy = syRedSyz(syzstr->syz_bucket,sec_red,crit_comp,secgen_length);
+        /*dummy =*/ (void) syRedSyz(syzstr->syz_bucket,sec_red,crit_comp,secgen_length);
         kBucketClear(syzstr->syz_bucket,&hn,&num_tail);
         pNext(h) = hn;
         if (hn==NULL)

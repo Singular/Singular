@@ -584,8 +584,8 @@ poly ssiReadPoly(ssiInfo *D)
   n=ssiReadInt(D->f_read);
   //Print("poly: terms:%d\n",n);
   poly p;
-  int j;
-  j=0;
+  // int j;
+  // j=0;
   poly ret=NULL;
   poly prev=NULL;
   for(l=0;l<n;l++) // read n terms
