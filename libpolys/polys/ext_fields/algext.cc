@@ -925,12 +925,15 @@ number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
   assume (nCoeff_is_transExt (src));
   assume (nCoeff_is_algExt (dst));
   fraction fa=(fraction)a;
-  if (!DENIS1 (fa))
-    WarnS ("ignoring denominators in naCopyTrans2AlgExt");
-  poly p;
+  poly p, q;
   if (rSamePolyRep(src->extRing, dst->extRing))
   {
     p = p_Copy(NUM(fa),src->extRing);
+    if (!DENIS1(fa))
+    {
+      q = p_Copy(DEN(fa),src->extRing);
+      assume (q != NULL);
+    }
   }
   else
   {
@@ -940,10 +943,28 @@ number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
 
     assume (nMap != NULL);
     p= p_PermPoly (NUM (fa), NULL, src->extRing, dst->extRing,nMap, NULL,rVar (src->extRing));
+    if (!DENIS1(fa))
+    {
+      q= p_PermPoly (DEN (fa), NULL, src->extRing, dst->extRing,nMap, NULL,rVar (src->extRing));
+      assume (q != NULL);
+    }
   }
   definiteReduce(p, dst->extRing->qideal->m[0], dst);
   assume (p_Test (p, dst->extRing));
-  return (number)p;
+  if (!DENIS1(fa))
+  {
+    definiteReduce(q, dst->extRing->qideal->m[0], dst);
+    assume (p_Test (q, dst->extRing));
+    if (q != NULL)
+    {
+      number t= naDiv ((number)p,(number)q, dst);
+      p_Delete (&p, dst->extRing);
+      p_Delete (&q, dst->extRing);
+      return t;
+    }
+    WerrorS ("mapping denominator to zero");
+  }
+  return (number) p;
 }
 
 /* assumes that src = Q, dst = Z/p(a) */
