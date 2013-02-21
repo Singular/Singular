@@ -699,7 +699,7 @@ long p_DegW(poly p, const short *w, const ring R)
   long r=~0L;
   loop
   {
-    long t = totaldegreeWecart_IV(p, R, w); pIter(p);
+    long t = totaldegreeWecart_IV(p, R, w);
     if (t > r) r = t;
     pIter(p);
     if (p==NULL) break;
