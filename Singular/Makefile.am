@@ -42,6 +42,7 @@ libSingular_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DLIBSINGULAR
 SOURCES =    Minor.cc\
    MinorInterface.cc\
    MinorProcessor.cc\
+   links/asciiLink.cc\
    attrib.cc\
    bbcone.cc\
    bbfan.cc\

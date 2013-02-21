@@ -83,7 +83,6 @@ BOOLEAN slWrite(si_link l, leftv v);
 BOOLEAN slDump(si_link l);
 BOOLEAN slGetDump(si_link l);
 const char* slStatus(si_link l, const char *request);
-const char* slStatusAscii(si_link l,const  char* request);
 BOOLEAN slInit(si_link l, char *str);
 void slKill(si_link l);
 void slCleanUp(si_link l);
@@ -112,6 +111,8 @@ extern omBin sip_link_bin;
 extern omBin ip_link_bin;
 
 int slStatusSsiL(lists L, int timeout);
+int ssiBatch(const char *host, const char * port);
+
 
 typedef struct
 {

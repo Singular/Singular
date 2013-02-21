@@ -35,8 +35,6 @@
 #include "feOpt.h"
 #include "distrib.h"
 #include "version.h"
-#include "links/slInit.h"
-#include  <Singular/links/ssiLink.h>
 #include "bigintm.h"
 #include "mmalloc.h"
 #include "tok.h"

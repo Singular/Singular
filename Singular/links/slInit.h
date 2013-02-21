@@ -15,5 +15,6 @@
 #ifdef HAVE_DBM
 si_link_extension slInitDBMExtension(si_link_extension s);
 #endif
+const char* slStatusAscii(si_link l,const  char* request);
 
 #endif // SL_INIT_H
