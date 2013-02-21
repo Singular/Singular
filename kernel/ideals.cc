@@ -1141,7 +1141,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
     if(w==NULL)
       N=si_max(N,p_Deg(Q->m[i],currRing));
     else
-      N=si_max(N,pDegW(Q->m[i],w));
+      N=si_max(N,p_DegW(Q->m[i],w,currRing));
   N+=n;
 
   T=mpNew(IDELEMS(Q),IDELEMS(P));
@@ -1166,7 +1166,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
         else
           p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
         pNormalize(p);
-        if(((w==NULL)&&(p_Deg(p0,currRing)>n))||((w!=NULL)&&(pDegW(p0,w)>n)))
+        if(((w==NULL)&&(p_Deg(p0,currRing)>n))||((w!=NULL)&&(p_DegW(p0,w,currRing)>n)))
           p_Delete(&p0,currRing);
         else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
@@ -1180,7 +1180,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
           pIter(p);
           pNext(p0)=NULL;
           if(((w==NULL)&&(p_Deg(p0,currRing)>n))
-          ||((w!=NULL)&&(pDegW(p0,w)>n)))
+          ||((w!=NULL)&&(p_DegW(p0,w,currRing)>n)))
             p_Delete(&p0,currRing);
           else
             R->m[i]=pAdd(R->m[i],p0);

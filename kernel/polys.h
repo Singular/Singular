@@ -341,6 +341,8 @@ inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
 #define   pInvers(n,p,w) p_Invers(n,p,w,currRing)
 // maximum weigthed degree of all monomials of p, w is indexed from
 // 1..pVariables
+
+/// Deprecated: only for compatibility with older code!
 #define    pDegW(p,w) p_DegW(p,w,currRing)
 
 /*-----------type conversions ----------------------------*/
