@@ -691,14 +691,20 @@ long p_WTotaldegree(poly p, const ring r)
 
 long p_DegW(poly p, const short *w, const ring R)
 {
-  long r=~0L;
+  assume( p_Test(p, R) );
+  assume( w != NULL );
+   
+  if( p == NULL ) // TODO: ???
+     return -1;
+   
+  long r = totaldegreeWecart_IV(p, R, w); pIter(p);
 
-  while (p!=NULL)
+  for ( ; p!=NULL; pIter(p) )
   {
-    long t=totaldegreeWecart_IV(p,R,w);
-    if (t>r) r=t;
-    pIter(p);
+    const long t = totaldegreeWecart_IV(p, R, w);
+    if (t > r) r = t;
   }
+   
   return r;
 }
 
