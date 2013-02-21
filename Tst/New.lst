@@ -23,4 +23,8 @@ New/quotient_cleardenom.tst
 New/testParametrization_2.tst
 New/imap_minimal.tst
 New/hnoether_transcendental.tst
-
+New/wdeg.tst
+New/subst_denoms.tst
+New/stdZ.tst
+New/quotient_error.tst
+New/division_lift.tst
