@@ -1,0 +1,1639 @@
+///////////////////////////////////////////////////////////////////////////////
+version ="$Id$";
+category="Singularities";
+info="
+LIBRARY: classifyAeq.lib         Simple Space Curve singularities in characteristic 0
+
+AUTHORS: Faira Kanwal Janjua     fairakanwaljanjua@gmail.com
+         Gerhard Pfister         pfister@mathematik.uni-kl.de
+
+OVERVIEW: A library for classifying the simple singularities
+          with respect to A equivalence in characteristic 0.
+  Simple Surface singularities in characteristic O have been classified by Bruce and Gaffney [4] resp.
+  Gibson and Hobbs [1] with respect to A equivalence. If the input is one of the simple singularities in
+  [1] it returns a normal form otherwise a zero ideal(i.e not simple).
+
+REFERENCES:
+  [1] Gibson,C.G; Hobbs,C.A.:Simple SIngularities of Space Curves.
+  Math.Proc. Comb.Phil.Soc.(1993),113,297.
+  [2] Hefez,A;Hernandes,M.E.:Standard bases for local rings of branches and their modules of differentials.
+  Journal of Symbolic Computation 42(2007) 178-191.
+  [3] Hefez,A;Hernandes,M.E.:The Analytic Classification Of Plane Branches. Bull.Lond Math Soc.43.(2011) 2,289-298.
+  [4] Bruce, J.W.,Gaffney, T.J.: Simple singularities of mappings (C, 0) ->(C2,0).
+  J. London Math. Soc. (2) 26 (1982), 465-474.
+
+PROCEDURES:
+          sagbiAlg(G);    Compute the Sagbi-basis of the Algebra.
+          sagbiMod(I,A);  Compute the Sagbi- basis of the Module.
+          semiGroup(G);   Compute the Semi-Group of the Algebra provided the input is Sagbi Bases of the Algebra.
+          semiMod(I,A);   Compute the Semi-Module provided that the input are the Sagbi Bases of the Algebra resp.Module.
+          planeCur(I);    Compute the type of the Simple Plane Curve singularity.
+          spaceCur(I);    Compute the type of the simple Space Curve singularity.
+";
+LIB "algebra.lib";
+LIB "curvepar.lib";
+///////////////////////////////////////////////////////////////////////////////
+proc planeCur(ideal I)
+"USAGE":  planeCur(I);  I ideal
+RETURN: An ideal.Ideal is one of the singularity in the list of Bruce and Gaffney [4]
+EXAMPLE: example planeCur;  shows an example
+"
+{
+   def R=basering;
+   I=sortMOD(I);
+   list M;
+   list K;
+   if(I==0)
+   {return(I);}
+   ideal G=sagbiAlg(I);
+   list L=semiGroup(G);
+   ideal J=diff(G,var(1));
+   J=sagbiMod(J,G);
+   M=semiMod(J,G);
+   int C=L[2];
+   ideal Z=0,0;
+   if(L[1][1]>4)
+   {
+      return(Z);
+   }
+   if(L[1][1]==1)
+   {
+        ideal A=var(1);
+        K=Guess(A);
+        if(CompareList(M,K,6)!=0)
+        {
+              return(A);
+        }
+        else
+        {
+            return(Z);
+        }
+    }
+    if(L[1][1]==2)
+    {
+         ideal A=var(1)^2,var(1)^(L[2]+1);
+         K=Guess(A);
+         if(CompareList(M,K,6)!=0)
+         {
+            return(A);
+         }
+         else
+         {
+            return(Z);
+         }
+    }
+    if(L[1][1]==4)
+    {
+          if(L[1][2]==5)
+          {
+                intvec q=4,5;
+                if((L[1]==q)&&(L[2]==12)&&(size(L[3])==7))
+                {
+                   intvec q1=3,4; intvec q2=3,4,10;
+                   if((M[4]==q1)&&(M[5]==11)&&(size(M[6])==6))
+                   {
+                       ideal A=var(1)^4,var(1)^5;
+                        K=Guess(A);
+                       if(CompareList(M,K,6)!=0)
+                       {
+                           return(A);
+                       }
+                   }
+                   if((M[4]==q2)&&(M[5]==7)&&(size(M[6])==3))
+                   {
+                       ideal A=var(1)^4,var(1)^5+var(1)^7;
+                       K=Guess(A);
+                       if(CompareList(M,K,6)!=0)
+                       {
+                         return(A);
+                       }
+                   }
+                   else
+                   {
+                      return(Z);
+                   }
+                }
+                else
+                {
+                   return(Z);
+                }
+          }
+          if(L[1][2]==6)
+          {
+                ideal A=var(1)^4,var(1)^6+var(1)^(L[1][3]-6);
+                K=Guess(A);
+                if(L[1][3] mod 2 !=0)
+                {
+                   ideal S=t4,t6+t^(M[2]-9);
+                   if(CompareList(M,K,6)!=0)
+                   {
+                      return(S);
+                   }
+                   if(CompareList(M,K,6)==0)
+                   {
+                      int m=size(K[4])+1;
+                      if(size(M[4])==m)
+                      {
+                        return(S);
+                      }
+                      else{return(Z);}
+                   }
+                }
+                else
+                {
+                   return(Z);
+                }
+          }
+          if(L[1][2]==7)
+          {
+                intvec q=4,7;list K;
+                ideal A=var(1)^4,var(1)^7;
+                ideal B=var(1)^4,var(1)^7+var(1)^9;
+                ideal T=var(1)^4,var(1)^7+var(1)^10;
+                list Q=A,B,T;
+                for(int i=1;i<=3;i++)
+                {    K=Guess(Q[i]);
+                     if(CompareList(M,K,6)!=0)
+                     {
+                        if(i==1)
+                        {
+                            return(A);
+                            break;
+                        }
+                        if(i==2)
+                        {
+                          return(B);
+                          break;
+                        }
+                        if(i==3)
+                        {
+                           return(T);
+                           break;
+                        }
+                     }
+                }
+                else
+                {
+                     return(Z);
+                }
+        }
+        else
+        {
+             return(Z);
+        }
+   }
+   if(L[1][1]==3)
+   {
+          int k=L[1][2]-1;
+          int p=L[1][2]-2;
+          if(k mod 3 ==0)
+          {
+              if(size(M[4])==2)
+              {
+                  ideal A=var(1)^3,var(1)^L[1][2];
+                  ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5];
+                  list Q=A,B;
+                  for(int i=1;i<=2;i++)
+                  {  K=Guess(Q[i]);
+                     if(CompareList(M,K,6)!=0)
+                     {
+                        return(Q[i]);
+                     }
+                  }
+              }
+              if(size(M[4])==3)
+              {
+                  ideal A=var(1)^3,var(1)^L[1][2];
+                  ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5];
+                  list Q=A,B;
+                  for(int i=1;i<=2;i++)
+                  {  K=Guess(Q[i]);
+                     if(CompareList(M,K,6)!=0)
+                     {
+                          return(Q[i]);
+                     }
+                  }
+              }
+              else
+              {
+                  return(Z);
+              }
+          }
+          if(p mod 3 ==0)
+          {
+               if(size(M[4])==2)
+               {
+                    ideal A=var(1)^3,var(1)^L[1][2];
+                    ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5];
+                    list Q=A,B;
+                    for(int i=1;i<=2;i++)
+                    {    K=Guess(Q[i]);
+                         if(CompareList(M,K,6)!=0)
+                         {
+                            return(Q[i]);
+                         }
+                     }
+                }
+                if(size(M[4])==3)
+                {
+                     ideal A=var(1)^3,var(1)^L[1][2];
+                     ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5];
+                     list Q=A,B;
+                     for(int i=1;i<=2;i++)
+                     {    K=Guess(Q[i]);
+                          if(CompareList(M,K,6)!=0)
+                          {
+                              return(Q[i]);
+                          }
+                     }
+                }
+                else
+                {
+                      return(Z);
+                }
+           }
+           else
+           {
+                 return(Z)
+           }
+   }
+}
+example
+{
+"EXAMPLE:"; echo=2;
+  ring R=0,t,Ds;
+  ideal I=t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16,t7+7t8+22t9+51t10+113t11+219t12+366t13+589t14+876t15+1170t16+1514t17
++1828t18+2011t19+2165t20+2163t21+1982t22+1806t23+1491t24+1141t25+889t26+588t27+379t28+252t29+120t30+72t31+36t32+9t33+9t34+t36;
+  planeCur(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+proc spaceCur(ideal I)
+"USAGE":  spaceCur(I);  I ideal
+RETURN: an ideal. Ideal is one of the singularity  in the list of C.G.Gibson and C.A.Hobbs.
+EXAMPLE: example spaceCur;  shows an example
+"
+{
+   def R=basering;
+   I=sortMOD(I);
+   list M;
+   list K;
+   if(I==0)
+   {return(I);}
+   ideal G=sagbiAlg(I);
+   if(size(G)<=2){return(planeCur(G));}
+   list L=semiGroup(G);
+   ideal J=diff(G,var(1));
+   J=sagbiMod(J,G);
+   M=semiMod(J,G);
+   int C=L[2];
+   ideal Z=0,0,0;
+   if(L[1][1]>5)
+   {
+      return(Z);
+   }
+   if(L[1][1]==3)
+   {
+          int k=L[1][2]-1;
+          int p=L[1][2]-2;
+          if(k mod 3 ==0)
+          {
+               poly q=var(1)*(J[2])-G[2];
+               if(leadexp(q)!=leadexp(J[3]))
+               {
+                  if(size(M[4])!=3)
+                  {
+                     ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                     return(B);
+                  }
+                  if(size(M[4])==3)
+                  {
+                     ideal I1=G[1],G[2];
+                     I1=sortMOD(I1);
+                     ideal T=sagbiAlg(I1);
+                     ideal J1=diff(T,var(1));
+                     J1=sagbiMod(J1,T);
+                     K=semiMod(J1,T);
+                     if(size(K[4])!=2)
+                     {
+                           ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                          return(B);
+                     }
+                     if(size(K[4])==2)
+                     {
+                         ideal A=var(1)^3,var(1)^L[1][2],var(1)^L[1][3];
+                          return(A);
+                     }
+                  }
+               }
+               if(leadexp(q)==leadexp(J[3]))
+               {
+                  if(size(M[4])!=3)
+                  {
+                      ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                      return(B);
+                  }
+                  if(size(M[4])==3)
+                  {
+                      ideal I1=G[1],G[2];
+                      I1=sortMOD(I1);
+                      ideal T=sagbiAlg(I1);
+                      ideal J1=diff(T,var(1));
+                      J1=sagbiMod(J1,T);
+                      K=semiMod(J1,T);
+                      if(size(K[4])!=2)
+                      {
+                            ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                            return(B);
+                      }
+                      if(size(K[4])==2)
+                      {
+                           ideal A=var(1)^3,var(1)^L[1][2],var(1)^L[1][3];
+                           return(A);
+                      }
+                  }
+               }
+          }
+          if(p mod 3 ==0)
+          {
+                poly q=var(1)^3*(J[2])-var(1)^2*(G[2]);
+               if(leadexp(q)!=leadexp(J[3]))
+               {
+                  if(size(M[4])!=3)
+                  {
+                     ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                     return(B);
+                  }
+                  if(size(M[4])==3)
+                  {
+                       ideal I1=G[1],G[2];
+                       I1=sortMOD(I1);
+                       ideal T=sagbiAlg(I1);
+                       ideal J1=diff(T,var(1));
+                       J1=sagbiMod(J1,T);
+                       K=semiMod(J1,T);
+                       if(size(K[4])!=2)
+                       {
+                           ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                           return(B);
+                       }
+                       if(size(K[4])==2)
+                       {
+                           ideal A=var(1)^3,var(1)^L[1][2],var(1)^L[1][3];
+                           return(A);
+                       }
+                 }
+              }
+              if(leadexp(q)==leadexp(J[3]))
+              {
+                  if(size(M[4])!=3)
+                  {
+                        ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                        return(B);
+                  }
+                  if(size(M[4])==3)
+                  {
+                       ideal I1=G[1],G[2];
+                       ideal T=sagbiAlg(I1);
+                       ideal J1=diff(T,var(1));
+                       J1=sagbiMod(J1,T);
+                       K=semiMod(J1,T);
+                       if(size(K[4])!=2)
+                       {
+                           ideal B=var(1)^3,var(1)^L[1][2]+var(1)^M[5],var(1)^L[1][3];
+                           return(B);
+                       }
+                       if(size(K[4])==2)
+                       {
+                           ideal A=var(1)^3,var(1)^L[1][2],var(1)^L[1][3];
+                           return(A);
+                       }
+                  }
+             }
+           }
+           else
+           {
+                 return(Z);
+           }
+   }
+   if(L[1][1]==4)
+   {
+      if(L[1][2]==5)
+      {
+         if(L[1][3]==11)
+         {
+             ideal A=var(1)^4,var(1)^5,var(1)^11;
+             ideal B=var(1)^4,var(1)^5+var(1)^7,var(1)^11;
+             list Q=A,B;
+             ideal Ij=jet(I,10);
+             Ij=simplify(Ij,2);
+             ideal Gj=sagbiAlg(Ij);
+             list Lj=semiGroup(Gj);
+             ideal Jj=diff(Gj,var(1));
+             Jj=sagbiMod(Jj,Gj);
+             list Mj=semiMod(Jj,Gj);
+             if(size(Mj[4])==2)
+             {
+                 K=Guess(Q[1]);
+                 if(CompareList(M,K,6)!=0)
+                 {
+                    return(Q[1]);
+                 }
+             }
+             if(size(Mj[4])==3)
+             {
+                 K=Guess(Q[2]);
+                 if(CompareList(M,K,6)!=0)
+                 {
+                    return(Q[2]);
+                 }
+             }
+         }
+         if(L[1][3]!=11)
+         {
+              ideal A=var(1)^4,var(1)^5,var(1)^6;
+              ideal B=var(1)^4,var(1)^5,var(1)^7;
+              list Q=A,B;
+              for(int i=1;i<=2;i++)
+              {
+                 K=Guess(Q[i]);
+                 if(CompareList(M,K,6)!=0)
+                 {
+                    return(Q[i]);
+                    break;
+                 }
+              }
+         }
+         else
+         {return(Z);
+         }
+      }
+      if(L[1][2]==6)
+      {
+          if(size(L[1])==3)
+          {
+               if(size(M[4])==3)
+               {
+                   ideal A=var(1)^4,var(1)^6,var(1)^L[1][3];
+                   K=Guess(A);
+                   if(CompareList(M,K,6)!=0)
+                   {
+                       return(A);
+                   }
+                   else
+                   {
+                       return(Z);
+                   }
+               }
+               if(size(M[4])==4)
+               {
+                   ideal A=var(1)^4,var(1)^6+var(1)^(L[1][3]-2),var(1)^L[1][3];
+                   K=Guess(A);
+                   if(CompareList(M,K,6)!=0)
+                   {
+                          return(A);
+                   }
+                   else
+                   {
+                       return(Z);
+                   }
+               }
+          }
+          if(size(L[1])==4)
+          {
+               if(size(M[4])==4)
+               {
+                   ideal A=var(1)^4,var(1)^6+var(1)^(L[1][3]-4),var(1)^L[1][3];
+                   K=Guess(A);
+                   if(CompareList(M,K,6)!=0)
+                   {
+                       return(A);
+                   }
+                   else
+                   {
+                       return(Z);
+                   }
+               }
+               if(size(M[4])==5)
+               {
+                   ideal A=var(1)^4,var(1)^6+var(1)^(L[1][4]-8),var(1)^L[1][4];
+                   K=Guess(A);
+                   if(CompareList(M,K,6)!=0)
+                   {
+                          return(A);
+                   }
+                   else
+                   {
+                       return(Z);
+                   }
+               }
+          }
+          else
+          {
+              return(Z);
+          }
+      }
+      if(L[1][2]==7)
+      {
+          if(L[1][3]==9)
+          {
+               ideal A=var(1)^4,var(1)^7,var(1)^9+var(1)^10;
+               ideal B=var(1)^4,var(1)^7,var(1)^9;
+               list Q=A,B;
+               for(int i=1;i<=2;i++)
+               {
+                  K=Guess(Q[i]);
+                  if(CompareList(M,K,6)!=0)
+                  {
+                     return(Q[i]);
+                     break;
+                  }
+               }
+          }
+          if(L[1][3]==10)
+          {
+               ideal A=var(1)^4,var(1)^7,var(1)^10;
+               ideal B=var(1)^4,var(1)^7+var(1)^9,var(1)^10;
+               list Q=A,B;
+               for(int i=1;i<=2;i++)
+               {
+                    K=Guess(Q[i]);
+                   if(CompareList(M,K,6)!=0)
+                   {
+                      return(Q[i]);
+                      break;
+                   }
+               }
+          }
+          if(L[1][3]==13)
+          {
+               ideal A=var(1)^4,var(1)^7,var(1)^13;
+               ideal B=var(1)^4,var(1)^7+var(1)^9,var(1)^13;
+               list Q=A,B;
+               ideal Ij=jet(I,12);
+               Ij=simplify(Ij,2);
+               ideal Gj=sagbiAlg(Ij);
+               list Lj=semiGroup(Gj);
+               ideal Jj=diff(Gj,var(1));
+               Jj=sagbiMod(Jj,Gj);
+               Jj=jet(Jj,12);
+               Jj=simplify(Jj,2);
+               list Mj=semiMod(Jj,Gj);
+               if(size(Jj)==2)
+               {
+                    K=Guess(Q[1]);
+                    if(CompareList(M,K,6)!=0)
+                    {
+                       return(A);
+                       break;
+                    }
+               }
+               if(size(Jj)==3)
+               {
+                    K=Guess(Q[2]);
+                    if(CompareList(M,K,6)!=0)
+                    {
+                       return(B);
+                       break;
+                    }
+                }
+          }
+          if(L[1][3]==17)
+          {
+                ideal A=var(1)^4,var(1)^7,var(1)^17;
+                ideal B=var(1)^4,var(1)^7+var(1)^9,var(1)^17;
+                ideal T=var(1)^4,var(1)^7+var(1)^10,var(1)^17;
+                list Q=A,B,T;
+                for(int i=1;i<=3;i++)
+                {
+                    K=Guess(Q[i]);
+                    if(CompareList(M,K,6)!=0)
+                    {
+                        if(i==2)
+                        {
+                           return(Q[i]);
+                           break;
+                        }
+                        else
+                        {
+                             ideal Ij=jet(I,16);
+                             Ij=simplify(Ij,2);
+                             ideal Gj=sagbiAlg(Ij);
+                             list Lj=semiGroup(Gj);
+                             ideal Jj=diff(Gj,var(1));
+                             Jj=sagbiMod(Jj,Gj);
+                             Jj=jet(Jj,16);
+                             Jj=simplify(Jj,2);
+                             list Mj=semiMod(Jj,Gj);
+                             if(size(Jj)==2)
+                             {
+                                 if(CompareList(M,K,6)!=0)
+                                 {
+                                    return(A);
+                                    break;
+                                 }
+                             }
+                             if(size(Jj)==3)
+                             {
+                                 if(CompareList(M,K,6)!=0)
+                                 {
+                                    return(T);
+                                    break;
+                                 }
+                             }
+                        }
+                    }
+                }
+          }
+          else
+          {
+              return(Z);
+          }
+      }
+   }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=0,t,Ds;
+ideal I=t3+3t4+3t5+t6,t13+14t14+92t15+377t16+1079t17+2288t18+3718t19+4719t20+4719t21+3718t22+2288t23+1079t24+377t25+92t26+14t27+t28,t17+17t18+136t19+680t20+2380t21+6188t22+12376t23+19448t24+24310t25+24310t26+19448t27+12376t28+6188t29+2380t30+680t31+136t32+17t33+t34;
+  spaceCur(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+proc sagbiAlg(ideal I)
+"USAGE":  sagbiAlg(I);  I ideal
+RETURN: An ideal.The sagbi bases of I.
+EXAMPLE: example sagbiAlg;  shows an example
+{
+    def R=basering;
+    def O=changeord("Ds");
+    setring O;
+    ideal I=imap(R,I);
+    ideal L;
+    poly h;
+    int z,n;
+
+    if(size(I)==0){return(I);}
+    int b=ConductorBound(I);
+
+  // int b=200;
+  //   b=correctBound(I,b);
+   ideal S=interReduceSagbi(I,b) ;
+  // b=correctBound(S,b);
+   while(size(S)!=n)
+   {
+       n=size(S);
+       L=sagbiSP(S);
+       for (z=1;z<=size(L);z++)
+       {
+             h=sagbiNF(L[z],S,b);
+             if(h!=0)
+             {
+                  S=insertOne(h,S,b);
+             }
+        }
+   }
+   setring R;
+   ideal S=imap(O,S);
+   return(S);
+}
+
+example
+{
+  "EXAMPLE:"; echo=2;
+ring R=0,t,ds;
+ideal I=t8,t10+t13,t12+t15;
+sagbiAlg(I);
+I=t8,t10+t13,t12+2t15;
+sagbiAlg(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+proc sagbiMod(ideal I,ideal G)
+"USAGE":  sagbiMod(I,G);  I an ideal module and ideal G being the sagbi bases of the Algebra
+RETURN: An ideal. the sagbi bases for the differential module.
+EXAMPLE: example sagbiMod;  shows an example
+{
+  def R=basering;//up till now the ordering of the base ring is ds
+  def O=changeord("Ds");
+  setring O;
+  ideal I=imap(R,I);
+  ideal G=imap(R,G);
+  int n=ncols(G);poly h;
+  if(I==0)
+  { return(I);}
+  ideal S,J,M;
+  I=sortMOD(I);
+  if(deg(lead(I[1]))<=1)
+  { setring R;
+    return(imap(O,I));}
+  int b=ConductorBound(lead(G))+deg(lead(I[1]));
+  list P;int i;
+  P=createP(I);
+  while(size(P)!=0)
+  {
+      J=P[1][1],P[1][2];
+      P=delete(P,1);
+      S=SpolyMOD(J,G);
+      for(i=1;i<=size(S);i++)
+      {
+         h=sagbiNFMOD(S[i],G,I,b);
+         if(h!=0)
+         {
+             h=simplify(h,1);
+             P=enlargeP(h,P,I);
+             I[size(I)+1]=h;
+         }
+      }
+  }
+  I=sortMOD(I);
+  setring R;
+  ideal K=imap(O,I);
+  return(K);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0,t,Ds;
+  ideal G=t8,t10+t13,t12+t15,t23-t29,t27;
+  ideal I=diff(G,t);
+  sagbiMod(I,G);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+proc semiGroup(ideal I)
+"USAGE": semiGroup(I);  I ideal the sagbi bases of Algebra.
+RETURN: list L; list with three entries associated to the algebra generated by
+   the sagbi basis:
+   generators of the semigroup
+   the conductor
+    the semigroup
+EXAMPLE: example planeCur;  shows an example
+{
+   list M;
+   if(deg(I[1])<=1)
+   {
+      M[1]=intvec(1);
+      M[2]=1;
+      M[3]=intvec(0,1);
+   }
+   else
+   {
+      ideal J=lead(I);
+      int b=ConductorBound(J);
+      int i;
+      list L=J[1];
+      for(i=2;i<=size(J);i++)
+      {
+         L[i]=J[i];
+      }
+      M=WSemigroup(L,b);
+      intvec v=0,M[3];
+      M[3]=cutAfterConductor(v);
+      M[2]=findConductor(M[3]);
+   }
+   return(M);
+}
+
+example
+{
+ "EXAMPLE:"; echo=2;
+ring R=0,t,ds;
+ideal I=t8,t10+t13,t12+t15,t23-t29,t27;
+semiGroup(I);
+I=t8,t10+t13,t12+2t15,t27-3t33,t29;
+semiGroup(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+proc semiMod(ideal I,ideal G)
+"USAGE":  semiMod(I,G);  I ideal,G ideal;I and G are the sagbi bases of the differential module resp.Algebra.
+RETURN: list K;
+      K[1]min generators of the semialgebra.
+      K[2]conductor of the algebra.
+      K[3]genrators for the semialgebra.
+      K[4]min generators of the module.
+      K[5]conductor of the module.
+      K[6]semigroup of the module.
+EXAMPLE: example semiMod;  shows an example
+{
+     list L=semiGroup(G);
+     intvec M;
+     list C;intvec S;
+     int j; int k; int b;
+     for(int i=1;i<=size(I);i++)
+     {
+         M[size(M)+1]=ord(I[i]);
+     }
+     M=M[2..size(M)];
+     for(i=1;i<=size(M);i++)
+     {
+         C[size(C)+1]=M[i]+L[3];
+     }
+     int a=M[1]+L[2];
+     for(j=1;j<=size(M);j++)
+     {
+        for(i=0;i<=a;i++)
+        {
+           for(k=1;k<=size(L[3]);k++)
+           {
+               if(i==C[j][k])
+               {
+                  S[size(S)+1]=i;
+               }
+           }
+        }
+      }
+      S=S[2..size(S)];
+      list K;
+      K[1]=L[1];//generators of the semialgebra.
+      K[2]=L[2];//conductor of the algebra.
+      K[3]=L[3];//semi group of the algebra.
+      K[4]=M;// generators of the semimodule.
+      K[5]=findConductor(sortIntvec(S)); //conductor of the module.
+      K[6]=cutAfterConductor(sortIntvec(S));//semigroup of the module.
+      return(K);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r=0,t,Ds;
+  ideal G=t4,t7+t10;
+  ideal I=diff(G,t);
+  ideal k=sagbiMod(I,G);
+  semiMod(k,G);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc sagbiNF(poly f,ideal I,int b)
+{
+//computes the Sagbi normal form
+   list L=1;
+   map psi;
+   f=jet(f,b);
+   if(f==0){return(f);}
+   while((f!=0) && (L[1]!=0))
+   {
+     L= algebra_containment(lead(f),lead(I),1);
+     if (L[1]==1)
+     {
+        def S= L[2];
+        psi= S,maxideal(1),I;
+        f=jet(f-psi(check),b);
+        kill S;
+     }
+   }
+   return (lead(f)+sagbiNF(f-lead(f),I,b));
+}
+
+/*
+ring R=0,t,ds;
+
+ideal I=t5+t7,t4;
+
+sagbiNF(t7+2t9+3t11+t14+t13+6t15+t17,I,20);
+
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc sagbiSP(ideal I)
+{
+//computes the set of Sagbi-s-polys
+   if(I==0){ return(I); }
+   list L=algDependent(lead(I));
+
+   def S= L[2];
+   map phi= S,maxideal(1),I;
+   return(simplify(phi(ker),2));
+}
+
+/*
+
+ring R=0,t,ds;
+
+ideal I=t4+t5,t7+t11,t9+t20;
+
+sagbiSP(I);
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+static proc sortSagbi(ideal I)
+{
+    //sorts, makes input monic and removes zeros
+    I=simplify(I,2+1);
+    int i;
+    int n=1;
+    poly p;
+    while(n)
+    {
+       n=0;
+       for(i=1;i<size(I);i++)
+       {
+           if(deg(lead(I[i]))>deg(lead(I[i+1])))
+           {
+                n=1;
+                p=I[i];
+                I[i]=I[i+1];
+               I[i+1]=p;
+               break;
+            }
+       }
+    }
+   return(I);
+}
+
+/*
+
+ring R=0,t,ds;
+
+ideal I=3t5,7t2+t7,6t3+t8,3t+t7;
+
+sortSagbi(I);
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+static proc insertOne(poly p, ideal I, int b)
+{
+   //assume I is sorted, inserts p at the correct place
+     int i,j;
+     poly q;
+     for(i=1;i<=size(I);i++)
+     {
+              if(deg(lead(p))<deg(lead(I[i])))
+              {
+                  break;
+              }
+     }
+     if(i==size(I)+1)
+     {
+        I=I,simplify(p,1);
+     }
+     else
+     {
+         for(j=size(I)+1;j>i;j--)
+         {
+              I[j]=I[j-1];
+         }
+         I[i]=simplify(p,1);
+     }
+     if(i<size(I))
+     {
+           I=interReduceSagbi(I,b);
+     }
+     return(I);
+}
+
+/*
+
+ring R=0,t,ds;
+
+ideal I=t8,t10+t13,t12+t15;
+
+insertOne(t17,I,20);
+
+I=t8,t10+t13,t12+t15,t23-t29;
+
+insertOne(-2t27,I,40);
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+static proc interReduceSagbi(ideal I, int b)
+{
+// reduces the elements of the dial against each other
+     I=sortSagbi(I);
+     ideal J;
+     int n=1;
+   int i;
+     poly h;
+     while(n)
+     {
+          n=0;
+          i=1;
+          while(i<size(I))
+          {
+              i++;
+              J=I[1..i-1];
+              h=sagbiNF(I[i],J,b);
+              h=simplify(h,1);
+              if(h!=I[i])
+              {
+                   n=1;
+                   I[i]=h;
+                   I=sortSagbi(I);
+                   break;
+              }
+           }
+      }
+      return(I);
+}
+
+/*
+
+    ring R=0,t,ds;
+
+    ideal I=t8,t8+t10+t13,t8+t12+t15;
+
+    interReduceSagbi(I,20);
+
+*/
+////////////////////////////////////////////////////////////////////////////////
+
+static proc correctBound(ideal I, int b)
+{
+  //computes the conductor c of the semigroup associated to K[I]
+  //if b>=c
+   list L;
+   int i;
+   for(i=1;i<=size(I);i++)
+   {
+       L[i]=I[i];
+   }
+   list M=WSemigroup(L,b);
+   if(b>M[2])
+   {b=M[2]+1;}
+   return(b);
+}
+
+/*
+
+ring R=0,t,ds;
+
+ideal I=t8,t10+t13,t12+t15;
+
+correctBound(I,40);
+
+I=t8,t10+t13,t12+2t15;
+
+correctBound(I,40);
+
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc sortMinord(ideal I)
+{
+    //input an ideal
+    //output a list L[1]=minimal order,
+    //              L[2]=poly having the minimal order,
+    //              L[3]=the k suchthat I[k] has the minimal order,
+    //              L[4]=ideal I sorted in a way that minimal degree polynomial
+
+    //appears as the last polynomial of the ideal.ie I[size(I)]=I[k].
+    int i;
+    int n=1;
+    list L;
+    poly p;
+    while(n)
+    {
+       n=0;
+       for(i=1;i<size(I);i++)
+       {
+           if(ord(I[i])<ord(I[i+1]))
+           {
+                n=1;
+                p=I[i];
+                I[i]=I[i+1];
+                I[i+1]=p;
+                break;
+            }
+       }
+    }
+    L[1]=ord(I[size(I)]);
+    L[2]=I[size(I)];
+    L[3]=size(I);
+    L[4]=I;
+    return(L);
+}
+/*
+ring r=0,t,Ds;
+ideal I=t3,t6,t8,t4,t5,t9,t11,t3;
+sortMinord(I);
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+static proc inversP(poly p,int b)
+{
+  //computes the inverse of p upto the bound b
+  if(size(p)==1)
+  {
+   return(p);
+  }
+  number c=leadcoef(p);
+  p=p/c;
+  poly q=1;
+  poly s=1;
+  while(deg(lead(q))<b)
+  {
+      q=q*(1-p);
+      s=s+q;
+  }
+  s=1/c*jet(s,b);
+  return(s);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static proc ConductorBound(ideal I)
+{
+    //input an ideal
+    // output an integer which gives the bound of the semigroup conductor
+    list M,L;
+    int c,i,b;
+    ideal J;
+    poly p;
+    if(size(I)<=1)
+    {return(2);}
+    while(1)
+    {
+        b=b+5;
+        J=I;
+        L=sortMinord(J);
+        M[size(M)+1]=L[1];
+        while((M[size(M)]!=1)&&(size(L[4])>1))
+        {
+             p=L[2]/var(1)^L[1];
+             J=L[4];
+             for(i=1;i<=L[3]-1;i++)
+             {
+               J[i]=J[i]/var(1)^L[1]*inversP(p,b);
+               if(deg(lead(J[i]))==0){J[i]=J[i]-lead(J[i]);}
+             }
+             J=simplify(J,2);
+             L=sortMinord(J);
+             M[size(M)+1]=L[1];
+        }
+        if(M[size(M)]==1){break;}
+    }
+    for(i=1;i<=size(M)-1;i++)
+    {
+       c=c+M[i]*(M[i]-1);
+    }
+    return(c+1);
+}
+/*
+ring r=0,t,Ds;
+ideal I=t3+3t7,t8+5t9;
+ConductorBound(I);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc sortMOD(ideal I)
+{
+    //sorts, makes input monic and removes zeros
+    I=simplify(I,2);
+    I=simplify(I,1);
+    int i;
+    int n=1;
+    poly p;
+    while(n)
+    {
+       n=0;
+       for(i=1;i<size(I);i++)
+       {
+           if(deg(lead(I[i]))>deg(lead(I[i+1])))
+           {
+                n=1;
+                p=I[i];
+                I[i]=I[i+1];
+                I[i+1]=p;
+                break;
+            }
+       }
+    }
+   return(I);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc SpolyMOD(ideal S,ideal P)
+{
+     //Assume that the basering is a ring in one variable.
+    //input two ideals ideal S=<s_1,s_2> generators of the module and ideal P=<p_1,p_2,..,p_n> the sagbi basis of the algebra
+    //output is an ideal generated by Q[p_1,p_2,...p_n]s_1-R[p_1,p_2,...p_n]s_2 for generators of
+    //Q[lead(p_1),lead(p_2),.,lead(p_n)]lead(s_1)-R[lead(p_1),lead(p_2),.,lead(p_n)]lead(s_2)=0 .
+   def br=basering;
+   int n=ncols(P);
+   ideal P1=lead(P);
+   ideal S1=lead(S);
+   execute
+    ("ring T=("+charstr(br)+",x(1),z(1..n)),(y(1..2)),dp;");
+    poly q;
+    execute
+   ("ring R=("+charstr(br)+"),(x(1),y(1..2),z(1..n)),(lp(3),dp(n));");
+   map phi=br,x(1);
+   ideal G=phi(P1);
+   ideal I=phi(S1);
+   ideal K,J;
+   int d,o,s,j;
+   poly q=I[1];
+   if(deg(I[1])>deg(I[2]))
+   {
+       o=1;
+       q=I[2];
+   }
+   I=I/q;
+   for(int i=1;i<=2;i++)
+   {
+     K[i]=I[i]-y(i);
+   }
+   for(i=1;i<=n;i++)
+   {
+     K[2+i]=G[i]-z(i);
+   }
+   option(redSB);
+   K=std(K);
+   for(i=1;i<=size(K);i++)
+   {
+         if((K[i]/x(1)==0)&&((diff(K[i],y(1))!=0)||(diff(K[i],y(2))!=0)))
+         {
+                q=K[i];
+                for(j=1;j<=2;j++)
+                {
+                    q=subst(q,y(j),0);
+                }
+                K[i]=K[i]-q+q*y(o+1);
+                q=K[i];
+                setring T;
+                q=imap(R,q);
+                s=deg(q);
+                setring R;
+                if(s==1){J[size(J)+1]=simplify(q,1);}
+         }
+   }
+   setring br;
+   map phi=R,maxideal(1),S,P;
+   return(phi(J));
+}
+/*
+ring r=0,t,dp;
+ideal I=4t3,7t6+10t9;
+ideal J=t4,t7+t10;
+sortSagbi(SpolyMOD(I,J));
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc sagbiNFMODO(poly p, ideal G, ideal I,int b)
+{
+    //input a poly ideal G ideal I int b is a bound
+    //output an ideal K such that in each K[i] generators of I appear in linear.
+    def br=basering;
+    p=jet(p,b);
+    if(p==0){return(p);}
+    int n=ncols(G);
+    int m=ncols(I);
+    ideal G1=lead(G);
+    ideal I1=lead(I);
+     poly p1=lead(p);
+    //create new ring with extra variables -
+    execute
+    ("ring T=("+charstr(br)+",x(1),z(1..n)),(x(2),y(1..m)),dp;");
+    execute
+    ("ring R=("+charstr(br)+"),(x(1..2),y(1..m),z(1..n)),(lp(m+2),dp(n));");
+     map phi = br,x(1);
+     ideal P = phi(G1);
+     ideal S = phi(I1);
+     poly check = phi(p1);
+     poly keep=S[1];
+     S=S/keep;
+
+     check=check/keep;
+     ideal M;
+     poly q;
+     for (int i=1;i<=m;i=i+1)
+     {
+         M[i]=S[i]-y(i);
+     }
+     for (i=1;i<=n;i=i+1)
+     {
+        M[m+i]=P[i]-z(i);
+     }
+     M[size(M)+1]=check-x(2);
+     check=check*keep;
+     option(redSB);
+     M=std(M);
+     int j,s;
+     for(i=1;i<=size(M);i++)
+     {
+         if((deg(M[i]/x(2))==0)&&(M[i]/x(1)==0))
+         {
+               q=subst(M[i],x(2),0);
+               for(j=1;j<=m;j++)
+               {
+                  q=subst(q,y(j),0);
+               }
+               M[i]=M[i]-q+q*y(1);
+             q=M[i];
+               setring T;
+               poly q=imap(R,q);
+             s=deg(q);
+               setring R;
+               if(s==1){check=simplify(q,1);break;}
+         }
+     }
+     setring br;
+     map psi=R,maxideal(1),p,I,G;
+     return(psi(check));
+}
+////////////////////////////////////////////////////////////////////////////////
+
+static proc sagbiNFMOD(poly p, ideal G, ideal I, int b)
+{
+    poly f=jet(p,b);
+    if(f==0){return(f);}
+    poly h;
+    while(f!=h)
+    {
+         h=f;
+         f=sagbiNFMODO(f,G,I,b);
+    }
+    if(f==0){return(f);}
+    return(lead(f)+sagbiNFMOD(f-lead(f),G,I,b));
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc createP(ideal I)
+{
+   list P;
+   int i=1;
+   int j;
+   while(i<=size(I)-1)
+   {
+      j=i+1;
+      while(j<=size(I))
+      {
+          P[size(P)+1]=list(I[i],I[j]);
+          j++;
+      }
+      i++;
+   }
+   return(P);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc enlargeP(poly h,list P,ideal I)
+{
+    int i;
+    for(i=1;i<=size(I);i++)
+    {
+         P[size(P)+1]=list(I[i],h);
+    }
+    return(P);
+}
+/*
+ring r=0,t,Ds;
+ideal I=4t3,7t6+10t9;
+ideal G=t4,t7+t10;
+sagbiMOD(I,G,18);
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+static proc sortIntvec(intvec L)
+{
+    //input: intvec L.
+    //output: L sorted, multiple elements canceled.
+    int i;
+    int j;
+    int n=1;
+    intvec M;
+    while(n)
+    {
+        for(i=1;i<=size(L);i++)
+        {
+            for(j=i+1;j<=size(L);j++)
+            {
+                 if(L[i]==L[j])
+                 {
+                    L[j]=0;
+                 }
+             }
+         }
+         n=0;
+     }
+     for(i=1;i<=size(L);i++)
+     {
+         if((L[i]!=0)||(i==1))
+         {
+            M[size(M)+1]=L[i];
+         }
+     }
+     int m=1;int p;
+     while(m)
+     {
+        m=0;
+        for(i=1;i<size(M);i++)
+        {
+           if(M[i]>M[i+1])
+           {
+                m=1;
+                p=M[i];
+                M[i]=M[i+1];
+               M[i+1]=p;
+               break;
+            }
+         }
+      }
+     M=M[2..size(M)];
+     return(M);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc findConductor(intvec L)
+{
+     //input a intvec L
+     //output is an integer which came before the gap from right to left.
+     int i;int j; list K;
+     int c;
+     for(i=size(L);i>=2;i--)
+     {
+        if(L[i]!=L[i-1]+1)
+        {
+            c=L[i];
+            break;
+        }
+     }
+     if(c==0){c=1;}
+     return(c);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc cutAfterConductor(intvec L)
+{
+     //input an integer vector
+     //output cut all the integers in the intvec which came after the conductor
+     int i;int j; intvec K;
+     int c=findConductor(L);
+     for(i=1;i<=size(L);i++)
+     {
+         if(L[i]==c)
+         {
+            K[1..i]=L[1..i];
+         }
+     }
+     return(K);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc CompareList(list L,list M,int n)
+{
+      //input two list L,M with the same size n
+      //out put 0 if not equal 1 if equal.
+      for(int i=1;i<=n;i++)
+      {
+           if(L[i]!=M[i])
+           {
+               i=0;
+               break;
+           }
+      }
+      return(i);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc Guess(ideal I)
+{
+  // comput the sagbi basis of the module
+  //which we guess .
+   I=sagbiAlg(I);
+   ideal H=diff(I,var(1));
+   H=sagbiMod(H,I);
+   list K=semiMod(H,I);
+   return(K);
+}
+////////////////////////////////////////////////////////////////////////////////
+/*
+===============================   Examples==========================================
+ideal I=t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16,t7+7t8+22t9+51t10+113t11+219t12+366t13+589t14+876t15+1170t16+1514t17+1828t1
+8+2011t19+2165t20+2163t21+1982t22+1806t23+1491t24+1141t25+889t26+588t27+379t28+2
+52t29+120t30+72t31+36t32+9t33+9t34+t36;
+planeCur(I);
+//=============================
+ideal I=t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16,t7+7t8+21t9+42t10+77t11+126t12+168t13+211t14+252t15+252t16+245t17+231t18+17
+5t19+140t20+105t21+56t22+42t23+21t24+7t25+7t26+t28
+planeCur(I);
+//===============================
+ideal I=t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16,t5+5t6+11t7+22t8+46t9+73t10+107t11+161t12+198t13+231t14+272t15+262t16+250t1
+7+236t18+175t19+141t20+105t21+56t22+42t23+21t24+7t25+7t26+t28
+planeCur(I);
+//===============================
+ideal I=t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16,t6+7t7+22t8+47t9+87t10+143t11+202t12+258t13+307t14+332t15+327t16+305t17+266
+t18+205t19+155t20+111t21+62t22+42t23+22t24+7t25+7t26+t28
+planeCur(I);
+//===============================
+ideal I=t2+2t3+t4+2t5+2t6+t8,t+t2+t4;
+planeCur(I);
+//===============================
+ideal I=t2+2t3+t4+2t5+2t6+t8,t3+3t4+3t5+4t6+6t7+3t8+3t9+3t10+t12;
+planeCur(I);
+//===============================
+ideal I=t2+2t3+t4+2t5+2t6+t8,t5+5t6+10t7+15t8+25t9+31t10+30t11+35t12+30t13+20t14+20t15+10t16+5t17+5t18+t
+20;
+planeCur(I);
+//================================================================
+ideal I=t2+2t3+t4+2t5+2t6+t8,t11+11t12+55t13+176t14+440t15+957t16+1837t17+3135t18+4917t19+7150t20+9581t2
+1+12046t22+14300t23+15851t24+16665t25+16687t26+15642t27+14025t28+12012t29+9570t3
+0+7392t31+5412t32+3630t33+2442t34+1485t35+825t36+495t37+220t38+110t39+55t40+11t4
+1+11t42+t44
+planeCur(I);
+//===============================
+ideal I=t2+2t3+t4+2t5+2t6+t8,t45+45t46+990t47+14235t48+150975t49+1264329t50+8742030t51+51530985t52+26531
+7525t53+1216052255t54+5037384726t55+19091253735t56+66860434260t57+218159032410t5
+8+667743178590t59+1928258130018t60+5278946615910t61+13758022145340t62+3425642198
+1760t63+81743054778990t64+187438301870193t65+413998043743845t66+882643063827960t
+67+1819834573178925t68+3634672399863945t69+7042671464388093t70+13256726980146210
+t71+24271349963247255t72+43270648586469315t73+75192560924341905t74+1274795590273
+39134t75+211037186585880765t76+341404127193205395t77+540109313678250885t78+83615
+2328502076770t79+1267494306126371433t80+1882391473790147350t81+27403488768330021
+60t82+3912426884928977910t83+5480608823069934180t84+7535946071701345419t85+10175
+247273088233765t86+13496177050168252770t87+17590776929351920305t88+2253760903474
+9950330t89+28392934993342165732t90+35181553858703840610t91+42888103580926417860t
+92+51449748796644626670t93+60751205041524651720t94+70622965899108523296t95+80843
+398349265488310t96+91145062374529367655t97+101225220090613564275t98+110760068529
+877638960t99+119421810187582522995t100+126897320456330125725t101+132906930278955
+392505t102+137221752614812709130t103+139678059865381605315t104+14018746206071963
+5683t105+138742016728357115865t106+135413875517988518550t107+1303495836626693311
+25t108+123759636437037165840t109+115904304930914703126t110+107077029168089360280
+t111+97586814544772570280t112+87741050370279892245t113+77830012377996062865t114+
+68114044171037561004t115+58814074232856531765t116+50105762317964865600t117+42117
+223130580686220t118+34929979773602146200t119+28582581501297657240t120+2307618932
+9698326690t121+18381388272325750530t122+14445518786710710480t123+111999120315284
+53530t124+8566543884036576384t125+6463772035817658320t126+4810966835075093880t12
+7+3531977599087147320t128+2557482632962404180t129+1826346112628778972t130+128615
+1054039308160t131+893096793855988260t132+611445912380539110t133+4126879484894709
+90t134+274559737461674588t135+180030436220988810t136+116328756134241090t137+7406
+1684381355110t138+46450833440621940t139+28695217633493598t140+17456561066064945t
+141+10455665532950385t142+6164429567615550t143+3576677924170795t144+204174682346
+8917t145+1146414046643415t146+632953124099190t147+343522434444255t148+1832093883
+47205t149+95981896978935t150+49375510221510t151+24930700142535t152+1234956944936
+0t153+5998779092790t154+2855797655022t155+1331635383390t156+607860009900t157+271
+401068250t158+118455934740t159+50498441136t160+20999419155t161+8518084355t162+33
+61582620t163+1290701115t164+481780299t165+173664315t166+61087950t167+20511645t16
+8+6704775t169+2115729t170+610170t171+191565t172+42570t173+15180t174+1980t175+990
+t176+45t177+45t178+t180
+planeCur(I);
+//===============================
+ideal I=t3+3t4+3t5+4t6+6t7+3t8+3t9+3t10+t12,t2+2t3+t4+2t5+2t6+t8
+planeCur(I);
+//===============================
+ ideal I=t3+3t4+3t5+4t6+6t7+3t8+3t9+3t10+t12,t5+5t6+10t7+15t8+25t9+31t10+30t11+35t12+30t13+20t14+20t15+10t16+5t17+5t18+t20
+ planeCur(I);
+//===============================
+ideal I=t3+3t4+3t5+4t6+6t7+3t8+3t9+3t10+t12,t4+4t5+6t6+8t7+13t8+12t9+10t10+12t11+6t12+4t13+4t14+t16
+ planeCur(I);
+//==========================================================================
+ ring r=0,t,Ds;
+ ideal I=t3,t10+t14;
+ planeCur(I);
+//===============================
+ideal I=t3+3t4+3t5+t6,t10+10t11+45t12+120t13+211t14+266t15+301t16+484t17+1046t18+2012t19+3004t20+
+3432t21+3003t22+2002t23+1001t24+364t25+91t26+14t27+t28
+planeCur(I);
+//=======================================
+ideal I=t3+3t4+3t5+t6,t10+10t11+45t12+120t13+210t14+252t15+210t16+120t17+45t18+10t19+t20
+ planeCur(I);
+//===============================
+ring r=0,t,Ds;
+ideal I=t3+3t4+3t5+t6,t13+14t14+92t15+377t16+1079t17+2288t18+3718t19+4719t20+4719t21+3718t22+2288
+t23+1079t24+377t25+92t26+14t27+t28,t20+20t21+190t22+1140t23+4845t24+15504t25+38760t26+77520t27+125970t28+16796
+0t29+184756t30+167960t31+125970t32+77520t33+38760t34+15504t35+4845t36+1140t37+19
+0t38+20t39+t40
+spaceCur(I);
+//=====================================================
+ideal I=t3+3t4+3t5+t6,t13+14t14+92t15+377t16+1079t17+2288t18+3718t19+4719t20+4719t21+3718t22+2288
+t23+1079t24+377t25+92t26+14t27+t28,t17+17t18+136t19+680t20+2380t21+6188t22+12376t23+19448t24+24310t25+24310t26
++19448t27+12376t28+6188t29+2380t30+680t31+136t32+17t33+t34
+spaceCur(I);
+//========================================================
+ideal I=t3,t16,t14;
+spaceCur(I);
+//=============================================
+ideal I=t3,t19,t14;
+spaceCur(I);
+//==============================================
+ideal I=t3,t14+t16,t19;
+spaceCur(I);
+//===============================================
+ideal I=t3,t14+t16,t25;
+spaceCur(I);
+//=======================================
+ideal I=t3+3t4+3t5+t6,t14+14t15+91t16+364t17+1001t18+2002t19+3003t20+3432t21+3004t22+2024t23+1232
+t24+1904t25+7406t26+26348t27+74614t28+170544t29+319770t30+497420t31+646646t32+70
+5432t33+646646t34+497420t35+319770t36+170544t37+74613t38+26334t39+7315t40+1540t4
+1+231t42+22t43+t44,t25+25t26+300t27+2300t28+12650t29+53130t30+177100t31+480700t32+1081575t33+2
+042975t34+3268760t35+4457400t36+5200300t37+5200300t38+4457400t39+3268760t40+2042
+975t41+1081575t42+480700t43+177100t44+53130t45+12650t46+2300t47+300t48+25t49+t50
+spaceCur(I);
+//=========================================================
+ideal I=t3+3t4+3t5+t6,t14+14t15+91t16+364t17+1001t18+2003t19+3022t20+3603t21+3972t22+5878t23+1262
+9t24+27496t25+50479t26+75596t27+92379t28+92378t29+75582t30+50388t31+27132t32+116
+28t33+3876t34+969t35+171t36+19t37+t38,t25+25t26+300t27+2300t28+12650t29+53130t30+177100t31+480700t32+1081575t33+2
+042975t34+3268760t35+4457400t36+5200300t37+5200300t38+4457400t39+3268760t40+2042
+975t41+1081575t42+480700t43+177100t44+53130t45+12650t46+2300t47+300t48+25t49+t50
+spaceCur(I);
+//==============================================================
+ideal I=t3+3t4+3t5+t6,t14+14t15+92t16+380t17+1121t18+2562t19+4823t20+7800t21+11011t22+13442t23+13
+871t24+11804t25+8099t26+4382t27+1821t28+560t29+120t30+16t31+t32,t19+19t20+171t21+969t22+3876t23+11628t24+27132t25+50388t26+75582t27+92378t2
+8+92378t29+75582t30+50388t31+27132t32+11628t33+3876t34+969t35+171t36+19t37+t38
+spaceCur(I);
+//======================================================================
+ideal I=t3+3t4+3t5+t6,t14+14t15+92t16+380t17+1121t18+2562t19+4823t20+7800t21+11011t22+13442t23+13
+871t24+11804t25+8099t26+4382t27+1821t28+560t29+120t30+16t31+t32,t25+25t26+300t27+2300t28+12650t29+53130t30+177100t31+480700t32+1081575t33+2
+042975t34+3268760t35+4457400t36+5200300t37+5200300t38+4457400t39+3268760t40+2042
+975t41+1081575t42+480700t43+177100t44+53130t45+12650t46+2300t47+300t48+25t49+t50
+spaceCur(I);
+//================================================================
+ideal I=t3+3t4+3t5+t6,t16+16t17+120t18+560t19+1820t20+4368t21+8008t22+11440t23+12870t24+11440t25+
+8008t26+4368t27+1820t28+560t29+120t30+16t31+t32
+,t14+14t15+91t16+364t17+1001t18+2002t19+3003t20+3432t21+3003t22+2002t23+1001
+t24+364t25+91t26+14t27+t28
+spaceCur(I);
+//===========================================================================================
+*/
