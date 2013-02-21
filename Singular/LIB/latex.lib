@@ -1310,19 +1310,19 @@ example
 static proc parsr(string s)                     // parse real
 {
   string t;
-  if (s=="      Inf") { return("\\infty",3);}
-  if (s=="     -Inf") { return("\\-infty",6);}
-  if (s[7]=="-"){t ="-";}
-  if (s[8]<>"0"){t = t + s[8];}
-  if (s[9]<>"0" or s[8]<>"0"){t = t + s[9];}
+  if (s=="(      Inf)") { return("\\infty",3);}
+  if (s=="(     -Inf)") { return("\\-infty",6);}
+  if (s[8]=="-"){t ="-";}
+  if (s[9]<>"0"){t = t + s[9];}
+  if (s[10]<>"0" or s[9]<>"0"){t = t + s[10];}
   if (size(t))
-  { if (t=="1") {return(s[1,5]+"*10",21);}
-    if (size(t)>1) {return(s[1,5]+"*10^{"+t+"}",21+2*size(t));}
-    else {return(s[1,5]+"*10^"+t,23);}
+  { if (t=="1") {return(s[1,6]+"\\cdot 10",21);}
+    if (size(t)>1) {return(s[1,6]+"\\cdot 10^{"+t+"}",21+2*size(t));}
+    else {return(s[1,6]+"\\cdot 10^"+t+")",23);}
   }
   else
   {
-    return(s[1,5],12);
+    return(s[2,5],12);
   }
 }
 ///////////////////////////////////////////////////////////////////////////////

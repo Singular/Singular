@@ -5,7 +5,6 @@
 /*
 * ABSTRACT:
 */
-#include <iostream>
 #include <coeffs/shortfl.h>
 
 #include <string.h>
@@ -248,7 +247,21 @@ void nrWrite (number &a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  StringAppend("%9.3e", nf(a).F());
+  char ch[11];
+  int n = sprintf(ch,"%9.3e", nf(a).F());
+  if (ch[0] == '-')
+  {
+    char* chbr = new char[n+3];
+    memcpy(&chbr[2],&ch[1],n-1);
+    chbr[0] = '-';
+    chbr[1] = '(';
+    chbr[n+1] = ')';
+    chbr[n+2] = '\0';
+    StringAppendS(chbr);
+    delete chbr;
+  }
+  else
+    StringAppend("(%s)",ch);
 }
 
 void nrPower (number a, int i, number * result, const coeffs r)
