@@ -29,7 +29,7 @@ static int bigintm_type_id = -1;
 #endif
 
 #ifdef HAVE_BIGINTM
-static char * bigintm_String(blackbox *b, void *d)
+static char * bigintm_String(blackbox */*b*/, void *d)
 { if (d==NULL) return omStrDup("oo");
    else
    {
@@ -38,20 +38,20 @@ static char * bigintm_String(blackbox *b, void *d)
      return StringEndS();
     }
 }
-static void * bigintm_Copy(blackbox*b, void *d)
+static void * bigintm_Copy(blackbox*/*b*/, void *d)
 {  number n=(number)d; return n_Copy(n, coeffs_BIGINT); }
 
 static BOOLEAN bigintm_Assign(leftv l, leftv r)
 {
   assume( l->Typ() == bigintm_type_id );
   
-  blackbox *ll=getBlackboxStuff(l->Typ());
+  // blackbox *ll=getBlackboxStuff(l->Typ());
   
   if (r->Typ()>MAX_TOK)
   {
     if (bigintm_type_id == r->Typ())
     {
-      blackbox *rr=getBlackboxStuff(r->Typ());
+      // blackbox *rr=getBlackboxStuff(r->Typ());
       
       if (l->Data()!=NULL) { number n1=(number)l->Data(); n_Delete(&n1,coeffs_BIGINT); }
       number n2=(number)r->CopyD();
@@ -125,7 +125,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
   // interpreter: a1 is ist bigintm
   assume( a1->Typ() == bigintm_type_id );
   
-  blackbox *a=getBlackboxStuff(a1->Typ());
+  // blackbox *a=getBlackboxStuff(a1->Typ());
   number n1=(number)a1->Data(); 
   switch(op)
   {
@@ -286,7 +286,7 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
   return blackbox_default_OpM(op, res, args);
 }
 
-static void bigintm_destroy(blackbox *b, void *d)
+static void bigintm_destroy(blackbox */*b*/, void *d)
 {
   if (d!=NULL)
   {

@@ -77,7 +77,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
 #endif
   
   int i,j;
-  poly p,pp,q;
+  poly p,/*pp,*/q;
   ideal temp1;
   ideal temp2;
 

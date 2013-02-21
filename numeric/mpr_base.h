@@ -31,9 +31,9 @@ public:
   virtual ideal getMatrix() { return NULL; }
   virtual ideal getSubMatrix() { return NULL; }
 
-  virtual poly getUDet( const number* evpoint ) { return NULL; }
+  virtual poly getUDet( const number* /*evpoint*/ ) { return NULL; }
 
-  virtual number getDetAt( const number* evpoint ) { return NULL; }
+  virtual number getDetAt( const number* /*evpoint*/ ) { return NULL; }
   virtual number getSubDet() { return NULL; }
 
   virtual long getDetDeg() { return totDeg; }

@@ -33,6 +33,7 @@
 
 void freeSize(void* addr, size_t size)
 {
+  (void) size;
   if (addr) free(addr);
 }
 

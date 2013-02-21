@@ -106,10 +106,12 @@ int main(int argc, char** argv)
 {
   char* singular = NULL;
   char* emacs = NULL;
+#ifndef TSINGULAR
   char* emacs_dir = NULL;
   char* emacs_load = NULL;
-  int no_emacs_call = 0;
   char cwd[MAXPATHLEN];
+#endif
+  int no_emacs_call = 0;
 
   // parse-cmdline options
 

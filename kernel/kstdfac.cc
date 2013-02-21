@@ -160,7 +160,7 @@ static void copyL (kStrategy o,kStrategy n)
 
 kStrategy kStratCopy(kStrategy o)
 {
-  int i;
+  // int i;
   assume(kTest_TS(o));
   kStrategy s=new skStrategy;
   s->next=NULL;
@@ -544,7 +544,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
   }
 }
 
-ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
+ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
 {
   int   olddeg,reduc=0;
   int red_result = 1;

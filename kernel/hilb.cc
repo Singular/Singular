@@ -212,7 +212,7 @@ static void hWDegree(intvec *wdegree)
 }
 
 static intvec * hSeries(ideal S, intvec *modulweight,
-                int notstc, intvec *wdegree, ideal Q, ring tailRing)
+                int /*notstc*/, intvec *wdegree, ideal Q, ring tailRing)
 {
   intvec *work, *hseries1=NULL;
   int  mc;

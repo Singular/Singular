@@ -197,9 +197,9 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 #ifdef RDEBUG
 void p_Debug_GetSpecNames(const ring r, const char* &field, const char* &length, const char* &ord)
 {
-  p_Field     e_field = p_FieldIs(r);
-  p_Length    e_length = p_LengthIs(r);
-  p_Ord       e_ord = p_OrdIs(r);
+  /*p_Field     e_field =*/ (void) p_FieldIs(r);
+  /*p_Length    e_length =*/ (void) p_LengthIs(r);
+  /*p_Ord       e_ord =*/ (void) p_OrdIs(r);
 
   field  = p_FieldEnum_2_String(p_FieldIs(r));
   length = p_LengthEnum_2_String(p_LengthIs(r));

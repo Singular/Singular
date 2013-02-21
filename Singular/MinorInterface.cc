@@ -99,7 +99,7 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
 
   /* containers for all upcoming results: */
   IntMinorValue theMinor;
-  int value = 0;
+  // int value = 0;
   int collectedMinors = 0;
   int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
 
@@ -322,7 +322,7 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
 
   /* containers for all upcoming results: */
   IntMinorValue theMinor;
-  int value = 0;
+  // int value = 0;
   int collectedMinors = 0;
   int characteristic = 0; if (currRing != 0) characteristic = rChar(currRing);
 
@@ -524,7 +524,7 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
 
   bool b = false; /* Bareiss */
   bool l = false; /* Laplace without caching */
-  bool c = false; /* Laplace with caching */
+  // bool c = false; /* Laplace with caching */
   if (currRingIsOverIntegralDomain())
   { /* the field case or ring Z */
     if      (minorSize <= 2)                                     b = true;
@@ -540,11 +540,11 @@ ideal getMinorIdealHeuristic (const matrix mat, const int minorSize,
     { /* k == 0, i.e., all minors are requested */
       int minorCount = binom(rowCount, minorSize);
       minorCount *= binom(columnCount, minorSize);
-      if      ((minorSize >= 3) && (vars <= 4)
-               && (minorCount >= 100))                           c = true;
-      else if ((minorSize >= 3) && (vars >= 5)
-               && (minorCount >= 40))                            c = true;
-      else                                                       l = true;
+      // if      ((minorSize >= 3) && (vars <= 4)
+      //          && (minorCount >= 100))                           c = true;
+      // else if ((minorSize >= 3) && (vars >= 5)
+      //          && (minorCount >= 40))                            c = true;
+      /*else*/                                                      l = true;
     }
   }
 

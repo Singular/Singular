@@ -34,7 +34,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
 extern si_link_extension si_link_root;
 
 /* =============== ASCII ============================================= */
-BOOLEAN slOpenAscii(si_link l, short flag, leftv h)
+BOOLEAN slOpenAscii(si_link l, short flag, leftv /*h*/)
 {
   const char *mode;
   if (flag & SI_LINK_OPEN)

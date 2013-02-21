@@ -149,7 +149,7 @@ err:
 int dbm_delete(register DBM *db, datum key)
 {
   register int i;
-  datum item;
+  // datum item;
 
   if (dbm_error(db))
     return (-1);

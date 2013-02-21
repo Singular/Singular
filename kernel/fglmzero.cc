@@ -608,7 +608,7 @@ fglmSdata::getBorderDiv( const poly m, int & var ) const
 }
 
 void
-internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
+internalCalculateFunctionals( const ideal /*& theIdeal*/, idealFunctionals & l,
                               fglmSdata & data )
 {
 

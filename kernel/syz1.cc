@@ -987,7 +987,7 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
 /*3
 * puts a pair into the right place in resPairs
 */
-void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
+void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int /*index*/)
 {
   int ll,k,no=(*so).order,sP=*sPlength,i;
 

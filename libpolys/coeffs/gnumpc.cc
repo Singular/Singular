@@ -697,7 +697,7 @@ nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
   return NULL;
 }
 
-void    ngcCoeffWrite  (const coeffs r, BOOLEAN details)
+void    ngcCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   Print("//   characteristic : 0 (complex:%d digits, additional %d digits)\n",
         r->float_len, r->float_len2);  /* long C */

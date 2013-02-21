@@ -484,7 +484,7 @@ static wlen_type do_pELength (poly p, slimgb_alg * c, int dlm = -1)
   return s;
 }
 
-wlen_type pELength (poly p, slimgb_alg * c, ring r)
+wlen_type pELength (poly p, slimgb_alg * c, ring /*r*/)
 {
   if(p == NULL)
     return 0;
@@ -507,7 +507,7 @@ wlen_type pELength (poly p, slimgb_alg * c, ring r)
   return s;
 }
 
-wlen_type kEBucketLength (kBucket * b, poly lm, int sugar, slimgb_alg * ca)
+wlen_type kEBucketLength (kBucket * b, poly lm, int /*sugar*/, slimgb_alg * ca)
 {
   wlen_type s = 0;
   if(lm == NULL)
@@ -3621,7 +3621,7 @@ ideal t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode)
 }
 
 ideal
-do_t_rep_gb (ring r, ideal arg_I, int syz_comp, BOOLEAN F4_mode, int deg_pos)
+do_t_rep_gb (ring /*r*/, ideal arg_I, int syz_comp, BOOLEAN F4_mode, int deg_pos)
 {
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
 
@@ -3978,7 +3978,7 @@ void free_sorted_pair_node (sorted_pair_node * s, ring r)
 }
 
 static BOOLEAN
-pair_better (sorted_pair_node * a, sorted_pair_node * b, slimgb_alg * c)
+pair_better (sorted_pair_node * a, sorted_pair_node * b, slimgb_alg * /*c*/)
 {
   if(a->deg < b->deg)
     return TRUE;
@@ -4181,7 +4181,7 @@ quality_of_pos_in_strat_S_mult_high (int pos, poly high, slimgb_alg * c)
 #endif
 
 static void
-multi_reduction_lls_trick (red_object * los, int losl, slimgb_alg * c,
+multi_reduction_lls_trick (red_object * los, int /*losl*/, slimgb_alg * c,
                            find_erg & erg)
 {
   erg.expand = NULL;
@@ -4503,7 +4503,7 @@ static int fwbw (red_object * los, int i)
 }
 
 static void
-canonicalize_region (red_object * los, int l, int u, slimgb_alg * c)
+canonicalize_region (red_object * los, int l, int u, slimgb_alg * /*c*/)
 {
   assume (l <= u + 1);
   int i;
@@ -4513,9 +4513,15 @@ canonicalize_region (red_object * los, int l, int u, slimgb_alg * c)
   }
 }
 
+#ifdef NDEBUG
+static void
+multi_reduction_find (red_object * los, int /*losl*/, slimgb_alg * c, int startf,
+                      find_erg & erg)
+#else
 static void
 multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
                       find_erg & erg)
+#endif
 {
   kStrategy strat = c->strat;
 
@@ -4630,7 +4636,7 @@ int search_red_object_pos (red_object * a, int top, red_object * key)
   }
 }
 
-static void sort_region_down (red_object * los, int l, int u, slimgb_alg * c)
+static void sort_region_down (red_object * los, int l, int u, slimgb_alg * /*c*/)
 {
   int r_size = u - l + 1;
   qsort (los + l, r_size, sizeof (red_object), red_object_better_gen);
@@ -4889,7 +4895,7 @@ int red_object::clear_to_poly ()
   return l;
 }
 
-void reduction_step::reduce (red_object * r, int l, int u)
+void reduction_step::reduce (red_object * /*r*/, int /*l*/, int /*u*/)
 {
 }
 
@@ -5064,6 +5070,6 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
   }
 }
 
-void simple_reducer::pre_reduce (red_object * r, int l, int u)
+void simple_reducer::pre_reduce (red_object * /*r*/, int /*l*/, int /*u*/)
 {
 }

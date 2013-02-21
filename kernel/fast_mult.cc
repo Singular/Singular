@@ -481,7 +481,7 @@ static poly p_MonPowerMB(poly p, int exp, ring r)
   p_Setm(p,r);
   return p;
 }
-static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_len,kBucket_pt erg_bucket,ring r, number coef, poly & zw, poly tmp, poly** term_pot){
+static void buildTermAndAdd(int /*n*/,number* /*facult*/,poly* /*f_terms*/,int* exp,int f_len,kBucket_pt /*erg_bucket*/,ring r, number coef, poly & zw, poly /*tmp*/, poly** term_pot){
 
   int i;
   //  poly term=p_Init(r);
