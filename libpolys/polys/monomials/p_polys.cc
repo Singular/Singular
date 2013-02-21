@@ -1389,7 +1389,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
       // We return the parsed polynomial nevertheless. This is needed when
       // we are parsing coefficients in a rational function field.
       s--;
-      return s;
+      break;
     }
   }
 done:

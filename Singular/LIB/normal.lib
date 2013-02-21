@@ -2705,6 +2705,7 @@ EXAMPLE: example deltaLoc;  shows an example
       }
 
       int mu=vdim(std(jacob(f)));
+
       poly g=f+var(1)^mu+var(2)^mu;  //to obtain a convenient Newton-polygon
 
       list NP=newtonpoly(g);
@@ -2733,7 +2734,8 @@ EXAMPLE: example deltaLoc;  shows an example
          if(w>=1){"Newton polygon can be used for splitting";"";}
          intvec v=NP[1][2]-NP[2][2],NP[2][1];
          int de=w_deg(g,v);
-         int st=w_deg(hc,v)+v[1]+v[2];
+         //int st=w_deg(hc,v)+v[1]+v[2];
+         int st=w_deg(var(1)^NP[size(NP)][1],v)+1;
          poly f1=var(2)^NP[2][2];
          poly f2=jet(g,de,v)/var(2)^NP[2][2];
          poly h=g-f1*f2;
@@ -2751,6 +2753,7 @@ EXAMPLE: example deltaLoc;  shows an example
            de=w_deg(h,v);
          }
          nb=deltaLoc(f1,maxideal(1))[3]+deltaLoc(f2,maxideal(1))[3];
+
          setring R;
          option(set,save_opt);
          return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
