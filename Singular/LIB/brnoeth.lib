@@ -2874,7 +2874,10 @@ static proc extra_place (ideal P)
     ring ES=(char(basering),a),(x,y,t),ls;
     map psi=base_r,a,0;
     minpoly=number(psi(aux2));
-    kill psi;
+    if (defined (psi))
+    {
+      kill psi;
+    }
     number A=a;
     number B=imap(base_r,B);
   }
@@ -2889,7 +2892,10 @@ static proc extra_place (ideal P)
       ring ES=(char(basering),a),(x,y,t),ls;
       map psi=base_r,0,a;
       minpoly=number(psi(P1));
-      kill psi;
+      if (defined (psi))
+      {
+        kill psi;
+      }
       poly aux1=imap(base_r,P2);
       poly aux2=subst(aux1,y,a);
       number A=-number(subst(aux2,x,0));
