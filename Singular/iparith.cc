@@ -6661,7 +6661,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   w1.CleanUp();
   w2.CleanUp();
   if(w!=NULL)
-    omFree(w);
+    omFreeSize( (ADDRESS)w, (rVar(currRing)+1)*sizeof(short) );
 
   lists L=(lists) omAllocBin(slists_bin);
   L->Init(2);
