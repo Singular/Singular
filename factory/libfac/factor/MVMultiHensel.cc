@@ -71,7 +71,7 @@ public:
     this->poly = value;
     return *this;
   }
-  RememberForm() : poly(0), calculated(false) {}
+  RememberForm() : calculated(false), poly(0) {}
   Boolean calculated;
   CanonicalForm poly;
 };
