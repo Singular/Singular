@@ -2494,6 +2494,7 @@ poly p_Cleardenom(poly ph, const ring r)
 
   if(pNext(p)==NULL)
   {
+    /*
     if (TEST_OPT_CONTENTSB)
     {
       number n=n_GetDenom(pGetCoeff(p),r->cf);
@@ -2506,6 +2507,7 @@ poly p_Cleardenom(poly ph, const ring r)
       n_Delete(&n,r->cf);
     }
     else
+    */
       p_SetCoeff(p,n_Init(1,r->cf),r);
 
     assume( n_GreaterZero(pGetCoeff(ph),C) );
@@ -2516,7 +2518,9 @@ poly p_Cleardenom(poly ph, const ring r)
 
   assume(pNext(p)!=NULL);
 
-#if CLEARENUMERATORS
+#if 0 && CLEARENUMERATORS
+//CF: does not seem to work that well..
+  
   if( nCoeff_is_Q(C) || nCoeff_is_Q_a(C) )
   {
     CPolyCoeffsEnumerator itr(ph);
@@ -2806,6 +2810,70 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     c = n_Neg(c, C);
   }
 
+}
+
+  // normalization: for poly over Q: make poly primitive, integral
+  //                              Qa make poly integral with leading
+  //                                  coefficient minimal in N
+  //                            Q(t) make poly primitive, integral
+
+void p_ProjectiveUnique(poly ph, const ring r)
+{
+  if( ph == NULL )
+    return;
+
+  assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
+
+  poly start=ph;
+
+  number d, h;
+  poly p;
+
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    p_Content(ph,r);
+    assume( n_GreaterZero(pGetCoeff(ph),C) );
+    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
+    return;
+  }
+#endif
+
+  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
+  {
+    assume( n_GreaterZero(pGetCoeff(ph),C) );
+    if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
+    return; 
+  }
+  p = ph;
+
+  assume(p != NULL);
+
+  if(pNext(p)==NULL) // a monomial
+  {
+    p_SetCoeff(p, n_Init(1, C), r);
+    return;
+  }
+
+  assume(pNext(p)!=NULL);
+
+  if(1)
+  {
+    h = p_GetCoeff(p, C);
+    number hInv = n_Invers(h, C);
+    pIter(p);
+    while (p!=NULL)
+    {
+      p_SetCoeff(p, n_Mult(p_GetCoeff(p, C), hInv, C), r);
+      pIter(p);
+    }
+    n_Delete(&hInv, C);
+    p = ph;
+    p_SetCoeff(p, n_Init(1, C), r);
+  }
+  p_Cleardenom(ph, r);
+  p_Content(ph, r);
+  return;
 }
 
 number p_GetAllDenom(poly ph, const ring r)
