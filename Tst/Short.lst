@@ -191,7 +191,7 @@ Short/pAddManyVarsManyL_s.tst
 Short/pAddManyVars_s.tst
 Short/pAdd_s.tst
 Short/parallel_s.tst
-Short/parallel_l.tst
+;;; Short/parallel_l.tst
 Short/paraplan_s.tst
 Short/pMultManyVarsManyL_s.tst
 Short/pMultManyVars_s.tst
@@ -243,7 +243,7 @@ Short/sres_s.tst
 Short/std_s.tst
 ;MP Short/stratify.tst
 Short/string.tst
-; Short/symodstd.tst ; the test  is also in Long/
+;;; Short/symodstd.tst ; the test  is also in Long/
 Short/test_c_dp.tst
 Short/triang_s.tst
 ; Short/tropical.tst ;; too long ?
