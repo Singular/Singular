@@ -696,15 +696,14 @@ long p_DegW(poly p, const short *w, const ring R)
    
   if( p == NULL ) // TODO: ???
      return -1;
-   
-  long r = totaldegreeWecart_IV(p, R, w); pIter(p);
-
-  for ( ; p!=NULL; pIter(p) )
+  long r=~0L;
+  loop
   {
-    const long t = totaldegreeWecart_IV(p, R, w);
+    long t = totaldegreeWecart_IV(p, R, w); pIter(p);
     if (t > r) r = t;
+    pIter(p);
+    if (p==NULL) break;
   }
-   
   return r;
 }
 
@@ -727,7 +726,7 @@ long p_WDegree(poly p, const ring r)
   for(i=1;i<=r->firstBlockEnds;i++)
     j+=p_GetExp(p, i, r)*r->firstwv[i-1];
 
-  for (;i<=r->N;i++)
+  for (;i<=rVar(r);i++)
     j+=p_GetExp(p,i, r)*p_Weight(i, r);
 
   return j;
