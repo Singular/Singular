@@ -1682,7 +1682,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if( !rSamePolyRep(r1, r2) )
     return FALSE;
 
-  int i, j;
+  int i/*, j*/;
 
   if (r1 == r2) return TRUE;
   if (r1 == NULL || r2 == NULL) return FALSE;

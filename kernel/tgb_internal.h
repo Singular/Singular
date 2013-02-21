@@ -657,7 +657,7 @@ public:
     //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
   #endif
-  DataNoroCacheNode<number_type>* insertAndTransferOwnerShip(poly t, ring r)
+  DataNoroCacheNode<number_type>* insertAndTransferOwnerShip(poly t, ring /*r*/)
   {
     ressources.push_back(t);
     DataNoroCacheNode<number_type>* res=treeInsertBackLink(t);
@@ -918,8 +918,13 @@ while(it!=end)
 #endif
 return res;
 }
+#ifdef NDEBUG
+template <class number_type> void add_coef_times_sparse(number_type* const temp_array,
+int /*temp_size*/,SparseRow<number_type>* row, number coef)
+#else
 template <class number_type> void add_coef_times_sparse(number_type* const temp_array,
 int temp_size,SparseRow<number_type>* row, number coef)
+#endif
 {
   int j;
   number_type* const coef_array=row->coef_array;
@@ -959,8 +964,13 @@ int temp_size,SparseRow<number_type>* row, number coef)
 
   }
 }
+#ifdef NDEBUG
+template <class number_type> void add_coef_times_dense(number_type* const temp_array,
+int /*temp_size*/,const number_type* row, int len,number coef)
+#else
 template <class number_type> void add_coef_times_dense(number_type* const temp_array,
 int temp_size,const number_type* row, int len,number coef)
+#endif
 {
   int j;
   const number_type* const coef_array=row;
@@ -1000,8 +1010,13 @@ int temp_size,const number_type* row, int len,number coef)
 
   }
 }
+#ifdef NDEBUG
+template <class number_type> void add_dense(number_type* const temp_array,
+int /*temp_size*/,const number_type* row, int len)
+#else
 template <class number_type> void add_dense(number_type* const temp_array,
 int temp_size,const number_type* row, int len)
+#endif
 {
   //int j;
   //const number_type* const coef_array=row;
@@ -1019,8 +1034,13 @@ int temp_size,const number_type* row, int len)
   }
 
 }
+#ifdef NDEBUG
+template <class number_type> void sub_dense(number_type* const temp_array,
+int /*temp_size*/,const number_type* row, int len)
+#else
 template <class number_type> void sub_dense(number_type* const temp_array,
 int temp_size,const number_type* row, int len)
+#endif
 {
   //int j;
   //const number_type* const coef_array=row;
@@ -1040,7 +1060,11 @@ int temp_size,const number_type* row, int len)
 
 }
 
+#ifdef NDEBUG
+template <class number_type> void add_sparse(number_type* const temp_array,int /*temp_size*/,SparseRow<number_type>* row)
+#else
 template <class number_type> void add_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row)
+#endif
 {
   int j;
 
@@ -1054,7 +1078,11 @@ template <class number_type> void add_sparse(number_type* const temp_array,int t
           assume(idx<temp_size);
         }
 }
+#ifdef NDEBUG
+template <class number_type> void sub_sparse(number_type* const temp_array,int /*temp_size*/,SparseRow<number_type>* row)
+#else
 template <class number_type> void sub_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row)
+#endif
 {
   int j;
 

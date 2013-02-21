@@ -75,7 +75,7 @@ bool Cache<KeyClass, ValueClass>::hasKey (const KeyClass& key) const
 }
 
 template<class KeyClass, class ValueClass>
-ValueClass Cache<KeyClass, ValueClass>::getValue (const KeyClass& key) const
+ValueClass Cache<KeyClass, ValueClass>::getValue (const KeyClass& /*key*/) const
 {
   if (_itKey == _key.end())
     /* _itKey refers to past-the-end element in the list;

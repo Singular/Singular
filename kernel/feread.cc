@@ -396,7 +396,7 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
 /* =                      batch mode                                = */
 /* ===================================================================*/
 /* dummy (for batch mode): */
-char * fe_fgets_dummy(const char *pr,char *s, int size)
+char * fe_fgets_dummy(const char */*pr*/,char */*s*/, int /*size*/)
 {
   return NULL;
 }

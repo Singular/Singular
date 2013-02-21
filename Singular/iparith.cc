@@ -2596,11 +2596,11 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
-static BOOLEAN jjLOAD2(leftv res, leftv, leftv v)
+static BOOLEAN jjLOAD2(leftv /*res*/, leftv, leftv v)
 {
   return jjLOAD((char*)v->Data(),TRUE);
 }
-static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
+static BOOLEAN jjLOAD_E(leftv /*res*/, leftv v, leftv u)
 {
   char * s=(char *)u->Data();
   if(strcmp(s, "with")==0)
@@ -4446,7 +4446,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   return FALSE;
 }
-static BOOLEAN jjLOAD1(leftv res, leftv v)
+static BOOLEAN jjLOAD1(leftv /*res*/, leftv v)
 {
   return jjLOAD((char*)v->Data(),FALSE);
 }
@@ -4848,7 +4848,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     return TRUE;
   }
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
-  tHomog hom=testHomog;
+  // tHomog hom=testHomog;
   ideal u_id=(ideal)u->Data();
   if (w!=NULL)
   {
@@ -4860,7 +4860,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     else
     {
       w=ivCopy(w);
-      hom=isHomog;
+      // hom=isHomog;
     }
   }
 
@@ -5936,7 +5936,7 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   delete iv;
   return TRUE;
 }
-static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv /*w*/)
 {
   PrintS("TODO\n");
   int i=pVar((poly)v->Data());
@@ -5954,7 +5954,7 @@ static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv w)
     WerrorS("variable must have weight 1");
   return (d!=1);
 }
-static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv w)
+static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv /*w*/)
 {
   PrintS("TODO\n");
   int i=pVar((poly)v->Data());

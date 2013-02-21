@@ -1538,7 +1538,7 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
 {
   assume( n_Test(a, src) );
   if (n_IsZero(a, src)) return NULL;
-  int p = rChar(dst->extRing);
+  // int p = rChar(dst->extRing);
   number q = nlModP(a, src, dst->extRing->cf);
 
   if (n_IsZero(q, dst->extRing->cf))
@@ -1693,7 +1693,7 @@ number ntConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
   ntTest((number)result);
   return (number)result;
 }
-CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs cf )
+CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs cf )
 {
   ntTest(n);
   if (IS0(n)) return CanonicalForm(0);

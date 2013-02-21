@@ -45,7 +45,7 @@ poly pShallowCopyDelete_General(poly s_p, ring s_r, ring d_r, omBin d_bin)
   return dp.next;
 }
 
-pShallowCopyDeleteProc pGetShallowCopyDeleteProc(ring source_r, ring dest_r)
+pShallowCopyDeleteProc pGetShallowCopyDeleteProc(ring /*source_r*/, ring /*dest_r*/)
 {
   return pShallowCopyDelete_General;
 }

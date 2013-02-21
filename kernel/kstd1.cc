@@ -514,7 +514,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing))
     {
       /*- remember the found T-poly -*/
-      poly pi = strat->T[j].p;
+      // poly pi = strat->T[j].p;
       int ei = strat->T[j].ecart;
       int li = strat->T[j].length;
       int ii = j;
@@ -537,7 +537,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
           /*
           * the polynomial to reduce with is now;
           */
-          pi = strat->T[j].p;
+          // pi = strat->T[j].p;
           ei = strat->T[j].ecart;
           li = strat->T[j].length;
           ii = j;
@@ -1040,7 +1040,7 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
     strat->kHEdgeFound = TRUE;
 }
 
-void initBba(ideal F,kStrategy strat)
+void initBba(ideal /*F*/,kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
@@ -2467,7 +2467,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   int   red_result = 1;
   int   olddeg,reduc;
   BOOLEAN withT = FALSE;
-  BOOLEAN toReset=FALSE;
+  // BOOLEAN toReset=FALSE;
   kStrategy strat=new skStrategy;
   tHomog h;
   intvec * w=NULL;
@@ -2498,7 +2498,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       strat->pOrigFDeg = currRing->pFDeg;
       strat->pOrigLDeg = currRing->pLDeg;
       pSetDegProcs(currRing,kModDeg);
-      toReset = TRUE;
+      // toReset = TRUE;
     }
     strat->LazyPass*=2;
   }

@@ -1738,7 +1738,7 @@ resMatrixSparse::~resMatrixSparse()
 
 ideal resMatrixSparse::getMatrix()
 {
-  int i,j,cp;
+  int i,/*j,*/cp;
   poly pp,phelp,piter,pgls;
 
   // copy original sparse res matrix
@@ -1860,7 +1860,7 @@ number resMatrixSparse::getDetAt( const number* evpoint )
 poly resMatrixSparse::getUDet( const number* evpoint )
 {
   int i,cp;
-  poly pp,phelp,piter;
+  poly pp,phelp/*,piter*/;
 
   mprPROTnl("smCallDet");
 
@@ -1869,7 +1869,7 @@ poly resMatrixSparse::getUDet( const number* evpoint )
     pp= (rmat->m)[IMATELEM(*uRPos,i,1)];
     pDelete( &pp );
     phelp= NULL;
-    piter= NULL;
+    // piter= NULL;
     for ( cp= 2; cp <= idelem; cp++ )
     { // u1 .. un
       if ( !nIsZero(evpoint[cp-1]) )
@@ -3071,7 +3071,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
 
 rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDetVal )
 {
-  int i,p,uvar;
+  int i,/*p,*/uvar;
   long tdg;
   poly pures,piter;
   int loops=(matchUp?n-2:n-1);
@@ -3091,7 +3091,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
   // now we evaluate D(u0,-1,0,...0), D(u0,0,-1,0,...,0), ..., D(u0,0,..,0,-1)
   // or D(u0,k1,k2,0,...,0), D(u0,k1,k2,k3,0,...,0), ..., D(u0,k1,k2,k3,...,kn)
-  p=3;
+  // p=3;
   for ( uvar= 0; uvar < loops; uvar++ )
   {
     // generate initial evaluation point
@@ -3205,10 +3205,10 @@ ideal loNewtonPolytope( const ideal id )
 {
   simplex * LP;
   int i;
-  int n,totverts,idelem;
+  int /*n,*/totverts,idelem;
   ideal idr;
 
-  n= (currRing->N);
+  // n= (currRing->N);
   idelem= IDELEMS(id);  // should be n+1
 
   totverts = 0;

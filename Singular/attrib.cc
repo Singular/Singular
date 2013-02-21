@@ -328,7 +328,7 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   }
   return FALSE;
 }
-BOOLEAN atATTRIB3(leftv res,leftv v,leftv b,leftv c)
+BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
 {
   idhdl h=(idhdl)v->data;
   int t;
@@ -415,7 +415,7 @@ BOOLEAN atATTRIB3(leftv res,leftv v,leftv b,leftv c)
   return FALSE;
 }
 
-BOOLEAN atKILLATTR1(leftv res,leftv a)
+BOOLEAN atKILLATTR1(leftv /*res*/,leftv a)
 {
   idhdl h=NULL;
   if ((a->rtyp==IDHDL)&&(a->e==NULL))
@@ -432,7 +432,7 @@ BOOLEAN atKILLATTR1(leftv res,leftv a)
   else atKillAll(a);
   return FALSE;
 }
-BOOLEAN atKILLATTR2(leftv res,leftv a,leftv b)
+BOOLEAN atKILLATTR2(leftv /*res*/,leftv a,leftv b)
 {
   if ((a->rtyp!=IDHDL)||(a->e!=NULL))
   {

@@ -196,7 +196,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   int k_ind2 = 0;
   int a_ind2 = ind2(a);
 
-  NATNUMBER k = 1;
+  // NATNUMBER k = 1;
   // of interest is only k_ind2, special routine for improvement ... TODO OLIVER
   for (int i = 1; i <= leadRing->N; i++)
   {
@@ -302,11 +302,11 @@ int redRing (LObject* h,kStrategy strat)
   if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
   if (strat->tl<0) return 1;
 
-  int at,i;
+  int at/*,i*/;
   long d;
   int j = 0;
   int pass = 0;
-  poly zeroPoly = NULL;
+  // poly zeroPoly = NULL;
 
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
@@ -389,10 +389,10 @@ int redHomog (LObject* h,kStrategy strat)
   poly h_p;
   int i,j,at,pass, ii;
   unsigned long not_sev;
-  long reddeg,d;
+  // long reddeg,d;
 
   pass = j = 0;
-  d = reddeg = h->GetpFDeg();
+  // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   int li;
   h_p = h->GetLmTailRing();
@@ -529,10 +529,10 @@ int redSig (LObject* h,kStrategy strat)
   int start=0;
   int sigSafe;
   unsigned long not_sev;
-  long reddeg,d;
+  // long reddeg,d;
 
   pass = j = 0;
-  d = reddeg = h->GetpFDeg();
+  // d = reddeg = h->GetpFDeg();
   h->SetShortExpVector();
   int li;
   h_p = h->GetLmTailRing();
@@ -1515,7 +1515,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   long zeroreductions = 0;
   LObject L;
-  BOOLEAN withT     = FALSE;
+  // BOOLEAN withT     = FALSE;
   strat->max_lower_index = 0;
 
   //initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
@@ -1536,8 +1536,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
 
   // redtailBBa against T for inhomogenous input
-  if (!TEST_OPT_OLDSTD)
-    withT = ! strat->homog;
+  // if (!TEST_OPT_OLDSTD)
+  //   withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
   assume(kTest_TS(strat));
@@ -2997,7 +2997,7 @@ int redFirstShift (LObject* h,kStrategy strat)
   }
 }
 
-void initBbaShift(ideal F,kStrategy strat)
+void initBbaShift(ideal /*F*/,kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba; /* remains as is, we change enterT! */

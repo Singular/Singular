@@ -397,8 +397,13 @@ CanonicalForm alg_lc(const CanonicalForm &f)
 }
 
 // the heart of the algorithm: the one from Trager
+#ifndef DEBUGOUTPUT
+static CFFList
+alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist /*& oldord*/, const CFList & as)
+#else
 static CFFList
 alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as)
+#endif
 {
   CFFList L, Factorlist;
   CanonicalForm R, Rstar, s, g, h;

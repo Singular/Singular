@@ -111,7 +111,7 @@ static void syShowRes(syStrategy syzstr)
 static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
             ideal old_repr,int old_tl, poly next_generator,resolvente totake)
 {
-  int index=syzstr->length-1,i,j,start,start_ttk,new_tl;
+  int index=syzstr->length-1,i,j,start,start_ttk/*,new_tl*/;
   poly gen=pCopy(next_generator),p;
   poly neg_gen=pCopy(next_generator);
   ideal current_ideal,current_repr;
@@ -236,7 +236,11 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
 * set of generators;
 * only for tests
 */
+#ifdef NDEBUG
+static void syTestPairs(SSet resPairs,int length,ideal /*old_generators*/)
+#else
 static void syTestPairs(SSet resPairs,int length,ideal old_generators)
+#endif
 {
   int i=0;
  
@@ -516,7 +520,7 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
 {
   int i=IDELEMS(red)-1,num_mon,num_tail;
   poly h,hn;
-  BOOLEAN dummy;
+  // BOOLEAN dummy;
  
   while ((i>0) && (red->m[i-1]==NULL)) i--;
   i--;
@@ -529,7 +533,7 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
     while (hn!=NULL)
     {
       kBucketInit(syzstr->syz_bucket,hn,num_tail);
-      dummy = syRedSyz(syzstr->syz_bucket,red,crit_comp,gen_length);
+      /*dummy =*/ (void) syRedSyz(syzstr->syz_bucket,red,crit_comp,gen_length);
       kBucketClear(syzstr->syz_bucket,&hn,&num_tail);
       pNext(h) = hn;
       if ((hn==NULL) || (pGetComp(hn)<=crit_comp))
@@ -547,7 +551,7 @@ static poly syRedTailSyz(poly tored,ideal red,ideal sec_red,int crit_comp,syStra
       while (hn!=NULL)
       {
         kBucketInit(syzstr->syz_bucket,hn,num_tail);
-        dummy = syRedSyz(syzstr->syz_bucket,sec_red,crit_comp,secgen_length);
+        /*dummy =*/ (void) syRedSyz(syzstr->syz_bucket,sec_red,crit_comp,secgen_length);
         kBucketClear(syzstr->syz_bucket,&hn,&num_tail);
         pNext(h) = hn;
         if (hn==NULL)
@@ -655,7 +659,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
   int og_idel=IDELEMS(old_generators),ng_place=IDELEMS(new_generators);
   int toReplace=0;
   int i,j,syz_l;
-  number coefgcd,n;
+  number /*coefgcd,*/n;
   polyset ogm=old_generators->m;
   poly p;
   BOOLEAN deleteP=FALSE;
@@ -940,7 +944,7 @@ static BOOLEAN redPairs(SSet resPairs,int l_pairs, ideal syzygies,
   int i,j,actdeg=resPairs[0].order;
   int * ogm_l=(int*)omAlloc0(IDELEMS(syzstr->res[index])*sizeof(int));
   int * orp_l=(int*)omAlloc0(IDELEMS(syzstr->orderedRes[index])*sizeof(int));
-  int t1=IDELEMS(syzstr->res[index]),t2=IDELEMS(syzstr->orderedRes[index]);
+  // int t1=IDELEMS(syzstr->res[index]),t2=IDELEMS(syzstr->orderedRes[index]);
  
   for (j=IDELEMS(syzstr->res[index])-1;j>=0;j--) 
   {
@@ -1048,9 +1052,9 @@ static poly normalize(poly next_p,ideal add_generators, syStrategy syzstr,
 /*3
 * updates the pairs inthe higher modules
 */
-static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
-       int index,ideal add_generators,ideal add_repr,ideal new_generators,
-       ideal new_repr,int crit_comp,int* first_new)
+static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy /*syzstr*/,
+       int index,ideal add_generators,ideal /*add_repr*/,ideal /*new_generators*/,
+       ideal /*new_repr*/,int /*crit_comp*/,int* first_new)
 {
   int i=*first_new,l=*l_pairs,j,ll,j1,add_idel=IDELEMS(add_generators);
   ideal pairs=idInit(add_idel,add_generators->rank);
@@ -1172,10 +1176,17 @@ PrintLn();
 /*3
 * reduction of a single pair in the higher moduls
 */
+#ifdef SHOW_PROT
 static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp, 
             syStrategy syzstr,int index,ideal add_generators, ideal add_repr,
             ideal new_generators, ideal new_repr,int * next_place_add,int ** g_l,
             poly deg_soc)
+#else
+static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp, 
+            syStrategy syzstr,int /*index*/,ideal add_generators, ideal add_repr,
+            ideal new_generators, ideal new_repr,int * next_place_add,int ** g_l,
+            poly deg_soc)
+#endif
 {
   SObject tso = resPairs[itso];
   assume (tso.lcm!=NULL);
@@ -1400,7 +1411,7 @@ static BOOLEAN reducePairsHIndex(SSet resPairs,int l_pairs,syStrategy syzstr,
 * new_generators and new_repr (which are empty) stores the result of the 
 * reduction which is normalized afterwards
 */
-static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
+static void procedeNextGenerators(ideal temp_generators,ideal /*temp_repr*/,
       ideal new_generators, ideal new_repr, ideal add_generators,
       ideal add_repr, syStrategy syzstr,int index, int crit_comp,
       resolvente totake)
@@ -1532,7 +1543,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
 * of former generators (old_generators);
 */
 static ideal normalizeOldPart(ideal new_generators,ideal new_repr,
-                      syStrategy syzstr,int index,int crit_comp)
+                      syStrategy syzstr,int index,int /*crit_comp*/)
 {
   ideal old_generators= syzstr->res[index];
   ideal old_repr= syzstr->orderedRes[index];
@@ -1752,7 +1763,7 @@ idPrint(new_repr);
 */
 syStrategy syKosz(ideal arg,int * length)
 {
-  int i,j,jj,k=0,index=0,rk_arg,next_syz=0;
+  int i,j,jj,k=0,index=0,rk_arg/*,next_syz=0*/;
   int crit_comp,t_comp,next_deg,old_tl;
   ideal temp=NULL,old_ideal,old_repr;
   ring origR = currRing;

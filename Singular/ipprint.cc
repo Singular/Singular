@@ -302,7 +302,7 @@ BOOLEAN jjDBPRINT(leftv res, leftv u)
   }
   if (print)
   {
-    BOOLEAN r=FALSE;
+    // BOOLEAN r=FALSE;
     leftv h=u;
     leftv hh;
     while (h!=NULL)

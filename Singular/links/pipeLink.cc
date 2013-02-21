@@ -37,7 +37,7 @@ typedef struct
 } pipeInfo;
 
 //**************************************************************************/
-BOOLEAN pipeOpen(si_link l, short flag, leftv u)
+BOOLEAN pipeOpen(si_link l, short flag, leftv /*u*/)
 {
   pipeInfo *d=(pipeInfo*)omAlloc0(sizeof(pipeInfo));
   if (flag & SI_LINK_OPEN)
@@ -165,7 +165,7 @@ const char* slStatusPipe(si_link l, const char* request)
     if ((!SI_LINK_R_OPEN_P(l)) || (feof(d->f_read))) s=0;
     else
     {
-      fd_set  mask, fdmask;
+      fd_set  mask/*, fdmask*/;
       struct timeval wt;
       /* Don't block. Return socket status immediately. */
       wt.tv_sec  = 0;

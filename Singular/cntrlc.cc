@@ -75,7 +75,7 @@ void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
 si_link pipeLastLink=NULL;
 BOOLEAN singular_in_batchmode=FALSE;
 
-void sig_pipe_hdl(int sig)
+void sig_pipe_hdl(int /*sig*/)
 {
  if (pipeLastLink!=NULL)
  {
@@ -85,7 +85,7 @@ void sig_pipe_hdl(int sig)
  }
 }
 
-void sig_term_hdl(int sig)
+void sig_term_hdl(int /*sig*/)
 {
  while (ssiToBeClosed!=NULL)
  {
@@ -319,7 +319,7 @@ void sigsegv_handler(int sig)
 * signal handler for SIGINT
 */
 int sigint_handler_cnt=0;
-void sigint_handler(int sig)
+void sigint_handler(int /*sig*/)
 {
   mflush();
   #ifdef HAVE_FEREAD
@@ -571,7 +571,7 @@ static void stack_trace (char *const*args)
   m2_end(0);
 }
 
-static void stack_trace_sigchld (int signum)
+static void stack_trace_sigchld (int /*signum*/)
 {
   stack_trace_done = 1;
 }

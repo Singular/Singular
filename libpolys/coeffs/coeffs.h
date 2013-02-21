@@ -591,7 +591,11 @@ static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
 
 /// test whether n is a correct number;
 /// only used if LDEBUG is defined
+#ifdef LDEBUG
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
+#else
+static inline BOOLEAN n_DBTest(number, const char*, const int, const coeffs)
+#endif
 {
   assume(r != NULL); 
 #ifdef LDEBUG

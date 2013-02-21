@@ -107,7 +107,7 @@ void main_init(int argc, char *argv[])
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-void main_result(char *libname)
+void main_result(char */*libname*/)
 {
   if(!found_info)    printf("*** No info-string found!\n");
   if(!found_version) printf("*** No version-string found!\n");
@@ -157,8 +157,8 @@ static void PrintOut(FILE *fd, int pos_start, int pos_end)
 
 void printpi(procinfov pi)
 {
-  char *buf, name[256];
-  int len1, len2;
+  // char *buf, name[256];
+  // int len1, len2;
   /* pi->libname is badly broken -- use file, instead */
   FILE *fp = fopen( lib_file, "rb");
 

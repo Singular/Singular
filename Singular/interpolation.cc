@@ -1040,7 +1040,11 @@ void PresentGenerator (int i)  // only for debuging, writes a generator in its f
 }
 #endif
 
+#ifdef HAVE_FACTORY
+static modp_number TakePrime (modp_number /*p*/)  // takes "previous" (smaller) prime
+#else
 static modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
+#endif
 {
 #ifdef HAVE_FACTORY
     myp_index--;

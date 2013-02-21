@@ -922,7 +922,7 @@ static void hHedgeStep(scmon pure, scfmon stc,
                        int Nstc, varset var, int Nvar,poly hEdge)
 {
   int  iv = Nvar -1, k = var[Nvar], a, a0, a1, b, i;
-  int  x, x0;
+  int  x/*, x0*/;
   scmon pn;
   scfmon sn;
   if (iv==0)
@@ -957,7 +957,7 @@ static void hHedgeStep(scmon pure, scfmon stc,
   loop
   {
     a0 = a;
-    x0 = x;
+    // x0 = x;
     hStepS(sn, Nstc, var, Nvar, &a, &x);
     hElimS(sn, &b, a0, a, var, iv);
     a1 = a;

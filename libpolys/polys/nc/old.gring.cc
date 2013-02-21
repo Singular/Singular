@@ -3337,7 +3337,7 @@ ring nc_rCreateNCcomm(ring r)
   /* and srcRing is one of such smaller rings */
   /* shift defines the position of a subring in srcRing */
   /* par_shift defines the position of a subfield in basefield of CurrRing */
-poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift, ring dstRing)
+poly p_CopyEmbed(poly p, ring srcRing, int shift, int /*par_shift*/, ring dstRing)
 {
   if (dstRing == srcRing)
   {

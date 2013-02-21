@@ -26,10 +26,12 @@
 #define OUTPUT 0
 #endif
 
+#if OUTPUT
 namespace 
 {
   static const char* m_Typenames[2] = {"lookup", "store"};
 }
+#endif
 
 #include <coeffs/numbers.h>
 #include "coeffrings.h"
@@ -40,8 +42,11 @@ namespace
 #include "monomials/p_polys.h"
 
 
-
+#if OUTPUT
 void CGlobalCacheHash::History(const EHistoryType t, const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const poly p)
+#else
+void CGlobalCacheHash::History(const EHistoryType, const CGlobalCacheHash::CExponent, const CGlobalCacheHash::CExponent, const poly)
+#endif
 {
 #if OUTPUT
   Print("History: GlobalPair, Action: %s", m_Typenames[(int)(t)]);
@@ -56,7 +61,11 @@ void CGlobalCacheHash::History(const EHistoryType t, const CGlobalCacheHash::CEx
 }
 
 
+#if OUTPUT
 void  CSpecialPairCacheHash::History(const EHistoryType t, const CSpecialPairCacheHash::CExponent a, const CSpecialPairCacheHash::CExponent b, const poly p)
+#else
+void  CSpecialPairCacheHash::History(const EHistoryType, const CSpecialPairCacheHash::CExponent, const CSpecialPairCacheHash::CExponent, const poly)
+#endif
 {
 #if OUTPUT
   Print("History: SpecialPair, Action: %s", m_Typenames[(int)(t)]);

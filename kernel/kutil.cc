@@ -394,7 +394,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 */
 void HEckeTest (poly pp,kStrategy strat)
 {
-  int   j,k,p;
+  int   j,/*k,*/p;
 
   strat->kHEdgeFound=FALSE;
   if (currRing->pLexOrder || currRing->MixedOrder)
@@ -409,7 +409,7 @@ void HEckeTest (poly pp,kStrategy strat)
     //if (pGetComp(pp) < strat->ak) /* ak is the number of the last component */
     //  return FALSE;
   }
-  k = 0;
+  // k = 0;
   p=pIsPurePower(pp);
   if (p!=0) strat->NotUsedAxis[p] = FALSE;
   /*- the leading term of pp is a power of the p-th variable -*/
@@ -634,7 +634,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   r_assume(strat_tailRing == tailRing);
 
   poly p = T->p;
-  ring r = currRing;
+  // ring r = currRing;
 
   if (T->p == NULL && T->t_p == NULL && i >= 0)
     return dReportError("%c[%d].poly is NULL", TN, i);
@@ -650,13 +650,13 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
       const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
       if (msg != NULL)
         return dReportError("%c[%d] %s", TN, i, msg);
-      r = T->tailRing;
+      // r = T->tailRing;
       p = T->t_p;
     }
     if (T->p == NULL)
     {
       p = T->t_p;
-      r = T->tailRing;
+      // r = T->tailRing;
     }
     if (T->t_p != NULL && i >= 0 && TN == 'T')
     {
@@ -845,7 +845,7 @@ BOOLEAN kTest_S(kStrategy strat)
 BOOLEAN kTest_TS(kStrategy strat)
 {
   int i, j;
-  BOOLEAN ret = TRUE;
+  // BOOLEAN ret = TRUE;
   kFalseReturn(kTest(strat));
 
   // test strat->R, strat->T[i].i_r
@@ -1730,7 +1730,11 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 * NOTE: here we need to add the signature-based criteria
 */
 
+#ifdef DEBUGF5
 void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+#else
+void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kStrategy strat, int atR = -1)
+#endif
 {
   assume(i<=strat->sl);
   if (strat->interred_flag) return;
@@ -1739,7 +1743,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int from, int ecart, int isFromQ
   poly m1 = NULL,m2 = NULL; // we need the multipliers for the s-polynomial to compute
               // the corresponding signatures for criteria checks
   LObject  Lp;
-  poly last;
+  // poly last;
   poly pSigMult = p_Copy(pSig,currRing);
   poly sSigMult = p_Copy(strat->sig[i],currRing);
   unsigned long pSigMultNegSev,sSigMultNegSev;
@@ -2337,7 +2341,7 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
 */
-void chainCritSig (poly p,int ecart,kStrategy strat)
+void chainCritSig (poly p,int /*ecart*/,kStrategy strat)
 {
   int i,j,l;
   kMergeBintoLSba(strat);
@@ -4469,7 +4473,7 @@ int posInL0 (const LSet set, const int length,
 * to the signature order
 */
 int posInLSig (const LSet set, const int length,
-            LObject* p,const kStrategy strat)
+               LObject* p,const kStrategy /*strat*/)
 {
 if (length<0) return 0;
 if (pLmCmp(set[length].sig,p->sig)== currRing->OrdSgn)
@@ -4498,8 +4502,8 @@ loop
 * critical pairs to strat->L only behind all other critical pairs which are
 * still in strat->L!
 */
-int posInLF5C (const LSet set, const int length,
-            LObject* p,const kStrategy strat)
+int posInLF5C (const LSet /*set*/, const int /*length*/,
+               LObject* /*p*/,const kStrategy strat)
 {
   return strat->Ll+1;
 }
@@ -5045,7 +5049,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat,
 //        leading monomials are smaller than the leading monomial of the
 //        critical pair. In this situation we can discard the critical pair
 //        completely.
-BOOLEAN arriRewCriterion(poly sig, unsigned long /*not_sevSig*/, kStrategy strat, int start=0)
+BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy strat, int /*start=0*/)
 {
   //printf("Arri Rewritten Criterion\n");
   while (strat->Ll > 0 && pLmEqual(strat->L[strat->Ll].sig,strat->P.sig))
@@ -8089,7 +8093,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   kStratChangeTailRing(strat, NULL, NULL, e);
 }
 
-ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
+ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 {
   int n = rBlocks(r); // Including trailing zero!
   // if incremental => use (C,monomial order from r)
@@ -8827,7 +8831,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 
   int j;
 
-  poly q, s;
+  poly q/*, s*/;
 
   // for the 0th shift: insert the orig. pair
   enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, 0, i, uptodeg, lV);

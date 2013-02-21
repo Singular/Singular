@@ -1414,7 +1414,7 @@ poly singclap_det( const matrix m, const ring s )
   return res;
 }
 
-int singclap_det_i( intvec * m, const ring r)
+int singclap_det_i( intvec * m, const ring /*r*/)
 {
 //  assume( r == currRing ); // Anything else is not guaranted to work!
    

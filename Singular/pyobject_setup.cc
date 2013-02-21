@@ -35,7 +35,7 @@ void* pyobject_autoload(blackbox* bbx)
 	  NULL: bbx->blackbox_Init(bbx));
 }
 
-void pyobject_default_destroy(blackbox  *b, void *d)
+void pyobject_default_destroy(blackbox  */*b*/, void */*d*/)
 {
   Werror("Python-based functionality not available!");
 }
