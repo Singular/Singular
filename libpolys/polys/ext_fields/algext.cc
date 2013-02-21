@@ -920,10 +920,16 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
 }
 #endif
 
-number naCopyExt(number a, const coeffs src, const coeffs)
+number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
 {
+  assume (nCoeff_is_transExt (src));
+  assume (nCoeff_is_algExt (dst));
   fraction fa=(fraction)a;
-  return (number)p_Copy(NUM(fa),src->extRing);
+  assume( rSamePolyRep(src->extRing, dst->extRing) );
+  poly p = p_Copy(NUM(fa),src->extRing);
+  definiteReduce(p, dst->extRing->qideal->m[0], dst);
+  assume (p_Test (p, dst->extRing));
+  return (number)p;
 }
 
 /* assumes that src = Q, dst = Z/p(a) */
@@ -994,13 +1000,12 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
-    if (strcmp(rRingVar(0, src->extRing),
-               rRingVar(0, dst->extRing)) == 0)
+    if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0, src->extRing), rRingVar(0, dst->extRing)) == 0))
     {
       if (src->type==n_algExt)
          return ndCopyMap; // naCopyMap;         /// Q(a)   --> Q(a)
       else
-         return naCopyExt;
+         return naCopyTrans2AlgExt;
     }
     else
       return NULL;                               /// Q(b)   --> Q(a)
@@ -1008,12 +1013,12 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
   if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
-    if (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0)
+    if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0))
     {
       if (src->type==n_algExt)
         return ndCopyMap; // naCopyMap;          /// Z/p(a) --> Z/p(a)
       else
-         return naCopyExt;
+         return naCopyTrans2AlgExt;
     }
     else
       return NULL;                               /// Z/p(b) --> Z/p(a)

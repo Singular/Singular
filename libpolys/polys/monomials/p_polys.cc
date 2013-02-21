@@ -3535,11 +3535,11 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   PrintS("\nDestination Ring: \n");
   rWrite(dst);
 
-  Print("\nOldPar: %d\n", OldPar);
+  /*Print("\nOldPar: %d\n", OldPar);
   for( int i = 1; i <= OldPar; i++ )
   {
     Print("par(%d) -> par/var (%d)\n", i, par_perm[i-1]);
-  }
+  }*/
 #endif
   if( z == NULL )
      return NULL;
@@ -3592,7 +3592,23 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
 
   assume( nMap != NULL );
 
-  poly qq = p_PermPoly(zz, par_perm - 1, srcExtRing, dst, nMap, NULL, rVar(srcExtRing) );
+  poly qq;
+
+  if ((par_perm == NULL) && (rPar(dst) != 0 && rVar (srcExtRing) > 0))
+  {
+    int* perm;
+    perm=(int *)omAlloc0((rVar(srcExtRing)+1)*sizeof(int));
+    perm[0]= 0;
+    for(int i=si_min(rVar(srcExtRing),rPar(dst));i>0;i--)
+      perm[i]=-i;
+    qq = p_PermPoly(zz, perm, srcExtRing, dst, nMap, NULL, rVar(srcExtRing)-1);
+    omFreeSize ((ADDRESS)perm, (rVar(srcExtRing)+1)*sizeof(int));
+  }
+  else
+    qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar (srcExtRing)-1);
+
+  assume (p_Test (qq, dst));
+
 //       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
 
 //  assume( FALSE );  WarnS("longalg missing 2");
@@ -3628,7 +3644,10 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     {
       qq = p_Init(dst);
       assume( nMap != NULL );
+
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
+
+      assume (n_Test (n,dst->cf));
 
       if ( nCoeff_is_algExt(dst->cf) )
         n_Normalize(n, dst->cf);
@@ -3748,7 +3767,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
           }
         }
       }
-      if ( mapped_to_par && nCoeff_is_algExt(dst->cf) )
+      if ( mapped_to_par && qq!= NULL && nCoeff_is_algExt(dst->cf) )
       {
         number n = p_GetCoeff(qq, dst);
         n_Normalize(n, dst->cf);
