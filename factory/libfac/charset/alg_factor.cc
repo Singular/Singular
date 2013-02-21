@@ -377,8 +377,7 @@ simpleextension(const CFList & Astar, const Variable & Extension,
       // spielt die Repraesentation eine Rolle?
       // muessen wir die Nachfolger aendern, wenn s != 0 ?
       DEBOUTLN(CERR, "simpleextension: g= ", g);
-      if ( s != 0 ) DEBOUTLN(CERR, "simpleextension: s= ", s);
-      else DEBOUTLN(CERR, "simpleextension: s= ", s);
+      DEBOUTLN(CERR, "simpleextension: s= ", s);
       DEBOUTLN(CERR, "simpleextension: R= ", R);
       Returnlist.insert(s);
     }
@@ -683,7 +682,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   // This is for now. we need alg_sqrfree implemented!
   CanonicalForm Fgcd;
           Fgcd= alg_gcd(f,f.deriv(),Astar);
-  if ( Fgcd == 0 ) DEBOUTMSG(CERR, "WARNING: p'th root ?");
+  if ( Fgcd == 0 ) {DEBOUTMSG(CERR, "WARNING: p'th root ?");}
   if (( degree(Fgcd, f.mvar()) > 0) && (!(f.deriv().isZero())) ){
     DEBOUTLN(CERR, "Nontrivial GCD found of ", f);
     CanonicalForm Ggcd= divide(f, Fgcd,Astar);
