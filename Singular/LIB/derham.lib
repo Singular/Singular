@@ -1245,7 +1245,7 @@ static proc toVdStrictSequence(list C,int n,intvec v,string Syzstring,int si,lis
       J_C=nHomogenize(J_C);
       /*computation of V_d-strict resolution of C[5]->needed for proc 
       VdstrictDoubleComplexes*/
-      def ringofSyz=Sres(transpose(J_C),lengthofres);
+      def ringofSyz=Sres(groebner(transpose(J_C)), lengthofres);
       setring ringofSyz;
       matrix J_C=transpose(matrix(RES[2]));
       J_C=subst(J_C,h,1);
@@ -1374,7 +1374,7 @@ static proc toVdStrictSequence(list C,int n,intvec v,string Syzstring,int si,lis
     setring HomWeyl;
     matrix J_A=fetch(B,J_A);
     J_A=nHomogenize(J_A);
-    def ringofSyz=Sres(transpose(J_A),lengthofres);
+    def ringofSyz=Sres(groebner(transpose(J_A)),lengthofres);
     setring ringofSyz;
     matrix J_A=transpose(matrix(RES[2]));
     matrix zerom;
@@ -1546,7 +1546,7 @@ static proc toVdStrictSequences (list L,int d,intvec v,string Syzstring,int size
     setring HomWeyl;
     matrix J_F=fetch(B,J_F);
     J_F=nHomogenize(J_F);
-    def ringofSyz=Sres(transpose(J_F),lengthofres);   
+    def ringofSyz=Sres(groebner(transpose(J_F)),lengthofres);   
     setring ringofSyz;
     matrix J_F=transpose(matrix(RES[2]));
     J_F=subst(J_F,h,1);
@@ -1662,7 +1662,7 @@ static proc toVdStrictSequences (list L,int d,intvec v,string Syzstring,int size
     setring HomWeyl;
     matrix J_D=fetch(B,J_D);
     J_D=nHomogenize(J_D);
-    def ringofSyz=Sres(transpose(J_D),lengthofres);
+    def ringofSyz=Sres(groebner(transpose(J_D)),lengthofres);
     setring ringofSyz;
     matrix J_D=transpose(matrix(RES[2]));
     J_D=subst(J_D,h,1);
@@ -1937,7 +1937,7 @@ static proc VdStrictDoubleComplexes(list L,int d,string Syzstring)
                   mem=nHomogenize(mem,containsndeg);
                   mem=h^totaldeg*mem;
                   mem=transpose(mem);
-                  mem=reduce(mem,M);
+                  mem=reduce(mem,groebner(M));
                   matrix jt=transpose(subst(mem,h,1));
                   setring B;
                   matrix jt=fetch(HomWeyl,jt);
@@ -2201,7 +2201,7 @@ static proc VdStrictDoubleComplexes(list L,int d,string Syzstring)
                   mem=nHomogenize(mem,containsndeg);
                   mem=h^totaldeg*mem;
                   mem=transpose(mem);
-                  mem=reduce(mem,M);
+                  mem=reduce(mem, groebner(M));
                   if (l==1)
                   {
                     Pinew=mem;
@@ -3644,7 +3644,7 @@ RETURN:a n_1 x n_2-matrix N such that:@*
           SBcom=1;
         }
         /*computes a V_d-strict normal form for FB*/
-        Fb=transpose(reduce(transpose(Fb),Mnew));
+        Fb=transpose(reduce(transpose(Fb),groebner(Mnew)));
         if (VdDegnhv(Fb,d,v)> VdDegnhv(subm2,d,w) 
             and Fb!=matrix(0,nrows(Fb),ncols(Fb)))//should not happen
         {
@@ -3666,7 +3666,7 @@ RETURN:a n_1 x n_2-matrix N such that:@*
         Mnew=slimgb(transpose(Mnew));// computes a V_d-strict Groebner basis
         SBcom=1;
       }
-      Fb=transpose(reduce(transpose(Fb),Mnew));//normal form 
+      Fb=transpose(reduce(transpose(Fb),groebner(Mnew)));//normal form 
     }
     for (k=1; k<=ncols(Fnew);k++)
     {
