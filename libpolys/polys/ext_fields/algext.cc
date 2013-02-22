@@ -219,6 +219,7 @@ static inline poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor
   }
 }
 
+
 /* assumes that p and q are univariate polynomials in r,
    mentioning the same variable;
    assumes a global monomial ordering in r;
@@ -504,8 +505,8 @@ number naMult(number a, number b, const coeffs cf)
   if ((a == NULL)||(b == NULL)) return NULL;
   poly aTimesB = p_Mult_q(p_Copy((poly)a, naRing),
                           p_Copy((poly)b, naRing), naRing);
-  p_Normalize(aTimesB,naRing);
   definiteReduce(aTimesB, naMinpoly, cf);
+  p_Normalize(aTimesB,naRing);
   return (number)aTimesB;
 }
 
@@ -519,6 +520,7 @@ number naDiv(number a, number b, const coeffs cf)
   {
     poly aDivB = p_Mult_q(p_Copy((poly)a, naRing), bInverse, naRing);
     definiteReduce(aDivB, naMinpoly, cf);
+    p_Normalize(aDivB,naRing);
     return (number)aDivB;
   }
   return NULL;
@@ -681,16 +683,21 @@ number napLcm(number b, const coeffs cf)
     h=d;
     pIter(bb);
   }
+  return h;
 }
 number naLcmContent(number a, number b, const coeffs cf)
 {
   if (nCoeff_is_Zp(naRing->cf)) return naCopy(a,cf);
-  else return ndGcd(a,b,cf);
-  #if 0
+#if 0
+  else {
+    number g = ndGcd(a, b, cf);
+    return g;
+  }
+#else
   {
     a=(number)p_Copy((poly)a,naRing);
     number t=napLcm(b,cf);
-    if(!naIsOne(t,cf))
+    if(!n_IsOne(t,naRing->cf))
     {
       number bt, rr;
       poly xx=(poly)a;
@@ -709,7 +716,7 @@ number naLcmContent(number a, number b, const coeffs cf)
     n_Delete(&t,naRing->cf);
     return (number) a;
   }
-  #endif
+#endif
 }
 
 /* expects *param to be castable to AlgExtInfo */
@@ -1194,6 +1201,7 @@ static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 */
 
   }
+
 
   // part3: all coeffs = all coeffs / cand
   if (!lc_is_pos)
