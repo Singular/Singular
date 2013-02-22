@@ -693,16 +693,13 @@ long p_DegW(poly p, const short *w, const ring R)
 {
   assume( p_Test(p, R) );
   assume( w != NULL );
-   
-  if( p == NULL ) // TODO: ???
-     return -1;
-  long r=~0L;
-  loop
+  long r=-LONG_MAX;
+
+  while (p!=NULL)
   {
-    long t = totaldegreeWecart_IV(p, R, w);
-    if (t > r) r = t;
+    long t=totaldegreeWecart_IV(p,R,w);
+    if (t>r) r=t;
     pIter(p);
-    if (p==NULL) break;
   }
   return r;
 }
