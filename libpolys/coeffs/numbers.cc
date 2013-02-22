@@ -522,3 +522,13 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
   }
 }
 
+
+void n_Print(number& a,  const coeffs r)
+{ 
+   assume(r != NULL); 
+   n_Test(a,r); 
+   
+   StringSetS("");  
+   n_Write(a, r); 
+   { char* s = StringEndS(); Print("%s", s); omFree(s); }
+}

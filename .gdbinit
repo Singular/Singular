@@ -20,3 +20,21 @@ define pp
   end
 end
      
+
+
+# print number coeffs
+define nn
+  if $argc > 0
+    print $arg0
+    if $arg0 != 0 
+      print *$arg0
+
+      if $argc == 2
+        call n_Print($arg0, $arg1)
+      else
+        call n_Print($arg0, currRing->cf)
+      end
+    end
+  end
+end
+     

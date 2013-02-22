@@ -1,2 +1,1 @@
-break dErrorBreak
-
+../.gdbinit

@@ -865,6 +865,9 @@ static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumer
   n_Delete(&d, r);
 }
 
+/// print a number (BEWARE of string buffers!)
+/// mostly for debugging
+void   n_Print(number& a,  const coeffs r);
 
 #endif
 
