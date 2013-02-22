@@ -201,13 +201,15 @@ static inline ideal
 idrMove(ideal &id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
   assume(src_r->cf==dest_r->cf);
+  assume( prproc != NULL );
+   
   if (id == NULL) return NULL;
-  ideal res = id;
 
-  int i;
-  for (i=IDELEMS(id)-1; i>=0; i--)
-    res->m[i] = prproc(id->m[i], src_r, dest_r);
-  id = NULL;
+  ideal res = id; id = NULL;
+
+  for (int i = IDELEMS(res) - 1; i >= 0; i--)
+    res->m[i] = prproc(res->m[i], src_r, dest_r);
+   
   return res;
 }
 

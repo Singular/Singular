@@ -219,7 +219,7 @@ fractalWalkProc(leftv first, leftv second)
      {
        ring almostDestRing=currRing;
        rChangeCurrRing(destRing);
-       destIdeal=idrMoveR(destIdeal,destRing,almostDestRing);
+       destIdeal=idrMoveR(destIdeal, almostDestRing, destRing);
      }
 
 

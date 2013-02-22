@@ -7,23 +7,27 @@
 
 
 static poly PR_NAME
-(poly &src, ring r_src, ring r_dest)
+(poly &src, const ring r_src, const ring r_dest)
 {
   if (src==NULL) return NULL;
+
+  /* PrintS("src: "); p_Write(src, r_src); PrintLn(); */
+   
+  //  p_Test(src, r_src); // may fail due to wrong monomial order
   spolyrec dest_s;
+   
   poly dest = &dest_s;
-  poly tmp;
   PR_INIT_EVECTOR_COPY(r_src, r_dest);
 
-  while (src != NULL)
+  poly p = src; src = NULL;
+  while (p != NULL)
   {
-    pNext(dest) = (poly) PR_ALLOC_MONOM(r_dest);
-    pIter(dest);
-    pSetCoeff0(dest, PR_NCOPY(pGetCoeff(src), r_src));
-    PR_CPY_EVECTOR(dest, r_dest, src, r_src);
-    tmp = pNext(src);
-    PR_DELETE_MONOM(src, r_src);
-    src = tmp;
+    pNext(dest) = (poly) PR_ALLOC_MONOM(r_dest); pIter(dest);
+     
+    p_SetCoeff0(dest, PR_NCOPY(p_GetCoeff(p, r_src), r_src), r_dest);
+    PR_CPY_EVECTOR(dest, r_dest, p, r_src);
+     
+    { poly tmp = pNext(p); PR_DELETE_MONOM(p, r_src); p = tmp; }
   }
   pNext(dest) = NULL;
   dest = pNext(&dest_s);
