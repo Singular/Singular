@@ -1090,7 +1090,8 @@ void heuristicGcdCancellation(number a, const coeffs cf)
     p_Delete(&NUM(f), ntRing); NUM(f) = p_ISet(1, ntRing);
     p_Delete(&DEN(f), ntRing); DEN(f) = NULL;
     COM(f) = 0;
-  } else
+  }
+  else
   {
     if (COM(f) > BOUND_COMPLEXITY)
       definiteGcdCancellation(a, cf, TRUE);
@@ -1104,8 +1105,7 @@ void heuristicGcdCancellation(number a, const coeffs cf)
     }
   }
 
-
-  ntTest(a); // !!!!????
+  ntTest(a);
 }
 
 /// modifies a
@@ -1116,9 +1116,11 @@ void definiteGcdCancellation(number a, const coeffs cf,
 
   fraction f = (fraction)a;
 
+  if (IS0(a)) return;
+  if (NUM(f)!=NULL) p_Normalize(NUM(f), ntRing);
+  if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
   if (!simpleTestsHaveAlreadyBeenPerformed)
   {
-    if (IS0(a)) return;
     if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
 
     /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
