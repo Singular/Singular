@@ -1486,7 +1486,14 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   assume(n_Test(a, src));
   assume(src == dst->extRing->cf);
-  return ntInit(p_NSet(n_Copy(a, src), dst->extRing), dst);
+  if ((SR_HDL(a) & SR_INT) || (a->s==3))
+    return ntInit(p_NSet(n_Copy(a, src), dst->extRing), dst);
+  number nn=nlGetDenom(a,src);
+  number zz=nlGetNumerator(a,src);
+  number res=ntInit(p_NSet(zz,dst->extRing), dst);
+  fraction ff=(fraction)res;
+  DEN(ff)=p_NSet(nn,dst->extRing);
+  return (number)ff;
 }
 
 /* assumes that src = Z/p, dst = Q(t_1, ..., t_s) */
