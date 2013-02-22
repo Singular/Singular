@@ -98,11 +98,82 @@ static poly singclap_gcd_r ( poly f, poly g, const ring r )
   return res;
 }
 
-poly singclap_gcd ( poly f, poly g, const ring r)
+void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
 {
   poly res=NULL;
 
   if (f!=NULL) p_Cleardenom(f, r);
+  if (g!=NULL) p_Cleardenom(g, r);
+  else         return; // g==0 => but do a p_Cleardenom(f)
+  if (f==NULL) return; // f==0 => but do a p_Cleardenom(g)
+
+  Off(SW_RATIONAL);
+  CanonicalForm F,G,GCD;
+  if (rField_is_Q(r) || (rField_is_Zp(r)))
+  {
+    bool b1=isOn(SW_USE_EZGCD_P);
+    Off (SW_USE_NTL_GCD_P);
+    setCharacteristic( rChar(r) );
+    F=convSingPFactoryP( f,r );
+    G=convSingPFactoryP( g,r );
+    GCD=gcd(F,G);
+    if (!GCD.isOne())
+    {
+      p_Delete(&f,r);
+      p_Delete(&g,r);
+      f=convFactoryPSingP( F/GCD, r);
+      g=convFactoryPSingP( G/GCD, r);
+    }
+    if (!b1) Off (SW_USE_EZGCD_P);
+  }
+  // and over Q(a) / Fp(a)
+  else if ( rField_is_Extension(r))
+  {
+    if ( rField_is_Q_a(r)) setCharacteristic( 0 );
+    else                   setCharacteristic( rChar(r) );
+    if (r->cf->extRing->qideal!=NULL)
+    {
+      bool b1=isOn(SW_USE_QGCD);
+      if ( rField_is_Q_a(r) ) On(SW_USE_QGCD);
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->qideal->m[0],
+                                           r->cf->extRing);
+      Variable a=rootOf(mipo);
+      F=( convSingAPFactoryAP( f,a,r ) );
+      G=( convSingAPFactoryAP( g,a,r ) );
+      GCD=gcd(F,G);
+      if (!GCD.isOne())
+      {
+        p_Delete(&f,r);
+        p_Delete(&g,r);
+        f= convFactoryAPSingAP( F/GCD,r );
+        g= convFactoryAPSingAP( G/GCD,r );
+      }
+      if (!b1) Off(SW_USE_QGCD);
+    }
+    else
+    {
+      F=( convSingTrPFactoryP( f,r ) );
+      G=( convSingTrPFactoryP( g,r ) );
+      GCD=gcd(F,G);
+      if (!GCD.isOne())
+      {
+        p_Delete(&f,r);
+        p_Delete(&g,r);
+        f= convFactoryPSingTrP( F/GCD,r );
+        g= convFactoryPSingTrP( G/GCD,r );
+      }
+    }
+  }
+  else
+    WerrorS( feNotImplemented );
+  Off(SW_RATIONAL);
+}
+
+poly singclap_gcd ( poly f, poly g, const ring r)
+{
+  poly res=NULL;
+
+  if (f!=NULL) p_Cleardenom(f, r);             
   if (g!=NULL) p_Cleardenom(g, r);
   else         return f; // g==0 => gcd=f (but do a p_Cleardenom)
   if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom)
