@@ -11,7 +11,7 @@
 #define KINLINE_H
 
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
-/* this file is a header file with inline routines, 
+/* this file is a header file with inline routines,
  *     if NO_KINLINE is not defined (AND ONLY THEN!)
  * otherwise it is an part of kutil.cc and a source file!
  * (remark: NO_KINLINE is defined by KDEBUG, i.e. in the debug version)
@@ -435,42 +435,34 @@ KINLINE void  sTObject::pCleardenom()
     {
       number n;
       if (t_p != NULL)
-	{
-	  p_Cleardenom_n(t_p, tailRing, n);
-	  pSetCoeff0(p, pGetCoeff(t_p));
-	}
+        {
+          p_Cleardenom_n(t_p, tailRing, n);
+          pSetCoeff0(p, pGetCoeff(t_p));
+        }
       else
-	{
-#ifdef HAVE_RATGRING
-	  p_Cleardenom_n(p, currRing, n);
-#else
-	  p_Cleardenom_n(p, currRing, n);
-#endif
-	}
+        {
+          p_Cleardenom_n(p, currRing, n);
+        }
       if (!nIsOne(n))
-	{
-	  denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
-	  denom->n=nInvers(n);
-	  denom->next=DENOMINATOR_LIST;
-	  DENOMINATOR_LIST=denom;
-	}
+        {
+          denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
+          denom->n=nInvers(n);
+          denom->next=DENOMINATOR_LIST;
+          DENOMINATOR_LIST=denom;
+        }
       nDelete(&n);
     }
   else
     {
       if (t_p != NULL)
-	{
-	  p_Cleardenom(t_p, tailRing);
-	  pSetCoeff0(p, pGetCoeff(t_p));
-	}
+        {
+          p_Cleardenom(t_p, tailRing);
+          pSetCoeff0(p, pGetCoeff(t_p));
+        }
       else
-	{
-#ifdef HAVE_RATGRING
-	  p_Cleardenom(p, currRing);
-#else
-	  p_Cleardenom(p, currRing);
-#endif
-	}
+        {
+          p_Cleardenom(p, currRing);
+        }
     }
 }
 
@@ -595,7 +587,7 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
     assume(_p != NULL);
 
     int lp=pLength-1;
-    pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m, q, lp, lq, 
+    pNext(_p) = p_Minus_mm_Mult_qq( pNext(_p), m, q, lp, lq,
                                     spNoether, tailRing );
     pLength=lp+1;
 //    tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q, shorter,spNoether, tailRing, last);
@@ -1045,11 +1037,11 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
   if ((s=pGetComp(p1))!=0)
   {
     p_SetComp(lcm,s, leadRing);
-  } 
+  }
   else if ((s=pGetComp(p2))!=0)
   {
     p_SetComp(lcm,s, leadRing);
-  } 
+  }
   // else p_SetComp(lcm,0,tailRing); // done by p_Init
 
   p_Setm(m1, tailRing);
