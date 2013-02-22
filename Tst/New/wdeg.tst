@@ -8,7 +8,7 @@ intvec iv1m1 = intvec(1,-1);
 ring A = (0),(x,d),(dp(2),C);
 
 
-TRACE=3; option(prot);
+// TRACE=3; option(prot);
 
 deg(xd4+xd2+2d3, iv1m1);
 deg(xd2+2d3, iv1m1);

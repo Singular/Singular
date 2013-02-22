@@ -30,7 +30,7 @@ y4,
 xy3
 ;
 
-TRACE=3; option(prot);
+// TRACE=3; option(prot);
 division(G, M); // idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);
  
 tst_status(1);$

@@ -11,7 +11,7 @@ I[5]=U(1)*U(2);
 				   
 ideal rad=1;
 
-TRACE=3; option(prot);
+// TRACE=3; option(prot);
 quotient(I, rad);
 
 
