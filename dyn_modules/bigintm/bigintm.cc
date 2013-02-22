@@ -218,14 +218,14 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       if (a2->Typ()==INT_CMD)
       {
         number n2=n_Init((int)(long)a2->Data(), coeffs_BIGINT);
-        res->data=(void *) n_Equal(n1,n2, coeffs_BIGINT);
+        res->data=(void *) (long) n_Equal(n1,n2, coeffs_BIGINT);
         res->rtyp= INT_CMD;
         return FALSE;
       }
       else if (a2->Typ()==a1->Typ())
       {
         number n2=(number)a2->Data(); 
-        res->data=(void *) n_Equal(n1,n2, coeffs_BIGINT);
+        res->data=(void *) (long) n_Equal(n1,n2, coeffs_BIGINT);
         res->rtyp= INT_CMD;
         return FALSE;
       }
