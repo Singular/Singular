@@ -215,7 +215,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 #endif
   }
 
-  assume (currRing->idroot==NULL);
+//  assume (currRing->idroot==NULL);
 
   number p = (number)a->CopyD(NUMBER_CMD);
 
