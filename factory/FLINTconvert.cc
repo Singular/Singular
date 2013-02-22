@@ -72,7 +72,8 @@ void convertFacCF2Fmpz_poly_t (fmpz_poly_t result, const CanonicalForm& f)
 
 CanonicalForm convertFmpz2CF (fmpz_t coefficient)
 {
-  if (fmpz_cmp_si (coefficient, MINIMMEDIATE) >= 0 && fmpz_cmp_si (coefficient, MAXIMMEDIATE) <= 0) //this should work with flint 2.3 now
+  if (fmpz_cmp_si (coefficient, MINIMMEDIATE) >= 0 &&
+      fmpz_cmp_si (coefficient, MAXIMMEDIATE) <= 0)
   {
     long coeff= fmpz_get_si (coefficient);
     return CanonicalForm (coeff);
@@ -85,19 +86,6 @@ CanonicalForm convertFmpz2CF (fmpz_t coefficient)
     CanonicalForm result= CanonicalForm (CFFactory::basic (gmp_val));
     return result;
   }
-
-  /*mpz_t gmp_val;
-  mpz_init (gmp_val);
-  fmpz_get_mpz (gmp_val, coefficient); //TODO fmpz_fits_si
-  if (mpz_is_imm (gmp_val)) //TODO for long
-  {
-    long coeff= mpz_get_si (gmp_val);
-    mpz_clear (gmp_val);
-    return CanonicalForm (coeff);
-  }
-
-  CanonicalForm result= CanonicalForm (CFFactory::basic (gmp_val));
-  return result;*/
 }
 
 CanonicalForm convertFmpz_poly_t2FacCF (fmpz_poly_t poly, const Variable& x)
@@ -146,7 +134,7 @@ CanonicalForm convertnmod_poly_t2FacCF (nmod_poly_t poly, const Variable& x)
   return result;
 }
 
-void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f) //TODO wie oben bei CF2Fmpz
+void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 {
   ASSERT (isOn (SW_RATIONAL), "expected rational");
   fmpz_t tmp1, tmp2;
@@ -177,7 +165,6 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f) //TODO wie oben bei 
 CanonicalForm convertFmpq_t2CF (const fmpq_t q)
 {
   ASSERT (isOn (SW_RATIONAL), "expected rational");
-  //TODO as for Fmpz check first if num and den are immediate
 
   CanonicalForm num, den;
   mpz_t nnum, nden;
@@ -200,20 +187,6 @@ CanonicalForm convertFmpq_t2CF (const fmpq_t q)
 
 CanonicalForm convertFmpq_poly_t2FacCF (fmpq_poly_t p, const Variable& x)
 {
-#if 0
-  ASSERT (isOn (SW_RATIONAL), "expected poly over Q");
-  CanonicalForm den= convertFmpz2CF (fmpq_poly_denref (p));
-  fmpz_poly_t FLINTnum;
-  long n= fmpq_poly_length (p);
-  fmpz_poly_init2 (FLINTnum, fmpq_poly_length (p));
-
-  for (long i= 0; i < n; i++)
-    fmpz_set (FLINTnum->coeffs + i,fmpq_poly_numref (p) + i);
-  _fmpz_poly_set_length (FLINTnum, n);
-  CanonicalForm result= convertFmpz_poly_t2FacCF (FLINTnum, x);
-  fmpz_poly_clear (FLINTnum);
-  return result/den;
-#else
   CanonicalForm result= 0;
   fmpq_t coeff;
   long n= fmpq_poly_length (p);
@@ -230,7 +203,6 @@ CanonicalForm convertFmpq_poly_t2FacCF (fmpq_poly_t p, const Variable& x)
     fmpq_clear (coeff);
   }
   return result;
-#endif
 }
 
 void convertFacCF2Fmpz_array (fmpz* result, const CanonicalForm& f)
@@ -239,7 +211,6 @@ void convertFacCF2Fmpz_array (fmpz* result, const CanonicalForm& f)
     convertCF2Fmpz (&result[i.exp()], i.coeff());
 }
 
-//TODO multiply by bCommonDen and convertFacCF2Fmpz_poly_t
 void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
 {
   ASSERT (isOn (SW_RATIONAL), "expected poly over Q");
@@ -249,14 +220,6 @@ void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
   CanonicalForm den= bCommonDen (f);
   convertFacCF2Fmpz_array (fmpq_poly_numref (result), f*den);
   convertCF2Fmpz (fmpq_poly_denref (result), den);
-  /*fmpq_t coeff;
-  for (CFIterator i= f; i.hasTerms(); i++)
-  {
-    fmpq_init (coeff);
-    convertCF2Fmpq (coeff, i.coeff());
-    fmpq_poly_set_coeff_fmpq (result, i.exp(), coeff);
-    fmpq_clear (coeff);
-  }*/
 }
 
 CFFList
