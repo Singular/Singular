@@ -417,7 +417,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfGreaterZero = nrzGreaterZero;
   r->cfPower = nrzPower;
   r->cfGcd  = nrzGcd;
-  r->cfLcm  = nrzGcd;
+  r->cfLcm  = nrzLcm;
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
   r->cfCoeffWrite = nrzCoeffWrite;

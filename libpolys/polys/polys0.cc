@@ -146,7 +146,7 @@ void p_String0(poly p, ring lmRing, ring tailRing)
     p = pNext(p);
     while (p!=NULL)
     {
-      assume(!n_IsZero(p->coef,tailRing->cf));
+      assume((p->coef==NULL)||(!n_IsZero(p->coef,tailRing->cf)));
       if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing->cf))
         StringAppendS("+");
       writemon(p,0, tailRing);
