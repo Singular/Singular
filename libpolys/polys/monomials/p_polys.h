@@ -202,6 +202,7 @@ poly p_Last(const poly a, int &l, const ring r);
 
 void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
+void      p_ProjectiveUnique(poly p,const ring r);
 
 void      p_Content(poly p, const ring r);
 #if 1
