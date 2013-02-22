@@ -653,8 +653,7 @@ BOOLEAN ntGreaterZero(number a, const coeffs cf)
   if (IS0(a)) return FALSE;
   fraction f = (fraction)a;
   poly g = NUM(f);
-  return (n_GreaterZero(p_GetCoeff(g, ntRing), ntCoeffs) ||
-          (!p_LmIsConstant(g, ntRing)));
+  return (!p_LmIsConstant(g,ntRing)|| n_GreaterZero(pGetCoeff(g), ntCoeffs));
 }
 
 void ntCoeffWrite(const coeffs cf, BOOLEAN details)
@@ -1096,12 +1095,28 @@ void heuristicGcdCancellation(number a, const coeffs cf)
     if (COM(f) > BOUND_COMPLEXITY)
       definiteGcdCancellation(a, cf, TRUE);
 
-  // TODO: check if it is enough to put the following into definiteGcdCancellation?!
-  if( DEN(f) != NULL )
-    if( !n_GreaterZero(pGetCoeff(DEN(f)), ntCoeffs) )
+    // TODO: check if it is enough to put the following into definiteGcdCancellation?!
+    if( DEN(f) != NULL )
     {
-      NUM(f) = p_Neg(NUM(f), ntRing);
-      DEN(f) = p_Neg(DEN(f), ntRing);
+      if( !n_GreaterZero(pGetCoeff(DEN(f)), ntCoeffs) )
+      {
+        NUM(f) = p_Neg(NUM(f), ntRing);
+        DEN(f) = p_Neg(DEN(f), ntRing);
+      }
+      if (ntCoeffs->has_simple_Inverse)
+      {
+        if (!n_IsOne(pGetCoeff(DEN(f)),ntCoeffs))
+        {
+          number inv=n_Invers(pGetCoeff(DEN(f)),ntCoeffs);
+          DEN(f)=p_Mult_nn(DEN(f),inv,ntRing);
+          NUM(f)=p_Mult_nn(NUM(f),inv,ntRing);
+        }
+        if(p_LmIsConstant(DEN(f),ntRing))
+        {
+          p_Delete(&DEN(f),ntRing);
+          COM(f)=0;
+        }
+      }
     }
   }
 
