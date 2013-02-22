@@ -432,11 +432,7 @@ KINLINE void  sTObject::pCleardenom()
 	}
       else
 	{
-#ifdef HAVE_RATGRING
 	  p_Cleardenom_n(p, currRing, n);
-#else
-	  p_Cleardenom_n(p, currRing, n);
-#endif
 	}
       if (!nIsOne(n))
 	{
@@ -456,11 +452,7 @@ KINLINE void  sTObject::pCleardenom()
 	}
       else
 	{
-#ifdef HAVE_RATGRING
 	  p_Cleardenom(p, currRing);
-#else
-	  p_Cleardenom(p, currRing);
-#endif
 	}
     }
 }
