@@ -448,7 +448,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
     double basis;
     signed long int exp;
     basis = mpf_get_d_2exp(&exp, e);
-    float f = ldexp(basis,exp);
+    float f= mpf_sgn(e)*ldexp(basis,exp);
     mpf_clear(e);
     return nf(f).N();
   }
@@ -474,7 +474,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   double basis;
   signed long int exp;
   basis = mpf_get_d_2exp(&exp, q);
-  float f = ldexp(basis,exp);
+  float f = mpf_sgn(e)*ldexp(basis,exp);
   mpf_clear(e);
   mpf_clear(d);
   mpf_clear(q);
