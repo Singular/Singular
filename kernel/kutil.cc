@@ -8552,9 +8552,19 @@ void kDebugPrint(kStrategy strat)
     Print(" syzring:%d, syzComp(strat):%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
-    #ifndef NDEBUG
+   
+    if( ecartWeights != NULL )
+    { 
+       PrintS("ecartWeights: "); 
+       for (int i = rVar(currRing); i > 0; i--)
+	 Print("%hd ", ecartWeights[i]);
+       PrintLn();
+       assume( TEST_OPT_WEIGHTM );
+    }
+     
+#ifndef NDEBUG
     rDebugPrint(currRing);
-    #endif
+#endif
 }
 
 

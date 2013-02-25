@@ -924,29 +924,29 @@ void firstUpdate(kStrategy strat)
   {
     assume(kTest_TS(strat));
     strat->update = (strat->tl == -1);
-    //if (TEST_OPT_WEIGHTM)
-    //{
-    //  pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
-    //  if (strat->tailRing != currRing)
-    //  {
-    //    strat->tailRing->pFDeg = strat->pOrigFDeg_TailRing;
-    //    strat->tailRing->pLDeg = strat->pOrigLDeg_TailRing;
-    //  }
-    //  int i;
-    //  for (i=strat->Ll; i>=0; i--)
-    //  {
-    //    strat->L[i].SetpFDeg();
-    //  }
-    //  for (i=strat->tl; i>=0; i--)
-    //  {
-    //    strat->T[i].SetpFDeg();
-    //  }
-    //  if (ecartWeights)
-    //  {
-    //    omFreeSize((ADDRESS)ecartWeights,((currRing->N)+1)*sizeof(short));
-    //    ecartWeights=NULL;
-    //  }
-    //}
+    if (TEST_OPT_WEIGHTM)
+    {
+      pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
+      if (strat->tailRing != currRing)
+      {
+        strat->tailRing->pFDeg = strat->pOrigFDeg_TailRing;
+        strat->tailRing->pLDeg = strat->pOrigLDeg_TailRing;
+      }
+      int i;
+      for (i=strat->Ll; i>=0; i--)
+      {
+        strat->L[i].SetpFDeg();
+      }
+      for (i=strat->tl; i>=0; i--)
+      {
+        strat->T[i].SetpFDeg();
+      }
+      if (ecartWeights)
+      {
+        omFreeSize((ADDRESS)ecartWeights,(rVar(currRing)+1)*sizeof(short));
+        ecartWeights=NULL;
+      }
+    }
     if (TEST_OPT_FASTHC)
     {
       strat->posInL = strat->posInLOld;
