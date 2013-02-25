@@ -451,8 +451,8 @@ static long dcalchash(datum item)
 {
   register int s, c, j;
   register char *cp;
-  register long hashl;
-  register int hashi;
+  register unsigned long hashl;
+  register unsigned int hashi;
 
   hashl = 0;
   hashi = 0;
@@ -466,7 +466,7 @@ static long dcalchash(datum item)
       c >>= 4;
     }
   }
-  return (hashl);
+  return (long)(hashl);
 }
 
 /*
