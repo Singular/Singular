@@ -277,9 +277,9 @@ number ntCopy(number a, const coeffs cf)
 number ntGetNumerator(number &a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf, FALSE);
-
   if (IS0(a)) return NULL;
+
+  definiteGcdCancellation(a, cf, FALSE);
 
   fraction f = (fraction)a;
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
@@ -1487,12 +1487,18 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   assume(n_Test(a, src));
   assume(src == dst->extRing->cf);
   if ((SR_HDL(a) & SR_INT) || (a->s==3))
-    return ntInit(p_NSet(n_Copy(a, src), dst->extRing), dst);
+  {
+    number res=ntInit(p_NSet(n_Copy(a, src), dst->extRing), dst);
+    n_Test(res,dst);
+    return res;
+  }
   number nn=nlGetDenom(a,src);
   number zz=nlGetNumerator(a,src);
   number res=ntInit(p_NSet(zz,dst->extRing), dst);
   fraction ff=(fraction)res;
-  DEN(ff)=p_NSet(nn,dst->extRing);
+  if (n_IsOne(nn,src)) DEN(ff)=NULL;
+  else                 DEN(ff)=p_NSet(nn,dst->extRing);
+  n_Test((number)ff,dst);
   return (number)ff;
 }
 
@@ -1745,8 +1751,7 @@ static number ntParameter(const int iParameter, const coeffs cf)
   assume( 0 < iParameter && iParameter <= rVar(R) );
 
   poly p = p_One(R); p_SetExp(p, iParameter, 1, R); p_Setm(p, R);
-
-//  return (number) p;
+  p_Test(p,R);
 
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p;

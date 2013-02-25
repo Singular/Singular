@@ -212,6 +212,11 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
 
   if (a->s<2)
   {
+    if (a->n[0]._mp_d[0]==0)
+    {
+      Print("!!longrat: n==0 in %s:%d\n",f,l);
+      return FALSE;
+    }
     /* TODO: If next line is active, then computations in algebraic field
              extensions over Q will throw a lot of assume violations although
              everything is computed correctly and no seg fault appears.
