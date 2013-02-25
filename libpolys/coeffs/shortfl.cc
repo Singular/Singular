@@ -5,7 +5,6 @@
 /*
 * ABSTRACT:
 */
-#include <iostream>
 #include <coeffs/shortfl.h>
 
 #include <string.h>
@@ -248,7 +247,21 @@ void nrWrite (number &a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  StringAppend("%9.3e", nf(a).F());
+  char ch[11];
+  int n = sprintf(ch,"%9.3e", nf(a).F());
+  if (ch[0] == '-')
+  {
+    char* chbr = new char[n+3];
+    memcpy(&chbr[2],&ch[1],n-1);
+    chbr[0] = '-';
+    chbr[1] = '(';
+    chbr[n+1] = ')';
+    chbr[n+2] = '\0';
+    StringAppendS(chbr);
+    delete chbr;
+  }
+  else
+    StringAppend("(%s)",ch);
 }
 
 void nrPower (number a, int i, number * result, const coeffs r)
@@ -435,7 +448,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
     double basis;
     signed long int exp;
     basis = mpf_get_d_2exp(&exp, e);
-    float f = ldexp(basis,exp);
+    float f= mpf_sgn(e)*ldexp(basis,exp);
     mpf_clear(e);
     return nf(f).N();
   }
@@ -461,7 +474,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   double basis;
   signed long int exp;
   basis = mpf_get_d_2exp(&exp, q);
-  float f = ldexp(basis,exp);
+  float f = mpf_sgn(e)*ldexp(basis,exp);
   mpf_clear(e);
   mpf_clear(d);
   mpf_clear(q);
