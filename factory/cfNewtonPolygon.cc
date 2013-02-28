@@ -856,6 +856,9 @@ int* getRightSide (int** polygon, int sizeOfPolygon, int& sizeOfOutput)
 
 bool irreducibilityTest (const CanonicalForm& F)
 {
+  ASSERT (getNumVars (F) == 2, "expected bivariate polynomial");
+  ASSERT (getCharacteristic() == 0, "expected polynomial over integers or rationals");
+
   int sizeOfNewtonPolygon;
   int ** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
   if (sizeOfNewtonPolygon == 3)
@@ -871,7 +874,7 @@ bool irreducibilityTest (const CanonicalForm& F)
         bool isRat= isOn (SW_RATIONAL);
         if (isRat)
           Off (SW_RATIONAL);
-        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]); // maybe it's better to use plain intgcd
         tmp= gcd (tmp, newtonPolyg[1][0]);
         tmp= gcd (tmp, newtonPolyg[1][1]);
         tmp= gcd (tmp, newtonPolyg[2][0]);
@@ -890,3 +893,49 @@ bool irreducibilityTest (const CanonicalForm& F)
   delete [] newtonPolyg;
   return false;
 }
+
+bool absIrredTest (const CanonicalForm& F)
+{
+  ASSERT (getNumVars (F) == 2, "expected bivariate polynomial");
+  ASSERT (factorize (F).length() <= 2, " expected irreducible polynomial");
+
+  int sizeOfNewtonPolygon;
+  int ** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
+  bool isRat= isOn (SW_RATIONAL);
+  if (isRat)
+    Off (SW_RATIONAL);
+  int p=getCharacteristic();
+  int d=1;
+  char bufGFName='Z';
+  bool GF= (CFFactory::gettype()==GaloisFieldDomain);
+  if (GF)
+  {
+    d= getGFDegree();
+    bufGFName=gf_name;
+  }
+
+  setCharacteristic(0);
+
+  CanonicalForm g= gcd (newtonPolyg[0][0], newtonPolyg[0][1]); //maybe it's better to use plain intgcd
+
+  int i= 1;
+  while (!g.isOne() && i < sizeOfNewtonPolygon)
+  {
+    g= gcd (g, newtonPolyg[i][0]);
+    g= gcd (g, newtonPolyg[i][1]);
+    i++;
+  }
+
+  bool result= g.isOne();
+
+  if (GF)
+    setCharacteristic (p, d, bufGFName);
+  else
+    setCharacteristic(p);
+
+  if (isRat)
+    On (SW_RATIONAL);
+
+  return result;
+}
+
