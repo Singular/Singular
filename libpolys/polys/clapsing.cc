@@ -62,12 +62,9 @@ static poly singclap_gcd_r ( poly f, poly g, const ring r )
   Off(SW_RATIONAL);
   if (rField_is_Q(r) || (rField_is_Zp(r)))
   {
-    bool b1=isOn(SW_USE_EZGCD_P);
-    Off (SW_USE_NTL_GCD_P);
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
-    if (!b1) Off (SW_USE_EZGCD_P);
   }
   // and over Q(a) / Fp(a)
   else if ( rField_is_Extension(r))
@@ -112,7 +109,6 @@ void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
   if (rField_is_Q(r) || (rField_is_Zp(r)))
   {
     bool b1=isOn(SW_USE_EZGCD_P);
-    Off (SW_USE_NTL_GCD_P);
     setCharacteristic( rChar(r) );
     F=convSingPFactoryP( f,r );
     G=convSingPFactoryP( g,r );
