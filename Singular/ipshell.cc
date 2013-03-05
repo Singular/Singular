@@ -5145,10 +5145,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
         float_len2=(int)(long)pn->next->Data();
+	float_len2+=float_len;
         pn=pn->next;
       }
     }
-    assume( float_len <= float_len2 );
 
     if (!complex_flag)
       complex_flag= pn->next != NULL;
