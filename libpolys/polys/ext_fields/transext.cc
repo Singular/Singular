@@ -151,13 +151,13 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
   {
     assume( _p_Test(den, ntRing,1) );
 
-    if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntRing->cf)))
+    if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntCoeffs)))
     {
       Print("?/1 in %s:%d\n",f,l);
       return FALSE;
     }
 
-    if( !n_GreaterZero(pGetCoeff(den), ntRing->cf) )
+    if( !n_GreaterZero(pGetCoeff(den), ntCoeffs) )
     {
       Print("negative sign of DEN. of a fraction in %s:%d\n",f,l);
       return FALSE;
@@ -299,25 +299,25 @@ number ntGetNumerator(number &a, const coeffs cf)
     CPolyCoeffsEnumerator itr(NUM(f));
 
 
-    n_ClearDenominators(itr, g, ntRing->cf);
+    n_ClearDenominators(itr, g, ntCoeffs);
 
-    if( !n_GreaterZero(g, ntRing->cf) )
+    if( !n_GreaterZero(g, ntCoeffs) )
     {
       NUM (f) = p_Neg(NUM (f), ntRing); // Ugly :(((
-      g = n_Neg(g, ntRing->cf);
+      g = n_Neg(g, ntCoeffs);
     }
 
     // g should be a positive integer now!
-    assume( n_GreaterZero(g, ntRing->cf) );
+    assume( n_GreaterZero(g, ntCoeffs) );
 
-    if( !n_IsOne(g, ntRing->cf) )
+    if( !n_IsOne(g, ntCoeffs) )
     {
       DEN (f) = p_NSet(g, ntRing); // update COM(f)???
       COM (f) ++;
       assume( DEN (f) != NULL );
     }
     else
-      n_Delete(&g, ntRing->cf);
+      n_Delete(&g, ntCoeffs);
 
     ntTest(a);
   }
@@ -385,23 +385,23 @@ number ntGetDenom(number &a, const coeffs cf)
   // Hannes!) as NUM (f) should be over Z!!!
   CPolyCoeffsEnumerator itr(NUM(f));
 
-  n_ClearDenominators(itr, g, ntRing->cf); // may return -1 :(((
+  n_ClearDenominators(itr, g, ntCoeffs); // may return -1 :(((
 
-  if( !n_GreaterZero(g, ntRing->cf) )
+  if( !n_GreaterZero(g, ntCoeffs) )
   {
 //     NUM (f) = p_Neg(NUM (f), ntRing); // Ugly :(((
-//     g = n_Neg(g, ntRing->cf);
+//     g = n_Neg(g, ntCoeffs);
     NUM (f) = p_Neg(NUM (f), ntRing); // Ugly :(((
-    g = n_Neg(g, ntRing->cf);
+    g = n_Neg(g, ntCoeffs);
   }
 
   // g should be a positive integer now!
-  assume( n_GreaterZero(g, ntRing->cf) );
+  assume( n_GreaterZero(g, ntCoeffs) );
 
-  if( !n_IsOne(g, ntRing->cf) )
+  if( !n_IsOne(g, ntCoeffs) )
   {
-    assume( n_GreaterZero(g, ntRing->cf) );
-    assume( !n_IsOne(g, ntRing->cf) );
+    assume( n_GreaterZero(g, ntCoeffs) );
+    assume( !n_IsOne(g, ntCoeffs) );
 
     DEN (f) = p_NSet(g, ntRing); // update COM(f)???
     assume( DEN (f) != NULL );
@@ -412,13 +412,13 @@ number ntGetDenom(number &a, const coeffs cf)
   else
   { // common denom == 1?
     NUM (result)= p_NSet(g, ntRing); // p_Copy (DEN (f), ntRing);
-//  n_Delete(&g, ntRing->cf);
+//  n_Delete(&g, ntCoeffs);
   }
 
 //    if (!p_IsConstant (num, ntRing) && pNext(num) != NULL)
 //    else
 //      g= p_GetAllDenom (num, ntRing);
-//    result= (fraction) ntSetMap (ntRing->cf, cf) (g, ntRing->cf, cf);
+//    result= (fraction) ntSetMap (ntCoeffs, cf) (g, ntCoeffs, cf);
 
   ntTest((number)result);
   return (number)result;
@@ -532,41 +532,44 @@ number ntInit(poly p, const coeffs cf)
 {
   if (p == NULL) return NULL;
 
+  fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
+
+  if (nCoeff_is_Q(ntCoeffs))
+  {
     number g;
     // TODO/NOTE: the following should not be necessary (due to
     // Hannes!) as NUM (f) should be over Z!!!
+    // but it is not: normalize it
     CPolyCoeffsEnumerator itr(p);
 
-    n_ClearDenominators(itr, g, ntRing->cf);
+    n_ClearDenominators(itr, g, ntCoeffs);
 
-    if( !n_GreaterZero(g, ntRing->cf) )
+    if( !n_GreaterZero(g, ntCoeffs) )
     {
-      p = p_Neg(p, ntRing); // Ugly :(((
-      g = n_Neg(g, ntRing->cf);
+      p = p_Neg(p, ntRing);
+      g = n_Neg(g, ntCoeffs);
     }
 
     // g should be a positive integer now!
-    assume( n_GreaterZero(g, ntRing->cf) );
+    assume( n_GreaterZero(g, ntCoeffs) );
 
-    fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-
-    if( !n_IsOne(g, ntRing->cf) )
+    if( !n_IsOne(g, ntCoeffs) )
     {
       DEN (f) = p_NSet(g, ntRing);
-//      COM (f) ++; // update COM(f)???
       assume( DEN (f) != NULL );
     }
     else
     {
-      DEN(f) = NULL;
-      n_Delete(&g, ntRing->cf);
+      //DEN(f) = NULL; // done by omAlloc0
+      n_Delete(&g, ntCoeffs);
     }
+  }
 
-    NUM(f) = p;
-    COM(f) = 0;
+  NUM(f) = p;
+  COM(f) = 0;
 
-    ntTest((number)f);
-    return (number)f;
+  ntTest((number)f);
+  return (number)f;
 }
 
 int ntInt(number &a, const coeffs cf)
@@ -632,13 +635,13 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
   if (aNumDeg-aDenDeg < bNumDeg-bDenDeg) return FALSE;
   number aa;
   number bb;
-  if (bDenCoeff==NULL) aa=n_Copy(aNumCoeff,ntRing->cf);
-  else                 aa=n_Mult(aNumCoeff,bDenCoeff,ntRing->cf);
-  if (aDenCoeff==NULL) bb=n_Copy(bNumCoeff,ntRing->cf);
-  else                 bb=n_Mult(bNumCoeff,aDenCoeff,ntRing->cf);
+  if (bDenCoeff==NULL) aa=n_Copy(aNumCoeff,ntCoeffs);
+  else                 aa=n_Mult(aNumCoeff,bDenCoeff,ntCoeffs);
+  if (aDenCoeff==NULL) bb=n_Copy(bNumCoeff,ntCoeffs);
+  else                 bb=n_Mult(bNumCoeff,aDenCoeff,ntCoeffs);
   BOOLEAN rr= n_Greater(aa, bb, ntCoeffs);
-  n_Delete(&aa,ntRing->cf);
-  n_Delete(&bb,ntRing->cf);
+  n_Delete(&aa,ntCoeffs);
+  n_Delete(&bb,ntCoeffs);
   return rr;
 }
 
@@ -848,13 +851,13 @@ number ntDiv(number a, number b, const coeffs cf)
 
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(result) = g;
-  if (!n_GreaterZero(pGetCoeff(f),ntRing->cf))
+  if (!n_GreaterZero(pGetCoeff(f),ntCoeffs))
   {
     g=p_Neg(g,ntRing);
     f=p_Neg(f,ntRing);
     NUM(result) = g;
   }
-  if (!p_IsConstant(f,ntRing) || !n_IsOne(pGetCoeff(f),ntRing->cf))
+  if (!p_IsConstant(f,ntRing) || !n_IsOne(pGetCoeff(f),ntCoeffs))
   {
     DEN(result) = f;
   }
@@ -1281,7 +1284,7 @@ void ntNormalize (number &a, const coeffs cf)
   {
     definiteGcdCancellation(a, cf, FALSE);
     if ((DEN(a)!=NULL)
-    &&(!n_GreaterZero(pGetCoeff(DEN(a)),ntRing->cf)))
+    &&(!n_GreaterZero(pGetCoeff(DEN(a)),ntCoeffs)))
     {
       NUM(a)=p_Neg(NUM(a),ntRing);
       DEN(a)=p_Neg(DEN(a),ntRing);
@@ -1449,7 +1452,7 @@ number ntInvers(number a, const coeffs cf)
   if( !NUMIS1(f) )
   {
     poly num_f=NUM(f);
-    BOOLEAN neg= !n_GreaterZero(pGetCoeff(num_f),ntRing->cf);
+    BOOLEAN neg= !n_GreaterZero(pGetCoeff(num_f),ntCoeffs);
     if (neg)
     {
       num_f=p_Neg(p_Copy(num_f, ntRing), ntRing);
