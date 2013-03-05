@@ -593,7 +593,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
            performed when "(i<coef_start)" is true?
            For the time being, I leave it as it is. */
         if (rField_is_Ring(r) && !(rField_is_Domain(r)))
-	{
+        {
           bucket->buckets_length[i] = pLength(bucket->buckets[i]);
           kBucketAdjust(bucket, i);
         }
@@ -740,17 +740,16 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     if (rField_is_Ring(r) && !(rField_is_Domain(r)))
     {
       l1 = pLength(p1);
-      assume(pLength(p1) == l1);
+      i = pLogLength(l1);
     }
 #endif
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
     {
       l1 = pLength(p1);
-      assume(pLength(p1) == l1);
+      i = pLogLength(l1);
     }
 #endif
-    i = pLogLength(l1);
   }
   else
   {
@@ -1097,8 +1096,8 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (! n_IsOne(pGetCoeff(p1),r->cf))
   {
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
-//StringSetS("##### an = "); nWrite(an); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
-//StringSetS("##### bn = "); nWrite(bn); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
+//StringSetS("##### an = "); nWrite(an); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
+//StringSetS("##### bn = "); nWrite(bn); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
     /* ksCheckCoeff: divide out gcd from an and bn: */
     int ct = ksCheckCoeff(&an, &bn,r->cf);
     /* the previous command returns ct=0 or ct=2 iff an!=1
