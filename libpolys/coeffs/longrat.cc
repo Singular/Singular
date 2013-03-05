@@ -1968,7 +1968,6 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u, NULL);
   return u;
 }
 

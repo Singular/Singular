@@ -22,7 +22,7 @@ typedef double mprfloat;
 #endif
 
 #if !defined(NDEBUG) || defined(mprDEBUG_ALL)
-#define mprDEBUG_PROT
+//#define mprDEBUG_PROT
 #endif
 
 #define mprDEBUG_STICKY
