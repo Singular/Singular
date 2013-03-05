@@ -34,15 +34,15 @@ class gmp_float
 public:
   gmp_float( const int v = 0 )
   {
-    mpf_init_set_d( t, (double) v );
+    mpf_init_set_si( t, (long)v );
   }
   gmp_float( const long v )
   {
-    mpf_init_set_d( t, (double) v );
+    mpf_init_set_si( t, v );
   }
   gmp_float( const mprfloat v ) // double
   {
-    mpf_init_set_d( t, (double) v );
+    mpf_init_set_d( t, v );
   }
   gmp_float( const mpf_t v )
   {
