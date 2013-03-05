@@ -212,7 +212,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
 
   if (a->s<2)
   {
-    if (a->n[0]._mp_d[0]==0)
+    if ((a->n[0]._mp_d[0]==0)&&(a->n[0]._mp_alloc<=1))
     {
       Print("!!longrat: n==0 in %s:%d\n",f,l);
       return FALSE;
@@ -1968,6 +1968,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
+  nlTest(u, NULL);
   return u;
 }
 
