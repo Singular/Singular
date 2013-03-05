@@ -251,9 +251,10 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
   if (a == NULL) return TRUE;
   p_Test((poly)a, naRing);
   if((((poly)a)!=naMinpoly)
-  && p_Totaldegree((poly)a, naRing) >= p_Totaldegree(naMinpoly, naRing))
+  && p_Totaldegree((poly)a, naRing) >= p_Totaldegree(naMinpoly, naRing)
+  && (p_Totaldegree((poly)a, naRing)> 1)) // allow to output par(1)
   {
-    Print("deg >= deg(minpoly) in %s:%d\n",f,l);
+    dReportError("deg >= deg(minpoly) in %s:%d\n",f,l);
     return FALSE;
   }
   return TRUE;
