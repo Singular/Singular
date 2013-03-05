@@ -743,6 +743,13 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       assume(pLength(p1) == l1);
     }
 #endif
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+    {
+      l1 = pLength(p1);
+      assume(pLength(p1) == l1);
+    }
+#endif
     i = pLogLength(l1);
   }
   else
@@ -759,6 +766,13 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
 #ifdef HAVE_RINGS
       if (rField_is_Ring(r) && !(rField_is_Domain(r)))
+      {
+        l1 = pLength(p1);
+        i = pLogLength(l1);
+      }
+#endif
+#ifdef HAVE_PLURAL
+      if (rIsPluralRing(r))
       {
         l1 = pLength(p1);
         i = pLogLength(l1);
