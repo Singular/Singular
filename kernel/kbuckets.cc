@@ -711,11 +711,25 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 #ifndef HAVE_PSEUDO_BUCKETS
   kBucketMergeLm(bucket);
   kbTest(bucket);
-  i = pLogLength(l1);
 
-  if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
+#if defined(HAVE_RINGS)||defined(HAVE_PLURAL)
+  if ((rField_is_Ring(r) && !(rField_is_Domain(r)))
+  ||(rIsPluralRing(r)))
   {
-    assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
+    pSetCoeff0(m, n_Neg(pGetCoeff(m),r));
+    p1=pp_Mult_mm(p,m,r);
+    pSetCoeff0(m, n_Neg(pGetCoeff(m),r));
+    l1=pLength(p1);
+    i = pLogLength(l1);
+  }
+  else
+#endif
+  {
+    i = pLogLength(l1);
+
+    if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
+    {
+      assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
 //#ifdef USE_COEF_BUCKETS
 //     if(bucket->coef[i]!=NULL)
 //     {
@@ -727,43 +741,30 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 //     }
 //     else
 //#endif
-    MULTIPLY_BUCKET(bucket,i);
-    p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], m, p1,
+      MULTIPLY_BUCKET(bucket,i);
+      p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], m, p1,
                             bucket->buckets_length[i], l1,
                             spNoether, r);
-    l1 = bucket->buckets_length[i];
-    bucket->buckets[i] = NULL;
-    bucket->buckets_length[i] = 0;
-#ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing)))
-    {
-      l1 = pLength(p1);
-      assume(pLength(p1) == l1);
-    }
-#endif
-    i = pLogLength(l1);
-  }
-  else
-  {
-    pSetCoeff0(m, nNeg(pGetCoeff(m)));
-    if (spNoether != NULL)
-    {
-      l1 = -1;
-      p1 = r->p_Procs->pp_Mult_mm_Noether(p1, m, spNoether, l1, r);
+      l1 = bucket->buckets_length[i];
+      bucket->buckets[i] = NULL;
+      bucket->buckets_length[i] = 0;
       i = pLogLength(l1);
     }
     else
     {
-      p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
-#ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing)))
+      pSetCoeff0(m, nNeg(pGetCoeff(m)));
+      if (spNoether != NULL)
       {
-        l1 = pLength(p1);
+        l1 = -1;
+        p1 = r->p_Procs->pp_Mult_mm_Noether(p1, m, spNoether, l1, r);
         i = pLogLength(l1);
       }
-#endif
+      else
+      {
+        p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
+      }
+      pSetCoeff0(m, nNeg(pGetCoeff(m)));
     }
-    pSetCoeff0(m, nNeg(pGetCoeff(m)));
   }
 
   while (bucket->buckets[i] != NULL)
