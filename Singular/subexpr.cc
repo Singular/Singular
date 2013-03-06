@@ -1731,6 +1731,8 @@ int sleftv::Eval()
     &&(name!=NULL))
   {
      syMake(this,name);
+     if (rtyp==0) /*not found */
+       nok=TRUE;
   }
 #ifdef MDEBUG
   switch(Typ())
