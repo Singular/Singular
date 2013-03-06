@@ -16,6 +16,7 @@
 #include <subexpr.h>
 #include <tok.h>
 #include <regex.h>
+#include <errno.h>
 
 #include "modgen.h"
 #include "typmap.h"
@@ -31,6 +32,11 @@
 #  define logx printf
 #else
 #  define logx
+#endif
+
+#ifndef SI_MOD_TOOLS_SSCANF
+#define SI_MOD_TOOLS_SSCANF(...) \
+while((sscanf(__VA_ARGS__ ) == EOF) && (errno == EINTR))
 #endif
 
 char *DYNAinclude[] = {
@@ -222,13 +228,13 @@ void make_version(char *p, moddefv module)
   ver[0]='0'; ver[1]='.'; ver[2]='0'; ver[3]='.'; ver[4]='0'; ver[5]='\0';
   date[0]='?'; date[1]='\0';
   //if(what) sscanf(p,"%*[^=]= %*s %*s %10s %16s",ver,date);
-  sscanf(p,"%*s %*s %10s %16s",ver,date);
-  sscanf(ver, "%d.%d.%d", &module->major, &module->minor, &module->level);
+  SI_MOD_TOOLS_SSCANF(p,"%*s %*s %10s %16s",ver,date);
+  SI_MOD_TOOLS_SSCANF(ver, "%d.%d.%d", &module->major, &module->minor, &module->level);
   
   sprintf(libnamebuf,"(%s,%s)", ver, date);
   if(strcmp(libnamebuf, "(0.0.0,?)")==0)
   {
-    sscanf(p,"%*[^\"]\"%[^\"]\"",libnamebuf);
+    SI_MOD_TOOLS_SSCANF(p,"%*[^\"]\"%[^\"]\"",libnamebuf);
   }
   module->revision = (char *)malloc(strlen(libnamebuf)+1);
   memset(module->revision, '\0', strlen(libnamebuf)+1);

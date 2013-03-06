@@ -20,6 +20,7 @@
 #include <Singular/misc_ip.h>
 #include <Singular/feOpt.h>
 #include <Singular/silink.h>
+#include <Singular/si_signals.h>
 
 void number2mpz(number n, mpz_t m)
 {
@@ -1036,7 +1037,7 @@ void checkall()
 extern "C"
 int singular_fstat(int fd, struct stat *buf)
 {
-  return fstat(fd,buf);
+  return si_fstat(fd,buf);
 }
 
 /*2

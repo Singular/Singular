@@ -11,6 +11,8 @@
 #include <omalloc/dlmalloc.h>
 #endif
 
+#include <errno.h>
+
 /*
   Emulation of sbrk for WIN32
   All code within the ifdef WIN32 is untested by me.
@@ -874,7 +876,10 @@ static mchunkptr mmap_chunk(size) size_t size;
 #else /* !MAP_ANONYMOUS */
   if (fd < 0)
   {
-    fd = open("/dev/zero", O_RDWR);
+    do
+    {
+      fd = open("/dev/zero", O_RDWR);
+    } while ((fd < 0) && (errno == EINTR));
     if(fd < 0) return 0;
   }
   p = (mchunkptr)mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);

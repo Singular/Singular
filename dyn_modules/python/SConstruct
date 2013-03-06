@@ -39,6 +39,9 @@ class PythonConfig(object):
         else:
             self.incdir=self.prefix+"/include/python"+self.version
 PYTHONSEARCH=[\
+    PythonConfig(version="2.7"),\
+    PythonConfig(version="2.6"),\
+    PythonConfig(version="2.5"),\
     PythonConfig(version="2.4"),\
     PythonConfig(version="2.3"),\
     PythonConfig(version="2.4",\

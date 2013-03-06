@@ -13,6 +13,7 @@
 #include <ctype.h>
 
 #include <unistd.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <boost/python.hpp>
 #include <Python.h>
@@ -166,7 +167,10 @@ extern "C" {
   memset(tempstr,0,strlen(currPack->libname)+1);
   memcpy(tempstr,currPack->libname,strlen(currPack->libname));
   memcpy(tempstr+strlen(currPack->libname)-3,".bin",4);
-  ret=stat(tempstr,&sb);
+  do
+  {
+    ret=stat(tempstr,&sb);
+  } while ((ret < 0) && (errno == EINTR));
   if(ret==0) {
     if ((sb.st_mode & S_IFMT) == S_IFREG) {
       if (crccheck(tempstr)!=crcsum)

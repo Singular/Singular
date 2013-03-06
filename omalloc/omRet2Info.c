@@ -7,6 +7,7 @@
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef HAVE_CONFIG_H
 #include <omalloc/omConfig.h>
@@ -43,7 +44,15 @@ void omInitRet_2_Info(const char* argv0)
   }
 }
 
-
+static inline
+int omScanfInfo(FILE *stream, const char *format, omRetInfo_t *data) {
+  int res = EOF;
+  do
+  {
+    res = fscanf(stream, format, data->func, data->file, &(data->line));
+  } while ((res == EOF) && (errno == EINTR) );
+  return res;
+}
 int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
 {
   int i=0, j=0, filled = 0;
@@ -84,7 +93,7 @@ FunctionName
 File:Line
         */
       while ((filled < j) &&
-             (fscanf(pipe, "%200[^\n]\n%200[^:]:%d\n", info[filled].func, info[filled].file, &(info[filled].line)) == 3))
+             (omScanfInfo(pipe, "%200[^\n]\n%200[^:]:%d\n", &(info[filled])) == 3))
       {
         if (*info[filled].func != '?' && *info[filled].file != '?' && info[filled].line > 0)
           filled++;

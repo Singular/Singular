@@ -15,6 +15,7 @@
 #include <Singular/ipshell.h>
 #include <Singular/ipid.h>
 #include <Singular/sdb.h>
+#include <Singular/si_signals.h>
 
 #ifdef HAVE_SDB
 // We use 8 breakpoints - corresponding to a bit in a char variable in procinfo
@@ -135,7 +136,7 @@ void sdb_edit(procinfo *pi)
       {
         PrintS("cannot get the procedure body\n");
         fclose(fp);
-        unlink(filename);
+        si_unlink(filename);
         omFree(filename);
         return;
       }
@@ -147,7 +148,7 @@ void sdb_edit(procinfo *pi)
     int pid=fork();
     if (pid!=0)
     {
-      wait(&pid);
+      si_wait(&pid);
     }
     else if(pid==0)
     {
@@ -187,7 +188,7 @@ void sdb_edit(procinfo *pi)
       fclose(fp);
     }
   }
-  unlink(filename);
+  si_unlink(filename);
   omFree(filename);
 }
 

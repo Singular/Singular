@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include "config.h"
 #include "crctab.h"
-
+#include <Singular/si_signals.h>
 int modlineno;    /* lineno within module */
 
 #include "modgen.h"
@@ -67,14 +67,14 @@ int create_tmpfile(
 
   if(debug)printf("create_tmpfile '%s'\n", tmpfile );
 
-  if (close(creat(tmpfile, 0600)) < 0) {
-    (void) unlink (tmpfile);        /*  Blow it away!!  */
+  if (si_close(si_creat(tmpfile, 0600)) < 0) {
+    (void) si_unlink (tmpfile);        /*  Blow it away!!  */
     return -1;
   } else if ((fp = fopen(tmpfile, "a+")) == NULL) {
-    (void) unlink (tmpfile);        /*  Blow it away!!  */
+    (void) si_unlink (tmpfile);        /*  Blow it away!!  */
     return -1;
   } else {
-    (void) unlink (tmpfile); /* delete now to avoid turds... */
+    (void) si_unlink (tmpfile); /* delete now to avoid turds... */
   }
 
   switch(which) {

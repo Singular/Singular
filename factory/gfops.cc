@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #endif
+#include <errno.h>
 #include <string.h>
 
 #include "assert.h"
@@ -139,19 +140,26 @@ static void gf_get_table ( int p, int n )
     int pFile, nFile;
     success = fgets( buffer, gf_maxbuffer, inputfile );
     STICKYASSERT( success, "illegal table (reading p and n)" );
-    sscanf( buffer, "%d %d", &pFile, &nFile );
+    int res = -1;
+    do {
+      res = sscanf( buffer, "%d %d", &pFile, &nFile );
+    } while((res == EOF) and (errno == EINTR));
     STICKYASSERT( p == pFile && n == nFile, "illegal table" );
     // skip (sic!) factory-representation of mipo
     // and terminating "; "
     bufptr = (char *)strchr( buffer, ';' ) + 2;
     // read simple representation of mipo
     int i, degree;
-    sscanf( bufptr, "%d", &degree );
+    do {
+      res = sscanf( bufptr, "%d", &degree );
+    } while((res == EOF) and (errno == EINTR));
     bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     int * mipo = new int[degree + 1];
     for ( i = 0; i <= degree; i++ )
     {
-        sscanf( bufptr, "%d", mipo + i );
+        do {
+          res = sscanf( bufptr, "%d", mipo + i );
+        } while((res == EOF) and (errno == EINTR));
         bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     }
 
