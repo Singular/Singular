@@ -22,8 +22,10 @@ endif
 
 if ENABLE_P_PROCS_DYNAMIC
   USE_P_PROCS_DYNAMIC_CC = templates/p_Procs_Dynamic.cc
+  P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS} -DDYNAMIC_VERSION 
 else
   USE_P_PROCS_DYNAMIC_CC =
+  P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS}
 endif
 
 if WANT_DEBUG
@@ -71,7 +73,6 @@ EXTRA_DIST = \
 	templates/p_kBucketSetLm__T.cc templates/p_Minus_mm_Mult_qq__T.cc \
 	templates/p_Merge_q__T.cc templates/p_Add_q__T.cc templates/p_Neg__T.cc
 
-P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS} -DDYNAMIC_VERSION 
 
 p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
 p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
