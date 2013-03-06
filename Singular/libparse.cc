@@ -1072,6 +1072,7 @@ char *yytext;
   #include <omalloc/omalloc.h>
 #endif
 #include <Singular/libparse.h>
+#include <Singular/si_signals.h>
 
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP
@@ -1602,8 +1603,8 @@ YY_RULE_SETUP
              BEGIN(pdef);
              found_proc_in_proc = 0;
              proc[0]='\0';
-             sscanf( yytext, "%*[^p]proc %s", proc);
-             if(strlen(proc)<1) sscanf( yytext, "proc %s", proc);
+             si_sscanf( yytext, "%*[^p]proc %s", proc);
+             if(strlen(proc)<1) si_sscanf( yytext, "proc %s", proc);
              #if YYLPDEBUG > 1
              printf("Newlib:%s\n", newlib);
              #endif
@@ -3395,8 +3396,8 @@ void make_version(char *p,int what)
   char date[16];
   ver[0]='?'; ver[1]='.'; ver[2]='?'; ver[3]='\0';
   date[0]='?'; date[1]='\0';
-  if(what) sscanf(p,"%*[^=]= %*s %*s %10s %16s",ver,date);
-  else sscanf(p,"// %*s %*s %10s %16s",ver,date);
+  if(what) si_sscanf(p,"%*[^=]= %*s %*s %10s %16s",ver,date);
+  else si_sscanf(p,"// %*s %*s %10s %16s",ver,date);
   strcpy(libnamebuf,"(");
   strcat(libnamebuf,ver);
   strcat(libnamebuf,",");
@@ -3404,7 +3405,7 @@ void make_version(char *p,int what)
   strcat(libnamebuf,")");
   if(what && strcmp(libnamebuf, "(?.?,?)")==0)
   {
-    sscanf(p,"%*[^\"]\"%[^\"]\"",libnamebuf);
+    si_sscanf(p,"%*[^\"]\"%[^\"]\"",libnamebuf);
   }
   //printf("ID=(%d)%s; \n", what, p);
 }

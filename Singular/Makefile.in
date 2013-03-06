@@ -51,12 +51,15 @@ includedir	= @includedir@
 slibdir		= ${prefix}/LIB
 install_bindir  = ${install_prefix}/${SINGUNAME}
 install_slibdir = ${install_prefix}/LIB
+dir_mod		= MOD
 ifeq (${PYOBJECT_MODULE},)
 bindir_mod	= 
 install_bindir_mod = 
+pattern_mod 	= 
 else
-bindir_mod	= ${bindir}/MOD
-install_bindir_mod = ${install_bindir}/MOD
+bindir_mod	= ${bindir}/${dir_mod}
+install_bindir_mod = ${install_bindir}/${dir_mod}
+pattern_mod 	= ${dir_mod}/*.so
 endif
 
 ##
@@ -495,9 +498,9 @@ dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
 
 # dynamic module for python bject support
-MOD/pyobject.${MODULE_SUFFIX}: pyobject.dl_o
+${dir_mod}/pyobject.${MODULE_SUFFIX}: pyobject.dl_o
 	@echo "build dynamic module pyobject..."
-	$(MKINSTALLDIRS) $(srcdir)/MOD 
+	$(MKINSTALLDIRS) ${dir_mod}
 	$(CXX) $^ ${PYTHON_MODULE_LDFLAGS} ${SLDFLAGS} ${PYTHON_MODULE_LIBS} ${LD_LIBC} -o $@
 
 src: scanner.cc grammar.h grammar.cc libparse.cc
@@ -567,8 +570,8 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	-for file in *.so; do \
 	  ${INSTALL_PROGRAM} $$file ${bindir}; \
 	done
-	-for file in MOD/*.so; do \
-	  ${INSTALL_PROGRAM} $$file ${bindir}/MOD; \
+	-for file in ${pattern_mod}; do \
+	  ${INSTALL_PROGRAM} $$file ${bindir_mod}; \
 	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${bindir}
@@ -583,8 +586,8 @@ installbin-nolns: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	-for file in *.so; do \
 	  ${INSTALL_PROGRAM} $$file ${bindir}; \
 	done
-	-for file in MOD/*.so; do \
-	  ${INSTALL_PROGRAM} $$file ${bindir}/MOD; \
+	-for file in ${pattern_mod}; do \
+	  ${INSTALL_PROGRAM} $$file ${bindir_mod}; \
 	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
@@ -620,7 +623,7 @@ uninstall: uninstallbin
 uninstallbin:
 	rm -f ${bindir}/Singular${EXEC_EXT} 
 	rm -f ${SINGULAR}
-	rm -f ${bindir}/MOD/*.so
+	rm -f ${bindir_mod}/*.so
 	-rmdir ${bindir} ${bindir_mod}
 
 ##
@@ -629,7 +632,7 @@ uninstallbin:
 mostlyclean: 
 	-rm -f Singular Singular-static Singularg Singularp libparse feOpt*.inc
 	-rm -f *.o *.og core *.op *.so* *.dl_o*
-	-rm -rf MOD
+	-rm -rf ${dir_mod}
 	-rm -f ESingular* TSingular*
 
 clean: mostlyclean
@@ -668,8 +671,12 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} ${install_bindir_mod}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${install_bindir}/Singular
-	-${INSTALL_PROGRAM} *.so ${install_bindir}
-	-${INSTALL_PROGRAM} MOD/*.so ${install_bindir}/MOD
+	-for file in *.so; do \
+	  ${INSTALL_PROGRAM} $$file ${install_bindir}; \
+	done
+	-for file in ${pattern_mod}; do \
+	  ${INSTALL_PROGRAM} $$file ${install_bindir_mod}; \
+	done
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
 	${INSTALL_PROGRAM} surfex ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h

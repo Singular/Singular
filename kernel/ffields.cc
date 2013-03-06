@@ -14,6 +14,7 @@
 #include <kernel/ring.h>
 #include <kernel/longrat.h>
 #include <kernel/ffields.h>
+#include <errno.h>
 
 int nfCharQ=0;  /* the number of elemts: q*/
 int nfM1;       /*representation of -1*/
@@ -615,7 +616,13 @@ void nfSetChar(int c, char **param)
       goto err;
     }
     int q;
-    sscanf(buf,"%d %d",&nfCharP,&q);
+    int res = -1;
+    do 
+    {
+      res = sscanf(buf,"%d %d",&nfCharP,&q);
+    }
+    while((res < 0) and (errno == EINTR));
+
     nfReadMipo(buf);
     nfCharQ1=nfCharQ-1;
     //Print("nfCharQ=%d,nfCharQ1=%d,mipo=>>%s<<\n",nfCharQ,nfCharQ1,buf);

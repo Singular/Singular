@@ -18,6 +18,7 @@
 #include <structs.h>
 #include <subexpr.h>
 #include <tok.h>
+#include <errno>
 
 #define DEBUG 0
  
@@ -83,6 +84,10 @@ void pop_state();
                   && ferror( yyin ) ) \
                 YY_FATAL_ERROR( "read in flex scanner failed" );
 
+#ifndef SI_MOD_TOOLS_SSCANF
+#define SI_MOD_TOOLS_SSCANF(...) \
+while((sscanf(__VA_ARGS__ ) == EOF) && (errno == EINTR))
+#endif
 
 extern "C"
 {
@@ -127,7 +132,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 (module+{eqnl}+{quote}+{name}+{quote}) {
              char *buff = (char *)malloc(yyleng+4);
              memset(buff, '\0', yyleng+4);
-             sscanf( yytext, "%*[^\"]\"%[^\"]\"", buff);
+             SI_MOD_TOOLS_SSCANF( yytext, "%*[^\"]\"%[^\"]\"", buff);
              module_def.name = (char *)malloc(strlen(buff)+1);
              memset(module_def.name, '\0', strlen(buff)+1);
              memcpy(module_def.name, buff, strlen(buff));
@@ -145,7 +150,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 (helpfile+{eqnl}+{quote}+{fname}+{quote}) {
              char *buff = (char *)malloc(yyleng+1);
              memset(buff, '\0', yyleng+1);
-             sscanf( yytext, "%*[^\"]\"%[^\"]\"", buff);
+             SI_MOD_TOOLS_SSCANF( yytext, "%*[^\"]\"%[^\"]\"", buff);
              module_def.helpfile = (char *)malloc(strlen(buff)+1);
              memset(module_def.helpfile, '\0', strlen(buff)+1);
              memcpy(module_def.helpfile, buff, strlen(buff));
@@ -156,7 +161,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 (cxxsource+{eqnl}+{fname}) {
              char *buff = (char *)malloc(yyleng+1);
              memset(buff, '\0', yyleng+1);
-             sscanf( yytext, "%*[^=]=%s", buff);
+             SI_MOD_TOOLS_SSCANF( yytext, "%*[^=]=%s", buff);
              Add2files(&module_def,buff);
              free(buff);
            }
@@ -191,8 +196,8 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
              char *proc = (char *)malloc(yyleng+1);
              memset(proc, '\0', yyleng+1);
              push_state(YYSTATE, pdef);
-             sscanf( yytext, "%*[^p]proc %s", proc);
-             if(strlen(proc)<1) sscanf( yytext, "proc %s", proc);
+             SI_MOD_TOOLS_SSCANF( yytext, "%*[^p]proc %s", proc);
+             if(strlen(proc)<1) SI_MOD_TOOLS_SSCANF( yytext, "proc %s", proc);
              Add2proclist(&module_def, proc, "none", "NONE", NONE);
              free(proc);
            }
@@ -207,8 +212,8 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
              int cmd;
              memset(n2, '\0', 32);
              push_state(YYSTATE, pdef);
-             sscanf( yytext, "%*[^p]proc %s %s", ret_val, proc);
-             if(strlen(proc)<1) sscanf( yytext, "proc %s %s", ret_val, proc);
+             SI_MOD_TOOLS_SSCANF( yytext, "%*[^p]proc %s %s", ret_val, proc);
+             if(strlen(proc)<1) SI_MOD_TOOLS_SSCANF( yytext, "proc %s %s", ret_val, proc);
              printf("'%s'\n", yytext);
              printf("R: proc '%s' '%s'\n", ret_val, proc);
              cmd = IsCmd(ret_val, tok);
@@ -232,7 +237,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
              int cmd;
              memset(n2, '\0', 32);
              memset(param, '\0', 256);
-             sscanf( yytext, "%[^,],", param);
+             SI_MOD_TOOLS_SSCANF( yytext, "%[^,],", param);
              cmd = IsCmd(param, tok);
              if(cmd!=0)AddParam(&module_def,
 				param, decl2str(tok,n2), tok);
@@ -246,7 +251,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
              BEGIN(procdef);
              memset(param, '\0', 256);
              memset(n2, '\0', 32);
-             sscanf( yytext, "%[^)])", param);
+             SI_MOD_TOOLS_SSCANF( yytext, "%[^)])", param);
              cmd = IsCmd(param, tok);
              if(cmd!=0)AddParam(&module_def,
 				param, decl2str(tok,n2), tok);
@@ -265,9 +270,9 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 <pdef>(")"+{eqnl}+{name})|({eq}+{name}) {
              char funcname[256];
              pop_state();
-             sscanf( yytext, "%*[^=]=%s", funcname);
+             SI_MOD_TOOLS_SSCANF( yytext, "%*[^=]=%s", funcname);
              if(strlen(funcname)<=0)
-                sscanf( yytext, "=%s", funcname);
+                SI_MOD_TOOLS_SSCANF( yytext, "=%s", funcname);
              free(module_def.procs[module_def.proccnt-1].funcname);
              module_def.procs[module_def.proccnt-1].funcname =
                 (char *)malloc(strlen(funcname)+1);
@@ -284,9 +289,9 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
              memset(param, '\0', 256);
              memset(n2, '\0', 32);
              memset(funcname, '\0', 256);
-             sscanf( yytext, "%[^)])%*[^=]=%s", param, funcname);
+             SI_MOD_TOOLS_SSCANF( yytext, "%[^)])%*[^=]=%s", param, funcname);
              if(strlen(funcname)<=0)
-                sscanf( yytext, "%[^)])=%s", param, funcname);
+                SI_MOD_TOOLS_SSCANF( yytext, "%[^)])=%s", param, funcname);
              free(module_def.procs[module_def.proccnt-1].funcname);
              module_def.procs[module_def.proccnt-1].funcname =
                 (char *)malloc(strlen(funcname)+1);
@@ -309,9 +314,9 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 <procdef>function+{eqnl}+{name}+{col} {
        char *funcname = (char *)malloc(yyleng+1);
        memset(funcname, '\0', yyleng+1);
-       sscanf( yytext, "%*[^=]=%[^;];", funcname);
+       SI_MOD_TOOLS_SSCANF( yytext, "%*[^=]=%[^;];", funcname);
        if(strlen(funcname)<=0)
-         sscanf( yytext, "=%[^;];", funcname);
+         SI_MOD_TOOLS_SSCANF( yytext, "=%[^;];", funcname);
        free(module_def.procs[module_def.proccnt-1].funcname);
        module_def.procs[module_def.proccnt-1].funcname =
          (char *)malloc(strlen(funcname)+   1);

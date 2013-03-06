@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 #include <sys/stat.h>
 
 
@@ -56,7 +57,11 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   lib_types LT=LT_NONE;
 
   FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
-  ret = stat(libnamebuf, &sb);
+
+  do
+  {
+    ret = stat(libnamebuf, &sb);
+  } while((ret < 0) and (errno == EINTR));
 
   if (fp==NULL)
   {

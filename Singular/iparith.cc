@@ -75,6 +75,8 @@
 
 #include <kernel/timer.h>
 
+#include <Singular/si_signals.h>
+
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
@@ -7527,6 +7529,9 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
     int i_s = (int)(long) v->next->next->next->Data();
     if (i_s > 0)
     {
+      // Note: usleep might be interrupted, but assuming that the
+      // exact time is not important, we do not care about this.
+      // usleep is deprecated anyway
       usleep((int)(long) v->next->next->next->Data());
       jjSTATUS3(res, v, v->next, v->next->next);
     }
@@ -7537,7 +7542,7 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
     int i_s = (int) v->next->next->next->Data();
     if (i_s > 0)
     {
-      sleep((is - 1)/1000000 + 1);
+      si_sleep((is - 1)/1000000 + 1);
       jjSTATUS3(res, v, v->next, v->next->next);
     }
   }

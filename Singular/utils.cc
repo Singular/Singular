@@ -5,6 +5,7 @@
 #include <kernel/fegetopt.h>
 #include <Singular/utils.h>
 #include <Singular/libparse.h>
+#include <Singular/si_signals.h>
 
 extern FILE *yylpin;
 extern char *optarg;
@@ -42,7 +43,7 @@ void main_init(int argc, char *argv[])
     {
         case 'd':
           lpverbose = 1;
-          if(isdigit(argv[fe_optind-1][0])) sscanf(optarg, "%d", &lpverbose);
+          if(isdigit(argv[fe_optind-1][0])) si_sscanf(optarg, "%d", &lpverbose);
           else fe_optind--;
           break;
         case 'f': lib_file = argv[fe_optind-1];

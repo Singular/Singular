@@ -31,7 +31,10 @@ static void* omVallocMmap(size_t size)
 #else /* !MAP_ANONYMOUS */
   if (fd < 0)
   {
-    fd = open("/dev/zero", O_RDWR);
+    do
+    {
+      fd = open("/dev/zero", O_RDWR);
+    } while ((fd < 0) && (errno == EINTR));
     if (fd < 0) return NULL;
   }
   addr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);

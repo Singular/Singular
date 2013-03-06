@@ -102,6 +102,10 @@ void * mmPage_Create(size_t size)
   if ( devZeroFd == -1 )
   {
     devZeroFd = open("/dev/zero", O_RDWR);
+    while((devZeroFd < 0) && (errno == EINTR))
+    {
+      devZeroFd = open("/dev/zero", O_RDWR)
+    }
     if ( devZeroFd < 0 )
       printf( "open() on /dev/zero failed: %s",mmStringErrorReport());
   }

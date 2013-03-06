@@ -50,6 +50,7 @@
  #include <direct.h>
 #endif
 
+#include <Singular/si_signals.h>
 
 char buffer[1024];
 
@@ -369,7 +370,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
       CYGWIN_CONV_TO_POSIX_PATH((exec_tmp,sym_link_name));
       Trace((sym_link_name));
       
-      if (lstat(sym_link_name, &stbuf) == 0)
+      if (si_lstat(sym_link_name, &stbuf) == 0)
       {
          if ((stbuf.st_mode & S_IFLNK) == S_IFLNK)
          {
