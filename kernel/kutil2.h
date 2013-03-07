@@ -348,7 +348,8 @@ public:
 
   uint divisibleBy( ShiftDVec::sTObject * T, 
                     int numVars              )
-  { SetDVecIfNULL(); T->SetDVecIfNULL();
+  { SetDVecIfNULL();
+    T->SetDVecIfNULL();
     return ShiftDVec::divisibleBy
       (dvec, dvSize, T->dvec, T->dvSize, numVars); }
 };

@@ -1,0 +1,53 @@
+set $new_red_count = 0
+set $did_reduce = 0
+
+# print the s-poly which was just created before reduction
+blc ShiftDVec::bba 'red_result = strat->red(&strat->P,strat);'
+commands
+  silent
+  set $did_reduce = 1
+  set $new_red_count = $new_red_count + 1
+  printf "\n\nReduction number %d of s-poly:\n",$new_red_count
+  if strat->P.p != 0x0
+    pct strat->P.p
+  else
+    ptt strat->P.t_p
+  end
+  printf "Now searching for divisors\n"
+  continue
+end
+
+# print successive the divisors found during reduction
+blc ShiftDVec::redHomog 'li = strat->T[j].pLength;'
+commands
+  silent
+  printf "Found new divisor:\n"
+  pct strat->T[j].p
+  continue
+end
+
+# print the s-poly after reduction
+blc ShiftDVec::bba 'if (red_result == 1)'
+commands
+  silent
+  if $did_reduce == 1
+    printf "S-polynomial after reduction:\n"
+    if strat->P.p != 0x0
+      pct strat->P.p
+    else
+      ptt strat->P.t_p
+    end
+  end
+  set $did_reduce = 0
+  continue
+end
+
+# print the new s-poly before reduction
+#blc ShiftDVec::bba 'strat->P.p == NULL'
+#commands
+#  silent
+#  printf "The new s-polynomial before reduction\n"
+#  continue
+#end
+
+# vim: set ft=gdb:

@@ -220,7 +220,8 @@ p_GetExpDiff		kspoly.cc	607, 659, 697
 * totaldegree in the dp-Case.                                 * 
 * TODO: This has to be adapted to other orderings. And the    *
 * comment should be rewritten to be more understandable and   *
-* more accurate.                                              */
+* more accurate. BOCO: Answer: There seems to be no Problem with
+* other orderings... - hopefully.                             */
 int ShiftDVec::InitOrderMapping( ring r )
 {
 r->omap = (int *) omAlloc( (r->N+1) * sizeof(int) );
@@ -228,7 +229,7 @@ r->omap = (int *) omAlloc( (r->N+1) * sizeof(int) );
 for(int i = 1; i < r->OrdSize; ++i)
 {
   sro_ord* o=&(r->typ[i]);
-  assume(o->ord_typ == ro_dp); //see comment above
+  //assume(o->ord_typ == ro_dp); //see comment above
   int a,e;
   a=o->data.dp.start;
   e=o->data.dp.end;
@@ -252,6 +253,7 @@ r->isLPring = strat->lV;
 
 r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
 
+#if 0 //BOCO: Well, I hope all works fine even without ro_dp...
 for(int i = 1; i < r->OrdSize; ++i)
 {
   if( r->typ[i].ord_typ != ro_dp )
@@ -260,6 +262,7 @@ for(int i = 1; i < r->OrdSize; ++i)
     return;
   }
 }
+#endif
 
 //BOCO: TODO: QUESTION: 
 //Should we reset that after the bba?
@@ -501,6 +504,8 @@ int ShiftDVec::ksReducePoly(LObject* PR,
   kTest_T(UPW);
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = SPW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
+  deBoGriPrint(p1, "p1: ", 4096, currRing, PR->tailRing);
+  deBoGriPrint(p2, "p1: ", 4096, currRing, PR->tailRing);
   poly t2 = pNext(UPW->GetLmTailRing()), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
   assume(p1 != NULL && p2 != NULL);// Attention, we have rings and there LC(p2) and LC(p1) are special
   p_CheckPolyRing(p1, tailRing);

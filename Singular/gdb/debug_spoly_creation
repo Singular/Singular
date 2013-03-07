@@ -1,0 +1,37 @@
+set $new_pair_count = 0
+
+# print the new pair we got from the L-Set
+blc ShiftDVec::bba 'strat->P = strat->L[strat->Ll];'
+commands
+  silent
+  set $new_pair_count = $new_pair_count + 1
+  printf "\nGetting new Pair number %d from L:\n",$new_pair_count
+  pct strat->L[strat->Ll]->p1
+  pct strat->L[strat->Ll]->p2
+  pct strat->L[strat->Ll]->lcm
+  continue
+end
+
+# print the new s-poly before reduction
+blc ShiftDVec::bba 'strat->P.p == NULL'
+commands
+  silent
+  printf "The new s-polynomial before reduction\n"
+  if strat->P.p != 0x0
+    pct strat->P.p
+  else
+    ptt strat->P.t_p
+  end
+  continue
+end
+
+# print the s-poly resulting from the Pair printet above
+blc ShiftDVec::bba 'enterT(strat->P, strat);'
+commands
+  silent
+  printf "\nThe resulting s-polynomial is:\n"
+  pct strat->P.p
+  continue
+end
+
+# vim: set ft=gdb:

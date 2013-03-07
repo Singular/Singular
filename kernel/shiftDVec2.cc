@@ -146,8 +146,14 @@ void ShiftDVec::clearS
 
   uint shift = SD::p_LmShortDivisibleBy
             (&T,p_sev, H, ~ strat->sevS[*at], currRing);
-  assume(shift != UINT_MAX-1);
-  if ( shift > UINT_MAX-2 ) return;
+
+  //BOCO: if T.dvec does not exist, then T.p ist a constant
+  //      monomial, in which case shift will be UINT_MAX-1
+  assume(!H->dvec || shift != UINT_MAX-1);
+
+  //BOCO: if T.dvec == NULL, then T.p is a constant, which
+  //TODO: implies R = 1 and we could stop here
+  if ( H->dvec && shift > UINT_MAX-2 ) return;
 #endif
   deleteInS((*at),strat);
   (*at)--;

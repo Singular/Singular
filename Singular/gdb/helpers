@@ -1,0 +1,25 @@
+define print_p_curryking
+  call p_Write($arg0, currRing, strat->tailRing)
+end
+
+define pct
+  print_p_curryking $arg0
+end
+
+define print_p_tailring
+  call p_Write($arg0, strat->tailRing, strat->tailRing)
+end
+
+define ptt
+  print_p_tailring $arg0
+end
+
+define disable_output
+   set logging redirect on
+   set logging file /dev/null
+   set logging on
+end
+
+define enable_output
+   set logging off
+end

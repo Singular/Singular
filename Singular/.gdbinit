@@ -1,15 +1,11 @@
 break dErrorBreak
+source gdb/helpers
+source gdb/bos_gdb_ext.py
 
-define pct
-  call p_Write($arg0, currRing, strat->tailRing)
-end
+# debug messages for creation of S-Polynomials
+# set pagination off
+# source gdb/debug_spoly_creation
 
-define ptt
-  call p_Write($arg0, strat->tailRing, strat->tailRing)
-end
-
-set pagination off
-#source gdbreak
-#source dbgid1
-source stop_print_bba_red_spoly
-
+# debug messages for reduction of s-polynomials
+# set pagination off
+# source gdb/debug_spoly_reduction
