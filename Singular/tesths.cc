@@ -59,7 +59,7 @@ extern int siInit(char *);
 int initializeGMP(){ return 1; }
 #endif
 
-int mmInit2( void )
+int mmInit( void )
 {
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
     /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
@@ -70,14 +70,6 @@ int mmInit2( void )
     mp_set_memory_functions(malloc,reallocSize,freeSize);
 #endif
   return 1;
-}
-int mmInit( void )
-{
-#ifndef SI_THREADS
-  return mmInit2();
-#else
-  return 1;
-#endif
 }
 
 /*0 implementation*/
