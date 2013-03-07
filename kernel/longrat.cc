@@ -125,9 +125,7 @@ number nlShort3_noinline(number x) // assume x->s==3
   return nlShort3(x);
 }
 
-//#ifndef SI_THREADS
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
-//#endif
 
 number nlOne=INT_TO_SR(1);
 

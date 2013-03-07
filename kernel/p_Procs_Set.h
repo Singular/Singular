@@ -160,9 +160,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     SetProcs_nv(FieldZp, length,ord); // p_Delete, p_ShallowCopyDelete...
   }
   #endif
-  #ifdef SI_THREADS
-  else if (field==FieldQ) p_Procs->p_Mult_nn=p_Mult_nn_pthread;
-  #endif
   CheckProc(p_Copy);
   CheckProc(p_Delete);
   CheckProc(p_ShallowCopyDelete);

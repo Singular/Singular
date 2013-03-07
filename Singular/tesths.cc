@@ -55,7 +55,7 @@
 extern int siInit(char *);
 
 #if ! defined(LIBSINGULAR)
-int mmInit2( void )
+static int mmInit2( void )
 {
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
     /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
@@ -69,11 +69,7 @@ int mmInit2( void )
 }
 int mmInit( void )
 {
-#ifndef SI_THREADS
   return mmInit2();
-#else
-  return 1;
-#endif
 }
 
 /*0 implementation*/
