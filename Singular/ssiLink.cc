@@ -18,10 +18,7 @@
 #include <ctype.h>   /*for isdigit*/
 #include <netdb.h>
 #include <sys/wait.h>
-#include <Singular/si_signals.h>
 #include <time.h>
-
-
 
 #include <kernel/mod2.h>
 #include <Singular/si_signals.h>
