@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <kernel/mod2.h>
 #include <kernel/fegetopt.h>
 #include <Singular/utils.h>
 #include <Singular/libparse.h>

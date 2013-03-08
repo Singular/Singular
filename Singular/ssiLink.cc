@@ -24,6 +24,7 @@
 
 
 #include <kernel/mod2.h>
+#include <Singular/si_signals.h>
 // #include "mod2.h"
 
 #include <Singular/tok.h>

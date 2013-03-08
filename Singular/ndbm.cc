@@ -10,9 +10,8 @@
 //
 //**************************************************************************/
 
-#include <Singular/si_signals.h>
-
 #include <kernel/mod2.h>
+#include <Singular/si_signals.h>
 #ifdef HAVE_DBM
 #ifndef HPUX_9
 #include <strings.h>

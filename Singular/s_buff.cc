@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <signal.h>
 
+#include <kernel/mod2.h>
 #include <kernel/si_gmp.h>
 
 #include <omalloc/omalloc.h>

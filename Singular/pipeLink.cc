@@ -15,8 +15,8 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
-#include <Singular/si_signals.h>
 #include "mod2.h"
+#include <Singular/si_signals.h>
 
 #include "tok.h"
 #include "ipid.h"
