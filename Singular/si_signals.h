@@ -60,9 +60,9 @@ SI_EINTR_SAVE_FUNC(pid_t, wait, (int *status), (status))
 SI_EINTR_SAVE_FUNC(pid_t, waitpid, (pid_t pid, int *status, int options),
                    (pid, status, options))
 
-SI_EINTR_SAVE_FUNC(int, waitid, 
-                   (idtype_t idtype, id_t id, siginfo_t *infop, int options),
-                   (idtype, id, infop, options))
+//SI_EINTR_SAVE_FUNC(int, waitid, 
+//                   (idtype_t idtype, id_t id, siginfo_t *infop, int options),
+//                   (idtype, id, infop, options))
 
 SI_EINTR_SAVE_FUNC(ssize_t,  read, (int fd, void *buf, size_t count), 
                    (fd, buf, count))
