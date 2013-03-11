@@ -411,9 +411,11 @@ MOD: ${top_builddir}/libpolys/polys/.libs
 moduledir = $(bindir)/MOD
 
 module_LTLIBRARIES =
+
 if PYTHON_MODULE
+
 module_LTLIBRARIES += pyobject.la
-pyobject_la_SOURCES += pyobject.cc
+pyobject_la_SOURCES = pyobject.cc
 pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
 pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
 
@@ -422,4 +424,5 @@ pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
 
 pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version \
   ${AMLDFLAGS} @PYTHON_LSPEC@
+  
 endif
