@@ -194,20 +194,17 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGUL
 
 ########################### Singular* #########################
 
-if WANT_DEBUG
-  EXTRA_PROGRAMS = Singulard Singulardg libparse
-else
-  EXTRA_PROGRAMS = Singulard libparse
-endif
+EXTRA_PROGRAMS = Singulard libparse
 
 # the "optional_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
 optional_Singular_programs = 
 
+bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
+
 if WANT_DEBUG
-  bin_PROGRAMS = Singular Singularg ESingular TSingular $(optional_Singular_programs)
-else
-  bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
+  bin_PROGRAMS += Singularg
+  EXTRA_PROGRAMS += Singulardg
 endif
 
 Singular Singularg ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
@@ -320,11 +317,12 @@ all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
 TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/Singular/LIB:${top_srcdir}/Singular/LIB:${top_builddir}/libpolys/polys/.libs:${top_builddir}/factory/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${top_builddir}'
 
-if WANT_DEBUG
-TESTS=test-s-g test-s-r test-d-g test-d-r
-else
 TESTS=test-s-r test-d-r
+
+if WANT_DEBUG
+TESTS += test-s-g test-d-g
 endif
+
 check_PROGRAMS=$(TESTS)
 
 # Static versions
@@ -413,8 +411,9 @@ moduledir = $(bindir)/MOD
 module_LTLIBRARIES =
 
 if PYTHON_MODULE
-
 module_LTLIBRARIES += pyobject.la
+endif
+
 pyobject_la_SOURCES = pyobject.cc
 pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
 pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
@@ -424,5 +423,3 @@ pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
 
 pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version \
   ${AMLDFLAGS} @PYTHON_LSPEC@
-  
-endif
