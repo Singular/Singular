@@ -206,7 +206,7 @@ doxyclean:
 ####################################################
 # the precomputed GF(q)-tables
 
-gftablesdir=$(datadir)/gftables
+gftablesdir=$(datadir)/factory/gftables
 dist_gftables_DATA = gftables/10201 gftables/1024 gftables/10609 gftables/11449 \
 gftables/11881 gftables/121 gftables/12167 gftables/125 gftables/12769 \
 gftables/128 gftables/1331 gftables/1369 gftables/14641 \

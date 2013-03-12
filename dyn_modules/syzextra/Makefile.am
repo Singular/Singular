@@ -1,7 +1,12 @@
-moduledir = $(bindir)/MOD
+moduledir = $(libexecdir)/singular/MOD
 
 if ENABLE_P_PROCS_DYNAMIC
-  module_LTLIBRARIES=syzextra.la syzextra_g.la 
+module_LTLIBRARIES=syzextra.la 
+
+if WANT_DEBUG
+module_LTLIBRARIES+=syzextra_g.la
+endif
+  
 endif
 
 if ENABLE_FACTORY
@@ -63,10 +68,10 @@ TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_sr
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular' 
 
-if WANT_DEBUG
-TESTS=test_release.sh test_debug.sh
-else
 TESTS=test_release.sh
+
+if WANT_DEBUG
+TESTS+=test_debug.sh
 endif
 
 EXTRA_DIST = syzextra.tst ederc.tst test.sh $(TESTS)

@@ -406,7 +406,7 @@ ${abs_builddir}/LIB: ${srcdir}/LIB
 MOD: ${top_builddir}/libpolys/polys/.libs
 	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
 
-moduledir = $(bindir)/MOD
+moduledir = $(libexecdir)/singular/MOD
 
 module_LTLIBRARIES =
 

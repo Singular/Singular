@@ -1,12 +1,11 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-if WANT_DEBUG
-  LIB_G=libomalloc_g.la
-else
-  LIB_G=
-endif
 
-lib_LTLIBRARIES=libomalloc.la ${LIB_G}
+lib_LTLIBRARIES=libomalloc.la libomalloc_g.la
+
+if WANT_DEBUG
+# lib_LTLIBRARIES+=
+endif
 
 libomalloc_includedir=$(includedir)/omalloc
 
@@ -68,8 +67,11 @@ CLEANFILES = $(BUILT_SOURCES)
 ##
 # AM_LDFLAGS = -L${top_builddir}/omalloc -L${top_builddir}/../omalloc
 
-
 TESTS = omtTest-s-g omtTest-s-m omtTest-d-g omtTest-d-m
+
+if WANT_DEBUG
+# TESTS+=
+endif
 
 check_PROGRAMS = $(TESTS)
 

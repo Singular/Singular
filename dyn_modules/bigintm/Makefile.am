@@ -1,7 +1,14 @@
-moduledir = $(bindir)/MOD
+# moduledir = $(libexecdir)/singular/MOD
 
 if ENABLE_P_PROCS_DYNAMIC
-  module_LTLIBRARIES=bigintm.la bigintm_g.la 
+#  noinst_LTLIBRARIES=bigintm.la 
+  check_LTLIBRARIES=bigintm.la 
+  
+if WANT_DEBUG
+#  noinst_module_LTLIBRARIES+=bigintm_g.la 
+  check_LTLIBRARIES+=bigintm_g.la 
+endif
+  
 endif
 
 if ENABLE_FACTORY
@@ -67,10 +74,10 @@ TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_sr
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
 TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
 
-if WANT_DEBUG
-TESTS=test_release.sh test_debug.sh
-else
 TESTS=test_release.sh
+
+if WANT_DEBUG
+TESTS+=test_debug.sh
 endif
 
 EXTRA_DIST = bigintm.tst test.sh $(TESTS)

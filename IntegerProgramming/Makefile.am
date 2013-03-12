@@ -5,6 +5,8 @@ noinst_HEADERS = list.h binomial__term_ordering.h BigInt.h LLL.h matrix.h ideal.
 		term_ordering.h globals.h IP_algorithms.h binomial.h testdata.h
 # Ikernel_to_send.c  # never used?
 
+# bindir=$(libexecdir)/singular/
+
 bin_PROGRAMS = toric_ideal solve_IP change_cost gen_test LLL
 
 COMMON_SOURCES = term_ordering.cc binomial.cc \

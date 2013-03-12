@@ -13,18 +13,17 @@ SUBDIRS=$(PACKAGES)
 TESTDIRS=$(PACKAGES)
 
 
-emacsdir=$(datadir)/emacs
-EMACS = emacs/BUGS \
+emacsdir=$(datadir)/singular/emacs
+
+EMACS = \
     emacs/ChangeLog \
-    emacs/cmpl.pl \
     emacs/COPYING \
-    emacs/ESingular.emacs21 \
-    emacs/lib.pl \
-    emacs/Makefile.in \
     emacs/NEWS \
     emacs/singular.el \
-    emacs/singular.el.decl \
-    emacs/singular.xpm
+    emacs/singular.xpm  emacs/.emacs-general  emacs/.emacs-singular
+
+#++ hlp-cmpl.el lib-cmpl.el ex-cmpl.el cmd-cmpl.el ??
+#-- emacs/BUGS     emacs/cmpl.pl     emacs/ESingular.emacs21     emacs/lib.pl     emacs/Makefile.in     emacs/singular.el.decl 
 
 dist_emacs_DATA = $(EMACS)
 

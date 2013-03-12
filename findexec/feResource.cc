@@ -57,16 +57,21 @@ feResourceConfig_s feResourceConfigs[] =
 {
   {"SearchPath",    's', feResPath,  NULL,
    "$SINGULARPATH;"
+   "%D/singular/LIB;"
+   "%r/share/singular/LIB;"
+   "%b/../share/singular/LIB;"
+   "%D/factory;"
+   "%r/share/factory;"
+   "%b/../share/factory;"
+   "%r/libexec/singular/MOD;"
+   "%b/../libexec/singular/MOD;"
    "%b/LIB;"
    "%r/LIB;"
    "%d/LIB;"
    "%b/MOD;"
-   "%b/../libexec/singular/MOD;"
    "%r/MOD;"
    "%d/MOD;"
    "%b;"
-   "%b/../share;"
-   "%b/../share/singular/LIB;"
    "%b/../factory;"
    "%b/../../factory",
    ""},

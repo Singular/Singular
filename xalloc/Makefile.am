@@ -1,13 +1,13 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
+lib_LTLIBRARIES=libomalloc.la
+# lib_LIBRARIES=libomalloc.a
+
 if WANT_DEBUG
-  LIB_G=libomalloc_g.la
-else
-  LIB_G=
+lib_LTLIBRARIES+=libomalloc_g.la
 endif
 
-lib_LTLIBRARIES=libomalloc.la ${LIB_G}
-lib_LIBRARIES=libomalloc.a
+
 ## libomallocdir = $(libdir)/
 
 libomalloc_includedir=$(includedir)/omalloc
