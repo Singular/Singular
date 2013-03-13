@@ -452,26 +452,14 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
 
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
 
-  logDeriv= swapvar (logDeriv, x, y);
-  int j= degree (logDeriv) + 1;
+  int j= degree (logDeriv, y) + 1;
   CFArray result= CFArray (j);
+  CFIterator ii;
   for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
   {
-    if (i.exp() == j - 1)
-    {
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
-    else
-    {
-      for (; i.exp() < j - 1; j--)
-        result [j - 1]= 0;
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
+    for (ii= i.coeff(); ii.hasTerms(); ii++)
+      result[ii.exp()] += ii.coeff()*power (x,i.exp());
   }
-  for (; j > 0; j--)
-    result [j - 1]= 0;
   Q= q;
   return result;
 }
@@ -531,26 +519,14 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
 
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
 
-  logDeriv= swapvar (logDeriv, x, y);
-  int j= degree (logDeriv) + 1;
+  int j= degree (logDeriv,y) + 1;
   CFArray result= CFArray (j);
+  CFIterator ii;
   for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
   {
-    if (i.exp() == j - 1)
-    {
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
-    else
-    {
-      for (; i.exp() < j - 1; j--)
-        result [j - 1]= 0;
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
+    for (ii= i.coeff(); ii.hasTerms(); ii++)
+      result[ii.exp()] += ii.coeff()*power (x,i.exp());
   }
-  for (; j > 0; j--)
-    result [j - 1]= 0;
   Q= q;
   return result;
 }
