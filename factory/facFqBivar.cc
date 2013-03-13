@@ -1481,11 +1481,9 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
-    tmp1 *= LC (F, x);
-    tmp1= mod (tmp1, yToL);
+    tmp1= mulMod2 (tmp1, LC (F,x), yToL);
     tmp1 /= content (tmp1, x);
-    tmp2 *= LC (F, x);
-    tmp2= mod (tmp2, yToL);
+    tmp2= mulMod2 (tmp2, LC (F,x), yToL);
     tmp2 /= content (tmp2, x);
     tmp3 = tmp1*tmp2;
     if (tmp3/Lc (tmp3) == F/Lc (F))
@@ -1523,8 +1521,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
           buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -1558,11 +1555,9 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
-    tmp1 *= LC (F, x);
-    tmp1= mod (tmp1, yToL);
+    tmp1= mulMod2 (tmp1, LC (F,x), yToL);
     tmp1 /= content (tmp1, x);
-    tmp2 *= LC (F, x);
-    tmp2= mod (tmp2, yToL);
+    tmp2= mulMod2 (tmp2, LC (F,x), yToL);
     tmp2 /= content (tmp2, x);
     tmp3 = tmp1*tmp2;
     if (tmp3/Lc (tmp3) == F/Lc (F))
@@ -1600,8 +1595,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
           buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -1636,11 +1630,9 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
-    tmp1 *= LC (F, x);
-    tmp1= mod (tmp1, yToL);
+    tmp1= mulMod2 (tmp1, LC (F,x), yToL);
     tmp1 /= content (tmp1, x);
-    tmp2 *= LC (F, x);
-    tmp2= mod (tmp2, yToL);
+    tmp2= mulMod2 (tmp2, LC (F,x), yToL);
     tmp2 /= content (tmp2, x);
     tmp3 = tmp1*tmp2;
     if (tmp3/Lc (tmp3) == F/Lc (F))
@@ -1678,8 +1670,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
           buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -1728,8 +1719,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
         buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -1780,8 +1770,7 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
       }
     }
     buf2= buf;
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -1837,8 +1826,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
         buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     buf2= buf (y-evaluation, y);
     buf2 /= Lc (buf2);
@@ -1918,8 +1906,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
         buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     buf2= buf (y-evaluation, y);
     buf2 /= Lc (buf2);
@@ -1992,8 +1979,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
         buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -2043,8 +2029,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
         buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     if (fdivides (buf, F, quot))
     {
@@ -2087,11 +2072,9 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
-    tmp1 *= LC (F, x);
-    tmp1= mod (tmp1, yToL);
+    tmp1= mulMod2 (tmp1, LC (F,x), yToL);
     tmp1 /= content (tmp1, x);
-    tmp2 *= LC (F, x);
-    tmp2= mod (tmp2, yToL);
+    tmp2= mulMod2 (tmp2, LC (F,x), yToL);
     tmp2 /= content (tmp2, x);
     tmp3 = tmp1*tmp2;
     if (tmp3/Lc (tmp3) == F/Lc (F))
@@ -2150,8 +2133,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
           buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     buf2= buf (y - evaluation, y);
     buf2 /= Lc (buf2);
@@ -2219,11 +2201,9 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     CanonicalForm tmp1, tmp2, tmp3;
     tmp1= factors.getFirst();
     tmp2= factors.getLast();
-    tmp1 *= LC (F, x);
-    tmp1= mod (tmp1, yToL);
+    tmp1= mulMod2 (tmp1, LC (F,x), yToL);
     tmp1 /= content (tmp1, x);
-    tmp2 *= LC (F, x);
-    tmp2= mod (tmp2, yToL);
+    tmp2= mulMod2 (tmp2, LC (F,x), yToL);
     tmp2 /= content (tmp2, x);
     tmp3 = tmp1*tmp2;
     if (tmp3/Lc (tmp3) == F/Lc (F))
@@ -2282,8 +2262,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
           buf= mulMod2 (buf, iter.getItem(), yToL);
       }
     }
-    buf *= LC (F, x);
-    buf= mod (buf, yToL);
+    buf= mulMod2 (buf, LC (F,x), yToL);
     buf /= content (buf, x);
     buf2= buf (y - evaluation, y);
     buf2 /= Lc (buf2);
