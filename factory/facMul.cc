@@ -2150,7 +2150,12 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
 
   int fallBackToNaive= 50;
   if (sizeF < fallBackToNaive || sizeG < fallBackToNaive)
-    return mod (F*G, M);
+  {
+    if (sizeF < sizeG)
+      return mod (G*F, M);
+    else
+      return mod (F*G, M);
+  }
 
 #ifdef HAVE_FLINT
   if (getCharacteristic() == 0)
