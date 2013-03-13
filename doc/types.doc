@@ -34,6 +34,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
 * bigint::
+* bigintmat::
 * def::
 * ideal::
 * int::
@@ -54,11 +55,15 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * string::
 * vector::
 * User defined types::
+* cone::
+* fan::
+* polytope::
 * pyobject::
+* countedref::
 @end menu
 
 @c ---------------------------------------
-@node bigint, def, Data types, Data types
+@node bigint, bigintmat, Data types, Data types
 @section bigint
 @cindex bigint
 
@@ -146,6 +151,7 @@ See
 @cindex *
 @cindex /
 @cindex ^
+@cindex %
 
 @c remark: the following table should have style @asis, since the
 @c   commas below should not by set in style @code.
@@ -158,8 +164,8 @@ negation or subtraction
 multiplication
 @item @code{div}
 integer division (omitting the remainder >= 0)
-@item @code{mod}
-integer modulo (the remainder of the division @code{div}), always non-negative
+@item @code{mod}, @code{%}
+integer modulo (the remainder of the division @code{div})
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
@@ -192,7 +198,175 @@ See
 @c ref
 
 @c ---------------------------------------
-@node def, ideal, bigint, Data types
+@node bigintmat, def, bigint, Data types
+@section bigintmat
+@cindex bigintmat
+
+Big integer matrices are matrices with big integer entries.
+No basering definition is required to use bigint matrices, for they
+do not belong to a ring. Bigintmat entries can have any size because
+of the use of bigint.
+
+@menu
+* bigintmat declarations::
+* bigintmat expressions::
+* bigintmat type cast::
+* bigintmat operations::
+@end menu
+
+@c ------------------------------
+@node bigintmat declarations, bigintmat expressions, bigintmat, bigintmat
+@subsection bigintmat declarations
+@cindex bigintmat declarations
+
+@table @strong
+@item Syntax:
+@code{bigintmat} name @code{=} bigintmat_expression @code{;}
+@*@code{bigintmat} name @code{[} rows @code{] [} cols @code{] =} bigintmat_expression @code{;}
+@*@code{bigintmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_and_bigint expressions @code{;}
+@*rows and cols must be positive int expressions.
+
+@item Purpose:
+defines a bigintmat variable.
+@* Given a list of (big) integers, the matrix is filled
+up with the first row from the left to the right, then the second
+one and so on. If the (big-)int_list contains less than rows*cols
+elements, the remaining ones are set to zero; if it contains
+more elements, only the first rows*cols ones are considered.
+
+@item Default:
+empty (1x0 matrix)
+
+@item Example:
+@smallexample
+@c example
+ bigintmat bim[4][3]=2, 5, 224553233465, 232444, 434, 0, 0, 4544232222;
+ bim;
+ bim[2, 1];
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+@node bigintmat expressions, bigintmat type cast, bigintmat declarations, bigintmat
+@subsection bigintmat expressions
+@cindex bigintmat expressions
+
+A bigintmat expression is:
+@enumerate
+@item
+an identifier of type bigintmat
+@item
+a function returning bigintmat
+@item
+a bigintmat operation involving (big-)ints and int operations (@code{+}, @code{-}, @code{*})
+@item
+an expression involving bigintmats and the operations (@code{+}, @code{-}, @code{*})
+@item
+a type cast to bigintmat (@pxref{bigintmat type cast})
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+  bigintmat m1[2][2]=1, 2, 6, 3;
+  m1*3;
+  intmat im[3][2] = intmat(m1*3);
+  bigintmat m2 = bigintmat(im); // cast intmat im to bigintmat
+  m2;
+  m2*m1+m2;
+  _+4;
+@c example
+@end smallexample
+@c ref
+See
+@ref{bigintmat};
+@ref{Type conversion and casting}.
+@c ref
+
+@c ------------------------------
+@node bigintmat type cast,  bigintmat operations, bigintmat expressions, bigintmat
+@subsection bigintmat type cast
+@cindex bigintmat type cast
+@table @code
+@item @strong{Syntax:}
+@code{bigintmat (} expression @code{)}
+@item @strong{Type:}
+bigintmat
+@item @strong{Purpose:}
+Converts expression to a bigintmat, where expression must be of type
+intmat, or bigintmat.The size (resp.@: dimension) of the created bigintmat
+equals the size (resp.@: dimension) of the expression.
+@item @strong{Example:}
+@smallexample
+@c example
+  intmat im[2][1]=2, 3;
+  bigintmat(im);
+  bigintmat(_);
+  bigintmat(intmat(intvec(1,2,3,4), 2, 2)); //casts at first to intmat, then to bigintmat
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{bigintmat};
+@ref{Type conversion and casting};
+@ref{intmat type cast}.
+@c ref
+
+@c ------------------------------
+@node bigintmat operations,, bigintmat type cast, bigintmat
+@subsection bigintmat operations
+@cindex bigintmat operations
+@cindex +
+@cindex -
+@cindex *
+
+@table @asis
+@item @code{+}
+addition with intmat, int, or bigint. In case of (big-)int, it is added to
+every entry of the matrix.
+
+@item @code{-}
+negation or subtraction with intmat, int, or bigint. In case of (big-)int,
+it is subtracted from every entry of the matrix.
+
+@item @code{*}
+multiplication with intmat, int, or bigint; In case of (big-)int, every entry
+of the matrix is multiplied by the (big-)int
+
+@item @code{<>}, @code{==}
+comparators
+
+@item bigintmat_expression @code{[} int@code{,} int @code{]}
+is a bigintmat entry, where the first index indicates the row and the
+second the column
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example error
+  bigintmat m[3][4] = 3,3,6,3,5,2,2,7,0,0,45,3;
+  m;
+  m[1,3];               // show entry at [row 1, col 3]
+  m[1,3] = 10;          // set entry at [row 1, col 3] to 10
+  m;
+  size(m);         // number of entries
+  bigintmat n[2][3] = 2,6,0,4,0,5;
+  n * m;
+  typeof(_);
+  -m;
+  bigintmat o;
+  o=n-10;
+  o;
+  m*2;           // double each entry of m
+  o-2*m;
+@c example
+@end smallexample
+
+
+@c ---------------------------------------
+@node def, ideal, bigintmat, Data types
 @section def
 @cindex def
 @cindex untyped definitions
@@ -615,7 +789,7 @@ an identifier of type int
 a function returning int
 @item
 an expression involving ints and the arithmetic operations
-@code{+}, @code{-}, @code{*}, @code{div}, @code{/},
+@code{+}, @code{-}, @code{*}, @code{div} (@code{/}),
 @code{%} (@code{mod}), or @code{^}
 @item a boolean expression
 @item
@@ -698,14 +872,10 @@ addition
 negation or subtraction
 @item @code{*}
 multiplication
-@item @code{/}
+@item @code{div}, @code{/}
 integer division (omitting the remainder), rounding toward 0
-@item @code{div}
-integer division (omitting the remainder >= 0)
-@item @code{%}
-integer modulo (the remainder of the division @code{/})
-@item @code{mod}
-integer modulo (the remainder of the division @code{div}), always non-negative
+@item @code{%}, @code{mod}
+integer modulo (the remainder of the division
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
@@ -1047,11 +1217,12 @@ See
 intmat
 @item @strong{Purpose:}
 Converts expression to an intmat, where expression must be of type
-intvec, or intmat. If
+intvec, intmat, or bigintmat. If
 int_n and int_m are supplied, then they specify the dimension of the
 intmat. Otherwise, the size (resp.@: dimensions) of the intmat
 are determined  by the size (resp.@: dimensions) of the
-expression.
+expression. If expression is a bigintmat containing an entry larger the the
+limit of int, it is set to 0 in the returning intmat.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1060,6 +1231,8 @@ expression.
   intmat(intvec(1,2,3,4), 2, 2);
   intmat(_, 2, 3);
   intmat(_, 2, 1);
+  bigintmat bim[2][3]=34, 64, 345553234, 35553, 6434, 6563335675;
+  intmat(bim);
 @c example
 @end smallexample
 @end table
@@ -1352,12 +1525,6 @@ something @sc{Singular} can write to and/or read from. Currently,
 @item ASCII links (see
 @ref{ASCII links})
 
-@item MPfile links (see
-@ref{MPfile links})
-
-@item MPtcp links (see
-@ref{MPtcp links})
-
 @item ssi links (see
 @ref{Ssi links})
 
@@ -1373,7 +1540,6 @@ something @sc{Singular} can write to and/or read from. Currently,
 * link expressions::
 * link related functions::
 * ASCII links::
-* MP links::
 * Ssi links::
 * Pipe links::
 * DBM links::
@@ -1426,22 +1592,16 @@ a string describing the link
 
 A link is described by a string which consists of two parts: a property
 string followed by a name string. The property string describes the type
-of the link (@code{ASCII}, @code{MPfile}, @code{MPtcp} or @code{DBM})
+of the link (@code{ASCII}, @code{ssi} or @code{DBM})
 and the mode of the link (e.g., open for read, write or append). The name
 string describes the filename of the link, resp.@: a network connection
-for MPtcp links.
+for ssi links.
 
 For a detailed format description of the link describing string see:
 @iftex
 @itemize @bullet
 @item for ASCII links:
 @ref{ASCII links}
-
-@item for MPfile links:
-@ref{MPfile links}
-
-@item for MPtcp links:
-@ref{MPtcp links}
 
 @item ssi links (see
 @ref{Ssi links})
@@ -1456,8 +1616,6 @@ For a detailed format description of the link describing string see:
 
 @menu
 * ASCII links::
-* MPfile links::
-* MPtcp links::
 * Ssi links::
 * Pipe links::
 * DBM links::
@@ -1488,7 +1646,7 @@ closes and kills a link (see @ref{kill})
 @end table
 
 @c ------------------------------
-@node ASCII links, MP links, link related functions, link
+@node ASCII links, Ssi links, link related functions, link
 @subsection ASCII links
 @cindex ASCII links
 
@@ -1565,259 +1723,8 @@ written.
 @c  dump(":w example.txt");
 @end smallexample
 
-@c ------------------------------
-@node MP links, Ssi links, ASCII links, link
-@subsection MP links
-@cindex MP links
-
-MP (Multi Protocol) links give the possibility to store and communicate
-data in the binary MP format: Read and write access is very fast
-compared to ASCII links. MP links can be established using files (link
-type is @code{MPfile}) or using TCP sockets (link type is
-@code{MPtcp}). All data (including such data that cannot be converted
-to a string) can be written to an MP link. For ring-dependent data, a
-ring description is written together with the data. Reading from an MP
-link returns an expression (not a string) which was evaluated after the
-read operation. If the expression read from an MP link is not from the
-same ring as the current ring, then a @code{read} changes the current
-ring.
-
-@strong{Note:} Currently, MP links are only available on Unix platforms and data is
-written without attributes (which is likely to change in future
-versions). For a general description of MP, see
-@code{http://www.symbolicnet.org/areas/protocols/mp.html}.
-
-@menu
-* MPfile links::
-* MPtcp links::
-@end menu
-
-@c -------------------------------------------------------------
-@node MPfile links, MPtcp links, MP links, MP links
-@subsubsection MPfile links
-@cindex MPfile links
-
-MPfile links provide the possibility to store data in a file using the
-binary MP format. Read and write operations are very fast compared to
-ASCII links. Therefore, for storing large amounts of data, MPfile links
-should be used instead of ASCII links. Unlike ASCII links, data read
-from MPfile links is returned as expressions one at a time, and not as a
-string containing the entire content of the file. Furthermore, ring-dependent
-data is stored together with a ring description. Therefore,
-reading ring-dependent data might change the current ring.
-
-The MPfile link describing string has to be one of the following:
-
-@enumerate
-@item @code{"MPfile: "} + filename
-@*the mode (read or append) is set by the first @code{read} or
-@code{write} command.
-@item @code{"MPfile:r "} + filename
-@*opens the file for reading.
-@item @code{"MPfile:w "} + filename
-@*opens the file for overwriting.
-@item @code{"MPfile:a "} + filename
-@*opens the file for appending.
-@end enumerate
-
-There are the following default values:
-@itemize @bullet
-@item if none of @code{r}, @code{w}, or @code{a} is specified, the mode of
-the link is set by the first @code{read} or @code{write} command on the
-link. If the first command is @code{write}, the mode is set to @code{a}
-(append mode).
-@c Tim: You and I were right here: It is indeed append. Olaf
-@end itemize
-
-Note that the filename may contain a path. An MPfile link can be used
-either for reading or for writing, but not for both at the same time. A
-@code{close} command must be used before a change of I/O direction.
-
-@*@strong{Example:}
-@smallexample
-@c example
-  ring r;
-  link l="MPfile:w example.mp"; // type=MPfile, mode=overwrite
-  l;
-  ideal i=x2,y2,z2;
-  write (l,1, i, "hello world");// write three expressions
-  write(l,4);                   // append one more expression
-  close(l);                     // link is closed
-  // open the file for reading now
-  read(l);                      // only first expression is read
-  kill r;                       // no basering active now
-  def i = read(l);              // second expression
-  // notice that current ring was set, the name was assigned
-  // automatically
-  listvar(ring);
-  def s = read(l);              // third expression
-  listvar();
-  close(l);                     // link is closed
-  dump("MPfile:w example.mp");  // dump everything to example.mp
-  kill i, s;                    // kill i and s
-  getdump("MPfile: example.mp");// get previous dump
-  listvar();                    // got all variables and values back
-@c example
-@end smallexample
-
-@c -------------------------------------------------------------
-@node MPtcp links,  , MPfile links, MP links
-@subsubsection MPtcp links
-@cindex MPtcp links
-
-MPtcp links give the possibility to exchange data in the binary MP
-format between two processes which may run on the same or on different
-computers. MPtcp links can be opened in four different modes:
-
-@table @code
-@item listen
-@sc{Singular} acts as a server.
-
-@item connect
-@sc{Singular} acts as a client.
-
-@item launch
-@sc{Singular} acts as a client, launching an application as server.
-
-@item fork
-@sc{Singular} acts as a client, forking another @sc{Singular} as
-server.
-@end table
-
-The MPtcp link describing string has to be
-@itemize @bullet
-@item listen mode:
-@enumerate
-@item @code{"MPtcp:listen --MPport "} + portnumber
-@end enumerate
-@sc{Singular} becomes a server and waits at the port for a
-connect call.
-@item connect mode:
-@enumerate 2
-@item @code{"MPtcp:connect --MPport "} + portnumber
-@item @code{"MPtcp:connect --MPhost "} + hostname + @code{" --MPport "} +
-portnumber
-@end enumerate
-@sc{Singular} becomes a client and connects to a server waiting at
-the host and port.
-@item launch mode:
-@enumerate 4
-@item @code{"MPtcp:launch"}
-@item @code{"MPtcp:launch --MPrsh "} + rsh
-@item @code{"MPtcp:launch --MPrsh "} + rsh  + @code{" --MPhost "} +
-hostname
-@item @code{"MPtcp:launch --MPrsh "} + rsh  + @code{" --MPhost "} +
-hostname + @code{" --MPapplication "} + application
-@end enumerate
-@sc{Singular} becomes a client and starts (launches) the application
-using the specified remote shell command (default is
-@code{ssh}) on a (possibly) different host (default is @code{localhost}
-which then acts as a server.
-@item fork mode:
-@enumerate 8
-@item @code{"MPtcp:fork"}
-@end enumerate
-@sc{Singular} becomes a client and forks another @sc{Singular} on the
-same host which acts as a server.
-@end itemize
-
-There are the following default values:
-@itemize @bullet
-@item if none of @code{listen}, @code{connect}, @code{launch} or
-@code{fork} is specified, the default mode is set to @code{fork}.
-
-@item if no remote shell (rsh) command is specified, then the command
-@code{ssh} is used.
-
-@item if no application is specified in mode @code{launch} the default
-application is the value of @code{system("Singular") + "-bq"}.
-(This evaluates to the absolute path of the @sc{Singular} currently running
-with the option @code{"-bq"} appended.)
-
-@item if no hostname is specified the local host is used as default host.
-@end itemize
-
-To open an MPtcp link in launch mode, the application to launch must
-either be given with an absolute pathname, or must be in a directory
-contained in the search path. The launched application acts as a server,
-whereas the @sc{Singular} that actually opened the link acts as a
-client. @sc{Singular} automatically appends the command line arguments
-"@code{--MPmode connect --MPhost} hostname @code{--MPport} portnumber"
-to the command line of the server application. Both hostname and
-portnumber are substituted by the values from the link
-specification. The client "listens" at the given port until the server
-application does a connect call. If @sc{Singular} is used as server
-application it has to be started with the command line option @code{-b}.
-Since launching is done using a remote shell command, the host on which
-the application should run must have an entry in the @code{.rhosts}
-file. Even the local machine must have an entry if applications are to
-be launched locally.
-
-If the MPtcp link is opened in fork mode a child of the current
-@sc{Singular} is forked. All variables and their values are inherited by
-the child. The child acts as a server whereas the @sc{Singular} that
-actually opened the link acts as a client.
-
-To arrange the evaluation of an expression by a server, the expression
-must be quoted using the command @code{quote} (see @ref{quote}), so that
-a local evaluation is prevented. Otherwise, the expression is evaluated
-first, and the result of the evaluation is written, instead of the
-expression which is to be evaluated.
-
-If @sc{Singular} is in server mode, the value of the variable
-@code{link_ll} is the MPtcp link connecting to the client and
-@sc{Singular} is in an infinite read-eval-write loop until the
-connection is closed from the client side (by closing its connecting
-link). Reading and writing is done to the link @code{link_ll}: After an
-expression is read, it is evaluated and the result of the evaluation is
-written back.  That is, for each expression which was written to the
-server, there is exactly one expression written back. This might be an
-"empty" expression, if the evaluation on the server side does not return
-a value.
-
-MPtcp links should explicitly be opened before being used. MPtcp links
-are bidirectional, i.e. can be used for both, writing and
-reading. Reading from an MPtcp link blocks until data was written to
-that link. The @code{status} command can be used to check whether there
-is data to read.
-
-@*@strong{Example:}
-@smallexample
-@c example unix_only
-  LIB "general.lib"; // needed for "killall" command
-  link l="MPtcp:launch";
-  open(l); l;        // l is ready for writing but not for reading
-
-  ring r; ideal i=x2+y,xyz+z,x2+y2;
-
-  write (l,quote(std(eval(i))));   // std(i) is computed on server
-  def j = read(l);j; // result of computation on server is read
-
-  write(l, quote(getdump(link_ll))); // server reads dump
-  dump(l);           //  dump is written to server (includes proc's)
-  read(l);           // result of previous write-command is read
-  killall("not", "link"); killall("proc"); // kills everything, but links
-
-  write(l, quote(dump(link_ll)));    // server writes dump
-  getdump(l);        // dump is read from server
-  read(l);           // result of previous write-command is read
-
-  close(l);          // server is shut down
-  listvar(all);      // same state as we had before "killall()"
-
-  l = "MPtcp:";      // fork link declaration
-  open(l); l;        // Notice that name is "parent"
-
-  write(l, quote(status(link_ll, "name")));
-  read(l);           // and name of forked link is "child"
-  write(l,quote(i)); // Child inherited vars and their values
-  read(l);
-  close(l);          // shut down forked child
-@c example
-@end smallexample
-
 @c -------------------------------------------------------------------
-@node Ssi links, Pipe links, MP links, link
+@node Ssi links, Pipe links, ASCII links, link
 @subsection Ssi links
 @cindex Ssi links
 
@@ -4384,7 +4291,7 @@ substitute a ring variable (see @ref{subst})
 @c @example
 @c @end example
 @c ---------------------------------------
-@node User defined types, pyobject, vector, Data types
+@node User defined types, cone, vector, Data types
 @section User defined types
 @cindex User defined types
 @cindex newstruct
@@ -4392,7 +4299,7 @@ substitute a ring variable (see @ref{subst})
 User defined types are (non-empty) lists with a fixed size
 whose element can be accessed by names (and not indices).
 These elements have a predefined type (which can also be a user defined type).
-If these elemnts depend on a ring they can only be accessed if
+If these elements depend on a ring they can only be accessed if
 their base ring ist the current base ring.
 In contrast to usual lists the elements of a user defined type may
 belong to different rings.
@@ -4401,12 +4308,16 @@ belong to different rings.
 * Definition of a user defined type::
 * Declaration of objects of a user defined type::
 * Access to elements of a user defined type::
+* Commands for user defined types::
+* Assignments for user defined types::
 @end menu
 
 @c ------------------------------
 @node Definition of a user defined type, Declaration of objects of a user defined type, User defined types, User defined types
 @subsection Definition of a user defined type
 @cindex Definition of a user defined type
+@cindex type,custom
+@cindex custom type
 
 @table @strong
 @item Syntax:
@@ -4481,7 +4392,7 @@ operator @code{.} to access the elements
 @end smallexample
 @end table
 
-@c ------------------------------
+@c ------------------------------------------------------------------
 @node Declaration of objects of a user defined type, Access to elements of a user defined type, Definition of a user defined type, User defined types
 @subsection Declaration of objects of a user defined type
 @cindex Declaration of objects of a user defined type
@@ -4503,7 +4414,7 @@ operator @code{.} to access the elements
 @c @c ref
 
 @c ------------------------------
-@node Access to elements of a user defined type, , Declaration of objects of a user defined type, User defined types
+@node Access to elements of a user defined type, Commands for user defined types, Declaration of objects of a user defined type, User defined types
 @subsection Access to elements of a user defined type
 @cindex Access to elements of a user defined type
 
@@ -4519,17 +4430,100 @@ operator @code{.} to access the elements
   A;
 @c example
 @end smallexample
+@c ------------------------------
+@node Commands for user defined types, Assignments for user defined types,Access to elements of a user defined type, User defined types
+@subsection Commands for user defined types
+@cindex Commands for user defined types
+@cindex command,custom
+@cindex custom command
 
+User defined types are normal data types (which do not belong to a ring,
+even if they have ring dependent parts), so they can be passed as argument
+to procedures, and recieved as result from procedures.
+
+In order to apply kernel commands to these types (like @code{string}, @code{+}),
+provide a usual procedure (say @code{proc p}..) for that task and 
+install it via @code{system("install",} user_type @code{,} kernel_command @code{,p,} number_of_args @code{);}.
+The user_type and kernel_command have to be given as strings.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  newstruct("nt","int a,poly b,string c");
+  nt A;
+  A;
+  ring r;
+  // a pretty print routine for nt:
+  proc pretty_print(nt A)
+  {
+    "nt with string c:"+A.c+" and poly:"+string(A.b);
+  }
+  system("install","nt","print",pretty_print,1); // default printing uses print
+  A;
+  // a custem add for nt:
+  proc nt_add(nt A,nt B)
+  {
+    nt C;
+    C.a=A.a+B.a; C.b=A.b+B.b; C.c=A.c+B.c;
+    return(C);
+  }
+  system("install","nt","+",nt_add,2);
+  A.b=x;
+  nt B; B.c="B"; B.b=y;
+  A+B;
+@c example
+@end smallexample
+
+@c ------------------------------
+@node Assignments for user defined types,,Commands for user defined types, User defined types
+@subsection Assignments for user defined types
+@cindex Assignments for user defined types
+@cindex assignment,custom
+@cindex custom assignment
+
+By default, only objects of the same (user defined) type can be assigned,
+there is no automatic type conversion as for the kernel data types.
+
+But the operator @code{=} can be overidden in oder to write custom
+constructors:
+via @code{system("install",} user_type @code{,"="} @code{,p,1);}.
+The user_type has to be given as a string.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  newstruct("wrapping","poly p");
+  proc wrap(poly p)
+  {
+    wrapping w; w.p = p;
+    return  (w);
+  }
+  system("install", "wrapping", "=", wrap, 1);
+  ring r = 0,x,dp;
+  wrapping w = x+1;
+  w;
+  w = int(1); // via conversion int->poly
+  w;
+  w=number(2); // via conversion number->poly
+  w;
+@c example
+@end smallexample
+
+@c ------------------------------
+@include cones.tex
 @c ------------------------------
 @ifset withpython
 @include pyobject.tex
 @end ifset
 
 @ifclear withpython
-@node  pyobject,,User defined types, Data types
+@node  pyobject,countedref,polytope, Data types
 @section pyobject
 @cindex pyobject
 @cindex blackbox
 
 This version of Singular does not support pyobject.
 @end ifclear
+@c ------------------------------
+@include countedref.tex
+@c ------------------------------
