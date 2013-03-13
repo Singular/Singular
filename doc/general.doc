@@ -582,27 +582,27 @@ set the default answer for interupt signals to C which should be
 a for abort, c for continue or q for quit.
 @end table
 
-The next three options are of interest for the use with MP links:
+The next three options are of interest for the use with ssi links:
 @table @asis
 @item @code{-b}, @code{--batch}
 @cindex -b
 @cindex --batch
-Run in MP batch mode. Opens a TCP/IP connection with host specified by
+Run in batch mode. Opens a TCP/IP connection with host specified by
 @code{--MPhost} at the port specified by @code{--MPport}. Input is read
-from and output is written to this connection in the MP format.
-@xref{MPtcp links}.
+from and output is written to this connection in the format given by @code{--link}.
+@xref{Ssi links}.
 
 @item @code{--MPport=PORT}
 @cindex --MPport
-Use @code{PORT} as default port number for MP connections (whenever not
+Use @code{PORT} as default port number for connections (whenever not
 further specified). This option is mandatory when the @code{--batch}
-option is given.  @xref{MPtcp links}.
+option is given.  @xref{Ssi links}.
 
 @item @code{--MPhost=HOST}
 @cindex --MPhost
-Use @code{HOST} as default host for MP connections (whenever not
+Use @code{HOST} as default host for connections (whenever not
 further specified).  This option is mandatory when the @code{--batch}
-option is given.  @xref{MPtcp links}.
+option is given.  @xref{Ssi links}.
 @end table
 
 Finally, the following options are only available when running
@@ -2936,16 +2936,16 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 @smallexample
 @c example unix_only
   ring r; poly p = x+y;
-  dump("MPfile:w test.mp");   // dump the session to the file test.mp
-  kill r;                     // kill the basering
-  listvar();                  // no output after killing the ring
-  getdump("MPfile:r test.mp");// read the dump from the file
+  dump(":w test.sv");   // dump the session to the file test.sv
+  kill r;               // kill the basering
+  listvar();            // no output after killing the ring
+  getdump(":r test.sv");// read the dump from the file
   listvar();
 @c example
 @end smallexample
 
 Specifying a link can be as easy as specifying a filename as a string.
-Except for MPtcp links, links do not even need to be explicitly opened
+Links do not even need to be explicitly opened
 or closed before, resp.@: after, they are used.  To explicitly open or
 close a link, the @code{open}, resp.@: @code{close}, commands may be
 used (see @ref{open}, @ref{close}).
@@ -2956,7 +2956,7 @@ Links have various properties which can be queried using the
 @strong{Example:}
 @smallexample
 @c example unix_only
-  link l = "MPtcp:fork";
+  link l = "ssi:fork";
   l;
   open(l);
   status(l, "open");
@@ -2991,54 +2991,24 @@ manipulate the data.
 @c example
 @end smallexample
 
-@subheading MPfile links
-Data is stored in the binary MP format.  Read and write access is very
-fast compared to ASCII links.  All data (including such data that cannot
-be converted to a string) can be written to an MPfile link.  Reading
-from an MPfile link returns the written expressions (i.e., not a string,
-in general).
-
-MPfile links should primarily be used for storing large amounts of data
-(like dumps of the content of an entire @sc{Singular} session), and if
-the data to be stored cannot be easily converted from or to a string
-(like rings, or maps).
-
-MPfile links are implemented on Unix-like operating systems only.
-
-@xref{MPfile links}, for more information.
-
-@strong{Example:}
-@smallexample
-@c example unix_only
-  ring r;
-  // (over)write MPfile test.mp, link is specified as string
-  write("MPfile:w test.mp", x+y);
-  kill r;
-  def p = read("MPfile:r test.mp");
-  typeof(p); p;
-@c example
-@end smallexample
-
-@subheading MPtcp links
+@subheading Ssi links
 Data is communicated with other processes (e.g., @sc{Singular}
 processes) which may run on the same computer or on different ones.  Data
-exchange is accomplished using TCP/IP links in the binary MP format.
-Reading from an MPtcp link returns the written expressions (i.e., not a
+exchange is accomplished using TCP/IP links in the ssi format.
+Reading from an ssi link returns the written expressions (i.e., not a
 string, in general).
 
-MPtcp links should primarily be used for communicating with other
+Ssi links should primarily be used for communicating with other
 programs or for parallel computations (see, for example,
-@ref{Parallelization with MPtcp links}).
+@ref{Parallelization with Ssi links}).
 
-MPtcp links are implemented on Unix-like operating systems only.
-
-@xref{MPtcp links}, for more information.
+@xref{Ssi links}, for more information.
 
 @strong{Example:}
 @smallexample
-@c example unix_only
+@c example
   ring r;
-  link l = "MPtcp:launch"; // declare a link explicitly
+  link l = "ssi:launch"; // declare a link explicitly
   open(l);  // needs an open, launches another SINGULAR as a server
   write(l, x+y);
   kill r;
