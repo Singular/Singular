@@ -70,14 +70,20 @@ Do not display warning messages
 \fB\-\-no\-out\fR
 Suppress all output
 .TP
+\fB\-\-no\-shell\fR
+Restricted mode: Prohibit shell escape commands and links
+.TP
 \fB\-\-min\-time\fR=\fISECS\fR
 Do not display times smaller than SECS (in seconds)
 .TP
 \fB\-\-MPport\fR=\fIPORT\fR
-Use PORT number for MP conections
+Use PORT number for connections
 .TP
 \fB\-\-MPhost\fR=\fIHOST\fR
-Use HOST for MP connections
+Use HOST for connections
+.TP
+\fB\-\-link\fR=\fILINKTYPE\fR
+Use LINKTYPE for connections
 .TP
 \fB\-\-MPrsh\fR=\fIRSH\fR
 Use RSH for MP connections
