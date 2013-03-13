@@ -723,7 +723,7 @@ Some explainatory remarks are in order:
 @enumerate
 @item
 Instead of using links of the type @code{ssi:fork}, we alternatively
-could use @code{ssi:launch} links such that the two "competing"
+could use @code{ssi:tcp} links such that the two "competing"
 @sc{Singular} processes run on different machines. This has the
 advantage of "true" parallel computing since no resource sharing is
 involved (as it usually is with forked processes).
@@ -735,7 +735,7 @@ competing processes, the identifier @code{i} is defined and has
 identical values in both child processes. Therefore, the innermost
 @code{eval} can be omitted (as is done for the @code{l_hilb} link),
 and only the identifier @code{i} needs to be communicated to the
-children. However, when @code{ssi:launch} links are used, the inner
+children. However, when @code{ssi:tcp} links are used, the inner
 evaluation must be applied so that actual values, and not the
 identifiers are communicated (as is done for the @code{l_fglm} link
 in our example).

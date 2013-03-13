@@ -3008,7 +3008,7 @@ programs or for parallel computations (see, for example,
 @smallexample
 @c example
   ring r;
-  link l = "ssi:launch"; // declare a link explicitly
+  link l = "ssi:tcp localhost:"+system("Singular"); // declare a link explicitly
   open(l);  // needs an open, launches another SINGULAR as a server
   write(l, x+y);
   kill r;
