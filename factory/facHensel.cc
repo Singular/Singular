@@ -889,7 +889,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     if (degree (bufFactors[k], x) > 0)
     {
       if (k > 0)
-        remainder= modNTL (E, bufFactors[k] [0], b);
+        remainder= modNTL (E, bufFactors[k] [0], b); //TODO precompute inverses of bufFactors[k][0]
       else
         remainder= E;
     }
