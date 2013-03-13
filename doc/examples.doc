@@ -77,7 +77,7 @@ The following topics are treated:
 * Parameters::
 * Formatting output::
 * Cyclic roots::
-* Parallelization with MPtcp links::
+* Parallelization with ssi links::
 * Dynamic modules::
 @end menu
 @end ifset
@@ -591,7 +591,7 @@ adding appropriate space.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Cyclic roots, Parallelization with MPtcp links , Formatting output, Programming
+@node Cyclic roots, Parallelization with ssi links , Formatting output, Programming
 @subsection Cyclic roots
 @cindex Cyclic roots
 
@@ -660,13 +660,13 @@ degree(j);
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node  Parallelization with MPtcp links, Dynamic modules, Cyclic roots, Programming
-@subsection Parallelization with MPtcp links
+@node  Parallelization with ssi links, Dynamic modules, Cyclic roots, Programming
+@subsection Parallelization with ssi links
 @cindex Parallelization
-@cindex MPtcp
+@cindex ssi
 @cindex link
 
-In this example, we demonstrate how MPtcp links can be used to
+In this example, we demonstrate how ssi links can be used to
 parallelize computations.
 
 To compute a standard basis for a zero-dimensional ideal in the
@@ -681,7 +681,7 @@ and @code{stdfglm}
 @end ifset
 should be used. However, in general one cannot predict
 which one of the two commands is faster. This very much depends on the
-(input) example. Therefore, we use MPtcp links to let both commands
+(input) example. Therefore, we use ssi links to let both commands
 work on the problem independently and in parallel, so that the one which
 finishes first delivers the result.
 
@@ -691,53 +691,42 @@ Singular; Diplomarbeit Fachbereich Mathematik, Universitaet
 Kaiserslautern; 1997} for more details.
 
 @smallexample
-@c example unix_only tag:MP
+@c example
 ring r=0,(a,b,c,u,v,w,x,y,z),lp;
 ideal i=a+c+v+2x-1, ab+cu+2vw+2xy+2xz-2/3,  ab2+cu2+2vw2+2xy2+2xz2-2/5,
 ab3+cu3+2vw3+2xy3+2xz3-2/7, ab4+cu4+2vw4+2xy4+2xz4-2/9, vw2+2xyz-1/9,
 vw4+2xy2z2-1/25, vw3+xyz2+xy2z-1/15, vw4+xyz3+xy3z-1/21;
 
-link l_hilb,l_fglm = "MPtcp:fork","MPtcp:fork";         // 1.
+link l_hilb,l_fglm = "ssi:fork","ssi:fork";         // 1.
 
 open(l_fglm); open(l_hilb);
 
-write(l_hilb, quote(system("pid")));                    // 2.
-write(l_fglm, quote(system("pid")));
-int pid_hilb,pid_fglm = read(l_hilb),read(l_fglm);
-
-write(l_hilb, quote(stdhilb(i)));                       // 3.
+write(l_hilb, quote(stdhilb(i)));                       // 2.
 write(l_fglm, quote(stdfglm(eval(i))));
 
-while ((! status(l_hilb, "read", "ready", 1)) &&        // 4.
-       (! status(l_fglm, "read", "ready", 1))) {}
+list L=list(l_hilb,l_fglm);                             // 3.
+int l_index=waitfirst(L);
 
-if (status(l_hilb, "read", "ready"))
+if (l_index==1)
 {
-  "stdhilb won !!!!"; size(read(l_hilb));
-  close(l_hilb); pid_fglm = system("sh","kill "+string(pid_fglm));
+  "stdhilb won !!!!"; size(read(L[1]));
+  close(L[1]); close(L[2]);
 }
-else                                                    // 5.
+else                                                    // 4.
 {
-  "stdfglm won !!!!"; size(read(l_fglm));
-  close(l_fglm); pid_hilb = system("sh","kill "+string(pid_hilb));
+  "stdfglm won !!!!"; size(read(L[2]));
+  close(L[1]); close(L[2]);
 }
 @c example
 @end smallexample
 Some explainatory remarks are in order:
 @enumerate
 @item
-Instead of using links of the type @code{MPtcp:fork}, we alternatively
-could use @code{MPtcp:launch} links such that the two "competing"
+Instead of using links of the type @code{ssi:fork}, we alternatively
+could use @code{ssi:launch} links such that the two "competing"
 @sc{Singular} processes run on different machines. This has the
 advantage of "true" parallel computing since no resource sharing is
 involved (as it usually is with forked processes).
-
-@item
-Unfortunately, MPtcp links do not offer means to (asynchronously)
-interrupt or kill an attached (i.e., launched or forked)
-process. Therefore, we explicitely need to get the process id numbers of
-the competing @sc{Singular} processes, so that we can "kill" the
-looser later.
 
 @item
 Notice how quoting is used in order to prevent local evaluation
@@ -746,28 +735,26 @@ competing processes, the identifier @code{i} is defined and has
 identical values in both child processes. Therefore, the innermost
 @code{eval} can be omitted (as is done for the @code{l_hilb} link),
 and only the identifier @code{i} needs to be communicated to the
-children. However, when @code{MPtcp:launch} links are used, the inner
+children. However, when @code{ssi:launch} links are used, the inner
 evaluation must be applied so that actual values, and not the
 identifiers are communicated (as is done for the @code{l_fglm} link
 in our example).
 
 @item
-We go into a "sleepy" loop and wait until one of the two children
-finished the computation. That is, the current process checks approximately
-once per second the status of one of the connecting links, and sleeps
+We wait until one of the two children
+finished the computation. The main process sleeps
 (i.e., suspends its execution) in the intermediate time.
 
 @item
 The child which has won delivers the result and is terminated with the usual
 @code{close} command. The other child which is still computing needs to
-be terminated by an explicit (i.e., system) kill command, since it can
-not be terminated through the link while it is still computing.
+be terminated by an explicit (i.e., system) kill command if running on a diffrent computer. For ssi:fork a @code{close} is sufficient.
 @end enumerate
 @end ifset
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Dynamic modules, groebner and std, Parallelization with MPtcp links, Programming
+@node Dynamic modules, groebner and std, Parallelization with ssi links, Programming
 @end ifset
 @ifclear singularmanual
 @node Dynamic modules, groebner and std, Formatting output, Programming
@@ -3623,8 +3610,8 @@ elements
 @item Classification of hypersurface singularities
 @*determine type and normal form of a hypersurface singularity
 after Arnold
-@item Parallelization with MPtcp links
-@*use MP for distributed and parallel computation
+@item Parallelization with ssi links
+@*use ssi for distributed and parallel computation
 @end itemize
 
 In this list the names of the items are the names of the
