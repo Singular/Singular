@@ -58,9 +58,13 @@ class ZFan
   void ensureConeCollection()const;
   void ensureComplex()const;
   void killComplex()const;
-  std::vector<std::vector<IntVector> > &table(bool orbit, bool maximal)const;
 public:
+  std::vector<std::vector<IntVector> > &table(bool orbit, bool maximal)const;
   ~ZFan();
+  ZFan():
+    coneCollection(0),
+    complex(0)
+  {}
   ZFan(ZFan const& f);
   /**
    *
@@ -104,6 +108,13 @@ public:
    * Returns the dimension of the ambient space.
    */
   int getAmbientDimension()const;
+  int getCodimension()const;
+  int getDimension()const;
+  int getLinealityDimension()const;
+  ZVector getFVector()const;
+  bool isSimplicial()const;
+  bool isPure()const;
+  bool isComplete()const;
   /**
    * Inserts c into the fan.
    * It is a mistake to insert a cone which live in a space of the wrong dimension.
@@ -117,7 +128,7 @@ public:
    * Notice that insert() has the effect of reordering cones, orbits and rays of the fan.
    */
   void insert(ZCone const &c);
-//  void remove(ZCone const &c);
+  void remove(ZCone const &c);
   /**
    * Returns the number of cones of dimension d in the collection.
    */
@@ -131,7 +142,7 @@ public:
    * Returns the dimension of the lineality space of the fan. Notice that the lineality space of the
    * empty fan is the ambient space.
    */
-  int dimensionOfLinealitySpace();
+  // int getLinealityDimension();
   /**
    * Returns the cone in the collection given by the index. It is a mistake to specify an index which
    * is out of range.

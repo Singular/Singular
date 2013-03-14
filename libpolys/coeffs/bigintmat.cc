@@ -48,7 +48,7 @@ void bigintmat::set(int i, number n, const coeffs C)
 void bigintmat::set(int i, int j, number n, const coeffs C)
 {
   assume (C == NULL || C == basecoeffs());
-  assume (i > 0 && j > 0);
+  assume (i >= 0 && j >= 0);
   assume (i <= rows() && j <= cols());
 
   set(index(i, j), n, C);
@@ -64,7 +64,7 @@ number bigintmat::get(int i) const
 
 number bigintmat::get(int i, int j) const
 {
-  assume (i > 0 && j > 0);
+  assume (i >= 0 && j >= 0);
   assume (i <= rows() && j <= cols());
 
   return get(index(i, j));
@@ -353,9 +353,6 @@ bigintmat * bimCopy(const bigintmat * b)
 
 char* bigintmat::String()
 {
-  assume (rows() > 0);
-  assume (cols() > 0);
-
   StringSetS("");
   const int l = cols()*rows();
 
@@ -371,6 +368,157 @@ char* bigintmat::String()
   StringAppendS("\n");
   }   */
   return StringEndS();
+}
+
+char* bigintmat::StringAsPrinted()
+{
+  if ((col==0) || (row==0))
+    PrintS("");
+  else
+  {
+    int * colwid = getwid(80);
+    char * ps;
+    if (colwid == NULL)
+    {
+      WerrorS("not enough space to print bigintmat");
+      WerrorS("try string(...) for a unformatted output");
+      return ps;
+    }
+    int slength = 0;
+    for (int j=0; j<col; j++)
+      slength += colwid[j]*row;
+    slength += col*row+row;
+    ps = (char*) omAlloc0(sizeof(char)*(slength));
+    int pos = 0;
+    for (int i=0; i<col*row; i++)
+    {
+      StringSetS("");
+      n_Write(v[i], basecoeffs());
+      char * ts = StringEndS();
+      const int _nl = strlen(ts);
+      int cj = i%col;
+      if (_nl > colwid[cj])
+      {
+        StringSetS("");
+        int ci = floor(i/col);
+        StringAppend("[%d,%d]", ci+1, cj+1);
+        char * ph = StringEndS();
+        int phl = strlen(ph);
+        if (phl > colwid[cj])
+        {
+          for (int j=0; j<colwid[cj]-1; j++)
+            ps[pos+j] = ' ';
+          ps[pos+colwid[cj]-1] = '*';
+        }
+        else
+        {
+          for (int j=0; j<colwid[cj]-phl; j++)
+            ps[pos+j] = ' ';
+          for (int j=0; j<phl; j++)
+            ps[pos+colwid[cj]-phl+j] = ph[j];
+        }
+        omFree(ph);
+      }
+      else  // Mit Leerzeichen auffüllen und zahl reinschreiben
+      {
+        for (int j=0; j<colwid[cj]-_nl; j++)
+          ps[pos+j] = ' ';
+        for (int j=0; j<_nl; j++)
+          ps[pos+colwid[cj]-_nl+j] = ts[j];
+      }
+      // ", " und (evtl) "\n" einfügen
+      if ((i+1)%col == 0)
+      {
+        if (i != col*row-1)
+        {
+          ps[pos+colwid[cj]] = ',';
+          ps[pos+colwid[cj]+1] = '\n';
+          pos += colwid[cj]+2;
+        }
+      }
+      else
+      {
+        ps[pos+colwid[cj]] = ',';
+        pos += colwid[cj]+1;
+      }
+
+      omFree(ts);  // Hier ts zerstören
+    }
+    return(ps);
+    // omFree(ps);
+  }
+  // if ((col==0) || (row==0))
+  //   return 0;
+  // int * colwid = getwid(80);
+  // if (colwid == NULL)
+  // {
+  //   WerrorS("not enough space to print bigintmat");
+  //   WerrorS("try string(...) for a unformatted output");
+  //   return 0;
+  // }
+  // char * ps;
+  // int slength = 0;
+  // for (int j=0; j<col; j++)
+  //   slength += colwid[j]*row;
+  // slength += 2*(col-1)*row+2*row-1;
+  // ps = (char*) omAlloc0(sizeof(char)*(slength));
+  // int pos = 0;
+  // for (int i=0; i<col*row; i++)
+  // {
+  //   StringSetS("");
+  //   n_Write(v[i], basecoeffs());
+  //   char * temp = StringAppendS("");
+  //   char * ts = omStrDup(temp);
+  //   int nl = strlen(ts);
+  //   int cj = i%col;
+  //   if (nl > colwid[cj])
+  //   {
+  //     StringSetS("");
+  //     int ci = floor(i/col);
+  //     StringAppend("[%d,%d]", ci+1, cj+1);
+  //     char *tmp = StringAppendS("");
+  //     char * ph = omStrDup(tmp);
+  //     int phl = strlen(ph);
+  //     if (phl > colwid[cj])
+  //     {
+  //       for (int j=0; j<colwid[cj]; j++)
+  //         ps[pos+j] = '*';
+  //     }
+  //     else
+  //     {
+  //       for (int j=0; j<colwid[cj]-phl; j++)
+  //         ps[pos+j] = ' ';
+  //       for (int j=0; j<phl; j++)
+  //         ps[pos+colwid[cj]-phl+j] = ph[j];
+  //     }
+  //     omFree(ph);
+  //   }
+  //   else  // Mit Leerzeichen auffüllen und Zahl reinschreiben
+  //   {
+  //     for (int j=0; j<colwid[cj]-nl; j++)
+  //       ps[pos+j] = ' ';
+  //     for (int j=0; j<nl; j++)
+  //       ps[pos+colwid[cj]-nl+j] = ts[j];
+  //   }
+  //   // ", " oder "\n" einfügen
+  //   if ((i+1)%col == 0)
+  //   {
+  //     if (i != col*row-1)
+  //     {
+  //       ps[pos+colwid[cj]] = ',';
+  //       ps[pos+colwid[cj]+1] = '\n';
+  //       pos += colwid[cj]+2;
+  //     }
+  //   }
+  //   else
+  //   {
+  //     ps[pos+colwid[cj]] = ',';
+  //     ps[pos+colwid[cj]+1] = ' ';
+  //     pos += colwid[cj]+2;
+  //   }
+  //   omFree(ts);
+  // }
+  // return ps;
 }
 
 int intArrSum(int * a, int length)

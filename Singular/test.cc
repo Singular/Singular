@@ -98,7 +98,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
 #include "mmalloc.h"
-#include <kernel/gfan.h>
 
 #include <kernel/kutil.h>
 
@@ -121,8 +120,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <kernel/f5gb.h>
 #include <kernel/f5lists.h>
 ////////#include <kernel/F5cLists.h>
-
-#include <kernel/gfan.h>
 
 
 #include <kernel/GMPrat.h>
@@ -347,8 +344,8 @@ int main( int, char *argv[] )
     else
     {
       printf("iiMake_proc: datetime returned type %d, >>%s<<\n", iiRETURNEXPR.Typ(), (char *)iiRETURNEXPR.Data());
-      iiRETURNEXPR.CleanUp(); // calls Init afterwards 
-    }    
+      iiRETURNEXPR.CleanUp(); // calls Init afterwards
+    }
   }
 
   // changing a ring for the interpreter

@@ -1,12 +1,18 @@
 ACLOCAL_AMFLAGS = -I m4
 
 if ENABLE_FACTORY
-  USE_FACTORY = factory 
+  USE_FACTORY = factory
 else
   USE_FACTORY =
 endif
- 
-PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming dyn_modules
+
+if HAVE_GFANLIB
+  USE_GFANLIB = gfanlib
+else
+  USE_GFANLIB =
+endif
+
+PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming dyn_modules $(USE_GFANLIB)
 
 SUBDIRS=$(PACKAGES)
 
@@ -23,7 +29,7 @@ EMACS = \
     emacs/singular.xpm  emacs/.emacs-general  emacs/.emacs-singular
 
 #++ hlp-cmpl.el lib-cmpl.el ex-cmpl.el cmd-cmpl.el ??
-#-- emacs/BUGS     emacs/cmpl.pl     emacs/ESingular.emacs21     emacs/lib.pl     emacs/Makefile.in     emacs/singular.el.decl 
+#-- emacs/BUGS     emacs/cmpl.pl     emacs/ESingular.emacs21     emacs/lib.pl     emacs/Makefile.in     emacs/singular.el.decl
 
 dist_emacs_DATA = $(EMACS)
 

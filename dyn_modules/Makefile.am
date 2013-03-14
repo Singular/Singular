@@ -1,6 +1,12 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-PACKAGES=bigintm syzextra
+if HAVE_GFANLIB
+  USE_GFANLIB = callgfanlib
+else
+  USE_GFANLIB =
+endif
+
+PACKAGES=bigintm syzextra $(USE_GFANLIB)
 SUBDIRS=$(PACKAGES)
 
 TESTDIRS=$(PACKAGES)

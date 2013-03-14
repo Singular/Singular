@@ -30,6 +30,7 @@ namespace gfan
   }
   int ZFan::numberOfConesOfDimension(int d, bool orbit, bool maximal)const
   {
+    this->ensureComplex();
     return numberOf(table(orbit,maximal),d);
   }
   ZCone ZFan::getCone(int dimension, int index, bool orbit, bool maximal)const
@@ -201,7 +202,11 @@ namespace gfan
   }
   ZFan::ZFan(ZFan const& f):
     complex(0),
-    coneCollection(0)
+    coneCollection(0),
+    cones(f.table(0,0)),
+    maximalCones(f.table(0,1)),
+    coneOrbits(f.table(1,0)),
+    maximalConeOrbits(f.table(1,1))
   {
     if(f.coneCollection)
       {
@@ -268,11 +273,68 @@ namespace gfan
     assert(0);
     return 0;
   }
+  int ZFan::getCodimension()const
+  {
+    if(complex)
+      return complex->getAmbientDimension()-complex->getMaxDim();
+    if(coneCollection)
+      return coneCollection->getAmbientDimension()-coneCollection->getMaxDimension();
+    assert(0);
+    return 0;
+  }
+  int ZFan::getDimension()const
+  {
+    if(complex)
+      return complex->getMaxDim();
+    if(coneCollection)
+      return coneCollection->getMaxDimension();
+    assert(0);
+    return 0;
+  }
+  int ZFan::getLinealityDimension()const
+  {
+    if(complex)
+      return complex->getLinDim();
+    if(coneCollection)
+      return coneCollection->dimensionOfLinealitySpace();
+    assert(0);
+    return 0;
+  }
+  ZVector ZFan::getFVector()const
+  {
+    ensureComplex();
+    return complex->fvector();
+  }
+  bool ZFan::isSimplicial()const
+  {
+    ensureComplex();
+    return complex->isSimplicial();
+  }
+  bool ZFan::isPure()const
+  {
+    ensureComplex();
+    return complex->isPure();
+  }
+  bool ZFan::isComplete()const
+  {
+    ensureConeCollection();
+    if(coneCollection->isEmpty())
+      return 0;
+    int ambientdim=coneCollection->getAmbientDimension();
+    int linealitydim=coneCollection->dimensionOfLinealitySpace();
+    return (ambientdim==linealitydim);
+  }
   void ZFan::insert(ZCone const &c)
   {
     ensureConeCollection();
     killComplex();
     coneCollection->insert(c);
+  }
+  void ZFan::remove(ZCone const &c)
+  {
+    ensureConeCollection();
+    killComplex();
+    coneCollection->remove(c);
   }
 
 /*  ZFan::ZFan(int ambientDimension):

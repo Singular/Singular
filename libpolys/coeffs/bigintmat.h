@@ -174,6 +174,11 @@ class bigintmat
     }
 
     char * String();
+/***
+ * Returns a string as it would have been printed in the interpreter.
+ * Used e.g. in print functions of various blackbox types.
+ **/
+    char * StringAsPrinted();
     void pprint(int maxwid);
     int compare(const bigintmat* op) const;
     int * getwid(int maxwid);
