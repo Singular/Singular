@@ -7614,6 +7614,23 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
+  int minBound= bounds[0];
+  for (int i= 1; i < boundsLength; i++)
+  {
+    if (bounds[i] != 0)
+      minBound= tmin (minBound, bounds[i]);
+  }
+
+  int boundsLength2;
+  int * bounds2= computeBoundsWrtDiffMainvar (A, boundsLength2, isIrreducible);
+  int minBound2= bounds2[0];
+  for (int i= 1; i < boundsLength2; i++)
+  {
+    if (bounds2[i] != 0)
+      minBound2= tmin (minBound2, bounds2[i]);
+  }
+
+
   bool fail= false;
   CanonicalForm Aeval, evaluation, bufAeval, bufEvaluation, buf, tmp;
   CFList uniFactors, list, bufUniFactors;
@@ -7680,6 +7697,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                             swap, swap2, N);
       normalize (factors);
+      delete [] bounds;
+      delete [] bounds2;
       return factors;
     }
 
@@ -7722,6 +7741,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
       if (!extension)
         normalize (factors);
+      delete [] bounds;
+      delete [] bounds2;
       return factors;
     }
 
@@ -7741,6 +7762,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                 swap, swap2, N);
           if (!extension)
             normalize (factors);
+          delete [] bounds;
+          delete [] bounds2;
           return factors;
         }
       }
@@ -7759,6 +7782,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                 swap, swap2, N);
           if (!extension)
             normalize (factors);
+          delete [] bounds;
+          delete [] bounds2;
           return factors;
         }
       }
@@ -7810,9 +7835,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   if (!derivXZero && !fail2 && !symmetric)
   {
-    if (uniFactors.length() > uniFactors2.length() ||
+    if ((uniFactors.length() > uniFactors2.length() && minBound2 <= minBound)||
         (uniFactors.length() == uniFactors2.length()
-         && degs.getLength() > degs2.getLength()))
+         && degs.getLength() > degs2.getLength() && minBound2 <= minBound))
     {
       degs= degs2;
       uniFactors= uniFactors2;
@@ -7836,19 +7861,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                             swap, swap2, N);
     if (!extension)
       normalize (factors);
+    delete [] bounds;
+    delete [] bounds2;
     return factors;
   }
 
   int liftBound= degree (A, y) + 1;
 
   if (swap2)
-    bounds= computeBounds (A, boundsLength, isIrreducible);
-
-  int minBound= bounds[0];
-  for (int i= 1; i < boundsLength; i++)
   {
-    if (bounds[i] != 0)
-      minBound= tmin (minBound, bounds[i]);
+    delete [] bounds;
+    bounds= bounds2;
+    minBound= minBound2;
   }
 
   TIMING_START (fac_fq_bi_shift_to_zero);
@@ -8043,6 +8067,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     else if (!earlySuccess && degs.getLength() == 1)
       factors= earlyFactors;
   }
+
+  if (!swap2)
+    delete [] bounds2;
   delete [] bounds;
   if (!extension)
   {
