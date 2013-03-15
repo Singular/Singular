@@ -734,6 +734,91 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
   return result;
 }
 
+int *
+computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
+                             bool& isIrreducible)
+{
+  n= degree (F, 2);
+  int* result= new int [n];
+  int sizeOfNewtonPolygon;
+  int** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
+
+  isIrreducible= false;
+  if (sizeOfNewtonPolygon == 3)
+  {
+    bool check1=
+        (newtonPolyg[0][0]==0 || newtonPolyg[1][0]==0 || newtonPolyg[2][0]==0);
+    if (check1)
+    {
+      bool check2=
+        (newtonPolyg[0][1]==0 || newtonPolyg[1][1]==0 || newtonPolyg[2][0]==0);
+      if (check2)
+      {
+        int p=getCharacteristic();
+        int d=1;
+        char bufGFName='Z';
+        bool GF= (CFFactory::gettype()==GaloisFieldDomain);
+        if (GF)
+        {
+          d= getGFDegree();
+          bufGFName=gf_name;
+        }
+        setCharacteristic(0);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        tmp= gcd (tmp, newtonPolyg[1][0]);
+        tmp= gcd (tmp, newtonPolyg[1][1]);
+        tmp= gcd (tmp, newtonPolyg[2][0]);
+        tmp= gcd (tmp, newtonPolyg[2][1]);
+        isIrreducible= (tmp==1);
+        if (GF)
+          setCharacteristic (p, d, bufGFName);
+        else
+          setCharacteristic(p);
+      }
+    }
+  }
+
+  int minX, minY, maxX, maxY;
+  minX= newtonPolyg [0] [0];
+  minY= newtonPolyg [0] [1];
+  maxX= minX;
+  maxY= minY;
+  for (int i= 1; i < sizeOfNewtonPolygon; i++)
+  {
+    if (minX > newtonPolyg [i] [0])
+      minX= newtonPolyg [i] [0];
+    if (maxX < newtonPolyg [i] [0])
+      maxX= newtonPolyg [i] [0];
+    if (minY > newtonPolyg [i] [1])
+      minY= newtonPolyg [i] [1];
+    if (maxY < newtonPolyg [i] [1])
+      maxY= newtonPolyg [i] [1];
+  }
+
+  int k= maxY;
+  for (int i= 0; i < n; i++)
+  {
+    if (i + 1 > maxX || i + 1 < minX)
+    {
+      result [i]= 0;
+      continue;
+    }
+    int* point= new int [2];
+    point [0]= i + 1;
+    point [1]= k;
+    while (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
+    {
+      k--;
+      point [1]= k;
+    }
+    result [i]= k;
+    k= maxY;
+    delete [] point;
+  }
+
+  return result;
+}
+
 int
 substituteCheck (const CanonicalForm& F, const Variable& x)
 {
