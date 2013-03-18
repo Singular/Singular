@@ -1,0 +1,64 @@
+source gdb_get_line.py
+
+define disable_output
+   set logging redirect on
+   set logging file /dev/null
+   set logging on
+end
+
+define enable_output
+   set logging off
+end
+
+break ShiftDVec::bba
+commands
+  set $spl_cnt=0
+#  watch strat->P if 1 > 2
+  continue
+end
+
+break ShiftDVec::bba:445
+commands
+  silent
+  printf "\n\nNew Element from strat->L\n"
+  printf "  strat->P.p (ptr): %p\n", strat->P.p
+  printf "  strat->P.p: "
+  pct strat->P.p
+  printf "\n"
+  continue
+end
+
+break ShiftDVec::enterpairs
+commands
+  silent
+  printf "\n\nAt start of enterpairs\n"
+  printf "  H->p (ptr): %p\n", H->p
+  printf "  H->p: "
+  pct H->p
+  printf "\n"
+  continue
+end
+
+# break, print, skip one line and print again
+#break ShiftDVec::sTObject::divisibleBy if $div_cnt == 118
+#commands
+#  silent
+#  printf "\nIn TObject::divisibleBy\n"
+#  printf "  this.dvec (ptr) %p\n", dvec
+#  printf "  T->dvec   (ptr) %p\n", T->dvec
+#  set print symbol-filename off
+#  #next_nonstop_stobj_divby
+#end
+#define next_nonstop_stobj_divby
+#  disable_output
+#  next
+#end
+#define hookpost-next_nonstop_stobj_divby
+#  enable_output
+#  printf "After setting dvecs if Null\n"
+#  printf "  this.dvec (ptr) %p\n", dvec
+#  printf "  T->dvec   (ptr) %p", T->dvec
+#  continue
+#end
+
+# vim: set ft=gdb :

@@ -278,6 +278,11 @@ class ShiftDVec::sTObject : public ::sTObject
 public:
   uint * dvec; //Distance Vector of lm(p)
   uint dvSize; //size of the >>uint * dvec<< array
+
+  uint  shift; //shift of polynomial
+  //TODO: this shift shall replace the necessity of storing
+  //      shifts of polynomials, when creating pairs
+
   //uint pIsInR; //already i_r in ::sTObject
 
   // constructors

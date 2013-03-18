@@ -1,0 +1,59 @@
+// Hardest GB calculation ever !!! <fold>>>
+LIB "freegb.lib";
+ring r = 0,x,dp;
+def R = makeLetterplaceRing(5);
+setring R;
+ideal I = 1;
+
+option(notBuckets);
+ideal J = system("freegbdvc",I,5,1);
+// <<<fold>
+
+// commutative version of the Ideal above <fold>>>
+LIB "freegb.lib";
+ring r = 0,x,dp;
+ideal I = 1;
+ideal J = std(I);
+// <<<fold>
+
+// verschärftes kommutatives Beispiel von oben <fold>>>
+LIB "freegb.lib";
+ring r = 0,x,dp;
+ideal I = x + 1,x;
+ideal J = std(I);
+// <<<fold>
+
+// an other set generating <1> <fold>>>
+LIB "freegb.lib";
+ring r = 0,x,dp;
+def R = makeLetterplaceRing(5);
+setring R;
+ideal I = 1, x(1) + 1;
+
+option(notBuckets);
+ideal J = system("freegbdvc",I,5,1);
+// <<<fold>
+
+//h1 <fold>>>
+LIB "freegb.lib";
+ring r = 0,(u,v,U,V),dp;
+int d = 14;
+def R = makeLetterplaceRing(d);
+setring(R);
+ideal I = u(1)*U(2)-1,
+U(1)*u(2)-1,
+v(1)*V(2)-1,
+V(1)*v(2)-1,
+v(1)*U(2)*v(3)*v(4)*U(5)*v(6)-1,
+U(1)*v(2)*U(3)*v(4)*U(5)*v(6)-1,
+u(1)*u(2)*u(3)*v(4)*u(5)*v(6)*v(7)*u(8)*u(9)*u(10)*v(11)*u(12)*v(13)*v(14)-1;
+option(prot);
+option(redTail);
+option(redSB);
+option(notBuckets);
+ideal J = system("freegbdvc",I,14,4);
+// <<<fold>
+
+// vim: set filetype=c :
+// vim: set foldmethod=marker :
+// vim: set foldmarker=<fold>>>,<<<fold> :

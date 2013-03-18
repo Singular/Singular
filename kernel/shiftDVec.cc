@@ -1,3 +1,18 @@
+// BOCO: What we have TODO for this file
+// 1. clean up, remove unecessary comments and old uncommented
+//    code; instead comment, when applicable, from where a
+//    function stems from
+// 2. divide this file in smaller portions
+// 3. move to current singular version; adapt functions;
+//    currRing is no longer global; look up, if some of these
+//    functions changed in the newest version and how they
+//    changed, adapt these changes if possible
+// 4. look for all TODO remarks in this file and try to resolve
+//    the TODO
+// 5. (always) pray; sacrifice some lambs to the goddess of code
+// 6. things from the global TODO list
+// 7. contemplate about what I have forgotten here
+
 // define to enable tailRings (TODO: do this properly)
 #define HAVE_TAIL_RING
 
@@ -107,10 +122,9 @@ inline static int* initS_2_R (const int maxnr)
 //the work begins
 
 
-#if 0 //BOCO: original header (replaced)
-ideal freegb(ideal I, int uptodeg, int lVblock)
-{
-#else //BOCO: replacement
+//BOCO: original header (replaced)
+//TODO CLEANUP: remove comment
+//ideal freegb(ideal I, int uptodeg, int lVblock)
 ideal ShiftDVec::freegbdvc
   (ideal I, int uptodeg, int lVblock, long deBoGriFlags)
 {
@@ -119,8 +133,6 @@ ideal ShiftDVec::freegbdvc
 #if DEBOGRI > 0
   SD::deBoGri = deBoGriFlags;
   SD::lpDVCase = 1;
-#endif
-
 #endif
   /* todo main call */
 
@@ -145,6 +157,7 @@ ideal ShiftDVec::freegbdvc
   /* ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
      int newIdeal, intvec *vw) */
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   ideal RS = 
     kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL, uptodeg, lVblock);
 #else //BOCO: replacement
@@ -157,18 +170,17 @@ ideal ShiftDVec::freegbdvc
 }
 
 
-#if 0 //BOCO: original header (replaced)
+/* BOCO: original header (replaced)
+ * TODO: CLEANUP: remove comment
 ideal kStd
   ( ideal F, ideal Q, tHomog h, intvec ** w, 
     intvec *hilb, int syzComp, int newIdeal, intvec *vw )
-{
-#else //BOCO: replacement
+*/
 ideal ShiftDVec::kStd
   ( ideal F, ideal Q, tHomog h, intvec ** w, intvec *hilb,
     int syzComp, int newIdeal, intvec *vw, int uptodeg, int lV )
 {
   namespace SD = ShiftDVec;
-#endif
   if(idIs0(F))
     return idInit(1,F->rank);
 
@@ -191,7 +203,8 @@ ideal ShiftDVec::kStd
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
-#if 0 //BOCO: replaced
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   strat->enterOnePair=enterOnePairNormal;
   strat->chainCrit=chainCritNormal;
 #else //BOCO: replacement
@@ -312,9 +325,9 @@ void kDebugPrint(kStrategy strat);
 
 
 #if 0 //BOCO: original header (replaced)
+      //TODO: CLEANUP: remove this
 ideal bba
   (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
-{
 #else //replacement
 ideal ShiftDVec::bba
   (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
@@ -335,6 +348,7 @@ ideal ShiftDVec::bba
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = FALSE;
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
 #else //BOCO: replacement
   SD::initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
@@ -342,6 +356,7 @@ ideal ShiftDVec::bba
   initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   initBba(F,strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
@@ -548,10 +563,10 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
         {
           deBoGriPrint("Red Tail.\n", 2048);
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
           strat->P.p = 
             redtailBba(&(strat->P),pos-1,strat, withT);
 #else //replacement
-
           strat->P.p = 
             SD::redtailBba(&(strat->P),pos-1,strat, withT);
 #endif
@@ -564,6 +579,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           deBoGriPrint("Red Tail.\n", 2048);
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
           strat->P.p = 
             redtailBba(&(strat->P),pos-1,strat, withT);
 #else //replacement
@@ -613,6 +629,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       /* BOCO: this piece of code was moved up from below (i
        * hope that works) */
       // posInS only depends on the leading term
+      //TODO: CLEANUP: remove this
       strat->enterS(strat->P, pos, strat, strat->tl);
 #endif
 
@@ -622,7 +639,8 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       else
 #endif
       deBoGriTTest(strat);
-#if 0 //BOCO: original code (replaced) 
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         enterpairs
           ( strat->P.p,strat->sl,
             strat->P.ecart,pos,strat, strat->tl );
@@ -638,7 +656,8 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       deBoGriTTest(strat);
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, strat->tl);
-#if 0
+#if 0 //BOCO: this was not uncommented by me, nevertheless:
+      //TODO: CLEANUP: remove this
       int pl=pLength(strat->P.p);
       if (pl==1)
       {
@@ -670,7 +689,8 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
     }
     deBoGriTTest(strat);
 
-#if 0 //BOCO: replaced
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     else if (strat->P.p1 == NULL && strat->minim > 0)
     {
       p_Delete(&strat->P.p2, currRing, strat->tailRing);
@@ -744,6 +764,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
   if (TEST_OPT_REDSB)
   {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     completeReduce(strat);
 #else
     SD::completeReduce(strat);
@@ -758,6 +779,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       int i;
       for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       completeReduce(strat);
 #else
       SD::completeReduce(strat);
@@ -780,6 +802,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
 //  }
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 #else
   if (Q!=NULL) SD::updateResult(strat->Shdl,Q,strat);
@@ -855,7 +878,8 @@ void ShiftDVec::updateResult(ideal r,ideal Q, kStrategy strat)
       {
         for(q=IDELEMS(Q)-1; q>=0;q--)
         {
-#if 0 //BOCO: original code replaced
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
           if ((Q->m[q]!=NULL)
           &&(pLmDivisibleBy(Q->m[q],r->m[l])))
 #else //replacement
@@ -932,7 +956,8 @@ void ShiftDVec::updateResult(ideal r,ideal Q, kStrategy strat)
         {
           for(q=IDELEMS(r)-1;q>=0;q--)
           {
-#if 0 //BOCO: original code replaced
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
             if ((l!=q)
             && (r->m[q]!=NULL)
             &&(pLmDivisibleBy(r->m[l],r->m[q])))
@@ -969,9 +994,9 @@ void ShiftDVec::updateResult(ideal r,ideal Q, kStrategy strat)
 static BOOLEAN sloppy_max = FALSE;
 #endif /* KDEBUG */
 
-#if 0 //BOCO: original header (replaced)
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
 void completeReduce (kStrategy strat, BOOLEAN withT)
-{
 #else //replacement
 void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
 {
@@ -1018,12 +1043,14 @@ void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
       #endif
       if (currRing->OrdSgn == 1)
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         strat->S[i] = redtailBba(&L, end_pos, strat, withT);
 #else //replacement
         strat->S[i] = SD::redtailBba(&L, end_pos, strat, withT);
 #endif
       else
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         strat->S[i] = redtail(&L, strat->sl, strat);
 #else //replacement
         strat->S[i] = SD::redtail(&L, strat->sl, strat);
@@ -1061,12 +1088,14 @@ void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
       #endif
       if (currRing->OrdSgn == 1)
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         strat->S[i] = redtailBba(strat->S[i], end_pos, strat, withT);
 #else //replacement
         strat->S[i] = SD::redtailBba(strat->S[i], end_pos, strat, withT);
 #endif
       else
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
 #else //replacement
         strat->S[i] = SD::redtail(strat->S[i], strat->sl, strat);
@@ -1115,9 +1144,9 @@ void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
  * WARNING: We only consider the homogenous case at the moment.
  * The original resides in kutil.cc
  */
-#if 0 //BOCO: original header (replaced)
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
 poly redtail (LObject* L, int pos, kStrategy strat)
-{
 #else //replacement
 poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
 {
@@ -1162,6 +1191,7 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       long ecart = strat->kHEdgeFound ? LONG_MAX : e;
 #endif
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (strat->kHEdgeFound)
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
       else
@@ -1191,7 +1221,8 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       With->pLength=0;
       strat->redTailChange=TRUE;
 
-#if 0 //BOCO: original
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
 #else //Replacement
       if ( ShiftDVec::ksReducePolyTail
@@ -1248,8 +1279,8 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
 }
 
 #if 0 //BOCO: original header (replaced) from kutil.cc
+      //TODO: CLEANUP: remove this
 poly redtail (poly p, int pos, kStrategy strat)
-{
 #else //replacement
 poly ShiftDVec::redtail(poly p, int pos, kStrategy strat)
 {
@@ -1261,6 +1292,7 @@ poly ShiftDVec::redtail(poly p, int pos, kStrategy strat)
 
 
 #if 0 //BOCO: original header (replaced) from kstd1.cc
+      //TODO: CLEANUP: remove this
 void initBba(ideal F,kStrategy strat)
 #else
 void ShiftDVec::initBba(ideal F,kStrategy strat)
@@ -1277,6 +1309,7 @@ void ShiftDVec::initBba(ideal F,kStrategy strat)
     strat->red = redHoney;
 #if 0 //BOCO: original code (deleted)
       //BOCO: We do not consider redHoney/redLazy at the moment
+      //TODO: CLEANUP: remove this
   if (strat->honey)
     strat->red = redHoney;
   else if (currRing->pLexOrder && !strat->homog)
@@ -1286,6 +1319,7 @@ void ShiftDVec::initBba(ideal F,kStrategy strat)
 #endif
     strat->LazyPass *=4;
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     strat->red = redHomog;
 #else //BOCO: replacement
     strat->red = SD::redHomog;
@@ -1294,6 +1328,7 @@ void ShiftDVec::initBba(ideal F,kStrategy strat)
 
 #if 0 //BOCO: original code (deleted) 
       //BOCO: We do not consider this option
+      //TODO: CLEANUP: remove this
 #ifdef HAVE_RINGS  //TODO Oliver
   if (rField_is_Ring(currRing))
   {
@@ -1378,6 +1413,7 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
     uint shift = 0;
 #endif
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     j=kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
 #else //BOCO: replacement
     j = SD::kFindDivisibleByInT
@@ -1403,6 +1439,7 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
       if (li<=1)
         break;
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   if ((strat->T[i].pLength < li)
      &&
       p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
@@ -1445,9 +1482,11 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
     assume(strat->fromT == FALSE);
 
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 #else //BOCO: replacement
 #if 0 //BOCO: old and bad idea (does not work with tailRing)
+      //TODO: CLEANUP: remove this
     poly pTemp;
     if(shift > 0){
       pTemp = p_LPshiftT
@@ -1577,6 +1616,7 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
       if (at <= strat->Ll)
       {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         int dummy=strat->sl;
         if (kFindDivisibleByInS(strat, &dummy, h) < 0)
 #else //replacement
@@ -1599,9 +1639,9 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
 
 //BOCO: used in ShiftDVec::redBba
 #if 0 //BOCO: original header (replaced)
+      //TODO: CLEANUP: remove this
 int kFindDivisibleByInS
   (const kStrategy strat, int* max_ind, LObject* L)
-{
 #else //BOCO: replacement
 int ShiftDVec::kFindDivisibleByInS
   (const kStrategy strat, int* max_ind, LObject* L, int shift)
@@ -1637,7 +1677,8 @@ int ShiftDVec::kFindDivisibleByInS
         return j;
 #else
 */
-#if 0 //BOCO: original code (replaced)
+#if 0 //BOCO: original header (replaced)
+      //TODO: CLEANUP: remove this
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
 #else //replacement
@@ -1678,6 +1719,7 @@ int ShiftDVec::kFindDivisibleByInS
  * procedure used in updateS
  */
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
 static poly redBba (poly h,int maxIndex,kStrategy strat)
 #else //BOCO: replacement
 poly ShiftDVec::redBba
@@ -1700,6 +1742,7 @@ poly ShiftDVec::redBba
   while (j <= maxIndex)
   {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     /*BOCO: pLmShortDivisibleBy is a macro and defined by:
      *
      * #define pLmShortDivisibleBy(a, sev_a, b, not_sev_b) \
@@ -1724,6 +1767,7 @@ poly ShiftDVec::redBba
 #endif
     {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
 #else //BOCO: replacement
       poly pTemp = p_LPshiftT
@@ -1783,6 +1827,7 @@ poly ShiftDVec::redBba
  * Currently the "*sev*"-Variables are not in use.
  */
 #if 0 //BOCO: original code (replaced) from pInline1.h
+      //TODO: CLEANUP: remove this
 PINLINE1 BOOLEAN p_LmShortDivisibleBy
   ( poly a, unsigned long sev_a, poly b, 
     unsigned long not_sev_b, const ring r )
@@ -1793,6 +1838,7 @@ uint ShiftDVec::p_LmShortDivisibleBy
 #endif
 {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   p_LmCheckPolyRing1(a, r);
   p_LmCheckPolyRing1(b, r);
 #else //BOCO: replacement
@@ -1833,6 +1879,7 @@ uint ShiftDVec::p_LmShortDivisibleBy
  * Tests if t1 is divisible by t2
  */
 #if 0 //BOCO: original code (replaced) from pInline1.h
+      //TODO: CLEANUP: remove this
 PINLINE1 BOOLEAN p_LmDivisibleBy ( poly a, poly b, const ring r )
 #else //BOCO: replacement
 uint ShiftDVec::p_LmDivisibleBy
@@ -1841,6 +1888,7 @@ uint ShiftDVec::p_LmDivisibleBy
   namespace SD = ShiftDVec;
 #endif
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   p_LmCheckPolyRing1(b, r);
   pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
@@ -1881,6 +1929,7 @@ uint ShiftDVec::p_LmDivisibleBy
  *               la ^ lb != la - lb
  */
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
 static inline BOOLEAN _p_LmDivisibleByNoComp
   ( poly a, poly b, const ring r )
 #else //BOCO: replacement
@@ -1889,6 +1938,7 @@ static inline uint ShiftDVec::_p_LmDivisibleByNoComp
 #endif
 {
 #if 0 //BOCO: original code (deleted)
+      //TODO: CLEANUP: remove this
   int i=r->VarL_Size - 1;
   unsigned long divmask = r->divmask;
   unsigned long la, lb;
@@ -1964,7 +2014,8 @@ static inline uint ShiftDVec::_p_LmDivisibleByNoComp
  * return -1 if no divisor is found
  *        number of first divisor, otherwise
  */
-#if 0 //BOCO: original header
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
 int kFindDivisibleByInT
   ( const TSet &T, const unsigned long* sevT, const int tl, 
     const LObject* L, const int start                       )
@@ -2003,7 +2054,8 @@ int ShiftDVec::kFindDivisibleByInT
   {
     loop
     {
-#if 0  //BOCO: original code (replaced)
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (j > tl) return -1;
 #else  //BOCO: replacement
       if (j > strat->tl) {ret = -1; break;};
@@ -2015,7 +2067,8 @@ int ShiftDVec::kFindDivisibleByInT
         return j;
 #else
 */
-#if 0 //BOCO: original code
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
         return j;
@@ -2046,6 +2099,7 @@ int ShiftDVec::kFindDivisibleByInT
     loop
     {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (j > tl) return -1;
 #else //replacement
       if (j > strat->tl) {ret = -1; break;}
@@ -2057,7 +2111,8 @@ int ShiftDVec::kFindDivisibleByInT
         return j;
 #else
 */
-#if 0 //BOCO: original code
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
         return j;
@@ -2100,6 +2155,7 @@ int ShiftDVec::kFindDivisibleByInT
  * degree bound).
  */
 #if 0 //BOCO: original header from kutil.cc
+      //TODO: CLEANUP: remove this
 TObject * kFindDivisibleByInS
   (kStrategy strat, int pos, LObject* L, TObject* T, long ecart)
 #else
@@ -2140,6 +2196,7 @@ TObject * ShiftDVec::kFindDivisibleByInS
 #else
 */
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
       if (!(sev[j] & not_sev) &&
           (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
           p_LmDivisibleBy(strat->S[j], p, r))
@@ -2225,6 +2282,7 @@ TObject * ShiftDVec::kFindDivisibleByInS
         assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
         strat->S_2_T(j)->SetDVecIfNULL(t->t_p, r); //Sets dvec, if dvec == NULL
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         if (p_LmDivisibleBy(t->t_p, p, r)) return t;
 #else //BOCO: replacement
         /*BOCO:
@@ -2258,10 +2316,10 @@ TObject * ShiftDVec::kFindDivisibleByInS
 
 
 #if 0 //BOCO: original header from kutil.cc
+      //TODO: CLEANUP: remove this
 poly redtailBba
   ( LObject* L, int pos, kStrategy strat, BOOLEAN withT, 
     BOOLEAN normalize                                    )
-{
 #else //replacement
 poly ShiftDVec::redtailBba
   ( LObject* L, int pos, kStrategy strat, BOOLEAN withT, 
@@ -2335,6 +2393,7 @@ poly ShiftDVec::redtailBba
         deBoGriPrint( "Reducing with T", 2048 );
         int j;
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         j = kFindDivisibleByInT
           (strat->T, strat->sevT, strat->tl, &Ln);
 #else //BOCO: replacement
@@ -2385,6 +2444,7 @@ poly ShiftDVec::redtailBba
 //    uint & shift, long ecart = LONG_MAX               )
 
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
 #else //BOCO: replacement
@@ -2600,8 +2660,8 @@ poly ShiftDVec::redtailBba
 
 
 #if 0 //BOCO: original header
+      //TODO: CLEANUP: remove this
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize)
-{
 #else //replacement
 KINLINE poly ShiftDVec::redtailBba
   (poly p,int pos,kStrategy strat,BOOLEAN normalize)
@@ -2618,7 +2678,8 @@ KINLINE poly ShiftDVec::redtailBba
 *the result is a set of polynomials which are in
 *normalform with respect to S
 */
-#if 0 //BOCO: original code          
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
 void updateS(BOOLEAN toT,kStrategy strat)
 #else //replacement
 void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
@@ -2649,7 +2710,8 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi = pHead(strat->S[i]);
-#if 0 //BOCO: original code          
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
           strat->S[i] = redBba(strat->S[i],i-1,strat);
 #else
           LObject h(strat->S[i]);
@@ -2694,6 +2756,7 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
             if (TEST_OPT_INTSTRATEGY)
             {
 #if 0  //BOCO: ATTENTION: Changed in spielwiese Version
+       //BOCO: TODO: CLEANUP
               //pContent(strat->S[i]);
               strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
 #else //the changes
@@ -2760,7 +2823,8 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
       {
         if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
         {
-#if 0 //BOCO: original code          
+#if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
           h.p = redtailBba(strat->S[i],i-1,strat);
 #else
           LObject L(h.p, currRing, strat->tailRing); 
@@ -2793,6 +2857,7 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
     }
   }
 #if 0 //BOCO: original code (we do not consider pOrdSgn != 1)
+      //TODO: CLEANUP: remove this
   else
   {
     while (suc != -1)
@@ -2898,6 +2963,7 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
 
 
 #if 0 //BOCO: original code and comment from kutil.cc
+      //TODO: CLEANUP: remove this
 void initBuchMoraCrit(kStrategy strat)
 #else //replacement
 void ShiftDVec::initBuchMoraCrit(kStrategy strat)
@@ -2906,6 +2972,7 @@ void ShiftDVec::initBuchMoraCrit(kStrategy strat)
 #endif
 
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
   strat->enterOnePair=enterOnePairNormal;
   strat->chainCrit=chainCritNormal;
 #else //replacement
@@ -2973,8 +3040,8 @@ void ShiftDVec::initBuchMoraCrit(kStrategy strat)
  * - We have to initialize the dvec of [[p]]. 
  * - We will return a pointer to the LObject in [[set]] . */
 #if 0 //BOCO: original code and comment
+      //TODO: CLEANUP: remove this
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
-{
 #else //BOCO: replacement
 LObject* ShiftDVec::enterL
   ( LSet *set,int *length, int *LSetmax, LObject p,int at, 
@@ -3009,8 +3076,8 @@ LObject* ShiftDVec::enterL
 
 //BOCO: nearly no change in this function
 #if 0 //BOCO: original code and comment
+      //TODO: CLEANUP: remove this
 void initSL (ideal F, ideal Q,kStrategy strat)
-{
 #else
 void ShiftDVec::initSL(ideal F, ideal Q,kStrategy strat)
 {
@@ -3101,6 +3168,7 @@ void ShiftDVec::initSL(ideal F, ideal Q,kStrategy strat)
             pos = strat->posInL(strat->L,strat->Ll,&h,strat);
           h.sev = pGetShortExpVector(h.p);
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
 #else
           SD::enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
@@ -3123,8 +3191,8 @@ void ShiftDVec::initSL(ideal F, ideal Q,kStrategy strat)
 
 //BOCO: nearly no change in this function
 #if 0 //BOCO: original code and comment from kutil.cc
+      //TODO: CLEANUP: remove this
 void initBuchMora(ideal F,ideal Q,kStrategy strat)
-{
 #else
 void ShiftDVec::initBuchMora(ideal F,ideal Q,kStrategy strat)
 {
@@ -3162,6 +3230,7 @@ void ShiftDVec::initBuchMora(ideal F,ideal Q,kStrategy strat)
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
 #if 0 //BOCO: removed -> maybe later?
+      //TODO: CLEANUP: remove this
   if(TEST_OPT_SB_1)
   {
     int i;
@@ -3183,6 +3252,7 @@ void ShiftDVec::initBuchMora(ideal F,ideal Q,kStrategy strat)
 #endif
   {
 #if 0 //BOCO: original code (replaced)
+      //TODO: CLEANUP: remove this
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
     // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
 #else

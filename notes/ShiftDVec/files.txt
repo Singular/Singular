@@ -1,0 +1,49 @@
+kernel/
+  kInline.h
+  kstd2.cc
+  kutil.h
+  kutil.cc
+  kutil2.h
+  kutil2.cc
+  shiftDVec.h
+  shiftDVec.cc
+  shiftDVec2.cc
+  SDMultiplication.h
+  SDMultiplication.cc
+  Makefile.am
+  others???
+
+Singular
+  extra.cc
+  .gdbinit
+
+Singular/gdb
+  bos_gdb_ext.py
+  helpers
+  debug_spoly_creation
+  debug_spoly_reduction
+  debug_p_LmShortDivisibleBy
+
+Singular/LIB
+  ???
+
+notes/ShiftDVec
+  ex-simple.txt
+  files.txt
+  todo.txt
+
+libpolys/polys/templates
+  p_Procs_Dynamic.cc
+  p_Procs_Generate.cc
+  p_Procs.h
+  p_Procs_Impl.h
+  p_Procs_Lib.cc
+  p_Procs_set.h
+  p_MemAdd.h
+  LPDV__mml_Mult_pp_Mult_mmr__T.cc
+  LPDV__mm_Mult_pp__T.cc
+  LPDV__p_Minus_mml_Mult_qq_Mult_mmr__T.cc
+  LPDV__p_Minus_mm_Mult_qq__T.cc
+  LPDV__pp_Mult_mm_Noether__T.cc
+  LPDV__pp_Mult_mm__T.cc
+  others???

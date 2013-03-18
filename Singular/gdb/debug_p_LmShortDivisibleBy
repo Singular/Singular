@@ -1,0 +1,70 @@
+define print_p_curryking
+  call p_Write($arg0, currRing, strat->tailRing)
+end
+
+define print_p_tailring
+  call p_Write($arg0, strat->tailRing, strat->tailRing)
+end
+
+define disable_output
+   set logging redirect on
+   set logging file /dev/null
+   set logging on
+end
+
+define enable_output
+   set logging off
+end
+
+break ShiftDVec::bba
+commands
+  set $div_cnt=0
+  continue
+end
+
+break ShiftDVec::clearS if $div_cnt == 118
+commands
+  silent
+  printf "\n\nBefore divisibleBy in clearS\n"
+  printf "  T.p  (ptr) %p\n", T.p
+  printf "  H->p (ptr) %p\n", H->p
+  printf "  T.dvec  (ptr) %p\n", T.dvec
+  printf "  H->dvec (ptr) %p", H->dvec
+  continue
+end
+
+# break, print, skip one line and print again
+break ShiftDVec::sTObject::divisibleBy if $div_cnt == 118
+commands
+  silent
+  printf "\nIn TObject::divisibleBy\n"
+  printf "  this.dvec (ptr) %p\n", dvec
+  printf "  T->dvec   (ptr) %p\n", T->dvec
+  set print symbol-filename off
+  #next_nonstop_stobj_divby
+end
+define next_nonstop_stobj_divby
+  disable_output
+  next
+end
+define hookpost-next_nonstop_stobj_divby
+  enable_output
+  printf "After setting dvecs if Null\n"
+  printf "  this.dvec (ptr) %p\n", dvec
+  printf "  T->dvec   (ptr) %p", T->dvec
+  continue
+end
+
+break ShiftDVec::divisibleBy
+commands
+  silent
+  set $div_cnt = $div_cnt + 1
+  printf "\nInvokation %d of divisibleBy\n", $div_cnt
+  if $div_cnt != 119
+    continue
+  end
+  printf "  dvec1 (ptr) %p\n", dvec1
+  printf "  dvec2 (ptr) %p\n", dvec2
+end
+
+# vim: set ft=gdb :

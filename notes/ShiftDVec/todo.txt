@@ -1,0 +1,152 @@
+Dies ist eine Kopie von /home/ben/data/mnt/uni/share/lpdv .
+/home/ben/data/mnt/uni/share/lpdv ist im zweifelsfalle 
+die aktuellere Version.
+
+TODO List - Letterplace DVec Implementation
+
+[PP]   - very high priority
+[P]    -      high priority
+[p]    -           priority
+other  -  no/minor priority
+[?]    -   unknown priority
+
+· [PP] Die aktuellste Version dieser Liste soll von nun an in Git
+  gespeichert werden.
+
+· [PP] Update this list.
+
+· [?] Complete the TODO-List
+  Status: don't know
+  Note: There is always something I forget
+
+· Complete files.txt and remove unecessary files from git. (e.g
+  some files from Singular/gdb; replace freegb_wrkcp.lib with
+  stable version.)
+
+· [P] Get the inhomogenous case to work (basically):
+  Status: seems to work, testing needed
+  Notes: Only a few calculations were made, especially very few
+  inhomogenous GB were calculated - we may still be in for
+  surprises
+  
+· [P] Get other orderings than dp to work:
+  Status: shouldn't be to hard but: see Notes
+  Note1: for weighted orderings we have first to change the
+  monomial structure - see „Implementational Details“ subitem
+  „Changes to monomial structure“
+  Note2: Which ordering is good for us has to be cleared by
+  Viktor/Grischa, I will assume, that every ordering is
+  multiplicative. However: There were some special orderings
+  Viktor and Grischa were talking about, which I think were
+  considered to solve the rp-Problem (see „Theory“ below). These
+  orderings Viktor wanted me to implement once (I think). That
+  could result in lots of work and I have to think about, how to
+  implement that effictiently. For sure, some of the comparison
+  algorithms in Singular have to be adapted.
+
+· Do we need the „Noether“-Versions of the multiplications?
+  Status: nothing done so far
+  Note: What are these Versions good for anyway?
+
+· [P/p] Buckets
+  Status: nothing done so far
+  Note: I don't know, if that is a problem. I have to investigate
+  it a bit more thoroughly. Viktor wanted me to include it, since
+  it could improve the performance of our algorithm. I do not
+  really know, what priority this has.
+
+· [p] GB over Left-/Right-Ideals
+  Status: nothing done so far
+  Notes: Viktor wants us to do that
+  
+· [P] Testing, comparison of output:
+  Status: To be done
+  Note: Testing and debugging are always necessary..., well for
+  the latter: Never had luck with it...
+
+· Implementational Details:
+  Status: Will be always incomplete
+  - [PP] Do not use shifting anylonger:
+    Status: incomplete
+    Notes: This is an important one, I think. Code will get
+    cleaner and software more efficient, should have priority
+  - [p] Search for memory leaks
+    Status: unknown - may always be incomplete/unknown
+    Notes: There are some portions of singular, especially in our
+    part of the implementation, i suspect to have memory leaks.
+    I suspect especially the SPoly functions and the ksReduce
+    functions:
+    Do we free the cofactors correctly?
+    Do we free the (l)ms which are cancelled?
+  - Why does the invokation of
+    r->p_Procs->p_Minus_mm_Mult_qq in pInline2.h:582
+    with the additional last parameter "last" work? The Pointer
+    declared in p_Procs.h:29 does not have this parameter!
+  - [P] changes to monomial structure
+    Status: to be done
+    Explanation: We want to have an additional field, which tells
+    us, how long our polynomial is (how many exponents there are,
+    noequal to zero). (Viktor named it length, but it is just a
+    non-weighted Totaldegre - hence the length of the
+    corresponding DVec.) For orderings, which set weight=1 to all
+    variables, this is no problem, since the weighted Totaldegree
+    is already stored, but for other weight settings... I think
+    Grischa claimed, that the non-weighted Totaldegree is stored,
+    but Hans S. disagreed - maybe the non-weighted Td is just
+    emitted at the interface, when one examines the poly...
+    however, we have to find that out. An additional field for
+    the shift might rather not be handy, since we want to map
+    several shifts to one poly, but one can think about that, as
+    a temporary field, but I dont think it will be useful. Shifts
+    have to be stored in the T-/LObjects. All this is important
+    for the multiplication, thus the reduction, creation of
+    s-polys, etc. and for orderings (see above:
+    „Get other orderings than dp to work“). We have to look into
+    rComplete for how to change the structure of the monomials. I
+    think that could be difficult, though Hannes or Viktor would
+    disagree, I am sure. 
+    Note to myself: see also:
+    /home/ben/data/scripts/src/singular/00_notes
+
+· [p] make implementation ready to be included in next release
+  Status: to be done
+  - clean the code:
+    Status: gets worse every day
+    Notes: maybe that should have higher priority, but somewhere
+    we have to shorten our demands...
+  - write a documentation
+    a) of the interface
+    Status: to be done
+    Notes: Have to include some concise but meaningful examples
+    b) of the theory
+    Status: I think Grischa wrote about Gebauer Möller...
+
+· [P] Profiling of our Implementation
+  Status: to be done
+  Notes: Which parts of the code result in the highest cpu-usage?
+  Note to myself: See 
+  /home/ben/data/scripts/src/singular/00_notes
+  for some approaches
+
+· [p] merge /home/ben/data/scripts/src/singular/00_notes hereto
+  Status: to be done
+  Notes: overview, what i have written
+
+· [P] Theory
+  Status: ask Grischa
+  Notes: Orderings, Gebauer Möller, etc.
+  (reverse) lexicographical ordering not multiplicative
+  let x > y, reverse lexicographical, then:
+  y^2 > y, but x*y^2 < x*y - epic fail ...
+  Question to myself: Is it really good to translate the
+  commutative rp to the non-commutative ordering like that, are
+  there no other choices...? Obviously you can't just literally
+  translate the ordering, because otherwise you would have that
+  yx == xy (or non comparable...). But for those cases one could
+  take the non-commutative interpretation (thus yx < xy) and for
+  the others the commutative (thus x*y^2 > x*y) or some other
+  mixture... But ok, the theoretical stuff is considered by
+  Grischa and Viktor.
+  Note to myself: Have to read more about orderings and their
+  matrices. Viktor gave me a short introduction for free, but it
+  was very fast and I didn't take notes
