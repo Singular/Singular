@@ -31,7 +31,6 @@
 @set PSUFFIX  (plural)
 @set namespaces 1
 @include version.texi
-@include uname.texi
 @c --------------------- end general setting --------------------
 
 
@@ -254,7 +253,7 @@ See also @ref{Non-commutative libraries}.
 
 @strong{Binary libraries:}
 @menu
-* convex geometry:: 
+* convex geometry::
 @end menu
 
 
@@ -515,7 +514,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node resbinomial_lib, resgraph_lib, paraplanecurves_lib, Algebraic geometry
 @subsection resbinomial_lib
- 
+
 Todos/Issues:
 @itemize
 @item formatting is inapprociate
