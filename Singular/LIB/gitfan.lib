@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="$Id: gitfan.lib";
+version="$Id$";
 category="Algebraic Geometry";
 info="
 LIBRARY:  gitfan.lib       Compute GIT-fans.
