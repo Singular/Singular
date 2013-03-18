@@ -72,10 +72,10 @@ public:
   //--------
   typ& operator[](int n)
     {
-      if(!(n>=0 && n<v.size()))outOfRange(n,v.size());
+      if(!(n>=0 && n<(int)v.size()))outOfRange(n,v.size());
       return (v[n]);
     }
-  const typ& operator[](int n)const{assert(n>=0 && n<v.size());return (v[n]);}
+  const typ& operator[](int n)const{assert(n>=0 && n<(int)v.size());return (v[n]);}
   const typ& UNCHECKEDACCESS(int n)const{return (v[n]);}
 
   //-------------
@@ -179,7 +179,7 @@ public:
 /*  inline friend Vector operator*(const Vektor& p, const Vektor& q){assert(p.size()==q.size());Vektor p1=p;for(int i=0;i<p.size();i++)p1.v[i]*=q.v[i];return p1;}
   inline friend Vektor operator+(const Vektor& p, const Vektor& q){assert(p.size()==q.size());Vektor p1=p;for(int i=0;i<p.size();i++)p1[i]+=q[i];return p1;}
 */
-  inline friend Vector operator/(const Vector& p, typ const &s){Vector ret(p.size());for(int i=0;i<p.size();i++)ret[i]=p[i]/s;return ret;}
+  inline friend Vector operator/(const Vector& p, typ const &s){Vector ret(p.size());for(unsigned i=0;i<p.size();i++)ret[i]=p[i]/s;return ret;}
   inline friend Vector operator+(const Vector& p, const Vector& q){assert(p.size()==q.size());Vector p1=p;for(int i=0;i<p.size();i++)p1[i]+=q[i];return p1;}
   inline friend Vector operator-(const Vector& p, const Vector& q){assert(p.size()==q.size());Vector p1=p;for(int i=0;i<p.size();i++)p1[i]-=q[i];return p1;}
   inline friend Vector max(const Vector& p, const Vector& q){assert(p.size()==q.size());Vector p1=p;for(int i=0;i<p.size();i++)if(p1[i]<q[i])p1[i]=q[i];return p1;}
@@ -278,17 +278,16 @@ public:
       for(int i=0;i<v.size();i++)support=(support<<1)|(((v[i]>0)==true)&1);
     }
 */
-  friend std::ostream &operator<<(std::ostream &f, Vector const &a){
+  friend std::ostream &operator<<(std::ostream &f, Vector const &a)
+  {
     f<<"(";
-
     for(typename std::vector<typ>::const_iterator i=a.v.begin();i!=a.v.end();i++)
-            {
-        if(i!=a.v.begin())
-          f<<",";
-          f<<*i;
-        }
-        f<<")";
-      }
+    {
+      if(i!=a.v.begin()) f<<",";
+      f<<*i;
+    }
+    return f<<")";
+  }
   typ gcd()const
   {
     typ temp1,temp2;
@@ -311,7 +310,7 @@ typedef Vector<int> IntVector;
 inline QVector ZToQVector(ZVector const &v)
 {
   QVector ret(v.size());
-  for(int i=0;i<v.size();i++)ret[i]=Rational(v[i]);
+  for(unsigned i=0;i<v.size();i++)ret[i]=Rational(v[i]);
   return ret;
 }
 
@@ -319,7 +318,7 @@ inline QVector ZToQVector(ZVector const &v)
 inline IntVector ZToIntVector(ZVector const &v)
 {
   IntVector ret(v.size());
-  for(int i=0;i<v.size();i++)ret[i]=v[i].toInt();
+  for(unsigned i=0;i<v.size();i++)ret[i]=v[i].toInt();
   return ret;
 }
 
@@ -327,7 +326,7 @@ inline IntVector ZToIntVector(ZVector const &v)
 inline ZVector IntToZVector(IntVector const &v)
 {
   ZVector ret(v.size());
-  for(int i=0;i<v.size();i++)ret[i]=Integer(v[i]);
+  for(unsigned i=0;i<v.size();i++)ret[i]=Integer(v[i]);
   return ret;
 }
 

@@ -690,6 +690,7 @@ void ZCone::ensureStateAsMinimum(int s)const
         {
           QMatrix m=ZToQMatrix(equations);
           m.reduce();
+          m.REformToRREform();
           ZMatrix inequalities2(0,equations.getWidth());
           for(int i=0;i<inequalities.getHeight();i++)
             {
@@ -707,8 +708,8 @@ void ZCone::ensureStateAsMinimum(int s)const
   if((state<3) && (s>=3))
     {
       QMatrix equations2=ZToQMatrix(equations);
-      equations2.reduce();
-
+      equations2.reduce(false,false,true);
+      equations2.REformToRREform();
       for(int i=0;i<inequalities.getHeight();i++)
         {
           inequalities[i]=QToZVectorPrimitive(equations2.canonicalize(ZToQVector(inequalities[i])));
@@ -731,6 +732,8 @@ std::ostream &operator<<(std::ostream &f, ZCone const &c)
 
 
 ZCone::ZCone(int ambientDimension):
+  inequalities(ZMatrix(0,ambientDimension)),
+  equations(ZMatrix(0,ambientDimension)),
   n(ambientDimension),
   state(1),
   preassumptions(PCP_impliedEquationsKnown|PCP_facetsKnown),
@@ -919,26 +922,11 @@ ZCone ZCone::positiveOrthant(int dimension)
 
 ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpace)
 {
-  //rewrite modulo lineality space
-  ZMatrix newGenerators(generators.getHeight(),generators.getWidth());
-  {
-    QMatrix l=ZToQMatrix(linealitySpace);
-    l.reduce();
-    for(int i=0;i<generators.getHeight();i++)
-      newGenerators[i]=QToZVectorPrimitive(l.canonicalize(ZToQVector(generators[i])));
-  }
-
-  ZCone dual(newGenerators,linealitySpace);
-  dual.findFacets();
-  dual.canonicalize();
+  ZCone dual(generators,linealitySpace);
   ZMatrix inequalities=dual.extremeRays();
+  ZMatrix equations=dual.generatorsOfLinealitySpace();
 
-  ZMatrix span=generators;
-  span.append(linealitySpace);
-  QMatrix m2Q=ZToQMatrix(span);
-  ZMatrix equations=QToZMatrixPrimitive(m2Q.reduceAndComputeKernel());
-
-  return ZCone(inequalities,equations);
+  return ZCone(inequalities,equations,3);
 }
 
 
@@ -1218,6 +1206,17 @@ ZCone ZCone::link(ZVector const &w)const
   C.setMultiplicity(getMultiplicity());
 
   return C;
+}
+
+bool ZCone::hasFace(ZCone const &f)const
+{
+  if(!contains(f.getRelativeInteriorPoint()))return false;
+  ZCone temp1=faceContaining(f.getRelativeInteriorPoint());
+  temp1.canonicalize();
+  ZCone temp2=f;
+  temp2.canonicalize();
+
+  return !(temp2!=temp1);
 }
 
 ZCone ZCone::faceContaining(ZVector const &v)const

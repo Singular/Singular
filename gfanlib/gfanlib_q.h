@@ -30,8 +30,8 @@ public:
   Rational(signed long int value_)
   {
     mpq_init(value);
-    mpz_init_set_si(mpq_numref(value), value_);
-    mpz_init_set_ui(mpq_denref(value), 1);
+    mpz_set_si(mpq_numref(value), value_);
+    mpz_set_ui(mpq_denref(value), 1);
     mpq_canonicalize(value);
   }
   Rational(Rational const & value_)
@@ -47,8 +47,8 @@ public:
   explicit Rational(Integer const & value_)
   {
     mpq_init(value);
-    mpz_init_set(mpq_numref(value), value_.value);
-    mpz_init_set_ui(mpq_denref(value), 1);
+    mpz_set(mpq_numref(value), value_.value);
+    mpz_set_ui(mpq_denref(value), 1);
     mpq_canonicalize(value);
   }
   ~Rational()

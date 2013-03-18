@@ -22,10 +22,12 @@
 #include <kernel/febase.h>
 #include <kernel/timer.h>
 
-#ifdef HAVE_FANS
-#include <kernel/bbcone.h>
-#include <kernel/bbfan.h>
-#endif
+// #ifdef HAVE_FANS
+// #include <callgfanlib/bbcone.h>
+// #include <callgfanlib/bbpolytope.h>
+// #include <callgfanlib/bbfan.h>
+// #include <callgfanlib/gitfan.h>
+// #endif
 
 #include "ipshell.h"
 #include "cntrlc.h"
@@ -176,10 +178,12 @@ int main(          /* main entry to Singular */
 #ifdef SI_COUNTEDREF_AUTOLOAD
   countedref_init();
 #endif
-#ifdef HAVE_FANS
-  bbcone_setup();
-  bbfan_setup();
-#endif /* HAVE_FANS */
+// #ifdef HAVE_FANS
+//   bbcone_setup();
+//   bbpolytope_setup();
+//   bbfan_setup();
+//   gitfan_setup();
+// #endif /* HAVE_FANS */
   errorreported = 0;
 
   // -- example for "static" modules ------
