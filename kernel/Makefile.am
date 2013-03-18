@@ -27,12 +27,12 @@ libkernel_g_la_CFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE}
 
 libkernel_la_CXXFLAGS   = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 libkernel_g_la_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
-# -fdiagnostics-show-option 
+# -fdiagnostics-show-option
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)
 
 libkernel_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-libkernel_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
+libkernel_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 SOURCES = polys.cc febase.cc feread.cc \
     hdegree.cc hilb.cc hutil.cc \
@@ -51,9 +51,9 @@ SOURCES = polys.cc febase.cc feread.cc \
     eigenval.cc units.cc \
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
-    ratgring.cc shiftgb.cc gfan.cc \
+    ratgring.cc shiftgb.cc \
     linearAlgebra.cc preimage.cc \
-    mod2.h 
+    mod2.h
 
 libkernel_la_SOURCES   = $(SOURCES)
 libkernel_g_la_SOURCES = $(SOURCES)
@@ -71,7 +71,6 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	ratgring.h shiftgb.h nc.h \
-	gfan.h bbcone.h bbfan.h \
 	preimage.h longrat.h timer.h kInline.h modulop.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
 	linearAlgebra.h \
@@ -94,9 +93,9 @@ TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 
 if WANT_DEBUG
-TESTS = test-s-g test-s-r test-d-g test-d-r 
+TESTS = test-s-g test-s-r test-d-g test-d-r
 else
-TESTS = test-s-r test-d-r 
+TESTS = test-s-r test-d-r
 endif
 check_PROGRAMS = $(TESTS)
 
@@ -114,7 +113,7 @@ test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lo
 test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
+test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 test_s_r_LDFLAGS = -static ${AMLDFLAGS}
 test_s_g_LDFLAGS = -static ${AMLDFLAGS}
@@ -133,17 +132,17 @@ test_d_r_LDADD = -lkernel -lpolys -lcoeffs  -lreporter -lmisc $(FACTORY_LIBS) -l
 test_d_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
+test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 test_d_r_LDFLAGS = ${AMLDFLAGS}
 test_d_g_LDFLAGS = ${AMLDFLAGS}
 
 # These files are built first
-# BUILT_SOURCES = MOD 
+# BUILT_SOURCES = MOD
 
 # MOD: ${top_builddir}/libpolys/tests/MOD
 # 	ln -snf ${top_builddir}/libpolys/tests/MOD ${builddir}/MOD
 
 
-CLEANFILES = $(TESTS) 
+CLEANFILES = $(TESTS)
 # $(BUILT_SOURCES)

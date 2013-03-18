@@ -32,9 +32,9 @@ RANLIB 		= @RANLIB@
 ## compiler and linker options
 ##
 PIPE		= -pipe
-CFLAGS		= @CFLAGS@ ${PIPE}
-CXXFLAGS	= @CXXFLAGS@ ${PIPE}
-#CXXTEMPLFLAGS	= -fno-implicit-templates
+CFLAGS		= -fpic @CFLAGS@ ${PIPE}
+CXXFLAGS	= -fpic @CXXFLAGS@ ${PIPE}
+#CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir}
 DEFS		= -DGMPRATIONAL
 

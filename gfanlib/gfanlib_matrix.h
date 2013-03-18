@@ -20,9 +20,9 @@ template <class typ> class Matrix{
 public:
   inline int getHeight()const{return height;};
   inline int getWidth()const{return width;};
-  Matrix(const Matrix &a):rows(a.rows),width(a.getWidth()),height(a.getHeight()){
+  Matrix(const Matrix &a):width(a.getWidth()),height(a.getHeight()),rows(a.rows){
   }
-  Matrix(int height_, int width_):rows(height_),height(height_),width(width_){
+  Matrix(int height_, int width_):width(width_),height(height_),rows(height_){
     assert(height>=0);
     assert(width>=0);
     for(int i=0;i<getHeight();i++)rows[i]=Vector<typ>(width);
@@ -103,14 +103,14 @@ public:
       for(int i=0;i<q.height;i++)p[i]=s*(q[i]);
       return p;
     }
-/*  friend Matrix operator*(const Matrix& a, const Matrix& b)
+  friend Matrix operator*(const Matrix& a, const Matrix& b)
     {
       assert(a.width==b.height);
       Matrix ret(b.width,a.height);
       for(int i=0;i<b.width;i++)
         ret[i]=a.vectormultiply(b.column(i));
       return ret.transposed();
-    }*/
+    }
   /*  template<class T>
     Matrix<T>(const Matrix<T>& c):v(c.size()){
     for(int i=0;i<size();i++)v[i]=typ(c[i]);}
@@ -305,7 +305,7 @@ public:
      make the routine terminate before completion if it discovers that
      the determinant is zero.
   */
-  int reduce(bool returnIfZeroDeterminant=false, bool integral=false)
+  int reduce(bool returnIfZeroDeterminant=false, bool integral=false, bool makePivotsOne=false)
   {
     assert(integral || typ::isField());
     int retSwaps=0;
@@ -321,6 +321,17 @@ public:
               {
                 swapRows(currentRow,s);
                 retSwaps++;
+              }
+            if(makePivotsOne)
+              {//THE PIVOT SHOULD BE SET TO ONE IF INTEGRAL IS FALSE
+                if(!rows[currentRow][i].sign()<0)retSwaps++;
+                typ inverse=typ(1)/rows[currentRow][i];
+                //                if(!rows[currentRow][i].isOne())
+                  {
+                    for(int k=0;k<width;k++)
+                      if(!rows[currentRow][k].isZero())
+                        rows[currentRow][k]*=inverse;
+                  }
               }
             for(int j=currentRow+1;j<height;j++)
               if(integral)
@@ -504,7 +515,10 @@ public:
    */
   int reduceAndComputeRank()
   {
-    reduce();
+    if (typ::isField())
+      reduce();
+    else
+      reduce(false,true,false);
     int ret=0;
     int pivotI=-1;
     int pivotJ=-1;
