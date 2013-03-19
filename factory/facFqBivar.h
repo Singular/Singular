@@ -547,6 +547,7 @@ factorRecombination (
             CanonicalForm& F,           ///< [in,out] poly to be factored
             const CanonicalForm& M,     ///< [in] Variable (2)^liftBound
             DegreePattern& degs,        ///< [in] degree pattern
+            const CanonicalForm& eval,  ///< [in] evaluation point
             int s,                      ///< [in] algorithm starts checking
                                         ///< subsets of size s
             int thres,                  ///< [in] threshold for the size of
@@ -600,7 +601,8 @@ earlyFactorDetection (
                                    ///< whenever we find a factor
            bool& success,          ///< [in,out] indicating success
            int deg,                ///< [in] stage of Hensel lifting
-           const modpk& b= modpk() ///< [in] coeff bound
+           const CanonicalForm& eval, ///<[in] evaluation point
+           const modpk& b= modpk()///< [in] coeff bound
                      );
 
 /// detects factors of @a F at stage @a deg of Hensel lifting.
