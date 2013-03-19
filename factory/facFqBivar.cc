@@ -47,6 +47,12 @@ TIMING_DEFINE_PRINT(fac_fq_bi_hensel_lift)
 TIMING_DEFINE_PRINT(fac_fq_bi_factor_recombination)
 TIMING_DEFINE_PRINT(fac_fq_bi_evaluation)
 TIMING_DEFINE_PRINT(fac_fq_bi_shift_to_zero)
+TIMING_DEFINE_PRINT(fac_fq_logarithmic)
+TIMING_DEFINE_PRINT(fac_fq_compute_lattice_lift)
+TIMING_DEFINE_PRINT(fac_fq_till_reduced)
+TIMING_DEFINE_PRINT(fac_fq_reconstruction)
+TIMING_DEFINE_PRINT(fac_fq_lift)
+TIMING_DEFINE_PRINT(fac_fq_uni_total)
 
 CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M, const modpk& b)
 {
@@ -2361,6 +2367,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   Variable y= F.mvar();
   while (l <= liftBound)
   {
+    TIMING_START (fac_fq_compute_lattice_lift);
     if (start)
     {
       henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
@@ -2373,12 +2380,15 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
       else
         henselLift12 (F, factors, l, Pi, diophant, M);
     }
+    TIMING_END_AND_PRINT (fac_fq_compute_lattice_lift,
+                          "time to lift in compute lattice: ");
 
     factors.insert (LCF);
     j= factors;
     j++;
 
     truncF= mod (F, power (y, l));
+    TIMING_START (fac_fq_logarithmic);
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
@@ -2387,6 +2397,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
         A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]);
     }
+    TIMING_END_AND_PRINT (fac_fq_logarithmic,
+                          "time to compute logarithmic derivative: ");
 
     for (int i= 0; i < sizeBounds; i++)
     {
@@ -2478,6 +2490,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   Variable y= F.mvar();
   while (l <= liftBound)
   {
+    TIMING_START (fac_fq_compute_lattice_lift);
     if (start)
     {
       henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
@@ -2490,12 +2503,15 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
       else
         henselLift12 (F, factors, l, Pi, diophant, M);
     }
+    TIMING_END_AND_PRINT (fac_fq_compute_lattice_lift,
+                          "time to lift in compute lattice: ");
 
     factors.insert (LCF);
     j= factors;
     j++;
 
     truncF= mod (F, power (y, l));
+    TIMING_START (fac_fq_logarithmic);
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
@@ -2504,6 +2520,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
         A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]);
     }
+    TIMING_END_AND_PRINT (fac_fq_logarithmic,
+                          "time to compute logarithmic derivative: ");
 
     for (int i= 0; i < sizeBounds; i++)
     {
@@ -2625,6 +2643,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   CFListIterator j;
   while (l <= liftBound)
   {
+    TIMING_START (fac_fq_compute_lattice_lift);
     if (start)
     {
       henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
@@ -2637,6 +2656,8 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
       else
         henselLift12 (F, factors, l, Pi, diophant, M);
     }
+    TIMING_END_AND_PRINT (fac_fq_compute_lattice_lift,
+                          "time to lift in compute lattice: ");
 
     factors.insert (LCF);
 
@@ -2665,6 +2686,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
     j++;
 
     truncF= mod (F, power (y, l));
+    TIMING_START (fac_fq_logarithmic);
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (!wasInBounds)
@@ -2673,6 +2695,8 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         A[i]= logarithmicDerivative (truncF, j.getItem(), l, oldL, bufQ[i],
                                      bufQ[i]);
     }
+    TIMING_END_AND_PRINT (fac_fq_logarithmic,
+                          "time to compute logarithmic derivative: ");
 
     for (int i= 0; i < sizeBounds; i++)
     {
@@ -3003,6 +3027,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   CanonicalForm truncF;
   while (l <= liftBound)
   {
+    TIMING_START (fac_fq_compute_lattice_lift);
     if (start)
     {
       henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
@@ -3015,12 +3040,15 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
       else
         henselLift12 (F, factors, l, Pi, diophant, M);
     }
+    TIMING_END_AND_PRINT (fac_fq_compute_lattice_lift,
+                          "time to lift in compute lattice: ");
 
     factors.insert (LCF);
     j= factors;
     j++;
 
     truncF= mod (F, power (y,l));
+    TIMING_START (fac_fq_logarithmic);
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (l == (minBound+1)*2)
@@ -3034,6 +3062,8 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
                                     );
       }
     }
+    TIMING_END_AND_PRINT (fac_fq_logarithmic,
+                          "time to compute logarithmic derivative: ");
 
     for (int i= 0; i < sizeBounds; i++)
     {
@@ -3145,6 +3175,7 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
   CanonicalForm truncF;
   while (l <= liftBound)
   {
+    TIMING_START (fac_fq_compute_lattice_lift);
     if (start)
     {
       henselLiftResume12 (F, factors, start, l, Pi, diophant, M);
@@ -3157,12 +3188,15 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
       else
         henselLift12 (F, factors, l, Pi, diophant, M);
     }
+    TIMING_END_AND_PRINT (fac_fq_compute_lattice_lift,
+                          "time to lift in compute lattice: ");
 
     factors.insert (LCF);
     j= factors;
     j++;
 
     truncF= mod (F, power (y,l));
+    TIMING_START (fac_fq_logarithmic);
     for (int i= 0; i < factors.length() - 1; i++, j++)
     {
       if (l == (minBound+1)*2)
@@ -3176,6 +3210,8 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
                                     );
       }
     }
+    TIMING_END_AND_PRINT (fac_fq_logarithmic,
+                          "time to compute logarithmic derivative: ");
 
     for (int i= 0; i < sizeBounds; i++)
     {
@@ -5693,21 +5729,27 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
   {
     if (l < smallFactorDeg)
     {
+      TIMING_START (fac_fq_lift);
       factors.insert (LCF);
       henselLiftResume12 (F, factors, l, smallFactorDeg, Pi, diophant, M);
+      TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction0: ");
       l= smallFactorDeg;
     }
 #ifdef HAVE_FLINT
+    TIMING_START (fac_fq_reconstruction);
     reconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                        factorsFoundIndex, FLINTN, evaluation, beenInThres
                       );
+    TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct0: ");
     if (result.length() == nmod_mat_ncols (FLINTN))
     {
       nmod_mat_clear (FLINTN);
 #else
+    TIMING_START (fac_fq_reconstruction);
     reconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                        factorsFoundIndex, NTLN, evaluation, beenInThres
                       );
+    TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct0: ");
     if (result.length() == NTLN.NumCols())
     {
 #endif
@@ -5726,7 +5768,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
       if (l < liftPre[i-1] + 1)
       {
         factors.insert (LCF);
+        TIMING_START (fac_fq_lift);
         henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction1: ");
         l= liftPre[i-1] + 1;
       }
       else
@@ -5736,16 +5780,20 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
           continue;
       }
 #ifdef HAVE_FLINT
+      TIMING_START (fac_fq_reconstruction);
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, FLINTN, evaluation, beenInThres
                         );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct1: ");
       if (result.length() == nmod_mat_ncols (FLINTN))
       {
         nmod_mat_clear (FLINTN);
 #else
+      TIMING_START (fac_fq_reconstruction);
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, NTLN, evaluation, beenInThres
                         );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct1: ");
       if (result.length() == NTLN.NumCols())
       {
 #endif
@@ -5767,7 +5815,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
       if (l < dummy)
       {
         factors.insert (LCF);
+        TIMING_START (fac_fq_lift);
         henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction2: ");
         l= dummy;
         if (i == 1 && degree (F)%4==0 && symmetric && factors.length() == 2 &&
             LC (F,1).inCoeffDomain() &&
@@ -5818,16 +5868,20 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
           continue;
       }
 #ifdef HAVE_FLINT
+      TIMING_START (fac_fq_reconstruction);
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, FLINTN, evaluation, beenInThres
                         );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct2: ");
       if (result.length() == nmod_mat_ncols (FLINTN))
       {
         nmod_mat_clear (FLINTN);
 #else
+      TIMING_START (fac_fq_reconstruction);
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, NTLN, evaluation, beenInThres
                         );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct2: ");
       if (result.length() == NTLN.NumCols())
       {
 #endif
@@ -5871,13 +5925,17 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
   {
     if (l < smallFactorDeg)
     {
+      TIMING_START (fac_fq_lift);
       factors.insert (LCF);
       henselLiftResume12 (F, factors, l, smallFactorDeg, Pi, diophant, M);
+      TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction0: ");
       l= smallFactorDeg;
     }
+    TIMING_START (fac_fq_reconstruction);
     reconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                        factorsFoundIndex, NTLN, evaluation, beenInThres
                       );
+    TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct0: ");
     if (result.length() == NTLN.NumCols())
     {
       delete [] liftPre;
@@ -5895,7 +5953,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
       if (l < liftPre[i-1] + 1)
       {
         factors.insert (LCF);
+        TIMING_START (fac_fq_lift);
         henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction1: ");
         l= liftPre[i-1] + 1;
       }
       else
@@ -5904,9 +5964,11 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
         if (i != 0)
           continue;
       }
+      TIMING_START (fac_fq_reconstruction);
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, NTLN, evaluation, beenInThres
                         );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct1: ");
       if (result.length() == NTLN.NumCols())
       {
         delete [] liftPre;
@@ -5927,7 +5989,9 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
       if (l < dummy)
       {
         factors.insert (LCF);
+        TIMING_START (fac_fq_lift);
         henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction2: ");
         l= dummy;
         if (i == 1 && degree (F)%4==0 && symmetric && factors.length() == 2 &&
             LC (F,1).inCoeffDomain() &&
@@ -5956,10 +6020,11 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
           hh= multiplier2*hh+mod (factors.getFirst(), power (y,m));
           check1= gg (y-evaluation,y);
           check2= hh (y-evaluation,y);
+          CanonicalForm oldcheck1= check1;
           check1= swapvar (check1, x, y);
           if (check1/Lc (check1) == check2/Lc (check2))
           {
-            result.append (check1);
+            result.append (oldcheck1);
             result.append (check2);
             delete [] liftPre;
             delete [] factorsFoundIndex;
@@ -5973,9 +6038,11 @@ earlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_pE& N,
         if (i < 5)
           continue;
       }
+      TIMING_START (fac_fq_reconstruction);
       reconstructionTry (result, bufF, factors, l, factorsFound,
                          factorsFoundIndex, NTLN, evaluation, beenInThres
                         );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct2: ");
       if (result.length() == NTLN.NumCols())
       {
         delete [] liftPre;
@@ -6017,14 +6084,18 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
   {
     if (l < smallFactorDeg)
     {
+      TIMING_START (fac_fq_lift);
       factors.insert (LCF);
       henselLiftResume12 (F, factors, l, smallFactorDeg, Pi, diophant, M);
+      TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction0: ");
       l= smallFactorDeg;
     }
+    TIMING_START (fac_fq_reconstruction);
     extReconstructionTry (result, bufF, factors, smallFactorDeg, factorsFound,
                           factorsFoundIndex, NTLN, beenInThres, info,
                           evaluation
                       );
+    TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct0: ");
     if (result.length() == NTLN.NumCols())
     {
       delete [] liftPre;
@@ -6042,7 +6113,9 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
       if (l < liftPre[i-1] + 1)
       {
         factors.insert (LCF);
+        TIMING_START (fac_fq_lift);
         henselLiftResume12 (F, factors, l, liftPre[i-1] + 1, Pi, diophant, M);
+        TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction1: ");
         l= liftPre[i-1] + 1;
       }
       else
@@ -6051,10 +6124,12 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
         if (i != 0)
           continue;
       }
+      TIMING_START (fac_fq_reconstruction);
       extReconstructionTry (result, bufF, factors, l, factorsFound,
                             factorsFoundIndex, NTLN, beenInThres, info,
                             evaluation
                            );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct1: ");
       if (result.length() == NTLN.NumCols())
       {
         delete [] liftPre;
@@ -6075,7 +6150,9 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
       if (l < dummy)
       {
         factors.insert (LCF);
+        TIMING_START (fac_fq_lift);
         henselLiftResume12 (F, factors, l, dummy, Pi, diophant, M);
+        TIMING_END_AND_PRINT (fac_fq_lift, "time to lift in reconstruction2: ");
         l= dummy;
       }
       else
@@ -6084,10 +6161,12 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
         if (i < 5)
           continue;
       }
+      TIMING_START (fac_fq_reconstruction);
       extReconstructionTry (result, bufF, factors, l, factorsFound,
                             factorsFoundIndex, NTLN, beenInThres, info,
                             evaluation
                            );
+      TIMING_END_AND_PRINT (fac_fq_reconstruction, "time to reconstruct2: ");
       if (result.length() == NTLN.NumCols())
       {
         delete [] liftPre;
@@ -6362,6 +6441,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
   CFArray bufQ= CFArray (bufUniFactors.length() - 1);
 
   int oldL;
+  TIMING_START (fac_fq_till_reduced);
   if (success)
   {
     int start= 0;
@@ -6426,6 +6506,8 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     }
   }
 
+  TIMING_END_AND_PRINT (fac_fq_till_reduced,
+                        "time to compute a reduced lattice: ");
   bufUniFactors.removeFirst();
   if (oldL > liftBound)
   {
@@ -7198,6 +7280,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   CFArray bufQ= CFArray (bufUniFactors.length() - 1);
 
   int oldL;
+  TIMING_START (fac_fq_till_reduced);
   if (success)
   {
     int start= 0;
@@ -7214,6 +7297,8 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
                                     source, dest
                                    );
   }
+  TIMING_END_AND_PRINT (fac_fq_till_reduced,
+                        "time to compute a reduced lattice: ");
 
   bufUniFactors.removeFirst();
   if (oldL > liftBound)
@@ -7689,6 +7774,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   int subCheck1= substituteCheck (A, x);
   int subCheck2= substituteCheck (A, y);
   bool symmetric= false;
+
+  TIMING_START (fac_fq_uni_total);
   for (int i= 0; i < factorNums; i++)
   {
     bufAeval= A;
@@ -7870,6 +7957,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     if (!derivXZero && !fail2 && !symmetric)
       list2.append (bufEvaluation2);
   }
+  TIMING_END_AND_PRINT (fac_fq_uni_total,
+                        "total time for univariate factorizations: ");
 
   if (!derivXZero && !fail2 && !symmetric)
   {
