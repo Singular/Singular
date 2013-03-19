@@ -12,6 +12,8 @@
 
 #include "config.h"
 
+#include "timing.h"
+
 #include "cf_map.h"
 #include "algext.h"
 #include "cf_map_ext.h"
@@ -27,6 +29,9 @@
 #include "facHensel.h"
 #include "facMul.h"
 
+TIMING_DEFINE_PRINT(fac_log_deriv_div)
+TIMING_DEFINE_PRINT(fac_log_deriv_mul)
+TIMING_DEFINE_PRINT(fac_log_deriv_pre)
 
 void append (CFList& factors1, const CFList& factors2)
 {
@@ -449,9 +454,13 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CanonicalForm q,r;
   CanonicalForm logDeriv;
 
+  TIMING_START (fac_log_deriv_div);
   q= newtonDiv (F, G, xToL);
+  TIMING_END_AND_PRINT (fac_log_deriv_div, "time for division in logderiv1: ");
 
+  TIMING_START (fac_log_deriv_mul);
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
+  TIMING_END_AND_PRINT (fac_log_deriv_mul, "time to multiply in logderiv1: ");
 
   int j= degree (logDeriv, y) + 1;
   CFArray result= CFArray (j);
@@ -479,6 +488,7 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CanonicalForm logDeriv;
 
   CanonicalForm bufF;
+  TIMING_START (fac_log_deriv_pre);
   if ((oldL > 100 && l - oldL < 50) || (oldL < 100 && l - oldL < 30))
   {
     bufF= F;
@@ -510,15 +520,20 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
     bufF= div (F, xToOldL);
     bufF -= Up;
   }
+  TIMING_END_AND_PRINT (fac_log_deriv_pre, "time to preprocess: ");
 
+  TIMING_START (fac_log_deriv_div);
   if (l-oldL > 0)
     q= newtonDiv (bufF, G, xToLOldL);
   else
     q= 0;
   q *= xToOldL;
   q += oldQ;
+  TIMING_END_AND_PRINT (fac_log_deriv_div, "time for div in logderiv2: ");
 
+  TIMING_START (fac_log_deriv_mul);
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
+  TIMING_END_AND_PRINT (fac_log_deriv_mul, "time for mul in logderiv2: ");
 
   int j= degree (logDeriv,y) + 1;
   CFArray result= CFArray (j);
