@@ -1839,7 +1839,7 @@ static void VMrDefault(intvec* va)
 
   r->cf  = currRing->cf;
   r->N   = currRing->N;
-  int nb = rBlocks(currRing) + 1;//31.10.01 (+1)
+  int nb = 4;
 
   /*names*/
   char* Q; //30.10.01 to avoid the corrupted memory, NOT change!!
@@ -1850,12 +1850,11 @@ static void VMrDefault(intvec* va)
     r->names[i]  = omStrDup(Q);
   }
 
-  intvec* iva = va;  //why?
   /*weights: entries for 3 blocks: NULL Made:???*/
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   r->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
   for(i=0; i<nv; i++)
-    r->wvhdl[0][i] = (*iva)[i];
+    r->wvhdl[0][i] = (*va)[i];
 
   /* order: a,lp,C,0 */
   r->order = (int *) omAlloc(nb * sizeof(int *));
@@ -1966,28 +1965,26 @@ static void DefRingPar(intvec* va)
   res->ref=0;
 
   res->cf = currRing->cf; currRing->cf->ref++;
-            
+
 //   if (currRing->cf->extRing!=NULL)
 //     currRing->cf->extRing->ref++;
-// 
+//
 //   if (rParameter (currRing)!=NULL)
 //   {
 //     res->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0],currRing->cf->extRing);
 //     int l=rPar(currRing);
-//     
+//
 //     res->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-// 
+//
 //     for(i=l-1;i>=0;i--)
 //       rParameter (res)[i]=omStrDup(rParameter (currRing)[i]);
 //   }
-
-  intvec* iva = va;
 
   /*weights: entries for 3 blocks: NULL Made:???*/
   res->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   res->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
   for(i=0; i<nv; i++)
-    res->wvhdl[0][i] = (*iva)[i];
+    res->wvhdl[0][i] = (*va)[i];
 
   /* order: a,lp,C,0 */
   res->order = (int *) omAlloc(nb * sizeof(int *));
@@ -2049,16 +2046,16 @@ static void DefRingParlp(void)
   r->ref=0;
 
   r->cf = currRing->cf; currRing->cf->ref++;
-  
+
 //   if (currRing->cf->extRing!=NULL)
 //     currRing->cf->extRing->ref++;
-// 
+//
 //   if (rParameter (currRing)!=NULL)
 //   {
 //     r->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0], currRing->cf->extRing);
 //     int l=rPar(currRing);
 //     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-// 
+//
 //     for(i=l-1;i>=0;i--)
 //       rParameter(r)[i]=omStrDup(rParameter (currRing)[i]);
 //   }
@@ -2106,7 +2103,7 @@ static void DefRingParlp(void)
 //     r->cf->extRing->qideal->m[0]=p_Copy(currRing->cf->extRing->qideal->m[0], currRing->cf->extRing);
 //     int l=rPar(currRing);
 //     r->cf->extRing->names=(char **)omAlloc(l*sizeof(char_ptr));
-// 
+//
 //     for(i=l-1;i>=0;i--)
 //       rParameter(r)[i]=omStrDup(rParameter(currRing)[i]);
 //   }
