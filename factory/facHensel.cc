@@ -6,10 +6,7 @@
  * This file implements functions to lift factors via Hensel lifting.
  *
  * ABSTRACT: Hensel lifting is described in "Efficient Multivariate
- * Factorization over Finite Fields" by L. Bernardin & M. Monagon. Division with
- * remainder is described in "Fast Recursive Division" by C. Burnikel and
- * J. Ziegler. Karatsuba multiplication is described in "Modern Computer
- * Algebra" by J. von zur Gathen and J. Gerhard.
+ * Factorization over Finite Fields" by L. Bernardin & M. Monagon.
  *
  * @author Martin Lee
  *
@@ -1755,15 +1752,23 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
     if (j + 2 <= M.rows())
       M (j + 2, 1)= mulNTL (bufFactors[0] [j + 1], bufFactors[1] [j + 1]);
   }
+  else
+    M (j + 1, 1)= 0;
+
   CanonicalForm uIZeroJ;
   if (degBuf0 > 0 && degBuf1 > 0)
-    uIZeroJ= mulNTL(bufFactors[0][0],buf[1])+mulNTL (bufFactors[1][0], buf[0]);
+    uIZeroJ= mulNTL(bufFactors[0][0], buf[1]) +
+             mulNTL (bufFactors[1][0], buf[0]);
   else if (degBuf0 > 0)
-    uIZeroJ= mulNTL (buf[0], bufFactors[1]);
+    uIZeroJ= mulNTL (buf[0], bufFactors[1]) +
+             mulNTL (buf[1], bufFactors[0][0]);
   else if (degBuf1 > 0)
-    uIZeroJ= mulNTL (bufFactors[0], buf [1]);
+    uIZeroJ= mulNTL (bufFactors[0], buf[1]) +
+             mulNTL (buf[0], bufFactors[1][0]);
   else
-    uIZeroJ= 0;
+    uIZeroJ= mulNTL (bufFactors[0], buf[1]) +
+             mulNTL (buf[0], bufFactors[1]);
+
   Pi [0] += xToJ*uIZeroJ;
 
   CFArray tmp= CFArray (factors.length() - 1);
@@ -1778,22 +1783,20 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
     while (two.hasTerms() && two.exp() > j) two++;
     for (k= 1; k <= (int) ceil (j/2.0); k++)
     {
-      if (one.hasTerms() && two.hasTerms())
+      if (k != j - k + 1)
       {
-        if (k != j - k + 1)
-        {
-          if ((one.hasTerms() && one.exp() == j - k + 1) && +
-              (two.hasTerms() && two.exp() == j - k + 1))
+        if ((one.hasTerms() && one.exp() == j - k + 1) && +
+            (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()),(bufFactors[1][k] +
-                      two.coeff())) - M (k + 1, 1) - M (j - k + 2, 1);
+                    two.coeff())) - M (k + 1, 1) - M (j - k + 2, 1);
           one++;
           two++;
         }
         else if (one.hasTerms() && one.exp() == j - k + 1)
         {
           tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()), bufFactors[1] [k]) -
-                      M (k + 1, 1);
+                    M (k + 1, 1);
           one++;
         }
         else if (two.hasTerms() && two.exp() == j - k + 1)
@@ -1805,7 +1808,6 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
       }
       else
         tmp[0] += M (k + 1, 1);
-      }
     }
   }
 
@@ -1844,16 +1846,21 @@ nonMonicHenselStep12 (const CanonicalForm& F, const CFList& factors,
       if (j + 2 <= M.rows())
         M (j + 2, l + 1)= mulNTL (Pi [l - 1][j + 1], bufFactors[l + 1] [j + 1]);
     }
+    else
+      M (j + 1, l + 1)= 0;
 
     if (degPi > 0 && degBuf > 0)
-      uIZeroJ= mulNTL (Pi[l -1] [0], buf[l + 1]) +
+      uIZeroJ= mulNTL (Pi[l - 1] [0], buf[l + 1]) +
                mulNTL (uIZeroJ, bufFactors[l+1] [0]);
     else if (degPi > 0)
-      uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1]);
+      uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1]) +
+               mulNTL (Pi[l - 1][0], buf[l + 1]);
     else if (degBuf > 0)
-      uIZeroJ= mulNTL (Pi[l - 1], buf[l+1]);
+      uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1][0]) +
+               mulNTL (Pi[l - 1], buf[l + 1]);
     else
-      uIZeroJ= 0;
+      uIZeroJ= mulNTL (uIZeroJ, bufFactors[l + 1]) +
+               mulNTL (Pi[l - 1], buf[l + 1]);
 
     Pi [l] += xToJ*uIZeroJ;
 
