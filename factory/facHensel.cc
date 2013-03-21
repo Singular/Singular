@@ -2142,17 +2142,22 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
     if (j + 2 <= M.rows())
       M (j + 2, 1)= mulMod (bufFactors[0] [j + 1], bufFactors[1] [j + 1], MOD);
   }
-  CanonicalForm uIZeroJ;
+  else
+    M (j + 1, 1)= 0;
 
+  CanonicalForm uIZeroJ;
   if (degBuf0 > 0 && degBuf1 > 0)
     uIZeroJ= mulMod (bufFactors[0] [0], buf[1], MOD) +
              mulMod (bufFactors[1] [0], buf[0], MOD);
   else if (degBuf0 > 0)
-    uIZeroJ= mulMod (buf[0], bufFactors[1], MOD);
+    uIZeroJ= mulMod (buf[0], bufFactors[1], MOD) +
+             mulMod (buf[1], bufFactors[0][0], MOD);
   else if (degBuf1 > 0)
-    uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
+    uIZeroJ= mulMod (bufFactors[0], buf[1], MOD) +
+             mulMod (buf[0], bufFactors[1][0], MOD);
   else
-    uIZeroJ= 0;
+    uIZeroJ= mulMod (bufFactors[0], buf[1], MOD) +
+             mulMod (buf[0], bufFactors[1], MOD);
   Pi [0] += xToJ*uIZeroJ;
 
   CFArray tmp= CFArray (factors.length() - 1);
@@ -2234,16 +2239,21 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
         M (j + 2, l + 1)= mulMod (Pi [l - 1] [j + 1], bufFactors[l + 1] [j + 1],
                                   MOD);
     }
+    else
+      M (j + 1, l + 1)= 0;
 
     if (degPi > 0 && degBuf > 0)
-      uIZeroJ= mulMod (Pi[l -1] [0], buf[l + 1], MOD) +
-               mulMod (uIZeroJ, bufFactors[l+1] [0], MOD);
+      uIZeroJ= mulMod (Pi[l - 1] [0], buf[l + 1], MOD) +
+               mulMod (uIZeroJ, bufFactors[l + 1] [0], MOD);
     else if (degPi > 0)
-      uIZeroJ= mulMod (uIZeroJ, bufFactors[l + 1], MOD);
+      uIZeroJ= mulMod (uIZeroJ, bufFactors[l + 1], MOD) +
+               mulMod (Pi[l - 1][0], buf[l + 1], MOD);
     else if (degBuf > 0)
-      uIZeroJ= mulMod (Pi[l - 1], buf[l + 1], MOD);
+      uIZeroJ= mulMod (Pi[l - 1], buf[l + 1], MOD) +
+               mulMod (uIZeroJ, bufFactors[l + 1][0], MOD);
     else
-      uIZeroJ= 0;
+      uIZeroJ= mulMod (Pi[l - 1], buf[l + 1], MOD) +
+               mulMod (uIZeroJ, bufFactors[l + 1], MOD);
 
     Pi [l] += xToJ*uIZeroJ;
 
