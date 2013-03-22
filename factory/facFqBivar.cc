@@ -231,17 +231,21 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   else
   {
 #ifdef HAVE_FLINT
-    nmod_poly_t FLINTA;
-    convertFacCF2nmod_poly_t (FLINTA, A);
-    nmod_poly_factor_t result;
-    nmod_poly_factor_init (result);
-    mp_limb_t leadingCoeff= nmod_poly_factor (result, FLINTA);
-    factorsA= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, x);
-    if (factorsA.getFirst().factor().inCoeffDomain())
-      factorsA.removeFirst();
-    nmod_poly_factor_clear (result);
-    nmod_poly_clear (FLINTA);
-#else
+    if (degree (A) < 300)
+    {
+      nmod_poly_t FLINTA;
+      convertFacCF2nmod_poly_t (FLINTA, A);
+      nmod_poly_factor_t result;
+      nmod_poly_factor_init (result);
+      mp_limb_t leadingCoeff= nmod_poly_factor (result, FLINTA);
+      factorsA= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, x);
+      if (factorsA.getFirst().factor().inCoeffDomain())
+        factorsA.removeFirst();
+      nmod_poly_factor_clear (result);
+      nmod_poly_clear (FLINTA);
+    }
+    else
+#endif
     if (getCharacteristic() > 2)
     {
       zz_pX NTLA= convertFacCF2NTLzzpX (A);
@@ -259,7 +263,6 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       factorsA= convertNTLvec_pair_GF2X_long2FacCFFList (NTLFactorsA, multi,
                                                           x);
     }
-#endif
   }
   CFList uniFactors;
   for (CFFListIterator i= factorsA; i.hasItem(); i++)
