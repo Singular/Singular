@@ -541,7 +541,7 @@ Singular_res.o: Singular.rc
 
 ## run
 run.o: run.c run.h
-	gcc -c -I. -O2 run.c -o run.o
+	gcc -c -I. -O2 run.c -o run.o -I..
 
 runTSingular : run.o TSingular_res.o
 	gcc -mwindows run.o TSingular_res.o -o runTSingular.exe
