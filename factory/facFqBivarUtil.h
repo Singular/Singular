@@ -209,6 +209,16 @@ computeBounds (const CanonicalForm& F,///< [in] compressed bivariate polynomial
                bool& isIrreducible    ///< [in,out] check if poly is irreducible
               );
 
+/// as above just wrt to the other variable
+///
+/// @return @a computeBounds returns bounds as described above
+int *
+computeBoundsWrtDiffMainvar
+              (const CanonicalForm& F,///< [in] compressed bivariate polynomial
+               int& n,                ///< [in,out] length of output
+               bool& isIrreducible    ///< [in,out] check if poly is irreducible
+              );
+
 /// extract coefficients of \f$ x^i \f$ for \f$i\geq k\f$ where \f$ x \f$ is
 /// a variable of level 1
 ///

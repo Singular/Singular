@@ -471,6 +471,14 @@ f=x^2*y^5+x^4*y^2+x^2*y^4+x^4*y+x^3*y^2+x*y^4+x^2*y^2+y^3+x^2+x*y+x+1;
 l= factorize (f);
 testfactors (l,f);
 
+kill r;
+ring r=2,(x,y,z,s,t,u,v),dp;
+poly f= y*z*s^2*t^2+x^4*y*u+y^3*z*s*u+x*y*z^2*s*u+x^2*z^2*u^2+x*y^4*v+x^2*t*u^2*v+x*y*z*s*t+z^2*s^2*t+z^2*s*t^2+x*y^3*v+y*s*t^2*v+x*z^2*s+y^2*t*u+x*y*z+y*z*v;
+poly g= x^2*z^2*s^2+x^2*y*s^3+y^2*z*s*t^2+x*s^3*t^2+y^3*z*s*u+y*t^4*u+x^2*z^2*u^2+y^2*z*t*u^2+x*s*t^2*u^2+y*t^2*u^3+y^2*z^3*v+x^2*s*u^2*v+x*z*s*u^2*v+y^2*z*s^2+y*z^3*t+x^2*z*t^2+z^2*s*t*v+z^2*t^2*v+z^3*u*v+s^2*t*u*v+s*v^4+y^3*u+x*z^2*u+x*z*s*v+u*v^3+x^2*t+z*t+u;
+poly h= x^2*y*s+z*s^2*t+z^3*u+x^2*s*u+y*s^2*u+x*y*u*v+x*s*u*v+x*z*t+z^2*t+x*y*u+x*t*u+y*s;
+poly k=f*g*h;
+def l= factorize (k);
+testfactors (l, k);
 
 kill r;
 // from P. Zimmermann via libsingular-devel
