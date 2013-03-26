@@ -581,7 +581,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
   Off (SW_RATIONAL);
 
   TIMING_START (fac_bi_factor_recombination);
-  factors= factorRecombination (uniFactors, A, MODl, degs, 1,
+  factors= factorRecombination (uniFactors, A, MODl, degs, evaluation, 1,
                                 uniFactors.length()/2, b, den);
   TIMING_END_AND_PRINT (fac_bi_factor_recombination,
                         "time for bivariate factor recombination over Q: ");
@@ -592,9 +592,6 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
     factors= Union (earlyFactors, factors);
   else if (!earlySuccess && degs.getLength() == 1)
     factors= earlyFactors;
-
-  for (CFListIterator i= factors; i.hasItem(); i++)
-    i.getItem()= i.getItem() (y - evaluation, y);
 
   appendSwapDecompress (factors, conv (contentAxFactors),
                         conv (contentAyFactors), swap, swap2, N);
