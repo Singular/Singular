@@ -340,7 +340,7 @@ char* bigintmat::StringAsPrinted()
     if (nl > colwid[cj])
     {
       StringSetS("");
-      int ci = floor(i/col);
+      int ci = i/col;
       StringAppend("[%d,%d]", ci+1, cj+1);
       char *ph = StringEndS();
       int phl = strlen(ph);
@@ -418,7 +418,7 @@ int getShorter (int * a, int l, int j, int cols, int rows)
     int index = cols*i+j;
     if ((a[index] > sndlong) && (a[index] < l))
     {
-      int min = (int)(floor(log10(cols))+floor(log10(rows)))+5;
+      int min = (int)(floor(log10((double)cols))+floor(log10((double)rows)))+5;
       if ((a[index] < min) && (min < l))
         sndlong = min;
       else
@@ -427,7 +427,7 @@ int getShorter (int * a, int l, int j, int cols, int rows)
   }
   if (sndlong == 0)
   {
-    int min = (int)(floor(log10(cols))+floor(log10(rows)))+5;
+    int min = (int)(floor(log10((double)cols))+floor(log10((double)rows)))+5;
     if (min < l)
       sndlong = min;
     else
@@ -497,7 +497,7 @@ void bigintmat::pprint(int maxwid)
       if (nl > colwid[cj])
       {
         StringSetS("");
-        int ci = floor(i/col);
+        int ci = i/col;
         StringAppend("[%d,%d]", ci+1, cj+1);
         char *ph = StringEndS();
         int phl = strlen(ph);
