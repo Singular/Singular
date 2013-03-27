@@ -25,8 +25,10 @@
 #include <NTL/ZZX.h>
 #include "NTLconvert.h"
 bool isPurePoly(const CanonicalForm & );
+#ifndef HAVE_FLINT
 static CanonicalForm gcd_univar_ntl0( const CanonicalForm &, const CanonicalForm & );
 static CanonicalForm gcd_univar_ntlp( const CanonicalForm &, const CanonicalForm & );
+#endif
 #endif
 
 #ifdef HAVE_FLINT
@@ -1099,7 +1101,7 @@ lcm ( const CanonicalForm & f, const CanonicalForm & g )
 //}}}
 
 #ifdef HAVE_NTL
-
+#ifndef HAVE_FLINT
 static CanonicalForm
 gcd_univar_ntl0( const CanonicalForm & F, const CanonicalForm & G )
 {
@@ -1141,7 +1143,7 @@ gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
   return  convertNTLzzpX2CF(R,F.mvar());
   #endif
 }
-
+#endif
 #endif
 
 #ifdef HAVE_FLINT

@@ -12,6 +12,8 @@
 
 #include <config.h>
 
+#include "timing.h"
+
 #include "cf_map.h"
 #include "algext.h"
 #include "cf_map_ext.h"
@@ -27,6 +29,9 @@
 #include "facHensel.h"
 #include "facMul.h"
 
+TIMING_DEFINE_PRINT(fac_log_deriv_div)
+TIMING_DEFINE_PRINT(fac_log_deriv_mul)
+TIMING_DEFINE_PRINT(fac_log_deriv_pre)
 
 void append (CFList& factors1, const CFList& factors2)
 {
@@ -448,30 +453,22 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CanonicalForm q,r;
   CanonicalForm logDeriv;
 
+  TIMING_START (fac_log_deriv_div);
   q= newtonDiv (F, G, xToL);
+  TIMING_END_AND_PRINT (fac_log_deriv_div, "time for division in logderiv1: ");
 
+  TIMING_START (fac_log_deriv_mul);
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
+  TIMING_END_AND_PRINT (fac_log_deriv_mul, "time to multiply in logderiv1: ");
 
-  logDeriv= swapvar (logDeriv, x, y);
-  int j= degree (logDeriv) + 1;
+  int j= degree (logDeriv, y) + 1;
   CFArray result= CFArray (j);
+  CFIterator ii;
   for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
   {
-    if (i.exp() == j - 1)
-    {
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
-    else
-    {
-      for (; i.exp() < j - 1; j--)
-        result [j - 1]= 0;
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
+    for (ii= i.coeff(); ii.hasTerms(); ii++)
+      result[ii.exp()] += ii.coeff()*power (x,i.exp());
   }
-  for (; j > 0; j--)
-    result [j - 1]= 0;
   Q= q;
   return result;
 }
@@ -490,6 +487,7 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CanonicalForm logDeriv;
 
   CanonicalForm bufF;
+  TIMING_START (fac_log_deriv_pre);
   if ((oldL > 100 && l - oldL < 50) || (oldL < 100 && l - oldL < 30))
   {
     bufF= F;
@@ -521,36 +519,29 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
     bufF= div (F, xToOldL);
     bufF -= Up;
   }
+  TIMING_END_AND_PRINT (fac_log_deriv_pre, "time to preprocess: ");
 
+  TIMING_START (fac_log_deriv_div);
   if (l-oldL > 0)
     q= newtonDiv (bufF, G, xToLOldL);
   else
     q= 0;
   q *= xToOldL;
   q += oldQ;
+  TIMING_END_AND_PRINT (fac_log_deriv_div, "time for div in logderiv2: ");
 
+  TIMING_START (fac_log_deriv_mul);
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
+  TIMING_END_AND_PRINT (fac_log_deriv_mul, "time for mul in logderiv2: ");
 
-  logDeriv= swapvar (logDeriv, x, y);
-  int j= degree (logDeriv) + 1;
+  int j= degree (logDeriv,y) + 1;
   CFArray result= CFArray (j);
+  CFIterator ii;
   for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
   {
-    if (i.exp() == j - 1)
-    {
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
-    else
-    {
-      for (; i.exp() < j - 1; j--)
-        result [j - 1]= 0;
-      result [j - 1]= swapvar (i.coeff(), x, y);
-      j--;
-    }
+    for (ii= i.coeff(); ii.hasTerms(); ii++)
+      result[ii.exp()] += ii.coeff()*power (x,i.exp());
   }
-  for (; j > 0; j--)
-    result [j - 1]= 0;
   Q= q;
   return result;
 }
@@ -750,6 +741,91 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
     }
     result [i]= k;
     k= maxX;
+    delete [] point;
+  }
+
+  return result;
+}
+
+int *
+computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
+                             bool& isIrreducible)
+{
+  n= degree (F, 2);
+  int* result= new int [n];
+  int sizeOfNewtonPolygon;
+  int** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
+
+  isIrreducible= false;
+  if (sizeOfNewtonPolygon == 3)
+  {
+    bool check1=
+        (newtonPolyg[0][0]==0 || newtonPolyg[1][0]==0 || newtonPolyg[2][0]==0);
+    if (check1)
+    {
+      bool check2=
+        (newtonPolyg[0][1]==0 || newtonPolyg[1][1]==0 || newtonPolyg[2][0]==0);
+      if (check2)
+      {
+        int p=getCharacteristic();
+        int d=1;
+        char bufGFName='Z';
+        bool GF= (CFFactory::gettype()==GaloisFieldDomain);
+        if (GF)
+        {
+          d= getGFDegree();
+          bufGFName=gf_name;
+        }
+        setCharacteristic(0);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        tmp= gcd (tmp, newtonPolyg[1][0]);
+        tmp= gcd (tmp, newtonPolyg[1][1]);
+        tmp= gcd (tmp, newtonPolyg[2][0]);
+        tmp= gcd (tmp, newtonPolyg[2][1]);
+        isIrreducible= (tmp==1);
+        if (GF)
+          setCharacteristic (p, d, bufGFName);
+        else
+          setCharacteristic(p);
+      }
+    }
+  }
+
+  int minX, minY, maxX, maxY;
+  minX= newtonPolyg [0] [0];
+  minY= newtonPolyg [0] [1];
+  maxX= minX;
+  maxY= minY;
+  for (int i= 1; i < sizeOfNewtonPolygon; i++)
+  {
+    if (minX > newtonPolyg [i] [0])
+      minX= newtonPolyg [i] [0];
+    if (maxX < newtonPolyg [i] [0])
+      maxX= newtonPolyg [i] [0];
+    if (minY > newtonPolyg [i] [1])
+      minY= newtonPolyg [i] [1];
+    if (maxY < newtonPolyg [i] [1])
+      maxY= newtonPolyg [i] [1];
+  }
+
+  int k= maxY;
+  for (int i= 0; i < n; i++)
+  {
+    if (i + 1 > maxX || i + 1 < minX)
+    {
+      result [i]= 0;
+      continue;
+    }
+    int* point= new int [2];
+    point [0]= i + 1;
+    point [1]= k;
+    while (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
+    {
+      k--;
+      point [1]= k;
+    }
+    result [i]= k;
+    k= maxY;
     delete [] point;
   }
 

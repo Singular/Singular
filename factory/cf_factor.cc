@@ -429,17 +429,21 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   {
     if (f.isUnivariate())
     {
-#ifdef HAVE_FLINT
-      nmod_poly_t f1;
-      convertFacCF2nmod_poly_t (f1, f);
-      nmod_poly_factor_t result;
-      nmod_poly_factor_init (result);
-      mp_limb_t leadingCoeff= nmod_poly_factor (result, f1);
-      F= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, f.mvar());
-      nmod_poly_factor_clear (result);
-      nmod_poly_clear (f1);
-#else
 #ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+      if (degree (f) < 300)
+      {
+        nmod_poly_t f1;
+        convertFacCF2nmod_poly_t (f1, f);
+        nmod_poly_factor_t result;
+        nmod_poly_factor_init (result);
+        mp_limb_t leadingCoeff= nmod_poly_factor (result, f1);
+        F= convertFLINTnmod_poly_factor2FacCFFList (result, leadingCoeff, f.mvar());
+        nmod_poly_factor_clear (result);
+        nmod_poly_clear (f1);
+      }
+      else
+#endif
       if (isOn(SW_USE_NTL) && (isPurePoly(f)))
       {
         // USE NTL
@@ -545,7 +549,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         else
           F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
       }
-#endif //HAVE_FLINT
     }
     else
     {
