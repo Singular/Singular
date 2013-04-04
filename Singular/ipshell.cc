@@ -5733,7 +5733,7 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
 
 void paPrint(const char *n,package p)
 {
-  Print("%s (",n);
+  Print(" %s (",n);
   switch (p->language)
   {
     case LANG_SINGULAR: PrintS("S"); break;
