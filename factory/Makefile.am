@@ -278,8 +278,8 @@ distclean-local:
 
 cplusplus_SOURCES = cplusplus.cc
 
-cplusplus.h: cplusplus
-	./cplusplus >$@
+cplusplus.h: cplusplus$(EXEEXT) 
+	./cplusplus$(EXEEXT)  >$@
 	cp $@ include/factory/
 
 .template.h:
