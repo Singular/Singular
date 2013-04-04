@@ -49,11 +49,11 @@ libomalloc_g_la_CPPFLAGS= ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL -DHAVE_CONFIG_H
 
 BUILT_SOURCES = omTables.inc omTables.h
 
-omTables.inc: omTables omalloc.h
-	./omTables > omTables.xx && mv omTables.xx  $@
+omTables.inc: omTables$(EXEEXT) omalloc.h
+	./omTables$(EXEEXT) > omTables.xx && mv omTables.xx  $@
 
-omTables.h: omTables
-	./omTables 1 >omTables.yy && mv omTables.yy $@
+omTables.h: omTables$(EXEEXT)
+	./omTables$(EXEEXT) 1 >omTables.yy && mv omTables.yy $@
 
 noinst_PROGRAMS = omTables
 omTables_SOURCES = omAllocPrivate.h omTables.c mylimits.h

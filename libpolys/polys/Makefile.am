@@ -162,8 +162,8 @@ templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC} ${AM_
 templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lfindexec
 templates_p_Procs_Generate_LDFLAGS  = -L${builddir} -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc -L${top_builddir}/../omalloc -L${top_builddir}/../findexec
 
-templates/p_Procs.inc: templates/p_Procs_Generate
-	${builddir}/templates/p_Procs_Generate > ${builddir}/templates/p_Procs.inc
+templates/p_Procs.inc: templates/p_Procs_Generate$(EXEEXT)
+	${builddir}/templates/p_Procs_Generate$(EXEEXT) > ${builddir}/templates/p_Procs.inc
 
 prCopy.inc: prCopy.pl
 	perl ${srcdir}/prCopy.pl >  prCopy.inc

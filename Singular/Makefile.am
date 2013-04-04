@@ -377,17 +377,17 @@ clean-local:
 	  if [ -L ${abs_builddir}/LIB ]; then unlink ${abs_builddir}/LIB; fi \
 	fi
 
-feOpt.inc: feOptGen
-	${builddir}/feOptGen
+feOpt.inc: feOptGen$(EXEEXT)
+	${builddir}/feOptGen$(EXEEXT)
 
-feOptES.inc: feOptES
-	${builddir}/feOptES
+feOptES.inc: feOptES$(EXEEXT)
+	${builddir}/feOptES$(EXEEXT)
 
-feOptTS.inc: feOptTS
-	${builddir}/feOptTS
+feOptTS.inc: feOptTS$(EXEEXT)
+	${builddir}/feOptTS$(EXEEXT)
 
-plural_cmd.inc iparith.inc: gentable1
-	${builddir}/gentable1
+plural_cmd.inc iparith.inc: gentable1$(EXEEXT)
+	${builddir}/gentable1$(EXEEXT)
 
 # # fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
 # plural_cmd.inc: iparith.inc
