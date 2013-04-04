@@ -5,7 +5,7 @@ if ENABLE_FACTORY
   USE_FACTORY += factory
 endif
 
-PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming gfanlib dyn_modules 
+PACKAGES=findexec omalloc $(USE_FACTORY) libpolys kernel numeric Singular IntegerProgramming gfanlib dyn_modules dox
 
 SUBDIRS =$(PACKAGES)
 TESTDIRS=$(PACKAGES)

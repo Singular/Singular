@@ -53,6 +53,12 @@ AM_PROG_CC_C_O
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN";
+   then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
+fi 
+AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
+                                                                    
 LT_INIT
 
 # Checks for libraries.
@@ -118,9 +124,6 @@ if test "x$ENABLE_OMALLOC" = xadd; then
    ENABLE_OMALLOC_ARG="--enable-omalloc $ENABLE_OMALLOC_ARG"
 fi
 
-
-
-
 if test "x$ENABLE_FACTORY" = xyes; then
  AC_MSG_CHECKING(whether to use omalloc in factory)
  if test "x$ENABLE_OMALLOC" = xyes; then
@@ -147,6 +150,9 @@ if test x"${ENABLE_COUNTEDREF_AUTOLOAD}" == xyes; then
   AC_DEFINE([SI_COUNTEDREF_AUTOLOAD],1,[Enable autoloading of reference counted types])
   AC_SUBST(SI_COUNTEDREF_AUTOLOAD)
 fi
+
+AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
+AC_CONFIG_FILES([dox/Makefile])
 
 AC_CONFIG_SUBDIRS([findexec])
 AC_CONFIG_SUBDIRS([omalloc])
