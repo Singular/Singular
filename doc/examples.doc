@@ -778,16 +778,13 @@ not be terminated through the link while it is still computing.
 
 The purpose of the following example is to illustrate the use of dynamic
 modules. Giving an example on how to write a dynamic module is beyond the
-scope of this manual. Detailed information on the latter topic can be found
-in a separate PostScript file at
-@code{http://www.singular.uni-kl.de/DynMod.ps}.
+scope of this manual.
 
 In this example, we use a dynamic module, residing in the file @code{kstd.so},
 which allows ignoring all but the first j entries of vectors when
 forming the pairs in the standard basis computation.
 
 @smallexample
-@c example tag:dynlib
 ring r=0,(x,y),dp;
 module mo=[x^2-y^2,1,0,0],[xy+y^2,0,1,0],[y^2,0,0,1];
 print(mo);
@@ -809,7 +806,6 @@ module mostd2=Kstd::kstd(mo,2); // calling procedure in Kstd
                     // treated too
 print(mostd2);
 
-@c example
 @end smallexample
 
 @c ----------------------------------------------------------------------------

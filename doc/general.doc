@@ -4311,10 +4311,8 @@ in C/C++ or some other higher programming language. A collection
 of such functions is called a dynamic module and can be loaded by
 the command @code{LIB} or @code{load}. It is basically handled in
 the same way as a library: upon loading, a new @code{package} is
-created which holds the contents of the dynamic module, but in contrast
-to the case of a library, the name of the @code{package} is not derived
-from the filename, but is hardcoded in the dynamic module. In particular,
-general information about it can be displayed by the command
+created which holds the contents of the dynamic module.
+General information about the loaded module can be displayed by the command
 @code{help package_name}. After loading the dynamic module, its functions
 can be used exactly like the built-in @sc{Singular} functions.
 
@@ -4322,6 +4320,5 @@ To have the full functionality of a built-in function, dynamic modules
 need to comply with certain requirements on their internal structure.
 As this would be beyond the scope of the @code{Singular} manual,
 a separate, more detailed guide on how to write and use dynamic modules
-can be found
-at @code{http://www.singular.uni-kl.de/DynMod.ps}.
+is available.
 
