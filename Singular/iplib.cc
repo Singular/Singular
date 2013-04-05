@@ -1056,6 +1056,15 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
+  #ifndef NDEBUG
+  int dummy;
+  if (IsCmd(procname,dummy))
+  {
+    Werror(">>%s< is a reserved name",procname);
+    return 0;
+  }
+  #endif
+
   h = enterid(procname,0, PROC_CMD, &IDROOT, TRUE);
   if ( h!= NULL )
   {
@@ -1216,12 +1225,12 @@ BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
   return FALSE;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-void module_help_main(char *newlib,const char *help)
+void module_help_main(const char *newlib,const char *help)
 {
   char *plib = iiConvName(newlib);
-  idhdl pl = IDROOT->get(plib,0);
+  idhdl pl = basePack->idroot->get(plib,0);
   if ((pl==NULL)||(IDTYP(pl)!=PACKAGE_CMD))
-    Werror(">>%s<< is not a package",plib);
+    Werror(">>%s<< is not a package (trying to add package help)",plib);
   else
   {
     package s=currPack;
@@ -1231,12 +1240,12 @@ void module_help_main(char *newlib,const char *help)
     currPack=s;
   }
 }
-void module_help_proc(char *newlib,const char *p, const char *help)
+void module_help_proc(const char *newlib,const char *p, const char *help)
 {
   char *plib = iiConvName(newlib);
-  idhdl pl = IDROOT->get(plib,0);
+  idhdl pl = basePack->idroot->get(plib,0);
   if ((pl==NULL)||(IDTYP(pl)!=PACKAGE_CMD))
-    Werror(">>%s<< is not a package",plib);
+    Werror(">>%s<< is not a package(trying to add help for %s)",plib,p);
   else
   {
     package s=currPack;
