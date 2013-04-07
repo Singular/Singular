@@ -487,4 +487,18 @@ poly f = y*t^8 + y^5*t^2 + y*t^6 + t^7 + y^6 + y^5*t + y^2*t^4 + y^2*t^2 +
 y^2*t + t^3 + y^2 + t^2;
 def l=factorize (f);
 testfactors (l, f);
+
+// tr. 482
+ring R6s = (32003,s),(x,y),dp;
+minpoly = (s6-11914s5+3952s4-5439s3-15290s2-15431s+15606);
+poly G3 = x3+y3+(-s-1)*x2+(s-2)*xy+(-s-1)*y2+(s+1)*x+(s+1)*y+(-s);
+def l=factorize(G3);
+testfactors (l, G3);
+
+kill r;
+ring r=(32003,s),(x,y,z),dp;
+minpoly=(s6-11914s5+3952s4-5439s3-15290s2-15431s+15606);
+poly f=x32003+y32003+(-15819s5+10130s4-13478s3-9892s2+7280s+7612)+z32003;
+factorize (f);
+
 tst_status(1);$
