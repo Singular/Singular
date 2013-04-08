@@ -10,6 +10,12 @@ TODO List - Letterplace DVec Implementation
 other  -  no/minor priority
 [?]    -   unknown priority
 
+· [?] Berechnung der GB eines Links Ideals in einer
+  Faktor-Algebra: Effizienzsteigerung möglich durch Erstellung
+  von Paaren der Polynome aus I -> Gebauer Möller ist dadurch
+  effizienter möglich: Beste Effizienzsteigerung: Paarmenge wird
+  „lazy“ erstellt.
+
 · [PP] Die aktuellste Version dieser Liste soll von nun an in Git
   gespeichert werden.
 

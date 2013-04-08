@@ -350,6 +350,136 @@ void ShiftDVec::initenterpairs
 #endif
 }
 
+/* BOCO:
+ * This is the initenterpairs for the case, that we want to
+ * calculate a GB of a left-ideal in the factor algebra K<X>/I.
+ */
+void ShiftDVec::Paul::initenterpairs
+  ( LObject* H, ideal I, int size_of_I,
+    int k, int ecart, int isFromQ, kStrategy strat, int atR )
+{
+  assume(strat->R[atR]->p == H->p);
+
+  namespace SD = ShiftDVec;
+  BOOLEAN new_pair=FALSE;
+
+  if ( (strat->syzComp==0) || (pGetComp(H->p)<=strat->syzComp) ) 
+    //grico: this doesn't seem to be a wrong assumpiton, so I
+    //kept it
+  { 
+    /* BOCO: 
+     *  We will look for those overlaps, where a p_i in I is
+     *  overlapped by a p_j in S from the right. Other overlaps
+     *  do not exist due to theoretical reasons.
+     */
+ 
+    //BOCO: arrays for overlaps
+    uint** overlaps = (uint**)omAlloc(size_of_I*sizeof(uint*));
+
+    //Sizes for above arrays
+    uint* ovl_sizes = (uint*)omAlloc(size_of_I*sizeof(uint));
+
+    //BOCO: Find the overlaps
+    for (int j = 0; j <= size_of_I; j++)
+      ovl_sizes[j] = 
+        SD::Paul::findOverlaps
+          ( H, strat->S_2_T(j), 
+            strat->lV, strat->uptodeg, &(overlaps[j]) );
+
+    SD::Paul::GebauerMoeller
+      ( overlaps, ovl_size, H, I, size_of_I, strat );
+
+    SD::Paul::enterOverlaps
+      ( H,I,size_of_I,strat,k,
+        overlaps, ovl_sizes, isFromQ, ecart, atR );
+
+    //BOCO: Free arrays with overlaps
+    for (int j = 0; j <= size_of_I; j++)
+      if( ovl_sizes[j] )
+        omFreeSize
+          ((ADDRESS)overlaps[j], sizeof(uint)*r_ovl_sizes[j]);
+
+    omFreeSize( (ADDRESS)overlaps, sizeof(uint)*size_of_I );
+  }
+
+
+  //This was formerly done in the chainCrit.
+  SD::kMergeBintoL(strat); //merges the B set into the L set
+}
+
+/* Finds all shifts sh, where the letterplace objects t1 and
+ * st2 := sh * t2 have a common divisor.
+ * into shifts. Any previous contents of shifts will be 
+ * deleted. Central Overlaps, i.e. shifts where st2 divides t1,
+ * are not considered. The found shifts are stored in uint **
+ * overlaps. The number of the found shifts, thus the size of
+ * uint ** overlaps is returned.
+ * Do we only get overlaps where sh * t2 is not violating the
+ * maxDeg? How do we test that?
+ * The current implementation does not yet care for maxDeg.
+ * We should have to change maxElCompared.
+ * overlaps have to be freed manually (with omFreeSize)!
+ */
+uint ShiftDVec::findRightOverlaps
+  ( ShiftDVec::sTObject * t1, ShiftDVec::sTObject * t2, 
+    int numVars, int maxDeg, uint ** overlaps )
+{
+  t1->SetDVecIfNULL(); t2->SetDVecIfNULL();
+  //assume(t1->dvSize > 0 && t2->dvSize > 0);
+  //TODO: t1->dvSize-1 should be sufficient because we dont want
+  //central overlaps
+  *overlaps = (uint*)omAlloc0((t1->dvSize+1)*sizeof(uint));
+  if(t1->dvSize == 0 || t2->dvSize == 0) return 0;
+  loGriToFile
+    ("omAlloc0 for overlaps in findRightOverlaps ",
+     (t1->dvSize+1)*sizeof(uint), 1024, (void*) (*overlaps) );
+
+  memcpy
+    ((void*)(*overlaps), (void*)t1->dvec, t1->dvSize*sizeof(uint));
+
+
+
+  //uint maxElCompared = min(t1.dvSize, maxDeg); //not correct
+  uint maxElCompared = t1->dvSize; //eventuell zuviele shifts
+
+  /* We want only to find right overlappings, not central
+   * overlappings.                                        */
+  int shift =
+    t2->dvSize > t1->dvSize ? 1 : t1->dvSize - t2->dvSize + 1;
+
+  int cmpLen = (t1->dvSize - shift) * sizeof(uint);
+  uint numberOfShifts = 0;
+  for(uint i = 0; i < shift; ++i)
+    (*overlaps)[shift] += (*overlaps)[i];
+  (*overlaps)[shift] -= (shift * numVars);
+  for(uint i = 0; shift < maxElCompared; ++shift, cmpLen -= sizeof(uint)){
+    if(!memcmp((void*)((*overlaps)+shift),(void*)t2->dvec,cmpLen)){
+      (*overlaps)[shift+1] = 
+        (*overlaps)[shift] + (*overlaps)[shift+1] - numVars;
+      (*overlaps)[i] = shift; i = ++numberOfShifts;
+    } else {
+      (*overlaps)[shift+1] = 
+        (*overlaps)[shift] + (*overlaps)[shift+1] - numVars;
+    }
+  }
+
+  if( numberOfShifts > 0 ){
+    (*overlaps) = (uint*) omrealloc
+      ( (*overlaps), numberOfShifts*sizeof(uint) );
+    loGriToFile
+      ( "Reallocation for overlaps in findRightOverlaps ",
+        numberOfShifts*sizeof(uint), 1024, (*overlaps)     );
+  }else{
+    loGriToFile
+      ( "omFreeSize for overlaps in findRightOverlaps ",
+        (t1->dvSize+1)*sizeof(uint), 1024, (void*) *overlaps );
+    omFreeSize
+      ((ADDRESS)(*overlaps), sizeof(uint)*(t1->dvSize+1));
+  }
+
+  return numberOfShifts;
+}
+
 void ShiftDVec::DeBoGriTestGM
   (TSet tset, int k, TObject* H, int uptodeg, int lVblock)
 {
@@ -1074,6 +1204,59 @@ void ShiftDVec::GebauerMoeller
 
 #endif //if 1 - under construction
 }
+
+/* BOCO:
+ *  Gebauer Moeller for GB of left ideals in factor algebra
+ *  K<X>/I.
+ *
+ *  picture:
+ *
+ *  iiiiiii    | lm(p_i)
+ *     JJJJJJJ | lm(p_j)
+ *    IIIIII   | lm(p'i)
+ *
+ *  p'i,p_j can be cancelled
+ *
+ *  possible cases:
+ *
+ *  1) p_i,p_j and p_j,p'i are both candidates for new pairs
+ *  2) lm(p_i),lm(p_j) are lms of a pair from L
+ *  3) lm(p'i),lm(p_j) are lms of a pair from L
+ *     -> cancellation in L
+ *
+ * Remark:
+ *  See todo list for an idea on how we could do this more
+ *  efficient.
+ */
+void ShiftDVec::Paul::GebauerMoeller
+  ( uint** overlaps, uint* sizesOvls,
+    LObject* J, ideal I, int size_of_I, kStrategy strat )
+{
+  namespace SP = ShiftDVec::Paul;
+
+  //BOCO IMPORTANT Assumption:
+  //overlaps in overlaps are sorted: The biggesst are coming
+  //first! (TODO: I hope, that is true.)
+
+#if 1 //under construction, un-uncomment, if errors occeur
+  for(int i = 0; i < sizesOvls)
+  {
+    //Case 1
+    for(int i = 0; i < sizesOvls)
+    {
+      //BOCO TODO: Test
+    }
+
+    //Case 2 & 3
+    //BOCO TODO: For l in L
+    {
+    }
+  }
+#endif //if 1 - under construction
+}
+
+SD::Paul::GebauerMoeller
+  ( overlaps, ovl_size, H, I, size_of_I, strat );
 
 
 /* Enter the right overlaps of H with Elements from S */

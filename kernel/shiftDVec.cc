@@ -330,8 +330,13 @@ ideal bba
   (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #else //replacement
 ideal ShiftDVec::bba
-  (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+  ( ideal F, ideal Q, ideal I,
+    intvec *w,intvec *hilb,kStrategy strat )
 {
+  /* BOCO:
+   * If I != NULL we want to calculate the GB of the left ideal
+   * F in the factor algebra K<X>/I.
+   */
   namespace SD = ShiftDVec;
 
   initDeBoGri
