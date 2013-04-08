@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib 14191 2011-05-04 13:11:46Z hannes $";
+version="$Id: general.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -1272,15 +1272,16 @@ EXAMPLE: example timeStd; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring r=32003,(a,b,c,d,e),dp;
-   int n=6;
+   int n=7;
    ideal i=
    a^n-b^n,
    b^n-c^n,
    c^n-d^n,
    d^n-e^n,
    a^(n-1)*b+b^(n-1)*c+c^(n-1)*d+d^(n-1)*e+e^(n-1)*a;
-   timeStd(i,2);
-   timeStd(i,20);
+   def i1=timeStd(i,1);
+   def i2=timeStd(i,20);
+   listvar();
 }
 
 proc factorH(poly p)
