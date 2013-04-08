@@ -382,7 +382,7 @@ randomElement (const CanonicalForm & F, const Variable & alpha, CFList & list,
   mipo= getMipo (alpha);
   int p= getCharacteristic ();
   int d= degree (mipo);
-  int bound= ipower (p, d);
+  double bound= pow ((double) p, (double) d);
   do
   {
     if (list.length() == bound)
@@ -435,29 +435,6 @@ Variable chooseExtension (const Variable & alpha)
   BuildIrred (NTLIrredpoly, i*m);
   CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
   return rootOf (newMipo);
-}
-
-/// chooses a suitable extension of \f$ F_{p}(\alpha ) \f$
-/// we do not extend \f$ F_{p}(\alpha ) \f$ itself but extend \f$ F_{p} \f$ ,
-/// s.t. \f$ F_{p}(\alpha ) \subset F_{p}(\beta ) \f$
-static inline
-void choose_extension (const int& d, const int& num_vars, Variable& beta)
-{
-  int p= getCharacteristic();
-  if (p != fac_NTL_char)
-  {
-    fac_NTL_char= p;
-    zz_p::init (p);
-  }
-  zz_pX NTLirredpoly;
-  //TODO: replace d by max_{i} (deg_x{i}(f))
-  int i= (int) (log ((double) ipower (d + 1, num_vars))/log ((double) p));
-  int m= degree (getMipo (beta));
-  if (i <= 1)
-    i= 2;
-  BuildIrred (NTLirredpoly, i*m);
-  CanonicalForm mipo= convertNTLzzpX2CF (NTLirredpoly, Variable(1));
-  beta= rootOf (mipo);
 }
 
 CanonicalForm
@@ -2252,19 +2229,19 @@ evaluationPoints (const CanonicalForm& F, const CanonicalForm& G,
   FFRandom genFF;
   GFRandom genGF;
   int p= getCharacteristic ();
-  int bound;
+  double bound;
   if (alpha != Variable (1))
   {
-    bound= ipower (p, degree (getMipo(alpha)));
-    bound= ipower (bound, k);
+    bound= pow ((double) p, (double) degree (getMipo(alpha)));
+    bound= pow (bound, (double) k);
   }
   else if (GF)
   {
-    bound= ipower (p, getGFDegree());
-    bound= ipower (bound, k);
+    bound= pow ((double) p, (double) getGFDegree());
+    bound= pow ((double) bound, (double) k);
   }
   else
-    bound= ipower (p, k);
+    bound= pow ((double) p, (double) k);
 
   CanonicalForm random;
   int j;
