@@ -93,7 +93,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
   {
     mipo= getMipo (alpha);
     int d= degree (mipo);
-    bound= ipower (p, d);
+    bound= pow ((double) p, (double) d);
   }
   else if (GF)
   {
