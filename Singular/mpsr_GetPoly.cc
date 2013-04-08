@@ -22,12 +22,12 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <kernel/ring.h>
-#include "kernel/longalg.h"
+#include <kernel/longalg.h>
 #include <kernel/maps.h>
 #include <kernel/ideals.h>
 #include <Singular/grammar.h>
 #include <kernel/febase.h>
-#include "kernel/modulop.h"
+#include <kernel/modulop.h>
 
 #include <Singular/mpsr_Tok.h>
 
@@ -142,7 +142,7 @@ static mpsr_Status_t GetModuloNumber(MP_Link_pt link, number *a)
 {
   MP_Uint32_t x;
   mp_failr(IMP_GetUint32(link, &x));
-  *a=npInit((int)x, currRing);
+  *a=npInit((long)x, currRing);
   return mpsr_Success;
 }
 
