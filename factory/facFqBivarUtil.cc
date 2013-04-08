@@ -467,8 +467,13 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CFIterator ii;
   for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
   {
-    for (ii= i.coeff(); ii.hasTerms(); ii++)
-      result[ii.exp()] += ii.coeff()*power (x,i.exp());
+    if (i.coeff().inCoeffDomain())
+      result[0] += i.coeff()*power (x,i.exp());
+    else
+    {
+      for (ii= i.coeff(); ii.hasTerms(); ii++)
+        result[ii.exp()] += ii.coeff()*power (x,i.exp());
+    }
   }
   Q= q;
   return result;
@@ -540,8 +545,13 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   CFIterator ii;
   for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
   {
-    for (ii= i.coeff(); ii.hasTerms(); ii++)
-      result[ii.exp()] += ii.coeff()*power (x,i.exp());
+    if (i.coeff().inCoeffDomain())
+      result[0] += i.coeff()*power (x,i.exp());
+    else
+    {
+      for (ii= i.coeff(); ii.hasTerms(); ii++)
+        result[ii.exp()] += ii.coeff()*power (x,i.exp());
+    }
   }
   Q= q;
   return result;
