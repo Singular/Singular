@@ -2,7 +2,7 @@
  * This is the initenterpairs for the case, that we want to
  * calculate a GB of a left-ideal in the factor algebra K<X>/I.
  */
-void ShiftDVec::Paul::initenterpairs
+void ShiftDVec::LeftGB::initenterpairs
   ( LObject* H, ideal I, int size_of_I,
     int k, int ecart, int isFromQ, kStrategy strat, int atR )
 {
@@ -30,14 +30,14 @@ void ShiftDVec::Paul::initenterpairs
     //BOCO: Find the overlaps
     for (int j = 0; j <= size_of_I; j++)
       ovl_sizes[j] = 
-        SD::Paul::findOverlaps
+        SD::LeftGB::findOverlaps
           ( H, strat->S_2_T(j), 
             strat->lV, strat->uptodeg, &(overlaps[j]) );
 
-    SD::Paul::GebauerMoeller
+    SD::LeftGB::GebauerMoeller
       ( overlaps, ovl_size, H, I, size_of_I, strat );
 
-    SD::Paul::enterOverlaps
+    SD::LeftGB::enterOverlaps
       ( H,I,size_of_I,strat,k,
         overlaps, ovl_sizes, isFromQ, ecart, atR );
 
@@ -74,19 +74,19 @@ void ShiftDVec::Paul::initenterpairs
  *  possible cases:
  *
  *  1) p_i,p_j and p_j,p'i are both candidates for new pairs
- *  2) lm(p_i),lm(p_j) are lms of a pair from L
+ *  2) lm(p'i),lm(p_j) are lms of a pair from L
+ *  3) lm(p_i),lm(p_j) are lms of a pair from L
  *     -> cancellation in L
- *  3) lm(p'i),lm(p_j) are lms of a pair from L
  *
  * Remark2:
  *  See todo list for an idea on how we could do this more
  *  efficient.
  */
-void ShiftDVec::Paul::GebauerMoeller
+void ShiftDVec::LeftGB::GebauerMoeller
   ( uint** overlaps,
     uint* sizesOvls, LObject* J, kStrategy strat )
 {
-  namespace SP = ShiftDVec::Paul;
+  namespace SP = ShiftDVec::LeftGB;
 
   //BOCO IMPORTANT Assumption:
   //overlaps in overlaps are sorted: The biggesst are coming
@@ -132,14 +132,12 @@ void ShiftDVec::Paul::GebauerMoeller
  * and thus smallest overlaps first).
  * TODO: Let this function get checked by Grischa!
  */
-void ShiftDVec::Paul::GMFilter
+void ShiftDVec::LeftGB::GMFilter
   ( LObject* J, LObject* p_i, LObject* p_k,
     uint* i_ovls_j, uint* k_ovls_j,
-    uint size_i_ovls_j, uint size_i_ovls_k )
+    uint size_i_ovls_j, uint size_k_ovls_j )
 {
-  uint tg_lm_pi = p_i->GetDVsize();
   uint tg_lm_pj = J->GetDVsize();
-  uint tg_lm_pk = p_k->GetDVsize();
 
   for(int i = 0; i < size_i_ovls_j; ++i)
   {
@@ -149,47 +147,95 @@ void ShiftDVec::Paul::GMFilter
       // Test if lcm_k_j divides lcm_i_j
       if( k_ovls_j[k] > i_ovls_j[i] ) break;
       uint shift_k = i_ovls_j[i] - k_ovls_j[k];
-      if( shift_k + tg_lm_pj > tg_lcm_i_j ) break;
-      if( p_i->cmpDVecProper(p_k, shift_k, 0, k_ovls_j[i]) )
+      if(p_i->cmpDVecProper(p_k, shift_k, 0, k_ovls_j[i]) != 0)
       { i_ovls_j[i] = 0; break; }
     }
   }
 }
 
 /* BOCO:
- * Case 2:
- *  1111111    | lm(L.p1)
- *     JJJJJJJ | lm(p_j) = lm(L.p2)
- *    kkkkkk   | lm(p_k)
  * L.p1 and p_k from I. i_ovls_j and i_ovls_j contain all shifts
  * which correspond to an overlap of lm(p_i) with lm(p_j) and
  * lm(p_k) with lm(p_j) respectivly. J is always overlapped
  * with an i from I from the left. See the theory for left-GB
- * for explanations. We want to filter the p_i - p_j pairs.
- * We expect i_ovls_j and k_ovls_j to be sorted (biggest shifts,
- * and thus smallest overlaps first).
- * TODO: Let this function get checked by Grischa!
+ * for explanations.  We expect i_ovls_j and k_ovls_j to be
+ * sorted (biggest shifts, and thus smallest overlaps first).
+ *
+ * Case 2:
+ *   11111     | lm(L.p1)
+ *     JJJJJJJ | lm(p_j) = lm(L.p2)
+ *  kkkkkkkk   | lm(p_k)
+ *
+ * Now we want to filter new pairs with existing pairs from L.
+ *
+ * TODO:
+ * · Let this function get checked by Grischa!
+ * · Everything has to be initialized correctly!!!! (Oh my)
  */
-void ShiftDVec::Paul::GMFilter
-  ( LObject* J, LObject* p_i, LObject* p_k,
-    uint* i_ovls_j, uint* k_ovls_j,
-    uint size_i_ovls_j, uint size_i_ovls_k )
+void ShiftDVec::LeftGB::GMFilter
+  ( LObject* L, LObject* J,
+    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, strat )
 {
-  uint tg_lm_pi = p_i->GetDVsize();
-  uint tg_lm_pj = J->GetDVsize();
-  uint tg_lm_pk = p_k->GetDVsize();
+  Lobject* L = strat->L[index_L];
 
-  for(int i = 0; i < size_i_ovls_j; ++i)
+  if( L->dv2Size != J->dvSize ) return;
+  if( !memcmp(L->dv1, J->dvec, sizeof(uint)*J->dvSize) )return;
+
+  uint tg_lm_pj = J->GetDVsize();
+
+  // Case 2
+  for(int k = 0; k < size_k_ovls_j; ++k)
   {
-    uint tg_lcm_i_j = i_ovls_j[i] + tg_lm_pj;
-    for(int k = size_k_ovls_j-1; k >= 0; --k)
-    {
-      // Test if lcm_k_j divides lcm_i_j
-      if( k_ovls_j[k] > i_ovls_j[i] ) break;
-      uint shift_k = i_ovls_j[i] - k_ovls_j[k];
-      if( shift_k + tg_lm_pj > tg_lcm_i_j ) break;
-      if( p_i->cmpDVecProper(p_k, shift_k, 0, k_ovls_j[i]) )
-    }
+    // Test if lcm_k_j divides lcm_i_j
+    if( k_ovls_j[k] < L->shift_p2 ) return;
+    uint shift_p1 = k_ovls_j[k] - L->shift_p2;
+    if( cmpDVecProper( L->dv1, 0,
+                       p_k->dvec, shift_p1,
+                       L->shift_p2, strat->lV) )
+    { k_ovls_j[k] = 0; }
+  }
+}
+
+/* BOCO:
+ * L.p1 and p_k from I. i_ovls_j and i_ovls_j contain all shifts
+ * which correspond to an overlap of lm(p_i) with lm(p_j) and
+ * lm(p_k) with lm(p_j) respectivly. J is always overlapped
+ * with an i from I from the left. See the theory for left-GB
+ * for explanations.  We expect i_ovls_j and k_ovls_j to be
+ * sorted (biggest shifts, and thus smallest overlaps first).
+ *
+ * Case 3:
+ *  1111111    | lm(L.p1)
+ *     JJJJJJJ | lm(p_j) = lm(L.p2)
+ *    kkkkkk   | lm(p_k)
+ *
+ * Now we want to filter pairs from L.
+ *
+ * TODO:
+ * · Let this function get checked by Grischa!
+ * · Everything has to be initialized correctly!!!! (Oh my)
+ * · We need to implement kStrategy::deleteInL
+ */
+void ShiftDVec::LeftGB::GMFilter
+  ( int index_L, LObject* J,
+    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, strat )
+{
+  Lobject* L = strat->L[index_L];
+
+  if( L->dv2Size != J->dvSize ) return;
+  if( !memcmp(L->dv1, J->dvec, sizeof(uint)*J->dvSize) )return;
+
+  uint tg_lm_pj = J->GetDVsize();
+
+  // Case 3
+  for(int k = size_k_ovls_j-1; k >= 0; --k)
+  {
+    // Test if lcm_k_j divides lcm_i_j
+    if( k_ovls_j[k] > L->shift_p2 ) return;
+    uint shift_k = L->shift_p2 - k_ovls_j[k];
+    if( cmpDVecProper( L->dv1, shift_k,
+                       p_k->dvec, 0, k_ovls_j[k], strat->lV) )
+    { strat->deleteInL(index_L); return; }
   }
 }
 

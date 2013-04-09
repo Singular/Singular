@@ -117,47 +117,52 @@ int ShiftDVec::sTObject::cmpDVec
 }
 
 /* Does what cmpDVec should do. size > 0 should hold.*/
+int ShiftDVec::cmpDVecProper
+  ( uint* dv1, uint begin_dv1,
+    uint* dv2, uint begin_dv2, uint size, int lV )
+{
+  assume(size > 0);
+  assume(begin_dv2 >= 0 && begin_dv1 >= 0);
+
+  if(begin_dv2 == 0 && begin_dv1 != 0)
+  {
+    int first = 0, i = 0;
+    for(; i <= begin_dv1; ++i) first += dv1[i];
+    if(first - begin_dv1*lV != dv2[begin_dv2]) return -1;
+    size -= 1; begin_dv2 += 1; begin_dv1 += 1;
+  }
+  else if(begin_dv1 == 0)
+  {
+    int first = 0, i = 0;
+    for(; i <= begin_dv2; ++i) first += dv2[i];
+    if(first - begin_dv2*lV != dv1[begin_dv1]) return -1;
+    size -= 1; begin_dv2 += 1; begin_dv1 += 1;
+  }
+
+  return 
+    memcmp( dv2+begin_dv2, dv1+begin_dv1, size*sizeof(uint) );
+}
+
+/* Does what cmpDVec should do. size > 0 should hold.*/
+int ShiftDVec::cmpDVecProper
+  ( ShiftDVec::sTObject* T1, uint beginT1,
+    ShiftDVec::sTObject* T2, uint beginT2, uint size, int lV )
+{
+  assume(beginT2+size <= dvSize && beginT1+size <= T1->dvSize);
+
+  return
+    cmpDVecProper
+      ( T1->dvec, beginT1, T2->dvec, beginT2, size, lV );
+}
+
+/* Does what cmpDVec should do. size > 0 should hold.*/
 int ShiftDVec::sTObject::cmpDVecProper
   ( ShiftDVec::sTObject* T1, 
     uint begin, uint beginT1, uint size, int lV )
 {
-  assume(size > 0);
-  assume(begin >= 0 && beginT1 >= 0);
-  assume(begin + size <= dvSize && beginT1 + size <= T1->dvSize);
-
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering cmpDVecProper", "Leaving cmpDVecProper", 128 );
-
-  deBoGriInitCounter();
-  deBoGriIncCounter();
-  deBoGriPrintCounter("Counter: ", 128);
-
-  deBoGriPrint(begin, "begin: ", 128);
-  deBoGriPrint(dvSize, "dvSize: ", 128);
-  deBoGriPrint(beginT1, "beginT1: ", 128);
-  deBoGriPrint(T1->dvSize, "T1->dvSize: ", 128);
-  deBoGriPrint(size, "size: ", 128);
-
-  if(begin == 0 && beginT1 != 0)
-  {
-    deBoGriPrint("begin == 0", 128);
-    int first = 0, i = 0;
-    for(; i <= beginT1; ++i) first += T1->dvec[i];
-    if(first - beginT1*lV != dvec[begin]) return -1;
-    size -= 1; begin += 1; beginT1 += 1;
-  } 
-  else if(beginT1 == 0)
-  {
-    deBoGriPrint("beginT1 == 0", 128);
-    int first = 0, i = 0;
-    for(; i <= begin; ++i) first += dvec[i];
-    if(first - begin*lV != T1->dvec[beginT1]) return -1;
-    size -= 1; begin += 1; beginT1 += 1;
-  }
-
   return 
-    memcmp( dvec+begin, T1->dvec+beginT1, size*sizeof(uint) );
+    ShiftDVec::cmpDVecProper
+      (T1, beginT1, this, begin, size, lV);
 }
 
 void ShiftDVec::sTObject::freeDVec()
