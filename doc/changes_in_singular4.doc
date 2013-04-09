@@ -1,0 +1,137 @@
+@comment this file contains the list of new features and difference between Singular 3.* and Singular 4.*
+
+The purpose of this section is to describe new features and changes
+between Singular 3.* and Singular 4.* both for developers and Singular
+users.
+
+@menu
+* Notes for Singular users::
+* Notes for developers::
+* Building Singular::
+@end menu
+
+
+@c ---------------------------------------------------------------------------
+@node Notes for Singular users, Notes for developers, , ???? 
+@subsection Notes for Singular users
+@cindex Notes for Singular users
+
+@subsubheading Coefficient fields
+@cindex Coefficient fields
+
+@c table @asis
+@itemize @bullet
+@item A 
+@item B
+@end itemize
+@c @end table
+
+@subsubheading Ring-dependent options
+@cindex Ring-dependent options
+
+
+@c table @asis
+@itemize @bullet
+@item option
+@item option
+@end itemize
+@c @end table
+
+
+@subsubheading New libraries depending on Singular 4.*
+@cindex New libraries depending on Singular 4.*
+
+In Singular 4.* there several new features are implemented within a
+dynamic module @code{syzextra.so}, not available in Singular 3.*. 
+The new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it.
+
+
+@c table @asis
+@itemize @bullet
+@item @ref{derham_lib} - computes de Rham cohomology
+@item @ref{schreyer_lib} - computes Schreyer resolution via several approaches. It also serves as a high-level wrapper to the dynamic module @code{syzextra.so}
+@item @code{syzextra.so} - implements the low-level functions for Schreyer resolutions and many auxiliary functions.
+@end itemize
+@c @end table
+
+
+
+
+
+@c ---------------------------------------------------------------------------
+@node Notes for developers, Building Singular, Notes for Singular users, ???
+@subsection Notes for developers
+@cindex Notes for developers
+
+
+@subsubheading Refactoring, redesign and modularization
+@cindex Refactoring, redesign and modularization
+
+@c table @asis
+@itemize @bullet
+@item Build System : automake
+@item Separation/modularization into libraries and packages 
+@c add diagram as an image?
+@end itemize
+@c @end table
+
+
+@subsubheading Changes to build system
+@cindex Changes to build system
+
+@code 
+
+
+@c ---------------------------------------------------------------------------
+@node Building Singular, , Notes for developers, ???
+@subsection Building Singular
+@cindex Building Singular
+
+
+
+
+
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+
+@c @c ---------------------------------------------------------------------------
+@c @node NODE TITLE, NEXT NODE TITLE, PREV. NODE TITLE, UPPER NODE!?
+@c @subsection NODE TITLE
+@c @cindex NODE TITLE
+
+
+@c @itemize @bullet
+@c @item [ABF2002]
+@c @"o
+@c Augot D.; Bardet M.; Faug@'ere J.-C.: @anchor{[ABF2002]}
+@c Efficient Decoding of (binary) Cyclic Codes beyond the correction capacity of the code using Gr@"obner bases.
+@c INRIA Report (2002) 4652
+@c @end itemize
+
+@c @tex
+@c  Let $C$ be the binary $[n,k,d]$ cyclic code with the defining set $S_C=\{i_1,\dots,i_v\}$. Let $1\le w\le n$ and let $J_C(w)$ denote the system:
+@c  $$
+@c  Z_1^{i_1}+\dots+Z_w^{i_1}=0,
+@c  \vdots
+@c   $$
+@c @end tex
+@c @ifinfo
+@c  S_C=@{i_1,@dots{},i_v@}. Let 1<= w<= n and let J_C(w) denote the system:
+@c  @display
+@c  Z_1^(i_1)+@dots{}+Z_w^(i_1)=0,  
+@c  @end display
+@c @end ifinfo
+
+@c @ref{decodegb_lib}. More details can be obtained from @ref{[BP2008b]}.
+@c @code{sysCRHT} in @ref{decodegb_lib}.
+
+@c @tex
+@c @end tex
+@c @ifinfo
+@c @end ifinfo
