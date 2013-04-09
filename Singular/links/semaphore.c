@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include <kernel/mod2.h>
+#include <Singular/si_signals.h>
 
 #ifdef HAVE_SIMPLEIPC
 #include "simpleipc.h"
@@ -65,14 +66,14 @@ int sipc_semaphore_exists(int id)
 int sipc_semaphore_acquire(int id)
 {
   if ((id<0) || (id >= SIPC_MAX_SEMAPHORES) || (semaphore[id]==NULL))  return -1;
-  sem_wait(semaphore[id]);
+  si_sem_wait(semaphore[id]);
   return 1;
 }
 
 int sipc_semaphore_try_acquire(int id)
 {
   if ((id<0) || (id >= SIPC_MAX_SEMAPHORES) || (semaphore[id]==NULL))  return -1;
-  return !sem_trywait(semaphore[id]);
+  return !si_sem_trywait(semaphore[id]);
 }
 
 int sipc_semaphore_release(int id)

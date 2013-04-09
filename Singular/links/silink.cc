@@ -30,6 +30,7 @@
 #include <misc/intvec.h>
 #include <Singular/links/ssiLink.h>
 #include <Singular/links/pipeLink.h>
+#include <Singular/si_signals.h>
 #include "feOpt.h"
 
 // #ifdef HAVE_DBM
@@ -158,7 +159,7 @@ const char* slStatus(si_link l, const char *request)
   else if (strcmp(request, "exists") ==0)
   {
     struct stat buf;
-    if (lstat(l->name,&buf)==0) return "yes";
+    if (si_lstat(l->name,&buf)==0) return "yes";
     else return "no";
   }
   else if (strcmp(request, "open") == 0)

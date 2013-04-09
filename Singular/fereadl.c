@@ -194,7 +194,7 @@ void fe_init (void)
       extern char PC;
       #endif
       /* OB: why this ? HS: char t_buf[128] does not work with glibc2 systems */
-      char *t_buf=(char *)omAlloc(128); 
+      char *t_buf=(char *)omAlloc(128);
       /*char t_buf[128];*/
       char *temp;
       char** t_buf_ptr= &t_buf;
@@ -324,12 +324,12 @@ static int fe_getchar()
   {
     /* check for CSI */
     c='\0';
-    read (STDIN_FILENO, &c, 1);
+    while((-1 == read (STDIN_FILENO, &c, 1)) && (errno == EINTR));
     if (c == '[')
     {
       /* get command character */
       c='\0';
-      read (STDIN_FILENO, &c, 1);
+      while((-1 == read (STDIN_FILENO, &c, 1)) && (errno == EINTR));
       switch (c)
       {
         case 'D': /* left arrow key */
@@ -414,11 +414,16 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
           FD_SET(STDIN_FILENO, &fdset);
           tv.tv_sec = 0;
           tv.tv_usec = 0;
-          #ifdef hpux
-            sel = select (STDIN_FILENO+1, (int *)fdset.fds_bits, NULL, NULL, &tv);
-          #else
-            sel = select (STDIN_FILENO+1, &fdset, NULL, NULL, &tv);
-          #endif
+          do
+          {
+            sel = select (STDIN_FILENO+1,
+#ifdef hpux
+                          (int *)fdset.fds_bits,
+#else
+                          &fdset,
+#endif
+                          NULL, NULL, &tv);
+          } while( (sel == -1) && (errno == EINTR) );
           if (sel==0)
             fe_temp_reset();
           return s;
@@ -769,7 +774,7 @@ int fe_init_dyn_rl()
     #endif
     if (fe_rl_hdl==NULL) { return 1;}
 
-    fe_filename_completion_function= 
+    fe_filename_completion_function=
       dynl_sym(fe_rl_hdl, "filename_completion_function");
     if (fe_filename_completion_function==NULL) { res=3; break; }
     fe_readline=dynl_sym(fe_rl_hdl,"readline");
@@ -824,7 +829,7 @@ int fe_init_dyn_rl()
 #if defined(HAVE_READLINE) && !defined(HAVE_FEREAD) && !defined(HAVE_DYN_RL)
 extern int history_total_bytes();
 extern int write_history (const char *);
-#endif    
+#endif
 void fe_reset_input_mode ()
 {
 #if defined(HAVE_DYN_RL)

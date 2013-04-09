@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "config.h"
 
@@ -96,7 +97,12 @@ FILE * feFopen(const char *path, const char *mode, char *where,
   if (! path_only)
   {
     struct stat statbuf;
-    if ((stat(path,&statbuf)==0)
+    int res = -1;
+    do
+    {
+      res = stat(path,&statbuf);
+    } while((res < 0) and (errno == EINTR));
+    if ((res == 0)
     && (S_ISREG(statbuf.st_mode)))
       f = myfopen(path,mode);
   }

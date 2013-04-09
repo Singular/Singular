@@ -198,11 +198,11 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       else
       {
         mpz_t tmp;
-	mpz_init_set_si(tmp,nn);
+        mpz_init_set_si(tmp,nn);
         fputs("8 ",d->f_write);
         mpz_out_str (d->f_write,32, tmp);
         fputc(' ',d->f_write);
-	mpz_clear(tmp);
+        mpz_clear(tmp);
       }
       #endif
       //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
@@ -490,8 +490,8 @@ static number ssiReadQNumber(ssiInfo *d)
          number n=(number)omAlloc0(sizeof(snumber_dummy));
          mpz_init(((number_dummy)n)->z);
          mpz_init(((number_dummy)n)->n);
-	 s_readmpz_base (d->f_read,((number_dummy)n)->z, 32);
-	 s_readmpz_base (d->f_read,((number_dummy)n)->n, 32);
+         s_readmpz_base (d->f_read,((number_dummy)n)->z, 32);
+         s_readmpz_base (d->f_read,((number_dummy)n)->n, 32);
          ((number_dummy)n)->s=sub_type-5;
          return n;
        }
@@ -499,7 +499,7 @@ static number ssiReadQNumber(ssiInfo *d)
        {// read raw mpz_t
          number n=(number)omAlloc0(sizeof(snumber_dummy));
          mpz_init(((number_dummy)n)->z);
-	 s_readmpz_base (d->f_read,((number_dummy)n)->z, 32);
+         s_readmpz_base (d->f_read,((number_dummy)n)->z, 32);
          ((number_dummy)n)->s=sub_type=3; /*subtype-5*/
          return n;
        }
@@ -981,7 +981,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         listen(sockfd,1);
         char* cli_host = (char*)omAlloc(256);
         char* path = (char*)omAlloc(1024);
-        int r = sscanf(l->name,"%255[^:]:%s",cli_host,path);
+        int r = si_sscanf(l->name,"%255[^:]:%s",cli_host,path);
         if(r == 0)
         {
           WerrorS("ERROR: no host specified");
@@ -1038,7 +1038,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         struct sockaddr_in serv_addr;
         struct hostent *server;
 
-        sscanf(l->name,"%255[^:]:%d",host,&portno);
+        si_sscanf(l->name,"%255[^:]:%d",host,&portno);
         //Print("connect to host %s, port %d\n",host,portno);mflush();
         if (portno!=0)
         {
@@ -1300,7 +1300,7 @@ leftv ssiRead1(si_link l)
              break;
     case 19: res->rtyp=BIGINTMAT_CMD;
              res->data=ssiReadBigintmat(d);
-	     break;
+             break;
     case 20: ssiReadBlackbox(res,l);
              break;
     // ------------

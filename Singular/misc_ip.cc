@@ -14,6 +14,7 @@
 #include <misc/auxiliary.h>
 #include "config.h"
 #include <kernel/mod2.h>
+#include <Singular/si_signals.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -1026,7 +1027,7 @@ void checkall()
 extern "C"
 int singular_fstat(int fd, struct stat *buf)
 {
-  return fstat(fd,buf);
+  return si_fstat(fd,buf);
 }
 
 /*2

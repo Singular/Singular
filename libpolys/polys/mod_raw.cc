@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 
 #include "config.h"
@@ -38,16 +39,16 @@
 
 char* si_bultin_libs[]={ SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)  NULL };
 
-#undef SI_BUILTIN_LIBSTR 
+#undef SI_BUILTIN_LIBSTR
 
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
   const unsigned char mach_o[]={0xfe,0xed,0xfa,0xce,0};
   const unsigned char mach_O[]={0xce,0xfa,0xed,0xfe,0};
-   
+
   const unsigned char mach_o64[]={0xfe,0xed,0xfa,0xcf,0};
   const unsigned char mach_O64[]={0xcf,0xfa,0xed,0xfe,0};
-   
+
   int i=0;
   while(si_bultin_libs[i]!=NULL)
   {
@@ -61,11 +62,15 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
-  // int ret;
+  int ret;
   lib_types LT=LT_NONE;
 
   FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
-  /*ret =*/ (void) stat(libnamebuf, &sb);
+
+  do
+  {
+    ret = stat(libnamebuf, &sb);
+  } while((ret < 0) and (errno == EINTR));
 
   if (fp==NULL)
   {

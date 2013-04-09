@@ -23,6 +23,8 @@
 
 #include <findexec/omFindExec.h>
 
+#include <Singular/si_signals.h>
+
 #include "ipid.h"
 #include "ipshell.h"
 #include "libparse.h"
@@ -509,7 +511,7 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
         // get chksum
         hentry->url[i] = '\0';
 
-        if (fscanf(fd, "%ld\n", &(hentry->chksum)) != 1)
+        if (si_fscanf(fd, "%ld\n", &(hentry->chksum)) != 1)
         {
           hentry->chksum = -1;
         }
@@ -637,7 +639,7 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
   fd = fopen(filename, "r");
   if (fd == NULL) return 0;
   memset(index_key,0,MAX_HE_ENTRY_LENGTH);
-  while (fscanf(fd, "%[^\t]\t%*[^\n]\n", index_key) == 1)
+  while (si_fscanf(fd, "%[^\t]\t%*[^\n]\n", index_key) == 1)
   {
     if ((index_key[MAX_HE_ENTRY_LENGTH-1]!='\0'))
     {
@@ -1219,7 +1221,7 @@ static int singular_manual(char *str)
   while(!feof(index))
   {
     // char* dummy=fgets(buffer, BUF_LEN, index); /* */
-    (void)sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset);
+    (void)si_sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset);
     for(p=Index; *p; p++) *p = tolow(*p);/* */
     (void)strcat(Index, " ");
     if( strstr(Index, String)!=NULL)
