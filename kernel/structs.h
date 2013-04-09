@@ -647,7 +647,7 @@ struct sip_sring
 #ifdef __cplusplus
 extern "C" {
 #endif
-void  m2_end(int i) __attribute__((noreturn));
+void  m2_end(int i);
 #ifdef __cplusplus
 }
 #endif
