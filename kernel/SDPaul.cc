@@ -75,8 +75,8 @@ void ShiftDVec::Paul::initenterpairs
  *
  *  1) p_i,p_j and p_j,p'i are both candidates for new pairs
  *  2) lm(p_i),lm(p_j) are lms of a pair from L
- *  3) lm(p'i),lm(p_j) are lms of a pair from L
  *     -> cancellation in L
+ *  3) lm(p'i),lm(p_j) are lms of a pair from L
  *
  * Remark2:
  *  See todo list for an idea on how we could do this more
@@ -109,6 +109,7 @@ void ShiftDVec::Paul::GebauerMoeller
     //Case 2 & 3
     for(int j = 0; j <= strat->Ll; ++i)
     {
+      //This function may delete from strat->L
       SP::GMFilter( strat->L[j], //TODO: write it!
                     J, strat->Get_I_at(i),
                     overlaps[i], sizesOvls[i] );
@@ -125,7 +126,45 @@ void ShiftDVec::Paul::GebauerMoeller
  * p_i and p_k from I. i_ovls_j and i_ovls_j contain all shifts
  * which correspond to an overlap of lm(p_i) with lm(p_j) and
  * lm(p_k) with lm(p_j) respectivly. J is always overlapped
- * with and i from I from the left. See the theory for left-GB
+ * with an i from I from the left. See the theory for left-GB
+ * for explanations. We want to filter the p_i - p_j pairs.
+ * We expect i_ovls_j and k_ovls_j to be sorted (biggest shifts,
+ * and thus smallest overlaps first).
+ * TODO: Let this function get checked by Grischa!
+ */
+void ShiftDVec::Paul::GMFilter
+  ( LObject* J, LObject* p_i, LObject* p_k,
+    uint* i_ovls_j, uint* k_ovls_j,
+    uint size_i_ovls_j, uint size_i_ovls_k )
+{
+  uint tg_lm_pi = p_i->GetDVsize();
+  uint tg_lm_pj = J->GetDVsize();
+  uint tg_lm_pk = p_k->GetDVsize();
+
+  for(int i = 0; i < size_i_ovls_j; ++i)
+  {
+    uint tg_lcm_i_j = i_ovls_j[i] + tg_lm_pj;
+    for(int k = size_k_ovls_j-1; k >= 0; --k)
+    {
+      // Test if lcm_k_j divides lcm_i_j
+      if( k_ovls_j[k] > i_ovls_j[i] ) break;
+      uint shift_k = i_ovls_j[i] - k_ovls_j[k];
+      if( shift_k + tg_lm_pj > tg_lcm_i_j ) break;
+      if( p_i->cmpDVecProper(p_k, shift_k, 0, k_ovls_j[i]) )
+      { i_ovls_j[i] = 0; break; }
+    }
+  }
+}
+
+/* BOCO:
+ * Case 2:
+ *  1111111    | lm(L.p1)
+ *     JJJJJJJ | lm(p_j) = lm(L.p2)
+ *    kkkkkk   | lm(p_k)
+ * L.p1 and p_k from I. i_ovls_j and i_ovls_j contain all shifts
+ * which correspond to an overlap of lm(p_i) with lm(p_j) and
+ * lm(p_k) with lm(p_j) respectivly. J is always overlapped
+ * with an i from I from the left. See the theory for left-GB
  * for explanations. We want to filter the p_i - p_j pairs.
  * We expect i_ovls_j and k_ovls_j to be sorted (biggest shifts,
  * and thus smallest overlaps first).
