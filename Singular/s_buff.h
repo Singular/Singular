@@ -16,6 +16,7 @@ typedef struct s_buff_s * s_buff;
 
 s_buff s_open(int fd);
 s_buff s_open_by_name(const char *n);
+int    s_free(s_buff &f);
 int    s_close(s_buff &f);
 
 int s_getc(s_buff F);
@@ -28,7 +29,4 @@ void s_readmpz(s_buff F, mpz_ptr a);
 void s_readmpz_base(s_buff F, mpz_ptr a, int base);
 int s_isready(s_buff F);
 int s_iseof(s_buff F);
-
-extern sigset_t ssi_sigmask; // set in ssiLink.cc
-extern sigset_t ssi_oldmask; // set in ssiLink.cc
 #endif

@@ -139,9 +139,9 @@ void slCleanUp(si_link l)
   {
     if (SI_LINK_OPEN_P(l))
     {
-      if (l->m->Kill != NULL) l->m->Kill(l);
-      else if (l->m->Close != NULL) l->m->Close(l);
+      if (l->m->Close != NULL) l->m->Close(l);
     }
+    if ((l->data != NULL) && (l->m->Kill != NULL)) l->m->Kill(l);
     omFree((ADDRESS)l->name);
     omFree((ADDRESS)l->mode);
     memset((void *) l, 0, sizeof(ip_link));

@@ -26,40 +26,36 @@
 
 #define S_BUFF_LEN 4096
 
-sigset_t ssi_sigmask; // set in ssiLink.cc
-sigset_t ssi_oldmask; // set in ssiLink.cc
-
-#define SSI_BLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_sigmask, &ssi_oldmask)
-#define SSI_UNBLOCK_CHLD sigprocmask(SIG_SETMASK, &ssi_oldmask, NULL)
-
 s_buff s_open(int fd)
 {
-  SSI_BLOCK_CHLD;
   s_buff F=(s_buff)omAlloc0(sizeof(*F));
   F->fd=fd;
   F->buff=(char*)omAlloc(S_BUFF_LEN);
-  SSI_UNBLOCK_CHLD;
   return F;
 }
 
 s_buff s_open_by_name(const char *n)
 {
-  SSI_BLOCK_CHLD;
   int fd=si_open(n,O_RDONLY);
-  SSI_UNBLOCK_CHLD;
   return s_open(fd);
+}
+
+int    s_free(s_buff &F)
+{
+  if (F!=NULL)
+  {
+    omFreeSize(F->buff,S_BUFF_LEN);
+    omFreeSize(F,sizeof(*F));
+    F=NULL;
+  }
+  return 0;
 }
 
 int    s_close(s_buff &F)
 {
   if (F!=NULL)
   {
-    SSI_BLOCK_CHLD;
-    omFreeSize(F->buff,S_BUFF_LEN);
-    int r=si_close(F->fd);
-    omFreeSize(F,sizeof(*F));
-    F=NULL;
-    SSI_UNBLOCK_CHLD;
+    int r=close(F->fd);
     return r;
   }
   return 0;
@@ -75,9 +71,7 @@ int s_getc(s_buff F)
   if (F->bp>=F->end)
   {
     memset(F->buff,0,S_BUFF_LEN); /*debug*/
-    SSI_BLOCK_CHLD;
     int r=si_read(F->fd,F->buff,S_BUFF_LEN);
-    SSI_UNBLOCK_CHLD;
     if (r<=0)
     {
       F->is_eof=1;
