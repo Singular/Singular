@@ -146,6 +146,7 @@ SingularHEADERS =    Cache.h \
    links/slInit.h \
    links/ssiLink.h \
    links/simpleipc.h \
+   si_signals.h \
    stype.h \
    subexpr.h \
    table.h \
