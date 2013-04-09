@@ -23,6 +23,10 @@
 #include "cf_factory.h"
 #include "facFqSquarefree.h"
 
+#ifdef HAVE_NTL
+#include "NTLconvert.h"
+#endif
+
 static inline
 CanonicalForm
 pthRoot (const CanonicalForm & F, const int & q)
@@ -42,6 +46,33 @@ pthRoot (const CanonicalForm & F, const int & q)
     return buf;
   }
 }
+
+#ifdef HAVE_NTL
+CanonicalForm
+pthRoot (const CanonicalForm & F, const ZZ& q, const Variable& alpha)
+{
+  CanonicalForm A= F;
+  int p= getCharacteristic ();
+  if (A.inCoeffDomain())
+  {
+    zz_p::init (p);
+    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+    zz_pE::init (NTLMipo);
+    zz_pX NTLA= convertFacCF2NTLzzpX (A);
+    zz_pE NTLA2= to_zz_pE (NTLA);
+    power (NTLA2, NTLA2, q/p);
+    A= convertNTLzzpE2CF (NTLA2, alpha);
+    return A;
+  }
+  else
+  {
+    CanonicalForm buf= 0;
+    for (CFIterator i= A; i.hasTerms(); i++)
+      buf= buf + power(A.mvar(), i.exp()/p)*pthRoot (i.coeff(), q, alpha);
+    return buf;
+  }
+}
+#endif
 
 CanonicalForm
 maxpthRoot (const CanonicalForm & F, const int & q, int& l)
@@ -156,7 +187,19 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   if (degcheck == false && tmp1.isEmpty() && tmp2.isEmpty())
     return CFFList (CFFactor (F/Lc(F), 1));
 
-  CanonicalForm buffer= pthRoot (A, ipower (p, k));
+  CanonicalForm buffer;
+#ifdef HAVE_NTL
+  if (alpha.level() == 1)
+#endif
+    buffer= pthRoot (A, ipower (p, k));
+#ifdef HAVE_NTL
+  else
+  {
+    ZZ q;
+    power (q, p, k);
+    buffer= pthRoot (A, q, alpha);
+  }
+#endif
 
   tmp1= squarefreeFactorization (buffer, alpha);
 
