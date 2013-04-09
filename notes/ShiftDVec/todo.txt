@@ -156,3 +156,6 @@ other  -  no/minor priority
   Note to myself: Have to read more about orderings and their
   matrices. Viktor gave me a short introduction for free, but it
   was very fast and I didn't take notes
+
+· [?] Look how many pairs are filtered (in the different cases)
+  (for normal GBs and left GBs)

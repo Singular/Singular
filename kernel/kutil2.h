@@ -359,4 +359,15 @@ public:
       (dvec, dvSize, T->dvec, T->dvSize, numVars); }
 };
 
+class ShiftDVec::skStrategy : public ::skStrategy
+{
+  // This is needed for the calculation of a left GB in a
+  // factor algebra K<X>/I; so this will be used in the
+  // ShiftDVec::Paul namespace
+  polyset I;
+  uint size_of_I; // This is, what it says!
+  poly Get_I_at(uint i){return I[i];}
+  void deleteFromL(uint index); //TODO: write this
+}
+
 #endif  //#ifndef KUTIL2_H

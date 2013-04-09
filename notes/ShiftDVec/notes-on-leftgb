@@ -27,6 +27,7 @@ Calculating Left Ideals in Factor Algebras
      jjjjjj p_j
    iiiii    p_i
 
+Idea (not implemented):
 · Init: S := J
 · For every p_s in S we keep a list of references to the P_l in
   L. A reference is given if and only if p_s is the shifted
