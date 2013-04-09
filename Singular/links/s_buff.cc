@@ -10,6 +10,7 @@
 
 #include <omalloc/omalloc.h>
 #include <Singular/links/s_buff.h>
+#include <Singular/si_signals.h>
 //struct s_buff_s
 //{
 //    char * buff; // buffer
@@ -42,7 +43,7 @@ s_buff s_open(int fd)
 s_buff s_open_by_name(const char *n)
 {
   SSI_BLOCK_CHLD;
-  int fd=open(n,O_RDONLY);
+  int fd=si_open(n,O_RDONLY);
   SSI_UNBLOCK_CHLD;
   return s_open(fd);
 }
@@ -53,7 +54,7 @@ int    s_close(s_buff &F)
   {
     SSI_BLOCK_CHLD;
     omFreeSize(F->buff,S_BUFF_LEN);
-    int r=close(F->fd);
+    int r=si_close(F->fd);
     omFreeSize(F,sizeof(*F));
     F=NULL;
     SSI_UNBLOCK_CHLD;
@@ -73,7 +74,7 @@ int s_getc(s_buff F)
   {
     memset(F->buff,0,S_BUFF_LEN); /*debug*/
     SSI_BLOCK_CHLD;
-    int r=read(F->fd,F->buff,S_BUFF_LEN);
+    int r=si_read(F->fd,F->buff,S_BUFF_LEN);
     SSI_UNBLOCK_CHLD;
     if (r<=0)
     {
