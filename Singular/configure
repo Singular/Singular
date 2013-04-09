@@ -9053,12 +9053,12 @@ else
 $as_echo "no" >&6; }
 fi
 
-NEED_LIBSG="${NEED_LIBS} -lpthread"
+NEED_LIBSG="${NEED_LIBS} -lpthread -lrt"
 
 if test "$ac_cv_sizeof_voidp" != 4; then
-  NEED_LIBS="${NEED_LIBS} -lomalloc -lpthread"
+  NEED_LIBS="${NEED_LIBS} -lomalloc -lpthread -lrt"
 else
-  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lpthread"
+  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lpthread -lrt"
 fi
 
 

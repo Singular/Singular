@@ -410,9 +410,6 @@ static void SentQuitMsg(si_link l)
 
 LINKAGE BOOLEAN slCloseMP(si_link l)
 {
-#ifdef HPUX_9
-  signal(SIGCHLD, (void (*)(int))SIG_DFL);
-#endif
   if ((strcmp(l->mode, "launch") == 0 || strcmp(l->mode, "fork") == 0) &&
       (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
   {
@@ -420,9 +417,6 @@ LINKAGE BOOLEAN slCloseMP(si_link l)
     //si_wait(NULL);
   }
   MP_CloseLink((MP_Link_pt) l->data);
-#ifdef HPUX_9
-  signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#endif
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
