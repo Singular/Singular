@@ -1891,11 +1891,11 @@ else
 main()
 {
   void* ptr = (void*) malloc(12);
-  double* d_ptr;
+  volatile double* d_ptr;
   if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;
   d_ptr = (double*) ptr;
-  *d_ptr = (double) 1.1;
-  if (*d_ptr != (double) 1.1) exit(1);
+  *d_ptr = (double) 1.25;
+  if (*d_ptr != (double) 1.25) exit(1);
   else exit(0);
 }
 
