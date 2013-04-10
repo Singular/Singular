@@ -142,20 +142,20 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
   {
      fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
   }
-  si_siginterrupt(sig, 0); 
+  si_siginterrupt(sig, 0);
   /*system calls will be restarted if interrupted by  the  specified
    * signal sig.  This is the default behavior in Linux.
    */
 #else
   struct sigaction new_action,old_action;
-     
+
   /* Set up the structure to specify the new action. */
   new_action.sa_handler = signal_handler;
   if (sig==SIGINT)
     sigemptyset (&new_action.sa_mask);
   else
     new_action.sa_flags = SA_RESTART;
-     
+
   int r=si_sigaction (sig, &new_action, &old_action);
   si_hdl_typ retval=(si_hdl_typ)old_action.sa_handler;
   if (r == -1)
@@ -416,7 +416,7 @@ void sigint_handler(int sig)
 
 #ifdef unix
 #  ifndef __OPTIMIZE__
-int si_stop_stack_trace_x;
+volatile int si_stop_stack_trace_x;
 #    ifdef CALL_GDB
 static void debug (int method)
 {
@@ -443,15 +443,13 @@ static void debug (int method)
     switch (method)
     {
       case INTERACTIVE:
-        fprintf (stderr, "debug_stop\n");
+        fprintf (stderr, "\n\nquit with \"p si_stop_stack_trace_x=0\"\n\n\n");
         debug_stop (args);
         break;
-      #ifndef __OPTIMIZE__
       case STACK_TRACE:
         fprintf (stderr, "stack_trace\n");
         stack_trace (args);
         break;
-      #endif
       default:
         // should not be reached:
         exit(1);
@@ -475,8 +473,6 @@ static void debug_stop (char *const*args)
 }
 #    endif /* CALL_GDB */
 
-static int stack_trace_done;
-
 static void stack_trace (char *const*args)
 {
   int pid;
@@ -488,10 +484,6 @@ static void stack_trace (char *const*args)
   int sel, index, state;
   char buffer[256];
   char c;
-
-  stack_trace_done = 0;
-
-  signal (SIGCHLD, stack_trace_sigchld);
 
   if ((pipe (in_fd) == -1) || (pipe (out_fd) == -1))
   {
@@ -565,7 +557,7 @@ static void stack_trace (char *const*args)
         }
       }
     }
-    else if (stack_trace_done)
+    else if (si_stop_stack_trace_x==0)
       break;
   }
 
@@ -574,11 +566,6 @@ static void stack_trace (char *const*args)
   si_close (out_fd[0]);
   si_close (out_fd[1]);
   m2_end(0);
-}
-
-static void stack_trace_sigchld (int signum)
-{
-  stack_trace_done = 1;
 }
 
 #  endif /* !__OPTIMIZE__ */
