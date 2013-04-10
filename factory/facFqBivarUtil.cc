@@ -442,6 +442,7 @@ CFFList multiplicity (CanonicalForm& F, const CFList& factors)
   return result;
 }
 
+#ifdef HAVE_NTL
 CFArray
 logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
                        CanonicalForm& Q
@@ -555,6 +556,7 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   Q= q;
   return result;
 }
+#endif
 
 void
 writeInMatrix (CFMatrix& M, const CFArray& A, const int column,

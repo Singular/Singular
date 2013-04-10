@@ -863,6 +863,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       else
         equal= true; // modular image did not add any new information
       TIMING_START (alg_termination)
+#ifdef HAVE_NTL
 #ifdef HAVE_FLINT
       if (equal && tmp.isUnivariate() && f.isUnivariate() && g.isUnivariate()
           && f.level() == tmp.level() && tmp.level() == g.level())
@@ -888,6 +889,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
         }
       }
       else
+#endif
 #endif
       if(equal && fdivides( tmp, f ) && fdivides( tmp, g )) // trial division
       {
