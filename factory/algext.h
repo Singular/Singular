@@ -1,5 +1,5 @@
-#ifndef ALGEXT_H
-#define ALGEXT_H
+#ifndef CF_ALGEXT_H
+#define CF_ALGEXT_H
 
 #include <config.h>
 

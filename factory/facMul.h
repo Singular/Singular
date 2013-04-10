@@ -17,6 +17,7 @@
 #include "canonicalform.h"
 #include "fac_util.h"
 
+#ifdef HAVE_NTL
 /// multiplication of univariate polys over a finite field using NTL, if we are
 /// in GF factory's default multiplication is used.
 ///
@@ -164,6 +165,7 @@ newtonDivrem (const CanonicalForm& F, ///<[in] univariate poly
               CanonicalForm& Q,       ///<[in, out] quotient
               CanonicalForm& R        ///<[in, out] remainder
              );
+#endif
 #endif
 
 #endif
