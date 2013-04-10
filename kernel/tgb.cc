@@ -1456,6 +1456,10 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   }
 
 #define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->array_lengths*sizeof(type))
+
+#define ENLARGE_ALIGN(pointer, type) {if(pointer)\
+         pointer=(type*)omReallocAligned(pointer, c->array_lengths*sizeof(type));\
+         else pointer=(type*)omAllocAligned(c->array_lengths*sizeof(type));}
 //  BOOLEAN corr=lenS_correct(c->strat);
   int sugar;
   int ecart = 0;
@@ -1471,22 +1475,22 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
     c->array_lengths = c->array_lengths * 2;
     assume (c->array_lengths >= c->n);
     ENLARGE (c->T_deg, int);
-    ENLARGE (c->tmp_pair_lm, poly);
-    ENLARGE (c->tmp_spn, sorted_pair_node *);
+    ENLARGE_ALIGN (c->tmp_pair_lm, poly);
+    ENLARGE_ALIGN (c->tmp_spn, sorted_pair_node *);
 
-    ENLARGE (c->short_Exps, long);
+    ENLARGE_ALIGN (c->short_Exps, long);
     ENLARGE (c->lengths, int);
 #ifndef HAVE_BOOST
 #ifndef USE_STDVECBOOL
 
-    ENLARGE (c->states, char *);
+    ENLARGE_ALIGN (c->states, char *);
 #endif
 #endif
-    ENLARGE (c->gcd_of_terms, poly);
+    ENLARGE_ALIGN (c->gcd_of_terms, poly);
     //if (c->weighted_lengths!=NULL) {
-    ENLARGE (c->weighted_lengths, wlen_type);
+    ENLARGE_ALIGN (c->weighted_lengths, wlen_type);
     //}
-    //ENLARGE(c->S->m,poly);
+    //ENLARGE_ALIGN(c->S->m,poly);
   }
   pEnlargeSet (&c->S->m, c->n - 1, 1);
   if(c->T_deg_full)
@@ -1537,6 +1541,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   c->short_Exps[i] = p_GetShortExpVector (h, c->r);
 
 #undef ENLARGE
+#undef ENLARGE_ALIGN
   if(p_GetComp (h, currRing) <= c->syz_comp)
   {
     for(j = 0; j < i; j++)
@@ -3274,7 +3279,7 @@ slimgb_alg::slimgb_alg (ideal I, int syz_comp, BOOLEAN F4, int deg_pos)
 #endif
   h = omAlloc (n * sizeof (int));
   lengths = (int *) h;
-  weighted_lengths = (wlen_type *) omAlloc (n * sizeof (wlen_type));
+  weighted_lengths = (wlen_type *) omAllocAligned (n * sizeof (wlen_type));
   gcd_of_terms = (poly *) omAlloc (n * sizeof (poly));
 
   short_Exps = (long *) omAlloc (n * sizeof (long));
