@@ -818,6 +818,7 @@ fi
 AC_CHECK_LIB(nsl,gethostbyname)
 AC_CHECK_LIB(socket,accept)
 AC_CHECK_LIB(rt,sem_open)
+AC_CHECK_LIB(pthread,pthread_create)
 
 SAVE_LIBS=${LIBS}
 LIBS=
@@ -1144,6 +1145,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
+
 AC_CHECK_LIB(ncurses,tgetent,,\
  AC_CHECK_LIB(curses,tgetent,,\
   AC_CHECK_LIB(termcap,tgetent)))
@@ -1456,12 +1458,12 @@ else
   AC_MSG_RESULT(no)
 fi
 
-NEED_LIBSG="${NEED_LIBS} -lpthread -lrt"
+NEED_LIBSG="${NEED_LIBS}"
 
 if test "$ac_cv_sizeof_voidp" != 4; then
-  NEED_LIBS="${NEED_LIBS} -lomalloc -lpthread -lrt"
+  NEED_LIBS="${NEED_LIBS} -lomalloc"
 else
-  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug -lpthread -lrt"
+  NEED_LIBS="${NEED_LIBS} -lomalloc_ndebug"
 fi
 
 AC_SUBST(NEED_LIBS)
