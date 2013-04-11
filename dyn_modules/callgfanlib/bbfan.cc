@@ -986,8 +986,8 @@ void bbfan_setup(SModulFunctions* p)
   b->blackbox_Init=bbfan_Init;
   b->blackbox_Copy=bbfan_Copy;
   b->blackbox_Assign=bbfan_Assign;
-  iiAddCproc("","emptyFan",FALSE,emptyFan);
-  iiAddCproc("","fullFan",FALSE,fullFan);
+  p->iiAddCproc("","emptyFan",FALSE,emptyFan);
+  p->iiAddCproc("","fullFan",FALSE,fullFan);
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","containsInSupport",FALSE,containsInSupport);
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
