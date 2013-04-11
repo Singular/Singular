@@ -3000,7 +3000,7 @@ string, in general).
 
 Ssi links should primarily be used for communicating with other
 programs or for parallel computations (see, for example,
-@ref{Parallelization with Ssi links}).
+@ref{Parallelization with ssi links}).
 
 @xref{Ssi links}, for more information.
 
