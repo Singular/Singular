@@ -6288,7 +6288,7 @@ See
 @ref{qring}.
 @c ref
 @c ---------------------------------------
-@node rvar, setring, ringlist, Functions
+@node rvar, sba, ringlist, Functions
 @subsection rvar
 @cindex rvar
 @table @code
@@ -6323,13 +6323,13 @@ See
 @ref{varstr}.
 @c ref
 @c ---------------------------------------
-@node sba
+@node sba, setring, rvar, Functions
 @subsection sba
 @cindex sba
 @table @code
 @item @strong{Syntax:}
 @code{sba (} ideal_expression@code{)}
-@*@code{std (} ideal_expression@code{,} int_expression{,} int_expression @code{)}
+@*@code{std (} ideal_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
@@ -6397,7 +6397,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node setring, simplex, rvar, Functions
+@node setring, simplex, sba, Functions
 @subsection setring
 @cindex setring
 @table @code
