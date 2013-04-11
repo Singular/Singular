@@ -243,6 +243,12 @@ See also @ref{Non-commutative libraries}.
 @ifset withplural
 @xref{Non-commutative libraries}.
 @end ifset
+
+@strong{Binary libraries:}
+@menu
+* convex geometry::
+@end menu
+
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
@@ -955,6 +961,21 @@ Todos/Issues:
 @node realclassify_lib,, multigrading_lib, Experimental libraries
 @subsection realclassify_lib
 @c lib realclassify.lib
+
+@c ----------------------------------------------------------
+@node convex geometry, , , SINGULAR libraries
+@section convex geometry
+@cindex convex geometry
+
+@menu
+* polymake_so:: A polymake interface for Singular
+@end menu
+
+@c ---------------------------------------------------------
+@node polymake_so, , ,convex geometry
+@subsection polymake_so
+
+@include polymake.tex
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
