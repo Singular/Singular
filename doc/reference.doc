@@ -727,7 +727,7 @@ none
 closes a link.
 @item @strong{Example:}
 @smallexample
-link l="MPtcp:launch";
+link l="ssi:tcp localhost:"+system("Singular");
 open(l); // start SINGULAR "server" on localhost in batchmode
 close(l); // shut down SINGULAR server
 @end smallexample
@@ -1535,7 +1535,7 @@ none
 @item @strong{Purpose:}
 dumps (i.e., writes in a "message" or "block") the state of the @sc{Singular}
 session (i.e., all defined variables and their values) to the specified
-link (which must be either an ASCII or MP link) such that a
+link (which must be either an ASCII or ssi link) such that a
 @code{getdump} can retrieve it later on.
 @item @strong{Example:}
 @smallexample
@@ -1630,16 +1630,16 @@ none
 evaluates (quoted) expressions. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
 effect of exactly one quote). Used only when receiving a quoted expression
-from an MPfile link,
+from an ssi link,
 with @code{quote} and @code{write} to
-prevent local evaluations  when writing to an MPtcp link.
+prevent local evaluations  when writing to an ssi link.
 @item @strong{Example:}
 @smallexample
 @c example unix_only
-  link l="MPfile:w example.mp";
+  link l="ssi:w example.ssi";
   ring r=0,(x,y,z),ds;
   ideal i=maxideal(3);
-  ideal j=x7,x2,z;
+  ideal j=x7+x3,x2,z;
   // compute i+j before writing, but not std
   // this writes 'std(ideal(x3,...,z))'
   write (l, quote(std(eval(i+j))));
@@ -1654,7 +1654,7 @@ prevent local evaluations  when writing to an MPtcp link.
 @end table
 @c ref
 See
-@ref{MPfile links};
+@ref{ssi links};
 @ref{quote};
 @ref{write}.
 @c ref
@@ -2343,7 +2343,7 @@ none
 @item @strong{Purpose:}
 reads the content of the entire file, resp.@: link, and restores all variables
 from it. For ASCII links, @code{getdump} is equivalent to an
-@code{execute(read(} link @code{))} command. For MP links,
+@code{execute(read(} link @code{))} command. For ssi links,
 @code{getdump} should only be used on data which were previously
 @code{dump}`ed.
 @item @strong{Example:}
@@ -4909,8 +4909,8 @@ none
 opens a link.
 @item @strong{Example:}
 @smallexample
-link l="MPtcp:launch";
-open(l);  // start SINGULAR "server" on localhost in batchmode
+link l="ssi:tcp localhost:"+system("Singular");
+open(l); // start SINGULAR "server" on localhost in batchmode
 close(l); // shut down SINGULAR server
 @end smallexample
 @end table
@@ -5756,7 +5756,7 @@ for all three number arguments is a small value like e.g. 10^(-100).)
 none
 @item @strong{Purpose:}
 prevents expressions from evaluation. Used only in connections with write to
-MPfile links, prevents evaluation of an expression before sending it to an other
+ssi links, prevents evaluation of an expression before sending it to an other
 @sc{Singular} process.
 Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
@@ -5764,7 +5764,7 @@ effect of exactly one quote).
 @item @strong{Example:}
 @smallexample
 @c example unix_only
-  link l="MPfile:w example.mp";
+  link l="ssi:w example.ssi";
   ring r=0,(x,y,z),ds;
   ideal i=maxideal(3);
   ideal j=x7,x2,z;
@@ -5782,7 +5782,7 @@ effect of exactly one quote).
 See
 @ref{eval};
 @ref{write};
-@ref{MPfile links}.
+@ref{ssi links}.
 @c ref
 @c ---------------------------------------
 @node quotient, random, quote, Functions
@@ -5945,9 +5945,9 @@ reads data from a link.
 @*For ASCII links, the content of the entire
 file is returned as a string. If the ASCII link is the empty string,
 @code{read} reads from standard input.
-@*For MP links, one expression is read
-from the link and returned after evaluation. See @ref{MP links}.
-@*For MPtcp links the @code{read} command blocks as long as there is no
+@*For ssi links, one expression is read
+from the link and returned after evaluation. See @ref{ssi links}.
+@*For ssi links the @code{read} command blocks as long as there is no
 data to be read from the link. The @code{status} command can be used to
 check whether or not there is data to be read.
 @*For DBM links, a @code{read} with one argument returns the value of
@@ -6893,28 +6893,19 @@ See
 string
 @item @strong{Syntax:}
 @code{status (} link_expression@code{,} string_expression@code{,} string_expression @code{)}
-@*@code{status (} link_expression@code{,} string_expression@code{,} string_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
 returns the status of the link as asked for by the second argument.  If
 a third argument is given, the result of the comparison to the status
 string is returned: @code{(status(l,s1)==s2)} is equivalent to
-@code{status(l,s1,s2)}.  If a fourth integer argument (say @code{i}) is
-given and if @code{status(l,s1,s2)} yields @code{0}, then the execution
-of the current process is suspended (the process is put to ``sleep'')
-for approximately@: @code{i} microseconds, and afterwards the result of another
-call to @code{status(l,s1,s2)} is returned. The latter is useful for
-``polling'' the @code{read} status of MPtcp links such that busy
-loops are avoided (see @ref{Parallelization with MPtcp links} for an
-example).  Note that on some systems, the minimum time for a process to
-be put to sleep is one second.
+@code{status(l,s1,s2)}.
 @*The following string expressions are allowed:
 @table @code
 @item @code{"name"}
 the name string given by the definition of the link (usually the filename)
 @item @code{"type"}
-returns @code{"ASCII"}, @code{"MPfile"}, @code{"MPtcp"}, @code{"DBM"} or @code{"ssi"}
+returns @code{"ASCII"}, @code{"DBM"} or @code{"ssi"}
 @item @code{"open"}
 returns @code{"yes"} or @code{"no"}
 @item @code{"openread"}
@@ -6929,7 +6920,7 @@ returns @code{"ready"} or @code{"not ready"}
 returns (depending on the type of the link and its status)
 @code{"","w","a","r"} or @code{"rw"}
 @item @code{"exists"}
-returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/MPfile/ssi links
+returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/ssi links
 @end table
 @item @strong{Example:}
 @smallexample
@@ -7707,8 +7698,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-Expects a list of open links (of mode ssi:fork, ssi:tcp, MPtcp:fork or
-MPtcp:launch)
+Expects a list of open links (of mode ssi:fork, ssi:tcp)
 and waits until all of them are finished, i.e., are ready to be read.
 @*In the first case, the command waits for all links to finish
 (or to crash, see below) and may therefore run forever.
@@ -7755,8 +7745,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-Expects a list of open links (of mode ssi:fork, ssi:tcp, MPtcp:fork or
-MPtcp:launch)
+Expects a list of open links (of mode ssi:fork, ssi:tcp)
 and waits until the first of them is finished, i.e., is ready to be read.
 @*In the first case, the command waits until the first link is finished
 (or all of them crashed, see below) and may therefore run forever.
@@ -7880,12 +7869,12 @@ writes data to a link.
 strings  (and separated by a newline character) before they are
 written. As a consequence, only such values which can be converted to a
 string can be written to an  @code{ASCII} link.
-@*For MP links,
+@*For ssi links,
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
 can be used. A @code{write} blocks (i.e., does not return to the prompt),
-as long as a MPtcp link is not ready for writing.
+as long as a ssi link is not ready for writing.
 @*For DBM links, @code{write} with three arguments inserts the first
 string as key and the second string as value into the dbm data
 base.
@@ -7917,9 +7906,9 @@ ring r=32003,(x,y,z),dp;
 string s=read("save_i");   //creates the string x+y,z3+22y
 execute("ideal k="+s+";"); // this defines an ideal k which
                            // is equal to i.
-// for large objects, the MP format and MPfile links are better:
-write("MPfile:w save_i.mp",i);
-def j=read("MPfile:r save_i.mp");
+// for large objects, the ssi format and ssi links are better:
+write("ssi:w save_i.ssi",i);
+def j=read("ssi:r save_i.ssi");
 @end smallexample
 @end table
 @c ref
@@ -7934,7 +7923,6 @@ See
 @ref{printf};
 @ref{short}.
 @c ref
-
 
 @c ---------------------------------------
 @node Control structures, System variables, Functions, Functions and system variables

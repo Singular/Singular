@@ -101,14 +101,10 @@ Ports of @sc{Singular} to different systems do not always implement all
 possible parts of @sc{Singular}:
 @itemize @bullet
 @item
-MP links are available only for 32bit unix systems.
-@item
 dynamic modules are implemented for
   @itemize @bullet
   @item
-  unix systems with ELF format for executables (Linux, Solaris)
-  @item
-  HPUX
+  unix systems with ELF format for executables (Linux, Solaris, FreeBSD)
   @end itemize
 @end itemize
 @c -------------------------------------------------------------------------
