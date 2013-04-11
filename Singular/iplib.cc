@@ -1103,8 +1103,6 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   WerrorS("mod_init: static version can not load modules");
   return TRUE;
 #else
-  int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
-                 BOOLEAN(*func)(leftv res, leftv v));
   typedef int (*fktn_t)(int(*iiAddCproc)(const char *libname, const char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
