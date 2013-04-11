@@ -21,7 +21,8 @@ or a subexpression of the latter. The resulting object can be stored to gain
 read and write access from sophisticated data structures.
 
 @smallexample
-@c example initializing references
+@c example error
+system("reference"); system("shared");
 int i = 17;
 reference ref = i;
 
@@ -38,7 +39,7 @@ uninitialized;   // not initialized
 // error: not a named identifier:
 uninitialized = 17;
 
-// but subexpressions of named identifiers will do 
+// but subexpressions of named identifiers will do
 list ll = list(3,4,5);
 reference ref = ll[2];
 ref;
@@ -53,7 +54,8 @@ avoid the initial identifier definition. Each copy has equal rights
 for manipulating the data.
 
 @smallexample
-@c example initializing shared
+@c example
+system("reference"); system("shared");
 shared ll= list(2,3);
 
 ll[1];
@@ -65,9 +67,10 @@ ll;
 
 In most cases the value look-up is done automatically, but sometimes
 you have to disambiguate the input.
- 
+
 @smallexample
-@c example automatically dereferencing
+@c example
+system("reference"); system("shared");
 int i = 0;
 reference ref = i;
 shared sh = 12;
@@ -94,12 +97,13 @@ string(ll);
 
 The previous example had shown that @code{reference} and @code{shared}
 objects can store highly structured without duplicating data
-all over again.  
-As an additional feature, you can use @code{reference} objects for 
+all over again.
+As an additional feature, you can use @code{reference} objects for
 implementing procedures having side-effects.
 
 @smallexample
-@c example side-effects
+@c example
+system("reference"); system("shared");
 list changeme;
 changeme;
 
@@ -140,7 +144,8 @@ defines a @code{reference} object.
 
 @item Example:
 @smallexample
-@c example
+@c example error
+system("reference"); system("shared");
   reference empty;
   empty;
 
@@ -157,7 +162,7 @@ defines a @code{reference} object.
 @end smallexample
 @end table
 @c ------------------------------
-@node reference expressions, reference and shared operations, reference declarations, countedref
+@node reference expressions, shared declarations, reference declarations, countedref
 @subsection reference expressions
 @cindex reference expressions
 
@@ -174,6 +179,7 @@ an object of type @code{reference} (result will reference the original identifie
 @*@strong{Example:}
 @smallexample
 @c example
+system("reference"); system("shared");
   int i = 17;
   reference ref = i;  // new reference
   ref;
@@ -193,7 +199,7 @@ an object of type @code{reference} (result will reference the original identifie
 
 @c ------------------------------
 
-@node shared declarations, shared expressions, countedref, countedref
+@node shared declarations, shared expressions, reference expressions, countedref
 @subsection shared declarations
 @cindex shared declarations
 
@@ -210,6 +216,7 @@ defines a @code{shared} object.
 @item Example:
 @smallexample
 @c example
+system("reference"); system("shared");
   shared empty;
   empty;
 
@@ -239,12 +246,13 @@ an object of type @code{shared} (result will reference the same data)
 @*@strong{Example:}
 @smallexample
 @c example
-  shared sh = 17;  // new shared 
+system("reference"); system("shared");
+  shared sh = 17;  // new shared
   shared second = sh;
   second;
   second = 9;       // also tied to 'sh'
-  i;
-  typeof(ref);
+  sh;
+  typeof(sh);
 
   shared ll = list(1, 2, 3);
   shared lref = ll[1];
@@ -254,18 +262,20 @@ an object of type @code{shared} (result will reference the same data)
 @c example
 @end smallexample
 
-@node reference and shared operations, reference and shared related functions, reference expressions, countedref
+@c --------------------------------------------------------------------------
+@node reference and shared operations, reference and shared related functions, shared expressions, countedref
 @subsection reference and shared operations
 @cindex reference operations
 @cindex shared operations
 
 All operations of the underlying objects are forwarded by
-@code{reference} and @code{shared} objects. 
+@code{reference} and @code{shared} objects.
 THis kind of dereferencing is done automatically in most cases:
 
 @*@strong{Example:}
 @smallexample
 @c example
+system("reference"); system("shared");
 int i = 2;
 reference two = i;
 shared three = 3;
@@ -287,7 +297,7 @@ subst(ref, x,1, y,2, zvar,3);
 
 
 In some cases @code{reference}s have to be dereferenced explicitely. For
-instance, this is the case for n-ary function calls not starting with 
+instance, this is the case for n-ary function calls not starting with
 a @code{reference} or @code{shared} object. You can use the @code{link}
 operator or a type cast to work around this.
 In contrast, some constructs like left-hand subexpressions prematurely
@@ -295,7 +305,8 @@ evaluate. You can avoid this by using the @code{def} operator or by
 explicitly type casting to @code{reference}.
 
 @smallexample
-@c example
+@c example error
+system("reference"); system("shared");
 ring r = 0, (x,y,z), dp;
 poly p = x + y + z;
 shared xsh = x;
@@ -317,7 +328,8 @@ In particular, explicit dereferencing is useful
 to distinguish between typecasting and nested constructings.
 
 @smallexample
-@c example unwrap list
+@c example
+system("reference"); system("shared");
 shared shl = list(1);
 shl;
 list(shl);  // wraps 'shl' by a list
@@ -334,12 +346,13 @@ link(shl);  // extract the list in 'shl'
 
 @table @code
 @item def
-explicitly type casts to @code{reference} or @code{shared}, respectively. 
+explicitly type casts to @code{reference} or @code{shared}, respectively.
 (Note: For the @code{def} declaration, see @ref{def}.)
 
 @*@strong{Example:}
 @smallexample
 @c example
+system("reference"); system("shared");
 int i =1;
 reference ref = i;
 shared sh = 17;
@@ -359,7 +372,8 @@ explicitly dereference a @code{reference} or @code{shared} object.
 
 @*@strong{Example:}
 @smallexample
-@c example
+@c example error
+system("reference"); system("shared");
 ring r = 0, (x,y,z), dp;
 poly p = x + y + z;
 def x_=x;
@@ -371,7 +385,7 @@ subst(p, link(xref),1, y,2, z,3);  // fine
 @end smallexample
 
 @item system
-The @code{reference} and @code{shared} objects overload the 
+The @code{reference} and @code{shared} objects overload the
 @code{system} command to gain extended features, see @code{system(ref, "help")}
 for more details.
 (Note: For the general @code{system} command, see @ref{system}.)
@@ -379,11 +393,10 @@ for more details.
 @*@strong{Example:}
 @smallexample
 @c example
+system("reference"); system("shared");
 shared sh;
 system(sh, "help");
 @c example
 @end smallexample
 @end table
-
-
 @c ---------------------------------------
