@@ -1331,7 +1331,7 @@ returns the denominator of a number.
 @smallexample
 @c example
   ring r = 0, x, dp;
-  number n = 3/2; 
+  number n = 3/2;
   denominator(n);
 @c example
 @end smallexample
@@ -1654,7 +1654,7 @@ prevent local evaluations  when writing to an ssi link.
 @end table
 @c ref
 See
-@ref{ssi links};
+@ref{Ssi links};
 @ref{quote};
 @ref{write}.
 @c ref
@@ -4858,7 +4858,7 @@ returns the numerator of a number.
 @smallexample
 @c example
   ring r = 0, x, dp;
-  number n = 3/2; 
+  number n = 3/2;
   numerator(n);
 @c example
 @end smallexample
@@ -5517,7 +5517,7 @@ prime factors
 @*When called with numbers these are assumed to be integers in a polynomial
 ring over Q.
 @*The method finds all prime factors of an integer n.
-n' will contain the sign, be zero, or the rest (when a bound is given) respectively. The returned list contains the following information: 
+n' will contain the sign, be zero, or the rest (when a bound is given) respectively. The returned list contains the following information:
 The returned list contains the following information:
 @*L[1][i] = i-th prime factor (in ascending order),
 @*L[2][i] = multiplicity of L[1][i],
@@ -5782,7 +5782,7 @@ effect of exactly one quote).
 See
 @ref{eval};
 @ref{write};
-@ref{ssi links}.
+@ref{Ssi links}.
 @c ref
 @c ---------------------------------------
 @node quotient, random, quote, Functions
@@ -5946,7 +5946,7 @@ reads data from a link.
 file is returned as a string. If the ASCII link is the empty string,
 @code{read} reads from standard input.
 @*For ssi links, one expression is read
-from the link and returned after evaluation. See @ref{ssi links}.
+from the link and returned after evaluation. See @ref{Ssi links}.
 @*For ssi links the @code{read} command blocks as long as there is no
 data to be read from the link. The @code{status} command can be used to
 check whether or not there is data to be read.
