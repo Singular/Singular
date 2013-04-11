@@ -817,7 +817,7 @@ AC_CHECK_LIB(m, atof)
 fi
 AC_CHECK_LIB(nsl,gethostbyname)
 AC_CHECK_LIB(socket,accept)
-AC_CHECK_LIB(rt,sem_open)
+AC_CHECK_LIB(rt,clock_gettime)
 AC_CHECK_LIB(pthread,pthread_create)
 
 SAVE_LIBS=${LIBS}
