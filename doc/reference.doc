@@ -6361,7 +6361,7 @@ algorithms is only guaranteed for global orderings, timings for pure
 lexicographical orderings can be slow. In those situation you should try to
 compute the basis w.r.t. the graded reverse-lexicographic ordering and then
 convert to a basis for the lexicographical ordering using other methods (see
-@pxref{fglm} and @pxref{grwalk.lib}). If the algorithms tend to use too much
+@pxref{fglm} and @pxref{grwalk_lib}). If the algorithms tend to use too much
 memory, you should try the other implemented standard basis algorithms (see
 @pxref{std}, @pxref{groebner}, and @pxref{slimgb}).
 
