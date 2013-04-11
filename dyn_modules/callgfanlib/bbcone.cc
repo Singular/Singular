@@ -1,5 +1,4 @@
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
@@ -14,6 +13,8 @@
 #include <bbfan.h>
 #include <bbpolytope.h>
 #include <sstream>
+
+#include "Singular/ipid.h"
 
 // #include <omalloc/omalloc.h>
 // #include <kernel/febase.h>
@@ -1558,7 +1559,7 @@ BOOLEAN containsCone(leftv res, leftv args)
   return TRUE;
 }
 
-void bbcone_setup()
+void bbcone_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   // all undefined entries will be set to default in setBlackboxStuff
@@ -1571,47 +1572,44 @@ void bbcone_setup()
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
   b->blackbox_Op2=bbcone_Op2;
-  iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
-  iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
+  p->iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
+  p->iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
 
   // iiAddCproc("","makePolytope",FALSE,coneToPolytope);
-  iiAddCproc("","ambientDimension",FALSE,ambientDimension);
-  iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
-  iiAddCproc("","codimension",FALSE,codimension);
-  iiAddCproc("","coneLink",FALSE,coneLink);
-  iiAddCproc("","containsAsFace",FALSE,hasFace);
-  iiAddCproc("","containsInSupport",FALSE,containsInSupport);
-  iiAddCproc("","containsPositiveVector",FALSE,containsPositiveVector);
-  iiAddCproc("","containsRelatively",FALSE,containsRelatively);
-  iiAddCproc("","convexHull",FALSE,convexHull);
-  iiAddCproc("","convexIntersection",FALSE,intersectCones);
-  iiAddCproc("","dimension",FALSE,dimension);
-  iiAddCproc("","dualCone",FALSE,dualCone);
-  iiAddCproc("","equations",FALSE,equations);
-  iiAddCproc("","facets",FALSE,facets);
-  iiAddCproc("","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
-  iiAddCproc("","generatorsOfSpan",FALSE,generatorsOfSpan);
-  iiAddCproc("","getLinearForms",FALSE,getLinearForms);
-  iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
-  iiAddCproc("","inequalities",FALSE,inequalities);
-  iiAddCproc("","isFullSpace",FALSE,isFullSpace);
-  iiAddCproc("","isOrigin",FALSE,isOrigin);
-  iiAddCproc("","isSimplicial",FALSE,isSimplicial);
-  iiAddCproc("","linealityDimension",FALSE,linealityDimension);
-  iiAddCproc("","linealitySpace",FALSE,linealitySpace);
-  iiAddCproc("","negatedCone",FALSE,negatedCone);
-  iiAddCproc("","quotientLatticeBasis",FALSE,quotientLatticeBasis);
-  iiAddCproc("","randomPoint",FALSE,randomPoint);
-  iiAddCproc("","rays",FALSE,rays);
-  iiAddCproc("","relativeInteriorPoint",FALSE,relativeInteriorPoint);
-  iiAddCproc("","semigroupGenerator",FALSE,semigroupGenerator);
-  iiAddCproc("","setLinearForms",FALSE,setLinearForms);
-  iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
-  iiAddCproc("","span",FALSE,impliedEquations);
-  iiAddCproc("","uniquePoint",FALSE,uniquePoint);
-  iiAddCproc("","listContainsCone",FALSE,containsCone);
+  p->iiAddCproc("","ambientDimension",FALSE,ambientDimension);
+  p->iiAddCproc("","canonicalizeCone",FALSE,canonicalizeCone);
+  p->iiAddCproc("","codimension",FALSE,codimension);
+  p->iiAddCproc("","coneLink",FALSE,coneLink);
+  p->iiAddCproc("","containsAsFace",FALSE,hasFace);
+  p->iiAddCproc("","containsInSupport",FALSE,containsInSupport);
+  p->iiAddCproc("","containsPositiveVector",FALSE,containsPositiveVector);
+  p->iiAddCproc("","containsRelatively",FALSE,containsRelatively);
+  p->iiAddCproc("","convexHull",FALSE,convexHull);
+  p->iiAddCproc("","convexIntersection",FALSE,intersectCones);
+  p->iiAddCproc("","dimension",FALSE,dimension);
+  p->iiAddCproc("","dualCone",FALSE,dualCone);
+  p->iiAddCproc("","equations",FALSE,equations);
+  p->iiAddCproc("","facets",FALSE,facets);
+  p->iiAddCproc("","generatorsOfLinealitySpace",FALSE,generatorsOfLinealitySpace);
+  p->iiAddCproc("","generatorsOfSpan",FALSE,generatorsOfSpan);
+  p->iiAddCproc("","getLinearForms",FALSE,getLinearForms);
+  p->iiAddCproc("","getMultiplicity",FALSE,getMultiplicity);
+  p->iiAddCproc("","inequalities",FALSE,inequalities);
+  p->iiAddCproc("","isFullSpace",FALSE,isFullSpace);
+  p->iiAddCproc("","isOrigin",FALSE,isOrigin);
+  p->iiAddCproc("","isSimplicial",FALSE,isSimplicial);
+  p->iiAddCproc("","linealityDimension",FALSE,linealityDimension);
+  p->iiAddCproc("","linealitySpace",FALSE,linealitySpace);
+  p->iiAddCproc("","negatedCone",FALSE,negatedCone);
+  p->iiAddCproc("","quotientLatticeBasis",FALSE,quotientLatticeBasis);
+  p->iiAddCproc("","randomPoint",FALSE,randomPoint);
+  p->iiAddCproc("","rays",FALSE,rays);
+  p->iiAddCproc("","relativeInteriorPoint",FALSE,relativeInteriorPoint);
+  p->iiAddCproc("","semigroupGenerator",FALSE,semigroupGenerator);
+  p->iiAddCproc("","setLinearForms",FALSE,setLinearForms);
+  p->iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);
+  p->iiAddCproc("","span",FALSE,impliedEquations);
+  p->iiAddCproc("","uniquePoint",FALSE,uniquePoint);
+  p->iiAddCproc("","listContainsCone",FALSE,containsCone);
   coneID=setBlackboxStuff(b,"cone");
 }
-
-#endif
-/* HAVE_FANS */

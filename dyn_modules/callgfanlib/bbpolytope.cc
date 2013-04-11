@@ -1,5 +1,4 @@
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
@@ -459,7 +458,7 @@ BOOLEAN dualPolytope(leftv res, leftv args)
   return TRUE;
 }
 
-void bbpolytope_setup()
+void bbpolytope_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   // all undefined entries will be set to default in setBlackboxStuff
@@ -471,12 +470,12 @@ void bbpolytope_setup()
   b->blackbox_Init=bbpolytope_Init;
   b->blackbox_Copy=bbpolytope_Copy;
   b->blackbox_Assign=bbpolytope_Assign;
-  iiAddCproc("","polytopeViaPoints",FALSE,polytopeViaVertices);
-  iiAddCproc("","polytopeViaInequalities",FALSE,polytopeViaNormals);
-  iiAddCproc("","vertices",FALSE,vertices);
-  iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
-  iiAddCproc("","scalePolytope",FALSE,scalePolytope);
-  iiAddCproc("","dualPolytope",FALSE,dualPolytope);
+  p->iiAddCproc("","polytopeViaPoints",FALSE,polytopeViaVertices);
+  p->iiAddCproc("","polytopeViaInequalities",FALSE,polytopeViaNormals);
+  p->iiAddCproc("","vertices",FALSE,vertices);
+  p->iiAddCproc("","newtonPolytope",FALSE,newtonPolytope);
+  p->iiAddCproc("","scalePolytope",FALSE,scalePolytope);
+  p->iiAddCproc("","dualPolytope",FALSE,dualPolytope);
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
@@ -496,6 +495,3 @@ void bbpolytope_setup()
   polytopeID=setBlackboxStuff(b,"polytope");
   //Print("created type %d (polytope)\n",polytopeID);
 }
-
-#endif
-/* HAVE_FANS */

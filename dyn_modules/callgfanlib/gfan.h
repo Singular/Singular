@@ -3,8 +3,6 @@ gfan.h Interface to gfan.cc
 
 Author: monerjan
 */
-#ifdef HAVE_FANS
-
 #ifndef GFAN_H
 #define GFAN_H
 
@@ -267,5 +265,4 @@ static bool ivAreEqual(const int64vec &a, const int64vec &b);
 static bool areEqual2(facet *f, facet *g);
 static bool areEqual( facet *f, facet *g);
 // bool iv64isStrictlyPositive(int64vec *);
-#endif
 #endif

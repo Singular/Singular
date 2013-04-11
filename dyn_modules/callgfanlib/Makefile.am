@@ -47,7 +47,7 @@ gfanlib_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 gfanlib_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
 gfanlib_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la
+gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la -lcddgmp
 gfanlib_g_la_LIBADD = ${gfanlib_la_LIBADD}
 
 if ENABLE_P_PROCS_DYNAMIC

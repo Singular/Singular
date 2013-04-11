@@ -2,13 +2,13 @@
 #define BBFAN_H
 
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
 
 #include <gfanlib/gfanlib.h>
+#include <Singular/ipid.h>
 
 extern int fanID;
 
-void bbfan_setup();
+void bbfan_setup(SModulFunctions* p);
 
 int getAmbientDimension(gfan::ZFan* zf);
 int getCodimension(gfan::ZFan* zf);
@@ -17,5 +17,4 @@ int getLinealityDimension(gfan::ZFan* zf);
 int isSimplicial(gfan::ZFan* zf);
 gfan::Matrix<gfan::Integer> rays(gfan::ZFan* zf);
 
-#endif
 #endif

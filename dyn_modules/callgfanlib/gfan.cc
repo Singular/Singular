@@ -6,7 +6,6 @@ Date: 2009/11/03 06:57:32
 
 #include <kernel/mod2.h>
 
-#ifdef HAVE_FANS
 #include <libpolys/misc/options.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
@@ -4520,4 +4519,3 @@ pointOfNoReturn:
 //   else
 //     WerrorS("Need wp ordering");
 // }
-#endif

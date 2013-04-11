@@ -1,5 +1,4 @@
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
 
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
@@ -975,7 +974,7 @@ BOOLEAN listOfFacets(leftv res, leftv args)
 //   }
 
 
-void bbfan_setup()
+void bbfan_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
   // all undefined entries will be set to default in setBlackboxStuff
@@ -997,25 +996,22 @@ void bbfan_setup()
   // iiAddCproc("","getLinealityDimension",FALSE,getLinealityDimension);
   // iiAddCproc("","isSimplicial",FALSE,isSimplicial);
   /********************************************************/
-  iiAddCproc("","isCompatible",FALSE,isCompatible);
-  iiAddCproc("","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
-  iiAddCproc("","ncones",FALSE,ncones);
-  iiAddCproc("","nmaxcones",FALSE,nmaxcones);
-  iiAddCproc("","insertCone",FALSE,insertCone);
-  iiAddCproc("","removeCone",FALSE,removeCone);
-  iiAddCproc("","getCone",FALSE,getCone);
-  iiAddCproc("","getCones",FALSE,getCones);
-  iiAddCproc("","isPure",FALSE,isPure);
-  iiAddCproc("","fanFromString",FALSE,fanFromString);
-  iiAddCproc("","fanViaCones",FALSE,fanViaCones);
-  iiAddCproc("","numberOfConesWithVector",FALSE,numberOfConesWithVector);
+  p->iiAddCproc("","isCompatible",FALSE,isCompatible);
+  p->iiAddCproc("","numberOfConesOfDimension",FALSE,numberOfConesOfDimension);
+  p->iiAddCproc("","ncones",FALSE,ncones);
+  p->iiAddCproc("","nmaxcones",FALSE,nmaxcones);
+  p->iiAddCproc("","insertCone",FALSE,insertCone);
+  p->iiAddCproc("","removeCone",FALSE,removeCone);
+  p->iiAddCproc("","getCone",FALSE,getCone);
+  p->iiAddCproc("","getCones",FALSE,getCones);
+  p->iiAddCproc("","isPure",FALSE,isPure);
+  p->iiAddCproc("","fanFromString",FALSE,fanFromString);
+  p->iiAddCproc("","fanViaCones",FALSE,fanViaCones);
+  p->iiAddCproc("","numberOfConesWithVector",FALSE,numberOfConesWithVector);
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
-  iiAddCproc("","fVector",FALSE,fVector);
-  iiAddCproc("","containsInCollection",FALSE,containsInCollection);
+  p->iiAddCproc("","fVector",FALSE,fVector);
+  p->iiAddCproc("","containsInCollection",FALSE,containsInCollection);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
 }
-
-#endif
-/* HAVE_FANS */

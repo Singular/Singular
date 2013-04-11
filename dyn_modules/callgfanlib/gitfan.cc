@@ -10,8 +10,8 @@
  ***************************************************************/
 
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
 
+#include <Singular/ipid.h>
 #include <Singular/lists.h>
 #include <Singular/ipshell.h>
 #include <libpolys/coeffs/bigintmat.h>
@@ -256,9 +256,7 @@ BOOLEAN refineCones(leftv res, leftv args)
   return TRUE;
 }
 
-void gitfan_setup()
+void gitfan_setup(SModulFunctions* p)
 {
-  iiAddCproc("","refineCones",FALSE,refineCones);
+  p->iiAddCproc("","refineCones",FALSE,refineCones);
 }
-
-#endif

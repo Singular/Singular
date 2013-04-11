@@ -2,10 +2,10 @@
 #define GITFAN_H
 
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
 
 #include <bbcone.h>
 #include <bbfan.h>
+#include <Singular/ipid.h>
 
 namespace gitfan
 {
@@ -49,7 +49,6 @@ namespace gitfan
 
 }
 
-void gitfan_setup();
+void gitfan_setup(SModulFunctions* p);
 
-#endif
 #endif
