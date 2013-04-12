@@ -37,6 +37,9 @@ public:
 #endif /* NOSTREAMIO */
 };
 
+template <class T> int
+operator== ( const AFactor<T>&, const AFactor<T>& );
+
 #ifndef NOSTREAMIO
 template <class T>
 OSTREAM& operator<< ( OSTREAM & os, const AFactor<T> & f );
