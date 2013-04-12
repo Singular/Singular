@@ -46,7 +46,7 @@ RETURN:  a list, containing the results of commands[i] applied to arg[i],
             disables the timeout.
 
             Supported linktypes are up to now \"ssi\" and \"mp\", see
-            @ref{Ssi links} and @ref{MP links}.
+            @ref{Ssi links}.
 
             Servers:
          @* Each server is given by a list containing the address of the server,
@@ -71,13 +71,10 @@ NOTE:       The entries of the list commands must be strings.
          @* The returned list may contain more than N results if several jobs
             finished \"at the same time\". It may contain less than N results in
             the case of timeout or errors occurring.
-         @* MP links do not work with a 64 bit version of Singular. If you want
-            to use MP links, make sure that MP is available. This can be checked
-            by the Singular command @code{system(\"with\", \"MP\");}.
          @* The check whether the jobs exceed the memory sizes given by
             maxmemory is only done from time to time. This feature is
             experimental and should be used with care.
-SEE ALSO: Ssi links, MP links, waitfirst, waitall
+SEE ALSO: Ssi links, waitfirst, waitall
 KEYWORDS: parallelWaitN; Parallelization; Links, user interface;
           Skeletons for parallelization; Distributed computing
 EXAMPLE:  @code{example parallelWaitN;} shows an example."
@@ -197,22 +194,10 @@ EXAMPLE:  @code{example parallelWaitN;} shows an example."
     }
     else
     {
-      if(linktype == "ssi")
-      {
+      //if(linktype == "ssi")
+      //{
         link lcpu(i) = "ssi:tcp "+servers[i][1]+":"+servers[i][3];
-      }
-      else
-      {
-        if(program == "")
-        {
-          link lcpu(i) = "MPtcp:launch+" --MPhost "+servers[i][1];
-        }
-        else
-        {
-          link lcpu(i) = "MPtcp:launch+" --MPhost "+servers[i][1]
-            +" --MPapplication "+servers[i][3];
-        }
-      }
+      //}
       open(lcpu(i));
       write(lcpu(i), quote(system("cpu")));
       int ncpus(i) = read(lcpu(i));
@@ -295,33 +280,17 @@ EXAMPLE:  @code{example parallelWaitN;} shows an example."
     {
       if(server == "localhost")
       {
-        if(linktype == "ssi")
-        {
+        //if(linktype == "ssi")
+        //{
           link l(k) = "ssi:fork";
-        }
-        else
-        {
-          link l(k) = "MPtcp:fork";
-        }
+        //}
       }
       else
       {
-        if(linktype == "ssi")
-        {
+        //if(linktype == "ssi")
+        //{
           link l(k) = "ssi:tcp "+server+":"+program;
-        }
-        else
-        {
-          if(program == "")
-          {
-            link l(k) = "MPtcp:launch+" --MPhost "+server;
-          }
-          else
-          {
-            link l(k) = "MPtcp:launch+" --MPhost "+server
-              +" --MPapplication "+program;
-          }
-        }
+        //}
       }
       open(l(k));
       k++;
@@ -332,14 +301,10 @@ EXAMPLE:  @code{example parallelWaitN;} shows an example."
   // start a memory watchdog if needed
   if(havemaxmem)
   {
-    if(linktype == "ssi")
-    {
+    //if(linktype == "ssi")
+    //{
       link mempatrol = "ssi:fork";
-    }
-    else
-    {
-      link mempatrol = "MPtcp:fork";
-    }
+    //}
     open(mempatrol);
     write(mempatrol, quote(watchlinks()));
     links = insert(links, mempatrol, nlinks);
@@ -581,7 +546,7 @@ RETURN:  a list, containing at least one (if no timeout occurs) of the results
          @code{parallelWaitN(list commands, list args, 1, list #)}. See
          @ref{parallelWaitN} for details on optional arguments and other
          remarks.
-SEE ALSO: Ssi links, MP links, waitfirst
+SEE ALSO: Ssi links, waitfirst
 KEYWORDS: parallelWaitFirst; Parallelization; Links, user interface;
           Skeletons for parallelization; Distributed computing
 EXAMPLE:  @code{example parallelWaitFirst;} shows an example."
@@ -613,7 +578,7 @@ RETURN:  a list, containing the results of commands[i] applied to arg[i],
          remarks.
          If commands is of type string, this is a shortcut for a list of size
          @code{size(args)} whose entries are just this string.
-SEE ALSO: Ssi links, MP links, waitall
+SEE ALSO: Ssi links, waitall
 KEYWORDS: parallelWaitAll; Parallelization; Links, user interface;
           Skeletons for parallelization; Distributed computing
 EXAMPLE:  @code{example parallelWaitAll;} shows an example."
