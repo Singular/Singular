@@ -87,19 +87,6 @@ from our FTP site
 
 Do not use the Finder for the installation!
 
-After inserting the CD, open a terminal (under /Applications/Utilities) and
-type the following commands (you need an Admin Account):
-@*   sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-ppcMac-darwin.tar.gz
-@*   sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-share.tar.gz
-@*   sudo ln -sf /usr/local/Singular/3-0-3/ppcMac-darwin/Singular /usr/local/bin/Singular-3-0-3
-@*The first two commands unpack the tar.gz files and copy the Singular
-files (binaries and documentation, libs, etc) to /usr/local/Singular/3-0-3.
-
-The final command creates a link in /usr/local/bin so that you can just type
-Singular-3-0-3
-to run @sc{Singular} in any terminal.
-
-
 (The expert might wish to read the INSTALL_unix.html file in the UNIX
 directory for alternatives).
 
@@ -109,8 +96,6 @@ Fink is a well-known package format for Mac OS X.
 (see http://fink.sf.net)
 
 There are two packages: singular-doc and singular.
-
-They are available for 10.3 and 10.4 (in fink called 10.4-transitional).
 
 If you have fink installed, choose one of the two possibilities:
 
@@ -134,5 +119,3 @@ using the Fink Commander:
    @end itemize
 
 @end itemize
-
-
