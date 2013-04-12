@@ -104,8 +104,7 @@ In case of problems, consult
 
 @heading To download @sc{Singular} for the Macintosh
 We recommend @code{fink} to install @code{Singular} on a Macintosh running 
-Mac OsX: it supports currently the follwing versions of OsX:
-10.4/intel, 10.4/powerpc, 10.4/powerpc (transitional), 10.3.
+Mac OsX.
 If you would like to install a binary package, Unix installation instructions apply.
 (See @uref{http://fink.sf.net})
 
