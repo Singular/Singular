@@ -15,20 +15,8 @@ geometry, singularity theory and polynomial system solving. For a more
 detailed overview of
 @sc{Singular}, see
 @display
-@uref{http://www.singular.uni-kl.de/Overview/}
+@uref{http://www.singular.uni-kl.de/}
 @end display
-
-@sc{Singular} version 2 is generally much faster than any previous version of
-@sc{Singular}, due to a rewriting of major parts of
-the @sc{Singular} kernel (e.g., the kernel has a new memory manager and a
-new polynomial arithmetic), and due to new and
-better implemented algorithms (e.g., for computing resolutions
-and determinants).
-
-Besides these internal changes, @sc{Singular} version 2 offers many new features
-and functionalities (which were already partly included in the 1-3 series).
-E.g., a native Windows distribution, an Emacs user interface,
-a new help system, 16 new libraries, etc.
 
 @macro nref{name,url}
 @ifhtml

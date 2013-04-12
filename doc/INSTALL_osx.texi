@@ -21,8 +21,7 @@ To install @sc{Singular} on a Macintosh, you need the file @code{Singular-<versi
 Please see @uref{INSTALL_unix.html}. Full functionality of @sc{Singular} requires the presence of the X-window
 environment. In the absense of X under Mac OS X, @sc{Singular} is only available as a shell command, that is
 there are no @code{TSingular} and @code{ESingular}. @sc{Singular} can only be used by typing @code{Singular}
-in a terminal under Aqua. Alternatively, you may choose @code{Terminal} as the application to open the file @code{Singular} with and put it into the dock. The last step is easier under 10.3 (Panther), because the binaries already
-have this property.
+in a terminal under Aqua. Alternatively, you may choose @code{Terminal} as the application to open the file @code{Singular} with and put it into the dock. 
 
 @include info.texi
 
