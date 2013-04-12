@@ -81,8 +81,10 @@ template OSTREAM & operator << ( OSTREAM &, const Array<REvaluation> & );
 #endif /* NOSTREAMIO */
 
 template int operator == ( const Factor<CanonicalForm> &, const Factor<CanonicalForm> & );
+template int operator == ( const AFactor<CanonicalForm> &, const AFactor<CanonicalForm> & );
 
 template List<CFFactor> Union ( const List<CFFactor> &, const List<CFFactor> & );
+template List<CFAFactor> Union ( const List<CFAFactor> &, const List<CFAFactor> & );
 
 #if ! defined(WINNT) || defined(__GNUC__)
 template CanonicalForm tmax ( const CanonicalForm &, const CanonicalForm & );
