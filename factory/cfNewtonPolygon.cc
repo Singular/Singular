@@ -17,6 +17,8 @@
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "cf_algorithm.h"
+#include "cf_primes.h"
+#include "cf_reval.h"
 #include "cfNewtonPolygon.h"
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
@@ -936,6 +938,191 @@ bool absIrredTest (const CanonicalForm& F)
   if (isRat)
     On (SW_RATIONAL);
 
+  for (int i= 0; i < sizeOfNewtonPolygon; i++)
+    delete [] newtonPolyg[i];
+
+  delete [] newtonPolyg;
+
   return result;
 }
+
+bool modularIrredTest (const CanonicalForm& F)
+{
+  ASSERT (getNumVars (F) == 2, "expected bivariate polynomial");
+  ASSERT (factorize (F).length() <= 2, " expected irreducible polynomial");
+
+  bool isRat= isOn (SW_RATIONAL);
+  if (isRat)
+    Off (SW_RATIONAL);
+
+  if (isRat)
+    ASSERT (bCommonDen (F).isOne(), "poly over Z expected");
+
+  CanonicalForm Fp, N= maxNorm (F);
+  int tdeg= totaldegree (F);
+
+  int i= 0;
+  //TODO: maybe it's better to choose the characteristic as large as possible
+  //      as factorization over large finite field will be faster
+  //TODO: handle those cases where our factory primes are not enough
+  //TODO: factorize coefficients corresponding to the vertices of the Newton
+  //      polygon and only try the obtained factors
+  if (N < cf_getSmallPrime (cf_getNumSmallPrimes()-1))
+  {
+    while (i < cf_getNumSmallPrimes() && N > cf_getSmallPrime(i))
+    {
+      setCharacteristic (cf_getSmallPrime (i));
+      Fp= F.mapinto();
+      i++;
+      if (totaldegree (Fp) == tdeg)
+      {
+        if (absIrredTest (Fp))
+        {
+          CFFList factors= factorize (Fp);
+          if (factors.length() == 2 && factors.getLast().exp() == 1)
+          {
+            if (isRat)
+              On (SW_RATIONAL);
+            setCharacteristic (0);
+            return true;
+          }
+        }
+      }
+      setCharacteristic (0);
+    }
+  }
+  else
+  {
+    while (i < cf_getNumPrimes() && N > cf_getPrime (i))
+    {
+      setCharacteristic (cf_getPrime (i));
+      Fp= F.mapinto();
+      i++;
+      if (totaldegree (Fp) == tdeg)
+      {
+        if (absIrredTest (Fp))
+        {
+          CFFList factors= factorize (Fp);
+          if (factors.length() == 2 && factors.getLast().exp() == 1)
+          {
+            if (isRat)
+              On (SW_RATIONAL);
+            setCharacteristic (0);
+            return true;
+          }
+        }
+      }
+      setCharacteristic (0);
+    }
+  }
+
+  if (isRat)
+    On (SW_RATIONAL);
+
+  return false;
+}
+
+bool
+modularIrredTestWithShift (const CanonicalForm& F)
+{
+  ASSERT (getNumVars (F) == 2, "expected bivariate polynomial");
+  ASSERT (factorize (F).length() <= 2, " expected irreducible polynomial");
+
+  bool isRat= isOn (SW_RATIONAL);
+  if (isRat)
+    Off (SW_RATIONAL);
+
+  if (isRat)
+    ASSERT (bCommonDen (F).isOne(), "poly over Z expected");
+
+  Variable x= Variable (1);
+  Variable y= Variable (2);
+  CanonicalForm Fp;
+  int tdeg= totaldegree (F);
+
+  REvaluation E;
+
+  setCharacteristic (2);
+  Fp= F.mapinto();
+
+  E= REvaluation (1,2, FFRandom());
+
+  E.nextpoint();
+
+  Fp= Fp (x+E[1], x);
+  Fp= Fp (y+E[2], y);
+
+  if (tdeg == totaldegree (Fp))
+  {
+    if (absIrredTest (Fp))
+    {
+      CFFList factors= factorize (Fp);
+      if (factors.length() == 2 && factors.getLast().exp() == 1)
+      {
+        if (isRat)
+          On (SW_RATIONAL);
+        setCharacteristic (0);
+        return true;
+      }
+    }
+  }
+
+  E.nextpoint();
+
+  Fp= Fp (x+E[1], x);
+  Fp= Fp (y+E[2], y);
+
+  if (tdeg == totaldegree (Fp))
+  {
+    if (absIrredTest (Fp))
+    {
+      CFFList factors= factorize (Fp);
+      if (factors.length() == 2 && factors.getLast().exp() == 1)
+      {
+        if (isRat)
+          On (SW_RATIONAL);
+        setCharacteristic (0);
+        return true;
+      }
+    }
+  }
+
+  int i= 0;
+  while (cf_getSmallPrime (i) < 102)
+  {
+    setCharacteristic (cf_getSmallPrime (i));
+    i++;
+    E= REvaluation (1, 2, FFRandom());
+
+    for (int j= 0; j < 3; j++)
+    {
+      Fp= F.mapinto();
+      E.nextpoint();
+      Fp= Fp (x+E[1], x);
+      Fp= Fp (y+E[2], y);
+
+      if (tdeg == totaldegree (Fp))
+      {
+        if (absIrredTest (Fp))
+        {
+          CFFList factors= factorize (Fp);
+          if (factors.length() == 2 && factors.getLast().exp() == 1)
+          {
+            if (isRat)
+              On (SW_RATIONAL);
+            setCharacteristic (0);
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  setCharacteristic (0);
+  if (isRat)
+    On (SW_RATIONAL);
+
+  return false;
+}
+
 
