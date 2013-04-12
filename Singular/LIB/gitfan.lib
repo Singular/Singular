@@ -28,6 +28,10 @@ orbitCones(ideal,bigintmat);        Returns the list of all projected a-faces
 LIB "parallel.lib"; // for parallelWaitAll
 
 ////////////////////////////////////////////////////
+proc mod_init()
+{
+  LIB"gfanlib.so";
+}
 
 static proc int2face(int n, int r)
 {
