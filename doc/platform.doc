@@ -21,6 +21,7 @@
 
 @menu
 * News and changes::
+* Singular 3 and Singular 4::
 * Download instructions::
 * Unix installation instructions::
 * Windows installation instructions::
@@ -28,7 +29,7 @@
 @end menu
 
 @c ----------------------------------------------------------
-@node News and changes, Download instructions,,Release Notes
+@node News and changes, Singular 3 and Singular 4,,Release Notes
 @section News and changes
 @cindex news
 @cindex changes
@@ -36,7 +37,14 @@
 @include NEWS.texi
 
 @c ----------------------------------------------------------
-@node Download instructions, Unix installation instructions, News and changes, Release Notes
+@node Singular 3 and Singular 4, Download instructions,News and changes,Release Notes
+@section Singular 3 and Singular 4
+@cindex Singular 3 and Singular 4
+
+@include changes_in_singular4.texi
+
+@c ----------------------------------------------------------
+@node Download instructions, Unix installation instructions, Singular 3 and Singular 4, Release Notes
 @section Download instructions
 @cindex downloading
 @cindex instructions, downloading

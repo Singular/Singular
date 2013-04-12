@@ -945,6 +945,7 @@ Comments should be send to the author of the library directly.
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * symodstd_lib:: Groebner bases for symmetric ideals
 * derham_lib:: Computation of deRham cohomology (Singular 4)
+* schreyer_lib:: Helpers for Schreyer resolution
 @end menu
 @c ----------------------------------------------------------
 @node classifyceq_lib,divisors_lib, , Experimental libraries
@@ -1067,14 +1068,16 @@ Todos/Issues:
 @c lib symodstd.lib
 
 @c ----------------------------------------------------------
-@node derham_lib,,symodstd_lib, Experimental libraries
+@node derham_lib,schreyer_lib,symodstd_lib, Experimental libraries
 @subsection derham_lib
 
-Remark: this libray needs the upcoming version 4 of Singular.
-Please contact the authors or the Singular team if you like
-to try it.
+@c lib derham.lib
 
-@c lib derham.lib no_ex
+@c ----------------------------------------------------------
+@node schreyer_lib,,derham_lib, Experimental libraries
+@subsection schreyer_lib
+
+@c lib schreyer.lib
 
 @c ----------------------------------------------------------
 @node convex geometry, , , SINGULAR libraries

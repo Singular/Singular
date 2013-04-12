@@ -12,7 +12,7 @@ and Singular users. In what follows we will refer to the systems as Singular 3 a
 
 
 @c ---------------------------------------------------------------------------
-@node Notes for Singular users, Notes for developers, , ???? 
+@node Notes for Singular users, Notes for developers, , Singular 3 and Singular 4 
 @subsection Notes for Singular users
 @cindex Notes for Singular users
 
@@ -123,7 +123,7 @@ The redesign of Singular will allow us to provide new features in the future, fo
 
 
 @c ---------------------------------------------------------------------------
-@node Notes for developers, Building Singular, Notes for Singular users, ???
+@node Notes for developers, Building Singular, Notes for Singular users, Singular 3 and Singular 4
 @subsection Notes for developers
 @cindex Notes for developers
 
@@ -151,11 +151,8 @@ In particular we have separated everything related to coeffcient rings into a se
 @subsubheading Changes to build system
 @cindex Changes to build system
 
-@code 
-
-
 @c ---------------------------------------------------------------------------
-@node Building Singular, , Notes for developers, ???
+@node Building Singular, , Notes for developers, Singular 3 and Singular 4
 @subsection Building Singular
 @cindex Building Singular
 
@@ -176,51 +173,4 @@ All possible options for configure can be seen by running the configure script w
 option @code{--help}. On a multicore compute consider running make with the 
 option @code{-f [cores]}.
 
-
-
-
-
 @c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-@c ---------------------------------------------------------------------------
-
-@c @c ---------------------------------------------------------------------------
-@c @node NODE TITLE, NEXT NODE TITLE, PREV. NODE TITLE, UPPER NODE!?
-@c @subsection NODE TITLE
-@c @cindex NODE TITLE
-
-
-@c @itemize @bullet
-@c @item [ABF2002]
-@c @"o
-@c Augot D.; Bardet M.; Faug@'ere J.-C.: @anchor{[ABF2002]}
-@c Efficient Decoding of (binary) Cyclic Codes beyond the correction capacity of the code using Gr@"obner bases.
-@c INRIA Report (2002) 4652
-@c @end itemize
-
-@c @tex
-@c  Let $C$ be the binary $[n,k,d]$ cyclic code with the defining set $S_C=\{i_1,\dots,i_v\}$. Let $1\le w\le n$ and let $J_C(w)$ denote the system:
-@c  $$
-@c  Z_1^{i_1}+\dots+Z_w^{i_1}=0,
-@c  \vdots
-@c   $$
-@c @end tex
-@c @ifinfo
-@c  S_C=@{i_1,@dots{},i_v@}. Let 1<= w<= n and let J_C(w) denote the system:
-@c  @display
-@c  Z_1^(i_1)+@dots{}+Z_w^(i_1)=0,  
-@c  @end display
-@c @end ifinfo
-
-@c @ref{decodegb_lib}. More details can be obtained from @ref{[BP2008b]}.
-@c @code{sysCRHT} in @ref{decodegb_lib}.
-
-@c @tex
-@c @end tex
-@c @ifinfo
-@c @end ifinfo
