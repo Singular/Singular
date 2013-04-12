@@ -116,7 +116,7 @@ inline number npSubAsm(number a, number b, int m)
 #ifdef HAVE_GENERIC_ADD
 static inline number npAddM(number a, number b, const coeffs r)
 {
-  long R = (long)a + (long)b;
+  unsigned long R = (unsigned long)a + (unsigned long)b;
   return (number)(R >= r->ch ? R - r->ch : R);
 }
 static inline number npSubM(number a, number b, const coeffs r)
@@ -127,12 +127,12 @@ static inline number npSubM(number a, number b, const coeffs r)
 #else
 static inline number npAddM(number a, number b, const coeffs r)
 {
-   long res = ((long)a + (long)b);
+   unsigned long res = (long)((unsigned long)a + (unsigned long)b);
    res -= r->ch;
 #if SIZEOF_LONG == 8
-   res += (res >> 63) & r->ch;
+   res += ((long)res >> 63) & r->ch;
 #else
-   res += (res >> 31) & r->ch;
+   res += ((long)res >> 31) & r->ch;
 #endif
    return (number)res;
 }
