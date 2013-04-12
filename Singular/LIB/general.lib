@@ -930,78 +930,67 @@ EXAMPLE: example watchdog; shows an example
   {
     kill watchdog_rneu;
   }
-// If we do not have MP-links, watchdog cannot be used
-  if (system("with","MP"))
+  if ( i > 0 )
   {
-    if ( i > 0 )
-    {
-      int j=10;
-      int k=999999;
+    int j=10;
+    int k=999999;
 // fork, get the pid of the child and send it the command
-      link l_fork="MPtcp:fork";
-      open(l_fork);
-      write(l_fork,quote(system("pid")));
-      int pid=read(l_fork);
-      execute("write(l_fork,quote(" + cmd + "));");
+    link l_fork="ssi:fork";
+    open(l_fork);
+    execute("write(l_fork,quote(" + cmd + "));");
 
 
 // sleep in small, but growing intervals for appr. 1 second
-      while(j < k)
-      {
-        if (status(l_fork, "read", "ready", j)) {break;}
-        j = j + j;
-      }
+    while(j < k)
+    {
+      if (status(l_fork, "read", "ready", j)) {break;}
+      j = j + j;
+    }
 
 // sleep in intervals of one second
-      j = 1;
-      if (!status(l_fork,"read","ready"))
+    j = 1;
+    if (!status(l_fork,"read","ready"))
+    {
+      while (j < i)
       {
-        while (j < i)
-        {
-          if (status(l_fork, "read", "ready", k)) {break;}
-          j = j + 1;
-        }
+        if (status(l_fork, "read", "ready", k)) {break;}
+        j = j + 1;
       }
+    }
 // check, whether we have a result, and return it
-      if (status(l_fork, "read", "ready"))
+    if (status(l_fork, "read", "ready"))
+    {
+      def result = read(l_fork);
+      if (nameof(basering)!=rname)
       {
-        def result = read(l_fork);
-        if (nameof(basering)!=rname)
+        def watchdog_rneu=basering;
+        setring rsave;
+        if (!defined(result))
         {
-          def watchdog_rneu=basering;
-          setring rsave;
-          if (!defined(result))
-          {
-            def result=fetch(watchdog_rneu,result);
-          }
+          def result=fetch(watchdog_rneu,result);
         }
-        if(defined(watchdog_interrupt))
-        {
-          kill watchdog_interrupt;
-        }
-        close(l_fork);
       }
-      else
+      if(defined(watchdog_interrupt))
       {
-        string result="Killed";
-        if(!defined(watchdog_interrupt))
-        {
-          int watchdog_interrupt=1;
-          export watchdog_interrupt;
-        }
-        close(l_fork);
-        j = system("sh","kill " + string(pid));
+        kill watchdog_interrupt;
       }
-      return(result);
+      close(l_fork);
     }
     else
     {
-      ERROR("First argument of watchdog has to be a positive integer.");
+      string result="Killed";
+      if(!defined(watchdog_interrupt))
+      {
+        int watchdog_interrupt=1;
+        export watchdog_interrupt;
+      }
+      close(l_fork);
     }
+    return(result);
   }
   else
   {
-    ERROR("MP-support is not enabled in this version of Singular.");
+    ERROR("First argument of watchdog has to be a positive integer.");
   }
 }
 example
@@ -1140,60 +1129,55 @@ EXAMPLE: example timeFactorize; shows an example
   def P=basering;
   if (size(#) > 0)
   {
-    if (system("with", "MP"))
+    if ((typeof(#[1]) == "int")&&(#[1]))
     {
-      if ((typeof(#[1]) == "int")&&(#[1]))
+      int wait = #[1];
+      int j = 10;
+
+      string bs = nameof(basering);
+      link l_fork = "ssi:fork";
+      open(l_fork);
+      write(l_fork, quote(timeFactorize(eval(i))));
+
+      // sleep in small intervalls for appr. one second
+      if (wait > 0)
       {
-        int wait = #[1];
-        int j = 10;
-
-        string bs = nameof(basering);
-        link l_fork = "MPtcp:fork";
-        open(l_fork);
-        write(l_fork, quote(system("pid")));
-        int pid = read(l_fork);
-        write(l_fork, quote(timeFactorize(eval(i))));
-
-        // sleep in small intervalls for appr. one second
-        if (wait > 0)
+        while(j < 1000000)
         {
-          while(j < 1000000)
-          {
-            if (status(l_fork, "read", "ready", j)) {break;}
-            j = j + j;
-          }
+          if (status(l_fork, "read", "ready", j)) {break;}
+          j = j + j;
         }
-
-        // sleep in intervalls of one second from now on
-        j = 1;
-        while (j < wait)
-        {
-          if (status(l_fork, "read", "ready", 1000000)) {break;}
-          j = j + 1;
-        }
-
-        if (status(l_fork, "read", "ready"))
-        {
-          def result = read(l_fork);
-          if (bs != nameof(basering))
-          {
-            def PP = basering;
-            setring P;
-            def result = imap(PP, result);
-            kill PP;
-          }
-          kill l_fork;
-        }
-        else
-        {
-          list result;
-          intvec v=1,1;
-          result[1]=list(1,i);
-          result[2]=v;
-          j = system("sh", "kill " + string(pid));
-        }
-        return (result);
       }
+
+      // sleep in intervalls of one second from now on
+      j = 1;
+      while (j < wait)
+      {
+        if (status(l_fork, "read", "ready", 1000000)) {break;}
+        j = j + 1;
+      }
+
+      if (status(l_fork, "read", "ready"))
+      {
+        def result = read(l_fork);
+        if (bs != nameof(basering))
+        {
+          def PP = basering;
+          setring P;
+          def result = imap(PP, result);
+          kill PP;
+        }
+        close(l_fork);
+      }
+      else
+      {
+        list result;
+        intvec v=1,1;
+        result[1]=list(1,i);
+        result[2]=v;
+        close(l_fork);
+      }
+      return (result);
     }
   }
   return(factorH(i));
@@ -1217,54 +1201,51 @@ EXAMPLE: example timeStd; shows an example
   def P=basering;
   if (size(#) > 0)
   {
-    if (system("with", "MP"))
+    if ((typeof(#[1]) == "int")&&(#[1]))
     {
-      if ((typeof(#[1]) == "int")&&(#[1]))
+      int wait = #[1];
+      int j = 10;
+
+      string bs = nameof(basering);
+      link l_fork = "ssi:fork";
+      open(l_fork);
+      write(l_fork, quote(system("pid")));
+      int pid = read(l_fork);
+      write(l_fork, quote(timeStd(eval(i))));
+
+      // sleep in small intervalls for appr. one second
+      if (wait > 0)
       {
-        int wait = #[1];
-        int j = 10;
-
-        string bs = nameof(basering);
-        link l_fork = "MPtcp:fork";
-        open(l_fork);
-        write(l_fork, quote(system("pid")));
-        int pid = read(l_fork);
-        write(l_fork, quote(timeStd(eval(i))));
-
-        // sleep in small intervalls for appr. one second
-        if (wait > 0)
+        while(j < 1000000)
         {
-          while(j < 1000000)
-          {
-            if (status(l_fork, "read", "ready", j)) {break;}
-            j = j + j;
-          }
+          if (status(l_fork, "read", "ready", j)) {break;}
+          j = j + j;
         }
-        j = 1;
-        while (j < wait)
-        {
-          if (status(l_fork, "read", "ready", 1000000)) {break;}
-          j = j + 1;
-        }
-        if (status(l_fork, "read", "ready"))
-        {
-          def result = read(l_fork);
-          if (bs != nameof(basering))
-          {
-            def PP = basering;
-            setring P;
-            def result = imap(PP, result);
-            kill PP;
-          }
-          kill l_fork;
-        }
-        else
-        {
-          ideal result=i;
-          j = system("sh", "kill " + string(pid));
-        }
-        return (result);
       }
+      j = 1;
+      while (j < wait)
+      {
+        if (status(l_fork, "read", "ready", 1000000)) {break;}
+        j = j + 1;
+      }
+      if (status(l_fork, "read", "ready"))
+      {
+        def result = read(l_fork);
+        if (bs != nameof(basering))
+        {
+          def PP = basering;
+          setring P;
+          def result = imap(PP, result);
+          kill PP;
+        }
+        close(l_fork);
+      }
+      else
+      {
+        ideal result=i;
+        close(l_fork);
+      }
+      return (result);
     }
   }
   return(std(i));
