@@ -212,7 +212,7 @@ void      p_SimpleContent(poly p, int s, const ring r);
 
 poly      p_Cleardenom(poly p, const ring r);
 void      p_Cleardenom_n(poly p, const ring r,number &c);
-number    p_GetAllDenom(poly ph, const ring r);
+//number    p_GetAllDenom(poly ph, const ring r);// unused
 
 int       p_Size( poly p, const ring r );
 

@@ -2831,6 +2831,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
   return;
 }
 
+#if 0   /*unused*/
 number p_GetAllDenom(poly ph, const ring r)
 {
   number d=n_Init(1,r->cf);
@@ -2850,6 +2851,7 @@ number p_GetAllDenom(poly ph, const ring r)
   }
   return d;
 }
+#endif
 
 int p_Size(poly p, const ring r)
 {
