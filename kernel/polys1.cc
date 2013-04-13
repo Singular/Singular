@@ -1182,8 +1182,10 @@ number p_GetAllDenom(poly ph, const ring r)
     if (!n_IsOne(h,r))
     {
       number dd=n_Mult(d,h,r);
+      number common=n_Gcd(d,h,r);
       n_Delete(&d,r);
-      d=dd;
+      d=n_IntDiv(dd,common,r);
+      n_Normalize(d,r);
     }
     n_Delete(&h,r);
     pIter(p);
