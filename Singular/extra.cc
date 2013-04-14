@@ -3591,7 +3591,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (h!=NULL && (h->Typ()== POLY_CMD))
         {
           CanonicalForm F= convSingPFactoryP((poly)(h->Data()));
-          CFFList factors= absFactorize (F);
+          CFAFList factors= absFactorize (F);
           res->rtyp= INT_CMD;
           res->data= (void*) 1;
           return FALSE;
