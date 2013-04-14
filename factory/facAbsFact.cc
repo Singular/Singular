@@ -81,7 +81,7 @@ int choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval)
   return 0;
 }
 
-CFFList absFactorize (const CanonicalForm& G)
+CFAFList absFactorizeMain (const CanonicalForm& G)
 {
   //F is assumed to be bivariate, irreducible over Q, primitive wrt x and y, compressed
 
