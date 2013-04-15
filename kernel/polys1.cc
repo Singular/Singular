@@ -498,8 +498,8 @@ void p_Content(poly ph, const ring r)
         k = nInvers(k);
         nDelete(&tmpNumber);
         poly h = pNext(ph);
-	p_Mult_nn(ph,k,currRing);
-	pNormalize(ph);
+        p_Mult_nn(ph,k,currRing);
+        pNormalize(ph);
       }
       nDelete(&k);
     }
@@ -1181,11 +1181,22 @@ number p_GetAllDenom(poly ph, const ring r)
     number h=n_GetDenom(pGetCoeff(p),r);
     if (!n_IsOne(h,r))
     {
-      number dd=n_Mult(d,h,r);
       number common=n_Gcd(d,h,r);
-      n_Delete(&d,r);
-      d=n_IntDiv(dd,common,r);
-      n_Normalize(d,r);
+      if(n_IsOne(common,r))
+      {
+        number dd=n_Mult(d,h,r);
+        n_Delete(&d,r);
+        d=dd;
+      }
+      else
+      {
+        number dd=n_IntDiv(d,common,r);
+        n_Normalize(dd,r);
+        n_Delete(&d,r);
+        d=n_Mult(dd,h,r);
+        n_Delete(&dd,r);
+      }
+      n_Delete(&common,r);
     }
     n_Delete(&h,r);
     pIter(p);

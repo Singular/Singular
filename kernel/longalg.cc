@@ -304,6 +304,27 @@ static napoly napInvers(napoly x, const napoly c)
     }
     return x;
   }
+  #ifdef HAVE_FACTORY
+  {
+    number den=p_GetAllDenom(x,nacRing);
+    poly xp=p_Mult_nn(p_Copy(x,nacRing),den,nacRing);
+    poly xp_f, mipo_f,g;
+    singclap_extgcd_r(xp,naMinimalPoly,g,xp_f,mipo_f,nacRing);
+    BOOLEAN zero_div_found=(!p_IsConstant(g,nacRing));
+    p_Delete(&g,nacRing);
+    p_Delete(&xp,nacRing);
+    p_Delete(&mipo_f,nacRing);
+    if (zero_div_found)
+    {
+      p_Delete(&xp,nacRing);
+      n_Delete(&den,nacRing);
+      goto zero_divisor;
+    }
+    xp_f=p_Mult_nn(xp_f,den,nacRing);
+    n_Delete(&den,nacRing);
+    return xp_f;
+  }
+  #else
   y = napCopy(c);
   napDivMod(y, x, &qa, &r);
   if (r==NULL)
@@ -380,6 +401,7 @@ static napoly napInvers(napoly x, const napoly c)
     q = napAdd(q, qa);
     qa = y;
   }
+  #endif
 // zero divisor found:
 zero_divisor:
   Werror("zero divisor found - your minpoly is not irreducible");
