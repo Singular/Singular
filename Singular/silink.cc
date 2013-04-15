@@ -847,6 +847,8 @@ BOOLEAN slGetDumpAscii(si_link l)
 
 #include <Singular/slInit.h>
 
+si_link_extension slInitTypedExtension(si_link_extension s);
+
 static si_link_extension slTypeInit(si_link_extension s, const char* type)
 {
   assume(s != NULL);
@@ -871,6 +873,10 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
 #if 1
   else if (strcmp(type, "|") == 0)
     s->next = slInitPipeExtension(ns);
+#endif
+#if 1
+  else if (strcmp(type, "typed") == 0)
+    s->next = slInitTypedExtension(ns);
 #endif
   else
   {
@@ -905,4 +911,45 @@ void slStandardInit()
   si_link_root->type="ASCII";
   s = si_link_root;
   s->next = NULL;
+}
+
+BOOLEAN typeWriteAscii(si_link l, leftv v)
+{
+  FILE *outfile=(FILE *)l->data;
+  BOOLEAN err=FALSE;
+  while (v!=NULL)
+  {
+    if ((v->rtyp==IDHDL)&&(v->e==NULL))
+    {
+      DumpRhs(outfile,(idhdl)v->data);
+    }
+    else
+    {
+      idrec dummy;
+      memset(&dummy,0,sizeof(dummy));
+      dummy.typ=v->Typ();
+      dummy.data.ustring=(char*)v->Data();
+      DumpRhs(outfile,&dummy);
+    }
+    fprintf(outfile,"\n");
+    v = v->next;
+  }
+  fflush(outfile);
+  return err;
+}
+
+si_link_extension slInitTypedExtension(si_link_extension s)
+{
+  s->Open=slOpenAscii;
+  s->Close=slCloseAscii;
+  s->Kill=NULL;
+  s->Read=slReadAscii;
+  s->Read2=slReadAscii2;
+  s->Write=typeWriteAscii;
+  s->Dump=slDumpAscii;
+  s->GetDump=slGetDumpAscii;
+
+  s->Status=slStatusAscii;
+  s->type="typed";
+  return s;
 }
