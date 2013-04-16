@@ -117,9 +117,9 @@ void sleftv::Print(leftv store, int spaces)
           PrintS("`");PrintS(n);PrintS("`");
           break;
         case PACKAGE_CMD:
-	  PrintNSpaces(spaces);
-	  paPrint(n,(package)d);
-	  break;
+          PrintNSpaces(spaces);
+          paPrint(n,(package)d);
+          break;
         case NONE:
           return;
         case INTVEC_CMD:
@@ -739,7 +739,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ps = pString((poly) d);
             s = (char*) omAlloc(strlen(ps) + 10);
             sprintf(s,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
-	    omFree(ps);
+            omFree(ps);
             return s;
           }
           else
@@ -845,7 +845,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           else
             return omStrDup(s);
-        } 
+        }
 
         case RING_CMD:
         case QRING_CMD:
@@ -1387,10 +1387,10 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   * 1) reserved id: done by scanner
   * 2) `basering` / 'Current`
   * 3) existing identifier, local
-  * 4) ringvar, local ring
+  * 4) ringvar, ringpar, local ring
   * 5) existing identifier, global
   * 6) monom (resp. number), local ring: consisting of:
-  * 6') ringvar, global ring
+  * 6') ringvar,  ringpar,global ring
   * 6'') monom (resp. number), local ring
   * 7) monom (resp. number), non-local ring
   * 8) basering
@@ -1479,6 +1479,20 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         v->name = id;
         v->rtyp = POLY_CMD;
         return;
+      }
+      if(rField_is_Extension(currRing)&&((vnr=r_IsRingVar(id, currRing->cf->extRing))>=0))
+      {
+        BOOLEAN ok=FALSE;
+        poly p = pmInit(id,ok);
+        if (ok)
+        {
+          v->data = pGetCoeff(p);
+          pGetCoeff(p)=NULL;
+          pLmFree(p);
+          v->rtyp = NUMBER_CMD;
+          v->name = id;
+          return;
+        }
       }
     }
     /* 5. existing identifier, global */
