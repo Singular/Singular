@@ -1191,7 +1191,7 @@ number p_GetAllDenom(poly ph, const ring r)
       else
       {
         number dd=n_IntDiv(d,common,r);
-        n_Normalize(dd,r);
+        //n_Normalize(dd,r);
         n_Delete(&d,r);
         d=n_Mult(dd,h,r);
         n_Delete(&dd,r);

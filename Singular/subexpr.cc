@@ -1357,10 +1357,10 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   * 1) reserved id: done by scanner
   * 2) `basering` / 'Current`
   * 3) existing identifier, local
-  * 4) ringvar, local ring
+  * 4) ringvar, ringpar, local ring
   * 5) existing identifier, global
   * 6) monom (resp. number), local ring: consisting of:
-  * 6') ringvar, global ring
+  * 6') ringvar, ringpar, global ring
   * 6'') monom (resp. number), local ring
   * 7) monom (resp. number), non-local ring
   * 8) basering
@@ -1450,6 +1450,21 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         v->rtyp = POLY_CMD;
         return;
       }
+      if ((currRing->algring!=NULL) && ((vnr=r_IsRingVar(id,currRing->algring))>=0))
+      {
+	BOOLEAN ok=FALSE;
+	poly p = pmInit(id,ok);
+	if (ok)
+	{
+          v->data = (void *)pGetCoeff(p);
+	  v->rtyp = NUMBER_CMD;
+          v->name = id;
+          pGetCoeff(p)=NULL;
+          pLmFree(p);
+          return;
+	}
+      }
+
     }
     /* 5. existing identifier, global */
     if (h!=NULL)
