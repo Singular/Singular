@@ -1484,7 +1484,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       {
         BOOLEAN ok=FALSE;
         poly p = pmInit(id,ok);
-        if (ok)
+        if (ok && (p!=NULL))
         {
           v->data = pGetCoeff(p);
           pGetCoeff(p)=NULL;

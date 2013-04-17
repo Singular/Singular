@@ -748,7 +748,7 @@ finished the computation. The main process sleeps
 @item
 The child which has won delivers the result and is terminated with the usual
 @code{close} command. The other child which is still computing needs to
-be terminated by an explicit (i.e., system) kill command if running on a diffrent computer. For ssi:fork a @code{close} is sufficient.
+be terminated by an explicit (i.e., system) kill command if running on a different computer. For ssi:fork a @code{close} is sufficient.
 @end enumerate
 @end ifset
 
