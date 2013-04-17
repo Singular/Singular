@@ -682,13 +682,8 @@ test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib"
 test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include"
 
 # add to -I to CPPFLAGS and and -L to LDFLAGS, just to be sure
-if test "$ac_cv_c_cpp" = gcc3 ; then
-  LDFLAGS="-L${libdir} ${LDFLAGS}"
-  CPPFLAGS="-I${includedir} ${CPPFLAGS}"
-else
-  LDFLAGS="-L${libdir} ${LDFLAGS} -L/usr/local/lib"
-  CPPFLAGS="-I${includedir} ${CPPFLAGS} -I/usr/local/include"
-fi
+LDFLAGS="-L${libdir} ${LDFLAGS}"
+CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 
 # this is a work-around to include the right term.h
 if test "$ac_cv_singuname" = SunOS-5; then
@@ -1406,7 +1401,6 @@ fi
 LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 if test "x$flint_found" = "xyes"; then
-  includedir= "${FLINT_HOME}/include ${includedir}"
   LDFLAGS="${LDFLAGS} ${FLINT_LIBS}"
   NEED_LIBS="-lflint -lmpfr ${NEED_LIBS}"
 fi
