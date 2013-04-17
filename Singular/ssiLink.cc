@@ -84,7 +84,7 @@ typedef struct
 } ssiInfo;
 
 link_list ssiToBeClosed=NULL;
-BOOLEAN ssiToBeClosed_inactive=TRUE;
+volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
 // the helper functions:
 void ssiSetCurrRing(const ring r)
@@ -1841,7 +1841,7 @@ void sig_chld_hdl(int sig)
 
     //printf("Child %ld terminated\n", kidpid);
     link_list hh=ssiToBeClosed;
-    while(hh!=NULL)
+    while((hh!=NULL)&&(ssiToBeClosed_inactive))
     {
       if((hh->l!=NULL) && (hh->l->m->Open==ssiOpen))
       {

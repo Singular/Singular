@@ -151,7 +151,7 @@ void slCleanUp(si_link l)
 void slKill(si_link l)
 {
   slCleanUp(l);
-  if (l->ref == 0)
+  if ((l!=NULL) &&(l->ref == 0))
     omFreeBin((ADDRESS)l,  ip_link_bin);
 }
 
