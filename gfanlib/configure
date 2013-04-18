@@ -16116,8 +16116,8 @@ for GMP_HOME in ${GMP_HOME_PATH}
 			GMP_CFLAGS="-I${GMP_HOME}/include"
 			GMP_LIBS="-L${GMP_HOME}/lib -lgmp"
 		else
-			GMP_CFLAGS=
-			GMP_LIBS="-lgmp"
+			GMP_CFLAGS="${BACKUP_CFLAGS}"
+			GMP_LIBS="${BACKUP_LIBS} -lgmp"
 		fi
 
 		CFLAGS="${CFLAGS} ${GMP_CFLAGS}"
