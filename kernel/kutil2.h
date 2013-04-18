@@ -361,13 +361,28 @@ public:
 
 class ShiftDVec::skStrategy : public ::skStrategy
 {
-  // This is needed for the calculation of a left GB in a
-  // factor algebra K<X>/I; so this will be used in the
-  // ShiftDVec::Paul namespace
-  polyset I;
-  uint size_of_I; // This is, what it says!
-  poly Get_I_at(uint i){return I[i];}
-  void deleteFromL(uint index); //TODO: write this
+  private:
+    // BOCO DESCRIPTION:
+    // This is needed for the calculation of a left GB in a
+    // factor algebra K<X>/I; so this will be used in the
+    // ShiftDVec::LeftGB namespace
+    //
+    // BOCO TODO:
+    // I is probably subset of R; so either we will keep
+    // references to the Objects in R here, or we will delete
+    // them completely and instead let get_I_at(i) handle the
+    // translation from R to I at index i. We will decide that
+    // later. However: we have to care for the Initialization
+    // somewhere.
+    //   Question: Will I be part of T ??? - I don't think so,
+    // but again: What was the difference between T and R ?
+    ShiftDVec::sTObject* I;
+    uint size_of_I; // This is, what it says!
+  public:
+    uint get_size_of_I(){return size_of_I;}
+    uint translate_index_I_to_R(uint i){/*TODO*/ assume(0);}
+    ShiftDVec::sLObject get_I_at(uint i){return I[i];}
+    void deleteFromL(uint index){/*TODO*/ assume(0);}
 }
 
 #endif  //#ifndef KUTIL2_H

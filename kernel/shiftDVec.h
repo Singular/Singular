@@ -98,8 +98,4 @@ namespace ShiftDVec
     (TSet tset, int k, TObject* H, int uptodeg, int lVblock);
 }
 
-namespace ShiftDVec::Paul
-{
-}
-
 #endif
