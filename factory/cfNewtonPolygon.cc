@@ -23,6 +23,8 @@
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
 
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
+
 static
 void translate (int** points, int* point, int sizePoints) //make point to 0
 {
@@ -920,11 +922,19 @@ bool absIrredTest (const CanonicalForm& F)
 
   CanonicalForm g= gcd (newtonPolyg[0][0], newtonPolyg[0][1]); //maybe it's better to use plain intgcd
 
+
+  printf ("newtonPolyg[0]= %d\n", newtonPolyg[0][0]);
+  printf ("newtonPolyg[0]= %d\n", newtonPolyg[0][1]);
+  out_cf ("g= ", g, "\n");
+
   int i= 1;
   while (!g.isOne() && i < sizeOfNewtonPolygon)
   {
     g= gcd (g, newtonPolyg[i][0]);
     g= gcd (g, newtonPolyg[i][1]);
+  printf ("newtonPolyg[i]= %d\n", newtonPolyg[i][0]);
+  printf ("newtonPolyg[i]= %d\n", newtonPolyg[i][1]);
+    out_cf ("g= ", g, "\n");
     i++;
   }
 
@@ -1028,6 +1038,7 @@ modularIrredTestWithShift (const CanonicalForm& F)
   ASSERT (getNumVars (F) == 2, "expected bivariate polynomial");
   ASSERT (factorize (F).length() <= 2, " expected irreducible polynomial");
 
+  out_cf ("F= ", F, "\n");
   bool isRat= isOn (SW_RATIONAL);
   if (isRat)
     Off (SW_RATIONAL);
@@ -1052,6 +1063,8 @@ modularIrredTestWithShift (const CanonicalForm& F)
   Fp= Fp (x+E[1], x);
   Fp= Fp (y+E[2], y);
 
+  out_cf ("Fp0= ", Fp, "\n");
+
   if (tdeg == totaldegree (Fp))
   {
     if (absIrredTest (Fp))
@@ -1059,6 +1072,7 @@ modularIrredTestWithShift (const CanonicalForm& F)
       CFFList factors= factorize (Fp);
       if (factors.length() == 2 && factors.getLast().exp() == 1)
       {
+        printf ("irred1\n");
         if (isRat)
           On (SW_RATIONAL);
         setCharacteristic (0);
@@ -1072,6 +1086,8 @@ modularIrredTestWithShift (const CanonicalForm& F)
   Fp= Fp (x+E[1], x);
   Fp= Fp (y+E[2], y);
 
+  out_cf ("Fp1= ", Fp, "\n");
+
   if (tdeg == totaldegree (Fp))
   {
     if (absIrredTest (Fp))
@@ -1079,6 +1095,7 @@ modularIrredTestWithShift (const CanonicalForm& F)
       CFFList factors= factorize (Fp);
       if (factors.length() == 2 && factors.getLast().exp() == 1)
       {
+        printf ("irred2\n");
         if (isRat)
           On (SW_RATIONAL);
         setCharacteristic (0);
@@ -1108,6 +1125,16 @@ modularIrredTestWithShift (const CanonicalForm& F)
           CFFList factors= factorize (Fp);
           if (factors.length() == 2 && factors.getLast().exp() == 1)
           {
+            out_cf ("Fp2= ", Fp, "\n");
+            printf ("tdeg= %d\n", tdeg);
+            printf ("totaldegree (Fp)= %d\n", totaldegree (Fp));
+            printf ("degree (Fp, 1)= %d\n", degree (Fp,1));
+            printf ("degree (Fp,2)= %d\n", degree (Fp,2));
+            printf ("degree (F,1)= %d\n", degree (F,1));
+            printf ("degree (F,2)= %d\n", degree (F,2));
+            out_cf ("factors.getFirst()= ", factors.getFirst().factor(), "\n");
+            printf ("char= %d\n", getCharacteristic ());
+            printf ("irred3\n");
             if (isRat)
               On (SW_RATIONAL);
             setCharacteristic (0);

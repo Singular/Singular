@@ -49,7 +49,7 @@ ratBiSqrfFactorize (const CanonicalForm & G,        ///< [in] a bivariate poly
 {
   CFMap N;
   CanonicalForm F= compress (G, N);
-  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentX= content (F, 1); //erwarte hier primitiven input: primitiv über Z bzw. Z[a]
   CanonicalForm contentY= content (F, 2);
   F /= (contentX*contentY);
   CFFList contentXFactors, contentYFactors;
