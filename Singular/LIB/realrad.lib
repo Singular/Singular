@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib 13597 2010-11-05 09:40:57Z hannes $";
+version="$Id: realrad.lib 15103 2012-07-11 10:00:13Z motsak $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -108,7 +108,8 @@ EXAMPE: example realrad; shows an example"
     pari="";
   }
   id=intersect(reddim[1..(siz+1)]);
-  id=timeStd(id,301);//simplify the output
+  //id=timeStd(id,301);//simplify the output
+  id=interred(id); // timeStd does not work yet
   setring r;
   id=imap(ri,id);
   return(id);
@@ -159,7 +160,8 @@ RETURN: an ideal j of dimension <=0 s.th. i is contained in
 
  setring r;
  i=imap(neu,i);
- i=timeStd(i,301);
+ //i=timeStd(i,301);
+ i=interred(i); // timeStd does not work yet
  return(i);
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -243,7 +245,8 @@ EXAMPLE:   example realzero; shows an example"
    boeser=GeneralPos(nonshape);
    j=intersect(j,boeser);
  }
- j=timeStd(j,301);
+ //j=timeStd(j,301);
+ j=interred(j); // timeStd does not work yet
  setring r_alt;
  j=fetch(r_neu,j);
  return(j);
@@ -379,7 +382,8 @@ EXAMPLE:   example radzero; shows no example"
 
      //going back
      buffer[l]=psi(trans);
-     buffer[l]=timeStd(buffer[l],301);//timelimit for std computation
+     //buffer[l]=timeStd(buffer[l],301);//timelimit for std computation
+     buffer[l]=interred(buffer[l]);//timeStd does not work yet
    }
  }
  //option(returnSB);
@@ -426,7 +430,8 @@ EXAMPLE:   example radzero; shows no example"
        pr=insert(pr,minreal[l][2]);
      }
      i=intersect(pr[1..m]);
-     i=timeStd(i,301);
+     //i=timeStd(i,301);
+     i=interred(i);//timeStd does not work yet
      list realmin=minreal+list(i);
      return(realmin);
   }
