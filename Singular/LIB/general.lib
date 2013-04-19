@@ -914,8 +914,7 @@ RETURN:  Result of cmd, if the result can be computed in i seconds.
          Otherwise the computation is interrupted after i seconds,
          the string "Killed" is returned and the global variable
          'watchdog_interrupt' is defined.
-NOTE:    * the MP package must be enabled
-         * the current basering should not be watchdog_rneu, since
+NOTE:    * the current basering should not be watchdog_rneu, since
            watchdog_rneu will be killed
          * if there are variable names of the structure x(i) all
            polynomials have to be put into eval(...) in order to be
@@ -932,33 +931,14 @@ EXAMPLE: example watchdog; shows an example
   }
   if ( i > 0 )
   {
-    int j=10;
-    int k=999999;
 // fork, get the pid of the child and send it the command
     link l_fork="ssi:fork";
     open(l_fork);
     execute("write(l_fork,quote(" + cmd + "));");
-
-
-// sleep in small, but growing intervals for appr. 1 second
-    while(j < k)
-    {
-      if (status(l_fork, "read", "ready", j)) {break;}
-      j = j + j;
-    }
-
-// sleep in intervals of one second
-    j = 1;
-    if (!status(l_fork,"read","ready"))
-    {
-      while (j < i)
-      {
-        if (status(l_fork, "read", "ready", k)) {break;}
-        j = j + 1;
-      }
-    }
+    list L=l_fork;
+    int j=waitfirst(L,i*1000);
 // check, whether we have a result, and return it
-    if (status(l_fork, "read", "ready"))
+    if (j==1)
     {
       def result = read(l_fork);
       if (nameof(basering)!=rname)
@@ -974,7 +954,6 @@ EXAMPLE: example watchdog; shows an example
       {
         kill watchdog_interrupt;
       }
-      close(l_fork);
     }
     else
     {
@@ -984,8 +963,8 @@ EXAMPLE: example watchdog; shows an example
         int watchdog_interrupt=1;
         export watchdog_interrupt;
       }
-      close(l_fork);
     }
+    close(l_fork);
     return(result);
   }
   else
