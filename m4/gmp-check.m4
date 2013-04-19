@@ -34,7 +34,7 @@ AC_MSG_CHECKING(for GMP >= $min_gmp_version)
 
 for GMP_HOME in ${GMP_HOME_PATH} 
   do	
-	if test -r "$GMP_HOME/include/gmp.h"; then
+#	if test -r "$GMP_HOME/include/gmp.h"; then
 
 		if test "x$GMP_HOME" != "x/usr"; then
 			GMP_CFLAGS="-I${GMP_HOME}/include"
@@ -100,9 +100,9 @@ for GMP_HOME in ${GMP_HOME_PATH}
 		unset GMP_LIBS	
 		])
 
-	else
-		gmp_found="no"	
-	fi
+#	else
+#		gmp_found="no"	
+#	fi
 done
 
 if test "x$gmp_found" != "xyes"; then
