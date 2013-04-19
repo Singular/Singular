@@ -38,3 +38,4 @@ Allgemein, was ist zu ändern?
 · Hinzufügen neuer Paare; Paarbildung J from S with i from I.
 · Reduktion auch mit Polynomen von I und mit J from S, aber
   hier NUR! Rechtsteiler betrachten
+· Ersteinmal nur mit "normaler" Reduktion implementieren!

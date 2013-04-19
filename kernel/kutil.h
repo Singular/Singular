@@ -185,20 +185,10 @@ extern int strat_fac_debug;
 //class ShiftDVec::sTObject;
 //delete do disable DVec related stuff
 
-
-//BOCO: Inheritance
-//case normal bba: sTObject <- sLObject
-//case shiftbba: sTObject <- ShiftDVec::sTObject <- sLObject
-#ifdef HAVE_SHIFTBBADVEC
-typedef class ShiftDVec::sTObject TObject;
-//typedef class sTObject TObject;
-#else
-typedef class sTObject TObject; //BOCO: moved
-#endif
-
 // BOCO: added
 #ifdef HAVE_SHIFTBBADVEC
-namespace ShiftDVec{
+namespace ShiftDVec
+{
   class sLObject;
   uint lcmDivisibleBy
     ( ShiftDVec::sLObject * lcm, 
@@ -208,25 +198,26 @@ namespace ShiftDVec{
 }
 #endif
 
-#ifdef HAVE_SHIFTBBADVEC
-typedef class ShiftDVec::sLObject sLObject;
-typedef class ShiftDVec::sLObject  LObject;
-#else
 typedef class sLObject LObject;
-#endif
 typedef TObject * TSet;
 typedef LObject * LSet;
 
 
-//BOCO: Inheritance
-//case normal bba: sTObject <- sLObject
-//case shiftbba: sTObject <- ShiftDVec::sTObject <- sLObject
-#ifdef HAVE_SHIFTBBADVEC
-class ShiftDVec::sLObject : public ShiftDVec::sTObject
-//Or should we better say ShiftDVec::sLObject, to make the idea clearer
-#else
-class sLObject : public sTObject
-#endif
+/* BOCO:
+ * 
+ * Inheritance:
+ *
+ *             sTObject
+ *            /        \
+ *           / (virtual)\
+ *          /            \
+ *      sLObject    ShiftDVec::sTObject
+ *           \          /
+ *            \        / 
+ *             \      /
+ *        ShiftDVec::sLObject
+ */
+class sLObject : public virtual sTObject
 {
 
 public:
