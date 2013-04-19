@@ -36,12 +36,33 @@ CFAFList uniAbsFactorize (const CanonicalForm& F)
   CFFList rationalFactors= factorize (F);
   CFFListIterator i= rationalFactors;
   i++;
-  CanonicalForm mipo;
+  Variable alpha;
   CFAFList result;
+  CFFList QaFactors;
+  CFFListIterator iter;
   for (; i.hasItem(); i++)
   {
-    mipo= rootOf (i.getItem().factor());
-    result.append (CFAFactor (i.getItem().factor(), mipo, i.getItem().exp()));
+    if (degree (i.getItem().factor()) == 1)
+    {
+      alpha= rootOf (Variable (1));
+      result.append (CFAFactor (i.getItem().factor(), getMipo (alpha),
+                                i.getItem().exp()));
+      continue;
+    }
+    alpha= rootOf (i.getItem().factor());
+    QaFactors= factorize (i.getItem().factor(), alpha);
+    iter= QaFactors;
+    if (iter.getItem().factor().inCoeffDomain())
+      iter++;
+    for (;iter.hasItem(); iter++)
+    {
+      if (degree (iter.getItem().factor()) == 1)
+      {
+        result.append (CFAFactor (iter.getItem().factor(), getMipo (alpha),
+                                  i.getItem().exp()));
+        break;
+      }
+    }
   }
   result.insert (CFAFactor (rationalFactors.getFirst().factor(), 1, 1));
   return result;
@@ -57,16 +78,16 @@ CFAFList absFactorize (const CanonicalForm& G)
 {
   //TODO handle homogeneous input
   ASSERT (getNumVars (F) == 2, "expected bivariate input");
-  ASSERT (getCharacteristic() == 0 && isOn (SW_RATIONAL), "expected poly over Q");
+  ASSERT (getCharacteristic() == 0 && isOn (SW_RATIONAL),
+          "expected poly over Q");
 
   CFMap N;
   CanonicalForm F= compress (G, N);
   bool isRat= isOn (SW_RATIONAL);
   if (isRat)
-  {
     F *= bCommonDen (F);
-    Off (SW_RATIONAL);
-  }
+
+  Off (SW_RATIONAL);
   F /= icontent (F);
   if (isRat)
     On (SW_RATIONAL);
@@ -111,7 +132,6 @@ CFAFList absFactorize (const CanonicalForm& G)
     result= Union (result, resultBuf);
   }
 
-
   for (CFAFListIterator i= result; i.hasItem(); i++)
     i.getItem()= CFAFactor (N (i.getItem().factor()), i.getItem().minpoly(),
                             i.getItem().exp());
@@ -123,6 +143,7 @@ CFAFList absFactorize (const CanonicalForm& G)
                               i.getItem().exp()));
   normalize (result);
   result.insert (CFAFactor (Lc(G), 1, 1));
+
   return result;
 }
 
