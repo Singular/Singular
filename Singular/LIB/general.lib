@@ -1203,32 +1203,19 @@ EXAMPLE: example timeStd; shows an example
   {
     if ((typeof(#[1]) == "int")&&(#[1]))
     {
-      int wait = #[1];
-      int j = 10;
+      int wait = #[1]*1000;
 
       string bs = nameof(basering);
       link l_fork = "ssi:fork";
       open(l_fork);
-      write(l_fork, quote(system("pid")));
-      int pid = read(l_fork);
-      write(l_fork, quote(timeStd(eval(i))));
-
-      // sleep in small intervalls for appr. one second
-      if (wait > 0)
+      write(l_fork, quote(std(eval(i))));
+      list L=l_fork;
+      int j=waitfirst(L,wait);
+      if (j==0) // timeout
       {
-        while(j < 1000000)
-        {
-          if (status(l_fork, "read", "ready", j)) {break;}
-          j = j + j;
-        }
+        ideal result=i;
       }
-      j = 1;
-      while (j < wait)
-      {
-        if (status(l_fork, "read", "ready", 1000000)) {break;}
-        j = j + 1;
-      }
-      if (status(l_fork, "read", "ready"))
+      else
       {
         def result = read(l_fork);
         if (bs != nameof(basering))
@@ -1238,13 +1225,8 @@ EXAMPLE: example timeStd; shows an example
           def result = imap(PP, result);
           kill PP;
         }
-        close(l_fork);
       }
-      else
-      {
-        ideal result=i;
-        close(l_fork);
-      }
+      close(l_fork);
       return (result);
     }
   }
