@@ -2020,6 +2020,40 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return FALSE;
       }
       else
+      if (strcmp(sys_cmd, "Mrwalk") == 0)
+      { // Random Walk
+        if (h == NULL || h->Typ() != IDEAL_CMD ||
+            h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+            h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+            h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD ||
+            h->next->next->next->next == NULL || h->next->next->next->next->Typ() != INT_CMD)
+        {
+          Werror("system(\"Mrwalk\", ideal, intvec, intvec, int, int) expected");
+          return TRUE;
+        }
+
+        if (((intvec*) h->next->Data())->length() != currRing->N &&
+            ((intvec*) h->next->next->Data())->length() != currRing->N )
+        {
+          Werror("system(\"Mrwalk\" ...) intvecs not of length %d\n",
+                 currRing->N);
+          return TRUE;
+        }
+        ideal arg1 = (ideal) h->Data();
+        intvec* arg2 = (intvec*) h->next->Data();
+        intvec* arg3 =  (intvec*) h->next->next->Data();
+        int arg4 = (int)(long) h->next->next->next->Data();
+        int arg5 = (int)(long) h->next->next->next->next->Data();
+
+
+        ideal result = (ideal) Mrwalk(arg1, arg2, arg3, arg4, arg5);
+
+        res->rtyp = IDEAL_CMD;
+        res->data =  result;
+
+        return FALSE;
+      }
+      else
       if (strcmp(sys_cmd, "MAltwalk1") == 0)
       {
         if (h == NULL || h->Typ() != IDEAL_CMD ||
@@ -2118,6 +2152,37 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return FALSE;
       }
       else
+      if (strcmp(sys_cmd, "Mfrwalk") == 0)
+      {
+        if (h == NULL || h->Typ() != IDEAL_CMD ||
+            h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+            h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+            h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD)
+        {
+          Werror("system(\"Mfrwalk\", ideal, intvec, intvec, int) expected");
+          return TRUE;
+        }
+
+        if (((intvec*) h->next->Data())->length() != currRing->N &&
+            ((intvec*) h->next->next->Data())->length() != currRing->N )
+        {
+          Werror("system(\"Mfrwalk\" ...) intvecs not of length %d\n",
+                 currRing->N);
+          return TRUE;
+        }
+        ideal arg1 = (ideal) h->Data();
+        intvec* arg2 = (intvec*) h->next->Data();
+        intvec* arg3 = (intvec*) h->next->next->Data();
+        int arg4 = (int)(long) h->next->next->next->Data();
+        
+        ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4);
+
+        res->rtyp = IDEAL_CMD;
+        res->data =  result;
+
+        return FALSE;
+      } 
+      else
 
   #ifdef TRAN_Orig
       if (strcmp(sys_cmd, "TranMImprovwalk") == 0)
@@ -2212,6 +2277,41 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return FALSE;
       }
       else
+      if (strcmp(sys_cmd, "TranMrImprovwalk") == 0)
+      {
+        if (h == NULL || h->Typ() != IDEAL_CMD ||
+            h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+            h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+            h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD ||
+            h->next->next->next == NULL || h->next->next->next->next->Typ() != INT_CMD ||
+            h->next->next->next == NULL || h->next->next->next->next->next->Typ() != INT_CMD)
+        {
+          Werror("system(\"TranMrImprovwalk\", ideal, intvec, intvec) expected");
+          return TRUE;
+        }
+
+        if (((intvec*) h->next->Data())->length() != currRing->N &&
+            ((intvec*) h->next->next->Data())->length() != currRing->N )
+        {
+          Werror("system(\"TranMrImprovwalk\" ...) intvecs not of length %d\n", currRing->N);
+          return TRUE;
+        }
+        ideal arg1 = (ideal) h->Data();
+        intvec* arg2 = (intvec*) h->next->Data();
+        intvec* arg3 = (intvec*) h->next->next->Data();
+        int arg4 = (int)(long) h->next->next->next->Data();
+        int arg5 = (int)(long) h->next->next->next->next->Data();
+        int arg6 = (int)(long) h->next->next->next->next->next->Data();
+
+        ideal result = (ideal) TranMrImprovwalk(arg1, arg2, arg3, arg4, arg5, arg6);
+
+        res->rtyp = IDEAL_CMD;
+        res->data =  result;
+
+        return FALSE;
+      }
+      else
+
   #endif
   /*================= Extended system call ========================*/
      {
