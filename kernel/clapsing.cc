@@ -1092,6 +1092,75 @@ notImpl:
   //PrintS("......S\n");
   return res;
 }
+#ifdef HAVE_NTL
+#ifdef HAVE_FLINT
+ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
+{
+  pTest(f);
+
+  ideal res=NULL;
+
+  if (f==NULL)
+  {
+    return NULL;
+  }
+  CanonicalForm F( convSingTrPFactoryP( f ) );
+
+  if (getNumVars (F) > 2)
+  {
+    WerrorS( feNotImplemented );
+    return res;
+  }
+  CFAFList absFactors= absFactorize (F);
+
+  int n= absFactors.length();
+  *exps=new intvec (n);
+
+  res= idInit (n, 1);
+
+  mipos= idInit (n, 1);
+
+  Variable x= Variable (1);
+  Variable alpha;
+  int i= 0;
+  numFactors= 0;
+  int count;
+  CFAFListIterator iter= absFactors;
+  CanonicalForm lead= iter.getItem().factor();
+  if (iter.getItem().factor().inCoeffDomain())
+  {
+    i++;
+    iter++;
+  }
+  for (; iter.hasItem(); iter++, i++)
+  {
+    (**exps)[i]= iter.getItem().exp();
+    alpha= iter.getItem().minpoly().mvar();
+    if (iter.getItem().minpoly().isOne()) //TODO make sure isOn (SW_RATIONAL) == true
+      lead /= bCommonDen (iter.getItem().factor());
+    else
+      lead /= power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly()));
+    res->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().factor()*bCommonDen (iter.getItem().factor()), alpha, x));
+    if (iter.getItem().minpoly().isOne())
+    {
+      count= iter.getItem().exp();
+      mipos->m[i]= convFactoryPSingTrP (x);
+    }
+    else
+    {
+      count= iter.getItem().exp()*degree (iter.getItem().minpoly());
+      mipos->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().minpoly(), alpha, x));
+    }
+    numFactors += count;
+  }
+
+  (**exps)[0]= 1;
+  res->m[0]= convFactoryPSingTrP (lead);
+  mipos->m[0]= convFactoryPSingTrP (x);
+  return res;
+}
+#endif
+#endif
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
 {
   pTest(f);
