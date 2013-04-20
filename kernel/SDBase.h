@@ -1,7 +1,7 @@
 #include <mod2.h>
 
-#ifndef SHIFTDVEC_H
-#define SHIFTDVEC_H
+#ifndef SDBASE_H
+#define SDBASE_H
 
 namespace ShiftDVec
 {

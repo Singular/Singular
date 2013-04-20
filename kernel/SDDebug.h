@@ -1,48 +1,69 @@
-//BOCO: Our personal debugging output
-//
-// Attention:
-// The usage of DEBOGRI as flag-variable became obsolete.
-// ShiftDVec::deBoGri is the successor.
-//
-//0 : RECOMMENDED for not-developers
-//    no debugging output; removes all in DEBOGRI defined debug
-//    functions from the code, which is recommended, if you do
-//    not want to debug the code.
-//1 : entering of pairs - check degree violation
-//2 : Which pairs are sorted out by... some criterion?
-//4 : debugging of Gebauer-Moeller
-//8 : debugging of the initialization of LObjects
-//16 : debugging of lcm related things
-//32 : debugging of missing pairs
-//64 : debugging of chainCrit
-//128 : Which pairs are sorted out by some criterion?
-//      - at the moment, this considers only GM3.
-//256 : debugging divisiblility/ reduction related things
-//512 : debugging Creation of DVecs
-//1024 : Debugging memory corruption
-//2048 : debugging redTail related things
-//4096 : debugging the multiplication
+#ifndef SDDEBUG_H
+#define SDDEBUG_H
+
+/* file:        SDDebug.h
+ * authors:     Grischa Studzinski & Benjamin Schnitzler
+ * created:     ask git
+ * last change: ask git
+ *
+ * DESCRIPTION:
+ * This file contains methods for formatted (and indented)
+ * debugging output. Flags can be set when using any function
+ * with debug-output. It will then only output, if this flag
+ * was set when invoking the freegbdvc command.
+ *
+ * REMARK:
+ * We are trying to get rid of debug output in the code and
+ * want to use gdb instead. We are currently working on a
+ * method for gdb, which can break on a line by regular
+ * expression, which will allow us to put debugging output
+ * to the right parts of our code. However this is only working
+ * with a 'recent' version of gdb.
+ *
+ * TODO: 
+ * - Introduce a singular option for setting debogri whilst in
+ *   debug mode.
+ * - Create a function, which can turn on/off debug output for
+ *   all debogris, local to the current function (works
+ *   together with initdebogri?)
+ */
+
+/* currently used flags:
+ * Attention:
+ * The usage of DEBOGRI as flag-variable became obsolete.
+ * ShiftDVec::deBoGri is the successor.
+ *
+ * 0    : RECOMMENDED for not-developers
+ *        no debugging output; removes all in DEBOGRI defined
+ *        debug functions from the code, which is recommended,
+ *        if you do not want to debug the code.
+ * 1    : entering of pairs - check degree violation
+ * 2    : Which pairs are sorted out by... some criterion?
+ * 4    : debugging of Gebauer-Moeller
+ * 8    : debugging of the initialization of LObjects
+ * 16   : debugging of lcm related things
+ * 32   : debugging of missing pairs
+ * 64   : debugging of chainCrit
+ * 128  : Which pairs are sorted out by some criterion?
+ *        - at the moment, this considers only GM3.
+ * 256  : debugging divisiblility/ reduction related things
+ * 512  : debugging Creation of DVecs
+ * 1024 : Debugging memory corruption
+ * 2048 : debugging redTail related things
+ * 4096 : debugging the multiplication
+ */
+
 #ifdef KDEBUG
 #define DEBOGRI 1
 #endif
-//TODO: 
-// - Introduce a singular option for setting debogri whilst in
-//   debug mode.
-// - Create a function, which can turn on/off debug output for
-//   all debogris, local to the current function (works together
-//   with initdebogri?)
 
 
 #if DEBOGRI > 0
 
-#if 0
 //This has to be changed to make it work again
 //void debugPrintDegViolation
 //  (const char* where, poly p1, uint shift, poly p2, kStrategy);
 #define debugPrintDegViolation(x1, x2, x3, x4, x5) ((void) 0)
-#else
-#define debugPrintDegViolation(x1, x2, x3, x4, x5) ((void) 0)
-#endif
 
 namespace ShiftDVec
 {
@@ -65,7 +86,7 @@ namespace ShiftDVec
       const ring lmRing, const ring tlRing = NULL,
       bool assume = false, int indent = -1              );
   bool deBoGriPrint
-    ( const TObject* P, const char* description, uint flag,
+    ( const ShiftDvec::TObject* P, const char* description, uint flag,
       const ring lmRing, const ring tlRing,
       bool assume = false, int indent = -1                 );
   bool deBoGriPrint
@@ -73,7 +94,7 @@ namespace ShiftDVec
       const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool deBoGriPrint
-    ( const poly p, int shift, kStrategy strat,
+    ( const poly p, int shift, ShiftDVec::kStrategy strat,
       const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool loGriToFile
@@ -88,6 +109,10 @@ namespace ShiftDVec
 #ifdef HAVE_DEBOGRITEST
   void deBoGriTTest(kStrategy strat);
 #endif
+
+
+typedef skStrategy* kStrategy;
+
 
 #if DEBOGRI > 0
 
@@ -179,3 +204,9 @@ class ShiftDVec::DeBoGri
 #define lmHasZeroShift(...) ((void) 0)
 
 #endif //#if DEBOGRI > 0
+
+
+#endif //ifndef SDDEBUG_H
+
+
+/* vim: set foldmethod=syntax : */

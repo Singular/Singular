@@ -1,18 +1,19 @@
-#define KUTIL2_CC
-
-/* Preamble
- * See kutil2.h
- * Last Change: 2012-03-02 18:00
- * Maintainers: Grischa Studzinski and Benjamin Schnitzler 
- */
-
-/* TODO:
- * a lot (see kutil2.h)
+/* file:        SDkutil.cc
+ * authors:     Grischa Studzinski & Benjamin Schnitzler
+ * created:     ask git
+ * last change: ask git
+ *
+ * TODO:
+ * a lot (see SDkutil.h)
  * - loop
  *     search for (semantic and syntax) bugs
  *   until all bugs are cleared
  * (unfortunatly the above statement does not compile)
  */
+
+#include <kernel/kutil.h>
+#include <kernel/SDkutil.h>
+#include <kernel/SDDebug.h>
 
 #include <climits>
 
@@ -20,19 +21,13 @@
 //ring.h
 #include <kernel/mod2.h>
 
-#include <kernel/kutil.h>
-#include <kernel/kutil2.h> //(already included in kutil.h)
 #include <polys/monomials/p_polys.h> //For p_Totaldegree and the like
 #include <kernel/polys.h> //For pTotaldegree and the like
 #include <kernel/febase.h> //For Print stuff
 
-#if DEBOGRI > 0
-#if 0
-#include <fstream>
-#endif
-#endif
+typedef skStrategy* kStrategy;
 
-
+namespace SD = ShiftDVec;
 
 //member functions of ShiftDVec::sTobject
 
@@ -291,7 +286,7 @@ void ShiftDVec::sLObject::freeLcmDVec()
  * DVec of the other objects lcm. Thus, if both lcm do not have
  * the same shift, but would otherwise be equal, true will be
  * returned, too.  In every other case, false is returned.    */
-bool ShiftDVec::sLObject::compareLcmTo( sLObject* other, ring r )
+bool ShiftDVec::sLObject::compareLcmTo( ShiftDVec::sLObject* other, ring r )
 {
   if( this->getLcmDvSize(r) != other->getLcmDvSize(r) ) 
     return false;
@@ -817,7 +812,7 @@ BOOLEAN ShiftDVec::redViolatesDeg
  *   degree bound.
  */
 BOOLEAN ShiftDVec::redViolatesDeg
-  ( TObject* a, TObject* b, int uptodeg, ring lmRing )
+  ( ShiftDVec::TObject* a, ShiftDVec::TObject* b, int uptodeg, ring lmRing )
 {
   initDeBoGri
     ( ShiftDVec::indent, 

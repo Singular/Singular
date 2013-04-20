@@ -53,12 +53,10 @@ typedef int* intset;
 typedef int64  wlen_type;
 typedef wlen_type* wlen_set;
 
-#if 0 //BOCO: (re)moved
 typedef class sTObject TObject;
 typedef class sLObject LObject;
 typedef TObject * TSet;
 typedef LObject * LSet;
-#endif
 
 typedef struct denominator_list_s denominator_list_s;
 typedef denominator_list_s *denominator_list;
@@ -178,31 +176,6 @@ extern int strat_nr;
 extern int strat_fac_debug;
 #endif
 
-//BOCO: added - defines HAVE_SHIFTBBADVEC 
-//#include <kernel/kutil2.h>
-//#define HAVE_SHIFTBBADVEC
-#include <kernel/kutil2.h>
-//class ShiftDVec::sTObject;
-//delete do disable DVec related stuff
-
-// BOCO: added
-#ifdef HAVE_SHIFTBBADVEC
-namespace ShiftDVec
-{
-  class sLObject;
-  uint lcmDivisibleBy
-    ( ShiftDVec::sLObject * lcm, 
-      ShiftDVec::sTObject * p, int numVars );
-
-  void lcmDvecWrite(sLObject* t);
-}
-#endif
-
-typedef class sLObject LObject;
-typedef TObject * TSet;
-typedef LObject * LSet;
-
-
 /* BOCO:
  * 
  * Inheritance:
@@ -234,47 +207,6 @@ public:
                  lm(pi) in currRing, tail(pi) in tailring -*/
 
   poly  lcm;   /*- the lcm of p1,p2 -*/
-
-  /* BOCO: We need a dvec for the lcm in shiftbbadvec case */
-#ifdef HAVE_SHIFTBBADVEC
-  /* BOCO: Important
-   * The lcmDvec and lcmDvSize need to be set to NULL
-   * respectivly 0, every time, the lcm changes and at the
-   * creation of an LObject.
-   * See kutil2.cc for most definitions.
-   * TODO:
-   * Do the latter in the constructor.
-   */
-  uint*   lcmDvec;   /*- the corresponding dvec -*/
-  uint  lcmDvSize;
-
-  void SetLcmDVec(poly p, ring r = currRing)
-  { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDvec); }
-
-  //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
-  void SetLcmDVec(ring r = currRing);
-
-  void SetLcmDvecIfNULL() {if(!lcmDvec) SetLcmDVec();}
-
-  void SetLcmDvecToNULL() {lcmDvec = NULL; lcmDvSize = 0;}
-
-  uint getLcmDvSize(ring r = currRing);
-
-  bool gm3LcmUnEqualToLcm
-    (poly p1, poly p2, int lV, ring r = currRing);
-
-  void freeLcmDVec();
-
-  uint lcmDivisibleBy( ShiftDVec::sTObject * T, int numVars );
-
-  uint lcmDivisibleBy
-    ( ShiftDVec::sTObject * T, 
-      uint minShift, uint maxShift, int numVars );
-
-  bool compareLcmTo( sLObject* other, ring r = currRing );
-
-  bool compareLcmTo( poly p1, poly p2, ring r = currRing );
-#endif
 
   poly last;   // pLast(p) during reductions
   kBucket_pt bucket;
@@ -445,9 +377,8 @@ public:
   int lastAxis;
   int newIdeal;
   int minim;
-  #if defined(HAVE_SHIFTBBA) || defined(HAVE_SHIFTBBADVEC)
+  #if defined(HAVE_SHIFTBBA)
   int lV;
-  int uptodeg; //BOCO: added
   #endif
   BOOLEAN interpt;
   BOOLEAN homog;
@@ -623,10 +554,6 @@ void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairSig (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
-
-//BOCO: I think we need that here... but i have forgotten, if
-//that is nescessary
-void kMergeBintoL(kStrategy strat);
 
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
@@ -881,32 +808,4 @@ extern  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
 extern  int (*test_PosInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
 
-
-/* BOCO: shiftDVec stuff */
-ideal kStdShiftDVec
-  ( ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,
-    int syzComp, int newIdeal, intvec *vw, int uptodeg, int lV );
-
-void initBuchMoraCritShiftDVec(kStrategy strat);
-
-ideal bbaShiftDVec
-  ( ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, 
-    int uptodeg, int lV                                      );
-
-void initBuchMoraCritShiftDVec(kStrategy strat);
-
-ideal freegbdvc(ideal I, int uptodeg, int lVblock);
-
-
-//BOCO: lpMult(Profiler) stuff
-poly lpMult( poly p, poly m, int uptodeg, int lV  );
-lists lpMultProfiler
-  ( lists L, int uptodeg, int lV, int n );
-lists lpMultProfilerR
-  ( lists L, int uptodeg, int lV, int n, int resolution );
-
 #endif
-
-
-//LPDV Template Test
-poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );

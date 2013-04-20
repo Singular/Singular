@@ -1,15 +1,18 @@
-/* Preamble
- * Definitions for the letterplace DVec implementations
- * Last Change: 2012-03-20 15:00
- * Maintainers: Grischa Studzinski and Benjamin Schnitzler 
+/* file:        SDkutil.h
+ * authors:     Grischa Studzinski & Benjamin Schnitzler
+ * created:     ask git
+ * last change: ask git
+ *
+ * DESCRIPTION:
+ * This file contains extensions to some structures and
+ * functions defined in kutil.h (...Object, ...Strategy, etc.).
+ *
+ * TODO: bidubidu
  */
 
-/* TODO: bidubidu  */
 
-#ifndef KUTIL2_H
-#define KUTIL2_H
-
-#define HAVE_SHIFTBBADVEC
+#ifndef SDKUTIL_H
+#define SDKUTIL_H
 
 namespace ShiftDVec
 { uint CreateDVec(poly p, ring r, uint*& dvec); }
@@ -18,15 +21,10 @@ namespace ShiftDVec
 
 typedef unsigned int uint;
 
+typedef skStrategy* kStrategy;
 
 namespace ShiftDVec
 {
-  class sLObject;
-  class sTObject;
-
-  typedef class ShiftDVec::sLObject LObject;
-  typedef class ShiftDVec::sTObject TObject;
-
   uint getShift
     (poly p, uint numFirstVar, ring r = currRing );
 
@@ -56,7 +54,7 @@ namespace ShiftDVec
       ring aLmRing = currRing, 
       ring bLmRing = currRing, ring bTailRing = currRing );
   BOOLEAN redViolatesDeg
-    ( TObject* a, TObject* b, 
+    ( ShiftDVec::TObject* a, ShiftDVec::TObject* b, 
       int uptodeg, ring lmRing = currRing );
 
   bool createSPviolatesDeg
@@ -71,14 +69,26 @@ namespace ShiftDVec
 
   void dvecWrite(const uint* dvec, uint dvSize);
 
-  void dvecWrite(const sTObject* t);
+  void dvecWrite(const ShiftDVec::sTObject* t);
 
-  void lcmDvecWrite(const sLObject* t);
+  void lcmDvecWrite(const ShiftDVec::sLObject* t);
 
   extern int lpDVCase; //defined in kutil2.cc
+
+  uint lcmDivisibleBy
+    ( ShiftDVec::sLObject * lcm, 
+      ShiftDVec::sTObject * p, int numVars );
+
+  void lcmDvecWrite(ShiftDVec::sLObject* t);
 };
 
-/* Inheritance for the ShiftDVec case
+
+
+/* classes for ShiftDVec case: ...Object, ...Strategy */
+
+
+
+/* Inheritance for the ShiftDVec case explained
  * 
  *             sTObject
  *            /        \
@@ -89,14 +99,12 @@ namespace ShiftDVec
  *            \        / 
  *             \      /
  *        ShiftDVec::sLObject
+ *
+ * sTObject and sLObject are those from kutil.h
  */
 
-class sTObject;
-
-typedef class ShiftDVec::sLObject SD_LObj;
-typedef class ShiftDVec::sTObject SD_TObj;
-typedef SD_LObj * SD_LSet;
-typedef SD_TObj * SD_TSet;
+class ShiftDVec::sTObject;
+class ShiftDVec::skStrategy;
 
 class ShiftDVec::sTObject : public virtual ::sTObject
 {
@@ -187,34 +195,112 @@ public:
 class ShiftDVec::skStrategy : public ::skStrategy
 {
   private:
-    // BOCO DESCRIPTION:
-    // This is needed for the calculation of a left GB in a
-    // factor algebra K<X>/I; so this will be used in the
-    // ShiftDVec::LeftGB namespace
-    //
-    // BOCO TODO:
-    // I is probably subset of R; so either we will keep
-    // references to the Objects in R here, or we will delete
-    // them completely and instead let get_I_at(i) handle the
-    // translation from R to I at index i. We will decide that
-    // later. However: we have to care for the Initialization
-    // somewhere.
-    //   Question: Will I be part of T ??? - I don't think so,
-    // but again: What was the difference between T and R ?
+    /* BOCO DESCRIPTION:
+     * This is needed for the calculation of a left GB in a
+     * factor algebra K<X>/I; so this will be used in the
+     * ShiftDVec::LeftGB namespace
+     *
+     * BOCO TODO:
+     * I is probably subset of R; so either we will keep
+     * references to the Objects in R here, or we will delete
+     * them completely and instead let get_I_at(i) handle the
+     * translation from R to I at index i. We will decide that
+     * later. However: we have to care for the Initialization
+     * somewhere.
+     *   Question: Will I be part of T ??? - I don't think so,
+     * but again: What was the difference between T and R ?
+     */
     ShiftDVec::sTObject* I;
     uint size_of_I; // This is, what it says!
+    int lV;
+    int uptodeg;
+
   public:
+    void init_I(ideal I){/*TODO*/ assume(0);}
     uint get_size_of_I(){return size_of_I;}
     uint translate_index_I_to_R(uint i){/*TODO*/ assume(0);}
     ShiftDVec::sLObject get_I_at(uint i){return I[i];}
     void deleteFromL(uint index){/*TODO*/ assume(0);}
+
 }
 
 class ShiftDVec::sLObject :
   public ShiftDVec::sTObject, public ::sLObject
 {
+  private:
+    /* BOCO: Important
+     * The lcmDvec and lcmDvSize need to be set to NULL
+     * respectivly 0, every time, the lcm changes and at the
+     * creation of an LObject.
+     * See kutil2.cc for most definitions.
+     * TODO:
+     * Do the latter in the constructor.
+     */
+    uint*   lcmDvec;   /*- the corresponding dvec -*/
+    uint  lcmDvSize;
+
+  public:
+    void SetLcmDVec(poly p, ring r = currRing)
+    { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDvec); }
+
+    //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
+    void SetLcmDVec(ring r = currRing);
+
+    void SetLcmDvecIfNULL() {if(!lcmDvec) SetLcmDVec();}
+
+    void SetLcmDvecToNULL() {lcmDvec = NULL; lcmDvSize = 0;}
+
+    uint getLcmDvSize(ring r = currRing);
+
+    bool gm3LcmUnEqualToLcm
+      (poly p1, poly p2, int lV, ring r = currRing);
+
+    void freeLcmDVec();
+
+    uint lcmDivisibleBy( ShiftDVec::sTObject * T, int numVars );
+
+    uint lcmDivisibleBy
+      ( ShiftDVec::sTObject * T, 
+        uint minShift, uint maxShift, int numVars );
+
+    bool compareLcmTo(  ShiftDVec::sLObject* other, ring r = currRing );
+
+    bool compareLcmTo( poly p1, poly p2, ring r = currRing );
 }
 
-#endif  //#ifndef KUTIL2_H
+
+
+/* other stuff */
+
+
+
+ideal kStdShiftDVec
+  ( ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,
+    int syzComp, int newIdeal, intvec *vw, int uptodeg, int lV );
+
+void initBuchMoraCritShiftDVec( ShiftDVec::kStrategy strat);
+
+ideal bbaShiftDVec
+  ( ideal F, ideal Q,intvec *w,intvec *hilb, ShiftDVec::kStrategy strat, 
+    int uptodeg, int lV                                      );
+
+void initBuchMoraCritShiftDVec( ShiftDVec::kStrategy strat);
+
+ideal freegbdvc(ideal I, int uptodeg, int lVblock);
+
+
+//BOCO: lpMult(Profiler) stuff
+poly lpMult( poly p, poly m, int uptodeg, int lV  );
+lists lpMultProfiler
+  ( lists L, int uptodeg, int lV, int n );
+lists lpMultProfilerR
+  ( lists L, int uptodeg, int lV, int n, int resolution );
+
+//LPDV Template Test
+poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );
+
+#endif  //#ifndef SDKUTIL_H
+
+
 
 /* vim: set foldmethod=syntax : */

@@ -1,14 +1,9 @@
+#ifndef SDLeftGB_H
+#define SDLeftGB_H
 
+#include <kernel/SDkutil.h>
 
-#include <kernel/kutil2.h>
-
-#ifndef
-typedef unsigned int uint;
-
-#ifndef
-#define namespace ShiftDVec
-
-namespace ShiftDVec::LeftGB
+namespace ShiftDVec
 {
 
   void initenterpairs
@@ -38,5 +33,3 @@ namespace ShiftDVec::LeftGB
 }
 
 #endif
-#endif
-

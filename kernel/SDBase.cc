@@ -1,17 +1,28 @@
-// BOCO: What we have TODO for this file
-// 1. clean up, remove unecessary comments and old uncommented
-//    code; instead comment, when applicable, from where a
-//    function stems from
-// 2. divide this file in smaller portions
-// 3. move to current singular version; adapt functions;
-//    currRing is no longer global; look up, if some of these
-//    functions changed in the newest version and how they
-//    changed, adapt these changes if possible
-// 4. look for all TODO remarks in this file and try to resolve
-//    the TODO
-// 5. (always) pray; sacrifice some lambs to the goddess of code
-// 6. things from the global TODO list
-// 7. contemplate about what I have forgotten here
+/* file:        SDBase.cc
+ * authors:     Grischa Studzinski & Benjamin Schnitzler
+ * created:     ask git
+ * last change: ask git
+ *
+ * DESCRIPTION:
+ * This file contains extensions to some structures and
+ * functions defined in kutil.h (...Object, ...Strategy, etc.).
+ *
+ * TODO:
+ * 1. clean up, remove unecessary comments and old uncommented
+ *    code; instead comment, when applicable, from where a
+ *    function stems from
+ * 2. divide this file in smaller portions
+ * 3. move to current singular version; adapt functions;
+ *    currRing is no longer global; look up, if some of these
+ *    functions changed in the newest version and how they
+ *    changed, adapt these changes if possible
+ * 4. look for all TODO remarks in this file and try to resolve
+ *    the TODO
+ * 5. (always) pray; sacrifice some lambs to the goddess of
+ *    code
+ * 6. things from the global TODO list
+ * 7. contemplate about what I have forgotten here
+ */
 
 // define to enable tailRings (TODO: do this properly)
 #define HAVE_TAIL_RING
@@ -34,8 +45,10 @@
 #include <kernel/shiftgb.h>
 
 #include <kernel/kutil.h>
-#include <kernel/kutil2.h> //already included in kutil.h
-#include <kernel/shiftDVec.h>
+
+#include <kernel/SDkutil.h>
+#include <kernel/SDBase.h>
+#include <kernel/SDDebug.h>
 
 //now our adapted multiplications for:
 //- ksCreateSpoly
@@ -61,7 +74,8 @@
 //HAVE_SEV >= 4 - This could include some sev stuff, which
 //                should maybe not included.
 
-namespace ShiftDVec{
+namespace ShiftDVec
+{
   class sTObject;
 
   uint divisibleBy
@@ -77,7 +91,12 @@ namespace ShiftDVec{
 //    ( poly a, poly b, int uptodeg, ring ar, ring br );
   bool createSPviolatesDeg
     (poly a, poly b, uint shift, int uptodeg);
+
+  typedef skStrategy* kStrategy;
 };
+
+namespace SD = ShiftDVec;
+
 
 
 //extracted inlines from kutil.cc
