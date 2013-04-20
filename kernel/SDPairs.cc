@@ -14,8 +14,9 @@
 #include <kernel/longrat.h>
 
 #include <kernel/kutil.h>
-#include <kernel/kutil2.h> //already included in kutil.h
-#include <kernel/shiftDVec.h>
+#include <kernel/SDkutil.h>
+#include <kernel/SDDebug.h>
+#include <kernel/SDBase.h>
 
 //now our adapted multiplications for:
 //- ksCreateShortSpoly

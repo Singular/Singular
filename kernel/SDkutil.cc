@@ -1,18 +1,19 @@
-#define KUTIL2_CC
-
-/* Preamble
- * See kutil2.h
- * Last Change: 2012-03-02 18:00
- * Maintainers: Grischa Studzinski and Benjamin Schnitzler 
- */
-
-/* TODO:
- * a lot (see kutil2.h)
+/* file:        SDkutil.cc
+ * authors:     Grischa Studzinski & Benjamin Schnitzler
+ * created:     ask git
+ * last change: ask git
+ *
+ * TODO:
+ * a lot (see SDkutil.h)
  * - loop
  *     search for (semantic and syntax) bugs
  *   until all bugs are cleared
  * (unfortunatly the above statement does not compile)
  */
+
+#include <kernel/kutil.h>
+#include <kernel/SDkutil.h>
+#include <kernel/SDDebug.h>
 
 #include <climits>
 
@@ -20,17 +21,9 @@
 //ring.h
 #include <kernel/mod2.h>
 
-#include <kernel/kutil.h>
-#include <kernel/kutil2.h> //(already included in kutil.h)
 #include <polys/monomials/p_polys.h> //For p_Totaldegree and the like
 #include <kernel/polys.h> //For pTotaldegree and the like
 #include <kernel/febase.h> //For Print stuff
-
-#if DEBOGRI > 0
-#if 0
-#include <fstream>
-#endif
-#endif
 
 
 

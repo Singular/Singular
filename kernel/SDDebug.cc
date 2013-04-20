@@ -1,5 +1,12 @@
-//functions for (debug) output
-
+#include <SDDebug.h>
+/* file:        SDDebug.cc
+ * authors:     Grischa Studzinski & Benjamin Schnitzler
+ * created:     ask git
+ * last change: ask git
+ *
+ * ELSE:
+ * see SDDebug.h
+ */
 
 
 void ShiftDVec::dvecWrite(const poly p, ring r)
@@ -27,6 +34,7 @@ void ShiftDVec::lcmDvecWrite(const LObject* t)
 
 
 int ShiftDVec::lpDVCase = 0;
+
 
 
 //class deBoGriInitializer functions
@@ -326,3 +334,5 @@ void ShiftDVec::deBoGriTTest(kStrategy strat)
   }
 }
 #endif
+
+/* vim: set foldmethod=syntax : */
