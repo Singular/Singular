@@ -25,6 +25,9 @@
  *   Polynomials from I can be accessed via strat->get_I_at(i)
  * ( i is and Integerindex: 0 <= i < get_size_of_I() ).
  */
+
+#include "SDLeftGB.h"
+
 void ShiftDVec::LeftGB::initenterpairs
   ( LObject* J,
     int ecart, int isFromQ, kStrategy strat, int atR )
@@ -197,7 +200,7 @@ void ShiftDVec::LeftGB::GMFilter
  */
 void ShiftDVec::LeftGB::GMFilter
   ( LObject* L, LObject* J,
-    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, strat )
+    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, kStrategy strat )
 {
   if( L->dv2Size != J->dvSize ) return;
   if( !memcmp(L->dv2, J->dvec, sizeof(uint)*J->dvSize) )return;
@@ -239,7 +242,7 @@ void ShiftDVec::LeftGB::GMFilter
  */
 void ShiftDVec::LeftGB::GMFilter
   ( int index_L, LObject* J,
-    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, strat )
+    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, kStrategy strat )
 {
   LObject* L = strat->L[index_L];
 
