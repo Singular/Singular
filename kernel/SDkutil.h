@@ -105,12 +105,6 @@ namespace ShiftDVec
 class sTObject;
 class ShiftDVec::skStrategy;
 
-typedef ShiftDVec::skStrategy * SD_kStrat;
-typedef class ShiftDVec::sLObject SD_LObj;
-typedef class ShiftDVec::sTObject SD_TObj;
-typedef SD_LObj * SD_LSet;
-typedef SD_TObj * SD_TSet;
-
 class ShiftDVec::sTObject : public virtual ::sTObject
 {
 public:

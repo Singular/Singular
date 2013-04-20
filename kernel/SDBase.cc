@@ -74,7 +74,8 @@
 //HAVE_SEV >= 4 - This could include some sev stuff, which
 //                should maybe not included.
 
-namespace ShiftDVec{
+namespace ShiftDVec
+{
   class sTObject;
 
   uint divisibleBy
@@ -90,7 +91,12 @@ namespace ShiftDVec{
 //    ( poly a, poly b, int uptodeg, ring ar, ring br );
   bool createSPviolatesDeg
     (poly a, poly b, uint shift, int uptodeg);
+
+  typedef skStrategy* kStrategy;
 };
+
+namespace SD = ShiftDVec;
+
 
 
 //extracted inlines from kutil.cc
