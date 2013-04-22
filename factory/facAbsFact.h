@@ -20,8 +20,19 @@
 #include "cf_map.h"
 #include "cfNewtonPolygon.h"
 
-CFAFList absFactorizeMain (const CanonicalForm& F);
+/// main absolute factorization routine, expects bivariate poly which is
+/// primitive wrt. any of its variables and irreducible over Q
+///
+/// @return absFactorizeMain returns a list whose entries contain three entities:
+///         an absolute irreducible factor, an irreducible univariate polynomial
+///         that defines the minimal field extension over which the irreducible
+///         factor is defined and the multiplicity of the absolute irreducible
+///         factor
+CFAFList absFactorizeMain (const CanonicalForm& F ///<[in] s.a.
+                          );
 
+
+/// normalize factors, i.e. make factors monic
 static inline
 void normalize (CFAFList & L)
 {
@@ -30,8 +41,16 @@ void normalize (CFAFList & L)
                             i.getItem().minpoly(), i.getItem().exp());
 }
 
+/// univariate absolute factorization over Q
+///
+/// @return uniAbsFactorize returns a list whose entries contain three entities:
+///         an absolute irreducible factor, an irreducible univariate polynomial
+///         that defines the minimal field extension over which the irreducible
+///         factor is defined and the multiplicity of the absolute irreducible
+///         factor
 static inline
-CFAFList uniAbsFactorize (const CanonicalForm& F)
+CFAFList uniAbsFactorize (const CanonicalForm& F ///<[in] univariate poly over Q
+                         )
 {
   CFFList rationalFactors= factorize (F);
   CFFListIterator i= rationalFactors;
@@ -74,7 +93,15 @@ CFAFList absFactorize (const CanonicalForm& G);
 
 /*ENDPUBLIC*/
 
-CFAFList absFactorize (const CanonicalForm& G)
+/// absolute factorization of bivariate poly over Q
+///
+/// @return absFactorize returns a list whose entries contain three entities:
+///         an absolute irreducible factor, an irreducible univariate polynomial
+///         that defines the minimal field extension over which the irreducible
+///         factor is defined and the multiplicity of the absolute irreducible
+///         factor
+CFAFList absFactorize (const CanonicalForm& G ///<[in] bivariate poly over Q
+                      )
 {
   //TODO handle homogeneous input
   ASSERT (getNumVars (F) == 2, "expected bivariate input");
