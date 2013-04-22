@@ -12,6 +12,9 @@
 /*****************************************************************************/
 
 #include "config.h"
+
+#include "cf_assert.h"
+
 #include <stdlib.h>
 
 #include "canonicalform.h"
@@ -19,6 +22,8 @@
 #include "cf_algorithm.h"
 #include "cf_primes.h"
 #include "cf_reval.h"
+#include "cf_factory.h"
+#include "gfops.h"
 #include "cfNewtonPolygon.h"
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
