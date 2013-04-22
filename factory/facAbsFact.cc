@@ -495,8 +495,8 @@ differentevalpoint:
   CFList biFactors;
 
   TIMING_START (fac_bi_factor_recombination);
-  biFactors= factorRecombination (uniFactors, F, MODl, degs, 1,
-                                uniFactors.length()/2, b, den);
+  biFactors= factorRecombination (uniFactors, F, MODl, degs, evaluation, 1,
+                                  uniFactors.length()/2, b, den);
   TIMING_END_AND_PRINT (fac_bi_factor_recombination,
                         "time for bivariate factor recombination over Q: ");
 
@@ -506,9 +506,6 @@ differentevalpoint:
     biFactors= Union (earlyFactors, biFactors);
   else if (!earlySuccess && degs.getLength() == 1)
     biFactors= earlyFactors;
-
-  for (CFListIterator i= biFactors; i.hasItem(); i++)
-    i.getItem()= i.getItem() (y - evaluation, y);
 
   bool swap2= false;
   appendSwapDecompress (biFactors, CFList(), CFList(), swap, swap2, CFMap());
