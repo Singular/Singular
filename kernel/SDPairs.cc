@@ -61,6 +61,8 @@
  *   advantages, this idea is cancelled for the forseeable
  *   future.                                                  */
 
+typedef skStrategy* kStrategy;
+
 
 #if 0 //BOCO: original code and comment
 /*2
@@ -79,7 +81,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
  * pos seems to be the position of h in S (see bba function)
  */
 void ShiftDVec::enterpairs 
-  (LObject* H,int k,int ecart,int pos,kStrategy strat, int atR)
+  (ShiftDVec::LObject* H,int k,int ecart,int pos,ShiftDVec::kStrategy strat, int atR)
 {
   namespace SD = ShiftDVec;
 #endif
@@ -124,7 +126,7 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 /* Cares for shifts of p, as the divisibleBy functions do care
  * for shifts. */
 void ShiftDVec::clearS 
-  (LObject* H, unsigned long p_sev, int* at, int* k, kStrategy strat)
+  (ShiftDVec::LObject* H, unsigned long p_sev, int* at, int* k, ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif
@@ -168,8 +170,8 @@ void ShiftDVec::clearS
  * criterion check initenterpairs for old code to compare the
  * implementations */
 void ShiftDVec::initenterpairs
-  ( LObject* H, int k, int ecart, 
-    int isFromQ, kStrategy strat, int atR )
+  ( ShiftDVec::LObject* H, int k, int ecart, 
+    int isFromQ, ShiftDVec::kStrategy strat, int atR )
 {
   assume(strat->R[atR]->p == H->p);
   initDeBoGri
@@ -425,7 +427,7 @@ uint ShiftDVec::findRightOverlaps
 }
 
 void ShiftDVec::DeBoGriTestGM
-  (TSet tset, int k, TObject* H, int uptodeg, int lVblock)
+  (ShiftDVec::TSet tset, int k, ShiftDVec::TObject* H, int uptodeg, int lVblock)
 {
  namespace SD = ShiftDVec;
 
@@ -532,7 +534,7 @@ void ShiftDVec::DeBoGriTestGM
     //right with self and right
     for(uint i = 0; i < sizesRightOvls[l]; ++i)
     {
-      TObject* Right = tset[l];
+      ShiftDVec::TObject* Right = tset[l];
       Print("Consider rightoverlap %d with element",r_overlaps[l][i]);
       pWrite(tset[l]->p);
       Print(with self and right overlaps./n");
@@ -546,7 +548,7 @@ void ShiftDVec::DeBoGriTestGM
     //left with left and self
     for(uint i = 0; i < sizesLeftOvls[l]; ++i)
     {
-      TObject* Left = tset[l];
+      ShiftDVec::TObject* Left = tset[l];
       Print("Consider leftoverlap %d with element ",l_overlaps[l][i]);
       pWrite(tset[l]->p);
       Print(with left and self overlaps./n");
@@ -574,8 +576,8 @@ void ShiftDVec::DeBoGriTestGM
           if( !shRight2 ) continue;
           uint shRight1 = r_overlaps[i][j];
           if( !shRight1 ) goto end_of_middle_loop_1;
-          TObject* Right1 = tset[i];
-          TObject* Right2 = tset[m];
+          ShiftDVec::TObject* Right1 = tset[i];
+          ShiftDVec::TObject* Right2 = tset[m];
           if( shRight2 >= shRight1 ||
               shRight2 + Right2->GetDVsize() >
               shRight1 + Right1->GetDVsize()   ) break;
@@ -605,8 +607,8 @@ void ShiftDVec::DeBoGriTestGM
           uint shLeft1 = l_overlaps[i][j];
           if( !shLeft2 ) continue;
           if( !shLeft1 ) goto end_of_middle_loop_2;
-          TObject* Left1 = tset[i];
-          TObject* Left2 = tset[m];
+          ShiftDVec::TObject* Left1 = tset[i];
+          ShiftDVec::TObject* Left2 = tset[m];
           if( shLeft2 > shLeft1 ||
               shLeft1 - Left1->GetDVsize() <=
               shLeft2 - Left1->GetDVsize()    ) break;
@@ -689,8 +691,8 @@ void ShiftDVec::DeBoGriTestGM
  *
  * This function has to be checked!                           */
 bool ShiftDVec::GMTestRight
-  ( TObject* H1, TObject* H2, TObject* H3, 
-    uint shift2, uint shift3, kStrategy strat, ring r )
+  ( ShiftDVec::TObject* H1, ShiftDVec::TObject* H2, ShiftDVec::TObject* H3, 
+    uint shift2, uint shift3, ShiftDVec::kStrategy strat, ring r )
 {
   /* We will do that by comparing the dvecs of h2 and h3. We
    * assume, that h2 and h3 have at least overlap of degree one
@@ -759,8 +761,8 @@ bool ShiftDVec::GMTestRight
  *
  * This function has to be checked!                           */
 bool ShiftDVec::GMTestLeft
-  ( TObject* H1, TObject* H2, TObject* H3, 
-    uint shift2, uint shift3, kStrategy strat, ring r )
+  ( ShiftDVec::TObject* H1, ShiftDVec::TObject* H2, ShiftDVec::TObject* H3, 
+    uint shift2, uint shift3, ShiftDVec::kStrategy strat, ring r )
 {
   initDeBoGri
     ( ShiftDVec::indent, 
@@ -814,7 +816,7 @@ bool ShiftDVec::GMTestLeft
  * return true, otherwise false. 
  * TODO: Special cases: h1 | h3 and h2 | h3                   */
 bool ShiftDVec::GMTest
-  ( TObject* H1, TObject* H2, uint sH2, TObject* H3, 
+  ( ShiftDVec::TObject* H1, ShiftDVec::TObject* H2, uint sH2, ShiftDVec::TObject* H3, 
     uint* ovlH1H3, uint numOvlH1H3, 
     uint* ovlH3H2, uint numOvlH3H2                   )
 {
@@ -985,7 +987,7 @@ void ShiftDVec::GebauerMoeller
   ( uint* selfOvls, uint sizeSelfOvls,
     uint** rightOvls, uint* sizesRightOvls,
     uint** leftOvls, uint* sizesLeftOvls, 
-    LObject* H, int k, kStrategy strat      )
+    ShiftDVec::LObject* H, int k, ShiftDVec::kStrategy strat      )
 {
   //IDEA: Include a special Class for shifts!
   initDeBoGri
@@ -1013,7 +1015,7 @@ void ShiftDVec::GebauerMoeller
     //self with right and left
     for(int l = 0; l <= k && selfOvls[i]; ++l)
     {
-      TObject* Right = strat->S_2_T(l);
+      ShiftDVec::TObject* Right = strat->S_2_T(l);
       if( GMTest
           ( H, H, selfOvls[i], Right, rightOvls[l],
             sizesRightOvls[l], leftOvls[l], sizesLeftOvls[l] ) )
@@ -1030,7 +1032,7 @@ void ShiftDVec::GebauerMoeller
     //right with self and right
     for(uint i = 0; i < sizesRightOvls[l]; ++i)
     {
-      TObject* Right = strat->S_2_T(l);
+      ShiftDVec::TObject* Right = strat->S_2_T(l);
       if ( GMTest
           ( H, Right, rightOvls[l][i], H, selfOvls,
             sizeSelfOvls, rightOvls[l], sizesRightOvls[l] ) )
@@ -1073,8 +1075,8 @@ void ShiftDVec::GebauerMoeller
           uint shRight1 = rightOvls[i][j];
           if( !shRight1 ) goto end_of_middle_loop_1;
 
-          TObject* Right1 = strat->S_2_T(i);
-          TObject* Right2 = strat->S_2_T(m);
+          ShiftDVec::TObject* Right1 = strat->S_2_T(i);
+          ShiftDVec::TObject* Right2 = strat->S_2_T(m);
 
           /*BOCO: 
            * TODO: Maybe it is more efficient not to
@@ -1119,8 +1121,8 @@ void ShiftDVec::GebauerMoeller
           if( !shLeft2 ) continue;
           if( !shLeft1 ) goto end_of_middle_loop_2;
 
-          TObject* Left1 = strat->S_2_T(i);
-          TObject* Left2 = strat->S_2_T(m);
+          ShiftDVec::TObject* Left1 = strat->S_2_T(i);
+          ShiftDVec::TObject* Left2 = strat->S_2_T(m);
 
           if( shLeft2 > shLeft1 ||
               shLeft1 - Left1->GetDVsize() <=
@@ -1151,7 +1153,7 @@ void ShiftDVec::GebauerMoeller
 
 /* Enter the right overlaps of H with Elements from S */
 void ShiftDVec::enterRightOverlaps
-  ( LObject* H, kStrategy strat, int k, uint** rightOvls, 
+  ( ShiftDVec::LObject* H, ShiftDVec::kStrategy strat, int k, uint** rightOvls, 
     uint* sizesRightOvls, int isFromQ, int ecart, int atR )
 {
   initDeBoGri
@@ -1194,7 +1196,7 @@ void ShiftDVec::enterRightOverlaps
 
 /* Enter the left overlaps of H with Elements from S */
 void ShiftDVec::enterLeftOverlaps
-  ( LObject* H, kStrategy strat, int k, uint** leftOvls, 
+  ( ShiftDVec::LObject* H, ShiftDVec::kStrategy strat, int k, uint** leftOvls, 
     uint* sizesLeftOvls, int isFromQ, int ecart, int atR )
 {
   initDeBoGri
@@ -1220,7 +1222,7 @@ void ShiftDVec::enterLeftOverlaps
       {
         deBoGriPrint("No degree Violation!", 1);
         int isFromQi = 0; //BOCO: hack TODO: clear
-        LObject* Pair = SD::enterOnePair
+        ShiftDVec::LObject* Pair = SD::enterOnePair
           ( strat->S[i], strat->S_2_R[i], isFromQi, 
             strat->ecartS[i], 
             H->p, shiftH, atR, isFromQ, ecart, strat );
@@ -1246,7 +1248,7 @@ void ShiftDVec::enterLeftOverlaps
  * however, in the letterplace variant, our first entered
  * polynomial might have self overlaps.                       */
 void ShiftDVec::enterSelfOverlaps
-  ( LObject* H, kStrategy strat, uint* selfOvls,
+  ( ShiftDVec::LObject* H, ShiftDVec::kStrategy strat, uint* selfOvls,
     uint numSelfOvls, int isFromQ, int ecart, int atR )
 {
   initDeBoGri
@@ -1255,7 +1257,7 @@ void ShiftDVec::enterSelfOverlaps
 
   namespace SD = ShiftDVec;
 
-  LObject* Pair;
+  ShiftDVec::LObject* Pair;
 
   bool new_pair = false;
   for (int j = 0; j < numSelfOvls; ++j)
@@ -1410,7 +1412,7 @@ bool ShiftDVec::GM3
  *    pairs (p1, p2) and (p2, p3); etc. (if you have questions:
  *    ask the authors, who hopefully still know, what they did)*/
 bool ShiftDVec::GM3
-  ( LObject* H, LObject* Pair, kStrategy strat, ring r )
+  ( ShiftDVec::LObject* H, ShiftDVec::LObject* Pair, ShiftDVec::kStrategy strat, ring r )
 {
   initDeBoGri
     ( ShiftDVec::indent, 
@@ -1496,7 +1498,7 @@ bool ShiftDVec::GM3
  * this case one can get rid of the pair (p1, p2) -, otherwise,
  * false will be returned.
  * This function has to be checked!                           */
-bool ShiftDVec::GM3(LObject* H, LObject* L, kStrategy strat)
+bool ShiftDVec::GM3(ShiftDVec::LObject* H, ShiftDVec::LObject* L, ShiftDVec::kStrategy strat)
 {
   initDeBoGri
     ( ShiftDVec::indent, "Entering GM3", "Leaving GM3", 132 );
@@ -1569,12 +1571,12 @@ bool ShiftDVec::GM3(LObject* H, LObject* L, kStrategy strat)
 #if 0 //BOCO: original Header
 void enterOnePairNormal
   ( int i,poly p,int ecart, 
-    int isFromQ,kStrategy strat, int atR = -1 )
+    int isFromQ,ShiftDVec::kStrategy strat, int atR = -1 )
 #else //BOCO: replacement
 LObject* ShiftDVec::enterOnePair
   ( poly p1, int atR1, int isFromQ1, int ecart1,
     poly p2, uint shift, int atR2, int isFromQ2, int ecart2, 
-    kStrategy strat                                          )
+    ShiftDVec::kStrategy strat                              )
 #endif
 {
   initDeBoGri
@@ -1974,8 +1976,8 @@ LObject* ShiftDVec::enterOnePair
  * unshiftet version.
  */
 LObject* ShiftDVec::enterOnePair
-  ( TObject* Q, TObject* H, int shift,int qi, int ecart, 
-    int isFromQ, kStrategy strat, int atR                )
+  ( ShiftDVec::TObject* Q, ShiftDVec::TObject* H, int shift,int qi, int ecart, 
+    int isFromQ, ShiftDVec::kStrategy strat, int atR                )
 {
   namespace SD = ShiftDVec;
 
@@ -2183,7 +2185,7 @@ LObject* ShiftDVec::enterOnePair
  * partly extracted and moved to the GM3 Function, which is part
  * of the enterSelfOverlaps function.                         */
 void ShiftDVec::chainCrit
-  (LObject* H, int ecart, kStrategy strat)
+  (ShiftDVec::LObject* H, int ecart, ShiftDVec::kStrategy strat)
 {
   /* grico: all new code, based on chaincritnormal
    * maybe shift must be added
@@ -2485,7 +2487,7 @@ int i,j;
 /*2
 * merge set B into L
 */
-void ShiftDVec::kMergeBintoL(kStrategy strat)
+void ShiftDVec::kMergeBintoL(ShiftDVec::kStrategy strat)
 {
   int j=strat->Ll+strat->Bl+1;
   if (j>strat->Lmax)

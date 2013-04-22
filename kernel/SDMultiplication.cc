@@ -209,7 +209,9 @@ p_GetExpDiff		kspoly.cc	607, 659, 697
 
 /* Part 1: General Tools - especially for dp case and the like */
 
+ typedef skStrategy* kStrategy;
 
+namespace SD = ShiftDVec;
 
 /* Creates a Mapping: i -> pos, where i is an index of a       *
 * variable in a block of the letterplace polynomial and pos   *
@@ -245,7 +247,7 @@ return r->osize = r->N+1;
 /* Initializes the letterplace multiplication. See also        *
 * InitOrderMapping. Do not forget to free r->omap as soon, as *
 * it will no longer be used.                                  */
-void ShiftDVec::InitSDMultiplication( ring r, kStrategy strat )
+void ShiftDVec::InitSDMultiplication( ring r, ShiftDVec::kStrategy strat )
 {
 r->isLPring = strat->lV; 
 //BOCO: this should have already been set by
@@ -472,12 +474,12 @@ int ShiftDVec::create_count = 0;  //count of spoly creations
 * SPW is the shifted UPW
 *
 ***************************************************************/
-int ShiftDVec::ksReducePoly(LObject* PR,
-               TObject* UPW,
-               TObject* SPW,
+int ShiftDVec::ksReducePoly(ShiftDVec::LObject* PR,
+               ShiftDVec::TObject* UPW,
+               ShiftDVec::TObject* SPW,
                poly spNoether,
                number *coef,
-               kStrategy strat)
+               ShiftDVec::kStrategy strat)
 {
   initDeBoGri
   ( ShiftDVec::indent, 
@@ -656,9 +658,9 @@ int ShiftDVec::ksReducePoly(LObject* PR,
  *
  *
  ***************************************************************/
-void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
+void ShiftDVec::ksCreateSpoly(ShiftDVec::LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
-                   poly m1, poly m2, TObject** R)
+                   poly m1, poly m2, ShiftDVec::TObject** R)
 {
   initDeBoGri
     ( ShiftDVec::indent, 
@@ -782,8 +784,8 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
 
 //BOCO: used in redtail
 int ShiftDVec::ksReducePolyTail
-  ( LObject* PR, TObject* UPW, TObject* SPW, 
-    poly Current, poly spNoether, kStrategy strat )
+  ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, 
+    poly Current, poly spNoether, ShiftDVec::kStrategy strat )
 {
   BOOLEAN ret;
   number coef;
@@ -847,7 +849,7 @@ KINLINE int ksReducePolyTail
 #else  //replacement
 int ShiftDVec::ksReducePolyTail
 #endif
-  ( LObject* PR, TObject* UPW, TObject* SPW, LObject* Red )
+  ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, ShiftDVec::LObject* Red )
 {
   BOOLEAN ret;
   number coef;
@@ -884,7 +886,7 @@ int ShiftDVec::ksReducePolyTail
  *
  ***************************************************************/
 BOOLEAN ShiftDVec::kCheckSpolyCreation
-  ( LObject *L, kStrategy strat, poly &m1, poly &m2 )
+  ( ShiftDVec::LObject *L, ShiftDVec::kStrategy strat, poly &m1, poly &m2 )
 {
   if (strat->overflow) return FALSE;
   assume(L->p1 != NULL && L->p2 != NULL);

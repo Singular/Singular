@@ -30,6 +30,7 @@ namespace ShiftDVec
     ( LObject* J, SD_kStrat strat, uint** overlaps,
       uint* ovl_sizes, int isFromQ, int ecart, int atR );
 
+  typedef skStrategy* kStrategy;
 }
 
 #endif

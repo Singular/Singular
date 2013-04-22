@@ -28,9 +28,11 @@
 
 #include "SDLeftGB.h"
 
+typedef skStrategy* kStrategy;
+
 void ShiftDVec::LeftGB::initenterpairs
-  ( LObject* J,
-    int ecart, int isFromQ, kStrategy strat, int atR )
+  ( ShiftDVec::LObject* J,
+    int ecart, int isFromQ, ShiftDVec::kStrategy strat, int atR )
 {
   namespace SD = ShiftDVec;
   namespace LGB = ShiftDVec::LeftGB;
@@ -110,7 +112,7 @@ void ShiftDVec::LeftGB::initenterpairs
  */
 void ShiftDVec::LeftGB::GebauerMoeller
   ( uint** overlaps,
-    uint* sizesOvls, LObject* J, kStrategy strat )
+    uint* sizesOvls, LObject* J, ShiftDVec::kStrategy strat )
 {
   namespace SP = ShiftDVec::LeftGB;
 
@@ -159,7 +161,7 @@ void ShiftDVec::LeftGB::GebauerMoeller
  * TODO: Let this function get checked by Grischa!
  */
 void ShiftDVec::LeftGB::GMFilter
-  ( LObject* J, TObject* p_i, TObject* p_k,
+  ( ShiftDVec::LObject* J, ShiftDVec::TObject* p_i, ShiftDVec::TObject* p_k,
     uint* i_ovls_j, uint* k_ovls_j,
     uint size_i_ovls_j, uint size_k_ovls_j )
 {
@@ -199,8 +201,8 @@ void ShiftDVec::LeftGB::GMFilter
  * · Everything has to be initialized correctly!!!! (Oh my)
  */
 void ShiftDVec::LeftGB::GMFilter
-  ( LObject* L, LObject* J,
-    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, kStrategy strat )
+  ( ShiftDVec::LObject* L, ShiftDVec::LObject* J,
+    ShiftDVec::LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, ShiftDVec::kStrategy strat )
 {
   if( L->dv2Size != J->dvSize ) return;
   if( !memcmp(L->dv2, J->dvec, sizeof(uint)*J->dvSize) )return;
@@ -238,13 +240,13 @@ void ShiftDVec::LeftGB::GMFilter
  * TODO:
  * · Let this function get checked by Grischa!
  * · Everything has to be initialized correctly!!!! (Oh my)
- * · We need to implement kStrategy::deleteInL
+ * · We need to implement kSD_Strat::deleteInL
  */
 void ShiftDVec::LeftGB::GMFilter
-  ( int index_L, LObject* J,
-    LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, kStrategy strat )
+  ( int index_L, ShiftDVec::LObject* J,
+    ShiftDVec::LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, ShiftDVec::kStrategy strat )
 {
-  LObject* L = strat->L[index_L];
+  ShiftDVec::LObject* L = strat->L[index_L];
 
   if( L->dv2Size != J->dvSize ) return;
   if( !memcmp(L->dv2, J->dvec, sizeof(uint)*J->dvSize) )return;
@@ -271,7 +273,7 @@ void ShiftDVec::LeftGB::GMFilter
  * reworked.
  */
 void ShiftDVec::LeftGB::enterOverlaps
-  ( LObject* J, kStrategy strat, uint** overlaps, 
+  ( ShiftDVec::LObject* J, ShiftDVec::SD_kStrat strat, uint** overlaps, 
     uint* ovl_sizes, int isFromQ, int ecart, int atR )
 {
   namespace SD = ShiftDVec;
