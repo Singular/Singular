@@ -21,6 +21,7 @@ namespace ShiftDVec
 
 typedef unsigned int uint;
 
+typedef skStrategy* kStrategy;
 
 namespace ShiftDVec
 {
@@ -53,7 +54,7 @@ namespace ShiftDVec
       ring aLmRing = currRing, 
       ring bLmRing = currRing, ring bTailRing = currRing );
   BOOLEAN redViolatesDeg
-    ( TObject* a, TObject* b, 
+    ( ShiftDVec::TObject* a, ShiftDVec::TObject* b, 
       int uptodeg, ring lmRing = currRing );
 
   bool createSPviolatesDeg
@@ -68,9 +69,9 @@ namespace ShiftDVec
 
   void dvecWrite(const uint* dvec, uint dvSize);
 
-  void dvecWrite(const sTObject* t);
+  void dvecWrite(const ShiftDVec::sTObject* t);
 
-  void lcmDvecWrite(const sLObject* t);
+  void lcmDvecWrite(const ShiftDVec::sLObject* t);
 
   extern int lpDVCase; //defined in kutil2.cc
 
@@ -78,7 +79,7 @@ namespace ShiftDVec
     ( ShiftDVec::sLObject * lcm, 
       ShiftDVec::sTObject * p, int numVars );
 
-  void lcmDvecWrite(sLObject* t);
+  void lcmDvecWrite(ShiftDVec::sLObject* t);
 };
 
 
@@ -102,7 +103,7 @@ namespace ShiftDVec
  * sTObject and sLObject are those from kutil.h
  */
 
-class sTObject;
+class ShiftDVec::sTObject;
 class ShiftDVec::skStrategy;
 
 class ShiftDVec::sTObject : public virtual ::sTObject
@@ -262,7 +263,7 @@ class ShiftDVec::sLObject :
       ( ShiftDVec::sTObject * T, 
         uint minShift, uint maxShift, int numVars );
 
-    bool compareLcmTo( sLObject* other, ring r = currRing );
+    bool compareLcmTo(  ShiftDVec::sLObject* other, ring r = currRing );
 
     bool compareLcmTo( poly p1, poly p2, ring r = currRing );
 }
@@ -277,13 +278,13 @@ ideal kStdShiftDVec
   ( ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,
     int syzComp, int newIdeal, intvec *vw, int uptodeg, int lV );
 
-void initBuchMoraCritShiftDVec(kStrategy strat);
+void initBuchMoraCritShiftDVec( ShiftDVec::kStrategy strat);
 
 ideal bbaShiftDVec
-  ( ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, 
+  ( ideal F, ideal Q,intvec *w,intvec *hilb, ShiftDVec::kStrategy strat, 
     int uptodeg, int lV                                      );
 
-void initBuchMoraCritShiftDVec(kStrategy strat);
+void initBuchMoraCritShiftDVec( ShiftDVec::kStrategy strat);
 
 ideal freegbdvc(ideal I, int uptodeg, int lVblock);
 

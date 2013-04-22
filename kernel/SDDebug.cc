@@ -8,6 +8,9 @@
  * see SDDebug.h
  */
 
+typedef skStrategy* kStrategy;
+
+namespace SD = ShiftDVec;
 
 void ShiftDVec::dvecWrite(const poly p, ring r)
 {
@@ -25,11 +28,11 @@ void ShiftDVec::dvecWrite(const uint* dvec, uint dvSize)
 }
 
 
-void ShiftDVec::dvecWrite(const TObject* t)
+void ShiftDVec::dvecWrite(const SD::TObject* t)
 { dvecWrite(t->dvec, t->dvSize); }
 
 
-void ShiftDVec::lcmDvecWrite(const LObject* t)
+void ShiftDVec::lcmDvecWrite(const SD::LObject* t)
 { dvecWrite(t->lcmDvec, t->lcmDvSize); }
 
 
@@ -98,7 +101,7 @@ ShiftDVec::DeBoGri::~DeBoGri()
  * function will do nothing, if DEBOGRI & 1 == 0 .         */
 void ShiftDVec::debugPrintDegViolation
   ( const char* where, poly p1, uint shift, 
-    poly p2, kStrategy strat                )
+    poly p2, SD::kStrategy strat                )
 {
   namespace SD = ShiftDVec;
   PrintS("\nAt "); Print(where); PrintLn();
@@ -193,7 +196,7 @@ bool ShiftDVec::deBoGriPrint
 
 #if DEBOGRI > 0
 bool ShiftDVec::deBoGriPrint
-  ( const TObject* P, const char* description, uint flag, 
+  ( const SD::TObject* P, const char* description, uint flag, 
     const ring lmRing, const ring tlRing, 
     bool assume, int indent )
 {
@@ -212,7 +215,7 @@ bool ShiftDVec::deBoGriPrint
 
 #if DEBOGRI > 0
 bool ShiftDVec::deBoGriPrint
-  ( const poly p, int shift, kStrategy strat,
+  ( const poly p, int shift, SD::kStrategy strat,
     const char* description, uint flag, bool assume, int indent )
 {
   if(indent < 0){ indent = ShiftDVec::indent; }

@@ -86,7 +86,7 @@ namespace ShiftDVec
       const ring lmRing, const ring tlRing = NULL,
       bool assume = false, int indent = -1              );
   bool deBoGriPrint
-    ( const TObject* P, const char* description, uint flag,
+    ( const ShiftDvec::TObject* P, const char* description, uint flag,
       const ring lmRing, const ring tlRing,
       bool assume = false, int indent = -1                 );
   bool deBoGriPrint
@@ -94,7 +94,7 @@ namespace ShiftDVec
       const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool deBoGriPrint
-    ( const poly p, int shift, kStrategy strat,
+    ( const poly p, int shift, ShiftDVec::kStrategy strat,
       const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool loGriToFile
@@ -109,6 +109,10 @@ namespace ShiftDVec
 #ifdef HAVE_DEBOGRITEST
   void deBoGriTTest(kStrategy strat);
 #endif
+
+
+typedef skStrategy* kStrategy;
+
 
 #if DEBOGRI > 0
 

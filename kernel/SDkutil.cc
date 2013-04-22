@@ -25,7 +25,9 @@
 #include <kernel/polys.h> //For pTotaldegree and the like
 #include <kernel/febase.h> //For Print stuff
 
+typedef skStrategy* kStrategy;
 
+namespace SD = ShiftDVec;
 
 //member functions of ShiftDVec::sTobject
 
@@ -284,7 +286,7 @@ void ShiftDVec::sLObject::freeLcmDVec()
  * DVec of the other objects lcm. Thus, if both lcm do not have
  * the same shift, but would otherwise be equal, true will be
  * returned, too.  In every other case, false is returned.    */
-bool ShiftDVec::sLObject::compareLcmTo( sLObject* other, ring r )
+bool ShiftDVec::sLObject::compareLcmTo( ShiftDVec::sLObject* other, ring r )
 {
   if( this->getLcmDvSize(r) != other->getLcmDvSize(r) ) 
     return false;
@@ -810,7 +812,7 @@ BOOLEAN ShiftDVec::redViolatesDeg
  *   degree bound.
  */
 BOOLEAN ShiftDVec::redViolatesDeg
-  ( TObject* a, TObject* b, int uptodeg, ring lmRing )
+  ( ShiftDVec::TObject* a, ShiftDVec::TObject* b, int uptodeg, ring lmRing )
 {
   initDeBoGri
     ( ShiftDVec::indent, 

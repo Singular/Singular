@@ -17,33 +17,36 @@ namespace ShiftDVec
       int divides_p_shift, poly* ml, poly* mr, ring r );
 
   int InitOrderMapping( ring r );
-  void InitSDMultiplication( ring r, kStrategy strat );
+  void InitSDMultiplication( ring r, ShiftDVec::kStrategy strat );
  
   extern int red_count;
   extern int create_count;
 
   int ksReducePoly
-    ( LObject* PR, TObject* UPW, TObject* SPW,
+    ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW,
       poly spNoether = NULL, 
-      number *coef = NULL, kStrategy strat = NULL );
+      number *coef = NULL, ShiftDVec::kStrategy strat = NULL );
 
   void ksCreateSpoly
-    ( LObject* Pair, poly spNoether, int use_buckets, 
-      ring tailRing, poly m1, poly m2, TObject** R    );
+    ( ShiftDVec::LObject* Pair, poly spNoether, int use_buckets, 
+      ring tailRing, poly m1, poly m2, ShiftDVec::TObject** R    );
 
   int ksReducePolyTail
-    ( LObject* PR, TObject* UPW, TObject* SPW, 
+    ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, 
       poly Current = NULL, 
-      poly spNoether = NULL, kStrategy strat = NULL );
+      poly spNoether = NULL, ShiftDVec::kStrategy strat = NULL );
 
   int ksReducePolyTail
-    ( LObject* PR, TObject* UPW, TObject* SPW, LObject* Red );
+    ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, ShiftDVec::LObject* Red );
 
   BOOLEAN kCheckSpolyCreation
-    ( LObject *L, kStrategy strat, poly &m1, poly &m2 );
+    ( ShiftDVec::LObject *L, ShiftDVec::kStrategy strat, poly &m1, poly &m2 );
 
   BOOLEAN k_GetLeadTerms
     ( const poly p1, const poly p2, 
       const ring p_r, poly &m1, poly &m2, const ring m_r );
+
+  typedef skStrategy* kStrategy;
+
 }
 #endif
