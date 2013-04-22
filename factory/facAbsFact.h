@@ -63,9 +63,7 @@ CFAFList uniAbsFactorize (const CanonicalForm& F ///<[in] univariate poly over Q
   {
     if (degree (i.getItem().factor()) == 1)
     {
-      alpha= rootOf (Variable (1));
-      result.append (CFAFactor (i.getItem().factor(), getMipo (alpha),
-                                i.getItem().exp()));
+      result.append (CFAFactor (i.getItem().factor(), 1, i.getItem().exp()));
       continue;
     }
     alpha= rootOf (i.getItem().factor());
