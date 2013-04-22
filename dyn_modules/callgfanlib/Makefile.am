@@ -34,7 +34,7 @@ $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 # -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
 
 
-SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gitfan.cc gitfan.h gfanlib.cc
+SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h gfanlib.cc
 gfanlib_la_SOURCES   = $(SOURCES)
 gfanlib_g_la_SOURCES = $(SOURCES)
 
