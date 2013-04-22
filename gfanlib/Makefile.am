@@ -30,7 +30,7 @@ libgfan_g_la_SOURCES = $(SOURCES)
 
 libgfan_includedir  =$(includedir)/gfanlib/
 
-libgfan_include_HEADERS = gfanlib_z.h gfanlib_q.h gfanlib_vector.h gfanlib_matrix.h gfanlib_zcone.h gfanlib.h gfanlib_polyhedralfan.h gfanlib_polymakefile.h gfanlib_symmetriccomplex.h gfanlib_zfan.h
+libgfan_include_HEADERS = gfanlib_z.h gfanlib_q.h gfanlib_vector.h gfanlib_matrix.h gfanlib_zcone.h gfanlib.h gfanlib_polyhedralfan.h gfanlib_polymakefile.h gfanlib_symmetriccomplex.h gfanlib_symmetry.h gfanlib_zfan.h
 
 
 
