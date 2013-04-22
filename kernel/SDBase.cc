@@ -113,7 +113,7 @@ inline static intset initec (const int maxnr)
 }
 
 //BOCO: copied from kutil.cc
-static inline void enlargeL (LSet* L,int* length,const int incr)
+static inline void enlargeL (ShiftDVec::LSet* L,int* length,const int incr)
 {
   assume((*L)!=NULL);
   assume((length+incr)>0);
@@ -340,17 +340,17 @@ ideal ShiftDVec::kStd
 #ifdef KDEBUG
 static int bba_count = 0;
 #endif /* KDEBUG */
-void kDebugPrint(kStrategy strat);
+void kDebugPrint(ShiftDvec::kStrategy strat);
 
 
 #if 0 //BOCO: original header (replaced)
       //TODO: CLEANUP: remove this
 ideal bba
-  (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
+  (ideal F, ideal Q,intvec *w,intvec *hilb,ShiftDVec::kStrategy strat)
 #else //replacement
 ideal ShiftDVec::bba
   ( ideal F, ideal Q, ideal I,
-    intvec *w,intvec *hilb,kStrategy strat )
+    intvec *w,intvec *hilb,ShiftDVec::kStrategy strat )
 {
   /* BOCO:
    * If I != NULL we want to calculate the GB of the left ideal
@@ -854,8 +854,8 @@ ideal ShiftDVec::initTestGM
     return(NULL);
   }
 
-  TObject* H = new TObject(p);
-  TSet tset = new TObject[IDELEMS(I)];
+  SD::TObject* H = new SD::TObject(p);
+  SD::TSet tset = new SD::TObject[IDELEMS(I)];
 
   for(int i=0; i < IDELEMS(I); ++i)
     tset[i].Set(I->m[i], currRing);
@@ -877,7 +877,7 @@ ideal ShiftDVec::initTestGM
  * deletes divisible vectors/polynomials
  * BOCO: original resides in kutil.cc
  */
-void ShiftDVec::updateResult(ideal r,ideal Q, kStrategy strat)
+void ShiftDVec::updateResult(ideal r,ideal Q, ShiftDVec::kStrategy strat)
 {
   using namespace ShiftDVec;
   int l;
@@ -1022,14 +1022,14 @@ static BOOLEAN sloppy_max = FALSE;
       //TODO: CLEANUP: remove this
 void completeReduce (kStrategy strat, BOOLEAN withT)
 #else //replacement
-void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
+void ShiftDVec::completeReduce (ShiftDVec::kStrategy strat, BOOLEAN withT)
 {
   namespace SD = ShiftDVec;
 
 #endif
   int i;
   int low = (((currRing->OrdSgn==1) && (strat->ak==0)) ? 1 : 0);
-  LObject L;
+  SD::LObject L;
 
 #ifdef KDEBUG
   // need to set this: during tailreductions of T[i], T[i].max 
@@ -1052,7 +1052,7 @@ void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
     int end_pos=strat->sl;
     if ((strat->fromQ!=NULL) && (strat->fromQ[i])) continue; // do not reduce Q_i
     if (strat->ak==0) end_pos=i-1;
-    TObject* T_j = strat->s_2_t(i);
+    SD::TObject* T_j = strat->s_2_t(i);
     if ((T_j != NULL)&&(T_j->p==strat->S[i]))
       //BOCO: Why do they test here, if T_j->p==strat->S[i] ?
     {
@@ -1172,7 +1172,7 @@ void ShiftDVec::completeReduce (kStrategy strat, BOOLEAN withT)
       //TODO: CLEANUP: remove this
 poly redtail (LObject* L, int pos, kStrategy strat)
 #else //replacement
-poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
+poly ShiftDVec::redtail (ShiftDVec::LObject* L, int pos, ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif
@@ -1186,10 +1186,10 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
   if (strat->noTailReduction || pNext(p) == NULL)
     return p;
 
-  LObject Ln(strat->tailRing);
-  TObject* With;
+  SD::LObject Ln(strat->tailRing);
+  SD::TObject* With;
   // placeholder in case strat->tl < 0
-  TObject  With_s(strat->tailRing);
+  SD::TObject  With_s(strat->tailRing);
   h = p;
   hn = pNext(h);
   long op = strat->tailRing->pFDeg(hn, strat->tailRing);
@@ -1222,7 +1222,7 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s, e);
       if (With == NULL) break;
 #else //replacement
-        TObject * WithTmp = SD::kFindDivisibleByInS
+        SD::TObject * WithTmp = SD::kFindDivisibleByInS
           (strat, pos, &Ln, &With_s, shift, strat->lV, ecart);
         if (WithTmp == NULL) break;
         if(shift == 0){ With = WithTmp; } //no problem
@@ -1306,11 +1306,11 @@ poly ShiftDVec::redtail (LObject* L, int pos, kStrategy strat)
       //TODO: CLEANUP: remove this
 poly redtail (poly p, int pos, kStrategy strat)
 #else //replacement
-poly ShiftDVec::redtail(poly p, int pos, kStrategy strat)
+poly ShiftDVec::redtail(poly p, int pos, ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif
-  LObject L(p, currRing);
+  SD::LObject L(p, currRing);
   return SD::redtail(&L, pos, strat);
 }
 
@@ -1319,7 +1319,7 @@ poly ShiftDVec::redtail(poly p, int pos, kStrategy strat)
       //TODO: CLEANUP: remove this
 void initBba(ideal F,kStrategy strat)
 #else
-void ShiftDVec::initBba(ideal F,kStrategy strat)
+void ShiftDVec::initBba(ideal F,ShiftDVec::kStrategy strat)
 #endif
 {
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
@@ -1401,7 +1401,7 @@ void ShiftDVec::initBba(ideal F,kStrategy strat)
  * and the case of a degree-ordering
  * original resides in kstd2.cc
  */
-int ShiftDVec::redHomog (LObject* h,kStrategy strat)
+int ShiftDVec::redHomog (ShiftDVec::LObject* h,ShiftDVec::kStrategy strat)
 {
   initDeBoGri
     ( ShiftDVec::indent, 
@@ -1474,8 +1474,8 @@ int ShiftDVec::redHomog (LObject* h,kStrategy strat)
        * divides first arg, we check if first arg is divisibly
        * by second arg! */
       if(strat->T[i].pLength < li){
-        TObject t_h(h_p);
-        TObject t_i(strat->T[i].GetLmTailRing());
+        SD::TObject t_h(h_p);
+        SD::TObject t_i(strat->T[i].GetLmTailRing());
         shift = SD::p_LmShortDivisibleBy
           (&t_h, strat->sevT[i], &t_i, not_sev, strat->tailRing);
         /*
@@ -1668,7 +1668,7 @@ int kFindDivisibleByInS
   (const kStrategy strat, int* max_ind, LObject* L)
 #else //BOCO: replacement
 int ShiftDVec::kFindDivisibleByInS
-  (const kStrategy strat, int* max_ind, LObject* L, int shift)
+  (const ShiftDVec::kStrategy strat, int* max_ind, ShiftDVec::LObject* L, int shift)
 {
   namespace SD = ShiftDVec;
 #endif
@@ -1710,7 +1710,7 @@ int ShiftDVec::kFindDivisibleByInS
      * The original p_LmDivisibleBy checks if second arg
      * divides first arg, we check if first arg is divisibly
      * by second arg! */
-    TObject t_Sj(strat->S[j]); TObject t_p(p);
+    SD::TObject t_Sj(strat->S[j]); TObject t_p(p);
     shift = p_LmDivisibleBy(&t_p, &t_Sj, currRing, strat->lV);
     if ( shift < UINT_MAX && 
          ( strat->homog ||
@@ -1747,7 +1747,7 @@ int ShiftDVec::kFindDivisibleByInS
 static poly redBba (poly h,int maxIndex,kStrategy strat)
 #else //BOCO: replacement
 poly ShiftDVec::redBba
-  (LObject * h,int maxIndex,kStrategy strat)
+  (SHiftDVec::LObject * h,int maxIndex,ShiftDVec::kStrategy strat)
 #endif
 {
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
@@ -1780,9 +1780,9 @@ poly ShiftDVec::redBba
      * The original p_LmShortDivisibleBy checks if second arg
      * divides first arg, we check if first arg is divisibly
      * by second arg! */
-    TObject * t;
+    SD::TObject * t;
     if(!(t = strat->s_2_t(j))) 
-      { TObject tt(strat->S[j]); t = &tt; }
+      { SD::TObject tt(strat->S[j]); t = &tt; }
     uint shift = 
       SD::p_LmShortDivisibleBy(h, strat->sevS[j], t, not_sev, currRing);
     if( shift < UINT_MAX && 
@@ -1798,8 +1798,8 @@ poly ShiftDVec::redBba
         ( strat->S[j], shift, 
           strat->uptodeg, strat->lV, strat, currRing);
       loGriToFile("p_LPshiftT poly in redBba ", 0,1024);
-      TObject tTemp(pTemp);
-      TObject noShift(strat->S[j]);
+      SD::TObject tTemp(pTemp);
+      SD::TObject noShift(strat->S[j]);
 
       //BOCO: hope that is ok... is it nescessary?...
       tTemp.tailRing = noShift.tailRing = strat->tailRing;
@@ -1857,7 +1857,7 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy
     unsigned long not_sev_b, const ring r )
 #else //BOCO: replacement
 uint ShiftDVec::p_LmShortDivisibleBy
-  ( TObject* t1, unsigned long sev_t1, TObject* t2,
+  ( ShiftDVec::TObject* t1, unsigned long sev_t1, ShiftDVec::TObject* t2,
     unsigned long not_sev_t2, const ring r          )
 #endif
 {
@@ -1907,7 +1907,7 @@ uint ShiftDVec::p_LmShortDivisibleBy
 PINLINE1 BOOLEAN p_LmDivisibleBy ( poly a, poly b, const ring r )
 #else //BOCO: replacement
 uint ShiftDVec::p_LmDivisibleBy
-  ( TObject * t1, TObject * t2, const ring r, int lV )
+  ( ShiftDVec::TObject * t1, ShiftDVec::TObject * t2, const ring r, int lV )
 {
   namespace SD = ShiftDVec;
 #endif
@@ -1958,7 +1958,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp
   ( poly a, poly b, const ring r )
 #else //BOCO: replacement
 static inline uint ShiftDVec::_p_LmDivisibleByNoComp
-  (TObject * t1, TObject * t2, const ring r, int lV)
+  (ShiftDVec::TObject * t1, ShiftDVec::TObject * t2, const ring r, int lV)
 #endif
 {
 #if 0 //BOCO: original code (deleted)
@@ -2045,8 +2045,8 @@ int kFindDivisibleByInT
     const LObject* L, const int start                       )
 #else
 int ShiftDVec::kFindDivisibleByInT
-  ( const TSet &T, const unsigned long* sevT, LObject * L, 
-    uint & shift, kStrategy strat, const int start         )
+  ( const ShiftDVec::TSet &T, const unsigned long* sevT, ShiftDVec::LObject * L, 
+    uint & shift, ShiftDVec::kStrategy strat, const int start         )
 {
   namespace SD = ShiftDVec;
 #endif
@@ -2183,8 +2183,8 @@ int ShiftDVec::kFindDivisibleByInT
 TObject * kFindDivisibleByInS
   (kStrategy strat, int pos, LObject* L, TObject* T, long ecart)
 #else
-TObject * ShiftDVec::kFindDivisibleByInS
-  ( kStrategy strat, int pos, LObject* L, TObject* T, 
+ShiftDVec::TObject * ShiftDVec::kFindDivisibleByInS
+  ( ShiftDVec::kStrategy strat, int pos, ShiftDVec::LObject* L, ShiftDVec::TObject* T, 
     uint & shift, int lV, int uptodeg, long ecart     )
 {
   initDeBoGri
@@ -2346,7 +2346,7 @@ poly redtailBba
     BOOLEAN normalize                                    )
 #else //replacement
 poly ShiftDVec::redtailBba
-  ( LObject* L, int pos, kStrategy strat, BOOLEAN withT, 
+  ( ShiftDVec::LObject* L, int pos, ShiftDVec::kStrategy strat, BOOLEAN withT, 
     BOOLEAN normalize                                    )
 {
   namespace SD = ShiftDVec;
@@ -2363,12 +2363,12 @@ poly ShiftDVec::redtailBba
   if ((h==NULL) || (pNext(h)==NULL))
     return L->GetLmCurrRing();
 
-  TObject* With;
+  SD::TObject* With;
   // placeholder in case strat->tl < 0
-  TObject  With_s(strat->tailRing);
+  SD::TObject  With_s(strat->tailRing);
 
   //BOCO: I think, this initializes Ln.t_p, but not Ln.p
-  LObject Ln(pNext(h), strat->tailRing);
+  SD::LObject Ln(pNext(h), strat->tailRing);
   Ln.dvec = NULL;
   Ln.pLength = L->GetpLength() - 1;
   deBoGriPrint(h, "h at the Beginning: ", 2048);
@@ -2389,7 +2389,7 @@ poly ShiftDVec::redtailBba
   //BOCO: TODO: remove all these tests
   assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000); 
 
-  TObject uTmp;
+  SD::TObject uTmp;
   uTmp.t_p = NULL;
   uTmp.p = NULL;
   static int deBoGriCnt2 = 0; //TODO: remove
@@ -2688,11 +2688,11 @@ poly ShiftDVec::redtailBba
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize)
 #else //replacement
 KINLINE poly ShiftDVec::redtailBba
-  (poly p,int pos,kStrategy strat,BOOLEAN normalize)
+  (poly p,int pos,ShiftDVec::kStrategy strat,BOOLEAN normalize)
 {
   namespace SD = ShiftDVec;
 #endif
-  LObject L(p, currRing, strat->tailRing);
+  SD::LObject L(p, currRing, strat->tailRing);
   return SD::redtailBba(&L, pos, strat,FALSE, normalize);
 }
 
@@ -2706,11 +2706,11 @@ KINLINE poly ShiftDVec::redtailBba
       //TODO: CLEANUP: remove this
 void updateS(BOOLEAN toT,kStrategy strat)
 #else //replacement
-void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
+void ShiftDVec::updateS(BOOLEAN toT,ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif
-  LObject h;
+  SD::LObject h;
   int i, suc=0;
   poly redSi=NULL;
   BOOLEAN change,any_change;
@@ -2738,7 +2738,7 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
       //TODO: CLEANUP: remove this
           strat->S[i] = redBba(strat->S[i],i-1,strat);
 #else
-          LObject h(strat->S[i]);
+          SD::LObject h(strat->S[i]);
           strat->S[i] = redBba(&h,i-1,strat);
 #endif
           //if ((strat->ak!=0)&&(strat->S[i]!=NULL))
@@ -2851,7 +2851,7 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
       //TODO: CLEANUP: remove this
           h.p = redtailBba(strat->S[i],i-1,strat);
 #else
-          LObject L(h.p, currRing, strat->tailRing); 
+          SD::LObject L(h.p, currRing, strat->tailRing); 
           h.p = SD::redtailBba(&L, i-1, strat, FALSE, FALSE);
 #endif
           if (TEST_OPT_INTSTRATEGY)
@@ -2990,7 +2990,7 @@ void ShiftDVec::updateS(BOOLEAN toT,kStrategy strat)
       //TODO: CLEANUP: remove this
 void initBuchMoraCrit(kStrategy strat)
 #else //replacement
-void ShiftDVec::initBuchMoraCrit(kStrategy strat)
+void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif
@@ -3068,7 +3068,7 @@ void ShiftDVec::initBuchMoraCrit(kStrategy strat)
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 #else //BOCO: replacement
 LObject* ShiftDVec::enterL
-  ( LSet *set,int *length, int *LSetmax, LObject p,int at, 
+  ( ShiftDVec::LSet *set,int *length, int *LSetmax, ShiftDVec::LObject p,int at, 
     uint* dvec                                             )
 {
 #endif
@@ -3103,7 +3103,7 @@ LObject* ShiftDVec::enterL
       //TODO: CLEANUP: remove this
 void initSL (ideal F, ideal Q,kStrategy strat)
 #else
-void ShiftDVec::initSL(ideal F, ideal Q,kStrategy strat)
+void ShiftDVec::initSL(ideal F, ideal Q,ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif
@@ -3161,7 +3161,7 @@ void ShiftDVec::initSL(ideal F, ideal Q,kStrategy strat)
   {
     if (F->m[i]!=NULL)
     {
-      LObject h; //BOCO: dvec is set to NULL by constructor
+      SD::LObject h; //BOCO: dvec is set to NULL by constructor
 
       //BOCO: TODO: should be set to NULL by constructor
       h.SetLcmDvecToNULL(); 
@@ -3218,7 +3218,7 @@ void ShiftDVec::initSL(ideal F, ideal Q,kStrategy strat)
       //TODO: CLEANUP: remove this
 void initBuchMora(ideal F,ideal Q,kStrategy strat)
 #else
-void ShiftDVec::initBuchMora(ideal F,ideal Q,kStrategy strat)
+void ShiftDVec::initBuchMora(ideal F,ideal Q,ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
 #endif

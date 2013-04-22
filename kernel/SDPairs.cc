@@ -330,7 +330,7 @@ void ShiftDVec::initenterpairs
 
 #if 0
 #if DEBOGRI > 0 
-  if( ShiftDVec::debogri == 1024 )
+  if( SD::debogri == 1024 )
   {
     //BOCO: Watch new Elements of L
     for(int i = 0; i <= strat->Bl; ++i)
@@ -534,7 +534,7 @@ void ShiftDVec::DeBoGriTestGM
     //right with self and right
     for(uint i = 0; i < sizesRightOvls[l]; ++i)
     {
-      ShiftDVec::TObject* Right = tset[l];
+      SD::TObject* Right = tset[l];
       Print("Consider rightoverlap %d with element",r_overlaps[l][i]);
       pWrite(tset[l]->p);
       Print(with self and right overlaps./n");
@@ -548,7 +548,7 @@ void ShiftDVec::DeBoGriTestGM
     //left with left and self
     for(uint i = 0; i < sizesLeftOvls[l]; ++i)
     {
-      ShiftDVec::TObject* Left = tset[l];
+      SD::TObject* Left = tset[l];
       Print("Consider leftoverlap %d with element ",l_overlaps[l][i]);
       pWrite(tset[l]->p);
       Print(with left and self overlaps./n");
@@ -576,8 +576,8 @@ void ShiftDVec::DeBoGriTestGM
           if( !shRight2 ) continue;
           uint shRight1 = r_overlaps[i][j];
           if( !shRight1 ) goto end_of_middle_loop_1;
-          ShiftDVec::TObject* Right1 = tset[i];
-          ShiftDVec::TObject* Right2 = tset[m];
+          SD::TObject* Right1 = tset[i];
+          SD::TObject* Right2 = tset[m];
           if( shRight2 >= shRight1 ||
               shRight2 + Right2->GetDVsize() >
               shRight1 + Right1->GetDVsize()   ) break;
@@ -607,8 +607,8 @@ void ShiftDVec::DeBoGriTestGM
           uint shLeft1 = l_overlaps[i][j];
           if( !shLeft2 ) continue;
           if( !shLeft1 ) goto end_of_middle_loop_2;
-          ShiftDVec::TObject* Left1 = tset[i];
-          ShiftDVec::TObject* Left2 = tset[m];
+          SD::TObject* Left1 = tset[i];
+          SD::TObject* Left2 = tset[m];
           if( shLeft2 > shLeft1 ||
               shLeft1 - Left1->GetDVsize() <=
               shLeft2 - Left1->GetDVsize()    ) break;
@@ -1222,7 +1222,7 @@ void ShiftDVec::enterLeftOverlaps
       {
         deBoGriPrint("No degree Violation!", 1);
         int isFromQi = 0; //BOCO: hack TODO: clear
-        ShiftDVec::LObject* Pair = SD::enterOnePair
+        SD::LObject* Pair = SD::enterOnePair
           ( strat->S[i], strat->S_2_R[i], isFromQi, 
             strat->ecartS[i], 
             H->p, shiftH, atR, isFromQ, ecart, strat );
@@ -1257,7 +1257,7 @@ void ShiftDVec::enterSelfOverlaps
 
   namespace SD = ShiftDVec;
 
-  ShiftDVec::LObject* Pair;
+  SD::LObject* Pair;
 
   bool new_pair = false;
   for (int j = 0; j < numSelfOvls; ++j)
@@ -1305,7 +1305,7 @@ void ShiftDVec::enterSelfOverlaps
   if(new_pair){
     for (int l=strat->Ll; l>=0; l--){
       //Gebauer-Moeller Kriterium 3
-      if (ShiftDVec::GM3(H,&(strat->L[l]),strat))
+      if (SD::GM3(H,&(strat->L[l]),strat))
         deleteInL(strat->L,&strat->Ll,l,strat);
     }
   }
@@ -2439,7 +2439,7 @@ int i,j;
    * work properly                                        */
   for (j=strat->Ll; j>=0; j--)
   {
-    if (ShiftDVec::compareChain(H,&(strat->L[j]),strat)) //renewed old procedure for new divisble tests
+    if (SD::compareChain(H,&(strat->L[j]),strat)) //renewed old procedure for new divisble tests
     {
       if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
       {

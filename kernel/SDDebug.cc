@@ -36,7 +36,7 @@ void ShiftDVec::lcmDvecWrite(const SD::LObject* t)
 { dvecWrite(t->lcmDvec, t->lcmDvSize); }
 
 
-int ShiftDVec::lpDVCase = 0;
+int SD::lpDVCase = 0;
 
 
 
@@ -46,46 +46,46 @@ int ShiftDVec::lpDVCase = 0;
 
 #if DEBOGRI > 0
 int ShiftDVec__deBoGriCnt = 0;
-int ShiftDVec::deBoGri = 0;
-int ShiftDVec::indent = 0;
-int ShiftDVec::indentInc = 2;
-int ShiftDVec::isSilenced = false;
-int ShiftDVec::debugCounter = 0;
+int SD::deBoGri = 0;
+int SD::indent = 0;
+int SD::indentInc = 2;
+int SD::isSilenced = false;
+int SD::debugCounter = 0;
 #endif
 
 #if DEBOGRI > 0
-ShiftDVec::DeBoGri::DeBoGri
+SD::DeBoGri::DeBoGri
   ( int& indent_ ) : indent(indent_), leaveMsg(NULL)
-{ ShiftDVec::indent = indent += ShiftDVec::indentInc; }
+{ SD::indent = indent += SD::indentInc; }
 #endif
 
 #if DEBOGRI > 0
-ShiftDVec::DeBoGri::DeBoGri
+SD::DeBoGri::DeBoGri
   ( int& indent_, const char* startMsg, uint flag_ ) : 
   indent(indent_), leaveMsg(NULL), flag(flag_)
 {
   deBoGriPrint( startMsg, flag_ );
-  ShiftDVec::indent = indent += ShiftDVec::indentInc;
+  SD::indent = indent += SD::indentInc;
 }
 #endif
 
 #if DEBOGRI > 0
-ShiftDVec::DeBoGri::DeBoGri
+SD::DeBoGri::DeBoGri
   ( int& indent_, 
     const char* startMsg, const char* leaveMsg_, uint flag_ ) : 
   indent(indent_), leaveMsg(leaveMsg_), flag(flag_)
 {
   ShiftDVec__deBoGriCnt++;
   deBoGriPrint( startMsg, flag_ );
-  ShiftDVec::indent = indent += ShiftDVec::indentInc;
+  SD::indent = indent += SD::indentInc;
 }
 #endif
 
 #if DEBOGRI > 0
-ShiftDVec::DeBoGri::~DeBoGri() 
+SD::DeBoGri::~DeBoGri() 
 {
   ShiftDVec__deBoGriCnt++;
-  ShiftDVec::indent = indent - ShiftDVec::indentInc; 
+  SD::indent = indent - SD::indentInc; 
   deBoGriPrint( leaveMsg, flag );
 }
 #endif
@@ -148,9 +148,9 @@ bool ShiftDVec::lmHasZeroShift(poly p, ring p_lm_ring, int lV)
 bool ShiftDVec::deBoGriPrint
   ( const char* description, uint flag, bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   { 
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); PrintLn();
@@ -164,9 +164,9 @@ bool ShiftDVec::deBoGriPrint
   ( const poly p, 
     const char* description, uint flag, bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); pWrite(p);
@@ -181,9 +181,9 @@ bool ShiftDVec::deBoGriPrint
     const ring lmRing, const ring tlRing, 
     bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); 
@@ -200,9 +200,9 @@ bool ShiftDVec::deBoGriPrint
     const ring lmRing, const ring tlRing, 
     bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); 
@@ -214,13 +214,13 @@ bool ShiftDVec::deBoGriPrint
 #endif
 
 #if DEBOGRI > 0
-bool ShiftDVec::deBoGriPrint
+bool SD::deBoGriPrint
   ( const poly p, int shift, SD::kStrategy strat,
     const char* description, uint flag, bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     poly pTemp = p;
     if( shiftViolatesDeg(p, shift, strat->uptodeg) )
@@ -248,13 +248,13 @@ bool ShiftDVec::deBoGriPrint
 #endif
 
 #if DEBOGRI > 0
-bool ShiftDVec::deBoGriPrint
+bool SD::deBoGriPrint
   ( const uint* dvec, uint size, 
     const char* description, uint flag, bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); dvecWrite(dvec, size); PrintLn();
@@ -268,9 +268,9 @@ bool ShiftDVec::deBoGriPrint
   ( int number, 
     const char* description, uint flag, bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); Print("%d\n", number);
@@ -284,9 +284,9 @@ bool ShiftDVec::deBoGriPrint
   ( void* address, 
     const char* description, uint flag, bool assume, int indent )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag && 
-      !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag && 
+      !assume && !SD::isSilenced )
   {
     for(int i = indent; i; --i) PrintS(" ");
     PrintS(description); Print("%p\n", address);
@@ -301,9 +301,9 @@ bool ShiftDVec::loGriToFile
     const void* addr, 
     const char* logfile, bool assume, int indent   )
 {
-  if(indent < 0){ indent = ShiftDVec::indent; }
-  if( ShiftDVec::deBoGri & flag 
-      && !assume && !ShiftDVec::isSilenced )
+  if(indent < 0){ indent = SD::indent; }
+  if( SD::deBoGri & flag 
+      && !assume && !SD::isSilenced )
   {
 #if 0 //Replaced
     std::ofstream toFile;

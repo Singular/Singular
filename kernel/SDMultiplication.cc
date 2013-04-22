@@ -247,20 +247,20 @@ return r->osize = r->N+1;
 /* Initializes the letterplace multiplication. See also        *
 * InitOrderMapping. Do not forget to free r->omap as soon, as *
 * it will no longer be used.                                  */
-void ShiftDVec::InitSDMultiplication( ring r, ShiftDVec::kStrategy strat )
+void ShiftDVec::InitSDMultiplication( ring r, SD::kStrategy strat )
 {
 r->isLPring = strat->lV; 
 //BOCO: this should have already been set by
 //makeLetterplaceRing, but it isnt :(
 
-r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
+r->p_ExpSum = &SD::p_ExpSum_slow;
 
 #if 0 //BOCO: Well, I hope all works fine even without ro_dp...
 for(int i = 1; i < r->OrdSize; ++i)
 {
   if( r->typ[i].ord_typ != ro_dp )
   {
-    r->p_ExpSum = &ShiftDVec::p_ExpSum_slow;
+    r->p_ExpSum = &SD::p_ExpSum_slow;
     return;
   }
 }
@@ -474,15 +474,15 @@ int ShiftDVec::create_count = 0;  //count of spoly creations
 * SPW is the shifted UPW
 *
 ***************************************************************/
-int ShiftDVec::ksReducePoly(ShiftDVec::LObject* PR,
-               ShiftDVec::TObject* UPW,
-               ShiftDVec::TObject* SPW,
+int ShiftDVec::ksReducePoly(SD::LObject* PR,
+               SD::TObject* UPW,
+               SD::TObject* SPW,
                poly spNoether,
                number *coef,
-               ShiftDVec::kStrategy strat)
+               SD::kStrategy strat)
 {
   initDeBoGri
-  ( ShiftDVec::indent, 
+  ( SD::indent, 
       "Entering ksReducePoly", "Leaving ksReducePoly", 4096 );
   deBoGriPrint
     (PR, "PReduce: ", 4096, currRing, PR->tailRing);
@@ -549,13 +549,13 @@ int ShiftDVec::ksReducePoly(ShiftDVec::LObject* PR,
   p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
 #else
   poly mr;
-  int shift_of_p2 = ShiftDVec::get_shift_of(p2, tailRing);
+  int shift_of_p2 = SD::get_shift_of(p2, tailRing);
   //BOCO:
   //lm: lm of poly which shall be reduced
   //    will become left cofactor
   //p2: divisor of lm
   //mr: will become right cofactor
-  ShiftDVec::get_division_cofactors
+  SD::get_division_cofactors
     (lm, p2, shift_of_p2, &lm, &mr, tailRing);
 #endif
 
@@ -584,7 +584,7 @@ int ShiftDVec::ksReducePoly(ShiftDVec::LObject* PR,
       p2 = SPW->GetLmTailRing();
       t2 = pNext(UPW->GetLmTailRing());
       lm = p1;
-      ShiftDVec::get_division_cofactors
+      SD::get_division_cofactors
         (lm, p2, shift_of_p2, &lm, &mr, tailRing);
       ret = 1;
     }
@@ -658,12 +658,12 @@ int ShiftDVec::ksReducePoly(ShiftDVec::LObject* PR,
  *
  *
  ***************************************************************/
-void ShiftDVec::ksCreateSpoly(ShiftDVec::LObject* Pair,   poly spNoether,
+void ShiftDVec::ksCreateSpoly(SD::LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
-                   poly m1, poly m2, ShiftDVec::TObject** R)
+                   poly m1, poly m2, SD::TObject** R)
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering ksCreateSpoly", "Leaving ksCreateSpoly", 4096 );
   deBoGriPrint(m1, "m1: ", 4096, tailRing); 
   deBoGriPrint(m2, "m2: ", 4096, tailRing);
@@ -704,7 +704,7 @@ void ShiftDVec::ksCreateSpoly(ShiftDVec::LObject* Pair,   poly spNoether,
   // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
   //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
   if (m1 == NULL)
-    ShiftDVec::k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
+    SD::k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
 
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
@@ -784,8 +784,8 @@ void ShiftDVec::ksCreateSpoly(ShiftDVec::LObject* Pair,   poly spNoether,
 
 //BOCO: used in redtail
 int ShiftDVec::ksReducePolyTail
-  ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, 
-    poly Current, poly spNoether, ShiftDVec::kStrategy strat )
+  ( SD::LObject* PR, SD::TObject* UPW, SD::TObject* SPW, 
+    poly Current, poly spNoether, SD::kStrategy strat )
 {
   BOOLEAN ret;
   number coef;
@@ -804,7 +804,7 @@ int ShiftDVec::ksReducePolyTail
   TObject UWith(UPW, Lp == Save);
 
   pAssume(!pHaveCommonMonoms(Red.p, SWith.p));
-  ret = ShiftDVec::ksReducePoly(&Red, &UWith, &SWith, spNoether, &coef, strat);
+  ret = SD::ksReducePoly(&Red, &UWith, &SWith, spNoether, &coef, strat);
 
   if (!ret)
   {
@@ -849,7 +849,7 @@ KINLINE int ksReducePolyTail
 #else  //replacement
 int ShiftDVec::ksReducePolyTail
 #endif
-  ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, ShiftDVec::LObject* Red )
+  ( SD::LObject* PR, SD::TObject* UPW, SD::TObject* SPW, SD::LObject* Red )
 {
   BOOLEAN ret;
   number coef;
@@ -861,7 +861,7 @@ int ShiftDVec::ksReducePolyTail
   ret = ksReducePoly(Red, PW, NULL, &coef);
 #else //replacement
   ret = 
-    ShiftDVec::ksReducePoly(Red, UPW, SPW, NULL, &coef);
+    SD::ksReducePoly(Red, UPW, SPW, NULL, &coef);
 #endif
 
   if (!ret)
@@ -886,7 +886,7 @@ int ShiftDVec::ksReducePolyTail
  *
  ***************************************************************/
 BOOLEAN ShiftDVec::kCheckSpolyCreation
-  ( ShiftDVec::LObject *L, ShiftDVec::kStrategy strat, poly &m1, poly &m2 )
+  ( SD::LObject *L, SD::kStrategy strat, poly &m1, poly &m2 )
 {
   if (strat->overflow) return FALSE;
   assume(L->p1 != NULL && L->p2 != NULL);
@@ -896,7 +896,7 @@ BOOLEAN ShiftDVec::kCheckSpolyCreation
   assume(strat->tailRing != currRing);
 
   //BOCO: only Change: using our k_GetLeadTerms adaption
-  if (! ShiftDVec::k_GetLeadTerms(L->p1, L->p2, currRing, m1, m2, strat->tailRing))
+  if (! SD::k_GetLeadTerms(L->p1, L->p2, currRing, m1, m2, strat->tailRing))
     return FALSE;
   // shift changes: extra case inserted
   if ((L->i_r1 == -1) || (L->i_r2 == -1) )

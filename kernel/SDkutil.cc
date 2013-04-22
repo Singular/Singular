@@ -37,9 +37,9 @@ uint ShiftDVec::CreateDVec
   (poly p, ring r, uint*& dvec)
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering CreateDVec", "Leaving CreateDVec", 512 );
-  deBoGriPrint(++ShiftDVec::debugCounter, "debugCounter: ", 512);
+  deBoGriPrint(++SD::debugCounter, "debugCounter: ", 512);
 
   if(p == NULL){dvec = NULL; return 0;}
 
@@ -81,7 +81,7 @@ uint ShiftDVec::sTObject::GetDVsize()
 }
 
 
-int ShiftDVec::sTObject::cmpDVec(ShiftDVec::sTObject* T)
+int ShiftDVec::sTObject::cmpDVec(SD::sTObject* T)
 {
   if(GetDVsize() == T->GetDVsize())
     return memcmp(dvec,T->dvec,dvSize*sizeof(uint));
@@ -96,11 +96,11 @@ int ShiftDVec::sTObject::cmpDVec(ShiftDVec::sTObject* T)
  * Returns 0 if these parts match, or non-zero value if not
  * (see memcmp for more informations).                        */
 int ShiftDVec::sTObject::cmpDVec
-  (ShiftDVec::sTObject* T1, uint begin, uint beginT1, uint size)
+  (SD::sTObject* T1, uint begin, uint beginT1, uint size)
 {
   assume(begin + size <= dvSize && beginT1 + size <= T1->dvSize);
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering cmpDVec", "Leaving cmpDVec", 128 );
   deBoGriPrint(begin + size, "begin + size: ", 128);
   deBoGriPrint(dvSize, "dvSize: ", 128);
@@ -140,8 +140,8 @@ int ShiftDVec::cmpDVecProper
 
 /* Does what cmpDVec should do. size > 0 should hold.*/
 int ShiftDVec::cmpDVecProper
-  ( ShiftDVec::sTObject* T1, uint beginT1,
-    ShiftDVec::sTObject* T2, uint beginT2, uint size, int lV )
+  ( SD::sTObject* T1, uint beginT1,
+    SD::sTObject* T2, uint beginT2, uint size, int lV )
 {
   assume(beginT2+size <= dvSize && beginT1+size <= T1->dvSize);
 
@@ -152,11 +152,11 @@ int ShiftDVec::cmpDVecProper
 
 /* Does what cmpDVec should do. size > 0 should hold.*/
 int ShiftDVec::sTObject::cmpDVecProper
-  ( ShiftDVec::sTObject* T1, 
+  ( SD::sTObject* T1, 
     uint begin, uint beginT1, uint size, int lV )
 {
   return 
-    ShiftDVec::cmpDVecProper
+    SD::cmpDVecProper
       (T1, beginT1, this, begin, size, lV);
 }
 
@@ -170,8 +170,8 @@ void ShiftDVec::sTObject::freeDVec()
   }
 }
 
-ShiftDVec::sTObject& ShiftDVec::sTObject::operator=
-  (const ShiftDVec::sTObject& t)
+SD::sTObject& SD::sTObject::operator=
+  (const SD::sTObject& t)
 {
   this->::sTObject::operator=(t);
 
@@ -184,7 +184,7 @@ ShiftDVec::sTObject& ShiftDVec::sTObject::operator=
 
 
 
-//member functions of ShiftDVec::sLobject
+//member functions of SD::sLobject
 
 
 
@@ -211,7 +211,7 @@ uint ShiftDVec::sLObject::getLcmDvSize(ring r)
 void ShiftDVec::sLObject::SetLcmDVec(ring r)
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering SetLcmDVec", "Leaving SetLcmDVec", 16 );
 
 #ifdef USE_DVEC_LCM
@@ -286,7 +286,7 @@ void ShiftDVec::sLObject::freeLcmDVec()
  * DVec of the other objects lcm. Thus, if both lcm do not have
  * the same shift, but would otherwise be equal, true will be
  * returned, too.  In every other case, false is returned.    */
-bool ShiftDVec::sLObject::compareLcmTo( ShiftDVec::sLObject* other, ring r )
+bool ShiftDVec::sLObject::compareLcmTo( SD::sLObject* other, ring r )
 {
   if( this->getLcmDvSize(r) != other->getLcmDvSize(r) ) 
     return false;
@@ -407,10 +407,10 @@ bool ShiftDVec::sLObject::gm3LcmUnEqualToLcm
 }
 
 uint ShiftDVec::sLObject::lcmDivisibleBy
-  ( ShiftDVec::sTObject * T, int numVars )
+  ( SD::sTObject * T, int numVars )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering lcmDivisibleBy", "Leaving lcmDivisibleBy", 16 );
 
   this->SetLcmDvecIfNULL();
@@ -429,11 +429,11 @@ uint ShiftDVec::sLObject::lcmDivisibleBy
 }
 
 uint ShiftDVec::sLObject::lcmDivisibleBy
-  ( ShiftDVec::sTObject * T, 
+  ( SD::sTObject * T, 
     uint minShift, uint maxShift, int numVars )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering lcmDivisibleBy(sTObject, int, uint, uint, int)", 
       "Leaving lcmDivisibleBy", 16                              );
 
@@ -518,7 +518,7 @@ uint ShiftDVec::divisibleBy
     const uint* dvec2, uint dvSize2, int numVars )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering divisibleBy", "Leaving divisibleBy", 256 );
   deBoGriPrint(dvec1, dvSize1, "dvec1: ", 256);
   deBoGriPrint(dvec2, dvSize2, "dvec2: ", 256);
@@ -622,8 +622,8 @@ uint ShiftDVec::divisibleBy
  * Has to be tested!
  */
 uint ShiftDVec::divisibleBy
-  ( ShiftDVec::sTObject * p1, 
-    ShiftDVec::sTObject * p2, int numVars )
+  ( SD::sTObject * p1, 
+    SD::sTObject * p2, int numVars )
 {
   p1->SetDVecIfNULL();
   p2->SetDVecIfNULL();
@@ -643,8 +643,8 @@ uint ShiftDVec::divisibleBy
  * Has to be tested!
  */
 bool ShiftDVec::divisibleBy
-  ( ShiftDVec::sTObject * p1, 
-    ShiftDVec::sTObject * p2, int& s0, int numVars )
+  ( SD::sTObject * p1, 
+    SD::sTObject * p2, int& s0, int numVars )
 {
   p1->SetDVecIfNULL();
   p2->SetDVecIfNULL();
@@ -662,11 +662,11 @@ bool ShiftDVec::divisibleBy
  * Has to be tested!
  */
 uint ShiftDVec::lcmDivisibleBy
-  ( LObject * lcm, ShiftDVec::sTObject * p, 
+  ( LObject * lcm, SD::sTObject * p, 
     int numVars                             )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering lcmDivisibleBy", "Leaving lcmDivisibleBy", 16 );
   lcm->SetLcmDvecIfNULL();
   p->SetDVecIfNULL();
@@ -695,7 +695,7 @@ uint ShiftDVec::lcmDivisibleBy
  * overlaps have to be freed manually (with omFreeSize)!
  */
 uint ShiftDVec::findRightOverlaps
-  ( ShiftDVec::sTObject * t1, ShiftDVec::sTObject * t2, 
+  ( SD::sTObject * t1, SD::sTObject * t2, 
     int numVars, int maxDeg, uint ** overlaps )
 {
   t1->SetDVecIfNULL(); t2->SetDVecIfNULL();
@@ -771,7 +771,7 @@ BOOLEAN ShiftDVec::redViolatesDeg
     ring aLmRing, ring bLmRing, ring bTailRing )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering redViolatesDeg.", "Leaving redViolatesDeg.", 1 );
   if(!uptodeg || !b) return FALSE;
   //or should we return true, if !b ?
@@ -812,10 +812,10 @@ BOOLEAN ShiftDVec::redViolatesDeg
  *   degree bound.
  */
 BOOLEAN ShiftDVec::redViolatesDeg
-  ( ShiftDVec::TObject* a, ShiftDVec::TObject* b, int uptodeg, ring lmRing )
+  ( SD::TObject* a, SD::TObject* b, int uptodeg, ring lmRing )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering redViolatesDeg v2.", 
       "Leaving redViolatesDeg v2.", 1 );
 
@@ -871,7 +871,7 @@ bool ShiftDVec::createSPviolatesDeg
     ring aLmRing, ring bLmRing, ring aTailRing, ring bTailRing )
 {
   initDeBoGri
-    ( ShiftDVec::indent, 
+    ( SD::indent, 
       "Entering createSPviolatesDeg", 
       "Leaving createSPviolatesDeg", 1 );
   if(!uptodeg) return false;
