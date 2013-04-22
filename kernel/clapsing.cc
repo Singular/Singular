@@ -1100,9 +1100,16 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
 
   ideal res=NULL;
 
+  int offs = rPar(currRing);
   if (f==NULL)
   {
-    return NULL;
+    res= idInit (1, 1);
+    mipos= idInit (1, 1);
+    mipos->m[0]= convFactoryPSingTrP (Variable (offs)); //overkill
+    (*exps)=new intvec (1);
+    (**exps)[0]= 1;
+    numFactors= 0;
+    return res;
   }
   CanonicalForm F( convSingTrPFactoryP( f ) );
 
@@ -1119,8 +1126,6 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
   res= idInit (n, 1);
 
   mipos= idInit (n, 1);
-
-  int offs = rPar(currRing);
 
   Variable x= Variable (offs);
   Variable alpha;
