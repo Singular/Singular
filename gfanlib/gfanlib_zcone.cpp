@@ -5,13 +5,21 @@
  *      Author: anders
  */
 
+
+#include "config.h"
+
 #include "gfanlib_zcone.h"
 
 #include <vector>
 #include <set>
 
+#ifdef HAVE_CDD_SETOPER_H
+#include "cdd/setoper.h"
+#include "cdd/cdd.h"
+#else
 #include "setoper.h"
 #include "cdd.h"
+#endif
 
 namespace gfan{
 

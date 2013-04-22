@@ -18,8 +18,9 @@ AC_PROG_RANLIB
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([gmp.h])
-AC_CHECK_HEADERS([setoper.h])
-AC_CHECK_HEADERS([cdd.h],,,
+AC_CHECK_HEADERS([cdd/setoper.h setoper.h], 
+                 [break]) 
+AC_CHECK_HEADERS([cdd/cdd.h],,,
 [
 # include <setoper.h>
 ])
@@ -55,4 +56,5 @@ AC_C_INLINE
 #AC_SUBST(SINGUNAME)
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_HEADERS([config.h])
 AC_OUTPUT

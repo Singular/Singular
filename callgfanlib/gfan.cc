@@ -26,15 +26,22 @@ Date: 2009/11/03 06:57:32
 #include <stdlib.h>
 #include <assert.h>
 #include <gfanlib/gfanlib.h>
+#include <gfanlib/config.h>
 
 /*DO NOT REMOVE THIS*/
 #ifndef GMPRATIONAL
 #define GMPRATIONAL
 #endif
 
+#ifdef HAVE_CDD_SETOPER_H
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
+#include <cdd/cddmp.h>
+#else
 #include <setoper.h>
 #include <cdd.h>
 #include <cddmp.h>
+#endif
 
 #ifndef gfan_DEBUG
 // #define gfan_DEBUG
@@ -4409,7 +4416,7 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
                         if(isMonomial(gcAct->gcBasis))
                         {//FIXME
                                 WerrorS("Monomial input - terminating");
-                                dd_free_global_constants();
+                                //dd_free_global_constants();
                                 //This is filthy
                                 goto pointOfNoReturn;
                         }
@@ -4441,7 +4448,7 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
                         }
                 }//method==noRevS
                 dd_FreeMatrix(gcone::dd_LinealitySpace);
-                dd_free_global_constants();
+                //dd_free_global_constants();
         }//rHasGlobalOrdering
         else
         {
