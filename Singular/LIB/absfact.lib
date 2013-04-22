@@ -25,6 +25,7 @@ SEE ALSO: factorize
 
 PROCEDURES:
   absFactorize();        absolute factorization of poly
+  absBiFactorize();      absolute factorization of bivariate poly
 ";
 
 ////////////////////////////////////////////////////////////////////
@@ -606,7 +607,41 @@ example
   absolute_factors;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 proc absBiFactorize(poly p, list #)
+"USAGE:  absBiFactorize(p [,s]);   p poly, s string
+ASSUME: coefficient field is the field of rational numbers or a
+        transcendental extension thereof
+RETURN: ring @code{R} which is obtained from the current basering
+        by adding a new parameter (if a string @code{s} is given as a
+        second input, the new parameter gets this string as name). The ring
+        @code{R} comes with a list @code{absolute_factors} with the
+        following entries:
+@format
+    absolute_factors[1]: ideal   (the absolute factors)
+    absolute_factors[2]: intvec  (the multiplicities)
+    absolute_factors[3]: ideal   (the minimal polynomials)
+    absolute_factors[4]: int     (total number of nontriv. absolute factors)
+@end format
+        The entry @code{absolute_factors[1][1]} is a constant, the
+        entry @code{absolute_factors[3][1]} is the parameter added to the
+        current ring.@*
+        Each of the remaining entries @code{absolute_factors[1][j]} stands for
+        a class of conjugated absolute factors. The corresponding entry
+        @code{absolute_factors[3][j]} is the minimal polynomial of the
+        field extension over which the factor is minimally defined (its degree
+        is the number of conjugates in the class). If the entry
+        @code{absolute_factors[3][j]} coincides with @code{absolute_factors[3][1]},
+        no field extension was necessary for the @code{j}th (class of)
+        absolute factor(s).
+NOTE:   The input polynomial p is assumed to be bivariate or to contain one para-
+        meter and one variable. All factors are presented denominator- and 
+        content-free. The constant factor (first entry) is chosen such that the
+        product of all (!) the (denominator- and content-free) absolute factors
+        of @code{p} equals @code{p / absolute_factors[1][1]}.
+SEE ALSO: factorize, absPrimdecGTZ, absFactorize
+EXAMPLE: example absBiFactorize; shows an example
+"
 {
   int dblevel = printlevel - voice + 2;
   dbprint(dblevel,"Entering absfact.lib::absBiFactorize with ",p);
@@ -723,7 +758,6 @@ proc absBiFactorize(poly p, list #)
     int di=deg(p);
   }
 
-  MPo;
   list tmpf=absBiFact (p);
 
   // the homogeneous case, homogenizing the result
@@ -781,12 +815,21 @@ proc absBiFactorize(poly p, list #)
   setring(MP);
 
   dbprint( printlevel-voice+3,"
-// 'absFactorize' created a ring, in which a list absolute_factors (the
+// 'absBiFactorize' created a ring, in which a list absolute_factors (the
 // absolute factors) is stored.
 // To access the list of absolute factors, type (if the name S was assigned
 // to the return value):
         setring(S); absolute_factors; ");
   return(MPo);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = (0), (x,y), lp;
+  poly p = (-7*x^2 + 2*x*y^2 + 6*x + y^4 + 14*y^2 + 47)*(5x2+y2)^3*(x-y)^4;
+  def S = absBiFactorize(p) ;
+  setring(S);
+  absolute_factors;
 }
 
 
