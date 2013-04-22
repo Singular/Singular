@@ -1120,7 +1120,9 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
 
   mipos= idInit (n, 1);
 
-  Variable x= Variable (1);
+  int offs = rPar(currRing);
+
+  Variable x= Variable (offs);
   Variable alpha;
   int i= 0;
   numFactors= 0;
