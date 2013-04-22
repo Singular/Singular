@@ -64,7 +64,8 @@ set(kernel_srcs
     ideals.cc intvec.cc int64vec.cc
     khstd.cc kstdfac.cc
     kstd1.cc kstd2.cc kutil.cc
-    kutil2.cc shiftDVec.cc shiftDVec2.cc SDMultiplication.cc
+    SDBase.cc SDkutil.cc SDDebug.cc SDPairs.cc
+    SDMultiplication.cc SDLeftGB.cc 
     longalg.cc longrat.cc longrat0.cc
     maps.cc matpol.cc misc.cc gnumpfl.cc gnumpc.cc
     rmodulo2m.cc rmodulon.cc rintegers.cc

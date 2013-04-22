@@ -38,7 +38,8 @@ SOURCES = polys.cc febase.cc feread.cc \
     ideals.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
-    kutil2.cc shiftDVec.cc shiftDVec2.cc SDMultiplication.cc \
+    SDBase.cc SDkutil.cc SDDebug.cc SDPairs.cc \
+    SDMultiplication.cc SDLeftGB.cc \
     nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
     fast_maps.cc \
