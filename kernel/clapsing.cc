@@ -1093,7 +1093,6 @@ notImpl:
   return res;
 }
 #ifdef HAVE_NTL
-#ifdef HAVE_FLINT
 ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
 {
   pTest(f);
@@ -1166,7 +1165,6 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
   mipos->m[0]= convFactoryPSingTrP (x);
   return res;
 }
-#endif
 #endif
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
 {
