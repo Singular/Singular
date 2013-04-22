@@ -136,16 +136,14 @@ differentevalpoint:
       if (absIrredTest (Fp))
       {
         setCharacteristic(0);
-        alpha= rootOf (x);
-        return CFAFList (CFAFactor (G, getMipo (alpha), 1));
+        return CFAFList (CFAFactor (G, 1, 1));
       }
       else
       {
         setCharacteristic (0);
         if (modularIrredTestWithShift (F))
         {
-          alpha= rootOf (x);
-          return CFAFList (CFAFactor (G, getMipo (alpha), 1));
+          return CFAFList (CFAFactor (G, 1, 1));
         }
         rec= true;
         continue;
