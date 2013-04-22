@@ -788,6 +788,12 @@ EXAMPLE: example absBiFactorize; shows an example
     tmpf=imap(MPhelp,tmpf);
   }
 
+  if (pa)
+  {
+    number cok=imap(MP,cok);
+    tmpf[1][1]=cok*tmpf[1][1];
+  }
+
   // if we want the output as string
   if(size(#)>0)
   {
