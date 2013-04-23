@@ -19,6 +19,7 @@
 #include "cf_algorithm.h"
 #include "cf_map.h"
 
+#ifdef HAVE_NTL
 /// main absolute factorization routine, expects bivariate poly which is
 /// primitive wrt. any of its variables and irreducible over Q
 ///
@@ -29,7 +30,7 @@
 ///         factor
 CFAFList absFactorizeMain (const CanonicalForm& F ///<[in] s.a.
                           );
-
+#endif
 
 /// normalize factors, i.e. make factors monic
 static inline
@@ -92,6 +93,7 @@ CFAFList absFactorize (const CanonicalForm& G);
 
 /*ENDPUBLIC*/
 
+#ifdef HAVE_NTL
 /// absolute factorization of bivariate poly over Q
 ///
 /// @return absFactorize returns a list whose entries contain three entities:
@@ -171,5 +173,6 @@ CFAFList absFactorize (const CanonicalForm& G ///<[in] bivariate poly over Q
 
   return result;
 }
+#endif
 
 #endif
