@@ -14,11 +14,14 @@
 #include <config.h>
 #include <stdlib.h>
 
+#include "assert.h"
+
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "cf_algorithm.h"
 #include "cf_primes.h"
 #include "cf_reval.h"
+#include "cf_factory.h"
 #include "cfNewtonPolygon.h"
 #include "templates/ftmpl_functions.h"
 #include "algext.h"

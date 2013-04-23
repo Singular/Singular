@@ -16,9 +16,8 @@
 
 #include "assert.h"
 
-#include "canonicalform.h"
+#include "cf_algorithm.h"
 #include "cf_map.h"
-#include "cfNewtonPolygon.h"
 
 /// main absolute factorization routine, expects bivariate poly which is
 /// primitive wrt. any of its variables and irreducible over Q
