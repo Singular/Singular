@@ -194,4 +194,7 @@ AC_CONFIG_FILES([IntegerProgramming/Makefile])
 AC_CONFIG_FILES([libsingular-config])
 AC_CONFIG_SUBDIRS([gfanlib])
 
+AC_CONFIG_FILES([debian/icons/Singular.desktop])
+AC_CONFIG_FILES([debian/icons/Singular-manual.desktop])
+
 AC_OUTPUT
