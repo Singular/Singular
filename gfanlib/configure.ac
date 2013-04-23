@@ -34,28 +34,29 @@ SING_CHECK_GFANLIB
 #	AC_MSG_WARN([Error, gmp.h is missing!])
 #	exit 1
 # fi
-AC_CHECK_HEADERS([setoper.h])
-if test "$ac_cv_header_setoper_h" == no 
+AC_CHECK_HEADERS([cdd/setoper.h setoper.h])
+if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no
 then
 	AC_MSG_WARN([Error, setoper.h is missing!])
 fi
 
-AC_CHECK_HEADERS([cdd.h],,,
-[
-# include <setoper.h>
-])
+# if setoper.h is there, assume that also cdd.h is there
+#AC_CHECK_HEADERS([cdd/cdd.h cdd.h],,,
+#[
+## include <setoper.h>
+#])
 
-if test "$ac_cv_header_cdd_h" == no
+if test "$ac_cv_header_cdd_h" == no -a "$ac_cv_header_cdd_cdd_h" == no
 then
 	AC_MSG_WARN([Error, cdd.h is missing!])
 fi
 
 if test "x$ENABLE_GFANLIB" = xyes; then
-if test "$ac_cv_header_setoper_h" == no 
+if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no
 then
 	exit 1
 fi
-if test "$ac_cv_header_cdd_h" == no
+if test "$ac_cv_header_cdd_h" == no -a "$ac_cv_header_cdd_cdd_h" == no
 then
 	exit 1
 fi
@@ -81,4 +82,5 @@ AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
 #AC_SUBST(SINGUNAME)
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_HEADERS([config.h])
 AC_OUTPUT

@@ -31,9 +31,15 @@ Date: 2009/11/03 06:57:32
 #define GMPRATIONAL
 #endif
 
+#ifdef HAVE_CDD_SETOPER_H
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
+#include <cdd/cddmp.h>
+#else
 #include <setoper.h>
 #include <cdd.h>
 #include <cddmp.h>
+#endif
 
 #ifndef gfan_DEBUG
 // #define gfan_DEBUG

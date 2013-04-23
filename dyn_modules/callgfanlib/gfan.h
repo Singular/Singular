@@ -8,9 +8,16 @@ Author: monerjan
 
 #include <libpolys/misc/int64vec.h>
 
+#include <gfanlib/config.h>
+#ifdef HAVE_CDD_SETOPER_H
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
+#include <cdd/cddmp.h>
+#else
 #include <setoper.h>
 #include <cdd.h>
 #include <cddmp.h>
+#endif
 #include <bbfan.h>
 #include <bbcone.h>
 extern int gfanHeuristic;
