@@ -103,9 +103,8 @@ CFAFList absFactorize (const CanonicalForm& G ///<[in] bivariate poly over Q
                       )
 {
   //TODO handle homogeneous input
-  ASSERT (getNumVars (F) == 2, "expected bivariate input");
-  ASSERT (getCharacteristic() == 0 && isOn (SW_RATIONAL),
-          "expected poly over Q");
+  ASSERT (getNumVars (G) <= 2, "expected bivariate input");
+  ASSERT (getCharacteristic() == 0, "expected poly over Q");
 
   CFMap N;
   CanonicalForm F= compress (G, N);
