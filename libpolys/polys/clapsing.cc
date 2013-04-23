@@ -1070,14 +1070,17 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
     i++;
     iter++;
   }
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
   for (; iter.hasItem(); iter++, i++)
   {
     (**exps)[i]= iter.getItem().exp();
     alpha= iter.getItem().minpoly().mvar();
-    if (iter.getItem().minpoly().isOne()) //TODO make sure isOn (SW_RATIONAL) == true
-      lead /= bCommonDen (iter.getItem().factor());
+    if (iter.getItem().minpoly().isOne())
+      lead /= power (bCommonDen (iter.getItem().factor()), iter.getItem().exp());
     else
-      lead /= power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly()));
+      lead /= power (power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly())), iter.getItem().exp());
     res->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().factor()*bCommonDen (iter.getItem().factor()), alpha, x), r);
     if (iter.getItem().minpoly().isOne())
     {
@@ -1091,6 +1094,8 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
     }
     numFactors += count;
   }
+  if (!isRat)
+    Off (SW_RATIONAL);
 
   (**exps)[0]= 1;
   res->m[0]= convFactoryPSingTrP (lead, r);
