@@ -409,8 +409,10 @@ moduledir = $(libexecdir)/singular/MOD
 
 module_LTLIBRARIES =
 
+if ENABLE_P_PROCS_DYNAMIC
 if PYTHON_MODULE
 module_LTLIBRARIES += pyobject.la
+endif
 endif
 
 pyobject_la_SOURCES = pyobject.cc

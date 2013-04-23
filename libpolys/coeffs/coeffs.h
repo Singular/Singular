@@ -138,12 +138,6 @@ struct n_Procs_s
    /// Converts a non-negative number n into a GMP number, 0 if impossible
    void     (*cfMPZ)(mpz_t result, number &n, const coeffs r);
    
-#ifdef HAVE_RINGS
-   int     (*cfDivComp)(number a,number b,const coeffs r);
-   BOOLEAN (*cfIsUnit)(number a,const coeffs r);
-   number  (*cfGetUnit)(number a,const coeffs r);
-#endif
-
    /// changes argument  inline: a:= -a
    /// return -a! (no copy is returned)
    /// the result should be assigned to the original argument: e.g. a = n_Neg(a,r)
@@ -164,10 +158,16 @@ struct n_Procs_s
    
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
    void    (*cfNormalize)(number &a, const coeffs r);
-   BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
+   
 #ifdef HAVE_RINGS
-           (*cfDivBy)(number a, number b, const coeffs r),
+   int     (*cfDivComp)(number a,number b,const coeffs r);
+   BOOLEAN (*cfIsUnit)(number a,const coeffs r);
+   number  (*cfGetUnit)(number a,const coeffs r);
+   BOOLEAN (*cfDivBy)(number a, number b, const coeffs r);
 #endif
+
+   
+   BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
             /// tests
            (*cfEqual)(number a,number b, const coeffs r),
            (*cfIsZero)(number a, const coeffs r),
@@ -427,15 +427,12 @@ static inline BOOLEAN n_Greater(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfGreater!=NULL); return r->cfGreater(a,b,r); }
 
 #ifdef HAVE_RINGS
+static inline int n_DivComp(number a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfDivComp!=NULL); return r->cfDivComp (a,b,r); }
+
 /// TRUE iff n has a multiplicative inverse in the given coeff field/ring r
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfIsUnit!=NULL); return r->cfIsUnit(n,r); }
-
-static inline number n_ExtGcd(number a, number b, number *s, number *t, const coeffs r)
-{ assume(r != NULL); assume(r->cfExtGcd!=NULL); return r->cfExtGcd (a,b,s,t,r); }
-
-static inline int n_DivComp(number a, number b, const coeffs r)
-{ assume(r != NULL); assume(r->cfDivComp!=NULL); return r->cfDivComp (a,b,r); }
 
 /// in Z: 1
 /// in Z/kZ (where k is not a prime): largest divisor of n (taken in Z) that
@@ -575,6 +572,11 @@ static inline number n_ExactDiv(number a, number b, const coeffs r)
 /// in K(t_1, ..., t_n): not implemented
 static inline number n_Gcd(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfGcd!=NULL); return r->cfGcd(a,b,r); }
+
+/// beware that ExtGCD is only relevant for a few chosen coeff. domains
+/// and may perform something unexpected in some cases...
+static inline number n_ExtGcd(number a, number b, number *s, number *t, const coeffs r)
+{ assume(r != NULL); assume(r->cfExtGcd!=NULL); return r->cfExtGcd (a,b,s,t,r); }
 
 /// in Z: return the lcm of 'a' and 'b'
 /// in Z/nZ, Z/2^kZ: computed as in the case Z
@@ -818,7 +820,9 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 
 // Missing wrappers for: (TODO: review this?)
 // cfIntMod, cfRead, cfName, cfInit_bigint
-// HAVE_RINGS: cfDivComp, cfExtGcd... 
+
+// HAVE_RINGS: cfDivComp, cfIsUnit, cfGetUnit, cfDivBy
+// BUT NOT cfExtGcd...!
 
 
 /// Computes the content and (inplace) divides it out on a collection

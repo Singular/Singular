@@ -18,10 +18,10 @@
 #endif
 
 /* standard types */
-#ifdef HAVE_RINGS
-typedef unsigned long NATNUMBER;
-typedef mpz_ptr int_number;
-#endif
+//#ifdef HAVE_RINGS
+//typedef unsigned long NATNUMBER;
+//typedef mpz_ptr int_number;
+//#endif
 
 #define BITSET  unsigned int
 

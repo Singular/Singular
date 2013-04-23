@@ -6,61 +6,66 @@
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <time.h>
-#include <unistd.h>
-
 #include "config.h"
-#include <coeffs/bigintmat.h>
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
-#include <Singular/ipid.h>
-#include <misc/intvec.h>
+
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/febase.h>
-#include <Singular/sdb.h>
-#include <kernel/ideals.h>
-#include <polys/prCopy.h>
-#include <polys/matpol.h>
-#include <kernel/kstd1.h>
-#include <kernel/timer.h>
 
-#include <kernel/preimage.h>
+#include <coeffs/bigintmat.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
 
-#include <Singular/subexpr.h>
-#include <Singular/lists.h>
-#include <kernel/modulop.h>
 #ifdef HAVE_RINGS
 #include <coeffs/rmodulon.h>
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rintegers.h>
 #endif
-#include <coeffs/numbers.h>
-#include <kernel/stairc.h>
+
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <polys/prCopy.h>
+#include <polys/matpol.h>
 #include <polys/monomials/maps.h>
-#include <Singular/maps_ip.h>
-#include <kernel/syz.h>
+#include <polys/coeffrings.h>
+#include <polys/sparsmat.h>
+#include <polys/mod_raw.h>
 #include <polys/weight.h>
+
+
+#include <kernel/modulop.h>
+#include <kernel/stairc.h>
+#include <kernel/mod2.h>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/timer.h>
+#include <kernel/preimage.h>
+#include <kernel/units.h>
+#include <kernel/GMPrat.h>
+#include <kernel/tgb.h>
+#include <kernel/walkProc.h>
+#include <kernel/linearAlgebra.h>
+#include <kernel/syz.h>
+#include <kernel/timer.h>
+
+
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <Singular/sdb.h>
+#include <Singular/subexpr.h>
+#include <Singular/lists.h>
+#include <Singular/maps_ip.h>
+
 #include <Singular/ipconv.h>
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>
-#include <polys/sparsmat.h>
-#include <kernel/units.h>
 #include <Singular/janet.h>
-#include <kernel/GMPrat.h>
-#include <kernel/tgb.h>
-#include <kernel/walkProc.h>
-#include <polys/mod_raw.h>
 #include <Singular/MinorInterface.h>
-#include <kernel/linearAlgebra.h>
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
+
 #ifdef HAVE_FACTORY
 #  include <factory/factory.h>
 #  include <polys/clapsing.h>
@@ -68,6 +73,7 @@
 #  include <kernel/fglm.h>
 #  include <Singular/fglm.h>
 #endif /* HAVE_FACTORY */
+
 #include <Singular/interpolation.h>
 
 #include <Singular/blackbox.h>
@@ -75,10 +81,16 @@
 #include <Singular/ipshell.h>
 //#include <kernel/mpr_inout.h>
 
-#include <kernel/timer.h>
-
-#include <polys/coeffrings.h>
 #include <Singular/si_signals.h>
+
+
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
+
 
 lists rDecompose(const ring r);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);

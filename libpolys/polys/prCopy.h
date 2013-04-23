@@ -7,6 +7,9 @@
 * ABSTRACT - declarations of functions for Copy/Move/Delete for Polys
 */
 
+struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
+struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
+struct sip_sideal; typedef struct sip_sideal *ideal;
 
 /*************************************************************************
  *

@@ -5,17 +5,11 @@
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 
-struct  spolyrec;
-typedef struct spolyrec    polyrec;
-typedef polyrec *          poly;
-
-struct ip_sring;
-typedef struct ip_sring *         ring;
+struct  spolyrec; typedef struct spolyrec    polyrec; typedef polyrec *          poly;
+struct ip_sring; typedef struct ip_sring *         ring;
+struct sip_sideal; typedef struct sip_sideal *       ideal;
 
 class intvec;
-
-struct sip_sideal;
-typedef struct sip_sideal *       ideal;
 
 class skStrategy; typedef skStrategy * kStrategy;
 typedef ideal (*GB_Proc_Ptr)(const ideal, const ideal, const intvec*, const intvec*, kStrategy, const ring);

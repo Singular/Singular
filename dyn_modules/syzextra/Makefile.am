@@ -74,4 +74,4 @@ if WANT_DEBUG
 TESTS+=test_debug.sh
 endif
 
-EXTRA_DIST = syzextra.tst ederc.tst test.sh $(TESTS)
+EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)
