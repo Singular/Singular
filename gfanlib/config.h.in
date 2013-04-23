@@ -1,0 +1,11 @@
+/* emacs edit mode for this file is -*- C -*- */
+
+#ifndef INCL_CONFIG_H
+#define INCL_CONFIG_H
+
+/* where are the cdd headers? */
+#undef HAVE_CDD_SETOPER_H
+
+#undef HAVE_SETOPER_H
+
+#endif /* ! INCL_CONFIG_H */
