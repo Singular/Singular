@@ -277,10 +277,10 @@ differentevalpoint:
 
     setCharacteristic(0);
     CanonicalForm liftedSmallestFactor=
-    convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[0],Variable (1));
+    convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[0],x);
 
     CanonicalForm otherFactor=
-    convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[1],Variable (1));
+    convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[1],x);
     modpk pk= modpk (p, k);
 #else
     modpk pk= modpk (p, k);
@@ -311,10 +311,10 @@ differentevalpoint:
     MultiLift (liftedFactors, modFactors, NTLFi, (long) k);
     setCharacteristic(0);
     CanonicalForm liftedSmallestFactor=
-                  convertNTLZZX2CF (liftedFactors[0],Variable (1));
+                  convertNTLZZX2CF (liftedFactors[0], x);
 
     CanonicalForm otherFactor=
-                  convertNTLZZX2CF (liftedFactors[1], Variable (1));
+                  convertNTLZZX2CF (liftedFactors[1], x);
 #endif
 
     Off (SW_SYMMETRIC_FF);
