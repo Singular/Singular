@@ -813,7 +813,7 @@ EXAMPLE: example absBiFactorize; shows an example
           }
         }
         abs_fac=abs_fac,newvar;
-        return(string(abs_fac)); //TODO muss ich Parameter zu Variable machen
+        return(string(abs_fac));
       }
     }
   }
