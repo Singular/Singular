@@ -1,0 +1,16 @@
+Source: singular
+Maintainer: Mathias Schulze <mschulze@mathematik.uni-kl.de>
+Section: math
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 8)
+
+Package: singular
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: computer algebra system for polynomial computations
+ Singular is a computer algebra system for polynomial computations with emphasis on the special needs of commutative algebra, algebraic geometry, and singularity theory.
+ Singular's main computational objects are ideals and modules over a large variety of baserings. The baserings are polynomial rings or localizations thereof over a field (e.g., finite fields, the rationals, floats, algebraic extensions, transcendental extensions) or quotient rings with respect to an ideal.
+ Singular features one of the fastest and most general implementations of various algorithms for computing Groebner resp. standard bases. The implementation includes Buchberger's algorithm (if the ordering is a wellordering) and Mora's algorithm (if the ordering is a tangent cone ordering) as special cases. Furthermore, it provides polynomial factorizations, resultant, characteristic set and gcd computations, syzygy and free-resolution computations, and many more related functionalities.
+ Based on an easy-to-use interactive shell and a C-like programming language, Singular's internal functionality is augmented and user-extendible by libraries written in the Singular programming language. A general and efficient implementation of communication links allows Singular to make its functionality available to other programs.
+
