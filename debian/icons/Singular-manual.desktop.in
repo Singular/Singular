@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=@PACKAGE_VERSION@
+Name=Singular Manual
+Name[de]=Singular-Handbuch
+Comment=read the user manual for Singular @PACKAGE_VERSION@
+Comment[de]=im Benutzerhandbuch zu Singular @PACKAGE_VERSION@ lesen
+Comment[es]=
+Comment[fr]=lire le manuel d'utilisation de Singular @PACKAGE_VERSION@
+Comment[ru]=
+Type=Link
+URL=file:///usr/share/doc/Singular/html/index.htm
+Icon=/usr/share/icons/Singular.png
+Categories=Math;Science;Development;Education;Documentation;
+Encoding=UTF-8
+
