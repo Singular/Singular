@@ -233,20 +233,21 @@ void ShiftDVec::initenterpairs
     {
       r_ovl_sizes[i] = 
         SD::findRightOverlaps
-          ( H, strat->S_2_T(i), 
-            strat->lV, strat->uptodeg, &(r_overlaps[i]) );
+          ( H, strat->S_2_T(i), strat->get_lV(),
+            strat->get_uptodeg(), &(r_overlaps[i]) );
 
       l_ovl_sizes[i] = 
         SD::findRightOverlaps
-          ( strat->S_2_T(i), H,
-            strat->lV, strat->uptodeg, &(l_overlaps[i]) );
+          ( strat->S_2_T(i), H, strat->get_lV(),
+            strat->get_uptodeg(), &(l_overlaps[i]) );
     }
 
     //BOCO: We are also interested in overlaps of H with itself.
     uint* s_overlaps;
     uint  s_ovl_size = 
       SD::findRightOverlaps
-        ( H,H,strat->lV, strat->uptodeg, &s_overlaps);
+        ( H, H,
+          strat->get_lV(), strat->get_uptodeg(), &s_overlaps );
 
     //BOCO: Before entering new pairs, we want to use the
     //Gebauer-Moeller criterion, to filter some pairs, we do
@@ -691,8 +692,8 @@ void ShiftDVec::DeBoGriTestGM
  *
  * This function has to be checked!                           */
 bool ShiftDVec::GMTestRight
-  ( ShiftDVec::TObject* H1, ShiftDVec::TObject* H2, ShiftDVec::TObject* H3, 
-    uint shift2, uint shift3, ShiftDVec::kStrategy strat, ring r )
+  ( SD::TObject* H1, SD::TObject* H2, SD::TObject* H3,
+    uint shift2, uint shift3, SD::kStrategy strat, ring r )
 {
   /* We will do that by comparing the dvecs of h2 and h3. We
    * assume, that h2 and h3 have at least overlap of degree one
@@ -717,20 +718,7 @@ bool ShiftDVec::GMTestRight
    * If you have a more concise, or better way to express these
    * thoughts - feel free to contact the developers of this
    * piece of code.                                           */
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering GMTestRight the other version.", 
-      "Leaving GMTestRight the other version.", 128 );
-
   assume(shift2 > shift3 && shift3 > 0);
-
-  deBoGriPrint
-    ("The following pair will be considered for cancellation:", 128);
-  deBoGriPrint(H1->p, "h1: ", 128);
-  deBoGriPrint(H2->p, shift2, strat, "shift2*h2 ", 128);
-  deBoGriPrint
-    ("The pair might be cancelled because of: ", 128);
-  deBoGriPrint(H3->p, shift3, strat, "shift3*h3: ", 128);
 
   int degH1 = H1->GetDVsize(); 
   int degH3 = H3->GetDVsize(); 
@@ -742,14 +730,10 @@ bool ShiftDVec::GMTestRight
   int minCmpDV3 = degH1 - shift3;
   int cmpLength = degH3 + shift3 - degH1;
 
-  if( H2->cmpDVecProper
-      (H3, minCmpDV2, minCmpDV3, cmpLength, strat->lV) == 0 )
-  {
-    deBoGriPrint("GMTestRight will return true.", 128);
-    return true;
-  }
+  int dv1_eq_dv3 = H2->cmpDVecProper
+    ( H3, minCmpDV2, minCmpDV3, cmpLength, strat->get_lV() );
+  if( dv1_eq_dv3 == 0 ) return true;
 
-  deBoGriPrint("GMTestRight will return false.", 128);
   return false;
 }
 
@@ -761,8 +745,8 @@ bool ShiftDVec::GMTestRight
  *
  * This function has to be checked!                           */
 bool ShiftDVec::GMTestLeft
-  ( ShiftDVec::TObject* H1, ShiftDVec::TObject* H2, ShiftDVec::TObject* H3, 
-    uint shift2, uint shift3, ShiftDVec::kStrategy strat, ring r )
+  ( SD::TObject* H1, SD::TObject* H2, SD::TObject* H3, 
+    uint shift2, uint shift3, SD::kStrategy strat, ring r )
 {
   initDeBoGri
     ( ShiftDVec::indent, 
@@ -1167,21 +1151,28 @@ void ShiftDVec::enterRightOverlaps
     for (int j = 0; j < sizesRightOvls[i]; j++)
     {
       uint shiftSi = rightOvls[i][j];
+      bool creation_of_spoly_violates_degree =
+        SD::createSPviolatesDeg
+          ( strat->S[i], H->p, shiftSi,
+            strat->get_uptodeg(), currRing,
+            currRing, strat->tailRing, strat->tailRing );
+      bool shift_of_spoly_violates_degree =
+        SD::shiftViolatesDeg
+            ( strat->S[i], shiftSi,
+              strat->get_uptodeg(), 
+              currRing, strat->tailRing );
       if( shiftSi &&
-          !SD::createSPviolatesDeg
-            ( strat->S[i], H->p, shiftSi, strat->uptodeg, 
-              currRing, currRing, 
-              strat->tailRing, strat->tailRing            ) &&
-          !shiftViolatesDeg
-            ( strat->S[i], shiftSi, strat->uptodeg, 
-              currRing, strat->tailRing             )          )
+          !shift_of_spoly_violates_degree &&
+          !creation_of_spoly_violates_degree )
         //grico: checks if degbound is violated
       {
         deBoGriPrint("No degree Violation!", 1);
         int isFromQi = 0; //BOCO: hack TODO: clear
         LObject* Pair = SD::enterOnePair
-          ( H->p, atR, isFromQ, ecart, strat->S[i], shiftSi,
-            strat->S_2_R[i], strat->ecartS[i], isFromQi, strat );
+          ( H->p, atR, isFromQ,
+            ecart, strat->S[i],
+            shiftSi, strat->S_2_R[i],
+            strat->ecartS[i], isFromQi, strat );
 
         //grico: sets new_pair to true, as in the old
         //version
@@ -1196,7 +1187,8 @@ void ShiftDVec::enterRightOverlaps
 
 /* Enter the left overlaps of H with Elements from S */
 void ShiftDVec::enterLeftOverlaps
-  ( ShiftDVec::LObject* H, ShiftDVec::kStrategy strat, int k, uint** leftOvls, 
+  ( ShiftDVec::LObject* H,
+    ShiftDVec::kStrategy strat, int k, uint** leftOvls,
     uint* sizesLeftOvls, int isFromQ, int ecart, int atR )
 {
   initDeBoGri
@@ -1210,14 +1202,18 @@ void ShiftDVec::enterLeftOverlaps
     for (int j = 0; j < sizesLeftOvls[i]; j++)
     {
       uint shiftH = leftOvls[i][j];
+      bool creation_of_spoly_violates_degree =
+        SD::createSPviolatesDeg
+          ( H->p, strat->S[i],
+            shiftH, strat->get_uptodeg(), currRing,
+            currRing, strat->tailRing, strat->tailRing );
+      bool shift_of_spoly_violates_degree =
+        SD::shiftViolatesDeg
+          ( H->p, shiftH,
+            strat->get_uptodeg(), currRing, strat->tailRing );
       if( shiftH &&
-          !SD::createSPviolatesDeg
-            ( H->p, strat->S[i], shiftH, strat->uptodeg, 
-              currRing, currRing, 
-              strat->tailRing, strat->tailRing           ) && 
-          !shiftViolatesDeg
-            ( H->p, shiftH, strat->uptodeg,
-              currRing, strat->tailRing     )                 )
+          !shift_of_spoly_violates_degree &&
+          !creation_of_spoly_violates_degree )
         //grico: checks if degbound is violated
       {
         deBoGriPrint("No degree Violation!", 1);
@@ -1248,7 +1244,8 @@ void ShiftDVec::enterLeftOverlaps
  * however, in the letterplace variant, our first entered
  * polynomial might have self overlaps.                       */
 void ShiftDVec::enterSelfOverlaps
-  ( ShiftDVec::LObject* H, ShiftDVec::kStrategy strat, uint* selfOvls,
+  ( ShiftDVec::LObject* H,
+    ShiftDVec::kStrategy strat, uint* selfOvls,
     uint numSelfOvls, int isFromQ, int ecart, int atR )
 {
   initDeBoGri

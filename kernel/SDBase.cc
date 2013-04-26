@@ -113,13 +113,16 @@ inline static intset initec (const int maxnr)
 }
 
 //BOCO: copied from kutil.cc
-static inline void enlargeL (ShiftDVec::LSet* L,int* length,const int incr)
+static inline void enlargeL
+  (SD::LSet* L,int* length,const int incr)
 {
   assume((*L)!=NULL);
   assume((length+incr)>0);
 
-  *L = (LSet)omReallocSize((*L),(*length)*sizeof(LObject),
-                                   ((*length)+incr)*sizeof(LObject));
+  *L = (SD::LSet)omReallocSize
+          ( (*L), 
+            (*length)*sizeof(SD::LObject),
+            ((*length)+incr)*sizeof(LObject) );
   (*length) += incr;
 }
 
@@ -209,8 +212,8 @@ ideal ShiftDVec::kStd
   kStrategy strat=new skStrategy;
 
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
-  strat->lV = lV;
-  strat->uptodeg = uptodeg;
+  strat->init_lV(lV);
+  strat->init_uptodeg(uptodeg);
 #endif
 
   if(!TEST_OPT_RETURN_SB)
@@ -314,10 +317,11 @@ ideal ShiftDVec::kStd
     else
 */
     {
+      ideal I = NULL; assume(0); //BOCO: TODO
       if (w!=NULL)
-        r=SD::bba(F,Q,*w,hilb,strat);
+        r=SD::bba(F,Q,I,*w,hilb,strat);
       else
-        r=SD::bba(F,Q,NULL,hilb,strat);
+        r=SD::bba(F,Q,I,NULL,hilb,strat);
     }
 //  } //BOCO: (deleted) see above
 #ifdef KDEBUG
@@ -340,7 +344,7 @@ ideal ShiftDVec::kStd
 #ifdef KDEBUG
 static int bba_count = 0;
 #endif /* KDEBUG */
-void kDebugPrint(ShiftDvec::kStrategy strat);
+void kDebugPrint(kStrategy strat);
 
 
 #if 0 //BOCO: original header (replaced)
@@ -776,7 +780,7 @@ ShiftDVec::InitSDMultiplication(currRing, strat);
       loop
       {
         if (j>=k) break;
-        LObject tmpL(strat->S[j]);
+        SD::LObject tmpL(strat->S[j]);
         SD::clearS(&tmpL,strat->sevS[j],&k,&j,strat);
         j++;
       }
@@ -913,12 +917,12 @@ void ShiftDVec::updateResult(ideal r,ideal Q, ShiftDVec::kStrategy strat)
            * divisibly by second arg! */
           ShiftDVec::sTObject t1(r->m[l]);
           ShiftDVec::sTObject t2(Q->m[q]); 
-          uint shift = 
-            p_LmDivisibleBy(&t1, &t2, currRing, strat->lV);
+          uint shift = p_LmDivisibleBy
+            (&t1, &t2, currRing, strat->get_lV());
           if ( (Q->m[q]!=NULL) && shift < UINT_MAX &&
                ( strat->homog ||
                 !redViolatesDeg
-                  ( r->m[l], r->m[q], strat->uptodeg, 
+                  ( r->m[l], r->m[q], strat->get_uptodeg(), 
                     currRing, currRing, strat->tailRing ) ) )
 #endif
           {
@@ -992,14 +996,20 @@ void ShiftDVec::updateResult(ideal r,ideal Q, ShiftDVec::kStrategy strat)
            * divisibly by second arg! */
           ShiftDVec::sTObject t1(r->m[q]); 
           ShiftDVec::sTObject t2(r->m[l]);
-          uint shift = 
-            p_LmDivisibleBy(&t1, &t2, currRing, strat->lV);
+
+          uint shift =
+            p_LmDivisibleBy
+              ( &t1, &t2, currRing, strat->get_lV() );
+
+          BOOLEAN reduction_violates_degree =
+            redViolatesDeg
+              ( r->m[q], r->m[l],
+                strat->get_uptodeg(),
+                currRing, currRing, strat->tailRing );
+
           if ( (l!=q) && 
                (shift < UINT_MAX) && (r->m[q]!=NULL) &&
-               ( strat->homog ||
-                 !redViolatesDeg
-                   ( r->m[q], r->m[l], strat->uptodeg,
-                     currRing, currRing, strat->tailRing ) ) )
+               (strat->homog || !reduction_violates_degree) )
 #endif
             {
               loGriToFile("pDelete(&r->m[q]) in updateResult ", 0,1024,(void*) r->m[q]);
@@ -1022,7 +1032,8 @@ static BOOLEAN sloppy_max = FALSE;
       //TODO: CLEANUP: remove this
 void completeReduce (kStrategy strat, BOOLEAN withT)
 #else //replacement
-void ShiftDVec::completeReduce (ShiftDVec::kStrategy strat, BOOLEAN withT)
+void ShiftDVec::completeReduce
+  ( SD::kStrategy strat, BOOLEAN withT )
 {
   namespace SD = ShiftDVec;
 
@@ -1223,15 +1234,17 @@ poly ShiftDVec::redtail (ShiftDVec::LObject* L, int pos, ShiftDVec::kStrategy st
       if (With == NULL) break;
 #else //replacement
         SD::TObject * WithTmp = SD::kFindDivisibleByInS
-          (strat, pos, &Ln, &With_s, shift, strat->lV, ecart);
+          ( strat, pos, &Ln,
+            &With_s, shift, strat->get_lV(), ecart );
         if (WithTmp == NULL) break;
         if(shift == 0){ With = WithTmp; } //no problem
         else //Our divisor is a shift (and thus not in T or S)
         {
           With = new TObject(*WithTmp); //should do just a shallow copy
           With->p = p_LPshiftT
-            ( WithTmp->p, shift, strat->uptodeg, strat->lV, 
-              strat, currRing                               );
+            ( WithTmp->p, shift,
+              strat->get_uptodeg(),
+              strat->get_lV(), strat, currRing );
           loGriToFile("p_LPshiftT in redtail ", 0,1024,(void*) With->p);
           /* BOCO: With->p has to be deleted later; i hope we
            * can just choose currRing for p_LPshift */
@@ -1328,38 +1341,15 @@ void ShiftDVec::initBba(ideal F,ShiftDVec::kStrategy strat)
 
   int i;
   idhdl h;
- /* setting global variables ------------------- */
+  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
-    strat->red = redHoney;
-#if 0 //BOCO: original code (deleted)
-      //BOCO: We do not consider redHoney/redLazy at the moment
-      //TODO: CLEANUP: remove this
-  if (strat->honey)
-    strat->red = redHoney;
-  else if (currRing->pLexOrder && !strat->homog)
-    strat->red = redLazy;
-  else
-  {
-#endif
-    strat->LazyPass *=4;
-#if 0 //BOCO: original code (replaced)
-      //TODO: CLEANUP: remove this
-    strat->red = redHomog;
-#else //BOCO: replacement
-    strat->red = SD::redHomog;
-#endif
-//} //BOCO: original code (deleted) see above
 
-#if 0 //BOCO: original code (deleted) 
-      //BOCO: We do not consider this option
-      //TODO: CLEANUP: remove this
-#ifdef HAVE_RINGS  //TODO Oliver
-  if (rField_is_Ring(currRing))
-  {
-    strat->red = redRing;
-  }
-#endif
-#endif
+  //BOCO:
+  //We do not use redHoney/redLazy/redRing at the moment;
+  //See original code for reference
+  //TODO:
+  //redHomog also applies to the inhomogenous case -> rename it!
+  strat->red = SD::redHomog;
 
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -1554,10 +1544,12 @@ int ShiftDVec::redHomog (ShiftDVec::LObject* h,ShiftDVec::kStrategy strat)
     {
       strat->T[ii].t_p = p_LPshiftT
         ( tmp.t_p, shift, 
-          strat->uptodeg, strat->lV, strat, strat->tailRing );
+          strat->get_uptodeg(),
+          strat->get_lV(), strat, strat->tailRing );
       strat->T[ii].p = p_LPshiftT
         ( tmp.p, shift, 
-          strat->uptodeg, strat->lV, strat, currRing );
+          strat->get_uptodeg(),
+          strat->get_lV(), strat, currRing );
     }
     tmp.tailRing = strat->T[ii].tailRing; //BOCO: added...
     SD::ksReducePoly(h, &tmp, &(strat->T[ii]) );
@@ -1711,15 +1703,17 @@ int ShiftDVec::kFindDivisibleByInS
      * divides first arg, we check if first arg is divisibly
      * by second arg! */
     SD::TObject t_Sj(strat->S[j]); TObject t_p(p);
-    shift = p_LmDivisibleBy(&t_p, &t_Sj, currRing, strat->lV);
+    shift = p_LmDivisibleBy
+      ( &t_p, &t_Sj, currRing, strat->get_lV() );
+    int reduction_violates_degree = redViolatesDeg
+      ( p, strat->S[j],
+        strat->get_uptodeg(),
+        currRing, currRing, strat->tailRing );
+
+
     if ( shift < UINT_MAX && 
-         ( strat->homog ||
-           !redViolatesDeg
-             ( p, strat->S[j], strat->uptodeg,
-               currRing, currRing, strat->tailRing ) ) )
-    {
+         ( strat->homog || !reduction_violates_degree ) )
       return j;
-    }
 #endif
 /*BOCO: We do have no debug version at the moment (see above)
  * original code:
@@ -1747,7 +1741,7 @@ int ShiftDVec::kFindDivisibleByInS
 static poly redBba (poly h,int maxIndex,kStrategy strat)
 #else //BOCO: replacement
 poly ShiftDVec::redBba
-  (SHiftDVec::LObject * h,int maxIndex,ShiftDVec::kStrategy strat)
+  (ShiftDVec::LObject * h,int maxIndex,ShiftDVec::kStrategy strat)
 #endif
 {
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
@@ -1783,11 +1777,12 @@ poly ShiftDVec::redBba
     SD::TObject * t;
     if(!(t = strat->s_2_t(j))) 
       { SD::TObject tt(strat->S[j]); t = &tt; }
-    uint shift = 
-      SD::p_LmShortDivisibleBy(h, strat->sevS[j], t, not_sev, currRing);
+    uint shift = SD::p_LmShortDivisibleBy
+      (h, strat->sevS[j], t, not_sev, currRing);
+    int reduction_violates_degree = redViolatesDeg
+      ( h, t, strat->get_uptodeg(), currRing );
     if( shift < UINT_MAX && 
-        ( strat->homog ||
-          !redViolatesDeg( h, t, strat->uptodeg, currRing ) ) )
+        (strat->homog || !reduction_violates_degree) )
 #endif
     {
 #if 0 //BOCO: original code (replaced)
@@ -1796,7 +1791,8 @@ poly ShiftDVec::redBba
 #else //BOCO: replacement
       poly pTemp = p_LPshiftT
         ( strat->S[j], shift, 
-          strat->uptodeg, strat->lV, strat, currRing);
+          strat->get_uptodeg(),
+          strat->get_lV(), strat, currRing);
       loGriToFile("p_LPshiftT poly in redBba ", 0,1024);
       SD::TObject tTemp(pTemp);
       SD::TObject noShift(strat->S[j]);
@@ -2102,14 +2098,14 @@ int ShiftDVec::kFindDivisibleByInT
        * divides first arg, we check if first arg is divisibly
        * by second arg! */
       T[j].SetDVecIfNULL(p, r);
-      shift = SD::p_LmDivisibleBy(L, &T[j], r, strat->lV);
+      shift = SD::p_LmDivisibleBy(L, &T[j], r, strat->get_lV());
+      int reduction_violates_degree = redViolatesDeg
+        ( L, &T[j], strat->get_uptodeg(), currRing );
       if ( shift < UINT_MAX && 
 #if (HAVE_SEV > 3) //BOCO: comments/uncomments sev
            !(sevT[j] & not_sev) &&
 #endif //#if (HAVE_SEV > 3)
-           ( strat->homog ||
-             !redViolatesDeg
-               ( L, &T[j], strat->uptodeg, currRing ) ) )
+           (strat->homog || !reduction_violates_degree) )
       {ret = j; break;}
 #endif //#if 0
 /* BOCO: we have no debug version at the moment
@@ -2146,14 +2142,14 @@ int ShiftDVec::kFindDivisibleByInT
        * divides first arg, we check if first arg is divisibly
        * by second arg! */
       //TObject tTemp(T[j].t_p);
-      shift = p_LmDivisibleBy(L, &T[j], r, strat->lV);
+      shift = p_LmDivisibleBy(L, &T[j], r, strat->get_lV());
       if ( shift < UINT_MAX && 
 #if (HAVE_SEV > 3) //BOCO: comments/uncomments sev
            !(sevT[j] & not_sev) &&
 #endif //#if (HAVE_SEV > 3)
            ( strat->homog ||
              !redViolatesDeg
-               ( L, &T[j], strat->uptodeg, currRing ) ) )
+               ( L, &T[j], strat->get_uptodeg(), currRing ) ) )
       {ret = j; break;}
 #endif
 /* BOCO: we have no debug version at the moment
@@ -2446,11 +2442,13 @@ poly ShiftDVec::redtailBba
         //Our divisor is a shift (and thus not in T or S)
         {
           With->t_p = p_LPshiftT
-            ( uTmp.t_p, shift, strat->uptodeg, strat->lV, 
-              strat, strat->tailRing                     );
+            ( uTmp.t_p, shift,
+              strat->get_uptodeg(),
+              strat->get_lV(), strat, strat->tailRing );
           With->p = ::p_mLPshift
-            ( uTmp.p, shift, strat->uptodeg, strat->lV, 
-              currRing                                 );
+            ( uTmp.p, shift,
+              strat->get_uptodeg(),
+              strat->get_lV(), currRing );
           if(With->t_p) With->p->next = With->t_p->next;
           loGriToFile("p_LPshiftT in redtailBba ", 0,1024,(void*)With->t_p);
           //BOCO: With->p and With->t_p have to be deleted later, 
@@ -2474,7 +2472,7 @@ poly ShiftDVec::redtailBba
 #else //BOCO: replacement
         assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
         With = kFindDivisibleByInS
-          ( strat, pos, &Ln, &With_s, shift, strat->lV );
+          ( strat, pos, &Ln, &With_s, shift, strat->get_lV() );
         assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
 
         if (With == NULL) {
@@ -2505,11 +2503,13 @@ poly ShiftDVec::redtailBba
 //            ( WithTmp->t_p, shift, strat->uptodeg, strat->lV, 
 //              strat, strat->tailRing                          );
           With->t_p = p_LPshiftT
-            ( uTmp.t_p, shift, strat->uptodeg, strat->lV, 
-              strat, strat->tailRing                     );
+            ( uTmp.t_p, shift,
+              strat->get_uptodeg(),
+              strat->get_lV(), strat, strat->tailRing );
           With->p = ::p_mLPshift
-            ( uTmp.p, shift, strat->uptodeg, strat->lV, 
-              currRing                                 );
+            ( uTmp.p, shift,
+              strat->get_uptodeg(),
+              strat->get_lV(), currRing );
           if(With->t_p) With->p->next = With->t_p->next;
           loGriToFile("p_LPshiftT in redtailBba ", 0,1024,(void*)With->t_p);
           //BOCO: With->p has to be deleted later, see below
@@ -3067,9 +3067,10 @@ void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
       //TODO: CLEANUP: remove this
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 #else //BOCO: replacement
-LObject* ShiftDVec::enterL
-  ( ShiftDVec::LSet *set,int *length, int *LSetmax, ShiftDVec::LObject p,int at, 
-    uint* dvec                                             )
+SD::LObject* ShiftDVec::enterL
+  ( SD::LSet *set,
+    int *length, int *LSetmax,
+    SD::LObject p,int at, uint* dvec )
 {
 #endif
   int i;
@@ -3103,7 +3104,7 @@ LObject* ShiftDVec::enterL
       //TODO: CLEANUP: remove this
 void initSL (ideal F, ideal Q,kStrategy strat)
 #else
-void ShiftDVec::initSL(ideal F, ideal Q,ShiftDVec::kStrategy strat)
+void ShiftDVec::initSL( ideal F, ideal Q, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
 #endif
@@ -3218,7 +3219,8 @@ void ShiftDVec::initSL(ideal F, ideal Q,ShiftDVec::kStrategy strat)
       //TODO: CLEANUP: remove this
 void initBuchMora(ideal F,ideal Q,kStrategy strat)
 #else
-void ShiftDVec::initBuchMora(ideal F,ideal Q,ShiftDVec::kStrategy strat)
+void ShiftDVec::initBuchMora
+  ( ideal F,ideal Q,SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
 #endif
@@ -3234,7 +3236,8 @@ void ShiftDVec::initBuchMora(ideal F,ideal Q,ShiftDVec::kStrategy strat)
   /*- set L -*/
   strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
   strat->Ll = -1;
-  strat->L = initL(((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc);
+  strat->initL
+    ( ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc );
   /*- set B -*/
   strat->Bmax = setmaxL;
   strat->Bl = -1;
@@ -3242,8 +3245,8 @@ void ShiftDVec::initBuchMora(ideal F,ideal Q,ShiftDVec::kStrategy strat)
   /*- set T -*/
   strat->tl = -1;
   strat->tmax = setmaxT;
-  strat->T = initT();
-  strat->R = initR();
+  strat->initT();
+  strat->initR();
   strat->sevT = initsevT();
   /*- init local data struct.---------------------------------------- -*/
   strat->P.ecart=0;

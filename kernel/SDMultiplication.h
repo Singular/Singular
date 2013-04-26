@@ -5,6 +5,15 @@
 
 namespace ShiftDVec
 {
+  namespace SD = ShiftDVec;
+
+  class sLObject;
+  class sTObject;
+  class skStrategy;
+  typedef skStrategy* kStrategy;
+  typedef sTObject TObject;
+  typedef sLObject LObject;
+
   void p_ExpSum_slow
     (poly rt, poly p, poly q, ring r);
   void p_ExpSum_dp
@@ -17,7 +26,8 @@ namespace ShiftDVec
       int divides_p_shift, poly* ml, poly* mr, ring r );
 
   int InitOrderMapping( ring r );
-  void InitSDMultiplication( ring r, ShiftDVec::kStrategy strat );
+  void InitSDMultiplication
+    ( ring r, ShiftDVec::kStrategy strat );
  
   extern int red_count;
   extern int create_count;
@@ -25,7 +35,7 @@ namespace ShiftDVec
   int ksReducePoly
     ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW,
       poly spNoether = NULL, 
-      number *coef = NULL, ShiftDVec::kStrategy strat = NULL );
+      number *coef = NULL, SD::kStrategy strat = NULL );
 
   void ksCreateSpoly
     ( ShiftDVec::LObject* Pair, poly spNoether, int use_buckets, 

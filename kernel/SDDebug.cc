@@ -8,7 +8,7 @@
  * see SDDebug.h
  */
 
-typedef skStrategy* kStrategy;
+#include <SDkutil.h>
 
 namespace SD = ShiftDVec;
 
@@ -32,8 +32,8 @@ void ShiftDVec::dvecWrite(const SD::TObject* t)
 { dvecWrite(t->dvec, t->dvSize); }
 
 
-void ShiftDVec::lcmDvecWrite(const SD::LObject* t)
-{ dvecWrite(t->lcmDvec, t->lcmDvSize); }
+void ShiftDVec::lcmDvecWrite(SD::LObject* t)
+{ dvecWrite(t->getLcmDVec(), t->getLcmDVSize()); }
 
 
 int SD::lpDVCase = 0;

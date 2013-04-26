@@ -27,7 +27,7 @@
 
 typedef skStrategy* kStrategy;
 
-namespace SD = ShiftDVec;
+
 
 //member functions of ShiftDVec::sTobject
 
@@ -170,8 +170,8 @@ void ShiftDVec::sTObject::freeDVec()
   }
 }
 
-SD::sTObject& SD::sTObject::operator=
-  (const SD::sTObject& t)
+ShiftDVec::sTObject&
+ShiftDVec::sTObject::operator=(const SD::sTObject& t)
 {
   this->::sTObject::operator=(t);
 
@@ -190,7 +190,7 @@ SD::sTObject& SD::sTObject::operator=
 
 //Get the size of the lcms dvec. Initialize it, if not set - the
 //latter requires p1 and p2 to be set and shifted correctly.
-uint ShiftDVec::sLObject::getLcmDvSize(ring r)
+uint ShiftDVec::sLObject::getLcmDVSize(ring r)
 {
   assume( p1 != NULL && p2 != NULL );
 
@@ -272,12 +272,12 @@ void ShiftDVec::sLObject::SetLcmDVec(ring r)
 
 void ShiftDVec::sLObject::freeLcmDVec()
 {
-  if(lcmDvec){ 
+  if(lcmDVec){ 
     loGriToFile("omFreeSize for (ADDRESS)lcmDvec in freeLcmDVec",sizeof(uint)*dvSize,1024);
-    omFreeSize((ADDRESS)lcmDvec, sizeof(uint)*dvSize); 
+    omFreeSize((ADDRESS)lcmDVec, sizeof(uint)*dvSize); 
     dvec = NULL;
     dvSize = 0;
-    lcmDvec = NULL;
+    lcmDVec = NULL;
   }
 }
 
@@ -288,17 +288,17 @@ void ShiftDVec::sLObject::freeLcmDVec()
  * returned, too.  In every other case, false is returned.    */
 bool ShiftDVec::sLObject::compareLcmTo( SD::sLObject* other, ring r )
 {
-  if( this->getLcmDvSize(r) != other->getLcmDvSize(r) ) 
+  if( this->getLcmDVSize(r) != other->getLcmDVSize(r) ) 
     return false;
 
   assume(this->p1 != NULL && this->p2 != NULL);
   assume(other->p1 != NULL && other->p2 != NULL);
 
   //now we need to create the dvecs
-  if(!this->lcmDvec) this->SetLcmDVec();
-  if(!other->lcmDvec) other->SetLcmDVec();
+  if(!this->lcmDVec) this->SetLcmDVec();
+  if(!other->lcmDVec) other->SetLcmDVec();
 
-  if(memcmp((void*)(lcmDvec),(void*)other->lcmDvec,lcmDvSize))
+  if(memcmp((void*)(lcmDVec),(void*)other->lcmDVec,lcmDvSize))
     return false;
 
   return true;
@@ -330,8 +330,8 @@ bool ShiftDVec::sLObject::compareLcmTo(poly p1, poly p2, ring r)
 
   if(pLcmDvSize != lcmDvSize){return false;}
 
-  if( compareDVec(lcmDvec, lowDeg, 0, dvSize1, r) &&
-      compareDVec(lcmDvec, lowDeg, dvSize1, pLcmDvSize, r) ) 
+  if( compareDVec(lcmDVec, lowDeg, 0, dvSize1, r) &&
+      compareDVec(lcmDVec, lowDeg, dvSize1, pLcmDvSize, r) ) 
     return true;
 
   return false;
@@ -418,14 +418,14 @@ uint ShiftDVec::sLObject::lcmDivisibleBy
 
   deBoGriPrint(this->lcm, "this->lcm: ", 16);
   deBoGriPrint
-    (this->lcmDvec, this->lcmDvSize, "this->lcmDvec: ", 16);
+    (this->lcmDVec, this->lcmDvSize, "this->lcmDvec: ", 16);
   deBoGriPrint(this->lcmDvSize, "this->lcmDvSize: ", 16);
   deBoGriPrint(T->p, "T->p: ", 16);
   deBoGriPrint(T->dvec, T->dvSize, "T->dvec: ", 16);
   deBoGriPrint(T->dvSize, "T->dvSize: ", 16);
 
   return ShiftDVec::divisibleBy
-    ( lcmDvec, lcmDvSize, T->dvec, T->dvSize, numVars );
+    ( lcmDVec, lcmDvSize, T->dvec, T->dvSize, numVars );
 }
 
 uint ShiftDVec::sLObject::lcmDivisibleBy
@@ -442,17 +442,73 @@ uint ShiftDVec::sLObject::lcmDivisibleBy
 
   deBoGriPrint(this->lcm, "this->lcm: ", 16);
   deBoGriPrint
-    (this->lcmDvec, this->lcmDvSize, "this->lcmDvec: ", 16);
+    (this->lcmDVec, this->lcmDvSize, "this->lcmDvec: ", 16);
   deBoGriPrint(this->lcmDvSize, "this->lcmDvSize: ", 16);
   deBoGriPrint(T->p, "T->p: ", 16);
   deBoGriPrint(T->dvec, T->dvSize, "T->dvec: ", 16);
   deBoGriPrint(T->dvSize, "T->dvSize: ", 16);
 
   return ShiftDVec::divisibleBy
-    ( lcmDvec, lcmDvSize, 
+    ( lcmDVec, lcmDvSize, 
       T->dvec, T->dvSize, minShift, maxShift, numVars );
 }
 
+
+
+//member functions of SD::skStrategy
+
+
+
+ShiftDVec::TObject* ShiftDVec::skStrategy::s_2_t(int i)
+{
+  if (i >= 0 && i <= sl)
+  {
+    int sri= S_2_R[i];
+    if ((sri >= 0) && (sri <= tl))
+    {
+      SD::TObject* t = R[sri];
+      if ((t != NULL) && (t->p == S[i]))
+        return t;
+    }
+    // last but not least, try kFindInT
+    sri = kFindInT(S[i], T, tl);
+    if (sri >= 0)
+      return &(T[sri]);
+  }
+  return NULL;
+}
+
+ShiftDVec::TObject* ShiftDVec::skStrategy::S_2_T(int i)
+{
+  assume(i>= 0 && i<=sl);
+  assume(S_2_R[i] >= 0 && S_2_R[i] <= tl);
+  SD::TObject* TT = R[S_2_R[i]];
+  assume(TT != NULL && TT->p == S[i]);
+  return TT;
+}
+
+ShiftDVec::sLObject&
+ShiftDVec::sLObject::operator=(const SD::sTObject& t)
+{
+  memset(this, 0, sizeof(*this));
+  memcpy(this, &t, sizeof(SD::sTObject));
+  return *this;
+}
+
+void ShiftDVec::skStrategy::initT()
+{
+  T = (SD::TSet)omAlloc0(setmaxT*sizeof(SD::TObject));
+  for (int i=setmaxT-1; i>=0; i--)
+  {
+    T[i].tailRing = currRing;
+    T[i].i_r = -1;
+  }
+}
+
+void ShiftDVec::skStrategy::initR()
+{
+  R = (SD::TObject**)omAlloc0(setmaxT*sizeof(SD::TObject*));
+}
 
 
 //other functions, which do not have no counterpart in normal bba
@@ -677,7 +733,8 @@ uint ShiftDVec::lcmDivisibleBy
   deBoGriPrint(p->dvSize, "p->dvSize: ", 16);
 
   return divisibleBy
-    ( lcm->lcmDvec, lcm->lcmDvSize, p->dvec, p->dvSize, numVars );
+    ( lcm->getLcmDVec(),
+      lcm->getLcmDVSize(), p->dvec, p->dvSize, numVars );
 }
 
 

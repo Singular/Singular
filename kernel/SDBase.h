@@ -1,4 +1,5 @@
 #include <mod2.h>
+#include <SDkutil.h>
 
 #ifndef SDBASE_H
 #define SDBASE_H
@@ -11,7 +12,8 @@ namespace ShiftDVec
     ( ideal F, ideal Q, tHomog h, intvec ** w, intvec *hilb,
       int syzComp, int newIdeal, intvec *vw, int uptodeg, int lV );
   ideal bba
-    (ideal F, ideal Q,intvec *w,intvec *hilb,ShiftDVec::kStrategy strat);
+    ( ideal F, ideal Q, ideal I,
+      intvec *w,intvec *hilb,ShiftDVec::kStrategy strat );
   void initBba(ideal F,ShiftDVec::kStrategy strat);
   poly redtailBba
     (ShiftDVec::LObject* L, int pos, ShiftDVec::kStrategy strat, BOOLEAN withT=FALSE, 
@@ -86,9 +88,10 @@ namespace ShiftDVec
   void chainCrit
     ( ShiftDVec::LObject *H, int ecart, ShiftDVec::kStrategy strat );
   void initBuchMoraCrit(ShiftDVec::kStrategy strat);
-  LObject* enterL
-    ( ShiftDVec::LSet *set,int *length, int *LSetmax, ShiftDVec::LObject p,int at, 
-      uint* dvec=NULL                                        );
+  SD::LObject* enterL
+    ( SD::LSet *set,
+      int *length, int *LSetmax,
+      SD::LObject p,int at, uint* dvec=NULL );
   void initSL(ideal F, ideal Q,ShiftDVec::kStrategy strat);
   void initBuchMora(ideal F,ideal Q,ShiftDVec::kStrategy strat);
   void kMergeBintoL(ShiftDVec::kStrategy strat);

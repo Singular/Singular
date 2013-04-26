@@ -14,17 +14,24 @@
 #ifndef SDKUTIL_H
 #define SDKUTIL_H
 
-namespace ShiftDVec
-{ uint CreateDVec(poly p, ring r, uint*& dvec); }
-
 #include <kernel/kutil.h>
-
-typedef unsigned int uint;
-
-typedef skStrategy* kStrategy;
 
 namespace ShiftDVec
 {
+  namespace SD = ShiftDVec;
+
+  typedef unsigned int uint;
+
+  class sLObject;
+  class sTObject;
+  class skStrategy;
+  typedef sTObject TObject;
+  typedef sTObject* TSet;
+  typedef sLObject* LSet;
+  typedef skStrategy* kStrategy;
+
+  uint CreateDVec(poly p, ring r, uint*& dvec);
+
   uint getShift
     (poly p, uint numFirstVar, ring r = currRing );
 
@@ -42,11 +49,10 @@ namespace ShiftDVec
       uint minShift, uint maxShift, int numVars );
 
   uint divisibleBy
-    ( ShiftDVec::sTObject * t1, 
-      ShiftDVec::sTObject * t2, int numVars );
+    ( sTObject * t1, sTObject * t2, int numVars );
 
   uint findRightOverlaps
-    ( ShiftDVec::sTObject * t1, ShiftDVec::sTObject * t2, 
+    ( SD::TObject * t1, SD::TObject * t2, 
       int numVars, int maxDeg, uint ** overlaps );
 
   BOOLEAN redViolatesDeg
@@ -54,7 +60,7 @@ namespace ShiftDVec
       ring aLmRing = currRing, 
       ring bLmRing = currRing, ring bTailRing = currRing );
   BOOLEAN redViolatesDeg
-    ( ShiftDVec::TObject* a, ShiftDVec::TObject* b, 
+    ( SD::TObject* a, SD::TObject* b, 
       int uptodeg, ring lmRing = currRing );
 
   bool createSPviolatesDeg
@@ -69,18 +75,25 @@ namespace ShiftDVec
 
   void dvecWrite(const uint* dvec, uint dvSize);
 
-  void dvecWrite(const ShiftDVec::sTObject* t);
+  void dvecWrite(const SD::TObject* t);
 
-  void lcmDvecWrite(const ShiftDVec::sLObject* t);
+  void lcmDvecWrite(const SD::LObject* t);
 
   extern int lpDVCase; //defined in kutil2.cc
 
   uint lcmDivisibleBy
-    ( ShiftDVec::sLObject * lcm, 
-      ShiftDVec::sTObject * p, int numVars );
+    ( SD::LObject * lcm, SD::TObject * p, int numVars );
 
-  void lcmDvecWrite(ShiftDVec::sLObject* t);
-};
+  void lcmDvecWrite(SD::LObject* t);
+
+  int cmpDVecProper
+      ( uint* dv1, uint begin_dv1,
+        uint* dv2, uint begin_dv2, uint size, int lV );
+
+  int cmpDVecProper
+      ( SD::sTObject* T1, uint beginT1,
+        SD::sTObject* T2, uint beginT2, uint size, int lV );
+}
 
 
 
@@ -103,94 +116,151 @@ namespace ShiftDVec
  * sTObject and sLObject are those from kutil.h
  */
 
-class ShiftDVec::sTObject;
-class ShiftDVec::skStrategy;
-
 class ShiftDVec::sTObject : public virtual ::sTObject
 {
-public:
-  uint * dvec; //Distance Vector of lm(p)
-  uint dvSize; //size of the >>uint * dvec<< array
+  public:
+    uint * dvec; //Distance Vector of lm(p)
+    uint dvSize; //size of the >>uint * dvec<< array
 
-  uint  shift; //shift of polynomial
-  //TODO: this shift shall replace the necessity of storing
-  //      shifts of polynomials, when creating pairs
+    uint  shift; //shift of polynomial
+    //TODO: this shift shall replace the necessity of storing
+    //      shifts of polynomials, when creating pairs
 
-  //uint pIsInR; //already i_r in ::sTObject
+    //uint pIsInR; //already i_r in ::sTObject
 
-  // constructors
-  sTObject(ring r = currRing) : 
-    ::sTObject(r), dvec(NULL){ t_p = NULL; }
+    // constructors
+    sTObject(ring r = currRing) : 
+      ::sTObject(r), dvec(NULL){ t_p = NULL; }
 
-  sTObject(poly p, ring tailRing = currRing) : 
-    ::sTObject(p, tailRing),  dvec(NULL){ t_p = NULL; }
+    sTObject(poly p, ring tailRing = currRing) : 
+      ::sTObject(p, tailRing),  dvec(NULL){ t_p = NULL; }
 
-  sTObject(poly p, ring c_r, ring tailRing) : 
-    ::sTObject(p, c_r, tailRing),  dvec(NULL){ t_p = NULL; }
+    sTObject(poly p, ring c_r, ring tailRing) : 
+      ::sTObject(p, c_r, tailRing),  dvec(NULL){ t_p = NULL; }
 
-  sTObject(sTObject* T, int copy) : 
-    ::sTObject(T, copy),  dvec(NULL){ t_p = NULL; }
+    sTObject(sTObject* T, int copy) : 
+      ::sTObject(T, copy),  dvec(NULL){ t_p = NULL; }
 
 #if 0
-  //destructor - 
-  //freeing dvecs automatically was to problematic with singular
-  ~sTObject()
-  { this->freeDVec(); }
+    //destructor - 
+    //freeing dvecs automatically was to problematic with singular
+    ~sTObject()
+    { this->freeDVec(); }
 #endif
 
-  void dumbInit(poly p_){ p = p_; dvec = NULL; t_p = NULL; }
+    void dumbInit(poly p_){ p = p_; dvec = NULL; t_p = NULL; }
 
-  void SetDVecIfNULL(poly p, ring r)
-  { if(!dvec) SetDVec(p, r); }
+    void SetDVecIfNULL(poly p, ring r)
+    { if(!dvec) SetDVec(p, r); }
 
-  void SetDVecIfNULL()
-  { if(!dvec) SetDVec(); }
-  
-  // Initialize the distance vector of an ShiftDVec::sTObject
-  void SetDVec(poly p, ring r)
-  { 
-    freeDVec(); 
-    dvSize = CreateDVec(p, r, dvec); 
-  }
+    void SetDVecIfNULL()
+    { if(!dvec) SetDVec(); }
+    
+    // Initialize the distance vector of an ShiftDVec::sTObject
+    void SetDVec(poly p, ring r)
+    { 
+      freeDVec(); 
+      dvSize = CreateDVec(p, r, dvec); 
+    }
 
-  // Initialize the distance vector of an ShiftDVec::sTObject
-  void SetDVec()
-  { 
-    freeDVec(); 
-    if(p == NULL)
-      dvSize = CreateDVec(t_p, tailRing, dvec); 
-    else
-      dvSize = CreateDVec(p, currRing, dvec); 
-  }
+    // Initialize the distance vector of an ShiftDVec::sTObject
+    void SetDVec()
+    { 
+      freeDVec(); 
+      if(p == NULL)
+        dvSize = CreateDVec(t_p, tailRing, dvec); 
+      else
+        dvSize = CreateDVec(p, currRing, dvec); 
+    }
 
-  void SetDVec(uint* dv) {dvec = dv;}
+    void SetDVec(uint* dv) {dvec = dv;}
 
-  uint*  GetDVec(); 
-  uint  getDVecAtIndex(uint index) {return dvec[index];}
-  uint GetDVsize(); 
+    uint*  GetDVec(); 
+    uint  getDVecAtIndex(uint index) {return dvec[index];}
+    uint GetDVsize(); 
 
-  int cmpDVec(ShiftDVec::sTObject* toCompare);
+    int cmpDVec(ShiftDVec::sTObject* toCompare);
 
-  int cmpDVec
-    (ShiftDVec::sTObject* T1, uint begin, uint beginT1, uint size);
+    int cmpDVec
+      (SD::sTObject* T1, uint begin, uint beginT1, uint size);
 
-  int cmpDVecProper
-    ( ShiftDVec::sTObject* T1, 
-      uint begin, uint beginT1, uint size, int lV );
+    int cmpDVecProper
+      ( ShiftDVec::sTObject* T1, 
+        uint begin, uint beginT1, uint size, int lV );
 
-  void freeDVec(); 
+    void freeDVec(); 
 
-  // may need adjustments
-  ShiftDVec::sTObject& operator=
-    (const ShiftDVec::sTObject& t);
+    // may need adjustments
+    ShiftDVec::sTObject& operator=
+      (const ShiftDVec::sTObject& t);
 
-  uint divisibleBy( ShiftDVec::sTObject * T, 
-                    int numVars              )
-  { SetDVecIfNULL();
-    T->SetDVecIfNULL();
-    return ShiftDVec::divisibleBy
-      (dvec, dvSize, T->dvec, T->dvSize, numVars); }
+    uint divisibleBy( ShiftDVec::sTObject * T, 
+                      int numVars              )
+    { SetDVecIfNULL();
+      T->SetDVecIfNULL();
+      return ShiftDVec::divisibleBy
+        (dvec, dvSize, T->dvec, T->dvSize, numVars); }
 };
+
+class ShiftDVec::sLObject :
+  public ShiftDVec::sTObject, public ::sLObject
+{
+  private:
+    /* BOCO: Important
+     * The lcmDvec and lcmDvSize need to be set to NULL
+     * respectivly 0, every time, the lcm changes and at the
+     * creation of an LObject.
+     * See kutil2.cc for most definitions.
+     * TODO:
+     * Do the latter in the constructor.
+     */
+    uint*   lcmDVec;   /*- the corresponding dvec -*/
+    uint  lcmDvSize;
+
+  public:
+    // constructors
+    sLObject(ring r = currRing) : 
+      SD::sTObject(r) {/*BOCO: others?*/}
+
+    sLObject(poly p, ring tailRing = currRing) : 
+      SD::sTObject(p, tailRing){/*BOCO: others?*/}
+
+    sLObject(poly p, ring c_r, ring tailRing) : 
+      SD::sLObject(p, c_r, tailRing){/*BOCO: others?*/}
+
+    void SetLcmDVec(poly p, ring r = currRing)
+    { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDVec); }
+
+    //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
+    void SetLcmDVec(ring r = currRing);
+
+    void SetLcmDvecIfNULL() {if(!lcmDVec) SetLcmDVec();}
+
+    void SetLcmDvecToNULL() {lcmDVec = NULL; lcmDvSize = 0;}
+
+    uint* getLcmDVec() const { return lcmDVec; }
+
+    uint getLcmDVSize(ring r = currRing);
+
+    bool gm3LcmUnEqualToLcm
+      (poly p1, poly p2, int lV, ring r = currRing);
+
+    void freeLcmDVec();
+
+    uint lcmDivisibleBy( ShiftDVec::sTObject * T, int numVars );
+
+    uint lcmDivisibleBy
+      ( ShiftDVec::sTObject * T, 
+        uint minShift, uint maxShift, int numVars );
+
+    bool compareLcmTo(  ShiftDVec::sLObject* other, ring r = currRing );
+
+    bool compareLcmTo( poly p1, poly p2, ring r = currRing );
+
+    //adapted from original sLObject
+    SD::sLObject& operator=(const SD::sTObject& t);
+};
+
 
 class ShiftDVec::skStrategy : public ::skStrategy
 {
@@ -210,63 +280,44 @@ class ShiftDVec::skStrategy : public ::skStrategy
      *   Question: Will I be part of T ??? - I don't think so,
      * but again: What was the difference between T and R ?
      */
-    ShiftDVec::sTObject* I;
+    SD::TObject* I; //first index:0; last index: size_of_I-1
     uint size_of_I; // This is, what it says!
     int lV;
     int uptodeg;
 
   public:
+    /* We had to overwrite some of the sets/objects from
+     * ::skStrategy, since they were generalized for ShiftDVec
+     * case.
+     */
+    SD::TSet T;
+    SD::LSet L;
+    SD::LObject P;
+    SD::TObject** R;
+
+    /* functions/function pointers we had to overwrite */
+    SD::TObject* s_2_t(int i);
+    SD::TObject* S_2_T(int i);
+    int (*red)(SD::LObject * L,kStrategy strat);
+    void initL(int nr)
+    { L = (SD::LSet)omAlloc(nr*sizeof(SD::LObject)); }
+    void initT();
+    void initR();
+
+
+    void init_lV(int lV){this->lV = lV;}
+    int get_lV(){return lV;}
+
+    void init_uptodeg(int uptodeg){this->uptodeg = uptodeg;}
+    int get_uptodeg(){return uptodeg;}
+
     void init_I(ideal I){/*TODO*/ assume(0);}
     uint get_size_of_I(){return size_of_I;}
     uint translate_index_I_to_R(uint i){/*TODO*/ assume(0);}
-    ShiftDVec::sLObject get_I_at(uint i){return I[i];}
+    SD::TObject* get_I_at(uint i){return &(I[i]);}
+
     void deleteFromL(uint index){/*TODO*/ assume(0);}
-
-}
-
-class ShiftDVec::sLObject :
-  public ShiftDVec::sTObject, public ::sLObject
-{
-  private:
-    /* BOCO: Important
-     * The lcmDvec and lcmDvSize need to be set to NULL
-     * respectivly 0, every time, the lcm changes and at the
-     * creation of an LObject.
-     * See kutil2.cc for most definitions.
-     * TODO:
-     * Do the latter in the constructor.
-     */
-    uint*   lcmDvec;   /*- the corresponding dvec -*/
-    uint  lcmDvSize;
-
-  public:
-    void SetLcmDVec(poly p, ring r = currRing)
-    { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDvec); }
-
-    //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
-    void SetLcmDVec(ring r = currRing);
-
-    void SetLcmDvecIfNULL() {if(!lcmDvec) SetLcmDVec();}
-
-    void SetLcmDvecToNULL() {lcmDvec = NULL; lcmDvSize = 0;}
-
-    uint getLcmDvSize(ring r = currRing);
-
-    bool gm3LcmUnEqualToLcm
-      (poly p1, poly p2, int lV, ring r = currRing);
-
-    void freeLcmDVec();
-
-    uint lcmDivisibleBy( ShiftDVec::sTObject * T, int numVars );
-
-    uint lcmDivisibleBy
-      ( ShiftDVec::sTObject * T, 
-        uint minShift, uint maxShift, int numVars );
-
-    bool compareLcmTo(  ShiftDVec::sLObject* other, ring r = currRing );
-
-    bool compareLcmTo( poly p1, poly p2, ring r = currRing );
-}
+};
 
 
 
@@ -281,8 +332,8 @@ ideal kStdShiftDVec
 void initBuchMoraCritShiftDVec( ShiftDVec::kStrategy strat);
 
 ideal bbaShiftDVec
-  ( ideal F, ideal Q,intvec *w,intvec *hilb, ShiftDVec::kStrategy strat, 
-    int uptodeg, int lV                                      );
+  ( ideal F, ideal Q,intvec *w,intvec *hilb,
+    ShiftDVec::kStrategy strat, int uptodeg, int lV );
 
 void initBuchMoraCritShiftDVec( ShiftDVec::kStrategy strat);
 

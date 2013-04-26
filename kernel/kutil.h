@@ -189,6 +189,8 @@ extern int strat_fac_debug;
  *            \        / 
  *             \      /
  *        ShiftDVec::sLObject
+ *
+ * see: SDkutil.h
  */
 class sLObject : public virtual sTObject
 {
