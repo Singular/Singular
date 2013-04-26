@@ -175,6 +175,32 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 //    }
     // test that nume is over integers!?
   }
+  if (getCoeffType(ntCoeffs)==n_Q)
+  {
+    poly p=num; // !=NULL
+    do
+    {
+      number n=pGetCoeff(p);
+      n_Test(n,ntCoeffs);
+      if (!(SR_HDL(n) & SR_INT))
+      {
+        if (n->s<2)
+          Print("rational coeff in num: %s:%d\n",f,l);
+      }
+      pIter(p);
+    } while(p!=NULL);
+    p=den;
+    while(p!=NULL)
+    {
+      number n=pGetCoeff(p);
+      if (!(SR_HDL(n) & SR_INT))
+      {
+        if (n->s!=3)
+          Print("rational coeff in den.:%s:%d\n",f,l);
+      }
+      pIter(p);
+    }
+  }
   return TRUE;
 }
 #endif

@@ -1087,7 +1087,7 @@ number nlGcd(number a, number b, const coeffs r)
   }
   else
   {
-    result=ALLOC_RNUMBER();
+    result=ALLOC0_RNUMBER();
     mpz_init(result->z);
     mpz_gcd(result->z,a->z,b->z);
     result->s = 3;
