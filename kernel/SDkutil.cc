@@ -12,7 +12,7 @@
  */
 
 #include <kernel/kutil.h>
-#include <kernel/SDkutil.h>
+//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
 #include <kernel/SDDebug.h>
 
 #include <climits>
@@ -143,7 +143,7 @@ int ShiftDVec::cmpDVecProper
   ( SD::sTObject* T1, uint beginT1,
     SD::sTObject* T2, uint beginT2, uint size, int lV )
 {
-  assume(beginT2+size <= dvSize && beginT1+size <= T1->dvSize);
+  assume(beginT2+size<=T2->dvSize && beginT1+size<=T1->dvSize);
 
   return
     cmpDVecProper
@@ -264,9 +264,6 @@ void ShiftDVec::sLObject::SetLcmDVec(ring r)
   deBoGriPrint(lcm, "The lcm is: ", 16);
   SetLcmDVec(lcm, r);
 #endif
-
-  deBoGriPrint(lcmDvec, lcmDvSize, "New dvec is: ", 16);
-  deBoGriPrint(lcmDvSize, "It's size is: ", 16);
 }
 
 
@@ -735,80 +732,6 @@ uint ShiftDVec::lcmDivisibleBy
   return divisibleBy
     ( lcm->getLcmDVec(),
       lcm->getLcmDVSize(), p->dvec, p->dvSize, numVars );
-}
-
-
-/* Finds all shifts sh, where the letterplace objects t1 and
- * st2 := sh * t2 have a common divisor.
- * into shifts. Any previous contents of shifts will be 
- * deleted. Central Overlaps, i.e. shifts where st2 divides t1,
- * are not considered. The found shifts are stored in uint **
- * overlaps. The number of the found shifts, thus the size of
- * uint ** overlaps is returned.
- * Do we only get overlaps where sh * t2 is not violating the
- * maxDeg? How do we test that?
- * The current implementation does not yet care for maxDeg.
- * We should have to change maxElCompared.
- * overlaps have to be freed manually (with omFreeSize)!
- */
-uint ShiftDVec::findRightOverlaps
-  ( SD::sTObject * t1, SD::sTObject * t2, 
-    int numVars, int maxDeg, uint ** overlaps )
-{
-  t1->SetDVecIfNULL(); t2->SetDVecIfNULL();
-  //assume(t1->dvSize > 0 && t2->dvSize > 0);
-  //TODO: t1->dvSize-1 should be sufficient because we dont want
-  //central overlaps
-  *overlaps = (uint*)omAlloc0((t1->dvSize+1)*sizeof(uint));
-  if(t1->dvSize == 0 || t2->dvSize == 0) return 0;
-  loGriToFile
-    ("omAlloc0 for overlaps in findRightOverlaps ",
-     (t1->dvSize+1)*sizeof(uint), 1024, (void*) (*overlaps) );
-
-  memcpy
-    ((void*)(*overlaps), (void*)t1->dvec, t1->dvSize*sizeof(uint));
-
-
-
-  //uint maxElCompared = min(t1.dvSize, maxDeg); //not correct
-  uint maxElCompared = t1->dvSize; //eventuell zuviele shifts
-
-  /* We want only to find right overlappings, not central
-   * overlappings.                                        */
-  int shift =
-    t2->dvSize > t1->dvSize ? 1 : t1->dvSize - t2->dvSize + 1;
-
-  int cmpLen = (t1->dvSize - shift) * sizeof(uint);
-  uint numberOfShifts = 0;
-  for(uint i = 0; i < shift; ++i)
-    (*overlaps)[shift] += (*overlaps)[i];
-  (*overlaps)[shift] -= (shift * numVars);
-  for(uint i = 0; shift < maxElCompared; ++shift, cmpLen -= sizeof(uint)){
-    if(!memcmp((void*)((*overlaps)+shift),(void*)t2->dvec,cmpLen)){
-      (*overlaps)[shift+1] = 
-        (*overlaps)[shift] + (*overlaps)[shift+1] - numVars;
-      (*overlaps)[i] = shift; i = ++numberOfShifts;
-    } else {
-      (*overlaps)[shift+1] = 
-        (*overlaps)[shift] + (*overlaps)[shift+1] - numVars;
-    }
-  }
-
-  if( numberOfShifts > 0 ){
-    (*overlaps) = (uint*) omrealloc
-      ( (*overlaps), numberOfShifts*sizeof(uint) );
-    loGriToFile
-      ( "Reallocation for overlaps in findRightOverlaps ",
-        numberOfShifts*sizeof(uint), 1024, (*overlaps)     );
-  }else{
-    loGriToFile
-      ( "omFreeSize for overlaps in findRightOverlaps ",
-        (t1->dvSize+1)*sizeof(uint), 1024, (void*) *overlaps );
-    omFreeSize
-      ((ADDRESS)(*overlaps), sizeof(uint)*(t1->dvSize+1));
-  }
-
-  return numberOfShifts;
 }
 
 

@@ -65,7 +65,7 @@ set(kernel_srcs
     khstd.cc kstdfac.cc
     kstd1.cc kstd2.cc kutil.cc
     SDBase.cc SDkutil.cc SDDebug.cc SDPairs.cc
-    SDMultiplication.cc SDLeftGB.cc 
+    SDMultiplication.cc #SDLeftGB.cc 
     longalg.cc longrat.cc longrat0.cc
     maps.cc matpol.cc misc.cc gnumpfl.cc gnumpc.cc
     rmodulo2m.cc rmodulon.cc rintegers.cc
@@ -102,7 +102,8 @@ set(kernel_hdrs hutil.h stairc.h ideals.h
         rmodulo2m.h rmodulon.h rintegers.h modulop.h sing_dbm.h weight.h
         fglmgauss.h fglmvec.h
         kstdfac.h kmatrix.h
-        kutil.h kutil2.h shiftDVec.h SDMultiplication.h
+        kutil.h
+        SDkutil.h SDDebug.h SDBase.h SDMultiplication.h
         dbm_sl.h polys-impl.h
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h
         eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h

@@ -67,6 +67,9 @@ extern denominator_list DENOMINATOR_LIST;
 class sTObject
 {
 public:
+  //BOCO: make this class polymorphic (kinda syntax rubbish)
+  virtual void virtualizer(){}
+
   unsigned long sevSig;
   poly sig;   // the signature of the element
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
@@ -769,6 +772,13 @@ ring sbaRing(kStrategy strat, const ring r=currRing, BOOLEAN complete=TRUE, int 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
 
+//BOCO TODO:
+//The include order for this code provides some
+//difficulties for us. At the moment this is rather
+//suboptimal. There should be a cleanup! Maybe kInhline.h
+//should not be included in kutil.h at all, but instead 
+//everywhere, where it is needed directly!!!
+#include <kernel/SDkutil.h>
 #include <kernel/kInline.h>
 
 /* shiftgb stuff */

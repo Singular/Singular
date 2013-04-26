@@ -368,7 +368,7 @@ void ShiftDVec::initenterpairs
  * overlaps have to be freed manually (with omFreeSize)!
  */
 uint ShiftDVec::findRightOverlaps
-  ( ShiftDVec::sTObject * t1, ShiftDVec::sTObject * t2, 
+  ( SD::sTObject * t1, SD::sTObject * t2, 
     int numVars, int maxDeg, uint ** overlaps )
 {
   t1->SetDVecIfNULL(); t2->SetDVecIfNULL();
@@ -771,9 +771,8 @@ bool ShiftDVec::GMTestLeft
   int cmpLength = shift2 - shift3;
 
   if( H1->cmpDVecProper
-      (H3, minCmpDV1, minCmpDV3, cmpLength, strat->lV) == 0 )
+      (H3, minCmpDV1, minCmpDV3, cmpLength, strat->get_lV()) == 0 )
   {
-    deBoGriPrint("GMTestLeft will return true.", 128);
     return true;
   }
 
@@ -1260,28 +1259,24 @@ void ShiftDVec::enterSelfOverlaps
   for (int j = 0; j < numSelfOvls; ++j)
   {
     uint shiftH = selfOvls[j];
+    bool creation_of_spoly_violates_degree =
+      SD::createSPviolatesDeg
+        ( H->p, H->p, shiftH, strat->get_uptodeg(),
+          currRing,currRing,strat->tailRing,strat->tailRing );
+    bool shift_of_spoly_violates_degree =
+      SD::shiftViolatesDeg
+        ( H->p, shiftH,
+          strat->get_uptodeg(), currRing, strat->tailRing );
     if( shiftH &&
-        !SD::createSPviolatesDeg
-          ( H->p, H->p, shiftH, strat->uptodeg, 
-             currRing, currRing, 
-             strat->tailRing, strat->tailRing   ) &&
-        !shiftViolatesDeg
-          ( H->p, shiftH, strat->uptodeg,
-            currRing, strat->tailRing     )          )
-      //grico: checks if degree bound is violated
+        !shift_of_spoly_violates_degree &&
+        !creation_of_spoly_violates_degree )
     {
-      deBoGriPrint("No degree Violation!", 1);
-
       Pair = SD::enterOnePair
         ( H->p, atR, isFromQ, ecart, 
           H->p, shiftH, atR, isFromQ, ecart, strat );
 
       if(Pair != NULL)
       {
-        deBoGriPrint("entered new pair to B", 32);
-        deBoGriPrint(Pair->p1, "Pair->p1", 32);
-        deBoGriPrint(Pair->p2, "Pair->p2", 32);
-
         //grico: sets new_pair to true, as in the old version
         new_pair=true; 
       }
@@ -1291,7 +1286,8 @@ void ShiftDVec::enterSelfOverlaps
 #if 0 
   //Work in Progress - 
   //No: This is not nescessary any long, i think, but i'm all
-  //but sure; TODO: clear this!
+  //but sure; TODO: clear this! Update: I think we have to
+  //care about this case!!!
  
   /* BOCO: This applies Gebauer-Moeller on strat->L .
    * Formerly, this was part of the chainCrit function.
@@ -1308,83 +1304,6 @@ void ShiftDVec::enterSelfOverlaps
   }
 #endif
 }
-
-
-#if 0 //No longer needed.
-/* BOCO: This is the third Kriterion of Gebauer-Moeller.
- * It is known as pCompareChain for the commutative case.
- * It is used in enterSelfOverlaps. This is the Version for
- * filtering self-overlaps. For the other Version, filtering
- * Pairs from the L-Set, see below. 
- * Let h := H->p;  h1 := shift1*H->p;  h2 := shift2*H->p;
- * lcm := lcm(h, h1), then this function returns true, 
- * if h2 | lcm and fals otherwise. For the criterion to work
- * properly, shift1 > shift2 > 0 should hold (this will not be
- * tested, but is assumed) and the shifts h1 and h2 should
- * correspond to overlaps of h. The pairs which will then
- * actually be responsible for the cancellation of the pair 
- * (h, h1) will be (h, h2) and (h2, h1), where (h2, h1)
- * corresponds to a pair (h, h3), with h3 := (shift1 - shift2)*h
- * . Remark: 0 < shift1 - shift2 < shift1 . See commentary below
- * for further explanations.
- * This function has to be checked!                           */
-bool ShiftDVec::GM3
-  ( LObject* H, 
-    uint shift1, uint shift2, kStrategy strat, ring r )
-{
-  /* We will do that by comparing the dvecs of h1 = s1*h and
-   * h2 = s2 * h . We assume, that h1 and h2 have at least
-   * overlap of degree one with h, and that the overlap of h2
-   * with h is bigger than the overlap of h1 with h - This is
-   * all due to our function prerequisites. We only need to find
-   * out, if the part of h2, not overlapping h prefix of the the
-   * part of h1, not overlapping h; consider the following
-   * diagram with monospaced font as an example:
-   * xyxyxyx     | h
-   *     xyxyxyx | h1
-   *   xyxyxyx   | h2
-   * h has overlap with h1: xyx
-   * h has overlap with h2: xyxyx
-   * We need to proof:
-   * yx prefixes yxyx
-   * (In this case, it is true of course.) 
-   * This is equivalent of showing, that the part of the DVec of
-   * h2, corresponding to the non-overlapping part of h,
-   * prefixes the part of the DVec of h2 corresponding to the
-   * non-overlapping part of h.                               
-   * If you have a more concise, or better way to express these
-   * thoughts - feel free to contact the developers of this
-   * piece of code.                                           */
-
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering GM3 for self-overlaps.", 
-      "Leaving GM3 for self-overlaps.", 128 );
-
-  deBoGriPrint
-    ("The following pair will be considered for cancellation:", 128);
-  deBoGriPrint(H->p, "H->p: ", 128);
-  deBoGriPrint(H->p, shift1, strat, "shift1*H->p: ", 128);
-  deBoGriPrint
-    ("The pair will be cancelled because of: ", 128);
-  deBoGriPrint(H->p, shift2, strat, "shift2*H->p: ", 128);
-
-  int degH = p_Totaldegree(H->p, r);
-  int minCmpDV1 = degH - shift1;
-  int minCmpDV2 = degH - shift2;
-
-  if( H->cmpDVec(H, minCmpDV1, minCmpDV2, shift2) == 0 )
-  {
-    deBoGriPrint("GM3 will return true.", 128);
-    return true;
-  }
-
-  deBoGriPrint("GM3 will return false.", 128);
-  return false;
-}
-#endif
-
-
 
 
 /* BOCO: This Version of the GM3 function is no longer needed.
@@ -1409,25 +1328,13 @@ bool ShiftDVec::GM3
  *    pairs (p1, p2) and (p2, p3); etc. (if you have questions:
  *    ask the authors, who hopefully still know, what they did)*/
 bool ShiftDVec::GM3
-  ( ShiftDVec::LObject* H, ShiftDVec::LObject* Pair, ShiftDVec::kStrategy strat, ring r )
+  ( SD::LObject* H,
+    SD::LObject* Pair,SD::kStrategy strat, ring r )
 {
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering GM3 (General Version)", "Leaving GM3", 132 );
-
-  deBoGriPrint
-    ("The following pair will be considered for cancellation:", 128);
-  deBoGriPrint(Pair->p1, "p2: ", 128);
-  deBoGriPrint(Pair->p2, "p3: ", 128);
-  deBoGriPrint
-    ("The pair might be cancelled because of: ", 128);
-  deBoGriPrint(H->p, "p1: ", 128);
-
-
   /* BOCO: Explanation/Idea/TODO
-   * Pair->lcm==NULL probably means, that the pair is one of our
-   * initial generators. The criterion would thus not be
-   * applicable on it.                                        */
+   * Pair->lcm==NULL probably means, that the pair is one of
+   * our initial generators. The criterion would thus not be
+   * applicable on it.                                       */
   if( Pair->lcm==NULL ) return false;
   deBoGriPrint("The lcm of the pair is not NULL", 4 + 128);
 
@@ -1444,118 +1351,15 @@ bool ShiftDVec::GM3
   if( ovSize >= dvSize1 ) return false;
   deBoGriPrint("Size of Overlap < length(DVec(p1)).", 128);
 
-  uint StartPos = dvSize2 >= dvSize1 ? dvSize2 - dvSize1 + 1 : 0;
+  uint StartPos = dvSize2 >= dvSize1 ? dvSize2-dvSize1+1 : 0;
   uint EndPos = dvSize2 - ovSize - 1;
   //if(EndPos + dvSize1 > degLcm) EndPos = degLcm - dvSize1;
 
-  deBoGriSilenceIf
-    (EndPos < 1000 && StartPos < 1000 && ovSize < 1000);
-  deBoGriPrint(dvSize1, "dvSize1: ", 128);
-  deBoGriPrint(dvSize2, "dvSize2: ", 128);
-  deBoGriPrint(dvSize3, "dvSize3: ", 128);
-  deBoGriPrint(dvSize3, "ovSize: ", 128);
-  //deBoGriPrint(degLcm, "degLcm: ", 128);
-  deBoGriPrint(StartPos, "StartPos: ", 128);
-  deBoGriPrint(EndPos, "Endpos: ", 128);
-  deBoGriSpeak();
+  if( Pair->lcmDivisibleBy
+        ( H, StartPos, EndPos, strat->get_lV() ) ) return true;
 
-  if( Pair->lcmDivisibleBy(H, StartPos, EndPos, strat->lV) )
-  {
-    deBoGriPrint("GM3 will return true.", 128);
-    return true;
-  }
-
-  deBoGriPrint("GM3 will return false.", 128);
   return false;
 }
-
-
-#if 0 //BOCO: some older code, left here, because... I dont know
-      //TODO: delete it some time
-/* BOCO: This is the third Kriterion of Gebauer-Moeller.
- * It is known as pCompareChain for the commutative case.
- * It is used in enterSelfOverlaps. Input is expected to be an
- * LObject in form of (p, s*p), where p is an unshifted
- * polynomial and s*p a non-zero shift of p. L should be some 
- * pair from strat->L, which should be intrisically in the form
- * of (q, s'*r), where q is unshifted and s' a non-zero shift. 
- * We will test, if (p, L->p2) and (L->p1, s*p) are valid pairs
- * If they do not correspond to a pair in strat->B, they can
- * not be used for the criterion. To test that, we will test,
- * if the pair corresponds to a valid overlap. Examples:
- *  - x(1)y(2) and y(2)z(3) correspond to a valid overlap
- *  - x(1)y(2) and y(3)z(4) do not correspond to a valid 
- *    overlap
- *  - x(1)y(2)z(3) and y(2)x(3)z(4) do not correspond to a valid 
- *    overlap, though they have indeed gcd != 1 .
- * If one of the pairs is not valid, false will be returned,
- * otherwise, we will try to apply the third part of the
- * Gebauer-Moeller criterion to (p, L->p2), (p1, p2) and 
- * (L->p1, s*p) and return true, if it could be applied - in
- * this case one can get rid of the pair (p1, p2) -, otherwise,
- * false will be returned.
- * This function has to be checked!                           */
-bool ShiftDVec::GM3(ShiftDVec::LObject* H, ShiftDVec::LObject* L, ShiftDVec::kStrategy strat)
-{
-  initDeBoGri
-    ( ShiftDVec::indent, "Entering GM3", "Leaving GM3", 132 );
-
-  deBoGriPrint(L->lcm, "L->lcm: ", 4 + 128);
-  deBoGriPrint(L->p1, "L->p1: ", 4 + 128);
-  deBoGriPrint(L->p2, "L->p2: ", 4 + 128);
-  deBoGriPrint(H->p1, "H->p1: ", 4 + 128);
-  deBoGriPrint(H->p2, "H->p2: ", 4 + 128);
-  deBoGriPrint(strat->R[H->i_r1]->p, "strat->R[H->i_r1]->p", 4);
-  deBoGriPrint(strat->R[H->i_r2]->p, "strat->R[H->i_r2]->p", 4);
-
-  /* BOCO: Explanation/Idea/TODO
-   * L->lcm==NULL probably means, that L is one of our initial
-   * generators. The criterion would thus not be applicable on
-   * it                                                      */
-  if( L->lcm==NULL )
-    return false;
-  deBoGriPrint("The lcm of L is not NULL", 4 + 128);
-
-
-  if(L->lcmDivisibleBy(strat->R[H->i_r1],strat->lV) > UINT_MAX-2)
-    return false;
-  deBoGriPrint("At GM3.", 4 + 128);
-  deBoGriPrint("The lcm of L is divisible by a shift of H->p1", 4 + 128);
-
-#if 0
-  //BOCO: TODO
-  //The kommutativ Gebauer-Moeller criterion part 3 says, that
-  //we shall test, if lcm(H->p, p1) != lcm(L->p1, L->p2), 
-  //and if lcm(H->p, p2) != lcm(L->p1, L->p2), but we that at
-  //the moment for our non-commutative or letterplace case. We
-  //neither sure, if we are allowed to do this, or if not, and
-  //how we have to do it. We have yet to sort this out. The
-  //implementation below is some sort of test like this, but it
-  //is presumably very wrong.
- 
-  if( !L->gm3LcmUnEqualToLcm(H->p1, L->p2, strat->lV) ) 
-    return false;
-  deBoGriPrint("L->lcm != lcm(H->p1, L->p2)", 4);
-
-  if( !L->gm3LcmUnEqualToLcm(L->p1, H->p2, strat->lV) ) 
-    return false;
-  deBoGriPrint("L->lcm != lcm(L->p1, H->p2)", 4);
-#endif
-
-  deBoGriPrint
-    ("Because of Gebauer-Moeller following Pair is expected to be superflous:", 128);
-  deBoGriPrint(L->p1, "p1: ", 128);
-  deBoGriPrint(L->p2, "p2: ", 128);
-  deBoGriPrint("Their lcm is:", 128);
-  deBoGriPrint(L->lcm, "lcm: ", 128);
-  deBoGriPrint("It can be left out, because of the following polynomial:", 128);
-  deBoGriPrint(H->p1, "h: ", 128);
-
-  deBoGriPrint("GM3 will return true.", 128);
-  return true;
-}
-#endif
-
 
 /* BOCO: 
  * This is an adapted version of enterOnePairNormal. It will
@@ -1565,34 +1369,21 @@ bool ShiftDVec::GM3(ShiftDVec::LObject* H, ShiftDVec::LObject* L, ShiftDVec::kSt
  * BOCO IMPORTANT:
  * Unfortunatly, The shift of H is not in R; we will link to an
  * unshiftet version.                                        */
-#if 0 //BOCO: original Header
-void enterOnePairNormal
-  ( int i,poly p,int ecart, 
-    int isFromQ,ShiftDVec::kStrategy strat, int atR = -1 )
-#else //BOCO: replacement
-LObject* ShiftDVec::enterOnePair
-  ( poly p1, int atR1, int isFromQ1, int ecart1,
-    poly p2, uint shift, int atR2, int isFromQ2, int ecart2, 
-    ShiftDVec::kStrategy strat                              )
-#endif
+ShiftDVec::LObject* ShiftDVec::enterOnePair
+  ( poly p1, int atR1,
+    int isFromQ1, int ecart1,
+    poly p2, uint shift, int atR2,
+    int isFromQ2, int ecart2, SD::kStrategy strat )
 {
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering enterOnePair", "Leaving enterOnePair", 8 );
-
-  namespace SD = ShiftDVec;
-
   if (strat->interred_flag) return NULL;
 
   int      l,j,compare;
   LObject  Lp;
   Lp.i_r = -1;
 
-#ifdef HAVE_SHIFTBBADVEC //BOCO: added
   p2 = p_LPshiftT
-    ( p2, shift, strat->uptodeg, strat->lV, strat, currRing );
-  loGriToFile("p_LPshiftT in enterOnePair ",0 ,1024, (void*)p2);
-#endif
+    ( p2, shift, strat->get_uptodeg(),
+      strat->get_lV(), strat, currRing );
 
 #ifdef KDEBUG
   Lp.ecart=0; Lp.length=0;
@@ -1600,173 +1391,24 @@ LObject* ShiftDVec::enterOnePair
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
 
-#if 0 //BOCO: replaced
-#ifndef HAVE_RATGRING
-  pLcm(p,strat->S[i],Lp.lcm);
-#elif defined(HAVE_RATGRING)
-  //  if (rIsRatGRing(currRing))
-  pLcmRat(p,strat->S[i],Lp.lcm, currRing->real_var_start); // int rat_shift
-#endif
-#else //BOCO: replacement
 #ifndef HAVE_RATGRING
   pLcm(p2,p1,Lp.lcm);
 #elif defined(HAVE_RATGRING)
-  //  if (rIsRatGRing(currRing))
-  pLcmRat(p2,p1,Lp.lcm, currRing->real_var_start); // int rat_shift
-#endif
+  // if (rIsRatGRing(currRing))
+  pLcmRat(p2,p1,Lp.lcm, currRing->real_var_start);
 #endif
   pSetm(Lp.lcm);
 
-#if 0 //BOCO: deleted - we do not have the product criterion
-  if (strat->sugarCrit && ALLOW_PROD_CRIT(strat))
-  {
-    if((!((strat->ecartS[i]>0)&&(ecart>0)))
-    && pHasNotCF(p,strat->S[i]))
-    {
-    /*
-    *the product criterion has applied for (s,p),
-    *i.e. lcm(s,p)=product of the leading terms of s and p.
-    *Suppose (s,r) is in L and the leading term
-    *of p divides lcm(s,r)
-    *(==> the leading term of p divides the leading term of r)
-    *but the leading term of s does not divide the leading term of r
-    *(notice that tis condition is automatically satisfied if r is still
-    *in S), then (s,r) can be cancelled.
-    *This should be done here because the
-    *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
-    *
-    *Moreover, skipping (s,r) holds also for the noncommutative case.
-    */
-      strat->cp++;
-      pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
-      return;
-    }
-    else
-      Lp.ecart = si_max(ecart,strat->ecartS[i]);
-    if (strat->fromT && (strat->ecartS[i]>ecart))
-    {
-      pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
-      return;
-      /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
-    }
-    /*
-    *the set B collects the pairs of type (S[j],p)
-    *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
-    */
-    {
-      j = strat->Bl;
-      loop
-      {
-        if (j < 0)  break;
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
-        if ((compare==1)
-        &&(sugarDivisibleBy(strat->B[j].ecart,Lp.ecart)))
-        {
-          strat->c3++;
-          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
-          {
-            pLmFree(Lp.lcm);
-            return;
-          }
-          break;
-        }
-        else
-        if ((compare ==-1)
-        && sugarDivisibleBy(Lp.ecart,strat->B[j].ecart))
-        {
-          deleteInL(strat->B,&strat->Bl,j,strat);
-          strat->c3++;
-        }
-        j--;
-      }
-    }
-  }
-  else /*sugarcrit*/
-  {
-    if (ALLOW_PROD_CRIT(strat))
-    {
-      // if currRing->nc_type!=quasi (or skew)
-      // TODO: enable productCrit for super commutative algebras...
-      if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
-      pHasNotCF(p,strat->S[i]))
-      {
-      /*
-      *the product criterion has applied for (s,p),
-      *i.e. lcm(s,p)=product of the leading terms of s and p.
-      *Suppose (s,r) is in L and the leading term
-      *of p devides lcm(s,r)
-      *(==> the leading term of p devides the leading term of r)
-      *but the leading term of s does not devide the leading term of r
-      *(notice that tis condition is automatically satisfied if r is still
-      *in S), then (s,r) can be canceled.
-      *This should be done here because the
-      *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
-      */
-          strat->cp++;
-          pLmFree(Lp.lcm);
-          Lp.lcm=NULL;
-          return;
-      }
-      if (strat->fromT && (strat->ecartS[i]>ecart))
-      {
-        pLmFree(Lp.lcm);
-        Lp.lcm=NULL;
-        return;
-        /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
-      }
-      /*
-      *the set B collects the pairs of type (S[j],p)
-      *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
-      */
-      for(j = strat->Bl;j>=0;j--)
-      {
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
-        if (compare==1)
-        {
-          strat->c3++;
-          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
-          {
-            pLmFree(Lp.lcm);
-            return;
-          }
-          break;
-        }
-        else
-        if (compare ==-1)
-        {
-          deleteInL(strat->B,&strat->Bl,j,strat);
-          strat->c3++;
-        }
-      }
-    }
-  }
-#endif
-
   /*
-  *the pair (S[i],p) enters B if the spoly != 0
-  */
-  /*-  compute the short s-polynomial -*/
-#if 0 //BOCO: replaced
-  if (strat->fromT && !TEST_OPT_INTSTRATEGY)
-    pNorm(p);
-#else //BOCO: replacement
-  if (strat->fromT && !TEST_OPT_INTSTRATEGY)
-    pNorm(p2);
-#endif
+   * the pair (S[i],p) enters B if the spoly != 0
+   */
 
-#if 0 //BOCO: replaced
-  if ((strat->S[i]==NULL) || (p==NULL))
-    return;
-#else //BOCO: replacement
+  /*-  compute the short s-polynomial -*/
+
+  if (strat->fromT && !TEST_OPT_INTSTRATEGY) pNorm(p2);
+
   if ((p1==NULL) || (p2==NULL))
-    {if(p2) {loGriToFile("pDelete in enteronepair ",0 ,1024, (void*)p2);pDelete(&p2);} return NULL;}
-#endif
+    { if(p2){pDelete(&p2);} return NULL; }
 
 #if 0 //BOCO: I do not know, how to translate this.
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
@@ -1943,238 +1585,14 @@ LObject* ShiftDVec::enterOnePair
     }
 
     l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
-    deBoGriPrint("Entering LObject Lp to B", 8);
-    deBoGriPrint(Lp.lcm, "Lp.lcm: ", 8);
-    deBoGriPrint(Lp.i_r1, "Lp.i_r1: ", 8);
-    deBoGriPrint(Lp.i_r2, "Lp.i_r2: ", 8);
-    deBoGriPrint(atR1, "atR1: ", 8);
-    deBoGriPrint(atR2, "atR2: ", 8);
     assume(strat->R[Lp.i_r1]->p == Lp.p1);
-    return SD::enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
+    return SD::enterL(&strat->B,&strat->Bl,&strat->Bmax,&Lp,l);
     //grico: pair is first saved to B, will be merged into L at
     //the end
   }
 
   return NULL;
 }
-
-
-#if 0 //BOCO: former version, had to adapt that
-/*
- * put the pair (q,p)  into the set B, ecart=ecart(p), 
- * q is the shift of some s[i]; BOCO: i do yet not know if
- * my approach of rewriting these functions is legal
- * grico: replaced the position i with qi, which is the position
- * of q (unshifted) in strat->S 
- * BOCO: 
- * returns a Pointer to the pair entered.
- * BOCO IMPORTANT:
- * Unfortunatly, The shift of H is not in R; we will link to an
- * unshiftet version.
- */
-LObject* ShiftDVec::enterOnePair
-  ( ShiftDVec::TObject* Q, ShiftDVec::TObject* H, int shift,int qi, int ecart, 
-    int isFromQ, ShiftDVec::kStrategy strat, int atR                )
-{
-  namespace SD = ShiftDVec;
-
-  poly p = p_LPshiftT
-    (H->p, shift, strat->uptodeg, strat->lV, currRing);
-
-  /* Format: q and p are like strat->P.p, so lm in CR, tail in TR */
-
-  /* check this Formats: */
-  assume(p_LmCheckIsFromRing(Q->p,currRing));
-  assume(p_CheckIsFromRing(pNext(Q->p),strat->tailRing));
-  assume(p_LmCheckIsFromRing(p,currRing));
-  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
-  //grico: thought this are the assumption on our ring, so i left them here
-
-  //grico to boco: till this point i took ur header, and left the assumption, the rest is new and imported from the enterOnePairNormal
-  assume(qi<=strat->sl);
-  if (strat->interred_flag) return NULL;
-
-  int      l,j,compare;
-  LObject  Lp;
-  Lp.i_r = -1;
-
-#ifdef KDEBUG
-  Lp.ecart=0; Lp.length=0;
-    if (TEST_OPT_DEBUG)
-    {
-//       PrintS("enterOnePairShift(q,p) invoked with q = ");
-//       wrp(q); //      wrp(pHead(q));
-//       PrintS(", p = ");
-//       wrp(p); //wrp(pHead(p));
-//       PrintLn();
-    }
-#endif
-
-  /*- computes the lcm(p,q) -*/
-  //grico:old code, just changed to p and q
-  Lp.lcm = pInit();
-  // q replaces strat->S[i]
-
-#ifndef HAVE_RATGRING
-  pLcm(Q->p,p,Lp.lcm);
-#elif defined(HAVE_RATGRING)
-  //  if (rIsRatGRing(currRing))
-  pLcmRat(Q->p,p,Lp.lcm, currRing->real_var_start); // int rat_shift
-#endif
-  pSetm(Lp.lcm);
-
-  Lp.SetLcmDvecToNULL();
-
-  //grico:
-  //Product criterion not allowed, skipped some code, since our Overlap computation takes care of that
-  //same for chain crit
-  // the following is the computation of the s poly, which should be the same in our case and in the old case, since q is shifted
-  // so these are basicly the old function, which should work (to boco: maybe a translation of the objects is needed?)
-  // just the inputs may differ to the renaming to p and q
- /*
-  *the pair (q,p) enters B if the spoly != 0
-  */
-  /*-  compute the short s-polynomial -*/
-  if (strat->fromT && !TEST_OPT_INTSTRATEGY)
-    pNorm(p);
-
-  if ((Q->p==NULL) || (p==NULL))
-    return NULL;
-
-  if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[qi]!=0))
-    Lp.p=NULL;
-  else
-  {
-    #ifdef HAVE_PLURAL
-    if ( rIsPluralRing(currRing) )
-    {
-      if(pHasNotCF(p, Q->p))
-      {
-         if(ncRingType(currRing) == nc_lie)
-         {
-             // generalized prod-crit for lie-type
-             strat->cp++;
-             Lp.p = nc_p_Bracket_qq(pCopy(p),Q->p);
-         }
-         else
-        if( ALLOW_PROD_CRIT(strat) )
-        {
-            // product criterion for homogeneous case in SCA
-            strat->cp++;
-            Lp.p = NULL;
-        }
-        else
-        {
-          Lp.p = // nc_CreateSpoly(q,p,currRing);
-                nc_CreateShortSpoly(Q->p, p, currRing);
-
-          assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
-          pNext(Lp.p) = strat->tail; // !!!
-        }
-      }
-      else
-      {
-        Lp.p = // nc_CreateSpoly(q,p,currRing);
-              nc_CreateShortSpoly(Q->p, p, currRing);
-
-        assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
-        pNext(Lp.p) = strat->tail; // !!!
-
-      }
-
-#if MYTEST
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("enterOnePairNormal::\n q: "); pWrite(Q->p);
-        PrintS("p: "); pWrite(p);
-        PrintS("SPoly: "); pWrite(Lp.p);
-      }
-#endif
-
-    }
-    else
-    #endif
-    {
-      assume(!rIsPluralRing(currRing));
-      Lp.p = ksCreateShortSpoly(Q->p, p, strat->tailRing);
-#if MYTEST
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("enterOnePairNormal::\n q: "); pWrite(Q->p);
-        PrintS("p: "); pWrite(p);
-        PrintS("commutative SPoly: "); pWrite(Lp.p);
-      }
-#endif
-
-      }
-  }
-  if (Lp.p == NULL)
-  {
-    /*- the case that the s-poly is 0 -*/
-    //if (strat->pairtest==NULL) initPairtest(strat);
-    //strat->pairtest[qi] = TRUE;/*- hint for spoly(S^[qi],p)=0 -*/
-    //strat->pairtest[strat->sl+1] = TRUE;
-    //grico: pairtest not needed, should be done in dvec::chaincrit ****************************************
-
-    /*hint for spoly(S[qi],p) == 0 for some qi,0 <= qi <= sl*/
-    /*
-    *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
-    *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
-    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
-    *term of p devides the lcm(s,r)
-    *(this canceling should be done here because
-    *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
-    *grico: this commentary isnt true any longer. all the cases are covered in the new chainCrit
-    */
-    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
-  }
-  else
-  {
-    /*- the pair (S[qi],p) enters B -*/
-    Lp.p1 = Q->p;
-    Lp.p2 = p;
-
-    if (
-        (!rIsPluralRing(currRing))
-//      ||  (rIsPluralRing(currRing) && (ncRingType(currRing) != nc_lie))
-       )
-    {
-      assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
-      pNext(Lp.p) = strat->tail; // !!!
-      // grico: i guess not needed, since we never have a PluralRing, but it doesnt harm anyone... 
-    }
-
-    if (atR >= 0)
-    {
-      Lp.i_r1 = strat->S_2_R[qi];
-      Lp.i_r2 = atR;
-    }
-    else
-    {
-      Lp.i_r1 = -1;
-      Lp.i_r2 = -1;
-    }
-    strat->initEcartPair(&Lp,Q->p,p,strat->ecartS[qi],ecart);
-    //grico: still unsure about Ecart, since we do not use Mora, I think its not needed
-    if (TEST_OPT_INTSTRATEGY)
-    {
-      if (!rIsPluralRing(currRing))
-        nDelete(&(Lp.p->coef));
-    }
-
-    l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
-    deBoGriPrint("Entering LObject Lp to B", 8);
-    deBoGriPrint(Lp.lcm, "Lp.lcm: ", 8);
-    deBoGriPrint(Lp.i_r1, "Lp.i_r1: ", 8);
-    deBoGriPrint(Lp.i_r2, "Lp.i_r2: ", 8);
-    deBoGriPrint(atR, "atR: ", 8);
-    deBoGriPrint(qi, "qi: ", 8);
-    return SD::enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
-    //grico: pair is first saved to B, will be merged into L at
-    //the end
-  }
-}
-#endif
 
 
 /* BOCO: This was heavily modified. The alternate
@@ -2220,17 +1638,9 @@ int i,j;
         {
           for (i=strat->Bl; i>=0; i--)
           {
-#if 0 //BOCO: old code - replaced
-            if (pDivisibleBy(strat->S[j],strat->B[i].lcm)) old divisibility test
-#else //replacement
-            //new divisbility test
-            if (strat->B[i].lcmDivisibleBy(strat->S_2_T(j),strat->lV))
-#endif
+            if ( strat->B[i].lcmDivisibleBy
+                   (strat->S_2_T(j),strat->get_lV()) )
             {
-              deBoGriPrint("Pairtest removed pair from B.", 64);
-              deBoGriPrint(strat->B[i].p1, "B[i]->p1: ", 64);
-              deBoGriPrint(strat->B[i].p2, "B[i]->p2: ", 64);
-              deBoGriPrint(strat->B[i].lcm, "B[i]->lcm: ", 64);
               deleteInL(strat->B,&strat->Bl,i,strat);
               strat->c3++;
             }
@@ -2499,7 +1909,8 @@ void ShiftDVec::kMergeBintoL(ShiftDVec::kStrategy strat)
   for (i=strat->Bl; i>=0; i--)
   {
     j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
-    ShiftDVec::enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+    ShiftDVec::enterL
+      ( &strat->L,&strat->Ll,&strat->Lmax,&(strat->B[i]),j );
   }
   strat->Bl = -1;
 }

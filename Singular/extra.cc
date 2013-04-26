@@ -199,7 +199,7 @@ static int PyInitialized = 0;
 #endif
 
 //BOCO: added:
-#include <kernel/shiftDVec.h>
+#include <kernel/SDBase.h>
 
 /* expects a SINGULAR square matrix with number entries
    where currRing is expected to be over some field F_p;

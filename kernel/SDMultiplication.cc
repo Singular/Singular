@@ -25,13 +25,14 @@
 //  ShiftDVec::ksReducePoly, ShiftDVec::ksCreateSpoly
 //
 //
-//TEMPORARY List (This should be done - still here for reference):
+//TEMPORARY List
+//(This should be done - still here for reference):
 //  k_GetLeadTerms - where is it used
 //    1.) in ksCreateSpoly - adapted
 //           in updateL
 //              in enterSMora
 //                 in initMora
-//                    in mora und kNF1 - I don't think we use them
+//                    in mora und kNF1 - Don't think we use 'em
 //           in updateLHC
 //              in enterSMora and mora - see above
 //           in mora - see above
@@ -52,21 +53,22 @@
 //           and in testGB - I don't think we use that
 //
 //TODO First:
-//The comments below have to be updated: This file was underwent
-//heavy changes.
+//The comments below have to be updated: This file was
+//underwent heavy changes.
 //
 //WARNING/TODO:
 //I do not know, if the ideas in this file will always work. I
-//do not yet know, if it was right to assume, that we always use
-//the ..._Mult_...__T functions. Are there other Kandidates for
-//r->p_Procs->..._Mult_... pointers???
+//do not yet know, if it was right to assume, that we always
+//use the ..._Mult_...__T functions. Are there other Kandidates
+//for r->p_Procs->..._Mult_... pointers???
 //
 //
 //TODO:
 // · Write a decent Header for this file
 //
-// · Doublecheck Part 2 - (This should be done before debugging, 
-//   but I know myself to well.)
+// · Doublecheck Part 2 -
+//  ( This should be done before debugging, but I know myself
+//    to well. )
 // · Doublecheck Part 3
 // · Create Part 4, in which old friends meet and we begin to
 //   adjust all functions in the letterplace bba, which use
@@ -107,7 +109,8 @@
 //kommt in ksReducePoly vor
 //Stellen die das benutzen koennen wahrscheinlich ausgeklammert
 //werden (hoffe ich), da wir uns um den exp bound keine Sorgen
-//machen muessen. (Unsere Exponenten haben hoechstens Groesse 1.)
+//machen muessen.
+//(Unsere Exponenten haben hoechstens Groesse 1.)
 //TODO: Kommt noch an so einigen Stellen vor und sollte
 //wahrscheinlich aus dem Code entfernt werden, aber das mache
 //ich vielleicht ein ander Mal -> vielleicht auch erst beim
@@ -117,7 +120,7 @@
 //p_ExpVectorAdd
 //Benutzt an der auskommentierten Stelle von
 //p_LmExpVectorAddIsOk - siehe Kommentar dazu
-//Ich denke hier geht es hauptsaechlich darum herauszufinden, ob
+//Ich denke hier geht es hauptsaechlich darum herauszufinden,ob
 //der exponent nicht zu gross ist, um ihn speichern zu koennen.
 //Das kann bei uns nicht passieren, da wir nur Exponenten der
 //Groesse maximal 1 haben, aber vielleicht sollte man sich das
@@ -146,36 +149,34 @@ ksReducePoly
                   
 ksReducePolySig 
                   pp_Mult_qq     		236
-                  Tail_Minus_mm_Mult_qq       346
+                  Tail_Minus_mm_Mult_qq         346
                   
 ksCreateSpoly
                   pp_Mult_mm_Noether	        448
                   pp_Mult_mm		        452
-                  Tail_Minus_mm_Mult_qq       460
+                  Tail_Minus_mm_Mult_qq         460
                   
 ksReducePolyTail   
                   uses ksReducePoly	      	512
                   Mult_nn			521
                   
 ksCreateShortSpoly
-                  nMult			582, 583, 588, 594, 773, 774, 804, 809, 817, 826,
-*/
-/*
+nMult	582, 583, 588, 594, 773, 774, 804, 809, 817, 826
 call in shiftDVec.cc of the procedures above:
 
 procedure 			line
 
 ksCreateSpoly			461(bba)
 
-ksReducePoly			1167(redtail)
-                              1416(redHomog)
-                              1427(redHomog)
-                              1466(redHomog)
-                              1700(redBba)
-                              2421(redtailBba)
+ksReducePoly	        1167(redtail)
+                        1416(redHomog)
+                        1427(redHomog)
+                        1466(redHomog)
+                        1700(redBba)
+                        2421(redtailBba)
                               
-ksReducePolyTail		2421(redtailBba)
-                              1167(redtail)
+ksReducePolyTail	2421(redtailBba)
+                        1167(redtail)
 ksCreateShortSpoly
 nc_ksCreateShortSpoly
 */
@@ -185,45 +186,45 @@ the Bba
 
 function		file		line
 
-SetShortExpVector	kspoly.cc	153, 488, 543 (360)
+SetShortExpVecto      kspoly.cc	153, 488, 543 (360)
                       kutil.cc	9400 (3118, 5308, 5406)
-                      shiftDVec.cc	1336(so close!), 1526, 2289
-                      kstd2.cc	319, 336, 399, 473, 539, 639, 687, 777, 842, 945, 1023, 1123, 2795, 3094, 3138
-                      tgb.cc		(1867, 1914, 3018, 3065, 4703)
-p_ExpVectorSub		kspoly.cc	99, 115, (227, 306, 322 )
-p_LmExpVectorAddIsOk	kspoly.cc	104, (311)
+                      shiftDVec.cc 1336(so close!), 1526, 2289
+                      kstd2.cc  319, 336, 399, 473, 539, 639,
+                                687, 777, 842, 945, 1023, 1123,
+                                2795, 3094, 3138
+                      tgb.cc	(1867, 1914, 3018, 3065, 4703)
+p_ExpVectorSub	      kspoly.cc	99, 115, (227, 306, 322 )
+p_LmExpVectorAddIsOk  kspoly.cc	104, (311)
                       kutil.cc	7936, 7937, 7963, 7964
-p_ExpVectorAdd		kspoly.cc	107, (314)
+p_ExpVectorAdd	      kspoly.cc	107, (314)
                       kutil.cc	5866, 5909
                       fast_mult.cc	(449)
                       kstd2.cc	1842, 1852
-p_GetExpDiff		kspoly.cc	607, 659, 697
+p_GetExpDiff	      kspoly.cc	607, 659, 697
                       ringgb.cc	(71)
 */
 
-#include <kutil.h>  //because of include order
+#include <kutil.h>
+//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
+#include <SDDebug.h>
 #include <SDMultiplication.h>
 
 #include <polys/monomials/p_polys.h>
 
 
-/* Part 1: General Tools - especially for dp case and the like */
+/*Part 1: General Tools - especially for dp case and the like*/
 
- typedef skStrategy* kStrategy;
-
-namespace SD = ShiftDVec;
-
-/* Creates a Mapping: i -> pos, where i is an index of a       *
-* variable in a block of the letterplace polynomial and pos   *
-* the position of the order Field for the block. May not yet  *
-* work for other orderings than dp. The Mapping is stored to  *
-* r->omap, the size of the mapping to r->osize. omap[0] has a *
-* special meaning: it is the glocal order Field, thus the     *
-* totaldegree in the dp-Case.                                 * 
-* TODO: This has to be adapted to other orderings. And the    *
-* comment should be rewritten to be more understandable and   *
-* more accurate. BOCO: Answer: There seems to be no Problem with
-* other orderings... - hopefully.                             */
+/* Creates a Mapping: i -> pos, where i is an index of a     *
+* variable in a block of the letterplace polynomial and pos  *
+* the position of the order Field for the block. May not yet *
+* work for other orderings than dp. The Mapping is stored to *
+* r->omap, the size of the mapping to r->osize. omap[0] has  *
+* a special meaning: it is the glocal order Field, thus the  *
+* totaldegree in the dp-Case.                                * 
+* TODO: This has to be adapted to other orderings. And the   *
+* comment should be rewritten to be more understandable and  *
+* more accurate. BOCO: Answer: There seems to be no Problem  *
+* with other orderings - hopefully.                          */
 int ShiftDVec::InitOrderMapping( ring r )
 {
 r->omap = (int *) omAlloc( (r->N+1) * sizeof(int) );
@@ -247,35 +248,36 @@ return r->osize = r->N+1;
 /* Initializes the letterplace multiplication. See also        *
 * InitOrderMapping. Do not forget to free r->omap as soon, as *
 * it will no longer be used.                                  */
-void ShiftDVec::InitSDMultiplication( ring r, SD::kStrategy strat )
+void ShiftDVec::InitSDMultiplication
+  ( ring r, SD::kStrategy strat )
 {
-r->isLPring = strat->lV; 
-//BOCO: this should have already been set by
-//makeLetterplaceRing, but it isnt :(
+  r->isLPring = strat->get_lV(); 
+  //BOCO: this should have already been set by
+  //makeLetterplaceRing, but it isnt :(
 
-r->p_ExpSum = &SD::p_ExpSum_slow;
+  r->p_ExpSum = &SD::p_ExpSum_slow;
 
 #if 0 //BOCO: Well, I hope all works fine even without ro_dp...
-for(int i = 1; i < r->OrdSize; ++i)
-{
-  if( r->typ[i].ord_typ != ro_dp )
+  for(int i = 1; i < r->OrdSize; ++i)
   {
-    r->p_ExpSum = &SD::p_ExpSum_slow;
-    return;
+    if( r->typ[i].ord_typ != ro_dp )
+    {
+      r->p_ExpSum = &SD::p_ExpSum_slow;
+      return;
+    }
   }
-}
 #endif
 
-//BOCO: TODO: QUESTION: 
-//Should we reset that after the bba?
-r->p_Procs->pp_Mult_mm =
-  r->p_Procs->LPDV__pp_Mult_mm;
-r->p_Procs->pp_Mult_mm_Noether =
-  r->p_Procs->LPDV__pp_Mult_mm_Noether;
-r->p_Procs->p_Minus_mm_Mult_qq =
-  r->p_Procs->LPDV__p_Minus_mm_Mult_qq;
+  //BOCO: TODO: QUESTION: 
+  //Should we reset that after the bba?
+  r->p_Procs->pp_Mult_mm =
+    r->p_Procs->LPDV__pp_Mult_mm;
+  r->p_Procs->pp_Mult_mm_Noether =
+    r->p_Procs->LPDV__pp_Mult_mm_Noether;
+  r->p_Procs->p_Minus_mm_Mult_qq =
+    r->p_Procs->LPDV__p_Minus_mm_Mult_qq;
 
-InitOrderMapping(r);
+  InitOrderMapping(r);
 }
 
 #if 0 //Not used at the moment
@@ -563,7 +565,8 @@ int ShiftDVec::ksReducePoly(SD::LObject* PR,
   {
     // check that reduction does not violate exp bound
     // BOCO: TODO: think about it!
-    while (SPW->max != NULL && !p_LmExpVectorAddIsOk(lm, SPW->max, tailRing))
+    while( SPW->max != NULL &&
+           !p_LmExpVectorAddIsOk(lm, SPW->max, tailRing) )
     {
       //BOCO: hopefully this loop is not executed very often...
       //otherwise: have to build a method called
@@ -572,7 +575,7 @@ int ShiftDVec::ksReducePoly(SD::LObject* PR,
       p_ExpVectorAdd(lm, p2, tailRing);
       poly mr_shifted = p_mLPshift
         ( mr, shift_of_p2 + p2->exp[tailRing->omap[0]],
-          strat->uptodeg, tailRing->isLPring, tailRing );
+          strat->get_uptodeg(), tailRing->isLPring, tailRing );
       p_Delete(&mr, tailRing);
       p_ExpVectorAdd(lm, mr_shifted, tailRing);
       p_Delete(&mr_shifted, tailRing);

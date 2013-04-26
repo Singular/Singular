@@ -14,7 +14,8 @@
 #ifndef SDKUTIL_H
 #define SDKUTIL_H
 
-#include <kernel/kutil.h>
+//#include <kernel/kutil.h>
+//No, we have first to include
 
 namespace ShiftDVec
 {
@@ -25,6 +26,7 @@ namespace ShiftDVec
   class sLObject;
   class sTObject;
   class skStrategy;
+  typedef sLObject LObject;
   typedef sTObject TObject;
   typedef sTObject* TSet;
   typedef sLObject* LSet;
@@ -95,8 +97,6 @@ namespace ShiftDVec
         SD::sTObject* T2, uint beginT2, uint size, int lV );
 }
 
-
-
 /* classes for ShiftDVec case: ...Object, ...Strategy */
 
 
@@ -119,6 +119,8 @@ namespace ShiftDVec
 class ShiftDVec::sTObject : public virtual ::sTObject
 {
   public:
+    void virtualizer(){}
+
     uint * dvec; //Distance Vector of lm(p)
     uint dvSize; //size of the >>uint * dvec<< array
 
@@ -292,6 +294,7 @@ class ShiftDVec::skStrategy : public ::skStrategy
      */
     SD::TSet T;
     SD::LSet L;
+    SD::LSet B;
     SD::LObject P;
     SD::TObject** R;
 
@@ -299,8 +302,14 @@ class ShiftDVec::skStrategy : public ::skStrategy
     SD::TObject* s_2_t(int i);
     SD::TObject* S_2_T(int i);
     int (*red)(SD::LObject * L,kStrategy strat);
-    void initL(int nr)
-    { L = (SD::LSet)omAlloc(nr*sizeof(SD::LObject)); }
+    void initL(ideal F)
+    { 
+      int nr =
+        ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
+      L = (SD::LSet)omAlloc(nr*sizeof(SD::LObject));
+    }
+    void initB()
+    { B = (SD::LSet)omAlloc(setmaxL*sizeof(SD::LObject)); }
     void initT();
     void initR();
 
@@ -352,6 +361,6 @@ poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );
 
 #endif  //#ifndef SDKUTIL_H
 
-
+#include <kernel/kInline.h>
 
 /* vim: set foldmethod=syntax : */

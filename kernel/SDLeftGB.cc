@@ -26,6 +26,8 @@
  * ( i is and Integerindex: 0 <= i < get_size_of_I() ).
  */
 
+//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
+#include "kutil.h"
 #include "SDLeftGB.h"
 
 typedef skStrategy* kStrategy;

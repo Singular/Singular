@@ -67,6 +67,8 @@
 
 namespace ShiftDVec
 {
+  namespace SD = ShiftDVec;
+
   class DeBoGri;
 
   bool deBoGriPrint
@@ -82,19 +84,22 @@ namespace ShiftDVec
     ( const poly p, const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool deBoGriPrint
-    ( const poly p, const char* description, uint flag,
-      const ring lmRing, const ring tlRing = NULL,
-      bool assume = false, int indent = -1              );
+    ( const poly p,
+      const char* description,
+      uint flag, const ring lmRing,
+      const ring tlRing = NULL,
+      bool assume = false, int indent = -1 );
   bool deBoGriPrint
-    ( const ShiftDvec::TObject* P, const char* description, uint flag,
+    ( const SD::TObject* P,
+      const char* description, uint flag,
       const ring lmRing, const ring tlRing,
-      bool assume = false, int indent = -1                 );
+      bool assume = false, int indent = -1  );
   bool deBoGriPrint
     ( const uint* dvec, uint size, 
       const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool deBoGriPrint
-    ( const poly p, int shift, ShiftDVec::kStrategy strat,
+    ( const poly p, int shift, SD::kStrategy strat,
       const char* description, 
       uint flag, bool assume = false, int indent = -1 );
   bool loGriToFile

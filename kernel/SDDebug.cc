@@ -8,7 +8,8 @@
  * see SDDebug.h
  */
 
-#include <SDkutil.h>
+//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
+#include <kutil.h>
 
 namespace SD = ShiftDVec;
 

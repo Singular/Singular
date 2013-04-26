@@ -49,6 +49,7 @@
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
 
+//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
 #include <kernel/kutil.h>
 #include <polys/kbuckets.h>
 #include <kernel/febase.h>
@@ -774,17 +775,10 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     if (i < 0)
       return dReportError("L[%d].p1 not in T",lpos);
     i = kFindInT(L->p2, T, tlength);
-#ifdef HAVE_SHIFTBBADVEC //BOCO: small modification
-    if (i < 0 && !ShiftDVec::lpDVCase)
-    {
-      //BOCO: We have to improve kFindInT, as we might hav a
-      //shift here
+    //BOCO: small modification (test for ShiftDVec Case)
+    //TODO: test if we really have a shift here
+    if (i < 0 && !dynamic_cast<ShiftDVec::sLObject*>(L))
       return dReportError("L[%d].p2 not in T",lpos);
-    }
-#else //original
-    if (i < 0)
-      return dReportError("L[%d].p2 not in T",lpos);
-#endif
   }
   return TRUE;
 }

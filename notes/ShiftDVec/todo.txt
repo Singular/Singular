@@ -10,32 +10,13 @@ TODO List - Letterplace DVec Implementation
 other  -  no/minor priority
 [?]    -   unknown priority
 
-· [?] Berechnung der GB eines Links Ideals in einer
-  Faktor-Algebra: Effizienzsteigerung möglich durch Erstellung
-  von Paaren der Polynome aus I -> Gebauer Möller ist dadurch
-  effizienter möglich: Beste Effizienzsteigerung: Paarmenge wird
-  „lazy“ erstellt.
-
-· [PP] Die aktuellste Version dieser Liste soll von nun an in Git
-  gespeichert werden.
-
 · [PP] Update this list.
 
-· [?] Complete the TODO-List
-  Status: don't know
-  Note: There is always something I forget
-
-· Complete files.txt and remove unecessary files from git. (e.g
-  some files from Singular/gdb; replace freegb_wrkcp.lib with
-  stable version.)
-
-· [P] Get the inhomogenous case to work (basically):
-  Status: seems to work, testing needed
-  Notes: Only a few calculations were made, especially very few
-  inhomogenous GB were calculated - we may still be in for
-  surprises
+· [PP] GB over Left-/Right-Ideals
+  Status: nothing done so far
+  Notes: Viktor wants us to do that
   
-· [P] Get other orderings than dp to work:
+· [PP] Get other orderings than dp to work:
   Status: shouldn't be to hard but: see Notes
   Note1: for weighted orderings we have first to change the
   monomial structure - see „Implementational Details“ subitem
@@ -50,6 +31,28 @@ other  -  no/minor priority
   implement that effictiently. For sure, some of the comparison
   algorithms in Singular have to be adapted.
 
+· [?] Berechnung der GB eines Links Ideals in einer
+  Faktor-Algebra: Effizienzsteigerung möglich durch Erstellung
+  von Paaren der Polynome aus I -> Gebauer Möller ist dadurch
+  effizienter möglich: Beste Effizienzsteigerung: Paarmenge wird
+  „lazy“ erstellt.
+
+· [PP] Die aktuellste Version dieser Liste soll von nun an in Git
+  gespeichert werden. - done (i think)
+
+· [?] Complete the TODO-List
+  Status: don't know
+  Note: There is always something I forget
+
+· Complete files.txt and remove unecessary files from git. (e.g
+  some files from Singular/gdb; replace freegb_wrkcp.lib with
+  stable version.)
+
+· [P] Get the inhomogenous case to work (basically):
+  Status: seems to work, testing needed
+  Notes: Only a few calculations were made, especially very few
+  inhomogenous GB were calculated - we may still be in for
+  surprises
 · Do we need the „Noether“-Versions of the multiplications?
   Status: nothing done so far
   Note: What are these Versions good for anyway?
@@ -60,10 +63,6 @@ other  -  no/minor priority
   it a bit more thoroughly. Viktor wanted me to include it, since
   it could improve the performance of our algorithm. I do not
   really know, what priority this has.
-
-· [p] GB over Left-/Right-Ideals
-  Status: nothing done so far
-  Notes: Viktor wants us to do that
   
 · [P] Testing, comparison of output:
   Status: To be done

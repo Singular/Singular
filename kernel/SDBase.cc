@@ -45,8 +45,8 @@
 #include <kernel/shiftgb.h>
 
 #include <kernel/kutil.h>
+//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
 
-#include <kernel/SDkutil.h>
 #include <kernel/SDBase.h>
 #include <kernel/SDDebug.h>
 
@@ -95,8 +95,6 @@ namespace ShiftDVec
   typedef skStrategy* kStrategy;
 };
 
-namespace SD = ShiftDVec;
-
 
 
 //extracted inlines from kutil.cc
@@ -114,8 +112,10 @@ inline static intset initec (const int maxnr)
 
 //BOCO: copied from kutil.cc
 static inline void enlargeL
-  (SD::LSet* L,int* length,const int incr)
+  (ShiftDVec::LSet* L,int* length,const int incr)
 {
+  namespace SD = ShiftDVec;
+
   assume((*L)!=NULL);
   assume((length+incr)>0);
 
@@ -1641,7 +1641,7 @@ int ShiftDVec::redHomog (ShiftDVec::LObject* h,ShiftDVec::kStrategy strat)
         if (j < 0)
 #endif
           return 1;
-        SD::enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        SD::enterL( &strat->L,&strat->Ll,&strat->Lmax,h,at );
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
           Print(" lazy: -> L%d\n",at);
@@ -3058,31 +3058,32 @@ void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
 }
 
 
-/*BOCO: original comment from kutil.cc
- * enters p at position at in L
- *BOCO:
- * - We have to initialize the dvec of [[p]]. 
- * - We will return a pointer to the LObject in [[set]] . */
-#if 0 //BOCO: original code and comment
-      //TODO: CLEANUP: remove this
-void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
-#else //BOCO: replacement
-SD::LObject* ShiftDVec::enterL
+/* BOCO: original comment from kutil.cc
+ *  enters p at position at in L
+ * BOCO:
+ *  - We have to initialize the dvec of [[p]]. 
+ *  - We will return a pointer to the LObject in [[set]] .
+ * WARNING (if an error occeurs: check):
+ *  p is now is passed as a pointer instead of passing it by
+ *  value (may save us one copy).
+ */
+ShiftDVec::LObject* ShiftDVec::enterL
   ( SD::LSet *set,
     int *length, int *LSetmax,
-    SD::LObject p,int at, uint* dvec )
+    SD::LObject* p,int at, uint* dvec )
 {
-#endif
   int i;
   // this should be corrected
-  assume(p.FDeg == p.pFDeg());
+  assume(p->FDeg == p->pFDeg());
 
   if ((*length)>=0)
   {
-    if ((*length) == (*LSetmax)-1) enlargeL(set,LSetmax,setmaxLinc);
+    if ( (*length) == (*LSetmax)-1 )
+      enlargeL(set,LSetmax,setmaxLinc);
     if (at <= (*length))
 #ifdef ENTER_USE_MEMMOVE
-      memmove(&((*set)[at+1]), &((*set)[at]), ((*length)-at+1)*sizeof(LObject));
+      memmove( &((*set)[at+1]), &((*set)[at]),
+               ((*length)-at+1)*sizeof(LObject) );
 #else
     for (i=(*length)+1; i>=at+1; i--) (*set)[i] = (*set)[i-1];
 #endif
@@ -3090,7 +3091,7 @@ SD::LObject* ShiftDVec::enterL
   else at = 0;
 
   (*length)++;
-  (*set)[at] = p;
+  (*set)[at] = *p;
 
   return &(*set)[at];
 }
@@ -3196,7 +3197,7 @@ void ShiftDVec::initSL( ideal F, ideal Q, SD::kStrategy strat )
       //TODO: CLEANUP: remove this
           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
 #else
-          SD::enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+          SD::enterL(&strat->L,&strat->Ll,&strat->Lmax,&h,pos);
 #endif
         }
       }
@@ -3236,12 +3237,11 @@ void ShiftDVec::initBuchMora
   /*- set L -*/
   strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
   strat->Ll = -1;
-  strat->initL
-    ( ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc );
+  strat->initL(F);
   /*- set B -*/
   strat->Bmax = setmaxL;
   strat->Bl = -1;
-  strat->B = initL();
+  strat->initB();
   /*- set T -*/
   strat->tl = -1;
   strat->tmax = setmaxT;
