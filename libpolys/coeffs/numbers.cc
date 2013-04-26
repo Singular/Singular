@@ -326,6 +326,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfImPart=ndReturn0;
     n->cfDelete= ndDelete;
     n->cfInpMult=ndInpMult;
+    n->cfInpAdd=ndInpAdd;
     n->cfCopy = ndCopy;
     n->cfIntMod=ndIntMod; /* dummy !! */
     n->cfNormalize=ndNormalize;

@@ -2887,6 +2887,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfSetMap = nlSetMap;
   //r->cfName = ndName;
   r->cfInpMult=nlInpMult;
+  r->cfInpAdd=nlInpAdd;
   r->cfInit_bigint=nlCopyMap;
   r->cfCoeffWrite=nlCoeffWrite;
 

@@ -190,6 +190,9 @@ struct n_Procs_s
    /// Inplace: a *= b
    void    (*cfInpMult)(number &a, number b, const coeffs r);
 
+   /// Inplace: a += b
+   void    (*cfInpAdd)(number &a, number b, const coeffs r);
+
    /// maps the bigint i (from dummy == coeffs_BIGINT!!!) into the
    /// coeffs dst
    /// TODO: to be exchanged with a map!!!
@@ -530,6 +533,11 @@ static inline number n_Mult(number a, number b, const coeffs r)
 /// replacement of 'a' by the product a*b
 static inline void n_InpMult(number &a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfInpMult!=NULL); r->cfInpMult(a,b,r); }
+
+/// addition of 'a' and 'b';
+/// replacement of 'a' by the sum a+b
+static inline void n_InpAdd(number &a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfInpAdd!=NULL); r->cfInpAdd(a,b,r); }
 
 /// return the difference of 'a' and 'b', i.e., a-b
 static inline number n_Sub(number a, number b, const coeffs r)
