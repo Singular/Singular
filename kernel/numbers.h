@@ -33,6 +33,7 @@
 #define n_Test(a,r)           (r)->cf->nDBTest(a,__FILE__,__LINE__)
 
 #define n_InpMult(a, b, r)    (r)->cf->nInpMult(a,b,r)
+#define n_InpAdd(a, b, r)    (r)->cf->nInpAdd(a,b,r)
 #define n_Power(a, b, res, r) (r)->cf->nPower(a,b,res)
 #define n_Size(n,r)           (r)->cf->nSize(n)
 #define n_GetDenom(N,r)       (r)->cf->cfGetDenom((N),r)
@@ -99,8 +100,8 @@ void ndDelete(number* d, const ring r);
 void nDummy2(number &d);
 number ndGcd(number a, number b, const ring);
 number ndCopy(number a);
-void   ndInpMult(number &a, number b, const ring r);
-number ndInpAdd(number &a, number b, const ring r);
+void ndInpMult(number &a, number b, const ring r);
+void ndInpAdd(number &a, number b, const ring r);
 
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);

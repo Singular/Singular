@@ -2233,18 +2233,18 @@ LINLINE number nlAdd (number a, number b)
 number nlShort1(number a);
 number nlShort3_noinline(number x);
 
-LINLINE number nlInpAdd (number a, number b, const ring r)
+LINLINE void nlInpAdd (number &a, number b, const ring r)
 {
   // a=a+b
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     LONG r=SR_HDL(a)+SR_HDL(b)-1L;
     if ( ((r << 1) >> 1) == r )
-      return (number)(long)r;
+      a=(number)(long)r;
     else
-      return nlRInit(SR_TO_INT(r));
+      a=nlRInit(SR_TO_INT(r));
   }
-  return _nlInpAdd_aNoImm_OR_bNoImm(a,b);
+  a=_nlInpAdd_aNoImm_OR_bNoImm(a,b);
 }
 
 LINLINE number nlMult (number a, number b)

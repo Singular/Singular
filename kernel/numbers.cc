@@ -77,12 +77,11 @@ void   ndInpMult(number &a, number b, const ring r)
   n_Delete(&a,r);
   a=n;
 }
-number ndInpAdd(number &a, number b, const ring r)
+void ndInpAdd(number &a, number b, const ring r)
 {
   number n=n_Add(a,b,r);
   n_Delete(&a,r);
   a=n;
-  return a;
 }
 
 #ifdef LDEBUG
@@ -309,6 +308,7 @@ void nInitChar(ring r)
   n->nImPart=ndReturn0;
   n->cfDelete= ndDelete;
   n->nInpMult=ndInpMult;
+  n->nInpMult=ndInpAdd;
   n->cfCopy=nd_Copy;
   n->nIntMod=ndIntMod; /* dummy !! */
   n->nNormalize=nDummy2;
@@ -502,6 +502,7 @@ void nInitChar(ring r)
     n->nSub   = nlSub;
     n->nMult  = nlMult;
     n->nInpMult=nlInpMult;
+    n->nInpMult=nlInpAdd;
     n->nDiv   = nlDiv;
     n->nExactDiv= nlExactDiv;
     n->nIntDiv= nlIntDiv;

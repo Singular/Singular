@@ -123,6 +123,11 @@ static inline number npAddM(number a, number b)
   long r = (long)a + (long)b;
   return (number)(r >= npPrimeM ? r - npPrimeM : r);
 }
+static inline void npInpAddM(number &a, number b)
+{
+  long r = (long)a + (long)b;
+  a=(number)(r >= npPrimeM ? r - npPrimeM : r);
+}
 static inline number npSubM(number a, number b)
 {
   return (number)((long)a<(long)b ?
@@ -139,6 +144,17 @@ static inline number npAddM(number a, number b)
    res += (res >> 31) & npPrimeM;
 #endif
    return (number)res;
+}
+static inline void npInpAddM(number &a, number b)
+{
+   long res = ((long)a + (long)b);
+   res -= npPrimeM;
+#if SIZEOF_LONG == 8
+   res += (res >> 63) & npPrimeM;
+#else
+   res += (res >> 31) & npPrimeM;
+#endif
+   a=(number)res;
 }
 static inline number npSubM(number a, number b)
 {

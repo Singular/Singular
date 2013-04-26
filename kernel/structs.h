@@ -241,6 +241,7 @@ struct n_Procs_s
    nMapFunc (*cfSetMap)(const ring src, const ring dst);
    char *  (*nName)(number n);
    void    (*nInpMult)(number &a, number b, ring r);
+   void    (*nInpAdd)(number &a, number b, ring r);
 #ifdef LDEBUG
    BOOLEAN (*nDBTest)(number a, const char *f,const int l);
 #endif

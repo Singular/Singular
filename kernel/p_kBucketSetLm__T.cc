@@ -73,7 +73,8 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
           pSetCoeff0(p, n_Add(pGetCoeff(bucket->buckets[i]), tn, r));
           n_Delete(&tn, r);
           #else
-          pSetCoeff0(p, n_InpAdd(tn,pGetCoeff(bucket->buckets[i]), r));
+          n_InpAdd(tn,pGetCoeff(bucket->buckets[i]),r);
+          pSetCoeff0(p, tn);
           #endif
           p = bucket->buckets[i];
           pIter(bucket->buckets[i]);

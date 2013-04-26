@@ -45,7 +45,8 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   t = n_Add(n1,n2, r);
   n_Delete(&n1, r);
   #else
-  t=n_InpAdd(n1,n2,r);
+  n_InpAdd(n1,n2,r);
+  t=n1;
   #endif
   n_Delete(&n2, r);
   q = p_LmFreeAndNext(q, r);
