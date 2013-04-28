@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
 
-CPPFLAGS = $(shell dpkg-buildflags --get CPPFLAGS)
-
 %:
 	dh $@
 
