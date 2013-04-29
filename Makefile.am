@@ -36,7 +36,10 @@ DEBIAN = \
 	debian/control \
 	debian/copyright \
 	debian/rules \
-	debian/singular.dirs \
+	debian/singular-bin.install \
+	debian/singular-common.dirs \
+	debian/singular-common.install \
+	debian/singular-dev.install \
 	debian/source/format \
 	debian/source/include-binaries \
 	debian/icons/Singular.png
