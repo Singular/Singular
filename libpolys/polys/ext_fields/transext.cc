@@ -182,6 +182,12 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
     {
       number n=pGetCoeff(p);
       n_Test(n,ntCoeffs);
+      if ((!(SR_HDL(n) & SR_INT))&&(n->s==0))
+      /* not normalized, just do for the following test*/
+      {
+        n_Normalize(pGetCoeff(p),ntCoeffs);
+        n=pGetCoeff(p);
+      }
       if (!(SR_HDL(n) & SR_INT))
       {
         if (n->s<2)
@@ -987,13 +993,6 @@ void ntPower(number a, int exp, number *b, const coeffs cf)
        with integers a_alpha, c_beta, and with a non-constant denominator,
        then both the numerator and the denominator will be divided by the
        GCD of the a_alpha's and the c_beta's (if this GCD is != 1),
-   (3) if 'a' is - e.g. after having performed steps (1) and (2) - of the
-       form
-          (sum_alpha a_alpha * t^alpha)
-          -----------------------------
-                        c
-       with integers a_alpha, and c != 1, then 'a' will be replaced by
-       (sum_alpha a_alpha/c * t^alpha);
    this procedure does not alter COM(f) (this has to be done by the
    calling procedure);
    modifies f */
@@ -1003,7 +1002,6 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
   assume(!IS0(f));
   assume(!DENIS1(f));
 
-  if (!p_IsConstant(DEN(f), ntRing))
   { /* step (1); see documentation of this procedure above */
     p_Normalize(NUM(f), ntRing);
     p_Normalize(DEN(f), ntRing);
@@ -1037,7 +1035,7 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
       p_Normalize(DEN(f), ntRing);
     }
     n_Delete(&lcmOfDenominators, ntCoeffs);
-    if (!p_IsConstant(DEN(f), ntRing))
+    if (DEN(f)!=NULL)
     { /* step (2); see documentation of this procedure above */
       p = NUM(f);
       number gcdOfCoefficients = n_Copy(p_GetCoeff(p, ntRing), ntCoeffs);
@@ -1071,15 +1069,6 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
       }
       n_Delete(&gcdOfCoefficients, ntCoeffs);
     }
-  }
-  if (p_IsConstant(DEN(f), ntRing) &&
-      (!n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs)))
-  { /* step (3); see documentation of this procedure above */
-    number inverseOfDen = n_Invers(p_GetCoeff(DEN(f), ntRing), ntCoeffs);
-    NUM(f) = p_Mult_nn(NUM(f), inverseOfDen, ntRing);
-    n_Delete(&inverseOfDen, ntCoeffs);
-    p_Delete(&DEN(f), ntRing);
-    DEN(f) = NULL;
   }
 
   /* Now, due to the above computations, DEN(f) may have become the
