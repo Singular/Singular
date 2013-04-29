@@ -57,6 +57,9 @@
 #define DEBOGRI 1
 #endif
 
+#define DEBOGRI 0 //got some errors, don't know why
+                  //temporary hack: shutting down deBoGri
+
 
 #if DEBOGRI > 0
 

@@ -1,7 +1,3 @@
-Dies ist eine Kopie von /home/ben/data/mnt/uni/share/lpdv .
-/home/ben/data/mnt/uni/share/lpdv ist im zweifelsfalle 
-die aktuellere Version.
-
 TODO List - Letterplace DVec Implementation
 
 [PP]   - very high priority
@@ -30,6 +26,8 @@ other  -  no/minor priority
   could result in lots of work and I have to think about, how to
   implement that effictiently. For sure, some of the comparison
   algorithms in Singular have to be adapted.
+
+· [PP] Basisdarstellung mit Faktoren für Elemente aus dem Ideal.
 
 · [?] Berechnung der GB eines Links Ideals in einer
   Faktor-Algebra: Effizienzsteigerung möglich durch Erstellung

@@ -33,8 +33,8 @@
 typedef skStrategy* kStrategy;
 
 void ShiftDVec::LeftGB::initenterpairs
-  ( ShiftDVec::LObject* J,
-    int ecart, int isFromQ, ShiftDVec::kStrategy strat, int atR )
+  ( SD::LObject* J,
+    int ecart, int isFromQ, SD::kStrategy strat, int atR )
 {
   namespace SD = ShiftDVec;
   namespace LGB = ShiftDVec::LeftGB;
@@ -163,7 +163,9 @@ void ShiftDVec::LeftGB::GebauerMoeller
  * TODO: Let this function get checked by Grischa!
  */
 void ShiftDVec::LeftGB::GMFilter
-  ( ShiftDVec::LObject* J, ShiftDVec::TObject* p_i, ShiftDVec::TObject* p_k,
+  ( SD::LObject* J,
+    SD::TObject* p_i,
+    SD::TObject* p_k,
     uint* i_ovls_j, uint* k_ovls_j,
     uint size_i_ovls_j, uint size_k_ovls_j )
 {
@@ -203,8 +205,8 @@ void ShiftDVec::LeftGB::GMFilter
  * · Everything has to be initialized correctly!!!! (Oh my)
  */
 void ShiftDVec::LeftGB::GMFilter
-  ( ShiftDVec::LObject* L, ShiftDVec::LObject* J,
-    ShiftDVec::LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, ShiftDVec::kStrategy strat )
+  ( SD::LObject* L, SD::LObject* J, SD::LObject* p_k,
+    uint* k_ovls_j, uint size_k_ovls_j, SD::kStrategy strat )
 {
   if( L->dv2Size != J->dvSize ) return;
   if( !memcmp(L->dv2, J->dvec, sizeof(uint)*J->dvSize) )return;
@@ -245,8 +247,8 @@ void ShiftDVec::LeftGB::GMFilter
  * · We need to implement kSD_Strat::deleteInL
  */
 void ShiftDVec::LeftGB::GMFilter
-  ( int index_L, ShiftDVec::LObject* J,
-    ShiftDVec::LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, ShiftDVec::kStrategy strat )
+  ( int index_L, SD::LObject* J, SD::LObject* p_k,
+    uint* k_ovls_j, uint size_k_ovls_j, SD::kStrategy strat )
 {
   ShiftDVec::LObject* L = strat->L[index_L];
 
@@ -275,7 +277,8 @@ void ShiftDVec::LeftGB::GMFilter
  * reworked.
  */
 void ShiftDVec::LeftGB::enterOverlaps
-  ( ShiftDVec::LObject* J, ShiftDVec::SD_kStrat strat, uint** overlaps, 
+  ( SD::LObject* J,
+    SD::SD_kStrat strat, uint** overlaps, 
     uint* ovl_sizes, int isFromQ, int ecart, int atR )
 {
   namespace SD = ShiftDVec;
