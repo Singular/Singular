@@ -33,7 +33,7 @@ Description: computer algebra system for polynomial computations (common files)
  emphasis on the special needs of commutative algebra, algebraic geometry,
  and singularity theory.
  .
- This package contains architecture independent files.
+ This package contains architecture-independent files.
 
 Package: singular-dev
 Architecture: all
