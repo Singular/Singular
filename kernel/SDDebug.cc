@@ -224,7 +224,7 @@ bool SD::deBoGriPrint
       !assume && !SD::isSilenced )
   {
     poly pTemp = p;
-    if( shiftViolatesDeg(p, shift, strat->uptodeg) )
+    if( shiftViolatesDeg(p, shift, strat->get_uptodeg()) )
     {
       PrintS("DEBOGRIPRINT: Shift would violate degree bound.\n"); 
       PrintS("DEBOGRIPRINT: Will print the polynomial unshifted.\n"); 
@@ -232,7 +232,8 @@ bool SD::deBoGriPrint
     else if(shift != 0)
      {
       pTemp = p_LPshift
-        ( p, shift, strat->uptodeg, strat->lV, currRing );
+        ( p, shift,
+          strat->get_uptodeg(), strat->get_lV(), currRing );
       loGriToFile("p_LPshift in deBoGriPrint",0 ,1024, (void*)pTemp);
      }
     for(int i = indent; i; --i) PrintS(" ");

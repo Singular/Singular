@@ -1,6 +1,8 @@
 #ifndef SDDEBUG_H
 #define SDDEBUG_H
 
+#include <kernel/kutil.h>
+
 /* file:        SDDebug.h
  * authors:     Grischa Studzinski & Benjamin Schnitzler
  * created:     ask git
@@ -56,9 +58,6 @@
 #ifdef KDEBUG
 #define DEBOGRI 1
 #endif
-
-#define DEBOGRI 0 //got some errors, don't know why
-                  //temporary hack: shutting down deBoGri
 
 
 #if DEBOGRI > 0

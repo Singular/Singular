@@ -361,6 +361,4 @@ poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );
 
 #endif  //#ifndef SDKUTIL_H
 
-#include <kernel/kInline.h>
-
 /* vim: set foldmethod=syntax : */
