@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
 
-CPPFLAGS = $(shell dpkg-buildflags --get CPPFLAGS)
-
 %:
 	dh $@
 
@@ -10,7 +8,7 @@ override_dh_auto_configure:
 
 override_dh_auto_install:
 	dh_auto_install
-	install debian/icons/Singular.desktop debian/singular/usr/share/applications
-	install debian/icons/Singular-manual.desktop debian/singular/usr/share/applications
-	install debian/icons/Singular.png debian/singular/usr/share/icons
+	install debian/icons/Singular.desktop debian/singular-common/usr/share/applications
+	install debian/icons/Singular-manual.desktop debian/singular-common/usr/share/applications
+	install debian/icons/Singular.png debian/singular-common/usr/share/icons
 
