@@ -206,8 +206,8 @@ p_GetExpDiff	      kspoly.cc	607, 659, 697
 
 #include <kutil.h>
 //#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
-#include <SDDebug.h>
-#include <SDMultiplication.h>
+#include <kernel/SDDebug.h>
+#include <kernel/SDMultiplication.h>
 
 #include <polys/monomials/p_polys.h>
 

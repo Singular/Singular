@@ -1,6 +1,8 @@
 #ifndef SDDEBUG_H
 #define SDDEBUG_H
 
+#include <kernel/kutil.h>
+
 /* file:        SDDebug.h
  * authors:     Grischa Studzinski & Benjamin Schnitzler
  * created:     ask git

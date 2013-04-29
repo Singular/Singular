@@ -228,7 +228,7 @@ class ShiftDVec::sLObject :
       SD::sTObject(p, tailRing){/*BOCO: others?*/}
 
     sLObject(poly p, ring c_r, ring tailRing) : 
-      SD::sLObject(p, c_r, tailRing){/*BOCO: others?*/}
+      SD::sTObject(p, c_r, tailRing){/*BOCO: others?*/}
 
     void SetLcmDVec(poly p, ring r = currRing)
     { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDVec); }
@@ -360,7 +360,5 @@ lists lpMultProfilerR
 poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );
 
 #endif  //#ifndef SDKUTIL_H
-
-#include <kernel/kInline.h>
 
 /* vim: set foldmethod=syntax : */
