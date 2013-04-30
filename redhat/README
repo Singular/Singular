@@ -1,11 +1,10 @@
-SINGULAR for Redhat
-===================
-by Mathias Schulze <mschulze@mathematik.uni-kl.de>
+SINGULAR rpm packages
+=====================
 
-To build Singular packages for Redhat based systems run (with 4.0.0 replaced by the respective Singular version):
-$ rpmbuild -ta singular-4.0.0.tar.gz
+To build Singular rpm packages run (with 4.0.0 replaced by the respective Singular version):
+$ rpmbuild -tb singular-4.0.0.tar.gz
 
-To install the newly created packages run (as superuser, replacing x86_64 by your architecture and 4.0.0 by the respective Singular version):
+To install the newly created packages run (as superuser, with x86_64 replaced by your architecture and 4.0.0 by the respective Singular version):
 $ cd `rpm --eval '%{_topdir}'`/RPMS
 $ rpm -i x86_64/singular-4.0.0-1.x86_64.rpm noarch/singular-common-4.0.0-1.noarch.rpm
 

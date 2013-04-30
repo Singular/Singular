@@ -1,14 +1,13 @@
-SINGULAR for Debian
-===================
-by Mathias Schulze <mschulze@mathematik.uni-kl.de>
+SINGULAR deb packages
+=====================
 
-To build Singular packages for Debian based systems run (with 4.0.0 replaced by the respective Singular version):
+To build Singular deb packages run (with 4.0.0 replaced by the respective Singular version):
 $ mv singular-4.0.0.tar.gz singular_4.0.0.orig.tar.gz
 $ tar xzvf singular_4.0.0.orig.tar.gz
 $ cd singular-4.0.0
-$ debuild -us -uc 
+$ debuild -us -uc
 
-To install the newly created packages run (as superuser, replacing amd64 by your architecture and 4.0.0 by the respective Singular version):
+To install the newly created packages run (as superuser, with amd64 replaced by your architecture and 4.0.0 by the respective Singular version):
 $ cd ..
 $ dpkg -i singular_4.0.0-1_amd64.deb singular-bin_4.0.0-1_amd64.deb singular-common_4.0.0-1_all.deb
 
