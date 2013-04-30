@@ -2244,7 +2244,8 @@ LINLINE void nlInpAdd (number &a, number b, const ring r)
     else
       a=nlRInit(SR_TO_INT(r));
   }
-  a=_nlInpAdd_aNoImm_OR_bNoImm(a,b);
+  else
+    a=_nlInpAdd_aNoImm_OR_bNoImm(a,b);
 }
 
 LINLINE number nlMult (number a, number b)

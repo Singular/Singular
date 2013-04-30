@@ -308,7 +308,7 @@ void nInitChar(ring r)
   n->nImPart=ndReturn0;
   n->cfDelete= ndDelete;
   n->nInpMult=ndInpMult;
-  n->nInpMult=ndInpAdd;
+  n->nInpAdd=ndInpAdd;
   n->cfCopy=nd_Copy;
   n->nIntMod=ndIntMod; /* dummy !! */
   n->nNormalize=nDummy2;
