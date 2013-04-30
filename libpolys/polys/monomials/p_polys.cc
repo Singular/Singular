@@ -2119,16 +2119,9 @@ void p_Content(poly ph, const ring r)
       }
     }
     n_Delete(&h,r->cf);
-#ifdef HAVE_FACTORY
-//    if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
-//    {
-//      singclap_divide_content(ph, r);
-//      if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
-//    }
-#endif
     if (rField_is_Q_a(r))
     {
-      // we only need special handling for alg. ext.
+      // special handling for alg. ext.:
       if (getCoeffType(r->cf)==n_algExt)
       {
         number hzz = n_Init(1, r->cf->extRing->cf);
@@ -2165,6 +2158,46 @@ void p_Content(poly ph, const ring r)
               pIter(c_n);
             }
             pIter(p);
+          }
+        }
+        n_Delete(&h,r->cf->extRing->cf);
+      }
+      else
+      {
+      // special handling for rat. functions.:
+        number hzz =NULL;
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          fraction f=(fraction)pGetCoeff(p); 
+          poly c_n=NUM(f);
+          if (hzz==NULL)
+	  {
+	    hzz=n_Copy(pGetCoeff(c_n),r->cf->extRing->cf); 
+	    pIter(c_n);
+	  }
+          while ((c_n!=NULL)&&(!n_IsOne(hzz,r->cf->extRing->cf)))
+          { // each monom: coeff in Q
+            d=n_Gcd(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
+            n_Delete(&hzz,r->cf->extRing->cf);
+            hzz=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+        /* hzz contains the gcd of all numerators in f*/
+        h=n_Invers(hzz,r->cf->extRing->cf);
+        n_Delete(&hzz,r->cf->extRing->cf);
+        n_Normalize(h,r->cf->extRing->cf);
+        if(!n_IsOne(h,r->cf->extRing->cf))
+        {
+          p=ph;
+          while (p!=NULL)
+          { // each monom: coeff in Q_a
+	    fraction f=(fraction)pGetCoeff(p);
+            NUM(f)=p_Mult_nn(NUM(f),h,r->cf->extRing);
+	    p_Normalize(NUM(f),r->cf->extRing);
+	    pIter(p);
           }
         }
         n_Delete(&h,r->cf->extRing->cf);
