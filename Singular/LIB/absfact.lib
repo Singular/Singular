@@ -760,7 +760,7 @@ EXAMPLE: example absBiFactorize; shows an example
     int di=deg(p);
   }
 
-  list tmpf=absBiFact (p);
+  list tmpf=system ("absBiFact", p);
 
   // the homogeneous case, homogenizing the result
   // the new variable has to have degree 0
