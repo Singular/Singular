@@ -1092,6 +1092,85 @@ notImpl:
   //PrintS("......S\n");
   return res;
 }
+#ifdef HAVE_NTL
+ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
+{
+  pTest(f);
+
+  ideal res=NULL;
+
+  int offs = rPar(currRing);
+  if (f==NULL)
+  {
+    res= idInit (1, 1);
+    mipos= idInit (1, 1);
+    mipos->m[0]= convFactoryPSingTrP (Variable (offs)); //overkill
+    (*exps)=new intvec (1);
+    (**exps)[0]= 1;
+    numFactors= 0;
+    return res;
+  }
+  CanonicalForm F( convSingTrPFactoryP( f ) );
+
+  if (getNumVars (F) > 2)
+  {
+    WerrorS( feNotImplemented );
+    return res;
+  }
+  CFAFList absFactors= absFactorize (F);
+
+  int n= absFactors.length();
+  *exps=new intvec (n);
+
+  res= idInit (n, 1);
+
+  mipos= idInit (n, 1);
+
+  Variable x= Variable (offs);
+  Variable alpha;
+  int i= 0;
+  numFactors= 0;
+  int count;
+  CFAFListIterator iter= absFactors;
+  CanonicalForm lead= iter.getItem().factor();
+  if (iter.getItem().factor().inCoeffDomain())
+  {
+    i++;
+    iter++;
+  }
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+  for (; iter.hasItem(); iter++, i++)
+  {
+    (**exps)[i]= iter.getItem().exp();
+    alpha= iter.getItem().minpoly().mvar();
+    if (iter.getItem().minpoly().isOne())
+      lead /= power (bCommonDen (iter.getItem().factor()), iter.getItem().exp());
+    else
+      lead /= power (power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly())), iter.getItem().exp());
+    res->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().factor()*bCommonDen (iter.getItem().factor()), alpha, x));
+    if (iter.getItem().minpoly().isOne())
+    {
+      count= iter.getItem().exp();
+      mipos->m[i]= convFactoryPSingTrP (x);
+    }
+    else
+    {
+      count= iter.getItem().exp()*degree (iter.getItem().minpoly());
+      mipos->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().minpoly(), alpha, x));
+    }
+    numFactors += count;
+  }
+  if (!isRat)
+    Off (SW_RATIONAL);
+
+  (**exps)[0]= 1;
+  res->m[0]= convFactoryPSingTrP (lead);
+  mipos->m[0]= convFactoryPSingTrP (x);
+  return res;
+}
+#endif
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps)
 {
   pTest(f);

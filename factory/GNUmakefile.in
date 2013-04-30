@@ -160,6 +160,7 @@ basefactorysrc := \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
+		facAbsFact.cc \
 		facAlgExt.cc \
 		facBivar.cc \
 		fac_berlekamp.cc \
@@ -246,6 +247,7 @@ basefactoryincl := \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \
+		facAbsFact.h \
 		facAlgExt.h \
 		facBivar.h \
 		fac_berlekamp.h \
@@ -332,12 +334,14 @@ distmemmanincl := \
 # factory template files
 templatesrc :=	\
 		ftmpl_array.cc \
+		ftmpl_afactor.cc \
 		ftmpl_factor.cc \
 		ftmpl_functions.h \
 		ftmpl_list.cc \
 		ftmpl_matrix.cc
 templateincl :=	\
 		ftmpl_array.h \
+		ftmpl_afactor.h \
 		ftmpl_factor.h \
 		ftmpl_list.h \
 		ftmpl_matrix.h
