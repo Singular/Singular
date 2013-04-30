@@ -7789,7 +7789,7 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
 #endif
         tproc = clock()-xftinput;
         
-        Print("\n//  main routine takes %d steps and calls \"Mpwalk\" (1,%d):", nwalk,  tp_deg);
+        //Print("\n//  main routine takes %d steps and calls \"Mpwalk\" (1,%d):", nwalk,  tp_deg);
         
         // compute the red. GB of <G> w.r.t. the lex order by the "recursive-modified" perturbation walk alg (1,tp_deg)
         G = Mpwalk_MAltwalk1(G, curr_weight, tp_deg);
