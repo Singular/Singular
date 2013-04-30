@@ -8,7 +8,7 @@ override_dh_auto_configure:
 
 override_dh_auto_install:
 	dh_auto_install
-	install debian/icons/Singular.desktop debian/singular-common/usr/share/applications
-	install debian/icons/Singular-manual.desktop debian/singular-common/usr/share/applications
-	install debian/icons/Singular.png debian/singular-common/usr/share/icons
+	install desktop/Singular.desktop debian/singular-common/usr/share/applications
+	install desktop/Singular-manual.desktop debian/singular-common/usr/share/applications
+	install desktop/Singular.png debian/singular-common/usr/share/icons
 
