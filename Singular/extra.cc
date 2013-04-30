@@ -3567,6 +3567,38 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
+  /*================= absBiFact ======================*/
+      if (strcmp(sys_cmd, "absBiFact") == 0)
+      {
+        if (h!=NULL)
+        {
+          res->rtyp=LIST_CMD;
+          if (h->Typ()==POLY_CMD)
+          {
+            intvec *v=NULL;
+            ideal mipos= NULL;
+            int n= 0;
+            ideal f=singclap_absBiFactorize((poly)(h->Data()), mipos, &v, n);
+            if (f==NULL) return TRUE;
+            ivTest(v);
+            lists l=(lists)omAllocBin(slists_bin);
+            l->Init(4);
+            l->m[0].rtyp=IDEAL_CMD;
+            l->m[0].data=(void *)f;
+            l->m[1].rtyp=INTVEC_CMD;
+            l->m[1].data=(void *)v;
+            l->m[2].rtyp=IDEAL_CMD;
+            l->m[2].data=(void*) mipos;
+            l->m[3].rtyp=INT_CMD;
+            l->m[3].data=(void*) (long) n;
+            res->data=(void *)l;
+            return FALSE;
+          }
+          else return TRUE;
+        }
+        else return TRUE;
+      }
+      else
       #endif
   /*================= probIrredTest ======================*/
       if (strcmp (sys_cmd, "probIrredTest") == 0)
