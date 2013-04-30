@@ -28,7 +28,6 @@
 #include <NTL/LLL.h>
 #endif
 
-#ifdef HAVE_FLINT
 #ifdef HAVE_NTL
 
 TIMING_DEFINE_PRINT(fac_Qa_factorize)
@@ -237,6 +236,7 @@ differentevalpoint:
 
     //TODO take floor (log2(k))
     k= k+1;
+#ifdef HAVE_FLINT
     fmpz_poly_t FLINTFi;
     convertFacCF2Fmpz_poly_t (FLINTFi, Fi);
     setCharacteristic (p);
@@ -276,13 +276,46 @@ differentevalpoint:
     nmod_poly_clear (FLINTGpi);
 
     setCharacteristic(0);
-    modpk pk= modpk (p,k);
     CanonicalForm liftedSmallestFactor=
     convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[0],Variable (1));
 
     CanonicalForm otherFactor=
     convertFmpz_poly_t2FacCF ((fmpz_poly_t &)liftedFactors->p[1],Variable (1));
-    CanonicalForm test= pk (otherFactor*liftedSmallestFactor);
+    modpk pk= modpk (p, k);
+#else
+    modpk pk= modpk (p, k);
+    ZZX NTLFi=convertFacCF2NTLZZX (pk (Fi*pk.inverse (lc(Fi))));
+    setCharacteristic (p);
+
+    if (fac_NTL_char != p)
+    {
+      fac_NTL_char= p;
+      zz_p::init (p);
+    }
+    zz_pX NTLFpi, NTLGpi;
+    if (i == 2)
+    {
+      NTLFpi= convertFacCF2NTLzzpX (smallestFactorEvalx/lc (smallestFactorEvalx));
+      NTLGpi= convertFacCF2NTLzzpX (Gpx/lc (Gpx));
+    }
+    else
+    {
+      NTLFpi= convertFacCF2NTLzzpX (smallestFactorEvaly/lc (smallestFactorEvaly));
+      NTLGpi= convertFacCF2NTLzzpX (Gpy/lc (Gpy));
+    }
+    vec_zz_pX modFactors;
+    modFactors.SetLength(2);
+    modFactors[0]= NTLFpi;
+    modFactors[1]= NTLGpi;
+    vec_ZZX liftedFactors;
+    MultiLift (liftedFactors, modFactors, NTLFi, (long) k);
+    setCharacteristic(0);
+    CanonicalForm liftedSmallestFactor=
+                  convertNTLZZX2CF (liftedFactors[0],Variable (1));
+
+    CanonicalForm otherFactor=
+                  convertNTLZZX2CF (liftedFactors[1], Variable (1));
+#endif
 
     Off (SW_SYMMETRIC_FF);
     liftedSmallestFactor= pk (liftedSmallestFactor);
@@ -316,6 +349,7 @@ differentevalpoint:
     CFFList mipoFactors= factorize (mipo);
     mipoFactors.removeFirst();
 
+#ifdef HAVE_FLINT
     fmpz_poly_clear (v[0]);
     fmpz_poly_clear (v[1]);
     fmpz_poly_clear (w[0]);
@@ -324,6 +358,7 @@ differentevalpoint:
     delete [] w;
     delete [] link;
     fmpz_poly_factor_clear (liftedFactors);
+#endif
 
     if (mipoFactors.length() > 1 ||
         (mipoFactors.length() == 1 && mipoFactors.getFirst().exp() > 1))
@@ -535,7 +570,6 @@ differentevalpoint:
   return result;
 }
 
-#endif
 #endif
 
 

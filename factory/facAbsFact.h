@@ -86,7 +86,9 @@ CFAFList uniAbsFactorize (const CanonicalForm& F ///<[in] univariate poly over Q
 
 /*BEGINPUBLIC*/
 
+#ifdef HAVE_NTL
 CFAFList absFactorize (const CanonicalForm& G);
+#endif
 
 /*ENDPUBLIC*/
 
