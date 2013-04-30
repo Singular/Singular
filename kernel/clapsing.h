@@ -43,6 +43,7 @@ matrix singntl_HNF(matrix A);
 intvec* singntl_HNF(intvec* A);
 matrix singntl_LLL(matrix A);
 intvec* singntl_LLL(intvec* A);
+ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & n);
 #endif
 
 BOOLEAN singclap_isSqrFree(poly f);
