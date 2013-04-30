@@ -4156,7 +4156,7 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
     {
       goto NEXT_STEP;
     }
-    Print("\n//REC_GB_Mwalk: Entering the %d-th step in the %d-th recursive:\n",nwalk,tp_deg);
+    //Print("\n//REC_GB_Mwalk: Entering the %d-th step in the %d-th recursive:\n",nwalk,tp_deg);
     to = clock();
     // compute an initial form ideal of <G> w.r.t. "curr_vector"
     Gomega = MwalkInitialForm(G, curr_weight);
@@ -4241,7 +4241,7 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
 
     if(Overflow_Error == TRUE)
     {
-      PrintS("\n//REC_GB_Mwalk: The computed vector does NOT stay in the correct cone!!\n");
+      //PrintS("\n//REC_GB_Mwalk: The computed vector does NOT stay in the correct cone!!\n");
       nnwinC = 0;
       if(tp_deg == nV)
       {
