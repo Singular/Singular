@@ -635,10 +635,10 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
 {
   ntTest(a);
   ntTest(b);
-  number aNumCoeff = NULL; int aNumDeg = -1;
-  number aDenCoeff = NULL; int aDenDeg = -1;
-  number bNumCoeff = NULL; int bNumDeg = -1;
-  number bDenCoeff = NULL; int bDenDeg = -1;
+  number aNumCoeff = NULL; int aNumDeg = 0;
+  number aDenCoeff = NULL; int aDenDeg = 0;
+  number bNumCoeff = NULL; int bNumDeg = 0;
+  number bDenCoeff = NULL; int bDenDeg = 0;
   if (!IS0(a))
   {
     fraction fa = (fraction)a;
