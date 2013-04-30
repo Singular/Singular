@@ -1043,16 +1043,16 @@ void * sleftv::Data()
         idhdl h=(idhdl)data;
         return  ((idhdl)h->data.ustring)->data.ustring;
       }
-      case VECHO:      return (void *)si_echo;
-      case VPRINTLEVEL:return (void *)printlevel;
-      case VCOLMAX:    return (void *)colmax;
-      case VTIMER:     return (void *)getTimer();
-      case VRTIMER:    return (void *)getRTimer();
-      case VOICE:      return (void *)(myynest+1);
-      case VMAXDEG:    return (void *)Kstd1_deg;
-      case VMAXMULT:   return (void *)Kstd1_mu;
-      case TRACE:      return (void *)traceit;
-      case VSHORTOUT:  return (void *)(currRing != NULL ? currRing->ShortOut : 0);
+      case VECHO:      return (void *)(long)si_echo;
+      case VPRINTLEVEL:return (void *)(long)printlevel;
+      case VCOLMAX:    return (void *)(long)colmax;
+      case VTIMER:     return (void *)(long)getTimer();
+      case VRTIMER:    return (void *)(long)getRTimer();
+      case VOICE:      return (void *)(long)(myynest+1);
+      case VMAXDEG:    return (void *)(long)Kstd1_deg;
+      case VMAXMULT:   return (void *)(long)Kstd1_mu;
+      case TRACE:      return (void *)(long)traceit;
+      case VSHORTOUT:  return (void *)(long)(currRing != NULL ? currRing->ShortOut : 0);
       case VMINPOLY:   if (currRing != NULL &&
                            (currRing->minpoly!=NULL)&&(!rField_is_GF()))
                        /* Q(a), Fp(a), but not GF(q) */
@@ -1099,7 +1099,7 @@ void * sleftv::Data()
           Werror("wrong range[%d] in intvec(%d)",index,iv->length());
       }
       else
-        r=(char *)((*iv)[index-1]);
+        r=(char *)(long)((*iv)[index-1]);
       break;
     }
     case INTMAT_CMD:
@@ -1115,7 +1115,7 @@ void * sleftv::Data()
                                                      iv->rows(),iv->cols());
       }
       else
-        r=(char *)(IMATELEM((*iv),index,e->next->start));
+        r=(char *)(long)(IMATELEM((*iv),index,e->next->start));
       break;
     }
     case BIGINTMAT_CMD:
