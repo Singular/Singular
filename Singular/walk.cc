@@ -4122,7 +4122,7 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
 
     if(test_G_GB_walk(H0_tmp,H1)==1)
     {
-      Print("\n//REC_GB_Mwalk: input in %d-th recursive is a GB!\n",tp_deg);
+      //Print("\n//REC_GB_Mwalk: input in %d-th recursive is a GB!\n",tp_deg);
       idDelete(&H0_tmp);
       idDelete(&H1);
       G = ssG;
