@@ -1,3 +1,4 @@
+#ifdef STANDALONE_PARSER
 #include "config.h"
 #include <kernel/mod2.h>
 
@@ -16,7 +17,7 @@ extern int optind, opterr, optopt;
 extern int lpverbose, check;
 extern int texinfo_out;
 
-int category_out;
+extern int category_out;
 
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
 int warning_info = 0, warning_version = 0;
@@ -118,6 +119,32 @@ void main_result(char */*libname*/)
     printf("*** VERSION-string should come before every procedure definition.\n");
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,
+                                 const char *procname, int line, long pos,
+                                 BOOLEAN pstatic /*= FALSE*/)
+{
+  pi->libname = (char *)malloc(strlen(libname)+1);
+  memcpy(pi->libname, libname, strlen(libname));
+  *(pi->libname+strlen(libname)) = '\0';
+
+  pi->procname = (char *)malloc(strlen(procname)+1);
+  strcpy(pi->procname, procname/*, strlen(procname)*/);
+  pi->language = LANG_SINGULAR;
+  pi->ref = 1;
+  pi->is_static = pstatic;
+  pi->data.s.proc_start = pos;
+  pi->data.s.def_end    = 0L;
+  pi->data.s.help_start = 0L;
+  pi->data.s.body_start = 0L;
+  pi->data.s.body_end   = 0L;
+  pi->data.s.example_start = 0L;
+  pi->data.s.proc_lineno = line;
+  pi->data.s.body_lineno = 0;
+  pi->data.s.example_lineno = 0;
+  pi->data.s.body = NULL;
+  pi->data.s.help_chksum = 0;
+  return(pi);
+}
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void pi_clear(procinfov pi)
@@ -220,3 +247,4 @@ void printpi(procinfov pi)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#endif

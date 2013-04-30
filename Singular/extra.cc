@@ -456,7 +456,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           #ifdef NDEBUG
             TEST_FOR("ndebug")
           #endif
-            ;
+            {};
           return FALSE;
           #undef TEST_FOR
         }
