@@ -1024,6 +1024,80 @@ notImpl:
   //PrintS("......S\n");
   return res;
 }
+#ifdef HAVE_NTL
+ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
+{
+  p_Test(f, r);
+
+  ideal res=NULL;
+
+  int offs = rPar(r);
+  if (f==NULL)
+  {
+    res= idInit (1, 1);
+    mipos= idInit (1, 1);
+    mipos->m[0]= convFactoryPSingTrP (Variable (offs), r); //overkill
+    (*exps)=new intvec (1);
+    (**exps)[0]= 1;
+    numFactors= 0;
+    return res;
+  }
+  CanonicalForm F( convSingTrPFactoryP( f, r) );
+
+  if (getNumVars (F) > 2)
+  {
+    WerrorS( feNotImplemented );
+    return res;
+  }
+  CFAFList absFactors= absFactorize (F);
+
+  int n= absFactors.length();
+  *exps=new intvec (n);
+
+  res= idInit (n, 1);
+
+  mipos= idInit (n, 1);
+
+  Variable x= Variable (offs);
+  Variable alpha;
+  int i= 0;
+  numFactors= 0;
+  int count;
+  CFAFListIterator iter= absFactors;
+  CanonicalForm lead= iter.getItem().factor();
+  if (iter.getItem().factor().inCoeffDomain())
+  {
+    i++;
+    iter++;
+  }
+  for (; iter.hasItem(); iter++, i++)
+  {
+    (**exps)[i]= iter.getItem().exp();
+    alpha= iter.getItem().minpoly().mvar();
+    if (iter.getItem().minpoly().isOne()) //TODO make sure isOn (SW_RATIONAL) == true
+      lead /= bCommonDen (iter.getItem().factor());
+    else
+      lead /= power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly()));
+    res->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().factor()*bCommonDen (iter.getItem().factor()), alpha, x), r);
+    if (iter.getItem().minpoly().isOne())
+    {
+      count= iter.getItem().exp();
+      mipos->m[i]= convFactoryPSingTrP (x,r);
+    }
+    else
+    {
+      count= iter.getItem().exp()*degree (iter.getItem().minpoly());
+      mipos->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().minpoly(), alpha, x), r);
+    }
+    numFactors += count;
+  }
+
+  (**exps)[0]= 1;
+  res->m[0]= convFactoryPSingTrP (lead, r);
+  mipos->m[0]= convFactoryPSingTrP (x, r);
+  return res;
+}
+#endif
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
 {
   p_Test(f,r);
