@@ -30,7 +30,7 @@ dist_emacs_DATA = $(EMACS)
 #all-local:
 #	[ -d ${builddir}/emacs ] || ln -s ${srcdir}/emacs ${builddir}
 
-DEBIAN = \
+DEBIAN = README \
 	debian/changelog \
 	debian/compat \
 	debian/control \
@@ -41,10 +41,14 @@ DEBIAN = \
 	debian/singular-common.install \
 	debian/singular-dev.install \
 	debian/source/format \
-	debian/source/include-binaries \
-	debian/icons/Singular.png
+	debian/source/include-binaries
 
-EXTRA_DIST = autogen.sh $(EMACS) $(DEBIAN) 
+REDHAT = README \
+	redhat/singular.spec
+
+DESKTOP = desktop/Singular.png
+
+EXTRA_DIST = autogen.sh $(EMACS) $(DEBIAN) $(REDHAT) $(DESKTOP) 
 
 bin_SCRIPTS = libsingular-config
 
