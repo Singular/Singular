@@ -1008,8 +1008,9 @@ void naDelete(number *p, const ring r)
 */
 number naCopy(number p)
 {
+  // no naTest: naCopy may be applied to "non-conforming" data
+  // while mapping from rational function to alg. ext. etc.
   if (p==NULL) return NULL;
-  naTest(p);
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);

@@ -1250,6 +1250,12 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
       && ((rField_is_Zp_a()) || (rField_is_Q_a())))
       {
         nNormalize(n);
+        if ((n!=NULL) && (((lnumber)n)->z==NULL))
+        {
+          omFreeBin((ADDRESS)n,  rnumber_bin);
+          n=NULL;
+        }
+        nTest(n);
       }
       pGetCoeff(qq)=n;
     // coef may be zero:  pTest(qq);
