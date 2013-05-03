@@ -25,6 +25,7 @@ SEE ALSO: factorize
 
 PROCEDURES:
   absFactorize();        absolute factorization of poly
+  absBiFactorize();      absolute factorization of bivariate poly
 ";
 
 ////////////////////////////////////////////////////////////////////
@@ -607,6 +608,238 @@ example
   setring(S);
   absolute_factors;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+proc absBiFactorize(poly p, list #)
+"USAGE:  absBiFactorize(p [,s]);   p poly, s string
+ASSUME: coefficient field is the field of rational numbers or a
+        transcendental extension thereof
+RETURN: ring @code{R} which is obtained from the current basering
+        by adding a new parameter (if a string @code{s} is given as a
+        second input, the new parameter gets this string as name). The ring
+        @code{R} comes with a list @code{absolute_factors} with the
+        following entries:
+@format
+    absolute_factors[1]: ideal   (the absolute factors)
+    absolute_factors[2]: intvec  (the multiplicities)
+    absolute_factors[3]: ideal   (the minimal polynomials)
+    absolute_factors[4]: int     (total number of nontriv. absolute factors)
+@end format
+        The entry @code{absolute_factors[1][1]} is a constant, the
+        entry @code{absolute_factors[3][1]} is the parameter added to the
+        current ring.@*
+        Each of the remaining entries @code{absolute_factors[1][j]} stands for
+        a class of conjugated absolute factors. The corresponding entry
+        @code{absolute_factors[3][j]} is the minimal polynomial of the
+        field extension over which the factor is minimally defined (its degree
+        is the number of conjugates in the class). If the entry
+        @code{absolute_factors[3][j]} coincides with @code{absolute_factors[3][1]},
+        no field extension was necessary for the @code{j}th (class of)
+        absolute factor(s).
+NOTE:   The input polynomial p is assumed to be bivariate or to contain one para-
+        meter and one variable. All factors are presented denominator- and 
+        content-free. The constant factor (first entry) is chosen such that the
+        product of all (!) the (denominator- and content-free) absolute factors
+        of @code{p} equals @code{p / absolute_factors[1][1]}.
+SEE ALSO: factorize, absPrimdecGTZ, absFactorize
+EXAMPLE: example absBiFactorize; shows an example
+"
+{
+  int dblevel = printlevel - voice + 2;
+  dbprint(dblevel,"Entering absfact.lib::absBiFactorize with ",p);
+  def MP = basering;
+  int i;
+  if (char(MP) != 0)
+  {
+    ERROR("// absfact.lib::absBiFactorize is only implemented for "+
+          "characteristic 0");
+  }
+  if(minpoly!=0)
+  {
+    ERROR("// absfact.lib::absBiFactorize is not implemented for algebraic "
+          +"extensions");
+  }
+
+  int n = nvars(MP);
+  int pa=npars(MP);
+  list lMP= ringlist(MP);
+  intvec vv,vk;
+  for(i=1;i<=n;i++){vv[i]=1;}
+  vk=vv,1;
+
+  //if the basering has parameters, add the parameters to the variables
+  //takes care about coefficients and possible denominators
+  if(pa>0)
+  {
+    poly qh=cleardenom(p);
+    if (p==0)
+    {
+      number cok=0;
+    }
+    else
+    {
+      number cok=leadcoef(p)/leadcoef(qh);
+    }
+    p=qh;
+    string sp;
+    for(i=1;i<=npars(basering);i++)
+    {
+      sp=string(par(i));
+      sp=sp[2..size(sp)-1];
+      lMP[2][n+i]=sp;
+      vv=vv,1;
+    }
+    lMP[1]=0;
+    n=n+npars(MP);
+  }
+
+  // MPz is obtained by adding the new variable @z to MP
+  // ordering is wp(1...1)
+  // All the above subroutines work in MPz
+  string newvar;
+  if(size(#)>0)
+  {
+    if(typeof(#[1])=="string")
+    {
+      newvar=#[1];
+    }
+    else
+    {
+      newvar = "a";
+    }
+  }
+  else
+  {
+    newvar = "a";
+  }
+  if (newvar=="a")
+  {
+    if(belongTo(newvar, lMP[2])||defined(a)){newvar = "b";}
+    if(belongTo(newvar, lMP[2])||defined(b)){newvar = "c";}
+    if(belongTo(newvar, lMP[2])||defined(c)){newvar = "@c";}
+    while(belongTo(newvar, lMP[2]))
+    {
+       newvar = "@" + newvar;
+    }
+  }
+
+  // create ring with extra parameter `newvar` for output:
+  setring(MP);
+  list Lout=ringlist(MP);
+  if(!pa)
+  {
+    list Lpar=list(char(MP),list(newvar),list(list("lp",intvec(1))),ideal(0));
+  }
+  else
+  {
+    list Lpar=Lout[1];
+    Lpar[2][size(Lpar[2])+1]=newvar;
+    vv=Lpar[3][1][2];
+    vv=vv,1;
+    Lpar[3][1][2]=vv;
+  }
+  Lout[1]=Lpar;
+  def MPo=ring(Lout);
+  setring(MPo);
+
+  poly p=imap(MP,p);
+
+  if (size (variables (p)) > 2)
+  {
+    ERROR("// absfact.lib::absBiFactorize is not implemented for polynomials "
+          +"with more than 2 variables");
+  }
+
+  // special treatment in the homogeneous case, dropping one variable
+  // by substituting the first variable by 1
+  int ho=homog(p);
+  if(ho)
+  {
+    int dh=deg(p);
+    p=subst(p,var(1),1);
+    int di=deg(p);
+  }
+
+  list tmpf=system ("absBiFact", p);
+
+  // the homogeneous case, homogenizing the result
+  // the new variable has to have degree 0
+  // need to change the ring
+  if(ho)
+  {
+    list ll=ringlist(MPo);
+    vv[size(vv)]=0;
+    ll[3][1][2]=vv;
+    def MPhelp=ring(ll);
+    setring(MPhelp);
+    list tmpf=imap(MPo,tmpf);
+    for(i=2;i<=size(tmpf[1]);i++)
+    {
+      tmpf[1][i]=homog(tmpf[1][i],var(1));
+    }
+    if(dh>di)
+    {
+      tmpf[1][size(tmpf[1])+1]=var(1);
+      tmpf[2][size(tmpf[2])+1]=dh-di;
+      tmpf[3][size(tmpf[3])+1]=par(npars(MPo));
+      tmpf[4]= tmpf[4]+dh-di;
+    }
+    setring(MPo);
+    tmpf=imap(MPhelp,tmpf);
+  }
+
+  if (pa)
+  {
+    number cok=imap(MP,cok);
+    tmpf[1][1]=cok*tmpf[1][1];
+  }
+
+  // if we want the output as string
+  if(size(#)>0)
+  {
+    if(typeof(#[1])=="int")
+    {
+      if(#[1]==77)
+      {  // undocumented feature for Gerhard's absPrimdecGTZ
+        if (size(tmpf[1])<2){ list abs_fac = list(var(n+1),poly(1)); }
+        else
+        {
+          list abs_fac= tmpf[3][2];
+          abs_fac= abs_fac, tmpf[1][2];
+          for (i= 3; i <= size(tmpf[1]); i++)
+          {
+            abs_fac=abs_fac,tmpf[3][i];
+            abs_fac=abs_fac,tmpf[1][i];
+          }
+        }
+        abs_fac=abs_fac,newvar;
+        return(string(abs_fac));
+      }
+    }
+  }
+
+  list absolute_factors= tmpf;
+  export absolute_factors;
+  setring(MP);
+
+  dbprint( printlevel-voice+3,"
+// 'absBiFactorize' created a ring, in which a list absolute_factors (the
+// absolute factors) is stored.
+// To access the list of absolute factors, type (if the name S was assigned
+// to the return value):
+        setring(S); absolute_factors; ");
+  return(MPo);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = (0), (x,y), lp;
+  poly p = (-7*x^2 + 2*x*y^2 + 6*x + y^4 + 14*y^2 + 47)*(5x2+y2)^3*(x-y)^4;
+  def S = absBiFactorize(p) ;
+  setring(S);
+  absolute_factors;
+}
+
 
 /*
   ring r=0,(x,t),dp;

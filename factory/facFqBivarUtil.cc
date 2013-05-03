@@ -704,7 +704,7 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
           bufGFName=gf_name;
         }
         setCharacteristic(0);
-        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);
+        CanonicalForm tmp= gcd (newtonPolyg[0][0],newtonPolyg[0][1]);  // maybe it's better to use plain intgcd
         tmp= gcd (tmp, newtonPolyg[1][0]);
         tmp= gcd (tmp, newtonPolyg[1][1]);
         tmp= gcd (tmp, newtonPolyg[2][0]);

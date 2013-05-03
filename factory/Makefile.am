@@ -61,6 +61,7 @@ SOURCES = \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
+		facAbsFact.cc \
 		facAlgExt.cc \
 		facBivar.cc \
 		fac_berlekamp.cc \
@@ -143,6 +144,7 @@ factory_headers = \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \
+		facAbsFact.h \
 		facAlgExt.h \
 		facBivar.h \
 		fac_berlekamp.h \
@@ -247,6 +249,7 @@ gengftables_LDADD = -L${builddir} -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS
 # the distribution. So they will be tacked on to EXTRA_DIST.
 
 templatesrc =	templates/ftmpl_array.cc \
+		templates/ftmpl_afactor.cc \
 		templates/ftmpl_factor.cc \
 		templates/ftmpl_functions.h \
 		templates/ftmpl_list.cc \

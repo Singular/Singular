@@ -22,6 +22,7 @@
 
 
 #include "templates/ftmpl_array.cc"
+#include "templates/ftmpl_afactor.cc"
 #include "templates/ftmpl_factor.cc"
 #include "templates/ftmpl_list.cc"
 #include "templates/ftmpl_functions.h"
@@ -33,6 +34,10 @@ template class Factor<CanonicalForm>;
 template class List<CFFactor>;
 template class ListItem<CFFactor>;
 template class ListIterator<CFFactor>;
+template class AFactor<CanonicalForm>;
+template class List<CFAFactor>;
+template class ListItem<CFAFactor>;
+template class ListIterator<CFAFactor>;
 template class List<CanonicalForm>;
 template class ListItem<CanonicalForm>;
 template class ListIterator<CanonicalForm>;
@@ -76,8 +81,10 @@ template OSTREAM & operator << ( OSTREAM &, const Array<REvaluation> & );
 #endif /* NOSTREAMIO */
 
 template int operator == ( const Factor<CanonicalForm> &, const Factor<CanonicalForm> & );
+template int operator == ( const AFactor<CanonicalForm> &, const AFactor<CanonicalForm> & );
 
 template List<CFFactor> Union ( const List<CFFactor> &, const List<CFFactor> & );
+template List<CFAFactor> Union ( const List<CFAFactor> &, const List<CFAFactor> & );
 
 #if ! defined(WINNT) || defined(__GNUC__)
 template CanonicalForm tmax ( const CanonicalForm &, const CanonicalForm & );

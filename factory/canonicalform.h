@@ -22,6 +22,7 @@
 #include <factory/cf_gmp.h>
 #include <factory/templates/ftmpl_list.h>
 #include <factory/templates/ftmpl_array.h>
+#include <factory/templates/ftmpl_afactor.h>
 #include <factory/templates/ftmpl_factor.h>
 #include <factory/templates/ftmpl_matrix.h>
 
@@ -359,6 +360,9 @@ bool isOn( int );
 //}}}
 
 //{{{ type definitions
+typedef AFactor<CanonicalForm> CFAFactor;
+typedef List <CFAFactor> CFAFList;
+typedef ListIterator<CFAFactor> CFAFListIterator;
 typedef Factor<CanonicalForm> CFFactor;
 typedef List<CFFactor> CFFList;
 typedef ListIterator<CFFactor> CFFListIterator;

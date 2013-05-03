@@ -73,6 +73,37 @@ bool
 irreducibilityTest (const CanonicalForm& F ///<[in] a bivariate polynomial
                    );
 
+/// absolute irreducibility test as described in "Modular Las Vegas Algorithms
+/// for Polynomial Absolute Factorization" by C. Bertone, G. Cheze, A. Galligo
+///
+/// @return true if F satisfies condition (C) from the above paper and thus
+/// is absolutely irreducible, false otherwise
+bool
+absIrredTest (const CanonicalForm& F ///< [in] a bivariate polynomial
+                                     ///< irreducible over ground field
+             );
+
+/// modular absolute irreducibility test as described in "Modular Las Vegas
+/// Algorithms for Polynomial Absolute Factorization" by C. Bertone, G. Cheze,
+/// A. Galligo
+///
+/// @return true if F is absolutely irreducible, false otherwise
+bool
+modularIrredTest (const CanonicalForm& F ///< [in] a bivariate polynomial
+                                         ///< irreducible over Z
+                 );
+
+/// modular absolute irreducibility test with shift as described in "Modular Las
+/// Vegas Algorithms for Polynomial Absolute Factorization" by C. Bertone,
+/// G. Cheze, A. Galligo
+///
+/// @return true if F is absolutely irreducible, false otherwise
+bool
+modularIrredTestWithShift (const CanonicalForm& F ///< [in] a bivariate polynomial
+                                                  ///< irreducible over Z
+                          );
+
+
 #ifdef HAVE_NTL
 /// Algorithm 5 as described in Convex-Dense Bivariate Polynomial Factorization
 /// by Berthomieu, Lecerf
