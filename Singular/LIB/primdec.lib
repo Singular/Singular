@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib 14732 2012-03-30 17:00:06Z motsak $";
+version="$Id: 296aa0556c431ddf8a2333478fd4f33e81a4e819 $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -3768,6 +3768,7 @@ example
     intvec save=option(get);option(redSB);
     I=interred(I+F);option(set,save);return(I);
    }
+   I=simplify(I,1);
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -4443,7 +4444,7 @@ static proc prim_dec(ideal I, int choose)
         }
         if(check==0) // H==I => U is a primary decomposition
         {
-	  option(set,save);
+          option(set,save);
           return(U);
         }
       }
