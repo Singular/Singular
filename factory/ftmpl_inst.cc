@@ -61,6 +61,39 @@ template class ListIterator< List<CanonicalForm> >;
 template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
 template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
+// NTL 6
+#ifdef HAVE_NTL
+#include<NTL/version.h>
+#if NTL_MAJOR_VERSION == 6
+
+#include<NTL/tools.h>
+#include<NTL/lzz_pE.h>
+#include<NTL/lzz_pEX.h>
+#include<NTL/lzz_p.h>
+#include<NTL/vector.h>
+#include<NTL/pair.h>
+#include<NTL/GF2X.h>
+#include<NTL/GF2EX.h>
+#include<NTL/ZZ.h>
+#include<NTL/ZZX.h>
+#include<NTL/ZZ_pX.h>
+#ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
+NTL_CLIENT
+#endif
+template class Vec<zz_p>;
+template class Vec<zz_pE>;
+template class Mat<zz_p>;
+template class Mat<zz_pE>;
+template class Mat<ZZ>;
+template class Vec<Pair<zz_pEX, long> >;
+template class Vec<Pair<GF2EX, long> >;
+template class Vec<Pair<ZZX, long> >;
+template class Vec<Pair<ZZ_pX, long> >;
+template class Vec<Pair<GF2X, long> >;
+template void swap<zz_pE>(Vec<zz_pE>&, Vec<zz_pE>&);
+template long operator==<zz_p>(Vec<zz_p> const&, Vec<zz_p> const&);
+#endif
+
 //}}}
 
 //{{{ explicit template function instantiations
