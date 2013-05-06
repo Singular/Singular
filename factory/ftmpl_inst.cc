@@ -93,6 +93,7 @@ template class Vec<Pair<GF2X, long> >;
 template void swap<zz_pE>(Vec<zz_pE>&, Vec<zz_pE>&);
 template long operator==<zz_p>(Vec<zz_p> const&, Vec<zz_p> const&);
 #endif
+#endif
 
 //}}}
 
