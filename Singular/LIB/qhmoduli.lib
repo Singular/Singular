@@ -1208,7 +1208,6 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
       }
     }
   }
-  "type of i:", typeof(i);
   combList[1] = linearSubs;
   combList[2] = nonlinearSubs;
   return(combList);
