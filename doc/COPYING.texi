@@ -7,12 +7,15 @@
 @cindex copyright
 @cindex factory
 @cindex GMP
-@cindex MP
 @cindex NTL
 @cindex readline
 @cindex libfac
 @cindex surfex
 @cindex surfer
+@cindex gfanlib
+@cindex cdd
+@cindex cddlib
+@cindex libcdd
 @cindex graphviz
 @cindex normaliz
 
@@ -21,7 +24,7 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~decker,,W. Decker}, @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2011
+@center Copyright @copyright{} 1986-2013
 @sp 2
 @center @strong{NOTICE}
 
@@ -36,8 +39,7 @@ The following software modules shipped with @sc{Singular} have their own copyrig
 the omalloc library, the readline library,
 the GNU Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
-the Multi Protocol library (MP), the
-Singular-Factory library, the Singular-libfac library,
+the Singular-Factory library, the Singular-libfac library,
 surfex, and,
 for the Windows distributions, the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
@@ -90,12 +92,15 @@ anonymous ftp through the following addresses:
 @item GMP, libreadline
 @copyright{} Free Software Foundation
 @* @uref{http://gmplib.org}
-@item MP
-@copyright{} Gray/Kajler/Wang, Kent State University
-@* @uref{http://www.symbolicnet.org/areas/protocols/mp.html}
 @item NTL
 @copyright{} Victor Shoup
 @* @uref{http://www.shoup.net/ntl}
+@item cdd (C implementation of the Double Description Method of Motzkin et al)
+@copyright{} Komei Fukuda
+@* @uref{http://www.ifor.math.ethz.ch/~fukuda/cdd_home}
+@item gfanlib
+@copyright{} Anders Jensen
+@* @uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
 @item Singular-Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
@@ -122,7 +127,7 @@ Some external programs are optional:
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
 @copyright{} Winfried Bruns and Bogdan Ichim
 @* @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}
-@item polymake (used by polymake.so, oldpolymake.lib, @pxref{oldpolymake_lib})
+@item polymake (used by oldpolymake.lib, @pxref{oldpolymake_lib})
 @copyright{} Ewgenij Gawrilow and Michael Joswig
 @* @uref{http://www.polymake.de/}
 @item surf (used by surf.lib, @pxref{surf_lib})
@@ -239,6 +244,7 @@ Thomas Bauer,
 Thomas Bayer,
 Markus Becker,
 J. Boehm,
+Gergo Gyula Borus,
 Winfried Bruns,
 Fernando Hernando Carrillo,
 Victor Castellanos,
@@ -260,6 +266,7 @@ Markus Hochstetter,
 N. Idrees,
 Manuel Kauers,
 Simon King,
+Sebastian Jambor,
 Oliver Labs,
 Anen Lakhal,
 Martin Lamm,
@@ -273,6 +280,7 @@ Thomas N@"u@ss{}ler,
 Wolfgang Neumann,
 Markus Perling,
 Wilfried Pohl,
+Adrian Popescu,
 Tetyana Povalyaeva,
 Carlos Rabelo,
 Philipp Renner,

@@ -374,9 +374,10 @@ EXAMPLE: example ArnoldAction; shows an example
   // extract the polynomials of the action of the stabilizer on T_
 
   parts = MonosAndTerms(h, wt, ub);
-  for(i = 1; i <= size(parts[1]); i = i + 1) {
+  for(i = 1; i <= size(parts[1]); i = i + 1)
+  {
     pos = FirstEntryQHM(upperBasis, parts[1][i]);
-    action[pos] = parts[2][i]/parts[1][i];
+    if (pos!=0) { action[pos] = parts[2][i]/parts[1][i];}
   }
   execute(ringSTR2);
   execute("minpoly = number(" + @mPoly + ");");
@@ -1207,7 +1208,6 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
       }
     }
   }
-  "type of i:", typeof(i);
   combList[1] = linearSubs;
   combList[2] = nonlinearSubs;
   return(combList);
