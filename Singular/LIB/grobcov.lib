@@ -12,6 +12,9 @@ PURPOSE:  Comprehensive Groebner Systems, Groebner Cover, Canonical Forms,
           Montes A., Wibmer M.,
           \"Groebner Bases for Polynomial Systems with parameters\".
           Journal of Symbolic Computation 45 (2010) 1391-1425.
+          The locus algorithm and definitions will be
+          published in a forthcoming paper by Abanades, Botana, Montes, Recio:
+          \''Geometrical locus of points using the Groebner cover\''.
 
           The central routine is grobcov. Given a parametric
           ideal, grobcov outputs its Canonical Groebner Cover, consisting
@@ -116,10 +119,12 @@ locus(G):   Special routine for determining the locus of points
                    classes of locus components. They can be
                    Normal, Special, Accumulation point, Degenerate.
                    The output are the components given in P-canonical form
-                   of at most 4 constructible sets: Normal, Special, Accumulation,
-                   Degenerate.
+                   of two constructible sets: Normal, and Non-Normal
+                   The Normal Set has Normal and Special components
+                   The Non-Normal set has Accumulation and Degenerate components.
                    The description of the algorithm and definitions will be
-                   given in a forthcoming paper by Abanades, Botana, Montes Recio.
+                   given in a forthcoming paper by Abanades, Botana, Montes, Recio:
+                   ''Geometrical locus of points using the Groebner cover''
 
 locusto:    Transforms the output of locus to a string that
                   can be reed from different computational systems.
@@ -1893,7 +1898,7 @@ proc gcover(ideal F,list #)
       }
       if(tes==0){break;}
       m++;
-    }    //"T_BB="; BB;
+    }
     crep=PtoCrep(prep);
     if(tes==0)
     {
@@ -3818,7 +3823,7 @@ proc containedideal(ideal E, ideal F)
 
 // AddCons: given a set of locally closed components of a selection of
 //       segments of the Grobner cover, it builds the canonical P-representation
-//       of the whole set.
+//       of the corresponding constructible set, including levels it they are
 // input: a list L of a selection of segments of the Groebner cover
 //       given a a set of components of the form
 //       ( (p_1,(p_11,..,p_1k_1).. (p_s,(p_s1,..,p_sk_s))
@@ -3827,7 +3832,6 @@ proc AddCons(list L)
 {
   // First step: Selecting the top varieties
   list L1; list L2; list LL; int i; int j; int t;
-  //"T_before first step L="; L;
   list Lend;
   for(i=1;i<=size(L);i++)
   {
@@ -3838,7 +3842,7 @@ proc AddCons(list L)
       {
         if(containedideal(L[j][1],L[i][1])==1)
         {t=0;
-         // "l'ideal "; L[j][1]; "esta contingut a l'ideal "; L[i][1];
+         // "the ideal "; L[j][1]; "is contained in ideal "; L[i][1];
           j=size(L);
         }
       }
@@ -3861,7 +3865,6 @@ proc AddCons(list L)
    while(size(L2)>0)
    {
      LL=addtolocalclosed(L1,L2);
-     //"T_LL="; LL;
      for(i=1;i<=size(LL[1]);i++)
      {
        if(size(LL[1][i])>=3)
@@ -3958,7 +3961,10 @@ proc  addtolocalclosed(list L1,list L2)
      if(alreadyadded!=intvec(0))
      {alreadyadded=sort(elimrepeatedvl(alreadyadded))[1];}
      if(Added==intvec(0)){Added=alreadyadded;}
-     else{Added=sort(elimrepeatedvl(Added,alreadyadded))[1];}
+     else{
+       Added=Added,alreadyadded;
+       Added=sort(elimrepeatedvl(Added))[1];
+     }
      h=1,1;
      while((h[1]==1) and (Added!=intvec(0)))
      {
@@ -4015,23 +4021,28 @@ proc  addtolocalclosed(list L1,list L2)
 }
 
 // locus(G):  Special routine for determining the locus of points
-//                   of  objects. Given a parametric ideal J with
-//                   parameters (a_1,..a_m) and variables (x_1,..,xn),
-//                   representing the system determining
-//                   the locus of points (a_1,..,a_m)) who verify certain
-//                   properties, computing the grobcov G of
-//                   J and applying to it locus, determines the different
-//                   classes of locus components. They can be
-//                   Normal, Special, Accumulation point, Degenerate.
-//                   The output are the components given in P-canonical form
-//                   of at most 4 constructible sets: Normal, Special, Accumulation,
-//                   Degenerate.
-//                   The description of the algorithm and definitions will be
-//                   given in a forthcoming paper by Abanades, Botana, Montes Recio.
+//                of  objects. Given a parametric ideal J with
+//                parameters (a_1,..a_m) and variables (x_1,..,xn),
+//                representing the system determining
+//                the locus of points (a_1,..,a_m)) who verify certain
+//                properties, computing the grobcov G of
+//                J and applying to it locus, determines the different
+//                classes of locus components. They can be
+//                Normal, Special, Accumulation point, Degenerate.
+//                The output are the components given in P-canonical form
+//                of at most 4 constructible sets: Normal, Special, Accumulation,
+//                Degenerate.
+//                The description of the algorithm and definitions will be
+//                given in a forthcoming paper by Abanades, Botana, Montes Recio.
 
-// input:
+// input:      The output G of the grobcov (in generic representation, which is the default)
+//                It allows an extra  pair of arguments as option: locus(G,"minus",N)
+//                where N is the ideal representing some excluded point of the mover
+//                if there is some point that the mover should avoid.
 // output:
-//    list, the canonical P-representation of the 4 types of the locus:
+//         list, the canonical P-representation of the Normal and Non-Normal locus:
+//              The Normal locus has two kind of components: Normal and Special.
+//              The Non-normal locus has two kind of components: Accumulation and Degenerate.
 //              Normal components: for each point in the component,
 //              the number of solutions in the variables is finite, and
 //              the solutions depend on the point in the component if the component is not 0-dimensional.
@@ -4045,28 +4056,63 @@ proc  addtolocalclosed(list L1,list L2)
 //              for every point in the component there exist infinite solutions.
 //         The output components are given as
 //              ((p1,(p11,..p1s_1),type_1,level_1),..,(pk,(pk1,..pks_k),type_k,level_k)
-//         The components are given in four groups: normal, special, accumulation, degenerate
-//              and each of these groups represent the canonical P-representation of the subset.
+//         The components are given in canonical P-representation of the subset.
 //              If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
 //              gives the depth of the component.
-proc locus(list G)
+proc locus(list GG,list #)
 "USAGE:   locus(G);
                The input must be the grobcov  of a parametrical ideal
-RETURN:   The  locus.
-          The output components are given as a list of  (pi,(pi1,..pis_i),type_i,level_i) varying i.
-NOTE: It can only be called after computing the grobcov of the
-          parametrical ideal in generic representation ('ext',0),
-          which is the default.
-          The basering R, must be of the form Q[a_1,..,a_m][x_1,..,x_n].
+RETURN:  The  locus.
+               The output are the components of two constructible subsets of the locus
+               of the parametrical system.: Normal and Non-normal.
+               These components are
+               given as a list of  (pi,(pi1,..pis_i),type_i,level_i) varying i,
+               where the p's are prime ideals, the type can be: Normal, Special,
+               Accumulation, Degenerate.
+NOTE:      It can only be called after computing the grobcov of the
+               parametrical ideal in generic representation ('ext',0),
+               which is the default.
+               The basering R, must be of the form Q[a_1,..,a_m][x_1,..,x_n].
 KEYWORDS: geometrical locus, locus, loci.
 EXAMPLE:  locus; shows an example"
 {
   int t1=1; int t2=1;
+  list Opc=#;
   def R=basering;
   setglobalrings();
   string ty;
   list G1; list G2;
-  int i; int d; int j; int k;
+  int i; int d; int j; int k; int i0=1; ideal minu; int te;
+  for(i=1;i<=size(Opc) div 2;i++)
+  {
+      if(Opc[2*i-1]=="minus")
+      {
+        minu=Opc[2*i];
+        setring(@RP);
+        list nGP;
+        def GP=imap(R,GG);
+        ideal BP;
+        def minup=imap(R,minu);
+        for(j=1;j<=size(GP);j++)
+        {
+          te=1; k=1;
+          BP=std(GP[j][2]);
+          while((te==1) and (k<=size(minup)))
+          {
+            if((reduce(minup[k],BP))!=0){te=0;}
+            k++;
+          }
+          if(te==0){nGP[size(nGP)+1]=GP[j];}
+        }
+        setring(R);
+        GG=imap(@RP,nGP);
+     }
+  }
+  list G;
+  for(i=i0;i<=size(GG);i++)
+  {
+    G[i+1-i0]=GG[i];
+  }
   for(i=1;i<=size(G);i++)
   {
     attrib(G[i][1],"IsSB",1);
@@ -4094,7 +4140,7 @@ EXAMPLE:  locus; shows an example"
      for(k=1;k<=size(G1RP[i][3]);k++)
      {
        attrib(G1RP[i][3][k][1],"IsSB",1);
-       G1RP[i][3][k][1]=std(G1RP[i][3][k][1]);       //"T_G1RP[i][2]="; G1RP[i][2];
+       G1RP[i][3][k][1]=std(G1RP[i][3][k][1]);
        for(j=1;j<=size(G1RP[i][2]);j++)
        {
          B[j]=reduce(G1RP[i][2][j],G1RP[i][3][k][1]);
@@ -4122,49 +4168,40 @@ EXAMPLE:  locus; shows an example"
     }
   }
   setring @P;
+  // CANVIAR
   if(t1==1)
   {
-    def P1P=imap(R,P1);
-    list CN; list CS;
-    for(i=1;i<=size(P1P);i++)
-    {
-      d=dim(std(P1P[i][1]));
-      if(d==0){P1P[i][3]="Normal";}
-      if(P1P[i][3]=="Normal"){CN[size(CN)+1]=P1P[i];}
-      else {CS[size(CS)+1]=P1P[i];}
-    }
-    def LN=AddCons(CN);
-    def LS=AddCons(CS);
-  }
-  else{list P1P; list CN; list CS; list C2; list LN; list LS;}
+    def C1=imap(R,P1);
+    def L1=AddCons(C1);
+   }
+  else{list C1; list L1; kill P1; list P1;}
   if(t2==1)
   {
     def C2=imap(R,P2);
     def L2=AddCons(C2);
   }
-  else{list L2; list C2; list P2;}
-  list LA; list LD;
-
+  else{list L2; list C2; kill P2; list P2;}
     for(i=1;i<=size(L2);i++)
     {
       d=dim(std(L2[i][1]));
       if(d==0)
       {
         L2[i][3]=string("Accumulation,",L2[i][3]);
-        LA[size(LA)+1]=L2[i];
       }
-      else{L2[i][3]=string("Degenerate,",L2[i][3]); LD[size(LD)+1]=L2[i];}
+      else{L2[i][3]=string("Degenerate,",L2[i][3]);}
     }
-
-  if(t1==0){list LN;}
-  else{for(i=1;i<=size(LS);i++){LN[size(LN)+1]=LS[i];}}
+  list LN;
+  if(t1==1)
+  {
+    for(i=1;i<=size(L1);i++){LN[size(LN)+1]=L1[i];}
+  }
   if(t2==1)
   {
-    for(i=1;i<=size(LA);i++){LN[size(LN)+1]=LA[i];}
-    for(i=1;i<=size(LD);i++){LN[size(LN)+1]=LD[i];}
+    for(i=1;i<=size(L2);i++){LN[size(LN)+1]=L2[i];}
   }
   setring(R);
   def L=imap(@P,LN);
+  for(i=1;i<=size(L);i++){if(size(L[i][2])==0){L[i][2]=ideal(1);}}
   kill @R; kill @RP; kill @P;
   return(L);
 }
@@ -4173,10 +4210,25 @@ example
   ring R=(0,a,b),(x,y),dp;
   short=0;
   ideal H=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
+  "System H = "; H; " ";
   def G=grobcov(H);
-  "grobcov(H)="; G; " ";
-  def Gp=locus(G);
-  "locus(G)="; Gp;
+  //"grobcov(H)="; G; " ";
+  def L=locus(G);
+  "locus(G)="; L; " ";
+  kill R;
+  ring R=(0,x5,x6),(x1,x2,x3,x4),dp;
+  ideal S=(x1-3)^2+(x2-1)^2-9,
+             (4-x2)*(x3-3)+(x1-3)*(x4-1),
+             (3-x1)*(x3-x1)+(4-x2)*(x4-x2),
+             (4-x4)*x5+(x3-3)*x6+3*x4-4*x3,
+             (x5-x1)^2+(x6-x2)^2-(x1-x3)^2-(x2-x4)^2;
+ "System S="; S;" ";
+ def G=grobcov(S);
+// "grobcov(S)="; G;
+ ideal N=x1-3,x2-4;
+ "N="; N;" ";
+  def L=locus(G,"minus",N);
+ "locus(G,minus,N)="; L;" ";
 }
 
 
