@@ -1193,7 +1193,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
     compareCoeff = n_DivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm), currRing->cf);
-    if (compareCoeff == pDivComp_EQUAL || compare == compareCoeff)
+    if ((compareCoeff == pDivComp_EQUAL) || (compare == compareCoeff))
     {
       if (compare == 1)
       {
@@ -1281,7 +1281,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *the pair (S[i],p) enters B if the spoly != 0
   */
   /*-  compute the short s-polynomial -*/
-  if ((strat->S[i]==NULL) || (p==NULL)) {
+  if ((strat->S[i]==NULL) || (p==NULL))
+  {
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -1784,7 +1785,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   pSigMultNegSev = ~p_GetShortExpVector(pSigMult,currRing);
   sSigMult = currRing->p_Procs->pp_Mult_mm(sSigMult,m2,currRing);
   sSigMultNegSev = ~p_GetShortExpVector(sSigMult,currRing);
-  
+
   pDelete (&m1);
   pDelete (&m2);
 
@@ -1795,10 +1796,10 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   pWrite(sSigMult);
   Print("----------------\n");
 #endif
-  // testing by syzCrit = F5 Criterion 
+  // testing by syzCrit = F5 Criterion
   // testing by rewCrit1 = Rewritten Criterion
   if  ( strat->syzCrit(pSigMult,pSigMultNegSev,strat) ||
-        strat->syzCrit(sSigMult,sSigMultNegSev,strat) 
+        strat->syzCrit(sSigMult,sSigMultNegSev,strat)
         || strat->rewCrit1(sSigMult,sSigMultNegSev,strat,i+1)
       )
   {
@@ -1812,9 +1813,9 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   // in any case Lp is checked up to the next strat->P which is added
   // to S right after this critical pair creation.
   // NOTE: this even holds if the 2nd generator gives the bigger signature
-  //       moreover, this improves rewCriterion, 
+  //       moreover, this improves rewCriterion,
   //       i.e. strat->checked > strat->from if and only if the 2nd generator
-  //       gives the bigger signature. 
+  //       gives the bigger signature.
   Lp.checked = strat->sl+1;
   int sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
 //#if 1
@@ -1838,7 +1839,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   // passed all tests up to now
 
   // store from which element this pair comes from for further tests
-  Lp.from = strat->sl+1;    
+  Lp.from = strat->sl+1;
   if(sigCmp==currRing->OrdSgn)
   {
     // pSig > sSig
@@ -2864,7 +2865,7 @@ void chainCritRing (poly p,int, kStrategy strat)
   assume(!(strat->Gebauer || strat->fromT));
   for (j=strat->Ll; j>=0; j--)
   {
-    if (strat->L[j].lcm != NULL && n_DivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p), currRing->cf))
+    if ((strat->L[j].lcm != NULL) && n_DivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p), currRing->cf))
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
@@ -3398,7 +3399,8 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
       // Print("j:%d, Ll:%d\n",j,strat->Ll);
 //      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
 //         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
-      if ( iCompH == pGetComp(strat->S[j]) )
+      if ((iCompH == pGetComp(strat->S[j]))
+      || (0 == pGetComp(strat->S[j])))
       {
         enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR);
       }
@@ -3625,9 +3627,10 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
         enterOnePairRing(j,h,ecart,FALSE,strat, atR);
       }
     }
+    kMergeBintoL(strat);
   }
   else
-#endif  
+#endif
   for (j=0; j<=k; j++)
   {
     const int iCompSj = pGetComp(strat->S[j]);
@@ -4497,7 +4500,7 @@ loop
 }
 
 /*2
-* 
+*
 * is only used in F5C, must ensure that the interreduction process does add new
 * critical pairs to strat->L only behind all other critical pairs which are
 * still in strat->L!
@@ -5095,7 +5098,8 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       strat->Ll--;
     }
 
-    if (strat->P.GetLmCurrRing() != NULL && strat->L[strat->Ll].GetLmCurrRing() != NULL)
+    if ((strat->P.GetLmCurrRing() != NULL)
+    && (strat->L[strat->Ll].GetLmCurrRing() != NULL))
     {
       if (pLmCmp(strat->P.GetLmCurrRing(),strat->L[strat->Ll].GetLmCurrRing()) == -1)
       {
@@ -5851,14 +5855,14 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
       //h.sig = pInit();
       //p_SetCoeff(h.sig,nInit(1),currRing);
       p_SetComp(h.sig,i+1,currRing);
-      // if we are working with the Schreyer order we generate it 
+      // if we are working with the Schreyer order we generate it
       // by multiplying the initial signatures with the leading monomial
       // of the corresponding initial polynomials generating the ideal
-      // => we can keep the underlying monomial order and get a Schreyer 
+      // => we can keep the underlying monomial order and get a Schreyer
       //    order without any bigger overhead
       if (!strat->incremental)
       {
-        p_ExpVectorAdd (h.sig,F->m[i],currRing);  
+        p_ExpVectorAdd (h.sig,F->m[i],currRing);
       }
       h.sevSig = pGetShortExpVector(h.sig);
 #ifdef DEBUGF5
@@ -5901,9 +5905,9 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
           p_SetCompP(strat->syz[ctr],i+1,currRing);
           // add LM(F->m[i]) to the signature to get a Schreyer order
           // without changing the underlying polynomial ring at all
-          p_ExpVectorAdd (strat->syz[ctr],F->m[i],currRing);  
+          p_ExpVectorAdd (strat->syz[ctr],F->m[i],currRing);
           // since p_Add_q() destroys all input
-          // data we need to recreate help 
+          // data we need to recreate help
           // each time
           poly help = pCopy(F->m[i]);
           p_SetCompP(help,j+1,currRing);
@@ -5950,7 +5954,7 @@ void initSyzRules (kStrategy strat)
     for(i=1; i<=strat->sl; i++)
     {
       if (pGetComp(strat->sig[i-1]) != pGetComp(strat->sig[i]))
-      { 
+      {
         ps += i;
       }
     }
@@ -5965,7 +5969,7 @@ void initSyzRules (kStrategy strat)
 #if defined(DEBUGF5) || defined(DEBUGF51)
     printf("------------- GENERATING SYZ RULES NEW ---------------\n");
 #endif
-    i = 1; 
+    i = 1;
     j = 0;
     /************************************************************
      * generating the leading terms of the principal syzygies
@@ -7048,7 +7052,7 @@ void enterT(LObject p, kStrategy strat, int atT)
     }
   }
 
-  if (strat->tailBin != NULL && (pNext(p.p) != NULL))
+  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
   {
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ?
@@ -7099,7 +7103,7 @@ void enterSyz(LObject p, kStrategy strat)
   int cc = strat->Ll;
   while (cc>-1)
   {
-    if (p_LmShortDivisibleBy( strat->syz[strat->syzl-1], strat->sevSyz[strat->syzl-1], 
+    if (p_LmShortDivisibleBy( strat->syz[strat->syzl-1], strat->sevSyz[strat->syzl-1],
                               strat->L[cc].sig, ~strat->L[cc].sevSig, currRing))
     {
       deleteInL(strat->L,&strat->Ll,cc,strat);
@@ -7927,8 +7931,8 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   poly p1_max = (strat->R[L->i_r1])->max;
   poly p2_max = (strat->R[L->i_r2])->max;
 
-  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
-      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
+  if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
+      ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
   {
     p_LmFree(m1, strat->tailRing);
     p_LmFree(m2, strat->tailRing);
@@ -7954,8 +7958,8 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   poly p1_max = (strat->R[atR])->max;
   poly p2_max = (strat->R[strat->S_2_R[atS]])->max;
 
-  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
-      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
+  if (((p1_max != NULL) && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
+      ((p2_max != NULL) && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
   {
     return FALSE;
   }
@@ -8014,11 +8018,11 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     if (pNext(strat->L[i].p) != strat->tail)
       strat->L[i].ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   }
-  if (strat->P.t_p != NULL ||
-      (strat->P.p != NULL && pNext(strat->P.p) != strat->tail))
+  if ((strat->P.t_p != NULL) ||
+      ((strat->P.p != NULL) && pNext(strat->P.p) != strat->tail))
     strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
 
-  if (L != NULL && L->tailRing != new_tailRing)
+  if ((L != NULL) && (L->tailRing != new_tailRing))
   {
     if (L->i_r < 0)
       L->ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
@@ -8034,7 +8038,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     }
   }
 
-  if (T != NULL && T->tailRing != new_tailRing && T->i_r < 0)
+  if ((T != NULL) && (T->tailRing != new_tailRing && T->i_r < 0))
     T->ShallowCopyDelete(new_tailRing, new_tailBin, p_shallow_copy_delete);
 
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
@@ -8139,12 +8143,12 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     strat->tailRing = res;
     return (res);
   }
-  
+
   // not incremental => use Schreyer order
   // this is done by a trick when initializing the signatures
   // in initSLSba():
   // Instead of using the signature 1e_i for F->m[i], we start
-  // with the signature LM(F->m[i])e_i for F->m[i]. Doing this we get a 
+  // with the signature LM(F->m[i])e_i for F->m[i]. Doing this we get a
   // Schreyer order w.r.t. the underlying monomial order.
   // => we do not need to change the underlying polynomial ring at all!
 
@@ -8245,7 +8249,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     return res;
   }
   */
-  
+
   assume(FALSE);
   return(NULL);
 }
@@ -8552,16 +8556,16 @@ void kDebugPrint(kStrategy strat)
     Print(" syzring:%d, syzComp(strat):%d limit:%d\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit(currRing));
     if(TEST_OPT_DEGBOUND)
       Print(" degBound: %d\n", Kstd1_deg);
-   
+
     if( ecartWeights != NULL )
-    { 
-       PrintS("ecartWeights: "); 
+    {
+       PrintS("ecartWeights: ");
        for (int i = rVar(currRing); i > 0; i--)
 	 Print("%hd ", ecartWeights[i]);
        PrintLn();
        assume( TEST_OPT_WEIGHTM );
     }
-     
+
 #ifndef NDEBUG
     rDebugPrint(currRing);
 #endif
