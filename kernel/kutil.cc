@@ -354,9 +354,9 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       L->pLength = 1;
       L->max = NULL;
 
-      if (L->t_p != NULL && pNext(L->t_p) != NULL)
+      if ((L->t_p != NULL) && (pNext(L->t_p) != NULL))
         pNext(L->t_p) = NULL;
-      if (L->p != NULL && pNext(L->p) != NULL)
+      if ((L->p != NULL) && (pNext(L->p) != NULL))
         pNext(L->p) = NULL;
       return;
     }
@@ -625,16 +625,16 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   poly p = T->p;
   ring r = currRing;
 
-  if (T->p == NULL && T->t_p == NULL && i >= 0)
+  if ((T->p == NULL) && (T->t_p == NULL) && (i >= 0))
     return dReportError("%c[%d].poly is NULL", TN, i);
 
   if (T->tailRing != currRing)
   {
-    if (T->t_p == NULL && i > 0)
+    if ((T->t_p == NULL) && (i > 0))
       return dReportError("%c[%d].t_p is NULL", TN, i);
     pFalseReturn(p_Test(T->t_p, T->tailRing));
     if (T->p != NULL) pFalseReturn(p_LmTest(T->p, currRing));
-    if (T->p != NULL && T->t_p != NULL)
+    if ((T->p != NULL) && (T->t_p != NULL))
     {
       const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
       if (msg != NULL)
@@ -647,7 +647,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
       p = T->t_p;
       r = T->tailRing;
     }
-    if (T->t_p != NULL && i >= 0 && TN == 'T')
+    if ((T->t_p != NULL) && (i >= 0) && (TN == 'T'))
     {
       if (pNext(T->t_p) == NULL)
       {
@@ -684,7 +684,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
       return dReportError("%c[%d].max != NULL but tailRing == currRing",TN,i);
     if (T->t_p != NULL)
       return dReportError("%c[%d].t_p != NULL but tailRing == currRing",TN,i);
-    if (T->p == NULL && i > 0)
+    if ((T->p == NULL) && (i > 0))
       return dReportError("%c[%d].p is NULL", TN, i);
     pFalseReturn(p_Test(T->p, currRing));
   }
@@ -731,7 +731,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     {
       kFalseReturn(kbTest(L->bucket));
       r_assume(L->bucket->bucket_ring == L->tailRing);
-      if (L->p != NULL && pNext(L->p) != NULL)
+      if ((L->p != NULL) && (pNext(L->p) != NULL))
       {
         pn = pNext(L->p);
         pNext(L->p) = NULL;
@@ -755,7 +755,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     // L->p2 either NULL or "normal" poly
     pFalseReturn(pp_Test(L->p2, currRing, L->tailRing));
   }
-  else if (tlength > 0 && T != NULL && (lpos >=0))
+  else if ((tlength > 0) && (T != NULL) && (lpos >=0))
   {
     // now p1 and p2 must be != NULL and must be contained in T
     int i;
@@ -775,7 +775,7 @@ BOOLEAN kTest (kStrategy strat)
 
   // test P
   kFalseReturn(kTest_L(&(strat->P), strat->tailRing,
-                       (strat->P.p != NULL && pNext(strat->P.p)!=strat->tail),
+                       ((strat->P.p != NULL) && (pNext(strat->P.p)!=strat->tail)),
                        -1, strat->T, strat->tl));
 
   // test T
@@ -819,8 +819,8 @@ BOOLEAN kTest_S(kStrategy strat)
   BOOLEAN ret = TRUE;
   for (i=0; i<=strat->sl; i++)
   {
-    if (strat->S[i] != NULL &&
-        strat->sevS[i] != pGetShortExpVector(strat->S[i]))
+    if ((strat->S[i] != NULL) &&
+        (strat->sevS[i] != pGetShortExpVector(strat->S[i])))
     {
       return dReportError("S[%d] wrong sev: has %o, specified to have %o",
                           i , pGetShortExpVector(strat->S[i]), strat->sevS[i]);
@@ -862,7 +862,7 @@ BOOLEAN kTest_TS(kStrategy strat)
   // test strat->L[i].i_r1
   for (i=0; i<=strat->Ll; i++)
   {
-    if (strat->L[i].p1 != NULL && strat->L[i].p2)
+    if ((strat->L[i].p1 != NULL) && (strat->L[i].p2))
     {
       if (strat->L[i].i_r1 < 0 ||
           strat->L[i].i_r1 > strat->tl ||
@@ -1127,7 +1127,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
     compareCoeff = nDivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
-    if (compareCoeff == pDivComp_EQUAL || compare == compareCoeff)
+    if ((compareCoeff == pDivComp_EQUAL) || (compare == compareCoeff))
     {
       if (compare == 1)
       {
@@ -1215,7 +1215,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *the pair (S[i],p) enters B if the spoly != 0
   */
   /*-  compute the short s-polynomial -*/
-  if ((strat->S[i]==NULL) || (p==NULL)) {
+  if ((strat->S[i]==NULL) || (p==NULL))
+  {
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -2383,7 +2384,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
   assume(!(strat->Gebauer || strat->fromT));
   for (j=strat->Ll; j>=0; j--)
   {
-    if (strat->L[j].lcm != NULL && nDivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
+    if ((strat->L[j].lcm != NULL) && nDivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
@@ -2917,7 +2918,8 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
       // Print("j:%d, Ll:%d\n",j,strat->Ll);
 //      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
 //         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
-      if ( iCompH == pGetComp(strat->S[j]) )
+      if ( iCompH == pGetComp(strat->S[j])
+      || (0 == pGetComp(strat->S[j])))
       {
         enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR);
       }
@@ -3112,6 +3114,7 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
         enterOnePairRing(j,h,ecart,FALSE,strat, atR);
       }
     }
+    kMergeBintoL(strat);
   }
   else
 #endif  
@@ -5717,7 +5720,7 @@ void enterT(LObject p, kStrategy strat, int atT)
     }
   }
 
-  if (strat->tailBin != NULL && (pNext(p.p) != NULL))
+  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
   {
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ?
@@ -6300,8 +6303,8 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   poly p1_max = (strat->R[L->i_r1])->max;
   poly p2_max = (strat->R[L->i_r2])->max;
 
-  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
-      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
+  if (((p1_max != NULL) && (!p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing))) ||
+      ((p2_max != NULL) && (!p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing))))
   {
     p_LmFree(m1, strat->tailRing);
     p_LmFree(m2, strat->tailRing);
@@ -6327,8 +6330,8 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   poly p1_max = (strat->R[atR])->max;
   poly p2_max = (strat->R[strat->S_2_R[atS]])->max;
 
-  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
-      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
+  if (((p1_max != NULL) && (!p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing))) ||
+      ((p2_max != NULL) && (!p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing))))
   {
     return FALSE;
   }
@@ -6387,11 +6390,11 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     if (pNext(strat->L[i].p) != strat->tail)
       strat->L[i].ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   }
-  if (strat->P.t_p != NULL ||
-      (strat->P.p != NULL && pNext(strat->P.p) != strat->tail))
+  if ((strat->P.t_p != NULL) ||
+      ((strat->P.p != NULL) && (pNext(strat->P.p) != strat->tail)))
     strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
 
-  if (L != NULL && L->tailRing != new_tailRing)
+  if ((L != NULL) && (L->tailRing != new_tailRing))
   {
     if (L->i_r < 0)
       L->ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
@@ -6407,7 +6410,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     }
   }
 
-  if (T != NULL && T->tailRing != new_tailRing && T->i_r < 0)
+  if ((T != NULL) && (T->tailRing != new_tailRing) && (T->i_r < 0))
     T->ShallowCopyDelete(new_tailRing, new_tailBin, p_shallow_copy_delete);
 
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
@@ -6725,8 +6728,8 @@ void kDebugPrint(kStrategy strat)
          strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
   Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
          strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
-  Print("posInLDependsOnLength=%d, use_buckets=%d\n",
-         strat->posInLDependsOnLength,strat->use_buckets);
+  Print("posInLDependsOnLength=%d\n",
+         strat->posInLDependsOnLength);
   PrintS(showOption());PrintLn();
   PrintS("LDeg: ");
     if (currRing->pLDeg==pLDeg0) PrintS("pLDeg0");
