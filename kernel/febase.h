@@ -9,7 +9,7 @@
 
 #include <reporter/reporter.h>
 
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #include <kernel/structs.h>
 

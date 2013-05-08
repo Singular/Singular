@@ -17,7 +17,7 @@
 #include <coeffs/numbers.h>
 
 #include <reporter/reporter.h>
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #ifndef PLURAL_INTERNAL_DECLARATIONS
 #define PLURAL_INTERNAL_DECLARATIONS

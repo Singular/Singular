@@ -208,7 +208,7 @@ endif
 
 Singular Singularg ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
-AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
+AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 Singularg_CFLAGS = -g ${PIPE}
@@ -222,8 +222,8 @@ nodist_Singularg_SOURCES =  libSingular_g.la
 Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la ${top_builddir}/libpolys/polys/libpolys.la -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
-Singularg_LDADD = libSingular_g.la ${top_builddir}/numeric/libnumeric_g.la ${top_builddir}/kernel/libkernel_g.la ${top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+Singular_LDADD = libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la ${top_builddir}/libpolys/polys/libpolys.la -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+Singularg_LDADD = libSingular_g.la ${top_builddir}/numeric/libnumeric_g.la ${top_builddir}/kernel/libkernel_g.la ${top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
@@ -244,8 +244,8 @@ nodist_Singulard_SOURCES = libSingular.la
 Singulardg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 nodist_Singulardg_SOURCES =  libSingular_g.la
 
-Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
-Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
@@ -260,7 +260,7 @@ ESingular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 ESingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR -DPROTO
 ESingular_LDFLAGS = -static ${AMLDFLAGS}
-ESingular_LDADD =   -lreporter -lmisc -lomalloc -lfindexec
+ESingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 
@@ -270,7 +270,7 @@ TSingular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 TSingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR -DPROTO
 TSingular_LDFLAGS = -static ${AMLDFLAGS}
-TSingular_LDADD =   -lreporter -lmisc -lomalloc -lfindexec
+TSingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
 # utils.cc utils.h
@@ -335,8 +335,8 @@ test_s_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPL
 test_s_r_SOURCES = test.cc
 test_s_g_SOURCES = test.cc
 
-test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
-test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
@@ -356,8 +356,8 @@ test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPL
 test_d_r_SOURCES = test.cc
 test_d_g_SOURCES = test.cc
 
-test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
-test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H

@@ -11,11 +11,11 @@ digraph singular {
 	omalloc_xalloc -> coeffs;
 	omalloc_xalloc -> polys;
 
-        findexec_resources [ color=lightgrey, fontcolor=blue, style=filled ];
-	findexec_resources -> factory_libfac [label="for testing"];
-	findexec_resources -> libpolys;
-	findexec_resources -> kernel;
-	findexec_resources -> SingularInterpreter;
+        resources_resources [ color=lightgrey, fontcolor=blue, style=filled ];
+	resources_resources -> factory_libfac [label="for testing"];
+	resources_resources -> libpolys;
+	resources_resources -> kernel;
+	resources_resources -> SingularInterpreter;
 
         factory_libfac [ color=lightgrey, fontcolor=blue, style=filled ];
 	factory_libfac -> libpolys;

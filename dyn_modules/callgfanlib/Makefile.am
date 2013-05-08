@@ -31,7 +31,7 @@ $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
 #AMLDFLAGS	=  -L${abs_top_builddir}/gfanlib/
 # -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel \
-# -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
+# -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 
 SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h gfanlib.cc

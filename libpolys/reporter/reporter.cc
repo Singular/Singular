@@ -20,8 +20,8 @@
 #endif
 
 #include <reporter/reporter.h>
-#include <findexec/feResource.h>
-#include <findexec/feFopen.h>
+#include <resources/feResource.h>
+#include <resources/feFopen.h>
 #include <omalloc/omalloc.h>
 //#include "options.h"
 

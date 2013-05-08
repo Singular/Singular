@@ -104,7 +104,7 @@ else
   USE_FACTORY =
 endif
 
-AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../findexec
+AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../resources
 
 
 coeffs_test_s_r_LDFLAGS = ${AM_LDFLAGS} -static 
@@ -124,20 +124,20 @@ polys_test_d_g_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_d_g_LDFLAGS = $(polys_test_d_g_LDFLAGS)
 
 
-coeffs_test_s_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS} 
-polys_test_s_r_LDADD = -lpolys -lcoeffs -lreporter -lmisc ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS} 
+coeffs_test_s_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
+polys_test_s_r_LDADD = -lpolys -lcoeffs -lreporter -lmisc ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
 rings_test_s_r_LDADD = $(polys_test_s_r_LDADD)
 
-coeffs_test_s_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS} 
-polys_test_s_g_LDADD = -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS} 
+coeffs_test_s_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
+polys_test_s_g_LDADD = -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
 rings_test_s_g_LDADD = $(polys_test_s_g_LDADD)
 
-coeffs_test_d_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS} 
-polys_test_d_r_LDADD = -lpolys -lcoeffs -lreporter -lmisc ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc -lfindexec ${NTL_LIBS} ${GMP_LIBS}
+coeffs_test_d_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
+polys_test_d_r_LDADD = -lpolys -lcoeffs -lreporter -lmisc ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS}
 rings_test_d_r_LDADD = $(polys_test_d_r_LDADD)
 
-coeffs_test_d_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS} 
-polys_test_d_g_LDADD = -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc_g -lfindexec_g ${NTL_LIBS} ${GMP_LIBS}
+coeffs_test_d_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
+polys_test_d_g_LDADD = -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS}
 rings_test_d_g_LDADD = $(polys_test_d_g_LDADD)
 
 

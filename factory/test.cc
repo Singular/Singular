@@ -1,5 +1,5 @@
 #include <factory/factory.h>
-#include <findexec/feFopen.h>
+#include <resources/feFopen.h>
 
 int mmInit(void) {
 #ifdef SINGULAR

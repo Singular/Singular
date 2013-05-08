@@ -26,7 +26,7 @@
 
 #include <omalloc/omalloc.h>
 #include <Singular/version.h>
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 #include <Singular/feOpt.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)

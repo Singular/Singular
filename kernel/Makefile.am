@@ -85,7 +85,7 @@ else
   USE_FACTORY =
 endif
 
-AMLDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter  -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/findexec
+AMLDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter  -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 
 ### TODO: the following has to be addapted...
@@ -109,8 +109,8 @@ testsources = test.cc
 test_s_r_SOURCES = $(testsources)
 test_s_g_SOURCES = $(testsources)
 
-test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_s_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
@@ -128,8 +128,8 @@ test_d_g_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPL
 test_d_r_SOURCES = $(testsources)
 test_d_g_SOURCES = $(testsources)
 
-test_d_r_LDADD = -lkernel -lpolys -lcoeffs  -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lfindexec $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-test_d_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lfindexec_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
+test_d_r_LDADD = -lkernel -lpolys -lcoeffs  -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_d_g_LDADD = -lkernel_g -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD}
 
 test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H

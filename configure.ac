@@ -173,7 +173,7 @@ fi[]dnl
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
 AC_CONFIG_FILES([dox/Makefile])
 
-AC_CONFIG_SUBDIRS([findexec])
+AC_CONFIG_SUBDIRS([resources])
 AC_CONFIG_SUBDIRS([omalloc])
 
 if test "x$ENABLE_FACTORY" = xyes; then

@@ -1,36 +1,36 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
 if WANT_DEBUG
-  LIB_G=libfindexec_g.la
+  LIB_G=libresources_g.la
 else
   LIB_G=
 endif
 
-libfindexec_LTLIBRARIES = libfindexec.la ${LIB_G}
-libfindexecdir = $(libdir)/
+libresources_LTLIBRARIES = libresources.la ${LIB_G}
+libresourcesdir = $(libdir)/
 
 CXXTEMPLFLAGS =-ftrapv 
 ### -fno-implicit-templates
 
-libfindexec_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
-libfindexec_g_la_CFLAGS = ${PIPE}
+libresources_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
+libresources_g_la_CFLAGS = ${PIPE}
 
-libfindexec_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} -fno-exceptions -fno-rtti
-libfindexec_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+libresources_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} -fno-exceptions -fno-rtti
+libresources_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} 
 
-libfindexec_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-libfindexec_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
+libresources_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+libresources_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 SOURCES  = omFindExec.c feResource.cc feFopen.cc
-libfindexec_la_SOURCES   = $(SOURCES)
-libfindexec_g_la_SOURCES = $(SOURCES)
+libresources_la_SOURCES   = $(SOURCES)
+libresources_g_la_SOURCES = $(SOURCES)
 
-libfindexec_includedir  =$(includedir)/findexec/
+libresources_includedir  =$(includedir)/resources/
 
-libfindexec_include_HEADERS = omFindExec.h feResource.h feFopen.h
+libresources_include_HEADERS = omFindExec.h feResource.h feFopen.h
 
 
 

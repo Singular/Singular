@@ -9,7 +9,7 @@
 #define BIGINTMAT_H
 
 #include <omalloc/omalloc.h>
-#include <findexec/feFopen.h>
+#include <resources/feFopen.h>
 #include <coeffs/coeffs.h>
 
 /// matrix of numbers

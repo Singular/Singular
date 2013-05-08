@@ -1,4 +1,4 @@
-AC_INIT([libfindexec], [3.1.4.sw])
+AC_INIT([libresources], [3.1.4.sw])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])

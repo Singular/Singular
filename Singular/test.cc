@@ -13,8 +13,8 @@
 
 #include <reporter/reporter.h>
 
-#include <findexec/feFopen.h>
-#include <findexec/feResource.h>
+#include <resources/feFopen.h>
+#include <resources/feResource.h>
 
 #include <coeffs/coeffs.h>
 

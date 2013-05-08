@@ -5,7 +5,7 @@
 #include <coeffs/numbers.h>
 
 #include <reporter/reporter.h>
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #ifdef HAVE_FACTORY
 // int initializeGMP(){ return 1; }

@@ -8,7 +8,7 @@
 #include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>

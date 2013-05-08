@@ -21,7 +21,7 @@
 #include <kernel/febase.h>
 #include <reporter/reporter.h>
 
-#include <findexec/omFindExec.h>
+#include <resources/omFindExec.h>
 
 #include <Singular/si_signals.h>
 

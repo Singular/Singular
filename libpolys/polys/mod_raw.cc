@@ -25,7 +25,7 @@
 
 #include <reporter/reporter.h>
 
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #include "mod_raw.h"
 

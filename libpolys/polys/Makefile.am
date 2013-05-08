@@ -159,8 +159,8 @@ templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
 templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
 templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
 
-templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lfindexec
-templates_p_Procs_Generate_LDFLAGS  = -L${builddir} -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc -L${top_builddir}/../omalloc -L${top_builddir}/../findexec
+templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lresources
+templates_p_Procs_Generate_LDFLAGS  = -L${builddir} -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc -L${top_builddir}/../omalloc -L${top_builddir}/../resources
 
 templates/p_Procs.inc: templates/p_Procs_Generate$(EXEEXT)
 	${builddir}/templates/p_Procs_Generate$(EXEEXT) > ${builddir}/templates/p_Procs.inc
