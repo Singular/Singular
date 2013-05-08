@@ -8508,8 +8508,8 @@ void kDebugPrint(kStrategy strat)
          strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
   Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
          strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
-  Print("posInLDependsOnLength=%d, use_buckets=%d\n",
-         strat->posInLDependsOnLength,strat->use_buckets);
+  Print("posInLDependsOnLength=%d\n",
+         strat->posInLDependsOnLength);
   PrintS(showOption());PrintLn();
   PrintS("LDeg: ");
     if (currRing->pLDeg==pLDeg0) PrintS("pLDeg0");
