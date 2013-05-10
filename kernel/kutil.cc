@@ -777,8 +777,8 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     i = kFindInT(L->p2, T, tlength);
     //BOCO: small modification (test for ShiftDVec Case)
     //TODO: test if we really have a shift here
-    if (i < 0 && !dynamic_cast<ShiftDVec::sLObject*>(L))
-      return dReportError("L[%d].p2 not in T",lpos);
+    //if (i < 0 && !dynamic_cast<ShiftDVec::sLObject*>(L))
+    if (i < 0) return dReportError("L[%d].p2 not in T",lpos);
   }
   return TRUE;
 }
@@ -8250,7 +8250,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
 
 skStrategy::skStrategy()
 {
-  memset(this, 0, this->size_of());
+  memset(this, 0, sizeof(skStrategy));
 
 #ifndef NDEBUG
   strat_nr++;

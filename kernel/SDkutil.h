@@ -118,13 +118,7 @@ namespace ShiftDVec
 
 class ShiftDVec::sTObject : public virtual ::sTObject
 {
-  private:
-    virtual const size_t size_of()
-    { return sizeof(SD::sTObject); }
-
   public:
-    void virtualizer(){}
-
     uint * dvec; //Distance Vector of lm(p)
     uint dvSize; //size of the >>uint * dvec<< array
 
@@ -211,7 +205,7 @@ class ShiftDVec::sTObject : public virtual ::sTObject
 class ShiftDVec::sLObject :
   public ShiftDVec::sTObject, public ::sLObject
 {
-  private:
+  public:
     /* BOCO: Important
      * The lcmDvec and lcmDvSize need to be set to NULL
      * respectivly 0, every time, the lcm changes and at the
@@ -223,10 +217,6 @@ class ShiftDVec::sLObject :
     uint*   lcmDVec;   /*- the corresponding dvec -*/
     uint  lcmDvSize;
 
-    virtual const size_t size_of()
-    { return sizeof(SD::sLObject); }
-
-  public:
     // constructors
     sLObject(ring r = currRing) : 
       SD::sTObject(r) {/*BOCO: others?*/}
@@ -273,7 +263,7 @@ class ShiftDVec::sLObject :
 
 class ShiftDVec::skStrategy : public ::skStrategy
 {
-  private:
+  public:
     /* BOCO DESCRIPTION:
      * This is needed for the calculation of a left GB in a
      * factor algebra K<X>/I; so this will be used in the
@@ -294,10 +284,6 @@ class ShiftDVec::skStrategy : public ::skStrategy
     int lV;
     int uptodeg;
 
-    virtual const size_t size_of()
-    { return sizeof(SD::skStrategy); }
-
-  public:
     /* We had to overwrite some of the sets/objects from
      * ::skStrategy, since they were generalized for ShiftDVec
      * case.

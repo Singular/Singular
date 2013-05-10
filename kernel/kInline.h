@@ -112,7 +112,7 @@ KINLINE void sTObject::Set(ring r)
 }
 KINLINE void sTObject::Init(ring r)
 {
-  memset(this, 0, this->size_of());
+  memset(this, 0, sizeof(sTObject));
   i_r = -1;
   Set(r);
 }
@@ -917,7 +917,7 @@ KINLINE long sLObject::Comp()
 
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
 {
-  memset( this, 0, this->size_of() );
+  memset( this, 0, sizeof(sTObject) );
   memcpy(this, &t, sizeof(sTObject));
   return *this;
 }
@@ -944,7 +944,8 @@ KINLINE TObject* sLObject::T_2(const skStrategy* strat)
   //In our case T->p might be a shift of p2; 
   //TODO: we should test, if T->p is such a shift
   //bool SDCase = dynamic_cast<ShiftDVec::sTObject*>(T);
-  assume( T->p == p2 || dynamic_cast<ShiftDVec::sTObject*>(T) );
+  //assume(T->p == p2 || dynamic_cast<ShiftDVec::sTObject*>(T));
+  assume( T->p == p2 );
 
   return T;
 }

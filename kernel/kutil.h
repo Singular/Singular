@@ -66,12 +66,7 @@ extern denominator_list DENOMINATOR_LIST;
 
 class sTObject
 {
-private:
-  virtual const size_t size_of() { return sizeof(sTObject); }
 public:
-  //BOCO: make this class polymorphic (kinda syntax rubbish)
-  virtual void virtualizer(){}
-
   unsigned long sevSig;
   poly sig;   // the signature of the element
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
@@ -197,11 +192,8 @@ extern int strat_fac_debug;
  *
  * see: SDkutil.h
  */
-class sLObject : public virtual sTObject
+class sLObject : public sTObject
 {
-private:
-  virtual const size_t size_of() { return sizeof(sLObject); }
-
 public:
   unsigned long sev;
   unsigned long from; // from which polynomial it comes from
@@ -300,9 +292,6 @@ class skStrategy;
 typedef skStrategy * kStrategy;
 class skStrategy
 {
-private:
-  virtual const size_t size_of() { return sizeof(skStrategy); }
-
 public:
   kStrategy next;
   int (*red)(LObject * L,kStrategy strat);
