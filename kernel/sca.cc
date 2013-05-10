@@ -1051,10 +1051,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   }
 #endif
 
-#ifdef KDEBUG
-  om_Opts.MinTrack = 5;
-#endif
-
   int srmax, lrmax;
   int olddeg, reduc;
   int red_result = 1;
@@ -1680,12 +1676,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
 //  strat->homog = strat->homog && strat->z2homog; // ?
 
-
-
-#ifdef KDEBUG
-  om_Opts.MinTrack = 5;
-#endif
-
   int   srmax, lrmax, red_result = 1;
   int   olddeg, reduc;
 
@@ -2171,11 +2161,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   sca_mora_count++;
   sca_mora_loop_count = 0;
 #endif
-
-#ifdef KDEBUG
-  om_Opts.MinTrack = 5;
-#endif
-
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/

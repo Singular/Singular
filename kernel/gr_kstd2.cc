@@ -11,7 +11,7 @@
 
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>

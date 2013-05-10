@@ -609,7 +609,7 @@ int feReadLine(char* b, int l)
   if (s!=NULL)
   {
     // handle prot:
-    if (feProt&PROT_I)
+    if (feProt&SI_PROT_I)
     {
       fputs(s,feProtFile);
     }
@@ -945,7 +945,7 @@ void WerrorS(const char *s)
       {
         WerrorS_callback(s);
       }
-      if (feProt&PROT_O)
+      if (feProt&SI_PROT_O)
       {
         fwrite("   ? ",1,5,feProtFile);
         fwrite((char *)s,1,strlen((char *)s),feProtFile);
@@ -981,7 +981,7 @@ void WarnS(const char *s)
     fwrite(s,1,strlen(s),stdout);
     fwrite("\n",1,1,stdout);
     fflush(stdout);
-    if (feProt&PROT_O)
+    if (feProt&SI_PROT_O)
     {
       fwrite(warn_str,1,6,feProtFile);
       fwrite(s,1,strlen(s),feProtFile);
@@ -1056,7 +1056,7 @@ void PrintS(const char *s)
     {
       fwrite(s,1,strlen(s),stdout);
       fflush(stdout);
-      if (feProt&PROT_O)
+      if (feProt&SI_PROT_O)
       {
         fwrite(s,1,strlen(s),feProtFile);
       }

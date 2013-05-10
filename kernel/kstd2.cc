@@ -973,7 +973,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   bba_count++;
   int loop_count = 0;
 #endif /* KDEBUG */
-  om_Opts.MinTrack = 5;
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
@@ -1452,7 +1451,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   bba_count++;
   int loop_count = 0;
 #endif
-  om_Opts.MinTrack = 5;
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
