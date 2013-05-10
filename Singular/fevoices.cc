@@ -575,7 +575,7 @@ int feReadLine(char* b, int l)
   if (s!=NULL)
   {
     // handle prot:
-    if (feProt&PROT_I)
+    if (feProt&SI_PROT_I)
     {
       fputs(s,feProtFile);
     }

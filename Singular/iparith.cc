@@ -2704,8 +2704,8 @@ static BOOLEAN jjMONITOR2(leftv, leftv u,leftv v)
   int mode=0;
   while(*opt!='\0')
   {
-    if (*opt=='i') mode |= PROT_I;
-    else if (*opt=='o') mode |= PROT_O;
+    if (*opt=='i') mode |= SI_PROT_I;
+    else if (*opt=='o') mode |= SI_PROT_O;
     opt++;
   }
   monitor((char *)(u->Data()),mode);
@@ -2727,8 +2727,8 @@ static BOOLEAN jjMONITOR2(leftv, leftv u,leftv v)
     else         opt=(const char *)v->Data();
     while(*opt!='\0')
     {
-      if (*opt=='i') mode |= PROT_I;
-      else if (*opt=='o') mode |= PROT_O;
+      if (*opt=='i') mode |= SI_PROT_I;
+      else if (*opt=='o') mode |= SI_PROT_O;
       opt++;
     }
     monitor((FILE *)l->data,mode);

@@ -30,10 +30,9 @@ extern int  traceit ;
 #define TRACE_BREAKPOINT  32
 #define TRACE_TMP_BREAKPOINT  64
 
-#define PROT_NONE 0
-#define PROT_I    1
-#define PROT_O    2
-#define PROT_IO   3
+#define SI_PROT_I    1
+#define SI_PROT_O    2
+#define SI_PROT_IO   3
 
 /* the C-part: */
 #define mflush() fflush(stdout)

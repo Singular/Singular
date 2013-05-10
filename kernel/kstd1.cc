@@ -1226,9 +1226,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   mora_count++;
   mora_loop_count = 0;
 #endif
-#ifdef KDEBUG
-  om_Opts.MinTrack = 5;
-#endif
   int olddeg = 0;
   int reduc = 0;
   int red_result = 1;

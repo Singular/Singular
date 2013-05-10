@@ -219,7 +219,7 @@ void WarnS(const char *s)
     fwrite(s,1,strlen(s),stdout);
     fwrite("\n",1,1,stdout);
     fflush(stdout);
-    if (feProt&PROT_O)
+    if (feProt&SI_PROT_O)
     {
       fwrite(warn_str,1,6,feProtFile);
       fwrite(s,1,strlen(s),feProtFile);
@@ -301,7 +301,7 @@ void PrintS(const char *s)
     {
       fwrite(s,1,strlen(s),stdout);
       fflush(stdout);
-      if (feProt&PROT_O)
+      if (feProt&SI_PROT_O)
       {
         fwrite(s,1,strlen(s),feProtFile);
       }
