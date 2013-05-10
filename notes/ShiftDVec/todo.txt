@@ -6,6 +6,10 @@ TODO List - Letterplace DVec Implementation
 other  -  no/minor priority
 [?]    -   unknown priority
 
+· [?] Von Viktor zum nachdenken:
+  Gewichtete Ordnung; Shift von Lm ist nicht Shift vom Polynom.
+  -> Was meint er damit??? -> muss mal Grischa fragen
+
 · [PP] Update this list.
 
 · [PP] GB over Left-/Right-Ideals

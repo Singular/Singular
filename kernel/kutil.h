@@ -66,6 +66,8 @@ extern denominator_list DENOMINATOR_LIST;
 
 class sTObject
 {
+private:
+  virtual const size_t size_of() { return sizeof(sTObject); }
 public:
   //BOCO: make this class polymorphic (kinda syntax rubbish)
   virtual void virtualizer(){}
@@ -197,6 +199,8 @@ extern int strat_fac_debug;
  */
 class sLObject : public virtual sTObject
 {
+private:
+  virtual const size_t size_of() { return sizeof(sLObject); }
 
 public:
   unsigned long sev;
@@ -296,6 +300,9 @@ class skStrategy;
 typedef skStrategy * kStrategy;
 class skStrategy
 {
+private:
+  virtual const size_t size_of() { return sizeof(skStrategy); }
+
 public:
   kStrategy next;
   int (*red)(LObject * L,kStrategy strat);

@@ -8250,7 +8250,8 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN complete, int sgn)
 
 skStrategy::skStrategy()
 {
-  memset(this, 0, sizeof(skStrategy));
+  memset(this, 0, this->size_of());
+
 #ifndef NDEBUG
   strat_nr++;
   nr=strat_nr;

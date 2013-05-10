@@ -112,7 +112,7 @@ KINLINE void sTObject::Set(ring r)
 }
 KINLINE void sTObject::Init(ring r)
 {
-  memset(this, 0, sizeof(sTObject));
+  memset(this, 0, this->size_of());
   i_r = -1;
   Set(r);
 }
@@ -515,7 +515,7 @@ KINLINE void sLObject::Delete()
 
 KINLINE void sLObject::Init(ring r)
 {
-  memset(this, 0, sizeof(sLObject));
+  memset( this, 0, sizeof(sLObject) ); //BOCO: TODO
   i_r1 = -1;
   i_r2 = -1;
   i_r = -1;
@@ -917,7 +917,7 @@ KINLINE long sLObject::Comp()
 
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
 {
-  memset(this, 0, sizeof(*this));
+  memset( this, 0, this->size_of() );
   memcpy(this, &t, sizeof(sTObject));
   return *this;
 }

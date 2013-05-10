@@ -118,6 +118,10 @@ namespace ShiftDVec
 
 class ShiftDVec::sTObject : public virtual ::sTObject
 {
+  private:
+    virtual const size_t size_of()
+    { return sizeof(SD::sTObject); }
+
   public:
     void virtualizer(){}
 
@@ -219,6 +223,9 @@ class ShiftDVec::sLObject :
     uint*   lcmDVec;   /*- the corresponding dvec -*/
     uint  lcmDvSize;
 
+    virtual const size_t size_of()
+    { return sizeof(SD::sLObject); }
+
   public:
     // constructors
     sLObject(ring r = currRing) : 
@@ -286,6 +293,9 @@ class ShiftDVec::skStrategy : public ::skStrategy
     uint size_of_I; // This is, what it says!
     int lV;
     int uptodeg;
+
+    virtual const size_t size_of()
+    { return sizeof(SD::skStrategy); }
 
   public:
     /* We had to overwrite some of the sets/objects from
