@@ -183,6 +183,7 @@ fi
 AC_CONFIG_SUBDIRS([libpolys])
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([xalloc/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([numeric/Makefile])
 AC_CONFIG_FILES([Singular/Makefile])

@@ -3,25 +3,26 @@ ACLOCAL_AMFLAGS = -I ../m4
 PACKAGES=include/factory libfac
 SUBDIRS=$(PACKAGES)
 
-CXXTEMPLFLAGS=-ftrapv 
+# CXXTEMPLFLAGS=-ftrapv 
 ## -fno-implicit-templates
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS}
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS} -DHAVE_CONFIG_H
 
-if WANT_DEBUG
-  LIB_G=libfactory_g.la
-else
-  LIB_G=
-endif
+# if WANT_DEBUG
+#   LIB_G=libfactory_g.la
+# else
+#   LIB_G=
+# endif
 
-lib_LTLIBRARIES = libfactory.la ${LIB_G}
+lib_LTLIBRARIES = libfactory.la
+#  ${LIB_G}
 
-libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
+# libfactory_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${CXXTEMPLFLAGS}
 libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
-libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
-libfactory_g_la_LIBADD   = ${builddir}/libfac/libfac_g.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
-libfactory_g_la_LDFLAGS  = -release ${PACKAGE_VERSION}
+# libfactory_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
+#libfactory_g_la_LIBADD   = ${builddir}/libfac/libfac_g.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+#libfactory_g_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
 
 
@@ -107,13 +108,13 @@ if WITH_PARSER_FOR_CANONICAL_FORM
 endif
 
 libfactory_la_SOURCES = $(SOURCES)
-libfactory_g_la_SOURCES = $(SOURCES)
+# libfactory_g_la_SOURCES = $(SOURCES)
 
-libfactory_la_CPPFLAGS  = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DOM_NDEBUG -DNDEBUG
-libfactory_g_la_CPPFLAGS= ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
+# libfactory_la_CPPFLAGS  = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DOM_NDEBUG -DNDEBUG
+# libfactory_la_CPPFLAGS= ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 nodist_libfactory_la_SOURCES = cplusplus.h factory.h factoryconf.h
-nodist_libfactory_g_la_SOURCES = cplusplus.h factory.h factoryconf.h
+# nodist_libfactory_g_la_SOURCES = cplusplus.h factory.h factoryconf.h
 
 # factory header files
 factory_headers = \
@@ -299,11 +300,11 @@ all-local:
 ####################################################
 ## Test program
 ##
-if WANT_DEBUG
-TESTS = test-s-g test-s-r test-d-g test-d-r
-else
+#if WANT_DEBUG
+# TESTS = test-s-g test-s-r test-d-g test-d-r
+#else
 TESTS = test-s-r test-d-r
-endif
+#endif
 check_PROGRAMS = $(TESTS)
 
 AMLDFLAGS =  -L${builddir}
@@ -315,28 +316,28 @@ TESTADDLIBDIRS = ${OMALLOC_LDFLAGS}
 TESTADDLIB = $(TESTADDLIBDIRS) $(OMALLOC_R_LDADD)
 TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
 
-test_s_g_SOURCES = $(TESTSSOURCES)
-test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
-#ftmpl_inst.o
-test_s_g_LDADD = -lfactory_g $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
+# test_s_g_SOURCES = $(TESTSSOURCES)
+# test_s_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
+# #ftmpl_inst.o
+# test_s_g_LDADD = -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
 
 test_s_r_SOURCES = $(TESTSSOURCES)
-test_s_r_CFLAGS = -O3 -fomit-frame-pointer 
+#test_s_r_CFLAGS = -O3 -fomit-frame-pointer 
 #ftmpl_inst.o
 test_s_r_LDADD = -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
 
 test_s_r_LDFLAGS = -static ${AMLDFLAGS}
-test_s_g_LDFLAGS = -static ${AMLDFLAGS}
+# test_s_g_LDFLAGS = -static ${AMLDFLAGS}
 
-test_d_g_SOURCES = $(TESTSSOURCES)
-test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
-#ftmpl_inst.o
-test_d_g_LDADD = -lfactory_g $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
+# test_d_g_SOURCES = $(TESTSSOURCES)
+# test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
+# #ftmpl_inst.o
+# test_d_g_LDADD = -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIBDEBUG)
 
 test_d_r_SOURCES = $(TESTSSOURCES)
-test_d_r_CFLAGS = -O3 -fomit-frame-pointer 
+# test_d_r_CFLAGS = -O3 -fomit-frame-pointer 
 #ftmpl_inst.o
 test_d_r_LDADD = -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
 
 test_d_r_LDFLAGS = ${AMLDFLAGS}
-test_d_g_LDFLAGS = ${AMLDFLAGS}
+# test_d_g_LDFLAGS = ${AMLDFLAGS}

@@ -1,24 +1,29 @@
-if WANT_DEBUG
-  LIB_G=libfac_g.la
-else
-  LIB_G=
-endif
+ACLOCAL_AMFLAGS = -I ../../m4
 
-noinst_LTLIBRARIES=libfac.la ${LIB_G}
+# If Want_Debug
+#   Lib_G=Libfac_G.La
+# Else
+#   Lib_G=
+# Endif
 
-CXXTEMPLFLAGS =-ftrapv  ## -fno-implicit-templates
+noinst_LTLIBRARIES=libfac.la 
+# ${LIB_G}
 
-libfac_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
-libfac_g_la_CFLAGS = ${PIPE}
+#CXXTEMPLFLAGS =-ftrapv  ## -fno-implicit-templates
 
-libfac_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-libfac_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+#libfac_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
+#libfac_g_la_CFLAGS = ${PIPE}
+
+#libfac_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
+#libfac_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${builddir} -I${srcdir}/.. -I${builddir}/.. -I${srcdir}/../include  -I${builddir}/../include -I${srcdir}/factor  -I${builddir}/factor -I${srcdir}/charset -I${builddir}/charset ${GMP_CFLAGS} ${NTL_CFLAGS}
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${builddir} -I${srcdir}/.. -I${builddir}/.. -I${srcdir}/../include  -I${builddir}/../include -I${srcdir}/factor  -I${builddir}/factor -I${srcdir}/charset -I${builddir}/charset ${GMP_CFLAGS} ${NTL_CFLAGS}  -DHAVE_CONFIG_H
 
-libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-libfac_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
+# libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+# libfac_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
+
+libfac_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
 		factor/MVMultiHensel.cc factor/Truefactor.cc \
@@ -44,7 +49,7 @@ noinst_HEADERS = factor/SqrFree.h factor/Factor.h \
     charset/csutil.h charset/charset.h charset/reorder.h charset/alg_factor.h charset/algfactor.h 
 
 libfac_la_SOURCES   = $(SOURCES)
-libfac_g_la_SOURCES = $(SOURCES)
+# libfac_g_la_SOURCES = $(SOURCES)
 
 
 libfac_includedir=$(includedir)/factory/libfac

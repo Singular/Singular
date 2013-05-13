@@ -1,11 +1,13 @@
+ACLOCAL_AMFLAGS = -I ../../m4
+
 moduledir = $(libexecdir)/singular/MOD
 
 if ENABLE_P_PROCS_DYNAMIC
 module_LTLIBRARIES=syzextra.la 
 
-if WANT_DEBUG
-module_LTLIBRARIES+=syzextra_g.la
-endif
+# if WANT_DEBUG
+# module_LTLIBRARIES+=syzextra_g.la
+# endif
   
 endif
 
@@ -15,15 +17,15 @@ else
   USE_FACTORY =
 endif
 
-CXXTEMPLFLAGS	= ${PIPE} 
-## -fno-implicit-templates
-
-DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
-
-NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer ${PIPE} 
-NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer ${CXXTEMPLFLAGS} -fno-rtti -fno-exceptions
-
-NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
+# CXXTEMPLFLAGS	= ${PIPE} 
+# ## -fno-implicit-templates
+# 
+# DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
+# 
+# NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer ${PIPE} 
+# NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer ${CXXTEMPLFLAGS} -fno-rtti -fno-exceptions
+# 
+# NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
 
 # -DHAVE_CONFIG_H??
 
@@ -33,34 +35,32 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
 
 
-AMLDFLAGS	= 
+AMLDFLAGS	= -release ${PACKAGE_VERSION}
 # -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel \
 # -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 
 SOURCES = mod_main.cc DebugPrint.cc DebugPrint.h myNF.cc myNF.h singularxx_defs.h
 syzextra_la_SOURCES   = $(SOURCES)
-syzextra_g_la_SOURCES = $(SOURCES)
+# syzextra_g_la_SOURCES = $(SOURCES)
 
 
-P_PROCS_CPPFLAGS_COMMON = ${PIPE} -DDYNAMIC_VERSION 
+P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
 
-syzextra_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
-syzextra_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
+syzextra_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
+# ${NODEBUGDEFS}
+# syzextra_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 
-syzextra_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
-syzextra_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+#syzextra_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
+#syzextra_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
 P_PROCS_MODULE_LDFLAGS = -shared -module ${AMLDFLAGS}
-P_PROCS_MODULE_LDFLAGSG = -shared -module ${AMLDFLAGS}
+# P_PROCS_MODULE_LDFLAGSG = -shared -module ${AMLDFLAGS}
 
 # Add under Mac OS X: -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 
 syzextra_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
-syzextra_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
-
-
-
+# syzextra_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
 
 AM_COLOR_TESTS=always
 
@@ -70,8 +70,8 @@ TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
 
 TESTS=test_release.sh
 
-if WANT_DEBUG
-TESTS+=test_debug.sh
-endif
+# if WANT_DEBUG
+# TESTS+=test_debug.sh
+# endif
 
 EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)
