@@ -147,7 +147,8 @@ static BOOLEAN warn_proc = FALSE;
 #ifdef NDEBUG
 #define DL_TAIL ".so"
 #else
-#define DL_TAIL "_g.so"
+#define DL_TAIL ".so"
+//#define DL_TAIL "_g.so"
 #endif
 #endif
 

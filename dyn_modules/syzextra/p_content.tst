@@ -11,7 +11,7 @@ if( system("with", "ndebug") )
 else
 {
   "Loading the Debug version!";
-  LIB("./syzextra_g.sog");
+  LIB("./syzextra.so");
 }
 
 noop();
