@@ -799,9 +799,10 @@ static proc cparam(ideal I,poly f,int n,int m,int N)
     I1=psi(I1);
     I1=I1/x(n);
   }
-  list Y=X,mi;
+  list Y=X,mi,var(1);
   setring r;
   list Y=imap(s,Y);
+  Y=delete(Y,3);
   return(Y);
 }
 //////////////////////////////////////////////////////////////
