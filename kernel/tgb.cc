@@ -1772,7 +1772,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
   //  Print("i:%d,spc_final:%d",i,spc_final);
 
   assume (spc_final <= spc);
-  omFree (nodes);
+  omfree (nodes);
   nodes = NULL;
 
   add_to_reductors (c, h, c->lengths[c->n - 1], ecart, TRUE);
@@ -1844,7 +1844,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
       spn_merge (c->apairs, c->pair_top + 1, nodes_final, spc_final, c);
     c->pair_top += spc_final;
     clean_top_of_pair_list (c);
-    omFree (nodes_final);
+    omfree (nodes_final);
     return NULL;
   }
   {
@@ -2227,7 +2227,7 @@ static void mass_add (poly * p, int pn, slimgb_alg * c)
   c->apairs = spn_merge (c->apairs, c->pair_top + 1, big_sbuf, sum, c);
   c->pair_top += sum;
   clean_top_of_pair_list (c);
-  omFree (big_sbuf);
+  omfree (big_sbuf);
   omfree (sbuf);
   omfree (ibuf);
   //omfree(buf);
