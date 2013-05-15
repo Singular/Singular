@@ -1204,6 +1204,7 @@ EXAMPLE: example timeStd; shows an example
           def result = imap(PP, result);
           kill PP;
         }
+        attrib(result,"isSB",1);
       }
       close(l_fork);
       return (result);
