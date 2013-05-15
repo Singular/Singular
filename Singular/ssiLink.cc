@@ -469,7 +469,7 @@ number ssiReadNumber(ssiInfo *d)
     // read int
     int dd;
     dd=s_readint(d->f_read);
-    return (number)dd;
+    return (number)(long)dd;
   }
   else Werror("coeffs not implemented");
   return NULL;
@@ -1170,7 +1170,7 @@ leftv ssiRead1(si_link l)
   switch(t)
   {
     case 1:res->rtyp=INT_CMD;
-           res->data=(char *)ssiReadInt(d->f_read);
+           res->data=(char *)(long)ssiReadInt(d->f_read);
            break;
     case 2:res->rtyp=STRING_CMD;
            res->data=(char *)ssiReadString(d);
