@@ -129,10 +129,38 @@ namespace ShiftDVec
  * make CXXFLAGS='-fdump-class-hierarchy'
  * .
  *
- * Updated Idea, avoiding multiple Inheritance:
- *
+ * case normal bba:
+ * 
  * sTObject
- * should not try in Singular:
+ *     ^
+ *     |
+ *     |
+ * sLObject
+ *
+ *
+ * case ShiftDVec::bba updated idea:
+ * (this avoids using multiple inheritance)
+ * 
+ *      sTObject
+ *          ^
+ *          |
+ *          |
+ * ShiftDVec::sTObject
+ *          ^
+ *          |
+ *          |
+ * ShiftDVec::sIObject (intermediate extensions)
+ *          ^
+ *          |
+ *          |
+ * ShiftDVec::sLObject ( which contents consist of an
+ *                       exact copy of sLObject's contents. ) 
+ * TODO: copy the member functions to the ShiftDVec namespace.
+ * Create SDkInline.h for this.
+ *
+ *
+ * case ShiftDVec::bba original Idea:
+ * (this is the original idea applying multiple inheritance)
  * 
  * Original Idea:
  *             sTObject
