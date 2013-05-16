@@ -102,7 +102,39 @@ namespace ShiftDVec
 
 
 /* Inheritance for the ShiftDVec case explained
+ *
+ * REMARK:
+ * sTObject and sLObject shall not have virtual functions,
+ * since it will make them "virtual", d.i. create a virtual
+ * table for them. Since in Singular these Objects are often
+ * created by the Singular internal memory management (for
+ * Performance reasons), their virtual table will not be
+ * correctly initialized, making them at best unusable and
+ * at worst producing inexplicable segfaults at runtime.
+ * Multiple inheritance is for the same reason a "no go!",
+ * at least, if one has to avoid the diamond problem, since
+ * subclasses inheriting "virtual" will have a virtual table
+ * (at least this seems to be right for gcc), which possibly
+ * stores the common Base class as a pointer. This is why
+ * for inheritance, we had to update our Original Idea, which
+ * relied on multiple virtual inheritance, to a simpler model,
+ * which duplicates the contents of the sLObject class
+ * declaration to the declaration of ShiftDVec::sLObject.
+ * To modify ShiftDVec::sLObject we introduced
+ * ShiftDVec::sIObject, which inherits from
+ * ShiftDVec::sTObject, which in turn inherits from sTObject,
+ * see class diagrams below. To see, how the Objects are
+ * actually internally represented (their memory layout) use
+ * the "-fdump-class-hierarchy" compiler flag, e.g.:
+ * make CXXFLAGS='-fdump-class-hierarchy'
+ * .
+ *
+ * Updated Idea, avoiding multiple Inheritance:
+ *
+ * sTObject
+ * should not try in Singular:
  * 
+ * Original Idea:
  *             sTObject
  *            /        \
  *           / (virtual)\
