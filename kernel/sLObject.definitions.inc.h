@@ -1,6 +1,7 @@
 
 
-KINLINE void sLObject::Normalize()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Normalize)()
 {
   if (t_p != NULL)
   {
@@ -13,7 +14,8 @@ KINLINE void sLObject::Normalize()
   }
 }
 
-KINLINE void sLObject::HeadNormalize()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::HeadNormalize)()
 {
   if (t_p != NULL)
   {
@@ -34,20 +36,23 @@ KINLINE void sLObject::HeadNormalize()
  *
  ***************************************************************/
 // Initialization
-KINLINE void sLObject::Clear()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Clear)()
 {
   sTObject::Clear();
   sev = 0;
 }
 // Initialization
-KINLINE void sLObject::Delete()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Delete)()
 {
   sTObject::Delete();
   if (bucket != NULL)
     kBucketDeleteAndDestroy(&bucket);
 }
 
-KINLINE void sLObject::Init(ring r)
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Init)(ring r)
 {
   memset(this, 0, sizeof(sLObject));
   i_r1 = -1;
@@ -55,23 +60,30 @@ KINLINE void sLObject::Init(ring r)
   i_r = -1;
   Set(r);
 }
-KINLINE sLObject::sLObject(ring r)
+
+KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
+(ring r)
 {
   Init(r);
 }
-KINLINE sLObject::sLObject(poly p_in, ring r)
+
+KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
+(poly p_in, ring r)
 {
   Init(r);
   Set(p_in, r);
 }
 
-KINLINE sLObject::sLObject(poly p_in, ring c_r, ring t_r)
+KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
+(poly p_in, ring c_r, ring t_r)
 {
   Init(t_r);
   Set(p_in, c_r, t_r);
 }
 
-KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::PrepareRed)
+(BOOLEAN use_bucket)
 {
   if (bucket == NULL)
   {
@@ -89,7 +101,10 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
   }
 }
 
-KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring _tailRing)
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetLmTail)
+(poly lm, poly p_tail, int p_Length, int use_bucket, 
+  ring _tailRing)
 {
 
   Set(lm, _tailRing);
@@ -107,7 +122,9 @@ KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_buc
   }
 }
 
-KINLINE void sLObject::Tail_Mult_nn(number n)
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Mult_nn)
+(number n)
 {
   if (bucket != NULL)
   {
@@ -121,8 +138,9 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   }
 }
 
-KINLINE void sLObject::Tail_Minus_mm_Mult_qq
-  (poly m, poly q, int lq, poly spNoether)
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Minus_mm_Mult_qq)
+(poly m, poly q, int lq, poly spNoether) 
 {
   if (bucket != NULL)
   {
@@ -148,8 +166,10 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq
 #ifdef HAVE_SHIFTBBADVEC
 //adapted version of sLObject::Tail_Minus_mm_Mult_qq; merged
 //with p_Minus_mm_Mult_qq from polys/pInline2.h
-KINLINE void sLObject::Tail_Minus_mml_Mult_qq_Mult_mmr
-  ( poly mml, poly q, poly mmr, int lq, poly spNoether )
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME
+(sLObject::Tail_Minus_mml_Mult_qq_Mult_mmr)
+( poly mml, poly q, poly mmr, int lq, poly spNoether )
 {
   assume(bucket == NULL);
 
@@ -171,7 +191,8 @@ KINLINE void sLObject::Tail_Minus_mml_Mult_qq_Mult_mmr
 
 #if 0
 #ifdef HAVE_SHIFTBBADVEC
-KINLINE void sLObject::Tail_Minus_mm_Mult_qq
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Minus_mm_Mult_qq)
   ( poly m, poly q, int lq, poly spNoether, int lV )
 {
   if (bucket != NULL)
@@ -201,7 +222,8 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq
 #endif
 #endif
 
-KINLINE void sLObject::LmDeleteAndIter()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::LmDeleteAndIter)()
 {
   sTObject::LmDeleteAndIter();
   if (bucket != NULL)
@@ -221,7 +243,8 @@ KINLINE void sLObject::LmDeleteAndIter()
   }
 }
 
-KINLINE poly sLObject::LmExtractAndIter()
+KINLINE poly 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::LmExtractAndIter)()
 {
   poly ret = GetLmTailRing();
   poly pn;
@@ -246,7 +269,8 @@ KINLINE poly sLObject::LmExtractAndIter()
   Set(pn, tailRing);
   return ret;
 }
-KINLINE poly sLObject::CanonicalizeP()
+KINLINE poly 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::CanonicalizeP)()
 {
   //kTest_L(this);
   int i = -1;
@@ -261,7 +285,8 @@ KINLINE poly sLObject::CanonicalizeP()
   return p;
 }
 
-KINLINE poly sLObject::GetTP()
+KINLINE poly 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetTP)()
 {
   //kTest_L(this);
   poly tp = GetLmTailRing();
@@ -276,7 +301,8 @@ KINLINE poly sLObject::GetTP()
   return tp;
 }
 
-KINLINE poly sLObject::GetP(omBin lmBin)
+KINLINE poly 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetP)(omBin lmBin)
 {
   //kTest_L(this);
   if (p == NULL)
@@ -303,8 +329,9 @@ KINLINE poly sLObject::GetP(omBin lmBin)
 }
 
 KINLINE void
-sLObject::ShallowCopyDelete(ring new_tailRing,
-                            pShallowCopyDeleteProc p_shallow_copy_delete)
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::ShallowCopyDelete)
+(ring new_tailRing,
+  pShallowCopyDeleteProc p_shallow_copy_delete)
 {
   if (bucket != NULL)
     kBucketShallowCopyDelete(bucket, new_tailRing, new_tailRing->PolyBin,
@@ -314,7 +341,8 @@ sLObject::ShallowCopyDelete(ring new_tailRing,
                               FALSE);
 }
 
-KINLINE void sLObject::SetShortExpVector()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetShortExpVector)()
 {
   if (t_p != NULL)
   {
@@ -326,7 +354,8 @@ KINLINE void sLObject::SetShortExpVector()
   }
 }
 
-KINLINE void sLObject::Copy()
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::Copy())
 {
   if (bucket != NULL)
   {
@@ -342,7 +371,8 @@ KINLINE void sLObject::Copy()
   TObject::Copy();
 }
 
-KINLINE poly sLObject::CopyGetP()
+KINLINE poly 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::CopyGetP)()
 {
   if (bucket != NULL)
   {
@@ -360,7 +390,8 @@ KINLINE poly sLObject::CopyGetP()
   return sLObject::GetP();
 }
 
-KINLINE long sLObject::pLDeg()
+KINLINE long 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::pLDeg)()
 {
   poly tp = GetLmTailRing();
   assume(tp != NULL);
@@ -375,7 +406,8 @@ KINLINE long sLObject::pLDeg()
   else
     return tailRing->pLDeg(tp, &length, tailRing);
 }
-KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
+KINLINE long 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::pLDeg)(BOOLEAN deg_last)
 {
   if (! deg_last || bucket != NULL) return sLObject::pLDeg();
 
@@ -391,28 +423,37 @@ KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
   return ldeg;
 }
 
-KINLINE long sLObject::SetDegStuffReturnLDeg()
+KINLINE long 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetDegStuffReturnLDeg())
 {
   FDeg = this->pFDeg();
   long d = this->pLDeg();
   ecart = d - FDeg;
   return d;
 }
-KINLINE long sLObject::SetDegStuffReturnLDeg(BOOLEAN use_last)
+
+KINLINE long 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetDegStuffReturnLDeg)
+(BOOLEAN use_last)
 {
   FDeg = this->pFDeg();
   long d = this->pLDeg(use_last);
   ecart = d - FDeg;
   return d;
 }
-KINLINE int sLObject::GetpLength()
+
+KINLINE int 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetpLength)()
 {
   if (bucket == NULL)
     return sTObject::GetpLength();
   int i = kBucketCanonicalize(bucket);
   return bucket->buckets_length[i] + 1;
 }
-KINLINE int sLObject::SetLength(BOOLEAN length_pLength)
+
+KINLINE int 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetLength)
+(BOOLEAN length_pLength)
 {
   if (length_pLength)
   {
@@ -423,7 +464,8 @@ KINLINE int sLObject::SetLength(BOOLEAN length_pLength)
   return length;
 }
 
-KINLINE long sLObject::MinComp()
+KINLINE long CREATE_CONCRETE_FUNCTION_NAME(sLObject::MinComp)
+()
 {
   poly tp = GetLmTailRing();
   assume(tp != NULL);
@@ -438,7 +480,7 @@ KINLINE long sLObject::MinComp()
   else
     return p_MinComp(tp, tailRing);
 }
-KINLINE long sLObject::Comp()
+KINLINE long CREATE_CONCRETE_FUNCTION_NAME(sLObject::Comp)()
 {
   poly pp;
   ring r;
@@ -447,14 +489,18 @@ KINLINE long sLObject::Comp()
   return p_GetComp(pp, r);
 }
 
-KINLINE sLObject& sLObject::operator=(const sTObject& t)
+KINLINE sLObject& 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::operator=)
+(const sTObject& t)
 {
   memset(this, 0, sizeof(*this));
   memcpy(this, &t, sizeof(sTObject));
   return *this;
 }
 
-KINLINE TObject* sLObject::T_1(const skStrategy* s)
+KINLINE TObject* 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_1)
+(const skStrategy* s)
 {
   if (p1 == NULL) return NULL;
   if (i_r1 == -1) i_r1 = kFindInT(p1, s->T, s->tl);
@@ -464,7 +510,9 @@ KINLINE TObject* sLObject::T_1(const skStrategy* s)
   return T;
 }
 
-KINLINE TObject* sLObject::T_2(const skStrategy* strat)
+KINLINE TObject* 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_2)
+(const skStrategy* strat)
 {
   if (p1 == NULL) return NULL;
   assume(p2 != NULL);
@@ -481,8 +529,9 @@ KINLINE TObject* sLObject::T_2(const skStrategy* strat)
   return T;
 }
 
-KINLINE void    sLObject::T_1_2(const skStrategy* strat,
-                                TObject* &T_1, TObject* &T_2)
+KINLINE void 
+CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_1_2)
+(const skStrategy* strat,TObject* &T_1, TObject* &T_2)
 {
   if (p1 == NULL)
   {
