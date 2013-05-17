@@ -176,7 +176,7 @@ namespace ShiftDVec
  * sTObject and sLObject are those from kutil.h
  */
 
-class ShiftDVec::sTObject : public virtual ::sTObject
+class ShiftDVec::sTObject : public ::sTObject
 {
   public:
     uint * dvec; //Distance Vector of lm(p)
@@ -262,8 +262,7 @@ class ShiftDVec::sTObject : public virtual ::sTObject
         (dvec, dvSize, T->dvec, T->dvSize, numVars); }
 };
 
-class ShiftDVec::sLObject :
-  public ShiftDVec::sTObject, public ::sLObject
+class ShiftDVec::sIObject : public ShiftDVec::sTObject
 {
   public:
     /* BOCO: Important
@@ -319,6 +318,9 @@ class ShiftDVec::sLObject :
     //adapted from original sLObject
     SD::sLObject& operator=(const SD::sTObject& t);
 };
+
+class ShiftDVec::sLObject : public ShiftDVec::sIObject
+#
 
 
 class ShiftDVec::skStrategy : public ::skStrategy
