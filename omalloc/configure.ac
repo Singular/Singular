@@ -27,12 +27,7 @@ AC_SUBST(VERSION)
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
 dnl
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_DEBUG=yes
- fi], ENABLE_DEBUG=no)
-
-AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
+SING_CHECK_DEBUG
 
 AC_ARG_WITH(
   external-config_h,

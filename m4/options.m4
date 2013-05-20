@@ -68,3 +68,27 @@ AM_CONDITIONAL([ENABLE_PLURAL],[test x$ENABLE_PLURAL = xyes])
 
 AC_MSG_RESULT($ENABLE_PLURAL)
 ])
+
+
+
+AC_DEFUN([SING_CHECK_DEBUG], [
+ ENABLE_DEBUG="no"
+
+ AC_MSG_CHECKING([whether debugging checks should be embedded])
+
+ AC_ARG_ENABLE([debug], 
+  AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
+  [if test "x$enableval" = "xyes"; then 
+  ENABLE_DEBUG="yes"
+  fi])
+  
+ AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
+ 
+ if test "x${ENABLE_DEBUG}" != xyes; then
+  AC_MSG_RESULT([no]) 
+  AC_DEFINE([OM_NDEBUG],1,"Disable OM Debug")
+  AC_DEFINE([NDEBUG],1,"Disable Debug")
+ else
+  AC_MSG_RESULT([yes])
+ fi
+])

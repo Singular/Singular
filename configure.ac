@@ -137,12 +137,7 @@ if test "x$ENABLE_FACTORY" = xyes; then
  fi
 fi
 
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_DEBUG=yes
- fi], ENABLE_DEBUG=no)
-
-AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
+SING_CHECK_DEBUG
 
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
 [if test "x$enableval" = "xyes"; then

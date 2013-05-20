@@ -117,12 +117,7 @@ fi
 #  PREFIX="$ac_default_prefix"
 #fi
 
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_DEBUG=yes
- fi], ENABLE_DEBUG=no)
-
-AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
+SING_CHECK_DEBUG
 
 # AC_SUBST(PREFIX)
 # AC_DEFINE_UNQUOTED(INSTALL_PREFIX,"$PREFIX",Prefix)
