@@ -32,7 +32,7 @@ noinst_LTLIBRARIES = libintvec.la
 libmisc_la_LIBADD = libintvec.la
 # libmisc_g_la_LIBADD = libintvec_g.la
 
-libmisc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+# libmisc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 SOURCES  = int64vec.cc options.c
 libmisc_la_SOURCES   = $(SOURCES)

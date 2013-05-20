@@ -23,7 +23,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_build
 # libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 # libfac_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-libfac_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+# libfac_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
 		factor/MVMultiHensel.cc factor/Truefactor.cc \
