@@ -5,7 +5,9 @@
 * ABSTRACT: eigenvalues of constant square matrices
 */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 #ifdef HAVE_EIGENVAL

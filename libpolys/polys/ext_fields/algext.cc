@@ -28,7 +28,9 @@
   *               computing in K[a_1, ..., a_s] / I.
   **/
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>

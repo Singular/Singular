@@ -1,9 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+#include <omalloc/omalloc.h>
 
 //#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+#include <misc/auxiliary.h>
+
 #include <polys/monomials/p_polys.h>
 //#include <kernel/febase.h>
 //#include <kernel/pShallowCopyDelete.h>

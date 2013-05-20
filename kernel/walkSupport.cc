@@ -1,5 +1,7 @@
 #include <string.h>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <misc/intvec.h>
 #include <misc/int64vec.h>

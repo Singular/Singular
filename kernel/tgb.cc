@@ -16,7 +16,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <queue>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <kernel/tgb.h>
 #include <kernel/tgb_internal.h>

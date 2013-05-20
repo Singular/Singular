@@ -8,7 +8,9 @@
  *  Created: 12/00
  *******************************************************************/
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/slInit.h>

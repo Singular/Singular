@@ -7,7 +7,9 @@
 //#define HAVE_TAIL_RING
 #define NO_BUCKETS
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <kernel/kutil.h>
 #include <kernel/structs.h>

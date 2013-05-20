@@ -15,7 +15,9 @@
 /*****************************************************************************/
 
 // include header files
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include "mod2.h"
 
 #include <coeffs/coeffs.h>

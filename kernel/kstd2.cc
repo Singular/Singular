@@ -12,7 +12,9 @@
 // define to enable tailRings
 #define HAVE_TAIL_RING
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 #ifndef NDEBUG

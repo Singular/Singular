@@ -1055,7 +1055,9 @@ char *yytext;
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #ifdef STANDALONE_PARSER
 #include <Singular/utils.h>

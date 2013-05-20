@@ -6,7 +6,9 @@
 * ABSTRACT: Windows specific routines
 */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #ifdef ix86_Win
 #include <windows.h>
