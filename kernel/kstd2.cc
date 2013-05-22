@@ -1213,7 +1213,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 
 #ifdef KDEBUG
-  //kDebugPrint(strat);
+//  kDebugPrint(strat);
 #endif
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
@@ -1244,7 +1244,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-
+    
     if (pNext(strat->P.p) == strat->tail)
     {
       // deletes the short spoly
@@ -1319,7 +1319,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
 #if MYTEST
-      PrintS("New S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
+      PrintS("New S: "); pWrite(strat->P.p); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
@@ -1345,7 +1345,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #if MYTEST
-      PrintS("New (reduced) S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
+      PrintS("New (reduced) S: "); pWrite(strat->P.p); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
@@ -1740,7 +1740,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
 #if MYTEST
-      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
+      PrintS("New S: "); p_DebugPrint(strat->P.p,currRing); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
@@ -1768,7 +1768,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #if MYTEST
 //#if 1
-      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
+      PrintS("New (reduced) S: "); p_DebugPrint(strat->P.p,currRing); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
@@ -2333,7 +2333,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
 #ifdef KDEBUG
 #if MYTEST
-      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
+      PrintS("New S: "); p_DebugPrint(strat->P.p,currRing); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
@@ -2361,7 +2361,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #if MYTEST
 //#if 1
-      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
+      PrintS("New (reduced) S: "); p_DebugPrint(strat->P.p,currRing); PrintLn();
 #endif /* MYTEST */
 #endif /* KDEBUG */
 

@@ -16,9 +16,9 @@
 #include "mod2.h"
 
 #ifndef NDEBUG
-# define MYTEST 0
+# define MYTEST 1
 #else /* ifndef NDEBUG */
-# define MYTEST 0
+# define MYTEST 1
 #endif /* ifndef NDEBUG */
 
 
@@ -39,6 +39,7 @@
 
 #ifdef HAVE_RINGS
 #include <kernel/ideals.h>
+#include <libpolys/coeffs/rmodulon.h>
 #endif
 
 // define if enterL, enterT should use memmove instead of doing it manually
@@ -82,6 +83,8 @@
 #undef DEBUGF5
 #define DEBUGF5 2
 #endif
+
+#define ADIDEBUG 0
 
 denominator_list DENOMINATOR_LIST=NULL;
 
@@ -265,7 +268,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     p1 = p;
     while (pNext(p1)!=NULL)
     {
-      if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
+    if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
@@ -279,6 +282,11 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         }
         else if (fromNext)
           L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
+        #ifdef HAVE_RINGS
+  			if((currRing->OrdSgn == -1)&&(strat->homog!=isHomog))
+  				L->max = NULL;
+  		//it changed max but tailRing = currRing
+  		#endif
         //if (L->pLength != 0)
         L->pLength = l;
         // Hmmm when called from updateT, then only
@@ -330,12 +338,30 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 {
   int  i;
   poly h;
+  number lc;
 
   if(rHasGlobalOrdering (currRing)) return;
   if(TEST_OPT_CANCELUNIT) return;
 
   ring r = L->tailRing;
   poly p = L->GetLmTailRing();
+  
+#if ADIDEBUG
+PrintS("\ncancelunit start: ");pWrite(L->p);
+#endif
+
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))  
+  		lc = p_GetCoeff(p,r);  
+  	
+  #if ADIDEBUG
+  poly ppp;
+  ppp=pInit();
+  pSetExp(ppp,1,0);
+  pSetCoeff0(ppp,lc);
+  printf("\n lc = ");pWrite(ppp);	
+  #endif  
+#endif 
 
 #ifdef HAVE_RINGS_LOC
   // Leading coef have to be a unit
@@ -349,6 +375,11 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 //      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
 //    }
   h = pNext(p);
+  
+#if ADIDEBUG  
+PrintS("\nStarting h = ");pWrite(h);
+#endif
+  
   loop
   {
     if (h==NULL)
@@ -356,8 +387,14 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       p_Delete(&pNext(p), r);
       if (!inNF)
       {
-        number eins=nInit(1);
-        if (L->p != NULL)  pSetCoeff(L->p,eins);
+     	number eins;
+      	#ifdef HAVE_RINGS
+      	if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
+  	    		eins = nCopy(lc);
+		    else
+  	   	#endif
+      	eins=nInit(1);
+	      if (L->p != NULL)  pSetCoeff(L->p,eins);
         else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
         if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
       }
@@ -371,6 +408,11 @@ void cancelunit (LObject* L,BOOLEAN inNF)
         pNext(L->t_p) = NULL;
       if (L->p != NULL && pNext(L->p) != NULL)
         pNext(L->p) = NULL;
+        
+      #if ADIDEBUG
+      PrintS("\ncancelunit end: ");pWrite(L->p);
+      #endif
+        
       return;
     }
     i = 0;
@@ -378,6 +420,12 @@ void cancelunit (LObject* L,BOOLEAN inNF)
     {
       i++;
       if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
+      #ifdef HAVE_RINGS
+      ///should check also if the lc is a zero divisor, if it divides all the others
+      if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
+      	if(nrnDivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
+      		return;
+      #endif
       if (i == r->N) break; // does divide, try next monom
     }
     pIter(h);
@@ -3536,12 +3584,89 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 */
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
+	#if ADIDEBUG
+	PrintLn();
+	PrintS("Enter superenterpairs");
+	PrintLn();
+	int iii = strat->Ll;
+	#endif
     assume (rField_is_Ring(currRing));
     // enter also zero divisor * poly, if this is non zero and of smaller degree
     if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
+     #if ADIDEBUG
+    if(iii==strat->Ll)
+    	{
+    	PrintLn();
+    	PrintS("		enterExtendedSpoly has not changed the list L.");
+    	PrintLn();
+    	}
+    else
+    {
+    	PrintLn();
+    	PrintS("		enterExtendedSpoly changed the list L: ");
+    	PrintLn();    
+    	for(iii=0;iii<=strat->Ll;iii++)
+			{
+			PrintLn();
+			PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
+			PrintS("		     ");pWrite(strat->L[iii].p1);
+			PrintS("		     ");pWrite(strat->L[iii].p2);
+			PrintS("		     ");pWrite(strat->L[iii].p);
+			}
+	}
+	iii = strat->Ll;
+    #endif
     initenterpairs(h, k, ecart, 0, strat, atR);
+    #if ADIDEBUG
+    if(iii==strat->Ll)
+    	{
+    	PrintLn();
+    	PrintS("		initenterpairs has not changed the list L.");
+    	PrintLn();
+    	}
+    else
+    {
+    	PrintLn();
+    	PrintS("		initenterpairs changed the list L: ");
+    	PrintLn();    
+    	for(iii=0;iii<=strat->Ll;iii++)
+			{
+			PrintLn();
+			PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
+			PrintS("		     ");pWrite(strat->L[iii].p1);
+			PrintS("		     ");pWrite(strat->L[iii].p2);
+			PrintS("		     ");pWrite(strat->L[iii].p);
+			}
+	}
+	iii = strat->Ll;
+    #endif
     initenterstrongPairs(h, k, ecart, 0, strat, atR);
-    clearSbatch(h, k, pos, strat);
+    #if ADIDEBUG
+    if(iii==strat->Ll)
+    	{
+    	PrintLn();
+    	PrintS("		initenterstrongPairs has not changed the list L.");
+    	PrintLn();
+    	}
+    else
+    {
+    	PrintLn();
+    	PrintS("		initenterstrongPairs changed the list L: ");
+    	PrintLn();    
+    	for(iii=0;iii<=strat->Ll;iii++)
+			{
+			PrintLn();
+			PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
+			PrintS("		     ");pWrite(strat->L[iii].p1);
+			PrintS("		     ");pWrite(strat->L[iii].p2);
+			PrintS("		     ");pWrite(strat->L[iii].p);
+			}
+	}
+	PrintLn();
+	PrintS("End of superenterpairs");
+	PrintLn();
+	#endif
+	clearSbatch(h, k, pos, strat);
 }
 #endif
 
@@ -5651,6 +5776,13 @@ void initS (ideal F, ideal Q, kStrategy strat)
       h.p = pCopy(F->m[i]);
       if (currRing->OrdSgn==-1)
       {
+            	#ifdef HAVE_RINGS
+  			if (rField_is_Ring(currRing))
+    			{
+    			h.pCleardenom();
+    			}
+  			else
+				#endif
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }
@@ -7118,6 +7250,18 @@ void enterSyz(LObject p, kStrategy strat)
 
 void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
 {
+
+  //if the ordering is local, then hilb criterion 
+  //can be used also if tzhe ideal is not homogenous
+  if((currRing->OrdSgn == -1) && (currRing->MixedOrder == 0 ))
+  #ifdef HAVE_RINGS
+  {
+  if(rField_is_Ring(currRing))
+  	*hilb=NULL;
+  else
+   	return;
+  }
+#endif
   if (strat->homog!=isHomog)
   {
     *hilb=NULL;
@@ -7873,6 +8017,9 @@ BOOLEAN newHEdge(kStrategy strat)
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
   j = p_FDeg(newNoether,currRing);
+/*  #ifdef HAVE_RINGS
+  if (!rField_is_Ring(currRing))
+  #endif */ 
   for (i=1; i<=(currRing->N); i++)
   {
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);

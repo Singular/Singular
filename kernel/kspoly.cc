@@ -388,7 +388,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
   Pair->tailRing = tailRing;
-
+  
   assume(p1 != NULL);
   assume(p2 != NULL);
   assume(tailRing != NULL);
