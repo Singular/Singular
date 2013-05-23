@@ -182,24 +182,24 @@ endif
 
 noinst_PROGRAMS = gentable1 feOptGen feOptES feOptTS
 
-CXXTEMPLFLAGS =-ftrapv ## -fno-implicit-templates
+# CXXTEMPLFLAGS =-ftrapv ## -fno-implicit-templates
 
 gentable1_SOURCES = gentable.cc grammar.h tok.h table.h
-gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-gentable1_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-gentable1_CPPFLAGS = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG
+# gentable1_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+# gentable1_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+gentable1_CPPFLAGS = ${AM_CPPFLAGS}
 
 feOptGen_SOURCES = feOptGen.cc feOptGen.h
-feOptGen_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptGen_CPPFLAGS = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG
+# feOptGen_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOptGen_CPPFLAGS = ${AM_CPPFLAGS}
 
 feOptES_SOURCES = feOptGen.cc feOptGen.h
-feOptES_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptES_CPPFLAGS = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DESINGULAR
+# feOptES_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOptES_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR
 
 feOptTS_SOURCES = feOptGen.cc feOptGen.h
-feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
-feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DTSINGULAR
+# feOptTS_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
+feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR
 
 ########################### Singular* #########################
 
@@ -434,11 +434,12 @@ endif
 endif
 
 pyobject_la_SOURCES = pyobject.cc
-pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
-pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
+# pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
+# pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
 
-pyobject_la_CXXFLAGS   = ${NODEBUGCXXFLAGS} @PYTHON_CSPEC@
-pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
+pyobject_la_CXXFLAGS   = @PYTHON_CSPEC@ 
+# ${NODEBUGCXXFLAGS} 
+# pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
 
-pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version \
-  ${AMLDFLAGS} @PYTHON_LSPEC@
+pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version ${AMLDFLAGS} @PYTHON_LSPEC@
+###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
