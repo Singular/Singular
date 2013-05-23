@@ -3207,7 +3207,7 @@ static void rSetOutParams(ring r)
       // Hmm... sometimes (e.g., from maGetPreimage) new variables
       // are introduced, but their names are never set
       // hence, we do the following awkward trick
-      int N = omSizeWOfAddr(r->names);
+      int N = omSizeOfAddr(r->names)/sizeof(char*);
       if (r->N < N) N = r->N;
 
       for (i=(N-1);i>=0;i--)
