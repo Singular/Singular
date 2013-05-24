@@ -11,7 +11,7 @@ if( system("with", "ndebug") )
 else
 {
   "Loading the Debug version!";
-  LIB("bigintm_g.so");
+  LIB("bigintm.so");
 }
 
 printBlackboxTypes();

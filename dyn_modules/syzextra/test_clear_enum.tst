@@ -12,8 +12,8 @@ if( system("with", "ndebug") )
 else
 {
   "Loading the Debug version!";
-  LIB("syzextra_g.so");
-  listvar(Syzextra_g);
+  LIB("syzextra.so");
+  listvar(Syzextra);
 }
 
 

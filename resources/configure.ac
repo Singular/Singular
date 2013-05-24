@@ -1,4 +1,4 @@
-AC_INIT([libfindexec], [3.1.4.sw])
+AC_INIT([libresources], [3.1.4.sw])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
@@ -59,13 +59,8 @@ LT_INIT
 
 
 SING_CHECK_PIPE
-
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_DEBUG=yes
- fi], ENABLE_DEBUG=no)
-
-AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
 
 
 # CFLAGS

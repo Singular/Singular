@@ -6,7 +6,9 @@
 */
 #define PLURAL_INTERNAL_DECLARATIONS
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include "mod2.h"
 
 #ifdef HAVE_PLURAL

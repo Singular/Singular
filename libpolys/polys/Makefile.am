@@ -1,15 +1,21 @@
-CXXTEMPLFLAGS	=  ## -fno-implicit-templates
+ACLOCAL_AMFLAGS = -I ../../m4
 
-DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+# CXXTEMPLFLAGS	=  ## -fno-implicit-templates
+# 
+# DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+# 
+# NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
+# NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer 
+# NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
+DEBUGCXXFLAGS   =
+NODEBUGCFLAGS   =
+NODEBUGCXXFLAGS =
+NODEBUGDEFS     =
 
-NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer
-NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer 
-NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
+# AM_CFLAGS	= ${PIPE}
+# AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
-AM_CFLAGS	= ${PIPE}
-AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
-
-AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}
+AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}  -DHAVE_CONFIG_H
 
 
 if ENABLE_P_PROCS_STATIC
@@ -28,15 +34,16 @@ else
   P_PROCS_CPPFLAGS_COMMON = ${AM_CPPFLAGS}
 endif
 
-if WANT_DEBUG
-  LIB_G=libpolys_g.la
-  MOD_G=p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
-else
-  LIB_G=
-  MOD_G=
-endif
+# if WANT_DEBUG
+#   LIB_G=libpolys_g.la
+#   MOD_G=p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
+# else
+#   LIB_G=
+#   MOD_G=
+# endif
 
-libpolys_LTLIBRARIES = libpolys.la ${LIB_G}
+libpolys_LTLIBRARIES = libpolys.la
+# ${LIB_G}
 libpolysdir = $(libdir)/singular
 
 SOURCES = \
@@ -79,20 +86,20 @@ p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
 p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
 p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
 
-p_Procs_FieldGeneral_g_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
-p_Procs_FieldIndep_g_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
-p_Procs_FieldQ_g_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
-p_Procs_FieldZp_g_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
+# p_Procs_FieldGeneral_g_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
+# p_Procs_FieldIndep_g_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
+# p_Procs_FieldQ_g_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
+# p_Procs_FieldZp_g_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
 p_Procs_FieldGeneral_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
 p_Procs_FieldIndep_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
 p_Procs_FieldQ_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
 p_Procs_FieldZp_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
 
-p_Procs_FieldGeneral_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-p_Procs_FieldIndep_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-p_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-p_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+# p_Procs_FieldGeneral_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+# p_Procs_FieldIndep_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+# p_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+# p_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
 P_PROCS_MODULE_LDFLAGS = -shared -module
 P_PROCS_MODULE_LDFLAGSG = -shared -module
@@ -102,10 +109,10 @@ p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 p_Procs_FieldQ_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 p_Procs_FieldZp_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 
-p_Procs_FieldGeneral_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
-p_Procs_FieldIndep_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
-p_Procs_FieldQ_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
-p_Procs_FieldZp_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
+# p_Procs_FieldGeneral_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
+# p_Procs_FieldIndep_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
+# p_Procs_FieldQ_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
+# p_Procs_FieldZp_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
 
 
 P_PROCS = templates/p_Procs_Lib.cc
@@ -115,10 +122,10 @@ p_Procs_FieldIndep_la_SOURCES = ${P_PROCS}
 p_Procs_FieldQ_la_SOURCES = ${P_PROCS}
 p_Procs_FieldZp_la_SOURCES = ${P_PROCS}
 
-p_Procs_FieldGeneral_g_la_SOURCES = ${P_PROCS}
-p_Procs_FieldIndep_g_la_SOURCES = ${P_PROCS}
-p_Procs_FieldQ_g_la_SOURCES = ${P_PROCS}
-p_Procs_FieldZp_g_la_SOURCES = ${P_PROCS}
+# p_Procs_FieldGeneral_g_la_SOURCES = ${P_PROCS}
+# p_Procs_FieldIndep_g_la_SOURCES = ${P_PROCS}
+# p_Procs_FieldQ_g_la_SOURCES = ${P_PROCS}
+# p_Procs_FieldZp_g_la_SOURCES = ${P_PROCS}
 
 
 # moduledir = $(bindir)
@@ -127,9 +134,9 @@ moduledir = $(libexecdir)/singular/MOD/
 if ENABLE_P_PROCS_DYNAMIC
   module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la
   
-if WANT_DEBUG
-  module_LTLIBRARIES+=p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
-endif
+# if WANT_DEBUG
+#   module_LTLIBRARIES+=p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
+# endif
 
 endif
 
@@ -138,14 +145,14 @@ libpolys_includedir=$(includedir)/singular/polys
 nobase_libpolys_include_HEADERS = $(LIBPOLYSHEADERS)
 
 libpolys_la_SOURCES = ${SOURCES}
-libpolys_g_la_SOURCES = ${SOURCES}
+# libpolys_g_la_SOURCES = ${SOURCES}
 
 EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
-libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+# libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 libpolys_la_CPPFLAGS = ${NODEBUGDEFS} ${AM_CPPFLAGS}
 
-
+libpolys_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 
 #################################################
@@ -155,12 +162,12 @@ BUILT_SOURCES = prCopy.inc templates/p_Procs.inc
 
 noinst_PROGRAMS = templates/p_Procs_Generate
 templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
-templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
-templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
-templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGDEFS} ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
+# templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
+# templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
+templates_p_Procs_Generate_CPPFLAGS = ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
 
-templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lfindexec
-templates_p_Procs_Generate_LDFLAGS  = -L${builddir} -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc -L${top_builddir}/../omalloc -L${top_builddir}/../findexec
+templates_p_Procs_Generate_LDADD    = -lreporter -lmisc -lomalloc -lresources
+templates_p_Procs_Generate_LDFLAGS  = -L${builddir} -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc -L${top_builddir}/../omalloc -L${top_builddir}/../resources
 
 templates/p_Procs.inc: templates/p_Procs_Generate$(EXEEXT)
 	${builddir}/templates/p_Procs_Generate$(EXEEXT) > ${builddir}/templates/p_Procs.inc

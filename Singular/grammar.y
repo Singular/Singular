@@ -12,6 +12,11 @@
 #include <stdarg.h>
 #include <string.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+#include <misc/auxiliary.h>
+
 #include <kernel/mod2.h>
 #include <misc/mylimits.h>
 #include <omalloc/omalloc.h>

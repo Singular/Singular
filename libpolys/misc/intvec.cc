@@ -8,10 +8,12 @@
 #define INTVEC_CC
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
-// #include <findexec/feFopen.h>
+// #include <resources/feFopen.h>
 #include <misc/intvec.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>

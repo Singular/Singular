@@ -15,7 +15,9 @@
 #include <stdlib.h>
 #include <strings.h>
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 static inline void malloc_free( void * ptr )
 {

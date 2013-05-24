@@ -5,7 +5,9 @@
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <omalloc/omalloc.h>
 

@@ -17,28 +17,15 @@ AM_SANITY_CHECK
 #
 # - Check for CC and CXX but be careful about CFLAGS.
 #
-test "${CFLAGS+set}" = set || cflags_expl_set=no
-AC_PROG_CC
-test "${CXXFLAGS+set}" = set || cxxflags_expl_set=no
-AC_PROG_CXX
-if test "x$GCC" != xyes && test "x$GXX" != xyes; then
-  AC_MSG_WARN(you better use gcc to compile Factory)
-else
-  if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CXXFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-  if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-fi
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
 
+AC_PROG_CC
+AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-# AM_PROG_AR
 # Turn off shared libraries during beta-testing, since they
 # make the build process take too long.
 LT_INIT
@@ -100,29 +87,6 @@ SING_CHECK_P_PROCS
 SING_CHECK_ARITH_RINGS
 SING_CHECK_FACTORY
 SING_CHECK_PLURAL
-
-# CFLAGS
-if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-  CFLAGS=""
-fi
-  
-# CXXFLAGS
-if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-  CXXFLAGS=""
-fi
-
-#if test "x$prefix" != xNONE; then
-#  PREFIX="$prefix"
-#else
-#  PREFIX="$ac_default_prefix"
-#fi
-
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_DEBUG=yes
- fi], ENABLE_DEBUG=no)
-
-AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
 
 # AC_SUBST(PREFIX)
 # AC_DEFINE_UNQUOTED(INSTALL_PREFIX,"$PREFIX",Prefix)

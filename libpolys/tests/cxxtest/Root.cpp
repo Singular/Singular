@@ -15,4 +15,13 @@
 #include <cxxtest/TestTracker.cpp>
 #include <cxxtest/ValueTraits.cpp>
 
+
+template char* CxxTest::numberToString<double>(double, char*, double, unsigned int, unsigned int);
+template char* CxxTest::numberToString<unsigned int>(unsigned int, char*, unsigned int, unsigned int, unsigned int);
+template char* CxxTest::numberToString<unsigned long>(unsigned long, char*, unsigned long, unsigned int, unsigned int);
+template std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*);
+template void CxxTest::doAssertDelta<float, float, float>(char const*, unsigned int, char const*, float, char const*, float, char const*, float, char const*);
+template bool CxxTest::delta<float, float, float>(float, float, float);
+
+
 #endif // __cxxtest__Root_cpp__

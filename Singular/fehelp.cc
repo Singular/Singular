@@ -12,7 +12,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
@@ -21,7 +23,7 @@
 #include <kernel/febase.h>
 #include <reporter/reporter.h>
 
-#include <findexec/omFindExec.h>
+#include <resources/omFindExec.h>
 
 #include <Singular/si_signals.h>
 

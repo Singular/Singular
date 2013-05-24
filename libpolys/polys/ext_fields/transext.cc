@@ -34,7 +34,9 @@
 */
 #define TRANSEXT_PRIVATES
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
@@ -2130,3 +2132,6 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   return FALSE;
 }
+
+template class CRecursivePolyCoeffsEnumerator<NTNumConverter>;
+template class IEnumerator<snumber*>;

@@ -1,7 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include "mod2.h"
 #include <polys/monomials/ring.h>
 #include <kernel/fast_mult.h>

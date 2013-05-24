@@ -16,7 +16,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <queue>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <kernel/tgb.h>
 #include <kernel/tgb_internal.h>
@@ -5078,3 +5080,144 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
 void simple_reducer::pre_reduce (red_object * /*r*/, int /*l*/, int /*u*/)
 {
 }
+
+#if 0
+
+template int pos_helper<int, int*>(skStrategy*, spolyrec*, int, int*, spolyrec**);
+template int pos_helper<long, long*>(skStrategy*, spolyrec*, long, long*, spolyrec**);
+
+template void noro_step<unsigned char>(spolyrec**, int&, slimgb_alg*);
+template void noro_step<unsigned int>(spolyrec**, int&, slimgb_alg*);
+template void noro_step<unsigned short>(spolyrec**, int&, slimgb_alg*);
+
+
+template int term_nodes_sort_crit<unsigned char>(void const*, void const*);
+template int term_nodes_sort_crit<unsigned int>(void const*, void const*);
+template int term_nodes_sort_crit<unsigned short>(void const*, void const*);
+
+template spolyrec* row_to_poly<unsigned char>(unsigned char*, spolyrec**, int, ip_sring*);
+template spolyrec* row_to_poly<unsigned int>(unsigned int*, spolyrec**, int, ip_sring*);
+template spolyrec* row_to_poly<unsigned short>(unsigned short*, spolyrec**, int, ip_sring*);
+
+template void simplest_gauss_modp<unsigned char>(unsigned char*, int, int);
+template void simplest_gauss_modp<unsigned int>(unsigned int*, int, int);
+template void simplest_gauss_modp<unsigned short>(unsigned short*, int, int);
+
+
+template int modP_lastIndexRow<unsigned char>(unsigned char*, int);
+template int modP_lastIndexRow<unsigned int>(unsigned int*, int);
+template int modP_lastIndexRow<unsigned short>(unsigned short*, int);
+
+template SparseRow<unsigned char>* noro_red_to_non_poly_t<unsigned char>(spolyrec*, int&, NoroCache<unsigned char>*, slimgb_alg*);
+template SparseRow<unsigned int>* noro_red_to_non_poly_t<unsigned int>(spolyrec*, int&, NoroCache<unsigned int>*, slimgb_alg*);
+template SparseRow<unsigned short>* noro_red_to_non_poly_t<unsigned short>(spolyrec*, int&, NoroCache<unsigned short>*, slimgb_alg*);
+
+
+template MonRedResNP<unsigned char> noro_red_mon_to_non_poly<unsigned char>(spolyrec*, NoroCache<unsigned char>*, slimgb_alg*);
+template MonRedResNP<unsigned int> noro_red_mon_to_non_poly<unsigned int>(spolyrec*, NoroCache<unsigned int>*, slimgb_alg*);
+template MonRedResNP<unsigned short> noro_red_mon_to_non_poly<unsigned short>(spolyrec*, NoroCache<unsigned short>*, slimgb_alg*);
+
+template SparseRow<unsigned char>* noro_red_to_non_poly_dense<unsigned char>(MonRedResNP<unsigned char>*, int, NoroCache<unsigned char>*);
+template SparseRow<unsigned char>* noro_red_to_non_poly_sparse<unsigned char>(MonRedResNP<unsigned char>*, int, NoroCache<unsigned char>*);
+template SparseRow<unsigned int>* noro_red_to_non_poly_dense<unsigned int>(MonRedResNP<unsigned int>*, int, NoroCache<unsigned int>*);
+template SparseRow<unsigned int>* noro_red_to_non_poly_sparse<unsigned int>(MonRedResNP<unsigned int>*, int, NoroCache<unsigned int>*);
+template SparseRow<unsigned short>* noro_red_to_non_poly_dense<unsigned short>(MonRedResNP<unsigned short>*, int, NoroCache<unsigned short>*);
+template SparseRow<unsigned short>* noro_red_to_non_poly_sparse<unsigned short>(MonRedResNP<unsigned short>*, int, NoroCache<unsigned short>*);
+
+
+
+template class DataNoroCacheNode<unsigned char>;
+template class DataNoroCacheNode<unsigned int>;
+template class DataNoroCacheNode<unsigned short>;
+
+template class NoroCache<unsigned char>;
+template class NoroCache<unsigned int>;
+template class NoroCache<unsigned short>;
+
+
+
+template void add_coef_times_dense<unsigned char>(unsigned char*, int, unsigned char const*, int, snumber*);
+template void add_coef_times_dense<unsigned int>(unsigned int*, int, unsigned int const*, int, snumber*);
+template void add_coef_times_dense<unsigned short>(unsigned short*, int, unsigned short const*, int, snumber*);
+template void add_coef_times_sparse<unsigned char>(unsigned char*, int, SparseRow<unsigned char>*, snumber*);
+template void add_coef_times_sparse<unsigned int>(unsigned int*, int, SparseRow<unsigned int>*, snumber*);
+template void add_coef_times_sparse<unsigned short>(unsigned short*, int, SparseRow<unsigned short>*, snumber*);
+template void add_dense<unsigned char>(unsigned char*, int, unsigned char const*, int);
+template void add_dense<unsigned int>(unsigned int*, int, unsigned int const*, int);
+template void add_dense<unsigned short>(unsigned short*, int, unsigned short const*, int);
+template void add_sparse<unsigned char>(unsigned char*, int, SparseRow<unsigned char>*);
+template void add_sparse<unsigned int>(unsigned int*, int, SparseRow<unsigned int>*);
+template void add_sparse<unsigned short>(unsigned short*, int, SparseRow<unsigned short>*);
+
+
+template void sub_dense<unsigned char>(unsigned char*, int, unsigned char const*, int);
+template void sub_dense<unsigned int>(unsigned int*, int, unsigned int const*, int);
+template void sub_dense<unsigned short>(unsigned short*, int, unsigned short const*, int);
+template void sub_sparse<unsigned char>(unsigned char*, int, SparseRow<unsigned char>*);
+template void sub_sparse<unsigned int>(unsigned int*, int, SparseRow<unsigned int>*);
+template void sub_sparse<unsigned short>(unsigned short*, int, SparseRow<unsigned short>*);
+template void write_coef_idx_to_buffer_dense<unsigned char>(CoefIdx<unsigned char>*, int&, unsigned char*, int);
+template void write_coef_idx_to_buffer_dense<unsigned int>(CoefIdx<unsigned int>*, int&, unsigned int*, int);
+template void write_coef_idx_to_buffer_dense<unsigned short>(CoefIdx<unsigned short>*, int&, unsigned short*, int);
+template void write_coef_idx_to_buffer<unsigned char>(CoefIdx<unsigned char>*, int&, int*, unsigned char*, int);
+template void write_coef_idx_to_buffer<unsigned int>(CoefIdx<unsigned int>*, int&, int*, unsigned int*, int);
+template void write_coef_idx_to_buffer<unsigned short>(CoefIdx<unsigned short>*, int&, int*, unsigned short*, int);
+template void write_coef_times_xx_idx_to_buffer_dense<unsigned char>(CoefIdx<unsigned char>*, int&, unsigned char*, int, snumber*);
+template void write_coef_times_xx_idx_to_buffer_dense<unsigned int>(CoefIdx<unsigned int>*, int&, unsigned int*, int, snumber*);
+template void write_coef_times_xx_idx_to_buffer_dense<unsigned short>(CoefIdx<unsigned short>*, int&, unsigned short*, int, snumber*);
+template void write_coef_times_xx_idx_to_buffer<unsigned char>(CoefIdx<unsigned char>*, int&, int*, unsigned char*, int, snumber*);
+template void write_coef_times_xx_idx_to_buffer<unsigned int>(CoefIdx<unsigned int>*, int&, int*, unsigned int*, int, snumber*);
+template void write_coef_times_xx_idx_to_buffer<unsigned short>(CoefIdx<unsigned short>*, int&, int*, unsigned short*, int, snumber*);
+template void write_minus_coef_idx_to_buffer_dense<unsigned char>(CoefIdx<unsigned char>*, int&, unsigned char*, int);
+template void write_minus_coef_idx_to_buffer_dense<unsigned int>(CoefIdx<unsigned int>*, int&, unsigned int*, int);
+template void write_minus_coef_idx_to_buffer_dense<unsigned short>(CoefIdx<unsigned short>*, int&, unsigned short*, int);
+template void write_minus_coef_idx_to_buffer<unsigned char>(CoefIdx<unsigned char>*, int&, int*, unsigned char*, int);
+template void write_minus_coef_idx_to_buffer<unsigned int>(CoefIdx<unsigned int>*, int&, int*, unsigned int*, int);
+template void write_minus_coef_idx_to_buffer<unsigned short>(CoefIdx<unsigned short>*, int&, int*, unsigned short*, int);
+
+
+
+template void std::__final_insertion_sort<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
+template void std::__final_insertion_sort<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
+template void std::__final_insertion_sort<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+template void std::__introsort_loop<CoefIdx<unsigned char>*, long>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, long);
+template void std::__introsort_loop<CoefIdx<unsigned int>*, long>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, long);
+template void std::__introsort_loop<CoefIdx<unsigned short>*, long>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, long);
+
+template void std::__heap_select<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
+template void std::__heap_select<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
+template void std::__heap_select<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+template void std::__insertion_sort<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
+template void std::__insertion_sort<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
+template void std::__insertion_sort<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+template void std::__move_median_first<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
+template void std::__move_median_first<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
+template void std::__move_median_first<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+template void std::sort_heap<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
+template void std::sort_heap<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
+template void std::sort_heap<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+template void std::__unguarded_linear_insert<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*);
+template void std::__unguarded_linear_insert<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*);
+template void std::__unguarded_linear_insert<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*);
+
+template CoefIdx<unsigned char>* std::__unguarded_partition<CoefIdx<unsigned char>*, CoefIdx<unsigned char> >(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, CoefIdx<unsigned char> const&);
+template CoefIdx<unsigned int>* std::__unguarded_partition<CoefIdx<unsigned int>*, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, CoefIdx<unsigned int> const&);
+template CoefIdx<unsigned short>* std::__unguarded_partition<CoefIdx<unsigned short>*, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, CoefIdx<unsigned short> const&);
+template void std::__adjust_heap<CoefIdx<unsigned char>*, long, CoefIdx<unsigned char> >(CoefIdx<unsigned char>*, long, long, CoefIdx<unsigned char>);
+template void std::__adjust_heap<CoefIdx<unsigned int>*, long, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, long, long, CoefIdx<unsigned int>);
+template void std::__adjust_heap<CoefIdx<unsigned short>*, long, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, long, long, CoefIdx<unsigned short>);
+template void std::make_heap<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
+template void std::make_heap<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
+template void std::make_heap<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+
+template void std::__push_heap<CoefIdx<unsigned char>*, long, CoefIdx<unsigned char> >(CoefIdx<unsigned char>*, long, long, CoefIdx<unsigned char>);
+template void std::__push_heap<CoefIdx<unsigned int>*, long, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, long, long, CoefIdx<unsigned int>);
+template void std::__push_heap<CoefIdx<unsigned short>*, long, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, long, long, CoefIdx<unsigned short>);
+
+
+template class std::vector<DataNoroCacheNode<unsigned char>*, std::allocator<DataNoroCacheNode<unsigned char>*> >;
+template class std::vector<DataNoroCacheNode<unsigned int>*, std::allocator<DataNoroCacheNode<unsigned int>*> >;
+template class std::vector<DataNoroCacheNode<unsigned short>*, std::allocator<DataNoroCacheNode<unsigned short>*> >;
+template class std::vector<PolySimple, std::allocator<PolySimple> >;
+#endif
+

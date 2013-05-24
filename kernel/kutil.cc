@@ -10,7 +10,9 @@
 #define KUTIL_CC
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include "mod2.h"
 
 #ifndef NDEBUG

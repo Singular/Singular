@@ -4,7 +4,9 @@
  *  tmult.cc: p_Mult_nn with pthreads - experimental
  *
  *******************************************************************/
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/numbers.h>

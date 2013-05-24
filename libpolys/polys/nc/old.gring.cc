@@ -16,7 +16,9 @@
 #define OM_TRACK 5
 #endif
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_PLURAL
@@ -3514,4 +3516,8 @@ bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
 //   }
 //   return(TRUE);
 // }
+
 #endif
+
+
+

@@ -1,10 +1,12 @@
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 
 #include <reporter/reporter.h>
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>

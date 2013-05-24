@@ -17,7 +17,9 @@
 #endif
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_PLURAL
@@ -1103,4 +1105,10 @@ poly CSpecialPairMultiplier::MultiplyEM(const CExponent expLeft, const poly pMon
 
   return MultiplyEE(expLeft, p_GetExp(pMonom, GetI(), GetBasering()));
 }
+
+template class CMultiplier<CPower>;
+template class CMultiplier<int>;
+template class CMultiplier<spolyrec*>;
+
+
 #endif
