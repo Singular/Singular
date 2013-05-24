@@ -987,7 +987,9 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   int  i;
   int  k = ak;
   
-  #if ADIDEBUG
+  #if HAVE_RINGS
+  if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
+  {
   //consider just monic generators (over rings with zero-divisors)
   ideal SS=id_Copy(S,currRing);
   for(i=0;i<=idElem(SS);i++)
@@ -996,6 +998,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   		p_Delete(&SS->m[i],currRing);
   	}
   	S=id_Copy(SS,currRing);
+  }
   #endif
 
   hNvar = (currRing->N);
