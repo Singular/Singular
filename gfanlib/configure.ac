@@ -65,7 +65,9 @@ fi
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
 
-SING_CHECK_DEBUG
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
+
 
 #AC_MSG_RESULT($ac_cv_singuname)
 #if test "$ac_cv_singuname" = unknown; then

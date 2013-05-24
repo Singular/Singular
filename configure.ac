@@ -11,47 +11,33 @@ AC_CONFIG_HEADER([config.h])
 
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
-m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
 #
 # - Check for CC and CXX but be careful about CFLAGS.
-#
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
 
-test "${CFLAGS+set}" = set || cflags_expl_set=no
+#!
 AC_PROG_CC
-test "${CXXFLAGS+set}" = set || cxxflags_expl_set=no
 AC_PROG_CXX
-if test "x$GCC" != xyes && test "x$GXX" != xyes; then
-  AC_MSG_WARN(you better use gcc to compile Factory)
-else
-  if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CXXFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-  if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-fi
-
-
-AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h iostream.h)
-
-AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
-
-
 AC_PROG_CPP
 AC_PROG_CXXCPP
 AM_PROG_CC_C_O
 ### AM_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_INSTALL
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h iostream.h)
+
+AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
+
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
@@ -96,22 +82,6 @@ SING_CHECK_READLINE
 SING_CHECK_DBM
 SING_CHECK_GFANLIB
 
-# CFLAGS
-if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-  CFLAGS=""
-fi
-
-# CXXFLAGS
-if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-  CXXFLAGS=""
-fi
-
-AC_DEFINE_UNQUOTED([CC],"$CC",[CC])
-AC_DEFINE_UNQUOTED([CXX],"$CXX",[CXX])
-AC_DEFINE_UNQUOTED([CFLAGS],"$CFLAGS",[CFLAGS])
-AC_DEFINE_UNQUOTED([CXXFLAGS],"$CXXFLAGS",[CXXFLAGS])
-AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
-
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
 
@@ -137,8 +107,6 @@ if test "x$ENABLE_FACTORY" = xyes; then
  fi
 fi
 
-SING_CHECK_DEBUG
-
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
 [if test "x$enableval" = "xyes"; then
 ENABLE_COUNTEDREF_AUTOLOAD=yes
@@ -163,6 +131,19 @@ m4_ifval([$3],
 ])dnl
 fi[]dnl
 ])])
+
+
+AC_DEFINE_UNQUOTED([CC],"$CC",[CC])
+AC_DEFINE_UNQUOTED([CXX],"$CXX",[CXX])
+AC_DEFINE_UNQUOTED([CFLAGS],"$CFLAGS",[CFLAGS])
+AC_DEFINE_UNQUOTED([CXXFLAGS],"$CXXFLAGS",[CXXFLAGS])
+AC_DEFINE_UNQUOTED([DEFS],"$DEFS",[DEFS])
+AC_DEFINE_UNQUOTED([CPPFLAGS],"$CPPFLAGS",[CPPFLAGS])
+AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
+AC_DEFINE_UNQUOTED([LIBS],"$LIBS",[LIBS])
+ 
+  
+SING_SHOW_FLAGS([Compiler/linker flags: ])
 
     
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])

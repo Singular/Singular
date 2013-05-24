@@ -59,7 +59,9 @@ LT_INIT
 
 
 SING_CHECK_PIPE
-SING_CHECK_DEBUG
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
+
 
 # CFLAGS
 if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then

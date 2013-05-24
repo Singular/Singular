@@ -27,7 +27,8 @@ AC_SUBST(VERSION)
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
 dnl
-SING_CHECK_DEBUG
+###### SING_RESET_FLAGS()
+###### SING_CHECK_SET_ARGS()
 
 AC_ARG_WITH(
   external-config_h,
