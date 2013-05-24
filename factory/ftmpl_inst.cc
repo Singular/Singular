@@ -10,7 +10,9 @@
 //
 //}}}
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 // #include <factory/factoryconf.h>
 // #include "factory.h"
@@ -61,8 +63,8 @@ template class List< List<int> >;
 template class ListItem< List<int> >;
 template class ListIterator< List<int> >;
 template class List< List<CanonicalForm> >;
+template class ListItem< List<CanonicalForm> >;
 template class ListIterator< List<CanonicalForm> >;
-
 
 template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
 template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );

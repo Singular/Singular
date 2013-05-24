@@ -46,7 +46,9 @@
 #include <sys/types.h>
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <misc/intvec.h>
 #include <Singular/cntrlc.h>

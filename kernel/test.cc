@@ -1,4 +1,6 @@
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>
@@ -14,8 +16,8 @@
 
 #include <reporter/reporter.h>
 
-#include <findexec/feFopen.h>
-#include <findexec/feResource.h>
+#include <resources/feFopen.h>
+#include <resources/feResource.h>
 
 #include <coeffs/coeffs.h>
 

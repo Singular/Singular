@@ -9,7 +9,7 @@
 #define BIGINTMAT_H
 
 #include <omalloc/omalloc.h>
-#include <findexec/feFopen.h>
+#include <resources/feFopen.h>
 #include <coeffs/coeffs.h>
 
 /// matrix of numbers
@@ -145,11 +145,7 @@ class bigintmat
 
     /// replace an entry with the given number n (only delete old).
     /// NOTE: starts at [0]
-#ifdef NDEBUG
-    inline void rawset(int i, number n, const coeffs /*C = NULL*/)
-#else
     inline void rawset(int i, number n, const coeffs C = NULL)
-#endif
     {
       assume (C == NULL || C == basecoeffs());
       assume (i >= 0);

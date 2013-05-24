@@ -1392,7 +1392,7 @@ static proc loadme()
 
   if( !defined(DetailedPrint) )
   {
-    if( !@DEBUG )
+    if( 1 )
     {
 
       if( @DEBUG )
@@ -1433,6 +1433,7 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::m2_end);
     }
+/*
     else
     {
       if( @DEBUG )
@@ -1440,7 +1441,7 @@ static proc loadme()
         "Loading the Debug version!";
       }
 
-      load("syzextra_g.so");
+      load("syzextra.so");
 
       if( @DEBUG )
       {      
@@ -1474,6 +1475,7 @@ static proc loadme()
       
       exportto(Schreyer, Syzextra_g::m2_end);
     }
+*/
 
     exportto(Top, DetailedPrint);
     exportto(Top, GetInducedData);
@@ -1487,7 +1489,7 @@ static proc loadme()
   
   if( !defined(GetInducedData) )
   {
-    ERROR("Sorry but we are missing the dynamic module (syzextra(_g)?.so)...");
+    ERROR("Sorry but we are missing the dynamic module (syzextra.so)...");
   }
 
 }

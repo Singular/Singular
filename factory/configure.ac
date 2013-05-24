@@ -23,23 +23,42 @@ AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werro
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
-
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([config.h],[],[config.h])
 
-AC_PROG_YACC
-# AM_PROG_AR
-LT_INIT
-
-#
-# Do not change version here!!!
-#
 dnl #
 dnl # Change version here, do not believe the comment in the
 dnl # preceding lines.
 dnl #
 factory_version="3.1.3"
 factory_configuration="'$ac_configure_args' in `pwd`"
+
+#
+# - check for CC and CXX but be careful about CFLAGS.
+#
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
+
+AC_PROG_CC
+AC_PROG_CXX
+#
+# - check for some other programs.
+#
+AC_PROG_CPP
+AC_PROG_CXXCPP
+AC_PROG_LN_S
+AC_PROG_INSTALL
+AC_DISABLE_STATIC
+AC_PROG_YACC
+LT_INIT
+AC_PROG_MAKE_SET
+AC_CHECK_PROG(AR, ar, ar, where-is-your-ar)
+AC_CHECK_PROG(M4, m4, m4, where-is-your-m4)
+AC_CHECK_PROG(BISON, bison, bison, where-is-your-bison)
+AC_CHECK_SIZEOF(long,4)
+AC_C_CONST
+AC_C_INLINE
+
 
 #
 # - check withs and enables.
@@ -92,50 +111,6 @@ AC_ARG_ENABLE(
   [AS_HELP_STRING([--enable-debugoutput],[build Factory so it will print debugging information])],
   ,
   enable_debugoutput=no)
-
-AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [build the debugging version of the libraries]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_DEBUG=yes
- fi], ENABLE_DEBUG=no)
-
-AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
-
-#
-# - check for CC and CXX but be careful about CFLAGS.
-#
-test "${CFLAGS+set}" = set || cflags_expl_set=no
-AC_PROG_CC
-test "${CXXFLAGS+set}" = set || cxxflags_expl_set=no
-AC_PROG_CXX
-if test "x$GCC" != xyes && test "x$GXX" != xyes; then
-  AC_MSG_WARN(you better use gcc to compile Factory)
-else
-  if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CXXFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-  if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-fi
-
-#
-# - check for some other programs.
-#
-AC_PROG_CPP
-AC_PROG_CXXCPP
-AC_PROG_LN_S
-AC_PROG_INSTALL
-AC_DISABLE_STATIC
-LT_INIT
-AC_PROG_MAKE_SET
-AC_CHECK_PROG(AR, ar, ar, where-is-your-ar)
-AC_CHECK_PROG(M4, m4, m4, where-is-your-m4)
-AC_CHECK_PROG(BISON, bison, bison, where-is-your-bison)
-AC_CHECK_SIZEOF(long,4)
-AC_C_CONST
-AC_C_INLINE
 
 AH_TEMPLATE([INT64], [Defenition for INT64])
 # Always long long int???!
@@ -382,7 +357,7 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   if test "x$with_omalloc_extra_dir" != "x"; then
     OMALLOC_CFLAGS="$OMALLOC_CFLAGS -I${with_omalloc_extra_dir}"
-    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc -L${with_omalloc_extra_dir}/findexec"
+    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc -L${with_omalloc_extra_dir}/resources"
   fi
   
   CPPFLAGS_save="$CPPFLAGS"
@@ -395,8 +370,8 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   CPPFLAGS="$CPPFLAGS_save"
 
-  OMALLOC_G_LDADD="-lfindexec_g -lomalloc_g"
-  OMALLOC_R_LDADD="-lfindexec -lomalloc"
+  OMALLOC_G_LDADD="-lresources_g -lomalloc_g"
+  OMALLOC_R_LDADD="-lresources -lomalloc"
   
   AC_DEFINE(HAVE_OMALLOC, 1, [omalloc support])
  

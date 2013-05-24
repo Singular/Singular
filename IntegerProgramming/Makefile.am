@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I ../m4
+
 AM_CPPFLAGS = -I${srcdir} $(GMP_CFLAGS)
 AM_LDFLAGS = $(GMP_LIBS)
 

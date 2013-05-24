@@ -17,7 +17,9 @@
  * o FindUnivariatePolys added
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 
@@ -1241,6 +1243,13 @@ FindUnivariateWrapper( ideal source, ideal & destIdeal )
     else
         return FALSE;
 }
+
+template class List<fglmSelem>;
+template class ListItem<fglmSelem>;
+template class ListIterator<fglmSelem>;
+template class List<fglmDelem>;
+template class ListItem<fglmDelem>;
+template class ListIterator<fglmDelem>;
 
 
 #endif

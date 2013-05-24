@@ -18,14 +18,16 @@
 #include <errno.h>
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
 
-#include <findexec/feResource.h>
+#include <resources/feResource.h>
 
 #include "mod_raw.h"
 
@@ -147,7 +149,8 @@ static BOOLEAN warn_proc = FALSE;
 #ifdef NDEBUG
 #define DL_TAIL ".so"
 #else
-#define DL_TAIL "_g.so"
+#define DL_TAIL ".so"
+//#define DL_TAIL "_g.so"
 #endif
 #endif
 

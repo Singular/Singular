@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <misc/auxiliary.h>
-#include <findexec/feFopen.h>
+#include <resources/feFopen.h>
 
 extern char*  feErrors;
 extern int    feErrorsLen;
