@@ -1105,4 +1105,10 @@ poly CSpecialPairMultiplier::MultiplyEM(const CExponent expLeft, const poly pMon
 
   return MultiplyEE(expLeft, p_GetExp(pMonom, GetI(), GetBasering()));
 }
+
+template class CMultiplier<CPower>;
+template class CMultiplier<int>;
+template class CMultiplier<spolyrec*>;
+
+
 #endif

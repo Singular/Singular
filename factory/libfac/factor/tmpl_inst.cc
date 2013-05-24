@@ -30,6 +30,7 @@
 template class Substitution<CanonicalForm>;
 template class List<SForm>;
 template class ListIterator<SForm>;
+template class ListItem<Substitution<CanonicalForm> >;
 
 #ifndef NOSTREAMIO
 template OSTREAM & operator << ( OSTREAM &, const List<int> & );

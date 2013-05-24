@@ -153,4 +153,35 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
 };
 
 
+template void CxxTest::doAssertDiffers<n_Procs_s*, void*>(char const*, unsigned int, char const*, n_Procs_s*, char const*, void*, char const*);
+template void CxxTest::doAssertDiffers<snumber* (*)(long, n_Procs_s*), void*>(char const*, unsigned int, char const*, snumber* (*)(long, n_Procs_s*), char const*, void*, char const*);
+template void CxxTest::doAssertDiffers<snumber* (*)(snumber*, snumber*, n_Procs_s*), void*>(char const*, unsigned int, char const*, snumber* (*)(snumber*, snumber*, n_Procs_s*), char const*, void*, char const*);
+template void CxxTest::doAssertDiffers<void (*)(n_Procs_s*, int), void*>(char const*, unsigned int, char const*, void (*)(n_Procs_s*, int), char const*, void*, char const*);
+template void CxxTest::doAssertDiffers<void (*)(snumber**, n_Procs_s*), void*>(char const*, unsigned int, char const*, void (*)(snumber**, n_Procs_s*), char const*, void*, char const*);
+template void CxxTest::doAssertDiffers<void (*)(snumber*&, n_Procs_s*), void*>(char const*, unsigned int, char const*, void (*)(snumber*&, n_Procs_s*), char const*, void*, char const*);
+template void CxxTest::doAssertEquals<int, int>(char const*, unsigned int, char const*, int, char const*, int, char const*);
+template void CxxTest::doAssertEquals<n_coeffType, n_coeffType>(char const*, unsigned int, char const*, n_coeffType, char const*, n_coeffType, char const*);
+template void CxxTest::doAssertEquals<snumber* (*)(long, n_Procs_s*), snumber* (*)(long, n_Procs_s*)>(char const*, unsigned int, char const*, snumber* (*)(long, n_Procs_s*), char const*, snumber* (*)(long, n_Procs_s*), char const*);
+template void CxxTest::doAssertEquals<snumber* (*)(snumber*, snumber*, n_Procs_s*), snumber* (*)(snumber*, snumber*, n_Procs_s*)>(char const*, unsigned int, char const*, snumber* (*)(snumber*, snumber*, n_Procs_s*), char const*, snumber* (*)(snumber*, snumber*, n_Procs_s*), char const*);
+template void CxxTest::doAssertEquals<void (*)(snumber**, n_Procs_s*), void (*)(snumber**, n_Procs_s*)>(char const*, unsigned int, char const*, void (*)(snumber**, n_Procs_s*), char const*, void (*)(snumber**, n_Procs_s*), char const*);
+
+template bool CxxTest::differs<n_Procs_s*, void*>(n_Procs_s*, void*);
+template bool CxxTest::differs<snumber* (*)(long, n_Procs_s*), void*>(snumber* (*)(long, n_Procs_s*), void*);
+template bool CxxTest::differs<snumber* (*)(snumber*, snumber*, n_Procs_s*), void*>(snumber* (*)(snumber*, snumber*, n_Procs_s*), void*);
+template bool CxxTest::differs<void (*)(n_Procs_s*, int), void*>(void (*)(n_Procs_s*, int), void*);
+template bool CxxTest::differs<void (*)(snumber**, n_Procs_s*), void*>(void (*)(snumber**, n_Procs_s*), void*);
+template bool CxxTest::differs<void (*)(snumber*&, n_Procs_s*), void*>(void (*)(snumber*&, n_Procs_s*), void*);
+template bool CxxTest::equals<int, int>(int, int);
+template bool CxxTest::equals<n_coeffType, n_coeffType>(n_coeffType, n_coeffType);
+template bool CxxTest::equals<snumber* (*)(long, n_Procs_s*), snumber* (*)(long, n_Procs_s*)>(snumber* (*)(long, n_Procs_s*), snumber* (*)(long, n_Procs_s*));
+template bool CxxTest::equals<snumber* (*)(snumber*, snumber*, n_Procs_s*), snumber* (*)(snumber*, snumber*, n_Procs_s*)>(snumber* (*)(snumber*, snumber*, n_Procs_s*), snumber* (*)(snumber*, snumber*, n_Procs_s*));
+template bool CxxTest::equals<void (*)(snumber**, n_Procs_s*), void (*)(snumber**, n_Procs_s*)>(void (*)(snumber**, n_Procs_s*), void (*)(snumber**, n_Procs_s*));
+template char* CxxTest::numberToString<long>(long, char*, long, unsigned int, unsigned int);
+
+template void CxxTest::doAssertDiffers<ip_sring*, void*>(char const*, unsigned int, char const*, ip_sring*, char const*, void*, char const*);
+template void CxxTest::doAssertEquals<short, int>(char const*, unsigned int, char const*, short, char const*, int, char const*);
+
+template bool CxxTest::differs<ip_sring*, void*>(ip_sring*, void*);
+template bool CxxTest::equals<short, int>(short, int);
+
 #endif /* TESTS_COMMON_H */

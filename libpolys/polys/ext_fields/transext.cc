@@ -2132,3 +2132,6 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   return FALSE;
 }
+
+template class CRecursivePolyCoeffsEnumerator<NTNumConverter>;
+template class IEnumerator<snumber*>;

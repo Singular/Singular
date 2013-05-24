@@ -1426,3 +1426,8 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 
   return FALSE;
 }
+
+template class CRecursivePolyCoeffsEnumerator<NAConverter>;
+
+template class IAccessor<snumber*>;
+

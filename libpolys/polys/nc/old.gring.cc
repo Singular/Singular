@@ -3516,4 +3516,8 @@ bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
 //   }
 //   return(TRUE);
 // }
+
 #endif
+
+
+

@@ -86,7 +86,7 @@ class CCacheHash
       return false; // the pair was not stored!
     };
     
-    virtual void History(const EHistoryType , const CExponent /*a*/, const CExponent /*b*/, const poly /*p = NULL*/)
+    virtual void History(const EHistoryType , const CExponent /*a*/, const CExponent /*b*/, const poly = NULL)
     {
       PrintS("CCacheHash::History(a, b, [p])!\n");
     }

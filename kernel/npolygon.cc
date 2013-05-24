@@ -395,6 +395,8 @@ newtonPolygon & newtonPolygon::operator = ( const newtonPolygon &np )
 //  Initialize a Newton polygon from a polynomial
 // ----------------------------------------------------------------------------
 
+template class KMatrix<Rational>;
+
 newtonPolygon::newtonPolygon( poly f, const ring s )
 {
   copy_zero( );
