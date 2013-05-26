@@ -1077,8 +1077,6 @@ void updateL(kStrategy strat)
 void updateLHC(kStrategy strat)
 {
 
-PrintS("\n\n kNoether = ");pWrite(strat->kNoether);
-
   int i = 0;
   assume(kTest_TS(strat));
   while (i <= strat->Ll)
@@ -1258,18 +1256,6 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
       if (TEST_OPT_FINDET)
         return;
         
-       PrintS("		The pair list L after first update "); PrintLn();
-		for(int iii=0;iii<=strat->Ll;iii++)
-			{
-			PrintLn();
-			PrintS("		L[");printf("%d",iii);Print("]: ");
-			PrintLn();
-			PrintS("		    ");pWrite(strat->L[iii].p1);
-			PrintS("		    ");pWrite(strat->L[iii].p2);
-			PrintS("		    ");pWrite(strat->L[iii].p);
-			}
-		PrintLn();
-       
       /*- cuts elements in L above noether and reorders L -*/
       updateLHC(strat);
       /*- reorders L with respect to posInL -*/
