@@ -283,7 +283,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         else if (fromNext)
           L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
         #ifdef HAVE_RINGS
-  			if((currRing->OrdSgn == -1)&&(strat->homog!=isHomog))
+  			if((rField_is_Ring(currRing)) && (currRing->OrdSgn == -1) && (strat->homog!=isHomog))
   				L->max = NULL;
   		//it changed max but tailRing = currRing
   		#endif
@@ -354,13 +354,13 @@ PrintS("\ncancelunit start: ");pWrite(L->p);
     if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))  
   		lc = p_GetCoeff(p,r);  
   	
-  #if ADIDEBUG
+  /*#if ADIDEBUG
   poly ppp;
   ppp=pInit();
   pSetExp(ppp,1,0);
   pSetCoeff0(ppp,lc);
   printf("\n lc = ");pWrite(ppp);	
-  #endif  
+  #endif */ 
 #endif 
 
 #ifdef HAVE_RINGS_LOC
@@ -5776,13 +5776,13 @@ void initS (ideal F, ideal Q, kStrategy strat)
       h.p = pCopy(F->m[i]);
       if (currRing->OrdSgn==-1)
       {
-            	#ifdef HAVE_RINGS
+            	/*#ifdef HAVE_RINGS
   			if (rField_is_Ring(currRing))
     			{
     			h.pCleardenom();
     			}
   			else
-				#endif
+				#endif*/
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }

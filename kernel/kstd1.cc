@@ -19,7 +19,7 @@
 # define MYTEST 1
 #endif /* ifndef NDEBUG */
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define ADIDEBUG_NF 0
 
 
@@ -1140,7 +1140,7 @@ void updateT(kStrategy strat)
 
   while (i <= strat->tl)
   {
-    p = strat->T[i];
+  	p = strat->T[i];
     deleteHC(&p,strat, TRUE);
     /*- tries to cancel a unit: -*/
     cancelunit(&p);
@@ -1198,7 +1198,7 @@ void firstUpdate(kStrategy strat)
     strat->red = redFirst;
     strat->use_buckets = kMoraUseBucket(strat);
 #else
-	if (! rField_is_Ring(currRing) || (currRing->OrdSgn != -1))
+	if ( (!rField_is_Ring(currRing)) || (currRing->OrdSgn != -1))
 		{
 		strat->red = redFirst;
     	strat->use_buckets = kMoraUseBucket(strat);
@@ -1211,7 +1211,7 @@ void firstUpdate(kStrategy strat)
     strat->posInT = posInT2;
     reorderT(strat);
 #else
-	if (! rField_is_Ring(currRing) || (currRing->OrdSgn != -1))
+	if ( (!rField_is_Ring(currRing)) || (currRing->OrdSgn != -1))
 		{
 		strat->posInT = posInT2;
 	    reorderT(strat);
@@ -1254,6 +1254,19 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
       firstUpdate(strat);
       if (TEST_OPT_FINDET)
         return;
+        
+       PrintS("		The pair list L after first update "); PrintLn();
+		for(int iii=0;iii<=strat->Ll;iii++)
+			{
+			PrintLn();
+			PrintS("		L[");printf("%d",iii);Print("]: ");
+			PrintLn();
+			PrintS("		    ");pWrite(strat->L[iii].p1);
+			PrintS("		    ");pWrite(strat->L[iii].p2);
+			PrintS("		    ");pWrite(strat->L[iii].p);
+			}
+		PrintLn();
+       
       /*- cuts elements in L above noether and reorders L -*/
       updateLHC(strat);
       /*- reorders L with respect to posInL -*/
@@ -1743,7 +1756,7 @@ loop_count = 1;
 
       // clear strat->P
       if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS || HAVE_RINGS_LOC
         pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
