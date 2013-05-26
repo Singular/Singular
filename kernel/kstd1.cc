@@ -19,7 +19,7 @@
 # define MYTEST 1
 #endif /* ifndef NDEBUG */
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 #define ADIDEBUG_NF 0
 
 
@@ -1076,6 +1076,9 @@ void updateL(kStrategy strat)
 */
 void updateLHC(kStrategy strat)
 {
+
+PrintS("\n\n kNoether = ");pWrite(strat->kNoether);
+
   int i = 0;
   assume(kTest_TS(strat));
   while (i <= strat->Ll)
@@ -1383,7 +1386,7 @@ void initSba(ideal F,kStrategy strat)
     strat->LazyPass *=4;
     strat->red2 = redHomog;
   }
-#ifdef HAVE_RINGS  //TODO Oliver
+#ifdef HAVE_RINGS || HAVE_RINGS_LOC  //TODO Oliver
   if (rField_is_Ring(currRing))
   {
     if(currRing->OrdSgn == -1)

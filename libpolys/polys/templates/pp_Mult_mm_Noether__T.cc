@@ -57,12 +57,21 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, i
     q = pNext(q) = r;
     #ifdef HAVE_RINGS
     if (rField_is_Ring(ri))
+    	{
     	if(n_IsZero(n_Mult__T(ln, pGetCoeff(p), ri),ri->cf)) 
-    		{pIter(p);}
+    		pIter(p);
+    	else
+    		{
+    		pSetCoeff0(q, n_Mult__T(ln, pGetCoeff(p), ri));
+    		pIter(p);
+    		}
+    	}
     else
     #endif
-    {pSetCoeff0(q, n_Mult__T(ln, pGetCoeff(p), ri));
-    pIter(p);}
+    {
+    pSetCoeff0(q, n_Mult__T(ln, pGetCoeff(p), ri));
+    pIter(p);
+    }
     
   } while (p != NULL);
 
