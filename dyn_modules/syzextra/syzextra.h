@@ -180,7 +180,20 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 };
 
 extern ideal id_Copy (const ideal, const ring);
+bool my_p_LmCmp (poly, poly, const ring);
 
+typedef poly TCacheKey;
+typedef poly TCacheValue;
+
+struct CCacheCompare
+{
+    const ring & m_ring; 
+    CCacheCompare(const ring& r): m_ring(r) {}   
+    inline bool operator() (const TCacheKey& l, const TCacheKey& r) { return my_p_LmCmp(l, r, m_ring); }
+};
+   
+typedef std::map<TCacheKey, TCacheValue, CCacheCompare> TP2PCache; // deallocation??? !!!
+typedef std::map<int, TP2PCache> TCache;
 
 /** @class SchreyerSyzygyComputation syzextra.h
  * 
@@ -204,7 +217,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
         m_syzLeads(NULL), m_syzTails(NULL),
         m_LS(NULL), m_lcm(m_idLeads, setting), 
-        m_div(m_idLeads, setting), m_checker(NULL, setting),
+        m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
         m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
     }
@@ -214,8 +227,8 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         SchreyerSyzygyComputationFlags(setting),
         m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
         m_syzLeads(syzLeads), m_syzTails(NULL),
-        m_LS(syzLeads), m_lcm(m_idLeads, setting), 
-        m_div(m_idLeads, setting), m_checker(NULL, setting),
+        m_LS(syzLeads), m_lcm(m_idLeads, setting),
+        m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
         m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
       if( __TAILREDSYZ__ && !__IGNORETAILS__)
@@ -252,13 +265,18 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     poly SchreyerSyzygyNF(const poly syz_lead, poly syz_2 = NULL) const;
 
+    /// High level caching function!!! 
     poly TraverseTail(poly multiplier, const int tail) const;
 
-    // called only from above and from outside (for testing)
+    // REMOVE?
+    /// called only from above and from outside (for testing)
     poly TraverseTail(poly multiplier, poly tail) const;
 
-    // TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
+    /// TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ? ???
     poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const;
+
+    /// low level computation...
+    poly ComputeImage(poly multiplier, const int tail) const;
 
     // 
     poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
@@ -324,8 +342,9 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     
     TTailTerms m_idTailTerms;
     */
-
    
+    mutable TCache m_cache; // cacher comp + poly -> poly! // mutable???
+
 /// TODO: look into m_idTailTerms!!!!!!!!!!!!!!!!!!!!!!!! map? heaps???
     // NOTE/TODO: the following globally shared buckets violate reentrance - they should rather belong to TLS!
     

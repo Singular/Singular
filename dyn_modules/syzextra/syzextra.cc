@@ -153,6 +153,53 @@ static int cmp_c_ds(const void *p1, const void *p2)
   return 0;  
 }
 
+   
+static int cmp_poly(const poly &a, const poly &b)
+{
+  const int YES = 1;
+  const int NO = -1;
+
+  const ring r =  (const ring) currRing; // TODO/NOTE: the structure is known: C, lp!!!
+
+  assume( r == currRing );
+
+  assume( a != NULL );
+  assume( b != NULL );
+
+  assume( p_LmTest(a, r) );
+  assume( p_LmTest(b, r) );
+  assume( p_GetComp(a, r) == 0 );
+  assume( p_GetComp(b, r) == 0 );
+   
+#ifndef NDEBUG
+  const int __DEBUG__ = 0;
+  if( __DEBUG__ )
+  {
+    PrintS("cmp_lex: a, b: \np1: "); dPrint(a, r, r, 2);
+    PrintS("b: "); dPrint(b, r, r, 2);
+    PrintLn();
+  }
+#endif
+
+  for (int v = rVar(r); v > 0; v--)
+  {
+    assume( v > 0 );
+    assume( v <= rVar(r) );
+
+    const signed int d = p_GetExp(a, v, r) - p_GetExp(b, v, r);
+
+    if( d > 0 )
+      return YES;
+
+    if( d < 0 )
+      return NO;
+
+    assume( d == 0 );
+  }
+
+  return 0;  
+}
+   
 END_NAMESPACE
 /* namespace SORT_c_ds */
 
@@ -249,7 +296,18 @@ void SchreyerSyzygyComputation::CleanUp()
   {
     kBucketDestroy(&m_spoly_bucket);
     m_spoly_bucket = NULL;
-  }  
+  }
+   
+  for( TCache::iterator it = m_cache.begin(); it != m_cache.end(); it++ )
+  {
+    TP2PCache& T = it->second;
+     
+    for(TP2PCache::iterator vit = T.begin(); vit != T.end(); vit++ )
+    {   
+      p_Delete( (&(vit->second)), m_rBaseRing);
+      p_Delete( const_cast<poly*>(&(vit->first)), m_rBaseRing);
+    }
+  }
 }
   /*
   for( TTailTerms::const_iterator it = m_idTailTerms.begin(); it != m_idTailTerms.end(); it++ )
@@ -284,7 +342,9 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
 
   if ( itr == m_hash.end() ) 
     return 2; // no such leading component!!!
-
+   
+  assume( itr->first == comp );
+   
   const bool bIdealCase = (comp == 0);    
   const bool bSyzCheck = syzChecker.IsNonempty(); // need to check even in ideal case????? proof?  "&& !bIdealCase"
 
@@ -719,7 +779,7 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
   
-  poly t = TraverseTail(aa, r);
+  poly t = TraverseTail(aa, r); 
 
   if( a2 != NULL )
   {
@@ -729,7 +789,7 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
     assume( r2 >= 0 && r2 < IDELEMS(T) );
 
-    t = p_Add_q(a2, p_Add_q(t, TraverseTail(aa2, r2), R), R);
+    t = p_Add_q(a2, p_Add_q(t, TraverseTail(aa2, r2), R), R); 
 
     p_Delete(&aa2, R);
   } else
@@ -1028,12 +1088,67 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   return result;
 }
 
+// namespace     {   
+
+// };
+
+bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; } // TODO: change to simple lex. memory compare!
+
+// NOTE: need p_Copy?????? for image + multiplier!!???
+// NOTE: better store complete syz. terms!!?
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) const
 {
-  // TODO: store (multiplier, tail) -.-^-.-^-.--> !
+  const ring& r = m_rBaseRing;
+   
   assume(m_idTails !=  NULL && m_idTails->m != NULL);
   assume( tail >= 0 && tail < IDELEMS(m_idTails) );
+   
+/*  return ComputeImage(multiplier, tail); */
+  
+  // TODO: store (multiplier, tail) -.-^-.-^-.--> !
+  TCache::iterator top_itr = m_cache.find(tail);
+   
+  if ( top_itr != m_cache.end() )
+  {
+     assume( top_itr->first == tail );
 
+     TP2PCache& T = top_itr->second;
+     
+     TP2PCache::iterator itr = T.find(multiplier);
+     
+     if( itr != T.end() ) // Yey - Reuse!!!
+     {
+       assume( p_LmEqual(itr->first, multiplier, r) ); 
+       poly p = p_Copy(itr->second, r); // no copy???
+       if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r) ) // normalize coeffs!?
+       {
+	 number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first), r); 
+         p = p_Mult_nn(p, n, r); 
+	 n_Delete(&n, r);
+       }
+	
+       return p;
+     }
+     
+     const poly p = ComputeImage(multiplier, tail);
+     T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
+//     T[ multiplier ] = p;
+     
+     return p_Copy(p, r);
+  }
+  CCacheCompare o(r); TP2PCache T(o);
+
+  const poly p = ComputeImage(multiplier, tail);
+   
+  T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
+   
+  m_cache.insert( TCache::value_type(tail, T) );
+
+  return p_Copy(p, r);
+}
+
+poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) const
+{
   const poly t = m_idTails->m[tail]; // !!!
 
   if(t != NULL)
@@ -1042,7 +1157,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   return NULL;
 }
 
-
+   
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 {
   assume( !__IGNORETAILS__ );
@@ -1136,7 +1251,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   const poly t = TraverseTail(b, c); // T->m[c];
 
   if( t != NULL )
-    s = p_Add_q(s, t, r);  
+    s = p_Add_q(s, t, r); 
 
   return s;
 }
@@ -1446,7 +1561,8 @@ bool CReducerFinder::IsDivisible(const poly product) const
 
   if( it == m_hash.end() )
     return false;
-
+  // assume comp!
+ 
   const TReducers& reducers = it->second;
 
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
@@ -1535,7 +1651,7 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
     {
       m_active = false;
       
-      m_itr = m_reds.m_hash.find(m_comp);
+      m_itr = m_reds.m_hash.find(m_comp); 
 
       if( m_itr == m_reds.m_hash.end() )
         return false;
@@ -1709,6 +1825,8 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
   if( it == m_hash.end() )
     return NULL;
 
+  // assume comp!
+ 
   assume( m_L != NULL );
 
   const TReducers& reducers = it->second;
