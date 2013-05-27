@@ -72,9 +72,9 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   if test "x${ENABLE_OPTIMIZATION}" == xyes; then
    AC_MSG_ERROR([Please note that you have enabled the debug and optimization flags, which may not work well together (try \`--disable-optimizationflags')!])
   fi
- else
-  AC_DEFINE([OM_NDEBUG],1,"Disable OM Debug")
-  AC_DEFINE([NDEBUG],1,"Disable Debug")
+# else
+#  AC_DEFINE([OM_NDEBUG],1,"Disable OM Debug")
+#  AC_DEFINE([NDEBUG],1,"Disable Debug")
  fi
 
 # SING_SHOW_FLAGS([checking flags....])
@@ -102,7 +102,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  fi
  
  if test "x${ENABLE_OPTIMIZATION}" != xno; then
-  OPTFLAGS="-O2 -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv"
+  OPTFLAGS="-DOM_NDEBUG -DNDEBUG -O2 -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv"
   #  -O3 - crashes gcc???!!!  
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${OPTFLAGS}, [CFLAGS])
