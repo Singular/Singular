@@ -4351,7 +4351,7 @@ EXAMPLE:  locusdg(GG); shows an example"
           }
         }
       }
-      G=nnGP;
+      def G=nnGP;
     }
     kill @RP; kill @P; kill @R;
     return(locus(G));
