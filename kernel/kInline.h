@@ -25,9 +25,6 @@
 
 #include <kernel/polys.h>
 
-#define ADIDEBUG 0
-
-
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN

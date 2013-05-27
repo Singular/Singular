@@ -14,9 +14,9 @@
 #define MORA_USE_BUCKETS
 
 #ifndef NDEBUG
-# define MYTEST 1
+# define MYTEST 0
 #else /* ifndef NDEBUG */
-# define MYTEST 1
+# define MYTEST 0
 #endif /* ifndef NDEBUG */
 
 #define ADIDEBUG 0
@@ -1548,8 +1548,10 @@ loop_count = 1;
 
 #ifdef HAVE_TAIL_RING
 //  if (strat->homog && strat->red == redFirst)
-  kStratInitChangeTailRing(strat);
+	if((hilb==NULL)||(strat->homog))
+	kStratInitChangeTailRing(strat);
 #endif
+
   if (BVERBOSE(23))
   {
     kDebugPrint(strat);
@@ -1634,9 +1636,7 @@ loop_count = 1;
 				pWrite(strat->T[iii].p);
 			}
 		PrintLn();
-		PrintS("		The old partial Standard Basis Shdl -- at the beg of loop ");
-		printf("%d",loop_count);PrintS(" -- is :"); PrintLn();
-		idPrint(strat->Shdl);
+		
 		#endif /* ADIDEBUG */	
 		#endif
 
@@ -1786,9 +1786,7 @@ loop_count = 1;
 		pWrite(strat->T[iii].p);
 		}
 	PrintLn();
-	PrintS("		The new partial Standard Basis Shdl -- at the end of loop ");
-	printf("%d",loop_count);PrintS(" -- is "); PrintLn();
-	idPrint(strat->Shdl);
+	
 	loop_count++;
 	#endif /* ADIDEBUG */	
   }

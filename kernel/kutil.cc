@@ -16,9 +16,9 @@
 #include "mod2.h"
 
 #ifndef NDEBUG
-# define MYTEST 1
+# define MYTEST 0
 #else /* ifndef NDEBUG */
-# define MYTEST 1
+# define MYTEST 0
 #endif /* ifndef NDEBUG */
 
 
@@ -8129,13 +8129,21 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
                                   // might be too strong
 #ifdef HAVE_RINGS
                                   (strat->homog && currRing->pFDeg == p_Deg && !(rField_is_Ring(currRing))), // TODO Oliver
+                                  
+                                  
 #else
                                   (strat->homog && currRing->pFDeg == p_Deg), // omit_degree
 #endif
                                   (strat->ak==0), // omit_comp if the input is an ideal
                                   expbound); // exp_limit
 
-  if (new_tailRing == currRing) return TRUE;
+if (new_tailRing == currRing) return TRUE;
+
+//Indeed, the condition pFDeg == p_Deg is too strong. What to do?
+  #ifdef HAVE_RINGS
+   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
+    return TRUE;
+  #endif
 
   strat->pOrigFDeg_TailRing = new_tailRing->pFDeg;
   strat->pOrigLDeg_TailRing = new_tailRing->pLDeg;
