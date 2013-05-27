@@ -65,7 +65,8 @@ struct SchreyerSyzygyComputationFlags
   //      __SYZCHECK__(attr.__SYZCHECK__),
         __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
-        __SYZNUMBER__(attr.__SYZNUMBER__), m_rBaseRing(attr.m_rBaseRing)
+        __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__), 
+        m_rBaseRing(attr.m_rBaseRing)
     {}   
 
   /// output all the intermediate states
@@ -89,7 +90,10 @@ struct SchreyerSyzygyComputationFlags
 
   /// Syzygy level (within a resolution)
   const int __SYZNUMBER__; 
-  
+
+  /// output lifting tree
+  const int __TREEOUTPUT__;
+
   /// global base ring
   const ring m_rBaseRing;
 };

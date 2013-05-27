@@ -44,6 +44,7 @@ PROCEDURES:
   Scontinue(len)  extend currently active resolution by (at most) len syszygies
 ";
 
+
 static proc prepareSyz( module I, list # )
 {
   int i;
@@ -578,7 +579,7 @@ static proc SSinit(def M)
     @SYZCHECK = attrib(SSinit, "SYZCHECK");
   }
 
-  int @KERCHECK = @DEBUG;
+  int @KERCHECK = 1; // @DEBUG;
 
   if( typeof( attrib(SSinit, "KERCHECK") ) == "int" )
   {
@@ -590,6 +591,13 @@ static proc SSinit(def M)
   if( typeof( attrib(SSinit, "IGNORETAILS") ) == "int" )
   {
     @IGNORETAILS = attrib(SSinit, "IGNORETAILS");
+  }
+
+  int @TREEOUTPUT = 0;
+
+  if( typeof( attrib(SSinit, "TREEOUTPUT") ) == "int" )
+  {
+    @TREEOUTPUT = attrib(SSinit, "TREEOUTPUT");
   }
 
   
@@ -782,8 +790,10 @@ static proc SSinit(def M)
   attrib(S, "SYZCHECK", @SYZCHECK);
   attrib(S, "KERCHECK", @KERCHECK);
   attrib(S, "IGNORETAILS", @IGNORETAILS);
-
+  attrib(S, "TREEOUTPUT", @TREEOUTPUT);
   attrib(S, "SYZNUMBER", 0);
+  
+  "attrib(S,'TREEOUTPUT'): ", attrib(S, "TREEOUTPUT");
   
   if( @DEBUG )
   {
@@ -1372,6 +1382,8 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
 
   if( @KERCHECK )
   {
+    int @TREEOUTPUT  = attrib(basering, "TREEOUTPUT");
+  
     vector s = 0;
 
     if( size(t) > 0 )
@@ -1385,6 +1397,8 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
         poly @b = leadmonomial(s);
 
         def @c = leadcomp(s); int k = int(@c);
+
+	if( @TREEOUTPUT ){ "\CHILD{", (s), "}{", ( @b*L[k]), "}"; }
 
         s = s + SSTraverseTail(@b, T[k], L, T, #); // !!!   
       }
@@ -1533,10 +1547,14 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 
   if( @KERCHECK )
   {
+    int @TREEOUTPUT  = attrib(basering, "TREEOUTPUT");
+    
     def spoly = leadmonomial(syz_lead) * T[int(leadcomp(syz_lead))] 
               + leadmonomial(syz_2)    * T[int(leadcomp(syz_2))];
 
     vector @tail = syz_2;
+    
+    poly @b; int k; 
 
     while (size(spoly) > 0)
     {
@@ -1544,8 +1562,14 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 
       if( size(syz_2) != 0)
       {          
-        spoly = spoly + leadmonomial(syz_2) * T[int(leadcomp(syz_2))];
+        @b = leadmonomial(syz_2);
+	k =  int(leadcomp(syz_2));
+	
+	if( @TREEOUTPUT ){ "\CHILD{", (syz_2), "}{", ( lead(spoly)), "}"; }
+	
+        spoly = spoly + @b * T[k];
         @tail = @tail + syz_2;
+	
       }
     }
     
@@ -1604,13 +1628,15 @@ proc SSComputeSyzygy(def L, def T)
 
   if( @KERCHECK )
   {
-    int @SYZCHECK = attrib(basering, "SYZCHECK");
-    int @LEAD2SYZ = attrib(basering, "LEAD2SYZ");
-    int @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
-    int @HYBRIDNF = attrib(basering, "HYBRIDNF");
+    int @SYZCHECK    = attrib(basering, "SYZCHECK");
+    int @LEAD2SYZ    = attrib(basering, "LEAD2SYZ");
+    int @TAILREDSYZ  = attrib(basering, "TAILREDSYZ");
+    int @HYBRIDNF    = attrib(basering, "HYBRIDNF");
     int @IGNORETAILS = attrib(basering, "IGNORETAILS");
+    int @TREEOUTPUT  = attrib(basering, "TREEOUTPUT");
 
-    int @SYZNUMBER = attrib(basering,"SYZNUMBER");
+    int @SYZNUMBER   = attrib(basering,"SYZNUMBER");
+    
     if( @HYBRIDNF == 2 )
     {
       if( @SYZNUMBER < 3 ){ @HYBRIDNF = 1; } else { @HYBRIDNF = 0; }
@@ -1647,21 +1673,25 @@ proc SSComputeSyzygy(def L, def T)
       {
         // leading syz. term:
         a = LL[k]; 
-
+	
         if( !@IGNORETAILS )
         {
           c = leadcomp(a); r = int(c); aa = leadmonomial(a);
+	  
+	  if( @TREEOUTPUT ){ "\ROOT{", (lead(a)), "}"; }
           
           // NF reduction:
           if( @HYBRIDNF == 0 ) // Traverse approach:
-          {        
+          {
             @tail = SSTraverseTail(aa, T[r], L, T, LS);
 
             // get the 2nd syzygy term...
             if( @LEAD2SYZ ) // with the 2nd syz. term:
             {      
               a2 = LL2[k]; c = leadcomp(a2); r = int(c); aa = leadmonomial(a2);
-
+	      
+	      if( @TREEOUTPUT ){ "\CHILD{", (lead(a2)), "}{", ( aa*L[r]), "}"; }
+	      
               @tail = a2 + @tail + SSTraverseTail(aa, T[r], L, T, LS);
             } else
             {
@@ -1688,6 +1718,8 @@ proc SSComputeSyzygy(def L, def T)
                 m2_end(666);
               }
             }
+	    
+	    if( @TREEOUTPUT ){ "\CHILD{", (a2), "}{", ( aa*L[r]), "}"; }
 
             @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
           }
@@ -2559,8 +2591,9 @@ proc TestSSresAttribs(def M, list #)
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
 
 
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
@@ -2610,7 +2643,8 @@ proc testSimple(list #)
   // TODO: only for now!!
   attrib(SSinit, "DEBUG", (DEBUG > 0)); 
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
-  attrib(SSinit, "KERCHECK", 1); 
+  attrib(SSinit, "KERCHECK", 0); 
+  attrib(SSinit, "TREEOUTPUT", 1); 
   attrib(SSinit, "PROFILE", 0);
 
   ring r; r; ideal M = maxideal(1); 
@@ -2658,7 +2692,8 @@ proc testAGR(list #)
   attrib(SSinit, "DEBUG", 0); 
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 0); 
-  attrib(SSinit, "PROFILE", 1); 
+  attrib(SSinit, "TREEOUTPUT", 0); 
+  attrib(SSinit, "PROFILE", 0); 
  
 //  option(prot);
 
@@ -2850,6 +2885,7 @@ proc testAGRhard(list #)
   attrib(SSinit, "DEBUG", 0); 
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 0); 
+  attrib(SSinit, "TREEOUTPUT", 0);
   attrib(SSinit, "PROFILE", 1); 
  
 //  option(prot);

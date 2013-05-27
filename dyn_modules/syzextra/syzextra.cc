@@ -460,7 +460,7 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
 
 #ifndef NDEBUG
   if( TEST_OPT_PROT | 1)
-    Print("      **!!**      SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing(): X: {c: %lu, C: %lu, P: %lu} + %lu\n", pp[1], pp[2], pp[3], pp[0]);
+    Print("%%      **!!**      SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing(): X: {c: %lu, C: %lu, P: %lu} + %lu\n", pp[1], pp[2], pp[3], pp[0]);
 #endif
    
 #ifndef NDEBUG
@@ -778,17 +778,31 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
-  
+  if( __TREEOUTPUT__ )
+  {
+     PrintS("%%%% BEGIN LIFTPART DIAGRAMM\n");
+     PrintS("\\begin{ROOTTREE}{"); dPrint(a, R, R, 0);PrintS("}");
+//    PrintS("\\ROOTRESULT{"); dPrint(t, R, R, 0); PrintS("}");	
+//     PrintS("\\end{ROOTTREE}\n");
+  }
+   
   poly t = TraverseTail(aa, r); 
 
   if( a2 != NULL )
   {
     assume( __LEAD2SYZ__ );
 
+    // replace the following... ?
     const int r2 = p_GetComp(a2, R) - 1; poly aa2 = leadmonom(a2, R); // :(
 
     assume( r2 >= 0 && r2 < IDELEMS(T) );
 
+    if( __TREEOUTPUT__ )
+    {
+//       PrintS("\\CONSIDERTERM{"); dPrint(spoly, r, r, 0); PrintS("}\n");
+       PrintS("\\CHILDNODE{"); dPrint(a2, R, R, 0); PrintS("}\n");
+    }
+     
     t = p_Add_q(a2, p_Add_q(t, TraverseTail(aa2, r2), R), R); 
 
     p_Delete(&aa2, R);
@@ -796,7 +810,15 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
     t = p_Add_q(t, ReduceTerm(aa, L->m[r], a), R);
 
   p_Delete(&aa, R);
-
+   
+  if( __TREEOUTPUT__ )
+  {   
+    PrintS("\\ROOTRESULT{"); dPrint(t, R, R, 0); PrintS("}");	
+    PrintS("\\end{ROOTTREE}\n");
+  }
+   
+     
+   
   return t;
 }
 
@@ -830,7 +852,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     if( TEST_OPT_PROT | 1)
     {
       t = getTimer(); r = getRTimer();
-      Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
+      Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
     }
 #endif     
     ComputeLeadingSyzygyTerms( __LEAD2SYZ__ && !__IGNORETAILS__ ); // 2 terms OR 1 term!
@@ -838,7 +860,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     if( TEST_OPT_PROT | 1)
     {
       t = getTimer() - t; r = getRTimer() - r;
-      Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
+      Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
     }
 #endif
      
@@ -864,7 +886,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
       if( TEST_OPT_PROT | 1 )
       {
         t = getTimer(); r = getRTimer();
-        Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
+        Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
       }
 #endif
        
@@ -873,7 +895,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
       if( TEST_OPT_PROT | 1)
       {
         t = getTimer() - t; r = getRTimer() - r;
-        Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
+        Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
       }
 #endif
     }     
@@ -883,7 +905,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   if( TEST_OPT_PROT | 1)
   {
     t = getTimer(); r = getRTimer();
-    Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
+    Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
   }
 #endif
    
@@ -896,7 +918,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     // Splitting 2-terms Leading syzygy module
     if( a2 != NULL )
       pNext(a) = NULL;
-
+     
     if( __IGNORETAILS__ )
     {
       TT->m[k] = NULL;
@@ -921,7 +943,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   if( TEST_OPT_PROT | 1)
   {
     t = getTimer() - t; r = getRTimer() - r;
-    Print("%5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
+    Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
   }
 #endif   
 
@@ -986,6 +1008,12 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
   assume( syz_lead != NULL );
 
+  if( __TREEOUTPUT__ )
+  {
+     PrintS("%%%% BEGIN LIFTHYBRID DIAGRAMM\n");
+     PrintS("\\begin{ROOTTREE}{"); dPrint(syz_lead, r, r, 0); PrintS("}");
+  }
+   
   if( syz_2 == NULL )
   {
     const int rr = p_GetComp(syz_lead, r) - 1; 
@@ -993,22 +1021,30 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     assume( rr >= 0 && rr < IDELEMS(T) );
     assume( rr >= 0 && rr < IDELEMS(L) );
 
-
 #if NOPRODUCT
     syz_2 = m_div.FindReducer(syz_lead, L->m[rr], syz_lead, m_checker);
 #else    
     poly aa = leadmonom(syz_lead, r); assume( aa != NULL); // :(
     aa = p_Mult_mm(aa, L->m[rr], r);
 
+    if( __TREEOUTPUT__ )
+    {
+      PrintS("\\CONSIDERTERM{"); dPrint(aa, r, r, 0); PrintS("}\n");
+    }
+     
     syz_2 = m_div.FindReducer(aa, syz_lead, m_checker);
 
     p_Delete(&aa, r);
 #endif
     
-    assume( syz_2 != NULL ); // by construction of S-Polynomial    
   }
+   
+  assume( syz_2 != NULL ); // by construction of S-Polynomial    
 
-
+  if( __TREEOUTPUT__ )
+  {
+    PrintS("\\CHILDNODE{"); dPrint(syz_2, r, r, 0); PrintS("}\n");
+  }
   
   assume( syz_2 != NULL );
 
@@ -1066,6 +1102,12 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
       c = p_GetComp(t, r) - 1;
 
       assume( c >= 0 && c < IDELEMS(T) );
+       
+      if( __TREEOUTPUT__ )
+      {
+         PrintS("\\CONSIDERTERM{"); dPrint(spoly, r, r, 0); PrintS("}\n");
+         PrintS("\\CHILDNODE{"); dPrint(t, r, r, 0); PrintS("}\n");
+      }
 
       kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], 0); // pLength(T->m[c])?
 //      spoly = p_Add_q(spoly, pp_Mult_qq(p, T->m[c], r), r);
@@ -1085,6 +1127,13 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   sBucketClearAdd(tail, &result, &len); // TODO: use Merge with sBucket???
   assume( pLength(result) == len );
      
+  if( __TREEOUTPUT__ )
+  {   
+    PrintS("\\ROOTRESULT{"); dPrint(result, r, r, 0); PrintS("}");	
+    PrintS("\\end{ROOTTREE}\n");
+  }
+   
+
   return result;
 }
 
@@ -1108,6 +1157,13 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   // TODO: store (multiplier, tail) -.-^-.-^-.--> !
   TCache::iterator top_itr = m_cache.find(tail);
    
+  if( __TREEOUTPUT__ )
+  {
+     PrintS("\\begin{ROOTTREE}{"); dPrint(multiplier, r, r, 0);Print("*gen(%d)}", tail);
+//    PrintS("\\ROOTRESULT{"); dPrint(t, R, R, 0); PrintS("}");	
+//     PrintS("\\end{ROOTTREE}\n");
+  }
+   
   if ( top_itr != m_cache.end() )
   {
      assume( top_itr->first == tail );
@@ -1126,6 +1182,12 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
          p = p_Mult_nn(p, n, r); 
 	 n_Delete(&n, r);
        }
+
+       if( __TREEOUTPUT__ )
+       {
+         PrintS("\\REUSEROOTRESULT{"); dPrint(p, r, r, 0); PrintS("}\n");
+         PrintS("\\end{ROOTTREE}\n");
+       }
 	
        return p;
      }
@@ -1134,16 +1196,26 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
      T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
 //     T[ multiplier ] = p;
      
+     if( __TREEOUTPUT__ )
+     {
+       PrintS("\\STOREROOTRESULT{"); dPrint(p, r, r, 0); PrintS("}");	
+       PrintS("\\end{ROOTTREE}\n");
+     }
      return p_Copy(p, r);
   }
   CCacheCompare o(r); TP2PCache T(o);
 
   const poly p = ComputeImage(multiplier, tail);
-   
+
   T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
    
   m_cache.insert( TCache::value_type(tail, T) );
 
+  if( __TREEOUTPUT__ )
+  {
+    PrintS("\\STOREROOTRESULT{"); dPrint(p, r, r, 0); PrintS("}");	
+    PrintS("\\end{ROOTTREE}\n");
+  }
   return p_Copy(p, r);
 }
 
@@ -1236,6 +1308,12 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     // NOTE: only LT(term4reduction) should be used in the following:
     poly product = pp_Mult_mm(multiplier, term4reduction, r);
     s = m_div.FindReducer(product, syztermCheck, m_checker);
+     
+    if( __TREEOUTPUT__ && (s != NULL) )
+    {
+      PrintS("\\CONSIDERTERM{"); dPrint(product, r, r, 0); PrintS("}\n");
+    }
+     
     p_Delete(&product, r);
 #endif
   }
@@ -1243,13 +1321,29 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   if( s == NULL ) // No Reducer?
     return s;
 
+  if( __TREEOUTPUT__ )
+  {
+    PrintS("\\CHILDNODE{"); dPrint(s, r, r, 0); PrintS("}\n");
+  }
+
   poly b = leadmonom(s, r);
 
   const int c = p_GetComp(s, r) - 1;
   assume( c >= 0 && c < IDELEMS(T) );
 
+  if( __TREEOUTPUT__ )
+  {
+     PrintS("\\begin{ROOTTREE}{"); dPrint(s, r, r, 0); PrintS("}");
+  }
+   
   const poly t = TraverseTail(b, c); // T->m[c];
 
+  if( __TREEOUTPUT__ )
+  {
+    PrintS("\\ROOTRESULT{"); dPrint(t, r, r, 0); PrintS("}");	
+    PrintS("\\end{ROOTTREE}\n");
+  }
+   
   if( t != NULL )
     s = p_Add_q(s, t, r); 
 
@@ -1281,6 +1375,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     __HYBRIDNF__( atGetInt(rootRingHdl, "HYBRIDNF", 2) ),
     __IGNORETAILS__( atGetInt(rootRingHdl, "IGNORETAILS", 0) ),
     __SYZNUMBER__( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
+    __TREEOUTPUT__( atGetInt(rootRingHdl, "TREEOUTPUT", 0) ),
     m_rBaseRing( rootRingHdl->data.uring )
 {    
 #ifndef NDEBUG
@@ -1292,6 +1387,8 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     Print("     LEAD2SYZ: \t%d\n", __LEAD2SYZ__);
     Print("   TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
     Print("  IGNORETAILS: \t%d\n", __IGNORETAILS__);
+    Print("   TREEOUTPUT: \t%d\n", __TREEOUTPUT__);
+
   }
 #endif
    
