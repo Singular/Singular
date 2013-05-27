@@ -16,6 +16,7 @@ PURPOSE:  Comprehensive Groebner Systems, Groebner Cover, Canonical Forms,
           published in a forthcoming paper by Abanades, Botana, Montes, Recio:
           \''Geometrical locus of points using the Groebner cover\''.
 
+
           The central routine is grobcov. Given a parametric
           ideal, grobcov outputs its Canonical Groebner Cover, consisting
           of a set of pairs of (basis, segment). The basis (after
@@ -126,7 +127,14 @@ locus(G):   Special routine for determining the locus of points
                    given in a forthcoming paper by Abanades, Botana, Montes, Recio:
                    ''Geometrical locus of points using the Groebner cover''
 
-locusto:    Transforms the output of locus to a string that
+locusdg(G):  Is a special routine for computing the locus in dinamical geometry.
+                    It detects automatically a possible point that is to be avoided by the mover,
+                    whose coordinates must be the last two coordinates in the definition of the ring.
+                    If such a point is detected, then it eliminates the segments of the grobcov
+                    depending on the point that is to be avoided.
+                    Then it calls locus.
+
+locusto(L):  Transforms the output of locus to a string that
                   can be reed from different computational systems.
 
 SEE ALSO: compregb_lib
@@ -3738,6 +3746,7 @@ proc groupKSWsegments(list T)
 
 //******************** Begin locus ******************************
 
+
 // indepparameters
 // Auxiliary routine to detect "Special" components of the locus
 // Input: ideal B
@@ -3747,40 +3756,18 @@ proc groupKSWsegments(list T)
 proc indepparameters(ideal B)
 {
   def R=basering;
-  ideal B0; ideal B00;
-  int te;
-  int i; int j;
-  list s;
-  poly t;
-  ideal v=variables(B); // all the variables on B but not the parameters
-  setring(@RP);
-  ideal vv=imap(R,v);
+  ideal v=variables(B);
+  setring @RP;
   def BP=imap(R,B);
-  option(redSB);
-  BP=std(BP);
+  def vp=imap(R,v);
+  ideal varpar=variables(BP);
+  int te;
+  te=equalideals(vp,varpar);
   setring(R);
-  B0=imap(@RP,BP);
-  for(i=1;i<=size(B0);i++)
-  {
-    if (equalideals(variables(B0[i]),ideal(0))){;}
-    else {B00[size(B00)+1]=B0[i];}
-  }
-  for(i=1;i<=size(B00);i++)
-  {
-    s=factorize(B00[i]);
-    for(j=1;j<=size(s[1]);j++)
-    {
-      if (equalideals(variables(s[1][j]),ideal(0))){;}
-      else{B00[i]=s[1][j];}
-    }
-  }
-  setring(@RP);
-  BP=imap(R,B00);
-  ideal vp=variables(BP);
-  if(equalideals(vv,vp)){te=1;} else{te=0;}
-  setring(R);
-  return(te);
+  if(te){return(1);}
+  else{return(0);}
 }
+
 
 // dimP0: Auxiliar routine
 // if the dimension in @P of an ideal in the parameters has dimension 0 then it returns 0
@@ -4036,9 +4023,6 @@ proc  addtolocalclosed(list L1,list L2)
 //                given in a forthcoming paper by Abanades, Botana, Montes Recio.
 
 // input:      The output G of the grobcov (in generic representation, which is the default)
-//                It allows an extra  pair of arguments as option: locus(G,"minus",N)
-//                where N is the ideal representing some excluded point of the mover
-//                if there is some point that the mover should avoid.
 // output:
 //         list, the canonical P-representation of the Normal and Non-Normal locus:
 //              The Normal locus has two kind of components: Normal and Special.
@@ -4059,7 +4043,7 @@ proc  addtolocalclosed(list L1,list L2)
 //         The components are given in canonical P-representation of the subset.
 //              If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
 //              gives the depth of the component.
-proc locus(list GG,list #)
+proc locus(list GG)
 "USAGE:   locus(G);
                The input must be the grobcov  of a parametrical ideal
 RETURN:  The  locus.
@@ -4077,42 +4061,12 @@ KEYWORDS: geometrical locus, locus, loci.
 EXAMPLE:  locus; shows an example"
 {
   int t1=1; int t2=1;
-  list Opc=#;
   def R=basering;
   setglobalrings();
-  string ty;
   list G1; list G2;
-  int i; int d; int j; int k; int i0=1; ideal minu; int te;
-  for(i=1;i<=size(Opc) div 2;i++)
-  {
-      if(Opc[2*i-1]=="minus")
-      {
-        minu=Opc[2*i];
-        setring(@RP);
-        list nGP;
-        def GP=imap(R,GG);
-        ideal BP;
-        def minup=imap(R,minu);
-        for(j=1;j<=size(GP);j++)
-        {
-          te=1; k=1;
-          BP=std(GP[j][2]);
-          while((te==1) and (k<=size(minup)))
-          {
-            if((reduce(minup[k],BP))!=0){te=0;}
-            k++;
-          }
-          if(te==0){nGP[size(nGP)+1]=GP[j];}
-        }
-        setring(R);
-        GG=imap(@RP,nGP);
-     }
-  }
-  list G;
-  for(i=i0;i<=size(GG);i++)
-  {
-    G[i+1-i0]=GG[i];
-  }
+  def G=GG;
+  int i; int d; int j; int k;
+  t1=1;
   for(i=1;i<=size(G);i++)
   {
     attrib(G[i][1],"IsSB",1);
@@ -4149,9 +4103,23 @@ EXAMPLE:  locus; shows an example"
      }
   }
   setring(R);
+  ideal h;
   if(t1)
   {
     def P1=imap(@RP,P1RP);
+    for(i=1;i<=size(P1);i++)
+    {
+      for(j=1;j<=size(P1[i][3]);j++)
+      {
+        h=factorize(P1[i][3][j],1);
+        P1[i][3][j]=h[1];
+        for(k=2;k<=size(h);k++)
+        {
+          P1[i][3][j]=P1[i][3][j]*h[k];
+        }
+        //P1[i][3][j]=normalize(P1[i][3][j]);
+      }
+    }
   }
   else{list P1;}
   for(i=1;i<=size(P1);i++)
@@ -4164,7 +4132,7 @@ EXAMPLE:  locus; shows an example"
   {
     for(k=1;k<=size(G2[i][3]);k++)
     {
-      P2[size(P2)+1]=list(G2[i][3][k][1],G2[i][3][k][2]); // ,ty
+      P2[size(P2)+1]=list(G2[i][3][k][1],G2[i][3][k][2]);
     }
   }
   setring @P;
@@ -4209,26 +4177,10 @@ example
 {"EXAMPLE:"; echo = 2;
   ring R=(0,a,b),(x,y),dp;
   short=0;
-  ideal H=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
-  "System H = "; H; " ";
-  def G=grobcov(H);
-  //"grobcov(H)="; G; " ";
-  def L=locus(G);
-  "locus(G)="; L; " ";
-  kill R;
-  ring R=(0,x5,x6),(x1,x2,x3,x4),dp;
-  ideal S=(x1-3)^2+(x2-1)^2-9,
-             (4-x2)*(x3-3)+(x1-3)*(x4-1),
-             (3-x1)*(x3-x1)+(4-x2)*(x4-x2),
-             (4-x4)*x5+(x3-3)*x6+3*x4-4*x3,
-             (x5-x1)^2+(x6-x2)^2-(x1-x3)^2-(x2-x4)^2;
- "System S="; S;" ";
- def G=grobcov(S);
-// "grobcov(S)="; G;
- ideal N=x1-3,x2-4;
- "N="; N;" ";
-  def L=locus(G,"minus",N);
- "locus(G,minus,N)="; L;" ";
+  "Concoid";
+  ideal S96=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
+  "System="; S96; " ";
+  locus(grobcov(S96));
 }
 
 
@@ -4246,8 +4198,8 @@ proc locusto(list L)
 
 RETURN: The locus in string standard form
 NOTE:     It can only be called after computing the locus(grobcov(F)) of the
-          parametrical ideal.
-          The basering R, must be of the form Q[a,b,..][x,y,..].
+              parametrical ideal.
+              The basering R, must be of the form Q[a,b,..][x,y,..].
 KEYWORDS: geometrical locus, locus, loci.
 EXAMPLE:  locusto; shows an example"
 {
@@ -4297,14 +4249,126 @@ example
 {"EXAMPLE:"; echo = 2;
   ring R=(0,a,b),(x,y),dp;
   short=0;
-  ideal H=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
-  def G=grobcov(H);
-  "grobcov(H)="; G; " ";
-  def Gp=locus(G);
-  "locus(G)="; Gp;
-  def L=locusto(Gp); " ";
-  "locusto(Gp)="; L;
+  ideal S96=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
+  "System="; S96; " ";
+  locusto(locus(grobcov(S96)));
 }
+
+// locusdg is the routine for computing the locus in dinamical geometry.
+//    It detects automatically a possible point that is to be avoided by the mover,
+//    whose coordinates must be the last two coordinates in the definition of the ring.
+//    If such a point is detected, then it eliminates the segments of the grobcov that
+//    have this point as solution.
+//    Then it calls locus.
+proc locusdg(list GG)
+"USAGE:  locusdg(GG) ;
+          The argument must be the output of grobcov
+RETURN:  The  components of the locus of points in dinamical geometry
+NOTE:  The basering R, must be of the form Q[a][x], a=parameters,
+          x=variables, and the mover coordinates must be the two last variables in the
+          definition of the ring.
+KEYWORDS: ring, locus, grobcov
+EXAMPLE:  locusdg(GG); shows an example"
+{
+  def R=basering;
+  int i; int j; int k;
+  def B0=GG[1][2];
+  if (equalideals(B0,ideal(1)))
+  {
+    return(locus(GG));
+  }
+  else
+  {
+    int n=nvars(R);
+    ideal vmov=var(n-1),var(n);
+    ideal N;
+    intvec xw; intvec yw;
+    for(i=1;i<=n-1;i++){xw[i]=0;}
+    xw[n]=1;
+    for(i=1;i<=n;i++){yw[i]=0;}
+    yw[n-1]=1;
+    poly px; poly py;
+    int te=1;
+    i=1;
+    while( te and i<=size(B0))
+    {
+      if((deg(B0[i],xw)==1) and (deg(B0[i])==1)){px=B0[i]; te=0;}
+      i++;
+    }
+    i=1; te=1;
+    while( te and i<=size(B0))
+    {
+      if((deg(B0[i],yw)==1) and (deg(B0[i])==1)){py=B0[i]; te=0;}
+      i++;
+    }
+    N=px,py;
+    setglobalrings();
+    te=indepparameters(N);
+    if(te)
+    {
+      //"T_N="; N;
+      // eliminate segments of GG where N is contained in the basis
+      list nGP;
+      def GP=GG;
+      ideal BP;
+      for(j=1;j<=size(GP);j++)
+      {
+        te=1; k=1;
+        BP=GP[j][2];
+        while((te==1) and (k<=size(N)))
+        {
+          if(pdivi(N[k],BP)[1]!=0){te=0;}
+          k++;
+        }
+        if(te==0){nGP[size(nGP)+1]=GP[j];}
+      }
+      //"T_nGP="; nGP;
+      // Now eliminate components for which the basis has dim>0, and all elements non reducing to 0
+      // modulo N do not contain the mover coordinates
+      list nnGP; poly r;
+      for(j=1; j<=size(nGP);j++)
+      {
+        if(not(indepparameters(nGP[j][2])))
+        {
+          if(dim(std(nGP[j][1]))==0){nnGP[size(nnGP)+1]=nGP[j];}
+          else
+          {
+            te=1; k=1;
+            while(te and k<=size(nGP[2]))
+            {
+              r=pdivi(nGP[j][2][k],N)[1];
+              if(r==0){k++;}
+              else
+              {
+                if(not(subset(variables(nGP[j][2][k]),vmov )))
+                {
+                  te=0;
+                }
+                else{k++;}
+              }
+            }
+            if(te==1){nnGP[size(nnGP)+1]=nGP[j];}
+          }
+        }
+      }
+      G=nnGP;
+    }
+    kill @RP; kill @P; kill @R;
+    return(locus(G));
+  }
+}
+example
+{"EXAMPLE:"; echo = 2;
+  ring R=(0,a,b),(x4,x3,x2,x1),dp;
+  ideal S=(x1-3)^2+(x2-1)^2-9,
+             (4-x2)*(x3-3)+(x1-3)*(x4-1),
+             (3-x1)*(x3-x1)+(4-x2)*(x4-x2),
+             (4-x4)*a+(x3-3)*b+3*x4-4*x3,
+             (a-x1)^2+(b-x2)^2-(x1-x3)^2-(x2-x4)^2;
+  short=0;
+  locusdg(grobcov(S));
+}
+
 
 //********************* End locus ****************************
 ;
