@@ -293,10 +293,11 @@ namespace gfan
   }
   int ZFan::getLinealityDimension()const
   {
-    if(complex)
+    ensureComplex();
+    // if(complex)
       return complex->getLinDim();
-    if(coneCollection)
-      return coneCollection->dimensionOfLinealitySpace();
+    // if(coneCollection)
+    //   return coneCollection->dimensionOfLinealitySpace();
     assert(0);
     return 0;
   }
