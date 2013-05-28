@@ -477,8 +477,8 @@ int ShiftDVec::create_count = 0;  //count of spoly creations
 *
 ***************************************************************/
 int ShiftDVec::ksReducePoly(SD::LObject* PR,
-               SD::TObject* UPW,
-               SD::TObject* SPW,
+               TObject* UPW,
+               TObject* SPW,
                poly spNoether,
                number *coef,
                SD::kStrategy strat)
@@ -663,7 +663,7 @@ int ShiftDVec::ksReducePoly(SD::LObject* PR,
  ***************************************************************/
 void ShiftDVec::ksCreateSpoly(SD::LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
-                   poly m1, poly m2, SD::TObject** R)
+                   poly m1, poly m2, TObject** R)
 {
   initDeBoGri
     ( SD::indent, 
@@ -787,7 +787,7 @@ void ShiftDVec::ksCreateSpoly(SD::LObject* Pair,   poly spNoether,
 
 //BOCO: used in redtail
 int ShiftDVec::ksReducePolyTail
-  ( SD::LObject* PR, SD::TObject* UPW, SD::TObject* SPW, 
+  ( SD::LObject* PR, TObject* UPW, TObject* SPW, 
     poly Current, poly spNoether, SD::kStrategy strat )
 {
   BOOLEAN ret;
@@ -852,7 +852,7 @@ KINLINE int ksReducePolyTail
 #else  //replacement
 int ShiftDVec::ksReducePolyTail
 #endif
-  ( SD::LObject* PR, SD::TObject* UPW, SD::TObject* SPW, SD::LObject* Red )
+  ( SD::LObject* PR, TObject* UPW, TObject* SPW, SD::LObject* Red )
 {
   BOOLEAN ret;
   number coef;

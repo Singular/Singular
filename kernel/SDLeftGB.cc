@@ -164,8 +164,8 @@ void ShiftDVec::LeftGB::GebauerMoeller
  */
 void ShiftDVec::LeftGB::GMFilter
   ( SD::LObject* J,
-    SD::TObject* p_i,
-    SD::TObject* p_k,
+    TObject* p_i,
+    TObject* p_k,
     uint* i_ovls_j, uint* k_ovls_j,
     uint size_i_ovls_j, uint size_k_ovls_j )
 {
@@ -179,7 +179,7 @@ void ShiftDVec::LeftGB::GMFilter
       // Test if lcm_k_j divides lcm_i_j
       if( k_ovls_j[k] > i_ovls_j[i] ) break;
       uint shift_k = i_ovls_j[i] - k_ovls_j[k];
-      if(p_i->cmpDVecProper(p_k, shift_k, 0, k_ovls_j[i]) != 0)
+      if(p_i->SD_Ext()->cmpDVecProper(p_k, shift_k, 0, k_ovls_j[i]) != 0)
       { i_ovls_j[i] = 0; break; }
     }
   }
