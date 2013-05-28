@@ -8,10 +8,8 @@ namespace ShiftDVec
   namespace SD = ShiftDVec;
 
   class sLObject;
-  class sTObject;
   class skStrategy;
   typedef skStrategy* kStrategy;
-  typedef sTObject TObject;
   typedef sLObject LObject;
 
   void p_ExpSum_slow
@@ -33,21 +31,21 @@ namespace ShiftDVec
   extern int create_count;
 
   int ksReducePoly
-    ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW,
+    ( ShiftDVec::LObject* PR, TObject* UPW, TObject* SPW,
       poly spNoether = NULL, 
       number *coef = NULL, SD::kStrategy strat = NULL );
 
   void ksCreateSpoly
     ( ShiftDVec::LObject* Pair, poly spNoether, int use_buckets, 
-      ring tailRing, poly m1, poly m2, ShiftDVec::TObject** R    );
+      ring tailRing, poly m1, poly m2, TObject** R    );
 
   int ksReducePolyTail
-    ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, 
+    ( ShiftDVec::LObject* PR, TObject* UPW, TObject* SPW, 
       poly Current = NULL, 
       poly spNoether = NULL, ShiftDVec::kStrategy strat = NULL );
 
   int ksReducePolyTail
-    ( ShiftDVec::LObject* PR, ShiftDVec::TObject* UPW, ShiftDVec::TObject* SPW, ShiftDVec::LObject* Red );
+    ( ShiftDVec::LObject* PR, TObject* UPW, TObject* SPW, ShiftDVec::LObject* Red );
 
   BOOLEAN kCheckSpolyCreation
     ( ShiftDVec::LObject *L, ShiftDVec::kStrategy strat, poly &m1, poly &m2 );

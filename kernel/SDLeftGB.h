@@ -15,7 +15,7 @@ namespace ShiftDVec
       uint* sizesOvls, ShiftDVec::LObject* J, ShiftDVec::kStrategy strat );
 
   void GMFilter
-    ( ShiftDVec::LObject* J, ShiftDVec::TObject* p_i, ShiftDVec::TObject* p_k,
+    ( ShiftDVec::LObject* J, TObject* p_i, TObject* p_k,
       uint* i_ovls_j, uint* k_ovls_j,uint size_i_ovls_j, uint size_k_ovls_j );
 
   void GMFilter

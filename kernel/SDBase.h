@@ -27,19 +27,19 @@ namespace ShiftDVec
   poly redtail( poly p, int pos, SD::kStrategy strat );
   int redHomog( SD::LObject* h,SD::kStrategy strat );
   uint p_LmShortDivisibleBy
-    ( SD::TObject* t1,unsigned long sev_t1,
-      SD::TObject* t2,unsigned long not_sev_t2, const ring r );
+    ( TObject* t1,unsigned long sev_t1,
+      TObject* t2,unsigned long not_sev_t2, const ring r );
   uint p_LmDivisibleBy
-    (SD::TObject * t1, SD::TObject * t2, const ring r, int lV);
+    (TObject * t1, TObject * t2, const ring r, int lV);
   static inline uint _p_LmDivisibleByNoComp
-    (SD::TObject * t1, SD::TObject * t2, const ring r, int lV);
+    (TObject * t1, TObject * t2, const ring r, int lV);
   int kFindDivisibleByInT
-    ( const SD::TSet& T,
+    ( const TSet& T,
       const unsigned long* sevT, SD::LObject* L, 
       uint& shift, SD::kStrategy strat, const int start=0 );
   TObject * kFindDivisibleByInS
     ( SD::kStrategy strat, int pos,
-      SD::LObject* L, SD::TObject* T, uint & shift,
+      SD::LObject* L, TObject* T, uint & shift,
       int lV, int uptodeg=0, long ecart = LONG_MAX  );
   int kFindDivisibleByInS
     ( const SD::kStrategy strat,
@@ -84,17 +84,17 @@ namespace ShiftDVec
       uint** leftOvls, uint* sizesLeftOvls, 
       SD::LObject* H, int k, SD::kStrategy strat );
   bool GMTestRight
-    ( SD::TObject* H1,
-      SD::TObject* H2, SD::TObject* H3, uint shift2,
+    ( TObject* H1,
+      TObject* H2, TObject* H3, uint shift2,
       uint shift3, SD::kStrategy strat, ring r = currRing );
   bool GMTestLeft
-    ( SD::TObject* H1,
-      SD::TObject* H2, SD::TObject* H3, uint shift2,
+    ( TObject* H1,
+      TObject* H2, TObject* H3, uint shift2,
       uint shift3, SD::kStrategy strat, ring r = currRing );
   bool GMTest
-    ( SD::TObject* H1,
-      SD::TObject* H2,
-      uint sH2, SD::TObject* H3, 
+    ( TObject* H1,
+      TObject* H2,
+      uint sH2, TObject* H3, 
       uint* ovlH1H3, uint numOvlH1H3,
       uint* ovlH3H2, uint numOvlH3H2  );
   bool GM3
@@ -116,8 +116,8 @@ namespace ShiftDVec
   poly p_mLPshift
     ( poly p, int sh, int uptodeg, int lV, const ring r );
   void DeBoGriTestGM
-    ( SD::TSet tset, int k,
-      SD::TObject* H, int uptodeg, int lVblock );
+    ( TSet tset, int k,
+      TObject* H, int uptodeg, int lVblock );
 }
 
 #endif

@@ -29,8 +29,8 @@ void ShiftDVec::dvecWrite(const uint* dvec, uint dvSize)
 }
 
 
-void ShiftDVec::dvecWrite(const SD::TObject* t)
-{ dvecWrite(t->dvec, t->dvSize); }
+void ShiftDVec::dvecWrite(const TObject* t)
+{ dvecWrite(t->SD_Ext()->dvec, t->SD_Ext()->dvSize); }
 
 
 void ShiftDVec::lcmDvecWrite(SD::LObject* t)
@@ -197,7 +197,7 @@ bool ShiftDVec::deBoGriPrint
 
 #if DEBOGRI > 0
 bool ShiftDVec::deBoGriPrint
-  ( const SD::TObject* P, const char* description, uint flag, 
+  ( const TObject* P, const char* description, uint flag, 
     const ring lmRing, const ring tlRing, 
     bool assume, int indent )
 {

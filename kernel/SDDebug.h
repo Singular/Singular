@@ -92,7 +92,7 @@ namespace ShiftDVec
       const ring tlRing = NULL,
       bool assume = false, int indent = -1 );
   bool deBoGriPrint
-    ( const SD::TObject* P,
+    ( const TObject* P,
       const char* description, uint flag,
       const ring lmRing, const ring tlRing,
       bool assume = false, int indent = -1  );
