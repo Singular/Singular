@@ -18,6 +18,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
 #include <kernel/ideals.h>
+#include <kernel/polys.h>
 
 #define ADIDEBUG 0
 
@@ -140,22 +141,27 @@ Assume f1,...,fs are already in the standard basis. Test if hilb(LM(f1),...,LM(f
 is equal to the inputed one. 
 If no, do nothing.
 If Yes, we know that all polys that we need are already in the standard basis
-si delete all the remaining pairs
+so delete all the remaining pairs
 */
 {
 int i;
 ideal Lm;
 intvec *newhilb;
 
-Lm=id_Copy(strat->Shdl,currRing);
+//Lm=id_Copy(strat->Shdl,currRing);
+Lm=idInit(IDELEMS(strat->Shdl),strat->Shdl->rank);
 
 //Construct Lm
 
 for(i=0;i<=strat->sl;i++)
 	{
+	Lm->m[i]=pCopy(strat->Shdl->m[i]);
 	pNext(Lm->m[i])=NULL;
 	}
 idTest(Lm);
+
+//idPrint(strat->Shdl);
+//idPrint(Lm);
 
 newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing);
 
@@ -204,5 +210,7 @@ if(newhilb->compare(hilb) == 0)
           delete newhilb;
           return;
    }
+   
+id_Delete(&Lm,currRing);
 	
 }

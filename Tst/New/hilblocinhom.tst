@@ -26,7 +26,6 @@ for(int l=1;l<=size(si);l++)
 		{"false";}
 	}
 
-$;
 
 tst_status(1);
 $

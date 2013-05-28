@@ -54,7 +54,6 @@ i=std(i);
 poly f = f1+4*f2+13*f3;
 lift(i,f);
 
-$;
 
 tst_status(1);
 $
