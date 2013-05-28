@@ -338,7 +338,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
 
-    //n->cfKillChar = ndKillChar; /* dummy */
+    // n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
 

@@ -87,7 +87,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfIsOne       = nrnIsOne;
   r->cfIsMOne      = nrnIsMOne;
   r->cfGreaterZero = nrnGreaterZero;
-  r->cfWriteLong       = nrnWrite;
+  r->cfWriteLong   = nrnWrite;
   r->cfRead        = nrnRead;
   r->cfPower       = nrnPower;
   r->cfSetMap      = nrnSetMap;
@@ -102,7 +102,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffsEqual;
   r->cfInit_bigint = nrnMapQ;
   r->cfKillChar    = ndKillChar;
-	
+
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
