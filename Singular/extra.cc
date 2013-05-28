@@ -48,6 +48,13 @@
 // #include <coeffs/ffields.h>
 #include <coeffs/coeffs.h>
 #include <coeffs/mpr_complex.h>
+#include "coeffs/AE.h"
+#include "coeffs/OPAE.h"
+#include "coeffs/AEp.h"
+#include "coeffs/OPAEp.h"
+#include "coeffs/AEQ.h"
+#include "coeffs/OPAEQ.h"
+
 
 #include <polys/monomials/ring.h>
 #include <kernel/polys.h>
@@ -3811,6 +3818,71 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 				(procinfov)h->next->next->Data());
     }
     return TRUE;
+  }
+  else
+  /*==================== Test Boos Epure ==================================*/
+  if (strcmp(sys_cmd, "Hallo")==0)
+  {
+    n_coeffType nae=nRegister(n_unknown,n_AEInitChar);
+    coeffs AE=nInitChar(nae,NULL);
+    ring r=currRing;
+    rUnComplete(r);
+    r->cf=AE;
+    rComplete(r,TRUE);
+    /*
+    // Ab hier wird gespielt
+    int_poly* f=new int_poly;
+    f->poly_insert();
+    int_poly* g=new int_poly;
+    g->poly_insert();
+    // Ab hier gerechnet
+    number a=reinterpret_cast<number> (f);
+    number b=reinterpret_cast<number> (g);
+    number erg=n_Gcd(a,b,AE);
+    int_poly* h= reinterpret_cast<int_poly*> (erg);
+    h->poly_print();
+*/
+    return FALSE;
+  }
+  else
+  /*==================== Test Boos Epure 2 ==================================*/
+  if (strcmp(sys_cmd, "Hallo2")==0)
+  {
+    n_coeffType naeq=nRegister(n_unknown,n_QAEInitChar);
+    coeffs AEQ=nInitChar(naeq,NULL);
+    ring r=currRing;
+    rUnComplete(r);
+    r->cf=AEQ;
+    rComplete(r,TRUE);
+
+    return FALSE;
+  }
+  else
+  /*==================== Test Boos Epure 3==================================*/
+  if (strcmp(sys_cmd, "Hallo3")==0)
+  {
+    n_coeffType naep=nRegister(n_unknown,n_pAEInitChar);
+    coeffs AEp=nInitChar(naep,NULL);
+    ring r=currRing;
+    rUnComplete(r);
+    r->cf=AEp;
+    rComplete(r,TRUE);
+    //JETZT WOLLEN WIR DOCH MAL SPIELEN
+
+    // Ab hier wird gespielt
+    p_poly* f=new p_poly;
+    f->p_poly_insert();
+
+    p_poly* g=new p_poly;
+    g->p_poly_insert();
+    // Ab hier gerechnet
+    number a=reinterpret_cast<number> (f);
+    number b=reinterpret_cast<number> (g);
+    number erg=n_Add(a,b,AEp);
+    p_poly* h= reinterpret_cast<p_poly*> (erg);
+    h->p_poly_print();
+   
+    return FALSE;
   }
   else
 /*==================== Error =================*/
