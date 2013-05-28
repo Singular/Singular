@@ -8134,12 +8134,6 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
 
 if (new_tailRing == currRing) return TRUE;
 
-//Indeed, the condition pFDeg == p_Deg is too strong. What to do?
- /* #ifdef HAVE_RINGS
-   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
-    return TRUE;
-  #endif
-*/
   strat->pOrigFDeg_TailRing = new_tailRing->pFDeg;
   strat->pOrigLDeg_TailRing = new_tailRing->pLDeg;
 
