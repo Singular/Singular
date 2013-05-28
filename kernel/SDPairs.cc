@@ -373,13 +373,11 @@ uint ShiftDVec::findRightOverlaps
 {
   t1->SD_Ext()->SetDVecIfNULL(); t2->SD_Ext()->SetDVecIfNULL();
   //assume(t1->dvSize > 0 && t2->dvSize > 0);
-  //TODO: t1->dvSize-1 should be sufficient because we dont want
-  //central overlaps
+  //TODO:
+  //  t1->dvSize-1 should be sufficient because we dont want
+  //  central overlaps
   *overlaps = (uint*)omAlloc0((t1->SD_Ext()->dvSize+1)*sizeof(uint));
   if(t1->SD_Ext()->dvSize == 0 || t2->SD_Ext()->dvSize == 0) return 0;
-  loGriToFile
-    ("omAlloc0 for overlaps in findRightOverlaps ",
-     (t1->SD_Ext()->dvSize+1)*sizeof(uint), 1024, (void*) (*overlaps) );
 
   memcpy
     ((void*)(*overlaps), (void*)t1->SD_Ext()->dvec, t1->SD_Ext()->dvSize*sizeof(uint));
@@ -399,8 +397,13 @@ uint ShiftDVec::findRightOverlaps
   for(uint i = 0; i < shift; ++i)
     (*overlaps)[shift] += (*overlaps)[i];
   (*overlaps)[shift] -= (shift * numVars);
-  for(uint i = 0; shift < maxElCompared; ++shift, cmpLen -= sizeof(uint)){
-    if(!memcmp((void*)((*overlaps)+shift),(void*)t2->SD_Ext()->dvec,cmpLen)){
+  for( uint i = 0;
+       shift < maxElCompared;
+       ++shift, cmpLen -= sizeof(uint) )
+  {
+    if( !memcmp( (void*)((*overlaps)+shift),
+                 (void*)t2->SD_Ext()->dvec,cmpLen) )
+    {
       (*overlaps)[shift+1] = 
         (*overlaps)[shift] + (*overlaps)[shift+1] - numVars;
       (*overlaps)[i] = shift; i = ++numberOfShifts;

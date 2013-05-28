@@ -286,7 +286,6 @@ class ShiftDVec::skStrategy : public ::skStrategy
      * ::skStrategy, since they were generalized for ShiftDVec
      * case.
      */
-    SD::TSet T;
     SD::LSet L;
     SD::LSet B;
     SD::LObject P;
@@ -304,9 +303,6 @@ class ShiftDVec::skStrategy : public ::skStrategy
     }
     void initB()
     { B = (SD::LSet)omAlloc(setmaxL*sizeof(SD::LObject)); }
-    void initT();
-    void initR();
-
 
     void init_lV(int lV){this->lV = lV;}
     int get_lV(){return lV;}
