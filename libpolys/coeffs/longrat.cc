@@ -2839,7 +2839,6 @@ BOOLEAN nlInitChar(coeffs r, void*)
   assume( getCoeffType(r) == ID );
   //const int ch = (int)(long)(p);
 
-  r->cfKillChar=NULL;
   r->nCoeffIsEqual=ndCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
 
