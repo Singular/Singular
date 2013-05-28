@@ -469,6 +469,18 @@ KINLINE void sTObject::pNorm() // pNorm seems to be a _bad_ method name...
 
 
 
+// Operation on sLObjects...
+#undef IS_BBA_SHIFTDVEC_CASE
+#include<sLObject.definitions.inc.h>
+
+// ...and ShiftDVec::sLObjects (which get the same members)
+#define IS_BBA_SHIFTDVEC_CASE
+#include<sLObject.definitions.inc.h>
+
+#undef IS_BBA_SHIFTDVEC_CASE
+
+
+
 /***************************************************************
  *
  * Conversion of polys

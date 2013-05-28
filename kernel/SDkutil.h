@@ -14,9 +14,6 @@
 #ifndef SDKUTIL_H
 #define SDKUTIL_H
 
-//#include <kernel/kutil.h>
-//No, we have first to include
-
 namespace ShiftDVec
 {
   namespace SD = ShiftDVec;
@@ -25,6 +22,7 @@ namespace ShiftDVec
 
   class sLObject;
   class sTObject;
+  class sIObject;
   class skStrategy;
   typedef sLObject LObject;
   typedef sTObject TObject;
@@ -97,86 +95,22 @@ namespace ShiftDVec
         SD::sTObject* T2, uint beginT2, uint size, int lV );
 }
 
-/* classes for ShiftDVec case: ...Object, ...Strategy */
+/* classes/class extensions for ShiftDVec case */
 
 
 
 /* Inheritance for the ShiftDVec case explained
  *
- * REMARK:
- * sTObject and sLObject shall not have virtual functions,
- * since it will make them "virtual", d.i. create a virtual
- * table for them. Since in Singular these Objects are often
- * created by the Singular internal memory management (for
- * Performance reasons), their virtual table will not be
- * correctly initialized, making them at best unusable and
- * at worst producing inexplicable segfaults at runtime.
- * Multiple inheritance is for the same reason a "no go!",
- * at least, if one has to avoid the diamond problem, since
- * subclasses inheriting "virtual" will have a virtual table
- * (at least this seems to be right for gcc), which possibly
- * stores the common Base class as a pointer. This is why
- * for inheritance, we had to update our Original Idea, which
- * relied on multiple virtual inheritance, to a simpler model,
- * which duplicates the contents of the sLObject class
- * declaration to the declaration of ShiftDVec::sLObject.
- * To modify ShiftDVec::sLObject we introduced
- * ShiftDVec::sIObject, which inherits from
- * ShiftDVec::sTObject, which in turn inherits from sTObject,
- * see class diagrams below. To see, how the Objects are
- * actually internally represented (their memory layout) use
- * the "-fdump-class-hierarchy" compiler flag, e.g.:
- * make CXXFLAGS='-fdump-class-hierarchy'
- * .
- *
- * case normal bba:
- * 
- * sTObject
+ * sTObject --- contains ---> ShiftDVec::sTObjectExtension
  *     ^
  *     |
- *     |
  * sLObject
- *
- *
- * case ShiftDVec::bba updated idea:
- * (this avoids using multiple inheritance)
- * 
- *      sTObject
- *          ^
- *          |
- *          |
- * ShiftDVec::sTObject
- *          ^
- *          |
- *          |
- * ShiftDVec::sIObject (intermediate extensions)
- *          ^
- *          |
- *          |
- * ShiftDVec::sLObject ( which contents consist of an
- *                       exact copy of sLObject's contents. ) 
- * TODO: copy the member functions to the ShiftDVec namespace.
- * Create SDkInline.h for this.
- *
- *
- * case ShiftDVec::bba original Idea:
- * (this is the original idea applying multiple inheritance)
- * 
- * Original Idea:
- *             sTObject
- *            /        \
- *           / (virtual)\
- *          /            \
- *      sLObject    ShiftDVec::sTObject
- *           \          /
- *            \        / 
- *             \      /
- *        ShiftDVec::sLObject
- *
- * sTObject and sLObject are those from kutil.h
+ *     ^
+ *     |
+ * ShiftDVec::sLObject
  */
 
-class ShiftDVec::sTObject : public ::sTObject
+class ShiftDVec::sTObjectExtension
 {
   public:
     uint * dvec; //Distance Vector of lm(p)
@@ -277,13 +211,13 @@ class ShiftDVec::sIObject : public ShiftDVec::sTObject
     uint  lcmDvSize;
 
     // constructors
-    sLObject(ring r = currRing) : 
+    sIObject(ring r = currRing) : 
       SD::sTObject(r) {/*BOCO: others?*/}
 
-    sLObject(poly p, ring tailRing = currRing) : 
+    sIObject(poly p, ring tailRing = currRing) : 
       SD::sTObject(p, tailRing){/*BOCO: others?*/}
 
-    sLObject(poly p, ring c_r, ring tailRing) : 
+    sIObject(poly p, ring c_r, ring tailRing) : 
       SD::sTObject(p, c_r, tailRing){/*BOCO: others?*/}
 
     void SetLcmDVec(poly p, ring r = currRing)
@@ -320,7 +254,7 @@ class ShiftDVec::sIObject : public ShiftDVec::sTObject
 };
 
 class ShiftDVec::sLObject : public ShiftDVec::sIObject
-#
+#include <kernel/sLObject.inc.h> // see above for explanations
 
 
 class ShiftDVec::skStrategy : public ::skStrategy

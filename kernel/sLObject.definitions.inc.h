@@ -1,17 +1,14 @@
-//test test...
-#define IS_BBA_SHIFTDVEC_CASE
-
 #ifdef IS_BBA_SHIFTDVEC_CASE
-  #define CREATE_FUNCTION_NAME(function_name) \
+  #define SET_SCOPE(function_name) \
       ShiftDVec::function_name
 #else
-  #define CREATE_FUNCTION_NAME(function_name) \
+  #define SET_SCOPE(function_name) \
       ::function_name
 #endif
 
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Normalize)()
+SET_SCOPE(sLObject::Normalize)()
 {
   if (t_p != NULL)
   {
@@ -25,7 +22,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Normalize)()
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::HeadNormalize)()
+SET_SCOPE(sLObject::HeadNormalize)()
 {
   if (t_p != NULL)
   {
@@ -38,23 +35,16 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::HeadNormalize)()
   }
 }
 
-
-
-/***************************************************************
- *
- * Operation on LObjects
- *
- ***************************************************************/
 // Initialization
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Clear)()
+SET_SCOPE(sLObject::Clear)()
 {
   sTObject::Clear();
   sev = 0;
 }
 // Initialization
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Delete)()
+SET_SCOPE(sLObject::Delete)()
 {
   sTObject::Delete();
   if (bucket != NULL)
@@ -62,7 +52,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Delete)()
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Init)(ring r)
+SET_SCOPE(sLObject::Init)(ring r)
 {
   memset(this, 0, sizeof(sLObject));
   i_r1 = -1;
@@ -71,20 +61,20 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Init)(ring r)
   Set(r);
 }
 
-KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
+KINLINE SET_SCOPE(sLObject::sLObject)
 (ring r)
 {
   Init(r);
 }
 
-KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
+KINLINE SET_SCOPE(sLObject::sLObject)
 (poly p_in, ring r)
 {
   Init(r);
   Set(p_in, r);
 }
 
-KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
+KINLINE SET_SCOPE(sLObject::sLObject)
 (poly p_in, ring c_r, ring t_r)
 {
   Init(t_r);
@@ -92,7 +82,7 @@ KINLINE CREATE_CONCRETE_FUNCTION_NAME(sLObject::sLObject)
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::PrepareRed)
+SET_SCOPE(sLObject::PrepareRed)
 (BOOLEAN use_bucket)
 {
   if (bucket == NULL)
@@ -112,7 +102,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::PrepareRed)
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetLmTail)
+SET_SCOPE(sLObject::SetLmTail)
 (poly lm, poly p_tail, int p_Length, int use_bucket, 
   ring _tailRing)
 {
@@ -133,7 +123,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetLmTail)
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Mult_nn)
+SET_SCOPE(sLObject::Tail_Mult_nn)
 (number n)
 {
   if (bucket != NULL)
@@ -149,7 +139,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Mult_nn)
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Minus_mm_Mult_qq)
+SET_SCOPE(sLObject::Tail_Minus_mm_Mult_qq)
 (poly m, poly q, int lq, poly spNoether) 
 {
   if (bucket != NULL)
@@ -177,7 +167,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Minus_mm_Mult_qq)
 //adapted version of sLObject::Tail_Minus_mm_Mult_qq; merged
 //with p_Minus_mm_Mult_qq from polys/pInline2.h
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME
+SET_SCOPE
 (sLObject::Tail_Minus_mml_Mult_qq_Mult_mmr)
 ( poly mml, poly q, poly mmr, int lq, poly spNoether )
 {
@@ -202,7 +192,7 @@ CREATE_CONCRETE_FUNCTION_NAME
 #if 0
 #ifdef HAVE_SHIFTBBADVEC
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Minus_mm_Mult_qq)
+SET_SCOPE(sLObject::Tail_Minus_mm_Mult_qq)
   ( poly m, poly q, int lq, poly spNoether, int lV )
 {
   if (bucket != NULL)
@@ -233,7 +223,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Tail_Minus_mm_Mult_qq)
 #endif
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::LmDeleteAndIter)()
+SET_SCOPE(sLObject::LmDeleteAndIter)()
 {
   sTObject::LmDeleteAndIter();
   if (bucket != NULL)
@@ -254,7 +244,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::LmDeleteAndIter)()
 }
 
 KINLINE poly 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::LmExtractAndIter)()
+SET_SCOPE(sLObject::LmExtractAndIter)()
 {
   poly ret = GetLmTailRing();
   poly pn;
@@ -280,7 +270,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::LmExtractAndIter)()
   return ret;
 }
 KINLINE poly 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::CanonicalizeP)()
+SET_SCOPE(sLObject::CanonicalizeP)()
 {
   //kTest_L(this);
   int i = -1;
@@ -296,7 +286,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::CanonicalizeP)()
 }
 
 KINLINE poly 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetTP)()
+SET_SCOPE(sLObject::GetTP)()
 {
   //kTest_L(this);
   poly tp = GetLmTailRing();
@@ -312,7 +302,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetTP)()
 }
 
 KINLINE poly 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetP)(omBin lmBin)
+SET_SCOPE(sLObject::GetP)(omBin lmBin)
 {
   //kTest_L(this);
   if (p == NULL)
@@ -339,7 +329,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetP)(omBin lmBin)
 }
 
 KINLINE void
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::ShallowCopyDelete)
+SET_SCOPE(sLObject::ShallowCopyDelete)
 (ring new_tailRing,
   pShallowCopyDeleteProc p_shallow_copy_delete)
 {
@@ -352,7 +342,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::ShallowCopyDelete)
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetShortExpVector)()
+SET_SCOPE(sLObject::SetShortExpVector)()
 {
   if (t_p != NULL)
   {
@@ -365,7 +355,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetShortExpVector)()
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::Copy())
+SET_SCOPE(sLObject::Copy())
 {
   if (bucket != NULL)
   {
@@ -382,7 +372,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::Copy())
 }
 
 KINLINE poly 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::CopyGetP)()
+SET_SCOPE(sLObject::CopyGetP)()
 {
   if (bucket != NULL)
   {
@@ -401,7 +391,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::CopyGetP)()
 }
 
 KINLINE long 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::pLDeg)()
+SET_SCOPE(sLObject::pLDeg)()
 {
   poly tp = GetLmTailRing();
   assume(tp != NULL);
@@ -417,7 +407,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::pLDeg)()
     return tailRing->pLDeg(tp, &length, tailRing);
 }
 KINLINE long 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::pLDeg)(BOOLEAN deg_last)
+SET_SCOPE(sLObject::pLDeg)(BOOLEAN deg_last)
 {
   if (! deg_last || bucket != NULL) return sLObject::pLDeg();
 
@@ -434,7 +424,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::pLDeg)(BOOLEAN deg_last)
 }
 
 KINLINE long 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetDegStuffReturnLDeg())
+SET_SCOPE(sLObject::SetDegStuffReturnLDeg())
 {
   FDeg = this->pFDeg();
   long d = this->pLDeg();
@@ -443,7 +433,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetDegStuffReturnLDeg())
 }
 
 KINLINE long 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetDegStuffReturnLDeg)
+SET_SCOPE(sLObject::SetDegStuffReturnLDeg)
 (BOOLEAN use_last)
 {
   FDeg = this->pFDeg();
@@ -453,7 +443,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetDegStuffReturnLDeg)
 }
 
 KINLINE int 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetpLength)()
+SET_SCOPE(sLObject::GetpLength)()
 {
   if (bucket == NULL)
     return sTObject::GetpLength();
@@ -462,7 +452,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::GetpLength)()
 }
 
 KINLINE int 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetLength)
+SET_SCOPE(sLObject::SetLength)
 (BOOLEAN length_pLength)
 {
   if (length_pLength)
@@ -474,7 +464,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::SetLength)
   return length;
 }
 
-KINLINE long CREATE_CONCRETE_FUNCTION_NAME(sLObject::MinComp)
+KINLINE long SET_SCOPE(sLObject::MinComp)
 ()
 {
   poly tp = GetLmTailRing();
@@ -490,7 +480,7 @@ KINLINE long CREATE_CONCRETE_FUNCTION_NAME(sLObject::MinComp)
   else
     return p_MinComp(tp, tailRing);
 }
-KINLINE long CREATE_CONCRETE_FUNCTION_NAME(sLObject::Comp)()
+KINLINE long SET_SCOPE(sLObject::Comp)()
 {
   poly pp;
   ring r;
@@ -499,8 +489,8 @@ KINLINE long CREATE_CONCRETE_FUNCTION_NAME(sLObject::Comp)()
   return p_GetComp(pp, r);
 }
 
-KINLINE sLObject& 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::operator=)
+KINLINE SET_SCOPE(sLObject)& 
+SET_SCOPE(sLObject::operator=)
 (const sTObject& t)
 {
   memset(this, 0, sizeof(*this));
@@ -508,8 +498,8 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::operator=)
   return *this;
 }
 
-KINLINE TObject* 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_1)
+KINLINE SET_SCOPE(TObject)* 
+SET_SCOPE(sLObject::T_1)
 (const skStrategy* s)
 {
   if (p1 == NULL) return NULL;
@@ -520,8 +510,8 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_1)
   return T;
 }
 
-KINLINE TObject* 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_2)
+KINLINE SET_SCOPE(TObject)* 
+SET_SCOPE(sLObject::T_2)
 (const skStrategy* strat)
 {
   if (p1 == NULL) return NULL;
@@ -540,7 +530,7 @@ CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_2)
 }
 
 KINLINE void 
-CREATE_CONCRETE_FUNCTION_NAME(sLObject::T_1_2)
+SET_SCOPE(sLObject::T_1_2)
 (const skStrategy* strat,TObject* &T_1, TObject* &T_2)
 {
   if (p1 == NULL)

@@ -115,8 +115,6 @@ namespace ShiftDVec
   void kMergeBintoL( SD::kStrategy strat );
   poly p_mLPshift
     ( poly p, int sh, int uptodeg, int lV, const ring r );
-  ideal initTestGM
-    ( ideal I, poly p, int uptodeg, int lVblock );
   void DeBoGriTestGM
     ( SD::TSet tset, int k,
       SD::TObject* H, int uptodeg, int lVblock );

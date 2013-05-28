@@ -1013,7 +1013,8 @@ void deleteInSSba (int i,kStrategy strat)
 /*2
 *cancels the j-th polynomial in the set
 */
-void deleteInL (LSet set, int *length, int j,kStrategy strat)
+void deleteInL
+  (LSet set, int *length, int j,kStrategy strat)
 {
   if (set[j].lcm!=NULL)
   {
