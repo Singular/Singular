@@ -368,39 +368,39 @@ void ShiftDVec::initenterpairs
  * overlaps have to be freed manually (with omFreeSize)!
  */
 uint ShiftDVec::findRightOverlaps
-  ( SD::sTObject * t1, SD::sTObject * t2, 
+  ( sTObject * t1, sTObject * t2, 
     int numVars, int maxDeg, uint ** overlaps )
 {
-  t1->SetDVecIfNULL(); t2->SetDVecIfNULL();
+  t1->SD_Ext()->SetDVecIfNULL(); t2->SD_Ext()->SetDVecIfNULL();
   //assume(t1->dvSize > 0 && t2->dvSize > 0);
   //TODO: t1->dvSize-1 should be sufficient because we dont want
   //central overlaps
-  *overlaps = (uint*)omAlloc0((t1->dvSize+1)*sizeof(uint));
-  if(t1->dvSize == 0 || t2->dvSize == 0) return 0;
+  *overlaps = (uint*)omAlloc0((t1->SD_Ext()->dvSize+1)*sizeof(uint));
+  if(t1->SD_Ext()->dvSize == 0 || t2->SD_Ext()->dvSize == 0) return 0;
   loGriToFile
     ("omAlloc0 for overlaps in findRightOverlaps ",
-     (t1->dvSize+1)*sizeof(uint), 1024, (void*) (*overlaps) );
+     (t1->SD_Ext()->dvSize+1)*sizeof(uint), 1024, (void*) (*overlaps) );
 
   memcpy
-    ((void*)(*overlaps), (void*)t1->dvec, t1->dvSize*sizeof(uint));
+    ((void*)(*overlaps), (void*)t1->SD_Ext()->dvec, t1->SD_Ext()->dvSize*sizeof(uint));
 
 
 
   //uint maxElCompared = min(t1.dvSize, maxDeg); //not correct
-  uint maxElCompared = t1->dvSize; //eventuell zuviele shifts
+  uint maxElCompared = t1->SD_Ext()->dvSize; //eventuell zuviele shifts
 
   /* We want only to find right overlappings, not central
    * overlappings.                                        */
   int shift =
-    t2->dvSize > t1->dvSize ? 1 : t1->dvSize - t2->dvSize + 1;
+    t2->SD_Ext()->dvSize > t1->SD_Ext()->dvSize ? 1 : t1->SD_Ext()->dvSize - t2->SD_Ext()->dvSize + 1;
 
-  int cmpLen = (t1->dvSize - shift) * sizeof(uint);
+  int cmpLen = (t1->SD_Ext()->dvSize - shift) * sizeof(uint);
   uint numberOfShifts = 0;
   for(uint i = 0; i < shift; ++i)
     (*overlaps)[shift] += (*overlaps)[i];
   (*overlaps)[shift] -= (shift * numVars);
   for(uint i = 0; shift < maxElCompared; ++shift, cmpLen -= sizeof(uint)){
-    if(!memcmp((void*)((*overlaps)+shift),(void*)t2->dvec,cmpLen)){
+    if(!memcmp((void*)((*overlaps)+shift),(void*)t2->SD_Ext()->dvec,cmpLen)){
       (*overlaps)[shift+1] = 
         (*overlaps)[shift] + (*overlaps)[shift+1] - numVars;
       (*overlaps)[i] = shift; i = ++numberOfShifts;
@@ -419,16 +419,16 @@ uint ShiftDVec::findRightOverlaps
   }else{
     loGriToFile
       ( "omFreeSize for overlaps in findRightOverlaps ",
-        (t1->dvSize+1)*sizeof(uint), 1024, (void*) *overlaps );
+        (t1->SD_Ext()->dvSize+1)*sizeof(uint), 1024, (void*) *overlaps );
     omFreeSize
-      ((ADDRESS)(*overlaps), sizeof(uint)*(t1->dvSize+1));
+      ((ADDRESS)(*overlaps), sizeof(uint)*(t1->SD_Ext()->dvSize+1));
   }
 
   return numberOfShifts;
 }
 
 void ShiftDVec::DeBoGriTestGM
-  (ShiftDVec::TSet tset, int k, ShiftDVec::TObject* H, int uptodeg, int lVblock)
+  (TSet tset, int k, TObject* H, int uptodeg, int lVblock)
 {
  namespace SD = ShiftDVec;
 
@@ -535,7 +535,7 @@ void ShiftDVec::DeBoGriTestGM
     //right with self and right
     for(uint i = 0; i < sizesRightOvls[l]; ++i)
     {
-      SD::TObject* Right = tset[l];
+      TObject* Right = tset[l];
       Print("Consider rightoverlap %d with element",r_overlaps[l][i]);
       pWrite(tset[l]->p);
       Print(with self and right overlaps./n");
@@ -549,7 +549,7 @@ void ShiftDVec::DeBoGriTestGM
     //left with left and self
     for(uint i = 0; i < sizesLeftOvls[l]; ++i)
     {
-      SD::TObject* Left = tset[l];
+      TObject* Left = tset[l];
       Print("Consider leftoverlap %d with element ",l_overlaps[l][i]);
       pWrite(tset[l]->p);
       Print(with left and self overlaps./n");
@@ -577,8 +577,8 @@ void ShiftDVec::DeBoGriTestGM
           if( !shRight2 ) continue;
           uint shRight1 = r_overlaps[i][j];
           if( !shRight1 ) goto end_of_middle_loop_1;
-          SD::TObject* Right1 = tset[i];
-          SD::TObject* Right2 = tset[m];
+          TObject* Right1 = tset[i];
+          TObject* Right2 = tset[m];
           if( shRight2 >= shRight1 ||
               shRight2 + Right2->GetDVsize() >
               shRight1 + Right1->GetDVsize()   ) break;
@@ -608,8 +608,8 @@ void ShiftDVec::DeBoGriTestGM
           uint shLeft1 = l_overlaps[i][j];
           if( !shLeft2 ) continue;
           if( !shLeft1 ) goto end_of_middle_loop_2;
-          SD::TObject* Left1 = tset[i];
-          SD::TObject* Left2 = tset[m];
+          TObject* Left1 = tset[i];
+          TObject* Left2 = tset[m];
           if( shLeft2 > shLeft1 ||
               shLeft1 - Left1->GetDVsize() <=
               shLeft2 - Left1->GetDVsize()    ) break;
@@ -692,7 +692,7 @@ void ShiftDVec::DeBoGriTestGM
  *
  * This function has to be checked!                           */
 bool ShiftDVec::GMTestRight
-  ( SD::TObject* H1, SD::TObject* H2, SD::TObject* H3,
+  ( TObject* H1, TObject* H2, TObject* H3,
     uint shift2, uint shift3, SD::kStrategy strat, ring r )
 {
   /* We will do that by comparing the dvecs of h2 and h3. We
@@ -720,17 +720,17 @@ bool ShiftDVec::GMTestRight
    * piece of code.                                           */
   assume(shift2 > shift3 && shift3 > 0);
 
-  int degH1 = H1->GetDVsize(); 
-  int degH3 = H3->GetDVsize(); 
+  int degH1 = H1->SD_Ext()->GetDVsize(); 
+  int degH3 = H3->SD_Ext()->GetDVsize(); 
 
-  //assume(degH3 + shift3 < H2->GetDVsize() + shift2);
-  assume(degH3 + shift3 <= H2->GetDVsize() + shift2);
+  //assume(degH3 + shift3 < H2->SD_Ext()->GetDVsize() + shift2);
+  assume(degH3 + shift3 <= H2->SD_Ext()->GetDVsize() + shift2);
 
   int minCmpDV2 = degH1 - shift2;
   int minCmpDV3 = degH1 - shift3;
   int cmpLength = degH3 + shift3 - degH1;
 
-  int dv1_eq_dv3 = H2->cmpDVecProper
+  int dv1_eq_dv3 = H2->SD_Ext()->cmpDVecProper
     ( H3, minCmpDV2, minCmpDV3, cmpLength, strat->get_lV() );
   if( dv1_eq_dv3 == 0 ) return true;
 
@@ -745,7 +745,7 @@ bool ShiftDVec::GMTestRight
  *
  * This function has to be checked!                           */
 bool ShiftDVec::GMTestLeft
-  ( SD::TObject* H1, SD::TObject* H2, SD::TObject* H3, 
+  ( TObject* H1, TObject* H2, TObject* H3, 
     uint shift2, uint shift3, SD::kStrategy strat, ring r )
 {
   initDeBoGri
@@ -770,7 +770,7 @@ bool ShiftDVec::GMTestLeft
   int minCmpDV3 = 0;
   int cmpLength = shift2 - shift3;
 
-  if( H1->cmpDVecProper
+  if( H1->SD_Ext()->cmpDVecProper
       (H3, minCmpDV1, minCmpDV3, cmpLength, strat->get_lV()) == 0 )
   {
     return true;
@@ -799,7 +799,7 @@ bool ShiftDVec::GMTestLeft
  * return true, otherwise false. 
  * TODO: Special cases: h1 | h3 and h2 | h3                   */
 bool ShiftDVec::GMTest
-  ( ShiftDVec::TObject* H1, ShiftDVec::TObject* H2, uint sH2, ShiftDVec::TObject* H3, 
+  ( TObject* H1, TObject* H2, uint sH2, TObject* H3, 
     uint* ovlH1H3, uint numOvlH1H3, 
     uint* ovlH3H2, uint numOvlH3H2                   )
 {
@@ -818,25 +818,25 @@ bool ShiftDVec::GMTest
     return false;
   }
 
-  assume( H1->GetDVsize() > 0 );
-  assume( H2->GetDVsize() > 0 );
-  assume( H3->GetDVsize() > 0 );
+  assume( H1->SD_Ext()->GetDVsize() > 0 );
+  assume( H2->SD_Ext()->GetDVsize() > 0 );
+  assume( H3->SD_Ext()->GetDVsize() > 0 );
 
   //maxShiftOfH3 = min(sizeOfLcmDVec - sizeOfH3DVec, sH2 - 1)
   //sizeOfLcmDVec = sizeOfH2DVec + sH2 - 1
   uint maxShiftOfH3;
   uint minShiftOfH3;
-  if( H3->GetDVsize() > H2->GetDVsize() ) //TODO: case h2 | h3
-    maxShiftOfH3 = H2->GetDVsize() + sH2 - H3->GetDVsize();
+  if( H3->SD_Ext()->GetDVsize() > H2->SD_Ext()->GetDVsize() ) //TODO: case h2 | h3
+    maxShiftOfH3 = H2->SD_Ext()->GetDVsize() + sH2 - H3->SD_Ext()->GetDVsize();
   else
     maxShiftOfH3 = sH2 - 1;
 
   int i = 0;
-  if( H3->GetDVsize() > H1->GetDVsize() ) //TODO: case h1 | h3
+  if( H3->SD_Ext()->GetDVsize() > H1->SD_Ext()->GetDVsize() ) //TODO: case h1 | h3
     minShiftOfH3 = 1;
   else
   {
-    minShiftOfH3 = H1->GetDVsize() - H3->GetDVsize() + 1;
+    minShiftOfH3 = H1->SD_Ext()->GetDVsize() - H3->SD_Ext()->GetDVsize() + 1;
     for(; ovlH1H3[i] && minShiftOfH3 > ovlH1H3[i]; ++i)
       if(i >= numOvlH1H3)
       {
@@ -998,7 +998,7 @@ void ShiftDVec::GebauerMoeller
     //self with right and left
     for(int l = 0; l <= k && selfOvls[i]; ++l)
     {
-      ShiftDVec::TObject* Right = strat->S_2_T(l);
+      TObject* Right = strat->S_2_T(l);
       if( GMTest
           ( H, H, selfOvls[i], Right, rightOvls[l],
             sizesRightOvls[l], leftOvls[l], sizesLeftOvls[l] ) )
@@ -1015,7 +1015,7 @@ void ShiftDVec::GebauerMoeller
     //right with self and right
     for(uint i = 0; i < sizesRightOvls[l]; ++i)
     {
-      ShiftDVec::TObject* Right = strat->S_2_T(l);
+      TObject* Right = strat->S_2_T(l);
       if ( GMTest
           ( H, Right, rightOvls[l][i], H, selfOvls,
             sizeSelfOvls, rightOvls[l], sizesRightOvls[l] ) )
@@ -1058,8 +1058,8 @@ void ShiftDVec::GebauerMoeller
           uint shRight1 = rightOvls[i][j];
           if( !shRight1 ) goto end_of_middle_loop_1;
 
-          ShiftDVec::TObject* Right1 = strat->S_2_T(i);
-          ShiftDVec::TObject* Right2 = strat->S_2_T(m);
+          TObject* Right1 = strat->S_2_T(i);
+          TObject* Right2 = strat->S_2_T(m);
 
           /*BOCO: 
            * TODO: Maybe it is more efficient not to
@@ -1069,8 +1069,8 @@ void ShiftDVec::GebauerMoeller
            * Think about that!
            */
           if( shRight2 >= shRight1 ||
-              shRight2 + Right2->GetDVsize() > 
-              shRight1 + Right1->GetDVsize()   ) break;
+              shRight2 + Right2->SD_Ext()->GetDVsize() > 
+              shRight1 + Right1->SD_Ext()->GetDVsize()   ) break;
 
           if( GMTestRight
                 (H,Right1,Right2, shRight1,shRight2, strat) )
@@ -1104,12 +1104,12 @@ void ShiftDVec::GebauerMoeller
           if( !shLeft2 ) continue;
           if( !shLeft1 ) goto end_of_middle_loop_2;
 
-          ShiftDVec::TObject* Left1 = strat->S_2_T(i);
-          ShiftDVec::TObject* Left2 = strat->S_2_T(m);
+          TObject* Left1 = strat->S_2_T(i);
+          TObject* Left2 = strat->S_2_T(m);
 
           if( shLeft2 > shLeft1 ||
-              shLeft1 - Left1->GetDVsize() <=
-              shLeft2 - Left1->GetDVsize()    ) break;
+              shLeft1 - Left1->SD_Ext()->GetDVsize() <=
+              shLeft2 - Left1->SD_Ext()->GetDVsize()    ) break;
 
           /*BOCO: 
            * TODO: Maybe it is more efficient not to
