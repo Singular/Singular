@@ -29,18 +29,12 @@ typedef skStrategy* kStrategy;
 
 
 
-//member functions of ShiftDVec::sTobject
+//member functions of ShiftDVec::sTObjectExtension
 
 
 
-uint ShiftDVec::CreateDVec
-  (poly p, ring r, uint*& dvec)
+uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering CreateDVec", "Leaving CreateDVec", 512 );
-  deBoGriPrint(++SD::debugCounter, "debugCounter: ", 512);
-
   if(p == NULL){dvec = NULL; return 0;}
 
   //We should test here, if p is in r. (see sTObject::Set ?)
@@ -50,7 +44,6 @@ uint ShiftDVec::CreateDVec
   assume(dvSize < 1000);
   if(!dvSize){dvec = NULL; return 0;}
   dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
-  loGriToFile("omAlloc0 for dvec in CreateDVec ",dvSize*sizeof(uint),1024, (void*)dvec);
 
   uint * it = dvec;
 
@@ -67,24 +60,26 @@ uint ShiftDVec::CreateDVec
 }
 
 
-uint* ShiftDVec::sTObject::GetDVec()
+uint* ShiftDVec::sTObjectExtension::GetDVec()
 {
-  return dvec;
+  return SD_Ext->dvec;
 }
 
 
-uint ShiftDVec::sTObject::GetDVsize()
+uint ShiftDVec::sTObjectExtension::GetDVsize()
 {
-  if(!dvec) SetDVec();
-  if(!dvec) return 0; //Be careful! p does not exist!
-  return dvSize;
+  if(!SD_Ext()->dvec) SetDVec();
+  if(!SD_Ext()->dvec) return 0; //Be careful! p does not exist!
+  return SD_Ext()->dvSize;
 }
 
 
-int ShiftDVec::sTObject::cmpDVec(SD::sTObject* T)
+int ShiftDVec::sTObjectExtension::cmpDVec(sTObject* T)
 {
-  if(GetDVsize() == T->GetDVsize())
-    return memcmp(dvec,T->dvec,dvSize*sizeof(uint));
+  if(SD_Ext()->GetDVsize() == T->SD_Ext()->GetDVsize())
+    return memcmp( SD_Ext()->dvec,
+                   T->SD_Ext->dvec,
+                   SD_Ext()->dvSize * sizeof(uint) );
   return -1;
 }
 
@@ -95,20 +90,15 @@ int ShiftDVec::sTObject::cmpDVec(SD::sTObject* T)
  * this object's DVec size, respectivly the size of T1's DVec.
  * Returns 0 if these parts match, or non-zero value if not
  * (see memcmp for more informations).                        */
-int ShiftDVec::sTObject::cmpDVec
-  (SD::sTObject* T1, uint begin, uint beginT1, uint size)
+int ShiftDVec::sTObjectExtension::cmpDVec
+  ( sTObject* T1, uint begin, uint beginT1, uint size )
 {
-  assume(begin + size <= dvSize && beginT1 + size <= T1->dvSize);
-  initDeBoGri
-    ( SD::indent, 
-      "Entering cmpDVec", "Leaving cmpDVec", 128 );
-  deBoGriPrint(begin + size, "begin + size: ", 128);
-  deBoGriPrint(dvSize, "dvSize: ", 128);
-  deBoGriPrint(beginT1 + size, "beginT1 + size: ", 128);
-  deBoGriPrint(T1->dvSize, "T1->dvSize: ", 128);
+  assume( begin + size <= SD_Ext()->dvSize &&
+          beginT1 + size <= T1->SD_Ext()->dvSize );
 
     return 
-      memcmp( dvec+begin, T1->dvec+beginT1, size*sizeof(uint) );
+      memcmp( SD_Ext()->dvec + begin,
+              T1->SD_Ext()->dvec+beginT1, size*sizeof(uint) );
 }
 
 /* Does what cmpDVec should do. size > 0 should hold.*/
@@ -140,46 +130,48 @@ int ShiftDVec::cmpDVecProper
 
 /* Does what cmpDVec should do. size > 0 should hold.*/
 int ShiftDVec::cmpDVecProper
-  ( SD::sTObject* T1, uint beginT1,
-    SD::sTObject* T2, uint beginT2, uint size, int lV )
+  ( sTObject* T1, uint beginT1,
+    sTObject* T2, uint beginT2, uint size, int lV )
 {
-  assume(beginT2+size<=T2->dvSize && beginT1+size<=T1->dvSize);
+  assume( beginT2+size <= T2->SD_Ext()->dvSize &&
+          beginT1+size <= T1->SD_Ext()->dvSize    );
 
   return
     cmpDVecProper
-      ( T1->dvec, beginT1, T2->dvec, beginT2, size, lV );
+      ( T1->SD_Ext()->dvec, beginT1,
+        T2->SD_Ext()->dvec, beginT2, size, lV );
 }
 
 /* Does what cmpDVec should do. size > 0 should hold.*/
-int ShiftDVec::sTObject::cmpDVecProper
-  ( SD::sTObject* T1, 
+int ShiftDVec::sTObjectExtension::cmpDVecProper
+  ( sTObject* T1, 
     uint begin, uint beginT1, uint size, int lV )
 {
   return 
     SD::cmpDVecProper
-      (T1, beginT1, this, begin, size, lV);
+      ( T1, beginT1, this, begin, size, lV );
 }
 
-void ShiftDVec::sTObject::freeDVec()
+void ShiftDVec::sTObjectExtension::freeDVec()
 {
-  if(dvec){ 
-    loGriToFile("omFreeSize of (ADDRESS)dvec in freeDVec ", sizeof(uint)*dvSize, 1024, (void*)dvec ); 
-    omFreeSize((ADDRESS)dvec, sizeof(uint)*dvSize); 
-    dvec = NULL;
-    dvSize = 0;
+  if(SD_Ext()->dvec)
+  {
+    omFreeSize( (ADDRESS)SD_Ext()->dvec,
+                sizeof(uint) * SD_Ext()->dvSize );
+    SD_Ext()->dvec = NULL;
+    SD_Ext()->dvSize = 0;
   }
 }
 
-ShiftDVec::sTObject&
-ShiftDVec::sTObject::operator=(const SD::sTObject& t)
+ShiftDVec::sTObjectExtension&
+ShiftDVec::sTObjectExtension::operator=(const sTObject& t)
 {
   this->::sTObject::operator=(t);
 
-  //dvec = NULL; //or should we copy, or deep copy??? - only user knows
-  //dvSize = 0;
   //Be careful: we copy the dvec shallow!
-  dvec = t.dvec;
-  dvSize = t.dvSize;
+  //TODO: Should we do make a deep copy, or no copy at all
+  SD_Ext()->dvec = t.SD_Ext()->dvec;
+  SD_Ext()->dvSize = t.SD_Ext()->dvSize;
 }
 
 
@@ -194,7 +186,8 @@ uint ShiftDVec::sLObject::getLcmDVSize(ring r)
 {
   assume( p1 != NULL && p2 != NULL );
 
-  if( !lcmDvSize ) {
+  if( !lcmDvSize )
+  {
     //I hope, this will get me the letterplace degree of lm(p1) 
     //(totaldeg(x(4)*y(5)*z(6)) for example should be 6).
     //BOCO: IMPORTANT: TODO: This was a wrong assuption - maybe
@@ -207,25 +200,14 @@ uint ShiftDVec::sLObject::getLcmDVSize(ring r)
   return lcmDvSize;
 }
 
-
 void ShiftDVec::sLObject::SetLcmDVec(ring r)
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering SetLcmDVec", "Leaving SetLcmDVec", 16 );
-
 #ifdef USE_DVEC_LCM
   //We want to create the lcm directly from p1, p2 .
   //This is an adapted version of the CreateDVec function.
   //TODO: This has to be testet!
-  deBoGriPrint("USE_DVEC_LCM is set.", 16);
-  deBoGriPrint
-    ("Using p1, p2 to create the lcm's DVec directly.", 16);
   
   assume(p1 != NULL && p2 != NULL);
-
-  deBoGriPrint(p1, "p1 is: ", 16);
-  deBoGriPrint(p2, "p2 is: ", 16);
 
   //I hope, this will get me the letterplace degree of lm(p1) 
   //(totaldeg(x(4)*y(5)*z(6)) for example should be 6).
@@ -245,7 +227,6 @@ void ShiftDVec::sLObject::SetLcmDVec(ring r)
 
   assume(lcmDvSize > 0);
 
- loGriToFile("omAlloc0 for lcmDvec in SetLcmDVec ",lcmDvSize*sizeof(uint),1024);
   lcmDvec = (uint *)omAlloc0(lcmDvSize*sizeof(uint));
 
   uint * it = lcmDvec;
@@ -261,20 +242,17 @@ void ShiftDVec::sLObject::SetLcmDVec(ring r)
   for(;l < lcmDvSize; ++i)
     if(p_GetExp(shifted,i,r)){*it=j;++it;j=1;++l;} else{++j;}
 #else
-  deBoGriPrint(lcm, "The lcm is: ", 16);
   SetLcmDVec(lcm, r);
 #endif
 }
 
-
 void ShiftDVec::sLObject::freeLcmDVec()
 {
-  if(lcmDVec){ 
-    loGriToFile("omFreeSize for (ADDRESS)lcmDvec in freeLcmDVec",sizeof(uint)*dvSize,1024);
-    omFreeSize((ADDRESS)lcmDVec, sizeof(uint)*dvSize); 
-    dvec = NULL;
-    dvSize = 0;
-    lcmDVec = NULL;
+  if(lcmDVec)
+  {
+    omFreeSize( (ADDRESS)lcmDVec, sizeof(uint) * lcmDvSize ); 
+    lcmDvec = NULL;
+    lcmDvSize = 0;
   }
 }
 
@@ -283,7 +261,8 @@ void ShiftDVec::sLObject::freeLcmDVec()
  * DVec of the other objects lcm. Thus, if both lcm do not have
  * the same shift, but would otherwise be equal, true will be
  * returned, too.  In every other case, false is returned.    */
-bool ShiftDVec::sLObject::compareLcmTo( SD::sLObject* other, ring r )
+bool ShiftDVec::sLObject::compareLcmTo
+  ( SD::sLObject* other, ring r )
 {
   if( this->getLcmDVSize(r) != other->getLcmDVSize(r) ) 
     return false;
@@ -300,7 +279,6 @@ bool ShiftDVec::sLObject::compareLcmTo( SD::sLObject* other, ring r )
 
   return true;
 }
-
 
 /* This function returns true, if the objects lcm is equal to
  * a shift of lcm(p1, p2).                                    */
@@ -333,7 +311,6 @@ bool ShiftDVec::sLObject::compareLcmTo(poly p1, poly p2, ring r)
 
   return false;
 }
-
 
 /* This function expects two letterplace polynomials and will
  * return true, if p1 and p2 correspond to a valid overlap and
@@ -406,117 +383,37 @@ bool ShiftDVec::sLObject::gm3LcmUnEqualToLcm
 uint ShiftDVec::sLObject::lcmDivisibleBy
   ( SD::sTObject * T, int numVars )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering lcmDivisibleBy", "Leaving lcmDivisibleBy", 16 );
-
   this->SetLcmDvecIfNULL();
-  T->SetDVecIfNULL();
-
-  deBoGriPrint(this->lcm, "this->lcm: ", 16);
-  deBoGriPrint
-    (this->lcmDVec, this->lcmDvSize, "this->lcmDvec: ", 16);
-  deBoGriPrint(this->lcmDvSize, "this->lcmDvSize: ", 16);
-  deBoGriPrint(T->p, "T->p: ", 16);
-  deBoGriPrint(T->dvec, T->dvSize, "T->dvec: ", 16);
-  deBoGriPrint(T->dvSize, "T->dvSize: ", 16);
+  T->SD_Ext()->SetDVecIfNULL();
 
   return ShiftDVec::divisibleBy
-    ( lcmDVec, lcmDvSize, T->dvec, T->dvSize, numVars );
+    ( lcmDVec, lcmDvSize,
+      T->SD_Ext()->dvec, T->SD_Ext()->dvSize, numVars );
 }
 
 uint ShiftDVec::sLObject::lcmDivisibleBy
-  ( SD::sTObject * T, 
-    uint minShift, uint maxShift, int numVars )
+  ( sTObject * T, uint minShift, uint maxShift, int numVars )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering lcmDivisibleBy(sTObject, int, uint, uint, int)", 
-      "Leaving lcmDivisibleBy", 16                              );
-
   this->SetLcmDvecIfNULL();
-  T->SetDVecIfNULL();
-
-  deBoGriPrint(this->lcm, "this->lcm: ", 16);
-  deBoGriPrint
-    (this->lcmDVec, this->lcmDvSize, "this->lcmDvec: ", 16);
-  deBoGriPrint(this->lcmDvSize, "this->lcmDvSize: ", 16);
-  deBoGriPrint(T->p, "T->p: ", 16);
-  deBoGriPrint(T->dvec, T->dvSize, "T->dvec: ", 16);
-  deBoGriPrint(T->dvSize, "T->dvSize: ", 16);
+  T->SD_Ext()->SetDVecIfNULL();
 
   return ShiftDVec::divisibleBy
-    ( lcmDVec, lcmDvSize, 
-      T->dvec, T->dvSize, minShift, maxShift, numVars );
-}
-
-
-
-//member functions of SD::skStrategy
-
-
-
-ShiftDVec::TObject* ShiftDVec::skStrategy::s_2_t(int i)
-{
-  if (i >= 0 && i <= sl)
-  {
-    int sri= S_2_R[i];
-    if ((sri >= 0) && (sri <= tl))
-    {
-      SD::TObject* t = R[sri];
-      if ((t != NULL) && (t->p == S[i]))
-        return t;
-    }
-    // last but not least, try kFindInT
-    sri = kFindInT(S[i], T, tl);
-    if (sri >= 0)
-      return &(T[sri]);
-  }
-  return NULL;
-}
-
-ShiftDVec::TObject* ShiftDVec::skStrategy::S_2_T(int i)
-{
-  assume(i>= 0 && i<=sl);
-  assume(S_2_R[i] >= 0 && S_2_R[i] <= tl);
-  SD::TObject* TT = R[S_2_R[i]];
-  assume(TT != NULL && TT->p == S[i]);
-  return TT;
-}
-
-ShiftDVec::sLObject&
-ShiftDVec::sLObject::operator=(const SD::sTObject& t)
-{
-  memset(this, 0, sizeof(*this));
-  memcpy(this, &t, sizeof(SD::sTObject));
-  return *this;
-}
-
-void ShiftDVec::skStrategy::initT()
-{
-  T = (SD::TSet)omAlloc0(setmaxT*sizeof(SD::TObject));
-  for (int i=setmaxT-1; i>=0; i--)
-  {
-    T[i].tailRing = currRing;
-    T[i].i_r = -1;
-  }
-}
-
-void ShiftDVec::skStrategy::initR()
-{
-  R = (SD::TObject**)omAlloc0(setmaxT*sizeof(SD::TObject*));
+    ( lcmDVec, lcmDvSize, T->SD_Ext()->dvec,
+      T->SD_Ext()->dvSize, minShift, maxShift, numVars );
 }
 
 
 //other functions, which do not have no counterpart in normal bba
 
 
-
-//This should get the shift of a letterplace polynomial.
-//numFirstVar should be the index of the variable in the first
-//visual block of p (first index should be 1!). TODO: It would
-//be more efficient to store the shifts for all shifted
-//polynomials somehow. p should not be NULL!
+/* This should get the shift of a letterplace polynomial.
+ * numFirstVar should be the index of the variable in the first
+ * visual block of p (first index should be 1!).
+ *
+ * TODO:
+ * It would be more efficient to store the shifts for all
+ * shifted polynomials somehow. p should not be NULL!
+ */
 uint ShiftDVec::getShift
   ( poly p, uint numFirstVar, ring r )
 {
@@ -526,22 +423,9 @@ uint ShiftDVec::getShift
 
 
 bool ShiftDVec::compareDVec
-  ( const uint* dvec, poly p, uint offset, uint maxSize, ring r )
+  ( const uint* dvec, poly p,
+    uint offset, uint maxSize, ring r )
 {
-
-#if DEBOGRI > 0 
-if( deBoGri == 4 )
-{
-  PrintS("\nIn compareDVec\nComparing\n");
-  dvecWrite(dvec, maxSize);
-  PrintS("\nWith\n");
-  pWrite(p);
-  PrintS("Which has dvec:\n");
-  dvecWrite(p);
-  Print("\nUp to size %d\n", maxSize);
-}
-#endif
-
   for(uint j = 1, i = 1, l = offset; l < maxSize; ++i)
   {
     if( p_GetExp(p,i,r) )
@@ -549,11 +433,6 @@ if( deBoGri == 4 )
       else { j = 1; ++l; }
     else{ ++j; }
   }
-
-#if DEBOGRI > 0
-if( deBoGri == 4 )
-  PrintS("compareDVec returns true!\n");
-#endif
 
   return true;
 }
@@ -570,17 +449,9 @@ uint ShiftDVec::divisibleBy
   ( const uint* dvec1, uint dvSize1, 
     const uint* dvec2, uint dvSize2, int numVars )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering divisibleBy", "Leaving divisibleBy", 256 );
-  deBoGriPrint(dvec1, dvSize1, "dvec1: ", 256);
-  deBoGriPrint(dvec2, dvSize2, "dvec2: ", 256);
-  //assume(dvSize2 > 0);
-  //assume(dvSize1 > 0);
   if(dvSize1 < dvSize2) return UINT_MAX;
   if(!dvSize2) return UINT_MAX-1;
 
-  loGriToFile("omAlloc0 for tmpVec in divBy ",dvSize1*sizeof(uint),1024);
   uint * tmpVec = (uint *)omAlloc0(dvSize1*sizeof(uint));
   memcpy((void*)tmpVec,(void*)dvec1,dvSize1*sizeof(uint));
 
@@ -592,7 +463,6 @@ uint ShiftDVec::divisibleBy
   {
     if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen))
     {
-      loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",dvSize1*sizeof(uint),1024);
       omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
       return shift;
     }
@@ -600,11 +470,9 @@ uint ShiftDVec::divisibleBy
   }
   if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen))
   {
-    loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",dvSize1*sizeof(uint),1024);
     omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
     return shift;
   }
-  loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",dvSize1*sizeof(uint),1024);
   omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
   return UINT_MAX;
 }
@@ -640,7 +508,6 @@ uint ShiftDVec::divisibleBy
   assume(maxShift + dvSize2 < dvSize1);
 
   uint tmpSize = (maxShift - minShift + dvSize2);
- loGriToFile("omAlloc0 in divBy for tmpVec ",tmpSize*sizeof(uint),1024);
   uint * tmpVec = (uint *) omAlloc0( tmpSize*sizeof(uint) );
 
   memcpy
@@ -652,14 +519,12 @@ uint ShiftDVec::divisibleBy
   size_t cmpLen = dvSize2 * sizeof(uint);
   for(int shift=0; shift <= maxShift - minShift; ++shift){
     if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen)){
-      loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",tmpSize*sizeof(uint),1024);
       omFreeSize((ADDRESS)tmpVec, sizeof(uint)*tmpSize);
       return shift;
     }
     tmpVec[shift+1] = tmpVec[shift] + tmpVec[shift+1] - numVars;
   }
 
-  loGriToFile("omFreeSize for (ADDRESS)tmpVec in divBy ",tmpSize*sizeof(uint),1024);
   omFreeSize((ADDRESS)tmpVec, sizeof(uint)*tmpSize);
   return UINT_MAX;
 }
@@ -675,37 +540,15 @@ uint ShiftDVec::divisibleBy
  * Has to be tested!
  */
 uint ShiftDVec::divisibleBy
-  ( SD::sTObject * p1, 
-    SD::sTObject * p2, int numVars )
+  ( sTObject * p1, sTObject * p2, int numVars )
 {
-  p1->SetDVecIfNULL();
-  p2->SetDVecIfNULL();
+  p1->SD_Ext()->SetDVecIfNULL();
+  p2->SD_Ext()->SetDVecIfNULL();
 
   return divisibleBy
-    (p1->dvec, p1->dvSize, p2->dvec, p2->dvSize, numVars );
+    ( p1->SD_Ext()->dvec, p1->SD_Ext()->dvSize,
+      p2->SD_Ext()->dvec, p2->SD_Ext()->dvSize, numVars );
 }
-
-
-#if 0 //in progress
-/* Stores the first shift s greater than s0 into s0, where
- * lm(p1) is divided by the shifted monomial s*lm(p2) (,that is
- * the dvec of lm(p1) has a central overlap with the dvec of 
- * lm(p2)). If no such shift exists, false is returned,
- * otherwise true.
- *
- * Has to be tested!
- */
-bool ShiftDVec::divisibleBy
-  ( SD::sTObject * p1, 
-    SD::sTObject * p2, int& s0, int numVars )
-{
-  p1->SetDVecIfNULL();
-  p2->SetDVecIfNULL();
-
-  return divisibleBy
-    (p1->dvec, p1->dvSize, p2->dvec, p2->dvSize, numVars );
-}
-#endif
 
 
 /* Tests if the LObject's polynomial lcm is divisible by a
@@ -715,23 +558,14 @@ bool ShiftDVec::divisibleBy
  * Has to be tested!
  */
 uint ShiftDVec::lcmDivisibleBy
-  ( LObject * lcm, SD::sTObject * p, 
-    int numVars                             )
+  ( LObject * lcm, sTObject * p, int numVars )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering lcmDivisibleBy", "Leaving lcmDivisibleBy", 16 );
-  lcm->SetLcmDvecIfNULL();
-  p->SetDVecIfNULL();
-
-  deBoGriPrint(lcm->dvec, lcm->dvSize, "lcm->dvec: ", 16);
-  deBoGriPrint(lcm->dvSize, "lcm->lcmdvSize: ", 16);
-  deBoGriPrint(p->dvec, p->dvSize, "p->dvec: ", 16);
-  deBoGriPrint(p->dvSize, "p->dvSize: ", 16);
+  lcm->SD_Ext()->SetLcmDvecIfNULL();
+  p->SD_Ext()->SetDVecIfNULL();
 
   return divisibleBy
-    ( lcm->getLcmDVec(),
-      lcm->getLcmDVSize(), p->dvec, p->dvSize, numVars );
+    ( lcm->getLcmDVec(), lcm->getLcmDVSize(),
+      p->SD_Ext()->dvec, p->SD_Ext()->dvSize, numVars );
 }
 
 
@@ -750,9 +584,6 @@ BOOLEAN ShiftDVec::redViolatesDeg
   ( poly a, poly b, int uptodeg,
     ring aLmRing, ring bLmRing, ring bTailRing )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering redViolatesDeg.", "Leaving redViolatesDeg.", 1 );
   if(!uptodeg || !b) return FALSE;
   //or should we return true, if !b ?
   
@@ -765,16 +596,6 @@ BOOLEAN ShiftDVec::redViolatesDeg
     int tg_lm_itb = p_Totaldegree(b, bTailRing);
     tg_b = tg_b > tg_lm_itb ? tg_b : tg_lm_itb;
   }
-
-  deBoGriPrint
-    ( "Reduction viol. deg. bound.", 1, 
-      !(tg_b + tg_lm_a - tg_lm_b > uptodeg) );
-  deBoGriPrint
-    ( a, "poly a: ", 1, 
-      !(tg_b + tg_lm_a - tg_lm_b > uptodeg) );
-  deBoGriPrint
-    ( b, "poly b: ", 1, 
-      !(tg_b + tg_lm_a - tg_lm_b > uptodeg) );
 
   return tg_b + tg_lm_a - tg_lm_b > uptodeg;
 }
@@ -792,13 +613,8 @@ BOOLEAN ShiftDVec::redViolatesDeg
  *   degree bound.
  */
 BOOLEAN ShiftDVec::redViolatesDeg
-  ( SD::TObject* a, SD::TObject* b, int uptodeg, ring lmRing )
+  ( TObject* a, TObject* b, int uptodeg, ring lmRing )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering redViolatesDeg v2.", 
-      "Leaving redViolatesDeg v2.", 1 );
-
   int tg_a, tg_b;
   poly it_b;
   ring r_a, r_b;
@@ -850,60 +666,28 @@ bool ShiftDVec::createSPviolatesDeg
   ( poly a, poly b, uint shifta, int uptodeg,
     ring aLmRing, ring bLmRing, ring aTailRing, ring bTailRing )
 {
-  initDeBoGri
-    ( SD::indent, 
-      "Entering createSPviolatesDeg", 
-      "Leaving createSPviolatesDeg", 1 );
   if(!uptodeg) return false;
 
   int tg_lm_b = p_Totaldegree(b, bLmRing);
   uint degOverlap = tg_lm_b - shifta + 1;
 
-#if 0 //replaced
-  poly it_a = a;
-#else //replacement
   poly it_a = pNext(a); //TODO: Does that work with Singular?
-#endif
 
-  while(it_a){
+  while(it_a)
+  {
     int tg_lm_it_a = p_Totaldegree(it_a, aTailRing);
-    if(tg_lm_b + tg_lm_it_a - degOverlap > uptodeg) 
-    {
-      deBoGriPrint("Creation of s-poly violates deg. bound.", 1);
-      deBoGriPrint(a, "poly a: ", 1);
-      deBoGriPrint(shifta, "Shift for poly a: ", 1);
-      deBoGriPrint(b, "poly b: ", 1);
-      deBoGriPrint(uptodeg, "Uptodeg: ", 1);
-      deBoGriPrint(tg_lm_b, "Totaldeg of lm(b): ", 1);
-      deBoGriPrint(degOverlap, "Degree of overlap: ", 1);
-      deBoGriPrint(tg_lm_it_a, "Degree of lm(it_a): ", 1);
-      return true;
-    }
+    if(tg_lm_b + tg_lm_it_a - degOverlap > uptodeg)return true;
     pIter(it_a);
   }
 
   int tg_lm_a = p_Totaldegree(a, aLmRing);
 
-#if 0 //replaced
-  poly it_b = b;
-#else //replacement
   poly it_b = pNext(b); //TODO: Does that work with Singular?
-#endif
 
-  while(it_b){
+  while(it_b)
+  {
     int tg_lm_it_b = p_Totaldegree(it_b, bTailRing);
-    if(tg_lm_a + tg_lm_it_b - degOverlap > uptodeg)
-    {
-      deBoGriPrint("Creation of s-poly violates deg. bound.", 1);
-      deBoGriPrint(a, "poly a: ", 1);
-      deBoGriPrint(shifta, "Shift for poly a: ", 1);
-      deBoGriPrint(b, "poly b: ", 1);
-      deBoGriPrint(uptodeg, "Uptodeg: ", 1);
-      deBoGriPrint(tg_lm_a, "Totaldeg of lm(a): ", 1);
-      deBoGriPrint(degOverlap, "Degree of overlap: ", 1);
-      deBoGriPrint(tg_lm_it_b, "Degree of lm(it_b): ", 1);
-      return true;
-    }
+    if(tg_lm_a + tg_lm_it_b - degOverlap > uptodeg)return true;
     pIter(it_b);
   }
 
@@ -916,7 +700,8 @@ bool ShiftDVec::shiftViolatesDeg
 {
   assume(p != NULL);
   int tg_lm_p = p_Totaldegree(p, pLmRing);
-  loop{
+  loop
+  {
     if(tg_lm_p + shift > uptodeg) return true;
     if( pIter(p) == NULL ) break;
     tg_lm_p = p_Totaldegree(p, pTailRing);

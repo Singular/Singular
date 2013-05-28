@@ -108,6 +108,12 @@ namespace ShiftDVec
  *     ^
  *     |
  * ShiftDVec::sLObject
+ *
+ * Note to myself: Better do not use private members in any of
+ * the classes, since the standard does not define, how members
+ * from the private/public areas are lay out in memory (in
+ * which order) and this might be important for the singular
+ * memory management.
  */
 
 class ShiftDVec::sTObjectExtension
@@ -196,7 +202,7 @@ class ShiftDVec::sTObjectExtension
         (dvec, dvSize, T->dvec, T->dvSize, numVars); }
 };
 
-class ShiftDVec::sIObject : public ShiftDVec::sTObject
+class ShiftDVec::sLObject : public ShiftDVec::sLObject
 {
   public:
     /* BOCO: Important
@@ -252,10 +258,6 @@ class ShiftDVec::sIObject : public ShiftDVec::sTObject
     //adapted from original sLObject
     SD::sLObject& operator=(const SD::sTObject& t);
 };
-
-class ShiftDVec::sLObject : public ShiftDVec::sIObject
-#include <kernel/sLObject.inc.h> // see above for explanations
-
 
 class ShiftDVec::skStrategy : public ::skStrategy
 {

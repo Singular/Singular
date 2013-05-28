@@ -95,6 +95,13 @@ public:
 #ifdef HAVE_PLURAL  
   BOOLEAN is_special; // true, it is a new special S-poly (e.g. for SCA)
 #endif
+
+#define SHIFT_BBA_DVEC  //BOCO: TODO
+#ifdef SHIFT_BBA_DVEC
+  sTObjectExtension SD_Object_Extension; //TODO: maybe this
+                                         //should be a pointer
+  sTObjectExtension * SD_Ext(){ return &SD_Object_Extension; }
+#endif
   
   // initialization
   KINLINE void Init(ring r = currRing);
