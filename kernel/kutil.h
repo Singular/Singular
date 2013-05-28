@@ -19,7 +19,7 @@
 
 #include <kernel/structs.h>
 
-#include <kernel/SDTObjectExtensions.h>
+#include <kernel/SDTObjectExtension.h>
 
 #include <Singular/lists.h>
 

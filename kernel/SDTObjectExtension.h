@@ -1,13 +1,17 @@
-/* file:        SDkutil.h
+/* file:        SDTObjectExtension.h
  * authors:     Grischa Studzinski & Benjamin Schnitzler
  * created:     ask git
  * last change: ask git
  *
  * DESCRIPTION:
- * This file contains extensions to some structures and
- * functions defined in kutil.h (...Object, ...Strategy, etc.).
- *
- * TODO: bidubidu
+ * This is a file on your computer. Ok, it may not be your
+ * computer. So this is a file on a computer. Hm, maybe the
+ * storage device containing this file is not located in a
+ * computer. Well at least, I am pretty sure that this is a
+ * file... Ha! As You are reading this file, it is contained
+ * in the RAM on a computer You are using! Hm, what is the
+ * definition of "computer"? Maybe not the whole file is
+ * contained in the RAM... . It is to complicated, I give up.
  */
 
 
