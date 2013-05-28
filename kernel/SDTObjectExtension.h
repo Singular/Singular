@@ -15,8 +15,8 @@
  */
 
 
-#ifndef SDKUTIL_H
-#define SDKUTIL_H
+#ifndef SDTOBJECTEXTENSION_H
+#define SDTOBJECTEXTENSION_H
 
 namespace ShiftDVec
 {
@@ -25,70 +25,6 @@ namespace ShiftDVec
   typedef unsigned int uint;
 
   class sTObjectExtension;
-
-  uint CreateDVec(poly p, ring r, uint*& dvec);
-
-  uint getShift
-    (poly p, uint numFirstVar, ring r = currRing );
-
-  bool compareDVec
-      ( const uint* dvec, poly p, 
-        uint offset, uint maxSize, ring r = currRing );
-
-  uint divisibleBy
-    ( const uint* dvec1, uint dvSize1, 
-      const uint* dvec2, uint dvSize2, int numVars );
-
-  uint divisibleBy
-    ( const uint* dvec1, uint dvSize1, 
-      const uint* dvec2, uint dvSize2, 
-      uint minShift, uint maxShift, int numVars );
-
-  uint divisibleBy
-    ( sTObject * t1, sTObject * t2, int numVars );
-
-  uint findRightOverlaps
-    ( SD::TObject * t1, SD::TObject * t2, 
-      int numVars, int maxDeg, uint ** overlaps );
-
-  BOOLEAN redViolatesDeg
-    ( poly a, poly b, int uptodeg,
-      ring aLmRing = currRing, 
-      ring bLmRing = currRing, ring bTailRing = currRing );
-  BOOLEAN redViolatesDeg
-    ( SD::TObject* a, SD::TObject* b, 
-      int uptodeg, ring lmRing = currRing );
-
-  bool createSPviolatesDeg
-    ( poly a, poly b, uint shift, int uptodeg, 
-      ring aLmRing = currRing, ring bLmRing = currRing, 
-      ring aTailRing = currRing, ring bTailRing = currRing );
-  bool shiftViolatesDeg
-    ( poly p, uint shift, int uptodeg, 
-      ring pLmRing = currRing, ring pTailRing = currRing );
-
-  void dvecWrite(const poly p, ring r = currRing);
-
-  void dvecWrite(const uint* dvec, uint dvSize);
-
-  void dvecWrite(const SD::TObject* t);
-
-  void lcmDvecWrite(const SD::LObject* t);
-
-  extern int lpDVCase; //defined in kutil2.cc
-
-  uint lcmDivisibleBy
-    ( SD::LObject * lcm, SD::TObject * p, int numVars );
-
-  void lcmDvecWrite(SD::LObject* t);
-
-  int cmpDVecProper
-      ( uint* dv1, uint begin_dv1,
-        uint* dv2, uint begin_dv2, uint size, int lV );
-
-  int cmpDVecProper
-      ( SD::sTObject* T1, uint beginT1,
-        SD::sTObject* T2, uint beginT2, uint size, int lV );
 }
 
 
@@ -197,3 +133,5 @@ class ShiftDVec::sTObjectExtension
       return ShiftDVec::divisibleBy
         (dvec, dvSize, T->dvec, T->dvSize, numVars); }
 };
+
+#endif
