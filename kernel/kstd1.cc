@@ -1548,8 +1548,7 @@ loop_count = 1;
 
 #ifdef HAVE_TAIL_RING
 //  if (strat->homog && strat->red == redFirst)
-	if((hilb==NULL)||(strat->homog))
-	kStratInitChangeTailRing(strat);
+  kStratInitChangeTailRing(strat);
 #endif
 
   if (BVERBOSE(23))

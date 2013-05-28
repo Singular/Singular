@@ -101,7 +101,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfCoeffWrite  = nrnCoeffWrite;
   r->nCoeffIsEqual = nrnCoeffsEqual;
   r->cfInit_bigint = nrnMapQ;
-
+  r->cfKillChar    = ndKillChar;
+	
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif

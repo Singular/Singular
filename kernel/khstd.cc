@@ -148,20 +148,7 @@ int i;
 ideal Lm;
 intvec *newhilb;
 
-//Lm=id_Copy(strat->Shdl,currRing);
-Lm=idInit(IDELEMS(strat->Shdl),strat->Shdl->rank);
-
-//Construct Lm
-
-for(i=0;i<=strat->sl;i++)
-	{
-	Lm->m[i]=pCopy(strat->Shdl->m[i]);
-	pNext(Lm->m[i])=NULL;
-	}
-idTest(Lm);
-
-//idPrint(strat->Shdl);
-//idPrint(Lm);
+Lm = id_Head(strat->Shdl,currRing);
 
 newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing);
 

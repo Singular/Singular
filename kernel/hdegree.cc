@@ -21,8 +21,6 @@
 #include <kernel/hutil.h>
 #include <kernel/stairc.h>
 
-#define ADIDEBUG 0
-
 int  hCo, hMu, hMu2;
 omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 
@@ -991,13 +989,13 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
   //consider just monic generators (over rings with zero-divisors)
-  ideal SS=id_Copy(S,currRing);
+  ideal SS=id_Copy(S,tailRing);
   for(i=0;i<=idElem(SS);i++)
   	{
   	if(pIsPurePower(SS->m[i])==0)
-  		p_Delete(&SS->m[i],currRing);
+  		p_Delete(&SS->m[i],tailRing);
   	}
-  	S=id_Copy(SS,currRing);
+  	S=id_Copy(SS,tailRing);
   }
   #endif
 

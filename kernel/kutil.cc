@@ -282,11 +282,6 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         }
         else if (fromNext)
           L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
-        #ifdef HAVE_RINGS
-  			if((rField_is_Ring(currRing)) && (currRing->OrdSgn == -1) && (strat->homog!=isHomog))
-  				L->max = NULL;
-  		//it changed max but tailRing = currRing
-  		#endif
         //if (L->pLength != 0)
         L->pLength = l;
         // Hmmm when called from updateT, then only
@@ -8140,11 +8135,11 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
 if (new_tailRing == currRing) return TRUE;
 
 //Indeed, the condition pFDeg == p_Deg is too strong. What to do?
-  #ifdef HAVE_RINGS
+ /* #ifdef HAVE_RINGS
    if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
     return TRUE;
   #endif
-
+*/
   strat->pOrigFDeg_TailRing = new_tailRing->pFDeg;
   strat->pOrigLDeg_TailRing = new_tailRing->pLDeg;
 
