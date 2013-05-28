@@ -19,6 +19,8 @@
 
 #include <kernel/structs.h>
 
+#include <kernel/SDTObjectExtensions.h>
+
 #include <Singular/lists.h>
 
 #if 1
@@ -98,9 +100,10 @@ public:
 
 #define SHIFT_BBA_DVEC  //BOCO: TODO
 #ifdef SHIFT_BBA_DVEC
-  sTObjectExtension SD_Object_Extension; //TODO: maybe this
-                                         //should be a pointer
-  sTObjectExtension * SD_Ext(){ return &SD_Object_Extension; }
+  //TODO: maybe the following should be a pointer:
+  ShiftDVec::sTObjectExtension SD_Object_Extension;
+  ShiftDVec::sTObjectExtension * SD_Ext()
+  { return &SD_Object_Extension; }
 #endif
   
   // initialization
