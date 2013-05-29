@@ -19,8 +19,6 @@
 
 #include <kernel/structs.h>
 
-#include <kernel/SDTObjectExtension.h>
-
 #include <Singular/lists.h>
 
 #if 1
@@ -66,6 +64,11 @@ typedef denominator_list_s *denominator_list;
 struct denominator_list_s{number n; denominator_list next;};
 extern denominator_list DENOMINATOR_LIST;
 
+namespace ShiftDVec
+{
+  class sTObjectExtension;
+}
+
 class sTObject
 {
 public:
@@ -100,10 +103,9 @@ public:
 
 #define SHIFT_BBA_DVEC  //BOCO: TODO
 #ifdef SHIFT_BBA_DVEC
-  //TODO: maybe the following should be a pointer:
-  ShiftDVec::sTObjectExtension SD_Object_Extension;
+  ShiftDVec::sTObjectExtension * SD_Object_Extension;
   ShiftDVec::sTObjectExtension * SD_Ext()
-  { return &SD_Object_Extension; }
+  { return SD_Object_Extension; }
 #endif
   
   // initialization

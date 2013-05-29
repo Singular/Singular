@@ -10,6 +10,8 @@
  * TODO: bidubidu
  */
 
+#include <kutil.h>
+
 
 #ifndef SDKUTIL_H
 #define SDKUTIL_H
@@ -48,7 +50,7 @@ namespace ShiftDVec
     ( sTObject * t1, sTObject * t2, int numVars );
 
   uint findRightOverlaps
-    ( SD::TObject * t1, SD::TObject * t2, 
+    ( TObject * t1, TObject * t2, 
       int numVars, int maxDeg, uint ** overlaps );
 
   BOOLEAN redViolatesDeg
@@ -56,7 +58,7 @@ namespace ShiftDVec
       ring aLmRing = currRing, 
       ring bLmRing = currRing, ring bTailRing = currRing );
   BOOLEAN redViolatesDeg
-    ( SD::TObject* a, SD::TObject* b, 
+    ( TObject* a, TObject* b, 
       int uptodeg, ring lmRing = currRing );
 
   bool createSPviolatesDeg
@@ -71,14 +73,14 @@ namespace ShiftDVec
 
   void dvecWrite(const uint* dvec, uint dvSize);
 
-  void dvecWrite(const SD::TObject* t);
+  void dvecWrite(const TObject* t);
 
   void lcmDvecWrite(const SD::LObject* t);
 
   extern int lpDVCase; //defined in kutil2.cc
 
   uint lcmDivisibleBy
-    ( SD::LObject * lcm, SD::TObject * p, int numVars );
+    ( SD::LObject * lcm, TObject * p, int numVars );
 
   void lcmDvecWrite(SD::LObject* t);
 
@@ -87,8 +89,8 @@ namespace ShiftDVec
         uint* dv2, uint begin_dv2, uint size, int lV );
 
   int cmpDVecProper
-      ( SD::sTObject* T1, uint beginT1,
-        SD::sTObject* T2, uint beginT2, uint size, int lV );
+      ( sTObject* T1, uint beginT1,
+        sTObject* T2, uint beginT2, uint size, int lV );
 }
 
 
@@ -112,7 +114,78 @@ namespace ShiftDVec
  * memory management.
  */
 
-class ShiftDVec::sLObject : public ShiftDVec::sLObject
+class ShiftDVec::sTObjectExtension
+{
+  public:
+    sTObject* T; //The sTObject, this object is contained in
+    uint * dvec; //Distance Vector of lm(p)
+    uint dvSize; //size of the >>uint * dvec<< array
+
+    uint  shift; //shift of polynomial
+    //TODO: this shift shall replace the necessity of storing
+    //      shifts of polynomials, when creating pairs
+
+    //uint pIsInR; //already i_r in ::sTObject
+
+    // constructor
+    sTObjectExtension(sTObject* _T) : dvec(NULL), T(_T) {}
+
+    // TODO: destructor - shall we define one?
+
+    void dumbInit(sTObject* _T){ T = _T; dvec = NULL; }
+
+    void SetDVecIfNULL(poly p, ring r)
+    { if(!dvec) SetDVec(p, r); }
+
+    void SetDVecIfNULL()
+    { if(!dvec) SetDVec(); }
+    
+    // Initialize the distance vector of an ShiftDVec::sTObject
+    void SetDVec(poly p, ring r)
+    {
+      freeDVec(); 
+      dvSize = CreateDVec(p, r, dvec); 
+    }
+
+    // Initialize the distance vector of an ShiftDVec::sTObject
+    void SetDVec()
+    {
+      freeDVec();
+      if(T->p == NULL)
+        dvSize = CreateDVec(T->t_p, T->tailRing, dvec);
+      else
+        dvSize = CreateDVec(T->p, currRing, dvec);
+    }
+
+    void SetDVec(uint* dv) {dvec = dv;}
+
+    uint*  GetDVec(); 
+    uint  getDVecAtIndex(uint index) {return dvec[index];}
+    uint GetDVsize(); 
+
+    int cmpDVec(sTObject* toCompare);
+
+    int cmpDVec
+      (sTObject* T1, uint begin, uint beginT1, uint size);
+
+    int cmpDVecProper
+      ( sTObject* T1, 
+        uint begin, uint beginT1, uint size, int lV );
+
+    void freeDVec(); 
+
+    uint divisibleBy( sTObject * Tobj, int numVars )
+    {
+      SetDVecIfNULL();
+      Tobj->SD_Ext()->SetDVecIfNULL();
+      return ShiftDVec::divisibleBy
+                          ( dvec, dvSize,
+                            Tobj->SD_Ext()->dvec,
+                            Tobj->SD_Ext()->dvSize, numVars );
+    }
+};
+
+class ShiftDVec::sLObject : public ::sLObject
 {
   public:
     /* BOCO: Important
@@ -127,14 +200,16 @@ class ShiftDVec::sLObject : public ShiftDVec::sLObject
     uint  lcmDvSize;
 
     // constructors
-    sIObject(ring r = currRing) : 
-      SD::sTObject(r) {/*BOCO: others?*/}
+    sLObject(ring r = currRing) : 
+      ::sLObject(r) {/*Initialization of Extensions?*/}
 
-    sIObject(poly p, ring tailRing = currRing) : 
-      SD::sTObject(p, tailRing){/*BOCO: others?*/}
+    sLObject(poly p, ring tailRing = currRing) : 
+      ::sLObject(p, tailRing)
+    {/*Initialization of Extensions?*/}
 
-    sIObject(poly p, ring c_r, ring tailRing) : 
-      SD::sTObject(p, c_r, tailRing){/*BOCO: others?*/}
+    sLObject(poly p, ring c_r, ring tailRing) : 
+      ::sLObject(p, c_r, tailRing)
+    {/*Initialization of Extensions?*/}
 
     void SetLcmDVec(poly p, ring r = currRing)
     { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDVec); }
@@ -155,18 +230,19 @@ class ShiftDVec::sLObject : public ShiftDVec::sLObject
 
     void freeLcmDVec();
 
-    uint lcmDivisibleBy( ShiftDVec::sTObject * T, int numVars );
+    uint lcmDivisibleBy( sTObject * T, int numVars );
 
     uint lcmDivisibleBy
-      ( ShiftDVec::sTObject * T, 
+      ( sTObject * T, 
         uint minShift, uint maxShift, int numVars );
 
-    bool compareLcmTo(  ShiftDVec::sLObject* other, ring r = currRing );
+    bool compareLcmTo
+      (  ShiftDVec::sLObject* other, ring r = currRing );
 
     bool compareLcmTo( poly p1, poly p2, ring r = currRing );
 
     //adapted from original sLObject
-    SD::sLObject& operator=(const SD::sTObject& t);
+    SD::sLObject& operator=(const sTObject& t);
 };
 
 class ShiftDVec::skStrategy : public ::skStrategy
@@ -187,7 +263,7 @@ class ShiftDVec::skStrategy : public ::skStrategy
      *   Question: Will I be part of T ??? - I don't think so,
      * but again: What was the difference between T and R ?
      */
-    SD::TObject* I; //first index:0; last index: size_of_I-1
+    TObject* I; //first index:0; last index: size_of_I-1
     uint size_of_I; // This is, what it says!
     int lV;
     int uptodeg;
@@ -199,11 +275,8 @@ class ShiftDVec::skStrategy : public ::skStrategy
     SD::LSet L;
     SD::LSet B;
     SD::LObject P;
-    SD::TObject** R;
 
     /* functions/function pointers we had to overwrite */
-    SD::TObject* s_2_t(int i);
-    SD::TObject* S_2_T(int i);
     int (*red)(SD::LObject * L,kStrategy strat);
     void initL(ideal F)
     { 
@@ -223,7 +296,7 @@ class ShiftDVec::skStrategy : public ::skStrategy
     void init_I(ideal I){/*TODO*/ assume(0);}
     uint get_size_of_I(){return size_of_I;}
     uint translate_index_I_to_R(uint i){/*TODO*/ assume(0);}
-    SD::TObject* get_I_at(uint i){return &(I[i]);}
+    TObject* get_I_at(uint i){return &(I[i]);}
 
     void deleteFromL(uint index){/*TODO*/ assume(0);}
 };
