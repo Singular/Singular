@@ -22,10 +22,7 @@ namespace ShiftDVec
 
   typedef unsigned int uint;
 
-  class sLObject;
   class skStrategy;
-  typedef sLObject LObject;
-  typedef sLObject* LSet;
   typedef skStrategy* kStrategy;
 
   uint CreateDVec(poly p, ring r, uint*& dvec);
@@ -75,14 +72,14 @@ namespace ShiftDVec
 
   void dvecWrite(const TObject* t);
 
-  void lcmDvecWrite(const SD::LObject* t);
+  void lcmDvecWrite(const LObject* t);
 
   extern int lpDVCase; //defined in kutil2.cc
 
   uint lcmDivisibleBy
-    ( SD::LObject * lcm, TObject * p, int numVars );
+    ( LObject * lcm, TObject * p, int numVars );
 
-  void lcmDvecWrite(SD::LObject* t);
+  void lcmDvecWrite(LObject* t);
 
   int cmpDVecProper
       ( uint* dv1, uint begin_dv1,
@@ -97,15 +94,12 @@ namespace ShiftDVec
 /* classes/class extensions for ShiftDVec case */
 
 
-/* Inheritance for the ShiftDVec case explained
+/* Object Extensions and Inheritance:
  *
  * sTObject --- contains ---> ShiftDVec::sTObjectExtension
- *     ^
- *     |
- * sLObject
- *     ^
- *     |
- * ShiftDVec::sLObject
+ *     ^                                   ^
+ *     |                                   |
+ * sLObject --- contains ---> ShiftDVec::sLObjectExtension
  *
  * Note to myself: Better do not use private members in any of
  * the classes, since the standard does not define, how members
@@ -129,6 +123,9 @@ class ShiftDVec::sTObjectExtension
 
     // constructor
     sTObjectExtension(sTObject* _T) : dvec(NULL), T(_T) {}
+
+    // destructor
+    ~sTObjectExtension(sTObject* _T) { freeDVec(); }
 
     // TODO: destructor - shall we define one?
 
@@ -185,50 +182,23 @@ class ShiftDVec::sTObjectExtension
     }
 };
 
-class ShiftDVec::sLObject : public ::sLObject
+class ShiftDVec::sLObjectExtension :
+  public ShiftDVec::sTObjectExtension
 {
   public:
-    /* BOCO: Important
-     * The lcmDvec and lcmDvSize need to be set to NULL
-     * respectivly 0, every time, the lcm changes and at the
-     * creation of an LObject.
-     * See kutil2.cc for most definitions.
-     * TODO:
-     * Do the latter in the constructor.
-     */
-    uint*   lcmDVec;   /*- the corresponding dvec -*/
-    uint  lcmDvSize;
-
-    // constructors
-    sLObject(ring r = currRing) : 
-      ::sLObject(r) {/*Initialization of Extensions?*/}
-
-    sLObject(poly p, ring tailRing = currRing) : 
-      ::sLObject(p, tailRing)
-    {/*Initialization of Extensions?*/}
-
-    sLObject(poly p, ring c_r, ring tailRing) : 
-      ::sLObject(p, c_r, tailRing)
-    {/*Initialization of Extensions?*/}
-
-    void SetLcmDVec(poly p, ring r = currRing)
-    { lcmDvSize = ShiftDVec::CreateDVec(p, r, lcmDVec); }
+    // constructor
+    sLObjectExtension(sLObject* _T) : dvec(NULL), T(_T) {}
 
     //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
     void SetLcmDVec(ring r = currRing);
 
-    void SetLcmDvecIfNULL() {if(!lcmDVec) SetLcmDVec();}
+    void SetLcmDvecIfNULL(ring r = currRing)
+    {if(!dvec) SetLcmDVec(r);}
 
-    void SetLcmDvecToNULL() {lcmDVec = NULL; lcmDvSize = 0;}
-
-    uint* getLcmDVec() const { return lcmDVec; }
-
-    uint getLcmDVSize(ring r = currRing);
+    void SetLcmDvecToNULL() {dvec = NULL; dvSize = 0;}
 
     bool gm3LcmUnEqualToLcm
       (poly p1, poly p2, int lV, ring r = currRing);
-
-    void freeLcmDVec();
 
     uint lcmDivisibleBy( sTObject * T, int numVars );
 
@@ -237,18 +207,12 @@ class ShiftDVec::sLObject : public ::sLObject
         uint minShift, uint maxShift, int numVars );
 
     bool compareLcmTo
-      (  ShiftDVec::sLObject* other, ring r = currRing );
+      (  sLObject* other, ring r = currRing );
 
     bool compareLcmTo( poly p1, poly p2, ring r = currRing );
 
-    //adapted from original sLObject
-    SD::sLObject& operator=(const sTObject& t)
-    {
-      //TODO: Do we want a deepcopy of the sTObjecteExtensions?
-      memset( this, 0, sizeof(sTObject) );
-      memcpy( this, &t, sizeof(sTObject));
-      return *this;
-    }
+    sLObject* get_LObject()
+    { return static_cast<sLObject*>(T); }
 };
 
 class ShiftDVec::skStrategy : public ::skStrategy
@@ -274,23 +238,6 @@ class ShiftDVec::skStrategy : public ::skStrategy
     int lV;
     int uptodeg;
 
-    /* We had to overwrite some of the sets/objects from
-     * ::skStrategy, since they were generalized for ShiftDVec
-     * case.
-     */
-    SD::LObject P;
-
-    /* functions/function pointers we had to overwrite */
-    int (*red)(SD::LObject * L,kStrategy strat);
-    void initL(ideal F)
-    { 
-      int nr =
-        ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
-      L = (SD::LSet)omAlloc(nr*sizeof(SD::LObject));
-    }
-    void initB()
-    { B = (SD::LSet)omAlloc(setmaxL*sizeof(SD::LObject)); }
-
     void init_lV(int lV){this->lV = lV;}
     int get_lV(){return lV;}
 
@@ -301,8 +248,6 @@ class ShiftDVec::skStrategy : public ::skStrategy
     uint get_size_of_I(){return size_of_I;}
     uint translate_index_I_to_R(uint i){/*TODO*/ assume(0);}
     TObject* get_I_at(uint i){return &(I[i]);}
-
-    void deleteFromL(uint index){/*TODO*/ assume(0);}
 };
 
 

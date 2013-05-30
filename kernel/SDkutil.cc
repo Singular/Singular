@@ -173,60 +173,49 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 
 
 
-//member functions of SD::sLobject
+//member functions of SD::sLObjectExtension
 
 
 
-//Get the size of the lcms dvec. Initialize it, if not set - the
-//latter requires p1 and p2 to be set and shifted correctly.
-uint ShiftDVec::sLObject::getLcmDVSize(ring r)
-{
-  assume( p1 != NULL && p2 != NULL );
-
-  if( !lcmDvSize )
-  {
-    //I hope, this will get me the letterplace degree of lm(p1) 
-    //(totaldeg(x(4)*y(5)*z(6)) for example should be 6).
-    //BOCO: IMPORTANT: TODO: This was a wrong assuption - maybe
-    //use getShift somehow.
-    int degP1 = p_Totaldegree(p1, r);
-    int degP2 = p_Totaldegree(p2, r);
-    lcmDvSize = degP1 > degP2 ? degP1 : degP2; 
-  }
-
-  return lcmDvSize;
-}
-
-void ShiftDVec::sLObject::SetLcmDVec(ring r)
+void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
 {
 #ifdef USE_DVEC_LCM
   //We want to create the lcm directly from p1, p2 .
   //This is an adapted version of the CreateDVec function.
   //TODO: This has to be testet!
   
-  assume(p1 != NULL && p2 != NULL);
+  assume( get_LObject()->p1 != NULL &&
+          get_LObject()->p2 != NULL    );
 
   //I hope, this will get me the letterplace degree of lm(p1) 
   //(totaldeg(x(4)*y(5)*z(6)) for example should be 6).
   //BOCO: IMPORTANT: TODO: This was a wrong assuption - maybe
   //use getShift somehow.
-  uint dvSize1 = p_Totaldegree(p1, r);
-  uint dvSize2 = p_Totaldegree(p2, r);
+  uint dvSize1 = p_Totaldegree(get_LObject()->p1, r);
+  uint dvSize2 = p_Totaldegree(get_LObject()->p2, r);
 
-  //One of the polys should be shifted in letterplace case. This
-  //one overlaps the other one.
+  //One of the polys should be shifted in letterplace case.
+  //This one overlaps the other one.
   poly shifted; poly notShifted;
   if(dvSize1 > dvSize2)
-    {poly shifted=p1; poly notShifted=p2; 
-      lcmDvSize=dvSize1; dvSize1 = dvSize2;}
+  {
+    poly shifted    = get_LObject()->p1;
+    poly notShifted = get_LObject()->p2;
+    this->dvSize    = dvSize1;
+    dvSize1 = dvSize2;
+  }
   else
-    {poly shifted=p2; poly notShifted=p1; lcmDvSize=dvSize2;}
+  {
+    poly shifted    = get_LObject()->p2;
+    poly notShifted = get_LObject()->p1;
+    this->dvSize    = dvSize2;
+  }
 
-  assume(lcmDvSize > 0);
+  assume(dvSize > 0);
 
-  lcmDvec = (uint *)omAlloc0(lcmDvSize*sizeof(uint));
+  dvec = (uint *)omAlloc0( dvSize*sizeof(uint) );
 
-  uint * it = lcmDvec;
+  uint * it = dvec;
 
   /* The creation of the shift invariant distance vector is
    * similar to its creation in CreateDVec; we will begin with
@@ -243,17 +232,6 @@ void ShiftDVec::sLObject::SetLcmDVec(ring r)
 #endif
 }
 
-void ShiftDVec::sLObject::freeLcmDVec()
-{
-  if(lcmDVec)
-  {
-    omFreeSize( (ADDRESS)lcmDVec, sizeof(uint) * lcmDvSize ); 
-    lcmDVec = NULL;
-    lcmDvSize = 0;
-  }
-}
-
-
 /* returns true, if the DVec of this objects lcm is equal to the
  * DVec of the other objects lcm. Thus, if both lcm do not have
  * the same shift, but would otherwise be equal, true will be
@@ -261,11 +239,12 @@ void ShiftDVec::sLObject::freeLcmDVec()
 bool ShiftDVec::sLObject::compareLcmTo
   ( SD::sLObject* other, ring r )
 {
-  if( this->getLcmDVSize(r) != other->getLcmDVSize(r) ) 
+  if(this->getLcmDVSize(r) != other->SD_Ext()->getLcmDVSize(r))
     return false;
 
-  assume(this->p1 != NULL && this->p2 != NULL);
-  assume(other->p1 != NULL && other->p2 != NULL);
+  assume( get_LObject()->p1 != NULL &&
+          get_LObject()->p2 != NULL    );
+  assume( other->p1 != NULL && other->p2 != NULL );
 
   //now we need to create the dvecs
   if(!this->lcmDVec) this->SetLcmDVec();
