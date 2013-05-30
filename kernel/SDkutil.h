@@ -189,6 +189,8 @@ class ShiftDVec::sLObjectExtension :
     // constructor
     sLObjectExtension(sLObject* _T) : dvec(NULL), T(_T) {}
 
+    uint getLcmDVSize(ring r = currRing);
+
     //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
     void SetLcmDVec(ring r = currRing);
 

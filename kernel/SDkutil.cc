@@ -155,6 +155,26 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 
 //member functions of SD::sLObjectExtension
 
+//Get the size of the lcms dvec. Initialize it, if not set - the
+//latter requires p1 and p2 to be set and shifted correctly.
+uint ShiftDVec::sLObjectExtension::getLcmDVSize(ring r)
+{
+  LObject * L = this->get_LObject();
+  assume( L->p1 != NULL && L->p2 != NULL );
+
+  if( !dvSize )
+  {
+    //I hope, this will get me the letterplace degree of lm(p1) 
+    //(totaldeg(x(4)*y(5)*z(6)) for example should be 6).
+    //BOCO: IMPORTANT: TODO: This was a wrong assuption - maybe
+    //use getShift somehow.
+    int degP1 = p_Totaldegree(L->p1, r);
+    int degP2 = p_Totaldegree(L->p2, r);
+    dvSize = degP1 > degP2 ? degP1 : degP2; 
+  }
+
+  return dvSize;
+}
 
 void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
 {
