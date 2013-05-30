@@ -105,17 +105,17 @@ inline static intset initec (const int maxnr)
 
 //BOCO: static function copied from kutil.cc
 static inline void enlargeL
-  (ShiftDVec::LSet* L,int* length,const int incr)
+  (LSet* L,int* length,const int incr)
 {
   namespace SD = ShiftDVec;
 
   assume((*L)!=NULL);
   assume((length+incr)>0);
 
-  *L = (SD::LSet)omReallocSize
+  *L = (LSet)omReallocSize
           ( (*L), 
-            (*length)*sizeof(SD::LObject),
-            ((*length)+incr)*sizeof(SD::LObject) );
+            (*length)*sizeof(LObject),
+            ((*length)+incr)*sizeof(LObject) );
   (*length) += incr;
 }
 
@@ -655,7 +655,7 @@ ideal ShiftDVec::bba
       loop
       {
         if (j>=k) break;
-        SD::LObject tmpL(strat->S[j]);
+        LObject tmpL(strat->S[j]);
         SD::clearS(&tmpL,strat->sevS[j],&k,&j,strat);
         j++;
       }
@@ -861,7 +861,7 @@ void ShiftDVec::completeReduce
 #endif
   int i;
   int low = (((currRing->OrdSgn==1) && (strat->ak==0)) ? 1 : 0);
-  SD::LObject L;
+  LObject L;
 
 #ifdef KDEBUG
   // need to set this: during tailreductions of T[i], T[i].max 
@@ -985,7 +985,7 @@ void ShiftDVec::completeReduce
  * The original resides in kutil.cc
  */
 poly ShiftDVec::redtail
-  (ShiftDVec::LObject* L, int pos, ShiftDVec::kStrategy strat)
+  (LObject* L, int pos, ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
   poly h, hn;
@@ -997,7 +997,7 @@ poly ShiftDVec::redtail
   poly p = L->p;
   if (strat->noTailReduction || pNext(p) == NULL) return p;
 
-  SD::LObject Ln(strat->tailRing);
+  LObject Ln(strat->tailRing);
   TObject* With;
   // placeholder in case strat->tl < 0
   TObject  With_s(strat->tailRing);
@@ -1097,7 +1097,7 @@ poly ShiftDVec::redtail
 poly ShiftDVec::redtail(poly p, int pos, SD::kStrategy strat)
 {
   namespace SD = ShiftDVec;
-  SD::LObject L(p, currRing);
+  LObject L(p, currRing);
   return SD::redtail(&L, pos, strat);
 }
 
@@ -1135,7 +1135,7 @@ void ShiftDVec::initBba( ideal F, SD::kStrategy strat )
  * and the case of a degree-ordering
  * original resides in kstd2.cc
  */
-int ShiftDVec::redHomog( SD::LObject* h, SD::kStrategy strat )
+int ShiftDVec::redHomog( LObject* h, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
 
@@ -1270,7 +1270,7 @@ int ShiftDVec::redHomog( SD::LObject* h, SD::kStrategy strat )
     {
       if (h->lcm!=NULL) pLmFree(h->lcm);
 
-      h->freeLcmDVec(); //BOCO: maybe this is not necessary ?
+      h->SD_Ext()->freeDVec(); //BOCO: maybe this is not necessary ?
 
 #ifdef KDEBUG
       h->lcm=NULL;
@@ -1314,7 +1314,7 @@ int ShiftDVec::redHomog( SD::LObject* h, SD::kStrategy strat )
 
 int ShiftDVec::kFindDivisibleByInS
   ( const SD::kStrategy strat,
-    int* max_ind, SD::LObject* L, int shift )
+    int* max_ind, LObject* L, int shift )
 {
   namespace SD = ShiftDVec;
 #if (HAVE_SEV > 0) //BOCO: comments/uncomments sev
@@ -1373,7 +1373,7 @@ int ShiftDVec::kFindDivisibleByInS
  *  procedure used in updateS
  */
 poly ShiftDVec::redBba
-  ( SD::LObject * h, int maxIndex, SD::kStrategy strat )
+  ( LObject * h, int maxIndex, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
 
@@ -1532,7 +1532,7 @@ static inline uint ShiftDVec::_p_LmDivisibleByNoComp
  */
 int ShiftDVec::kFindDivisibleByInT
   ( const TSet &T,
-    const unsigned long* sevT, SD::LObject * L, 
+    const unsigned long* sevT, LObject * L, 
     uint & shift, SD::kStrategy strat, const int start )
 {
   namespace SD = ShiftDVec;
@@ -1624,7 +1624,7 @@ int ShiftDVec::kFindDivisibleByInT
  */
 TObject * ShiftDVec::kFindDivisibleByInS
   ( SD::kStrategy strat, int pos,
-    SD::LObject* L, TObject* T, 
+    LObject* L, TObject* T, 
     uint & shift, int lV, int uptodeg, long ecart )
 {
   namespace SD = ShiftDVec;
@@ -1730,7 +1730,7 @@ TObject * ShiftDVec::kFindDivisibleByInS
 
 
 poly ShiftDVec::redtailBba
-  ( ShiftDVec::LObject* L, int pos,
+  ( LObject* L, int pos,
     SD::kStrategy strat, BOOLEAN withT, BOOLEAN normalize )
 {
   namespace SD = ShiftDVec;
@@ -1748,7 +1748,7 @@ poly ShiftDVec::redtailBba
   TObject  With_s(strat->tailRing);
 
   //BOCO: I think, this initializes Ln.t_p, but not Ln.p
-  SD::LObject Ln(pNext(h), strat->tailRing);
+  LObject Ln(pNext(h), strat->tailRing);
   Ln.SD_Ext_Init();
   Ln.pLength = L->GetpLength() - 1;
 
@@ -1943,7 +1943,7 @@ KINLINE poly ShiftDVec::redtailBba
 {
   namespace SD = ShiftDVec;
 
-  SD::LObject L(p, currRing, strat->tailRing);
+  LObject L(p, currRing, strat->tailRing);
   return SD::redtailBba(&L, pos, strat,FALSE, normalize);
 }
 
@@ -1958,7 +1958,7 @@ void ShiftDVec::updateS( BOOLEAN toT, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
 
-  SD::LObject h;
+  LObject h;
   int i, suc=0;
   poly redSi=NULL;
   BOOLEAN change,any_change;
@@ -1974,7 +1974,7 @@ void ShiftDVec::updateS( BOOLEAN toT, SD::kStrategy strat )
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi = pHead(strat->S[i]);
-          SD::LObject h(strat->S[i]);
+          LObject h(strat->S[i]);
           strat->S[i] = redBba(&h,i-1,strat);
           /*BOCO:
            *   wouldnt it be more efficient, if the reduction
@@ -2065,7 +2065,7 @@ void ShiftDVec::updateS( BOOLEAN toT, SD::kStrategy strat )
       {
         if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
         {
-          SD::LObject L(h.p, currRing, strat->tailRing); 
+          LObject L(h.p, currRing, strat->tailRing); 
           h.p = SD::redtailBba(&L, i-1, strat, FALSE, FALSE);
           if (TEST_OPT_INTSTRATEGY)
           {
@@ -2169,9 +2169,9 @@ void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
  *  p is now is passed as a pointer instead of passing it by
  *  value (may save us one copy).
  */
-ShiftDVec::LObject* ShiftDVec::enterL
-  ( SD::LSet *set,
-    int *length, int *LSetmax, SD::LObject* p, int at )
+LObject* ShiftDVec::enterL
+  ( LSet *set,
+    int *length, int *LSetmax, LObject* p, int at )
 {
   namespace SD = ShiftDVec;
 
@@ -2186,7 +2186,7 @@ ShiftDVec::LObject* ShiftDVec::enterL
     if (at <= (*length))
 #ifdef ENTER_USE_MEMMOVE
       memmove( &((*set)[at+1]), &((*set)[at]),
-               ((*length)-at+1)*sizeof(SD::LObject) );
+               ((*length)-at+1)*sizeof(LObject) );
 #else
     for (i=(*length)+1; i>=at+1; i--) (*set)[i] = (*set)[i-1];
 #endif
@@ -2261,7 +2261,7 @@ void ShiftDVec::initSL( ideal F, ideal Q, SD::kStrategy strat )
   {
     if (F->m[i]!=NULL)
     {
-      SD::LObject h;
+      LObject h;
 
       h.p = pCopy(F->m[i]);
       if (h.p!=NULL)
