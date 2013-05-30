@@ -158,7 +158,7 @@ class ShiftDVec::sTObjectExtension
 
     uint*  GetDVec(); 
     uint  getDVecAtIndex(uint index) {return dvec[index];}
-    uint GetDVsize(); 
+    uint GetDVsize(ring r = currRing); 
 
     int cmpDVec(sTObject* toCompare);
 
@@ -192,22 +192,20 @@ class ShiftDVec::sLObjectExtension :
     //uses the LObjects lcm or p1, p2 if USE_DVEC_LCM is set.
     void SetLcmDVec(ring r = currRing);
 
-    void SetLcmDvecIfNULL(ring r = currRing)
-    {if(!dvec) SetLcmDVec(r);}
+    void SetLcmDvecIfNULL( ring r = currRing )
+    { if(!dvec) SetLcmDVec(r); }
 
-    void SetLcmDvecToNULL() {dvec = NULL; dvSize = 0;}
+    void SetLcmDvecToNULL() { dvec = NULL; dvSize = 0; }
 
-    bool gm3LcmUnEqualToLcm
-      (poly p1, poly p2, int lV, ring r = currRing);
+    bool gm3LcmUnEqualToLcm( poly p1, poly p2,
+                             int lV, ring r = currRing );
 
     uint lcmDivisibleBy( sTObject * T, int numVars );
 
-    uint lcmDivisibleBy
-      ( sTObject * T, 
-        uint minShift, uint maxShift, int numVars );
+    uint lcmDivisibleBy( sTObject * T, uint minShift,
+                         uint maxShift, int numVars   );
 
-    bool compareLcmTo
-      (  sLObject* other, ring r = currRing );
+    bool compareLcmTo( sLObject* other, ring r = currRing );
 
     bool compareLcmTo( poly p1, poly p2, ring r = currRing );
 

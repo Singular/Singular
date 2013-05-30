@@ -28,46 +28,29 @@
 typedef skStrategy* kStrategy;
 
 
-
 //additional member functions of sTObject
+
+
 ShiftDVec::sTObjectExtension * sTObject::SD_Ext_Init()
 {
-  assume(SD_Object_Extension == NULL);
+  assume( SD_Object_Extension == NULL );
   return SD_Object_Extension =
       new ShiftDVec::sTObjectExtension(this);
 }
 
 
+//additional member functions of sLObject
+
+
+ShiftDVec::sTObjectExtension * sLObject::SD_Ext_Init()
+{
+  assume( SD_Object_Extension == NULL );
+  return SD_Object_Extension =
+      new ShiftDVec::sLObjectExtension(this);
+}
+
 
 //member functions of ShiftDVec::sTObjectExtension
-
-
-
-uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
-{
-  if(p == NULL){dvec = NULL; return 0;}
-
-  //We should test here, if p is in r. (see sTObject::Set ?)
-
-  //I hope this is the right way to get the total deg. of lm(p)
-  uint dvSize = p_Totaldegree(p, r);
-  assume(dvSize < 1000);
-  if(!dvSize){dvec = NULL; return 0;}
-  dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
-
-  uint * it = dvec;
-
-  /* transform lm(p) to shift invariant distance vector
-   * j is the distance to the next entry in the block
-   * representation of the letterplace monomial lm(p)   
-   * "it" is a pointer to the next free entry in our distance
-   * vector                                                   
-   */
-  for(int j=1, i=1, l=0; l < dvSize; ++i)
-    if(p_GetExp(p,i,r)){*it=j;++it;j=1;++l;} else{++j;}
-
-  return dvSize;
-}
 
 
 uint* ShiftDVec::sTObjectExtension::GetDVec()
@@ -75,14 +58,12 @@ uint* ShiftDVec::sTObjectExtension::GetDVec()
   return dvec;
 }
 
-
-uint ShiftDVec::sTObjectExtension::GetDVsize()
+uint ShiftDVec::sTObjectExtension::GetDVsize(ring r)
 {
   if(!dvec) SetDVec();
   if(!dvec) return 0; //Be careful! p does not exist!
   return dvSize;
 }
-
 
 int ShiftDVec::sTObjectExtension::cmpDVec(sTObject* T)
 {
@@ -172,9 +153,7 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 }
 
 
-
 //member functions of SD::sLObjectExtension
-
 
 
 void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
@@ -236,11 +215,12 @@ void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
  * DVec of the other objects lcm. Thus, if both lcm do not have
  * the same shift, but would otherwise be equal, true will be
  * returned, too.  In every other case, false is returned.    */
-bool ShiftDVec::sLObject::compareLcmTo
-  ( SD::sLObject* other, ring r )
+bool ShiftDVec::sLObjectExtension::compareLcmTo
+  ( sLObject* other, ring r )
 {
-  if(this->getLcmDVSize(r) != other->SD_Ext()->getLcmDVSize(r))
-    return false;
+  if( this->GetLcmDVsize(r) !=
+      other->SD_LExt()->GetLcmDVsize(r) )
+  { return false; }
 
   assume( get_LObject()->p1 != NULL &&
           get_LObject()->p2 != NULL    );
@@ -250,15 +230,17 @@ bool ShiftDVec::sLObject::compareLcmTo
   if(!this->lcmDVec) this->SetLcmDVec();
   if(!other->lcmDVec) other->SetLcmDVec();
 
-  if(memcmp((void*)(lcmDVec),(void*)other->lcmDVec,lcmDvSize))
-    return false;
-
+  if( memcmp( (void*)(lcmDVec),
+              (void*)other->lcmDVec, lcmDvSize) )
+  { return false; }
+  
   return true;
 }
 
 /* This function returns true, if the objects lcm is equal to
- * a shift of lcm(p1, p2).                                    */
-bool ShiftDVec::sLObject::compareLcmTo(poly p1, poly p2, ring r)
+ * a shift of lcm(p1, p2).                                   */
+bool ShiftDVec::sLObjectExtension::compareLcmTo
+  ( poly p1, poly p2, ring r )
 {
   //We want to obtain the lcm directly from p1, p2 .
   //This is an adapted version of the SetLcmDVec function.
@@ -274,12 +256,16 @@ bool ShiftDVec::sLObject::compareLcmTo(poly p1, poly p2, ring r)
   //We need to sort out, which poly has the higher degree
   poly hiDeg; poly lowDeg; uint pLcmDvSize;
   if(dvSize1 > dvSize2)
-    {poly shifted=p1; poly notShifted=p2; 
-      lcmDvSize=dvSize1; dvSize1 = dvSize2;}
+  {
+    poly shifted    = p1;
+    poly notShifted = p2; 
+    lcmDvSize       = dvSize1;
+    dvSize1         = dvSize2;
+  }
   else
-    {poly hiDeg=p2; poly lowDeg=p1; pLcmDvSize=dvSize2;}
+  { poly hiDeg = p2; poly lowDeg = p1; pLcmDvSize = dvSize2; }
 
-  if(pLcmDvSize != lcmDvSize){return false;}
+  if(pLcmDvSize != lcmDvSize){ return false; }
 
   if( compareDVec(lcmDVec, lowDeg, 0, dvSize1, r) &&
       compareDVec(lcmDVec, lowDeg, dvSize1, pLcmDvSize, r) ) 
@@ -307,10 +293,12 @@ bool ShiftDVec::sLObject::compareLcmTo(poly p1, poly p2, ring r)
  *  does not divide p1.
  * This function was somehow inspired by the pCompareChain
  * function. See that function for more info.                 */
-bool ShiftDVec::sLObject::gm3LcmUnEqualToLcm
-  (poly p1, poly p2, int lV, ring r /* = currRing */ )
+bool ShiftDVec::sLObjectExtension::gm3LcmUnEqualToLcm
+  ( poly p1, poly p2, int lV, ring r /* = currRing */ )
 {
   bool unequal;
+
+  LObject* L = this->get_LObject();
 
   //Number of variables in our letterplace ring
   int numVars = r->N;
@@ -319,13 +307,14 @@ bool ShiftDVec::sLObject::gm3LcmUnEqualToLcm
   //variable not equal to 0.
   int j;
   for (j=1; j <= numVars && !pGetExp(p2, j); ++j)
-    unequal = unequal || pGetExp(p1, j) != pGetExp(this->lcm,j);
+    unequal = unequal || pGetExp(p1, j) != pGetExp(L->lcm,j);
 
   //We looped, until pGetExp(p2, j) != 0. From here on, p1 and
   //p2 should be equal, until the end of p1.
   assume(lV < j);
-  for (; j <= numVars; ++j){
-    unequal = unequal || pGetExp(p2, j) != pGetExp(this->lcm,j);
+  for (; j <= numVars; ++j)
+  {
+    unequal = unequal || pGetExp(p2, j) != pGetExp(L->lcm,j);
     if( pGetExp(p1, j) != pGetExp(p2, j) ) break;
   }
 
@@ -350,37 +339,63 @@ bool ShiftDVec::sLObject::gm3LcmUnEqualToLcm
   if(unequal) return true;
 
   for (; j <= numVars; ++j)
-    if( pGetExp(p2, j) != pGetExp(this->lcm,j) ) return true;
+    if( pGetExp(p2, j) != pGetExp(L->lcm,j) ) return true;
 
   //The lcms were equal
   return false;
 }
 
-uint ShiftDVec::sLObject::lcmDivisibleBy
+uint ShiftDVec::sLObjectExtension::lcmDivisibleBy
   ( sTObject * T, int numVars )
 {
-  this->SetLcmDvecIfNULL();
+  get_LObject->SetLcmDvecIfNULL();
   T->SD_Ext()->SetDVecIfNULL();
 
   return ShiftDVec::divisibleBy
-    ( lcmDVec, lcmDvSize,
+    ( dvec, dvSize,
       T->SD_Ext()->dvec, T->SD_Ext()->dvSize, numVars );
 }
 
-uint ShiftDVec::sLObject::lcmDivisibleBy
+uint ShiftDVec::sLObjectExtension::lcmDivisibleBy
   ( sTObject * T, uint minShift, uint maxShift, int numVars )
 {
-  this->SetLcmDvecIfNULL();
+  get_LObject()->SetLcmDvecIfNULL();
   T->SD_Ext()->SetDVecIfNULL();
 
   return ShiftDVec::divisibleBy
-    ( lcmDVec, lcmDvSize, T->SD_Ext()->dvec,
+    ( dvec, dvSize, T->SD_Ext()->dvec,
       T->SD_Ext()->dvSize, minShift, maxShift, numVars );
 }
 
 
 //other functions, which do not have no counterpart in normal bba
 
+
+uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
+{
+  if(p == NULL){dvec = NULL; return 0;}
+
+  //We should test here, if p is in r. (see sTObject::Set ?)
+
+  //I hope this is the right way to get the total deg. of lm(p)
+  uint dvSize = p_Totaldegree(p, r);
+  assume(dvSize < 1000);
+  if(!dvSize){dvec = NULL; return 0;}
+  dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
+
+  uint * it = dvec;
+
+  /* transform lm(p) to shift invariant distance vector
+   * j is the distance to the next entry in the block
+   * representation of the letterplace monomial lm(p)   
+   * "it" is a pointer to the next free entry in our distance
+   * vector                                                   
+   */
+  for(int j=1, i=1, l=0; l < dvSize; ++i)
+    if(p_GetExp(p,i,r)){*it=j;++it;j=1;++l;} else{++j;}
+
+  return dvSize;
+}
 
 /* This should get the shift of a letterplace polynomial.
  * numFirstVar should be the index of the variable in the first
@@ -397,7 +412,6 @@ uint ShiftDVec::getShift
     if( p_GetExp(p, i, r) ) return sh;
 }
 
-
 bool ShiftDVec::compareDVec
   ( const uint* dvec, poly p,
     uint offset, uint maxSize, ring r )
@@ -412,7 +426,6 @@ bool ShiftDVec::compareDVec
 
   return true;
 }
-
 
 /* Returns the first shift s, where the polynomial corresponding
  * to dvec1, is divisible by the shifted polynomial corresponding
@@ -452,7 +465,6 @@ uint ShiftDVec::divisibleBy
   omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
   return UINT_MAX;
 }
-
 
 /* Returns the first shift s >= minShift, with s <= maxShift
  * where the polynomial corresponding to dvec1, is divisible by 
@@ -505,7 +517,6 @@ uint ShiftDVec::divisibleBy
   return UINT_MAX;
 }
 
-
 /* Returns the first shift s, where lm(p1) is divided by the 
  * shifted monomial s*lm(p2) (,that is the dvec of lm(p1) has a
  * central overlap with the dvec of lm(p2)). If no such shift
@@ -526,7 +537,6 @@ uint ShiftDVec::divisibleBy
       p2->SD_Ext()->dvec, p2->SD_Ext()->dvSize, numVars );
 }
 
-
 /* Tests if the LObject's polynomial lcm is divisible by a
  * shift s of TObject's polynomial p. Returns this shift s.
  * Sets the dvecs, if they are NULL.
@@ -543,7 +553,6 @@ uint ShiftDVec::lcmDivisibleBy
     ( lcm->getLcmDVec(), lcm->getLcmDVSize(),
       p->SD_Ext()->dvec, p->SD_Ext()->dvSize, numVars );
 }
-
 
 /* Returns true, if reduction of poly a with poly b would
  * violate the the degree bound. (to be more exact: We test, if
@@ -575,7 +584,6 @@ BOOLEAN ShiftDVec::redViolatesDeg
 
   return tg_b + tg_lm_a - tg_lm_b > uptodeg;
 }
-
 
 /* Returns true, if reduction of poly a with poly b would
  * violate the the degree bound. (to be more exact: We test, if
@@ -626,7 +634,6 @@ BOOLEAN ShiftDVec::redViolatesDeg
   return tg_b + tg_a - tg_b > uptodeg;
 }
 
-
 /* Returns true, if the creation of the s-poly of poly a and
  * poly b would violate the degree bound, false otherwise.
  * shift has to be the shift of a, such that b and shift a
@@ -669,7 +676,6 @@ bool ShiftDVec::createSPviolatesDeg
 
   return false;
 }
-
 
 bool ShiftDVec::shiftViolatesDeg
   (poly p, uint shift, int uptodeg, ring pLmRing, ring pTailRing)
