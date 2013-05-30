@@ -1554,7 +1554,7 @@ int ShiftDVec::kFindDivisibleByInT
   L->GetLm(p, r);
 
   //BOCO: added following line
-  L->SD_Ext()->SetDVecIfNULL(p, r);
+  L->SD_LExt()->SetLcmDvecIfNULL(p, r);
 
 
 #if (HAVE_SEV > 2) //BOCO: comments/uncomments sev
@@ -1638,7 +1638,7 @@ TObject * ShiftDVec::kFindDivisibleByInS
   poly p;
   ring r;
   L->GetLm(p, r);
-  L->SD_Ext()->SetDVecIfNULL(p, r);
+  L->SD_LExt()->SetLcmDvecIfNULL(p, r);
 
 #if (HAVE_SEV > 2) //BOCO: comments/uncomments sev
   assume(~not_sev == p_GetShortExpVector(p, r));
