@@ -793,8 +793,6 @@ static proc SSinit(def M)
   attrib(S, "TREEOUTPUT", @TREEOUTPUT);
   attrib(S, "SYZNUMBER", 0);
   
-  "attrib(S,'TREEOUTPUT'): ", attrib(S, "TREEOUTPUT");
-  
   if( @DEBUG )
   {
     "SSinit::MRES";
@@ -2288,11 +2286,20 @@ example
 
 /*static*/ proc  StartResTesting(list #)
 {
+  int @treeout = attrib(SSinit, "TREEOUTPUT");
+  
   if( defined(@save_res_list) ) 
   { ERROR("Sorry: existing global variable @save_res_list - run StopAddResTesting before another Start!!!"); }
   
   string @save_res_desc = string(#);
-  ">>>>>>>>> {{{{{{{{{ STARTING TESTING ('" + @save_res_desc + "') :::::::::::: ";
+  
+  if( !@treeout )
+  {
+    ">>>>>>>>> {{{{{{{{{ STARTING TESTING ('" + @save_res_desc + "') :::::::::::: ";
+  } else 
+  {
+    "{ \"Example\": \"" + @save_res_desc + "\", \"computations\": [";
+  }
   
   list @save_res_list = list(); 
   export @save_res_list;
@@ -2301,19 +2308,25 @@ example
 
 /*static*/ proc  StopResTesting()
 {
+  int @treeout = attrib(SSinit, "TREEOUTPUT");
+  
   if( defined(@save_opts) || defined(@save_method) || defined(@save_desc) )
   { ERROR("Sorry: existing global variables - run StopAddResTest before another Start!!!"); }
 
   if( !defined(@save_res_list) || !defined(@save_res_desc) ) 
   { ERROR("Sorry: no global variable - run StartResTesting beforehand!!!"); }
-  
+
   int i, j; 
   int f = 0;
   def m, mm;
-  
+
+  if( !@treeout )
+  {
   for (i = size(@save_res_list); i > 0; i--)
   {
     "Total Time: ", @save_res_list[i][5], ", Res: ", @save_res_list[i][6], ", Minimal Betti: ", @save_res_list[i][5] - @save_res_list[i][6], ",        ", @save_res_list[i][1], "   :with:    ", @save_res_list[i][2];
+  }
+  
   }
   
   for (i = size(@save_res_list); i > 1; i--)
@@ -2356,6 +2369,7 @@ example
     };
   
   };
+  
   if( f ) 
   {
     print(@save_res_list);
@@ -2365,17 +2379,29 @@ example
     m2_end(666);    
   } else
   {
-    "BETTI: "; print( @save_res_list[1][4], "betti");    
+    if( !@treeout )
+    {
+      "BETTI: "; print( @save_res_list[1][4], "betti");
+    }
   }
 
   kill @save_res_list;
     
-  "<<<<<<<<< }}}}}}}}}  STOP TESTING (", @save_res_desc,  ") !!!!!!!!!!!! ";
+  if( !@treeout )
+  {
+    "<<<<<<<<< }}}}}}}}}  STOP TESTING (", @save_res_desc,  ") !!!!!!!!!!!! ";
+  } else
+  {
+//    "{ \"Example\": \"" + @save_res_desc + "\", \"computations\": [";
+    "] },";
+  }
   kill @save_res_desc;
 }
 
 /*static*/ proc StartAddResTest(string method, string desc)
 {
+  int @treeout = attrib(SSinit, "TREEOUTPUT");
+  
   if( !defined(@save_res_list) ) 
   { ERROR("Sorry: no global variable - run StartResTesting beforehand!!!"); }
 
@@ -2387,12 +2413,22 @@ example
   def @save_method = method; export @save_method;
   def @save_desc = desc; export @save_desc;
   
-  "< START RES TEST{{{ ", @save_method, ", with:", @save_desc, " ... ";
+  if( !@treeout )
+  {
+    "< START RES TEST{{{ ", @save_method, ", with:", @save_desc, " ... ";
+  } else
+  {
+//    Print("{ \"RESOLUTION: HYBRIDNF:%d, TAILREDSYZ: %d, LEAD2SYZ: %d, IGNORETAILS: %d\": [\n", 
+//       attributes.__HYBRIDNF__, attributes.__TAILREDSYZ__, attributes.__LEAD2SYZ__, attributes.__IGNORETAILS__);
+    " { \"RESOLUTION: " + @save_method + ", with: " + @save_desc + "\": [";
+  }
 }
 
 
 /*static*/ proc StopAddResTest(def RR, intmat S, int @t, int @m)
 {
+  int @treeout = attrib(SSinit, "TREEOUTPUT");
+  
   if( !(defined(@save_opts) && defined(@save_method) && defined(@save_desc)) )
   { ERROR("Sorry: no global variables - run StartAddResTest beforehand!!!"); }
 
@@ -2401,7 +2437,14 @@ example
 //  RR,  
 //  print(S, "betti");
   
-  "> -STOP RES TEST}}} ", @save_method, ", with:", @save_desc, ", Timer:", @t; option();
+  if( !@treeout )
+  {
+    "> -STOP RES TEST}}} ", @save_method, ", with:", @save_desc, ", Timer:", @t; option();
+  } else
+  {
+    " ] },";
+  }
+
   
   option(set, @save_opts); kill @save_opts;
 
@@ -2485,7 +2528,7 @@ proc TestSSres(def I)
   timer=0;rtimer=0;def R=SSres(I,0);@m=rtimer;
   if(@PROFILE){ProfilerStop();}
   setring R;module M;list @l=list();@l[size(RES)-1]=list();r=nrows(RES[1]);for(i=2;i<=size(RES);i++){M=RES[i];rr=nrows(M);if((r>0)&&(size(M)>0)&&(r<rr)){M=transpose(M);M=M[(r+1)..ncols(M)];M=transpose(M);RES[i]=M;};r=rr;@l[i-1] = M;};resolution RR=@l;RR=minres(RR);def S=betti(RR,1);@t=rtimer;
-  DetailedPrint(RR,0);
+//  DetailedPrint(RR,0);
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
   kill S, RR; setring save; kill R;
@@ -2576,22 +2619,26 @@ proc Testnres(def M)
 proc TestSSresAttribs(def M, list #)
 {
   StartResTesting(#);
+  int @treeout = attrib(SSinit, "TREEOUTPUT");
 // simple tests...
 //  M = groebner(M);  "groebner: "; M;  "";
 
-  Testlres(M);  
-  Testnres(M);  
+ if( !@treeout )
+ {
+   Testlres(M);  
+   Testnres(M);
+ }
 //  Testsres(M);  
 //  TestSres(M); // too long for the last medium test :(
 
 
-//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M); // TODO: FIX ERROR!!!!
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
-  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
 
@@ -2641,35 +2688,53 @@ proc testSimple(list #)
 //  option(prot);
 
   // TODO: only for now!!
-  attrib(SSinit, "DEBUG", (DEBUG > 0)); 
-  attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
-  attrib(SSinit, "KERCHECK", 0); 
+  attrib(SSinit, "DEBUG", (DEBUG > 0) );
+  attrib(SSinit, "SYZCHECK", 0);
+  attrib(SSinit, "KERCHECK",  (DEBUG > 0) ); 
   attrib(SSinit, "TREEOUTPUT", 1); 
   attrib(SSinit, "PROFILE", 0);
 
-  ring r; r; ideal M = maxideal(1); 
+  int @treeout = attrib(SSinit, "TREEOUTPUT");
+  
+  if( @treeout)
+  {
+    monitor("SimpleTests.json", "o");
+    "{ \"SimpleTests\": [";
+  }
+
+  ring r; ideal M = maxideal(1); 
 //  M;
-  TestSSresAttribs(M, "<" + string(M) + "> in " + string(basering));
+  TestSSresAttribs(M, "\\\\GENERATED{" + string(M) + "} in " + string(basering));
   kill r;
 
-  ring r = 0, (a, b, c, d), lp; r; ideal M = maxideal(1); 
+  ring r = 0, (a, b, c, d), lp; ideal M = maxideal(1); 
 //  M;
-  TestSSresAttribs(M, "<" + string(M) + "> in " + string(basering));
+  TestSSresAttribs(M, "\\\\GENERATED{" + string(M) + "} in " + string(basering));
   kill r;
 
-  ring R = 0, (w, x, y, z), dp; R;
+  ring R = 0, (w, x, y, z), dp; 
   ideal M = w^2 - x*z,  w*x - y*z,  x^2 - w*y, x*y - z^2, y^2 - w*z; 
 //  M;
-  TestSSresAttribs(M, "<" + string(M) + "> in " + string(basering));
+  TestSSresAttribs(M, "\\\\GENERATED{" + string(M) + "} in " + string(basering));
   kill R;
 
 
-  ring r = 0, (a, b, c, d, e, f), dp; r; ideal M = maxideal(1); 
+  ring r = 0, (a, b, c, d, e, f), dp; ideal M = maxideal(1); 
 //  M;
-  TestSSresAttribs(M, "<" + string(M) + "> in " + string(basering));
+  TestSSresAttribs(M, "\\\\GENERATED{" + string(M) + "} in " + string(basering));
   kill r;  
+
+
+  ring r = 0, (x, y), lp; ideal M = x2, xy, y2;  // Schreyer conterexample???
+  TestSSresAttribs(M, "\\\\GENERATED{" + string(M) + "} in " + string(basering));
+  kill r;
+
+  ring r = 0, (x, y, z), lp; ideal M = xy + y2 +x + 2y -1, xz - x -y -z -2, yz +1;  // TODO: seg. fault?
+  TestSSresAttribs(M, "\\\\GENERATED{" + string(M) + "} in " + string(basering));
+  kill r;
+
   
-  ring AGR = (101), (a, b, c, d), dp; AGR;
+  ring AGR = (101), (a, b, c, d), dp; 
   // simple: AGR@101n3d002s004%1:
   ideal M = c*d, b*d, a*d, c^2-d^2, b*c, a*c, b^2-d^2, a*b, a^2-d^2;
 //  M;
@@ -2679,6 +2744,13 @@ proc testSimple(list #)
   M = a*b+7*a*c-16*b*c-27*a*d+37*b*d-2*c*d, d^3, c*d^2, b*d^2, a*d^2, c^2*d, b*c*d, a*c*d, b^2*d, a^2*d, c^3, b*c^2, a*c^2, b^2*c, a^2*c, b^3, a^3;
 //  M;
   TestSSresAttribs(M, "medium: AGR@101n3d004s009%1");
+
+  if( @treeout)
+  {
+    "] }";
+    monitor("");
+  }
+
 }
 
 proc testAGR(list #)

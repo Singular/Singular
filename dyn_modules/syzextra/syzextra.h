@@ -89,7 +89,12 @@ struct SchreyerSyzygyComputationFlags
   const int __IGNORETAILS__; // @IGNORETAILS
 
   /// Syzygy level (within a resolution)
-  const int __SYZNUMBER__; 
+  mutable int __SYZNUMBER__;
+   
+  inline void  nextSyzygyLayer() const
+  {
+     __SYZNUMBER__++;
+  }
 
   /// output lifting tree
   const int __TREEOUTPUT__;

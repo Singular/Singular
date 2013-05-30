@@ -32,3 +32,5 @@ syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOO
 # TESTS=test_release.sh
 #
 # EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)
+
+CLEANFILES = SimpleTests.json
