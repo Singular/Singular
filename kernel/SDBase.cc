@@ -76,8 +76,6 @@
 
 namespace ShiftDVec
 {
-  class sTObject;
-
   uint divisibleBy
     ( const sTObject * t1, 
       const sTObject * t2, int numVars );
@@ -1000,9 +998,9 @@ poly ShiftDVec::redtail
   if (strat->noTailReduction || pNext(p) == NULL) return p;
 
   SD::LObject Ln(strat->tailRing);
-  SD::TObject* With;
+  TObject* With;
   // placeholder in case strat->tl < 0
-  SD::TObject  With_s(strat->tailRing);
+  TObject  With_s(strat->tailRing);
   h = p;
   hn = pNext(h);
   long op = strat->tailRing->pFDeg(hn, strat->tailRing);
@@ -1071,7 +1069,7 @@ poly ShiftDVec::redtail
       {
         pDelete(&With->p); 
         shift=0; 
-        With->dvec = NULL; 
+        With->SD_Ext()->dvec = NULL; 
         delete With;
       }
     }
@@ -1083,7 +1081,7 @@ poly ShiftDVec::redtail
   if(shift != 0)
   { 
     pDelete(&With->p); 
-    With->SD_Ext()->set_DVec_to_NULL();
+    With->SD_Ext()->freeDVec();
     delete With;
   }
   if (strat->redTailChange)
@@ -1240,7 +1238,7 @@ int ShiftDVec::redHomog( SD::LObject* h, SD::kStrategy strat )
     }
     tmp.tailRing = strat->T[ii].tailRing; //BOCO: added...
     SD::ksReducePoly(h, &tmp, &(strat->T[ii]) );
-    h->SD_Ext()->set_DVec_to_NULL();
+    h->SD_Ext()->freeDVec();
 
     //BOCO: why did i change it to that?:
     //ksReducePoly(h,strat->T[ii],strat->kNoetherTail());
@@ -1301,6 +1299,7 @@ int ShiftDVec::redHomog( SD::LObject* h, SD::kStrategy strat )
         j = SD::kFindDivisibleByInS(strat, &dummy, h, shift_dummy);
         if (j < 0) return 1;
 
+        h->SD_Object_Extension = NULL;
         SD::enterL( &strat->L,&strat->Ll,&strat->Lmax,h,at );
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -1344,7 +1343,8 @@ int ShiftDVec::kFindDivisibleByInS
      * The original p_LmDivisibleBy checks if second arg
      * divides first arg, we check if first arg is divisibly
      * by second arg! */
-    SD::TObject t_Sj(strat->S[j]); TObject t_p(p);
+    TObject t_p(p);
+    TObject t_Sj(strat->S[j]);
     shift = p_LmDivisibleBy
       ( &t_p, &t_Sj, currRing, strat->get_lV() );
     int reduction_violates_degree = redViolatesDeg
@@ -1391,9 +1391,9 @@ poly ShiftDVec::redBba
      * The original p_LmShortDivisibleBy checks if second arg
      * divides first arg, we check if first arg is divisibly
      * by second arg! */
-    SD::TObject * t;
+    TObject * t;
     if(!(t = strat->s_2_t(j))) 
-      { SD::TObject tt(strat->S[j]); t = &tt; }
+    { TObject tt(strat->S[j]); t = &tt; }
     uint shift = SD::p_LmShortDivisibleBy
       (h, strat->sevS[j], t, not_sev, currRing);
     int reduction_violates_degree = redViolatesDeg
@@ -1404,15 +1404,16 @@ poly ShiftDVec::redBba
       poly pTemp = p_LPshiftT( strat->S[j], shift, 
                                strat->get_uptodeg(),
                                strat->get_lV(),strat,currRing );
-      SD::TObject tTemp(pTemp);
-      SD::TObject noShift(strat->S[j]);
+      TObject tTemp(pTemp);
+      TObject noShift(strat->S[j]);
 
       //BOCO: hope that is ok... is it nescessary?...
       tTemp.tailRing = noShift.tailRing = strat->tailRing;
       SD::ksReducePoly( h, &noShift,
                         &tTemp, strat->kNoetherTail() );
 
-      h->freeDVec(); //BOCO: after reduction lm has changed
+      //BOCO: after reduction lm has changed:
+      h->SD_Ext()->freeDVec();
       if(shift > 0) pDelete(&pTemp); 
       if (h->p==NULL) return NULL;
       j = 0;
@@ -1437,8 +1438,8 @@ poly ShiftDVec::redBba
  * Currently the "*sev*"-Variables are not in use.
  */
 uint ShiftDVec::p_LmShortDivisibleBy
-  ( SD::TObject* t1, unsigned long sev_t1,
-    SD::TObject* t2, unsigned long not_sev_t2, const ring r )
+  ( TObject* t1, unsigned long sev_t1,
+    TObject* t2, unsigned long not_sev_t2, const ring r )
 {
   namespace SD = ShiftDVec;
 
@@ -1469,7 +1470,7 @@ uint ShiftDVec::p_LmShortDivisibleBy
  *  in pInline1.h
  */
 uint ShiftDVec::p_LmDivisibleBy
-  ( ShiftDVec::TObject * t1, ShiftDVec::TObject * t2, const ring r, int lV )
+  ( TObject * t1, TObject * t2, const ring r, int lV )
 {
   namespace SD = ShiftDVec;
   p_LmCheckPolyRing1(t2->p, r);
@@ -1503,7 +1504,7 @@ uint ShiftDVec::p_LmDivisibleBy
  *                 la ^ lb != la - lb
  */
 static inline uint ShiftDVec::_p_LmDivisibleByNoComp
-  ( SD::TObject * t1, SD::TObject * t2, const ring r, int lV )
+  ( TObject * t1, TObject * t2, const ring r, int lV )
 {
   //BOCO: Well, thats all it does at the moment!
   return t1->SD_Ext()->divisibleBy( t2, lV );
@@ -1621,9 +1622,9 @@ int ShiftDVec::kFindDivisibleByInT
  * otherwise we do (by not returning p, if the reduction
  * violates the degree bound).
  */
-ShiftDVec::TObject * ShiftDVec::kFindDivisibleByInS
+TObject * ShiftDVec::kFindDivisibleByInS
   ( SD::kStrategy strat, int pos,
-    SD::LObject* L, SD::TObject* T, 
+    SD::LObject* L, TObject* T, 
     uint & shift, int lV, int uptodeg, long ecart )
 {
   namespace SD = ShiftDVec;
@@ -1658,7 +1659,7 @@ ShiftDVec::TObject * ShiftDVec::kFindDivisibleByInS
          * The original p_LmDivisibleBy checks if second arg
          * divides first arg, we check if first arg is divisibly
          * by second arg! */
-        SD::sTObject t(strat->S[j]);
+        sTObject t(strat->S[j]);
         t.SD_Ext()->SetDVec();
         shift = p_LmDivisibleBy(L, &t, r, lV);
         t.SD_Ext()->freeDVec();
@@ -1702,8 +1703,9 @@ ShiftDVec::TObject * ShiftDVec::kFindDivisibleByInS
 #endif //#if (HAVE_SEV > 3)
       {
         t = strat->S_2_T(j);
-        assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
-        strat->S_2_T(j)->SetDVecIfNULL(t->t_p, r); //Sets dvec, if dvec == NULL
+        assume( t != NULL && t->t_p != NULL &&
+                t->tailRing == r && t->p == strat->S[j] );
+        strat->S_2_T(j)->SD_Ext()->SetDVecIfNULL(t->t_p, r);
         /*BOCO:
          * The original p_LmDivisibleBy checks if second arg
          * divides first arg, we check if first arg is divisibly
@@ -1747,7 +1749,7 @@ poly ShiftDVec::redtailBba
 
   //BOCO: I think, this initializes Ln.t_p, but not Ln.p
   SD::LObject Ln(pNext(h), strat->tailRing);
-  Ln.SD_Ext()->set_DVec_to_NULL();
+  Ln.SD_Ext_Init();
   Ln.pLength = L->GetpLength() - 1;
 
   pNext(h) = NULL;
@@ -1759,7 +1761,7 @@ poly ShiftDVec::redtailBba
   int cnt=REDTAIL_CANONICALIZE;
   uint shift = 0;
 
-  SD::TObject uTmp;
+  TObject uTmp;
   uTmp.t_p = NULL;
   uTmp.p = NULL;
   while(!Ln.IsNull())
@@ -1893,7 +1895,7 @@ poly ShiftDVec::redtailBba
         shift = 0;
       }
 
-      Ln.->SD_Ext()->freeDVec();
+      Ln.SD_Ext()->freeDVec();
     }
     assume(h != NULL);
 
@@ -1931,7 +1933,7 @@ poly ShiftDVec::redtailBba
   }
 
   kTest_L(L);
-  With_s.->SD_Ext()->freeDVec();
+  With_s.SD_Ext()->freeDVec();
   return L->GetLmCurrRing();
 }
 
@@ -2162,8 +2164,6 @@ void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
 /* BOCO: original comment from kutil.cc
  *  enters p at position at in L
  * BOCO:
- *  - TODO: We have to initialize the dvec of [[p]].
- *    (should set it to NULL)
  *  - We will return a pointer to the LObject in [[set]] .
  * WARNING (if an error occeurs: check):
  *  p is now is passed as a pointer instead of passing it by
@@ -2171,8 +2171,10 @@ void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
  */
 ShiftDVec::LObject* ShiftDVec::enterL
   ( SD::LSet *set,
-    int *length, int *LSetmax, SD::LObject* p,int at )
+    int *length, int *LSetmax, SD::LObject* p, int at )
 {
+  namespace SD = ShiftDVec;
+
   int i;
   // this should be corrected
   assume(p->FDeg == p->pFDeg());
@@ -2184,7 +2186,7 @@ ShiftDVec::LObject* ShiftDVec::enterL
     if (at <= (*length))
 #ifdef ENTER_USE_MEMMOVE
       memmove( &((*set)[at+1]), &((*set)[at]),
-               ((*length)-at+1)*sizeof(LObject) );
+               ((*length)-at+1)*sizeof(SD::LObject) );
 #else
     for (i=(*length)+1; i>=at+1; i--) (*set)[i] = (*set)[i-1];
 #endif
@@ -2286,6 +2288,7 @@ void ShiftDVec::initSL( ideal F, ideal Q, SD::kStrategy strat )
           else
             pos = strat->posInL(strat->L,strat->Ll,&h,strat);
           h.sev = pGetShortExpVector(h.p);
+          h.SD_Object_Extension = NULL;
           SD::enterL(&strat->L,&strat->Ll,&strat->Lmax,&h,pos);
         }
       }
@@ -2328,8 +2331,8 @@ void ShiftDVec::initBuchMora
   /*- set T -*/
   strat->tl = -1;
   strat->tmax = setmaxT;
-  strat->initT();
-  strat->initR();
+  strat->T = initT();
+  strat->R = initR();
   strat->sevT = initsevT();
   /*- init local data struct.---------------------------------------- -*/
   strat->P.ecart=0;
@@ -2340,6 +2343,7 @@ void ShiftDVec::initBuchMora
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
   /*Shdl=*/SD::initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
+  //debug marker: after ShiftDVec::initSL
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)

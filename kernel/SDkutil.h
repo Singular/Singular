@@ -242,7 +242,13 @@ class ShiftDVec::sLObject : public ::sLObject
     bool compareLcmTo( poly p1, poly p2, ring r = currRing );
 
     //adapted from original sLObject
-    SD::sLObject& operator=(const sTObject& t);
+    SD::sLObject& operator=(const sTObject& t)
+    {
+      //TODO: Do we want a deepcopy of the sTObjecteExtensions?
+      memset( this, 0, sizeof(sTObject) );
+      memcpy( this, &t, sizeof(sTObject));
+      return *this;
+    }
 };
 
 class ShiftDVec::skStrategy : public ::skStrategy
@@ -272,8 +278,6 @@ class ShiftDVec::skStrategy : public ::skStrategy
      * ::skStrategy, since they were generalized for ShiftDVec
      * case.
      */
-    SD::LSet L;
-    SD::LSet B;
     SD::LObject P;
 
     /* functions/function pointers we had to overwrite */

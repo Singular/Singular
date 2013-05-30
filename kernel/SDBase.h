@@ -108,8 +108,7 @@ namespace ShiftDVec
   void initBuchMoraCrit( SD::kStrategy strat );
   SD::LObject* enterL
     ( SD::LSet *set,
-      int *length, int *LSetmax,
-      SD::LObject* p,int at, uint* dvec=NULL );
+      int *length, int *LSetmax,SD::LObject* p,int at );
   void initSL( ideal F, ideal Q, SD::kStrategy strat );
   void initBuchMora( ideal F, ideal Q, SD::kStrategy strat );
   void kMergeBintoL( SD::kStrategy strat );

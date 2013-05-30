@@ -3,3 +3,4 @@ p_Procs_Static.inc
 prCopy.inc
 testr
 testg
+*.class

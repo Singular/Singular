@@ -29,6 +29,16 @@ typedef skStrategy* kStrategy;
 
 
 
+//additional member functions of sTObject
+ShiftDVec::sTObjectExtension * sTObject::SD_Ext_Init()
+{
+  assume(SD_Object_Extension == NULL);
+  return SD_Object_Extension =
+      new ShiftDVec::sTObjectExtension(this);
+}
+
+
+
 //member functions of ShiftDVec::sTObjectExtension
 
 
@@ -62,24 +72,23 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
 
 uint* ShiftDVec::sTObjectExtension::GetDVec()
 {
-  return SD_Ext->dvec;
+  return dvec;
 }
 
 
 uint ShiftDVec::sTObjectExtension::GetDVsize()
 {
-  if(!SD_Ext()->dvec) SetDVec();
-  if(!SD_Ext()->dvec) return 0; //Be careful! p does not exist!
-  return SD_Ext()->dvSize;
+  if(!dvec) SetDVec();
+  if(!dvec) return 0; //Be careful! p does not exist!
+  return dvSize;
 }
 
 
 int ShiftDVec::sTObjectExtension::cmpDVec(sTObject* T)
 {
-  if(SD_Ext()->GetDVsize() == T->SD_Ext()->GetDVsize())
-    return memcmp( SD_Ext()->dvec,
-                   T->SD_Ext->dvec,
-                   SD_Ext()->dvSize * sizeof(uint) );
+  if(GetDVsize() == T->SD_Ext()->GetDVsize())
+    return memcmp( dvec,
+                   T->SD_Ext()->dvec, dvSize * sizeof(uint) );
   return -1;
 }
 
@@ -93,11 +102,11 @@ int ShiftDVec::sTObjectExtension::cmpDVec(sTObject* T)
 int ShiftDVec::sTObjectExtension::cmpDVec
   ( sTObject* T1, uint begin, uint beginT1, uint size )
 {
-  assume( begin + size <= SD_Ext()->dvSize &&
+  assume( begin + size <= dvSize &&
           beginT1 + size <= T1->SD_Ext()->dvSize );
 
     return 
-      memcmp( SD_Ext()->dvec + begin,
+      memcmp( dvec + begin,
               T1->SD_Ext()->dvec+beginT1, size*sizeof(uint) );
 }
 
@@ -149,29 +158,17 @@ int ShiftDVec::sTObjectExtension::cmpDVecProper
 {
   return 
     SD::cmpDVecProper
-      ( T1, beginT1, this, begin, size, lV );
+      ( T1, beginT1, this->T, begin, size, lV );
 }
 
 void ShiftDVec::sTObjectExtension::freeDVec()
 {
-  if(SD_Ext()->dvec)
+  if(dvec)
   {
-    omFreeSize( (ADDRESS)SD_Ext()->dvec,
-                sizeof(uint) * SD_Ext()->dvSize );
-    SD_Ext()->dvec = NULL;
-    SD_Ext()->dvSize = 0;
+    omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
+    dvec = NULL;
+    dvSize = 0;
   }
-}
-
-ShiftDVec::sTObjectExtension&
-ShiftDVec::sTObjectExtension::operator=(const sTObject& t)
-{
-  this->::sTObject::operator=(t);
-
-  //Be careful: we copy the dvec shallow!
-  //TODO: Should we do make a deep copy, or no copy at all
-  SD_Ext()->dvec = t.SD_Ext()->dvec;
-  SD_Ext()->dvSize = t.SD_Ext()->dvSize;
 }
 
 
@@ -251,7 +248,7 @@ void ShiftDVec::sLObject::freeLcmDVec()
   if(lcmDVec)
   {
     omFreeSize( (ADDRESS)lcmDVec, sizeof(uint) * lcmDvSize ); 
-    lcmDvec = NULL;
+    lcmDVec = NULL;
     lcmDvSize = 0;
   }
 }
@@ -381,7 +378,7 @@ bool ShiftDVec::sLObject::gm3LcmUnEqualToLcm
 }
 
 uint ShiftDVec::sLObject::lcmDivisibleBy
-  ( SD::sTObject * T, int numVars )
+  ( sTObject * T, int numVars )
 {
   this->SetLcmDvecIfNULL();
   T->SD_Ext()->SetDVecIfNULL();
@@ -560,7 +557,7 @@ uint ShiftDVec::divisibleBy
 uint ShiftDVec::lcmDivisibleBy
   ( LObject * lcm, sTObject * p, int numVars )
 {
-  lcm->SD_Ext()->SetLcmDvecIfNULL();
+  lcm->SetLcmDvecIfNULL();
   p->SD_Ext()->SetDVecIfNULL();
 
   return divisibleBy

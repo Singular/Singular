@@ -1,0 +1,3 @@
+blc ShiftDVec::kStd 'SD::skStrategy * strat=new SD::skStrategy;'
+
+# vim: set ft=gdb:

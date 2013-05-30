@@ -101,7 +101,8 @@ void ShiftDVec::enterpairs
   && ((strat->syzComp==0)
     ||(pGetComp(H->p)<=strat->syzComp)))
   {
-    //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
+    //Print
+    //("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
     unsigned long h_sev = pGetShortExpVector(H->p);
     loop
     {
@@ -152,11 +153,11 @@ void ShiftDVec::clearS
 
   //BOCO: if T.dvec does not exist, then T.p ist a constant
   //      monomial, in which case shift will be UINT_MAX-1
-  assume(!H->dvec || shift != UINT_MAX-1);
+  assume(!H->SD_Ext()->dvec || shift != UINT_MAX-1);
 
   //BOCO: if T.dvec == NULL, then T.p is a constant, which
   //TODO: implies R = 1 and we could stop here
-  if ( H->dvec && shift > UINT_MAX-2 ) return;
+  if ( H->SD_Ext()->dvec && shift > UINT_MAX-2 ) return;
 #endif
   deleteInS((*at),strat);
   (*at)--;
@@ -751,35 +752,22 @@ bool ShiftDVec::GMTestLeft
   ( TObject* H1, TObject* H2, TObject* H3, 
     uint shift2, uint shift3, SD::kStrategy strat, ring r )
 {
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering GMTest the other version.", 
-      "Leaving GMTest the other version.", 128 );
-
   //assume(shift2 > shift3 && shift3 > 0);
   assume(shift2 > shift3);
-  assume(H1->GetDVsize() < H2->GetDVsize() + shift2);
-  assume(H3->GetDVsize() + shift3 < H2->GetDVsize() + shift2);
-
-  deBoGriPrint
-    ("The following pair will be considered for cancellation:", 128);
-  deBoGriPrint(H1->p, "h1: ", 128);
-  deBoGriPrint(H2->p, shift2, strat, "shift2*h2 ", 128);
-  deBoGriPrint
-    ("The pair might be cancelled because of: ", 128);
-  deBoGriPrint(H3->p, shift3, strat, "shift3*h3: ", 128);
+  assume( H1->SD_Ext()->GetDVsize() <
+                          H2->SD_Ext()->GetDVsize() + shift2 );
+  assume( H3->SD_Ext()->GetDVsize() + shift3 <
+                          H2->SD_Ext()->GetDVsize() + shift2 );
 
   int minCmpDV1 = shift3;
   int minCmpDV3 = 0;
   int cmpLength = shift2 - shift3;
 
-  if( H1->SD_Ext()->cmpDVecProper
-      (H3, minCmpDV1, minCmpDV3, cmpLength, strat->get_lV()) == 0 )
-  {
-    return true;
-  }
+  int H1_eq_H3 = 
+    H1->SD_Ext()->cmpDVecProper
+      ( H3, minCmpDV1, minCmpDV3, cmpLength, strat->get_lV() );
+  if( H1_eq_H3 == 0 ) return true;
 
-  deBoGriPrint("GMTestLeft will return false.", 128);
   return false;
 }
 
@@ -806,20 +794,12 @@ bool ShiftDVec::GMTest
     uint* ovlH1H3, uint numOvlH1H3, 
     uint* ovlH3H2, uint numOvlH3H2                   )
 {
-  initDeBoGri
-    ( ShiftDVec::indent, 
-      "Entering GMTest", "Leaving GMTest", 4 );
-
 #if DEBOGRI > 0
   static int counter;
   ++counter;
-  deBoGriPrint(counter, "Der Counter", 128+2);
 #endif
 
-  if( sH2 == 0 ) {
-    loGriToFile("GMTest return 1 ", counter, 4, NULL);
-    return false;
-  }
+  if( sH2 == 0 ) return false;
 
   assume( H1->SD_Ext()->GetDVsize() > 0 );
   assume( H2->SD_Ext()->GetDVsize() > 0 );
@@ -829,14 +809,21 @@ bool ShiftDVec::GMTest
   //sizeOfLcmDVec = sizeOfH2DVec + sH2 - 1
   uint maxShiftOfH3;
   uint minShiftOfH3;
-  if( H3->SD_Ext()->GetDVsize() > H2->SD_Ext()->GetDVsize() ) //TODO: case h2 | h3
-    maxShiftOfH3 = H2->SD_Ext()->GetDVsize() + sH2 - H3->SD_Ext()->GetDVsize();
+  if( H3->SD_Ext()->GetDVsize() > H2->SD_Ext()->GetDVsize() )
+      //TODO: case h2 | h3
+  {
+    maxShiftOfH3 = H2->SD_Ext()->GetDVsize() +
+                   sH2 - H3->SD_Ext()->GetDVsize();
+  }
   else
     maxShiftOfH3 = sH2 - 1;
 
   int i = 0;
-  if( H3->SD_Ext()->GetDVsize() > H1->SD_Ext()->GetDVsize() ) //TODO: case h1 | h3
+  if( H3->SD_Ext()->GetDVsize() > H1->SD_Ext()->GetDVsize() )
+      //TODO: case h1 | h3
+  {
     minShiftOfH3 = 1;
+  }
   else
   {
     minShiftOfH3 = H1->SD_Ext()->GetDVsize() - H3->SD_Ext()->GetDVsize() + 1;
@@ -849,23 +836,14 @@ bool ShiftDVec::GMTest
   }
 
   int j;
-  deBoGriPrint("TestTest1", 2);
   for( j = numOvlH3H2-1; j >= 0; --j )
     if( ovlH3H2[j] && ovlH3H2[j] + minShiftOfH3 <= sH2 ) break;
-  if(j < 0) {
-    loGriToFile("GMTest return 3 ", counter, 4, NULL);
-    return false;
-  }
+  if(j < 0) return false;
 
 
-  deBoGriPrint("TestTest2", 2);
-  if(ovlH1H3[i] > maxShiftOfH3) {
-    loGriToFile("GMTest return 4 ", counter, 4, NULL);
-    return false;
-  }
+  if(ovlH1H3[i] > maxShiftOfH3) return false;
 
   uint sH3;
-  deBoGriPrint("TestTest3", 2);
   while( sH3 = sH2 - ovlH3H2[j] != ovlH1H3[i] )
   {
     if(sH3 > maxShiftOfH3) {
@@ -1193,9 +1171,6 @@ void ShiftDVec::enterLeftOverlaps
     ShiftDVec::kStrategy strat, int k, uint** leftOvls,
     uint* sizesLeftOvls, int isFromQ, int ecart, int atR )
 {
-  initDeBoGri
-    ( ShiftDVec::indent, "Entering enterLeftOverlaps", 
-      "Leaving enterLeftOverlaps", 4 + 1 + 128         );
   namespace SD = ShiftDVec;
 
   bool new_pair;
@@ -1218,7 +1193,6 @@ void ShiftDVec::enterLeftOverlaps
           !creation_of_spoly_violates_degree )
         //grico: checks if degbound is violated
       {
-        deBoGriPrint("No degree Violation!", 1);
         int isFromQi = 0; //BOCO: hack TODO: clear
         SD::LObject* Pair = SD::enterOnePair
           ( strat->S[i], strat->S_2_R[i], isFromQi, 
@@ -1341,11 +1315,11 @@ bool ShiftDVec::GM3
   if( Pair->lcm==NULL ) return false;
   deBoGriPrint("The lcm of the pair is not NULL", 4 + 128);
 
-  uint dvSize1 = H->GetDVsize();
-  uint dvSize2 = strat->R[Pair->i_r1]->GetDVsize();
-  uint dvSize3 = strat->R[Pair->i_r2]->GetDVsize();
-  uint dv3sh = 
-    getShift(Pair->p2, strat->R[Pair->i_r2]->getDVecAtIndex(0));
+  uint dvSize1 = H->SD_Ext()->GetDVsize();
+  uint dvSize2 = strat->R[Pair->i_r1]->SD_Ext()->GetDVsize();
+  uint dvSize3 = strat->R[Pair->i_r2]->SD_Ext()->GetDVsize();
+  uint dv3sh = getShift( Pair->p2,
+           strat->R[Pair->i_r2]->SD_Ext()->getDVecAtIndex(0) );
 
   //BOCO: I hope, this will get me the length of the overlap 
   //of (p2, p3) .
@@ -1589,6 +1563,7 @@ ShiftDVec::LObject* ShiftDVec::enterOnePair
 
     l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
     assume(strat->R[Lp.i_r1]->p == Lp.p1);
+    Lp.SD_Object_Extension = NULL;
     return SD::enterL(&strat->B,&strat->Bl,&strat->Bmax,&Lp,l);
     //grico: pair is first saved to B, will be merged into L at
     //the end

@@ -1,0 +1,31 @@
+# after SD::initSL
+blc ShiftDVec::initBuchMora 'after ShiftDVec::initSL'
+commands
+  silent
+  print "\nTrying to access strat->L[0].p1/2 after initSL."
+  pct strat->L[0].p1
+  pct strat->L[0].p2
+  continue
+end
+
+# before first kTest_TS in bba
+blc ShiftDVec::bba 'kTest_TS'
+commands
+  silent
+  print "\nTrying to access strat->L[0].p1/2"
+  print "\nbefore first kTest_TS in bba."
+  pct strat->L[0].p1
+  pct strat->L[0].p2
+  continue
+end
+
+# in kTest_TS
+blc kTest_TS 'for (i=0; i<=strat->Ll; i++)'
+commands
+  silent
+  print "\nTrying to access strat->L[0].p1/2 in kTest_TS."
+  pct strat->L[0].p1
+  pct strat->L[0].p2
+end
+
+# vim: set ft=gdb:
