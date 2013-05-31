@@ -38,6 +38,9 @@ ShiftDVec::sTObjectExtension * sTObject::SD_Ext_Init()
       new ShiftDVec::sTObjectExtension(this);
 }
 
+ShiftDVec::sLObjectExtension* SD_LExt() const
+{return static_cast<sLObjectExtension*>(SD_Object_Extension);}
+
 
 //additional member functions of sLObject
 

@@ -67,6 +67,7 @@ extern denominator_list DENOMINATOR_LIST;
 namespace ShiftDVec
 {
   class sTObjectExtension;
+  class sLObjectExtension;
 }
 
 class sTObject
@@ -104,14 +105,15 @@ public:
 #define SHIFT_BBA_DVEC  //BOCO: TODO
 #ifdef SHIFT_BBA_DVEC
   ShiftDVec::sTObjectExtension * SD_Object_Extension;
-  ShiftDVec::sTObjectExtension * SD_Ext() const
-  { return SD_Object_Extension; }
-  ShiftDVec::sLObjectExtension * SD_LExt() const
-  { return
-      static_cast<sLObjectExtension*>(SD_Object_Extension); }
+
+  // allocation/deallocation of memory
   ShiftDVec::sTObjectExtension * SD_Ext_Init(); //in SDkutil.cc
   ShiftDVec::sTObjectExtension * SD_Ext_Delete()
   { delete SD_Object_Extension; SD_Object_Extension = NULL; }
+
+  ShiftDVec::sTObjectExtension * SD_Ext() const
+  { return SD_Object_Extension; }
+  ShiftDVec::sLObjectExtension* SD_LExt() const;//in SDkutil.cc
 #endif
   
   // initialization

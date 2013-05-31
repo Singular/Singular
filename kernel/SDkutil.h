@@ -23,6 +23,8 @@ namespace ShiftDVec
   typedef unsigned int uint;
 
   class skStrategy;
+  class sLObjectExtension;
+  class sTObjectExtension;
   typedef skStrategy* kStrategy;
 
   uint CreateDVec(poly p, ring r, uint*& dvec);
@@ -125,7 +127,7 @@ class ShiftDVec::sTObjectExtension
     sTObjectExtension(sTObject* _T) : dvec(NULL), T(_T) {}
 
     // destructor
-    ~sTObjectExtension(sTObject* _T) { freeDVec(); }
+    ~sTObjectExtension() { freeDVec(); }
 
     // TODO: destructor - shall we define one?
 
@@ -187,7 +189,7 @@ class ShiftDVec::sLObjectExtension :
 {
   public:
     // constructor
-    sLObjectExtension(sLObject* _T) : dvec(NULL), T(_T) {}
+    sLObjectExtension(sLObject* T) : sTObjectExtension(T) {}
 
     uint getLcmDVSize(ring r = currRing);
 
