@@ -50,6 +50,14 @@
 #include <string.h>
 
 
+#ifdef _GNU_SOURCE
+#define qsort_my(m, s, ss, r, cmp) qsort_r(m, s, ss, cmp, r)
+#else
+#define qsort_my(m, s, ss, r, cmp) qsort_r(m, s, ss, cmp)
+#endif
+
+
+
 extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
 // extern ring rCurrRingAssure_SyzComp();
 extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
@@ -521,12 +529,21 @@ static BOOLEAN Tail(leftv res, leftv h)
 }
 
 
+#ifdef _GNU_SOURCE
 static int cmp_c_ds(const void *p1, const void *p2, void *R)
 {
+#else
+static int cmp_c_ds(const void *p1, const void *p2)
+{
+  void *R = currRing; 
+#endif
+
   const int YES = 1;
   const int NO = -1;
 
   const ring r =  (const ring) R; // TODO/NOTE: the structure is known: C, lp!!!
+
+  assume( r == currRing );
 
   const poly a = *(const poly*)p1;
   const poly b = *(const poly*)p2;
@@ -542,7 +559,7 @@ static int cmp_c_ds(const void *p1, const void *p2, void *R)
 
   // TODO: test this!!!!!!!!!!!!!!!!
 
-  //return -( compare (c, ds) )
+  //return -( compare (c, qsorts) )
 
   const int __DEBUG__ = 0;
 
@@ -752,7 +769,7 @@ static BOOLEAN ComputeLeadingSyzygyTerms(leftv res, leftv h)
     const int sizeNew = IDELEMS(newid);
 
     if( sizeNew >= 2 )
-      qsort_r(newid->m, sizeNew, sizeof(poly), cmp_c_ds, r);
+      qsort_my(newid->m, sizeNew, sizeof(poly), r, cmp_c_ds);
 
     if (IDELEMS(newid) == 0 || (IDELEMS(newid) == 1 && newid->m[0] == NULL) )
       newid->rank = 1;    
@@ -827,7 +844,7 @@ static BOOLEAN Sort_c_ds(leftv res, leftv h)
     const ideal newid = id; // id_Copy(id, r); // copy???
 
     if( size >= 2 )
-      qsort_r(newid->m, size, sizeof(poly), cmp_c_ds, r);
+      qsort_my(newid->m, size, sizeof(poly), r, cmp_c_ds);
     
 //    res->data = newid;
 //    res->rtyp = h->Typ();
@@ -1034,7 +1051,7 @@ static BOOLEAN Compute2LeadingSyzygyTerms(leftv res, leftv h)
     const int sizeNew = IDELEMS(newid);
 
     if( sizeNew >= 2 )
-      qsort_r(newid->m, sizeNew, sizeof(poly), cmp_c_ds, r);
+      qsort_my(newid->m, sizeNew, sizeof(poly), r, cmp_c_ds);
 
     if (IDELEMS(newid) == 0 || (IDELEMS(newid) == 1 && newid->m[0] == NULL) )
       newid->rank = 1;
