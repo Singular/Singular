@@ -476,7 +476,7 @@ int ShiftDVec::create_count = 0;  //count of spoly creations
 * SPW is the shifted UPW
 *
 ***************************************************************/
-int ShiftDVec::ksReducePoly(SD::LObject* PR,
+int ShiftDVec::ksReducePoly(LObject* PR,
                TObject* UPW,
                TObject* SPW,
                poly spNoether,
@@ -661,7 +661,7 @@ int ShiftDVec::ksReducePoly(SD::LObject* PR,
  *
  *
  ***************************************************************/
-void ShiftDVec::ksCreateSpoly(SD::LObject* Pair,   poly spNoether,
+void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
                    int use_buckets, ring tailRing,
                    poly m1, poly m2, TObject** R)
 {
@@ -852,7 +852,7 @@ KINLINE int ksReducePolyTail
 #else  //replacement
 int ShiftDVec::ksReducePolyTail
 #endif
-  ( SD::LObject* PR, TObject* UPW, TObject* SPW, SD::LObject* Red )
+  ( LObject* PR, TObject* UPW, TObject* SPW, LObject* Red )
 {
   BOOLEAN ret;
   number coef;
@@ -889,7 +889,7 @@ int ShiftDVec::ksReducePolyTail
  *
  ***************************************************************/
 BOOLEAN ShiftDVec::kCheckSpolyCreation
-  ( SD::LObject *L, SD::kStrategy strat, poly &m1, poly &m2 )
+  ( LObject *L, SD::kStrategy strat, poly &m1, poly &m2 )
 {
   if (strat->overflow) return FALSE;
   assume(L->p1 != NULL && L->p2 != NULL);
