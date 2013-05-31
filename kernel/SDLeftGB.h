@@ -5,7 +5,6 @@
 
 namespace ShiftDVec
 {
-
   void initenterpairs
     ( LObject* J,
       int ecart, int isFromQ, ShiftDVec::kStrategy strat, int atR );
@@ -25,6 +24,9 @@ namespace ShiftDVec
   void GMFilter
     ( int index_L, LObject* J,
       LObject* p_k, uint* k_ovls_j, uint size_k_ovls_j, ShiftDVec::kStrategy strat );
+
+  void ShiftDVec::LeftGB::init_I
+    ( ideal I, SD::kStrategy strat );
 
   void enterOverlaps
     ( LObject* J, ShiftDVec::kStrategy strat, uint** overlaps,

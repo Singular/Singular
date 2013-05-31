@@ -30,6 +30,7 @@
 #include "kutil.h"
 #include "SDLeftGB.h"
 
+
 typedef skStrategy* kStrategy;
 
 void ShiftDVec::LeftGB::initenterpairs
@@ -184,6 +185,62 @@ void ShiftDVec::LeftGB::GMFilter
     }
   }
 }
+
+/*GRICO:
+Should be used to initalize the ideals and put them into lsets
+strat->I shall be used for elements of the left gb while Q contains
+the elements of the original gb
+this should only be choosen if I<>NULL
+strat-> must be initialized somewhere else
+*/
+void ShiftDVec::LeftGB::init_I( ideal I, SD::kStrategy strat )
+{
+  namespace SD = ShiftDVec;
+
+  int   i;
+
+  for (i=0; i<IDELEMS(I); i++)
+  {
+    if (I->p[i]!=NULL)
+    {
+      TObject h;
+
+      h.p = pCopy(I->p[i]);
+      if (h.p!=NULL)
+      {
+        if (currRing->OrdSgn==-1)
+        {
+          cancelunit(&h);  /*- tries to cancel a unit -*/
+          deleteHC(&h, strat);
+        }
+        if (h.p!=NULL)
+        {
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            //pContent(h.p);
+            h.pCleardenom(); // also does a pContent
+          }
+          else
+          {
+            h.pNorm();
+          }
+          strat->initEcart(&h);
+          /*
+          if (strat->I->get_size_of_I==-1)
+            pos =0;
+          else
+            pos = strat->posInL(strat->I,strat->I->get_size_of_I,&h,strat);
+          pos is not requiered anymore, since it is LSet related*/
+          h.sev = pGetShortExpVector(h.p);
+          h.SD_Object_Extension = NULL;
+          SD::enterT(strat->I,strat);
+        }
+      }
+    }
+  }
+
+}
+
 
 /* BOCO:
  * L.p1 and p_k from I. i_ovls_j and i_ovls_j contain all shifts
