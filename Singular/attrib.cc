@@ -168,7 +168,9 @@ void atSet(leftv root,const char * name,void * data,int typ)
   {
     attr *a=root->Attribute();
     int rt=root->Typ();
-    if ((rt!=RING_CMD)
+    if (a==NULL)
+      WerrorS("cannot set attributes of this object");
+    else if ((rt!=RING_CMD)
     && (rt!=QRING_CMD)
     && (!RingDependend(rt))&&(RingDependend(typ)))
       WerrorS("cannot set ring-dependend objects at this type");
