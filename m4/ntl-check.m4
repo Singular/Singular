@@ -67,7 +67,12 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	[
 	AC_TRY_RUN(
 	[#include <NTL/version.h>
-	int main () { if (NTL_MAJOR_VERSION < 5) return -1; else return 0; }	
+	#include <NTL/config.h>
+	#ifndef NTL_GMP_LIP
+	int main() {return -1;}
+	#else
+	int main () { if (NTL_MAJOR_VERSION < 5) return -1; else return 0;}
+	#endif	
 	],[
 	ntl_found="yes"	
 	break
@@ -107,7 +112,7 @@ if test "x$ntl_found" = "xyes" ; then
 	ifelse([$2], , :, [$2])
 elif test -n "$ntl_problem"; then
 	AC_MSG_RESULT(problem)
-	echo "Sorry, your NTL version is too old. Disabling."
+	echo "Sorry, your NTL version is too old or not configured with NTL_GMP_LIP=on. Disabling."
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
 	AC_MSG_RESULT(not found)
