@@ -24,7 +24,7 @@ number integerToNumber(const gfan::Integer &I)
   mpz_t i;
   mpz_init(i);
   I.setGmp(i);
-  long m = 268435456; 
+  long m = 268435456;
   if(mpz_cmp_si(i,m))
   {
     int temp = (int) mpz_get_si(i);
@@ -40,7 +40,7 @@ bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
   bigintmat* bim = new bigintmat(1,d);
   for(int i=1;i<=d;i++)
   {
-    number temp = integerToNumber(zv[i-1]); 
+    number temp = integerToNumber(zv[i-1]);
     bim->set(1,i,temp);
     nlDelete(&temp,NULL);
   }
@@ -55,7 +55,7 @@ bigintmat* zMatrixToBigintmat(const gfan::ZMatrix &zm)
   for(int i=1;i<=d;i++)
     for(int j=1; j<=n; j++)
     {
-      number temp = integerToNumber(zm[i-1][j-1]); 
+      number temp = integerToNumber(zm[i-1][j-1]);
       bim->set(i,j,temp);
       nlDelete(&temp,NULL);
     }
@@ -111,20 +111,53 @@ char* toString(gfan::ZMatrix const &zm)
 std::string toString(const gfan::ZCone* const c)
 {
   std::stringstream s;
-  gfan::ZMatrix i=c->getInequalities();
-  gfan::ZMatrix e=c->getEquations();
   s<<"AMBIENT_DIM"<<std::endl;
   s<<c->ambientDimension()<<std::endl;
+
+  gfan::ZMatrix i=c->getInequalities();
+  char* ineqs = toString(i);
   if (c->areFacetsKnown())
     s<<"FACETS"<<std::endl;
   else
     s<<"INEQUALITIES"<<std::endl;
-  s<<toString(i)<<std::endl;
+  if (ineqs!=NULL)
+  {
+    s<<ineqs<<std::endl;
+    delete ineqs;
+  }
+
+  gfan::ZMatrix e=c->getEquations();
+  char* eqs = toString(e);
   if (c->areImpliedEquationsKnown())
     s<<"LINEAR_SPAN"<<std::endl;
   else
     s<<"EQUATIONS"<<std::endl;
-  s<<toString(e)<<std::endl;
+  if (eqs!=NULL)
+  {
+    s<<eqs<<std::endl;
+    delete eqs;
+  }
+
+  if (c->areExtremeRaysKnown())
+  {
+    gfan::ZMatrix r=c->extremeRays();
+    char* rs = toString(r);
+    s<<"RAYS"<<std::endl;
+    if (rs!=NULL)
+    {
+      s<<rs<<std::endl;
+      delete rs;
+    }
+    gfan::ZMatrix l=c->generatorsOfLinealitySpace();
+    char* ls = toString(l);
+    s<<"LINEALITY_SPACE"<<std::endl;
+    if (ls!=NULL)
+    {
+      s<<ls<<std::endl;
+      delete ls;
+    }
+  }
+
   return s.str();
 }
 
@@ -137,9 +170,9 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
 {
   gfan::ZCone* newZc;
   if (r==NULL)
-  { 
-    if (l->Data()!=NULL) 
-    {   
+  {
+    if (l->Data()!=NULL)
+    {
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
@@ -148,7 +181,7 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
   else if (r->Typ()==l->Typ())
   {
     if (l->Data()!=NULL)
-    {   
+    {
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
@@ -164,7 +197,7 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
       return TRUE;
     }
     if (l->Data()!=NULL)
-    {   
+    {
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
@@ -175,7 +208,7 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
     Werror("assign Type(%d) = Type(%d) not implemented",l->Typ(),r->Typ());
     return TRUE;
   }
- 
+
   if (l->rtyp==IDHDL)
   {
     IDDATA((idhdl)l->data)=(char*) newZc;
@@ -206,7 +239,7 @@ void bbcone_destroy(blackbox *b, void *d)
 }
 
 void* bbcone_Copy(blackbox*b, void *d)
-{       
+{
   gfan::ZCone* zc = (gfan::ZCone*)d;
   gfan::ZCone* newZc = new gfan::ZCone(*zc);
   return newZc;
@@ -218,7 +251,7 @@ static BOOLEAN bbcone_Op2(int op, leftv res, leftv i1, leftv i2)
   switch(op)
   {
     case '&':
-    {  
+    {
       if (i2->Typ()==coneID)
       {
         gfan::ZCone* zq = (gfan::ZCone*) i2->Data();
@@ -293,7 +326,7 @@ static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* ineq0 = (intvec*) v->Data();
-    ineq = iv2bim(ineq0);     
+    ineq = iv2bim(ineq0);
   }
   else
     ineq = (bigintmat*) v->Data();
@@ -318,14 +351,14 @@ static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* ineq0 = (intvec*) u->Data();
-    ineq = iv2bim(ineq0);     
+    ineq = iv2bim(ineq0);
   }
   else
     ineq = (bigintmat*) u->Data();
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* eq0 = (intvec*) v->Data();
-    eq = iv2bim(eq0);     
+    eq = iv2bim(eq0);
   }
   else
     eq = (bigintmat*) v->Data();
@@ -363,14 +396,14 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* ineq0 = (intvec*) u->Data();
-    ineq = iv2bim(ineq0);     
+    ineq = iv2bim(ineq0);
   }
   else
     ineq = (bigintmat*) u->Data();
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* eq0 = (intvec*) v->Data();
-    eq = iv2bim(eq0);     
+    eq = iv2bim(eq0);
   }
   else
     eq = (bigintmat*) v->Data();
@@ -431,7 +464,7 @@ static BOOLEAN jjCONERAYS1(leftv res, leftv v)
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* rays0 = (intvec*) v->Data();
-    rays = iv2bim(rays0);     
+    rays = iv2bim(rays0);
   }
   else
     rays = (bigintmat*) v->Data();
@@ -462,14 +495,14 @@ static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* rays0 = (intvec*) u->Data();
-    rays = iv2bim(rays0);     
+    rays = iv2bim(rays0);
   }
   else
     rays = (bigintmat*) u->Data();
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* linSpace0 = (intvec*) v->Data();
-    linSpace = iv2bim(linSpace0);     
+    linSpace = iv2bim(linSpace0);
   }
   else
     linSpace = (bigintmat*) v->Data();
@@ -514,14 +547,14 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* rays0 = (intvec*) u->Data();
-    rays = iv2bim(rays0);     
+    rays = iv2bim(rays0);
   }
   else
     rays = (bigintmat*) u->Data();
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* linSpace0 = (intvec*) v->Data();
-    linSpace = iv2bim(linSpace0);     
+    linSpace = iv2bim(linSpace0);
   }
   else
     linSpace = (bigintmat*) v->Data();
@@ -546,7 +579,7 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
   res->rtyp = coneID;
   res->data = (void*) zc;
 
-  delete zm1; 
+  delete zm1;
   delete zm2;
   if (u->Typ() == INTMAT_CMD)
     delete rays;
@@ -582,7 +615,7 @@ BOOLEAN inequalities(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == coneID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-    
+
     gfan::ZMatrix zmat = zc->getInequalities();
     res->rtyp = BIGINTMAT_CMD;
     res->data = (void*) zMatrixToBigintmat(zmat);
@@ -1123,7 +1156,7 @@ BOOLEAN coneToPolytope(leftv res, leftv args)
     res->rtyp = polytopeID;
     res->data = (void*) zd;
     return FALSE;
-  } 
+  }
   WerrorS("makePolytope: unexpected parameters");
   return TRUE;
 }
@@ -1250,7 +1283,7 @@ BOOLEAN convexHull(leftv res, leftv args)
     if ((v != NULL) && (v->Typ() == polytopeID))
     {
       gfan::ZCone* zc11 = (gfan::ZCone*)u->Data();
-      gfan::ZCone zc1 = liftUp(*zc11); 
+      gfan::ZCone zc1 = liftUp(*zc11);
       gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
       int d1 = zc1.ambientDimension()-1;
       int d2 = zc2->ambientDimension()-1;
@@ -1402,7 +1435,7 @@ BOOLEAN containsInSupport(leftv res, leftv args)
       }
       else
         iv = (bigintmat*)v->Data();
-      
+
       gfan::ZVector* zv = bigintmatToZVector(iv);
       int d1 = zc->ambientDimension();
       int d2 = zv->size();
@@ -1469,7 +1502,7 @@ BOOLEAN containsRelatively(leftv res, leftv args)
 
 BOOLEAN hasFace(leftv res, leftv args)
 {
-  leftv u=args;                             
+  leftv u=args;
   if ((u != NULL) && (u->Typ() == coneID))
   {
     leftv v=u->next;

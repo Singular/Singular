@@ -158,7 +158,10 @@ public:
       * Returns true iff it is known that the set of equations span the space of implied equations of the description.
       */
      bool areImpliedEquationsKnown()const{return (state>=1)||(preassumptions&PCP_impliedEquationsKnown);}
-
+     /**
+      * Returns true iff the extreme rays are known.
+      */
+     bool areExtremeRaysKnown()const{return haveExtremeRaysBeenCached;}
      /**
       * Takes the cone to a canonical form. After taking cones to canonical form, two cones are the same
       * if and only if their matrices of equations and inequalities are the same.
