@@ -392,8 +392,6 @@ lists primeFactorisation(const number n, const int pBound)
 #include "ipid.h"
 #include "ipshell.h"
 
-#include "version.h"
-
 #include "fehelp.h"
 
 #ifdef HAVE_STATIC
@@ -772,9 +770,9 @@ char * showOption()
 char * versionString()
 {
   StringSetS("");
-  StringAppend("Singular for %s version %s (%s %s)  %s\nwith\n", // %d-
+  StringAppend("Singular for %s version %s (%s)  %s\nwith\n", // %d-
                S_UNAME, S_VERSION1, // SINGULAR_VERSION,
-               PACKAGE_VERSION, feVersionId, singular_date);
+               PACKAGE_VERSION, singular_date);
   StringAppendS("\t");
 #ifdef HAVE_FACTORY
   StringAppend("factory(%s)", factoryVersion);
@@ -877,11 +875,11 @@ char * versionString()
               StringAppendS("ratGB,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-              StringAppend("\tCC=%s,\n\tCXX=%s"
+              StringAppend("\tCC=%s %s,\n\tCXX=%s %s"
 #ifdef __GNUC__
               "(" __VERSION__ ")"
 #endif
-              "\n",CC,CXX);
+              "\n",CC,CFLAGS,CXX,CXXFLAGS);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");

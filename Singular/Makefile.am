@@ -164,8 +164,6 @@ SingularHEADERS =    Cache.h \
 nodist_libSingular_la_SOURCES = iparith.inc
 # nodist_libSingular_g_la_SOURCES = iparith.inc
 
-noinst_HEADERS = version.h
-
 libSingular_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 libSingular_includedir = ${includedir}/singular/Singular/

@@ -28,7 +28,6 @@
 #include <kernel/febase.h>
 void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
 //#include <Singular/feOpt.h>
-//#include <Singular/version.h>
 //#include <Singular/silink.h>
 //#include <Singular/ssiLink.h>
 #include <Singular/si_signals.h>
@@ -37,7 +36,6 @@ void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
 #include "ipshell.h"
 #include "cntrlc.h"
 #include "feOpt.h"
-#include "version.h"
 #include "links/silink.h"
 
 /* undef, if you don't want GDB to come up on error */
@@ -222,7 +220,7 @@ typedef struct sigcontext_struct sigcontext;
 /*---------------------------------------------------------------------*/
 void sigsegv_handler(int sig, sigcontext s)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%s):\n",sig,SINGULAR_VERSION,feVersionId);
+  fprintf(stderr,"Singular : signal %d (v: %d):\n",sig,SINGULAR_VERSION);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
@@ -261,8 +259,8 @@ void sigsegv_handler(int sig, sigcontext s)
 */
 void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 {
-  fprintf(stderr,"Singular : signal %d, code %d (v: %d/%s):\n",
-    sig,code,SINGULAR_VERSION,feVersionId);
+  fprintf(stderr,"Singular : signal %d, code %d (v: %d):\n",
+    sig,code,SINGULAR_VERSION);
   if ((sig!=SIGINT)&&(sig!=SIGABRT))
   {
     fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
@@ -292,8 +290,8 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 */
 void sigsegv_handler(int sig)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%s):\n",
-    sig,SINGULAR_VERSION,feVersionId);
+  fprintf(stderr,"Singular : signal %d (v: %d):\n",
+    sig,SINGULAR_VERSION);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
