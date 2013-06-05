@@ -94,8 +94,16 @@ biSqrfFactorizeHelper (const CanonicalForm& G, ExtensionInfo& info)
     result.insert (Lc (G));
     return result;
   }
-  mat_ZZ M;
-  vec_ZZ S;
+  mpz_t * M=new mpz_t [4];
+  mpz_init (M[0]);
+  mpz_init (M[1]);
+  mpz_init (M[2]);
+  mpz_init (M[3]);
+
+  mpz_t * S=new mpz_t [2];
+  mpz_init (S[0]);
+  mpz_init (S[1]);
+
   F= compress (F, M, S);
   CFList result= biFactorize (F, info);
   for (CFListIterator i= result; i.hasItem(); i++)
@@ -106,6 +114,17 @@ biSqrfFactorizeHelper (const CanonicalForm& G, ExtensionInfo& info)
     result.append (N (i.getItem().factor()));
   normalize (result);
   result.insert (Lc(G));
+
+  mpz_clear (M[0]);
+  mpz_clear (M[1]);
+  mpz_clear (M[2]);
+  mpz_clear (M[3]);
+  delete [] M;
+
+  mpz_clear (S[0]);
+  mpz_clear (S[1]);
+  delete [] S;
+
   return result;
 }
 
@@ -228,8 +247,16 @@ FpBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
     result.insert (CFFactor (LcF, 1));
     return result;
   }
-  mat_ZZ M;
-  vec_ZZ S;
+  mpz_t * M=new mpz_t [4];
+  mpz_init (M[0]);
+  mpz_init (M[1]);
+  mpz_init (M[2]);
+  mpz_init (M[3]);
+
+  mpz_t * S=new mpz_t [2];
+  mpz_init (S[0]);
+  mpz_init (S[1]);
+
   F= compress (F, M, S);
 
   TIMING_START (fac_fq_bi_sqrf);
@@ -254,6 +281,17 @@ FpBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   result= Union (result, contentYFactors);
   normalize (result);
   result.insert (CFFactor (LcF, 1));
+
+  mpz_clear (M[0]);
+  mpz_clear (M[1]);
+  mpz_clear (M[2]);
+  mpz_clear (M[3]);
+  delete [] M;
+
+  mpz_clear (S[0]);
+  mpz_clear (S[1]);
+  delete [] S;
+
   return result;
 }
 
@@ -335,8 +373,17 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
     result.insert (CFFactor (LcF, 1));
     return result;
   }
-  mat_ZZ M;
-  vec_ZZ S;
+
+  mpz_t * M=new mpz_t [4];
+  mpz_init (M[0]);
+  mpz_init (M[1]);
+  mpz_init (M[2]);
+  mpz_init (M[3]);
+
+  mpz_t * S=new mpz_t [2];
+  mpz_init (S[0]);
+  mpz_init (S[1]);
+
   F= compress (F, M, S);
 
   TIMING_START (fac_fq_bi_sqrf);
@@ -361,6 +408,17 @@ FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   result= Union (result, contentYFactors);
   normalize (result);
   result.insert (CFFactor (LcF, 1));
+
+  mpz_clear (M[0]);
+  mpz_clear (M[1]);
+  mpz_clear (M[2]);
+  mpz_clear (M[3]);
+  delete [] M;
+
+  mpz_clear (S[0]);
+  mpz_clear (S[1]);
+  delete [] S;
+
   return result;
 }
 
@@ -443,8 +501,17 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
     result.insert (CFFactor (LcF, 1));
     return result;
   }
-  mat_ZZ M;
-  vec_ZZ S;
+
+  mpz_t * M=new mpz_t [4];
+  mpz_init (M[0]);
+  mpz_init (M[1]);
+  mpz_init (M[2]);
+  mpz_init (M[3]);
+
+  mpz_t * S=new mpz_t [2];
+  mpz_init (S[0]);
+  mpz_init (S[1]);
+
   F= compress (F, M, S);
 
   TIMING_START (fac_fq_bi_sqrf);
@@ -469,6 +536,17 @@ GFBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
   result= Union (result, contentYFactors);
   normalize (result);
   result.insert (CFFactor (LcF, 1));
+
+  mpz_clear (M[0]);
+  mpz_clear (M[1]);
+  mpz_clear (M[2]);
+  mpz_clear (M[3]);
+  delete [] M;
+
+  mpz_clear (S[0]);
+  mpz_clear (S[1]);
+  delete [] S;
+
   return result;
 }
 

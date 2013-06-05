@@ -531,84 +531,11 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   ppA= A/cA;
   ppB= B/cB;
 
-  int sizeNewtonPolyg;
-  int ** newtonPolyg= NULL;
-  mat_ZZ MM;
-  vec_ZZ V;
-  bool compressConvexDense= false; //(ppA.level() == 2 && ppB.level() == 2);
-  if (compressConvexDense)
-  {
-    CanonicalForm bufcA= cA;
-    CanonicalForm bufcB= cB;
-    cA= content (ppA, 1);
-    cB= content (ppB, 1);
-    ppA /= cA;
-    ppB /= cB;
-    gcdcAcB *= gcd (cA, cB);
-    cA *= bufcA;
-    cB *= bufcB;
-    if (ppA.isUnivariate() || ppB.isUnivariate())
-    {
-      if (ppA.level() == ppB.level())
-      {
-        CanonicalForm result= gcd (ppA, ppB);
-        coF= N ((ppA/result)*(cA/gcdcAcB));
-        coG= N ((ppB/result)*(cB/gcdcAcB));
-        return N (result*gcdcAcB);
-      }
-      else
-      {
-        coF= N (ppA*(cA/gcdcAcB));
-        coG= N (ppB*(cB/gcdcAcB));
-        return N (gcdcAcB);
-      }
-    }
-
-    newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
-    convexDense (newtonPolyg, sizeNewtonPolyg, MM, V);
-
-    for (int i= 0; i < sizeNewtonPolyg; i++)
-      delete [] newtonPolyg[i];
-    delete [] newtonPolyg;
-
-    ppA= compress (ppA, MM, V, false);
-    ppB= compress (ppB, MM, V, false);
-    MM= inv (MM);
-
-    if (ppA.isUnivariate() && ppB.isUnivariate())
-    {
-      if (ppA.level() == ppB.level())
-      {
-        CanonicalForm result= gcd (ppA, ppB);
-        coF= N (decompress ((ppA/result), MM, V)*(cA/gcdcAcB));
-        coG= N (decompress ((ppB/result), MM, V)*(cB/gcdcAcB));
-        return N (decompress (result, MM, V)*gcdcAcB);
-      }
-      else
-      {
-        coF= N (decompress (ppA, MM, V));
-        coG= N (decompress (ppB, MM, V));
-        return N (gcdcAcB);
-      }
-    }
-  }
-
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB;
 
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
-
-  /*if (fdivides (lcA, lcB))
-  {
-    if (fdivides (A, B))
-      return F/Lc(F);
-  }
-  if (fdivides (lcB, lcA))
-  {
-    if (fdivides (B, A))
-      return G/Lc(G);
-  }*/
 
   gcdlcAlcB= gcd (lcA, lcB);
 
@@ -811,12 +738,6 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
           ppCoF= mapDown (ppCoF, prim_elem, im_prim_elem, alpha, u, v);
           ppCoG= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-          if (compressConvexDense)
-          {
-            ppH= decompress (ppH, MM, V);
-            ppCoF= decompress (ppCoF, MM, V);
-            ppCoG= decompress (ppCoG, MM, V);
-          }
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
           TIMING_END_AND_PRINT (termination_test,
@@ -829,12 +750,6 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
                 terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
                 (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
-        if (compressConvexDense)
-        {
-          ppH= decompress (ppH, MM, V);
-          ppCoF= decompress (ppCoF, MM, V);
-          ppCoG= decompress (ppCoG, MM, V);
-        }
         coF= N ((cA/gcdcAcB)*ppCoF);
         coG= N ((cB/gcdcAcB)*ppCoG);
         TIMING_END_AND_PRINT (termination_test,
@@ -992,96 +907,11 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   ppA= A/cA;
   ppB= B/cB;
 
-  int sizeNewtonPolyg;
-  int ** newtonPolyg= NULL;
-  mat_ZZ MM;
-  vec_ZZ V;
-  bool compressConvexDense= false; //(ppA.level() == 2 && ppB.level() == 2);
-  if (compressConvexDense)
-  {
-    CanonicalForm bufcA= cA;
-    CanonicalForm bufcB= cB;
-    cA= content (ppA, 1);
-    cB= content (ppB, 1);
-    ppA /= cA;
-    ppB /= cB;
-    gcdcAcB *= gcd (cA, cB);
-    cA *= bufcA;
-    cB *= bufcB;
-    if (ppA.isUnivariate() || ppB.isUnivariate())
-    {
-      if (ppA.level() == ppB.level())
-      {
-        CanonicalForm result= gcd (ppA, ppB);
-        coF= N ((ppA/result)*(cA/gcdcAcB));
-        coG= N ((ppB/result)*(cB/gcdcAcB));
-        return N (result*gcdcAcB);
-      }
-      else
-      {
-        coF= N (ppA*(cA/gcdcAcB));
-        coG= N (ppB*(cB/gcdcAcB));
-        return N (gcdcAcB);
-      }
-    }
-
-    newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
-    convexDense (newtonPolyg, sizeNewtonPolyg, MM, V);
-
-    for (int i= 0; i < sizeNewtonPolyg; i++)
-      delete [] newtonPolyg[i];
-    delete [] newtonPolyg;
-
-    ppA= compress (ppA, MM, V, false);
-    ppB= compress (ppB, MM, V, false);
-    MM= inv (MM);
-
-    if (ppA.isUnivariate() && ppB.isUnivariate())
-    {
-      if (ppA.level() == ppB.level())
-      {
-        CanonicalForm result= gcd (ppA, ppB);
-        coF= N (decompress ((ppA/result), MM, V)*(cA/gcdcAcB));
-        coG= N (decompress ((ppB/result), MM, V)*(cB/gcdcAcB));
-        return N (decompress (result, MM, V)*gcdcAcB);
-      }
-      else
-      {
-        coF= N (decompress (ppA, MM, V));
-        coG= N (decompress (ppB, MM, V));
-        return N (gcdcAcB);
-      }
-    }
-  }
-
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB;
 
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
-
-  /*if (fdivides (lcA, lcB))
-  {
-    if (fdivides (ppA, ppB, coG))
-    {
-      coF= 1;
-      if (compressConvexDense)
-        coG= decompress (coG, MM, V);
-      coG= N (coG*(cB/gcdcAcB));
-      return F;
-    }
-  }
-  if (fdivides (lcB, lcA))
-  {
-    if (fdivides (ppB, ppA, coF))
-    {
-      coG= 1;
-      if (compressConvexDense)
-        coF= decompress (coF, MM, V);
-      coF= N (coF*(cA/gcdcAcB));
-      return G;
-    }
-  }*/
 
   gcdlcAlcB= gcd (lcA, lcB);
 
@@ -1113,7 +943,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   coG= 0;
   H= 0;
   bool fail= false;
-  //topLevel= false;
+  topLevel= false;
   bool inextension= false;
   int p=-1;
   int k= getGFDegree();
@@ -1259,12 +1089,6 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
           ppCoF= GFMapDown (ppCoF, k);
           ppCoG= GFMapDown (ppCoG, k);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
-          if (compressConvexDense)
-          {
-            ppH= decompress (ppH, MM, V);
-            ppCoF= decompress (ppCoF, MM, V);
-            ppCoG= decompress (ppCoG, MM, V);
-          }
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
           setCharacteristic (p, k, gf_name_buf);
@@ -1280,12 +1104,6 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
            terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
            (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
-          if (compressConvexDense)
-          {
-            ppH= decompress (ppH, MM, V);
-            ppCoF= decompress (ppCoF, MM, V);
-            ppCoG= decompress (ppCoG, MM, V);
-          }
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
           TIMING_END_AND_PRINT (termination_test,
@@ -1453,83 +1271,10 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   ppA= A/cA;
   ppB= B/cB;
 
-  int sizeNewtonPolyg;
-  int ** newtonPolyg= NULL;
-  mat_ZZ MM;
-  vec_ZZ V;
-  bool compressConvexDense= false; //(ppA.level() == 2 && ppB.level() == 2);
-  if (compressConvexDense)
-  {
-    CanonicalForm bufcA= cA;
-    CanonicalForm bufcB= cB;
-    cA= content (ppA, 1);
-    cB= content (ppB, 1);
-    ppA /= cA;
-    ppB /= cB;
-    gcdcAcB *= gcd (cA, cB);
-    cA *= bufcA;
-    cB *= bufcB;
-    if (ppA.isUnivariate() || ppB.isUnivariate())
-    {
-      if (ppA.level() == ppB.level())
-      {
-        CanonicalForm result= gcd (ppA, ppB);
-        coF= N ((ppA/result)*(cA/gcdcAcB));
-        coG= N ((ppB/result)*(cB/gcdcAcB));
-        return N (result*gcdcAcB);
-      }
-      else
-      {
-        coF= N (ppA*(cA/gcdcAcB));
-        coG= N (ppB*(cB/gcdcAcB));
-        return N (gcdcAcB);
-      }
-    }
-
-    newtonPolyg= newtonPolygon (ppA,ppB, sizeNewtonPolyg);
-    convexDense (newtonPolyg, sizeNewtonPolyg, MM, V);
-
-    for (int i= 0; i < sizeNewtonPolyg; i++)
-      delete [] newtonPolyg[i];
-    delete [] newtonPolyg;
-
-    ppA= compress (ppA, MM, V, false);
-    ppB= compress (ppB, MM, V, false);
-    MM= inv (MM);
-
-    if (ppA.isUnivariate() && ppB.isUnivariate())
-    {
-      if (ppA.level() == ppB.level())
-      {
-        CanonicalForm result= gcd (ppA, ppB);
-        coF= N (decompress ((ppA/result), MM, V)*(cA/gcdcAcB));
-        coG= N (decompress ((ppB/result), MM, V)*(cB/gcdcAcB));
-        return N (decompress (result, MM, V)*gcdcAcB);
-      }
-      else
-      {
-        coF= N (decompress (ppA, MM, V));
-        coG= N (decompress (ppB, MM, V));
-        return N (gcdcAcB);
-      }
-    }
-  }
-
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB;
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
-
-  /*if (fdivides (lcA, lcB))
-  {
-    if (fdivides (A, B))
-      return F/Lc(F);
-  }
-  if (fdivides (lcB, lcA))
-  {
-    if (fdivides (B, A))
-      return G/Lc(G);
-  }*/
 
   gcdlcAlcB= gcd (lcA, lcB);
 
@@ -1770,12 +1515,6 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
            terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
            (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
-        if (compressConvexDense)
-        {
-          ppH= decompress (ppH, MM, V);
-          ppCoF= decompress (ppCoF, MM, V);
-          ppCoG= decompress (ppCoG, MM, V);
-        }
         coF= N ((cA/gcdcAcB)*ppCoF);
         coG= N ((cB/gcdcAcB)*ppCoG);
         TIMING_END_AND_PRINT (termination_test,
