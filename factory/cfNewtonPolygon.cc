@@ -22,6 +22,7 @@
 #include "cf_primes.h"
 #include "cf_reval.h"
 #include "cf_factory.h"
+#include "gfops.h"
 #include "cfNewtonPolygon.h"
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
@@ -496,83 +497,153 @@ void getMaxMin (int** points, int sizePoints, int& minDiff, int& minSum,
   }
 }
 
-#ifdef HAVE_NTL
-void convexDense(int** points, int sizePoints, mat_ZZ& M, vec_ZZ& A)
+void mpz_mat_mul (const mpz_t* N, mpz_t*& M)
+{
+  mpz_t * tmp= new mpz_t[4];
+
+  mpz_init_set (tmp[0], N[0]);
+  mpz_mul (tmp[0], tmp[0], M[0]);
+  mpz_addmul (tmp[0], N[1], M[2]);
+
+  mpz_init_set (tmp[1], N[0]);
+  mpz_mul (tmp[1], tmp[1], M[1]);
+  mpz_addmul (tmp[1], N[1], M[3]);
+
+  mpz_init_set (tmp[2], N[2]);
+  mpz_mul (tmp[2], tmp[2], M[0]);
+  mpz_addmul (tmp[2], N[3], M[2]);
+
+  mpz_init_set (tmp[3], N[2]);
+  mpz_mul (tmp[3], tmp[3], M[1]);
+  mpz_addmul (tmp[3], N[3], M[3]);
+
+  mpz_set (M[0], tmp[0]);
+  mpz_set (M[1], tmp[1]);
+  mpz_set (M[2], tmp[2]);
+  mpz_set (M[3], tmp[3]);
+
+  mpz_clear (tmp[0]);
+  mpz_clear (tmp[1]);
+  mpz_clear (tmp[2]);
+  mpz_clear (tmp[3]);
+
+  delete [] tmp;
+}
+
+void mpz_mat_inv (mpz_t*& M)
+{
+  mpz_t det;
+  mpz_init_set (det, M[0]);
+  mpz_mul (det, det, M[3]);
+  mpz_submul (det, M[1], M[2]);
+
+  mpz_t tmp;
+  mpz_init_set (tmp, M[0]);
+  mpz_divexact (tmp, tmp, det);
+  mpz_set (M[0], M[3]);
+  mpz_divexact (M[0], M[0], det);
+  mpz_set (M[3], tmp);
+
+  mpz_neg (M[1], M[1]);
+  mpz_divexact (M[1], M[1], det);
+  mpz_neg (M[2], M[2]);
+  mpz_divexact (M[2], M[2], det);
+
+  mpz_clear (det);
+  mpz_clear (tmp);
+}
+
+void convexDense(int** points, int sizePoints, mpz_t*& M, mpz_t*& A)
 {
   if (sizePoints < 3)
   {
     if (sizePoints == 2)
     {
-      int maxX= (points [1] [1] < points [0] [1])?points [0] [1]:points [1] [1];
-      int maxY= (points [1] [0] < points [0] [0])?points [0] [0]:points [1] [0];
-      long u,v,g;
-      XGCD (g, u, v, maxX, maxY);
-      M.SetDims (2,2);
-      A.SetLength (2);
+      mpz_t u,v,g,maxX,maxY;
+      mpz_init (u);
+      mpz_init (v);
+      mpz_init (g);
+      mpz_init_set_si (maxX,
+                       (points[1][1] < points[0][1])?points[0][1]:points[1][1]);
+      mpz_init_set_si (maxY,
+                       (points[1][0] < points[0][0])?points[0][0]:points[1][0]);
+      mpz_gcdext (g, u, v, maxX, maxY);
       if (points [0] [1] != points [0] [0] && points [1] [0] != points [1] [1])
       {
-        M (1,1)= -u;
-        M (1,2)= v;
-        M (2,1)= maxY/g;
-        M (2,2)= maxX/g;
-        A (1)= u*maxX;
-        A (2)= -(maxY/g)*maxX;
+        mpz_set (A[0], u);
+        mpz_mul (A[0], A[0], maxX);
+        mpz_set (M[2], maxY);
+        mpz_divexact (M[2], M[2], g);
+        mpz_set (A[1], M[2]);
+        mpz_neg (A[1], A[1]);
+        mpz_mul (A[1], A[1], maxX);
+        mpz_neg (u, u);
+        mpz_set (M[0], u);
+        mpz_set (M[1], v);
+        mpz_set (M[3], maxX);
+        mpz_divexact (M[3], M[3], g);
       }
       else
       {
-        M (1,1)= u;
-        M (1,2)= v;
-        M (2,1)= -maxY/g;
-        M (2,2)= maxX/g;
-        A (1)= to_ZZ (0);
-        A (2)= to_ZZ (0);
+        mpz_set (M[0], u);
+        mpz_set (M[1], v);
+        mpz_set (M[2], maxY);
+        mpz_divexact (M[2], M[2], g);
+        mpz_neg (M[2], M[2]);
+        mpz_set (M[3], maxX);
+        mpz_divexact (M[3], M[3], g);
       }
+      mpz_clear (u);
+      mpz_clear (v);
+      mpz_clear (g);
+      mpz_clear (maxX);
+      mpz_clear (maxY);
     }
     else if (sizePoints == 1)
     {
-      ident (M, 2);
-      A.SetLength (2);
-      A (1)= to_ZZ (0);
-      A (2)= to_ZZ (0);
+      mpz_set_si (M[0], 1);
+      mpz_set_si (M[3], 1);
     }
     return;
   }
-  A.SetLength (2);
-  A (1)= to_ZZ (0);
-  A (2)= to_ZZ (0);
-  ident (M, 2);
-  mat_ZZ Mu;
-  Mu.SetDims (2, 2);
-  Mu (2,1)= to_ZZ (1);
-  Mu (1,2)= to_ZZ (1);
-  Mu (1,1)= to_ZZ (0);
-  Mu (2,2)= to_ZZ (0);
-  mat_ZZ Lambda;
-  Lambda.SetDims (2, 2);
-  Lambda (1,1)= to_ZZ (1);
-  Lambda (1,2)= to_ZZ (-1);
-  Lambda (2,2)= to_ZZ (1);
-  Lambda (2,1)= to_ZZ (0);
-  mat_ZZ InverseLambda;
-  InverseLambda.SetDims (2,2);
-  InverseLambda (1,1)= to_ZZ (1);
-  InverseLambda (1,2)= to_ZZ (1);
-  InverseLambda (2,2)= to_ZZ (1);
-  InverseLambda (2,1)= to_ZZ (0);
-  ZZ tmp;
+  mpz_set_si (M[0], 1);
+  mpz_set_si (M[3], 1);
+
+  mpz_t * Mu= new mpz_t[4];
+  mpz_init_set_si (Mu[1], 1);
+  mpz_init_set_si (Mu[2], 1);
+  mpz_init (Mu[0]);
+  mpz_init (Mu[3]);
+
+  mpz_t * Lambda= new mpz_t[4];
+  mpz_init_set_si (Lambda[0], 1);
+  mpz_init_set_si (Lambda[1], -1);
+  mpz_init_set_si (Lambda[3], 1);
+  mpz_init (Lambda[2]);
+
+  mpz_t * InverseLambda= new mpz_t[4];
+  mpz_init_set_si (InverseLambda[0], 1);
+  mpz_init_set_si (InverseLambda[1], 1);
+  mpz_init_set_si (InverseLambda[3], 1);
+  mpz_init (InverseLambda[2]);
+
+  mpz_t tmp;
+  mpz_init (tmp);
   int minDiff, minSum, maxDiff, maxSum, maxX, maxY, b, d, f, h;
-  getMaxMin (points, sizePoints, minDiff, minSum, maxDiff, maxSum, maxX, maxY);
+  getMaxMin(points, sizePoints, minDiff, minSum, maxDiff, maxSum, maxX, maxY);
   do
   {
     if (maxX < maxY)
     {
       mu (points, sizePoints);
-      M= Mu*M;
-      tmp= A (1);
-      A (1)= A (2);
-      A (2)= tmp;
+
+      mpz_mat_mul (Mu, M);
+
+      mpz_set (tmp, A[0]);
+      mpz_set (A[0], A[1]);
+      mpz_set (A[1], tmp);
     }
-    getMaxMin (points, sizePoints, minDiff, minSum, maxDiff, maxSum, maxX, maxY);
+    getMaxMin(points, sizePoints, minDiff, minSum, maxDiff, maxSum, maxX, maxY);
     b= maxX - maxDiff;
     d= maxX + maxY - maxSum;
     f= maxY + minDiff;
@@ -581,25 +652,56 @@ void convexDense(int** points, int sizePoints, mat_ZZ& M, vec_ZZ& A)
     {
       lambda (points, sizePoints);
       tau (points, sizePoints, maxY - f);
-      M= Lambda*M;
-      A [0] += (maxY-f);
+
+      mpz_mat_mul (Lambda, M);
+
+      if (maxY-f > 0)
+        mpz_add_ui (A[0], A[0], maxY-f);
+      else
+        mpz_add_ui (A[0], A[0], f-maxY);
       maxX= maxX + maxY - b - f;
     }
     else if (d + h > maxY)
     {
       lambdaInverse (points, sizePoints);
       tau (points, sizePoints, -h);
-      M= InverseLambda*M;
-      A [0] += (-h);
+
+      mpz_mat_mul (InverseLambda, M);
+
+      if (h < 0)
+        mpz_add_ui (A[0], A[0], -h);
+      else
+        mpz_sub_ui (A[0], A[0], h);
       maxX= maxX + maxY - d - h;
     }
     else
+    {
+      mpz_clear (tmp);
+      mpz_clear (Mu[0]);
+      mpz_clear (Mu[1]);
+      mpz_clear (Mu[2]);
+      mpz_clear (Mu[3]);
+      delete [] Mu;
+
+      mpz_clear (Lambda[0]);
+      mpz_clear (Lambda[1]);
+      mpz_clear (Lambda[2]);
+      mpz_clear (Lambda[3]);
+      delete [] Lambda;
+
+      mpz_clear (InverseLambda[0]);
+      mpz_clear (InverseLambda[1]);
+      mpz_clear (InverseLambda[2]);
+      mpz_clear (InverseLambda[3]);
+      delete [] InverseLambda;
+
       return;
+    }
   } while (1);
 }
 
 CanonicalForm
-compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A, bool computeMA)
+compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
 {
   int n;
   int ** newtonPolyg= NULL;
@@ -608,12 +710,16 @@ compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A, bool computeMA)
     newtonPolyg= newtonPolygon (F, n);
     convexDense (newtonPolyg, n, M, A);
   }
+
   CanonicalForm result= 0;
-  ZZ expX, expY;
   Variable x= Variable (1);
   Variable y= Variable (2);
 
-  ZZ minExpX, minExpY;
+  mpz_t expX, expY, minExpX, minExpY;
+  mpz_init (expX);
+  mpz_init (expY);
+  mpz_init (minExpX);
+  mpz_init (minExpY);
 
   int k= 0;
   Variable alpha;
@@ -621,59 +727,81 @@ compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A, bool computeMA)
   {
     if (i.coeff().inCoeffDomain() && hasFirstAlgVar (i.coeff(), alpha))
     {
-      expX= i.exp()*M (1,2) + A (1);
-      expY= i.exp()*M (2,2) + A (2);
+      mpz_set (expX, A[0]);
+      mpz_set (expY, A[1]);
+      mpz_addmul_ui (expX, M[1], i.exp());
+      mpz_addmul_ui (expY, M[3], i.exp());
+
       if (k == 0)
       {
-        minExpY= expY;
-        minExpX= expX;
+        mpz_set (minExpX, expX);
+        mpz_set (minExpY, expY);
         k= 1;
       }
       else
       {
-        minExpY= (minExpY > expY) ? expY : minExpY;
-        minExpX= (minExpX > expX) ? expX : minExpX;
+        if (mpz_cmp (minExpY, expY) > 0)
+          mpz_set (minExpY, expY);
+        if (mpz_cmp (minExpX, expX) > 0)
+          mpz_set (minExpX, expX);
       }
-      result += i.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
+      result += i.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
       continue;
     }
     CFIterator j= i.coeff();
     if (k == 0)
     {
-      expX= j.exp()*M (1,1) + i.exp()*M (1,2) + A (1);
-      expY= j.exp()*M (2,1) + i.exp()*M (2,2) + A (2);
-      minExpX= expX;
-      minExpY= expY;
-      result += j.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
+      mpz_set (expX, A[0]);
+      mpz_addmul_ui (expX, M[1], i.exp());
+      mpz_addmul_ui (expX, M[0], j.exp());
+
+      mpz_set (expY, A[1]);
+      mpz_addmul_ui (expY, M[3], i.exp());
+      mpz_addmul_ui (expY, M[2], j.exp());
+
+      mpz_set (minExpX, expX);
+      mpz_set (minExpY, expY);
+      result += j.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
       j++;
       k= 1;
     }
 
     for (; j.hasTerms(); j++)
     {
-      expX= j.exp()*M (1,1) + i.exp()*M (1,2) + A (1);
-      expY= j.exp()*M (2,1) + i.exp()*M (2,2) + A (2);
-      result += j.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
-      minExpY= (minExpY > expY) ? expY : minExpY;
-      minExpX= (minExpX > expX) ? expX : minExpX;
+      mpz_set (expX, A[0]);
+      mpz_addmul_ui (expX, M[1], i.exp());
+      mpz_addmul_ui (expX, M[0], j.exp());
+
+      mpz_set (expY, A[1]);
+      mpz_addmul_ui (expY, M[3], i.exp());
+      mpz_addmul_ui (expY, M[2], j.exp());
+
+      result += j.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
+      if (mpz_cmp (minExpY, expY) > 0)
+        mpz_set (minExpY, expY);
+      if (mpz_cmp (minExpX, expX) > 0)
+        mpz_set (minExpX, expX);
     }
   }
 
-  if (to_long (minExpX) < 0)
+  if (mpz_sgn (minExpX) < 0)
   {
-    result *= power (x,-to_long(minExpX));
+    result *= power (x,-mpz_get_si(minExpX));
     result /= CanonicalForm (x, 0);
   }
   else
-    result /= power (x,to_long(minExpX));
+    result /= power (x,mpz_get_si(minExpX));
 
-  if (to_long (minExpY) < 0)
+  if (mpz_sgn (minExpY) < 0)
   {
-    result *= power (y,-to_long(minExpY));
+    result *= power (y,-mpz_get_si(minExpY));
     result /= CanonicalForm (y, 0);
   }
   else
-    result /= power (y,to_long(minExpY));
+    result /= power (y,mpz_get_si(minExpY));
 
   CanonicalForm tmp= LC (result);
   if (tmp.inPolyDomain() && degree (tmp) <= 0)
@@ -689,120 +817,202 @@ compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A, bool computeMA)
     for (int i= 0; i < n; i++)
       delete [] newtonPolyg [i];
     delete [] newtonPolyg;
-    M= inv (M);
+    mpz_mat_inv (M);
   }
+
+  mpz_clear (expX);
+  mpz_clear (expY);
+  mpz_clear (minExpX);
+  mpz_clear (minExpY);
 
   return result;
 }
 
 CanonicalForm
-decompress (const CanonicalForm& F, const mat_ZZ& inverseM, const vec_ZZ& A)
+decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
 {
   CanonicalForm result= 0;
-  ZZ expX, expY;
   Variable x= Variable (1);
   Variable y= Variable (2);
-  ZZ minExpX, minExpY;
+
+  mpz_t expX, expY, minExpX, minExpY;
+  mpz_init (expX);
+  mpz_init (expY);
+  mpz_init (minExpX);
+  mpz_init (minExpY);
+
   if (F.isUnivariate() && F.level() == 1)
   {
     CFIterator i= F;
-    expX= (i.exp() - A (1))*inverseM (1,1) + (-A (2))*inverseM (1,2);
-    expY= (i.exp() - A (1))*inverseM (2,1) + (-A (2))*inverseM (2,2);
-    minExpX= expX;
-    minExpY= expY;
-    result += i.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
+
+    mpz_set_si (expX, i.exp());
+    mpz_sub (expX, expX, A[0]);
+    mpz_mul (expX, expX, inverseM[0]);
+    mpz_submul (expX, inverseM[1], A[1]);
+
+    mpz_set_si (expY, i.exp());
+    mpz_sub (expY, expY, A[0]);
+    mpz_mul (expY, expY, inverseM[2]);
+    mpz_submul (expY, inverseM[3], A[1]);
+
+    mpz_set (minExpX, expX);
+    mpz_set (minExpY, expY);
+    result += i.coeff()*power (x, mpz_get_si (expX))*
+              power (y, mpz_get_si (expY));
     i++;
     for (; i.hasTerms(); i++)
     {
-      expX= (i.exp() - A (1))*inverseM (1,1) + (-A (2))*inverseM (1,2);
-      expY= (i.exp() - A (1))*inverseM (2,1) + (-A (2))*inverseM (2,2);
-      result += i.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
-      minExpY= (minExpY > expY) ? expY : minExpY;
-      minExpX= (minExpX > expX) ? expX : minExpX;
+      mpz_set_si (expX, i.exp());
+      mpz_sub (expX, expX, A[0]);
+      mpz_mul (expX, expX, inverseM[0]);
+      mpz_submul (expX, inverseM[1], A[1]);
+
+      mpz_set_si (expY, i.exp());
+      mpz_sub (expY, expY, A[0]);
+      mpz_mul (expY, expY, inverseM[2]);
+      mpz_submul (expY, inverseM[3], A[1]);
+
+      result += i.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
+      if (mpz_cmp (minExpY, expY) > 0)
+        mpz_set (minExpY, expY);
+      if (mpz_cmp (minExpX, expX) > 0)
+        mpz_set (minExpX, expX);
     }
 
-    if (to_long (minExpX) < 0)
+    if (mpz_sgn (minExpX) < 0)
     {
-      result *= power (x,-to_long(minExpX));
+      result *= power (x,-mpz_get_si(minExpX));
       result /= CanonicalForm (x, 0);
     }
     else
-      result /= power (x,to_long(minExpX));
+      result /= power (x,mpz_get_si(minExpX));
 
-    if (to_long (minExpY) < 0)
+    if (mpz_sgn (minExpY) < 0)
     {
-      result *= power (y,-to_long(minExpY));
+      result *= power (y,-mpz_get_si(minExpY));
       result /= CanonicalForm (y, 0);
     }
     else
-      result /= power (y,to_long(minExpY));
+      result /= power (y,mpz_get_si(minExpY));
+
+    mpz_clear (expX);
+    mpz_clear (expY);
+    mpz_clear (minExpX);
+    mpz_clear (minExpY);
 
     return result/ Lc (result); //normalize
   }
 
+  mpz_t tmp;
+  mpz_init (tmp);
   int k= 0;
   Variable alpha;
   for (CFIterator i= F; i.hasTerms(); i++)
   {
     if (i.coeff().inCoeffDomain() && hasFirstAlgVar (i.coeff(), alpha))
     {
-      expX= -A(1)*inverseM (1,1) + (i.exp() - A (2))*inverseM (1,2);
-      expY= -A(1)*inverseM (2,1) + (i.exp() - A (2))*inverseM (2,2);
+      mpz_set_si (expX, i.exp());
+      mpz_sub (expX, expX, A[1]);
+      mpz_mul (expX, expX, inverseM[1]);
+      mpz_submul (expX, A[0], inverseM[0]);
+
+      mpz_set_si (expY, i.exp());
+      mpz_sub (expY, expY, A[1]);
+      mpz_mul (expY, expY, inverseM[3]);
+      mpz_submul (expY, A[0], inverseM[2]);
+
       if (k == 0)
       {
-        minExpY= expY;
-        minExpX= expX;
+        mpz_set (minExpX, expX);
+        mpz_set (minExpY, expY);
         k= 1;
       }
       else
       {
-        minExpY= (minExpY > expY) ? expY : minExpY;
-        minExpX= (minExpX > expX) ? expX : minExpX;
+        if (mpz_cmp (minExpY, expY) > 0)
+          mpz_set (minExpY, expY);
+        if (mpz_cmp (minExpX, expX) > 0)
+          mpz_set (minExpX, expX);
       }
-      result += i.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
+      result += i.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
       continue;
     }
     CFIterator j= i.coeff();
     if (k == 0)
     {
-      expX= (j.exp() - A (1))*inverseM (1,1) + (i.exp() - A (2))*inverseM (1,2);
-      expY= (j.exp() - A (1))*inverseM (2,1) + (i.exp() - A (2))*inverseM (2,2);
-      minExpX= expX;
-      minExpY= expY;
-      result += j.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
+      mpz_set_si (expX, j.exp());
+      mpz_sub (expX, expX, A[0]);
+      mpz_mul (expX, expX, inverseM[0]);
+      mpz_set_si (tmp, i.exp());
+      mpz_sub (tmp, tmp, A[1]);
+      mpz_addmul (expX, tmp, inverseM[1]);
+
+      mpz_set_si (expY, j.exp());
+      mpz_sub (expY, expY, A[0]);
+      mpz_mul (expY, expY, inverseM[2]);
+      mpz_set_si (tmp, i.exp());
+      mpz_sub (tmp, tmp, A[1]);
+      mpz_addmul (expY, tmp, inverseM[3]);
+
+      mpz_set (minExpX, expX);
+      mpz_set (minExpY, expY);
+      result += j.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
       j++;
       k= 1;
     }
 
     for (; j.hasTerms(); j++)
     {
-      expX= (j.exp() - A (1))*inverseM (1,1) + (i.exp() - A (2))*inverseM (1,2);
-      expY= (j.exp() - A (1))*inverseM (2,1) + (i.exp() - A (2))*inverseM (2,2);
-      result += j.coeff()*power (x, to_long (expX))*power (y, to_long (expY));
-      minExpY= (minExpY > expY) ? expY : minExpY;
-      minExpX= (minExpX > expX) ? expX : minExpX;
+      mpz_set_si (expX, j.exp());
+      mpz_sub (expX, expX, A[0]);
+      mpz_mul (expX, expX, inverseM[0]);
+      mpz_set_si (tmp, i.exp());
+      mpz_sub (tmp, tmp, A[1]);
+      mpz_addmul (expX, tmp, inverseM[1]);
+
+      mpz_set_si (expY, j.exp());
+      mpz_sub (expY, expY, A[0]);
+      mpz_mul (expY, expY, inverseM[2]);
+      mpz_set_si (tmp, i.exp());
+      mpz_sub (tmp, tmp, A[1]);
+      mpz_addmul (expY, tmp, inverseM[3]);
+
+      result += j.coeff()*power (x, mpz_get_si (expX))*
+                power (y, mpz_get_si (expY));
+      if (mpz_cmp (minExpY, expY) > 0)
+        mpz_set (minExpY, expY);
+      if (mpz_cmp (minExpX, expX) > 0)
+        mpz_set (minExpX, expX);
     }
   }
 
-  if (to_long (minExpX) < 0)
+  if (mpz_sgn (minExpX) < 0)
   {
-    result *= power (x,-to_long(minExpX));
+    result *= power (x,-mpz_get_si(minExpX));
     result /= CanonicalForm (x, 0);
   }
   else
-    result /= power (x,to_long(minExpX));
+    result /= power (x,mpz_get_si(minExpX));
 
-  if (to_long (minExpY) < 0)
+  if (mpz_sgn (minExpY) < 0)
   {
-    result *= power (y,-to_long(minExpY));
+    result *= power (y,-mpz_get_si(minExpY));
     result /= CanonicalForm (y, 0);
   }
   else
-    result /= power (y,to_long(minExpY));
+    result /= power (y,mpz_get_si(minExpY));
+
+  mpz_clear (expX);
+  mpz_clear (expY);
+  mpz_clear (minExpX);
+  mpz_clear (minExpY);
+  mpz_clear (tmp);
 
   return result/Lc (result); //normalize
 }
-#endif
 
 //assumes the input is a Newton polygon of a bivariate polynomial which is
 //primitive wrt. x and y, i.e. there is at least one point of the polygon lying
