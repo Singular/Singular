@@ -15,7 +15,7 @@ int getCodimension(gfan::ZFan* zf);
 int getDimension(gfan::ZFan* zf);
 int getLinealityDimension(gfan::ZFan* zf);
 int isSimplicial(gfan::ZFan* zf);
-gfan::Matrix<gfan::Integer> rays(gfan::ZFan* zf);
+gfan::Matrix<gfan::Integer> rays(const gfan::ZFan* const zf);
 
 #endif
 #endif

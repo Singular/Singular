@@ -362,6 +362,12 @@ std::string ZFan::toString(int flags)const
   //return theFan.toString();
 }
 
+std::string ZFan::toStringJustRaysAndMaximalCones(int flags)const
+{
+  ensureComplex();
+  return complex->toStringJustRaysAndMaximalCones(flags);
+}
+
 /*int ZFan::getAmbientDimension()const
 {
   return theFan.getAmbientDimension();
