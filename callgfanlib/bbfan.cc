@@ -40,7 +40,7 @@ char* bbfan_String(blackbox *b, void *d)
   else
   {
     gfan::ZFan* zf = (gfan::ZFan*)d;
-    std::string s = zf->toString();
+    std::string s = zf->toStringJustRaysAndMaximalCones();
     return omStrDup(s.c_str());
   }
 }
@@ -120,7 +120,7 @@ static gfan::IntMatrix permutationIntMatrix(const bigintmat* iv)
       number temp1 = nlInit(1,NULL);
       number temp2 = nlSub(IMATELEM(*iv, r, c),temp1);
       ivCopy->set(r,c,temp2);
-      nlDelete(&temp1,NULL); 
+      nlDelete(&temp1,NULL);
       nlDelete(&temp2,NULL);
     }
   gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
@@ -265,8 +265,8 @@ BOOLEAN numberOfConesOfDimension(leftv res, leftv args)
           int d = (int)(long)v->Data();
           int o = (int)(long)w->Data();
           int m = (int)(long)x->Data();
-          if ( (0<=d) && (d <= zf->getAmbientDimension()) 
-                      && ((o == 0) || (o == 1)) 
+          if ( (0<=d) && (d <= zf->getAmbientDimension())
+                      && ((o == 0) || (o == 1))
                       && ((m == 0) || (m == 1)))
           {
             bool oo = (bool) o;
@@ -398,7 +398,7 @@ BOOLEAN insertCone(leftv res, leftv args)
       if (n != 0)
       {
         if (!isCompatible(zf,zc))
-        {          
+        {
           WerrorS("insertCone: cone and fan not compatible");
           return TRUE;
         }
@@ -508,7 +508,7 @@ BOOLEAN removeCone(leftv res, leftv args)
       if (n != 0)
       {
         if (!containsInCollection(zf,zc))
-        {          
+        {
           WerrorS("removeCone: cone not contained in fan");
           return TRUE;
         }
@@ -725,7 +725,7 @@ BOOLEAN fVector(leftv res, leftv args)
   return TRUE;
 }
 
-gfan::ZMatrix rays(gfan::ZFan* zf)
+gfan::ZMatrix rays(const gfan::ZFan* const zf)
 {
   int linDim = zf->getLinealityDimension();
   gfan::ZMatrix rays(0,zf->getAmbientDimension());
@@ -747,7 +747,7 @@ int numberOfConesWithVector(gfan::ZFan* zf, gfan::ZVector* v)
     if (zc.contains(*v))
     {
       count = count +1;
-      if (count > 1) 
+      if (count > 1)
         return count;
     }
   }
@@ -770,7 +770,7 @@ BOOLEAN numberOfConesWithVector(leftv res, leftv args)
         WerrorS("numberOfConesWithVector: mismatching dimensions");
         return TRUE;
       }
-      gfan::ZVector* v1 = bigintmatToZVector(*v0); 
+      gfan::ZVector* v1 = bigintmatToZVector(*v0);
       int count = numberOfConesWithVector(zf, v1);
       delete v1;
       res->rtyp = INT_CMD;
@@ -880,14 +880,14 @@ lists listOfFacets(const gfan::ZCone &zc)
   int r = inequalities.getHeight();
   int c = inequalities.getWidth();
   L->Init(r);
-  
+
   /* next we iterate over each of the r facets, build the respective cone and add it to the list */
   /* this is the i=0 case */
   gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
-  gfan::ZMatrix newEquations = equations; 
+  gfan::ZMatrix newEquations = equations;
   newEquations.appendRow(inequalities[0]);
   L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations);
-  
+
   /* these are the cases i=1,...,r-2 */
   for (int i=1; i<r-1; i++)
   {
@@ -897,7 +897,7 @@ lists listOfFacets(const gfan::ZCone &zc)
     newEquations.appendRow(inequalities[i]);
     L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations);
   }
-  
+
   /* this is the i=r-1 case */
   newInequalities = inequalities.submatrix(0,0,r-1,c);
   newEquations = equations;
