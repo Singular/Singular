@@ -26,12 +26,52 @@
  * ( i is and Integerindex: 0 <= i < get_size_of_I() ).
  */
 
+/*GRICO INFORMATION:
+ *Find out the pointer stuff? Would be nice, but then again 
+ *the changes must be done in the main bba!? -> ask Bo
+ *Find out what to do else there is and fing 
+ *your english back
+*/
+
 //#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
 #include "kutil.h"
 #include "SDLeftGB.h"
 
 
 typedef skStrategy* kStrategy;
+
+//we want a left GB for J
+
+ideal ShiftDVec::leftgbdvc
+  (ideal J, ideal I, int uptodeg, int lVblock, long deBoGriFlags)
+{
+  namespace SD = ShiftDVec;
+
+#if DEBOGRI > 0
+  SD::deBoGri = deBoGriFlags;
+  SD::lpDVCase = 1;
+#endif
+  /* todo main call */
+
+  /* assume: ring is prepared, ideal is copied into shifted ring */
+  /* uptodeg and lVblock are correct - test them! */
+
+  /* check whether the ideal is in V */
+  /* same for Q i guess*/
+  if (! ideal_isInV(I,lVblock) )
+  {
+    WerrorS("The input ideal contains incorrectly encoded elements! ");
+    return(NULL);
+  }
+  //this has to change we want a pointer on the right functions wenn J is not zero
+  ideal RS = SD::kStd
+    (I,J, testHomog, NULL,NULL,0,0,NULL, uptodeg, lVblock);
+ 
+  idSkipZeroes(RS);
+  return(RS);
+}
+
+
 
 void ShiftDVec::LeftGB::initenterpairs
   ( LObject* J,
