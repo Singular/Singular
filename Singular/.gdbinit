@@ -3,8 +3,8 @@ source gdb/helpers
 source gdb/bos_gdb_ext.py
 
 # debug memory bugs considering L/TObjects
-set pagination off
-source gdb/debug_lt
+# set pagination off
+# source gdb/debug_lt
 
 # source gdb/dbg_strat_segfault
 
