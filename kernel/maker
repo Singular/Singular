@@ -1,0 +1,4 @@
+#!/bin/bash
+
+make 2> errors
+vim errors +/error

@@ -104,13 +104,17 @@ public:
 
 #define SHIFT_BBA_DVEC  //BOCO: TODO
 #ifdef SHIFT_BBA_DVEC
-  ShiftDVec::sTObjectExtension * SD_Object_Extension;
+  ShiftDVec::sTObjectExtension* SD_Object_Extension;
 
-  // allocation/deallocation of memory
-  ShiftDVec::sTObjectExtension * SD_Ext_Init(); //in SDkutil.cc
-  ShiftDVec::sTObjectExtension * SD_Ext_Delete()
-  { delete SD_Object_Extension; SD_Object_Extension = NULL; }
+  // allocation/deallocation of memory (in SDkutil.cc)
+  ShiftDVec::sTObjectExtension* SD_Ext_Init();
+  void SD_Ext_Delete();
 
+  // hostile acquisition (well, not really)
+  ShiftDVec::sTObjectExtension* Own_Extension_From
+                                  ( sTObject* Other_Possesor );
+
+  // access of the extension
   ShiftDVec::sTObjectExtension * SD_Ext() const
   { return SD_Object_Extension; }
   ShiftDVec::sLObjectExtension* SD_LExt() const;//in SDkutil.cc
@@ -122,6 +126,9 @@ public:
   KINLINE sTObject(poly p, ring tailRing = currRing);
   KINLINE sTObject(poly p, ring c_r, ring tailRing);
   KINLINE sTObject(sTObject* T, int copy);
+
+  // destructor
+  ~sTObject(){ SD_Ext_Delete(); }
 
   KINLINE void Set(ring r=currRing);
   KINLINE void Set(poly p_in, ring r=currRing);
@@ -219,7 +226,7 @@ public:
 
 #define SHIFT_BBA_DVEC  //BOCO: TODO
 #ifdef SHIFT_BBA_DVEC
-  ShiftDVec::sTObjectExtension * SD_Ext_Init(); //in SDkutil.cc
+  ShiftDVec::sLObjectExtension * SD_LExt_Init();//in SDkutil.cc
 #endif
 
   // initialization

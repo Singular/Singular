@@ -12,7 +12,7 @@
  */
 
 #include <kernel/kutil.h>
-//#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
+#include <kernel/SDkutil.h>
 #include <kernel/SDDebug.h>
 
 #include <climits>
@@ -26,30 +26,112 @@
 #include <kernel/febase.h> //For Print stuff
 
 typedef skStrategy* kStrategy;
+typedef class ShiftDVec::sTObjectExtension TExt;
+typedef class ShiftDVec::sLObjectExtension LExt;
 
 
 //additional member functions of sTObject
 
 
-ShiftDVec::sTObjectExtension * sTObject::SD_Ext_Init()
+/* BOCO:
+ * This initializes the TObject extensions for our
+ * non-commutative DVec algorithms. Initialized extensions
+ * have to be freed with SD_Ext_Delete, if not needed any
+ * longer. If the destructor of the corresponding TObject is
+ * invoced correctly, SD_Ext_Delete() will be called
+ * automatically, and may or may not be called again. Beware
+ * however, that this is in Singular not always the case, since
+ * TObjects are sometimes allocated with Singulars internal
+ * omalloc functions (and are then freed with omfree).
+ */
+ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
 {
   assume( SD_Object_Extension == NULL );
-  return SD_Object_Extension =
-      new ShiftDVec::sTObjectExtension(this);
+
+  if( SD_Object_Extension ) SD_Ext_Delete();
+  SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
+  SD_Ext()->Extension_Type = TExt::TObject_Extension;
+
+  return SD_Object_Extension;
 }
 
-ShiftDVec::sLObjectExtension* SD_LExt() const
-{return static_cast<sLObjectExtension*>(SD_Object_Extension);}
+/* BOCO:
+ * Get possesion of an extension from an other sTObject. The
+ * other object will retain possession of the extension.
+ */
+ShiftDVec::sTObjectExtension*
+sTObject::Own_Extension_From(sTObject* Other_Possesor)
+{
+  assume( Other_Possesor->SD_Ext() != NULL );
+  assume( SD_Object_Extension == NULL );
+  assume( SD_Object_Extension != Other_Possesor->SD_Ext() );
+
+  if( SD_Object_Extension ) SD_Ext_Delete();
+  if( Other_Possesor->SD_Ext() == NULL )
+    return SD_Ext_Init();
+  else
+  {
+    SD_Object_Extension = Other_Possesor->SD_Ext();
+    SD_Ext()->number_of_possesors += 1;
+  }
+
+  return SD_Object_Extension;
+}
+
+/* BOCO:
+ * This frees the memory reserved for the T/Lobject extensions.
+ * If multiple T/LObjects possess the extension, the extension
+ * will not be deleted (no memory is freed), but the possession
+ * of it will just be removed from this Object.
+ */
+void sTObject::SD_Ext_Delete()
+{
+  if( SD_Object_Extension == NULL ) return;
+
+  SD_Ext()->number_of_possesors -= 1;
+  assume(SD_Ext()->number_of_possesors >= 0);
+
+  if( SD_Ext()->number_of_possesors == 0)
+  {
+    switch( SD_Ext()->Extension_Type )
+    {
+      case TExt::TObject_Extension:
+        delete SD_Object_Extension;  break;
+      case TExt::LObject_Extension:
+        delete static_cast<ShiftDVec::sLObjectExtension*>
+              (SD_Object_Extension); break;
+      default:
+        assume(0);
+    }
+  }
+
+  SD_Object_Extension = NULL;
+}
+
+ShiftDVec::sLObjectExtension* sTObject::SD_LExt() const
+{
+  assume(SD_Ext()->Extension_Type == TExt::LObject_Extension);
+  return static_cast<ShiftDVec::sLObjectExtension*>(SD_Ext());
+}
 
 
 //additional member functions of sLObject
 
 
-ShiftDVec::sTObjectExtension * sLObject::SD_Ext_Init()
+/* BOCO:
+ * Like SD_Ext_Init(), but extension will be of type
+ * sLObjectExtension.
+ */
+ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
 {
   assume( SD_Object_Extension == NULL );
-  return SD_Object_Extension =
-      new ShiftDVec::sLObjectExtension(this);
+
+  if( SD_Object_Extension ) SD_Ext_Delete();
+  LExt* ext = new LExt(this);
+  SD_Object_Extension = ext;
+  SD_Ext()->Extension_Type = TExt::LObject_Extension;
+
+  return ext;
 }
 
 
@@ -61,7 +143,7 @@ uint* ShiftDVec::sTObjectExtension::GetDVec()
   return dvec;
 }
 
-uint ShiftDVec::sTObjectExtension::GetDVsize(ring r)
+uint ShiftDVec::sTObjectExtension::GetDVsize()
 {
   if(!dvec) SetDVec();
   if(!dvec) return 0; //Be careful! p does not exist!
@@ -227,10 +309,10 @@ void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
   int j = 1, i = 1, l = 0;
   for(;l < dvSize1; ++i)
     if(p_GetExp(notShifted,i,r)){*it=j;++it;j=1;++l;} else{++j;}
-  for(;l < lcmDvSize; ++i)
+  for(;l < dvSize; ++i)
     if(p_GetExp(shifted,i,r)){*it=j;++it;j=1;++l;} else{++j;}
 #else
-  SetLcmDVec(lcm, r);
+  SetDVec(get_LObject()->lcm, r);
 #endif
 }
 
@@ -241,8 +323,8 @@ void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
 bool ShiftDVec::sLObjectExtension::compareLcmTo
   ( sLObject* other, ring r )
 {
-  if( this->GetLcmDVsize(r) !=
-      other->SD_LExt()->GetLcmDVsize(r) )
+  if( this->getLcmDVSize(r) !=
+      other->SD_LExt()->getLcmDVSize(r) )
   { return false; }
 
   assume( get_LObject()->p1 != NULL &&
@@ -250,21 +332,26 @@ bool ShiftDVec::sLObjectExtension::compareLcmTo
   assume( other->p1 != NULL && other->p2 != NULL );
 
   //now we need to create the dvecs
-  if(!this->lcmDVec) this->SetLcmDVec();
-  if(!other->lcmDVec) other->SetLcmDVec();
+  if(!this->dvec) this->SetLcmDVec();
+  if(!other->SD_Ext()->dvec) other->SD_LExt()->SetLcmDVec();
 
-  if( memcmp( (void*)(lcmDVec),
-              (void*)other->lcmDVec, lcmDvSize) )
+  if( memcmp( (void*)(dvec),
+              (void*)other->SD_Ext()->dvec, dvSize) )
   { return false; }
   
   return true;
 }
 
 /* This function returns true, if the objects lcm is equal to
- * a shift of lcm(p1, p2).                                   */
+ * a shift of lcm(p1, p2).                                   
+ * WARNING: This function is garbage!                        */
 bool ShiftDVec::sLObjectExtension::compareLcmTo
   ( poly p1, poly p2, ring r )
 {
+  assume(0); //TODO: This function is garbage
+
+  return false;
+#if 0
   //We want to obtain the lcm directly from p1, p2 .
   //This is an adapted version of the SetLcmDVec function.
   //TODO: This has to be testet!
@@ -282,19 +369,20 @@ bool ShiftDVec::sLObjectExtension::compareLcmTo
   {
     poly shifted    = p1;
     poly notShifted = p2; 
-    lcmDvSize       = dvSize1;
+    dvSize          = dvSize1;
     dvSize1         = dvSize2;
   }
   else
   { poly hiDeg = p2; poly lowDeg = p1; pLcmDvSize = dvSize2; }
 
-  if(pLcmDvSize != lcmDvSize){ return false; }
+  if(pLcmDvSize != dvSize){ return false; }
 
-  if( compareDVec(lcmDVec, lowDeg, 0, dvSize1, r) &&
-      compareDVec(lcmDVec, lowDeg, dvSize1, pLcmDvSize, r) ) 
+  if( compareDVec(dvec, lowDeg, 0, dvSize1, r) &&
+      compareDVec(dvec, lowDeg, dvSize1, pLcmDvSize, r) ) 
     return true;
 
   return false;
+#endif
 }
 
 /* This function expects two letterplace polynomials and will
@@ -371,7 +459,7 @@ bool ShiftDVec::sLObjectExtension::gm3LcmUnEqualToLcm
 uint ShiftDVec::sLObjectExtension::lcmDivisibleBy
   ( sTObject * T, int numVars )
 {
-  get_LObject->SetLcmDvecIfNULL();
+  SetLcmDvecIfNULL();
   T->SD_Ext()->SetDVecIfNULL();
 
   return ShiftDVec::divisibleBy
@@ -382,7 +470,7 @@ uint ShiftDVec::sLObjectExtension::lcmDivisibleBy
 uint ShiftDVec::sLObjectExtension::lcmDivisibleBy
   ( sTObject * T, uint minShift, uint maxShift, int numVars )
 {
-  get_LObject()->SetLcmDvecIfNULL();
+  SetLcmDvecIfNULL();
   T->SD_Ext()->SetDVecIfNULL();
 
   return ShiftDVec::divisibleBy
@@ -569,12 +657,13 @@ uint ShiftDVec::divisibleBy
 uint ShiftDVec::lcmDivisibleBy
   ( LObject * lcm, sTObject * p, int numVars )
 {
-  lcm->SetLcmDvecIfNULL();
+  lcm->SD_LExt()->SetLcmDvecIfNULL();
   p->SD_Ext()->SetDVecIfNULL();
 
-  return divisibleBy
-    ( lcm->getLcmDVec(), lcm->getLcmDVSize(),
-      p->SD_Ext()->dvec, p->SD_Ext()->dvSize, numVars );
+  return divisibleBy( lcm->SD_LExt()->GetDVec(),
+                      lcm->SD_LExt()->getLcmDVSize(),
+                      p->SD_Ext()->dvec,
+                      p->SD_Ext()->dvSize, numVars    );
 }
 
 /* Returns true, if reduction of poly a with poly b would

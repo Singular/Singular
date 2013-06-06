@@ -34,7 +34,10 @@ void ShiftDVec::dvecWrite(const TObject* t)
 
 
 void ShiftDVec::lcmDvecWrite(LObject* t)
-{ dvecWrite(t->SD_Ext()->getLcmDVec(), t->SD_Ext()->getLcmDVSize()); }
+{
+  dvecWrite( t->SD_Ext()->GetDVec(),
+             t->SD_LExt()->getLcmDVSize() );
+}
 
 
 int SD::lpDVCase = 0;

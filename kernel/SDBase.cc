@@ -288,7 +288,7 @@ ideal ShiftDVec::kStd
     else
 */
     {
-      ideal I = NULL; assume(0); //BOCO: TODO
+      ideal I = NULL; //BOCO: TODO
       if (w!=NULL)
         r=SD::bba(F,Q,I,*w,hilb,strat);
       else
@@ -614,7 +614,7 @@ ideal ShiftDVec::bba
       }
     }else{
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
-      strat->P.SD_Ext()->freeDVec();  
+      strat->P.SD_Ext_Delete();
 #endif
     }
 
@@ -643,7 +643,7 @@ ideal ShiftDVec::bba
   //  we have to do that manually, since destructors for
   //  sTObjects are mostly useless in Singular
   for(int j = 0; j <= strat->tl; ++j)
-    strat->T[j].SD_Ext()->freeDVec();
+    strat->T[j].SD_Ext_Delete();
 
   if (TEST_OPT_SB_1)
   {
@@ -720,20 +720,17 @@ ideal ShiftDVec::bba
  * deletes divisible vectors/polynomials
  * BOCO: original resides in kutil.cc
  */
-void ShiftDVec::updateResult(ideal r,ideal Q, ShiftDVec::kStrategy strat)
+void ShiftDVec::updateResult
+  ( ideal r,ideal Q, ShiftDVec::kStrategy strat )
 {
   using namespace ShiftDVec;
+
   int l;
   if (strat->ak>0)
   {
     for (l=IDELEMS(r)-1;l>=0;l--)
-    {
       if ((r->m[l]!=NULL) && (pGetComp(r->m[l])==0))
-      {
-        loGriToFile("pDelete in updateResult on &r->m[1]", 0,1024, r->m[1]);
         pDelete(&r->m[l]); // and set it to NULL
-      }
-    }
     int q;
     poly p;
     for (l=IDELEMS(r)-1;l>=0;l--)
@@ -755,7 +752,9 @@ void ShiftDVec::updateResult(ideal r,ideal Q, ShiftDVec::kStrategy strat)
            * divides first arg, we check if first arg is
            * divisibly by second arg! */
           sTObject t1(r->m[l]);
-          sTObject t2(Q->m[q]); 
+          sTObject t2(Q->m[q]);
+          t1.SD_Ext_Init();
+          t2.SD_Ext_Init();
           uint shift = p_LmDivisibleBy
             (&t1, &t2, currRing, strat->get_lV());
           if ( (Q->m[q]!=NULL) && shift < UINT_MAX &&
@@ -821,6 +820,8 @@ void ShiftDVec::updateResult(ideal r,ideal Q, ShiftDVec::kStrategy strat)
              * divisibly by second arg! */
             sTObject t1(r->m[q]); 
             sTObject t2(r->m[l]);
+            t1.SD_Ext_Init();
+            t2.SD_Ext_Init();
 
             uint shift =
               p_LmDivisibleBy
@@ -1032,7 +1033,8 @@ poly ShiftDVec::redtail
       if(shift == 0){ With = WithTmp; } //no problem
       else //Our divisor is a shift (and thus not in T or S)
       {
-        With = new TObject(*WithTmp); //should do just a shallow copy
+        //should do just a shallow copy
+        With = new TObject(*WithTmp);
         With->p = p_LPshiftT
           ( WithTmp->p, shift,
             strat->get_uptodeg(),
@@ -1069,7 +1071,6 @@ poly ShiftDVec::redtail
       {
         pDelete(&With->p); 
         shift=0; 
-        With->SD_Ext()->dvec = NULL; 
         delete With;
       }
     }
@@ -1079,9 +1080,8 @@ poly ShiftDVec::redtail
 
   all_done:
   if(shift != 0)
-  { 
+  {
     pDelete(&With->p); 
-    With->SD_Ext()->freeDVec();
     delete With;
   }
   if (strat->redTailChange)
@@ -1135,9 +1135,11 @@ void ShiftDVec::initBba( ideal F, SD::kStrategy strat )
  * and the case of a degree-ordering
  * original resides in kstd2.cc
  */
-int ShiftDVec::redHomog( LObject* h, SD::kStrategy strat )
+int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
 {
   namespace SD = ShiftDVec;
+
+  SD::kStrategy strat = static_cast<SD::kStrategy>(strategy);
 
   if (strat->tl<0) return 1;
   assume(h->FDeg == h->pFDeg());
@@ -1192,6 +1194,8 @@ int ShiftDVec::redHomog( LObject* h, SD::kStrategy strat )
       if(strat->T[i].pLength < li){
         TObject t_h(h_p);
         TObject t_i(strat->T[i].GetLmTailRing());
+        t_h.SD_Ext_Init();
+        t_i.SD_Ext_Init();
         shift = SD::p_LmShortDivisibleBy
           (&t_h, strat->sevT[i], &t_i, not_sev, strat->tailRing);
         /*
@@ -1202,8 +1206,6 @@ int ShiftDVec::redHomog( LObject* h, SD::kStrategy strat )
           li = strat->T[i].pLength;
           ii = i;
         }
-        t_h.SD_Ext()->freeDVec();
-        t_i.SD_Ext()->freeDVec();
       }
     }
 #endif
@@ -1270,7 +1272,7 @@ int ShiftDVec::redHomog( LObject* h, SD::kStrategy strat )
     {
       if (h->lcm!=NULL) pLmFree(h->lcm);
 
-      h->SD_Ext()->freeDVec(); //BOCO: maybe this is not necessary ?
+      h->SD_Ext()->freeDVec(); //BOCO TODO: is this necessary ?
 
 #ifdef KDEBUG
       h->lcm=NULL;
@@ -1296,10 +1298,10 @@ int ShiftDVec::redHomog( LObject* h, SD::kStrategy strat )
       if (at <= strat->Ll)
       {
         int dummy=strat->sl; int shift_dummy;
-        j = SD::kFindDivisibleByInS(strat, &dummy, h, shift_dummy);
+        j = SD::kFindDivisibleByInS( strat, &dummy,
+                                     h, shift_dummy );
         if (j < 0) return 1;
 
-        h->SD_Object_Extension = NULL;
         SD::enterL( &strat->L,&strat->Ll,&strat->Lmax,h,at );
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -1345,6 +1347,8 @@ int ShiftDVec::kFindDivisibleByInS
      * by second arg! */
     TObject t_p(p);
     TObject t_Sj(strat->S[j]);
+    t_p.SD_Ext_Init();
+    t_Sj.SD_Ext_Init();
     shift = p_LmDivisibleBy
       ( &t_p, &t_Sj, currRing, strat->get_lV() );
     int reduction_violates_degree = redViolatesDeg
@@ -1361,16 +1365,15 @@ int ShiftDVec::kFindDivisibleByInS
 
 
 /*2
- *BOCO:
- *  This function will overload the redBba function of the
- *  bba-Algorithm for the non-commutative dvec-case. The original
- *  comment does still apply; however, h is no longer of type
- *  poly, but of type TObject *, which expands to sTObjectDVec in
- *  the dvec-case (,which we do consider here). Same goes for the
- *  return value of this function.
- *BOCO original comment from kutil.cc:
- *  reduces h using the set S
- *  procedure used in updateS
+ * BOCO:
+ *   This function will overload the redBba function of the
+ *   bba-Algorithm for the non-commutative dvec-case. The
+ *   original comment does still apply; however, h is no longer
+ *   of type poly, but of type TObject. Same goes for the
+ *   return value of this function.
+ * BOCO original comment from kutil.cc:
+ *   reduces h using the set S
+ *   procedure used in updateS
  */
 poly ShiftDVec::redBba
   ( LObject * h, int maxIndex, SD::kStrategy strat )
@@ -1387,10 +1390,10 @@ poly ShiftDVec::redBba
 
   while (j <= maxIndex)
   {
-    /*BOCO:
-     * The original p_LmShortDivisibleBy checks if second arg
-     * divides first arg, we check if first arg is divisibly
-     * by second arg! */
+    /* BOCO:
+     *   The original p_LmShortDivisibleBy checks if second arg
+     *   divides first arg, we check if first arg is divisibly
+     *   by second arg! */
     TObject * t;
     if(!(t = strat->s_2_t(j))) 
     { TObject tt(strat->S[j]); t = &tt; }
@@ -1554,7 +1557,7 @@ int ShiftDVec::kFindDivisibleByInT
   L->GetLm(p, r);
 
   //BOCO: added following line
-  L->SD_LExt()->SetLcmDvecIfNULL(p, r);
+  L->SD_Ext_Init();
 
 
 #if (HAVE_SEV > 2) //BOCO: comments/uncomments sev
@@ -1570,7 +1573,7 @@ int ShiftDVec::kFindDivisibleByInT
        * The original p_LmDivisibleBy checks if second arg
        * divides first arg, we check if first arg is divisibly
        * by second arg! */
-      T[j].SD_Ext()->SetDVecIfNULL(p, r);
+      T[j].SD_Ext_Init();
       shift = SD::p_LmDivisibleBy(L,&T[j], r, strat->get_lV());
       int reduction_violates_degree = redViolatesDeg
         ( L, &T[j], strat->get_uptodeg(), currRing );
@@ -1638,7 +1641,7 @@ TObject * ShiftDVec::kFindDivisibleByInS
   poly p;
   ring r;
   L->GetLm(p, r);
-  L->SD_LExt()->SetLcmDvecIfNULL(p, r);
+  L->SD_LExt()->SetDVecIfNULL(p, r);
 
 #if (HAVE_SEV > 2) //BOCO: comments/uncomments sev
   assume(~not_sev == p_GetShortExpVector(p, r));
@@ -1660,13 +1663,12 @@ TObject * ShiftDVec::kFindDivisibleByInS
          * divides first arg, we check if first arg is divisibly
          * by second arg! */
         sTObject t(strat->S[j]);
-        t.SD_Ext()->SetDVec();
+        t.SD_Ext_Init()->SetDVec();
         shift = p_LmDivisibleBy(L, &t, r, lV);
-        t.SD_Ext()->freeDVec();
       }
       else
       {
-        strat->S_2_T(j)->SD_Ext()->SetDVecIfNULL();
+        strat->S_2_T(j)->SD_Ext_Init()->SetDVecIfNULL();
         shift = p_LmDivisibleBy(L, strat->S_2_T(j), r, lV);
       }
       if ( shift < UINT_MAX && 
@@ -1705,7 +1707,8 @@ TObject * ShiftDVec::kFindDivisibleByInS
         t = strat->S_2_T(j);
         assume( t != NULL && t->t_p != NULL &&
                 t->tailRing == r && t->p == strat->S[j] );
-        strat->S_2_T(j)->SD_Ext()->SetDVecIfNULL(t->t_p, r);
+        strat->S_2_T(j)->SD_Ext_Init()
+                       ->SetDVecIfNULL(t->t_p, r);
         /*BOCO:
          * The original p_LmDivisibleBy checks if second arg
          * divides first arg, we check if first arg is divisibly
@@ -1784,9 +1787,6 @@ poly ShiftDVec::redtailBba
           ( strat->T, strat->sevT, &Ln, shift, strat );
         assume(h != NULL);
 
-        //BOCO may not be needed, but want to be sure
-        Ln.SD_Ext()->freeDVec(); 
-
         if (j < 0)
         {
           assume(h != NULL);
@@ -1841,7 +1841,6 @@ poly ShiftDVec::redtailBba
           // BOCO: do we need to set With_s.p, or is With_s
           //       just a dummy?
           With_s.p = With->p;
-          With_s.SD_Ext()->freeDVec();
         }
         uTmp.tailRing = With->tailRing; //BOCO: added...
       }
@@ -1852,10 +1851,10 @@ poly ShiftDVec::redtailBba
         /*poly tmp=*/Ln.CanonicalizeP();
         if (normalize) { Ln.Normalize(); }
       }
-      if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
-      {
-        With->pNorm();
-      }
+      if ( normalize &&
+           (!TEST_OPT_INTSTRATEGY) &&
+           (!nIsOne(pGetCoeff(With->p))) )
+      { With->pNorm(); }
       strat->redTailChange=TRUE;
 
       // BOCO: do we need to test for violation of exp bound?
@@ -1875,7 +1874,6 @@ poly ShiftDVec::redtailBba
         } while (!Ln.IsNull());
 
         goto all_done;
-
       }
 
       if (Ln.IsNull())
@@ -2323,11 +2321,11 @@ void ShiftDVec::initBuchMora
   /*- set L -*/
   strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
   strat->Ll = -1;
-  strat->initL(F);
+  strat->L = initL(((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc);
   /*- set B -*/
   strat->Bmax = setmaxL;
   strat->Bl = -1;
-  strat->initB();
+  strat->B = initL();
   /*- set T -*/
   strat->tl = -1;
   strat->tmax = setmaxT;
