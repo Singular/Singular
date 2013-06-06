@@ -171,7 +171,7 @@ void ShiftDVec::clearS
  * criterion check initenterpairs for old code to compare the
  * implementations */
 void ShiftDVec::initenterpairs
-  ( ShiftDVec::LObject* H, int k, int ecart, 
+  ( LObject* H, int k, int ecart, 
     int isFromQ, ShiftDVec::kStrategy strat, int atR )
 {
   assume(strat->R[atR]->p == H->p);
@@ -1332,7 +1332,7 @@ bool ShiftDVec::GM3
   uint EndPos = dvSize2 - ovSize - 1;
   //if(EndPos + dvSize1 > degLcm) EndPos = degLcm - dvSize1;
 
-  if( Pair->lcmDivisibleBy
+  if( Pair->SD_LExt()->lcmDivisibleBy
         ( H, StartPos, EndPos, strat->get_lV() ) ) return true;
 
   return false;
@@ -1616,8 +1616,8 @@ int i,j;
         {
           for (i=strat->Bl; i>=0; i--)
           {
-            if ( strat->B[i].lcmDivisibleBy
-                   (strat->S_2_T(j),strat->get_lV()) )
+            if ( strat->B[i].SD_LExt()->lcmDivisibleBy
+                            (strat->S_2_T(j),strat->get_lV()) )
             {
               deleteInL(strat->B,&strat->Bl,i,strat);
               strat->c3++;

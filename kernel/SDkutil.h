@@ -113,6 +113,13 @@ namespace ShiftDVec
 class ShiftDVec::sTObjectExtension
 {
   public:
+    // This is used for simulating polymorphism
+    enum { TObject_Extension = 1,
+           LObject_Extension = 2 } Extension_Type;
+
+    // How many Objects do possess a pointer to this extension
+    int number_of_possesors;
+
     sTObject* T; //The sTObject, this object is contained in
     uint * dvec; //Distance Vector of lm(p)
     uint dvSize; //size of the >>uint * dvec<< array
@@ -124,12 +131,11 @@ class ShiftDVec::sTObjectExtension
     //uint pIsInR; //already i_r in ::sTObject
 
     // constructor
-    sTObjectExtension(sTObject* _T) : dvec(NULL), T(_T) {}
+    sTObjectExtension(sTObject* _T) :
+      T(_T), dvec(NULL), number_of_possesors(1) {}
 
     // destructor
     ~sTObjectExtension() { freeDVec(); }
-
-    // TODO: destructor - shall we define one?
 
     void dumbInit(sTObject* _T){ T = _T; dvec = NULL; }
 
@@ -160,7 +166,7 @@ class ShiftDVec::sTObjectExtension
 
     uint*  GetDVec(); 
     uint  getDVecAtIndex(uint index) {return dvec[index];}
-    uint GetDVsize(ring r = currRing); 
+    uint GetDVsize(); 
 
     int cmpDVec(sTObject* toCompare);
 

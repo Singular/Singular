@@ -25,7 +25,7 @@ namespace ShiftDVec
     ( LObject * h, int maxIndex, SD::kStrategy strat );
   poly redtail( LObject* L, int pos, SD::kStrategy strat );
   poly redtail( poly p, int pos, SD::kStrategy strat );
-  int redHomog( LObject* h,SD::kStrategy strat );
+  int redHomog( LObject* h, ::kStrategy strat );
   uint p_LmShortDivisibleBy
     ( TObject* t1,unsigned long sev_t1,
       TObject* t2,unsigned long not_sev_t2, const ring r );

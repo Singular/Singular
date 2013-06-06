@@ -787,7 +787,7 @@ void ShiftDVec::ksCreateSpoly(LObject* Pair,   poly spNoether,
 
 //BOCO: used in redtail
 int ShiftDVec::ksReducePolyTail
-  ( SD::LObject* PR, TObject* UPW, TObject* SPW, 
+  ( LObject* PR, TObject* UPW, TObject* SPW, 
     poly Current, poly spNoether, SD::kStrategy strat )
 {
   BOOLEAN ret;
@@ -799,7 +799,10 @@ int ShiftDVec::ksReducePolyTail
   kTest_T(UPW);
   pAssume(pIsMonomOf(Lp, Current));
 
-  assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
+  assume( Lp != NULL &&
+          Current != NULL &&
+          pNext(Current) != NULL );
+
   assume(PR->bucket == NULL);
 
   LObject Red(pNext(Current), PR->tailRing);
@@ -807,7 +810,8 @@ int ShiftDVec::ksReducePolyTail
   TObject UWith(UPW, Lp == Save);
 
   pAssume(!pHaveCommonMonoms(Red.p, SWith.p));
-  ret = SD::ksReducePoly(&Red, &UWith, &SWith, spNoether, &coef, strat);
+  ret = SD::ksReducePoly
+    (&Red, &UWith, &SWith, spNoether, &coef, strat);
 
   if (!ret)
   {
@@ -824,23 +828,9 @@ int ShiftDVec::ksReducePolyTail
     if (Current == PR->p && PR->t_p != NULL)
       pNext(PR->t_p) = pNext(Current);
   }
-  if (Lp == Save)
+  if (Lp == Save)  //BOCO TODO: Do we miss braces here ???
    SWith.Delete();
    UWith.Delete();
-
-  // the following is commented out: shrinking
-#ifdef HAVE_SHIFTBBA_NONEXISTENT
-  if (currRing->isLPring)
-  {
-    // assume? h->p in currRing
-    PR->GetP();
-    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
-    PR->Clear(); // does the right things
-    PR->p = qq;
-    PR->t_p = NULL;
-    PR->SetShortExpVector();
-  }
-#endif
 
   return ret;
 }
