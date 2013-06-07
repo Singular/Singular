@@ -102,12 +102,13 @@ public:
   BOOLEAN is_special; // true, it is a new special S-poly (e.g. for SCA)
 #endif
 
-#define SHIFT_BBA_DVEC  //BOCO: TODO
-#ifdef SHIFT_BBA_DVEC
+#define HAVE_SHIFT_BBA_DVEC  //BOCO: TODO
+#ifdef HAVE_SHIFT_BBA_DVEC
   ShiftDVec::sTObjectExtension* SD_Object_Extension;
 
   // allocation/deallocation of memory (in SDkutil.cc)
   ShiftDVec::sTObjectExtension* SD_Ext_Init();
+  ShiftDVec::sTObjectExtension* SD_Ext_Init_If_NULL();
   void SD_Ext_Delete();
 
   // hostile acquisition (well, not really)
@@ -224,9 +225,10 @@ public:
   kBucket_pt bucket;
   int   i_r1, i_r2;
 
-#define SHIFT_BBA_DVEC  //BOCO: TODO
-#ifdef SHIFT_BBA_DVEC
+#define HAVE_SHIFT_BBA_DVEC  //BOCO: TODO
+#ifdef HAVE_SHIFT_BBA_DVEC
   ShiftDVec::sLObjectExtension * SD_LExt_Init();//in SDkutil.cc
+  ShiftDVec::sLObjectExtension * SD_LExt_Init_If_NULL();
 #endif
 
   // initialization
@@ -397,6 +399,12 @@ public:
   #if defined(HAVE_SHIFTBBA)
   int lV;
   #endif
+  BOOLEAN _is_SD_Case;
+#define HAVE_SHIFT_BBA_DVEC
+#ifdef HAVE_SHIFT_BBA_DVEC
+  void mark_as_SD_Case() { _is_SD_Case = true; }
+  BOOLEAN is_SD_Case() const { return _is_SD_Case; }
+#endif
   BOOLEAN interpt;
   BOOLEAN homog;
 #ifdef HAVE_PLURAL
@@ -632,9 +640,11 @@ BOOLEAN kTest(kStrategy strat);
 // test strat, and test that S is contained in T
 BOOLEAN kTest_TS(kStrategy strat);
 // test LObject
-BOOLEAN kTest_L(LObject* L, ring tailRing = NULL,
-                 BOOLEAN testp = FALSE, int lpos = -1,
-                 TSet T = NULL, int tlength = -1);
+BOOLEAN kTest_L( LObject* L,
+                 ring tailRing = NULL,
+                 BOOLEAN testp = FALSE,
+                 int lpos = -1, TSet T = NULL,
+                 int tlength = -1, kStrategy strat = NULL );
 // test TObject
 BOOLEAN kTest_T(TObject* T, ring tailRing = NULL, int tpos = -1, char TN = '?');
 // test set strat->SevS

@@ -328,8 +328,7 @@ ideal ShiftDVec::bba
    */
   namespace SD = ShiftDVec;
 
-  initDeBoGri
-    ( ShiftDVec::indent, "Entering bba", "Leaving bba", 4096 );
+  strat->mark_as_SD_Case();
 
 #ifdef KDEBUG
   bba_count++;
@@ -521,7 +520,6 @@ ideal ShiftDVec::bba
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
-          deBoGriPrint("Red Tail.\n", 2048);
           strat->P.p = 
             SD::redtailBba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
@@ -531,7 +529,6 @@ ideal ShiftDVec::bba
       {
         strat->P.pNorm();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-          deBoGriPrint("Red Tail.\n", 2048);
           strat->P.p = 
             SD::redtailBba(&(strat->P),pos-1,strat, withT);
       }
@@ -569,6 +566,7 @@ ideal ShiftDVec::bba
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       
+      strat->P.SD_Ext_Init_If_NULL();
       strat->P.SD_Ext()->SetDVecIfNULL();
       enterT(strat->P, strat);
 
@@ -1510,7 +1508,7 @@ static inline uint ShiftDVec::_p_LmDivisibleByNoComp
   ( TObject * t1, TObject * t2, const ring r, int lV )
 {
   //BOCO: Well, thats all it does at the moment!
-  return t1->SD_Ext()->divisibleBy( t2, lV );
+  return t1->SD_Ext_Init_If_NULL()->divisibleBy( t2, lV );
 }
 
 
@@ -1641,7 +1639,7 @@ TObject * ShiftDVec::kFindDivisibleByInS
   poly p;
   ring r;
   L->GetLm(p, r);
-  L->SD_LExt()->SetDVecIfNULL(p, r);
+  L->SD_Ext()->SetDVecIfNULL(p, r);
 
 #if (HAVE_SEV > 2) //BOCO: comments/uncomments sev
   assume(~not_sev == p_GetShortExpVector(p, r));
