@@ -827,6 +827,53 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
         return FALSE;
       }
+ /*===================leftgb mit DVecs========================*/
+      if (strcmp(sys_cmd, "leftgbdvc") == 0)
+      {
+        ideal I, J;
+        int uptodeg, lVblock;
+        if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+        {
+          I=(ideal)h->CopyD();
+          h=h->next;
+        }
+        else return TRUE;
+        if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+        {
+          J=(ideal)h->CopyD();
+          h=h->next;
+        }
+        else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          uptodeg=(int)((long)(h->Data()));
+          h=h->next;
+        }
+        else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          lVblock=(int)((long)(h->Data()));
+          h=h->next;
+
+          long deBoGriFlags = 0;
+          if (h!=NULL)
+            if( (h->Typ()) == INT_CMD )
+              deBoGriFlags= (long) (h->Data()) ;
+            else return TRUE;
+
+          res->data =
+            ShiftDVec::leftgbdvc(I,J,uptodeg,lVblock,deBoGriFlags);
+          if (res->data == NULL)
+          {
+            /* that is there were input errors */
+            res->data = I;
+          }
+          res->rtyp = IDEAL_CMD;
+        }
+        else return TRUE;
+
+        return FALSE;
+      }
   /*=================== Testfunktion for Gebauer Moeller ========================*/
       /* This code somehow got lost... */
   /*==================== Hensel's lemma ======================*/
