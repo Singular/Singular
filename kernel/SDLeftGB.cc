@@ -72,6 +72,38 @@ ideal ShiftDVec::leftgbdvc
 }
 
 
+//BOCO: original resides in kstd1.cc
+//GRICO:update for left Bba
+//needed to initialize a new reduction??
+//like SD::redHomogLeft
+void ShiftDVec::initBba( ideal F, ideal J, SD::kStrategy strat )
+{
+  namespace SD = ShiftDVec;
+
+  int i;
+  idhdl h;
+  /* setting global variables ------------------- */
+  strat->enterS = enterSBba;
+
+  //BOCO:
+  //  We do not use redHoney/redLazy/redRing at the moment;
+  //  See original code for reference
+  //TODO:
+  //  redHomog also applies to the inhomogenous case
+  //  -> rename it!
+  strat->red = SD::redHomog;
+
+  if (currRing->pLexOrder && strat->honey)
+    strat->initEcart = initEcartNormal;
+  else
+    strat->initEcart = initEcartBBA;
+  if (strat->honey)
+    strat->initEcartPair = initEcartPairMora;
+  else
+    strat->initEcartPair = initEcartPairBba;
+}
+
+
 
 void ShiftDVec::LeftGB::initenterpairs
   ( LObject* J,
