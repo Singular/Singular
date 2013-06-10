@@ -89,7 +89,7 @@ The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
 @cindex Library versioning
 
 Due to switching from Subversion to GIT revision control system for the Singular source code, 
-library version variables (displayed when loading a library) have changed (to include the GIT commit IDs).
+library version variables (displayed when loading a library) have changed.
 
 
 @subsubheading New orderings for modules
