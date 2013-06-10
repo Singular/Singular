@@ -8231,6 +8231,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{load(} string_expression @code{);}
+@*@code{load(} string_expression @code{, "with");}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -8244,7 +8245,8 @@ none
 @c libraries, by starting up @sc{Singular} with the option @code{-v}, or by
 @c issuing the command @code{system("with");"}.
 reads a library of procedures from a file. In contrast to the command
-@code{LIB}, the command @code{load} does not add the procedures of the
+@code{LIB} (see note below),
+the command @code{load} does not add the procedures of the
 library to the package @code{Top}, but only to the package corresponding
 to the library. If the given filename does
 not start with @kbd{.} or @kbd{/}, the following directories are
@@ -8256,6 +8258,8 @@ You can view the search path which @sc{Singular} uses to locate its
 libraries, by starting up @sc{Singular} with the option @code{-v},
 or by issuing the command @code{system("with");}.
 
+@item @strong{Note:} @code{load(<string_expr>,"with")} is equivalent to
+@code{LIB <string_expr>}.
 @end table
 
 All loaded libraries are displayed by the @code{listvar(package);}
