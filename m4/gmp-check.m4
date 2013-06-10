@@ -44,9 +44,12 @@ for GMP_HOME in ${GMP_HOME_PATH}
 			GMP_LIBS="${BACKUP_LIBS} -lgmp"		
 		fi
 	
-		CFLAGS="${CFLAGS} ${GMP_CFLAGS}"
-		LIBS="${LIBS} ${GMP_LIBS}"
+		CFLAGS="${BACKUP_CFLAGS} ${GMP_CFLAGS}"
+		LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 
+    # According to C. Fieker this would link but would not RUN
+    # (AC_TRY_RUN) due to missing SHARED libgmp.so :(
+    # TODO: set LD_LIBRARY_PATH???
 		AC_TRY_LINK(
 		[#include <gmp.h>],
 		[mpz_t a; mpz_init (a);],

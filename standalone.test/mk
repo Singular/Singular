@@ -29,4 +29,4 @@ CMD="g++ -static -g -Wextra -Winline -Wall -Wno-long-long -O0 -fno-exceptions $N
 echo "executing '$CMD':"
 $CMD
 
-SINGULARPATH="$LIBPOLYSPREFIX/share/gftables:$LIBPOLYSPREFIX/libexec/singular/MOD" SINGULAR_ROOT_DIR="$LIBPOLYSPREFIX" ./$NAME
+SINGULARPATH="$LIBPOLYSPREFIX/share/gftables:$LIBPOLYSPREFIX/bin" SINGULAR_ROOT_DIR="$LIBPOLYSPREFIX" ./$NAME

@@ -683,6 +683,8 @@ void bigintmat::pprint(int maxwid)
 }
 
 // Ungetestet
+// (According to C. Fieker) Seems to have a lot of memory leaks (pure adaptation of the
+// corresponding method for intmat) due to return statements
 static void bimRowContent(bigintmat *bimat, int rowpos, int colpos)
 {
   const coeffs basecoeffs = bimat->basecoeffs();
