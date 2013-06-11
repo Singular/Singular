@@ -843,6 +843,7 @@ cmdnames cmds[] =
   { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
+  { "apply",       0, APPLY,              APPLY},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_13},
   { "betti",       0, BETTI_CMD ,         CMD_12},

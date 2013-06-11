@@ -95,6 +95,7 @@ BOOLEAN iiExprArith2(leftv res, sleftv* a, int op, sleftv* b,
                      BOOLEAN proccall=FALSE);
 BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c);
 BOOLEAN iiExprArithM(leftv res, sleftv* a, int op);
+BOOLEAN iiApply(leftv res,leftv a, int op, leftv proc);
 
 typedef BOOLEAN (*proc1)(leftv,leftv);
 
