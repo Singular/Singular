@@ -1,0 +1,157 @@
+source gdb_get_line.py
+
+define disable_output
+   set logging redirect on
+   set logging file /dev/null
+   set logging on
+end
+
+define enable_output
+   set logging on
+   set logging file gridb.txt
+end
+
+
+blc ShiftDVec::updateResult 't1.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  t1->P.p (ptr): %p\n", t1.p
+  printf "  t1.p: "
+  pct t1.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::updateResult 't2.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  t2->P.p (ptr): %p\n", t2.p
+  printf "  t2.p: "
+  pct t2.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::redHomog 'th.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  th.P.p (ptr): %p\n", th.p
+  printf "  th.p: "
+  pct th.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::redHomog 'ti.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  ti->P.p (ptr): %p\n", ti.p
+  printf "  ti.p: "
+  pct ti.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::kFindDivisibleByInS 't_p.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  t_p->P.p (ptr): %p\n", t_p.p
+  printf "  t_p.p: "
+  pct t_p.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::kFindDivisibleByInS 't_Sj.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  t_Sj->P.p (ptr): %p\n", t_Sj.p
+  printf "  t_Sj.p: "
+  pct t_Sj.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::kFindDivisibleByInT 'L->SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  L->P.p (ptr): %p\n", L.p
+  printf "  L.p: "
+  pct L.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::kFindDivisibleByInT 'T[j]->SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  T[j].P.p (ptr): %p\n", T[j].p
+  printf "  T[j].p: "
+  pct T[j].p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::kFindDivisibleByInS 't.SD_Ext_Init()->SetDVec()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  t.P.p (ptr): %p\n", t.p
+  printf "  t.p: "
+  pct t.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::kFindDivisibleByInS 'strat->S_2_T(j)->SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  S_2_T(j).p (ptr): %p\n", strat->S_2_T(j)->p
+  printf "  strat->S_2_T(j)->p: "
+  pct strat->S_2_T(j)->p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::redtailBba 'Ln.SD_Ext_Init()'
+commands
+  silent
+  printf "\n\nNew Extension created\n"
+  printf "  Ln.p (ptr): %p\n", Ln.p
+  printf "  Ln.p: "
+  pct Ln.p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::bba 'strat->P.SD_Ext_Delete()'
+commands
+  silent
+  printf "\n\n Extension deleted\n"
+  printf "  strat->P (ptr): %p\n", strat->P
+  printf "  strat->P: "
+  pct strat->P
+  printf "\n"
+  continue
+end
+
+lc ShiftDVec::bba 'strat->T[j].SD_Ext_Delete()'
+commands
+  silent
+  printf "\n\n Extension deleted\n"
+  printf "  strat->T[j] (ptr): %p\n", strat->T[j]
+  printf "  strat->T[j]: "
+  pct strat->T[j]
+  printf "\n"
+  continue
+end
+

@@ -46,13 +46,19 @@ typedef class ShiftDVec::sLObjectExtension LExt;
  */
 ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
 {
-  assume( SD_Object_Extension == NULL );
-
   if( SD_Object_Extension ) SD_Ext_Delete();
+
   SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
+  SD_Ext()->Set_Number_Of_Possesors(1);
 
   return SD_Object_Extension;
+}
+
+ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init_If_NULL()
+{
+  if( SD_Object_Extension == NULL ) return SD_Ext_Init();
+  else                              return SD_Object_Extension;
 }
 
 /* BOCO:
@@ -67,9 +73,7 @@ sTObject::Own_Extension_From(sTObject* Other_Possesor)
   assume( SD_Object_Extension != Other_Possesor->SD_Ext() );
 
   if( SD_Object_Extension ) SD_Ext_Delete();
-  if( Other_Possesor->SD_Ext() == NULL )
-    return SD_Ext_Init();
-  else
+  if( Other_Possesor->SD_Ext() != NULL )
   {
     SD_Object_Extension = Other_Possesor->SD_Ext();
     SD_Ext()->number_of_possesors += 1;
@@ -124,14 +128,20 @@ ShiftDVec::sLObjectExtension* sTObject::SD_LExt() const
  */
 ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
 {
-  assume( SD_Object_Extension == NULL );
-
-  if( SD_Object_Extension ) SD_Ext_Delete();
+  if( SD_Object_Extension ) { SD_Ext_Delete(); }
+    
   LExt* ext = new LExt(this);
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
+  SD_Ext()->Set_Number_Of_Possesors(1);
 
   return ext;
+}
+
+ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init_If_NULL()
+{
+  if( SD_Object_Extension == NULL ) return SD_LExt_Init();
+  else                              return SD_LExt();
 }
 
 
@@ -229,7 +239,7 @@ int ShiftDVec::sTObjectExtension::cmpDVecProper
 
 void ShiftDVec::sTObjectExtension::freeDVec()
 {
-  if(dvec)
+  if(this && dvec)
   {
     omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
     dvec = NULL;

@@ -940,12 +940,7 @@ KINLINE TObject* sLObject::T_2(const skStrategy* strat)
   assume(i_r2 >= 0 && i_r2 <= strat->tl);
   TObject* T = strat->R[i_r2];
 
-  //BOCO/TODO: 
-  //In our case T->p might be a shift of p2; 
-  //TODO: we should test, if T->p is such a shift
-  //bool SDCase = dynamic_cast<ShiftDVec::sTObject*>(T);
-  //assume(T->p == p2 || dynamic_cast<ShiftDVec::sTObject*>(T));
-  assume( T->p == p2 );
+  assume( T->p == p2 || strat->is_SD_Case() );
 
   return T;
 }

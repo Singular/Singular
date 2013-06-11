@@ -10,7 +10,7 @@
  * TODO: bidubidu
  */
 
-#include <kutil.h>
+#include <kernel/kutil.h>
 
 
 #ifndef SDKUTIL_H
@@ -136,6 +136,9 @@ class ShiftDVec::sTObjectExtension
 
     // destructor
     ~sTObjectExtension() { freeDVec(); }
+
+    void Set_Number_Of_Possesors(int num)
+    { number_of_possesors = num; }
 
     void dumbInit(sTObject* _T){ T = _T; dvec = NULL; }
 

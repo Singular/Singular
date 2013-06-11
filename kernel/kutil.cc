@@ -733,8 +733,9 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   return TRUE;
 }
 
-BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
-                BOOLEAN testp, int lpos, TSet T, int tlength)
+BOOLEAN kTest_L( LObject *L,
+                 ring strat_tailRing, BOOLEAN testp, int lpos,
+                 TSet T, int tlength, kStrategy strat )
 {
   if (testp)
   {
@@ -775,10 +776,8 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     if (i < 0)
       return dReportError("L[%d].p1 not in T",lpos);
     i = kFindInT(L->p2, T, tlength);
-    //BOCO: small modification (test for ShiftDVec Case)
-    //TODO: test if we really have a shift here
-    //if (i < 0 && !dynamic_cast<ShiftDVec::sLObject*>(L))
-    if (i < 0) return dReportError("L[%d].p2 not in T",lpos);
+    if (!strat->is_SD_Case() && i < 0)
+      return dReportError("L[%d].p2 not in T",lpos);
   }
   return TRUE;
 }
@@ -810,7 +809,7 @@ BOOLEAN kTest (kStrategy strat)
     {
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
                            strat->L[i].Next() != strat->tail, i,
-                           strat->T, strat->tl));
+                           strat->T, strat->tl, strat));
       // may be unused
       //if (strat->use_buckets && strat->L[i].Next() != strat->tail &&
       //    strat->L[i].Next() != NULL && strat->L[i].p1 != NULL)
@@ -6766,6 +6765,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
 */
 void enterSBba (LObject p,int atS,kStrategy strat, int atR)
 {
+  //BOCO TODO: better would be to define a proper copy
+  //           constructor for L/TObjects !!!
+  p.SD_Object_Extension = NULL;
+
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
@@ -7061,6 +7064,8 @@ void enterT(LObject p, kStrategy strat, int atT)
     if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
   }
   strat->T[atT] = (TObject) p;
+
+  p.SD_Object_Extension = NULL;
 
   if (strat->tailRing != currRing && pNext(p.p) != NULL)
     strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);

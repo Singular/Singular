@@ -1,0 +1,55 @@
+source gdb_get_line.py
+
+define disable_output
+   set logging redirect on
+   set logging file /dev/null
+   set logging on
+end
+
+define enable_output
+   set logging on
+   set logging file gridbdv.txt
+end
+
+blc ShiftDVec::sLObjectExtension::SetLcmDVec 'dvec ='
+commands
+  silent
+  printf "\n\n New DVec created\n"
+  printf "  get_LObject()->p1 (ptr): %p\n", get_LObject()->p1
+  printf "  get_LObject()->p1: "
+  pct get_LObject()->p1
+  printf "\n"
+  printf "\n\n New DVec created\n"
+  printf "  get_LObject()->p2 (ptr): %p\n", get_LObject()->p2
+  printf "  get_LObject()->p2: "
+  pct get_LObject()->p2
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::CreateDVec 'dvec ='
+commands
+  silent
+  printf "\n\n New DVec created\n"
+  printf "  p (ptr): %p\n", p
+  printf "  p: "
+  pct p
+  printf "\n"
+  continue
+end
+
+blc ShiftDVec::sTObjectExtension::freeDVec 'if(this && dvec)'
+commands
+  silent
+  printf "\n\n DVec destruction\n"
+  printf "  this (ptr): %p\n", this
+  printf "  this: "
+  pct this
+  printf "\n"
+  printf "\n\n DVec destruction\n"
+  printf "  dvec (ptr): %p\n", dvec
+  printf "  dvec: "
+  pct dvec
+  printf "\n"
+  continue
+end
