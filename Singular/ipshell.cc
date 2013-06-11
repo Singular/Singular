@@ -5748,3 +5748,91 @@ void paPrint(const char *n,package p)
   Print(",%s", p->libname);
   PrintS(")");
 }
+
+BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
+{
+  intvec *aa=(intvec*)a->Data();
+  intvec *r=ivCopy(aa);
+  sleftv tmp_out;
+  sleftv tmp_in;
+  BOOLEAN bo=FALSE;
+  for(int i=0;i<aa->length(); i++)
+  {
+    memset(&tmp_in,0,sizeof(tmp_in));
+    tmp_in.rtyp=INT_CMD;
+    tmp_in.data=(void*)(*aa)[i];
+    if (proc==NULL)
+      bo=iiExprArith1(&tmp_out,&tmp_in,op);
+    else
+      bo=jjPROC(&tmp_out,proc,&tmp_in);
+    if (bo || (tmp_out.rtyp!=INT_CMD))
+    {
+      if (r!=NULL) delete r;
+      Werror("apply fails at index %d",i+1);
+      return TRUE;
+    }
+    (*r)[i]=(int)(long)tmp_out.data;
+  }
+  res->data=(void*)r;
+  return FALSE;
+}
+BOOLEAN iiApplyBIGINTMAT(leftv res, leftv a, int op, leftv proc)
+{
+  WerrorS("not implemented");
+  return TRUE;
+}
+BOOLEAN iiApplyIDEAL(leftv res, leftv a, int op, leftv proc)
+{
+  WerrorS("not implemented");
+  return TRUE;
+}
+BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
+{
+  lists aa=(lists)a->Data();
+  lists r=(lists)omAlloc0Bin(slists_bin); r->Init(aa->nr+1);
+  sleftv tmp_out;
+  sleftv tmp_in;
+  BOOLEAN bo=FALSE;
+  for(int i=0;i<=aa->nr; i++)
+  {
+    memset(&tmp_in,0,sizeof(tmp_in));
+    tmp_in.Copy(&(aa->m[i]));
+    if (proc==NULL)
+      bo=iiExprArith1(&tmp_out,&tmp_in,op);
+    else
+      bo=jjPROC(&tmp_out,proc,&tmp_in);
+    tmp_in.CleanUp();
+    if (bo)
+    {
+      if (r!=NULL) r->Clean();
+      Werror("apply fails at index %d",i+1);
+      return TRUE;
+    }
+    memcpy(&(r->m[i]),&tmp_out,sizeof(sleftv));
+  }
+  res->data=(void*)r;
+  return FALSE;
+  WerrorS("not implemented");
+  return TRUE;
+}
+BOOLEAN iiApply(leftv res, leftv a, int op, leftv proc)
+{
+  memset(res,0,sizeof(sleftv));
+  res->rtyp=a->Typ();
+  switch (res->rtyp /*a->Typ()*/)
+  {
+    case INTVEC_CMD:
+    case INTMAT_CMD:
+        return iiApplyINTVEC(res,a,op,proc);
+    case BIGINTMAT_CMD:
+        return iiApplyBIGINTMAT(res,a,op,proc);
+    case IDEAL_CMD:
+    case MODUL_CMD:
+    case MATRIX_CMD:
+        return iiApplyIDEAL(res,a,op,proc);
+    case LIST_CMD:
+        return iiApplyLIST(res,a,op,proc);
+  }
+  WerrorS("first argument to `apply` must allow an index");
+  return TRUE;
+}

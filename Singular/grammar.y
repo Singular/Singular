@@ -317,6 +317,7 @@ void yyerror(const char * fmt)
 %token <name> UNKNOWN_IDENT RINGVAR PROC_DEF
 
 /* control */
+%token <i> APPLY
 %token <i> BREAK_CMD
 %token <i> CONTINUE_CMD
 %token <i> ELSE_CMD
@@ -666,22 +667,6 @@ expr:   expr_arithmetic
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
-        | CMD_2 '(' expr ',' expr ')'
-          {
-            if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
-          }
-        | CMD_3 '(' expr ',' expr ',' expr ')'
-          {
-            if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
-          }
-        | CMD_23 '(' expr ',' expr ')'
-          {
-            if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
-          }
-        | CMD_23 '(' expr ',' expr ',' expr ')'
-          {
-            if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
-          }
         | CMD_12 '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
@@ -690,19 +675,35 @@ expr:   expr_arithmetic
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
+        | CMD_123 '(' expr ')'
+          {
+            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
+          }
+        | CMD_2 '(' expr ',' expr ')'
+          {
+            if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
+          }
         | CMD_12 '(' expr ',' expr ')'
           {
             if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
           }
-        | CMD_123 '(' expr ')'
+        | CMD_23 '(' expr ',' expr ')'
           {
-            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
+            if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
           }
         | CMD_123 '(' expr ',' expr ')'
           {
             if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
           }
+        | CMD_3 '(' expr ',' expr ',' expr ')'
+          {
+            if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
+          }
         | CMD_13 '(' expr ',' expr ',' expr ')'
+          {
+            if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
+          }
+        | CMD_23 '(' expr ',' expr ',' expr ')'
           {
             if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
@@ -733,6 +734,30 @@ expr:   expr_arithmetic
         | RING_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,RING_CMD)) YYERROR;
+          }
+        | APPLY '('  expr ',' CMD_1 ')'
+          {
+            if (iiApply(&$$, &$3, $5, NULL)) YYERROR;
+          }
+        | APPLY '('  expr ',' CMD_12 ')'
+          {
+            if (iiApply(&$$, &$3, $5, NULL)) YYERROR;
+          }
+        | APPLY '('  expr ',' CMD_13 ')'
+          {
+            if (iiApply(&$$, &$3, $5, NULL)) YYERROR;
+          }
+        | APPLY '('  expr ',' CMD_123 ')'
+          {
+            if (iiApply(&$$, &$3, $5, NULL)) YYERROR;
+          }
+        | APPLY '('  expr ',' CMD_M ')'
+          {
+            if (iiApply(&$$, &$3, $5, NULL)) YYERROR;
+          }
+        | APPLY '('  expr ',' expr ')'
+          {
+            if (iiApply(&$$, &$3, 0, &$5)) YYERROR;
           }
         | quote_start expr quote_end
           {
@@ -1101,6 +1126,7 @@ cmdeq:  '='
             expected_parms = TRUE;
           }
         ;
+
 
 mat_cmd: MATRIX_CMD
             { $$ = $1; }
