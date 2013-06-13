@@ -729,7 +729,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
-int huhu_mod_init(SModulFunctions*){ return 0; }
+void staticdemo_mod_init(SModulFunctions*){ PrintS("init of staticdemo\n"); }
 
 #define SI_GET_BUILTIN_MOD_INIT(name) \
   int name##_mod_init(SModulFunctions*); \
