@@ -3949,6 +3949,20 @@ static BOOLEAN jjDET_I(leftv res, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjDET_BI(leftv res, leftv v)
+{
+  bigintmat * m=(bigintmat*)v->Data();
+  int i,j;
+  i=m->rows();j=m->cols();
+  if(i==j)
+    res->data = (char *)(long)singclap_det_bi(m);
+  else
+  {
+    Werror("det of %d x %d bigintmat",i,j);
+    return TRUE;
+  }
+  return FALSE;
+}
 static BOOLEAN jjDET_S(leftv res, leftv v)
 {
   ideal I=(ideal)v->Data();

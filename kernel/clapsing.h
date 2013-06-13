@@ -52,6 +52,7 @@ char* singclap_neworder ( ideal I);
 
 poly singclap_det( const matrix m );
 int singclap_det_i( intvec * m );
+number singclap_det_bi( bigintmat * m);
 
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN jjCHARSERIES(leftv res, leftv u);

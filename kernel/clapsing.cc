@@ -19,6 +19,7 @@
 #include <kernel/ffields.h>
 #include <factory/factory.h>
 #include <kernel/clapconv.h>
+#include <kernel/bigintmat.h>
 #include <libfac/factor.h>
 #include <kernel/ring.h>
 
@@ -1905,6 +1906,20 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
  Off(SW_RATIONAL);
 }
 
+number singclap_det_bi( bigintmat * m)
+{
+  CFMatrix M(m->rows(),m->cols());
+  int i,j;
+  for(i=m->rows();i>0;i--)
+  {
+    for(j=m->cols();j>0;j--)
+    {
+      M(i,j)=convSingNFactoryN(BIMATELEM(*m,i,j),NULL);
+    }
+  }
+  number res= convFactoryNSingN( determinant(M,m->rows()),NULL ) ;
+  return res;
+}
 #if 0
 lists singclap_chineseRemainder(lists x, lists q)
 {
