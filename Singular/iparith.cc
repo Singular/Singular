@@ -128,6 +128,9 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
 
+// bit 4 for warning, if used at toplevel
+#define WARN_RING        16
+
 static BOOLEAN check_valid(const int p, const int op);
 
 /*=============== types =====================*/
@@ -8881,6 +8884,10 @@ static BOOLEAN check_valid(const int p, const int op)
       return TRUE;
     }
     /* else ALLOW_ZERODIVISOR */
+    else if(((p & WARN_RING)==WARN_RING)&&(myynest==0))
+    {
+      WarnS("considering the image in Q[...]");
+    }
   }
   #endif
   return FALSE;
