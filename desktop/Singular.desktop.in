@@ -10,6 +10,6 @@ Type=Application
 Exec=Singular
 Terminal=true
 Categories=Math;Science;Education;
-Icon=/usr/share/icons/Singular.png
+Icon=@datadir@/icons/Singular.png
 Encoding=UTF-8
 
