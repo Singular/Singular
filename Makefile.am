@@ -10,7 +10,6 @@ PACKAGES=resources omalloc xalloc $(USE_FACTORY) libpolys kernel numeric Singula
 SUBDIRS =$(PACKAGES)
 TESTDIRS=$(PACKAGES)
 
- 
 emacsdir=$(datadir)/singular/emacs
 
 EMACS = \
@@ -46,9 +45,25 @@ DEBIAN = README \
 REDHAT = README \
 	redhat/singular.spec
 
-DESKTOP = desktop/Singular.png
+iconsdir = $(datadir)/icons
+icons_DATA = desktop/Singular.png
 
-EXTRA_DIST = autogen.sh $(EMACS) $(DEBIAN) $(REDHAT) $(DESKTOP) 
+desktopdir = $(datadir)/applications
+desktop_DATA = desktop/Singular.desktop desktop/Singular-manual.desktop
+
+substvars = sed \
+	-e 's|@docdir[@]|$(docdir)|g' \
+	-e 's|@datadir[@]|$(datadir)|g' \
+	-e 's|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g'
+desktop/Singular.desktop: desktop/Singular.desktop.in
+	$(AM_V_GEN) $(substvars) $< > $@
+desktop/Singular-manual.desktop: desktop/Singular-manual.desktop.in
+	$(AM_V_GEN) $(substvars) $< > $@
+desktop_in = desktop/Singular.desktop.in desktop/Singular-manual.desktop.in
+
+EXTRA_DIST = autogen.sh $(EMACS) \
+	$(DEBIAN) $(REDHAT) \
+	$(icons_DATA) $(desktop_in) 
 
 bin_SCRIPTS = libsingular-config
 

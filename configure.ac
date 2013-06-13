@@ -170,10 +170,9 @@ AC_CONFIG_FILES([dyn_modules/syzextra/Makefile])
 AC_CONFIG_FILES([dyn_modules/callgfanlib/Makefile])
 AC_CONFIG_FILES([IntegerProgramming/Makefile])
 AC_CONFIG_FILES([libsingular-config])
+
 AC_CONFIG_SUBDIRS([gfanlib])
 
 AC_CONFIG_FILES([redhat/singular.spec])
-AC_CONFIG_FILES([desktop/Singular.desktop])
-AC_CONFIG_FILES([desktop/Singular-manual.desktop])
 
 AC_OUTPUT
