@@ -194,7 +194,7 @@ nodist_libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
 
 ####################################################
 # Documentation
-include $(top_srcdir)/aminclude.am
+include $(srcdir)/aminclude.am
 
 doxysrc = $(SOURCES) parseutil.cc
 doxyincl = $(factory_headers) parseutil.h
