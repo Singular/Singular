@@ -26,13 +26,6 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([config.h],[],[config.h])
 
-dnl #
-dnl # Change version here, do not believe the comment in the
-dnl # preceding lines.
-dnl #
-factory_version="3.1.3"
-factory_configuration="'$ac_configure_args' in `pwd`"
-
 #
 # - check for CC and CXX but be careful about CFLAGS.
 #
@@ -122,54 +115,54 @@ DX_INIT_DOXYGEN($PACKAGE_NAME, MYDOXYGENCONFIG)
 # name clashes with other peoples configure scripts via
 # `config.cache'.  Furthermore, we do not use cache at all to
 # avoid some nasty problems with our own development environment.
-unset ac_cv_path_FACTORY_MKINSTALLDIRS
-unset ac_cv_path_FACTORY_MAKEHEADER
-save_path="$PATH"
-PATH="$PATH:$srcdir/bin"
-AC_PATH_PROG(FACTORY_MKINSTALLDIRS, mkinstalldirs, -mkdir)
-PATH="$srcdir/bin:$save_path"
-AC_PATH_PROG(FACTORY_MAKEHEADER, makeheader)
-PATH="$save_path"
+#unset ac_cv_path_FACTORY_MKINSTALLDIRS
+#unset ac_cv_path_FACTORY_MAKEHEADER
+#save_path="$PATH"
+#PATH="$PATH:$srcdir/bin"
+#AC_PATH_PROG(FACTORY_MKINSTALLDIRS, mkinstalldirs, -mkdir)
+#PATH="$srcdir/bin:$save_path"
+#AC_PATH_PROG(FACTORY_MAKEHEADER, makeheader)
+#PATH="$save_path"
 
 #
 # - expand paths.
 #
 
-AC_MSG_CHECKING(and generating explicit install paths)
+#AC_MSG_CHECKING(and generating explicit install paths)
 
-# generate Makefile
-save_prefix="$prefix"
-save_exec_prefix="$exec_prefix"
-test "x$prefix" = xNONE && prefix=$ac_default_prefix
-test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
-for dir in prefix exec_prefix bindir sbindir libexecdir \
-	   datadir sysconfdir sharedstatedir localstatedir libdir \
-	   includedir oldincludedir infodir mandir; do
-  eval "dir_value=\$$dir"
-  cat >> ./conftest.mk << EXPLPATHEOT
-$dir=$dir_value
-explicit_$dir:
-	@ echo \$($dir)
-	@ if echo \$($dir) | grep '^/'; \\
-	then echo \$($dir) > ./conftest.dir; \\
-	else echo \`pwd\`/\$($dir) > ./conftest.dir; fi
-EXPLPATHEOT
-done
-prefix="$save_prefix"
-exec_prefix="$save_exec_prefix"
+## generate Makefile
+#save_prefix="$prefix"
+#save_exec_prefix="$exec_prefix"
+#test "x$prefix" = xNONE && prefix=$ac_default_prefix
+#test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+#for dir in prefix exec_prefix bindir sbindir libexecdir \
+#	   datadir sysconfdir sharedstatedir localstatedir libdir \
+#	   includedir oldincludedir infodir mandir; do
+#  eval "dir_value=\$$dir"
+#  cat >> ./conftest.mk << EXPLPATHEOT
+#$dir=$dir_value
+#explicit_$dir:
+#	@ echo \$($dir)
+#	@ if echo \$($dir) | grep '^/'; \\
+#	then echo \$($dir) > ./conftest.dir; \\
+#	else echo \`pwd\`/\$($dir) > ./conftest.dir; fi
+#EXPLPATHEOT
+#done
+#prefix="$save_prefix"
+#exec_prefix="$save_exec_prefix"
 
 # generate the explicit paths
-make >&5 2>&1 -f ./conftest.mk explicit_datadir
-explicit_datadir=`cat ./conftest.dir`
-make >&5 2>&1 -f ./conftest.mk explicit_libdir
-explicit_libdir=`cat ./conftest.dir`
-make >&5 2>&1 -f ./conftest.mk explicit_includedir
-explicit_includedir=`cat ./conftest.dir`
+#make >&5 2>&1 -f ./conftest.mk explicit_datadir
+#explicit_datadir=`cat ./conftest.dir`
+#make >&5 2>&1 -f ./conftest.mk explicit_libdir
+#explicit_libdir=`cat ./conftest.dir`
+#make >&5 2>&1 -f ./conftest.mk explicit_includedir
+#explicit_includedir=`cat ./conftest.dir`
 
 # clean up
-rm -f ./conftest.mk ./conftest.dir
+#rm -f ./conftest.mk ./conftest.dir
 
-AC_MSG_RESULT(done)
+#AC_MSG_RESULT(done)
 
 #
 # - check for libraries.
@@ -230,7 +223,7 @@ fi
 
 # use C to check compiler characteristics instead of C++.  On
 # nextstep, checking with C++ may fail.
-AC_LANG_C
+# AC_LANG_C
 
 # cross-compiling ?!
 #AC_C_CROSS
@@ -250,83 +243,82 @@ AC_LANG_C
 
 # note that Singular has its own mechanism to search the tables,
 # hence we do not need to mind it here
-gftabledir='${datadir}/factory/gftables'
-explicit_gftabledir="$explicit_datadir/gftables"
+#gftabledir='${datadir}/factory/gftables'
+#explicit_gftabledir="$explicit_datadir/gftables"
 
 # for installation of the templates
-templatedir='${includedir}/templates'
+#templatedir='${includedir}/templates'
 
 #
 # - the name of the game and the targets to create.
 #
-if test "x$with_Singular" = xyes; then
-  libfactory=libfactory.a
-
-  factorysrc='$(basefactorysrc) $(singfactorysrc)'
-  factoryincl='$(basefactoryincl) $(singfactoryincl)'
-
-  alltargets=cf
-  installtargets=installcf
-  uninstalltargets=uninstallcf
-else
-  libfactory=libcf.a
-
-  factorysrc='$(basefactorysrc)'
-  factoryincl='$(basefactoryincl)'
-
-  alltargets=cf
-  installtargets=installcf
-  uninstalltargets=uninstallcf
-fi
+#if test "x$with_Singular" = xyes; then
+#  libfactory=libfactory.a
+#
+#  factorysrc='$(basefactorysrc) $(singfactorysrc)'
+#  factoryincl='$(basefactoryincl) $(singfactoryincl)'
+#
+#  alltargets=cf
+#  installtargets=installcf
+#  uninstalltargets=uninstallcf
+#else
+#  libfactory=libcf.a
+#
+#  factorysrc='$(basefactorysrc)'
+#  factoryincl='$(basefactoryincl)'
+#
+#  alltargets=cf
+#  installtargets=installcf
+#  uninstalltargets=uninstallcf
+#fi
 
 #
 # - set defines and variables according to our tests.
 #
 
-# CFLAGS
-if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-  CFLAGS=""
-fi
+## CFLAGS
+#if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
+#  CFLAGS=""
+#fi
 
 # CXXFLAGS
-if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-  CXXFLAGS=""
-
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
+#if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
+#  CXXFLAGS=""
+#
+#AC_LANG_SAVE
+#AC_LANG_CPLUSPLUS
 # check whether CXX accepts -fno-rtti
-AC_MSG_CHECKING(whether gcc accepts -fno-rtti)
-tmp_flags=${CXXFLAGS}
-CXXFLAGS="${CXXFLAGS}"
-AC_CACHE_VAL(ac_cv_cxx_have_rtti,
-AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
-)
-AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
-CXXFLAGS=$tmp_flags
-if test "${ac_cv_cxx_have_rtti}" = yes; then
-CXXFLAGS="$CXXFLAGS"
-fi
-
-AC_MSG_CHECKING(whether gcc accepts -fno-exceptions)
-tmp_flags=${CXXFLAGS}
-CXXFLAGS="${CXXFLAGS} -fno-exceptions"
-AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
-AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
-)
-AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
-CXXFLAGS=$tmp_flags
-if test "${ac_cv_cxx_have_exceptions}" = yes; then
-CXXFLAGS="$CXXFLAGS -fno-exceptions"
-fi
-AC_LANG_RESTORE
-
-fi
+#AC_MSG_CHECKING(whether gcc accepts -fno-rtti)
+#tmp_flags=${CXXFLAGS}
+#CXXFLAGS="${CXXFLAGS}"
+#AC_CACHE_VAL(ac_cv_cxx_have_rtti,
+#AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
+#)
+#AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
+#CXXFLAGS=$tmp_flags
+#if test "${ac_cv_cxx_have_rtti}" = yes; then
+#CXXFLAGS="$CXXFLAGS"
+#fi
+#AC_MSG_CHECKING(whether gcc accepts -fno-exceptions)
+#tmp_flags=${CXXFLAGS}
+#CXXFLAGS="${CXXFLAGS} -fno-exceptions"
+#AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
+#AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+#)
+#AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
+#CXXFLAGS=$tmp_flags
+#if test "${ac_cv_cxx_have_exceptions}" = yes; then
+#CXXFLAGS="$CXXFLAGS -fno-exceptions"
+#fi
+#AC_LANG_RESTORE
+#
+#fi
 
 # ARFLAGS
-test "${ARFLAGS+set}" = set || ARFLAGS=cr
+#test "${ARFLAGS+set}" = set || ARFLAGS=cr
 
 # M4FLAGS
-test "${M4FLAGS+set}" = set || M4FLAGS=
+#test "${M4FLAGS+set}" = set || M4FLAGS=
 
 AH_TEMPLATE([SINGULAR], [define if linked to Singular])
 AH_TEMPLATE([DISABLE_GMP_CPP],[DISABLE_GMP_CPP])
@@ -370,7 +362,7 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   fi
   CPPFLAGS="$CPPFLAGS_save"
 
-  OMALLOC_G_LDADD="-lresources_g -lomalloc_g"
+#  OMALLOC_G_LDADD="-lresources_g -lomalloc_g"
   OMALLOC_R_LDADD="-lresources -lomalloc"
   
   AC_DEFINE(HAVE_OMALLOC, 1, [omalloc support])
@@ -378,7 +370,7 @@ if test "x$ENABLE_OMALLOC" = xyes; then
   AC_SUBST(OMALLOC_CFLAGS)
   AC_SUBST(OMALLOC_LDFLAGS)
 
-  AC_SUBST(OMALLOC_G_LDADD)
+#  AC_SUBST(OMALLOC_G_LDADD)
   AC_SUBST(OMALLOC_R_LDADD)
 else
   AC_MSG_RESULT(no)
@@ -399,9 +391,9 @@ AH_TEMPLATE([NOSTREAMIO], [define to build factory without stream IO])
 # iostream
 if test "x$enable_streamio" = xno; then
   AC_DEFINE([NOSTREAMIO],[1])
-else
-  factorysrc="$factorysrc \$(useiofactorysrc)"
-  factoryincl="$factoryincl \$(useiofactoryincl)"
+#else
+#  factorysrc="$factorysrc \$(useiofactorysrc)"
+#  factoryincl="$factoryincl \$(useiofactoryincl)"
 fi
 
 AH_TEMPLATE([NOASSERT], [define if you do not want to activate assertions])
@@ -425,23 +417,28 @@ fi
 #
 # - complete and substitute variables, defines.
 #
-AC_SUBST(gftabledir)
-AC_SUBST(templatedir)
+#AC_SUBST(gftabledir)
+#AC_SUBST(templatedir)
 
-AC_SUBST(factory_version)
 
-AC_SUBST(libfactory)
 
-AC_SUBST(ARFLAGS)
-AC_SUBST(M4FLAGS)
+# AC_SUBST(libfactory)
+
+#AC_SUBST(ARFLAGS)
+#AC_SUBST(M4FLAGS)
+
 AC_SUBST(MAKEHEADERFLAGS)
 
-AC_SUBST(factorysrc)
-AC_SUBST(factoryincl)
+#AC_SUBST(factorysrc)
+#AC_SUBST(factoryincl)
 
-AC_SUBST(alltargets)
-AC_SUBST(installtargets)
-AC_SUBST(uninstalltargets)
+#AC_SUBST(alltargets)
+#AC_SUBST(installtargets)
+#AC_SUBST(uninstalltargets)
+
+factory_version="3.1.3"
+factory_configuration="'$ac_configure_args' in `pwd`"
+AC_SUBST(factory_version)
 
 AH_TEMPLATE([FACTORYVERSION], [factory version])
 AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version")
@@ -452,8 +449,10 @@ AC_DEFINE_UNQUOTED([HAVE_LIBFAC], 1)
 AH_TEMPLATE([FACTORYCONFIGURATION], [factory configuration])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")
 
-AH_TEMPLATE([GFTABLEDIR], [where the gftables live])
-AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir")
+#AH_TEMPLATE([GFTABLEDIR], [where the gftables live])
+#AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir")
+
+
 
 AM_CONDITIONAL(
     [WITH_PARSER_FOR_CANONICAL_FORM], 
