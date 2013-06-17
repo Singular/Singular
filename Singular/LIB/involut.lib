@@ -1,5 +1,5 @@
 //
-version="$Id$";
+version="version involut.lib 4.0.0.0 Jun_2013 ";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Computations and operations with involutions

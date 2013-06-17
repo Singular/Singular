@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version bimodules.lib 4.0.0.0 Jun_2013 ";
 category="Noncommutative";
 info="
 LIBRARY: bimodules.lib     Tools for handling bimodules

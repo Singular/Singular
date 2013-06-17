@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id$";
+version="version tst.lib 4.0.0.0 Jun_2013 ";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests

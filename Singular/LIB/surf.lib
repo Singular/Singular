@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version surf.lib 4.0.0.0 Jun_2013 ";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf

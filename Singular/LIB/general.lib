@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version general.lib 4.0.0.0 Jun_2013 ";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version schreyer.lib 4.0.0.0 Jun_2013 ";
 category="General purpose";
 info="
 LIBRARY: schreyer.lib     Helpers for working with the Schreyer induced ordering

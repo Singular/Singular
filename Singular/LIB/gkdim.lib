@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version gkdim.lib 4.0.0.0 Jun_2013 ";
 category="Noncommutative";
 info="
 LIBRARY: gkdim.lib     Procedures for calculating the Gelfand-Kirillov dimension

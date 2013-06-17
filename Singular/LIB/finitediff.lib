@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version finitediff.lib 4.0.0.0 Jun_2013 ";
 category="Teaching";
 info="
 LIBRARY:  finitediff.lib   procedures to compute finite difference schemes

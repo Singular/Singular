@@ -1,6 +1,6 @@
 // Singular library normaliz.lib
 
-version="$Id$"
+version="version normaliz.lib 4.0.0.0 Jun_2013 ";
 category="Commutative algebra"
 info="
 LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.7

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version kskernel.lib 4.0.0.0 Jun_2013 ";
 category="General purpose";
 info="
 LIBRARY:  kskernel.lib   PROCEDURES FOR COMPUTING THE KERNEL
