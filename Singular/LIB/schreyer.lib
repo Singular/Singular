@@ -2136,15 +2136,19 @@ static proc loadme()
 
       if( @DEBUG )
       {
+        "Loading the Debug version!";
+      } else
+      {
         "Loading the Release version!";
       }
+      
       load("syzextra.so");
 
       if( @DEBUG )
       {
         listvar(Syzextra);
       }
-
+      
       exportto(Top, Syzextra::ClearContent);
       exportto(Top, Syzextra::ClearDenominators);
 
@@ -2188,10 +2192,6 @@ static proc loadme()
 /*
     else
     {
-      if( @DEBUG )
-      {
-        "Loading the Debug version!";
-      }
 
       load("syzextra.so");
 
@@ -2251,11 +2251,19 @@ static proc loadme()
     }
   }
   
+  mod_assure_load();
+}
+
+
+
+static proc mod_assure_load()
+{
   if( !defined(GetInducedData) )
   {
-    ERROR("Sorry but we are missing the dynamic module (syzextra.so)...");
+    "ERROR: Sorry but we are missing the dynamic module (syzextra.so)...";
+    $
+    // m2_end(666); // :(
   }
-
 }
 
 static proc mod_init()
@@ -2679,6 +2687,8 @@ proc TestSSresAttribs2tr(def M, list #)
 
 proc testSimple(list #)
 {
+  mod_assure_load();
+
   def DEBUG = 1;
   if(size(#) > 0) { DEBUG = #[1]; }
 
