@@ -1,6 +1,3 @@
-//syntax of nselect adopted (intvec instead of two integers),
-//help for finitenessTest and mapIsFinite edited
-//new proc  nonZeroEntry(id), used to fix a bug in proc finitenessTest
 ///////////////////////////////////////////////////////////////////////////////
 version="version algebra.lib 4.0.0.0 Jun_2013 ";
 category="Commutative Algebra";

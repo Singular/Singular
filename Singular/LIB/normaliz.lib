@@ -1,4 +1,4 @@
-// Singular library normaliz.lib
+//// Singular library normaliz.lib
 
 version="version normaliz.lib 4.0.0.0 Jun_2013 ";
 category="Commutative algebra"
