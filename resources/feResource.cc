@@ -80,7 +80,7 @@ feResourceConfig_s feResourceConfigs[] =
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/MOD/",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
-  {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share",          (char *)""},
+  {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
   {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", (char *)""},
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  (char *)""},
@@ -96,7 +96,7 @@ feResourceConfig_s feResourceConfigs[] =
   {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs",            (char *)""},
   {"SingularEmacs",'M', feResBinary,"ESINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
   {"EmacsLoad", 'l',    feResFile,  "ESINGULAR_EMACS_LOAD", "%e/.emacs-singular",   (char *)""},
-  {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",  "%D/emacs",             (char *)""},
+  {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",  "%D/singular/emacs",             (char *)""},
   {"SingularXterm",'M', feResBinary,"TSINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
 #ifdef ix86_Win
   {"rxvt",      'X',    feResBinary,"RXVT",                 "%b/rxvt",              (char *)""},
