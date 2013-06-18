@@ -675,11 +675,13 @@ void sync_contexts()
   long len = newElts.size();
   for (long idx = 0; idx < len; ++idx)
   {
-    char* name = newElts[idx][0].str();
+    long i = 0;
+    char* name = newElts[idx][i].str();
     if (name && (*name != '\0') && (*name != '_'))
     {
       Py_XDECREF(get_current_definition(name));
-      newElts[idx][1].import_as(name);
+      i = 1;
+      newElts[idx][i].import_as(name);
     }
 
   }

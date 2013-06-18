@@ -6,19 +6,23 @@
 * ABSTRACT: interface between Singular and factory
 */
 
-
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-
 #ifdef HAVE_FACTORY
 
-#include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/simpleideals.h>
-#include <misc/intvec.h>
-#include <polys/matpol.h>
-#include <coeffs/bigintmat.h>
+class bigintmat;
+class intvec;
+
+struct snumber; typedef struct snumber *   number;
+struct spolyrec; typedef struct spolyrec    polyrec; typedef polyrec *          poly;
+struct ip_sring; typedef struct ip_sring *         ring;
+struct sip_sideal; typedef struct sip_sideal *       ideal;
+
+class ip_smatrix; typedef ip_smatrix *       matrix;
+
+struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
+
 //#include <polys/clapconv.h>
 //#include <kernel/longtrans.h>
 
@@ -44,22 +48,23 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r);
 
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r );
 
-#ifdef HAVE_NTL
-#if 1
-matrix singntl_HNF(matrix A, const ring r);
+# ifdef HAVE_NTL
+#  if 1
+matrix  singntl_HNF(matrix A, const ring r);
 intvec* singntl_HNF(intvec* A, const ring r);
-matrix singntl_LLL(matrix A, const ring r);
+matrix  singntl_LLL(matrix A, const ring r);
 intvec* singntl_LLL(intvec* A, const ring r);
+
 ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & n, const ring r);
-#endif
-#endif
+#  endif
+# endif
 
 BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
-#ifdef HAVE_LIBFAC
+# ifdef HAVE_LIBFAC
  matrix singclap_irrCharSeries ( ideal I, const ring r);
  char* singclap_neworder ( ideal I, const ring r);
-#endif 
+# endif 
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );
@@ -69,7 +74,6 @@ number   nChineseRemainder(number *x, number *q,int rl, const coeffs r);
 
 
 #endif /* HAVE_FACTORY */
-
 
 #endif /* INCL_FACTORYSING_H */
 

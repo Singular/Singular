@@ -7,18 +7,24 @@
 */
 
 //#define FACTORIZE2_DEBUG
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_FACTORY
+
 #define SI_DONT_HAVE_GLOBAL_VARS
+
+#include <misc/auxiliary.h>
+#include "clapsing.h"
 
 #include <factory/factory.h>
 
 #ifdef HAVE_LIBFAC
-#include <factory/libfac/libfac.h>
+#    include <factory/libfac/libfac.h>
 #endif
 
 
@@ -35,12 +41,19 @@
 
 //#include "polys.h"
 #define TRANSEXT_PRIVATES
+
 #include "ext_fields/transext.h"
 
 
-#include "clapsing.h"
 #include "clapconv.h"
 // #include <kernel/clapconv.h>
+
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/simpleideals.h>
+#include <misc/intvec.h>
+#include <polys/matpol.h>
+#include <coeffs/bigintmat.h>
 
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
@@ -454,7 +467,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
       res= convFactoryPSingTrP(  F / G,r  );
     }
   }
-  #if 0 // not yet working
+#if 0 // not yet working
   else if (rField_is_GF())
   {
     //Print("GF(%d^%d)\n",nfCharP,nfMinPoly[0]);
@@ -462,7 +475,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     CanonicalForm F( convSingGFFactoryGF( f ) ), G( convSingGFFactoryGF( g ) );
     res = convFactoryGFSingGF( F / G );
   }
-  #endif
+#endif
   else
     WerrorS( feNotImplemented );
   Off(SW_RATIONAL);
@@ -700,9 +713,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         (**v)[0]=1;
         // no break
       case 1: ;
-      #ifdef TEST
+#ifdef TEST
       default: ;
-      #endif
+#endif
     }
     if (n==0)
     {
@@ -732,10 +745,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
-  #ifdef HAVE_NTL
+#ifdef HAVE_NTL
   extern int prime_number;
   if(rField_is_Q(r)) prime_number=0;
-  #endif
+#endif
   CFFList L;
   number N=NULL;
   number NN=NULL;
@@ -844,10 +857,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
         res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
       }
-      #if 0
+#if 0
       else if (rField_is_GF())
         res->m[j] = convFactoryGFSingGF( J.getItem().factor() );
-      #endif
+#endif
       else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
       {
 #ifndef NDEBUG
@@ -889,9 +902,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       if (singclap_factorize_retry<3)
       {
         int jj;
-        #ifdef FACTORIZE2_DEBUG
+#ifdef FACTORIZE2_DEBUG
         printf("factorize_retry\n");
-        #endif
+#endif
         intvec *ww=NULL;
         id_Test(res,r);
         ideal h=singclap_factorize ( ff, &ww , with_exps, r );
@@ -921,10 +934,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       else
       {
         WarnS("problem with factorize");
-        #if 0
+#if 0
         pWrite(ff);
         idShow(res);
-        #endif
+#endif
         id_Delete(&res,r);
         res=idInit(2,1);
         res->m[0]=p_One(r);
@@ -1026,85 +1039,7 @@ notImpl:
   //PrintS("......S\n");
   return res;
 }
-#ifdef HAVE_NTL
-ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
-{
-  p_Test(f, r);
 
-  ideal res=NULL;
-
-  int offs = rPar(r);
-  if (f==NULL)
-  {
-    res= idInit (1, 1);
-    mipos= idInit (1, 1);
-    mipos->m[0]= convFactoryPSingTrP (Variable (offs), r); //overkill
-    (*exps)=new intvec (1);
-    (**exps)[0]= 1;
-    numFactors= 0;
-    return res;
-  }
-  CanonicalForm F( convSingTrPFactoryP( f, r) );
-
-  if (getNumVars (F) > 2)
-  {
-    WerrorS( feNotImplemented );
-    return res;
-  }
-  CFAFList absFactors= absFactorize (F);
-
-  int n= absFactors.length();
-  *exps=new intvec (n);
-
-  res= idInit (n, 1);
-
-  mipos= idInit (n, 1);
-
-  Variable x= Variable (offs);
-  Variable alpha;
-  int i= 0;
-  numFactors= 0;
-  int count;
-  CFAFListIterator iter= absFactors;
-  CanonicalForm lead= iter.getItem().factor();
-  if (iter.getItem().factor().inCoeffDomain())
-  {
-    i++;
-    iter++;
-  }
-  bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
-  for (; iter.hasItem(); iter++, i++)
-  {
-    (**exps)[i]= iter.getItem().exp();
-    alpha= iter.getItem().minpoly().mvar();
-    if (iter.getItem().minpoly().isOne())
-      lead /= power (bCommonDen (iter.getItem().factor()), iter.getItem().exp());
-    else
-      lead /= power (power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly())), iter.getItem().exp());
-    res->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().factor()*bCommonDen (iter.getItem().factor()), alpha, x), r);
-    if (iter.getItem().minpoly().isOne())
-    {
-      count= iter.getItem().exp();
-      mipos->m[i]= convFactoryPSingTrP (x,r);
-    }
-    else
-    {
-      count= iter.getItem().exp()*degree (iter.getItem().minpoly());
-      mipos->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().minpoly(), alpha, x), r);
-    }
-    numFactors += count;
-  }
-  if (!isRat)
-    Off (SW_RATIONAL);
-
-  (**exps)[0]= 1;
-  res->m[0]= convFactoryPSingTrP (lead, r);
-  mipos->m[0]= convFactoryPSingTrP (x, r);
-  return res;
-}
-#endif
 ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
 {
   p_Test(f,r);
@@ -1722,8 +1657,87 @@ intvec* singntl_LLL(intvec*  m, const ring)
   delete MM;
   return mm;
 }
+
+ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
+{
+  p_Test(f, r);
+
+  ideal res=NULL;
+
+  int offs = rPar(r);
+  if (f==NULL)
+  {
+    res= idInit (1, 1);
+    mipos= idInit (1, 1);
+    mipos->m[0]= convFactoryPSingTrP (Variable (offs), r); //overkill
+    (*exps)=new intvec (1);
+    (**exps)[0]= 1;
+    numFactors= 0;
+    return res;
+  }
+  CanonicalForm F( convSingTrPFactoryP( f, r) );
+
+  if (getNumVars (F) > 2)
+  {
+    WerrorS( feNotImplemented );
+    return res;
+  }
+  CFAFList absFactors= absFactorize (F);
+
+  int n= absFactors.length();
+  *exps=new intvec (n);
+
+  res= idInit (n, 1);
+
+  mipos= idInit (n, 1);
+
+  Variable x= Variable (offs);
+  Variable alpha;
+  int i= 0;
+  numFactors= 0;
+  int count;
+  CFAFListIterator iter= absFactors;
+  CanonicalForm lead= iter.getItem().factor();
+  if (iter.getItem().factor().inCoeffDomain())
+  {
+    i++;
+    iter++;
+  }
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+  for (; iter.hasItem(); iter++, i++)
+  {
+    (**exps)[i]= iter.getItem().exp();
+    alpha= iter.getItem().minpoly().mvar();
+    if (iter.getItem().minpoly().isOne())
+      lead /= power (bCommonDen (iter.getItem().factor()), iter.getItem().exp());
+    else
+      lead /= power (power (bCommonDen (iter.getItem().factor()), degree (iter.getItem().minpoly())), iter.getItem().exp());
+    res->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().factor()*bCommonDen (iter.getItem().factor()), alpha, x), r);
+    if (iter.getItem().minpoly().isOne())
+    {
+      count= iter.getItem().exp();
+      mipos->m[i]= convFactoryPSingTrP (x,r);
+    }
+    else
+    {
+      count= iter.getItem().exp()*degree (iter.getItem().minpoly());
+      mipos->m[i]= convFactoryPSingTrP (replacevar (iter.getItem().minpoly(), alpha, x), r);
+    }
+    numFactors += count;
+  }
+  if (!isRat)
+    Off (SW_RATIONAL);
+
+  (**exps)[0]= 1;
+  res->m[0]= convFactoryPSingTrP (lead, r);
+  mipos->m[0]= convFactoryPSingTrP (x, r);
+  return res;
+}
+
 #endif
-#endif
+#endif /* HAVE_NTL */
 
 
 #endif /* HAVE_FACTORY */
