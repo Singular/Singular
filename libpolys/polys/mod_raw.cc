@@ -39,7 +39,7 @@
 
 #define SI_BUILTIN_LIBSTR(name) (char*) #name ".so",
 
-char* si_bultin_libs[]={ SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)  NULL };
+char* si_builtin_libs[]={ SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)  NULL };
 
 #undef SI_BUILTIN_LIBSTR
 
@@ -52,9 +52,9 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   const unsigned char mach_O64[]={0xcf,0xfa,0xed,0xfe,0};
 
   int i=0;
-  while(si_bultin_libs[i]!=NULL)
+  while(si_builtin_libs[i]!=NULL)
   {
-    if (strcmp(newlib,si_bultin_libs[i])==0)
+    if (strcmp(newlib,si_builtin_libs[i])==0)
     {
       if(libnamebuf!=NULL) strcpy(libnamebuf,newlib);
       return LT_BUILTIN;
