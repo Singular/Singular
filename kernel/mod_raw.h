@@ -52,7 +52,7 @@ const char * dynl_error();
 /// Data for @c type_of_LIB to determine built-in modules,
 /// use @c add(name) to add built-in library to macro
 #define SI_FOREACH_BUILTIN(add)\
-  add(huhu)\
+  add(staticdemo)\
   SI_BUILTIN_PYOBJECT(add)
 
 
