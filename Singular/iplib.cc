@@ -59,7 +59,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
 
-#include <polys/mod_raw.h>
+#include <Singular/mod_lib.h>
 
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );

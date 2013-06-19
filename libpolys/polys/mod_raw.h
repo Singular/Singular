@@ -1,4 +1,3 @@
-
 #ifndef MOD_RAW_H
 #define MOD_RAW_H
 /****************************************
@@ -16,7 +15,6 @@
 
 typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O, LT_BUILTIN} lib_types;
 
-lib_types type_of_LIB(char *newlib, char *fullname);
 
 #if defined(HAVE_DL)
 #ifdef __cplusplus
@@ -42,19 +40,5 @@ const char * dynl_error();
 
 #endif /* HAVE_DL */
 
-
-#ifdef EMBED_PYTHON
-#define SI_BUILTIN_PYOBJECT(add) add(pyobject)
-#else
-#define SI_BUILTIN_PYOBJECT(add) 
-#endif
-
-/// Data for @c type_of_LIB to determine built-in modules,
-/// use @c add(name) to add built-in library to macro
-#define SI_FOREACH_BUILTIN(add)\
-  add(staticdemo)\
-  SI_BUILTIN_PYOBJECT(add)
-
-#define SI_MOD_INIT(name) name##_mod_init
 
 #endif /* MOD_RAW_H */

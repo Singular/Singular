@@ -77,6 +77,7 @@ SOURCES =    Minor.cc\
    maps_ip.cc\
    minpoly.cc\
    misc_ip.cc\
+   mod_lib.cc\
    links/ndbm.cc\
    newstruct.cc\
    pcv.cc\
@@ -135,6 +136,7 @@ SingularHEADERS =    Cache.h \
    minpoly.h \
    misc_ip.h \
    mmalloc.h \
+   mod_lib.h \
    omSingularConfig.h \
    links/ndbm.h \
    newstruct.h \

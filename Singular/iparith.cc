@@ -30,7 +30,7 @@
 #include <polys/monomials/maps.h>
 #include <polys/coeffrings.h>
 #include <polys/sparsmat.h>
-#include <polys/mod_raw.h>
+#include <Singular/mod_lib.h>
 #include <polys/weight.h>
 
 
