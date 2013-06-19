@@ -14,7 +14,7 @@
 #include <kernel/mod2.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/slInit.h>
-#include <polys/mod_raw.h>
+#include <Singular/mod_lib.h>
 
 #ifdef HAVE_DL
 

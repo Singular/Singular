@@ -74,15 +74,9 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
     const int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name);
     char* binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
     snprintf(binary_name_so, binary_name_so_length, "%s%s", binary_name, DL_TAIL);
+    handle = dynl_open(binary_name_so);
 
-    char* pp = (char *)omAlloc0( MAXPATHLEN * sizeof(char) );
-    lib_types type = type_of_LIB( binary_name_so, pp );
-    omFreeSize((ADDRESS)binary_name_so, binary_name_so_length * sizeof(char) );
-
-    if( type != LT_SINGULAR && type != LT_NONE && type != LT_NOTFOUND )
-      handle = dynl_open(pp);
-
-    omFreeSize((ADDRESS)pp, MAXPATHLEN * sizeof(char) );
+    omFree((ADDRESS)binary_name_so );
   }
 
   if (handle == NULL && ! warn_handle)
