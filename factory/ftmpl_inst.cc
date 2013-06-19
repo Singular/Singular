@@ -77,11 +77,23 @@ template List<Variable> Difference ( const List<Variable>&, const List<Variable>
 #include<NTL/ZZ.h>
 #include<NTL/ZZX.h>
 #include<NTL/ZZ_pX.h>
+#include<NTL/vector.h>
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
 #endif
+template void BlockDestroy<zz_pE> (zz_pE*, long);
+template void BlockConstruct<zz_pE> (zz_pE*, long);
+template void BlockDestroy<Pair<zz_pEX, long> > (Pair<zz_pEX, long>*, long);
+template void BlockDestroy<Pair<GF2EX, long> > (Pair<GF2EX, long>*, long);
+template void BlockDestroy<Pair<ZZX, long> > (Pair<ZZX, long>*, long);
+template void BlockDestroy<Pair<ZZ_pX, long> > (Pair<ZZ_pX, long>*, long);
+template void BlockDestroy<Pair<GF2X, long> > (Pair<GF2X, long>*, long);
+template void BlockDestroy<Vec<zz_pE> > (Vec<zz_pE>*, long);
 template class Vec<zz_p>;
+template class Vec<Vec<zz_p> >;
 template class Vec<zz_pE>;
+template class Vec<ZZ>;
+template class Vec<Vec<ZZ> >;
 template class Mat<zz_p>;
 template class Mat<zz_pE>;
 template class Mat<ZZ>;
@@ -90,6 +102,7 @@ template class Vec<Pair<GF2EX, long> >;
 template class Vec<Pair<ZZX, long> >;
 template class Vec<Pair<ZZ_pX, long> >;
 template class Vec<Pair<GF2X, long> >;
+template class Vec<Vec<zz_pE> >;
 template void swap<zz_pE>(Vec<zz_pE>&, Vec<zz_pE>&);
 template long operator==<zz_p>(Vec<zz_p> const&, Vec<zz_p> const&);
 #endif
@@ -106,6 +119,7 @@ template OSTREAM & operator << ( OSTREAM &, const Array<CanonicalForm> & );
 template OSTREAM & operator << ( OSTREAM &, const Factor<CanonicalForm> & );
 template OSTREAM & operator << ( OSTREAM &, const Matrix<CanonicalForm> & );
 template OSTREAM & operator << ( OSTREAM &, const Array<REvaluation> & );
+template OSTREAM & operator << ( OSTREAM &, const AFactor<CanonicalForm> & );
 #endif /* NOSTREAMIO */
 
 template int operator == ( const Factor<CanonicalForm> &, const Factor<CanonicalForm> & );
