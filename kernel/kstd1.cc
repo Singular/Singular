@@ -371,9 +371,9 @@ int redRiloc (LObject* h,kStrategy strat)
 	PrintS("---------------------------- NEW REDRILOC COMPUTATION ----------------------------");
 	PrintLn();
 	PrintS("		The pair h : "); PrintLn(); PrintLn();
-	PrintS("			p1 = "); pWrite(h->p1); PrintLn();
-	PrintS("			p2 = "); pWrite(h->p2); PrintLn();
-	PrintS("			p  = "); pWrite(h->p); PrintLn();
+	PrintS("			p1 = "); p_Write(h->p1,strat->tailRing); PrintLn();
+	PrintS("			p2 = "); p_Write(h->p2,strat->tailRing); PrintLn();
+	PrintS("			p  = "); p_Write(h->p,strat->tailRing); PrintLn();
 	PrintLn();
 	PrintS("		The actual reducer T is: ");
 	if(strat->tl<0)
@@ -382,7 +382,7 @@ int redRiloc (LObject* h,kStrategy strat)
 	for (iii=0;iii<=strat->tl;iii++)
 		{
 		PrintLn();
-		PrintS("			T[");printf("%i",iii);PrintS("] = ");pWrite(strat->T[iii].p);
+		PrintS("			T[");printf("%i",iii);PrintS("] = ");p_Write(strat->T[iii].p,strat->tailRing);
 		PrintLn();
 		}
 	#endif /* ADIDEBUG_NF */
@@ -406,7 +406,7 @@ int redRiloc (LObject* h,kStrategy strat)
 	    	PrintLn();
 	    	PrintS("		Found one: T[");printf("%i",j);
 	    	PrintS("] of ecart ");printf("%i",ei);
-	    	PrintS(": ");pWrite(strat->T[j].p);
+	    	PrintS(": ");p_Write(strat->T[j].p,strat->tailRing);
 	    	PrintLn();
 	    	PrintS("		Try to find another with smaller ecart:");
     		PrintLn();
@@ -474,7 +474,7 @@ int redRiloc (LObject* h,kStrategy strat)
     	{
     	PrintLn();
     	PrintS("		A better one (ecart = ");printf("%i",ei);PrintS("): T[");
-    	printf("%i] = ",ii);pWrite(strat->T[ii].p);
+    	printf("%i] = ",ii);p_Write(strat->T[ii].p,strat->tailRing);
     	PrintLn();
     	}
     #endif
@@ -513,7 +513,7 @@ int redRiloc (LObject* h,kStrategy strat)
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
     #if ADIDEBUG_NF
     PrintLn();
-	  PrintS("	Partial Reduced h = ");pWrite(h->p);
+	  PrintS("	Partial Reduced h = ");p_Write(h->p,strat->tailRing);
 	  PrintLn();
 	  #endif
     strat->fromT=FALSE;
@@ -1603,9 +1603,9 @@ loop_count = 1;
 			PrintLn();
 			PrintS("		L[");printf("%d",iii);Print("]: ");
 			PrintLn();
-			PrintS("		    ");pWrite(strat->L[iii].p1);
-			PrintS("		    ");pWrite(strat->L[iii].p2);
-			PrintS("		    ");pWrite(strat->L[iii].p);
+			PrintS("		    ");p_Write(strat->L[iii].p1,strat->tailRing);
+			PrintS("		    ");p_Write(strat->L[iii].p2,strat->tailRing);
+			PrintS("		    ");p_Write(strat->L[iii].p,strat->tailRing);
 			}
 		PrintLn();
 		#endif
@@ -1619,9 +1619,9 @@ loop_count = 1;
 		#if ADIDEBUG 
 		#ifdef KDEBUG   
 		PrintS("		My new pair P = (p1,p2,p) is: "); PrintLn();
-		PrintS("			p1 = "); pWrite(strat->P.p1);PrintLn();
-		PrintS("			p2 = "); pWrite(strat->P.p2);PrintLn();
-		PrintS("			p = "); pWrite(strat->P.p); PrintLn();
+		PrintS("			p1 = "); p_Write(strat->P.p1,strat->tailRing);PrintLn();
+		PrintS("			p2 = "); p_Write(strat->P.p2,strat->tailRing);PrintLn();
+		PrintS("			p = "); p_Write(strat->P.p,strat->tailRing); PrintLn();
 		PrintLn();
 		PrintS("		The old reducer list T -- at the beg of loop ");
 		printf("%d",loop_count);PrintS(" -- is :");
@@ -1632,7 +1632,7 @@ loop_count = 1;
 			{		
 				PrintLn();
 				PrintS("		T[");printf("%d",iii);PrintS("]:");
-				pWrite(strat->T[iii].p);
+				p_Write(strat->T[iii].p,strat->T->tailRing);
 			}
 		PrintLn();
 		
@@ -1706,6 +1706,8 @@ loop_count = 1;
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
       {
+      	if(currRing->MixedOrder)
+      	{
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
         
                 #ifdef KDEBUG
@@ -1717,12 +1719,13 @@ loop_count = 1;
 				{
 				PrintLn();
 				PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
-				PrintS("		     ");pWrite(strat->L[iii].p1);
-				PrintS("		     ");pWrite(strat->L[iii].p2);
-				PrintS("		     ");pWrite(strat->L[iii].p);
+				PrintS("		     ");p_Write(strat->L[iii].p1,strat->tailRing);
+				PrintS("		     ");p_Write(strat->L[iii].p2,strat->tailRing);
+				PrintS("		     ");p_Write(strat->L[iii].p,strat->tailRing);
 				}
 				#endif
 				#endif
+		}
       }
       
       else
@@ -1782,7 +1785,7 @@ loop_count = 1;
 		{
 		PrintLn();
 		PrintS("		T[");printf("%d",iii);PrintS("]:");
-		pWrite(strat->T[iii].p);
+		p_Write(strat->T[iii].p,strat->tailRing);
 		}
 	PrintLn();
 	

@@ -39,7 +39,7 @@
 
 #ifdef HAVE_RINGS
 #include <kernel/ideals.h>
-#include <libpolys/coeffs/rmodulon.h>
+#include <libpolys/coeffs/coeffs.h>
 #endif
 
 // define if enterL, enterT should use memmove instead of doing it manually
@@ -342,20 +342,20 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   poly p = L->GetLmTailRing();
   
 #if ADIDEBUG
-PrintS("\ncancelunit start: ");pWrite(L->p);
+PrintS("\ncancelunit start: ");p_Write(L->p,L->tailRing);
 #endif
 
 #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))  
   		lc = p_GetCoeff(p,r);  
   	
-  /*#if ADIDEBUG
+  #if ADIDEBUG
   poly ppp;
   ppp=pInit();
   pSetExp(ppp,1,0);
   pSetCoeff0(ppp,lc);
   printf("\n lc = ");pWrite(ppp);	
-  #endif */ 
+  #endif 
 #endif 
 
 #ifdef HAVE_RINGS_LOC
@@ -372,7 +372,7 @@ PrintS("\ncancelunit start: ");pWrite(L->p);
   h = pNext(p);
   
 #if ADIDEBUG  
-PrintS("\nStarting h = ");pWrite(h);
+PrintS("\nStarting h = ");p_Write(h,L->tailRing);
 #endif
   
   loop
@@ -418,7 +418,7 @@ PrintS("\nStarting h = ");pWrite(h);
       #ifdef HAVE_RINGS
       ///should check also if the lc is a zero divisor, if it divides all the others
       if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
-      	if(nrnDivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
+      	if(r->cf->cfDivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
       		return;
       #endif
       if (i == r->N) break; // does divide, try next monom
@@ -3604,9 +3604,9 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 			{
 			PrintLn();
 			PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
-			PrintS("		     ");pWrite(strat->L[iii].p1);
-			PrintS("		     ");pWrite(strat->L[iii].p2);
-			PrintS("		     ");pWrite(strat->L[iii].p);
+			PrintS("		     ");p_Write(strat->L[iii].p1,strat->tailRing);
+			PrintS("		     ");p_Write(strat->L[iii].p2,strat->tailRing);
+			PrintS("		     ");p_Write(strat->L[iii].p,strat->tailRing);
 			}
 	}
 	iii = strat->Ll;
@@ -3628,9 +3628,9 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 			{
 			PrintLn();
 			PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
-			PrintS("		     ");pWrite(strat->L[iii].p1);
-			PrintS("		     ");pWrite(strat->L[iii].p2);
-			PrintS("		     ");pWrite(strat->L[iii].p);
+			PrintS("		     ");p_Write(strat->L[iii].p1,strat->tailRing);
+			PrintS("		     ");p_Write(strat->L[iii].p2,strat->tailRing);
+			PrintS("		     ");p_Write(strat->L[iii].p,strat->tailRing);
 			}
 	}
 	iii = strat->Ll;
@@ -3652,9 +3652,9 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 			{
 			PrintLn();
 			PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
-			PrintS("		     ");pWrite(strat->L[iii].p1);
-			PrintS("		     ");pWrite(strat->L[iii].p2);
-			PrintS("		     ");pWrite(strat->L[iii].p);
+			PrintS("		     ");p_Write(strat->L[iii].p1,strat->tailRing);
+			PrintS("		     ");p_Write(strat->L[iii].p2,strat->tailRing);
+			PrintS("		     ");p_Write(strat->L[iii].p,strat->tailRing);
 			}
 	}
 	PrintLn();
