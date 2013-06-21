@@ -82,6 +82,7 @@ The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
 
 @item Accordingly Singular search paths (where Singular searches for libraries, dynamic modules, etc.) have been changed. You can display them by calling Singular by @code{Singular -v}.
 
+@item currently, multi-arch installations of Singular 4 aere not possible.
 @end itemize
 @c @end table
 

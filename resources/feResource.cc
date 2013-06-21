@@ -79,6 +79,8 @@ feResourceConfig_s feResourceConfigs[] =
    ""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/MOD/",                  (char *)""},
+  // should be changed to %b/../libexec/singular/pProcs/:
+  {"ProcDir",   'P',    feResDir,   "SINGULAR_PROCS_DIR",   "%b/MOD/",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
