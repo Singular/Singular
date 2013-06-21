@@ -5081,8 +5081,6 @@ void simple_reducer::pre_reduce (red_object * /*r*/, int /*l*/, int /*u*/)
 {
 }
 
-#if 0
-
 template int pos_helper<int, int*>(skStrategy*, spolyrec*, int, int*, spolyrec**);
 template int pos_helper<long, long*>(skStrategy*, spolyrec*, long, long*, spolyrec**);
 
@@ -5176,7 +5174,13 @@ template void write_minus_coef_idx_to_buffer<unsigned int>(CoefIdx<unsigned int>
 template void write_minus_coef_idx_to_buffer<unsigned short>(CoefIdx<unsigned short>*, int&, int*, unsigned short*, int);
 
 
+template class std::vector<DataNoroCacheNode<unsigned char>*>;
+template class std::vector<DataNoroCacheNode<unsigned int>*>;
+template class std::vector<DataNoroCacheNode<unsigned short>*>;
+template class std::vector<PolySimple>;
 
+
+#if 0
 template void std::__final_insertion_sort<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
 template void std::__final_insertion_sort<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
 template void std::__final_insertion_sort<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
@@ -5190,9 +5194,11 @@ template void std::__heap_select<CoefIdx<unsigned short>*>(CoefIdx<unsigned shor
 template void std::__insertion_sort<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
 template void std::__insertion_sort<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
 template void std::__insertion_sort<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+
 template void std::__move_median_first<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
 template void std::__move_median_first<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
 template void std::__move_median_first<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
+
 template void std::sort_heap<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
 template void std::sort_heap<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
 template void std::sort_heap<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
@@ -5200,12 +5206,10 @@ template void std::__unguarded_linear_insert<CoefIdx<unsigned char>*>(CoefIdx<un
 template void std::__unguarded_linear_insert<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*);
 template void std::__unguarded_linear_insert<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*);
 
-template CoefIdx<unsigned char>* std::__unguarded_partition<CoefIdx<unsigned char>*, CoefIdx<unsigned char> >(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, CoefIdx<unsigned char> const&);
-template CoefIdx<unsigned int>* std::__unguarded_partition<CoefIdx<unsigned int>*, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, CoefIdx<unsigned int> const&);
-template CoefIdx<unsigned short>* std::__unguarded_partition<CoefIdx<unsigned short>*, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, CoefIdx<unsigned short> const&);
 template void std::__adjust_heap<CoefIdx<unsigned char>*, long, CoefIdx<unsigned char> >(CoefIdx<unsigned char>*, long, long, CoefIdx<unsigned char>);
 template void std::__adjust_heap<CoefIdx<unsigned int>*, long, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, long, long, CoefIdx<unsigned int>);
 template void std::__adjust_heap<CoefIdx<unsigned short>*, long, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, long, long, CoefIdx<unsigned short>);
+
 template void std::make_heap<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
 template void std::make_heap<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
 template void std::make_heap<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
@@ -5214,10 +5218,9 @@ template void std::__push_heap<CoefIdx<unsigned char>*, long, CoefIdx<unsigned c
 template void std::__push_heap<CoefIdx<unsigned int>*, long, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, long, long, CoefIdx<unsigned int>);
 template void std::__push_heap<CoefIdx<unsigned short>*, long, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, long, long, CoefIdx<unsigned short>);
 
+template CoefIdx<unsigned char>* std::__unguarded_partition<CoefIdx<unsigned char>*, CoefIdx<unsigned char> >(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*, CoefIdx<unsigned char> const&);
+template CoefIdx<unsigned int>* std::__unguarded_partition<CoefIdx<unsigned int>*, CoefIdx<unsigned int> >(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*, CoefIdx<unsigned int> const&);
+template CoefIdx<unsigned short>* std::__unguarded_partition<CoefIdx<unsigned short>*, CoefIdx<unsigned short> >(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*, CoefIdx<unsigned short> const&);
 
-template class std::vector<DataNoroCacheNode<unsigned char>*, std::allocator<DataNoroCacheNode<unsigned char>*> >;
-template class std::vector<DataNoroCacheNode<unsigned int>*, std::allocator<DataNoroCacheNode<unsigned int>*> >;
-template class std::vector<DataNoroCacheNode<unsigned short>*, std::allocator<DataNoroCacheNode<unsigned short>*> >;
-template class std::vector<PolySimple, std::allocator<PolySimple> >;
 #endif
 

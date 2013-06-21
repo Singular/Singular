@@ -126,10 +126,13 @@ template class std::list<MinorKey>;
 template class std::list<IntMinorValue>;
 template class std::list<PolyMinorValue>;
 
+
+/*
 template class std::_List_base<IntMinorValue, std::allocator<IntMinorValue> >;
 template class std::_List_base<int, std::allocator<int> >;
 template class std::_List_base<MinorKey, std::allocator<MinorKey> >;
 template class std::_List_base<PolyMinorValue, std::allocator<PolyMinorValue> >;
+*/
 
 template class Cache<MinorKey, IntMinorValue>;
 template class Cache<MinorKey, PolyMinorValue>;
