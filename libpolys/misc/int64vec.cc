@@ -4,6 +4,12 @@
 /*
 * ABSTRACT: class int64vec: lists/vectors of int64
 */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+
 #include <misc/int64vec.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>

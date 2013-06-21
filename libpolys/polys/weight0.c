@@ -6,10 +6,15 @@
 * ABSTRACT:
 */
 
-#include <math.h>
-#include <string.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
+
+#include <math.h>
+#include <string.h>
 
 double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx, double wwNsqr);

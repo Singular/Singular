@@ -5,16 +5,12 @@
 * ABSTRACT: interpreter: LIB and help
 */
 
-//#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/stat.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
+
 #include <Singular/tok.h>
 #include <misc/options.h>
 #include <Singular/ipid.h>
@@ -24,6 +20,13 @@
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
+
+//#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <sys/stat.h>
+
 
 #if SIZEOF_LONG == 8
 #define SI_MAX_NEST 500

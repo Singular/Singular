@@ -15,14 +15,15 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
 #include <kernel/febase.h>
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 
-#ifdef EMBED_PYTHON
-#include "pyobject.cc"
-#endif
+//#ifdef EMBED_PYTHON
+//#include "pyobject.cc"
+//#endif
 
 static BOOLEAN pyobject_load()
 {

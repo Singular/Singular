@@ -1,7 +1,8 @@
 #ifndef MOD_LIB_H
 #define MOD_LIB_H
 
-#include <config.h>         /* for EMBED_PYTHON */
+// #include <config.h>         /* for EMBED_PYTHON */
+
 #include <polys/mod_raw.h>  /* for lib_types */
 
 

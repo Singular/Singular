@@ -6,16 +6,23 @@
 * ABSTRACT:
 */
 
-#include <math.h>
-//#include <kernel/mod2.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+
 #include <omalloc/omalloc.h>
+
 #include <misc/options.h>
-#include <polys/monomials/p_polys.h>
 #include <misc/intvec.h>
-//#include <kernel/febase.h>
-//#include <kernel/ideals.h>
+
 #include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
+
 #include <polys/weight.h>
+
+#include <math.h>
 
 /*0 implementation*/
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,

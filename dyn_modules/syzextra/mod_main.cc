@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
@@ -30,6 +34,9 @@
 #include "singularxx_defs.h"
 #include "DebugPrint.h"
 #include "myNF.h"
+
+
+#include <Singular/mod_lib.h>
 
 
 #if GOOGLE_PROFILE_ENABLED 
@@ -997,10 +1004,8 @@ static BOOLEAN _m2_end(leftv res, leftv h)
 
 END_NAMESPACE
 
-extern "C"
-{
 
-int mod_init(SModulFunctions* psModulFunctions) 
+int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions) 
 {
 #define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
 // #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
@@ -1035,4 +1040,12 @@ int mod_init(SModulFunctions* psModulFunctions)
 #undef ADD  
   return 0;
 }
+
+#ifndef EMBED_PYTHON
+extern "C" { 
+int mod_init(SModulFunctions* psModulFunctions)
+{ 
+  return SI_MOD_INIT(syzextra)(psModulFunctions); 
 }
+}
+#endif

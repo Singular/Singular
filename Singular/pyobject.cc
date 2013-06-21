@@ -15,10 +15,20 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
-  //#include <misc/auxiliary.h>
-  //#include "newstruct.h"
 
+#include <kernel/mod2.h>
+
+//#include <misc/auxiliary.h>
+//#include "newstruct.h"
+
+#include <misc/auxiliary.h>
+
+#include <omalloc/omalloc.h>
+
+#include <kernel/febase.h>
+#include <misc/intvec.h>
+
+#include <polys/mod_raw.h>
 
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -27,13 +37,6 @@
 #include <Singular/ipshell.h>
 #include <Singular/newstruct.h>
 
-
-#include <misc/auxiliary.h>
-
-#include <omalloc/omalloc.h>
-
-#include <kernel/febase.h>
-#include <misc/intvec.h>
 
 #include "subexpr.h"
 #include "lists.h"
@@ -719,7 +722,7 @@ blackbox* pyobject_blackbox(int& tok) {
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),\
      (char*)#name, FALSE, name);
 
-int pyobject_mod_init(SModulFunctions* psModulFunctions)
+int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 {
   int tok = -1;
   blackbox* bbx = pyobject_blackbox(tok);
@@ -750,7 +753,7 @@ int pyobject_mod_init(SModulFunctions* psModulFunctions)
 extern "C" { 
   int mod_init(SModulFunctions* psModulFunctions)
   { 
-    return pyobject_mod_init(psModulFunctions); 
+    return SI_MOD_INIT(pyobject)(psModulFunctions); 
   }
 }
 #endif

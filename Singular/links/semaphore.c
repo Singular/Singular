@@ -1,3 +1,15 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
+
+#ifdef HAVE_SIMPLEIPC
+
+# include "simpleipc.h"
+
+#include <Singular/si_signals.h>
+
 #include <semaphore.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -5,11 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <kernel/mod2.h>
-#include <Singular/si_signals.h>
-
-#ifdef HAVE_SIMPLEIPC
-#include "simpleipc.h"
 
 // Not yet implemented: SYSV IPC Semaphores
 // They are more difficult to clean up after a process crash

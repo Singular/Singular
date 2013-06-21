@@ -1,13 +1,20 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
+
+#include <resources/feFopen.h>
+#include <polys/mod_raw.h>
+
+#include <Singular/mod_lib.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
 #include <errno.h>
 
-#include <kernel/mod2.h>
-#include <resources/feFopen.h>
-#include <polys/mod_raw.h>
-#include <Singular/mod_lib.h>
 
 #define SI_BUILTIN_LIBSTR(name) (char*) #name ".so",
 
