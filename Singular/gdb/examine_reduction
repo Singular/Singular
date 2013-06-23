@@ -1,0 +1,57 @@
+b main
+commands
+  silent
+  loginit "gdblog.txt"
+  continue
+end
+
+
+blc ShiftDVec::bba 'red_result = strat->red'
+commands
+  silent
+  logon
+  call (void)printf("Reducing new S-polynomial\n")
+  call (void)printf("  p before reduction: ")
+  Pctt strat->P
+  logoff
+  continue
+end
+
+b ShiftDVec::redHomog
+commands
+  silent
+  logon
+  call (void)printf("  Reducing with redHomog\n")
+  logoff
+  continue
+end
+
+blc ShiftDVec::bba 'int pos=posInS'
+commands
+  silent
+  logon
+  call (void)printf("  reduced to nonzero poly:")
+  pct strat->P.p
+  logoff
+  continue
+end
+
+b ShiftDVec::kFindDivisibleByInT
+commands
+  silent
+  logon
+  call (void)printf("  Using kFindDivisibleByInT\n")
+  logoff
+  continue
+end
+
+b ShiftDVec::kFindDivisibleByInS
+commands
+  silent
+  logon
+  call (void)printf("  Using kFindDivisibleByInS\n")
+  logoff
+  continue
+end
+
+# vim: set ft=gdb :

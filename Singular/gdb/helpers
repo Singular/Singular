@@ -1,5 +1,18 @@
+define loginit
+  set $stdout_fd_save = dup(1)
+  set $log_fd         = creat($arg0, 0600)
+end
+
+define logon
+  call (void)dup2($log_fd,1)
+end
+
+define logoff
+  call (void)dup2($stdout_fd_save,1)
+end
+
 define print_p_curryking
-  call p_Write($arg0, currRing, strat->tailRing)
+  call (void)p_Write($arg0, currRing, strat->tailRing)
 end
 
 define pct
@@ -7,11 +20,19 @@ define pct
 end
 
 define print_p_tailring
-  call p_Write($arg0, strat->tailRing, strat->tailRing)
+  call (void)p_Write($arg0, strat->tailRing, strat->tailRing)
 end
 
 define ptt
   print_p_tailring $arg0
+end
+
+define Pctt
+  if $arg0.p == 0x0
+    ptt $arg0.t_p
+  else
+    ptt $arg0.t_p
+  end
 end
 
 define disable_output
@@ -23,3 +44,5 @@ end
 define enable_output
    set logging off
 end
+
+# vim: set ft=gdb :

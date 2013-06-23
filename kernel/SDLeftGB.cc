@@ -23,7 +23,7 @@
  * and i is from I and i ist overlapped by J from the right.
  * See theory of Left GBs for more information about that.
  *   Polynomials from I can be accessed via strat->get_I_at(i)
- * ( i is and Integerindex: 0 <= i < get_size_of_I() ).
+ * ( i is an Integerindex: 0 <= i < get_size_of_I() ).
  */
 
 /*GRICO INFORMATION:
