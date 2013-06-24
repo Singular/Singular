@@ -78,9 +78,9 @@ feResourceConfig_s feResourceConfigs[] =
    "%b/../../factory",
    ""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
-  {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/MOD/",                  (char *)""},
+  {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "",                  (char *)""},
   // should be changed to %b/../libexec/singular/pProcs/:
-  {"ProcDir",   'P',    feResDir,   "SINGULAR_PROCS_DIR",   "%b/MOD/",                  (char *)""},
+  {"ProcDir",   'P',    feResDir,   "SINGULAR_PROCS_DIR",   "%d/libexec/singular/MOD/",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
@@ -381,11 +381,11 @@ static char* feInitResource(feResourceConfig config, int warn)
   // this value is gotten for the first time
   if (warn > 0 || (warn < 0 && config->value != NULL))
   {
-    printf("// ** Could not get %s. ", config->key);
-    printf("// ** Either set environment variable %s to %s,",
+    printf("// ** Could not get %s.\n", config->key);
+    printf("// ** Either set environment variable %s to %s,\n",
          config->env, config->key);
     feSprintf(value, config->fmt, warn);
-    printf("// ** or make sure that %s is at %s", config->key, value);
+    printf("// ** or make sure that %s is at %s\n", config->key, value);
   }
 #ifdef RESOURCE_DEBUG
       printf("feInitResource: Set value of %s to NULL", config->key);

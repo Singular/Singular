@@ -312,7 +312,7 @@ int main()
   printf("*   Generated PolyProcs= %d\n",NumberOfHaveProcs);
 
 #ifndef p_Procs_Static
-  printf(" *\n");
+  printf("*\n");
   printf("* KernelProcs          = %d\n",KernelProcs);
   printf("* FieldIndepProcs      = %d\n",FieldIndepProcs);
   printf("* FieldZpProcs         = %d\n",FieldZpProcs);
