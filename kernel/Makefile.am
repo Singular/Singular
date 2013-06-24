@@ -38,7 +38,7 @@ SOURCES = polys.cc febase.cc feread.cc \
     ideals.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
-    SDBase.cc SDkutil.cc SDDebug.cc SDPairs.cc \
+    SDBase.cc SDkutil.cc SDDebug.cc SDPairs.cc SDReduce.cc \
     SDMultiplication.cc \
     nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
@@ -68,7 +68,7 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	kstdfac.h kmatrix.h\
 	kutil.h \
 	SDkutil.h \
-	SDDebug.h SDBase.h SDMultiplication.h \
+	SDDebug.h SDBase.h SDMultiplication.h SDReduce.h \
 	khstd.h kstd1.h \
 	fglm.h fglmgauss.h fglmvec.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \

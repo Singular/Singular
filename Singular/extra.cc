@@ -828,6 +828,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return FALSE;
       }
  /*===================leftgb mit DVecs========================*/
+#if 0
       if (strcmp(sys_cmd, "leftgbdvc") == 0)
       {
         ideal I, J;
@@ -874,6 +875,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
         return FALSE;
       }
+#endif
   /*=================== Testfunktion for Gebauer Moeller ========================*/
       /* This code somehow got lost... */
   /*==================== Hensel's lemma ======================*/
