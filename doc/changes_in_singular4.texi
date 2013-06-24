@@ -103,7 +103,7 @@ The now can assign weights to module components, when defining a monomial orderi
 @smallexample
 ring R = 0, (x,y,z), (am(1,2,3,   10,20,30,40), dp, C);
 deg(x*gen(1));
-@expansion 11
+@expansion{} 11
 @end smallexample
 
 will assign weights 1,2,3 to x,y,z respectively, and weights 10,20,30,40,0,0,... to 
