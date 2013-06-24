@@ -26,6 +26,9 @@ In general, the user syntax has not changed, however there are some changes in t
 
 @c table @asis
 @itemize @bullet
+@item setting @code{minpoly} results in changing the current coefficient domain
+and clears all previously defined varaiables of that ring
+
 @item Minor changes in the output of coefficient ring description. Moreover the output of elements of certain rings has been improved (for example, reals).
 
 @item Algebraic and transcendental extensions of rationals and finite fields
@@ -97,10 +100,11 @@ library version variables (displayed when loading a library) have changed.
 @cindex New orderings for modules
 
 The now can assign weights to module components, when defining a monomial ordering. For example
-
-@code{> ring R = 0, (x,y,z), (am(1,2,3,   10,20,30,40), dp, C);}
-@code{> deg(x*gen(1));}
-@code{11}
+@smallexample
+ring R = 0, (x,y,z), (am(1,2,3,   10,20,30,40), dp, C);
+deg(x*gen(1));
+@expansion 11
+@end smallexample
 
 will assign weights 1,2,3 to x,y,z respectively, and weights 10,20,30,40,0,0,... to 
 components of any free module defined over R. This ordering will first sort
