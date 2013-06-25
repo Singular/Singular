@@ -7,7 +7,7 @@
  *
  * This file implements the GCD of two polynomials over \f$ F_{p} \f$ ,
  * \f$ F_{p}(\alpha ) \f$ or GF based on Alg. 7.2. as described in "Algorithms
- * for Computer Algebra" by Geddes, Czapor, Labahnn
+ * for Computer Algebra" by Geddes, Czapor, Labahn
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
@@ -1125,9 +1125,8 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   } while (1);
 }
 
-/// F is assumed to be an univariate polynomial in x,
-/// computes a random monic irreducible univariate polynomial of random
-/// degree < i in x which does not divide F
+/// computes a random monic irreducible univariate polynomial in x of random
+/// degree < i
 CanonicalForm
 randomIrredpoly (int i, const Variable & x)
 {

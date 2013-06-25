@@ -6,7 +6,9 @@
  * This file defines functions for Hensel lifting.
  *
  * ABSTRACT: function are used for bi- and multivariate factorization over
- * finite fields
+ * finite fields. Described in "Efficient Multivariate Factorization over Finite
+ * Fields" by L. Bernardin & M. Monagon and "Algorithms for Computer Algebra" by
+ * Geddes, Czapor, Labahn
  *
  * @author Martin Lee
  *

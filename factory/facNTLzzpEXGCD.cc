@@ -12,10 +12,7 @@
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
-**/
-//*****************************************************************************
 
-/**
                   COPYRIGHT NOTICE
 		    for NTL 5.5
 	  (modified for Singular 2-0-6 - 3-1)
