@@ -231,21 +231,21 @@ class ShiftDVec::skStrategy : public ::skStrategy
   public:
     /* BOCO DESCRIPTION:
      * This is needed for the calculation of a left GB in a
-     * factor algebra K<X>/I; so this will be used in the
+     * factor algebra K<X>/U; so this will be used in the
      * ShiftDVec::LeftGB namespace
      *
      * BOCO TODO:
-     * I is probably subset of R; so either we will keep
+     * U is probably subset of R; so either we will keep
      * references to the Objects in R here, or we will delete
-     * them completely and instead let get_I_at(i) handle the
-     * translation from R to I at index i. We will decide that
+     * them completely and instead let get_U_at(i) handle the
+     * translation from R to U at index i. We will decide that
      * later. However: we have to care for the Initialization
      * somewhere.
-     *   Question: Will I be part of T ??? - I don't think so,
+     *   Question: Will U be part of T ??? - I don't think so,
      * but again: What was the difference between T and R ?
      */
-    TObject* I; //first index:0; last index: size_of_I-1
-    uint size_of_I; // This is, what it says!
+    TObject* U; //first index:0; last index: size_of_U-1
+    uint size_of_U; // This is, what it says!
     int lV;
     int uptodeg;
 
@@ -255,10 +255,10 @@ class ShiftDVec::skStrategy : public ::skStrategy
     void init_uptodeg(int uptodeg){this->uptodeg = uptodeg;}
     int get_uptodeg(){return uptodeg;}
 
-    void init_I(ideal I){/*TODO*/ assume(0);}
-    uint get_size_of_I(){return size_of_I;}
-    uint translate_index_I_to_R(uint i){/*TODO*/ assume(0);}
-    TObject* get_I_at(uint i){return &(I[i]);}
+    void init_U(ideal U){/*TODO*/ assume(0);}
+    uint get_size_of_U(){return size_of_U;}
+    uint translate_index_U_to_R(uint i){/*TODO*/ assume(0);}
+    TObject* get_U_at(uint i){return &(U[i]);}
 };
 
 
