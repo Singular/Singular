@@ -6,7 +6,8 @@
  * This file implements functions to lift factors via Hensel lifting.
  *
  * ABSTRACT: Hensel lifting is described in "Efficient Multivariate
- * Factorization over Finite Fields" by L. Bernardin & M. Monagon.
+ * Factorization over Finite Fields" by L. Bernardin & M. Monagon and 
+ * "Algorithms for Computer Algebra" by Geddes, Czapor, Labahn
  *
  * @author Martin Lee
  *
@@ -482,6 +483,8 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
   return result;
 }
 
+/// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
+/// over Q(alpha) by p-adic lifting
 CFList
 diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
                      const CFList& factors, modpk& b, const Variable& alpha)
@@ -690,6 +693,10 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   return result;
 }
 
+
+/// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
+/// over Q(alpha) by first computing mod \f$p\f$ and if no zero divisor occured
+/// compute it mod \f$p^k\f$
 CFList
 diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                const CFList& factors, modpk& b, const Variable& alpha)
@@ -2010,8 +2017,8 @@ nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
 }
 
 
-/// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
-/// mod M, products contains \f$ prod_{j=1, j\neq i}^{r}{f_{i}}} \f$
+/// solve \f$ E=\sum_{i= 1}^r{\sigma_{i}\prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
+/// mod M, @a products contains \f$ \prod_{j=1, j\neq i}^{r}{f_{j}} \f$
 CFList
 diophantine (const CFList& recResult, const CFList& factors,
              const CFList& products, const CFList& M, const CanonicalForm& E,
