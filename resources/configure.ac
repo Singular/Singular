@@ -10,29 +10,11 @@ AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werro
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
-
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
-#
-# - Check for CC and CXX but be careful about CFLAGS.
-#
-test "${CFLAGS+set}" = set || cflags_expl_set=no
-AC_PROG_CC
-test "${CXXFLAGS+set}" = set || cxxflags_expl_set=no
-AC_PROG_CXX
-if test "x$GCC" != xyes && test "x$GXX" != xyes; then
-  AC_MSG_WARN(you better use gcc to compile Factory)
-else
-  if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CXXFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-  if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we use \`' as default for \`CFLAGS'
-                    (instead of the configure default \`-g -O')])
-  fi
-fi
+SING_RESET_FLAGS()
+SING_CHECK_SET_ARGS()
 
 AM_PROG_CC_C_O
 # AM_PROG_AR
@@ -57,21 +39,7 @@ LT_INIT
 # ([shared])
 # LT_INIT(dlopen disable-static) # doesn't work on PowerPC!
 
-
-SING_CHECK_PIPE
-SING_RESET_FLAGS()
-SING_CHECK_SET_ARGS()
-
-
-# CFLAGS
-if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-  CFLAGS=""
-fi
-  
-# CXXFLAGS
-if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-  CXXFLAGS=""
-fi
+# SING_CHECK_PIPE
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

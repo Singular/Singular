@@ -18,10 +18,11 @@ AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER(config.h)
 
-AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
+AM_MAINTAINER_MODE
 
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([config.h],[],[config.h])
@@ -32,8 +33,8 @@ AX_PREFIX_CONFIG_H([config.h],[],[config.h])
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()
 
-AC_PROG_CC
-AC_PROG_CXX
+#AC_PROG_CC
+#AC_PROG_CXX
 #
 # - check for some other programs.
 #

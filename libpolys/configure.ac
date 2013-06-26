@@ -10,13 +10,10 @@ AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werro
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
-
 dnl Check if build env is sane
 AM_SANITY_CHECK
 
-#
 # - Check for CC and CXX but be careful about CFLAGS.
-#
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()
 
@@ -59,7 +56,7 @@ AC_C_INLINE
 AC_HEADER_STDBOOL
 AC_TYPE_SIZE_T
 
-SING_CHECK_PIPE
+# SING_CHECK_PIPE
 
 # check for cpu properties
 AC_CHECK_SIZEOF(long,4)

@@ -119,6 +119,9 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 #  AX_APPEND_LINK_FLAGS([-rdynamic]) 
  fi
 
+
 # SING_SHOW_FLAGS([before PROG_C_CC])
 
+AC_PROG_CC
+AC_PROG_CXX
 ])
