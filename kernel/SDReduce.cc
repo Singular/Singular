@@ -61,7 +61,7 @@ int ShiftDVec::Reduce::red_get_opt_len
   int ii;
   poly h_p;
   ring r;
-  h->GetLmTailRing(h_p, r);
+  h_p = h->GetLmTailRing();
 
   loop
   {
