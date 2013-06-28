@@ -1,6 +1,9 @@
 #include <kutil.h>
 #include <SDBase.h>
 #include <SDReduce.h>
+#include <SDMultiplication.h>
+
+#include <misc/options.h> // for TEST_OPT_LENGTH macro
 
 /* reduction procedure for the homogeneous case
  * and the case of a degree-ordering
@@ -110,7 +113,7 @@ void ShiftDVec::Reduce::debug_red_to_print( LObject* to )
 {
 #ifdef KDEBUG
   PrintS("\nto ");
-  h->wrp();
+  to->wrp();
   PrintLn();
 #endif
 }
@@ -155,7 +158,7 @@ ShiftDVec::Reduce::red_reduce_with(LObject* red,
   }
 
 #ifdef KDEBUG
-  if (TEST_OPT_DEBUG) debug_red_to_print( h );
+  if (TEST_OPT_DEBUG) debug_red_to_print( red );
 #endif
 }
 
