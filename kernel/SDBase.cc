@@ -341,6 +341,9 @@ ideal ShiftDVec::bba
     // ShiftDVec::Debug::Free, when
     // we do no longer need debugging output
     Init();
+
+    add_logger("DVec_Memory")->set_output_stream("MemoryLog","w");
+    add_logger("SDExt_Memory")->set_output_stream("MemoryLog","w");
   }
   strat->mark_as_SD_Case();
 
