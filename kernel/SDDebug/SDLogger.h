@@ -32,7 +32,7 @@ class SDDebug::AbstractLogger
 
     virtual ~AbstractLogger() {}
 
-    enum special { Date };
+    enum special { Date, Flush };
 
     virtual ALogger& operator<<( const char* str ) = 0;
     virtual ALogger& operator<<( int number ) = 0;

@@ -334,78 +334,14 @@ ideal ShiftDVec::bba
   namespace SDD  = ShiftDVec::Debug;
   namespace SDDD = ShiftDVec::Debug::Debugger;
 
-  // Debug Sectionen verschwinden aus dem Code, wenn man nicht
-  // Singularg kompiliert.
   SD_DEBUG_SEC
   {
-    // innerhalb der Debug Sektion machen wir alle Funktionen
-    // aus dem Namensraum ShiftDVec::Debug::Debugger bekannt:
     using namespace SDDD;
-
-    Init(); // Initialisierung der Debugausgabe.
-
-    // Hinzufügen eines Ausgabeobjektes: Es können mehrere
-    // Ausgabeobjekte hinzugefügt werden. Ausschalten kann
-    // man dann die Debug Ausgabe, indem man z.B. diesen
-    // Code auskommentiert. Aber Achtung: Das Object "Default"
-    // wird immer hinzugefügt. Das folgende Statement wäre
-    // also gar nicht notwendig. In Zukunft wird es noch
-    // Kommandos geben, um einzelne Debugging Objekte temporär
-    // - oder permanent - auszuschalten.
-    add_logger("Default");
-
-    // Alternativ hätten wir gleich noch eine Logfile beim
-    // erstellen des Debugging Objektes angeben können.
-    // Wenn man kein Logfile angeben möchte, so wird auf
-    // die Standardausgabe geschrieben.
-    //add_logger("Default")->set_output_stream("logfile");
-
-    // Will man später noch etwas an dem Debug Objekt
-    // ändern, so kann man es mit 'get_logger' erreichen.
-    //get_logger("Default")->set_output_stream("logfile");
+    // Initialize debugging output; we should use
+    // ShiftDVec::Debug::Free, when
+    // we do no longer need debugging output
+    Init();
   }
-
-  // Hier eine einfache Debug Ausgabe. Falls wir uns nicht im
-  // Debugging Modus befinden (d.h. nicht Singularg aufrufen)
-  // wird dieser Code vom Compiler aus dem Programm entfernt.
-  // Bisher können noch nicht alle Datentypen ausgegeben werden.
-  // Unterstützt wird char* (normale C-Strings mit
-  // terminierendem '\0'-Byte), int, poly, void* (Ausgabe von
-  // Adressen), ShiftDVec::Debug::AbstractLogger::special
-  // ( siehe unten für ein Beispiel ) und PolyFormat*, was
-  // allerdings keine Ausgabe erzeugt und was du dir auch nicht
-  // weiter merken musst.
-  SD_DEBUG_LOG("Default") << "Hello World!\n";
-
-  // Um sich die Speicheradresse eines Pointers ausgeben lassen
-  // zu können gibt es die Fuktions ShiftDVec::Debug::sddr,
-  // die einen Pointer einfach nur nach void* castet. Achtung,
-  // Falls die Übergebene Variable kein Pointer ist, so muss
-  // man die Adresse der Variable erst noch mittels & erfragen.
-  // ideal ist jedoch ein verkappter Pointer Typ, genauso wie 
-  // poly.
-  SD_DEBUG_LOG("Default")
-    << "Die Adresse des Ideals F: " << SDD::addr(F) << "\n";
-
-  // Falls man in ein Logfile schreibt, möchte man manchmal
-  // auch noch bestimmte Informationen haben wie Zeile,
-  // Funktionsname, Dateiname und aktuelles Datum. Für die
-  // Ausgabe nach stdout wird dies hier alles jeweils in eine
-  // neue Zeile geschrieben. Aber wichtig: für Logdateien
-  // sollte man sich unbedingt an ein anderes Format halten:
-  // Alles in eine Zeile und verschiedene Daten getrennt durch
-  // einen einheitlichen Separatorstring, z.B. "--", oder Tab
-  // - je nach Geschmack (Ich mag keine Tabs...).
-  // SDD::Date ist hier vom Typ special und gibt das Datum aus.
-  // __FUNCTION__ sollte man möglichst nur zum Eigengebrauch
-  // benutzen und wieder aus dem Code entfernen, da es kein
-  // Standardmacro ist und eventuell von einigen Compilern
-  // nicht erkannt wird.
-  SD_DEBUG_LOG("Default")
-    << "Aktuelles Datum: " << SDD::AbstractLogger::Date << "\n"
-    << "Datei:           " << __FILE__ << "\n"
-    << "Zeilennummer:    " << __LINE__  << "\n"
-    << "Funktion:        " << __FUNCTION__ << "\n";
 
   strat->mark_as_SD_Case();
 
@@ -500,18 +436,6 @@ ideal ShiftDVec::bba
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-
-    // mit SDD::pf teilt man der Debug Ausgabe mit, wie das
-    // Polynom gespeichert ist. SDD::pf kann überall
-    // aufgerufen werden, muss also nicht unbedingt, wie hier,
-    // in den Ausgabestream geschrieben werden. Bevor man ein
-    // Polynom - oder mehrere - ausgibt, sollte man es
-    // irgendwann mal korrekt gesetzt haben.  Es reicht
-    // allerdings es einmal zu setzen, insofern es für alle
-    // folgenden Polynome stimmt.
-    SD_DEBUG_LOG("Default") << "Das Polynom strat->P.p: "
-      << SDD::pf( currRing, strat->tailRing )
-      << strat->P.p << "\n";
 
     deBoGriTTest(strat);
     if (pNext(strat->P.p) == strat->tail)
@@ -797,8 +721,7 @@ ideal ShiftDVec::bba
 #endif /* KDEBUG */
   idTest(strat->Shdl);
 
-  // Hier geben wir brav wieder allen Speicher frei, der für
-  // die Debugausgabe (intern) reserviert wurde.
+  // Free internal memory reserved for loggers
   SD_DEBUG_SEC{ SDDD::Free(); }
 
   return (strat->Shdl);

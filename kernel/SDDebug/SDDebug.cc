@@ -57,6 +57,10 @@ SDDebug::DefaultLogger::operator<<( special spcl )
       output = ctime(&now);
       int len_time = strlen( output );
       output[len_time-1] = '\0';
+      break;
+    case Flush:
+      if( output_stream ) fflush( output_stream );
+      return *this;
   }
 
   if( !output_stream ) PrintS( output );
