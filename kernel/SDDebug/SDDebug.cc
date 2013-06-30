@@ -21,10 +21,20 @@ SDDebug::PolyFormat SDDebug::pf = SDDebug::PolyFormat();
 SDDebug::DefaultLogger::DefaultLogger() :
   filename(NULL), output_stream(NULL), pf(NULL) {}
 
+/* filename != NULL:
+ * logger is owner of output stream corresponding to filename
+ *
+ * filename == NULL && output_stream != NULL
+ * logger has output stream output_stream, but this stream
+ * was created somewhere else -> do not fclose it!
+ */
 SDDebug::DefaultLogger::~DefaultLogger()
 {
-  if(output_stream) fclose(output_stream);
-  if(filename)      delete filename;
+  if(filename)
+  {
+    delete filename;
+    fclose(output_stream);
+  }
 }
 
 
@@ -127,6 +137,18 @@ void SDDebug::DefaultLogger::set_output_stream
   this->filename = new char[strlen(filename_)+1];
   strcpy( this->filename, filename_ );
   output_stream = fopen( filename_, mode );
+}
+
+void SDDebug::DefaultLogger::set_output_stream(ALogger* logger)
+{
+  if( this->filename )
+  {
+    delete this->filename;
+    fclose(output_stream);
+    filename = NULL;
+  }
+
+  output_stream = logger->output_stream;
 }
 
 #endif
