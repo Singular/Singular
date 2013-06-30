@@ -56,7 +56,7 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
     << __FILE__ << ":" << __LINE__  << " -- "
     << "new" << " -- "
     << ShiftDVec::Debug::addr(SD_Object_Extension)
-    <<"\n" << ShiftDVec::Debug::Flush;
+    <<"\n" << ShiftDVec::Debug::AbstractLogger::Flush;
 
 
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
@@ -112,7 +112,7 @@ void sTObject::SD_Ext_Delete()
     << __FILE__ << ":" << __LINE__  << " -- "
     << "delete" << " -- " 
     << ShiftDVec::Debug::addr(SD_Object_Extension)
-    << "\n" << ShiftDVec::Debug::Flush;
+    << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
 
     switch( SD_Ext()->Extension_Type )
     {
@@ -152,7 +152,7 @@ ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
   SD_DEBUG_LOG("SDExt_Memory")
   << __FILE__ << ":" << __LINE__  << " -- "
   << "new" << " -- " << ShiftDVec::Debug::addr(ext)
-  << "\n" << ShiftDVec::Debug::Flush;
+  << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
 
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
@@ -267,7 +267,7 @@ void ShiftDVec::sTObjectExtension::freeDVec()
     SD_DEBUG_LOG("DVec_Memory")
      << __FILE__ << ":" << __LINE__  << " -- "
      << "omFreeSize" << " -- " << ShiftDVec::Debug::addr(dvec)
-     << "\n" << ShiftDVec::Debug::Flush;
+     << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
 
     omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
     dvec = NULL;
@@ -535,7 +535,7 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
   SD_DEBUG_LOG("DVec_Memory")
    << __FILE__ << ":" << __LINE__  << " -- "
    << "omAlloc0" << " -- " << ShiftDVec::Debug::addr(dvec)
-   << "\n" << ShiftDVec::Debug::Flush;
+   << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
 
 
   uint * it = dvec;
