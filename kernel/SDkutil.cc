@@ -51,7 +51,7 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
   if( SD_Object_Extension ) SD_Ext_Delete();
 
   SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
- 
+
   SD_DEBUG_LOG("SDExt_Memory")
     << __FILE__ << ":" << __LINE__  << " -- "
     << "new" << " -- "
