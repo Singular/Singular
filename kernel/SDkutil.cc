@@ -25,6 +25,8 @@
 #include <kernel/polys.h> //For pTotaldegree and the like
 #include <kernel/febase.h> //For Print stuff
 
+#include <kernel/SDDebug/SDDebug.h>
+
 typedef skStrategy* kStrategy;
 typedef class ShiftDVec::sTObjectExtension TExt;
 typedef class ShiftDVec::sLObjectExtension LExt;
@@ -49,6 +51,12 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
   if( SD_Object_Extension ) SD_Ext_Delete();
 
   SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
+ 
+  SD_DEBUG_LOG("SDExt_Memory")
+    << __FILE__ << ":" << __LINE__  << " -- "
+    << "new" << " -- " << ShiftDVec::Debug::addr(SD_Object_Extension)"\n";
+
+
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
 
@@ -97,6 +105,11 @@ void sTObject::SD_Ext_Delete()
 
   if( SD_Ext()->number_of_possesors == 0)
   {
+
+    SD_DEBUG_LOG("SDExt_Memory")
+    << __FILE__ << ":" << __LINE__  << " -- "
+    << "delete" << " -- " << ShiftDVec::Debug::addr(SD_Object_Extension)"\n";
+
     switch( SD_Ext()->Extension_Type )
     {
       case TExt::TObject_Extension:
@@ -131,6 +144,11 @@ ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
   if( SD_Object_Extension ) { SD_Ext_Delete(); }
     
   LExt* ext = new LExt(this);
+ 
+  SD_DEBUG_LOG("SDExt_Memory")
+  << __FILE__ << ":" << __LINE__  << " -- "
+  << "new" << " -- " << ShiftDVec::Debug::addr(ext)"\n";
+
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
@@ -241,6 +259,10 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 {
   if(this && dvec)
   {
+    SD_DEBUG_LOG("DVec_Memory")
+     << __FILE__ << ":" << __LINE__  << " -- "
+     << "omFreeSize" << " -- " << ShiftDVec::Debug::addr(dvec)"\n";
+
     omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
     dvec = NULL;
     dvSize = 0;
@@ -503,6 +525,11 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
   assume(dvSize < 1000);
   if(!dvSize){dvec = NULL; return 0;}
   dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
+
+  SD_DEBUG_LOG("DVec_Memory")
+   << __FILE__ << ":" << __LINE__  << " -- "
+   << "omAlloc0" << " -- " << ShiftDVec::Debug::addr(dvec)"\n";
+
 
   uint * it = dvec;
 

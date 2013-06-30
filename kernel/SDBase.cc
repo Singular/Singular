@@ -342,7 +342,6 @@ ideal ShiftDVec::bba
     // we do no longer need debugging output
     Init();
   }
-
   strat->mark_as_SD_Case();
 
 #ifdef KDEBUG
