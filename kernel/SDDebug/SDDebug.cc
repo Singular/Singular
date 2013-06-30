@@ -50,12 +50,13 @@ SDDebug::ALogger&
 SDDebug::DefaultLogger::operator<<( special spcl )
 {
   char* output;
+  int len_time;
   switch( spcl )
   {
     case Date:
       time_t now; time(&now);
       output = ctime(&now);
-      int len_time = strlen( output );
+      len_time = strlen( output );
       output[len_time-1] = '\0';
       break;
     case Flush:
