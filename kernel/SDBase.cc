@@ -352,7 +352,9 @@ ideal ShiftDVec::bba
     // also gar nicht notwendig. In Zukunft wird es noch
     // Kommandos geben, um einzelne Debugging Objekte temporär
     // - oder permanent - auszuschalten.
-    add_logger("Default");
+    //add_logger("Default");
+    add_logger("DVec_Memory")->set_output_stream("MemoryLog");
+    add_logger("SDExt_Memory")->set_output_stream("MemoryLog");
 
     // Alternativ hätten wir gleich noch eine Logfile beim
     // erstellen des Debugging Objektes angeben können.
@@ -375,7 +377,7 @@ ideal ShiftDVec::bba
   // ( siehe unten für ein Beispiel ) und PolyFormat*, was
   // allerdings keine Ausgabe erzeugt und was du dir auch nicht
   // weiter merken musst.
-  SD_DEBUG_LOG("Default") << "Hello World!\n";
+  //SD_DEBUG_LOG("Default") << "Hello World!\n";
 
   // Um sich die Speicheradresse eines Pointers ausgeben lassen
   // zu können gibt es die Fuktions ShiftDVec::Debug::sddr,
@@ -384,8 +386,8 @@ ideal ShiftDVec::bba
   // man die Adresse der Variable erst noch mittels & erfragen.
   // ideal ist jedoch ein verkappter Pointer Typ, genauso wie 
   // poly.
-  SD_DEBUG_LOG("Default")
-    << "Die Adresse des Ideals F: " << SDD::addr(F) << "\n";
+  //SD_DEBUG_LOG("Default")
+  //  << "Die Adresse des Ideals F: " << SDD::addr(F) << "\n";
 
   // Falls man in ein Logfile schreibt, möchte man manchmal
   // auch noch bestimmte Informationen haben wie Zeile,
@@ -401,11 +403,11 @@ ideal ShiftDVec::bba
   // benutzen und wieder aus dem Code entfernen, da es kein
   // Standardmacro ist und eventuell von einigen Compilern
   // nicht erkannt wird.
-  SD_DEBUG_LOG("Default")
-    << "Aktuelles Datum: " << SDD::AbstractLogger::Date << "\n"
-    << "Datei:           " << __FILE__ << "\n"
-    << "Zeilennummer:    " << __LINE__  << "\n"
-    << "Funktion:        " << __FUNCTION__ << "\n";
+  //SD_DEBUG_LOG("Default")
+  //  << "Aktuelles Datum: " << SDD::AbstractLogger::Date << "\n"
+  //  << "Datei:           " << __FILE__ << "\n"
+  //  << "Zeilennummer:    " << __LINE__  << "\n"
+  //  << "Funktion:        " << __FUNCTION__ << "\n";
 
   strat->mark_as_SD_Case();
 

@@ -49,6 +49,12 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
   if( SD_Object_Extension ) SD_Ext_Delete();
 
   SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
+ 
+  SD_DEBUG_LOG("SDExt_Memory")
+    << __FILE__ << ":" << __LINE__  << " -- "
+    << "new" << " -- " << Debug::addr(SD_Object_Extension);
+
+
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
 
@@ -97,6 +103,11 @@ void sTObject::SD_Ext_Delete()
 
   if( SD_Ext()->number_of_possesors == 0)
   {
+
+    SD_DEBUG_LOG("SDExt_Memory")
+    << __FILE__ << ":" << __LINE__  << " -- "
+    << "delete" << " -- " << Debug::addr(SD_Object_Extension);
+
     switch( SD_Ext()->Extension_Type )
     {
       case TExt::TObject_Extension:
@@ -131,6 +142,11 @@ ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
   if( SD_Object_Extension ) { SD_Ext_Delete(); }
     
   LExt* ext = new LExt(this);
+ 
+  SD_DEBUG_LOG("SDExt_Memory")
+  << __FILE__ << ":" << __LINE__  << " -- "
+  << "new" << " -- " << Debug::addr(ext);
+
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
@@ -241,6 +257,10 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 {
   if(this && dvec)
   {
+    SD_DEBUG_LOG("DVec_Memory")
+     << __FILE__ << ":" << __LINE__  << " -- "
+     << "omFreeSize" << " -- " << Debug::addr(dvec);
+
     omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
     dvec = NULL;
     dvSize = 0;
@@ -503,6 +523,11 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
   assume(dvSize < 1000);
   if(!dvSize){dvec = NULL; return 0;}
   dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
+
+  SD_DEBUG_LOG("DVec_Memory")
+   << __FILE__ << ":" << __LINE__  << " -- "
+   << "omAlloc0" << " -- " << Debug::addr(dvec);
+
 
   uint * it = dvec;
 
