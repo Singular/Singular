@@ -73,6 +73,7 @@ class ShiftDVec::Debug::DefaultLogger :
   protected:
     char* filename;
     PolyFormat* pf;
+    FILE* output_stream;
 
   public:
     DefaultLogger();

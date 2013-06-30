@@ -129,6 +129,8 @@ void SDDebug::DefaultLogger::set_output_stream( FILE* stream )
 void SDDebug::DefaultLogger::set_output_stream
   ( const char* filename_, const char* mode )
 {
+  assume( mode[0] != 'r' || mode[1] == '+' );
+
   if( this->filename )
   {
     delete this->filename;
@@ -139,16 +141,25 @@ void SDDebug::DefaultLogger::set_output_stream
   output_stream = fopen( filename_, mode );
 }
 
+// REMARK:
+// logger should be of type DefaultLogger; otherwise this
+// function will do nothing.
 void SDDebug::DefaultLogger::set_output_stream(ALogger* logger)
 {
-  if( this->filename )
-  {
-    delete this->filename;
-    fclose(output_stream);
-    filename = NULL;
-  }
+  DefaultLogger* lg = dynamic_cast<DefaultLogger*>(logger);
 
-  output_stream = logger->output_stream;
+  if( lg )
+  {
+    if( this->filename )
+    {
+      delete this->filename;
+      fclose(output_stream);
+      filename = NULL;
+    }
+
+    output_stream = lg->output_stream;
+  }
+  else assume(0); // not so good ...
 }
 
 #endif
