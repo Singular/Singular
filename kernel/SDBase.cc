@@ -799,6 +799,8 @@ ideal ShiftDVec::bba
 #endif /* KDEBUG */
   idTest(strat->Shdl);
 
+  // Hier geben wir brav wieder allen Speicher frei, der für
+  // die Debugausgabe (intern) reserviert wurde.
   SD_DEBUG_SEC{ SDDD::Free(); }
 
   return (strat->Shdl);
