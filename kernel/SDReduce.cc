@@ -49,7 +49,8 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
     // end of search: have to reduce with pi
     RD::red_reduce_with( h, strat->T+ii, shift, strat );
 
-    not_sev = RD::after_red( h );
+    if( !RD::after_red( h ) ) return 0;
+    not_sev = ~ h->sev;
 
     int ret;
     if( (ret = RD::red_with_S(h, strat, &pass)) ) return ret;
@@ -179,7 +180,7 @@ unsigned long ShiftDVec::Reduce::after_red( LObject* h )
   }
 
   h->SetShortExpVector();
-  return ~ h->sev;
+  return 1;
 }
 
 /*
