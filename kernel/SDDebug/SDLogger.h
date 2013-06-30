@@ -46,6 +46,9 @@ class SDDebug::AbstractLogger
     virtual void set_output_stream
       ( const char* filename, const char* mode ) = 0;
     virtual void set_output_stream( ALogger* logger ) = 0;
+
+  protected:
+    FILE* output_stream;
 };
 
 class SDDebug::DummyLogger : public AbstractLogger

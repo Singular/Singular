@@ -342,8 +342,9 @@ ideal ShiftDVec::bba
     // we do no longer need debugging output
     Init();
 
-    add_logger("DVec_Memory")->set_output_stream("MemoryLog","w");
-    add_logger("SDExt_Memory")->set_output_stream("MemoryLog","w");
+    SDD::AbstractLogger* dvm = add_logger("DVec_Memory");
+    dvm->set_output_stream("MemoryLog","w");
+    add_logger("SDExt_Memory")->set_output_stream(dvm);
   }
   strat->mark_as_SD_Case();
 

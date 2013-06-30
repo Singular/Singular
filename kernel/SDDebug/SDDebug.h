@@ -72,7 +72,6 @@ class ShiftDVec::Debug::DefaultLogger :
 {
   protected:
     char* filename;
-    FILE* output_stream;
     PolyFormat* pf;
 
   public:
@@ -90,6 +89,7 @@ class ShiftDVec::Debug::DefaultLogger :
     virtual void set_output_stream( FILE* stream );
     virtual void set_output_stream
       ( const char* filename_, const char* mode );
+    virtual void set_output_stream( ALogger* logger );
 };
 
 #else  // SD_HAVE_DEBUG is unset
