@@ -353,8 +353,8 @@ ideal ShiftDVec::bba
     // Kommandos geben, um einzelne Debugging Objekte temporär
     // - oder permanent - auszuschalten.
     //add_logger("Default");
-    add_logger("DVec_Memory")->set_output_stream("MemoryLog");
-    add_logger("SDExt_Memory")->set_output_stream("MemoryLog");
+    add_logger("DVec_Memory")->set_output_stream("MemoryLog","w");
+    add_logger("SDExt_Memory")->set_output_stream("MemoryLog","w");
 
     // Alternativ hätten wir gleich noch eine Logfile beim
     // erstellen des Debugging Objektes angeben können.
@@ -511,9 +511,9 @@ ideal ShiftDVec::bba
     // irgendwann mal korrekt gesetzt haben.  Es reicht
     // allerdings es einmal zu setzen, insofern es für alle
     // folgenden Polynome stimmt.
-    SD_DEBUG_LOG("Default") << "Das Polynom strat->P.p: "
-      << SDD::pf( currRing, strat->tailRing )
-      << strat->P.p << "\n";
+    //SD_DEBUG_LOG("Default") << "Das Polynom strat->P.p: "
+    //  << SDD::pf( currRing, strat->tailRing )
+    //  << strat->P.p << "\n";
 
     deBoGriTTest(strat);
     if (pNext(strat->P.p) == strat->tail)

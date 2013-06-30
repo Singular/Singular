@@ -25,6 +25,8 @@
 #include <kernel/polys.h> //For pTotaldegree and the like
 #include <kernel/febase.h> //For Print stuff
 
+#include <kernel/SDDebug/SDDebug.h>
+
 typedef skStrategy* kStrategy;
 typedef class ShiftDVec::sTObjectExtension TExt;
 typedef class ShiftDVec::sLObjectExtension LExt;
@@ -52,7 +54,7 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
  
   SD_DEBUG_LOG("SDExt_Memory")
     << __FILE__ << ":" << __LINE__  << " -- "
-    << "new" << " -- " << Debug::addr(SD_Object_Extension);
+    << "new" << " -- " << ShiftDVec::Debug::addr(SD_Object_Extension)"\n";
 
 
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
@@ -106,7 +108,7 @@ void sTObject::SD_Ext_Delete()
 
     SD_DEBUG_LOG("SDExt_Memory")
     << __FILE__ << ":" << __LINE__  << " -- "
-    << "delete" << " -- " << Debug::addr(SD_Object_Extension);
+    << "delete" << " -- " << ShiftDVec::Debug::addr(SD_Object_Extension)"\n";
 
     switch( SD_Ext()->Extension_Type )
     {
@@ -145,7 +147,7 @@ ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
  
   SD_DEBUG_LOG("SDExt_Memory")
   << __FILE__ << ":" << __LINE__  << " -- "
-  << "new" << " -- " << Debug::addr(ext);
+  << "new" << " -- " << ShiftDVec::Debug::addr(ext)"\n";
 
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
@@ -259,7 +261,7 @@ void ShiftDVec::sTObjectExtension::freeDVec()
   {
     SD_DEBUG_LOG("DVec_Memory")
      << __FILE__ << ":" << __LINE__  << " -- "
-     << "omFreeSize" << " -- " << Debug::addr(dvec);
+     << "omFreeSize" << " -- " << ShiftDVec::Debug::addr(dvec)"\n";
 
     omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
     dvec = NULL;
@@ -526,7 +528,7 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
 
   SD_DEBUG_LOG("DVec_Memory")
    << __FILE__ << ":" << __LINE__  << " -- "
-   << "omAlloc0" << " -- " << Debug::addr(dvec);
+   << "omAlloc0" << " -- " << ShiftDVec::Debug::addr(dvec)"\n";
 
 
   uint * it = dvec;
