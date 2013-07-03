@@ -119,22 +119,53 @@ char* toString(gfan::ZMatrix const &zm)
 std::string toString(const gfan::ZCone* const c)
 {
   std::stringstream s;
-  gfan::ZMatrix i=c->getInequalities();
-  gfan::ZMatrix e=c->getEquations();
   s<<"AMBIENT_DIM"<<std::endl;
   s<<c->ambientDimension()<<std::endl;
+
+  gfan::ZMatrix i=c->getInequalities();
+  char* ineqs = toString(i);
   if (c->areFacetsKnown())
     s<<"FACETS"<<std::endl;
   else
     s<<"INEQUALITIES"<<std::endl;
-  s<<toString(i)<<std::endl;
-  // std::cout << toString(i) << std::endl;
+  if (ineqs!=NULL)
+  {
+    s<<ineqs<<std::endl;
+    delete ineqs;
+  }
+
+  gfan::ZMatrix e=c->getEquations();
+  char* eqs = toString(e);
   if (c->areImpliedEquationsKnown())
     s<<"LINEAR_SPAN"<<std::endl;
   else
     s<<"EQUATIONS"<<std::endl;
-  s<<toString(e)<<std::endl;
-  // std::cout << toString(e) << std::endl;
+  if (eqs!=NULL)
+  {
+    s<<eqs<<std::endl;
+    delete eqs;
+  }
+
+  if (c->areExtremeRaysKnown())
+  {
+    gfan::ZMatrix r=c->extremeRays();
+    char* rs = toString(r);
+    s<<"RAYS"<<std::endl;
+    if (rs!=NULL)
+    {
+      s<<rs<<std::endl;
+      delete rs;
+    }
+    gfan::ZMatrix l=c->generatorsOfLinealitySpace();
+    char* ls = toString(l);
+    s<<"LINEALITY_SPACE"<<std::endl;
+    if (ls!=NULL)
+    {
+      s<<ls<<std::endl;
+      delete ls;
+    }
+  }
+
   return s.str();
 }
 
