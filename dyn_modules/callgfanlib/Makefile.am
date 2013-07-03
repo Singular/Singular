@@ -6,19 +6,19 @@ if HAVE_GFANLIB
 if ENABLE_P_PROCS_DYNAMIC
   module_LTLIBRARIES=gfanlib.la
 
-# if WANT_DEBUG
-#   module_LTLIBRARIES+=gfanlib_g.la
-# endif
-  
+if WANT_DEBUG
+  module_LTLIBRARIES+=gfanlib_g.la
+endif
+
 endif
 endif
 
-# CXXTEMPLFLAGS	= ${PIPE}
+CXXTEMPLFLAGS	= ${PIPE} -lcddgmp
 ## -fno-implicit-templates
 ## --no-exceptions
 
 # DEBUGCXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
-# 
+#
 # NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer ${PIPE}
 # NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer ${CXXTEMPLFLAGS}
 # ##  --no-rtti ?
@@ -44,7 +44,7 @@ gfanlib_la_SOURCES   = $(SOURCES)
 
 P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
 
-gfanlib_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON} 
+gfanlib_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 # ${NODEBUGDEFS}
 # gfanlib_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 

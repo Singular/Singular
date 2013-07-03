@@ -29,8 +29,8 @@ class bigintmat
 
     bigintmat(int r, int c, const coeffs n): m_coeffs(n), v(NULL), row(r), col(c)
     {
-      assume (rows() > 0);
-      assume (cols() > 0);
+      assume (rows() >= 0);
+      assume (cols() >= 0);
 
       const int l = r*c;
 
@@ -52,8 +52,8 @@ class bigintmat
 
       if (l > 0)
       {
-        assume (rows() > 0);
-        assume (cols() > 0);
+        assume (rows() >= 0);
+        assume (cols() >= 0);
 
         assume (m->v != NULL);
 

@@ -110,6 +110,8 @@ char* toString(gfan::ZMatrix const &zm)
 {
   bigintmat* bim = zMatrixToBigintmat(zm);
   char* s = bim->StringAsPrinted();
+  if (s==NULL)
+    s = (char*) omAlloc0(sizeof(char));
   delete bim;
   return s;
 }
@@ -126,11 +128,13 @@ std::string toString(const gfan::ZCone* const c)
   else
     s<<"INEQUALITIES"<<std::endl;
   s<<toString(i)<<std::endl;
+  // std::cout << toString(i) << std::endl;
   if (c->areImpliedEquationsKnown())
     s<<"LINEAR_SPAN"<<std::endl;
   else
     s<<"EQUATIONS"<<std::endl;
   s<<toString(e)<<std::endl;
+  // std::cout << toString(e) << std::endl;
   return s.str();
 }
 
@@ -1559,6 +1563,267 @@ BOOLEAN containsCone(leftv res, leftv args)
   return TRUE;
 }
 
+gfan::ZVector intStar2ZVector(const int d, const int* i)
+{
+  gfan::ZVector zv(d);
+  for(int j=0; j<d; j++)
+    zv[j]=i[j+1];
+  return zv;
+}
+
+BOOLEAN maximalGroebnerCone(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      int n = currRing->N;
+      ideal I = (ideal) u->Data();
+      poly g = NULL;
+      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+      gfan::ZVector leadexpw = gfan::ZVector(n);
+      gfan::ZVector tailexpw = gfan::ZVector(n);
+      gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+      for (int i=0; i<IDELEMS(I); i++)
+      {
+        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
+        leadexpw = intStar2ZVector(n, leadexpv);
+        pIter(g);
+        while (g != NULL)
+        {
+          pGetExpV(g,tailexpv);
+          tailexpw = intStar2ZVector(n, tailexpv);
+          inequalities.appendRow(leadexpw-tailexpw);
+          pIter(g);
+        }
+      }
+      gfan::ZCone* gCone = new gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
+      omFreeSize(leadexpv,(n+1)*sizeof(int));
+      omFreeSize(tailexpv,(n+1)*sizeof(int));
+
+      res->rtyp = coneID;
+      res->data = (void*) gCone;
+      return FALSE;
+    }
+  }
+  WerrorS("maximalGroebnerCone: unexpected parameters");
+  return TRUE;
+}
+
+
+poly initial(poly p)
+{
+  poly g = p;
+  poly h = p_Head(g,currRing);
+  poly f = h;
+  long d = p_Deg(g,currRing);
+  pIter(g);
+  while ((g != NULL) && (p_Deg(g,currRing) == d))
+  {
+    pNext(h) = p_Head(g,currRing);
+    pIter(h);
+    pIter(g);
+  }
+  return(f);
+}
+
+
+BOOLEAN initial(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      poly p = (poly) u->Data();
+      res->rtyp = POLY_CMD;
+      res->data = (void*) initial(p);
+      return FALSE;
+    }
+  }
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      ideal I = (ideal) u->Data();
+      ideal inI = idInit(IDELEMS(I));
+      poly g; poly h; long d;
+      for (int i=0; i<IDELEMS(I); i++)
+      {
+        g = (poly) I->m[i];
+        inI->m[i]=initial(g);
+      }
+      res->rtyp = IDEAL_CMD;
+      res->data = (void*) inI;
+      return FALSE;
+    }
+  }
+  WerrorS("initial: unexpected parameters");
+  return TRUE;
+}
+
+
+BOOLEAN homogeneitySpace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      int n = currRing->N;
+      ideal I = (ideal) u->Data();
+      poly g;
+      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+      gfan::ZVector leadexpw = gfan::ZVector(n);
+      gfan::ZVector tailexpw = gfan::ZVector(n);
+      gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+      for (int i=0; i<IDELEMS(I); i++)
+      {
+        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
+        leadexpw = intStar2ZVector(n, leadexpv);
+        pIter(g);
+        while (g != NULL)
+        {
+          pGetExpV(g,tailexpv);
+          tailexpw = intStar2ZVector(n, tailexpv);
+          equations.appendRow(leadexpw-tailexpw);
+          pIter(g);
+        }
+      }
+      gfan::ZCone* gCone = new gfan::ZCone(gfan::ZMatrix(0, equations.getWidth()),equations);
+      omFreeSize(leadexpv,(n+1)*sizeof(int));
+      omFreeSize(tailexpv,(n+1)*sizeof(int));
+
+      res->rtyp = coneID;
+      res->data = (void*) gCone;
+      return FALSE;
+    }
+  }
+  WerrorS("homogeneitySpace: unexpected parameters");
+  return TRUE;
+}
+
+
+BOOLEAN groebnerCone(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      int n = currRing->N;
+      ideal I = (ideal) u->Data();
+      poly g = NULL;
+      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+      gfan::ZVector leadexpw = gfan::ZVector(n);
+      gfan::ZVector tailexpw = gfan::ZVector(n);
+      gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+      gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+      long d;
+      for (int i=0; i<IDELEMS(I); i++)
+      {
+        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
+        leadexpw = intStar2ZVector(n, leadexpv);
+        pIter(g);
+        d = p_Deg(g,currRing);
+        while ((g != NULL) && (p_Deg(g,currRing) == d))
+        {
+          pGetExpV(g,tailexpv);
+          tailexpw = intStar2ZVector(n, tailexpv);
+          equations.appendRow(leadexpw-tailexpw);
+          pIter(g);
+        }
+
+        if (g != NULL)
+        {
+          while (g != NULL)
+          {
+            pGetExpV(g,tailexpv);
+            tailexpw = intStar2ZVector(n, tailexpv);
+            inequalities.appendRow(leadexpw-tailexpw);
+            pIter(g);
+          }
+        }
+      }
+      gfan::ZCone* gCone = new gfan::ZCone(inequalities,equations);
+      omFreeSize(leadexpv,(n+1)*sizeof(int));
+      omFreeSize(tailexpv,(n+1)*sizeof(int));
+
+      res->rtyp = coneID;
+      res->data = (void*) gCone;
+      return FALSE;
+    }
+  }
+  WerrorS("groebnerCone: unexpected parameters");
+  return TRUE;
+}
+
+/***
+ * Given a cone and a point in its boundary,
+ * returns the inner normal vector of a facet
+ * containing the point.
+ * In case no facet contains the point,
+ * then 0 is returned.
+ **/
+gfan::ZVector* facetContaining(gfan::ZCone* zc, gfan::ZVector* zv)
+{
+  gfan::ZMatrix facets = zc->getFacets();
+  for (int i=0; i<facets.getHeight(); i++)
+  {
+    gfan::ZVector facet = facets[i];
+    if (dot(facet,*zv) == (long) 0)
+      return new gfan::ZVector(facet);
+  }
+  return new gfan::ZVector(zc->ambientDimension());
+}
+
+
+BOOLEAN facetContaining(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+
+      bigintmat* point1;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* point0 = (intvec*) v->Data();
+        point1 = iv2bim(point0,coeffs_BIGINT)->transpose();
+      }
+      else
+        point1 = (bigintmat*) v->Data();
+
+      gfan::ZVector* point = bigintmatToZVector(*point1);
+      gfan::ZVector* facet = facetContaining(zc, point);
+
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(*facet);
+
+      delete facet;
+      delete point;
+      if (v->Typ() == INTVEC_CMD)
+        delete point1;
+      return FALSE;
+    }
+  }
+  WerrorS("facetContaining: unexpected parameters");
+  return TRUE;
+}
+
+
 void bbcone_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1611,5 +1876,10 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","span",FALSE,impliedEquations);
   p->iiAddCproc("","uniquePoint",FALSE,uniquePoint);
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
+  p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
+  p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
+  p->iiAddCproc("","initial",FALSE,initial);
+  p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
+  p->iiAddCproc("","facetContaining",FALSE,facetContaining);
   coneID=setBlackboxStuff(b,"cone");
 }
