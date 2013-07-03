@@ -1116,13 +1116,8 @@ void nlNormalize (number &x)
       x->s=1;
       if (mpz_cmp_si(gcd,(long)1)!=0)
       {
-        mpz_t r;
-        mpz_init(r);
-        MPZ_EXACTDIV(r,x->z,gcd);
-        mpz_set(x->z,r);
-        MPZ_EXACTDIV(r,x->n,gcd);
-        mpz_set(x->n,r);
-        mpz_clear(r);
+        MPZ_EXACTDIV(x->z,x->z,gcd);
+        MPZ_EXACTDIV(x->n,x->n,gcd);
         if (mpz_cmp_si(x->n,(long)1)==0)
         {
           mpz_clear(x->n);
