@@ -293,11 +293,10 @@ namespace gfan
   }
   int ZFan::getLinealityDimension()const
   {
-    ensureComplex();
-    // if(complex)
+    if(complex)
       return complex->getLinDim();
-    // if(coneCollection)
-    //   return coneCollection->dimensionOfLinealitySpace();
+    if(coneCollection)
+      return coneCollection->dimensionOfLinealitySpace();
     assert(0);
     return 0;
   }
@@ -361,6 +360,12 @@ std::string ZFan::toString(int flags)const
 //  return "NEEDTOFIXTHIS";
 
   //return theFan.toString();
+}
+
+std::string ZFan::toStringJustRaysAndMaximalCones(int flags)const
+{
+  ensureComplex();
+  return complex->toStringJustRaysAndMaximalCones(flags);
 }
 
 /*int ZFan::getAmbientDimension()const

@@ -365,6 +365,19 @@ std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool on
 }
 
 
+std::string SymmetricComplex::toStringJustRaysAndMaximalCones(int flags)const
+{
+  PolymakeFile polymakeFile;
+  polymakeFile.create("NONAME","PolyhedralFan","PolyhedralFan",flags&FPF_xml);
+  polymakeFile.writeMatrixProperty("RAYS",vertices,true);
+  polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
+
+  std::stringstream s;
+  polymakeFile.writeStream(s);
+  return s.str();
+}
+
+
 ZVector SymmetricComplex::fvector(bool boundedPart)const
 {
   int min=getMinDim();
@@ -525,7 +538,7 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
     polymakeFile.writeCardinalProperty("DIM",getMaxDim());
     polymakeFile.writeCardinalProperty("LINEALITY_DIM",linealitySpace.getHeight());
     //    polymakeFile.writeMatrixProperty("RAYS",rays,true,comments);
-        polymakeFile.writeMatrixProperty("RAYS",vertices,true);
+    polymakeFile.writeMatrixProperty("RAYS",vertices,true);
     polymakeFile.writeCardinalProperty("N_RAYS",vertices.getHeight());
 
 

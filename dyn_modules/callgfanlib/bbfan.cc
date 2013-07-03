@@ -44,7 +44,7 @@ char* bbfan_String(blackbox *b, void *d)
   else
   {
     gfan::ZFan* zf = (gfan::ZFan*)d;
-    std::string s = zf->toString();
+    std::string s = zf->toStringJustRaysAndMaximalCones();
     return omStrDup(s.c_str());
   }
 }
@@ -717,7 +717,7 @@ BOOLEAN fVector(leftv res, leftv args)
   return TRUE;
 }
 
-gfan::ZMatrix rays(gfan::ZFan* zf)
+gfan::ZMatrix rays(const gfan::ZFan* const zf)
 {
   gfan::ZMatrix rays(0,zf->getAmbientDimension());
   for (int i=0; i<zf->numberOfConesOfDimension(1,0,0); i++)
