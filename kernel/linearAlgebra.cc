@@ -106,11 +106,7 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat,
   int rr = aMat->rows();
   int cc = aMat->cols();
   pMat = mpNew(rr, rr);
-  uMat = mpNew(rr, cc);
-  /* copy aMat into uMat: */
-  for (int r = 1; r <= rr; r++)
-    for (int c = 1; c <= cc; c++)
-      MATELEM(uMat, r, c) = p_Copy(aMat->m[c - 1 + (r - 1) * cc], R);
+  uMat = mp_Copy(aMat,R); /* copy aMat into uMat: */
 
   /* we use an int array to store all row permutations;
      note that we only make use of the entries [1..rr] */
@@ -158,13 +154,13 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat,
          we are certain that the matrix entry at [r, r + cOffset]
          is non-zero: */
       number pivotElement = pGetCoeff(MATELEM(uMat, r, r + cOffset));
-      poly p; number n;
+      poly p;
       for (int rGauss = r + 1; rGauss <= rr; rGauss++)
       {
         p = MATELEM(uMat, rGauss, r + cOffset);
         if (p != NULL)
         {
-          n = n_Div(pGetCoeff(p), pivotElement, R->cf);
+          number n = n_Div(pGetCoeff(p), pivotElement, R->cf);
           n_Normalize(n,R->cf);
 
           /* filling lMat;
