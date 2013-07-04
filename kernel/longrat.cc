@@ -798,39 +798,45 @@ number nlIntMod (number a, number b)
 */
 number nlDiv (number a, number b)
 {
-  number u;
   if (nlIsZero(b))
   {
     WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
-  u=ALLOC_RNUMBER();
-  u->s=0;
-#if defined(LDEBUG)
-  u->debug=123456;
-#endif
+  number u;
 // ---------- short / short ------------------------------------
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     long i=SR_TO_INT(a);
     long j=SR_TO_INT(b);
-    if (j==1L) return a;
+    if (j==1L)
+    {
+      return a;
+    }
     if ((i==-POW_2_28) && (j== -1L))
     {
-      FREE_RNUMBER(u);
       return nlRInit(POW_2_28);
     }
     long r=i%j;
     if (r==0)
     {
-      FREE_RNUMBER(u);
       return INT_TO_SR(i/j);
     }
+    u=ALLOC_RNUMBER();
+    u->s=0;
+    #if defined(LDEBUG)
+    u->debug=123456;
+    #endif
     mpz_init_set_si(u->z,i);
     mpz_init_set_si(u->n,j);
   }
   else
   {
+    u=ALLOC_RNUMBER();
+    u->s=0;
+    #if defined(LDEBUG)
+    u->debug=123456;
+    #endif
     mpz_init(u->z);
 // ---------- short / long ------------------------------------
     if (SR_HDL(a) & SR_INT)
