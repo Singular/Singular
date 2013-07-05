@@ -8,9 +8,8 @@ namespace ShiftDVec
 
   namespace Reduce
   {
-    int red_get_opt_len( uint* shift,
-                         kStrategy strat, int i,int li,
-                         unsigned long not_sev, LObject* h );
+    int red_get_opt_len( uint* shift, kStrategy strat,
+                         int i,int li, LObject* h      );
     void debug_red_with_print( TObject* red, TObject* with );
     void debug_red_to_print( LObject* to );
     void red_reduce_with( LObject* red, TObject* with,

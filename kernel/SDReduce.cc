@@ -20,7 +20,6 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
   assume(h->FDeg == h->pFDeg());
 
   int i,j, pass, ii;
-  unsigned long not_sev;
   long reddeg,d;
 
   pass = j = 0;
@@ -28,7 +27,6 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
   h->SetShortExpVector();
   h->GetLmTailRing();
   int li;
-  not_sev = ~ h->sev;
   loop
   {
     uint shift = 0;
@@ -44,13 +42,12 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
     //pi with length li
 
     if( TEST_OPT_LENGTH )
-      ii = RD::red_get_opt_len( &shift,strat, i,li,not_sev, h );
+      ii = RD::red_get_opt_len( &shift,strat, i,li, h );
 
     // end of search: have to reduce with pi
     RD::red_reduce_with( h, strat->T+ii, shift, strat );
 
     if( !RD::after_red( h ) ) return 0;
-    not_sev = ~ h->sev;
 
     int ret;
     if( (ret = RD::red_with_S(h, strat, &pass)) ) return ret;
@@ -59,9 +56,9 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
 
 /*- search the shortest possible with respect to length -*/
 int ShiftDVec::Reduce::red_get_opt_len
-  ( uint* shift, SD::kStrategy strat,
-    int i, int li, unsigned long not_sev, LObject* h )
+  (uint* shift, SD::kStrategy strat, int i, int li, LObject* h)
 {
+  unsigned long not_sev = ~ h->sev;
   int ii;
   poly h_p;
   ring r;
