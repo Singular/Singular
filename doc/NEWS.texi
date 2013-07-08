@@ -38,6 +38,11 @@ Besides theses internal changes, @sc{Singular} version 4 offers many new
 features and functionalities (which were partly already incorporated in
 the 3-1-6 pre-release series).
 
+@heading New commands
+@itemize
+@item @nref{sba}: an F5 like Groebner base computation
+@end itemize
+
 @heading Porting
 
 @itemize @bullet
