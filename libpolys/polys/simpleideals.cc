@@ -1615,11 +1615,11 @@ BOOLEAN id_IsZeroDim(ideal I, const ring r)
   return res;
 }
 
-void id_Normalize(ideal I,const ring r)
+void id_Normalize(ideal I,const ring r) /* for ideal/matrix */
 {
   if (rField_has_simple_inverse(r)) return; /* Z/p, GF(p,n), R, long R/C */
   int i;
-  for(i=IDELEMS(I)-1;i>=0;i--)
+  for(i=I->nrows*I->ncols-1;i>=0;i--)
   {
     p_Normalize(I->m[i],r);
   }
