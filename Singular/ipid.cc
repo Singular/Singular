@@ -6,35 +6,42 @@
 * ABSTRACT: identfier handling
 */
 
-#include <string.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
+
 #include <omalloc/omalloc.h>
-#include <Singular/tok.h>
+
 #include <misc/options.h>
-#include <Singular/ipshell.h>
 #include <misc/intvec.h>
-#include <kernel/febase.h>
+
 #include <coeffs/numbers.h>
 #include <coeffs/bigintmat.h>
+
+#include <polys/matpol.h>
+#include <polys/monomials/ring.h>
+
+#include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <kernel/polys.h>
-#include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
-#include <polys/matpol.h>
+#include <kernel/syz.h>
+
+#include <Singular/tok.h>
+#include <Singular/ipshell.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>
-#include <kernel/syz.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 
 #ifdef HAVE_DYNAMIC_LOADING
 #include <polys/mod_raw.h>
 #endif /* HAVE_DYNAMIC_LOADING */
+
+#include <string.h>
 
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
 omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));

@@ -18,7 +18,7 @@
 
 #define SI_BUILTIN_LIBSTR(name) (char*) #name ".so",
 
-char* si_builtin_libs[]={ SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR)  NULL };
+const char * const si_builtin_libs[] = { SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR) NULL };
 
 #undef SI_BUILTIN_LIBSTR
 
