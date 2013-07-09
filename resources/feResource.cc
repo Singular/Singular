@@ -150,9 +150,9 @@ char* feResource(const char id, int warn)
   return feResource(feGetResourceConfig(id), warn);
 }
 
-char* feGetResource(const char id)
+char* feGetResource(const char id, int warn)
 {
-  return feResource(feGetResourceConfig(id), -1);
+  return feResource(feGetResourceConfig(id), warn);
 }
 
 char* feResourceDefault(const char id)
@@ -180,7 +180,7 @@ void feInitResources(const char* argv0)
   else
     feArgv0 = strdup(argv0);
 #ifdef RESOURCE_DEBUG
-  printf("feInitResources: entering with argv0=%s=\n", feArgv0);
+  printf("feInitResources(argv0: '%s'): entering...\n", feArgv0);
 #endif
   // init some Resources
   feResource('b');
@@ -191,7 +191,7 @@ void feInitResources(const char* argv0)
 #if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
   char* path = feResource('p');
 #ifdef RESOURCE_DEBUG
-  printf("feInitResources: setting path with argv0=%s=\n", path);
+  printf("feInitResources(argv0): setting path with '%s'\n", path);
 #endif
 #ifdef HAVE_PUTENV
   if (path != NULL) { char *s=(char *)malloc(strlen(path)+6);
@@ -218,7 +218,7 @@ void feReInitResources()
     i++;
   }
 #ifdef RESOURCE_DEBUG
-  printf("feInitResources: entering with argv0=%s=\n", feArgv0);
+  printf("feInitResources(): entering...\n");
 #endif
   // init some Resources
   feResource('b');
@@ -274,7 +274,7 @@ static char* feInitResource(feResourceConfig config, int warn)
 {
   /*assume(config != NULL);*/
 #ifdef RESOURCE_DEBUG
-  printf("feInitResource: entering for %s\n", config->key);
+  printf("feInitResource(config->key: '%s', warn: '%d') : entering ...\n", config->key, warn);
 #endif
 
   char value[MAXRESOURCELEN];
@@ -286,7 +286,7 @@ static char* feInitResource(feResourceConfig config, int warn)
     if (evalue != NULL)
     {
 #ifdef RESOURCE_DEBUG
-      printf("feInitResource: Found value from env:%s\n", evalue);
+      printf("feInitResource(config,warn): Found value from env:%s\n", evalue);
 #endif
       strcpy(value, evalue);
       if (config->type == feResBinary  // do not verify binaries
@@ -295,7 +295,7 @@ static char* feInitResource(feResourceConfig config, int warn)
                                 feCleanResourceValue(config->type, value)))
       {
 #ifdef RESOURCE_DEBUG
-        printf("feInitResource: Set value of %s to =%s=\n", config->key, value);
+        printf("feInitResource(config,warn): Set value of config (with key: '%s') to '%s'\n", config->key, value);
 #endif
         config->value = strdup(value);
         return config->value;
@@ -325,7 +325,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   {
     char* executable = feResource('S');
 #ifdef RESOURCE_DEBUG
-      printf("feInitResource: Get %s from %s\n", config->key, executable);
+      printf("feInitResource(config,warn): Get '%s' from \"%s\"\n", config->key, executable);
 #endif
     if (executable != NULL)
     {
@@ -345,7 +345,8 @@ static char* feInitResource(feResourceConfig config, int warn)
   }
   else if (config->fmt == NULL)
   {
-    printf("Bug >>Wrong Resource Specification of %s<< at %s:%d\n",config->key,__FILE__,__LINE__);
+    printf("Bug >>Wrong Resource Specification of '%s'<< at \"%s:%d\"\n",config->key,__FILE__,__LINE__);
+    // TODO: printf -> WarnS???
     return NULL;
   }
 
@@ -354,7 +355,7 @@ static char* feInitResource(feResourceConfig config, int warn)
                             feCleanResourceValue(config->type, value)))
   {
 #ifdef RESOURCE_DEBUG
-    printf("feInitResource: Set value of %s to =%s=\n", config->key, value);
+    printf("feInitResource(config,warn): Set value of '%s' to \"%s\"\n", config->key, value);
 #endif
     config->value = strdup(value);
     return config->value;
@@ -370,7 +371,7 @@ static char* feInitResource(feResourceConfig config, int warn)
       {
         config->value = strdup(value);
 #ifdef RESOURCE_DEBUG
-        printf("feInitResource: Set value of %s to =%s=\n", config->key, config->value);
+        printf("feInitResource(config,warn): Set value of '%s' to \"%s\"\n", config->key, config->value);
 #endif
         return config->value;
       }
@@ -381,14 +382,14 @@ static char* feInitResource(feResourceConfig config, int warn)
   // this value is gotten for the first time
   if (warn > 0 || (warn < 0 && config->value != NULL))
   {
-    printf("// ** Could not get %s.\n", config->key);
-    printf("// ** Either set environment variable %s to %s,\n",
+    printf("// ** Could not get '%s'.\n", config->key);
+    printf("// ** Either set environment variable '%s' to '%s',\n",
          config->env, config->key);
     feSprintf(value, config->fmt, warn);
-    printf("// ** or make sure that %s is at %s\n", config->key, value);
+    printf("// ** or make sure that '%s' is at \"%s\"\n", config->key, value);
   }
 #ifdef RESOURCE_DEBUG
-      printf("feInitResource: Set value of %s to NULL", config->key);
+  printf("feInitResource(config,warn): Set value of '%s' to NULL", config->key);
 #endif
   config->value = NULL;
   return NULL;
@@ -416,16 +417,16 @@ static char* feGetExpandedExecutable()
   }
 #endif
 #ifdef RESOURCE_DEBUG
-  printf("feGetExpandedExecutable: calling find_exec with =%s=\n", feArgv0);
+  printf("feGetExpandedExecutable: calling find_exec with \"%s\"\n", feArgv0);
 #endif
   char executable[MAXRESOURCELEN];
   char* value = omFindExec(feArgv0, executable);
 #ifdef RESOURCE_DEBUG
-  printf("feGetExpandedExecutable: find_exec exited with =%s=%d\n", executable, access(executable, X_OK));
+  printf("feGetExpandedExecutable: find_exec exited with \"%s\": %d\n", executable, access(executable, X_OK));
 #endif
   if (value == NULL)
   {
-    printf("Bug >>Could not get expanded executable from %s<< at %s:%d\n",feArgv0,__FILE__,__LINE__);
+    printf("Bug >>Could not get expanded executable from \"%s\"<< at %s:%d\n",feArgv0,__FILE__,__LINE__);
     return NULL;
   }
   return strdup(value);
@@ -435,8 +436,8 @@ static char* feGetExpandedExecutable()
 static int feVerifyResourceValue(feResourceType type, char* value)
 {
 #ifdef RESOURCE_DEBUG
-  printf("feVerifyResourceValue: entering with =%s=\n", value);
-  printf("%d:%d\n", access(value, R_OK), access(value, X_OK));
+  printf("feVerifyResourceValue(type: %d, value: \"%s\"): entering\n", (int)type, value);
+  printf("Access: ROK: %d, XOK: %d\n", access(value, R_OK), access(value, X_OK));
 #endif
   switch(type)
   {
@@ -589,17 +590,17 @@ static char* feCleanUpPath(char* path)
   for (i=0; i<n_comps; i++)
     path_comps[i] = feCleanUpFile(path_comps[i]);
 #ifdef RESOURCE_DEBUG
-  PrintS("feCleanUpPath: after CleanUpName: ");
+  printf("feCleanUpPath: after CleanUpName: ");
   for (i=0; i<n_comps; i++)
-    Print("%s:", path_comps[i]);
-  Print("\n");
+    printf("%s:", path_comps[i]);
+  printf("\n");
 #endif
 
   for (i=0; i<n_comps;)
   {
 #ifdef RESOURCE_DEBUG
     if (access(path_comps[i], X_OK | R_OK))
-      Print("feCleanUpPath: remove %d:%s -- can not access\n", i, path_comps[i]);
+      printf("feCleanUpPath: remove %d:%s -- can not access\n", i, path_comps[i]);
 #endif
     if ( ! access(path_comps[i], X_OK | R_OK))
     {
@@ -610,7 +611,7 @@ static char* feCleanUpPath(char* path)
         {
           // found a duplicate
 #ifdef RESOURCE_DEBUG
-          Print("feCleanUpPath: remove %d:%s -- equal to %d:%s\n", j, path_comps[j], i, path_comps[i]);
+          printf("feCleanUpPath: remove %d:%s -- equal to %d:%s\n", j, path_comps[j], i, path_comps[i]);
 #endif
           j = i+1;
           break;
@@ -648,7 +649,7 @@ static char* feCleanUpPath(char* path)
   }
   free(path_comps);
 #ifdef RESOURCE_DEBUG
-  Print("feCleanUpPath: leaving with path=%s=\n", opath);
+  printf("feCleanUpPath: leaving with path=%s=\n", opath);
 #endif
   return opath;
 }

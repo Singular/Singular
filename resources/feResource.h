@@ -39,7 +39,7 @@ extern feResourceConfig_s feResourceConfigs[];
 char* feResource(const char id, int warn = -1);
 char* feResource(const char* key, int warn = -1);
 
-char* feGetResource(const char id);
+char* feGetResource(const char id, int warn = -1);
 
 // char* feResourceDefault(const char id);
 // char* feResourceDefault(const char* key);
