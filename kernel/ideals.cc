@@ -4150,11 +4150,11 @@ BOOLEAN idIsZeroDim(ideal I)
   return res;
 }
 
-void idNormalize(ideal I)
+void idNormalize(ideal I) /* for ideal/matrix */
 {
   if (rField_has_simple_inverse()) return; /* Z/p, GF(p,n), R, long R/C */
   int i;
-  for(i=IDELEMS(I)-1;i>=0;i--)
+  for(i=I->nrows*I->ncols-1;i>=0;i--)
   {
     pNormalize(I->m[i]);
   }
