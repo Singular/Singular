@@ -16,6 +16,8 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#ifdef HAVE_PYTHON
+
 #include <kernel/mod2.h>
 
 //#include <misc/auxiliary.h>
@@ -28,8 +30,6 @@
 #include <kernel/febase.h>
 #include <misc/intvec.h>
 
-#include <polys/mod_raw.h>
-
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <Singular/lists.h>
@@ -37,13 +37,14 @@
 #include <Singular/ipshell.h>
 #include <Singular/newstruct.h>
 
-
 #include "subexpr.h"
 #include "lists.h"
 #include "ipid.h"
 #include "blackbox.h"
 #include "ipshell.h"
 #include "newstruct.h"
+
+#include <Singular/mod_lib.h>
 
 #include <Python.h>
 
@@ -757,3 +758,5 @@ extern "C" {
   }
 }
 #endif
+
+#endif /* HAVE_PYTHON */
