@@ -16,7 +16,52 @@ ACLOCAL_AMFLAGS = -I ../m4
 # NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 # 
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) ${EMBED_PYOBJECT_CFLAGS} -DHAVE_CONFIG_H 
+
+if ENABLE_FACTORY
+  USE_FACTORY = -L${top_builddir}/factory
+else
+  USE_FACTORY =
+endif
+
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H
+AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
+
+########################### Dynamic Modules... #########################
+if ENABLE_P_PROCS_DYNAMIC
+  moduledir = $(libexecdir)/singular/MOD
+else !ENABLE_P_PROCS_DYNAMIC
+  moduledir = $(libdir)/singular
+endif !ENABLE_P_PROCS_DYNAMIC
+
+if PYTHON_USE
+  PY=pyobject.la
+else !PYTHON_USE
+  PY=
+endif !PYTHON_USE
+
+if SI_EMBED_PYTHON
+  EMBED_PYOBJECT = ${PY} ${top_builddir}/dyn_modules/syzextra/syzextra.la 
+else !SI_EMBED_PYTHON
+  EMBED_PYOBJECT = 
+endif !SI_EMBED_PYTHON
+
+##########################################################################
+module_LTLIBRARIES = pyobject.la
+
+pyobject_la_SOURCES = pyobject.cc
+
+# pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
+# pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
+
+pyobject_la_CXXFLAGS = @PYTHON_CSPEC@
+pyobject_la_CFLAGS   = @PYTHON_CSPEC@ 
+
+# ${NODEBUGCXXFLAGS} 
+# pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
+
+pyobject_la_LDFLAGS = ${AMLDFLAGS} @PYTHON_LSPEC@ -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
+
 
 ########################### libSingular* #########################
 
@@ -100,8 +145,8 @@ SOURCES =    Minor.cc\
 
 #   links/slInit_Dynamic.cc
 
-libSingular_la_SOURCES   = $(SOURCES) feOpt.inc
-# libSingular_g_la_SOURCES = $(SOURCES) feOpt.inc
+libSingular_la_SOURCES   = $(SOURCES)
+# libSingular_g_la_SOURCES = $(SOURCES)
 
 SingularHEADERS =    Cache.h \
    CacheImplementation.h \
@@ -163,19 +208,23 @@ SingularHEADERS =    Cache.h \
 # -DMAKE_DISTRIBUTION 
 
 # plural_cmd.inc
-nodist_libSingular_la_SOURCES = iparith.inc
+nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc ${EMBED_PYOBJECT}
 # nodist_libSingular_g_la_SOURCES = iparith.inc
 
-libSingular_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libSingular_la_LDFLAGS    =  -release ${PACKAGE_VERSION} ${AMLDFLAGS} ${EMBED_PYOBJECT} \
+-lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
+$(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+
+libSingular_la_LIBADD      = ${EMBED_PYOBJECT} \
+-lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
+$(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+
+# ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la ${top_builddir}/libpolys/polys/libpolys.la 
+
+
 
 libSingular_includedir = ${includedir}/singular/Singular/
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
-
-if ENABLE_FACTORY
-  USE_FACTORY = -L${top_builddir}/factory
-else
-  USE_FACTORY =
-endif
 
 #########################################################
 # handle all the generated *.inc
@@ -219,8 +268,6 @@ bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
 Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
-AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
-
 # Singular_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
 # Singularg_CFLAGS = -g ${PIPE}
 # 
@@ -233,7 +280,8 @@ nodist_Singular_SOURCES = libSingular.la
 Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 # Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la ${top_builddir}/libpolys/polys/libpolys.la -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+Singular_LDADD = libSingular.la
+
 # Singularg_LDADD = libSingular_g.la ${top_builddir}/numeric/libnumeric_g.la ${top_builddir}/kernel/libkernel_g.la ${top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 # Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
@@ -256,7 +304,9 @@ nodist_Singulard_SOURCES = libSingular.la
 # Singulardg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 # nodist_Singulardg_SOURCES =  libSingular_g.la
 
-Singulard_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+#  ${EMBED_PYOBJECT_LDFLAGS}  ${EMBED_PYOBJECT_LDFLAGS}
+Singulard_LDADD = libSingular.la
+
 # Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 # Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
@@ -350,9 +400,21 @@ check_PROGRAMS=$(TESTS)
 
 test_s_r_SOURCES = test.cc
 #test_s_g_SOURCES = test.cc
+# ${EMBED_PYOBJECT_LDFLAGS}
+test_s_r_LDADD = libSingular.la 
 
-test_s_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
-#test_s_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+#-lnumeric -lkernel -lpolys -lcoeffs \
+#-lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) \
+#$(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
+#${EMBED_PYOBJECT}
+
+#test_s_g_LDADD = libSingular_g.la 
+#-lnumeric_g -lkernel_g -lpolys_g \
+#-lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g \
+#-lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) \
+#${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} \
+#${EMBED_PYOBJECT}
+
 
 # test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 #test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
@@ -372,15 +434,16 @@ test_s_r_LDFLAGS = -static ${AMLDFLAGS}
 
 test_d_r_SOURCES = test.cc
 # test_d_g_SOURCES = test.cc
-
-test_d_r_LDADD = libSingular.la -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
+#  ${EMBED_PYOBJECT_LDFLAGS}
+test_d_r_LDADD = libSingular.la 
+# -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 # test_d_g_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 #test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 # test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-test_d_r_LDFLAGS = ${AMLDFLAGS}
+#test_d_r_LDFLAGS = ${AMLDFLAGS}
 # test_d_g_LDFLAGS = ${AMLDFLAGS}
 
 #########################################################
@@ -423,23 +486,3 @@ ${abs_builddir}/LIB: ${srcdir}/LIB
 MOD: ${top_builddir}/libpolys/polys/.libs
 	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
 
-moduledir = $(libexecdir)/singular/MOD
-
-module_LTLIBRARIES =
-
-if ENABLE_P_PROCS_DYNAMIC
-if PYTHON_MODULE
-module_LTLIBRARIES += pyobject.la
-endif
-endif
-
-pyobject_la_SOURCES = pyobject.cc
-# pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
-# pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
-
-pyobject_la_CXXFLAGS   = @PYTHON_CSPEC@ 
-# ${NODEBUGCXXFLAGS} 
-# pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
-
-pyobject_la_LDFLAGS = -export-dynamic -shared -module -avoid-version ${AMLDFLAGS} @PYTHON_LSPEC@
-###  -export-dynamic -shared -module -avoid-version (add to all DMs?)

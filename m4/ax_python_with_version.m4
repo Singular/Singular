@@ -111,8 +111,8 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
         if  test x"$si_embed_python" = x"yes"
         then 
           AC_DEFINE(EMBED_PYTHON,1,integrate python)
-          AC_SUBST(EMBED_PYOBJECT_CFLAGS,"\${PYTHON_CSPEC}")
-          AC_SUBST(EMBED_PYOBJECT_LDFLAGS,"\${PYTHON_LSPEC}")
+#          AC_SUBST(EMBED_PYOBJECT_CFLAGS,"\${PYTHON_CSPEC}")
+#          AC_SUBST(EMBED_PYOBJECT_LDFLAGS,"\${PYTHON_LSPEC}")
         fi
 	if test x"$ax_python_use" = x"true" 
 	then 

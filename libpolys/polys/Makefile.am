@@ -101,8 +101,7 @@ p_Procs_FieldZp_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
 # p_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 # p_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-P_PROCS_MODULE_LDFLAGS = -shared -module
-P_PROCS_MODULE_LDFLAGSG = -shared -module
+P_PROCS_MODULE_LDFLAGS = -shared -module -dynamic -export-dynamic -avoid-version -weak_reference_mismatches weak -undefined dynamic_lookup -Wl,-undefined -Wl,dynamic_lookup -flat_namespace
 
 p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}

@@ -102,8 +102,8 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AX_APPEND_LINK_FLAGS(${DBGFLAGS})
  fi
  
- if test "x${ENABLE_OPTIMIZATION}" != xno; then
-  OPTFLAGS="-DOM_NDEBUG -DNDEBUG -O2 -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv"
+ if test "x${ENABLE_OPTIMIZATION}" != xno; then 
+  OPTFLAGS="-DOM_NDEBUG -DNDEBUG -O2 -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fpermissive -fvisibility=default"
   #  -O3 - crashes gcc???!!!  
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${OPTFLAGS}, [CFLAGS])
@@ -116,7 +116,8 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AX_APPEND_LINK_FLAGS(${OPTFLAGS}) 
   AX_APPEND_LINK_FLAGS([-fno-exceptions -fno-rtti -fpermissive])
 #  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
-#  AX_APPEND_LINK_FLAGS([-rdynamic]) 
+  AX_APPEND_LINK_FLAGS([-rdynamic]) 
+  AX_APPEND_LINK_FLAGS([-flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup  -fpermissive -fvisibility=default]) 
  fi
 
 

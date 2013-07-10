@@ -1,15 +1,19 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-moduledir = $(libexecdir)/singular/MOD
-
 if ENABLE_P_PROCS_DYNAMIC
+  moduledir = $(libexecdir)/singular/MOD
+else
+  moduledir = $(libdir)/singular
+endif
+
+
 module_LTLIBRARIES=syzextra.la 
 
+#if ENABLE_P_PROCS_DYNAMIC
 # if WANT_DEBUG
 # module_LTLIBRARIES+=syzextra_g.la
 # endif
-  
-endif
+#endif
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/factory
@@ -52,16 +56,14 @@ syzextra_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 # ${NODEBUGDEFS}
 # syzextra_g_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 
-#syzextra_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
+syzextra_la_CXXFLAGS   = 
+# ${NODEBUGCXXFLAGS}
 #syzextra_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-P_PROCS_MODULE_LDFLAGS = -shared -module ${AMLDFLAGS}
-# P_PROCS_MODULE_LDFLAGSG = -shared -module ${AMLDFLAGS}
-
-# Add under Mac OS X: -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+# Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 
 syzextra_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
-# syzextra_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
 
 AM_COLOR_TESTS=always
 
