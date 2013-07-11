@@ -55,7 +55,7 @@ gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la -lcddgmp
 # gfanlib_g_la_LIBADD = ${gfanlib_la_LIBADD}
 
 if ENABLE_P_PROCS_DYNAMIC
-  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -shared -module -dynamic -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 else
   P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS}
 endif

@@ -59,7 +59,7 @@ bigintm_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 # bigintm_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
 if ENABLE_P_PROCS_DYNAMIC
-  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -shared -module -dynamic -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 else
   P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS}
 endif

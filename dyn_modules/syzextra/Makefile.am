@@ -60,7 +60,7 @@ syzextra_la_CXXFLAGS   =
 # ${NODEBUGCXXFLAGS}
 #syzextra_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 
 syzextra_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
