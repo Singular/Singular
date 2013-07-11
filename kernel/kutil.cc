@@ -40,7 +40,6 @@
 #ifdef HAVE_RINGS
 #include <kernel/ideals.h>
 #include <libpolys/coeffs/coeffs.h>
-#include <libpolys/coeffs/rmodulon.h>
 #endif
 
 // define if enterL, enterT should use memmove instead of doing it manually
